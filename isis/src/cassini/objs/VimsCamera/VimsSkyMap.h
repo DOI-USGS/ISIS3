@@ -1,3 +1,5 @@
+#ifndef VimsSkyMap_h
+#define VimsSkyMap_h
 /**
  * @file
  * $Revision: 1.2 $
@@ -21,74 +23,76 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#ifndef VimsSkyMap_h
-#define VimsSkyMap_h
-
 #include "CameraSkyMap.h"
 
 
 namespace Isis {
-  namespace Cassini {
-    /** Convert between undistorted focal plane and ground coordinates
-     *
-     * This base class is used to convert between undistorted focal plane
-     * coordinates (x/y) in millimeters and ground coordinates lat/lon.
-     * This class handles the case of framing cameras.
-     *
-     * @ingroup Camera
-     *
-     * @see Camera
-     *
-     * @internal
-     *
-     * @history 2006-04-05 Tracie Sucharski
-     * Original version
-     * @history 2009-04-06 Steven Lambright Fixed problem that caused double
-     *          deletion of sky map / ground map.
-     *
-     */
-    class VimsSkyMap : public CameraSkyMap {
-      public:
-        VimsSkyMap(Camera *parent, Pvl &lab);
+  /** 
+   *  Convert between undistorted focal plane and ground coordinates
+   *
+   * This base class is used to convert between undistorted focal plane
+   * coordinates (x/y) in millimeters and ground coordinates lat/lon.
+   * This class handles the case of framing cameras.
+   *
+   * @ingroup SpiceInstrumentsAndCameras
+   * @ingroup Cassini-Huygens
+   *
+   * @see Camera
+   * @see VimsCamera
+   *
+   * @internal
+   *
+   *   @history 2006-04-05 Tracie Sucharski - Original version 
+   *   @history 2009-04-06 Steven Lambright - Fixed problem that caused double
+   *                          deletion of sky map / ground map.
+   *   @history 2011-02-09 Steven Lambright - Major changes to camera classes.
+   *   @history 2011-05-03 Jeannie Walldren - Updated documentation. Removed
+   *                          Cassini namespace wrap inside Isis namespace.
+   */
+  class VimsSkyMap : public CameraSkyMap {
+    public:
+      VimsSkyMap(Camera *parent, Pvl &lab);
 
-        //! Destructor
-        virtual ~VimsSkyMap() {};
+      //! Destroys the VimsSkyMap object.
+      virtual ~VimsSkyMap() {};
 
-        virtual bool SetFocalPlane(const double ux, const double uy,
-                                   const double uz);
+      virtual bool SetFocalPlane(const double ux, const double uy,
+                                 const double uz);
 
-        virtual bool SetSky(const double ra, const double dec);
+      virtual bool SetSky(const double ra, const double dec);
 
-        void Init(Pvl &lab);
+      void Init(Pvl &lab);
 
-      protected:
+    protected:
 
-      private:
-        SpiceDouble p_etStart;
+    private:
+      SpiceDouble p_etStart;           //!< Start ephemeris time
 
-        double p_exposureDuration;
-        double p_interlineDelay;
+      double p_exposureDuration;       //!< Exposure duration
+      double p_interlineDelay;         /**< InterlineDelayDuration keyword value from
+                                            the instrument group of the labels, divided by 1000 */
 
-        std::string p_channel;
-        double p_visExp;
-        double p_irExp;
-        int    p_nsUv;
-        int    p_nlUv;
-        int    p_swathWidth;
-        int    p_swathLength;
-        int    p_camSampOffset;
-        int    p_camLineOffset;
+      std::string p_channel;           /**< Channel keyword value from the instrument group of the labels.
+                                            Possible values are IR or VIS */
+      double p_visExp;                 //!< VIS exposure duration, divided by 1000
+      double p_irExp;                  //!< IR exposure duration, divided by 1000
+      int    p_nsUv;                   //!< Normal or high resolution sample uv
+      int    p_nlUv;                   //!< Normal or high resolution line uv
+      int    p_swathWidth;             /**< SwathWidth keyword value from the instrument group of the labels.
+                                            This will be image size unless occultation image */
+      int    p_swathLength;            /**< SwathLength keyword value from the instrument group of the labels.
+                                            This will be image size unless occultation image */
+      int    p_camSampOffset;          //!< Sample offset
+      int    p_camLineOffset;          //!< Line offset
 
-        double p_unitVector[192][192][3];
+      double p_unitVector[192][192][3];//!< Unit vector
 
-        double p_minRa;
-        double p_maxRa;
-        double p_minDec;
-        double p_maxDec;
-        double p_raMap[64][64];
-        double p_decMap[64][64];
-
-    };
+      double p_minRa;                  //!< Minimum right ascension
+      double p_maxRa;                  //!< Maximum right ascension
+      double p_minDec;                 //!< Minimum declination
+      double p_maxDec;                 //!< Maximum declination
+      double p_raMap[64][64];          //!< Right ascension map
+      double p_decMap[64][64];         //!< Declination map
   };
 };
 #endif

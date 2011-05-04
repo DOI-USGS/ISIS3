@@ -1,15 +1,38 @@
-using namespace std;
-
+/**
+ * @file
+ *
+ *   Unless noted otherwise, the portions of Isis written by the USGS are public
+ *   domain. See individual third-party library and package descriptions for 
+ *   intellectual property information,user agreements, and related information.
+ *
+ *   Although Isis has been used by the USGS, no warranty, expressed or implied,
+ *   is made by the USGS as to the accuracy and functioning of such software 
+ *   and related material nor shall the fact of distribution constitute any such 
+ *   warranty, and no responsibility is assumed by the USGS in connection 
+ *   therewith.
+ *
+ *   For additional information, launch
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see 
+ *   the Privacy &amp; Disclaimers page on the Isis website,
+ *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
+ *   http://www.usgs.gov/privacy.html.
+ */
 #include <iomanip>
 #include <iostream>
 #include <vector>
 #include <utility>
+
 #include "Camera.h"
 #include "CameraFactory.h"
+#include "Filename.h"
 #include "iException.h"
 #include "Preference.h"
+#include "Pvl.h"
 
-void TestLineSamp(Isis::Camera *cam, double samp, double line);
+using namespace std;
+using namespace Isis;
+
+void TestLineSamp(Camera *cam, double samp, double line);
 
 /**
  * @internal
@@ -17,7 +40,7 @@ void TestLineSamp(Isis::Camera *cam, double samp, double line);
  *                         ir and vis, normal and hires modes with offsets.
  */
 int main(void) {
-  Isis::Preference::Preferences(true);
+  Preference::Preferences(true);
 
   cout << "Unit Test for VimsCamera..." << endl;
   /*
@@ -87,10 +110,19 @@ int main(void) {
     corners.push_back(std::make_pair(36, 29));
 
     for(unsigned int i = 0; i < sizeof(knownLat) / sizeof(double); i++) {
-      Isis::Pvl p(files[i]);
-      Isis::Camera *cam = Isis::CameraFactory::Create(p);
+      Pvl p(files[i]);
+      Camera *cam = CameraFactory::Create(p);
+      cout << "Filename: " << Filename(p.Filename()).Name() << endl;
+      cout << "CK Frame: " << cam->InstrumentRotation()->Frame() << endl << endl;
+      cout.setf(std::ios::fixed);
       cout << setprecision(9);
-      cout << "Testing image " << files[i] << " ..." << endl;
+
+      // Test kernel IDs
+      cout << "Kernel IDs: " << endl;
+      cout << "CK Frame ID = " << cam->CkFrameId() << endl;
+      cout << "CK Reference ID = " << cam->CkReferenceId() << endl;
+      cout << "SPK Target ID = " << cam->SpkTargetId() << endl;
+      cout << "SPK Reference ID = " << cam->SpkReferenceId() << endl << endl;
 
       // Test all four corners to make sure the conversions are right
       cout << "For upper left corner ..." << endl;
@@ -110,7 +142,7 @@ int main(void) {
       cout << "For center pixel position ..." << endl;
 
       if(!cam->SetImage(samp, line)) {
-        std::cout << "ERROR" << std::endl;
+        cout << "ERROR" << endl;
         return 0;
       }
 
@@ -131,12 +163,12 @@ int main(void) {
       cout << endl;
     }
   }
-  catch(Isis::iException &e) {
+  catch(iException &e) {
     e.Report();
   }
 }
 
-void TestLineSamp(Isis::Camera *cam, double samp, double line) {
+void TestLineSamp(Camera *cam, double samp, double line) {
   bool success = cam->SetImage(samp, line);
 
   if(success) {
