@@ -1,17 +1,50 @@
+/**
+ * @file
+ *
+ *   Unless noted otherwise, the portions of Isis written by the USGS are public
+ *   domain. See individual third-party library and package descriptions for 
+ *   intellectual property information,user agreements, and related information.
+ *
+ *   Although Isis has been used by the USGS, no warranty, expressed or implied,
+ *   is made by the USGS as to the accuracy and functioning of such software 
+ *   and related material nor shall the fact of distribution constitute any such 
+ *   warranty, and no responsibility is assumed by the USGS in connection 
+ *   therewith.
+ *
+ *   For additional information, launch
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see 
+ *   the Privacy &amp; Disclaimers page on the Isis website,
+ *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
+ *   http://www.usgs.gov/privacy.html.
+ */
+
 #include "DawnFcCamera.h"
+
 #include "CameraDetectorMap.h"
-#include "CameraFocalPlaneMap.h"
 #include "CameraDistortionMap.h"
+#include "CameraFocalPlaneMap.h"
 #include "CameraGroundMap.h"
 #include "CameraSkyMap.h"
-#include "RadialDistortionMap.h"
 #include "iString.h"
 #include "iTime.h"
+#include "NaifStatus.h"
+#include "RadialDistortionMap.h"
 
 using namespace std;
-using namespace Isis;
-namespace Dawn {
+
+namespace Isis {
+  /**
+   * Constructs a Dawn Framing Camera object.
+   *
+   * @param lab Pvl label from a Dawn Framing Camera image.
+   *
+   * @author Janet Barret
+   * @internal
+   *   @history 2011-05-03 Jeannie Walldren - Added NAIF error check.  Added
+   *                          call to ShutterOpenCloseTimes() method.
+   */
   DawnFcCamera::DawnFcCamera(Pvl &lab) : FramingCamera(lab) {
+    NaifStatus::CheckErrors();
     PvlGroup bandBin = lab.FindGroup("BandBin", Pvl::Traverse);
 
     // Get the camera characteristics
@@ -27,8 +60,11 @@ namespace Dawn {
     string stime = inst["StartTime"];
     double et;
     str2et_c(stime.c_str(), &et);
+    // divide exposure duration keyword value by 1000 to convert to seconds
     double exposureDuration = (double)inst["ExposureDuration"] / 1000.0;
-    et += exposureDuration / 2.0;
+    pair<iTime, iTime> shuttertimes = ShutterOpenCloseTimes(et, exposureDuration);
+
+    iTime centerTime = shuttertimes.first.Et() + exposureDuration / 2.0;
 
     // Setup detector map
     CameraDetectorMap *detectorMap = new CameraDetectorMap(this);
@@ -48,11 +84,49 @@ namespace Dawn {
     new CameraGroundMap(this);
     new CameraSkyMap(this);
 
-    SetTime(et);
+    SetTime(centerTime);
     LoadCache();
+    NaifStatus::CheckErrors();
+  }
+
+  /**
+   * Returns the shutter open and close times.  The user should pass in the
+   * ExposureDuration keyword value, converted from milliseconds to seconds, and
+   * the StartTime keyword value, converted to ephemeris time. The StartTime
+   * keyword value from the labels represents the shutter open time of the
+   * observation. This method uses the FramingCamera class implementation,
+   * returning the given time value as the shutter open and the sum of the time
+   * value and exposure duration as the shutter close.
+   *
+   * @param exposureDuration ExposureDuration keyword value from the labels,
+   *                         converted to seconds.
+   * @param time The StartTime keyword value from the labels, converted to
+   *             ephemeris time.
+   *
+   * @return @b pair < @b iTime, @b iTime > The first value is the shutter
+   *         open time and the second is the shutter close time.
+   *
+   * @author 2011-05-03 Jeannie Walldren
+   * @internal
+   *   @history 2011-05-03 Jeannie Walldren - Original version.
+   */
+  pair<iTime, iTime> DawnFcCamera::ShutterOpenCloseTimes(double time,
+                                                         double exposureDuration) {
+    return FramingCamera::ShutterOpenCloseTimes(time, exposureDuration);
   }
 }
 
-extern "C" Camera *DawnFcCameraPlugin(Pvl &lab) {
-  return new Dawn::DawnFcCamera(lab);
+/**
+ * This is the function that is called in order to instantiate a DawnFcCamera
+ * object. 
+ *
+ * @param lab Cube labels
+ *
+ * @return Isis::Camera* DawnFcCamera
+ * @internal 
+ *   @history 2011-05-03 Jeannie Walldren - Added documentation.  Removed Dawn
+ *            namespace.
+ */
+extern "C" Isis::Camera *DawnFcCameraPlugin(Isis::Pvl &lab) {
+  return new Isis::DawnFcCamera(lab);
 }
