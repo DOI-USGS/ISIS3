@@ -4,15 +4,16 @@
 #include "Preference.h"
 
 using namespace std;
+using namespace Isis;
 
 int main() {
-  Isis::Preference::Preferences(true);
+  Preference::Preferences(true);
 
   try {
     cout << "Unit test for MocLabels" << endl;
     cout << "MocWideAngleCamera cub test..." << endl;
-    Isis::Pvl p1("$mgs/testData/ab102401.cub");
-    Isis::Mgs::MocLabels lab1(p1);
+    Pvl p1("$mgs/testData/ab102401.cub");
+    MocLabels lab1(p1);
 
     cout << "NarrowAngle?  " << lab1.NarrowAngle() << endl;
     cout << "WideAngle?  " << lab1.WideAngle() << endl;
@@ -34,8 +35,8 @@ int main() {
     cout << "Offset = " << lab1.Offset() << endl << endl;
 
     cout << "MocNarrowAngleCamera cub test..." << endl;
-    Isis::Pvl p2("$mgs/testData/fha00491.lev1.cub");
-    Isis::Mgs::MocLabels lab2(p2);
+    Pvl p2("$mgs/testData/fha00491.lev1.cub");
+    MocLabels lab2(p2);
 
     cout << "NarrowAngle?  " << lab2.NarrowAngle() << endl;
     cout << "WideAngle?  " << lab2.WideAngle() << endl;
@@ -57,7 +58,7 @@ int main() {
     cout << "Offset = " << lab2.Offset() << endl << endl;
 
   }
-  catch(Isis::iException &e) {
+  catch(iException &e) {
     e.Report();
   }
 }
