@@ -171,7 +171,9 @@
     <change name="Steven Koechle" date="2009-05-14">
       Fixed calls to AddComment.  Removed "/*" that should not have been there.
     </change>
-
+    <change name="Jeannie Walldren" date="2011-05-03">
+      Removed Mgs namespace scope.
+    </change>
   </history>
 
   <category>
