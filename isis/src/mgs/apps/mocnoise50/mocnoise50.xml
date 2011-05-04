@@ -33,6 +33,9 @@
     <change name="Jeannie Walldren" date="2008-11-05">
       Replaced reference to MocLabels::IsWideAngle() with MocLabels::WideAngle()
     </change>
+    <change name="Jeannie Walldren" date="2011-05-03">
+      Removed Mgs namespace scope.
+    </change>
   </history>
 
   <groups>
