@@ -170,6 +170,7 @@ namespace Isis {
    *                                         were replaced with references to
    *                                         SetTime()). Added missing
    *                                         documentation to new methods.
+   *   @history 2011-05-03 Jeannie Walldren - Added Isis Disclaimer to files.
    */
   class Spice {
     public:
