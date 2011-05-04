@@ -1,19 +1,28 @@
 Unit Test for MarciCamera...
+Filename: P12_005911_3396_MA_00N009W.cropped.cub
+CK Frame: -74410
+
+Kernel IDs: 
+CK Frame ID = -74000
+CK Reference ID = -74900
+SPK Target ID = -74
+SPK Reference ID = 1
+
 For upper left corner ...
-DeltaSample = 0
-DeltaLine = 0
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
 
 For upper right corner ...
-DeltaSample = 0
-DeltaLine = 0
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
 
 For lower left corner ...
-DeltaSample = 0
-DeltaLine = 0
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
 
 For lower right corner ...
-DeltaSample = 0
-DeltaLine = 0
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
 
 For center pixel position ...
 Latitude OK

@@ -1,3 +1,5 @@
+#ifndef MarciDistortionMap_h
+#define MarciDistortionMap_h
 /**
  * @file
  * $Revision: 1.2 $
@@ -20,25 +22,26 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-#ifndef MarciDistortionMap_h
-#define MarciDistortionMap_h
 
 #include <vector>
 #include "CameraDistortionMap.h"
 
 namespace Isis {
-  /** Distort/undistort focal plane coordinates
+  /** 
+   *  Distort/undistort focal plane coordinates
    *
    * Creates a map for adding/removing optical distortions
    * from the focal plane of a camera.
    *
-   * @ingroup Camera
+   * @ingroup SpiceInstrumentsAndCameras
+   * @ingroup MarsReconnaissanceOrbiter
    *
-   * @see Camera
+   * @see MarciCamera
    *
    * @author 2008-08-22 Steven Lambright
    *
    * @internal
+   *   @history 2011-05-03 Jeannie Walldren - Updated documentation.
    */
   class MarciDistortionMap : public CameraDistortionMap {
     public:
