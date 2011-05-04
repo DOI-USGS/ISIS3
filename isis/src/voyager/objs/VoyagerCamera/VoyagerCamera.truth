@@ -1,19 +1,31 @@
 Unit Test for Voyager...
+Filename: c1639118.imq.cub
+CK Frame: -31101
+
+Kernel IDs: 
+CK Frame ID = -31100
+CK Reference ID = 2
+SPK Target ID = -31
+SPK Reference ID = 1
+
+Shutter open = -657238998.219731212
+Shutter close = -657238998.219551206
+
 For upper left corner ...
-DeltaSample = 0
-DeltaLine = 0
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
 
 For upper right corner ...
-DeltaSample = 0
-DeltaLine = 0
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
 
 For lower left corner ...
-DeltaSample = 0
-DeltaLine = 0
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
 
 For lower right corner ...
-DeltaSample = 0
-DeltaLine = 0
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
 
 For center pixel position ...
 Latitude OK

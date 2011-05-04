@@ -30,13 +30,37 @@
 #include "iString.h"
 #include "iTime.h"
 #include "naif/SpiceUsr.h"
+#include "NaifStatus.h"
 #include "ReseauDistortionMap.h"
 #include "Spice.h"
 
-
 using namespace std;
+
 namespace Isis {
+  /**
+   * Constructs a Voyager Camera Model using the image labels.  The constructor
+   * determines the pixel pitch, focal length, kernels and reseaus, and sets up
+   * the focal plane map, detector origin, ground map and sky map. As required
+   * for all framing cameras, the start and end exposure times are set in this
+   * constructor.
+   *
+   * @param lab Pvl label from a Voyager image.
+   *
+   * @throw iException::User - "File does not appear to be a Voyager image.
+   *        Invalid InstrumentId."
+   * @throw iException::User - "File does not appear to be a Voyager image.
+   *        Invalid SpacecraftName."
+   *
+   * @author 2010-07-19 Mackenzie Boyd 
+   *
+   * @internal 
+   *   @history 2010-07-19 Mackenzie Boyd - Original Version 
+   *   @history 2011-05-03 Jeannie Walldren - Added NAIF error check. Updated
+   *                          documentation. Added call to
+   *                          ShutterOpenCloseTimes() method.
+   */
   VoyagerCamera::VoyagerCamera (Pvl &lab) : FramingCamera(lab) {
+    NaifStatus::CheckErrors();
 
     // Set the pixel pitch
     SetPixelPitch();
@@ -68,7 +92,8 @@ namespace Isis {
         instCode = -31102;
       }
       else {
-        string msg = "File does not appear to be a voyager image";
+        string msg = "File does not appear to be a Voyager image. InstrumentId ["
+          + instId + "] is invalid Voyager value.";
         throw iException::Message(iException::User,msg, _FILEINFO_);
       }
     }
@@ -88,12 +113,14 @@ namespace Isis {
         instCode = -32102;
       }
       else {
-        string msg = "File does not appear to be a voyager image";
+        string msg = "File does not appear to be a Voyager image. InstrumentId ["
+          + instId + "] is invalid Voyager value.";
         throw iException::Message(iException::User,msg, _FILEINFO_);
       }
     }
     else {
-      string msg = "File does not appear to be a voyager image";
+      string msg = "File does not appear to be a Voyager image. SpacecraftName ["
+          + spacecraft + "] is invalid Voyager value.";
       throw iException::Message(iException::User,msg, _FILEINFO_);
     }
 
@@ -107,7 +134,7 @@ namespace Isis {
     reseauFilename = "$voyager" + reseauFilename + "MasterReseaus.pvl";
     Filename masterReseaus(reseauFilename);
     try {
-      new ReseauDistortionMap(this, lab, masterReseaus.Expanded()); 
+      new ReseauDistortionMap(this, lab, masterReseaus.Expanded());
     } catch (iException &e) {
       e.Report();
     }
@@ -119,23 +146,72 @@ namespace Isis {
     // StartTime is the most accurate time available because in voy2isis the
     // StartTime is modified to be highly accurate.
     string startTime = inst["StartTime"];
+    // exposure duration keyword value is measured in seconds
+    double exposureDuration = inst["ExposureDuration"];
     double eTime = 0.0;
     utc2et_c(startTime.c_str(), &eTime);
 
-    double expoDur = inst["ExposureDuration"];
+    // set the start (shutter open) and end (shutter close) times for the image
+    /*****************************************************************************
+     * AS NOTED IN ISIS2 PROGRAM lev1u_vgr_routines.c:
+     * StartTime (FDS count) from the labels calculated to correspond the true spacecraft
+     * clock count for the frame.  The true spacecraft clock count is readout
+     * time of the frame, which occurred 2 seconds after shutter close. 
+     *****************************************************************************/
+    pair<iTime, iTime> shuttertimes = ShutterOpenCloseTimes(eTime, exposureDuration);
 
-    // So, StartTime was actually a time two seconds after the end of the
-    // exposure. For that reason, we will take of two seconds, and then
-    // take off half the exposure duration to get the center if the image
-    eTime -= 2.0;
-    eTime -= 0.5 * expoDur;
-
-    SetTime(eTime);
+    // add half the exposure duration to the start time to get the center if the image
+    iTime centerTime = shuttertimes.first.Et() + exposureDuration / 2.0;
+    SetTime(centerTime);
 
     LoadCache();
+    NaifStatus::CheckErrors();
   }
-}//End Isis namespace
 
+  /**
+   * Returns the shutter open and close times. The user should pass in the
+   * ExposureDuration keyword value and the StartTime keyword value, converted
+   * to ephemeris time. The StartTime keyword value from the labels represents
+   * the true spacecraft clock count. This is the readout time of the frame,
+   * which occurred 2 seconds after the shutter close. To find the end time of
+   * the exposure, 2 seconds are subtracted from the time input parameter. To
+   * find the start time of the exposure, the exposure duration is subtracted
+   * from the end time. This method overrides the FramingCamera class method.
+   *
+   * @param exposureDuration ExposureDuration keyword value from the labels, in
+   *                         seconds.
+   * @param time The StartTime keyword value from the labels, converted to
+   *             ephemeris time.
+   *
+   * @return @b pair < @b iTime, @b iTime > The first value is the shutter
+   *         open time and the second is the shutter close time.
+   *
+   * @author 2011-05-03 Jeannie Walldren
+   * @internal
+   *   @history 2011-05-03 Jeannie Walldren - Original version.
+   */
+  pair<iTime, iTime> VoyagerCamera::ShutterOpenCloseTimes(double time,
+                                                          double exposureDuration) {
+    pair<iTime, iTime> shuttertimes;
+    // To get shutter end (close) time, subtract 2 seconds from the StartTime keyword value
+    shuttertimes.second = time - 2;
+    // To get shutter start (open) time, take off the exposure duration from the end time.
+    shuttertimes.first = shuttertimes.second.Et() - exposureDuration;
+    return shuttertimes;
+  }
+}
+
+/**
+ * This is the function that is called in order to instantiate a VoyagerCamera
+ * object.
+ *
+ * @param lab Cube labels
+ *
+ * @return Isis::Camera* VoyagerCamera
+ * @author 2010-07-19 Mackenzie Boyd
+ * @internal
+ *   @history 2010-07-19 Mackenzie Boyd - Original Version
+ */
 extern "C" Isis::Camera *VoyagerCameraPlugin(Isis::Pvl &lab) {
   return new Isis::VoyagerCamera(lab);
 }
