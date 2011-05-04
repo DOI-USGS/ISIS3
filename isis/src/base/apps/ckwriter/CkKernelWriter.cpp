@@ -238,7 +238,6 @@ namespace Isis {
 
     int nrecs = segment.size();
 
-
     segment.FurnshKernelType("FK");
     NaifStatus::CheckErrors();
     ckw03_c(_handle, sclks[0], sclks[nrecs-1], segment.InstCode(),

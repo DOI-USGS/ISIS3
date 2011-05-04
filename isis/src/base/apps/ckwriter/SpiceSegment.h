@@ -59,8 +59,7 @@ class PvlObject;
  * @author 2010-11-10 Kris Becker 
  * @internal 
  * @history 2010-12-09 Kris Becker Added more documentation
- * @history 2011-05-04 Kris Becker Added pad time
- * 
+ * @history 2011-05-04 Kris Becker Added pad time. 
  * 
  */
 class SpiceSegment {
@@ -166,6 +165,9 @@ class SpiceSegment {
 
     SMatrix expand(int ntop, int nbot, const SMatrix &matrix) const;
     SVector expand(int ntop, int nbot, const SVector &vec) const;
+
+    double SCLKtoET(SpiceInt scCode, double sclk) const;
+    double ETtoSCLK(SpiceInt scCode, double et) const;
 
     std::string toUTC(const double &et) const;
 

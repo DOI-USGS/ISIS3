@@ -173,6 +173,9 @@ void SpiceSegment::import(Cube &cube, const std::string &tblname) {
     _startTime = _times[0];
     _endTime = _times[size(_times)-1];
 
+    // Load necesary kernels
+    _kernels.Load("FK,SCLK,LSK");
+
     //  Here's where all the heavy lifting occurs.
     SMatSeq lmats, rmats;
     SVector sclks;
@@ -180,8 +183,11 @@ void SpiceSegment::import(Cube &cube, const std::string &tblname) {
     SMatrix ckQuats, ckAvvs;
     convert(_quats, _avvs, lmats, rmats, ckQuats, ckAvvs);
   
-    // Add records with 3 milliseconds padding to top and bottom of records
+    // Compute small increment to pad each end
     const double Epsilon(3.0e-3);
+    double topSclk = ETtoSCLK(camera->NaifSclkCode(), _times[0] - Epsilon);
+    double botSclk = ETtoSCLK(camera->NaifSclkCode(), 
+                              _times[size(_times)-1] + Epsilon);
 
     // Pad the top and bottom of the CK data.  This copies the top and bottom
     //  contents of the data - that will work for us.
@@ -190,8 +196,8 @@ void SpiceSegment::import(Cube &cube, const std::string &tblname) {
     sclks   = expand(1, 1, sclks);
     
     //  Finally, adjust the top and bottom times by pad time
-    sclks[0] = sclks[1] - Epsilon;
-    sclks[size(sclks)-1] = sclks[size(sclks)-2] + Epsilon;
+    sclks[0]             = topSclk;
+    sclks[size(sclks)-1] = botSclk;
     
     // Replace contents with converted quaternions, angular velocities (if
     // they exist) and sclk times.
@@ -199,10 +205,13 @@ void SpiceSegment::import(Cube &cube, const std::string &tblname) {
     _avvs =  ckAvvs;
     _times = sclks;
 
-    _startTime = _times[0];
-    _endTime = _times[size(_times)-1];
+    _startTime = SCLKtoET(camera->NaifSclkCode(),_times[0]);
+    _endTime = SCLKtoET(camera->NaifSclkCode(),_times[size(_times)-1]);
+
     _utcStartTime = toUTC(startTime());
     _utcEndTime   = toUTC(endTime());
+    _kernels.UnLoad("FK,SCLK,LSK");
+
   } catch ( iException &ie  ) {
     ostringstream mess;
     mess << "Failed to construct CK content from ISIS file " << _fname;
@@ -412,7 +421,6 @@ void SpiceSegment::getRotationMatrices(Cube &cube, Camera &camera, Table &table,
   }
   else {  //  The label contains all that is needed
 
-    _kernels.Load("FK,SCLK,LSK");
     SVector av(3, 0.0);  // Constant angular velocity
 
     SMatrix lmat = getConstantRotation(table);
@@ -430,7 +438,6 @@ void SpiceSegment::getRotationMatrices(Cube &cube, Camera &camera, Table &table,
     lmats = SMatSeq(1, left);
     rmats = SMatSeq(1,right);
     sclks = convertTimes(camera.NaifSclkCode(), _times);
-    //  _kernels.UnLoad("FK,SCLK,LSK");  // Reentrant nature may need persistence
   }
 #endif
 
@@ -699,6 +706,18 @@ SpiceSegment::SVector SpiceSegment::expand(int ntop, int nbot,
   }
 
   return (myvec);
+}
+
+double SpiceSegment::SCLKtoET(SpiceInt scCode, double sclk) const {
+  SpiceDouble et;
+  sct2e_c(scCode, sclk, &et);
+  return (et);
+}
+
+double SpiceSegment::ETtoSCLK(SpiceInt scCode, double et) const {
+  SpiceDouble sclk;
+  sce2c_c(scCode, et, &sclk);
+  return (sclk);
 }
 
 std::string SpiceSegment::toUTC(const double &et) const {

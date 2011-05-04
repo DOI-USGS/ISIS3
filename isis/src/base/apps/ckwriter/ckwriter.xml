@@ -219,7 +219,8 @@ Segment (by file) Summary
       Original version
     </change>
     <change name="Kris Becker" date="2011-05-04">
-      Pad CK records with a small time to avoid round off issues.
+      Pad CK records with a small time on each end of CK segment to avoid round 
+      off issues.
     </change>
 </history>
 
