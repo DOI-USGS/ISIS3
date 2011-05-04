@@ -218,6 +218,9 @@ Segment (by file) Summary
     <change name="Kris Becker" date="2010-12-06">
       Original version
     </change>
+    <change name="Kris Becker" date="2011-05-04">
+      Pad CK records with a small time to avoid round off issues.
+    </change>
 </history>
 
   <groups>

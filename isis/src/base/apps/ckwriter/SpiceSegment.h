@@ -59,6 +59,8 @@ class PvlObject;
  * @author 2010-11-10 Kris Becker 
  * @internal 
  * @history 2010-12-09 Kris Becker Added more documentation
+ * @history 2011-05-04 Kris Becker Added pad time
+ * 
  * 
  */
 class SpiceSegment {
@@ -161,6 +163,10 @@ class SpiceSegment {
                  const SMatSeq &lmats, const SMatSeq &rmats, 
                  SMatrix &ckQuats, SMatrix &ckAvvs) const;
     const SMatrix &getMatrix(const SMatSeq &seq, const int &nth) const;
+
+    SMatrix expand(int ntop, int nbot, const SMatrix &matrix) const;
+    SVector expand(int ntop, int nbot, const SVector &vec) const;
+
     std::string toUTC(const double &et) const;
 
 };

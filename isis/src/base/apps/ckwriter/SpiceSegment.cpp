@@ -168,8 +168,8 @@ void SpiceSegment::import(Cube &cube, const std::string &tblname) {
 
     _quats = getQuaternions(spice);
     _avvs = getAngularVelocities(spice);
-
     _times = getTimes(spice);
+
     _startTime = _times[0];
     _endTime = _times[size(_times)-1];
 
@@ -180,11 +180,29 @@ void SpiceSegment::import(Cube &cube, const std::string &tblname) {
     SMatrix ckQuats, ckAvvs;
     convert(_quats, _avvs, lmats, rmats, ckQuats, ckAvvs);
   
+    // Add records with 3 milliseconds padding to top and bottom of records
+    const double Epsilon(3.0e-3);
+
+    // Pad the top and bottom of the CK data.  This copies the top and bottom
+    //  contents of the data - that will work for us.
+    ckQuats = expand(1, 1, ckQuats);
+    if ( size(ckAvvs) > 0 ) ckAvvs = expand(1, 1, ckAvvs);
+    sclks   = expand(1, 1, sclks);
+    
+    //  Finally, adjust the top and bottom times by pad time
+    sclks[0] = sclks[1] - Epsilon;
+    sclks[size(sclks)-1] = sclks[size(sclks)-2] + Epsilon;
+    
     // Replace contents with converted quaternions, angular velocities (if
     // they exist) and sclk times.
     _quats = ckQuats;
     _avvs =  ckAvvs;
     _times = sclks;
+
+    _startTime = _times[0];
+    _endTime = _times[size(_times)-1];
+    _utcStartTime = toUTC(startTime());
+    _utcEndTime   = toUTC(endTime());
   } catch ( iException &ie  ) {
     ostringstream mess;
     mess << "Failed to construct CK content from ISIS file " << _fname;
@@ -572,6 +590,115 @@ SpiceSegment::SMatrix SpiceSegment::load(Table &table) {
     }
   }
   return (spice);
+}
+
+
+/**
+ * @brief Add elements to top and bottom of a matrix
+ *  
+ * This method is to expand a matrix to add additional records for padding 
+ * purposes. The parameter ntop indicate the number to add to the top of the
+ * matrix. nbot indicates the number to add to the bottom
+ *  
+ * Elements added to the top have the contents of the first element of the
+ * input matrix copied to it. Elements added to the bottom have the last 
+ * element copied to it. 
+ *  
+ * The new matrix has the contents of the original copied to it place 
+ * immediately after the number of elements added to it.
+ *  
+ * @author Kris Becker - 4/6/2011
+ * 
+ * @param ntop Number of elements to add to the top
+ * @param vec  number of elements to add to the bottom
+ * @param matrix Matrix to add elements to 
+ *  
+ *  @return SpiceSegment::SMatrix Expanded matrix
+ */
+SpiceSegment::SMatrix SpiceSegment::expand(int ntop, int nbot,
+                                           const SpiceSegment::SMatrix &matrix) 
+                                           const {
+  //  Add lines to matrix at top and bottom
+  int ndim(matrix.dim1());
+  ntop = std::max(0, ntop);
+  nbot = std::max(0, nbot);
+  int nlines(ndim+ntop+nbot);
+  SMatrix mat(nlines, matrix.dim2());
+
+
+  // Duplicate top lines from first input matrix line
+  for (int n = 0 ; n < ntop ; n++) {
+    for (int s = 0 ; s < matrix.dim2() ; s++) {
+      mat[n][s] = matrix[0][s];
+    }
+  }
+
+  // Copy the contents of the input matrix to the output
+  for (int n = 0 ; n < ndim ; n++) {
+    for (int s = 0 ; s < matrix.dim2() ; s++) {
+      mat[n+ntop][s] = matrix[n][s];
+    }
+  }
+
+  // Duplicate bottom lines from last input matrix lines
+  for (int n = 0 ; n < nbot ; n++) {
+    for (int s = 0 ; s < matrix.dim2() ; s++) {
+      mat[nlines-1-n][s] = matrix[ndim-1][s];
+    }
+  }
+
+  return (mat);
+}
+
+/**
+ * @brief Add elements to top and bottom of a vector
+ *  
+ * This method is to expand a vector to add additional records for padding 
+ * purposes. The parameter ntop indicate the number to add to the top of the
+ * vector. nbot indicates the number to add to the bottom
+ *  
+ * Elements added to the top have the contents of the first element of the
+ * input vector copied to it. Elements added to the bottom have the last 
+ * element copied to it. 
+ *  
+ * The new vector has the contents of the original copied to it place 
+ * immediately after the number of elements added to it.
+ *  
+ * @author Kris Becker - 4/6/2011
+ * 
+ * @param ntop Number of elements to add to the top
+ * @param vec  number of elements to add to the bottom
+ * @param vector Vector to add elements to
+ *  
+ *  @return SpiceSegment::SVector Expanded vector
+ */
+SpiceSegment::SVector SpiceSegment::expand(int ntop, int nbot, 
+                                           const SpiceSegment::SVector &vec) 
+                                           const {
+  //  Add lines to matrix at top and bottom
+  int ndim(vec.dim1());
+  ntop = std::max(0, ntop);
+  nbot = std::max(0, nbot);
+  int nvals(ndim+ntop+nbot);
+  SVector myvec(nvals);
+
+  // Duplicate top elements to expanded elements
+  for (int n = 0 ; n < ntop ; n++) {
+    myvec[n] = vec[0];
+  }
+
+  // Copy elements from input vector to output
+  for (int n = 0 ; n < vec.dim1() ; n++) {
+    myvec[n+ntop] = vec[n];
+  }
+
+
+  // Duplicate bottom elements to expanded elements
+  for (int n = 0 ; n < nbot ; n++) {
+    myvec[nvals-1-n] = vec[ndim-1];
+  }
+
+  return (myvec);
 }
 
 std::string SpiceSegment::toUTC(const double &et) const {
