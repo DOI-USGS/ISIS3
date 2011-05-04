@@ -1,5 +1,8 @@
+#ifndef LoHighCamera_h
+#define LoHighCamera_h
 /**
- *
+ * @file 
+ *  
  *   Unless noted otherwise, the portions of Isis written by the USGS are public
  *   domain. See individual third-party library and package descriptions for
  *   intellectual property information,user agreements, and related information.
@@ -17,49 +20,69 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#ifndef LoHighCamera_h
-#define LoHighCamera_h
-
 #include "FramingCamera.h"
 
-using namespace std;
-
 namespace Isis {
-  namespace Lo {
-    /**
-     * @brief Defines the Lunar Orbiter High Resolution camera class
-     *
-     * The LoHighCamera class defines the High Resolution camera for the last three
-     * Lunar Orbiter missions (3, 4, and 5).
-     *
-     * @ingroup SpiceInstrumentsAndCameras
-     * @ingroup LunarOrbiter
-     *
-     * @author 2007-07-17 Debbie A. Cook
-     *
-     * @internal
-     *   @history 2007-07-17 Debbie A. Cook - Original Version
-     *   @history 2008-08-08 Steven Lambright Made the unit test work with a Sensor
-     *            change. Also, now using the new LoadCache(...) method instead of
-     *            CreateCache(...).
-     *   @history 2009-03-07 Debbie A. Cook Removed reference to obsolute CameraDetectorMap methods
-     *   @history 2009-08-28 Steven Lambright - Changed inheritance to no longer
-     *            inherit directly from Camera
-     */
-    class LoHighCamera : public Isis::FramingCamera {
-      public:
-        LoHighCamera(Isis::Pvl &lab);
-        ~LoHighCamera() {};
+  /**
+   * @brief Defines the Lunar Orbiter High Resolution camera class
+   *
+   * The LoHighCamera class defines the High Resolution camera for the last three
+   * Lunar Orbiter missions (3, 4, and 5).
+   *
+   * @ingroup SpiceInstrumentsAndCameras
+   * @ingroup LunarOrbiter
+   *
+   * @author 2007-07-17 Debbie A. Cook
+   *
+   * @internal
+   *   @history 2007-07-17 Debbie A. Cook - Original Version
+   *   @history 2008-08-08 Steven Lambright Made the unit test work with a Sensor
+   *                          change. Also, now using the new LoadCache(...)
+   *                          method instead of CreateCache(...).
+   *   @history 2009-03-07 Debbie A. Cook Removed reference to obsolute CameraDetectorMap methods
+   *   @history 2009-08-28 Steven Lambright - Changed inheritance to no longer
+   *                          inherit directly from Camera
+   *   @history 2010-09-16 Steven Lambright - Updated unitTest to not use a DEM.
+   *   @history 2011-01-14 Travis Addair - Added new CK/SPK accessor methods,
+   *                          pure virtual in Camera, implemented in mission
+   *                          specific cameras.
+   *   @history 2011-02-09 Steven Lambright - Major changes to camera classes.
+   *   @history 2011-05-03 Jeannie Walldren - Added ShutterOpenCloseTimes()
+   *                          method. Updated unitTest to test for new methods.
+   *                          Updated documentation. Removed Lo namespace wrap
+   *                          inside Isis namespace wrap. Added Isis Disclaimer
+   *                          to files. Added NAIF error check to constructor.
+   */
+  class LoHighCamera : public FramingCamera {
+    public:
+      LoHighCamera(Pvl &lab);
+      //! Destroys the LoHighCamera Object
+      ~LoHighCamera() {};
+      virtual std::pair <iTime, iTime> ShutterOpenCloseTimes(double time, 
+                                                             double exposureDuration);
+      /**
+       * CK frame ID -  - Instrument Code from spacit run on CK
+       *  
+       * @return @b int The appropriate instrument code for the "Camera-matrix" 
+       *         Kernel Frame ID
+       */
+      virtual int CkFrameId() const { return (-533000); }
 
-        /** CK Frame ID - Instrument Code from spacit run on CK */
-        virtual int CkFrameId() const { return (-533000); }
+      /** 
+       * CK Reference ID - J2000
+       * 
+       * @return @b int The appropriate instrument code for the "Camera-matrix"
+       *         Kernel Reference ID
+       */
+      virtual int CkReferenceId() const { return (1); }
 
-        /** CK Reference ID - J2000 */
-        virtual int CkReferenceId() const { return (1); }
-
-        /** SPK Reference ID - J2000 */
-        virtual int SpkReferenceId() const { return (1); }
-    };
+      /** 
+       *  SPK Reference ID - J2000
+       *  
+       * @return @b int The appropriate instrument code for the Spacecraft 
+       *         Kernel Reference ID
+       */
+      virtual int SpkReferenceId() const { return (1); }
   };
 };
 #endif
