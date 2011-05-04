@@ -1,6 +1,5 @@
 #ifndef HrscCamera_h
 #define HrscCamera_h
-
 /**
  * @file
  * $Revision: 1.3 $
@@ -27,48 +26,66 @@
 #include "VariableLineScanCameraDetectorMap.h"
 
 namespace Isis {
-  namespace Mex {
-    /**
-     * @brief HRSC Camera Model
-     *
-     * This class is the implementation of the camera model
-     * for the MEX HRSC instrument.
-     *
-     * @ingroup SpiceInstrumentsAndCameras
-     *
-     * @author 2008-07-28 Steven Lambright
-     *
-     * @internal
-     *   @history 2008-08-08 Steven Lambright Made the unit test work with a Sensor
-     *            change. Also, now using the new LoadCache(...) method instead of
-     *            CreateCache(...). Increased the delta line/samp tolerance in the
-     *            unit test.
-     *   @history 2009-08-28 Steven Lambright - Changed inheritance to no longer
-     *            inherit directly from Camera
-     */
-    class HrscCamera : public Isis::LineScanCamera {
-      public:
-        // Constructs a HiriseCamera object
-        HrscCamera(Isis::Pvl &lab);
+  /**
+   * @brief HRSC Camera Model
+   *
+   * This class is the implementation of the camera model
+   * for the Mars Express HRSC (High/Super Resolution Stereo Colour Imager) 
+   * instrument. 
+   *
+   * @ingroup SpiceInstrumentsAndCameras
+   * @ingroup MarsExpress
+   *
+   * @author 2008-07-28 Steven Lambright
+   *
+   * @internal
+   *   @history 2008-08-08 Steven Lambright Made the unit test work with a Sensor
+   *            change. Also, now using the new LoadCache(...) method instead of
+   *            CreateCache(...). Increased the delta line/samp tolerance in the
+   *            unit test.
+   *   @history 2009-08-28 Steven Lambright - Changed inheritance to no longer
+   *            inherit directly from Camera
+   *   @history 2011-05-03 Jeannie Walldren - Updated unitTest to test
+   *            for new methods. Updated documentation. Removed Mex
+   *            namespace wrap inside Isis namespace. Added Isis Disclaimer to
+   *            files. Added NAIF error check to constructor.
+   */
+  class HrscCamera : public LineScanCamera {
+    public:
+      // Constructs a HiriseCamera object
+      HrscCamera(Pvl &lab);
 
-        // Destroys the HiriseCamera object
-        ~HrscCamera();
+      // Destroys the HiriseCamera object
+      ~HrscCamera();
 
-        /** CK Frame ID - Instrument Code from spacit run on CK */
-        virtual int CkFrameId() const { return (-41001); }
+      /**
+       * CK frame ID -  - Instrument Code from spacit run on CK
+       *  
+       * @return @b int The appropriate instrument code for the "Camera-matrix" 
+       *         Kernel Frame ID
+       */
+      virtual int CkFrameId() const { return (-41001); }
 
-        /** CK Reference ID - J2000 */
-        virtual int CkReferenceId() const { return (1); }
+      /** 
+       * CK Reference ID - J2000
+       * 
+       * @return @b int The appropriate instrument code for the "Camera-matrix"
+       *         Kernel Reference ID
+       */
+      virtual int CkReferenceId() const { return (1); }
 
-        /** SPK Reference ID - J2000 */
-        virtual int SpkReferenceId() const { return (1); }
+      /** 
+       * SPK Reference ID - J2000
+       * 
+       * @return @b int The appropriate instrument code for the Spacecraft
+       *         Kernel Reference ID
+       */
+      virtual int SpkReferenceId() const { return (1); }
 
-      private:
-        void ReadLineRates(iString filename);
+    private:
+      void ReadLineRates(iString filename);
 
-        std::vector<LineRateChange> p_lineRates;
-    };
+      std::vector<LineRateChange> p_lineRates;
   };
 };
-
 #endif
