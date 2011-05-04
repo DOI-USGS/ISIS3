@@ -24,50 +24,62 @@
 #include "RadarCamera.h"
 
 namespace Isis {
-  namespace Lro {
-    /**
-     * @brief LRO Mini-RF SAR and Chandrayaan 1 Mini-RF SAR
-     *
-     * This is the camera model for both LRO Mini-RF SAR and
-     * Chandrayaan 1 Mini-RF SAR radar systems.
-     *
-     * @ingroup SpiceInstrumentsAndCameras
-     * @ingroup LRO
-     *
-     * @author 2008-07-01 Jeff Anderson
-     *
-     * @internal
-     *   @history 2009-07-01 Janet Barrett - Updated with code to handle
-     *            weighting of slant range and Doppler shift; fixed so that
-     *            the frequency and wavelength of the instrument are made
-     *            available to Radar classes.
-     *   @history 2009-07-31 Debbie A. Cook and Jeannie Walldren - Added
-     *            new tolerance argument to LoadCache call to be compatible
-     *            with update to Spice class
-     *   @history 2009-08-05 Debbie A. Cook - corrected altitude in tolerance
-     *            calculation
-     *   @history 2009-10-16 Debbie A. Cook - fixed the rotation of the velocity vector
-     *   @history 2009-11-03 Debbie A. Cook - added RadarGroundMap method calls to set radar parameters
-     *   @history 2010-03-19 Debbie A. Cook - removed unit change of rangeResolution so range_sigma works
-     *            on meters instead of km
-     */
-    class MiniRF : public RadarCamera {
-      public:
-        MiniRF(Isis::Pvl &lab);
+  /**
+   * @brief LRO Mini-RF SAR and Chandrayaan 1 Mini-RF SAR
+   *
+   * This is the camera model for both LRO Mini-RF SAR and
+   * Chandrayaan 1 Mini-RF SAR radar systems.
+   *
+   * @ingroup SpiceInstrumentsAndCameras
+   * @ingroup LunarReconnaissanceOrbiter
+   *
+   * @author 2008-07-01 Jeff Anderson
+   *
+   * @internal
+   *   @history 2009-07-01 Janet Barrett - Updated with code to handle
+   *            weighting of slant range and Doppler shift; fixed so that
+   *            the frequency and wavelength of the instrument are made
+   *            available to Radar classes.
+   *   @history 2009-07-31 Debbie A. Cook and Jeannie Walldren - Added
+   *            new tolerance argument to LoadCache call to be compatible
+   *            with update to Spice class
+   *   @history 2009-08-05 Debbie A. Cook - corrected altitude in tolerance
+   *            calculation
+   *   @history 2009-10-16 Debbie A. Cook - fixed the rotation of the velocity vector
+   *   @history 2009-11-03 Debbie A. Cook - added RadarGroundMap method calls to set radar parameters
+   *   @history 2010-03-19 Debbie A. Cook - removed unit change of rangeResolution so range_sigma works
+   *            on meters instead of km
+   *   @history 2011-05-03 Jeannie Walldren - Updated unitTest to test for new
+   *            methods. Updated documentation. Removed Lro namespace wrap
+   *            inside Isis namespace wrap. Added Isis Disclaimer to files.
+   *            Added NAIF error check to constructor.
+   */
+  class MiniRF : public RadarCamera {
+    public:
+      MiniRF(Pvl &lab);
 
-        ~MiniRF() {};
+      //! Destroys the MiniRF object
+      ~MiniRF() {};
 
-        virtual int CkFrameId() const;
+      virtual int CkFrameId() const;
 
-        virtual int CkReferenceId() const;
+      virtual int CkReferenceId() const;
 
-        /** SPK Target Body ID - Lunar Reconnaissance Orbiter spacecraft */
-        virtual int SpkTargetId() const { return (-85); }
+      /** 
+       *  SPK Target Body ID - Lunar Reconnaissance Orbiter spacecraft
+       *  
+       * @return @b int The appropriate instrument code for the Spacecraft 
+       *         Kernel Target ID
+       */
+      virtual int SpkTargetId() const { return (-85); }
 
-        /** SPK Reference ID - J2000 */
-        virtual int SpkReferenceId() const { return (1); }
-    };
+      /** 
+       *  SPK Reference ID - J2000
+       *  
+       * @return @b int The appropriate instrument code for the Spacecraft 
+       *         Kernel Reference ID
+       */
+      virtual int SpkReferenceId() const { return (1); }
   };
 };
-
 #endif

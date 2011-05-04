@@ -1,12 +1,34 @@
-using namespace std;
-
+/**
+ * @file
+ *
+ *   Unless noted otherwise, the portions of Isis written by the USGS are public
+ *   domain. See individual third-party library and package descriptions for 
+ *   intellectual property information,user agreements, and related information.
+ *
+ *   Although Isis has been used by the USGS, no warranty, expressed or implied,
+ *   is made by the USGS as to the accuracy and functioning of such software 
+ *   and related material nor shall the fact of distribution constitute any such 
+ *   warranty, and no responsibility is assumed by the USGS in connection 
+ *   therewith.
+ *
+ *   For additional information, launch
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see 
+ *   the Privacy &amp; Disclaimers page on the Isis website,
+ *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
+ *   http://www.usgs.gov/privacy.html.
+ */
 #include <iomanip>
 #include <iostream>
+
 #include "Camera.h"
 #include "CameraFactory.h"
-#include "Pvl.h"
+#include "Filename.h"
 #include "iException.h"
 #include "Preference.h"
+#include "Pvl.h"
+
+using namespace std;
+using namespace Isis;
 
 void TestLineSamp(Isis::Camera *cam, double samp, double line);
 
@@ -23,6 +45,9 @@ int main(void) {
 
     Isis::Pvl p("$chan1/testData/FSR_CDR_LV1_01801_0R.cub");
     Isis::Camera *cam = Isis::CameraFactory::Create(p);
+    cout << "Filename: " << Filename(p.Filename()).Name() << endl;
+    cout << "CK Frame: " << cam->InstrumentRotation()->Frame() << endl << endl;
+    cout.setf(std::ios::fixed);
     cout << setprecision(9);
 
     // Test all four corners to make sure the conversions are right
@@ -60,6 +85,18 @@ int main(void) {
     else {
       cout << setprecision(16) << "Longitude off by: " << cam->UniversalLongitude() - knownLon << endl;
     }
+
+    // Test kernel ID messages
+    cout << endl << "Kernel ID error messages: " << endl;
+    try{ cam->CkFrameId(); }
+    catch (iException e){ e.Report(); }
+    try{ cam->CkReferenceId(); }
+    catch (iException e){ e.Report(); }
+    try{ cam->SpkTargetId(); }
+    catch (iException e){ e.Report(); }
+    try{ cam->SpkReferenceId(); }
+    catch (iException e){ e.Report(); }
+
  // }
 //  catch(Isis::iException &e) {
 //    e.Report();

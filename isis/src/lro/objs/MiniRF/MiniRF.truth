@@ -1,20 +1,27 @@
 Unit Test for MiniRFCamera...
+Filename: FSR_CDR_LV1_01801_0R.cub
+CK Frame: -86001
+
 For upper left corner ...
-DeltaSample = 0
-DeltaLine = 0
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
 
 For upper right corner ...
-DeltaSample = 0
-DeltaLine = 0
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
 
 For lower left corner ...
-DeltaSample = 0
-DeltaLine = 0
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
 
 For lower right corner ...
-DeltaSample = 0
-DeltaLine = 0
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
 
 For center pixel position ...
 Latitude OK
 Longitude OK
+
+Kernel ID error messages: 
+**USER ERROR** Cannot generate CK for MiniRF
+**USER ERROR** Cannot generate CK for MiniRF
