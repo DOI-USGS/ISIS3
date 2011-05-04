@@ -25,7 +25,6 @@
 #include <string>
 #include <vector>
 #include "TextFile.h"
-using namespace std;
 namespace Isis {
   /**
    * @brief Extends <b>TextFile</b>  to handle Cassini ISS
@@ -37,21 +36,25 @@ namespace Isis {
    *        and skip all header info that exists before the tag
    *        <TT>"\begindata"</TT>.
    *
-   * @ingroup Cassini
-   * @author 2008-03-27 Jeannie Walldren
-   * @history 2008-03-27 Jeannie Walldren - Original Version.
+   * @ingroup Cassini-Huygens
+   * @author 2008-03-27 Jeannie Walldren 
+   * @internal 
+   *   @history 2008-03-27 Jeannie Walldren - Original Version.
+   *   @history 2011-05-03 Jeannie Walldren - Fixed documentation of ingroup
+   *                          name and added Isis disclaimer.
    */
   class CisscalFile : public TextFile {
     public:
-      CisscalFile(const string &filename, const char *openmode = "input",
+      CisscalFile(const std::string &filename, const char *openmode = "input",
                   const char *extension = "");
+      //!> Destructor closes the text file.
       ~CisscalFile() {
         TextFile::Close();
-      }; //!> Destructor closes the text file.
-      bool GetLine(string &line);
+      }; 
+      bool GetLine(std::string &line);
     protected:
       bool p_begindataFound; //!> Flag variable indicates whether the tag <code>"\begindata"</code> has been found.
-      bool p_GetLine(string &line);
+      bool p_GetLine(std::string &line);
   };
 };
 #endif
