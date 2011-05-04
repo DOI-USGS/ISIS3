@@ -32,6 +32,9 @@
     <change name="Jeff Anderson" date="2003-06-11">
       Converted to Isis 3.0
     </change>
+    <change name="Jeannie Walldren" date="2011-05-03">
+      Removed Mgs namespace scope.
+    </change>
   </history>
 
   <groups>
