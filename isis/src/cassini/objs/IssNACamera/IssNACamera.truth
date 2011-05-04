@@ -2,27 +2,37 @@ Unit Test for IssNACamera...
 Filename: N1525100863_2.cub
 CK Frame: 14082360
 
+Kernel IDs: 
+CK Frame ID = -82000
+CK Reference ID = 1
+SPK Target ID = -82
+SPK Reference ID = 1
+
+Shutter open = 199679854.998486459
+Shutter close = 199679900.998486459
+
+
 For upper left corner ...
-Line, Sample: 0.5000, 0.5000
-Lat, Long:    8.2462, 323.2153
-WestLon:      36.7847
+Line, Sample: 0.500000000, 0.500000000
+Lat, Long:    8.246224868, 323.215344272
+WestLon:      36.784655728
 
 For upper right corner ...
-Line, Sample: 0.5000, 1024.5000
-Lat, Long:    23.3914, 331.5063
-WestLon:      28.4937
+Line, Sample: 0.500000000, 1024.500000000
+Lat, Long:    23.391446827, 331.506337646
+WestLon:      28.493662354
 
 For lower left corner ...
-Line, Sample: 1024.5000, 0.5000
-Lat, Long:    -0.6730, 339.0561
-WestLon:      20.9439
+Line, Sample: 1024.500000000, 0.500000000
+Lat, Long:    -0.673025426, 339.056058256
+WestLon:      20.943941744
 
 For lower right corner ...
-Line, Sample: 1024.5000, 1024.5000
-Lat, Long:    13.9600, 347.9185
-WestLon:      12.0815
+Line, Sample: 1024.500000000, 1024.500000000
+Lat, Long:    13.960023542, 347.918544571
+WestLon:      12.081455429
 
 For center pixel position ...
-Line, Sample: 512.5000, 512.5000
-Lat, Long:    11.0856, 335.8600
-WestLon:      24.1400
+Line, Sample: 512.500000000, 512.500000000
+Lat, Long:    11.085602524, 335.860028157
+WestLon:      24.139971843
