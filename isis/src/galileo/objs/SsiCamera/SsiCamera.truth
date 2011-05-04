@@ -1,19 +1,31 @@
 Unit Test for SsiCamera...
+Filename: 1213r.cub
+CK Frame: -77001
+
+Kernel IDs: 
+CK Frame ID = -77001
+CK Reference ID = 2
+SPK Target ID = -77
+SPK Reference ID = 21
+
+Shutter open = -7094505.337652090
+Shutter close = -7094505.337645841
+
 For upper left corner ...
 DeltaSample = ERROR
 DeltaLine = ERROR
 
 For upper right corner ...
-DeltaSample = 0
-DeltaLine = 0
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
 
 For lower left corner ...
-DeltaSample = 0
-DeltaLine = 0
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
 
 For lower right corner ...
-DeltaSample = 0
-DeltaLine = 0
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
 
 For center pixel position ...
 Latitude OK

@@ -1,30 +1,66 @@
+/**
+ * @file
+ * $Revision: 1.4 $
+ * $Date: 2008/05/14 21:07:11 $
+ *
+ *   Unless noted otherwise, the portions of Isis written by the USGS are public
+ *   domain. See individual third-party library and package descriptions for
+ *   intellectual property information,user agreements, and related information.
+ *
+ *   Although Isis has been used by the USGS, no warranty, expressed or implied,
+ *   is made by the USGS as to the accuracy and functioning of such software
+ *   and related material nor shall the fact of distribution constitute any such
+ *   warranty, and no responsibility is assumed by the USGS in connection
+ *   therewith.
+ *
+ *   For additional information, launch
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
+ *   the Privacy &amp; Disclaimers page on the Isis website,
+ *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
+ *   http://www.usgs.gov/privacy.html.
+ */
 #include "SsiCamera.h"
+
 #include "CameraDetectorMap.h"
-#include "CameraFocalPlaneMap.h"
 #include "CameraDistortionMap.h"
+#include "CameraFocalPlaneMap.h"
 #include "CameraGroundMap.h"
 #include "CameraSkyMap.h"
-#include "RadialDistortionMap.h"
 #include "iString.h"
 #include "iTime.h"
+#include "NaifStatus.h"
+#include "Pvl.h"
+#include "PvlObject.h"
+#include "RadialDistortionMap.h"
+#include "Spice.h"
 
 using namespace std;
-using namespace Isis;
-namespace Galileo {
+
+namespace Isis {
+  /**
+   * Constructs a SsiCamera object using the image labels.
+   *  
+   * @param lab Pvl label from a Galileo SSI image. 
+   *  
+   * @internal 
+   *   @history 2011-05-03 Jeannie Walldren - Added NAIF error check. Added call
+   *                          to ShutterOpenCloseTimes() method.
+   */
   SsiCamera::SsiCamera(Pvl &lab) : FramingCamera(lab) {
+    NaifStatus::CheckErrors();
     // Get the camera characteristics
     double k1;
 
     iTime removeCoverDate("1994/04/01 00:00:00");
-    iTime imageDate(lab.FindKeyword("StartTime", Isis::PvlObject::Traverse)[0]);
+    iTime imageDate(lab.FindKeyword("StartTime", PvlObject::Traverse)[0]);
     /*
     * Change the Focal Length and K1 constant based on whether or not the protective cover is on
     * See "The Direction of the North Pole and the Control Network of Asteroid 951 Gaspra"  Icarus 107, 18-22 (1994)
     */
     if(imageDate < removeCoverDate) {
       int code = NaifIkCode();
-      string key = "INS" + Isis::iString(code) + "_FOCAL_LENGTH_COVER";
-      SetFocalLength(Isis::Spice::GetDouble(key));
+      string key = "INS" + iString(code) + "_FOCAL_LENGTH_COVER";
+      SetFocalLength(Spice::GetDouble(key));
       k1 = Spice::GetDouble("INS" + (iString)(int)NaifIkCode() + "_K1_COVER");
     }
     else {
@@ -39,6 +75,10 @@ namespace Galileo {
     string stime = inst["StartTime"];
     double et;
     str2et_c(stime.c_str(), &et);
+    //?????????? NEED THESE??????
+    // exposure duration keyword value is measured in seconds
+    double exposureDuration = ((double) inst["ExposureDuration"]);
+    pair<iTime, iTime> shuttertimes = ShutterOpenCloseTimes(et, exposureDuration);
 
     // Get summation mode
     double sumMode = inst["Summing"];
@@ -51,8 +91,11 @@ namespace Galileo {
     // Setup focal plane map
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, NaifIkCode());
 
-    focalMap->SetDetectorOrigin(Spice::GetDouble("INS" + (iString)(int)NaifIkCode() + "_BORESIGHT_SAMPLE"),
-                                Spice::GetDouble("INS" + (iString)(int)NaifIkCode() + "_BORESIGHT_LINE"));
+    focalMap->SetDetectorOrigin(
+      Spice::GetDouble("INS" + (iString)(int)NaifIkCode() + 
+                       "_BORESIGHT_SAMPLE"),
+      Spice::GetDouble("INS" + (iString)(int)NaifIkCode() + 
+                       "_BORESIGHT_LINE"));
 
     // Setup distortion map
     new RadialDistortionMap(this, k1);
@@ -63,9 +106,52 @@ namespace Galileo {
 
     SetTime(et);
     LoadCache();
+    NaifStatus::CheckErrors();
+  }
+
+  /**
+   * Returns the shutter open and close times. The user should pass in the
+   * ExposureDuration keyword value and the StartTime keyword value, converted
+   * to ephemeris time. The  StartTime keyword value from the labels represents
+   * the shutter center time of the observation. To find the shutter open and
+   * close times, half of the exposure duration is subtracted from and added to
+   * the input time parameter, respectively. This method overrides the
+   * FramingCamera class method.
+   *
+   * @param exposureDuration ExposureDuration keyword value from the labels, in
+   *                         seconds.
+   * @param time The StartTime keyword value from the labels, converted to
+   *             ephemeris time.
+   *
+   * @return @b pair < @b iTime, @b iTime > The first value is the shutter
+   *         open time and the second is the shutter close time.
+   *
+   * @author 2011-05-03 Jeannie Walldren
+   * @internal
+   *   @history 2011-05-03 Jeannie Walldren - Original version.
+   */
+  pair<iTime, iTime> SsiCamera::ShutterOpenCloseTimes(double time,
+                                                      double exposureDuration) {
+    pair <iTime, iTime> shuttertimes;
+    // To get shutter start (open) time, subtract half exposure duration
+    shuttertimes.first = time - (exposureDuration / 2.0);
+    // To get shutter end (close) time, add half exposure duration
+    shuttertimes.second = time + (exposureDuration / 2.0);
+    return shuttertimes;
   }
 }
 
-extern "C" Camera *SsiCameraPlugin(Pvl &lab) {
-  return new Galileo::SsiCamera(lab);
+/**
+ * This is the function that is called in order to instantiate a SsiCamera
+ * object. 
+ *
+ * @param lab Cube labels
+ *
+ * @return Isis::Camera* SsiCamera 
+ * @internal 
+ *   @history 2011-05-03 Jeannie Walldren - Added documentation.  Removed
+ *            Galileo namespace.
+ */
+extern "C" Isis::Camera *SsiCameraPlugin(Isis::Pvl &lab) {
+  return new Isis::SsiCamera(lab);
 }
