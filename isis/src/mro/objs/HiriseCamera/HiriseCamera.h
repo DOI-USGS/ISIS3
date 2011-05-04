@@ -1,6 +1,5 @@
 #ifndef HiriseCamera_h
 #define HiriseCamera_h
-
 /**
  * @file
  * $Revision: 1.4 $
@@ -26,47 +25,61 @@
 #include "LineScanCamera.h"
 
 namespace Isis {
-  namespace Mro {
-    /**
-     * @brief Hirise Camera Model
-     *
-     * This class is the implementation of the camera model
-     * for the MRO HiRISE instrument.
-     *
-     * @ingroup SpiceInstrumentsAndCameras
-     * @ingroup MarsReconnaissanceOrbiter
-     *
-     * @author  2005-02-22 Jim Torson
-     *
-     * @internal
-     *  @history 2005-10-03 Elizabeth Miller - Modified file to support Doxygen
-     *                                         documentation
-     *  @history 2008-08-08 Steven Lambright Made the unit test work with a Sensor
-     *           change. Also, now using the new LoadCache(...) method instead of
-     *           CreateCache(...).
-     *  @history 2009-03-08 Debbie A. Cook Removed reference to obsolete LineScanCameraDetectorMap
-     *           method SetXAxisTimeDependent
-     *   @history 2009-08-28 Steven Lambright - Changed inheritance to no longer
-     *            inherit directly from Camera
-     */
-    class HiriseCamera : public Isis::LineScanCamera {
-      public:
-        // Constructs a HiriseCamera object
-        HiriseCamera(Isis::Pvl &lab);
+  /**
+   * @brief Hirise Camera Model
+   *
+   * This class is the implementation of the camera model
+   * for the MRO HiRISE instrument.
+   *
+   * @ingroup SpiceInstrumentsAndCameras
+   * @ingroup MarsReconnaissanceOrbiter
+   *
+   * @author  2005-02-22 Jim Torson
+   *
+   * @internal
+   *  @history 2005-10-03 Elizabeth Miller - Modified file to support Doxygen
+   *                                         documentation
+   *  @history 2008-08-08 Steven Lambright Made the unit test work with a Sensor
+   *           change. Also, now using the new LoadCache(...) method instead of
+   *           CreateCache(...).
+   *  @history 2009-03-08 Debbie A. Cook Removed reference to obsolete LineScanCameraDetectorMap
+   *           method SetXAxisTimeDependent
+   *   @history 2009-08-28 Steven Lambright - Changed inheritance to no longer
+   *            inherit directly from Camera
+   *   @history 2011-05-03 Jeannie Walldren - Updated unitTest to test for new
+   *            methods. Added NAIF error check. Removed Mro namespace.
+   */
+  class HiriseCamera : public LineScanCamera {
+    public:
+      // Constructs a HiriseCamera object
+      HiriseCamera(Pvl &lab);
 
-        // Destroys the HiriseCamera object
-        ~HiriseCamera();
+      // Destroys the HiriseCamera object
+      ~HiriseCamera();
 
-        /** CK Frame ID - Instrument Code from spacit run on CK */
-        virtual int CkFrameId() const { return (-74000); }
+      /**
+       * CK frame ID -  - Instrument Code from spacit run on CK
+       *  
+       * @return @b int The appropriate instrument code for the "Camera-matrix" 
+       *         Kernel Frame ID
+       */
+      virtual int CkFrameId() const { return (-74000); }
 
-        /** CK Reference ID - MRO_MME_OF_DATE */
-        virtual int CkReferenceId() const { return (-74900); }
+      /** 
+       *  CK Reference ID - MRO_MME_OF_DATE
+       * 
+       * @return @b int The appropriate instrument code for the "Camera-matrix"
+       *         Kernel Reference ID
+       */
+      virtual int CkReferenceId() const { return (-74900); }
 
-        /** SPK Reference ID - J2000 */
-        virtual int SpkReferenceId() const { return (1); }
-    };
+      /** 
+       *  SPK Reference ID - J2000
+       *  
+       * @return @b int The appropriate instrument code for the Spacecraft 
+       *         Kernel Reference ID
+       */
+      virtual int SpkReferenceId() const { return (1); }
   };
 };
-
 #endif
