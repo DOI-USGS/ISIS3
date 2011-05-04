@@ -1,174 +1,215 @@
-using namespace std;
+/**
+ * @file
+ *
+ *   Unless noted otherwise, the portions of Isis written by the USGS are public
+ *   domain. See individual third-party library and package descriptions for 
+ *   intellectual property information,user agreements, and related information.
+ *
+ *   Although Isis has been used by the USGS, no warranty, expressed or implied,
+ *   is made by the USGS as to the accuracy and functioning of such software 
+ *   and related material nor shall the fact of distribution constitute any such 
+ *   warranty, and no responsibility is assumed by the USGS in connection 
+ *   therewith.
+ *
+ *   For additional information, launch
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see 
+ *   the Privacy &amp; Disclaimers page on the Isis website,
+ *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
+ *   http://www.usgs.gov/privacy.html.
+ */
 
 #include "ThemisIrCamera.h"
-#include "LineScanCameraDetectorMap.h"
-#include "CameraFocalPlaneMap.h"
 #include "ThemisIrDistortionMap.h"
+
+#include "CameraFocalPlaneMap.h"
+#include "iException.h"
+#include "LineScanCameraDetectorMap.h"
 #include "LineScanCameraGroundMap.h"
 #include "LineScanCameraSkyMap.h"
+#include "NaifStatus.h"
 
+using namespace std;
 namespace Isis {
-  namespace Odyssey {
-    ThemisIrCamera::ThemisIrCamera(Isis::Pvl &lab) : Isis::LineScanCamera(lab) {
-      // Set the detector size
-      SetPixelPitch(0.05);
-      SetFocalLength(203.9213);
+  /**
+   * Constructor for the Themis Ir Camera Model
+   *
+   * @param lab Pvl label from an Odyssey Themis Ir image. 
+   *
+   * @internal
+   *   @history 2011-05-03 Jeannie Walldren - Added NAIF error check.
+   */
+  ThemisIrCamera::ThemisIrCamera(Pvl &lab) : LineScanCamera(lab) {
+    NaifStatus::CheckErrors();
+    // Set the detector size
+    SetPixelPitch(0.05);
+    SetFocalLength(203.9213);
 
-      // Get the start time.  This includes adding a time offset that could
-      // have been put in the labels during ingestion (thm2isis).  This is meant
-      // to handle a random timing errors which can be up to four pixels
-      Isis::PvlGroup &inst = lab.FindGroup("Instrument", Isis::Pvl::Traverse);
-      string stime = inst["SpacecraftClockCount"];
-      scs2e_c(NaifSclkCode(), stime.c_str(), &p_etStart);
-      double offset = inst["SpacecraftClockOffset"];
-      p_etStart += offset;
+    // Get the start time.  This includes adding a time offset that could
+    // have been put in the labels during ingestion (thm2isis).  This is meant
+    // to handle a random timing errors which can be up to four pixels
+    PvlGroup &inst = lab.FindGroup("Instrument", Pvl::Traverse);
+    string stime = inst["SpacecraftClockCount"];
+    scs2e_c(NaifSclkCode(), stime.c_str(), &p_etStart);
+    double offset = inst["SpacecraftClockOffset"];
+    p_etStart += offset;
 
-      // If bands have been extracted from the original image then we
-      // need to read the band bin group so we can map from the cube band
-      // number to the instrument band number
-      Isis::PvlGroup &bandBin = lab.FindGroup("BandBin", Isis::Pvl::Traverse);
-      Isis::PvlKeyword &orgBand = bandBin["FilterNumber"];
-      for(int i = 0; i < orgBand.Size(); i++) {
-        p_originalBand.push_back(orgBand[i]);
-      }
-
-      // Themis IR had a summing mode added.  This directly affects the line
-      // rate.  That is, the seconds per line.  In the Kieffer-Torson model
-      // the line rates was 33.2804 ms per line in SumMode = 1.  In the
-      // Duxbury model it is 33.2871 based on 1/22/2009 email with a readout
-      // rate of 30.0417 lines/second
-      int sumMode = 1;
-      if(inst.HasKeyword("SpatialSumming")) {
-        sumMode = inst["SpatialSumming"];
-      }
-      p_lineRate = 33.2871 / 1000.0 * sumMode;
-
-      // If the TDI mode is enabled then 16 line in the detector are summed
-      // to improve the SNR.  In the SetBand method we will the TDI mode to
-      // determine line offset for the band.
-      p_tdiMode = (string) inst["TimeDelayIntegration"];
-
-      // The detector map tells us how to convert from image coordinates to
-      // detector coordinates.  In our case, a (sample,line) to a (sample,time)
-      // This is band dependent so it will change in SetBand
-      LineScanCameraDetectorMap *detectorMap = new LineScanCameraDetectorMap(this, p_etStart, p_lineRate);
-      detectorMap->SetDetectorSampleSumming(sumMode);
-      detectorMap->SetDetectorLineSumming(sumMode);
-
-      // The focal plane map tells us how to go from detector position
-      // to focal plane x/y (distorted).  That is, (sample,time) to (x,y).
-      // This is band dependent so it will change in SetBand
-      CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, NaifIkCode());
-
-      // The boresight sample in the K-T model was 164.25.  In Duxbury's it is
-      // 160.5 or half the detector width.  The detector offset varies by band
-      // and is set to the proper value for band 1 for now
-      focalMap->SetDetectorOrigin(160.5, 0.0);
-      focalMap->SetDetectorOffset(0.0, 120.5 - 8.5);
-
-      // The camera has a distortion map which scales in the X direction,
-      // effectively a variable focal length, and an independent Y direction.
-      // Both are based on the band number
-      new ThemisIrDistortionMap(this);
-
-      // Setup the ground and sky map
-      new LineScanCameraGroundMap(this);
-      new LineScanCameraSkyMap(this);
-
-      LoadCache();
+    // If bands have been extracted from the original image then we
+    // need to read the band bin group so we can map from the cube band
+    // number to the instrument band number
+    PvlGroup &bandBin = lab.FindGroup("BandBin", Pvl::Traverse);
+    PvlKeyword &orgBand = bandBin["FilterNumber"];
+    for(int i = 0; i < orgBand.Size(); i++) {
+      p_originalBand.push_back(orgBand[i]);
     }
 
-    /**
-     * Change the THEMIS IR camera parameters based on the band
-     * number
-     *
-     * @author janderson (2/26/2009)
-     *
-     * @param vband
-     */
-    void ThemisIrCamera::SetBand(const int vband) {
-      // Lookup the original band from the band bin group.  Unless there is
-      // a reference band which means the data has all been aligned in the
-      // band dimension
-      int band;
-      if(HasReferenceBand()) {
-        band = ReferenceBand();
-        if((band < 1) || (band > 10)) {
-          string msg = "Invalid Reference Band [" + iString(band) + "]";
-          throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
-        }
-      }
-      else {
-        if(vband > (int) p_originalBand.size()) {
-          string msg = "Band number out of array bounds in ThemisIRCamera";
-          throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
-        }
-        band = p_originalBand[vband-1];
-      }
-
-      // Get the detector line in the CCD.  If TDI mode is enabled then
-      // we used the middle of the 16 lines which were summed.  Otherwise
-      // an individual line was read out.  It is not clear where/how the
-      // noTDI offsets were derived.  Hopefully from some THEMIS document.
-      // They were copied from ISIS2 code and the only suspicious value is
-      // at 52.  Also, Duxbury's 1/22/09 email used 128.5 vs 129.5 for the
-      // center of the TDI enable detector line positions.
-      double detectorLine;
-      if(p_tdiMode == "ENABLED") {
-        double bandDetector_TDI[] = {8.5, 24.5, 50.5, 76.5, 102.5,
-                                     128.5, 154.5, 180.5, 205.5, 231.5
-                                    };
-        detectorLine = bandDetector_TDI[band-1];
-      }
-      else {
-        int bandDetector_noTDI[] = {9, 24, 52, 77, 102, 129, 155, 181, 206, 232};
-        detectorLine = (double) bandDetector_noTDI[band-1];
-      }
-
-      // Compute the time offset for this band (using detector line)
-      // Subtracting 1.0 as in Duxbury's example would be the offset to
-      // the center of the pixel but we want to the top edge so we
-      // subtract 0.5
-      p_bandTimeOffset = (detectorLine - 0.5) * p_lineRate;
-      p_bandTimeOffset /= this->DetectorMap()->LineScaleFactor();
-
-      // Adjust the starting time in the detector map for this band
-      LineScanCameraDetectorMap *detectorMap =
-        (LineScanCameraDetectorMap *) this->DetectorMap();
-      detectorMap->SetStartTime(p_etStart + p_bandTimeOffset);
-
-      // Compute the along track offset at this detector line.  That is,
-      // the number of pixels away from the boresight line.  In the K-T model
-      // the boresight line was 109.5.  In Duxbury's it is half of the
-      // detector height or 120.5
-      double alongtrackOffset = 120.5 - detectorLine;
-
-      // Adjust alongtrackOffset using Kirk's empirically fitted numbers from
-      // Apr 2009
-      double empiricalOffset[] = { -0.076, -0.098, -0.089, -0.022, 0.0,
-                                   -0.020, -0.005, -0.069, 0.025, 0.0
-                                 };
-      alongtrackOffset += empiricalOffset[band-1];
-      this->FocalPlaneMap()->SetDetectorOffset(0.0, alongtrackOffset);
-
-      // Adjust the sample boresight using Kirk's empirically fitted numbers
-      // from Apr 2009
-      double sampleBoresight = 160.5;
-      double empiricalBoresightOffset[] = { 0.021, 0.027, 0.005, 0.005, 0.0,
-                                            -0.007, -0.012, -0.039, -0.045, 0.0
-                                          };
-      sampleBoresight -= empiricalBoresightOffset[band-1];
-      this->FocalPlaneMap()->SetDetectorOrigin(sampleBoresight, 0.0);
-
-      // Finally, adjust the optical distortion model based on the band
-      ThemisIrDistortionMap *distMap =
-        (ThemisIrDistortionMap *) DistortionMap();
-      distMap->SetBand(band);
+    // Themis IR had a summing mode added.  This directly affects the line
+    // rate.  That is, the seconds per line.  In the Kieffer-Torson model
+    // the line rates was 33.2804 ms per line in SumMode = 1.  In the
+    // Duxbury model it is 33.2871 based on 1/22/2009 email with a readout
+    // rate of 30.0417 lines/second
+    int sumMode = 1;
+    if(inst.HasKeyword("SpatialSumming")) {
+      sumMode = inst["SpatialSumming"];
     }
+    p_lineRate = 33.2871 / 1000.0 * sumMode;
+
+    // If the TDI mode is enabled then 16 line in the detector are summed
+    // to improve the SNR.  In the SetBand method we will the TDI mode to
+    // determine line offset for the band.
+    p_tdiMode = (string) inst["TimeDelayIntegration"];
+
+    // The detector map tells us how to convert from image coordinates to
+    // detector coordinates.  In our case, a (sample,line) to a (sample,time)
+    // This is band dependent so it will change in SetBand
+    LineScanCameraDetectorMap *detectorMap = new LineScanCameraDetectorMap(this, p_etStart, p_lineRate);
+    detectorMap->SetDetectorSampleSumming(sumMode);
+    detectorMap->SetDetectorLineSumming(sumMode);
+
+    // The focal plane map tells us how to go from detector position
+    // to focal plane x/y (distorted).  That is, (sample,time) to (x,y).
+    // This is band dependent so it will change in SetBand
+    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, NaifIkCode());
+
+    // The boresight sample in the K-T model was 164.25.  In Duxbury's it is
+    // 160.5 or half the detector width.  The detector offset varies by band
+    // and is set to the proper value for band 1 for now
+    focalMap->SetDetectorOrigin(160.5, 0.0);
+    focalMap->SetDetectorOffset(0.0, 120.5 - 8.5);
+
+    // The camera has a distortion map which scales in the X direction,
+    // effectively a variable focal length, and an independent Y direction.
+    // Both are based on the band number
+    new ThemisIrDistortionMap(this);
+
+    // Setup the ground and sky map
+    new LineScanCameraGroundMap(this);
+    new LineScanCameraSkyMap(this);
+
+    LoadCache();
+    NaifStatus::CheckErrors();
+  }
+
+  /**
+   * Change the THEMIS IR camera parameters based on the band
+   * number
+   *
+   * @param vband The band number to set
+   *  
+   * @author 2009-02-26 Jeff Anderson
+   */
+  void ThemisIrCamera::SetBand(const int vband) {
+    // Lookup the original band from the band bin group.  Unless there is
+    // a reference band which means the data has all been aligned in the
+    // band dimension
+    int band;
+    if(HasReferenceBand()) {
+      band = ReferenceBand();
+      if((band < 1) || (band > 10)) {
+        string msg = "Invalid Reference Band [" + iString(band) + "]";
+        throw iException::Message(iException::User, msg, _FILEINFO_);
+      }
+    }
+    else {
+      if(vband > (int) p_originalBand.size()) {
+        string msg = "Band number out of array bounds in ThemisIRCamera";
+        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      }
+      band = p_originalBand[vband-1];
+    }
+
+    // Get the detector line in the CCD.  If TDI mode is enabled then
+    // we used the middle of the 16 lines which were summed.  Otherwise
+    // an individual line was read out.  It is not clear where/how the
+    // noTDI offsets were derived.  Hopefully from some THEMIS document.
+    // They were copied from ISIS2 code and the only suspicious value is
+    // at 52.  Also, Duxbury's 1/22/09 email used 128.5 vs 129.5 for the
+    // center of the TDI enable detector line positions.
+    double detectorLine;
+    if(p_tdiMode == "ENABLED") {
+      double bandDetector_TDI[] = {8.5, 24.5, 50.5, 76.5, 102.5,
+                                   128.5, 154.5, 180.5, 205.5, 231.5
+                                  };
+      detectorLine = bandDetector_TDI[band-1];
+    }
+    else {
+      int bandDetector_noTDI[] = {9, 24, 52, 77, 102, 129, 155, 181, 206, 232};
+      detectorLine = (double) bandDetector_noTDI[band-1];
+    }
+
+    // Compute the time offset for this band (using detector line)
+    // Subtracting 1.0 as in Duxbury's example would be the offset to
+    // the center of the pixel but we want to the top edge so we
+    // subtract 0.5
+    p_bandTimeOffset = (detectorLine - 0.5) * p_lineRate;
+    p_bandTimeOffset /= this->DetectorMap()->LineScaleFactor();
+
+    // Adjust the starting time in the detector map for this band
+    LineScanCameraDetectorMap *detectorMap =
+      (LineScanCameraDetectorMap *) this->DetectorMap();
+    detectorMap->SetStartTime(p_etStart + p_bandTimeOffset);
+
+    // Compute the along track offset at this detector line.  That is,
+    // the number of pixels away from the boresight line.  In the K-T model
+    // the boresight line was 109.5.  In Duxbury's it is half of the
+    // detector height or 120.5
+    double alongtrackOffset = 120.5 - detectorLine;
+
+    // Adjust alongtrackOffset using Kirk's empirically fitted numbers from
+    // Apr 2009
+    double empiricalOffset[] = { -0.076, -0.098, -0.089, -0.022, 0.0,
+                                 -0.020, -0.005, -0.069, 0.025, 0.0
+                               };
+    alongtrackOffset += empiricalOffset[band-1];
+    this->FocalPlaneMap()->SetDetectorOffset(0.0, alongtrackOffset);
+
+    // Adjust the sample boresight using Kirk's empirically fitted numbers
+    // from Apr 2009
+    double sampleBoresight = 160.5;
+    double empiricalBoresightOffset[] = { 0.021, 0.027, 0.005, 0.005, 0.0,
+                                          -0.007, -0.012, -0.039, -0.045, 0.0
+                                        };
+    sampleBoresight -= empiricalBoresightOffset[band-1];
+    this->FocalPlaneMap()->SetDetectorOrigin(sampleBoresight, 0.0);
+
+    // Finally, adjust the optical distortion model based on the band
+    ThemisIrDistortionMap *distMap =
+      (ThemisIrDistortionMap *) DistortionMap();
+    distMap->SetBand(band);
   }
 }
 
+
 // Plugin
+/**
+ * This is the function that is called in order to instantiate a 
+ * ThemisIrCamera object. 
+ *
+ * @param lab Cube labels
+ *
+ * @return Isis::Camera* ThemisIrCamera
+ * @internal
+ *   @history 2011-05-03 Jeannie Walldren - Removed Odyssey namespace.
+ */
 extern "C" Isis::Camera *ThemisIrCameraPlugin(Isis::Pvl &lab) {
-  return new Isis::Odyssey::ThemisIrCamera(lab);
+  return new Isis::ThemisIrCamera(lab);
 }
