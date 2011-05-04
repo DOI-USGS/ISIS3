@@ -1,18 +1,28 @@
+Unit Test for LroNarrowAngleCamera...
+Filename: M111607830RE_crop.cub
+CK Frame: -85610
+
+Kernel IDs: 
+CK Frame ID = -85000
+CK Reference ID = 1
+SPK Target ID = -85
+SPK Reference ID = 1
+
 For upper left corner ...
-DeltaSample = 0
-DeltaLine = 0
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
 
 For upper right corner ...
-DeltaSample = 0
-DeltaLine = 0
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
 
 For lower left corner ...
-DeltaSample = 0
-DeltaLine = 0
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
 
 For lower right corner ...
-DeltaSample = 0
-DeltaLine = 0
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
 
 For center pixel position ...
 Latitude OK
