@@ -1,16 +1,50 @@
+/**
+ * @file
+ *
+ *   Unless noted otherwise, the portions of Isis written by the USGS are public
+ *   domain. See individual third-party library and package descriptions for 
+ *   intellectual property information,user agreements, and related information.
+ *
+ *   Although Isis has been used by the USGS, no warranty, expressed or implied,
+ *   is made by the USGS as to the accuracy and functioning of such software 
+ *   and related material nor shall the fact of distribution constitute any such 
+ *   warranty, and no responsibility is assumed by the USGS in connection 
+ *   therewith.
+ *
+ *   For additional information, launch
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see 
+ *   the Privacy &amp; Disclaimers page on the Isis website,
+ *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
+ *   http://www.usgs.gov/privacy.html.
+ */
 #include "ApolloMetricDistortionMap.h"
 #include "CameraFocalPlaneMap.h"
 
 using namespace std;
-
 namespace Isis {
+  /**
+   *  
+   * Constructs a Distortion Map object for the Apollo Metric Camera. 
+   *  
+   * @param parent Pointer to parent Camera object
+   * @param xp Pricipal point x-coordinate
+   * @param yp Pricipal point y-coordinate
+   * @param k1 First coefficient of radial distortion
+   * @param k2 Second coefficient of radial distortion
+   * @param k3 Third coefficient of radial distortion
+   * @param j1 First coefficient of decentering distortion
+   * @param j2 Second coefficient of decentering distortion
+   * @param t0 Angle between positive x-axis of image and vector to imaged point
+   * 
+   * @internal
+   *   @history 2011-05-03 Jeannie Walldren - Added documentation.
+   */
   ApolloMetricDistortionMap::ApolloMetricDistortionMap(Camera *parent,
-      double xp, double yp,
-      double k1, double k2,
-      double k3, double j1,
-      double j2, double t0) :
-    CameraDistortionMap(parent) {
-
+                                                       double xp, double yp,
+                                                       double k1, double k2,
+                                                       double k3, double j1,
+                                                       double j2, double t0) :
+                                                       CameraDistortionMap(parent) {
     p_xp = xp;
     p_yp = yp;
     p_k1 = k1;
@@ -28,10 +62,10 @@ namespace Isis {
    * fter calling this method, you can obtain the undistorted
    * x/y via the UndistortedFocalPlaneX and UndistortedFocalPlaneY methods
    *
-   * @param dx distorted focal plane x in millimeters
-   * @param dy distorted focal plane y in millimeters
+   * @param dx Distorted focal plane x, in millimeters
+   * @param dy Distorted focal plane y, in millimeters
    *
-   * @return if the conversion was successful
+   * @return whether the conversion was successful
    */
   bool ApolloMetricDistortionMap::SetFocalPlane(const double dx, const double dy) {
     p_focalPlaneX = dx;
@@ -66,10 +100,10 @@ namespace Isis {
    * After calling this method, you can obtain the distorted x/y via the
    * FocalPlaneX and FocalPlaneY methods
    *
-   * @param ux undistorted focal plane x in millimeters
-   * @param uy undistorted focal plane y in millimeters
+   * @param ux Undistorted focal plane x, in millimeters
+   * @param uy Undistorted focal plane y, in millimeters
    *
-   * @return if the conversion was successful
+   * @return whether the conversion was successful
    */
   bool ApolloMetricDistortionMap::SetUndistortedFocalPlane(const double ux, const double uy) {
     // image coordinates prior to introducing distortion
