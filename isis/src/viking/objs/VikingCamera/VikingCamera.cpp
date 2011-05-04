@@ -21,29 +21,39 @@
  */
 
 #include "VikingCamera.h"
+
 #include "CameraDetectorMap.h"
-#include "CameraFocalPlaneMap.h"
 #include "ReseauDistortionMap.h"
+#include "CameraFocalPlaneMap.h"
 #include "CameraGroundMap.h"
 #include "CameraSkyMap.h"
+#include "Filename.h"
 #include "iString.h"
 #include "iTime.h"
 #include "naif/SpiceUsr.h"
 #include "naif/SpiceZfc.h"
 #include "naif/SpiceZmc.h"
-#include "Filename.h"
-
+#include "NaifStatus.h"
 
 using namespace std;
+
 namespace Isis {
   /**
-   * Creates a Viking Camera Model
+   * Constructs a Viking Camera Model.
    *
-   * @param lab Pvl Label from the image
+   * @param lab Pvl label from a Viking image
    *
-   * @throws Isis::iException::User - The file does not appear to be a viking image
+   * @throw iException::User - "File does not appear to be a Viking image.
+   *        Invalid InstrumentId."
+   * @throw iException::User - "File does not appear to be a Viking image.
+   *        Invalid SpacecraftName."
+   * @internal
+   *   @history 2011-05-03 Jeannie Walldren - Added NAIF error check. Moved
+   *                          offset calculation to ShutterOpenCloseTimes()
+   *                          method and added a call to the new method.
    */
   VikingCamera::VikingCamera(Pvl &lab) : FramingCamera(lab) {
+    NaifStatus::CheckErrors();
     // Set the pixel pitch
     SetPixelPitch(1.0 / 85.0);
 
@@ -77,7 +87,8 @@ namespace Isis {
         raster = 90.022800;
       }
       else {
-        string msg = "File does not appear to be a viking image";
+        string msg = "File does not appear to be a Viking image. InstrumentId ["
+          + instId + "] is invalid Viking value.";
         throw iException::Message(iException::User, msg, _FILEINFO_);
       }
     }
@@ -102,39 +113,57 @@ namespace Isis {
         raster = 89.663790;
       }
       else {
-        string msg = "File does not appear to be a viking image";
+        string msg = "File does not appear to be a Viking image. InstrumentId ["
+          + instId + "] is invalid Viking value.";
         throw iException::Message(iException::User, msg, _FILEINFO_);
       }
     }
     else {
-      string msg = "File does not appear to be a viking image";
+      string msg = "File does not appear to be a Viking image. SpacecraftName ["
+          + spacecraft + "] is invalid Viking value.";
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
+    // DOCUMENTATION FROM ISIS2 lev1u_vik_vis_routines.c:
+    /*****************************************************************************
+     * Calculate the START_TIME keyword (time at middle of exposure in this case)*
+     * value from FSC to get fractional seconds (PDS START_TIME provided is only *
+     * to the nearest whole second).  The algorithm below was extracted from the *
+     * NAIF document Viking Orbiter Time Tag Analysis and Restoration by Boris   *
+     * Semenov and Chuck Acton.                                                  *
+     *       1.  Get exposure duration from labels to center the time            *
+     *       2.  Get FSC from IMAGE_NUMBER on labels to use as spacecraftClock   *
+     *       3.  Load the appropriate FSC spacecraft clock kernel based on       *
+     *           the spacecraft (Viking Orbiter 1 or Viking Orbiter 2)           *
+     *       4.  Load a leap second kernel                                       *
+     *       5.  Convert FSC to et                                               *
+     *       6.  Add the offsets to get to midexposure                           *
+     *       7.  Convert et to UTC calendar format and write to labels as        *
+     *           START_TIME                                                      *
+     *****************************************************************************/
+
     // Get clock count and convert it to a time
     string spacecraftClock = inst["SpacecraftClockCount"];
-    double et, offset1;
-    scs2e_c(altinstcode, spacecraftClock.c_str(), &et);
+    double etClock;
+    scs2e_c(altinstcode, spacecraftClock.c_str(), &etClock);
+
+    // exposure duration keyword value is measured in seconds
+    double exposureDuration = inst["ExposureDuration"];
 
     // Calculate and load the euler angles
     SpiceDouble CP[3][3];
     eul2m_c((SpiceDouble)raster * rpd_c(), (SpiceDouble)cone * rpd_c(),
             (SpiceDouble) - crosscone * rpd_c(), 3, 2, 1, CP);
 
-//    LoadEulerMounting(CP);
+    //    LoadEulerMounting(CP);
 
-    double exposure_duration = inst["ExposureDuration"];
-    if(exposure_duration <= .420) {
-      offset1 = 7.0 / 8.0 * 4.48;    //4.48 seconds
-    }
-    else offset1 = 3.0 / 8.0 * 4.48;
-    double offset2 = 1.0 / 64.0 * 4.48;
+    pair<iTime, iTime> shuttertimes = ShutterOpenCloseTimes(etClock, exposureDuration);
 
-    et += offset1 + offset2 + exposure_duration / 2.0;
-
+    // find center shutter time
+    double centerTime = shuttertimes.first.Et() + exposureDuration / 2.0;
     char timepds[25];
-    et2utc_c(et, "ISOC", 3, 25, timepds);
-    utc2et_c(timepds, &et);
+    et2utc_c(centerTime, "ISOC", 3, 25, timepds);
+    utc2et_c(timepds, &centerTime);
 
     // Setup detector map
     new CameraDetectorMap(this);
@@ -152,11 +181,59 @@ namespace Isis {
     new CameraGroundMap(this);
     new CameraSkyMap(this);
 
-    SetTime(et);
+    SetTime(centerTime);
     LoadCache();
+    NaifStatus::CheckErrors();
   }
-} // end namespace isis
 
+  /**
+   * Returns the shutter open and close times. The user should pass in the
+   * ExposureDuration keyword value and the SpacecraftClockCount keyword value,
+   * converted to ephemeris time. To find the shutter open time, 2 offset values
+   * must be added to the SpacecraftClockCount keyword value. To find the
+   * shutter close time, the exposure duration is added to the calculated
+   * shutter open time. This method overrides the FramingCamera class method. 
+   *
+   * @param exposureDuration ExposureDuration keyword value from the labels, in
+   *                         seconds.
+   * @param time The SpacecraftClockCount keyword value from the labels,
+   *             converted to ephemeris time.
+   *
+   * @return @b pair < @b iTime, @b iTime > The first value is the shutter open 
+   *         time and the second is the shutter close time.
+   *
+   * @author 2011-05-03 Jeannie Walldren
+   * @internal
+   *   @history 2011-05-03 Jeannie Walldren - Original version.
+   */
+  pair<iTime, iTime> VikingCamera::ShutterOpenCloseTimes(double time,
+                                                         double exposureDuration) {
+    pair<iTime, iTime> shuttertimes;
+    double offset1;
+    if(exposureDuration <= .420) {
+      offset1 = 7.0 / 8.0 * 4.48;    //4.48 seconds = nomtick
+    }
+    else {
+      offset1 = 3.0 / 8.0 * 4.48;
+    }
+    double offset2 = 1.0 / 64.0 * 4.48;
+
+    // set private variables inherited from Spice class
+    shuttertimes.first = time + offset1 + offset2;
+    shuttertimes.second = shuttertimes.first.Et() + exposureDuration;
+    return shuttertimes;
+  }
+}
+
+
+/**
+ * This is the function that is called in order to instantiate a VikingCamera
+ * object. 
+ *
+ * @param lab Cube labels
+ *
+ * @return Isis::Camera* VikingCamera
+ */
 extern "C" Isis::Camera *VikingCameraPlugin(Isis::Pvl &lab) {
   return new Isis::VikingCamera(lab);
 }

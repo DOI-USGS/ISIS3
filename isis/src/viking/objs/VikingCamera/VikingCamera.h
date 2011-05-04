@@ -33,33 +33,49 @@ namespace Isis {
    *
    * @ingroup SpiceInstrumentsAndCameras
    * @ingroup Viking
-   *
+   *  
+   * @see http://nssdc.gsfc.nasa.gov/nmc/masterCatalog.do?sc=1975-075A 
+   * @see http://nssdc.gsfc.nasa.gov/nmc/masterCatalog.do?sc=1975-083A 
+   *  
    * @author 2005-06-09 Elizabeth Ribelin
    *
    * @internal
    *   @history 2005-11-15 Elizabeth Miller - Fixed problems caused by viking
-   *                                          data area split
+   *                          data area split
    *   @history 2006-05-17 Elizabeth Miller - Depricated CameraManager to
-   *                                          CameraFactory
+   *                          CameraFactory
    *   @history 2006-06-14 Elizabeth Miller - Changed format of unitTest to
-   *                                          fix problems with minor naif
-   *                                          changes
+   *                          fix problems with minor naif changes
    *   @history 2008-08-08 Steven Lambright Now using the new LoadCache(...)
-   *            method instead of CreateCache(...).
-   *   @history 2009-08-28 Steven Lambright - Changed inheritance to no
-   *           longer inherit directly from Camera
+   *                          method instead of CreateCache(...).
+   *   @history 2009-08-28 Steven Lambright - Changed inheritance to no longer
+   *                          inherit directly from Camera
+   *   @history 2011-01-14 Travis Addair - Added new CK/SPK accessor methods,
+   *                          pure virtual in Camera, implemented in mission
+   *                          specific cameras.
+   *   @history 2011-02-09 Steven Lambright - Major changes to camera classes.
+   *   @history 2011-05-03 Jeannie Walldren - Added ShutterOpenCloseTimes()
+   *                          method. Updated unitTest to test for new methods.
+   *                          Updated documentation. Added Isis Disclaimer to
+   *                          files. Added NAIF error check to constructor.
+   *  
    */
-  class VikingCamera : public Isis::FramingCamera {
+  class VikingCamera : public FramingCamera {
     public:
-      VikingCamera(Isis::Pvl &lab);
-
+      VikingCamera(Pvl &lab);
       //! Destroys the VikingCamera Object
       ~VikingCamera() {};
+      virtual std::pair <iTime, iTime> ShutterOpenCloseTimes(double time, 
+                                                             double exposureDuration);
 
       /** 
        * CK frame ID -
        * Viking1 instrument code (VO1_PLATFORM) = -27000
        * Viking2 instrument code (VO2_PLATFORM) = -30000
+       *  
+       * @return @b int The appropriate instrument code for the "Camera-matrix" 
+       *         Kernel Frame ID
+       *  
        */
       virtual int CkFrameId() const { return p_ckFrameId; }
 
@@ -68,6 +84,10 @@ namespace Isis {
        * B1950 or J2000 depending on the ck used.  The mdim2.0_rand ck is in
        * J2000.  Here we use B1950 (code = 2) because it was the reference
        * frame for the original spice
+       * 
+       * @return @b int The appropriate instrument code for the "Camera-matrix"
+       *         Kernel Reference ID
+       *  
        */
       virtual int CkReferenceId() const { return (2); }
 
@@ -75,16 +95,23 @@ namespace Isis {
        * SPK Target Body ID -
        * VIKING 1 ORBITER = -27
        * VIKING 2 ORBITER = -30
+       *  
+       * @return @b int The appropriate instrument code for the Spacecraft 
+       *         Kernel Target ID
        */
       virtual int SpkTargetId() const { return p_spkTargetId; }
 
-      /** SPK Reference ID - B1950 */
+      /** 
+       * SPK Reference ID - B1950
+       * 
+       * @return @b int The appropriate instrument code for the Spacecraft
+       *         Kernel Reference ID
+       */
       virtual int SpkReferenceId() const { return (2); }
 
     private:
-      int p_ckFrameId;
-      int p_spkTargetId;
+      int p_ckFrameId;       //!< "Camera-matrix" Kernel Frame ID
+      int p_spkTargetId;     //!< Spacecraft Kernel Target ID
   };
 };
 #endif
-

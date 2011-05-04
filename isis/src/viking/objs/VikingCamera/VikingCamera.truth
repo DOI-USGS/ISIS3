@@ -1,19 +1,31 @@
 Unit Test for VikingCamera...
+Filename: f348b26.cub
+CK Frame: -30002
+
+Kernel IDs: 
+CK Frame ID = -30000
+CK Reference ID = 2
+SPK Target ID = -30
+SPK Reference ID = 2
+
+Shutter open = -707255998.826805711
+Shutter close = -707255998.826669931
+
 For upper left corner ...
-DeltaSample = 0
-DeltaLine = 0
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
 
 For upper right corner ...
-DeltaSample = 0
-DeltaLine = 0
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
 
 For lower left corner ...
-DeltaSample = 0
-DeltaLine = 0
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
 
 For lower right corner ...
-DeltaSample = 0
-DeltaLine = 0
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
 
 For center pixel position ...
 Latitude OK
