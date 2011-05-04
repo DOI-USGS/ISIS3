@@ -1209,10 +1209,10 @@ namespace Qisis {
                        Isis::iString((int)(p_rightMeasure->GetLine()))   + "_";
     std::string fname = baseFile + "Search.cub";
     std::string command = "$ISISROOT/bin/qview " + fname;
-    p_autoRegFact->SearchChip()->Write(fname);
+    p_autoRegFact->RegistrationSearchChip()->Write(fname);
     fname = baseFile + "Pattern.cub";
     command += " " + fname;
-    p_autoRegFact->PatternChip()->Write(fname);
+    p_autoRegFact->RegistrationPatternChip()->Write(fname);
     fname = baseFile + "Fit.cub";
     command += " " + fname + "&";
     p_autoRegFact->FitChip()->Write(fname);

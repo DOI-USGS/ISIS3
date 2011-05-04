@@ -156,7 +156,9 @@ namespace Isis {
    *             being reapplied to pattern and search chips each time
    *             Register() was called. Also fixed bug where filtered chips
    *             lost cube positioning information in ApplyGradientFilter().
-   *
+   *    @history 2011-05-04 Jai Rideout - Added ability to save gradient-
+   *             filtered chips after registration instead of just saving the
+   *             original chips.
    */
   class AutoRegItem;
   class Buffer;
@@ -213,6 +215,26 @@ namespace Isis {
       //! Return pointer to fit chip
       inline Chip *FitChip() {
         return &p_fitChip;
+      };
+
+      //! Return pointer to pattern chip used in registration
+      inline Chip *RegistrationPatternChip() {
+        if (p_gradientFilterType == None) {
+          return &p_patternChip;
+        }
+        else {
+          return &p_gradientPatternChip;
+        }
+      };
+
+      //! Return pointer to search chip used in registration
+      inline Chip *RegistrationSearchChip() {
+        if (p_gradientFilterType == None) {
+          return &p_searchChip;
+        }
+        else {
+          return &p_gradientSearchChip;
+        }
       };
 
       //! Return pointer to reduced pattern chip
@@ -516,6 +538,8 @@ namespace Isis {
       Chip p_patternChip;                                  //!< Chip to be matched
       Chip p_searchChip;                                   //!< Chip to be searched for best registration
       Chip p_fitChip;                                      //!< Results from MatchAlgorithm() method
+      Chip p_gradientSearchChip;                           //!< Chip to be searched for best registration with gradient applied
+      Chip p_gradientPatternChip;                          //!< Chip to be matched with gradient applied
       Chip p_reducedPatternChip;                           //!< Pattern Chip with reduction factor
       Chip p_reducedSearchChip;                            //!< Search Chip with reduction factor
       Chip p_reducedFitChip;                               //!< Fit Chip with reduction factor

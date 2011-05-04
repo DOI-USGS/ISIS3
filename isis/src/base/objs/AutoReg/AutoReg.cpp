@@ -88,7 +88,7 @@ namespace Isis {
     p_reducedPatternChip.SetSize(3, 3);
     p_reducedSearchChip.SetSize(5, 5);
     p_reducedFitChip.SetSize(5, 5);
-    p_gradientFilterType = AutoReg::None;
+    p_gradientFilterType = None;
 
     SetPatternValidPercent(50.0);
     SetSubsearchValidPercent(50.0);
@@ -308,13 +308,13 @@ namespace Isis {
    */
   void AutoReg::SetGradientFilterType(const iString& gradientFilterType) {
     if (gradientFilterType == "None") {
-      p_gradientFilterType = AutoReg::None;
+      p_gradientFilterType = None;
     }
     else if (gradientFilterType == "Roberts") {
-      p_gradientFilterType = AutoReg::Roberts;
+      p_gradientFilterType = Roberts;
     }
     else if (gradientFilterType == "Sobel") {
-      p_gradientFilterType = AutoReg::Sobel;
+      p_gradientFilterType = Sobel;
     }
     else {
       throw iException::Message(iException::User,
@@ -683,7 +683,9 @@ namespace Isis {
     p_totalRegistrations++;
 
     // Create copies of the search and pattern chips and run a gradient filter
-    // over them before attempting to perform a match.
+    // over them before attempting to perform a match. We do this so that
+    // multiple calls to this method won't result in having a gradient filter
+    // applied multiple times to the same chip.
     Chip gradientPatternChip(p_patternChip);
     Chip gradientSearchChip(p_searchChip);
     ApplyGradientFilter(gradientPatternChip);
@@ -830,6 +832,14 @@ namespace Isis {
         gradientSearchChip.SetChipPosition(p_chipSample, p_chipLine);
         p_cubeSample = gradientSearchChip.CubeSample();
         p_cubeLine   = gradientSearchChip.CubeLine();
+        
+        // Save off the gradient search and pattern chips if we used a gradient
+        // filter.
+        if (p_gradientFilterType != None) {
+          p_gradientSearchChip = gradientSearchChip;
+          p_gradientPatternChip = gradientPatternChip;
+        }
+
         p_goodnessOfFit = p_bestFit;
         p_subpixelSuccesses++;
       }
@@ -854,6 +864,7 @@ namespace Isis {
     // ----------------------------------------------------------------
     p_goodnessOfFit = p_bestFit;
     p_searchChip.SetChipPosition(p_bestSamp, p_bestLine);
+    gradientSearchChip.SetChipPosition(p_bestSamp, p_bestLine);
     p_cubeSample = p_searchChip.CubeSample();
     p_cubeLine   = p_searchChip.CubeLine();
 
@@ -915,6 +926,7 @@ namespace Isis {
 
       // Ok we have subpixel fits in chip space so convert to cube space
       p_searchChip.SetChipPosition(p_chipSample, p_chipLine);
+      gradientSearchChip.SetChipPosition(p_chipSample, p_chipLine);
       p_cubeSample = p_searchChip.CubeSample();
       p_cubeLine   = p_searchChip.CubeLine();
     }
@@ -928,6 +940,14 @@ namespace Isis {
       p_pixelSuccesses++;
       p_registrationStatus = SuccessPixel;
     }
+
+    // Save off the gradient search and pattern chips if we used a gradient
+    // filter.
+    if (p_gradientFilterType != None) {
+      p_gradientSearchChip = gradientSearchChip;
+      p_gradientPatternChip = gradientPatternChip;
+    }
+
     return p_registrationStatus;
   }
 
