@@ -1,23 +1,52 @@
-using namespace std;
+/**
+ * @file
+ *
+ *   Unless noted otherwise, the portions of Isis written by the USGS are public
+ *   domain. See individual third-party library and package descriptions for 
+ *   intellectual property information,user agreements, and related information.
+ *
+ *   Although Isis has been used by the USGS, no warranty, expressed or implied,
+ *   is made by the USGS as to the accuracy and functioning of such software 
+ *   and related material nor shall the fact of distribution constitute any such 
+ *   warranty, and no responsibility is assumed by the USGS in connection 
+ *   therewith.
+ *
+ *   For additional information, launch
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see 
+ *   the Privacy &amp; Disclaimers page on the Isis website,
+ *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
+ *   http://www.usgs.gov/privacy.html.
+ */
 
 #include <iomanip>
 #include <iostream>
+
 #include "Camera.h"
 #include "CameraFactory.h"
 #include "CameraFocalPlaneMap.h"
+#include "Filename.h"
 #include "iException.h"
+#include "iTime.h"
 #include "Preference.h"
+#include "Pvl.h"
+
+using namespace std;
+using namespace Isis;
 
 int main(void) {
-  Isis::Preference::Preferences(true);
+  Preference::Preferences(true);
 
   cout << "Unit Test for LoCameraFiducialMap..." << endl;
 
   try {
 
-    std::cout << "Testing medium fiducial fit on a 100 x 100 cropped frame" << std::endl;
-    Isis::Pvl pm("$lo/testData/3083_med_raw.cub");
-    Isis::Camera *camm = Isis::CameraFactory::Create(pm);
+    cout << "Testing medium fiducial fit on a 100 x 100 cropped frame" << endl;
+    Pvl pm("$lo/testData/3083_med_raw.cub");
+    Camera *camm = CameraFactory::Create(pm);
+
+    cout << "Filename: " << Filename(pm.Filename()).Name() << endl;
+    cout << "CK Frame: " << camm->InstrumentRotation()->Frame() << endl << endl;
+    cout.setf(std::ios::fixed);
     cout << setprecision(9);
 
     // Test all four corners to make sure the conversions are correct
@@ -99,11 +128,16 @@ int main(void) {
         cout << setprecision(16) << "Lower right X off by: " << focalPlaneX - knownLowerRightX << endl;
         cout << setprecision(16) << "Lower right Y off by: " << focalPlaneY - knownLowerRightY << endl;
       }
+      cout  << endl << "-------------------------------------" << endl;
     }
 
-    std::cout << "Testing high fiducial fit on a full 34530 x 8750 frame" << std::endl;
-    Isis::Pvl ph("$lo/testData/4164H_Full_mirror.cub");
-    Isis::Camera *camh = Isis::CameraFactory::Create(ph);
+    cout << "Testing high fiducial fit on a full 34530 x 8750 frame" << endl;
+    Pvl ph("$lo/testData/4164H_Full_mirror.cub");
+    Camera *camh = CameraFactory::Create(ph);
+
+    cout << "Filename: " << Filename(ph.Filename()).Name() << endl;
+    cout << "CK Frame: " << camh->InstrumentRotation()->Frame() << endl << endl;
+    cout.setf(std::ios::fixed);
     cout << setprecision(9);
 
     // Test all four corners and center pixel to make sure the conversions are correct
@@ -210,7 +244,7 @@ int main(void) {
     delete camh;
   }
 
-  catch(Isis::iException &e) {
+  catch(iException &e) {
     e.Report();
   }
 }
