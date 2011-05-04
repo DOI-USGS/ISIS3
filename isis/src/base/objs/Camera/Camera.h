@@ -197,7 +197,8 @@ namespace Isis {
    *                          SurfacePoint
    *  @history 2011-02-18 Steven Lambright - Fixed a problem where using a
    *                          planetographic mapping group in GroundRange would
-   *                          still output planetocentric latitudes. 
+   *                          still output planetocentric latitudes.
+   *   @history 2011-05-03 Jeannie Walldren - Added Isis Disclaimer to files.
    */
 
   class Camera : public Sensor {
