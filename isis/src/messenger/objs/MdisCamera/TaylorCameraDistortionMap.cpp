@@ -1,23 +1,37 @@
 /**
  * @file
- * This class describes a geometric distortion model which is
- * approximated by a third-order Taylor series expansion.
  *
- * Please direct questions to
- * Lillian Nguyen, JHUAPL, (443)778-5477, Lillian.Nguyen@jhuapl.edu
+ *   Unless noted otherwise, the portions of Isis written by the USGS are public
+ *   domain. See individual third-party library and package descriptions for 
+ *   intellectual property information,user agreements, and related information.
+ *
+ *   Although Isis has been used by the USGS, no warranty, expressed or implied,
+ *   is made by the USGS as to the accuracy and functioning of such software 
+ *   and related material nor shall the fact of distribution constitute any such 
+ *   warranty, and no responsibility is assumed by the USGS in connection 
+ *   therewith.
+ *
+ *   For additional information, launch
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see 
+ *   the Privacy &amp; Disclaimers page on the Isis website,
+ *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
+ *   http://www.usgs.gov/privacy.html.
  */
+
 #include <cmath>
 #include "iString.h"
 #include "TaylorCameraDistortionMap.h"
 
+using namespace std;
 namespace Isis {
 
-  /** Camera distortion map constructor
+  /** 
+   *  @brief Taylor series camera distortion map constructor.
    *
-   * Create a camera distortion map.  This class maps between distorted
-   * and undistorted focal plane x/y's.  The default mapping is the
-   * identity, that is, the focal plane x/y and undistorted focal plane
-   * x/y will be identical.
+   * Create a geometric distortion model which is approximated by a third-order 
+   * Taylor series expansion. This class maps between distorted and undistorted
+   * focal plane x/y's. The default mapping is the identity, that is, the focal 
+   * plane x/y and undistorted focal plane x/y will be identical. 
    *
    * @param parent        the parent camera that will use this distortion map
    * @param zDirection    the direction of the focal plane Z-axis
@@ -28,7 +42,8 @@ namespace Isis {
     CameraDistortionMap(parent, zDirection) {
   }
 
-  /** Load distortion coefficients
+  /** 
+   *  @brief Load distortion coefficients.
    *
    * This method loads the distortion coefficients from the instrument
    * kernel.  The coefficients in the NAIF instrument kernel are
@@ -58,15 +73,16 @@ namespace Isis {
    * @param naifIkCode    Code to search for in instrument kernel
    */
   void TaylorCameraDistortionMap::SetDistortion(const int naifIkCode) {
-    std::string odtxkey = "INS" + Isis::iString(naifIkCode) + "_OD_T_X";
-    std::string odtykey = "INS" + Isis::iString(naifIkCode) + "_OD_T_Y";
+    string odtxkey = "INS" + iString(naifIkCode) + "_OD_T_X";
+    string odtykey = "INS" + iString(naifIkCode) + "_OD_T_Y";
     for(int i = 0; i < 10; ++i) {
       p_odtx.push_back(Spice::GetDouble(odtxkey, i));
       p_odty.push_back(Spice::GetDouble(odtykey, i));
     }
   }
 
-  /** Compute undistorted focal plane x/y
+  /** 
+   *  @brief Compute undistorted focal plane x/y.
    *
    * Compute undistorted focal plane x/y given a distorted focal plane x/y.
    * The undistorted coordinates are solved for using the Newton-Raphson
@@ -155,7 +171,8 @@ namespace Isis {
     return true;
   }
 
-  /** Compute distorted focal plane x/y
+  /** 
+   *  @brief Compute distorted focal plane x/y.
    *
    * Compute distorted focal plane x/y given an undistorted focal plane x/y.
    * The distortion model is approximated by a third order Taylor series
@@ -270,4 +287,8 @@ namespace Isis {
   }
 
 }
+/**
+ * Please direct questions to
+ * Lillian Nguyen, JHUAPL, (443)778-5477, Lillian.Nguyen@jhuapl.edu
+ */
 
