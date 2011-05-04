@@ -25,7 +25,6 @@
 #include <string>
 #include <vector>
 #include "iString.h"
-using namespace std;
 namespace Isis {
   class Pvl;
   /**
@@ -36,18 +35,19 @@ namespace Isis {
    * for the values of Keywords in the Instrument Group of the
    * cube's labels.
    *
-   * @ingroup Cassini
+   * @ingroup Cassini-Huygens
    * @author 2008-11-05 Jeannie Walldren
    * @internal
    *  @history 2008-11-05 Jeannie Walldren - Original Version
-   *  @history 2008-11-07 Fixed documentation
+   *  @history 2008-11-07 Jeannie Walldren - Fixed documentation.
+   *  @history 2011-05-03 Jeannie Walldren - Fixed documentation.
    */
 
   class CissLabels {
     public:
       CissLabels(Pvl &lab);
-      CissLabels(const string &file);
-      //! Empty Destructor
+      CissLabels(const std::string &file);
+      //! Destroys the CissLabels object
       ~CissLabels() {};
 
 
@@ -196,7 +196,7 @@ namespace Isis {
        *
        *  @returns @b vector @b \<iString\> The optical filter names.
        */
-      vector <iString>       FilterName()              const {
+      std::vector <iString>       FilterName()              const {
         return p_filter;
       };
 
@@ -211,7 +211,7 @@ namespace Isis {
        *
        *  @returns @b vector @b \<int\> The filter indices.
        */
-      vector <int>           FilterIndex()             const {
+      std::vector <int>           FilterIndex()             const {
         return p_filterIndex;
       };
 
@@ -422,7 +422,7 @@ namespace Isis {
 
 
       //! Value of the PDS keyword AntiBloomingFlag in the cube's labels
-      string p_ABflag;
+      std::string p_ABflag;
       //! Indicates whether anti-blooming state flag on
       bool p_antiblooming;
       //! Value of the PDS keyword BiasStripMean in the cube's labels
@@ -440,9 +440,9 @@ namespace Isis {
       //! Value of the PDS keyword ExposureDuration in the cube's labels
       double p_exposureDuration;
       //! Two-element array of optical filters used for this image
-      vector <iString> p_filter;
+      std::vector <iString> p_filter;
       //! Two-element array of filter indices corresponding to optical filters
-      vector <int> p_filterIndex;
+      std::vector <int> p_filterIndex;
       //! Value of the PDS keyword FlightSoftwareVersion in the cube's labels
       iString p_flightSoftwareVersion;
       //! Value of the PDS keyword OpticsTemperature[0] in the cube's labels
