@@ -2,25 +2,35 @@ Unit Test for IssWACamera...
 Filename: W1525116136_1.cub
 CK Frame: 14082361
 
+Kernel IDs: 
+CK Frame ID = -82000
+CK Reference ID = 1
+SPK Target ID = -82
+SPK Reference ID = 1
+
+Shutter open = 199695168.300484270
+Shutter close = 199695173.900484264
+
+
 For upper left corner ...
-Line, Sample: 0.5000, 0.5000
-Lat, Long:    19.8765, 301.2891
-WestLon:      58.7109
+Line, Sample: 0.500000000, 0.500000000
+Lat, Long:    19.876486030, 301.289080166
+WestLon:      58.710919834
 
 For upper right corner ...
-Line, Sample: 0.5000, 512.5000
+Line, Sample: 0.500000000, 512.500000000
 Point not on planet!
 
 For lower left corner ...
-Line, Sample: 512.5000, 0.5000
-Lat, Long:    -4.9743, 356.8556
-WestLon:      3.1444
+Line, Sample: 512.500000000, 0.500000000
+Lat, Long:    -4.974316941, 356.855564471
+WestLon:      3.144435529
 
 For lower right corner ...
-Line, Sample: 512.5000, 512.5000
+Line, Sample: 512.500000000, 512.500000000
 Point not on planet!
 
 For center pixel position ...
-Line, Sample: 256.5000, 256.5000
-Lat, Long:    33.7641, 344.5575
-WestLon:      15.4425
+Line, Sample: 256.500000000, 256.500000000
+Lat, Long:    33.764083075, 344.557493425
+WestLon:      15.442506575
