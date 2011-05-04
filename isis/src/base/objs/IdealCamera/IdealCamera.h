@@ -1,6 +1,5 @@
 #ifndef IdealCamera_h
 #define IdealCamera_h
-
 /**
  * @file
  * $Revision: 1.5 $
@@ -48,12 +47,16 @@ namespace Isis {
    *   @history 2010-09-16 Jeannie Walldren - Modified test cube to run properly
    *                          with ShapeModel changes to Sensor class and
    *                          updated unitTest known lat/lon values.
+   *   @history 2011-05-03 Jeannie Walldren - Updated unitTest to test for new
+   *                          methods. Updated documentation. Added Isis
+   *                          Disclaimer to files. Added NAIF error check to
+   *                          constructor.
    *  
    */
-  class IdealCamera : public Isis::Camera {
+  class IdealCamera : public Camera {
     public:
       // Constructs a HiriseCamera object
-      IdealCamera(Isis::Pvl &lab);
+      IdealCamera(Pvl &lab);
 
       // Destroys the HiriseCamera object
       ~IdealCamera();

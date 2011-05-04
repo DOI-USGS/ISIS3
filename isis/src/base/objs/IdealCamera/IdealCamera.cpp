@@ -20,17 +20,23 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include <string>
-#include "CameraFocalPlaneMap.h"
-#include "CameraDistortionMap.h"
 #include "IdealCamera.h"
+
+#include <iomanip>
+#include <string>
+
+#include "CameraDistortionMap.h"
+#include "CameraFocalPlaneMap.h"
+#include "iException.h"
+#include "iString.h"
 #include "iTime.h"
 #include "LineScanCameraDetectorMap.h"
 #include "LineScanCameraGroundMap.h"
 #include "LineScanCameraSkyMap.h"
-#include <iomanip>
+#include "NaifStatus.h"
+#include "Pvl.h"
 
-
+using namespace std;
 namespace Isis {
   /**
    * Creates a generic camera model.  That is a camera without
@@ -61,11 +67,14 @@ namespace Isis {
    *
    * @param lab Pvl label from the image
    * @internal
-   * @history 2007-02-12 Debbie A. Cook - Added sign for all the trans parameters
+   *   @history 2007-02-12 Debbie A. Cook - Added sign for all the trans
+   *           parameters
+   *   @history 2011-05-03 Jeannie Walldren - Added NAIF error check.
    */
-  IdealCamera::IdealCamera(Isis::Pvl &lab) : Isis::Camera(lab) {
+  IdealCamera::IdealCamera(Pvl &lab) : Camera(lab) {
+    NaifStatus::CheckErrors();
     // Get required keywords from instrument group
-    Isis::PvlGroup &inst = lab.FindGroup("Instrument", Isis::Pvl::Traverse);
+    PvlGroup &inst = lab.FindGroup("Instrument", Pvl::Traverse);
     double focalLength      = inst["FocalLength"];
     double pixelPitch       = inst["PixelPitch"];
     double et               = inst["EphemerisTime"];
@@ -83,13 +92,13 @@ namespace Isis {
     ydir = 1.;
     if(inst.HasKeyword("TransY")) ydir = inst["TransY"];
 
-    if(xDependency == Isis::CameraFocalPlaneMap::Sample) {
-      yDependency = Isis::CameraFocalPlaneMap::Line;
+    if(xDependency == CameraFocalPlaneMap::Sample) {
+      yDependency = CameraFocalPlaneMap::Line;
       sdir = xdir;
       ldir = ydir;
     }
     else {
-      yDependency = Isis::CameraFocalPlaneMap::Sample;
+      yDependency = CameraFocalPlaneMap::Sample;
       sdir = ydir;
       ldir = xdir;
     }
@@ -126,7 +135,7 @@ namespace Isis {
     SetPixelPitch(pixelPitch);
 
     // Create correct camera type
-    Isis::iString type = (std::string) inst["InstrumentType"];
+    iString type = (string) inst["InstrumentType"];
     if(type.UpCase() == "FRAMING") {
       p_framing = true;
       new CameraDetectorMap(this);
@@ -151,11 +160,12 @@ namespace Isis {
       new LineScanCameraSkyMap(this);
 
       LoadCache();
+      NaifStatus::CheckErrors();
     }
     else {
-      std::string msg = "Unknown InstrumentType [" +
-                        (std::string) inst["InstrumentType"] + "]";
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      string msg = "Unknown InstrumentType [" +
+                        (string) inst["InstrumentType"] + "]";
+      throw iException::Message(iException::User, msg, _FILEINFO_);
     }
   }
 
@@ -163,33 +173,60 @@ namespace Isis {
   IdealCamera::~IdealCamera() {}
 
 
+  /**
+   * CK frame ID.  This is an overridden method for the Camera class pure 
+   * virtual method. It will always throw an error for Ideal Camera models.
+   * @throw iException - "No CK Frame ID for Ideal Camera class."
+   * @return @b int 
+   */
   int IdealCamera::CkFrameId() const {
-    std::string msg = "No CK Frame ID for Ideal Camera class";
-    throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+    string msg = "No CK Frame ID for Ideal Camera class";
+    throw iException::Message(iException::User, msg, _FILEINFO_);
   }
 
 
+  /**
+   * CK Reference ID.  This is an overridden method for the Camera class pure 
+   * virtual method. It will always throw an error for Ideal Camera models.
+   * @throw iException - "No CK Reference ID for Ideal Camera class."
+   * @return @b int 
+   */
   int IdealCamera::CkReferenceId() const {
-    std::string msg = "No CK Reference ID for Ideal Camera class";
-    throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+    string msg = "No CK Reference ID for Ideal Camera class";
+    throw iException::Message(iException::User, msg, _FILEINFO_);
   }
 
-
+  /**
+   * SPK Target ID.  This is an overridden method for the Camera class pure 
+   * virtual method. It will always throw an error for Ideal Camera models.
+   * @throw iException - "No SPK Target ID for Ideal Camera class."
+   * @return @b int 
+   */
   int IdealCamera::SpkTargetId() const {
-    std::string msg = "No SPK Target ID for Ideal Camera class";
-    throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+    string msg = "No SPK Target ID for Ideal Camera class";
+    throw iException::Message(iException::User, msg, _FILEINFO_);
   }
 
-
+  /**
+   * SPK Center ID.  This is an overridden method for the Camera class pure 
+   * virtual method. It will always throw an error for Ideal Camera models.
+   * @throw iException - "No SPK Center ID for Ideal Camera class."
+   * @return @b int 
+   */
   int IdealCamera::SpkCenterId() const {
-    std::string msg = "No SPK Center ID for Ideal Camera class";
-    throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+    string msg = "No SPK Center ID for Ideal Camera class";
+    throw iException::Message(iException::User, msg, _FILEINFO_);
   }
 
-
+  /**
+   * SPK Reference ID.  This is an overridden method for the Camera class pure 
+   * virtual method. It will always throw an error for Ideal Camera models.
+   * @throw iException - "No SPK Reference ID for Ideal Camera class."
+   * @return @b int 
+   */
   int IdealCamera::SpkReferenceId() const {
-    std::string msg = "No SPK Reference ID for Ideal Camera class";
-    throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+    string msg = "No SPK Reference ID for Ideal Camera class";
+    throw iException::Message(iException::User, msg, _FILEINFO_);
   }
 }
 

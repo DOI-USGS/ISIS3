@@ -1,43 +1,54 @@
 Unit Test for IdealCamera...
-Testing image $base/testData/ab102401_ideal.cub ...
+Filename: ab102401_ideal.cub
+CK Frame: -94032
+
 For upper left corner ...
-DeltaSample = 0
-DeltaLine = 0
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
 
 For upper right corner ...
-DeltaSample = 0
-DeltaLine = 0
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
 
 For lower left corner ...
-DeltaSample = 0
-DeltaLine = 0
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
 
 For lower right corner ...
-DeltaSample = 0
-DeltaLine = 0
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
 
 For center pixel position ...
 Latitude OK
 Longitude OK
 
-Testing image $base/testData/f319b18_ideal.cub ...
+--------------------------------------------
+Filename: f319b18_ideal.cub
+CK Frame: -30002
+
 For upper left corner ...
-DeltaSample = 0
-DeltaLine = 0
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
 
 For upper right corner ...
-DeltaSample = 0
-DeltaLine = 0
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
 
 For lower left corner ...
-DeltaSample = 0
-DeltaLine = 0
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
 
 For lower right corner ...
-DeltaSample = 0
-DeltaLine = 0
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
 
 For center pixel position ...
 Latitude OK
 Longitude OK
 
+--------------------------------------------
+Kernel ID error messages: 
+**USER ERROR** No CK Frame ID for Ideal Camera class
+**USER ERROR** No CK Reference ID for Ideal Camera class
+**USER ERROR** No SPK Target ID for Ideal Camera class
+**USER ERROR** No SPK Reference ID for Ideal Camera class
