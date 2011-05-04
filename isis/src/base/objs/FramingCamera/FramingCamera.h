@@ -30,22 +30,35 @@ namespace Isis {
    * @brief Generic class for Framing Cameras
    *
    * This class is used to abstract out framing camera functionality from children
-   * classes.
+   * classes.   The ShutterOpenCloseTimes() method is pure virtual and must be 
+   * overridden by all framing camera models that extend this class. 
    *
+   * @ingroup SpiceInstrumentsAndCameras
    * @author 2009-08-26 Steven Lambright
    *
    * @internal
+   *   @history 2011-05-03 Jeannie Walldren - Added destructor and
+   *                          ShutterOpenCloseTimes() method. Updated unitTest.
+   *  
    *   @todo Implement more functionality in this class and abstract away from the children
    */
 
   class FramingCamera : public Camera {
     public:
-      FramingCamera(Isis::Pvl &lab);
+      FramingCamera(Pvl &lab);
+      //! Destroys the FramingCamera Object
+      ~FramingCamera() {};
 
+      /**
+       * This method returns Framing camera type.
+       * 
+       * @return @b CameraType Type of camera, Framing.
+       */
       virtual CameraType GetCameraType() const {
         return Framing;
       }
-
+      virtual std::pair<iTime, iTime> ShutterOpenCloseTimes(double time,
+                                                            double exposureDuration) = 0;
     private:
       //! Copying cameras is not allowed
       FramingCamera(const FramingCamera &);
