@@ -37,29 +37,53 @@ namespace Isis {
    * @author 2009-04-13 Tracie Sucharski
    *
    * @internal
-   * @history 2009-12-18 Tracie Sucharski - Changed inheritance from Camera to
-   *                        FramingCamera.
-   * @history 2010-02-22 Tracie Sucharski - Preface naif includes with /naif.
-   * @history 2010-03-04 Tracie Sucharski - Removed couts.
-   * @history 2010-03-04 Tracie Sucharski - Added throw when creation of
-   *                        ReseauDistortion fails.
+   *   @history 2009-12-18 Tracie Sucharski - Changed inheritance from Camera to
+   *                          FramingCamera.
+   *   @history 2010-02-22 Tracie Sucharski - Preface naif includes with /naif.
+   *   @history 2010-03-04 Tracie Sucharski - Removed couts.
+   *   @history 2010-03-04 Tracie Sucharski - Added throw when creation of
+   *                          ReseauDistortion fails.
+   *   @history 2011-01-14 Travis Addair - Added new CK/SPK accessor methods,
+   *                          pure virtual in Camera, implemented in mission
+   *                          specific cameras.
+   *   @history 2011-02-09 Steven Lambright - Major changes to camera classes.
+   *   @history 2011-05-03 Jeannie Walldren - Added ShutterOpenCloseTimes()
+   *                          method. Updated unitTest to test for new methods.
+   *                          Updated documentation. Added Isis Disclaimer to
+   *                          files. Added NAIF error check to constructor.
+   *  
    */
-  class Mariner10Camera : public Isis::FramingCamera {
+  class Mariner10Camera : public FramingCamera {
     public:
-      Mariner10Camera(Isis::Pvl &lab);
-
+      Mariner10Camera(Pvl &lab);
       //! Destroys the Mariner10Camera Object
       ~Mariner10Camera() {};
+      virtual std::pair <iTime, iTime> ShutterOpenCloseTimes(double time, 
+                                                             double exposureDuration);
 
-      /** CK Frame ID - Instrument Code from spacit run on CK */
+      /**
+       * CK frame ID -  - Instrument Code from spacit run on CK
+       *  
+       * @return @b int The appropriate instrument code for the "Camera-matrix" 
+       *         Kernel Frame ID
+       */
       virtual int CkFrameId() const { return (-76000); }
 
-      /** CK Reference ID - J2000 */
+      /** 
+       * CK Reference ID - J2000
+       * 
+       * @return @b int The appropriate instrument code for the "Camera-matrix"
+       *         Kernel Reference ID
+       */
       virtual int CkReferenceId() const { return (1); }
 
-      /** SPK Reference ID - J2000 */
+      /** 
+       *  SPK Reference ID - J2000
+       *  
+       * @return @b int The appropriate instrument code for the Spacecraft 
+       *         Kernel Reference ID
+       */
       virtual int SpkReferenceId() const { return (1); }
   };
 };
 #endif
-

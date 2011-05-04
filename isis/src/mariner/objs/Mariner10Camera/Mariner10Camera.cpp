@@ -22,34 +22,40 @@
 
 #include "Mariner10Camera.h"
 
+#include <iostream>
+#include <iomanip>
+
 #include <naif/SpiceUsr.h>
 #include <naif/SpiceZfc.h>
 #include <naif/SpiceZmc.h>
 
 #include "CameraDetectorMap.h"
 #include "CameraFocalPlaneMap.h"
-#include "ReseauDistortionMap.h"
 #include "CameraGroundMap.h"
 #include "CameraSkyMap.h"
 #include "iString.h"
 #include "iTime.h"
 #include "Filename.h"
-
-#include <iostream>
-#include <iomanip>
-
+#include "NaifStatus.h"
+#include "Pvl.h"
+#include "ReseauDistortionMap.h"
 
 using namespace std;
 namespace Isis {
   /**
    * Creates a Mariner10 Camera Model
    *
-   * @param lab Pvl Label from the image
+   * @param lab Pvl label from a Mariner 10 image.
    *
-   * @throws Isis::iException::User - The file does not appear to be a mariner10
-   *                                            image
+   * @throw iException::User - "File does not appear to be a Mariner 10 image.
+   *        Invalid InstrumentId."
+   * @throw iException::Programmer - "Unable to create distortion map."
+   * @internal
+   *   @history 2011-05-03 Jeannie Walldren - Added NAIF error check.
+   *
    */
   Mariner10Camera::Mariner10Camera(Pvl &lab) : FramingCamera(lab) {
+    NaifStatus::CheckErrors();
 
     //  Turn off the aberration corrections for instrument position object
     InstrumentPosition()->SetAberrationCorrection("NONE");
@@ -64,18 +70,18 @@ namespace Isis {
     string stime = inst["StartTime"];
     double et;
     utc2et_c(stime.c_str(), &et);
-    //std::cout<<std::setw(12)<<std::fixed<<std::setprecision(8)<<"et = "<<et<<std::endl;
+    //cout<<std::setw(12)<<std::fixed<<setprecision(8)<<"et = "<<et<<endl;
 
     double sclk;
     sce2c_c(-76, et, &sclk);
-    //std::cout<<std::setw(12)<<std::fixed<<std::setprecision(8)<<"sclk = "<<sclk<<std::endl;
+    //cout<<std::setw(12)<<std::fixed<<setprecision(8)<<"sclk = "<<sclk<<endl;
 
     sce2t_c(-76, et, &sclk);
-    //std::cout<<std::setw(12)<<std::fixed<<std::setprecision(8)<<"sclk = "<<sclk<<std::endl;
+    //cout<<std::setw(12)<<std::fixed<<setprecision(8)<<"sclk = "<<sclk<<endl;
 
     char ssclk[25];
     sce2s_c(-76, et, 25, ssclk);
-    //std::cout<<std::setw(25)<<std::fixed<<std::setprecision(8)<<"ssclk = "<<ssclk<<std::endl;
+    //cout<<std::setw(25)<<std::fixed<<setprecision(8)<<"ssclk = "<<ssclk<<endl;
 
     // Setup detector map
     new CameraDetectorMap(this);
@@ -102,7 +108,8 @@ namespace Isis {
       cam = "b";
     }
     else {
-      string msg = "File does not appear to be a Mariner10 image";
+      string msg = "File does not appear to be a Mariner10 image. InstrumentId ["
+        + instId + "] is invalid Mariner 10 value.";
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
@@ -113,8 +120,8 @@ namespace Isis {
       new ReseauDistortionMap(this, lab, fname);
     }
     catch(iException &e) {
-      std::string msg = "Unable to create distortion map.";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      string msg = "Unable to create distortion map.";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
     // Setup the ground and sky map
@@ -123,9 +130,50 @@ namespace Isis {
 
     SetTime(et);
     LoadCache();
+    NaifStatus::CheckErrors();
   }
-} // end namespace isis
 
+  /**
+   * Returns the shutter open and close times.  The user should pass in the
+   * ExposureDuration keyword value, converted from milliseconds to seconds, and
+   * the StartTime keyword value, converted to ephemeris time. The StartTime
+   * keyword value from the labels represents the shutter center time of the
+   * observation. To find the shutter open and close times, half of the exposure
+   * duration is subtracted from and added to the input time parameter,
+   * respectively. This method overrides the FramingCamera class method.
+   *
+   * @param exposureDuration ExposureDuration keyword value from the labels,
+   *                         converted to seconds.
+   * @param time The StartTime keyword value from the labels, converted to
+   *             ephemeris time.
+   *
+   * @return @b pair < @b iTime, @b iTime > The first value is the shutter
+   *         open time and the second is the shutter close time.
+   *
+   * @author 2011-05-03 Jeannie Walldren
+   * @internal
+   *   @history 2011-05-03 Jeannie Walldren - Original version.
+   */
+  pair<iTime, iTime> Mariner10Camera::ShutterOpenCloseTimes(double time,
+                                                            double exposureDuration) {
+    pair<iTime, iTime> shuttertimes;
+    // To get shutter start (open) time, subtract half exposure duration
+    shuttertimes.first = time - (exposureDuration / 2.0);
+    // To get shutter end (close) time, add half exposure duration
+    shuttertimes.second = time + (exposureDuration / 2.0);
+    return shuttertimes;
+  }
+}
+
+
+/**
+ * This is the function that is called in order to instantiate a Mariner10Camera
+ * object. 
+ *
+ * @param lab Cube labels
+ *
+ * @return Isis::Camera* Mariner10Camera
+ */
 extern "C" Isis::Camera *Mariner10CameraPlugin(Isis::Pvl &lab) {
   return new Isis::Mariner10Camera(lab);
 }

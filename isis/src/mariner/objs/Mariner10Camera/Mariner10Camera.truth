@@ -1,41 +1,67 @@
 Unit Test for Mariner10Camera...
-Testing image $mariner10/testData/27265.cub ...
+Filename: 27265.cub
+CK Frame: -76000
+
+Kernel IDs: 
+CK Frame ID = -76000
+CK Reference ID = 1
+SPK Target ID = -76
+SPK Reference ID = 1
+
+Shutter open = -812916168.429748774
+Shutter close = -812916168.406948805
+
 For upper left corner ...
-DeltaSample = -0.0250238898
-DeltaLine = 0.0117888667
+DeltaSample = -0.025023890
+DeltaLine = 0.011788867
 
 For upper right corner ...
-DeltaSample = 0.0113466804
-DeltaLine = -0.00137409172
+DeltaSample = 0.011346680
+DeltaLine = -0.001374092
 
 For lower left corner ...
-DeltaSample = 0
-DeltaLine = 0.0128398463
+DeltaSample = 0.000000000
+DeltaLine = 0.012839846
 
 For lower right corner ...
-DeltaSample = -0.0124746887
-DeltaLine = 0.0516041294
+DeltaSample = -0.012474689
+DeltaLine = 0.051604129
 
 For center pixel position ...
 Latitude OK
 Longitude OK
-Testing image $mariner10/testData/166474.cub ...
+
+--------------------------------------------
+Filename: 166474.cub
+CK Frame: -76000
+
+Kernel IDs: 
+CK Frame ID = -76000
+CK Reference ID = 1
+SPK Target ID = -76
+SPK Reference ID = 1
+
+Shutter open = -797710216.329613090
+Shutter close = -797710216.329613090
+
 For upper left corner ...
-DeltaSample = 0.0275677459
-DeltaLine = -0.0452389126
+DeltaSample = 0.027567746
+DeltaLine = -0.045238913
 
 For upper right corner ...
-DeltaSample = 0.0248980849
-DeltaLine = 0.00357873038
+DeltaSample = 0.024898085
+DeltaLine = 0.003578730
 
 For lower left corner ...
-DeltaSample = -0.0662917843
-DeltaLine = 0.0440512044
+DeltaSample = -0.066291784
+DeltaLine = 0.044051204
 
 For lower right corner ...
-DeltaSample = 0.00496599101
-DeltaLine = 0.0112288006
+DeltaSample = 0.004965991
+DeltaLine = 0.011228801
 
 For center pixel position ...
 Latitude OK
 Longitude OK
+
+--------------------------------------------
