@@ -139,20 +139,20 @@ namespace Isis {
     parentNetwork = NULL;
 
     switch (fileEntry.type()) {
-    case ControlPointFileEntryV0002_PointType_obsolete_Tie:
+      case ControlPointFileEntryV0002_PointType_obsolete_Tie:
       case ControlPointFileEntryV0002_PointType_Tie:
         type = Tie;
         break;
       case ControlPointFileEntryV0002_PointType_Constrained:
         type = Constrained;
         break;
-    case ControlPointFileEntryV0002_PointType_obsolete_Ground:
+      case ControlPointFileEntryV0002_PointType_obsolete_Ground:
       case ControlPointFileEntryV0002_PointType_Ground:
         type = Ground;
         break;
       default:
         iString msg = "Point type is invalid.";
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);        
+        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
     ignore = fileEntry.ignore();
@@ -247,8 +247,8 @@ namespace Isis {
         covar(2, 2) = fileEntry.aprioricovar(5);
         apriori.SetRectangularMatrix(covar);
 
-        if (Displacement(covar(0,0), Displacement::Meters).Valid() ||
-            Displacement(covar(1,1), Displacement::Meters).Valid()) {
+        if (Displacement(covar(0, 0), Displacement::Meters).Valid() ||
+            Displacement(covar(1, 1), Displacement::Meters).Valid()) {
           if (fileEntry.latitudeconstrained())
             constraintStatus.set(LatitudeConstrained);
           if (fileEntry.longitudeconstrained())
@@ -256,7 +256,7 @@ namespace Isis {
           if (fileEntry.radiusconstrained())
             constraintStatus.set(RadiusConstrained);
         }
-        else if (Displacement(covar(2,2), Displacement::Meters).Valid()) {
+        else if (Displacement(covar(2, 2), Displacement::Meters).Valid()) {
           if (fileEntry.latitudeconstrained())
             constraintStatus.set(LatitudeConstrained);
           if (fileEntry.radiusconstrained())
@@ -268,12 +268,12 @@ namespace Isis {
     }
 
     if (fileEntry.has_adjustedx() &&
-             fileEntry.has_adjustedy() &&
-             fileEntry.has_adjustedz()) {
+        fileEntry.has_adjustedy() &&
+        fileEntry.has_adjustedz()) {
       SurfacePoint adjusted(
-          Displacement(fileEntry.adjustedx(), Displacement::Meters),
-          Displacement(fileEntry.adjustedy(), Displacement::Meters),
-          Displacement(fileEntry.adjustedz(), Displacement::Meters));
+        Displacement(fileEntry.adjustedx(), Displacement::Meters),
+        Displacement(fileEntry.adjustedy(), Displacement::Meters),
+        Displacement(fileEntry.adjustedz(), Displacement::Meters));
 
       if (fileEntry.adjustedcovar_size() > 0) {
         symmetric_matrix<double, upper> covar;
@@ -446,9 +446,8 @@ namespace Isis {
     cubeSerials->append(newSerial);
 
     // notify parent network if we have one
-    if (!IsIgnored() && parentNetwork && !measure->IsIgnored())
-    {
-      parentNetwork->MeasureAdded(measure);
+    if (parentNetwork) {
+      parentNetwork->measureAdded(measure);
       parentNetwork->emitNetworkStructureModified();
     }
   }
@@ -496,9 +495,8 @@ namespace Isis {
     }
 
     // notify parent network of the change
-    if (!IsIgnored() && parentNetwork && !cm->IsIgnored())
-    {
-      parentNetwork->MeasureDeleted(cm);
+    if (!IsIgnored() && parentNetwork && !cm->IsIgnored()) {
+      parentNetwork->measureDeleted(cm);
       parentNetwork->emitNetworkStructureModified();
     }
 
@@ -783,12 +781,12 @@ namespace Isis {
     if (oldStatus != ignore) {
       PointModified();
       if (parentNetwork) {
-        foreach (ControlMeasure * cm, measures->values()) {
+        foreach(ControlMeasure * cm, measures->values()) {
           if (!cm->IsIgnored()) {
             if (ignore)
-              parentNetwork->MeasureDeleted(cm);
+              parentNetwork->measureIgnored(cm);
             else
-              parentNetwork->MeasureAdded(cm);
+              parentNetwork->measureUnIgnored(cm);
           }
         }
         parentNetwork->emitNetworkStructureModified();
@@ -892,16 +890,16 @@ namespace Isis {
     SurfacePoint aprioriSP) {
     if (parentNetwork) {
       std::vector<Distance> targetRadii = parentNetwork->GetTargetRadii();
-      aprioriSurfacePoint.SetRadii(targetRadii[0], targetRadii[1],targetRadii[2]);
+      aprioriSurfacePoint.SetRadii(targetRadii[0], targetRadii[1], targetRadii[2]);
     }
     if (editLock)
       return PointLocked;
     if (aprioriSP.GetLatSigma().Valid())
-        constraintStatus.set(LatitudeConstrained);
+      constraintStatus.set(LatitudeConstrained);
     if (aprioriSP.GetLonSigma().Valid())
-        constraintStatus.set(LongitudeConstrained);
+      constraintStatus.set(LongitudeConstrained);
     if (aprioriSP.GetLocalRadiusSigma().Valid())
-        constraintStatus.set(RadiusConstrained);
+      constraintStatus.set(RadiusConstrained);
     PointModified();
     aprioriSurfacePoint = aprioriSP;
     return Success;
@@ -1048,8 +1046,8 @@ namespace Isis {
 
     // Don't update the apriori x/y/z for ground points  TODO This needs a closer look
     if (GetType() == Ground || NumberOfConstrainedCoordinates() == 3
-                            || IsLatitudeConstrained()
-                            || IsRadiusConstrained()) {
+        || IsLatitudeConstrained()
+        || IsRadiusConstrained()) {
       // Initialize the adjusted x/y/z to the apriori in this case
       adjustedSurfacePoint = aprioriSurfacePoint;
       return Success;
@@ -1073,9 +1071,9 @@ namespace Isis {
     // longitude must be constrained.  This constrains x and y as well.
     else {
       aprioriSurfacePoint.SetRectangular(
-              aprioriSurfacePoint.GetX(),
-              aprioriSurfacePoint.GetY(),
-              Displacement((zB / goodMeasures), Displacement::Kilometers));
+        aprioriSurfacePoint.GetX(),
+        aprioriSurfacePoint.GetY(),
+        Displacement((zB / goodMeasures), Displacement::Kilometers));
     }
 
     adjustedSurfacePoint = aprioriSurfacePoint;
@@ -1238,13 +1236,13 @@ namespace Isis {
 //         continue;
 
       // TODO:  Should we use crater diameter?
-      Camera* cam = m->Camera();
+      Camera *cam = m->Camera();
       double cudx, cudy;
 
       // Map the lat/lon/radius of the control point through the Spice of the
       // measurement sample/line to get the computed sample/line.
-      if( cam->GetCameraType() != Isis::Camera::Radar ) {
-        if( cam->GetCameraType() != 0 ) // no need to call setimage for framing camera
+      if (cam->GetCameraType() != Isis::Camera::Radar) {
+        if (cam->GetCameraType() != 0)  // no need to call setimage for framing camera
           cam->SetImage(m->GetSample(), m->GetLine());
         cam->GroundMap()->GetXY(GetAdjustedSurfacePoint(), &cudx, &cudy);
       }
@@ -1259,9 +1257,9 @@ namespace Isis {
       double mudx = m->GetFocalPlaneMeasuredX();
       double mudy = m->GetFocalPlaneMeasuredY();
 
-      m->SetFocalPlaneComputed(cudx,cudy);
+      m->SetFocalPlaneComputed(cudx, cudy);
 
-      m->SetResidual(mudx-cudx,mudy-cudy);
+      m->SetResidual(mudx - cudx, mudy - cudy);
     }
 
     return Success;
@@ -1307,7 +1305,7 @@ namespace Isis {
    * the a priori surface point.
    */
   SurfacePoint ControlPoint::GetBestSurfacePoint() const {
-    if(adjustedSurfacePoint.Valid())
+    if (adjustedSurfacePoint.Valid())
       return adjustedSurfacePoint;
     else
       return aprioriSurfacePoint;
@@ -1415,26 +1413,22 @@ namespace Isis {
    *
    *  @returns The RadiusSource::Source matching the given string
    */
-   ControlPoint::RadiusSource::Source ControlPoint::StringToRadiusSource(
-       QString str) {
+  ControlPoint::RadiusSource::Source ControlPoint::StringToRadiusSource(
+    QString str) {
 
     str = str.toLower();
     RadiusSource::Source source = RadiusSource::None;
 
     if (str == "user")
       source = RadiusSource::User;
-    else
-      if (str == "averageofmeasures")
-        source = RadiusSource::AverageOfMeasures;
-      else
-        if (str == "ellipsoid")
-          source = RadiusSource::Ellipsoid;
-        else
-          if (str == "dem")
-            source = RadiusSource::DEM;
-          else
-            if (str == "bundlesolution")
-              source = RadiusSource::BundleSolution;
+    else if (str == "averageofmeasures")
+      source = RadiusSource::AverageOfMeasures;
+    else if (str == "ellipsoid")
+      source = RadiusSource::Ellipsoid;
+    else if (str == "dem")
+      source = RadiusSource::DEM;
+    else if (str == "bundlesolution")
+      source = RadiusSource::BundleSolution;
 
     return source;
   }
@@ -1459,7 +1453,7 @@ namespace Isis {
    *  @returns A string representation of SurfacePointSource
    */
   iString ControlPoint::SurfacePointSourceToString(
-      SurfacePointSource::Source source) {
+    SurfacePointSource::Source source) {
 
     iString str;
 
@@ -1495,27 +1489,23 @@ namespace Isis {
    *
    *  @returns The SurfacePint::Source matching the given string
    */
-   ControlPoint::SurfacePointSource::Source
-       ControlPoint::StringToSurfacePointSource(
-       QString str) {
+  ControlPoint::SurfacePointSource::Source
+  ControlPoint::StringToSurfacePointSource(
+    QString str) {
 
     str = str.toLower();
     SurfacePointSource::Source source = SurfacePointSource::None;
 
     if (str == "user")
       source = SurfacePointSource::User;
-    else
-      if (str == "averageofmeasures")
-        source = SurfacePointSource::AverageOfMeasures;
-      else
-        if (str == "reference")
-          source = SurfacePointSource::Reference;
-        else
-          if (str == "basemap")
-            source = SurfacePointSource::Basemap;
-          else
-            if (str == "bundlesolution")
-              source = SurfacePointSource::BundleSolution;
+    else if (str == "averageofmeasures")
+      source = SurfacePointSource::AverageOfMeasures;
+    else if (str == "reference")
+      source = SurfacePointSource::Reference;
+    else if (str == "basemap")
+      source = SurfacePointSource::Basemap;
+    else if (str == "bundlesolution")
+      source = SurfacePointSource::BundleSolution;
 
     return source;
   }
@@ -1548,38 +1538,37 @@ namespace Isis {
 
 
   ControlPoint::RadiusSource::Source ControlPoint::GetAprioriRadiusSource()
-      const {
+  const {
     return aprioriRadiusSource;
   }
 
-  bool ControlPoint::HasAprioriCoordinates()
-  {
+  bool ControlPoint::HasAprioriCoordinates() {
     if (aprioriSurfacePoint.GetX().Valid() &&
         aprioriSurfacePoint.GetY().Valid() &&
         aprioriSurfacePoint.GetZ().Valid())
-          return true;
+      return true;
 
-      return false;
+    return false;
   }
 
-  bool ControlPoint::IsConstrained()   {
-      return constraintStatus.any();
-   }
-
-  bool ControlPoint::IsLatitudeConstrained()   {
-      return constraintStatus[LatitudeConstrained];
+  bool ControlPoint::IsConstrained() {
+    return constraintStatus.any();
   }
 
-  bool ControlPoint::IsLongitudeConstrained()   {
-      return constraintStatus[LongitudeConstrained];
+  bool ControlPoint::IsLatitudeConstrained() {
+    return constraintStatus[LatitudeConstrained];
+  }
+
+  bool ControlPoint::IsLongitudeConstrained() {
+    return constraintStatus[LongitudeConstrained];
   }
 
   bool ControlPoint::IsRadiusConstrained() {
-      return constraintStatus[RadiusConstrained];
+    return constraintStatus[RadiusConstrained];
   }
 
   int ControlPoint::NumberOfConstrainedCoordinates() {
-      return constraintStatus.count();
+    return constraintStatus.count();
   }
 
   iString ControlPoint::GetAprioriRadiusSourceFile() const {
@@ -1754,10 +1743,10 @@ namespace Isis {
    * @returns A list of this points measures
    */
   QList< ControlMeasure * > ControlPoint::GetMeasures(
-      bool excludeIgnored) const {
+    bool excludeIgnored) const {
     QList< ControlMeasure * > orderedMeasures;
     for (int i = 0; i < cubeSerials->size(); i++) {
-      ControlMeasure * measure = measures->value((*cubeSerials)[i]);
+      ControlMeasure *measure = measures->value((*cubeSerials)[i]);
       if (!excludeIgnored || !measure->IsIgnored())
         orderedMeasures.append(measures->value((*cubeSerials)[i]));
     }

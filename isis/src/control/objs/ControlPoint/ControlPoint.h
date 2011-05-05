@@ -353,8 +353,8 @@ namespace Isis {
       ControlPoint(const ControlPoint &);
       ControlPoint(const iString &id);
       ControlPoint(const ControlPointFileEntryV0002 &fileEntry,
-                   const Distance &majorRad, const Distance &minorRad,
-                   const Distance &polarRad);
+          const Distance &majorRad, const Distance &minorRad,
+          const Distance &polarRad);
       ~ControlPoint();
 
       ControlNet *Parent() { return parentNetwork; }
@@ -394,8 +394,8 @@ namespace Isis {
       Status SetAprioriSurfacePointSource(SurfacePointSource::Source source);
       Status SetAprioriSurfacePointSourceFile(iString sourceFile);
 
- //    Status UpdateSphericalPointCoordinates(const Latitude &lat, const Longitude &lon,
- //                                      const Distance &radius);
+//    Status UpdateSphericalPointCoordinates(const Latitude &lat, const Longitude &lon,
+//                                      const Distance &radius);
 
       Status ComputeApriori();
       Status ComputeResiduals();
