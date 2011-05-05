@@ -166,6 +166,7 @@ namespace Qisis {
       void modifyPoint(Isis::ControlPoint *);
       void ignoredPoints();
       void deletedPoints();
+      void pointChanged(QString pointId);
       void netChanged();
       void serialListModified();
 

@@ -241,12 +241,18 @@ namespace Qisis {
     p_pointAprioriLatitude = new QLabel;
     p_pointAprioriLongitude = new QLabel;
     p_pointAprioriRadius = new QLabel;
+    p_pointAprioriLatitudeSigma = new QLabel;
+    p_pointAprioriLongitudeSigma = new QLabel;
+    p_pointAprioriRadiusSigma = new QLabel;
     QVBoxLayout * leftLayout = new QVBoxLayout;
     leftLayout->addWidget(p_ptIdValue);
     leftLayout->addWidget(p_numMeasures);
     leftLayout->addWidget(p_pointAprioriLatitude);
     leftLayout->addWidget(p_pointAprioriLongitude);
     leftLayout->addWidget(p_pointAprioriRadius);
+    leftLayout->addWidget(p_pointAprioriLatitudeSigma);
+    leftLayout->addWidget(p_pointAprioriLongitudeSigma);
+    leftLayout->addWidget(p_pointAprioriRadiusSigma);
     
     // create right vertical layout's top layout
     p_lockPoint = new QCheckBox("Edit Lock Point");
@@ -1194,8 +1200,6 @@ namespace Qisis {
     //  contain the point.
     QStringList pointFiles;
 
-    //  Initialize camera for all images in control network,
-    //  TODO::   Needs to be moved to QnetFileTool.cpp
     Camera *cam;
     for(int i = 0; i < g_serialNumberList->Size(); i++) {
       if (g_serialNumberList->SerialNumber(i) == p_groundSN) continue;
@@ -1235,6 +1239,10 @@ namespace Qisis {
 
       ControlPoint *newPoint =
         new ControlPoint(newPointDialog->ptIdValue->text().toStdString());
+      SurfacePoint surfPt = newPoint->GetAprioriSurfacePoint();
+      vector<Distance> targRadii = g_controlNetwork->GetTargetRadii();
+      surfPt.SetRadii(targRadii[0],targRadii[1],targRadii[2]);
+      newPoint->SetAprioriSurfacePoint(surfPt);
 
       // If this ControlPointId already exists, message box pops up and user is 
       // asked to enter a new value.
@@ -1316,8 +1324,6 @@ namespace Qisis {
     //  contain the point.
     QStringList pointFiles;
 
-    //  Initialize camera for all images in control network,  
-    //  TODO::   Needs to be moved to QnetFileTool.cpp
     Camera *cam;
     for (int i=0; i<g_serialNumberList->Size(); i++) {
       if (g_serialNumberList->SerialNumber(i) == p_groundSN) continue;
@@ -1702,7 +1708,6 @@ namespace Qisis {
    */
   void QnetTool::updateSurfacePointInfo () {
 
-
     QString s;
   
     SurfacePoint aprioriPoint = p_editPoint->GetAprioriSurfacePoint();
@@ -1732,6 +1737,42 @@ namespace Qisis {
     }
     p_pointAprioriRadius->setText(s);
   
+    if (aprioriPoint.Valid()) {
+      if (aprioriPoint.GetLatSigmaDistance().GetMeters() == Isis::Null) {
+        s = "Apriori Latitude Sigma:  Null";
+      }
+      else {
+        s = "Apriori Latitude Sigma:  " +
+            QString::number(aprioriPoint.GetLatSigmaDistance().GetMeters()) +
+            " <meters>";
+      }
+      if (aprioriPoint.GetLonSigmaDistance().GetMeters() == Isis::Null) {
+        s = "Apriori Longitude Sigma:  Null";
+      }
+      else {
+        s = "Apriori Longitude Sigma:  " +
+            QString::number(aprioriPoint.GetLonSigmaDistance().GetMeters()) +
+            " <meters>";
+      }
+      if (aprioriPoint.GetLocalRadiusSigma().GetMeters() == Isis::Null) {
+        s = "Apriori Radius Sigma:  Null";
+      }
+      else {
+        s = "Apriori Radius Sigma:  " +
+            QString::number(aprioriPoint.GetLocalRadiusSigma().GetMeters()) +
+            " <meters>";
+      }
+    }
+    else {
+      s = "Apriori Latitude Sigma:  Null";
+      s = "Apriori Longitude Sigma:  Null";
+      s = "Apriori Radius Sigma:  Null";
+    }
+    p_pointAprioriLatitudeSigma->setText(s);
+    p_pointAprioriLongitudeSigma->setText(s);
+    p_pointAprioriRadiusSigma->setText(s);
+      
+          
     SurfacePoint point = p_editPoint->GetAdjustedSurfacePoint();
     if (point.GetLatitude().GetDegrees() == Isis::Null) {
       s = "Adjusted Latitude:  Null";
@@ -2501,6 +2542,43 @@ namespace Qisis {
     
     p_templateEditorWidget->setVisible(!p_templateEditorWidget->isVisible());
   }
+
+
+
+  /**
+   * Update the current editPoint information in the Point Editor labels
+   * 
+   * @author 2011-05-05 Tracie Sucharski
+   *  
+   * @TODO  Instead of a single method, should slots be separate for each 
+   *        updated point parameter, ie. ignore, editLock, apriori, etc.
+   *        This is not robust, if other point attributes are changed outside
+   *        of QnetTool, this method will need to be updated.
+   *       *** THIS METHOD SHOULD GO AWAY WHEN CONTROLpOINTEDITOR IS INCLUDED
+   *           IN QNET ***
+   */
+  void QnetTool::updatePointInfo(QString pointId) {
+    if (pointId != p_editPoint->GetId()) return;
+    //  The edit point has been changed by SetApriori, so p_editPoint needs
+    //  to possibly update some values.  Need to retain measures from p_editPoint
+    //  because they might have been updated, but not yet saved to the network
+    //   ("Save Point").
+    ControlPoint *updatedPoint = g_controlNetwork->GetPoint(pointId);
+    p_editPoint->SetEditLock(updatedPoint->IsEditLocked());
+    p_editPoint->SetIgnored(updatedPoint->IsIgnored());
+    p_editPoint->SetAprioriSurfacePoint(updatedPoint->GetAprioriSurfacePoint());
+
+    //  Set EditLock box correctly
+    p_lockPoint->setChecked(p_editPoint->IsEditLocked());
+
+    //  Set ignore box correctly
+    p_ignorePoint->setChecked(p_editPoint->IsIgnored());
+
+    updateSurfacePointInfo();
+
+  }
+
+
 
 
   /**

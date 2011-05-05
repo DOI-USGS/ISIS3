@@ -115,6 +115,7 @@ namespace Qisis {
     // Create action options
     QWidget *actionArea = new QWidget();
     QPushButton *load = new QPushButton("&View Cube(s)", actionArea);
+    load->setAutoDefault(false);
     load->setToolTip("Open Selected Images");
     load->setWhatsThis("<b>Function: </b> Opens all selected images, or images \
                         that are associated with the given point or overlap.  \
@@ -123,6 +124,7 @@ namespace Qisis {
     connect(load, SIGNAL(clicked()),
         this, SLOT(load()));
     p_tie = new QPushButton("&Modify Point", actionArea);
+    p_tie->setAutoDefault(false);
     p_tie->setToolTip("Modify Selected Point");
     p_tie->setWhatsThis("<b>Function: </b> Opens the tie tool to modify the \
                          selected point from the list.  This option is only \
@@ -131,6 +133,7 @@ namespace Qisis {
         this, SLOT(tie()));
 
     p_multiIgnore = new QPushButton("&Ignore Points", actionArea);
+    p_multiIgnore->setAutoDefault(false);
     p_multiIgnore->setToolTip("Set selected points to Ignore");
     p_multiIgnore->setWhatsThis("<b>Function: </b> Sets the selected points \
                                Ignore = True.  You will not be able to preview \
@@ -143,6 +146,7 @@ namespace Qisis {
         this, SLOT(ignorePoints()));
 
     p_multiDelete = new QPushButton("&Delete Points", actionArea);
+    p_multiDelete->setAutoDefault(false);
     p_multiIgnore->setToolTip("Set selected points to Delete");
     p_multiIgnore->setWhatsThis("<b>Function: </b> Delete the selected points \
                                from control network.  You will not be able to \
@@ -155,6 +159,7 @@ namespace Qisis {
         this, SLOT(deletePoints()));
 
     p_setApriori = new QPushButton("&Set Apriori/Sigmas", actionArea);
+    p_setApriori->setAutoDefault(false);
     p_setApriori->setToolTip("Set selected points apriori/sigmas");
     p_setApriori->setWhatsThis("<b>Function: </b> Set the apriori points \
                                and sigmas. \
@@ -164,6 +169,7 @@ namespace Qisis {
     connect(p_setApriori, SIGNAL(clicked()), this, SLOT(aprioriDialog()));
 
     p_filter = new QPushButton("&Filter", actionArea);
+    p_filter->setAutoDefault(true);
     p_filter->setToolTip("Filter Current List");
     p_filter->setWhatsThis("<b>Function: </b> Filters the current list by user \
                             specifications made in the selected filter. \
@@ -173,6 +179,7 @@ namespace Qisis {
         this, SLOT(filter()));
 
     QPushButton *reset = new QPushButton("&Show All", actionArea);
+    reset->setAutoDefault(false);
     reset->setToolTip("Reset the Current List to show all the values in the list");
     reset->setWhatsThis("<b>Function: </b> Resets the list of points, \
                          overlaps, or images to the complete initial list.  \
@@ -717,9 +724,9 @@ namespace Qisis {
           else {
             (*g_controlNetwork)[g_filteredPoints[index]]->SetIgnored(true);
           }
+          emit pointChanged((*g_controlNetwork)[g_filteredPoints[index]]->GetId());
         }
         QApplication::restoreOverrideCursor();
-        emit deletedPoints();
         emit netChanged();
         break;
         //  case 1: // No was clicked, close window and do nothing to points
@@ -801,9 +808,12 @@ namespace Qisis {
     if (!p_aprioriDialog) {
       p_aprioriDialog = new QnetSetAprioriDialog();
       setAprioriDialogPoints();
-      connect (p_listBox, SIGNAL(itemSelectionChanged()),
-               this, SLOT(setAprioriDialogPoints()));
-      connect (p_aprioriDialog, SIGNAL(netChanged()), this, SIGNAL(netChanged()));
+      connect(p_listBox, SIGNAL(itemSelectionChanged()),
+              this, SLOT(setAprioriDialogPoints()));
+      connect(p_aprioriDialog, SIGNAL(pointChanged(QString)),
+              this, SIGNAL(pointChanged(QString)));
+      connect(p_aprioriDialog, SIGNAL(netChanged()),
+              this, SIGNAL(netChanged()));
     }
     p_aprioriDialog->show();
     p_aprioriDialog->activateWindow();
@@ -814,17 +824,16 @@ namespace Qisis {
   /**
    * Slot to pass points selected in Nav List Widget to Apriori Dialog 
    *  
+   * @internal 
+   * @history 2011-05-04 Tracie Sucharski - Do not print error if no pts 
+   *                        selected, simply return.
    */
   void QnetNavTool::setAprioriDialogPoints() {
 
     if (p_aprioriDialog == NULL) return;
 
     int index = p_listBox->currentRow();
-    if (index < 0) {
-      QMessageBox::information((QWidget *)parent(),
-          "Error", "No point selected to set apriori values.");
-      return;
-    }
+    if (index < 0) return;
 
     QList<QListWidgetItem *> selected = p_listBox->selectedItems();
     p_aprioriDialog->setPoints(selected);

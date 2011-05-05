@@ -159,6 +159,8 @@ int main(int argc, char *argv[]) {
                      qnetTool, SLOT(modifyPoint(Isis::ControlPoint *)));
     QObject::connect(ntool, SIGNAL(ignoredPoints()), qnetTool, SLOT(refresh()));
     QObject::connect(ntool, SIGNAL(deletedPoints()), qnetTool, SLOT(refresh()));
+    QObject::connect(ntool, SIGNAL(pointChanged(QString)),
+                     qnetTool, SLOT(updatePointInfo(QString)));
 
     /**** RECORDING POINTS ****/
     // Connect the FindTool to the AdvancedTrackTool to record the point if the

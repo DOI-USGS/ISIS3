@@ -171,6 +171,7 @@ namespace Qisis {
       void createGroundPoint(double lat,double lon);
       void modifyPoint(Isis::ControlPoint *point);
       void deletePoint(Isis::ControlPoint *point);
+      void updatePointInfo(QString pointId);
       void refresh();
 
     protected:
@@ -270,6 +271,9 @@ namespace Qisis {
       QLabel *p_pointAprioriLatitude;
       QLabel *p_pointAprioriLongitude;
       QLabel *p_pointAprioriRadius;
+      QLabel *p_pointAprioriLatitudeSigma;
+      QLabel *p_pointAprioriLongitudeSigma;
+      QLabel *p_pointAprioriRadiusSigma;
       QLabel *p_pointLatitude;
       QLabel *p_pointLongitude;
       QLabel *p_pointRadius;

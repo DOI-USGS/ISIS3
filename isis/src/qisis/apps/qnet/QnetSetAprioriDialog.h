@@ -17,6 +17,7 @@ class QnetSetAprioriDialog : public QDialog, public Ui::QnetSetAprioriDialog {
 
   signals:
    // void aprioriDialogClosed();
+    void pointChanged(QString pointId);
     void netChanged();
 
   private slots:

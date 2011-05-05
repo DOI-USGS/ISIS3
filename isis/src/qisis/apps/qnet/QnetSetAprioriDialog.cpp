@@ -218,6 +218,8 @@ void QnetSetAprioriDialog::setApriori() {
       //  Write the surface point back out to the controlPoint and set to Ground
       pt->SetAprioriSurfacePoint(spt);
       pt->SetType(ControlPoint::Ground);
+      emit pointChanged(id);
+      emit netChanged();
     }
     catch (iException &e )  {
       QString message = "Error setting sigmas. \n";
@@ -225,10 +227,12 @@ void QnetSetAprioriDialog::setApriori() {
       QMessageBox::critical((QWidget *)parent(),"Error",message);
       e.Clear();
       QApplication::restoreOverrideCursor();
+      // Sigmas failed, but surface pt coordinate was set
+      emit pointChanged(id);
+      emit netChanged();
       return;
     }
   }
 
-  emit netChanged();
 }
 
