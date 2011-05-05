@@ -34,7 +34,7 @@ using namespace boost::numeric::ublas;
 
 
 namespace Isis {
-  void ControlNet::Nullify() {
+  void ControlNet::nullify() {
     points = NULL;
     cubeGraphNodes = NULL;
     pointIds = NULL;
@@ -42,7 +42,7 @@ namespace Isis {
 
   //!Creates an empty ControlNet object
   ControlNet::ControlNet() {
-    Nullify();
+    nullify();
 
     points = new QHash< QString, ControlPoint * >;
     cubeGraphNodes = new QHash< QString, ControlCubeGraphNode * >;
@@ -55,7 +55,7 @@ namespace Isis {
 
 
   ControlNet::ControlNet(const ControlNet &other) {
-    Nullify();
+    nullify();
 
     points = new QHash< QString, ControlPoint * >;
     cubeGraphNodes = new QHash< QString, ControlCubeGraphNode * >;
@@ -75,7 +75,7 @@ namespace Isis {
       if (!newPoint->IsIgnored()) {
         QList< ControlMeasure * > measures = newPoint->GetMeasures();
         for (int i = 0; i < measures.size(); i++) {
-          ControlMeasure * measure = measures[i];
+          ControlMeasure *measure = measures[i];
           QString serial = measure->GetCubeSerialNumber();
 
           if (!measure->IsIgnored()) {
@@ -84,7 +84,7 @@ namespace Isis {
             }
             else {
               ControlCubeGraphNode *newControlCubeGraphNode =
-                  new ControlCubeGraphNode(serial);
+                new ControlCubeGraphNode(serial);
 
               newControlCubeGraphNode->addMeasure(measure);
               cubeGraphNodes->insert(serial, newControlCubeGraphNode);
@@ -114,7 +114,7 @@ namespace Isis {
    * @param progress A pointer to the progress of reading in the control points
    */
   ControlNet::ControlNet(const iString &ptfile, Progress *progress) {
-    Nullify();
+    nullify();
 
     points = new QHash< QString, ControlPoint * >;
     cubeGraphNodes = new QHash< QString, ControlCubeGraphNode * >;
@@ -189,7 +189,7 @@ namespace Isis {
     p_description   = header.description();
 
     QList< ControlPointFileEntryV0002 > &fileDataPoints =
-        fileData->GetNetworkPoints();
+      fileData->GetNetworkPoints();
 
     if (progress != NULL) {
       progress->SetText("Loading Control Points...");
@@ -240,7 +240,7 @@ namespace Isis {
     header.set_description(p_description);
 
     QList< ControlPointFileEntryV0002 > &fileDataPoints =
-        fileData->GetNetworkPoints();
+      fileData->GetNetworkPoints();
 
     for (int i = 0; i < pointIds->size(); i++) {
       ControlPoint *point = points->value(pointIds->at(i));
@@ -282,13 +282,10 @@ namespace Isis {
     point->parentNetwork = this;
 
     // notify control network of new (non-ignored) measures
-    if (!point->IsIgnored()) {
-      foreach(ControlMeasure * measure, point->GetMeasures()) {
-        if (!measure->IsIgnored())
-          MeasureAdded(measure);
-      }
-      emit networkStructureModified();
+    foreach(ControlMeasure * measure, point->GetMeasures()) {
+      measureAdded(measure);
     }
+    emit networkStructureModified();
   }
 
 
@@ -300,15 +297,9 @@ namespace Isis {
    *
    * @param measure The measure added to the network.
    */
-  void ControlNet::MeasureAdded(ControlMeasure *measure) {
+  void ControlNet::measureAdded(ControlMeasure *measure) {
     if (!measure) {
       iString msg = "NULL measure passed to "
-          "ControlNet::AddControlCubeGraphNode!";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
-    }
-
-    if (measure->IsIgnored()) {
-      iString msg = "Ignored measure passed to "
           "ControlNet::AddControlCubeGraphNode!";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
@@ -326,12 +317,10 @@ namespace Isis {
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
-    ASSERT(!point->IsIgnored());
-
     // make sure there is a node for every measure in this measure's parent
     for (int i = 0; i < point->GetNumMeasures(); i++) {
       QString sn = point->GetMeasure(i)->GetCubeSerialNumber();
-      if (!cubeGraphNodes->contains(sn) && !point->GetMeasure(sn)->IsIgnored())
+      if (!cubeGraphNodes->contains(sn))
         cubeGraphNodes->insert(sn, new ControlCubeGraphNode(sn));
     }
 
@@ -350,6 +339,63 @@ namespace Isis {
         if (neighborNode != node) {
           node->addConnection(neighborNode, point);
           neighborNode->addConnection(node, point);
+        }
+      }
+    }
+  }
+
+
+  /**
+   * Updates the connections for the ControlCubeGraphNode associated with the
+   * measure's serial number to reflect the unignoration.
+   *
+   * @param measure The measure unignored from the network.
+   */
+  void ControlNet::measureUnIgnored(ControlMeasure *measure) {
+    if (!measure) {
+      iString msg = "NULL measure passed to "
+          "ControlNet::AddControlCubeGraphNode!";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    }
+
+    ControlPoint *point = measure->Parent();
+    if (!point) {
+      iString msg = "Control measure with NULL parent passed to "
+          "ControlNet::AddControlCubeGraphNode!";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    }
+
+    if (!ContainsPoint(point->GetId())) {
+      iString msg = "ControlNet does not contain the point [";
+      msg += point->GetId() + "]";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    }
+
+    // make sure there is a node for every measure in this measure's parent
+    for (int i = 0; i < point->GetNumMeasures(); i++) {
+      QString sn = point->GetMeasure(i)->GetCubeSerialNumber();
+      if (!cubeGraphNodes->contains(sn)) {
+        iString msg = "Node does not exist for [";
+        msg += measure->GetCubeSerialNumber() + "]";
+        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      }
+    }
+
+    if (!point->IsIgnored()) {
+      QString serial = measure->GetCubeSerialNumber();
+      ControlCubeGraphNode *node = (*cubeGraphNodes)[serial];
+
+      // in this measure's node add connections to the other nodes reachable
+      // from its point
+      for (int i = 0; i < point->GetNumMeasures(); i++) {
+        ControlMeasure *cm = point->GetMeasure(i);
+        if (!cm->IsIgnored()) {
+          QString sn = cm->GetCubeSerialNumber();
+          ControlCubeGraphNode *neighborNode = (*cubeGraphNodes)[sn];
+          if (neighborNode != node) {
+            node->addConnection(neighborNode, point);
+            neighborNode->addConnection(node, point);
+          }
         }
       }
     }
@@ -378,10 +424,11 @@ namespace Isis {
    *
    * @param measure The measure removed from the network.
    */
-  void ControlNet::MeasureDeleted(ControlMeasure *measure) {
+  void ControlNet::measureDeleted(ControlMeasure *measure) {
     ASSERT(measure);
 
     ControlPoint *point = measure->Parent();
+    ASSERT(point);
     QString serial = measure->GetCubeSerialNumber();
     ASSERT(cubeGraphNodes->contains(serial));
     ControlCubeGraphNode *node = (*cubeGraphNodes)[serial];
@@ -408,9 +455,48 @@ namespace Isis {
     }
   }
 
+  void ControlNet::measureIgnored(ControlMeasure *measure) {
+    if (!measure) {
+      iString msg = "NULL measure passed to "
+          "ControlNet::AddControlCubeGraphNode!";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    }
 
-  void ControlNet::emitNetworkStructureModified()
-  {
+    ControlPoint *point = measure->Parent();
+    if (!point) {
+      iString msg = "Control measure with NULL parent passed to "
+          "ControlNet::AddControlCubeGraphNode!";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    }
+
+    // make sure there is a node for every measure in this measure's parent
+    for (int i = 0; i < point->GetNumMeasures(); i++) {
+      QString sn = point->GetMeasure(i)->GetCubeSerialNumber();
+      if (!cubeGraphNodes->contains(sn)) {
+        iString msg = "Node does not exist for [";
+        msg += measure->GetCubeSerialNumber() + "]";
+        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      }
+    }
+
+    QString serial = measure->GetCubeSerialNumber();
+    ControlCubeGraphNode *node = (*cubeGraphNodes)[serial];
+
+    // remove connections to and from this node
+    for (int i = 0; i < point->GetNumMeasures(); i++) {
+      QString sn = point->GetMeasure(i)->GetCubeSerialNumber();
+      if (cubeGraphNodes->contains(sn)) {
+        ControlCubeGraphNode *neighborNode = (*cubeGraphNodes)[sn];
+        if (node != neighborNode) {
+          neighborNode->removeConnection(node, point);
+          node->removeConnection(neighborNode, point);
+        }
+      }
+    }
+  }
+
+
+  void ControlNet::emitNetworkStructureModified() {
     emit networkStructureModified();
   }
 
@@ -558,7 +644,7 @@ namespace Isis {
     if (!wasIgnored) {
       foreach(ControlMeasure * measure, point->GetMeasures()) {
         if (!measure->IsIgnored())
-          MeasureDeleted(measure);
+          measureDeleted(measure);
       }
     }
 
@@ -947,8 +1033,9 @@ namespace Isis {
    */
   int ControlNet::GetNumEditLockMeasures() {
     int numLockedMeasures = 0;
-    foreach(ControlPoint * p, *points)
+    foreach(ControlPoint * p, *points) {
       numLockedMeasures += p->GetNumMeasures() - p->GetNumLockedMeasures();
+    }
 
     return numLockedMeasures;
   }
@@ -978,8 +1065,9 @@ namespace Isis {
    */
   int ControlNet::GetNumIgnoredMeasures() {
     int numIgnoredMeasures = 0;
-    foreach(ControlPoint * p, *points)
+    foreach(ControlPoint * p, *points) {
       numIgnoredMeasures += p->GetNumMeasures() - p->GetNumValidMeasures();
+    }
 
     return numIgnoredMeasures;
   }
@@ -1031,8 +1119,9 @@ namespace Isis {
    */
   int ControlNet::GetNumMeasures() const {
     int numMeasures = 0;
-    foreach(ControlPoint * p, *points)
+    foreach(ControlPoint * p, *points) {
       numMeasures += p->GetNumMeasures();
+    }
 
     return numMeasures;
   }
@@ -1055,8 +1144,10 @@ namespace Isis {
    */
   int ControlNet::GetNumValidMeasures() {
     int numValidMeasures = 0;
-    foreach(ControlPoint * p, *points)
-      if (!p->IsIgnored()) numValidMeasures += p->GetNumValidMeasures();
+    foreach(ControlPoint * p, *points) {
+      if (!p->IsIgnored())
+        numValidMeasures += p->GetNumValidMeasures();
+    }
 
     return numValidMeasures;
   }
@@ -1288,7 +1379,7 @@ namespace Isis {
       if (!newPoint->IsIgnored()) {
         QList< ControlMeasure * > measures = newPoint->GetMeasures();
         for (int i = 0; i < measures.size(); i++) {
-          ControlMeasure * measure = measures[i];
+          ControlMeasure *measure = measures[i];
           QString serial = measure->GetCubeSerialNumber();
 
           if (!measure->IsIgnored()) {
@@ -1297,7 +1388,7 @@ namespace Isis {
             }
             else {
               ControlCubeGraphNode *newControlCubeGraphNode =
-                  new ControlCubeGraphNode(serial);
+                new ControlCubeGraphNode(serial);
 
               newControlCubeGraphNode->addMeasure(measure);
               cubeGraphNodes->insert(serial, newControlCubeGraphNode);

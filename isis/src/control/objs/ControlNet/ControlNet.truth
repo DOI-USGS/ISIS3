@@ -8,6 +8,8 @@ UnitTest for ControlNet ....
 
   ALPHA
 
+  BRAVO
+
 
   ALPHA
     BRAVO :  p0
@@ -30,6 +32,8 @@ testing setting point to ignored.......................
     BRAVO :  p0
   BRAVO
     ALPHA :  p0
+  CHARLIE
+
 
   ALPHA
     BRAVO :  p0, p1

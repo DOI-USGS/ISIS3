@@ -139,6 +139,8 @@ namespace Isis {
    *                release.
    *   @history 2011-04-27 Steven Lambright - UpdatePointReference had a bug
    *                where the pointIds list was not being correctly updated.
+   *   @history 2011-05-04 Eric Hyer - References in graph data structure now
+   *                kept for ignored points and measures
    */
   class ControlNet : public QObject {
       Q_OBJECT
@@ -223,12 +225,13 @@ namespace Isis {
     signals:
       void networkStructureModified();
 
-
     private:
-      void Nullify();
+      void nullify();
       void ValidateSerialNumber(iString serialNumber) const;
-      void MeasureAdded(ControlMeasure *measure);
-      void MeasureDeleted(ControlMeasure *measure);
+      void measureAdded(ControlMeasure *measure);
+      void measureDeleted(ControlMeasure *measure);
+      void measureIgnored(ControlMeasure *measure);
+      void measureUnIgnored(ControlMeasure *measure);
       void UpdatePointReference(ControlPoint *point, iString oldId);
       void emitNetworkStructureModified();
 
