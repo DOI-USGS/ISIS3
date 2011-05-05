@@ -53,7 +53,9 @@ namespace Isis {
    *                          Updated documentation. Replaced Clementine
    *                          namespace wrap with Isis namespace. Added Isis
    *                          Disclaimer to files. Added NAIF error check to
-   *                          constructor.
+   *                          constructor. Changed centertime in constructor to
+   *                          add half exposure duration to start time to
+   *                          maintain consistency with other Clementine models.
    */
   class HiresCamera : public FramingCamera {
     public:
