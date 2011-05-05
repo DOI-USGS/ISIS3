@@ -86,8 +86,6 @@ namespace Isis {
    */
   void ControlCubeGraphNode::addMeasure(ControlMeasure *measure) {
     ASSERT(measure);
-    ASSERT(!measure->IsIgnored());
-    ASSERT(!measure->Parent()->IsIgnored());
 
     if (measure->GetCubeSerialNumber() != *serialNumber) {
       iString msg = "Attempted to add Control Measure with Cube Serial Number ";
@@ -105,7 +103,6 @@ namespace Isis {
   void ControlCubeGraphNode::removeMeasure(ControlMeasure *measure) {
 
     if (measures->remove(measure->Parent()) != 1) {
-      abort();
       ASSERT(0);
     }
 
@@ -241,7 +238,7 @@ namespace Isis {
 
   QString ControlCubeGraphNode::connectionsToString() const {
     QHashIterator< ControlCubeGraphNode *, QList< ControlPoint * > > i(
-        *connections);
+      *connections);
 
     QStringList serials;
     while (i.hasNext()) {
@@ -256,7 +253,7 @@ namespace Isis {
       serials << line;
     }
     qSort(serials);
-    
+
     return serials.join("\n");
   }
 
