@@ -1,4 +1,5 @@
 APPNAME = isiscomplete
+NOPREFERENCES = true
 
 include $(ISISROOT)/make/isismake.tsts
 

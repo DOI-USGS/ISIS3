@@ -10,7 +10,6 @@ commands:
 	  TO=$(OUTPUT)/outputcnet.pvl getlatlon=adjusted \
 	  networkid=ErrorsTestCase_CnetNewRadii \
 	  errors=errors.pvl \
-	  -preference=$$ISISROOT/src/base/objs/Preference/TestPreferences \
 	  2>> $(OUTPUT)/error1.txt > /dev/null;
 	cat $(OUTPUT)/error1.txt | sed s+/usgs.*errors/++g > $(OUTPUT)/error.txt;
 	rm -f $(OUTPUT)/error1.txt;

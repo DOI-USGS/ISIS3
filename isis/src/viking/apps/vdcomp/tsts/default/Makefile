@@ -1,4 +1,5 @@
 APPNAME = vdcomp
+NOPREFERENCES = true
 
 include $(ISISROOT)/make/isismake.tsts
 

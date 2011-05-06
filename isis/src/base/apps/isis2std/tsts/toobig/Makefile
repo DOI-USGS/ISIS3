@@ -8,7 +8,6 @@ commands:
 	  mode=grayscale \
 	  format=png \
 	  stretch=linear \
-	  -preference=$(ISISROOT)/src/base/objs/Preference/TestPreferences \
 	   >& $(OUTPUT)/error.txt` ]; \
 	then \
 	  true; \

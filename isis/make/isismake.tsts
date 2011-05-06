@@ -80,6 +80,12 @@ else
   APPNAME := $(ISISROOT)/bin/$(APPNAME)
 endif
 
+# Make sure all apps use the correct preferences file when testing, unless
+# they have set NOPREFERENCES. This is valid for non-Isis apps.
+ifeq ($(origin NOPREFERENCES), undefined)
+  APPNAME += -preference=$(ISISROOT)/src/base/objs/Preference/TestPreferences
+endif
+
 # set the output variable to the output directory
 OUTPUT = output
 

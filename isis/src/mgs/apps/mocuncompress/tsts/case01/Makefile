@@ -1,4 +1,5 @@
 APPNAME = mocuncompress
+NOPREFERENCES = true
 
 include $(ISISROOT)/make/isismake.tsts
 

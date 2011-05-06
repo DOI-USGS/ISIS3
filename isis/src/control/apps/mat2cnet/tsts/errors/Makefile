@@ -7,7 +7,6 @@ include $(ISISROOT)/make/isismake.tsts
 commands:
 	ls $(INPUT)/Isis3_cube*.cub >& $(OUTPUT)/cub3.lis;
 	$(APPNAME) \
-	-preference=$(ISISROOT)/src/base/objs/Preference/TestPreferences \
 	list2=$(INPUT)/cub2.lis \
 	match=$(INPUT)/match.mat \
 	list3=$(OUTPUT)/cub3.lis \
@@ -17,7 +16,6 @@ commands:
 	target=Titan 2> $(OUTPUT)/error1.txt > /dev/null;
 	ls $(INPUT)/Isis2_cube*.cub >& $(OUTPUT)/cub2.lis;
 	$(APPNAME) list2=$(OUTPUT)/cub2.lis \
-	-preference=$(ISISROOT)/src/base/objs/Preference/TestPreferences \
 	match=$(INPUT)/match_noMatchptKeywd.mat \
 	list3=$(OUTPUT)/cub3.lis \
 	onet=$(OUTPUT)/out.net \
@@ -25,7 +23,6 @@ commands:
 	networkid=TestNet02 \
 	target=Titan 2>> $(OUTPUT)/error1.txt > /dev/null;
 	$(APPNAME) list2=$(OUTPUT)/cub2.lis \
-	-preference=$(ISISROOT)/src/base/objs/Preference/TestPreferences \
 	match=$(INPUT)/match_noColumnLabels.mat \
 	list3=$(OUTPUT)/cub3.lis \
 	onet=$(OUTPUT)/out.net \
@@ -33,7 +30,6 @@ commands:
 	networkid=TestNet03 \
 	target=Titan 2>> $(OUTPUT)/error1.txt > /dev/null;
 	$(APPNAME) list2=$(OUTPUT)/cub2.lis \
-	-preference=$(ISISROOT)/src/base/objs/Preference/TestPreferences \
 	match=$(INPUT)/match_invalidKeyword.mat \
 	list3=$(OUTPUT)/cub3.lis \
 	onet=$(OUTPUT)/out.net \
@@ -41,7 +37,6 @@ commands:
 	networkid=TestNet04 \
 	target=Titan 2>> $(OUTPUT)/error1.txt > /dev/null;
 	$(APPNAME) list2=$(OUTPUT)/cub2.lis \
-	-preference=$(ISISROOT)/src/base/objs/Preference/TestPreferences \
 	match=$(INPUT)/match_invalidMeasType.mat \
 	list3=$(OUTPUT)/cub3.lis \
 	onet=$(OUTPUT)/out.net \
@@ -49,7 +44,6 @@ commands:
 	networkid=TestNet05 \
 	target=Titan 2>> $(OUTPUT)/error1.txt > /dev/null;
 	$(APPNAME) list2=$(OUTPUT)/cub2.lis \
-	-preference=$(ISISROOT)/src/base/objs/Preference/TestPreferences \
 	match=$(INPUT)/match_repeatedPointID.mat \
 	list3=$(OUTPUT)/cub3.lis \
 	onet=$(OUTPUT)/out.net \
@@ -57,7 +51,6 @@ commands:
 	networkid=TestNet06 \
 	target=Titan 2>> $(OUTPUT)/error1.txt > /dev/null;
 	$(APPNAME) list2=$(OUTPUT)/cub2.lis \
-	-preference=$(ISISROOT)/src/base/objs/Preference/TestPreferences \
 	match=$(INPUT)/match_invalidLineSamp.mat \
 	list3=$(OUTPUT)/cub3.lis \
 	onet=$(OUTPUT)/out.net \
@@ -65,7 +58,6 @@ commands:
 	networkid=TestNet07 \
 	target=Titan 2>> $(OUTPUT)/error1.txt > /dev/null;
 	$(APPNAME) list2=$(OUTPUT)/cub2.lis \
-	-preference=$(ISISROOT)/src/base/objs/Preference/TestPreferences \
 	match=$(INPUT)/match.mat \
 	inputppp=true \
 	ppp=$(INPUT)/rand_invalidLineCount.ppp \
@@ -75,7 +67,6 @@ commands:
 	networkid=TestNet09 \
 	target=Titan 2>> $(OUTPUT)/error1.txt > /dev/null;
 	$(APPNAME) list2=$(OUTPUT)/cub2.lis \
-	-preference=$(ISISROOT)/src/base/objs/Preference/TestPreferences \
 	match=$(INPUT)/match.mat \
 	inputppp=true \
 	ppp=$(INPUT)/rand_invalidLatLonRad.ppp \
