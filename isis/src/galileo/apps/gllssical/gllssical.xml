@@ -5,82 +5,129 @@
     Perform Radiometric correction on GALILEO-SSI Imaging
   </brief>
 
+  <oldName>
+    <item>ssical</item>
+  </oldName>
+
   <category>
     <missionItem>Galileo</missionItem>
   </category>
 
   <description>
-    This program is used to radiometrically correct flight images using a linear
-    model of the light-transfer function.  This program is specific to the 
-    Galileo SSI camera.
-    
+    This program is used to radiometrically correct flight images using a
+    linear model of the light-transfer function.  This program is specific to
+    the Galileo SSI camera.
+    <br/><br/>
+
     References:
-    
-    1) D-4264 MIPL Software Structural Design for the Instrument Calibration
-       of GLL SSI Science Processing.
-    
-    2) K. Klaasen, "Reduction in Number of Unique SSI Calibration Files",
-       29 May 1987.
-    
-    3) 625-210,"Galileo SSI Calibration Report Part 1", K. Klaasen, H. 
-       Breneman, November 1, 1988.
-    
+    <ol> 
+      <li>
+        D-4264 MIPL Software Structural Design for the Instrument Calibration
+        of GLL SSI Science Processing.
+      </li>
+      <li>
+        K. Klaasen, "Reduction in Number of Unique SSI Calibration Files",
+        29 May 1987.
+      </li>
+      <li>
+        625-210,"Galileo SSI Calibration Report Part 1", K. Klaasen, H. 
+        Breneman, November 1, 1988.
+      </li>
+      <li>
+        <a href="http://www-mipl.jpl.nasa.gov/vicar/vicar310/html/vichelp/galsos.html"
+           target="_blank">
+          JPL VICAR GALSOS application help page.
+        </a>
+      </li>
+    </ol>
     
     This program will radiometrically correct the input image, converting the
-    input DN values to some specified radiometric unit.  The program
-    requires a radiometric file generated from calibration data acquired at
-    the same filter position as the input image, and a dark-current file
-    acquired at the same camera gain-state, frame-rate, PNI, and BPM
-    settings.  Also, extended exposure mode frames require an
+    input DN values to some specified radiometric unit (either I/F or
+    radiance).  The program requires a radiometric file generated from
+    calibration data acquired at the same filter position as the input image,
+    and a dark-current file acquired at the same camera gain-state, frame-rate,
+    PNI, and BPM settings.  Also, extended exposure mode frames require an
     extended-exposure mode dark-current file.
+    <br/><br/>
     
     This program extracts the filter position, exposure time, and frame-rate
     from the label of the input file to determine the required gain file
     to use.  The file $ISIS3DATA/galileo/calibration/gll_gain.sav defines the 
-    gain file to use for the given filter, gain state, and frame mode.  The file
-    $ISIS3DATA/galileo/calibration/gll_dc.sav defines the DC file to use for the given, gain
-    state, frame mode, frame rate, blemish protection mode, clock mode, and
-    extended exposure mode.
+    gain file to use for the given filter, gain state, and frame mode.  The
+    file $ISIS3DATA/galileo/calibration/gll_dc.sav defines the DC file to use
+    for the given, gain state, frame mode, frame rate, blemish protection mode,
+    clock mode, and extended exposure mode.
+    <br/><br/>
     
     This program performs the following processing steps on each pixel:
-     
-     1. The radiometric correction is applied:
-    		e = z(d - dc)
-        where z is retrieved from the Radiometric File and dc is retrieved 
-        from the Dark-Current File.
-    
-     2. The output pixel is scaled to radiometric units R. 
-    
-    		           S1 	    K
-    		r = e * -------- * --- (D/5.2)**2
-    			A1(t-to)    Ko
-        where
-    
-    	S1 = filter-dependent conversion factor from ft-Lamberts to
-    	     I/F units for a reference distance of 5.2 AU from the Sun.
-    	t  = commanded exposure time of the input image (msec).
+    <ol>
+      <li>
+        The radiometric correction is applied:
+        <pre>
+          e = z(d - dc)
+
+          where:
+            z is retrieved from the Radiometric File.
+            d is the DN.
+            dc is retrieved from the Dark-Current File.
+        </pre>
+      </li>
+      <li>
+        The output pixel is scaled to radiometric units R (units of reflectance
+        or units of radiance). If output units are I/F, the following equation
+        is used:
+        <pre> 
+    		     S1       K
+          r = e * -------- * --- (D/5.2)<sup>2</sup>
+    		  A1(t-to)    Ko
+
+          where:
+            S1 = filter-dependent conversion factor from ft-Lamberts to
+                 I/F units for a reference distance of 5.2 AU from the Sun.
+            A1 = output picture scale factor (see SCALE parameter for more info).
+            t  = commanded exposure time of the input image (msec).
             to = line-dependent shutter offset.
             K  = system gain constant for the gain-state of the image.
             Ko = system gain constant for the calibration file gain-state.
-    	D  = target distance from the Sun (in AU).
-    
-     5. The output DN is usually in the range of 
-        0.0 to 1.0. 
-    
-    If the uneven bit weighting correction is enabled, the input DN values (d) 
-    will be corrected for uneven-bit-weighting due to the ADC.  If the input 
-    dark-current file is in byte format (i.e. an individual dark-current frame), 
-    then the correction will be applied to the dark-current as well. The current 
-    correction table was supplied by Herb Breneman, 2 Mar 89, and is based on 
-    1975 calibration data.
+            D  = target distance from the Sun (in AU).
+        </pre>
+
+        If output units are in radiance, the following equation is used:
+        <pre>
+    		     S2       K
+          r = e * -------- * ---
+    		  A2(t-to)    Ko
+
+          where:
+            S2 = filter-dependent conversion factor from ft-Lamberts to
+                 units of nanowatts/cm<sup>2</sup>/steradian/nanometer.
+            A2 = output picture scale factor (see SCALE parameter for more info).
+            t  = commanded exposure time of the input image (msec).
+            to = line-dependent shutter offset.
+            K  = system gain constant for the gain-state of the image.
+            Ko = system gain constant for the calibration file gain-state.
+        </pre>
+        Note: The original version of this equation (found in GALSOS) was
+        multiplied by 10,000. The Isis 2 version of the program chose to
+        remove this scaling factor, so we do the same here.
+      </li>
+      <li>
+        The output DN is usually in the range of 0.0 to 1.0.
+      </li>
+    </ol>
+
+    If the uneven bit weighting correction is enabled, the input DN values (d)
+    will be corrected for uneven-bit-weighting due to the ADC.  If the input
+    dark-current file is in byte format (i.e. an individual
+    dark-current frame), then the correction will be applied to the
+    dark-current as well. The current correction table was supplied by Herb
+    Breneman, 2 Mar 89, and is based on 1975 calibration data.
+    <br/><br/>
 
     Please note that the original Isis 2 version of this app (ssical) included
-    negative I/F values in the output. We will not be supporting this bevior as
-    negative I/F are not useful and do not make sense. Thus, this app outputs
-    LRS for any negative I/F values that are encountered.
-
-    In the future, this app needs to be modified to output units in either I/F
-    or radiance.
+    negative I/F values in the output. We will not be supporting this behavior
+    as negative I/F are not useful and do not make sense. Thus, this app
+    outputs LRS for any negative I/F values that are encountered.
   </description>
 
   <history>
@@ -101,6 +148,12 @@
     <change name="Jai Rideout" date="2011-04-14">
       Fixed bug where shutter file buffers were being accessed out of array
       bounds.
+    </change>
+    <change name="Jai Rideout" date="2011-05-06">
+      Added SCALE and UNITS parameters so that radiance output is supported in
+      addition to I/F. Added more user documentation and comments in order to
+      make the radiometric correction equation clearer. Fixed formatting of
+      equations in XML description section.
     </change>
   </history>
 
@@ -133,6 +186,48 @@
     </group>
  
     <group name="Settings">
+      <parameter name="UNITS">
+        <type>string</type>
+        <brief>Output units</brief>
+        <description>
+          The units that the output will be in.
+        </description>
+        <default><item>IOF</item></default>
+        <list>
+          <option value="IOF">
+            <brief>I/F</brief>
+            <description>
+              This option indicates that the output is in terms of solar flux
+              (I/F).
+            </description>
+          </option>
+          <option value="RADIANCE">
+            <brief>Radiance</brief>
+            <description>
+              This option indicates that the output is in terms of radiance.
+            </description>
+          </option>
+        </list>
+      </parameter>
+
+      <parameter name="SCALE">
+        <type>double</type>
+        <brief>
+          Scale factor
+        </brief>
+        <default><item>1.0</item></default>
+        <description>
+          If output units are in I/F, the scale factor is the number of I/F
+          units per DN, where 10,000 I/F units would be produced by normal
+          incidence of sunlight on a Lambert disk at the planet's distance
+          from the sun.
+          <br/><br/>
+          If output units are in radiance, the scale factor is the number
+          of nanowatts per cm<sup>2</sup> per steradian per nanometer
+          wavelength per DN.
+        </description>
+       </parameter>
+
       <parameter name="BITWEIGHTING">
         <type>boolean</type>
         <brief>
@@ -143,5 +238,4 @@
        </parameter>
     </group>
   </groups>
-
 </application>

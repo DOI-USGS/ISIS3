@@ -20,32 +20,31 @@ using namespace std;
  *   Science Team," Section H Part I.
  */
  
+// Globals
 vector<double> weight;
-double scaleFactor0;
-double a2;
+double scaleFactor0; // Entire scale factor that e is multiplied by
+double scaleFactor; // A1 or A2 in the equation, depending on units
 double dcScaleFactor;
 double exposureDuration;
-double picScale;
+bool eightBitDarkCube; // Is the dark cube of type unsigned byte?
+bool iof; // Determines output units (i.e. I/F or radiance)
 
-void Calibrate1(vector<Buffer *> &in, vector<Buffer *> &out);
-void Calibrate2(vector<Buffer *> &in, vector<Buffer *> &out);
+void Calibrate(vector<Buffer *> &in, vector<Buffer *> &out);
 Filename FindDarkFile(Cube *icube);
 Filename FindGainFile(Cube *icube);
 Filename FindShutterFile(Cube *icube);
 Filename ReadWeightTable(Cube *icube);
 Filename GetScaleFactorFile();
 int getGainModeID(Cube *icube);
-void calculateScaleFactor(Cube *icube, Cube *gaincube);
+void calculateScaleFactor0(Cube *icube, Cube *gaincube);
 
 void IsisMain() {
   // Initialize Globals
-  UserInterface &ui = Application::GetUserInterface();
   weight.clear();
-  scaleFactor0 = 0.0;
   dcScaleFactor = 0.0;
   exposureDuration = 0.0;
-  a2 = 0.0;
-  picScale = 0.0;
+
+  UserInterface &ui = Application::GetUserInterface();
 
   // Set up our ProcessByLine
   ProcessByLine p;
@@ -57,7 +56,7 @@ void IsisMain() {
   Isis::CubeAttributeInput inAtt1;
   Filename darkFilename = FindDarkFile(icube);
   Cube *darkcube = p.SetInputCube(darkFilename.Expanded(), inAtt1);
-  picScale = darkcube->GetGroup("Instrument")["PicScale"][0];
+  dcScaleFactor = darkcube->GetGroup("Instrument")["PicScale"][0];
 
   Isis::CubeAttributeInput inAtt2;
   Filename gainFilename = FindGainFile(icube);
@@ -68,6 +67,9 @@ void IsisMain() {
 
   Cube *ocube = p.SetOutputCube("TO");
 
+  (ui.GetString("UNITS") == "IOF") ? iof = true : iof = false;
+  scaleFactor = ui.GetDouble("SCALE");
+
   if(ui.GetBoolean("BITWEIGHTING")) {
     ReadWeightTable(icube);
   }
@@ -77,16 +79,18 @@ void IsisMain() {
     }
   }
 
-  calculateScaleFactor(icube, gaincube);
+  calculateScaleFactor0(icube, gaincube);
 
   exposureDuration = ((double)icube->GetGroup("Instrument")["ExposureDuration"][0]) * 1000;
 
   if(darkcube->PixelType() == Isis::UnsignedByte) {
-    p.StartProcess(Calibrate1);
+    eightBitDarkCube = true;
   }
   else {
-    p.StartProcess(Calibrate2);
+    eightBitDarkCube = false;
   }
+
+  p.StartProcess(Calibrate);
 
   PvlGroup calibrationLog("RadiometricCalibration");
   calibrationLog.AddKeyword(PvlKeyword("From", (std::string)ui.GetFilename("FROM")));
@@ -95,27 +99,34 @@ void IsisMain() {
   calibrationLog.AddKeyword(PvlKeyword("DarkCurrentFile", darkFilename.OriginalPath() + "/" + darkFilename.Name()));
   calibrationLog.AddKeyword(PvlKeyword("GainFile", gainFilename.OriginalPath() + "/" + gainFilename.Name()));
   calibrationLog.AddKeyword(PvlKeyword("ShutterFile", shutterFilename.OriginalPath() + "/" + shutterFilename.Name()));
+  calibrationLog.AddKeyword(PvlKeyword("ScaleFactor", scaleFactor));
+  calibrationLog.AddKeyword(PvlKeyword("OutputUnits", iof ? "I/F" : "Radiance"));
 
   ocube->PutGroup(calibrationLog);
   Application::Log(calibrationLog);
-
   p.EndProcess();
 }
 
-void Calibrate1(vector<Buffer *> &in, vector<Buffer *> &out) {
+void Calibrate(vector<Buffer *> &in, vector<Buffer *> &out) {
   Buffer &inputFile   = *in[0];
   Buffer &darkFile    = *in[1];
   Buffer &gainFile    = *in[2];
   Buffer &shutterFile = *in[3];
   Buffer &outputFile  = *out[0];
 
-  double scaleFactor = scaleFactor0 / (exposureDuration - shutterFile[0]);
+  /*
+   * Calculate this part of the radiometric correction equation:
+   *
+   * scaleFactor0 / (t-to)
+   */
+  double scale = scaleFactor0 / (exposureDuration - shutterFile[0]);
 
   for(int samp = 0; samp < inputFile.size(); samp++) {
     // Some shutter files are only a single sample. Others may match the number
     // of samples in the cube.
     int shutterIndex = (shutterFile.size() == 1) ? 0 : samp;
 
+    // Don't do anything to special pixels.
     if(IsSpecial(inputFile[samp])) {
       outputFile[samp] = inputFile[samp];
       continue;
@@ -126,54 +137,28 @@ void Calibrate1(vector<Buffer *> &in, vector<Buffer *> &out) {
       continue;
     }
 
-    double xdn = weight[(unsigned long)(inputFile[samp])];
-    double xdc = weight[(unsigned long)(darkFile[samp])];
-    double xdo = scaleFactor * gainFile[samp] * (xdn - xdc);
+    /*
+     * Calculate this part of the equation:
+     *   e = z(d - dc)
+     */
+    double dn = weight[(unsigned long)(inputFile[samp])];
 
-    // The following behavior does not match the Isis 2 version of this app.
-    // In the Isis 2 version, negative I/F were kept in the output, which
-    // doesn't make sense.
-    if(xdo >= 0) {
-      outputFile[samp] = xdo;
+    double dc;
+    if (eightBitDarkCube) {
+      dc = weight[(unsigned long)(darkFile[samp])];
     }
     else {
-      outputFile[samp] = Isis::Lrs;
-    }
-  }
-}
-
-void Calibrate2(vector<Buffer *> &in, vector<Buffer *> &out) {
-  Buffer &inputFile   = *in[0];
-  Buffer &darkFile    = *in[1];
-  Buffer &gainFile    = *in[2];
-  Buffer &shutterFile = *in[3];
-  Buffer &outputFile  = *out[0];
-
-  double scaleFactor = scaleFactor0 / (exposureDuration - shutterFile[0]);
-
-  for(int samp = 0; samp < inputFile.size(); samp++) {
-    // Some shutter files are only a single sample. Others may match the number
-    // of samples in the cube.
-    int shutterIndex = (shutterFile.size() == 1) ? 0 : samp;
-
-    if(IsSpecial(inputFile[samp])) {
-      outputFile[samp] = inputFile[samp];
-      continue;
+      dc = (1.0 / dcScaleFactor) * darkFile[samp];
     }
 
-    if(IsSpecial(darkFile[samp]) || IsSpecial(gainFile[samp]) || IsSpecial(shutterFile[shutterIndex])) {
-      outputFile[samp] = Isis::Null;
-      continue;
-    }
-
-    double xdn = weight[(unsigned long)(inputFile[samp])];
-    double xdo = scaleFactor * gainFile[samp] * (xdn - (1.0 / picScale) * darkFile[samp]); // weight of dark file DN??? See decal1
+    double e = gainFile[samp] * (dn - dc);
+    double r = e * scale;
 
     // The following behavior does not match the Isis 2 version of this app.
     // In the Isis 2 version, negative I/F were kept in the output, which
     // doesn't make sense.
-    if(xdo >= 0) {
-      outputFile[samp] = xdo;
+    if(r >= 0 || !iof) {
+      outputFile[samp] = r;
     }
     else {
       outputFile[samp] = Isis::Lrs;
@@ -213,7 +198,7 @@ Filename FindDarkFile(Cube *icube) {
   int exposureTypeId = (icube->GetGroup("Instrument")["ExposureType"][0] == "NORMAL") ? 0 : 1;
 
   // We have what we need from the image label, now go through the text file that is our table line by line
-  //   looking for a match.
+  // looking for a match.
   while(darkFile.GetLine(data)) {
     data = data.Compress();
 
@@ -364,7 +349,22 @@ int getGainModeID(Cube *icube) {
   return gainModeId;
 }
 
-void calculateScaleFactor(Cube *icube, Cube *gaincube) {
+/* 
+ * Calculates scaleFactor0, which is:
+ *
+ *         S1       K
+ *      -------- * --- (D/5.2)**2
+ *         A1       Ko
+ *
+ * if output units are in I/F, or:
+ *
+ *         S2       K
+ *      -------- * ---
+ *         A2       Ko
+ *
+ * if output units are in radiance.
+ */
+void calculateScaleFactor0(Cube *icube, Cube *gaincube) {
   Pvl conversionFactors(GetScaleFactorFile().Expanded());
   PvlKeyword fltToRef, fltToRad;
 
@@ -409,22 +409,43 @@ void calculateScaleFactor(Cube *icube, Cube *gaincube) {
   double s1 = fltToRef[filterNumber];
   double s2 = fltToRad[filterNumber];
 
-  Camera *cam = icube->Camera();
-  bool camSuccess = cam->SetImage(icube->Samples() / 2, icube->Lines() / 2);
+  if (iof) {
+    Camera *cam = icube->Camera();
+    bool camSuccess = cam->SetImage(icube->Samples() / 2, icube->Lines() / 2);
 
-  if(!camSuccess) {
-    throw iException::Message(iException::Camera,
-                              "Unable to calculate the Solar Distance on [" +
-                              icube->Filename() + "]", _FILEINFO_);
+    if(!camSuccess) {
+      throw iException::Message(iException::Camera,
+                                "Unable to calculate the Solar Distance on [" +
+                                icube->Filename() + "]", _FILEINFO_);
+    }
+
+
+    double rsun = cam->SolarDistance() / 5.2;
+
+    /*
+     * We are calculating I/F, so scaleFactor0 is:
+     *
+     *         S1       K
+     *      -------- * --- (D/5.2)**2
+     *         A1       Ko
+     */
+    scaleFactor0 =
+      (s1 * ((double)conversionFactors["GainRatios"][getGainModeID(icube)-1] /
+             (double)conversionFactors["GainRatios"][getGainModeID(gaincube)-1]) *
+       pow(rsun, 2)) / (scaleFactor);
   }
-
-  double rsun = cam->SolarDistance() / 5.2;
-
-  a2 = (s2 / s1) / pow(rsun, 2);
-
-  scaleFactor0 = s1 * (
-                   (double)conversionFactors["GainRatios"][getGainModeID(icube)-1] /
-                   (double)conversionFactors["GainRatios"][getGainModeID(gaincube)-1]) * pow(rsun, 2);
+  else {
+    /*
+     * We are calculating radiance, so scaleFactor0 is:
+     *
+     *         S2       K
+     *      -------- * ---
+     *         A2       Ko
+     */
+    scaleFactor0 = (s2 / scaleFactor) *
+      ((double)conversionFactors["GainRatios"][getGainModeID(icube)-1] /
+       (double)conversionFactors["GainRatios"][getGainModeID(gaincube)-1]);
+  }
 }
 
 Filename GetScaleFactorFile() {
