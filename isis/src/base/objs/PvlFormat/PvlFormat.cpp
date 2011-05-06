@@ -112,6 +112,10 @@ namespace Isis {
       type.UpCase();
       PvlKeyword newKey(name, type);
       for(int j = 1; j < key.Size(); ++j) newKey.AddValue(key[j]);
+      // Make sure we don't duplicate Keys
+      if (p_keywordMap.HasKeyword(name)) {
+        p_keywordMap.DeleteKeyword(name);  
+      }
       p_keywordMap.AddKeyword(newKey);
     }
   }
