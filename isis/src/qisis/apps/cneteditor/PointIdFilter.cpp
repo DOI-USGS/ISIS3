@@ -41,22 +41,41 @@ namespace Isis
   }
 
 
-  bool PointIdFilter::evaluate(ControlPoint const * point) const
+  /**
+   * Given a point to evaluate, return true if it makes it through the filter,
+   * and false otherwise.  Criteria defining the filter is defined in this
+   * method.  Note that whether the filter is inclusive or exclusive is handled
+   * in this method.
+   *
+   * @param point The point to evaluate
+   *
+   * @returns True if the point makes it through the filter, false otherwise
+   */
+  bool PointIdFilter::evaluate(const ControlPoint * point) const
   {
-    if (inclusive())
-      return ((QString) point->GetId()).startsWith(lineEdit->text());
-    else
-      return !((QString) point->GetId()).startsWith(lineEdit->text());
+    bool match = ((QString) point->GetId()).startsWith(lineEdit->text());
+    
+    //                     match
+    //                    T     F
+    //                  ___________
+    //                 |     |     |
+    //              T  |  T  |  F  |
+    // inclusive()     |_____|_____|
+    //                 |     |     |
+    //              F  |  F  |  T  |
+    //                 |_____|_____|
+    
+    return !(inclusive() ^ match);
   }
 
 
-  bool PointIdFilter::evaluate(ControlMeasure const * measure) const
+  bool PointIdFilter::evaluate(const ControlMeasure * measure) const
   {
     return true;
   }
 
 
-  bool PointIdFilter::evaluate(ControlCubeGraphNode const * node) const
+  bool PointIdFilter::evaluate(const ControlCubeGraphNode * node) const
   {
     return true;
   }

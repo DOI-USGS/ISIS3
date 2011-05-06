@@ -16,6 +16,7 @@ namespace Isis
 {
   class ConnectionModel;
   class ControlNet;
+  class FilterWidget;
   class MeasureTableDelegate;
   class MeasureTableModel;
   class PointModel;
@@ -53,9 +54,16 @@ namespace Isis
 
 
     private:
-      QBoxLayout * createMainLayout();
       void nullify();
+      QBoxLayout * createMainLayout();
+      void createPointView();
+      void createSerialView();
+      void createConnectionView();
+      void createFilterWidgets();
+      void createEditPointView();
+      void createEditMeasureView();
       void focusView(QTreeView * view, QStringList label);
+      void syncFilterWidgets();
       void updateTreeItemsWithNewSelection(const QItemSelection & newSelected,
           const QItemSelection & newDeselected);
 
@@ -82,6 +90,10 @@ namespace Isis
       QTreeView * pointView;
       QTreeView * serialView;
       QTreeView * connectionView;
+      
+      FilterWidget * pointFilterWidget;
+      FilterWidget * serialFilterWidget;
+      FilterWidget * connectionFilterWidget;
 
       PointModel * pointModel;
       SerialModel * serialModel;
@@ -99,7 +111,6 @@ namespace Isis
       QSplitter * topSplitter;
       QSplitter * mainSplitter;
   };
-
 }
 
 #endif

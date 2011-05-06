@@ -23,6 +23,7 @@ namespace Isis
       bool evaluate(const ControlMeasure *) const;
       bool evaluate(const ControlCubeGraphNode *) const;
 
+
     protected:
       void nullify();
       void createWidget();

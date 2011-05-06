@@ -24,6 +24,7 @@
 #include "ControlPoint.h"
 
 #include "ConnectionModel.h"
+#include "FilterWidget.h"
 #include "MeasureTableDelegate.h"
 #include "MeasureTableModel.h"
 #include "PointTableDelegate.h"
@@ -31,8 +32,6 @@
 #include "PointModel.h"
 #include "SerialModel.h"
 #include "AbstractTreeItem.h"
-
-#include <QPushButton>
 
 
 using std::cerr;
@@ -61,6 +60,32 @@ namespace Isis
   }
 
 
+  void CnetEditorWidget::nullify()
+  {
+    pointView = NULL;
+    serialView = NULL;
+    connectionView = NULL;
+
+    pointModel = NULL;
+    serialModel = NULL;
+    connectionModel = NULL;
+
+    editPointModel = NULL;
+    editMeasureModel = NULL;
+
+    editPointDelegate = NULL;
+    editMeasureDelegate = NULL;
+
+    editPointView = NULL;
+    editMeasureView = NULL;
+
+    topSplitter = NULL;
+    mainSplitter = NULL;
+
+    controlNet = NULL;
+  }
+
+
   void CnetEditorWidget::setDriverView(int driverView)
   {
     View view = (View) driverView;
@@ -76,6 +101,28 @@ namespace Isis
 
     connectionView->selectionModel()->clear();
     connectionView->collapseAll();
+    
+//     syncFilterWidgets();
+  }
+  
+  
+  void CnetEditorWidget::syncFilterWidgets()
+  {
+    pointFilterWidget->setVisible(false);
+    serialFilterWidget->setVisible(false);
+    connectionFilterWidget->setVisible(false);
+    
+    switch ((View) getDriverView())
+    {
+      case PointView:
+        pointFilterWidget->show();
+        break;
+      case SerialView:
+        serialFilterWidget->show();
+        break;
+      case ConnectionView:
+        connectionFilterWidget->show();
+    }
   }
 
 
@@ -110,6 +157,45 @@ namespace Isis
 
   QBoxLayout * CnetEditorWidget::createMainLayout()
   {
+    createPointView();
+    createSerialView();
+    createConnectionView();
+//     createFilterWidgets();
+
+    createEditPointView();
+    QGroupBox * editPointBox = new QGroupBox(tr("Control Point Table"));
+    QHBoxLayout * editPointLayout = new QHBoxLayout;
+    editPointLayout->addWidget(editPointView);
+    editPointBox->setLayout(editPointLayout);
+
+    createEditMeasureView();
+    QGroupBox * editMeasureBox = new QGroupBox(tr("Control Measure Table"));
+    QHBoxLayout * editMeasureLayout = new QHBoxLayout;
+    editMeasureLayout->addWidget(editMeasureView);
+    editMeasureBox->setLayout(editMeasureLayout);
+
+    topSplitter = new QSplitter(Qt::Horizontal);
+    topSplitter->addWidget(pointView);
+    topSplitter->addWidget(serialView);
+    topSplitter->addWidget(connectionView);
+//     topSplitter->addWidget(pointFilterWidget);
+//     topSplitter->addWidget(serialFilterWidget);
+//     topSplitter->addWidget(connectionFilterWidget);
+
+    mainSplitter = new QSplitter(Qt::Vertical);
+    mainSplitter->addWidget(topSplitter);
+    mainSplitter->addWidget(editPointBox);
+    mainSplitter->addWidget(editMeasureBox);
+
+    QBoxLayout * mainLayout = new QHBoxLayout;
+    mainLayout->addWidget(mainSplitter);
+
+    return mainLayout;
+  }
+  
+  
+  void CnetEditorWidget::createPointView()
+  {
     pointView = new QTreeView();
     pointModel = new PointModel(controlNet, "Point View", pointView, qApp);
     pointView->setModel(pointModel);
@@ -123,7 +209,11 @@ namespace Isis
         SLOT(itemCollapsed(const QModelIndex &)));
     pointView->setAlternatingRowColors(true);
     pointView->setSelectionMode(QAbstractItemView::MultiSelection);
-
+  }
+  
+  
+  void CnetEditorWidget::createSerialView()
+  {
     serialView = new QTreeView();
     serialModel = new SerialModel(controlNet, "Cube View", serialView, qApp);
     serialView->setModel(serialModel);
@@ -137,7 +227,11 @@ namespace Isis
         SLOT(itemCollapsed(const QModelIndex &)));
     serialView->setAlternatingRowColors(true);
     serialView->setSelectionMode(QAbstractItemView::MultiSelection);
-
+  }
+  
+  
+  void CnetEditorWidget::createConnectionView()
+  {
     connectionView = new QTreeView();
     connectionModel = new ConnectionModel(controlNet, "Cube Connection View",
         connectionView, qApp);
@@ -152,7 +246,19 @@ namespace Isis
         SLOT(itemCollapsed(const QModelIndex &)));
     connectionView->setAlternatingRowColors(true);
     connectionView->setSelectionMode(QAbstractItemView::MultiSelection);
-
+  }
+  
+  
+  void CnetEditorWidget::createFilterWidgets()
+  {
+    pointFilterWidget = new FilterWidget;
+    serialFilterWidget = new FilterWidget;
+    connectionFilterWidget = new FilterWidget;
+  }
+  
+  
+  void CnetEditorWidget::createEditPointView()
+  {
     editPointView = new QTableView();
     editPointModel = new PointTableModel(qApp);
     editPointView->setModel(editPointModel);
@@ -166,11 +272,11 @@ namespace Isis
     editPointView->setEditTriggers(QAbstractItemView::SelectedClicked |
         QAbstractItemView::DoubleClicked | QAbstractItemView::AnyKeyPressed);
     editPointView->setSelectionMode(QAbstractItemView::ExtendedSelection);
-    QGroupBox * editPointBox = new QGroupBox(tr("Control Point Table"));
-    QHBoxLayout * editPointLayout = new QHBoxLayout;
-    editPointLayout->addWidget(editPointView);
-    editPointBox->setLayout(editPointLayout);
-
+  }
+  
+  
+  void CnetEditorWidget::createEditMeasureView()
+  {
     editMeasureView = new QTableView();
     editMeasureModel = new MeasureTableModel(qApp);
     editMeasureView->setModel(editMeasureModel);
@@ -186,52 +292,6 @@ namespace Isis
     editMeasureView->setEditTriggers(QAbstractItemView::SelectedClicked |
         QAbstractItemView::DoubleClicked | QAbstractItemView::AnyKeyPressed);
     editMeasureView->setSelectionMode(QAbstractItemView::ExtendedSelection);
-    QGroupBox * editMeasureBox = new QGroupBox(tr("Control Measure Table"));
-    QHBoxLayout * editMeasureLayout = new QHBoxLayout;
-    editMeasureLayout->addWidget(editMeasureView);
-    editMeasureBox->setLayout(editMeasureLayout);
-
-
-    topSplitter = new QSplitter(Qt::Horizontal);
-    topSplitter->addWidget(pointView);
-    topSplitter->addWidget(serialView);
-    topSplitter->addWidget(connectionView);
-
-    mainSplitter = new QSplitter(Qt::Vertical);
-    mainSplitter->addWidget(topSplitter);
-    mainSplitter->addWidget(editPointBox);
-    mainSplitter->addWidget(editMeasureBox);
-
-    QBoxLayout * mainLayout = new QHBoxLayout;
-    mainLayout->addWidget(mainSplitter);
-
-    return mainLayout;
-  }
-
-
-  void CnetEditorWidget::nullify()
-  {
-    pointView = NULL;
-    serialView = NULL;
-    connectionView = NULL;
-
-    pointModel = NULL;
-    serialModel = NULL;
-    connectionModel = NULL;
-
-    editPointModel = NULL;
-    editMeasureModel = NULL;
-
-    editPointDelegate = NULL;
-    editMeasureDelegate = NULL;
-
-    editPointView = NULL;
-    editMeasureView = NULL;
-
-    topSplitter = NULL;
-    mainSplitter = NULL;
-
-    controlNet = NULL;
   }
 
 
