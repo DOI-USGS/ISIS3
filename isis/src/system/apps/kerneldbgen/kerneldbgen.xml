@@ -15,35 +15,73 @@
       being referenced that are located in a user's development area, absolute
       pathnames should be used. Relative pathnames using ".", "..", or user-defined
       environment variables are highly discouraged.
-      </p>
-      <p>
-        Kernels have different qualities. The lowest quality is nadir, which supplies
-        what may be considered "placeholder" values. Generally, nadir kernels exist
-        to fill in gaps and mimic the instrument pointing at -90 degrees. Since they
-        only mimic pointing data, they cannot be used for SPKs, since these kernels
-        specify positions rather than pointing.
-      </p>
-      <p>
-        The second lowest quality kernel is predict. Predict kernels are based on
-        the predicted location of spacecraft and thus are subject to error.
-      </p>
-      <p>
-        Reconstructed kernels are of higher quality than predicts. They are
-        supplemented with information as to the actual position of bodies and
-        spacecraft.
-      </p>
-      <p>
-        The highest quality kernels are smithed. These generally come from reconstructed
-        kernels that have been corrected even further by an individual institution.
-      </p>
-      <p>
-        The four levels of kernels listed above are the only ones that will be
-        listed in the database. Kernels are ordered from the lowest quality at the
-        top of the output file to the highest quality at the bottom of the output
-        file within individual kernel qualities, kernels are listed from earliest to
-        latest created file. This is done in anticipation of programs such as spiceinit
-        which read from the bottom of the file for the best kernel.
-      </p>
+    </p>
+    <p>
+      Kernels have different qualities. The lowest quality is nadir, which supplies
+      what may be considered "placeholder" values. Generally, nadir kernels exist
+      to fill in gaps and mimic the instrument pointing at -90 degrees. Since they
+      only mimic pointing data, they cannot be used for SPKs, since these kernels
+    specify positions rather than pointing.
+    </p>
+    <p>
+      The second lowest quality kernel is predict. Predict kernels are based on
+      the predicted location of spacecraft and thus are subject to error.
+    </p>
+    <p>
+      Reconstructed kernels are of higher quality than predicts. They are
+      supplemented with information as to the actual position of bodies and
+      spacecraft.
+    </p>
+    <p>
+      The highest quality kernels are smithed. These generally come from reconstructed
+      kernels that have been corrected even further by an individual institution.
+    </p>
+    <p>
+      The four levels of kernels listed above are the only ones that will be
+      listed in the database. Kernels are ordered from the lowest quality at the
+      top of the output file to the highest quality at the bottom of the output
+      file within individual kernel qualities, kernels are listed from earliest to
+      latest created file. This is done in anticipation of programs such as spiceinit
+      which read from the bottom of the file for the best kernel.
+    </p>
+    <br />
+    <p>
+      This program's database is in pvl format, and as such order is
+      significant. The last listed kernel file covering the timespan will be
+      used. Because of this in combination with the individual needs of
+      specific missions, ISIS arrays can be used to control kernel file order.
+    </p>
+    <p><pre>
+      For example, using the pure string expression:
+      
+      "m01_sc_ext??_rec_nadir.bc ; m01_sc_ext??.bc"
+      
+      would result in the listing:
+      
+      m01_sc_ext10.bc
+      m01_sc_ext10_rec_nadir.bc
+      m01_sc_ext11.bc
+      m01_sc_ext11_rec_nadir.bc
+      m01_sc_ext12.bc
+      m01_sc_ext12_rec_nadir.bc
+      m01_sc_ext13.bc
+      m01_sc_ext13_rec_nadir.bc
+	  
+	  while using the ISIS array expression:
+	  
+	  ("m01_sc_ext??_rec_nadir.bc", "m01_sc_ext??.bc")
+	  
+	  would result in the listing:
+	  
+      m01_sc_ext10_rec_nadir.bc
+      m01_sc_ext11_rec_nadir.bc
+      m01_sc_ext12_rec_nadir.bc
+      m01_sc_ext13_rec_nadir.bc
+      m01_sc_ext10.bc
+      m01_sc_ext11.bc
+      m01_sc_ext12.bc
+      m01_sc_ext13.bc
+    </pre></p>
   </description>
 
   <category>
@@ -98,6 +136,9 @@
     <change name="Stuart Sides" date="2010-04-27">
       Modified to use a vector of filters for each quality of kernel instead of 
       a single string 
+    </change>
+    <change name="Christopher Austin" date="2011-05-06">
+      Added documentation for ISIS array input.
     </change>
   </history>
 
