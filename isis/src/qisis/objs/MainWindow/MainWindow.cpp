@@ -1,5 +1,10 @@
 #include "MainWindow.h"
+
 #include <iostream>
+
+#include "iString.h"
+
+using namespace Isis;
 
 namespace Qisis {
   /**
@@ -76,17 +81,18 @@ namespace Qisis {
    * file in the user's home directory.
    *
    */
-  void MainWindow::writeSettings() {
+  void MainWindow::writeSettings() const {
     /*We do not want to write the settings unless the window is
       visible at the time of closing the application*/
-    if(!this->isVisible()) return;
+    if(!isVisible()) return;
+    iString appName = p_appName;
 
-    if(p_appName == "") {
-      p_appName = this->windowTitle().toStdString();
+    if(appName == "") {
+      appName = windowTitle().toStdString();
     }
 
-    std::string instanceName = this->windowTitle().toStdString();
-    Isis::Filename config("$HOME/.Isis/" + p_appName + "/" + instanceName + ".config");
+    std::string instanceName = windowTitle().toStdString();
+    Isis::Filename config("$HOME/.Isis/" + appName + "/" + instanceName + ".config");
     QSettings settings(QString::fromStdString(config.Expanded()), QSettings::NativeFormat);
     settings.setValue("pos", pos());
     settings.setValue("size", size());

@@ -1,106 +1,150 @@
 #include "MosaicMainWindow.h"
 
+#include <QDockWidget>
 #include <QMenu>
 #include <QSettings>
 
+#include "Camera.h"
 #include "FileDialog.h"
+#include "MosaicController.h"
+#include "MosaicFileListWidget.h"
+#include "MosaicSceneWidget.h"
+#include "Projection.h"
+#include "ProjectionFactory.h"
+#include "TextFile.h"
 #include "ToolPad.h"
 
+using namespace Qisis;
 
-namespace Qisis {
+namespace Isis {
   MosaicMainWindow::MosaicMainWindow(QString title, QWidget *parent) :
-    Qisis::MainWindow(title, parent) {
-
+      MainWindow(title, parent),
+      p_settings(Filename("$HOME/.Isis/qmos/qmos.config").Expanded().c_str(),
+                 QSettings::NativeFormat) {
     p_filename = "";
-    installEventFilter(this);
+    p_fileMenu = NULL;
+    p_viewMenu = NULL;
 
-    this->setWindowTitle(title);
+    setWindowTitle(title);
 
     p_permToolbar = new QToolBar("Standard Tools", this);
-    p_permToolbar->setObjectName("perm");
-    p_permToolbar->setAllowedAreas(Qt::TopToolBarArea | Qt::BottomToolBarArea);
-    p_permToolbar->setIconSize(QSize(22, 22));
-    this->addToolBar(p_permToolbar);
+    p_permToolbar->setObjectName("Standard Tools");
+    addToolBar(p_permToolbar);
 
     p_activeToolbar = new QToolBar("Active Tool", this);
-    p_activeToolbar->setObjectName("Active");
-    p_activeToolbar->setAllowedAreas(Qt::TopToolBarArea | Qt::BottomToolBarArea);
-    p_activeToolbar->setIconSize(QSize(22, 22));
-    this->addToolBar(p_activeToolbar);
+    p_activeToolbar->setObjectName("Active Tool");
+    addToolBar(p_activeToolbar);
 
     QStatusBar *sbar = statusBar();
     sbar->showMessage("Ready");
 
-    p_toolpad = new ToolPad("Tool Pad", this);
-    p_toolpad->setObjectName("MosaicMainWindow");
-    p_toolpad->setAllowedAreas(Qt::LeftToolBarArea | Qt::RightToolBarArea);
-    this->addToolBar(Qt::RightToolBarArea, p_toolpad);
+    p_toolpad = new Qisis::ToolPad("Tool Pad", this);
+    p_toolpad->setObjectName("Tool Pad");
+    // default to the right hand side for qview-like behavior... we might
+    //   want to do something different here
+    addToolBar(Qt::RightToolBarArea, p_toolpad);
 
     p_progressBar = new QProgressBar(parent);
     p_progressBar->setOrientation(Qt::Horizontal);
     sbar->addWidget(p_progressBar);
-
     setupMenus();
+
+    p_fileListDock = new QDockWidget("File List", this, Qt::SubWindow);
+    p_fileListDock->setObjectName("FileListDock");
+    p_fileListDock->setFeatures(QDockWidget::DockWidgetFloatable |
+                              QDockWidget::DockWidgetMovable);
+
+    p_mosaicPreviewDock = new QDockWidget("Mosaic World View",
+                                          this, Qt::SubWindow);
+    p_mosaicPreviewDock->setObjectName("MosaicPreviewDock");
+    p_mosaicPreviewDock->setFeatures(QDockWidget::DockWidgetFloatable |
+                                     QDockWidget::DockWidgetMovable);
+
+    addDockWidget(Qt::LeftDockWidgetArea, p_fileListDock);
+    addDockWidget(Qt::LeftDockWidgetArea, p_mosaicPreviewDock);
+
     readSettings();
+
+    setCentralWidget(new QWidget());
+    centralWidget()->setLayout(new QHBoxLayout());
+
+    p_mosaicController = NULL;
   }
 
 
   /**
    * Sets up the menus on the menu bar for the qmos window.
+   *
+   * This should be the job of the widgets this application uses... inheritance
+   *   off of something that says it has menu options probably. This should
+   *   probably have open project, save project, close project, and exit.
+   *   Projects need to be an accumulated file also, if we want them.
    */
   void MosaicMainWindow::setupMenus() {
     // Create the file menu
-    QMenu *fileMenu = menuBar()->addMenu("&File");
+    p_fileMenu = menuBar()->addMenu("&File");
+
+    iString iconDir = Filename("$base/icons").Expanded();
 
     QAction *open = new QAction(this);
-    open->setText("Open...");
-    open->setIcon(QPixmap(QString::fromStdString(Isis::Filename("$base/icons").Expanded().c_str()) + "/fileopen.png"));
+    open->setText("Open Cube...");
+    open->setIcon(QPixmap(QString::fromStdString(iconDir.c_str()) + "/fileopen.png"));
     connect(open, SIGNAL(activated()), this, SLOT(open()));
 
     QAction *openList = new QAction(this);
-    openList->setText("Import List...");
-    openList->setIcon(QPixmap(QString::fromStdString(Isis::Filename("$base/icons").Expanded().c_str()) + "/mActionHelpContents.png"));
+    openList->setText("Open Cube List...");
+    openList->setIcon(QPixmap(QString::fromStdString(iconDir.c_str()) + "/mActionHelpContents.png"));
     connect(openList, SIGNAL(activated()), this, SLOT(openList()));
 
-    QAction *saveList = new QAction(this);
-    saveList->setText("Export List...");
-    //saveList->setIcon(QPixmap(QString::fromStdString(Isis::Filename("$base/icons").Expanded().c_str())+"/filesaveas.png"));
-    connect(saveList, SIGNAL(activated()), this, SLOT(saveList()));
-
-    QAction *exportView = new QAction(this);
-    exportView->setText("Export View...");
-    //exportView->setIcon(QPixmap(QString::fromStdString(Isis::Filename("$base/icons").Expanded().c_str())+"/fileexport.png"));
-    connect(exportView, SIGNAL(activated()), this, SLOT(exportView()));
-
     QAction *saveProject = new QAction(this);
-    saveProject->setText("Save Project...");
+    saveProject->setText("Save Project");
     saveProject->setShortcut(Qt::CTRL + Qt::Key_S);
-    saveProject->setIcon(QPixmap(QString::fromStdString(Isis::Filename("$base/icons").Expanded().c_str()) + "/mActionFileSave.png"));
+    saveProject->setIcon(QPixmap(QString::fromStdString(iconDir.c_str()) + "/mActionFileSave.png"));
+    p_actionsRequiringOpen.append(saveProject);
     connect(saveProject, SIGNAL(activated()), this, SLOT(saveProject()));
 
     QAction *saveProjectAs = new QAction(this);
     saveProjectAs->setText("Save Project As...");
-    saveProjectAs->setIcon(QPixmap(QString::fromStdString(Isis::Filename("$base/icons").Expanded().c_str()) + "/mActionFileSaveAs.png"));
+    saveProjectAs->setIcon(QPixmap(QString::fromStdString(iconDir.c_str()) + "/mActionFileSaveAs.png"));
+    p_actionsRequiringOpen.append(saveProjectAs);
     connect(saveProjectAs, SIGNAL(activated()), this, SLOT(saveProjectAs()));
 
     QAction *loadProject = new QAction(this);
-    loadProject->setText("Load Project...");                                                                //linguist-editpaste
-    loadProject->setIcon(QPixmap(QString::fromStdString(Isis::Filename("$base/icons").Expanded().c_str()) + "/mActionExportMapServer.png"));
+    loadProject->setText("Load Project...");
+    loadProject->setIcon(QPixmap(QString::fromStdString(iconDir.c_str()) + "/mActionExportMapServer.png"));
+    p_actionsRequiringClosed.append(loadProject);
     connect(loadProject, SIGNAL(activated()), this, SLOT(loadProject()));
+    
 
-    QAction *close = new QAction(this);
-    close->setText("Close");
-    connect(close, SIGNAL(activated()), this, SLOT(close()));
+    QAction *closeProject = new QAction(this);
+    closeProject->setText("Close Project");
+    p_actionsRequiringOpen.append(closeProject);
+    connect(closeProject, SIGNAL(activated()), this, SLOT(closeMosaic()));
 
-    fileMenu->addAction(open);
-    fileMenu->addAction(openList);
-    fileMenu->addAction(saveList);
-    fileMenu->addAction(exportView);
-    fileMenu->addSeparator();
-    fileMenu->addAction(saveProject);
-    fileMenu->addAction(loadProject);
-    fileMenu->addSeparator();
-    fileMenu->addAction(close);
+    QAction *exit = new QAction(this);
+    exit->setText("Exit");
+    connect(exit, SIGNAL(activated()), this, SLOT(close()));
+
+    QAction *actionRequiringOpen = NULL;
+    foreach(actionRequiringOpen, p_actionsRequiringOpen) {
+      actionRequiringOpen->setEnabled(false);
+    }
+
+    QAction *actionRequiringClosed = NULL;
+    foreach(actionRequiringClosed, p_actionsRequiringClosed) {
+      actionRequiringClosed->setEnabled(true);
+    }
+
+    p_fileMenu->addAction(open);
+    p_fileMenu->addAction(openList);
+    p_fileMenu->addSeparator();
+    p_fileMenu->addAction(loadProject);
+    p_fileMenu->addAction(saveProject);
+    p_fileMenu->addAction(saveProjectAs);
+    p_fileMenu->addAction(closeProject);
+    p_fileMenu->addSeparator();
+    p_exportMenu = p_fileMenu->addMenu("Export");
+    p_fileMenu->addAction(exit);
 
     permanentToolBar()->addAction(loadProject);
     permanentToolBar()->addAction(saveProject);
@@ -111,90 +155,8 @@ namespace Qisis {
     permanentToolBar()->addSeparator();
 
     p_viewMenu = menuBar()->addMenu("View");
-    p_viewMenu->setTearOffEnabled(true);
-    connect(p_viewMenu, SIGNAL(triggered(QAction *)), this, SLOT(hideShowColumns(QAction *)));
 
-    p_itemColumn = new QAction(this);
-    p_itemColumn->setText("Item Column");
-    p_itemColumn->setCheckable(true);
-    p_itemColumn->setChecked(true);
-
-    p_footprintColumn = new QAction(this);
-    p_footprintColumn->setText("Footprint Column");
-    p_footprintColumn->setCheckable(true);
-    p_footprintColumn->setChecked(true);
-
-    p_outlineColumn = new QAction(this);
-    p_outlineColumn->setText("Outline Column");
-    p_outlineColumn->setCheckable(true);
-    p_outlineColumn->setChecked(true);
-
-    p_imageColumn = new QAction(this);
-    p_imageColumn->setText("Image Column");
-    p_imageColumn->setCheckable(true);
-    p_imageColumn->setChecked(true);
-
-    p_labelColumn = new QAction(this);
-    p_labelColumn->setText("Label Column");
-    p_labelColumn->setCheckable(true);
-    p_labelColumn->setChecked(true);
-
-    p_resolutionColumn = new QAction(this);
-    p_resolutionColumn->setText("Resolution Column");
-    p_resolutionColumn->setCheckable(true);
-    p_resolutionColumn->setChecked(true);
-
-    p_emissionAngleColumn = new QAction(this);
-    p_emissionAngleColumn->setText("Emission Angle Column");
-    p_emissionAngleColumn->setCheckable(true);
-    p_emissionAngleColumn->setChecked(true);
-
-    p_incidenceAngleColumn = new QAction(this);
-    p_incidenceAngleColumn->setText("Incidence Angle Column");
-    p_incidenceAngleColumn->setCheckable(true);
-    p_incidenceAngleColumn->setChecked(true);
-
-    p_islandColumn = new QAction(this);
-    p_islandColumn->setText("Island Column");
-    p_islandColumn->setCheckable(true);
-    p_islandColumn->setChecked(true);
-
-    p_notesColumn = new QAction(this);
-    p_notesColumn->setText("Notes Column");
-    p_notesColumn->setCheckable(true);
-    p_notesColumn->setChecked(true);
-
-    p_referenceFootprint = new QAction(this);
-    p_referenceFootprint->setText("Show Reference Footprint");
-    p_referenceFootprint->setCheckable(true);
-    p_referenceFootprint->setChecked(false);
-
-    p_viewMenu->addSeparator();
-    p_viewMenu->addAction(p_itemColumn);
-    p_viewMenu->addAction(p_footprintColumn);
-    p_viewMenu->addAction(p_outlineColumn);
-    p_viewMenu->addAction(p_imageColumn);
-    p_viewMenu->addAction(p_labelColumn);
-    p_viewMenu->addAction(p_resolutionColumn);
-    p_viewMenu->addAction(p_emissionAngleColumn);
-    p_viewMenu->addAction(p_incidenceAngleColumn);
-    p_viewMenu->addAction(p_islandColumn);
-    p_viewMenu->addAction(p_notesColumn);
-    p_viewMenu->addSeparator();
-    p_viewMenu->addAction(p_referenceFootprint);
-
-  }
-
-
-  /**
-   * Allows users to decide which columns in the tree widget they
-   * would like to have visible.
-   *
-   *
-   * @param action
-   */
-  void MosaicMainWindow::hideShowColumns(QAction *action) {
-    ((MosaicWidget *)centralWidget())->viewMenuAction(action);
+    updateMenuVisibility();
   }
 
 
@@ -204,7 +166,111 @@ namespace Qisis {
    *
    */
   void MosaicMainWindow::open() {
-    ((MosaicWidget *)centralWidget())->open();
+    QStringList filterList;
+    filterList.append("Isis cubes (*.cub)");
+    filterList.append("All Files (*)");
+
+    QDir directory = p_lastOpenedFile.dir();
+
+    QStringList selected = QFileDialog::getOpenFileNames(this, "Open Cubes",
+        directory.path(), filterList.join(";;"));
+
+    if(!selected.empty()) {
+      openFiles(selected);
+    }
+  }
+
+
+  void MosaicMainWindow::updateMenuVisibility() {
+    QMenuBar *rootMenu = menuBar();
+
+    QAction *rootAction = NULL;
+    foreach(rootAction, rootMenu->actions()) {
+      QMenu *rootMenu = rootAction->menu();
+
+      if(rootMenu) {
+        rootAction->setVisible(updateMenuVisibility(rootAction->menu()));
+      }
+    }
+  }
+
+
+  void MosaicMainWindow::createController() {
+    if(p_mosaicController == NULL) {
+      p_mosaicController = new MosaicController(statusBar(), p_settings);
+      p_mosaicController->addExportActions(*p_exportMenu);
+
+      p_fileListDock->setWidget(p_mosaicController->getMosaicFileList());
+      p_mosaicPreviewDock->setWidget(p_mosaicController->getMosaicScene2());
+
+      centralWidget()->layout()->addWidget(
+          p_mosaicController->getMosaicScene());
+
+      QAction *actionRequiringOpen = NULL;
+      foreach(actionRequiringOpen, p_actionsRequiringOpen) {
+        actionRequiringOpen->setEnabled(true);
+      }
+
+      QAction *actionRequiringClosed = NULL;
+      foreach(actionRequiringClosed, p_actionsRequiringClosed) {
+        actionRequiringClosed->setEnabled(false);
+      }
+
+      p_mosaicController->getMosaicScene()->addTo(p_toolpad);
+      p_mosaicController->getMosaicScene()->addToPermanent(p_permToolbar);
+      p_mosaicController->getMosaicScene()->addTo(p_activeToolbar);
+
+      statusBar()->addWidget(p_mosaicController->getProgress());
+      statusBar()->addWidget(
+          p_mosaicController->getMosaicScene()->getProgress());
+      statusBar()->addWidget(
+          p_mosaicController->getMosaicScene2()->getProgress());
+      statusBar()->addWidget(
+          p_mosaicController->getMosaicFileList()->getProgress());
+
+      QList<QAction *> viewActs =
+          p_mosaicController->getMosaicFileList()->getViewActions();
+
+      QAction *viewAct;
+      foreach(viewAct, viewActs) {
+        connect(viewAct, SIGNAL(destroyed(QObject *)),
+                this, SLOT(updateMenuVisibility()));
+
+        p_viewMenu->addAction(viewAct);
+      }
+
+      updateMenuVisibility();
+    }
+  }
+
+
+  bool MosaicMainWindow::updateMenuVisibility(QMenu *menu) {
+    bool anythingVisible = false;
+
+    if(menu) {
+      QList<QAction *> actions = menu->actions();
+
+      // Recursively search the menu for other menus to show or hide and handle
+      //   every internal being invisible
+      QAction *menuAction = NULL;
+      foreach(menuAction, menu->actions()) {
+        bool thisVisible = true;
+
+        if(menuAction->menu() != NULL) {
+          thisVisible = updateMenuVisibility(menuAction->menu());
+        }
+        else {
+          thisVisible = menuAction->isVisible();
+        }
+
+        if(thisVisible)
+          anythingVisible = true;
+      }
+
+      menu->menuAction()->setVisible(anythingVisible);
+    }
+
+    return anythingVisible;
   }
 
 
@@ -213,7 +279,34 @@ namespace Qisis {
    *
    */
   void MosaicMainWindow::openList() {
-    ((MosaicWidget *)centralWidget())->openList();
+    // Set up the list of filters that are default with this dialog.
+    QStringList filterList;
+    filterList.append("List Files (*.lis)");
+    filterList.append("Text Files (*.txt)");
+    filterList.append("All files (*)");
+
+    QDir directory = p_lastOpenedFile.dir();
+
+    QString selected = QFileDialog::getOpenFileName(this, "Open Cube List",
+        directory.path(), filterList.join(";;"));
+
+    if(selected != "") {
+      TextFile fileList((iString) selected);
+
+      QStringList filesInList;
+      iString line;
+
+      while(fileList.GetLine(line)) {
+        filesInList.append(line);
+      }
+
+      if(filesInList.empty()) {
+        iString msg = "No files were found inside the file list";
+        throw iException::Message(iException::Io, msg, _FILEINFO_);
+      }
+
+      openFiles(filesInList);
+    }
   }
 
 
@@ -225,20 +318,25 @@ namespace Qisis {
    */
   void MosaicMainWindow::readSettings() {
     // Call the base class function to read the size and location
-    this->MainWindow::readSettings();
-    // Now read the settings that are specific to this window.
-    std::string instanceName = this->windowTitle().toStdString();
-    Isis::Filename config("$HOME/.Isis/" + instanceName + "/" + instanceName + ".config");
-    QSettings settings(QString::fromStdString(config.Expanded()), QSettings::NativeFormat);
-    QByteArray state = settings.value("state", QByteArray("0")).toByteArray();
+    MainWindow::readSettings();
+
+    p_settings.beginGroup("MosaicMainWindow");
+    QByteArray state = p_settings.value("state", QByteArray("0")).toByteArray();
     restoreState(state);
-    QList <QAction *> actionList = p_viewMenu->actions();
-    for(int i = 0; i < actionList.size(); i++) {
-      QString itemTitle = actionList[i]->text();
-      bool state = (bool)settings.value(itemTitle, 0).toBool();
-      actionList[i]->setChecked(state);
-    }
-    p_referenceFootprint->setChecked(false);
+    QByteArray geom = p_settings.value("geometry",
+        QByteArray("0")).toByteArray();
+    restoreGeometry(geom);
+    p_settings.endGroup();
+  }
+
+
+  void MosaicMainWindow::openFiles(QStringList cubeNames) {
+    // Create a mosaic widget if we don't have one
+    if(!p_mosaicController && !cubeNames.empty())
+      createController();
+
+    if(p_mosaicController)
+      p_mosaicController->openCubes(cubeNames);
   }
 
 
@@ -249,78 +347,30 @@ namespace Qisis {
    * directory.
    *
    */
-  void MosaicMainWindow::writeSettings() {
-    // Call the base class function to write the size and location
-    this->MainWindow::writeSettings();
+  void MosaicMainWindow::saveSettings2() {
     // Now write the settings that are specific to this window.
-    std::string instanceName = this->windowTitle().toStdString();
-    Isis::Filename config("$HOME/.Isis/" + instanceName + "/" + instanceName + ".config");
-    QSettings settings(QString::fromStdString(config.Expanded()), QSettings::NativeFormat);
-    settings.setValue("state", this->saveState());
+    p_settings.beginGroup("MosaicMainWindow");
+    p_settings.setValue("state", saveState());
+    p_settings.setValue("geometry", saveGeometry());
+    p_settings.endGroup();
 
-    //-----------------------------------------------------------
-    // Save the check state of all the actions in the view menu.
-    //-----------------------------------------------------------
-    QList <QAction *>actionList = p_viewMenu->actions();
-    for(int i = 0; i < actionList.size(); i++) {
-      QString itemTitle = actionList[i]->text();
-      settings.setValue(itemTitle, actionList[i]->isChecked());
-    }
-    /* settings.setValue("nameColumn", p_nameColumn->isChecked());
-     settings.setValue("itemColumn", p_itemColumn->isChecked());
-     settings.setValue("footprintColumn", p_footprintColumn->isChecked());
-     settings.setValue("outlineColumn", p_outlineColumn->isChecked());
-     settings.setValue("imageColumn", p_imageColumn->isChecked());
-     settings.setValue("labelColumn", p_labelColumn->isChecked());
-     settings.setValue("resolutionColumn", p_resolutionColumn->isChecked());
-     settings.setValue("emissionColumn", p_emissionAngleColumn->isChecked());
-     settings.setValue("incidenceAngleColumn", p_incidenceAngleColumn->isChecked());
-     settings.setValue("islandColumn", p_islandColumn->isChecked());
-     settings.setValue("notesColumn", p_notesColumn->isChecked());
-     settings.setValue("referenceFootprint", p_referenceFootprint->isChecked());*/
-  }
-
-
-  /**
-   * Saves the list of cubes to a text file.
-   *
-   */
-  void MosaicMainWindow::saveList() {
-    QString fn =  QFileDialog::getSaveFileName(this, "Save File",
-                  QDir::currentPath() + "/untitled.lis",
-                  "List (*.lis)");
-    if(fn.isEmpty()) return;
-    QString filename;
-
-    if(!fn.endsWith(".lis")) {
-      filename = fn + ".lis";
-    }
-    else {
-      filename = fn;
-    }
-    ((MosaicWidget *)centralWidget())->saveList(filename);
+    closeMosaic();
   }
 
 
   /**
    * Allows the user to save a project file.
-   *
    */
   void MosaicMainWindow::saveProjectAs() {
-    QString fn =  QFileDialog::getSaveFileName(this, "Save Project",
-                  QDir::currentPath() + "/untitled.mos",
-                  "Mosaic (*.mos)");
-    if(fn.isEmpty()) return;
-    QString filename;
+    if(p_mosaicController) {
+      QString fn =  QFileDialog::getSaveFileName(this, "Save Project",
+                    QDir::currentPath() + "/untitled.mos",
+                    "Mosaic (*.mos)");
+      if(fn.isEmpty()) return;
 
-    if(!fn.endsWith(".mos")) {
-      filename = fn + ".mos";
+      p_mosaicController->saveProject(fn);
+      p_filename = fn;
     }
-    else {
-      filename = fn;
-    }
-    ((MosaicWidget *)centralWidget())->saveProject(filename);
-    p_filename = filename;
   }
 
 
@@ -329,15 +379,12 @@ namespace Qisis {
    *
    */
   void MosaicMainWindow::saveProject() {
-    //--------------------------------------
-    // If the project does not already have
-    // a name, call saveProjectAs
-    //--------------------------------------
     if(p_filename == "") {
       saveProjectAs();
-      return;
     }
-    ((MosaicWidget *)centralWidget())->saveProject(p_filename);
+    else {
+      p_mosaicController->saveProject(p_filename);
+    }
   }
 
 
@@ -347,72 +394,44 @@ namespace Qisis {
    *
    */
   void MosaicMainWindow::loadProject() {
-    QString fn =  QFileDialog::getOpenFileName(this, "Load Project",
-                  QDir::currentPath(),
-                  "Mosaic (*.mos)");
-    if(fn.isEmpty()) return;
-    QString filename;
-
-    if(!fn.endsWith(".mos")) {
-      filename = fn + ".mos";
-    }
-    else {
-      filename = fn;
-    }
-    ((MosaicWidget *)centralWidget())->readProject(filename);
-    p_filename = filename;
-  }
-
-
-  /**
-   * Saves the graphics view as a png, jpg, of tif file.
-   *
-   */
-  void MosaicMainWindow::exportView() {
-
-    QString output =
-      QFileDialog::getSaveFileName((QWidget *)parent(),
-                                   "Choose output file",
-                                   QDir::currentPath() + "/untitled.png",
-                                   QString("Images (*.png *.jpg *.tif)"));
-    if(output.isEmpty()) return;
-
-    // Use png format is the user did not add a suffix to their output filename.
-    if(QFileInfo(output).suffix().isEmpty()) {
-      output = output + ".png";
-    }
-
-    QString format = QFileInfo(output).suffix();
-    QPixmap pm = QPixmap::grabWidget(((MosaicWidget *)centralWidget())->scene()->views().last());
-
-    std::string formatString = format.toStdString();
-    if(!pm.save(output, formatString.c_str())) {
-      QMessageBox::information((QWidget *)parent(), "Error", "Unable to save " + output);
-      return;
+    if(!p_mosaicController) {
+      QString fn =  QFileDialog::getOpenFileName(this, "Load Project",
+                    QDir::currentPath(),
+                    "Mosaic (*.mos)");
+      loadProject(fn);
     }
   }
 
 
-  /**
-   * This event filter is installed in the constructor.
-   * @param o
-   * @param e
-   *
-   * @return bool
-   */
-  bool MosaicMainWindow::eventFilter(QObject *o, QEvent *e) {
+  void MosaicMainWindow::loadProject(QString fn) {
+    if(!p_mosaicController && !fn.isEmpty()) {
+      createController();
 
-    switch(e->type()) {
-      case QEvent::Close: {
-          writeSettings();
-          break;
-        }
+      if(p_mosaicController)
+        p_mosaicController->readProject(fn);
 
-      default: {
-          return false;
-        }
+      p_filename = fn;
     }
-    return false;
+  }
+
+
+  void MosaicMainWindow::closeMosaic() {
+    if(p_mosaicController) {
+      QAction *actionRequiringOpen = NULL;
+      foreach(actionRequiringOpen, p_actionsRequiringOpen) {
+        actionRequiringOpen->setEnabled(false);
+      }
+
+      QAction *actionRequiringClosed = NULL;
+      foreach(actionRequiringClosed, p_actionsRequiringClosed) {
+        actionRequiringClosed->setEnabled(true);
+      }
+
+      delete p_mosaicController;
+      p_mosaicController = NULL;
+
+      p_filename = "";
+    }
   }
 }
 

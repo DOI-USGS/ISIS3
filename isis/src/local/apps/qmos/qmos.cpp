@@ -1,17 +1,16 @@
 #include "IsisDebug.h"
 
-#include <QApplication>
-
 #include "iException.h"
-#include "ProjectionFactory.h"
-#include "Filename.h"
-#include "MosaicWidget.h"
 #include "MosaicMainWindow.h"
 #include "Preference.h"
 #include "PvlGroup.h"
+#include "QIsisApplication.h"
 
 void startMonitoringMemory();
 void stopMonitoringMemory();
+
+using namespace std;
+using namespace Isis;
 
 int main(int argc, char *argv[]) {
 #ifdef CWDEBUG
@@ -19,53 +18,37 @@ int main(int argc, char *argv[]) {
 #endif
 
   try {
-    QApplication *app = new QApplication(argc, argv);
+    QApplication *app = new Qisis::QIsisApplication(argc, argv);
     QApplication::setApplicationName("qmos");
 
     // check for forcing of gui style
-    Isis::PvlGroup &uiPref = Isis::Preference::Preferences().FindGroup(
-                               "UserInterface");
-    if(uiPref.HasKeyword("GuiStyle")) {
-      std::string style = uiPref["GuiStyle"];
-      QApplication::setStyle((Isis::iString) style);
-    }
+//     PvlGroup &uiPref = Isis::Preference::Preferences().FindGroup(
+//                                "UserInterface");
+//     if(uiPref.HasKeyword("GuiStyle")) {
+//       string style = uiPref["GuiStyle"];
+//       QApplication::setStyle((Isis::iString) style);
+//     }
 
-    // Add the Qt plugin directory to the library path
-    Isis::Filename qtpluginpath("$ISISROOT/3rdParty/plugins");
-    QCoreApplication::addLibraryPath(qtpluginpath.Expanded().c_str());
+    MosaicMainWindow *mainWindow = new MosaicMainWindow("qmos");
 
-
-    Qisis::MosaicMainWindow *mainWindow = new Qisis::MosaicMainWindow("qmos");
-
-    Isis::PvlGroup mapping("Mapping");
-    {
-      mapping += Isis::PvlKeyword("ProjectionName", "Equirectangular");
-      mapping += Isis::PvlKeyword("CenterLatitude", "0.0");
-      mapping += Isis::PvlKeyword("CenterLongitude", "0.0");
-      mapping += Isis::PvlKeyword("TargetName", "Moon");
-      mapping += Isis::PvlKeyword("LatitudeType", "Planetocentric");
-      mapping += Isis::PvlKeyword("LongitudeDirection", "PositiveEast");
-      mapping += Isis::PvlKeyword("LongitudeDomain", "360");
-    }
-
-    Isis::Pvl pvl;
-    pvl.AddGroup(mapping);
-    Isis::Projection *proj = Isis::ProjectionFactory::Create(pvl);
-
-    Qisis::MosaicWidget *mos = new Qisis::MosaicWidget(mainWindow);
-    mos->setProjection(proj);
-    mos->setLabelText("Equirectangular");
-    mainWindow->setCentralWidget(mos);
     mainWindow->show();
 
+    if(argc == 2) {
+      mainWindow->loadProject(argv[1]);
+    }
+    else if(argc > 2) {
+      std::cerr << "Usage: qmos [project file]" << std::endl;
+      return 1;
+    }
+
     int status = app->exec();
-    delete mos;
+
     delete mainWindow;
     delete app;
 
     return status;
   }
-  catch(Isis::iException &e) {
+  catch(iException &e) {
     e.Report();
   }
 

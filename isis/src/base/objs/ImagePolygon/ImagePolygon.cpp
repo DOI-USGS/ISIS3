@@ -566,30 +566,12 @@ namespace Isis {
     }
     while(!currentPoint.equals(firstPoint));
 
-// Prints out the sample/line polygon; should be removed once the algorithm is "completed"
-    /*geos::geom::CoordinateSequence * temp = new geos::geom::CoordinateArraySequence();
-    for( unsigned int i = 0; i < points.size(); i ++ ) {
-      temp->add( points[i] );
-    }
-    std::cerr << std::endl;
-    std::cerr << temp->toString() << std::endl;
-    std::cerr << std::endl;*/
-
     if(points.size() <= 3) {
       std::string msg = "Failed to find enough points on the image.";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
     FindSubpixel(points);
-
-// Prints out the sample/line polygon after subpixel adjustments; should be removed once the algorithm is "completed"
-    /*geos::geom::CoordinateSequence * temp2 = new geos::geom::CoordinateArraySequence();
-    for( unsigned int i = 0; i < points.size(); i ++ ) {
-      temp2->add( points[i] );
-    }
-    std::cerr << std::endl;
-    std::cerr << temp2->toString() << std::endl;
-    std::cerr << std::endl;*/
 
     prevLat = 0;
     prevLon = 0;
@@ -1135,9 +1117,13 @@ namespace Isis {
     }
 
     char *buf = new char[p_nbytes+1];
+    memset(buf, 0, p_nbytes + 1);
+
     is.read(buf, p_nbytes);
+
     p_polyStr = buf;
-    delete []buf;
+
+    delete [] buf;
 
     if(!is.good()) {
       string msg = "Error reading data from " + p_type + " [" +

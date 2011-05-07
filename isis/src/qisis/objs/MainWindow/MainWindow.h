@@ -25,7 +25,7 @@ namespace Qisis {
 
       virtual void hideEvent(QHideEvent *event);
       virtual void readSettings();
-      virtual void writeSettings();
+      virtual void writeSettings() const;
 
     protected:
       virtual bool eventFilter(QObject *o, QEvent *e);
@@ -37,3 +37,4 @@ namespace Qisis {
 };
 
 #endif
+

@@ -1,17 +1,19 @@
 #ifndef MosaicMainWindow_h
 #define MosaicMainWindow_h
 
-#include <QToolBar>
-#include <QMenu>
-#include <QGraphicsView>
+#include <iostream>
 
-#include "Filename.h"
 #include "MainWindow.h"
-#include "MosaicWidget.h"
-#include "MosaicItem.h"
-
 
 namespace Qisis {
+  class ToolPad;
+}
+
+namespace Isis {
+  class Cube;
+  class iString;
+  class MosaicController;
+
   /**
   * @brief
   *
@@ -22,26 +24,30 @@ namespace Qisis {
   * @internal
   *
   *  @history 2010-05-10 Christopher Austin - added cnet connectivity
-  *  	      functionality
+  *           functionality
   */
-  class ToolPad;
-
   class MosaicMainWindow : public Qisis::MainWindow {
       Q_OBJECT
     public:
       MosaicMainWindow(QString title, QWidget *parent = 0);
+      ~MosaicMainWindow() { saveSettings2(); }
+
       QToolBar *permanentToolBar() {
         return p_permToolbar;
-      };
+      }
+
       QToolBar *activeToolBar() {
         return p_activeToolbar;
-      };
+      }
+
       Qisis::ToolPad *toolPad() {
         return p_toolpad;
-      };
+      }
+
       QProgressBar *progressBar() {
         return p_progressBar;
-      };
+      }
+
       /**
       * Returns the View menu.
       *
@@ -52,50 +58,48 @@ namespace Qisis {
         return p_viewMenu;
       };
 
-    protected:
-      bool eventFilter(QObject *o, QEvent *e);
-      void readSettings();
-      void writeSettings();
+      void saveSettings();
+      void loadProject(QString filename);
 
     public slots:
       void open();
       void openList();
-      void saveList();
       void saveProject();
       void saveProjectAs();
       void loadProject();
-      void exportView();
-      void hideShowColumns(QAction *action);
+      void closeMosaic();
+      void updateMenuVisibility();
 
     private:
       void setupMenus();
       void setupPvlToolBar();
+      void readSettings();
+      void saveSettings2();
+      void openFiles(QStringList cubeNames);
+      bool updateMenuVisibility(QMenu *menu);
+      void createController();
+
+      Qisis::ToolPad *p_toolpad; //!< Tool pad on this mainwindow
 
       QToolBar *p_permToolbar; //!< Tool bar attached to mainwindow
-      Qisis::ToolPad *p_toolpad; //!< Tool pad on this mainwindow
       QToolBar *p_activeToolbar; //!< The active toolbar
-      std::map<QString, QMenu *> p_menus; //!< Maps Menus to string names
-      std::string p_appName; //!< The main application
       QString p_filename;
 
       QProgressBar *p_progressBar; //!< The mainwindow's progress bar.
 
-      QAction *p_nameColumn;
-      QAction *p_itemColumn;
-      QAction *p_footprintColumn;
-      QAction *p_outlineColumn;
-      QAction *p_imageColumn;
-      QAction *p_labelColumn;
-      QAction *p_resolutionColumn;
-      QAction *p_emissionAngleColumn;
-      QAction *p_incidenceAngleColumn;
-      QAction *p_islandColumn;
-      QAction *p_notesColumn;
-      QAction *p_referenceFootprint;
-
       QMenu *p_viewMenu;
-
+      QMenu *p_fileMenu;
+      QMenu *p_exportMenu;
+      MosaicController *p_mosaicController;
+      QList<QAction *> p_actionsRequiringOpen;
+      QList<QAction *> p_actionsRequiringClosed;
+      QList<Cube *> p_openCubes;
+      QFileInfo p_lastOpenedFile;
+      QSettings p_settings;
+      QDockWidget *p_fileListDock;
+      QDockWidget *p_mosaicPreviewDock;
   };
 };
 
 #endif
+
