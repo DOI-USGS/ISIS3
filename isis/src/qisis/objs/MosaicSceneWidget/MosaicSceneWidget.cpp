@@ -26,7 +26,6 @@
 #include "MosaicFindTool.h"
 #include "MosaicGraphicsView.h"
 #include "MosaicPanTool.h"
-#include "MosaicPointTool.h"
 #include "MosaicSceneItem.h"
 #include "MosaicSelectTool.h"
 #include "MosaicTrackTool.h"
@@ -77,7 +76,6 @@ namespace Isis {
     p_tools->append(new MosaicSelectTool(this));
     p_tools->append(new MosaicZoomTool(this));
     p_tools->append(new MosaicPanTool(this));
-    p_tools->append(new MosaicPointTool(this));
     p_tools->append(new MosaicControlNetTool(this));
     p_tools->append(new MosaicFindTool(this));
     if(status)

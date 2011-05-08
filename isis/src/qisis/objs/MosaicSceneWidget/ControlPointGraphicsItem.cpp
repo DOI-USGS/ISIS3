@@ -75,8 +75,11 @@ namespace Isis {
 
       QPointF center = rect().center();
 
-      painter->drawLine(rect().left(), center.y(), rect().right(), center.y());
-      painter->drawLine(center.x(), rect().top(), center.x(), rect().bottom());
+      // This is the source of the CP zoom in draw bug I'm fairly sure...
+      painter->drawLine((int)rect().left(), (int)center.y(),
+                        (int)rect().right(), (int)center.y());
+      painter->drawLine((int)center.x(), (int)rect().top(),
+                        (int)center.x(), (int)rect().bottom());
     }
   }
 
