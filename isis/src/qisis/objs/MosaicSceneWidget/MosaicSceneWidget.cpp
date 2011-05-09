@@ -46,8 +46,6 @@ namespace Isis {
 
     p_graphicsView = new MosaicGraphicsView(p_graphicsScene, this);
     p_graphicsView->setScene(p_graphicsScene);
-    p_graphicsView->setOptimizationFlag(QGraphicsView::DontSavePainterState,
-                                        true);
     p_graphicsView->setInteractive(true);
     p_graphicsView->setViewportUpdateMode(QGraphicsView::MinimalViewportUpdate);
     p_graphicsView->setResizeAnchor(QGraphicsView::AnchorViewCenter);

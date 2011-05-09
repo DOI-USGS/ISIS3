@@ -12,6 +12,10 @@
 using namespace std;
 
 namespace Isis {
+  /**
+   * Create a CP graphics item. This will colorize and set the appropriate
+   *   toolTip for this control point. 
+   */
   ControlPointGraphicsItem::ControlPointGraphicsItem(QPointF center,
       ControlPoint *cp, MosaicSceneWidget *boundingRectSrc,
       QGraphicsItem *parent) : QGraphicsRectItem(parent) {
@@ -73,13 +77,15 @@ namespace Isis {
       painter->setPen(pen());
       painter->setBrush(brush());
 
-      QPointF center = rect().center();
+      QPointF center = pointRect.center();
 
-      // This is the source of the CP zoom in draw bug I'm fairly sure...
-      painter->drawLine((int)rect().left(), (int)center.y(),
-                        (int)rect().right(), (int)center.y());
-      painter->drawLine((int)center.x(), (int)rect().top(),
-                        (int)center.x(), (int)rect().bottom());
+      QPointF centerLeft(pointRect.left(), center.y());
+      QPointF centerRight(pointRect.right(), center.y());
+      QPointF centerTop(center.x(), pointRect.top());
+      QPointF centerBottom(center.x(), pointRect.bottom());
+
+      painter->drawLine(centerLeft, centerRight);
+      painter->drawLine(centerTop, centerBottom);
     }
   }
 
@@ -95,6 +101,7 @@ namespace Isis {
           findSpotScreen - QPoint(size / 2, size / 2);
 
       QRect pointRectScreen(findSpotTopLeftScreen, QSize(size, size));
+
       pointRect =
           p_mosaicScene->getView()->mapToScene(pointRectScreen).boundingRect();
     }
