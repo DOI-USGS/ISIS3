@@ -82,6 +82,9 @@ namespace Isis {
     }
     catch(iException &e) {
       p_cubeDisplay->deleteLater();
+      iException::Message(iException::Io,
+                          "Please run camerastats with the 'attach' option",
+                          _FILEINFO_);
       e.Report();
       e.Clear();
     }
