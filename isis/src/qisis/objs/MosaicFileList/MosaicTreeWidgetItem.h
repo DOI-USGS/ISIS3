@@ -30,7 +30,6 @@ namespace Isis {
         ResolutionColumn,
         EmissionAngleColumn,
         IncidenceAngleColumn,
-        IslandColumn,
         BlankColumn
       };
 

@@ -179,8 +179,6 @@ namespace Isis {
         return "Emission Angle";
       case IncidenceAngleColumn:
         return "Incidence Angle";
-      case IslandColumn:
-        return "Island";
       case BlankColumn:
         return "";
     }
@@ -204,7 +202,6 @@ namespace Isis {
 
       case EmissionAngleColumn:
       case IncidenceAngleColumn:
-      case IslandColumn:
         return text(column).toDouble() <
                other.text(column).toDouble();
 
