@@ -8,6 +8,7 @@ class QPointF;
 namespace Isis {
   class ControlPoint;
   class MosaicSceneWidget;
+  class SerialNumberList;
 
   /**
    * @brief The visual display of a single control point
@@ -24,7 +25,8 @@ namespace Isis {
   class ControlPointGraphicsItem : public QGraphicsRectItem {
     public:
       ControlPointGraphicsItem(QPointF center, ControlPoint *cp,
-          MosaicSceneWidget *scene, QGraphicsItem *parent);
+          SerialNumberList *snList, MosaicSceneWidget *scene,
+          QGraphicsItem *parent);
       virtual ~ControlPointGraphicsItem();
 
       QRectF boundingRect() const;
@@ -32,9 +34,12 @@ namespace Isis {
                  QWidget * widget = 0);
 
     protected:
+      void contextMenuEvent(QGraphicsSceneContextMenuEvent * event);
 
     private:
       QRectF calcRect() const;
+      QString makeToolTip(SerialNumberList *snlist);
+
       QPointF *p_centerPoint;
       MosaicSceneWidget *p_mosaicScene;
       ControlPoint *p_controlPoint;

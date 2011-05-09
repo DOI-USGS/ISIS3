@@ -193,6 +193,8 @@ namespace Isis {
    * This slot opens and reopens this tool properly
    */
   void MosaicControlNetTool::updateTool() {
+    if(isActive() && p_controlNetFile == "")
+      openControlNet();
   }
 
 

@@ -161,27 +161,16 @@ namespace Isis {
 
 
   QString ControlNetGraphicsItem::snToFilename(QString sn) {
-    if(!p_serialNumbers) {
-      p_serialNumbers = new SerialNumberList;
-    }
-
-    if(p_serialNumbers->Size() == 0) {
-      QStringList cubeFiles(p_mosaicScene->cubeFilenames());
-
-      QString filename;
-      foreach(filename, cubeFiles) {
-        p_serialNumbers->Add(filename.toStdString());
-      }
-    }
-
     QString result;
 
-    try {
-      result = QString::fromStdString(
-          p_serialNumbers->Filename(sn.toStdString()));
-    }
-    catch(iException &e) {
-      e.Clear();
+    if(p_serialNumbers && p_serialNumbers->Size()) {
+      try {
+        result = QString::fromStdString(
+            p_serialNumbers->Filename(sn.toStdString()));
+      }
+      catch(iException &e) {
+        e.Clear();
+      }
     }
 
     return result;
@@ -199,11 +188,20 @@ namespace Isis {
     }
 
     if(p_controlNet) {
+      QList<ControlPointGraphicsItem *> newChildren;
       const int numCp = p_controlNet->GetNumPoints();
 
       if(p_serialNumbers) {
         delete p_serialNumbers;
-        p_serialNumbers = new SerialNumberList;
+      }
+
+      p_serialNumbers = new SerialNumberList;
+
+      QStringList cubeFiles(p_mosaicScene->cubeFilenames());
+
+      QString filename;
+      foreach(filename, cubeFiles) {
+        p_serialNumbers->Add(filename.toStdString());
       }
 
       ProgressBar *p = (ProgressBar *)p_mosaicScene->getProgress();
@@ -213,11 +211,12 @@ namespace Isis {
       p->setVisible(true);
 
       for(int cp = 0; cp < numCp; cp ++) {
-        new ControlPointGraphicsItem(
+        newChildren.append(new ControlPointGraphicsItem(
             pointToScene(p_controlNet->GetPoint(cp)),
-            p_controlNet->GetPoint(cp), p_mosaicScene, this);
+            p_controlNet->GetPoint(cp), p_serialNumbers, p_mosaicScene, this));
         p->setValue(cp);
       }
+
       p->setVisible(false);
     }
   }
