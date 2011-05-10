@@ -33,7 +33,7 @@ namespace Isis {
   
     miInputSamples= mInCube->Samples();
     miInputLines  = mInCube->Lines();
-    miOutputLines  = mInCube->Bands();
+    miInputBands  = mInCube->Bands();
       
     // Save off the sample and mdLine magnification
     mdSampleScale = sampleScale;
@@ -121,20 +121,14 @@ namespace Isis {
    */
   void Average::operator() (Isis::Buffer & out)
   {
-    static double *sinctab;
-    static double *sum;
-    static double *npts;
-    static double *sum2;
-    static double *npts2;
-
     double rline = (double)out.Line() * mdLineScale;
 
     if(out.Line() == 1 && out.Band() == 1) {
       sinctab = new double[miOutputSamples];
-      sum = new double[miOutputSamples];
-      npts = new double[miOutputSamples];
-      sum2 = new double[miOutputSamples];
-      npts2 = new double[miOutputSamples];
+      sum     = new double[miOutputSamples];
+      npts    = new double[miOutputSamples];
+      sum2    = new double[miOutputSamples];
+      npts2   = new double[miOutputSamples];
 
       //  Fill sinctab and Initialize buffers for first band
       for(int osamp = 0; osamp < miOutputSamples; osamp++) {

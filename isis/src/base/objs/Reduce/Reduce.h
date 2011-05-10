@@ -25,6 +25,8 @@ namespace Isis {
    *  @history 2011-04-15 Sharmila Prasad - Ported the class from "reduce" app
    *           to base object class with added functionality to reduce only the
    *           sub area within the input image into the output image
+   *  @history 2011-05-10 Sharmila Prasad - Fixed error while setting input bands and
+   *                            moved static members to data members in Average class.
    */
   class Reduce {
   public:
@@ -86,6 +88,11 @@ namespace Isis {
     private:
       double mdValidPer;   //!< Valid Percentage
       string msReplaceMode;//!< Replace Mode (scale/total)
+      double *sinctab;
+      double *sum;
+      double *npts;
+      double *sum2;
+      double *npts2;
   };
   
 };
