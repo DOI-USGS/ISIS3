@@ -52,4 +52,6 @@ void IsisMain() {
   p.EndProcess();
   icube->Close();
   ocube->Close();
+  remove(ui.GetAsString("TO").c_str());
+  remove(ui.GetAsString("TO2").c_str());
 }
