@@ -40,7 +40,6 @@ namespace Isis {
     hideColumn(MosaicTreeWidgetItem::ResolutionColumn);
     hideColumn(MosaicTreeWidgetItem::EmissionAngleColumn);
     hideColumn(MosaicTreeWidgetItem::IncidenceAngleColumn);
-    hideColumn(MosaicTreeWidgetItem::IslandColumn);
     hideColumn(MosaicTreeWidgetItem::BlankColumn);
 
     setContextMenuPolicy(Qt::DefaultContextMenu);
