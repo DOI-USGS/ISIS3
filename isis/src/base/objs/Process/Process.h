@@ -133,6 +133,9 @@ namespace Isis {
    *           calculating statistics to store off its results in
    *           both p_bandStats and p_cubeStats, and added methods
    *           to access those results
+   *  @history 2011-05-07 Sharmila Prasad - 1. Added API SetInputCube(Cube*) to take opened cube
+   *           2. Added API to ClearOutputCubes()
+   *           3. Added additional testing while writing history to output files
    *
    *  @todo 2005-02-08 Jeff Anderson - add an example to the class documentation.
    */
@@ -203,12 +206,12 @@ namespace Isis {
       };
       virtual void EndProcess();
 
-
       Isis::Cube *SetInputCube(const std::string &parameter,
                                const int requirements = 0);
       Isis::Cube *SetInputCube(const std::string &fname,
                                const Isis::CubeAttributeInput &att,
                                int requirements = 0);
+      void SetInputCube(Isis::Cube *inCube);
       void ClearInputCubes();
 
       Isis::Cube *SetOutputCube(const std::string &parameter);
@@ -218,7 +221,8 @@ namespace Isis {
                                 const Isis::CubeAttributeOutput &att,
                                 const int nsamps, const int nlines,
                                 const int nbands = 1);
-
+      void ClearOutputCubes();
+ 
       void PropagateLabels(const bool prop);
       void PropagateLabels(const std::string &cube);
       void PropagateTables(const bool prop);

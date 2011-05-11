@@ -182,6 +182,25 @@ namespace Isis {
   }
 
   /**
+   * Set the InputCube vector to an opened Cube. This is used if there already exists 
+   * a valid opened cube 
+   * 
+   * @author Sharmila Prasad (5/7/2011)
+   * 
+   * @param inCube - Pointer to input Cube
+   */
+  void Process::SetInputCube(Isis::Cube *inCube)
+  {
+    if(inCube != NULL && inCube->IsOpen()) {
+      InputCubes.push_back(inCube);
+    }
+    else {
+      string message = "Input cube does not exist";
+      throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+    }
+  }
+  
+  /**
    * Opens an input cube specified by the user and verifies requirements are met.
    *
    * @return Cube*
@@ -443,13 +462,16 @@ namespace Isis {
    * etc.
    */
   void Process::EndProcess() {
-    // Close the input cubes
-    for(int i = 0; i < (int)InputCubes.size(); i++) {
-      InputCubes[i]->Close();
-      delete InputCubes[i];
-    }
-    InputCubes.clear();
+    ClearInputCubes();
+    ClearOutputCubes();
+  }
 
+  /**
+   * Close output cubes from the list and clear the list
+   * 
+   * @author Sharmila Prasad (5/7/2011)
+   */
+  void Process::ClearOutputCubes(){
     // Close the output cubes
     for(int i = 0; i < (int)OutputCubes.size(); i++) {
       OutputCubes[i]->Close();
@@ -457,7 +479,6 @@ namespace Isis {
     }
     OutputCubes.clear();
   }
-
   /**
    * This method allows the programmer to turn on/off the propagation of labels
    * from the 1st input cube to any of the output cubes.  By default, propagation
@@ -593,7 +614,7 @@ namespace Isis {
     if(p_propagateHistory) {
       bool addedHist = false;
       if(InputCubes.size() > 0) {
-        Isis::Pvl &inlab = *InputCubes[0]->Label();
+        Isis::Pvl & inlab = *InputCubes[0]->Label();
         for(int i = 0; i < inlab.Objects(); i++) {
           if(inlab.Object(i).IsNamed("History")) {
             Isis::History h((string)inlab.Object(i)["Name"]);
@@ -605,7 +626,7 @@ namespace Isis {
         }
       }
 
-      if(!addedHist) {
+      if(!addedHist && Isis::iApp != NULL) {
         Isis::History h("IsisCube");
         h.AddEntry();
         cube.Write(h);
