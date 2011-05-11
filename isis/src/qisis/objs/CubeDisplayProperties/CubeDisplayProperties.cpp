@@ -8,7 +8,13 @@
 
 #include "Cube.h"
 #include "Filename.h"
+#include "ImagePolygon.h"
 #include "PvlObject.h"
+#include "SpecialPixel.h"
+#include "Table.h"
+#include "UniversalGroundMap.h"
+
+using geos::geom::MultiPolygon;
 
 namespace Isis {
   /**
@@ -22,10 +28,10 @@ namespace Isis {
    */
   CubeDisplayProperties::CubeDisplayProperties(QString filename,
       QObject *parent) : QObject(parent) {
-    p_propertyUsed = new QBitArray;
-    p_propertyValues = new QMap<int, QVariant>;
+    m_propertyUsed = new QBitArray;
+    m_propertyValues = new QMap<int, QVariant>;
 
-    p_filename = filename;
+    m_filename = filename;
 
     // set all of the defaults to prevent unwanted change signals from
     //   being emitted later.
@@ -37,8 +43,82 @@ namespace Isis {
 
     setValue(Color, QVariant::fromValue(randomColor()));
 
-    p_cube = NULL;
+    m_cube = NULL;
+    m_gMap = NULL;
+    m_footprint = NULL;
+
     cube();
+    footprint();
+
+    m_incidenceAngle = Null;
+    m_resolution = Null;
+    m_emissionAngle = Null;
+
+    try {
+      Table table("CameraStatistics", m_filename.toStdString());
+      //Table table("CameraStatistics", m_filename.Name());
+      for (int i = 0; i < table.Records(); i++) {
+        for (int j = 0; j < table[i].Fields(); j++) {
+          QString label;
+
+          if (table[i][j].IsText()) {
+            label = QString::fromStdString((std::string)table[i][j]);
+            label.truncate(10);
+          }
+
+          // Get the average resolution for this mosaic item.
+          if (table[i][j].IsText() && label.compare("Resolution") == 0) {
+            if (j + 3 < table[i].Fields()) {
+              if (table[i][j+3].IsInteger()) {
+              }
+              else if (table[i][j+3].IsDouble()) {
+                m_resolution = (double)table[i][j+3];
+              }
+              else if (table[i][j+3].IsText()) {
+              }
+            }
+          }
+
+          // Get the average emission angle for this mosaic item.
+          if (table[i][j].IsText() && label.compare("EmissionAn") == 0) {
+            if (j + 3 < table[i].Fields()) {
+              if (table[i][j+3].IsInteger()) {
+              }
+              else if (table[i][j+3].IsDouble()) {
+                m_emissionAngle = (double)table[i][j+3];
+              }
+              else if (table[i][j+3].IsText()) {
+              }
+            }
+          }
+
+          // Get the average incidence angle for this mosaic item.
+          if (table[i][j].IsText() && label.compare("IncidenceA") == 0) {
+            if (j + 3 < table[i].Fields()) {
+              if (table[i][j+3].IsInteger()) {
+              }
+              else if (table[i][j+3].IsDouble()) {
+                m_incidenceAngle = (double)table[i][j+3];
+              }
+              else if (table[i][j+3].IsText()) {
+              }
+            }
+          }
+
+        } // end for table[i].Fields
+      } // end for table.Records
+    }
+    catch(iException &e) {
+      e.Clear();
+
+      iException::Message(iException::Io,
+          "Please run camstats with the attach option. "
+          "Camera statistics will be unavailable for [" +
+              m_filename.toStdString() + "]", _FILEINFO_);
+      e.Report();
+
+      e.Clear();
+    }
   }
 
 
@@ -52,16 +132,18 @@ namespace Isis {
    */
   CubeDisplayProperties::CubeDisplayProperties(const PvlObject &pvl,
       QObject *parent) : QObject(parent) {
-    p_propertyUsed = new QBitArray;
-    p_propertyValues = new QMap<int, QVariant>;
+    m_propertyUsed = new QBitArray;
+    m_propertyValues = new QMap<int, QVariant>;
 
-    p_cube = NULL;
+    m_cube = NULL;
+    m_gMap = NULL;
+    m_footprint = NULL;
 
-    p_filename = QString(pvl["Filename"][0]);
+    m_filename = QString(pvl["Filename"][0]);
 
     QByteArray hexValues(pvl["Values"][0].c_str());
     QDataStream valuesStream(QByteArray::fromHex(hexValues));
-    valuesStream >> *p_propertyValues;
+    valuesStream >> *m_propertyValues;
 
     cube();
   }
@@ -73,6 +155,11 @@ namespace Isis {
    */
   CubeDisplayProperties::~CubeDisplayProperties() {
     closeCube();
+
+    if(m_gMap) {
+      delete m_gMap;
+      m_gMap = NULL;
+    }
   }
 
 
@@ -83,11 +170,11 @@ namespace Isis {
    * @param prop The property you are adding support for
    */
   void CubeDisplayProperties::addSupport(Property prop) {
-    if(p_propertyUsed->size() <= prop)
-      p_propertyUsed->resize((int)(prop + 1));
+    if(m_propertyUsed->size() <= prop)
+      m_propertyUsed->resize((int)(prop + 1));
 
-    if(!p_propertyUsed->testBit(prop)) {
-      p_propertyUsed->setBit(prop);
+    if(!m_propertyUsed->testBit(prop)) {
+      m_propertyUsed->setBit(prop);
       emit supportAdded(prop);
     }
   }
@@ -121,10 +208,10 @@ namespace Isis {
    * @returns True if the property has support, false otherwise
    */
   bool CubeDisplayProperties::supports(Property prop) {
-    if(p_propertyUsed->size() <= prop)
+    if(m_propertyUsed->size() <= prop)
       return false;
 
-    return p_propertyUsed->testBit(prop);
+    return m_propertyUsed->testBit(prop);
   }
 
 
@@ -134,7 +221,7 @@ namespace Isis {
    * @param prop The property
    */
   QVariant CubeDisplayProperties::getValue(Property prop) const {
-    return (*p_propertyValues)[prop];
+    return (*m_propertyValues)[prop];
   }
 
 
@@ -143,12 +230,26 @@ namespace Isis {
    *   the Cube * if one is not already present.
    */
   Cube *CubeDisplayProperties::cube() {
-    if(!p_cube) {
-      p_cube = new Cube;
-      p_cube->Open(p_filename.toStdString());
+    if(!m_cube) {
+      m_cube = new Cube;
+      m_cube->Open(m_filename.toStdString());
     }
 
-    return p_cube;
+    return m_cube;
+  }
+
+
+  /**
+   * Get the UniversalGroundMap * associated with this display property.
+   *   This will allocate the pointer if one is not already present.
+   */
+  UniversalGroundMap *CubeDisplayProperties::groundMap() {
+    if(m_gMap == NULL) {
+      Pvl lab(m_filename.toStdString());
+      m_gMap = new UniversalGroundMap(lab);
+    }
+
+    return m_gMap;
   }
 
 
@@ -156,7 +257,7 @@ namespace Isis {
    * Returns the display name
    */
   QString CubeDisplayProperties::displayName() const {
-    return Filename(p_filename.toStdString()).fileName();
+    return Filename(m_filename.toStdString()).fileName();
   }
 
 
@@ -165,10 +266,40 @@ namespace Isis {
    *   with the Cube because the OS will limit how many of these we have open.
    */
   void CubeDisplayProperties::closeCube() {
-    if(p_cube) {
-      delete p_cube;
-      p_cube = NULL;
+    if(m_cube) {
+      delete m_cube;
+      m_cube = NULL;
     }
+  }
+
+
+  /**
+   * Cleans up the Cube *. You want to call this once you're sure you are done
+   *   with the Cube because the OS will limit how many of these we have open.
+   */
+  geos::geom::MultiPolygon *CubeDisplayProperties::footprint() {
+    if(!m_footprint) {
+      try {
+        ImagePolygon poly;
+        cube()->Read(poly);
+        m_footprint = (MultiPolygon *)poly.Polys()->clone();
+      }
+      catch (iException &e) {
+        e.Clear();
+
+        try {
+          createManualFootprint();
+        }
+        catch(iException &e) {
+          iString msg = "Could not read the footprint from cube [" +
+              displayName() + "]. Please make "
+              "sure footprintinit has been run";
+          throw iException::Message(iException::Io, msg, _FILEINFO_);
+        }
+      }
+    }
+
+    return m_footprint;
   }
 
 
@@ -179,13 +310,13 @@ namespace Isis {
    */
   PvlObject CubeDisplayProperties::toPvl() const {
     PvlObject output("CubeProperties");
-    output += PvlKeyword("Filename", p_filename);
+    output += PvlKeyword("Filename", m_filename);
 
     QBuffer dataBuffer;
     dataBuffer.open(QIODevice::ReadWrite);
 
     QDataStream propsStream(&dataBuffer);
-    propsStream << *p_propertyValues;
+    propsStream << *m_propertyValues;
     dataBuffer.seek(0);
 
     output += PvlKeyword("Values", QString(dataBuffer.data().toHex()));
@@ -548,8 +679,8 @@ namespace Isis {
    *   change it and emit propertyChanged if its different and supported.
    */
   void CubeDisplayProperties::setValue(Property prop, QVariant value) {
-    if((*p_propertyValues)[prop] != value) {
-      (*p_propertyValues)[prop] = value;
+    if((*m_propertyValues)[prop] != value) {
+      (*m_propertyValues)[prop] = value;
 
       if(supports(prop)) {
         emit propertyChanged(this);
@@ -576,6 +707,29 @@ namespace Isis {
     }
 
     return data;
+  }
+
+
+  void CubeDisplayProperties::createManualFootprint() {
+    // We need to walk the polygon...
+    ImagePolygon imgPoly;
+
+    int sampleStepSize = cube()->Samples() / 10;
+    if(sampleStepSize <= 0) sampleStepSize = 1;
+
+    int lineStepSize = cube()->Lines() / 10;
+    if(lineStepSize <= 0) lineStepSize = 1;
+
+    imgPoly.Create(*cube(), sampleStepSize, lineStepSize);
+
+    m_footprint = (geos::geom::MultiPolygon *)imgPoly.Polys()->clone();
+
+    iException &e = iException::Message(iException::User,
+        "Warning: Polygon re-calculated "
+        " for [" + displayName().toStdString() +
+        " which can be very slow", _FILEINFO_);
+    e.Report();
+    e.Clear();
   }
 }
 

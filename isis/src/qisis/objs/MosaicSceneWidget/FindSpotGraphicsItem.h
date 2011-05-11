@@ -26,8 +26,8 @@ namespace Isis {
                  QWidget * widget = 0);
     private:
       QRectF calcRect() const;
-      QPointF *p_centerPoint;
-      MosaicSceneWidget *p_mosaicScene;
+      QPointF *m_centerPoint;
+      MosaicSceneWidget *m_mosaicScene;
   };
 }
 

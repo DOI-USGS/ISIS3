@@ -32,18 +32,20 @@ namespace Isis {
                  QWidget * widget = 0);
       QString snToFilename(QString sn);
 
+      void setArrowsVisible(bool visible);
+
     private slots:
       void buildChildren();
 
     private:
       QPair<QPointF, QPointF> pointToScene(ControlPoint *);
 
-      ControlNet *p_controlNet;
+      ControlNet *m_controlNet;
 
-      MosaicSceneWidget *p_mosaicScene;
-      QMap<ControlPoint *, QPair<QPointF, QPointF> > *p_pointToScene;
-      QMap<QString, UniversalGroundMap *> *p_cubeToGroundMap;
-      SerialNumberList *p_serialNumbers;
+      MosaicSceneWidget *m_mosaicScene;
+      QMap<ControlPoint *, QPair<QPointF, QPointF> > *m_pointToScene;
+      QMap<QString, UniversalGroundMap *> *m_cubeToGroundMap;
+      SerialNumberList *m_serialNumbers;
   };
 }
 

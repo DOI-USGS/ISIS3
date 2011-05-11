@@ -13,8 +13,6 @@
 #include <QStyleOptionGraphicsItem>
 #include <QTreeWidgetItem>
 
-#include "ControlMeasure.h"
-#include "ControlPoint.h"
 #include "CubeDisplayProperties.h"
 #include "FileDialog.h"
 #include "Histogram.h"
@@ -28,6 +26,8 @@
 #include "Statistics.h"
 #include "Stretch.h"
 #include "Table.h"
+
+using namespace geos::geom;
 
 namespace Isis {
   /**
@@ -44,47 +44,42 @@ namespace Isis {
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
-    p_cubeDisplay = cubeDisplay;
+    m_cubeDisplay = cubeDisplay;
 
-    connect(p_cubeDisplay, SIGNAL(destroyed(QObject *)),
+    connect(m_cubeDisplay, SIGNAL(destroyed(QObject *)),
             this, SLOT(lostCubeDisplay()));
-    connect(p_cubeDisplay, SIGNAL(destroyed(QObject *)),
+    connect(m_cubeDisplay, SIGNAL(destroyed(QObject *)),
             this, SLOT(deleteLater()));
 
-    p_imageTransparency = 180;
-    p_pixRes = 0;
-    p_emissionAngle = 0;
-    p_incidenceAngle = 0;
-    p_lastPaintScale = 0;
+    m_mp = NULL;
+    m_polygons = NULL;
+    m_cubeDnStretch = NULL;
+    groundMap = NULL;
 
-    p_mp = NULL;
-    p_polygons = NULL;
-    p_cubeDnStretch = NULL;
+    m_scene = parent;
 
-    p_scene = parent;
+    m_polygons = new QList< QGraphicsPolygonItem *>();
 
-    p_polygons = new QList< QGraphicsPolygonItem *>();
+    setupFootprint();
 
-    createFootprint();
-
-    setToolTip(p_cubeDisplay->displayName());
+    setToolTip(m_cubeDisplay->displayName());
 
     setAcceptHoverEvents(true);
 
-    p_cubeDisplay->addSupport(CubeDisplayProperties::Color);
-    p_cubeDisplay->addSupport(CubeDisplayProperties::Selected);
-    p_cubeDisplay->addSupport(CubeDisplayProperties::ShowDNs);
-    p_cubeDisplay->addSupport(CubeDisplayProperties::ShowFill);
-    p_cubeDisplay->addSupport(CubeDisplayProperties::ShowLabel);
-    p_cubeDisplay->addSupport(CubeDisplayProperties::ShowOutline);
+    m_cubeDisplay->addSupport(CubeDisplayProperties::Color);
+    m_cubeDisplay->addSupport(CubeDisplayProperties::Selected);
+    m_cubeDisplay->addSupport(CubeDisplayProperties::ShowDNs);
+    m_cubeDisplay->addSupport(CubeDisplayProperties::ShowFill);
+    m_cubeDisplay->addSupport(CubeDisplayProperties::ShowLabel);
+    m_cubeDisplay->addSupport(CubeDisplayProperties::ShowOutline);
 
     if(parent->userHasTools()) {
-      p_cubeDisplay->addSupport(CubeDisplayProperties::Zooming);
+      m_cubeDisplay->addSupport(CubeDisplayProperties::Zooming);
     }
 
-    p_cubeDisplay->addSupport(CubeDisplayProperties::ZOrdering);
+    m_cubeDisplay->addSupport(CubeDisplayProperties::ZOrdering);
 
-    connect(p_cubeDisplay, SIGNAL(propertyChanged(CubeDisplayProperties *)),
+    connect(m_cubeDisplay, SIGNAL(propertyChanged(CubeDisplayProperties *)),
             this, SLOT(cubeDisplayChanged()));
   }
 
@@ -97,22 +92,9 @@ namespace Isis {
     if(scene())
       scene()->removeItem(this);
 
-    while(p_polygons->size()) {
-      delete p_polygons->takeAt(0);
+    while(m_polygons->size()) {
+      delete m_polygons->takeAt(0);
     }
-  }
-
-
-  /**
-   * This method is called from the constructor when there is a
-   * group passed as one of the header args.
-   * When this method is called it means a saved project file has
-   * been read in and this sets up the item back to the way the
-   * user had set it up before the save project command.
-   *
-   * @param grp
-   */
-  void MosaicSceneItem::setUpItem(PvlGroup *grp) {
   }
 
 
@@ -120,7 +102,7 @@ namespace Isis {
     QRectF boundingRect;
 
     QGraphicsPolygonItem *polygon;
-    foreach(polygon, *p_polygons) {
+    foreach(polygon, *m_polygons) {
       boundingRect = boundingRect.united(polygon->boundingRect());
 
       QGraphicsItem *polyChild;
@@ -135,6 +117,7 @@ namespace Isis {
     return boundingRect;
   }
 
+
   /**
    * Re-paints the item
    *
@@ -144,109 +127,30 @@ namespace Isis {
    */
   void MosaicSceneItem::paint(QPainter *painter,
       const QStyleOptionGraphicsItem *option, QWidget *widget) {
-    if(p_cubeDisplay &&
-       p_cubeDisplay->getValue(CubeDisplayProperties::ShowDNs).toBool()) {
+    if(m_cubeDisplay &&
+       m_cubeDisplay->getValue(CubeDisplayProperties::ShowDNs).toBool()) {
       drawImage(painter, option);
     }
   }
 
 
   /**
-   * This method gets the footprint polygon of the cube
    *
    */
-  void MosaicSceneItem::createFootprint() {
-    // The Archive group should never be searched for anything ever!
-    //Get the product ID and set the label text to that.
-    //PvlKeyword keyword = cube.Label()->FindObject("IsisCube").FindGroup("Archive").FindKeyword("ProductId");
-    //p_label->setPlainText(keyword[0].ToQt());
-    //p_label->setText(keyword[0].ToQt());
+  void MosaicSceneItem::setupFootprint() {
+    if(m_cubeDisplay) {
+      m_mp = m_cubeDisplay->footprint();
 
-    //Get the camera stats table from the cube.
-    //This is how we know the cube's resolution.
-    //This is the reason we need to run camstats
-    //with the attach option set to yes.
-    if(!p_cubeDisplay)
-      return;
+      try {
+        reproject();
+      }
+      catch(iException &e) {
+        m_cubeDisplay->deleteLater();
 
-    try {
-      Table table("CameraStatistics", p_cubeDisplay->cube()->Filename());
-      //Table table("CameraStatistics", p_filename.Name());
-      for (int i = 0; i < table.Records(); i++) {
-        for (int j = 0; j < table[i].Fields(); j++) {
-          QString label;
-
-          if (table[i][j].IsText()) {
-            label = QString::fromStdString((std::string)table[i][j]);
-            label.truncate(10);
-          }
-
-          // Get the average resolution for this mosaic item.
-          if (table[i][j].IsText() && label.compare("Resolution") == 0) {
-            if (j + 3 < table[i].Fields()) {
-              if (table[i][j+3].IsInteger()) {
-              }
-              else if (table[i][j+3].IsDouble()) {
-                p_pixRes = (double)table[i][j+3];
-              }
-              else if (table[i][j+3].IsText()) {
-              }
-            }
-          }
-
-          // Get the average emission angle for this mosaic item.
-          if (table[i][j].IsText() && label.compare("EmissionAn") == 0) {
-            if (j + 3 < table[i].Fields()) {
-              if (table[i][j+3].IsInteger()) {
-              }
-              else if (table[i][j+3].IsDouble()) {
-                p_emissionAngle = (double)table[i][j+3];
-              }
-              else if (table[i][j+3].IsText()) {
-              }
-            }
-          }
-
-          // Get the average incidence angle for this mosaic item.
-          if (table[i][j].IsText() && label.compare("IncidenceA") == 0) {
-            if (j + 3 < table[i].Fields()) {
-              if (table[i][j+3].IsInteger()) {
-              }
-              else if (table[i][j+3].IsDouble()) {
-                p_incidenceAngle = (double)table[i][j+3];
-              }
-              else if (table[i][j+3].IsText()) {
-              }
-            }
-          }
-
-        } // end for table[i].Fields
-      } // end for table.Records
-
-    }
-    catch (iException &e) {
-      iException::Message(iException::Io,
-          "Could not find the CameraStatistics Table. "
-          "Please run camstats with the attach option", _FILEINFO_);
-      e.Report(false);
-      return;
-    }
-
-    try {
-      ImagePolygon poly;
-      p_cubeDisplay->cube()->Read(poly);
-
-      p_mp = (geos::geom::MultiPolygon *)poly.Polys()->clone();
-
-      reproject();
-    }
-    catch (...) {
-      p_cubeDisplay->deleteLater();
-
-      iString msg = "Could not read the footprint from cube [" +
-          p_cubeDisplay->displayName() + "]. Please make "
-          "sure footprintinit has been run";
-      throw iException::Message(iException::Io, msg, _FILEINFO_);
+        iString msg = "Could not project the footprint from cube [" +
+            m_cubeDisplay->displayName() + "]";
+        throw iException::Message(iException::Io, msg, _FILEINFO_);
+      }
     }
   }
 
@@ -256,25 +160,27 @@ namespace Isis {
    * map file.) And everytime a mosaic item is created.
    */
   void MosaicSceneItem::reproject() {
-    geos::geom::MultiPolygon *mp;
-    Projection *proj = p_scene->getProjection();
+    prepareGeometryChange();
+
+    MultiPolygon *mp;
+    Projection *proj = m_scene->getProjection();
 
     // Remove current polygons from the scene
-    while(p_polygons->size()) {
-      QGraphicsPolygonItem *polyItem = p_polygons->at(0);
-      p_scene->getScene()->removeItem(polyItem);
-      p_polygons->removeAll(polyItem);
+    while(m_polygons->size()) {
+      QGraphicsPolygonItem *polyItem = m_polygons->at(0);
+      m_scene->getScene()->removeItem(polyItem);
+      m_polygons->removeAll(polyItem);
 
       delete polyItem;
       polyItem = NULL;
     }
 
     if (proj->Has180Domain()) {
-      p_180mp = PolygonTools::To180(p_mp);
-      mp = p_180mp;
+      m_180mp = PolygonTools::To180(m_mp);
+      mp = m_180mp;
     }
     else {
-      mp = p_mp;
+      mp = m_mp;
     }
 
     //----------------------------------------------------------
@@ -283,8 +189,8 @@ namespace Isis {
     // boundries.
     //----------------------------------------------------------
     for (unsigned int i = 0; i < mp->getNumGeometries(); i++) {
-      const geos::geom::Geometry *geom = mp->getGeometryN(i);
-      geos::geom::CoordinateSequence *pts;
+      const Geometry *geom = mp->getGeometryN(i);
+      CoordinateSequence *pts;
 
       pts = geom->getCoordinates();
       double lat, lon;
@@ -311,151 +217,19 @@ namespace Isis {
       polyItem->setPolygon(QPolygonF(polyPoints));
 
       QGraphicsSimpleTextItem *label = new QGraphicsSimpleTextItem(polyItem);
-      if(p_cubeDisplay)
-        label->setText(p_cubeDisplay->displayName());
+      if(m_cubeDisplay)
+        label->setText(m_cubeDisplay->displayName());
       label->setFlag(QGraphicsItem::ItemIsMovable);
       label->setFont(QFont("Helvetica", 10));
       label->setPos(polyItem->polygon().boundingRect().center());
       label->setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
 
-      p_polygons->append(polyItem);
+      m_polygons->append(polyItem);
 
       delete pts;
     }
 
     updateChildren();
-  }
-
-
-  /**
-   * Translates the screen coordinates(x,y) to camera coordinates.
-   *
-   *
-   * @param x
-   * @param y
-   *
-   * @return QPointF
-   */
-  QPointF MosaicSceneItem::screenToCam(int x, int y) {
-    QPointF camPoints;
-    QPointF scenePoint = scene()->views().last()->mapToScene(QPoint(x, y));
-    Projection *proj = p_scene->getProjection();
-
-    if (!proj->SetWorld(scenePoint.x(), -scenePoint.y())) {
-      camPoints.setX(-1);
-      camPoints.setY(-1);
-      return camPoints;
-    }
-
-    double lat = proj->UniversalLatitude();
-    double lon = proj->UniversalLongitude();
-
-    if(p_cubeDisplay) {
-      Camera *cam = p_cubeDisplay->cube()->Camera();
-      if (!cam->SetUniversalGround(lat, lon)) {
-        camPoints.setX(-1);
-        camPoints.setY(-1);
-        return camPoints;
-      }
-
-      camPoints.setX(cam->Sample() + 0.5);
-      camPoints.setY(cam->Line() + 0.5);
-    }
-
-    return camPoints;
-  }
-
-
-  /**
-   * Translates the screen coordinates(x,y) to line/sample.
-   *
-   *
-   * @param x
-   * @param y
-   *
-   * @return QPointF
-   */
-  QPointF MosaicSceneItem::screenToCam(QPointF p) {
-    QPointF camPoints;
-    Projection *proj = p_scene->getProjection();
-
-    if (!proj->SetWorld(p.x(), -p.y())) {
-      camPoints.setX(-1);
-      camPoints.setY(-1);
-      return camPoints;
-    }
-
-    double lat = proj->UniversalLatitude();
-    double lon = proj->UniversalLongitude();
-
-    if(p_cubeDisplay) {
-      Camera *cam = p_cubeDisplay->cube()->Camera();
-      if (!cam->SetUniversalGround(lat, lon)) {
-        camPoints.setX(-1);
-        camPoints.setY(-1);
-        return camPoints;
-      }
-
-      camPoints.setX(cam->Sample());
-      camPoints.setY(cam->Line());
-    }
-
-    return camPoints;
-  }
-
-
-  /**
-   * Translates screen points to lat/lon for reporting in the
-   * lower right corner of the qmos window.
-   *
-   *
-   * @param point
-   *
-   * @return QPointF
-   */
-  QPointF MosaicSceneItem::screenToGround(QPointF point) {
-    QPointF groundPoints;
-    Projection *proj = p_scene->getProjection();
-
-    if (!proj->SetWorld(point.x(), -point.y())) {
-      groundPoints.setX(-1);
-      groundPoints.setY(-1);
-      return groundPoints;
-    }
-
-    double lat = proj->Latitude();
-    double lon = proj->Longitude();
-    groundPoints.setX(lat);
-    groundPoints.setY(lon);
-
-    return groundPoints;
-  }
-
-
-  /**
-   * Returns true if the distance between two points is less than
-   * .5, otherwise returns false.
-   *
-   *
-   * @param trueMidX
-   * @param trueMidY
-   * @param testMidX
-   * @param testMidY
-   *
-   * @return bool
-   */
-  bool MosaicSceneItem::midTest(double trueMidX, double trueMidY,
-                           double testMidX, double testMidY) {
-    //since sqrt is expensive, we will just compare dist to .5^2.
-    //double dist = sqrt(pow(testMidX - trueMidX,2) + pow(testMidY - trueMidY,2));
-    double dist = (testMidX - trueMidX) * (testMidX - trueMidX) +
-                  (testMidY - trueMidY) * (testMidY - trueMidY);
-    if (dist < .5 * .5) {
-      return true;
-    }
-    else {
-      return false;
-    }
   }
 
 
@@ -471,10 +245,10 @@ namespace Isis {
   double MosaicSceneItem::getPixelValue(int sample, int line) {
     double pixelValue = 0;
 
-    if(p_cubeDisplay) {
-      Brick gryBrick(1, 1, 1, p_cubeDisplay->cube()->PixelType());
+    if(m_cubeDisplay) {
+      Brick gryBrick(1, 1, 1, m_cubeDisplay->cube()->PixelType());
       gryBrick.SetBasePosition((int)(sample + 0.5), (int)(line + 0.5), 1);
-      p_cubeDisplay->cube()->Read(gryBrick);
+      m_cubeDisplay->cube()->Read(gryBrick);
 
       pixelValue = gryBrick[0];
       if (pixelValue == Null) {
@@ -493,52 +267,17 @@ namespace Isis {
    * item.
    * @param painter
    */
-  void MosaicSceneItem::drawImage(QPainter *painter, const QStyleOptionGraphicsItem *option) {
-    //if paint is not enabled, then just draw the last image and return
-    //the paint is only disable when in zoom mode and the mouse button is down.
-
-    //If the exposed rect is the same as the last exposed rect, then don't draw again.
-    //just draw the last image and return
-//     QRectF exposed(option->exposedRect);
-//
-//     QRectF exposedOverlap = exposed.intersected(p_lastExposedRect);
-//
-//     QPoint test1(0, 0);
-//     QPoint test2(2, 2);
-//     QPointF scenePointDifference =
-//       p_scene->getView()->mapToScene(test1) -
-//       p_scene->getView()->mapToScene(test2);
-//
-//     double sceneScale =
-//         scenePointDifference.x() * scenePointDifference.x() +
-//         scenePointDifference.y() * scenePointDifference.y();
-//
-//     if(fabs(p_lastPaintScale - sceneScale) < 0.00001)
-//       sceneScale = p_lastPaintScale;
-//
-//     if(exposedOverlap == exposed &&
-//        p_lastPaintScale == sceneScale) {
-//       for(int i = 0; i < p_polygons->size(); i++) {
-//         QImage *image = &p_lastImages[i];
-//         painter->drawImage(p_polygons->at(i)->polygon().boundingRect(), *image);
-//       }
-//       return;
-//     }
-//
-//     p_lastImages.clear();
-//     p_lastExposedRect = option->exposedRect;
-//
-//     p_lastPaintScale = sceneScale;
-
+  void MosaicSceneItem::drawImage(QPainter *painter,
+      const QStyleOptionGraphicsItem *option) {
     Stretch *stretch = getStretch();
     QApplication::setOverrideCursor(Qt::WaitCursor);
 
     try {
       QGraphicsPolygonItem *polygon;
-      foreach(polygon, *p_polygons) {
+      foreach(polygon, *m_polygons) {
         QPolygonF polyBounding = polygon->polygon();
         QRectF sceneRect = polyBounding.boundingRect();
-        QPolygon screenPoly = p_scene->getView()->mapFromScene(sceneRect);
+        QPolygon screenPoly = m_scene->getView()->mapFromScene(sceneRect);
         QRect visibleBox = screenPoly.boundingRect();
 
         int bbWidth  = (int)visibleBox.width();
@@ -559,38 +298,54 @@ namespace Isis {
 
             // We have an x,y in screen space. Let's translate it to
             //   projected space, ask the polygon if it's in the area,
-            QPointF scenePos = p_scene->getView()->mapToScene(
+            QPointF scenePos = m_scene->getView()->mapToScene(
                 QPoint(x, y));
 
             if(polygon->polygon().containsPoint(scenePos, Qt::OddEvenFill)) {
               // This is likely in the cube... use the projection to go to
               //   lat/lon and use that lat/lon to go to cube sample,line
-              p_scene->getProjection()->SetWorld(scenePos.x(),
-                                                 -1 * scenePos.y());
+              m_scene->getProjection()->SetCoordinate(scenePos.x(),
+                                                      -1 * scenePos.y());
 
-              double lat = p_scene->getProjection()->UniversalLatitude();
-              double lon = p_scene->getProjection()->UniversalLongitude();
+              double lat = m_scene->getProjection()->UniversalLatitude();
+              double lon = m_scene->getProjection()->UniversalLongitude();
 
-              if(p_cubeDisplay) {
-                Camera *cam = p_cubeDisplay->cube()->Camera();
-                if(cam->SetUniversalGround(lat, lon) &&
-                   cam->InCube()) {
-                  double samp = cam->Sample();
-                  double line = cam->Line();
+              if(m_cubeDisplay) {
+                if(!groundMap) {
+                  groundMap = new UniversalGroundMap(*m_cubeDisplay->cube());
+                }
 
-                  double dn = getPixelValue((int)(samp + 0.5),
-                                            (int)(line + 0.5));
-                  int stretched = (int)stretch->Map(dn);
+                if(groundMap->SetUniversalGround(lat, lon)) {
+                  double dn = Null;
 
-                  lineData[x - bbLeft] = qRgba(stretched, stretched,
-                                               stretched, 255);
+                  if(groundMap->Camera() && groundMap->Camera()->InCube()) {
+                    double samp = groundMap->Camera()->Sample();
+                    double line = groundMap->Camera()->Line();
+
+                    dn = getPixelValue((int)(samp + 0.5),
+                                       (int)(line + 0.5));
+                  }
+                  else {
+                    double samp = groundMap->Projection()->WorldX();
+                    double line = groundMap->Projection()->WorldY();
+
+                    dn = getPixelValue((int)(samp + 0.5),
+                                       (int)(line + 0.5));
+                  }
+
+                  if(!IsSpecial(dn)) {
+                    int stretched = (int)stretch->Map(dn);
+
+                    lineData[x - bbLeft] = qRgba(stretched, stretched,
+                                                stretched, 255);
+                  }
                 }
               }
             }
           }
         }
 
-        p_lastImages.append(image);
+//         m_lastImages.append(image);
         painter->drawImage(polygon->boundingRect(), image);
       }
     }
@@ -603,106 +358,28 @@ namespace Isis {
   }
 
 
-  /**
-   * This method returns a list of x values where the polygon
-   * intersects with the bounding box.
-   *
-   * @param poly
-   * @param line
-   * @param boxWidth
-   *
-   * @return QList<int>
-   */
-  QList<int> MosaicSceneItem::scanLineIntersections(QPolygon poly, int y, int boxWidth) {
-    QList <int> inter;
-    for (int i = 0; i < poly.size() - 1; i++) {
-      int n = i + 1;
-
-      int yMax = qMax(poly.point(i).y(), poly.point(n).y());
-      int yMin = qMin(poly.point(i).y(), poly.point(n).y());
-
-      if (y < yMin) continue;
-      if (y > yMax) continue;
-      if (yMin == yMax) continue;
-
-      if ((poly.point(n).x() - poly.point(i).x()) == 0) {
-        inter.push_back(poly.point(n).x());
-      }
-      else {
-        double slope = (double)(poly.point(n).y() - poly.point(i).y()) / (poly.point(n).x() - poly.point(i).x());
-        double x = (y - poly.point(i).y()) / slope + poly.point(i).x();
-        inter.push_back((int)(x + 0.5));
-      }
-    }
-
-    qSort(inter.begin(), inter.end());
-
-    QList<int> uniqueList;
-    for (int i = 0; i < inter.size(); i++) {
-      if (uniqueList.size() == 0) {
-        uniqueList.push_back(inter[i]);
-      }
-      else if (inter[i] != uniqueList.last()) {
-        uniqueList.push_back(inter[i]);
-      }
-    }
-    if (uniqueList.size() == 3) {
-      uniqueList.removeAt(1);
-    }
-
-    return uniqueList;
-  }
-
-
   QColor MosaicSceneItem::color() const {
     return
-        p_cubeDisplay->getValue(CubeDisplayProperties::Color).value<QColor>();
+        m_cubeDisplay->getValue(CubeDisplayProperties::Color).value<QColor>();
   }
 
 
   /**
-   * This method sets the z values for this item and gives it's
-   * children, if there are any, the same z value.
-   *
-   *
-   * @param z
+   * Someone changed something in the cube display properties, re-read the
+   *   whole thing.
    */
-  void MosaicSceneItem::setZValue(qreal z) {
-    QGraphicsItem::setZValue(z);
-  }
-
-
-  QVariant MosaicSceneItem::itemChange(GraphicsItemChange change,
-      const QVariant & value) {
-    return QGraphicsObject::itemChange(change, value);
-  }
-
   void MosaicSceneItem::cubeDisplayChanged() {
-    p_scene->blockSelectionChange(true);
+    m_scene->blockSelectionChange(true);
     updateSelection(false);
-    p_scene->blockSelectionChange(false);
+    m_scene->blockSelectionChange(false);
 
     updateChildren();
   }
 
 
   /**
-   * Overloaded methoded for convenience.
-   * Set the font size of the item's label.
-   *
-   *
-   * @param font
-   */
-  void MosaicSceneItem::setFontSize(QFont font) {
-    p_label->setFont(font);
-    p_updateFont = true;
-    update();
-  }
-
-
-  /**
-   * This filters out events that happen within our bounding box but not on
-   *   one of the polygons.
+   * This filters out events that happen within our polygons. This is necessary
+   *   because usually events are filtered based on the bounding box alone.
    *
    * @param watched
    * @param event
@@ -747,12 +424,16 @@ namespace Isis {
   }
 
 
+  /**
+   * Test if we contain the point. Even though our rect is empty, return true
+   *   if a child polygon contains it for toolTips and other events.
+   */
   bool MosaicSceneItem::contains(const QPointF &p) const {
     if(p.isNull())
       return false;
 
     QGraphicsPolygonItem * polygon;
-    foreach(polygon, *p_polygons) {
+    foreach(polygon, *m_polygons) {
       if(polygon->contains(p)) {
         return true;
       }
@@ -762,26 +443,32 @@ namespace Isis {
   }
 
 
+  /**
+   * Update the selected state.
+   *
+   * @param save True if we need to write to the CubeDisplayProperties, false
+   *             if we need to read from them.
+   */
   void MosaicSceneItem::updateSelection(bool save) {
     QGraphicsPolygonItem * polygon;
-    if(save && p_cubeDisplay) {
+    if(save && m_cubeDisplay) {
       bool selected = isSelected();
 
-      foreach(polygon, *p_polygons) {
+      foreach(polygon, *m_polygons) {
         selected = selected || polygon->isSelected();
       }
 
-      p_cubeDisplay->setSelected(selected);
+      m_cubeDisplay->setSelected(selected);
     }
-    else if(p_cubeDisplay) {
+    else if(m_cubeDisplay) {
       bool selected =
-          p_cubeDisplay->getValue(CubeDisplayProperties::Selected).toBool();
+          m_cubeDisplay->getValue(CubeDisplayProperties::Selected).toBool();
 
       if(selected != isSelected()) {
         setSelected(selected);
       }
 
-      foreach(polygon, *p_polygons) {
+      foreach(polygon, *m_polygons) {
         if(polygon->isSelected() != selected) {
           polygon->setSelected(selected);
         }
@@ -791,17 +478,22 @@ namespace Isis {
   }
 
 
+  /**
+   * The user right clicked on us (or otherwise requested a context menu).
+   *
+   * Give it to them.
+   */
   void MosaicSceneItem::contextMenuEvent(
       QGraphicsSceneContextMenuEvent *event) {
-    if(p_cubeDisplay) {
+    if(m_cubeDisplay) {
       QMenu menu;
 
-      QAction *title = menu.addAction(p_cubeDisplay->displayName());
+      QAction *title = menu.addAction(m_cubeDisplay->displayName());
       title->setEnabled(false);
       menu.addSeparator();
 
       QList<CubeDisplayProperties *> cubeDisplays;
-      cubeDisplays.append(p_cubeDisplay);
+      cubeDisplays.append(m_cubeDisplay);
 
       QList<QAction *> displayActs =
           CubeDisplayProperties::getSupportedDisplayActions(cubeDisplays);
@@ -834,7 +526,7 @@ namespace Isis {
       menu.addSeparator();
       QAction *removeAction = menu.addAction("Close Cube");
       connect(removeAction, SIGNAL(triggered()),
-              p_cubeDisplay, SLOT(deleteLater()));
+              m_cubeDisplay, SLOT(deleteLater()));
 
       menu.exec(event->screenPos());
     }
@@ -842,20 +534,25 @@ namespace Isis {
 
 
   void MosaicSceneItem::lostCubeDisplay() {
-    p_cubeDisplay = NULL;
+    m_cubeDisplay = NULL;
   }
 
 
+  /**
+   * This applies the cubeDisplayProperties and selectability. It's called
+   *   updateChildren because the child items are the visually displayed
+   *   items on the scene.
+   */
   void MosaicSceneItem::updateChildren() {
-    setFlag(QGraphicsItem::ItemIsSelectable, p_scene->cubesSelectable());
+    setFlag(QGraphicsItem::ItemIsSelectable, m_scene->cubesSelectable());
 
     QList<QRectF> regionsChanged;
 
-    if(p_cubeDisplay) {
+    if(m_cubeDisplay) {
       QGraphicsPolygonItem * polygon;
-      foreach(polygon, *p_polygons) {
+      foreach(polygon, *m_polygons) {
         // Fill
-        if(p_cubeDisplay->getValue(CubeDisplayProperties::ShowFill).toBool())
+        if(m_cubeDisplay->getValue(CubeDisplayProperties::ShowFill).toBool())
           polygon->setBrush(color());
         else
           polygon->setBrush(Qt::NoBrush);
@@ -863,19 +560,19 @@ namespace Isis {
         // Outline
         QColor opaqueColor(color());
         opaqueColor.setAlpha(255);
-        if(p_cubeDisplay->getValue(CubeDisplayProperties::ShowOutline).toBool())
+        if(m_cubeDisplay->getValue(CubeDisplayProperties::ShowOutline).toBool())
           polygon->setPen(opaqueColor);
         else
           polygon->setPen(Qt::NoPen);
 
         polygon->setFlag(QGraphicsItem::ItemIsSelectable,
-                        p_scene->cubesSelectable());
+                        m_scene->cubesSelectable());
 
         // Children (label is the only child)
         QGraphicsItem *polyChild;
         foreach(polyChild, polygon->childItems()) {
           polyChild->setVisible(
-              p_cubeDisplay->getValue(
+              m_cubeDisplay->getValue(
                 CubeDisplayProperties::ShowLabel).toBool());
 
           // Qt documentation was lacking the enum that this matches to, so this
@@ -894,11 +591,17 @@ namespace Isis {
   }
 
 
-
+  /**
+   * This gets a Stretch object that will work for the 
+   *   cubeDisplay converting from DN to screen pixel.
+   *
+   * The first time this is called the stretch is calculated, later calls
+   *   re-use the original object. Ownership remains at the class scope.
+   */
   Stretch *MosaicSceneItem::getStretch() {
-    if (p_cubeDnStretch != NULL || !p_cubeDisplay) return p_cubeDnStretch;
+    if (m_cubeDnStretch != NULL || !m_cubeDisplay) return m_cubeDnStretch;
 
-    LineManager mgr(*p_cubeDisplay->cube());
+    LineManager mgr(*m_cubeDisplay->cube());
 
     mgr.begin();
     Statistics stats;
@@ -906,26 +609,25 @@ namespace Isis {
     const int skip = 0;
 
     while(mgr ++) {
-      p_cubeDisplay->cube()->Read(mgr);
+      m_cubeDisplay->cube()->Read(mgr);
       stats.AddData(mgr.DoubleBuffer(), mgr.size());
 
       for(int i = 0; i < skip; i++)
         mgr ++;
     }
 
-    p_cubeDnStretch = new Stretch();
-    p_cubeDnStretch->AddPair(stats.BestMinimum(), 0.0);
-    p_cubeDnStretch->AddPair(stats.BestMaximum(), 255.0);
+    m_cubeDnStretch = new Stretch();
+    m_cubeDnStretch->AddPair(stats.BestMinimum(), 0.0);
+    m_cubeDnStretch->AddPair(stats.BestMaximum(), 255.0);
 
-    p_cubeDnStretch->SetNull(0.0);
-    p_cubeDnStretch->SetLis(0.0);
-    p_cubeDnStretch->SetLrs(0.0);
-    p_cubeDnStretch->SetHis(255.0);
-    p_cubeDnStretch->SetHrs(255.0);
-    p_cubeDnStretch->SetMinimum(0.0);
-    p_cubeDnStretch->SetMaximum(255.0);
+    m_cubeDnStretch->SetNull(0.0);
+    m_cubeDnStretch->SetLis(0.0);
+    m_cubeDnStretch->SetLrs(0.0);
+    m_cubeDnStretch->SetHis(255.0);
+    m_cubeDnStretch->SetHrs(255.0);
+    m_cubeDnStretch->SetMinimum(0.0);
+    m_cubeDnStretch->SetMaximum(255.0);
 
-    return p_cubeDnStretch;
+    return m_cubeDnStretch;
   }
 }
-

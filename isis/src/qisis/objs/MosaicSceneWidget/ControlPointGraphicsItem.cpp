@@ -25,12 +25,14 @@ namespace Isis {
       QPointF apriori, ControlPoint *cp, SerialNumberList *snList,
       MosaicSceneWidget *boundingRectSrc, QGraphicsItem *parent) :
       QGraphicsRectItem(parent) {
-    p_centerPoint = new QPointF(center);
-    p_mosaicScene = boundingRectSrc;
-    p_controlPoint = cp;
+    m_centerPoint = new QPointF(center);
+    m_mosaicScene = boundingRectSrc;
+    m_controlPoint = cp;
+    m_showArrow = false;
+
     setZValue(DBL_MAX);
 
-    p_origPoint = new QPointF(apriori);
+    m_origPoint = new QPointF(apriori);
 
     if(cp->IsIgnored())
       setPen(QPen(Qt::red));
@@ -50,17 +52,17 @@ namespace Isis {
 
 
   ControlPointGraphicsItem::~ControlPointGraphicsItem() {
-    if(p_centerPoint) {
-      delete p_centerPoint;
-      p_centerPoint = NULL;
+    if(m_centerPoint) {
+      delete m_centerPoint;
+      m_centerPoint = NULL;
     }
 
-    if(p_origPoint) {
-      delete p_origPoint;
-      p_origPoint = NULL;
+    if(m_origPoint) {
+      delete m_origPoint;
+      m_origPoint = NULL;
     }
 
-    p_mosaicScene = NULL;
+    m_mosaicScene = NULL;
   }
 
 
@@ -89,29 +91,13 @@ namespace Isis {
       painter->drawLine(centerLeft, centerRight);
       painter->drawLine(centerTop, centerBottom);
 
-      if(!p_origPoint->isNull() && *p_origPoint != *p_centerPoint) {
+      if(!m_origPoint->isNull() && *m_origPoint != *m_centerPoint
+         && m_showArrow) {
         painter->setPen(Qt::black);
         painter->setBrush(Qt::black);
-        painter->drawLine(*p_origPoint, *p_centerPoint);
+        painter->drawLine(*m_origPoint, *m_centerPoint);
 
-        double crosshairSize = crosshairRect.width() * 4.0 / 5.0;
-
-        // Draw arrow
-        QPointF lineVector = *p_centerPoint - *p_origPoint;
-        double lineVectorMag = sqrt(lineVector.x() * lineVector.x() +
-                                    lineVector.y() * lineVector.y());
-        double thetaPointOnLine = crosshairSize / (2 * (tanf(PI / 6) / 2) *
-                              lineVectorMag);
-        QPointF pointOnLine = *p_centerPoint - thetaPointOnLine * lineVector;
-
-        QPointF normalVector = QPointF(-lineVector.y(), lineVector.x());
-        double thetaNormal = crosshairSize / (2 * lineVectorMag);
-
-        QPointF leftPoint = pointOnLine + thetaNormal * normalVector;
-        QPointF rightPoint = pointOnLine - thetaNormal * normalVector;
-
-        QPolygonF arrowHead;
-        arrowHead << leftPoint << center << rightPoint;
+        QPolygonF arrowHead = calcArrowHead();
         painter->drawPolygon(arrowHead);
       }
     }
@@ -123,7 +109,7 @@ namespace Isis {
     QMenu menu;
 
     QAction *title = menu.addAction(
-        QString::fromStdString(p_controlPoint->GetId()));
+        QString::fromStdString(m_controlPoint->GetId()));
     title->setEnabled(false);
     menu.addSeparator();
 
@@ -132,7 +118,7 @@ namespace Isis {
     QAction *selected = menu.exec(event->screenPos());
 
     if(selected == infoAction) {
-      QMessageBox::information(p_mosaicScene, "Control Point Information",
+      QMessageBox::information(m_mosaicScene, "Control Point Information",
           toolTip());
     }
   }
@@ -141,21 +127,27 @@ namespace Isis {
   QRectF ControlPointGraphicsItem::calcRect() const {
     QRectF pointRect(calcCrosshairRect());
 
-    if(!p_origPoint->isNull() && pointRect.isValid()) {
+    if(!m_origPoint->isNull() && pointRect.isValid()) {
       // Make the rect contain the orig point
-      if(pointRect.left() > p_origPoint->x()) {
-        pointRect.setLeft(p_origPoint->x());
+      if(pointRect.left() > m_origPoint->x()) {
+        pointRect.setLeft(m_origPoint->x());
       }
-      else if(pointRect.right() < p_origPoint->x()) {
-        pointRect.setRight(p_origPoint->x());
+      else if(pointRect.right() < m_origPoint->x()) {
+        pointRect.setRight(m_origPoint->x());
       }
 
-      if(pointRect.top() > p_origPoint->y()) {
-        pointRect.setTop(p_origPoint->y());
+      if(pointRect.top() > m_origPoint->y()) {
+        pointRect.setTop(m_origPoint->y());
       }
-      else if(pointRect.bottom() < p_origPoint->y()) {
-        pointRect.setBottom(p_origPoint->y());
+      else if(pointRect.bottom() < m_origPoint->y()) {
+        pointRect.setBottom(m_origPoint->y());
       }
+    }
+
+    QPolygonF arrowHead = calcArrowHead();
+
+    if(arrowHead.size() > 2) {
+      pointRect = pointRect.united(arrowHead.boundingRect());
     }
 
     return pointRect;
@@ -165,37 +157,68 @@ namespace Isis {
   QRectF ControlPointGraphicsItem::calcCrosshairRect() const {
     QRectF pointRect;
 
-    if(p_centerPoint && !p_centerPoint->isNull() && p_mosaicScene) {
+    if(m_centerPoint && !m_centerPoint->isNull() && m_mosaicScene) {
       static const int size = 12;
       QPoint findSpotScreen =
-          p_mosaicScene->getView()->mapFromScene(*p_centerPoint);
+          m_mosaicScene->getView()->mapFromScene(*m_centerPoint);
       QPoint findSpotTopLeftScreen =
           findSpotScreen - QPoint(size / 2, size / 2);
 
       QRect pointRectScreen(findSpotTopLeftScreen, QSize(size, size));
 
       pointRect =
-          p_mosaicScene->getView()->mapToScene(pointRectScreen).boundingRect();
+          m_mosaicScene->getView()->mapToScene(pointRectScreen).boundingRect();
     }
 
     return pointRect;
   }
 
 
+  QPolygonF ControlPointGraphicsItem::calcArrowHead() const {
+    QPolygonF arrowHead;
+
+    if(m_showArrow && !m_origPoint->isNull() &&
+       *m_origPoint != *m_centerPoint) {
+      QRectF crosshairRect = calcCrosshairRect();
+      double headSize = crosshairRect.width() * 4.0 / 5.0;
+
+      double crosshairSize = headSize;
+
+      // Draw arrow
+      QPointF lineVector = *m_centerPoint - *m_origPoint;
+      double lineVectorMag = sqrt(lineVector.x() * lineVector.x() +
+                                  lineVector.y() * lineVector.y());
+      double thetaPointOnLine = crosshairSize / (2 * (tanf(PI / 6) / 2) *
+                            lineVectorMag);
+      QPointF pointOnLine = *m_centerPoint - thetaPointOnLine * lineVector;
+
+      QPointF normalVector = QPointF(-lineVector.y(), lineVector.x());
+      double thetaNormal = crosshairSize / (2 * lineVectorMag);
+
+      QPointF leftPoint = pointOnLine + thetaNormal * normalVector;
+      QPointF rightPoint = pointOnLine - thetaNormal * normalVector;
+
+      arrowHead << leftPoint << crosshairRect.center() << rightPoint;
+    }
+
+    return arrowHead;
+  }
+
+
   QString ControlPointGraphicsItem::makeToolTip(SerialNumberList *snList) {
     QString toolTip = "Point ID: " +
-        QString::fromStdString(p_controlPoint->GetId());
+        QString::fromStdString(m_controlPoint->GetId());
     toolTip += "\nPoint Type: " +
-        QString::fromStdString(p_controlPoint->GetPointTypeString());
+        QString::fromStdString(m_controlPoint->GetPointTypeString());
     toolTip += "\nNumber of Measures: ";
-    toolTip += QString::number(p_controlPoint->GetNumMeasures());
+    toolTip += QString::number(m_controlPoint->GetNumMeasures());
     toolTip += "\n";
 
     if(snList == NULL) {
-      toolTip += QStringList(p_controlPoint->GetCubeSerialNumbers()).join("\n");
+      toolTip += QStringList(m_controlPoint->GetCubeSerialNumbers()).join("\n");
     }
     else {
-      QStringList serialNums(p_controlPoint->GetCubeSerialNumbers());
+      QStringList serialNums(m_controlPoint->GetCubeSerialNumbers());
 
       for(int snIndex = 0; snIndex < serialNums.size(); snIndex ++) {
         QString serialNum = serialNums[snIndex];

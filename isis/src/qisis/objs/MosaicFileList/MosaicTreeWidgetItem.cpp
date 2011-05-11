@@ -4,6 +4,7 @@
 #include "CubeDisplayProperties.h"
 #include "Filename.h"
 #include "iException.h"
+#include "SpecialPixel.h"
 #include "Table.h"
 
 namespace Isis {
@@ -23,71 +24,18 @@ namespace Isis {
     p_cubeDisplay->addSupport(CubeDisplayProperties::Color);
 
     setText(NameColumn, p_cubeDisplay->displayName());
-    Cube *cube = p_cubeDisplay->cube();
 
-    try {
-      Table table("CameraStatistics", cube->Filename());
-      for (int i = 0; i < table.Records(); i++) {
-        for (int j = 0; j < table[i].Fields(); j++) {
-          QString label;
+    if(!IsSpecial(p_cubeDisplay->resolution()))
+      setText(ResolutionColumn,
+              QString::number(p_cubeDisplay->resolution()));
 
-          if (table[i][j].IsText()) {
-            label = QString::fromStdString((std::string)table[i][j]);
-            label.truncate(10);
-          }
+    if(!IsSpecial(p_cubeDisplay->emissionAngle()))
+      setText(ResolutionColumn,
+              QString::number(p_cubeDisplay->emissionAngle()));
 
-          // Get the average resolution for this mosaic item.
-          if (table[i][j].IsText() && label.compare("Resolution") == 0) {
-            if (j + 3 < table[i].Fields()) {
-              if (table[i][j+3].IsInteger()) {
-              }
-              else if (table[i][j+3].IsDouble()) {
-                setText(ResolutionColumn,
-                        QString::number((double)table[i][j+3]));
-              }
-              else if (table[i][j+3].IsText()) {
-              }
-            }
-          }
-
-          // Get the average emission angle for this mosaic item.
-          if (table[i][j].IsText() && label.compare("EmissionAn") == 0) {
-            if (j + 3 < table[i].Fields()) {
-              if (table[i][j+3].IsInteger()) {
-              }
-              else if (table[i][j+3].IsDouble()) {
-                setText(EmissionAngleColumn,
-                        QString::number((double)table[i][j+3]));
-              }
-              else if (table[i][j+3].IsText()) {
-              }
-            }
-          }
-
-          // Get the average incidence angle for this mosaic item.
-          if (table[i][j].IsText() && label.compare("IncidenceA") == 0) {
-            if (j + 3 < table[i].Fields()) {
-              if (table[i][j+3].IsInteger()) {
-              }
-              else if (table[i][j+3].IsDouble()) {
-                setText(IncidenceAngleColumn,
-                        QString::number((double)table[i][j+3]));
-              }
-              else if (table[i][j+3].IsText()) {
-              }
-            }
-          }
-        }
-      }
-    }
-    catch(iException &e) {
-      p_cubeDisplay->deleteLater();
-      iException::Message(iException::Io,
-                          "Please run camerastats with the 'attach' option",
-                          _FILEINFO_);
-      e.Report();
-      e.Clear();
-    }
+    if(!IsSpecial(p_cubeDisplay->incidenceAngle()))
+      setText(ResolutionColumn,
+              QString::number(p_cubeDisplay->incidenceAngle()));
 
     setFlags(Qt::ItemIsEnabled |
              Qt::ItemIsUserCheckable |

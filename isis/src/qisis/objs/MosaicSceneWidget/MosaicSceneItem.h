@@ -14,7 +14,6 @@ namespace geos {
 namespace Isis {
   class Camera;
   class CubeDisplayProperties;
-  class ControlPoint;
   class MosaicSceneWidget;
   class Projection;
   class PvlGroup;
@@ -35,6 +34,9 @@ namespace Isis {
    *  @history 2011-05-07 Steven Lambright Refactored from MosaicItem to
    *                                have far fewer responsibilities.
    *  @history 2011-05-10 Steven Lambright Reduced the amount of useless code
+   *  @history 2011-05-11 Steven Lambright Reduced the amount of useless code,
+   *                      footprint is now gathered from the
+   *                      CubeDisplayProperties so duplicate work is not done.
    */
   class MosaicSceneItem : public QGraphicsObject {
       Q_OBJECT
@@ -47,25 +49,11 @@ namespace Isis {
                          const QStyleOptionGraphicsItem *option,
                          QWidget *widget = 0);
 
-      void highlightSelected(QGraphicsPolygonItem *item, QPainter *painter,
-                             const QStyleOptionGraphicsItem *option);
-
-      double levelOfDetail() const { return p_lastLevelOfDetail; }
-      double emissionAngle() const { return p_emissionAngle; }
-      double incidenceAngle() const { return p_incidenceAngle; }
       QColor color() const;
-      CubeDisplayProperties *cubeDisplay() { return p_cubeDisplay; }
-      QGraphicsSimpleTextItem *getLabel() const { return p_label; }
-      int getImageTrans() const { return p_imageTransparency; }
+      CubeDisplayProperties *cubeDisplay() { return m_cubeDisplay; }
+      QGraphicsSimpleTextItem *getLabel() const { return m_label; }
 
       void reproject();
-      void setImageVisible(bool visible);
-      void setTreeItemSelected(bool selected);
-      void setZValue(qreal z);
-      QPointF screenToGround(QPointF point);
-      QPointF screenToCam(int x, int y);
-      QPointF screenToCam(QPointF p);
-      void setSelectedPoint(ControlPoint *p);
       bool contains(const QPointF &) const;
       void updateSelection(bool);
 
@@ -82,8 +70,6 @@ namespace Isis {
 
     protected:
       virtual bool sceneEvent(QEvent *event);
-      virtual QVariant itemChange(GraphicsItemChange change,
-                                  const QVariant & value);
 
     protected:
       virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
@@ -98,46 +84,23 @@ namespace Isis {
       void updateChildren();
       Stretch *getStretch();
 
+      MosaicSceneWidget *m_scene;
 
-      MosaicSceneWidget *p_scene;
+      geos::geom::MultiPolygon *m_mp; //!< This item's multipolygon in the 0/360 longitude domain
+      geos::geom::MultiPolygon *m_180mp; //!< This item's multipolygon in the -180/180 longitude domain
+      QList< QGraphicsPolygonItem * > *m_polygons;
+      UniversalGroundMap *groundMap;
 
-      geos::geom::MultiPolygon *p_mp; //!< This item's multipolygon in the 0/360 longitude domain
-      geos::geom::MultiPolygon *p_180mp; //!< This item's multipolygon in the -180/180 longitude domain
-      QList< QGraphicsPolygonItem * > *p_polygons;
-
-      void createFootprint(); //!< Creates the footprint of this image.
+      void setupFootprint();
       void drawImage(QPainter *painter, const QStyleOptionGraphicsItem *option);
-      QList<int> scanLineIntersections(QPolygon poly, int y, int boxWidth);
 
-      bool midTest(double trueMidX, double trueMidY, double testMidX, double testMidY);
       double getPixelValue(int sample, int line);
       void setupStretch();
-      void setFontSize();
-      void setFontSize(QFont font);
-      void setUpItem(PvlGroup *grp);
 
-      void paintControlPoints(QPainter *painter, const QStyleOptionGraphicsItem *option);
+      CubeDisplayProperties *m_cubeDisplay;
+      Stretch *m_cubeDnStretch;
 
-      QColor getColor();
-
-      double p_pixRes; //!< Pixel Resolution of the cube
-      double p_emissionAngle;
-      double p_incidenceAngle;
-      double p_levelOfDetail; //!< Level of detail
-
-      double p_maxPixelValue;
-      int p_imageTransparency;
-      CubeDisplayProperties *p_cubeDisplay;
-      Stretch *p_cubeDnStretch;
-
-      QList<QImage> p_lastImages;
-      QRectF p_lastExposedRect;
-      double p_lastPaintScale;
-
-      QGraphicsSimpleTextItem *p_label;
-      double p_lastLevelOfDetail;
-      double p_screenResolution;
-      bool p_updateFont;
+      QGraphicsSimpleTextItem *m_label;
   };
 };
 

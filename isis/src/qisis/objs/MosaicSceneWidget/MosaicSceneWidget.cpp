@@ -40,55 +40,55 @@
 namespace Isis {
   MosaicSceneWidget::MosaicSceneWidget(QStatusBar *status,
                                        QWidget *parent) : QWidget(parent) {
-    p_mosaicSceneItems = new QList<MosaicSceneItem *>;
+    m_mosaicSceneItems = new QList<MosaicSceneItem *>;
 
-    p_graphicsScene = new QGraphicsScene(this);
-    p_graphicsScene->installEventFilter(this);
+    m_graphicsScene = new QGraphicsScene(this);
+    m_graphicsScene->installEventFilter(this);
 
-    p_graphicsView = new MosaicGraphicsView(p_graphicsScene, this);
-    p_graphicsView->setScene(p_graphicsScene);
-    p_graphicsView->setInteractive(true);
-    p_graphicsView->setViewportUpdateMode(QGraphicsView::MinimalViewportUpdate);
-    p_graphicsView->setResizeAnchor(QGraphicsView::AnchorViewCenter);
+    m_graphicsView = new MosaicGraphicsView(m_graphicsScene, this);
+    m_graphicsView->setScene(m_graphicsScene);
+    m_graphicsView->setInteractive(true);
+    m_graphicsView->setViewportUpdateMode(QGraphicsView::MinimalViewportUpdate);
+    m_graphicsView->setResizeAnchor(QGraphicsView::AnchorViewCenter);
     // This enables OpenGL acceleration
-//     p_graphicsView->setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
+//     m_graphicsView->setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
 
     QLayout * sceneLayout = new QHBoxLayout;
-    sceneLayout->addWidget(p_graphicsView);
+    sceneLayout->addWidget(m_graphicsView);
     sceneLayout->setContentsMargins(0, 0, 0, 0);
     setLayout(sceneLayout);
 
-    p_projection = NULL;
-    p_mapAction = NULL;
+    m_projection = NULL;
+    m_mapAction = NULL;
 
-//     p_projectionFootprint = new QGraphicsPolygonItem();
-//     p_projectionFootprint->hide();
+//     m_projectionFootprint = new QGraphicsPolygonItem();
+//     m_projectionFootprint->hide();
 
-    p_cubesSelectable = true;
-    p_customRubberBandEnabled = false;
-    p_customRubberBand = NULL;
-    p_rubberBandOrigin = NULL;
-    p_outlineRect = NULL;
+    m_cubesSelectable = true;
+    m_customRubberBandEnabled = false;
+    m_customRubberBand = NULL;
+    m_rubberBandOrigin = NULL;
+    m_outlineRect = NULL;
 
     // Create the tools we want
-    p_tools = new QList<MosaicTool *>;
-    p_tools->append(new MosaicSelectTool(this));
-    p_tools->append(new MosaicZoomTool(this));
-    p_tools->append(new MosaicPanTool(this));
-    p_tools->append(new MosaicControlNetTool(this));
-    p_tools->append(new MosaicFindTool(this));
+    m_tools = new QList<MosaicTool *>;
+    m_tools->append(new MosaicSelectTool(this));
+    m_tools->append(new MosaicZoomTool(this));
+    m_tools->append(new MosaicPanTool(this));
+    m_tools->append(new MosaicControlNetTool(this));
+    m_tools->append(new MosaicFindTool(this));
     if(status)
-      p_tools->append(new MosaicTrackTool(this, status));
+      m_tools->append(new MosaicTrackTool(this, status));
 
-    p_tools->at(0)->activate(true);
+    m_tools->at(0)->activate(true);
 
     blockSelectionChange(false);
 
-    p_userToolControl = false;
-    p_ownProjection = false;
+    m_userToolControl = false;
+    m_ownProjection = false;
 
-    p_progress = new ProgressBar;
-    p_progress->setVisible(false);
+    m_progress = new ProgressBar;
+    m_progress->setVisible(false);
 
     getView()->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     getView()->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -104,23 +104,23 @@ namespace Isis {
   }
 
   MosaicSceneWidget::~MosaicSceneWidget() {
-    p_outlineRect = NULL; // The scene will clean this up
+    m_outlineRect = NULL; // The scene will clean this up
 
-    if(p_tools) {
+    if(m_tools) {
       MosaicTool *tool;
-      foreach(tool, *p_tools) {
+      foreach(tool, *m_tools) {
         delete tool;
         tool = NULL;
       }
 
-      delete p_tools;
-      p_tools = NULL;
+      delete m_tools;
+      m_tools = NULL;
     }
 
-    if(p_ownProjection && p_projection) {
-      delete p_projection;
+    if(m_ownProjection && m_projection) {
+      delete m_projection;
     }
-    p_projection = NULL;
+    m_projection = NULL;
   }
 
 
@@ -130,24 +130,24 @@ namespace Isis {
   void MosaicSceneWidget::setProjection(Projection *proj) {
     PvlGroup mapping(proj->Mapping());
 
-    if(p_mapAction) {
+    if(m_mapAction) {
       PvlKeyword projectionKeyword = mapping.FindKeyword("ProjectionName");
       QString projName = QString::fromStdString(projectionKeyword[0]);
-      p_mapAction->setText(projName);
+      m_mapAction->setText(projName);
     }
 
-    Projection *old = p_projection;
-    p_projection = proj;
+    Projection *old = m_projection;
+    m_projection = proj;
 
     reprojectItems();
-    emit projectionChanged(p_projection);
+    emit projectionChanged(m_projection);
 
-    if(old && p_ownProjection) {
+    if(old && m_ownProjection) {
       delete old;
       old = NULL;
     }
 
-    p_ownProjection = false;
+    m_ownProjection = false;
   }
 
 
@@ -156,17 +156,17 @@ namespace Isis {
     if(outline.united(getView()->sceneRect()) != getView()->sceneRect())
       outline = QRectF();
 
-    if(!p_outlineRect) {
-      p_outlineRect = getScene()->addRect(outline,
+    if(!m_outlineRect) {
+      m_outlineRect = getScene()->addRect(outline,
                                           QPen(Qt::black),
                                           Qt::NoBrush);
-      p_outlineRect->setZValue(DBL_MAX);
+      m_outlineRect->setZValue(DBL_MAX);
     }
     else {
-      p_outlineRect->setRect(outline);
+      m_outlineRect->setRect(outline);
     }
 
-    if(!p_userToolControl)
+    if(!m_userToolControl)
       refit();
   }
 
@@ -222,7 +222,7 @@ namespace Isis {
     QList<CubeDisplayProperties *> cubes;
 
     MosaicSceneItem *mosaicItem;
-    foreach(mosaicItem, *p_mosaicSceneItems) {
+    foreach(mosaicItem, *m_mosaicSceneItems) {
       if(mosaicItem->isSelected()) {
         cubes.append(mosaicItem->cubeDisplay());
       }
@@ -233,32 +233,32 @@ namespace Isis {
 
 
   void MosaicSceneWidget::addToPermanent(QToolBar *perm) {
-    if(!p_mapAction) {
-      p_mapAction = new QAction(this);
-      p_mapAction->setToolTip("Select Map File");
-      p_mapAction->setText("Select Map File");
+    if(!m_mapAction) {
+      m_mapAction = new QAction(this);
+      m_mapAction->setToolTip("Select Map File");
+      m_mapAction->setText("Select Map File");
 
-      if(p_projection) {
+      if(m_projection) {
         PvlKeyword projectionKeyword =
-            p_projection->Mapping().FindKeyword("ProjectionName");
+            m_projection->Mapping().FindKeyword("ProjectionName");
         QString projName = QString::fromStdString(projectionKeyword[0]);
-        p_mapAction->setText(projName);
+        m_mapAction->setText(projName);
       }
     }
 
-    perm->addAction(p_mapAction);
+    perm->addAction(m_mapAction);
 
-    connect(p_mapAction, SIGNAL(triggered()), this, SLOT(askNewProjection()));
+    connect(m_mapAction, SIGNAL(triggered()), this, SLOT(askNewProjection()));
   }
 
 
   void MosaicSceneWidget::addTo(QToolBar *toolbar) {
     MosaicTool *tool;
-    foreach(tool, *p_tools) {
+    foreach(tool, *m_tools) {
       tool->addTo(toolbar);
     }
 
-    p_userToolControl = true;
+    m_userToolControl = true;
 
     getView()->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     getView()->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
@@ -269,7 +269,7 @@ namespace Isis {
 
   void MosaicSceneWidget::addTo(QMenu *menu) {
     MosaicTool *tool;
-    foreach(tool, *p_tools) {
+    foreach(tool, *m_tools) {
       tool->addTo(menu);
     }
   }
@@ -277,14 +277,14 @@ namespace Isis {
 
   void MosaicSceneWidget::addTo(Qisis::ToolPad *toolPad) {
     MosaicTool *tool;
-    foreach(tool, *p_tools) {
+    foreach(tool, *m_tools) {
       tool->addTo(toolPad);
     }
   }
 
 
   void MosaicSceneWidget::enableRubberBand(bool enable) {
-    p_customRubberBandEnabled = enable;
+    m_customRubberBandEnabled = enable;
   }
 
 
@@ -301,18 +301,18 @@ namespace Isis {
 
 
   QProgressBar *MosaicSceneWidget::getProgress() {
-    return p_progress;
+    return m_progress;
   }
 
 
   PvlObject MosaicSceneWidget::toPvl() const {
     PvlObject output("MosaicScene");
 
-    if(p_projection) {
-      output += p_projection->Mapping();
+    if(m_projection) {
+      output += m_projection->Mapping();
 
       MosaicTool *tool;
-      foreach(tool, *p_tools) {
+      foreach(tool, *m_tools) {
         if(tool->projectPvlObjectName() != "") {
           PvlObject toolObj = tool->toPvl();
           toolObj.SetName(tool->projectPvlObjectName());
@@ -333,10 +333,12 @@ namespace Isis {
     Pvl tmp;
     tmp += project.FindGroup("Mapping");
     setProjection(ProjectionFactory::Create(tmp));
-    p_ownProjection = true;
+    m_ownProjection = true;
+
+    recalcSceneRect();
 
     MosaicTool *tool;
-    foreach(tool, *p_tools) {
+    foreach(tool, *m_tools) {
       if(tool->projectPvlObjectName() != "") {
         if(project.HasObject(tool->projectPvlObjectName())) {
           tool->fromPvl(project.FindObject(tool->projectPvlObjectName()));
@@ -350,23 +352,23 @@ namespace Isis {
     QRectF boundingRect;
 
     MosaicSceneItem * mosaicItem;
-    foreach(mosaicItem, *p_mosaicSceneItems) {
+    foreach(mosaicItem, *m_mosaicSceneItems) {
       if(boundingRect.isEmpty())
         boundingRect = mosaicItem->boundingRect();
       else
         boundingRect = boundingRect.united(mosaicItem->boundingRect());
     }
 
-    if(p_outlineRect)
-      boundingRect = boundingRect.united(p_outlineRect->boundingRect());
+    if(m_outlineRect)
+      boundingRect = boundingRect.united(m_outlineRect->boundingRect());
 
     return boundingRect;
   }
 
   MosaicSceneItem *MosaicSceneWidget::addCube(CubeDisplayProperties *cube) {
-    if(p_projection == NULL) {
+    if(m_projection == NULL) {
       setProjection(createInitialProjection(cube));
-      p_ownProjection = true;
+      m_ownProjection = true;
     }
 
     // Verify we don't have this cube already
@@ -381,14 +383,14 @@ namespace Isis {
     MosaicSceneItem *mosItem = new MosaicSceneItem(cube, this);
 
     connect(mosItem, SIGNAL(changed(const QList<QRectF> &)),
-            p_graphicsView, SLOT(updateScene(const QList<QRectF> &)));
+            m_graphicsView, SLOT(updateScene(const QList<QRectF> &)));
 
     // We want everything to have a unique Z value so we can manage the z order
     //   well.
     mosItem->setZValue(maximumZ() + 1);
 
     getScene()->addItem(mosItem);
-    p_mosaicSceneItems->append(mosItem);
+    m_mosaicSceneItems->append(mosItem);
 
     connect(mosItem, SIGNAL(destroyed(QObject *)),
             this, SLOT(removeMosItem(QObject *)));
@@ -412,7 +414,7 @@ namespace Isis {
     // 0 is okay for a maximum even if everything is below
     qreal maxZ = 0;
     MosaicSceneItem *mosaicItem;
-    foreach(mosaicItem, *p_mosaicSceneItems) {
+    foreach(mosaicItem, *m_mosaicSceneItems) {
       if(mosaicItem->zValue() > maxZ)
         maxZ = mosaicItem->zValue();
     }
@@ -425,7 +427,7 @@ namespace Isis {
     // 0 is okay for a minimum even if everything is above
     qreal minZ = 0;
     MosaicSceneItem *mosaicItem;
-    foreach(mosaicItem, *p_mosaicSceneItems) {
+    foreach(mosaicItem, *m_mosaicSceneItems) {
       if(mosaicItem->zValue() < minZ)
         minZ = mosaicItem->zValue();
     }
@@ -434,17 +436,17 @@ namespace Isis {
   }
 
   void MosaicSceneWidget::recalcSceneRect() {
-    if(p_projection) {
+    if(m_projection) {
       double minX, minY, maxX, maxY;
-      p_projection->XYRange(minX, maxX, minY, maxY);
+      m_projection->XYRange(minX, maxX, minY, maxY);
 
       QRectF projRect(minX, minY, maxX - minX, maxY - minY);
       QRectF cubesBounding = cubesBoundingRect();
 
       QRectF bounding = projRect.united(cubesBounding);
 
-      if(p_outlineRect && p_outlineRect->isVisible())
-        bounding = bounding.united(p_outlineRect->boundingRect());
+      if(m_outlineRect && m_outlineRect->isVisible())
+        bounding = bounding.united(m_outlineRect->boundingRect());
 
       getView()->setSceneRect(bounding);
     }
@@ -453,14 +455,14 @@ namespace Isis {
   void MosaicSceneWidget::addCubes(QList<CubeDisplayProperties *> cubes) {
     QList<QGraphicsItem *> sceneItems;
 
-    if(p_userToolControl)
-      p_progress->setText("Loading primary scene");
+    if(m_userToolControl)
+      m_progress->setText("Loading primary scene");
     else
-      p_progress->setText("Loading secondary scene");
+      m_progress->setText("Loading secondary scene");
 
-    p_progress->setRange(0, cubes.size() - 1);
-    p_progress->setValue(0);
-    p_progress->setVisible(true);
+    m_progress->setRange(0, cubes.size() - 1);
+    m_progress->setValue(0);
+    m_progress->setVisible(true);
 
     CubeDisplayProperties *cube;
     foreach(cube, cubes) {
@@ -475,20 +477,20 @@ namespace Isis {
         e.Clear();
       }
 
-      p_progress->setValue(p_progress->value() + 1);
+      m_progress->setValue(m_progress->value() + 1);
     }
 
     recalcSceneRect();
     refit();
 
-    p_progress->setVisible(false);
+    m_progress->setVisible(false);
     emit cubesChanged();
   }
 
 
   void MosaicSceneWidget::removeMosItem(QObject *mosItem) {
     MosaicSceneItem *castedMosItem = (MosaicSceneItem*) mosItem;
-    p_mosaicSceneItems->removeAll(castedMosItem);
+    m_mosaicSceneItems->removeAll(castedMosItem);
     recalcSceneRect();
     emit cubesChanged();
   }
@@ -509,7 +511,7 @@ namespace Isis {
     // need to create a polygon from the min/max lat/long numbers in the map
     //   file.
     try {
-      PvlGroup mapping(p_projection->Mapping());
+      PvlGroup mapping(m_projection->Mapping());
       PvlKeyword minLatKeyword = mapping.FindKeyword("MinimumLatitude");
       Latitude minLat(minLatKeyword[0], mapping, Angle::Degrees);
       PvlKeyword minLonKeyword = mapping.FindKeyword("MinimumLongitude");
@@ -520,69 +522,69 @@ namespace Isis {
       Longitude maxLon(maxLonKeyword[0], mapping, Angle::Degrees);
 
       Angle increment(1, Angle::Degrees);
-      if(p_projection->SetUniversalGround(minLat.GetDegrees(),
+      if(m_projection->SetUniversalGround(minLat.GetDegrees(),
          minLon.GetDegrees())) {
-        x = p_projection->XCoord();
-        y = -1 * (p_projection->YCoord());
+        x = m_projection->XCoord();
+        y = -1 * (m_projection->YCoord());
         footprintPoints.push_back(QPointF(x, y));
       }
 
       for(Angle lat = minLat + increment; lat < maxLat; lat += increment) {
-        if(p_projection->SetUniversalGround(lat.GetDegrees(),
+        if(m_projection->SetUniversalGround(lat.GetDegrees(),
            minLon.GetDegrees())) {
-          x = p_projection->XCoord();
-          y = -1 * (p_projection->YCoord());
+          x = m_projection->XCoord();
+          y = -1 * (m_projection->YCoord());
           footprintPoints.push_back(QPointF(x, y));
         }
       }
       for(Angle lon = minLon + increment; lon < maxLon; lon += increment) {
-        if(p_projection->SetUniversalGround(maxLat.GetDegrees(),
+        if(m_projection->SetUniversalGround(maxLat.GetDegrees(),
            lon.GetDegrees())) {
-          x = p_projection->XCoord();
-          y = -1 * (p_projection->YCoord());
+          x = m_projection->XCoord();
+          y = -1 * (m_projection->YCoord());
           footprintPoints.push_back(QPointF(x, y));
         }
       }
       for(Angle lat = maxLat; lat > minLat + increment; lat -= increment) {
-        if(p_projection->SetUniversalGround(lat.GetDegrees(),
+        if(m_projection->SetUniversalGround(lat.GetDegrees(),
            maxLon.GetDegrees())) {
-          x = p_projection->XCoord();
-          y = -1 * (p_projection->YCoord());
+          x = m_projection->XCoord();
+          y = -1 * (m_projection->YCoord());
           footprintPoints.push_back(QPointF(x, y));
         }
       }
       for(Angle lon = maxLon; lon > minLon + increment; lon -= increment) {
-        if(p_projection->SetUniversalGround(minLat.GetDegrees(),
+        if(m_projection->SetUniversalGround(minLat.GetDegrees(),
            lon.GetDegrees())) {
-          x = p_projection->XCoord();
-          y = -1 * (p_projection->YCoord());
+          x = m_projection->XCoord();
+          y = -1 * (m_projection->YCoord());
           footprintPoints.push_back(QPointF(x, y));
         }
       }
 
       //Now close the polygon.
-      if(p_projection->SetUniversalGround(minLat.GetDegrees(),
+      if(m_projection->SetUniversalGround(minLat.GetDegrees(),
          minLon.GetDegrees())) {
-        x = p_projection->XCoord();
-        y = -1 * (p_projection->YCoord());
+        x = m_projection->XCoord();
+        y = -1 * (m_projection->YCoord());
         footprintPoints.push_back(QPointF(x, y));
       }
       footprintPoly = QPolygonF(footprintPoints);
-      p_projectionFootprint->setPolygon(footprintPoly);
-      p_projectionFootprint->setBrush(QBrush(QColor(255, 255, 0, 100)));
-      p_projectionFootprint->setPen(QColor(Qt::black));
-      p_projectionFootprint->setZValue(-FLT_MAX);
-      p_projectionFootprint->setFlag(QGraphicsItem::ItemIsSelectable, false);
-      p_graphicsScene->addItem(p_projectionFootprint);
-      //p_graphicsView->fitInView(p_footprintItem, Qt::KeepAspectRatio);
-      p_projectionFootprint->show();
+      m_projectionFootprint->setPolygon(footprintPoly);
+      m_projectionFootprint->setBrush(QBrush(QColor(255, 255, 0, 100)));
+      m_projectionFootprint->setPen(QColor(Qt::black));
+      m_projectionFootprint->setZValue(-FLT_MAX);
+      m_projectionFootprint->setFlag(QGraphicsItem::ItemIsSelectable, false);
+      m_graphicsScene->addItem(m_projectionFootprint);
+      //m_graphicsView->fitInView(m_footprintItem, Qt::KeepAspectRatio);
+      m_projectionFootprint->show();
 
     }
     catch(Isis::iException &e) {
       std::string msg = e.Errors();
       QMessageBox::information(this, "Error", QString::fromStdString(msg),
                                QMessageBox::Ok);
-      //p_showReference->setChecked(Qt::Unchecked);
+      //m_showReference->setChecked(Qt::Unchecked);
       return;
     }
   }
@@ -607,11 +609,11 @@ namespace Isis {
 
 
   void MosaicSceneWidget::setCubesSelectable(bool selectable) {
-    if(p_cubesSelectable != selectable) {
-      p_cubesSelectable = selectable;
+    if(m_cubesSelectable != selectable) {
+      m_cubesSelectable = selectable;
 
       MosaicSceneItem *mosaicSceneItem;
-      foreach(mosaicSceneItem, *p_mosaicSceneItems) {
+      foreach(mosaicSceneItem, *m_mosaicSceneItems) {
         mosaicSceneItem->scenePropertiesChanged();
       }
     }
@@ -653,7 +655,7 @@ namespace Isis {
 
       Isis::Projection *proj = Isis::ProjectionFactory::Create(pvl);
       setProjection(proj);
-      p_ownProjection = true;
+      m_ownProjection = true;
     }
     catch(Isis::iException &e) {
       std::string msg = e.Errors();
@@ -679,21 +681,21 @@ namespace Isis {
 
     switch(event->type()) {
       case QMouseEvent::GraphicsSceneMousePress: {
-        if(p_customRubberBandEnabled) {
+        if(m_customRubberBandEnabled) {
           // Intiate the rubber banding!
-          if(!p_customRubberBand) {
-            p_customRubberBand = new QRubberBand(QRubberBand::Rectangle,
+          if(!m_customRubberBand) {
+            m_customRubberBand = new QRubberBand(QRubberBand::Rectangle,
                                                  getView());
           }
 
-          if(!p_rubberBandOrigin) {
-            p_rubberBandOrigin = new QPoint;
+          if(!m_rubberBandOrigin) {
+            m_rubberBandOrigin = new QPoint;
           }
 
-          *p_rubberBandOrigin = getView()->mapFromScene(
+          *m_rubberBandOrigin = getView()->mapFromScene(
               ((QGraphicsSceneMouseEvent *)event)->scenePos());
-          p_customRubberBand->setGeometry(QRect(*p_rubberBandOrigin, QSize()));
-          p_customRubberBand->show();
+          m_customRubberBand->setGeometry(QRect(*m_rubberBandOrigin, QSize()));
+          m_customRubberBand->show();
         }
 
         emit mouseButtonPress(
@@ -706,22 +708,22 @@ namespace Isis {
 
       case QMouseEvent::GraphicsSceneMouseRelease: {
         bool signalEmitted = false;
-        if(p_customRubberBandEnabled && p_rubberBandOrigin &&
-           p_customRubberBand) {
-          if(p_customRubberBand->geometry().width() +
-             p_customRubberBand->geometry().height() > 10) {
+        if(m_customRubberBandEnabled && m_rubberBandOrigin &&
+           m_customRubberBand) {
+          if(m_customRubberBand->geometry().width() +
+             m_customRubberBand->geometry().height() > 10) {
             emit rubberBandComplete(
                 getView()->mapToScene(
-                    p_customRubberBand->geometry()).boundingRect(),
+                    m_customRubberBand->geometry()).boundingRect(),
                 ((QGraphicsSceneMouseEvent *)event)->button());
             signalEmitted = true;
           }
 
-          delete p_rubberBandOrigin;
-          p_rubberBandOrigin = NULL;
+          delete m_rubberBandOrigin;
+          m_rubberBandOrigin = NULL;
 
-          delete p_customRubberBand;
-          p_customRubberBand = NULL;
+          delete m_customRubberBand;
+          m_customRubberBand = NULL;
         }
 
         if(!signalEmitted) {
@@ -740,15 +742,15 @@ namespace Isis {
         break;
 
       case QMouseEvent::GraphicsSceneMouseMove:
-        if(p_customRubberBandEnabled && p_rubberBandOrigin &&
-           p_customRubberBand) {
+        if(m_customRubberBandEnabled && m_rubberBandOrigin &&
+           m_customRubberBand) {
           QPointF scenePos = ((QGraphicsSceneMouseEvent *)event)->scenePos();
           QPoint screenPos = getView()->mapFromScene(scenePos);
 
           QRect rubberBandRect =
-              QRect(*p_rubberBandOrigin, screenPos).normalized();
+              QRect(*m_rubberBandOrigin, screenPos).normalized();
 
-          p_customRubberBand->setGeometry(rubberBandRect);
+          m_customRubberBand->setGeometry(rubberBandRect);
         }
         else {
           stopProcessingEvent = false;
@@ -816,41 +818,41 @@ namespace Isis {
    *
    */
   void MosaicSceneWidget::reprojectItems() {
-    if(p_mosaicSceneItems->size() == 0)
+    if(m_mosaicSceneItems->size() == 0)
       return;
 
-    if(p_userToolControl)
-      p_progress->setText("Reprojecting primary scene");
+    if(m_userToolControl)
+      m_progress->setText("Reprojecting primary scene");
     else
-      p_progress->setText("Reprojecting secondary scene");
+      m_progress->setText("Reprojecting secondary scene");
 
     // This gives some pretty graphics as thing work
-    const int reprojectsPerUpdate = qMax(1, p_mosaicSceneItems->size() / 20);
+    const int reprojectsPerUpdate = qMax(1, m_mosaicSceneItems->size() / 20);
 
-    p_progress->setRange(0,
-        (p_mosaicSceneItems->size() - 1) / reprojectsPerUpdate + 1);
-    p_progress->setValue(0);
-    p_progress->setVisible(true);
+    m_progress->setRange(0,
+        (m_mosaicSceneItems->size() - 1) / reprojectsPerUpdate + 1);
+    m_progress->setValue(0);
+    m_progress->setVisible(true);
 
     MosaicSceneItem *mosaicSceneItem;
 
     int progressCountdown = reprojectsPerUpdate;
-    foreach(mosaicSceneItem, *p_mosaicSceneItems) {
+    foreach(mosaicSceneItem, *m_mosaicSceneItems) {
       mosaicSceneItem->reproject();
 
       progressCountdown --;
       if(progressCountdown == 0) {
-        p_progress->setValue(p_progress->value() + 1);
+        m_progress->setValue(m_progress->value() + 1);
         progressCountdown = reprojectsPerUpdate;
         refit();
       }
     }
 
-    p_progress->setValue(p_progress->maximum());
+    m_progress->setValue(m_progress->maximum());
 
     recalcSceneRect();
     refit();
-    p_progress->setVisible(false);
+    m_progress->setVisible(false);
   }
 
 
@@ -862,7 +864,7 @@ namespace Isis {
       qreal newZValue = nextDown->zValue() - 1;
 
       MosaicSceneItem *mosaicSceneItem;
-      foreach(mosaicSceneItem, *p_mosaicSceneItems) {
+      foreach(mosaicSceneItem, *m_mosaicSceneItems) {
         if(mosaicSceneItem->zValue() <= newZValue) {
           mosaicSceneItem->setZValue(mosaicSceneItem->zValue() - 1);
         }
@@ -896,7 +898,7 @@ namespace Isis {
       qreal newZValue = nextUp->zValue() + 1;
 
       MosaicSceneItem *mosaicSceneItem;
-      foreach(mosaicSceneItem, *p_mosaicSceneItems) {
+      foreach(mosaicSceneItem, *m_mosaicSceneItems) {
         if(mosaicSceneItem->zValue() >= newZValue) {
           mosaicSceneItem->setZValue(mosaicSceneItem->zValue() + 1);
         }
@@ -920,7 +922,7 @@ namespace Isis {
 
 
   void MosaicSceneWidget::fitInView() {
-    if(p_userToolControl) {
+    if(m_userToolControl) {
       CubeDisplayProperties *cube = (CubeDisplayProperties *)sender();
       MosaicSceneItem *item = cubeToMosaic(cube);
       QRectF boundingBox = item->boundingRect();
@@ -942,7 +944,7 @@ namespace Isis {
 
   void MosaicSceneWidget::onSelectionChanged() {
     MosaicSceneItem *mosaicSceneItem;
-    foreach(mosaicSceneItem, *p_mosaicSceneItems) {
+    foreach(mosaicSceneItem, *m_mosaicSceneItems) {
       mosaicSceneItem->updateSelection(true);
     }
   }
@@ -956,7 +958,7 @@ namespace Isis {
 
     QMap<qreal, bool> zvals;
 
-    foreach(mosaicSceneItem, *p_mosaicSceneItems) {
+    foreach(mosaicSceneItem, *m_mosaicSceneItems) {
       if(mosaicSceneItem != item &&
          mosaicSceneItem->boundingRect().intersects(item->boundingRect())) {
         // Does this item qualify as above or below at all?
@@ -988,7 +990,7 @@ namespace Isis {
   MosaicSceneItem *MosaicSceneWidget::cubeToMosaic(
       CubeDisplayProperties *cubeDisplay) {
     MosaicSceneItem *mosaicSceneItem;
-    foreach(mosaicSceneItem, *p_mosaicSceneItems) {
+    foreach(mosaicSceneItem, *m_mosaicSceneItems) {
       if(mosaicSceneItem->cubeDisplay() == cubeDisplay)
         return mosaicSceneItem;
     }
@@ -1002,7 +1004,7 @@ namespace Isis {
     QStringList cubes;
 
     MosaicSceneItem *mosaicSceneItem;
-    foreach(mosaicSceneItem, *p_mosaicSceneItems) {
+    foreach(mosaicSceneItem, *m_mosaicSceneItems) {
       if(mosaicSceneItem->cubeDisplay())
         cubes.append(mosaicSceneItem->cubeDisplay()->fileName());
     }
@@ -1015,7 +1017,7 @@ namespace Isis {
     QList<CubeDisplayProperties *> displays;
 
     MosaicSceneItem *mosaicSceneItem;
-    foreach(mosaicSceneItem, *p_mosaicSceneItems) {
+    foreach(mosaicSceneItem, *m_mosaicSceneItems) {
       if(mosaicSceneItem->cubeDisplay())
         displays.append(mosaicSceneItem->cubeDisplay());
     }

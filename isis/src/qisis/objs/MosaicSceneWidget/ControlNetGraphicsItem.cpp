@@ -26,11 +26,11 @@ using namespace std;
 namespace Isis {
   ControlNetGraphicsItem::ControlNetGraphicsItem(ControlNet *controlNet,
        MosaicSceneWidget *mosaicScene) : QGraphicsObject() {
-    p_controlNet = controlNet;
-    p_mosaicScene = mosaicScene;
-    p_pointToScene = new QMap<ControlPoint *, QPair<QPointF, QPointF> >;
-    p_cubeToGroundMap = new QMap<QString, UniversalGroundMap *>;
-    p_serialNumbers = NULL;
+    m_controlNet = controlNet;
+    m_mosaicScene = mosaicScene;
+    m_pointToScene = new QMap<ControlPoint *, QPair<QPointF, QPointF> >;
+    m_cubeToGroundMap = new QMap<QString, UniversalGroundMap *>;
+    m_serialNumbers = NULL;
     mosaicScene->getScene()->addItem(this);
 
     buildChildren();
@@ -45,13 +45,13 @@ namespace Isis {
 
 
   ControlNetGraphicsItem::~ControlNetGraphicsItem() {
-    if(p_pointToScene) {
-      delete p_pointToScene;
-      p_pointToScene = NULL;
+    if(m_pointToScene) {
+      delete m_pointToScene;
+      m_pointToScene = NULL;
     }
 
-    if(p_cubeToGroundMap) {
-      QMapIterator<QString, UniversalGroundMap *> it(*p_cubeToGroundMap);
+    if(m_cubeToGroundMap) {
+      QMapIterator<QString, UniversalGroundMap *> it(*m_cubeToGroundMap);
 
       while(it.hasNext()) {
         it.next();
@@ -60,8 +60,8 @@ namespace Isis {
           delete it.value();
       }
 
-      delete p_cubeToGroundMap;
-      p_cubeToGroundMap = NULL;
+      delete m_cubeToGroundMap;
+      m_cubeToGroundMap = NULL;
     }
   }
 
@@ -78,12 +78,12 @@ namespace Isis {
 
   QPair<QPointF, QPointF> ControlNetGraphicsItem::pointToScene(ControlPoint *cp)
       {
-    Projection *proj = p_mosaicScene->getProjection();
+    Projection *proj = m_mosaicScene->getProjection();
 
     QPointF initial;
     QPointF adjusted;
 
-    QPair<QPointF, QPointF> rememberedLoc = (*p_pointToScene)[cp];
+    QPair<QPointF, QPointF> rememberedLoc = (*m_pointToScene)[cp];
 
     if(!rememberedLoc.second.isNull()) {
       proj->SetUniversalGround(rememberedLoc.second.y(),
@@ -124,17 +124,17 @@ namespace Isis {
           QString filename = snToFilename(sn);
 
           if(filename.size() > 0) {
-            if((*p_cubeToGroundMap)[filename] == NULL) {
+            if((*m_cubeToGroundMap)[filename] == NULL) {
               Pvl label(Filename(filename.toStdString()).Expanded());
               UniversalGroundMap *groundMap = new UniversalGroundMap(label);
-              (*p_cubeToGroundMap)[filename] = groundMap;
+              (*m_cubeToGroundMap)[filename] = groundMap;
             }
 
-            if((*p_cubeToGroundMap)[filename]->SetImage(
+            if((*m_cubeToGroundMap)[filename]->SetImage(
                   cp->GetRefMeasure()->GetSample(),
                   cp->GetRefMeasure()->GetLine())) {
-              double lat = (*p_cubeToGroundMap)[filename]->UniversalLatitude();
-              double lon = (*p_cubeToGroundMap)[filename]->UniversalLongitude();
+              double lat = (*m_cubeToGroundMap)[filename]->UniversalLatitude();
+              double lon = (*m_cubeToGroundMap)[filename]->UniversalLongitude();
 
               if(proj->SetUniversalGround(lat, lon))
                 initial = QPointF(proj->XCoord(), -1 * proj->YCoord());
@@ -156,7 +156,7 @@ namespace Isis {
       result.second = initial;
     }
 
-    (*p_pointToScene)[cp] = result;
+    (*m_pointToScene)[cp] = result;
 
     return result;
   }
@@ -165,10 +165,10 @@ namespace Isis {
   QString ControlNetGraphicsItem::snToFilename(QString sn) {
     QString result;
 
-    if(p_serialNumbers && p_serialNumbers->Size()) {
+    if(m_serialNumbers && m_serialNumbers->Size()) {
       try {
         result = QString::fromStdString(
-            p_serialNumbers->Filename(sn.toStdString()));
+            m_serialNumbers->Filename(sn.toStdString()));
       }
       catch(iException &e) {
         e.Clear();
@@ -179,10 +179,21 @@ namespace Isis {
   }
 
 
-  void ControlNetGraphicsItem::buildChildren() {
-    bool wasVisible = isVisible();
-    setVisible(false);
+  void ControlNetGraphicsItem::setArrowsVisible(bool visible) {
+    QList<QGraphicsItem *> children = childItems();
+    QGraphicsItem *child;
+    foreach(child, children) {
+      ((ControlPointGraphicsItem *)child)->setArrowVisible(visible);
+    }
+  }
 
+
+  /**
+   * Call this to re-calculate where control points ought to lie.
+   *
+   * This creates a new cube list and re-projects everything
+   */
+  void ControlNetGraphicsItem::buildChildren() {
     QList<QGraphicsItem *> children = childItems();
     QGraphicsItem *child;
     foreach(child, children) {
@@ -193,44 +204,42 @@ namespace Isis {
       child = NULL;
     }
 
-    if(p_controlNet) {
-      const int numCp = p_controlNet->GetNumPoints();
+    if(m_controlNet) {
+      const int numCp = m_controlNet->GetNumPoints();
 
-      if(p_serialNumbers) {
-        delete p_serialNumbers;
+      if(m_serialNumbers) {
+        delete m_serialNumbers;
       }
 
-      p_serialNumbers = new SerialNumberList;
+      m_serialNumbers = new SerialNumberList;
 
-      QStringList cubeFiles(p_mosaicScene->cubeFilenames());
+      QStringList cubeFiles(m_mosaicScene->cubeFilenames());
 
       QString filename;
       foreach(filename, cubeFiles) {
-        p_serialNumbers->Add(filename.toStdString());
+        m_serialNumbers->Add(filename.toStdString());
       }
 
-      ProgressBar *p = (ProgressBar *)p_mosaicScene->getProgress();
+      ProgressBar *p = (ProgressBar *)m_mosaicScene->getProgress();
       p->setText("Calculating CP Locations");
       p->setRange(0, numCp - 1);
       p->setValue(0);
       p->setVisible(true);
 
       for(int cpIndex = 0; cpIndex < numCp; cpIndex ++) {
-        ControlPoint *cp = p_controlNet->GetPoint(cpIndex);
+        ControlPoint *cp = m_controlNet->GetPoint(cpIndex);
 
-        // Apriori/Camera, Adjusted
+        // Initial, Final
         QPair<QPointF, QPointF> scenePoints = pointToScene(cp);
 
         new ControlPointGraphicsItem( scenePoints.second, scenePoints.first,
-            cp, p_serialNumbers, p_mosaicScene, this);
+            cp, m_serialNumbers, m_mosaicScene, this);
 
         p->setValue(cpIndex);
       }
 
       p->setVisible(false);
     }
-
-    setVisible(wasVisible);
   }
 }
 

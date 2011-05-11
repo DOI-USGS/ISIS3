@@ -22,55 +22,66 @@ namespace Isis {
    */
   MosaicControlNetTool::MosaicControlNetTool(MosaicSceneWidget *scene) :
       MosaicTool(scene) {
-    p_controlNet = NULL;
-    p_controlNetGraphics = NULL;
-    p_loadControlNetButton = NULL;
-    p_displayControlNetButton = NULL;
-    p_displayConnectivity = NULL;
-    p_closeNetwork = NULL;
+    m_controlNet = NULL;
+    m_controlNetGraphics = NULL;
+    m_loadControlNetButton = NULL;
+    m_displayControlNetButton = NULL;
+    m_displayConnectivity = NULL;
+    m_closeNetwork = NULL;
 
     // Create the action buttons
-    p_loadControlNetButton = new QPushButton();
-    p_loadControlNetButton->setIcon(getIcon("HILLBLU_molecola.png"));
-    connect(p_loadControlNetButton, SIGNAL(clicked()), this, SLOT(openControlNet()));
-    connect(p_loadControlNetButton, SIGNAL(destroyed(QObject *)),
+    m_loadControlNetButton = new QPushButton();
+    m_loadControlNetButton->setIcon(getIcon("HILLBLU_molecola.png"));
+    connect(m_loadControlNetButton, SIGNAL(clicked()), this, SLOT(openControlNet()));
+    connect(m_loadControlNetButton, SIGNAL(destroyed(QObject *)),
             this, SLOT(objectDestroyed(QObject *)));
 
-    p_displayControlNetButton = new QPushButton("Display");
-    p_displayControlNetButton->setCheckable(true);
-    p_displayControlNetButton->setEnabled(false);
-    connect(p_displayControlNetButton, SIGNAL(clicked()), this, SLOT(displayControlNet()));
-    connect(p_displayControlNetButton, SIGNAL(destroyed(QObject *)),
+    m_displayControlNetButton = new QPushButton("Display");
+    m_displayControlNetButton->setCheckable(true);
+    m_displayControlNetButton->setEnabled(false);
+    connect(m_displayControlNetButton, SIGNAL(clicked()), this, SLOT(displayControlNet()));
+    connect(m_displayControlNetButton, SIGNAL(destroyed(QObject *)),
             this, SLOT(objectDestroyed(QObject *)));
 
-    p_displayConnectivity = new QPushButton("Color Connectivity");
-    connect(p_displayConnectivity, SIGNAL(clicked()), this, SLOT(displayConnectivity()));
-    connect(p_displayConnectivity, SIGNAL(destroyed(QObject *)),
+    m_displayConnectivity = new QPushButton("Color Connectivity");
+    connect(m_displayConnectivity, SIGNAL(clicked()), this, SLOT(displayConnectivity()));
+    connect(m_displayConnectivity, SIGNAL(destroyed(QObject *)),
             this, SLOT(objectDestroyed(QObject *)));
-    p_displayConnectivity->setEnabled(false);
+    m_displayConnectivity->setEnabled(false);
 
-    p_closeNetwork = new QPushButton("Close Network");
-    p_closeNetwork->setEnabled(false);
-    connect(p_closeNetwork, SIGNAL(clicked()), this, SLOT(closeNetwork()));
-    connect(p_closeNetwork, SIGNAL(destroyed(QObject *)),
+    m_displayArrows = new QPushButton("Show Movement");
+    m_displayArrows->setCheckable(true);
+    m_displayArrows->setChecked(false);
+    connect(m_displayArrows, SIGNAL(clicked()), this, SLOT(displayArrows()));
+    connect(m_displayArrows, SIGNAL(destroyed(QObject *)),
+            this, SLOT(objectDestroyed(QObject *)));
+    m_displayArrows->setEnabled(false);
+
+    m_closeNetwork = new QPushButton("Close Network");
+    m_closeNetwork->setEnabled(false);
+    connect(m_closeNetwork, SIGNAL(clicked()), this, SLOT(closeNetwork()));
+    connect(m_closeNetwork, SIGNAL(destroyed(QObject *)),
             this, SLOT(objectDestroyed(QObject *)));
   }
 
 
   MosaicControlNetTool::~MosaicControlNetTool() {
-    p_controlNetGraphics = NULL; // the scene cleans/cleaned this up
+    m_controlNetGraphics = NULL; // the scene cleans/cleaned this up
 
-    if(p_loadControlNetButton)
-      delete p_loadControlNetButton;
+    if(m_loadControlNetButton)
+      delete m_loadControlNetButton;
 
-    if(p_displayControlNetButton)
-      delete p_displayControlNetButton;
+    if(m_displayControlNetButton)
+      delete m_displayControlNetButton;
 
-    if(p_displayConnectivity)
-      delete p_displayConnectivity;
+    if(m_displayConnectivity)
+      delete m_displayConnectivity;
 
-    if(p_closeNetwork)
-      delete p_closeNetwork;
+    if(m_displayArrows)
+      delete m_displayArrows;
+
+    if(m_closeNetwork)
+      delete m_closeNetwork;
 
     closeNetwork();
   }
@@ -78,8 +89,8 @@ namespace Isis {
 
   CubeDisplayProperties *MosaicControlNetTool::takeDisplay(
       QString sn, QList<CubeDisplayProperties *> &displays) {
-    if(p_controlNet && p_controlNetGraphics) {
-      QString filename = p_controlNetGraphics->snToFilename(sn);
+    if(m_controlNet && m_controlNetGraphics) {
+      QString filename = m_controlNetGraphics->snToFilename(sn);
 
       for(int i = 0; i < displays.size(); i++) {
         CubeDisplayProperties *display = displays[i];
@@ -97,23 +108,23 @@ namespace Isis {
   PvlObject MosaicControlNetTool::toPvl() const {
     PvlObject obj(projectPvlObjectName());
 
-    obj += PvlKeyword("Filename", p_controlNetFile);
+    obj += PvlKeyword("Filename", m_controlNetFile);
     obj += PvlKeyword("Visible",
-        p_controlNetGraphics && p_controlNetGraphics->isVisible());
+        m_controlNetGraphics && m_controlNetGraphics->isVisible());
 
     return obj;
   }
 
 
   void MosaicControlNetTool::fromPvl(PvlObject &obj) {
-    p_controlNetFile = QString::fromStdString(obj["Filename"][0]);
-    if(p_controlNetFile == "Null")
-      p_controlNetFile = "";
+    m_controlNetFile = QString::fromStdString(obj["Filename"][0]);
+    if(m_controlNetFile == "Null")
+      m_controlNetFile = "";
 
     loadNetwork();
 
-    if(p_controlNetGraphics && p_displayControlNetButton) {
-      p_displayControlNetButton->setChecked( (int)obj["Visible"][0] );
+    if(m_controlNetGraphics && m_displayControlNetButton) {
+      m_displayControlNetButton->setChecked( (int)obj["Visible"][0] );
       displayControlNet();
     }
   }
@@ -147,17 +158,20 @@ namespace Isis {
   QWidget *MosaicControlNetTool::getToolBarWidget() {
     // Put the buttons in a horizontal orientation
     QHBoxLayout *actionLayout = new QHBoxLayout();
-    if(p_loadControlNetButton)
-      actionLayout->addWidget(p_loadControlNetButton);
+    if(m_loadControlNetButton)
+      actionLayout->addWidget(m_loadControlNetButton);
 
-    if(p_displayControlNetButton)
-      actionLayout->addWidget(p_displayControlNetButton);
+    if(m_displayControlNetButton)
+      actionLayout->addWidget(m_displayControlNetButton);
 
-    if(p_displayConnectivity)
-      actionLayout->addWidget(p_displayConnectivity);
+    if(m_displayConnectivity)
+      actionLayout->addWidget(m_displayConnectivity);
 
-    if(p_closeNetwork)
-      actionLayout->addWidget(p_closeNetwork);
+    if(m_displayArrows)
+      actionLayout->addWidget(m_displayArrows);
+
+    if(m_closeNetwork)
+      actionLayout->addWidget(m_closeNetwork);
 
     actionLayout->setMargin(0);
 
@@ -172,8 +186,19 @@ namespace Isis {
    * This slot opens and reopens this tool properly
    */
   void MosaicControlNetTool::updateTool() {
-    if(isActive() && p_controlNetFile == "")
+    if(isActive() && m_controlNetFile == "") {
       openControlNet();
+    }
+  }
+
+
+  /**
+   * The user toggled the cnet visibility - re-sync the graphics item visibility
+   *   with the action.
+   */
+  void MosaicControlNetTool::displayArrows() {
+    if(m_controlNetGraphics && m_displayArrows)
+      m_controlNetGraphics->setArrowsVisible(m_displayArrows->isChecked());
   }
 
 
@@ -182,13 +207,13 @@ namespace Isis {
    *
    */
   void MosaicControlNetTool::displayConnectivity() {
-    if(p_controlNet) {
+    if(m_controlNet) {
       QList<CubeDisplayProperties *> displays = getWidget()->cubeDisplays();
 
       QList<QColor> colorsUsed;
 
       QList< QList<QString> > serialConns =
-          p_controlNet->GetSerialConnections();
+          m_controlNet->GetSerialConnections();
 
       QList<QString> island;
       foreach(island, serialConns) {
@@ -223,45 +248,60 @@ namespace Isis {
   }
 
 
+  /**
+   * Close the open network, if one is open. m_controlNetFile is set to an
+   *   empty string.
+   */
   void MosaicControlNetTool::closeNetwork() {
-    if(p_controlNetGraphics) {
-      getWidget()->getScene()->removeItem(p_controlNetGraphics);
+    if(m_controlNetGraphics) {
+      getWidget()->getScene()->removeItem(m_controlNetGraphics);
 
-      delete p_controlNetGraphics;
+      delete m_controlNetGraphics;
     }
 
-    if(p_controlNet) {
-      delete p_controlNet;
-      p_controlNet = NULL;
+    if(m_controlNet) {
+      delete m_controlNet;
+      m_controlNet = NULL;
     }
 
-    if(p_displayControlNetButton)
-      p_displayControlNetButton->setChecked(false);
+    if(m_displayControlNetButton)
+      m_displayControlNetButton->setChecked(false);
 
-    if(p_displayControlNetButton)
-      p_displayControlNetButton->setEnabled(false);
+    if(m_displayControlNetButton)
+      m_displayControlNetButton->setEnabled(false);
 
-    if(p_displayConnectivity)
-      p_displayConnectivity->setEnabled(false);
+    if(m_displayConnectivity)
+      m_displayConnectivity->setEnabled(false);
 
-    if(p_closeNetwork)
-      p_closeNetwork->setEnabled(false);
+    if(m_displayArrows)
+      m_displayArrows->setChecked(false);
 
-    p_controlNetFile = "";
+    if(m_displayArrows)
+      m_displayArrows->setEnabled(false);
+
+    if(m_closeNetwork)
+      m_closeNetwork->setEnabled(false);
+
+    m_controlNetFile = "";
   }
 
 
+  /**
+   * An object was destroyed, NULL it out.
+   */
   void MosaicControlNetTool::objectDestroyed(QObject *obj) {
-    if(obj == p_loadControlNetButton)
-      p_loadControlNetButton = NULL;
-    else if(obj == p_displayControlNetButton)
-      p_displayControlNetButton = NULL;
-    else if(obj == p_displayConnectivity)
-      p_displayConnectivity = NULL;
-    else if(obj == p_closeNetwork)
-      p_closeNetwork = NULL;
-    else if(obj == p_controlNetGraphics)
-      p_controlNetGraphics = NULL;
+    if(obj == m_loadControlNetButton)
+      m_loadControlNetButton = NULL;
+    else if(obj == m_displayControlNetButton)
+      m_displayControlNetButton = NULL;
+    else if(obj == m_displayConnectivity)
+      m_displayConnectivity = NULL;
+    else if(obj == m_closeNetwork)
+      m_closeNetwork = NULL;
+    else if(obj == m_controlNetGraphics)
+      m_controlNetGraphics = NULL;
+    else if(obj == m_displayArrows)
+      m_displayArrows = NULL;
   }
 
 
@@ -283,26 +323,30 @@ namespace Isis {
     //---------------------------------------------------------------
     if(!netFile.isEmpty()) {
       Filename controlNetFile(netFile.toStdString());
-      p_controlNetFile = QString::fromStdString(controlNetFile.Expanded());
+      m_controlNetFile = QString::fromStdString(controlNetFile.Expanded());
       loadNetwork();
 
-      if(p_displayControlNetButton)
-        p_displayControlNetButton->setChecked(true);
+      if(m_displayControlNetButton)
+        m_displayControlNetButton->setChecked(true);
     }
   }
 
 
+  /**
+   * Load m_controlNetFile into memory - this will re-load the network if it's
+   *   already open.
+   */
   void MosaicControlNetTool::loadNetwork() {
-    QString netFile = p_controlNetFile;
+    QString netFile = m_controlNetFile;
     closeNetwork();
-    p_controlNetFile = netFile;
+    m_controlNetFile = netFile;
 
-    if(p_controlNetFile.size() > 0) {
+    if(m_controlNetFile.size() > 0) {
       try {
-        p_controlNet = new ControlNet(p_controlNetFile.toStdString());
-        p_controlNetGraphics = new ControlNetGraphicsItem(p_controlNet,
+        m_controlNet = new ControlNet(m_controlNetFile.toStdString());
+        m_controlNetGraphics = new ControlNetGraphicsItem(m_controlNet,
             getWidget());
-        connect(p_controlNetGraphics, SIGNAL(destroyed(QObject *)),
+        connect(m_controlNetGraphics, SIGNAL(destroyed(QObject *)),
                 this, SLOT(objectDestroyed(QObject *)));
       }
       catch(iException &e) {
@@ -314,21 +358,28 @@ namespace Isis {
         return;
       }
 
-      if(p_displayControlNetButton)
-        p_displayControlNetButton->setEnabled(true);
+      if(m_displayControlNetButton)
+        m_displayControlNetButton->setEnabled(true);
 
-      if(p_displayConnectivity)
-        p_displayConnectivity->setEnabled(true);
+      if(m_displayConnectivity)
+        m_displayConnectivity->setEnabled(true);
 
-      if(p_closeNetwork)
-        p_closeNetwork->setEnabled(true);
+      if(m_displayArrows)
+        m_displayArrows->setEnabled(true);
+
+      if(m_closeNetwork)
+        m_closeNetwork->setEnabled(true);
     }
   }
 
 
+  /**
+   * The user toggled the cnet visibility - re-sync the graphics item visibility
+   *   with the action.
+   */
   void MosaicControlNetTool::displayControlNet() {
-    if(p_controlNetGraphics && p_displayControlNetButton)
-      p_controlNetGraphics->setVisible(p_displayControlNetButton->isChecked());
+    if(m_controlNetGraphics && m_displayControlNetButton)
+      m_controlNetGraphics->setVisible(m_displayControlNetButton->isChecked());
   }
 }
 

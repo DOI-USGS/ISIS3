@@ -23,7 +23,7 @@ namespace Isis {
    *            control net loading
    *   @history 2010-05-07 Steven Lambright - Refactored.
    *   @history 2010-05-10 Steven Lambright - Reduced useless code, open cnet
-   *            button is now always available.
+   *            button is now always enabled.
    */
   class MosaicControlNetTool : public MosaicTool {
       Q_OBJECT
@@ -47,8 +47,9 @@ namespace Isis {
     protected slots:
       void updateTool();
       void openControlNet();
-      void displayControlNet();
+      void displayArrows();
       void displayConnectivity();
+      void displayControlNet();
       void closeNetwork();
 
     private slots:
@@ -61,14 +62,15 @@ namespace Isis {
       CubeDisplayProperties *
           takeDisplay(QString sn, QList< CubeDisplayProperties *> &displays);
 
-      QPushButton *p_loadControlNetButton;
-      QPushButton *p_displayControlNetButton;
-      QPushButton *p_displayConnectivity;
-      QPushButton *p_closeNetwork;
-      QAction *p_connectivity;
-      ControlNet *p_controlNet;
-      ControlNetGraphicsItem *p_controlNetGraphics;
-      QString p_controlNetFile;
+      QPushButton *m_loadControlNetButton;
+      QPushButton *m_displayControlNetButton;
+      QPushButton *m_displayConnectivity;
+      QPushButton *m_displayArrows;
+      QPushButton *m_closeNetwork;
+      QAction *m_connectivity;
+      ControlNet *m_controlNet;
+      ControlNetGraphicsItem *m_controlNetGraphics;
+      QString m_controlNetFile;
   };
 };
 

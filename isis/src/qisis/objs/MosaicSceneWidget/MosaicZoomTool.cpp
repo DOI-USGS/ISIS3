@@ -229,6 +229,9 @@ namespace Isis {
     QPointF point2 = matrix.map(QPointF(smallerDimension, 0));
 
     // If the factor cannot be done, find the one that can
+    //   This max zoom in factor isn't right; I haven't found the number
+    //   that corresponds to the Qt bug(?) causing us to not pan correctly on
+    //   the zoom in.
     if((point2.x() - point1.x()) < 1) {
       QMatrix origMatrix = getWidget()->getView()->matrix();
       factor = smallerDimension / (origMatrix.m11() * 1.0);

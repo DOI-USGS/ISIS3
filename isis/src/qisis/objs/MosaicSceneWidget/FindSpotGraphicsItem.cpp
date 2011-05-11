@@ -13,8 +13,8 @@ using namespace std;
 namespace Isis {
   FindSpotGraphicsItem::FindSpotGraphicsItem(QPointF center,
                            MosaicSceneWidget *boundingRectSrc) {
-    p_centerPoint = new QPointF(center);
-    p_mosaicScene = boundingRectSrc;
+    m_centerPoint = new QPointF(center);
+    m_mosaicScene = boundingRectSrc;
     setZValue(DBL_MAX);
 
     setPen(Qt::NoPen);
@@ -24,9 +24,9 @@ namespace Isis {
 
 
   FindSpotGraphicsItem::~FindSpotGraphicsItem() {
-    if(p_centerPoint) {
-      delete p_centerPoint;
-      p_centerPoint = NULL;
+    if(m_centerPoint) {
+      delete m_centerPoint;
+      m_centerPoint = NULL;
     }
   }
 
@@ -45,16 +45,16 @@ namespace Isis {
   QRectF FindSpotGraphicsItem::calcRect() const {
     QRectF findRect;
 
-    if(!p_centerPoint->isNull()) {
+    if(!m_centerPoint->isNull()) {
       static const int size = 8;
       QPoint findSpotScreen =
-          p_mosaicScene->getView()->mapFromScene(*p_centerPoint);
+          m_mosaicScene->getView()->mapFromScene(*m_centerPoint);
       QPoint findSpotTopLeftScreen =
           findSpotScreen - QPoint(size / 2, size / 2);
 
       QRect findRectScreen(findSpotTopLeftScreen, QSize(size, size));
       findRect =
-          p_mosaicScene->getView()->mapToScene(findRectScreen).boundingRect();
+          m_mosaicScene->getView()->mapToScene(findRectScreen).boundingRect();
     }
 
     return findRect;

@@ -35,18 +35,25 @@ namespace Isis {
       void paint(QPainter *, const QStyleOptionGraphicsItem *,
                  QWidget * widget = 0);
 
+      void setArrowVisible(bool visible) {
+        m_showArrow = visible;
+        setRect(calcRect());
+      }
+
     protected:
       void contextMenuEvent(QGraphicsSceneContextMenuEvent * event);
 
     private:
       QRectF calcRect() const;
       QRectF calcCrosshairRect() const;
+      QPolygonF calcArrowHead() const;
       QString makeToolTip(SerialNumberList *snlist);
 
-      QPointF *p_centerPoint;
-      QPointF *p_origPoint;
-      MosaicSceneWidget *p_mosaicScene;
-      ControlPoint *p_controlPoint;
+      QPointF *m_centerPoint;
+      QPointF *m_origPoint;
+      MosaicSceneWidget *m_mosaicScene;
+      ControlPoint *m_controlPoint;
+      bool m_showArrow;
   };
 }
 

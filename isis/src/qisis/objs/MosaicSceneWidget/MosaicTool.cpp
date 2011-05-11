@@ -19,7 +19,6 @@ namespace Isis {
     p_widget = scene;
 
     connect(this, SIGNAL(activated(bool)), this, SLOT(updateTool()));
-    connect(scene, SIGNAL(cubesChanged()), this, SLOT(updateTool()));
     connect(scene, SIGNAL(mouseEnter()), this, SLOT(mouseEnter()));
     connect(scene, SIGNAL(mouseLeave()), this, SLOT(mouseLeave()));
     connect(scene, SIGNAL(mouseMove(QPointF)), this, SLOT(mouseMove(QPointF)));
@@ -147,7 +146,6 @@ namespace Isis {
     }
 
     p_active = on;
-    updateTool();
 
     if(activeStateChanged)
       emit activated(p_active);

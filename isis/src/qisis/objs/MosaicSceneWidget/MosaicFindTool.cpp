@@ -154,6 +154,31 @@ namespace Isis {
   }
 
 
+  PvlObject MosaicFindTool::toPvl() const {
+    PvlObject obj(projectPvlObjectName());
+
+    obj += PvlKeyword("Latitude", p_latLineEdit->text());
+    obj += PvlKeyword("Longitude", p_lonLineEdit->text());
+    obj += PvlKeyword("Visible", (p_findSpot != NULL));
+
+    return obj;
+  }
+
+
+  void MosaicFindTool::fromPvl(PvlObject &obj) {
+    p_latLineEdit->setText(obj["Latitude"][0]);
+    p_lonLineEdit->setText(obj["Longitude"][0]);
+    if((int)obj["Visible"][0] != 0) {
+      getUserGroundPoint();
+    }
+  }
+
+
+  iString MosaicFindTool::projectPvlObjectName() const {
+    return "MosaicFindTool";
+  }
+
+
   /**
    * Creates the widget to add to the tool bar.
    *

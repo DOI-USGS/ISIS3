@@ -12,9 +12,16 @@
 class QAction;
 class QBitArray;
 
+namespace geos {
+  namespace geom {
+    class MultiPolygon;
+  }
+}
+
 namespace Isis {
   class Cube;
   class PvlObject;
+  class UniversalGroundMap;
 
   /**
    * @brief This is the GUI communication mechanism for cubes
@@ -44,6 +51,9 @@ namespace Isis {
    * @author 2011-05-05 Steven Lambright
    *
    * @internal
+   *   @history 2011-05-11 Steven Lambright - Added accessors for data that is
+   *                       complicated to get or expensive (i.e. Camera
+   *                       statistics and the footprint).
    */
   class CubeDisplayProperties : public QObject {
       Q_OBJECT
@@ -82,15 +92,30 @@ namespace Isis {
       QVariant getValue(Property prop) const;
 
       Cube *cube();
+      UniversalGroundMap *groundMap();
 
       QString displayName() const;
 
       // Use this only if you actually need the file name
       QString fileName() const {
-        return p_filename;
+        return m_filename;
       }
 
       void closeCube();
+
+      double incidenceAngle() const {
+        return m_incidenceAngle;
+      }
+
+      double emissionAngle() const {
+        return m_emissionAngle;
+      }
+
+      double resolution() const {
+        return m_resolution;
+      }
+
+      geos::geom::MultiPolygon *footprint();
 
       PvlObject toPvl() const;
 
@@ -148,29 +173,37 @@ namespace Isis {
       void setValue(Property prop, QVariant value);
       static QList<Isis::CubeDisplayProperties *> senderToData(QObject *sender);
 
+      void createManualFootprint();
+
       /**
        * This indicated whether any widgets with this CubeDisplayProperties
        *   is using a particulat property. This helps others who can set
        *   but not display know whether they should give the option to set.
        */
-      QBitArray *p_propertyUsed;
+      QBitArray *m_propertyUsed;
 
       /**
        * This is a map from Property to value -- the reason I use an int is
        *   so Qt knows how to serialize this QMap into binary data
        */
-      QMap<int, QVariant> *p_propertyValues;
+      QMap<int, QVariant> *m_propertyValues;
 
       /**
        * This is the filename of the input cube
        */
-      QString p_filename;
+      QString m_filename;
 
       /**
        * This is an optionally allocated version of the cube; typically present
        *   only during the loading phase.
        */
-      Cube *p_cube;
+      Cube *m_cube;
+
+      UniversalGroundMap *m_gMap;
+      geos::geom::MultiPolygon *m_footprint;
+      double m_incidenceAngle;
+      double m_resolution;
+      double m_emissionAngle;
   };
 }
 

@@ -51,19 +51,19 @@ namespace Isis {
       virtual ~MosaicSceneWidget();
 
       MosaicGraphicsView *getView() const {
-        return p_graphicsView;
+        return m_graphicsView;
       }
 
       QGraphicsScene *getScene() const {
-        return p_graphicsScene;
+        return m_graphicsScene;
       }
 
       Projection *getProjection() const {
-        return p_projection;
+        return m_projection;
       }
 
       QList<MosaicSceneItem *> allMosaicSceneItems() {
-        return *p_mosaicSceneItems;
+        return *m_mosaicSceneItems;
       }
 
       void addTo(QMenu *menu);
@@ -72,14 +72,14 @@ namespace Isis {
       void addTo(QToolBar *toolBar);
 
       bool cubesSelectable() const {
-        return p_cubesSelectable;
+        return m_cubesSelectable;
       }
 
       void enableRubberBand(bool);
       void blockSelectionChange(bool);
 
       bool userHasTools() const {
-        return p_userToolControl;
+        return m_userToolControl;
       }
 
       QProgressBar *getProgress();
@@ -144,24 +144,24 @@ namespace Isis {
 
       QList<CubeDisplayProperties *> getSelectedCubes() const;
 
-      bool p_cubesSelectable;
-      bool p_customRubberBandEnabled;
-      QRubberBand *p_customRubberBand;
-      QPoint *p_rubberBandOrigin;
-      QGraphicsScene *p_graphicsScene; //!< The graphics scene that makes up this widget.
-      MosaicGraphicsView *p_graphicsView; //!< The graphics view
-      Projection *p_projection; //!< The current projection type.
-      QGraphicsPolygonItem *p_projectionFootprint;
-      QList<MosaicSceneItem *> *p_mosaicSceneItems;
-      QGraphicsRectItem *p_outlineRect;
+      bool m_cubesSelectable;
+      bool m_customRubberBandEnabled;
+      QRubberBand *m_customRubberBand;
+      QPoint *m_rubberBandOrigin;
+      QGraphicsScene *m_graphicsScene; //!< The graphics scene that makes up this widget.
+      MosaicGraphicsView *m_graphicsView; //!< The graphics view
+      Projection *m_projection; //!< The current projection type.
+      QGraphicsPolygonItem *m_projectionFootprint;
+      QList<MosaicSceneItem *> *m_mosaicSceneItems;
+      QGraphicsRectItem *m_outlineRect;
 
-      QAction *p_mapAction;
+      QAction *m_mapAction;
 
-      QList<MosaicTool *> *p_tools;
-      ProgressBar *p_progress;
+      QList<MosaicTool *> *m_tools;
+      ProgressBar *m_progress;
 
-      bool p_userToolControl;
-      bool p_ownProjection;
+      bool m_userToolControl;
+      bool m_ownProjection;
   };
 }
 
