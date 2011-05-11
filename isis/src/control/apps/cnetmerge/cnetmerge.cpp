@@ -66,7 +66,7 @@ void IsisMain() {
     ControlNet sourceNet(Filename(filelist[cnetIndex]).Expanded());
 
     // Checks to make sure the ControlNets are valid to merge
-    if (destinationNet.GetTarget() != sourceNet.GetTarget()) {
+    if (destinationNet.GetTarget().DownCase() != sourceNet.GetTarget().DownCase()) {
       string msg = "Input [" + sourceNet.GetNetworkId() + "] does not target the "
           "same target as other Control Network(s)";
       throw iException::Message(iException::User, msg, _FILEINFO_);
