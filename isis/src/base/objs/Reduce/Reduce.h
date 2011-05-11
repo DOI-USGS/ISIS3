@@ -4,7 +4,7 @@
 #include "Buffer.h"
 #include "Cube.h"
 #include "iString.h"
-#include "LineManager.h"
+#include "Portal.h"
 
 #include <cmath>
 
@@ -23,10 +23,11 @@ namespace Isis {
    *
    * @internal
    *  @history 2011-04-15 Sharmila Prasad - Ported the class from "reduce" app
-   *           to base object class with added functionality to reduce only the
-   *           sub area within the input image into the output image
+   *                                        to base object class.
    *  @history 2011-05-10 Sharmila Prasad - Fixed error while setting input bands and
    *                            moved static members to data members in Average class.
+   *  @history 2011-05-11 Sharmila Prasad - Use Portal instead of LineMgr to read Line &
+   *                          added API setInputBoundary to reduce subarea of an image
    */
   class Reduce {
   public:
@@ -34,28 +35,31 @@ namespace Isis {
     Reduce(Isis::Cube *pInCube, vector<string>psBands, const double sampleScale, const double lineScale);
     
     //! Destructor
-    ~Reduce(){};
+    ~Reduce();
     
     //! Create label for the reduced output image
     Isis::PvlGroup  UpdateOutputLabel(Isis::Cube *pOutCube);
     
+    //! Parameters to input image sub area
+    void setInputBoundary(int startSample, int endSample, int startLine, int endLine);
+    
     protected:
-      Isis::Cube *mInCube; //!< Input image
-      double mdSampleScale;//!< Sample scale
-      double mdLineScale;  //!< Line scale
-      double mdStartSample;//!< Input start sample
-      double mdEndSample;  //!< Input end sample
-      double mdStartLine;  //!< Input start line
-      double mdEndLine;    //!< Input end line      
-      double mdLine;       //!< Line index
-      int miOutputSamples; //!< Output Samples
-      int miOutputLines;   //!< Output Lines
-      int miInputSamples;  //!< Input Samples
-      int miInputLines;    //!< Input Lines
-      int miInputBands;    //!< Input Bands
-      int miBandIndex;     //!< Band Index
+      Isis::Cube *mInCube;        //!< Input image
+      double mdSampleScale;       //!< Sample scale
+      double mdLineScale;         //!< Line scale
+      int miStartSample;          //!< Input start sample
+      int miEndSample;            //!< Input end sample
+      int miStartLine;            //!< Input start line
+      int miEndLine;              //!< Input end line
+      double mdLine;              //!< Line index
+      int miOutputSamples;        //!< Output Samples
+      int miOutputLines;          //!< Output Lines
+      int miInputSamples;         //!< Input Samples
+      int miInputLines;           //!< Input Lines
+      int miInputBands;           //!< Input Bands
+      int miBandIndex;            //!< Band Index
       vector<string>msBands;      //!< Bands list
-      Isis::LineManager *mLineMgr;//!< Line Manager
+      Isis::Portal *m_iPortal;    //!< Input portal
   };
   
   // Functor for reduce using near functionality
@@ -88,11 +92,11 @@ namespace Isis {
     private:
       double mdValidPer;   //!< Valid Percentage
       string msReplaceMode;//!< Replace Mode (scale/total)
-      double *sinctab;
-      double *sum;
-      double *npts;
-      double *sum2;
-      double *npts2;
+      double *mdIncTab;
+      double *mdSum;
+      double *mdNpts;
+      double *mdSum2;
+      double *mdNpts2;
   };
   
 };

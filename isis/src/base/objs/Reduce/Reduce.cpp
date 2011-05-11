@@ -24,12 +24,12 @@ namespace Isis {
     mInCube = pInCube;
     
     mdLine      = 1;
-    miBandIndex = 0;
+    miBandIndex = 1;
     // Set input image area to defaults
-    mdStartSample = 1;
-    mdEndSample   = mInCube->Samples();
-    mdStartLine   = 1;
-    mdEndLine     = mInCube->Lines();
+    miStartSample = 1;
+    miEndSample   = mInCube->Samples();
+    miStartLine   = 1;
+    miEndLine     = mInCube->Lines();
   
     miInputSamples= mInCube->Samples();
     miInputLines  = mInCube->Lines();
@@ -38,12 +38,47 @@ namespace Isis {
     // Save off the sample and mdLine magnification
     mdSampleScale = sampleScale;
     mdLineScale   = lineScale;
-    
-    mLineMgr = new LineManager(*mInCube);
-    
+
     // Calculate output size based on the sample and line scales
-    miOutputSamples = (int)ceil((double)mInCube->Samples() / mdSampleScale);
-    miOutputLines   = (int)ceil((double)mInCube->Lines() / mdLineScale);
+    miOutputSamples = (int)ceil((double)(miInputSamples) / mdSampleScale);
+    miOutputLines   = (int)ceil((double)(miInputLines) / mdLineScale);
+    
+    // Initialize the input portal
+    m_iPortal = new Isis::Portal(miInputSamples, 1, mInCube->PixelType());
+  }
+  
+  /**
+   * Destructor
+   * 
+   * @author Sharmila Prasad (5/11/2011)
+   */
+  Reduce::~Reduce(){
+    delete(m_iPortal);
+  }
+  
+  /**
+   * Parameters to input image sub area to be reduced
+   * 
+   * @author Sharmila Prasad (5/11/2011)
+   * 
+   * @param startSample - input image start sample
+   * @param endSample   - input image end sample
+   * @param startLine   - input image start line
+   * @param endLine     - input image end line
+   */
+  void Reduce::setInputBoundary(int startSample, int endSample, int startLine, int endLine){
+    miStartSample  = startSample;
+    miEndSample    = endSample;
+    miInputSamples = endSample - startSample + 1;
+
+    miStartLine  = startLine;
+    miEndLine    = endLine;
+    miInputLines = endLine - startLine + 1;
+    mdLine       = miStartLine;  
+
+    // Calculate output size based on the sample and line scales
+    miOutputSamples = (int)ceil((double)(miInputSamples) / mdSampleScale);
+    miOutputLines   = (int)ceil((double)(miInputLines) / mdLineScale);
   }
   
   /**
@@ -64,20 +99,20 @@ namespace Isis {
     // Information will be added to it if the Mapping or Instrument
     // groups are deleted from the output image label
     PvlGroup resultsGrp("Results");
-    resultsGrp += PvlKeyword("InputLines",     miInputLines);
-    resultsGrp += PvlKeyword("InputSamples",   miInputSamples);
-    resultsGrp += PvlKeyword("StartingLine",   (int)mdStartLine);
-    resultsGrp += PvlKeyword("StartingSample", (int)mdStartSample);
-    resultsGrp += PvlKeyword("EndingLine",     (int)mdEndLine);
-    resultsGrp += PvlKeyword("EndingSample",   (int)mdEndSample);
+    resultsGrp += PvlKeyword("InputLines",      miInputLines);
+    resultsGrp += PvlKeyword("InputSamples",    miInputSamples);
+    resultsGrp += PvlKeyword("StartingLine",    miStartLine);
+    resultsGrp += PvlKeyword("StartingSample",  miStartSample);
+    resultsGrp += PvlKeyword("EndingLine",      miEndLine);
+    resultsGrp += PvlKeyword("EndingSample",    miEndSample);
     resultsGrp += PvlKeyword("LineIncrement",   mdLineScale);
     resultsGrp += PvlKeyword("SampleIncrement", mdSampleScale);
     resultsGrp += PvlKeyword("OutputLines",     miOutputSamples);
     resultsGrp += PvlKeyword("OutputSamples",   miOutputLines);
    
     Isis::SubArea subArea;
-    subArea.SetSubArea(mInCube->Lines(), mInCube->Samples(), (int)mdStartLine, (int)mdStartSample, 
-                       (int)mdEndLine, (int)mdEndSample, mdLineScale, mdSampleScale);
+    subArea.SetSubArea(mInCube->Lines(), mInCube->Samples(), miStartLine, miStartSample, 
+                       miEndLine, miEndSample, mdLineScale, mdSampleScale);
     subArea.UpdateLabel(mInCube, pOutCube, resultsGrp);
     
     return resultsGrp;
@@ -94,12 +129,13 @@ namespace Isis {
   void Nearest::operator()(Isis::Buffer & out)
   {
     int readLine = (int)(mdLine + 0.5);
-    mLineMgr->SetLine(readLine, (Isis::iString::ToInteger(msBands[miBandIndex])));
-    mInCube->Read(*mLineMgr);
+
+    m_iPortal->SetPosition(miStartSample, readLine, miBandIndex);
+    mInCube->Read(*m_iPortal);
     
     // Scale down buffer
     for(int os = 0; os < miOutputSamples; os++) {
-      out[os] = (*mLineMgr)[(int)((double) os * mdSampleScale)];
+      out[os] = (*m_iPortal)[(int)((double) os * mdSampleScale)];
     }
 
     if(out.Line() == miOutputLines) {
@@ -124,48 +160,48 @@ namespace Isis {
     double rline = (double)out.Line() * mdLineScale;
 
     if(out.Line() == 1 && out.Band() == 1) {
-      sinctab = new double[miOutputSamples];
-      sum     = new double[miOutputSamples];
-      npts    = new double[miOutputSamples];
-      sum2    = new double[miOutputSamples];
-      npts2   = new double[miOutputSamples];
+      mdIncTab = new double[miOutputSamples];
+      mdSum    = new double[miOutputSamples];
+      mdNpts   = new double[miOutputSamples];
+      mdSum2   = new double[miOutputSamples];
+      mdNpts2  = new double[miOutputSamples];
 
-      //  Fill sinctab and Initialize buffers for first band
+      //  Fill mdIncTab and Initialize buffers for first band
       for(int osamp = 0; osamp < miOutputSamples; osamp++) {
-        sinctab[osamp] = ((double)osamp + 1.) * mdSampleScale;
-        sum[osamp] = 0.0;
-        npts[osamp] = 0.0;
-        sum2[osamp] = 0.0;
-        npts2[osamp] = 0.0;
+        mdIncTab[osamp] = ((double)osamp + 1.) * mdSampleScale;
+        mdSum[osamp]   = 0.0;
+        mdNpts[osamp]  = 0.0;
+        mdSum2[osamp]  = 0.0;
+        mdNpts2[osamp] = 0.0;
       }
-      sinctab[miOutputSamples-1] = miInputSamples;
+      mdIncTab[miOutputSamples-1] = miInputSamples;
     }
 
     while(mdLine <= rline) {
       if((int)mdLine <= miInputLines) {
-        mLineMgr->SetLine((int)mdLine, (iString::ToInteger(msBands[miBandIndex])));
-        mInCube->Read(*mLineMgr);
+        m_iPortal->SetPosition(miStartSample, mdLine, miBandIndex);
+        mInCube->Read(*m_iPortal);
       }
       int isamp = 1;
       for(int osamp = 0; osamp < out.size(); osamp++) {
-        while((double)isamp <= sinctab[osamp]) {
-          // If Pixel is valid add it to sum
-          if(IsValidPixel((*mLineMgr)[isamp-1])) {
-            sum[osamp] += (*mLineMgr)[isamp-1];
-            npts[osamp] += 1.0;
+        while((double)isamp <= mdIncTab[osamp]) {
+          // If Pixel is valid add it to mdSum
+          if(IsValidPixel((*m_iPortal)[isamp-1])) {
+            mdSum[osamp]  += (*m_iPortal)[isamp-1];
+            mdNpts[osamp] += 1.0;
           }
           isamp++;
         }
 
-        double sdel = (double) isamp - sinctab[osamp];
+        double sdel = (double) isamp - mdIncTab[osamp];
         if(isamp > miInputSamples) continue;
 
-        if(IsValidPixel((*mLineMgr)[isamp-1])) {
-          sum[osamp] += (*mLineMgr)[isamp-1] * (1.0 - sdel);
-          npts[osamp] += (1.0 - sdel);
+        if(IsValidPixel((*m_iPortal)[isamp-1])) {
+          mdSum[osamp]  += (*m_iPortal)[isamp-1] * (1.0 - sdel);
+          mdNpts[osamp] += (1.0 - sdel);
           if(osamp + 1 < miOutputSamples) {
-            sum[osamp+1] += (*mLineMgr)[isamp-1] * sdel;
-            npts[osamp+1] += sdel;
+            mdSum[osamp+1]  += (*m_iPortal)[isamp-1] * sdel;
+            mdNpts[osamp+1] += sdel;
           }
         }
         isamp++;
@@ -174,37 +210,37 @@ namespace Isis {
     }
 
     if(mdLine <= miInputLines) {
-      mLineMgr->SetLine((int)mdLine, (iString::ToInteger(msBands[miBandIndex])));
-      mInCube->Read(*mLineMgr);
+      m_iPortal->SetPosition(miStartSample, mdLine, miBandIndex);
+      mInCube->Read(*m_iPortal);
     }
     double ldel = (double)mdLine - rline;
     double ldel2 = 1.0 - ldel;
     int isamp = 1;
     for(int osamp = 0; osamp < miOutputSamples; osamp++) {
-      while(isamp <= sinctab[osamp]) {
-        if(IsValidPixel((*mLineMgr)[isamp-1])) {
-          sum[osamp] += (*mLineMgr)[isamp-1] * ldel2;
-          npts[osamp] += ldel2;
-          sum2[osamp] += (*mLineMgr)[isamp-1] * ldel;
-          npts2[osamp] += ldel;
+      while(isamp <= mdIncTab[osamp]) {
+        if(IsValidPixel((*m_iPortal)[isamp-1])) {
+          mdSum[osamp]   += (*m_iPortal)[isamp-1] * ldel2;
+          mdNpts[osamp]  += ldel2;
+          mdSum2[osamp]  += (*m_iPortal)[isamp-1] * ldel;
+          mdNpts2[osamp] += ldel;
         }
         isamp++;
       }
 
-      double sdel = (double) isamp - sinctab[osamp];
+      double sdel = (double) isamp - mdIncTab[osamp];
       if(isamp > miInputSamples) continue;
-      if(IsValidPixel((*mLineMgr)[isamp-1])) {
-        sum[osamp] += (*mLineMgr)[isamp-1] * (1.0 - sdel) * ldel2;
-        npts[osamp] += (1.0 - sdel) * ldel2;
+      if(IsValidPixel((*m_iPortal)[isamp-1])) {
+        mdSum[osamp]  += (*m_iPortal)[isamp-1] * (1.0 - sdel) * ldel2;
+        mdNpts[osamp] += (1.0 - sdel) * ldel2;
         if(osamp + 1 < miOutputSamples) {
-          sum[osamp+1] += (*mLineMgr)[isamp-1] * sdel * ldel2;
-          npts[osamp+1] += sdel * ldel2;
+          mdSum[osamp+1]  += (*m_iPortal)[isamp-1] * sdel * ldel2;
+          mdNpts[osamp+1] += sdel * ldel2;
         }
-        sum2[osamp] += (*mLineMgr)[isamp-1] * (1.0 - sdel) * ldel;
-        npts2[osamp] += (1.0 - sdel) * ldel;
+        mdSum2[osamp]  += (*m_iPortal)[isamp-1] * (1.0 - sdel) * ldel;
+        mdNpts2[osamp] += (1.0 - sdel) * ldel;
         if(osamp + 1 < miOutputSamples) {
-          sum2[osamp+1] += (*mLineMgr)[isamp-1] * sdel * ldel;
-          npts2[osamp+1] += sdel * ldel;
+          mdSum2[osamp+1]  += (*m_iPortal)[isamp-1] * sdel * ldel;
+          mdNpts2[osamp+1] += sdel * ldel;
         }
       }
       isamp++;
@@ -214,40 +250,40 @@ namespace Isis {
 
     double npix = mdSampleScale * mdLineScale;
     for(int osamp = 0; osamp < miOutputSamples; osamp++) {
-      if(npts[osamp] > npix * mdValidPer) {
-        out[osamp] = sum[osamp] / npts[osamp];
+      if(mdNpts[osamp] > npix * mdValidPer) {
+        out[osamp] = mdSum[osamp] / mdNpts[osamp];
       }
       else {
         if(msReplaceMode == "NEAREST") {
-          out[osamp] = (*mLineMgr)[(int)(sinctab[osamp] + 0.5) - 1];
+          out[osamp] = (*m_iPortal)[(int)(mdIncTab[osamp] + 0.5) - 1];
         }
         else {
           out[osamp] = Isis::Null;
         }
       }
-      sum[osamp] = sum2[osamp];
-      npts[osamp] = npts2[osamp];
-      sum2[osamp] = 0.0;
-      npts2[osamp] = 0.0;
+      mdSum[osamp]   = mdSum2[osamp];
+      mdNpts[osamp]  = mdNpts2[osamp];
+      mdSum2[osamp]  = 0.0;
+      mdNpts2[osamp] = 0.0;
     }
 
     if(out.Line() == miOutputLines && out.Band() != miInputBands) {
       miBandIndex++;
       mdLine = 1;
       for(int osamp = 0; osamp < miOutputSamples; osamp++) {
-        sum[osamp] = 0.0;
-        npts[osamp] = 0.0;
-        sum2[osamp] = 0.0;
-        npts2[osamp] = 0.0;
+        mdSum[osamp]   = 0.0;
+        mdNpts[osamp]  = 0.0;
+        mdSum2[osamp]  = 0.0;
+        mdNpts2[osamp] = 0.0;
       }
     }
 
     if(out.Line() == miOutputLines && out.Band() == miInputBands) {
-      delete [] sinctab;
-      delete [] sum;
-      delete [] npts;
-      delete [] sum2;
-      delete [] npts2;
+      delete [] mdIncTab;
+      delete [] mdSum;
+      delete [] mdNpts;
+      delete [] mdSum2;
+      delete [] mdNpts2;
     }
   } 
 }
