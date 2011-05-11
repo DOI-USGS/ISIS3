@@ -82,7 +82,8 @@ namespace Isis {
    *                                          documentation
    *  @history 2011-04-22 Sharmila Prasad - Extended StartProcess functionality to
    *     be able to be called from any Object class by using Functors
-   *
+   *  @history 2011-05-07 Sharmila Prasad - 1. Added API SetInputCube(Cube*) to take opened cube
+   *           2. Edited StartProcess using Functors take reference to Functors
    *  @history 2006-03-29 Jacob Danton Rewrote code to extend ProcessByBrick class.
    */
   class ProcessByLine : public Isis::ProcessByBrick {
@@ -97,6 +98,7 @@ namespace Isis {
       Isis::Cube *SetInputCube(const std::string &file,
                                Isis::CubeAttributeInput &att,
                                const int requirements = 0);
+      void SetInputCube(Isis::Cube *inCube);
 
       void StartProcess(void funct(Isis::Buffer &inout));
 
@@ -118,7 +120,7 @@ namespace Isis {
        * @param funct - Functor with overloaded operator()(Isis::Buffer &)
        */
       template <typename Functor> 
-      void StartProcessInPlace(Functor funct) {
+      void StartProcessInPlace(Functor & funct) {
         VerifyCubeInPlace();
         Isis::ProcessByBrick::StartProcessInPlace(funct);
       }
@@ -136,7 +138,7 @@ namespace Isis {
        * @param funct - Functor with overloaded operator()(Isis::Buffer &, Isis::Buffer &)
        */
       template <typename Functor> 
-      void StartProcessIO(Functor funct) {
+      void StartProcessIO(Functor & funct) {
         VerifyCubeIO();
         Isis::ProcessByBrick::StartProcessIO(funct);
       }
@@ -156,7 +158,7 @@ namespace Isis {
        *                std::vector<Isis::Buffer *> &)
        */
       template <typename Functor> 
-      void StartProcessIOList(Functor funct) {
+      void StartProcessIOList(Functor & funct) {
         VerifyCubeIOList();
         Isis::ProcessByBrick::StartProcessIOList(funct);
       }

@@ -61,6 +61,20 @@ namespace Isis {
     return Isis::Process::SetInputCube(file, att, allRequirements);
   }
 
+  
+  /**
+   * Set the InputCube vector to an opened Cube. This is used if there already exists 
+   * a valid opened cube 
+   * 
+   * @author Sharmila Prasad (5/7/2011)
+   * 
+   * @param inCube - Pointer to input Cube 
+   */
+  void ProcessByLine::SetInputCube(Isis::Cube *inCube)
+  {
+    Isis::Process::SetInputCube(inCube);
+  }
+  
   /**
    * Verify input and output cubes and set brick size. 
    * 
