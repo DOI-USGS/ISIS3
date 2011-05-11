@@ -54,14 +54,6 @@ namespace Isis {
     connect(p_closeNetwork, SIGNAL(clicked()), this, SLOT(closeNetwork()));
     connect(p_closeNetwork, SIGNAL(destroyed(QObject *)),
             this, SLOT(objectDestroyed(QObject *)));
-
-    p_connectivity = new QAction(this);
-    p_connectivity->setShortcut(Qt::Key_I);
-    p_connectivity->setText("Show Islands (I)");
-    p_connectivity->setIcon(getIcon("viewmag+.png"));
-    connect(p_connectivity, SIGNAL(activated()), this, SLOT(displayConnectivity()));
-    connect(p_connectivity, SIGNAL(destroyed(QObject *)),
-            this, SLOT(objectDestroyed(QObject *)));
   }
 
 
@@ -79,9 +71,6 @@ namespace Isis {
 
     if(p_closeNetwork)
       delete p_closeNetwork;
-
-    if(p_connectivity)
-      delete p_connectivity;
 
     closeNetwork();
   }
@@ -102,16 +91,6 @@ namespace Isis {
     }
 
     return NULL;
-  }
-
-
-  /**
-   * Adds the control net action to the given menu.
-   *
-   * @param menu
-   */
-  void MosaicControlNetTool::addToMenu(QMenu *menu) {
-    menu->addAction(p_connectivity);
   }
 
 
@@ -249,7 +228,6 @@ namespace Isis {
       getWidget()->getScene()->removeItem(p_controlNetGraphics);
 
       delete p_controlNetGraphics;
-      p_controlNetGraphics = NULL;
     }
 
     if(p_controlNet) {
@@ -259,9 +237,6 @@ namespace Isis {
 
     if(p_displayControlNetButton)
       p_displayControlNetButton->setChecked(false);
-
-    if(p_loadControlNetButton)
-      p_loadControlNetButton->setEnabled(true);
 
     if(p_displayControlNetButton)
       p_displayControlNetButton->setEnabled(false);
@@ -285,8 +260,6 @@ namespace Isis {
       p_displayConnectivity = NULL;
     else if(obj == p_closeNetwork)
       p_closeNetwork = NULL;
-    else if(obj == p_connectivity)
-      p_connectivity = NULL;
     else if(obj == p_controlNetGraphics)
       p_controlNetGraphics = NULL;
   }
@@ -312,12 +285,9 @@ namespace Isis {
       Filename controlNetFile(netFile.toStdString());
       p_controlNetFile = QString::fromStdString(controlNetFile.Expanded());
       loadNetwork();
-    }
-    else {
-      //---------------------------------------------------
-      // this means the user canceled out of the dialog box
-      //---------------------------------------------------
-      p_loadControlNetButton->setChecked(false);
+
+      if(p_displayControlNetButton)
+        p_displayControlNetButton->setChecked(true);
     }
   }
 
@@ -341,15 +311,8 @@ namespace Isis {
         message += errors.c_str();
         e.Clear();
         QMessageBox::information(getWidget(), "Error", message);
-        p_loadControlNetButton->setChecked(false);
         return;
       }
-
-      if(p_displayControlNetButton)
-        p_displayControlNetButton->setChecked(true);
-
-      if(p_loadControlNetButton)
-        p_loadControlNetButton->setEnabled(false);
 
       if(p_displayControlNetButton)
         p_displayControlNetButton->setEnabled(true);

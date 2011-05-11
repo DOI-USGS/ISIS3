@@ -21,6 +21,9 @@ namespace Isis {
    * @internal
    *   @history 2010-06-24 Christopher Austin - Added |x| functionality and fixed
    *            control net loading
+   *   @history 2010-05-07 Steven Lambright - Refactored.
+   *   @history 2010-05-10 Steven Lambright - Reduced useless code, open cnet
+   *            button is now always available.
    */
   class MosaicControlNetTool : public MosaicTool {
       Q_OBJECT
@@ -49,10 +52,10 @@ namespace Isis {
       void closeNetwork();
 
     private slots:
+      void loadNetwork();
       void objectDestroyed(QObject *);
 
     private:
-      void loadNetwork();
       void createDialog();
 
       CubeDisplayProperties *

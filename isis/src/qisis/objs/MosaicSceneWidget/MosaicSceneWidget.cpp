@@ -14,6 +14,7 @@
 #include <QScrollBar>
 #include <QStatusBar>
 #include <QToolBar>
+#include <QToolTip>
 
 #include "Camera.h"
 #include "Cube.h"
@@ -761,7 +762,8 @@ namespace Isis {
         emit mouseWheel(
               ((QGraphicsSceneWheelEvent *)event)->scenePos(),
               ((QGraphicsSceneWheelEvent *)event)->delta());
-          stopProcessingEvent = true;
+        stopProcessingEvent = true;
+        break;
 
       case QMouseEvent::Enter:
         emit mouseEnter();
@@ -774,21 +776,26 @@ namespace Isis {
         break;
 
       case QEvent::GraphicsSceneHelp: {
-        double maxZ = DBL_MIN;
-        MosaicSceneItem *mosaicSceneItem;
-        foreach(mosaicSceneItem, *p_mosaicSceneItems) {
-          if(maxZ < mosaicSceneItem->zValue()) {
-            if(mosaicSceneItem->contains(
-              ((QGraphicsSceneHelpEvent*)event)->scenePos())) {
-              setToolTip(mosaicSceneItem->toolTip());
-              maxZ = mosaicSceneItem->zValue();
-              stopProcessingEvent = false; // We want the tooltip to proceed
+        setToolTip("");
+        bool toolTipFound = false;
+
+        QGraphicsItem *sceneItem;
+        foreach(sceneItem, getScene()->items()) {
+          if(!toolTipFound) {
+            if(sceneItem->contains(
+              ((QGraphicsSceneHelpEvent*)event)->scenePos()) &&
+              sceneItem->toolTip().size() > 0) {
+              setToolTip(sceneItem->toolTip());
+              toolTipFound = true;
             }
           }
         }
 
-        if(maxZ == DBL_MIN) {
-          setToolTip("");
+        if(toolTipFound) {
+          stopProcessingEvent = true;
+          QToolTip::showText(
+              ((QGraphicsSceneHelpEvent*)event)->screenPos(),
+              toolTip());
         }
         break;
       }
@@ -844,23 +851,6 @@ namespace Isis {
     recalcSceneRect();
     refit();
     p_progress->setVisible(false);
-  }
-
-
-  /**
-   * This slot is changes the level of detail at which mosaic
-   * footprints will be allowed to have transparency.  This is
-   * adjustable because it affects the speed of the re-paint
-   * calls.
-   *
-   * @param detail
-   */
-  void MosaicSceneWidget::setLevelOfDetail(int detail) {
-    MosaicSceneItem *mosaicSceneItem;
-    foreach(mosaicSceneItem, *p_mosaicSceneItems) {
-      mosaicSceneItem->setLevelOfDetail(detail * 0.005);
-      mosaicSceneItem->update();
-    }
   }
 
 

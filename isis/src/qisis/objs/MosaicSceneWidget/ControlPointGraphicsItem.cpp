@@ -22,13 +22,15 @@ namespace Isis {
    *   toolTip for this control point. 
    */
   ControlPointGraphicsItem::ControlPointGraphicsItem(QPointF center,
-      ControlPoint *cp, SerialNumberList *snList,
+      QPointF apriori, ControlPoint *cp, SerialNumberList *snList,
       MosaicSceneWidget *boundingRectSrc, QGraphicsItem *parent) :
       QGraphicsRectItem(parent) {
     p_centerPoint = new QPointF(center);
     p_mosaicScene = boundingRectSrc;
     p_controlPoint = cp;
     setZValue(DBL_MAX);
+
+    p_origPoint = new QPointF(apriori);
 
     if(cp->IsIgnored())
       setPen(QPen(Qt::red));
@@ -42,6 +44,8 @@ namespace Isis {
     setBrush(Qt::NoBrush);
 
     setToolTip(makeToolTip(snList));
+
+    setRect(calcRect());
   }
 
 
@@ -51,38 +55,65 @@ namespace Isis {
       p_centerPoint = NULL;
     }
 
+    if(p_origPoint) {
+      delete p_origPoint;
+      p_origPoint = NULL;
+    }
+
     p_mosaicScene = NULL;
-  }
-
-
-  QRectF ControlPointGraphicsItem::boundingRect() const {
-    return calcRect();
   }
 
 
   void ControlPointGraphicsItem::paint(QPainter *painter,
       const QStyleOptionGraphicsItem *style,  QWidget * widget) {
-    QRectF pointRect = calcRect();
+    QRectF fullRect = calcRect();
+    QRectF crosshairRect = calcCrosshairRect();
 
-    if(pointRect.isNull())
+    if(crosshairRect.isNull())
       return;
 
-    if(rect() != pointRect) {
-      setRect(pointRect);
+    if(rect() != fullRect) {
+      setRect(fullRect);
     }
     else {
       painter->setPen(pen());
       painter->setBrush(brush());
 
-      QPointF center = pointRect.center();
+      QPointF center = crosshairRect.center();
 
-      QPointF centerLeft(pointRect.left(), center.y());
-      QPointF centerRight(pointRect.right(), center.y());
-      QPointF centerTop(center.x(), pointRect.top());
-      QPointF centerBottom(center.x(), pointRect.bottom());
+      QPointF centerLeft(crosshairRect.left(), center.y());
+      QPointF centerRight(crosshairRect.right(), center.y());
+      QPointF centerTop(center.x(), crosshairRect.top());
+      QPointF centerBottom(center.x(), crosshairRect.bottom());
 
       painter->drawLine(centerLeft, centerRight);
       painter->drawLine(centerTop, centerBottom);
+
+      if(!p_origPoint->isNull() && *p_origPoint != *p_centerPoint) {
+        painter->setPen(Qt::black);
+        painter->setBrush(Qt::black);
+        painter->drawLine(*p_origPoint, *p_centerPoint);
+
+        double crosshairSize = crosshairRect.width() * 4.0 / 5.0;
+
+        // Draw arrow
+        QPointF lineVector = *p_centerPoint - *p_origPoint;
+        double lineVectorMag = sqrt(lineVector.x() * lineVector.x() +
+                                    lineVector.y() * lineVector.y());
+        double thetaPointOnLine = crosshairSize / (2 * (tanf(PI / 6) / 2) *
+                              lineVectorMag);
+        QPointF pointOnLine = *p_centerPoint - thetaPointOnLine * lineVector;
+
+        QPointF normalVector = QPointF(-lineVector.y(), lineVector.x());
+        double thetaNormal = crosshairSize / (2 * lineVectorMag);
+
+        QPointF leftPoint = pointOnLine + thetaNormal * normalVector;
+        QPointF rightPoint = pointOnLine - thetaNormal * normalVector;
+
+        QPolygonF arrowHead;
+        arrowHead << leftPoint << center << rightPoint;
+        painter->drawPolygon(arrowHead);
+      }
     }
   }
 
@@ -108,6 +139,30 @@ namespace Isis {
 
 
   QRectF ControlPointGraphicsItem::calcRect() const {
+    QRectF pointRect(calcCrosshairRect());
+
+    if(!p_origPoint->isNull() && pointRect.isValid()) {
+      // Make the rect contain the orig point
+      if(pointRect.left() > p_origPoint->x()) {
+        pointRect.setLeft(p_origPoint->x());
+      }
+      else if(pointRect.right() < p_origPoint->x()) {
+        pointRect.setRight(p_origPoint->x());
+      }
+
+      if(pointRect.top() > p_origPoint->y()) {
+        pointRect.setTop(p_origPoint->y());
+      }
+      else if(pointRect.bottom() < p_origPoint->y()) {
+        pointRect.setBottom(p_origPoint->y());
+      }
+    }
+
+    return pointRect;
+  }
+
+
+  QRectF ControlPointGraphicsItem::calcCrosshairRect() const {
     QRectF pointRect;
 
     if(p_centerPoint && !p_centerPoint->isNull() && p_mosaicScene) {

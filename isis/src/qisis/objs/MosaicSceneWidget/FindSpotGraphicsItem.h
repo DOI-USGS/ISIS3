@@ -12,6 +12,9 @@ namespace Isis {
    * @brief The visual display of the find point
    *
    * @author 2011-05-07 Steven Lambright
+   *
+   * @internal
+   *   @history 2011-05-10 Steven Lambright - Fixed problem with boundingRect()
    */
   class FindSpotGraphicsItem : public QGraphicsEllipseItem {
     public:
@@ -19,7 +22,6 @@ namespace Isis {
                            MosaicSceneWidget *boundingRectSrc);
       virtual ~FindSpotGraphicsItem();
 
-      QRectF boundingRect() const;
       void paint(QPainter *, const QStyleOptionGraphicsItem *,
                  QWidget * widget = 0);
     private:

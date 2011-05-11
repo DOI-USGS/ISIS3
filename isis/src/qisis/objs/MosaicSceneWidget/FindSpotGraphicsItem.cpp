@@ -19,6 +19,7 @@ namespace Isis {
 
     setPen(Qt::NoPen);
     setBrush(QBrush(Qt::red, Qt::SolidPattern));
+    setRect(calcRect());
   }
 
 
@@ -27,16 +28,6 @@ namespace Isis {
       delete p_centerPoint;
       p_centerPoint = NULL;
     }
-  }
-
-
-  QRectF FindSpotGraphicsItem::boundingRect() const {
-    QRectF findRect = calcRect();
-
-    if(findRect.isNull())
-      return p_mosaicScene->cubesBoundingRect();
-    else
-      return p_mosaicScene->cubesBoundingRect().united(findRect);
   }
 
 

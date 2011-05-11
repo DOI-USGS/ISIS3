@@ -34,6 +34,7 @@ namespace Isis {
    *                                removing includes from ControlNet.h.
    *  @history 2011-05-07 Steven Lambright Refactored from MosaicItem to
    *                                have far fewer responsibilities.
+   *  @history 2011-05-10 Steven Lambright Reduced the amount of useless code
    */
   class MosaicSceneItem : public QGraphicsObject {
       Q_OBJECT
@@ -58,10 +59,8 @@ namespace Isis {
       int getImageTrans() const { return p_imageTransparency; }
 
       void reproject();
-      PvlGroup saveState();
       void setImageVisible(bool visible);
       void setTreeItemSelected(bool selected);
-      void setLevelOfDetail(double detail);
       void setZValue(qreal z);
       QPointF screenToGround(QPointF point);
       QPointF screenToCam(int x, int y);
@@ -115,17 +114,12 @@ namespace Isis {
       void setupStretch();
       void setFontSize();
       void setFontSize(QFont font);
-      void setEnableRepaint(bool paint);
       void setUpItem(PvlGroup *grp);
 
       void paintControlPoints(QPainter *painter, const QStyleOptionGraphicsItem *option);
 
       QColor getColor();
 
-      double p_xmin; //!< min x value of item
-      double p_xmax; //!< max x value of item
-      double p_ymin; //!< min y value of item
-      double p_ymax; //!< max y value of item
       double p_pixRes; //!< Pixel Resolution of the cube
       double p_emissionAngle;
       double p_incidenceAngle;
@@ -144,7 +138,6 @@ namespace Isis {
       double p_lastLevelOfDetail;
       double p_screenResolution;
       bool p_updateFont;
-      bool p_enablePaint;
   };
 };
 

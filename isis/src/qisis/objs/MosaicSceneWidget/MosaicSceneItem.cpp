@@ -61,16 +61,7 @@ namespace Isis {
     p_polygons = NULL;
     p_cubeDnStretch = NULL;
 
-    p_levelOfDetail = 0;
-    p_updateFont = false;
-    p_enablePaint = true;
-    p_lastExposedRect = QRectF(QPoint(0, 0), QPoint(0, 0));
-
     p_scene = parent;
-    p_xmin = DBL_MAX;
-    p_xmax = -DBL_MAX;
-    p_ymin = DBL_MAX;
-    p_ymax = -DBL_MAX;
 
     p_polygons = new QList< QGraphicsPolygonItem *>();
 
@@ -161,18 +152,6 @@ namespace Isis {
 
 
   /**
-   * Allows the programmer to set the level of detail at which the
-   * paint function will not allow transparent footprint colors.
-   *
-   *
-   * @param detail
-   */
-  void MosaicSceneItem::setLevelOfDetail(double detail) {
-    p_levelOfDetail = detail;
-  }
-
-
-  /**
    * This method gets the footprint polygon of the cube
    *
    */
@@ -248,7 +227,7 @@ namespace Isis {
     catch (iException &e) {
       iException::Message(iException::Io,
           "Could not find the CameraStatistics Table. "
-          "Please run camerastats with the attach option", _FILEINFO_);
+          "Please run camstats with the attach option", _FILEINFO_);
       e.Report(false);
       return;
     }
@@ -277,11 +256,6 @@ namespace Isis {
    * map file.) And everytime a mosaic item is created.
    */
   void MosaicSceneItem::reproject() {
-    double xmin = DBL_MAX;
-    double xmax = -DBL_MAX;
-    double ymin = DBL_MAX;
-    double ymax = -DBL_MAX;
-
     geos::geom::MultiPolygon *mp;
     Projection *proj = p_scene->getProjection();
 
@@ -327,23 +301,9 @@ namespace Isis {
           double x = proj->XCoord();
           double y = -1 * (proj->YCoord());
 
-          //-----------------------------------------------
-          // determine x/y min/max for the polygons(s)
-          // so we know how big to make the QGraphicsScene
-          //-----------------------------------------------
-          if (x < xmin) xmin = x;
-          if (y < ymin) ymin = y;
-          if (x > xmax) xmax = x;
-          if (y > ymax) ymax = y;
-
           polyPoints.push_back(QPointF(x, y));
         }
       }
-
-      p_xmin = xmin;
-      p_xmax = xmax;
-      p_ymin = ymin;
-      p_ymax = ymax;
 
       setFlag(QGraphicsItem::ItemIsSelectable);
 
@@ -741,17 +701,6 @@ namespace Isis {
 
 
   /**
-   * This is a way to allow the programmer to disable
-   * the paint routine if need be.
-   *
-   * @param paint
-   */
-  void MosaicSceneItem::setEnableRepaint(bool paint) {
-    p_enablePaint = paint;
-  }
-
-
-  /**
    * This filters out events that happen within our bounding box but not on
    *   one of the polygons.
    *
@@ -978,34 +927,5 @@ namespace Isis {
 
     return p_cubeDnStretch;
   }
-
-
-  /**
-   * This method saves all the item's current attributes to a pvl
-   * group which is returned.
-   *
-   *
-   * @return PvlGroup
-   */
-  PvlGroup MosaicSceneItem::saveState() {
-     PvlGroup grp("test");
-
-     return grp;
-  }
-
-  /*void MosaicSceneItem::resizeEvent(QGraphicsSceneResizeEvent*){
-    // Centre the contained text item
-    QTransform m = sceneTransform();
-    p_label->resetTransform();
-    p_label->scale( 1.0 / m.m11(), 1.0 / m.m22() );
-    QRectF m_textRect = p_label->boundingRect();
-    QPolygonF itemTextPoly = p_label->mapToItem( this, m_textRect );
-    QRectF itemTextRect = itemTextPoly.boundingRect();
-    double dx = 0.5 * m.m11() * ( rect().width() - itemTextRect.width() );
-    double dy = 0.5 * m.m22() * ( rect().height() - itemTextRect.height() );
-    p_label->translate( dx, dy );
-  }*/
-
-
 }
 

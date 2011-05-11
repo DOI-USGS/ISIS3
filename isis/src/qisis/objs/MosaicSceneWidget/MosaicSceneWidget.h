@@ -39,6 +39,9 @@ namespace Isis {
    *                                functionality and fixed a few design issues
    *  @history 2011-04-01 Steven Lambright - Separated this class from the
    *                                MosaicWidget class.
+   *  @history 2011-05-10 Steven Lambright - Reduced unnecessary code, fixed
+   *                                toolTips to work on everything (not just
+   *                                cubes). 
    */
   class MosaicSceneWidget : public QWidget {
       Q_OBJECT
@@ -118,7 +121,6 @@ namespace Isis {
       void fitInView();
 
       void onSelectionChanged();
-      void setLevelOfDetail(int);
 
       void askNewProjection();
       void sendVisibleRectChanged();

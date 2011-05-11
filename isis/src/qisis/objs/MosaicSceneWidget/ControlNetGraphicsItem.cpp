@@ -28,7 +28,7 @@ namespace Isis {
        MosaicSceneWidget *mosaicScene) : QGraphicsObject() {
     p_controlNet = controlNet;
     p_mosaicScene = mosaicScene;
-    p_pointToLatLon = new QMap<ControlPoint *, QPointF>;
+    p_pointToScene = new QMap<ControlPoint *, QPair<QPointF, QPointF> >;
     p_cubeToGroundMap = new QMap<QString, UniversalGroundMap *>;
     p_serialNumbers = NULL;
     mosaicScene->getScene()->addItem(this);
@@ -45,9 +45,9 @@ namespace Isis {
 
 
   ControlNetGraphicsItem::~ControlNetGraphicsItem() {
-    if(p_pointToLatLon) {
-      delete p_pointToLatLon;
-      p_pointToLatLon = NULL;
+    if(p_pointToScene) {
+      delete p_pointToScene;
+      p_pointToScene = NULL;
     }
 
     if(p_cubeToGroundMap) {
@@ -55,7 +55,9 @@ namespace Isis {
 
       while(it.hasNext()) {
         it.next();
-        delete it.value();
+
+        if(it.value())
+          delete it.value();
       }
 
       delete p_cubeToGroundMap;
@@ -65,14 +67,7 @@ namespace Isis {
 
 
   QRectF ControlNetGraphicsItem::boundingRect() const {
-    QRectF tmp;
-    return tmp;
-    QRectF networkRect = calcRect();
-
-    if(networkRect.isNull())
-      return p_mosaicScene->cubesBoundingRect();
-    else
-      return p_mosaicScene->cubesBoundingRect().united(networkRect);
+    return QRectF();
   }
 
 
@@ -81,51 +76,49 @@ namespace Isis {
   }
 
 
-  QRectF ControlNetGraphicsItem::calcRect() const {
-    return childrenBoundingRect();
-  }
-
-
-  QRectF ControlNetGraphicsItem::calcRect(QPointF pt) {
-    QRectF networkRect;
-
-    if(!pt.isNull()) {
-      static const int size = 8;
-      QPoint findSpotScreen =
-          p_mosaicScene->getView()->mapFromScene(pt);
-      QPoint findSpotTopLeftScreen =
-          findSpotScreen - QPoint(size / 2, size / 2);
-
-      QRect findRectScreen(findSpotTopLeftScreen, QSize(size, size));
-      networkRect =
-          p_mosaicScene->getView()->mapToScene(findRectScreen).boundingRect();
-    }
-
-    return networkRect;
-  }
-
-
-  QPointF ControlNetGraphicsItem::pointToScene(ControlPoint *cp) {
+  QPair<QPointF, QPointF> ControlNetGraphicsItem::pointToScene(ControlPoint *cp)
+      {
     Projection *proj = p_mosaicScene->getProjection();
 
-    QPointF sceneLoc;
+    QPointF initial;
+    QPointF adjusted;
 
-    QPointF rememberedLoc = (*p_pointToLatLon)[cp];
+    QPair<QPointF, QPointF> rememberedLoc = (*p_pointToScene)[cp];
 
-    if(!rememberedLoc.isNull()) {
-      proj->SetUniversalGround(rememberedLoc.y(),
-                               rememberedLoc.x());
-      sceneLoc = QPointF(proj->XCoord(), -1 * proj->YCoord());
+    if(!rememberedLoc.second.isNull()) {
+      proj->SetUniversalGround(rememberedLoc.second.y(),
+                               rememberedLoc.second.x());
+      adjusted = QPointF(proj->XCoord(), -1 * proj->YCoord());
+
+      if(!rememberedLoc.first.isNull()) {
+        proj->SetUniversalGround(rememberedLoc.first.y(),
+                                 rememberedLoc.first.x());
+        initial = QPointF(proj->XCoord(), -1 * proj->YCoord());
+      }
     }
     else if(proj) {
-      const SurfacePoint &sp = cp->GetBestSurfacePoint();
 
-      if(sp.Valid()) {
-        proj->SetUniversalGround(sp.GetLatitude().GetDegrees(),
-                                sp.GetLongitude().GetDegrees());
-        sceneLoc = QPointF(proj->XCoord(), -1 * proj->YCoord());
+      SurfacePoint adjSurfacePoint(cp->GetAdjustedSurfacePoint());
+      if(adjSurfacePoint.Valid()) {
+        if(proj->SetUniversalGround(adjSurfacePoint.GetLatitude().GetDegrees(),
+                                 adjSurfacePoint.GetLongitude().GetDegrees())) {
+          adjusted = QPointF(proj->XCoord(), -1 * proj->YCoord());
+        }
       }
-      else {
+
+      SurfacePoint apriSurfacePoint(cp->GetAprioriSurfacePoint());
+      if(apriSurfacePoint.Valid()) {
+        if(proj->SetUniversalGround(apriSurfacePoint.GetLatitude().GetDegrees(),
+            apriSurfacePoint.GetLongitude().GetDegrees())) {
+          initial = QPointF(proj->XCoord(), -1 * proj->YCoord());
+        }
+      }
+
+      // If we have adjusted and not apriori then find camera
+      //    OR if we don't have an adjusted and don't have an initial we still
+      //       need an initial
+      if((!adjusted.isNull() && initial.isNull()) ||
+         (adjusted.isNull() && initial.isNull())) {
         try {
           QString sn = cp->GetReferenceSN();
           QString filename = snToFilename(sn);
@@ -143,10 +136,8 @@ namespace Isis {
               double lat = (*p_cubeToGroundMap)[filename]->UniversalLatitude();
               double lon = (*p_cubeToGroundMap)[filename]->UniversalLongitude();
 
-              (*p_pointToLatLon)[cp] = QPointF(lon, lat);
-
               if(proj->SetUniversalGround(lat, lon))
-                sceneLoc = QPointF(proj->XCoord(), -1 * proj->YCoord());
+                initial = QPointF(proj->XCoord(), -1 * proj->YCoord());
             }
           }
         }
@@ -156,7 +147,18 @@ namespace Isis {
       }
     }
 
-    return sceneLoc;
+    QPair<QPointF, QPointF> result;
+    if(!adjusted.isNull() && adjusted != initial) {
+      result.second = adjusted;
+      result.first = initial;
+    }
+    else {
+      result.second = initial;
+    }
+
+    (*p_pointToScene)[cp] = result;
+
+    return result;
   }
 
 
@@ -176,7 +178,11 @@ namespace Isis {
     return result;
   }
 
+
   void ControlNetGraphicsItem::buildChildren() {
+    bool wasVisible = isVisible();
+    setVisible(false);
+
     QList<QGraphicsItem *> children = childItems();
     QGraphicsItem *child;
     foreach(child, children) {
@@ -188,7 +194,6 @@ namespace Isis {
     }
 
     if(p_controlNet) {
-      QList<ControlPointGraphicsItem *> newChildren;
       const int numCp = p_controlNet->GetNumPoints();
 
       if(p_serialNumbers) {
@@ -205,20 +210,27 @@ namespace Isis {
       }
 
       ProgressBar *p = (ProgressBar *)p_mosaicScene->getProgress();
-      p->setText("Calculating Control Point Locations");
+      p->setText("Calculating CP Locations");
       p->setRange(0, numCp - 1);
       p->setValue(0);
       p->setVisible(true);
 
-      for(int cp = 0; cp < numCp; cp ++) {
-        newChildren.append(new ControlPointGraphicsItem(
-            pointToScene(p_controlNet->GetPoint(cp)),
-            p_controlNet->GetPoint(cp), p_serialNumbers, p_mosaicScene, this));
-        p->setValue(cp);
+      for(int cpIndex = 0; cpIndex < numCp; cpIndex ++) {
+        ControlPoint *cp = p_controlNet->GetPoint(cpIndex);
+
+        // Apriori/Camera, Adjusted
+        QPair<QPointF, QPointF> scenePoints = pointToScene(cp);
+
+        new ControlPointGraphicsItem( scenePoints.second, scenePoints.first,
+            cp, p_serialNumbers, p_mosaicScene, this);
+
+        p->setValue(cpIndex);
       }
 
       p->setVisible(false);
     }
+
+    setVisible(wasVisible);
   }
 }
 

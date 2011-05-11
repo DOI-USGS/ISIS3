@@ -21,15 +21,17 @@ namespace Isis {
    * @internal
    *   @history 2011-05-09 Steven Lambright - Fixed known issue with paint()
    *                       when zoomed in.
+   *   @history 2011-05-10 Steven Lambright - Added arrow capabilities, fixed
+   *                       problem with boundingRect() that seemed to cause a
+   *                       crash.
    */
   class ControlPointGraphicsItem : public QGraphicsRectItem {
     public:
-      ControlPointGraphicsItem(QPointF center, ControlPoint *cp,
-          SerialNumberList *snList, MosaicSceneWidget *scene,
+      ControlPointGraphicsItem(QPointF center, QPointF apriori,
+          ControlPoint *cp, SerialNumberList *snList, MosaicSceneWidget *scene,
           QGraphicsItem *parent);
       virtual ~ControlPointGraphicsItem();
 
-      QRectF boundingRect() const;
       void paint(QPainter *, const QStyleOptionGraphicsItem *,
                  QWidget * widget = 0);
 
@@ -38,9 +40,11 @@ namespace Isis {
 
     private:
       QRectF calcRect() const;
+      QRectF calcCrosshairRect() const;
       QString makeToolTip(SerialNumberList *snlist);
 
       QPointF *p_centerPoint;
+      QPointF *p_origPoint;
       MosaicSceneWidget *p_mosaicScene;
       ControlPoint *p_controlPoint;
   };

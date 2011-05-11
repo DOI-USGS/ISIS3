@@ -15,6 +15,9 @@ namespace Isis {
    * @brief Control Network Display on Mosaic Scene
    *
    * @author 2011-05-07 Steven Lambright
+   *
+   * @internal
+   *   @history 2011-05-10 Steven Lambright - Added arrow capabilities for CPs
    */
   class ControlNetGraphicsItem : public QGraphicsObject {
       Q_OBJECT
@@ -33,14 +36,12 @@ namespace Isis {
       void buildChildren();
 
     private:
-      QRectF calcRect() const;
-      QRectF calcRect(QPointF);
-      QPointF pointToScene(ControlPoint *);
+      QPair<QPointF, QPointF> pointToScene(ControlPoint *);
 
       ControlNet *p_controlNet;
 
       MosaicSceneWidget *p_mosaicScene;
-      QMap<ControlPoint *, QPointF> *p_pointToLatLon;
+      QMap<ControlPoint *, QPair<QPointF, QPointF> > *p_pointToScene;
       QMap<QString, UniversalGroundMap *> *p_cubeToGroundMap;
       SerialNumberList *p_serialNumbers;
   };
