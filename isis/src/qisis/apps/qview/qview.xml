@@ -61,5 +61,9 @@
       Connect the viewport's close signal to the all windows/subwindows like 
       plottool and histogram tools as well.
     </change>
+    <change name="Sharmila Prasad" date="2011-05-11">
+      Added options for SaveAs to save cube as fullImage, Export AsIs or Export 
+      FullResolution options
+    </change>
   </history>
 </application>
