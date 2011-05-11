@@ -112,6 +112,7 @@ namespace Isis {
     catch(iException &error) {
       try {
         proj = cube.Projection();
+        p_isProjected = true;
         error.Clear();
       }
       catch(iException &error) {
@@ -143,7 +144,7 @@ namespace Isis {
     p_cubeStartSamp = ss;
     p_cubeStartLine = sl;
 
-    if(p_ellipsoid && IsLimb()) {
+    if(p_ellipsoid && IsLimb() && p_gMap->Camera()) {
       try {
         p_gMap->Camera()->IgnoreElevationModel(true);
       }
@@ -168,15 +169,18 @@ namespace Isis {
     /  If image contains 0/360 boundary, the polygon needs to be split up
     /  into multi polygons.
     /-----------------------------------------------------------------------*/
-    Pvl defaultMap;
-    cam->BasicMapping(defaultMap);
+    if(cam) {
+      Pvl defaultMap;
+      cam->BasicMapping(defaultMap);
+    }
 
     // Create the polygon, fixing if needed
     Fix360Poly();
 
     if(p_brick != 0) delete p_brick;
 
-    p_gMap->Camera()->IgnoreElevationModel(false);
+    if(p_gMap->Camera())
+      p_gMap->Camera()->IgnoreElevationModel(false);
   }
 
 
@@ -629,7 +633,50 @@ namespace Isis {
   */
   void ImagePolygon::FixPolePoly(std::vector<geos::geom::Coordinate> *crossingPoints) {
     // We currently do not support both poles in one image
-    if(p_gMap->SetUniversalGround(90, 0) && p_gMap->SetUniversalGround(-90, 0)) {
+    bool hasNorthPole = false;
+    bool hasSouthPole = false;
+
+    if(p_gMap->SetUniversalGround(90, 0)) {
+      double nPoleSample = Null;
+      double nPoleLine = Null;
+
+      if(p_gMap->Projection()) {
+        nPoleSample = p_gMap->Projection()->WorldX();
+        nPoleLine = p_gMap->Projection()->WorldY();
+      }
+      else if(p_gMap->Camera()) {
+        nPoleSample = p_gMap->Camera()->Sample();
+        nPoleLine = p_gMap->Camera()->Line();
+      }
+
+      if(nPoleSample >= 0.5 && nPoleLine >= 0.5 &&
+         nPoleSample <= p_cube->Samples() + 0.5 &&
+         nPoleLine <= p_cube->Lines() + 0.5) {
+        hasNorthPole = true;
+      }
+    }
+
+    if(p_gMap->SetUniversalGround(-90, 0)) {
+      double sPoleSample = Null;
+      double sPoleLine = Null;
+
+      if(p_gMap->Projection()) {
+        sPoleSample = p_gMap->Projection()->WorldX();
+        sPoleLine = p_gMap->Projection()->WorldY();
+      }
+      else if(p_gMap->Camera()) {
+        sPoleSample = p_gMap->Camera()->Sample();
+        sPoleLine = p_gMap->Camera()->Line();
+      }
+
+      if(sPoleSample >= 0.5 && sPoleLine >= 0.5 &&
+         sPoleSample <= p_cube->Samples() + 0.5 &&
+         sPoleLine <= p_cube->Lines() + 0.5) {
+        hasSouthPole = true;
+      }
+    }
+
+    if(hasNorthPole && hasSouthPole) {
       std::string msg = "Unable to create image footprint because image has both poles";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
@@ -638,23 +685,31 @@ namespace Isis {
       return;
     }
 
-    if(p_gMap->SetUniversalGround(90, 0)) {
+    if(hasNorthPole) {
+      p_gMap->SetUniversalGround(90, 0);
+
       // If the (north) pole is settable but not within proper angles,
       //  then the polygon does not contain the (north) pole when the cube does
-      if(p_gMap->Camera()->EmissionAngle() > p_emission) {
+      if(p_gMap->Camera() &&
+         p_gMap->Camera()->EmissionAngle() > p_emission) {
         return;
       }
-      if(p_gMap->Camera()->IncidenceAngle() > p_incidence) {
+      if(p_gMap->Camera() &&
+         p_gMap->Camera()->IncidenceAngle() > p_incidence) {
         return;
       }
     }
-    else if(p_gMap->SetUniversalGround(-90, 0)) {
+    else if(hasSouthPole) {
+      p_gMap->SetUniversalGround(-90, 0);
+
       // If the (south) pole is settable but not within proper angles,
       //  then the polygon does not contain the (south) pole when the cube does
-      if(p_gMap->Camera()->EmissionAngle() > p_emission) {
+      if(p_gMap->Camera() &&
+         p_gMap->Camera()->EmissionAngle() > p_emission) {
         return;
       }
-      if(p_gMap->Camera()->IncidenceAngle() > p_incidence) {
+      if(p_gMap->Camera() &&
+         p_gMap->Camera()->IncidenceAngle() > p_incidence) {
         return;
       }
     }
@@ -663,10 +718,10 @@ namespace Isis {
     geos::geom::Coordinate *pole = NULL;
 
     // Setup the right pole
-    if(p_gMap->SetUniversalGround(90, 0)) {
+    if(hasNorthPole) {
       pole = new geos::geom::Coordinate(0, 90);
     }
-    else if(p_gMap->SetUniversalGround(-90, 0)) {
+    else if(hasSouthPole) {
       pole = new geos::geom::Coordinate(0, -90);
     }
     else if(crossingPoints->size() % 2 == 1) {
@@ -830,10 +885,12 @@ namespace Isis {
       else {
         // Check for valid emission and incidence
         try {
-          if(p_gMap->Camera()->EmissionAngle() > p_emission) {
+          if(p_gMap->Camera() &&
+             p_gMap->Camera()->EmissionAngle() > p_emission) {
             return false;
           }
-          if(p_gMap->Camera()->IncidenceAngle() > p_incidence) {
+          if(p_gMap->Camera() &&
+             p_gMap->Camera()->IncidenceAngle() > p_incidence) {
             return false;
           }
         }
@@ -869,25 +926,7 @@ namespace Isis {
         return false;
       }
       else {
-        found = p_gMap->SetImage(sample, line);
-        if(!found) {
-          return false;
-        }
-        else {
-          // Check for valid emission and incidence
-          try {
-            if(p_gMap->Camera()->EmissionAngle() > p_emission) {
-              return false;
-            }
-            if(p_gMap->Camera()->IncidenceAngle() > p_incidence) {
-              return false;
-            }
-          }
-          catch(iException &error) {
-            error.Clear();
-          }
-          return found;
-        }
+        return p_gMap->SetImage(sample, line);
       }
     }
   }

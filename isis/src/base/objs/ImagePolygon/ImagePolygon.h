@@ -142,13 +142,14 @@ namespace Isis {
    *  @history 2009-08-05 Christopher Austin - Added pole meridian proper polygon
    *           division.
    *  @history 2009-08-20 Christopher Austin - Added meridian walking and subpixel
-   *  	     accuracy.
+   *           accuracy.
    *  @history 2009-08-28 Christopher Austin - Fixed a memory bounds error.
    *  @history 2010-02-08 Christopher Austin - Fixed an infinite loop which
    *           revisited the starting point, and added 360 meridian crossing
    *  @history 2010-02-17 Christopher Austin - Fixed two more infinite looping
    *           issues, including a cycle fix which occured during Emission Angle
    *           and Incidence Angle restrictions
+   *  @history 2011-05-11 Steven Lambright - Now works with projected images.
    */
 
   class ImagePolygon : public Isis::Blob {
