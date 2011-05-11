@@ -8,16 +8,16 @@
 
 class QAction;
 
-
 namespace Isis {
   class Brick;
   class Buffer;
+  class Cube;
+  class CubeAttributeOutput;
 }
-
 
 namespace Qisis {
   class MdiCubeViewport;
-
+  class SaveAsDialog;
   /**
    *
    * @internal
@@ -26,6 +26,8 @@ namespace Qisis {
    *   @history 2010-06-26 Eric Hyer - Now uses MdiCubeViewport
    *   @history 2011-04-05 Sharmila Prasad - Added SaveInfo option to save
    *              the current cubeviewport's whatsthis info
+   *   @history 2011-05-11 Sharmila Prasad - Added SaveAsDialog to select the output 
+   *                   cube and options to save FullImage, ExportAsIs, ExportFullRes
    */
   class FileTool : public Tool {
       Q_OBJECT
@@ -75,6 +77,7 @@ namespace Qisis {
       virtual void exit();
       void enableSave(bool enable);
       void discard();
+      void saveAsCubeByOption(QString); //!< Save as Isis Cube (FullImage, AsIs, FullRes)
 
     protected:
       //! Returns the menu name for the file tool
@@ -93,12 +96,33 @@ namespace Qisis {
       QAction *p_saveAs; //!< Action save the current cube as a user specified file
       QAction *p_saveInfo;   //!< Action to save the current cube's Whatsthis info
       QAction *p_exportView; //!< Action to export the view as a picture
-      QAction *p_closeAll;
+      QAction *p_closeAll;   //!< Action to close all windows
       QAction *p_exit;       //!< Action to exit qview
       QWidget *p_parent;     //!< The parent widget of this object
       QString p_lastDir;     //!< The last directory opened
       Workspace *p_workSpace;          //!< The workspace being used
       MdiCubeViewport *p_lastViewport; //!< The last cubeviewport that was used
+      SaveAsDialog *p_saveAsDialog;    //!< SaveAs Dialog with different save options
+      
+      //! Save Image in its entirety to an output file
+      void saveAsFullImage(Isis::Cube *icube, Isis::Cube *ocube); 
+      
+      //! Copy input cube details into output file given its dimensions
+      void copyCubeDetails(const QString & psFilename, Isis::Cube *icube, 
+           Isis::Cube *ocube, int piNumSamples, int piNumLines, int piNumBands);
+      
+      //! Save image AsIs (As viewed in the viewport window) into output file
+      void saveAs_AsIs(Isis::Cube *icube, const QString & psOutFile);
+      
+      //! Save image Full Resolution (image viewed in the viewport window) into output
+      void saveAs_FullResolution(Isis::Cube *pInCube, Isis::Cube *pOutCube, 
+                                 int pNumSamples, int pNumLines);
+      
+      //! Save image AsIs Enlarged into output
+      void saveAsEnlargedCube(Isis::Cube *icube, const QString & psOutFile);
+      
+      //! Save image AsIs Reduced into output
+      void saveAsReducedCube (Isis::Cube *icube, const QString & psOutFile);
   };
 };
 
