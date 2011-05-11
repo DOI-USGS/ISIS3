@@ -52,6 +52,8 @@ namespace Isis {
    *  @history 2008-06-18 Steven Koechle - Fixed Documentation
    *  @history 2011-04-22 Sharmila Prasad - Extended StartProcess functionality
    *     to be able to be called from any Object class by using Functors
+   *  @history 2011-05-07 Sharmila Prasad - 1. Added API SetInputCube(Cube*) to take opened cube
+   *           2. Edited StartProcess using Functors take reference to Functors
    */
   class ProcessByBrick : public Isis::Process {
     
@@ -132,7 +134,7 @@ namespace Isis {
        * @param funct - Functor with overloaded operator()(Isis::Buffer &) 
        */
       template <typename Functor> 
-      void StartProcessInPlace(Functor funct) {
+      void StartProcessInPlace(Functor & funct) {
         Isis::Cube *cube=NULL;
         Isis::Brick *bricks=NULL;
         
@@ -140,7 +142,7 @@ namespace Isis {
         
         p_progress->SetMaximumSteps(bricks->Bricks());
         p_progress->CheckStatus();
-        
+
         // Loop and let the app programmer work with the bricks
         for(bricks->begin(); !bricks->end(); (*bricks)++) {
           if(haveInput) {
@@ -151,7 +153,8 @@ namespace Isis {
             cube->Write(*bricks);  // output only or input/output
           }
           p_progress->CheckStatus();
-        }
+
+          }
         delete bricks;
       }
       
@@ -169,7 +172,7 @@ namespace Isis {
        * @param funct - Functor with overloaded operator()(Isis::Buffer &, Isis::Buffer &) 
        */
       template <typename FunctorIO>
-      void StartProcessIO(FunctorIO funct) {
+      void StartProcessIO(FunctorIO & funct) {
 
         Isis::Brick *ibrick=NULL, *obrick=NULL;
     
@@ -210,7 +213,7 @@ namespace Isis {
        *                vector<Isis::Buffer *> &out) 
        */
       template <typename FunctorIOList>
-      void StartProcessIOList(FunctorIOList funct) {
+      void StartProcessIOList(FunctorIOList & funct) {
         // Construct two vectors of brick buffer managers
         // The input buffer managers
         vector<Isis::Brick *> imgrs;
