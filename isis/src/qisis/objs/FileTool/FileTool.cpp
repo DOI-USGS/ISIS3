@@ -317,8 +317,20 @@ namespace Qisis {
     }
     
     //If the filename is empty, return
-    if(psOutFile.isEmpty() || (p_saveAsDialog==NULL)) 
+    if(psOutFile.isEmpty() || (p_saveAsDialog==NULL)){
+      QMessageBox::information((QWidget *)parent(), "Error", "No output file selected");
       return;
+    }
+    
+    //Check if the output file is already opened
+    QVector< MdiCubeViewport *> *vwportList = p_workSpace->cubeViewportList();
+    QVector<MdiCubeViewport *>::iterator it;
+    for (it = vwportList->begin(); it != vwportList->end(); ++it){
+      if(QString((*it)->cube()->Filename().c_str()) ==  psOutFile) {
+        QMessageBox::information((QWidget *)parent(), "Error", "Output File is already open\n\""+ psOutFile + "\"");
+        return;
+      }
+    }
 
     //If the filename is the same as the current cube's filename, just save it
     if(p_saveAsDialog->getSaveAsType() == SaveAsDialog::FullImage && 
