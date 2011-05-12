@@ -385,6 +385,9 @@ End
      <change name="Christopher Austin" date="2011-03-22">
        Changed the new parameter's names. (INCTYPE, NUMVERTICES)
      </change>
+     <change name="Christopher Austin" date="2011-05-12">
+      Added smarts to the VERTICES option.
+    </change>
   </history>
 
   <category>

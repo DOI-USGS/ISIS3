@@ -7,6 +7,7 @@
 #include "CamTools.h"
 #include "Filename.h"
 #include "iException.h"
+#include "ImagePolygon.h"
 #include "iString.h"
 #include "iTime.h"
 #include "LineManager.h"
@@ -167,8 +168,10 @@ void IsisMain() {
     iString incType = ui.GetString("INCTYPE");
     int polySinc, polyLinc;
     if(doPolygon && incType.UpCase() == "VERTICES") {
-      polySinc = polyLinc = (int)(0.5 + (((incube->Samples() * 2) +
-                                 (incube->Lines() * 2) - 3.0) /
+      ImagePolygon poly;
+      poly.initCube(*incube);
+      polySinc = polyLinc = (int)(0.5 + (((poly.validSampleDim() * 2) +
+                                 (poly.validLineDim() * 2) - 3.0) /
                                  ui.GetInteger("NUMVERTICES")));
     }
     else if (incType.UpCase() == "LINCSINC"){
