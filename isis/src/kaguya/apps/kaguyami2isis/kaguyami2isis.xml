@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="dawnfc2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>Import PDS formatted Kaguya MI image cube into Isis format cube</brief>
+
+  <description>
+    This program will import a PDS formatted Kaguya MI VIS and NIR level 1 (EDR) 
+    image into an Isis cube. The image will be flipped in the line direction if
+    the UPPER_LEFT_LATITUDE and LOWER_LEFT_LATITUDE are inverted.
+  </description>
+
+  <history>
+    <change name="Janet Barrett" date="2011-05-09">
+      Original version
+    </change>
+  </history>
+
+  <category>
+    <categoryItem>Import and Export</categoryItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input PDS formatted Kaguya MI VIS or NIR file
+        </brief>
+        <description>
+          Use this parameter to select the Kaguya MI VIS or
+	  NIR EDR filename. This file must contain the PDS 
+          labels.
+        </description>
+        <filter>
+          *.img *.IMG
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+         <type>cube</type>
+         <fileMode>output</fileMode>
+         <brief>
+           Output Isis cube
+         </brief>
+         <description>
+           Use this parameter to select the output filename
+         </description>
+         <filter>
+           *.cub
+         </filter>
+      </parameter>
+    </group>
+  </groups>
+</application>
