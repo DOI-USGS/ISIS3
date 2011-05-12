@@ -83,17 +83,22 @@ namespace Isis {
     QPointF initial;
     QPointF adjusted;
 
+    QPointF initialLatLon;
+    QPointF adjustedLatLon;
+
     QPair<QPointF, QPointF> rememberedLoc = (*m_pointToScene)[cp];
 
     if(!rememberedLoc.second.isNull()) {
       proj->SetUniversalGround(rememberedLoc.second.y(),
                                rememberedLoc.second.x());
       adjusted = QPointF(proj->XCoord(), -1 * proj->YCoord());
+      adjustedLatLon = rememberedLoc.second;
 
       if(!rememberedLoc.first.isNull()) {
         proj->SetUniversalGround(rememberedLoc.first.y(),
                                  rememberedLoc.first.x());
         initial = QPointF(proj->XCoord(), -1 * proj->YCoord());
+        initialLatLon = rememberedLoc.first;
       }
     }
     else if(proj) {
@@ -103,6 +108,8 @@ namespace Isis {
         if(proj->SetUniversalGround(adjSurfacePoint.GetLatitude().GetDegrees(),
                                  adjSurfacePoint.GetLongitude().GetDegrees())) {
           adjusted = QPointF(proj->XCoord(), -1 * proj->YCoord());
+          adjustedLatLon = QPointF(adjSurfacePoint.GetLongitude().GetDegrees(),
+              adjSurfacePoint.GetLatitude().GetDegrees());
         }
       }
 
@@ -111,6 +118,8 @@ namespace Isis {
         if(proj->SetUniversalGround(apriSurfacePoint.GetLatitude().GetDegrees(),
             apriSurfacePoint.GetLongitude().GetDegrees())) {
           initial = QPointF(proj->XCoord(), -1 * proj->YCoord());
+          initialLatLon = QPointF(apriSurfacePoint.GetLongitude().GetDegrees(),
+              apriSurfacePoint.GetLatitude().GetDegrees());
         }
       }
 
@@ -136,8 +145,10 @@ namespace Isis {
               double lat = (*m_cubeToGroundMap)[filename]->UniversalLatitude();
               double lon = (*m_cubeToGroundMap)[filename]->UniversalLongitude();
 
-              if(proj->SetUniversalGround(lat, lon))
+              if(proj->SetUniversalGround(lat, lon)) {
                 initial = QPointF(proj->XCoord(), -1 * proj->YCoord());
+                initialLatLon = QPointF(lon, lat);
+              }
             }
           }
         }
@@ -148,15 +159,19 @@ namespace Isis {
     }
 
     QPair<QPointF, QPointF> result;
+    QPair<QPointF, QPointF> latLonResult;
     if(!adjusted.isNull() && adjusted != initial) {
       result.second = adjusted;
       result.first = initial;
+      latLonResult.second = adjustedLatLon;
+      latLonResult.first = initialLatLon;
     }
     else {
       result.second = initial;
+      latLonResult.second = initialLatLon;
     }
 
-    (*m_pointToScene)[cp] = result;
+    (*m_pointToScene)[cp] = latLonResult;
 
     return result;
   }

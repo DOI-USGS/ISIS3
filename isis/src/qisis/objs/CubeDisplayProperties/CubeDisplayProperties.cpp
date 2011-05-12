@@ -726,7 +726,7 @@ namespace Isis {
 
     iException &e = iException::Message(iException::User,
         "Warning: Polygon re-calculated "
-        " for [" + displayName().toStdString() +
+        "for [" + displayName().toStdString() +
         "] which can be very slow", _FILEINFO_);
     e.Report();
     e.Clear();
