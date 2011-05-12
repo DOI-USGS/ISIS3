@@ -4,6 +4,8 @@
 
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 #include <google/protobuf/io/coded_stream.h>
+#include <boost/numeric/ublas/symmetric.hpp>
+#include <boost/numeric/ublas/io.hpp>
 
 #include <QList>
 
@@ -11,10 +13,16 @@
 #include "ControlNetFileV0002.pb.h"
 #include "Filename.h"
 #include "iException.h"
+#include "Latitude.h"
+#include "Longitude.h"
+#include "Projection.h"
 #include "Pvl.h"
+#include "SurfacePoint.h"
 
 using namespace google::protobuf;
 using namespace google::protobuf::io;
+using boost::numeric::ublas::symmetric_matrix;
+using boost::numeric::ublas::upper;
 using namespace std;
 
 namespace Isis {
@@ -187,6 +195,8 @@ namespace Isis {
    * @internal
    * @history 2011-05-02 Debbie A. Cook - Converted to version pvl 3
    *                     instead of 2
+   * @history 2011-05-09 Tracie Sucharski - Add comments for printing apriori 
+   *                     and adjusted values as lat/lon/radius, and sigmas.
    *
    */
   Pvl ControlNetFileV0002::ToPvl() const {
@@ -203,6 +213,17 @@ namespace Isis {
 
     // This is the Pvl version we're converting to
     network += PvlKeyword("Version", "3");
+
+    //  Get Target Radii from naif kernel
+    PvlGroup pvlRadii;
+    try {
+      pvlRadii = Projection::TargetRadii(network["TargetName"]);
+    }
+    catch(iException &e) {
+      iString msg = "The target name, " + (string)(network["TargetName"]) +
+                    ", is not recognized.";
+      throw iException::Message(iException::Io, msg, _FILEINFO_);
+    }
 
     ControlPointFileEntryV0002 binaryPoint;
     foreach(binaryPoint, *p_controlPoints) {
@@ -289,6 +310,22 @@ namespace Isis {
         pvlPoint += PvlKeyword("AprioriY", binaryPoint.aprioriy(), "meters");
         pvlPoint += PvlKeyword("AprioriZ", binaryPoint.aprioriz(), "meters");
 
+        // Get surface point, convert to lat,lon,radius and output as comment
+        SurfacePoint apriori;
+        apriori.SetRectangular(
+                Displacement(binaryPoint.apriorix(),Displacement::Meters),
+                Displacement(binaryPoint.aprioriy(),Displacement::Meters),
+                Displacement(binaryPoint.aprioriz(),Displacement::Meters));
+        pvlPoint.FindKeyword("AprioriX").AddComment("Apriori Latitude = " + 
+                                 iString(apriori.GetLatitude().GetDegrees()) +
+                                 " <degrees>");
+        pvlPoint.FindKeyword("AprioriY").AddComment("Apriori Longitude = " + 
+                                 iString(apriori.GetLongitude().GetDegrees()) +
+                                 " <degrees>");
+        pvlPoint.FindKeyword("AprioriZ").AddComment("Apriori Radius = " + 
+                                 iString(apriori.GetLocalRadius().GetMeters()) +
+                                 " <meters>");
+
         if(binaryPoint.aprioricovar_size()) {
           PvlKeyword matrix("AprioriCovarianceMatrix");
           matrix += binaryPoint.aprioricovar(0);
@@ -298,6 +335,29 @@ namespace Isis {
           matrix += binaryPoint.aprioricovar(4);
           matrix += binaryPoint.aprioricovar(5);
           pvlPoint += matrix;
+
+          apriori.SetRadii(
+                       Distance(pvlRadii["EquatorialRadius"],Distance::Meters),
+                       Distance(pvlRadii["EquatorialRadius"],Distance::Meters),
+                       Distance(pvlRadii["PolarRadius"],Distance::Meters));
+          symmetric_matrix<double, upper> covar;
+          covar.resize(3);
+          covar.clear();
+          covar(0, 0) = binaryPoint.aprioricovar(0);
+          covar(0, 1) = binaryPoint.aprioricovar(1);
+          covar(0, 2) = binaryPoint.aprioricovar(2);
+          covar(1, 1) = binaryPoint.aprioricovar(3);
+          covar(1, 2) = binaryPoint.aprioricovar(4);
+          covar(2, 2) = binaryPoint.aprioricovar(5);
+          apriori.SetRectangularMatrix(covar);
+          iString sigmas = "AprioriLatitudeSigma = " +
+                           iString(apriori.GetLatSigmaDistance().GetMeters()) +
+                           " <meters>  AprioriLongitudeSigma = " +
+                           iString(apriori.GetLonSigmaDistance().GetMeters()) +
+                           " <meters>  AprioriRadiusSigma = " +
+                           iString(apriori.GetLocalRadiusSigma().GetMeters()) +
+                           " <meters>";
+          pvlPoint.FindKeyword("AprioriCovarianceMatrix").AddComment(sigmas);
         }
       }
 
@@ -315,6 +375,22 @@ namespace Isis {
         pvlPoint += PvlKeyword("AdjustedY", binaryPoint.adjustedy(), "meters");
         pvlPoint += PvlKeyword("AdjustedZ", binaryPoint.adjustedz(), "meters");
 
+        // Get surface point, convert to lat,lon,radius and output as comment
+        SurfacePoint adjusted;
+        adjusted.SetRectangular(
+                Displacement(binaryPoint.adjustedx(),Displacement::Meters),
+                Displacement(binaryPoint.adjustedy(),Displacement::Meters),
+                Displacement(binaryPoint.adjustedz(),Displacement::Meters));
+        pvlPoint.FindKeyword("AdjustedX").AddComment("AdjustedLatitude = " + 
+                                 iString(adjusted.GetLatitude().GetDegrees()) +
+                                 " <degrees>");
+        pvlPoint.FindKeyword("AdjustedY").AddComment("AdjustedLongitude = " + 
+                                 iString(adjusted.GetLongitude().GetDegrees()) +
+                                 " <degrees>");
+        pvlPoint.FindKeyword("AdjustedZ").AddComment("AdjustedRadius = " + 
+                                 iString(adjusted.GetLocalRadius().GetMeters()) +
+                                 " <meters>");
+
         if(binaryPoint.adjustedcovar_size()) {
           PvlKeyword matrix("AdjustedCovarianceMatrix");
           matrix += binaryPoint.adjustedcovar(0);
@@ -324,6 +400,29 @@ namespace Isis {
           matrix += binaryPoint.adjustedcovar(4);
           matrix += binaryPoint.adjustedcovar(5);
           pvlPoint += matrix;
+
+          adjusted.SetRadii(
+                       Distance(pvlRadii["EquatorialRadius"],Distance::Meters),
+                       Distance(pvlRadii["EquatorialRadius"],Distance::Meters),
+                       Distance(pvlRadii["PolarRadius"],Distance::Meters));
+          symmetric_matrix<double, upper> covar;
+          covar.resize(3);
+          covar.clear();
+          covar(0, 0) = binaryPoint.adjustedcovar(0);
+          covar(0, 1) = binaryPoint.adjustedcovar(1);
+          covar(0, 2) = binaryPoint.adjustedcovar(2);
+          covar(1, 1) = binaryPoint.adjustedcovar(3);
+          covar(1, 2) = binaryPoint.adjustedcovar(4);
+          covar(2, 2) = binaryPoint.adjustedcovar(5);
+          adjusted.SetRectangularMatrix(covar);
+          iString sigmas = "AdjustedLatitudeSigma = " +
+                           iString(adjusted.GetLatSigmaDistance().GetMeters()) +
+                           " <meters>  AdjustedLongitudeSigma = " +
+                           iString(adjusted.GetLonSigmaDistance().GetMeters()) +
+                           " <meters>  AdjustedRadiusSigma = " +
+                           iString(adjusted.GetLocalRadiusSigma().GetMeters()) +
+                           " <meters>";
+          pvlPoint.FindKeyword("AdjustedCovarianceMatrix").AddComment(sigmas);
         }
       }
 
