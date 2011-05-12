@@ -47,8 +47,9 @@ void IsisMain() {
   int linc = 1;
   iString incType = ui.GetString("INCTYPE");
   if(incType.UpCase() == "VERTICES") {
-    sinc = linc = (int)(0.5 + (((cube.Samples() * 2) +
-                       (cube.Lines() * 2) - 3.0) /
+    poly.initCube(cube);
+    sinc = linc = (int)(0.5 + (((poly.validSampleDim() * 2) +
+                       (poly.validLineDim() * 2) - 3.0) /
                        ui.GetInteger("NUMVERTICES")));
   }
   else if (incType.UpCase() == "LINCSINC"){

@@ -97,6 +97,9 @@
     <change name="Christopher Austin" date="2011-04-12">
       Added the INCTYPE parameter (so it is consistant with caminfo).
     </change>
+    <change name="Christopher Austin" date="2011-05-12">
+      Added smarts to the VERTICES option.
+    </change>
   </history>
 
   <groups>
