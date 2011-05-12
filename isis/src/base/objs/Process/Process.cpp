@@ -616,7 +616,7 @@ namespace Isis {
       if(InputCubes.size() > 0) {
         Isis::Pvl & inlab = *InputCubes[0]->Label();
         for(int i = 0; i < inlab.Objects(); i++) {
-          if(inlab.Object(i).IsNamed("History")) {
+          if(inlab.Object(i).IsNamed("History") && Isis::iApp != NULL) {
             Isis::History h((string)inlab.Object(i)["Name"]);
             InputCubes[0]->Read(h);
             h.AddEntry();
