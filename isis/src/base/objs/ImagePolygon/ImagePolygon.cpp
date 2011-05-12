@@ -20,11 +20,12 @@
 *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
 *   http://www.usgs.gov/privacy.html.
 */
-
+#include "IsisDebug.h"
 
 #include <string>
 #include <iostream>
 #include <vector>
+
 #include "ImagePolygon.h"
 #include "SpecialPixel.h"
 #include "PolygonTools.h"
@@ -49,11 +50,22 @@ namespace Isis {
    */
   ImagePolygon::ImagePolygon() : Blob("Footprint", "Polygon") {
     p_polygons = NULL;
+
+    p_cube = NULL;
+
+    m_leftCoord = NULL;
+    m_rightCoord = NULL;
+    m_topCoord = NULL;
+    m_botCoord = NULL;
+
     p_cubeStartSamp = 1;
     p_cubeStartLine = 1;
+
     p_emission = 180.0;
     p_incidence = 180.0;
+
     p_subpixelAccuracy = 50; //An accuracte and quick number
+
     p_ellipsoid = false;
   }
 
@@ -61,6 +73,93 @@ namespace Isis {
   //! Destroys the Polygon object
   ImagePolygon::~ImagePolygon() {
     if(p_polygons != 0) delete p_polygons;
+
+    if(p_cube) p_cube = NULL;
+
+    if(m_leftCoord) delete m_leftCoord;
+    if(m_rightCoord) delete m_rightCoord;
+    if(m_topCoord) delete m_topCoord;
+    if(m_botCoord) delete m_botCoord;
+  }
+
+
+  /**
+   * Create a Polygon from given cube
+   *
+   * @param[in]  cube                 (Cube &)    Cube used to create polygon
+   *
+   * @param[in]  ss    (Default=1)    (in)       Starting sample number
+   * @param[in]  sl    (Default=1)    (in)       Starting Line number
+   * @param[in]  ns    (Default=0)    (in)       Number of samples used to create
+   *       the polygon. Default of 0 will cause ns to be set to the number of
+   *       samples in the cube.
+   * @param[in]  nl    (Default=0)    (in)       Number of lines used to create
+   *       the polygon. Default of 0 will cause nl to be set to the number of
+   *       lines in the cube.
+   * @param[in]  band  (Default=1)    (in)       Image band number
+   */
+  Camera * ImagePolygon::initCube(Cube &cube, int ss, int sl,
+                                  int ns, int nl, int band) {
+    p_gMap = new UniversalGroundMap(cube);
+    p_gMap->SetBand(band);
+
+    p_cube = &cube;
+
+    Camera *cam = NULL;
+    Projection *proj = NULL;
+    p_isProjected = false;
+
+    try {
+      cam = cube.Camera();
+    }
+    catch(iException &error) {
+      try {
+        proj = cube.Projection();
+        p_isProjected = true;
+        error.Clear();
+      }
+      catch(iException &error) {
+        std::string msg = "Can not create polygon, ";
+        msg += "cube [" + cube.Filename();
+        msg += "] is not a camera or map projection";
+        throw iException::Message(iException::User, msg, _FILEINFO_);
+      }
+    }
+    if(cam != NULL) p_isProjected = cam->HasProjection();
+
+    //  Create brick for use in SetImage
+    p_brick = new Brick(1, 1, 1, cube.PixelType());
+
+    //------------------------------------------------------------------------
+    //  Save cube number of samples and lines for later use.
+    //------------------------------------------------------------------------
+    p_cubeSamps = cube.Samples();
+    p_cubeLines = cube.Lines();
+
+    if(ns != 0) {
+      p_cubeSamps = std::min(p_cubeSamps, ss + ns);
+    }
+
+    if(nl != 0) {
+      p_cubeLines = std::min(p_cubeLines, sl + nl);
+    }
+
+    p_cubeStartSamp = ss;
+    p_cubeStartLine = sl;
+
+    if(p_ellipsoid && IsLimb() && p_gMap->Camera()) {
+      try {
+        p_gMap->Camera()->IgnoreElevationModel(true);
+      }
+      catch(iException &e) {
+        e.Clear();
+        std::string msg = "Cannot use an ellipsoid shape model";
+        msg += " on a limb image without a camera.";
+        throw iException::Message(iException::User, msg, _FILEINFO_);
+      }
+    }
+
+    return cam;
   }
 
 
@@ -97,64 +196,7 @@ namespace Isis {
     p_lineinc = lineinc;
     p_pts = new geos::geom::CoordinateArraySequence();
 
-    p_gMap = new UniversalGroundMap(cube);
-    p_gMap->SetBand(band);
-
-    p_cube = &cube;
-
-    Camera *cam = NULL;
-    Projection *proj = NULL;
-    p_isProjected = false;
-
-    try {
-      cam = cube.Camera();
-    }
-    catch(iException &error) {
-      try {
-        proj = cube.Projection();
-        p_isProjected = true;
-        error.Clear();
-      }
-      catch(iException &error) {
-        std::string msg = "Can not create polygon, ";
-        msg += "cube [" + cube.Filename();
-        msg += "] is not a camera or map projection";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
-      }
-    }
-    if(cam != NULL) p_isProjected = cam->HasProjection();
-
-    //  Create brick for use in SetImage
-    p_brick = new Brick(1, 1, 1, cube.PixelType());
-
-    /*------------------------------------------------------------------------
-    /  Save cube number of samples and lines for later use.
-    /-----------------------------------------------------------------------*/
-    p_cubeSamps = cube.Samples();
-    p_cubeLines = cube.Lines();
-
-    if(ns != 0) {
-      p_cubeSamps = std::min(p_cubeSamps, ss + ns);
-    }
-
-    if(nl != 0) {
-      p_cubeLines = std::min(p_cubeLines, sl + nl);
-    }
-
-    p_cubeStartSamp = ss;
-    p_cubeStartLine = sl;
-
-    if(p_ellipsoid && IsLimb() && p_gMap->Camera()) {
-      try {
-        p_gMap->Camera()->IgnoreElevationModel(true);
-      }
-      catch(iException &e) {
-        e.Clear();
-        std::string msg = "Cannot use an ellipsoid shape model";
-        msg += " on a limb image without a camera.";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
-      }
-    }
+    Camera *cam = initCube(cube, ss, sl, ns, nl, band);
 
     try {
       WalkPoly();
@@ -424,6 +466,69 @@ namespace Isis {
     // Check to make sure a point was found
     std::string msg = "No lat/lon data found for image";
     throw iException::Message(iException::User, msg, _FILEINFO_);
+  }
+
+
+  /**
+   * Retuns the maximum valid sample width of the cube set with either
+   * initCube() or Create()
+   */
+  double ImagePolygon::validSampleDim() {
+    if (not m_leftCoord or not m_rightCoord) calcImageBorderCoordinates();
+    return m_rightCoord->x - m_leftCoord->x + 1;
+  }
+
+
+  /**
+   * Retuns the maximum valid line width of the cube set with either
+   * initCube() or Create()
+   */
+  double ImagePolygon::validLineDim() {
+    if (not m_topCoord or not m_botCoord) calcImageBorderCoordinates();
+    return m_botCoord->y - m_topCoord->y + 1;
+  }
+
+
+  /**
+   * Calculates the four border points, particularly for validSampleDim() and
+   * validLineDim()
+   */
+  void ImagePolygon::calcImageBorderCoordinates() {
+    ASSERT(p_cube);
+    ASSERT(p_cubeSamples);
+    ASSERT(p_cubeLines);
+    if (not m_leftCoord) {
+      for(int line = p_cubeStartLine; line <= p_cubeLines; line++)
+        for(int sample = p_cubeStartSamp; sample <= p_cubeSamps; sample++)
+          if(SetImage(sample, line)) {
+            m_leftCoord = new geos::geom::Coordinate(sample, line);
+            break;
+          }
+    }
+    if (not m_rightCoord) {
+      for(int line = p_cubeStartLine; line <= p_cubeLines; line++)
+        for(int sample = p_cube->Samples(); sample >= m_leftCoord->x; sample--)
+          if(SetImage(sample, line)) {
+            m_rightCoord = new geos::geom::Coordinate(sample, line);
+            break;
+          }
+    }
+    if (not m_topCoord) {
+      for(int sample = (int)m_leftCoord->x; sample <= m_rightCoord->x; sample++)
+        for(int line = 1; line <= p_cubeLines; line++)
+          if(SetImage(sample, line)) {
+            m_topCoord = new geos::geom::Coordinate(sample, line);
+            break;
+          }
+    }
+    if (not m_botCoord) {
+      for(int sample = (int)m_leftCoord->x; sample <= m_rightCoord->x; sample++)
+        for(int line = p_cube->Lines(); line >= m_topCoord->y; line--)
+          if(SetImage(sample, line)) {
+            m_botCoord = new geos::geom::Coordinate(sample, line);
+            break;
+          }
+    }
   }
 
 

@@ -150,6 +150,8 @@ namespace Isis {
    *           issues, including a cycle fix which occured during Emission Angle
    *           and Incidence Angle restrictions
    *  @history 2011-05-11 Steven Lambright - Now works with projected images.
+   *  @history 2011-05-12 Christopher Austin - Added validSample/LineDim()
+   *                                           functionality.
    */
 
   class ImagePolygon : public Isis::Blob {
@@ -160,6 +162,8 @@ namespace Isis {
 
       void Create(Cube &cube, int sampinc = 1, int lineinc = 1,
                   int ss = 1, int sl = 1, int ns = 0, int nl = 0, int band = 1);
+      Camera * initCube(Cube &cube, int ss = 1, int sl = 1,
+                        int ns = 0, int nl = 0, int band = 1);
 
       /**
        * Set the maximum emission angle ( light refleted to camera )
@@ -206,6 +210,9 @@ namespace Isis {
         return p_polygons;
       };
 
+      double validSampleDim();
+      double validLineDim();
+
     protected:
       void ReadData(std::istream &is);
       void WriteInit();
@@ -238,6 +245,8 @@ namespace Isis {
 
       void FindSubpixel(std::vector<geos::geom::Coordinate> & points);
 
+      void calcImageBorderCoordinates();
+
       Cube *p_cube;       //!< The cube provided
       bool p_isProjected; //!< True when the provided cube is projected
 
@@ -250,6 +259,11 @@ namespace Isis {
       std::string p_polyStr; //!< The string representation of the polygon
 
       UniversalGroundMap *p_gMap; //!< The cube's ground map
+
+      geos::geom::Coordinate *m_leftCoord; //!< The cube's left-most valid coord
+      geos::geom::Coordinate *m_rightCoord; //!< The cube's right-most valid coord
+      geos::geom::Coordinate *m_topCoord; //!< The cube's top-most valid coord
+      geos::geom::Coordinate *m_botCoord; //!< The cube's bot-most valid coord
 
       int p_cubeStartSamp; //!< The the sample of the first valid point in the cube
       int p_cubeStartLine; //!< The the line of the first valid point in the cube
