@@ -1705,6 +1705,9 @@ namespace Qisis {
    * Update the Surface Point Information in the QnetTool window
    *  
    * @author 2011-03-01 Tracie Sucharski 
+   *  
+   * @internal 
+   * @history 2011-05-12 Tracie Sucharski - Type printing Apriori Values 
    */
   void QnetTool::updateSurfacePointInfo () {
 
@@ -1732,7 +1735,7 @@ namespace Qisis {
     }
     else {
       s = "Apriori Radius:  " +
-          QString::number(aprioriPoint.GetLocalRadius().GetMeters()) +
+          QString::number(aprioriPoint.GetLocalRadius().GetMeters(),'f',2) +
           " <meters>";
     }
     p_pointAprioriRadius->setText(s);
@@ -1746,6 +1749,7 @@ namespace Qisis {
             QString::number(aprioriPoint.GetLatSigmaDistance().GetMeters()) +
             " <meters>";
       }
+      p_pointAprioriLatitudeSigma->setText(s);
       if (aprioriPoint.GetLonSigmaDistance().GetMeters() == Isis::Null) {
         s = "Apriori Longitude Sigma:  Null";
       }
@@ -1754,6 +1758,7 @@ namespace Qisis {
             QString::number(aprioriPoint.GetLonSigmaDistance().GetMeters()) +
             " <meters>";
       }
+      p_pointAprioriLongitudeSigma->setText(s);
       if (aprioriPoint.GetLocalRadiusSigma().GetMeters() == Isis::Null) {
         s = "Apriori Radius Sigma:  Null";
       }
@@ -1762,15 +1767,16 @@ namespace Qisis {
             QString::number(aprioriPoint.GetLocalRadiusSigma().GetMeters()) +
             " <meters>";
       }
+      p_pointAprioriRadiusSigma->setText(s);
     }
     else {
       s = "Apriori Latitude Sigma:  Null";
+      p_pointAprioriLatitudeSigma->setText(s);
       s = "Apriori Longitude Sigma:  Null";
+      p_pointAprioriLongitudeSigma->setText(s);
       s = "Apriori Radius Sigma:  Null";
+      p_pointAprioriRadiusSigma->setText(s);
     }
-    p_pointAprioriLatitudeSigma->setText(s);
-    p_pointAprioriLongitudeSigma->setText(s);
-    p_pointAprioriRadiusSigma->setText(s);
       
           
     SurfacePoint point = p_editPoint->GetAdjustedSurfacePoint();

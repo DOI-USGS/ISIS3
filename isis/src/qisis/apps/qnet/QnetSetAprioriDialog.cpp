@@ -217,7 +217,7 @@ void QnetSetAprioriDialog::setApriori() {
                                      Distance(radiusSigma,Distance::Meters));
       //  Write the surface point back out to the controlPoint and set to Ground
       pt->SetAprioriSurfacePoint(spt);
-      pt->SetType(ControlPoint::Ground);
+      pt->SetType(ControlPoint::Tie);
       emit pointChanged(id);
       emit netChanged();
     }
