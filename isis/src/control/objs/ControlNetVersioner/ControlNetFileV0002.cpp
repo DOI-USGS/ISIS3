@@ -316,13 +316,13 @@ namespace Isis {
                 Displacement(binaryPoint.apriorix(),Displacement::Meters),
                 Displacement(binaryPoint.aprioriy(),Displacement::Meters),
                 Displacement(binaryPoint.aprioriz(),Displacement::Meters));
-        pvlPoint.FindKeyword("AprioriX").AddComment("Apriori Latitude = " + 
+        pvlPoint.FindKeyword("AprioriX").AddComment("AprioriLatitude = " + 
                                  iString(apriori.GetLatitude().GetDegrees()) +
                                  " <degrees>");
-        pvlPoint.FindKeyword("AprioriY").AddComment("Apriori Longitude = " + 
+        pvlPoint.FindKeyword("AprioriY").AddComment("AprioriLongitude = " + 
                                  iString(apriori.GetLongitude().GetDegrees()) +
                                  " <degrees>");
-        pvlPoint.FindKeyword("AprioriZ").AddComment("Apriori Radius = " + 
+        pvlPoint.FindKeyword("AprioriZ").AddComment("AprioriRadius = " + 
                                  iString(apriori.GetLocalRadius().GetMeters()) +
                                  " <meters>");
 
