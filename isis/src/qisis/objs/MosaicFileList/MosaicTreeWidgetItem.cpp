@@ -30,11 +30,11 @@ namespace Isis {
               QString::number(p_cubeDisplay->resolution()));
 
     if(!IsSpecial(p_cubeDisplay->emissionAngle()))
-      setText(ResolutionColumn,
+      setText(EmissionAngleColumn,
               QString::number(p_cubeDisplay->emissionAngle()));
 
     if(!IsSpecial(p_cubeDisplay->incidenceAngle()))
-      setText(ResolutionColumn,
+      setText(IncidenceAngleColumn,
               QString::number(p_cubeDisplay->incidenceAngle()));
 
     setFlags(Qt::ItemIsEnabled |
