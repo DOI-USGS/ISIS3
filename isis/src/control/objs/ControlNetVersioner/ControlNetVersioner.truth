@@ -119,16 +119,32 @@ Object = ControlNetwork
     AprioriXYZSourceFile     = /work1/tsucharski/basemap.cub
     AprioriRadiusSource      = DEM
     AprioriRadiusSourceFile  = $base/dems/molaMarsPlanetaryRadius0003.cub
+
+    # AprioriLatitude = 31.999999989922 <degrees>
     AprioriX                 = -424.024048 <meters>
+
+    # AprioriLongitude = 119.99999999551 <degrees>
     AprioriY                 = 734.4311949 <meters>
+
+    # AprioriRadius = 999.99999984142 <meters>
     AprioriZ                 = 529.919264 <meters>
+
+    # AprioriLatitudeSigma = 97324.497783569 <meters>  AprioriLongitudeSigma = 124939.57715415 <meters>  AprioriRadiusSigma = 38.454887341483 <meters>
     AprioriCovarianceMatrix  = (100.0, 0.0, 0.0, 2500.0, 0.0, 400.0)
     LatitudeConstrained      = True
     LongitudeConstrained     = True
     RadiusConstrained        = True
+
+    # AdjustedLatitude = 31.999999989922 <degrees>
     AdjustedX                = -424.024048 <meters>
+
+    # AdjustedLongitude = 119.99999999551 <degrees>
     AdjustedY                = 734.4311949 <meters>
+
+    # AdjustedRadius = 999.99999984142 <meters>
     AdjustedZ                = 529.919264 <meters>
+
+    # AdjustedLatitudeSigma = 97324.497783569 <meters>  AdjustedLongitudeSigma = 124939.57715415 <meters>  AdjustedRadiusSigma = 38.454887341483 <meters>
     AdjustedCovarianceMatrix = (100.0, 0.0, 0.0, 2500.0, 0.0, 400.0)
 
     Group = ControlMeasure
