@@ -1,0 +1,679 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="hidtmgen" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Generate PDS products from a DTM and four orthographic images.
+  </brief>
+
+  <description>
+    This application is designed to take a DTM and four orthographic images and 
+    produce a set PDS products. The two things accomplished by this program are 
+    exporting to the PDS format, and modifying the labels to included extra 
+    information and to be formatted correctly. The expected files are generally 
+    from Socet Set and require some processing before being ready to be 
+    exported. 
+  </description>
+
+  <category>
+    <categoryItem>Import and Export</categoryItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>    
+        hirdrgen
+      </item>
+      <item>    
+        isis2pds 
+      </item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Mackenzie Boyd" date="2011-05-13">
+      0riginal Version
+    </change>
+  </history>
+  
+  <groups>
+    <group name="Files">
+
+      <parameter name="DTM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>The name of the DTM</brief>
+        <description>
+          This is the name of the DTM from Socet Set. It must contain labels 
+          with a mapping group, there are no expectations as to the formatting 
+          of its name.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+      
+      <parameter name="ORTHO1">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>First of four orthographic images</brief>
+        <description>
+          This is one of the four orthographic images. It is expected that the 
+          matching cube of a different resolution will be under ORTHO2. If using 
+          DEFAULTNAMES=TRUE, the default, the name should be of the form 
+          AAA_######_####_... where AAA is letters, e.g. PSP, and the #s are 
+          numbers.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+      
+      <parameter name="ORTHO2">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>Second of four orthographic images</brief>
+        <description>
+          This is one of the four orthographic images. It is expected that the 
+          matching cube of a different resolution will be under ORTHO1. If using 
+          DEFAULTNAMES=TRUE, the default, the name should be of the form 
+          AAA_######_####_... where AAA is letters, e.g. PSP, and the #s are 
+          numbers.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+      
+      <parameter name="ORTHO3">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>Third of four orthographic images</brief>
+        <description>
+          This is one of the four orthographic images. It is expected that the 
+          matching cube of a different resolution will be under ORTHO4. If using 
+          DEFAULTNAMES=TRUE, the default, the name should be of the form 
+          AAA_######_####_... where AAA is letters, e.g. PSP, and the #s are 
+          numbers.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+      
+      <parameter name="ORTHO4">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>Last of four orthographic images</brief>
+        <description>
+          This is one of the four orthographic images. It is expected that the 
+          matching cube of a different resolution will be under ORTHO3. If using 
+          DEFAULTNAMES=TRUE, the default, the name should be of the form 
+          AAA_######_####_... where AAA is letters, e.g. PSP, and the #s are 
+          numbers.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+
+      <parameter name="DEFAULTNAMES">
+        <type>boolean</type>
+        <default><item>TRUE</item></default>
+        <brief>
+          Input names match expected form  
+        </brief>
+        <description>
+          <p>
+            For convenience names of a certian form may be used so that output 
+            filenames do not need to be specified. If true/checked, no output 
+            filenames are required, and filenames will be built from input 
+            names and other cube attributes. Input filenames of a certain form 
+            are required if true, see ORTHO 1-4 and DTM parameters for more 
+            details. If false, output filenames must be specified as well as a 
+            few other values, and no assumptions are made about the input 
+            filenames.  
+          </p>
+
+          <pre> 
+          The output filenames used when true are as follows. For all files, the 
+          form is aabcd_xxxxxx_xxxx_yyyyyy_yyyy_Vnn, where aa = DT, indicating 
+          it's a DTM product
+            b = type of data 
+              E = areoid elevations 
+              R = radii
+              1 = orthoimage pixels from first image
+              2 = orthoimage pixels from second image 
+            c = projection (others are possible but these are the important 
+              ones) 
+              E = Equirectangular
+              P = Polar Stereographic
+            d = grid spacing
+              A = 0.25 m 
+              B = 0.5 m 
+              C = 1.0 m 
+              etc. 
+              Z is used if no match is found, a 10% tolerance on the resolution 
+              is value is used to catch values that are close. 
+            xxxxxx_xxxx = orbit number and bin from ORTHO1 and ORTHO2.
+            yyyyyy_yyyy = orbit number and bin from ORTHO3 and ORTHO4. 
+            V = letter indicating producing institution 
+              U = USGS 
+              A = University of Arizona 
+              C = CalTech 
+              N = NASA Ames 
+              J = JPL 
+              O = Ohio State 
+              Z = other 
+            nn = 2 digit version number 
+          </pre>
+        </description>
+        <exclusions>
+          <item>DTMTO</item>   
+          <item>ORTHO1TO</item>   
+          <item>ORTHO2TO</item>   
+          <item>ORTHO3TO</item>   
+          <item>ORTHO4TO</item>   
+          <item>SOURCE_PRODUCT_ID</item>   
+          <item>DTM_PRODUCT_ID</item>   
+          <item>ORTHO1_PRODUCT_ID</item>   
+          <item>ORTHO2_PRODUCT_ID</item>   
+          <item>ORTHO3_PRODUCT_ID</item>   
+          <item>ORTHO4_PRODUCT_ID</item>   
+        </exclusions>
+        <inclusions>
+          <item>OUTPUTDIR</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="OUTPUTDIR">
+        <type>string</type>
+        <default><item>./</item></default>
+        <brief>
+          Directory for output products
+        </brief>
+        <description>
+          The directory for all output products to go to. Only applies when 
+          DEFAULTNAMES is true.
+        </description>
+      </parameter>
+
+      <parameter name="DTMTO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>DTM output filename</brief>
+        <description>
+          The file for the DTM to be exported to.
+        </description>
+        <filter> *.IMG </filter> 
+      </parameter>
+      
+      <parameter name="ORTHO1TO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>ORTHO1 output filename</brief>
+        <description>
+          The file for the first orthoimage to be exported to.
+        </description>
+        <filter> *.IMG </filter> 
+      </parameter>
+      
+      <parameter name="ORTHO2TO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>ORTHO2 output filename</brief>
+        <description>
+          The file for the second orthoimage to be exported to.
+        </description>
+        <filter> *.IMG </filter> 
+      </parameter>
+      
+      <parameter name="ORTHO3TO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>ORTHO3 output filename</brief>
+        <description>
+          The file for the third orthoimage to be exported to.
+        </description>
+        <filter> *.IMG </filter> 
+      </parameter>
+
+      <parameter name="ORTHO4TO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>ORTHO4 output filename</brief>
+        <description>
+          The file for the fourth orthoimage to be exported to.
+        </description>
+        <filter> *.IMG </filter> 
+      </parameter>
+
+    </group>
+
+    <group name="Producer and Data Set information">
+      
+      <!--<parameter name="DATA_SET_ID">
+        <type>string</type>
+        <brief>              
+          Id of the data set
+        </brief>
+       <description>
+          Data set ID, this can be any value, it is used in the identification 
+          information in the labels.
+        </description>
+      </parameter>
+
+      <parameter name="DATA_SET_NAME">
+        <type>string</type>
+        <brief>
+          Name of the data set
+        </brief>
+        <description>
+          Data set name, this can be any value, it is used in the identification 
+          information in the labels.
+        </description>
+      </parameter>
+
+      <parameter name="PRODUCER_INSTITUTION_NAME">
+        <type>string</type>
+        <brief>
+          Full name of producing institution
+        </brief>
+        <description>
+          The full name of the producing institution, e.g. "University Of 
+          Arizona".
+        </description>
+      </parameter>
+
+      <parameter name="PRODUCER_ID">
+        <type>string</type>
+        <brief>
+          Abbreviation of PRODUCER_INSTITUTION_NAME
+        </brief>
+        <description>
+          A short string representing the producer instituion, e.g. UA.
+        </description>
+      </parameter>-->
+      
+      <parameter name="PARAMSPVL">
+        <type>filename</type>
+        <default><item>$mro/templates/labels/hidtmgenDefaults.pvl</item></default>
+        <brief>
+          Pvl formatted file with necessary parameters
+        </brief>
+        <description>
+          This should be a pvl formatted file that contains the following 
+          required keywords:<br/>
+          <ul>
+            <li>DATA_SET_ID</li>
+            <li>DATA_SET_NAME</li>
+            <li>PRODUCER_INSTITUION_NAME</li>
+            <li>PRODUCER_ID</li>
+            <li>PRODUCER_FULL_NAME</li>
+            <li>PRODUCT_VERSION_ID</li>
+            <li>SOFTWARE_NAME</li>
+            <li>PRODUCTING_INSTITUION</li>
+          </ul>
+        </description>
+      </parameter>
+
+      <parameter name="PRODUCER_FULL_NAME">
+        <type>string</type>
+        <default><item>From parameters pvl file</item></default>
+        <brief>Name of producer</brief>
+        <description>
+          The full name(s) of the producer(s).
+        </description>
+      </parameter>
+
+      <parameter name="RATIONALE_DESC">
+        <type>string</type>
+        <brief>
+          The rationale description
+        </brief>
+        <description>
+          A text description of the rationale, it is used in the identificaiton 
+          information in the labels.
+        </description>
+      </parameter>
+
+      <parameter name="PRODUCT_VERSION_ID">
+        <type>double</type>
+        <default><item>1.0</item></default>
+        <brief>
+          Version number of the product
+        </brief>
+        <description>
+          Version number of the product, any number is acceptable. This is used 
+          in creating output names if DEFAULTNAMES is true/checked. If so, the 
+          number will be used as follows when being put into the output names: 
+          if greater than 10, the first two digits will be used, if #.0, the 
+          number will be 0#, if #.#, the number will be ##, if less than 1.0, 
+          the decimal point will be removed and the number will be: if 0.#, 0#, 
+          or, if 0.0#, 0#. Except for the special case of #.0, the most 
+          significant digits are used.  
+        </description>
+      </parameter>
+
+      <parameter name="DTM_PRODUCT_ID">
+        <type>string</type>
+        <brief>Id of the product</brief>
+        <description>
+          Id for the product image. When using default names, this is the same 
+          as the output name.
+        </description>
+      </parameter>
+
+      <parameter name="ORTHO1_PRODUCT_ID">
+        <type>string</type>
+        <brief>Id of the product</brief>
+        <description>
+          Id for the product image. When using default names, this is the same 
+          as the output name.
+        </description>
+      </parameter>
+      
+      <parameter name="ORTHO2_PRODUCT_ID">
+        <type>string</type>
+        <brief>Id of the product</brief>
+        <description>
+          Id for the product image. When using default names, this is the same 
+          as the output name.
+        </description>
+      </parameter>
+      
+      <parameter name="ORTHO3_PRODUCT_ID">
+        <type>string</type>
+        <brief>Id of the product</brief>
+        <description>
+          Id for the product image. When using default names, this is the same 
+          as the output name.
+        </description>
+      </parameter>
+      
+      <parameter name="ORTHO4_PRODUCT_ID">
+        <type>string</type>
+        <brief>Id of the product</brief>
+        <description>
+          Id for the product image. When using default names, this is the same 
+          as the output name.
+        </description>
+      </parameter>
+
+      <parameter name="SOURCE_PRODUCT_ID">
+        <type>string</type>
+        <brief>
+          Names of source products
+        </brief>
+        <description>
+          The names of the source product files. If DEFAULTNAMES is checked, 
+          this will be of the form (######_####,######_####), where the numbers 
+          come from ortho1 and ortho3 filenames. Otherwise, this can be any 
+          string. Only used in the labels of the output files.
+        </description>
+      </parameter>
+
+      <!--<parameter name="SOFTWARE_NAME">
+        <type>string</type>
+        <brief>
+          Name of software used to generate files
+        </brief>
+        <description>
+          The name of the software used to generate the files, e.g. Socet Set 
+          5.4.1, it is used in the identificaiton information in the labels.
+        </description>
+      </parameter>
+
+      <parameter name="PRODUCING_INSTITUTION">
+        <type>string</type>
+        <brief>
+          Single letter abbreviation of producing institution
+        </brief>
+        <description>
+          This must be a single character representing the producing 
+          institution. It is used in the output filenames when DEFAULTEVALUES is 
+          true. Common values are:
+          <pre>
+            U = USGS
+            A = University of Arizona
+            C = CalTech
+            N = NASA Ames
+            J = JPL
+            O = Ohio State
+            Z = other
+          </pre> 
+        </description>
+      </parameter>-->
+      
+    </group>
+
+    <group name="DTM Output Settings">
+      <parameter name="DTMBITTYPE">
+        <type>string</type>
+        <default>
+          <item>32BIT</item>
+        </default>
+        <brief>Bit type of output file</brief>
+        <description>
+          Bit type of output:
+            8 bit (0=black, 255=white)
+            16 bit unsigned (0=black, 65535=white)
+            16 bit signed (-32767=black, 32768=white)
+            32 bit (1.17549435e-38=black, 3.40282347e+38=white)
+        </description>
+        <list>
+          <option value="8BIT">
+            <brief>8 bit data</brief>
+            <description>
+              Pixels are in 8-bit data range (0 to 255).
+            </description>
+          </option>         
+          <option value="U16BIT">
+            <brief> 16 bit unsigned data </brief>
+            <description>
+              Pixels are in the 16-bit data range (0 to 65535)
+            </description>
+          </option>
+          <option value="S16BIT">
+            <brief> 16 bit signed data </brief>
+            <description>
+              Pixels are in 16 bit signed data range (-32768 to 32767)
+            </description>
+          </option>
+          <option value="32BIT">
+            <brief> 32 bit data </brief>
+            <description>
+              Pixels are in the 32 bit floating point data range
+              (-3.40282347e+38 to 3.40282347e+38)
+            </description>
+         </option>
+        </list>
+      </parameter>
+
+      <parameter name="NULL">
+        <type>boolean</type>
+        <default><item>true</item></default>
+        <brief>Dedicates the minimum DN value for null pixels.</brief>
+        <description>
+          If set to true, the minimum value of the raw output data will be
+          reserved for null pixels.  The actual value used for null pixels will
+          be denoted in the print.prt file as well as displayed onscreen.
+        </description>
+      </parameter>
+      <parameter name="LRS">
+        <type>boolean</type>
+        <default><item>false</item></default>
+        <brief>Dedicates a DN value for LRS pixels.</brief>
+        <description>
+          If set to true, then an output DN value is set aside for the LRS input pixels.
+          The actual DN value used for LRS pixels will be denoted in the print.prt
+          file as well as displayed onscreen.
+        </description>
+      </parameter>
+      <parameter name="LIS">
+        <type>boolean</type>
+        <default><item>false</item></default>
+        <brief>Dedicates a DN value for LIS pixels.</brief>
+        <description>
+          If set to true, then an output DN value is set aside for the LIS input pixels.
+          The actual DN value used for LIS pixels will be denoted in the print.prt
+          file as well as displayed onscreen.
+        </description>
+      </parameter>
+      <parameter name="HIS">
+        <type>boolean</type>
+        <default><item>false</item></default>
+        <brief>Dedicates a DN value for HIS pixels.</brief>
+        <description>
+          If set to true, then an output DN value is set aside for the HIS input pixels.
+          The actual DN value used for HIS pixels will be denoted in the print.prt
+          file as well as displayed onscreen.
+        </description>
+      </parameter>
+      <parameter name="HRS">
+        <type>boolean</type>
+        <default><item>false</item></default>
+        <brief>Dedicates a DN value for HRS pixels.</brief>
+        <description>
+          If set to true, then an output DN value is set aside for the HRS input pixels.
+          The actual DN value used for HRS pixels will be denoted in the print.prt
+          file as well as displayed onscreen.
+        </description>
+      </parameter>
+
+    </group>
+
+    <group name="Ortho Output Settings">
+      <parameter name="ORTHOBITTYPE">
+        <type>string</type>
+        <default>
+          <item>8BIT</item>
+        </default>
+        <brief>Bit type of output file</brief>
+        <description>
+          Bit type of output:
+            8 bit (0=black, 255=white)
+            16 bit unsigned (0=black, 65535=white)
+            16 bit signed (-32767=black, 32768=white)
+            32 bit (1.17549435e-38=black, 3.40282347e+38=white)
+        </description>
+        <list>
+          <option value="8BIT">
+            <brief>8 bit data</brief>
+            <description>
+              Pixels are in 8-bit data range (0 to 255).
+            </description>
+            <!--<exclusions>
+              <item>ENDIAN</item>
+            </exclusions>!-->
+          </option>         
+          <option value="U16BIT">
+            <brief> 16 bit unsigned data </brief>
+            <description>
+              Pixels are in the 16-bit data range (0 to 65535)
+            </description>
+          </option>
+          <option value="S16BIT">
+            <brief> 16 bit signed data </brief>
+            <description>
+              Pixels are in 16 bit signed data range (-32768 to 32767)
+            </description>
+          </option>
+          <option value="32BIT">
+            <brief> 32 bit data </brief>
+            <description>
+              Pixels are in the 32 bit floating point data range
+              (-3.40282347e+38 to 3.40282347e+38)
+            </description>
+         </option>
+        </list>
+      </parameter>
+
+      <parameter name="ONULL">
+        <type>boolean</type>
+        <default><item>true</item></default>
+        <brief>Dedicates the minimum DN value for null pixels.</brief>
+        <description>
+          If set to true, the minimum value of the raw output data will be
+          reserved for null pixels.  The actual value used for null pixels will
+          be denoted in the print.prt file as well as displayed onscreen.
+        </description>
+      </parameter>
+      <parameter name="OLRS">
+        <type>boolean</type>
+        <default><item>false</item></default>
+        <brief>Dedicates a DN value for LRS pixels.</brief>
+        <description>
+          If set to true, then an output DN value is set aside for the LRS input pixels.
+          The actual DN value used for LRS pixels will be denoted in the print.prt
+          file as well as displayed onscreen.
+        </description>
+      </parameter>
+      <parameter name="OLIS">
+        <type>boolean</type>
+        <default><item>false</item></default>
+        <brief>Dedicates a DN value for LIS pixels.</brief>
+        <description>
+          If set to true, then an output DN value is set aside for the LIS input pixels.
+          The actual DN value used for LIS pixels will be denoted in the print.prt
+          file as well as displayed onscreen.
+        </description>
+      </parameter>
+      <parameter name="OHIS">
+        <type>boolean</type>
+        <default><item>false</item></default>
+        <brief>Dedicates a DN value for HIS pixels.</brief>
+        <description>
+          If set to true, then an output DN value is set aside for the HIS input pixels.
+          The actual DN value used for HIS pixels will be denoted in the print.prt
+          file as well as displayed onscreen.
+        </description>
+      </parameter>
+      <parameter name="OHRS">
+        <type>boolean</type>
+        <default><item>false</item></default>
+        <brief>Dedicates a DN value for HRS pixels.</brief>
+        <description>
+          If set to true, then an output DN value is set aside for the HRS input pixels.
+          The actual DN value used for HRS pixels will be denoted in the print.prt
+          file as well as displayed onscreen.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Output Data Storage Order">
+      <parameter name="ENDIAN">
+        <type>string</type>
+        <default>
+          <item>LSB</item>
+        </default>
+        <brief>Endianness of the output bytes</brief>
+        <description>
+          This parameter is used to select one whether the output will be
+	      streamed starting with the most significant byte (MSB) or starting
+	      with the least significant bytes (LSB). The choice should be made by
+	      the user depending upon the format read by the system architecture
+	      from which they plan to read the raw data.
+        </description>
+        <list>
+          <option value="LSB">
+            <brief>Least significant byte</brief>
+            <description>
+            The least significant byte will be the first byte output.
+            </description>
+          </option>
+          <option value="MSB">
+            <brief>Most significant byte</brief>
+            <description>
+            The most significant byte will be the first byte output.
+            </description>
+          </option>
+        </list>
+      </parameter>
+    </group>
+
+
+  </groups>
+</application>
+
