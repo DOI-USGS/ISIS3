@@ -500,7 +500,6 @@ force: ;
 	    $(PRINTF) "$(BLANKS)  " >> casefailed.txt;                       \
 	    $$msg >> casefailed.txt;                                         \
 	  fi ;                                                               \
-	  $(RM) compare.txt;                                                 \
 	fi;
 
 #----------------------------------------------------------------------------
