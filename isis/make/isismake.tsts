@@ -473,6 +473,37 @@ force: ;
 	fi
 
 #----------------------------------------------------------------------------
+# Target = %.csv
+# Dependencies = 
+#
+# Compare two csv files using csvdiff.py. The tolerances and ignore lines are
+#   specified in the file (if it exists) filename.DIFF.
+#----------------------------------------------------------------------------
+%.csv: force
+	if [ ! -f $(OUTPUT)/$@ ]; then                                       \
+	  msg='$(FILENOTFOUND)';                                             \
+	  $(PRINTF) "$(BLANKS)  " >> casefailed.txt;                         \
+	  $$msg >> casefailed.txt;                                           \
+	else                                                                 \
+	  difffile="$(INPUT)/$@.DIFF";                                       \
+	  if [ ! -f $$difffile ];                                            \
+	  then                                                               \
+	    difffile='';                                                     \
+	  fi;                                                                \
+	                                                                     \
+	  $(ISISROOT)/scripts/csvdiff.py $(TRUTH)/$@ $(OUTPUT)/$@            \
+	      $$difffile >& /dev/null;                                       \
+	                                                                     \
+	  RETVAL=$$?;                                                        \
+	  if [ $$RETVAL != 0 ]; then                                         \
+	    msg='$(TESTFILEFAILED)';                                         \
+	    $(PRINTF) "$(BLANKS)  " >> casefailed.txt;                       \
+	    $$msg >> casefailed.txt;                                         \
+	  fi ;                                                               \
+	  $(RM) compare.txt;                                                 \
+	fi;
+
+#----------------------------------------------------------------------------
 # Target = %.pvl
 # Dependencies = 
 #
