@@ -122,9 +122,7 @@ namespace Isis {
    * Near Operator () overload, parameter for StartProcessInPlace 
    * refer ProcessByLine, ProcessByBrick 
    * 
-   * @author Sharmila Prasad (4/26/2011)
-   * 
-   * @param out - output buffer
+   * @param out - output buffer 
    */
   void Nearest::operator()(Isis::Buffer & out)
   {
@@ -150,8 +148,6 @@ namespace Isis {
   /**
    * Average Operator () overload, parameter for StartProcessInPlace 
    * refer ProcessByLine, ProcessByBrick 
-   * 
-   * @author Sharmila Prasad (4/26/2011)
    * 
    * @param out - output buffer
    */
