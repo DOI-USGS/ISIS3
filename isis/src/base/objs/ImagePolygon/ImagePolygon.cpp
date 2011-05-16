@@ -491,11 +491,15 @@ namespace Isis {
 
   /**
    * Calculates the four border points, particularly for validSampleDim() and
-   * validLineDim()
+   * validLineDim() 
+   *  
+   * @internal 
+   * @history 2011-05-16 Tracie Sucharski - Fixed typo from p_cubeSamples to 
+   *                       p_cubeSamps in ASSERT.
    */
   void ImagePolygon::calcImageBorderCoordinates() {
     ASSERT(p_cube);
-    ASSERT(p_cubeSamples);
+    ASSERT(p_cubeSamps);
     ASSERT(p_cubeLines);
     if (not m_leftCoord) {
       for(int line = p_cubeStartLine; line <= p_cubeLines; line++)
