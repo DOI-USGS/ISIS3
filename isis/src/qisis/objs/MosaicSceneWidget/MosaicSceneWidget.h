@@ -24,6 +24,7 @@ namespace Isis {
   class MosaicTool;
   class ProgressBar;
   class Projection;
+  class PvlGroup;
   class PvlObject;
 
   /**
@@ -43,6 +44,9 @@ namespace Isis {
    *                                toolTips to work on everything (not just
    *                                cubes). 
    *  @history 2011-05-17 Steven Lambright - More robust createInitialProj 
+   *  @history 2011-05-17 Steven Lambright - Target radii recalculated when
+   *                                the user specifies a map file, if they
+   *                                are missing. 
    */
   class MosaicSceneWidget : public QWidget {
       Q_OBJECT
@@ -130,6 +134,7 @@ namespace Isis {
       virtual bool eventFilter(QObject *obj, QEvent *ev);
 
     private:
+      void setProjection(const PvlGroup &);
       MosaicSceneItem *addCube(CubeDisplayProperties *);
       void createReferenceFootprint();
       void reprojectItems();
@@ -139,7 +144,7 @@ namespace Isis {
 
       MosaicSceneItem *getNextItem(MosaicSceneItem *item, bool up);
 
-      Projection *createInitialProjection(CubeDisplayProperties *cube);
+      PvlGroup createInitialProjection(CubeDisplayProperties *cube);
 
       MosaicSceneItem *cubeToMosaic(CubeDisplayProperties *);
 

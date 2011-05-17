@@ -124,6 +124,20 @@ namespace Isis {
   }
 
 
+  void MosaicSceneWidget::setProjection(const PvlGroup &mapping) {
+    Pvl tmp;
+    tmp += mapping;
+   
+    if(!mapping.HasKeyword("EquatorialRadius")) { 
+      PvlGroup radii = Projection::TargetRadii(mapping["TargetName"]);
+      tmp.FindGroup("Mapping") += radii["EquatorialRadius"];
+      tmp.FindGroup("Mapping") += radii["PolarRadius"];
+    }
+
+    setProjection(ProjectionFactory::Create(tmp));
+    m_ownProjection = true;
+  }
+
   /**
    * This method takes ownership of proj
    */
@@ -171,13 +185,14 @@ namespace Isis {
   }
 
 
-  Projection *MosaicSceneWidget::createInitialProjection(
+  PvlGroup MosaicSceneWidget::createInitialProjection(
       CubeDisplayProperties * cubeDisplay) {
     Projection *proj = NULL;
     Cube *cube = cubeDisplay->cube();
 
     try {
       proj = ProjectionFactory::CreateFromCube(*cube->Label());
+      return proj->Mapping();
     }
     catch(iException &e) {
       Pvl mappingPvl("$base/templates/maps/equirectangular.map");
@@ -207,17 +222,11 @@ namespace Isis {
       catch(iException &e) {
         mappingGrp +=
             cube->Label()->FindGroup("Instrument", Pvl::Traverse)["TargetName"];
-
-        PvlGroup radii = Projection::TargetRadii(mappingGrp["TargetName"]);
-        mappingGrp += radii["EquatorialRadius"];
-        mappingGrp += radii["PolarRadius"];
       }
 
-      proj = ProjectionFactory::Create(mappingPvl);
       e.Clear();
+      return mappingGrp;
     }
-
-    return proj;
   }
 
   /**
@@ -337,10 +346,7 @@ namespace Isis {
   }
 
   void MosaicSceneWidget::fromPvl(PvlObject project) {
-    Pvl tmp;
-    tmp += project.FindGroup("Mapping");
-    setProjection(ProjectionFactory::Create(tmp));
-    m_ownProjection = true;
+    setProjection(project.FindGroup("Mapping"));
 
     recalcSceneRect();
 
@@ -375,7 +381,6 @@ namespace Isis {
   MosaicSceneItem *MosaicSceneWidget::addCube(CubeDisplayProperties *cube) {
     if(m_projection == NULL) {
       setProjection(createInitialProjection(cube));
-      m_ownProjection = true;
     }
 
     // Verify we don't have this cube already
@@ -660,9 +665,7 @@ namespace Isis {
           mapping += PvlKeyword("MaximumLongitude", 180);
       }
 
-      Isis::Projection *proj = Isis::ProjectionFactory::Create(pvl);
-      setProjection(proj);
-      m_ownProjection = true;
+      setProjection(mapping);
     }
     catch(Isis::iException &e) {
       std::string msg = e.Errors();
