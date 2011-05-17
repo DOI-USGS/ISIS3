@@ -30,13 +30,15 @@ namespace Isis {
    * @internal
    *
    *  @history 2010-10-26 Tracie Sucharski Added missing includes to cpp after
-   *                                removing includes from ControlNet.h.
+   *                      removing includes from ControlNet.h.
    *  @history 2011-05-07 Steven Lambright Refactored from MosaicItem to
-   *                                have far fewer responsibilities.
+   *                      have far fewer responsibilities.
    *  @history 2011-05-10 Steven Lambright Reduced the amount of useless code
    *  @history 2011-05-11 Steven Lambright Reduced the amount of useless code,
    *                      footprint is now gathered from the
    *                      CubeDisplayProperties so duplicate work is not done.
+   *  @history 2011-05-17 Steven Lambright Labels auto-rotate by 90 degrees
+   *                      once again 
    */
   class MosaicSceneItem : public QGraphicsObject {
       Q_OBJECT

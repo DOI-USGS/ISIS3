@@ -180,14 +180,8 @@ namespace Isis {
       proj = ProjectionFactory::CreateFromCube(*cube->Label());
     }
     catch(iException &e) {
-      Camera * cam = cube->Camera();
-
       Pvl mappingPvl("$base/templates/maps/equirectangular.map");
-
-      // The template is missing most information... let's fill it in
       PvlGroup &mappingGrp = mappingPvl.FindGroup("Mapping");
-
-      mappingGrp += PvlKeyword("TargetName", cam->Target());
       mappingGrp += PvlKeyword("LatitudeType", "Planetocentric");
       mappingGrp += PvlKeyword("LongitudeDirection", "PositiveEast");
       mappingGrp += PvlKeyword("LongitudeDomain", "360");
@@ -198,13 +192,26 @@ namespace Isis {
       mappingGrp += PvlKeyword("MinimumLongitude", "0");
       mappingGrp += PvlKeyword("MaximumLongitude", "360");
 
-      Distance radii[3];
-      cam->Radii(radii);
+      try {
+        Camera * cam = cube->Camera();
+        Distance radii[3];
+        cam->Radii(radii);
 
-      mappingGrp += PvlKeyword("EquatorialRadius", radii[0].GetMeters(),
-                               "meters");
-      mappingGrp += PvlKeyword("PolarRadius", radii[2].GetMeters(),
-                               "meters");
+        mappingGrp += PvlKeyword("TargetName", cam->Target());
+        mappingGrp += PvlKeyword("EquatorialRadius", radii[0].GetMeters(),
+                                 "meters");
+        mappingGrp += PvlKeyword("PolarRadius", radii[2].GetMeters(),
+                                 "meters");
+
+      }
+      catch(iException &e) {
+        mappingGrp +=
+            cube->Label()->FindGroup("Instrument", Pvl::Traverse)["TargetName"];
+
+        PvlGroup radii = Projection::TargetRadii(mappingGrp["TargetName"]);
+        mappingGrp += radii["EquatorialRadius"];
+        mappingGrp += radii["PolarRadius"];
+      }
 
       proj = ProjectionFactory::Create(mappingPvl);
       e.Clear();

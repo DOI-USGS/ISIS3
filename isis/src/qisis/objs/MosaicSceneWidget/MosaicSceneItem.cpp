@@ -224,6 +224,10 @@ namespace Isis {
       label->setPos(polyItem->polygon().boundingRect().center());
       label->setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
 
+      QRectF boundingRect = polyItem->boundingRect();
+      if(boundingRect.width() < boundingRect.height())
+        label->rotate(90);
+
       m_polygons->append(polyItem);
 
       delete pts;

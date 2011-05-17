@@ -42,6 +42,7 @@ namespace Isis {
    *  @history 2011-05-10 Steven Lambright - Reduced unnecessary code, fixed
    *                                toolTips to work on everything (not just
    *                                cubes). 
+   *  @history 2011-05-17 Steven Lambright - More robust createInitialProj 
    */
   class MosaicSceneWidget : public QWidget {
       Q_OBJECT
