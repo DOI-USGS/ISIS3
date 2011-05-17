@@ -5569,16 +5569,20 @@ namespace Isis {
     double dX, dY, dZ;
     double dSigmaLat, dSigmaLong, dSigmaRadius;
     std::string strStatus;
+    double cor_lat_m;
+    double cor_lon_m;
+    double cor_rad_m;
 
     // print column headers
     if (m_bErrorPropagation) {
-        sprintf(buf, ",,,,,Sigma,Sigma,Sigma\n,,Latitude,Longitude,Radius,Latitude,Longitude,Radius,X,Y,Z\nLabel,Status,(dd),(dd),(km),(m),(m),(m),(km),(km),(km)\n");
+        sprintf(buf, ",,,,,Sigma,Sigma,Sigma,Correction,Correction,Correction\n,,Latitude,Longitude,Radius,Latitude,Longitude,Radius,Latitude,Longitude,Radius,X,Y,Z\nLabel,Status,(dd),(dd),(km),(m),(m),(m),(m),(m),(m),(km),(km),(km)\n");
     }
     else {
-        sprintf(buf, ",,Latitude,Longitude,Radius,X,Y,Z\nLabel,Status,(dd),(dd),(km),(km),(km),(km)\n");
+        sprintf(buf, ",,,,,Correction,Correction,Correction\n,,Latitude,Longitude,Radius,Latitude,Longitude,Radius,X,Y,Z\nLabel,Status,(dd),(dd),(km),(m),(m),(m),(km),(km),(km)\n");
     }
     fp_out << buf;
 
+    int nPointIndex = 0;
     for (int i = 0; i < nPoints; i++) {
       const ControlPoint *point = m_pCnet->GetPoint(i);
 
@@ -5595,6 +5599,12 @@ namespace Isis {
       dY = point->GetAdjustedSurfacePoint().GetY().GetKilometers();
       dZ = point->GetAdjustedSurfacePoint().GetZ().GetKilometers();
 
+      // point corrections and initial sigmas
+      bounded_vector<double,3>& corrections = m_Point_Corrections[nPointIndex];
+      cor_lat_m = corrections[0]*m_dRTM;
+      cor_lon_m = corrections[1]*m_dRTM*cos(dLat*Isis::DEG2RAD);
+      cor_rad_m  = corrections[2]*1000.0;
+
       if (point->GetType() == ControlPoint::Ground)
         strStatus = "GROUND";
       else if (point->GetType() == ControlPoint::Tie)
@@ -5607,15 +5617,19 @@ namespace Isis {
         dSigmaLong = point->GetAdjustedSurfacePoint().GetLonSigmaDistance().GetMeters();
         dSigmaRadius = point->GetAdjustedSurfacePoint().GetLocalRadiusSigma().GetMeters();
 
-        sprintf(buf, "%s,%s,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf\n",
+        sprintf(buf, "%s,%s,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf\n",
                 point->GetId().c_str(), strStatus.c_str(), dLat, dLon, dRadius,
-                dSigmaLat, dSigmaLong, dSigmaRadius, dX, dY, dZ);
+                dSigmaLat, dSigmaLong, dSigmaRadius, cor_lat_m,cor_lon_m,cor_rad_m,
+                dX, dY, dZ);
       }
       else
-        sprintf(buf, "%s,%s,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf\n",
-                point->GetId().c_str(), strStatus.c_str(), dLat, dLon, dRadius, dX, dY, dZ);
+        sprintf(buf, "%s,%s,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf\n",
+                point->GetId().c_str(), strStatus.c_str(), dLat, dLon, dRadius, cor_lat_m,
+                cor_lon_m,cor_rad_m, dX, dY, dZ);
 
       fp_out << buf;
+
+      nPointIndex++;
     }
 
     fp_out.close();
