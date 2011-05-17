@@ -103,6 +103,8 @@ namespace Isis {
    *   @history 2010-12-29 Sharmila Prasad - Modified for new ControlNet API's
   *                                         (UpdatePoint, UpdateMeasure)
   *    @history 2011-02-24 Sharmila Prasad - Fixed segmentation fault
+  *    @history 2011-05-14 Sharmila Prasad - Modified to accomodate changes to ControlNetValidMeasure
+  *                                   which added line, sample residuals for Measure validation
    */
   class InterestOperator : public ControlNetValidMeasure {
     public:
@@ -120,7 +122,7 @@ namespace Isis {
         return mOperatorGrp["Name"];
       };
 
-      //! Operate used b      y the app interestcube- to calculate interest by sample,line
+      //! Operate used by the app interestcube- to calculate interest by sample,line
       bool Operate(Cube &pCube, UniversalGroundMap &pUnivGrndMap, int piSample, int piLine);
 
       //! Operate - to calculate interest for entire control net to get better reference
@@ -189,7 +191,7 @@ namespace Isis {
 
       double p_worstInterest, p_interestAmount;
 
-      //!< clipping polygon set by SetClipPolygon (line,samp)
+      //! Clipping polygon set by SetClipPolygon (line,samp)
       geos::geom::MultiPolygon *p_clipPolygon;
 
       Isis::PvlGroup mOperatorGrp;        //!< Operator group that created this projection

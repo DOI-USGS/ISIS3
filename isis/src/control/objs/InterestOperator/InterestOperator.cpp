@@ -292,8 +292,8 @@ namespace Isis {
       bool bMeasureLocked = newMeasure->IsEditLocked();
 
       std::string sn = newMeasure->GetCubeSerialNumber();
-      double dSample = newMeasure->GetSample();
-      double dLine   = newMeasure->GetLine();
+      //double dSample = newMeasure->GetSample();
+      //double dLine   = newMeasure->GetLine();
 
       // Log
       PvlGroup pvlMeasureGrp("MeasureDetails");
@@ -305,7 +305,7 @@ namespace Isis {
         Cube *measureCube = mCubeMgr.OpenCube(mSerialNumbers.Filename(sn));
 
         MeasureValidationResults results =
-          ValidStandardOptions(dSample, dLine, measureCube);
+          ValidStandardOptions(newMeasure, measureCube);
         if (!results.isValid()) {
           if (bPntEditLock) {
             pvlMeasureGrp += Isis::PvlKeyword("UnIgnored", "Failed Validation Test but not "
@@ -502,10 +502,10 @@ namespace Isis {
                 double dLine   = measureCamera->Line();
 
                 MeasureValidationResults results =
-                  ValidStandardOptions(dSample, dLine, measureCube);
+                  ValidStandardOptions(newMeasure, measureCube);
                 if (!results.isValid()) {
                   iNumIgnore++;
-                  pvlMeasureGrp += Isis::PvlKeyword("Ignored",   "Failed Validation Test");
+                  pvlMeasureGrp += Isis::PvlKeyword("Ignored",   "Failed Validation Test-" + results.toString().toStdString());
                   newMeasure->SetIgnored(true);
                 }
                 pvlMeasureGrp += Isis::PvlKeyword("NewLocation", LocationString(dSample, dLine));
@@ -735,7 +735,7 @@ namespace Isis {
         bCalculateInterest = false;
 
         MeasureValidationResults results =
-          ValidStandardOptions(chip.CubeSample(), chip.CubeLine(), &pCube);
+          ValidStandardOptions(chip.CubeSample(), chip.CubeLine(), &pCnetMeasure, &pCube);
         if (results.isValid()) {
           bCalculateInterest = true;
         }
