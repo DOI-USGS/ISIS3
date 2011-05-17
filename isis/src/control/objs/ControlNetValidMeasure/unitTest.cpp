@@ -103,15 +103,17 @@ int main(void) {
     try {
       Pvl pvlLog;
       PvlGroup op("ValidMeasure");
-      op += PvlKeyword("Name", "None");
-      op += PvlKeyword("MinDN", -1.0);
-      op += PvlKeyword("MaxDN", 1.0);
-      op += PvlKeyword("MinEmission", 0.0);
-      op += PvlKeyword("MaxEmission", 135.0);
-      op += PvlKeyword("MinIncidence", 0.0);
-      op += PvlKeyword("MaxIncidence", 135.0);
-      op += PvlKeyword("MinResolution", 100.0);
-      op += PvlKeyword("MaxResolution", 500.0);
+      op += PvlKeyword("Name",             "None");
+      op += PvlKeyword("MinDN",            -1.0);
+      op += PvlKeyword("MaxDN",             1.0);
+      op += PvlKeyword("MinEmission",       0.0);
+      op += PvlKeyword("MaxEmission",       135.0);
+      op += PvlKeyword("MinIncidence",      0.0);
+      op += PvlKeyword("MaxIncidence",      135.0);
+      op += PvlKeyword("MinResolution",     100.0);
+      op += PvlKeyword("MaxResolution",     500.0);
+      op += PvlKeyword("SampleResidual",    5.0);
+      op += PvlKeyword("LineResidual",      5.0);
 
       pvlLog += op;
 

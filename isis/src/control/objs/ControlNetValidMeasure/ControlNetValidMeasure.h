@@ -38,6 +38,7 @@ namespace Isis {
   class Cube;
   class ControlNet;
   class MeasureValidationResults;
+  class ControlMeasure;
   
    /**
     * @brief ControlNetValidMeasure class
@@ -58,6 +59,8 @@ namespace Isis {
     *  @history 2010-10-14 Sharmila Prasad - Use only a single copy of Control Net
     *  @history 2010-11-10 Sharmila Prasad - Change group name of DefFile from "Operator" to
     *                                        "ValidMeasure"
+    *  @history 2011-05-17 Sharmila Prasad - Added Sample, Line Residuals and Residual Magnitude
+    *                                        for validation
     */
 
   class ControlNetValidMeasure {
@@ -95,6 +98,10 @@ namespace Isis {
       
       //! Validate whether the Resolution is in the set Range
       bool ValidResolution(double pdResolution);
+      
+      //! Validate whether the Residuals are within the set Tolerance
+      bool ValidResidualTolerances(double pdSampleResidual, double pdLineResidual, 
+                     double pdResidualMagnitude, MeasureValidationResults & pResults);
       
       //! Validate the Lat/Lon
       bool ValidLatLon(Isis::Camera *pCamera, int piSample, int piLine); 
@@ -161,8 +168,16 @@ namespace Isis {
       bool MetersFromEdge(int piSample, int piLine, Cube *pCube);
 
       //! Validate Standard options to pick a reference based on a particular criteria
-      MeasureValidationResults ValidStandardOptions(double pdSample, double pdLine,
+      MeasureValidationResults ValidStandardOptions(const ControlMeasure *pMeasure,
           Cube *pCube, PvlGroup *pMeasureGrp = NULL);
+      
+      //! Validate Standard options to pick a reference based on a particular criteria
+      MeasureValidationResults ValidStandardOptions(double pSample, double pLine, 
+          const ControlMeasure *pMeasure, Cube *pCube, PvlGroup *pMeasureGrp = NULL);
+      
+      //! Validate Standard options to pick a reference based on a particular criteria
+      MeasureValidationResults ValidStandardOptions(double pSample, double pLine, 
+                                          Cube *pCube, PvlGroup *pMeasureGrp = NULL);
 
     protected:
       //! Validate PVL Min & Max DN Standard Options
@@ -180,6 +195,9 @@ namespace Isis {
       //! Validate and read Pixels and Meters from Edge Standard Options
       void ValidatePvlFromEdge(void);
       
+      //! Validate Pvl Sample, Line, Residual Magnitude Tolerances
+      void ValidatePvlResidualTolerances(void);
+      
       //! Read the Serial Numbers from the file and open assocaited cubes
       void ReadSerialNumbers(std::string psSerialNumfile);
 
@@ -193,12 +211,18 @@ namespace Isis {
       double mdMaxIncidenceAngle;      //!< Standard Option MaxIncidenceAngle
       double mdMetersFromEdge;         //!< Standard Option MeteresFromEdge
       int miPixelsFromEdge;            //!< Standard Option PixelsFromEdge
-
+      double mdSampleResTolerance;     //!< Standard Option Sample Residual
+      double mdLineResTolerance;       //!< Standard Option Line Residual
+      double mdResidualTolerance;      //!< Standard Option Residual Magnitude
+      
       double mdEmissionAngle;          //!< Store current Measure's Emission Angle
       double mdIncidenceAngle;         //!< Store current Measure's Incidence Angle
       double mdResolution;             //!< Store current Measure's Resolution
       double mdDnValue;                //!< Store current Measure's DN Value
-
+      double mdSampleResidual;         //!< Store current Measure's Sample Residual
+      double mdLineResidual;           //!< Store current Measure's Line Residual
+      double mdResidualMagnitude;      //!< Store current Measure's Residual Magnitude
+                                       //!
       PvlGroup mPvlOpGrp;              //!< Pvl Operator Group
       PvlGroup mStdOptionsGrp;         //!< Pvl Standard Options Group
       PvlGroup mStatisticsGrp;         //!< Pvl output Statistics Group

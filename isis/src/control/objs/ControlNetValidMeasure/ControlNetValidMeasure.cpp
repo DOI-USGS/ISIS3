@@ -1,6 +1,7 @@
 #include "ControlNetValidMeasure.h"
 #include "Cube.h"
 #include "Camera.h"
+#include "ControlMeasure.h"
 #include "CubeManager.h"
 #include "MeasureValidationResults.h"
 #include "SerialNumberList.h"
@@ -60,6 +61,9 @@ namespace Isis {
     mdMaxDN             = Isis::ValidMaximum;
     miPixelsFromEdge    = 0;
     mdMetersFromEdge    = 0;
+    mdSampleResTolerance= DBL_MAX;
+    mdLineResTolerance  = DBL_MAX;
+    mdResidualTolerance = DBL_MAX; 
   }
 
   /**
@@ -70,16 +74,19 @@ namespace Isis {
   void ControlNetValidMeasure::InitStdOptionsGroup(void) {
     mStdOptionsGrp = PvlGroup("StandardOptions");
 
-    mStdOptionsGrp += Isis::PvlKeyword("MinDN",          mdMinDN);
-    mStdOptionsGrp += Isis::PvlKeyword("MaxDN",          mdMaxDN);
-    mStdOptionsGrp += Isis::PvlKeyword("MinEmission",    mdMinEmissionAngle);
-    mStdOptionsGrp += Isis::PvlKeyword("MaxEmission",    mdMaxEmissionAngle);
-    mStdOptionsGrp += Isis::PvlKeyword("MinIncidence",   mdMinIncidenceAngle);
-    mStdOptionsGrp += Isis::PvlKeyword("MaxIncidence",   mdMaxIncidenceAngle);
-    mStdOptionsGrp += Isis::PvlKeyword("MinResolution",  mdMinResolution);
-    mStdOptionsGrp += Isis::PvlKeyword("MaxResolution",  mdMaxResolution);
-    mStdOptionsGrp += Isis::PvlKeyword("PixelsFromEdge", miPixelsFromEdge);
-    mStdOptionsGrp += Isis::PvlKeyword("MetersFromEdge", mdMetersFromEdge);
+    mStdOptionsGrp += Isis::PvlKeyword("MinDN",                   mdMinDN);
+    mStdOptionsGrp += Isis::PvlKeyword("MaxDN",                   mdMaxDN);
+    mStdOptionsGrp += Isis::PvlKeyword("MinEmission",             mdMinEmissionAngle);
+    mStdOptionsGrp += Isis::PvlKeyword("MaxEmission",             mdMaxEmissionAngle);
+    mStdOptionsGrp += Isis::PvlKeyword("MinIncidence",            mdMinIncidenceAngle);
+    mStdOptionsGrp += Isis::PvlKeyword("MaxIncidence",            mdMaxIncidenceAngle);
+    mStdOptionsGrp += Isis::PvlKeyword("MinResolution",           mdMinResolution);
+    mStdOptionsGrp += Isis::PvlKeyword("MaxResolution",           mdMaxResolution);
+    mStdOptionsGrp += Isis::PvlKeyword("PixelsFromEdge",          miPixelsFromEdge);
+    mStdOptionsGrp += Isis::PvlKeyword("MetersFromEdge",          mdMetersFromEdge);
+    mStdOptionsGrp += Isis::PvlKeyword("SampleResidual",          mdSampleResTolerance);
+    mStdOptionsGrp += Isis::PvlKeyword("LineResidual",            mdLineResTolerance);
+    mStdOptionsGrp += Isis::PvlKeyword("ResidualMagnitude",       mdResidualTolerance);
   }
 
   /**
@@ -123,24 +130,27 @@ namespace Isis {
     ValidatePvlIncidenceAngle();
     ValidatePvlResolution();
     ValidatePvlFromEdge();
+    ValidatePvlResidualTolerances();
 
     mPvlLog += mStdOptionsGrp;
   }
 
   /**
-   * Validate a measure for all the Standard Options
-   *
-   * @author Sharmila Prasad (6/22/2010)
-   *
-   * @param piSample    - Point Sample location
-   * @param piLine      - Point Line location
-   * @param pCube       - Control Measure Cube
-   * @param pMeasureGrp - Log PvlGroup 
+   * Validate a point on an image and the Control Measure if not Null
+   * 
+   * @author Sharmila Prasad (5/17/2011)
+   * 
+   * @param pSample      - Image Sample
+   * @param pLine        - Image Line
+   * @param pMeasure     - Control Measure
+   * @param pCube        - Control Measure's image
+   * @param pMeasureGrp  - Result PvlGroup
    *  
-   * @return bool
+   * @return MeasureValidationResults 
    */
-  MeasureValidationResults ControlNetValidMeasure::ValidStandardOptions(
-      double pdSample, double pdLine, Cube *pCube, PvlGroup *pMeasureGrp) {
+  MeasureValidationResults ControlNetValidMeasure::ValidStandardOptions(double pSample, double pLine, 
+          const ControlMeasure *pMeasure, Cube *pCube, PvlGroup *pMeasureGrp)
+  {
     // Get the Camera
     Camera *measureCamera;
     try {
@@ -151,22 +161,30 @@ namespace Isis {
       throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
     }
 
-    measureCamera->SetImage(pdSample, pdLine);
+    measureCamera->SetImage(pSample, pLine);
 
-    mdEmissionAngle  = measureCamera->EmissionAngle();
-    mdIncidenceAngle = measureCamera->IncidenceAngle();
-    mdResolution     = measureCamera->PixelResolution();
+    mdEmissionAngle     = measureCamera->EmissionAngle();
+    mdIncidenceAngle    = measureCamera->IncidenceAngle();
+    mdResolution        = measureCamera->PixelResolution();
+    if(pMeasure != NULL) {
+      mdSampleResidual    = pMeasure->GetSampleResidual();
+      mdLineResidual      = pMeasure->GetLineResidual();
+      mdResidualMagnitude = pMeasure->GetResidualMagnitude();
+    }
 
     Isis::Portal inPortal(1, 1, pCube->PixelType());
-    inPortal.SetPosition(pdSample, pdLine, 1);
+    inPortal.SetPosition(pSample, pLine, 1);
     pCube->Read(inPortal);
     mdDnValue = inPortal[0];
 
     if(pMeasureGrp != NULL) {
-      *pMeasureGrp += Isis::PvlKeyword("EmissionAngle",  mdEmissionAngle);
-      *pMeasureGrp += Isis::PvlKeyword("IncidenceAngle", mdIncidenceAngle);
-      *pMeasureGrp += Isis::PvlKeyword("DNValue",        mdDnValue);
-      *pMeasureGrp += Isis::PvlKeyword("Resolution",     mdResolution);
+      *pMeasureGrp += Isis::PvlKeyword("EmissionAngle",     mdEmissionAngle);
+      *pMeasureGrp += Isis::PvlKeyword("IncidenceAngle",    mdIncidenceAngle);
+      *pMeasureGrp += Isis::PvlKeyword("DNValue",           mdDnValue);
+      *pMeasureGrp += Isis::PvlKeyword("Resolution",        mdResolution);
+      *pMeasureGrp += Isis::PvlKeyword("SampleResidual",    mdSampleResidual);
+      *pMeasureGrp += Isis::PvlKeyword("LineResidual",      mdLineResidual);
+      *pMeasureGrp += Isis::PvlKeyword("ResidualMagnitude", mdResidualMagnitude);
     }
 
     MeasureValidationResults results;
@@ -190,18 +208,62 @@ namespace Isis {
       results.addFailure(MeasureValidationResults::Resolution,
           mdResolution, mdMinResolution, mdMaxResolution);
     }
-
-    if(!PixelsFromEdge((int)pdSample, (int)pdLine, pCube)) {
-      results.addFailure(MeasureValidationResults::PixelsFromEdge,
-          miPixelsFromEdge);
+    
+    if(!PixelsFromEdge((int)pSample, (int)pLine, pCube)) {
+      results.addFailure(MeasureValidationResults::PixelsFromEdge, miPixelsFromEdge);
     }
 
-    if(!MetersFromEdge((int)pdSample, (int)pdLine, pCube)) {
+    if(!MetersFromEdge((int)pSample, (int)pLine, pCube)) {
       results.addFailure(MeasureValidationResults::MetersFromEdge,
           mdMetersFromEdge);
     }
-
+    
+    if(pMeasure != NULL) {
+      ValidResidualTolerances(mdSampleResidual, mdLineResidual, 
+                              mdResidualMagnitude, results);
+    }
+    //std::cerr << results.toString().toStdString() << "\n";
     return results;
+  }
+  
+  /**
+   * Validate a point on an image for Standard Options
+   * 
+   * @author Sharmila Prasad (5/17/2011)
+   * 
+   * @param pSample     - Image Sample
+   * @param pLine       - Image Line
+   * @param pCube       - Image
+   * @param pMeasureGrp - Optional Result Group
+   * 
+   * @return MeasureValidationResults 
+   */
+  MeasureValidationResults ControlNetValidMeasure::ValidStandardOptions(
+       double pSample, double pLine, Cube *pCube, PvlGroup *pMeasureGrp) {
+    
+    return ValidStandardOptions(pSample, pLine, NULL, pCube, pMeasureGrp);
+    
+  }
+  /**
+   * Validate a measure for all the Standard Options
+   *
+   * @author Sharmila Prasad (6/22/2010)
+   *
+   * @param piSample    - Point Sample location
+   * @param piLine      - Point Line location
+   * @param pCube       - Control Measure Cube
+   * @param pMeasureGrp - Log PvlGroup 
+   *  
+   * @return bool
+   */
+  MeasureValidationResults ControlNetValidMeasure::ValidStandardOptions(
+    const ControlMeasure * pMeasure,Cube *pCube, PvlGroup *pMeasureGrp) {
+
+    double dSample, dLine;
+    dSample = pMeasure->GetSample();
+    dLine   = pMeasure->GetLine();
+    
+    return (ValidStandardOptions(dSample, dLine, pMeasure, pCube, pMeasureGrp));
   }
 
   /**
@@ -359,6 +421,51 @@ namespace Isis {
   }
 
   /**
+   * Validate Pvl Sample, Line, Residual Magnitude Tolerances
+   * 
+   * @author Sharmila Prasad (5/16/2011)
+   */
+  void ControlNetValidMeasure::ValidatePvlResidualTolerances(void){
+    bool bRes=false;
+    bool bResMag = false;
+    if(mPvlOpGrp.HasKeyword("SampleResidual")) {
+      mdSampleResTolerance = mPvlOpGrp["SampleResidual"];
+      if(mdSampleResTolerance < 0) {
+        std::string msg = "Invalid Sample Residual, must be greater than zero";
+        throw iException::Message(iException::User, msg, _FILEINFO_);
+      }
+      bRes = true;
+    }
+    mStdOptionsGrp += Isis::PvlKeyword("SampleResidual", mdSampleResTolerance);
+    
+    if(mPvlOpGrp.HasKeyword("LineResidual")) {
+      mdLineResTolerance = mPvlOpGrp["LineResidual"];
+      if(mdLineResTolerance < 0) {
+        std::string msg = "Invalid Line Residual, must be greater than zero";
+        throw iException::Message(iException::User, msg, _FILEINFO_);
+      }
+      bRes = true;
+    }
+    mStdOptionsGrp += Isis::PvlKeyword("LineResidual", mdLineResTolerance);
+    
+    if(mPvlOpGrp.HasKeyword("ResidualMagnitude")) {
+      mdResidualTolerance = mPvlOpGrp["ResidualMagnitude"];
+      if(mdResidualTolerance < 0) {
+        std::string msg = "Invalid Residual Magnitude Tolerance, must be greater than zero";
+        throw iException::Message(iException::User, msg, _FILEINFO_);
+      }
+      bResMag = true;
+    }
+    mStdOptionsGrp += Isis::PvlKeyword("ResidualMagnitude", mdResidualTolerance);
+    
+    if(bRes && bResMag) {
+      std::string msg = "Cannot have both Sample/Line Residuals and Residual Magnitude.";
+      msg += "\nChoose either Sample/Line Residual or Residual Magnitude";
+      throw iException::Message(iException::User, msg, _FILEINFO_);
+    }
+  }
+  
+  /**
    * Validates an Emission angle by comparing with the min and max values in the def file.
    * If Emission Angle is greater or lesser than the max/min values in the def file or the defaults
    * it returns false else true.
@@ -429,6 +536,40 @@ namespace Isis {
   }
 
   /**
+   * Validate whether the Sample and Line Residuals and Residual Magnitudes are 
+   * within the set Tolerances'
+   * 
+   * @author Sharmila Prasad (5/16/2011)
+   * 
+   * @param pdSampleResidual    - Measure's Sample residual
+   * @param pdLineResidual      - Measure's Line residual
+   * @param pdResidualMagnitude - Measure's Residual Magnitude
+   * @param pResults            - MeasureValidationResults
+   * 
+   * @return bool - Valid (true/false)
+   */
+  bool ControlNetValidMeasure::ValidResidualTolerances(double pdSampleResidual, 
+                             double pdLineResidual, double pdResidualMagnitude, 
+                                            MeasureValidationResults & pResults){
+    bool bFlag = true;
+    
+    if(pdSampleResidual > mdSampleResTolerance) {
+      bFlag = false;
+      pResults.addFailure(MeasureValidationResults::SampleResidual, mdSampleResTolerance, "greater");
+    }
+    if(pdLineResidual > mdLineResTolerance) {
+      bFlag = false;
+      pResults.addFailure(MeasureValidationResults::LineResidual, mdLineResTolerance, "greater");
+    }
+    if(pdResidualMagnitude > mdResidualTolerance) {
+      bFlag = false;
+      pResults.addFailure(MeasureValidationResults::ResidualMagnitude, mdResidualTolerance, "greater");
+    }
+    
+    return bFlag;
+  }
+      
+  /**
    * Validate if a point has a valid lat, lon for that camera
    *
    * @author Sharmila Prasad (6/4/2010)
@@ -463,17 +604,17 @@ namespace Isis {
     int iNumLines   = pCube->Lines();
 
     // test right
-    if((iNumSamples - piSample) < miPixelsFromEdge)  {
+    if((iNumSamples - piSample) < miPixelsFromEdge) {
       return false;
     }
 
     // test left
-    if((piSample - miPixelsFromEdge) <= 0)  {
+    if((piSample - miPixelsFromEdge) <= 0) {
       return false;
     }
 
     // test down
-    if((iNumLines - piLine) < miPixelsFromEdge)  {
+    if((iNumLines - piLine) < miPixelsFromEdge) {
       return false;
     }
 

@@ -57,10 +57,10 @@ namespace Isis {
   }
 
 
-  void MeasureValidationResults::addFailure(Option opt, double tolerance) {
+  void MeasureValidationResults::addFailure(Option opt, double tolerance, const char* compare) {
     failures->push_back(opt);
 
-    QString failureReason = getFailurePrefix(opt) + "is less than tolerance " +
+    QString failureReason = getFailurePrefix(opt) + "is " + compare + " than tolerance " +
       QString::number(tolerance);
     errorMsg->append(failureReason);
   }
@@ -96,6 +96,16 @@ namespace Isis {
         break;
       case MetersFromEdge:
         optString += "Meters From Edge";
+        break;
+      case SampleResidual:
+        optString += "Sample Residual";
+        break;
+      case LineResidual:
+        optString += "Line Residual";
+        break;
+      case ResidualMagnitude:
+        optString += "Residual Magnitude";
+        break;
     }
     optString += " ";
 

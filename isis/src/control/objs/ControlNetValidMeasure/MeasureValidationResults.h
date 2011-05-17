@@ -1,6 +1,8 @@
 #ifndef _MeasureValidationResults_h_
 #define _MeasureValidationResults_h_
 
+#include <string.h>
+
 class QString;
 template< class T > class QVector;
 
@@ -26,9 +28,18 @@ template< class T > class QVector;
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-
 namespace Isis {
-  
+  /**
+   * @brief MeasureValidationResults class
+   *
+   * Stores the error/results string of a Measure's Validation
+   *
+   * @see cnetref cnetedit etc.
+   *
+   * @internal
+   *  @history 2011-05-11 Sharmila Prasad - Added Residuals for Validation and added
+   *                                        comparison string for API addFailure(..)
+   */
   class MeasureValidationResults {
 
     public:
@@ -38,7 +49,10 @@ namespace Isis {
         DNValue,
         Resolution,
         PixelsFromEdge,
-        MetersFromEdge
+        MetersFromEdge,
+        SampleResidual,
+        LineResidual,
+        ResidualMagnitude
       };
 
       MeasureValidationResults();
@@ -52,7 +66,7 @@ namespace Isis {
       QString toString(QString sample, QString line, QString serialNumber,
           QString pointID);
 
-      void addFailure(Option opt, double tolerance);
+      void addFailure(Option opt, double tolerance, const char* compare="less");
       void addFailure(Option opt, double computed, double min, double max);
 
       QString getFailurePrefix(Option opt);

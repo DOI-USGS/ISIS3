@@ -3,13 +3,16 @@
 **USER ERROR** Invalid Max Incidence Angle, Valid Range is [0-135]
 **USER ERROR** Invalid Resolution value(s), Resolution must be greater than zero
 Group = StandardOptions
-  MinDN         = -1.0
-  MaxDN         = 1.0
-  MinEmission   = 0.0
-  MaxEmission   = 135.0
-  MinIncidence  = 0.0
-  MaxIncidence  = 135.0
-  MinResolution = 100.0
-  MaxResolution = 500.0
+  MinDN             = -1.0
+  MaxDN             = 1.0
+  MinEmission       = 0.0
+  MaxEmission       = 135.0
+  MinIncidence      = 0.0
+  MaxIncidence      = 135.0
+  MinResolution     = 100.0
+  MaxResolution     = 500.0
+  SampleResidual    = 5.0
+  LineResidual      = 5.0
+  ResidualMagnitude = 1.79769313486232e+308
 End_Group
 End
