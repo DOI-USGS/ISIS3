@@ -54,6 +54,7 @@ namespace Isis {
         col = (MosaicTreeWidgetItem::TreeColumn)(col + 1);
       }
 
+      p_tree->updateViewActs();
       p_tree->sortItems(pvl["SortColumn"], Qt::AscendingOrder);
 
       QList<QTreeWidgetItem *> allCubes;

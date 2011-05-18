@@ -24,6 +24,7 @@ namespace Isis {
       void disableSort();
 
       QList<QAction *> getViewActions();
+      void updateViewActs();
 
     public slots:
 
@@ -48,7 +49,6 @@ namespace Isis {
       bool groupInList(QList<QTreeWidgetItem *>);
       bool mosaicItemInList(QList<QTreeWidgetItem *>);
       QList<CubeDisplayProperties *> selectedDisplays();
-      void updateViewActs();
 
       MosaicTreeWidgetItem *treeItem(CubeDisplayProperties *);
       ProgressBar *p_progress;
