@@ -116,7 +116,10 @@ void SpkSegment::import(Cube &cube) {
     SpicePosition *ipos(camera->InstrumentPosition());
     double currentTime = ipos->EphemerisTime();
 
-#if 1
+#if 0
+    ////  This is currently determined to not be required and needs to bei
+    ////   turned off.  (2011-05-17 KJB)
+
     //  Adjust times for aberration and light time corrections.  Note this
     //  is a kludge only needed until we correct this on read by spiceinit
     _epochs = adjustTimes(*camera, _epochs);
