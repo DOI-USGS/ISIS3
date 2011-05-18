@@ -232,7 +232,12 @@ namespace Isis {
 
       QString filename;
       foreach(filename, cubeFiles) {
-        m_serialNumbers->Add(filename.toStdString());
+        try {
+          m_serialNumbers->Add(filename.toStdString());
+        }
+        catch(iException &e) {
+          e.Clear();
+        }
       }
 
       ProgressBar *p = (ProgressBar *)m_mosaicScene->getProgress();
