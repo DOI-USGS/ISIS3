@@ -159,6 +159,7 @@ namespace Isis {
    *    @history 2011-05-04 Jai Rideout - Added ability to save gradient-
    *             filtered chips after registration instead of just saving the
    *             original chips.
+   *    @history 2011-05-18 Steven Lambright - Fixed a bug with ReductionFactor 
    */
   class AutoRegItem;
   class Buffer;

@@ -769,12 +769,13 @@ namespace Isis {
 
       p_reducedSearchChip = Reduce(gradientSearchChip, p_reduceFactor);
       int reducedStartSamp = (p_reducedPatternChip.Samples() - 1) / 2 + 1;
-      int reducedEndSamp = p_reducedSearchChip.Samples() - startSamp + 1;
+      int reducedEndSamp = p_reducedSearchChip.Samples() - reducedStartSamp + 1;
       int reducedStartLine = (p_reducedPatternChip.Lines() - 1) / 2 + 1;
-      int reducedEndLine = p_reducedSearchChip.Lines() - startLine + 1;
+      int reducedEndLine = p_reducedSearchChip.Lines() - reducedStartLine + 1;
 
       Match(p_reducedSearchChip, p_reducedPatternChip, p_reducedFitChip,
           reducedStartSamp, reducedEndSamp, reducedStartLine, reducedEndLine);
+
       if(p_bestFit == Isis::Null) {
         p_fitChipNoDataCount++;
         p_registrationStatus = FitChipNoData;
