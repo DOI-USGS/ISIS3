@@ -6,6 +6,11 @@
 namespace Isis {
   class CubeDisplayProperties;
 
+  /**
+   *
+   * @internal
+   *   @history 2011-05-18 Steven Lambright - Resolution now sorts correctly
+   */
   class MosaicTreeWidgetItem : public QTreeWidgetItem {
     public:
       MosaicTreeWidgetItem(CubeDisplayProperties *cube,

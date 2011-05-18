@@ -145,11 +145,11 @@ namespace Isis {
       case LabelColumn:
       case NameColumn:
       case OutlineColumn:
-      case ResolutionColumn:
         return text(column) < other.text(column);
 
       case EmissionAngleColumn:
       case IncidenceAngleColumn:
+      case ResolutionColumn:
         return text(column).toDouble() <
                other.text(column).toDouble();
 
