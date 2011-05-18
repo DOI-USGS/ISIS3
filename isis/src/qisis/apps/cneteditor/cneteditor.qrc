@@ -5,5 +5,6 @@
     <file alias="saveAs">icons/saveAs.png</file>
     <file alias="close">icons/close.png</file>
     <file alias="quit">icons/quit.png</file>
+    <file alias="add">icons/add.png</file>
   </qresource>
 </RCC>
