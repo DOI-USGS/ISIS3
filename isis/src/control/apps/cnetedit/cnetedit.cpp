@@ -157,8 +157,18 @@ void IsisMain() {
   if(ui.GetBoolean("CHECKVALID") && cnet.GetNumPoints() > 0) {
     validator = NULL;
 
-    // Construct the validator from the user-specified definition file
+    // First validate DefFile's keywords and value type
     Pvl defFile(ui.GetFilename("DEFFILE"));
+    Pvl pvlTemplate("$ISIS3DATA/base/templates/cnet_validmeasure/validmeasure.def");
+    Pvl pvlResults;
+    pvlTemplate.ValidatePvl(defFile, pvlResults);
+    if (pvlResults.Groups() > 0 || pvlResults.Keywords() > 0) {
+      Application::Log(pvlResults.Group(0));
+      string sErrMsg = "Invalid Deffile\n";
+      throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_);
+    }
+
+    // Construct the validator from the user-specified definition file
     validator = new ControlNetValidMeasure(&defFile);
 
     // User also provided a list of all serial numbers corresponding to every
@@ -586,8 +596,7 @@ MeasureValidationResults ValidateMeasure(const ControlMeasure *curMeasure,
   Cube curCube;
   curCube.Open(cubeName);
 
-  MeasureValidationResults results = validator->ValidStandardOptions(
-                                       curMeasure->GetSample(), curMeasure->GetLine(), &curCube);
+  MeasureValidationResults results = validator->ValidStandardOptions(curMeasure, &curCube);
 
   return results;
 }
