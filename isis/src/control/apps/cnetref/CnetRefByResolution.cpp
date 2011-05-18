@@ -124,7 +124,7 @@ namespace Isis {
             Cube *measureCube = mCubeMgr.OpenCube(mSerialNumbers.Filename(sn));
 
             MeasureValidationResults results =
-              ValidStandardOptions(dSample, dLine, measureCube, &pvlMeasureGrp);
+              ValidStandardOptions(newMsr, measureCube, &pvlMeasureGrp);
             if (!results.isValid()) {
               if (bPntEditLock) {
                 pvlMeasureGrp += Isis::PvlKeyword("UnIgnored", "Failed Validation Test but not Ignored as Point EditLock is True");

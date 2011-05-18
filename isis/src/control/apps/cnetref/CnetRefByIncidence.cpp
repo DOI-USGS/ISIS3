@@ -109,7 +109,7 @@ namespace Isis {
             Cube *measureCube = mCubeMgr.OpenCube(mSerialNumbers.Filename(sn));
 
             MeasureValidationResults results =
-              ValidStandardOptions(dSample, dLine, measureCube, &pvlMeasureGrp);
+              ValidStandardOptions(newMsr, measureCube, &pvlMeasureGrp);
             if (results.isValid()) {
               if (!bPntEditLock && !bRefLocked) {
                 newMsr->SetType(ControlMeasure::Candidate);
