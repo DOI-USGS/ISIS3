@@ -54,6 +54,7 @@ namespace Isis {
    *   @history 2011-05-11 Steven Lambright - Added accessors for data that is
    *                       complicated to get or expensive (i.e. Camera
    *                       statistics and the footprint).
+   *   @history 2011-05-18 Steven Lambright - Fixed the second constructor 
    */
   class CubeDisplayProperties : public QObject {
       Q_OBJECT

@@ -146,6 +146,78 @@ namespace Isis {
     valuesStream >> *m_propertyValues;
 
     cube();
+    footprint();
+
+    m_incidenceAngle = Null;
+    m_resolution = Null;
+    m_emissionAngle = Null;
+
+    // This needs moved to its own method!
+    try {
+      Table table("CameraStatistics", m_filename.toStdString());
+      //Table table("CameraStatistics", m_filename.Name());
+      for (int i = 0; i < table.Records(); i++) {
+        for (int j = 0; j < table[i].Fields(); j++) {
+          QString label;
+
+          if (table[i][j].IsText()) {
+            label = QString::fromStdString((std::string)table[i][j]);
+            label.truncate(10);
+          }
+
+          // Get the average resolution for this mosaic item.
+          if (table[i][j].IsText() && label.compare("Resolution") == 0) {
+            if (j + 3 < table[i].Fields()) {
+              if (table[i][j+3].IsInteger()) {
+              }
+              else if (table[i][j+3].IsDouble()) {
+                m_resolution = (double)table[i][j+3];
+              }
+              else if (table[i][j+3].IsText()) {
+              }
+            }
+          }
+
+          // Get the average emission angle for this mosaic item.
+          if (table[i][j].IsText() && label.compare("EmissionAn") == 0) {
+            if (j + 3 < table[i].Fields()) {
+              if (table[i][j+3].IsInteger()) {
+              }
+              else if (table[i][j+3].IsDouble()) {
+                m_emissionAngle = (double)table[i][j+3];
+              }
+              else if (table[i][j+3].IsText()) {
+              }
+            }
+          }
+
+          // Get the average incidence angle for this mosaic item.
+          if (table[i][j].IsText() && label.compare("IncidenceA") == 0) {
+            if (j + 3 < table[i].Fields()) {
+              if (table[i][j+3].IsInteger()) {
+              }
+              else if (table[i][j+3].IsDouble()) {
+                m_incidenceAngle = (double)table[i][j+3];
+              }
+              else if (table[i][j+3].IsText()) {
+              }
+            }
+          }
+
+        } // end for table[i].Fields
+      } // end for table.Records
+    }
+    catch(iException &e) {
+      e.Clear();
+
+      iException::Message(iException::Io,
+          "Please run camstats with the attach option. "
+          "Camera statistics will be unavailable for [" +
+              m_filename.toStdString() + "]", _FILEINFO_);
+      e.Report();
+
+      e.Clear();
+    }
   }
 
 
