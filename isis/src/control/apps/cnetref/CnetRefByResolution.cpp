@@ -35,6 +35,7 @@ namespace Isis {
     mdMaxRes   = pdMaxRes;
     meType     = peType;
     ReadSerialNumbers(psSerialNumfile);
+    SetCameraRequiredFlag(true);
   }
 
   /**
@@ -100,11 +101,8 @@ namespace Isis {
           (iNumMeasuresLocked == 0 || (iNumMeasuresLocked > 0 && bRefLocked))) {
         int iNumIgnore = 0;
         iString istrTemp;
-
         for (int measure = 0; measure < newPnt->GetNumMeasures(); ++measure) {
-
           ControlMeasure *newMsr = newPnt->GetMeasure(measure);
-
           bool bMeasureLocked = newMsr->IsEditLocked();
           double dSample      = newMsr->GetSample();
           double dLine        = newMsr->GetLine();
@@ -122,7 +120,7 @@ namespace Isis {
 
           if (!newMsr->IsIgnored()) {
             Cube *measureCube = mCubeMgr.OpenCube(mSerialNumbers.Filename(sn));
-
+            
             MeasureValidationResults results =
               ValidStandardOptions(newMsr, measureCube, &pvlMeasureGrp);
             if (!results.isValid()) {

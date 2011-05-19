@@ -25,6 +25,7 @@ namespace Isis {
   CnetRefByEmission::CnetRefByEmission(Pvl *pPvlDef, std::string psSerialNumfile)
     : ControlNetValidMeasure(pPvlDef) {
     ReadSerialNumbers(psSerialNumfile);
+    SetCameraRequiredFlag(true);
   }
 
   /**
