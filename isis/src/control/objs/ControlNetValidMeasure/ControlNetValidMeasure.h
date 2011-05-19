@@ -61,6 +61,8 @@ namespace Isis {
     *                                        "ValidMeasure"
     *  @history 2011-05-17 Sharmila Prasad - Added Sample, Line Residuals and Residual Magnitude
     *                                        for validation
+    *  @history 2011-05-19 Sharmila Prasad - Flag to indicate whether Camera is required, to increase
+    *                                        the processing speed
     */
 
   class ControlNetValidMeasure {
@@ -200,7 +202,31 @@ namespace Isis {
       
       //! Read the Serial Numbers from the file and open assocaited cubes
       void ReadSerialNumbers(std::string psSerialNumfile);
+      
+      /**
+       * Set the CameraRequired Flag. This flag indicates whether a camera is required 
+       * to Validate a Control Measure. Camera is required to get Emission, Incidence 
+       * angles and Resolution 
+       * 
+       * @author Sharmila Prasad (5/19/2011)
+       * 
+       * @param pbFlag 
+       */
+      void SetCameraRequiredFlag(bool pbFlag){
+        mbCameraRequired = pbFlag;
+      }
 
+      /**
+       * API to get status of CameraRequired flag
+       * 
+       * @author Sharmila Prasad (5/19/2011)
+       * 
+       * @return bool 
+       */
+      bool IsCameraRequired(void){
+        return mbCameraRequired;
+      }
+      
       double mdMinDN;                  //!< Standard Option MinDN
       double mdMaxDN;                  //!< Standard Option MaxDN
       double mdMinResolution;          //!< Standard Option MinResolution
@@ -214,7 +240,7 @@ namespace Isis {
       double mdSampleResTolerance;     //!< Standard Option Sample Residual
       double mdLineResTolerance;       //!< Standard Option Line Residual
       double mdResidualTolerance;      //!< Standard Option Residual Magnitude
-      
+
       double mdEmissionAngle;          //!< Store current Measure's Emission Angle
       double mdIncidenceAngle;         //!< Store current Measure's Incidence Angle
       double mdResolution;             //!< Store current Measure's Resolution
@@ -222,7 +248,7 @@ namespace Isis {
       double mdSampleResidual;         //!< Store current Measure's Sample Residual
       double mdLineResidual;           //!< Store current Measure's Line Residual
       double mdResidualMagnitude;      //!< Store current Measure's Residual Magnitude
-                                       //!
+
       PvlGroup mPvlOpGrp;              //!< Pvl Operator Group
       PvlGroup mStdOptionsGrp;         //!< Pvl Standard Options Group
       PvlGroup mStatisticsGrp;         //!< Pvl output Statistics Group
@@ -230,6 +256,9 @@ namespace Isis {
       Progress mStatus;                //!< Monitor the status of the app
       CubeManager mCubeMgr;            //!< CubeManager to open and read cubes
       SerialNumberList mSerialNumbers; //!< Serial numbers list
+
+      bool mbCameraRequired;           //!< To improve speed, flag to indicate if 
+                                       //!< Camera needs to be opened
   };
 };
 #endif

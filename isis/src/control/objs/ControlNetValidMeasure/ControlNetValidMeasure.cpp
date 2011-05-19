@@ -64,6 +64,8 @@ namespace Isis {
     mdSampleResTolerance= DBL_MAX;
     mdLineResTolerance  = DBL_MAX;
     mdResidualTolerance = DBL_MAX; 
+    
+    mbCameraRequired    = false;
   }
 
   /**
@@ -151,21 +153,31 @@ namespace Isis {
   MeasureValidationResults ControlNetValidMeasure::ValidStandardOptions(double pSample, double pLine, 
           const ControlMeasure *pMeasure, Cube *pCube, PvlGroup *pMeasureGrp)
   {
+    mdEmissionAngle  = 0;
+    mdIncidenceAngle = 0;
+    mdResolution     = 0;
+    mdSampleResidual = 0;
+    mdLineResidual   = 0;
+    mdResidualMagnitude=0;
+
     // Get the Camera
-    Camera *measureCamera;
-    try {
-      measureCamera = pCube->Camera();
-    }
-    catch(Isis::iException &e) {
-      std::string msg = "Cannot Create Camera for Image:" + pCube->Filename();
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+    if(mbCameraRequired) {
+      Camera *measureCamera;
+      try {
+        measureCamera = pCube->Camera();
+      }
+      catch(Isis::iException &e) {
+        std::string msg = "Cannot Create Camera for Image:" + pCube->Filename();
+        throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      }
+  
+      measureCamera->SetImage(pSample, pLine);
+  
+      mdEmissionAngle     = measureCamera->EmissionAngle();
+      mdIncidenceAngle    = measureCamera->IncidenceAngle();
+      mdResolution        = measureCamera->PixelResolution();
     }
 
-    measureCamera->SetImage(pSample, pLine);
-
-    mdEmissionAngle     = measureCamera->EmissionAngle();
-    mdIncidenceAngle    = measureCamera->IncidenceAngle();
-    mdResolution        = measureCamera->PixelResolution();
     if(pMeasure != NULL) {
       mdSampleResidual    = pMeasure->GetSampleResidual();
       mdLineResidual      = pMeasure->GetLineResidual();
@@ -178,10 +190,12 @@ namespace Isis {
     mdDnValue = inPortal[0];
 
     if(pMeasureGrp != NULL) {
-      *pMeasureGrp += Isis::PvlKeyword("EmissionAngle",     mdEmissionAngle);
-      *pMeasureGrp += Isis::PvlKeyword("IncidenceAngle",    mdIncidenceAngle);
+      if(mbCameraRequired) {
+        *pMeasureGrp += Isis::PvlKeyword("EmissionAngle",     mdEmissionAngle);
+        *pMeasureGrp += Isis::PvlKeyword("IncidenceAngle",    mdIncidenceAngle);
+        *pMeasureGrp += Isis::PvlKeyword("Resolution",        mdResolution);
+      }
       *pMeasureGrp += Isis::PvlKeyword("DNValue",           mdDnValue);
-      *pMeasureGrp += Isis::PvlKeyword("Resolution",        mdResolution);
       *pMeasureGrp += Isis::PvlKeyword("SampleResidual",    mdSampleResidual);
       *pMeasureGrp += Isis::PvlKeyword("LineResidual",      mdLineResidual);
       *pMeasureGrp += Isis::PvlKeyword("ResidualMagnitude", mdResidualMagnitude);
@@ -189,24 +203,26 @@ namespace Isis {
 
     MeasureValidationResults results;
 
-    if(!ValidEmissionAngle(mdEmissionAngle)) {
-      results.addFailure(MeasureValidationResults::EmissionAngle,
-          mdEmissionAngle, mdMinEmissionAngle, mdMaxEmissionAngle);
-    }
-
-    if(!ValidIncidenceAngle(mdIncidenceAngle)) {
-      results.addFailure(MeasureValidationResults::IncidenceAngle,
-          mdIncidenceAngle, mdMinIncidenceAngle, mdMaxEmissionAngle);
+    if(mbCameraRequired) {
+      if(!ValidEmissionAngle(mdEmissionAngle)) {
+        results.addFailure(MeasureValidationResults::EmissionAngle,
+            mdEmissionAngle, mdMinEmissionAngle, mdMaxEmissionAngle);
+      }
+  
+      if(!ValidIncidenceAngle(mdIncidenceAngle)) {
+        results.addFailure(MeasureValidationResults::IncidenceAngle,
+            mdIncidenceAngle, mdMinIncidenceAngle, mdMaxEmissionAngle);
+      }
+      
+      if(!ValidResolution(mdResolution)) {
+        results.addFailure(MeasureValidationResults::Resolution,
+          mdResolution, mdMinResolution, mdMaxResolution);
+      }
     }
 
     if(!ValidDnValue(mdDnValue)) {
       results.addFailure(MeasureValidationResults::DNValue,
           mdDnValue, mdMinDN, mdMaxDN);
-    }
-
-    if(!ValidResolution(mdResolution)) {
-      results.addFailure(MeasureValidationResults::Resolution,
-          mdResolution, mdMinResolution, mdMaxResolution);
     }
     
     if(!PixelsFromEdge((int)pSample, (int)pLine, pCube)) {
@@ -222,7 +238,6 @@ namespace Isis {
       ValidResidualTolerances(mdSampleResidual, mdLineResidual, 
                               mdResidualMagnitude, results);
     }
-    //std::cerr << results.toString().toStdString() << "\n";
     return results;
   }
   
@@ -299,15 +314,19 @@ namespace Isis {
    * @author Sharmila Prasad (6/4/2010)
    */
   void ControlNetValidMeasure::ValidatePvlResolution(void) {
-    if(mPvlOpGrp.HasKeyword("MinResolution"))
+    if(mPvlOpGrp.HasKeyword("MinResolution")){
       mdMinResolution = mPvlOpGrp["MinResolution"];
+      mbCameraRequired = true;
+    } 
     else {
       mdMinResolution = 0;
     }
     mStdOptionsGrp += Isis::PvlKeyword("MinResolution", mdMinResolution);
 
-    if(mPvlOpGrp.HasKeyword("MaxResolution"))
+    if(mPvlOpGrp.HasKeyword("MaxResolution")){
       mdMaxResolution = mPvlOpGrp["MaxResolution"];
+      mbCameraRequired = true;
+    } 
     else {
       mdMaxResolution = DBL_MAX;
     }
@@ -364,6 +383,7 @@ namespace Isis {
   void ControlNetValidMeasure::ValidatePvlEmissionAngle(void) {
     if(mPvlOpGrp.HasKeyword("MinEmission")) {
       mdMinEmissionAngle = mPvlOpGrp["MinEmission"];
+      mbCameraRequired = true;
       if(mdMinEmissionAngle < 0 || mdMinEmissionAngle > 135) {
         std::string msg = "Invalid Min Emission Angle, Valid Range is [0-135]";
         throw iException::Message(iException::User, msg, _FILEINFO_);
@@ -373,6 +393,7 @@ namespace Isis {
 
     if(mPvlOpGrp.HasKeyword("MaxEmission")) {
       mdMaxEmissionAngle = mPvlOpGrp["MaxEmission"];
+      mbCameraRequired = true;
       if(mdMaxEmissionAngle < 0 || mdMaxEmissionAngle > 135) {
         std::string msg = "Invalid Max Emission Angle, Valid Range is [0-135]";
         throw iException::Message(iException::User, msg, _FILEINFO_);
@@ -398,6 +419,7 @@ namespace Isis {
   void ControlNetValidMeasure::ValidatePvlIncidenceAngle(void) {
     if(mPvlOpGrp.HasKeyword("MinIncidence")) {
       mdMinIncidenceAngle = mPvlOpGrp["MinIncidence"];
+      mbCameraRequired = true;
       if(mdMinIncidenceAngle < 0 || mdMinIncidenceAngle > 135) {
         std::string msg = "Invalid Min Incidence Angle, Valid Range is [0-135]";
         throw iException::Message(iException::User, msg, _FILEINFO_);
@@ -407,6 +429,7 @@ namespace Isis {
 
     if(mPvlOpGrp.HasKeyword("MaxIncidence")) {
       mdMaxIncidenceAngle = mPvlOpGrp["MaxIncidence"];
+      mbCameraRequired = true;
       if(mdMaxIncidenceAngle < 0 || mdMaxIncidenceAngle > 135) {
         std::string msg = "Invalid Max Incidence Angle, Valid Range is [0-135]";
         throw iException::Message(iException::User, msg, _FILEINFO_);
