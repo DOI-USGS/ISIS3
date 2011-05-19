@@ -1297,18 +1297,21 @@ namespace Isis {
 //      printf("LatWt: %20.10lf LonWt: %20.10lf RadWt: %20.10lf\n",weights[0],weights[1],weights[2]);
 
       // TODO: do we need the four lines below??????
-      try {
-        aprioriSurfacePoint.SetSphericalSigmasDistance(Distance(apriorisigmas[0], Distance::Meters),
-          Distance(apriorisigmas[1], Distance::Meters),
-          Distance(apriorisigmas[2], Distance::Meters));
-      }
-      catch (iException &e) {
-        std::string msg = "Required target radii not available for converting lat/lon sigmas from meters ";
-        msg += "for control point " + Isis::iString(point->GetId());
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
-    }
-
-      point->SetAprioriSurfacePoint(aprioriSurfacePoint);
+      // 2011-05-19 KLE: NOOOO! this causes apriori sigmas to be set if the user has input
+      // global point weights. This causes a mess in the adjustment and the output
+      // net is corrupted with an invalid apriori covariance matrix
+//      try {
+//        aprioriSurfacePoint.SetSphericalSigmasDistance(Distance(apriorisigmas[0], Distance::Meters),
+//          Distance(apriorisigmas[1], Distance::Meters),
+//          Distance(apriorisigmas[2], Distance::Meters));
+//      }
+//      catch (iException &e) {
+//        std::string msg = "Required target radii not available for converting lat/lon sigmas from meters ";
+//        msg += "for control point " + Isis::iString(point->GetId());
+//        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+//    }
+//
+//      point->SetAprioriSurfacePoint(aprioriSurfacePoint);
       nPointIndex++;
     }
 
