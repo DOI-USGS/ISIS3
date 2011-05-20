@@ -4,6 +4,7 @@
 #include "MosaicTool.h"
 
 class QDialog;
+class QLabel;
 class QPushButton;
 
 namespace Isis {
@@ -21,9 +22,11 @@ namespace Isis {
    * @internal
    *   @history 2010-06-24 Christopher Austin - Added |x| functionality and fixed
    *            control net loading
-   *   @history 2010-05-07 Steven Lambright - Refactored.
-   *   @history 2010-05-10 Steven Lambright - Reduced useless code, open cnet
+   *   @history 2011-05-07 Steven Lambright - Refactored.
+   *   @history 2011-05-10 Steven Lambright - Reduced useless code, open cnet
    *            button is now always enabled.
+   *   @history 2011-05-10 Steven Lambright - Added label for currently open
+   *            network. 
    */
   class MosaicControlNetTool : public MosaicTool {
       Q_OBJECT
@@ -70,6 +73,7 @@ namespace Isis {
       QAction *m_connectivity;
       ControlNet *m_controlNet;
       ControlNetGraphicsItem *m_controlNetGraphics;
+      QLabel *m_controlNetFileLabel;
       QString m_controlNetFile;
   };
 };

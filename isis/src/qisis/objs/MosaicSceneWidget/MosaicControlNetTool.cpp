@@ -28,6 +28,7 @@ namespace Isis {
     m_displayControlNetButton = NULL;
     m_displayConnectivity = NULL;
     m_closeNetwork = NULL;
+    m_controlNetFileLabel = NULL;
 
     // Create the action buttons
     m_loadControlNetButton = new QPushButton();
@@ -62,6 +63,10 @@ namespace Isis {
     connect(m_closeNetwork, SIGNAL(clicked()), this, SLOT(closeNetwork()));
     connect(m_closeNetwork, SIGNAL(destroyed(QObject *)),
             this, SLOT(objectDestroyed(QObject *)));
+    
+    m_controlNetFileLabel = new QLabel;
+    connect(m_controlNetFileLabel, SIGNAL(destroyed(QObject *)),
+            this, SLOT(objectDestroyed(QObject *)));
   }
 
 
@@ -82,6 +87,9 @@ namespace Isis {
 
     if(m_closeNetwork)
       delete m_closeNetwork;
+
+    if(m_controlNetFileLabel)
+      delete m_controlNetFileLabel;
 
     closeNetwork();
   }
@@ -172,6 +180,9 @@ namespace Isis {
 
     if(m_closeNetwork)
       actionLayout->addWidget(m_closeNetwork);
+
+    if(m_controlNetFileLabel)
+      actionLayout->addWidget(m_controlNetFileLabel);
 
     actionLayout->setMargin(0);
 
@@ -282,6 +293,9 @@ namespace Isis {
     if(m_closeNetwork)
       m_closeNetwork->setEnabled(false);
 
+    if(m_controlNetFileLabel)
+      m_controlNetFileLabel->setText("");
+
     m_controlNetFile = "";
   }
 
@@ -302,6 +316,8 @@ namespace Isis {
       m_controlNetGraphics = NULL;
     else if(obj == m_displayArrows)
       m_displayArrows = NULL;
+    else if(obj == m_controlNetFileLabel)
+      m_controlNetFileLabel = NULL;
   }
 
 
@@ -340,10 +356,12 @@ namespace Isis {
     QString netFile = m_controlNetFile;
     closeNetwork();
     m_controlNetFile = netFile;
+    m_controlNetFileLabel->setText( QFileInfo(netFile).fileName() );
 
     if(m_controlNetFile.size() > 0) {
       try {
-        m_controlNet = new ControlNet(m_controlNetFile.toStdString());
+        m_controlNet = new ControlNet(
+            m_controlNetFile.toStdString());
         m_controlNetGraphics = new ControlNetGraphicsItem(m_controlNet,
             getWidget());
         connect(m_controlNetGraphics, SIGNAL(destroyed(QObject *)),
