@@ -444,111 +444,127 @@ namespace Isis {
    */
 
   geos::geom::MultiPolygon *PolygonTools::To180(geos::geom::MultiPolygon *poly360) {
-
-    geos::geom::CoordinateSequence *convPts;
-    std::vector<geos::geom::Geometry *> polys;
-    bool greater180 = false;
-    bool less180 = false;
-    //---------------------------------------------------------------------
-    //We need to know if the poly360 came in as 1 or 2 polygons.
-    //If it came in as 2 polys, then we need to union it before we return
-    //because it was a polygon that crossed the 0/360 boundary.
-    //---------------------------------------------------------------------
-    int initialNumPolys = poly360->getNumGeometries();
-
-    //------------------------------------------------------------------------
-    // If single poly, and points in the single polygon are less than
-    // 180 AND greater than 180, then we know we need to split this polygon up.
-    //------------------------------------------------------------------------
-    if(initialNumPolys == 1) {
-      convPts = poly360->getGeometryN(0)->getCoordinates();
-
-      //-----------------------------------------------------------------
-      //Handling the case when a polygon will cross the -180/180 boundary
-      //-----------------------------------------------------------------
-      for(unsigned int i = 0; i < convPts->getSize(); i++) {
-        if(convPts->getAt(i).x > 180) greater180 = true;
-        if(convPts->getAt(i).x < 180) less180 = true;
-      }
-
-      //-----------------------------------------------------------------------
-      // IF we do have a poly that crosses the -180/180 bndry...
-      // THEN go thru the convPts and if any points are greater than 180, then
-      // we'll put the > 180 in one poly and the < 180 in another poly and
-      // convert both.
-      //----------------------------------------------------------------------
-      if(greater180 && less180) {
-        geos::geom::CoordinateSequence *pts1 = new geos::geom::DefaultCoordinateSequence();
-        geos::geom::CoordinateSequence *pts2 = new geos::geom::DefaultCoordinateSequence();
-        std::vector<geos::geom::Geometry *> case4polys;
+    try {
+      geos::geom::CoordinateSequence *convPts;
+      std::vector<geos::geom::Geometry *> polys;
+      bool greater180 = false;
+      bool less180 = false;
+      //---------------------------------------------------------------------
+      //We need to know if the poly360 came in as 1 or 2 polygons.
+      //If it came in as 2 polys, then we need to union it before we return
+      //because it was a polygon that crossed the 0/360 boundary.
+      //---------------------------------------------------------------------
+      int initialNumPolys = poly360->getNumGeometries();
+  
+      //------------------------------------------------------------------------
+      // If single poly, and points in the single polygon are less than
+      // 180 AND greater than 180, then we know we need to split this polygon up.
+      //------------------------------------------------------------------------
+      if(initialNumPolys == 1) {
+        convPts = poly360->getGeometryN(0)->getCoordinates();
+  
+        //-----------------------------------------------------------------
+        //Handling the case when a polygon will cross the -180/180 boundary
+        //-----------------------------------------------------------------
         for(unsigned int i = 0; i < convPts->getSize(); i++) {
-          if(convPts->getAt(i).x <= 180) {
-            pts1->add(geos::geom::Coordinate(convPts->getAt(i).x, convPts->getAt(i).y));
-          }
-          if(convPts->getAt(i).x >= 180) {
-            pts2->add(geos::geom::Coordinate(convPts->getAt(i).x, convPts->getAt(i).y));
-          }
+          if(convPts->getAt(i).x > 180) greater180 = true;
+          if(convPts->getAt(i).x < 180) less180 = true;
         }
+  
+        //-----------------------------------------------------------------------
+        // IF we do have a poly that crosses the -180/180 bndry...
+        // THEN go thru the convPts and if any points are greater than 180, then
+        // we'll put the > 180 in one poly and the < 180 in another poly and
+        // convert both.
+        //----------------------------------------------------------------------
+        if(greater180 && less180) {
+          geos::geom::CoordinateSequence *pts1 = new geos::geom::DefaultCoordinateSequence();
+          geos::geom::CoordinateSequence *pts2 = new geos::geom::DefaultCoordinateSequence();
+          std::vector<geos::geom::Geometry *> case4polys;
+          for(unsigned int i = 0; i < convPts->getSize(); i++) {
+            if(convPts->getAt(i).x <= 180) {
+              pts1->add(geos::geom::Coordinate(convPts->getAt(i).x, convPts->getAt(i).y));
+            }
+            if(convPts->getAt(i).x >= 180) {
+              pts2->add(geos::geom::Coordinate(convPts->getAt(i).x, convPts->getAt(i).y));
+            }
+          }
+  
+          pts1->add(geos::geom::Coordinate(pts1->getX(0), pts1->getY(0)));
+          pts2->add(geos::geom::Coordinate(pts2->getX(0), pts2->getY(0)));
+ 
+          if(pts1->getSize() > 3) { 
+            case4polys.push_back(Isis::globalFactory.createPolygon
+                                 (Isis::globalFactory.createLinearRing(pts1), NULL));
+          }
 
-        pts1->add(geos::geom::Coordinate(pts1->getX(0), pts1->getY(0)));
-        pts2->add(geos::geom::Coordinate(pts2->getX(0), pts2->getY(0)));
+          if(pts2->getSize() > 3) {
+            case4polys.push_back(Isis::globalFactory.createPolygon
+                                 (Isis::globalFactory.createLinearRing(pts2), NULL));
+          }
 
-        case4polys.push_back(Isis::globalFactory.createPolygon
-                             (Isis::globalFactory.createLinearRing(pts1), NULL));
-        case4polys.push_back(Isis::globalFactory.createPolygon
-                             (Isis::globalFactory.createLinearRing(pts2), NULL));
-        poly360 = Isis::globalFactory.createMultiPolygon(case4polys);
+          poly360 = Isis::globalFactory.createMultiPolygon(case4polys);
+        }
       }
-    }
-
-    //--------------------------------------------------------
-    // If we still only have one single poly, simply convert
-    // coordinates to 180 system
-    //--------------------------------------------------------
-    if(poly360->getNumGeometries() == 1) {
-      convPts = poly360->getGeometryN(0)->getCoordinates();
-    }
-    else {
-      //  Find the poly that needs to be converted to 180 coordinates
-      if((poly360->getGeometryN(0)->getCoordinate()->x -
-          poly360->getGeometryN(1)->getCoordinate()->x) > 0) {
-        polys.push_back(poly360->getGeometryN(1)->clone());
+  
+      //--------------------------------------------------------
+      // If we still only have one single poly, simply convert
+      // coordinates to 180 system
+      //--------------------------------------------------------
+      if(poly360->getNumGeometries() == 1) {
         convPts = poly360->getGeometryN(0)->getCoordinates();
       }
       else {
-        polys.push_back(poly360->getGeometryN(0)->clone());
-        convPts = poly360->getGeometryN(1)->getCoordinates();
-        for(unsigned int i = 0; i < convPts->getSize(); i++) {
+        //  Find the poly that needs to be converted to 180 coordinates
+        if((poly360->getGeometryN(0)->getCoordinate()->x -
+            poly360->getGeometryN(1)->getCoordinate()->x) > 0) {
+          polys.push_back(poly360->getGeometryN(1)->clone());
+          convPts = poly360->getGeometryN(0)->getCoordinates();
+        }
+        else {
+          polys.push_back(poly360->getGeometryN(0)->clone());
+          convPts = poly360->getGeometryN(1)->getCoordinates();
+          for(unsigned int i = 0; i < convPts->getSize(); i++) {
+          }
         }
       }
-    }
-
-    //Convert poly to greater than 180
-    geos::geom::CoordinateSequence *newPts = new geos::geom::CoordinateArraySequence();
-    for(unsigned int i = 0; i < convPts->getSize(); i++) {
-      if(convPts->getAt(i).x > 180) {
-        newPts->add(geos::geom::Coordinate(convPts->getAt(i).x - 360., convPts->getAt(i).y));
+  
+      //Convert poly to greater than 180
+      geos::geom::CoordinateSequence *newPts = new geos::geom::CoordinateArraySequence();
+      for(unsigned int i = 0; i < convPts->getSize(); i++) {
+        if(convPts->getAt(i).x > 180) {
+          newPts->add(geos::geom::Coordinate(convPts->getAt(i).x - 360., convPts->getAt(i).y));
+        }
+        else {
+          newPts->add(geos::geom::Coordinate(convPts->getAt(i).x, convPts->getAt(i).y));
+        }
+      }
+  
+      polys.push_back(Isis::globalFactory.createPolygon
+                      (Isis::globalFactory.createLinearRing(newPts), NULL));
+  
+      //--------------------------------------------------------------
+      //If the poly360 was initially 2 polygons, then we know that we
+      //need to union them now.
+      //--------------------------------------------------------------
+      if(initialNumPolys > 1) {
+        geos::geom::GeometryCollection *polyCollection =
+          Isis::globalFactory.createGeometryCollection(polys);
+        geos::geom::Geometry *unionPoly = polyCollection->buffer(0);
+        return (geos::geom::MultiPolygon *) unionPoly;
       }
       else {
-        newPts->add(geos::geom::Coordinate(convPts->getAt(i).x, convPts->getAt(i).y));
+        return Isis::globalFactory.createMultiPolygon(polys);
       }
     }
-
-    polys.push_back(Isis::globalFactory.createPolygon
-                    (Isis::globalFactory.createLinearRing(newPts), NULL));
-
-    //--------------------------------------------------------------
-    //If the poly360 was initially 2 polygons, then we know that we
-    //need to union them now.
-    //--------------------------------------------------------------
-    if(initialNumPolys > 1) {
-      geos::geom::GeometryCollection *polyCollection =
-        Isis::globalFactory.createGeometryCollection(polys);
-      geos::geom::Geometry *unionPoly = polyCollection->buffer(0);
-      return (geos::geom::MultiPolygon *) unionPoly;
+    catch(geos::util::GEOSException *exc) {
+      iString msg = "Conversion to 180 failed. The reason given was [" + iString(exc->what()) + "]";
+      delete exc;
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
-    else {
-      return Isis::globalFactory.createMultiPolygon(polys);
+    catch(...) {
+      iString msg = "Conversion to 180 failed. Could not determine the reason";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
   }
 

@@ -51,6 +51,8 @@ namespace Isis {
    *            MultiPolygon. Often times perfectly good polygons are mixed with
    *            tiny, scattered, invalid polygons and this should now just throw
    *            those out and keep what it can.
+   *   @history 2011-05-20 Steven Lambright To180 now catches all errors as it
+   *            should and also works in more cases.
    *
    */
 
