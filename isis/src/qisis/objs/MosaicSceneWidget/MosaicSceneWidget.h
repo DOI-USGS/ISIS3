@@ -47,6 +47,8 @@ namespace Isis {
    *  @history 2011-05-17 Steven Lambright - Target radii recalculated when
    *                                the user specifies a map file, if they
    *                                are missing. 
+   *  @history 2011-05-20 Steven Lambright - Improved error handling when
+   *                                reprojecting. 
    */
   class MosaicSceneWidget : public QWidget {
       Q_OBJECT

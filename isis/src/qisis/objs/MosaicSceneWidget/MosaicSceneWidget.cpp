@@ -848,7 +848,23 @@ namespace Isis {
 
     int progressCountdown = reprojectsPerUpdate;
     foreach(mosaicSceneItem, *m_mosaicSceneItems) {
-      mosaicSceneItem->reproject();
+      try {
+        mosaicSceneItem->reproject();
+      }
+      catch(iException &e) {
+        iString msg = "The file [";
+
+        if(mosaicSceneItem->cubeDisplay())
+          msg += (iString)mosaicSceneItem->cubeDisplay()->displayName();
+
+        msg += "] is being removed due to not being able to project";
+
+        iException &tmp = iException::Message(iException::Programmer,
+                                              msg, _FILEINFO_);
+        tmp.Report();
+        tmp.Clear();
+        mosaicSceneItem->cubeDisplay()->deleteLater();
+      }
 
       progressCountdown --;
       if(progressCountdown == 0) {
