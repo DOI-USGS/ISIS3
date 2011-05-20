@@ -281,11 +281,13 @@ namespace Qisis {
       QCheckBox *p_lockPoint;
       QCheckBox *p_ignorePoint;
       QCheckBox *p_groundPoint;
+      QLabel *p_leftReference;
       QLabel *p_leftMeasureType;
       QLabel *p_leftSampError;
       QLabel *p_leftLineError;
       QLabel *p_leftGoodness;
       QLabel *p_rightGoodness;
+      QLabel *p_rightReference;
       QLabel *p_rightMeasureType;
       QLabel *p_rightSampError;
       QLabel *p_rightLineError;

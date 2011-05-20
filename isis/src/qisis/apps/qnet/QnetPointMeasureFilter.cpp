@@ -27,7 +27,6 @@ namespace Qisis {
    */
   QnetPointMeasureFilter::QnetPointMeasureFilter(QWidget *parent) : QnetFilter(parent) {
     p_measureType = NULL;
-    p_reference = NULL;
     p_candidate = NULL;
     p_manual = NULL;
     p_registeredPixel = NULL;
@@ -38,14 +37,12 @@ namespace Qisis {
 
     // Create the components for the filter window
     p_measureType = new QCheckBox("Filter by Measure Type(s)");
-    p_reference = new QCheckBox("Reference");
     p_candidate = new QCheckBox("Candidate");
     p_manual = new QCheckBox("Manual");
     p_registeredPixel = new QCheckBox("RegisteredPixel");
     p_registeredSubPixel = new QCheckBox("RegisteredSubPixel");
 
     p_measureType->setChecked(false);
-    p_reference->setEnabled(false);
     p_candidate->setEnabled(false);
     p_manual->setEnabled(false);
     p_registeredPixel->setEnabled(false);
@@ -76,7 +73,6 @@ namespace Qisis {
 
     QVBoxLayout *typelayout = new QVBoxLayout();
     typelayout->addWidget(p_measureType);
-    typelayout->addWidget(p_reference);
     typelayout->addWidget(p_candidate);
     typelayout->addWidget(p_manual);
     typelayout->addWidget(p_registeredPixel);
@@ -125,8 +121,7 @@ namespace Qisis {
     }
     // if Filter by Measure Type is selected but no Measure Type is checked, throw error
     if ((p_measureType->isChecked()) &&
-        !(p_reference->isChecked() ||
-            p_candidate->isChecked() ||
+        !(p_candidate->isChecked() ||
             p_manual->isChecked() ||
             p_registeredPixel->isChecked() ||
             p_registeredSubPixel->isChecked())) {
@@ -173,10 +168,13 @@ namespace Qisis {
             }
           }
         }
-        else
-          // ignore status not selected, only filter by measure type
-        {
-          if (MeasureTypeMatched(cp[j]->GetType())) {
+        // ignore status not selected, only filter by measure type, do not
+        // include measure if Reference 
+        else {
+          //  Is this a reference measure
+          bool reference = cp.IsReferenceExplicit() &&
+             ((QString(cp[j]->GetCubeSerialNumber()) == cp.GetReferenceSN()));
+          if (MeasureTypeMatched(cp[j]->GetType()) && reference == false) {
             // keep this point in the list and go on to the next point
             break;
           }
@@ -269,19 +267,16 @@ namespace Qisis {
    */
   void QnetPointMeasureFilter::enableTypeFilter() {
     if (p_measureType->isChecked()) {
-      p_reference->setEnabled(true);
       p_candidate->setEnabled(true);
       p_manual->setEnabled(true);
       p_registeredPixel->setEnabled(true);
       p_registeredSubPixel->setEnabled(true);
     }
     else {
-      p_reference->setEnabled(false);
       p_candidate->setEnabled(false);
       p_manual->setEnabled(false);
       p_registeredPixel->setEnabled(false);
       p_registeredSubPixel->setEnabled(false);
-      p_reference->setChecked(false);
       p_candidate->setChecked(false);
       p_manual->setChecked(false);
       p_registeredPixel->setChecked(false);

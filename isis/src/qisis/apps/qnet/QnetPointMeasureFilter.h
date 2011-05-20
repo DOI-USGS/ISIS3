@@ -25,7 +25,10 @@ namespace Qisis {
    * properties. This class is designed to remove points from the
    * current filtered list that do not contain any measures of the
    * selected type.
-   *
+   *  
+   * @todo 
+   *   Add ability to filter points without a Reference.
+   *  
    * @internal
    *   @history 2009-01-08 Jeannie Walldren - Modified filter()
    *                          method to remove new filter points
@@ -37,6 +40,9 @@ namespace Qisis {
    *                          to null in constructor.
    *   @history 2010-07-16 Tracie Sucharski - Implemented binary
    *                          control networks.
+   *   @history 2011-05-20 Tracie Sucharski - Remove reference as a measure
+   *                          type.  Need to add ability to search for
+   *                          points without a reference?
    *
    */
   class QnetPointMeasureFilter : public QnetFilter {
@@ -53,7 +59,6 @@ namespace Qisis {
 
     private:
       QCheckBox *p_measureType;
-      QCheckBox *p_reference;
       QCheckBox *p_candidate;
       QCheckBox *p_manual;
       QCheckBox *p_registeredPixel;

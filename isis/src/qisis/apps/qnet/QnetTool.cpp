@@ -81,10 +81,12 @@ namespace Qisis {
     p_lockPoint = NULL;
     p_ignorePoint = NULL;
     p_groundPoint = NULL;
+    p_leftReference = NULL;
     p_leftMeasureType = NULL;
     p_leftSampError = NULL;
     p_leftLineError = NULL;
     p_leftGoodness = NULL;
+    p_rightReference = NULL;
     p_rightMeasureType = NULL;
     p_rightSampError = NULL;
     p_rightLineError = NULL;
@@ -307,7 +309,8 @@ namespace Qisis {
             this, SLOT(setIgnoreLeftMeasure(bool)));
     connect(this, SIGNAL(ignoreLeftChanged()),
             p_ignoreLeftMeasure, SLOT(toggle()));
-    p_leftMeasureType = new QLabel;
+    p_leftReference = new QLabel();
+    p_leftMeasureType = new QLabel();
     p_leftSampError = new QLabel();
     p_leftLineError = new QLabel();
     p_leftGoodness = new QLabel();
@@ -315,6 +318,7 @@ namespace Qisis {
     leftLayout->addWidget(p_leftCombo);
     leftLayout->addWidget(p_lockLeftMeasure);
     leftLayout->addWidget(p_ignoreLeftMeasure);
+    leftLayout->addWidget(p_leftReference);
     leftLayout->addWidget(p_leftMeasureType);
     leftLayout->addWidget(p_leftSampError);
     leftLayout->addWidget(p_leftLineError);
@@ -343,7 +347,8 @@ namespace Qisis {
             this, SLOT(setIgnoreRightMeasure(bool)));
     connect(this, SIGNAL(ignoreRightChanged()),
             p_ignoreRightMeasure, SLOT(toggle()));
-    p_rightMeasureType = new QLabel;
+    p_rightReference = new QLabel();
+    p_rightMeasureType = new QLabel();
     p_rightSampError = new QLabel();
     p_rightLineError = new QLabel();
     p_rightGoodness = new QLabel();
@@ -353,6 +358,7 @@ namespace Qisis {
     rightLayout->addWidget(p_rightCombo);
     rightLayout->addWidget(p_lockRightMeasure);
     rightLayout->addWidget(p_ignoreRightMeasure);
+    rightLayout->addWidget(p_rightReference);
     rightLayout->addWidget(p_rightMeasureType);
     rightLayout->addWidget(p_rightSampError);
     rightLayout->addWidget(p_rightLineError);
@@ -1895,6 +1901,7 @@ namespace Qisis {
    * @history 2010-12-27  Tracie Sucharski - Write textual Null instead of 
    *                           the numeric Null for sample & line residuals.
    * @history 2011-04-20  Tracie Sucharski - Set EditLock check box correctly 
+   * @history 2011-05-20  Tracie Sucharski - Added Reference output 
    * 
    */
   void QnetTool::updateLeftMeasureInfo () {
@@ -1904,10 +1911,17 @@ namespace Qisis {
     //  Set ignore measure box correctly
     p_ignoreLeftMeasure->setChecked(p_leftMeasure->IsIgnored());
 
-    QString s = "Measure Type: ";
+    QString s = "Reference: ";
     if (p_editPoint->IsReferenceExplicit() &&
-        (QString(p_leftMeasure->GetCubeSerialNumber()) == p_editPoint->GetReferenceSN()))
-       s+= "Reference";
+        (QString(p_leftMeasure->GetCubeSerialNumber()) == p_editPoint->GetReferenceSN())) {
+      s += "True";
+    }
+    else {
+      s += "False";
+    }
+    p_leftReference->setText(s);
+
+    s = "Measure Type: ";
     if (p_leftMeasure->GetType() == ControlMeasure::Candidate) s+= "Candidate";
     if (p_leftMeasure->GetType() == ControlMeasure::Manual) s+= "Manual";
     if (p_leftMeasure->GetType() == ControlMeasure::RegisteredPixel) s+= "RegisteredPixel";
@@ -1955,6 +1969,7 @@ namespace Qisis {
    * @history 2010-12-27  Tracie Sucharski - Write textual Null instead of 
    *                           the numeric Null for sample & line residuals. 
    * @history 2011-04-20  Tracie Sucharski - Set EditLock check box correctly 
+   * @history 2011-05-20  Tracie Sucharski - Added Reference output 
    * 
    */
 
@@ -1965,10 +1980,18 @@ namespace Qisis {
       //  Set ignore measure box correctly
     p_ignoreRightMeasure->setChecked(p_rightMeasure->IsIgnored());
 
-    QString s = "Measure Type: ";
-    if (p_editPoint->IsReferenceExplicit() && 
-        (QString(p_rightMeasure->GetCubeSerialNumber()) == p_editPoint->GetReferenceSN()))
-      s+= "Reference";
+    QString s = "Reference: ";
+    if (p_editPoint->IsReferenceExplicit() &&
+        (QString(p_rightMeasure->GetCubeSerialNumber()) == p_editPoint->GetReferenceSN())) {
+      s += "True";
+    }
+    else {
+      s += "False";
+    }
+
+    p_rightReference->setText(s);
+
+    s = "Measure Type: ";
     if (p_rightMeasure->GetType() == ControlMeasure::Candidate) s+= "Candidate";
     if (p_rightMeasure->GetType() == ControlMeasure::Manual) s+= "Manual";
     if (p_rightMeasure->GetType() == ControlMeasure::RegisteredPixel) s+= "RegisteredPixel";
