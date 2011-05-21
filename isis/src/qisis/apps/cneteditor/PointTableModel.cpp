@@ -187,9 +187,11 @@ namespace Isis
                   - 7;
               }
               QString label;
-              for (int i = 0; i < widthAdditions; i++) label += " ";
+              for (int i = 0; i < widthAdditions; i++)
+                label += " ";
               label += "Reference";
-              for (int i = 0; i < widthAdditions; i++) label += " ";
+              for (int i = 0; i < widthAdditions; i++)
+                label += " ";
               result = QVariant::fromValue(label);
             }
             break;

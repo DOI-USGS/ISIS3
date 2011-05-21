@@ -2,60 +2,68 @@
 
 #include "PointFilterSelector.h"
 
+#include <iostream>
+
 #include <QComboBox>
 #include <QHBoxLayout>
+#include <QIcon>
+#include <QPushButton>
 
 #include "AbstractFilter.h"
+#include "ChooserNameFilter.h"
+#include "IgnoredFilter.h"
 #include "PointIdFilter.h"
 
+
+using std::cerr;
 
 namespace Isis
 {
   PointFilterSelector::PointFilterSelector()
   {
-    selector = new QComboBox;
-    selector->addItem("select");
-    selector->addItem("Points by Point Id");
-    
-    QHBoxLayout * mainLayout = new QHBoxLayout;
-    mainLayout->addWidget(selector);
-    setLayout(mainLayout);
+    nullify();
+    createSelector();
   }
-  
-  
+
+
   PointFilterSelector::~PointFilterSelector()
   {
-    if (selector)
-      selector->setCurrentIndex(0);
   }
-  
-  
-  void PointFilterSelector::nullify()
+ 
+ 
+  void PointFilterSelector::createSelector()
   {
-    selector = NULL;
+    AbstractFilterSelector::createSelector();
+  
+    selector->addItem("Chooser Name");
+    selector->addItem("Ignored Points");
+    selector->addItem("Point Id");
   }
-  
-  
-  void PointFilterSelector::filterChanged(int index)
+
+
+  void PointFilterSelector::changeFilter(int index)
   {
-    if (filter)
+    AbstractFilterSelector::changeFilter(index);
+    
+    if (index != 0)
     {
-      QLayoutItem * item = mainLayout->takeAt(1);
-      ASSERT(item);
-      delete item;
-      filter = NULL;
+      switch (index)
+      {
+        case 1:
+          filter = new ChooserNameFilter;
+          break;
+        case 2:
+          filter = new IgnoredFilter;
+          break;
+        case 3:
+          filter = new PointIdFilter;
+          break;
+      }
+      
+      connect(filter, SIGNAL(filterChanged()), this, SIGNAL(filterChanged()));
+      mainLayout->insertWidget(2, filter);
     }
     
-    switch (index)
-    {
-      case 1:
-        mainLayout->addWidget(new PointIdFilter);
-    }
-  }
-  
-  
-  AbstractFilter * PointFilterSelector::getFilter()
-  {
-    return filter;
+    emit filterChanged();
   }
 }

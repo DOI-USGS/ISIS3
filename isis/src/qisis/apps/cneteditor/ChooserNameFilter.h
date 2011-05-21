@@ -1,5 +1,5 @@
-#ifndef PointIdFilter_H
-#define PointIdFilter_H
+#ifndef ChooserNameFilter_H
+#define ChooserNameFilter_H
 
 #include "AbstractFilter.h"
 
@@ -12,13 +12,13 @@ namespace Isis
 {
   class ControlPoint;
 
-  class PointIdFilter : public AbstractFilter
+  class ChooserNameFilter : public AbstractFilter
   {
       Q_OBJECT
 
     public:
-      PointIdFilter(int minimumForImageSuccess = -1);
-      virtual ~PointIdFilter();
+      ChooserNameFilter(int minimumForImageSuccess = -1);
+      virtual ~ChooserNameFilter();
 
       bool evaluate(const ControlPoint *) const;
       bool evaluate(const ControlMeasure *) const;

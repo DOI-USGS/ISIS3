@@ -11,6 +11,7 @@ namespace Isis
 {
   class AbstractTreeItem;
   class ControlNet;
+  class FilterWidget;
   class RootItem;
 
   class TreeModel : public QAbstractItemModel
@@ -38,10 +39,15 @@ namespace Isis
 
       void setDrivable(bool drivableStatus);
       bool isDrivable() { return drivable; }
+      
+      void setFilter(FilterWidget * newFilter);
 
-      virtual void rebuildItems() = 0;
       void saveViewState();
       void loadViewState();
+      
+      
+    public slots:
+      virtual void rebuildItems() = 0;
 
 
       // disable copying of this class
@@ -68,6 +74,7 @@ namespace Isis
       QList< QPair< QString, QString > > * selectedState;
       QTreeView * view;
       bool drivable;
+      FilterWidget * filter;
   };
 }
 

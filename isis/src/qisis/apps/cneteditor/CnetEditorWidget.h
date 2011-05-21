@@ -6,6 +6,7 @@
 class QBoxLayout;
 class QItemSelection;
 class QModelIndex;
+class QScrollArea;
 class QSplitter;
 class QStringList;
 class QTableView;
@@ -59,7 +60,7 @@ namespace Isis
       void createPointView();
       void createSerialView();
       void createConnectionView();
-      void createFilterWidgets();
+      void createFilterArea();
       void createEditPointView();
       void createEditMeasureView();
       void focusView(QTreeView * view, QStringList label);
@@ -90,7 +91,9 @@ namespace Isis
       QTreeView * pointView;
       QTreeView * serialView;
       QTreeView * connectionView;
-      
+
+      QScrollArea * filterArea;
+
       FilterWidget * pointFilterWidget;
       FilterWidget * serialFilterWidget;
       FilterWidget * connectionFilterWidget;

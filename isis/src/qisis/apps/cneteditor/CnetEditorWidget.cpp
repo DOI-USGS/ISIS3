@@ -12,6 +12,7 @@
 #include <QHeaderView>
 #include <QItemSelection>
 #include <QModelIndex>
+#include <QScrollArea>
 #include <QSettings>
 #include <QSplitter>
 #include <QString>
@@ -82,6 +83,12 @@ namespace Isis
     topSplitter = NULL;
     mainSplitter = NULL;
 
+    filterArea = NULL;
+
+    pointFilterWidget = NULL;
+    serialFilterWidget = NULL;
+    connectionFilterWidget = NULL;
+
     controlNet = NULL;
   }
 
@@ -101,17 +108,17 @@ namespace Isis
 
     connectionView->selectionModel()->clear();
     connectionView->collapseAll();
-    
-//     syncFilterWidgets();
+
+    syncFilterWidgets();
   }
-  
-  
+
+
   void CnetEditorWidget::syncFilterWidgets()
   {
     pointFilterWidget->setVisible(false);
     serialFilterWidget->setVisible(false);
     connectionFilterWidget->setVisible(false);
-    
+
     switch ((View) getDriverView())
     {
       case PointView:
@@ -123,6 +130,11 @@ namespace Isis
       case ConnectionView:
         connectionFilterWidget->show();
     }
+
+//     topSplitter->addWidget(pointFilterArea);
+//     topSplitter->addWidget(serialFilterArea);
+//     topSplitter->addWidget(connectionFilterArea);
+
   }
 
 
@@ -160,7 +172,7 @@ namespace Isis
     createPointView();
     createSerialView();
     createConnectionView();
-//     createFilterWidgets();
+    createFilterArea();
 
     createEditPointView();
     QGroupBox * editPointBox = new QGroupBox(tr("Control Point Table"));
@@ -175,12 +187,11 @@ namespace Isis
     editMeasureBox->setLayout(editMeasureLayout);
 
     topSplitter = new QSplitter(Qt::Horizontal);
+//     topSplitter->setChildrenCollapsible(false);
     topSplitter->addWidget(pointView);
     topSplitter->addWidget(serialView);
     topSplitter->addWidget(connectionView);
-//     topSplitter->addWidget(pointFilterWidget);
-//     topSplitter->addWidget(serialFilterWidget);
-//     topSplitter->addWidget(connectionFilterWidget);
+    topSplitter->addWidget(filterArea);
 
     mainSplitter = new QSplitter(Qt::Vertical);
     mainSplitter->addWidget(topSplitter);
@@ -192,8 +203,8 @@ namespace Isis
 
     return mainLayout;
   }
-  
-  
+
+
   void CnetEditorWidget::createPointView()
   {
     pointView = new QTreeView();
@@ -210,8 +221,8 @@ namespace Isis
     pointView->setAlternatingRowColors(true);
     pointView->setSelectionMode(QAbstractItemView::MultiSelection);
   }
-  
-  
+
+
   void CnetEditorWidget::createSerialView()
   {
     serialView = new QTreeView();
@@ -228,8 +239,8 @@ namespace Isis
     serialView->setAlternatingRowColors(true);
     serialView->setSelectionMode(QAbstractItemView::MultiSelection);
   }
-  
-  
+
+
   void CnetEditorWidget::createConnectionView()
   {
     connectionView = new QTreeView();
@@ -247,16 +258,40 @@ namespace Isis
     connectionView->setAlternatingRowColors(true);
     connectionView->setSelectionMode(QAbstractItemView::MultiSelection);
   }
-  
-  
-  void CnetEditorWidget::createFilterWidgets()
+
+
+  void CnetEditorWidget::createFilterArea()
   {
-    pointFilterWidget = new FilterWidget;
-    serialFilterWidget = new FilterWidget;
-    connectionFilterWidget = new FilterWidget;
+    ASSERT(pointModel);
+    ASSERT(serialModel);
+    ASSERT(connectionModel);
+    
+    pointFilterWidget = new FilterWidget("Points");
+    if (pointModel)
+      pointModel->setFilter(pointFilterWidget);
+      
+    serialFilterWidget = new FilterWidget("Images");
+    if (serialModel)
+      serialModel->setFilter(serialFilterWidget);
+      
+    connectionFilterWidget = new FilterWidget("Connections");
+    if (connectionModel)
+      connectionModel->setFilter(connectionFilterWidget);
+
+    QHBoxLayout * layout = new QHBoxLayout;
+    layout->addWidget(pointFilterWidget);
+    layout->addWidget(serialFilterWidget);
+    layout->addWidget(connectionFilterWidget);
+
+    QWidget * filterAreaWidget = new QWidget;
+    filterAreaWidget->setLayout(layout);
+
+    filterArea = new QScrollArea;
+    filterArea->setWidget(filterAreaWidget);
+    filterArea->setWidgetResizable(true);
   }
-  
-  
+
+
   void CnetEditorWidget::createEditPointView()
   {
     editPointView = new QTableView();
@@ -273,8 +308,8 @@ namespace Isis
         QAbstractItemView::DoubleClicked | QAbstractItemView::AnyKeyPressed);
     editPointView->setSelectionMode(QAbstractItemView::ExtendedSelection);
   }
-  
-  
+
+
   void CnetEditorWidget::createEditMeasureView()
   {
     editMeasureView = new QTableView();

@@ -12,6 +12,7 @@ class QTreeView;
 namespace Isis
 {
   class ControlNet;
+  class FilterWidget;
 
   class ConnectionModel : public TreeModel
   {

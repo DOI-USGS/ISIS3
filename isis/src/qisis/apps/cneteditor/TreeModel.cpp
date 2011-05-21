@@ -18,6 +18,7 @@
 #include "iException.h"
 
 #include "AbstractTreeItem.h"
+#include "FilterWidget.h"
 #include "RootItem.h"
 
 using std::cerr;
@@ -34,6 +35,7 @@ namespace Isis
     rootItem = NULL;
     expandedState = NULL;
     selectedState = NULL;
+    filter = NULL;
 
     headerTitle = new QString(name);
     rootItem = new RootItem;
@@ -72,6 +74,7 @@ namespace Isis
 
     cNet = NULL;
     view = NULL;
+    filter = NULL;
   }
 
 
@@ -168,6 +171,14 @@ namespace Isis
       drivable = drivableStatus;
       emit(dataChanged(QModelIndex(), QModelIndex()));
     }
+  }
+  
+  
+  void TreeModel::setFilter(FilterWidget * fw)
+  {
+    ASSERT(fw);
+    filter = fw;
+    connect(filter, SIGNAL(filterChanged()), this, SLOT(rebuildItems()));
   }
 
 

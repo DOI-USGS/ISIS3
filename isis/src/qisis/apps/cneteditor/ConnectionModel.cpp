@@ -10,15 +10,16 @@
 #include "ControlNet.h"
 
 #include "ConnectionParentItem.h"
+#include "FilterWidget.h"
+#include "PointLeafItem.h"
 #include "RootItem.h"
 #include "SerialParentItem.h"
-#include "PointLeafItem.h"
 
 
 namespace Isis
 {
-  ConnectionModel::ConnectionModel(ControlNet * controlNet, QString name,
-      QTreeView * tv, QObject * parent) : TreeModel(controlNet, name, tv, parent)
+  ConnectionModel::ConnectionModel(ControlNet * cNet, QString name,
+      QTreeView * tv, QObject * parent) : TreeModel(cNet, name, tv, parent)
   {
     rebuildItems();
   }

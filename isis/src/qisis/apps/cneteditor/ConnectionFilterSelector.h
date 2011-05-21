@@ -1,5 +1,5 @@
-#ifndef PointFilterSelector_H
-#define PointFilterSelector_H
+#ifndef ConnectionFilterSelector_H
+#define ConnectionFilterSelector_H
 
 
 #include "AbstractFilterSelector.h"
@@ -9,13 +9,13 @@ namespace Isis
 {
   class AbstractFilter;
 
-  class PointFilterSelector : public AbstractFilterSelector
+  class ConnectionFilterSelector : public AbstractFilterSelector
   {
       Q_OBJECT
 
     public:
-      PointFilterSelector();
-      virtual ~PointFilterSelector();
+      ConnectionFilterSelector();
+      virtual ~ConnectionFilterSelector();
 
 
     protected:

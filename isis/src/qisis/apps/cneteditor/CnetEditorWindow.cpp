@@ -357,7 +357,7 @@ namespace Isis
 
   void CnetEditorWindow::save()
   {
-    Q_ASSERT(!curFile->isEmpty());
+    ASSERT(!curFile->isEmpty());
 
     cnet->Write(*curFile, saveAsPvl);
     setDirty(false);

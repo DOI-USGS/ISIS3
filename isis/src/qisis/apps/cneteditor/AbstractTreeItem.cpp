@@ -35,8 +35,6 @@ namespace Isis
 
   int AbstractTreeItem::row() const
   {
-    ASSERT(parentItem);
-
     int rowIndex = -1;
     if (parentItem)
       rowIndex = parentItem->indexOf(const_cast< AbstractTreeItem * >(this));

@@ -1,8 +1,6 @@
 #include "IsisDebug.h"
 
-#include "PointIdFilter.h"
-
-#include <iostream>
+#include "ChooserNameFilter.h"
 
 #include <QHBoxLayout>
 #include <QLineEdit>
@@ -10,12 +8,9 @@
 #include "ControlPoint.h"
 
 
-using std::cerr;
-
-
 namespace Isis
 {
-  PointIdFilter::PointIdFilter(int minimumForImageSuccess) :
+  ChooserNameFilter::ChooserNameFilter(int minimumForImageSuccess) :
       AbstractFilter(minimumForImageSuccess)
   {
     nullify();
@@ -23,12 +18,12 @@ namespace Isis
   }
 
 
-  PointIdFilter::~PointIdFilter()
+  ChooserNameFilter::~ChooserNameFilter()
   {
   }
 
 
-  void PointIdFilter::nullify()
+  void ChooserNameFilter::nullify()
   {
     AbstractFilter::nullify();
 
@@ -36,7 +31,7 @@ namespace Isis
   }
 
 
-  void PointIdFilter::createWidget()
+  void ChooserNameFilter::createWidget()
   {
     AbstractFilter::createWidget();
 
@@ -48,24 +43,14 @@ namespace Isis
   }
 
 
-  /**
-   * Given a point to evaluate, return true if it makes it through the filter,
-   * and false otherwise.  Criteria defining the filter is defined in this
-   * method.  Note that whether the filter is inclusive or exclusive is handled
-   * in this method.
-   *
-   * @param point The point to evaluate
-   *
-   * @returns True if the point makes it through the filter, false otherwise
-   */
-  bool PointIdFilter::evaluate(const ControlPoint * point) const
+  bool ChooserNameFilter::evaluate(const ControlPoint * point) const
   {
     bool evaluation = true;
     
     QString lineEditText = lineEdit->text();
     if (lineEditText.size() >= 1)
     {
-      bool match = ((QString) point->GetId()).contains(
+      bool match = ((QString) point->GetChooserName()).contains(
           lineEditText, Qt::CaseInsensitive);
       evaluation = !(inclusive() ^ match);
       
@@ -85,27 +70,26 @@ namespace Isis
   }
 
 
-  bool PointIdFilter::evaluate(const ControlMeasure * measure) const
+  bool ChooserNameFilter::evaluate(const ControlMeasure * measure) const
   {
     return true;
   }
 
 
-  bool PointIdFilter::evaluate(const ControlCubeGraphNode * node) const
+  bool ChooserNameFilter::evaluate(const ControlCubeGraphNode * node) const
   {
     return true;
   }
   
   
-  QString PointIdFilter::getDescription() const
+  QString ChooserNameFilter::getDescription() const
   {
-    cerr << "PointIdFilter::getDescription(): " << minForImageSuccess << "\n";
     QString description;
     
     ASSERT(lineEdit);
     if (lineEdit)
     {
-      description = "have point id's ";
+      description = "have chooser names ";
       if (inclusive())
         description += "containing ";
       else

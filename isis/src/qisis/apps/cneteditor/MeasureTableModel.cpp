@@ -339,14 +339,16 @@ namespace Isis
           case EditLock:
             if (value.toString() == "Yes")
               measure->SetEditLock(true);
-            else if (value.toString() == "No")
-              measure->SetEditLock(false);
+            else
+              if (value.toString() == "No")
+                measure->SetEditLock(false);
             break;
           case Ignored:
             if (value.toString() == "Yes")
               measure->SetIgnored(true);
-            else if (value.toString() == "No")
-              measure->SetIgnored(false);
+            else
+              if (value.toString() == "No")
+                measure->SetIgnored(false);
             break;
           case Type:
             measure->SetType(measure->StringToMeasureType(value.toString()));
