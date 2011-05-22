@@ -1,6 +1,6 @@
 #include "IsisDebug.h"
 
-#include "PointFilterSelector.h"
+#include "PointMeasureFilterSelector.h"
 
 #include <iostream>
 
@@ -19,29 +19,29 @@ using std::cerr;
 
 namespace Isis
 {
-  PointFilterSelector::PointFilterSelector()
+  PointMeasureFilterSelector::PointMeasureFilterSelector()
   {
     nullify();
     createSelector();
   }
 
 
-  PointFilterSelector::~PointFilterSelector()
+  PointMeasureFilterSelector::~PointMeasureFilterSelector()
   {
   }
  
  
-  void PointFilterSelector::createSelector()
+  void PointMeasureFilterSelector::createSelector()
   {
     AbstractFilterSelector::createSelector();
   
     selector->addItem("Chooser Name");
-    selector->addItem("Ignored Points");
+    selector->addItem("Ignored");
     selector->addItem("Point Id");
   }
 
 
-  void PointFilterSelector::changeFilter(int index)
+  void PointMeasureFilterSelector::changeFilter(int index)
   {
     AbstractFilterSelector::changeFilter(index);
     
