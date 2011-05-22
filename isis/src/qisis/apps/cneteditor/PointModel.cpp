@@ -40,29 +40,43 @@ namespace Isis
     
 //     cerr << "  returned from clear()\n";
     
-
-    beginInsertRows(QModelIndex(), 0, cNet->GetNumPoints() - 1);
+    RootItem * newRoot = new RootItem;
     for (int i = 0; i < cNet->GetNumPoints(); i++)
     {
       ControlPoint * point = cNet->GetPoint(i);
       if (!filter || filter->evaluate(point))
       {
         PointParentItem * pointItem = new PointParentItem(point);
-        rootItem->addChild(pointItem);
+        newRoot->addChild(pointItem);
         for (int j = 0; j < point->GetNumMeasures(); j++)
         {
           ControlMeasure * measure = point->GetMeasure(j);
           ASSERT(measure);
           if (!filter || filter->evaluate(measure))
           {
-            MeasureLeafItem * measureItem = new MeasureLeafItem(measure, pointItem);
+            MeasureLeafItem * measureItem = new MeasureLeafItem(
+                measure, pointItem);
             pointItem->addChild(measureItem);
           }
         }
       }
     }
-    endInsertRows();
     
+    if (newRoot->childCount())
+    {
+      beginInsertRows(QModelIndex(), 0, newRoot->childCount() - 1);
+      ASSERT(rootItem);
+      delete rootItem;
+      rootItem = NULL;
+      rootItem = newRoot;
+      endInsertRows();
+    }
+    else
+    {
+      ASSERT(newRoot);
+      delete newRoot;
+      newRoot = NULL;
+    }
 //     cerr << "rebuildItems done\n\n";
   }
 }

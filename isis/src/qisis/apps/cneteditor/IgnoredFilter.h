@@ -17,10 +17,15 @@ namespace Isis
     public:
       IgnoredFilter(int minimumForImageSuccess = -1);
       virtual ~IgnoredFilter();
-
+      
+      bool canFilterImages() const;
+      bool canFilterPoints() const;
+      bool canFilterMeasures() const;
+      
+      bool evaluate(const ControlCubeGraphNode *) const;
       bool evaluate(const ControlPoint *) const;
       bool evaluate(const ControlMeasure *) const;
-      bool evaluate(const ControlCubeGraphNode *) const;
+
       QString getDescription() const;
   };
 }

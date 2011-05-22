@@ -7,6 +7,8 @@
 #include <QHBoxLayout>
 #include <QLineEdit>
 
+#include "ControlCubeGraphNode.h"
+#include "ControlMeasure.h"
 #include "ControlPoint.h"
 
 
@@ -48,16 +50,24 @@ namespace Isis
   }
 
 
-  /**
-   * Given a point to evaluate, return true if it makes it through the filter,
-   * and false otherwise.  Criteria defining the filter is defined in this
-   * method.  Note that whether the filter is inclusive or exclusive is handled
-   * in this method.
-   *
-   * @param point The point to evaluate
-   *
-   * @returns True if the point makes it through the filter, false otherwise
-   */
+  bool PointIdFilter::canFilterImages() const
+  {
+    return minForImageSuccess != -1;
+  }
+  
+  
+  bool PointIdFilter::canFilterPoints() const
+  {
+    return true;
+  }
+  
+  
+  bool PointIdFilter::canFilterMeasures() const
+  {
+    return false;
+  }
+
+
   bool PointIdFilter::evaluate(const ControlPoint * point) const
   {
     bool evaluation = true;
@@ -93,25 +103,40 @@ namespace Isis
 
   bool PointIdFilter::evaluate(const ControlCubeGraphNode * node) const
   {
-    return true;
+    bool evaluation = true;
+    
+    if (canFilterImages())
+    {
+      int passedPoints = 0;
+      
+      QList< ControlMeasure * > measures = node->getMeasures();
+      foreach (ControlMeasure * measure, measures)
+      {
+        ASSERT(measure);
+        ControlPoint * point = measure->Parent();
+        ASSERT(point);
+        if (point && evaluate(point))
+          passedPoints++;
+      }
+      
+      evaluation = passedPoints >= minForImageSuccess;
+    }
+    
+    return evaluation;
   }
   
   
   QString PointIdFilter::getDescription() const
   {
-    cerr << "PointIdFilter::getDescription(): " << minForImageSuccess << "\n";
-    QString description;
+    QString description = "<font color=black>with</font> IDs ";
+    
+    if (inclusive())
+      description += "containing ";
+    else
+      description += "that don't contain ";
     
     ASSERT(lineEdit);
-    if (lineEdit)
-    {
-      description = "have point id's ";
-      if (inclusive())
-        description += "containing ";
-      else
-        description += "that don't contain ";
-      description += "\"" + lineEdit->text() + "\"";
-    }
+    description += "\"" + lineEdit->text() + "\"";
     
     return description;
   }

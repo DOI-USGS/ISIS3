@@ -2,11 +2,16 @@
 
 #include "IgnoredFilter.h"
 
+#include <iostream>
+
 #include <QHBoxLayout>
 
 #include "ControlCubeGraphNode.h"
 #include "ControlMeasure.h"
 #include "ControlPoint.h"
+
+
+using std::cerr;
 
 
 namespace Isis
@@ -22,23 +27,23 @@ namespace Isis
   IgnoredFilter::~IgnoredFilter()
   {
   }
-
-
-  bool IgnoredFilter::evaluate(const ControlPoint * point) const
+  
+  
+  bool IgnoredFilter::canFilterImages() const
   {
-    if (effectiveness == AbstractPointMeasureFilter::MeasuresOnly)
-      return true;
-      
-    return !(point->IsIgnored() ^ inclusive());
+    return minForImageSuccess != -1;
   }
-
-
-  bool IgnoredFilter::evaluate(const ControlMeasure * measure) const
+  
+  
+  bool IgnoredFilter::canFilterPoints() const
   {
-    if (effectiveness == AbstractPointMeasureFilter::PointsOnly)
-      return true;
-      
-    return !(measure->IsIgnored() ^ inclusive());
+    return effectiveness != AbstractPointMeasureFilter::MeasuresOnly;
+  }
+  
+  
+  bool IgnoredFilter::canFilterMeasures() const
+  {
+    return effectiveness != AbstractPointMeasureFilter::PointsOnly;
   }
 
 
@@ -46,7 +51,7 @@ namespace Isis
   {
     bool evaluation = true;
     
-    if (minForImageSuccess != -1)
+    if (canFilterImages())
     {
       int passedMeasures = 0;
       int passedPoints = 0;
@@ -83,31 +88,32 @@ namespace Isis
     return evaluation;
   }
   
+
+  bool IgnoredFilter::evaluate(const ControlPoint * point) const
+  {
+    bool evaluation = true;
+    
+    if (canFilterPoints())
+      evaluation = !(point->IsIgnored() ^ inclusive());
+      
+    return evaluation;
+  }
+
+
+  bool IgnoredFilter::evaluate(const ControlMeasure * measure) const
+  {
+    bool evaluation = true;
+    
+    if (canFilterMeasures())
+      evaluation = !(measure->IsIgnored() ^ inclusive());
+    
+    return evaluation;
+  }
+
   
   QString IgnoredFilter::getDescription() const
   {
-    QString description;
-    
-    if (minForImageSuccess != -1)
-    {
-      description += "contain at least ";
-      description += QString::number(minForImageSuccess);
-      switch (effectiveness)
-      {
-        case AbstractPointMeasureFilter::PointsOnly:
-          description += " points ";
-          break;
-        case AbstractPointMeasureFilter::MeasuresOnly:
-          description += " measures ";
-          break;          
-        case AbstractPointMeasureFilter::Both:
-          description += " points & measures ";
-          break;
-      }
-      description += "that ";
-    }
-    
-    description += "are ";
+    QString description = "<font color=black>that</font> are ";
      
     if (!inclusive())
       description += "not ";

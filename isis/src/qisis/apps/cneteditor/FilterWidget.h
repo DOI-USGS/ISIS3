@@ -19,6 +19,8 @@ class QVBoxLayout;
 
 namespace Isis
 {
+  class ControlCubeGraphNode;
+  class ControlMeasure;
   class ControlPoint;
   class FilterGroup;
 
@@ -30,31 +32,13 @@ namespace Isis
       explicit FilterWidget(QString);
       virtual ~FilterWidget();
       
-      template< typename Evaluatable >
-      bool evaluate(const Evaluatable * evaluatable) const
-      {
-        // if andFiltersTogether is true then we break out of the loop as soon
-        // as any selectors evaluate to false.  If andFiltersTogether is false
-        // then we are ORing them so we break out as soon as any selector
-        // evaluates to true.  Whether we are looking for successes or failures
-        // depends on whether we are ANDing or ORing the filters (selectors)
-        // together!!!
-        bool looking = true;
-        for (int i = 0; looking && i < filterGroups->size(); i++)
-        {
-          if (filterGroups->at(i)->hasFilter())
-            looking = !(filterGroups->at(i)->evaluate(evaluatable) ^
-                        andGroupsTogether);
-        }
-        
-        // It is good that we are still looking for failures if we were ANDing
-        // filters together, but it is bad if we were ORing them since in this
-        // case we were looking for success.
-        return !(looking ^ andGroupsTogether) || !hasFilter();
-      }
+      bool evaluate(const ControlCubeGraphNode * node) const;
+      bool evaluate(const ControlPoint * point) const;
+      bool evaluate(const ControlMeasure * measure) const;
       
-      bool hasFilter() const;
-
+      bool hasImageFilter() const;
+      bool hasPointFilter() const;
+      bool hasMeasureFilter() const;
       
       
     signals:
@@ -63,8 +47,15 @@ namespace Isis
 
     private:
       void nullify();
+      bool hasGroupWithCondition(bool (FilterGroup::*)() const) const;
+      QList< FilterGroup * > groupsWithCondition(
+          bool (FilterGroup::*)() const) const;
+      void updateDescription(QLabel * label,
+          bool (FilterGroup::*)() const,
+          QString (FilterGroup::*)() const,
+          QString);
  
-
+  
     private slots:
       void addGroup();
       void deleteGroup(FilterGroup *);
@@ -74,7 +65,9 @@ namespace Isis
 
     private:
       QPushButton * addGroupButton;
-      QLabel * description;
+      QLabel * imageDescription;
+      QLabel * pointDescription;
+      QLabel * measureDescription;
       QVBoxLayout * mainLayout;
       QWidget * logicWidget;
       

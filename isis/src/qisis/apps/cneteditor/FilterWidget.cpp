@@ -80,14 +80,26 @@ namespace Isis
     addGroupLayout->addWidget(addGroupButton);
     addGroupLayout->addStretch();
     
-    description = new QLabel;
-    description->setWordWrap(true);
-    description->setFont(QFont("SansSerif", 13));
-    connect(this, SIGNAL(filterChanged()), this, SLOT(updateDescription()));
+    imageDescription = new QLabel;
+    imageDescription->setWordWrap(true);
+    imageDescription->setFont(QFont("SansSerif", 12));
+    
+    pointDescription = new QLabel;
+    pointDescription->setWordWrap(true);
+    pointDescription->setFont(QFont("SansSerif", 12));
+    
+    measureDescription = new QLabel;
+    measureDescription->setWordWrap(true);
+    measureDescription->setFont(QFont("SansSerif", 12));
+    
+    connect(this, SIGNAL(filterChanged()),
+        this, SLOT(updateDescription()));
 
     mainLayout = new QVBoxLayout;
     mainLayout->addLayout(titleLayout);
-    mainLayout->addWidget(description);
+    mainLayout->addWidget(imageDescription);
+    mainLayout->addWidget(pointDescription);
+    mainLayout->addWidget(measureDescription);
     mainLayout->addWidget(logicWidget);
     mainLayout->addSpacing(10);
     mainLayout->addLayout(addGroupLayout);
@@ -97,6 +109,7 @@ namespace Isis
     setWhatsThis(whatsThis);
     
     addGroup();
+    updateDescription();
   }
 
 
@@ -110,75 +123,194 @@ namespace Isis
   }
   
   
-  bool FilterWidget::hasFilter() const
+  bool FilterWidget::evaluate(const ControlCubeGraphNode * node) const
   {
-    bool foundFilter = false;
-    if (filterGroups)
-      for (int i = 0; !foundFilter && i < filterGroups->size(); i++)
-        foundFilter = filterGroups->at(i)->hasFilter();
+    // if andFiltersTogether is true then we break out of the loop as soon
+    // as any selectors evaluate to false.  If andFiltersTogether is false
+    // then we are ORing them so we break out as soon as any selector
+    // evaluates to true.  Whether we are looking for successes or failures
+    // depends on whether we are ANDing or ORing the filters (selectors)
+    // together!!!
+    bool looking = true;
+    for (int i = 0; looking && i < filterGroups->size(); i++)
+    {
+      if (filterGroups->at(i)->hasImageFilter())
+        looking = !(filterGroups->at(i)->evaluate(node) ^
+            andGroupsTogether);
+    }
     
-    return foundFilter;
+    // It is good that we are still looking for failures if we were ANDing
+    // filters together, but it is bad if we were ORing them since in this
+    // case we were looking for success (unless of course there were no
+    // filters to look through).
+    return !(looking ^ andGroupsTogether) || !hasImageFilter();
   }
-
-
+  
+  
+  bool FilterWidget::evaluate(const ControlPoint * point) const
+  {
+    // if andFiltersTogether is true then we break out of the loop as soon
+    // as any selectors evaluate to false.  If andFiltersTogether is false
+    // then we are ORing them so we break out as soon as any selector
+    // evaluates to true.  Whether we are looking for successes or failures
+    // depends on whether we are ANDing or ORing the filters (selectors)
+    // together!!!
+    bool looking = true;
+    for (int i = 0; looking && i < filterGroups->size(); i++)
+    {
+      if (filterGroups->at(i)->hasPointFilter())
+        looking = !(filterGroups->at(i)->evaluate(point) ^
+            andGroupsTogether);
+    }
+    
+    // It is good that we are still looking for failures if we were ANDing
+    // filters together, but it is bad if we were ORing them since in this
+    // case we were looking for success (unless of course there were no
+    // filters to look through).
+    return !(looking ^ andGroupsTogether) || !hasPointFilter();
+  }
+  
+  
+  bool FilterWidget::evaluate(const ControlMeasure * measure) const
+  {
+    // if andFiltersTogether is true then we break out of the loop as soon
+    // as any selectors evaluate to false.  If andFiltersTogether is false
+    // then we are ORing them so we break out as soon as any selector
+    // evaluates to true.  Whether we are looking for successes or failures
+    // depends on whether we are ANDing or ORing the filters (selectors)
+    // together!!!
+    bool looking = true;
+    for (int i = 0; looking && i < filterGroups->size(); i++)
+    {
+      if (filterGroups->at(i)->hasMeasureFilter())
+        looking = !(filterGroups->at(i)->evaluate(measure) ^
+            andGroupsTogether);
+    }
+    
+    // It is good that we are still looking for failures if we were ANDing
+    // filters together, but it is bad if we were ORing them since in this
+    // case we were looking for success (unless of course there were no
+    // filters to look through).
+    return !(looking ^ andGroupsTogether) || !hasMeasureFilter();
+  }
+  
+  
+  bool FilterWidget::hasImageFilter() const
+  {
+    return hasGroupWithCondition(&FilterGroup::hasImageFilter);
+  }
+  
+  
+  bool FilterWidget::hasPointFilter() const
+  {
+    return hasGroupWithCondition(&FilterGroup::hasPointFilter);
+  }
+  
+  
+  bool FilterWidget::hasMeasureFilter() const
+  {
+    return hasGroupWithCondition(&FilterGroup::hasMeasureFilter);
+  }
+  
+  
   void FilterWidget::nullify()
   {
     addGroupButton = NULL;
+    imageDescription = NULL;
+    pointDescription = NULL;
+    measureDescription = NULL;
     mainLayout = NULL;
     filterGroups = NULL;
   }
   
   
+  bool FilterWidget::hasGroupWithCondition(
+      bool (FilterGroup::*meth)() const) const
+  {
+    bool found = false;
+    
+    for (int i = 0; !found && i < filterGroups->size(); i++)
+      found = (filterGroups->at(i)->*meth)();
+    
+    return found;
+  }
+  
+  
+  QList< FilterGroup * > FilterWidget::groupsWithCondition(
+      bool (FilterGroup::*meth)() const) const
+  {
+    QList< FilterGroup * > groups;
+    
+    for (int i = 0; i < filterGroups->size(); i++)
+      if ((filterGroups->at(i)->*meth)())
+        groups.append(filterGroups->at(i));
+    
+    return groups;
+  }
+  
+  
   void FilterWidget::updateDescription()
   {
-    ASSERT(description);
-    if (description)
+    updateDescription(imageDescription, &FilterGroup::hasImageFilter,
+                      &FilterGroup::getImageDescription, "images");
+    updateDescription(pointDescription, &FilterGroup::hasPointFilter,
+                      &FilterGroup::getPointDescription, "points");
+    updateDescription(measureDescription, &FilterGroup::hasMeasureFilter,
+                      &FilterGroup::getMeasureDescription, "measures");
+  }
+  
+  
+  void FilterWidget::updateDescription(QLabel * label,
+      bool (FilterGroup::*conditionMeth)() const,
+      QString (FilterGroup::*descriptionMeth)() const,
+      QString title)
+  {
+    ASSERT(label);
+    
+    if (label)
     {
-      QString newText = "<font color=black>Showing ";
-      description->clear();
+      label->clear();
+
+      QList< FilterGroup * > groups = groupsWithCondition(conditionMeth);
+      const int GROUP_SIZE = groups.size();
       
-      if (hasFilter())
+      if (GROUP_SIZE)
       {
-        ASSERT(filterGroups);
-        if (filterGroups->size())
+        QString black = "<font color=black>";
+        QString blue = "<font color=darkBlue>";
+        QString red = "<font color=darkRed>";
+        QString end = "</font>";
+
+        QString text = "Showing " + red + title + end + " ";
+        
+        QString groupLogic;
+        if (andGroupsTogether)
+          groupLogic += " AND ";
+        else
+          groupLogic += " OR ";
+        
+        QString leftParen = black + "<b>(</b>" + end;
+        QString rightParen = black + "<b>)</b>" + end;
+        
+        for (int i = 0; i < GROUP_SIZE - 1; i++)
         {
-          newText += filterType + " which </font>";
-          
-          QString groupLogic;
-          if (andGroupsTogether)
-            groupLogic += " AND ";
-          else
-            groupLogic += " OR ";
-          
-          int numGroups = filterGroups->size();
-          ASSERT(numGroups);
-          for (int i = 0; i < numGroups - 1; i++)
-          {
-            if (numGroups > 1)
-              newText += "<font color=black><b>(</b></font>";
-            newText += "<font color=darkBlue>";
-            newText += filterGroups->at(i)->getDescription() + "</font>";
-            if (numGroups > 1)
-              newText += "<font color=black><b>)</b></font>";
-            newText += "<font color=black><b>" + groupLogic + "</b></font>";
-          }
-          
-          if (numGroups > 1)
-            newText += "<font color=black><b>(</b></font>";
-          newText += "<font color=darkBlue>";
-          newText += filterGroups->at(numGroups - 1)->getDescription();
-          newText += "</font>";
-          if (numGroups > 1)
-            newText += "<font color=black><b>)</b></font>";
-          newText += "<font color=black>.</font>";
+          if (GROUP_SIZE > 1)
+            text += leftParen;
+          text += blue + (groups[i]->*descriptionMeth)() + end;         
+          if (GROUP_SIZE > 1)
+            text += rightParen + black + "<b>" + groupLogic + "</b>" + end;
         }
+          
+        if (GROUP_SIZE > 1)
+          text += leftParen;
+        text += blue + (groups[GROUP_SIZE - 1]->*descriptionMeth)() + end;
+        if (GROUP_SIZE > 1)
+          text += rightParen;
+        
+        text += black + ".<br/>" + end;
+        
+        label->setText(text);
       }
-      else
-      {
-        newText += "all " + filterType + ".</font>";
-      }
-      
-      description->setText(newText);
     }
   }
 
@@ -192,6 +324,7 @@ namespace Isis
     mainLayout->insertWidget(mainLayout->count() - 2, newGroup);
     filterGroups->append(newGroup);
     filterGroups->size() > 1 ? logicWidget->show() : logicWidget->hide();
+    emit filterChanged();
   }
 
 

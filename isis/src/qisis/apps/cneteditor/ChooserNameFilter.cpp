@@ -5,6 +5,8 @@
 #include <QHBoxLayout>
 #include <QLineEdit>
 
+#include "ControlCubeGraphNode.h"
+#include "ControlMeasure.h"
 #include "ControlPoint.h"
 
 
@@ -43,6 +45,24 @@ namespace Isis
   }
 
 
+  bool ChooserNameFilter::canFilterImages() const
+  {
+    return minForImageSuccess != -1;
+  }
+  
+  
+  bool ChooserNameFilter::canFilterPoints() const
+  {
+    return true;
+  }
+  
+  
+  bool ChooserNameFilter::canFilterMeasures() const
+  {
+    return false;
+  }
+
+
   bool ChooserNameFilter::evaluate(const ControlPoint * point) const
   {
     bool evaluation = true;
@@ -68,8 +88,8 @@ namespace Isis
     
     return evaluation;
   }
-
-
+  
+  
   bool ChooserNameFilter::evaluate(const ControlMeasure * measure) const
   {
     return true;
@@ -78,24 +98,40 @@ namespace Isis
 
   bool ChooserNameFilter::evaluate(const ControlCubeGraphNode * node) const
   {
-    return true;
+    bool evaluation = true;
+    
+    if (canFilterImages())
+    {
+      int passedPoints = 0;
+      
+      QList< ControlMeasure * > measures = node->getMeasures();
+      foreach (ControlMeasure * measure, measures)
+      {
+        ASSERT(measure);
+        ControlPoint * point = measure->Parent();
+        ASSERT(point);
+        if (point && evaluate(point))
+          passedPoints++;
+      }
+      
+      evaluation = passedPoints >= minForImageSuccess;
+    }
+    
+    return evaluation;
   }
   
   
   QString ChooserNameFilter::getDescription() const
   {
-    QString description;
+    QString description = "<font color=black>with</font> chooser names ";
+    
+    if (inclusive())
+      description += "containing ";
+    else
+      description += "that don't contain ";
     
     ASSERT(lineEdit);
-    if (lineEdit)
-    {
-      description = "have chooser names ";
-      if (inclusive())
-        description += "containing ";
-      else
-        description += "that don't contain ";
-      description += "\"" + lineEdit->text() + "\"";
-    }
+    description += "\"" + lineEdit->text() + "\"";
     
     return description;
   }

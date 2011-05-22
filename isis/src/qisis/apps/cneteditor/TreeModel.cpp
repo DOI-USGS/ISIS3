@@ -178,7 +178,7 @@ namespace Isis
   {
     ASSERT(fw);
     filter = fw;
-    connect(filter, SIGNAL(filterChanged()), this, SLOT(rebuildItems()));
+//     connect(filter, SIGNAL(filterChanged()), this, SLOT(rebuildItems()));
   }
 
 

@@ -36,6 +36,10 @@ namespace Isis
       }
       
       bool hasFilter() const;
+      bool hasImageFilter() const;
+      bool hasPointFilter() const;
+      bool hasMeasureFilter() const;
+      
       QString getDescription() const;
 
 

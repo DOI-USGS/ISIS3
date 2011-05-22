@@ -19,10 +19,15 @@ namespace Isis
     public:
       PointIdFilter(int minimumForImageSuccess = -1);
       virtual ~PointIdFilter();
-
+      
+      bool canFilterImages() const;
+      bool canFilterPoints() const;
+      bool canFilterMeasures() const;
+      
       bool evaluate(const ControlPoint *) const;
       bool evaluate(const ControlMeasure *) const;
       bool evaluate(const ControlCubeGraphNode *) const;
+
       QString getDescription() const;
 
 

@@ -19,7 +19,6 @@ namespace Isis
   AbstractPointMeasureFilter::AbstractPointMeasureFilter(
       int minimumForImageSuccess) : AbstractFilter(minimumForImageSuccess)
   {
-    cerr << "AbstractPointMeasureFilter: " << minimumForImageSuccess << "\n";
   }
 
 
@@ -42,11 +41,12 @@ namespace Isis
     connect(combo, SIGNAL(currentIndexChanged(int)),
         this, SLOT(changeEffectiveness(int)));
         
-    // FIXME: QSettings should handle this
-    combo->setCurrentIndex(0);
-    
     mainLayout->addWidget(label);
     mainLayout->addWidget(combo);
+    
+    // FIXME: QSettings should handle this
+    combo->setCurrentIndex(1);
+    combo->setCurrentIndex(0);
   }
 
 

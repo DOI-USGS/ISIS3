@@ -35,6 +35,24 @@ namespace Isis
   }
   
   
+  bool AbstractFilterSelector::hasImageFilter() const
+  {
+    return filter && filter->canFilterImages();
+  }
+  
+  
+  bool AbstractFilterSelector::hasPointFilter() const
+  {
+    return filter && filter->canFilterPoints();;
+  }
+  
+  
+  bool AbstractFilterSelector::hasMeasureFilter() const
+  {
+    return filter && filter->canFilterMeasures();;
+  }
+  
+  
   QString AbstractFilterSelector::getDescription() const
   {
     QString description;

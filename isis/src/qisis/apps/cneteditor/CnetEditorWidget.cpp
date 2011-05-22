@@ -266,15 +266,21 @@ namespace Isis
     ASSERT(serialModel);
     ASSERT(connectionModel);
     
-    pointFilterWidget = new FilterWidget("Points");
+    pointFilterWidget = new FilterWidget("Points and Measures");
+    connect(pointFilterWidget, SIGNAL(filterChanged()),
+        this, SLOT(rebuildModels()));
     if (pointModel)
       pointModel->setFilter(pointFilterWidget);
       
-    serialFilterWidget = new FilterWidget("Images");
+    serialFilterWidget = new FilterWidget("Images and Points");
+    connect(serialFilterWidget, SIGNAL(filterChanged()),
+        this, SLOT(rebuildModels()));
     if (serialModel)
       serialModel->setFilter(serialFilterWidget);
       
     connectionFilterWidget = new FilterWidget("Connections");
+    connect(connectionFilterWidget, SIGNAL(filterChanged()),
+        this, SLOT(rebuildModels()));
     if (connectionModel)
       connectionModel->setFilter(connectionFilterWidget);
 

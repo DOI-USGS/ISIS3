@@ -21,7 +21,6 @@ namespace Isis
   AbstractFilter::AbstractFilter(int minimumForImageSuccess) :
       minForImageSuccess(minimumForImageSuccess)
   {
-    cerr << this << " AbstractFilter::AbstractFilter: " << minForImageSuccess << "\n";
   }
 
 
@@ -55,7 +54,6 @@ namespace Isis
     mainLayout->setContentsMargins(margins);
     mainLayout->addWidget(inclusiveButton);
     mainLayout->addWidget(exclusiveButton);
-    cerr << this << " minForImageSuccess: " << minForImageSuccess << "\n";
     if (minForImageSuccess != -1)
     {
       QLabel * label = new QLabel("Min Count: ");

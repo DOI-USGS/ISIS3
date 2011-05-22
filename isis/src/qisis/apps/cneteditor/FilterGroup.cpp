@@ -14,7 +14,7 @@
 
 #include "AbstractFilterSelector.h"
 #include "ConnectionFilterSelector.h"
-#include "PointFilterSelector.h"
+#include "PointMeasureFilterSelector.h"
 #include "SerialFilterSelector.h"
 
 
@@ -90,6 +90,102 @@ namespace Isis
       selectors = NULL;
     }
   }
+  
+  
+  bool FilterGroup::evaluate(const ControlCubeGraphNode * node) const
+  {
+    // if andFiltersTogether is true then we break out of the loop as soon
+    // as any selectors evaluate to false.  If andFiltersTogether is false
+    // then we are ORing them so we break out as soon as any selector
+    // evaluates to true.  Whether we are looking for successes or failures
+    // depends on whether we are ANDing or ORing the filters (selectors)
+    // together!
+    bool looking = true;
+    for (int i = 0; looking && i < selectors->size(); i++)
+      if (selectors->at(i)->hasImageFilter())
+        looking = !(selectors->at(i)->evaluate(node) ^ andFiltersTogether);
+
+    // It is good that we are still looking for failures if we were ANDing
+    // filters together, but it is bad if we were ORing them since in this
+    // case we were looking for success.
+    return !(looking ^ andFiltersTogether) || !hasImageFilter();
+  }
+
+
+  bool FilterGroup::evaluate(const ControlPoint * point) const
+  {
+    // if andFiltersTogether is true then we break out of the loop as soon
+    // as any selectors evaluate to false.  If andFiltersTogether is false
+    // then we are ORing them so we break out as soon as any selector
+    // evaluates to true.  Whether we are looking for successes or failures
+    // depends on whether we are ANDing or ORing the filters (selectors)
+    // together!
+    bool looking = true;
+    for (int i = 0; looking && i < selectors->size(); i++)
+      if (selectors->at(i)->hasPointFilter())
+        looking = !(selectors->at(i)->evaluate(point) ^ andFiltersTogether);
+
+    // It is good that we are still looking for failures if we were ANDing
+    // filters together, but it is bad if we were ORing them since in this
+    // case we were looking for success.
+    return !(looking ^ andFiltersTogether) || !hasPointFilter();
+  }
+
+  bool FilterGroup::evaluate(const ControlMeasure * measure) const
+  {
+    // if andFiltersTogether is true then we break out of the loop as soon
+    // as any selectors evaluate to false.  If andFiltersTogether is false
+    // then we are ORing them so we break out as soon as any selector
+    // evaluates to true.  Whether we are looking for successes or failures
+    // depends on whether we are ANDing or ORing the filters (selectors)
+    // together!
+    bool looking = true;
+    for (int i = 0; looking && i < selectors->size(); i++)
+      if (selectors->at(i)->hasMeasureFilter())
+        looking = !(selectors->at(i)->evaluate(measure) ^ andFiltersTogether);
+
+    // It is good that we are still looking for failures if we were ANDing
+    // filters together, but it is bad if we were ORing them since in this
+    // case we were looking for success.
+    return !(looking ^ andFiltersTogether) || !hasMeasureFilter();
+  }
+
+  
+  
+  bool FilterGroup::hasFilter() const
+  {
+    return hasSelectorWithCondition(&AbstractFilterSelector::hasFilter);
+  }
+  
+  
+  bool FilterGroup::hasImageFilter() const
+  {
+    return hasSelectorWithCondition(&AbstractFilterSelector::hasImageFilter);
+  }
+  
+  
+  bool FilterGroup::hasPointFilter() const
+  {
+    return hasSelectorWithCondition(&AbstractFilterSelector::hasPointFilter);
+  }
+  
+  
+  bool FilterGroup::hasMeasureFilter() const
+  {
+    return hasSelectorWithCondition(&AbstractFilterSelector::hasMeasureFilter);
+  }
+  
+
+  bool FilterGroup::hasSelectorWithCondition(
+      bool (AbstractFilterSelector::*meth)() const) const
+  {
+    bool found = false;
+    
+    for (int i = 0; !found && i < selectors->size(); i++)
+      found = (selectors->at(i)->*meth)();
+    
+    return found;
+  }
 
 
   void FilterGroup::nullify()
@@ -98,15 +194,15 @@ namespace Isis
     groupBoxLayout = NULL;
     selectors = NULL;
   }
-
-
+  
+  
   void FilterGroup::addFilter()
   {
     AbstractFilterSelector * filterSelector = NULL;
-    if (filterType == "Points")
-      filterSelector = new PointFilterSelector;
+    if (filterType == "Points and Measures")
+      filterSelector = new PointMeasureFilterSelector;
     else
-      if (filterType == "Images")
+      if (filterType == "Images and Points")
         filterSelector = new SerialFilterSelector;
       else
         if (filterType == "Connections")
@@ -135,31 +231,21 @@ namespace Isis
     selectorsSize > 1 ? logicWidget->show() : logicWidget->hide();
     if (!selectorsSize)
       emit close(this);
+    else
+      emit filterChanged();
   }
-
-
+  
+  
   void FilterGroup::sendClose()
   {
     emit close(this);
   }
-
-
+  
+  
   void FilterGroup::changeFilterCombinationLogic(int button)
   {
     andFiltersTogether = button == 0;
     emit filterChanged();
-  }
-  
-  
-  bool FilterGroup::hasFilter() const
-  {
-    bool foundFilter = false;
-    
-    if (selectors)
-      for (int i = 0; !foundFilter && i < selectors->size(); i++)
-        foundFilter = selectors->at(i)->hasFilter();
-    
-    return foundFilter;
   }
   
   
@@ -169,41 +255,53 @@ namespace Isis
   }
   
   
-  QString FilterGroup::getDescription() const
+  QString FilterGroup::getDescription(
+      bool (AbstractFilterSelector::*meth)() const) const
   {
     QString description;
     
-    if (hasFilter())
+    ASSERT(selectors);
+      
+    QList< AbstractFilterSelector * > selectorsWithFilters;
+    for (int i = 0; i < selectors->size(); i++)
+      if ((selectors->at(i)->*meth)())
+        selectorsWithFilters.append(selectors->at(i));
+    
+    int numFilters = selectorsWithFilters.size();
+   
+    if (numFilters)
     {
-      ASSERT(selectors);
+      QString logic = "<b> ";
+      if (andFiltersTogether)
+        logic += "and";
+      else
+        logic += "or";
+      logic += " </b>";
       
-      int numFilters = selectors->size();
-      ASSERT(numFilters);
+      for (int i = 0; i < numFilters - 1; i++)
+        description += selectorsWithFilters[i]->getDescription() + logic;
       
-      if (numFilters)
-      {
-        QString logic = "<b> ";
-        if (andFiltersTogether)
-          logic += "and";
-        else
-          logic += "or";
-        logic += " </b>";
-        
-        for (int i = 0; i < numFilters - 1; i++)
-        {
-          if (selectors->at(i)->hasFilter())
-          {
-            description += selectors->at(i)->getDescription();
-            if (selectors->at(i + 1)->hasFilter())
-              description += logic;
-          }
-        }
-        
-        if (selectors->at(numFilters - 1)->hasFilter())
-          description += selectors->at(numFilters - 1)->getDescription();
-      }
+      description += selectorsWithFilters[numFilters - 1]->getDescription();
     }
     
     return description;
+  }
+  
+  
+  QString FilterGroup::getImageDescription() const
+  {
+    return getDescription(&AbstractFilterSelector::hasImageFilter);
+  }
+  
+  
+  QString FilterGroup::getPointDescription() const
+  {
+    return getDescription(&AbstractFilterSelector::hasPointFilter);
+  }
+  
+  
+  QString FilterGroup::getMeasureDescription() const
+  {
+    return getDescription(&AbstractFilterSelector::hasMeasureFilter);
   }
 }

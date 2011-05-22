@@ -22,9 +22,14 @@ namespace Isis
       AbstractFilter(int minimumForImageSuccess = -1);
       virtual ~AbstractFilter();
 
+      virtual bool canFilterImages() const = 0;
+      virtual bool canFilterPoints() const = 0;
+      virtual bool canFilterMeasures() const = 0;
+      
       virtual bool evaluate(const ControlPoint *) const = 0;
       virtual bool evaluate(const ControlMeasure *) const = 0;
       virtual bool evaluate(const ControlCubeGraphNode *) const = 0;
+      
       virtual QString getDescription() const = 0;
 
 
