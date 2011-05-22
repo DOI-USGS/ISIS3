@@ -43,6 +43,7 @@ namespace Isis
       
     signals:
       void filterChanged();
+      void scrollToBottom();
 
 
     private:
@@ -61,6 +62,7 @@ namespace Isis
       void deleteGroup(FilterGroup *);
       void changeGroupCombinationLogic(int);
       void updateDescription();
+      void maybeScroll(FilterGroup *);
 
 
     private:

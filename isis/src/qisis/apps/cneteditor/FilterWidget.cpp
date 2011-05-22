@@ -313,6 +313,17 @@ namespace Isis
       }
     }
   }
+  
+  
+  void FilterWidget::maybeScroll(FilterGroup * group)
+  {
+    ASSERT(filterGroups);
+    ASSERT(filterGroups->size());
+    
+    if (filterGroups && filterGroups->size() &&
+        filterGroups->at(filterGroups->size() - 1) == group)
+      emit scrollToBottom();
+  }
 
 
   void FilterWidget::addGroup()
@@ -321,9 +332,13 @@ namespace Isis
     connect(newGroup, SIGNAL(close(FilterGroup *)),
         this, SLOT(deleteGroup(FilterGroup *)));
     connect(newGroup, SIGNAL(filterChanged()), this, SIGNAL(filterChanged()));
+    connect(newGroup, SIGNAL(sizeChanged(FilterGroup *)),
+        this, SLOT(maybeScroll(FilterGroup *)));
     mainLayout->insertWidget(mainLayout->count() - 2, newGroup);
     filterGroups->append(newGroup);
     filterGroups->size() > 1 ? logicWidget->show() : logicWidget->hide();
+    
+    emit scrollToBottom();
     emit filterChanged();
   }
 

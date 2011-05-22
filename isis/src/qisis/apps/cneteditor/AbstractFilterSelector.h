@@ -46,6 +46,7 @@ namespace Isis
     signals:
       void close(AbstractFilterSelector *);
       void filterChanged();
+      void sizeChanged();
 
 
     protected:

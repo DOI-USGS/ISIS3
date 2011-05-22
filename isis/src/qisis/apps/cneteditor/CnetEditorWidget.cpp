@@ -13,11 +13,13 @@
 #include <QItemSelection>
 #include <QModelIndex>
 #include <QScrollArea>
+#include <QScrollBar>
 #include <QSettings>
 #include <QSplitter>
 #include <QString>
 #include <QStringList>
 #include <QTableView>
+#include <QTimer>
 #include <QTreeView>
 #include <QVBoxLayout>
 
@@ -291,6 +293,12 @@ namespace Isis
 
     QWidget * filterAreaWidget = new QWidget;
     filterAreaWidget->setLayout(layout);
+    connect(pointFilterWidget, SIGNAL(scrollToBottom()),
+        this, SLOT(scrollFilterAreaToBottom()));
+    connect(serialFilterWidget, SIGNAL(scrollToBottom()),
+        this, SLOT(scrollFilterAreaToBottom()));
+    connect(connectionFilterWidget, SIGNAL(scrollToBottom()),
+        this, SLOT(scrollFilterAreaToBottom()));
 
     filterArea = new QScrollArea;
     filterArea->setWidget(filterAreaWidget);
@@ -550,6 +558,24 @@ namespace Isis
 
     updatingSelection = false;
 //     cerr << "CnetEditorWidget::rebuildModels done\n";
+  }
+  
+  
+  void CnetEditorWidget::scrollFilterAreaToBottom()
+  {
+    QTimer::singleShot(100, this, SLOT(doScroll()));
+  }
+  
+  
+  void CnetEditorWidget::doScroll()
+  {
+    ASSERT(filterArea);
+    
+    if (filterArea)
+    {
+      QScrollBar * vsb = filterArea->verticalScrollBar();
+      vsb->setValue(vsb->maximum());
+    }
   }
 
 

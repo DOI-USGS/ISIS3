@@ -46,6 +46,7 @@ namespace Isis
     signals:
       void close(FilterGroup *);
       void filterChanged();
+      void sizeChanged(FilterGroup *);
 
 
     private:
@@ -60,6 +61,7 @@ namespace Isis
       void addFilter();
       void deleteFilter(AbstractFilterSelector *);
       void sendClose();
+      void sendSizeChanged();
       void changeFilterCombinationLogic(int);
 
 

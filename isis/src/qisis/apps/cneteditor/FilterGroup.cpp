@@ -214,10 +214,14 @@ namespace Isis
           this, SLOT(deleteFilter(AbstractFilterSelector *)));
       connect(filterSelector, SIGNAL(filterChanged()),
           this, SIGNAL(filterChanged()));
+      connect(filterSelector, SIGNAL(sizeChanged()),
+          this, SLOT(sendSizeChanged()));
       groupBoxLayout->insertWidget(groupBoxLayout->count() - 1, filterSelector);
       selectors->append(filterSelector);
       selectors->size() > 1 ? logicWidget->show() : logicWidget->hide();
     }
+    
+    sendSizeChanged();
   }
 
 
@@ -239,6 +243,12 @@ namespace Isis
   void FilterGroup::sendClose()
   {
     emit close(this);
+  }
+  
+  
+  void FilterGroup::sendSizeChanged()
+  {
+    emit sizeChanged(this);
   }
   
   

@@ -80,6 +80,8 @@ namespace Isis
       void itemExpanded(const QModelIndex & index);
       void itemCollapsed(const QModelIndex & index);
       void rebuildModels();
+      void scrollFilterAreaToBottom();
+      void doScroll();
 
 
     private: // data

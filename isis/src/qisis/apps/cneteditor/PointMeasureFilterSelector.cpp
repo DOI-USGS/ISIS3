@@ -64,6 +64,7 @@ namespace Isis
       mainLayout->insertWidget(2, filter);
     }
     
+    emit sizeChanged();
     emit filterChanged();
   }
 }
