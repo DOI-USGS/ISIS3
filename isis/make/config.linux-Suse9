@@ -11,7 +11,6 @@ ISISCPPFLAGS += -fPIC
 ifeq ($(findstring DEBUG, $(MODE)),DEBUG)
   ISISCPPFLAGS += -g 
   ISISCPPFLAGS += -O0
-#  ISISCPPFLAGS += -DCWDEBUG
 else
   ISISCPPFLAGS += -O1
 endif
@@ -28,10 +27,6 @@ ISISLDFLAGS = -Wl,-E
 ISISSYSLIBS = 
 ISISSTATIC  = -Wl,-Bstatic
 ISISDYNAMIC = -Wl,-Bdynamic
-
-#ifeq ($(findstring DEBUG, $(MODE)),DEBUG)
-#  ISISSYSLIBS += -lcwd_r
-#endif
 
 #---------------------------------------------------------------------------
 # Shared library options

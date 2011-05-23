@@ -12,10 +12,11 @@ ISISCPPFLAGS += -DGMM_USES_SUPERLU
 ifeq ($(findstring DEBUG, $(MODE)),DEBUG)
   ISISCPPFLAGS += -g 
   ISISCPPFLAGS += -O0
-  ISISCPPFLAGS += -DCWDEBUG -DLIBCWD_THREAD_SAFE -D_REENTRANT
-
-  ifeq ($(findstring NOMEMCHECK, $(MODE)),NOMEMCHECK)
-    ISISCPPFLAGS += -DNOMEMCHECK
+  ifeq ($(findstring CWD, $(MODE)),CWD)
+    ISISCPPFLAGS += -DCWDEBUG -DLIBCWD_THREAD_SAFE -D_REENTRANT
+    ifeq (,$(findstring MEMCHECK, $(MODE)))
+      ISISCPPFLAGS += -DNOMEMCHECK
+    endif
   endif
 else
   ISISCPPFLAGS += -O1
@@ -36,7 +37,9 @@ ISISSTATIC  = -Wl,-Bstatic
 ISISDYNAMIC = -Wl,-Bdynamic
 
 ifeq ($(findstring DEBUG, $(MODE)),DEBUG)
-  ISISSYSLIBS += -lcwd_r -pthread
+  ifeq ($(findstring CWD, $(MODE)),CWD)
+    ISISSYSLIBS += -lcwd_r -pthread
+  endif
 endif
 
 #---------------------------------------------------------------------------
@@ -57,10 +60,17 @@ ISIS3LOCAL  ?= /usgs/pkgs/local/isis$(ISISVERSION)
 #---------------------------------------------------------------------------
 # Set up for cwd
 #---------------------------------------------------------------------------
-CWDINCDIR = -I$(ISIS3LOCAL)/include/libcwd/libcwd-1.0.4
-CWDLIBDIR = -L$(ISIS3LOCAL)/lib
-CWDLIB    = -lcwd_r
+CWDINCDIR =
+CWDLIBDIR =
+CWDLIB    =
 
+ifeq ($(findstring DEBUG, $(MODE)),DEBUG)
+  ifeq ($(findstring CWD, $(MODE)),CWD)
+    CWDINCDIR = -I$(ISIS3LOCAL)/include/libcwd/libcwd-1.0.4
+    CWDLIBDIR = -L$(ISIS3LOCAL)/lib
+    CWDLIB    = -lcwd_r
+  endif
+endif
 
 #---------------------------------------------------------------------------
 # Set up for Qt
@@ -213,7 +223,6 @@ THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libgeos_c.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libcspice.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libsuperlu_3.0.a"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libcwd_r.so*"
-
 THIRDPARTYLIBS    += "$(ISIS3SYSLIB)/libblas.so.*"
 THIRDPARTYLIBS    += "$(ISIS3SYSLIB)/libgfortran.so.*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libxerces-c*.so*"
@@ -226,7 +235,6 @@ THIRDPARTYLIBS    += "$(ISIS3SYSLIB)/libgsl*.so*"
 #THIRDPARTYLIBS    += "$(ISIS3SYSLIB)/libcrypto.so*"
 #THIRDPARTYLIBS    += "/lib/libreadline.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libkdu_a63R.so*"
-
 
 #  Plugins
 THIRDPARTYPLUGINS += "$(ISIS3LOCAL)/plugins/"

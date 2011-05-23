@@ -10,12 +10,13 @@ ISISCPPFLAGS += -fPIC
 ISISCPPFLAGS += -DGMM_USES_SUPERLU
 
 ifeq ($(findstring DEBUG, $(MODE)),DEBUG)
-  ISISCPPFLAGS += -g 
+  ISISCPPFLAGS += -g
   ISISCPPFLAGS += -O0
-  ISISCPPFLAGS += -DCWDEBUG -DLIBCWD_THREAD_SAFE -D_REENTRANT
-
-  ifeq ($(findstring NOMEMCHECK, $(MODE)),NOMEMCHECK)
-    ISISCPPFLAGS += -DNOMEMCHECK
+  ifeq ($(findstring CWD, $(MODE)),CWD)
+    ISISCPPFLAGS += -DCWDEBUG -DLIBCWD_THREAD_SAFE -D_REENTRANT
+    ifeq (,$(findstring MEMCHECK, $(MODE)))
+      ISISCPPFLAGS += -DNOMEMCHECK
+    endif
   endif
 else
   ISISCPPFLAGS += -O1
@@ -36,7 +37,9 @@ ISISSTATIC  = -Wl,-Bstatic
 ISISDYNAMIC = -Wl,-Bdynamic
 
 ifeq ($(findstring DEBUG, $(MODE)),DEBUG)
-  ISISSYSLIBS += -lcwd_r -pthread
+  ifeq ($(findstring CWD, $(MODE)),CWD)
+    ISISSYSLIBS += -lcwd_r -pthread
+  endif
 endif
 
 #---------------------------------------------------------------------------
@@ -57,9 +60,17 @@ ISIS3LOCAL  ?= /usgs/pkgs/local/isis$(ISISVERSION)
 #---------------------------------------------------------------------------
 # Set up for cwd
 #---------------------------------------------------------------------------
-CWDINCDIR = -I$(ISIS3LOCAL)/include/libcwd-1.0.4
-CWDLIBDIR = -L$(ISIS3LOCAL)/lib
-CWDLIB    = -lcwd_r
+CWDINCDIR =
+CWDLIBDIR =
+CWDLIB    =
+
+ifeq ($(findstring DEBUG, $(MODE)),DEBUG)
+  ifeq ($(findstring CWD, $(MODE)),CWD)
+    CWDINCDIR = -I$(ISIS3LOCAL)/include/libcwd-1.0.4
+    CWDLIBDIR = -L$(ISIS3LOCAL)/lib
+    CWDLIB    = -lcwd_r
+  endif
+endif
 
 #---------------------------------------------------------------------------
 # Set up for Qt

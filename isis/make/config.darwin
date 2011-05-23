@@ -9,10 +9,10 @@ CC            = cc
 ISISCPPFLAGS  = -Wall
 ISISCPPFLAGS += -ansi
 ifeq ($(HOST_PROC), powerpc)
-#  Powerpc support
+  # Powerpc support
   ISISCPPFLAGS += -DISIS_LITTLE_ENDIAN=0
 else
-#  Assumes Intel Mac
+  # Assumes Intel Mac
   ISISCPPFLAGS += -DISIS_LITTLE_ENDIAN=1
 endif
 ISISCPPFLAGS += -D_LARGEFILE64_SOURCE -D_LARGEFILE_SOURCE
@@ -22,7 +22,6 @@ ISISCPPFLAGS += -DGMM_USES_SUPERLU
 ifeq ($(findstring DEBUG, $(MODE)),DEBUG)
   ISISCPPFLAGS  += -g 
   ISISCPPFLAGS  += -O0
-#  ISISCPPFLAGS += -DCWDEBUG
 else
   ISISCPPFLAGS  += -O1
   QTDARWINFLAGS += -DQT_NO_DEBUG 
@@ -38,10 +37,6 @@ ISISLDRPATH = -Wl,-rpath,@loader_path/..  -Wl,-rpath,$(ISISROOT)
 ISISSYSLIBS = -lz -lm -framework ApplicationServices
 ISISSTATIC  = 
 ISISDYNAMIC = 
-
-#ifeq ($(findstring DEBUG, $(MODE)),DEBUG)
-#  ISISSYSLIBS += -lcwd
-#endif
 
 #---------------------------------------------------------------------------
 # Shared library options
