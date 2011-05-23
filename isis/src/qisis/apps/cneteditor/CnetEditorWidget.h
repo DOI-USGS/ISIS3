@@ -8,7 +8,7 @@ class QItemSelection;
 class QModelIndex;
 class QScrollArea;
 class QSplitter;
-class QStringList;
+class QString;
 class QTableView;
 class QTreeView;
 
@@ -67,6 +67,7 @@ namespace Isis
       void syncFilterWidgets();
       void updateTreeItemsWithNewSelection(const QItemSelection & newSelected,
           const QItemSelection & newDeselected);
+      void upgradeVersion();
 
 
     private slots:
@@ -87,6 +88,9 @@ namespace Isis
     private: // data
       bool updatingSelection;
       Isis::ControlNet * controlNet;
+      QByteArray * topSplitterDefault;
+      QString * workingVersion;
+      QString * VERSION;
 
 
     private: // widgets

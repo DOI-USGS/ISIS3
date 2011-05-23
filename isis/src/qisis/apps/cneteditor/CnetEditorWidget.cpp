@@ -7,6 +7,7 @@
 #include <QAction>
 #include <QApplication>
 #include <QBoxLayout>
+#include <QByteArray>
 #include <QGroupBox>
 #include <QHBoxLayout>
 #include <QHeaderView>
@@ -46,6 +47,22 @@ namespace Isis
   CnetEditorWidget::CnetEditorWidget(Isis::ControlNet * cNet)
   {
     nullify();
+    
+
+//**************************************************************
+//**************************************************************
+//**************************************************************    
+    
+    VERSION = new QString("0.1");
+    
+//**************************************************************
+//**************************************************************
+//**************************************************************
+    
+    
+    
+    workingVersion = new QString;
+    
     updatingSelection = false;
     controlNet = cNet;
     connect(cNet, SIGNAL(networkStructureModified()),
@@ -53,7 +70,12 @@ namespace Isis
 
     QBoxLayout * mainLayout = createMainLayout();
     setLayout(mainLayout);
+
+    topSplitterDefault = new QByteArray(topSplitter->saveState());
+
     readSettings();
+    
+    upgradeVersion();
   }
 
 
@@ -92,6 +114,9 @@ namespace Isis
     connectionFilterWidget = NULL;
 
     controlNet = NULL;
+    topSplitterDefault = NULL;
+    workingVersion = NULL;
+    VERSION = NULL;
   }
 
 
@@ -622,17 +647,33 @@ namespace Isis
         newDeselectedIndexes[i].internalPointer())->setSelected(false);
     }
   }
-
+  
+  
+  void CnetEditorWidget::upgradeVersion()
+  {
+    if (*workingVersion == "")
+    {
+      topSplitter->restoreState(*topSplitterDefault);
+      *workingVersion = "0.1";
+    }
+    
+    if (*workingVersion != *VERSION)
+      upgradeVersion();
+  }
+  
 
   void CnetEditorWidget::readSettings()
   {
     ASSERT(topSplitter);
     ASSERT(mainSplitter);
-
+    ASSERT(workingVersion);
+    
     QSettings settings("USGS", "CnetEditorWidget");
+    *workingVersion = settings.value("version", "").toString();
+    setDriverView(settings.value("driverView", PointView).toInt());
+    
     topSplitter->restoreState(settings.value("topSplitter").toByteArray());
     mainSplitter->restoreState(settings.value("mainSplitter").toByteArray());
-    setDriverView(settings.value("driverView", PointView).toInt());
   }
 
 
@@ -642,6 +683,7 @@ namespace Isis
     ASSERT(mainSplitter);
 
     QSettings settings("USGS", "CnetEditorWidget");
+    settings.setValue("version", *VERSION);
     settings.setValue("topSplitter", topSplitter->saveState());
     settings.setValue("mainSplitter", mainSplitter->saveState());
     settings.setValue("driverView", getDriverView());
