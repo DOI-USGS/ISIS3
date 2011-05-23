@@ -123,7 +123,7 @@ namespace Isis
   
   QString ChooserNameFilter::getDescription() const
   {
-    QString description = "<font color=black>with</font> chooser names ";
+    QString description = "have chooser names ";
     
     if (inclusive())
       description += "containing ";

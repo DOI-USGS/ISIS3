@@ -29,91 +29,21 @@ namespace Isis
   }
   
   
-  bool IgnoredFilter::canFilterImages() const
-  {
-    return minForImageSuccess != -1;
-  }
-  
-  
-  bool IgnoredFilter::canFilterPoints() const
-  {
-    return effectiveness != AbstractPointMeasureFilter::MeasuresOnly;
-  }
-  
-  
-  bool IgnoredFilter::canFilterMeasures() const
-  {
-    return effectiveness != AbstractPointMeasureFilter::PointsOnly;
-  }
-
-
-  bool IgnoredFilter::evaluate(const ControlCubeGraphNode * node) const
-  {
-    bool evaluation = true;
-    
-    if (canFilterImages())
-    {
-      int passedMeasures = 0;
-      int passedPoints = 0;
-      
-      QList< ControlMeasure * > measures = node->getMeasures();
-      foreach (ControlMeasure * measure, measures)
-      {
-        ASSERT(measure);
-        if (measure && evaluate(measure))
-          passedMeasures++;
-        
-        ControlPoint * point = measure->Parent();
-        ASSERT(point);
-        if (point && evaluate(point))
-          passedPoints++;
-      }
-      
-      bool pointsPass = true;
-      bool measuresPass = true;
-      
-      if (effectiveness != AbstractPointMeasureFilter::MeasuresOnly)
-      {
-        pointsPass = passedPoints >= minForImageSuccess;
-      }
-      
-      if (effectiveness != AbstractPointMeasureFilter::PointsOnly)
-      {
-        measuresPass = passedMeasures >= minForImageSuccess;
-      }
-    
-      evaluation = pointsPass && measuresPass;
-    }
-    
-    return evaluation;
-  }
-  
-
   bool IgnoredFilter::evaluate(const ControlPoint * point) const
   {
-    bool evaluation = true;
-    
-    if (canFilterPoints())
-      evaluation = !(point->IsIgnored() ^ inclusive());
-      
-    return evaluation;
+    return AbstractFilter::evaluate(point, &ControlPoint::IsIgnored);
   }
-
-
+  
+  
   bool IgnoredFilter::evaluate(const ControlMeasure * measure) const
   {
-    bool evaluation = true;
-    
-    if (canFilterMeasures())
-      evaluation = !(measure->IsIgnored() ^ inclusive());
-    
-    return evaluation;
+    return AbstractFilter::evaluate(measure, &ControlMeasure::IsIgnored);
   }
-
+  
   
   QString IgnoredFilter::getDescription() const
   {
-    QString description = "<font color=black>that</font> are ";
+    QString description = "are ";
      
     if (!inclusive())
       description += "not ";

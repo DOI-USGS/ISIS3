@@ -11,6 +11,7 @@
 
 #include "AbstractFilter.h"
 #include "ChooserNameFilter.h"
+#include "EditLockFilter.h"
 #include "IgnoredFilter.h"
 #include "PointIdFilter.h"
 
@@ -36,6 +37,7 @@ namespace Isis
     AbstractFilterSelector::createSelector();
   
     selector->addItem("Chooser Name");
+    selector->addItem("Edit Locked");
     selector->addItem("Ignored");
     selector->addItem("Point Id");
   }
@@ -53,9 +55,12 @@ namespace Isis
           filter = new ChooserNameFilter;
           break;
         case 2:
-          filter = new IgnoredFilter;
+          filter = new EditLockFilter;
           break;
         case 3:
+          filter = new IgnoredFilter;
+          break;
+        case 4:
           filter = new PointIdFilter;
           break;
       }

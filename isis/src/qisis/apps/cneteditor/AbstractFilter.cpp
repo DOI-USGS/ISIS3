@@ -78,6 +78,30 @@ namespace Isis
     return inclusiveExclusiveGroup->checkedId() == 0;
   }
   
+
+  bool AbstractFilter::evaluate(const ControlPoint * point,
+      bool (ControlPoint::*meth)() const) const
+  {
+    bool evaluation = true;
+    
+    if (canFilterPoints())
+      evaluation = !((point->*meth)() ^ inclusive());
+      
+    return evaluation;
+  }
+  
+  
+  bool AbstractFilter::evaluate(const ControlMeasure * measure,
+      bool (ControlMeasure::*meth)() const) const
+  {
+    bool evaluation = true;
+    
+    if (canFilterMeasures())
+      evaluation = !((measure->*meth)() ^ inclusive());
+    
+    return evaluation;
+  }
+
   
   void AbstractFilter::updateMinForImageSuccess(int newMin)
   {

@@ -281,7 +281,7 @@ namespace Isis
         QString red = "<font color=darkRed>";
         QString end = "</font>";
 
-        QString text = "Showing " + red + title + end + " ";
+        QString text = "Showing " + red + title + end + black + " which " + end;
         
         QString groupLogic;
         if (andGroupsTogether)

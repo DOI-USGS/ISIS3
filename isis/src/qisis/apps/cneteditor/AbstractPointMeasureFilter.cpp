@@ -8,7 +8,9 @@
 #include <QHBoxLayout>
 #include <QLabel>
 
+#include "ControlCubeGraphNode.h"
 #include "ControlPoint.h"
+#include "ControlMeasure.h"
 
 
 using std::cerr;
@@ -25,8 +27,69 @@ namespace Isis
   AbstractPointMeasureFilter::~AbstractPointMeasureFilter()
   {
   }
-
-
+  
+  
+  bool AbstractPointMeasureFilter::canFilterImages() const
+  {
+    return minForImageSuccess != -1;
+  }
+  
+  
+  bool AbstractPointMeasureFilter::canFilterPoints() const
+  {
+    return effectiveness != AbstractPointMeasureFilter::MeasuresOnly;
+  }
+  
+  
+  bool AbstractPointMeasureFilter::canFilterMeasures() const
+  {
+    return effectiveness != AbstractPointMeasureFilter::PointsOnly;
+  }
+  
+  
+  bool AbstractPointMeasureFilter::evaluate(
+      const ControlCubeGraphNode * node) const
+  {
+    bool evaluation = true;
+    
+    if (canFilterImages())
+    {
+      int passedMeasures = 0;
+      int passedPoints = 0;
+      
+      QList< ControlMeasure * > measures = node->getMeasures();
+      foreach (ControlMeasure * measure, measures)
+      {
+        ASSERT(measure);
+        if (measure && evaluate(measure))
+          passedMeasures++;
+        
+        ControlPoint * point = measure->Parent();
+        ASSERT(point);
+        if (point && evaluate(point))
+          passedPoints++;
+      }
+      
+      bool pointsPass = true;
+      bool measuresPass = true;
+      
+      if (effectiveness != AbstractPointMeasureFilter::MeasuresOnly)
+      {
+        pointsPass = passedPoints >= minForImageSuccess;
+      }
+      
+      if (effectiveness != AbstractPointMeasureFilter::PointsOnly)
+      {
+        measuresPass = passedMeasures >= minForImageSuccess;
+      }
+    
+      evaluation = pointsPass && measuresPass;
+    }
+    
+    return evaluation;
+  }
+  
+  
   void AbstractPointMeasureFilter::createWidget()
   {
     AbstractFilter::createWidget();
@@ -48,8 +111,8 @@ namespace Isis
     combo->setCurrentIndex(1);
     combo->setCurrentIndex(0);
   }
-
-
+  
+  
   void AbstractPointMeasureFilter::changeEffectiveness(int button)
   {
     effectiveness = (Effectiveness) button;

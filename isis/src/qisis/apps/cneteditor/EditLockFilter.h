@@ -1,5 +1,5 @@
-#ifndef IgnoredFilter_H
-#define IgnoredFilter_H
+#ifndef EditLockFilter_H
+#define EditLockFilter_H
 
 #include "AbstractPointMeasureFilter.h"
 
@@ -9,14 +9,14 @@ namespace Isis
   class ControlPoint;
   class ControlMeasure;
 
-  class IgnoredFilter : public AbstractPointMeasureFilter
+  class EditLockFilter : public AbstractPointMeasureFilter
   {
       Q_OBJECT
 
     public:
-      IgnoredFilter(int minimumForImageSuccess = -1);
-      virtual ~IgnoredFilter();
-      
+      EditLockFilter(int minimumForImageSuccess = -1);
+      virtual ~EditLockFilter();
+
       bool evaluate(const ControlPoint *) const;
       bool evaluate(const ControlMeasure *) const;
 

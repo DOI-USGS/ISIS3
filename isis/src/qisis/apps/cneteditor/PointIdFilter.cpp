@@ -128,7 +128,7 @@ namespace Isis
   
   QString PointIdFilter::getDescription() const
   {
-    QString description = "<font color=black>with</font> IDs ";
+    QString description = "have ID's ";
     
     if (inclusive())
       description += "containing ";
