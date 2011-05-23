@@ -5176,6 +5176,9 @@ namespace Isis {
 
    /**
    * output bundle results to file with no error propagation
+   *
+   * @history 2011-05-22 Debbie A. Cook - Added commas to make csv header lines
+   *                      consistent for comparer   
    */
   bool BundleAdjust::OutputNoErrorPropagation() {
 
@@ -5581,7 +5584,7 @@ namespace Isis {
         sprintf(buf, ",,,,,Sigma,Sigma,Sigma,Correction,Correction,Correction\n,,Latitude,Longitude,Radius,Latitude,Longitude,Radius,Latitude,Longitude,Radius,X,Y,Z\nLabel,Status,(dd),(dd),(km),(m),(m),(m),(m),(m),(m),(km),(km),(km)\n");
     }
     else {
-        sprintf(buf, ",,,,,Correction,Correction,Correction\n,,Latitude,Longitude,Radius,Latitude,Longitude,Radius,X,Y,Z\nLabel,Status,(dd),(dd),(km),(m),(m),(m),(km),(km),(km)\n");
+        sprintf(buf, ",,,,,Correction,Correction,Correction,,,\n,,Latitude,Longitude,Radius,Latitude,Longitude,Radius,X,Y,Z\nLabel,Status,(dd),(dd),(km),(m),(m),(m),(km),(km),(km)\n");
     }
     fp_out << buf;
 
