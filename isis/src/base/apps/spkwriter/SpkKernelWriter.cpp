@@ -43,7 +43,12 @@ namespace Isis {
    * @brief Provide general comments for an SPK kernel header
    * 
    * 
-   * @return std::string Comment generated for SPK SPICE kernel header
+   * @return std::string Comment generated for SPK SPICE kernel header 
+   *  
+   * @internal 
+   * @history 2012-05-23 Kris Becker Added creation of special tag to ID the 
+   *                                 kernel as needing special light time and
+   *                                 stellar aberration correction in spiceinit
    */
   std::string SpkKernelWriter::k_header() const {
     ostringstream comment;
@@ -104,7 +109,17 @@ namespace Isis {
        Segments in this file are actually individual ISIS files where the\n\
        internally cached SPICE data is extracted and transformed into the\n\
        appropriate content to satisfy NAIF\'s SPICE kernel storage\n\
-       requirements.  The contents of this kernel are summarized below.\n\
+       requirements.\n\
+ \n\
+       Note that ISIS defaults to applying light time and stellar\n\
+       abberation correction when computing positions relative to s/c and\n\
+       target body.  Currently, this correction should not be utilized\n\
+       for kernels created by the spkwriter application.  Therefore the\n\
+       computation correcting for light time/stellar abberation is turned\n\
+       off. It should be noted that this option applies to all files\n\
+       contained herein.  (ID:USGS_SPK_ABCORR=NONE)\n\
+ \n\
+        The contents of this kernel are summarized below.\n\
  \n\
  \n\
  Segment (by file) Summary\n\
