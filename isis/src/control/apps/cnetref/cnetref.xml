@@ -259,6 +259,9 @@
       Added ability to validate Measure by Sample/Line Residuals and Residual 
       Magnitude
     </change>
+    <change name="Sharmila Prasad" date="2011-05-24">
+      Helper function to edit DefFile
+    </change>
 </history>
 
 <groups>
@@ -440,6 +443,27 @@
           <filter>
             *
           </filter>
+
+          <helpers >
+            <helper name="H1">
+              <function>View</function>
+              <brief>View DefFile</brief>
+              <description>
+                This helper button will print the definition file to the session
+                log of the application
+              </description>
+              <icon>$ISIS3DATA/base/icons/labels.png</icon>
+            </helper>
+            <helper name="H2">
+              <function>Edit</function>
+              <brief>Edit DefFile</brief>
+              <description>
+                This helper button opens an editor to able to edit the DefFile
+              </description>
+              <icon>$ISIS3DATA/base/icons/labels.png</icon>
+            </helper>
+          </helpers>
+
         </parameter>
 
       </group> 

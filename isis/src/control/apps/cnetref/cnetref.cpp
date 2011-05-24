@@ -1,20 +1,32 @@
-#include "Isis.h"
+#define GUIHELPERS // should always be the first command
 
-#include "Pvl.h"
-#include "ControlNet.h"
-#include "Progress.h"
-#include "InterestOperatorFactory.h"
-#include "InterestOperator.h"
-#include "iException.h"
+#include "Isis.h"
 
 #include "CnetRefByEmission.h"
 #include "CnetRefByIncidence.h"
 #include "CnetRefByResolution.h"
+#include "ControlNet.h"
+#include "GuiEditFile.h"
+#include "InterestOperatorFactory.h"
+#include "InterestOperator.h"
+#include "iException.h"
+#include "Progress.h"
+#include "Pvl.h"
 
 #include <string.h>
 
 using namespace std;
 using namespace Isis;
+
+void ViewDefFile();
+void EditDefFile();
+
+map <string, void *> GuiHelpers() {
+  map <string, void *> helper;
+  helper ["View"] = (void *)ViewDefFile;
+  helper ["Edit"] = (void *)EditDefFile;
+  return helper;
+}
 
 ResolutionType GetResolutionType(std::string psType);
 
@@ -206,3 +218,33 @@ ResolutionType GetResolutionType(std::string psType) {
 
   return High;
 }
+
+/**
+ * Helper function to print out template to log.
+ * 
+ * @author Sharmila Prasad (5/24/2011)
+ */
+void ViewDefFile() {
+  UserInterface &ui = Application::GetUserInterface();
+
+  // Get template PVL
+  Pvl defFile;
+  defFile.Read(ui.GetFilename("DEFFILE"));
+
+  // Write deffile file out to the log
+  Isis::Application::GuiLog(defFile);
+}
+
+/**
+ * Helper function to be able to edit the Deffile. 
+ * Opens an editor to edit the file. 
+ * 
+ * @author Sharmila Prasad (5/23/2011)
+ */
+void EditDefFile(void) {
+  UserInterface &ui = Application::GetUserInterface();
+  string sDefFile = ui.GetAsString("DEFFILE");
+  
+  GuiEditFile::EditFile(ui, sDefFile);
+}
+

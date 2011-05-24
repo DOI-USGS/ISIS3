@@ -70,6 +70,7 @@ namespace Isis {
 
   class Pvl;
   class ControlNet;
+  class ControlPoint;
 
   class CnetRefByResolution : public ControlNetValidMeasure {
     public:
