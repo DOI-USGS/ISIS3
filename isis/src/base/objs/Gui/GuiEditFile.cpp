@@ -257,6 +257,7 @@ namespace Isis {
         lineLength = m_editFile->readLine(buf, sizeof(buf));
       }
     }
+    m_textChanged = false;
   }
   
   /**
