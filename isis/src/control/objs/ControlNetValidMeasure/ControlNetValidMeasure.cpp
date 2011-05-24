@@ -179,9 +179,20 @@ namespace Isis {
     }
 
     if(pMeasure != NULL) {
-      mdSampleResidual    = fabs(pMeasure->GetSampleResidual());
-      mdLineResidual      = fabs(pMeasure->GetLineResidual());
-      mdResidualMagnitude = fabs(pMeasure->GetResidualMagnitude());
+      double temp = pMeasure->GetSampleResidual();
+      if(temp != Null) {
+        mdSampleResidual    = fabs(temp);
+      }
+      
+      temp = pMeasure->GetLineResidual();
+      if(temp != Null) {
+        mdLineResidual    = fabs(temp);
+      }
+      
+      temp = pMeasure->GetResidualMagnitude();
+      if(temp != Null) {
+        mdResidualMagnitude    = fabs(temp);
+      }
     }
 
     Isis::Portal inPortal(1, 1, pCube->PixelType());
