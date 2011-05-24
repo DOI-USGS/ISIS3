@@ -20,6 +20,8 @@
 #include "PvlObject.h"
 #include "SerialNumberList.h"
 
+#include "GuiEditFile.h"
+
 using std::map;
 using std::string;
 
@@ -47,10 +49,12 @@ MeasureValidationResults ValidateMeasure(const ControlMeasure *curMeasure,
     string filename);
 
 void PrintTemp();
+void EditDefFile();
 
 map <string, void *> GuiHelpers() {
   map <string, void *> helper;
-  helper ["PrintTemp"] = (void *) PrintTemp;
+  helper ["PrintTemp"]   = (void *) PrintTemp;
+  helper ["EditDefFile"] = (void *) EditDefFile;
   return helper;
 }
 
@@ -614,4 +618,17 @@ void PrintTemp() {
 
   // Write template file out to the log
   Isis::Application::GuiLog(userTemp);
+}
+
+/**
+ * Helper function to be able to edit the Deffile. 
+ * Opens an editor to edit the file. 
+ * 
+ * @author Sharmila Prasad (5/23/2011)
+ */
+void EditDefFile(void) {
+  UserInterface &ui = Application::GetUserInterface();
+  string sDefFile = ui.GetAsString("DEFFILE");
+  
+  GuiEditFile::EditFile(ui, sDefFile);
 }
