@@ -35,6 +35,8 @@
 #include "Longitude.h"
 #include "NaifStatus.h"
 
+#include "getSpkAbCorrState.hpp" 
+
 using namespace std;
 
 namespace Isis {
@@ -523,6 +525,10 @@ namespace Isis {
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
+    string abcorr;
+    if(getSpkAbCorrState(abcorr) ) 
+      InstrumentPosition()->SetAberrationCorrection("NONE");
+
     iTime avgTime((startTime.Et() + endTime.Et()) / 2.0);
     ComputeSolarLongitude(avgTime);
 
@@ -637,8 +643,20 @@ namespace Isis {
    *                                        SetEphemerisTime()
    */
   void Spice::SetTime(const iTime &et) {
-    if(p_et == NULL)
+
+    if(p_et == NULL) {
       p_et = new iTime();
+      // Before the Spice is cached, but after the camera aberration correction
+      // is set, check to see if the instrument position kernel was created
+      // by spkwriter.  If so turn off aberration corrections because the camera
+      // set aberration corrections are included in the spk already.
+      string abcorr;
+      if(*p_cacheSize == 0) {
+        if(p_startTime->Et() == 0.0  && p_endTime->Et() == 0.0  &&
+           getSpkAbCorrState(abcorr))
+          InstrumentPosition()->SetAberrationCorrection("NONE");
+      }
+    }
 
     *p_et = et;
 
@@ -1115,4 +1133,5 @@ namespace Isis {
     }
     return true;
   }
+
 }

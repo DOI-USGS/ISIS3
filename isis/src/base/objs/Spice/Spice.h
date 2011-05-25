@@ -314,6 +314,10 @@ namespace Isis {
 
       bool p_allowDownsizing; //!< Indicates whether to allow downsizing
 
+      bool p_cancelAberrationCorrections; /**< Indicates whether to cancel
+                                               the light-time/aberration
+                                               corrections set by the camera.*/
+
       // Constants
       SpiceInt *p_bodyCode;    /**< The NaifBodyCode value, if it exists in the 
                                     labels. Otherwise, if the target is sky, 
