@@ -240,7 +240,7 @@ namespace Isis
     connect(pointView->selectionModel(), SIGNAL(selectionChanged(
         const QItemSelection &, const QItemSelection &)), this,
         SLOT(pointViewSelectionChanged(const QItemSelection &,
-            const QItemSelection &)));
+        const QItemSelection &)));
     connect(pointView, SIGNAL(expanded(const QModelIndex &)), this,
         SLOT(itemExpanded(const QModelIndex &)));
     connect(pointView, SIGNAL(collapsed(const QModelIndex &)), this,
@@ -258,7 +258,7 @@ namespace Isis
     connect(serialView->selectionModel(), SIGNAL(selectionChanged(
         const QItemSelection &, const QItemSelection &)), this,
         SLOT(serialViewSelectionChanged(const QItemSelection &,
-            const QItemSelection &)));
+        const QItemSelection &)));
     connect(serialView, SIGNAL(expanded(const QModelIndex &)), this,
         SLOT(itemExpanded(const QModelIndex &)));
     connect(serialView, SIGNAL(collapsed(const QModelIndex &)), this,

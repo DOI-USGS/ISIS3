@@ -1,8 +1,12 @@
 #ifndef PointModel_H
 #define PointModel_H
 
+
+// parent
 #include "TreeModel.h"
 
+// ummm, yeah
+#include <functional>
 
 class QString;
 class QTreeView;
@@ -11,6 +15,9 @@ class QTreeView;
 namespace Isis
 {
   class ControlNet;
+  class ControlPoint;
+  class PointParentItem;
+  class RootItem;
 
   class PointModel : public TreeModel
   {
@@ -26,6 +33,23 @@ namespace Isis
       // keyword here would do nothing except make more work for both MOC and
       // the compiler!
       void rebuildItems();
+      
+      
+    private:
+      class CreateRootItemFunctor : public std::unary_function<
+          ControlPoint * const &, PointParentItem * >
+
+      {
+        public:
+          CreateRootItemFunctor(FilterWidget * fw);
+          PointParentItem * operator()(ControlPoint * const &) const;
+          
+          static void addToRootItem(RootItem *&, PointParentItem * const &);
+          
+        private:
+          FilterWidget * filter;
+          static bool rootInstantiated;
+      };
   };
 }
 

@@ -10,7 +10,9 @@ class QTreeView;
 
 namespace Isis
 {
+  class ControlCubeGraphNode;
   class ControlNet;
+  class SerialParentItem;
 
   class SerialModel : public TreeModel
   {
@@ -26,6 +28,22 @@ namespace Isis
       // keyword here would do nothing except make more work for both MOC and
       // the compiler!
       void rebuildItems();
+      
+    private:
+      class CreateRootItemFunctor : public std::unary_function<
+          ControlCubeGraphNode * const &, SerialParentItem * >
+
+      {
+        public:
+          CreateRootItemFunctor(FilterWidget * fw);
+          SerialParentItem * operator()(ControlCubeGraphNode * const &) const;
+          
+          static void addToRootItem(RootItem *&, SerialParentItem * const &);
+          
+        private:
+          FilterWidget * filter;
+          static bool rootInstantiated;
+      };
   };
 }
 

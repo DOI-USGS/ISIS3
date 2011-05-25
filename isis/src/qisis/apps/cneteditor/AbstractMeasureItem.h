@@ -15,7 +15,7 @@ namespace Isis
   class AbstractMeasureItem : public virtual AbstractTreeItem
   {
     public:
-      AbstractMeasureItem(Isis::ControlMeasure * cm,
+      AbstractMeasureItem(ControlMeasure * cm,
           AbstractTreeItem * parent = 0);
       virtual ~AbstractMeasureItem();
 
