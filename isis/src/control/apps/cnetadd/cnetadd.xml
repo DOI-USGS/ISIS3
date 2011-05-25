@@ -86,6 +86,9 @@
     <change name="Jai Rideout" date="2011-04-12">
       Changed INNET to CNET and OUTNET to ONET for consistency.
     </change>
+    <change name="Travis Addair" date="2011-05-25">
+      Moved writing of TOLIST to occur after filtering for modified.
+    </change>
   </history>
 
   <groups>

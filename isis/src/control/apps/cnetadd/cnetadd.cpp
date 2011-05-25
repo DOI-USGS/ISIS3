@@ -287,37 +287,6 @@ void IsisMain() {
     results.Write(logFile.Expanded());
   }
 
-  // Generate the TOLIST if wanted
-  if(ui.WasEntered("TOLIST")) {
-    SerialNumberList toList;
-
-    SerialNumberList addSerials(ui.GetFilename("ADDLIST"));
-
-    SerialNumberList fromSerials;
-    bool hasFromList = ui.WasEntered("FROMLIST");
-    if(hasFromList) fromSerials = SerialNumberList(ui.GetFilename("FROMLIST"));
-
-    const QList<QString> snList = inNet.GetCubeSerials();
-    for(int i = 0; i < snList.size(); i++) {
-      iString sn = snList[i];
-
-      if(addSerials.HasSerialNumber(sn))
-        toList.Add(addSerials.Filename(sn));
-      else if(hasFromList and fromSerials.HasSerialNumber(sn))
-        toList.Add(fromSerials.Filename(sn));
-    }
-
-    iString name(ui.GetFilename("TOLIST"));
-    std::fstream out_stream;
-    out_stream.open(name.c_str(), std::ios::out);
-    out_stream.seekp(0, std::ios::beg); //Start writing from beginning of file
-
-    for(int f = 0; f < (int)toList.Size(); f++)
-      out_stream << toList.Filename(f) << std::endl;
-
-    out_stream.close();
-  }
-
   // List the modified points
   if(ui.WasEntered("MODIFIEDPOINTS")) {
     Filename pointList(ui.GetFilename("MODIFIEDPOINTS"));
@@ -357,6 +326,37 @@ void IsisMain() {
         }
       }
     }
+  }
+
+  // Generate the TOLIST if wanted
+  if(ui.WasEntered("TOLIST")) {
+    SerialNumberList toList;
+
+    SerialNumberList addSerials(ui.GetFilename("ADDLIST"));
+
+    SerialNumberList fromSerials;
+    bool hasFromList = ui.WasEntered("FROMLIST");
+    if(hasFromList) fromSerials = SerialNumberList(ui.GetFilename("FROMLIST"));
+
+    const QList<QString> snList = inNet.GetCubeSerials();
+    for(int i = 0; i < snList.size(); i++) {
+      iString sn = snList[i];
+
+      if(addSerials.HasSerialNumber(sn))
+        toList.Add(addSerials.Filename(sn));
+      else if(hasFromList and fromSerials.HasSerialNumber(sn))
+        toList.Add(fromSerials.Filename(sn));
+    }
+
+    iString name(ui.GetFilename("TOLIST"));
+    std::fstream out_stream;
+    out_stream.open(name.c_str(), std::ios::out);
+    out_stream.seekp(0, std::ios::beg); //Start writing from beginning of file
+
+    for(int f = 0; f < (int)toList.Size(); f++)
+      out_stream << toList.Filename(f) << std::endl;
+
+    out_stream.close();
   }
 
   inNet.Write(outNetFile.Expanded());
