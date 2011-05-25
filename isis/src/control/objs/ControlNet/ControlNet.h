@@ -141,6 +141,7 @@ namespace Isis {
    *                where the pointIds list was not being correctly updated.
    *   @history 2011-05-04 Eric Hyer - References in graph data structure now
    *                kept for ignored points and measures
+   *   @history 2011-05-25 Eric Hyer - Added getPoints method
    */
   class ControlNet : public QObject {
       Q_OBJECT
@@ -202,6 +203,7 @@ namespace Isis {
       int GetNumValidPoints();
       iString GetTarget() const;
       iString GetUserName() const;
+      QList< ControlPoint * > getPoints() const;
       QList< QString > GetPointIds() const;
       std::vector<Distance> GetTargetRadii();
 

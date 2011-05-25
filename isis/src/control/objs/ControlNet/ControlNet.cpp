@@ -1179,6 +1179,13 @@ namespace Isis {
   iString ControlNet::GetUserName() const {
     return p_userName;
   }
+  
+  
+  //! Return QList of ControlPoints
+  QList< ControlPoint * > ControlNet::getPoints() const {
+    return points->values();
+  }
+  
 
   //! Return QList of ControlPoint Ids used in hash, in order of addition
   QList< QString > ControlNet::GetPointIds() const {
