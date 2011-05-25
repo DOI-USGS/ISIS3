@@ -44,8 +44,7 @@ int main(void) {
   cout << "Unit Test for LroNarrowAngleCamera..." << endl;
   try {
     // Support different camera model versions thusly...
-    //Pvl p("$lro/testData/M111607830RE_crop.cub");
-    Pvl p("./M111607830RE_crop.cub");
+    Pvl p("$lro/testData/M111607830RE_crop.cub");
     int cmVersion = CameraFactory::CameraVersion(p);
 
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
