@@ -41,11 +41,12 @@ int main(void) {
 
   cout << "Unit Test for IssNACamera..." << endl;
   /*
-   * Sample/Line TestLineSamp points changed for the IssNACamera
+   * Sample/Line TestLineSamp points changed for the IssNACamera. This test has
+   *   been significantly modified for this camera and should not be used
+   *   as a template.
    */
   try {
 
-//    Pvl p("N1477312678_2.cub");
     Pvl p("$cassini/testData/N1525100863_2.cub");
     IssNACamera *cam = (IssNACamera *) CameraFactory::Create(p);
     cout << "Filename: " << Filename(p.Filename()).Name() << endl;

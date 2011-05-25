@@ -37,6 +37,7 @@
 #include "MdiCubeViewport.h"
 #include "PvlEditDialog.h"
 #include "PvlObject.h"
+#include "Projection.h"
 #include "QIsisApplication.h"
 #include "SerialNumber.h"
 #include "ToolPad.h"

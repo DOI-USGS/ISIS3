@@ -43,6 +43,8 @@ namespace Isis {
    *
    * @internal
    *   @history 2011-05-03 Jeannie Walldren - Added Isis disclaimer.
+   *   @history 2011-05-23 Janet Barrett and Steven Lambright - Spice::GetDouble
+   *                         is no longer a static call.
    */
   class TaylorCameraDistortionMap : public CameraDistortionMap {
     public:

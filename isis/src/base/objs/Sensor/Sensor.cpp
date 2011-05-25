@@ -34,6 +34,7 @@
 #include "Latitude.h"
 #include "Longitude.h"
 #include "NaifStatus.h"
+#include "Projection.h"
 #include "SpecialPixel.h"
 #include "SurfacePoint.h"
 
@@ -78,16 +79,16 @@ namespace Isis {
     if(demCube != "") {
       p_hasElevationModel = true;
       p_demCube = CubeManager::Open(demCube);
-      p_demProj = ProjectionFactory::CreateFromCube(*(p_demCube->Label()));
+      p_demProj = p_demCube->Projection();
 
       p_interp = new Interpolator(Interpolator::BiLinearType);
       p_portal = new Portal(p_interp->Samples(), p_interp->Lines(),
-                                  p_demCube->PixelType(),
-                                  p_interp->HotSample(), p_interp->HotLine());
+                            p_demCube->PixelType(),
+                            p_interp->HotSample(), p_interp->HotLine());
 
       // Read in the min/max radius of the DEM file and the Scale of the DEM
       // file in pixels/degree
-      Pvl demlab = *(p_demCube->Label());
+      const Pvl &demlab = *(p_demCube->Label());
       if (p_demProj->IsEquatorialCylindrical()) {
         if (!p_demCube->HasTable("ShapeModelStatistics")) {
           std::string msg = "The input cube references a ShapeModel that has not been ";
@@ -98,11 +99,14 @@ namespace Isis {
           msg += "information available in the documentation of the demprep program.";
           throw iException::Message(iException::User, msg, _FILEINFO_);
         }
-        Table table("ShapeModelStatistics");
-        p_demCube->Read(table);
-        p_minRadius = new Distance(table[0]["MinimumRadius"], Distance::Kilometers);
-        p_maxRadius = new Distance(table[0]["MaximumRadius"], Distance::Kilometers);
-        PvlGroup &mapgrp = demlab.FindGroup("Mapping", Pvl::Traverse);
+
+        Table table("ShapeModelStatistics", demCube, demlab);
+        p_minRadius = new Distance(table[0]["MinimumRadius"],
+                                   Distance::Kilometers);
+        p_maxRadius = new Distance(table[0]["MaximumRadius"],
+                                   Distance::Kilometers);
+
+        const PvlGroup &mapgrp = demlab.FindGroup("Mapping", Pvl::Traverse);
         p_demScale = (double) mapgrp["Scale"];
       }
     }
@@ -119,7 +123,6 @@ namespace Isis {
     }
 
     if(p_demProj) {
-      delete p_demProj;
       p_demProj = NULL;
     }
 

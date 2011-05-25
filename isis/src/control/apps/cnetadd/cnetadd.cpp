@@ -1,5 +1,9 @@
 #include "Isis.h"
 
+#include <map>
+#include <set>
+
+#include "Camera.h"
 #include "CameraFactory.h"
 #include "ControlNet.h"
 #include "ControlNetValidMeasure.h"
@@ -17,9 +21,6 @@
 #include "SerialNumberList.h"
 #include "SurfacePoint.h"
 #include "UserInterface.h"
-
-#include <map>
-#include <set>
 
 using namespace Isis;
 

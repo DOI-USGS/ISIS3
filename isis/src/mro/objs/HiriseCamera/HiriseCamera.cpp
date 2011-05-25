@@ -27,6 +27,7 @@
 
 #include "CameraDistortionMap.h"
 #include "CameraFocalPlaneMap.h"
+#include "iTime.h"
 #include "LineScanCameraDetectorMap.h"
 #include "LineScanCameraGroundMap.h"
 #include "LineScanCameraSkyMap.h"
@@ -71,7 +72,8 @@ namespace Isis {
     SpiceDouble et;
     // The -74999 is the code to select the transformation from
     // high-precision MRO SCLK to ET
-    scs2e_c(-74999, stime.c_str(), &et);
+    et = getClockTime(stime, -74999).Et();
+
     // Adjust the start time so that it is the effective time for
     // the first line in the image file.  Note that on 2006-03-29, this
     // time is now subtracted as opposed to adding it.  The computed start
@@ -130,8 +132,6 @@ namespace Isis {
 }
 
 
-//    H i r i s e C a m e r a P l u g i n
-//
 /**
  * This is the function that is called in order to instantiate a
  * HiriseCamera object.

@@ -1,7 +1,10 @@
 #include "ProcessGroundPolygons.h"
-#include "PolygonTools.h"
-#include "geos/geosAlgorithm.h"
+
+#include <geos/geosAlgorithm.h>
+
 #include "Application.h"
+#include "PolygonTools.h"
+#include "Projection.h"
 
 using namespace std;
 namespace Isis {

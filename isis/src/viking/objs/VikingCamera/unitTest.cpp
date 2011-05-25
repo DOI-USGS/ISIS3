@@ -52,7 +52,6 @@ int main(void) {
     double knownLat = -24.2744713106319;
     double knownLon = 180.6234120834806;
 
-    //Pvl p("$mgs/testData/lub0428b.cub");
     Pvl p("$viking2/testData/f348b26.cub");
     VikingCamera *cam = (VikingCamera *) CameraFactory::Create(p);
     cout << "Filename: " << Filename(p.Filename()).Name() << endl;

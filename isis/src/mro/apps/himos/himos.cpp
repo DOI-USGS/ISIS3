@@ -11,6 +11,7 @@
 #include "OriginalLabel.h"
 #include "Process.h"
 #include "ProgramLauncher.h"
+#include "Projection.h"
 #include "UserInterface.h"
 
 

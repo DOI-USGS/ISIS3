@@ -28,14 +28,13 @@
 
 #include "Constants.h"
 #include "Distance.h"
+#include "EndianSwapper.h"
 #include "Filename.h"
 #include "iException.h"
 #include "iString.h"
 #include "iTime.h"
 #include "Longitude.h"
 #include "NaifStatus.h"
-
-#include "getSpkAbCorrState.hpp" 
 
 using namespace std;
 
@@ -127,6 +126,8 @@ namespace Isis {
     p_sclkCode = new SpiceInt;
     p_spkBodyCode = new SpiceInt;
 
+    p_naifKeywords = new PvlObject("NaifKeywords");
+
     p_sky = false;
 
     // Get the kernel group and load main kernels
@@ -146,32 +147,38 @@ namespace Isis {
     else {
       *p_endTimePadding = 0.0;
     }
-
+    
+    p_usingNaif = !lab.HasObject("NaifKeywords") || noTables;
 
 //  Modified  to load planetary ephemeris SPKs before s/c SPKs since some
 //  missions (e.g., MESSENGER) may augment the s/c SPK with new planet
 //  ephemerides. (2008-02-27 (KJB))
-    if(noTables) {
-      Load(kernels["TargetPosition"], noTables);
-      Load(kernels["InstrumentPosition"], noTables);
-      Load(kernels["InstrumentPointing"], noTables);
-    }
+    if(p_usingNaif) {
+      if(noTables) {
+        Load(kernels["TargetPosition"], noTables);
+        Load(kernels["InstrumentPosition"], noTables);
+        Load(kernels["InstrumentPointing"], noTables);
+      }
 
-    if(kernels.HasKeyword("Frame")) {
-      Load(kernels["Frame"], noTables);
-    }
+      if(kernels.HasKeyword("Frame")) {
+        Load(kernels["Frame"], noTables);
+      }
 
-    Load(kernels["TargetAttitudeShape"], noTables);
-    Load(kernels["Instrument"], noTables);
-    // Always load after instrument
-    Load(kernels["InstrumentAddendum"], noTables);
-    Load(kernels["LeapSecond"], noTables);
-    Load(kernels["SpacecraftClock"], noTables);
+      Load(kernels["TargetAttitudeShape"], noTables);
+      Load(kernels["Instrument"], noTables);
+      // Always load after instrument
+      Load(kernels["InstrumentAddendum"], noTables);
+      Load(kernels["LeapSecond"], noTables);
+      Load(kernels["SpacecraftClock"], noTables);
 
 // Modified to load extra kernels last to allow overriding default values
 // (2010-04-07) (DAC)
-    if(kernels.HasKeyword("Extra")) {
-      Load(kernels["Extra"], noTables);
+      if(kernels.HasKeyword("Extra")) {
+        Load(kernels["Extra"], noTables);
+      }
+    }
+    else {
+      *p_naifKeywords = lab.FindObject("NaifKeywords");
     }
 
     // Get NAIF ik, spk, sclk, and ck codes
@@ -207,14 +214,11 @@ namespace Isis {
     }
     else {
       *p_bodyCode = NaifBodyCode();
-      SpiceInt n;
-      SpiceDouble radii[3];
+      iString radiiKey = "BODY" + iString((BigInt)*p_bodyCode) + "_RADII";
 
-      bodvar_c(*p_bodyCode, "RADII", &n, radii);
-
-      p_radii[0] = Distance(radii[0], Distance::Kilometers);
-      p_radii[1] = Distance(radii[1], Distance::Kilometers);
-      p_radii[2] = Distance(radii[2], Distance::Kilometers);
+      p_radii[0] = Distance(GetDouble(radiiKey, 0), Distance::Kilometers);
+      p_radii[1] = Distance(GetDouble(radiiKey, 1), Distance::Kilometers);
+      p_radii[2] = Distance(GetDouble(radiiKey, 2), Distance::Kilometers);
 
       p_sky = false;
     }
@@ -268,10 +272,10 @@ namespace Isis {
     // Check to see if we have nadir pointing that needs to be computed &
     // See if we have table blobs to load
     if(kernels["TargetPosition"][0].UpCase() == "TABLE") {
-      Table t("SunPosition", lab.Filename());
+      Table t("SunPosition", lab.Filename(), lab);
       p_sunPosition->LoadCache(t);
 
-      Table t2("BodyRotation", lab.Filename());
+      Table t2("BodyRotation", lab.Filename(), lab);
       p_bodyRotation->LoadCache(t2);
       if(t2.Label().HasKeyword("SolarLongitude")) {
         *p_solarLongitude = Longitude(t2.Label()["SolarLongitude"],
@@ -305,7 +309,7 @@ namespace Isis {
       p_instrumentRotation = new SpiceRotation(*p_ikCode, *p_spkBodyCode);
     }
     else if(iString((std::string)kernels["InstrumentPointing"]).UpCase() == "TABLE") {
-      Table t("InstrumentPointing", lab.Filename());
+      Table t("InstrumentPointing", lab.Filename(), lab);
       p_instrumentRotation->LoadCache(t);
     }
 
@@ -316,7 +320,7 @@ namespace Isis {
     }
 
     if(iString((std::string)kernels["InstrumentPosition"]).UpCase() == "TABLE") {
-      Table t("InstrumentPosition", lab.Filename());
+      Table t("InstrumentPosition", lab.Filename(), lab);
       p_instrumentPosition->LoadCache(t);
     }
 
@@ -525,10 +529,6 @@ namespace Isis {
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
-    string abcorr;
-    if(getSpkAbCorrState(abcorr) ) 
-      InstrumentPosition()->SetAberrationCorrection("NONE");
-
     iTime avgTime((startTime.Et() + endTime.Et()) / 2.0);
     ComputeSolarLongitude(avgTime);
 
@@ -579,6 +579,7 @@ namespace Isis {
       string fileName(file.Expanded());
       unload_c(fileName.c_str());
     }
+
     p_kernels->clear();
 
     NaifStatus::CheckErrors();
@@ -643,20 +644,8 @@ namespace Isis {
    *                                        SetEphemerisTime()
    */
   void Spice::SetTime(const iTime &et) {
-
-    if(p_et == NULL) {
+    if(p_et == NULL)
       p_et = new iTime();
-      // Before the Spice is cached, but after the camera aberration correction
-      // is set, check to see if the instrument position kernel was created
-      // by spkwriter.  If so turn off aberration corrections because the camera
-      // set aberration corrections are included in the spk already.
-      string abcorr;
-      if(*p_cacheSize == 0) {
-        if(p_startTime->Et() == 0.0  && p_endTime->Et() == 0.0  &&
-           getSpkAbCorrState(abcorr))
-          InstrumentPosition()->SetAberrationCorrection("NONE");
-      }
-    }
 
     *p_et = et;
 
@@ -819,6 +808,16 @@ namespace Isis {
   SpiceInt Spice::NaifSclkCode() const {
     return *p_sclkCode;
   }
+
+  /**
+   * This returns the PvlObject that stores all of the requested Naif data
+   *   and can be a replacement for furnishing text kernels.
+   */
+  PvlObject Spice::getStoredNaifKeywords() const {
+    return *p_naifKeywords;
+  }
+
+
   /**
    * This returns a value from the NAIF text pool. It is a static convience
    *
@@ -831,20 +830,7 @@ namespace Isis {
    * @throw Isis::iException::Io - "Can not find key in instrument kernels
    */
   SpiceInt Spice::GetInteger(const iString &key, int index) {
-    NaifStatus::CheckErrors();
-
-    SpiceBoolean found;
-    SpiceInt value;
-    SpiceInt n;
-    gipool_c(key.c_str(), (SpiceInt)index, 1, &n, &value, &found);
-    if(!found) {
-      string msg = "Can not find [" + key + "] in instrument kernels";
-      throw iException::Message(iException::Io, msg, _FILEINFO_);
-    }
-
-    NaifStatus::CheckErrors();
-
-    return value;
+    return readValue(key, SpiceIntType, index).toInt();
   }
 
   /**
@@ -858,21 +844,195 @@ namespace Isis {
    * @throw Isis::iException::Io - "Can not find key in instrument kernels."
    */
   SpiceDouble Spice::GetDouble(const iString &key, int index) {
-    NaifStatus::CheckErrors();
+    return readValue(key, SpiceDoubleType, index).toDouble();
+  }
 
-    SpiceBoolean found;
-    SpiceDouble value;
-    SpiceInt n;
-    gdpool_c(key.c_str(), (SpiceInt)index, 1, &n, &value, &found);
-    if(!found) {
-      string msg = "Can not find [" + key + "] in instrument kernels";
-      throw iException::Message(iException::Io, msg, _FILEINFO_);
+
+  /**
+   * This converts the spacecraft clock ticks value (clockValue) to an iTime.
+   *
+   * Use this when possible because naif calls (such as scs2e_c) cannot be
+   *   called when not using naif.
+   */
+  iTime Spice::getClockTime(iString clockValue, int sclkCode) {
+    if(sclkCode == -1)
+      sclkCode = NaifSclkCode();
+
+    iTime result;
+
+    iString key = "CLOCK_ET_" + iString(sclkCode) + "_" + clockValue;
+    QVariant storedClockTime = getStoredResult(key, SpiceDoubleType);
+
+    if(storedClockTime.isNull()) {
+      SpiceDouble timeOutput;
+      scs2e_c(sclkCode, clockValue.c_str(), &timeOutput);
+      storedClockTime = timeOutput;
+      storeResult(key, SpiceDoubleType, timeOutput);
     }
 
-    NaifStatus::CheckErrors();
+    result = storedClockTime.toDouble();
 
-    return value;
+    return result;
   }
+
+
+  /**
+   * This should be used for reading ALL text naif kernel values. This will
+   *   read it from Naif if we're using naif/not attached kernels. If we have
+   *   attached kernels and a NaifKeywords label object we will grab it from
+   *   there instead. This allows us to not furnish kernels after spiceinit.
+   *
+   * @param key The naif keyword/value name
+   * @param type The naif value's primitive type
+   * @param index The index into the naif keyword array to read
+   */
+  QVariant Spice::readValue(iString key, SpiceValueType type, int index) {
+    QVariant result;
+
+    if(p_usingNaif) {
+      NaifStatus::CheckErrors();
+
+      // This is the success status of the naif call
+      SpiceBoolean found = false;
+
+      // Naif tells us how many values were read, but we always just read one.
+      //   Use this variable to make naif happy.
+      SpiceInt numValuesRead;
+
+      if(type == SpiceDoubleType) {
+        SpiceDouble kernelValue;
+        gdpool_c(key.c_str(), (SpiceInt)index, 1,
+                 &numValuesRead, &kernelValue, &found);
+        result = kernelValue;
+      }
+      else if(type == SpiceStringType) {
+        char kernelValue[512];
+        gcpool_c(key.c_str(), (SpiceInt)index, 1, sizeof(kernelValue),
+                 &numValuesRead, kernelValue, &found);
+        result = kernelValue;
+      }
+      else if(type == SpiceIntType) {
+        SpiceInt kernelValue;
+        gipool_c(key.c_str(), (SpiceInt)index, 1, &numValuesRead,
+                 &kernelValue, &found);
+        result = (int)kernelValue;
+      }
+
+      if(!found) {
+        string msg = "Can not find [" + key + "] in text kernels";
+        throw iException::Message(iException::Io, msg, _FILEINFO_);
+      }
+
+      storeValue(key, index, type, result);
+    }
+    else {
+      // Read from PvlObject that is our naif keywords
+      result = readStoredValue(key, type, index);
+
+      if(result.isNull()) {
+        iString msg = "The camera is requesting spice data [" + key + "] that "
+            "was not attached, please re-run spiceinit";
+        throw iException::Message(iException::Spice, msg, _FILEINFO_);
+      }
+    }
+
+    return result;
+  }
+
+
+  void Spice::storeResult(iString name, SpiceValueType type, QVariant value) {
+    if(type == SpiceDoubleType) {
+      EndianSwapper swapper("LSB");
+
+      double doubleVal = value.toDouble();
+      doubleVal = swapper.Double(&doubleVal);
+      QByteArray byteCode((char *) &doubleVal, sizeof(double));
+      value = byteCode;
+      type = SpiceByteCodeType;
+    }
+
+    storeValue(name + "_COMPUTED", 0, type, value);
+  }
+
+
+  QVariant Spice::getStoredResult(iString name, SpiceValueType type) {
+    bool wasDouble = false;
+    
+    if(type == SpiceDoubleType) {
+      wasDouble = true;
+      type = SpiceByteCodeType;
+    }
+    
+    QVariant stored = readStoredValue(name + "_COMPUTED", type, 0);
+    
+    if(wasDouble && !stored.isNull()) {
+      EndianSwapper swapper("LSB");
+      double doubleVal = swapper.Double((void *)QByteArray::fromHex(
+          stored.toByteArray()).data());
+      stored = doubleVal;
+    }
+
+    return stored;
+  }
+
+
+  void Spice::storeValue(iString key, int index, SpiceValueType type,
+                         QVariant value) {
+    if(!p_naifKeywords->HasKeyword(key))
+      p_naifKeywords->AddKeyword(PvlKeyword(key));
+    
+    PvlKeyword &storedKey = p_naifKeywords->FindKeyword(key);
+    
+    while(index >= storedKey.Size()) {
+      storedKey.AddValue("");
+    }
+
+    if(type == SpiceByteCodeType) {
+      storedKey[index] = iString(value.toByteArray().toHex().data());
+    }
+    else if(type == SpiceStringType) {
+      storedKey[index] = value.toString();
+    }
+    else if(type == SpiceDoubleType) {
+      storedKey[index] = value.toDouble();
+    }
+    else if(type == SpiceIntType) {
+      storedKey[index] = value.toInt();
+    }
+    else {
+      iString msg = "Unable to store variant in labels for key [" + key + "]";
+      throw iException::Message(iException::Spice, msg, _FILEINFO_);
+    }
+  }
+
+
+  QVariant Spice::readStoredValue(iString key, SpiceValueType type,
+                                  int index) {
+    // Read from PvlObject that is our naif keywords
+    QVariant result;
+
+    if(p_naifKeywords->HasKeyword(key) && !p_usingNaif) {
+      PvlKeyword &storedKeyword = p_naifKeywords->FindKeyword(key);
+      
+      try {
+        if(type == SpiceDoubleType)
+          result = (double)storedKeyword[index];
+        else if(type == SpiceStringType)
+          result = QString::fromStdString(storedKeyword[index]);
+        else if(type == SpiceByteCodeType || SpiceStringType)
+          result = QByteArray(
+              string(storedKeyword[index]).c_str());
+        else if(type == SpiceIntType)
+          result = (int)storedKeyword[index];
+      }
+      catch(iException &e) {
+        e.Clear();
+      }
+    }
+
+    return result;
+  }
+
 
   /**
    * This returns a value from the NAIF text pool. It is a static convience
@@ -886,21 +1046,9 @@ namespace Isis {
    * @throw Isis::iException::Io - "Can not find key in instrument kernels."
    */
   iString Spice::GetString(const iString &key, int index) {
-    NaifStatus::CheckErrors();
-
-    SpiceBoolean found;
-    SpiceInt n;
-    char cstr[512];
-    gcpool_c(key.c_str(), (SpiceInt)index, 1, 512, &n, cstr, &found);
-    if(!found) {
-      string msg = "Can not find [" + key + "] in instrument kernels";
-      throw iException::Message(iException::Io, msg, _FILEINFO_);
-    }
-
-    NaifStatus::CheckErrors();
-
-    return string(cstr);
+    return readValue(key, SpiceStringType, index).toString();
   }
+
 
   /**
    * Returns the sub-spacecraft latitude/longitude in universal coordinates
@@ -1133,5 +1281,4 @@ namespace Isis {
     }
     return true;
   }
-
 }

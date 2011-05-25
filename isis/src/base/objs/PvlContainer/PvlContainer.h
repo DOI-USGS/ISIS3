@@ -83,7 +83,7 @@ namespace Isis {
        * @return True if the name and string are the same, false if they are
        * not.
        */
-      bool IsNamed(const std::string &match) {
+      bool IsNamed(const std::string &match) const {
         return PvlKeyword::StringEqual(match, (std::string)p_name);
       }
       /**

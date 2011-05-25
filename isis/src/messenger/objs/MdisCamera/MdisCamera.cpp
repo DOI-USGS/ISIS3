@@ -129,8 +129,7 @@ namespace Isis {
     string stime = inst["SpacecraftClockCount"];
     double exposureDuration = ((double) inst["ExposureDuration"]) / 1000.0;// divide by 1000 to convert to seconds
 
-    SpiceDouble etStart;
-    scs2e_c(NaifSpkCode(), stime.c_str(), &etStart);
+    iTime etStart = getClockTime(stime);
 
     //  Setup camera detector map
     CameraDetectorMap *detMap = new CameraDetectorMap(this);
@@ -214,7 +213,7 @@ namespace Isis {
     // SetEpheremisTime call above.  IMPORTANT that it be done prior to
     // creating the cache since all kernels are unloaded, essentially
     // clearing the pool and whacking the frames definitions, required to
-    double centerTime = etStart + (exposureDuration / 2.0);
+    iTime centerTime = etStart + (exposureDuration / 2.0);
     SetTime(centerTime);
     LoadCache();
     NaifStatus::CheckErrors();

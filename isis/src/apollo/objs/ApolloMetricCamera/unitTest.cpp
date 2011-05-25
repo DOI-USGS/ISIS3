@@ -43,8 +43,8 @@ int main(void) {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
     // and "Longitude off by: " values directly into these variables.
-    double knownLat = 12.31538783296954;
-    double knownLon = 67.78104621714586;
+    double knownLat = 12.3153878329695363;
+    double knownLon = 67.7810462171458568;
 
     Pvl p(Filename("$apollo15/testData/AS15-M-0533.cropped.cub").Expanded());
     ApolloMetricCamera *cam = (ApolloMetricCamera *) CameraFactory::Create(p);

@@ -5,6 +5,7 @@
 #include "Pvl.h"
 #include "Cube.h"
 #include "History.h"
+#include "Projection.h"
 #include "ProjectionFactory.h"
 
 using namespace Isis;

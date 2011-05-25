@@ -1,12 +1,15 @@
-#include "UniversalGroundMap.h"
-#include "ProjectionFactory.h"
+#include <geos/geom/CoordinateSequence.h>
+#include <geos/geom/CoordinateArraySequence.h>
+#include <geos/geom/LinearRing.h>
+#include <geos/geom/Polygon.h>
+#include <geos/util/GEOSException.h>
+
+#include "iException.h"
 #include "PolygonTools.h"
+#include "Projection.h"
+#include "ProjectionFactory.h"
 #include "Preference.h"
-#include "geos/geom/CoordinateSequence.h"
-#include "geos/geom/CoordinateArraySequence.h"
-#include "geos/geom/LinearRing.h"
-#include "geos/geom/Polygon.h"
-#include "geos/util/GEOSException.h"
+#include "UniversalGroundMap.h"
 
 using namespace std;
 using namespace Isis;

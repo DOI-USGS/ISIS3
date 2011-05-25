@@ -28,6 +28,7 @@
 #include "CameraSkyMap.h"
 #include "CollectorMap.h"
 #include "iException.h"
+#include "iTime.h"
 #include "NaifStatus.h"
 #include "PushFrameCameraDetectorMap.h"
 #include "PushFrameCameraGroundMap.h"
@@ -56,7 +57,7 @@ namespace Isis {
     double et;
     PvlGroup &inst = lab.FindGroup("Instrument", Pvl::Traverse);
     string stime = inst["SpacecraftClockStartCount"];
-    scs2e_c(NaifSclkCode(), stime.c_str(), &et);
+    et = getClockTime(stime).Et();
 
     p_exposureDur = inst["ExposureDuration"];
     // TODO:  Changed et - exposure to et + exposure.
@@ -250,9 +251,16 @@ namespace Isis {
    * @param key 
    * @return @b vector < @b int > 
    */
-  vector<int> LroWideAngleCamera::GetVector(const string &key) 
-                                                 const {
-    int nvals = PoolKeySize(key);
+  vector<int> LroWideAngleCamera::GetVector(const string &key) {
+    QVariant poolKeySize = getStoredResult(key + "_SIZE", SpiceIntType);
+
+    int nvals = poolKeySize.toInt();
+
+    if(nvals == 0) {
+      nvals = PoolKeySize(key);
+      storeResult(key + "_SIZE", SpiceIntType, nvals);
+    }
+
     if(nvals <= 0) {
       string mess = "Kernel pool keyword " + key + " not found!";
       throw iException::Message(iException::Programmer, mess, _FILEINFO_);

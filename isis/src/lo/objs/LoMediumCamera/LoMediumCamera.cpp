@@ -75,9 +75,7 @@ namespace Isis {
     SetPixelPitch();
 
     // Get the start time in et
-    string stime = inst["StartTime"];
-    double time;
-    str2et_c(stime.c_str(), &time);
+    double time = iTime((string)inst["StartTime"]).Et();
 
     // Setup focal plane map
     if(type == Fiducial) {

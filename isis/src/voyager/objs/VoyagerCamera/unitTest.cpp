@@ -48,8 +48,8 @@ int main(void) {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
     // and "Longitude off by: " values directly into these variables.
-    double knownLat = -1.030981471822638;
-    double knownLon = 82.04233643109912;
+    double knownLat = -1.0309814869702094;
+    double knownLon = 82.0423364316989279;
 
     Pvl p("$voyager1/testData/c1639118.imq.cub");
     VoyagerCamera *cam = (VoyagerCamera *) CameraFactory::Create(p);

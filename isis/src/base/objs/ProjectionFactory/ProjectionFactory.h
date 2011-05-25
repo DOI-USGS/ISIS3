@@ -22,10 +22,14 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include "Projection.h"
-#include "Cube.h"
+#include "Plugin.h"
+#include "WorldMapper.h"
 
 namespace Isis {
+  class Camera;
+  class Cube;
+  class Projection;
+
   /**
    * @brief Initialize a map projection
    *
@@ -47,29 +51,29 @@ namespace Isis {
    *
    * @internal
    *   @history 2005-06-22 Elizabeth Ribelin - Merged ProjectionManager and
-   *                                           CubeProjection into a single class
-   *   @history 2006-01-27 Jacob Danton - Renamed PixelMapper to PFPixelMapper\
+   *                         CubeProjection into a single class
+   *   @history 2006-01-27 Jacob Danton - Renamed PixelMapper to PFPixelMapper
    *   @history 2006-05-19 Elizabeth Miller - Depricated ProjectionManager and
-   *                                          CubeProjection.  Renamed
-   *                                          ProjectionManager.plugin to
-   *                                          Projection.plugin
+   *                         CubeProjection.  Renamed ProjectionManager.plugin
+   *                         to Projection.plugin
    *   @history 2006-09-07 Elizabeth Miller - Added the bool sizeMatch
-   *                                          parameter to CreateForCube()
-   *   @history 2007-03-13 Jeff Anderson - Added new method CreateForCube using a
-   *                                          camera
-   *   @history 2007-06-29 Steven Lambright - Removed TrueScaleLatitude keyword from CreateForCube
-   *                                          methods, added units to Scale and PixelResolution
-   *                                          keywords
+   *                         parameter to CreateForCube()
+   *   @history 2007-03-13 Jeff Anderson - Added new method CreateForCube using
+   *                         a camera
+   *   @history 2007-06-29 Steven Lambright - Removed TrueScaleLatitude keyword
+   *                         from CreateForCube methods, added units to Scale
+   *                         and PixelResolution keywords
    *   @history 2008-06-18 Steven Koechle - Fixed Documentation Error
    *   @history 2009-06-18 Jeff Anderson - Modified the CreateForCube method to
-   *                                       make sure extra pixels were not
-   *                                       included in the image size due to
-   *                                       machine precision roundoff problems.
+   *                         make sure extra pixels were not included in the 
+   *                         image size due to machine precision roundoff
+   *                         problems.
    *   @history 2011-02-10 Jai Rideout - UpperLeftCornerX and UpperLeftCornerY
-   *                                     are now set in projection mapping
-   *                                     group via the new SetUpperLeftCorner
-   *                                     method in Projection.
-   *
+   *                         are now set in projection mapping group via the new
+   *                         SetUpperLeftCorner method in Projection.
+   *   @history 2011-05-23 Jannet Barrett and Steven Lambright -
+   *                         Added m_projPlugin to reduce cost of instantiating
+   *                         Projections.
    */
   class ProjectionFactory {
     public:
@@ -91,7 +95,8 @@ namespace Isis {
 
       //! Destroys the ProjectionFactory object
       ~ProjectionFactory() {};
-
+      
+      static Plugin m_projPlugin;
   };
 
   /// @cond INTERNAL

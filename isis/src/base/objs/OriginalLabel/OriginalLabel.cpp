@@ -96,14 +96,4 @@ namespace Isis {
     os >> pvl;
     return pvl;
   }
-
-  /**
-   * Fill pvl with original label data.
-   *
-   * @param[out] pvl Pvl to store original label data
-   * @param[out] is  file stream to get data from
-   */
-  void OriginalLabel::Read(Isis::Pvl &pvl, std::istream &is) {
-    Blob::Read(pvl, is);
-  }
 }

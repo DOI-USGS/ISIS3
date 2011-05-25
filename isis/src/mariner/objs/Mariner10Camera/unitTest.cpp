@@ -47,10 +47,10 @@ int main(void) {
                             "$mariner10/testData/166474.cub"
                           };
 
-    double knownLat[2] = { -27.5746680495404,
+    double knownLat[2] = { -21.1110851813477538,
                            -22.58558961173848
                          };
-    double knownLon[2] = { 312.1934068790935,
+    double knownLon[2] = { 2.9545840388299451,
                            292.0697686733246
                          };
 

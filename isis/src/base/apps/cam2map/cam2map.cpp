@@ -2,6 +2,7 @@
 
 #include "Isis.h"
 #include "Camera.h"
+#include "Projection.h"
 #include "ProjectionFactory.h"
 #include "ProcessRubberSheet.h"
 #include "iException.h"

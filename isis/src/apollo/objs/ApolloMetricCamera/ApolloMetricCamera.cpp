@@ -99,10 +99,7 @@ namespace Isis {
     // Create a cache and grab spice info since it does not change for
     // a framing camera (fixed spacecraft position and pointing)
     // Convert the start time to et
-    string stime = inst["StartTime"];
-    double time; // StartTime keyword is the center exposure time
-    str2et_c(stime.c_str(), &time);
-    SetTime(time);
+    SetTime((string)inst["StartTime"]);
     LoadCache();
     NaifStatus::CheckErrors();
   }

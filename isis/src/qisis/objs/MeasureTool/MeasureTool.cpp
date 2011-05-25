@@ -18,6 +18,7 @@
 #include "Latitude.h"
 #include "Longitude.h"
 #include "MdiCubeViewport.h"
+#include "Projection.h"
 #include "SurfacePoint.h"
 #include "ToolPad.h"
 

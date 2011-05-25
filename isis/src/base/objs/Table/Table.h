@@ -53,6 +53,9 @@ namespace Isis {
    *          if a re-read occurred.
    * @history 2009-02-18 Steven Lambright - Added copy constructor and
    *          assignment operator.
+   * @history 2011-05-25 Janet Barrett and Steven Lambright Added a Constructor
+   *          that takes the pvl labels so they do not have to be
+   *          re-read, which is a very expensive operation.
    */
   class Table : public Isis::Blob {
     public:
@@ -60,6 +63,8 @@ namespace Isis {
       Table(const std::string &tableName);
       Table(const std::string &tableName, Isis::TableRecord &rec);
       Table(const std::string &tableName, const std::string &file);
+      Table(const std::string &tableName, const std::string &file,
+            const Pvl &fileHeader);
       Table(const Table &other);
 
       ~Table();

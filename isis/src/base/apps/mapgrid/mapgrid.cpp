@@ -1,10 +1,13 @@
 #include "Isis.h"
-#include "UserInterface.h"
+
+#include <cmath>
+
 #include "iException.h"
 #include "ProjectionFactory.h"
 #include "Progress.h"
+#include "Projection.h"
 #include "Pvl.h"
-#include <cmath>
+#include "UserInterface.h"
 
 using namespace std;
 using namespace Isis;

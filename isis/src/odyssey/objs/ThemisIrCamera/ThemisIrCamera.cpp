@@ -23,6 +23,7 @@
 
 #include "CameraFocalPlaneMap.h"
 #include "iException.h"
+#include "iTime.h"
 #include "LineScanCameraDetectorMap.h"
 #include "LineScanCameraGroundMap.h"
 #include "LineScanCameraSkyMap.h"
@@ -49,7 +50,8 @@ namespace Isis {
     // to handle a random timing errors which can be up to four pixels
     PvlGroup &inst = lab.FindGroup("Instrument", Pvl::Traverse);
     string stime = inst["SpacecraftClockCount"];
-    scs2e_c(NaifSclkCode(), stime.c_str(), &p_etStart);
+    p_etStart = getClockTime(stime).Et();
+
     double offset = inst["SpacecraftClockOffset"];
     p_etStart += offset;
 

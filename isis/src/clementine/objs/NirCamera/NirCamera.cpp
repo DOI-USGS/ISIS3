@@ -72,11 +72,10 @@ namespace Isis {
 
     // Get the start time in et
     PvlGroup inst = lab.FindGroup("Instrument", Pvl::Traverse);
-    string stime = inst["StartTime"];
 
     // set variables startTime and exposureDuration
-    double et;
-    str2et_c(stime.c_str(), &et);
+    double et = iTime((string)inst["StartTime"]).Et();
+
     // divide exposure duration keyword value by 1000 to convert to seconds
     double exposureDuration = ((double) inst["ExposureDuration"]) / 1000.0;
     pair<iTime, iTime> shuttertimes = ShutterOpenCloseTimes(et, exposureDuration);

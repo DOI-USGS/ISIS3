@@ -71,7 +71,6 @@ int main(void) {
     double knownLat = -9.931519304735847;
     double knownLon = 286.6184572896974;
 
-    //Pvl p("$mgs/testData/lub0428b.cub");
     Pvl p("$mgs/testData/fha00491.lev1.cub");
     Camera *cam = CameraFactory::Create(p);
     cout << "Filename: " << Filename(p.Filename()).Name() << endl;

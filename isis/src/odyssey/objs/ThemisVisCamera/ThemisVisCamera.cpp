@@ -68,7 +68,8 @@ namespace Isis {
     // Get the start and end time
     double et;
     string stime = inst["SpacecraftClockCount"];
-    scs2e_c(NaifSclkCode(), stime.c_str(), &et);
+    et = getClockTime(stime).Et();
+
     double offset = inst["SpacecraftClockOffset"];
     p_etStart = et + offset - ((p_exposureDur / 1000.0) / 2.0);
     p_nframes = inst["NumFramelets"];

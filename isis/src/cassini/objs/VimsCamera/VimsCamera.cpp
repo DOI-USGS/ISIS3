@@ -84,8 +84,8 @@ namespace Isis {
     iString stime = (string) inst ["NativeStartTime"];
     string intTime = stime.Token(".");
 
-    double etStart;
-    scs2e_c(NaifSpkCode(), intTime.c_str(), &etStart);
+    double etStart = getClockTime(intTime).Et();
+
     //  Add 2 seconds to either side of time range because the time are for IR
     // channel, the VIS may actually start integrating before NATIVE_START_TIME.
     //  This insures the cache is large enough.
@@ -95,8 +95,8 @@ namespace Isis {
     iString etime = (string) inst ["NativeStopTime"];
     intTime = etime.Token(".");
 
-    double etStop;
-    scs2e_c(NaifSpkCode(), intTime.c_str(), &etStop);
+    double etStop = getClockTime(intTime).Et();
+
     //  Add 2 seconds to either side of time range because the time are for IR
     // channel, the VIS may actually start integrating before NATIVE_START_TIME.
     //  This insures the cache is large enough.

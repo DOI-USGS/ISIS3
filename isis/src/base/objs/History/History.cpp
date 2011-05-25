@@ -78,7 +78,7 @@ namespace Isis {
     return pvl;
   }
 
-  void History::Read(Isis::Pvl &pvl, std::istream &is) {
+  void History::Read(const Isis::Pvl &pvl, std::istream &is) {
     try {
       Blob::Read(pvl, is);
     }

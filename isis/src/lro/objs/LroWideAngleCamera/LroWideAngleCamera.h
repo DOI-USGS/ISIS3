@@ -119,7 +119,7 @@ namespace Isis {
       std::vector<int> p_frameletOffsets;
 
       int PoolKeySize(const std::string &key) const;
-      std::vector<int> GetVector(const std::string &key) const;
+      std::vector<int> GetVector(const std::string &key);
   };
 };
 #endif

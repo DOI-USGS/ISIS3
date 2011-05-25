@@ -171,6 +171,9 @@
     <change name="Steven Lambright" date="2009-07-21">
       Fixed handling of user-entered CK kernels
     </change>
+    <change name="Janet Barrett and Steven Lambright" date="2011-05-25">
+      Added support for storing text spice kernel values in the cube labels
+    </change>
   </history>
 
   <oldName>

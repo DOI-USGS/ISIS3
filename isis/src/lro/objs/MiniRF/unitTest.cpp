@@ -40,11 +40,11 @@ int main(void) {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
     // and "Longitude off by: " values directly into these variables.
-    double knownLat = 85.59669503708331;
-    double knownLon = 264.741957434605;
+    double knownLat = 85.5973849707835512;
+    double knownLon = 264.7360862944493078;
 
-    Isis::Pvl p("$chan1/testData/FSR_CDR_LV1_01801_0R.cub");
-    Isis::Camera *cam = Isis::CameraFactory::Create(p);
+    Pvl p("$chan1/testData/FSR_CDR_LV1_01801_0R.cub");
+    Camera *cam = Isis::CameraFactory::Create(p);
     cout << "Filename: " << Filename(p.Filename()).Name() << endl;
     cout << "CK Frame: " << cam->InstrumentRotation()->Frame() << endl << endl;
     cout.setf(std::ios::fixed);

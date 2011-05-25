@@ -136,7 +136,7 @@ namespace Isis {
     iString stime = (string) inst ["NativeStartTime"];
     string intTime = stime.Token(".");
 
-    scs2e_c(-82, intTime.c_str(), &p_etStart);
+    p_etStart = p_camera->getClockTime(intTime).Et();
     p_etStart += stime.ToDouble() / 15959.0;
     //----------------------------------------------------------------------
     //  Because of inaccuracy with the 15 Mhz clock, the IR exposure and

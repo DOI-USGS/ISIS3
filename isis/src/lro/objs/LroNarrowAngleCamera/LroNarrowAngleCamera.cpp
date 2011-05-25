@@ -18,7 +18,8 @@
  *   http://www.usgs.gov/privacy.html.
  */
 #include "LroNarrowAngleCamera.h"
-#include "LroNarrowAngleDistortionMap.h"
+
+#include <iomanip>
 
 #include "CameraFocalPlaneMap.h"
 #include "iException.h"
@@ -27,6 +28,7 @@
 #include "LineScanCameraDetectorMap.h"
 #include "LineScanCameraGroundMap.h"
 #include "LineScanCameraSkyMap.h"
+#include "LroNarrowAngleDistortionMap.h"
 #include "NaifStatus.h"
 
 using namespace std;
@@ -66,12 +68,12 @@ namespace Isis {
     PvlGroup &inst = lab.FindGroup("Instrument", Pvl::Traverse);
     iString stime = (string)inst["SpacecraftClockPrerollCount"];
     SpiceDouble etStart;
+
     if(stime != "NULL") {
-      scs2e_c(NaifSclkCode(), stime.c_str(), &etStart);
+      etStart = getClockTime(stime).Et();
     }
     else {
-      stime = (string)inst["PrerollTime"];
-      str2et_c(stime.c_str(), &etStart);
+      etStart = iTime((string)inst["PrerollTime"]).Et();
     }
 
     // Get other info from labels

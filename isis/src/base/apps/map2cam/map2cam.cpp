@@ -2,6 +2,7 @@
 
 #include "Camera.h"
 #include "ProcessRubberSheet.h"
+#include "Projection.h"
 
 #include "map2cam.h"
 

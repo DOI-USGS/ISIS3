@@ -45,7 +45,8 @@ int main(void) {
   cout << "Unit Test for VimsCamera..." << endl;
   /*
    * Sample/Line TestLineSamp points changed for the VimsCamera,
-   *   tolerance increased
+   *   tolerance increased. This unitTest has been modified enough that you
+   *   should not use this as a template when making a new camera unit test.
    */
   try {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,

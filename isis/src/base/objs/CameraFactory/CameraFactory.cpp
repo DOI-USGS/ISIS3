@@ -21,13 +21,17 @@
  */
 
 #include "CameraFactory.h"
+
 #include "Camera.h"
 #include "Plugin.h"
 #include "iException.h"
 #include "Filename.h"
 
 using namespace std;
+
 namespace Isis {
+  Plugin CameraFactory::m_cameraPlugin;
+
   /**
    * Creates a Camera object using Pvl Specifications
    *
@@ -39,14 +43,10 @@ namespace Isis {
    *                                    the plugin
    * @throws Isis::iException::Camera - Unable to initialize camera model
    */
-  Camera *CameraFactory::Create(Isis::Pvl &lab) {
+  Camera *CameraFactory::Create(Pvl &lab) {
     // Try to load a plugin file in the current working directory and then
     // load the system file
-    Plugin p;
-    Filename localFile("Camera.plugin");
-    if(localFile.Exists()) p.Read(localFile.Expanded());
-    Filename systemFile("$ISISROOT/lib/Camera.plugin");
-    if(systemFile.Exists()) p.Read(systemFile.Expanded());
+    initPlugin();
 
     try {
       // First get the spacecraft and instrument and combine them
@@ -65,6 +65,7 @@ namespace Isis {
       }
 
       int cameraOriginalVersion = (int)kerns["CameraVersion"];
+
       int cameraNewestVersion = CameraVersion(lab);
 
       if(cameraOriginalVersion != cameraNewestVersion) {
@@ -77,7 +78,7 @@ namespace Isis {
       // See if we have a camera model plugin
       void *ptr;
       try {
-        ptr = p.GetPlugin(group);
+        ptr = m_cameraPlugin.GetPlugin(group);
       }
       catch(Isis::iException &e) {
         string msg = "Unsupported camera model, unable to find plugin for ";
@@ -99,6 +100,20 @@ namespace Isis {
     }
   }
 
+
+  void CameraFactory::initPlugin() {
+    if(m_cameraPlugin.Filename() == "") {
+      Filename localFile("Camera.plugin");
+      if(localFile.Exists())
+        m_cameraPlugin.Read(localFile.Expanded());
+
+      Filename systemFile("$ISISROOT/lib/Camera.plugin");
+      if(systemFile.Exists())
+        m_cameraPlugin.Read(systemFile.Expanded());
+    }
+  }
+
+
   /**
    * This looks up the current camera model version from the cube labels.
    *
@@ -109,11 +124,7 @@ namespace Isis {
   int CameraFactory::CameraVersion(Pvl &lab) {
     // Try to load a plugin file in the current working directory and then
     // load the system file
-    Pvl cameraPluginGrp;
-    Filename localFile("Camera.plugin");
-    if(localFile.Exists()) cameraPluginGrp.Read(localFile.Expanded());
-    Filename systemFile("$ISISROOT/lib/Camera.plugin");
-    if(systemFile.Exists()) cameraPluginGrp.Read(systemFile.Expanded());
+    initPlugin();
 
     try {
       // First get the spacecraft and instrument and combine them
@@ -127,7 +138,7 @@ namespace Isis {
 
       PvlGroup plugin;
       try {
-        plugin = cameraPluginGrp.FindGroup(group);
+        plugin = m_cameraPlugin.FindGroup(group);
       }
       catch(iException &e) {
         string msg = "Unsupported camera model, unable to find plugin for ";

@@ -70,9 +70,10 @@ namespace Isis {
    * @see Camera
    *
    * @internal
-   * @history 2007-02-13 Debbie A. Cook - Added methods SignMostSigX() and
+   *   @history 2007-02-13 Debbie A. Cook - Added methods SignMostSigX() and
    *                                      SignMostSigY()
-   *
+   *   @history 2011-05-25 Janet Barrett and Steven Lambright - Spice::GetDouble
+   *                                      is no longer static. 
    */
   class CameraFocalPlaneMap {
     public:

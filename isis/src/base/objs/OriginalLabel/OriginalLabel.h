@@ -57,9 +57,6 @@ namespace Isis {
       // Return the original labels
       Pvl ReturnLabels();
 
-      // Read original labels from file
-      void Read(Isis::Pvl &pvl, std::istream &is);
-
     protected:
       // prepare data for writing
       void WriteInit();

@@ -21,12 +21,12 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-
-#include "Camera.h"
+#include "Plugin.h"
 
 namespace Isis {
   class Pvl;
   class Camera;
+
   /**
    * @brief Initializes a Camera Model
    *
@@ -46,11 +46,14 @@ namespace Isis {
    * @author 2005-05-10 Elizabeth Ribelin
    *
    * @internal
-   *  @history 2005-10-06 Elizabeth Miller - added unitTest.exclude file
-   *  @history 2006-05-17 Elizabeth Miller - changed CameraManager.plugin to
-   *                                         Camera.plugin
-   *  @history 2009-05-12 Steven Lambright - Added CameraVersion(...) and version
-   *           checking.
+   *   @history 2005-10-06 Elizabeth Miller - added unitTest.exclude file
+   *   @history 2006-05-17 Elizabeth Miller - changed CameraManager.plugin to
+   *                         Camera.plugin
+   *   @history 2009-05-12 Steven Lambright - Added CameraVersion(...) and 
+   *                         version checking.
+   *   @history 2011-05-23 Jannet Barrett and Steven Lambright - Added
+   *                          m_cameraPlugin to reduce cost of instantiating
+   *                          Cameras.
    */
 
   class CameraFactory {
@@ -59,6 +62,8 @@ namespace Isis {
       static int CameraVersion(Pvl &pvl);
 
     private:
+      static void initPlugin();
+
       /**
        * Constructor (Its private, so you cannot use it.  Use the Create method
        * instead
@@ -67,6 +72,8 @@ namespace Isis {
 
       //! Destroys the CameraFactory object
       ~CameraFactory() {};
+
+      static Plugin m_cameraPlugin;
   };
 };
 

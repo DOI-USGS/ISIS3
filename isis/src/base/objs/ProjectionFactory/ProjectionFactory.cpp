@@ -34,7 +34,10 @@
 #include "Projection.h"
 
 using namespace std;
+
 namespace Isis {
+  Plugin ProjectionFactory::m_projPlugin;
+
   /**
    * This method returns a pointer to a Projection object. The projection is
    * intialized using information contained in a Label object. The information
@@ -61,10 +64,16 @@ namespace Isis {
     // Try to load a plugin file in the current working directory and then
     // load the system file
     Plugin p;
-    Isis::Filename localFile("Projection.plugin");
-    if(localFile.Exists()) p.Read(localFile.Expanded());
-    Isis::Filename systemFile("$ISISROOT/lib/Projection.plugin");
-    if(systemFile.Exists()) p.Read(systemFile.Expanded());
+    
+    if(m_projPlugin.Filename() == "") {
+      Filename localFile("Projection.plugin");
+      if(localFile.Exists())
+        m_projPlugin.Read(localFile.Expanded());
+
+      Filename systemFile("$ISISROOT/lib/Projection.plugin");
+      if(systemFile.Exists())
+        m_projPlugin.Read(systemFile.Expanded());
+    }
 
     try {
       // Look for info in the mapping group
@@ -74,7 +83,7 @@ namespace Isis {
       // Now get the plugin for the projection
       void *ptr;
       try {
-        ptr = p.GetPlugin(proj);
+        ptr = m_projPlugin.GetPlugin(proj);
       }
       catch(Isis::iException &e) {
         string msg = "Unsupported projection, unable to find plugin for [" +
@@ -85,7 +94,6 @@ namespace Isis {
       // Now cast that pointer in the proper way
       Isis::Projection * (*plugin)(Isis::Pvl & label, bool flag);
       plugin = (Isis::Projection * ( *)(Isis::Pvl & label, bool flag)) ptr;
-
       // Create the projection as requested
       return (*plugin)(label, allowDefaults);
     }

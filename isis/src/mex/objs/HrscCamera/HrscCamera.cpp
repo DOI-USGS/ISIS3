@@ -51,7 +51,6 @@ namespace Isis {
 
     // Get required keywords from instrument group
     PvlGroup &inst = lab.FindGroup("Instrument", Pvl::Traverse);
-    iTime stime(inst["StartTime"][0]);
 
     ReadLineRates(lab.Filename());
 
@@ -103,7 +102,9 @@ namespace Isis {
     }
 
     for(int i = 0; i < timesTable.Records(); i++) {
-      p_lineRates.push_back(LineRateChange((int)timesTable[i][2], (double)timesTable[i][0], timesTable[i][1]));
+      p_lineRates.push_back(LineRateChange((int)timesTable[i][2],
+                                           (double)timesTable[i][0],
+                                           timesTable[i][1]));
     }
 
     if(p_lineRates.size() <= 0) {
@@ -115,8 +116,6 @@ namespace Isis {
 }
 
 
-//    H r s c C a m e r a P l u g i n
-//
 /**
  * This is the function that is called in order to instantiate a
  * HrscCamera object.

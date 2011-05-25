@@ -42,8 +42,8 @@ int main(void) {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
     // and "Longitude off by: " values directly into these variables.
-    double knownLat = 48.35423755148862;
-    double knownLon = 277.8684962230142;
+    double knownLat = 48.3591843148432545;
+    double knownLon = 277.9465647067391387;
 
     Pvl p("$dawn/testData/FC21B0001010_09049002212F5D.cub");
     DawnFcCamera *cam = (DawnFcCamera *) CameraFactory::Create(p);

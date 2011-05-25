@@ -20,14 +20,16 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
+#include "CameraPointInfo.h"
+
 #include "Brick.h"
 #include "Camera.h"
-#include "CameraPointInfo.h"
 #include "CubeManager.h"
 #include "Distance.h"
 #include "iException.h"
 #include "iTime.h"
 #include "Longitude.h"
+#include "Projection.h"
 #include "PvlGroup.h"
 
 using namespace std;

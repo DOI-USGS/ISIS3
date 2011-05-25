@@ -1,18 +1,21 @@
 #define GUIHELPERS
 
 #include "Isis.h"
-#include "PvlGroup.h"
-#include "UserInterface.h"
-#include "iException.h"
-#include "Spice.h"
-#include "FileList.h"
-#include "ProjectionFactory.h"
-#include "Cube.h"
-#include "iString.h"
-#include "SpecialPixel.h"
-#include "Camera.h"
+
 #include <map>
 #include <cctype>
+
+#include "Camera.h"
+#include "Cube.h"
+#include "FileList.h"
+#include "iException.h"
+#include "iString.h"
+#include "Projection.h"
+#include "ProjectionFactory.h"
+#include "PvlGroup.h"
+#include "SpecialPixel.h"
+#include "Spice.h"
+#include "UserInterface.h"
 
 using namespace std;
 using namespace Isis;

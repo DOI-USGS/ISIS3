@@ -5,6 +5,7 @@
 #include "FileList.h"
 #include "iException.h"
 #include "SpecialPixel.h"
+#include "Projection.h"
 #include "ProjectionFactory.h"
 
 using namespace std;

@@ -28,6 +28,7 @@
 #include "Filename.h"
 #include "iString.h"
 #include "iTime.h"
+#include "SpecialPixel.h"
 
 using namespace std;
 namespace Isis {
@@ -173,6 +174,26 @@ namespace Isis {
   bool iTime::operator==(const iTime &time) {
     return (p_et == time.p_et);
   }
+
+
+  iTime iTime::operator +(const double &secondsToAdd) const {
+    iTime tmp(*this);
+    tmp += secondsToAdd;
+    return tmp;
+  }
+
+
+  void iTime::operator +=(const double &secondsToAdd) {
+    if(!IsSpecial(secondsToAdd) && !IsSpecial(p_et) && (p_et != 0.0))
+      p_et += secondsToAdd;
+  }
+
+
+  iTime operator +(const double &secondsToAdd, iTime time) {
+    time += secondsToAdd;
+    return time;
+  }
+
 
   /**
    * Returns the year portion of the time as a string
@@ -375,6 +396,21 @@ namespace Isis {
     else utc += SecondString();
 
     return utc;
+  }
+
+  void iTime::setEt(double et) {
+    if(!IsSpecial(et))
+      p_et = et;
+    else
+      p_et = 0.0;
+  }
+
+  void iTime::setUtc(iString utcString) {
+    LoadLeapSecondKernel();
+
+    double et;
+    utc2et_c(utcString.c_str(), &et);
+    setEt(et);
   }
 
   //---------------------------------------------------

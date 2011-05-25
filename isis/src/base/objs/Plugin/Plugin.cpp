@@ -20,19 +20,22 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
+#include "Plugin.h"
 
+#include <ostream>
+
+#include <QCoreApplication>
 #include <QLibrary>
 #include <QStringList>
-#include <QCoreApplication>
-#include <ostream>
-#include "iException.h"
-#include "Plugin.h"
+
 #include "Filename.h"
+#include "iException.h"
 
 using namespace std;
+
 namespace Isis {
   //! Constructs a Plugin object.
-  Plugin::Plugin() : Isis::Pvl() {
+  Plugin::Plugin() : Pvl() {
   }
 
   /**
@@ -51,7 +54,7 @@ namespace Isis {
    */
   void *Plugin::GetPlugin(const std::string &group) {
     // Get the library and plugin to load
-    Isis::PvlGroup &g = FindGroup(group);
+    PvlGroup &g = FindGroup(group);
     string library = g["Library"];
 
     string path = "./";
@@ -64,6 +67,7 @@ namespace Isis {
     // so the scope of lib does not matter.
     QLibrary lib(libraryFile.Expanded().c_str());
     bool loadedOk = lib.load();
+
     if(!loadedOk) {
       path = "$ISISROOT/lib/";
       libraryFile = path + library;

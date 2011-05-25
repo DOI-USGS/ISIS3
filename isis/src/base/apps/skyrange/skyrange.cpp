@@ -1,6 +1,8 @@
 #include "Isis.h"
-#include "Process.h"
+
 #include "Camera.h"
+#include "Process.h"
+#include "Projection.h"
 #include "Pvl.h"
 
 using namespace std;

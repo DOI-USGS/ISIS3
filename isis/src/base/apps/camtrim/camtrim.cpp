@@ -1,8 +1,9 @@
 #include "Isis.h"
 #include "Camera.h"
 #include "ProcessByLine.h"
-#include "SpecialPixel.h"
+#include "Projection.h"
 #include "ProjectionFactory.h"
+#include "SpecialPixel.h"
 
 using namespace std;
 using namespace Isis;

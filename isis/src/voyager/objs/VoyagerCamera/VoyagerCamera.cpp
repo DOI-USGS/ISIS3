@@ -145,11 +145,10 @@ namespace Isis {
    
     // StartTime is the most accurate time available because in voy2isis the
     // StartTime is modified to be highly accurate.
-    string startTime = inst["StartTime"];
     // exposure duration keyword value is measured in seconds
     double exposureDuration = inst["ExposureDuration"];
-    double eTime = 0.0;
-    utc2et_c(startTime.c_str(), &eTime);
+    iTime startTime;
+    startTime.setUtc((string)inst["StartTime"]);
 
     // set the start (shutter open) and end (shutter close) times for the image
     /*****************************************************************************
@@ -158,7 +157,8 @@ namespace Isis {
      * clock count for the frame.  The true spacecraft clock count is readout
      * time of the frame, which occurred 2 seconds after shutter close. 
      *****************************************************************************/
-    pair<iTime, iTime> shuttertimes = ShutterOpenCloseTimes(eTime, exposureDuration);
+    pair<iTime, iTime> shuttertimes = ShutterOpenCloseTimes(startTime.Et(),
+                                                            exposureDuration);
 
     // add half the exposure duration to the start time to get the center if the image
     iTime centerTime = shuttertimes.first.Et() + exposureDuration / 2.0;

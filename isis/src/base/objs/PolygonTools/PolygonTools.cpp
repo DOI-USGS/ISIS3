@@ -40,6 +40,7 @@
 
 #include "SpecialPixel.h"
 #include "PolygonTools.h"
+#include "Projection.h"
 #include "ProjectionFactory.h"
 #include "UniversalGroundMap.h"
 

@@ -3,17 +3,18 @@
 #include <fstream>
 #include <vector>
 
+#include "Histogram.h"
 #include "iTime.h"
 #include "iString.h"
-#include "ProcessExportPds.h"
+#include "JP2Encoder.h"
 #include "LineManager.h"
 #include "OriginalLabel.h"
-#include "PvlTranslationManager.h"
-#include "PvlFormatPds.h"
 #include "PixelType.h"
-#include "Histogram.h"
+#include "ProcessExportPds.h"
+#include "Projection.h"
 #include "ProjectionFactory.h"
-#include "JP2Encoder.h"
+#include "PvlFormatPds.h"
+#include "PvlTranslationManager.h"
 
 using namespace Isis;
 using namespace std;

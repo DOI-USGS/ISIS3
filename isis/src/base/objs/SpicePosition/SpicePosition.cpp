@@ -1,8 +1,9 @@
+#include "SpicePosition.h"
+
 #include <algorithm>
 #include <cfloat>
 #include <iomanip>
 
-#include "SpicePosition.h"
 #include "BasisFunction.h"
 #include "LeastSquares.h"
 #include "LineEquation.h"
@@ -123,9 +124,11 @@ namespace Isis {
     else {  // Read from the kernel
       SetEphemerisTimeSpice();
     }
+
     // Return the coordinate
-    return p_coordinate;
     NaifStatus::CheckErrors();
+
+    return p_coordinate;
   }
 
 
@@ -176,6 +179,7 @@ namespace Isis {
       p_cache.push_back(p_coordinate);
       if(p_hasVelocity) p_cacheVelocity.push_back(p_velocity);
     }
+
     p_source = Memcache;
   }
 
@@ -1248,6 +1252,7 @@ namespace Isis {
     // Read from the kernel
     SpiceDouble j[6], lt;
     // First try getting the entire state (including the velocity vector)
+
     spkez_c((SpiceInt)p_targetCode,
             (SpiceDouble)(p_et + p_timeBias),
             "J2000",
@@ -1255,6 +1260,7 @@ namespace Isis {
             (SpiceInt)p_observerCode,
             j,
             &lt);
+
     // If Naif fails attempting to get the entire state, assume the velocity vector is
     // not available and just get the position.  First turn off Naif error reporting and
     // return any error without printing them.

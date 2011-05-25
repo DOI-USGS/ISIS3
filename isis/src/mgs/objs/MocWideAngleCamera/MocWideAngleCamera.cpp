@@ -24,6 +24,7 @@
 
 #include "CameraFocalPlaneMap.h"
 #include "iException.h"
+#include "iTime.h"
 #include "LineScanCameraGroundMap.h"
 #include "LineScanCameraSkyMap.h"
 #include "NaifStatus.h"
@@ -66,8 +67,7 @@ namespace Isis {
     // Get the start time from labels
     PvlGroup &inst = lab.FindGroup("Instrument", Pvl::Traverse);
     string stime = inst["SpacecraftClockCount"];
-    SpiceDouble etStart;
-    scs2e_c(NaifSpkCode(), stime.c_str(), &etStart);
+    double etStart = getClockTime(stime).Et();
 
     // Setup detector map
     MocWideAngleDetectorMap *detectorMap =

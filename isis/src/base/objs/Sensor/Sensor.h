@@ -154,6 +154,10 @@ namespace Isis {
    *                                      tracing routine. The check for this was moved when other
    *                                      code was added. This was causing a problem with footprintinit.
    *   @history 2011-05-03 Jeannie Walldren - Added Isis Disclaimer to files.
+   *   @history 2011-05-25 Janet Barrett and Steven Lambright - Moved the
+   *                                      ownership of the DEM projection to
+   *                                      the DEM cube which is owned by
+   *                                      CubeManager.
    */
   class Sensor : public Spice {
     public:

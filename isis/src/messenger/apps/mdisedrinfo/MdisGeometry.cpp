@@ -21,6 +21,8 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
+#include "MdisGeometry.h"
+
 #include <cmath>
 #include <string>
 #include <vector>
@@ -29,15 +31,16 @@
 #include <iomanip>
 #include <sstream>
 
-#include "MdisGeometry.h"
+#include <naif/SpiceUsr.h>
+
 #include "CameraFactory.h"
-#include "SpiceManager.h"
-#include "Pvl.h"
-#include "OriginalLabel.h"
-#include "SpecialPixel.h"
-#include "iString.h"
 #include "iException.h"
-#include "naif/SpiceUsr.h"
+#include "iString.h"
+#include "OriginalLabel.h"
+#include "Projection.h"
+#include "Pvl.h"
+#include "SpecialPixel.h"
+#include "SpiceManager.h"
 
 using namespace std;
 
@@ -746,7 +749,10 @@ namespace Isis {
     inst -= (int) key;
 
     // Get CK time tolerance (tol)
-    SpiceDouble tol = Spice::GetDouble("INS" + iCode + "_CK_TIME_TOLERANCE");
+    SpiceDouble tol;
+    SpiceInt tmp;
+    gdpool_c(iString("INS" + iCode + "_CK_TIME_TOLERANCE").c_str(),
+             0, 1, &tmp, &tol, &found);
 
     // Finally get av
     SpiceDouble cmat[3][3], av[3], clkout;

@@ -43,8 +43,8 @@ int main(void) {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
     // and "Longitude off by: " values directly into these variables.
-    double knownLat = -0.172932390665937;
-    double knownLon = 225.0136299445319;
+    double knownLat = -0.1890205755726288;
+    double knownLon = 225.0221110457575264;
 
     //Pvl p("$mgs/testData/lub0428b.cub");
     Pvl p("$messenger/testData/EW0089570936I.cub");

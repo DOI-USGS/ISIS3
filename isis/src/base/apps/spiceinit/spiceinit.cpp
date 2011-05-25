@@ -378,6 +378,20 @@ bool TryKernels(Cube *icube, Process &p,
         currentKernels["TargetPosition"].AddValue(origTargPos[i]);
       }
       icube->PutGroup(currentKernels);
+      
+      Pvl *label = icube->Label();
+      int i = 0;
+      while(i < label->Objects()) {
+        PvlObject currObj = label->Object(i);
+        if(currObj.IsNamed("NaifKeywords")) {
+          label->DeleteObject(i);
+        }
+        else {
+          i ++;
+        }
+      }
+      
+      *icube->Label() += cam->getStoredNaifKeywords();
     }
     //modify Kernels group only
     else {
@@ -401,6 +415,9 @@ bool TryKernels(Cube *icube, Process &p,
           else {
             i++;
           }
+        }
+        else if(currObj.IsNamed("NaifKeywords")) {
+          label->DeleteObject(i);
         }
         else {
           i++;

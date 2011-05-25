@@ -72,9 +72,9 @@ namespace Isis {
 
     // Get the start time in et
     PvlGroup inst = lab.FindGroup("Instrument", Pvl::Traverse);
-    string stime = inst["StartTime"];
-    double et;
-    str2et_c(stime.c_str(), &et);
+
+    double et = iTime((string)inst["StartTime"]).Et();
+
     //?????????? NEED THESE??????
     // exposure duration keyword value is measured in seconds
     double exposureDuration = ((double) inst["ExposureDuration"]);

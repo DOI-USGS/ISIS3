@@ -31,6 +31,8 @@
 #include "Filename.h"
 
 namespace Isis {
+  class iString;
+
   /**
    * @brief Parse and return pieces of a time string
    *
@@ -63,9 +65,8 @@ namespace Isis {
    *           than 8 digits after the decimal point.  It was returning scientific
    *           notation causing parsing errors (in NAIF, PostgreSQL TIMESTAMP
    *           fields, etc...)
-   *
-   *  @todo 2005-02-22 Stuart Sides - add coded and implementation examples to
-   *                                  class documentation
+   *  @history 2011-05-25 Janet Barrett and Steven Lambright - Added setUtc,
+   *           setEt and addition operators
    */
   class iTime {
     public:
@@ -99,6 +100,10 @@ namespace Isis {
       bool operator!=(const iTime &time);
       bool operator==(const iTime &time);
 
+      iTime operator +(const double &secondsToAdd) const;
+      void operator +=(const double &secondsToAdd);
+      friend iTime operator +(const double &secondsToAdd, iTime time);
+
       // Return the year
       std::string YearString() const;
       int Year() const;
@@ -126,6 +131,9 @@ namespace Isis {
       std::string UTC() const;
       static std::string CurrentGMT();
       static std::string CurrentLocalTime();
+      
+      void setEt(double et);
+      void setUtc(iString utcString);
 
     private:
       double p_et;     /**<The ephemeris representaion of the original string

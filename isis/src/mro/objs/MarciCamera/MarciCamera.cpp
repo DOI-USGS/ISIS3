@@ -25,6 +25,7 @@
 #include "CameraFocalPlaneMap.h"
 #include "CameraSkyMap.h"
 #include "iException.h"
+#include "iTime.h"
 #include "NaifStatus.h"
 #include "PushFrameCameraDetectorMap.h"
 #include "PushFrameCameraGroundMap.h"
@@ -65,7 +66,7 @@ namespace Isis {
     // Get the start and end time
     double et;
     string stime = inst["SpacecraftClockCount"];
-    scs2e_c(NaifSclkCode(), stime.c_str(), &et);
+    et = getClockTime(stime).Et();
     p_etStart = et - ((p_exposureDur / 1000.0) / 2.0);
     p_nframelets = ParentLines() / sumMode;
 
@@ -184,7 +185,6 @@ namespace Isis {
 }
 
 
-// Plugin
 /**
  * This is the function that is called in order to instantiate a MarciCamera object. 
  *

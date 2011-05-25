@@ -36,7 +36,7 @@ namespace Isis {
    * @param rec Name of the TableRecord to be read into the Table
    */
   Table::Table(const std::string &tableName, Isis::TableRecord &rec) :
-    Isis::Blob(tableName, "Table") {
+    Blob(tableName, "Table") {
     p_assoc = Table::None;
     p_blobPvl += Isis::PvlKeyword("Records", 0);
     p_blobPvl += Isis::PvlKeyword("ByteOrder", "NULL");
@@ -52,10 +52,18 @@ namespace Isis {
    * @param file Name of the file to be read into the Table
    */
   Table::Table(const std::string &tableName, const std::string &file) :
-    Isis::Blob(tableName, "Table") {
+    Blob(tableName, "Table") {
     p_assoc = Table::None;
     Read(file);
   }
+
+
+  Table::Table(const std::string &tableName, const std::string &file,
+      const Pvl &fileHeader) : Blob(tableName, "Table") {
+    p_assoc = Table::None;
+    Read(file, fileHeader);
+  }
+
 
   /**
    * Copy constructor for table

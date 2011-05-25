@@ -171,6 +171,15 @@ namespace Isis {
    *                                         SetTime()). Added missing
    *                                         documentation to new methods.
    *   @history 2011-05-03 Jeannie Walldren - Added Isis Disclaimer to files.
+   *   @history 2011-05-25 Janet Barrett and Steven Lambright - Added API that
+   *                                         stores naif values and arbitrary
+   *                                         computations so that the text
+   *                                         kernels do not have to be
+   *                                         furnished. This makes the
+   *                                         Camera instantiation much, much
+   *                                         quicker. Text kernels are no longer
+   *                                         furnished when their data has been
+   *                                         stored in the labels.
    */
   class Spice {
     public:
@@ -211,10 +220,12 @@ namespace Isis {
       bool IsSky() const {
         return p_sky;
       };
-
-      static SpiceDouble GetDouble(const iString &key, int index = 0);
-      static SpiceInt GetInteger(const iString &key,   int index = 0);
-      static iString GetString(const iString &key,     int index = 0);
+      
+      iTime getClockTime(iString clockValue,
+                         int sclkCode = -1);
+      SpiceDouble GetDouble(const iString &key, int index = 0);
+      SpiceInt GetInteger(const iString &key,   int index = 0);
+      iString GetString(const iString &key,     int index = 0);
 
       /**
        * Accessor method for the sun position.
@@ -267,8 +278,26 @@ namespace Isis {
       SpiceInt NaifCkCode() const;
       SpiceInt NaifIkCode() const;
       SpiceInt NaifSclkCode() const;
+      
+      PvlObject getStoredNaifKeywords() const;
 
     protected:
+      enum SpiceValueType {
+        SpiceDoubleType,
+        SpiceStringType,
+        SpiceIntType,
+        SpiceByteCodeType
+      };
+
+      QVariant readValue(iString key, SpiceValueType type, int index = 0);
+
+      void storeResult(iString name, SpiceValueType type, QVariant value);
+      QVariant getStoredResult(iString name, SpiceValueType type);
+
+      void storeValue(iString key, int index, SpiceValueType type,
+                      QVariant value);
+      QVariant readStoredValue(iString key, SpiceValueType type, int index);
+
       // Leave these protected so that inheriting classes don't
       // have to convert between double and spicedouble
       // None of the below data elements are usable (except
@@ -314,10 +343,6 @@ namespace Isis {
 
       bool p_allowDownsizing; //!< Indicates whether to allow downsizing
 
-      bool p_cancelAberrationCorrections; /**< Indicates whether to cancel
-                                               the light-time/aberration
-                                               corrections set by the camera.*/
-
       // Constants
       SpiceInt *p_bodyCode;    /**< The NaifBodyCode value, if it exists in the 
                                     labels. Otherwise, if the target is sky, 
@@ -328,9 +353,12 @@ namespace Isis {
       SpiceInt *p_ikCode;      //!< Instrument kernel (IK) code
       SpiceInt *p_sclkCode;    //!< Spacecraft clock correlation kernel (SCLK) code
       SpiceInt *p_spkBodyCode; //!< Spacecraft and planet ephemeris kernel (SPK) body code
+      
+      PvlObject *p_naifKeywords;
 
       bool p_sky; //!< Indicates whether the target of the observation is the sky.
+      bool p_usingNaif;
   };
-};
+}
 
 #endif

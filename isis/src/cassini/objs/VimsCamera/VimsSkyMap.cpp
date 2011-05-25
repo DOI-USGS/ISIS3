@@ -74,9 +74,7 @@ namespace Isis {
     iString stime = (string) inst ["NativeStartTime"];
     string intTime = stime.Token(".");
 
-    //  ??? How do I get to Naif code ???
-    //scs2e_c(NaifSpkCode(),intTime.c_str(),&p_etStart);
-    scs2e_c(-82, intTime.c_str(), &p_etStart);
+    p_etStart = p_camera->getClockTime(intTime).Et();
     p_etStart += stime.ToDouble() / 15959.0;
 
     //----------------------------------------------------------------------

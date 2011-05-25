@@ -36,11 +36,12 @@ namespace Isis {
    *          OriginalLabel naming and modified to be backwards
    *          compatible
    *   @history Steven Lambright Added copy constructor,
-   *           assignment operator
-   *   @history Steven Lambright Added copy constructor,
-   *           assignment operator
+   *            assignment operator
    *   @history 2010-05-15 Steven Lambright Changed Read to use an
    *            istream instead of an fstream
+   *   @history 2011-05-25 Janet Barrett and Steven Lambright Added a Read
+   *            method that takes the pvl labels so they do not have to be
+   *            re-read, which is a very expensive operation.
    *
    * @todo Write class description, history, etc.
    */
@@ -53,7 +54,8 @@ namespace Isis {
       virtual ~Blob();
 
       void Read(const std::string &file);
-      virtual void Read(Isis::Pvl &pvl, std::istream &is);
+      void Read(const std::string &file, const Pvl &pvlLabels);
+      virtual void Read(const Pvl &pvl, std::istream &is);
 
       void Write(const std::string &file);
       void Write(Isis::Pvl &pvl, std::fstream &stm,
@@ -73,7 +75,7 @@ namespace Isis {
       Blob &operator=(const Blob &other);
 
     protected:
-      void Find(Isis::Pvl &pvl);
+      void Find(const Isis::Pvl &pvl);
       virtual void ReadInit() {};
       virtual void ReadData(std::istream &is);
 

@@ -68,20 +68,10 @@ namespace Isis {
     PvlGroup inst = lab.FindGroup("Instrument", Pvl::Traverse);
     // Get utc start time
     string stime = inst["StartTime"];
-    double et;
-    utc2et_c(stime.c_str(), &et);
-    //cout<<std::setw(12)<<std::fixed<<setprecision(8)<<"et = "<<et<<endl;
 
-    double sclk;
-    sce2c_c(-76, et, &sclk);
-    //cout<<std::setw(12)<<std::fixed<<setprecision(8)<<"sclk = "<<sclk<<endl;
-
-    sce2t_c(-76, et, &sclk);
-    //cout<<std::setw(12)<<std::fixed<<setprecision(8)<<"sclk = "<<sclk<<endl;
-
-    char ssclk[25];
-    sce2s_c(-76, et, 25, ssclk);
-    //cout<<std::setw(25)<<std::fixed<<setprecision(8)<<"ssclk = "<<ssclk<<endl;
+    iTime startTime;
+    startTime.setUtc((string)inst["StartTime"]);
+    SetTime(startTime);
 
     // Setup detector map
     new CameraDetectorMap(this);
@@ -128,7 +118,6 @@ namespace Isis {
     new CameraGroundMap(this);
     new CameraSkyMap(this);
 
-    SetTime(et);
     LoadCache();
     NaifStatus::CheckErrors();
   }

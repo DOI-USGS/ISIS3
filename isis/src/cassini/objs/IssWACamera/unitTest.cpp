@@ -41,7 +41,7 @@ int main(void) {
 
   cout << "Unit Test for IssWACamera..." << endl;
   /*
-   * Sample/Line TestLineSamp points changed for the IssNACamera
+   * Sample/Line TestLineSamp points changed for the IssWACamera
    */
   try {
 

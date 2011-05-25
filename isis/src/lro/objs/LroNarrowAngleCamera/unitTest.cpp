@@ -26,6 +26,7 @@
 #include "iException.h"
 #include "Preference.h"
 #include "Pvl.h"
+#include "iTime.h"
 
 using namespace std;
 using namespace Isis;
@@ -35,16 +36,16 @@ void TestLineSamp(Camera *cam, double samp, double line);
 int main(void) {
   Preference::Preferences(true);
 
-
-  /** LRO NAC: The line,samp to lat,lon to line,samp tolerance was increased for this
-   *  camera model test.
-   *
+  /**
+   *  LRO NAC: The line,samp to lat,lon to line,samp tolerance was increased for
+   *    this camera model test. This test was re-written and should NOT be used
+   *    as a template for other camera model unit tests.
    */
-
   cout << "Unit Test for LroNarrowAngleCamera..." << endl;
   try {
     // Support different camera model versions thusly...
-    Pvl p("$lro/testData/M111607830RE_crop.cub");
+    //Pvl p("$lro/testData/M111607830RE_crop.cub");
+    Pvl p("./M111607830RE_crop.cub");
     int cmVersion = CameraFactory::CameraVersion(p);
 
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
@@ -60,11 +61,12 @@ int main(void) {
       p.Read("$lro/testData/M111607830RE_crop.cub.cv1");
     }
     else {
-      knownLat = -83.25981500725959;
-      knownLon = 353.9497987082822;
+      knownLat = -83.2598150072595899;
+      knownLon = 353.9497987082821737;
     }
 
     Camera *cam = CameraFactory::Create(p);
+    
     cout << "Filename: " << Filename(p.Filename()).Name() << endl;
     cout << "CK Frame: " << cam->InstrumentRotation()->Frame() << endl << endl;
     cout.setf(std::ios::fixed);
@@ -98,7 +100,7 @@ int main(void) {
       cout << "ERROR" << endl;
       return 0;
     }
-
+    
     if(abs(cam->UniversalLatitude() - knownLat) < 1E-10) {
       cout << "Latitude OK" << endl;
     }

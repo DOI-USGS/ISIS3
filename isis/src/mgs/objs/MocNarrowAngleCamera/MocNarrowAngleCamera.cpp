@@ -23,6 +23,7 @@
 #include "CameraFocalPlaneMap.h"
 #include "iException.h"
 #include "iString.h"
+#include "iTime.h"
 #include "LineScanCameraDetectorMap.h"
 #include "LineScanCameraGroundMap.h"
 #include "LineScanCameraSkyMap.h"
@@ -49,8 +50,7 @@ namespace Isis {
     // Get the start time from labels
     PvlGroup &inst = lab.FindGroup("Instrument", Pvl::Traverse);
     string stime = inst["SpacecraftClockCount"];
-    SpiceDouble etStart;
-    scs2e_c(NaifSpkCode(), stime.c_str(), &etStart);
+    double etStart = getClockTime(stime).Et();
 
     // Get other info from labels
     double csum = inst["CrosstrackSumming"];

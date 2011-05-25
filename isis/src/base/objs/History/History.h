@@ -45,7 +45,7 @@ namespace Isis {
       void AddEntry();
       void AddEntry(Isis::PvlObject &obj);
       Pvl ReturnHist();
-      void Read(Isis::Pvl &pvl, std::istream &is);
+      void Read(const Isis::Pvl &pvl, std::istream &is);
 
     protected:
       void WriteInit();

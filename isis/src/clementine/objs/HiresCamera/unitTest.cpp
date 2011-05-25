@@ -42,8 +42,8 @@ int main(void) {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
     // and "Longitude off by: " values directly into these variables.
-    double knownLat = -75.78744747708977;
-    double knownLon = 270.640944120971;
+    double knownLat = -75.7874376789158504;
+    double knownLon = 270.6409527241640944;
 
     Pvl p("$clementine1/testData/lhd0147b.200.lev1.cub");
     HiresCamera *cam = (HiresCamera *) CameraFactory::Create(p);

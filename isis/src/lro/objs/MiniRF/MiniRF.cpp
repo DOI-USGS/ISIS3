@@ -63,9 +63,7 @@ namespace Isis {
 
     // Get the start time from labels (the SpacecraftClockStartCount is set to
     // is set to UNK in the PDS labels, so StartTime is used instead)
-    string stime = inst["StartTime"];
-    SpiceDouble etStart;
-    str2et_c(stime.c_str(), &etStart);
+    SpiceDouble etStart = iTime((string)inst["StartTime"]).Et();
 
     // The line rate is in units of seconds in the PDS label. The exposure
     // is the sum of the burst and the delay for the return. The movement of the

@@ -76,8 +76,8 @@ namespace Isis {
     string odtxkey = "INS" + iString(naifIkCode) + "_OD_T_X";
     string odtykey = "INS" + iString(naifIkCode) + "_OD_T_Y";
     for(int i = 0; i < 10; ++i) {
-      p_odtx.push_back(Spice::GetDouble(odtxkey, i));
-      p_odty.push_back(Spice::GetDouble(odtykey, i));
+      p_odtx.push_back(p_camera->GetDouble(odtxkey, i));
+      p_odty.push_back(p_camera->GetDouble(odtykey, i));
     }
   }
 

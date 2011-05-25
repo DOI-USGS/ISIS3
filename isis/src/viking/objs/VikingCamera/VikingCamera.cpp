@@ -144,8 +144,7 @@ namespace Isis {
 
     // Get clock count and convert it to a time
     string spacecraftClock = inst["SpacecraftClockCount"];
-    double etClock;
-    scs2e_c(altinstcode, spacecraftClock.c_str(), &etClock);
+    double etClock = getClockTime(spacecraftClock, altinstcode).Et();
 
     // exposure duration keyword value is measured in seconds
     double exposureDuration = inst["ExposureDuration"];
