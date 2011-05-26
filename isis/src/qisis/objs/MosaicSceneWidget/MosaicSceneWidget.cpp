@@ -23,6 +23,7 @@
 #include "GraphicsView.h"
 #include "Latitude.h"
 #include "Longitude.h"
+#include "MosaicAreaTool.h"
 #include "MosaicControlNetTool.h"
 #include "MosaicFindTool.h"
 #include "MosaicGraphicsView.h"
@@ -76,6 +77,7 @@ namespace Isis {
     m_tools->append(new MosaicZoomTool(this));
     m_tools->append(new MosaicPanTool(this));
     m_tools->append(new MosaicControlNetTool(this));
+    m_tools->append(new MosaicAreaTool(this));
     m_tools->append(new MosaicFindTool(this));
     if(status)
       m_tools->append(new MosaicTrackTool(this, status));
