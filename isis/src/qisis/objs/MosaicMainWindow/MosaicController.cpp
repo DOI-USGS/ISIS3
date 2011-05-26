@@ -3,12 +3,15 @@
 #include <QAction>
 #include <QApplication>
 #include <QFileDialog>
+#include <QFuture>
+#include <QFutureWatcher>
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QMenu>
 #include <QMessageBox>
 #include <QProgressBar>
 #include <QSettings>
+#include <QtConcurrentMap>
 
 #include "ControlNet.h"
 #include "Cube.h"
@@ -33,6 +36,10 @@ namespace Isis {
    * @param parent
    */
   MosaicController::MosaicController(QStatusBar *status, QSettings &settings) {
+    m_mutex = new QMutex;
+    m_watcher = NULL;
+    m_projectPvl = NULL;
+
     p_progress = new ProgressBar;
     p_progress->setVisible(false);
 
@@ -134,6 +141,55 @@ namespace Isis {
   }
 
 
+  MosaicController::FilenameToDisplayFunctor::FilenameToDisplayFunctor(
+      QMutex *cameraMutex, QThread *targetThread) {
+    m_mutex = cameraMutex;
+    m_targetThread = targetThread;
+  }
+
+
+  CubeDisplayProperties *MosaicController::FilenameToDisplayFunctor::operator()(
+      const QString &filename) {
+    try {
+      CubeDisplayProperties *prop = new CubeDisplayProperties(
+          QString(Filename(filename.toStdString()).Expanded().c_str()),
+          m_mutex);
+      prop->moveToThread(m_targetThread);
+      return prop;
+    }
+    catch(iException &e) {
+      e.Report(false);
+      e.Clear();
+      return NULL;
+    }
+  }
+
+
+  MosaicController::ProjectToDisplayFunctor::ProjectToDisplayFunctor(
+      QMutex *cameraMutex, QThread *targetThread) {
+    m_mutex = cameraMutex;
+    m_targetThread = targetThread;
+  }
+
+
+  CubeDisplayProperties *MosaicController::ProjectToDisplayFunctor::operator()(
+      const PvlObject &projectCube) {
+    try {
+      CubeDisplayProperties *prop = new CubeDisplayProperties(
+          (QString)projectCube["Filename"][0],
+          m_mutex);
+      prop->fromPvl(projectCube);
+      prop->moveToThread(m_targetThread);
+      return prop;
+    }
+    catch(iException &e) {
+      e.Report(false);
+      e.Clear();
+      return NULL;
+    }
+  }
+
+
   /**
    * Handle opening cubes by filename. This class constructs and owns the
    *   actual Cube objects.
@@ -152,46 +208,74 @@ namespace Isis {
           QMessageBox::Yes);
     }
 
-    if(loadUnfilled != QMessageBox::Cancel) {
-      p_progress->setText("Opening cubes");
-      p_progress->setRange(0, cubeNames.size() - 1);
-      p_progress->setValue(0);
-      p_progress->setVisible(true);
-
-      for(int cubePos = 0; cubePos < cubeNames.size(); cubePos ++) {
-        p_progress->setValue(cubePos);
-
-        QString cubeName = cubeNames[cubePos];
-        try {
-          if(cubeName != "") {
-            CubeDisplayProperties *cubeDisplay = new CubeDisplayProperties(
-                QString(Filename(cubeName.toStdString()).Expanded().c_str()));
-
-            if(loadUnfilled == QMessageBox::Yes)
-              cubeDisplay->setShowFill(false);
-
-            p_unannouncedCubes.append(cubeDisplay);
-            p_cubes.append(cubeDisplay);
-
-            connect(cubeDisplay, SIGNAL(destroyed(QObject *)),
-                    this, SLOT(cubeClosed(QObject *)));
-
-            flushCubes();
-          }
-        }
-        catch(iException &e) {
-          e.Report(false);
-          e.Clear();
-        }
+    if(loadUnfilled != QMessageBox::Cancel && cubeNames.size()) {
+      if(m_watcher) {
+        m_watcher->waitForFinished();
+        delete m_watcher;
+        m_watcher = NULL;
       }
 
-      flushCubes(true);
+      p_progress->setText("Opening cubes");
 
-      p_progress->setVisible(false);
+      QFuture< CubeDisplayProperties * > displays = QtConcurrent::mapped(
+          cubeNames,
+          FilenameToDisplayFunctor(m_mutex, QThread::currentThread()));
+
+      m_watcher = new QFutureWatcher< CubeDisplayProperties * >;
+      m_watcher->setPendingResultsLimit(50);
+      connect(m_watcher, SIGNAL(resultReadyAt(int)),
+              this, SLOT(cubeDisplayReady(int)));
+      connect(m_watcher, SIGNAL(finished()),
+              this, SLOT(loadFinished()));
+      connect(m_watcher, SIGNAL(progressValueChanged(int)),
+              this, SLOT(updateProgress(int)));
+      m_watcher->setFuture(displays);
+      p_progress->setRange(m_watcher->progressMinimum(),
+          m_watcher->progressMaximum());
+      p_progress->setValue(0);
+      p_progress->setVisible(true);
+    }
+  }
+
+
+  void MosaicController::cubeDisplayReady(int index) {
+    static int i = 0;
+    i++;
+    if(m_watcher) {
+      CubeDisplayProperties *cubeDisplay = m_watcher->resultAt(index);
+
+      if(cubeDisplay) {
+        p_unannouncedCubes.append(cubeDisplay);
+        p_cubes.append(cubeDisplay);
+        connect(cubeDisplay, SIGNAL(destroyed(QObject *)),
+                this, SLOT(cubeClosed(QObject *)));
+
+        flushCubes();
+      }
     }
 
-//     if(p_cubes.empty())
-//       emit allCubesClosed();
+    i --;
+  }
+
+  void MosaicController::loadFinished() {
+    flushCubes(true);
+
+    if(m_projectPvl && m_projectPvl->HasObject("MosaicFileList"))
+      p_fileList->fromPvl(m_projectPvl->FindObject("MosaicFileList"));
+
+    if(m_projectPvl && m_projectPvl->HasObject("MosaicScene"))
+      p_scene->fromPvl(m_projectPvl->FindObject("MosaicScene"));
+
+    if(m_projectPvl) {
+      delete m_projectPvl;
+      m_projectPvl = NULL;
+    }
+
+    p_progress->setVisible(false);
+  }
+
+  void MosaicController::updateProgress(int newVal) {
+    p_progress->setValue(newVal);
   }
 
 
@@ -213,38 +297,35 @@ namespace Isis {
 
   void MosaicController::readProject(QString filename) {
     try {
-      Pvl projFile(filename.toStdString());
-      PvlObject cubes(projFile.FindObject("Cubes"));
-
-      p_progress->setText("Opening cubes");
-      p_progress->setRange(0, cubes.Objects() - 1);
-      p_progress->setValue(0);
-      p_progress->setVisible(true);
-
-      for(int cubePos = 0; cubePos < cubes.Objects(); cubePos ++) {
-        try {
-          p_progress->setValue(cubePos);
-          CubeDisplayProperties *cubeDisplay = new CubeDisplayProperties(
-              cubes.Object(cubePos));
-
-          p_unannouncedCubes.append(cubeDisplay);
-          p_cubes.append(cubeDisplay);
-
-          connect(cubeDisplay, SIGNAL(destroyed(QObject *)),
-                  this, SLOT(cubeClosed(QObject *)));
-
-          flushCubes();
-        }
-        catch(iException &e) {
-          e.Report(false);
-          e.Clear();
-        }
+      if(m_watcher) {
+        m_watcher->waitForFinished();
+        delete m_watcher;
+        m_watcher = NULL;
       }
 
-      flushCubes(true);
+      m_projectPvl = new Pvl(filename.toStdString());
+      PvlObject &cubes(m_projectPvl->FindObject("Cubes"));
 
-      p_fileList->fromPvl(projFile.FindObject("MosaicFileList"));
-      p_scene->fromPvl(projFile.FindObject("MosaicScene"));
+      p_progress->setText("Opening cubes");
+
+      QFuture< CubeDisplayProperties * > displays = QtConcurrent::mapped(
+          cubes.BeginObject(), cubes.EndObject(),
+          ProjectToDisplayFunctor(m_mutex, QThread::currentThread()));
+
+      m_watcher = new QFutureWatcher< CubeDisplayProperties * >;
+      // The max open cubes is PendingResults + flush count = 1050 currently
+      m_watcher->setPendingResultsLimit(50);
+      connect(m_watcher, SIGNAL(resultReadyAt(int)),
+              this, SLOT(cubeDisplayReady(int)));
+      connect(m_watcher, SIGNAL(finished()),
+              this, SLOT(loadFinished()));
+      connect(m_watcher, SIGNAL(progressValueChanged(int)),
+              this, SLOT(updateProgress(int)));
+      m_watcher->setFuture(displays);
+      p_progress->setRange(m_watcher->progressMinimum(),
+          m_watcher->progressMaximum());
+      p_progress->setValue(0);
+      p_progress->setVisible(true);
     }
     catch(iException &e) {
       p_progress->setVisible(false);
@@ -279,6 +360,10 @@ namespace Isis {
     //   the OS stops letting us open more files. Throttle at 1k.
     if(force || p_unannouncedCubes.size() >= 1000) {
       if(p_unannouncedCubes.size() > 0) {
+
+        // Assume cameras are being used in other parts of code since it's
+        //   unknown
+        QMutexLocker lock(m_mutex);
         emit cubesAdded(p_unannouncedCubes);
 
         CubeDisplayProperties *openCube;

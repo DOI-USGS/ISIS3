@@ -3,8 +3,10 @@
 
 #include <QObject>
 
+template <typename A> class QFutureWatcher;
 template <typename A> class QList;
 class QMenu;
+class QMutex;
 class QProgressBar;
 class QSettings;
 class QStatusBar;
@@ -12,12 +14,16 @@ class QStatusBar;
 // This is required since we have a slot with a QStringList
 #include <QStringList>
 
+// This is the parent of the inner class
+#include <functional>
+
 namespace Isis {
   class ControlNet;
   class CubeDisplayProperties;
   class MosaicFileListWidget;
   class MosaicSceneWidget;
   class ProgressBar;
+  class PvlObject;
 
   /**
    * @brief
@@ -70,23 +76,57 @@ namespace Isis {
       void saveProject(QString filename);
       void readProject(QString filename);
       void openCubes(QStringList filenames);
+      void cubeDisplayReady(int);
 
     private slots:
       void cubeClosed(QObject * cubeDisplay);
-
-    private slots:
-      void saveList();
       void exportView();
+      void loadFinished();
+      void saveList();
+      void updateProgress(int);
+
+    private:
+      void flushCubes(bool force = false);
 
     private:
       QList<CubeDisplayProperties *> p_cubes;
       QList<CubeDisplayProperties *> p_unannouncedCubes;
 
-      void flushCubes(bool force = false);
       MosaicFileListWidget *p_fileList;
       MosaicSceneWidget *p_scene;
       MosaicSceneWidget *p_scene2;
       ProgressBar *p_progress;
+      PvlObject *m_projectPvl;
+
+      // Cameras are not re-entrant and so this mutex will make sure they
+      //   aren't overly abused
+      QMutex *m_mutex;
+
+      QFutureWatcher< CubeDisplayProperties * > * m_watcher;
+
+      class FilenameToDisplayFunctor : public std::unary_function<
+          const QString &, CubeDisplayProperties *> {
+
+        public:
+          FilenameToDisplayFunctor(QMutex *cameraMutex, QThread *targetThread);
+          CubeDisplayProperties *operator()(const QString &);
+
+        private:
+          QMutex *m_mutex;
+          QThread *m_targetThread;
+      };
+
+      class ProjectToDisplayFunctor : public std::unary_function<
+          const PvlObject &, CubeDisplayProperties *> {
+
+        public:
+          ProjectToDisplayFunctor(QMutex *cameraMutex, QThread *targetThread);
+          CubeDisplayProperties *operator()(const PvlObject &);
+
+        private:
+          QMutex *m_mutex;
+          QThread *m_targetThread;
+      };
   };
 };
 
