@@ -236,7 +236,7 @@ namespace Isis {
     areaLabel->setToolTip("This is the width and the height of the box");
 
     // Create the action buttons
-    QPushButton *okButton = new QPushButton("Go to Box");
+    QPushButton *okButton = new QPushButton("Update Box");
     connect(okButton, SIGNAL(clicked()), this, SLOT(userChangedBox()));
 
     QPushButton *clearButton = new QPushButton("Clear Box");
