@@ -313,7 +313,7 @@ namespace Isis {
           ProjectToDisplayFunctor(m_mutex, QThread::currentThread()));
 
       m_watcher = new QFutureWatcher< CubeDisplayProperties * >;
-      // The max open cubes is PendingResults + flush count = 1050 currently
+      // The max open cubes is PendingResults + flush count ~= 550 currently
       m_watcher->setPendingResultsLimit(50);
       connect(m_watcher, SIGNAL(resultReadyAt(int)),
               this, SLOT(cubeDisplayReady(int)));
@@ -358,7 +358,7 @@ namespace Isis {
   void MosaicController::flushCubes(bool force) {
     // We really can't have all of the cubes in memory before
     //   the OS stops letting us open more files. Throttle at 1k.
-    if(force || p_unannouncedCubes.size() >= 1000) {
+    if(force || p_unannouncedCubes.size() >= 500) {
       if(p_unannouncedCubes.size() > 0) {
 
         // Assume cameras are being used in other parts of code since it's
