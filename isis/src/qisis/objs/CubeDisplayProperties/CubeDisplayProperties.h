@@ -11,6 +11,7 @@
 
 class QAction;
 class QBitArray;
+class QMutex;
 
 namespace geos {
   namespace geom {
@@ -82,9 +83,11 @@ namespace Isis {
       };
 
 
-      CubeDisplayProperties(QString filename, QObject *parent = NULL);
-      CubeDisplayProperties(const PvlObject &pvl, QObject *parent = NULL);
+      CubeDisplayProperties(QString filename, QMutex *cameraMutex,
+          QObject *parent = NULL);
       virtual ~CubeDisplayProperties();
+
+      void fromPvl(const PvlObject &pvl);
 
       void addSupport(Property prop);
       static bool allSupport(Property prop, QList<CubeDisplayProperties *>);
@@ -116,7 +119,7 @@ namespace Isis {
         return m_resolution;
       }
 
-      geos::geom::MultiPolygon *footprint();
+      geos::geom::MultiPolygon *footprint(QMutex *lock = NULL);
 
       PvlObject toPvl() const;
 
@@ -174,7 +177,7 @@ namespace Isis {
       void setValue(Property prop, QVariant value);
       static QList<Isis::CubeDisplayProperties *> senderToData(QObject *sender);
 
-      void createManualFootprint();
+      void createManualFootprint(QMutex *cameraMutex);
 
       /**
        * This indicated whether any widgets with this CubeDisplayProperties

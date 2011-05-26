@@ -5,6 +5,7 @@
 #include <QBuffer>
 #include <QColorDialog>
 #include <QInputDialog>
+#include <QMutexLocker>
 
 #include "Cube.h"
 #include "Filename.h"
@@ -27,7 +28,7 @@ namespace Isis {
    * @param parent Qt parent object (this is destroyed when parent is destroyed)
    */
   CubeDisplayProperties::CubeDisplayProperties(QString filename,
-      QObject *parent) : QObject(parent) {
+      QMutex *cameraMutex, QObject *parent) : QObject(parent) {
     m_propertyUsed = new QBitArray;
     m_propertyValues = new QMap<int, QVariant>;
 
@@ -48,111 +49,12 @@ namespace Isis {
     m_footprint = NULL;
 
     cube();
-    footprint();
+    footprint(cameraMutex);
 
     m_incidenceAngle = Null;
     m_resolution = Null;
     m_emissionAngle = Null;
 
-    try {
-      Table table("CameraStatistics", m_filename.toStdString());
-      //Table table("CameraStatistics", m_filename.Name());
-      for (int i = 0; i < table.Records(); i++) {
-        for (int j = 0; j < table[i].Fields(); j++) {
-          QString label;
-
-          if (table[i][j].IsText()) {
-            label = QString::fromStdString((std::string)table[i][j]);
-            label.truncate(10);
-          }
-
-          // Get the average resolution for this mosaic item.
-          if (table[i][j].IsText() && label.compare("Resolution") == 0) {
-            if (j + 3 < table[i].Fields()) {
-              if (table[i][j+3].IsInteger()) {
-              }
-              else if (table[i][j+3].IsDouble()) {
-                m_resolution = (double)table[i][j+3];
-              }
-              else if (table[i][j+3].IsText()) {
-              }
-            }
-          }
-
-          // Get the average emission angle for this mosaic item.
-          if (table[i][j].IsText() && label.compare("EmissionAn") == 0) {
-            if (j + 3 < table[i].Fields()) {
-              if (table[i][j+3].IsInteger()) {
-              }
-              else if (table[i][j+3].IsDouble()) {
-                m_emissionAngle = (double)table[i][j+3];
-              }
-              else if (table[i][j+3].IsText()) {
-              }
-            }
-          }
-
-          // Get the average incidence angle for this mosaic item.
-          if (table[i][j].IsText() && label.compare("IncidenceA") == 0) {
-            if (j + 3 < table[i].Fields()) {
-              if (table[i][j+3].IsInteger()) {
-              }
-              else if (table[i][j+3].IsDouble()) {
-                m_incidenceAngle = (double)table[i][j+3];
-              }
-              else if (table[i][j+3].IsText()) {
-              }
-            }
-          }
-
-        } // end for table[i].Fields
-      } // end for table.Records
-    }
-    catch(iException &e) {
-      e.Clear();
-
-      iException::Message(iException::Io,
-          "Please run camstats with the attach option. "
-          "Camera statistics will be unavailable for [" +
-              m_filename.toStdString() + "]", _FILEINFO_);
-      e.Report();
-
-      e.Clear();
-    }
-  }
-
-
-  /**
-   * CubeDisplayProperties constructor. This loads values from the Pvl and
-   *   constructs the Cube *.
-   *
-   *
-   * @param pvl Object created from the "toPvl" method.
-   * @param parent Qt parent object (this is destroyed when parent is destroyed)
-   */
-  CubeDisplayProperties::CubeDisplayProperties(const PvlObject &pvl,
-      QObject *parent) : QObject(parent) {
-    m_propertyUsed = new QBitArray;
-    m_propertyValues = new QMap<int, QVariant>;
-
-    m_cube = NULL;
-    m_gMap = NULL;
-    m_footprint = NULL;
-
-    m_filename = QString(pvl["Filename"][0]);
-
-    QByteArray hexValues(pvl["Values"][0].c_str());
-    QDataStream valuesStream(QByteArray::fromHex(hexValues));
-    valuesStream >> *m_propertyValues;
-
-    cube();
-    footprint();
-
-    m_incidenceAngle = Null;
-    m_resolution = Null;
-    m_emissionAngle = Null;
-
-    // This needs moved to its own method!
     try {
       Table table("CameraStatistics", m_filename.toStdString());
       //Table table("CameraStatistics", m_filename.Name());
@@ -232,6 +134,13 @@ namespace Isis {
       delete m_gMap;
       m_gMap = NULL;
     }
+  }
+
+
+  void CubeDisplayProperties::fromPvl(const PvlObject &pvl) {
+    QByteArray hexValues(pvl["Values"][0].c_str());
+    QDataStream valuesStream(QByteArray::fromHex(hexValues));
+    valuesStream >> *m_propertyValues;
   }
 
 
@@ -349,7 +258,7 @@ namespace Isis {
    * Cleans up the Cube *. You want to call this once you're sure you are done
    *   with the Cube because the OS will limit how many of these we have open.
    */
-  geos::geom::MultiPolygon *CubeDisplayProperties::footprint() {
+  geos::geom::MultiPolygon *CubeDisplayProperties::footprint(QMutex *lock) {
     if(!m_footprint) {
       try {
         ImagePolygon poly;
@@ -360,7 +269,7 @@ namespace Isis {
         e.Clear();
 
         try {
-          createManualFootprint();
+          createManualFootprint(lock);
         }
         catch(iException &e) {
           iString msg = "Could not read the footprint from cube [" +
@@ -782,7 +691,9 @@ namespace Isis {
   }
 
 
-  void CubeDisplayProperties::createManualFootprint() {
+  void CubeDisplayProperties::createManualFootprint(QMutex *cameraMutex) {
+    QMutexLocker lock(cameraMutex);
+
     // We need to walk the polygon...
     ImagePolygon imgPoly;
 
