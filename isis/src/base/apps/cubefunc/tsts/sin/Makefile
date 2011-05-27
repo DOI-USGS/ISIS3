@@ -10,7 +10,8 @@ commands:
 	sinc=1 \
 	nlines=13  \
 	line=1 \
-	linc=1  > /dev/null;
+	linc=1  > /dev/null; \
 	$(APPNAME) from=$(OUTPUT)/tempCrop.cub \
 	  to=$(OUTPUT)/cubefuncTruth2.cub \
-	  function=sin > /dev/null;
+	  function=sin > /dev/null; \
+	$(RM) $(OUTPUT)/tempCrop.cub;
