@@ -180,6 +180,12 @@ namespace Isis {
    *                                         quicker. Text kernels are no longer
    *                                         furnished when their data has been
    *                                         stored in the labels.
+   *   @history 2011-05-26 Debbie A. Cook -  Put back the code for spkwriter that 
+   *                                         was checked in May 25 but disappeared
+   *                                         in the May 26 build.  This code turns
+   *                                         aberration corrections off for the
+   *                                         instrument position if the spk file
+   *                                         was created by spkwriter.
    */
   class Spice {
     public:
