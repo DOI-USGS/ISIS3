@@ -14,7 +14,9 @@
 using namespace std;
 using namespace Isis;
 
-ControlPoint *MergePoints(ControlPoint *, ControlPoint *, bool, bool &);
+ControlPoint * MergePoints(ControlPoint *point1, ControlPoint *point2,
+    bool allowMeasureOverride, bool allowReferenceOverride,
+    bool &mergeHasConflicts);
 
 // Main program
 void IsisMain() {
@@ -32,9 +34,11 @@ void IsisMain() {
 
   bool allowPointOverride = false;
   bool allowMeasureOverride = false;
+  bool allowReferenceOverride = false;
   if (ui.GetString("DUPLICATEPOINTS") == "MERGE") {
     allowPointOverride = ui.GetBoolean("OVERWRITEPOINTS");
     allowMeasureOverride = ui.GetBoolean("OVERWRITEMEASURES");
+    allowReferenceOverride  = ui.GetBoolean("OVERWRITEREFERENCE");
   }
 
   // Creates a Progress
@@ -142,6 +146,7 @@ void IsisMain() {
           mergedPoint = MergePoints(sourcePoint,
               dupPoint,
               allowMeasureOverride,
+              allowReferenceOverride,
               mergeHasConflicts);
 
           if (report && mergeHasConflicts) {
@@ -166,7 +171,8 @@ void IsisMain() {
 
 
 ControlPoint *MergePoints(ControlPoint *point1, ControlPoint *point2,
-    bool allowReferenceOverride, bool &mergeHasConflicts) {
+    bool allowMeasureOverride, bool allowReferenceOverride,
+    bool &mergeHasConflicts) {
   ControlPoint *merger = point1; // Merging from this one
   ControlPoint *mergee = new ControlPoint(*point2); // to this one
   mergeHasConflicts = false;
@@ -187,7 +193,7 @@ ControlPoint *MergePoints(ControlPoint *point1, ControlPoint *point2,
         // If we have a ground truth in our merger then try to propagate it to
         //   the mergee.
         if (merger->GetType() == ControlPoint::Ground) {
-          if (!allowReferenceOverride) {
+          if (!allowMeasureOverride) {
             // Allow reference override refers to the merger's reference, not
             //   the mergee's reference. If we can't change the reference then
             //   keep the merger's reference status.

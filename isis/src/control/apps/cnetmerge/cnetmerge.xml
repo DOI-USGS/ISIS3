@@ -62,6 +62,10 @@
     <change name="Steven Lambright" date="2011-04-11">
       Updated parameter names
     </change>
+    <change name="Travis Addair" date="2011-05-26">
+      Separated reference resolution control out of OVERWRITEMEASURES and into
+      new parameter OVERWRITEREFERENCE.
+    </change>
   </history> 
   
   <category>
@@ -257,6 +261,24 @@
           parameter is TRUE. If this parameter is FALSE and a reference measure
           change is found, the change will be noted in the LOG file, but
           will not be merged in the final output.
+        </description>
+      </parameter>
+
+      <parameter name="OVERWRITEREFERENCE">
+        <type>boolean</type>
+        <default><item>False</item></default>
+        <brief>Replace reference measures in base as networks are added</brief>
+        <description>
+          When this parameter is true, if a Control Point in the current
+          "base" network and the current network being added to it have
+          different reference measures, there is ambiguity about which measure
+          should be defined as the one and only "reference measure" in the
+          output Control Network.  When this parameter is set to TRUE, the
+          reference measure in the network being added will overwrite the
+          existing reference status of the reference measure in the base
+          network.  If FALSE, the base reference will be retained.  In both
+          cases, both measures make it into the final network, but only one
+          will be listed as the reference for that point.
         </description>
       </parameter>
 
