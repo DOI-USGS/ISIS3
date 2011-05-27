@@ -419,7 +419,7 @@ namespace Isis {
    *
    */
   void MosaicMainWindow::loadProject() {
-    if(!p_mosaicController) {
+    if(!m_controllerVisible) {
       QString fn =  QFileDialog::getOpenFileName(this, "Load Project",
                     QDir::currentPath(),
                     "Mosaic (*.mos)");
@@ -429,8 +429,8 @@ namespace Isis {
 
 
   void MosaicMainWindow::loadProject(QString fn) {
-    if(!p_mosaicController && !fn.isEmpty()) {
-      createController();
+    if(!fn.isEmpty()) {
+      displayController();
 
       if(p_mosaicController)
         p_mosaicController->readProject(fn);
