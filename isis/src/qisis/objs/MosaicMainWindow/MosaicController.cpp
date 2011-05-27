@@ -419,6 +419,12 @@ namespace Isis {
 
       p_progress->setText("Opening cubes");
 
+      if(m_maxThreads > 1)
+        QThreadPool::globalInstance()->setMaxThreadCount(m_maxThreads - 1);
+      else
+        QThreadPool::globalInstance()->setMaxThreadCount(
+            QThread::idealThreadCount());
+
       QFuture< CubeDisplayProperties * > displays = QtConcurrent::mapped(
           cubes.BeginObject(), cubes.EndObject(),
           ProjectToDisplayFunctor(m_mutex, QThread::currentThread()));
