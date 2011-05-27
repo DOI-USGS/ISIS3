@@ -463,6 +463,7 @@ namespace Isis {
       }
 
       m_cubeDisplay->setSelected(selected);
+      updateSelection(false);
     }
     else if(m_cubeDisplay) {
       bool selected =
