@@ -10,6 +10,7 @@
 #include <QLabel>
 #include <QMargins>
 #include <QRadioButton>
+#include <QReadWriteLock>
 #include <QSpinBox>
 
 
@@ -21,6 +22,8 @@ namespace Isis
   AbstractFilter::AbstractFilter(int minimumForImageSuccess) :
       minForImageSuccess(minimumForImageSuccess)
   {
+    lock = NULL;
+    lock = new QReadWriteLock;
   }
 
 

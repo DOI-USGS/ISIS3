@@ -2,7 +2,10 @@
 
 #include "SerialModel.h"
 
+#include <iostream>
+
 #include <QFuture>
+#include <QFutureWatcher>
 #include <QList>
 #include <QModelIndex>
 #include <QString>
@@ -19,12 +22,19 @@
 #include "SerialParentItem.h"
 
 
+using std::cerr;
+
+
 namespace Isis
 {
   SerialModel::SerialModel(ControlNet * controlNet, QString name,
       QTreeView * tv, QObject * parent) : TreeModel(controlNet, name, tv,
             parent)
   {
+    watcher = new QFutureWatcher< QAtomicPointer< RootItem > >;
+    connect(watcher, SIGNAL(finished()),
+            this, SLOT(rebuildItemsDone()));
+
     rebuildItems();
   }
 
@@ -34,13 +44,9 @@ namespace Isis
   }
 
 
-  bool SerialModel::CreateRootItemFunctor::rootInstantiated = false;
-  
-  
   SerialModel::CreateRootItemFunctor::CreateRootItemFunctor(
       FilterWidget * fw) : filter(fw)
   {
-    rootInstantiated = false;
   }
   
   
@@ -49,7 +55,7 @@ namespace Isis
   {
     SerialParentItem * serialItem = NULL;
 
-    if (!filter || filter->evaluate(node))
+    if (true || !filter || filter->evaluate(node))
     {
       serialItem = new SerialParentItem(node);
       QList< ControlMeasure * > measures = node->getMeasures();
@@ -57,7 +63,7 @@ namespace Isis
       {
         ControlPoint * point = measures[j]->Parent();
         ASSERT(measure);
-        if (!filter || filter->evaluate(point))
+        if (true || !filter || filter->evaluate(point))
         {
           PointLeafItem * pointItem = new PointLeafItem(
               point, serialItem);
@@ -70,14 +76,11 @@ namespace Isis
   }
   
   
-  void SerialModel::CreateRootItemFunctor::addToRootItem(RootItem *& root,
-      SerialParentItem * const & item)
+  void SerialModel::CreateRootItemFunctor::addToRootItem(
+      QAtomicPointer< RootItem > & root, SerialParentItem * const & item)
   {
-    if (!rootInstantiated)
-    {
+    if (!root)
       root = new RootItem;
-      rootInstantiated = true;
-    }
     
     if (item)
       root->addChild(item);
@@ -86,16 +89,36 @@ namespace Isis
 
   void SerialModel::rebuildItems()
   {
-    clear();
+    QFuture< QAtomicPointer< RootItem > > futureRoot;
+    if (watcher->isStarted())
+    {
+      futureRoot = watcher->future();
+      futureRoot.cancel();
+//       futureRoot.waitForFinished();
+//       if (futureRoot.result())
+//         delete futureRoot.result();
+    }
     
-    QFuture< RootItem * > futureRoot = QtConcurrent::mappedReduced(
-        cNet->GetCubeGraphNodes(), CreateRootItemFunctor(filter),
+    futureRoot = QtConcurrent::mappedReduced(cNet->GetCubeGraphNodes(),
+        CreateRootItemFunctor(filter),
         &CreateRootItemFunctor::addToRootItem,
         QtConcurrent::OrderedReduce | QtConcurrent::SequentialReduce);
-        
-    RootItem * newRoot = futureRoot;
     
-    if (newRoot->childCount())
+    watcher->setFuture(futureRoot);
+  }
+  
+  
+  void SerialModel::rebuildItemsDone()
+  {
+    if (watcher->isCanceled())
+      return;
+   
+//     saveViewState();
+    
+    clear();
+    QAtomicPointer< RootItem > newRoot = watcher->future();
+
+    if (newRoot && newRoot->childCount())
     {
       beginInsertRows(QModelIndex(), 0, newRoot->childCount() - 1);
       ASSERT(rootItem);
@@ -106,9 +129,13 @@ namespace Isis
     }
     else
     {
-      ASSERT(newRoot);
-      delete newRoot;
-      newRoot = NULL;
+      if (newRoot)
+      {
+        delete newRoot;
+        newRoot = NULL;
+      }
     }
+
+//     loadViewState();
   }
 }

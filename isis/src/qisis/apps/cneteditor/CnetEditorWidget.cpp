@@ -567,19 +567,19 @@ namespace Isis
     updatingSelection = true;
 
 //     cerr << "CnetEditorWidget::rebuildModels one\n";
-    pointModel->saveViewState();
+//     pointModel->saveViewState();
     pointModel->rebuildItems();
-    pointModel->loadViewState();
+//     pointModel->loadViewState();
 
 //     cerr << "CnetEditorWidget::rebuildModels two\n";
-    serialModel->saveViewState();
-    serialModel->rebuildItems();
-    serialModel->loadViewState();
+//     serialModel->saveViewState();
+//     serialModel->rebuildItems();
+//     serialModel->loadViewState();
 
 //     cerr << "CnetEditorWidget::rebuildModels three\n";
-    connectionModel->saveViewState();
-    connectionModel->rebuildItems();
-    connectionModel->loadViewState();
+//     connectionModel->saveViewState();
+//     connectionModel->rebuildItems();
+//     connectionModel->loadViewState();
 
     updatingSelection = false;
 //     cerr << "CnetEditorWidget::rebuildModels done\n";

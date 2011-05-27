@@ -1,9 +1,14 @@
 #ifndef SerialModel_H
 #define SerialModel_H
 
+// parent
 #include "TreeModel.h"
 
+// parent of inner class
+#include <functional>
 
+
+template <typename A> class QFutureWatcher;
 class QString;
 class QTreeView;
 
@@ -29,20 +34,28 @@ namespace Isis
       // the compiler!
       void rebuildItems();
       
+      
+    private slots:
+      void rebuildItemsDone();
+      
+      
+    private:
+      QFutureWatcher< QAtomicPointer< RootItem > > * watcher;
+      
+      
     private:
       class CreateRootItemFunctor : public std::unary_function<
           ControlCubeGraphNode * const &, SerialParentItem * >
-
       {
         public:
           CreateRootItemFunctor(FilterWidget * fw);
           SerialParentItem * operator()(ControlCubeGraphNode * const &) const;
           
-          static void addToRootItem(RootItem *&, SerialParentItem * const &);
+          static void addToRootItem(QAtomicPointer< RootItem > &,
+              SerialParentItem * const &);
           
         private:
           FilterWidget * filter;
-          static bool rootInstantiated;
       };
   };
 }

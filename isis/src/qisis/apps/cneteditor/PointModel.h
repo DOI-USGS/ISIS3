@@ -5,9 +5,11 @@
 // parent
 #include "TreeModel.h"
 
-// ummm, yeah
+// parent of inner class
 #include <functional>
 
+
+template <typename A> class QFutureWatcher;
 class QString;
 class QTreeView;
 
@@ -35,20 +37,27 @@ namespace Isis
       void rebuildItems();
       
       
+    private slots:
+      void rebuildItemsDone();
+      
+      
+    private:
+      QFutureWatcher< QAtomicPointer< RootItem > > * watcher;
+      
+      
     private:
       class CreateRootItemFunctor : public std::unary_function<
           ControlPoint * const &, PointParentItem * >
-
       {
         public:
           CreateRootItemFunctor(FilterWidget * fw);
           PointParentItem * operator()(ControlPoint * const &) const;
           
-          static void addToRootItem(RootItem *&, PointParentItem * const &);
+          static void addToRootItem(QAtomicPointer< RootItem > &,
+              PointParentItem * const &);
           
         private:
           FilterWidget * filter;
-          static bool rootInstantiated;
       };
   };
 }

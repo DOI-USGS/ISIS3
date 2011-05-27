@@ -6,6 +6,7 @@
 
 class QButtonGroup;
 class QHBoxLayout;
+class QReadWriteLock;
 
 
 namespace Isis
@@ -55,6 +56,8 @@ namespace Isis
     protected:
       QHBoxLayout * mainLayout;
       int minForImageSuccess;
+      
+      QReadWriteLock * lock;
 
 
     private:

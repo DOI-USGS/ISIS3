@@ -46,7 +46,7 @@ namespace Isis
       void loadViewState();
       
       
-    public slots:
+    public:
       virtual void rebuildItems() = 0;
 
 

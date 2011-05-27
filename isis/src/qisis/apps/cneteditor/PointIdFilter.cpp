@@ -6,6 +6,8 @@
 
 #include <QHBoxLayout>
 #include <QLineEdit>
+#include <QReadLocker>
+#include <QWriteLocker>
 
 #include "ControlCubeGraphNode.h"
 #include "ControlMeasure.h"
@@ -21,12 +23,18 @@ namespace Isis
       AbstractFilter(minimumForImageSuccess)
   {
     nullify();
+    lineEditText = new QString;
     createWidget();
   }
 
 
   PointIdFilter::~PointIdFilter()
   {
+    if (lineEditText)
+    {
+      delete lineEditText;
+      lineEditText = NULL;
+    }
   }
 
 
@@ -35,6 +43,7 @@ namespace Isis
     AbstractFilter::nullify();
 
     lineEdit = NULL;
+    lineEditText = NULL;
   }
 
 
@@ -44,6 +53,8 @@ namespace Isis
 
     lineEdit = new QLineEdit;
     lineEdit->setMinimumWidth(200);
+    connect(lineEdit, SIGNAL(textChanged(QString)),
+        this, SLOT(updateLineEditText(QString)));
     connect(lineEdit, SIGNAL(textChanged(QString)),
         this, SIGNAL(filterChanged()));
     mainLayout->addWidget(lineEdit);
@@ -72,11 +83,16 @@ namespace Isis
   {
     bool evaluation = true;
     
-    QString lineEditText = lineEdit->text();
-    if (lineEditText.size() >= 1)
+    
+    QReadLocker locker(lock);
+    QString text = *lineEditText;
+    locker.unlock();
+    
+    
+    if (text.size() >= 1)
     {
       bool match = ((QString) point->GetId()).contains(
-          lineEditText, Qt::CaseInsensitive);
+          text, Qt::CaseInsensitive);
       evaluation = !(inclusive() ^ match);
       
       //  inclusive() | match | evaluation
@@ -131,13 +147,23 @@ namespace Isis
     QString description = "have ID's ";
     
     if (inclusive())
-      description += "containing ";
+      description += "containing \"";
     else
-      description += "that don't contain ";
+      description += "that don't contain \"";
     
-    ASSERT(lineEdit);
-    description += "\"" + lineEdit->text() + "\"";
+    QReadLocker locker(lock);
+    description += *lineEditText;
+    locker.unlock();
+    
+    description += "\"";
     
     return description;
+  }
+  
+  
+  void PointIdFilter::updateLineEditText(QString newText)
+  {
+    QWriteLocker locker(lock);
+    *lineEditText = newText;
   }
 }

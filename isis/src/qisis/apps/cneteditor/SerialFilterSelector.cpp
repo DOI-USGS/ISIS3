@@ -10,6 +10,7 @@
 #include <QPushButton>
 
 #include "AbstractFilter.h"
+#include "PointIdFilter.h"
 
 
 using std::cerr;
@@ -38,22 +39,19 @@ namespace Isis
 
   void SerialFilterSelector::changeFilter(int index)
   {
-    AbstractFilterSelector::changeFilter(index);
-    
-    if (index != 0)
-    {
+//     AbstractFilterSelector::changeFilter(index);
+//     
+//     if (index != 0)
+//     {
 //       switch (index)
 //       {
 //         case 1:
-//           filter = new PointIdFilter;
-//           break;
-//         case 2:
-//           filter = new PointIdFilter;
+//           filter = new PointIdFilter(1);
 //           break;
 //       }
 //       
 //       connect(filter, SIGNAL(filterChanged()), this, SIGNAL(filterChanged()));
 //       mainLayout->insertWidget(2, filter);
-    }
+//     }
   }
 }

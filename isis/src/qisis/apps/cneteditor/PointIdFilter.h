@@ -5,6 +5,7 @@
 
 
 class QLineEdit;
+class QMutex;
 class QString;
 
 
@@ -34,10 +35,16 @@ namespace Isis
     protected:
       void nullify();
       void createWidget();
+      
+      
+    private slots:
+      void updateLineEditText(QString);
 
 
     private:
       QLineEdit * lineEdit;
+      QString * lineEditText;
+      QMutex * mutex;
   };
 }
 
