@@ -40,6 +40,7 @@ namespace Isis {
       void deleteSelectedGroups();
       void onItemChanged(QTreeWidgetItem *, int);
       void onSelectionChanged();
+      void renameSelectedGroup();
       void requestCloseSelected();
       void toggleColumnVisible();
       void updateDragAndDropability();

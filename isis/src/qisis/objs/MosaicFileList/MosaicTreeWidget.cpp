@@ -315,6 +315,10 @@ namespace Isis {
       }
 
       if(selectedItems().size() == 1) {
+        QAction *rename = menu.addAction("Rename Group");
+        connect(rename, SIGNAL(triggered()),
+                this, SLOT(renameSelectedGroup()));
+
         QAction *group = menu.addAction("Insert Group");
         connect(group, SIGNAL(triggered()),
                 this, SLOT(addGroup()));
@@ -455,6 +459,15 @@ namespace Isis {
       }
 
       it ++;
+    }
+  }
+
+
+  void MosaicTreeWidget::renameSelectedGroup() {
+    if(selectedItems().size() == 1 &&
+       selectedItems()[0]->type() == QTreeWidgetItem::Type) {
+      QTreeWidgetItem *groupToEdit = selectedItems()[0];
+      editItem(groupToEdit);
     }
   }
 
