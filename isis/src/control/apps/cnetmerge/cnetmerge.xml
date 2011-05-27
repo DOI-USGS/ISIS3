@@ -3,14 +3,18 @@
 <application name="cnetmerge" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>
-    Merges 2 ControlNets into one.
+    Merges multiple Control Networks into one
   </brief>
 
   <description>
     <p>
-    Merges 2 Control Nets into a single Control Net.  Each Control Net must
-    share the same  target, and be of the same type (i .e. Singleton,
-    ImageToImage, ImageToGround ).
+      This program attempts to merge a set of (two or more) Control Networks
+      into a single network.  The merging process starts with a "base" network
+      into which each successive network is "added".  When conflicts arise
+      between the base network and the network being added, a set of
+      user-defined rules are used to determine how the conflicts are resolved.
+      Each network must share the same target and be of the same type (i.e.,
+      Singleton, ImageToImage, ImageToGround).
     </p>
   </description>
 
@@ -66,28 +70,39 @@
       Separated reference resolution control out of OVERWRITEMEASURES and into
       new parameter OVERWRITEREFERENCE.
     </change>
+    <change name="Travis Addair" date="2011-05-27">
+      Overhauled documentation to better explain the distinction between the
+      base Control Network and the networks being added into it.
+    </change>
   </history> 
-  
+
   <category>
     <categoryItem>Control Networks</categoryItem>
   </category>
 
   <groups>
-    
     <group name="Input">
-
       <parameter name = "INPUTTYPE">
         <type>string</type>
         <default><item>LIST</item></default>
-        <brief>File I/O options</brief>
+        <brief>How the program should retrieve its input</brief>
         <description>
-          There is a choice to simply specify input cubes directly, use a list of input cubes in a text file, or to create output data only.
+          This parameter specifies whether the program should take its input
+          from a list of Control Networks to be merged (LIST) or directly from
+          a pair of parameters specifying a base and add network (CNETS).
         </description>
         <list>
           <option value = "LIST">
-            <brief>Select input Control Net list</brief>
+            <brief>Merge a list of networks</brief>
             <description>
-              Select a list of Control Nets, all to be merged.
+              This option will have the program retrieve its input from a list
+              of Control Networks (one per line), and merge them one by one.
+              The first network in the list acts as the initial "base" network
+              into which each successive network is "added".  The last network
+              in the file is the last network to be added to the network, and
+              thus will have either highest or lowest priority in certain
+              conflict resolutions depending on the options specified in the
+              "Conflict Resolution" parameter group.
             </description>
             <exclusions>
               <item>CNET</item>
@@ -95,9 +110,12 @@
             </exclusions>
           </option>
           <option value = "CNETS">
-            <brief>Select input Control Nets directly</brief>
+            <brief>Merge a pair of networks</brief>
             <description>
-              Select the 2 Control Nets to be merged directly.
+              Selecting this option is like providing a list of networks to be
+              merged with only two networks.  The first network (CNET) will
+              act as the base network, and the second network (CNET2) will act
+              as the network being "added".
             </description>
             <exclusions>
               <item>CLIST</item>
@@ -110,24 +128,31 @@
         <type>filename</type>
         <fileMode>input</fileMode>
         <brief>
-          Input list file 
+          List of Control Networks to be merged
         </brief>
         <description>
-          This file contains a list of all the Control Nets to be merged
+          Starting from the first network in the list as the "base", the
+          program will "add" each following network in the order specified by
+          this list to produce the output.  When conflicts arise, they are
+          resolved in accordance with the options in the "Conflict Resolution"
+          group.
         </description>
         <filter>
           *.txt *.lis *.list *.lst
         </filter>
       </parameter>
-      
+
       <parameter name="CNET">
         <type>filename</type>
         <fileMode>input</fileMode>
         <brief>
-          Input ControlNet
+          "Base" Control Network
         </brief>
         <description>
-          The first ControlNet to be merged.
+          The "base" Control Network into which the second control network
+          will be "added".  When an overwrite option in "Conflict Resolution"
+          is set to FALSE, the conflicting value from this network will be
+          retained.
         </description>
         <filter>
           *.ctl *.pvl *.net
@@ -138,59 +163,42 @@
         <type>filename</type>
         <fileMode>input</fileMode>
         <brief>
-          Input ControlNet
+          Control Network to be "added"
         </brief>
         <description>
-          The second ControlNet to be merged.
+          The Control Network to be "added" into the base network.  When an
+          overwrite option in "Conflict Resolution" is set to TRUE, the
+          conflicting value from this network will replace the existing value
+          in the base network.
         </description>
         <filter>
           *.ctl *.pvl *.net
         </filter>
       </parameter>
-
     </group>
 
     <group name="Output">
-
       <parameter name="ONET">
         <type>filename</type>
         <fileMode>output</fileMode>
         <brief>
-          Merged ControlNet
+          Merged Control Network
         </brief>
         <description>
-          The output ControlNet, which is the merged result of the two input 
-          ControlNets.
+          The output Control Network, which is the merged result of the input
+          networks.
         </description>
         <filter>
           *.ctl *.pvl *.net
         </filter>
       </parameter>
-
-      <parameter name="LOG">
-        <type>filename</type>
-        <fileMode>output</fileMode>
-        <internalDefault>No Report Output</internalDefault>
-        <brief>
-          Reports Control Points that were renamed or replaced
-        </brief>
-        <description>
-          This file will contain a report that reveals all Control Points that
-          were renamed or replaced. If no Control Points were renamed or
-          replaced, than this file will be empty.
-        </description>
-      </parameter>
-
-    </group>
-
-    <group name="Output Control">
 
       <parameter name="NETWORKID">
         <type>string</type>
         <brief>The NetworkId for the merged ControlNet</brief>
         <description>
-          The NetworkId keyword for the new merged ControlNet will be set to the 
-          given value.
+          The NetworkId keyword for the newly merged ControlNet will be set to
+          the given value.
         </description>
       </parameter>
 
@@ -198,76 +206,113 @@
         <type>string</type>
         <brief>The Description for the merged ControlNet</brief>
         <description>
-          The Descrition keyword for the new merged ControlNet will be set to the 
-          given value.
+          The Descrition keyword for the newly merged ControlNet will be set
+          to the given value.
         </description>
       </parameter>
 
+      <parameter name="LOG">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <internalDefault>None</internalDefault>
+        <brief>
+          Reports Control Points that conflicted
+        </brief>
+        <description>
+          This file will contain a report that reveals all Control Points that
+          were conflicted during the merging process. If no Control Points
+          conflicted, then this file will be empty.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Conflict Resolution">
       <parameter name="DUPLICATEPOINTS">
         <type>string</type>
-        <brief>Defines how duplicate Control Points are handled</brief>
+        <brief>
+          How to handle Control Points appearing in both base and add networks
+        </brief>
         <default><item>ERROR</item></default>
         <description>
-          This parameter is used to specify how duplicate Control Points of the
-          given Control Networks are handled when merging.
+          This parameter specifies how conflicting Control Points between two
+          networks are handled when merging.  The current options are to throw
+          an error when a Control Point appears in both the base and add
+          networks (ERROR), or to attempt to merge the conflicts in the
+          duplicated point (MERGE).
         </description>
         <list>
-           <option value="ERROR">
-              <brief>Does not merge duplicate Control Points</brief>
-              <description>
-                This option will check for duplicate Control Points in the
-                Control Nets and throw an error when a duplication occurs.
-                If no duplication occurs, all Control Points will be transfered
-                to the new Control Net as is.
-              </description>
-              <exclusions>
-                <item>LOG</item>
-              </exclusions>
-            </option>
-            <option value="MERGE">
-              <brief>Merges duplicate Control Points</brief>
-              <description>
-                This option will merge all duplicate Control Points in the
-                following Control Net over the first Control Net.  When
-                INPUTTYPE=CNETS, the CNET2 Control Net will override the
-                duplicate Control Points in CNET. When INPUTTYPE=LIST, a
-                listed Control Net will override any and all duplicate Control
-                Points from any and all previously listed Control Nets.
-              </description>
-            </option>
+          <option value="ERROR">
+            <brief>Disallow merging networks with duplicate points</brief>
+            <description>
+              This option will check for conflicting Control Points in the
+              Control Networks and throw an error when a conflict occurs.
+              If no conflict occurs, all Control Points will be added
+              without changing any existing points in the base network.  For
+              the purposes of this parameter, a conflict can be as simple as
+              two Control Points sharing the same ID.  In such a case, an
+              error will be thrown, even if nothing else is different
+              between them.
+            </description>
+            <exclusions>
+              <item>LOG</item>
+              <item>OVERWRITEPOINTS</item>
+              <item>OVERWRITEMEASURES</item>
+              <item>OVERWRITEREFERENCE</item>
+            </exclusions>
+          </option>
+          <option value="MERGE">
+            <brief>Merge duplicate points and resolve their conflicts</brief>
+            <description>
+              This option will attempt to merge duplicate points between the
+              base network and the successive networks being added to it.
+              When conflicts arise, they will be resolved in accordance with
+              the various overwrite parameters.  By default, values in the
+              base network will take priority over those in the networks
+              added to it, but this can be changed using these parameters.
+              For example, if OVERWRITEMEASURES is set to TRUE, then
+              Line/Sample values in the last network added will take
+              precedence over all the Line/Sample values for conflicting
+              measures in the base network and the networks that were added
+              prior.
+            </description>
+          </option>
         </list>
       </parameter>
-      
+
       <parameter name="OVERWRITEPOINTS">
         <type>boolean</type>
         <default><item>False</item></default>
-        <brief>Merge conficting Control Points</brief>
+        <brief>Replace conflicting points as networks are added</brief>
         <description>
-          Whenever a latitude or a longitude value has been changed on a held
-          or ground Control Point, then the changed values will be merged when
-          this parameter is TRUE. If this parameter is FALSE and a change is
-          found, the change will be noted in the LOG file, but will not be
-          merged in the final output.
+          Whenever a latitude or longitude value conflicts between the base
+          network and the network being added on a held or ground Control
+          Point, then the value in the base network will be replaced with that
+          from the add network when this option is TRUE.  When this options is
+          FALSE, the conflict will be noted in the LOG file (if provided), but
+          the value from base will be retained in the output network.
         </description>
       </parameter>
 
       <parameter name="OVERWRITEMEASURES">
         <type>boolean</type>
         <default><item>False</item></default>
-        <brief>Merge conficting Control Measures</brief>
+        <brief>Replace conflicting measures as networks are added</brief>
         <description>
-          Whenever a the reference measure has been changed in a held or
-          ground Control Measure, then the change will be merged when this
-          parameter is TRUE. If this parameter is FALSE and a reference measure
-          change is found, the change will be noted in the LOG file, but
-          will not be merged in the final output.
+          Whenever a Control Measure conflicts between the base network and
+          the network being added on a held or ground Control Point, then the
+          measure in the base network will be replaced with that from the add
+          network when this option is TRUE.  When this options is FALSE, the
+          conflict will be noted in the LOG file (if provided), but the
+          measure from base will be retained in the output network.
         </description>
       </parameter>
 
       <parameter name="OVERWRITEREFERENCE">
         <type>boolean</type>
         <default><item>False</item></default>
-        <brief>Replace reference measures in base as networks are added</brief>
+        <brief>
+          Replace reference measures in conflicting points as networks are added
+        </brief>
         <description>
           When this parameter is true, if a Control Point in the current
           "base" network and the current network being added to it have
@@ -281,9 +326,6 @@
           will be listed as the reference for that point.
         </description>
       </parameter>
-
     </group>
-
   </groups>
-
 </application>

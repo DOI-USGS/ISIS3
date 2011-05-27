@@ -14,7 +14,7 @@
 using namespace std;
 using namespace Isis;
 
-ControlPoint * MergePoints(ControlPoint *point1, ControlPoint *point2,
+ControlPoint * MergePoints(ControlPoint *addPoint, ControlPoint *basePoint,
     bool allowMeasureOverride, bool allowReferenceOverride,
     bool &mergeHasConflicts);
 
@@ -47,12 +47,12 @@ void IsisMain() {
   progress.CheckStatus();
 
   // Set up the output ControlNet with the first Control Net in the list
-  ControlNet destinationNet(Filename(filelist[0]).Expanded());
-  destinationNet.SetNetworkId(ui.GetString("NETWORKID"));
-  destinationNet.SetUserName(Isis::Application::UserName());
-  destinationNet.SetCreatedDate(Isis::Application::DateTime());
-  destinationNet.SetModifiedDate(Isis::iTime::CurrentLocalTime());
-  destinationNet.SetDescription(ui.GetString("DESCRIPTION"));
+  ControlNet baseNet(Filename(filelist[0]).Expanded());
+  baseNet.SetNetworkId(ui.GetString("NETWORKID"));
+  baseNet.SetUserName(Isis::Application::UserName());
+  baseNet.SetCreatedDate(Isis::Application::DateTime());
+  baseNet.SetModifiedDate(Isis::iTime::CurrentLocalTime());
+  baseNet.SetDescription(ui.GetString("DESCRIPTION"));
 
   progress.CheckStatus();
 
@@ -67,18 +67,18 @@ void IsisMain() {
   bool mergePoints = (ui.GetString("DUPLICATEPOINTS") == "MERGE");
 
   for (int cnetIndex = 1; cnetIndex < (int)filelist.size(); cnetIndex ++) {
-    ControlNet sourceNet(Filename(filelist[cnetIndex]).Expanded());
+    ControlNet addNet(Filename(filelist[cnetIndex]).Expanded());
 
     // Checks to make sure the ControlNets are valid to merge
-    if (destinationNet.GetTarget().DownCase() != sourceNet.GetTarget().DownCase()) {
-      string msg = "Input [" + sourceNet.GetNetworkId() + "] does not target the "
+    if (baseNet.GetTarget().DownCase() != addNet.GetTarget().DownCase()) {
+      string msg = "Input [" + addNet.GetNetworkId() + "] does not target the "
           "same target as other Control Network(s)";
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
     // Adds currentnet to the ControlNet if it does not exist in cnet
-    for (int cp = 0; cp < sourceNet.GetNumPoints(); cp++) {
-      ControlPoint *sourcePoint = sourceNet.GetPoint(cp);
+    for (int cp = 0; cp < addNet.GetNumPoints(); cp++) {
+      ControlPoint *sourcePoint = addNet.GetPoint(cp);
 
       // Duplicate point in the input
       ControlPoint *dupPoint = NULL;
@@ -87,14 +87,14 @@ void IsisMain() {
       try {
         // Find if there is a duplicate point. This will throw an exception if
         //   the control network doesn't have a duplicate point.
-        dupPoint = destinationNet.GetPoint(QString(sourcePoint->GetId()));
+        dupPoint = baseNet.GetPoint(QString(sourcePoint->GetId()));
       }
       catch (iException &e) {
         e.Clear();
 
         // There was no duplicate point so transfer the point directly
         ControlPoint *cp = new ControlPoint(*sourcePoint);
-        destinationNet.AddPoint(cp);
+        baseNet.AddPoint(cp);
         // dupPoint should be null if this happened
       }
 
@@ -103,7 +103,7 @@ void IsisMain() {
         if (!mergePoints) {
           string msg = "Inputs contain the same ControlPoint. [Id=";
           msg += sourcePoint->GetId() + "] Set DUPLICATEPOINTS=MERGE to";
-          msg += " merge duplicate Control Points.";
+          msg += " merge conflicting Control Points.";
           throw iException::Message(iException::User, msg, _FILEINFO_);
         }
 
@@ -115,7 +115,7 @@ void IsisMain() {
 
         if (report) {
           ss << "Control Point " << sourcePoint->GetId() << " was merged from "
-             << sourceNet.GetNetworkId() << endl;
+             << addNet.GetNetworkId() << endl;
         }
 
         // Merge the Control Points correctly
@@ -157,8 +157,8 @@ void IsisMain() {
 
         dupPoint = NULL;
 
-        destinationNet.DeletePoint(sourcePoint->GetId());
-        destinationNet.AddPoint(mergedPoint);
+        baseNet.DeletePoint(sourcePoint->GetId());
+        baseNet.AddPoint(mergedPoint);
       }
     }
 
@@ -166,48 +166,53 @@ void IsisMain() {
   }
 
   // Writes out the final Control Net
-  destinationNet.Write(outfile.Expanded());
+  baseNet.Write(outfile.Expanded());
 }
 
 
-ControlPoint *MergePoints(ControlPoint *point1, ControlPoint *point2,
+ControlPoint *MergePoints(ControlPoint *addPoint, ControlPoint *basePoint,
     bool allowMeasureOverride, bool allowReferenceOverride,
     bool &mergeHasConflicts) {
-  ControlPoint *merger = point1; // Merging from this one
-  ControlPoint *mergee = new ControlPoint(*point2); // to this one
-  mergeHasConflicts = false;
 
-  for (int mergerIndex = 0; mergerIndex < mergee->GetNumMeasures(); mergerIndex ++) {
+  // Start with a copy of the base point, which we will attempt to add to in
+  // order to create the new merged point
+  ControlPoint *mergedPoint = new ControlPoint(*basePoint);
+
+  // Loop through every measure in the add point, attempting to add it to the
+  // resulting merged point.  If there are conflicts, attempt to resolve them
+  // using rules defined by the program user.
+  mergeHasConflicts = false;
+  for (int addIndex = 0; addIndex < mergedPoint->GetNumMeasures(); addIndex++) {
     bool merged = false;
-    ControlMeasure *mergerMeasure = merger->GetMeasure(mergerIndex);
+    ControlMeasure *addMeasure = addPoint->GetMeasure(addIndex);
 
     // Try to get the mergee equivalent and merge this control measure in
     try {
-      ControlMeasure *mergeeMeasure =
-        mergee->GetMeasure(mergerMeasure->GetCubeSerialNumber());
+      ControlMeasure *mergedMeasure =
+        mergedPoint->GetMeasure(addMeasure->GetCubeSerialNumber());
 
       // If we have found the equivalent control measures in the merger and
       //   mergee
-      if (mergerMeasure->GetCubeSerialNumber() ==
-          mergeeMeasure->GetCubeSerialNumber()) {
+      if (addMeasure->GetCubeSerialNumber() ==
+          mergedMeasure->GetCubeSerialNumber()) {
         // If we have a ground truth in our merger then try to propagate it to
         //   the mergee.
-        if (merger->GetType() == ControlPoint::Ground) {
+        if (addPoint->GetType() == ControlPoint::Ground) {
           if (!allowMeasureOverride) {
             // Allow reference override refers to the merger's reference, not
             //   the mergee's reference. If we can't change the reference then
             //   keep the merger's reference status.
-            if (mergee->IsReferenceExplicit() &&
-                mergeeMeasure != mergee->GetRefMeasure() &&
-                mergerMeasure != merger->GetRefMeasure()) {
-              ControlMeasure *origReference = mergee->GetRefMeasure();
+            if (mergedPoint->IsReferenceExplicit() &&
+                mergedMeasure != mergedPoint->GetRefMeasure() &&
+                addMeasure != addPoint->GetRefMeasure()) {
+              ControlMeasure *origReference = mergedPoint->GetRefMeasure();
               origReference->SetType(ControlMeasure::Candidate);
               //mergee.UpdateMeasure(origReference); // Redesign fixed this
             }
 
             // Copy the rest of merger's information to mergee, mergee will be
             //   a reference since merger is a reference.
-            mergeeMeasure = mergerMeasure;
+            mergedMeasure = addMeasure;
             mergeHasConflicts = true; // lost some information
           }
         }
@@ -222,14 +227,14 @@ ControlPoint *MergePoints(ControlPoint *point1, ControlPoint *point2,
       // No matching serial number was found, we need to pull over this measure
       e.Clear();
 
-      ControlMeasure *newMeasure = mergerMeasure;
+      ControlMeasure *newMeasure = addMeasure;
 
       // We have a new reference
-      if (mergee->IsReferenceExplicit() &&
-          merger->GetRefMeasure() != mergerMeasure) {
+      if (mergedPoint->IsReferenceExplicit() &&
+          addPoint->GetRefMeasure() != addMeasure) {
         if (allowReferenceOverride) {
           // Use the new reference
-          ControlMeasure *origReference = mergee->GetRefMeasure();
+          ControlMeasure *origReference = mergedPoint->GetRefMeasure();
           origReference->SetType(ControlMeasure::Candidate);
           //mergee.UpdateMeasure(origReference); // Redesign fixed this
           // new measure is already a reference since merger is a reference
@@ -241,9 +246,9 @@ ControlPoint *MergePoints(ControlPoint *point1, ControlPoint *point2,
         }
       }
 
-      mergee->Add(newMeasure);
+      mergedPoint->Add(newMeasure);
     }
   }
 
-  return mergee;
+  return mergedPoint;
 }
