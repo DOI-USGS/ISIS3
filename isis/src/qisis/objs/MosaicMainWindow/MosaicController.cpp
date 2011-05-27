@@ -296,7 +296,6 @@ namespace Isis {
             QThread::idealThreadCount());
       
       m_watcher = new QFutureWatcher< CubeDisplayProperties * >;
-      m_watcher->setPendingResultsLimit(1);
       connect(m_watcher, SIGNAL(resultReadyAt(int)),
               this, SLOT(cubeDisplayReady(int)));
       connect(m_watcher, SIGNAL(finished()),
@@ -425,8 +424,6 @@ namespace Isis {
           ProjectToDisplayFunctor(m_mutex, QThread::currentThread()));
 
       m_watcher = new QFutureWatcher< CubeDisplayProperties * >;
-      // The max open cubes is PendingResults + flush count ~= 550 currently
-      m_watcher->setPendingResultsLimit(50);
       connect(m_watcher, SIGNAL(resultReadyAt(int)),
               this, SLOT(cubeDisplayReady(int)));
       connect(m_watcher, SIGNAL(finished()),
@@ -445,8 +442,6 @@ namespace Isis {
       throw iException::Message(iException::Io, "Input project file does is not"
           " an up to date qmos project", _FILEINFO_);
     }
-
-    p_progress->setVisible(false);
   }
 
 
