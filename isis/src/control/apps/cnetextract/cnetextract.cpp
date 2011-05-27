@@ -27,7 +27,7 @@
 #include "SurfacePoint.h"
 #include "UserInterface.h"
 
-//using namespace std;
+using namespace std;
 using namespace Isis;
 
 void ExtractPointList(ControlNet &outNet, QVector<iString> nonListedPoints);
@@ -57,6 +57,7 @@ void IsisMain() {
   bool pointsEntered     = ui.WasEntered("POINTLIST");
   bool cubePoints        = ui.GetBoolean("CUBES");
   bool cubeMeasures      = ui.GetBoolean("CUBEMEASURES");
+  bool retainReference   = ui.GetBoolean("RETAIN_REFERENCE");
   bool latLon            = ui.GetBoolean("LATLON");
 
   if(!(noIgnore || noMeasureless || noSingleMeasure || reference || ground ||
@@ -90,7 +91,7 @@ void IsisMain() {
   progress.SetMaximumSteps(outNet.GetNumPoints());
   progress.CheckStatus();
 
-  // Set up verctor records of how points/measures are removed
+  // Set up vector records of how points/measures are removed
   QVector<iString> ignoredPoints;
   QVector<iString> ignoredMeasures;
   QVector<iString> singleMeasurePoints;
@@ -178,18 +179,28 @@ void IsisMain() {
       }
       else if(cubeMeasures) {
         bool hasSerialNumber = false;
-
-        for(int sn = 0; sn < serialNumbers.size() && !hasSerialNumber; sn ++) {
-          if(serialNumbers[sn] == newMeasure->GetCubeSerialNumber()) hasSerialNumber = true;
+        std::string serialNum = newMeasure->GetCubeSerialNumber();
+        for(int sn = 0; sn < serialNumbers.size(); sn ++) {
+          if(serialNumbers[sn] == serialNum) {
+            hasSerialNumber = true;
+            break;
+          }
         }
 
         if(!hasSerialNumber) {
-          noCubeMeasures.append(newPoint->GetId() + "," + newMeasure->GetCubeSerialNumber());
-          //New error with deleting Reference Measures
-          if(newPoint->GetRefMeasure() != newMeasure)
+          string msg = newPoint->GetId() + "," + newMeasure->GetCubeSerialNumber();
+          //Delete Reference Measures not in the list, if retainReference is turned off
+          if(newPoint->GetRefMeasure() != newMeasure || 
+             (newPoint->GetRefMeasure() == newMeasure && !retainReference))
             newPoint->Delete(cm);
-          else
+          else {
             shouldDeleteReferenceMeasure = true;
+            if(newPoint->GetRefMeasure() == newMeasure && retainReference) {
+              msg += ", Reference not in the list but Retained";
+            }
+          }
+          
+          noCubeMeasures.append(msg);
         }
       }
     }

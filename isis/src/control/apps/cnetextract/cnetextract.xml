@@ -22,9 +22,9 @@
     creates a selected Exclusive Filter condition during processing, that
     Exclusive Filter will prevent the extraction.<br />
     For example, if the Cube Filters CUBES, CUBELIST, and CUBEMEASURES are
-    used along with the Inclusive Filter NOSINGLEMEASURES, then an input Control
+    used along with the Exclusive Filter NOSINGLEMEASURES, then an input Control
     Point which contains only one cube in the CUBELIST will not be extracted,
-    reguardless of the number of Control Measures it had on input. This is
+    regardless of the number of Control Measures it had on input. This is
     because NOSINGLEMEASURES will see it as a Control Point with exactly one
     Control Measure and prevent its extraction.<br />
     If only Exclusive Filters are used, all Control Points/Measures that do not
@@ -37,7 +37,8 @@
     Points/Measures that contain all inclusive properties will be extracted.</p>
 
     <p>Cube Filters also allow extraction, however, they pertain to the
-    cubes contained within the Control Points/Measures.</p>
+    cubes contained within the Control Points/Measures. Option RETAIN_REFERENCE 
+    will extract the Reference even if not in the Cube List.</p>
 
     <p>Lat/Lon Filters allow extraction as well, however, they only extract
     Control Points/Measures that lie in the lat/lon bounding box.</p>
@@ -110,6 +111,10 @@
     </change>
     <change name="Jai Rideout" date="2011-04-12">
       Changed OUTNET to ONET for consistency.
+    </change>
+    <change name="Sharmila Prasad" date="2011-05-27">
+      Added an option RETAIN_REFERENCE to extract the Reference measure even if 
+      it is not in the CUBELIST
     </change>
   </history>
 
@@ -404,6 +409,23 @@
           <p>When PREFIX is used, the file [PREFIX]NonCubeMeasures.txt will be
           created when using this option. Each Control Measure it lists was not
           extracted due to this filter.</p>
+        </description>
+      </parameter>
+
+      <parameter name="RETAIN_REFERENCE">
+        <type>boolean</type>
+        <default><item>False</item></default>
+        <brief>Retain Reference even if not in the CUBELIST</brief>
+        <description>
+          <p>When true, retain the Reference in the extracted Control Points 
+          even if it is not in the  the CUBELIST  list. </p> 
+
+          <p>When this parameter is used, NOMEASURELESS will be set to TRUE
+          automatically.</p>
+
+          <p>When option PREFIX is used, the file [PREFIX]NonCubeMeasures.txt 
+          will be created. It will list the Reference which is not in the list 
+          but retained because this option was set to true.</p>
         </description>
       </parameter>
 
