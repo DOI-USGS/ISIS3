@@ -23,7 +23,10 @@ namespace Isis {
                  QSettings::NativeFormat) {
     p_filename = "";
     p_fileMenu = NULL;
+    p_settingsMenu = NULL;
     p_viewMenu = NULL;
+
+    m_controllerVisible = false;
 
     setWindowTitle(title);
 
@@ -69,6 +72,7 @@ namespace Isis {
     centralWidget()->setLayout(new QHBoxLayout());
 
     p_mosaicController = NULL;
+    createController();
   }
 
 
@@ -143,7 +147,7 @@ namespace Isis {
     p_fileMenu->addAction(saveProjectAs);
     p_fileMenu->addAction(closeProject);
     p_fileMenu->addSeparator();
-    p_exportMenu = p_fileMenu->addMenu("Export");
+    p_exportMenu = p_fileMenu->addMenu("&Export");
     p_fileMenu->addAction(exit);
 
     permanentToolBar()->addAction(loadProject);
@@ -154,7 +158,8 @@ namespace Isis {
     permanentToolBar()->addAction(openList);
     permanentToolBar()->addSeparator();
 
-    p_viewMenu = menuBar()->addMenu("View");
+    p_viewMenu = menuBar()->addMenu("&View");
+    p_settingsMenu = menuBar()->addMenu("&Settings");
 
     updateMenuVisibility();
   }
@@ -198,10 +203,32 @@ namespace Isis {
   void MosaicMainWindow::createController() {
     if(p_mosaicController == NULL) {
       p_mosaicController = new MosaicController(statusBar(), p_settings);
+      
+      
+      QList<QAction *> settingsActs = p_mosaicController->getSettingsActions();
+      
+      QAction *settingsAct;
+      foreach(settingsAct, settingsActs) {
+        connect(settingsAct, SIGNAL(destroyed(QObject *)),
+                this, SLOT(updateMenuVisibility()));
+
+        p_settingsMenu->addAction(settingsAct);
+      }
+
+      updateMenuVisibility();
+    }
+  }
+
+
+  void MosaicMainWindow::displayController() {
+    createController();
+    
+    if(p_mosaicController && !m_controllerVisible) {
+      m_controllerVisible = true;
       p_mosaicController->addExportActions(*p_exportMenu);
 
       p_fileListDock->setWidget(p_mosaicController->getMosaicFileList());
-      p_mosaicPreviewDock->setWidget(p_mosaicController->getMosaicScene2());
+      p_mosaicPreviewDock->setWidget(p_mosaicController->getMosaicWorldScene());
 
       centralWidget()->layout()->addWidget(
           p_mosaicController->getMosaicScene());
@@ -224,7 +251,7 @@ namespace Isis {
       statusBar()->addWidget(
           p_mosaicController->getMosaicScene()->getProgress());
       statusBar()->addWidget(
-          p_mosaicController->getMosaicScene2()->getProgress());
+          p_mosaicController->getMosaicWorldScene()->getProgress());
       statusBar()->addWidget(
           p_mosaicController->getMosaicFileList()->getProgress());
 
@@ -238,8 +265,6 @@ namespace Isis {
 
         p_viewMenu->addAction(viewAct);
       }
-
-      updateMenuVisibility();
     }
   }
 
@@ -332,8 +357,8 @@ namespace Isis {
 
   void MosaicMainWindow::openFiles(QStringList cubeNames) {
     // Create a mosaic widget if we don't have one
-    if(!p_mosaicController && !cubeNames.empty())
-      createController();
+    if(!cubeNames.empty())
+      displayController();
 
     if(p_mosaicController)
       p_mosaicController->openCubes(cubeNames);
@@ -427,11 +452,17 @@ namespace Isis {
         actionRequiringClosed->setEnabled(true);
       }
 
+      p_mosaicController->saveSettings(p_settings);
       delete p_mosaicController;
       p_mosaicController = NULL;
 
       p_filename = "";
+      m_controllerVisible = false;
     }
+
+    // Create a non-visible controller... so we have things like the settings
+    //   menu
+    createController();
   }
 }
 

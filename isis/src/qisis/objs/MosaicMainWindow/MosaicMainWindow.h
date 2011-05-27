@@ -78,7 +78,10 @@ namespace Isis {
       void openFiles(QStringList cubeNames);
       bool updateMenuVisibility(QMenu *menu);
       void createController();
+      void displayController();
 
+      bool m_controllerVisible;
+      
       Qisis::ToolPad *p_toolpad; //!< Tool pad on this mainwindow
 
       QToolBar *p_permToolbar; //!< Tool bar attached to mainwindow
@@ -88,6 +91,7 @@ namespace Isis {
       QProgressBar *p_progressBar; //!< The mainwindow's progress bar.
 
       QMenu *p_viewMenu;
+      QMenu *p_settingsMenu;
       QMenu *p_fileMenu;
       QMenu *p_exportMenu;
       MosaicController *p_mosaicController;

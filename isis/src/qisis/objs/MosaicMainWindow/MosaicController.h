@@ -3,6 +3,7 @@
 
 #include <QObject>
 
+class QAction;
 template <typename A> class QFutureWatcher;
 template <typename A> class QList;
 class QMenu;
@@ -51,8 +52,8 @@ namespace Isis {
         return p_scene;
       }
 
-      MosaicSceneWidget *getMosaicScene2() {
-        return p_scene2;
+      MosaicSceneWidget *getMosaicWorldScene() {
+        return p_worldScene;
       }
 
       MosaicFileListWidget *getMosaicFileList() {
@@ -63,6 +64,9 @@ namespace Isis {
 
       QProgressBar *getProgress();
       void saveProject();
+      
+      QList<QAction *> getSettingsActions();
+      void saveSettings(QSettings &settings);
 
     signals:
       /**
@@ -79,7 +83,10 @@ namespace Isis {
       void cubeDisplayReady(int);
 
     private slots:
+      void changeDefaultAlpha();
+      void changeMaxThreads();
       void cubeClosed(QObject * cubeDisplay);
+      void defaultFillChanged(bool);
       void exportView();
       void loadFinished();
       void saveList();
@@ -94,9 +101,14 @@ namespace Isis {
 
       MosaicFileListWidget *p_fileList;
       MosaicSceneWidget *p_scene;
-      MosaicSceneWidget *p_scene2;
+      MosaicSceneWidget *p_worldScene;
       ProgressBar *p_progress;
       PvlObject *m_projectPvl;
+      
+      bool m_openFilled;
+      int m_defaultAlpha;
+      int m_maxThreads;
+      
 
       // Cameras are not re-entrant and so this mutex will make sure they
       //   aren't overly abused
@@ -108,12 +120,15 @@ namespace Isis {
           const QString &, CubeDisplayProperties *> {
 
         public:
-          FilenameToDisplayFunctor(QMutex *cameraMutex, QThread *targetThread);
+          FilenameToDisplayFunctor(QMutex *cameraMutex, QThread *targetThread,
+              bool openFilled, int defaultAlpha);
           CubeDisplayProperties *operator()(const QString &);
 
         private:
           QMutex *m_mutex;
           QThread *m_targetThread;
+          bool m_openFilled;
+          int m_defaultAlpha;
       };
 
       class ProjectToDisplayFunctor : public std::unary_function<
