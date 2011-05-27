@@ -10,8 +10,9 @@ commands:
 	  sinc = 1 \
 	  line = 8 \
 	  nlines = 6 \
-	  linc = 1 > /dev/null;
+	  linc = 1 > /dev/null; \
 	$(APPNAME) from= $(OUTPUT)/cropTemp.cub \
 	  to=$(OUTPUT)/cubenormTruth1.cub \
 	  normalizer = average \
-	  preserve = true > /dev/null;
+	  preserve = true > /dev/null; \
+	$(RM) $(OUTPUT)/cropTemp.cub;
