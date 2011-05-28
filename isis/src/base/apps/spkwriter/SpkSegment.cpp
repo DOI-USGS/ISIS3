@@ -82,6 +82,11 @@ SpkSegment::SpkSegment(Cube &cube) : SpiceSegment(cube) {
  * @author kbecker (5/2/2011)
  * 
  * @param cube  Cube to generate SPICE segment from 
+ *
+ * @internal
+ *   @history 2011-05-27 Debbie A. Cook - Added call to create Hermite cache
+ *                           to make this option available for testing. 
+ *                           This will need to be an option in the future.
  */
 void SpkSegment::import(Cube &cube) {
   typedef std::vector<std::string>  StrList;
@@ -109,12 +114,15 @@ void SpkSegment::import(Cube &cube) {
     _centerFrame = getNaifName(_center);
 
     //  Get the SPICE data
-    Table spkCache = camera->InstrumentPosition()->LineCache("SpkSegment");
+//       spkCache = camera->InstrumentPosition()->LineCache("SpkSegment");
+      Table spkCache = camera->InstrumentPosition()->LoadHermiteCache("SpkSegment");
     getStates(*camera, load(spkCache), _states, _epochs, _hasVV);
 
       // Save current time
     SpicePosition *ipos(camera->InstrumentPosition());
     double currentTime = ipos->EphemerisTime();
+
+
 
 #if 0
     ////  This is currently determined to not be required and needs to bei
@@ -354,13 +362,13 @@ SpkSegment::SMatrix SpkSegment::load(Table &table) {
   int nvals = rec.Fields();
 
   // Ensure the table has the expected format, error out if not valid.
-  if ( !((nvals == 7) || (nvals == 4)) ) {
-    ostringstream mess;
-    mess << "SPICE (SPK) Table " << table.Name() 
-         << " must have 7 (with velocity vectors) or 4 fields but has " 
-         << nvals;
-    throw iException::Message(iException::User, mess.str(), _FILEINFO_);
-  }
+//   if ( !((nvals == 7) || (nvals == 4)) ) {
+//     ostringstream mess;
+//     mess << "SPICE (SPK) Table " << table.Name() 
+//          << " must have 7 (with velocity vectors) or 4 fields but has " 
+//          << nvals;
+//     throw iException::Message(iException::User, mess.str(), _FILEINFO_);
+//   }
 
   // Extract contents
   SMatrix spice = SMatrix(nrecs,nvals);

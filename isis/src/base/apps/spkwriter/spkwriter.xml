@@ -220,6 +220,9 @@
     <change name="Kris Becker" date="2011-05-02">
       Original version
     </change>
+    <change name="Debbie A. Cook" date="2011-05-27">
+      Changed default for type to Hermite
+    </change>
 </history>
 
   <groups>
@@ -280,7 +283,7 @@
          
           <parameter name="TYPE">
               <type>integer</type> 
-              <default><item>9</item></default>
+              <default><item>13</item></default>
               <brief>
                   Specify the type of SPK kernel to create
               </brief>
