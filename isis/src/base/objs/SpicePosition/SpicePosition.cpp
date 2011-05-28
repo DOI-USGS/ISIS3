@@ -125,9 +125,9 @@ namespace Isis {
       SetEphemerisTimeSpice();
     }
 
-    // Return the coordinate
     NaifStatus::CheckErrors();
 
+    // Return the coordinate
     return p_coordinate;
   }
 
@@ -556,34 +556,38 @@ namespace Isis {
   }
 
 
-//  Obsolete
   /** Cache J2000 position over existing cached time range using
-   *  polynomials
+   *  polynomials stored as Hermite cubic spline knots
    *
    * This method will reload an internal cache with positions
-   * formed from coordinates fit to polynomials over a time
-   * range.
+   * formed from a cubic Hermite spline over a time range.  The
+   * method assumes a polynomial function has been fit to the
+   * coordinates of the positions and calculates the spline
+   * from the polynomial function.
    *
-   * @param function1   The first polynomial function used to
-   *                    find the position coordinates
-   * @param function2   The second polynomial function used to
-   *                    find the position coordinates
-   * @param function3   The third polynomial function used to
-   *                    find the position coordinates
    */
-  /*  void SpicePosition::ReloadCache(Isis::PolynomialUnivariate &function1,
-                                  Isis::PolynomialUnivariate &function2,
-                                  Isis::PolynomialUnivariate &function3) {
-    // Make sure cache is already loaded
-    if(p_source != Memcache && p_source != HermiteCache) {
-      std::string msg = "A SpicePosition cache has not been created yet";
+   Table SpicePosition::LoadHermiteCache(const std::string &tableName) {
+    // find the first and last time values
+    double firstTime = p_fullCacheStartTime;
+    double lastTime = p_fullCacheEndTime;
+    int cacheTimeSize = (int) p_fullCacheSize;
+
+    // Framing cameras are already cached and don't need to be reduced.
+    if(cacheTimeSize == 1) return Cache(tableName);
+
+    // Load the polynomial functions
+    Isis::PolynomialUnivariate function1(p_degree);
+    Isis::PolynomialUnivariate function2(p_degree);
+    Isis::PolynomialUnivariate function3(p_degree);
+    function1.SetCoefficients(p_coefficients[0]);
+    function2.SetCoefficients(p_coefficients[1]);
+    function3.SetCoefficients(p_coefficients[2]);
+
+    // Make sure a polynomial function is already loaded
+    if(p_source != PolyFunction) {
+      std::string msg = "A SpicePosition polynomial function has not been created yet";
       throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
     }
-
-    // find the first and last time values
-    double firstTime = p_cacheTime[0];
-    double lastTime = p_cacheTime[p_cacheTime.size()-1];
-    int cacheTimeSize = p_cacheTime.size();
 
     // Clear existing coordinates from cache
     ClearCache();
@@ -604,104 +608,86 @@ namespace Isis {
 //    }
 
 
-    if(cacheTimeSize != 1) {
+    // find time for the extremum of each polynomial
+    // since this is only a 2nd degree polynomial,
+    // finding these extrema is simple
+    double b1 = function1.Coefficient(1);
+    double c1 = function1.Coefficient(2);
+    double extremumXtime = -b1 / (2.*c1) + p_baseTime; // extremum is time value for root of 1st derivative
+    // make sure we are in the domain
+    if(extremumXtime < firstTime) {
+      extremumXtime = firstTime;
+    }
+    if(extremumXtime > lastTime) {
+      extremumXtime = lastTime;
+    }
 
-      // find time for the extremum of each polynomial
-      // since this is only a 2nd degree polynomial,
-      // finding these extrema is simple
-      double b1 = function1.Coefficient(1);
-      double c1 = function1.Coefficient(2);
-      double extremumXtime = -b1 / (2.*c1) + p_baseTime; // extremum is time value for root of 1st derivative
-      // make sure we are in the domain
-      if(extremumXtime < firstTime) {
-        extremumXtime = firstTime;
-      }
-      if(extremumXtime > lastTime) {
-        extremumXtime = lastTime;
-      }
+    double b2 = function2.Coefficient(1);
+    double c2 = function2.Coefficient(2);
+    double extremumYtime = -b2 / (2.*c2) + p_baseTime;
+    // make sure we are in the domain
+    if(extremumYtime < firstTime) {
+      extremumYtime = firstTime;
+    }
+    if(extremumYtime > lastTime) {
+      extremumYtime = lastTime;
+    }
 
-      double b2 = function2.Coefficient(1);
-      double c2 = function2.Coefficient(2);
-      double extremumYtime = -b2 / (2.*c2) + p_baseTime;
-      // make sure we are in the domain
-      if(extremumYtime < firstTime) {
-        extremumYtime = firstTime;
-      }
-      if(extremumYtime > lastTime) {
-        extremumYtime = lastTime;
-      }
+    double b3 = function3.Coefficient(1);
+    double c3 = function3.Coefficient(2);
+    double extremumZtime = -b3 / (2.*c3) + p_baseTime;
+    // make sure we are in the domain
+    if(extremumZtime < firstTime) {
+      extremumZtime = firstTime;
+    }
+    if(extremumZtime > lastTime) {
+      extremumZtime = lastTime;
+    }
 
-      double b3 = function3.Coefficient(1);
-      double c3 = function3.Coefficient(2);
-      double extremumZtime = -b3 / (2.*c3) + p_baseTime;
-      // make sure we are in the domain
-      if(extremumZtime < firstTime) {
-        extremumZtime = firstTime;
-      }
-      if(extremumZtime > lastTime) {
-        extremumZtime = lastTime;
-      }
+    // refill the time vector
+    p_cacheTime.clear();
+    p_cacheTime.push_back(firstTime);
+    p_cacheTime.push_back(extremumXtime);
+    p_cacheTime.push_back(extremumYtime);
+    p_cacheTime.push_back(extremumZtime);
+    p_cacheTime.push_back(lastTime);
+    // we don't know order of extrema, so sort
+    sort(p_cacheTime.begin(), p_cacheTime.end());
+    // in case an extremum is an endpoint
+    std::vector <double>::iterator it = unique(p_cacheTime.begin(), p_cacheTime.end());
+    p_cacheTime.resize(it - p_cacheTime.begin());
 
-      // refill the time vector
+    if(p_cacheTime.size() == 2) {
       p_cacheTime.clear();
       p_cacheTime.push_back(firstTime);
-      p_cacheTime.push_back(extremumXtime);
-      p_cacheTime.push_back(extremumYtime);
-      p_cacheTime.push_back(extremumZtime);
+      p_cacheTime.push_back((firstTime + lastTime) / 2);
       p_cacheTime.push_back(lastTime);
-      // we don't know order of extrema, so sort
-      sort(p_cacheTime.begin(), p_cacheTime.end());
-      // in case an extremum is an endpoint
-      std::vector <double>::iterator it = unique(p_cacheTime.begin(), p_cacheTime.end());
-      p_cacheTime.resize(it - p_cacheTime.begin());
-
-      if(p_cacheTime.size() == 2) {
-        p_cacheTime.clear();
-        p_cacheTime.push_back(firstTime);
-        p_cacheTime.push_back((firstTime + lastTime) / 2);
-        p_cacheTime.push_back(lastTime);
-      }
-
-      // add positions and velocities for these times
-      for(int i = 0; i < (int) p_cacheTime.size(); i++) {
-        // x,y,z positions
-        std::vector <double> time;
-        time.push_back(p_cacheTime[i] - p_baseTime);
-        p_coordinate[0] = function1.Evaluate(time);
-        p_coordinate[1] = function2.Evaluate(time);
-        p_coordinate[2] = function3.Evaluate(time);
-        p_cache.push_back(p_coordinate);
-
-        // x,y,z velocities
-        p_velocity[0] = b1 + 2 * c1 * (p_cacheTime[i] - p_baseTime);
-        p_velocity[1] = b2 + 2 * c2 * (p_cacheTime[i] - p_baseTime);
-        p_velocity[2] = b3 + 2 * c3 * (p_cacheTime[i] - p_baseTime);
-        p_cacheVelocity.push_back(p_velocity);
-      }
     }
-    else {
-      // Restore the framing camera time
-      p_cacheTime.push_back(firstTime);
 
+    // add positions and velocities for these times
+    for(int i = 0; i < (int) p_cacheTime.size(); i++) {
+      // x,y,z positions
       std::vector <double> time;
-      time.push_back(p_cacheTime[0] - p_baseTime);
+      time.push_back(p_cacheTime[i] - p_baseTime);
       p_coordinate[0] = function1.Evaluate(time);
       p_coordinate[1] = function2.Evaluate(time);
       p_coordinate[2] = function3.Evaluate(time);
       p_cache.push_back(p_coordinate);
-      p_velocity[0] = 0.;
-      p_velocity[1] = 0.;
-      p_velocity[2] = 0.;
-      p_cacheVelocity.push_back(p_velocity);
-    }
 
+      // x,y,z velocities
+      p_velocity[0] = b1 + 2 * c1 * (p_cacheTime[i] - p_baseTime);
+      p_velocity[1] = b2 + 2 * c2 * (p_cacheTime[i] - p_baseTime);
+      p_velocity[2] = b3 + 2 * c3 * (p_cacheTime[i] - p_baseTime);
+      p_cacheVelocity.push_back(p_velocity);
+    }  
+
+    p_source = HermiteCache;
     double et = p_et;
     p_et = -DBL_MAX;
     SetEphemerisTime(et);
 
-    return;
+    return Cache(tableName);
   }
-*/
 
 
   /** Set the coefficients of a polynomial fit to each of the components (X, Y, Z)
@@ -1251,8 +1237,8 @@ namespace Isis {
   void SpicePosition::SetEphemerisTimeSpice() {
     // Read from the kernel
     SpiceDouble j[6], lt;
-    // First try getting the entire state (including the velocity vector)
 
+    // First try getting the entire state (including the velocity vector)
     spkez_c((SpiceInt)p_targetCode,
             (SpiceDouble)(p_et + p_timeBias),
             "J2000",

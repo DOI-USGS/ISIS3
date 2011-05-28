@@ -137,6 +137,9 @@ namespace Isis {
    *                       memory problem in SetPolynomial
    *  @history 2011-04-10 Debbie A. Cook - Added GetSource method to support
    *                       spkwriter.
+   *  @history 2011-05-27 Debbie A. Cook - Renamed old ReloadCache method for
+   *                       converting polynomial functions to Hermite cubic
+   *                       splines to LoadHermiteCache for use with spkwriter.
    */
   class SpicePosition {
     public:
@@ -185,10 +188,9 @@ namespace Isis {
       void LoadCache(Table &table);
 
       Table LineCache(const std::string &tableName);
+      Table LoadHermiteCache(const std::string &tableName);
 
       void ReloadCache();
-      void ReloadCache(Isis::PolynomialUnivariate &function1, Isis::PolynomialUnivariate &function2,
-                       Isis::PolynomialUnivariate &function3);
       void ReloadCache(Table &table);
 
       Table Cache(const std::string &tableName);
