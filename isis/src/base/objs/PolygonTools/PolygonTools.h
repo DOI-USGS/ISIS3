@@ -119,6 +119,8 @@ namespace Isis {
    *            when reducing precision
    *   @history 2009-06-09 Steven Lambright - Added a check to Equal(double,double). This
    *            never caused a problem but could have.
+   *   @history 2011-05-31 Steven Lambright - Improved To180 (not finished). The
+   *            remaining work is to remove the 0 seam from the polygons.
    */
 
   class PolygonTools {
@@ -185,6 +187,7 @@ namespace Isis {
       static geos::geom::LinearRing   *ReducePrecision(const geos::geom::LinearRing *ring, unsigned int precision);
       static geos::geom::Coordinate   *ReducePrecision(const geos::geom::Coordinate *coord, unsigned int precision);
       static double ReducePrecision(double num, unsigned int precision);
+
     private:
 
       static geos::geom::Geometry *Operate(const geos::geom::Geometry *geom1, const geos::geom::Geometry *geom2, unsigned int opcode);
