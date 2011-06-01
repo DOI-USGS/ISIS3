@@ -50,7 +50,7 @@ namespace Isis
   {
     PointParentItem * pointItem = NULL;
 
-    int sum1 = 1;
+//     int sum1 = 1;
 
     if (!filter || filter->evaluate(point))
     {
@@ -74,7 +74,7 @@ namespace Isis
       }
     }
     
-    if (sum1)
+//     if (sum1)
       return pointItem;
   }
   
@@ -116,7 +116,7 @@ namespace Isis
   void PointModel::rebuildItemsDone()
   {
    
-//     saveViewState();
+    saveViewState();
     
     clear();
     QAtomicPointer< RootItem > newRoot = watcher->future();
@@ -137,6 +137,6 @@ namespace Isis
       newRoot = NULL;
     }
 
-//     loadViewState();
+    loadViewState();
   }
 }

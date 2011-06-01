@@ -36,11 +36,9 @@ namespace Isis
       }
       
       bool hasFilter() const;
-      bool hasImageFilter() const;
-      bool hasPointFilter() const;
-      bool hasMeasureFilter() const;
+      bool hasFilter(bool (AbstractFilter::*)() const) const;
       
-      QString getDescription() const;
+      QString getDescription(QString (AbstractFilter::*)() const) const;
 
 
     signals:

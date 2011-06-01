@@ -31,7 +31,7 @@ namespace Isis
   
   bool AbstractPointMeasureFilter::canFilterImages() const
   {
-    return minForImageSuccess != -1;
+    return getMinForImageSuccess() != -1;
   }
   
   
@@ -75,12 +75,12 @@ namespace Isis
       
       if (effectiveness != AbstractPointMeasureFilter::MeasuresOnly)
       {
-        pointsPass = passedPoints >= minForImageSuccess;
+        pointsPass = passedPoints >= getMinForImageSuccess();
       }
       
       if (effectiveness != AbstractPointMeasureFilter::PointsOnly)
       {
-        measuresPass = passedMeasures >= minForImageSuccess;
+        measuresPass = passedMeasures >= getMinForImageSuccess();
       }
     
       evaluation = pointsPass && measuresPass;

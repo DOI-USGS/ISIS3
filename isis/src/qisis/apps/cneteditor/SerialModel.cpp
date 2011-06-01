@@ -55,7 +55,7 @@ namespace Isis
   {
     SerialParentItem * serialItem = NULL;
 
-    if (true || !filter || filter->evaluate(node))
+    if (!filter || filter->evaluate(node))
     {
       serialItem = new SerialParentItem(node);
       QList< ControlMeasure * > measures = node->getMeasures();
@@ -63,7 +63,7 @@ namespace Isis
       {
         ControlPoint * point = measures[j]->Parent();
         ASSERT(measure);
-        if (true || !filter || filter->evaluate(point))
+        if (!filter || filter->evaluate(point))
         {
           PointLeafItem * pointItem = new PointLeafItem(
               point, serialItem);
@@ -113,7 +113,7 @@ namespace Isis
     if (watcher->isCanceled())
       return;
    
-//     saveViewState();
+    saveViewState();
     
     clear();
     QAtomicPointer< RootItem > newRoot = watcher->future();
@@ -136,6 +136,6 @@ namespace Isis
       }
     }
 
-//     loadViewState();
+    loadViewState();
   }
 }

@@ -36,9 +36,7 @@ namespace Isis
       bool evaluate(const ControlPoint * point) const;
       bool evaluate(const ControlMeasure * measure) const;
       
-      bool hasImageFilter() const;
-      bool hasPointFilter() const;
-      bool hasMeasureFilter() const;
+      bool hasFilter(bool (AbstractFilter::*)() const) const;
       
       
     signals:
@@ -48,13 +46,10 @@ namespace Isis
 
     private:
       void nullify();
-      bool hasGroupWithCondition(bool (FilterGroup::*)() const) const;
       QList< FilterGroup * > groupsWithCondition(
           bool (FilterGroup::*)() const) const;
-      void updateDescription(QLabel * label,
-          bool (FilterGroup::*)() const,
-          QString (FilterGroup::*)() const,
-          QString);
+      void updateDescription(QLabel * label, bool (AbstractFilter::*)() const,
+          QString (AbstractFilter::*)() const, QString);
  
   
     private slots:

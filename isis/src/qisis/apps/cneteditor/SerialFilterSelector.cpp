@@ -10,6 +10,8 @@
 #include <QPushButton>
 
 #include "AbstractFilter.h"
+#include "ChooserNameFilter.h"
+#include "IgnoredFilter.h"
 #include "PointIdFilter.h"
 
 
@@ -33,25 +35,33 @@ namespace Isis
   {
     AbstractFilterSelector::createSelector();
   
-//     selector->addItem("Point Id");
+    selector->addItem("Chooser Name");
+    selector->addItem("Ignored");
+    selector->addItem("Point Id");
   }
 
 
   void SerialFilterSelector::changeFilter(int index)
   {
-//     AbstractFilterSelector::changeFilter(index);
-//     
-//     if (index != 0)
-//     {
-//       switch (index)
-//       {
-//         case 1:
-//           filter = new PointIdFilter(1);
-//           break;
-//       }
-//       
-//       connect(filter, SIGNAL(filterChanged()), this, SIGNAL(filterChanged()));
-//       mainLayout->insertWidget(2, filter);
-//     }
+    AbstractFilterSelector::changeFilter(index);
+    
+    if (index != 0)
+    {
+      switch (index)
+      {
+        case 1:
+          filter = new ChooserNameFilter(1);
+          break;
+        case 2:
+          filter = new IgnoredFilter(1);
+          break;
+        case 3:
+          filter = new PointIdFilter(1);
+          break;
+      }
+      
+      connect(filter, SIGNAL(filterChanged()), this, SIGNAL(filterChanged()));
+      mainLayout->insertWidget(2, filter);
+    }
   }
 }

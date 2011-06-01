@@ -28,16 +28,22 @@ namespace Isis
       bool evaluate(const ControlMeasure *) const;
       bool evaluate(const ControlCubeGraphNode *) const;
       
-      QString getDescription() const;
-
+      QString getImageDescription() const;
+      QString getPointDescription() const;
+      
 
     protected:
       void nullify();
       void createWidget();
+      
+      
+    private slots:
+      void updateLineEditText(QString);
 
 
     private:
       QLineEdit * lineEdit;
+      QString * lineEditText;
   };
 }
 

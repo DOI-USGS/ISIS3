@@ -573,12 +573,12 @@ namespace Isis
 
 //     cerr << "CnetEditorWidget::rebuildModels two\n";
 //     serialModel->saveViewState();
-//     serialModel->rebuildItems();
+    serialModel->rebuildItems();
 //     serialModel->loadViewState();
 
 //     cerr << "CnetEditorWidget::rebuildModels three\n";
 //     connectionModel->saveViewState();
-//     connectionModel->rebuildItems();
+    connectionModel->rebuildItems();
 //     connectionModel->loadViewState();
 
     updatingSelection = false;

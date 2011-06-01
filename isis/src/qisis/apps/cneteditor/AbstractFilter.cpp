@@ -12,6 +12,7 @@
 #include <QRadioButton>
 #include <QReadWriteLock>
 #include <QSpinBox>
+#include <QWriteLocker>
 
 
 using std::cerr;
@@ -61,8 +62,8 @@ namespace Isis
     {
       QLabel * label = new QLabel("Min Count: ");
       QSpinBox * spinBox = new QSpinBox;
-      spinBox->setRange(0, std::numeric_limits< int >::max());
-      spinBox->setValue(1);
+      spinBox->setRange(1, std::numeric_limits< int >::max());
+      spinBox->setValue(1);  // FIXME: QSettings should handle this
       connect(spinBox, SIGNAL(valueChanged(int)),
           this, SLOT(updateMinForImageSuccess(int)));
       mainLayout->addWidget(label);
@@ -104,10 +105,31 @@ namespace Isis
     
     return evaluation;
   }
+  
+  
+  QString AbstractFilter::getImageDescription() const
+  {
+    return "have at least " + QString::number(getMinForImageSuccess()) + " ";
+  }
+
+
+  QString AbstractFilter::getPointDescription() const
+  {
+    return QString();
+  }
 
   
+  QString AbstractFilter::getMeasureDescription() const
+  {
+    return QString();
+  }
+
+
   void AbstractFilter::updateMinForImageSuccess(int newMin)
   {
+    QWriteLocker locker(lock);
     minForImageSuccess = newMin;
+    locker.unlock();
+    emit filterChanged();
   }
 }

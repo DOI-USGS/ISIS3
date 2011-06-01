@@ -20,7 +20,9 @@ namespace Isis
       bool evaluate(const ControlPoint *) const;
       bool evaluate(const ControlMeasure *) const;
 
-      QString getDescription() const;
+      QString getImageDescription() const;
+      QString getPointDescription() const;
+      QString getMeasureDescription() const;
   };
 }
 

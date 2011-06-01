@@ -109,7 +109,7 @@ namespace Isis
   
   void ConnectionModel::rebuildItemsDone()
   {
-//     saveViewState();
+    saveViewState();
     
     clear();
     QAtomicPointer< RootItem > newRoot = watcher->future();
@@ -132,6 +132,6 @@ namespace Isis
       }
     }
 
-//     loadViewState();
+    loadViewState();
   }
 }

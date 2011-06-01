@@ -31,7 +31,9 @@ namespace Isis
       virtual bool evaluate(const ControlPoint *) const = 0;
       virtual bool evaluate(const ControlMeasure *) const = 0;
       
-      virtual QString getDescription() const = 0;
+      virtual QString getImageDescription() const;
+      virtual QString getPointDescription() const;
+      virtual QString getMeasureDescription() const;
 
 
     signals:
@@ -42,6 +44,7 @@ namespace Isis
       virtual void nullify();
       virtual void createWidget();
       bool inclusive() const;
+      int getMinForImageSuccess() const { return minForImageSuccess; }
       
       virtual bool evaluate(const ControlPoint *,
           bool (ControlPoint::*)() const) const;
@@ -55,13 +58,12 @@ namespace Isis
 
     protected:
       QHBoxLayout * mainLayout;
-      int minForImageSuccess;
-      
       QReadWriteLock * lock;
 
 
     private:
       QButtonGroup * inclusiveExclusiveGroup;
+      int minForImageSuccess;
   };
 }
 

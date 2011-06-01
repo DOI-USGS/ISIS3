@@ -63,7 +63,7 @@ namespace Isis
 
   bool PointIdFilter::canFilterImages() const
   {
-    return minForImageSuccess != -1;
+    return getMinForImageSuccess() != -1;
   }
   
   
@@ -135,14 +135,38 @@ namespace Isis
           passedPoints++;
       }
       
-      evaluation = passedPoints >= minForImageSuccess;
+      evaluation = passedPoints >= getMinForImageSuccess();
     }
     
     return evaluation;
   }
   
   
-  QString PointIdFilter::getDescription() const
+  QString PointIdFilter::getImageDescription() const
+  {
+    QString description = AbstractFilter::getImageDescription();
+    description += "point";
+    if (getMinForImageSuccess() == 1)
+      description += " with it's ID ";
+    else
+      description += "s with ID's ";
+    
+    if (inclusive())
+      description += "containing \"";
+    else
+      description += "that don't contain \"";
+    
+    QReadLocker locker(lock);
+    description += *lineEditText;
+    locker.unlock();
+    
+    description += "\"";
+    
+    return description;
+  }
+  
+  
+  QString PointIdFilter::getPointDescription() const
   {
     QString description = "have ID's ";
     

@@ -41,15 +41,53 @@ namespace Isis
   }
   
   
-  QString IgnoredFilter::getDescription() const
+  QString IgnoredFilter::getImageDescription() const
   {
-    QString description = "are ";
-     
-    if (!inclusive())
-      description += "not ";
+    QString description = AbstractFilter::getImageDescription();
+    if (effectiveness == AbstractPointMeasureFilter::Both)
+    {
+      if (getMinForImageSuccess() == 1)
+        description += "point or measure that is ";
+      else
+        description += "points or measures that are ";
+    }
+    else
+    {
+      if (effectiveness == AbstractPointMeasureFilter::PointsOnly)
+        description += "point";
+      else
+        description += "measure";
+        
+      if (getMinForImageSuccess() == 1)
+        description += " that is ";
+      else
+        description += "s that are ";
+    }
     
-    description += "ignored";
+    if (inclusive())
+      description += "ignored";
+    else
+      description += "not ignored";
     
     return description;
+  }
+  
+  
+  QString IgnoredFilter::getPointDescription() const
+  {
+    QString description = "are ";
+    
+    if (inclusive())
+      description += "ignored";
+    else
+      description += "not ignored";
+    
+    return description;
+  }
+
+  
+  QString IgnoredFilter::getMeasureDescription() const
+  {
+    return getPointDescription();
   }
 }

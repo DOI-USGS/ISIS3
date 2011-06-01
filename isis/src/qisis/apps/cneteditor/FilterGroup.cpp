@@ -102,13 +102,13 @@ namespace Isis
     // together!
     bool looking = true;
     for (int i = 0; looking && i < selectors->size(); i++)
-      if (selectors->at(i)->hasImageFilter())
+      if (selectors->at(i)->hasFilter(&AbstractFilter::canFilterImages))
         looking = !(selectors->at(i)->evaluate(node) ^ andFiltersTogether);
 
     // It is good that we are still looking for failures if we were ANDing
     // filters together, but it is bad if we were ORing them since in this
     // case we were looking for success.
-    return !(looking ^ andFiltersTogether) || !hasImageFilter();
+    return !(looking ^ andFiltersTogether) || !hasFilter(&AbstractFilter::canFilterImages);
   }
 
 
@@ -122,14 +122,15 @@ namespace Isis
     // together!
     bool looking = true;
     for (int i = 0; looking && i < selectors->size(); i++)
-      if (selectors->at(i)->hasPointFilter())
+      if (selectors->at(i)->hasFilter(&AbstractFilter::canFilterPoints))
         looking = !(selectors->at(i)->evaluate(point) ^ andFiltersTogether);
 
     // It is good that we are still looking for failures if we were ANDing
     // filters together, but it is bad if we were ORing them since in this
     // case we were looking for success.
-    return !(looking ^ andFiltersTogether) || !hasPointFilter();
+    return !(looking ^ andFiltersTogether) || !hasFilter(&AbstractFilter::canFilterPoints);
   }
+
 
   bool FilterGroup::evaluate(const ControlMeasure * measure) const
   {
@@ -141,52 +142,40 @@ namespace Isis
     // together!
     bool looking = true;
     for (int i = 0; looking && i < selectors->size(); i++)
-      if (selectors->at(i)->hasMeasureFilter())
+      if (selectors->at(i)->hasFilter(&AbstractFilter::canFilterMeasures))
         looking = !(selectors->at(i)->evaluate(measure) ^ andFiltersTogether);
 
     // It is good that we are still looking for failures if we were ANDing
     // filters together, but it is bad if we were ORing them since in this
     // case we were looking for success.
-    return !(looking ^ andFiltersTogether) || !hasMeasureFilter();
-  }
-
-  
-  
-  bool FilterGroup::hasFilter() const
-  {
-    return hasSelectorWithCondition(&AbstractFilterSelector::hasFilter);
+    return !(looking ^ andFiltersTogether) || !hasFilter(&AbstractFilter::canFilterMeasures);
   }
   
   
-  bool FilterGroup::hasImageFilter() const
-  {
-    return hasSelectorWithCondition(&AbstractFilterSelector::hasImageFilter);
-  }
+//   bool FilterGroup::hasFilter() const
+//   {
+//     bool found = false;
+//     
+//     for (int i = 0; !found && i < selectors->size(); i++)
+//       found = selectors->at(i)->hasFilter();
+//     
+//     return found;
+//   }
   
   
-  bool FilterGroup::hasPointFilter() const
-  {
-    return hasSelectorWithCondition(&AbstractFilterSelector::hasPointFilter);
-  }
-  
-  
-  bool FilterGroup::hasMeasureFilter() const
-  {
-    return hasSelectorWithCondition(&AbstractFilterSelector::hasMeasureFilter);
-  }
-  
-
-  bool FilterGroup::hasSelectorWithCondition(
-      bool (AbstractFilterSelector::*meth)() const) const
+  bool FilterGroup::hasFilter(bool (AbstractFilter::*meth)() const) const
   {
     bool found = false;
     
     for (int i = 0; !found && i < selectors->size(); i++)
-      found = (selectors->at(i)->*meth)();
+      if (meth)
+        found = selectors->at(i)->hasFilter(meth);
+      else
+        found = selectors->at(i)->hasFilter();
     
     return found;
   }
-
+  
 
   void FilterGroup::nullify()
   {
@@ -266,19 +255,20 @@ namespace Isis
   
   
   QString FilterGroup::getDescription(
-      bool (AbstractFilterSelector::*meth)() const) const
+      bool (AbstractFilter::*hasFilterMeth)() const,
+      QString (AbstractFilter::*descriptionMeth)() const) const
   {
     QString description;
     
     ASSERT(selectors);
-      
+    
     QList< AbstractFilterSelector * > selectorsWithFilters;
     for (int i = 0; i < selectors->size(); i++)
-      if ((selectors->at(i)->*meth)())
+      if (selectors->at(i)->hasFilter(hasFilterMeth))
         selectorsWithFilters.append(selectors->at(i));
     
     int numFilters = selectorsWithFilters.size();
-   
+    
     if (numFilters)
     {
       QString logic = "<b> ";
@@ -289,29 +279,15 @@ namespace Isis
       logic += " </b>";
       
       for (int i = 0; i < numFilters - 1; i++)
-        description += selectorsWithFilters[i]->getDescription() + logic;
+      {
+        description += selectorsWithFilters[i]->getDescription(descriptionMeth)
+            + logic;
+      }
       
-      description += selectorsWithFilters[numFilters - 1]->getDescription();
+      description += selectorsWithFilters[numFilters - 1]->getDescription(
+          descriptionMeth);
     }
     
     return description;
-  }
-  
-  
-  QString FilterGroup::getImageDescription() const
-  {
-    return getDescription(&AbstractFilterSelector::hasImageFilter);
-  }
-  
-  
-  QString FilterGroup::getPointDescription() const
-  {
-    return getDescription(&AbstractFilterSelector::hasPointFilter);
-  }
-  
-  
-  QString FilterGroup::getMeasureDescription() const
-  {
-    return getDescription(&AbstractFilterSelector::hasMeasureFilter);
   }
 }

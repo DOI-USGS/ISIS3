@@ -31,14 +31,11 @@ namespace Isis
       bool evaluate(const ControlPoint * point) const;
       bool evaluate(const ControlMeasure * measure) const;
       
-      bool hasFilter() const;
-      bool hasImageFilter() const;
-      bool hasPointFilter() const;
-      bool hasMeasureFilter() const;
+      //bool hasFilter() const;
+      bool hasFilter(bool (AbstractFilter::*)() const = NULL) const;
       
-      QString getImageDescription() const;
-      QString getPointDescription() const;
-      QString getMeasureDescription() const;
+      QString getDescription(bool (AbstractFilter::*)() const,
+          QString (AbstractFilter::*)() const) const;
       
       bool filtersAreAndedTogether() const;
       
@@ -50,8 +47,6 @@ namespace Isis
 
 
     private:
-      QString getDescription(bool (AbstractFilterSelector::*)() const) const;
-
       bool hasSelectorWithCondition(
           bool (AbstractFilterSelector::*)() const) const;
       void nullify();

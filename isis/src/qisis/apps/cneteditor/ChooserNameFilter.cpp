@@ -4,6 +4,8 @@
 
 #include <QHBoxLayout>
 #include <QLineEdit>
+#include <QReadLocker>
+#include <QWriteLocker>
 
 #include "ControlCubeGraphNode.h"
 #include "ControlMeasure.h"
@@ -16,12 +18,18 @@ namespace Isis
       AbstractFilter(minimumForImageSuccess)
   {
     nullify();
+    lineEditText = new QString;
     createWidget();
   }
 
 
   ChooserNameFilter::~ChooserNameFilter()
   {
+    if (lineEditText)
+    {
+      delete lineEditText;
+      lineEditText = NULL;
+    }
   }
 
 
@@ -30,6 +38,7 @@ namespace Isis
     AbstractFilter::nullify();
 
     lineEdit = NULL;
+    lineEditText = NULL;
   }
 
 
@@ -47,7 +56,7 @@ namespace Isis
 
   bool ChooserNameFilter::canFilterImages() const
   {
-    return minForImageSuccess != -1;
+    return getMinForImageSuccess() != -1;
   }
   
   
@@ -114,25 +123,59 @@ namespace Isis
           passedPoints++;
       }
       
-      evaluation = passedPoints >= minForImageSuccess;
+      evaluation = passedPoints >= getMinForImageSuccess();
     }
     
     return evaluation;
   }
   
   
-  QString ChooserNameFilter::getDescription() const
+  QString ChooserNameFilter::getImageDescription() const
+  {
+    QString description = AbstractFilter::getImageDescription();
+    description += "point";
+    if (getMinForImageSuccess() == 1)
+      description += " with it's chooser name ";
+    else
+      description += "s with chooser names ";
+    
+    if (inclusive())
+      description += "containing \"";
+    else
+      description += "that don't contain \"";
+    
+    QReadLocker locker(lock);
+    description += *lineEditText;
+    locker.unlock();
+     
+    description += "\"";
+    
+    return description;
+  }
+  
+  
+  QString ChooserNameFilter::getPointDescription() const
   {
     QString description = "have chooser names ";
     
     if (inclusive())
-      description += "containing ";
+      description += "containing \"";
     else
-      description += "that don't contain ";
+      description += "that don't contain \"";
     
-    ASSERT(lineEdit);
-    description += "\"" + lineEdit->text() + "\"";
+    QReadLocker locker(lock);
+    description += *lineEditText;
+    locker.unlock();
+    
+    description += "\"";
     
     return description;
+  }
+  
+  
+  void ChooserNameFilter::updateLineEditText(QString newText)
+  {
+    QWriteLocker locker(lock);
+    *lineEditText = newText;
   }
 }

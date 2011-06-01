@@ -134,7 +134,7 @@ namespace Isis
     bool looking = true;
     for (int i = 0; looking && i < filterGroups->size(); i++)
     {
-      if (filterGroups->at(i)->hasImageFilter())
+      if (filterGroups->at(i)->hasFilter(&AbstractFilter::canFilterImages))
         looking = !(filterGroups->at(i)->evaluate(node) ^
             andGroupsTogether);
     }
@@ -143,7 +143,7 @@ namespace Isis
     // filters together, but it is bad if we were ORing them since in this
     // case we were looking for success (unless of course there were no
     // filters to look through).
-    return !(looking ^ andGroupsTogether) || !hasImageFilter();
+    return !(looking ^ andGroupsTogether) || !hasFilter(&AbstractFilter::canFilterImages);
   }
   
   
@@ -158,7 +158,7 @@ namespace Isis
     bool looking = true;
     for (int i = 0; looking && i < filterGroups->size(); i++)
     {
-      if (filterGroups->at(i)->hasPointFilter())
+      if (filterGroups->at(i)->hasFilter(&AbstractFilter::canFilterPoints))
         looking = !(filterGroups->at(i)->evaluate(point) ^
             andGroupsTogether);
     }
@@ -167,7 +167,7 @@ namespace Isis
     // filters together, but it is bad if we were ORing them since in this
     // case we were looking for success (unless of course there were no
     // filters to look through).
-    return !(looking ^ andGroupsTogether) || !hasPointFilter();
+    return !(looking ^ andGroupsTogether) || !hasFilter(&AbstractFilter::canFilterPoints);
   }
   
   
@@ -182,7 +182,7 @@ namespace Isis
     bool looking = true;
     for (int i = 0; looking && i < filterGroups->size(); i++)
     {
-      if (filterGroups->at(i)->hasMeasureFilter())
+      if (filterGroups->at(i)->hasFilter(&AbstractFilter::canFilterMeasures))
         looking = !(filterGroups->at(i)->evaluate(measure) ^
             andGroupsTogether);
     }
@@ -191,25 +191,18 @@ namespace Isis
     // filters together, but it is bad if we were ORing them since in this
     // case we were looking for success (unless of course there were no
     // filters to look through).
-    return !(looking ^ andGroupsTogether) || !hasMeasureFilter();
+    return !(looking ^ andGroupsTogether) || !hasFilter(&AbstractFilter::canFilterMeasures);
   }
   
   
-  bool FilterWidget::hasImageFilter() const
+  bool FilterWidget::hasFilter(bool (AbstractFilter::*meth)() const) const
   {
-    return hasGroupWithCondition(&FilterGroup::hasImageFilter);
-  }
-  
-  
-  bool FilterWidget::hasPointFilter() const
-  {
-    return hasGroupWithCondition(&FilterGroup::hasPointFilter);
-  }
-  
-  
-  bool FilterWidget::hasMeasureFilter() const
-  {
-    return hasGroupWithCondition(&FilterGroup::hasMeasureFilter);
+    bool found = false;
+    
+    for (int i = 0; !found && i < filterGroups->size(); i++)
+      found = filterGroups->at(i)->hasFilter(meth);
+    
+    return found;
   }
   
   
@@ -224,45 +217,20 @@ namespace Isis
   }
   
   
-  bool FilterWidget::hasGroupWithCondition(
-      bool (FilterGroup::*meth)() const) const
-  {
-    bool found = false;
-    
-    for (int i = 0; !found && i < filterGroups->size(); i++)
-      found = (filterGroups->at(i)->*meth)();
-    
-    return found;
-  }
-  
-  
-  QList< FilterGroup * > FilterWidget::groupsWithCondition(
-      bool (FilterGroup::*meth)() const) const
-  {
-    QList< FilterGroup * > groups;
-    
-    for (int i = 0; i < filterGroups->size(); i++)
-      if ((filterGroups->at(i)->*meth)())
-        groups.append(filterGroups->at(i));
-    
-    return groups;
-  }
-  
-  
   void FilterWidget::updateDescription()
   {
-    updateDescription(imageDescription, &FilterGroup::hasImageFilter,
-                      &FilterGroup::getImageDescription, "images");
-    updateDescription(pointDescription, &FilterGroup::hasPointFilter,
-                      &FilterGroup::getPointDescription, "points");
-    updateDescription(measureDescription, &FilterGroup::hasMeasureFilter,
-                      &FilterGroup::getMeasureDescription, "measures");
+    updateDescription(imageDescription, &AbstractFilter::canFilterImages,
+                      &AbstractFilter::getImageDescription, "images");
+    updateDescription(pointDescription, &AbstractFilter::canFilterPoints,
+                      &AbstractFilter::getPointDescription, "points");
+    updateDescription(measureDescription, &AbstractFilter::canFilterMeasures,
+                      &AbstractFilter::getMeasureDescription, "measures");
   }
   
   
   void FilterWidget::updateDescription(QLabel * label,
-      bool (FilterGroup::*conditionMeth)() const,
-      QString (FilterGroup::*descriptionMeth)() const,
+      bool (AbstractFilter::*hasFilterMeth)() const,
+      QString (AbstractFilter::*descriptionMeth)() const,
       QString title)
   {
     ASSERT(label);
@@ -271,7 +239,11 @@ namespace Isis
     {
       label->clear();
 
-      QList< FilterGroup * > groups = groupsWithCondition(conditionMeth);
+      QList< FilterGroup * > groups;
+      for (int i = 0; i < filterGroups->size(); i++)
+        if (filterGroups->at(i)->hasFilter(hasFilterMeth))
+          groups.append(filterGroups->at(i));
+           
       const int GROUP_SIZE = groups.size();
       
       if (GROUP_SIZE)
@@ -296,14 +268,16 @@ namespace Isis
         {
           if (GROUP_SIZE > 1)
             text += leftParen;
-          text += blue + (groups[i]->*descriptionMeth)() + end;         
+          text += blue + groups[i]->getDescription(
+              hasFilterMeth, descriptionMeth) + end;         
           if (GROUP_SIZE > 1)
             text += rightParen + black + "<b>" + groupLogic + "</b>" + end;
         }
           
         if (GROUP_SIZE > 1)
           text += leftParen;
-        text += blue + (groups[GROUP_SIZE - 1]->*descriptionMeth)() + end;
+        text += blue + groups[GROUP_SIZE - 1]->getDescription(
+            hasFilterMeth, descriptionMeth) + end;
         if (GROUP_SIZE > 1)
           text += rightParen;
         
