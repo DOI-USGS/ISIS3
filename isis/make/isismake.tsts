@@ -95,12 +95,14 @@ TESTNOCLEAN := NOCLEAN
 # Defined text statements
 TESTPASSED =$(PRINTF) $(BLANKS) \"\"; echo -n "OK ... Case [$(CASE)] "
 TESTFAILED =$(PRINTF) $(BLANKS) \"\"; echo -n "Failed ... Case [$(CASE)] "
-TESTFILEFAILED =echo Failed ... File [$@]
-FILENOTFOUND =echo Failed ... File does not exist [$@]
-UNKNOWNFILE =echo Failed ... Unknown file type [$@]
+TESTFILEFAILED =echo Failed ... File
+FILENOTFOUND =echo Failed ... File does not exist
+UNKNOWNFILE =echo Failed ... Unknown file type
 NOTRUTH =echo Failed ... No truth folder or files
 NOTRUTHFILE =echo Failed ... No files in truth directory
-NOOUTPUT =$(PRINTF) $(BLANKS) ""; echo "Error ... Output folder does not exist"
+NOOUTPUT =echo Error ... Output folder does not exist
+FILECOUNTMISMATCH =echo Failed ... Number of files in truth and output folder do not match
+NOTALLMATCH =echo Failed ... Not all files in truth and output folders match
 
 DIRPATTERN=2774
 FILEPATTERN=2664
@@ -112,7 +114,7 @@ DIRLISTPATTERN="drwxrwsr--"
 #
 # Displays a list of targets and their descriptions.
 #----------------------------------------------------------------------------
-help:
+help: FORCE
 	echo "Isis Make Test Commands"
 	echo "------------------------ "
 	echo "make test               : Run test and print result, remove output"
@@ -127,110 +129,324 @@ help:
 
 #----------------------------------------------------------------------------
 # Target = test
-# Dependencies = clean output compare
+# Dependencies = FORCE clean
 #
-# Clean is to make sure that there is nothing in the 
-# output directory other than what is generated in the test.
-# Output then generates the file from the test.  Finally 
-# comparefiles shows the result of the test.  If the truth
-# directory doesn't exist that a message is printed stating so.
+# Cleans the output directory to ensure that all files are freshly generated
+# for this test, and then makes new output. The files in the output and truth
+# directories are compared, and any appropriate error or success messages are
+# printed out. The time that it took for the test to run is also printed.
 #----------------------------------------------------------------------------
-test: clean; \
-	TIME1=`date +"%s"`; \
-	if [ -d "$(TRUTH)" ]; \
-	then \
-	  truthdir=`$(LS) $(TRUTH)`; \
-	  if [ "$$truthdir" == "" ]; \
-	  then \
-	    msg='$(NOTRUTHFILE)'; \
-	    $(PRINTF) "$(BLANKS)  " >> casefailed.txt; \
-	    $$msg >> casefailed.txt; \
-	  else \
-	    $(MAKE) output; \
-	    $(MAKE) comparefiles; \
-	    if [  "$(findstring $(TESTNOCLEAN), $(MODE))" != "$(TESTNOCLEAN)" ]; \
-	    then \
-	      $(MAKE) clean; \
-	    fi; \
-	  fi; \
-	else \
-	  msg='$(NOTRUTH)'; \
-	  $(PRINTF) "$(BLANKS)  " >> casefailed.txt; \
-	  $$msg >> casefailed.txt; \
-	fi; \
-	if [ $$TIME1 = %s ]; \
-	then \
-	  if [ -f casefailed.txt ]; \
-	  then \
-	    eval $(TESTFAILED); \
-	    echo; \
-	    $(CAT) casefailed.txt; \
-	    $(RM) casefailed.txt; \
-	  else \
-	    eval $(TESTPASSED); \
-	    echo; \
-	  fi; \
-	else \
-	  TIME2=`date +"%s"`; \
-	  TIMEDIFF=`expr $$TIME2 - $$TIME1`; \
-	  SEC60=`expr $$TIMEDIFF % 60`; \
-	  MIN=`expr $$TIMEDIFF / 60`; \
-	  MIN60=`expr $$MIN % 60`; \
-	  HOUR=`expr $$MIN / 60`; \
-	  HOUR60=`expr $$HOUR % 60`; \
-	  if [ -f casefailed.txt ]; \
-	  then \
-	    eval $(TESTFAILED); \
-	    $(PRINTF) "(%.2i:%.2i:%.2i)\n" $$HOUR60 $$MIN60 $$SEC60; \
-	    $(CAT) casefailed.txt; \
-	    $(RM) casefailed.txt; \
-	  else \
-	    eval $(TESTPASSED); \
-	    $(PRINTF) "(%.2i:%.2i:%.2i)\n" $$HOUR60 $$MIN60 $$SEC60; \
-	  fi; \
+test: FORCE clean
+	TIME1=`date +"%s"`;                                                   \
+	if [ -d "$(TRUTH)" ]; then                                            \
+	  TRUTHDIR=`$(LS) $(TRUTH)`;                                          \
+	  if [ "$$TRUTHDIR" == "" ]; then                                     \
+	    MSG='$(NOTRUTHFILE)';                                             \
+	    $(PRINTF) "$(BLANKS)  " >> errors.txt;                            \
+	    $$MSG >> errors.txt;                                              \
+	  else                                                                \
+	    $(MAKE) output;                                                   \
+	    TRUTHFILECOUNT=`$(LS) -p $(TRUTH) | $(GREP) -v "/" | wc -l`;      \
+	    OUTPUTFILECOUNT=`$(LS) -p $(OUTPUT) | $(GREP) -v "/" | wc -l`;    \
+	    if [ $$TRUTHFILECOUNT -ne $$OUTPUTFILECOUNT ]; then               \
+	      MSG='$(FILECOUNTMISMATCH)';                                     \
+	      $(PRINTF) "$(BLANKS)  " >> errors.txt;                          \
+	      $$MSG >> errors.txt;                                            \
+	    else                                                              \
+	      $(MAKE) comparefiles;                                           \
+	    fi;                                                               \
+	  fi;                                                                 \
+	else                                                                  \
+	  MSG='$(NOTRUTH)';                                                   \
+	  $(PRINTF) "$(BLANKS)  " >> errors.txt;                              \
+	  $$MSG >> errors.txt;                                                \
+	fi;                                                                   \
+	                                                                      \
+	TIME2=`date +"%s"`;                                                   \
+	TIMEDIFF=`expr $$TIME2 - $$TIME1`;                                    \
+	SEC60=`expr $$TIMEDIFF % 60`;                                         \
+	MIN=`expr $$TIMEDIFF / 60`;                                           \
+	MIN60=`expr $$MIN % 60`;                                              \
+	HOUR=`expr $$MIN / 60`;                                               \
+	HOUR60=`expr $$HOUR % 60`;                                            \
+	if [ -f casesucceeded.txt ]; then                                     \
+	  eval $(TESTPASSED);                                                 \
+	  $(PRINTF) "(%.2i:%.2i:%.2i)\n" $$HOUR60 $$MIN60 $$SEC60;            \
+	  $(RM) casesucceeded.txt;                                            \
+	else                                                                  \
+	  eval $(TESTFAILED);                                                 \
+	  $(PRINTF) "(%.2i:%.2i:%.2i)\n" $$HOUR60 $$MIN60 $$SEC60;            \
+	  $(CAT) errors.txt;                                                  \
+	  $(RM) errors.txt;                                                   \
+	fi;                                                                   \
+	                                                                      \
+	if [ "$(findstring $(TESTNOCLEAN), $(MODE))" != "$(TESTNOCLEAN)" ];   \
+	then                                                                  \
+	  $(MAKE) clean;                                                      \
 	fi;
 
 #----------------------------------------------------------------------------
 # Target = compare
-# Dependencies = All files in the truth directory
+# Dependencies = All files in the truth and output directories
+#
+# Iterates over the list of files in the truth directory and 
+# compares the files against the files in the output directory.
+# If successful (indicated by presence of casesucceeded.txt),
+# prints success message. If not, prints all errors that were
+# encountered (found in errors.txt).
+#----------------------------------------------------------------------------
+compare: FORCE
+	if [ -d "$(OUTPUT)" ]; then                                           \
+	  if [ -d "$(TRUTH)" ]; then                                          \
+	    TRUTHDIR=`$(LS) $(TRUTH)`;                                        \
+	    if [ "$$TRUTHDIR" == "" ]; then                                   \
+	      MSG='$(NOTRUTHFILE)';                                           \
+	      $(PRINTF) "$(BLANKS)  " >> errors.txt;                          \
+	      $$MSG >> errors.txt;                                            \
+	    else                                                              \
+	      TRUTHFILECOUNT=`$(LS) -p $(TRUTH) | $(GREP) -v "/" | wc -l`;    \
+	      OUTPUTFILECOUNT=`$(LS) -p $(OUTPUT) | $(GREP) -v "/" | wc -l`;  \
+	      if [ $$TRUTHFILECOUNT -ne $$OUTPUTFILECOUNT ]; then             \
+	        MSG='$(FILECOUNTMISMATCH)';                                   \
+	        $(PRINTF) "$(BLANKS)  " >> errors.txt;                        \
+	        $$MSG >> errors.txt;                                          \
+	      else                                                            \
+	        $(MAKE) comparefiles;                                         \
+	      fi;                                                             \
+	    fi;                                                               \
+	  else                                                                \
+	    MSG='$(NOTRUTH)';                                                 \
+	    $(PRINTF) "$(BLANKS)  " >> errors.txt;                            \
+	    $$MSG >> errors.txt;                                              \
+	  fi;                                                                 \
+	                                                                      \
+	  if [ -f casesucceeded.txt ]; then                                   \
+	    eval $(TESTPASSED);                                               \
+	    echo;                                                             \
+	    $(RM) casesucceeded.txt;                                          \
+	  else                                                                \
+	    eval $(TESTFAILED);                                               \
+	    echo;                                                             \
+	    $(CAT) errors.txt;                                                \
+	    $(RM) errors.txt;                                                 \
+	  fi;                                                                 \
+	else                                                                  \
+	  MSG='$(NOOUTPUT)';                                                  \
+	  eval $$MSG;                                                         \
+	fi;
+
+#----------------------------------------------------------------------------
+# Target = comparefiles
+# Dependencies = All files in the truth and output directories
 #
 # Iterates over the list of files in the truth directory and 
 # compares the files against the files in the output
 # directory.  If there are any files that are not recognized
-# then an unknown file message is printed.
+# then an unknown file message is printed. If and only if all
+# of the files in the truth directory match all of the files
+# in the output directory, casesucceeded.txt is created to
+# indicate that the comparison was successful. All errors are
+# written to errors.txt.
+#
+# Some parts of this target are not very straightforward. For comparing cubes,
+# users may specify make variables within their tests to indicate tolerance or
+# to ignore special pixels when running cubediff 
+# (i.e. test_cube.cub.TOLERANCE=0.0000001). The problem here is that within
+# this target, we have the current filename that is being compared stored in a
+# bash variable. We know that the *make* tolerance variable, if it exists, will
+# have the same name as the current file, but with .TOLERANCE appended to it.
+# We cannot, however, access it by simply appending .TOLERANCE to the contents
+# of our current filename variable (bash) and then ask make to evaluate that
+# new variable name because make converts all make-specific code into bash
+# BEFORE it evaluates the bash code.
+#
+# Here is an example of the problem:
+#
+#   FILENAME=foo.cub;                  // this is a bash variable
+#   TOLERANCE=$($$FILENAME.TOLERANCE); // this does not work because make will
+#                                      // try to look for a make variable named
+#                                      // '$FILENAME.TOLERANCE' (literally).
+#
+# The workaround is to use make's special variable that is a space-separated
+# list of currently defined make variable *names* (NOT values). This variable
+# is .VARIABLES. The names of each of the currently defined make .TOLERANCE 
+# variables are extracted from this list, and their values are looked up as
+# well. A new bash variable is used to hold these name/values pairs for each of
+# the tolerances (the name and value is separated by a semicolon). The list of
+# tolerances is searched for the matching tolerance for the current file (if it
+# even exists), and this is used in the cubediff. The reason that all of this
+# works is because the we are able to get the name AND value of each tolerance
+# out of the make variables and into bash variables. This same process is
+# repeated for cubes that have .IGNORESPECIAL variables defined.
+#
+# This is only a workaround. The real solution would be to completely get rid
+# of make variable tolerances from all tests and force the use of .DIFF files
+# (like pvldiff uses). However, around 138 tests are currently using make
+# variables to do this, so it would be a considerable undertaking. 
 #----------------------------------------------------------------------------
-compare:
-	if [ -d "output" ]; \
-	then \
-	  if [ -d "$(TRUTH)" ]; \
-	  then \
-	    truthdir=`$(LS) $(TRUTH)`; \
-	    if [ "$$truthdir" == "" ]; \
-	    then \
-	      msg='$(NOTRUTHFILE)'; \
-	      $(PRINTF) "$(BLANKS)  " >> casefailed.txt; \
-	      $$msg >> casefailed.txt; \
-	    else \
-	      $(MAKE) comparefiles; \
-	    fi; \
-	  else \
-	    msg='$(NOTRUTH)'; \
-	    $(PRINTF) "$(BLANKS)  " >> casefailed.txt; \
-	    $$msg >> casefailed.txt; \
-	  fi; \
-	  if [ -f casefailed.txt ]; \
-	  then \
-	    eval $(TESTFAILED); \
-	    echo; \
-	    $(CAT) casefailed.txt; \
-	    $(RM) casefailed.txt; \
-	  else \
-	    eval $(TESTPASSED); \
-	    echo; \
-	  fi; \
-	else \
-	  command='$(NOOUTPUT)'; \
-	  eval $$command; \
+comparefiles: FORCE
+	TRUTHFILECOUNT=`$(LS) -p $(TRUTH) | $(GREP) -v "/" | wc -l`;          \
+	SUCCESSFULCOMPARISONS=0;                                              \
+	                                                                      \
+	FILES="$(notdir $(wildcard $(TRUTH)/*))";                             \
+	for FILE in $$FILES; do                                               \
+	  if [ ! -f $(OUTPUT)/$$FILE ]; then                                  \
+	    MSG="$(FILENOTFOUND) [$$FILE]";                                   \
+	    $(PRINTF) "$(BLANKS)  " >> errors.txt;                            \
+	    $$MSG >> errors.txt;                                              \
+	  else                                                                \
+	    FILETYPE=$${FILE##*.};                                            \
+	                                                                      \
+	    if [ "$$FILETYPE" == "cub" ]; then                                \
+	      TOLERANCESTR="";                                                \
+	      FILETOLERANCES="$(foreach TOLERANCEVAR,                         \
+	                          $(filter %.TOLERANCE,$(.VARIABLES)),        \
+	                          $(TOLERANCEVAR);$($(TOLERANCEVAR)))";       \
+	      if [ -n "$$FILETOLERANCES" ]; then                              \
+	        for TOLERANCE in $$FILETOLERANCES; do                         \
+	          TOLERANCEFILENAME=`echo "$$TOLERANCE" | sed "s/;.*//"`;     \
+	          if [ "$$TOLERANCEFILENAME" == "$$FILE.TOLERANCE" ]; then    \
+	            TOLERANCEVALUE=`echo "$$TOLERANCE" | sed "s/^.*;//"`;     \
+	            TOLERANCESTR="tolerance=$$TOLERANCEVALUE";                \
+	            break;                                                    \
+	          fi;                                                         \
+	        done;                                                         \
+	      fi;                                                             \
+	                                                                      \
+	      IGNORESTR="";                                                   \
+	      FILESTOIGNORESPECIALS="$(foreach IGNOREVAR,$(filter             \
+	                                 %.IGNORESPECIAL,$(.VARIABLES)),      \
+	                                 $(IGNOREVAR);$($(IGNOREVAR)))";      \
+	      if [ -n "$$FILESTOIGNORESPECIALS" ]; then                       \
+	        for IGNOREDFILE in $$FILESTOIGNORESPECIALS; do                \
+	          IGNOREDNAME=`echo "$$IGNOREDFILE" | sed "s/;.*//"`;         \
+	          if [ "$$IGNOREDNAME" == "$$FILE.IGNORESPECIAL" ]; then      \
+	            IGNOREDVALUE=`echo "$$IGNOREDFILE" | sed "s/^.*;//"`;     \
+	            IGNORESTR="ignorespecial=$$IGNOREDVALUE";                 \
+	            break;                                                    \
+	          fi;                                                         \
+	        done;                                                         \
+	      fi;                                                             \
+	                                                                      \
+	      $(ISISROOT)/bin/cubediff from=$(TRUTH)/$$FILE                   \
+	          from2=$(OUTPUT)/$$FILE                                      \
+	          to=compare.txt                                              \
+	          $$TOLERANCESTR                                              \
+	          $$IGNORESTR 1>>/dev/null 2>cubediffError.txt;               \
+	      if [ $$? != 0 ]; then                                           \
+	        COMPRESULT="ERROR";                                           \
+	      else                                                            \
+	        COMPRESULT=`$(ISISROOT)/bin/getkey from=compare.txt           \
+	            grp=Results keyword=Compare`;                             \
+	      fi;                                                             \
+	      COMMAND="";                                                     \
+	      if [ "$$COMPRESULT" != "Identical" ]; then                      \
+	        MSG="$(TESTFILEFAILED) [$$FILE]";                             \
+	        $(PRINTF) "$(BLANKS)  " >> errors.txt;                        \
+	        $$MSG >> errors.txt;                                          \
+	        if [ "$$COMPRESULT" == "ERROR" ]; then                        \
+	          cat cubediffError.txt >> errors.txt;                        \
+	        fi;                                                           \
+	      else                                                            \
+	        let SUCCESSFULCOMPARISONS++;                                  \
+	      fi;                                                             \
+	      $(RM) compare.txt;                                              \
+	      if [ -f cubediffError.txt ]; then                               \
+	        $(RM) cubediffError.txt;                                      \
+	      fi;                                                             \
+	    elif [ "$$FILETYPE" == "txt" ]; then                              \
+	      COMMAND="";                                                     \
+	      $(DIFF) $(TRUTH)/$$FILE $(OUTPUT)/$$FILE > /dev/null;           \
+	      if [ $$? -ne 0 ]; then                                          \
+	        MSG="$(TESTFILEFAILED) [$$FILE]";                             \
+	        $(PRINTF) "$(BLANKS)  " >> errors.txt;                        \
+	        $$MSG >> errors.txt;                                          \
+	      else                                                            \
+	        let SUCCESSFULCOMPARISONS++;                                  \
+	      fi;                                                             \
+	    elif [ "$$FILETYPE" == "csv" ]; then                              \
+	      DIFFFILE="$(INPUT)/$$FILE.DIFF";                                \
+	      if [ ! -f $$DIFFFILE ]; then                                    \
+	        DIFFFILE='';                                                  \
+	      fi;                                                             \
+	                                                                      \
+	      $(ISISROOT)/scripts/csvdiff.py $(TRUTH)/$$FILE $(OUTPUT)/$$FILE \
+	          $$DIFFFILE >& /dev/null;                                    \
+	                                                                      \
+	      RETVAL=$$?;                                                     \
+	      if [ $$RETVAL != 0 ]; then                                      \
+	        MSG="$(TESTFILEFAILED) [$$FILE]";                             \
+	        $(PRINTF) "$(BLANKS)  " >> errors.txt;                        \
+	        $$MSG >> errors.txt;                                          \
+	      else                                                            \
+	        let SUCCESSFULCOMPARISONS++;                                  \
+	      fi;                                                             \
+	    elif [ "$$FILETYPE" == "pvl" ]; then                              \
+	      DIFFFILE="$(INPUT)/$$FILE.DIFF";                                \
+	      if [ ! -f $$DIFFFILE ]; then                                    \
+	        DIFFFILE='';                                                  \
+	      fi;                                                             \
+	                                                                      \
+	      $(ISISROOT)/bin/pvldiff from=$(TRUTH)/$$FILE                    \
+	          from2=$(OUTPUT)/$$FILE                                      \
+	          to=compare.txt diff=$$DIFFFILE >& /dev/null;                \
+	                                                                      \
+	      COMPRESULT=`$(ISISROOT)/bin/getkey from=compare.txt grp=Results \
+	          keyword=Compare | tr '[:upper:]' '[:lower:]'`;              \
+	                                                                      \
+	      if [ "$$COMPRESULT" == "different" ]; then                      \
+	        MSG="$(TESTFILEFAILED) [$$FILE]";                             \
+	        $(PRINTF) "$(BLANKS)  " >> errors.txt;                        \
+	        $$MSG >> errors.txt;                                          \
+	      else                                                            \
+	        let SUCCESSFULCOMPARISONS++;                                  \
+	      fi;                                                             \
+	      $(RM) compare.txt;                                              \
+	    elif [ "$$FILETYPE" == "net" ]; then                              \
+	      DIFFFILE="$(INPUT)/$$FILE.DIFF";                                \
+	      if [ ! -f $$DIFFFILE ]; then                                    \
+	        DIFFFILE='';                                                  \
+	      fi;                                                             \
+	                                                                      \
+	      $(ISISROOT)/bin/cnetdiff from=$(TRUTH)/$$FILE                   \
+	          from2=$(OUTPUT)/$$FILE                                      \
+	          to=compare.txt diff=$$DIFFFILE >& /dev/null;                \
+	                                                                      \
+	      compResult=`$(ISISROOT)/bin/getkey from=compare.txt grp=Results \
+	          keyword=Compare | tr '[:upper:]' '[:lower:]'`;              \
+	                                                                      \
+	      if [ "$$COMPRESULT" == "different" ]; then                      \
+	        MSG="$(TESTFILEFAILED) [$$FILE]";                             \
+	        $(PRINTF) "$(BLANKS)  " >> errors.txt;                        \
+	        $$MSG >> errors.txt;                                          \
+	      else                                                            \
+	        let SUCCESSFULCOMPARISONS++;                                  \
+	      fi;                                                             \
+	      $(RM) compare.txt;                                              \
+	    elif [[ "$(BINFILES)" =~ "$$FILETYPE" ]]; then                    \
+	      COMMAND="";                                                     \
+	      $(DIFF) $(TRUTH)/$$FILE $(OUTPUT)/$$FILE > /dev/null;           \
+	      if [ $$? -ne 0 ]; then                                          \
+	        MSG="$(TESTFILEFAILED) [$$FILE]";                             \
+	        $(PRINTF) "$(BLANKS)  " >> errors.txt;                        \
+	        $$MSG >> errors.txt;                                          \
+	      else                                                            \
+	        let SUCCESSFULCOMPARISONS++;                                  \
+	      fi;                                                             \
+	    else                                                              \
+	      MSG="$(UNKNOWNFILE) [$$FILE]";                                  \
+	      $(PRINTF) "$(BLANKS)  " >> errors.txt;                          \
+	      $$MSG >> errors.txt;                                            \
+	    fi;                                                               \
+	  fi;                                                                 \
+	done;                                                                 \
+	                                                                      \
+	if [ $$SUCCESSFULCOMPARISONS -eq $$TRUTHFILECOUNT ]; then             \
+	  touch casesucceeded.txt;                                            \
+	elif [ ! -s errors.txt ]; then                                        \
+	  MSG='$(NOTALLMATCH)';                                               \
+	  $(PRINTF) "$(BLANKS)  " >> errors.txt;                              \
+	  $$MSG >> errors.txt;                                                \
 	fi;
 
 #----------------------------------------------------------------------------
@@ -241,7 +457,7 @@ compare:
 # directory.  If the truth directory doesn't exist it is created.
 # $(RSYNC) -ru --delete $(TESTDATA_PATH)/input/ input; \
 #----------------------------------------------------------------------------
-truthdata:
+truthdata: FORCE
 	$(MKDIR) truth;
 	$(RSYNC) -rt --delete output/ truth;
 
@@ -253,7 +469,7 @@ truthdata:
 # directory.  If the truth directory corresponding to the 
 # OS the test is being run on doesn't exist it is created.
 #----------------------------------------------------------------------------
-ostruthdata:
+ostruthdata: FORCE
 	osdir="$(TRUTH)"; \
 	if [ "$(TRUTH)" = "truth" ]; then \
 	  if [ "$(HOST_OS)" = "" ]; then \
@@ -267,24 +483,26 @@ ostruthdata:
 
 #----------------------------------------------------------------------------
 # Target = output
-# Dependencies = temp commands modifyFiles
+# Dependencies = FORCE commands modifyFiles
 #
 # Masks target command with a better name to just run the 
 # commands.  If the output directory doesn't exist it is 
-# created.  The temp target is needed because the directory
+# created.  The force target is needed because the directory
 # output causes make to check the directory output if there
 # is no dependency.  Runs the commands and then
 # modifies the output files based on the variables set 
 # in the test.
 #----------------------------------------------------------------------------
-output: temp
-	$(MKDIR) $(OUTPUT);
-	$(MAKE) commands;
+output: FORCE clean
+	$(MKDIR) $(OUTPUT);                                                   \
+	$(MAKE) commands;                                                     \
 	$(MAKE) modifyFiles;
 
-# needed to make the output target work
-temp:
-	temp="";
+#----------------------------------------------------------------------------
+# This target is needed to make the output target work. When used as a 
+# dependency to a target, it forces make to always execute that target.
+#----------------------------------------------------------------------------
+FORCE:
 
 #----------------------------------------------------------------------------
 # Target = clean
@@ -292,24 +510,10 @@ temp:
 #
 # Deletes the output directory.
 #----------------------------------------------------------------------------
-clean:
+clean: FORCE
 	$(RM) -r $(OUTPUT); \
 	$(RM) print.prt; \
 
-#----------------------------------------------------------------------------
-# Target = comparefiles
-# Dependencies = All files in the truth directory
-#
-# Iterates over the list of files in the truth directory and 
-# compares the files against the files in the output
-# directory.  If there are any files that are not recognized
-# then an unknown file message is printed.  
-#echo "t = $(notdir $(wildcard $(TRUTH)/*) )";
-#echo "b = $(BINFILES)";
-#----------------------------------------------------------------------------
-comparefiles:  $(notdir $(wildcard $(TRUTH)/*) )
-	temp="";
-	
 #----------------------------------------------------------------------------
 # Target = modifyFiles
 # Dependencies = modText modBin
@@ -320,7 +524,7 @@ comparefiles:  $(notdir $(wildcard $(TRUTH)/*) )
 # Utilizes the modText and modBin targets to carryout
 # the modifactions. 
 #----------------------------------------------------------------------------
-modifyFiles:
+modifyFiles: FORCE
 	files="$(notdir $(wildcard $(OUTPUT)/*.txt) )"; \
 	for i in $$files; do \
 	    $(MAKE) modText FILE=$$i; \
@@ -343,7 +547,7 @@ modifyFiles:
 # The variable FILE must be set to the name of the file in
 # the output directory to be modified.
 #----------------------------------------------------------------------------
-modText: 
+modText: FORCE
 	if [ "$(FILE)" != "" ]; \
 	then \
 	  numLines="+0"; \
@@ -378,7 +582,7 @@ modText:
 # The variable FILE must be set to the name of the file in
 # the output directory to be modified. 
 #----------------------------------------------------------------------------
-modBin:
+modBin: FORCE
 	if [ "$(FILE)" != "" ]; \
 	then \
 	  binskipstr="";  \
@@ -394,221 +598,6 @@ modBin:
 	  $(DD) if=$(OUTPUT)/$(FILE) of=$(OUTPUT)/$(FILE).dd $$binskipstr $$bincountstr >& /dev/null; \
 	  $(MV) $(OUTPUT)/$(FILE).dd $(OUTPUT)/$(FILE); \
 	fi
-
-force: ;
-
-#----------------------------------------------------------------------------
-# Target = %.cub
-# Dependencies = 
-#
-# Compare two cub files.  This is a pattern rule used by the 
-# compare target to compare cubs in the truth directory 
-# against a similiarly named file in the output directory.
-#----------------------------------------------------------------------------
-%.cub: force
-	if [ ! -f $(OUTPUT)/$@ ];                      \
-	then                                           \
-	  msg='$(FILENOTFOUND)';                       \
-	  $(PRINTF) "$(BLANKS)  " >> casefailed.txt;   \
-	  $$msg >> casefailed.txt;                     \
-	else                                           \
-	  tolerancestr="";                             \
-	  ignorestr="";                                \
-	  if [ "$($@.TOLERANCE)" != "" ];              \
-	  then                                         \
-	    tolerancestr="tolerance=$($@.TOLERANCE)";  \
-	  fi;                                          \
-	  if [ "$($@.IGNORESPECIAL)" != "" ];          \
-	  then                                         \
-	    ignorestr="ignorespecial=$($@.IGNORESPECIAL)"; \
-	  fi;                                          \
-	  $(ISISROOT)/bin/cubediff from=$(TRUTH)/$@    \
-	          from2=$(OUTPUT)/$@                   \
-	          to=compare.txt                       \
-		  $$tolerancestr                       \
-		  $$ignorestr 1>>/dev/null 2>cubediffError.txt; \
-	  if [ $$? != 0 ]; then                        \
-	    compResult="ERROR";                        \
-	  else                                         \
-	    compResult=`$(ISISROOT)/bin/getkey from=compare.txt grp=Results keyword=Compare`; \
-	  fi;                                          \
-	  command="";                                  \
-	  if [ "$$compResult" != "Identical" ]; then   \
-	    msg='$(TESTFILEFAILED)';                   \
-	    $(PRINTF) "$(BLANKS)  " >> casefailed.txt; \
-	    $$msg >> casefailed.txt;                   \
-	    if [ "$$compResult" == "ERROR" ]; then     \
-	      cat cubediffError.txt >> casefailed.txt; \
-	    fi;                                        \
-	  fi ;                                         \
-	  $(RM) compare.txt;                           \
-	  if [ -f cubediffError.txt ]; then            \
-	    $(RM) cubediffError.txt;                   \
-	  fi;                                          \
-	fi;
-
-#----------------------------------------------------------------------------
-# Target = %.txt
-# Dependencies = 
-#
-# Compare two text files.  This is a pattern rule used by the 
-# compare target to compare text files in the truth directory 
-# against a similiarly named file in the output directory.
-#----------------------------------------------------------------------------
-%.txt: force
-	if [ ! -f "$(OUTPUT)/$@" ]; \
-	then \
-	  msg='$(FILENOTFOUND)'; \
-	  $(PRINTF) "$(BLANKS)  " >> casefailed.txt; \
-	  $$msg >> casefailed.txt; \
-	else \
-	  command="";\
-	  $(DIFF) $(TRUTH)/$@ $(OUTPUT)/$@ > /dev/null; \
-	  if [ $$? -ne 0 ];  \
-	  then \
-	    msg='$(TESTFILEFAILED)'; \
-	    $(PRINTF) "$(BLANKS)  " >> casefailed.txt; \
-	    $$msg >> casefailed.txt; \
-	  fi; \
-	fi
-
-#----------------------------------------------------------------------------
-# Target = %.csv
-# Dependencies = 
-#
-# Compare two csv files using csvdiff.py. The tolerances and ignore lines are
-#   specified in the file (if it exists) filename.DIFF.
-#----------------------------------------------------------------------------
-%.csv: force
-	if [ ! -f $(OUTPUT)/$@ ]; then                                       \
-	  msg='$(FILENOTFOUND)';                                             \
-	  $(PRINTF) "$(BLANKS)  " >> casefailed.txt;                         \
-	  $$msg >> casefailed.txt;                                           \
-	else                                                                 \
-	  difffile="$(INPUT)/$@.DIFF";                                       \
-	  if [ ! -f $$difffile ];                                            \
-	  then                                                               \
-	    difffile='';                                                     \
-	  fi;                                                                \
-	                                                                     \
-	  $(ISISROOT)/scripts/csvdiff.py $(TRUTH)/$@ $(OUTPUT)/$@            \
-	      $$difffile >& /dev/null;                                       \
-	                                                                     \
-	  RETVAL=$$?;                                                        \
-	  if [ $$RETVAL != 0 ]; then                                         \
-	    msg='$(TESTFILEFAILED)';                                         \
-	    $(PRINTF) "$(BLANKS)  " >> casefailed.txt;                       \
-	    $$msg >> casefailed.txt;                                         \
-	  fi ;                                                               \
-	fi;
-
-#----------------------------------------------------------------------------
-# Target = %.pvl
-# Dependencies = 
-#
-# Compare two pvl files using pvldiff. The tolerances and ignore lines are
-#   specified in the file (if it exists) filename.DIFF.
-#----------------------------------------------------------------------------
-%.pvl: force
-	if [ ! -f $(OUTPUT)/$@ ]; then                                       \
-	  msg='$(FILENOTFOUND)';                                             \
-	  $(PRINTF) "$(BLANKS)  " >> casefailed.txt;                         \
-	  $$msg >> casefailed.txt;                                           \
-	else                                                                 \
-	  difffile="$(INPUT)/$@.DIFF";                                       \
-	  if [ ! -f $$difffile ];                                            \
-	  then                                                               \
-	    difffile='';                                                     \
-	  fi;                                                                \
-	                                                                     \
-	  $(ISISROOT)/bin/pvldiff from=$(TRUTH)/$@ from2=$(OUTPUT)/$@        \
-	      to=compare.txt diff=$$difffile >& /dev/null;                   \
-	                                                                     \
-	  compResult=`$(ISISROOT)/bin/getkey from=compare.txt grp=Results    \
-	      keyword=Compare | tr '[:upper:]' '[:lower:]'`;                 \
-	                                                                     \
-	  if [ "$$compResult" = "different" ]; then                          \
-	    msg='$(TESTFILEFAILED)';                                         \
-	    $(PRINTF) "$(BLANKS)  " >> casefailed.txt;                       \
-	    $$msg >> casefailed.txt;                                         \
-	  fi ;                                                               \
-	  $(RM) compare.txt;                                                 \
-	fi;
-
-%.DIFF: force
-	temp="";
-
-#----------------------------------------------------------------------------
-# Target = %.net
-# Dependencies =
-#
-# Compare two cnet files using cnetdiff. The tolerances and ignore lines are
-#   specified in the file (if it exists) filename.DIFF.
-#----------------------------------------------------------------------------
-%.net: force
-	if [ ! -f $(OUTPUT)/$@ ]; then                                       \
-	  msg='$(FILENOTFOUND)';                                             \
-	  $(PRINTF) "$(BLANKS)  " >> casefailed.txt;                         \
-	  $$msg >> casefailed.txt;                                           \
-	else                                                                 \
-	  difffile="$(INPUT)/$@.DIFF";                                       \
-	  if [ ! -f $$difffile ];                                            \
-	  then                                                               \
-	    difffile='';                                                     \
-	  fi;                                                                \
-	                                                                     \
-	  $(ISISROOT)/bin/cnetdiff from=$(TRUTH)/$@ from2=$(OUTPUT)/$@       \
-	      to=compare.txt diff=$$difffile >& /dev/null;                   \
-	                                                                     \
-	  compResult=`$(ISISROOT)/bin/getkey from=compare.txt grp=Results    \
-	      keyword=Compare | tr '[:upper:]' '[:lower:]'`;                 \
-	                                                                     \
-	  if [ "$$compResult" = "different" ]; then                          \
-	    msg='$(TESTFILEFAILED)';                                         \
-	    $(PRINTF) "$(BLANKS)  " >> casefailed.txt;                       \
-	    $$msg >> casefailed.txt;                                         \
-	  fi ;                                                               \
-	  $(RM) compare.txt;                                                 \
-	fi;
-
-#----------------------------------------------------------------------------
-# Target = %.BIN
-# Dependencies = 
-#
-# Compare two bin files.  This is a pattern rule used by the 
-# compare target to compare bin files in the truth directory 
-# against a similiarly named file in the output directory.
-# This target covers any files with extension in the list in the
-# variable BINFILES.
-#----------------------------------------------------------------------------
-$(foreach i, $(BINFILES), $(addprefix %., $i)):
-	if [ ! -f "$(OUTPUT)/$@" ]; \
-	then \
-	  msg='$(FILENOTFOUND)'; \
-	  $(PRINTF) "$(BLANKS)  " >> casefailed.txt; \
-	  $$msg >> casefailed.txt; \
-	else \
-	  command="";\
-	  $(DIFF) $(TRUTH)/$@ $(OUTPUT)/$@ > /dev/null; \
-	  if [ $$? -ne 0 ];  \
-	  then \
-	    msg='$(TESTFILEFAILED)'; \
-	    $(PRINTF) "$(BLANKS)  " >> casefailed.txt; \
-	    $$msg >> casefailed.txt; \
-	  fi; \
-	fi
-
-#----------------------------------------------------------------------------
-# Target = %
-# Dependencies = 
-#
-# Handles any other files that may be in the truth directory.
-# Prints that the file is unknown.
-#----------------------------------------------------------------------------
-% :: 
-	msg='$(UNKNOWNFILE)'; \
-	$(PRINTF) "$(BLANKS)  " >> casefailed.txt; \
-	$$msg >> casefailed.txt; \
 
 #----------------------------------------------------------------------------
 # Target = checkin
@@ -629,7 +618,7 @@ $(foreach i, $(BINFILES), $(addprefix %., $i)):
 # Modified by: Steven Lambright 2007-07-18
 # Modified to properly sync the input folder because it is not required
 #----------------------------------------------------------------------------
-checkin:
+checkin: FORCE
 	if [ "$(ISIS3TESTDATA)" != "" ]; \
 	then \
 	  if [ -d "$(TRUTH)" ]; \
@@ -677,7 +666,7 @@ checkin:
 # and then copies all of the files in the truth directory to 
 # directory in DEST.
 #----------------------------------------------------------------------------
-copyInTruth:
+copyInTruth: FORCE
 	for i in $(wildcard truth*); do \
 	  $(MKDIR) -m2775 $(DEST)$$i; \
 	  files=`$(LS) $$i`; \
@@ -702,7 +691,7 @@ copyInTruth:
 # If the input or truth directories exist in the local test a warning
 # is printed and no copying takes place.
 #----------------------------------------------------------------------------
-checkout:
+checkout: FORCE
 	if [ "$(ISIS3TESTDATA)" = "" ]; \
 	then \
 	  echo "ISIS3TESTDATA not set"; \
@@ -738,7 +727,7 @@ checkout:
 # and then copies all of the files from the DEST directory
 # to the one in the test.
 #----------------------------------------------------------------------------
-copyOutTruth:
+copyOutTruth: FORCE
 	for i in $(notdir $(wildcard $(DEST)/truth*) ); do \
 	  $(MKDIR) $$i; \
 	  files=`$(LS) $(DEST)/$$i`; \
@@ -757,7 +746,7 @@ copyOutTruth:
 # If any of these files or folders do not exist or don't match the ones      #
 # in $ISIS3TESTDATA then the user is prompted before continuing.             #
 #----------------------------------------------------------------------------#
-release: clean
+release: FORCE clean
 	proceedWithRelease="true";                                           \
 	                                                                     \
 	for i in $(notdir $(filter-out CVS Makefile print.prt  $(OUTPUT),    \
@@ -803,7 +792,7 @@ release: clean
 #
 # Creates the necessary directories for the test.
 #----------------------------------------------------------------------------
-dirs:
+dirs: FORCE
 	$(MKDIR) input;
 
 #----------------------------------------------------------------------------
@@ -818,7 +807,7 @@ dirs:
 # folder permissions on, and DEST_PATH is the full directory 
 # path above the LOOKUP directory.
 #----------------------------------------------------------------------------
-changePerms:
+changePerms: FORCE
 	lookup=$(LOOKUP); \
 	path=$(DEST_PATH); \
 	permsline=`$(LS) -l $$path | grep -w $$lookup`; \
