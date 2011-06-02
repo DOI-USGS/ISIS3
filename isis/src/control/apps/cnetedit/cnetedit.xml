@@ -14,8 +14,9 @@
       points in a given list, ignoring measures in a given list, and ignoring
       measures with attributes failing to meet the requirements defined by a
       definition file.  Additional options include the ability to preserve
-      points with less than a single valid measure, and the ability to print
-      detailed logging results to a text file.
+      points with less than a single valid measure, ability to retain the 
+      Reference even if not validated or exists in the Ignore Cube List and the 
+      ability to print detailed logging results to a text file.
     </p>
   </description>
 
@@ -82,6 +83,10 @@
     </change>
     <change name="Sharmila Prasad" date="2011-05-23">
       Helper function to be able to edit the Deffile. 
+    </change>
+    <change name="Sharmila Prasad" date="2011-06-02">
+      Added option RETAIN_REFERENCE to retain reference even if not validated or 
+      if it is in the ignore CubeList
     </change>
   </history> 
   
@@ -235,7 +240,7 @@
         <helpers >
           <helper name="H1">
             <function>PrintTemp</function>
-            <brief>View Template</brief>
+            <brief>View DefFile</brief>
             <description>
               This helper button will print the definition file to the session
               log of the application
@@ -276,6 +281,15 @@
         <description>
           This option preserves Control Points with Control Measures equal to 
           one.
+        </description>
+      </parameter>
+      <parameter name="RETAIN_REFERENCE">
+        <type>boolean</type>
+        <default><item>False</item></default>
+        <brief>Retain Reference even if not Validated or not in CUBELIST</brief> 
+        <description>
+          <p>When true, retain the Reference even if not validated by the 
+            DefFile and/or if it is in the Ignore List CUBELIST. </p> 
         </description>
       </parameter>
     </group>

@@ -9,5 +9,6 @@ commands:
 	LOG=$(OUTPUT)/log.txt \
 	CHECKVALID=yes \
        	FROMLIST=$(OUTPUT)/list.lis \
-	DEFFILE=$(INPUT)/deffile.def > /dev/null;
+	DEFFILE=$(INPUT)/deffile.def \
+	RETAIN_REFERENCE=yes > /dev/null;
 	$(RM) $(OUTPUT)/list.lis;

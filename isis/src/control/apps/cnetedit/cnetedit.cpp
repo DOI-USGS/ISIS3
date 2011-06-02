@@ -64,10 +64,12 @@ int numMeasuresDeleted;
 
 bool deleteIgnored;
 bool preservePoints;
-
+bool retainRef;
+bool comments;
 bool keepLog;
 PvlObject *ignoredPoints;
 QMap<string, PvlGroup> * ignoredMeasures;
+PvlObject *commentPoints;
 
 ControlNetValidMeasure *validator;
 
@@ -77,18 +79,21 @@ void IsisMain() {
   // Reset the counts of points and measures deleted
   numPointsDeleted = 0;
   numMeasuresDeleted = 0;
+  comments = false;
 
   // Interface for getting user parameters
   UserInterface &ui = Application::GetUserInterface();
 
   // Get global user parameters
-  deleteIgnored = ui.GetBoolean("DELETE");
+  deleteIgnored  = ui.GetBoolean("DELETE");
   preservePoints = ui.GetBoolean("PRESERVE");
+  retainRef      = ui.GetBoolean("RETAIN_REFERENCE");
 
   // Data needed to keep track of ignored/deleted points and measures
   keepLog = ui.WasEntered("LOG");
   ignoredPoints = NULL;
   ignoredMeasures = NULL;
+  commentPoints = NULL;
 
   // If the user wants to keep a log, go ahead and populate it with all the
   // existing ignored points and measures
@@ -102,7 +107,7 @@ void IsisMain() {
    * measures.  Originally, this check was performed last, only if the user
    * didn't specify any other deletion methods.  However, performing this
    * check first will actually improve the running time in cases where there
-   * are already ignored points and measures in the input network.  The added
+   * are already ignored points and measures in the input network. The added
    * cost of doing this check here actually doesn't add to the running time at
    * all, because these same checks would need to have been done later
    * regardless.
@@ -193,9 +198,13 @@ void IsisMain() {
   // Log statistics
   if(keepLog) {
     Pvl outputLog;
+    
     outputLog.AddKeyword(PvlKeyword("PointsDeleted", numPointsDeleted));
     outputLog.AddKeyword(PvlKeyword("MeasuresDeleted", numMeasuresDeleted));
 
+    if(comments) {
+      outputLog.AddObject(*commentPoints);
+    }
     // Depending on whether the user chose to delete ignored points and
     // measures, the log will either contain reasons for being ignored, or
     // reasons for being deleted
@@ -225,6 +234,10 @@ void IsisMain() {
     if(ignoredMeasures != NULL) {
       delete ignoredMeasures;
       ignoredMeasures = NULL;
+    }
+    if(commentPoints != NULL) {
+      delete commentPoints;
+      commentPoints = NULL;
     }
   }
 
@@ -380,6 +393,8 @@ void DeleteMeasure(ControlPoint *point, int cm) {
 void PopulateLog(ControlNet &cnet) {
   ignoredPoints = new PvlObject("Points");
   ignoredMeasures = new QMap<string, PvlGroup>;
+  
+  commentPoints = new PvlObject("RetainedPointReference");
 
   Progress progress;
   progress.SetText("Initializing Log File");
@@ -494,11 +509,18 @@ void ProcessControlMeasures(string fileName, ControlNet &cnet) {
       ControlMeasure *measure = point->GetMeasure(cm);
 
       string serialNumber = measure->GetCubeSerialNumber();
-      if(!measure->IsIgnored() && snl.HasSerialNumber(serialNumber)) {
-        IgnoreMeasure(cnet, point, measure, "Serial Number in CUBELIST");
-
-        if(cm == point->IndexOfRefMeasure() && !point->IsIgnored()) {
-          IgnorePoint(cnet, point, "Reference measure ignored");
+      if(snl.HasSerialNumber(serialNumber)){
+        if(cm == point->IndexOfRefMeasure() && retainRef) {
+          comments = true;
+          commentPoints->AddKeyword( 
+            PvlKeyword(point->GetId(), "Reference Measure is in the Ignore CubeList"));
+        }
+        else if (!measure->IsIgnored() || (cm == point->IndexOfRefMeasure() && !retainRef)) {
+          IgnoreMeasure(cnet, point, measure, "Serial Number in CUBELIST");
+  
+          if(cm == point->IndexOfRefMeasure() && !point->IsIgnored()) {
+            IgnorePoint(cnet, point, "Reference measure ignored");
+          }
         }
       }
 
@@ -556,11 +578,24 @@ void CheckAllMeasureValidity(ControlNet &cnet, string cubeList) {
         MeasureValidationResults results =
           ValidateMeasure(measure, serialNumbers.Filename(serialNumber));
         if(!results.isValid()) {
-          string failure = results.toString().toStdString();
-          IgnoreMeasure(cnet, point, measure, "Validity Check " + failure);
-
-          if(cm == point->IndexOfRefMeasure()) {
-            IgnorePoint(cnet, point, "Reference measure ignored");
+          if(cm == point->IndexOfRefMeasure() && retainRef) {
+            comments = true;
+            if(commentPoints->HasKeyword(point->GetId())) {
+              PvlKeyword & key = commentPoints->FindKeyword(point->GetId());
+              key += "\nReference Measure is not Validated";
+            }
+            else {
+              commentPoints->AddKeyword(
+                PvlKeyword(point->GetId(), "Reference Measure is not Validated"));
+            }
+          }
+          else {
+            string failure = results.toString().toStdString();
+            IgnoreMeasure(cnet, point, measure, "Validity Check " + failure);
+  
+            if(cm == point->IndexOfRefMeasure()) {
+              IgnorePoint(cnet, point, "Reference measure ignored");
+            }
           }
         }
       }
@@ -578,7 +613,6 @@ void CheckAllMeasureValidity(ControlNet &cnet, string cubeList) {
     if(ShouldDelete(point)) {
       DeletePoint(cnet, cp);
     }
-
     progress.CheckStatus();
   }
 }
