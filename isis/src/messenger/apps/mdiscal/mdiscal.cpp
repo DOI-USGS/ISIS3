@@ -71,7 +71,7 @@ void IsisMain() {
   string mdiscal_runtime = Application::DateTime();
 
   // Specify the version of the CDR generated
-  const int cdr_version = 4;
+  const int cdr_version = 3;
 
   // We will be processing by column in case of a linear dark current fit. This will make the
   //   calibration a one pass system in this case, rather than two.
