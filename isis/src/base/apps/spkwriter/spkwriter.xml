@@ -252,10 +252,22 @@
         <description>
           This file contains a list of ISIS cubes that will be used to generate 
           SPICE kernels from.  Each file is expected to be a level 0 image that 
-          has at least had spiceinit run on it.  The relevant SPICE quaternions 
-          are extracted from each file, translated to appropriate coordinates 
-          compatible with established mission criteria and written to the 
-          specified SPICE kernel file.
+          has at least had spiceinit run on it.  The relevant SPICE positions 
+          and velocities are extracted from each file, translated to appropriate
+          coordinates compatible with established mission criteria and written
+          to the specified SPICE kernel file.
+
+          WARNING- Data from missions with multiple cameras imaging
+          concurrently should not be put into the same kernel unless
+          the concurrent images were treated as a single observation
+          in the bundle adjustment.  For instance, a left and right
+          camera imaging concurrently could be considered to be a
+          single observation.  If these images are not treated as a
+          single observation in the bundle adjustment, they will
+          likely have different positions/velocities for the same
+          time coverage.  In this case two runs of spkwriter would
+          be necessary:  one run using only left images and the
+          other run using only right images.
         </description>
         <filter>
           *.lis
