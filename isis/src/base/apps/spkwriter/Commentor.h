@@ -76,9 +76,19 @@ template <class K>
          return;
       }
 
-      /** Loads general comments from a given file */
+      /** 
+       * @brief Loads general comments from a given file 
+       *
+       * @internal
+       * @history Debbie A. Cook - Added spkwriter signature keyword to user's
+       *                           comment
+       */
       void loadCommentFile(const std::string &comFile) {
         _comComment = readCommentFile(comFile);
+        // The following line was added to ensure that a
+        // user's entered comment file includes the
+        // keyword indicating an spkwriter-created kernel.
+        _comComment += "  (ID:USGS_SPK_ABCORR=NONE)\n";
         _comFile = comFile;
         return;
       }
