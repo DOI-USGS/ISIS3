@@ -134,6 +134,7 @@ void SpkSegment::import(Cube &cube) {
 #endif
 
     // Add records with 3 milliseconds padding to top and bottom of records
+//     const double Epsilon(3.0e-3);
     const double Epsilon(3.0e-3);
 
     // Pad the top and bottom of the 
@@ -157,7 +158,7 @@ void SpkSegment::import(Cube &cube) {
     SVector(ndim2, _states[ndim1-1]).inject(s0);
     _epochs[ndim1-1] = sTime;
 
-      //  Restore saved time and determine degree of NAIF interpolation
+    //  Restore saved time and determine degree of NAIF interpolation
     ipos->SetEphemerisTime(currentTime);
     _degree = std::min((int) MaximumDegree, _states.dim1()-1);
     //  Ensure the degree is odd and less that the even value
@@ -262,23 +263,27 @@ void SpkSegment::getStates(Camera &camera, const SMatrix &spice,
  * @param timeT     Desired time of the new state
  * 
  * @return SpkSegment::SVector New state at timeT
+ * @internal
+ * @history 2011-06-03 Debbie A. Cook Put extrapolation code back
+ *                                    in use since it gives the best results.
  */
 SpkSegment::SVector SpkSegment::makeState(SpicePosition *position, const double &time0,
                                           const SVector &state0, const double &timeT) const {
 
 
   SVector stateT = state0.copy();
-#if 0
+  // The code below seems to be working well for fixing the ends so I am putting it back in DAC
+#if 1
   position->SetEphemerisTime(time0);
   std::vector<double> tstate = position->Extrapolate(timeT);
   int nElems = std::min((int) tstate.size(), state0.dim1());
-  for ( unsigned int i = 0 ; i < nElems ; i++ ) {
+  for ( int i = 0 ; i < nElems ; i++ ) {
     stateT[i] = tstate[i];
   }
 #endif
-  for ( int i = 3 ; i < stateT.dim1() ; i++ ) {
-    stateT[i] = 0.0;  
-  }
+//   for ( int i = 3 ; i < stateT.dim1() ; i++ ) {
+//     stateT[i] = 0.0;  
+//   }
 
   return (stateT);
 }
