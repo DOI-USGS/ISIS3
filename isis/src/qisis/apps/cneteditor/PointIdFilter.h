@@ -17,16 +17,12 @@ namespace Isis
       Q_OBJECT
 
     public:
-      PointIdFilter(int minimumForImageSuccess = -1);
+      PointIdFilter(AbstractFilter::FilterEffectivenessFlag flag,
+                    int minimumForImageSuccess = -1);
       virtual ~PointIdFilter();
       
-      bool canFilterImages() const;
-      bool canFilterPoints() const;
-      bool canFilterMeasures() const;
-      
-      bool evaluate(const ControlPoint *) const;
-      bool evaluate(const ControlMeasure *) const;
       bool evaluate(const ControlCubeGraphNode *) const;
+      bool evaluate(const ControlPoint *) const;
 
       QString getImageDescription() const;
       QString getPointDescription() const;

@@ -19,8 +19,8 @@ using std::cerr;
 
 namespace Isis
 {
-  PointIdFilter::PointIdFilter(int minimumForImageSuccess) :
-      AbstractFilter(minimumForImageSuccess)
+  PointIdFilter::PointIdFilter(AbstractFilter::FilterEffectivenessFlag flag,
+      int minimumForImageSuccess) : AbstractFilter(flag, minimumForImageSuccess)
   {
     nullify();
     lineEditText = new QString;
@@ -61,24 +61,31 @@ namespace Isis
   }
 
 
-  bool PointIdFilter::canFilterImages() const
+  bool PointIdFilter::evaluate(const ControlCubeGraphNode * node) const
   {
-    return getMinForImageSuccess() != -1;
+    bool evaluation = true;
+    
+    if (canFilterImages())
+    {
+      int passedPoints = 0;
+      
+      QList< ControlMeasure * > measures = node->getMeasures();
+      foreach (ControlMeasure * measure, measures)
+      {
+        ASSERT(measure);
+        ControlPoint * point = measure->Parent();
+        ASSERT(point);
+        if (point && evaluate(point))
+          passedPoints++;
+      }
+      
+      evaluation = passedPoints >= getMinForImageSuccess();
+    }
+    
+    return evaluation;
   }
   
   
-  bool PointIdFilter::canFilterPoints() const
-  {
-    return true;
-  }
-  
-  
-  bool PointIdFilter::canFilterMeasures() const
-  {
-    return false;
-  }
-
-
   bool PointIdFilter::evaluate(const ControlPoint * point) const
   {
     bool evaluation = true;
@@ -105,37 +112,6 @@ namespace Isis
       //  ------------|-------|-----------
       //       F      |   F   |   T
       //  ------------|-------|-----------
-    }
-    
-    return evaluation;
-  }
-
-
-  bool PointIdFilter::evaluate(const ControlMeasure * measure) const
-  {
-    return true;
-  }
-
-
-  bool PointIdFilter::evaluate(const ControlCubeGraphNode * node) const
-  {
-    bool evaluation = true;
-    
-    if (canFilterImages())
-    {
-      int passedPoints = 0;
-      
-      QList< ControlMeasure * > measures = node->getMeasures();
-      foreach (ControlMeasure * measure, measures)
-      {
-        ASSERT(measure);
-        ControlPoint * point = measure->Parent();
-        ASSERT(point);
-        if (point && evaluate(point))
-          passedPoints++;
-      }
-      
-      evaluation = passedPoints >= getMinForImageSuccess();
     }
     
     return evaluation;

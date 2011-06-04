@@ -5,7 +5,9 @@
 
 
 class QButtonGroup;
+template< typename T > class QFlags;
 class QHBoxLayout;
+class QMenu;
 class QReadWriteLock;
 
 
@@ -20,21 +22,32 @@ namespace Isis
       Q_OBJECT
 
     public:
-      AbstractFilter(int minimumForImageSuccess = -1);
+      enum FilterEffectiveness
+      {
+        Images = 1,
+        Points = 2,
+        Measures = 4
+      };
+      Q_DECLARE_FLAGS(FilterEffectivenessFlag, FilterEffectiveness)
+    
+    
+    public:
+      AbstractFilter(FilterEffectivenessFlag effectiveness,
+          int minimumForImageSuccess = -1);
       virtual ~AbstractFilter();
 
-      virtual bool canFilterImages() const = 0;
-      virtual bool canFilterPoints() const = 0;
-      virtual bool canFilterMeasures() const = 0;
+      virtual bool canFilterImages() const;
+      virtual bool canFilterPoints() const;
+      virtual bool canFilterMeasures() const;
       
-      virtual bool evaluate(const ControlCubeGraphNode *) const = 0;
-      virtual bool evaluate(const ControlPoint *) const = 0;
-      virtual bool evaluate(const ControlMeasure *) const = 0;
+      virtual bool evaluate(const ControlCubeGraphNode *) const;
+      virtual bool evaluate(const ControlPoint *) const { return true; }
+      virtual bool evaluate(const ControlMeasure *) const { return true; }
       
       virtual QString getImageDescription() const;
       virtual QString getPointDescription() const;
       virtual QString getMeasureDescription() const;
-
+    
 
     signals:
       void filterChanged();
@@ -45,6 +58,7 @@ namespace Isis
       virtual void createWidget();
       bool inclusive() const;
       int getMinForImageSuccess() const { return minForImageSuccess; }
+      AbstractFilter::FilterEffectivenessFlag * getEffectivenessFlags() const;
       
       virtual bool evaluate(const ControlPoint *,
           bool (ControlPoint::*)() const) const;
@@ -53,7 +67,12 @@ namespace Isis
       
       
     private slots:
+      void updateEffectiveness();
       void updateMinForImageSuccess(int);
+      
+      
+    private:
+      QAction * createEffectivenessAction(QString);
 
 
     protected:
@@ -63,8 +82,15 @@ namespace Isis
 
     private:
       QButtonGroup * inclusiveExclusiveGroup;
+      QMenu * effectivenessMenu;
+      
+      
+    private:
       int minForImageSuccess;
+      FilterEffectivenessFlag * effectivenessFlags;
   };
+  
+  Q_DECLARE_OPERATORS_FOR_FLAGS(AbstractFilter::FilterEffectivenessFlag)
 }
 
 #endif

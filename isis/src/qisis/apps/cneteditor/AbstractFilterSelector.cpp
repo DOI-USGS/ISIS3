@@ -78,6 +78,9 @@ namespace Isis
     mainLayout->addWidget(closeButton);
     mainLayout->addWidget(selector);
     mainLayout->addStretch();
+    mainLayout->setAlignment(closeButton, Qt::AlignTop);
+    mainLayout->setAlignment(selector, Qt::AlignTop);
+    
 
     setLayout(mainLayout);
   }

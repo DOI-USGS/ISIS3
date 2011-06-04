@@ -10,8 +10,8 @@
 #include <QPushButton>
 
 #include "AbstractFilter.h"
-#include "ChooserNameFilter.h"
-#include "IgnoredFilter.h"
+// #include "ChooserNameFilter.h"
+#include "PointIgnoredFilter.h"
 #include "PointIdFilter.h"
 
 
@@ -36,7 +36,7 @@ namespace Isis
     AbstractFilterSelector::createSelector();
   
     selector->addItem("Chooser Name");
-    selector->addItem("Ignored");
+    selector->addItem("Ignored Points");
     selector->addItem("Point Id");
   }
 
@@ -49,14 +49,17 @@ namespace Isis
     {
       switch (index)
       {
-        case 1:
-          filter = new ChooserNameFilter(1);
-          break;
+//         case 1:
+//           filter = new ChooserNameFilter(AbstractFilter::Images |
+//               AbstractFilter::Points, 1);
+//           break;
         case 2:
-          filter = new IgnoredFilter(1);
+          filter = new PointIgnoredFilter(AbstractFilter::Images |
+              AbstractFilter::Points, 1);
           break;
         case 3:
-          filter = new PointIdFilter(1);
+          filter = new PointIdFilter(AbstractFilter::Images |
+              AbstractFilter::Points, 1);
           break;
       }
       
