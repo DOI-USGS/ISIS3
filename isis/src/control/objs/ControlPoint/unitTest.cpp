@@ -115,7 +115,7 @@ int main() {
   printPoint(assignment);
 
   // Should be successful
-  cout << "Deleting ControlMeasure with cube serial number [" << cp.GetCubeSerialNumbers().at(0).toStdString() << "]" << endl;
+  cout << "Deleting ControlMeasure with cube serial number [" << cp.getCubeSerialNumbers().at(0).toStdString() << "]" << endl;
   cout << "Measure type: " << ControlMeasure::MeasureTypeToString(cp.GetMeasure(0)->GetType()) << endl;
   cp.Delete(0);
   printPoint(cp);
@@ -221,19 +221,19 @@ int main() {
   newCp.Delete(cm3);
   cout << "newCp reverted to implicit:   " << newCp.IsReferenceExplicit() << endl;
 
-  cout << "\ntesting GetMeasures method...\n";
+  cout << "\ntesting getMeasures method...\n";
   ControlMeasure * alpha = new ControlMeasure;
   alpha->SetCubeSerialNumber("alpha");
   ControlMeasure * beta = new ControlMeasure;
   beta->SetCubeSerialNumber("beta");
-  ControlPoint GetMeasuresTestPoint;
-  GetMeasuresTestPoint.Add(alpha);
-  GetMeasuresTestPoint.Add(beta);
-  QList< ControlMeasure * > measures = GetMeasuresTestPoint.GetMeasures();
+  ControlPoint getMeasuresTestPoint;
+  getMeasuresTestPoint.Add(alpha);
+  getMeasuresTestPoint.Add(beta);
+  QList< ControlMeasure * > measures = getMeasuresTestPoint.getMeasures();
   foreach (ControlMeasure * measure, measures)
     cout << measure->GetCubeSerialNumber() << "\n";
   beta->SetIgnored(true);
-  measures = GetMeasuresTestPoint.GetMeasures(true);
+  measures = getMeasuresTestPoint.getMeasures(true);
   foreach (ControlMeasure * measure, measures)
     cout << measure->GetCubeSerialNumber() << "\n";
 }

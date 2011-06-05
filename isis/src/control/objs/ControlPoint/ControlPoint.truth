@@ -424,7 +424,7 @@ newCp with implicit:   0
 newCp with explicit:   1
 newCp reverted to implicit:   0
 
-testing GetMeasures method...
+testing getMeasures method...
 alpha
 beta
 alpha

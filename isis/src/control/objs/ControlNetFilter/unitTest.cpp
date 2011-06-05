@@ -192,7 +192,7 @@ void PrintControlNetInfo(ControlNet &pCNet) {
     ControlPoint *controlPoint = pCNet[pointId];
 
     cerr << "Control Point ID  " << pointId.toStdString() << endl;
-    QList<QString> serialNums(controlPoint->GetCubeSerialNumbers());
+    QList<QString> serialNums(controlPoint->getCubeSerialNumbers());
     qSort(serialNums);
     for (int j = 0; j < serialNums.size(); j++) {
       const QString &serialNum = serialNums.at(j);
