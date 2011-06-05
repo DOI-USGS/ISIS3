@@ -303,7 +303,7 @@ namespace Isis
     {
       int passedMeasures = 0;
       
-      QList< ControlMeasure * > measures = point->GetMeasures();
+      QList< ControlMeasure * > measures = point->getMeasures();
       if (point->GetId() == "M136890723_auto_010")
         cerr << "measures size: " << measures.size() << "\n";
       foreach (ControlMeasure * measure, measures)

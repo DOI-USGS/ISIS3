@@ -20,7 +20,7 @@ namespace Isis
 
     public:
       PointIdFilter(AbstractFilter::FilterEffectivenessFlag,
-          AbstractFilterSelector *, int minimumForImageSuccess = -1);
+          AbstractFilterSelector *, int minimumForSuccess = -1);
       virtual ~PointIdFilter();
       
       bool evaluate(const ControlCubeGraphNode *) const;

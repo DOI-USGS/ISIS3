@@ -132,7 +132,7 @@ namespace Isis
     if (inclusive())
       description += "containing \"";
     else
-      description += "that don't contain \"";
+      description += "not containing \"";
     
     QReadLocker locker(lock);
     description += *lineEditText;

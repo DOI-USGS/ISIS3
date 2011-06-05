@@ -10,6 +10,7 @@
 #include <QPushButton>
 
 #include "AbstractFilter.h"
+#include "CubeSerialNumberFilter.h"
 #include "ChooserNameFilter.h"
 #include "PointEditLockedFilter.h"
 #include "MeasureIgnoredFilter.h"
@@ -42,6 +43,7 @@ namespace Isis
     selector->addItem("Ignored Points");
     selector->addItem("Point Id");
     selector->insertSeparator(selector->count());
+    selector->addItem("Cube Serial Number");
     selector->addItem("Ignored Measures");
   }
 
@@ -67,8 +69,12 @@ namespace Isis
           filter = new PointIdFilter(AbstractFilter::Points, this);
           break;
         case 7:
+          filter = new CubeSerialNumberFilter(AbstractFilter::Points |
+              AbstractFilter::Measures, this, 1); //FIXME
+          break;
+        case 8:
           filter = new MeasureIgnoredFilter(AbstractFilter::Points |
-              AbstractFilter::Measures, this, 1);
+              AbstractFilter::Measures, this, 1); //FIXME
           break;
       }
       

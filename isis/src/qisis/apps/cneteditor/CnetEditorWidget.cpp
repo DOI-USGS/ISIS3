@@ -415,7 +415,7 @@ namespace Isis
     QList< ControlMeasure * > allMeasuresForSelectedPoints;
     foreach(ControlPoint * point, points)
     {
-      allMeasuresForSelectedPoints.append(point->GetMeasures());
+      allMeasuresForSelectedPoints.append(point->getMeasures());
     }
     editMeasureModel->setMeasures(allMeasuresForSelectedPoints);
 

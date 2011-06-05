@@ -11,6 +11,7 @@
 
 #include "AbstractFilter.h"
 #include "ChooserNameFilter.h"
+#include "CubeSerialNumberFilter.h"
 #include "MeasureIgnoredFilter.h"
 #include "PointEditLockedFilter.h"
 #include "PointIgnoredFilter.h"
@@ -56,6 +57,9 @@ namespace Isis
     {
       switch (index)
       {
+        case 2:
+          filter = new CubeSerialNumberFilter(AbstractFilter::Images, this);
+          break;
         case 4:
           filter = new ChooserNameFilter(AbstractFilter::Images |
               AbstractFilter::Points, this, 1);
