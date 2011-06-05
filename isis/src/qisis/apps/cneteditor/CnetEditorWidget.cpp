@@ -391,7 +391,11 @@ namespace Isis
 
       if (type == AbstractTreeItem::Point)
       {
-        points << controlNet->GetPoint(item->data().toString());
+        ControlPoint * point = (*controlNet)[item->data().toString()];
+        points << point;
+        
+        for (int i = 0; i < item->childCount(); i++)
+          measures << (*point)[item->childAt(i)->data().toString()];
       }
       else
       {
@@ -400,7 +404,7 @@ namespace Isis
           QString pointId = item->parent()->data().toString();
           QString serial = item->data().toString();
 
-          measures << controlNet->GetPoint(pointId)->GetMeasure(serial);
+//           measures << controlNet->GetPoint(pointId)->GetMeasure(serial);
           cubeSerialNumbers << serial;
         }
         else
@@ -412,12 +416,7 @@ namespace Isis
 
     // populate editor tables
     editPointModel->setPoints(points);
-    QList< ControlMeasure * > allMeasuresForSelectedPoints;
-    foreach(ControlPoint * point, points)
-    {
-      allMeasuresForSelectedPoints.append(point->getMeasures());
-    }
-    editMeasureModel->setMeasures(allMeasuresForSelectedPoints);
+    editMeasureModel->setMeasures(measures);
 
     if (pointModel->isDrivable())
     {
