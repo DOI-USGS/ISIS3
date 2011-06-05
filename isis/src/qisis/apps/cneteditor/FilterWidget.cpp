@@ -30,8 +30,8 @@ namespace Isis
         "multiple groups are supported, and the logic used to combine the "
         "various groups is also configurable.  To illustrate what this allows "
         "consider an example.  Let A, B, and C be (filters).  By creating two "
-        "groups, one with A and B in it and the other with C in it, it is "
-        "possible to build the expression \"(A and B) or C\".";
+        "groups, one with A and B and the other with C, it is possible to "
+        "build the expression \"(A and B) or C\".";
     
     filterType = type;
     QString title = "Filter " + type;
@@ -43,8 +43,7 @@ namespace Isis
     titleLayout->addWidget(titleLabel);
     titleLayout->addStretch();
     
-    QLabel * logicTypeLabel = new QLabel(
-        "Combine groups using logic type: ");
+    QLabel * logicTypeLabel = new QLabel("Combine groups using logic type: ");
     QFont logicTypeLabelFont("SansSerif", 12);
     logicTypeLabel->setFont(logicTypeLabelFont);
 
@@ -83,15 +82,6 @@ namespace Isis
     QLabel * titleDummy = new QLabel;
     titleDummy->setFont(QFont("SansSerif", 6)); // FIXME
     
-    imageDummy = new QLabel;
-    imageDummy->setFont(QFont("SansSerif", 6)); // FIXME
-    
-    pointDummy = new QLabel;
-    pointDummy->setFont(QFont("SansSerif", 6)); // FIXME
-    
-    measureDummy = new QLabel;
-    measureDummy->setFont(QFont("SansSerif", 6)); // FIXME
-    
     imageDescription = new QLabel;
     imageDescription->setWordWrap(true);
     imageDescription->setFont(QFont("SansSerif", 10)); // FIXME
@@ -105,17 +95,10 @@ namespace Isis
     measureDescription->setFont(QFont("SansSerif", 10)); // FIXME
     
     QVBoxLayout * descriptionLayout = new QVBoxLayout;
-    QMargins margins = descriptionLayout->contentsMargins();
-    margins.setTop(0);
-    margins.setBottom(0);
-    descriptionLayout->setContentsMargins(margins);
     descriptionLayout->addWidget(titleDummy);
     descriptionLayout->addWidget(imageDescription);
-    descriptionLayout->addWidget(imageDummy);
     descriptionLayout->addWidget(pointDescription);
-    descriptionLayout->addWidget(pointDummy);
     descriptionLayout->addWidget(measureDescription);
-    descriptionLayout->addWidget(measureDummy);
     
     connect(this, SIGNAL(filterChanged()),
         this, SLOT(updateDescription()));
@@ -124,7 +107,6 @@ namespace Isis
     mainLayout->addLayout(titleLayout);
     mainLayout->addLayout(descriptionLayout);
     mainLayout->addWidget(logicWidget);
-    mainLayout->addSpacing(10);
     mainLayout->addLayout(addGroupLayout);
     mainLayout->addStretch();
     
@@ -148,73 +130,19 @@ namespace Isis
   
   bool FilterWidget::evaluate(const ControlCubeGraphNode * node) const
   {
-    // if andFiltersTogether is true then we break out of the loop as soon
-    // as any selectors evaluate to false.  If andFiltersTogether is false
-    // then we are ORing them so we break out as soon as any selector
-    // evaluates to true.  Whether we are looking for successes or failures
-    // depends on whether we are ANDing or ORing the filters (selectors)
-    // together!!!
-    bool looking = true;
-    for (int i = 0; looking && i < filterGroups->size(); i++)
-    {
-      if (filterGroups->at(i)->hasFilter(&AbstractFilter::canFilterImages))
-        looking = !(filterGroups->at(i)->evaluate(node) ^
-            andGroupsTogether);
-    }
-    
-    // It is good that we are still looking for failures if we were ANDing
-    // filters together, but it is bad if we were ORing them since in this
-    // case we were looking for success (unless of course there were no
-    // filters to look through).
-    return !(looking ^ andGroupsTogether) || !hasFilter(&AbstractFilter::canFilterImages);
+    return evaluate(node, &AbstractFilter::canFilterImages);
   }
   
   
   bool FilterWidget::evaluate(const ControlPoint * point) const
   {
-    // if andFiltersTogether is true then we break out of the loop as soon
-    // as any selectors evaluate to false.  If andFiltersTogether is false
-    // then we are ORing them so we break out as soon as any selector
-    // evaluates to true.  Whether we are looking for successes or failures
-    // depends on whether we are ANDing or ORing the filters (selectors)
-    // together!!!
-    bool looking = true;
-    for (int i = 0; looking && i < filterGroups->size(); i++)
-    {
-      if (filterGroups->at(i)->hasFilter(&AbstractFilter::canFilterPoints))
-        looking = !(filterGroups->at(i)->evaluate(point) ^
-            andGroupsTogether);
-    }
-    
-    // It is good that we are still looking for failures if we were ANDing
-    // filters together, but it is bad if we were ORing them since in this
-    // case we were looking for success (unless of course there were no
-    // filters to look through).
-    return !(looking ^ andGroupsTogether) || !hasFilter(&AbstractFilter::canFilterPoints);
+    return evaluate(point, &AbstractFilter::canFilterPoints);
   }
   
   
   bool FilterWidget::evaluate(const ControlMeasure * measure) const
   {
-    // if andFiltersTogether is true then we break out of the loop as soon
-    // as any selectors evaluate to false.  If andFiltersTogether is false
-    // then we are ORing them so we break out as soon as any selector
-    // evaluates to true.  Whether we are looking for successes or failures
-    // depends on whether we are ANDing or ORing the filters (selectors)
-    // together!!!
-    bool looking = true;
-    for (int i = 0; looking && i < filterGroups->size(); i++)
-    {
-      if (filterGroups->at(i)->hasFilter(&AbstractFilter::canFilterMeasures))
-        looking = !(filterGroups->at(i)->evaluate(measure) ^
-            andGroupsTogether);
-    }
-    
-    // It is good that we are still looking for failures if we were ANDing
-    // filters together, but it is bad if we were ORing them since in this
-    // case we were looking for success (unless of course there were no
-    // filters to look through).
-    return !(looking ^ andGroupsTogether) || !hasFilter(&AbstractFilter::canFilterMeasures);
+    return evaluate(measure, &AbstractFilter::canFilterMeasures);
   }
   
   

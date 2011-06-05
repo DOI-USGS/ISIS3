@@ -32,6 +32,29 @@ namespace Isis
       explicit FilterWidget(QString);
       virtual ~FilterWidget();
       
+      template< typename T >
+      bool evaluate(const T * t, bool (AbstractFilter::*meth)() const) const
+      {
+        // if andFiltersTogether is true then we break out of the loop as soon
+        // as any selectors evaluate to false.  If andFiltersTogether is false
+        // then we are ORing them so we break out as soon as any selector
+        // evaluates to true.  Whether we are looking for successes or failures
+        // depends on whether we are ANDing or ORing the filters (selectors)
+        // together!!!
+        bool looking = true;
+        for (int i = 0; looking && i < filterGroups->size(); i++)
+        {
+          if (filterGroups->at(i)->hasFilter(meth))
+            looking = !(filterGroups->at(i)->evaluate(t) ^
+                andGroupsTogether);
+        }
+        
+        // It is good that we are still looking for failures if we were ANDing
+        // filters together, but it is bad if we were ORing them since in this
+        // case we were looking for success (unless of course there were no
+        // filters to look through).
+        return !(looking ^ andGroupsTogether) || !hasFilter(meth);
+      }
       bool evaluate(const ControlCubeGraphNode * node) const;
       bool evaluate(const ControlPoint * point) const;
       bool evaluate(const ControlMeasure * measure) const;
