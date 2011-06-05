@@ -448,8 +448,8 @@ namespace Isis {
 
       Statistics GetStatistic(double(ControlMeasure::*statFunc)() const) const;
 
-      QList< ControlMeasure * > GetMeasures(bool excludeIgnored = false) const;
-      QList< QString > GetCubeSerialNumbers() const;
+      QList< ControlMeasure * > getMeasures(bool excludeIgnored = false) const;
+      QList< QString > getCubeSerialNumbers() const;
 
       const ControlMeasure *operator[](iString serialNumber) const;
       ControlMeasure *operator[](iString serialNumber);

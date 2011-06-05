@@ -70,9 +70,9 @@ namespace Isis {
       void addConnection(ControlCubeGraphNode *, ControlPoint *);
       void removeConnection(ControlCubeGraphNode *, ControlPoint *);
 
-      bool contains(ControlPoint *point);
-      iString getSerialNumber();
-      int getNumMeasures();
+      bool contains(ControlPoint *point) const;
+      iString getSerialNumber() const;
+      int getMeasureCount() const;
       QList< ControlMeasure * > getMeasures() const;
       QList< ControlCubeGraphNode * > getAdjacentNodes() const;
       bool isConnected(ControlCubeGraphNode *other) const;

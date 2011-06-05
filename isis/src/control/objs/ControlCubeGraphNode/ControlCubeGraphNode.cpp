@@ -74,7 +74,7 @@ namespace Isis {
    *
    * @returns true if the point is contained, false otherwise
    */
-  bool ControlCubeGraphNode::contains(ControlPoint *point) {
+  bool ControlCubeGraphNode::contains(ControlPoint *point) const {
     return measures->contains(point);
   }
 
@@ -143,12 +143,12 @@ namespace Isis {
   }
 
 
-  int ControlCubeGraphNode::getNumMeasures() {
+  int ControlCubeGraphNode::getMeasureCount() const {
     return measures->size();
   }
 
 
-  iString ControlCubeGraphNode::getSerialNumber() {
+  iString ControlCubeGraphNode::getSerialNumber() const {
     return *serialNumber;
   }
 

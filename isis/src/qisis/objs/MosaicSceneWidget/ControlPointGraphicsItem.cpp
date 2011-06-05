@@ -215,10 +215,10 @@ namespace Isis {
     toolTip += "\n";
 
     if(snList == NULL) {
-      toolTip += QStringList(m_controlPoint->GetCubeSerialNumbers()).join("\n");
+      toolTip += QStringList(m_controlPoint->getCubeSerialNumbers()).join("\n");
     }
     else {
-      QStringList serialNums(m_controlPoint->GetCubeSerialNumbers());
+      QStringList serialNums(m_controlPoint->getCubeSerialNumbers());
 
       for(int snIndex = 0; snIndex < serialNums.size(); snIndex ++) {
         QString serialNum = serialNums[snIndex];

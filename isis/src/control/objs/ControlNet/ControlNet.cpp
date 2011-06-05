@@ -74,7 +74,7 @@ namespace Isis {
 
       // create graph for non-ignored points and measures
       if (!newPoint->IsIgnored()) {
-        QList< ControlMeasure * > measures = newPoint->GetMeasures();
+        QList< ControlMeasure * > measures = newPoint->getMeasures();
         for (int i = 0; i < measures.size(); i++) {
           ControlMeasure *measure = measures[i];
           QString serial = measure->GetCubeSerialNumber();
@@ -283,7 +283,7 @@ namespace Isis {
     point->parentNetwork = this;
 
     // notify control network of new (non-ignored) measures
-    foreach(ControlMeasure * measure, point->GetMeasures()) {
+    foreach(ControlMeasure * measure, point->getMeasures()) {
       measureAdded(measure);
     }
     emit networkStructureModified();
@@ -449,7 +449,7 @@ namespace Isis {
     // Remove the measure from the node.  If this caused the node to be empty,
     // then delete the node.
     node->removeMeasure(measure);
-    if (!node->getNumMeasures()) {
+    if (!node->getMeasureCount()) {
       delete node;
       node = NULL;
       cubeGraphNodes->remove(serial);
@@ -643,7 +643,7 @@ namespace Isis {
     // notify CubeSerialNumbers of the loss of this point
 
     if (!wasIgnored) {
-      foreach(ControlMeasure * measure, point->GetMeasures()) {
+      foreach(ControlMeasure * measure, point->getMeasures()) {
         if (!measure->IsIgnored())
           measureDeleted(measure);
       }
@@ -1274,7 +1274,7 @@ namespace Isis {
       p.next();
       ControlPoint *curPoint = p.value();
 
-      QList< QString > serialNums = curPoint->GetCubeSerialNumbers();
+      QList< QString > serialNums = curPoint->getCubeSerialNumbers();
       for (int m = 0; m < serialNums.size(); m++) {
         ControlMeasure *curMeasure = (*curPoint)[serialNums[m]];
 
@@ -1385,7 +1385,7 @@ namespace Isis {
 
       // create graph for non-ignored points and measures
       if (!newPoint->IsIgnored()) {
-        QList< ControlMeasure * > measures = newPoint->GetMeasures();
+        QList< ControlMeasure * > measures = newPoint->getMeasures();
         for (int i = 0; i < measures.size(); i++) {
           ControlMeasure *measure = measures[i];
           QString serial = measure->GetCubeSerialNumber();

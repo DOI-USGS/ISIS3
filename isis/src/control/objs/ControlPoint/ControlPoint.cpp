@@ -1742,7 +1742,7 @@ namespace Isis {
    *
    * @returns A list of this points measures
    */
-  QList< ControlMeasure * > ControlPoint::GetMeasures(
+  QList< ControlMeasure * > ControlPoint::getMeasures(
     bool excludeIgnored) const {
     QList< ControlMeasure * > orderedMeasures;
     for (int i = 0; i < cubeSerials->size(); i++) {
@@ -1757,7 +1757,7 @@ namespace Isis {
   /**
    * @returns A list of cube serial numbers
    */
-  QList< QString > ControlPoint::GetCubeSerialNumbers() const {
+  QList< QString > ControlPoint::getCubeSerialNumbers() const {
     return *cubeSerials;
   }
 
