@@ -63,8 +63,11 @@ namespace Isis
     private:
       QPushButton * addGroupButton;
       QLabel * imageDescription;
+      QLabel * imageDummy;
       QLabel * pointDescription;
+      QLabel * pointDummy;
       QLabel * measureDescription;
+      QLabel * measureDummy;
       QVBoxLayout * mainLayout;
       QWidget * logicWidget;
       

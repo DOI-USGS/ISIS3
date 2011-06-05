@@ -10,19 +10,22 @@ class QString;
 
 namespace Isis
 {
+  class AbstractFilterSelector;
   class ControlPoint;
+  class ControlMeasure;
 
   class PointIdFilter : public AbstractFilter
   {
       Q_OBJECT
 
     public:
-      PointIdFilter(AbstractFilter::FilterEffectivenessFlag flag,
-                    int minimumForImageSuccess = -1);
+      PointIdFilter(AbstractFilter::FilterEffectivenessFlag,
+          AbstractFilterSelector *, int minimumForImageSuccess = -1);
       virtual ~PointIdFilter();
       
       bool evaluate(const ControlCubeGraphNode *) const;
       bool evaluate(const ControlPoint *) const;
+      bool evaluate(const ControlMeasure *) const { return true; }
 
       QString getImageDescription() const;
       QString getPointDescription() const;

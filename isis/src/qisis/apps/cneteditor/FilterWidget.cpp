@@ -80,26 +80,49 @@ namespace Isis
     addGroupLayout->addWidget(addGroupButton);
     addGroupLayout->addStretch();
     
+    QLabel * titleDummy = new QLabel;
+    titleDummy->setFont(QFont("SansSerif", 6)); // FIXME
+    
+    imageDummy = new QLabel;
+    imageDummy->setFont(QFont("SansSerif", 6)); // FIXME
+    
+    pointDummy = new QLabel;
+    pointDummy->setFont(QFont("SansSerif", 6)); // FIXME
+    
+    measureDummy = new QLabel;
+    measureDummy->setFont(QFont("SansSerif", 6)); // FIXME
+    
     imageDescription = new QLabel;
     imageDescription->setWordWrap(true);
-    imageDescription->setFont(QFont("SansSerif", 12));
+    imageDescription->setFont(QFont("SansSerif", 10)); // FIXME
     
     pointDescription = new QLabel;
     pointDescription->setWordWrap(true);
-    pointDescription->setFont(QFont("SansSerif", 12));
+    pointDescription->setFont(QFont("SansSerif", 10)); // FIXME
     
     measureDescription = new QLabel;
     measureDescription->setWordWrap(true);
-    measureDescription->setFont(QFont("SansSerif", 12));
+    measureDescription->setFont(QFont("SansSerif", 10)); // FIXME
+    
+    QVBoxLayout * descriptionLayout = new QVBoxLayout;
+    QMargins margins = descriptionLayout->contentsMargins();
+    margins.setTop(0);
+    margins.setBottom(0);
+    descriptionLayout->setContentsMargins(margins);
+    descriptionLayout->addWidget(titleDummy);
+    descriptionLayout->addWidget(imageDescription);
+    descriptionLayout->addWidget(imageDummy);
+    descriptionLayout->addWidget(pointDescription);
+    descriptionLayout->addWidget(pointDummy);
+    descriptionLayout->addWidget(measureDescription);
+    descriptionLayout->addWidget(measureDummy);
     
     connect(this, SIGNAL(filterChanged()),
         this, SLOT(updateDescription()));
 
     mainLayout = new QVBoxLayout;
     mainLayout->addLayout(titleLayout);
-    mainLayout->addWidget(imageDescription);
-    mainLayout->addWidget(pointDescription);
-    mainLayout->addWidget(measureDescription);
+    mainLayout->addLayout(descriptionLayout);
     mainLayout->addWidget(logicWidget);
     mainLayout->addSpacing(10);
     mainLayout->addLayout(addGroupLayout);
@@ -281,7 +304,7 @@ namespace Isis
         if (GROUP_SIZE > 1)
           text += rightParen;
         
-        text += black + ".<br/>" + end;
+        text += black + "." + end;
         
         label->setText(text);
       }

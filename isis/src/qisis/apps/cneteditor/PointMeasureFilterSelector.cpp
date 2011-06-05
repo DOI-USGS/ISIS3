@@ -10,8 +10,9 @@
 #include <QPushButton>
 
 #include "AbstractFilter.h"
-// #include "ChooserNameFilter.h"
-// #include "EditLockFilter.h"
+#include "ChooserNameFilter.h"
+#include "PointEditLockedFilter.h"
+#include "MeasureIgnoredFilter.h"
 #include "PointIgnoredFilter.h"
 #include "PointIdFilter.h"
 
@@ -40,6 +41,8 @@ namespace Isis
     selector->addItem("Edit Locked Points");
     selector->addItem("Ignored Points");
     selector->addItem("Point Id");
+    selector->insertSeparator(selector->count());
+    selector->addItem("Ignored Measures");
   }
 
 
@@ -51,18 +54,21 @@ namespace Isis
     {
       switch (index)
       {
-//         case 1:
-//           filter = new ChooserNameFilter(AbstractFilter::Points);
-//           break;
-//         case 2:
-//           filter = new EditLockFilter(AbstractFilter::Points |
-//                                       AbstractFilter::Measures);
-//           break;
+        case 2:
+          filter = new ChooserNameFilter(AbstractFilter::Points, this);
+          break;
         case 3:
-          filter = new PointIgnoredFilter(AbstractFilter::Points);
+          filter = new PointEditLockedFilter(AbstractFilter::Points, this);
           break;
         case 4:
-          filter = new PointIdFilter(AbstractFilter::Points);
+          filter = new PointIgnoredFilter(AbstractFilter::Points, this);
+          break;
+        case 5:
+          filter = new PointIdFilter(AbstractFilter::Points, this);
+          break;
+        case 7:
+          filter = new MeasureIgnoredFilter(AbstractFilter::Points |
+              AbstractFilter::Measures, this, 1);
           break;
       }
       

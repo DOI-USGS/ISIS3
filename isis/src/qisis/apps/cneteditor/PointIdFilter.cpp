@@ -20,7 +20,8 @@ using std::cerr;
 namespace Isis
 {
   PointIdFilter::PointIdFilter(AbstractFilter::FilterEffectivenessFlag flag,
-      int minimumForImageSuccess) : AbstractFilter(flag, minimumForImageSuccess)
+      AbstractFilterSelector * parent, int minimumForSuccess) :
+      AbstractFilter(flag, parent, minimumForSuccess)
   {
     nullify();
     lineEditText = new QString;
@@ -52,12 +53,12 @@ namespace Isis
     AbstractFilter::createWidget();
 
     lineEdit = new QLineEdit;
-    lineEdit->setMinimumWidth(200);
+    lineEdit->setMinimumWidth(250);
     connect(lineEdit, SIGNAL(textChanged(QString)),
         this, SLOT(updateLineEditText(QString)));
     connect(lineEdit, SIGNAL(textChanged(QString)),
         this, SIGNAL(filterChanged()));
-    mainLayout->addWidget(lineEdit);
+    getMainLayout()->addWidget(lineEdit);
   }
 
 
@@ -79,7 +80,7 @@ namespace Isis
           passedPoints++;
       }
       
-      evaluation = passedPoints >= getMinForImageSuccess();
+      evaluation = passedPoints >= getMinForSuccess();
     }
     
     return evaluation;
@@ -122,10 +123,11 @@ namespace Isis
   {
     QString description = AbstractFilter::getImageDescription();
     description += "point";
-    if (getMinForImageSuccess() == 1)
+    
+    if (getMinForSuccess() == 1)
       description += " with it's ID ";
     else
-      description += "s with ID's ";
+      description += "s with IDs ";
     
     if (inclusive())
       description += "containing \"";
@@ -144,7 +146,7 @@ namespace Isis
   
   QString PointIdFilter::getPointDescription() const
   {
-    QString description = "have ID's ";
+    QString description = "have IDs ";
     
     if (inclusive())
       description += "containing \"";

@@ -25,6 +25,12 @@ namespace Isis
   {
       Q_OBJECT
 
+    signals:
+      void close(AbstractFilterSelector *);
+      void filterChanged();
+      void sizeChanged();
+
+
     public:
       AbstractFilterSelector();
       virtual ~AbstractFilterSelector();
@@ -39,12 +45,10 @@ namespace Isis
       bool hasFilter(bool (AbstractFilter::*)() const) const;
       
       QString getDescription(QString (AbstractFilter::*)() const) const;
-
-
-    signals:
-      void close(AbstractFilterSelector *);
-      void filterChanged();
-      void sizeChanged();
+      
+      
+    public slots:
+      void sendClose();
 
 
     protected:
@@ -55,10 +59,6 @@ namespace Isis
     protected slots:
       virtual void changeFilter(int);
       
-
-    private slots:
-      void sendClose();
-
 
     protected:
       QComboBox * selector;

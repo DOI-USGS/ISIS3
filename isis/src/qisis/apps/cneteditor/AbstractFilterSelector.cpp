@@ -69,7 +69,8 @@ namespace Isis
     connect(closeButton, SIGNAL(clicked()), this, SLOT(sendClose()));
 
     selector = new QComboBox;
-    selector->addItem("select");
+    selector->addItem("---- select ----");
+    selector->insertSeparator(selector->count());
     connect(selector, SIGNAL(currentIndexChanged(int)),
         this, SLOT(changeFilter(int)));
 

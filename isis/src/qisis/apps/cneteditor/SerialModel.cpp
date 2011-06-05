@@ -61,8 +61,9 @@ namespace Isis
       QList< ControlMeasure * > measures = node->getMeasures();
       for (int j = 0; j < measures.size(); j++)
       {
+        ASSERT(measures[j]);
         ControlPoint * point = measures[j]->Parent();
-        ASSERT(measure);
+        ASSERT(point);
         if (!filter || filter->evaluate(point))
         {
           PointLeafItem * pointItem = new PointLeafItem(

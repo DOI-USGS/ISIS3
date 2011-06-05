@@ -7,7 +7,6 @@
 #include <QHBoxLayout>
 
 #include "ControlCubeGraphNode.h"
-#include "ControlMeasure.h"
 #include "ControlPoint.h"
 
 
@@ -18,7 +17,8 @@ namespace Isis
 {
   PointIgnoredFilter::PointIgnoredFilter(
       AbstractFilter::FilterEffectivenessFlag flag,
-      int minimumForImageSuccess) : AbstractFilter(flag, minimumForImageSuccess)
+      AbstractFilterSelector * parent, int minimumForSuccess) :
+      AbstractFilter(flag, parent, minimumForSuccess)
   {
     nullify();
     createWidget();
@@ -27,6 +27,12 @@ namespace Isis
 
   PointIgnoredFilter::~PointIgnoredFilter()
   {
+  }
+  
+  
+  bool PointIgnoredFilter::evaluate(const ControlCubeGraphNode * node) const
+  {
+    return AbstractFilter::evaluateImageFromPointFilter(node);
   }
   
   
@@ -39,7 +45,8 @@ namespace Isis
   QString PointIgnoredFilter::getImageDescription() const
   {
     QString description = AbstractFilter::getImageDescription();
-    if (getMinForImageSuccess() == 1)
+    
+    if (getMinForSuccess() == 1)
       description += "point that is ";
     else
       description += "points that are ";

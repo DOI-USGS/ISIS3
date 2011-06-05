@@ -10,24 +10,23 @@ class QString;
 
 namespace Isis
 {
+  class AbstractFilterSelector;
   class ControlPoint;
+  class ControlMeasure;
 
   class ChooserNameFilter : public AbstractFilter
   {
       Q_OBJECT
 
     public:
-      ChooserNameFilter(int minimumForImageSuccess = -1);
+      ChooserNameFilter(AbstractFilter::FilterEffectivenessFlag,
+          AbstractFilterSelector *, int minimumForImageSuccess = -1);
       virtual ~ChooserNameFilter();
       
-      bool canFilterImages() const;
-      bool canFilterPoints() const;
-      bool canFilterMeasures() const;
-      
-      bool evaluate(const ControlPoint *) const;
-      bool evaluate(const ControlMeasure *) const;
       bool evaluate(const ControlCubeGraphNode *) const;
-      
+      bool evaluate(const ControlPoint *) const;
+      bool evaluate(const ControlMeasure *) const { return true; }
+
       QString getImageDescription() const;
       QString getPointDescription() const;
       
