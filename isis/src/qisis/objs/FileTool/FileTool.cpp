@@ -143,6 +143,7 @@ namespace Qisis {
     p_lastDir.clear();
     p_lastViewport = NULL;
 
+    p_saveAsDialog = NULL;
     activate(true);
   }
 
@@ -295,9 +296,11 @@ namespace Qisis {
     if(!p_dir.exists()) {
       p_dir = QDir(p_lastDir);
     }
-    p_saveAsDialog = new SaveAsDialog("Save As", p_filterList, p_dir, (QWidget *)parent());
+    if(p_saveAsDialog == NULL) {
+      p_saveAsDialog = new SaveAsDialog("Save As", p_filterList, p_dir, (QWidget *)parent());
+      connect(p_saveAsDialog, SIGNAL(fileSelected(QString)), this, SLOT(saveAsCubeByOption(QString)));
+    }
     p_saveAsDialog->show();
-    connect(p_saveAsDialog, SIGNAL(fileSelected(QString)), this, SLOT(saveAsCubeByOption(QString)));
   }
 
   /**
