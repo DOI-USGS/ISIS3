@@ -1,10 +1,9 @@
 #ifndef ChooserNameFilter_H
 #define ChooserNameFilter_H
 
-#include "AbstractFilter.h"
+#include "AbstractStringFilter.h"
 
 
-class QLineEdit;
 class QString;
 
 
@@ -14,35 +13,21 @@ namespace Isis
   class ControlPoint;
   class ControlMeasure;
 
-  class ChooserNameFilter : public AbstractFilter
+  class ChooserNameFilter : public AbstractStringFilter
   {
       Q_OBJECT
 
     public:
       ChooserNameFilter(AbstractFilter::FilterEffectivenessFlag,
-          AbstractFilterSelector *, int minimumForImageSuccess = -1);
+          AbstractFilterSelector *, int minimumForSuccess = -1);
       virtual ~ChooserNameFilter();
       
       bool evaluate(const ControlCubeGraphNode *) const;
       bool evaluate(const ControlPoint *) const;
-      bool evaluate(const ControlMeasure *) const { return true; }
+      bool evaluate(const ControlMeasure *) const;
 
       QString getImageDescription() const;
       QString getPointDescription() const;
-      
-
-    protected:
-      void nullify();
-      void createWidget();
-      
-      
-    private slots:
-      void updateLineEditText(QString);
-
-
-    private:
-      QLineEdit * lineEdit;
-      QString * lineEditText;
   };
 }
 

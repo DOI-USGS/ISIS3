@@ -16,6 +16,7 @@
 #include "PointEditLockedFilter.h"
 #include "PointIgnoredFilter.h"
 #include "PointIdFilter.h"
+#include "ResidualMagnitudeFilter.h"
 
 
 using std::cerr;
@@ -46,6 +47,7 @@ namespace Isis
     selector->addItem("Point Id");
     selector->insertSeparator(selector->count());
     selector->addItem("Ignored Measures");
+    selector->addItem("Residual Magnitude");
   }
 
 
@@ -78,6 +80,9 @@ namespace Isis
           break;
         case 9:
           filter = new MeasureIgnoredFilter(AbstractFilter::Images, this, 1);
+          break;
+        case 10:
+          filter = new ResidualMagnitudeFilter(AbstractFilter::Images, this, 1);
           break;
       }
       

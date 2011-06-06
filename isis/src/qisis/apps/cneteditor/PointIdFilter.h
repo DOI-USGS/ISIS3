@@ -1,10 +1,9 @@
 #ifndef PointIdFilter_H
 #define PointIdFilter_H
 
-#include "AbstractFilter.h"
+#include "AbstractStringFilter.h"
 
 
-class QLineEdit;
 class QString;
 
 
@@ -14,7 +13,7 @@ namespace Isis
   class ControlPoint;
   class ControlMeasure;
 
-  class PointIdFilter : public AbstractFilter
+  class PointIdFilter : public AbstractStringFilter
   {
       Q_OBJECT
 
@@ -25,24 +24,10 @@ namespace Isis
       
       bool evaluate(const ControlCubeGraphNode *) const;
       bool evaluate(const ControlPoint *) const;
-      bool evaluate(const ControlMeasure *) const { return true; }
+      bool evaluate(const ControlMeasure *) const;
 
       QString getImageDescription() const;
       QString getPointDescription() const;
-
-
-    protected:
-      void nullify();
-      void createWidget();
-      
-      
-    private slots:
-      void updateLineEditText(QString);
-
-
-    private:
-      QLineEdit * lineEdit;
-      QString * lineEditText;
   };
 }
 

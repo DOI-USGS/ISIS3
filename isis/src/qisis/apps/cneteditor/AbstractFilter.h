@@ -61,6 +61,7 @@ namespace Isis
       int getMinForSuccess() const { return minForSuccess; }
       AbstractFilter::FilterEffectivenessFlag * getEffectivenessFlags() const;
       QBoxLayout * getMainLayout() const;
+      QBoxLayout * getInclusiveExclusiveLayout() const;
       
       bool evaluateImageFromPointFilter(const ControlCubeGraphNode *) const;
       bool evaluateImageFromMeasureFilter(const ControlCubeGraphNode *) const;
@@ -70,7 +71,11 @@ namespace Isis
           bool (ControlPoint::*)() const) const;
       virtual bool evaluate(const ControlMeasure *,
           bool (ControlMeasure::*)() const) const;
-      
+    
+  
+    private:
+      bool evaluateFromCount(QList< ControlMeasure * >, bool) const;
+    
       
     private slots:
       void showHideEffectivenessMenu();
@@ -88,6 +93,7 @@ namespace Isis
 
     private:
       QBoxLayout * mainLayout;
+      QBoxLayout * inclusiveExclusiveLayout;
       QButtonGroup * inclusiveExclusiveGroup;
       QMenu * effectivenessMenu;
       QWidget * minWidget;

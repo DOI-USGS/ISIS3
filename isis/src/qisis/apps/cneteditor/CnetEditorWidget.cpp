@@ -429,7 +429,7 @@ namespace Isis
 
 
   void CnetEditorWidget::serialViewSelectionChanged(
-    const QItemSelection & newSelected, const QItemSelection & newDeselected)
+      const QItemSelection & newSelected, const QItemSelection & newDeselected)
   {
     if (updatingSelection)
       return;

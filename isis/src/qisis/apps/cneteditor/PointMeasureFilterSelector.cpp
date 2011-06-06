@@ -16,6 +16,7 @@
 #include "MeasureIgnoredFilter.h"
 #include "PointIgnoredFilter.h"
 #include "PointIdFilter.h"
+#include "ResidualMagnitudeFilter.h"
 
 
 using std::cerr;
@@ -45,6 +46,7 @@ namespace Isis
     selector->insertSeparator(selector->count());
     selector->addItem("Cube Serial Number");
     selector->addItem("Ignored Measures");
+    selector->addItem("Residual Magnitude");
   }
 
 
@@ -70,11 +72,15 @@ namespace Isis
           break;
         case 7:
           filter = new CubeSerialNumberFilter(AbstractFilter::Points |
-              AbstractFilter::Measures, this, 1); //FIXME
+              AbstractFilter::Measures, this, 1);
           break;
         case 8:
           filter = new MeasureIgnoredFilter(AbstractFilter::Points |
-              AbstractFilter::Measures, this, 1); //FIXME
+              AbstractFilter::Measures, this, 1);
+          break;
+        case 9:
+          filter = new ResidualMagnitudeFilter(AbstractFilter::Points |
+              AbstractFilter::Measures, this, 1);
           break;
       }
       

@@ -1,9 +1,11 @@
-#ifndef CubeSerialNumberFilter_H
-#define CubeSerialNumberFilter_H
+#ifndef ResidualMagnitudeFilter_H
+#define ResidualMagnitudeFilter_H
 
-#include "AbstractStringFilter.h"
+#include "AbstractNumberFilter.h"
 
 
+class QLabel;
+class QLineEdit;
 class QString;
 
 
@@ -13,21 +15,18 @@ namespace Isis
   class ControlCubeGraphNode;
   class ControlMeasure;
   class ControlPoint;
-
-  class CubeSerialNumberFilter : public AbstractStringFilter
+  
+  class ResidualMagnitudeFilter : public AbstractNumberFilter
   {
       Q_OBJECT
 
     public:
-      CubeSerialNumberFilter(AbstractFilter::FilterEffectivenessFlag,
-          AbstractFilterSelector *, int minimumForSuccess = -1);
-      virtual ~CubeSerialNumberFilter();
-      
+      ResidualMagnitudeFilter(AbstractFilter::FilterEffectivenessFlag flag,
+          AbstractFilterSelector *, int minimumForImageSuccess = -1);
+      virtual ~ResidualMagnitudeFilter();
       bool evaluate(const ControlCubeGraphNode *) const;
       bool evaluate(const ControlPoint *) const;
       bool evaluate(const ControlMeasure *) const;
-
-
       QString getImageDescription() const;
       QString getPointDescription() const;
       QString getMeasureDescription() const;

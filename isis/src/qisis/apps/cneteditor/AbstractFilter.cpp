@@ -88,6 +88,7 @@ namespace Isis
   {
     effectivenessMenu = NULL;
     inclusiveExclusiveGroup = NULL;
+    inclusiveExclusiveLayout = NULL;
     mainLayout = NULL;
     minWidget = NULL;
   }
@@ -107,7 +108,7 @@ namespace Isis
     inclusiveExclusiveGroup->addButton(inclusiveButton, 0);
     inclusiveExclusiveGroup->addButton(exclusiveButton, 1);
     
-    QBoxLayout * inclusiveExclusiveLayout = new QHBoxLayout;
+    inclusiveExclusiveLayout = new QHBoxLayout;
     QMargins margins = inclusiveExclusiveLayout->contentsMargins();
     margins.setTop(0);
     margins.setBottom(0);
@@ -231,6 +232,41 @@ namespace Isis
   }
   
   
+  QBoxLayout * AbstractFilter::getInclusiveExclusiveLayout() const
+  {
+    ASSERT(inclusiveExclusiveLayout);
+    
+    return inclusiveExclusiveLayout;
+  }
+  
+  
+  bool AbstractFilter::evaluateFromCount(QList< ControlMeasure * > measures,
+      bool usePoints) const
+  {
+    int passedCount = 0;
+      
+    foreach (ControlMeasure * measure, measures)
+    {
+      ASSERT(measure);
+      
+      if (usePoints)
+      {
+        ControlPoint * point = measure->Parent();
+        ASSERT(point);
+        if (point && evaluate(point))
+          passedCount++;
+      }
+      else
+      {
+        if (measure && evaluate(measure))
+          passedCount++;
+      }
+    }
+    
+    return passedCount >= getMinForSuccess();
+  }
+
+  
   bool AbstractFilter::evaluateImageFromPointFilter(
       const ControlCubeGraphNode * node) const
   {
@@ -239,26 +275,7 @@ namespace Isis
     bool evaluation = true;
     
     if (canFilterImages())
-    {
-      int passedPoints = 0;
-      
-      QList< ControlMeasure * > measures = node->getMeasures();
-      foreach (ControlMeasure * measure, measures)
-      {
-        ASSERT(measure);
-        
-        ControlPoint * point = NULL;
-        if (measure)
-          point = measure->Parent();
-        
-        ASSERT(point);
-        
-        if (point && evaluate(point))
-          passedPoints++;
-      }
-      
-      evaluation = passedPoints >= getMinForSuccess();
-    }
+      evaluation = evaluateFromCount(node->getMeasures(), true);
       
     return evaluation;
   }
@@ -272,19 +289,7 @@ namespace Isis
     bool evaluation = true;
     
     if (canFilterImages())
-    {
-      int passedMeasures = 0;
-      
-      QList< ControlMeasure * > measures = node->getMeasures();
-      foreach (ControlMeasure * measure, measures)
-      {
-        ASSERT(measure);
-        
-        if (measure && evaluate(measure))
-          passedMeasures++;
-      }
-      evaluation = passedMeasures >= getMinForSuccess();
-    }
+      evaluation = evaluateFromCount(node->getMeasures(), false);
     
     return evaluation;
   }
@@ -293,34 +298,13 @@ namespace Isis
   bool AbstractFilter::evaluatePointFromMeasureFilter(
       const ControlPoint * point) const
   {
-    if (point->GetId() == "M136890723_auto_010")
-      cerr << "AbstractFilter::evaluatePointFromMeasureFilter called\n";
     ASSERT(point);
     
     bool evaluation = true;
     
     if (canFilterPoints())
-    {
-      int passedMeasures = 0;
-      
-      QList< ControlMeasure * > measures = point->getMeasures();
-      if (point->GetId() == "M136890723_auto_010")
-        cerr << "measures size: " << measures.size() << "\n";
-      foreach (ControlMeasure * measure, measures)
-      {
-        ASSERT(measure);
-        
-        if (measure && evaluate(measure))
-          passedMeasures++;
-      }
-      
-      if (point->GetId() == "M136890723_auto_010")
-        cerr << "passedMeasures: " << passedMeasures << "\n";
-      evaluation = passedMeasures >= getMinForSuccess();
-    }
+      evaluation = evaluateFromCount(point->getMeasures(), false);
     
-    if (point->GetId() == "M136890723_auto_010")
-      cerr << "AbstractFilter::evaluatePointFromMeasureFilter done\n";
     return evaluation;
   }
   
@@ -360,6 +344,8 @@ namespace Isis
       {
         effectivenessMenu->hide();
         
+        // if there are no checked actions when the menu closes then close
+        // this filter
         bool noCheckedActions = true;
         QList< QAction * > actions = effectivenessMenu->actions();
         for (int i = 0; noCheckedActions && i < actions.size(); i++)

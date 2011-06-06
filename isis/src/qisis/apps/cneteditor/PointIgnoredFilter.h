@@ -8,8 +8,8 @@ namespace Isis
 {
   class AbstractFilterSelector;
   class ControlCubeGraphNode;
-  class ControlPoint;
   class ControlMeasure;
+  class ControlPoint;
   
   class PointIgnoredFilter : public AbstractFilter
   {
