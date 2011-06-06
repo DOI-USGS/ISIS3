@@ -66,6 +66,8 @@ namespace Isis {
     mdResidualTolerance = DBL_MAX; 
     
     mbCameraRequired    = false;
+    mbValidateDN        = false;
+    mbValidateFromEdge  = false;
   }
 
   /**
@@ -195,18 +197,22 @@ namespace Isis {
       }
     }
 
-    Isis::Portal inPortal(1, 1, pCube->PixelType());
-    inPortal.SetPosition(pSample, pLine, 1);
-    pCube->Read(inPortal);
-    mdDnValue = inPortal[0];
+    if(mbValidateDN) {
+      Isis::Portal inPortal(1, 1, pCube->PixelType());
+      inPortal.SetPosition(pSample, pLine, 1);
+      pCube->Read(inPortal);
+      mdDnValue = inPortal[0];
+    }
 
     if(pMeasureGrp != NULL) {
       if(mbCameraRequired) {
-        *pMeasureGrp += Isis::PvlKeyword("EmissionAngle",     mdEmissionAngle);
-        *pMeasureGrp += Isis::PvlKeyword("IncidenceAngle",    mdIncidenceAngle);
-        *pMeasureGrp += Isis::PvlKeyword("Resolution",        mdResolution);
+        *pMeasureGrp += Isis::PvlKeyword("EmissionAngle",  mdEmissionAngle);
+        *pMeasureGrp += Isis::PvlKeyword("IncidenceAngle", mdIncidenceAngle);
+        *pMeasureGrp += Isis::PvlKeyword("Resolution",     mdResolution);
       }
-      *pMeasureGrp += Isis::PvlKeyword("DNValue",           mdDnValue);
+      if(mbValidateDN) {
+        *pMeasureGrp += Isis::PvlKeyword("DNValue", mdDnValue);
+      }
       *pMeasureGrp += Isis::PvlKeyword("SampleResidual",    mdSampleResidual);
       *pMeasureGrp += Isis::PvlKeyword("LineResidual",      mdLineResidual);
       *pMeasureGrp += Isis::PvlKeyword("ResidualMagnitude", mdResidualMagnitude);
@@ -231,18 +237,22 @@ namespace Isis {
       }
     }
 
-    if(!ValidDnValue(mdDnValue)) {
-      results.addFailure(MeasureValidationResults::DNValue,
-          mdDnValue, mdMinDN, mdMaxDN);
+    if(mbValidateDN) {
+      if(!ValidDnValue(mdDnValue)) {
+        results.addFailure(MeasureValidationResults::DNValue,
+            mdDnValue, mdMinDN, mdMaxDN);
+      }
     }
     
-    if(!PixelsFromEdge((int)pSample, (int)pLine, pCube)) {
-      results.addFailure(MeasureValidationResults::PixelsFromEdge, miPixelsFromEdge);
-    }
-
-    if(!MetersFromEdge((int)pSample, (int)pLine, pCube)) {
-      results.addFailure(MeasureValidationResults::MetersFromEdge,
-          mdMetersFromEdge);
+    if(mbValidateFromEdge) {
+      if(!PixelsFromEdge((int)pSample, (int)pLine, pCube)) {
+        results.addFailure(MeasureValidationResults::PixelsFromEdge, miPixelsFromEdge);
+      }
+  
+      if(!MetersFromEdge((int)pSample, (int)pLine, pCube)) {
+        results.addFailure(MeasureValidationResults::MetersFromEdge,
+            mdMetersFromEdge);
+      }
     }
     
     if(pMeasure != NULL) {
@@ -305,6 +315,9 @@ namespace Isis {
       if(miPixelsFromEdge < 0) {
         miPixelsFromEdge = 0;
       }
+      else {
+        mbValidateFromEdge = true;
+      }
       mStdOptionsGrp += Isis::PvlKeyword("PixelsFromEdge", miPixelsFromEdge);
     }
     // Parse the Meters from edge
@@ -312,6 +325,9 @@ namespace Isis {
       mdMetersFromEdge = mPvlOpGrp["MetersFromEdge"];
       if(mdMetersFromEdge < 0) {
         mdMetersFromEdge = 0;
+      }
+      else {
+        mbValidateFromEdge = true;
       }
       mStdOptionsGrp += Isis::PvlKeyword("MetersFromEdge", mdMetersFromEdge);
     }
@@ -363,15 +379,19 @@ namespace Isis {
    *
    */
   void ControlNetValidMeasure::ValidatePvlDN(void) {
-    if(mPvlOpGrp.HasKeyword("MinDN"))
+    if(mPvlOpGrp.HasKeyword("MinDN")) {
       mdMinDN = mPvlOpGrp["MinDN"];
+      mbValidateDN = true;
+    } 
     else {
       mdMinDN = Isis::ValidMinimum;
     }
     mStdOptionsGrp += Isis::PvlKeyword("MinDN", mdMinDN);
 
-    if(mPvlOpGrp.HasKeyword("MaxDN"))
+    if(mPvlOpGrp.HasKeyword("MaxDN")) {
       mdMaxDN = mPvlOpGrp["MaxDN"];
+      mbValidateDN = true;
+    } 
     else {
       mdMaxDN = Isis::ValidMaximum;
     }

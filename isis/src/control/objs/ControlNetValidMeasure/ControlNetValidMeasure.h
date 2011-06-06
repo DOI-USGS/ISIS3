@@ -63,6 +63,8 @@ namespace Isis {
     *                                        for validation
     *  @history 2011-05-19 Sharmila Prasad - Flag to indicate whether Camera is required, to increase
     *                                        the processing speed
+    *  @history 2011-06-06 Sharmila Prasad - Process the options only is specified in the DefFile to
+    *                                        improve run time
     */
 
   class ControlNetValidMeasure {
@@ -259,6 +261,8 @@ namespace Isis {
 
       bool mbCameraRequired;           //!< To improve speed, flag to indicate if 
                                        //!< Camera needs to be opened
+      bool mbValidateDN;               //!< Check if DN needs to be Validated
+      bool mbValidateFromEdge;         //!< Check if Pixels/Meters from edge needs to be Validated
   };
 };
 #endif
