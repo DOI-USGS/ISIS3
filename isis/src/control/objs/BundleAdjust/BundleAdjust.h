@@ -72,6 +72,7 @@
  *   @history 2011-03-29 Ken Edmundson Fixed bug in observation mode when solving for spacecraft position and improved output
  *   @history 2011-04-02 Debbie A. Cook Updated to ControlPoint class changes regarding target radii.  Also separated out 2 sets of
  *                          calculations to test later for efficiency
+ *   @history 2011-06-05 Debbie A. Cook Changed checks for solution type to match change from SPARSE to SPARSE-LU
 */
 
 #include <vector>
