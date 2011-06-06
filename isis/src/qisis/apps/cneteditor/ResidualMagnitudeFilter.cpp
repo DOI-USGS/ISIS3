@@ -2,23 +2,16 @@
 
 #include "ResidualMagnitudeFilter.h"
 
-#include <iostream>
-
-#include <QHBoxLayout>
-
 #include "ControlCubeGraphNode.h"
 #include "ControlMeasure.h"
-
-
-using std::cerr;
 
 
 namespace Isis
 {
   ResidualMagnitudeFilter::ResidualMagnitudeFilter(
       AbstractFilter::FilterEffectivenessFlag flag,
-      AbstractFilterSelector * parent, int minimumForImageSuccess) :
-      AbstractNumberFilter(flag, parent, minimumForImageSuccess)
+      AbstractFilterSelector * parent, int minimumForSuccess) :
+      AbstractNumberFilter(flag, parent, minimumForSuccess)
   {
     nullify();
     createWidget();

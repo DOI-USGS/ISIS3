@@ -168,7 +168,7 @@ namespace Isis
       spinBox->setRange(1, std::numeric_limits< int >::max());
       spinBox->setValue(1);  // FIXME: QSettings should handle this
       connect(spinBox, SIGNAL(valueChanged(int)),
-              this, SLOT(updateMinForImageSuccess(int)));
+              this, SLOT(updateMinForSuccess(int)));
       QHBoxLayout * minLayout = new QHBoxLayout;
       margins = minLayout->contentsMargins();
       margins.setTop(0);
@@ -400,7 +400,7 @@ namespace Isis
   }
 
 
-  void AbstractFilter::updateMinForImageSuccess(int newMin)
+  void AbstractFilter::updateMinForSuccess(int newMin)
   {
     QWriteLocker locker(lock);
     minForSuccess = newMin;

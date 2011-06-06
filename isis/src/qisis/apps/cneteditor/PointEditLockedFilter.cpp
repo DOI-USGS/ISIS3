@@ -17,8 +17,8 @@ namespace Isis
 {
   PointEditLockedFilter::PointEditLockedFilter(
       AbstractFilter::FilterEffectivenessFlag flag,
-      AbstractFilterSelector * parent, int minimumForImageSuccess) :
-      AbstractFilter(flag, parent, minimumForImageSuccess)
+      AbstractFilterSelector * parent, int minimumForSuccess) :
+      AbstractFilter(flag, parent, minimumForSuccess)
   {
     nullify();
     createWidget();

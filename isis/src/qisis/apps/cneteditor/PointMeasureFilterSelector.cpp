@@ -2,24 +2,20 @@
 
 #include "PointMeasureFilterSelector.h"
 
-#include <iostream>
-
 #include <QComboBox>
 #include <QHBoxLayout>
-#include <QIcon>
-#include <QPushButton>
 
 #include "AbstractFilter.h"
 #include "CubeSerialNumberFilter.h"
 #include "ChooserNameFilter.h"
+#include "LineResidualFilter.h"
 #include "PointEditLockedFilter.h"
 #include "MeasureIgnoredFilter.h"
 #include "PointIgnoredFilter.h"
 #include "PointIdFilter.h"
 #include "ResidualMagnitudeFilter.h"
+#include "SampleResidualFilter.h"
 
-
-using std::cerr;
 
 namespace Isis
 {
@@ -46,7 +42,9 @@ namespace Isis
     selector->insertSeparator(selector->count());
     selector->addItem("Cube Serial Number");
     selector->addItem("Ignored Measures");
+    selector->addItem("Line Residual");
     selector->addItem("Residual Magnitude");
+    selector->addItem("Sample Residual");
   }
 
 
@@ -79,7 +77,15 @@ namespace Isis
               AbstractFilter::Measures, this, 1);
           break;
         case 9:
+          filter = new LineResidualFilter(AbstractFilter::Points |
+              AbstractFilter::Measures, this, 1);
+          break;
+        case 10:
           filter = new ResidualMagnitudeFilter(AbstractFilter::Points |
+              AbstractFilter::Measures, this, 1);
+          break;
+        case 11:
+          filter = new SampleResidualFilter(AbstractFilter::Points |
               AbstractFilter::Measures, this, 1);
           break;
       }

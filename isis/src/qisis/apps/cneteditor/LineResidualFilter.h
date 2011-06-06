@@ -1,7 +1,10 @@
-#ifndef MeasureIgnoredFilter_H
-#define MeasureIgnoredFilter_H
+#ifndef LineResidualFilter_H
+#define LineResidualFilter_H
 
-#include "AbstractFilter.h"
+#include "AbstractNumberFilter.h"
+
+
+class QString;
 
 
 namespace Isis
@@ -9,15 +12,16 @@ namespace Isis
   class AbstractFilterSelector;
   class ControlCubeGraphNode;
   class ControlMeasure;
+  class ControlPoint;
   
-  class MeasureIgnoredFilter : public AbstractFilter
+  class LineResidualFilter : public AbstractNumberFilter
   {
       Q_OBJECT
 
     public:
-      MeasureIgnoredFilter(AbstractFilter::FilterEffectivenessFlag flag,
+      LineResidualFilter(AbstractFilter::FilterEffectivenessFlag flag,
           AbstractFilterSelector *, int minimumForSuccess = -1);
-      virtual ~MeasureIgnoredFilter();
+      virtual ~LineResidualFilter();
       bool evaluate(const ControlCubeGraphNode *) const;
       bool evaluate(const ControlPoint *) const;
       bool evaluate(const ControlMeasure *) const;

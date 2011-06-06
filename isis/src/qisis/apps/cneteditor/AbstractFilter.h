@@ -34,7 +34,7 @@ namespace Isis
     
     public:
       AbstractFilter(FilterEffectivenessFlag, AbstractFilterSelector *,
-          int minimumForImageSuccess = -1);
+          int minimumForSuccess = -1);
       virtual ~AbstractFilter();
 
       virtual bool canFilterImages() const;
@@ -80,7 +80,7 @@ namespace Isis
     private slots:
       void showHideEffectivenessMenu();
       void updateEffectiveness();
-      void updateMinForImageSuccess(int);
+      void updateMinForSuccess(int);
       
       
     private:

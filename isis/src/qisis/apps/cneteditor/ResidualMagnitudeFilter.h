@@ -4,8 +4,6 @@
 #include "AbstractNumberFilter.h"
 
 
-class QLabel;
-class QLineEdit;
 class QString;
 
 
@@ -22,7 +20,7 @@ namespace Isis
 
     public:
       ResidualMagnitudeFilter(AbstractFilter::FilterEffectivenessFlag flag,
-          AbstractFilterSelector *, int minimumForImageSuccess = -1);
+          AbstractFilterSelector *, int minimumForSuccess = -1);
       virtual ~ResidualMagnitudeFilter();
       bool evaluate(const ControlCubeGraphNode *) const;
       bool evaluate(const ControlPoint *) const;
