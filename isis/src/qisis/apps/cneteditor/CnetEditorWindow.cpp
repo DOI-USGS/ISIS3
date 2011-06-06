@@ -49,7 +49,7 @@ namespace Isis
       QWidget * parent) : QFileDialog(parent)
   {
     setAcceptMode(AcceptSave);
-    setNameFilter("Control Network files (*.net);;All files (*)");
+    setNameFilter("Control Network files (*.net *.bin);;All files (*)");
     QGridLayout * mainLayout = dynamic_cast< QGridLayout * >(layout());
     ASSERT(mainLayout);
     if (mainLayout)
@@ -300,7 +300,7 @@ namespace Isis
   {
     QString filename = QFileDialog::getOpenFileName(this,
         tr("Open a control net file"), ".",
-        tr("Control Network files (*.net);;All files (*)"));
+        tr("Control Network files (*.net *.bin);;All files (*)"));
 
     if (!filename.isEmpty())
       load(filename);
