@@ -59,7 +59,7 @@ namespace Isis {
    *          multipolygon from (Lon,Lat) to (X,Y).
    */
   geos::geom::MultiPolygon *PolygonTools::LatLonToXY(
-    const geos::geom::MultiPolygon &lonLatPolygon, Projection *projection) {
+      const geos::geom::MultiPolygon &lonLatPolygon, Projection *projection) {
     if(projection == NULL) {
       string msg = "Unable to convert Lon/Lat polygon to X/Y. ";
       msg += "No projection has was supplied";
@@ -439,14 +439,12 @@ namespace Isis {
    */
   geos::geom::MultiPolygon *PolygonTools::To180(geos::geom::MultiPolygon *poly360) {
     try {
-      // We need to put the polygon back together somehow...
-      
       // Let's take the 360 pieces that sit between 180 and 360 and move them
       //   to -180 to 0. To accomplish this, make a poly that fits 180 -> 360
       //   degrees longitude and intersect (this gives us the pieces that sit
       //   >180). Move this intersection to the left. Then make a poly that fits
       //   0 to 180 and intersect with the original. These two combined are the
-      //   result. If we could remove the seam that would be nice...
+      //   result.
       geos::geom::CoordinateArraySequence *leftOf180Pts =
           new geos::geom::CoordinateArraySequence();
       leftOf180Pts->add(geos::geom::Coordinate(0, -90));
@@ -505,8 +503,13 @@ namespace Isis {
 
       geos::geom::MultiPolygon *result = MakeMultiPolygon(the180Polys);
       delete the180Polys;
+      the180Polys = NULL;
 
-      return result;
+      geos::geom::MultiPolygon *fixedResult = FixSeam(result);
+      delete result;
+      result = NULL;
+
+      return fixedResult;
     }
     catch(geos::util::GEOSException *exc) {
       iString msg = "Conversion to 180 failed. The reason given was [" +
@@ -1315,47 +1318,134 @@ namespace Isis {
     }
   }
 
+
+  geos::geom::MultiPolygon *PolygonTools::FixSeam(
+      const geos::geom::Polygon *polyA, const geos::geom::Polygon *polyB) {
+    geos::geom::CoordinateSequence *polyAPoints = polyA->getCoordinates();
+    geos::geom::CoordinateSequence *polyBPoints = polyB->getCoordinates();
+
+    unsigned int aIntersectionBegin = 0;
+    unsigned int aIntersectionEnd = 0;
+    unsigned int bIntersectionBegin = 0;
+    unsigned int bIntersectionEnd = 0;
+
+    bool intersectionStarted = false;
+    bool intersectionEnded = false;
+
+    unsigned int lastBMatch  = 0;
+    for (unsigned int i = 0;
+        !intersectionEnded && i < polyAPoints->getSize();
+        i++) {
+
+      bool foundEquivalent = false;
+
+      geos::geom::Coordinate coordA = polyAPoints->getAt(i);
+      coordA = *ReducePrecision(&coordA, 13);
+
+      for (unsigned int j = 0;
+           !foundEquivalent && j < polyBPoints->getSize();
+           j++) {
+        geos::geom::Coordinate coordB = polyBPoints->getAt(j);
+        coordB = *ReducePrecision(&coordB, 13);
+
+        foundEquivalent = coordA.equals(coordB);
+
+        if (foundEquivalent) lastBMatch = j;
+
+        if (foundEquivalent && !intersectionStarted) {
+          intersectionStarted = true;
+          aIntersectionBegin = i;
+          bIntersectionBegin = j;
+        }
+      }
+
+      if (!foundEquivalent && intersectionStarted && !intersectionEnded) {
+        intersectionEnded = true;
+        aIntersectionEnd = i;
+        bIntersectionEnd = lastBMatch;
+      }
+    }
+
+    geos::geom::MultiPolygon * result = NULL;
+    if (intersectionStarted && intersectionEnded) {
+      geos::geom::CoordinateSequence *merged =
+          new geos::geom::CoordinateArraySequence;
+    
+      unsigned int i = 0;
+      for (i = 0; i < aIntersectionBegin; i ++) {
+        merged->add(polyAPoints->getAt(i));
+      }
+
+      i = bIntersectionBegin;
+      while (i != bIntersectionEnd) {
+        merged->add(polyBPoints->getAt(i));
+        i++;
+        if (i >= polyBPoints->getSize()) i = 0;
+      }
+
+      for (i = aIntersectionEnd; i < polyAPoints->getSize() - 1; i++) {
+        merged->add(polyAPoints->getAt(i));
+      }
+
+      merged->add(merged->getAt(0));
+      result = MakeMultiPolygon(globalFactory.createPolygon(
+          globalFactory.createLinearRing(merged), NULL));
+    }
+
+    return result;
+  }
+
   
-//   geos::geom::MultiPolygon *PolygonTools::FixSeam(
-//       const geos::geom::MultiPolygon *poly) {
-//     std::vector<geos::geom::Geometry *> *polys =
-//         new std::vector<geos::geom::Geometry *>;
-//     
-//     
-//     for(unsigned int copyIndex = 0;
-//         copyIndex < poly->getNumGeometries();
-//         copyIndex ++) {
-//       polys->push_back(poly->getGeometryN(copyIndex)->clone());
-//     }
-// 
-//     unsigned int outerPolyIndex = 0;
-//     
-//     while(outerPolyIndex + 1 < poly->getNumGeometries()) {
-//       unsigned int innerPolyIndex = outerPolyIndex + 1;
-// 
-//       while(innerPolyIndex < poly->getNumGeometries()) {
-//         geos::geom::MultiPolygon *fixedPair = FixSeam(
-//             (geos::geom::Polygon *)polys->at(outerPolyIndex),
-//             (geos::geom::Polygon *)polys->at(innerPolyIndex));
-// 
-//         if(fixedPair->getNumGeometries() == 1) {
-//           polys->erase(polys->begin() + innerPolyIndex);
-//           (*polys)[outerPolyIndex] = fixedPair->getGeometryN(0)->clone();
-//           innerPolyIndex = outerPolyIndex + 1;
-//         }
-//         else {
-//           innerPolyIndex ++;
-//         }
-//         
-//         delete fixedPair;
-//         fixedPair = NULL;
-//       }
-//       
-//       outerPolyIndex ++;
-//     }
-//     
-//     return globalFactory.createMultiPolygon(polys);
-//   }
+  geos::geom::MultiPolygon *PolygonTools::FixSeam(
+      const geos::geom::MultiPolygon *poly) {
+
+    std::vector<geos::geom::Geometry *> *polys =
+        new std::vector<geos::geom::Geometry *>;
+    
+    
+    for(unsigned int copyIndex = 0;
+        copyIndex < poly->getNumGeometries();
+        copyIndex ++) {
+      polys->push_back(poly->getGeometryN(copyIndex)->clone());
+    }
+
+    unsigned int outerPolyIndex = 0;
+    
+    while(outerPolyIndex + 1 < polys->size()) {
+      unsigned int innerPolyIndex = outerPolyIndex + 1;
+
+      while(innerPolyIndex < polys->size()) {
+        geos::geom::MultiPolygon *fixedPair = FixSeam(
+            (geos::geom::Polygon *)polys->at(outerPolyIndex),
+            (geos::geom::Polygon *)polys->at(innerPolyIndex));
+
+        if(fixedPair != NULL) {
+          geos::geom::Geometry *oldInnerPoly = polys->at(innerPolyIndex);
+          geos::geom::Geometry *oldOuterPoly = polys->at(outerPolyIndex);
+
+          polys->erase(polys->begin() + innerPolyIndex);
+          (*polys)[outerPolyIndex] = fixedPair->getGeometryN(0)->clone();
+          innerPolyIndex = outerPolyIndex + 1;
+
+          delete fixedPair;
+          fixedPair = NULL;
+
+          delete oldInnerPoly;
+          oldInnerPoly = NULL;
+
+          delete oldOuterPoly;
+          oldOuterPoly = NULL;
+        }
+        else {
+          innerPolyIndex ++;
+        }
+      }
+      
+      outerPolyIndex ++;
+    }
+
+    return globalFactory.createMultiPolygon(polys);
+  }
 
 
   /**

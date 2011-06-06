@@ -181,6 +181,10 @@ namespace Isis {
       static geos::geom::LinearRing   *FixGeometry(const geos::geom::LinearRing *ring);
 
     public:
+      static geos::geom::MultiPolygon *FixSeam(const geos::geom::MultiPolygon *poly);
+      static geos::geom::MultiPolygon *FixSeam(const geos::geom::Polygon *polyA,
+                                               const geos::geom::Polygon *polyB);
+      
       static geos::geom::Geometry     *ReducePrecision(const geos::geom::Geometry *geom, unsigned int precision);
       static geos::geom::MultiPolygon *ReducePrecision(const geos::geom::MultiPolygon *poly, unsigned int precision);
       static geos::geom::Polygon      *ReducePrecision(const geos::geom::Polygon *poly, unsigned int precision);
