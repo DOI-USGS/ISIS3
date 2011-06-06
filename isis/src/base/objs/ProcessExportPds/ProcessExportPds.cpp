@@ -65,6 +65,8 @@ namespace Isis {
     p_forceCoreHrs = true;
     p_forceCoreHis = true;
     p_detachedLabel = false;
+
+    p_pdsFileType = Image;
   }
 
   /**
