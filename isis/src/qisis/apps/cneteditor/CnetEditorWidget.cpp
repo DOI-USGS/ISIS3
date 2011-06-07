@@ -12,6 +12,7 @@
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QItemSelection>
+#include <QMenu>
 #include <QModelIndex>
 #include <QScrollArea>
 #include <QScrollBar>
@@ -353,6 +354,19 @@ namespace Isis
   {
     editMeasureView = new QTableView();
     editMeasureModel = new MeasureTableModel(qApp);
+
+//     for (int i = 0; i < MeasureTableModel::COLS; i++)
+//     {
+//       QAction * act = new QAction(
+//           MeasureTableModel::getColName((MeasureTableModel::Column) i), this);
+//       act->setCheckable(true);
+//       editMeasureView->horizontalHeader()->addAction(act);
+//     }
+    
+    editMeasureView->horizontalHeader()->setContextMenuPolicy(
+        Qt::ActionsContextMenu);
+    
+
     editMeasureView->setModel(editMeasureModel);
     connect(editMeasureModel, SIGNAL(dataChanged(const QModelIndex &,
         const QModelIndex &)),
@@ -442,7 +456,7 @@ namespace Isis
     QStringList pointIds;
     QStringList cubeSerialNumbers;
     QList< QModelIndex > indexes =
-      serialView->selectionModel()->selectedIndexes();
+        serialView->selectionModel()->selectedIndexes();
     for (int i = 0; i < indexes.size(); i++)
     {
       AbstractTreeItem * item = static_cast< AbstractTreeItem * >(

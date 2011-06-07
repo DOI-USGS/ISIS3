@@ -2,7 +2,9 @@
 
 #include "CnetEditorWindow.h"
 
+
 using namespace Isis;
+
 
 int main(int argc, char ** argv)
 {

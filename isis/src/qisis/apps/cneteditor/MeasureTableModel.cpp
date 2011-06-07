@@ -40,6 +40,40 @@ namespace Isis
       measures = NULL;
     }
   }
+  
+  
+  QString MeasureTableModel::getColName(MeasureTableModel::Column col)
+  {
+    switch (col)
+    {
+      case PointId: return "Point ID";
+      case CubeSerialNumber: return "Cube Serial Number";
+      case Sample: return "Sample";
+      case Line: return "Line";
+      case EditLock: return "Edit Locked";
+      case Ignored: return "Ignored";
+      case Type: return "Measure Type";
+      case Eccentricity: return "Eccentricity";
+      case GoodnessOfFit: return "Goodness of Fit";
+      case MinPixelZScore: return "Minimum Pixel Z-Score";
+      case MaxPixelZScore: return "Maximum Pixel Z-Score";
+      case PixelShift: return "Pixel Shift";
+      case APrioriSample: return "A Priori Sample";
+      case APrioriLine: return "A Priori Line";
+      case Diameter: return "Diameter";
+      case FocalPlaneMeasuredX: return "Focal Plane Measured X";
+      case FocalPlaneMeasuredY: return "Focal Plane Measured Y";
+      case FocalPlaneComputedX: return "Focal Plane Computed X";
+      case FocalPlaneComputedY: return "Focal Plane Computed Y";
+      case JigsawRejected: return "Jigsaw Rejected";
+      case ResidualSample: return "Residual Sample";
+      case ResidualLine: return "Residual Line";
+      case ResidualMagnitude: return "Residual Magnitude";
+    }
+    
+    ASSERT(0);
+    return QString();
+  }
 
 
   void MeasureTableModel::setMeasures(QList< ControlMeasure * > newMeasures)
@@ -116,9 +150,9 @@ namespace Isis
           case PixelShift:
             return QVariant::fromValue(catchNULL(
                 measure->GetLogData(index.column() - 4).GetNumericalValue()));
-          case AprioriSample:
+          case APrioriSample:
             return QVariant::fromValue(catchNULL(measure->GetAprioriSample()));
-          case AprioriLine:
+          case APrioriLine:
             return QVariant::fromValue(catchNULL(measure->GetAprioriLine()));
           case Diameter:
             return QVariant::fromValue(catchNULL(measure->GetDiameter()));
@@ -163,78 +197,7 @@ namespace Isis
     {
       if (orientation == Qt::Horizontal)
       {
-        switch ((Column) section)
-        {
-          case PointId:
-            result = QVariant::fromValue(QString("Point ID"));
-            break;
-          case CubeSerialNumber:
-            result = QVariant::fromValue(QString("Cube Serial #"));
-            break;
-          case Sample:
-            result = QVariant::fromValue(QString("Sample"));
-            break;
-          case Line:
-            result = QVariant::fromValue(QString("Line"));
-            break;
-          case EditLock:
-            result = QVariant::fromValue(QString("Edit Lock"));
-            break;
-          case Ignored:
-            result = QVariant::fromValue(QString("Ignored"));
-            break;
-          case Type:
-            result = QVariant::fromValue(QString("Measure Type           "));
-            break;
-          case Eccentricity:
-            result = QVariant::fromValue(QString("Eccentricity"));
-            break;
-          case GoodnessOfFit:
-            result = QVariant::fromValue(QString("Goodness of Fit"));
-            break;
-          case MinPixelZScore:
-            result = QVariant::fromValue(QString("Minimum Pixel Z-Score"));
-            break;
-          case MaxPixelZScore:
-            result = QVariant::fromValue(QString("Maximum Pixel Z-Score"));
-            break;
-          case PixelShift:
-            result = QVariant::fromValue(QString("Pixel Shift"));
-            break;
-          case AprioriSample:
-            result = QVariant::fromValue(QString("A Priori Sample"));
-            break;
-          case AprioriLine:
-            result = QVariant::fromValue(QString("A Priori Line"));
-            break;
-          case Diameter:
-            result = QVariant::fromValue(QString("Diameter"));
-            break;
-          case FocalPlaneMeasuredX:
-            result = QVariant::fromValue(QString("Focal Plane Measured X"));
-            break;
-          case FocalPlaneMeasuredY:
-            result = QVariant::fromValue(QString("Focal Plane Measured Y"));
-            break;
-          case FocalPlaneComputedX:
-            result = QVariant::fromValue(QString("Focal Plane Computed X"));
-            break;
-          case FocalPlaneComputedY:
-            result = QVariant::fromValue(QString("Focal Plane Computed Y"));
-            break;
-          case JigsawRejected:
-            result = QVariant::fromValue(QString("Jigsaw Rejected"));
-            break;
-          case ResidualSample:
-            result = QVariant::fromValue(QString("Residual Sample"));
-            break;
-          case ResidualLine:
-            result = QVariant::fromValue(QString("Residual Line"));
-            break;
-          case ResidualMagnitude:
-            result = QVariant::fromValue(QString("Residual Magnitude"));
-            break;
-        }
+        result = QVariant::fromValue(getColName((Column) section));
       }
       else
       {
@@ -282,8 +245,8 @@ namespace Isis
             case MinPixelZScore:
             case MaxPixelZScore:
             case PixelShift:
-            case AprioriSample:
-            case AprioriLine:
+            case APrioriSample:
+            case APrioriLine:
             case Diameter:
             case FocalPlaneMeasuredX:
             case FocalPlaneMeasuredY:
@@ -362,7 +325,7 @@ namespace Isis
             {
               QString newDataStr = value.toString().toLower();
               ControlMeasureLogData::NumericLogDataType type =
-                (ControlMeasureLogData::NumericLogDataType)(col - 4);
+                  (ControlMeasureLogData::NumericLogDataType)(col - 4);
               if (newDataStr == "null")
               {
                 measure->DeleteLogData(type);
@@ -379,10 +342,10 @@ namespace Isis
 //               e.Clear();
             }
             break;
-          case AprioriSample:
+          case APrioriSample:
             measure->SetAprioriSample(catchNULL(value.toString()));
             break;
-          case AprioriLine:
+          case APrioriLine:
             measure->SetAprioriLine(catchNULL(value.toString()));
             break;
           case Diameter:
@@ -453,6 +416,5 @@ namespace Isis
 
     return d;
   }
-
 }
 

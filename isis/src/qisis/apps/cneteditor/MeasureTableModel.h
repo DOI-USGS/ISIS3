@@ -6,6 +6,7 @@
 template< class T > class QList;
 
 class QModelIndex;
+class QString;
 
 namespace Isis
 {
@@ -32,8 +33,8 @@ namespace Isis
         MinPixelZScore = 9,
         MaxPixelZScore = 10,
         PixelShift = 11,
-        AprioriSample = 12,
-        AprioriLine = 13,
+        APrioriSample = 12,
+        APrioriLine = 13,
         Diameter = 14,
         FocalPlaneMeasuredX = 15,
         FocalPlaneMeasuredY = 16,
@@ -50,6 +51,8 @@ namespace Isis
     public:
       explicit MeasureTableModel(QObject * parent = 0);
       virtual ~MeasureTableModel();
+      
+      static QString getColName(Column);
 
       void setMeasures(QList< ControlMeasure * > newMeasures);
       ControlMeasure * getMeasure(int row) const;
