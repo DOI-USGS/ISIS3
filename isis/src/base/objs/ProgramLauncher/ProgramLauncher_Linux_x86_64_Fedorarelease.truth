@@ -1,0 +1,84 @@
+Testing ProgramLauncher Class ... 
+
+Testing ls, grep, sed and pipes ... 
+
+ProgramLauncher.cpp
+ProgramLauncher.h
+ProgramLauncher.o
+ProgramLauncher.truth
+Testing stats ... 
+
+hist: Computing min/max for histogram
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+hist: Gathering histogram
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+Group = Results
+  From                    = /usgs/cpkgs/isis3/data/base/testData/ab102401_ide-
+                            al.cub
+  Band                    = 1
+  Average                 = 0.040536894512714
+  StandardDeviation       = 0.01519314883071
+  Variance                = 2.30831771392117e-04
+  Median                  = 0.037797920878468
+  Mode                    = 0.034160507255072
+  Skew                    = 0.54083067271281
+  Minimum                 = 0.010204331949353
+  Maximum                 = 0.095491595566273
+  Sum                     = 31525.745547011
+  TotalPixels             = 1152000
+  ValidPixels             = 777705
+  OverValidMaximumPixels  = 0
+  UnderValidMinimumPixels = 0
+  NullPixels              = 353897
+  LisPixels               = 0
+  LrsPixels               = 0
+  HisPixels               = 0
+  HrsPixels               = 20398
+End_Group
+
+Testing malformed command... 
+
+sh: -c: line 0: unexpected EOF while looking for matching `''
+sh: -c: line 1: syntax error: unexpected end of file
+**PROGRAMMER ERROR** Executing command [ls -l * | grep Program | sed 's/\(.*\)\(ProgramLauncher.*\)/\2/] failed with return status [256]
+
+Testing non-existant Isis 3 program... 
+
+**SYSTEM ERROR** Program [chocolatelab] does not appear to be a valid Isis 3 program
+
+Testing using Isis 3 program as a system program... 
+
+terminate called after throwing an instance of 'Isis::iException'
+  what():  **SYSTEM ERROR** Unable to communicate with parent process with pid [999]
+**SYSTEM ERROR** Unable to communicate with parent process with pid [999]
+**PROGRAMMER ERROR** Executing command [$ISISROOT/bin/stats from=\$base/testData/ab102401_ideal.cub -pid=999 -preference=\$ISISROOT/src/base/objs/Preference/TestPreferences] failed with return status [134]
+
+Testing using Isis 3 program as a system program without pid... 
+
+stats: Computing min/max for histogram
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+stats: Gathering histogram
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+Group = Results
+  From                    = /usgs/cpkgs/isis3/data/base/testData/ab102401_ide-
+                            al.cub
+  Band                    = 1
+  Average                 = 0.040536894512714
+  StandardDeviation       = 0.01519314883071
+  Variance                = 2.30831771392117e-04
+  Median                  = 0.037797920878468
+  Mode                    = 0.034160507255072
+  Skew                    = 0.54083067271281
+  Minimum                 = 0.010204331949353
+  Maximum                 = 0.095491595566273
+  Sum                     = 31525.745547011
+  TotalPixels             = 1152000
+  ValidPixels             = 777705
+  OverValidMaximumPixels  = 0
+  UnderValidMinimumPixels = 0
+  NullPixels              = 353897
+  LisPixels               = 0
+  LrsPixels               = 0
+  HisPixels               = 0
+  HrsPixels               = 20398
+End_Group
