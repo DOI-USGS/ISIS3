@@ -155,11 +155,11 @@ namespace Qisis {
     p_unitsComboBox = new QComboBox(hbox);
     p_unitsComboBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 
+    miComboUnit = -1;
+
     updateUnitsCombo();
     connect(p_unitsComboBox, SIGNAL(activated(int)), this, SLOT(updateDistEdit()));
     connect(RubberBandTool::getInstance(), SIGNAL(modeChanged()), this, SLOT(updateUnitsCombo()));
-
-    miComboUnit = -1;
 
     QHBoxLayout *layout = new QHBoxLayout(hbox);
     layout->setMargin(0);
