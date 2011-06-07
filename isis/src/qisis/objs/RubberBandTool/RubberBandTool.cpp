@@ -64,6 +64,7 @@ namespace Qisis {
 
     p_mouseLoc = new QPoint;
     p_vertices = new QList< QPoint >;
+    p_bandingMode = Line;
 
     activate(false);
     repaint();
