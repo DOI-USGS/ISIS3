@@ -265,6 +265,8 @@ namespace Isis {
 
         p_viewMenu->addAction(viewAct);
       }
+
+      updateMenuVisibility();
     }
   }
 
