@@ -26,16 +26,19 @@ namespace Qisis {
     p_toolBar = NULL;
     p_menubar = NULL;
     p_tableWindow = NULL;
+    p_mainWindow = NULL;
     p_parent = parent;
-    createWindow();
-    createConfigDialog();
-    createLegendMenu();
     p_scaled = false;
     p_curvePropsSaved = false;
     p_xLogScale = false;
     p_yLogScale = false;
-    p_plotCurves.clear();
+    p_deletable = false;
+
+    createWindow();
+    createConfigDialog();
+    createLegendMenu();
     setWindowTitle(title);
+
     readSettings();
   }
 
