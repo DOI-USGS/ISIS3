@@ -286,7 +286,7 @@ namespace Isis {
       else if (point->GetType() == ControlPoint::Ground) {
         m_nGroundPoints++;
 
-        if (m_strSolutionMethod == "SPECIALK"  ||  m_strSolutionMethod == "SPARSE-LU") {
+        if (m_strSolutionMethod == "SPECIALK"  ||  m_strSolutionMethod == "SPARSE") {
           m_nPointIndexMap.push_back(count);
           count++;
         }
@@ -361,7 +361,7 @@ namespace Isis {
 
 
     // Test code to match old test runs which don't solve for radius
-    if (m_strSolutionMethod != "SPECIALK"  &&  m_strSolutionMethod != "SPARSE-LU") {
+    if (m_strSolutionMethod != "SPECIALK"  &&  m_strSolutionMethod != "SPARSE") {
       m_nNumPointPartials = 2;
 
       if (m_bSolveRadii) 
@@ -525,7 +525,7 @@ namespace Isis {
 
     int nPointParameterColumns = m_pCnet->GetNumValidPoints() * m_nNumPointPartials;
 
-    if (m_strSolutionMethod != "SPECIALK"  &&  m_strSolutionMethod != "SPARSE-LU")
+    if (m_strSolutionMethod != "SPECIALK"  &&  m_strSolutionMethod != "SPARSE")
       nPointParameterColumns -= m_nGroundPoints * m_nNumPointPartials;
 
     return m_nImageParameters + nPointParameterColumns;
@@ -2144,7 +2144,7 @@ namespace Isis {
                                        &coeff_point3D(1, 1));
 
     // test added to check old test case that didn't solve for radius
-    //    if (m_bSolveRadii || m_strSolutionMethod == "SPARSE-LU")
+    //    if (m_bSolveRadii || m_strSolutionMethod == "SPARSE")
       pCamera->GroundMap()->GetdXYdPoint(d_lookB_WRT_RAD, &coeff_point3D(0, 2),
                                        &coeff_point3D(1, 2));
 
@@ -2297,7 +2297,7 @@ namespace Isis {
     // Create the basis function and prep for a least squares solution
     m_nBasisColumns = BasisColumns();
     BasisFunction basis("Bundle", m_nBasisColumns, m_nBasisColumns);
-    if (m_strSolutionMethod == "SPARSE-LU") {
+    if (m_strSolutionMethod == "SPARSE") {
       m_pLsq = new Isis::LeastSquares(basis, true,
                                       m_pCnet->GetNumValidMeasures() * 2, m_nBasisColumns, true);
         SetParameterWeights();
@@ -2548,7 +2548,7 @@ namespace Isis {
                         CameraGroundMap::WRT_Longitude);
 
     // Test to match old test run that didn't solve for radius
-    if (m_bSolveRadii || m_strSolutionMethod == "SPARSE-LU")
+    if (m_bSolveRadii || m_strSolutionMethod == "SPARSE")
     d_lookB_WRT_RAD = point->GetMeasure(0)->Camera()->GroundMap()->PointPartial(
                         point->GetAdjustedSurfacePoint(),
                         CameraGroundMap::WRT_Radius);
@@ -2640,7 +2640,7 @@ namespace Isis {
       // partials for 3D point
       if (point->GetType() != ControlPoint::Ground  ||
           m_strSolutionMethod == "SPECIALK"  ||
-          m_strSolutionMethod == "SPARSE-LU") {
+          m_strSolutionMethod == "SPARSE") {
         nIndex = PointIndex(nPointIndex);
         pCamera->GroundMap()->GetdXYdPoint(d_lookB_WRT_LAT, &px[nIndex],
                                          &py[nIndex]);
@@ -2650,7 +2650,7 @@ namespace Isis {
         nIndex++;
 
         // test added to check old test case that didn't solve for radii
-        if (m_bSolveRadii || m_strSolutionMethod == "SPARSE-LU")
+        if (m_bSolveRadii || m_strSolutionMethod == "SPARSE")
           pCamera->GroundMap()->GetdXYdPoint(d_lookB_WRT_RAD, &px[nIndex],
                                          &py[nIndex]);
 
@@ -2744,7 +2744,7 @@ namespace Isis {
                         CameraGroundMap::WRT_Longitude);
 
     // Test to match old test run that didn't solve for radius
-    if (m_bSolveRadii || m_strSolutionMethod == "SPARSE-LU")
+    if (m_bSolveRadii || m_strSolutionMethod == "SPARSE")
     d_lookB_WRT_RAD = point->GetMeasure(0)->Camera()->GroundMap()->PointPartial(
                         point->GetAdjustedSurfacePoint(),
                         CameraGroundMap::WRT_Radius);
@@ -2983,7 +2983,7 @@ namespace Isis {
       // partials for 3D point
       if (point->GetType() != ControlPoint::Ground  ||
           m_strSolutionMethod == "SPECIALK"  ||
-          m_strSolutionMethod == "SPARSE-LU") {
+          m_strSolutionMethod == "SPARSE") {
         nIndex = PointIndex(nPointIndex);
         pCamera->GroundMap()->GetdXYdPoint(d_lookB_WRT_LAT, &px[nIndex],
                                          &py[nIndex]);
@@ -2993,7 +2993,7 @@ namespace Isis {
         nIndex++;
 
         // test added to check old test case that didn't solve for radii
-        if (m_bSolveRadii || m_strSolutionMethod == "SPARSE-LU")
+        if (m_bSolveRadii || m_strSolutionMethod == "SPARSE")
           pCamera->GroundMap()->GetdXYdPoint(d_lookB_WRT_RAD, &px[nIndex],
                                          &py[nIndex]);
 
@@ -4107,7 +4107,7 @@ namespace Isis {
       if (point->IsIgnored())
         continue;
       if (m_strSolutionMethod != "SPECIALK" &&
-          m_strSolutionMethod != "SPARSE-LU"  &&
+          m_strSolutionMethod != "SPARSE"  &&
           point->GetType() == ControlPoint::Ground)
         continue;
 
@@ -4134,7 +4134,7 @@ namespace Isis {
       while (dLon < 0.0) dLon = dLon + 360.0;
 
       // test to match results of old test case that didn't solve for radius
-      if ( m_bSolveRadii || m_strSolutionMethod == "SPARSE-LU") {
+      if ( m_bSolveRadii || m_strSolutionMethod == "SPARSE") {
       dRad += 1000.*basis.Coefficient(index);
       index++;
       }
@@ -4703,7 +4703,7 @@ namespace Isis {
 
 //      std::cout << m_Image_Corrections << std::endl;
 
-      if( m_strSolutionMethod == "SPARSE-LU" )
+      if( m_strSolutionMethod == "SPARSE" )
       {
           lsqCovMatrix = m_pLsq->GetCovarianceMatrix();  // get reference to the covariance matrix from the least-squares object
           bSolveSparse = true;
@@ -5177,6 +5177,7 @@ namespace Isis {
    /**
    * output bundle results to file with no error propagation
    *
+   * @internal
    * @history 2011-05-22 Debbie A. Cook - Added commas to make csv header lines
    *                      consistent for comparer   
    * @history 2011-06-05 Debbie A. Cook - Fixed output of spacecraft position
