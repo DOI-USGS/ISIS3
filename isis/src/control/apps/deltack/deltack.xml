@@ -42,8 +42,8 @@
     <change name="Steven Koechle" date="2007-10-05">
       Added check to see if cube has existing polygon, if so delete it.
     </change>
-    <change name="Debbie A. Cook" date="2011-04-07">
-        Removed obsolete user input parameters maxits and tol.
+    <change name="Debbie A. Cook" date="2011-06-06">
+        Updated to current version of BundleAdjust class.
     </change>
   </history>
 
@@ -62,6 +62,22 @@
         <filter>
           *.cub
         </filter>
+      </parameter>
+    </group>
+
+    <group name="Bundle Adjustment Options">
+      <parameter name="SIGMA0">
+        <brief>Standard deviation of unit weight</brief>
+        <description>Converges on stabilizationof Sigma0</description>
+        <type>double</type>
+        <default><item>1.0e-10</item></default>
+      </parameter>
+
+      <parameter name="MAXITS">
+        <brief>Iterations</brief>
+        <description>Maximum number of iterations</description>
+        <type>integer</type>
+        <default><item>10</item></default>
       </parameter>
     </group>
 

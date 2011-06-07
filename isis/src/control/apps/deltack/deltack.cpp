@@ -13,6 +13,7 @@
 #include "Sensor.h"
 #include "SerialNumberList.h"
 #include "Table.h"
+#include "iTime.h"
 
 using namespace std;
 using namespace Isis;
@@ -46,7 +47,8 @@ void IsisMain() {
   ControlMeasure * m = new ControlMeasure;
   m->SetCubeSerialNumber(serialNumberList.SerialNumber(0));
   m->SetCoordinate(samp1, line1);
-  m->SetType(ControlMeasure::Manual);
+//   m->SetType(ControlMeasure::Manual);
+  m->SetType(ControlMeasure::RegisteredPixel);
 
   ControlPoint * p = new ControlPoint;
   p->SetAprioriSurfacePoint(SurfacePoint(lat1, lon1, rad1));
@@ -57,6 +59,18 @@ void IsisMain() {
   ControlNet cnet;
 //  cnet.SetType(ControlNet::ImageToGround);
   cnet.AddPoint(p);
+
+    // We need the target body
+    Cube c;
+    c.Open(filename, "rw");
+    //check for target name
+    if(c.Label()->HasKeyword("TargetName", PvlObject::Traverse)) {
+//       c.Label()->FindKeyword("TargetName");
+      PvlGroup inst = c.Label()->FindGroup("Instrument", PvlObject::Traverse);
+      std::string targetName = inst["TargetName"];
+      cnet.SetTarget(targetName);
+    }
+    c.Close();
 
   // See if they wanted to solve for twist
   if(ui.GetBoolean("TWIST")) {
@@ -93,7 +107,18 @@ void IsisMain() {
     //    double tol = ui.GetDouble("TOL");
     //int maxIterations = ui.GetInteger("MAXITS");
     //b.Solve(tol, maxIterations);
-    b.Solve();
+    b.SetSolveCmatrix(BundleAdjust::AnglesOnly);
+    b.SetSolveSpacecraftPosition(BundleAdjust::Nothing);
+    b.SetErrorPropagation(false);
+    b.SetOutlierRejection(false);
+    b.SetSolutionMethod("SPECIALK");
+    b.SetStandardOutput(true);
+    b.SetCSVOutput(true);
+    b.SetResidualOutput(true);
+    b.SetConvergenceThreshold(ui.GetDouble("SIGMA0"));
+    b.SetMaxIterations(ui.GetInteger("MAXITS"));
+
+    b.SolveSpecialK();
 
     Cube c;
     c.Open(filename, "rw");
@@ -106,6 +131,8 @@ void IsisMain() {
     Table cmatrix = b.Cmatrix(0);
 
     // Write out a description in the spice table
+    std::string deltackComment = "deltackAdjusted = " + Isis::iTime::CurrentLocalTime();
+    cmatrix.Label().AddComment(deltackComment);
     //PvlKeyword description("Description");
     //description = "Camera pointing updated via deltack application";
     //cmatrix.Label().FindObject("Table",Pvl::Traverse).AddKeyword(description);
