@@ -79,25 +79,22 @@
         <type>integer</type>
         <default><item>10</item></default>
       </parameter>
-    </group>
-
-    <group name="Bundle Adjustment Options">
-        <parameter name="TWIST">
-          <type>boolean</type>
-          <brief>Solve for camera twist</brief>
-          <default><item>False</item></default>
-          <description>
-            In addition to right ascension and declination, If this parameter is set, the program will solve for the camera twist.  This requires input of a second ground coordinate (SAMP2,LINE2) and
+      <parameter name="TWIST">
+        <type>boolean</type>
+        <brief>Solve for camera twist</brief>
+        <default><item>False</item></default>
+        <description>
+          In addition to right ascension and declination, If this parameter is set, the program will solve for the camera twist.  This requires input of a second ground coordinate (SAMP2,LINE2) and
             (LAT2,LON2)
-          </description>
-          <inclusions>
-            <item>LINE2</item>
-            <item>SAMP2</item>
-            <item>LAT2</item>
-            <item>LON2</item>
-            <item>RAD2</item>
-          </inclusions>
-        </parameter>
+        </description>
+        <inclusions>
+          <item>LINE2</item>
+          <item>SAMP2</item>
+          <item>LAT2</item>
+          <item>LON2</item>
+          <item>RAD2</item>
+        </inclusions>
+      </parameter>
    </group>
 
    <group name="Ground Points">
