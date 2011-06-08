@@ -186,7 +186,7 @@ namespace Isis {
       while(*sptr == '0') sptr--;
       if(*sptr == '.') sptr++;
       sptr++;
-      char tmp[8];
+      char tmp[22];
       strcpy(tmp, e);
       strcpy(sptr, tmp);
 
