@@ -1,5 +1,5 @@
 APPNAME = editlab
-editlabTruth1.txt.IGNORELINES=ByteOrder
+editlabTruth1.txt.IGNORELINES = ByteOrder TileSamples TileLines StartByte
 
 include $(ISISROOT)/make/isismake.tsts
 
