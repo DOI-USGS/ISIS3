@@ -1,3 +1,7 @@
+// 2011-06-07 Tracie Sucharski/Debbie Cook - Changed PointType 
+//                    Ground  ---->  Fixed
+//                    Tie     ---->  Free          
+
 // Protocol buffer descriptor for Isis3 Control Networks
 package Isis;
 
@@ -14,9 +18,9 @@ message ControlNetFileHeaderV0002 {
 
 message ControlPointFileEntryV0002 {
   enum PointType {
-    Tie                  = 2; //  Image to Image
+    Free                 = 2; //  Image to Image
     Constrained          = 3; //  Image to Ground
-    Ground               = 4; //  Image to Groun
+    Fixed                = 4; //  Image to Groun
     obsolete_Tie         = 0; //  Image to Image
     obsolete_Ground      = 1; //  Image to Ground
   }

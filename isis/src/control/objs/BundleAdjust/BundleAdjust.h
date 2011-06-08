@@ -73,7 +73,10 @@
  *   @history 2011-04-02 Debbie A. Cook Updated to ControlPoint class changes regarding target radii.  Also separated out 2 sets of
  *                          calculations to test later for efficiency
  *   @history 2011-06-05 Debbie A. Cook Changed checks for solution type to match change from SPARSE to SPARSE-LU
-*/
+ *   @history 2011-06-07 Debbie A. Cook and Tracie Sucharski - Modified point types
+ *                          Ground ------> Fixed
+ *                          Tie----------> Free
+ */
 
 #include <vector>
 #include <fstream>
@@ -193,7 +196,7 @@ namespace Isis {
 
 //      int HeldPoints() const { return m_nHeldPoints; }
       int IgnoredPoints() const { return m_nIgnoredPoints; }
-      int GroundPoints() const { return m_nGroundPoints; }
+      int FixedPoints() const { return m_nFixedPoints; }
       void SetObservationMode(bool bObservationMode);
 
       void SetConvergenceThreshold(double d) { m_dConvergenceThreshold = d; }
@@ -268,7 +271,7 @@ namespace Isis {
       int m_nConstrainedImageParameters;                     //!< number of constrained image parameters
       int m_nDegreesOfFreedom;                               //!< degrees of freedom                                            //!
       int m_nHeldPoints;                                     //!< number of 'held' points (define)
-      int m_nGroundPoints;                                   //!< number of 'ground' points (define)
+      int m_nFixedPoints;                                    //!< number of 'fixed' (ground) points (define)
       int m_nIgnoredPoints;                                  //!< number of ignored points
       int m_nHeldImages;                                     //!< number of 'held' images (define)
       int m_nHeldObservations;                               //!< number of 'held' observations (define)
@@ -294,7 +297,7 @@ namespace Isis {
       //!< apriori sigmas from user interface
       //!< for points, these override values control-net except
 
-      //!< for "held" & "ground" points
+      //!< for "held" & "fixed" points
       double m_dGlobalLatitudeAprioriSigma;                  //!< latitude apriori sigma
       double m_dGlobalLongitudeAprioriSigma;                 //!< longitude apriori sigma
       double m_dGlobalRadiusAprioriSigma;                    //!< radius apriori sigma

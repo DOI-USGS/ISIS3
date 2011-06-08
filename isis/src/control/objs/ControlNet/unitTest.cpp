@@ -115,7 +115,7 @@ int main() {
     ControlPoint *cp = new ControlPoint(oss1.str());
 
     if (i == 0) {
-      cp->SetType(ControlPoint::Ground);
+      cp->SetType(ControlPoint::Fixed);
       cp->SetAprioriSurfacePointSource(ControlPoint::SurfacePointSource::Basemap);
       cp->SetAprioriSurfacePointSourceFile("/work1/tsucharski/basemap.cub");
       cp->SetAprioriRadiusSource(ControlPoint::RadiusSource::DEM);
@@ -135,7 +135,7 @@ int main() {
       cp->SetIgnored(true);
     }
     else {
-      cp->SetType(ControlPoint::Tie);
+      cp->SetType(ControlPoint::Free);
     }
 
     for (int k = 0; k < 2; k++) {

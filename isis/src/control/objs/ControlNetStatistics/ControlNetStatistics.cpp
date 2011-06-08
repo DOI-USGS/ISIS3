@@ -15,7 +15,7 @@ using namespace std;
 namespace Isis {
 
   //! String names for Point Type
-  string sPointType [] = { "Ground", "Constrained", "Tie" };
+  string sPointType [] = { "Fixed", "Constrained", "Free" };
 
   //! String values for Boolean
   string sBoolean[]    = { "False", "True" };
@@ -58,7 +58,7 @@ namespace Isis {
 
   /**
    * Generates the summary stats for the entire control network.
-   * Stats include Total images, Total, Valid, Ignored, Ground Points,
+   * Stats include Total images, Total, Valid, Ignored, Fixed Points,
    * Total, Valid, Ignored Measures and also Average, Min, Max Error,
    * Min, Max Line and Sample Errors
    *
@@ -74,7 +74,7 @@ namespace Isis {
     pStatsGrp += PvlKeyword("TotalPoints",       mCNet->GetNumPoints());
     pStatsGrp += PvlKeyword("ValidPoints",       NumValidPoints());
     pStatsGrp += PvlKeyword("IgnoredPoints",     mCNet->GetNumPoints() - NumValidPoints());
-    pStatsGrp += PvlKeyword("GroundPoints",      NumGroundPoints());
+    pStatsGrp += PvlKeyword("FixedPoints",       NumFixedPoints());
     pStatsGrp += PvlKeyword("AverageResidual",   AverageResidual());
 
     double dError = MinimumResidual();
@@ -103,7 +103,7 @@ namespace Isis {
   /**
    * Generate the statistics of a Control Network by Image
    * Stats include Filename, Serial Num, and
-   * Total, Valid, Ignored, Ground Points in each Image
+   * Total, Valid, Ignored, Fixed Points in each Image
    *
    * @author Sharmila Prasad (8/24/2010)
    *
@@ -126,7 +126,7 @@ namespace Isis {
       const ControlPoint *cPoint = mCNet->GetPoint(i);
       int iNumMeasures = cPoint->GetNumMeasures();
       bool bIgnore = cPoint->IsIgnored();
-      bool bGround = (cPoint->GetType() == ControlPoint::Ground ? true : false);
+      bool bFixed = (cPoint->GetType() == ControlPoint::Fixed ? true : false);
 
       for (int j = 0; j < iNumMeasures; j++) {
         const ControlMeasure *cMeasure = cPoint->GetMeasure(j);
@@ -136,13 +136,13 @@ namespace Isis {
         if (mImageTotalPointMap.find(sMeasureSN) == mImageTotalPointMap.end()) {
           mImageTotalPointMap [sMeasureSN]  = 0;
           mImageIgnorePointMap[sMeasureSN]  = 0;
-          mImageGroundPointMap[sMeasureSN]  = 0;
+          mImageFixedPointMap[sMeasureSN]  = 0;
         }
         mImageTotalPointMap[sMeasureSN]++;
         if (bIgnore)
           mImageIgnorePointMap[sMeasureSN]++;
-        if (bGround)
-          mImageGroundPointMap[sMeasureSN]++;
+        if (bFixed)
+          mImageFixedPointMap[sMeasureSN]++;
       }
       // Update Progress
       if (mProgress != NULL)
@@ -172,10 +172,10 @@ namespace Isis {
     map<string, int>::iterator it;
 
     // Log into the output file
-    ostm << "Filename" << ", " << "SerialNumber" << ", " << "Total Points" << ", " << "Ignore" << ", " << "Ground" << ", " <<  endl;
+    ostm << "Filename" << ", " << "SerialNumber" << ", " << "Total Points" << ", " << "Ignore" << ", " << "Fixed" << ", " <<  endl;
     for (it = mImageTotalPointMap.begin(); it != mImageTotalPointMap.end(); it++) {
       ostm << mSerialNumList.Filename((*it).first) << ", " << (*it).first << ", ";
-      ostm << (*it).second << ", " << mImageIgnorePointMap[(*it).first] << ", " << mImageGroundPointMap[(*it).first] << endl;
+      ostm << (*it).second << ", " << mImageIgnorePointMap[(*it).first] << ", " << mImageFixedPointMap[(*it).first] << endl;
     }
     ostm.close();
   }
@@ -186,7 +186,7 @@ namespace Isis {
    * @author Sharmila Prasad (9/17/2010)
    *
    * @param psSerialNum   - Image Serial Number File
-   * @param piPointDetail - Calculated Points stats (total, ignore, ground)
+   * @param piPointDetail - Calculated Points stats (total, ignore, fixed)
    * @param piSize        - array size
    */
   void ControlNetStatistics::GetImageStatsBySerialNum(string psSerialNum, int *piPointDetail, int piSize) {
@@ -195,7 +195,7 @@ namespace Isis {
     }
     piPointDetail[total]  = mImageTotalPointMap[psSerialNum];
     piPointDetail[ignore] = mImageIgnorePointMap[psSerialNum];
-    piPointDetail[ground] = mImageGroundPointMap[psSerialNum];
+    piPointDetail[fixed] = mImageFixedPointMap[psSerialNum];
   }
 
   /**
@@ -266,19 +266,19 @@ namespace Isis {
   }
 
   /**
-   * Returns the total number of Ground Points in the Control Network
+   * Returns the total number of Fixed Points in the Control Network
    * Moved from ControlNet class
    *
    * @author Sharmila Prasad (9/8/2010)
    *
-   * @return int - Total Ground Points
+   * @return int - Total Fixed Points
    */
-  int ControlNetStatistics::NumGroundPoints() {
+  int ControlNetStatistics::NumFixedPoints() {
     int iCount = 0;
     int iNumPoints = mCNet->GetNumPoints();
 
     for (int i = 0; i < iNumPoints; i++) {
-      if (mCNet->GetPoint(i)->GetType() == ControlPoint::Ground)
+      if (mCNet->GetPoint(i)->GetType() == ControlPoint::Fixed)
         iCount ++;
     }
     return iCount;

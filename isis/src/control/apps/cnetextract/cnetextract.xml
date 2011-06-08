@@ -116,6 +116,9 @@
       Added an option RETAIN_REFERENCE to extract the Reference measure even if 
       it is not in the CUBELIST
     </change>
+    <change name="Debbie A. Cook and Tracie Sucharski" date="2011-06-07">
+      Change point types "Ground" to "Fixed" and "Tie" to "Free".
+    </change>
   </history>
 
   <category>
@@ -295,15 +298,15 @@
         </exclusions>
       </parameter>
 
-      <parameter name="GROUND">
+      <parameter name="FIXED">
         <type>boolean</type>
         <default><item>False</item></default>
-        <brief>Only extract ground Control Points</brief>
+        <brief>Only extract fixed Control Points</brief>
         <description>
-          <p>When true, only ground Control Points will be extracted into the
+          <p>When true, only fixed Control Points will be extracted into the
           output Control Net.</p>
 
-          <p>When PREFIX is used, the file [PREFIX]NonGroundPoints.txt will be
+          <p>When PREFIX is used, the file [PREFIX]NonFixedPoints.txt will be
           created when using this parameter. Each Control Point it lists was not
           extracted due to this filter.</p>
         </description>
@@ -442,10 +445,10 @@
            latitude longitude range will be removed. Control Points whos
            latitude longitude cannot be computed will be removed.</p>
 
-           <p>Ground Points will use the lat/lon values provided in the CNET
-           while Tie Points will calculate their lat/lon from the images
+           <p>Fixed Points will use the lat/lon values provided in the CNET
+           while Free Points will calculate their lat/lon from the images
            provided by the FROMLIST.  These calculated lat/lon values will be
-           added to Tie Point in the ONET for reference purposes. No Isis
+           added to Free Points in the ONET for reference purposes. No Isis
            application will use these added Control Point keywords.</p>
 
           <p>When PREFIX is used, the files [PREFIX]LatLonOutOfRange.txt and

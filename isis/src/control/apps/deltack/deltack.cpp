@@ -53,7 +53,7 @@ void IsisMain() {
   ControlPoint * p = new ControlPoint;
   p->SetAprioriSurfacePoint(SurfacePoint(lat1, lon1, rad1));
   p->SetId("Point1");
-  p->SetType(ControlPoint::Ground);
+  p->SetType(ControlPoint::Fixed);
   p->Add(m);
 
   ControlNet cnet;
@@ -94,7 +94,7 @@ void IsisMain() {
     ControlPoint * p = new ControlPoint;
     p->SetAprioriSurfacePoint(SurfacePoint(lat2, lon2, rad2));
     p->SetId("Point2");
-    p->SetType(ControlPoint::Ground);
+    p->SetType(ControlPoint::Fixed);
     p->Add(m);
 
     cnet.AddPoint(p);

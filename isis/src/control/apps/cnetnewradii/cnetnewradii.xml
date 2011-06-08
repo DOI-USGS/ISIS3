@@ -8,7 +8,7 @@
   <description>
     <p>
       This application will go through an existing ControlNet and copy it to a new 
-      one. When it encounters a PointType Ground it will give the latitude and 
+      one. When it encounters a PointType Fixed it will give the latitude and 
       longitude to a Universal Ground Map that is generated from the DEM and ask 
       it for a value back. The Radius of that ControlPoint is updated with the DN 
       value recieved from the DEM. 
@@ -22,7 +22,7 @@
       corresponding control points will be listed in the ERRORS log output file.  
       If the user did not enter a filename for this log and there are any 
       points that failed, one will be created with the name "failures.log".  
-      <strong>Note: </strong> If a significant number of ground points in the 
+      <strong>Note: </strong> If a significant number of fixed points in the 
       ControlNet fail to find a new Radius value, the user should make sure 
       that they have input the correct DEM for the network.  
     </p>
@@ -57,6 +57,9 @@
     </change>
     <change name="Steven Lambright" date="2011-04-11">
       Changed the DEM parameter name to MODEL
+    </change>
+    <change name="Debbie A. Cook and Tracie Sucharski" date="2011-06-07">
+      Changed the point type "Ground" to "Fixed"
     </change>
   </history>
 
@@ -166,9 +169,9 @@
 
   <examples>
     <example>
-      <brief>All ground points successfully updated </brief>
+      <brief>All fixed points successfully updated </brief>
       <description>
-        Example of the use of cnetnewradii on a ControlNet whose ground point 
+        Example of the use of cnetnewradii on a ControlNet whose fixed point 
         lat/lon values are all contained within the given DEM.
       </description>
       <terminalInterface>
@@ -179,7 +182,7 @@
         <description>
           In this example, cnetnewradii will take the input control network and 
           copy it to the output network with new Radius values calculated for 
-          all ground points using the DN value recieved from the DEM cube.  
+          all fixed points using the DN value recieved from the DEM cube.  
           No error log will be generated.
         </description>
       </terminalInterface>
@@ -210,7 +213,7 @@
           <description>
             Example of an output ControlNet corresponding to the input example 
             with updated Radius values.  Notice that Radius values have been 
-            updated for all ground points.
+            updated for all fixed points.
           </description>
           <parameterName>TO</parameterName>
         </dataFile>
@@ -220,7 +223,7 @@
           <brief>Input DEM for cnetnewradii</brief>
           <description>
             Example of an input DEM cube used by cnetnewradii to update the 
-            Radius values of ground points in the ControlNet.
+            Radius values of fixed points in the ControlNet.
           </description>
           <thumbnail caption="DEM " src="assets/thumbs/inputDEM1Thumb.jpg" width="200" height="154"/>
           <parameterName>DEM</parameterName>
@@ -228,10 +231,10 @@
       </inputImages>
     </example>
     <example>
-      <brief>Some ground points fail to be updated </brief>
+      <brief>Some fixed points fail to be updated </brief>
       <description>
         Example of the use of cnetnewradii on a ControlNet that contains some 
-        ground points whose Radius can not be calculated.
+        fixed points whose Radius can not be calculated.
       </description>
       <terminalInterface>
         <commandLine>
@@ -242,8 +245,8 @@
         <description>
           In this example, cnetnewradii will take the input control network and 
           copy it to the output network with new Radius values calculated for 
-          ground points using the DN value recieved from the DEM cube. The 
-          PointIDs of ground points that fail to calculate a new Radius value 
+          fixed points using the DN value recieved from the DEM cube. The 
+          PointIDs of fixed points that fail to calculate a new Radius value 
           will be listed in the error log. 
         </description>
       </terminalInterface>
@@ -281,7 +284,7 @@
           <brief>Output ControlNet for cnetnewradii </brief>
           <description>
             Example of an output ControlNet corresponding to the input example 
-            with updated Radius values.  Notice that the ground points 
+            with updated Radius values.  Notice that the fixed points 
             that failed are set to Ignore=True and their original radius values 
             are retained.
           </description>
@@ -293,7 +296,7 @@
           <brief>Input DEM for cnetnewradii</brief>
           <description>
             Example of an input DEM cube used by cnetnewradii to update the 
-            Radius values of ground points in the ControlNet.
+            Radius values of fixed points in the ControlNet.
           </description>
           <thumbnail caption="DEM " src="assets/thumbs/inputDEM2Thumb.jpg" width="200" height="154"/>
           <parameterName>DEM</parameterName>

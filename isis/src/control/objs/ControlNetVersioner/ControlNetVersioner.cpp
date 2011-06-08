@@ -113,6 +113,10 @@ namespace Isis {
           ConvertVersion2ToVersion3(network);
           break;
 
+        case 3:
+          ConvertVersion3ToVersion4(network);
+          break;
+
         default:
           iString msg = "The Pvl file version [" + iString(version) + "] is not"
               " supported";
@@ -205,12 +209,12 @@ namespace Isis {
       Copy(object, "RadiusConstrained",
            point, &ControlPointFileEntryV0002::set_radiusconstrained);
 
-      if (object["PointType"][0] == "Ground")
-        point.set_type(ControlPointFileEntryV0002::Ground);
+      if (object["PointType"][0] == "Fixed")
+        point.set_type(ControlPointFileEntryV0002::Fixed);
       else if (object["PointType"][0] == "Constrained")
         point.set_type(ControlPointFileEntryV0002::Constrained);
       else
-        point.set_type(ControlPointFileEntryV0002::Tie);
+        point.set_type(ControlPointFileEntryV0002::Free);
 
       if (object.HasKeyword("AprioriXYZSource")) {
         iString source = object["AprioriXYZSource"][0];
@@ -743,6 +747,26 @@ namespace Isis {
      if(cp.HasKeyword("AprioriCovarianceMatrix") ||
         cp.HasKeyword("AdjustedCovarianceMatrix"))
        cp["PointType"] = "Constrained";
+    }
+  }
+
+
+  /**
+   * This converts pvl networks from their version 3 to version 4.
+   *
+   * Modify in place to prevent unnecessary memory usage.
+   *
+   * @param network Input is Version 3, must be modified to conform to Version 4
+   */
+  void ControlNetVersioner::ConvertVersion3ToVersion4(
+      PvlObject &network) {
+    network["Version"] = 4;
+
+    for (int cpIndex = 0; cpIndex < network.Objects(); cpIndex ++) {
+      PvlObject &cp = network.Object(cpIndex);
+
+     if (cp["PointType"][0] == "Ground") cp["PointType"] = "Fixed";
+     if (cp["PointType"][0] == "Tie") cp["PointType"] = "Free";
     }
   }
 

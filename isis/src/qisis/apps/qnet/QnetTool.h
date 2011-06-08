@@ -143,6 +143,9 @@ namespace Qisis {
    *   @history 2010-12-17 Eric Hyer - Fixed bug where current template file
    *                was not being updated with saveAs.  Moved template file
    *                display to outside of control point groupbox.
+   *   @history 2011-06-08 Tracie Sucharski - Point types renamed:
+   *                   Ground ----> Fixed
+   *                   Tie    ----> Free
    */
   class QnetTool : public Tool {
     Q_OBJECT
@@ -168,7 +171,7 @@ namespace Qisis {
       void updateList();
       void updateNet(QString cNetFilename);
       void createPoint(double lat,double lon);
-      void createGroundPoint(double lat,double lon);
+      void createFixedPoint(double lat,double lon);
       void modifyPoint(Isis::ControlPoint *point);
       void deletePoint(Isis::ControlPoint *point);
       void updatePointInfo(QString pointId);
@@ -188,7 +191,7 @@ namespace Qisis {
       void addMeasure();
       void setLockPoint (bool ignore);
       void setIgnorePoint (bool ignore);
-      void setGroundPoint (bool ground);
+      void setFixedPoint (bool fixed);
       void setLockLeftMeasure (bool ignore);
       void setIgnoreLeftMeasure (bool ignore);
       void setLockRightMeasure (bool ignore);
@@ -280,7 +283,7 @@ namespace Qisis {
       
       QCheckBox *p_lockPoint;
       QCheckBox *p_ignorePoint;
-      QCheckBox *p_groundPoint;
+      QCheckBox *p_fixedPoint;
       QLabel *p_leftReference;
       QLabel *p_leftMeasureType;
       QLabel *p_leftSampError;

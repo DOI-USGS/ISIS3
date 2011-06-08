@@ -147,6 +147,11 @@ int main(int argc, char *argv[]) {
     //  QObject::connect(ftool,SIGNAL(serialNumberListUpdated()),
     //                   qnetTool,SLOT(updateList()));
 
+    //  Connect file tools open ground & dem to QnetTool slots which will create
+    //  FSB and open the files
+    QObject::connect(ftool, SIGNAL(newGroundFile()), qnetTool, SLOT(openGround()));
+    QObject::connect(ftool, SIGNAL(newDemFile()), qnetTool, SLOT(openDem()));
+
     /**** MAKE NAV TOOL DIALOG VISIBLE  ****/
     // NavigationTool needs to know when the QnetTool (Tie Tool) has been
     // acitvated on the tool pad in order to reopen the NavTool, if necessary.

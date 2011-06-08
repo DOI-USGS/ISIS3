@@ -11,7 +11,7 @@ commands:
 	ppp=$(INPUT)/rand.ppp \
 	list3=$(OUTPUT)/cub3.lis \
 	onet=$(OUTPUT)/mat2cnetTruth3.net \
-	pointtype=Tie \
+	pointtype=Free \
 	description="PointTypeTie Test Network" \
 	networkid=TestNet03 \
 	target=Titan > /dev/null;

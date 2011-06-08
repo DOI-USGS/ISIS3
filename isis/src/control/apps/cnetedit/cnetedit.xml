@@ -88,6 +88,9 @@
       Added option RETAIN_REFERENCE to retain reference even if not validated or 
       if it is in the ignore CubeList
     </change>
+    <change name="Debbie A. Cook and Tracie Sucharski" date="2011-06-07">
+      Changed point type "ground" to "fixed"
+    </change>
   </history> 
   
   <category>

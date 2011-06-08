@@ -268,9 +268,9 @@ namespace Isis {
    */
   void BundleAdjust::FillPointIndexMap() {
 
-    // Create a lookup table of ignored, and ground points
+    // Create a lookup table of ignored, and fixed points
     // TODO  Deal with edit lock points
-    m_nGroundPoints = m_nIgnoredPoints = 0;
+    m_nFixedPoints = m_nIgnoredPoints = 0;
     int count = 0;
     int nObjectPoints = m_pCnet->GetNumPoints();
 
@@ -283,8 +283,8 @@ namespace Isis {
         continue;
       }
 
-      else if (point->GetType() == ControlPoint::Ground) {
-        m_nGroundPoints++;
+      else if (point->GetType() == ControlPoint::Fixed) {
+        m_nFixedPoints++;
 
         if (m_strSolutionMethod == "SPECIALK"  ||  m_strSolutionMethod == "SPARSE") {
           m_nPointIndexMap.push_back(count);
@@ -526,7 +526,7 @@ namespace Isis {
     int nPointParameterColumns = m_pCnet->GetNumValidPoints() * m_nNumPointPartials;
 
     if (m_strSolutionMethod != "SPECIALK"  &&  m_strSolutionMethod != "SPARSE")
-      nPointParameterColumns -= m_nGroundPoints * m_nNumPointPartials;
+      nPointParameterColumns -= m_nFixedPoints * m_nNumPointPartials;
 
     return m_nImageParameters + nPointParameterColumns;
   }
@@ -1202,8 +1202,8 @@ namespace Isis {
 
 //      std::cout << weights << std::endl;
 
-//      if( point->Held() || point->Type() == ControlPoint::Ground )
-      if (point->GetType() == ControlPoint::Ground) {
+//      if( point->Held() || point->Type() == ControlPoint::Fixed )
+      if (point->GetType() == ControlPoint::Fixed) {
         weights[0] = 1.0e+50;
         weights[1] = 1.0e+50;
         weights[2] = 1.0e+50;
@@ -1723,7 +1723,7 @@ namespace Isis {
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
-    // partials for ground point w/r lat, long, radius in Body-Fixed
+    // partials for fixed point w/r lat, long, radius in Body-Fixed
     d_lookB_WRT_LAT = pCamera->GroundMap()->PointPartial(point.GetAdjustedSurfacePoint(),
                       CameraGroundMap::WRT_Latitude);
     d_lookB_WRT_LON = pCamera->GroundMap()->PointPartial(point.GetAdjustedSurfacePoint(),
@@ -1869,7 +1869,7 @@ namespace Isis {
     double dMeasuredx, dComputedx, dMeasuredy, dComputedy;
     double deltax, deltay;
     double dObservationSigma;
-    // Compute ground point in body-fixed coordinates km
+    // Compute fixed point in body-fixed coordinates km
 //    latrec_c((double) point->GetAdjustedSurfacePoint().GetLocalRadius().GetKilometers(),
 //             (double) point->GetAdjustedSurfacePoint().GetLongitude().GetRadians(),
 //             (double) point->GetAdjustedSurfacePoint().GetLatitude().GetRadians(),
@@ -1885,7 +1885,7 @@ namespace Isis {
 
 //    double dTime = -1.0;
 
-    // partials for ground point w/r lat, long, radius in Body-Fixed (?)
+    // partials for fixed point w/r lat, long, radius in Body-Fixed (?)
     // need to verify this
     // For now move entire point partial below.  Maybe later be more efficient  ----DC
     // and split the GetdXYdPoint method of CameraGroundMap into PointPartial part
@@ -1897,7 +1897,7 @@ namespace Isis {
 
     pCamera = measure.Camera();
 
-    // Compute ground point in body-fixed coordinates
+    // Compute fixed point in body-fixed coordinates
 
 //  printf("Lat: %20.10lf  Long: %20.10lf   Radius: %20.10lf\n",point.UniversalLatitude(),point.UniversalLongitude(),point.Radius());
 
@@ -1928,7 +1928,7 @@ namespace Isis {
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
-    // partials for ground point w/r lat, long, radius in Body-Fixed
+    // partials for fixed point w/r lat, long, radius in Body-Fixed
     d_lookB_WRT_LAT = pCamera->GroundMap()->PointPartial(point.GetAdjustedSurfacePoint(),
                       CameraGroundMap::WRT_Latitude);
     d_lookB_WRT_LON = pCamera->GroundMap()->PointPartial(point.GetAdjustedSurfacePoint(),
@@ -2539,7 +2539,7 @@ namespace Isis {
     double dObservationSigma;
     double dObservationWeight;
 
-    // partials for ground point w/r lat, long, radius in Body-Fixed km
+    // partials for fixed point w/r lat, long, radius in Body-Fixed km
     d_lookB_WRT_LAT = point->GetMeasure(0)->Camera()->GroundMap()->PointPartial(
                         point->GetAdjustedSurfacePoint(),
                         CameraGroundMap::WRT_Latitude);
@@ -2638,7 +2638,7 @@ namespace Isis {
       }
 
       // partials for 3D point
-      if (point->GetType() != ControlPoint::Ground  ||
+      if (point->GetType() != ControlPoint::Fixed  ||
           m_strSolutionMethod == "SPECIALK"  ||
           m_strSolutionMethod == "SPARSE") {
         nIndex = PointIndex(nPointIndex);
@@ -2735,7 +2735,7 @@ namespace Isis {
 
 //     double dTime = -1.0;
 
-    // partials for ground point w/r lat, long, radius in Body-Fixed km
+    // partials for fixed point w/r lat, long, radius in Body-Fixed km
     d_lookB_WRT_LAT = point->GetMeasure(0)->Camera()->GroundMap()->PointPartial(
                         point->GetAdjustedSurfacePoint(),
                         CameraGroundMap::WRT_Latitude);
@@ -2753,7 +2753,7 @@ namespace Isis {
 //    std::cout << "d_lookB_WRT_LON" << d_lookB_WRT_LON << std::endl;
 //    std::cout << "d_lookB_WRT_RAD" << d_lookB_WRT_RAD << std::endl;
 
-    // Compute ground point in body-fixed coordinates km
+    // Compute fixed point in body-fixed coordinates km
 //     latrec_c((double) point->GetAdjustedSurfacePoint().GetLocalRadius().GetKilometers(),
 //              (double) point->GetAdjustedSurfacePoint().GetLongitude().GetRadians(),
 //              (double) point->GetAdjustedSurfacePoint().GetLatitude().GetRadians(),
@@ -2981,7 +2981,7 @@ namespace Isis {
       }
 
       // partials for 3D point
-      if (point->GetType() != ControlPoint::Ground  ||
+      if (point->GetType() != ControlPoint::Fixed  ||
           m_strSolutionMethod == "SPECIALK"  ||
           m_strSolutionMethod == "SPARSE") {
         nIndex = PointIndex(nPointIndex);
@@ -3340,7 +3340,7 @@ namespace Isis {
           Longitude(lon, Angle::Radians),
           Distance(rad, Distance::Kilometers)));
 
-    // Compute ground point in body-fixed coordinates
+    // Compute fixed point in body-fixed coordinates
     double pB[3];
     latrec_c((double) rPoint.GetAdjustedSurfacePoint().GetLocalRadius().GetKilometers(),
              (double) rPoint.GetAdjustedSurfacePoint().GetLongitude().GetRadians(),
@@ -3580,7 +3580,7 @@ namespace Isis {
       nPointIndex++;
 
       // testing
-      // Compute ground point in body-fixed coordinates
+      // Compute fixed point in body-fixed coordinates
 //      double pB[3];
 //      latrec_c( dRad * 0.001,
 //               (dLon * DEG2RAD),
@@ -4108,7 +4108,7 @@ namespace Isis {
         continue;
       if (m_strSolutionMethod != "SPECIALK" &&
           m_strSolutionMethod != "SPARSE"  &&
-          point->GetType() == ControlPoint::Ground)
+          point->GetType() == ControlPoint::Fixed)
         continue;
 
       double dLat = point->GetAdjustedSurfacePoint().GetLatitude().GetDegrees();
@@ -4140,7 +4140,7 @@ namespace Isis {
       }
 
       // testing
-      // Compute ground point in body-fixed coordinates
+      // Compute fixed point in body-fixed coordinates
       double pB[3];
       latrec_c(dRad * 0.001,
                (dLon * DEG2RAD),
@@ -4351,7 +4351,7 @@ namespace Isis {
 //       // How do I solve the compile error regarding the const?
 //       //      point->SetAprioriSurfacePoint(aprioriSurfacePoint);
 
-      if (point->GetType() == ControlPoint::Ground) {
+      if (point->GetType() == ControlPoint::Fixed) {
         m_dParameterWeights[nWtIndex] = 1.0e+50;
         m_dParameterWeights[nWtIndex+1] = 1.0e+50;
         m_dParameterWeights[nWtIndex+2] = 1.0e+50;
@@ -5088,10 +5088,12 @@ namespace Isis {
           dSigmaRadius = point->GetAdjustedSurfacePoint().GetLocalRadiusSigma().GetMeters();
           nGoodRays = nRays - point->GetNumberOfRejectedMeasures();
 
-          if (point->GetType() == ControlPoint::Ground)
-              strStatus = "GROUND";
-          else if (point->GetType() == ControlPoint::Tie)
-              strStatus = "TIE";
+          if (point->GetType() == ControlPoint::Fixed)
+              strStatus = "FIXED";
+          else if (point->GetType() == ControlPoint::Constrained) 
+              strStatus = "CONSTRAINED";
+          else if (point->GetType() == ControlPoint::Free)
+              strStatus = "FREE";
           else
               strStatus = "UNKNOWN";
 
@@ -5137,10 +5139,12 @@ namespace Isis {
           dLonInit = dLon - cor_lon_dd;
           dRadiusInit = dRadius - (corrections[2] * 1000.0);
 
-          if (point->GetType() == ControlPoint::Ground)
-              strStatus = "GROUND";
-          else if (point->GetType() == ControlPoint::Tie)
-              strStatus = "TIE";
+          if (point->GetType() == ControlPoint::Fixed)
+              strStatus = "FIXED";
+          else if (point->GetType() == ControlPoint::Constrained)
+              strStatus = "CONSTRAINED";
+          else if (point->GetType() == ControlPoint::Free)
+              strStatus = "FREE";
           else
               strStatus = "UNKNOWN";
 
@@ -5480,10 +5484,12 @@ namespace Isis {
         dRadius = point->GetAdjustedSurfacePoint().GetLocalRadius().GetMeters();
         nGoodRays = nRays - point->GetNumberOfRejectedMeasures();
 
-        if( point->GetType() == ControlPoint::Ground)
-            strStatus = "GROUND";
-        else if( point->GetType() == ControlPoint::Tie)
-            strStatus = "TIE";
+        if( point->GetType() == ControlPoint::Fixed)
+            strStatus = "FIXED";
+        else if( point->GetType() == ControlPoint::Constrained)
+            strStatus = "CONSTRAINED";
+        else if( point->GetType() == ControlPoint::Free)
+            strStatus = "FREE";
         else
             strStatus = "UNKNOWN";
 
@@ -5525,10 +5531,12 @@ namespace Isis {
         dLonInit = dLon-cor_lon_dd;
         dRadiusInit = dRadius-(corrections[2]*1000.0);
 
-        if( point->GetType() == ControlPoint::Ground)
-            strStatus = "GROUND";
-        else if( point->GetType() == ControlPoint::Tie)
-            strStatus = "TIE";
+        if( point->GetType() == ControlPoint::Fixed)
+            strStatus = "FIXED";
+        else if( point->GetType() == ControlPoint::Constrained)
+            strStatus = "CONSTRAINED";
+        else if( point->GetType() == ControlPoint::Free)
+            strStatus = "FREE";
         else
             strStatus = "UNKNOWN";
 
@@ -5614,10 +5622,12 @@ namespace Isis {
       cor_lon_m = corrections[1]*m_dRTM*cos(dLat*Isis::DEG2RAD);
       cor_rad_m  = corrections[2]*1000.0;
 
-      if (point->GetType() == ControlPoint::Ground)
-        strStatus = "GROUND";
-      else if (point->GetType() == ControlPoint::Tie)
-        strStatus = "TIE";
+      if (point->GetType() == ControlPoint::Fixed)
+        strStatus = "FIXED";
+      else if (point->GetType() == ControlPoint::Constrained)
+        strStatus = "CONSTRAINED";
+      else if (point->GetType() == ControlPoint::Free)
+        strStatus = "FREE";
       else
         strStatus = "UNKNOWN";
 

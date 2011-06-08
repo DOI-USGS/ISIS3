@@ -398,9 +398,9 @@ namespace Isis {
         e.Clear();
       }
 
-      // Only perform the interest operation on points of type "Tie" and
+      // Only perform the interest operation on points of type "Free" and
       // Points having atleast 1 measure and Point is not Ignored
-      if (!newPnt->IsIgnored() && newPnt->GetType() == ControlPoint::Tie &&
+      if (!newPnt->IsIgnored() && newPnt->GetType() == ControlPoint::Free &&
           iOrigRefIndex >= 0 &&
           (iNumMeasuresLocked == 0 || (iNumMeasuresLocked > 0 && bRefLocked))) {
 
@@ -581,7 +581,7 @@ namespace Isis {
         delete [] mtInterestResults;
       }
       else {
-        // Process Ignored, non Tie points or Measures=0
+        // Process Ignored, non Free points or Measures=0
         int iComment = 1;
 
         if (iOrigRefIndex < 0) {
@@ -594,9 +594,9 @@ namespace Isis {
           pvlPointObj += Isis::PvlKeyword(sComment, "Point was originally Ignored");
         }
 
-        if (newPnt->GetType() == ControlPoint::Tie) {
+        if (newPnt->GetType() == ControlPoint::Free) {
           std::string sComment = "Comment" + iComment++;
-          pvlPointObj += Isis::PvlKeyword(sComment, "Not a Tie Point");
+          pvlPointObj += Isis::PvlKeyword(sComment, "Not a Free Point");
         }
 
         if (iNumMeasuresLocked > 0 && !bRefLocked) {
@@ -609,7 +609,7 @@ namespace Isis {
           cm->SetDateTime();
           cm->SetChooserName("Application cnetref(Interest)");
         }
-      } // End of if point is of type tie
+      } // End of if point is of type free
 
       mPvlLog += pvlPointObj;
 

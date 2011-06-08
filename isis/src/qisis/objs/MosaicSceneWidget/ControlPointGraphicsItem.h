@@ -24,6 +24,9 @@ namespace Isis {
    *   @history 2011-05-10 Steven Lambright - Added arrow capabilities, fixed
    *                       problem with boundingRect() that seemed to cause a
    *                       crash.
+   *   @history 2011-06-07 Debbie A. Cook and Tracie Sucharski - Modified point types
+   *                       Ground ------> Fixed
+   *                       Tie----------> Free
    */
   class ControlPointGraphicsItem : public QGraphicsRectItem {
     public:

@@ -45,7 +45,7 @@ namespace Isis {
     measures = new QHash< QString, ControlMeasure * >;
     cubeSerials = new QStringList;
 
-    type = Tie;
+    type = Free;
     dateTime = "";
     editLock = false;
     ignore = false;
@@ -140,15 +140,15 @@ namespace Isis {
 
     switch (fileEntry.type()) {
       case ControlPointFileEntryV0002_PointType_obsolete_Tie:
-      case ControlPointFileEntryV0002_PointType_Tie:
-        type = Tie;
+      case ControlPointFileEntryV0002_PointType_Free:
+        type = Free;
         break;
       case ControlPointFileEntryV0002_PointType_Constrained:
         type = Constrained;
         break;
       case ControlPointFileEntryV0002_PointType_obsolete_Ground:
-      case ControlPointFileEntryV0002_PointType_Ground:
-        type = Ground;
+      case ControlPointFileEntryV0002_PointType_Fixed:
+        type = Fixed;
         break;
       default:
         iString msg = "Point type is invalid.";
@@ -324,7 +324,7 @@ namespace Isis {
     cubeSerials = new QStringList;
 
     id = newId;
-    type = Tie;
+    type = Free;
     editLock = false;
     jigsawRejected = false;
     referenceExplicitlySet = false;
@@ -824,7 +824,7 @@ namespace Isis {
    * @param newType The new type this control point should be
    */
   ControlPoint::Status ControlPoint::SetType(PointType newType) {
-    if (type != Ground && type != Tie && type != Constrained) {
+    if (type != Fixed && type != Free && type != Constrained) {
       iString msg = "Invalid Point Enumeration, [" + iString(type) + "], for "
           "Control Point [" + GetId() + "]";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
@@ -943,7 +943,7 @@ namespace Isis {
   /**
    * This method computes the apriori lat/lon for a point.  It computes this
    * by determining the average lat/lon of all the measures.  Note that this
-   * does not change held, ignored, or ground points.  Also, it does not
+   * does not change ignored, or fixed points.  Also, it does not
    * use unmeasured or ignored measures when computing the lat/lon.
    * @internal
    *   @history 2008-06-18  Tracie Sucharski/Jeannie Walldren,
@@ -979,11 +979,11 @@ namespace Isis {
 
     PointModified();
 
-    // Don't goof with ground points.  The lat/lon is what it is ... if
+    // Don't goof with fixed points.  The lat/lon is what it is ... if
     // it exists!
-    if (GetType() == Ground) {
+    if (GetType() == Fixed) {
       if (!aprioriSurfacePoint.Valid()) {
-        iString msg = "ControlPoint [" + GetId() + "] is a ground point ";
+        iString msg = "ControlPoint [" + GetId() + "] is a fixed point ";
         msg += "and requires an apriori x/y/z";
         throw iException::Message(iException::User, msg, _FILEINFO_);
       }
@@ -1030,7 +1030,7 @@ namespace Isis {
         else {
           // JAA: Don't stop if we know the lat/lon.  The SetImage may fail
           // but the FocalPlane measures have been set
-          if (GetType() == Ground)
+          if (GetType() == Fixed)
             continue;
 
           // TODO: What do we do
@@ -1044,8 +1044,8 @@ namespace Isis {
       }
     }
 
-    // Don't update the apriori x/y/z for ground points  TODO This needs a closer look
-    if (GetType() == Ground || NumberOfConstrainedCoordinates() == 3
+    // Don't update the apriori x/y/z for fixed points  TODO This needs a closer look
+    if (GetType() == Fixed || NumberOfConstrainedCoordinates() == 3
         || IsLatitudeConstrained()
         || IsRadiusConstrained()) {
       // Initialize the adjusted x/y/z to the apriori in this case
@@ -1348,14 +1348,14 @@ namespace Isis {
     iString str;
 
     switch (pointType) {
-      case Ground:
-        str = "Ground";
+      case Fixed:
+        str = "Fixed";
         break;
       case Constrained:
         str = "Constrained";
         break;
-      case Tie:
-        str = "Tie";
+      case Free:
+        str = "Free";
         break;
     }
 
@@ -1527,8 +1527,8 @@ namespace Isis {
 
 
 
-  bool ControlPoint::IsGround() const {
-    return (type == Ground);
+  bool ControlPoint::IsFixed() const {
+    return (type == Fixed);
   }
 
 
@@ -1955,14 +1955,14 @@ namespace Isis {
 
     fileEntry.set_id(GetId());
     switch (GetType()) {
-      case ControlPoint::Tie:
-        fileEntry.set_type(ControlPointFileEntryV0002::Tie);
+      case ControlPoint::Free:
+        fileEntry.set_type(ControlPointFileEntryV0002::Free);
         break;
       case ControlPoint::Constrained:
         fileEntry.set_type(ControlPointFileEntryV0002::Constrained);
         break;
-      case ControlPoint::Ground:
-        fileEntry.set_type(ControlPointFileEntryV0002::Ground);
+      case ControlPoint::Fixed:
+        fileEntry.set_type(ControlPointFileEntryV0002::Fixed);
         break;
     }
 

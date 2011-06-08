@@ -58,9 +58,12 @@ namespace Isis {
   *   @history 2010-10-22 Sharmila Prasad - Reset apriori for source==Reference
   *   @history 2010-12-29 Sharmila Prasad - Modified for new ControlNet API's
   *                                         (UpdatePoint, UpdateMeasure)
-   *  @history 2011-01-19 Christopher Austin - Altered to compile with the new
+  *   @history 2011-01-19 Christopher Austin - Altered to compile with the new
   *                                             Control redesign.
   *   @history 2011-02-24 Sharmila Prasad - Fixed segmentation fault
+  *   @history 2011-06-07 Debbie A. Cook and Tracie Sucharski - Modified point types
+  *                                             Ground ------> Fixed
+  *                                             Tie----------> Free
   */
 
   /**

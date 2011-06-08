@@ -256,12 +256,12 @@ void IsisMain() {
  * @return Whether or not the point should be deleted
  */
 bool ShouldDelete(ControlPoint *point) {
-  // If the point only has one measure, then unless it's a ground point or the
+  // If the point only has one measure, then unless it's a fixed point or the
   // user wishes to preserve such points, it should be deleted. As a side
   // effect, this check will also delete empty points that satisfy this
   // condition without having to do the next check
   if((point->GetNumMeasures() < 2 && !preservePoints) &&
-      point->GetType() != ControlPoint::Ground)
+      point->GetType() != ControlPoint::Fixed)
     return true;
 
   // A point without any measures should always be deleted

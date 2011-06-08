@@ -45,6 +45,9 @@
     <change name="Debbie A. Cook" date="2011-06-06">
         Updated to current version of BundleAdjust class.
     </change>
+    <change name="Debbie A. Cook" date="2011-06-07">
+        Changed point type "Ground" to "Fixed".
+    </change>
   </history>
 
   <groups>
@@ -84,7 +87,7 @@
         <brief>Solve for camera twist</brief>
         <default><item>False</item></default>
         <description>
-          In addition to right ascension and declination, If this parameter is set, the program will solve for the camera twist.  This requires input of a second ground coordinate (SAMP2,LINE2) and
+          In addition to right ascension and declination, If this parameter is set, the program will solve for the camera twist.  This requires input of a second fixed coordinate (SAMP2,LINE2) and
             (LAT2,LON2)
         </description>
         <inclusions>
@@ -97,17 +100,17 @@
       </parameter>
    </group>
 
-   <group name="Ground Points">
+   <group name="Fixed Points">
      <parameter name="SAMP1">
        <type>double</type>
        <brief>Sample coordinate</brief>
-       <description>The sample coordinate for ground point #1 (LAT1,LON1)</description>
+       <description>The sample coordinate for fixed point #1 (LAT1,LON1)</description>
      </parameter>
 
      <parameter name="LINE1">
        <type>double</type>
        <brief>Line coordinate</brief>
-       <description>The line coordinate for ground point #1 (LAT1,LON1)</description>
+       <description>The line coordinate for fixed point #1 (LAT1,LON1)</description>
      </parameter>
 
      <parameter name="LAT1">
@@ -140,7 +143,7 @@
      <parameter name="SAMP2">
        <type>double</type>
        <brief>Sample coordinate</brief>
-       <description>The sample coordinate for ground point #2 (LAT2,LON2)</description>
+       <description>The sample coordinate for fixed point #2 (LAT2,LON2)</description>
        <inclusions>
            <item>TWIST</item>
        </inclusions>
@@ -149,7 +152,7 @@
      <parameter name="LINE2">
        <type>double</type>
        <brief>Line coordinate</brief>
-       <description>The line coordinate for ground point #2 (LAT2,LON2)</description>
+       <description>The line coordinate for fixed point #2 (LAT2,LON2)</description>
        <inclusions>
            <item>TWIST</item>
        </inclusions>

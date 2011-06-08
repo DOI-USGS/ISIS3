@@ -60,6 +60,9 @@ namespace Isis {
    *  @history 2010-11-09 Sharmila Prasad - Point_MeasureProperties,process 'All' measuretype
    *  @history 2011-01-17 Eric Hyer - Fixed breakages caused by ControlNet api
    *                          changes
+   *   @history 2011-06-07 Debbie A. Cook and Tracie Sucharski - Modified point types
+   *                          Ground ------> Fixed
+   *                          Tie----------> Free
    *
    */
   class ControlNetFilter : public ControlNetStatistics {

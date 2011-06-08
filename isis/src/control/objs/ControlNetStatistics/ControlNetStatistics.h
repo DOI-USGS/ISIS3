@@ -41,7 +41,7 @@ namespace Isis {
   const int IMAGE_POINT_SIZE = 3;
 
   //! Enumeration for Point Statistics
-  enum ePointDetails { total, ignore, ground };
+  enum ePointDetails { total, ignore, fixed };
 
   /**
    * @brief Control Network Stats
@@ -62,6 +62,9 @@ namespace Isis {
    *   @history 2010-10-26 Tracie Sucharski Added missing includes to cpp after
    *                                       removing includes from ControlNet.h.
    *   @history 2011-05-03 Debbie A. Cook Added type "Constrained" to sPointType values
+   *   @history 2011-06-07 Debbie A. Cook and Tracie Sucharski - Modified point types
+   *                          Ground ------> Fixed
+   *                          Tie----------> Free
    */
   class ControlNetStatistics {
     public:
@@ -74,7 +77,7 @@ namespace Isis {
       //! Destructor
       ~ControlNetStatistics();
 
-      //! Generate stats like Total, Ignored, Ground Points in an Image
+      //! Generate stats like Total, Ignored, Fixed Points in an Image
       void GenerateImageStats(void);
 
       //! Print the Image Stats into specified output file
@@ -83,7 +86,7 @@ namespace Isis {
       //! Returns the Image Stats by Serial Number
       void GetImageStatsBySerialNum(string psSerialNum, int *piPointDetail, int piSize);
 
-      //! Generate stats like Ignored, Ground, Total Measures, Ignored by Control Point
+      //! Generate stats like Ignored, Fixed, Total Measures, Ignored by Control Point
       void GeneratePointStats(const string &psPointFile);
 
       //! Generate the Control Net Stats into the PvlGroup
@@ -92,8 +95,8 @@ namespace Isis {
       //! Returns the Number of Valid (Not Ignored) Points in the Control Net
       int NumValidPoints();
 
-      //! Returns the Number of Ground Points in the Control Net
-      int NumGroundPoints();
+      //! Returns the Number of Fixed Points in the Control Net
+      int NumFixedPoints();
 
       //! Returns the total Number of Measures in the Control Net
       int NumMeasures();
@@ -133,7 +136,7 @@ namespace Isis {
     private:
       map <string, int> mImageTotalPointMap;   //!< Contains map of serial num and Total points
       map <string, int> mImageIgnorePointMap;  //!< Contains map of serial num and Ignored points
-      map <string, int> mImageGroundPointMap;  //!< Contains map of serial num and Ground points
+      map <string, int> mImageFixedPointMap;   //!< Contains map of serial num and Fixed points
   };
 }
 #endif

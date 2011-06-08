@@ -133,10 +133,11 @@ namespace Isis {
 
       static void ConvertVersion1ToVersion2(PvlObject &network);
       static void ConvertVersion2ToVersion3(PvlObject &network);
+      static void ConvertVersion3ToVersion4(PvlObject &network);
 
       // We only need the latest Pvl version because it has our update cycle
       //! The latest version of the Pvl formatted control networks
-      static const int LATEST_PVL_VERSION = 3;
+      static const int LATEST_PVL_VERSION = 4;
       //! The latest version of the Binary formatted control networks
       static const int LATEST_BINARY_VERSION = 2;
 

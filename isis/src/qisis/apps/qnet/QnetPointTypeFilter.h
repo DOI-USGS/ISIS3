@@ -32,6 +32,9 @@ namespace Qisis {
    *                          "Isis::ControlPoint::Ground" in
    *                          filter().  Initialized pointers to
    *                          null in constructor
+   *   @history 2011-06-08 Tracie Sucharski - Change for new point types and
+   *                          held points no longer exist, but editLocked
+   *                          points do.
    */
   class QnetPointTypeFilter : public QnetFilter {
       Q_OBJECT
@@ -41,9 +44,10 @@ namespace Qisis {
       virtual void filter();
 
     private:
-      QRadioButton *p_ground;
+      QRadioButton *p_fixed;
       QRadioButton *p_ignore;
-      QRadioButton *p_held;
+      QRadioButton *p_constrained;
+      QRadioButton *p_editLocked;
   };
 };
 

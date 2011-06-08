@@ -11,7 +11,7 @@ Object = ControlNetwork
   Version      = 3
 
   Object = ControlPoint
-    PointType                = Ground
+    PointType                = Fixed
     PointId                  = C151
     ChooserName              = cnetref
     DateTime                 = 2005-05-03T00:00:00
@@ -80,7 +80,7 @@ Object = ControlNetwork
   Version      = 3
 
   Object = ControlPoint
-    PointType                = Ground
+    PointType                = Fixed
     PointId                  = C151
     ChooserName              = cnetref
     DateTime                 = 2005-05-03T00:00:00
@@ -165,7 +165,7 @@ Object = ControlNetwork
   Version      = 3
 
   Object = ControlPoint
-    PointType                = Ground
+    PointType                = Fixed
     PointId                  = C151
     ChooserName              = cnetref
     DateTime                 = 2005-05-03T00:00:00
@@ -250,7 +250,7 @@ Object = ControlNetwork
   Version      = 3
 
   Object = ControlPoint
-    PointType                = Ground
+    PointType                = Fixed
     PointId                  = C151
     ChooserName              = cnetref
     DateTime                 = 2005-05-03T00:00:00
@@ -335,7 +335,7 @@ Object = ControlNetwork
   Version      = 3
 
   Object = ControlPoint
-    PointType                = Ground
+    PointType                = Fixed
     PointId                  = C151
     ChooserName              = cnetref
     DateTime                 = 2005-05-03T00:00:00

@@ -64,6 +64,8 @@ namespace Qisis {
     *     screen pixel off on each direction.  Also no longer paint cross under
     *     the large main red crosses.
     * @history 2010-12-01 Eric Hyer - Added stretch locking
+    * @history 2011-06-07 Debbie A. Cook and Tracie Sucharski - Changed point
+    *     type "Ground" to "Fixed".
     */
   class ChipViewport : public QWidget {
       Q_OBJECT

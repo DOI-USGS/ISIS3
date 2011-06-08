@@ -26,8 +26,11 @@ void printPoint(ControlPoint &p);
   * @history 2010-08-12  Tracie Sucharski,  Keywords changed AGAIN.. Added many
   *                         more tests for conversions between lat/lon/radius
   *                         and x/y/z and between simgas and covariance matrices.
+  *   @history 2011-06-07 Debbie A. Cook and Tracie Sucharski - Modified point types
+  *                         Ground ------> Fixed
+  *                         Tie----------> Free
   *
-*/
+  */
 int main() {
   Preference::Preferences(true);
 
@@ -35,7 +38,7 @@ int main() {
 
   ControlPoint cp("C151");
 
-  cp.SetType(ControlPoint::Ground);
+  cp.SetType(ControlPoint::Fixed);
   cp.SetIgnored(true);
   cp.SetAprioriSurfacePointSource(ControlPoint::SurfacePointSource::Basemap);
   cp.SetAprioriSurfacePointSourceFile("/work1/tsucharski/basemap.cub");

@@ -26,9 +26,11 @@ namespace Qisis {
    *   @history 2008-12-10 Jeannie Walldren - Reworded "What's this?" description
    *                          for saveAs action. Changed "Save As" action text to
    *                          match QnetTool's "Save As" action
+   *   @history 2011-06-03 Tracie Sucharski - Add Open Ground & Open Dem. 
    */
   QnetFileTool::QnetFileTool(QWidget *parent) : Qisis::FileTool(parent) {
-    openAction()->setToolTip("Open network");
+    openAction()->setText("Open control network & cube list");
+    openAction()->setToolTip("Open control network & cube list");
     QString whatsThis =
       "<b>Function:</b> Open a <i>control network</i> \
        <p><b>Shortcut:</b>  Ctrl+O\n</p>";
@@ -42,6 +44,29 @@ namespace Qisis {
 
     p_saveNet = false;
 
+    QAction *openGround = new QAction(parent);
+    openGround->setText("Open &Ground Source");
+    openGround->setStatusTip("Open a ground source for choosing ground points");
+    whatsThis =
+      "<b>Function:</b> Open and display a ground source for choosing ground points."
+      "This can be level1, level2 or dem cube.";
+    openGround->setWhatsThis(whatsThis);
+    connect (openGround,SIGNAL(activated()),this,SIGNAL(newGroundFile()));
+
+    QAction *openDem = new QAction(parent);
+    openDem->setText("Open &Radius Source");
+    whatsThis =
+      "<b>Function:</b> Open a DEM for determining the radius when "
+      "choosing ground points.  This is not the file that will be displayed "
+      "to be used for visually picking points.  This is strictly used to "
+      "determine the radius value.";
+    openDem->setWhatsThis(whatsThis);
+    connect (openDem,SIGNAL(activated()),this,SIGNAL(newDemFile()));
+
+    QMenu *menu = g_vpMainWindow->getMenu(menuName());
+    menu->addAction(openGround);
+    menu->addAction(openDem);
+    menu->addSeparator();
 
   }
 

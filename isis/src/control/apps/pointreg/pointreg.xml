@@ -134,6 +134,9 @@
       MinimumPixelZScore, MaximumPixelZScore, and GoodnessOfFit to output
       nothing in the flat file if not existant, as opposed to 0 or Isis::Null.
     </change>
+    <change name="Debbie A. Cook" date="2011-06-07">
+      Changed point types "Ground" to "Fixed" and "Tie" to "Free".
+    </change>
   </history>
 
   <groups>

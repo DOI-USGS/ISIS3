@@ -74,6 +74,9 @@
       Overhauled documentation to better explain the distinction between the
       base Control Network and the networks being added into it.
     </change>
+    <change name="Debbie A. Cook and Tracie Sucharski" date="2011-06-07">
+      Change point type "Ground" to "Fixed"
+    </change>
   </history> 
 
   <category>
@@ -285,8 +288,8 @@
         <brief>Replace conflicting points as networks are added</brief>
         <description>
           Whenever a latitude or longitude value conflicts between the base
-          network and the network being added on a held or ground Control
-          Point, then the value in the base network will be replaced with that
+          network and the network being added on a fixed Control Point,
+          then the value in the base network will be replaced with that
           from the add network when this option is TRUE.  When this options is
           FALSE, the conflict will be noted in the LOG file (if provided), but
           the value from base will be retained in the output network.
@@ -299,8 +302,8 @@
         <brief>Replace conflicting measures as networks are added</brief>
         <description>
           Whenever a Control Measure conflicts between the base network and
-          the network being added on a held or ground Control Point, then the
-          measure in the base network will be replaced with that from the add
+          the network being added on a fixed Control Point, then the measure
+          in the base network will be replaced with that from the add
           network when this option is TRUE.  When this options is FALSE, the
           conflict will be noted in the LOG file (if provided), but the
           measure from base will be retained in the output network.

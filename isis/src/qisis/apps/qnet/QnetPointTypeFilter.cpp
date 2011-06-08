@@ -26,24 +26,27 @@ namespace Qisis {
    *
    */
   QnetPointTypeFilter::QnetPointTypeFilter(QWidget *parent) : QnetFilter(parent) {
-    p_ground = NULL;
+    p_fixed = NULL;
     p_ignore = NULL;
-    p_held = NULL;
+    p_constrained = NULL;
+    p_editLocked = NULL;
 
     // Create the components for the filter window
-    p_ground = new QRadioButton("Ground");
-    p_ground->setChecked(false);
+    p_fixed = new QRadioButton("Fixed");
+    p_fixed->setChecked(false);
     p_ignore = new QRadioButton("Ignored");
-    p_held = new QRadioButton("Held");
+    p_constrained = new QRadioButton("Constrained");
+    p_editLocked = new QRadioButton("Edit Locked");
     QLabel *pad = new QLabel();
 
     // Create the layout and add the components to it
     QGridLayout *gridLayout = new QGridLayout();
-    gridLayout->addWidget(p_ground, 0, 0, 1, 4);
+    gridLayout->addWidget(p_fixed, 0, 0, 1, 4);
     gridLayout->addWidget(p_ignore, 1, 0, 1, 4);
-    gridLayout->addWidget(p_held, 2, 0, 1, 4);
-    gridLayout->addWidget(pad, 3, 0);
-    gridLayout->setRowStretch(3, 50);
+    gridLayout->addWidget(p_constrained, 2, 0, 1, 4);
+    gridLayout->addWidget(p_editLocked, 3, 0, 1, 4);
+    gridLayout->addWidget(pad, 4, 0);
+    gridLayout->setRowStretch(4, 50);
     this->setLayout(gridLayout);
   }
 
@@ -86,8 +89,9 @@ namespace Qisis {
     // Loop in reverse order since removal list of elements affects index number
     for (int i = g_filteredPoints.size() - 1; i >= 0; i--) {
       Isis::ControlPoint &cp = *(*g_controlNetwork)[g_filteredPoints[i]];
-      if (p_ground->isChecked()) {
-        if (cp.GetType() == Isis::ControlPoint::Ground) {
+
+      if (p_fixed->isChecked()) {
+        if (cp.GetType() == Isis::ControlPoint::Fixed) {
           continue;
         }
         else {
@@ -109,6 +113,22 @@ namespace Qisis {
           // if all measures have Ignore=True, treat point as ignored
           // and keep in filtered list
           continue;
+        }
+      }
+      else if (p_constrained->isChecked()) {
+        if (cp.GetType() == Isis::ControlPoint::Constrained) {
+          continue;
+        }
+        else {
+          g_filteredPoints.removeAt(i);
+        }
+      }
+      else if (p_editLocked->isChecked()) {
+        if (cp.IsEditLocked()) {
+          continue;
+        }
+        else {
+          g_filteredPoints.removeAt(i);
         }
       }
     }

@@ -101,10 +101,13 @@ namespace Isis {
    *   @history 2010-11-10 Sharmila Prasad - Modify unit test to accomodate changes in the deffile
    *   @history 2010-11-12 Sharmila Prasad - Move definition of structure InterestResults to private
    *   @history 2010-12-29 Sharmila Prasad - Modified for new ControlNet API's
-  *                                         (UpdatePoint, UpdateMeasure)
-  *    @history 2011-02-24 Sharmila Prasad - Fixed segmentation fault
-  *    @history 2011-05-14 Sharmila Prasad - Modified to accomodate changes to ControlNetValidMeasure
-  *                                   which added line, sample residuals for Measure validation
+   *                                         (UpdatePoint, UpdateMeasure)
+   *   @history 2011-02-24 Sharmila Prasad - Fixed segmentation fault
+   *   @history 2011-05-14 Sharmila Prasad - Modified to accomodate changes to ControlNetValidMeasure
+   *                                   which added line, sample residuals for Measure validation
+   *   @history 2011-06-07 Debbie A. Cook and Tracie Sucharski - Modified point types
+   *                          Ground ------> Fixed
+   *                          Tie----------> Free
    */
   class InterestOperator : public ControlNetValidMeasure {
     public:

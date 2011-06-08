@@ -8,7 +8,7 @@
 
   <description>
     <p>
-      This program creates a first guess control network with tie points between
+      This program creates a first guess control network with control points between
       overlapping images. The control network is based on the available pointing information
       for each image (most likely SPICE).
     </p>
@@ -101,6 +101,9 @@
     <change name="Steven Lambright" date="2011-04-11">
       Changed SEEDDEF to DEFFILE and TO to ONET as per the control network
       standard application parameter names.
+    </change>
+    <change name="Debbie A. Cook and Tracie Sucharski" date="2011-06-07">
+      Changed point type "tie" to "free"
     </change>
   </history>
 

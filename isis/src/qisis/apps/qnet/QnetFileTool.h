@@ -69,6 +69,8 @@ namespace Qisis {
    *  @history 2010-11-17 Eric Hyer - Added newControlNetwork SIGNAL
    *  @history 2010-12-10 Tracie Sucharski - Renamed slot loadPoint to
    *                          loadPointImages.
+   *   @history 2011-06-03 Tracie Sucharski - Add Open Ground & Open Dem
+   *                          signals.
    *
    */
 
@@ -79,6 +81,8 @@ namespace Qisis {
       void serialNumberListUpdated();
       void controlNetworkUpdated(QString cNetName);
       void newControlNetwork(Isis::ControlNet *);
+      void newGroundFile();
+      void newDemFile();
 
     public:
       QnetFileTool(QWidget *parent);

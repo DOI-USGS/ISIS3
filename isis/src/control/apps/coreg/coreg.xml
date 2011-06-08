@@ -188,6 +188,9 @@
         Changed REGDEF parameter name to DEFFILE. Changed CNETFILE parameter name
         to ONET.
     </change>
+    <change name="Debbie A. Cook and Tracie Sucharski" date="2011-06-07">
+        Changed point types "Ground" to "Fixed" and "Tie" to "Free".
+    </change>
   </history>
 
   <groups>

@@ -272,7 +272,7 @@ void IsisMain() {
       // registered. When a measure can't be registered to the reference then
       // that measure is set to be ignored where in the past the whole point
       // was ignored
-      if (goodMeasureCount < 2 && outPoint->GetType() != ControlPoint::Ground) {
+      if (goodMeasureCount < 2 && outPoint->GetType() != ControlPoint::Fixed) {
         outPoint->SetIgnored(true);
       }
 

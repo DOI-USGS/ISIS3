@@ -262,6 +262,9 @@
     <change name="Sharmila Prasad" date="2011-05-24">
       Helper function to edit DefFile
     </change>
+    <change name="Debbie A. Cook and Tracie Sucharski" date="2011-06-07">
+      Changed point types "Ground" to "Fixed" and "Tie" to "Free"
+    </change>
 </history>
 
 <groups>

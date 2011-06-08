@@ -204,6 +204,9 @@
     <change name="Travis Addair" date="2009-08-10">
         Auto registration parameters are now placed into the print file.
     </change>
+    <change name="Debbie A. Cook" date="2011-06-07">
+        Changed point type "Tie" to "Free".
+    </change>
   </history>
 
   <groups>

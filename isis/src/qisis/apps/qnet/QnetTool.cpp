@@ -9,7 +9,7 @@
 #include "QnetDeletePointDialog.h"
 #include "QnetNewMeasureDialog.h"
 #include "QnetNewPointDialog.h"
-#include "QnetGroundPointDialog.h"
+#include "QnetFixedPointDialog.h"
 #include "Workspace.h"
 
 #include "Application.h"
@@ -80,7 +80,7 @@ namespace Qisis {
     p_pointRadius = NULL;
     p_lockPoint = NULL;
     p_ignorePoint = NULL;
-    p_groundPoint = NULL;
+    p_fixedPoint = NULL;
     p_leftReference = NULL;
     p_leftMeasureType = NULL;
     p_leftSampError = NULL;
@@ -173,12 +173,12 @@ namespace Qisis {
     
     QPushButton * addMeasure = new QPushButton("Add Measure(s) to Point");
     connect(addMeasure, SIGNAL(clicked()), this, SLOT(addMeasure()));
-    QPushButton *savePointToNet = new QPushButton ("Save Point to Control Network");
+    QPushButton *savePointToNet = new QPushButton ("Save Point");
     connect (savePointToNet,SIGNAL(clicked()),this,SLOT(savePoint()));
     QHBoxLayout * addMeasureLayout = new QHBoxLayout;
     addMeasureLayout->addWidget(addMeasure);
-    addMeasureLayout->addStretch();
     addMeasureLayout->addWidget(savePointToNet);
+//    addMeasureLayout->addStretch();
     
     p_templateFilenameLabel = new QLabel("Template File: " +
         QString::fromStdString(p_pointEditor->templateFilename()));
@@ -265,9 +265,9 @@ namespace Qisis {
             this, SLOT(setIgnorePoint(bool)));
     connect(this, SIGNAL(ignorePointChanged()),
             p_ignorePoint, SLOT(toggle()));
-    p_groundPoint = new QCheckBox("Ground Point");
-    p_groundPoint->setEnabled(true);
-    connect(p_groundPoint,SIGNAL(clicked(bool)),this,SLOT(setGroundPoint(bool)));
+    p_fixedPoint = new QCheckBox("Fixed Point");
+    p_fixedPoint->setEnabled(true);
+    connect(p_fixedPoint,SIGNAL(clicked(bool)),this,SLOT(setFixedPoint(bool)));
     p_pointLatitude = new QLabel;
     p_pointLongitude = new QLabel;
     p_pointRadius = new QLabel;
@@ -275,7 +275,7 @@ namespace Qisis {
     QVBoxLayout * rightLayout = new QVBoxLayout;
     rightLayout->addWidget(p_lockPoint);
     rightLayout->addWidget(p_ignorePoint);
-    rightLayout->addWidget(p_groundPoint);
+    rightLayout->addWidget(p_fixedPoint);
     rightLayout->addWidget(p_pointLatitude);
     rightLayout->addWidget(p_pointLongitude);
     rightLayout->addWidget(p_pointRadius);
@@ -397,9 +397,9 @@ namespace Qisis {
   void QnetTool::createActions() {
     p_openGround = new QAction(p_qnetTool);
     p_openGround->setText("Open &Ground Source");
-    p_openGround->setStatusTip("Open a ground source for choosing ground points");
+    p_openGround->setStatusTip("Open a ground source for choosing fixed points");
     QString whatsThis =
-      "<b>Function:</b> Open and display a ground source for choosing ground points."
+      "<b>Function:</b> Open and display a ground source for choosing fixed points."
       "This can be level1, level2 or dem cube.";
     p_openGround->setWhatsThis(whatsThis);
     connect (p_openGround,SIGNAL(activated()),this,SLOT(openGround()));
@@ -408,7 +408,7 @@ namespace Qisis {
     p_openDem->setText("Open &Radius Source");
     whatsThis =
       "<b>Function:</b> Open a DEM for determining the radius when "
-      "choosing ground points.  This is not the file that will be displayed "
+      "choosing fixed points.  This is not the file that will be displayed "
       "to be used for visually picking points.  This is strictly used to "
       "determine the radius value.";
     p_openDem->setWhatsThis(whatsThis);
@@ -615,8 +615,9 @@ namespace Qisis {
       // Reference Measure not on left.  Ask user if they want to change
       // the reference measure, but only if it is not the ground source on the left
       if (refMeasure->GetCubeSerialNumber() != p_leftMeasure->GetCubeSerialNumber() ) {
-        if (!p_editPoint->IsGround() || 
-            (p_editPoint->IsGround() && (p_leftMeasure->GetCubeSerialNumber() != p_groundSN))) {
+        if (!p_editPoint->IsFixed() || 
+            (p_editPoint->IsFixed() &&
+            (p_leftMeasure->GetCubeSerialNumber() != p_groundSN))) {
           QString message = "This point already contains a reference measure.  ";
           message += "Would you like to replace it with the measure on the left?";
           switch(QMessageBox::question((QWidget *)parent(),
@@ -651,9 +652,9 @@ namespace Qisis {
       p_editPoint->SetRefMeasure(p_leftMeasure->GetCubeSerialNumber());
     }
 
-    // If this is a ground point, if either measure (left or right) is the
+    // If this is a fixed point, if either measure (left or right) is the
     // ground source, update the lat,lon,radius.
-    if (p_editPoint->IsGround() &&
+    if (p_editPoint->IsFixed() &&
         (p_leftMeasure->GetCubeSerialNumber() == p_groundSN ||
          p_rightMeasure->GetCubeSerialNumber() == p_groundSN)) {
 
@@ -792,11 +793,11 @@ namespace Qisis {
     ControlPoint *updatePoint = new ControlPoint;
     *updatePoint = *p_editPoint;
 
-    //  If this is a ground point, see if there is a temporary
+    //  If this is a fixed point, see if there is a temporary
     //  measure holding the coordinate information from the ground source. 
     //  If so, delete this measure before saving point.  Clear out the
-    //  ground Measure variable (memory deleted in ControlPoint::Delete).
-    if (updatePoint->GetType() == ControlPoint::Ground) {
+    //  fixed Measure variable (memory deleted in ControlPoint::Delete).
+    if (updatePoint->GetType() == ControlPoint::Fixed) {
       for (int i=0; i<updatePoint->GetNumMeasures(); i++) {
         if ((*updatePoint)[i]->GetCubeSerialNumber() == p_groundSN) {
           updatePoint->Delete(i);
@@ -862,35 +863,35 @@ namespace Qisis {
 
 
   /**
-   * Sets the "PointType" keyword of the control point.  If ground
-   * is true the point type will be set to "Ground".  If ground is
-   * false, it will be set to "Tie".
+   * Sets the "PointType" keyword of the control point.  If fixed
+   * is true the point type will be set to "Fixed".  If fixed is
+   * false, it will be set to "Free".
    * 
-   * @param ground Boolean value that determines whether the PointType will be set
-   *               to ground.  If false, PointType will be set to Tie.
+   * @param fixed Boolean value that determines whether the PointType will be 
+   *               set to Fixed.  If false, PointType will be set to Free.
    *  
    * @author 2010-12-01 Tracie Sucharski 
    */
-  void QnetTool::setGroundPoint (bool ground) {
+  void QnetTool::setFixedPoint (bool fixed) {
 
-    //  if false, turn back Tie
-    if (!ground) {
-      p_editPoint->SetType(ControlPoint::Tie);
+    //  if false, turn back Free
+    if (!fixed) {
+      p_editPoint->SetType(ControlPoint::Free);
     }
     else {
-      //  Make sure a ground source is open, if not warn user, set type back to Tie
-      //  and return.
+      //  Make sure a ground source is open, if not warn user, set type back to
+      //  Free and return.
       if (!p_groundOpen) {
         QString message = "Must open ground source file before changing point ";
-        message += "type to Ground.  Open the ground source file from the File ";
+        message += "type to Fixed.  Open the ground source file from the File ";
         message += "menu on the Control Point Editor.";
         QMessageBox::critical((QWidget *)parent(),"Error",message);
-        p_groundPoint->setChecked(false);
+        p_fixedPoint->setChecked(false);
         return;
       }
 
 
-      p_editPoint->SetType(ControlPoint::Ground);
+      p_editPoint->SetType(ControlPoint::Fixed);
     }
     loadPoint();
 
@@ -1062,7 +1063,7 @@ namespace Qisis {
   QAction *QnetTool::toolPadAction(ToolPad *pad) {
     QAction *action = new QAction(pad);
     action->setIcon(QPixmap(toolIconDir()+"/stock_draw-connector-with-arrows.png"));
-    action->setToolTip("Tie (T)");
+    action->setToolTip("Control Point Editor (T)");
     action->setShortcut(Qt::Key_T);
     QObject::connect(action,SIGNAL(triggered(bool)),this,SLOT(showNavWindow(bool)));
     return action;
@@ -1148,7 +1149,7 @@ namespace Qisis {
       double lat = gmap->UniversalLatitude();
       double lon = gmap->UniversalLongitude();
       if (p_groundOpen && file == p_groundCube->Filename()) {
-        createGroundPoint (lat,lon);
+        createFixedPoint (lat,lon);
       }
       else {
         createPoint(lat,lon);
@@ -1312,7 +1313,7 @@ namespace Qisis {
 
 
   /**
-   *   Create new ground control point
+   *   Create new Fixed control point
    *  
    * @param lat Latitude value of control point to be created. 
    * @param lon Longitude value of control point to be created. 
@@ -1322,7 +1323,7 @@ namespace Qisis {
    * @internal
    *  
    */
-  void QnetTool::createGroundPoint(double lat,double lon) {
+  void QnetTool::createFixedPoint(double lat,double lon) {
 
     //  TODO:   ADD AUTOSEED OPTION (CHECKBOX?)
 
@@ -1345,40 +1346,40 @@ namespace Qisis {
       }
     }
 
-    QnetGroundPointDialog *groundPointDialog = new QnetGroundPointDialog();
-    groundPointDialog->SetFiles(pointFiles);
-    if (groundPointDialog->exec()) {
-      ControlPoint *groundPoint = 
-      new ControlPoint(groundPointDialog->ptIdValue->text().toStdString()); 
+    QnetFixedPointDialog *fixedPointDialog = new QnetFixedPointDialog();
+    fixedPointDialog->SetFiles(pointFiles);
+    if (fixedPointDialog->exec()) {
+      ControlPoint *fixedPoint = 
+      new ControlPoint(fixedPointDialog->ptIdValue->text().toStdString()); 
 
-      groundPoint->SetType(ControlPoint::Ground);
+      fixedPoint->SetType(ControlPoint::Fixed);
 
       //  ??????       What radius , check for dem or shape model
       double radius = p_groundGmap->Projection()->LocalRadius();
 
-      groundPoint->SetAprioriSurfacePoint(SurfacePoint(
+      fixedPoint->SetAprioriSurfacePoint(SurfacePoint(
                                           Latitude(lat, Angle::Degrees),
                                           Longitude(lon, Angle::Degrees),
                                           Distance(radius, Distance::Meters)));
 
       // If this ControlPointId already exists, message box pops up and user is 
       // asked to enter a new value.
-      if (g_controlNetwork->ContainsPoint(groundPoint->GetId())) {
-        string message = "A ControlPoint with Point Id = [" + groundPoint->GetId();
+      if (g_controlNetwork->ContainsPoint(fixedPoint->GetId())) {
+        string message = "A ControlPoint with Point Id = [" + fixedPoint->GetId();
         message += "] already exists.  Re-enter Point Id for this ControlPoint.";
         QMessageBox::warning((QWidget *)parent(),"New Point Id",message.c_str());
         pointFiles.clear();
-        delete groundPoint;
-        groundPoint = NULL;
-        createGroundPoint(lat,lon);
+        delete fixedPoint;
+        fixedPoint = NULL;
+        createFixedPoint(lat,lon);
         return;
       }
 
-      groundPoint->SetChooserName(Application::UserName());
+      fixedPoint->SetChooserName(Application::UserName());
 
-      for (int i=0; i<groundPointDialog->fileList->count(); i++) {
-        QListWidgetItem *item = groundPointDialog->fileList->item(i);
-        if (!groundPointDialog->fileList->isItemSelected(item)) continue;
+      for (int i=0; i<fixedPointDialog->fileList->count(); i++) {
+        QListWidgetItem *item = fixedPointDialog->fileList->item(i);
+        if (!fixedPointDialog->fileList->isItemSelected(item)) continue;
         //  Create measure for any file selected
         ControlMeasure *m = new ControlMeasure;
         //  Find serial number for this file
@@ -1393,13 +1394,13 @@ namespace Qisis {
         m->SetType(ControlMeasure::Manual);
         m->SetChooserName(Application::UserName());
         m->SetCamera(cam);
-        groundPoint->Add(m);
+        fixedPoint->Add(m);
       }
       if (p_editPoint != NULL && p_editPoint->Parent() == NULL) {
         delete p_editPoint;
         p_editPoint = NULL;
       }
-      p_editPoint = groundPoint;
+      p_editPoint = fixedPoint;
 
       //  Load new point in QnetTool
       loadPoint();
@@ -1480,7 +1481,7 @@ namespace Qisis {
           QListWidgetItem *item = deletePointDialog->fileList->item(i);
           if (! deletePointDialog->fileList->isItemSelected(item)) continue;
 
-          //  TODO:  If measure is GroundReference , make Point Tie???
+          //  TODO:  If measure is GroundReference , make Point Free???
           //  Delete measure from ControlPoint
           p_editPoint->Delete(i);
         }
@@ -1589,8 +1590,8 @@ namespace Qisis {
     //  Set ignore box correctly
     p_ignorePoint->setChecked(p_editPoint->IsIgnored());
 
-    //  Set ground box correctly
-    p_groundPoint->setChecked(p_editPoint->IsGround());
+    //  Set fixed box correctly
+    p_fixedPoint->setChecked(p_editPoint->IsFixed());
 
     // Clear combo boxes
     p_leftCombo->clear();
@@ -1598,14 +1599,14 @@ namespace Qisis {
     p_pointFiles.clear();
     
     // Find in point and delete, it will be re-created with current
-    // ground source if this is a ground point
+    // ground source if this is a fixed point
     if (p_editPoint->HasSerialNumber(p_groundSN)) {
         p_editPoint->Delete(p_groundSN);
     }
 
-    //  If ground, add ground source file to combos, create a measure for
+    //  If fixed, add ground source file to combos, create a measure for
     //  the ground source, load reference on left, ground source on right
-    if (p_editPoint->IsGround() && p_groundOpen) {
+    if (p_editPoint->IsFixed() && p_groundOpen) {
 
       // TODO:  Does open ground source match point ground source
 
@@ -1673,13 +1674,13 @@ namespace Qisis {
       leftIndex = p_editPoint->IndexOfRefMeasure();
     }
     else {
-      if (!p_editPoint->IsGround() && (p_leftFile.length() != 0)) {
+      if (!p_editPoint->IsFixed() && (p_leftFile.length() != 0)) {
         iString tempFilename = Filename(p_leftFile).Name();
         leftIndex = p_leftCombo->findText(tempFilename);
       }
     }
 
-    if (p_groundOpen && p_editPoint->IsGround())  {
+    if (p_groundOpen && p_editPoint->IsFixed())  {
       rightIndex = p_rightCombo->findText((QString)p_groundSN);
     }
     else {
@@ -1714,6 +1715,9 @@ namespace Qisis {
    *  
    * @internal 
    * @history 2011-05-12 Tracie Sucharski - Type printing Apriori Values 
+   * @history 2011-05-24 Tracie Sucharski - Set target radii on apriori 
+   *                        surface point, so that sigmas can be converted to
+   *                        meters.
    */
   void QnetTool::updateSurfacePointInfo () {
 
@@ -1747,6 +1751,9 @@ namespace Qisis {
     p_pointAprioriRadius->setText(s);
   
     if (aprioriPoint.Valid()) {
+      vector<Distance> targRadii = g_controlNetwork->GetTargetRadii();
+      aprioriPoint.SetRadii(targRadii[0],targRadii[1],targRadii[2]);
+
       if (aprioriPoint.GetLatSigmaDistance().GetMeters() == Isis::Null) {
         s = "Apriori Latitude Sigma:  Null";
       }
@@ -2032,7 +2039,7 @@ namespace Qisis {
    * @history 2010-07-22  Tracie Sucharski - MeasureType of Estimated is now 
    *                           Reference.  This change associated with
    *                           implementation of binary control networks.
-   * @history 2011-04-06  Tracie Sucharski - If not a ground point, use the 
+   * @history 2011-04-06  Tracie Sucharski - If not a fixed point, use the 
    *                           Reference measure to get lat,lon. 
    * 
    */
@@ -2218,8 +2225,8 @@ namespace Qisis {
         else if (p[serialNumber]->IsIgnored()) {
           painter->setPen(QColor(255, 255, 0)); // set point marker yellow
         }
-        // Neither point nor measure is not ignored and the measure is ground,
-        else if (p.GetType() == Isis::ControlPoint::Ground) {
+        // Neither point nor measure is not ignored and the measure is fixed,
+        else if (p.GetType() == Isis::ControlPoint::Fixed) {
           painter->setPen(Qt::magenta);// set point marker magenta
         }
         else {
@@ -2697,11 +2704,13 @@ namespace Qisis {
 
 
   /**
-   * Open a ground source for selecting ground points
+   * Open a ground source for selecting fixed points
    * 
    * @author  2009-07-20 Tracie Sucharski
    * 
-   * 
+   * @internal 
+   * @history 2011-06-03 Tracie Sucharski - Make sure edit point valid before 
+   *                        loading. 
    */
   void QnetTool::openGround() {
 
@@ -2835,7 +2844,7 @@ namespace Qisis {
       }
     }
 
-    if (p_editPoint->IsGround()) loadPoint();
+    if (p_editPoint != NULL && p_editPoint->IsFixed()) loadPoint();
     p_groundFilenameLabel->setText("Ground Source File:  " + p_groundFile);
     p_radiusFilenameLabel->setText("Radius Source File:  " + p_demFile);
 
@@ -2927,10 +2936,10 @@ namespace Qisis {
 
   void QnetTool::clearGroundSource () {
 
-    //  If the loaded point is a ground point, see if there is a temporary measure
+    //  If the loaded point is a fixed point, see if there is a temporary measure
     //  holding the coordinate information for the currentground source. If so,
     //  delete this measure.
-    if (p_editPoint->IsGround()) {
+    if (p_editPoint->IsFixed()) {
       if (p_editPoint->HasSerialNumber(p_groundSN)) {
         p_editPoint->Delete(p_groundSN);
       }

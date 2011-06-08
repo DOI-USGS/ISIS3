@@ -352,7 +352,7 @@ void IsisMain() {
 
       ControlPoint *controlpt = new ControlPoint();
       controlpt->SetId(QString::fromStdString(pointId.Next()));
-      controlpt->SetType(ControlPoint::Tie);
+      controlpt->SetType(ControlPoint::Free);
 
       // Create a measurment at this point for each image in the overlap area
       for(int sn = 0; sn < overlaps[ov]->Size(); ++sn) {

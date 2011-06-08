@@ -36,11 +36,11 @@ namespace Isis {
 
     if(cp->IsIgnored())
       setPen(QPen(Qt::red));
-    else if(cp->GetType() == ControlPoint::Ground)
+    else if(cp->GetType() == ControlPoint::Fixed)
       setPen(QPen(Qt::green));
     else if(cp->GetType() == ControlPoint::Constrained)
       setPen(QPen(Qt::darkGreen));
-    else // Tie
+    else // Free
       setPen(QPen(Qt::blue));
 
     setBrush(Qt::NoBrush);

@@ -201,6 +201,9 @@ namespace Isis {
    * @history 2011-05-16 Tracie Sucharski - Before trying to get radii, make
    *                     sure network has a TargetName.  If not, do not add
    *                     lat/lon/radius comments for SurfacePoints.
+   * @history 2011-06-07 Tracie Sucharski/Debbie A. Cook - Point Type changes 
+   *                          Ground ----> Fixed
+   *                          Tie    ----> Free
    *
    */
   Pvl ControlNetFileV0002::ToPvl() const {
@@ -236,12 +239,12 @@ namespace Isis {
     foreach(binaryPoint, *p_controlPoints) {
       PvlObject pvlPoint("ControlPoint");
 
-      if(binaryPoint.type() == ControlPointFileEntryV0002::Ground)
-        pvlPoint += PvlKeyword("PointType", "Ground");
+      if(binaryPoint.type() == ControlPointFileEntryV0002::Fixed)
+        pvlPoint += PvlKeyword("PointType", "Fixed");
       else if(binaryPoint.type() == ControlPointFileEntryV0002::Constrained)
         pvlPoint += PvlKeyword("PointType", "Constrained");
       else
-        pvlPoint += PvlKeyword("PointType", "Tie");
+        pvlPoint += PvlKeyword("PointType", "Free");
 
       pvlPoint += PvlKeyword("PointId", binaryPoint.id());
       pvlPoint += PvlKeyword("ChooserName", binaryPoint.choosername());

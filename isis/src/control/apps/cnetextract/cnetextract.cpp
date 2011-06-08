@@ -52,7 +52,7 @@ void IsisMain() {
   bool noMeasureless     = ui.GetBoolean("NOMEASURELESS");
   bool noSingleMeasure   = ui.GetBoolean("NOSINGLEMEASURES");
   bool reference         = ui.GetBoolean("REFERENCE");
-  bool ground            = ui.GetBoolean("GROUND");
+  bool fixed             = ui.GetBoolean("FIXED");
   bool noTolerancePoints = ui.GetBoolean("TOLERANCE");
   bool pointsEntered     = ui.WasEntered("POINTLIST");
   bool cubePoints        = ui.GetBoolean("CUBES");
@@ -60,10 +60,10 @@ void IsisMain() {
   bool retainReference   = ui.GetBoolean("RETAIN_REFERENCE");
   bool latLon            = ui.GetBoolean("LATLON");
 
-  if(!(noIgnore || noMeasureless || noSingleMeasure || reference || ground ||
+  if(!(noIgnore || noMeasureless || noSingleMeasure || reference || fixed ||
        noTolerancePoints || pointsEntered || cubePoints || latLon)) {
     std::string msg = "At least one filter must be selected [";
-    msg += "NOIGNORE,NOMEASURELESS,NOSINGLEMEASURE,REFERENCE,GROUND,TOLERANCE,";
+    msg += "NOIGNORE,NOMEASURELESS,NOSINGLEMEASURE,REFERENCE,FIXED,TOLERANCE,";
     msg += "POINTLIST,CUBES,LATLON]";
     throw iException::Message(iException::User, msg, _FILEINFO_);
   }
@@ -98,7 +98,7 @@ void IsisMain() {
   QVector<iString> measurelessPoints;
   QVector<iString> tolerancePoints;
   QVector<iString> nonReferenceMeasures;
-  QVector<iString> nonGroundPoints;
+  QVector<iString> nonFixedPoints;
   QVector<iString> nonCubePoints;
   QVector<iString> noCubeMeasures;
   QVector<iString> noMeasurePoints;
@@ -140,8 +140,8 @@ void IsisMain() {
       outNet.DeletePoint(cp);
       continue;
     }
-    if(ground && !(controlpt->GetType() == ControlPoint::Ground)) {
-      nonGroundPoints.append(controlpt->GetId());
+    if(fixed && !(controlpt->GetType() == ControlPoint::Fixed)) {
+      nonFixedPoints.append(controlpt->GetId());
       outNet.DeletePoint(cp);
       continue;
     }
@@ -149,7 +149,7 @@ void IsisMain() {
     if(noSingleMeasure) {
       bool invalidPoint = false;
       invalidPoint |= noIgnore && (controlpt->GetNumValidMeasures() < 2);
-      invalidPoint |= controlpt->GetNumMeasures() < 2 && (controlpt->GetType() != ControlPoint::Ground);
+      invalidPoint |= controlpt->GetNumMeasures() < 2 && (controlpt->GetType() != ControlPoint::Fixed);
 
       if(invalidPoint) {
         singleMeasurePoints.append(controlpt->GetId());
@@ -230,7 +230,7 @@ void IsisMain() {
     if(noSingleMeasure) {
       bool invalidPoint = false;
       invalidPoint |= noIgnore && (newPoint->GetNumValidMeasures() < 2);
-      invalidPoint |= newPoint->GetNumMeasures() < 2 && newPoint->GetType() != ControlPoint::Ground;
+      invalidPoint |= newPoint->GetNumMeasures() < 2 && newPoint->GetType() != ControlPoint::Fixed;
 
       if(invalidPoint) {
         singleMeasurePoints.append(controlpt->GetId());
@@ -315,8 +315,8 @@ void IsisMain() {
   if(reference) {
     summary.AddKeyword(PvlKeyword("NonReferenceMeasures", iString((int)nonReferenceMeasures.size())));
   }
-  if(ground) {
-    summary.AddKeyword(PvlKeyword("NonGroundPoints", iString((int)nonGroundPoints.size())));
+  if(fixed) {
+    summary.AddKeyword(PvlKeyword("NonFixedPoints", iString((int)nonFixedPoints.size())));
   }
   if(cubePoints) {
     summary.AddKeyword(PvlKeyword("NonCubePoints", iString((int)nonCubePoints.size())));
@@ -387,9 +387,9 @@ void IsisMain() {
 
     resultsProgress.CheckStatus();
 
-    if(ground) {
-      iString name = Filename(prefix + "NonGroundPoints.txt").Expanded();
-      WriteResults(name, nonGroundPoints);
+    if(fixed) {
+      iString name = Filename(prefix + "NonFixedPoints.txt").Expanded();
+      WriteResults(name, nonFixedPoints);
     }
 
     resultsProgress.CheckStatus();
@@ -508,7 +508,7 @@ void ExtractLatLonRange(ControlNet &outNet, QVector<iString> nonLatLonPoints,
     //Latitude pointLat(controlPt.UniversalLatitude(),Angle::Degrees);
     //Longitude pointLon(controlPt.UniversalLongitude(),Angle::Degrees);
     //bool hasLatLon = pointLat != Isis::Null && pointLon != Isis::Null;
-    if(controlPt->GetType() == Isis::ControlPoint::Ground || surfacePt.Valid()) {
+    if(controlPt->GetType() == Isis::ControlPoint::Fixed || surfacePt.Valid()) {
       if(NotInLatLonRange(surfacePt, minlat, maxlat, minlon, maxlon)) {
         nonLatLonPoints.push_back(controlPt->GetId());
         outNet.DeletePoint(cp);

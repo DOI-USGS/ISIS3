@@ -119,8 +119,8 @@ void IsisMain() {
         }
 
         // Merge the Control Points correctly
-        if (dupPoint->GetType() == ControlPoint::Ground &&
-            sourcePoint->GetType() == ControlPoint::Ground) {
+        if (dupPoint->GetType() == ControlPoint::Fixed &&
+            sourcePoint->GetType() == ControlPoint::Fixed) {
           // See if there are conflicts in merging the two points
           bool pointHasConflict = false;
           SurfacePoint surfPt(dupPoint->GetAprioriSurfacePoint());
@@ -195,9 +195,9 @@ ControlPoint *MergePoints(ControlPoint *addPoint, ControlPoint *basePoint,
       //   mergee
       if (addMeasure->GetCubeSerialNumber() ==
           mergedMeasure->GetCubeSerialNumber()) {
-        // If we have a ground truth in our merger then try to propagate it to
+        // If we have a fixed point in our merger then try to propagate it to
         //   the mergee.
-        if (addPoint->GetType() == ControlPoint::Ground) {
+        if (addPoint->GetType() == ControlPoint::Fixed) {
           if (!allowMeasureOverride) {
             // Allow reference override refers to the merger's reference, not
             //   the mergee's reference. If we can't change the reference then
@@ -217,7 +217,7 @@ ControlPoint *MergePoints(ControlPoint *addPoint, ControlPoint *basePoint,
           }
         }
 
-        // If SNs match, but not ground, then keep mergee's version
+        // If SNs match, but not fixed, then keep mergee's version
         merged = true;
       }
 

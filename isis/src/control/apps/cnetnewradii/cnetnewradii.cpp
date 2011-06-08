@@ -57,7 +57,7 @@ void IsisMain() {
   for(int i = 0; i < cnet.GetNumPoints() ; i++) {
     ControlPoint *cp = cnet.GetPoint(i);
 
-    if(cp->GetType() == ControlPoint::Ground) {
+    if(cp->GetType() == ControlPoint::Fixed) {
       // Create Brick on samp, line to get the dn value of the pixel
       SurfacePoint surfacePt;
       if (newRadiiSource == Adjusted)

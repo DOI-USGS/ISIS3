@@ -390,10 +390,10 @@ void IsisMain() {
         cpoint = cnet.GetPoint((QString) pid);
         // if the point is already added to the control net, it was found in
         // the match point file also.
-        if (ui.GetString("POINTTYPE") == "GROUND") {
-          // If the POINTTYPE parameter is set to ground, change point type
+        if (ui.GetString("POINTTYPE") == "FIXED") {
+          // If the POINTTYPE parameter is set to fixed, change point type
           // of points in rand file
-          cpoint->SetType(ControlPoint::Ground);
+          cpoint->SetType(ControlPoint::Fixed);
         }
         cpoint->SetAprioriSurfacePointSource(
           ControlPoint::SurfacePointSource::BundleSolution);

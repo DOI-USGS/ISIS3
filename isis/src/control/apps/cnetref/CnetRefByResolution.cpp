@@ -93,11 +93,11 @@ namespace Isis {
       std::vector <PvlGroup> pvlGrpVector;
       int iBestIndex = 0;
 
-      // Only perform the interest operation on points of type "Tie" and
+      // Only perform the interest operation on points of type "Free" and
       // Points having atleast 1 measure and Point is not Ignored
       // Check for EditLock in the Measures and also verfify that
       // only a Reference Measure can be Locked else error
-      if (!newPnt->IsIgnored() && newPnt->GetType() == ControlPoint::Tie && iRefIndex >= 0 &&
+      if (!newPnt->IsIgnored() && newPnt->GetType() == ControlPoint::Free && iRefIndex >= 0 &&
           (iNumMeasuresLocked == 0 || (iNumMeasuresLocked > 0 && bRefLocked))) {
         int iNumIgnore = 0;
         iString istrTemp;
@@ -192,7 +192,7 @@ namespace Isis {
         for (int i = 0; i < newPnt->GetNumMeasures(); i++) {
           pvlPointObj += pvlGrpVector[i];
         }
-      } // end Tie
+      } // end Free
       else {
         int iComment = 1;
         if (iRefIndex < 0) {
@@ -205,9 +205,9 @@ namespace Isis {
           pvlPointObj += Isis::PvlKeyword(sComment, "Point was originally Ignored");
         }
 
-        if (newPnt->GetType() == ControlPoint::Ground) {
+        if (newPnt->GetType() == ControlPoint::Fixed) {
           std::string sComment = "Comment" + iComment++;
-          pvlPointObj += Isis::PvlKeyword(sComment, "Not a Tie Point");
+          pvlPointObj += Isis::PvlKeyword(sComment, "Not a Free Point");
         }
 
         if (iNumMeasuresLocked > 0 && !bRefLocked) {

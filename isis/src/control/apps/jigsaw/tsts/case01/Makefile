@@ -38,6 +38,6 @@ commands:
 	$(RM) $(OUTPUT)/cube.lis > /dev/null;
 	$(RM) bundleout.txt > /dev/null;
 	$(RM) case01OutLog.txt > /dev/null;
-#	$(RM) residuals.csv  > /dev/null;
+	$(RM) residuals.csv  > /dev/null;
 	cathist from=$(OUTPUT)/PSP_002733_1880_RED4.crop.cub > $(OUTPUT)/PSP4.pvl;				    
 	cathist from=$(OUTPUT)/PSP_002733_1880_RED5.crop.cub > $(OUTPUT)/PSP5.pvl;

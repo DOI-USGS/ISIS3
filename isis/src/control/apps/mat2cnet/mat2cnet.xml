@@ -18,9 +18,9 @@
       PPP log.  This program converts the radius values in these files from km
       to meters before adding them to the output control network.  If a RAND 
       PPP file is not entered, all the points in the MATCH file will be set to 
-      type TIE.  If a RAND PPP is input, then any points not found in this file 
-      will still be set to TIE and the user may choose whether to set points 
-      found in both the RAND and MATCH files to GROUND or TIE.  Any points 
+      type FREE.  If a RAND PPP is input, then any points not found in this file 
+      will still be set to FREE and the user may choose whether to set points 
+      found in both the RAND and MATCH files to FIXED or FREE.  Any points 
       found in the RAND file without measurements in the MATCH file will not be 
       included in the output control net.  The corresponding lines from the 
       RAND PPP file for these points will be copied to the RAND PPP log.
@@ -91,6 +91,9 @@
     </change>
     <change name="Travis Addair" date="2011-04-11">
       Changed CNET to ONET and PPPLOG to LOG as per consistency wiki.
+    </change>
+    <change name="Debbie A. Cook" date="2011-06-07">
+      Changed point types "Ground" to "Fixed" and "Tie" to "Free".
     </change>
   </history>
 
@@ -195,37 +198,37 @@
 
       <parameter name="POINTTYPE">
         <type>string</type>
-        <default><item>GROUND</item></default>
+        <default><item>FIXED</item></default>
         <brief>
           ControlPoint type for points found in RAND PPP and MATCH files.
         </brief>
         <description>
           This parameter determines the ControlPoint type to which points will 
           be set if they are found in the RAND PPP file and have corresponding 
-          measurements in the MATCH file.  This parameter defaults to GROUND.  
+          measurements in the MATCH file.  This parameter defaults to FIXED.  
           <strong>Note: </strong> All points from the MATCH file not found in 
-          the RAND PPP file will be set to TIE and all points from the RAND PPP
+          the RAND PPP file will be set to FREE and all points from the RAND PPP
           file not found in the MATCH file will be omitted from the output 
           Control Network.
         </description>
         <list>
 
-          <option value = "GROUND">
+          <option value = "FIXED">
             <brief> 
-              Points in RAND PPP with measurements in MATCH set to ground type
+              Points in RAND PPP with measurements in MATCH set to fixed type
             </brief>
             <description>
-              Set Control Point Type to Ground in output control net for points 
+              Set Control Point Type to Fixed in output control net for points 
               in RAND PPP file.
             </description>
           </option>
 
-          <option value = "TIE">
+          <option value = "FREE">
             <brief> 
-              Points in RAND PPP with measurements in MATCH set to tie type
+              Points in RAND PPP with measurements in MATCH set to free type
             </brief>
             <description>
-              Set Control Point Type to Tie in output control net for points in 
+              Set Control Point Type to Free in output control net for points in 
               RAND PPP file.
             </description>
           </option>
@@ -408,7 +411,7 @@
         <description> 
           Run the <strong>mat2cnet</strong> application to create a ControlNet 
           file from a match point file with corresponding Isis2 cubelist, Isis3
-          cubelist, RAND PPP file with a default point type of ground.
+          cubelist, RAND PPP file with a default point type of fixed.
         </description>
       </terminalInterface>
       <guiInterfaces>
@@ -450,7 +453,7 @@
             This pvl file is an example of the output control network created
             from the given match point file and RAND PPP file.  Notice the 
             following: the first point in the RAND PPP file has 3 measures in 
-            the MATCH file and is written to the control network as type GROUND
+            the MATCH file and is written to the control network as type FIXED
             and the second point in the RAND PPP file is not contained in the 
             Control Network since there are no measures with this ID in the 
             MATCH file.

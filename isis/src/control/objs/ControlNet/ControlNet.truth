@@ -111,7 +111,7 @@ Object = ControlNetwork
   Version      = 3
 
   Object = ControlPoint
-    PointType                = Ground
+    PointType                = Fixed
     PointId                  = T0000
     ChooserName              = autoseed
     DateTime                 = 2010-08-27T17:10:06
@@ -187,7 +187,7 @@ Object = ControlNetwork
   End_Object
 
   Object = ControlPoint
-    PointType   = Tie
+    PointType   = Free
     PointId     = T0001
     ChooserName = autoseed
     DateTime    = 2010-08-27T17:10:06
@@ -232,7 +232,7 @@ Object = ControlNetwork
   End_Object
 
   Object = ControlPoint
-    PointType   = Tie
+    PointType   = Free
     PointId     = T0003
     ChooserName = autoseed
     DateTime    = 2010-08-27T17:10:06
@@ -276,7 +276,7 @@ Object = ControlNetwork
   End_Object
 
   Object = ControlPoint
-    PointType   = Tie
+    PointType   = Free
     PointId     = T0004
     ChooserName = autoseed
     DateTime    = 2010-08-27T17:10:06

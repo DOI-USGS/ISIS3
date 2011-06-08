@@ -262,7 +262,7 @@ namespace Qisis {
             painter.setPen(QColor(255, 255, 0)); // set point marker yellow
           }
           // check for ground measure
-          else if (p->GetType() == Isis::ControlPoint::Ground) {
+          else if (p->GetType() == Isis::ControlPoint::Fixed) {
             painter.setPen(Qt::magenta);// set point marker magenta
           }
           else {

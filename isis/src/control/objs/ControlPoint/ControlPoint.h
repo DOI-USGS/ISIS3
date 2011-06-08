@@ -251,6 +251,9 @@ namespace Isis {
    *   @history 2011-04-04 Steven Lambright - Updated constructor from binary to
    *            take planetary radii
    *   @history 2011-05-02 Debbie A. Cook - Added new point type Constrained
+   *   @history 2011-06-07 Debbie A. Cook and Tracie Sucharski - Modified point
+   *            types:  Ground ------> Fixed
+   *                    Tie----------> Free
    */
   class ControlPoint {
       friend class ControlNet;
@@ -261,26 +264,25 @@ namespace Isis {
        */
       enum PointType {
         /**
-          * A Ground point is a Control Point whose lat/lon is well established
+          * A Fixed point is a Control Point whose lat/lon is well established
           * and should not be changed. Some people will refer to this as a
-          * truth (i.e., ground truth).  Holding a point is equivalent to making
-          * it a ground point.  A ground point can be identifed in one or more
-          * cubes.
+          * truth (i.e., ground truth).  A fixed point can be identifed in one or
+          * more cubes.  Historically this point was called a "Ground" point.
           */
-        Ground,
+        Fixed,
         /**
           * A Constrained point is a Control Point whose lat/lon/radius is somewhat
           * established and should not be changed.
           */
         Constrained,
         /**
-          * A Tie point is a Control Point that identifies common measurements
+          * A Free point is a Control Point that identifies common measurements
           * between two or more cubes. While it could have a lat/lon, it is not
           * necessarily correct and is subject to change.  This is the most
           * common type of control point.  This point type floats freely in
-          * a bundle adjustment
+          * a bundle adjustment.  Historically this point type was called "Tie".
           */
-        Tie
+        Free
       };
 
       /**
@@ -412,7 +414,7 @@ namespace Isis {
       bool IsValid() const;
       bool IsInvalid() const;
       PointType GetType() const;
-      bool IsGround() const;
+      bool IsFixed() const;
 
       bool HasAprioriCoordinates();
       bool IsConstrained();
