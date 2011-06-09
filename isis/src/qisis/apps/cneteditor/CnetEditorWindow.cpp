@@ -23,16 +23,18 @@
 #include <QString>
 #include <QToolBar>
 
-#include "CnetEditorWidget.h"
 #include "ControlNet.h"
+#include "Filename.h"
 #include "iException.h"
 #include "Pvl.h"
+
+#include "CnetEditorWidget.h"
 
 
 using std::cerr;
 
 
-
+// FIXME
 const int defaultWindowWidth = 1100;
 const int defaultWindowHeight = 700;
 
@@ -240,7 +242,9 @@ namespace Isis
 
   void CnetEditorWindow::readSettings()
   {
-    QSettings settings("USGS", "cneteditor");
+    QSettings settings(Filename(
+        "$HOME/.Isis/cneteditor/cneteditor.config").Expanded().c_str(),
+        QSettings::NativeFormat);
 
     // load window position and size
     QPoint pos = settings.value("pos", QPoint(100, 100)).toPoint();
@@ -255,12 +259,13 @@ namespace Isis
 
   void CnetEditorWindow::writeSettings()
   {
-    QSettings settings("USGS", "cneteditor");
+    QSettings settings(Filename(
+        "$HOME/.Isis/cneteditor/cneteditor.config").Expanded().c_str(),
+        QSettings::NativeFormat);
 
     // save window position and size
     settings.setValue("pos", pos());
     settings.setValue("size", size());
-
   }
 
 
@@ -338,7 +343,8 @@ namespace Isis
     try
     {
       cnet = new ControlNet(filename);
-      editorWidget = new CnetEditorWidget(cnet);
+      editorWidget = new CnetEditorWidget(cnet, Filename(
+          "$HOME/.Isis/cneteditor/cneteditor.config").Expanded().c_str());
       connect(editorWidget, SIGNAL(cnetModified()), this, SLOT(setDirty()));
       connect(driveViewGrp, SIGNAL(buttonClicked(int)), editorWidget,
           SLOT(setDriverView(int)));

@@ -45,7 +45,8 @@ using std::cerr;
 namespace Isis
 {
 
-  CnetEditorWidget::CnetEditorWidget(Isis::ControlNet * cNet)
+  CnetEditorWidget::CnetEditorWidget(Isis::ControlNet * cNet,
+      QString pathForSettings)
   {
     nullify();
     
@@ -61,14 +62,16 @@ namespace Isis
 //**************************************************************
     
     
-    
     workingVersion = new QString;
     
     updatingSelection = false;
-    controlNet = cNet;
-    connect(cNet, SIGNAL(networkStructureModified()),
-        this, SLOT(rebuildModels()));
 
+    controlNet = cNet;
+    connect(controlNet, SIGNAL(networkStructureModified()),
+        this, SLOT(rebuildModels()));
+    
+    settingsPath = new QString(pathForSettings);
+    
     QBoxLayout * mainLayout = createMainLayout();
     setLayout(mainLayout);
 
@@ -83,6 +86,12 @@ namespace Isis
   CnetEditorWidget::~CnetEditorWidget()
   {
     writeSettings();
+    
+    if (settingsPath)
+    {
+      delete settingsPath;
+      settingsPath = NULL;
+    }
   }
 
 
@@ -115,6 +124,7 @@ namespace Isis
     connectionFilterWidget = NULL;
 
     controlNet = NULL;
+    settingsPath = NULL;
     topSplitterDefault = NULL;
     workingVersion = NULL;
     VERSION = NULL;
@@ -355,13 +365,13 @@ namespace Isis
     editMeasureView = new QTableView();
     editMeasureModel = new MeasureTableModel(qApp);
 
-//     for (int i = 0; i < MeasureTableModel::COLS; i++)
-//     {
-//       QAction * act = new QAction(
-//           MeasureTableModel::getColName((MeasureTableModel::Column) i), this);
-//       act->setCheckable(true);
-//       editMeasureView->horizontalHeader()->addAction(act);
-//     }
+    for (int i = 0; i < MeasureTableModel::COLS; i++)
+    {
+      QAction * act = new QAction(
+          MeasureTableModel::getColName((MeasureTableModel::Column) i), this);
+      act->setCheckable(true);
+      editMeasureView->horizontalHeader()->addAction(act);
+    }
     
     editMeasureView->horizontalHeader()->setContextMenuPolicy(
         Qt::ActionsContextMenu);
@@ -680,8 +690,9 @@ namespace Isis
     ASSERT(topSplitter);
     ASSERT(mainSplitter);
     ASSERT(workingVersion);
+    ASSERT(settingsPath);
     
-    QSettings settings("USGS", "CnetEditorWidget");
+    QSettings settings(*settingsPath, QSettings::NativeFormat);
     *workingVersion = settings.value("version", "").toString();
     setDriverView(settings.value("driverView", PointView).toInt());
     
@@ -694,8 +705,9 @@ namespace Isis
   {
     ASSERT(topSplitter);
     ASSERT(mainSplitter);
-
-    QSettings settings("USGS", "CnetEditorWidget");
+    ASSERT(settingsPath);
+    
+    QSettings settings(*settingsPath, QSettings::NativeFormat);
     settings.setValue("version", *VERSION);
     settings.setValue("topSplitter", topSplitter->saveState());
     settings.setValue("mainSplitter", mainSplitter->saveState());

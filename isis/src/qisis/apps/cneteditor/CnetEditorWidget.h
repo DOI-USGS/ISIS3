@@ -39,7 +39,7 @@ namespace Isis
 
 
     public:
-      CnetEditorWidget(Isis::ControlNet *);
+      CnetEditorWidget(Isis::ControlNet *, QString);
       virtual ~CnetEditorWidget();
       int getDriverView() const;
       void readSettings();
@@ -119,6 +119,8 @@ namespace Isis
 
       QSplitter * topSplitter;
       QSplitter * mainSplitter;
+      
+      QString * settingsPath;
   };
 }
 
