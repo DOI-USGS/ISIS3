@@ -37,6 +37,35 @@ namespace Isis
       points = NULL;
     }
   }
+  
+  
+  QString PointTableModel::getColName(PointTableModel::Column col)
+  {
+    switch (col)
+    {
+      case Id: return "Point ID";
+      case ChooserName: return "Chooser Name";
+      case DateTime: return "Date Time";
+      case EditLock: return "Edit Lock";
+      case Ignored: return "Ignored";
+      case Reference: return "Reference";
+      case AdjustedSPLat: return "Adjusted SP Lat";
+      case AdjustedSPLon: return "Adjusted SP Lon";
+      case AdjustedSPRadius: return "Adjusted SP Radius";
+      case APrioriSPLat: return "A Priori SP Lat";
+      case APrioriSPLon: return "A Priori SP Lon";
+      case APrioriSPRadius: return "A Priori SP Radius";
+      case APrioriSPSource: return "A Priori SP Source";
+      case APrioriSPSourceFile: return "A Priori SP Source File";
+      case APrioriRadiusSource: return "A Priori Radius Source";
+      case APrioriRadiusSourceFile: return "A Priori Radius Source File";
+      case JigsawRejected: return "JigsawRejected";
+      
+    }
+    
+    ASSERT(0);
+    return QString();
+  }
 
 
   void PointTableModel::setPoints(QList< ControlPoint * > newPoints)
@@ -115,25 +144,25 @@ namespace Isis
           case AdjustedSPRadius:
             return QVariant::fromValue(catchNULL(
                 point->GetAdjustedSurfacePoint().GetLocalRadius().GetMeters()));
-          case AprioriSPLat:
+          case APrioriSPLat:
             return QVariant::fromValue(catchNULL(
                 point->GetAprioriSurfacePoint().GetLatitude().GetDegrees()));
-          case AprioriSPLon:
+          case APrioriSPLon:
             return QVariant::fromValue(catchNULL(
                 point->GetAprioriSurfacePoint().GetLongitude().GetDegrees()));
-          case AprioriSPRadius:
+          case APrioriSPRadius:
             return QVariant::fromValue(catchNULL(
                 point->GetAprioriSurfacePoint().GetLocalRadius().GetMeters()));
-          case AprioriSPSource:
+          case APrioriSPSource:
             return QVariant::fromValue(
                 (QString) point->GetSurfacePointSourceString());
-          case AprioriSPSourceFile:
+          case APrioriSPSourceFile:
             return QVariant::fromValue(
                 (QString) point->GetAprioriSurfacePointSourceFile());
-          case AprioriRadiusSource:
+          case APrioriRadiusSource:
             return QVariant::fromValue(
                 (QString) point->GetRadiusSourceString());
-          case AprioriRadiusSourceFile:
+          case APrioriRadiusSourceFile:
             return QVariant::fromValue(
                 (QString) point->GetAprioriRadiusSourceFile());
           case JigsawRejected:
@@ -204,25 +233,25 @@ namespace Isis
           case AdjustedSPRadius:
             result = QVariant::fromValue(QString("Adjusted SP Radius (m)"));
             break;
-          case AprioriSPLat:
+          case APrioriSPLat:
             result = QVariant::fromValue(QString("A Priori Lat"));
             break;
-          case AprioriSPLon:
+          case APrioriSPLon:
             result = QVariant::fromValue(QString("A Priori Lon"));
             break;
-          case AprioriSPRadius:
+          case APrioriSPRadius:
             result = QVariant::fromValue(QString("A Priori Radius (m)"));
             break;
-          case AprioriSPSource:
+          case APrioriSPSource:
             result = QVariant::fromValue(QString("  A Priori Source  "));
             break;
-          case AprioriSPSourceFile:
+          case APrioriSPSourceFile:
             result = QVariant::fromValue(QString("A Priori Source File"));
             break;
-          case AprioriRadiusSource:
+          case APrioriRadiusSource:
             result = QVariant::fromValue(QString("A Priori Radius Source"));
             break;
-          case AprioriRadiusSourceFile:
+          case APrioriRadiusSourceFile:
             result = QVariant::fromValue(QString("A Priori Radius Source File"));
             break;
           case JigsawRejected:
@@ -274,13 +303,13 @@ namespace Isis
             case AdjustedSPLat:
             case AdjustedSPLon:
             case AdjustedSPRadius:
-            case AprioriSPLat:
-            case AprioriSPLon:
-            case AprioriSPRadius:
-            case AprioriSPSource:
-            case AprioriSPSourceFile:
-            case AprioriRadiusSource:
-            case AprioriRadiusSourceFile:
+            case APrioriSPLat:
+            case APrioriSPLon:
+            case APrioriSPRadius:
+            case APrioriSPSource:
+            case APrioriSPSourceFile:
+            case APrioriRadiusSource:
+            case APrioriRadiusSourceFile:
               flags = flags | Qt::ItemIsEditable | Qt::ItemIsEnabled |
                   Qt::ItemIsSelectable;
               break;
@@ -347,36 +376,36 @@ namespace Isis
                 point->GetAdjustedSurfacePoint().GetLongitude(),
                 Distance(catchNULL(value.toString()), Distance::Meters)));
             break;
-          case AprioriSPLat:
+          case APrioriSPLat:
             point->SetAprioriSurfacePoint(SurfacePoint(
                 Latitude(catchNULL(value.toString()), Angle::Degrees),
                 point->GetAprioriSurfacePoint().GetLongitude(),
                 point->GetAprioriSurfacePoint().GetLocalRadius()));
             break;
-          case AprioriSPLon:
+          case APrioriSPLon:
             point->SetAprioriSurfacePoint(SurfacePoint(
                 point->GetAprioriSurfacePoint().GetLatitude(),
                 Longitude(catchNULL(value.toString()), Angle::Degrees),
                 point->GetAprioriSurfacePoint().GetLocalRadius()));
             break;
-          case AprioriSPRadius:
+          case APrioriSPRadius:
             point->SetAprioriSurfacePoint(SurfacePoint(
                 point->GetAprioriSurfacePoint().GetLatitude(),
                 point->GetAprioriSurfacePoint().GetLongitude(),
                 Distance(catchNULL(value.toString()), Distance::Meters)));
             break;
-          case AprioriSPSource:
+          case APrioriSPSource:
             point->SetAprioriSurfacePointSource(
               point->StringToSurfacePointSource(value.toString()));
             break;
-          case AprioriSPSourceFile:
+          case APrioriSPSourceFile:
             point->SetAprioriSurfacePointSourceFile(value.toString());
             break;
-          case AprioriRadiusSource:
+          case APrioriRadiusSource:
             point->SetAprioriRadiusSource(
               point->StringToRadiusSource(value.toString()));
             break;
-          case AprioriRadiusSourceFile:
+          case APrioriRadiusSourceFile:
             point->SetAprioriRadiusSourceFile(value.toString());
             break;
           case JigsawRejected:

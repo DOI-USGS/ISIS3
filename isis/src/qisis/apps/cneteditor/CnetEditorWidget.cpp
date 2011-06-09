@@ -346,6 +346,19 @@ namespace Isis
   {
     editPointView = new QTableView();
     editPointModel = new PointTableModel(qApp);
+    
+    for (int i = 0; i < PointTableModel::COLS; i++)
+    {
+      QAction * act = new QAction(
+          PointTableModel::getColName((PointTableModel::Column) i), this);
+      act->setCheckable(true);
+      connect(act, SIGNAL(toggled(bool)), this, SLOT(pointColToggled()));
+      editPointView->horizontalHeader()->addAction(act);
+    }
+    
+    editPointView->horizontalHeader()->setContextMenuPolicy(
+        Qt::ActionsContextMenu);
+    
     editPointView->setModel(editPointModel);
     connect(editPointModel, SIGNAL(dataChanged(const QModelIndex &,
         const QModelIndex &)), editPointView, SLOT(resizeColumnsToContents()));
@@ -370,12 +383,12 @@ namespace Isis
       QAction * act = new QAction(
           MeasureTableModel::getColName((MeasureTableModel::Column) i), this);
       act->setCheckable(true);
+      connect(act, SIGNAL(toggled(bool)), this, SLOT(measureColToggled()));
       editMeasureView->horizontalHeader()->addAction(act);
     }
     
     editMeasureView->horizontalHeader()->setContextMenuPolicy(
         Qt::ActionsContextMenu);
-    
 
     editMeasureView->setModel(editMeasureModel);
     connect(editMeasureModel, SIGNAL(dataChanged(const QModelIndex &,
@@ -625,6 +638,22 @@ namespace Isis
       vsb->setValue(vsb->maximum());
     }
   }
+  
+  
+  void CnetEditorWidget::pointColToggled()
+  {
+    QList< QAction * > actions = editPointView->horizontalHeader()->actions();
+    for (int i = 0; i < actions.size(); i++)
+      editPointView->setColumnHidden(i, !actions[i]->isChecked());
+  }
+
+
+  void CnetEditorWidget::measureColToggled()
+  {
+    QList< QAction * > actions = editMeasureView->horizontalHeader()->actions();
+    for (int i = 0; i < actions.size(); i++)
+      editMeasureView->setColumnHidden(i, !actions[i]->isChecked());
+  }
 
 
   void CnetEditorWidget::focusView(QTreeView * view, QStringList labels)
@@ -654,7 +683,7 @@ namespace Isis
 
 
   void CnetEditorWidget::updateTreeItemsWithNewSelection(
-    const QItemSelection & newSelected, const QItemSelection & newDeselected)
+      const QItemSelection & newSelected, const QItemSelection & newDeselected)
   {
     QList< QModelIndex > newSelectedIndexes = newSelected.indexes();
     for (int i = 0; i < newSelectedIndexes.size(); i++)
@@ -691,6 +720,7 @@ namespace Isis
     ASSERT(mainSplitter);
     ASSERT(workingVersion);
     ASSERT(settingsPath);
+    ASSERT(editMeasureView);
     
     QSettings settings(*settingsPath, QSettings::NativeFormat);
     *workingVersion = settings.value("version", "").toString();
@@ -698,6 +728,22 @@ namespace Isis
     
     topSplitter->restoreState(settings.value("topSplitter").toByteArray());
     mainSplitter->restoreState(settings.value("mainSplitter").toByteArray());
+    
+    QList< QAction * > actions = editMeasureView->horizontalHeader()->actions();
+    for (int i = 0; i < actions.size(); i++)
+    {
+      actions[i]->setChecked(settings.value("measure table column: " +
+          MeasureTableModel::getColName((MeasureTableModel::Column) i),
+          true).toBool());
+    }
+    
+    actions = editPointView->horizontalHeader()->actions();
+    for (int i = 0; i < actions.size(); i++)
+    {
+      actions[i]->setChecked(settings.value("point table column: " +
+          PointTableModel::getColName((PointTableModel::Column) i),
+          true).toBool());
+    }
   }
 
 
@@ -706,11 +752,28 @@ namespace Isis
     ASSERT(topSplitter);
     ASSERT(mainSplitter);
     ASSERT(settingsPath);
+    ASSERT(editMeasureView);
     
     QSettings settings(*settingsPath, QSettings::NativeFormat);
     settings.setValue("version", *VERSION);
     settings.setValue("topSplitter", topSplitter->saveState());
     settings.setValue("mainSplitter", mainSplitter->saveState());
     settings.setValue("driverView", getDriverView());
+    
+    QList< QAction * > actions = editMeasureView->horizontalHeader()->actions();
+    for (int i = 0; i < actions.size(); i++)
+    {
+      settings.setValue("measure table column: " +
+          MeasureTableModel::getColName((MeasureTableModel::Column) i),
+          actions[i]->isChecked());
+    }
+    
+    actions = editPointView->horizontalHeader()->actions();
+    for (int i = 0; i < actions.size(); i++)
+    {
+      settings.setValue("point table column: " +
+          PointTableModel::getColName((PointTableModel::Column) i),
+          actions[i]->isChecked());
+    }
   }
 }

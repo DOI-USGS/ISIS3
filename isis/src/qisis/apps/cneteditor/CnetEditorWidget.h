@@ -83,6 +83,8 @@ namespace Isis
       void rebuildModels();
       void scrollFilterAreaToBottom();
       void doScroll();
+      void pointColToggled();
+      void measureColToggled();
 
 
     private: // data

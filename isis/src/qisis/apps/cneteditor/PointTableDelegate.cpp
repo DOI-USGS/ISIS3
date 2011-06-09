@@ -45,8 +45,8 @@ namespace Isis
         case PointTableModel::EditLock:
         case PointTableModel::Ignored:
         case PointTableModel::Reference:
-        case PointTableModel::AprioriSPSource:
-        case PointTableModel::AprioriRadiusSource:
+        case PointTableModel::APrioriSPSource:
+        case PointTableModel::APrioriRadiusSource:
           {
             QComboBox * combo = new QComboBox(parent);
 
@@ -68,7 +68,7 @@ namespace Isis
                       point->GetMeasure(i)->GetCubeSerialNumber());
                 combo->setCurrentIndex(point->IndexOfRefMeasure());
                 break;
-              case PointTableModel::AprioriSPSource:
+              case PointTableModel::APrioriSPSource:
                 combo->insertItem(0, "None");
                 combo->insertItem(1, "User");
                 combo->insertItem(2, "AverageOfMeasures");
@@ -77,7 +77,7 @@ namespace Isis
                 combo->insertItem(5, "BundleSolution");
                 combo->setCurrentIndex((int) point->GetAprioriSurfacePointSource());
                 break;
-              case PointTableModel::AprioriRadiusSource:
+              case PointTableModel::APrioriRadiusSource:
                 combo->insertItem(0, "None");
                 combo->insertItem(1, "User");
                 combo->insertItem(2, "AverageOfMeasures");
@@ -120,8 +120,8 @@ namespace Isis
         case PointTableModel::EditLock:
         case PointTableModel::Ignored:
         case PointTableModel::Reference:
-        case PointTableModel::AprioriSPSource:
-        case PointTableModel::AprioriRadiusSource:
+        case PointTableModel::APrioriSPSource:
+        case PointTableModel::APrioriRadiusSource:
           {
             QComboBox * combo = static_cast< QComboBox * >(editor);
             switch ((PointTableModel::Column) col)
@@ -135,11 +135,11 @@ namespace Isis
               case PointTableModel::Reference:
                 combo->setCurrentIndex(point->IndexOfRefMeasure());
                 break;
-              case PointTableModel::AprioriSPSource:
+              case PointTableModel::APrioriSPSource:
                 combo->setCurrentIndex(
                   (int) point->StringToSurfacePointSource(value));
                 break;
-              case PointTableModel::AprioriRadiusSource:
+              case PointTableModel::APrioriRadiusSource:
                 combo->setCurrentIndex(
                   (int) point->StringToRadiusSource(value));
                 break;
@@ -172,8 +172,8 @@ namespace Isis
       case PointTableModel::EditLock:
       case PointTableModel::Ignored:
       case PointTableModel::Reference:
-      case PointTableModel::AprioriSPSource:
-      case PointTableModel::AprioriRadiusSource:
+      case PointTableModel::APrioriSPSource:
+      case PointTableModel::APrioriRadiusSource:
         {
           QComboBox * combo = static_cast< QComboBox * >(editor);
           newData = QVariant::fromValue(combo->currentText());

@@ -29,13 +29,13 @@ namespace Isis
         AdjustedSPLat = 6,
         AdjustedSPLon = 7,
         AdjustedSPRadius = 8,
-        AprioriSPLat = 9,
-        AprioriSPLon = 10,
-        AprioriSPRadius = 11,
-        AprioriSPSource = 12,
-        AprioriSPSourceFile = 13,
-        AprioriRadiusSource = 14,
-        AprioriRadiusSourceFile = 15,
+        APrioriSPLat = 9,
+        APrioriSPLon = 10,
+        APrioriSPRadius = 11,
+        APrioriSPSource = 12,
+        APrioriSPSourceFile = 13,
+        APrioriRadiusSource = 14,
+        APrioriRadiusSourceFile = 15,
         JigsawRejected = 16,
       };
       static const int COLS = 17;
@@ -44,6 +44,8 @@ namespace Isis
     public:
       explicit PointTableModel(QObject * parent = 0);
       virtual ~PointTableModel();
+      
+      static QString getColName(Column);
 
       void setPoints(QList< ControlPoint * > newPoints);
       ControlPoint * getPoint(int row) const;
