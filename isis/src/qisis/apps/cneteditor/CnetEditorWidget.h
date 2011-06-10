@@ -1,7 +1,9 @@
 #ifndef CnetEditorWidget_H
 #define CnetEditorWidget_H
 
+
 #include <QWidget>
+
 
 class QBoxLayout;
 class QItemSelection;
@@ -27,7 +29,7 @@ namespace Isis
 
   class CnetEditorWidget : public QWidget
   {
-      Q_OBJECT
+    Q_OBJECT
 
     public:
       enum View

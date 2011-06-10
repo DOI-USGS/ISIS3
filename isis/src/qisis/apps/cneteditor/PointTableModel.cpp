@@ -184,80 +184,12 @@ namespace Isis
       Qt::Orientation orientation, int role) const
   {
     QVariant result;
-
+    
     if (role == Qt::DisplayRole)
     {
       if (orientation == Qt::Horizontal)
       {
-        switch ((Column) section)
-        {
-          case Id:
-            result = QVariant::fromValue(QString("Point ID"));
-            break;
-          case ChooserName:
-            result = QVariant::fromValue(QString("Chooser Name"));
-            break;
-          case DateTime:
-            result = QVariant::fromValue(QString("Date Time"));
-            break;
-          case EditLock:
-            result = QVariant::fromValue(QString("Edit Lock"));
-            break;
-          case Ignored:
-            result = QVariant::fromValue(QString("Ignored"));
-            break;
-          case Reference:
-            {
-              int widthAdditions = 0;
-              if (points->size())
-              {
-                widthAdditions =
-                  points->at(0)->GetMeasure(0)->GetCubeSerialNumber().size()
-                  - 7;
-              }
-              QString label;
-              for (int i = 0; i < widthAdditions; i++)
-                label += " ";
-              label += "Reference";
-              for (int i = 0; i < widthAdditions; i++)
-                label += " ";
-              result = QVariant::fromValue(label);
-            }
-            break;
-          case AdjustedSPLat:
-            result = QVariant::fromValue(QString("Adjusted SP Lat"));
-            break;
-          case AdjustedSPLon:
-            result = QVariant::fromValue(QString("Adjusted SP Lon"));
-            break;
-          case AdjustedSPRadius:
-            result = QVariant::fromValue(QString("Adjusted SP Radius (m)"));
-            break;
-          case APrioriSPLat:
-            result = QVariant::fromValue(QString("A Priori Lat"));
-            break;
-          case APrioriSPLon:
-            result = QVariant::fromValue(QString("A Priori Lon"));
-            break;
-          case APrioriSPRadius:
-            result = QVariant::fromValue(QString("A Priori Radius (m)"));
-            break;
-          case APrioriSPSource:
-            result = QVariant::fromValue(QString("  A Priori Source  "));
-            break;
-          case APrioriSPSourceFile:
-            result = QVariant::fromValue(QString("A Priori Source File"));
-            break;
-          case APrioriRadiusSource:
-            result = QVariant::fromValue(QString("A Priori Radius Source"));
-            break;
-          case APrioriRadiusSourceFile:
-            result = QVariant::fromValue(QString("A Priori Radius Source File"));
-            break;
-          case JigsawRejected:
-            result = QVariant::fromValue(QString("Jigsaw Rejected"));
-            break;
-        }
+        result = QVariant::fromValue(getColName((Column) section));
       }
       else
       {
@@ -265,7 +197,7 @@ namespace Isis
         result = QVariant::fromValue(label);
       }
     }
-
+    
     return result;
   }
 
