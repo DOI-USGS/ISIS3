@@ -127,7 +127,8 @@
           <image width="441" height="221" src="assets/image/IoMirrorGui.jpg">
             <brief>Example Gui</brief>
             <description>Screenshot of GUI with parameters filled in to perform
-a mirror operation on the input image. </description>
+              a mirror operation on the input image.
+            </description>
             <thumbnail width="200" height="100" caption="Mirror Gui" src="assets/thumb/IoMirrorGui.jpg" />
           </image>
         </guiInterface>
