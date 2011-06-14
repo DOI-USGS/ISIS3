@@ -1,6 +1,6 @@
 APPNAME = gllssi2isis
 
-7500r.txt.IGNORELINES = Bytes StartByte ByteOrder
+7500r.txt.IGNORELINES = Bytes StartByte ByteOrder TileSamples TileLines
 
 include $(ISISROOT)/make/isismake.tsts
 
