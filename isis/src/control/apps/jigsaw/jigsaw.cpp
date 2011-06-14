@@ -86,8 +86,13 @@ void IsisMain() {
   b->SetGlobalCameraAngularAccelerationAprioriSigma(ui.GetDouble("CAMERA_ANGULAR_ACCELERATION_SIGMA"));
 
   // output options
+  if (ui.WasEntered("FILE_PREFIX"))  {
+      std::string outputfileprefix = ui.GetString("FILE_PREFIX");
+      b->SetOutputFilePrefix(outputfileprefix);
+  }
+
   b->SetStandardOutput(ui.GetBoolean("BUNDLEOUT_TXT"));
-  b->SetCSVOutput(ui.GetBoolean("OUTPUT_CSV"));
+  b->SetCSVOutput(ui.GetBoolean("OUTPUT_CSV"));  
   b->SetResidualOutput(ui.GetBoolean("RESIDUALS_CSV"));
 
   // Check to make sure user entered something to adjust... Or can just points be in solution?

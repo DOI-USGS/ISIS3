@@ -40,6 +40,7 @@ namespace Isis {
     m_pHeldSnList = NULL;
     m_bPrintSummary = bPrintSummary;
     m_strCnetFilename = cnetFile;
+    m_strOutputFilePrefix = "";
 
     Init(&progress);
   }
@@ -55,6 +56,7 @@ namespace Isis {
     m_pHeldSnList = new Isis::SerialNumberList(heldList);
     m_bPrintSummary = bPrintSummary;
     m_strCnetFilename = cnetFile;
+    m_strOutputFilePrefix = "";
 
     Init(&progress);
   }
@@ -69,6 +71,7 @@ namespace Isis {
     m_bPrintSummary = bPrintSummary;
     m_dConvergenceThreshold = 0.;    // This is needed for deltack???
     m_strCnetFilename = "";
+    m_strOutputFilePrefix = "";
 
     Init();
   }
@@ -83,6 +86,7 @@ namespace Isis {
     m_pHeldSnList = &heldsnlist;
     m_bPrintSummary = bPrintSummary;
     m_strCnetFilename = "";
+    m_strOutputFilePrefix = "";
 
     Init();
   }
@@ -3595,7 +3599,7 @@ namespace Isis {
     double vtpv_control = 0.0;
     double vtpv_image = 0.0;
     double dWeight;
-    double v, vx, vy, vz;
+    double v, vx, vy;
 
     // clear residual stats vectors
     m_Statsrx.Reset();
@@ -3652,26 +3656,28 @@ namespace Isis {
     int nPointIndex = 0;
     for (int i = 0; i < nObjectPoints; i++) {
       const ControlPoint *point = m_pCnet->GetPoint(i);
-      if (point->IsIgnored() || point->IsInvalid())
+      if ( point->IsIgnored() )
         continue;
 
       // get weight and correction vector for this point
       bounded_vector<double, 3>& weights = m_Point_Weights[nPointIndex];
       bounded_vector<double, 3>& corrections = m_Point_Corrections[nPointIndex];
 
-//    std::cout << weights << std::endl;
-//    std::cout << corrections << std::endl;
+      //printf("Point: %s PointIndex: %d Loop(i): %d\n",point->GetId().c_str(),nPointIndex,i);
+      //std::cout << weights << std::endl;
+      //std::cout << corrections << std::endl;
 
-      vx = corrections[0];
-      vy = corrections[1];
-      vz = corrections[2];
+      if( weights[0] > 0.0 )
+          vtpv_control += corrections[0] * corrections[0] * weights[0];
+      if( weights[1] > 0.0 )
+          vtpv_control += corrections[1] * corrections[1] * weights[1];
+      if( weights[2] > 0.0 )
+          vtpv_control += corrections[2] *corrections[2] * weights[2];
 
-      vtpv_control += vx * vx * weights[0] + vy * vy * weights[1] + vz * vz * weights[2];
       nPointIndex++;
     }
 
-    //    std::cout << "vtpv control = " << vtpv_control << std::endl;
-
+//    std::cout << "vtpv control = " << vtpv_control << std::endl;
 
     // add vtpv from constrained image parameters
     int n = 0;
@@ -3688,13 +3694,15 @@ namespace Isis {
     }
     while (n < m_nRank);
 
+//    std::cout << "vtpv_image = " << vtpv_image << std::endl;
 
     vtpv = vtpv + vtpv_control + vtpv_image;
 
-    // Compute stats for image coordinate residuals
-    m_drms_rx  = sqrt(m_Statsrx.SumSquare() / (m_nObservations / 2));
-    m_drms_ry  = sqrt(m_Statsry.SumSquare() / (m_nObservations / 2));
-    m_drms_rxy = sqrt(m_Statsrxy.SumSquare() / m_nObservations);
+    // Compute rms for all image coordinate residuals
+    // separately for x, y, then x and y together
+    m_drms_rx = m_Statsrx.Rms();
+    m_drms_ry = m_Statsry.Rms();
+    m_drms_rxy = m_Statsrxy.Rms();
 
     return vtpv;
   }
@@ -4677,7 +4685,11 @@ namespace Isis {
  */
     bool BundleAdjust::OutputWithErrorPropagation() {
 
-      std::ofstream fp_out("bundleout.txt", std::ios::out);
+      std:: string ofname("bundleout.txt");
+      if( m_strOutputFilePrefix.length() != 0 )
+          ofname = m_strOutputFilePrefix + "_" + ofname;
+
+      std::ofstream fp_out(ofname.c_str(), std::ios::out);
       if (!fp_out)
           return false;
 
@@ -5189,9 +5201,13 @@ namespace Isis {
    */
   bool BundleAdjust::OutputNoErrorPropagation() {
 
-      std::ofstream fp_out("bundleout.txt", std::ios::out);
+      std:: string ofname("bundleout.txt");
+      if( !m_strOutputFilePrefix.empty() )
+          ofname = m_strOutputFilePrefix + "_" + ofname;
+
+      std::ofstream fp_out(ofname.c_str(), std::ios::out);
       if (!fp_out)
-        return false;
+          return false;
 
       char buf[1056];
 
@@ -5576,9 +5592,13 @@ namespace Isis {
   bool BundleAdjust::OutputPointsCSV() {
     char buf[1056];
 
-    std::ofstream fp_out("bundleout_points.csv", std::ios::out);
+    std:: string ofname("bundleout_points.csv");
+    if( !m_strOutputFilePrefix.empty() )
+        ofname = m_strOutputFilePrefix + "_" + ofname;
+
+    std::ofstream fp_out(ofname.c_str(), std::ios::out);
     if (!fp_out)
-      return false;
+        return false;
 
     int nPoints = m_pCnet->GetNumPoints();
 
@@ -5663,9 +5683,13 @@ namespace Isis {
   bool BundleAdjust::OutputResiduals() {
     char buf[1056];
 
-    std::ofstream fp_out("residuals.csv", std::ios::out);
+    std:: string ofname("residuals.csv");
+    if( !m_strOutputFilePrefix.empty() )
+        ofname = m_strOutputFilePrefix + "_" + ofname;
+
+    std::ofstream fp_out(ofname.c_str(), std::ios::out);
     if (!fp_out)
-      return false;
+        return false;
 
     // output column headers
     sprintf(buf, ",,,x image,y image,sample,line,Residual Vector\n");
@@ -5721,9 +5745,13 @@ namespace Isis {
   bool BundleAdjust::OutputImagesCSV() {
     char buf[1056];
 
-    std::ofstream fp_out("bundleout_images.csv", std::ios::out);
+    std:: string ofname("bundleout_images.csv");
+    if( !m_strOutputFilePrefix.empty() )
+        ofname = m_strOutputFilePrefix + "_" + ofname;
+
+    std::ofstream fp_out(ofname.c_str(), std::ios::out);
     if (!fp_out)
-      return false;
+        return false;
 
     Camera *pCamera = NULL;
     SpicePosition *pSpicePosition = NULL;

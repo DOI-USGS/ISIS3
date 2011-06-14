@@ -538,6 +538,16 @@
         </group>
 
         <group name="Output Options">
+
+       <parameter name="FILE_PREFIX">
+            <type>string</type>
+            <internalDefault>none</internalDefault>
+            <brief>output file prefix</brief>
+            <description>
+                output file prefix
+            </description>
+        </parameter>
+
           <parameter name="BUNDLEOUT_TXT">
             <brief> standard bundle output file - bundleout.txt
             </brief>

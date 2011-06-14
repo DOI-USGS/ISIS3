@@ -157,6 +157,7 @@ namespace Isis {
       void SetStandardOutput(bool b) { m_bOutputStandard = b; }
       void SetCSVOutput(bool b) { m_bOutputCSV = b; }
       void SetResidualOutput(bool b) { m_bOutputResiduals = b; }
+      void SetOutputFilePrefix(const std::string &str) { m_strOutputFilePrefix = str; }
 
       enum CmatrixSolveType {
         None,
@@ -334,8 +335,9 @@ namespace Isis {
       std::vector<double> m_dxKnowns;
       std::vector<double> m_dyKnowns;
 
-      std::string m_strCnetFilename;                                //!< Control Net file specification
+      std::string m_strCnetFilename;                         //!< Control Net file specification
       std::string m_strSolutionMethod;                       //!< solution method string (QR,SVD,SPARSE-LU,SPECIALK)
+      std::string m_strOutputFilePrefix;                     //!< output file prefix
 
       //!< pointers to...
       Isis::LeastSquares *m_pLsq;                            //!< 'LeastSquares' object
