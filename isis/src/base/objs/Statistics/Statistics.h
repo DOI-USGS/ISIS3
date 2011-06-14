@@ -145,6 +145,7 @@ namespace Isis {
       double Average() const;
       double StandardDeviation() const;
       double Variance() const;
+      double Rms() const;
 
       double Minimum() const;
       double Maximum() const;

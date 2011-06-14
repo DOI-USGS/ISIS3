@@ -181,6 +181,22 @@ namespace Isis {
   }
 
   /**
+   * Computes and returns the rms.
+   * If there are no valid pixels, then NULL8 is returned.
+   *
+   * @return The rms (root mean square)
+   *
+   * @internal
+   * @history 2011-06-13 Ken Edmundson.
+   */
+  double Statistics::Rms() const {
+    if(p_validPixels <= 1) return Isis::NULL8;
+    double temp = p_sumsum / p_validPixels;
+    if(temp < 0.0) temp = 0.0;
+    return sqrt(temp);
+  }
+
+  /**
    * Returns the absolute minimum double found in all data passed through the
    * AddData method. If there are no valid pixels, then NULL8 is returned.
    *
