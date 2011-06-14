@@ -1,6 +1,6 @@
 APPNAME = map2map
 
-labels.txt.IGNORELINES = Bytes ByteOrder
+labels.txt.IGNORELINES = Bytes ByteOrder StartByte TileSamples TileLines
 # This tolerance is so high because it's ObliqueCylindrical and
 #   the interpolation causes pixel differences.
 map2mapTruth.cub.TOLERANCE = 0.000001
