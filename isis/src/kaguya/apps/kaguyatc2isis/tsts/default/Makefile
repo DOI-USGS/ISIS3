@@ -1,6 +1,6 @@
 APPNAME = kaguyatc2isis
 
-labels.txt.IGNORELINES = Bytes StartByte ByteOrder
+labels.txt.IGNORELINES = Bytes StartByte ByteOrder TileSamples TileLines
 
 include $(ISISROOT)/make/isismake.tsts
 
