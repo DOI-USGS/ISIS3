@@ -1,7 +1,7 @@
 APPNAME = clem2isis
 
-nirLabels.txt.IGNORELINES = Bytes StartByte ByteOrder
-uvvisLabels.txt.IGNORELINES = Bytes StartByte ByteOrder
+nirLabels.txt.IGNORELINES = Bytes StartByte ByteOrder TileSamples TileLines
+uvvisLabels.txt.IGNORELINES = Bytes StartByte ByteOrder TileSamples TileLines
 
 include $(ISISROOT)/make/isismake.tsts
 
