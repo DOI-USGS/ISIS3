@@ -1,6 +1,6 @@
 APPNAME = ciss2isis
 
-labels.txt.IGNORELINES = Bytes StartByte
+labels.txt.IGNORELINES = Bytes StartByte TileSamples TileLines
 
 include $(ISISROOT)/make/isismake.tsts
 
