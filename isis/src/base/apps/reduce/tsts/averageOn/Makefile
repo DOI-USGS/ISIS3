@@ -1,7 +1,7 @@
 APPNAME = reduce
 
-labels3.txt.IGNORELINES = ByteOrder StartByte Bytes
-labels6.txt.IGNORELINES = ByteOrder StartByte Bytes
+labels3.txt.IGNORELINES = ByteOrder StartByte Bytes TileSamples TileLines
+labels6.txt.IGNORELINES = ByteOrder StartByte Bytes TileSamples TileLines
 
 include $(ISISROOT)/make/isismake.tsts
 
