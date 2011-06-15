@@ -14,8 +14,11 @@ commands:
 	lon1=79.72 > /dev/null;
 	cat bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
 	  | sed 's/\/[^,]*\/\([^,\/]*\.cub\)/\1/g' \
+	  | sed 's/\/[^,]*\/\([^,\/]*\.net\)/\1/g' \
 	  | sed 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
 	  | sed s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
+	  | sed 's/\-0.00000/ 0.00000/' \
+	  | sed 's/\-0.00000/ 0.00000/' \
 	  > $(OUTPUT)/bundleout.txt
 	# The above command uses sed to do the following (in order):
 	# 1. remove cube filename paths
