@@ -89,7 +89,7 @@ inline void FixLabels(PvlObject &obj) {
 void IsisMain() {
   const std::string mdis2pds_program = "mdis2pds";
   const std::string mdis2pds_version = "1.0";
-  const std::string mdis2pds_revision = "$Revision: 1.10 $";
+  const std::string mdis2pds_revision = "$Revision$";
   const std::string mdis2pds_runtime = Application::DateTime();
 
   UserInterface &ui = Application::GetUserInterface();

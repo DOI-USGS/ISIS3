@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- $Id: mdis2pds.xml,v 1.10 2009/05/11 18:39:42 slambright Exp $ -->
+<!-- $Id$ -->
 
 <application name="mdis2pds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
@@ -46,6 +46,10 @@
     </change>
     <change name="Steven Lambright" date="2011-03-31">
       The DarkStripMean keyword can now be "N/A"
+    </change>
+    <change name="Kris Becker" date="2011-06-15">
+        Added ORBIT_NUMBER to translation table for inclusion in output RDR 
+        (CDR) file.
     </change>
   </history>
 

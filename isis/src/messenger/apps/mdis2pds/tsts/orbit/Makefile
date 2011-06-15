@@ -7,9 +7,8 @@ output.pvl.IGNORELINES = PRODUCT_CREATION_TIME
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
-	$(APPNAME) from=$(INPUT)/EN0108840044M.cal.cub \
-	to=$(OUTPUT)/output type=manual \
-	min=-1.0 max=1.0 > /dev/null;
+	$(APPNAME) from=$(INPUT)/EW0216154583G.cal.cub \
+	to=$(OUTPUT)/output > /dev/null;
 	catlab from=$(OUTPUT)/output.IMG \
 	to=$(OUTPUT)/output.pvl > /dev/null;
 	pds2isis from=$(OUTPUT)/output.IMG \
