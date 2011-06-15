@@ -1,13 +1,13 @@
 /*
- *	THIS ROUTINE IS PART OF THE CLEMENTINE PDS FILE READER PROGRAM.
- *	IT WAS WRITTEN BY ACT CORP. IN DIRECT SUPPORT TO THE
- *	CLEMENTINE (DSPSE) PROGRAM.
+ *      THIS ROUTINE IS PART OF THE CLEMENTINE PDS FILE READER PROGRAM.
+ *      IT WAS WRITTEN BY ACT CORP. IN DIRECT SUPPORT TO THE
+ *      CLEMENTINE (DSPSE) PROGRAM.
  *
- *	IF YOU FIND A PROBLEM OR MAKE ANY CHANGES TO THIS CODE PLEASE CONTACT
- *	Dr. Erick Malaret at ACT Corp.
- *			tel: (703) 742-0294
- *			     (703) 683-7431
- *                       email:	nrlvax.nrl.navy.mil
+ *      IF YOU FIND A PROBLEM OR MAKE ANY CHANGES TO THIS CODE PLEASE CONTACT
+ *      Dr. Erick Malaret at ACT Corp.
+ *                       tel: (703) 742-0294
+ *                            (703) 683-7431
+ *                       email: nrlvax.nrl.navy.mil
  *
  *
  *      Oct 31, 1994 Tracie Sucharski, USGS, Flagstaff  Change so that the
@@ -40,16 +40,16 @@
 #define sun
 #endif
 
-PDSINFO	pds;
-//FILE	*qparm;                    //removed qparm references BMG 2006-07-18
-extern long	*DCTHist[64];
-extern float	*Rn[64];
-extern float	Q[64];
+PDSINFO pds;
+//FILE *qparm;                    //removed qparm references BMG 2006-07-18
+extern long *DCTHist[64];
+extern float *Rn[64];
+extern float Q[64];
 
 void init_q_table(FILE *fptr);
 void readhufftbls(FILE *fptr);
 void pds_decomp(FILE *fptr, CHARH *p, long sizej, long sizei);
-#ifdef	sun
+#ifdef sun
 void PClong2SUNlongVector(unsigned long invec[], int npts) ;
 void PCshort2SUNshortVector(unsigned short invec[], int npts) ;
 #endif
@@ -79,12 +79,12 @@ PDSINFO *PDSR(char *fname, long *rows, long *cols) {
   }
 
   /* initialize some basic variables */
-  bitpix			= 0;
-  sizej = sizei		= 0;
-  pds.browse_nrows	= 0;
-  pds.browse_ncols	= 0;
-  pds.image_nrows		= 0;
-  pds.image_ncols		= 0;
+  bitpix = 0;
+  sizej = sizei = 0;
+  pds.browse_nrows = 0;
+  pds.browse_ncols = 0;
+  pds.image_nrows = 0;
+  pds.image_ncols = 0;
   hist_rec = brw_rec = image_rec = -1;
 
   /* read header */
@@ -165,7 +165,10 @@ PDSINFO *PDSR(char *fname, long *rows, long *cols) {
       printf(" histogram memory not allocated \n");
     }
     if(pds.hist) {
-      fread(pds.hist, sizeof(long), 256, fptr);
+      if(fread(pds.hist, sizeof(long), 256, fptr) != 256 &&
+         ferror(fptr) != 0) {
+        printf(" error reading histogram \n");
+      }
 #ifdef sun
       PClong2SUNlongVector((unsigned long *)pds.hist, 256);
 #endif
@@ -175,13 +178,16 @@ PDSINFO *PDSR(char *fname, long *rows, long *cols) {
 
   /**************   read browse image **********/
   if(brw_rec != -1) {
-    pds.browse_ncols	= sizei / 8;
-    pds.browse_nrows	= sizej / 8;
+    pds.browse_ncols = sizei / 8;
+    pds.browse_nrows = sizej / 8;
     fseek(fptr, brw_rec - 1, 0);
     brwsize = (sizej / 8) * (sizei / 8);
     pds.brw_imag = (unsigned char *)malloc(brwsize);
     if(pds.brw_imag)
-      fread(pds.brw_imag, sizeof(char), brwsize, fptr);
+      if(fread(pds.brw_imag, sizeof(char), brwsize, fptr) !=
+         (unsigned int)brwsize && ferror(fptr) != 0) {
+        printf(" error reading browse image \n");
+      }
   }
 
   /*************   read image data ***************/
@@ -207,7 +213,7 @@ PDSINFO *PDSR(char *fname, long *rows, long *cols) {
         init_q_table(fptr);
         readhufftbls(fptr);
         pds_decomp(fptr, c, sizej, sizei);
-//			fclose(qparm);                         //removed qparm references BMG 2006-07-18
+// fclose(qparm);                         //removed qparm references BMG 2006-07-18
       }
       else {
 
@@ -239,13 +245,15 @@ PDSINFO *PDSR(char *fname, long *rows, long *cols) {
   if(pds.text) {
     ptr = pds.text;
     for(i = 0; i < hdr_size; i++) {
-      /*	*(ptr) = fgetc(fptr); */
-      fread(ptr, sizeof(char), 1, fptr);
-      /*	if ( *ptr == '\r' ) {
-      		 do nothing
-      	} else {
-      		ptr++;
-      	}
+      /* *(ptr) = fgetc(fptr); */
+      if(fread(ptr, sizeof(char), 1, fptr) != 1 && ferror(fptr) != 0) {
+        printf(" error allocating string buffer \n");
+      }
+      /* if ( *ptr == '\r' ) {
+        do nothing
+       } else {
+       ptr++;
+      }
                   */
       ptr++;
     }
@@ -274,21 +282,25 @@ void init_q_table(FILE *fptr) {
   short   table[64];
   float   ftable[64];
 
-  fread(&scalef, sizeof(short), 1, fptr);
+  if(fread(&scalef, sizeof(short), 1, fptr) != 1 && ferror(fptr) != 0) {
+    printf(" error reading scale while initializing q_table \n");
+  }
 #ifdef sun
   PCshort2SUNshortVector((unsigned short *)&scalef, 1) ;
 #endif
-//	fprintf(qparm,"tabf: %d\n",scalef);         //removed qparm references BMG 2006-07-18
-  fread(table, sizeof(short), 64, fptr);
+// fprintf(qparm,"tabf: %d\n",scalef);         //removed qparm references BMG 2006-07-18
+  if(fread(table, sizeof(short), 64, fptr) != 64 && ferror(fptr) != 0) {
+    printf(" error reading table while initializing q_table \n");
+  }
 #ifdef sun
   PCshort2SUNshortVector((unsigned short *)table, 64);
 #endif
-//	fprintf(qparm,"tabq:\n");                    //removed qparm references BMG 2006-07-18
+// fprintf(qparm,"tabq:\n");                    //removed qparm references BMG 2006-07-18
 
   for(i = 0; i < 64; i++) {
     table[i] = table[i] & 0x00ff;  /*  TLS 9-29-95  */
-//		fprintf(qparm,"%3d ",table[i]);            //removed qparm references BMG 2006-07-18
-//		if ( (i+1) % 8 == 0 ) fprintf(qparm,"\n"); //removed qparm references BMG 2006-07-18
+// fprintf(qparm,"%3d ",table[i]);            //removed qparm references BMG 2006-07-18
+// if ( (i+1) % 8 == 0 ) fprintf(qparm,"\n"); //removed qparm references BMG 2006-07-18
 
     ftable[i] = ((float)scalef * (float)table[i]) / 64.0 + 0.5;
     ftable[i] = 4096.0 / (float)floor(ftable[i]);
@@ -372,18 +384,27 @@ void init_q_table(FILE *fptr) {
 }
 
 void readhufftbls(FILE *fptr) {
-  fread(dcbits, sizeof(short), 16, fptr);
+  if(fread(dcbits, sizeof(short), 16, fptr) != 16 && ferror(fptr) != 0) {
+    printf(" error reading dcbits while trying to read huffman tables \n");
+  }
 #ifdef sun
   PCshort2SUNshortVector((unsigned short *)dcbits, 16);
 #endif
 
-  fread(dchuffval, sizeof(char), 12, fptr);
-  fread(acbits, sizeof(short), 16, fptr);
+  if(fread(dchuffval, sizeof(char), 12, fptr) != 12 && ferror(fptr) != 0) {
+    printf(" error reading dchuffval while trying to read huffman tables \n");
+  }
+
+  if(fread(acbits, sizeof(short), 16, fptr) != 16 && ferror(fptr) != 0) {
+    printf(" error reading acbits while trying to read huffman tables \n");
+  }
 #ifdef sun
   PCshort2SUNshortVector((unsigned short *)acbits, 16);
 #endif
 
-  fread(achuffval, sizeof(char), 162, fptr);
+  if(fread(achuffval, sizeof(char), 162, fptr) != 162 && ferror(fptr) != 0) {
+    printf(" error reading achuffval while trying to read huffman tables \n");
+  }
 
   inithuffcode();
 }
@@ -486,12 +507,12 @@ void pds_decomp(FILE *fptr, CHARH *p, long sizej, long sizei) {
 
 #ifdef sun
 void PClong2SUNlongVector(unsigned long invec[], int npts) {
-  int	i;
-  unsigned long 	ival, oval;
+  int i;
+  unsigned long ival, oval;
 
   for(i = 0; i < npts; i++) {
-    ival	= invec[i];
-    oval	= ((ival & 0x000000ff) << 24) +
+    ival = invec[i];
+    oval = ((ival & 0x000000ff) << 24) +
             ((ival & 0x0000ff00) << 8) +
             ((ival & 0x00ff0000) >> 8) +
             ((ival & 0xff000000) >> 24);
@@ -499,11 +520,11 @@ void PClong2SUNlongVector(unsigned long invec[], int npts) {
   }
 }
 void PCshort2SUNshortVector(unsigned short invec[], int npts) {
-  int	i;
-  unsigned short 	ival, oval;
+  int i;
+  unsigned short ival, oval;
   for(i = 0; i < npts; i++) {
-    ival	= invec[i];
-    oval	= (ival << 8) + ((ival >> 8) & 0x00ff);
+    ival = invec[i];
+    oval = (ival << 8) + ((ival >> 8) & 0x00ff);
     invec[i] = oval;
 
   }
