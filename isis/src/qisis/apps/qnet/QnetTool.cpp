@@ -173,11 +173,14 @@ namespace Qisis {
     
     QPushButton * addMeasure = new QPushButton("Add Measure(s) to Point");
     connect(addMeasure, SIGNAL(clicked()), this, SLOT(addMeasure()));
-    QPushButton *savePointToNet = new QPushButton ("Save Point");
-    connect (savePointToNet,SIGNAL(clicked()),this,SLOT(savePoint()));
+
+    p_savePoint = new QPushButton ("Save Point");
+    p_saveDefaultPalette = p_savePoint->palette();
+    connect (p_savePoint,SIGNAL(clicked()),this,SLOT(savePoint()));
+
     QHBoxLayout * addMeasureLayout = new QHBoxLayout;
     addMeasureLayout->addWidget(addMeasure);
-    addMeasureLayout->addWidget(savePointToNet);
+    addMeasureLayout->addWidget(p_savePoint);
 //    addMeasureLayout->addStretch();
     
     p_templateFilenameLabel = new QLabel("Template File: " +
@@ -258,10 +261,10 @@ namespace Qisis {
     
     // create right vertical layout's top layout
     p_lockPoint = new QCheckBox("Edit Lock Point");
-    connect(p_lockPoint, SIGNAL(toggled(bool)),
+    connect(p_lockPoint, SIGNAL(clicked(bool)),
             SLOT(setLockPoint(bool)));
     p_ignorePoint = new QCheckBox("Ignore Point");
-    connect(p_ignorePoint, SIGNAL(toggled(bool)),
+    connect(p_ignorePoint, SIGNAL(clicked(bool)),
             this, SLOT(setIgnorePoint(bool)));
     connect(this, SIGNAL(ignorePointChanged()),
             p_ignorePoint, SLOT(toggle()));
@@ -302,7 +305,7 @@ namespace Qisis {
     connect(p_leftCombo, SIGNAL(activated(int)),
             this, SLOT(selectLeftMeasure(int)));
     p_lockLeftMeasure = new QCheckBox("Edit Lock Measure");
-    connect(p_lockLeftMeasure, SIGNAL(toggled(bool)),
+    connect(p_lockLeftMeasure, SIGNAL(clicked(bool)),
             SLOT(setLockLeftMeasure(bool)));
     p_ignoreLeftMeasure = new QCheckBox("Ignore Measure");
     connect(p_ignoreLeftMeasure, SIGNAL(clicked(bool)),
@@ -340,7 +343,7 @@ namespace Qisis {
     connect(p_rightCombo, SIGNAL(activated(int)),
             this, SLOT(selectRightMeasure(int)));
     p_lockRightMeasure = new QCheckBox("Edit Lock Measure");
-    connect(p_lockRightMeasure, SIGNAL(toggled(bool)),
+    connect(p_lockRightMeasure, SIGNAL(clicked(bool)),
             SLOT(setLockRightMeasure(bool)));
     p_ignoreRightMeasure = new QCheckBox("Ignore Measure");
     connect(p_ignoreRightMeasure, SIGNAL(clicked(bool)),
@@ -749,7 +752,10 @@ namespace Qisis {
       *p_leftMeasure = *p_rightMeasure;
     }
 
-    //  Update measure info
+    //  Change Save Point button text to red
+    colorizeSaveButton();
+
+    // Update measure info
     updateLeftMeasureInfo();
     updateRightMeasureInfo();
 
@@ -817,6 +823,9 @@ namespace Qisis {
       g_controlNetwork->AddPoint(updatePoint);
     }
 
+    //  Change Save Measure button text back to default
+    p_savePoint->setPalette(p_saveDefaultPalette);
+
     // emit signal so the nav tool refreshes the list
     emit refreshNavList();
     // emit signal so the nav tool can update edit point
@@ -839,6 +848,7 @@ namespace Qisis {
   void QnetTool::setLockPoint (bool lock) {
     if (p_editPoint != NULL) {
       p_editPoint->SetEditLock(lock);
+      colorizeSaveButton();
     }
   }
 
@@ -857,6 +867,7 @@ namespace Qisis {
   void QnetTool::setIgnorePoint (bool ignore) {
     if (p_editPoint != NULL) {
       p_editPoint->SetIgnored(ignore);
+      colorizeSaveButton();
     }
   }
 
@@ -893,6 +904,7 @@ namespace Qisis {
 
       p_editPoint->SetType(ControlPoint::Fixed);
     }
+    colorizeSaveButton();
     loadPoint();
 
   }
@@ -922,6 +934,7 @@ namespace Qisis {
         p_lockRightMeasure->setChecked(lock);
       }
     }
+    colorizeSaveButton();
   }
 
 
@@ -951,6 +964,7 @@ namespace Qisis {
         p_ignoreRightMeasure->setChecked(ignore);
       }
     }
+    colorizeSaveButton();
   }
 
 
@@ -975,6 +989,7 @@ namespace Qisis {
         p_lockLeftMeasure->setChecked(lock);
       }
     }
+    colorizeSaveButton();
   }
 
 
@@ -1004,6 +1019,7 @@ namespace Qisis {
         p_ignoreLeftMeasure->setChecked(ignore);
       }
     }
+    colorizeSaveButton();
   }
 
 
@@ -1304,6 +1320,8 @@ namespace Qisis {
       emit refreshNavList();
       // emit signal so the nav tool can update edit point
       emit editPointChanged(p_editPoint->GetId());
+      colorizeSaveButton();
+
     }
   }
 
@@ -1411,6 +1429,7 @@ namespace Qisis {
       emit refreshNavList();
       // emit signal so the nav tool can update edit point
       emit editPointChanged(p_editPoint->GetId());
+      colorizeSaveButton();
     }
   }
 
@@ -1558,6 +1577,9 @@ namespace Qisis {
 
     // emit signal so the nav tool can update edit point
     emit editPointChanged(p_editPoint->GetId());
+
+    // New point loaded, make sure Save Measure Button text is default
+    p_savePoint->setPalette(p_saveDefaultPalette);
   }
 
   /**
@@ -2111,6 +2133,7 @@ namespace Qisis {
 
       // emit signal so the nav tool can update edit point
       emit editPointChanged(p_editPoint->GetId());
+      colorizeSaveButton();
     }
   }
 
@@ -2973,7 +2996,26 @@ namespace Qisis {
 
     // Remove from serial number list
     g_serialNumberList->Delete(p_groundSN);
+  }
+
+
+
+
+  /**
+   * Turn "Save Point" button text to red
+   *
+   * @author 2011-06-14 Tracie Sucharski
+   */
+  void QnetTool::colorizeSaveButton() {
+
+    QColor qc = Qt::red;
+    QPalette p = p_savePoint->palette();
+    p.setColor(QPalette::ButtonText,qc);
+    p_savePoint->setPalette(p);
 
   }
+
+
+
 }
 
