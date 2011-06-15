@@ -432,7 +432,7 @@ namespace Qisis {
     //  Reload with new cube position
     p_chip->SetChipPosition((double)x, (double)y);
     reloadChip(p_chip->CubeSample(), p_chip->CubeLine());
-
+    emit userMovedTackPoint();
   }
 
 
@@ -445,7 +445,7 @@ namespace Qisis {
       //  Reload with new cube position
       p_chip->SetChipPosition((double)p.x(), (double)p.y());
       reloadChip(p_chip->CubeSample(), p_chip->CubeLine());
-      emit mouseClicked();
+      emit userMovedTackPoint();
     }
   }
 

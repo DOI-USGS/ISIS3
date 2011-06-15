@@ -69,6 +69,10 @@ namespace Qisis {
     * @history 2011-06-14 Tracie Sucharski - Added mouseClick signal.  Qnet 
     *     needed to know if user moved the tackpoint vs. simply loading a new
     *     chip, or geoming the chip.
+    * @history 2011-06-15 Tracie Sucharski - Changed signal mouseClick to 
+    *     userMovedTackPoint.  TODO:  Could not use tackPointChanged signal
+    *     because that signal is emitted whenever the measure is loaded not
+    *     just when the user initiates the move.  This should be cleaned up.
     */
   class ChipViewport : public QWidget {
       Q_OBJECT
@@ -122,7 +126,11 @@ namespace Qisis {
     signals:
       //!< Signal sent when tack point changes
       void tackPointChanged(double);
-      void mouseClicked();
+
+      //   TODO: This needs better name, tackPointChanged signal is emitted
+      //   even if user does not initiate, maybe change tackPointChanged signal
+      //   to only emit if user moves the tack point???
+      void userMovedTackPoint();
 
     public slots:
 
