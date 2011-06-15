@@ -8,6 +8,22 @@
 #include "Statistics.h"
 
 namespace Isis {
+
+
+  /**
+   * Constructs the Camera Statistics object from a Cube filename.  This
+   * constructor will first open the cube corresponding to the "filename"
+   * parameter, then gather statistics with the Cube's Camera.  Neither the
+   * Cube nor its Camera is retained after statistics gathering has completed,
+   * but the filename used to open the Cube will be output in the "User
+   * Parameters" group of the "toPvl" method.  The invoker of this constructor
+   * must also specify the sample and line increments to be used during
+   * statistics gathering.
+   *
+   * @param filename String filename of the Cube whose Camera will be used
+   * @param sinc Sample increment for gathering statistics
+   * @param linc Line increment for gathering statistics
+   */
   CameraStatistics::CameraStatistics(std::string filename, int sinc, int linc) {
     Cube cube;
     cube.Open(filename);
@@ -16,17 +32,57 @@ namespace Isis {
   }
 
 
+  /**
+   * Constructs the Camera Statistics object from an already-existent Camera
+   * pointer.  Specifying sample and line increments of 1 will gather
+   * statistics on the entire area encompassed by the Camera, but higher
+   * numbers can be used to improve performance.  Using this
+   * constructor--lacking a Cube filename--the "toPvl" method will not output
+   * the Cube filename associated with the Camera.  If the user desires this
+   * information, there is a constructor that will take the filename purely for
+   * this purpose.
+   *
+   * @param cam Camera pointer upon which statistics will be gathered
+   * @param sinc Sample increment for gathering statistics
+   * @param linc Line increment for gathering statistics
+   */
   CameraStatistics::CameraStatistics(Camera *cam, int sinc, int linc) {
     init(cam, sinc, linc, "");
   }
 
 
+  /**
+   * Constructs the Camera Statistics object from an already-existent Camera
+   * pointer.  Specifying sample and line increments of 1 will gather
+   * statistics on the entire area encompassed by the Camera, but higher
+   * numbers can be used to improve performance.  The filename provided does
+   * not serve a functional purpose during the statistics gathering process,
+   * but will report the filename used to create the Camera instance in the
+   * "User Parameters" section of the PVL output from the "toPvl" method.
+   *
+   * @param cam Camera pointer upon which statistics will be gathered
+   * @param sinc Sample increment for gathering statistics
+   * @param linc Line increment for gathering statistics
+   * @param filename String filename of the Cube whose Camera is being used
+   */
   CameraStatistics::CameraStatistics(Camera *cam, int sinc, int linc,
       std::string filename) {
     init(cam, sinc, linc, filename);
   }
 
 
+  /**
+   * Initializes this collection of statistics by incrementing over sample/line
+   * positions in the Camera and compiling various Camera values at those
+   * locations into all the Statistics objects maintained as the persistent
+   * state of the object.  Statistics can be added to these objects later using
+   * the "addStats" method.
+   *
+   * @param cam Camera pointer upon which statistics will be gathered
+   * @param sinc Sample increment for gathering statistics
+   * @param linc Line increment for gathering statistics
+   * @param filename String filename of the Cube whose Camera is being used
+   */
   void CameraStatistics::init(Camera *cam, int sinc, int linc,
       std::string filename) {
 
@@ -50,30 +106,34 @@ namespace Isis {
     int eband = cam->Bands();
 
     // If the camera is band independent then only run one band
-    if(cam->IsBandIndependent()) eband = 1;
+    if (cam->IsBandIndependent()) eband = 1;
 
     int pTotal = eband * ((cam->Lines() - 2) / linc + 2);
     Progress progress;
     progress.SetMaximumSteps(pTotal);
     progress.CheckStatus();
 
-    for(int band = 1; band <= eband; band++) {
+    for (int band = 1; band <= eband; band++) {
       cam->SetBand(band);
-      for(int line = 1; line < (int)cam->Lines(); line = line + linc) {
-        for(int sample = 1; sample < cam->Samples(); sample = sample + sinc) {
+      for (int line = 1; line < (int)cam->Lines(); line = line + linc) {
+        for (int sample = 1; sample < cam->Samples(); sample = sample + sinc) {
           addStats(cam, sample, line);
         }
-        //set the sample value to the last sample and run buildstats
+
+        // Set the sample value to the last sample and run buildstats
         int sample = cam->Samples();
         addStats(cam, sample, line);
         progress.CheckStatus();
       }
-      //set the line value to the last line and run on all samples(sample + sinc)
+
+      // Set the line value to the last line and run on all samples (sample +
+      // sinc)
       int line = cam->Lines();
-      for(int sample = 1; sample < cam->Samples(); sample = sample + sinc) {
+      for (int sample = 1; sample < cam->Samples(); sample = sample + sinc) {
         addStats(cam, sample, line);
       }
-      //set last sample and run with last line
+
+      // Set last sample and run with last line
       int sample = cam->Samples();
       addStats(cam, sample, line);
       progress.CheckStatus();
@@ -81,6 +141,9 @@ namespace Isis {
   }
 
 
+  /**
+   * Destroy this instance, deletes all the Statistics objects.
+   */
   CameraStatistics::~CameraStatistics() {
     if (m_latStat != NULL) {
       delete m_latStat;
@@ -133,8 +196,14 @@ namespace Isis {
   }
 
 
-  //function to add stats data to the stats object.
-  //also tests if the line and samp are valid
+  /**
+   * Add statistics data to Statistics objects if the Camera position given by
+   * the provided line and sample is looking at the surface of the target.
+   *
+   * @param cam Camera pointer upon which statistics are being gathered
+   * @param sample Sample of the image to gather Camera information on
+   * @param line Line of the image to gather Camera information on
+   */
   void CameraStatistics::addStats(Camera *cam, int &sample, int &line) {
     cam->SetImage(sample, line);
     if(cam->HasSurfaceIntersection()) {
@@ -156,13 +225,16 @@ namespace Isis {
   }
 
 
-  /**  Produces NULL values for special pixels
+  /**
+   * Takes a name, value, and optionally units and constructs a PVL Keyword.
+   * If the value is determined to be a "special pixel", then the string NULL
+   * will be used for the value.
    *
-   * @param keyname  Name of keyword to generate
-   * @param value    Value to write to keyword
-   * @param unit     Optional units for keywords
+   * @param keyname Name of keyword to generate
+   * @param value Value to write to keyword
+   * @param unit Optional units for keywords
    *
-   * @return PvlKeyword Newly created keyword
+   * @return PvlKeyword Keyword constructed from input parameters
    */
   PvlKeyword CameraStatistics::constructKeyword(std::string keyname,
       double value, std::string unit="") const {
@@ -176,6 +248,80 @@ namespace Isis {
   }
 
 
+  /**
+   * Constructs a Pvl object from the values in the various statistics objects.
+   * The general format will look as follows:
+   *   
+   * @code
+   *   Group = User Parameters
+   *     Filename (not provided for constructor w/ Camera but not filename)
+   *     Linc
+   *     Sinc
+   *   End_Group
+   *   Group = Latitude
+   *     LatitudeMinimum
+   *     LatitudeMaximum
+   *     LatitudeStandardDeviation
+   *   End_Group
+   *   Group = Longitude
+   *     LongitudeMinimum
+   *     LongitudeMaximum
+   *     LongitudeStandardDeviation
+   *   End_Group
+   *   Group = SampleResolution
+   *     SampleResolutionMinimum
+   *     SampleResolutionMaximum
+   *     SampleResolutionStandardDeviation
+   *   End_Group
+   *   Group = LineResolution
+   *     LineResolutionMinimum
+   *     LineResolutionMaximum
+   *     LineResolutionStandardDeviation
+   *   End_Group
+   *   Group = Resolution
+   *     ResolutionMinimum
+   *     ResolutionMaximum
+   *     ResolutionStandardDeviation
+   *   End_Group
+   *   Group = AspectRatio
+   *     AspectRatioMinimum
+   *     AspectRatioMaximum
+   *     AspectRatioStandardDeviation
+   *   End_Group
+   *   Group = PhaseAngle
+   *     PhaseMinimum
+   *     PhaseMaximum
+   *     PhaseStandardDeviation
+   *   End_Group
+   *   Group = EmissionAngle
+   *     EmissionMinimum
+   *     EmissionMaximum
+   *     EmissionStandardDeviation
+   *   End_Group
+   *   Group = IncidenceAngle
+   *     IncidenceMinimum
+   *     IncidenceMaximum
+   *     IncidenceStandardDeviation
+   *   End_Group
+   *   Group = LocalSolarTime
+   *     LocalSolarTimeMinimum
+   *     LocalSolarTimeMaximum
+   *     LocalSolarTimeStandardDeviation
+   *   End_Group
+   *   Group = LocalRadius
+   *     LocalRadiusMinimum
+   *     LocalRadiusMaximum
+   *     LocalRadiusStandardDeviation
+   *   End_Group
+   *   Group = NorthAzimuth
+   *     NorthAzimuthMinimum
+   *     NorthAzimuthMaximum
+   *     NorthAzimuthStandardDeviation
+   *   End_Group
+   * @endcode
+   *
+   * @return Pvl PVL collection of all values for all statistics gathered
+   */
   Pvl CameraStatistics::toPvl() const {
     // Set up the Pvl groups and get min, max, avg, and sd for each statstics
     // object
@@ -294,7 +440,5 @@ namespace Isis {
     returnPvl.AddGroup(pNorthAzimuth);
     return returnPvl;
   }
-
-
-} // End namespace Isis
+}
 

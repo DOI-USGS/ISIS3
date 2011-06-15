@@ -1,3 +1,6 @@
+#ifndef CameraStatistics_h
+#define CameraStatistics_h
+
 /**
  * @file
  * $Revision: 1.16 $
@@ -21,9 +24,6 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#ifndef CameraStatistics_h
-#define CameraStatistics_h
-
 #include <string>
 
 namespace Isis {
@@ -31,6 +31,26 @@ namespace Isis {
   class Pvl;
   class PvlKeyword;
   class Statistics;
+
+  /**
+   * @brief Calculates a series of statistics pertaining to a Camera.
+   *
+   * Given a Camera pointer--or the filename of a Cube whose Camera is to be
+   * used--this class will calculate a series of statistics at initialization
+   * on the Camera.  After construction, the user can retrieve statistics,
+   * compiled for every line/sample of the Camera, for the Camera's latitude,
+   * longitude, pixel resolution, sample resolution, line resolution, phase
+   * angle, emission angle, incidence angle, local solar time, meters, north
+   * azimuth, and aspect ratio.
+   *
+   * @ingroup SpiceInstrumentsAndCameras
+   *
+   * @author 2011-06-14 Travis Addair
+   *
+   * @internal
+   * @history 2011-06-14 Travis Addair - Extracted logic from "camstats"
+   * application to create this class.
+   */
 
   class CameraStatistics {
     public:
@@ -44,50 +64,134 @@ namespace Isis {
           std::string unit) const;
       Pvl toPvl() const;
 
+
+      /**
+       * Accessor method for inspecting the statistics gathered on the
+       * Universal Latitudes of the input Camera.
+       *
+       * @return Statistics * Constant pointer to Latitude Statistics
+       */
       const Statistics * getLatStat() const {
         return m_latStat;
       };
 
+
+      /**
+       * Accessor method for inspecting the statistics gathered on the
+       * Universal Longitudes of the input Camera.
+       *
+       * @return Statistics * Constant pointer to Longitude Statistics
+       */
       const Statistics * getLonStat() const {
         return m_lonStat;
       };
 
+
+      /**
+       * Accessor method for inspecting the statistics gathered on the
+       * Pixel Resolutions of the input Camera.
+       *
+       * @return Statistics * Constant pointer to Pixel Resolution Statistics
+       */
       const Statistics * getResStat() const {
         return m_resStat;
       };
 
+
+      /**
+       * Accessor method for inspecting the statistics gathered on the
+       * Sample Resolutions of the input Camera.
+       *
+       * @return Statistics * Constant pointer to Sample Resolution Statistics
+       */
       const Statistics * getSampleResStat() const {
         return m_sampleResStat;
       };
 
+
+      /**
+       * Accessor method for inspecting the statistics gathered on the
+       * Line Resolution of the input Camera.
+       *
+       * @return Statistics * Constant pointer to Line Resolution Statistics
+       */
       const Statistics * getLineResStat() const {
         return m_lineResStat;
       };
 
+
+      /**
+       * Accessor method for inspecting the statistics gathered on the
+       * Aspect Ratios of the input Camera.
+       *
+       * @return Statistics * Constant pointer to Aspect Ratio Statistics
+       */
       const Statistics * getAspectRatioStat() const {
         return m_aspectRatioStat;
       };
 
+
+      /**
+       * Accessor method for inspecting the statistics gathered on the
+       * Phase Angles of the input Camera.
+       *
+       * @return Statistics * Constant pointer to Phase Angle Statistics
+       */
       const Statistics * getPhaseStat() const {
         return m_phaseStat;
       };
 
+
+      /**
+       * Accessor method for inspecting the statistics gathered on the
+       * Emission Angles of the input Camera.
+       *
+       * @return Statistics * Constant pointer to Emission Angle Statistics
+       */
       const Statistics * getEmissionStat() const {
         return m_emissionStat;
       };
 
+
+      /**
+       * Accessor method for inspecting the statistics gathered on the
+       * Incidence Angles of the input Camera.
+       *
+       * @return Statistics * Constant pointer to Incidence Angle Statistics
+       */
       const Statistics * getIncidenceStat() const {
         return m_incidenceStat;
       };
 
+
+      /**
+       * Accessor method for inspecting the statistics gathered on the
+       * Local Solar Times of the input Camera.
+       *
+       * @return Statistics * Constant pointer to Local Solar Time Statistics
+       */
       const Statistics * getLocalSolarTimeStat() const {
         return m_localSolarTimeStat;
       };
 
+
+      /**
+       * Accessor method for inspecting the statistics gathered on the
+       * Local Radii (in meters) of the input Camera.
+       *
+       * @return Statistics * Constant pointer to Local Radius Statistics
+       */
       const Statistics * getLocalRaduisStat() const {
         return m_localRaduisStat;
       };
 
+
+      /**
+       * Accessor method for inspecting the statistics gathered on the
+       * North Azimuths of the input Camera.
+       *
+       * @return Statistics * Constant pointer to North Azimuth Statistics
+       */
       const Statistics * getNorthAzimuthStat() const {
         return m_northAzimuthStat;
       };
@@ -95,22 +199,23 @@ namespace Isis {
     private:
       void init(Camera *cam, int sinc, int linc, std::string filename);
 
+      //!< Filename of the Cube the Camera was derived from.
       std::string m_filename;
-      int m_sinc;
-      int m_linc;
+      int m_sinc; //!< Sample increment for composing statistics.
+      int m_linc; //!< Line increment for composing statistics.
 
-      Statistics *m_latStat;
-      Statistics *m_lonStat;
-      Statistics *m_resStat;
-      Statistics *m_sampleResStat;
-      Statistics *m_lineResStat;
-      Statistics *m_aspectRatioStat;
-      Statistics *m_phaseStat;
-      Statistics *m_emissionStat;
-      Statistics *m_incidenceStat;
-      Statistics *m_localSolarTimeStat;
-      Statistics *m_localRaduisStat;
-      Statistics *m_northAzimuthStat;
+      Statistics *m_latStat; //!< Universal latitude statistics.
+      Statistics *m_lonStat; //!< Universal longitude statistics.
+      Statistics *m_resStat; //!< Pixel resolution statistics.
+      Statistics *m_sampleResStat; //!< Sample resolution statistics.
+      Statistics *m_lineResStat; //!< Line resolution statistics.
+      Statistics *m_aspectRatioStat; //!< Aspect ratio statistics.
+      Statistics *m_phaseStat; //!< Phase angle statistics.
+      Statistics *m_emissionStat; //!< Emission angle statistics.
+      Statistics *m_incidenceStat; //!< Incidence angle statistics.
+      Statistics *m_localSolarTimeStat; //!< Local solar time statistics.
+      Statistics *m_localRaduisStat; //!< Local radius statistics (in meters).
+      Statistics *m_northAzimuthStat; //!< North azimuth statistics.
   };
 };
 
