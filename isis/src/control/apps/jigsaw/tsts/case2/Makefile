@@ -26,6 +26,10 @@ commands:
 	# 1. remove cube filename paths
 	# 2. remove net filename paths
 	# 4. remove date and time
+	cat residuals.csv | sed 's/\/[^,]*\/\([^,\/]*\.cub\)/\1/g'\
+	  > $(OUTPUT)/residuals.csv
+	cat bundleout_images.csv | sed 's/\/[^,]*\/\([^,\/]*\.cub\)/\1/g' \
+	  > $(OUTPUT)/bundleout_images.csv
 	$(MV) residuals.csv $(OUTPUT)/residuals.csv > /dev/null;
 	$(MV) bundleout_images.csv $(OUTPUT)/bundleout_images.csv > /dev/null;
 	$(MV) bundleout_points.csv $(OUTPUT)/bundleout_points.csv > /dev/null;
