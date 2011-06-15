@@ -11,6 +11,7 @@ class QDoubleSpinBox;
 class QHBoxLayout;
 class QLabel;
 class QLCDNumber;
+class QPalette;
 class QPushButton;
 class QRadioButton;
 class QScrollBar;
@@ -82,9 +83,9 @@ namespace Qisis {
     *   @history 2010-11-17 Eric Hyer - now forwards new ControlNets to the
     *                          ChipViewports
     *   @history 2010-11-19 Tracie Sucharski - Renamed the "Save Point" button
-    *                          to "Save Measure" along with signals and slots.
-    *                          Add a new "Save Point" button which actually
-    *                          saves the edit point to the network.
+    *                           to "Save Measure" along with signals and slots.
+    *                           Add a new "Save Point" button which actually
+    *                           saves the edit point to the network.
     *   @history 2010-11-22 Eric Hyer - Forwarded SIGNAL from StretchTool to
     *                          ChipViewports
     *   @history 2010-12-01 Eric Hyer - Added checkboxes for stretch locking
@@ -94,6 +95,11 @@ namespace Qisis {
     *   @history 2011-05-04 Jai Rideout - updated saveChips() to reference new
     *                          AutoReg API for accessing chips used in
     *                          registration.
+    *   @history 2011-06-14 Tracie Sucharski - Added slot to colorize the
+    *                          Save Measure button.  If user moved the tack
+    *                          point, the button text will be changed to red.
+    *                          If they push the save button, button will go back
+    *                          to black.
     */
   class ControlPointEdit : public QWidget {
       Q_OBJECT
@@ -136,6 +142,7 @@ namespace Qisis {
       void updateLeftPositionLabel(double zoomFactor);
       void updateRightGeom();
       void updateRightPositionLabel(double zoomFactor);
+      void colorizeSaveButton();
 
       void blinkStart();
       void blinkStop();
@@ -180,6 +187,8 @@ namespace Qisis {
       bool   p_autoRegShown;
       bool   p_autoRegAttempted;
 
+      QPushButton *p_saveMeasure;
+      QPalette p_saveDefaultPalette;
 
       ChipViewport *p_leftView;
       ChipViewport *p_rightView;
