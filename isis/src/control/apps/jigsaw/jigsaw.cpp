@@ -141,6 +141,7 @@ void IsisMain() {
 
         //  Get Kernel group and add or replace LastModifiedInstrumentPointing
         //  keyword.
+        if (b->IsHeld(i)) continue;   // Don't update held images at all
         Table cmatrix = b->Cmatrix(i);
         std::string jigComment = "Jigged = " + Isis::iTime::CurrentLocalTime();
         cmatrix.Label().AddComment(jigComment);

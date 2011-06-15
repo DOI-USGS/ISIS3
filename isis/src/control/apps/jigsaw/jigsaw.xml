@@ -42,13 +42,16 @@
     <change name="Mackenzie Boyd" date="2009-07-23">
       Modified program to write history to input cubes.
     </change>
-    <change name="Debbie A. Cook" data="2010-08-12">
+    <change name="Debbie A. Cook" date="2010-08-12">
       Commented out Heldlist until mechanism in place to enter individual
       image parameter constraints.
     </change>
-    <change name="Debbie A. Cook" data="2010-08-12">
+    <change name="Debbie A. Cook" date="2010-08-12">
       Merged Ken Edmundson version with system and binary control net.
-      </change>
+    </change>
+    <change name="Debbie A. Cook" date="2011-06-14">
+      Modified code to prevent updates to cube files in held list.
+    </change>
   </history>
 
   <groups>

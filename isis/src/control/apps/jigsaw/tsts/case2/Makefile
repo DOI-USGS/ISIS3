@@ -1,21 +1,35 @@
 APPNAME = jigsaw
-#This test exercises the held image option, SVD solution method, and spsolve=position.
+#This test exercises the held image option, sparse solution method, and spsolve=position.
 
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
-	$(LS) -1 $(INPUT)/*.cub > $(OUTPUT)/cub.lis;
-	$(LS) -1 $(INPUT)/e0400710.lev1.cub > $(OUTPUT)/held.lis;
-
+	$(CP) $(INPUT)/*.cub $(OUTPUT) > /dev/null;
+	$(LS) -1 $(OUTPUT)/*.cub > $(OUTPUT)/cub.lis;
+	$(LS) -1 $(OUTPUT)/e0400710.lev1.cub > $(OUTPUT)/held.lis;
 	$(APPNAME) fromlist=$(OUTPUT)/cub.lis  \
 	heldlist=$(OUTPUT)/held.lis  \
 	cnet=$(INPUT)/mocVik.net \
-	onet=$(OUTPUT)/case2OutNet.bin \
+	onet=$(OUTPUT)/case2OutNet.net \
 	maxits=10 \
 	method=sparse \
 	sigma0=1.e-5  \
-	update=no \
+	update=yes \
 	spsolve=position | grep -v "100% Processed" | \
-	grep -v "jigsaw" > $(OUTPUT)/case2OutLog.pvl;
-	cnetbin2pvl from=$(OUTPUT)/case2OutNet.bin to=$(OUTPUT)/case2OutNet.pvl > /dev/null;
-	$(RM) $(OUTPUT)/cub.lis $(OUTPUT)/held.lis $(OUTPUT)/case2OutNet.bin > /dev/null;
+	grep -v "jigsaw" > $(OUTPUT)/case2OutLog.txt;
+	cat bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
+	  | sed 's/\/[^,]*\/\([^,\/]*\.cub\)/\1/g' \
+	  | sed 's/\/[^,]*\/\([^,\/]*\.net\)/\1/g' \
+	  | sed s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
+	  > $(OUTPUT)/bundleout.txt
+	# The above command uses sed to do the following (in order):
+	# 1. remove cube filename paths
+	# 2. remove net filename paths
+	# 4. remove date and time
+	$(MV) residuals.csv $(OUTPUT)/residuals.csv > /dev/null;
+	$(MV) bundleout_images.csv $(OUTPUT)/bundleout_images.csv > /dev/null;
+	$(MV) bundleout_points.csv $(OUTPUT)/bundleout_points.csv > /dev/null;
+	$(RM) $(OUTPUT)/cub.lis $(OUTPUT)/held.lis $(OUTPUT)/case2OutNet.bin print.prt > /dev/null;
+	$(RM) bundleout.txt > /dev/null
+	cathist from=$(OUTPUT)/vik.cub > $(OUTPUT)/vik.pvl;
+	cathist from=$(OUTPUT)/e0400710.lev1.cub > $(OUTPUT)/e0400710.lev1.cub.pvl;

@@ -1195,12 +1195,6 @@ namespace Isis {
 
       SurfacePoint aprioriSurfacePoint = point->GetAprioriSurfacePoint();
 
-      // Discussion points:  1) Should these primitive classes like Distance and angles not have a default unit?
-      // I have already seen mistakes made because of assumptions about the default unit.  2) What should be the
-      // unit for distances in the bundle? I believe it is currently km.  The Isis default unit, I believe, is m.
-      // When we deal with landers, m would be a more reasonable distance unit for dealing with both orbiters and
-      // landers.
-
       bounded_vector<double, 3>& weights = m_Point_Weights[nPointIndex];
       bounded_vector<double, 3>& apriorisigmas = m_Point_AprioriSigmas[nPointIndex];
 
@@ -4199,6 +4193,15 @@ namespace Isis {
 //    std::string serialNumber = (*m_pSnList)[i];
 //    return m_pSnList->Filename(serialNumber);
     return m_pSnList->Filename(i);
+  }
+
+
+  //! Return whether the ith file in the cube list is held
+  bool BundleAdjust::IsHeld(int i) {
+    if ( m_nHeldImages > 0 )
+         if ((m_pHeldSnList->HasSerialNumber(m_pSnList->SerialNumber(i))))
+           return true;
+    return false;
   }
 
   //! Return a table cmatrix for the ith cube in the cube list given to the

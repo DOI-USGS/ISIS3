@@ -76,6 +76,7 @@
  *   @history 2011-06-07 Debbie A. Cook and Tracie Sucharski - Modified point types
  *                          Ground ------> Fixed
  *                          Tie----------> Free
+ *   @history 2011-06-14 Debbie A. Cook added method IsHeld(int index) for preventing any updates to held images
  */
 
 #include <vector>
@@ -127,6 +128,7 @@ namespace Isis {
       int Images() const { return m_pSnList->Size(); }
       int Observations() const;
       std::string Filename(int index);
+      bool IsHeld(int index);
       Table Cmatrix(int index);
       Table SpVector(int index);
 
