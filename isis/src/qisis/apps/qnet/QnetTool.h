@@ -4,6 +4,7 @@
 #include "Tool.h"
 #include "ControlPoint.h"
 
+#include <QPalette>
 #include <QStringList>
 
 class QAction;
@@ -16,6 +17,7 @@ class QMainWindow;
 class QObject;
 class QPainter;
 class QPoint;
+class QPushButton;
 class QSplitter;
 class QStackedWidget;
 class QString;
@@ -207,6 +209,7 @@ namespace Qisis {
 
       void measureSaved ();
       void savePoint();
+      void colorizeSaveButton();
 
       void openTemplateFile();
       void viewTemplateFile();
@@ -261,6 +264,9 @@ namespace Qisis {
       
       QMainWindow *p_mw;
       ControlPointEdit *p_pointEditor;
+
+      QPushButton *p_savePoint;
+      QPalette p_saveDefaultPalette;
 
       QTextEdit *p_templateEditor;
       QWidget *p_templateEditorWidget;
