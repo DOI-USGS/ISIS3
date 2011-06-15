@@ -1,13 +1,16 @@
-#include <QWhatsThis>
+#include "HelpTool.h"
+
+#include <QApplication>
 #include <QMenu>
 #include <QString>
-#include <QApplication>
+#include <QWhatsThis>
 
-#include "HelpTool.h"
+#include "iException.h"
 #include "MainWindow.h"
 #include "Workspace.h"
-#include "Application.h"
 #include "Preference.h"
+
+using namespace Isis;
 
 namespace Qisis {
   // Constructor
@@ -56,15 +59,17 @@ namespace Qisis {
    * @author  2007-06-12 Tracie Sucharski
    */
   void HelpTool::aboutProgram() {
-    Isis::Filename file((std::string)
+    Filename file((std::string)
                         "$ISISROOT/doc/Application/presentation/PrinterFriendly/" +
                         QApplication::applicationName().toStdString() + "/" +
                         QApplication::applicationName().toStdString() + ".html");
 
-    Isis::PvlGroup &uig = Isis::Preference::Preferences().FindGroup("UserInterface");
+    PvlGroup &uig = Preference::Preferences().FindGroup("UserInterface");
     std::string command = (std::string) uig["GuiHelpBrowser"] +
                           (std::string)" file:" + file.Expanded() + " &";
-    system(command.c_str());
-
+    if(system(command.c_str()) != 0) {
+      iString msg = "Failed to execute [" + command + "]";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    }
   }
 }
