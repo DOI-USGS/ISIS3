@@ -100,6 +100,12 @@ namespace Qisis {
     *                          point, the button text will be changed to red.
     *                          If they push the save button, button will go back
     *                          to black.
+    *   @history 2011-06-15 Tracie Sucharski - Changed signal mouseClick
+    *                          to userMovedTackPoint.  TODO:  Could not use
+    *                          tackPointChanged signal because that signal is
+    *                          emitted whenever the measure is loaded not just
+    *                          when the user initiates the move.  This should be
+    *                          cleaned up.
     */
   class ControlPointEdit : public QWidget {
       Q_OBJECT

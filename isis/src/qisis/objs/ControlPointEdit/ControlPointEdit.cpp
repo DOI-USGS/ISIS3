@@ -297,7 +297,7 @@ namespace Qisis {
     connect(this, SIGNAL(updateLeftView(double, double)),
             p_leftView, SLOT(refreshView(double, double)));
 
-    connect (p_leftView, SIGNAL(mouseClicked()),
+    connect (p_leftView, SIGNAL(userMovedTackPoint()),
              this, SLOT(colorizeSaveButton()));
 
     if(p_allowLeftMouse) {
@@ -306,6 +306,11 @@ namespace Qisis {
       connect(leftPanDown, SIGNAL(clicked()), p_leftView, SLOT(panDown()));
       connect(leftPanLeft, SIGNAL(clicked()), p_leftView, SLOT(panLeft()));
       connect(leftPanRight, SIGNAL(clicked()), p_leftView, SLOT(panRight()));
+
+      connect(leftPanUp, SIGNAL(clicked()), this, SLOT(colorizeSaveButton()));
+      connect(leftPanDown, SIGNAL(clicked()), this, SLOT(colorizeSaveButton()));
+      connect(leftPanLeft, SIGNAL(clicked()), this, SLOT(colorizeSaveButton()));
+      connect(leftPanRight, SIGNAL(clicked()), this, SLOT(colorizeSaveButton()));
     }
 
     p_rightView = new ChipViewport(VIEWSIZE, VIEWSIZE, this);
@@ -329,7 +334,7 @@ namespace Qisis {
     connect(this, SIGNAL(updateRightView(double, double)),
             p_rightView, SLOT(refreshView(double, double)));
 
-    connect (p_rightView, SIGNAL(mouseClicked()),
+    connect (p_rightView, SIGNAL(userMovedTackPoint()),
              this, SLOT(colorizeSaveButton()));
 
     connect(p_rightZoomIn, SIGNAL(clicked()), p_rightView, SLOT(zoomIn()));
@@ -341,6 +346,11 @@ namespace Qisis {
     connect(rightPanDown, SIGNAL(clicked()), p_rightView, SLOT(panDown()));
     connect(rightPanLeft, SIGNAL(clicked()), p_rightView, SLOT(panLeft()));
     connect(rightPanRight, SIGNAL(clicked()), p_rightView, SLOT(panRight()));
+
+    connect(rightPanUp, SIGNAL(clicked()), this, SLOT(colorizeSaveButton()));
+    connect(rightPanDown, SIGNAL(clicked()), this, SLOT(colorizeSaveButton()));
+    connect(rightPanLeft, SIGNAL(clicked()), this, SLOT(colorizeSaveButton()));
+    connect(rightPanRight, SIGNAL(clicked()), this, SLOT(colorizeSaveButton()));
 
     //  Create chips for left and right
     p_leftChip = new Isis::Chip(VIEWSIZE, VIEWSIZE);
