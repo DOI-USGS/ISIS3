@@ -1,33 +1,34 @@
-#include <string>
-#include <sstream>
+#include "Gui.h"
 
-#include <QWidget>
+#include <sstream>
+#include <string>
 
 #include <QApplication>
+#include <QDesktopWidget>
+#include <QFrame>
+#include <QIcon>
+#include <QLineEdit>
 #include <QMenu>
 #include <QMenuBar>
-#include <QIcon>
-#include <QToolBar>
+#include <QMessageBox>
 #include <QSplitter>
 #include <QScrollArea>
 #include <QStatusBar>
-#include <QLineEdit>
+#include <QToolBar>
 #include <QWhatsThis>
-#include <QMessageBox>
-#include <QFrame>
-#include <QDesktopWidget>
+#include <QWidget>
 
-#include "Gui.h"
-#include "UserInterface.h"
-#include "Preference.h"
-#include "iString.h"
-#include "iException.h"
 #include "Application.h"
+#include "Filename.h"
+#include "iException.h"
+#include "iString.h"
+#include "Preference.h"
+#include "ProgramLauncher.h"
 #include "PvlObject.h"
 #include "PvlGroup.h"
 #include "Pvl.h"
 #include "SessionLog.h"
-#include "Filename.h"
+#include "UserInterface.h"
 
 namespace Isis {
 
@@ -771,7 +772,7 @@ namespace Isis {
     Isis::PvlGroup &uig = Isis::Preference::Preferences().FindGroup("UserInterface");
     std::string command = (std::string) uig["GuiHelpBrowser"] +
                           " http://isis.astrogeology.usgs.gov >> /dev/null &";
-    system(command.c_str());
+    ProgramLauncher::RunSystemCommand(command);
   }
 
   // Show help for the current app
@@ -786,7 +787,7 @@ namespace Isis {
     Isis::PvlGroup &uig = Isis::Preference::Preferences().FindGroup("UserInterface");
     std::string command = (std::string) uig["GuiHelpBrowser"] +
                           (std::string)" file:" + file.Expanded() + " &";
-    system(command.c_str());
+    ProgramLauncher::RunSystemCommand(command);
   }
 
   //! Activate helper buttons
