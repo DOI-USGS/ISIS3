@@ -1,92 +1,80 @@
 UnitTest for Camera Statistics
 Working
 0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Group = "User Parameters"
+
+User Parameters:
   Linc = 1
   Sinc = 1
-End_Group
 
-Group = Latitude
-  LatitudeMinimum           = -20.743419955997
-  LatitudeMaximum           = -18.686072173289
-  LatitudeAverage           = -19.71681386966
-  LatitudeStandardDeviation = 0.58835134290867
-End_Group
+Latitude:
+  LatitudeMinimum = -20.7434
+  LatitudeMaximum = -18.6861
+  LatitudeAverage = -19.7168
+  LatitudeStandardDeviation = 0.588351
 
-Group = Longitude
-  LongitudeMinimum           = 59.57478574391
-  LongitudeMaximum           = 61.760679042474
-  LongitudeAverage           = 60.674084136199
-  LongitudeStandardDeviation = 0.62505397316487
-End_Group
+Longitude:
+  LongitudeMinimum = 59.5748
+  LongitudeMaximum = 61.7607
+  LongitudeAverage = 60.6741
+  LongitudeStandardDeviation = 0.625054
 
-Group = SampleResolution
-  SampleResolutionMinimum           = 244.73491531858 <meters/pixel>
-  SampleResolutionMaximum           = 245.67634691522 <meters/pixel>
-  SampleResolutionAverage           = 245.01463448871 <meters/pixel>
-  SampleResolutionStandardDeviation = 0.18103889280198 <meters/pixel>
-End_Group
+SampleResolution:
+  SampleResolutionMinimum = 244.735
+  SampleResolutionMaximum = 245.676
+  SampleResolutionAverage = 245.015
+  SampleResolutionStandardDeviation = 0.181039
 
-Group = LineResolution
-  LineResolutionMinimum           = 244.73491531858 <meters/pixel>
-  LineResolutionMaximum           = 245.67634691522 <meters/pixel>
-  LineResolutionAverage           = 245.01463448871 <meters/pixel>
-  LineResolutionStandardDeviation = 0.18103889280198 <meters/pixel>
-End_Group
+LineResolution:
+  LineResolutionMinimum = 244.735
+  LineResolutionMaximum = 245.676
+  LineResolutionAverage = 245.015
+  LineResolutionStandardDeviation = 0.181039
 
-Group = Resolution
-  ResolutionMinimum           = 244.73491531858 <meters/pixel>
-  ResolutionMaximum           = 245.67634691522 <meters/pixel>
-  ResolutionAverage           = 245.01463448871 <meters/pixel>
-  ResolutionStandardDeviation = 0.18103889280198 <meters/pixel>
-End_Group
+Resolution:
+  ResolutionMinimum = 244.735
+  ResolutionMaximum = 245.676
+  ResolutionAverage = 245.015
+  ResolutionStandardDeviation = 0.181039
 
-Group = AspectRatio
-  AspectRatioMinimum           = 1.0
-  AspectRatioMaximun           = 1.0
-  AspectRatioAverage           = 1.0
-  AspectRatioStandardDeviation = 0.0
-End_Group
+AspectRatio:
+  AspectRatioMinimum = 1
+  AspectRatioMaximun = 1
+  AspectRatioAverage = 1
+  AspectRatioStandardDeviation = 0
 
-Group = PhaseAngle
-  PhaseMinimum           = 26.054237241148
-  PhaseMaximum           = 33.901113868904
-  PhaseAverage           = 30.017793870509
-  PhaseStandardDeviation = 1.6368195261582
-End_Group
+PhaseAngle:
+  PhaseMinimum = 26.0542
+  PhaseMaximum = 33.9011
+  PhaseAverage = 30.0178
+  PhaseStandardDeviation = 1.63682
 
-Group = EmissionAngle
-  EmissionMinimum           = 0.011134531995214
-  EmissionMaximum           = 5.8513054958698
-  EmissionAverage           = 2.9866724541674
-  EmissionStandardDeviation = 1.1256764927357
-End_Group
+EmissionAngle:
+  EmissionMinimum = 0.0111345
+  EmissionMaximum = 5.85131
+  EmissionAverage = 2.98667
+  EmissionStandardDeviation = 1.12568
 
-Group = IncidenceAngle
-  IncidenceMinimum           = 28.746959414683
-  IncidenceMaximum           = 31.56881410666
-  IncidenceAverage           = 30.162744173036
-  IncidenceStandardDeviation = 0.58835691504548
-End_Group
+IncidenceAngle:
+  IncidenceMinimum = 28.747
+  IncidenceMaximum = 31.5688
+  IncidenceAverage = 30.1627
+  IncidenceStandardDeviation = 0.588357
 
-Group = LocalSolarTime
-  LocalSolarTimeMinimum           = 10.419188834715 <hours>
-  LocalSolarTimeMaximum           = 10.56491505462 <hours>
-  LocalSolarTimeAverage           = 10.492475394201 <hours>
-  LocalSolarTimeStandardDeviation = 0.041670264876096 <hours>
-End_Group
+LocalSolarTime:
+  LocalSolarTimeMinimum = 10.4192
+  LocalSolarTimeMaximum = 10.5649
+  LocalSolarTimeAverage = 10.4925
+  LocalSolarTimeStandardDeviation = 0.0416703
 
-Group = LocalRadius
-  LocalRadiusMinimum           = 1737400.0
-  LocalRadiusMaximum           = 1737400.0
-  LocalRadiusAverage           = 1737400.0
-  LocalRadiusStandardDeviation = 0.0
-End_Group
+LocalRadius:
+  LocalRadiusMinimum = 1.7374e+06
+  LocalRadiusMaximum = 1.7374e+06
+  LocalRadiusAverage = 1.7374e+06
+  LocalRadiusStandardDeviation = 0
 
-Group = NorthAzimuth
-  NorthAzimuthMinimum           = 7.65717912202035e-04
-  NorthAzimuthMaximum           = 359.999865858
-  NorthAzimuthAverage           = 356.02518387129
-  NorthAzimuthStandardDeviation = 28.450666885516
-End_Group
+NorthAzimuth:
+  NorthAzimuthMinimum = 0.000765718
+  NorthAzimuthMaximum = 360
+  NorthAzimuthAverage = 356.025
+  NorthAzimuthStandardDeviation = 28.4507
 

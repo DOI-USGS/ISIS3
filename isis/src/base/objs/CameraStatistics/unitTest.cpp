@@ -18,11 +18,23 @@ int main(int argc, char *argv[]) {
     Isis::Cube cube;
     cube.Open("$Clementine1/testData/lna1391h.cub");
     Isis::Camera *cam = cube.Camera();
-    cout << setprecision(9);
+    cout << setprecision(6);
 
     Isis::CameraStatistics camStats(cam, 1, 1);
-    Isis::Pvl test = camStats.toPvl();
-    cout << test << endl;
+    Isis::Pvl statsPvl = camStats.toPvl();
+    cout << endl;
+
+    for (int i = 0; i < statsPvl.Groups(); i++) {
+      Isis::PvlGroup &group = statsPvl.Group(i);
+      cout << group.Name() << ":" << endl;
+
+      for (int j = 0; j < group.Keywords(); j++) {
+        Isis::PvlKeyword &keyword = group[j];
+        cout << "  " << keyword.Name() << " = " << (double) keyword[0] << endl;
+      }
+
+      cout << endl;
+    }
   }
   catch(Isis::iException &e) {
     e.Report();
