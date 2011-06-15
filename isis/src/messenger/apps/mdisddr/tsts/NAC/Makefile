@@ -2,6 +2,7 @@ APPNAME = mdisddr
 
 output.cub.TOLERANCE = 0.0000002
 output.pvl.IGNORELINES = PRODUCT_CREATION_TIME
+#NOPREFERENCES=
 
 include $(ISISROOT)/make/isismake.tsts
 

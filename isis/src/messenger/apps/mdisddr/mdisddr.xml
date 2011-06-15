@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- $Id: mdisddr.xml,v 1.3 2009/09/08 21:35:48 kbecker Exp $ -->
+<!-- $Id$ -->
 
 <application name="mdisddr" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
@@ -44,6 +44,10 @@
     </change>
     <change name="Kris Becker" date="2009-09-08">
         Added additional documentation.
+    </change>
+    <change name="Kris Becker" date="2011-06-15">
+        Removed local copy of Kernels class, now using system version.  Updated 
+        label translations to propagate ORBIT_NUMBER to output PDS DDR file.
     </change>
   </history>
 

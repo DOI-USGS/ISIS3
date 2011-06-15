@@ -103,7 +103,7 @@ inline void WriteBand(ProcessExportPds &process, ofstream &out,
 void IsisMain() {
   const std::string mdisddr_program = "mdisddr";
   const std::string mdisddr_version = "1.0";
-  const std::string mdisddr_revision = "$Revision: 1.1 $";
+  const std::string mdisddr_revision = "$Revision$";
   const std::string mdisddr_runtime = Application::DateTime();
   const std::string dataSetID = "MESS-E/V/H-MDIS-6-DDR-GEOMDATA-V1.0";
 
@@ -264,11 +264,12 @@ void IsisMain() {
     //  For DDRs, the SOURCE_PRODUCT_ID is made up of SPICE kernels.  I need to
     //  go get em.
     Kernels kernels(from);
-    Kernels::KernelFiles kfiles = kernels.getList(true);
+    vector<string> kfiles = kernels.getKernelList();
     PvlKeyword &source_product_id = pdsLabel.FindKeyword("SOURCE_PRODUCT_ID", Pvl::Traverse);
     source_product_id.Clear();
     for(unsigned int i = 0; i < kfiles.size(); i++) {
-      source_product_id.AddValue(Quote(kfiles[i]));
+      Filename kfile(kfiles[i]);
+      source_product_id.AddValue(Quote(kfile.Name()));
     }
 
     //  Enforce parentheses for scalars
