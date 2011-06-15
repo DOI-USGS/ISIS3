@@ -66,6 +66,9 @@ namespace Qisis {
     * @history 2010-12-01 Eric Hyer - Added stretch locking
     * @history 2011-06-07 Debbie A. Cook and Tracie Sucharski - Changed point
     *     type "Ground" to "Fixed".
+    * @history 2011-06-14 Tracie Sucharski - Added mouseClick signal.  Qnet 
+    *     needed to know if user moved the tackpoint vs. simply loading a new
+    *     chip, or geoming the chip.
     */
   class ChipViewport : public QWidget {
       Q_OBJECT
@@ -119,6 +122,7 @@ namespace Qisis {
     signals:
       //!< Signal sent when tack point changes
       void tackPointChanged(double);
+      void mouseClicked();
 
     public slots:
 
