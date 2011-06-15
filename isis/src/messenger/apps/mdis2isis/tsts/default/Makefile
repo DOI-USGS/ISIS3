@@ -1,5 +1,6 @@
 APPNAME = mdis2isis
 
+#NOPREFERENCES=
 include $(ISISROOT)/make/isismake.tsts
 
 commands:

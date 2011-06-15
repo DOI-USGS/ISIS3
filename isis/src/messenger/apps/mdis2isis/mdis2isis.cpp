@@ -1,4 +1,4 @@
-// $Id: mdis2isis.cpp,v 1.18 2009/12/29 21:45:54 slambright Exp $
+// $Id$
 #include "Isis.h"
 
 #include <cfloat>
@@ -106,9 +106,15 @@ void IsisMain() {
     target = ui.GetString("TARGET");
   }
 
+  // Perform PDS/EDR source keyword translations to ISIS label keywords
   p.SetPdsFile(inFile.Expanded(), "", pdsLabel);
   Pvl outLabel = TranslateMdisEdrLabels(inFile, target);
   PvlKeyword sourceId("SourceProductId", '"' + inFile.Basename() + '"');
+
+  //  Create YearDoy keyword in Archive group
+  iTime stime(outLabel.FindGroup("Instrument", Pvl::Traverse)["StartTime"][0]);
+  PvlKeyword yeardoy("YearDoy", stime.Year()*1000 + stime.DayOfYear());
+  (void) outLabel.FindGroup("Archive", Pvl::Traverse).AddKeyword(yeardoy);
 
   if(ui.GetBoolean("UNLUT") == false || !needsUnlut) {
     // We're not going to unlut the data, so just set output cube
@@ -176,7 +182,7 @@ Pvl TranslateMdisEdrLabels(Filename &labelFile, const std::string &target) {
   //Create a PVL to store the translated labels
   Pvl outLabel;
 
-  // Get the directory where the MRO HiRISE translation tables are.
+  // Get the directory where the MESSENGER/MDIS translation tables are.
   PvlGroup dataDir(Preference::Preferences().FindGroup("DataDirectory"));
   iString transDir = (string) dataDir["Messenger"] + "/translations/";
 

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- $Id: mdis2isis.xml,v 1.13 2009/12/29 21:45:54 slambright Exp $ -->
+<!-- $Id$ -->
 
 <application name="mdis2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
@@ -70,6 +70,13 @@
       Now looking for mdisCalibration????.trn in $messenger/calibration instead of
       $messenger/translations
     </change>
+      <change name="Kris Becker" date="2011-06-15">
+          Added YearDoy keyword to the Archive group. The format is a valid 
+          numerical value.  This value is created from the StartTime, 
+          multiplying the year by 1000 and adding the day-of-year ; added the 
+          OrbitNumber keyword to the translation tables for inclusion in the 
+          Archive group. 
+      </change>
   </history>
 
   <groups>
