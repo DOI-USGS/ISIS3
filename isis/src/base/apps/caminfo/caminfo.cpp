@@ -4,6 +4,7 @@
 #include <string>
 #include <iostream>
 
+#include "CameraStatistics.h"
 #include "CamTools.h"
 #include "Filename.h"
 #include "iException.h"
@@ -78,20 +79,11 @@ void IsisMain() {
   if(ui.GetBoolean("CAMSTATS")) {
     camstats = new QList< QPair<iString, iString> >;
 
-    Pvl camPvl; // This becomes useful if there is only one band, which is
-    Filename tempCamPvl;
-    tempCamPvl.Temporary(in.Basename() + "_", "pvl");
-    string pvlOut = tempCamPvl.Expanded();
-    // Set up camstats run and execute
-    string parameters = "FROM=" + ui.GetAsString("FROM") +
-                        " TO=" + pvlOut +
-                        " LINC=" + iString(ui.GetInteger("LINC")) +
-                        " SINC=" + iString(ui.GetInteger("SINC"));
-
-    ProgramLauncher::RunIsisProgram("camstats", parameters);
-    // Output to common object of the PVL
-    camPvl.Read(pvlOut);
-    remove(pvlOut.c_str());
+    string filename = ui.GetAsString("FROM");
+    int sinc = ui.GetInteger("SINC");
+    int linc = ui.GetInteger("LINC");
+    CameraStatistics stats(filename, sinc, linc);
+    Pvl camPvl = stats.toPvl();
 
     PvlGroup cg = camPvl.FindGroup("Latitude", Pvl::Traverse);
     camstats->append(MakePair("MinimumLatitude", cg["latitudeminimum"][0]));
