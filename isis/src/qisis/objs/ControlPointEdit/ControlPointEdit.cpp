@@ -3,6 +3,7 @@
 #include <QApplication>
 #include <QButtonGroup>
 #include <QCheckBox>
+#include <QColor>
 #include <QDial>
 #include <QDoubleSpinBox>
 #include <QFileDialog>
@@ -10,6 +11,7 @@
 #include <QHBoxLayout>
 #include <QLCDNumber>
 #include <QMessageBox>
+#include <QPalette>
 #include <QPushButton>
 #include <QRadioButton>
 #include <QScrollBar>
@@ -295,6 +297,9 @@ namespace Qisis {
     connect(this, SIGNAL(updateLeftView(double, double)),
             p_leftView, SLOT(refreshView(double, double)));
 
+    connect (p_leftView, SIGNAL(mouseClicked()),
+             this, SLOT(colorizeSaveButton()));
+
     if(p_allowLeftMouse) {
       //  Connect pan buttons to ChipViewport
       connect(leftPanUp, SIGNAL(clicked()), p_leftView, SLOT(panUp()));
@@ -324,6 +329,8 @@ namespace Qisis {
     connect(this, SIGNAL(updateRightView(double, double)),
             p_rightView, SLOT(refreshView(double, double)));
 
+    connect (p_rightView, SIGNAL(mouseClicked()),
+             this, SLOT(colorizeSaveButton()));
 
     connect(p_rightZoomIn, SIGNAL(clicked()), p_rightView, SLOT(zoomIn()));
     connect(p_rightZoomOut, SIGNAL(clicked()), p_rightView, SLOT(zoomOut()));
@@ -477,16 +484,17 @@ namespace Qisis {
 
     QHBoxLayout *rightLayout = new QHBoxLayout();
     p_autoReg = new QPushButton("Register");
-    QPushButton *save = new QPushButton("Save Measures");
+    p_saveMeasure = new QPushButton("Save Measure");
+    p_saveDefaultPalette = p_saveMeasure->palette();
 
     rightLayout->addWidget(p_autoReg);
-    rightLayout->addWidget(save);
+    rightLayout->addWidget(p_saveMeasure);
     rightLayout->addStretch();
     gridLayout->addLayout(rightLayout, row, 1);
 
     connect(find, SIGNAL(clicked()), this, SLOT(findPoint()));
     connect(p_autoReg, SIGNAL(clicked()), this, SLOT(registerPoint()));
-    connect(save, SIGNAL(clicked()), this, SLOT(saveMeasure()));
+    connect(p_saveMeasure, SIGNAL(clicked()), this, SLOT(saveMeasure()));
 
     setLayout(gridLayout);
 
@@ -607,6 +615,9 @@ namespace Qisis {
     updateRightGeom();
     //p_rightView->geomChip(p_leftChip,p_leftCube);
 
+    // New right measure, make sure Save Measure Button text is default
+    p_saveMeasure->setPalette(p_saveDefaultPalette);
+
   }
 
 
@@ -673,6 +684,22 @@ namespace Qisis {
     p_rightZoomFactor->setText(pos);
 
   }
+
+
+  /**
+   * Turn "Save Measure" button text to red
+   *
+   * @author 2011-06-14 Tracie Sucharski
+   */
+  void ControlPointEdit::colorizeSaveButton() {
+
+    QColor qc = Qt::red;
+    QPalette p = p_saveMeasure->palette();
+    p.setColor(QPalette::ButtonText,qc);
+    p_saveMeasure->setPalette(p);
+
+  }
+
 
 
   //! Find point from left ChipViewport in the right ChipViewport
@@ -844,6 +871,8 @@ namespace Qisis {
    *                          subPixelRegistered, but the new position has
    *                          not be sub-pixel registered, change measure type
    *                          and get rid of goodness of fit.
+   *   @history 2011-06-14 Tracie Sucharski - Change Save Measure button text
+   *                          back to black.
    *  
    */
   void ControlPointEdit::saveMeasure() {
@@ -903,6 +932,9 @@ namespace Qisis {
       *p_leftMeasure = *p_rightMeasure;
       setLeftMeasure(p_leftMeasure,p_leftCube,p_pointId);
     }
+
+    //  Change Save Measure button text back to default palette
+    p_saveMeasure->setPalette(p_saveDefaultPalette);
 
     //  Redraw measures on viewports
     emit measureSaved();
