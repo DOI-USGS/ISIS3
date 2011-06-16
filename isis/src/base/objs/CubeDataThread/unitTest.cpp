@@ -3,18 +3,19 @@
 #include <iostream>
 #include <unistd.h>
 
+#include "Cube.h"
 #include "CubeDataThread.h"
 #include "CubeDataThreadTester.h"
 #include "Filename.h"
-#include "Cube.h"
+#include "ProgramLauncher.h"
 
 using namespace Isis;
 
 using namespace std;
 
 void IsisMain() {
-  system("cp unitTest.cub unitTest2.cub");
-  system("cp unitTest.cub unitTest3.cub");
+  ProgramLauncher::RunSystemCommand("cp unitTest.cub unitTest2.cub");
+  ProgramLauncher::RunSystemCommand("cp unitTest.cub unitTest3.cub");
 
   CubeDataThread *cubeData = new CubeDataThread();
 

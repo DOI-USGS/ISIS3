@@ -231,6 +231,8 @@ int main(int argc, char *argv[]) {
     e.Report(false);
   }
 
+  /*
+  Enum value of -1 is undefined and cannot be properly tested.
   try {
     Displacement disp(1, (Displacement::Units)-1);
     disp.SetKilometers(-1);
@@ -238,6 +240,7 @@ int main(int argc, char *argv[]) {
   catch(iException &e) {
     e.Report(false);
   }
+  */
 
   try {
     Displacement() > Displacement();
