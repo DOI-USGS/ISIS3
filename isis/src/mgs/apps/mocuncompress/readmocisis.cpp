@@ -141,13 +141,19 @@ int main(int argc, char **argv)
 
   if(argc < 3) {
     printf("\nEnter name of file to be decompressed: ");
-    fgets(infname, 256, stdin);
+    if(!fgets(infname, 256, stdin)) {
+      fprintf(stderr, "Encountered error while tring to read name of "
+              "file to be decompressed\n");
+    }
     int inLen = strlen(infname) - 1;
     if(inLen == '\n') infname[inLen] = '\0';
     printf("\nEnter name of uncompressed output file: ");
     int outLen = strlen(outfname) - 1;
     if(outLen == '\n') outfname[outLen] = '\0';
-    fgets(outfname, 256, stdin);
+    if(!fgets(outfname, 256, stdin)) {
+      fprintf(stderr, "Encountered error while tring to read name of "
+              "uncompressed output file\n");
+    }
   }
   else {
     strcpy(infname, argv[1]);
@@ -236,7 +242,12 @@ int main(int argc, char **argv)
     // check MSDP checksum
     if(cs_check) {
       memmove(chunk, &h, sizeof(h));
-      fread(chunk + datlen + sizeof(h), 1, 1, infile);
+      if(fread(chunk + datlen + sizeof(h), 1, 1, infile) != 1
+         && ferror(infile) && verbose) {
+        fprintf(stderr, "Encountered error while tring to read MSDP "
+                "checksum\n");
+      }
+      
       if(!CS8EACC2(chunk, datlen + sizeof(h) + 1)) {
         if(verbose) fprintf(stderr, "Error: bad MSDP checksum\n");
         status |= STAT_BADCS;
