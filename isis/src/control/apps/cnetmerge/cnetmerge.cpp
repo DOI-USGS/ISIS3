@@ -182,7 +182,7 @@ ControlPoint *MergePoints(ControlPoint *addPoint, ControlPoint *basePoint,
   // resulting merged point.  If there are conflicts, attempt to resolve them
   // using rules defined by the program user.
   mergeHasConflicts = false;
-  for (int addIndex = 0; addIndex < mergedPoint->GetNumMeasures(); addIndex++) {
+  for (int addIndex = 0; addIndex < addPoint->GetNumMeasures(); addIndex++) {
     bool merged = false;
     ControlMeasure *addMeasure = addPoint->GetMeasure(addIndex);
 
@@ -195,6 +195,7 @@ ControlPoint *MergePoints(ControlPoint *addPoint, ControlPoint *basePoint,
       //   mergee
       if (addMeasure->GetCubeSerialNumber() ==
           mergedMeasure->GetCubeSerialNumber()) {
+
         // If we have a fixed point in our merger then try to propagate it to
         //   the mergee.
         if (addPoint->GetType() == ControlPoint::Fixed) {
@@ -212,7 +213,10 @@ ControlPoint *MergePoints(ControlPoint *addPoint, ControlPoint *basePoint,
 
             // Copy the rest of merger's information to mergee, mergee will be
             //   a reference since merger is a reference.
-            mergedMeasure = addMeasure;
+            mergedPoint->Delete(mergedMeasure);
+            ControlMeasure *newMeasure = new ControlMeasure(*addMeasure);
+            mergedPoint->Add(newMeasure);
+
             mergeHasConflicts = true; // lost some information
           }
         }
@@ -227,7 +231,7 @@ ControlPoint *MergePoints(ControlPoint *addPoint, ControlPoint *basePoint,
       // No matching serial number was found, we need to pull over this measure
       e.Clear();
 
-      ControlMeasure *newMeasure = addMeasure;
+      ControlMeasure *newMeasure = new ControlMeasure(*addMeasure);
 
       // We have a new reference
       if (mergedPoint->IsReferenceExplicit() &&

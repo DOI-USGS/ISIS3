@@ -36,6 +36,7 @@
 #include "ControlNetFileV0002.pb.h"
 #include "SpecialPixel.h"
 
+using namespace std;
 
 namespace Isis {
   /**
@@ -154,7 +155,6 @@ namespace Isis {
     p_sampleResidual = other.p_sampleResidual;
     p_lineResidual = other.p_lineResidual;
     p_camera = other.p_camera;
-    parentPoint = other.parentPoint;
     associatedCSN = other.associatedCSN;
   }
 
@@ -958,6 +958,8 @@ namespace Isis {
       p_loggedData = NULL;
     }
 
+    parentPoint = NULL;
+
     p_serialNumber = new iString;
     p_chooserName = new iString;
     p_dateTime = new iString;
@@ -985,7 +987,6 @@ namespace Isis {
     p_focalPlaneMeasuredY = other.p_focalPlaneMeasuredY;
     p_focalPlaneComputedX = other.p_focalPlaneComputedX;
     p_focalPlaneComputedY = other.p_focalPlaneComputedY;
-    parentPoint = other.parentPoint;
     associatedCSN = other.associatedCSN;
 
     return *this;

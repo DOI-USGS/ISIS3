@@ -88,7 +88,7 @@ namespace Isis {
     if (referenceMeasure == NULL && cubeSerials->size() != 0)
       referenceMeasure = measures->value(cubeSerials->at(0));
 
-    parentNetwork = other.parentNetwork;
+    parentNetwork = NULL;
     id = other.id;
     chooserName = other.chooserName;
     dateTime = other.dateTime;
@@ -1893,6 +1893,8 @@ namespace Isis {
     if (referenceMeasure == NULL && cubeSerials->size() != 0)
       referenceMeasure = measures->value(cubeSerials->at(0));
 
+    parentNetwork = NULL;
+
     id             = other.id;
     chooserName    = other.chooserName;
     dateTime       = other.dateTime;
@@ -2007,6 +2009,7 @@ namespace Isis {
     if (!GetAprioriSurfacePointSourceFile().empty()) {
       fileEntry.set_apriorisurfpointsourcefile(GetAprioriSurfacePointSourceFile());
     }
+
     switch (GetAprioriRadiusSource()) {
       case ControlPoint::RadiusSource::None:
         break;
@@ -2028,6 +2031,7 @@ namespace Isis {
       default:
         break;
     }
+
     if (!GetAprioriRadiusSourceFile().empty()) {
       fileEntry.set_aprioriradiussourcefile(GetAprioriRadiusSourceFile());
     }
@@ -2081,8 +2085,10 @@ namespace Isis {
     }
 
     //  Process all measures in the point
-    for (int i = 0; i < cubeSerials->size(); i++)
-      *fileEntry.add_measures() = (*measures)[cubeSerials->at(i)]->ToProtocolBuffer();
+    for (int i = 0; i < cubeSerials->size(); i++) {
+      *fileEntry.add_measures() =
+        (*measures)[cubeSerials->at(i)]->ToProtocolBuffer();
+    }
 
     return fileEntry;
   }
