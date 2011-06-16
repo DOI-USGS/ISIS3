@@ -47,10 +47,12 @@ using namespace std;
 namespace Isis {
 
 
+  /** Default constructor */
 SpiceSegment::SpiceSegment() { 
   init(); 
 }
 
+/** Construct with an ISIS cube file */
 SpiceSegment::SpiceSegment(const std::string &fname) {
   init();
   Cube cube;
@@ -58,20 +60,45 @@ SpiceSegment::SpiceSegment(const std::string &fname) {
   import(cube);
 }
 
+/** Construct with a Cube and optional naming of table */
 SpiceSegment::SpiceSegment(Cube &cube, const std::string &tblname) {
   init();
   import(cube, tblname);
 }
 
+/** Set the name of the CK SPICE segment */
 void SpiceSegment::setId(const std::string &name) {
   _name = name;
   return;
 }
 
+/**
+ * @brief Provide specified kernel types 
+ *  
+ * This method is provided to load (furnsh) NAIF kernels.  This is typically 
+ * required at the time the output CK file is created. 
+ * 
+ * @param ktypes Kernel types to load.  If empty, all kernels in the cube file 
+ *               will be loaded.  Example would be "FK,SCLK,LSK".
+ * 
+ * @return int Returns number of kernels loaded
+ */
 int SpiceSegment::FurnshKernelType(const std::string &ktypes) const {
   return (_kernels.Load(ktypes));
 }
 
+/**
+ * @brief Unload NAIF kernels of specified type 
+ *  
+ * This method unloads NAIF SPICE kernels that are associate with the specified 
+ * types in the ktypes parameter.  It can be used in succession with the 
+ * FurnshKernelType() method above. 
+ * 
+ * @param ktypes  Kernel types to unload.  If empty, all kernels in the cube 
+ *               file will be unloaded.  Example would be "FK,SCLK,LSK".
+ * 
+ * @return int  Returns number of kernels unloaded
+ */
 int SpiceSegment::UnloadKernelType(const std::string &ktypes) const {
   return (_kernels.UnLoad(ktypes));
 }
@@ -173,8 +200,8 @@ void SpiceSegment::import(Cube &cube, const std::string &tblname) {
     _startTime = _times[0];
     _endTime = _times[size(_times)-1];
 
-    // Load necesary kernels
-    _kernels.Load("FK,SCLK,LSK");
+    // Load necesary kernels (IAK for Cassini, mainly)
+    _kernels.Load("FK,SCLK,LSK,IAK");
 
     //  Here's where all the heavy lifting occurs.
     SMatSeq lmats, rmats;
@@ -210,7 +237,7 @@ void SpiceSegment::import(Cube &cube, const std::string &tblname) {
 
     _utcStartTime = toUTC(startTime());
     _utcEndTime   = toUTC(endTime());
-    _kernels.UnLoad("FK,SCLK,LSK");
+    _kernels.UnLoad("FK,SCLK,LSK,IAK");
 
   } catch ( iException &ie  ) {
     ostringstream mess;
@@ -391,55 +418,27 @@ void SpiceSegment::getRotationMatrices(Cube &cube, Camera &camera, Table &table,
   // Set CK instrument code
   _instCode = toId;
 
-  // Now check to see if we have the more complicated condition of time-dependent
-  // rotations.
-#if defined(CODE_FOR_NO_DYNAMIC_KERNELS_NEEDED) 
-  if ( (LtoId != toId) || (fromId != 1) ) {
-#endif
-    Spice mySpice(*cube.Label(), true);  // load w/out tables
+  // Load SPICE and extract necessary contents
+  Spice mySpice(*cube.Label(), true);  // load w/out tables
 
-    string CLtoId = getFrameName(LtoId);
-    string CtoId = getFrameName(toId);
-    _instFrame = CtoId;
-    string CfromId = getFrameName(fromId);
-    _refFrame = CfromId;
-    string CLfromId = getFrameName(LfromId);
+  string CLtoId = getFrameName(LtoId);
+  string CtoId = getFrameName(toId);
+  _instFrame = CtoId;
+  string CfromId = getFrameName(fromId);
+  _refFrame = CfromId;
+  string CLfromId = getFrameName(LfromId);
 
-    SMatSeq lmat(size(_times)), rmat(size(_times)), avr(size(_times));
-    for ( int i = 0 ; i < size(_times) ; i++ ) {
-      SMatrix left = computeStateRotation(CtoId, CLtoId, _times[i]);
-      SMatrix right = computeStateRotation(CfromId, CLfromId, _times[i]);
-      lmat[i] = left;
-      rmat[i] = right;
-    }
-
-    lmats = lmat;
-    rmats = rmat;
-    sclks = convertTimes(camera.NaifSclkCode(), _times);
-
-#if defined(CODE_FOR_NO_DYNAMIC_KERNELS_NEEDED) 
+  SMatSeq lmat(size(_times)), rmat(size(_times)), avr(size(_times));
+  for ( int i = 0 ; i < size(_times) ; i++ ) {
+    SMatrix left = computeStateRotation(CtoId, CLtoId, _times[i]);
+    SMatrix right = computeStateRotation(CfromId, CLfromId, _times[i]);
+    lmat[i] = left;
+    rmat[i] = right;
   }
-  else {  //  The label contains all that is needed
 
-    SVector av(3, 0.0);  // Constant angular velocity
-
-    SMatrix lmat = getConstantRotation(table);
-    SMatrix left(6,6);
-    rav2xf_c((SpiceDouble (*)[3]) lmat[0], &av[0], 
-               (SpiceDouble (*)[6]) left[0]);
-
-    SMatrix rmat = getIdentityRotation();
-    SMatrix right(6,6);
-    rav2xf_c((SpiceDouble (*)[3]) rmat[0], &av[0], 
-               (SpiceDouble (*)[6]) right[0]);
-
-    _refFrame = getFrameName(fromId);
-
-    lmats = SMatSeq(1, left);
-    rmats = SMatSeq(1,right);
-    sclks = convertTimes(camera.NaifSclkCode(), _times);
-  }
-#endif
+  lmats = lmat;
+  rmats = rmat;
+  sclks = convertTimes(camera.NaifSclkCode(), _times);
 
   return;
 }
@@ -542,7 +541,7 @@ std::string SpiceSegment::getComment() const {
 
   comment <<
 "  CamVersion: " << _camVersion << endl;
-  std::vector<std::string> klist = _kernels.getList();
+  std::vector<std::string> klist = _kernels.getKernelList();
   if ( klist.size() > 0 ) {
     comment << 
 "  Kernels:    \n";

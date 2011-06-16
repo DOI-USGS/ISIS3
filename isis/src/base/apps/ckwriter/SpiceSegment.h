@@ -37,7 +37,7 @@
 #include "tnt/tnt_array2d.h"
 #include "tnt/tnt_array2d_utils.h"
 
-#include "LocalKernels.h"
+#include "Kernels.h"
 #include "iString.h"
 #include "iException.h"
 
@@ -62,6 +62,10 @@ class PvlObject;
  * @history 2011-05-04 Kris Becker Added pad time. 
  * @history 2011-05-29 Debbie A. Cook Changed name of local Kernels class to
  *                                    LocalKernels to avoid confusion
+ * @history 2011-06-15 Kris Becker Removed use of LocalKernels and use version 
+ *                                  in system; added loading of IAK kernel
+ *                                  specifically for Cassini support; removed
+ *                                  conditionalized obsolete code.
  * 
  */
 class SpiceSegment {
@@ -120,7 +124,7 @@ class SpiceSegment {
     typedef TNT::Array1D<SMatrix>     SMatSeq;       //!<  Time ordered matrices
 
     // Mutable for full loading/unloading of kernels w/o restrictions
-    mutable LocalKernels  _kernels;
+    mutable Kernels  _kernels;
     int         _camVersion;
     std::string _name;
     std::string _fname;
