@@ -33,7 +33,7 @@ void IsisMain() {
   for(unsigned int i = 0; i < tokens.size(); i++) {
     double percentage = iString::ToDouble(tokens[i]);
     // Obtain the Histogram and the value at the percentage
-    Histogram *hist = icube->Histogram();
+    Histogram *hist = icube->getHistogram();
     double value = hist->Percent(percentage);
     kwPercent += percentage;
     kwValue += value;

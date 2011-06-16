@@ -53,9 +53,9 @@ void IsisMain() {
   PvlGroup calgrp("Radiometry");
 
   //check if the image is calibrated
-  if(pack->HasGroup("Radiometry")) {
-    string msg = "The MI image [" + pack->Filename() + "] has already been ";
-    msg += "radiometrically calibrated";
+  if(pack->hasGroup("Radiometry")) {
+    string msg = "The MI image [" + pack->getFilename() + "] has already "
+                 "been radiometrically calibrated";
     throw iException::Message(iException::User, msg, _FILEINFO_);
   }
 
@@ -120,10 +120,10 @@ void IsisMain() {
   else if(ui.WasEntered("REFPIXIMAGE")) {
     Brick *b;
     Cube ERPfile;
-    ERPfile.Open(ui.GetFilename("REFPIXIMAGE"));
-    b = new Brick(11, 201, 1, ERPfile.PixelType());
+    ERPfile.open(ui.GetFilename("REFPIXIMAGE"));
+    b = new Brick(11, 201, 1, ERPfile.getPixelType());
     b->SetBasePosition(4, 412, 1);
-    ERPfile.Read(*b);
+    ERPfile.read(*b);
 
     Statistics stat;
     b->SetBaseLine(5);
@@ -212,7 +212,7 @@ void IsisMain() {
 
 //write Radiometry group to the output cube.
   Cube *opack = p.SetOutputCube("TO");
-  opack->PutGroup(calgrp);
+  opack->putGroup(calgrp);
 
   p.StartProcess(gbl::Calibrate);
   p.EndProcess();

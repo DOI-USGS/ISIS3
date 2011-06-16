@@ -29,49 +29,49 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   string from = ui.GetAsString("FROM");
   CubeAttributeInput inAtt(from);
-  cube.SetVirtualBands(inAtt.Bands());
+  cube.setVirtualBands(inAtt.Bands());
   from = ui.GetFilename("FROM");
-  cube.Open(from);
+  cube.open(from);
 
   // Determine the sub-area to extract
   ss = ui.GetInteger("SAMPLE");
   sl = ui.GetInteger("LINE");
   sb = 1;
 
-  int origns = cube.Samples();
-  int orignl = cube.Lines();
-  int es = cube.Samples();
+  int origns = cube.getSampleCount();
+  int orignl = cube.getLineCount();
+  int es = cube.getSampleCount();
   if(ui.WasEntered("NSAMPLES")) es = ui.GetInteger("NSAMPLES") + ss - 1;
-  int el = cube.Lines();
+  int el = cube.getLineCount();
   if(ui.WasEntered("NLINES")) el = ui.GetInteger("NLINES") + sl - 1;
-  int eb = cube.Bands();
+  int eb = cube.getBandCount();
 
   sinc = ui.GetInteger("SINC");
   linc = ui.GetInteger("LINC");
 
   // Make sure starting positions fall within the cube
-  if(ss > cube.Samples()) {
-    cube.Close();
+  if(ss > cube.getSampleCount()) {
+    cube.close();
     string msg = "[SAMPLE] exceeds number of samples in the [FROM] cube";
     throw iException::Message(iException::User, msg, _FILEINFO_);
   }
 
-  if(sl > cube.Lines()) {
-    cube.Close();
+  if(sl > cube.getLineCount()) {
+    cube.close();
     string msg = "[LINE] exceeds number of lines in the [FROM] cube";
     throw iException::Message(iException::User, msg, _FILEINFO_);
   }
 
   // Make sure the number of elements do not fall outside the cube
-  if(es > cube.Samples()) {
-    cube.Close();
+  if(es > cube.getSampleCount()) {
+    cube.close();
     string msg = "[SAMPLE+NSAMPLES-1] exceeds number of ";
     msg += "samples in the [FROM] cube";
     throw iException::Message(iException::User, msg, _FILEINFO_);
   }
 
-  if(el > cube.Lines()) {
-    cube.Close();
+  if(el > cube.getLineCount()) {
+    cube.close();
     string msg = "[LINE+NLINES-1] exceeds number of ";
     msg += "lines in the [FROM] cube";
     throw iException::Message(iException::User, msg, _FILEINFO_);
@@ -93,7 +93,7 @@ void IsisMain() {
   p.ClearInputCubes();
 
   // propagate tables manually
-  Pvl &inLabels = *cube.Label();
+  Pvl &inLabels = *cube.getLabel();
 
   // Loop through the labels looking for object = Table
   for(int labelObj = 0; labelObj < inLabels.Objects(); labelObj++) {
@@ -119,7 +119,7 @@ void IsisMain() {
     /* Deal with associations, sample first
     if(table.IsSampleAssociated()) {
       int numDeleted = 0;
-      for(int samp = 0; samp < cube.Samples(); samp++) {
+      for(int samp = 0; samp < cube.getSampleCount(); samp++) {
         // This tests checks to see if we would include this sample.
         //   samp - (ss-1)) / sinc must be a whole number less than ns.
         if((samp - (ss-1)) % sinc != 0 || (samp - (ss-1)) / sinc >= ns || (samp - (ss-1)) < 0) {
@@ -132,7 +132,7 @@ void IsisMain() {
     // Deal with line association
     if(table.IsLineAssociated()) {
       int numDeleted = 0;
-      for(int line = 0; line < cube.Lines(); line++) {
+      for(int line = 0; line < cube.getLineCount(); line++) {
         // This tests checks to see if we would include this line.
         //   line - (sl-1)) / linc must be a whole number less than nl.
         if((line - (sl-1)) % linc != 0 || (line - (sl-1)) / linc >= nl || (line - (sl-1)) < 0) {
@@ -143,10 +143,10 @@ void IsisMain() {
     }*/
 
     // Write the table
-    ocube->Write(table);
+    ocube->write(table);
   }
 
-  Pvl &outLabels = *ocube->Label();
+  Pvl &outLabels = *ocube->getLabel();
   if(!ui.GetBoolean("PROPSPICE") && outLabels.FindObject("IsisCube").HasGroup("Kernels")) {
     PvlGroup &kerns = outLabels.FindObject("IsisCube").FindGroup("Kernels");
 
@@ -192,7 +192,7 @@ void IsisMain() {
 
   // Cleanup
   p.EndProcess();
-  cube.Close();
+  cube.close();
 
   // Write the results to the log
   Application::Log(results);
@@ -203,7 +203,7 @@ void crop(Buffer &out) {
   // Read the input line
   int iline = sl + (out.Line() - 1) * linc;
   in->SetLine(iline, sb);
-  cube.Read(*in);
+  cube.read(*in);
 
   // Loop and move appropriate samples
   for(int i = 0; i < out.size(); i++) {

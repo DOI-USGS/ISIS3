@@ -31,14 +31,14 @@ int main() {
   // Open the cube
   Cube cube;
   Cube cube1;
-  cube.Open(inFile, "r");
+  cube.open(inFile, "r");
 
   ImagePolygon poly;
   try {
     poly.Create(cube);
   }
   catch(iException &e) {
-    std::string msg = "Cannot create polygon for [" + cube.Filename() + "]";
+    std::string msg = "Cannot create polygon for [" + cube.getFilename() + "]";
     throw iException::Message(iException::Programmer, msg, _FILEINFO_);
   }
 
@@ -54,7 +54,7 @@ int main() {
     poly.Create(cube, 12, 1, 384, 640, 385);
   }
   catch(iException &e) {
-    std::string msg = "Cannot create sub-polygon for [" + cube.Filename() + "]";
+    std::string msg = "Cannot create sub-polygon for [" + cube.getFilename() + "]";
     throw iException::Message(iException::Programmer, msg, _FILEINFO_);
   }
 
@@ -71,7 +71,7 @@ int main() {
   }
   catch(iException &e) {
     std::string msg = "Cannot create lower quality polygon for [" +
-        cube.Filename() + "]";
+        cube.getFilename() + "]";
     throw iException::Message(iException::Programmer, msg, _FILEINFO_);
   }
   //  write poly as WKT
@@ -80,6 +80,6 @@ int main() {
       "'s/\\([0-9][0-9]*\\.[0-9][0-9][0-9][0-9][0-9][0-9]\\)\\([0-9]*\\)/\\1/g'"
     );
 
-  cube.Close();
+  cube.close();
 }
 

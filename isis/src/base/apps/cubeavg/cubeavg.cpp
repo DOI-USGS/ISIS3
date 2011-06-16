@@ -21,13 +21,13 @@ void IsisMain() {
   ProcessBySpectra p;
   p.SetType(ProcessBySpectra::PerPixel);
   Cube *icube = p.SetInputCube("FROM");
-  Cube *ocube = p.SetOutputCube("TO", icube->Samples(), icube->Lines(), 1);
+  Cube *ocube = p.SetOutputCube("TO", icube->getSampleCount(), icube->getLineCount(), 1);
 
   //Get user parameters and sets outputcube's BandBin
   UserInterface &ui = Application::GetUserInterface();
   if(ui.GetString("BANDBIN") == "COMPUTE") {
-    if(icube->HasGroup("BandBin")) {
-      PvlGroup &pvlg = icube->GetGroup("BandBin");
+    if(icube->hasGroup("BandBin")) {
+      PvlGroup &pvlg = icube->getGroup("BandBin");
       removekeywords(pvlg);
       if(pvlg.HasKeyword("Center")) {
         bool hasWidth = pvlg.HasKeyword("Width");
@@ -37,9 +37,9 @@ void IsisMain() {
           pvlWidth = & pvlg.FindKeyword("Width");
         }
         std::vector<double> centers;
-        centers.resize(icube->Bands());
+        centers.resize(icube->getBandCount());
         std::vector<double> widths;
-        widths.resize(icube->Bands());
+        widths.resize(icube->getBandCount());
         for(int i = 0; i < pvlCenter.Size(); i++) {
           centers[i] = pvlCenter[i];
           if(hasWidth)
@@ -62,12 +62,12 @@ void IsisMain() {
 
   else if(ui.GetString("BANDBIN") == "USER") {
     PvlGroup pvlg;
-    if(!icube->HasGroup("BandBin")) {
+    if(!icube->hasGroup("BandBin")) {
       pvlg = PvlGroup("BandBin");
-      icube->PutGroup(pvlg);
+      icube->putGroup(pvlg);
     }
     else {
-      pvlg = ocube->GetGroup("BandBin");
+      pvlg = ocube->getGroup("BandBin");
       removekeywords(pvlg);
     }
     string Units = "";
@@ -92,15 +92,15 @@ void IsisMain() {
     pvlWidth.SetValue(ui.GetAsString("WIDTH"), Units);
     pvlg.AddKeyword(pvlWidth);
     //Destroys the old and adds the new BandBin Group
-    if(ocube->HasGroup("BandBin")) {
-      ocube->DeleteGroup("BandBin");
+    if(ocube->hasGroup("BandBin")) {
+      ocube->deleteGroup("BandBin");
     }
-    ocube->PutGroup(pvlg);
+    ocube->putGroup(pvlg);
   }
 
   else if(ui.GetString("BANDBIN") == "DELETE") {
-    if(ocube->HasGroup("BandBin")) {
-      ocube->DeleteGroup("BandBin");
+    if(ocube->hasGroup("BandBin")) {
+      ocube->deleteGroup("BandBin");
     }
   }
 
@@ -132,7 +132,7 @@ void removekeywords(PvlGroup &pvlg) {
 //BandBin Computeing
 void compute(vector<double> centers, vector<double> widths,
              Cube *ocube) {
-  PvlGroup &pvlg = ocube->GetGroup("BandBin");
+  PvlGroup &pvlg = ocube->getGroup("BandBin");
   PvlKeyword &pvlCenter = pvlg.FindKeyword("Center");
   string centerUnit = pvlCenter.Unit();
   bool hasWidth  = pvlg.HasKeyword("Width");

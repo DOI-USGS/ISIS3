@@ -111,7 +111,7 @@ void IsisMain() {
 
     if(mode == "GRAYSCALE") {
       Cube *outCube = p.SetOutputCube("TO", qimage->width(), qimage->height());
-      Pvl *label = outCube->Label();
+      Pvl *label = outCube->getLabel();
       PvlGroup bandBin("BandBin");
       PvlKeyword name("Name");
       name += "Gray";
@@ -121,7 +121,7 @@ void IsisMain() {
     }
     else if(mode == "RGB") {
       Cube *outCube = p.SetOutputCube("TO", qimage->width(), qimage->height(), 3);
-      Pvl *label = outCube->Label();
+      Pvl *label = outCube->getLabel();
       PvlGroup bandBin("BandBin");
       PvlKeyword name("Name");
       name += "Red";
@@ -133,7 +133,7 @@ void IsisMain() {
     }
     else {
       Cube *outCube = p.SetOutputCube("TO", qimage->width(), qimage->height(), 4);
-      Pvl *label = outCube->Label();
+      Pvl *label = outCube->getLabel();
       PvlGroup bandBin("BandBin");
       PvlKeyword name("Name");
       name += "Red";

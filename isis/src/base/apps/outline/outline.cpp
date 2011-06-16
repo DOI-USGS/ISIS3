@@ -29,8 +29,8 @@ void IsisMain() {
   bclear = ui.GetBoolean("CLEAR");
 
   // Allocate space for a work buffer
-  lastLine = new double[icube->Samples()];
-  nl = icube->Lines();
+  lastLine = new double[icube->getSampleCount()];
+  nl = icube->getLineCount();
 
   // Start the processing
   p.StartProcess(outline);

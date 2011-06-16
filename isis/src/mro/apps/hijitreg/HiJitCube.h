@@ -127,7 +127,7 @@ namespace Isis {
       double getLineTime(double line = 1.0) const;
 
 
-      void Compatable(HiJitCube &cube) throw(iException &);
+      void Compatable(HiJitCube &cube);
 
       geos::geom::Polygon const *Poly() const {
         return (fpGeom);
@@ -149,8 +149,8 @@ namespace Isis {
       void initLocal();
       void loadNaifTiming();
       void computeStartTime();
-      void Init() throw(iException &);
-      int getBinModeIndex(int summing) const throw(iException &);
+      void Init();
+      int getBinModeIndex(int summing) const;
       void computePoly();
       Corners FocalPlaneToImage(const Corners &fp) const;
       Corners getCorners(const geos::geom::Geometry &poly) const;

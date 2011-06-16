@@ -53,19 +53,19 @@ void IsisMain() {
 
   if(otherLabels.HasGroup("Mapping") &&
       (otherLabels.FindGroup("Mapping").Keywords() > 0)) {
-    ocube->PutGroup(otherLabels.FindGroup("Mapping"));
+    ocube->putGroup(otherLabels.FindGroup("Mapping"));
   }
   if(otherLabels.HasGroup("Instrument") &&
       (otherLabels.FindGroup("Instrument").Keywords() > 0)) {
-    ocube->PutGroup(otherLabels.FindGroup("Instrument"));
+    ocube->putGroup(otherLabels.FindGroup("Instrument"));
   }
   if(otherLabels.HasGroup("BandBin") &&
       (otherLabels.FindGroup("BandBin").Keywords() > 0)) {
-    ocube->PutGroup(otherLabels.FindGroup("BandBin"));
+    ocube->putGroup(otherLabels.FindGroup("BandBin"));
   }
   if(otherLabels.HasGroup("Archive") &&
       (otherLabels.FindGroup("Archive").Keywords() > 0)) {
-    ocube->PutGroup(otherLabels.FindGroup("Archive"));
+    ocube->putGroup(otherLabels.FindGroup("Archive"));
   }
 
   p.EndProcess();

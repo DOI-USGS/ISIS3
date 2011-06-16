@@ -106,9 +106,10 @@ namespace Qisis {
     //Read in the CubeAttribueInput from the cube name
     Isis::CubeAttributeInput inAtt(cubename.toStdString());
     std::vector<std::string> bands = inAtt.Bands();
+
     //Set the virtual bands to the bands specified by the input
-    cube->SetVirtualBands(bands);
-    cube->Open(cubename.toStdString());
+    cube->setVirtualBands(bands);
+    cube->open(cubename.toStdString());
 
     MdiCubeViewport *cvp = addCubeViewport(cube);
 
@@ -176,7 +177,7 @@ namespace Qisis {
       // add a new message to the caught exception and throw
       throw e.Message(Isis::iException::Programmer,
                       "Exception caught when attempting to show cube "
-                      + cube->Filename(),
+                      + cube->getFilename(),
                       _FILEINFO_);
     }
 

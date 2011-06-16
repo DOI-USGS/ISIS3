@@ -56,7 +56,7 @@ SpkSegment::SpkSegment() : SpiceSegment() {
 SpkSegment::SpkSegment(const std::string &fname) : SpiceSegment() {
   init();
   Cube cube;
-  cube.Open(fname);
+  cube.open(fname);
   SpiceSegment::init(cube);
   import(cube);
 }
@@ -95,7 +95,7 @@ void SpkSegment::import(Cube &cube) {
   NaifStatus::CheckErrors();
   try {
 
-    Camera *camera(cube.Camera());
+    Camera *camera(cube.getCamera());
     Kernels kernels = getKernels();
 
     // Load necessary kernels and id frames

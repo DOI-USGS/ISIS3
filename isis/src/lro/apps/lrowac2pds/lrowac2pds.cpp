@@ -115,19 +115,19 @@ void IsisMain() {
 
     if(instId == "WAC-VIS" && framelets == "Even") {
       viseven = new Cube();
-      viseven->Open(list[i]);
+      viseven->open(list[i]);
     }
     else if(instId == "WAC-VIS" && framelets == "Odd") {
       visodd = new Cube();
-      visodd->Open(list[i]);
+      visodd->open(list[i]);
     }
     if(instId == "WAC-UV" && framelets == "Even") {
       uveven = new Cube();
-      uveven->Open(list[i]);
+      uveven->open(list[i]);
     }
     else if(instId == "WAC-UV" && framelets == "Odd") {
       uvodd = new Cube();
-      uvodd->Open(list[i]);
+      uvodd->open(list[i]);
     }
   }
 
@@ -162,13 +162,13 @@ void IsisMain() {
   numLines = numFramelets * (UV_LINES * numUVFilters + VIS_LINES * numVisFilters);
 
   out = new Cube();
-  out->SetDimensions(numSamples, numLines, 1);
-  out->SetPixelType(Isis::Real);
+  out->setDimensions(numSamples, numLines, 1);
+  out->setPixelType(Isis::Real);
 
   Filename mergedCube = ui.GetFilename("TO");
   mergedCube.Temporary(ui.GetFilename("TO"), "cub");
 
-  out->Create(mergedCube.Expanded().c_str());
+  out->create(mergedCube.Expanded().c_str());
 
   mergeFramelets();
 
@@ -184,30 +184,30 @@ void IsisMain() {
 
    */
 
-  out->Close();
+  out->close();
   delete out;
   out = NULL;
 
   if(uveven) {
-    uveven->Close();
+    uveven->close();
     delete uveven;
     uveven = NULL;
   }
 
   if(uvodd) {
-    uvodd->Close();
+    uvodd->close();
     delete uvodd;
     uvodd = NULL;
   }
 
   if(viseven) {
-    viseven->Close();
+    viseven->close();
     delete viseven;
     viseven = NULL;
   }
 
   if(visodd) {
-    visodd->Close();
+    visodd->close();
     delete visodd;
     visodd = NULL;
   }
@@ -311,8 +311,8 @@ void mergeFramelets() {
   for(int f = 0; f < numFramelets; f++) {
     // write out the UV first
     if(numUVFilters > 0) {
-      uveven->Read(*uvevenManager);
-      uvodd->Read(*uvoddManager);
+      uveven->read(*uvevenManager);
+      uvodd->read(*uvoddManager);
 
       int pad = (numSamples - UV_SAMPLES) / 2;
       for(int line = 0; line < numUVFilters * UV_LINES; line++) {
@@ -336,8 +336,8 @@ void mergeFramelets() {
     }
     // then the vis
     if(numVisFilters > 0) {
-      viseven->Read(*visevenManager);
-      visodd->Read(*visoddManager);
+      viseven->read(*visevenManager);
+      visodd->read(*visoddManager);
 
       int offset = numUVFilters * UV_LINES * numSamples;
       for(int i = 0; i < numVisFilters * VIS_LINES * numSamples; i++) {
@@ -351,7 +351,7 @@ void mergeFramelets() {
       visoddManager->next();
     }
 
-    out->Write(outManager);
+    out->write(outManager);
     outManager.next();
   }
 }
@@ -413,8 +413,8 @@ void OutputLabel(std::ofstream &fout, Cube *cube, Pvl &labelPvl) {
   // Update the "IMAGE" Object
   PvlObject &imageObject = labelPvl.FindObject("IMAGE");
   imageObject.Clear();
-  imageObject += PvlKeyword("LINES", cube->Lines());
-  imageObject += PvlKeyword("LINE_SAMPLES", cube->Samples());
+  imageObject += PvlKeyword("LINES", cube->getLineCount());
+  imageObject += PvlKeyword("LINE_SAMPLES", cube->getSampleCount());
   imageObject += PvlKeyword("SAMPLE_BITS", 32);
   imageObject += PvlKeyword("SAMPLE_TYPE", "PC_REAL");
   imageObject += PvlKeyword("VALID_MINIMUM", "16#FF7FFFFA#");
@@ -431,11 +431,11 @@ void OutputLabel(std::ofstream &fout, Cube *cube, Pvl &labelPvl) {
 
   stream << labelPvl;
 
-  int recordBytes = cube->Samples();
+  int recordBytes = cube->getSampleCount();
   int labelRecords = (int)((stream.str().length()) / recordBytes) + 1;
 
   labelPvl["RECORD_BYTES"] = recordBytes;
-  labelPvl["FILE_RECORDS"] = (int)(cube->Lines() * 4 + labelRecords);
+  labelPvl["FILE_RECORDS"] = (int)(cube->getLineCount() * 4 + labelRecords);
   labelPvl["LABEL_RECORDS"] = labelRecords;
   labelPvl["^IMAGE"] = (int)(labelRecords + 1);
 

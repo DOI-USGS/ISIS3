@@ -32,7 +32,8 @@ void IsisMain() {
   Cube * inCube = p.SetInputCube("DTM");
 
   // Verify HiRISE
-  if (inCube->Bands() > 1 || inCube->Label()->HasObject("Instrument")) {
+  if (inCube->getBandCount() > 1 ||
+      inCube->getLabel()->HasObject("Instrument")) {
     string msg = "Input cube [" + ui.GetFilename("FROM") + "] does not appear"
                + "to be a DTM";
     throw iException::Message(iException::User, msg, _FILEINFO_);
@@ -314,7 +315,7 @@ void IsisMain() {
   image.DeleteKeyword("CORE_HIGH_INSTR_SATURATION");
 
   // Create statistics and add to image group
-  Statistics * stat = inCube->Statistics();
+  Statistics * stat = inCube->getStatistics();
   image.AddKeyword(PvlKeyword("VALID_MINIMUM",stat->Minimum()));
   image.AddKeyword(PvlKeyword("VALID_MAXIMUM",stat->Maximum()));
 

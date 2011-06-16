@@ -60,14 +60,14 @@ void IsisMain() {
   // Get the output projection set up properly
   if(ui.GetBoolean("CREATE")) {
     Cube inCube;
-    inCube.Open(ui.GetFilename("FROM"));
+    inCube.open(ui.GetFilename("FROM"));
 
     // Set the create flag
     m.SetCreateFlag(true);
 
     // Use the input projection as a starting point for the mosaic
-    PvlGroup mapGroup = inCube.Label()->FindGroup("Mapping", Pvl::Traverse);
-    inCube.Close();
+    PvlGroup mapGroup = inCube.getLabel()->FindGroup("Mapping", Pvl::Traverse);
+    inCube.close();
 
     mapGroup.AddKeyword(PvlKeyword("MinimumLatitude",  ui.GetDouble("MINLAT")), Pvl::Replace);
     mapGroup.AddKeyword(PvlKeyword("MaximumLatitude",  ui.GetDouble("MAXLAT")), Pvl::Replace);

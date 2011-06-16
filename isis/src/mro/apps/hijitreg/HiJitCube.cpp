@@ -27,6 +27,7 @@
 #include "naif/SpiceUsr.h"
 
 #include "HiJitCube.h"
+#include "iException.h"
 #include "Instrument.hh"
 #include "Pvl.h"
 #include "PvlGroup.h"
@@ -77,24 +78,24 @@ namespace Isis {
    */
   HiJitCube::~HiJitCube() {
     delete fpGeom;
-    Close();
+    close();
   }
 
   void HiJitCube::setSampleOffset(int soff) {
     jdata.sampOffset = soff;
-    if(IsOpen()) computePoly();
+    if(isOpen()) computePoly();
     return;
   }
 
   void HiJitCube::setLineOffset(int loff) {
     jdata.lineOffset = loff;
-    if(IsOpen()) computePoly();
+    if(isOpen()) computePoly();
     return;
   }
 
 
   void HiJitCube::OpenCube(const std::string &filename) {
-    Open(filename);
+    open(filename);
     Init();
     return;
   }
@@ -102,7 +103,7 @@ namespace Isis {
   void HiJitCube::OpenCube(const std::string &filename, PvlObject &shift) {
     OpenCube(filename);
 
-//  Determine if a shift of the CCD exists in the definitions file
+    //  Determine if a shift of the CCD exists in the definitions file
     if(shift.HasGroup(jdata.ccdName)) {
       PvlGroup &ccddef = shift.FindGroup(jdata.ccdName, Pvl::Traverse);
       if(ccddef.HasKeyword("SampleOffset")) {
@@ -121,14 +122,14 @@ namespace Isis {
     return (((line - 1.0) * jdata.linerate) + jdata.obsStartTime);
   }
 
-  void HiJitCube::Compatable(HiJitCube &cube) throw(iException &) {
+  void HiJitCube::Compatable(HiJitCube &cube) {
     JitInfo other = cube.GetInfo();
 
     if(jdata.summing != other.summing) {
       ostringstream msg;
       msg << "Summing mode (" << jdata.summing
-          << ") in file " << Filename() << " is not equal to summing mode ("
-          << other.summing << ") in file " << cube.Filename() << endl;
+          << ") in file " << getFilename() << " is not equal to summing mode ("
+          << other.summing << ") in file " << cube.getFilename() << endl;
       throw iException::Message(iException::User, msg.str(), _FILEINFO_);
     }
     return;
@@ -219,16 +220,16 @@ namespace Isis {
     fpGeom = 0;
   }
 
-  void HiJitCube::Init() throw(iException &) {
+  void HiJitCube::Init() {
     // Get required keywords from instrument group
-    Pvl *label(Label());
+    Pvl *label(getLabel());
     Isis::PvlGroup inst;
     Isis::PvlGroup idinst;
-    jdata.filename = Filename();
+    jdata.filename = getFilename();
     Isis::PvlGroup &archive = label->FindGroup("Archive", Isis::Pvl::Traverse);
     jdata.productId = (string) archive["ProductId"];
 
-    jdata.lines = Lines();
+    jdata.lines = getLineCount();
     if(label->FindObject("IsisCube").HasGroup("OriginalInstrument")) {
       inst = label->FindGroup("OriginalInstrument", Isis::Pvl::Traverse);
       originst = true;
@@ -257,7 +258,7 @@ namespace Isis {
       jdata.samples = npSamps[jdata.cpmmNumber];
     }
     else {
-      jdata.samples = Samples();
+      jdata.samples = getSampleCount();
     }
     jdata.ccdName = Instrument::CCD_NAMES[jdata.cpmmNumber];
     jdata.dltCount = inst["DeltaLineTimerCount"];
@@ -277,7 +278,7 @@ namespace Isis {
       ostringstream msg;
       msg << "Summing mode (" << jdata.summing
           << ") is illegal (must be > 0) or CPMM number (" << jdata.cpmmNumber
-          << ") is invalid in file " << Filename() << endl;
+          << ") is invalid in file " << getFilename() << endl;
       throw iException::Message(iException::User, msg.str(), _FILEINFO_);
     }
 
@@ -288,7 +289,8 @@ namespace Isis {
     if((jdata.channelNumber > 2) || (jdata.channelNumber < 0)) {
       ostringstream msg;
       msg << "Channel number (" << jdata.channelNumber
-          << ") is invalid (must be 0, 1 or 2) in file " << Filename() << endl;
+          << ") is invalid (must be 0, 1 or 2) in file " << getFilename()
+          << endl;
       throw iException::Message(iException::User, msg.str(), _FILEINFO_);
     }
     else {
@@ -296,7 +298,7 @@ namespace Isis {
         if(jdata.channelNumber == 0) jdata.fpSamp0 += npSamps[jdata.cpmmNumber];
       }
       else {
-        if(jdata.channelNumber == 0) jdata.fpSamp0 += Samples();
+        if(jdata.channelNumber == 0) jdata.fpSamp0 += getSampleCount();
       }
     }
 
@@ -309,7 +311,7 @@ namespace Isis {
   }
 
 
-  int HiJitCube::getBinModeIndex(int summing) const throw(iException &) {
+  int HiJitCube::getBinModeIndex(int summing) const {
     for(unsigned int i = 0 ; i < Instrument::TOTAL_BINNING_FACTORS ; i++) {
       int binFactor = Instrument::BINNING_FACTORS[i];
       if(binFactor == summing) return (i);
@@ -317,7 +319,7 @@ namespace Isis {
 
     ostringstream msg;
     msg << "Invalid summing mode (" << summing << ") for file " <<
-        Filename() << std::endl;
+        getFilename() << std::endl;
     throw iException::Message(iException::User, msg.str(), _FILEINFO_);
   }
 
@@ -332,9 +334,9 @@ namespace Isis {
     }
     else {
       samp0 = jdata.fpSamp0 + jdata.sampOffset;
-      sampN = samp0 + Samples() - 1;
+      sampN = samp0 + getSampleCount() - 1;
     }
-    int line0(jdata.fpLine0 + jdata.lineOffset), lineN(line0 + Lines() - 1);
+    int line0(jdata.fpLine0 + jdata.lineOffset), lineN(line0 + getLineCount() - 1);
 
 //  Allocate a new coordinate sequence and define it
     geos::geom::CoordinateSequence *pts = new geos::geom::CoordinateArraySequence();

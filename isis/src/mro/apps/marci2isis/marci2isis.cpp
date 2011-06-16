@@ -112,15 +112,15 @@ void IsisMain() {
   outputCubes.push_back(new Isis::Cube());
   outputCubes.push_back(new Isis::Cube());
 
-  outputCubes[0]->SetDimensions(numSamples, numLines, numFilters);
-  outputCubes[1]->SetDimensions(numSamples, numLines, numFilters);
+  outputCubes[0]->setDimensions(numSamples, numLines, numFilters);
+  outputCubes[1]->setDimensions(numSamples, numLines, numFilters);
 
   Filename outputFile(ui.GetFilename("TO"));
   iString evenFile = outputFile.Path() + "/" + outputFile.Basename() + ".even.cub";
   iString oddFile = outputFile.Path() + "/" + outputFile.Basename() + ".odd.cub";
 
-  outputCubes[0]->Create(evenFile);
-  outputCubes[1]->Create(oddFile);
+  outputCubes[0]->create(evenFile);
+  outputCubes[1]->create(oddFile);
 
   if(ui.GetString("FLIP") == "AUTO") {
     flip = -1; // Flip is unknown, this let's us know we need to figure it out later
@@ -147,12 +147,12 @@ void IsisMain() {
 
   // Translate labels to every image and close output cubes before calling EndProcess
   for(unsigned int i = 0; i < outputCubes.size(); i++) {
-    translateMarciLabels(pdsLab, *outputCubes[i]->Label());
+    translateMarciLabels(pdsLab, *outputCubes[i]->getLabel());
 
-    PvlObject &isisCube = outputCubes[i]->Label()->FindObject("IsisCube");
+    PvlObject &isisCube = outputCubes[i]->getLabel()->FindObject("IsisCube");
     isisCube.FindGroup("Instrument").AddKeyword(PvlKeyword("Framelets", framelets[i]));
 
-    outputCubes[i]->Write(origLabel);
+    outputCubes[i]->write(origLabel);
     delete outputCubes[i];
   }
 
@@ -244,7 +244,7 @@ void writeCubeOutput(Isis::Buffer &data) {
       output.SetBasePosition(1, currentLine[band] + padding[band], band + 1);
     }
     else if(flip == 1) {
-      int outLine = outputCubes[cube]->Lines() - filterHeight -
+      int outLine = outputCubes[cube]->getLineCount() - filterHeight -
                     ((currentLine[band] - 1) / filterHeight) * filterHeight + (currentLine[band] - 1) % filterHeight;
 
       output.SetBasePosition(1, outLine + 1 - padding[band], band + 1);
@@ -264,7 +264,7 @@ void writeCubeOutput(Isis::Buffer &data) {
     }
 
     // Data is in our brick, let's write it into the cube.
-    outputCubes[cube]->Write(output);
+    outputCubes[cube]->write(output);
   }
 
   currentLine[band] ++;
@@ -382,11 +382,11 @@ void writeFlipBricks() {
           }
         }
         else {
-          int outLine = outputCubes[cube]->Lines() - (filterHeight * (framelet + 1)) - padding[band];
+          int outLine = outputCubes[cube]->getLineCount() - (filterHeight * (framelet + 1)) - padding[band];
           outBrick.SetBasePosition(1, outLine + 1, band + 1);
         }
 
-        outputCubes[cube]->Write(outBrick);
+        outputCubes[cube]->write(outBrick);
       }
     }
   }
@@ -403,7 +403,7 @@ void writeOutputPadding() {
   if(paddingHeight == 0) return; // no padding
 
   for(unsigned int cube = 0; cube < outputCubes.size(); cube++) {
-    Isis::Brick nullBrick(outputCubes[cube]->Samples(), paddingHeight, outputCubes[cube]->Bands(), Isis::Real);
+    Isis::Brick nullBrick(outputCubes[cube]->getSampleCount(), paddingHeight, outputCubes[cube]->getBandCount(), Isis::Real);
 
     for(int i = 0; i < nullBrick.size(); i++) {
       nullBrick[i] = Isis::Null;
@@ -411,9 +411,9 @@ void writeOutputPadding() {
 
     // Write padding to the beginning & end of all cubes, to ensure it's all set to null
     nullBrick.SetBasePosition(1, 1, 1);
-    outputCubes[cube]->Write(nullBrick);
+    outputCubes[cube]->write(nullBrick);
 
-    nullBrick.SetBasePosition(1, outputCubes[cube]->Lines() - paddingHeight, 1);
-    outputCubes[cube]->Write(nullBrick);
+    nullBrick.SetBasePosition(1, outputCubes[cube]->getLineCount() - paddingHeight, 1);
+    outputCubes[cube]->write(nullBrick);
   }
 }

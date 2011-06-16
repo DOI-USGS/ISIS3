@@ -67,10 +67,10 @@ void IsisMain() {
   CubeAttributeOutput outAtt(ui.GetFilename("TO"));
   outCube = new Cube();
 
-  outCube->SetByteOrder(outAtt.ByteOrder());
-  outCube->SetCubeFormat(outAtt.FileFormat());
-  if(outAtt.DetachedLabel()) outCube->SetDetached();
-  if(outAtt.AttachedLabel()) outCube->SetAttached();
+  outCube->setByteOrder(outAtt.ByteOrder());
+  outCube->setFormat(outAtt.FileFormat());
+  if(outAtt.DetachedLabel()) outCube->setLabelsAttached(false);
+  if(outAtt.AttachedLabel()) outCube->setLabelsAttached(true);
 
   /**
     * Isis2 mex2isis.pl:
@@ -143,7 +143,7 @@ void IsisMain() {
       }
     }
 
-    outCube->SetDimensions(p.Samples(), lineInFile.size(), p.Bands());
+    outCube->setDimensions(p.Samples(), lineInFile.size(), p.Bands());
   }
   else {
     //Checks if in file is rdr
@@ -154,11 +154,11 @@ void IsisMain() {
   }
 
   p.Progress()->SetText("Importing");
-  outCube->Create(ui.GetFilename("TO"));
+  outCube->create(ui.GetFilename("TO"));
   p.StartProcess(WriteOutput);
 
   if(hasPrefix) {
-    outCube->Write(timesTable);
+    outCube->write(timesTable);
   }
 
   // Get as many of the other labels as we can
@@ -169,32 +169,32 @@ void IsisMain() {
 
   if(otherLabels.HasGroup("Mapping") &&
       (otherLabels.FindGroup("Mapping").Keywords() > 0)) {
-    outCube->PutGroup(otherLabels.FindGroup("Mapping"));
+    outCube->putGroup(otherLabels.FindGroup("Mapping"));
   }
 
   if(otherLabels.HasGroup("Instrument") &&
       (otherLabels.FindGroup("Instrument").Keywords() > 0)) {
-    outCube->PutGroup(otherLabels.FindGroup("Instrument"));
+    outCube->putGroup(otherLabels.FindGroup("Instrument"));
   }
 
   if(otherLabels.HasGroup("BandBin") &&
       (otherLabels.FindGroup("BandBin").Keywords() > 0)) {
-    outCube->PutGroup(otherLabels.FindGroup("BandBin"));
+    outCube->putGroup(otherLabels.FindGroup("BandBin"));
   }
 
   if(otherLabels.HasGroup("Archive") &&
       (otherLabels.FindGroup("Archive").Keywords() > 0)) {
-    outCube->PutGroup(otherLabels.FindGroup("Archive"));
+    outCube->putGroup(otherLabels.FindGroup("Archive"));
   }
 
   if(otherLabels.HasGroup("Kernels") &&
       (otherLabels.FindGroup("Kernels").Keywords() > 0)) {
-    outCube->PutGroup(otherLabels.FindGroup("Kernels"));
+    outCube->putGroup(otherLabels.FindGroup("Kernels"));
   }
 
   p.EndProcess();
 
-  outCube->Close();
+  outCube->close();
   delete outCube;
   outCube = NULL;
   lineInFile.clear();
@@ -210,7 +210,7 @@ void WriteOutput(Isis::Buffer &buf) {
 
     while(!lineInFile[(buf.Line()+numLinesSkipped) % lineInFile.size()]) {
       outLines.SetLine(buf.Line() + numLinesSkipped, buf.Band());
-      outCube->Write(outLines);
+      outCube->write(outLines);
       numLinesSkipped ++;
     }
   }
@@ -221,7 +221,7 @@ void WriteOutput(Isis::Buffer &buf) {
   for(int i = 0; i < outLines.size(); i++)
     outLines[i] = buf[i];
 
-  outCube->Write(outLines);
+  outCube->write(outLines);
 }
 
 void TranslateHrscLabels(Pvl &inLabels, Pvl &outLabel) {

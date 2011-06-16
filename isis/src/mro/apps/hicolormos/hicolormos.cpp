@@ -260,10 +260,10 @@ void IsisMain() {
   from1OrgLab.Blob::Read(from1);
 
   Cube c;
-  c.Open(ui.GetFilename("TO"), "rw");
-  c.Label()->FindObject("IsisCube", Pvl::Traverse).AddGroup(mos);
-  c.Write(from1OrgLab);
-  c.Close();
+  c.open(ui.GetFilename("TO"), "rw");
+  c.getLabel()->FindObject("IsisCube", Pvl::Traverse).AddGroup(mos);
+  c.write(from1OrgLab);
+  c.close();
 
   // Clean up the temporary automos list file
   string tmp(tempFile.Expanded());

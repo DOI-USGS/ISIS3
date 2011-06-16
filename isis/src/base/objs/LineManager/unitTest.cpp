@@ -14,7 +14,7 @@ int main(int argc, char *argv[]) {
 
   string fname = "$base/testData/isisTruth.cub";
   Isis::Cube cube;
-  cube.Open(fname);
+  cube.open(fname);
 
   Isis::LineManager line(cube);
   cout << "Buffer Size:  " <<
@@ -71,5 +71,5 @@ int main(int argc, char *argv[]) {
     cout << endl;
   }
 
-  cube.Close();
+  cube.close();
 }

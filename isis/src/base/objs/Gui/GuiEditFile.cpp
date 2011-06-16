@@ -107,7 +107,7 @@ namespace Isis {
     connect(m_saveAs, SIGNAL(activated()), this, SLOT(saveAs()));
     fileMenu->addAction(m_saveAs);
     
-    // Action File->Close
+    // Action File->close
     m_close = new QAction(menuBar);
     m_close->setText("&Close...");
     m_close->setShortcut(Qt::CTRL + Qt::Key_C);
@@ -205,7 +205,7 @@ namespace Isis {
   }
 
   /**
-   * Action File->Close, close the opened file
+   * Action File->close, close the opened file
    * 
    * @author Sharmila Prasad (5/20/2011)
    */

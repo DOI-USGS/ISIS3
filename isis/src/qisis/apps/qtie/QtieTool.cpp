@@ -255,7 +255,7 @@ namespace Qisis {
     p_baseSN = Isis::SerialNumber::Compose(*p_baseCube, true);
     p_matchSN = Isis::SerialNumber::Compose(*p_matchCube);
 
-    p_serialNumberList->Add(matchCube.Filename());
+    p_serialNumberList->Add(matchCube.getFilename());
 
     //  Save off universal ground maps
     try {
@@ -293,8 +293,8 @@ namespace Qisis {
           //  Make sure point on base cube
           baseSamp = p_baseGM->Sample();
           baseLine = p_baseGM->Line();
-          if (baseSamp < 1 || baseSamp > p_baseCube->Samples() ||
-              baseLine < 1 || baseLine > p_baseCube->Lines()) {
+          if (baseSamp < 1 || baseSamp > p_baseCube->getSampleCount() ||
+              baseLine < 1 || baseLine > p_baseCube->getLineCount()) {
             // throw error? point not on base
             QString message = "Error parsing input control net.  Lat/Lon for Point Id: " +
                               QString::fromStdString(p.GetId()) + " computes to a sample/line off " +
@@ -404,7 +404,7 @@ namespace Qisis {
     // ???  do we only allow mouse clicks on level1???
     //    If we allow on both, need to find samp,line on level1 if
     //    they clicked on basemap.
-    std::string file = cvp->cube()->Filename();
+    std::string file = cvp->cube()->getFilename();
     std::string sn = p_serialNumberList->SerialNumber(file);
 
     double samp, line;
@@ -475,8 +475,8 @@ namespace Qisis {
       //  Make sure point on base cube
       baseSamp = p_baseGM->Sample();
       baseLine = p_baseGM->Line();
-      if (baseSamp < 1 || baseSamp > p_baseCube->Samples() ||
-          baseLine < 1 || baseLine > p_baseCube->Lines()) {
+      if (baseSamp < 1 || baseSamp > p_baseCube->getSampleCount() ||
+          baseLine < 1 || baseLine > p_baseCube->getLineCount()) {
         // throw error? point not on base
         QString message = "Point does not exist on base map.";
         QMessageBox::warning((QWidget *)parent(), "Warning", message);
@@ -666,7 +666,7 @@ namespace Qisis {
       }
 
       double samp, line;
-      if (vp->cube()->Filename() == p_baseCube->Filename()) {
+      if (vp->cube()->getFilename() == p_baseCube->getFilename()) {
         // Draw on left viewport (base)
         samp = p[Base]->GetSample();
         line = p[Base]->GetLine();
@@ -738,7 +738,7 @@ namespace Qisis {
       msgBox.setDefaultButton(close);
       msgBox.exec();
       if (msgBox.clickedButton() == update) {
-        p_matchCube->ReOpen("rw");
+        p_matchCube->reopen("rw");
         Isis::Table cmatrix = b.Cmatrix(0);
         //cmatrix = b.Cmatrix(0);
         emit newSolution(&cmatrix);
@@ -772,15 +772,15 @@ namespace Qisis {
   void QtieTool::writeNewCmatrix(Isis::Table *cmatrix) {
 
     //check for existing polygon, if exists delete it
-    if (p_matchCube->Label()->HasObject("Polygon")) {
-      p_matchCube->Label()->DeleteObject("Polygon");
+    if (p_matchCube->getLabel()->HasObject("Polygon")) {
+      p_matchCube->getLabel()->DeleteObject("Polygon");
     }
 
     // Update the cube history
-    p_matchCube->Write(*cmatrix);
+    p_matchCube->write(*cmatrix);
     Isis::History h("IsisCube");
     try {
-      p_matchCube->Read(h);
+      p_matchCube->read(h);
     }
     catch (Isis::iException &e) {
       QString message = "Could not read cube history, "
@@ -801,12 +801,12 @@ namespace Qisis {
     history += Isis::PvlKeyword("UserName", Isis::Application::UserName());
     Isis::PvlGroup results("Results");
     results += Isis::PvlKeyword("CameraAnglesUpdated", "True");
-    results += Isis::PvlKeyword("BaseMap", p_baseCube->Filename());
+    results += Isis::PvlKeyword("BaseMap", p_baseCube->getFilename());
     history += results;
 
     h.AddEntry(history);
-    p_matchCube->Write(h);
-    p_matchCube->ReOpen("r");
+    p_matchCube->write(h);
+    p_matchCube->reopen("r");
 
   }
 
@@ -887,7 +887,7 @@ namespace Qisis {
               pt->Delete(m);
           }
 //          net.SetType(Isis::ControlNet::ImageToGround);
-          net.SetTarget(p_matchCube->Camera()->Target());
+          net.SetTarget(p_matchCube->getCamera()->Target());
           net.SetNetworkId("Qtie");
           net.SetUserName(Isis::Application::UserName());
           net.SetCreatedDate(Isis::Application::DateTime());

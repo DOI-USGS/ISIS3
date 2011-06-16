@@ -15,24 +15,7 @@
 #include "MeasureValidationResults.h"
 #include "PolygonTools.h"
 
-//#define _DEBUG_
-
 namespace Isis {
-
-#ifdef _DEBUG_
-  //debugging
-  fstream ostm;
-
-  void StartDebug() {
-    ostm.open("Debug.log", std::ios::out | std::ios::app);
-    ostm << "\n*************************\n";
-  }
-
-  void CloseDebug() {
-    ostm << "\n*************************\n";
-    ostm.close();
-  }
-#endif
 
   /**
    * Create InterestOperator object. Because this is a pure virtual class you can
@@ -54,20 +37,15 @@ namespace Isis {
 
     mOperatorGrp = PvlGroup("InterestOptions");
     Parse(pPvl);
-
-#ifdef _DEBUG_
-    StartDebug();
-#endif
   }
 
 
   //! Destroy InterestOperator object
   InterestOperator::~InterestOperator() {
-    if (p_clipPolygon != NULL)
+    if (p_clipPolygon != NULL) {
       delete p_clipPolygon;
-#ifdef _DEBUG_
-    CloseDebug();
-#endif
+      p_clipPolygon = NULL;
+    }
   }
 
 
@@ -170,7 +148,7 @@ namespace Isis {
       // Level 3 images/mosaic or bad image
     {
       std::string msg = "Cannot run interest on images with no camera. Image " +
-                        pCube.Filename() + " has no Camera";
+                        pCube.getFilename() + " has no Camera";
       throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
     }
 
@@ -429,7 +407,7 @@ namespace Isis {
           // Get the Camera for the reference image and get the lat/lon from that measurment
           Camera *bestCamera;
           try {
-            bestCamera = bestCube->Camera();
+            bestCamera = bestCube->getCamera();
           }
           catch (Isis::iException &e) {
             std::string msg = "Cannot Create Camera for Image:" + mSerialNumbers.Filename(sn);
@@ -474,7 +452,7 @@ namespace Isis {
             // Get the Camera
             Camera *measureCamera;
             try {
-              measureCamera = measureCube->Camera();
+              measureCamera = measureCube->getCamera();
             }
             catch (Isis::iException &e) {
               std::string msg = "Cannot Create Camera for Image:" + mSerialNumbers.Filename(sn);
@@ -776,7 +754,7 @@ namespace Isis {
       // Get the Camera
       Camera *camera;
       try {
-        camera = pCube.Camera();
+        camera = pCube.getCamera();
       }
       catch (Isis::iException &e) {
         std::string msg = "Cannot Create Camera for Image:" + mSerialNumbers.Filename(serialNum);
@@ -784,9 +762,9 @@ namespace Isis {
       }
 
       if (camera->SetImage(iOrigSample, iOrigLine)) {
-        Portal inPortal(1, 1, pCube.PixelType());
+        Portal inPortal(1, 1, pCube.getPixelType());
         inPortal.SetPosition(iOrigSample, iOrigLine, 1);
-        pCube.Read(inPortal);
+        pCube.read(inPortal);
 
         mtInterestResults[piMeasure].mdInterest   = dBestInterest;
         mtInterestResults[piMeasure].mdBestSample = Isis::Null;
@@ -875,12 +853,12 @@ namespace Isis {
     // Create Multipolygon for the first Control Measure
     std::string sn1 = pCnetPoint[0]->GetCubeSerialNumber();
     Cube *inCube1 = mCubeMgr.OpenCube(mSerialNumbers.Filename(sn1));
-    inCube1->Read((Blob &)measPolygon1);
+    inCube1->read((Blob &)measPolygon1);
 
     // Create Multipolygon for the Second Control Measure
     std::string sn2 = pCnetPoint[1]->GetCubeSerialNumber();
     Cube *inCube2 = mCubeMgr.OpenCube(mSerialNumbers.Filename(sn2));
-    inCube2->Read((Blob &)measPolygon2);
+    inCube2->read((Blob &)measPolygon2);
 
     // Get the interesection for the first 2 polgons
     geomIntersect1 = PolygonTools::Intersect((const geos::geom::Geometry *)measPolygon1.Polys(),
@@ -889,7 +867,7 @@ namespace Isis {
     for (int measureIndex = 2; measureIndex < pCnetPoint.GetNumMeasures(); measureIndex ++) {
       std::string sn3 = pCnetPoint[measureIndex]->GetCubeSerialNumber();
       Cube *inCube3 = mCubeMgr.OpenCube(mSerialNumbers.Filename(sn3));
-      inCube3->Read((Blob &)measPolygon3);
+      inCube3->read((Blob &)measPolygon3);
 
       // Get the intersection of the intersection and the measure Image Polygon
       geomIntersect2 = PolygonTools::Intersect(geomIntersect1,

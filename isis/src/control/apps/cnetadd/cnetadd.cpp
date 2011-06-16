@@ -102,9 +102,9 @@ void IsisMain() {
   for(unsigned int img = 0; img < addList.size(); img++) {
     bool imageAdded = false;
     Cube cube;
-    cube.Open(addList[img]);
-    Pvl *cubepvl = cube.Label();
-    Camera *cam = cube.Camera();
+    cube.open(addList[img]);
+    Pvl *cubepvl = cube.getLabel();
+    Camera *cam = cube.getCamera();
 
     //loop through all the control points
     for(int cp = 0; cp < inNet.GetNumPoints(); cp++) {
@@ -202,9 +202,9 @@ void IsisMain() {
               newCm->SetIgnored(true);
             }
             else {
-              Portal portal(1, 1, cube.PixelType());
+              Portal portal(1, 1, cube.getPixelType());
               portal.SetPosition(cam->Sample(), cam->Line(), 1);
-              cube.Read(portal);
+              cube.read(portal);
               if(!validator.ValidDnValue(portal[0])) {
                 //TODO: log that it was DN that failed the check
                 newCm->SetIgnored(true);
@@ -388,8 +388,8 @@ void SetControlPointLatLon(const std::string &incubes, const std::string &cnet) 
 
     Cube *cube = manager.OpenCube(snl.Filename(cm->GetCubeSerialNumber()));
     try {
-      cube->Camera()->SetImage(cm->GetSample(), cm->GetLine());
-      p_surfacePoints[point->GetId()] = cube->Camera()->GetSurfacePoint();
+      cube->getCamera()->SetImage(cm->GetSample(), cm->GetLine());
+      p_surfacePoints[point->GetId()] = cube->getCamera()->GetSurfacePoint();
     }
     catch(iException &e) {
       std::string msg = "Unable to create camera for cube file [";

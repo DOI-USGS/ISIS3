@@ -213,10 +213,10 @@ void IsisMain() {
 
 
   Isis::Cube cube;
-  cube.Open("/tmp/isisProcessByLine_01");
-  cube.Close(true);
-  cube.Open("/tmp/isisProcessByLine_02");
-  cube.Close(true);
+  cube.open("/tmp/isisProcessByLine_01");
+  cube.close(true);
+  cube.open("/tmp/isisProcessByLine_02");
+  cube.close(true);
 }
 
 void oneInput(Isis::Buffer &b) {

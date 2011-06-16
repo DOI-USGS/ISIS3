@@ -56,8 +56,8 @@ namespace Isis {
       p_cubes.insert(fileName, new Cube());
       searchResult = p_cubes.find(fileName);
       // Bands are the only thing input attributes can affect
-      (*searchResult)->SetVirtualBands(attIn.Bands());
-      (*searchResult)->Open(fileName.toStdString());
+      (*searchResult)->setVirtualBands(attIn.Bands());
+      (*searchResult)->open(fileName.toStdString());
     }
 
     // Keep track of the newly opened cube in our queue
@@ -90,7 +90,7 @@ namespace Isis {
       return;
     }
 
-    (*searchResult)->Close();
+    (*searchResult)->close();
     delete *searchResult;
     p_cubes.erase(searchResult);
   }
@@ -103,7 +103,7 @@ namespace Isis {
     QMap<QString, Cube *>::iterator pos = p_cubes.begin();
 
     while(pos != p_cubes.end()) {
-      (*pos)->Close();
+      (*pos)->close();
       delete *pos;
       pos ++;
     }

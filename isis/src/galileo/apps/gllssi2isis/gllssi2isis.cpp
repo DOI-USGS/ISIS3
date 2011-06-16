@@ -96,9 +96,9 @@ void IsisMain() {
   }
   else {
     summedOutput = new Cube();
-    summedOutput->SetDimensions(p.Samples() / 2, p.Lines() / 2, p.Bands());
-    summedOutput->SetPixelType(p.PixelType());
-    summedOutput->Create(ui.GetFilename("TO"));
+    summedOutput->setDimensions(p.Samples() / 2, p.Lines() / 2, p.Bands());
+    summedOutput->setPixelType(p.PixelType());
+    summedOutput->create(ui.GetFilename("TO"));
     p.StartProcess(TranslateData);
     ocube = summedOutput;
   }
@@ -107,7 +107,7 @@ void IsisMain() {
   p.EndProcess();
 
   if(summed) {
-    summedOutput->Close();
+    summedOutput->close();
     delete summedOutput;
   }
 
@@ -115,7 +115,7 @@ void IsisMain() {
 }
 
 void TranslateData(Buffer &inData) {
-  summedOutput->Write(inData);
+  summedOutput->write(inData);
 }
 
 void TranslateLabels(Pvl &pdsLabel, Cube *ocube) {
@@ -129,7 +129,7 @@ void TranslateLabels(Pvl &pdsLabel, Cube *ocube) {
   // Get the translation manager ready
   PvlTranslationManager labelXlater(pdsLabel, transFile.Expanded());
   // Pvl outputLabels;
-  Pvl *outputLabel = ocube->Label();
+  Pvl *outputLabel = ocube->getLabel();
   labelXlater.Auto(*(outputLabel));
 
   //Add to the Archive Group
@@ -206,5 +206,5 @@ void TranslateLabels(Pvl &pdsLabel, Cube *ocube) {
   //create the kernel group
   PvlGroup kern("Kernels");
   kern += PvlKeyword("NaifFrameCode", -77001);
-  ocube->PutGroup(kern);
+  ocube->putGroup(kern);
 }

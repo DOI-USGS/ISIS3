@@ -53,10 +53,10 @@ void IsisMain() {
 
   Isis::Filename fromFile = ui.GetFilename("FROM");
   Isis::Cube inputCube;
-  inputCube.Open(fromFile.Expanded());
+  inputCube.open(fromFile.Expanded());
 
   //Check to make sure we got the cube properly
-  if(!inputCube.IsOpen()) {
+  if(!inputCube.isOpen()) {
     string msg = "Could not open FROM cube" + fromFile.Expanded();
     throw iException::Message(iException::User, msg, _FILEINFO_);
   }
@@ -66,10 +66,10 @@ void IsisMain() {
 
   // Get statistics from the cube prefix and suffix data
   Table hifix("HiRISE Ancillary");
-  icube->Read(hifix);
+  icube->read(hifix);
   Statistics darkStats, bufStats, rampDarkStats;
-  int tdi = icube->GetGroup("Instrument")["Tdi"];
-  int binning_mode = icube->GetGroup("Instrument")["Summing"];
+  int tdi = icube->getGroup("Instrument")["Tdi"];
+  int binning_mode = icube->getGroup("Instrument")["Summing"];
 
   //This gets us the statistics for the dark and buffer pixels
   // alongside of the image itself
@@ -127,7 +127,7 @@ void IsisMain() {
   int rampLines = tdi / binning_mode;
 
   Table calimg("HiRISE Calibration Image");
-  icube->Read(calimg);
+  icube->read(calimg);
   Statistics calStats;
   //Statistics for the Reverse readout lines of the cal image
   Statistics reverseStats;
@@ -205,7 +205,7 @@ void IsisMain() {
 
   // Get statistics from the calibration prefix and suffix data
   Table calfix("HiRISE Calibration Ancillary");
-  icube->Read(calfix);
+  icube->read(calfix);
   Statistics calDarkStats, calBufStats;
   int rampLine0 = rampStart + 1;
   int rampLineN = (rampStart + rampLines - 1) - 1;
@@ -256,7 +256,7 @@ void IsisMain() {
 
 
   for(int postRampLine = 0 ; postRampLine < LINES_POSTRAMP ; postRampLine++) {
-    inputCube.Read(imageBuffer);
+    inputCube.read(imageBuffer);
     for(int postRampSamp = 0 ; postRampSamp < out.SampleDimension() ; postRampSamp++) {
       out[postRampSamp] = imageBuffer[postRampSamp + imageLeft];
     }
@@ -264,8 +264,8 @@ void IsisMain() {
     imageBuffer++;
   }
 
-  for(int imageLine = LINES_POSTRAMP; imageLine < inputCube.Lines(); imageLine++) {
-    inputCube.Read(imageBuffer);
+  for(int imageLine = LINES_POSTRAMP; imageLine < inputCube.getLineCount(); imageLine++) {
+    inputCube.read(imageBuffer);
     for(int imageSample = 0 ; imageSample < out.SampleDimension(); imageSample++) {
       out[imageSample] = imageBuffer[imageSample + imageLeft];
     }

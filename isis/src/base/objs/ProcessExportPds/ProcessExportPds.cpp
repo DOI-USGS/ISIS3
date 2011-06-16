@@ -257,9 +257,9 @@ namespace Isis {
     cmpObj += PvlKeyword("ENCODING_TYPE", "JP2");
     cmpObj += PvlKeyword("ENCODING_TYPE_VERSION_NAME", "ISO/IEC15444-1:2004");
     cmpObj += PvlKeyword("INTERCHANGE_FORMAT", "BINARY");
-    Filename infilename(InputCubes[0]->Filename());
+    Filename infilename(InputCubes[0]->getFilename());
     cmpObj += PvlKeyword("UNCOMPRESSED_FILE_NAME", infilename.Name());
-    int storagebytes = InputCubes[0]->Samples() * InputCubes[0]->Lines();
+    int storagebytes = InputCubes[0]->getSampleCount() * InputCubes[0]->getLineCount();
     if(p_pixelType == Isis::Real) {
       string msg = "JPEG2000 does not support floating point data";
       throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
@@ -272,12 +272,12 @@ namespace Isis {
     PvlObject ucmpObj("UNCOMPRESSED_FILE");
     ucmpObj += PvlKeyword("FILE_NAME", infilename.Name());
     ucmpObj += PvlKeyword("RECORD_TYPE", "FIXED_LENGTH");
-    int recordbytes = InputCubes[0]->Samples();
+    int recordbytes = InputCubes[0]->getSampleCount();
     if(p_pixelType == Isis::UnsignedWord || p_pixelType == Isis::SignedWord) {
       recordbytes = recordbytes * 2;
     }
     ucmpObj += PvlKeyword("RECORD_BYTES", recordbytes);
-    ucmpObj += PvlKeyword("FILE_RECORDS", InputCubes[0]->Lines());
+    ucmpObj += PvlKeyword("FILE_RECORDS", InputCubes[0]->getLineCount());
     ucmpObj += PvlKeyword("^IMAGE", infilename.Name());
     mainPvl.AddObject(ucmpObj);
   }
@@ -341,9 +341,9 @@ namespace Isis {
     cmpObj += PvlKeyword("ENCODING_TYPE", "JP2");
     cmpObj += PvlKeyword("ENCODING_TYPE_VERSION_NAME", "ISO/IEC15444-1:2004");
     cmpObj += PvlKeyword("INTERCHANGE_FORMAT", "BINARY");
-    Filename infilename(InputCubes[0]->Filename());
+    Filename infilename(InputCubes[0]->getFilename());
     cmpObj += PvlKeyword("UNCOMPRESSED_FILE_NAME", infilename.Name());
-    int storagebytes = InputCubes[0]->Samples() * InputCubes[0]->Lines();
+    int storagebytes = InputCubes[0]->getSampleCount() * InputCubes[0]->getLineCount();
     if(p_pixelType == Isis::Real) {
       string msg = "JPEG2000 does not support floating point data";
       throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
@@ -356,12 +356,12 @@ namespace Isis {
     PvlObject ucmpObj("UNCOMPRESSED_FILE");
     ucmpObj += PvlKeyword("FILE_NAME", infilename.Name());
     ucmpObj += PvlKeyword("RECORD_TYPE", "FIXED_LENGTH");
-    int recordbytes = InputCubes[0]->Samples();
+    int recordbytes = InputCubes[0]->getSampleCount();
     if(p_pixelType == Isis::UnsignedWord || p_pixelType == Isis::SignedWord) {
       recordbytes = recordbytes * 2;
     }
     ucmpObj += PvlKeyword("RECORD_BYTES", recordbytes);
-    ucmpObj += PvlKeyword("FILE_RECORDS", InputCubes[0]->Lines());
+    ucmpObj += PvlKeyword("FILE_RECORDS", InputCubes[0]->getLineCount());
     ucmpObj += PvlKeyword("^IMAGE", infilename.Name());
     mainPvl.AddObject(ucmpObj);
   }
@@ -378,7 +378,7 @@ namespace Isis {
     mainPvl.GetFormat()->Add("$base/translations/pdsExportImageImage.typ");
     // Build up an IMAGE object:
     // Auto translate standard keywords for the IMAGE object
-    Pvl *inputLabel = InputCubes[0]->Label();
+    Pvl *inputLabel = InputCubes[0]->getLabel();
     Filename transfile;
     transfile = "$base/translations/pdsExportImageImage.trn";
     PvlTranslationManager Xlator(*inputLabel, transfile.Expanded());
@@ -520,7 +520,7 @@ namespace Isis {
     }
     // Build up a JP2 IMAGE object:
     // Auto translate standard keywords for the IMAGE object
-    Pvl *inputLabel = InputCubes[0]->Label();
+    Pvl *inputLabel = InputCubes[0]->getLabel();
     Filename transfile;
     transfile = "$base/translations/pdsExportImageJP2.trn";
     PvlTranslationManager Xlator(*inputLabel, transfile.Expanded());
@@ -657,7 +657,7 @@ namespace Isis {
   void ProcessExportPds::StandardAllMapping(Pvl &outputPvl) {
 
     // Get the input Isis cube label and find the Mapping group if it has one
-    Pvl *inputLabel = InputCubes[0]->Label();
+    Pvl *inputLabel = InputCubes[0]->getLabel();
     if(inputLabel->HasObject("IsisCube") &&
         !(inputLabel->FindObject("IsisCube").HasGroup("Mapping"))) return;
     PvlGroup &inputMapping = inputLabel->FindGroup("Mapping", Pvl::Traverse);
@@ -817,7 +817,7 @@ namespace Isis {
   int ProcessExportPds::LineBytes() {
     Cube *cube = InputCubes[0];
     int a = SizeOf(p_pixelType);
-    int b = cube->Samples();
+    int b = cube->getSampleCount();
     return b * a ;
   }
 
@@ -882,8 +882,8 @@ namespace Isis {
         if(p_label->HasKeyword("LABEL_RECORDS")) { //LRO MRF doesn't have this keyword
           (*p_label)["LABEL_RECORDS"].SetValue(iString(labelRecords));
         }
-        (*p_label)["FILE_RECORDS"].SetValue(iString(labelRecords + (InputCubes[0])->Lines() *
-                                            InputCubes[0]->Bands()));
+        (*p_label)["FILE_RECORDS"].SetValue(iString(labelRecords + (InputCubes[0])->getLineCount() *
+                                            InputCubes[0]->getBandCount()));
         if(!p_detachedLabel) {
           (*p_label)["^IMAGE"].SetValue(iString(labelRecords + 1));
         }

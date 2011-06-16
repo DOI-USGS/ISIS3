@@ -28,8 +28,8 @@ void IsisMain() {
 
   // Setup the input cube and lastLine array
   Cube *icube = p.SetInputCube("FROM");
-  previousLine.resize(icube->Samples());
-  lineNum = icube->Lines();
+  previousLine.resize(icube->getSampleCount());
+  lineNum = icube->getLineCount();
 
   // Gets the Correlation Tollerance
   UserInterface &ui = Application::GetUserInterface();

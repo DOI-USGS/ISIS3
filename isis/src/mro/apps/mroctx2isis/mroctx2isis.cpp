@@ -249,10 +249,10 @@ void TranslateMroCtxLabels(Filename &labelFile, Cube *ocube) {
   inst += PvlKeyword("SampleFirstPixel", startSamp);
 
   //Add all groups to the output cube
-  ocube->PutGroup(inst);
-  ocube->PutGroup(outLabel.FindGroup("Archive", Pvl::Traverse));
-  ocube->PutGroup(bbin);
-  ocube->PutGroup(kern);
+  ocube->putGroup(inst);
+  ocube->putGroup(outLabel.FindGroup("Archive", Pvl::Traverse));
+  ocube->putGroup(bbin);
+  ocube->putGroup(kern);
 }
 
 void SaveDarkData(ProcessImportPds &process, Cube *ocube, int startPix, int endPix) {
@@ -269,7 +269,7 @@ void SaveDarkData(ProcessImportPds &process, Cube *ocube, int startPix, int endP
     darkRecord[0] = ConvertDarkPixels(pixNum, process.PixelType(), linePrefix);
     darkTable += darkRecord;
   }
-  ocube->Write(darkTable);
+  ocube->write(darkTable);
 }
 
 vector<int> ConvertDarkPixels(int samples, Isis::PixelType pixelType,

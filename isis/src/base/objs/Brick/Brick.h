@@ -72,9 +72,9 @@ namespace Isis {
 
       Brick(const Isis::Cube &cube, const int &bufNumSamples,
             const int &bufNumLines, const int &bufNumBands) :
-        Isis::BufferManager(cube.Samples(), cube.Lines(), cube.Bands(),
-                            bufNumSamples, bufNumLines, bufNumBands,
-                            cube.PixelType()) {
+        Isis::BufferManager(cube.getSampleCount(), cube.getLineCount(),
+                            cube.getBandCount(), bufNumSamples, bufNumLines,
+                            bufNumBands, cube.getPixelType()) {
       };
 
     public:

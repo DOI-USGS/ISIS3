@@ -31,11 +31,11 @@ void IsisMain() {
     // For slope we need a resolution
     // Try to use the camera first
     try {
-      Camera *cam = icube->Camera();
+      Camera *cam = icube->getCamera();
 
       // Really we should be doing this at every point in the image... but for now,
       //   the center will work.
-      if(!cam->SetImage(icube->Samples() / 2, icube->Lines() / 2)) {
+      if(!cam->SetImage(icube->getSampleCount() / 2, icube->getLineCount() / 2)) {
         // Get into the catch(...)
         throw iException::Message(iException::Programmer, "", _FILEINFO_);
       }
@@ -48,9 +48,9 @@ void IsisMain() {
       // Failed at getting the camera, reset our exception and try again with the projection
       e.Clear();
 
-      Projection *proj = icube->Projection();
+      Projection *proj = icube->getProjection();
 
-      if(!proj->SetWorld(icube->Samples() / 2, icube->Lines() / 2)) {
+      if(!proj->SetWorld(icube->getSampleCount() / 2, icube->getLineCount() / 2)) {
         iString message = "Failed to SetWorld at the center of the image";
         throw iException::Message(iException::Programmer, message, _FILEINFO_);
       }

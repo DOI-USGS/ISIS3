@@ -42,10 +42,10 @@ int main() {
     AutoReg *ar = AutoRegFactory::Create(pvl);
 
     Cube p;
-    p.Open("$messenger/testData/EW0131770376G.equi.cub");
+    p.open("$messenger/testData/EW0131770376G.equi.cub");
 
     Cube s;
-    s.Open("$messenger/testData/EW0131770381F.equi.cub");
+    s.open("$messenger/testData/EW0131770381F.equi.cub");
 
     ar->SearchChip()->TackCube(512.0, 512.0);
     ar->SearchChip()->Load(s);

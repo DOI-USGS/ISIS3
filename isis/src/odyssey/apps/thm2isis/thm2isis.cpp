@@ -76,16 +76,16 @@ void IsisMain() {
     Cube *even = new Cube();
     Cube *odd = new Cube();
 
-    even->SetDimensions(p.Samples(), p.Lines(), p.Bands());
-    even->SetPixelType(Isis::Real);
-    odd->SetDimensions(p.Samples(), p.Lines(), p.Bands());
-    odd->SetPixelType(Isis::Real);
+    even->setDimensions(p.Samples(), p.Lines(), p.Bands());
+    even->setPixelType(Isis::Real);
+    odd->setDimensions(p.Samples(), p.Lines(), p.Bands());
+    odd->setPixelType(Isis::Real);
 
     string evenFile = outFile.Path() + "/" + outFile.Basename() + ".even.cub";
     string oddFile = outFile.Path() + "/" + outFile.Basename() + ".odd.cub";
 
-    even->Create(evenFile);
-    odd->Create(oddFile);
+    even->create(evenFile);
+    odd->create(oddFile);
 
     frameletLines = 192 / ((int)inst["SpatialSumming"]);
 
@@ -94,10 +94,10 @@ void IsisMain() {
   }
   else {
     Cube *outCube = new Cube();
-    outCube->SetDimensions(p.Samples(), p.Lines(), p.Bands());
-    outCube->SetPixelType(Isis::Real);
+    outCube->setDimensions(p.Samples(), p.Lines(), p.Bands());
+    outCube->setPixelType(Isis::Real);
 
-    outCube->Create(outFile.Expanded());
+    outCube->create(outFile.Expanded());
     outputCubes.push_back(outCube);
   }
 
@@ -121,11 +121,11 @@ void IsisMain() {
         );
       }
 
-      outputCubes[i]->PutGroup(isis3Lab.Group(grp));
+      outputCubes[i]->putGroup(isis3Lab.Group(grp));
     }
 
-    outputCubes[i]->Write(origLabels);
-    outputCubes[i]->Close();
+    outputCubes[i]->write(origLabels);
+    outputCubes[i]->close();
     delete outputCubes[i];
   }
 
@@ -143,7 +143,7 @@ void separateFrames(Buffer &in) {
   for(int i = 0; i < mgr.size(); i++)
     mgr[i] = in[i];
 
-  outputCubes[outputCube]->Write(mgr);
+  outputCubes[outputCube]->write(mgr);
 
   // Null out every other cube
   for(int i = 0; i < (int)outputCubes.size(); i++) {
@@ -156,7 +156,7 @@ void separateFrames(Buffer &in) {
       mgr[j] = Isis::Null;
     }
 
-    outputCubes[i]->Write(mgr);
+    outputCubes[i]->write(mgr);
   }
 }
 

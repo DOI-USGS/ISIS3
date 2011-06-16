@@ -191,9 +191,10 @@ namespace Isis {
       CubeDisplayProperties * cubeDisplay) {
     Projection *proj = NULL;
     Cube *cube = cubeDisplay->cube();
+    Pvl *label = cube->getLabel();
 
     try {
-      proj = ProjectionFactory::CreateFromCube(*cube->Label());
+      proj = ProjectionFactory::CreateFromCube(*label);
       return proj->Mapping();
     }
     catch(iException &e) {
@@ -210,7 +211,7 @@ namespace Isis {
       mappingGrp += PvlKeyword("MaximumLongitude", "360");
 
       try {
-        Camera * cam = cube->Camera();
+        Camera * cam = cube->getCamera();
         Distance radii[3];
         cam->Radii(radii);
 
@@ -223,7 +224,7 @@ namespace Isis {
       }
       catch(iException &e) {
         mappingGrp +=
-            cube->Label()->FindGroup("Instrument", Pvl::Traverse)["TargetName"];
+            label->FindGroup("Instrument", Pvl::Traverse)["TargetName"];
       }
 
       e.Clear();

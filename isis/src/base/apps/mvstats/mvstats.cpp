@@ -33,7 +33,7 @@ void IsisMain() {
   //Use a Process to get the number of bands in the input cube
   Process q;
   Cube *icube = q.SetInputCube("FROM");
-  int bands = icube->Bands();
+  int bands = icube->getBandCount();
 
   //Check to see if the input cube has enough bands
   if(bands < 2) {
@@ -64,8 +64,8 @@ void IsisMain() {
 
       //Set CubeAttributeInputs to tell the ProcessByLine which
       //bands to compare
-      CubeAttributeInput band_a("d+" + iString(icube->PhysicalBand(i)));
-      CubeAttributeInput band_b("d+" + iString(icube->PhysicalBand(j)));
+      CubeAttributeInput band_a("d+" + iString(icube->getPhysicalBand(i)));
+      CubeAttributeInput band_b("d+" + iString(icube->getPhysicalBand(j)));
 
       //Set Input files and process, to accumulate the statistics
       p.SetInputCube(file, band_a);
@@ -115,7 +115,7 @@ void IsisMain() {
     Cube *ocube = p.SetOutputCube(ui.GetFilename("CUBE"),
                                   set, bands, bands, 2);
     p.StartProcess(WriteCube);
-    ocube->PutGroup(bandBin);
+    ocube->putGroup(bandBin);
     p.EndProcess();
   }
 }

@@ -50,14 +50,14 @@ void IsisMain() {
   Cube * ocube = p.SetOutputCube("TO");
 
   // Check for projection
-  if (incube->HasProjection()) {
+  if (incube->isProjected()) {
     string msg = "The cube [" + ui.GetFilename("FROM") + "] has a projection" +
                  " and cannot be radiometrically calibrated";
     throw iException::Message(iException::User, msg, _FILEINFO_);
   }
 
   // access important label objects, will be used later.
-  PvlObject isiscube = incube->Label()->FindObject("IsisCube");
+  PvlObject isiscube = incube->getLabel()->FindObject("IsisCube");
   PvlGroup instrument = isiscube.FindGroup("Instrument");
   PvlGroup archive = isiscube.FindGroup("Archive");
   PvlGroup bandbin = isiscube.FindGroup("BandBin");
@@ -153,7 +153,7 @@ void IsisMain() {
   newExpo = ((double)instrument["ExposureDuration"] * 1000) + (double)calib["DeltaExposureTime"];
 
   // Camera for sun position/distance, so we have to have spice data
-  Camera * cam = incube->Camera();
+  Camera * cam = incube->getCamera();
   double sunPos[3];
   cam->SunPosition(sunPos);
   // Magnitude of sun vector ||s||
@@ -205,7 +205,7 @@ void IsisMain() {
   }
 
   // Add Radiometry group
-  ocube->PutGroup(calgrp);
+  ocube->putGroup(calgrp);
 
   p.StartProcess(calibration);
   p.EndProcess();

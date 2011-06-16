@@ -151,7 +151,7 @@ namespace Isis {
       Cube *outCube) {
     Clear();
 
-    p_outputSamples = outCube->Samples();
+    p_outputSamples = outCube->getSampleCount();
 
     iString eq = equation;
     while(eq != "") {
@@ -455,7 +455,7 @@ namespace Isis {
     // Now we can for sure put the stats object in the right place... put it
     //   there
     if((*p_cubeStats)[cubeStatsIndex] == NULL) {
-      (*p_cubeStats)[cubeStatsIndex] = inCubes[cubeStatsIndex]->Statistics();
+      (*p_cubeStats)[cubeStatsIndex] = inCubes[cubeStatsIndex]->getStatistics();
     }
 
     return cubeStatsIndex;

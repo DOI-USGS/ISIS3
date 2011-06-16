@@ -23,7 +23,7 @@ void IsisMain() {
 
   ProcessByBrick p;
   Cube *icube = p.SetInputCube("FROM");
-  p.SetBrickSize(128, 128, icube->Bands());
+  p.SetBrickSize(128, 128, icube->getBandCount());
 
   // The output cube with no attributes and real pixel type
   Isis::CubeAttributeOutput cao;
@@ -31,11 +31,11 @@ void IsisMain() {
 
   // Start the sample processing
   if(ui.GetString("MODE") == "TRANSFORM") {
-    Cube *ocube = p.SetOutputCube(ui.GetAsString("TO"), cao, icube->Samples(), icube->Lines(), icube->Bands());
-    numDimensions = icube->Bands();
+    Cube *ocube = p.SetOutputCube(ui.GetAsString("TO"), cao, icube->getSampleCount(), icube->getLineCount(), icube->getBandCount());
+    numDimensions = icube->getBandCount();
     pca = Isis::PrincipalComponentAnalysis(numDimensions);
     ProcessByBrick p2;
-    p2.SetBrickSize(128, 128, icube->Bands());
+    p2.SetBrickSize(128, 128, icube->getBandCount());
     p2.SetInputCube("FROM");
     p2.Progress()->SetText("Computing Transform");
     p2.StartProcess(PCA);
@@ -60,16 +60,16 @@ void IsisMain() {
 
     p.Progress()->SetText("Transforming Cube");
     p.StartProcess(Transform);
-    ocube->Write(table);
+    ocube->write(table);
     p.EndProcess();
   }
   else if(ui.GetString("MODE") == "INVERSE") {
-    if(!(icube->HasTable("Transform Matrix"))) {
+    if(!(icube->hasTable("Transform Matrix"))) {
       std::string m = "The input cube has not been transformed into its principal components";
       throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
     }
     Isis::Table table("Transform Matrix");
-    icube->Read(table);
+    icube->read(table);
     numDimensions = table.Records();
     TNT::Array2D<double> transform(numDimensions, numDimensions);
     for(int i = 0; i < numDimensions; i++) {
@@ -80,8 +80,8 @@ void IsisMain() {
     }
 
     pca = Isis::PrincipalComponentAnalysis(transform);
-    Cube *ocube = p.SetOutputCube(ui.GetAsString("TO"), cao, icube->Samples(), icube->Lines(), numDimensions);
-    Pvl *label = ocube->Label();
+    Cube *ocube = p.SetOutputCube(ui.GetAsString("TO"), cao, icube->getSampleCount(), icube->getLineCount(), numDimensions);
+    Pvl *label = ocube->getLabel();
     // remove the transform matrix table from the cube
     for(int i = 0; i < label->Objects(); i++) {
       if(label->Object(i).HasKeyword("Name")

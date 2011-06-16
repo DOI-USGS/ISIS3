@@ -185,7 +185,7 @@ namespace Qisis {
     // ----------------------------------------------------
     QVector< MdiCubeViewport * > * cubeList = ((ViewportMainWindow *)(p_parent))->workspace()->cubeViewportList();
     for(int i = 0; i < cubeList->size(); i++) {
-      std::string cubeFilename = cubeList->at(i)->cube()->Filename();
+      std::string cubeFilename = cubeList->at(i)->cube()->getFilename();
       QString str = QFileInfo(cubeFilename.c_str()).fileName();
       // ---------------------------------------------------------
       // Make sure we are not adding the same text more than once.
@@ -197,7 +197,7 @@ namespace Qisis {
 
     cubeList = ((ViewportMainWindow *)(p_parent))->workspace()->cubeViewportList();
     for(int i = 0; i < cubeList->size(); i++) {
-      std::string cubeFilename = cubeList->at(i)->cube()->Filename();
+      std::string cubeFilename = cubeList->at(i)->cube()->getFilename();
       QString str = QFileInfo(cubeFilename.c_str()).fileName();
       // ---------------------------------------------------------
       // Make sure we are not adding the same text more than once.
@@ -232,7 +232,7 @@ namespace Qisis {
     int numBands2 = 0;
     QVector< MdiCubeViewport * > * cubeList = ((ViewportMainWindow *)(p_parent))->workspace()->cubeViewportList();
     for(int i = 0; i < cubeList->size(); i++) {
-      std::string cubeFilename = cubeList->at(i)->cube()->Filename();
+      std::string cubeFilename = cubeList->at(i)->cube()->getFilename();
       QString str = QFileInfo(cubeFilename.c_str()).fileName();
       if(str.compare(p_cube1ComboBox->currentText()) == 0) {
         numBands1 = cubeList->at(i)->cubeBands();
@@ -279,7 +279,7 @@ namespace Qisis {
     MdiCubeViewport *cube2Viewport = NULL;
     QVector< MdiCubeViewport * > * cubeList = ((ViewportMainWindow *)(p_parent))->workspace()->cubeViewportList();
     for(int i = 0; i < cubeList->size(); i++) {
-      std::string cubeFilename = cubeList->at(i)->cube()->Filename();
+      std::string cubeFilename = cubeList->at(i)->cube()->getFilename();
       QString str = QFileInfo(cubeFilename.c_str()).fileName();
       if(str.compare(cube1) == 0) {
         cube1Viewport = cubeList->at(i);

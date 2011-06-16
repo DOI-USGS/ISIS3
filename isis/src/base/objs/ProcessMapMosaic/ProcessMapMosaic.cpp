@@ -53,10 +53,10 @@ namespace Isis {
     Cube *inCube = ProcessMosaic::SetInputCube(inputFile, inAtt);
     
     Cube *mosaicCube = OutputCubes[0];
-    Projection *iproj = inCube->Projection();
-    Projection *oproj = mosaicCube->Projection();
-    int nsMosaic = mosaicCube->Samples();
-    int nlMosaic = mosaicCube->Lines();
+    Projection *iproj = inCube->getProjection();
+    Projection *oproj = mosaicCube->getProjection();
+    int nsMosaic = mosaicCube->getSampleCount();
+    int nlMosaic = mosaicCube->getLineCount();
 
     if(*iproj != *oproj) {
       string msg = "Mapping groups do not match between cube [" + inputFile + "] and mosaic";
@@ -67,8 +67,8 @@ namespace Isis {
     outSample = (int)(oproj->ToWorldX(iproj->ToProjectionX(1.0)) + 0.5);
     outLine   = (int)(oproj->ToWorldY(iproj->ToProjectionY(1.0)) + 0.5);
 
-    outSampleEnd = outSample + InputCubes[0]->Samples();
-    outLineEnd   = outLine + InputCubes[0]->Lines();
+    outSampleEnd = outSample + InputCubes[0]->getSampleCount();
+    outLineEnd   = outLine + InputCubes[0]->getLineCount();
 
     bool wrapPossible = iproj->IsEquatorialCylindrical();
     int worldSize = 0;
@@ -156,12 +156,13 @@ namespace Isis {
     for(unsigned int i = 0; i < propagationCubes.size(); i++) {
       // Open the cube and get the maximum number of band in all cubes
       Cube cube;
-      cube.Open(propagationCubes[i]);
-      bands = max(bands, cube.Bands());
+      cube.open(propagationCubes[i]);
+      bands = max(bands, cube.getBandCount());
 
       // See if the cube has a projection and make sure it matches
       // previous input cubes
-      Projection *projNew = Isis::ProjectionFactory::CreateFromCube(*(cube.Label()));
+      Projection *projNew =
+          Isis::ProjectionFactory::CreateFromCube(*(cube.getLabel()));
       if((proj != NULL) && (*proj != *projNew)) {
         string msg = "Mapping groups do not match between cubes [" +
                      propagationCubes[0] + "] and [" + propagationCubes[i] + "]";
@@ -176,8 +177,8 @@ namespace Isis {
       if(x > xmax) xmax = x;
       if(y > ymax) ymax = y;
 
-      x = projNew->ToProjectionX(cube.Samples() + 0.5);
-      y = projNew->ToProjectionY(cube.Lines() + 0.5);
+      x = projNew->ToProjectionX(cube.getSampleCount() + 0.5);
+      y = projNew->ToProjectionY(cube.getLineCount() + 0.5);
       if(x < xmin) xmin = x;
       if(y < ymin) ymin = y;
       if(x > xmax) xmax = x;
@@ -189,7 +190,7 @@ namespace Isis {
       elon = max(elon, projNew->MaximumLongitude());
 
       // Cleanup
-      cube.Close();
+      cube.close();
       if(proj) delete proj;
       proj = projNew;
     }
@@ -240,12 +241,13 @@ namespace Isis {
 
     for(unsigned int i = 0; i < propagationCubes.size(); i++) {
       Cube cube;
-      cube.Open(propagationCubes[i]);
-      bands = max(cube.Bands(), bands);
+      cube.open(propagationCubes[i]);
+      bands = max(cube.getBandCount(), bands);
 
       // See if the cube has a projection and make sure it matches
       // previous input cubes
-      Projection *projNew = Isis::ProjectionFactory::CreateFromCube(*(cube.Label()));
+      Projection *projNew =
+          Isis::ProjectionFactory::CreateFromCube(*(cube.getLabel()));
 
       if(proj == NULL) {
       }
@@ -316,12 +318,12 @@ namespace Isis {
       p.StartProcess(ProcessMapMosaic::FillNull);
 
       // CreateForCube created some keywords in the mapping group that needs to be added
-      ocube->PutGroup(newMap.FindGroup("Mapping", Pvl::Traverse));
+      ocube->putGroup(newMap.FindGroup("Mapping", Pvl::Traverse));
       p.EndProcess();
     }
 
     Cube *mosaicCube = new Cube();
-    mosaicCube->Open(mosaicFile, "rw");
+    mosaicCube->open(mosaicFile, "rw");
 
     OutputCubes.push_back(mosaicCube);
     return mosaicCube;
@@ -352,7 +354,7 @@ namespace Isis {
       ProcessByLine p;
       CubeAttributeInput inAtt(inputFile);
       Cube *propCube = p.SetInputCube(inputFile, inAtt);
-      bands = propCube->Bands();
+      bands = propCube->getBandCount();
 
       // If track set, create the origin band
       if(GetTrackFlag()) {
@@ -371,13 +373,13 @@ namespace Isis {
       p.StartProcess(ProcessMapMosaic::FillNull);
 
       // CreateForCube created some keywords in the mapping group that needs to be added
-      ocube->PutGroup(newMap.FindGroup("Mapping", Pvl::Traverse));
+      ocube->putGroup(newMap.FindGroup("Mapping", Pvl::Traverse));
       p.EndProcess();
     }
 
     Cube *mosaicCube = new Cube();
     OutputCubes.push_back(mosaicCube);
-    mosaicCube->Open(mosaicFile, "rw");
+    mosaicCube->open(mosaicFile, "rw");
 
     return mosaicCube;
   }
@@ -387,9 +389,9 @@ namespace Isis {
   Cube *ProcessMapMosaic::SetOutputCube(const std::string &mosaicFile) {
     p_createMosaic = false;
     Cube mosaic;
-    mosaic.Open(mosaicFile);
+    mosaic.open(mosaicFile);
 
-    PvlGroup &mapping = mosaic.Label()->FindGroup("Mapping", Pvl::Traverse);
+    PvlGroup &mapping = mosaic.getLabel()->FindGroup("Mapping", Pvl::Traverse);
     CubeAttributeOutput oAtt;
     // The other SetOutput will not use the attribute or filename
     Cube *ocube = SetOutputCube("", mapping, oAtt, mosaicFile);

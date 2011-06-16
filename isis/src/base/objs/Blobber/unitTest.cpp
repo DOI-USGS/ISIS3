@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
 // Test access from Cube object class
     std::cout << "\n** Test Cube Class access...\n";
     Cube cube;
-    cube.Open(fname);
+    cube.open(fname);
     Blobber blob1(cube, blobName, fieldName, name);
     std::cout << "Blob Name:           " << blob1.getName() << std::endl;
     std::cout << "Object Name:         " << blob1.getBlobName() << std::endl;

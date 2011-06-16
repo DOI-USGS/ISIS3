@@ -20,38 +20,39 @@ void IsisMain() {
 
   Cube *icube = p.SetInputCube("FROM");
 
-  filterHeight = 16 / (int)icube->GetGroup("Instrument")["SummingMode"];
-  p.SetBrickSize(icube->Samples(), filterHeight, icube->Bands());
-  currentLine = icube->Lines();
+  filterHeight = 16 / (int)icube->getGroup("Instrument")["SummingMode"];
+  p.SetBrickSize(icube->getSampleCount(), filterHeight, icube->getBandCount());
+  currentLine = icube->getLineCount();
 
   UserInterface &ui = Application::GetUserInterface();
   outputCube = new Isis::Cube();
-  outputCube->SetDimensions(icube->Samples(), icube->Lines(), icube->Bands());
-  outputCube->Create(ui.GetFilename("TO"));
+  outputCube->setDimensions(icube->getSampleCount(), icube->getLineCount(), icube->getBandCount());
+  outputCube->create(ui.GetFilename("TO"));
 
-  if(icube->HasGroup("Instrument")) {
-    PvlGroup inst = icube->GetGroup("Instrument");
+  if(icube->hasGroup("Instrument")) {
+    PvlGroup inst = icube->getGroup("Instrument");
 
     // change flipped keyword
     inst["DataFlipped"] = ((int)inst["DataFlipped"] + 1) % 2;
 
-    outputCube->Label()->FindObject("IsisCube").AddGroup(inst);
+    outputCube->getLabel()->FindObject("IsisCube").AddGroup(inst);
   }
 
-  if(icube->HasGroup("BandBin")) {
-    outputCube->Label()->FindObject("IsisCube").AddGroup(icube->GetGroup("BandBin"));
+  if(icube->hasGroup("BandBin")) {
+    outputCube->getLabel()->FindObject("IsisCube").AddGroup(
+        icube->getGroup("BandBin"));
   }
 
-  if(icube->Label()->HasObject("OriginalLabel")) {
+  if(icube->getLabel()->HasObject("OriginalLabel")) {
     OriginalLabel origLabel;
-    icube->Read(origLabel);
-    outputCube->Write(origLabel);
+    icube->read(origLabel);
+    outputCube->write(origLabel);
   }
 
   p.StartProcess(flipCube);
   p.EndProcess();
 
-  outputCube->Close();
+  outputCube->close();
   delete outputCube;
 }
 
@@ -60,5 +61,5 @@ void flipCube(Isis::Buffer &data) {
   Brick outBrick(data.SampleDimension(), data.LineDimension(), data.BandDimension(), data.PixelType());
   outBrick.Copy(data);
   outBrick.SetBasePosition(1, currentLine + 1, data.Band());
-  outputCube->Write(outBrick);
+  outputCube->write(outBrick);
 }

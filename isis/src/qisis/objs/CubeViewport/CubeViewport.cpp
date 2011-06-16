@@ -73,7 +73,7 @@ namespace Qisis {
                                 "Can not view NULL cube pointer",
                                 _FILEINFO_);
     }
-    else if(!cube->IsOpen()) {
+    else if(!cube->isOpen()) {
       throw iException::Message(iException::Programmer,
                                 "Can not view unopened cube",
                                 _FILEINFO_);
@@ -117,11 +117,11 @@ namespace Qisis {
 
     setCaption();
 
-    p_redBrick = new Brick(4, 1, 1, cube->PixelType());
-    p_grnBrick = new Brick(4, 1, 1, cube->PixelType());
-    p_bluBrick = new Brick(4, 1, 1, cube->PixelType());
-    p_gryBrick = new Brick(4, 1, 1, cube->PixelType());
-    p_pntBrick = new Brick(4, 1, 1, cube->PixelType());
+    p_redBrick = new Brick(4, 1, 1, cube->getPixelType());
+    p_grnBrick = new Brick(4, 1, 1, cube->getPixelType());
+    p_bluBrick = new Brick(4, 1, 1, cube->getPixelType());
+    p_gryBrick = new Brick(4, 1, 1, cube->getPixelType());
+    p_pntBrick = new Brick(4, 1, 1, cube->getPixelType());
 
     p_paintPixmap = false;
     p_image = NULL;
@@ -148,7 +148,7 @@ namespace Qisis {
         p_camera = p_groundMap->Camera();
         if(p_camera->HasProjection()) {
           try {
-            p_projection = cube->Projection();
+            p_projection = cube->getProjection();
           }
           catch(iException &e) {
             e.Clear();
@@ -162,20 +162,20 @@ namespace Qisis {
 
 
     // Setup context sensitive help
-    string cubeFileName = p_cube->Filename();
+    string cubeFileName = p_cube->getFilename();
     p_whatsThisText = QString("<b>Function: </b>Viewport to ") + cubeFileName.c_str();
 
     p_cubeWhatsThisText =
       "<p><b>Cube Dimensions:</b> \
       <blockQuote>Samples = " +
-      QString::number(cube->Samples()) + "<br>" +
+      QString::number(cube->getSampleCount()) + "<br>" +
       "Lines = " +
-      QString::number(cube->Lines()) + "<br>" +
+      QString::number(cube->getLineCount()) + "<br>" +
       "Bands = " +
-      QString::number(cube->Bands()) + "</blockquote></p>";
+      QString::number(cube->getBandCount()) + "</blockquote></p>";
 
     /*setting up the qlist of CubeBandsStretch objs.
-    for( int b = 0; b < p_cube->Bands(); b++) {
+    for( int b = 0; b < p_cube->getBandCount(); b++) {
       CubeBandsStretch *stretch = new CubeBandsStretch();
       p_bandsStretchList.push_back(stretch);
     }*/
@@ -196,7 +196,7 @@ namespace Qisis {
     p_knownStretches = new QVector< Isis::Stretch * >();
     p_globalStretches = new QVector< Isis::Stretch * >();
 
-    while(p_cube->Bands() > p_knownStretches->size()) {
+    while(p_cube->getBandCount() > p_knownStretches->size()) {
       p_knownStretches->push_back(NULL);
       p_globalStretches->push_back(NULL);
     }
@@ -410,19 +410,19 @@ namespace Qisis {
 
   //! Return the number of samples in the cube
   int CubeViewport::cubeSamples() const {
-    return p_cube->Samples();
+    return p_cube->getSampleCount();
   }
 
 
   //! Return the number of lines in the cube
   int CubeViewport::cubeLines() const {
-    return p_cube->Lines();
+    return p_cube->getLineCount();
   }
 
 
   //! Return the number of bands in the cube
   int CubeViewport::cubeBands() const {
-    return p_cube->Bands();
+    return p_cube->getBandCount();
   }
 
 
@@ -446,11 +446,11 @@ namespace Qisis {
       if(sl < 0.5){
         sl = 0.5;
       }
-      if(es > cube()->Samples() + 0.5){
-        es = cube()->Samples() + 0.5;
+      if(es > cube()->getSampleCount() + 0.5){
+        es = cube()->getSampleCount() + 0.5;
       }
-      if(el > cube()->Lines() + 0.5){
-        el = cube()->Lines() + 0.5;
+      if(el > cube()->getLineCount() + 0.5){
+        el = cube()->getLineCount() + 0.5;
       }
 
       int sx, sy, ex, ey;
@@ -962,7 +962,7 @@ namespace Qisis {
    *
    */
   void CubeViewport::setCaption() {
-    string cubeFilename = p_cube->Filename();
+    string cubeFilename = p_cube->getFilename();
     QString str = QFileInfo(cubeFilename.c_str()).fileName();
     str += QString(" @ ");
     str += QString::number(p_scale * 100.0);
@@ -1343,12 +1343,12 @@ namespace Qisis {
   {
     // Get Cube Info
     PvlObject whatsThisObj = PvlObject("WhatsThis");
-    whatsThisObj += PvlKeyword("Cube", p_cube->Filename());
+    whatsThisObj += PvlKeyword("Cube", p_cube->getFilename());
 
     PvlGroup cubeGrp("CubeDimensions");
-    cubeGrp += PvlKeyword("Samples", p_cube->Samples());
-    cubeGrp += PvlKeyword("Lines",   p_cube->Lines());
-    cubeGrp += PvlKeyword("Bands",   p_cube->Bands());
+    cubeGrp += PvlKeyword("Samples", p_cube->getSampleCount());
+    cubeGrp += PvlKeyword("Lines",   p_cube->getLineCount());
+    cubeGrp += PvlKeyword("Bands",   p_cube->getBandCount());
     whatsThisObj += cubeGrp;
 
     // Get Viewport Info
@@ -1379,9 +1379,9 @@ namespace Qisis {
       virtualKey += iBlueBand;
       bandGrp   += virtualKey;
 
-      physicalKey =  p_cube->PhysicalBand(iRedBand);
-      physicalKey += p_cube->PhysicalBand(iGreenBand);
-      physicalKey += p_cube->PhysicalBand(iBlueBand);
+      physicalKey =  p_cube->getPhysicalBand(iRedBand);
+      physicalKey += p_cube->getPhysicalBand(iGreenBand);
+      physicalKey += p_cube->getPhysicalBand(iBlueBand);
       bandGrp += physicalKey;
 
       if(iFilterSize) {
@@ -1414,7 +1414,7 @@ namespace Qisis {
       bandGrp  += PvlKeyword("Color", "Gray");
 
       bandGrp  += PvlKeyword("Virtual", iGrayBand);
-      bandGrp  += PvlKeyword("Physical", p_cube->PhysicalBand(iGrayBand));
+      bandGrp  += PvlKeyword("Physical", p_cube->getPhysicalBand(iGrayBand));
 
       if(iFilterSize && iGrayBand <= iFilterSize) {
         bandGrp  += PvlKeyword("FilterName", filterName[iGrayBand-1]);
@@ -1444,7 +1444,7 @@ namespace Qisis {
   void CubeViewport::getBandFilterName(PvlKeyword & pFilterNameKey)
   {
     // get the band info
-    Pvl* cubeLbl = p_cube->Label();
+    Pvl* cubeLbl = p_cube->getLabel();
     PvlObject isisObj = cubeLbl->FindObject("IsisCube");
     if (isisObj.HasGroup("BandBin")) {
       PvlGroup bandBinGrp = isisObj.FindGroup("BandBin");
@@ -1503,13 +1503,15 @@ namespace Qisis {
       int iGreenBand = p_greenBuffer->getBand();
       int iBlueBand  = p_blueBuffer->getBand();
 
-      sBandInfo = "Bands(RGB)&nbsp;Virtual  = " + QString::number(iRedBand) + ", ";
+      sBandInfo = "Bands(RGB)&nbsp;Virtual  = " +
+          QString::number(iRedBand) + ", ";
       sBandInfo += QString::number(iGreenBand) + ", ";
       sBandInfo += QString::number(iBlueBand) + " ";
 
-      sBandInfo += "Physical = " + QString::number(p_cube->PhysicalBand(iRedBand)) + ", ";
-      sBandInfo += QString::number(p_cube->PhysicalBand(iGreenBand)) + ", ";
-      sBandInfo += QString::number(p_cube->PhysicalBand(iBlueBand));
+      sBandInfo += "Physical = " +
+          QString::number(p_cube->getPhysicalBand(iRedBand)) + ", ";
+      sBandInfo += QString::number(p_cube->getPhysicalBand(iGreenBand)) + ", ";
+      sBandInfo += QString::number(p_cube->getPhysicalBand(iBlueBand));
 
       if(iFilterSize) {
         sBandInfo += "<br>FilterName = ";
@@ -1542,7 +1544,7 @@ namespace Qisis {
 
       sBandInfo = "Band(Gray)&nbsp;Virtual = " + QString::number(iGrayBand) + " ";
 
-      sBandInfo += "Physical = " + QString::number(p_cube->PhysicalBand(iGrayBand));
+      sBandInfo += "Physical = " + QString::number(p_cube->getPhysicalBand(iGrayBand));
 
       if(iFilterSize && iGrayBand <= iFilterSize) {
         sBandInfo += "<br>FilterName = " + QString(filterNameKey[iGrayBand-1]);
@@ -1572,7 +1574,7 @@ namespace Qisis {
    */
   double CubeViewport::redPixel(int sample, int line) {
     p_pntBrick->SetBasePosition(sample, line, p_red.band);
-    p_cube->Read(*p_pntBrick);
+    p_cube->read(*p_pntBrick);
     return (*p_pntBrick)[0];
   }
 
@@ -1588,7 +1590,7 @@ namespace Qisis {
    */
   double CubeViewport::greenPixel(int sample, int line) {
     p_pntBrick->SetBasePosition(sample, line, p_green.band);
-    p_cube->Read(*p_pntBrick);
+    p_cube->read(*p_pntBrick);
     return (*p_pntBrick)[0];
   }
 
@@ -1604,7 +1606,7 @@ namespace Qisis {
    */
   double CubeViewport::bluePixel(int sample, int line) {
     p_pntBrick->SetBasePosition(sample, line, p_blue.band);
-    p_cube->Read(*p_pntBrick);
+    p_cube->read(*p_pntBrick);
     return (*p_pntBrick)[0];
   }
 
@@ -1620,7 +1622,7 @@ namespace Qisis {
    */
   double CubeViewport::grayPixel(int sample, int line) {
     p_pntBrick->SetBasePosition(sample, line, p_gray.band);
-    p_cube->Read(*p_pntBrick);
+    p_cube->read(*p_pntBrick);
     return (*p_pntBrick)[0];
   }
 
@@ -2265,11 +2267,11 @@ namespace Qisis {
     if(sl < 1){
       sl = 0.5;
     }
-    if(es > cube()->Samples()){
-      es = cube()->Samples() + 0.5;
+    if(es > cube()->getSampleCount()){
+      es = cube()->getSampleCount() + 0.5;
     }
-    if(el > cube()->Lines()){
-      el = cube()->Lines() + 0.5;
+    if(el > cube()->getLineCount()){
+      el = cube()->getLineCount() + 0.5;
     }
 
     //start x/y and end x/y

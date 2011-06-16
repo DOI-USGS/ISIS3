@@ -20,7 +20,7 @@ void IsisMain() {
 
   // Set up the default reference band to the middle of the cube
   // If we have even bands it will be close to the middle
-  int referenceBand = ocube->Bands();
+  int referenceBand = ocube->getBandCount();
   referenceBand += (referenceBand % 2);
   referenceBand /= 2;
 
@@ -34,41 +34,41 @@ void IsisMain() {
   // filename required by the Camera is not passed by the process class in this
   // case.  Use the CameraFactory to create the Camera instead to get around this
   // problem.
-  Camera *outcam = CameraFactory::Create(*(mcube->Label()));
+  Camera *outcam = CameraFactory::Create(*(mcube->getLabel()));
 
   // Set the reference band we want to match
-  PvlGroup instgrp = mcube->GetGroup("Instrument");
+  PvlGroup instgrp = mcube->getGroup("Instrument");
   if(!outcam->IsBandIndependent()) {
     PvlKeyword rBand("ReferenceBand", referenceBand);
     rBand.AddComment("# All bands are aligned to reference band");
     instgrp += rBand;
-    mcube->PutGroup(instgrp);
+    mcube->putGroup(instgrp);
     delete outcam;
     outcam = NULL;
   }
 
   // Only recreate the output camera if it was band dependent
-  if(outcam == NULL) outcam = CameraFactory::Create(*(mcube->Label()));
+  if(outcam == NULL) outcam = CameraFactory::Create(*(mcube->getLabel()));
 
   // We might need the instrument group later, so get a copy before clearing the input
   //   cubes.
   m.ClearInputCubes();
 
   Cube *icube = m.SetInputCube("FROM");
-  incam = icube->Camera();
+  incam = icube->getCamera();
 
   // Set up the transform object which will simply map
   // output line/samps -> output lat/lons -> input line/samps
-  Transform *transform = new cam2cam(icube->Samples(),
-                                     icube->Lines(),
+  Transform *transform = new cam2cam(icube->getSampleCount(),
+                                     icube->getLineCount(),
                                      incam,
-                                     ocube->Samples(),
-                                     ocube->Lines(),
+                                     ocube->getSampleCount(),
+                                     ocube->getLineCount(),
                                      outcam);
 
 
   // Add the reference band to the output if necessary
-  ocube->PutGroup(instgrp);
+  ocube->putGroup(instgrp);
 
   // Set up the interpolator
   Interpolator *interp = NULL;

@@ -66,21 +66,21 @@ namespace Isis {
     }
 
     // The lines in the input and output must match
-    if(InputCubes[0]->Lines() != OutputCubes[0]->Lines()) {
+    if(InputCubes[0]->getLineCount() != OutputCubes[0]->getLineCount()) {
       string m = "The number of lines in the input and output cubes ";
       m += "must match";
       throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
     }
 
     // The samples in the input and output must match
-    if(InputCubes[0]->Samples() != OutputCubes[0]->Samples()) {
+    if(InputCubes[0]->getSampleCount() != OutputCubes[0]->getSampleCount()) {
       string m = "The number of samples in the input and output cubes ";
       m += "must match";
       throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
     }
 
     // The bands in the input and output must match
-    if(InputCubes[0]->Bands() != OutputCubes[0]->Bands()) {
+    if(InputCubes[0]->getBandCount() != OutputCubes[0]->getBandCount()) {
       string m = "The number of bands in the input and output cubes ";
       m += "must match";
       throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
@@ -98,18 +98,18 @@ namespace Isis {
     double out;
 
     // Loop and let the app programmer use the boxcar to change output pixel
-    p_progress->SetMaximumSteps(InputCubes[0]->Lines()*InputCubes[0]->Bands());
+    p_progress->SetMaximumSteps(InputCubes[0]->getLineCount()*InputCubes[0]->getBandCount());
     p_progress->CheckStatus();
 
     box.begin();
     for(line.begin(); !line.end(); line.next()) {
       for(int i = 0; i < line.size(); i++) {
-        InputCubes[0]->Read(box);
+        InputCubes[0]->read(box);
         funct(box, out);
         line[i] = out;
         box++;
       }
-      OutputCubes[0]->Write(line);
+      OutputCubes[0]->write(line);
       p_progress->CheckStatus();
     }
 

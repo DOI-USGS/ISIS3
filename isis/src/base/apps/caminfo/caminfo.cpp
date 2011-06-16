@@ -69,9 +69,9 @@ void IsisMain() {
   general->append(MakePair("RunDate",     iTime::CurrentGMT()));
   general->append(MakePair("IsisId",      SerialNumber::Compose(*incube)));
   general->append(MakePair("From",        in.Basename() + ".cub"));
-  general->append(MakePair("Lines",       incube->Lines()));
-  general->append(MakePair("Samples",     incube->Samples()));
-  general->append(MakePair("Bands",       incube->Bands()));
+  general->append(MakePair("Lines",       incube->getLineCount()));
+  general->append(MakePair("Samples",     incube->getSampleCount()));
+  general->append(MakePair("Bands",       incube->getBandCount()));
 
   // Run camstats on the entire image (all bands)
   // another camstats will be run for each band and output
@@ -122,11 +122,11 @@ void IsisMain() {
     Statistics stats;
     Progress progress;
     progress.SetText("Statistics...");
-    progress.SetMaximumSteps(incube->Lines()*incube->Bands());
+    progress.SetMaximumSteps(incube->getLineCount()*incube->getBandCount());
     progress.CheckStatus();
     iline.SetLine(1);
     for(; !iline.end() ; iline.next()) {
-      incube->Read(iline);
+      incube->read(iline);
       stats.AddData(iline.DoubleBuffer(), iline.size());
       progress.CheckStatus();
     }
@@ -155,7 +155,7 @@ void IsisMain() {
   bool doGeometry = ui.GetBoolean("GEOMETRY");
   bool doPolygon = ui.GetBoolean("POLYGON");
   if(doGeometry || doPolygon) {
-    Camera *cam = incube->Camera();
+    Camera *cam = incube->getCamera();
 
     iString incType = ui.GetString("INCTYPE");
     int polySinc, polyLinc;
@@ -171,14 +171,14 @@ void IsisMain() {
         polySinc = ui.GetInteger("POLYSINC");
       }
       else {
-        polySinc = (int)(0.5 + 0.10 * incube->Samples());
+        polySinc = (int)(0.5 + 0.10 * incube->getSampleCount());
         if(polySinc == 0) polySinc = 1;
       }
       if(ui.WasEntered("POLYLINC")) {
         polyLinc = ui.GetInteger("POLYLINC");
       }
       else {
-        polyLinc = (int)(0.5 + 0.10 * incube->Lines());
+        polyLinc = (int)(0.5 + 0.10 * incube->getLineCount());
         if(polyLinc == 0) polyLinc = 1;
       }
     }
@@ -260,7 +260,7 @@ void GeneratePVLOutput(Cube *incube,
 
   // Add the input ISIS label if requested
   if(ui.GetBoolean("ISISLABEL")) {
-    Pvl label = *(incube->Label());
+    Pvl label = *(incube->getLabel());
     label.SetName("IsisLabel");
     params.AddObject(label);
   }
@@ -268,7 +268,7 @@ void GeneratePVLOutput(Cube *incube,
   // Add the orginal label blob
   if(ui.GetBoolean("ORIGINALLABEL")) {
     OriginalLabel orig;
-    incube->Read(orig);
+    incube->read(orig);
     Pvl p = orig.ReturnLabels();
     p.SetName("OriginalLabel");
     params.AddObject(p);

@@ -33,12 +33,12 @@ void IsisMain() {
 
   // Loop and accumulate histogram
   p.Progress()->SetText("Gathering Histogram");
-  p.Progress()->SetMaximumSteps(icube->Lines());
+  p.Progress()->SetMaximumSteps(icube->getLineCount());
   p.Progress()->CheckStatus();
   LineManager line(*icube);
-  for(int i = 1; i <= icube->Lines(); i++) {
+  for(int i = 1; i <= icube->getLineCount(); i++) {
     line.SetLine(i);
-    icube->Read(line);
+    icube->read(line);
     hist.AddData(line.DoubleBuffer(), line.size());
     p.Progress()->CheckStatus();
   }
@@ -55,7 +55,7 @@ void IsisMain() {
     fout.open(outfile.c_str());
 
     fout << "Cube:           " << ui.GetFilename("FROM") << endl;
-    fout << "Band:           " << icube->Bands() << endl;
+    fout << "Band:           " << icube->getBandCount() << endl;
     fout << "Average:        " << hist.Average() << endl;
     fout << "Std Deviation:  " << hist.StandardDeviation() << endl;
     fout << "Variance:       " << hist.Variance() << endl;

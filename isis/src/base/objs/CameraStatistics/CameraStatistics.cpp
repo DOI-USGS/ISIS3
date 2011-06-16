@@ -26,8 +26,8 @@ namespace Isis {
    */
   CameraStatistics::CameraStatistics(std::string filename, int sinc, int linc) {
     Cube cube;
-    cube.Open(filename);
-    Camera *cam = cube.Camera();
+    cube.open(filename);
+    Camera *cam = cube.getCamera();
     init(cam, sinc, linc, filename);
   }
 

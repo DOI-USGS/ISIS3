@@ -274,11 +274,11 @@ namespace Qisis {
     MdiCubeViewport *vp = cubeViewport();
     if(vp == NULL) return;
 
-    if(vp->cube()->IsReadOnly()) {
+    if(vp->cube()->isReadOnly()) {
       //  ReOpen cube as read/write
       //  If cube readonly print error
       try {
-        vp->cube()->ReOpen("rw");
+        vp->cube()->reopen("rw");
       }
       catch(Isis::iException &e) {
         QMessageBox::information((QWidget *)parent(), "Error", "Cannot open cube read/write");
@@ -391,11 +391,11 @@ namespace Qisis {
     if(vp == NULL) return;
     if(p_valTypeComboBox->currentIndex() == UserDn && p_dnLineEdit->text() == "" && m != Qt::RightButton) return;
     //  If cube readonly try to open read/write
-    if(vp->cube()->IsReadOnly()) {
+    if(vp->cube()->isReadOnly()) {
       //  ReOpen cube as read/write
       //  If cube readonly print error
       try {
-        vp->cube()->ReOpen("rw");
+        vp->cube()->reopen("rw");
       }
       catch(Isis::iException &e) {
         QMessageBox::information((QWidget *)parent(), "Error", "Cannot open cube read/write");
@@ -417,9 +417,10 @@ namespace Qisis {
       vp->viewportToCube(p.x(), p.y(), ssamp, sline);
       issamp = (int)(ssamp + 0.5);
       isline = (int)(sline + 0.5);
-      Isis::Brick *pntBrick = new Isis::Brick(1, 1, 1, vp->cube()->PixelType());
+      Isis::Brick *pntBrick = new Isis::Brick(1, 1, 1,
+                                              vp->cube()->getPixelType());
       pntBrick->SetBasePosition(issamp, isline, vp->grayBand());
-      vp->cube()->Read(*pntBrick);
+      vp->cube()->read(*pntBrick);
       p_dn = (*pntBrick)[0];
       p_dnLineEdit->setText(QString::number(p_dn));
       delete pntBrick;
@@ -442,11 +443,11 @@ namespace Qisis {
       ieline = isline;
       if(p_shapeComboBox->currentIndex() == HorizLine) {
         issamp = 1;
-        iesamp = vp->cube()->Samples();
+        iesamp = vp->cube()->getSampleCount();
       }
       if(p_shapeComboBox->currentIndex() == VertLine) {
         isline = 1;
-        ieline = vp->cube()->Lines();
+        ieline = vp->cube()->getLineCount();
       }
       // Write the changes to the cube.
       writeToCube(iesamp, issamp, ieline, isline, NULL);
@@ -472,9 +473,9 @@ namespace Qisis {
       int nsamps = iesamp - issamp + 1;
       int nlines = ieline - isline + 1;
 
-      brick = new Isis::Brick(nsamps, nlines, 1, vp->cube()->PixelType());
+      brick = new Isis::Brick(nsamps, nlines, 1, vp->cube()->getPixelType());
       brick->SetBasePosition(issamp, isline, vp->grayBand());
-      vp->cube()->Read(*brick);
+      vp->cube()->read(*brick);
 
       //  Save for Undo operation,  See if viewport has undo entry.  If it
       //  does, get Stack, push new undo and put stack back in hash.  If not,
@@ -500,9 +501,9 @@ namespace Qisis {
       }
 
       //  no deep copy constructor so re-read brick for editing....
-      brick = new Isis::Brick(nsamps, nlines, 1, vp->cube()->PixelType());
+      brick = new Isis::Brick(nsamps, nlines, 1, vp->cube()->getPixelType());
       brick->SetBasePosition(issamp, isline, vp->grayBand());
-      vp->cube()->Read(*brick);
+      vp->cube()->read(*brick);
 
       //  Now that we have where, do the actual edits
       if(p_shapeComboBox->currentIndex() == StartEndLine) {
@@ -522,7 +523,7 @@ namespace Qisis {
       emit cubeChanged(true);
       p_undoButton->setEnabled(true);
       p_saveButton->setEnabled(true);
-      vp->cube()->Write(*brick);
+      vp->cube()->write(*brick);
       vp->cubeChanged(true);
       vp->setCaption();
 
@@ -560,7 +561,7 @@ namespace Qisis {
       }
 
       //  If cube readonly print error
-      if(vp->cube()->IsReadOnly()) {
+      if(vp->cube()->isReadOnly()) {
         QMessageBox::information((QWidget *)parent(), "Error", "Cube is Read Only");
         return;
       }
@@ -570,9 +571,9 @@ namespace Qisis {
       Isis::Brick *brick = s->top();
 
       //Write the current cube to the a brick and add it to the redo stack
-      redoBrick = new Isis::Brick(brick->SampleDimension(), brick->LineDimension(), 1, vp->cube()->PixelType());
+      redoBrick = new Isis::Brick(brick->SampleDimension(), brick->LineDimension(), 1, vp->cube()->getPixelType());
       redoBrick->SetBasePosition(brick->Sample(), brick->Line(), vp->grayBand());
-      vp->cube()->Read(*(redoBrick));
+      vp->cube()->read(*(redoBrick));
 
       QStack<Isis::Brick *> *redo;
       if(p_redoEdit.contains(vp)) {
@@ -585,7 +586,7 @@ namespace Qisis {
       p_redoEdit[vp] = redo;
 
       //  Write the saved brick to the cube
-      vp->cube()->Write(*(brick));
+      vp->cube()->write(*(brick));
 
       //  Update the viewport
       QRect r(brick->Sample(), brick->Line(),
@@ -628,7 +629,7 @@ namespace Qisis {
       if(vp == NULL) return;
 
       //  If cube readonly print error
-      if(vp->cube()->IsReadOnly()) {
+      if(vp->cube()->isReadOnly()) {
         QMessageBox::information((QWidget *)parent(), "Error", "Cube is Read Only");
         return;
       }
@@ -650,7 +651,7 @@ namespace Qisis {
           Isis::Brick *brick = undo->at(i);
 
           //  Write the saved brick to the cube
-          vp->cube()->Write(*(brick));
+          vp->cube()->write(*(brick));
         }
 
         //If undos have been made past the save point, we need to redo them
@@ -667,7 +668,7 @@ namespace Qisis {
           Isis::Brick *brick = redo->at(i);
 
           //  Write the saved brick to the cube
-          vp->cube()->Write(*(brick));
+          vp->cube()->write(*(brick));
         }
       }
     }
@@ -695,7 +696,7 @@ namespace Qisis {
       }
 
       //  If cube readonly print error
-      if(vp->cube()->IsReadOnly()) {
+      if(vp->cube()->isReadOnly()) {
         QMessageBox::information((QWidget *)parent(), "Error", "Cube is Read Only");
         return;
       }
@@ -704,9 +705,11 @@ namespace Qisis {
       Isis::Brick *brick = s->top();
 
       //Write the current cube to the a brick and add it to the undo stack
-      undoBrick = new Isis::Brick(brick->SampleDimension(), brick->LineDimension(), 1, vp->cube()->PixelType());
+      undoBrick = new Isis::Brick(brick->SampleDimension(),
+                                  brick->LineDimension(), 1,
+                                  vp->cube()->getPixelType());
       undoBrick->SetBasePosition(brick->Sample(), brick->Line(), vp->grayBand());
-      vp->cube()->Read(*(undoBrick));
+      vp->cube()->read(*(undoBrick));
 
       QStack<Isis::Brick *> *undo;
       if(p_undoEdit.contains(vp)) {
@@ -719,7 +722,7 @@ namespace Qisis {
       p_undoEdit[vp] = undo;
 
       //  Write the saved brick to the cube
-      vp->cube()->Write(*(brick));
+      vp->cube()->write(*(brick));
       //  Update the viewport
 
       QRect r(brick->Sample(), brick->Line(),

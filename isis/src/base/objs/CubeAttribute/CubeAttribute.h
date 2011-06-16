@@ -1,3 +1,5 @@
+#ifndef CubeAttribute_h
+#define CubeAttribute_h
 /**
  * @file
  * $Revision: 1.2 $
@@ -21,15 +23,14 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#ifndef CubeAttribute_h
-#define CubeAttribute_h
 #include <string>
-#include "Pvl.h"
-#include "iString.h"
-#include "PixelType.h"
+
+#include "Cube.h"
 #include "Endian.h"
 #include "iException.h"
-#include "CubeFormat.h"
+#include "iString.h"
+#include "PixelType.h"
+#include "Pvl.h"
 
 namespace Isis {
 
@@ -427,11 +428,11 @@ namespace Isis {
       //! Return the file format as a string
       std::string FileFormatStr() const;
 
-      //! Return the file format an Isis::CubeFormat
-      Isis::CubeFormat FileFormat() const;
+      //! Return the file format an Cube::Format
+      Cube::Format FileFormat() const;
 
       //! Set the format to the fmt parameter
-      void Format(const Isis::CubeFormat fmt);
+      void Format(const Cube::Format &fmt);
 
       //! Return the byte order as a string
       std::string ByteOrderStr() const;
@@ -502,7 +503,7 @@ namespace Isis {
 
       double p_minimum; //!< Stores the minimum for the output cube attribute
       double p_maximum; //!< Stores the maximum for the output cube attribute
-      Isis::CubeFormat p_format; //!< Store the cube format
+      Cube::Format p_format; //!< Store the cube format
       Isis::ByteOrder p_order; //!< Store the byte order for the cube attribute
       Isis::LabelAttachment p_labelAttachment; //!< Store the type of label attachment
 

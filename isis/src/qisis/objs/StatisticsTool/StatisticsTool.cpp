@@ -303,7 +303,7 @@ namespace Qisis {
     int iline = (int)(line + 0.5);
 
     Isis::Statistics stats;
-    Isis::Brick *brick = new Isis::Brick(1, 1, 1, cvp->cube()->PixelType());
+    Isis::Brick *brick = new Isis::Brick(1, 1, 1, cvp->cube()->getPixelType());
 
 
     QVector<QVector<double> > pixelData(p_boxLines, QVector<double>(p_boxSamps, 0));
@@ -330,7 +330,7 @@ namespace Qisis {
           continue;
         }
         brick->SetBasePosition(x, y, cvp->grayBand());
-        cvp->cube()->Read(*brick);
+        cvp->cube()->read(*brick);
         stats.AddData(brick->at(0));
         pixelData[i][j] = brick->at(0);
 

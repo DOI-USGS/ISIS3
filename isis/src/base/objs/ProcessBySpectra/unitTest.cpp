@@ -32,10 +32,10 @@ void IsisMain() {
   p.EndProcess();
 
   Isis::Cube cube;
-  cube.Open("/tmp/isisProcessBySpectra_01");
-  cube.Close(true);
-  cube.Open("/tmp/isisProcessBySpectra_02");
-  cube.Close(true);
+  cube.open("/tmp/isisProcessBySpectra_01");
+  cube.close(true);
+  cube.open("/tmp/isisProcessBySpectra_02");
+  cube.close(true);
 }
 
 void oneInput(Isis::Buffer &b) {

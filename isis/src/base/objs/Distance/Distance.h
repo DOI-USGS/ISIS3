@@ -30,10 +30,6 @@ namespace Isis {
    *   typically used for Radius and XYZ values but is also available as a
    *   general purpose class. This class does not accept negative values.
    *
-   * The empty constructor is purposefully disallowed, I strongly discourage
-   *   constructing these with a 'known' bad distance and testing for that
-   *   later on.
-   *
    * @ingroup Utility
    *
    * @author 2010-10-12 Steven Lambright
@@ -52,19 +48,25 @@ namespace Isis {
         //! The distance is being specified in meters
         Meters,
         //! The distance is being specified in kilometers
-        Kilometers
+        Kilometers,
+        //! The distance is being specified in pixels
+        Pixels
       };
 
       Distance();
       Distance(double distance, Units distanceUnit);
+      Distance(double distanceInPixels, double pixelsPerMeter);
       Distance(const Distance &distanceToCopy);
-      ~Distance();
+      virtual ~Distance();
 
       double GetMeters() const;
       void SetMeters(double distanceInMeters);
 
       double GetKilometers() const;
       void SetKilometers(double distanceInKilometers);
+
+      double GetPixels(double pixelsPerMeter = 1.0) const;
+      void SetPixels(double distanceInPixels, double pixelsPerMeter = 1.0);
 
       bool Valid() const;
 
@@ -136,8 +138,8 @@ namespace Isis {
       void operator *=(const double &valueToMult);
 
     protected:
-      double GetDistance(Units distanceUnit) const;
-      void SetDistance(const double &distance, Units distanceUnit);
+      virtual double GetDistance(Units distanceUnit) const;
+      virtual void SetDistance(const double &distance, Units distanceUnit);
 
     private:
       /**

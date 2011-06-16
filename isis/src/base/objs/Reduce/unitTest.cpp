@@ -18,19 +18,20 @@ void IsisMain() {
   
   p.SetInputCube("FROM");
   Isis::Cube *icube=new Isis::Cube;
-  icube->Open(ui.GetFilename("FROM"));
+
+  icube->open(ui.GetFilename("FROM"));
   // Get input bands
-  int inb = icube->Bands();
+  int inb = icube->getBandCount();
   for(int i = 1; i <= inb; i++) {
     bands.push_back((Isis::iString)i);
   }
   double sscale = 3;
   double lscale = 4;
-  int ons = (int)ceil((double)icube->Samples() / sscale);
-  int onl = (int)ceil((double)icube->Lines() / lscale);
+  int ons = (int)ceil((double)icube->getSampleCount() / sscale);
+  int onl = (int)ceil((double)icube->getLineCount() / lscale);
     
   // Reduce by "Near"
-  Isis::Cube *ocube = p.SetOutputCube("TO", ons, onl, icube->Bands());
+  Isis::Cube *ocube = p.SetOutputCube("TO", ons, onl, icube->getBandCount());
   Isis::Nearest near(icube, bands, sscale, lscale);
   p.ClearInputCubes();
   cout << "Reduce by Near\n";
@@ -41,17 +42,16 @@ void IsisMain() {
   
   // Reduce by "Average"
   p.SetInputCube("FROM");
-  ocube=p.SetOutputCube("TO2", ons, onl, icube->Bands());
+  ocube=p.SetOutputCube("TO2", ons, onl, icube->getBandCount());
   p.ClearInputCubes();
   Isis::Average avg(icube, bands, sscale, lscale, 0.5, "scale");
   cout << "\nReduce by Average\n";
   p.StartProcessInPlace(avg);
   results = avg.UpdateOutputLabel(ocube);
   cout << results << endl;
-  
+
   p.EndProcess();
-  icube->Close();
-  ocube->Close();
+  icube->close();
   remove(ui.GetAsString("TO").c_str());
   remove(ui.GetAsString("TO2").c_str());
 }

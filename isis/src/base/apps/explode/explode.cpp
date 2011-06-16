@@ -12,10 +12,10 @@ void IsisMain() {
   // Get the cube to explode
   Process p;
   Cube *icube = p.SetInputCube("FROM");
-  int samps = icube->Samples();
-  int lines = icube->Lines();
-  int bands = icube->Bands();
-  string infile = icube->Filename();
+  int samps = icube->getSampleCount();
+  int lines = icube->getLineCount();
+  int bands = icube->getBandCount();
+  string infile = icube->getFilename();
 
   // We the output filename so we can add attributes and extensions
   UserInterface &ui = Application::GetUserInterface();
@@ -24,7 +24,7 @@ void IsisMain() {
 
   // Loop and extract each band
   for(int band = 1; band <= bands; band++) {
-    int pband = icube->PhysicalBand(band);
+    int pband = icube->getPhysicalBand(band);
     iString sband(pband);
 
     ProcessByLine p2;

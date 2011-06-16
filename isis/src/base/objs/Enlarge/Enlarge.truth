@@ -5,8 +5,8 @@ Object = IsisCube
   Object = Core
     StartByte   = 65537
     Format      = Tile
-    TileSamples = 128
-    TileLines   = 128
+    TileSamples = 252
+    TileLines   = 252
 
     Group = Dimensions
       Samples = 252

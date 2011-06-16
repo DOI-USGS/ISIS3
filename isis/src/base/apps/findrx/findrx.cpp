@@ -16,7 +16,7 @@ void IsisMain() {
   // Import cube data & PVL information
   Cube cube;
   UserInterface &ui = Application::GetUserInterface();
-  cube.Open(ui.GetFilename("FROM"), "rw");
+  cube.open(ui.GetFilename("FROM"), "rw");
   Pvl *regdef;
   // If regdef was supplied by the user, use it. else, use the template.
   if(ui.WasEntered("REGDEF")) {
@@ -25,7 +25,7 @@ void IsisMain() {
   else {
     regdef = new Pvl("$base/templates/autoreg/findrx.def");
   }
-  PvlGroup &reseaus = cube.Label()->FindGroup("Reseaus", Pvl::Traverse);
+  PvlGroup &reseaus = cube.getLabel()->FindGroup("Reseaus", Pvl::Traverse);
 
   // If the Keyword sizes don't match up, throw errors.
   int nres = reseaus["Line"].Size();
@@ -51,7 +51,7 @@ void IsisMain() {
   // Auto Registration
   AutoReg *ar = AutoRegFactory::Create(*regdef);
   Cube pattern;
-  pattern.Open(reseaus["Template"], "r");
+  pattern.open(reseaus["Template"][0], "r");
   ar->PatternChip()->TackCube(5.0, 5.0);
 
   // Display the progress...10% 20% etc.
@@ -109,7 +109,7 @@ void IsisMain() {
       double line = reseaus["Line"][res];
       double sample = reseaus["Sample"][res];
       white->SetBasePosition(int(sample), int(line), 1);
-      cube.Write(*white);
+      cube.write(*white);
     }
     prog.CheckStatus();
 
@@ -118,6 +118,6 @@ void IsisMain() {
   // Change status to "Refined", corrected!
   reseaus["Status"] = "Refined";
 
-  pattern.Close();
-  cube.Close();
+  pattern.close();
+  cube.close();
 }

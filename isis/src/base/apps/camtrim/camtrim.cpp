@@ -26,7 +26,7 @@ void IsisMain() {
 
   // Setup the input and get the camera model
   icube = p.SetInputCube("FROM");
-  cam = icube->Camera();
+  cam = icube->getCamera();
 
   // Create the output cube
   p.SetOutputCube("TO");
@@ -64,7 +64,7 @@ void camtrim(Buffer &in, Buffer &out) {
   // See if there is a change in band which would change the camera model
   if(in.Band() != lastBand) {
     lastBand = in.Band();
-    cam->SetBand(icube->PhysicalBand(lastBand));
+    cam->SetBand(icube->getPhysicalBand(lastBand));
   }
 
   // Loop for each pixel in the line.

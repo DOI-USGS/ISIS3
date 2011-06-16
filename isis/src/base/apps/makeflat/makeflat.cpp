@@ -256,14 +256,14 @@ void IsisMain() {
      * Read the current cube into memory
      */
     Cube tmp;
-    tmp.Open(Filename(inList[currImage]).Expanded());
+    tmp.open(Filename(inList[currImage]).Expanded());
 
     /**
      * If we haven't determined how many samples the output
      *   should have, we can do so now
      */
-    if(numOutputSamples == 0 && tmp.Bands() == 1) {
-      numOutputSamples = tmp.Samples();
+    if(numOutputSamples == 0 && tmp.getBandCount() == 1) {
+      numOutputSamples = tmp.getSampleCount();
     }
 
     /**
@@ -274,14 +274,14 @@ void IsisMain() {
     bool imageValid = true;
 
     // Only single band images are acceptable
-    imageValid &= (tmp.Bands() == 1);
+    imageValid &= (tmp.getBandCount() == 1);
 
     // Sample sizes must always match
-    imageValid &= (numOutputSamples == tmp.Samples());
+    imageValid &= (numOutputSamples == tmp.getSampleCount());
 
     // For push frame cameras, there must be valid all framelets
     if(cameraType == PushFrame) {
-      imageValid &= (tmp.Lines() % numFrameLines == 0);
+      imageValid &= (tmp.getLineCount() % numFrameLines == 0);
     }
 
     // For framing cameras, we need to figure out the size...
@@ -290,12 +290,12 @@ void IsisMain() {
     bool setTempFileLength = false;
     if(cameraType == Framing) {
       if(tempFileLength == 0 && imageValid) {
-        tempFileLength = tmp.Lines();
+        tempFileLength = tmp.getLineCount();
         numFrameLines = tempFileLength;
         setTempFileLength = true;
       }
 
-      imageValid &= (tempFileLength == tmp.Lines());
+      imageValid &= (tempFileLength == tmp.getLineCount());
     }
 
     // Statistics are necessary at this point for push frame and framing cameras
@@ -307,7 +307,7 @@ void IsisMain() {
       prog += iString((int)inList.size()) + " (" + Filename(inList[currImage]).Name() + ")";
 
       if(cameraType == Framing) {
-        Statistics *stats = tmp.Statistics(1, prog);
+        Statistics *stats = tmp.getStatistics(1, prog);
         imageValid &= !IsSpecial(stats->StandardDeviation());
         imageValid &= !IsSpecial(stats->Average());
         imageValid &= stats->StandardDeviation() <= maxStdev;
@@ -330,10 +330,10 @@ void IsisMain() {
     // The line scan camera needs to actually count the number of lines in each image to know
     //   how many total frames there are before beginning pass 2.
     if(imageValid && (cameraType == LineScan)) {
-      int lines = (tmp.Lines() / numFrameLines);
+      int lines = (tmp.getLineCount() / numFrameLines);
 
       // partial frame?
-      if(tmp.Lines() % numFrameLines != 0) {
+      if(tmp.getLineCount() % numFrameLines != 0) {
         lines ++;
       }
 
@@ -343,7 +343,7 @@ void IsisMain() {
       excludedFiles.insert(pair<int, bool>(currImage, true));
     }
 
-    tmp.Close();
+    tmp.close();
 
     if(cameraType == LineScan) {
       progress.CheckStatus();
@@ -372,11 +372,11 @@ void IsisMain() {
    * ocube is now the temporary file (for pass 2).
    */
   ocube = new Cube();
-  ocube->SetDimensions(numOutputSamples, tempFileLength, 2);
+  ocube->setDimensions(numOutputSamples, tempFileLength, 2);
   PvlGroup &prefs = Preference::Preferences().FindGroup("DataDirectory", Pvl::Traverse);
   iString outTmpName = (string)prefs["Temporary"][0] + "/";
   outTmpName += Filename(ui.GetFilename("TO")).Basename() + ".tmp.cub";
-  ocube->Create(outTmpName);
+  ocube->create(outTmpName);
   oLineMgr = new LineManager(*ocube);
   oLineMgr->SetLine(1);
 
@@ -445,7 +445,7 @@ void IsisMain() {
   }
 
   if(ocube) {
-    ocube->Close();
+    ocube->close();
     delete ocube;
   }
 
@@ -455,13 +455,13 @@ void IsisMain() {
   ocube = new Cube();
 
   if(cameraType == LineScan) {
-    ocube->SetDimensions(numOutputSamples, 1, 1);
+    ocube->setDimensions(numOutputSamples, 1, 1);
   }
   else if(cameraType == Framing || cameraType == PushFrame) {
-    ocube->SetDimensions(numOutputSamples, tempFileLength, 1);
+    ocube->setDimensions(numOutputSamples, tempFileLength, 1);
   }
 
-  ocube->Create(Filename(ui.GetFilename("TO")).Expanded());
+  ocube->create(Filename(ui.GetFilename("TO")).Expanded());
   oLineMgr = new LineManager(*ocube);
   oLineMgr->SetLine(1);
 
@@ -478,7 +478,7 @@ void IsisMain() {
   p.EndProcess();
 
   if(cameraType == LineScan) {
-    ocube->Write(*oLineMgr);
+    ocube->write(*oLineMgr);
   }
 
   if(oLineMgr) {
@@ -487,7 +487,7 @@ void IsisMain() {
   }
 
   if(ocube) {
-    ocube->Close();
+    ocube->close();
     delete ocube;
     ocube = NULL;
   }
@@ -570,7 +570,7 @@ bool CheckFramelets(string progress, Cube &theCube) {
   LineManager mgr(theCube);
   Progress prog;
   prog.SetText(progress);
-  prog.SetMaximumSteps(theCube.Lines());
+  prog.SetMaximumSteps(theCube.getLineCount());
   prog.CheckStatus();
 
   vector<double> frameletAvgs;
@@ -580,13 +580,13 @@ bool CheckFramelets(string progress, Cube &theCube) {
   vector< pair<int, double> > excludedFrameletsTmp;
   Statistics frameletStats;
 
-  for(int line = 1; line <= theCube.Lines(); line++) {
+  for(int line = 1; line <= theCube.getLineCount(); line++) {
     if((line - 1) % numFrameLines == 0) {
       frameletStats.Reset();
     }
 
     mgr.SetLine(line);
-    theCube.Read(mgr);
+    theCube.read(mgr);
     frameletStats.AddData(mgr.DoubleBuffer(), mgr.size());
 
     if((line - 1) % numFrameLines == numFrameLines - 1) {
@@ -688,7 +688,7 @@ void CreateTemporaryData(Buffer &in) {
         }
       }
 
-      ocube->Write(*oLineMgr);
+      ocube->write(*oLineMgr);
       oLineMgr->SetLine(oLineMgr->Line(), 2);
 
       // band 2 is our valid dn counts
@@ -697,7 +697,7 @@ void CreateTemporaryData(Buffer &in) {
         numInputDns[i] += (int)(outputTmpCounts[i] + 0.5);
       }
 
-      ocube->Write(*oLineMgr);
+      ocube->write(*oLineMgr);
       (*oLineMgr) ++;
 
       inputFrameStats.Reset();
@@ -733,7 +733,7 @@ void CreateTemporaryData(Buffer &in) {
     oLineMgr->SetLine(((in.Line() - 1) % numFrameLines) + 1, 1);
 
     if(!excluded || !cubeInitialized) {
-      ocube->Read(*oLineMgr);
+      ocube->read(*oLineMgr);
     }
 
     if(!cubeInitialized) {
@@ -763,13 +763,13 @@ void CreateTemporaryData(Buffer &in) {
     }
 
     if(!excluded || !cubeInitialized) {
-      ocube->Write(*oLineMgr);
+      ocube->write(*oLineMgr);
     }
 
     oLineMgr->SetLine(oLineMgr->Line(), 2);
 
     if(!excluded || !cubeInitialized) {
-      ocube->Read(*oLineMgr);
+      ocube->read(*oLineMgr);
     }
 
     if(!cubeInitialized) {
@@ -777,7 +777,7 @@ void CreateTemporaryData(Buffer &in) {
         (*oLineMgr)[i] = Isis::Null;
       }
 
-      if(ocube->Lines() == oLineMgr->Line())
+      if(ocube->getLineCount() == oLineMgr->Line())
         cubeInitialized = true;
     }
 
@@ -794,7 +794,7 @@ void CreateTemporaryData(Buffer &in) {
     }
 
     if(!excluded || !cubeInitialized) {
-      ocube->Write(*oLineMgr);
+      ocube->write(*oLineMgr);
     }
   }
 }
@@ -841,9 +841,9 @@ void ProcessTemporaryData(Buffer &in) {
       }
     }
 
-    ocube->Write(*oLineMgr);
+    ocube->write(*oLineMgr);
 
-    if(ocube->Lines() == oLineMgr->Line())
+    if(ocube->getLineCount() == oLineMgr->Line())
       cubeInitialized = true;
   }
 }

@@ -22,8 +22,8 @@ void IsisMain() {
   Cube *cube = NULL;
   if(label->HasObject("IsisCube")) {
     cube = new Cube();
-    cube->Open(ui.GetFilename("FROM"), "rw");
-    pvl = &(cube->Label()->FindObject("IsisCube"));
+    cube->open(ui.GetFilename("FROM"), "rw");
+    pvl = &(cube->getLabel()->FindObject("IsisCube"));
   }
 
   // Add Template File
@@ -97,7 +97,7 @@ void IsisMain() {
 
   // Write and clean the data
   if(cube) {
-    cube->Close();
+    cube->close();
     delete cube;
     cube = NULL;
   }

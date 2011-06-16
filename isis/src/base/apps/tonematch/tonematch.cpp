@@ -25,8 +25,8 @@ void IsisMain() {
   if(ui.GetBoolean("POVERLAP")) {
     // Set up the overlap statistics object
     Cube from, match;
-    from.Open(ui.GetFilename("FROM"));
-    match.Open(ui.GetFilename("MATCH"));
+    from.open(ui.GetFilename("FROM"));
+    match.open(ui.GetFilename("MATCH"));
     OverlapStatistics oStats(from, match);
 
     //Make sure the projections overlap

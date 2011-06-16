@@ -116,7 +116,7 @@ namespace Qisis {
     int redBand = 0, greenBand = 0, blueBand = 0, grayBand = 0;
 
     Cube *cube = p_cvp->cube();
-    Pvl &pvl = *cube->Label();
+    Pvl &pvl = *cube->getLabel();
 
     if(pvl.FindObject("IsisCube").HasGroup("BandBin")) {
       PvlGroup &bandBin = pvl.FindObject("IsisCube").FindGroup("BandBin");

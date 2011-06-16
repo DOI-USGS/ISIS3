@@ -173,8 +173,8 @@ void IsisMain() {
             // If the measurements were correctly registered
             // Write them to the new ControlNet
             AutoReg::RegisterStatus res = ar->Register();
-            searchCube.ClearCache();
-            patternCube.ClearCache();
+            searchCube.clearIoCache();
+            patternCube.clearIoCache();
 
             double score1, score2;
             ar->ZScores(score1, score2);
@@ -188,7 +188,7 @@ void IsisMain() {
             if (ar->Success()) {
               // Check to make sure the newly calculated measure position is on
               // the surface of the planet
-              Camera *cam = searchCube.Camera();
+              Camera *cam = searchCube.getCamera();
               bool foundLatLon = cam->SetImage(ar->CubeSample(), ar->CubeLine());
 
               if (foundLatLon) {
@@ -405,10 +405,10 @@ void IsisMain() {
 // Verify a cube has either a Camera or a Projection, throw an exception if not
 void VerifyCube(Cube & cube) {
   try {
-    cube.Camera();
+    cube.getCamera();
   }
   catch (iException &e) {
-    cube.Projection();
+    cube.getProjection();
     e.Clear();
   }
 }

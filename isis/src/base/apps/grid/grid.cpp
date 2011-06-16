@@ -76,8 +76,8 @@ void IsisMain() {
     throw iException::Message(iException::User, msg, _FILEINFO_);
   }
 
-  inputSamples = icube->Samples();
-  inputLines   = icube->Lines();
+  inputSamples = icube->getSampleCount();
+  inputLines   = icube->getLineCount();
 
   // Line & sample based grid
   if(mode == "IMAGE") {
@@ -92,12 +92,12 @@ void IsisMain() {
   // Lat/Lon based grid
   else {
     CubeAttributeOutput oatt("+32bit");
-    p.SetOutputCube(ui.GetFilename("TO"), oatt, icube->Samples(),
-                    icube->Lines(), icube->Bands());
+    p.SetOutputCube(ui.GetFilename("TO"), oatt, icube->getSampleCount(),
+                    icube->getLineCount(), icube->getBandCount());
 
     UniversalGroundMap *gmap = new UniversalGroundMap(*icube,
         UniversalGroundMap::ProjectionFirst);
-    latLonGrid = new GroundGrid(gmap, ticks, icube->Samples(), icube->Lines());
+    latLonGrid = new GroundGrid(gmap, ticks, icube->getSampleCount(), icube->getLineCount());
 
     baseLat = Latitude(ui.GetDouble("BASELAT"),
         *latLonGrid->GetMappingGroup(), Angle::Degrees);

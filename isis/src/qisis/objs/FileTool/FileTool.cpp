@@ -267,7 +267,7 @@ namespace Qisis {
 
     //Essentially, closing the cube saves it's changes, and we want to keep it open,
     //so reopen the current cube!
-    cubeViewport()->cube()->ReOpen("rw");
+    cubeViewport()->cube()->reopen("rw");
   }
   
   /**
@@ -282,8 +282,7 @@ namespace Qisis {
    *  
    * @author Sharmila Prasad (4/8/2011)
    */
-  void FileTool::saveAs()
-  {
+  void FileTool::saveAs() {
     //If the current viewport is null (safety check), return from this method
     if(cubeViewport() == NULL) {
       QMessageBox::information((QWidget *)parent(), "Error", "No active cube to save");
@@ -296,10 +295,14 @@ namespace Qisis {
     if(!p_dir.exists()) {
       p_dir = QDir(p_lastDir);
     }
-    if(p_saveAsDialog == NULL) {
-      p_saveAsDialog = new SaveAsDialog("Save As", p_filterList, p_dir, (QWidget *)parent());
-      connect(p_saveAsDialog, SIGNAL(fileSelected(QString)), this, SLOT(saveAsCubeByOption(QString)));
+    if(p_saveAsDialog) {
+      delete p_saveAsDialog;
+      p_saveAsDialog = NULL;
     }
+
+    p_saveAsDialog = new SaveAsDialog("Save As", p_filterList, p_dir, (QWidget *)parent());
+    connect(p_saveAsDialog, SIGNAL(fileSelected(QString)), this, SLOT(saveAsCubeByOption(QString)));
+
     p_saveAsDialog->show();
   }
 
@@ -311,52 +314,55 @@ namespace Qisis {
    * 
    * @param psOutFile - user specified output file 
    */
-  void FileTool::saveAsCubeByOption(QString psOutFile)
-  {
+  void FileTool::saveAsCubeByOption(QString psOutFile) {
     //If the current viewport is null (safety check), return from this method
     if(cubeViewport() == NULL) {
-      QMessageBox::information((QWidget *)parent(), "Error", "No active cube to save");
+      QMessageBox::information((QWidget *)parent(), "Error",
+                               "No active cube to save");
       return;
     }
-    
+
     //If the filename is empty, return
     if(psOutFile.isEmpty() || (p_saveAsDialog==NULL)){
-      QMessageBox::information((QWidget *)parent(), "Error", "No output file selected");
+      QMessageBox::information((QWidget *)parent(), "Error",
+                               "No output file selected");
       return;
     }
-    
+
     //Check if the output file is already opened
     QVector< MdiCubeViewport *> *vwportList = p_workSpace->cubeViewportList();
     QVector<MdiCubeViewport *>::iterator it;
     for (it = vwportList->begin(); it != vwportList->end(); ++it){
-      if(QString((*it)->cube()->Filename().c_str()) ==  psOutFile) {
-        QMessageBox::information((QWidget *)parent(), "Error", "Output File is already open\n\""+ psOutFile + "\"");
+      if(QString((*it)->cube()->getFilename().c_str()) ==  psOutFile) {
+        QMessageBox::information((QWidget *)parent(), "Error",
+            "Output File is already open\n\""+ psOutFile + "\"");
         return;
       }
     }
 
     //If the filename is the same as the current cube's filename, just save it
-    if(p_saveAsDialog->getSaveAsType() == SaveAsDialog::FullImage && 
-       psOutFile.toStdString().compare(cubeViewport()->cube()->Filename()) == 0) {
+    if(p_saveAsDialog->getSaveAsType() == SaveAsDialog::FullImage &&
+       psOutFile.toStdString() == cubeViewport()->cube()->getFilename()) {
       save();
       return;
     }
-    
+
     //Save the current cube's changes by reopening it, and open an input cube
     //from the current cube's location
     Isis::Cube *icube = new Isis::Cube(); 
-    icube->Open(cubeViewport()->cube()->Filename(), "rw");
+    icube->open(cubeViewport()->cube()->getFilename(), "rw");
     Isis::Cube *ocube = NULL;
 
     if(p_saveAsDialog->getSaveAsType() != SaveAsDialog::ExportAsIs) {
       //Create the output cube
-      ocube = new Isis::Cube();
+      ocube = new Isis::Cube;
     }
-    
+
     if(p_saveAsDialog->getSaveAsType() == SaveAsDialog::FullImage) {
-      copyCubeDetails(psOutFile, icube, ocube, icube->Samples(), icube->Lines(), icube->Bands());
+      copyCubeDetails(psOutFile, icube, ocube, icube->getSampleCount(),
+                      icube->getLineCount(), icube->getBandCount());
       saveAsFullImage(icube, ocube);
-      ocube->Close();
+      ocube->close();
     }
     else {
       // start and end Samples and Lines
@@ -366,9 +372,9 @@ namespace Qisis {
       if(p_saveAsDialog->getSaveAsType() == SaveAsDialog::ExportFullRes || p_lastViewport->scale() == 1) {
         int numSamples = (int)ceil(dEndSample-dStartSample);
         int numLines = (int)ceil(dEndLine-dStartLine);
-        copyCubeDetails(psOutFile, icube, ocube, numSamples, numLines, icube->Bands());
+        copyCubeDetails(psOutFile, icube, ocube, numSamples, numLines, icube->getBandCount());
         saveAs_FullResolution(icube, ocube, numSamples, numLines);
-        ocube->Close();
+        ocube->close();
       }
       else if(p_saveAsDialog->getSaveAsType() == SaveAsDialog::ExportAsIs ) {
         saveAs_AsIs(icube, psOutFile);
@@ -392,8 +398,8 @@ namespace Qisis {
    * @param pInCube - Input Cube
    * @param pOutCube - Output Cube 
    */
-  void FileTool::saveAsEnlargedCube(Isis::Cube *icube, const QString & psOutFile)
-  {
+  void FileTool::saveAsEnlargedCube(Isis::Cube *icube,
+                                    const QString & psOutFile) {
     double dScale = p_lastViewport->scale();
 
     // start and end Samples and Lines
@@ -408,7 +414,7 @@ namespace Qisis {
       Isis::ProcessRubberSheet p;
       p.SetInputCube (icube);
       Isis::Cube *ocube = p.SetOutputCube(psOutFile.toStdString(), Isis::CubeAttributeOutput(" "),
-                       ons , onl, icube->Bands());
+                       ons , onl, icube->getBandCount());
       
       Isis::Interpolator *interp = new Isis::Interpolator(Isis::Interpolator::NearestNeighborType);
       
@@ -422,7 +428,7 @@ namespace Qisis {
       delete imgEnlarge;
       delete interp;
       
-      ocube->Close();
+      ocube->close();
     } catch(iException &e) {
       QMessageBox::critical((QWidget *)parent(),
                             "Error", "Cannot open file, please check permissions");
@@ -439,8 +445,8 @@ namespace Qisis {
    * @param pInCube - Input Cube
    * @param psOutFile - Output filename 
    */
-  void FileTool::saveAsReducedCube(Isis::Cube *icube, const QString & psOutFile)
-  {
+  void FileTool::saveAsReducedCube(Isis::Cube *icube,
+                                   const QString & psOutFile) {
     double dScale = p_lastViewport->scale();
     //dScale *= 10;
     // start and end Samples and Lines
@@ -455,12 +461,12 @@ namespace Qisis {
     ons = (int)ceil(ins * dScale);
     onl = (int)ceil(inl * dScale);
 
-    Isis::CubeAttributeInput cai(icube->Filename());
+    Isis::CubeAttributeInput cai(icube->getFilename());
     vector<string> bands = cai.Bands();
     int inb = bands.size();
 
     if(inb == 0) {
-      inb = cubeViewport()->cube()->Bands();
+      inb = cubeViewport()->cube()->getBandCount();
       for(int i = 1; i <= inb; i++) {
         bands.push_back((iString)i);
       }
@@ -477,12 +483,12 @@ namespace Qisis {
     }
     catch(iException &e) {
       // If there is a problem, catch it and close the cube so it isn't open next time around
-      icube->Close();
+      icube->close();
       throw e;
     }
 
     Isis::Cube *tempcube=new Cube;
-    tempcube->Open(cubeViewport()->cube()->Filename(), "r");
+    tempcube->open(cubeViewport()->cube()->getFilename(), "r");
     Isis::Nearest *near = new Isis::Nearest(tempcube, bands, ins/ons, inl/onl);
     near->setInputBoundary((int)dStartSample, (int)dEndSample, (int)dStartLine, (int)dEndLine);
     
@@ -502,8 +508,7 @@ namespace Qisis {
    * @param pInCube - Input Cube
    * @param pOutCube - Output Cube
    */
-  void FileTool::saveAs_AsIs(Isis::Cube *icube, const QString & psOutFile)
-  {
+  void FileTool::saveAs_AsIs(Isis::Cube *icube, const QString & psOutFile) {
     double dScale = p_lastViewport->scale();
 
     // Enlarge the cube area
@@ -530,43 +535,37 @@ namespace Qisis {
    * @history 2011-05-11 Sharmila Prasad - Isolated from original SaveAs function so that
    *                                           it can be used by different SaveAs options 
    */
-  void FileTool::copyCubeDetails(const QString & psOutFile, Isis::Cube *icube, Isis::Cube *ocube, 
-                 int piNumSamples, int piNumLines, int piNumBands)
-  {
+  void FileTool::copyCubeDetails(const QString & psOutFile, Isis::Cube *icube,
+      Isis::Cube *ocube, int piNumSamples, int piNumLines, int piNumBands) {
     //Create the default output attribute with the output filename
     Isis::CubeAttributeOutput outAtt(psOutFile.toStdString());
-    
+
     //Propagate all labels, tables, blobs, etc from the input to output cube
     try {
-      ocube->SetDimensions(piNumSamples, piNumLines, piNumBands);
-      ocube->SetByteOrder(outAtt.ByteOrder());
-      ocube->SetCubeFormat(outAtt.FileFormat());
-      if(outAtt.DetachedLabel()){
-        ocube->SetDetached();
-      }
-      if(outAtt.AttachedLabel()){
-        ocube->SetAttached();
-      }
+      ocube->setDimensions(piNumSamples, piNumLines, piNumBands);
+      ocube->setByteOrder(outAtt.ByteOrder());
+      ocube->setFormat(outAtt.FileFormat());
+      ocube->setLabelsAttached(outAtt.AttachedLabel());
 
       if(outAtt.PropagatePixelType()) {
-        ocube->SetPixelType(icube->PixelType());
+        ocube->setPixelType(icube->getPixelType());
       }
       else {
-        ocube->SetPixelType(outAtt.PixelType());
+        ocube->setPixelType(outAtt.PixelType());
       }
 
       if(outAtt.PropagateMinimumMaximum()) {
-        if(ocube->PixelType() == Isis::Real) {
-          ocube->SetBaseMultiplier(0.0, 1.0);
+        if(ocube->getPixelType() == Isis::Real) {
+          ocube->setBaseMultiplier(0.0, 1.0);
         }
-        else if(ocube->PixelType() >= icube->PixelType()) {
-          double base = icube->Base();
-          double mult = icube->Multiplier();
-          ocube->SetBaseMultiplier(base, mult);
+        else if(ocube->getPixelType() >= icube->getPixelType()) {
+          double base = icube->getBase();
+          double mult = icube->getMultiplier();
+          ocube->setBaseMultiplier(base, mult);
         }
-        else if((ocube->PixelType() != Isis::Real) &&
-                (ocube->PixelType() != Isis::UnsignedByte) &&
-                (ocube->PixelType() != Isis::SignedWord)) {
+        else if((ocube->getPixelType() != Isis::Real) &&
+                (ocube->getPixelType() != Isis::UnsignedByte) &&
+                (ocube->getPixelType() != Isis::SignedWord)) {
           std::string msg = "Looks like your refactoring to add different pixel types";
           msg += " you'll need to make changes here";
           throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
@@ -579,51 +578,51 @@ namespace Qisis {
       }
       else {
         // Not propagating so either the user entered or the programmer did
-        ocube->SetMinMax(outAtt.Minimum(), outAtt.Maximum());
+        ocube->setMinMax(outAtt.Minimum(), outAtt.Maximum());
       }
 
-      int needLabBytes = icube->LabelBytesUsed() + (1024 * 6);
-      if(needLabBytes > ocube->LabelBytes()) {
-        ocube->SetLabelBytes(needLabBytes);
+      int needLabBytes = icube->getLabelSize(true) + (1024 * 6);
+      if(needLabBytes > ocube->getLabelSize()) {
+        ocube->setLabelSize(needLabBytes);
       }
 
       // Allocate the cube
-      ocube->Create(psOutFile.toStdString());
+      ocube->create(psOutFile.toStdString());
 
       // Transfer labels from the first input cube
-      Isis::PvlObject &incube = icube->Label()->FindObject("IsisCube");
-      Isis::PvlObject &outcube = ocube->Label()->FindObject("IsisCube");
+      Isis::PvlObject &incube = icube->getLabel()->FindObject("IsisCube");
+      Isis::PvlObject &outcube = ocube->getLabel()->FindObject("IsisCube");
       for(int i = 0; i < incube.Groups(); i++) {
         outcube.AddGroup(incube.Group(i));
       }
 
       // Transfer tables from the first input cube
-      Isis::Pvl &inlab = *icube->Label();
+      Isis::Pvl &inlab = *icube->getLabel();
       for(int i = 0; i < inlab.Objects(); i++) {
         if(inlab.Object(i).IsNamed("Table")) {
           Isis::Blob t((std::string)inlab.Object(i)["Name"], inlab.Object(i).Name());
-          icube->Read(t);
-          ocube->Write(t);
+          icube->read(t);
+          ocube->write(t);
         }
       }
 
       // Transfer blobs from the first input cube
-      inlab = *icube->Label();
+      inlab = *icube->getLabel();
       for(int i = 0; i < inlab.Objects(); i++) {
         if(inlab.Object(i).IsNamed("Polygon")) {
           Isis::Blob t((std::string)inlab.Object(i)["Name"], inlab.Object(i).Name());
-          icube->Read(t);
-          ocube->Write(t);
+          icube->read(t);
+          ocube->write(t);
         }
       }
 
       // Transfer tables from the first input cube
-      inlab = *icube->Label();
+      inlab = *icube->getLabel();
       for(int i = 0; i < inlab.Objects(); i++) {
         if(inlab.Object(i).IsNamed("OriginalLabel")) {
           Isis::OriginalLabel ol;
-          icube->Read(ol);
-          ocube->Write(ol);
+          icube->read(ol);
+          ocube->write(ol);
         }
       }
     }
@@ -643,11 +642,10 @@ namespace Qisis {
    * @param pInCube  - input image
    * @param pOutCube - output image 
    */
-  void FileTool::saveAsFullImage(Isis::Cube *icube, Isis::Cube *ocube)
-  {
+  void FileTool::saveAsFullImage(Isis::Cube *icube, Isis::Cube *ocube) {
     //Start the copy process line by line
-    Isis::Brick ibrick(*icube, icube->Samples(), 1, 1);
-    Isis::Brick obrick(*ocube, ocube->Samples(), 1, 1);
+    Isis::Brick ibrick(*icube, icube->getSampleCount(), 1, 1);
+    Isis::Brick obrick(*ocube, ocube->getSampleCount(), 1, 1);
 
     int numBricks;
     if(ibrick.Bricks() > obrick.Bricks()) numBricks = ibrick.Bricks();
@@ -657,10 +655,10 @@ namespace Qisis {
     ibrick.begin();
     obrick.begin();
     for(int i = 0; i < numBricks; i++) {
-      icube->Read(ibrick);
+      icube->read(ibrick);
       //Copy the contents to the output cube
       copy(ibrick, obrick);
-      ocube->Write(obrick);
+      ocube->write(obrick);
       ibrick++;
       obrick++;
     }
@@ -677,27 +675,27 @@ namespace Qisis {
    * @param pNumSamples - out samples
    * @param pNumLines   - out lines
    */
-  void FileTool::saveAs_FullResolution(Isis::Cube *pInCube, Isis::Cube *pOutCube, int pNumSamples, int pNumLines)
-  {
+  void FileTool::saveAs_FullResolution(Isis::Cube *pInCube,
+      Isis::Cube *pOutCube, int pNumSamples, int pNumLines) {
     // start and end Samples and Lines
     double dStartSample=0, dEndSample=0, dStartLine=0, dEndLine=0;
     p_lastViewport->getCubeArea(dStartSample, dEndSample, dStartLine, dEndLine);
-    int iNumBands   = pInCube->Bands();
+    int iNumBands   = pInCube->getBandCount();
     
-    Isis::Portal iPortal (pNumSamples, 1, pInCube->PixelType());
-    Isis::Portal oPortal (pNumSamples, 1, pOutCube->PixelType());
+    Isis::Portal iPortal (pNumSamples, 1, pInCube->getPixelType());
+    Isis::Portal oPortal (pNumSamples, 1, pOutCube->getPixelType());
     
     for(int iBand=1; iBand<=iNumBands; iBand++) {
       int ol=1;
       for(int iLine=(int)dStartLine; iLine<=(int)dEndLine; iLine++) {
         iPortal.SetPosition(dStartSample, iLine, iBand);
-        pInCube->Read(iPortal);
+        pInCube->read(iPortal);
 
         oPortal.SetPosition(1, ol++, iBand);
-        pOutCube->Read(oPortal);
+        pOutCube->read(oPortal);
         
         oPortal.Copy(iPortal);
-        pOutCube->Write(oPortal);
+        pOutCube->write(oPortal);
       }
     }
   }

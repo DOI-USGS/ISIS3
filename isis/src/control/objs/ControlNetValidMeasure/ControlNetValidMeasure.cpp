@@ -152,9 +152,9 @@ namespace Isis {
    *  
    * @return MeasureValidationResults 
    */
-  MeasureValidationResults ControlNetValidMeasure::ValidStandardOptions(double pSample, double pLine, 
-          const ControlMeasure *pMeasure, Cube *pCube, PvlGroup *pMeasureGrp)
-  {
+  MeasureValidationResults ControlNetValidMeasure::ValidStandardOptions(
+      double pSample, double pLine, const ControlMeasure *pMeasure, Cube *pCube,
+      PvlGroup *pMeasureGrp) {
     mdEmissionAngle  = 0;
     mdIncidenceAngle = 0;
     mdResolution     = 0;
@@ -166,10 +166,10 @@ namespace Isis {
     if(mbCameraRequired) {
       Camera *measureCamera;
       try {
-        measureCamera = pCube->Camera();
+        measureCamera = pCube->getCamera();
       }
       catch(Isis::iException &e) {
-        std::string msg = "Cannot Create Camera for Image:" + pCube->Filename();
+        std::string msg = "Cannot Create Camera for Image:" + pCube->getFilename();
         throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
       }
   
@@ -198,9 +198,9 @@ namespace Isis {
     }
 
     if(mbValidateDN) {
-      Isis::Portal inPortal(1, 1, pCube->PixelType());
+      Isis::Portal inPortal(1, 1, pCube->getPixelType());
       inPortal.SetPosition(pSample, pLine, 1);
-      pCube->Read(inPortal);
+      pCube->read(inPortal);
       mdDnValue = inPortal[0];
     }
 
@@ -654,8 +654,8 @@ namespace Isis {
       return true;
     }
 
-    int iNumSamples = pCube->Samples();
-    int iNumLines   = pCube->Lines();
+    int iNumSamples = pCube->getSampleCount();
+    int iNumLines   = pCube->getLineCount();
 
     // test right
     if((iNumSamples - piSample) < miPixelsFromEdge) {
@@ -696,12 +696,12 @@ namespace Isis {
       return true;
     }
 
-    int iNumSamples = pCube->Samples();
-    int iNumLines   = pCube->Lines();
+    int iNumSamples = pCube->getSampleCount();
+    int iNumLines   = pCube->getLineCount();
 
     try {
       // Get the image's camera to get pixel resolution
-      Camera *camera = pCube->Camera();
+      Camera *camera = pCube->getCamera();
       double resMetersTotal = 0;
       bool bMinDistance     = false;
 
@@ -765,7 +765,8 @@ namespace Isis {
       return false;
     }
     catch(iException &e) {
-      std::string msg = "Cannot Create Camera for Image:" + pCube->Filename();
+      std::string msg = "Cannot Create Camera for Image [" +
+          pCube->getFilename() + "]";
       throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
     }
   }

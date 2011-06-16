@@ -43,7 +43,7 @@ namespace Qisis {
 
 
     Isis::Statistics stats;
-    Isis::Brick brick(1, 1, 1, p_cube1->PixelType());
+    Isis::Brick brick(1, 1, 1, p_cube1->getPixelType());
 
     int bufns1 = (int)esamp - (int)ssamp + 1;
     brick.Resize(bufns1, 1, 1);
@@ -51,7 +51,7 @@ namespace Qisis {
     //for (int line=(int)sline; line <= (int)eline; line+=lineRate) {
     for(int line = (int)sline; line <= (int)eline; line++) {
       brick.SetBasePosition((int)ssamp, line, band1);
-      p_cube1->Read(brick);
+      p_cube1->read(brick);
       stats.AddData(brick.DoubleBuffer(), bufns1);
     }
 
@@ -75,7 +75,7 @@ namespace Qisis {
     //for (int line=(int)sline; line <=(int) eline; line+=lineRate) {
     for(int line = (int)sline; line <= (int)eline; line++) {
       brick.SetBasePosition((int)ssamp, line, band2);
-      p_cube2->Read(brick);
+      p_cube2->read(brick);
       stats.AddData(brick.DoubleBuffer(), bufns2);
     }
 
@@ -91,32 +91,32 @@ namespace Qisis {
 
     setBoundingRect(QwtDoubleRect(p_min1, p_min2, p_max1, p_max2));
 
-    Isis::Brick brick1(1, 1, 1, p_cube1->PixelType());
-    Isis::Brick brick2(1, 1, 1, p_cube2->PixelType());
+    Isis::Brick brick1(1, 1, 1, p_cube1->getPixelType());
+    Isis::Brick brick2(1, 1, 1, p_cube2->getPixelType());
 
     // -----------------------------------------------
     // If the actual cube size is smaller than the
     // visible cube viewport area, we don't need
     // to loop through all the access lines/samples.
     // -----------------------------------------------
-    if((esamp - ssamp) > p_cube1->Samples()) {
+    if((esamp - ssamp) > p_cube1->getSampleCount()) {
       ssamp = 0;
-      esamp = p_cube1->Samples();
+      esamp = p_cube1->getSampleCount();
     }
-    if((eline - sline) > p_cube1->Lines()) {
+    if((eline - sline) > p_cube1->getLineCount()) {
       sline = 0;
-      eline = p_cube1->Lines();
+      eline = p_cube1->getLineCount();
     }
 
     for(int s = (int)ssamp; s < (int)esamp; s++) {
       for(int l = (int)sline; l <= (int)eline; l++) {
         brick1.SetBasePosition(s, l, band1);
-        p_cube1->Read(brick1);
+        p_cube1->read(brick1);
 
         unsigned int x = (int)(p_str1.Map(brick1[0]));
 
         brick2.SetBasePosition(s, l, band2);
-        p_cube2->Read(brick2);
+        p_cube2->read(brick2);
 
         unsigned int y = (int)(p_str2.Map(brick2[0]));
         if(x < p_counts.size() && y < p_counts.size()) {
@@ -132,8 +132,8 @@ namespace Qisis {
    *
    */
   ScatterPlotData::~ScatterPlotData() {
-    p_cube1->Close();
-    p_cube2->Close();
+    p_cube1->close();
+    p_cube2->close();
   }
 
 

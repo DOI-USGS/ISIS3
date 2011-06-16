@@ -45,7 +45,7 @@ int main() {
     InterestOperator *iop = InterestOperatorFactory::Create(pvl);
 
     Cube c;
-    c.Open("$mgs/testData/ab102401.cub");
+    c.open("$mgs/testData/ab102401.cub");
 
     UniversalGroundMap univGrndMap(c);
     iop->Operate(c,  univGrndMap, 100, 350);

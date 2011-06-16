@@ -250,9 +250,9 @@ namespace Isis {
     double pixelValue = 0;
 
     if(m_cubeDisplay) {
-      Brick gryBrick(1, 1, 1, m_cubeDisplay->cube()->PixelType());
+      Brick gryBrick(1, 1, 1, m_cubeDisplay->cube()->getPixelType());
       gryBrick.SetBasePosition((int)(sample + 0.5), (int)(line + 0.5), 1);
-      m_cubeDisplay->cube()->Read(gryBrick);
+      m_cubeDisplay->cube()->read(gryBrick);
 
       pixelValue = gryBrick[0];
       if (pixelValue == Null) {
@@ -614,7 +614,7 @@ namespace Isis {
     const int skip = 0;
 
     while(mgr ++) {
-      m_cubeDisplay->cube()->Read(mgr);
+      m_cubeDisplay->cube()->read(mgr);
       stats.AddData(mgr.DoubleBuffer(), mgr.size());
 
       for(int i = 0; i < skip; i++)

@@ -400,7 +400,8 @@ namespace Qisis {
               p_grnSpin->value() > bands ||
               p_bluSpin->value() > bands) continue;
 
-          cvp->viewRGB(p_redSpin->value(), p_grnSpin->value(), p_bluSpin->value());
+          cvp->viewRGB(p_redSpin->value(), p_grnSpin->value(),
+                       p_bluSpin->value());
         }
       }
       else {
@@ -433,7 +434,8 @@ namespace Qisis {
               p_grnSpin->value() > bands ||
               p_bluSpin->value() > bands) continue;
 
-          cvp->viewRGB(p_redSpin->value(), p_grnSpin->value(), p_bluSpin->value());
+          cvp->viewRGB(p_redSpin->value(), p_grnSpin->value(),
+                       p_bluSpin->value());
         }
       }
       else {
@@ -461,9 +463,8 @@ namespace Qisis {
 
     MdiCubeViewport *cvp = cubeViewport();
     if(cvp != NULL) {
-
       if(p_bandBinViewport != cvp) {
-        setBandBin(*cvp->cube()->Label());
+        setBandBin(*cvp->cube()->getLabel());
       }
 
       if(cvp->isGray()) {

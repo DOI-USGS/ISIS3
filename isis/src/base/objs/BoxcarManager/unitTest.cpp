@@ -14,7 +14,7 @@ int main(int argc, char *argv[]) {
 
   string fname = "$base/testData/isisTruth.cub";
   Isis::Cube cube;
-  cube.Open(fname);
+  cube.open(fname);
 
   //  Test 5x5 boxcar
   Isis::BoxcarManager box5x5(cube, 5, 5);
@@ -52,5 +52,5 @@ int main(int argc, char *argv[]) {
   }
   cout << endl;
 
-  cube.Close();
+  cube.close();
 }

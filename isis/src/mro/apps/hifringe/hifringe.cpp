@@ -44,24 +44,24 @@ void IsisMain() {
   Isis::Filename fromFile = ui.GetFilename("FROM");
 
   Isis::Cube inputCube;
-  inputCube.Open(fromFile.Expanded());
+  inputCube.open(fromFile.Expanded());
 
   //Check to make sure we got the cube properly
-  if(!inputCube.IsOpen()) {
+  if(!inputCube.isOpen()) {
     string msg = "Could not open FROM cube" + fromFile.Expanded();
     throw iException::Message(iException::User, msg, _FILEINFO_);
   }
   Process p;
   Cube *icube = p.SetInputCube("FROM");
 
-  int totalSamples = icube->Samples();
-  int totalLines   = icube->Lines();
+  int totalSamples = icube->getSampleCount();
+  int totalLines   = icube->getLineCount();
 
   Isis::LineManager lineManager(inputCube);
   lineManager.begin();
 
   int leftFringe, rightFringe;
-  int binningMode = icube->GetGroup("Instrument")["Summing"];
+  int binningMode = icube->getGroup("Instrument")["Summing"];
 
   //determine the edges between which no statistics should be gathered
   leftFringe = 48 / binningMode;
@@ -107,7 +107,7 @@ void IsisMain() {
 
   //Walk down the cube
   for(int lineCount = 0 ; lineCount < totalLines ; lineCount++) {
-    inputCube.Read(lineManager);
+    inputCube.read(lineManager);
     //Read the edges into the fringe buffers
     for(int i = 0 ; i < leftFringe ; i++) {
       leftFringeBuf[i] = lineManager[i];
@@ -172,7 +172,7 @@ void IsisMain() {
   PvlGroup sourceInfo("SourceInfo");
 
   sourceInfo += PvlKeyword("From", fromFile.Expanded());
-  sourceInfo += icube->GetGroup("Archive")["ProductId"];
+  sourceInfo += icube->getGroup("Archive")["ProductId"];
   outputPvl.AddGroup(sourceInfo);
   if(numSections > 0) {
     outputPvl.AddObject(leftSide);

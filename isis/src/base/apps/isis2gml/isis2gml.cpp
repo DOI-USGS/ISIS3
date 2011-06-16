@@ -18,7 +18,7 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
   Cube cube;
-  cube.Open(ui.GetFilename("FROM"));
+  cube.open(ui.GetFilename("FROM"));
   ImagePolygon poly;
   poly.Create(cube);
 

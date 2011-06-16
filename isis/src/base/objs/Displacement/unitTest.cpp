@@ -103,7 +103,6 @@ int main(int argc, char *argv[]) {
     e.Report(false);
   }
 
-//345678901234567890123456789012345678901234567890123456789012345678901234567890
   try {
     Displacement disp1(1, Displacement::Meters);
     Displacement disp2(10, Displacement::Meters);
@@ -185,6 +184,33 @@ int main(int argc, char *argv[]) {
         " meters" << endl;
     disp1 -= disp2;
     cout << "Displacement 1 -= Displacement 2... Displacement 1 = " << disp1.GetMeters() <<
+        " meters" << endl;
+  }
+  catch(iException &e) {
+    e.Report(false);
+  }
+
+  try {
+    Displacement disp1(10, Displacement::Pixels);
+    Displacement disp2(100, 10.0);
+    cout << endl;
+    cout << "Displacement 1: " << disp1.GetMeters() << " meters" << endl;
+    cout << "Displacement 2: " << disp2.GetMeters() << " meters" << endl;
+    cout << "Displacement 1: " << disp1.GetPixels() << " pixels" << endl;
+    cout << "Displacement 2: " << disp2.GetPixels(10.0) << " pixels" << endl;
+
+    cout << "Displacement 1 > Displacement 2 ? " << (disp1 > disp2) << endl;
+    cout << "Displacement 1 >= Displacement 2 ? " << (disp1 >= disp2) << endl;
+    cout << "Displacement 1 == Displacement 2 ? " << (disp1 == disp2) << endl;
+    cout << "Displacement 1 <= Displacement 2 ? " << (disp1 <= disp2) << endl;
+    cout << "Displacement 1 < Displacement 2 ? " << (disp1 < disp2) << endl;
+    cout << "Displacement 1 + Displacement 2 ? " << (disp1 + disp2).GetMeters() << 
+        " meters" << endl;
+    cout << "Displacement 1 - Displacement 2 ? " << (disp1 - disp2).GetMeters() << 
+        " meters" << endl;
+
+    disp1 = disp2;
+    cout << "Displacement 1 = Displacement 2... Displacement 1 = " << disp1.GetMeters() <<
         " meters" << endl;
   }
   catch(iException &e) {

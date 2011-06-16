@@ -44,7 +44,7 @@ void IsisMain() {
   PvlGroup dataDir(Preference::Preferences().FindGroup("DataDirectory"));
   iString transDir = (string) dataDir["Kaguya"] + "/translations/";
   Pvl inputLabel(inFile.Expanded());
-  Pvl *outputLabel = outcube->Label();
+  Pvl *outputLabel = outcube->getLabel();
   Filename transFile;
 
   // Translate the Archive group

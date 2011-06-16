@@ -181,7 +181,7 @@ void IsisMain() {
   Cube *output = pfits.SetOutputCube("TO");
 
   // Add instrument group if any relevant data exists
-  Pvl *lbls = output->Label();
+  Pvl *lbls = output->getLabel();
   if(instGrp) {
     lbls->FindObject("IsisCube") += inst;
   }
@@ -190,7 +190,7 @@ void IsisMain() {
   Pvl pvl;
   pvl += labels;
   OriginalLabel originals(pvl);
-  output->Write(originals);
+  output->write(originals);
 
   // Process...
   pfits.StartProcess();

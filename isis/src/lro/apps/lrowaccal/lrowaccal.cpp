@@ -54,23 +54,27 @@ void IsisMain () {
     Cube *icube = p.SetInputCube("FROM");
 
     // Make sure it is a WAC cube
-    Isis::PvlGroup &inst = icube->Label()->FindGroup("Instrument", Pvl::Traverse);
+    Isis::PvlGroup &inst =
+        icube->getLabel()->FindGroup("Instrument", Pvl::Traverse);
     iString instId = (string) inst["InstrumentId"];
     instId.UpCase();
     if (instId != "WAC-VIS" && instId != "WAC-UV") {
-        string msg = "This program is intended for use on LROC WAC images only. [";
-        msg += icube->Filename() + "] does not appear to be a WAC image.";
+        string msg = "This program is intended for use on LROC WAC images "
+                     "only. [" + icube->getFilename() + "] does not appear "
+                     "to be a WAC image.";
         throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
     // And check if it has already run through calibration
-    if (icube->Label()->FindObject("IsisCube").HasGroup("Radiometry")) {
+    if (icube->getLabel()->FindObject("IsisCube").HasGroup("Radiometry")) {
         string msg = "This image has already been calibrated";
         throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
-    if (icube->Label()->FindObject("IsisCube").HasGroup("AlphaCube")) {
-        string msg = "This application can not be run on any image that has been geometrically transformed (i.e. scaled, rotated, sheared, or reflected) or cropped.";
+    if (icube->getLabel()->FindObject("IsisCube").HasGroup("AlphaCube")) {
+        string msg = "This application can not be run on any image that has "
+                     "been geometrically transformed (i.e. scaled, rotated, "
+                     "sheared, or reflected) or cropped.";
         throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
@@ -103,11 +107,12 @@ void IsisMain () {
     iString specpixFile = ui.GetAsString("SPECIALPIXELSFILE");
 
     // Figure out which bands are input
-    for (int i = 1; i <= icube->Bands(); i++) {
-        g_bands.push_back(icube->PhysicalBand(i));
+    for (int i = 1; i <= icube->getBandCount(); i++) {
+        g_bands.push_back(icube->getPhysicalBand(i));
     }
 
-    Isis::PvlGroup &bandBin = icube->Label()->FindGroup("BandBin", Pvl::Traverse);
+    Isis::PvlGroup &bandBin =
+        icube->getLabel()->FindGroup("BandBin", Pvl::Traverse);
     iString filter = (string) bandBin["Center"][0];
 
     if (g_dark) {
@@ -252,7 +257,7 @@ void IsisMain () {
         calgrp += responsivity;
         calgrp += PvlKeyword("SolarDistance", g_solarDistance);
     }
-    ocube->PutGroup(calgrp);
+    ocube->putGroup(calgrp);
 
     p.EndProcess();
 }
@@ -354,10 +359,11 @@ void CopyCubeIntoArray ( string &fileString, vector<double> & data ) {
         string msg = fileString + " does not exist.";
         throw iException::Message(iException::User, msg, _FILEINFO_);
     }
-    cube.Open(filename.Expanded());
-    Brick brick(cube.Samples(), cube.Lines(), cube.Bands(), cube.PixelType());
+    cube.open(filename.Expanded());
+    Brick brick(cube.getSampleCount(), cube.getLineCount(),
+                cube.getBandCount(), cube.getPixelType());
     brick.SetBasePosition(1, 1, 1);
-    cube.Read(brick);
+    cube.read(brick);
 
     data.clear();
 

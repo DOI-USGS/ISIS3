@@ -187,9 +187,9 @@ void IsisMain() {
     // cube as the phocube output goes into the specification of the
     // output PDS file (required for 5 band IMAGE object).
     Cube from;
-    from.Open(input.Expanded());
+    from.open(input.Expanded());
     OriginalLabel origBlob;
-    from.Read(origBlob);
+    from.read(origBlob);
     Pvl origLabel;
     PvlObject origLabelObj = origBlob.ReturnLabels();
     origLabelObj.SetName("OriginalLabelObject");
@@ -197,7 +197,7 @@ void IsisMain() {
     p.CheckStatus();
 
     // Translates the ISIS labels along with the original EDR labels
-    origLabel.AddObject(*from.Label());
+    origLabel.AddObject(*from.getLabel());
     PvlTranslationManager labels(origLabel,
                                  "$messenger/translations/mdisDDRLabel.trn");
     labels.Auto(pdsLabel);

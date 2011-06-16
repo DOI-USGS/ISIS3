@@ -51,23 +51,23 @@ void IsisMain() {
   // Make sure number of bands and projection parameters match for all cubes
   for(unsigned int i = 0; i < imageList.size(); i++) {
     Cube cube1;
-    cube1.Open(imageList[i]);
-    g_maxBand = cube1.Bands();
+    cube1.open(imageList[i]);
+    g_maxBand = cube1.getBandCount();
 
     for(unsigned int j = (i + 1); j < imageList.size(); j++) {
       Cube cube2;
-      cube2.Open(imageList[j]);
+      cube2.open(imageList[j]);
 
       // Make sure number of bands match
-      if(g_maxBand != cube2.Bands()) {
+      if(g_maxBand != cube2.getBandCount()) {
         string msg = "Number of bands do not match between cubes [" +
                      imageList[i] + "] and [" + imageList[j] + "]";
         throw iException::Message(iException::User, msg, _FILEINFO_);
       }
 
       //Create projection from each cube
-      Projection *proj1 = cube1.Projection();
-      Projection *proj2 = cube2.Projection();
+      Projection *proj1 = cube1.getProjection();
+      Projection *proj2 = cube2.getProjection();
 
       // Test to make sure projection parameters match
       if(*proj1 != *proj2) {
@@ -166,11 +166,11 @@ void IsisMain() {
     // band shared amongst cubes
     for(unsigned int i = 0; i < imageList.size(); i++) {
       Cube cube1;
-      cube1.Open(imageList[i]);
+      cube1.open(imageList[i]);
 
       for(unsigned int j = (i + 1); j < imageList.size(); j++) {
         Cube cube2;
-        cube2.Open(imageList[j]);
+        cube2.open(imageList[j]);
         iString cubeStr1((int)(i + 1));
         iString cubeStr2((int)(j + 1));
         string statMsg = "Gathering Overlap Statisitcs for Cube " +
@@ -387,7 +387,7 @@ void IsisMain() {
 
       // Allocate output cube
       CubeAttributeOutput outAtt;
-      p.SetOutputCube(out, outAtt, icube->Samples(), icube->Lines(), icube->Bands());
+      p.SetOutputCube(out, outAtt, icube->getSampleCount(), icube->getLineCount(), icube->getBandCount());
 
       // Apply gain/offset to the image
       g_imageIndex = img;
@@ -434,13 +434,13 @@ Isis::Statistics GatherStatistics(Cube &icube, const int band,
   // Create our progress message
   iString curCubeStr(g_imageIndex + 1);
   std::string statMsg = "";
-  if(icube.Bands() == 1) {
+  if(icube.getBandCount() == 1) {
     statMsg = "Calculating Statistics for Band 1 in Cube " + curCubeStr +
               " of " + maxCubeStr;
   }
   else {
     iString curBandStr(band);
-    iString maxBandStr(icube.Bands());
+    iString maxBandStr(icube.getBandCount());
     statMsg = "Calculating Statistics for Band " + curBandStr + " of " +
               maxBandStr + " in Cube " + curCubeStr + " of " + maxCubeStr;
   }
@@ -448,7 +448,7 @@ Isis::Statistics GatherStatistics(Cube &icube, const int band,
   int linc = (int)(100.0 / sampPercent + 0.5);  // Calculate our line incrementer
 
   // Make sure band is valid
-  if((band <= 0) || (band > icube.Bands())) {
+  if((band <= 0) || (band > icube.getBandCount())) {
     string msg = "Invalid band in method [GatherStatistics]";
     throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
   }
@@ -462,22 +462,22 @@ Isis::Statistics GatherStatistics(Cube &icube, const int band,
 
   // Calculate the number of steps for the Progress object, and add an extra
   // step if the total lines and incrementer do not divide evenly
-  int maxSteps = icube.Lines() / linc;
-  if(icube.Lines() % linc != 0) maxSteps += 1;
+  int maxSteps = icube.getLineCount() / linc;
+  if(icube.getLineCount() % linc != 0) maxSteps += 1;
   progress.SetMaximumSteps(maxSteps);
   progress.CheckStatus();
 
   // Add data to Statistics object by line
   Isis::Statistics stats;
   int i = 1;
-  while(i <= icube.Lines()) {
+  while(i <= icube.getLineCount()) {
     line.SetLine(i, band);
-    icube.Read(line);
+    icube.read(line);
     stats.AddData(line.DoubleBuffer(), line.size());
 
     // Make sure we consider the last line
-    if(i + linc > icube.Lines() && i != icube.Lines()) {
-      i = icube.Lines();
+    if(i + linc > icube.getLineCount() && i != icube.getLineCount()) {
+      i = icube.getLineCount();
       progress.AddSteps(1);
     }
     else i += linc; // Increment the current line by our incrementer

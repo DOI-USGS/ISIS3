@@ -149,15 +149,15 @@ void IsisMain() {
   bool gotNir = false;
   bool gotBg = false;
   bool first = true;
-  string obsId;		// ObservationId keyword value
+  string obsId;     // ObservationId keyword value
   int maxBands = 0;
 
   for(unsigned int i = 0; i < list.size(); i++) {
     HiriseCCD CCDinfo;
     Cube *cube = new Cube();
-    cube->Open(list[i]);
+    cube->open(list[i]);
 
-    PvlGroup arch = cube->Label()->FindGroup("Archive", Pvl::Traverse);
+    PvlGroup arch = cube->getLabel()->FindGroup("Archive", Pvl::Traverse);
     if(first) {
       obsId = (string) arch["ObservationId"];
       first = false;
@@ -170,7 +170,7 @@ void IsisMain() {
       }
     }
 
-    PvlGroup inst = cube->Label()->FindGroup("Instrument", Pvl::Traverse);
+    PvlGroup inst = cube->getLabel()->FindGroup("Instrument", Pvl::Traverse);
     int chan = inst["ChannelNumber"];
     if(chan != 2) {
       string msg = "Input file " + list[i] + " contains a single channel";
@@ -198,9 +198,9 @@ void IsisMain() {
     CCDinfo.trimLines = arch["TrimLines"];
     CCDinfo.fpsamp = xoffset[ccd];
     CCDinfo.fpline = yoffset[ccd];
-    CCDinfo.ns = cube->Samples();
-    CCDinfo.nl = cube->Lines();
-    CCDinfo.nb = cube->Bands();
+    CCDinfo.ns = cube->getSampleCount();
+    CCDinfo.nl = cube->getLineCount();
+    CCDinfo.nb = cube->getBandCount();
     if(CCDinfo.nb > maxBands) maxBands = CCDinfo.nb;
     CCDinfo.outss = 1;
     CCDinfo.outsl = 1;
@@ -251,13 +251,13 @@ void IsisMain() {
 
     //  Set up portal
     CCDinfo.portal = new Portal(interp->Samples(), interp->Lines(),
-                                cube->PixelType(),
+                                cube->getPixelType(),
                                 interp->HotSample(), interp->HotLine());
     CCDlist.push_back(CCDinfo);
 
 //cout << "CCD: " << ccd << " Summing: " << CCDinfo.summing << endl;
 
-//    cube->Close();
+//    cube->close();
   }
 
   // Check for consistent filters
@@ -348,10 +348,10 @@ void IsisMain() {
   Cube *ocube = placing.SetOutputCube("TO", outns, outnl, maxBands);
 
   //  Delete ChannelNumber and CpmmNumber so that the output cannot be projected.
-  PvlGroup oinst = ocube->GetGroup("Instrument");
+  PvlGroup oinst = ocube->getGroup("Instrument");
   oinst.DeleteKeyword("ChannelNumber");
   oinst.DeleteKeyword("CpmmNumber");
-  ocube->PutGroup(oinst);
+  ocube->putGroup(oinst);
 
   placing.ClearInputCubes();
 
@@ -388,7 +388,7 @@ void IsisMain() {
 
   // close all inputs
   for(vec_sz i = 0; i < CCDlist.size(); ++i) {
-    CCDlist[i].cube->Close();
+    CCDlist[i].cube->close();
   }
 
 //  Write the object if requested
@@ -400,7 +400,7 @@ void IsisMain() {
     pfile.close();
   }
 
-}	// End of IsisMain
+} // End of IsisMain
 
 
 
@@ -482,7 +482,7 @@ void PlaceCCDs(Buffer &obuf) {
       double inLine = CCDlocation[i].startLine +
                       (CCDlocation[i].lineInc * (obuf.Line() - 1.0));
       CCDlocation[i].portal->SetPosition(inSamp, inLine, obuf.Band());
-      CCDlocation[i].cube->Read(*(CCDlocation[i].portal));
+      CCDlocation[i].cube->read(*(CCDlocation[i].portal));
       obuf[i] = interp->Interpolate(inSamp, inLine,
                                     CCDlocation[i].portal->DoubleBuffer());
     }

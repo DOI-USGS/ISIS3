@@ -133,10 +133,10 @@ void IsisMain() {
   }
 
   Isis::Cube cube;
-  cube.Open("/tmp/isisProcessByBoxcar_01");
-  cube.Close(true);
-  cube.Open("/tmp/isisProcessByBoxcar_02");
-  cube.Close(true);
+  cube.open("/tmp/isisProcessByBoxcar_01");
+  cube.close(true);
+  cube.open("/tmp/isisProcessByBoxcar_02");
+  cube.close(true);
 
 }
 

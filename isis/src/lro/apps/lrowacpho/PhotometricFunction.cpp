@@ -50,7 +50,7 @@ namespace Isis {
      */
     PhotometricFunction::PhotometricFunction ( PvlObject &pvl, Cube &cube , bool useCamera) {
         if (useCamera)
-            _camera = cube.Camera();
+            _camera = cube.getCamera();
     }
     /**
      * @brief Compute photometric DN at given line/sample/band

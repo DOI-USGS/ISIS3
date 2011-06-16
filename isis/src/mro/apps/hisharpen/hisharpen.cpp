@@ -130,11 +130,11 @@ void CreatePsf(Pipeline &p) {
 
   // We need the base input and psf cubes to make the temporary psf cube
   Cube fromCube;
-  fromCube.Open(ui.GetFilename("FROM"));
+  fromCube.open(ui.GetFilename("FROM"));
 
   // Verify the image looks like a hirise image
   try {
-    const PvlGroup &instGrp = fromCube.Label()->FindGroup("Instrument", Pvl::Traverse);
+    const PvlGroup &instGrp = fromCube.getLabel()->FindGroup("Instrument", Pvl::Traverse);
     iString instrument = (std::string)instGrp["InstrumentId"];
 
     if(instrument != "HIRISE") {
@@ -149,16 +149,16 @@ void CreatePsf(Pipeline &p) {
     throw iException::Message(iException::User, message, _FILEINFO_);
   }
 
-  if(fromCube.Lines() != fromCube.Samples()) {
+  if(fromCube.getLineCount() != fromCube.getSampleCount()) {
     iString message = "This program only works on square cubes, the number of samples [" +
-                      iString(fromCube.Samples()) + "] must match the number of lines [" +
-                      iString(fromCube.Lines()) + "]";
+                      iString(fromCube.getSampleCount()) + "] must match the number of lines [" +
+                      iString(fromCube.getLineCount()) + "]";
     throw iException::Message(iException::User, message, _FILEINFO_);
   }
 
   // Let's figure out which point spread function we're supposed to be using
   iString psfFile = "$mro/calibration/psf/PSF_";
-  iString filter = (std::string)fromCube.Label()->FindGroup("Instrument", Pvl::Traverse)["CcdId"];
+  iString filter = (std::string)fromCube.getLabel()->FindGroup("Instrument", Pvl::Traverse)["CcdId"];
 
   if(filter.find("RED") != string::npos) {
     psfFile += "RED";
@@ -177,17 +177,17 @@ void CreatePsf(Pipeline &p) {
   psfFile += ".cub";
 
   Cube psfCube;
-  psfCube.Open(psfFile);
+  psfCube.open(psfFile);
 
-  if(psfCube.Lines() > fromCube.Lines()) {
-    iString message = "The input cube dimensions must be at least [" + iString(psfCube.Lines());
+  if(psfCube.getLineCount() > fromCube.getLineCount()) {
+    iString message = "The input cube dimensions must be at least [" + iString(psfCube.getLineCount());
     message += "] pixels in the line and sample dimensions";
     throw iException::Message(iException::User, message, _FILEINFO_);
   }
 
-  if(!IsPowerOf2(fromCube.Lines())) {
+  if(!IsPowerOf2(fromCube.getLineCount())) {
     iString message = "The input cube dimensions must be a power of 2 (found [" +
-                      iString(fromCube.Lines()) + "])";
+                      iString(fromCube.getLineCount()) + "])";
     throw iException::Message(iException::User, message, _FILEINFO_);
   }
 
@@ -196,39 +196,39 @@ void CreatePsf(Pipeline &p) {
 
   // We also need the output temp psf cube
   Cube outPsfCube;
-  outPsfCube.SetDimensions(fromCube.Samples(), fromCube.Lines(), 1);
-  outPsfCube.Create(tmpFile);
+  outPsfCube.setDimensions(fromCube.getSampleCount(), fromCube.getLineCount(), 1);
+  outPsfCube.create(tmpFile);
 
   LineManager outMgr(outPsfCube);
   outMgr.SetLine(1, 1);
 
   Progress progress;
   progress.SetText("Creating PSF File");
-  progress.SetMaximumSteps(fromCube.Lines());
+  progress.SetMaximumSteps(fromCube.getLineCount());
   progress.CheckStatus();
 
-  const int halfInSamples = psfCube.Samples() / 2;
-  for(int line = 0; line < outPsfCube.Lines(); line++) {
-    psfCube.Read(psfMgr);
+  const int halfInSamples = psfCube.getSampleCount() / 2;
+  for(int line = 0; line < outPsfCube.getLineCount(); line++) {
+    psfCube.read(psfMgr);
 
-    for(int sample = 0; sample < outPsfCube.Samples(); sample++) {
+    for(int sample = 0; sample < outPsfCube.getSampleCount(); sample++) {
       if(sample < halfInSamples) {
         outMgr[sample] = psfMgr[sample];
       }
-      else if(sample >= outPsfCube.Samples() - halfInSamples) {
-        outMgr[sample] = psfMgr[psfCube.Samples() - (outPsfCube.Samples() - sample)];
+      else if(sample >= outPsfCube.getSampleCount() - halfInSamples) {
+        outMgr[sample] = psfMgr[psfCube.getSampleCount() - (outPsfCube.getSampleCount() - sample)];
       }
       else {
         outMgr[sample] = 0.0;
       }
     }
 
-    outPsfCube.Write(outMgr);
+    outPsfCube.write(outMgr);
 
-    if(line < psfCube.Lines() / 2) {
+    if(line < psfCube.getLineCount() / 2) {
       psfMgr ++;
     }
-    else if(line >= outPsfCube.Lines() - psfCube.Lines() / 2) {
+    else if(line >= outPsfCube.getLineCount() - psfCube.getLineCount() / 2) {
       psfMgr ++;
     }
 

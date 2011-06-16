@@ -26,7 +26,7 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   Cube cube;
   string from = ui.GetFilename("FROM");
-  cube.Open(from, "r");
+  cube.open(from, "r");
 
   // Determine if output should be written base on parameters
   bool WriteFile = ui.GetBoolean("FILE");
@@ -47,7 +47,7 @@ void IsisMain() {
   }
 
   // Extract label from cube file
-  Pvl *label = cube.Label();
+  Pvl *label = cube.getLabel();
 
   PvlGroup sn("Results");
 

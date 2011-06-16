@@ -52,7 +52,7 @@ namespace Isis {
    */
   MdisGeometry::MdisGeometry(const std::string &filename) {
     Cube cube;
-    cube.Open(filename);
+    cube.open(filename);
     init(cube);
   }
 
@@ -75,7 +75,7 @@ namespace Isis {
    */
   void MdisGeometry::setCube(const std::string &filename) {
     Cube cube;
-    cube.Open(filename);
+    cube.open(filename);
     delete _camera;
     init(cube);
     return;
@@ -279,8 +279,8 @@ namespace Isis {
    * @param cube ISIS Cube to initialize
    */
   void MdisGeometry::init(Cube &cube) {
-    _label = *cube.Label();
-    _orglabel = OriginalLabel(cube.Filename()).ReturnLabels();
+    _label = *cube.getLabel();
+    _orglabel = OriginalLabel(cube.getFilename()).ReturnLabels();
     _nSubframes = (int) _orglabel.FindKeyword("MESS:SUBFRAME",
                   PvlObject::Traverse);
     _camera = CameraFactory::Create(_label);

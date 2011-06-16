@@ -25,16 +25,16 @@ namespace Isis {
   
     // Set input image area to defaults
     mdStartSample = 1;
-    mdEndSample   = mInCube->Samples();
+    mdEndSample   = mInCube->getSampleCount();
     mdStartLine   = 1;
-    mdEndLine     = mInCube->Lines();
+    mdEndLine     = mInCube->getLineCount();
   
     // Save off the sample and line magnification
     mdSampleScale = sampleScale;
     mdLineScale   = lineScale;
 
-    miOutputSamples = (int)ceil(mInCube->Samples() * mdSampleScale);
-    miOutputLines   = (int)ceil(mInCube->Lines() * mdLineScale);
+    miOutputSamples = (int)ceil(mInCube->getSampleCount() * mdSampleScale);
+    miOutputLines   = (int)ceil(mInCube->getLineCount() * mdLineScale);
   }
 
   /**
@@ -80,13 +80,13 @@ namespace Isis {
     if (pdStartSample >= 1) {
       mdStartSample = pdStartSample;
     }
-    if (pdEndSample <= mInCube->Samples()) {
+    if (pdEndSample <= mInCube->getSampleCount()) {
       mdEndSample = pdEndSample;
     }
     if (pdStartLine >= 1) {
       mdStartLine = pdStartLine;
     }
-    if (pdEndLine <= mInCube->Lines()) {
+    if (pdEndLine <= mInCube->getLineCount()) {
       mdEndLine = pdEndLine;
     }
     
@@ -106,8 +106,8 @@ namespace Isis {
    */
   Isis::PvlGroup Enlarge::UpdateOutputLabel(Isis::Cube *pOutCube)
   {
-    int iNumSamples= mInCube->Samples();
-    int iNumLines  = mInCube->Lines();
+    int iNumSamples= mInCube->getSampleCount();
+    int iNumLines  = mInCube->getLineCount();
     // Construct a label with the results
     // This is the Results group that will go into the application
     // log file. This group must be created by the calling application.
@@ -126,7 +126,7 @@ namespace Isis {
     resultsGrp += PvlKeyword("OutputSamples",   miOutputLines);
   
     Isis::SubArea subArea;
-    subArea.SetSubArea(mInCube->Lines(), mInCube->Samples(), (int)mdStartLine, (int)mdStartSample, 
+    subArea.SetSubArea(mInCube->getLineCount(), mInCube->getSampleCount(), (int)mdStartLine, (int)mdStartSample, 
                        (int)mdEndLine, (int)mdEndSample, 1.0 / mdLineScale, 1.0 / mdSampleScale);
     subArea.UpdateLabel(mInCube, pOutCube, resultsGrp);
     

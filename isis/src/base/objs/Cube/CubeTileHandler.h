@@ -44,53 +44,22 @@ namespace Isis {
    *            transfered to the right most and bottom most tiles
    */
 
-
-  class CubeTileHandler : public Isis::CubeIoHandler {
+  class CubeTileHandler : public CubeIoHandler {
     public:
-      CubeTileHandler(IsisCubeDef &cube);
+      CubeTileHandler(QFile * dataFile, QList<int> *virtualBandList,
+          const Pvl &label, bool alreadyOnDisk);
       ~CubeTileHandler();
-      void Close(const bool remove = false);
-      void Read(Isis::Buffer &rbuf);
-      void Write(Isis::Buffer &wbuf);
-      void Create(bool overwrite);
-      void ClearCache();
+
+      void updateLabels(Pvl &label);
+
+    protected:
+      virtual void readRaw(RawCubeChunk &chunkToFill) const;
+      virtual void writeRaw(const RawCubeChunk &chunkToWrite) const;
 
     private:
-      class InternalCache {
-        public:
-          bool dirty;
-          int startLine, startSamp;
-          int endLine, endSamp;
-          int band;
-          char *buf;
-      };
-
-      int p_tileSamples;
-      int p_tileLines;
-      std::vector<bool> p_tileAllocated;
-
-      int p_bytesPerTile;
-      int p_sampleTiles;
-      int p_lineTiles;
-      int p_maxTiles;
-      std::vector<const Isis::Buffer *> p_bufList;
-      std::vector<InternalCache *> p_cacheList;
-      InternalCache p_nullCache;
-      int p_lastCache;
-
-      int p_sample;
-      int p_line;
-      int p_band;
-
-      void GrowCache(const Isis::Buffer &buf);
-      InternalCache *FindCache();
-      void Move(char *dest, int dindex,
-                char *src, int sindex, int nelements);
-      void WriteCache(InternalCache *cache);
-      void WriteTile(char *buf, int tile);
-      void MakeNullCache();
-
+      int findGoodSize(int maxSize, int dimensionSize) const;
+      BigInt getTileStartByte(const RawCubeChunk &chunk) const;
   };
-};
+}
 
 #endif

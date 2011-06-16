@@ -99,9 +99,9 @@ void IsisMain() {
 
   // Write the BandBin, Archive, and Instrument groups
   // to the output cube label
-  outcube->PutGroup(outLabel.FindGroup("BandBin", Pvl::Traverse));
-  outcube->PutGroup(outLabel.FindGroup("Archive", Pvl::Traverse));
-  outcube->PutGroup(outLabel.FindGroup("Instrument", Pvl::Traverse));
+  outcube->putGroup(outLabel.FindGroup("BandBin", Pvl::Traverse));
+  outcube->putGroup(outLabel.FindGroup("Archive", Pvl::Traverse));
+  outcube->putGroup(outLabel.FindGroup("Instrument", Pvl::Traverse));
 
   // Set the BandBin filter name, center, and width values based on the
   // FilterNumber.
@@ -158,7 +158,7 @@ void IsisMain() {
   bbGrp.AddKeyword(PvlKeyword("Center", center));
   bbGrp.AddKeyword(PvlKeyword("Width", width));
   bbGrp.AddKeyword(PvlKeyword("FilterName", filtname));
-  outcube->PutGroup(bbGrp);
+  outcube->putGroup(bbGrp);
 
   PvlGroup kerns("Kernels");
   if(instid == "FC1") {
@@ -172,7 +172,7 @@ void IsisMain() {
                  "InstrumentId.";
     throw iException::Message(iException::Io, msg, _FILEINFO_);
   }
-  outcube->PutGroup(kerns);
+  outcube->putGroup(kerns);
 
   p2.StartProcess(flipbyline);
   p2.EndProcess();

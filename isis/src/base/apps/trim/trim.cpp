@@ -33,8 +33,8 @@ void IsisMain() {
   }
 
   //  Adjust bottom and right
-  bottom = icube->Lines() - bottom;
-  rright = icube->Samples() - rright;
+  bottom = icube->getLineCount() - bottom;
+  rright = icube->getSampleCount() - rright;
 
   // Start the processing
   p.StartProcess(trim);

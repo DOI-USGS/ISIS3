@@ -280,10 +280,10 @@ namespace Isis {
             ++algo;
         }
 
-        Pvl *label = cube.Label();
+        Pvl *label = cube.getLabel();
         PvlKeyword center = label->FindGroup("BandBin", Pvl::Traverse)["Center"];
         string errs("");
-        for (int i = 0; i < cube.Bands(); i++) {
+        for (int i = 0; i < cube.getBandCount(); i++) {
             Parameters parms = findParameters(center[i]);
             if (parms.IsValid()) {
                 parms.band = i + 1;

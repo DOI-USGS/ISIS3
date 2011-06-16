@@ -69,7 +69,7 @@ namespace Qisis {
     filter += "All (*)";
 
     Isis::Cube *baseCube = new Isis::Cube;
-    while (!baseCube->IsOpen()) {
+    while (!baseCube->isOpen()) {
       baseFile = QFileDialog::getOpenFileName((QWidget *)parent(),
                                               "Select basemap cube (projected)",
                                               ".", filter);
@@ -84,15 +84,15 @@ namespace Qisis {
 
       //  Make sure base is projected
       try {
-        baseCube->Open(baseFile.toStdString());
+        baseCube->open(baseFile.toStdString());
         try {
-          baseCube->Projection();
+          baseCube->getProjection();
         }
         catch (Isis::iException &e) {
-          baseCube->Close();
+          baseCube->close();
           QString message = "Base must be projected";
           QMessageBox::critical((QWidget *)parent(), "Error", message);
-          baseCube->Close();
+          baseCube->close();
         }
       }
       catch (Isis::iException &e) {
@@ -100,12 +100,12 @@ namespace Qisis {
         QMessageBox::critical((QWidget *)parent(), "Error", message);
       }
     }
-    baseCube->Close();
+    baseCube->close();
 
 
     Isis::Cube *matchCube = new Isis::Cube;
 
-    while (!matchCube->IsOpen()) {
+    while (!matchCube->isOpen()) {
       // Get match cube
       matchFile = QFileDialog::getOpenFileName((QWidget *)parent(),
                   "Select cube to tie to base",
@@ -119,20 +119,20 @@ namespace Qisis {
 
       //Make sure match is not projected
       try {
-        matchCube->Open(matchFile.toStdString());
+        matchCube->open(matchFile.toStdString());
         try {
 
-          if (matchCube->HasGroup("Mapping")) {
+          if (matchCube->hasGroup("Mapping")) {
             QString message = "The match cube cannot be a projected cube.";
             QMessageBox::critical((QWidget *)parent(), "Error", message);
-            matchCube->Close();
+            matchCube->close();
             continue;
           }
         }
         catch (Isis::iException &e) {
           QString message = "Error reading match cube labels.";
           QMessageBox::critical((QWidget *)parent(), "Error", message);
-          matchCube->Close();
+          matchCube->close();
         }
       }
       catch (Isis::iException &e) {
@@ -140,7 +140,7 @@ namespace Qisis {
         QMessageBox::critical((QWidget *)parent(), "Error", message);
       }
     }
-    matchCube->Close();
+    matchCube->close();
 
     // Find directory and save for use in file dialog for match cube
     Isis::Filename fname(matchFile.toStdString());

@@ -14,12 +14,12 @@ void IsisMain() {
 
   // Set up the transform object
   UserInterface &ui = Application::GetUserInterface();
-  Transform *transform = new Translate(icube->Samples(), icube->Lines(),
+  Transform *transform = new Translate(icube->getSampleCount(), icube->getLineCount(),
                                        ui.GetDouble("STRANS"),
                                        ui.GetDouble("LTRANS"));
 
   // Allocate the output file, same size as input
-  p.SetOutputCube("TO", icube->Samples(), icube->Lines(), icube->Bands());
+  p.SetOutputCube("TO", icube->getSampleCount(), icube->getLineCount(), icube->getBandCount());
 
   // Set up the interpolator
   Interpolator *interp;

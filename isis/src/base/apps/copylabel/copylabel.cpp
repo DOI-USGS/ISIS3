@@ -23,12 +23,12 @@ void IsisMain() {
   
   // Make cube and open Read/Write
   Cube inOut;
-  inOut.Open(ui.GetFilename("From"),"rw");
+  inOut.open(ui.GetFilename("From"),"rw");
 
   Pvl * mergeTo = NULL; 
   Pvl * source = NULL;
   iString sourceFileName = ui.GetFilename("Source");
-  mergeTo = inOut.Label();
+  mergeTo = inOut.getLabel();
   source = new Pvl(sourceFileName);
 
   // We have 3 possible running options, those are
@@ -47,12 +47,12 @@ void IsisMain() {
   }
   else {
     // We may or may not be using sourceCube later
-    sourceCube.Open(sourceFileName,"r");
+    sourceCube.open(sourceFileName,"r");
     if (source != NULL) {
       delete source;
       source = NULL;
     }
-    source = sourceCube.Label();
+    source = sourceCube.getLabel();
   }
 
   // Check if we need an alpha cube group. 
@@ -67,10 +67,10 @@ void IsisMain() {
 
   // Check, do we have the same size cubes? how about same sample line scale?
   if (isACube) {
-    sourceSamps = sourceCube.Samples();
-    sourceLines = sourceCube.Lines();
-    outSamps = inOut.Samples();
-    outLines = inOut.Lines();
+    sourceSamps = sourceCube.getSampleCount();
+    sourceLines = sourceCube.getLineCount();
+    outSamps = inOut.getSampleCount();
+    outLines = inOut.getLineCount();
     sampScale = (double)outSamps/(double)sourceSamps;
     lineScale = (double)outLines/(double)sourceLines;
     if (isACube) {
@@ -104,7 +104,7 @@ void IsisMain() {
   if (ui.GetBoolean("Bandbin")) {
     if (isACube) {
       // If the number of bands doesn't match, we can't continue
-      if (inOut.Bands() != sourceCube.Bands()) {
+      if (inOut.getBandCount() != sourceCube.getBandCount()) {
         string msg = "Cannot copy BandBin group when the number of bands does"
                      " not match";
         throw iException::Message(iException::User, msg, _FILEINFO_);
@@ -232,20 +232,20 @@ void IsisMain() {
   for (int i = 0; i < mergeTo->Objects() && !found; i++) {
     if (mergeTo->Object(i).IsNamed("History")) {
       History his((string)mergeTo->Object(i)["Name"]);
-      inOut.Read(his);
+      inOut.read(his);
       his.AddEntry();
-      inOut.Write(his);
+      inOut.write(his);
       found = true;
     }
   }
   if (!found) {
     History his("IsisCube");
     his.AddEntry();
-    inOut.Write(his);
+    inOut.write(his);
   }
 
-  inOut.Close();
-  sourceCube.Close(); 
+  inOut.close();
+  sourceCube.close(); 
 
   Application::Log(results);
 }
@@ -272,8 +272,8 @@ bool copyGroup(Pvl * source, Pvl * mergeTo, iString name) {
 bool copyBlob(Cube * from, Cube * to, iString name, iString type, iString fname) {
   try {
     Blob blob(name, type, fname);
-    from->Read(blob);
-    to->Write(blob);
+    from->read(blob);
+    to->write(blob);
     return true;
   }
   catch (iException & e) {

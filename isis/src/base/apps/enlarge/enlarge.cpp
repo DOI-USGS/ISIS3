@@ -14,9 +14,9 @@ void IsisMain() {
   Cube *icube = p.SetInputCube("FROM");
 
   // Input number of samples, lines, and bands
-  int ins = icube->Samples();
-  int inl = icube->Lines();
-  int inb = icube->Bands();
+  int ins = icube->getSampleCount();
+  int inl = icube->getLineCount();
+  int inb = icube->getBandCount();
 
   // Output samples and lines
   int ons, onl;

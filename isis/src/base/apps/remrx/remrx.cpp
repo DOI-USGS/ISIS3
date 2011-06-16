@@ -25,7 +25,7 @@ void IsisMain() {
 
   // Setup the input and output cubes
   Cube *icube = p.SetInputCube("FROM");
-  PvlKeyword &status = icube->GetGroup("RESEAUS")["STATUS"];
+  PvlKeyword &status = icube->getGroup("RESEAUS")["STATUS"];
   UserInterface &ui = Application::GetUserInterface();
   string in = ui.GetFilename("FROM");
 
@@ -60,9 +60,9 @@ void IsisMain() {
 
   // Open the output cube
   Cube cube;
-  cube.Open(out, "rw");
+  cube.open(out, "rw");
 
-  PvlGroup &res = cube.Label()->FindGroup("RESEAUS", Pvl::Traverse);
+  PvlGroup &res = cube.getLabel()->FindGroup("RESEAUS", Pvl::Traverse);
 
   // Get reseau line, sample, type, and valid Keywords
   PvlKeyword lines = res.FindKeyword("LINE");
@@ -71,13 +71,13 @@ void IsisMain() {
   PvlKeyword valid = res.FindKeyword("VALID");
   int numres = lines.Size();
 
-  Brick brick(sdim, ldim, 1, cube.PixelType());
+  Brick brick(sdim, ldim, 1, cube.getPixelType());
   for(int res = 0; res < numres; res++) {
     if((resvalid == 0 || (int)valid[res] == 1) && (int)type[res] != 0) {
       int baseSamp = (int)((double)samps[res] + 0.5) - (sdim / 2);
       int baseLine = (int)((double)lines[res] + 0.5) - (ldim / 2);
       brick.SetBasePosition(baseSamp, baseLine, 1);
-      cube.Read(brick);
+      cube.read(brick);
       if(action == "NULL") {
         for(int i = 0; i < brick.size(); i++) brick[i] = Isis::Null;
       }
@@ -196,9 +196,9 @@ void IsisMain() {
         }
       }
     }
-    cube.Write(brick);
+    cube.write(brick);
   }
-  cube.Close();
+  cube.close();
 
 }
 

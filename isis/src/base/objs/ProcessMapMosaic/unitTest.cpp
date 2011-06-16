@@ -74,19 +74,19 @@ void IsisMain() {
   cout << labels << endl;
 
   Cube tmp;
-  tmp.Open("./unitTest.cub");
+  tmp.open("./unitTest.cub");
   LineManager lm(tmp);
   lm.SetLine(1, 1);
 
   while(!lm.end()) {
-    tmp.Read(lm);
+    tmp.read(lm);
     cout << "Mosaic Data: " << lm[lm.SampleDimension()/4] << '\t' <<
               lm[lm.SampleDimension()/2] << '\t' <<
               lm[(3*lm.SampleDimension())/4] << endl;
     lm++;
   }
 
-  tmp.Close();
+  tmp.close();
   remove("./unitTest.cub");
 }
 

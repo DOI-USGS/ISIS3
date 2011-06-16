@@ -14,7 +14,7 @@ void IsisMain() {
 
   // Set up the transform object
   UserInterface &ui = Application::GetUserInterface();
-  Transform *transform = new Rotate(icube->Samples(), icube->Lines(),
+  Transform *transform = new Rotate(icube->getSampleCount(), icube->getLineCount(),
                                     ui.GetDouble("DEGREES"));
 
   // Determine the output size
@@ -22,7 +22,7 @@ void IsisMain() {
   int lines = transform->OutputLines();
 
   // Allocate the output file
-  p.SetOutputCube("TO", samples, lines, icube->Bands());
+  p.SetOutputCube("TO", samples, lines, icube->getBandCount());
 
   // Set up the interpolator
   Interpolator *interp;

@@ -13,16 +13,16 @@ void IsisMain() {
   Isis::Cube *icube = p.SetInputCube("FROM");
   p.SetInputCube("FROM2");
   p.SetTileSize(10, 10);
-  p.SetOutputCube("TO", icube->Samples() + 10, icube->Lines(), icube->Bands());
-  p.SetOutputCube("TO2", icube->Samples() + 10, icube->Lines(), icube->Bands());
+  p.SetOutputCube("TO", icube->getSampleCount() + 10, icube->getLineCount(), icube->getBandCount());
+  p.SetOutputCube("TO2", icube->getSampleCount() + 10, icube->getLineCount(), icube->getBandCount());
   p.StartProcess(twoInAndOut);
   p.EndProcess();
 
   Isis::Cube cube;
-  cube.Open("/tmp/isisProcessByTile_01");
-  cube.Close(true);
-  cube.Open("/tmp/isisProcessByTile_02");
-  cube.Close(true);
+  cube.open("/tmp/isisProcessByTile_01");
+  cube.close(true);
+  cube.open("/tmp/isisProcessByTile_02");
+  cube.close(true);
 }
 
 void twoInAndOut(vector<Isis::Buffer *> &ib, vector<Isis::Buffer *> &ob) {

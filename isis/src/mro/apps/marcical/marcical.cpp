@@ -23,19 +23,19 @@ void IsisMain() {
   Cube icube;
 
   if(inAtt.Bands().size() != 0) {
-    icube.SetVirtualBands(inAtt.Bands());
+    icube.setVirtualBands(inAtt.Bands());
   }
 
-  icube.Open(Filename(ui.GetFilename("FROM")).Expanded());
+  icube.open(Filename(ui.GetFilename("FROM")).Expanded());
 
   // Make sure it is a Marci cube
   Filename inFilename = ui.GetFilename("FROM");
   try {
-    if(icube.GetGroup("Instrument")["InstrumentID"][0] != "Marci") {
+    if(icube.getGroup("Instrument")["InstrumentID"][0] != "Marci") {
       throw iException::Message(iException::User, "", _FILEINFO_);
     }
 
-    if(!icube.GetGroup("Archive").HasKeyword("SampleBitModeId")) {
+    if(!icube.getGroup("Archive").HasKeyword("SampleBitModeId")) {
       throw iException::Message(iException::User, "", _FILEINFO_);
     }
   }
@@ -46,8 +46,8 @@ void IsisMain() {
     throw iException::Message(iException::User, msg, _FILEINFO_);
   }
 
-  if(icube.GetGroup("Archive")["SampleBitModeId"][0] != "SQROOT") {
-    string msg = "Sample bit mode [" + icube.GetGroup("Archive")["SampleBitModeId"][0] + "] is not supported.";
+  if(icube.getGroup("Archive")["SampleBitModeId"][0] != "SQROOT") {
+    string msg = "Sample bit mode [" + icube.getGroup("Archive")["SampleBitModeId"][0] + "] is not supported.";
     throw iException::Message(iException::User, msg, _FILEINFO_);
   }
 
@@ -63,7 +63,7 @@ void IsisMain() {
     decimation.push_back(1.0);
   }
 
-  iString startTime = icube.Label()->FindGroup("Instrument", Pvl::Traverse)["StartTime"][0];
+  iString startTime = icube.getLabel()->FindGroup("Instrument", Pvl::Traverse)["StartTime"][0];
   iTime start(startTime);
   iTime changeTime("November 6, 2006 21:30:00 UTC");
 
@@ -122,7 +122,7 @@ void IsisMain() {
 
   vector<Cube *> flatcubes;
   vector<LineManager *> fcubeMgrs;
-  int summing = icube.GetGroup("Instrument")["SummingMode"][0];
+  int summing = icube.getGroup("Instrument")["SummingMode"][0];
 
   // Read in the flat files
   for(int band = 0; band < 7; band++) {
@@ -147,7 +147,7 @@ void IsisMain() {
     Filename flatFile(filePattern);
     flatFile.HighestVersion();
     Cube *fcube = new Cube();
-    fcube->Open(flatFile.Expanded());
+    fcube->open(flatFile.Expanded());
     flatcubes.push_back(fcube);
 
     LineManager *fcubeMgr = new LineManager(*fcube);
@@ -159,14 +159,13 @@ void IsisMain() {
   Cube ocube;
 
   CubeAttributeOutput outAtt = ui.GetOutputAttribute("TO");
-  ocube.SetDimensions(icube.Samples(), icube.Lines(), icube.Bands());
-  ocube.SetByteOrder(outAtt.ByteOrder());
-  ocube.SetCubeFormat(outAtt.FileFormat());
-  if(outAtt.DetachedLabel()) ocube.SetDetached();
-  if(outAtt.AttachedLabel()) ocube.SetAttached();
-  ocube.SetPixelType(outAtt.PixelType());
+  ocube.setDimensions(icube.getSampleCount(), icube.getLineCount(), icube.getBandCount());
+  ocube.setByteOrder(outAtt.ByteOrder());
+  ocube.setFormat(outAtt.FileFormat());
+  ocube.setLabelsAttached(outAtt.AttachedLabel());
+  ocube.setPixelType(outAtt.PixelType());
 
-  ocube.Create(Filename(ui.GetFilename("TO")).Expanded());
+  ocube.create(Filename(ui.GetFilename("TO")).Expanded());
 
   LineManager icubeMgr(icube);
 
@@ -183,7 +182,7 @@ void IsisMain() {
   filterNameToFilterIndex.insert(pair<string, int>("SHORT_UV", 6));
   filterNameToFilterIndex.insert(pair<string, int>("LONG_UV",  7));
 
-  PvlKeyword &filtNames = icube.Label()->FindGroup("BandBin", Pvl::Traverse)["FilterName"];;
+  PvlKeyword &filtNames = icube.getLabel()->FindGroup("BandBin", Pvl::Traverse)["FilterName"];;
   for(int i = 0; i < filtNames.Size(); i++) {
     if(filterNameToFilterIndex.find(filtNames[i]) != filterNameToFilterIndex.end()) {
       filter.push_back(filterNameToFilterIndex.find(filtNames[i])->second);
@@ -195,12 +194,12 @@ void IsisMain() {
   }
 
   bool iof = ui.GetBoolean("IOF");
-  double exposure = ((double)icube.Label()->FindGroup("Instrument", Pvl::Traverse)["ExposureDuration"]) * 1000.0;
+  double exposure = ((double)icube.getLabel()->FindGroup("Instrument", Pvl::Traverse)["ExposureDuration"]) * 1000.0;
   Camera *cam = NULL;
   double solarDist = Isis::Null;
 
   if(iof) {
-    cam = icube.Camera();
+    cam = icube.getCamera();
     cam->SetImage(icubeMgr.size() / 2.0, 0.5 + (16 / 2) / summing);
     solarDist = cam->SolarDistance();
   }
@@ -210,17 +209,17 @@ void IsisMain() {
 
   Progress prog;
   prog.SetText("Calibrating Image");
-  prog.SetMaximumSteps(ocube.Lines() * ocube.Bands());
+  prog.SetMaximumSteps(ocube.getLineCount() * ocube.getBandCount());
   prog.CheckStatus();
 
   Statistics stats;
 
   do {
-    icube.Read(icubeMgr);
-    ocube.Read(ocubeMgr);
+    icube.read(icubeMgr);
+    ocube.read(ocubeMgr);
 
     int fcubeIndex = filter[ocubeMgr.Band()-1] - 1;
-    flatcubes[fcubeIndex]->Read((*fcubeMgrs[fcubeIndex]));
+    flatcubes[fcubeIndex]->read((*fcubeMgrs[fcubeIndex]));
 
     for(int i = 0; i < ocubeMgr.size(); i++) {
       if(IsSpecial((*fcubeMgrs[fcubeIndex])[i]) || (*fcubeMgrs[fcubeIndex])[i] == 0.0) {
@@ -241,7 +240,7 @@ void IsisMain() {
       }
     }
 
-    ocube.Write(ocubeMgr);
+    ocube.write(ocubeMgr);
 
     icubeMgr++;
     ocubeMgr++;
@@ -269,23 +268,23 @@ void IsisMain() {
   while(!ocubeMgr.end());
 
   // Propagate labels and objects (in case of spice data)
-  PvlObject &inCubeObj = icube.Label()->FindObject("IsisCube");
-  PvlObject &outCubeObj = ocube.Label()->FindObject("IsisCube");
+  PvlObject &inCubeObj = icube.getLabel()->FindObject("IsisCube");
+  PvlObject &outCubeObj = ocube.getLabel()->FindObject("IsisCube");
 
   for(int g = 0; g < inCubeObj.Groups(); g++) {
     outCubeObj.AddGroup(inCubeObj.Group(g));
   }
 
-  for(int o = 0; o < icube.Label()->Objects(); o++) {
-    if(icube.Label()->Object(o).IsNamed("Table")) {
-      Blob t(icube.Label()->Object(o)["Name"], icube.Label()->Object(o).Name());
-      icube.Read(t);
-      ocube.Write(t);
+  for(int o = 0; o < icube.getLabel()->Objects(); o++) {
+    if(icube.getLabel()->Object(o).IsNamed("Table")) {
+      Blob t(icube.getLabel()->Object(o)["Name"], icube.getLabel()->Object(o).Name());
+      icube.read(t);
+      ocube.write(t);
     }
   }
 
-  icube.Close();
-  ocube.Close();
+  icube.close();
+  ocube.close();
 
   // The cube still owns this
   cam = NULL;

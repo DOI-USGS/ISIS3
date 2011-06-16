@@ -380,7 +380,7 @@ namespace Isis {
 
       // Or get the automatic parameters
       else if(strType != "NONE") {
-        Isis::Histogram *hist = InputCubes[i]->Histogram(0);
+        Isis::Histogram *hist = InputCubes[i]->getHistogram(0);
         p_inputMinimum.push_back(hist->Percent(
                                    Application::GetUserInterface().GetDouble("MINPERCENT")));
         p_inputMaximum.push_back(hist->Percent(
@@ -655,10 +655,10 @@ namespace Isis {
 
     // Construct a line buffer manager
     if(p_format == BIP) {
-      p_progress->SetMaximumSteps((InputCubes[0]->Samples()) * (InputCubes[0]->Lines()));
+      p_progress->SetMaximumSteps((InputCubes[0]->getSampleCount()) * (InputCubes[0]->getLineCount()));
     }
     else {
-      p_progress->SetMaximumSteps((InputCubes[0]->Lines()) * (InputCubes[0]->Bands()));
+      p_progress->SetMaximumSteps((InputCubes[0]->getLineCount()) * (InputCubes[0]->getBandCount()));
     }
 
 
@@ -727,7 +727,7 @@ namespace Isis {
     // Loop and let the app programmer fiddle with the buffers
     for(buff->begin(); !buff->end(); buff->next()) {
       // Read a line of data
-      InputCubes[0]->Read(*buff);
+      InputCubes[0]->read(*buff);
       // Stretch the pixels into the desired range
       for(int i = 0; i < buff->size(); i++) {
         (*buff)[i] = p_str[0]->Map((*buff)[i]);
@@ -796,12 +796,12 @@ namespace Isis {
                                       funct(std::vector<Isis::Buffer *> &in)) {
     InitProcess();
 
-    int samples = InputCubes[0]->Samples();
-    int lines = InputCubes[0]->Lines();
+    int samples = InputCubes[0]->getSampleCount();
+    int lines = InputCubes[0]->getLineCount();
     vector<Isis::LineManager *> imgrs;
 
     for(unsigned int i = 0; i < InputCubes.size(); i++) {
-      if((InputCubes[i]->Samples() == samples) && (InputCubes[i]->Lines() == lines)) {
+      if((InputCubes[i]->getSampleCount() == samples) && (InputCubes[i]->getLineCount() == lines)) {
         Isis::LineManager *iline = new Isis::LineManager(*InputCubes[i]);
         iline->begin();
         imgrs.push_back(iline);
@@ -818,7 +818,7 @@ namespace Isis {
 
       for(unsigned int j = 0; j < InputCubes.size(); j++) {
         // Read a line of data
-        InputCubes[j]->Read(*imgrs[j]);
+        InputCubes[j]->read(*imgrs[j]);
         // Stretch the pixels into the desired range
         for(int i = 0; i < samples; i++) {
           (*imgrs[j])[i] = p_str[j]->Map((*imgrs[j])[i]);
@@ -858,12 +858,12 @@ namespace Isis {
                                       funct(std::vector<Isis::Buffer *> &in)) {
     InitProcess();
 
-    int samples = InputCubes[0]->Samples();
-    int lines = InputCubes[0]->Lines();
+    int samples = InputCubes[0]->getSampleCount();
+    int lines = InputCubes[0]->getLineCount();
     vector<Isis::LineManager *> imgrs;
 
     for(unsigned int i = 0; i < InputCubes.size(); i++) {
-      if((InputCubes[i]->Samples() == samples) && (InputCubes[i]->Lines() == lines)) {
+      if((InputCubes[i]->getSampleCount() == samples) && (InputCubes[i]->getLineCount() == lines)) {
         Isis::LineManager *iline = new Isis::LineManager(*InputCubes[i], true);
         iline->begin();
         imgrs.push_back(iline);
@@ -880,7 +880,7 @@ namespace Isis {
 
       for(unsigned int j = 0; j < InputCubes.size(); j++) {
         // Read a line of data
-        InputCubes[j]->Read(*imgrs[j]);
+        InputCubes[j]->read(*imgrs[j]);
         // Stretch the pixels into the desired range
         for(int i = 0; i < samples; i++) {
           (*imgrs[j])[i] = p_str[j]->Map((*imgrs[j])[i]);
@@ -919,12 +919,12 @@ namespace Isis {
                                       funct(std::vector<Isis::Buffer *> &in)) {
     InitProcess();
 
-    int bands = InputCubes[0]->Bands();
-    int samples = InputCubes[0]->Samples();
+    int bands = InputCubes[0]->getBandCount();
+    int samples = InputCubes[0]->getSampleCount();
     vector<Isis::BandManager *> imgrs;
 
     for(unsigned int i = 0; i < InputCubes.size(); i++) {
-      if((InputCubes[i]->Bands() == bands) && (InputCubes[i]->Samples() == samples)) {
+      if((InputCubes[i]->getBandCount() == bands) && (InputCubes[i]->getSampleCount() == samples)) {
         Isis::BandManager *iband = new Isis::BandManager(*InputCubes[i]);
         iband->begin();
         imgrs.push_back(iband);
@@ -941,7 +941,7 @@ namespace Isis {
 
       for(unsigned int j = 0; j < InputCubes.size(); j++) {
         // Read a line of data
-        InputCubes[j]->Read(*imgrs[j]);
+        InputCubes[j]->read(*imgrs[j]);
         // Stretch the pixels into the desired range
         for(int i = 0; i < bands; i++) {
           (*imgrs[j])[i] = p_str[j]->Map((*imgrs[j])[i]);
@@ -996,7 +996,7 @@ namespace Isis {
     // Loop for each line of data
     for(buff->begin(); !buff->end(); buff->next()) {
       // Read a line of data
-      InputCubes[0]->Read(*buff);
+      InputCubes[0]->read(*buff);
       // Stretch the pixels into the desired range
       for(int i = 0; i < buff->size(); i++) {
         (*buff)[i] = p_str[0]->Map((*buff)[i]);
@@ -1190,7 +1190,7 @@ namespace Isis {
   */
   void ProcessExport::CreateWorldFile(const std::string &worldFile) {
     try {
-      Projection *proj = InputCubes[0]->Projection();
+      Projection *proj = InputCubes[0]->getProjection();
       proj->SetWorld(1.0, 1.0);
       ofstream os;
       os.open(worldFile.c_str(), ios::out);

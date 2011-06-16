@@ -45,7 +45,7 @@ void IsisMain() {
     for(int i = 0; i < (int)flist.size(); i++) {
       Cube *c = new Cube();
       clist.push_back(c);
-      c->Open(flist[i]);
+      c->open(flist[i]);
     }
 
 
@@ -55,8 +55,8 @@ void IsisMain() {
     PvlKeyword sourceProductId("SourceProductId");
     string ProdId;
     for(int i = 0; i < (int)clist.size(); i++) {
-      Pvl *pmatch = clist[0]->Label();
-      Pvl *pcomp = clist[i]->Label();
+      Pvl *pmatch = clist[0]->getLabel();
+      Pvl *pcomp = clist[i]->getLabel();
       CompareLabels(*pmatch, *pcomp);
       PvlGroup g = pcomp->FindGroup("Instrument", Pvl::Traverse);
       if(g.HasKeyword("StitchedProductIds")) {
@@ -80,7 +80,7 @@ void IsisMain() {
     double avgLat;
     double avgLon;
     for(int i = 0; i < (int)clist.size(); i++) {
-      Projection *proj = clist[i]->Projection();
+      Projection *proj = clist[i]->getProjection();
       if(proj->MinimumLatitude() < minLat) minLat = proj->MinimumLatitude();
       if(proj->MaximumLatitude() > maxLat) maxLat = proj->MaximumLatitude();
       if(proj->MinimumLongitude() < minLon) minLon = proj->MinimumLongitude();
@@ -88,7 +88,7 @@ void IsisMain() {
     }
     avgLat = (minLat + maxLat) / 2;
     avgLon = (minLon + maxLon) / 2;
-    Projection *proj = clist[0]->Projection();
+    Projection *proj = clist[0]->getProjection();
     proj->SetGround(avgLat, avgLon);
     avgLat = proj->UniversalLatitude();
     avgLon = proj->UniversalLongitude();
@@ -102,7 +102,7 @@ void IsisMain() {
     double CsunAzimuth;
     double CnorthAzimuth;
     for(int i = 0; i < (int)clist.size(); i++) {
-      Camera *cam = clist[i]->Camera();
+      Camera *cam = clist[i]->getCamera();
       if(cam->SetUniversalGround(avgLat, avgLon)) {
         Cemiss = cam->EmissionAngle();
         Cphase = cam->PhaseAngle();
@@ -126,7 +126,7 @@ void IsisMain() {
       double startY = DBL_MAX;
       double endY =  DBL_MIN;
       for(int i = 0; i < (int)clist.size(); i++) {
-        Projection *proj = clist[i]->Projection();
+        Projection *proj = clist[i]->getProjection();
         proj->SetWorld(0.5, 0.5);
         if(i == 0) {
           startX = proj->XCoord();
@@ -136,7 +136,7 @@ void IsisMain() {
           if(proj->XCoord() < startX) startX =  proj->XCoord();
           if(proj->YCoord() > endY) endY = proj->YCoord();
         }
-        Pvl *p = clist[i]->Label();
+        Pvl *p = clist[i]->getLabel();
         double nlines = p->FindGroup("Dimensions", Pvl::Traverse)["Lines"];
         double nsamps = p->FindGroup("Dimensions", Pvl::Traverse)["Samples"];
 
@@ -157,7 +157,7 @@ void IsisMain() {
       double line = proj->ToWorldY(avgY);
 
       for(int i = 0; i < (int)clist.size(); i++) {
-        Camera *cam = clist[i]->Camera();
+        Camera *cam = clist[i]->getCamera();
         if(cam->SetImage(sample, line)) {
           Cemiss = cam->EmissionAngle();
           Cphase = cam->PhaseAngle();
@@ -184,7 +184,7 @@ void IsisMain() {
     string stopTime;
     for(int i = 0; i < (int)clist.size(); i++) {
       OriginalLabel origLab;
-      clist[i]->Read(origLab);
+      clist[i]->read(origLab);
       PvlGroup timegrp = origLab.ReturnLabels().FindGroup("TIME_PARAMETERS", Pvl::Traverse);
       if(i == 0) {
         startClock = (string)timegrp["SpacecraftClockStartCount"];
@@ -217,10 +217,10 @@ void IsisMain() {
     }
 
     for(int i = 0; i < (int)clist.size(); i++) {
-      Pvl *clab = clist[i]->Label();
+      Pvl *clab = clist[i]->getLabel();
       PvlGroup cInst = clab->FindGroup("Instrument", Pvl::Traverse);
       OriginalLabel cOrgLab;
-      clist[i]->Read(cOrgLab);
+      clist[i]->read(cOrgLab);
       PvlGroup cGrp = cOrgLab.ReturnLabels().FindGroup("INSTRUMENT_SETTING_PARAMETERS", Pvl::Traverse);
       cpmmTdiFlag[(int)cInst["CpmmNumber"]] = (string) cGrp["MRO:TDI"];
       cpmmSummingFlag[(int)cInst["CpmmNumber"]] = (string) cGrp["MRO:BINNING"];
@@ -238,11 +238,11 @@ void IsisMain() {
 
     // Get the blob of original labels from first image in list
     OriginalLabel org;
-    clist[0]->Read(org);
+    clist[0]->read(org);
 
     //close all cubes
     for(int i = 0; i < (int)clist.size(); i++) {
-      clist[i]->Close();
+      clist[i]->close();
       delete clist[i];
     }
     clist.clear();
@@ -276,17 +276,17 @@ void IsisMain() {
     mos += specialProcessingFlag;
 
     Cube mosCube;
-    mosCube.Open(ui.GetFilename("TO"), "rw");
-    PvlObject &lab = mosCube.Label()->FindObject("IsisCube");
+    mosCube.open(ui.GetFilename("TO"), "rw");
+    PvlObject &lab = mosCube.getLabel()->FindObject("IsisCube");
     lab.AddGroup(mos);
     //add orginal label blob to the output cube
-    mosCube.Write(org);
-    mosCube.Close();
+    mosCube.write(org);
+    mosCube.close();
 
   }
   catch(iException &e) {
     for(int i = 0; i < (int)clist.size(); i++) {
-      clist[i]->Close();
+      clist[i]->close();
       delete clist[i];
     }
     string msg = "The mosaic [" + ui.GetFilename("TO") + "] was NOT created";

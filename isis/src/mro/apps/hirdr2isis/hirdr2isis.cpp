@@ -43,7 +43,7 @@ void IsisMain() {
   archiveXlater.Auto(otherLabels);
 
   // Write the BandBin, Archive, and Mapping groups to the output cube label
-  ocube->PutGroup(otherLabels.FindGroup("BandBin"));
+  ocube->putGroup(otherLabels.FindGroup("BandBin"));
 
   // Reorder CPMM keywords back to original arrangement.  This copies the values
   //  back to keywords in place.
@@ -62,7 +62,7 @@ void IsisMain() {
     ccdBin[cpmmByCcd[ccd]]  = tempccdBin[ccd];
     ccdTdi[cpmmByCcd[ccd]]  = tempccdTdi[ccd];
   }
-  ocube->PutGroup(mosgrp);
+  ocube->putGroup(mosgrp);
 
 //  Modify the output Mosaic group if the Projection is of type
 //  Equirectangular.
@@ -105,7 +105,7 @@ void IsisMain() {
   }
 
   //  Write the group to the label
-  ocube->PutGroup(mapgrp);
+  ocube->putGroup(mapgrp);
 
   p.EndProcess();
 

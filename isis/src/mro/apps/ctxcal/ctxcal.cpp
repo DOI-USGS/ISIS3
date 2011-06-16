@@ -48,21 +48,21 @@ void IsisMain() {
 
   Cube flatFile;
   if(ui.WasEntered("FLATFILE")) {
-    flatFile.Open(ui.GetFilename("FLATFILE"));
+    flatFile.open(ui.GetFilename("FLATFILE"));
   }
   else {
     Filename flat("$mro/calibration/ctxFlat_????.cub");
     flat.HighestVersion();
-    flatFile.Open(flat.Expanded());
+    flatFile.open(flat.Expanded());
   }
-  flat = new Brick(5000, 1, 1, flatFile.PixelType());
+  flat = new Brick(5000, 1, 1, flatFile.getPixelType());
   flat->SetBasePosition(1, 1, 1);
-  flatFile.Read(*flat);
+  flatFile.read(*flat);
 
   // If it is already calibrated then complain
-  if(icube->HasGroup("Radiometry")) {
-    string msg = "The CTX image [" + icube->Filename() + "] has already been ";
-    msg += "radiometrically calibrated";
+  if(icube->hasGroup("Radiometry")) {
+    string msg = "The CTX image [" + icube->getFilename() + "] has already "
+                 "been radiometrically calibrated";
     throw iException::Message(iException::User, msg, _FILEINFO_);
   }
 
@@ -81,7 +81,7 @@ void IsisMain() {
 
   //  Read dark current info, if no dc exit?
   Table dcTable("Ctx Prefix Dark Pixels");
-  icube->Read(dcTable);
+  icube->read(dcTable);
   //  TODO::  make sure dc records match cube nlines.
 
   //  If summing mode = 1 , average odd & even dc pixels separately for
@@ -148,7 +148,7 @@ void IsisMain() {
     double w0 = 3660.5;
     double w1 = w0 * ((dist * dist) / (dist1 * dist1));
     if(exposure *w1 == 0.0) {
-      string msg = icube->Filename() + ": exposure or w1 has value of 0.0 ";
+      string msg = icube->getFilename() + ": exposure or w1 has value of 0.0 ";
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
     iof = 1.0 / (exposure * w1);
@@ -163,11 +163,11 @@ void IsisMain() {
   // Add the radiometry group
   PvlGroup calgrp("Radiometry");
 
-  calgrp += PvlKeyword("FlatFile", flatFile.Filename());
+  calgrp += PvlKeyword("FlatFile", flatFile.getFilename());
   calgrp += PvlKeyword("iof", iof);
 
 
-  ocube->PutGroup(calgrp);
+  ocube->putGroup(calgrp);
 
   // Start the line-by-line calibration sequence
   p.StartProcess(Calibrate);

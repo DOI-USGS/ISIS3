@@ -49,8 +49,8 @@ void IsisMain() {
   Cube trans;
   CubeAttributeInput &attTrans = ui.GetInputAttribute("FROM");
   std::vector<string> bandTrans = attTrans.Bands();
-  trans.SetVirtualBands(bandTrans);
-  trans.Open(ui.GetFilename("FROM"), "r");
+  trans.setVirtualBands(bandTrans);
+  trans.open(ui.GetFilename("FROM"), "r");
 
 
   // Open the second cube, it is held in place.  We will be matching the
@@ -58,18 +58,18 @@ void IsisMain() {
   Cube match;
   CubeAttributeInput &attMatch = ui.GetInputAttribute("MATCH");
   std::vector<string> bandMatch = attMatch.Bands();
-  match.SetVirtualBands(bandMatch);
-  match.Open(ui.GetFilename("MATCH"), "r");
+  match.setVirtualBands(bandMatch);
+  match.open(ui.GetFilename("MATCH"), "r");
 
   // Input cube Lines and Samples must be the same and each must have only
   // one band
-  if((trans.Lines() != match.Lines()) ||
-      (trans.Samples() != match.Samples())) {
+  if((trans.getLineCount() != match.getLineCount()) ||
+      (trans.getSampleCount() != match.getSampleCount())) {
     string msg = "Input Cube Lines and Samples must be equal!";
     throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
   }
 
-  if(trans.Bands() != 1 || match.Bands() != 1) {
+  if(trans.getBandCount() != 1 || match.getBandCount() != 1) {
     string msg = "Input Cubes must have only one band!";
     throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
   }
@@ -80,8 +80,8 @@ void IsisMain() {
 
 //  This still precludes band to band registrations.
   if(serialTrans == serialMatch) {
-    string sTrans = Filename(trans.Filename()).Name();
-    string sMatch = Filename(match.Filename()).Name();
+    string sTrans = Filename(trans.getFilename()).Name();
+    string sMatch = Filename(match.getFilename()).Name();
     if(sTrans == sMatch) {
       string msg = "Cube Serial Numbers must be unique - FROM=" + serialTrans +
                    ", MATCH=" + serialMatch;
@@ -106,13 +106,14 @@ void IsisMain() {
     rows = ui.GetInteger("ROWS");
   }
   else {
-    rows = (int)((trans.Lines() - 1) / ar->SearchChip()->Lines() + 1);
+    rows = (int)((trans.getLineCount() - 1) / ar->SearchChip()->Lines() + 1);
   }
   if(ui.WasEntered("COLUMNS")) {
     cols = ui.GetInteger("COLUMNS");
   }
   else {
-    cols = (int)((trans.Samples() - 1) / ar->SearchChip()->Samples() + 1);
+    cols = (int)((trans.getSampleCount() - 1)
+                 / ar->SearchChip()->Samples() + 1);
   }
 
   // Display the progress...10% 20% etc.
@@ -121,13 +122,13 @@ void IsisMain() {
   prog.CheckStatus();
 
   // Calculate spacing for the grid of points
-  double lSpacing = (double)trans.Lines() / rows;
-  double sSpacing = (double)trans.Samples() / cols;
+  double lSpacing = (double)trans.getLineCount() / rows;
+  double sSpacing = (double)trans.getSampleCount() / cols;
 
   // Initialize control point network and set target name (only required
   // field)
   ControlNet cn;
-  PvlGroup inst = match.GetGroup("Instrument");
+  PvlGroup inst = match.getGroup("Instrument");
   PvlKeyword &targname = inst.FindKeyword("TargetName");
   string targetname = targname;
   cn.SetTarget(targetname);
@@ -220,8 +221,8 @@ void IsisMain() {
   }
 
   // Don't need the cubes opened anymore
-  trans.Close();
-  match.Close();
+  trans.close();
+  match.close();
 
   // If a cnet file was entered, write the ControlNet pvl to the file
   if(ui.WasEntered("ONET")) {

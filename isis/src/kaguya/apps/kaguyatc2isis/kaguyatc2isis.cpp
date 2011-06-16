@@ -61,15 +61,15 @@ void IsisMain() {
   archiveXlater.Auto(otherLabels);
 
   // Write the Archive and Mapping groups to the output cube label
-  outcube->PutGroup(otherLabels.FindGroup("Mapping"));
-  outcube->PutGroup(otherLabels.FindGroup("Archive"));
+  outcube->putGroup(otherLabels.FindGroup("Mapping"));
+  outcube->putGroup(otherLabels.FindGroup("Archive"));
    
   // Add the BandBin group
   PvlGroup bbin("BandBin");
   bbin += PvlKeyword("FilterName", "BroadBand");
   bbin += PvlKeyword("Center", "640nm");
   bbin += PvlKeyword("Width", "420nm");
-  outcube->PutGroup(bbin);
+  outcube->putGroup(bbin);
 
   p.EndProcess();
 }

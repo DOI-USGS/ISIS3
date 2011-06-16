@@ -160,9 +160,9 @@ namespace Isis {
                              bool doPolygon) {
     destruct();
 
-    _nLines  = cube.Lines();
-    _nSamps  = cube.Samples();
-    _nBands  = cube.Bands();
+    _nLines  = cube.getLineCount();
+    _nSamps  = cube.getSampleCount();
+    _nBands  = cube.getBandCount();
 
     //  Compute average planetary radius in meters.  This is used as a fallback
     //  to compute surface area if no geoemetry has a center intersect point.
@@ -187,7 +187,7 @@ namespace Isis {
       g.bands = _nBands;
       g.band = band + 1;
       camera.SetBand(band + 1);
-      g.realBand = cube.PhysicalBand(band + 1);
+      g.realBand = cube.getPhysicalBand(band + 1);
 
 
       g.target = camera.Target();

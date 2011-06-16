@@ -58,7 +58,7 @@ void IsisMain() {
     dccube = p.SetInputCube(dcfileloc, cubeAtt);
   }
 
-  iString filter = (string)(icube->GetGroup("BandBin"))["FilterName"];
+  iString filter = (string)(icube->getGroup("BandBin"))["FilterName"];
   filter = filter.DownCase();
 
   Cube *ffcube;
@@ -67,7 +67,7 @@ void IsisMain() {
   }
   else {
     // compute default fffile
-    double compressRatio = (icube->GetGroup("Instrument"))["EncodingCompressionRatio"];
+    double compressRatio = (icube->getGroup("Instrument"))["EncodingCompressionRatio"];
 
     // check to see if cube is compressed or uncompressed
     if(compressRatio == 1.0) {
@@ -88,7 +88,7 @@ void IsisMain() {
 
   avgFF = uvvisDef.FindGroup("Filter" + filter.UpCase())["AVGFF"];
   cr = uvvisDef.FindGroup("Filter" + filter.UpCase())["CO"];
-  gain = uvvisDef.FindGroup(iString("GainModeID") + iString(icube->GetGroup("Instrument")["GainModeID"][0]))["GAIN"];
+  gain = uvvisDef.FindGroup(iString("GainModeID") + iString(icube->getGroup("Instrument")["GainModeID"][0]))["GAIN"];
 
   useDcconst = ui.WasEntered("DCCONST");
   if(useDcconst) {
@@ -99,19 +99,19 @@ void IsisMain() {
   }
 
   conv = ui.GetBoolean("CONV");
-  exposureDuration = icube->GetGroup("Instrument")["ExposureDuration"];
-  offsetModeID = icube->GetGroup("Instrument")["OffsetModeID"];
+  exposureDuration = icube->getGroup("Instrument")["ExposureDuration"];
+  offsetModeID = icube->getGroup("Instrument")["OffsetModeID"];
 
-  if(((string)icube->GetGroup("Instrument")["FocalPlaneTemperature"]).compare("UNK") == 0) {
+  if(((string)icube->getGroup("Instrument")["FocalPlaneTemperature"]).compare("UNK") == 0) {
     //if FocalPlaneTemp is unknown set it to zero
     focalPlaneTemp = 0.0;
   }
   else {
-    focalPlaneTemp = icube->GetGroup("Instrument")["FocalPlaneTemperature"];
+    focalPlaneTemp = icube->getGroup("Instrument")["FocalPlaneTemperature"];
   }
 
-  Camera *cam = icube->Camera();
-  bool camSuccess = cam->SetImage(icube->Samples() / 2, icube->Lines() / 2);
+  Camera *cam = icube->getCamera();
+  bool camSuccess = cam->SetImage(icube->getSampleCount() / 2, icube->getLineCount() / 2);
 
   if(!camSuccess) {
     throw iException::Message(iException::Camera, "Unable to calculate the Solar Distance for this cube.", _FILEINFO_);
@@ -123,8 +123,8 @@ void IsisMain() {
   if(ui.GetBoolean("TCOR") || abs(focalPlaneTemp) <= DBL_EPSILON) {
     // Temperature correction requires the use of the mission phase
     //   (PRELAUNCH, EARTH, LUNAR) and the product ID.
-    string productID = (string)(icube->GetGroup("Archive")["ProductID"]);
-    char missionPhase = ((string)((icube->GetGroup("Archive"))["MissionPhase"])).at(0);
+    string productID = (string)(icube->getGroup("Archive")["ProductID"]);
+    char missionPhase = ((string)((icube->getGroup("Archive"))["MissionPhase"])).at(0);
     string n1substring(productID.substr(productID.find('.') + 1, productID.length() - 1));
     string n2substring(productID.substr(4, productID.find('.') - 1));
     int n1 = atoi(n1substring.c_str());
@@ -156,15 +156,15 @@ void IsisMain() {
   }
 
   // Start the processing
-  p.SetBrickSize(icube->Samples(), icube->Lines(), 1);
+  p.SetBrickSize(icube->getSampleCount(), icube->getLineCount(), 1);
   p.StartProcess(UvVisCal);
 
   // Add the radiometry group
   PvlGroup calgrp("Radiometry");
-  calgrp += PvlKeyword("FlatFieldFile", ffcube->Filename());
+  calgrp += PvlKeyword("FlatFieldFile", ffcube->getFilename());
 
   if(ui.GetString("DARKCURRENT").compare("DCFILE") == 0) {
-    calgrp += PvlKeyword("DarkCurrentFile", dccube->Filename());
+    calgrp += PvlKeyword("DarkCurrentFile", dccube->getFilename());
   }
   else {
     calgrp += PvlKeyword("DarkCurrentConstant", dcconst);
@@ -187,7 +187,7 @@ void IsisMain() {
   calgrp += PvlKeyword("CCO", CCO);
   calgrp += PvlKeyword("DCO", DCO);
 
-  ocube->PutGroup(calgrp);
+  ocube->putGroup(calgrp);
   p.EndProcess();
 }
 

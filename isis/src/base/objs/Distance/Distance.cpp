@@ -34,6 +34,38 @@ namespace Isis {
     SetDistance(Null, Meters);
   }
 
+
+  /**
+   * This is the general purpose constructor for Distance. This will initialize
+   *   with the given distance. If Pixels are supplied as the units, then a
+   *   default pixels/meter = 1.0 will be used.
+   *
+   * @param distance The distance to initialize with, must be in units of
+   *     distanceUnit and not be negative
+   * @param distanceUnit The unit distance is in, can be any value in
+   *     Distance::Units
+   */
+  Distance::Distance(double distance, Units distanceUnit) {
+    if(distanceUnit == Pixels)
+      distanceUnit = Meters;
+
+    SetDistance(distance, distanceUnit);
+  }
+
+
+  /**
+   * This is a constructor for Distance given pixels with a conversion ratio.
+   *   This will initialize with the pixels converted to meters.
+   *
+   * @param distanceInPixels The distance to initialize with, must be in units
+   *     of pixels and should not be negative
+   * @param pixelsPerMeter The pixels/meter conversion factor
+   */
+  Distance::Distance(double distanceInPixels, double pixelsPerMeter) {
+    SetDistance(distanceInPixels / pixelsPerMeter, Meters);
+  }
+
+
   /**
    * This is the copy constructor for Distance. The distance passed in will be
    *   exactly duplicated.
@@ -44,20 +76,6 @@ namespace Isis {
   Distance::Distance(const Distance &distanceToCopy) {
     // Use meters because it is the stored format, no precision loss
     SetDistance(distanceToCopy.GetMeters(), Meters);
-  }
-
-
-  /**
-   * This is the general purpose constructor for Distance. This will initialize
-   *   with the given distance.
-   *
-   * @param distance The distance to initialize with, must be in units of
-   *     distanceUnit and not be negative
-   * @param distanceUnit The unit distance is in, can be any value in
-   *     Distance::Units
-   */
-  Distance::Distance(double distance, Units distanceUnit) {
-    SetDistance(distance, distanceUnit);
   }
 
 
@@ -111,6 +129,33 @@ namespace Isis {
    */
   void Distance::SetKilometers(double distanceInKilometers) {
     SetDistance(distanceInKilometers, Kilometers);
+  }
+
+
+  /**
+   * Get the distance in pixels using the given conversion ratio.
+   *
+   * @param pixelsPerMeter Pixels/Meters conversion ratio to use, stored data
+   *         is always in meters
+   * @return Current distance, in pixels, guaranteed to be >= 0.0 if
+   *         pixelsPerMeter is positive
+   */
+  double Distance::GetPixels(double pixelsPerMeter) const {
+    return GetDistance(Meters) * pixelsPerMeter;
+  }
+
+
+  /**
+   * Set the distance in pixels.
+   *
+   * @param distanceInPixels This is the value to set this distance to,
+   *     given in pixels. This will throw an exception if the distance is
+   *     negative after the conversion to meters.
+   * @param pixelsPerMeter Pixels/Meters conversion ratio to use, stored data
+   *         is always in meters
+   */
+  void Distance::SetPixels(double distanceInPixels, double pixelsPerMeter) {
+    SetDistance(distanceInPixels / pixelsPerMeter, Meters);
   }
 
 
@@ -208,7 +253,7 @@ namespace Isis {
   /**
    * Divide another distance into this distance (5m / 1m = 5).
    *
-   * @param displacementToDiv This is the divisor displacement (denominator)
+   * @param distanceToDiv This is the divisor displacement (denominator)
    * @return Resulting value
    */
   double Distance::operator /(const Distance &distanceToDiv) const {
@@ -346,6 +391,11 @@ namespace Isis {
       case Kilometers:
         resultingDistance = distanceInMeters / 1000.0;
         break;
+
+      case Pixels:
+        iString msg = "Cannot GetDistance with pixels, ask for another unit";
+        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+        break;
     }
 
     if(resultingDistance == Null) {
@@ -383,6 +433,12 @@ namespace Isis {
 
       case Kilometers:
         distanceInMeters = distance * 1000.0;
+        break;
+
+      case Pixels:
+        iString msg = "Cannot SetDistance with pixels, must convert to another "
+            "unit first";
+        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
         break;
     }
 

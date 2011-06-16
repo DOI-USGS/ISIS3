@@ -530,7 +530,7 @@ namespace Isis {
    * @return A pointer to a Projection object
    */
   Isis::Projection *ProjectionFactory::CreateFromCube(Isis::Cube &cube) {
-    return CreateFromCube(*cube.Label());
+    return CreateFromCube(*cube.getLabel());
   }
 
   /**

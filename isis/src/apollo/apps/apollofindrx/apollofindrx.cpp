@@ -38,11 +38,11 @@ void IsisMain ()
     int patternSize = ui.GetInteger("PATTERNSIZE");
     MAX_DISPX = ui.GetInteger("DELTAX");
     MAX_DISPY = ui.GetInteger("DELTAY");
-    cube.Open(ui.GetFilename("FROM"),"rw");
+    cube.open(ui.GetFilename("FROM"),"rw");
 
-    PvlGroup &reseaus = cube.Label()->FindGroup("Reseaus",Pvl::Traverse);
-    string mission = (cube.Label()->FindGroup("Instrument",Pvl::Traverse))["SpacecraftName"];
-    string instrument = (cube.Label()->FindGroup("Instrument",Pvl::Traverse))["InstrumentId"];
+    PvlGroup &reseaus = cube.getLabel()->FindGroup("Reseaus",Pvl::Traverse);
+    string mission = (cube.getLabel()->FindGroup("Instrument",Pvl::Traverse))["SpacecraftName"];
+    string instrument = (cube.getLabel()->FindGroup("Instrument",Pvl::Traverse))["InstrumentId"];
     Apollo apollo(mission, instrument);
     if (mission.substr(0,6) != "APOLLO") {
       string msg = "This application is for use with Apollo spacecrafts only.";
@@ -156,7 +156,7 @@ void IsisMain ()
       throw Isis::iException::Message(Isis::iException::Pvl,msg, _FILEINFO_);
     }
 
-    cube.Close();
+    cube.close();
 }
 
 bool Walk() {

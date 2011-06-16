@@ -100,12 +100,12 @@ int main() {
   chip.Write("junk.cub");
 
   Cube junk;
-  junk.Open("junk.cub");
+  junk.open("junk.cub");
   LineManager line(junk);
 
   for(int i = 1; i <= chip.Lines(); i++) {
     line.SetLine(i);
-    junk.Read(line);
+    junk.read(line);
     for(int j = 1; j <= chip.Samples(); j++) {
       double value = chip.GetValue(j, i);
       if(value != line[j-1]) {
@@ -229,7 +229,7 @@ int main() {
   // Test Load using match chip method
   cout << "\nTest reading with match chip and cube...\n";
   Cube junkCube;
-  junkCube.Open("$base/testData/ab102401_ideal.cub");
+  junkCube.open("$base/testData/ab102401_ideal.cub");
   // 4 by 4 chip at samle 1000 line 500
   Chip matchChip(4, 4);
   matchChip.TackCube(1000, 500);
@@ -280,7 +280,7 @@ int main() {
   cout << endl;
   cout << "Generate Errors:" << endl;
   Cube junkCube2;
-  junkCube2.Open("$base/testData/f319b18_ideal.cub");
+  junkCube2.open("$base/testData/f319b18_ideal.cub");
   // 4 by 4 chip at samle 1000 line 500
   matchChip.TackCube(1, 1);
   matchChip.Load(junkCube2);
@@ -351,9 +351,9 @@ int main() {
   }
 
 
-  junk.Close(true);// the "true" flag removes junk.cub from the /tmp/ directory
-  junkCube.Close(); // these cubes are kept in test data area, do not delete
-  junkCube2.Close();
+  junk.close(true);// the "true" flag removes junk.cub from the /tmp/ directory
+  junkCube.close(); // these cubes are kept in test data area, do not delete
+  junkCube2.close();
 
 
 #if 0

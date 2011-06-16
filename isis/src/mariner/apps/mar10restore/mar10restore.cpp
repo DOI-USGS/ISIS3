@@ -15,10 +15,10 @@ void IsisMain() {
 
   UserInterface &ui = Application::GetUserInterface();
   Cube cube;
-  cube.Open(ui.GetFilename("FROM"));
+  cube.open(ui.GetFilename("FROM"));
 
   // Check that it is a Mariner10 cube.
-  Pvl * labels = cube.Label();
+  Pvl * labels = cube.getLabel();
   if ("Mariner_10" != (string)labels->FindKeyword("SpacecraftName", Pvl::Traverse)) {
     string msg = "The cube [" + ui.GetFilename("FROM") + "] does not appear" +
       " to be a Mariner10 cube";

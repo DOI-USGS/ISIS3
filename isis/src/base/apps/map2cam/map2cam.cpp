@@ -19,19 +19,19 @@ void IsisMain() {
   // the camera object
   Process p;
   mcube = p.SetInputCube("MATCH");
-  outcam = mcube->Camera();
+  outcam = mcube->getCamera();
 
   // Open the input projection cube and get the projection information
   ProcessRubberSheet rub;
   Cube *icube = rub.SetInputCube("FROM");
-  Projection *inmap = icube->Projection();
+  Projection *inmap = icube->getProjection();
 
   // Set up for rubbersheeting
-  Transform *transform = new map2cam(icube->Samples(),
-                                     icube->Lines(),
+  Transform *transform = new map2cam(icube->getSampleCount(),
+                                     icube->getLineCount(),
                                      inmap,
-                                     mcube->Samples(),
-                                     mcube->Lines(),
+                                     mcube->getSampleCount(),
+                                     mcube->getLineCount(),
                                      outcam);
 
   // Allocate the output cube but don't propogate any labels from the map
@@ -39,7 +39,7 @@ void IsisMain() {
   rub.PropagateLabels(false);
   rub.SetOutputCube("TO", transform->OutputSamples(),
                     transform->OutputLines(),
-                    icube->Bands());
+                    icube->getBandCount());
   UserInterface &ui = Application::GetUserInterface();
   rub.PropagateLabels(ui.GetFilename("MATCH"));
 
@@ -115,5 +115,5 @@ int map2cam::OutputLines() const {
 }
 
 void BandChange(const int band) {
-  outcam->SetBand(mcube->PhysicalBand(band));
+  outcam->SetBand(mcube->getPhysicalBand(band));
 }

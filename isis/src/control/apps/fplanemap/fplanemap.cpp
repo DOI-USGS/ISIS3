@@ -44,9 +44,9 @@ void IsisMain() {
   Cube from;
   CubeAttributeInput &attFrom = ui.GetInputAttribute("FROM");
   vector<string> bandFrom = attFrom.Bands();
-  from.SetVirtualBands(bandFrom);
-  from.Open(ui.GetFilename("FROM"), "r");
-  Camera *fcamera = from.Camera();
+  from.setVirtualBands(bandFrom);
+  from.open(ui.GetFilename("FROM"), "r");
+  Camera *fcamera = from.getCamera();
   CameraDistortionMap *dmap = fcamera->DistortionMap();
 
 
@@ -99,7 +99,7 @@ void IsisMain() {
       bool isGood(true);
       if (checkForNulls) {
         pixel.SetBasePosition((int) c.samp, (int) c.line, 1);
-        from.Read(pixel);
+        from.read(pixel);
         isGood = !IsSpecial(pixel[0]);
       }
 
@@ -155,7 +155,7 @@ void IsisMain() {
   Application::Log(results);
 
   // Don't need the cubes opened anymore
-  from.Close();
+  from.close();
 
   // If flatfile was entered, create the flatfile
   // The flatfile is comma seperated and can be imported into an excel

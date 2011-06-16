@@ -29,7 +29,7 @@ void IsisMain(){
   A histogram is made from the input cube, as the default min of the
   bit2bit output is at .5% of the data range, and the default max is at 99.5%
   */  
-  Histogram* histptr = cubeptr -> Histogram();
+  Histogram* histptr = cubeptr -> getHistogram();
   
   double maxper = histptr -> Percent(ui.GetDouble("MAXPER"));
   double minper = histptr -> Percent(ui.GetDouble("MINPER"));
@@ -65,11 +65,12 @@ void IsisMain(){
 
   if(ui.GetInteger("STATS")){ //! Run extended statistics
     Cube* ocubeptr = p.SetOutputCube (ui.GetFilename("TO"),outputProperties,
-                     cubeptr->Samples(),cubeptr->Lines(),cubeptr->Bands());  
+                     cubeptr->getSampleCount(),cubeptr->getLineCount(),
+                     cubeptr->getBandCount());
   
     p.StartProcess(populate);
   
-    Histogram* ohistptr =  (ocubeptr -> Histogram(1,validMin,validMax));
+    Histogram* ohistptr =  (ocubeptr -> getHistogram(1,validMin,validMax));
     int iLrs = histptr -> LrsPixels();
     int iHrs = histptr -> HrsPixels();
     int iNull = histptr -> NullPixels();

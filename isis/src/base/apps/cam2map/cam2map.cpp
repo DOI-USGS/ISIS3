@@ -45,7 +45,7 @@ void IsisMain() {
 
   // Open the input cube and get the camera
   icube = p.SetInputCube("FROM");
-  incam = icube->Camera();
+  incam = icube->getCamera();
 
   // Make sure it is not the sky
   if(incam->IsSky()) {
@@ -237,8 +237,8 @@ void IsisMain() {
 
   // Set up the transform object which will simply map
   // output line/samps -> output lat/lons -> input line/samps
-  Transform *transform = new cam2map(icube->Samples(),
-                                     icube->Lines(),
+  Transform *transform = new cam2map(icube->getSampleCount(),
+                                     icube->getLineCount(),
                                      incam,
                                      samples,
                                      lines,
@@ -248,9 +248,9 @@ void IsisMain() {
   // Allocate the output cube and add the mapping labels
   Cube *ocube = p.SetOutputCube("TO", transform->OutputSamples(),
                                 transform->OutputLines(),
-                                icube->Bands());
+                                icube->getBandCount());
 
-  ocube->PutGroup(cleanMapping);
+  ocube->putGroup(cleanMapping);
 
   // Set up the interpolator
   Interpolator *interp = NULL;
@@ -271,8 +271,8 @@ void IsisMain() {
 
   //  See if center of input image projects.  If it does, force tile
   //  containing this center to be processed in ProcessRubberSheet.
-  double centerSamp = icube->Samples() / 2.;
-  double centerLine = icube->Lines() / 2.;
+  double centerSamp = icube->getSampleCount() / 2.;
+  double centerLine = icube->getLineCount() / 2.;
   if(incam->SetImage(centerSamp, centerLine)) {
     if(outmap->SetUniversalGround(incam->UniversalLatitude(),
                                   incam->UniversalLongitude())) {
@@ -280,17 +280,17 @@ void IsisMain() {
     }
   }
   // Create an alpha cube group for the output cube
-  if(!ocube->HasGroup("AlphaCube")) {
+  if(!ocube->hasGroup("AlphaCube")) {
     PvlGroup alpha("AlphaCube");
-    alpha += PvlKeyword("AlphaSamples", icube->Samples());
-    alpha += PvlKeyword("AlphaLines", icube->Lines());
+    alpha += PvlKeyword("AlphaSamples", icube->getSampleCount());
+    alpha += PvlKeyword("AlphaLines", icube->getLineCount());
     alpha += PvlKeyword("AlphaStartingSample", 0.5);
     alpha += PvlKeyword("AlphaStartingLine", 0.5);
-    alpha += PvlKeyword("AlphaEndingSample", icube->Samples() + 0.5);
-    alpha += PvlKeyword("AlphaEndingLine", icube->Lines() + 0.5);
-    alpha += PvlKeyword("BetaSamples", icube->Samples());
-    alpha += PvlKeyword("BetaLines", icube->Lines());
-    ocube->PutGroup(alpha);
+    alpha += PvlKeyword("AlphaEndingSample", icube->getSampleCount() + 0.5);
+    alpha += PvlKeyword("AlphaEndingLine", icube->getLineCount() + 0.5);
+    alpha += PvlKeyword("BetaSamples", icube->getSampleCount());
+    alpha += PvlKeyword("BetaLines", icube->getLineCount());
+    ocube->putGroup(alpha);
   }
 
   // Warp the cube
@@ -415,8 +415,8 @@ void LoadCameraRes() {
 
   // Open the input cube, get the camera object, and the cam map projection
   Cube c;
-  c.Open(file);
-  Camera *cam = c.Camera();
+  c.open(file);
+  Camera *cam = c.getCamera();
   Pvl camMap;
   cam->BasicMapping(camMap);
   PvlGroup &camGrp = camMap.FindGroup("Mapping");
@@ -482,8 +482,8 @@ void LoadCameraRange() {
 
   // Open the input cube, get the camera object, and the cam map projection
   Cube c;
-  c.Open(file);
-  Camera *cam = c.Camera();
+  c.open(file);
+  Camera *cam = c.getCamera();
 
   // Make the target info match the user mapfile
   double minlat, maxlat, minlon, maxlon;

@@ -23,7 +23,7 @@ string valueToString(const double &value);
 void IsisMain() {
   Process p;
   Cube *icube = p.SetInputCube("FROM");
-  Camera *cam = icube->Camera();
+  Camera *cam = icube->getCamera();
 
   UserInterface &ui = Application::GetUserInterface();
 
@@ -167,10 +167,10 @@ void IsisMain() {
       table += record;
     }
 
-    icube->ReOpen("rw");
-    icube->Write(table);
+    icube->reopen("rw");
+    icube->write(table);
     p.WriteHistory(*icube);
-    icube->Close();
+    icube->close();
   }
 }
 

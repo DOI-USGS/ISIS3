@@ -33,13 +33,6 @@ void InterruptSignal(int);
 #include "iString.h"
 #include "Constants.h"
 
-#define ASSERT(x)                                                         \
-          if (!(x))                                                         \
-          {                                                                 \
-            std::cerr << ">> " << __FILE__ << ":" << __LINE__ <<            \
-            " error: ASSERT " << #x << " FAILED\n";                         \
-          }
-
 /**
  * This asserts the pointer is delete-able
  */
@@ -105,7 +98,6 @@ class StackTrace {
 };
 
 #else
-#define ASSERT(x)
 #define ASSERT_PTR(x)
 
 class StackTrace {
@@ -113,4 +105,17 @@ class StackTrace {
     static void GetStackTrace(const void *) {}
 };
 #endif
+
+#ifdef DEBUG
+#include <iostream>
+#define ASSERT(x)                                                         \
+          if (!(x))                                                         \
+          {                                                                 \
+            std::cerr << ">> " << __FILE__ << ":" << __LINE__ <<            \
+            " error: ASSERT " << #x << " FAILED\n";                         \
+          }
+#else
+#define ASSERT(x)
+#endif
+
 #endif

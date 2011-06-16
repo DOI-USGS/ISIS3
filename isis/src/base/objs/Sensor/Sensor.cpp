@@ -79,24 +79,25 @@ namespace Isis {
     if(demCube != "") {
       p_hasElevationModel = true;
       p_demCube = CubeManager::Open(demCube);
-      p_demProj = p_demCube->Projection();
+      p_demProj = p_demCube->getProjection();
 
       p_interp = new Interpolator(Interpolator::BiLinearType);
       p_portal = new Portal(p_interp->Samples(), p_interp->Lines(),
-                            p_demCube->PixelType(),
+                            p_demCube->getPixelType(),
                             p_interp->HotSample(), p_interp->HotLine());
 
       // Read in the min/max radius of the DEM file and the Scale of the DEM
       // file in pixels/degree
-      const Pvl &demlab = *(p_demCube->Label());
+      const Pvl &demlab = *(p_demCube->getLabel());
       if (p_demProj->IsEquatorialCylindrical()) {
-        if (!p_demCube->HasTable("ShapeModelStatistics")) {
-          std::string msg = "The input cube references a ShapeModel that has not been ";
-          msg += "updated for the new ray tracing algorithm. All DEM files must now be ";
-          msg += "padded at the poles and contain a ShapeModelStatistics table defining ";
-          msg += "their minimum and maximum radii values. The demprep program should be ";
-          msg += "used to prepare the DEM before you can run this program. There is more ";
-          msg += "information available in the documentation of the demprep program.";
+        if (!p_demCube->hasTable("ShapeModelStatistics")) {
+          std::string msg = "The input cube references a ShapeModel that has "
+              "not been updated for the new ray tracing algorithm. All DEM "
+              "files must now be padded at the poles and contain a "
+              "ShapeModelStatistics table defining their minimum and maximum "
+              "radii values. The demprep program should be used to prepare the "
+              "DEM before you can run this program. There is more information "
+              "available in the documentation of the demprep program.";
           throw iException::Message(iException::User, msg, _FILEINFO_);
         }
 
@@ -1033,7 +1034,7 @@ namespace Isis {
 
     p_portal->SetPosition(p_demProj->WorldX(), p_demProj->WorldY(), 1);
 
-    p_demCube->Read(*p_portal);
+    p_demCube->read(*p_portal);
 
     const double &radius = p_interp->Interpolate(p_demProj->WorldX(),
                                                  p_demProj->WorldY(),
@@ -1059,8 +1060,8 @@ namespace Isis {
     }
 
     p_portal->SetPosition(p_demProj->WorldX(), p_demProj->WorldY(), 1);
-    p_demCube->Read(*p_portal);
-    
+    p_demCube->read(*p_portal);
+
     double radius = p_interp->Interpolate(p_demProj->WorldX(),
                                           p_demProj->WorldY(),
                                           p_portal->DoubleBuffer());

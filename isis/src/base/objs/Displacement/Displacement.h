@@ -49,11 +49,14 @@ namespace Isis {
         //! The distance is being specified in meters
         Meters,
         //! The distance is being specified in kilometers
-        Kilometers
+        Kilometers,
+        //! The distance is being specified in pixels
+        Pixels
       };
 
       Displacement();
       Displacement(double displacement, Units distanceUnit);
+      Displacement(double displacementInPixels, double pixelsPerMeter);
       Displacement(const Distance &distanceToCopy);
 
       /**
@@ -66,6 +69,9 @@ namespace Isis {
 
       double GetKilometers() const;
       void SetKilometers(double displacementInKilometers);
+
+      double GetPixels(double pixelsPerMeter = 1.0) const;
+      void SetPixels(double distanceInPixels, double pixelsPerMeter = 1.0);
 
       bool Valid() const;
 
@@ -141,7 +147,7 @@ namespace Isis {
       double operator /(const Displacement &displacementToDiv) const;
       Displacement operator /(const double &valueToDiv) const;
       Displacement operator *(const double &valueToMult) const;
-      friend Displacement operator *(double mult, Displacement dist);
+      friend Displacement operator *(double mult, Displacement displacement);
       void operator +=(const Displacement &displacementToAdd);
       void operator -=(const Displacement &displacementToSub);
       void operator -=(const Distance &distanceToSub);

@@ -194,6 +194,33 @@ int main(int argc, char *argv[]) {
     e.Report(false);
   }
 
+  try {
+    Distance dist1(10, Distance::Pixels);
+    Distance dist2(100, 10.0);
+    cerr << endl;
+    cerr << "Distance 1: " << dist1.GetMeters() << " meters" << endl;
+    cerr << "Distance 2: " << dist2.GetMeters() << " meters" << endl;
+    cerr << "Distance 1: " << dist1.GetPixels() << " pixels" << endl;
+    cerr << "Distance 2: " << dist2.GetPixels(10.0) << " pixels" << endl;
+
+    cerr << "Distance 1 > Distance 2 ? " << (dist1 > dist2) << endl;
+    cerr << "Distance 1 >= Distance 2 ? " << (dist1 >= dist2) << endl;
+    cerr << "Distance 1 == Distance 2 ? " << (dist1 == dist2) << endl;
+    cerr << "Distance 1 <= Distance 2 ? " << (dist1 <= dist2) << endl;
+    cerr << "Distance 1 < Distance 2 ? " << (dist1 < dist2) << endl;
+    cerr << "Distance 1 + Distance 2 ? " << (dist1 + dist2).GetMeters() << 
+        " meters" << endl;
+    cerr << "Distance 1 - Distance 2 ? " << (dist1 - dist2).GetMeters() << 
+        " meters" << endl;
+
+    dist1 = dist2;
+    cerr << "Distance 1 = Distance 2... Distance 1 = " << dist1.GetMeters() <<
+        " meters" << endl;
+  }
+  catch(iException &e) {
+    e.Report(false);
+  }
+
   cerr << endl << "----- Testing Error Checking -----" << endl << endl;
 
   try {
@@ -229,17 +256,6 @@ int main(int argc, char *argv[]) {
   try {
     Distance dist(1, Distance::Kilometers);
     dist.SetKilometers(-1);
-  }
-  catch(iException &e) {
-    e.Report(false);
-  }
-
-  // This is actually undefined behavior that has changed in
-  //   newer versions of the g++ compiler. Disable the test and
-  //   know the Distance class does its best to handle this case.
-  try {
-    //Distance dist(1, (Distance::Units)-1);
-    //dist.SetKilometers(-1);
   }
   catch(iException &e) {
     e.Report(false);

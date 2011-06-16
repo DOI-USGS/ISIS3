@@ -15,11 +15,11 @@ using namespace Isis;
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   Cube cube;
-  cube.Open(ui.GetFilename("FROM"), "rw");
+  cube.open(ui.GetFilename("FROM"), "rw");
 
   // Make sure cube has been run through spiceinit
   try {
-    cube.Camera();
+    cube.getCamera();
   }
   catch(iException &e) {
     string msg = "Spiceinit must be run before initializing the polygon";
@@ -144,8 +144,8 @@ void IsisMain() {
 
 
 
-  cube.BlobDelete("Polygon", sn);
-  cube.Write(poly);
+  cube.deleteBlob("Polygon", sn);
+  cube.write(poly);
 
   if(precision) {
     PvlGroup results("Results");
@@ -158,6 +158,6 @@ void IsisMain() {
   p.SetInputCube("FROM");
   p.WriteHistory(cube);
 
-  cube.Close();
+  cube.close();
   prog.CheckStatus();
 }

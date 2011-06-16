@@ -73,7 +73,7 @@ namespace Isis {
         _buffer    = HiBlob(cube, "HiRISE Ancillary", "BufferPixels").buffer();
         _dark      = HiBlob(cube, "HiRISE Ancillary", "DarkPixels").buffer();
 
-        PvlGroup &instrument = cube.GetGroup("Instrument");
+        PvlGroup &instrument = cube.getGroup("Instrument");
 
 // Extract what is needed
         _binning = instrument["Summing"];

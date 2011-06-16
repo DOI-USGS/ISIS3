@@ -34,9 +34,9 @@ void IsisMain() {
 
   // Automatic is selected
   if(ui.GetString("MODE") == "AUTOMATIC") {
-    Histogram *redHist = redCube->Histogram();
-    Histogram *greenHist = greenCube->Histogram();
-    Histogram *blueHist = blueCube->Histogram();
+    Histogram *redHist = redCube->getHistogram();
+    Histogram *greenHist = greenCube->getHistogram();
+    Histogram *blueHist = blueCube->getHistogram();
 
     rMin = redHist->Percent(ui.GetDouble("RMINPER"));
     rMax = redHist->Percent(ui.GetDouble("RMAXPER"));

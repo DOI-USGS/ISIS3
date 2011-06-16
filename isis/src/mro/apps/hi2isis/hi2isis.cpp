@@ -118,7 +118,7 @@ void IsisMain() {
   // and remove it from the labels.
   // Add the UNLUTTED keyword to the instrument group so we know
   // if the lut has been used to convert back to 14 bit data
-  PvlGroup &instgrp = ocube->GetGroup("Instrument");
+  PvlGroup &instgrp = ocube->getGroup("Instrument");
   PvlKeyword lutKey = instgrp["LookupTable"];
   PvlSequence lutSeq;
   lutSeq = lutKey;
@@ -270,10 +270,10 @@ void TranslateHiriseEdrLabels(Filename &labelFile, Cube *ocube) {
 
   // Write the Instrument, BandBin, Archive, and Kernels groups to the output
   // cube label
-  ocube->PutGroup(outLabel.FindGroup("Instrument", Pvl::Traverse));
-  ocube->PutGroup(outLabel.FindGroup("BandBin", Pvl::Traverse));
-  ocube->PutGroup(outLabel.FindGroup("Archive", Pvl::Traverse));
-  ocube->PutGroup(kerns);
+  ocube->putGroup(outLabel.FindGroup("Instrument", Pvl::Traverse));
+  ocube->putGroup(outLabel.FindGroup("BandBin", Pvl::Traverse));
+  ocube->putGroup(outLabel.FindGroup("Archive", Pvl::Traverse));
+  ocube->putGroup(kerns);
 }
 
 

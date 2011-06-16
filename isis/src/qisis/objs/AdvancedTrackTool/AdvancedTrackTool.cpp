@@ -259,7 +259,7 @@ namespace Qisis {
     }
 
     // Write out the path, filename, and serial number
-    Isis::Filename fname = Isis::Filename(cvp->cube()->Filename()).Expanded();
+    Isis::Filename fname = Isis::Filename(cvp->cube()->getFilename()).Expanded();
     std::string fnamePath = fname.Path();
     std::string fnameName = fname.Name();
     p_tableWin->table()->item(row, PATH)->setText(fnamePath.c_str());
@@ -453,8 +453,8 @@ namespace Qisis {
     Cube *cCube = cvp->cube();
     int iTrackBand = -1;
 
-    if(cCube->HasTable(TABLE_MOSAIC_SRC)) {
-      Pvl *cPvl = cCube->Label();
+    if(cCube->hasTable(TABLE_MOSAIC_SRC)) {
+      Pvl *cPvl = cCube->getLabel();
       PvlObject cObjIsisCube = cPvl->FindObject("IsisCube");
       PvlGroup cGrpBandBin = cObjIsisCube.FindGroup("BandBin");
       for(int i = 0; i < cGrpBandBin.Keywords(); i++) {
@@ -467,13 +467,14 @@ namespace Qisis {
         }
       }
 
-      if(iTrackBand > 0 && iTrackBand <= cCube->Bands()) {
-        Isis::Portal cOrgPortal(cCube->Samples(), 1, cCube->PixelType());
+      if(iTrackBand > 0 && iTrackBand <= cCube->getBandCount()) {
+        Isis::Portal cOrgPortal(cCube->getSampleCount(), 1,
+                                cCube->getPixelType());
         cOrgPortal.SetPosition(piSample, piLine, iTrackBand + 1); // 1 based
-        cCube->Read(cOrgPortal);
+        cCube->read(cOrgPortal);
 
         piOrigin = (int)cOrgPortal[0];
-        switch(SizeOf(cCube->PixelType())) {
+        switch(SizeOf(cCube->getPixelType())) {
           case 1:
             piOrigin -= VALID_MIN1;
             break;
@@ -489,7 +490,7 @@ namespace Qisis {
 
         // Get the input file name and serial number
         Table cFileTable(TABLE_MOSAIC_SRC);
-        cCube->Read(cFileTable);
+        cCube->read(cFileTable);
         int iRecs =   cFileTable.Records();
         if(piOrigin >= 0 && piOrigin < iRecs) {
           psSrcFileName = std::string(cFileTable[piOrigin][0]);

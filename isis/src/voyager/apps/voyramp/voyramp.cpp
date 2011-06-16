@@ -59,7 +59,7 @@ void IsisMain() {
   Cube * outCube = p.SetOutputCube("TO");
   
   // FYI, labels are copied on SetOutputCube call, so In and Out labels match
-  PvlObject & isiscube = outCube->Label()->FindObject("IsisCube");
+  PvlObject & isiscube = outCube->getLabel()->FindObject("IsisCube");
   PvlGroup & inst = isiscube.FindGroup("Instrument");
   
   // Verify Voyager1 spacecraft

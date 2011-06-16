@@ -69,7 +69,7 @@ void IsisMain() {
   int pixelsReplaced = darkPixelsReplaced + brightPixelsReplaced + specialPixelsReplaced;
   results += PvlKeyword("TotalPixelsReplaced", pixelsReplaced);
   double pct = ((double)pixelsReplaced /
-                ((double)icube->Samples() * (double)icube->Lines())) * 100.;
+                ((double)icube->getSampleCount() * (double)icube->getLineCount())) * 100.;
   pct = (int)(pct * 10.0) / 10.0;
   results += PvlKeyword("PercentChanged", pct);
   Application::Log(results);

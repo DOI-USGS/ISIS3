@@ -15,8 +15,8 @@ void IsisMain() {
   // Get input cube and get camera model for it
   string channel = ui.GetFilename("FROM");
   Cube cube;
-  cube.Open(channel);
-  Camera *cam = cube.Camera();
+  cube.open(channel);
+  Camera *cam = cube.getCamera();
 
   // Get the type of conversion that we are doing
   string type = ui.GetString("TYPE");
@@ -42,11 +42,11 @@ void IsisMain() {
   }
 
   // Create Brick on samp, line to get the dn value of the pixel
-  Brick b(3, 3, 1, cube.PixelType());
+  Brick b(3, 3, 1, cube.getPixelType());
   int intSamp = (int)(samp + 0.5);
   int intLine = (int)(line + 0.5);
   b.SetBasePosition(intSamp, intLine, 1);
-  cube.Read(b);
+  cube.read(b);
 
   // Create group with sky position
   PvlGroup sp("SkyPoint");

@@ -213,7 +213,7 @@ namespace Isis {
   Cube *CubeDisplayProperties::cube() {
     if(!m_cube) {
       m_cube = new Cube;
-      m_cube->Open(m_filename.toStdString());
+      m_cube->open(m_filename.toStdString());
     }
 
     return m_cube;
@@ -262,7 +262,7 @@ namespace Isis {
     if(!m_footprint) {
       try {
         ImagePolygon poly;
-        cube()->Read(poly);
+        cube()->read(poly);
         m_footprint = (MultiPolygon *)poly.Polys()->clone();
       }
       catch (iException &e) {
@@ -697,10 +697,10 @@ namespace Isis {
     // We need to walk the polygon...
     ImagePolygon imgPoly;
 
-    int sampleStepSize = cube()->Samples() / 10;
+    int sampleStepSize = cube()->getSampleCount() / 10;
     if(sampleStepSize <= 0) sampleStepSize = 1;
 
-    int lineStepSize = cube()->Lines() / 10;
+    int lineStepSize = cube()->getLineCount() / 10;
     if(lineStepSize <= 0) lineStepSize = 1;
 
     imgPoly.Create(*cube(), sampleStepSize, lineStepSize);

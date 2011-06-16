@@ -632,7 +632,7 @@ void CheckAllMeasureValidity(ControlNet &cnet, string cubeList) {
 MeasureValidationResults ValidateMeasure(const ControlMeasure *curMeasure,
     string cubeName) {
   Cube curCube;
-  curCube.Open(cubeName);
+  curCube.open(cubeName);
 
   MeasureValidationResults results = validator->ValidStandardOptions(curMeasure, &curCube);
 

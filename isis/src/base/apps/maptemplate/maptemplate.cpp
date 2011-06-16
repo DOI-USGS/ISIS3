@@ -573,8 +573,8 @@ void calcRange(double &minLat, double &maxLat,
     double camMinLon;
     double camMaxLon;
     Cube c;
-    c.Open(flist[i]);
-    Camera *cam = c.Camera();
+    c.open(flist[i]);
+    Camera *cam = c.getCamera();
     Pvl defaultMap;
     cam->BasicMapping(defaultMap);
     PvlGroup &defaultGrp = defaultMap.FindGroup("Mapping");
@@ -613,8 +613,8 @@ double calcResolution() {
 // Loop through the from list at get high and low camera resolution
   for(int i = 0; i < (int)flist.size(); i++) {
     Cube c;
-    c.Open(flist[i]);
-    Camera *cam = c.Camera();
+    c.open(flist[i]);
+    Camera *cam = c.getCamera();
     double camLowRes = cam->LowestImageResolution();
     double camHighRes = cam->HighestImageResolution();
     if(camLowRes > lowRes) lowRes = camLowRes;

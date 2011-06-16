@@ -34,7 +34,7 @@ void IsisMain() {
 
   // Setup the input cube
   Cube *cInCube = cProcess.SetInputCube("FROM");
-  Pvl *cInLabel =  cInCube->Label();
+  Pvl *cInLabel =  cInCube->getLabel();
 
   // Get the output label file
   Filename outFile(ui.GetFilename("TO", "lbl"));
@@ -71,20 +71,20 @@ void IsisMain() {
   Pvl &pdsLabel = cProcess.StandardPdsLabel(ProcessExportPds::Image);
 
   // bLevel => Level 2 = True, Level 3 = False
-  bool bLevel2 = cInCube->HasGroup("Instrument");
+  bool bLevel2 = cInCube->hasGroup("Instrument");
 
   // Translate the keywords from the original EDR PDS label that go in
   // this RDR PDS label for Level2 images only
   if(bLevel2) {
     OriginalLabel cOriginalBlob;
-    cInCube->Read(cOriginalBlob);
+    cInCube->read(cOriginalBlob);
     Pvl cOrigLabel;
     PvlObject cOrigLabelObj = cOriginalBlob.ReturnLabels();
     cOrigLabelObj.SetName("OriginalLabelObject");
     cOrigLabel.AddObject(cOrigLabelObj);
 
     // Translates the ISIS labels along with the original EDR labels
-    cOrigLabel.AddObject(*(cInCube->Label()));
+    cOrigLabel.AddObject(*(cInCube->getLabel()));
     PvlTranslationManager cCubeLabel2(cOrigLabel, "$lro/translations/mrfExportOrigLabel.trn");
     cCubeLabel2.Auto(pdsLabel);
 
@@ -103,7 +103,7 @@ void IsisMain() {
     }
   }
   else { //Level3 - add Band_Name keyword
-    PvlGroup &cBandBinGrp = cInCube->GetGroup("BandBin");
+    PvlGroup &cBandBinGrp = cInCube->getGroup("BandBin");
     PvlKeyword cKeyBandBin = PvlKeyword("BAND_NAME");
     PvlKeyword cKeyInBandBin;
     if(cBandBinGrp.HasKeyword("OriginalBand")) {
@@ -133,7 +133,7 @@ void IsisMain() {
   }
 
   // Calculate CheckSum
-  Statistics *cStats =  cInCube->Statistics();
+  Statistics *cStats =  cInCube->getStatistics();
   iCheckSum = (unsigned int)cStats->Sum();
 
   FixLabel(pdsLabel, bLevel2);

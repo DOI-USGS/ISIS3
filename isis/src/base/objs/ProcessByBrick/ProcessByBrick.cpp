@@ -317,9 +317,9 @@ namespace Isis {
     ibrick->begin();
     obrick->begin();
     for(int i = 0; i < numBricks; i++) {
-      InputCubes[0]->Read(*ibrick);
+      InputCubes[0]->read(*ibrick);
       funct(*ibrick, *obrick);
-      OutputCubes[0]->Write(*obrick);
+      OutputCubes[0]->write(*obrick);
       p_progress->CheckStatus();
       (*ibrick)++;
       (*obrick)++;
@@ -408,9 +408,9 @@ namespace Isis {
     p_progress->CheckStatus();
 
     for(bricks->begin(); !bricks->end(); (*bricks)++) {
-      if(haveInput) cube->Read(*bricks);  // input only
+      if(haveInput) cube->read(*bricks);  // input only
       funct(*bricks);
-      if((!haveInput) || (cube->IsReadWrite())) cube->Write(*bricks);  // output only or input/output
+      if((!haveInput) || (cube->isReadWrite())) cube->write(*bricks);  // output only or input/output
       p_progress->CheckStatus();
     }
 
@@ -516,7 +516,7 @@ namespace Isis {
     for(int t = 0; t < numBricks; t++) {
       // Read the input buffers
       for(unsigned int i = 0; i < InputCubes.size(); i++) {
-        InputCubes[i]->Read(*ibufs[i]);
+        InputCubes[i]->read(*ibufs[i]);
       }
 
       // Pass them to the application function
@@ -524,7 +524,7 @@ namespace Isis {
 
       // And copy them into the output cubes
       for(unsigned int i = 0; i < OutputCubes.size(); i++) {
-        OutputCubes[i]->Write(*obufs[i]);
+        OutputCubes[i]->write(*obufs[i]);
         omgrs[i]->next();
       }
 
@@ -535,7 +535,7 @@ namespace Isis {
         if(Wraps() && imgrs[i]->end()) imgrs[i]->begin();
 
         // Enforce same band
-        if(imgrs[i]->Band() != imgrs[0]->Band() && InputCubes[i]->Bands() != 1) {
+        if(imgrs[i]->Band() != imgrs[0]->Band() && InputCubes[i]->getBandCount() != 1) {
           imgrs[i]->SetBaseBand(imgrs[0]->Band());
         }
       }

@@ -138,12 +138,12 @@ void calcRange(double &minLat, double &maxLat, double &minLon, double &maxLon) {
   for(unsigned int i = 0; i < list.size(); i++) {
     // Open the cube and get the maximum number of band in all cubes
     Cube cube;
-    cube.Open(list[i]);
-    if(cube.Bands() > nbands) nbands = cube.Bands();
+    cube.open(list[i]);
+    if(cube.getBandCount() > nbands) nbands = cube.getBandCount();
 
     // See if the cube has a projection and make sure it matches
     // previous input cubes
-    Projection *proj = Isis::ProjectionFactory::CreateFromCube(*(cube.Label()));
+    Projection *proj = Isis::ProjectionFactory::CreateFromCube(*(cube.getLabel()));
     if(firstProj == NULL) {
       firstProj = proj;
     }
@@ -160,7 +160,7 @@ void calcRange(double &minLat, double &maxLat, double &minLon, double &maxLon) {
     }
 
     // Cleanup
-    cube.Close();
+    cube.close();
     if(proj != firstProj)
       delete proj;
   }

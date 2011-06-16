@@ -36,26 +36,26 @@ void IsisMain() {
       Cube cube;
       CubeAttributeInput inatt(cubeList[i]);
       vector<string> bands = inatt.Bands();
-      cube.SetVirtualBands(bands);
-      cube.Open(cubeList[i]);
+      cube.setVirtualBands(bands);
+      cube.open(cubeList[i]);
       if(i == 0) {
-        nsamps = cube.Samples();
-        nlines = cube.Lines();
-        nbands = cube.Bands();
+        nsamps = cube.getSampleCount();
+        nlines = cube.getLineCount();
+        nbands = cube.getBandCount();
       }
       else {
         // Make sure they are all the same size
-        if((nsamps != cube.Samples()) || (nlines != cube.Lines())) {
+        if((nsamps != cube.getSampleCount()) || (nlines != cube.getLineCount())) {
           string msg = "Spatial dimensions of cube [" +
                        cubeList[i] + "] does not match other cubes in list";
           throw iException::Message(iException::User, msg, _FILEINFO_);
         }
         // Get the total number of bands
-        nbands += cube.Bands();
+        nbands += cube.getBandCount();
       }
 
       // Build up the band bin group
-      PvlObject &isiscube = cube.Label()->FindObject("IsisCube");
+      PvlObject &isiscube = cube.getLabel()->FindObject("IsisCube");
       if(isiscube.HasGroup("BandBin")) {
         PvlGroup &inBandBin = isiscube.FindGroup("BandBin");
         for(int key = 0; key < inBandBin.Keywords(); key++) {
@@ -71,7 +71,7 @@ void IsisMain() {
           }
         }
       }
-      cube.Close();
+      cube.close();
     }
   }
   catch(iException &e) {
@@ -113,7 +113,7 @@ void IsisMain() {
 
   // Add the band bin group if necessary
   if(outBandBin.Keywords() > 0) {
-    ocube->PutGroup(outBandBin);
+    ocube->putGroup(outBandBin);
   }
   p2.EndProcess();
 
@@ -131,7 +131,7 @@ void IsisMain() {
     Cube *icube = m.SetInputCube(cubeList[i], attrib);
     m.SetPriority(ProcessMosaic::input);
     m.StartProcess(1, 1, sband);
-    sband += icube->Bands();
+    sband += icube->getBandCount();
     m.EndProcess();
   }
 }

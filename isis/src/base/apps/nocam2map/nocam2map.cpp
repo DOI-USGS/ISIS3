@@ -44,18 +44,18 @@ void IsisMain() {
 
   //A 1x1 brick to read in the latitude and longitude DN values from
   //the specified cubes
-  Brick latBrick(1, 1, 1, latCube->PixelType());
-  Brick lonBrick(1, 1, 1, lonCube->PixelType());
+  Brick latBrick(1, 1, 1, latCube->getPixelType());
+  Brick lonBrick(1, 1, 1, lonCube->getPixelType());
 
   UserInterface &ui = Application::GetUserInterface();
 
   //Set the sample and line increments
-  int sinc = (int)(inCube->Samples() * 0.10);
+  int sinc = (int)(inCube->getSampleCount() * 0.10);
   if(ui.WasEntered("SINC")) {
     sinc = ui.GetInteger("SINC");
   }
 
-  int linc = (int)(inCube->Lines() * 0.10);
+  int linc = (int)(inCube->getLineCount() * 0.10);
   if(ui.WasEntered("LINC")) {
     linc = ui.GetInteger("LINC");
   }
@@ -76,8 +76,8 @@ void IsisMain() {
   //y = cos(lat_center) * sin(latitude) - sin(lat_center) * cos(latitude) * cos(longitude - lon_center)
 
   //Get the center lat and long from the input cubes
-  double lat_center = latCube->Statistics()->Average() * PI / 180.0;
-  double lon_center = lonCube->Statistics()->Average() * PI / 180.0;
+  double lat_center = latCube->getStatistics()->Average() * PI / 180.0;
+  double lon_center = lonCube->getStatistics()->Average() * PI / 180.0;
 
 
   /**
@@ -85,14 +85,14 @@ void IsisMain() {
    * points to stereographic x and y and adding these points to the LeastSquares
    * matrix.
    */
-  for(int i = 1; i <= inCube->Lines(); i += linc) {
-    for(int j = 1; j <= inCube->Samples(); j += sinc) {
+  for(int i = 1; i <= inCube->getLineCount(); i += linc) {
+    for(int j = 1; j <= inCube->getSampleCount(); j += sinc) {
       latBrick.SetBasePosition(j, i, 1);
-      latCube->Read(latBrick);
+      latCube->read(latBrick);
       if(IsSpecial(latBrick.at(0))) continue;
       double lat = latBrick.at(0) * PI / 180.0;
       lonBrick.SetBasePosition(j, i, 1);
-      lonCube->Read(lonBrick);
+      lonCube->read(lonBrick);
       if(IsSpecial(lonBrick.at(0))) continue;
       double lon = lonBrick.at(0) * PI / 180.0;
 
@@ -110,14 +110,14 @@ void IsisMain() {
 
       //If the sample increment goes past the last sample in the line, we want to
       //always read the last sample..
-      if(j != inCube->Samples() && j + sinc > inCube->Samples()) {
-        j = inCube->Samples() - sinc;
+      if(j != inCube->getSampleCount() && j + sinc > inCube->getSampleCount()) {
+        j = inCube->getSampleCount() - sinc;
       }
     }
     //If the line increment goes past the last line in the cube, we want to
     //always read the last line..
-    if(i != inCube->Lines() && i + linc > inCube->Lines()) {
-      i = inCube->Lines() - linc;
+    if(i != inCube->getLineCount() && i + linc > inCube->getLineCount()) {
+      i = inCube->getLineCount() - linc;
     }
   }
 
@@ -190,12 +190,12 @@ void IsisMain() {
 
     //Reopen the lat and long cubes
     latCube = new Cube();
-    latCube->SetVirtualBands(ui.GetInputAttribute("LATCUB").Bands());
-    latCube->Open(ui.GetFilename("LATCUB"));
+    latCube->setVirtualBands(ui.GetInputAttribute("LATCUB").Bands());
+    latCube->open(ui.GetFilename("LATCUB"));
 
     lonCube = new Cube();
-    lonCube->SetVirtualBands(ui.GetInputAttribute("LONCUB").Bands());
-    lonCube->Open(ui.GetFilename("LONCUB"));
+    lonCube->setVirtualBands(ui.GetInputAttribute("LONCUB").Bands());
+    lonCube->open(ui.GetFilename("LONCUB"));
 
     PvlKeyword targetName;
 
@@ -287,8 +287,8 @@ void IsisMain() {
       //the input longitude cube and then converted to the mapping group's domain they may be
       //invalid for cubes containing the longitude seam.
 
-      Statistics *latStats = latCube->Statistics();
-      Statistics *lonStats = lonCube->Statistics();
+      Statistics *latStats = latCube->getStatistics();
+      Statistics *lonStats = lonCube->getStatistics();
 
       double minLat = latStats->Minimum();
       double maxLat = latStats->Maximum();
@@ -363,20 +363,20 @@ void IsisMain() {
     //If the pixel resolution is to be computed, compute the pixels/degree from the input
     if(ui.GetString("PIXRES") == "COMPUTE") {
       latBrick.SetBasePosition(1, 1, 1);
-      latCube->Read(latBrick);
+      latCube->read(latBrick);
 
       lonBrick.SetBasePosition(1, 1, 1);
-      lonCube->Read(lonBrick);
+      lonCube->read(lonBrick);
 
       //Read the lat and long at the upper left corner
       double a = latBrick.at(0) * PI / 180.0;
       double c = lonBrick.at(0) * PI / 180.0;
 
-      latBrick.SetBasePosition(latCube->Samples(), latCube->Lines(), 1);
-      latCube->Read(latBrick);
+      latBrick.SetBasePosition(latCube->getSampleCount(), latCube->getLineCount(), 1);
+      latCube->read(latBrick);
 
-      lonBrick.SetBasePosition(lonCube->Samples(), lonCube->Lines(), 1);
-      lonCube->Read(lonBrick);
+      lonBrick.SetBasePosition(lonCube->getSampleCount(), lonCube->getLineCount(), 1);
+      lonCube->read(lonBrick);
 
       //Read the lat and long at the lower right corner
       double b = latBrick.at(0) * PI / 180.0;
@@ -388,7 +388,7 @@ void IsisMain() {
       angle *= 180 / PI;
 
       //Determine the number of pixels between the two points
-      double pixels = sqrt(pow(latCube->Samples() - 1.0, 2.0) + pow(latCube->Lines() - 1.0, 2.0));
+      double pixels = sqrt(pow(latCube->getSampleCount() - 1.0, 2.0) + pow(latCube->getLineCount() - 1.0, 2.0));
 
       //Add the scale in pixels/degree to the mapping group
       mapGrp.AddKeyword(PvlKeyword("Scale",
@@ -439,14 +439,14 @@ void IsisMain() {
                                          ui.GetString("LATTYPE") == "PLANETOCENTRIC",
                                          ui.GetString("LONDIR") == "POSITIVEEAST",
                                          tolerance, ui.GetInteger("ITERATIONS"),
-                                         inCube->Samples(), inCube->Lines(),
+                                         inCube->getSampleCount(), inCube->getLineCount(),
                                          samples, lines);
 
     //Allocate the output cube and add the mapping labels
     Cube *oCube = r.SetOutputCube("TO", transform->OutputSamples(),
                                   transform->OutputLines(),
-                                  inCube->Bands());
-    oCube->PutGroup(mapGrp);
+                                  inCube->getBandCount());
+    oCube->putGroup(mapGrp);
 
     //Determine which interpolation to use
     Interpolator *interp = NULL;
@@ -500,8 +500,8 @@ nocam2map::nocam2map(LeastSquares sample, LeastSquares line, Projection *outmap,
   p_isPosEast = isPosEast;
   p_tolerance = tolerance;
   p_iterations = iterations;
-  p_latCenter = p_latCube->Statistics()->Average() * PI / 180.0;
-  p_lonCenter = p_lonCube->Statistics()->Average() * PI / 180.0;
+  p_latCenter = p_latCube->getStatistics()->Average() * PI / 180.0;
+  p_lonCenter = p_lonCube->getStatistics()->Average() * PI / 180.0;
   p_radius = p_outmap->LocalRadius(p_latCenter);
 }
 
@@ -569,19 +569,19 @@ bool nocam2map::Xform(double &inSample, double &inLine,
 
   //Create a 2x2 buffer to read the lat and long cubes
   Portal latPortal(interp.Samples(), interp.Lines(),
-                   p_latCube->PixelType() ,
+                   p_latCube->getPixelType() ,
                    interp.HotSample(), interp.HotLine());
 
   Portal lonPortal(interp.Samples(), interp.Lines(),
-                   p_lonCube->PixelType() ,
+                   p_lonCube->getPixelType() ,
                    interp.HotSample(), interp.HotLine());
 
   //Set the buffers positions to the sample/line guess and read from the lat/long cubes
   latPortal.SetPosition(sample_guess, line_guess, 1);
-  p_latCube->Read(latPortal);
+  p_latCube->read(latPortal);
 
   lonPortal.SetPosition(sample_guess, line_guess, 1);
-  p_lonCube->Read(lonPortal);
+  p_lonCube->read(lonPortal);
 
   //Get the lat/long guess from the interpolator
   double lat_guess = interp.Interpolate(sample_guess, line_guess, latPortal.DoubleBuffer()) * PI / 180.0;
@@ -618,12 +618,12 @@ bool nocam2map::Xform(double &inSample, double &inLine,
         if(j < 1 || j > p_inputSamples) continue;
 
         latPortal.SetPosition(j, i, 1);
-        p_latCube->Read(latPortal);
+        p_latCube->read(latPortal);
         if(IsSpecial(latPortal.at(0))) continue;
         double n_lat = latPortal.at(0) * PI / 180.0;
 
         lonPortal.SetPosition(j, i, 1);
-        p_lonCube->Read(lonPortal);
+        p_lonCube->read(lonPortal);
         if(IsSpecial(lonPortal.at(0))) continue;
         double n_lon = lonPortal.at(0) * PI / 180.0;
 
@@ -663,10 +663,10 @@ bool nocam2map::Xform(double &inSample, double &inLine,
 
     //Set the buffers positions to the sample/line guess and read from the lat/long cubes
     latPortal.SetPosition(sample_guess, line_guess, 1);
-    p_latCube->Read(latPortal);
+    p_latCube->read(latPortal);
 
     lonPortal.SetPosition(sample_guess, line_guess, 1);
-    p_lonCube->Read(lonPortal);
+    p_lonCube->read(lonPortal);
 
     //Get the lat/long guess from the interpolator
     lat_guess = interp.Interpolate(sample_guess, line_guess, latPortal.DoubleBuffer()) * PI / 180.0;
@@ -717,22 +717,22 @@ void ComputePixRes() {
   UserInterface &ui = Application::GetUserInterface();
   Cube *latCube = p.SetInputCube("LATCUB");
   Cube *lonCube = p.SetInputCube("LONCUB");
-  Brick latBrick(1, 1, 1, latCube->PixelType());
-  Brick lonBrick(1, 1, 1, lonCube->PixelType());
+  Brick latBrick(1, 1, 1, latCube->getPixelType());
+  Brick lonBrick(1, 1, 1, lonCube->getPixelType());
   latBrick.SetBasePosition(1, 1, 1);
-  latCube->Read(latBrick);
+  latCube->read(latBrick);
 
   lonBrick.SetBasePosition(1, 1, 1);
-  lonCube->Read(lonBrick);
+  lonCube->read(lonBrick);
 
   double a = latBrick.at(0) * PI / 180.0;
   double c = lonBrick.at(0) * PI / 180.0;
 
-  latBrick.SetBasePosition(latCube->Samples(), latCube->Lines(), 1);
-  latCube->Read(latBrick);
+  latBrick.SetBasePosition(latCube->getSampleCount(), latCube->getLineCount(), 1);
+  latCube->read(latBrick);
 
-  lonBrick.SetBasePosition(lonCube->Samples(), lonCube->Lines(), 1);
-  lonCube->Read(lonBrick);
+  lonBrick.SetBasePosition(lonCube->getSampleCount(), lonCube->getLineCount(), 1);
+  lonCube->read(lonBrick);
 
   double b = latBrick.at(0) * PI / 180.0;
   double d = lonBrick.at(0) * PI / 180.0;
@@ -740,7 +740,7 @@ void ComputePixRes() {
   double angle = acos(cos(a) * cos(b) * cos(c - d) + sin(a) * sin(b));
   angle *= 180 / PI;
 
-  double pixels = sqrt(pow(latCube->Samples() - 1.0, 2.0) + pow(latCube->Lines() - 1.0, 2.0));
+  double pixels = sqrt(pow(latCube->getSampleCount() - 1.0, 2.0) + pow(latCube->getLineCount() - 1.0, 2.0));
 
   p.EndProcess();
 
@@ -790,8 +790,8 @@ void ComputeInputRange() {
   userMap.Read(ui.GetFilename("MAP"));
   PvlGroup &userGrp = userMap.FindGroup("Mapping", Pvl::Traverse);
 
-  Statistics *latStats = latCub->Statistics();
-  Statistics *lonStats = lonCub->Statistics();
+  Statistics *latStats = latCub->getStatistics();
+  Statistics *lonStats = lonCub->getStatistics();
 
   double minLat = latStats->Minimum();
   double maxLat = latStats->Maximum();

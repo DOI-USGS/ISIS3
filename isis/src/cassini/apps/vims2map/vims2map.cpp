@@ -63,8 +63,8 @@ void IsisMain() {
     // Open the input cube and get the camera
     CubeAttributeInput atts0(list[i]);
     icube = p.SetInputCube(list[i], atts0);
-    g_bands = icube->Bands();
-    incam = icube->Camera();
+    g_bands = icube->getBandCount();
+    incam = icube->getCamera();
 
     // Make sure it is not the sky
     if(incam->IsSky()) {
@@ -86,8 +86,8 @@ void IsisMain() {
     Pvl camMap;
     incam->BasicMapping(camMap);
     camGrp = camMap.FindGroup("Mapping");
-    if(icube->HasGroup("BandBin")) {
-      bandBinGrp = icube->GetGroup("BandBin");
+    if(icube->hasGroup("BandBin")) {
+      bandBinGrp = icube->getGroup("BandBin");
 
     }
 

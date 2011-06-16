@@ -69,7 +69,7 @@ namespace Isis {
       // Open the cube
       Cube cube;
       try {
-        cube.Open(sns.Filename(i));
+        cube.open(sns.Filename(i));
       }
       catch(iException &error) {
         std::string msg = "Unable to open cube for serial number [";
@@ -80,8 +80,8 @@ namespace Isis {
 
       // Read the bounding polygon
       ImagePolygon *poly = new ImagePolygon();
-      cube.Read(*poly);
-      cube.Close();
+      cube.read(*poly);
+      cube.close();
 
       // Create a ImageOverlap with the serial number and the bounding
       // polygon and save it

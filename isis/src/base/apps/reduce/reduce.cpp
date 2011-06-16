@@ -29,14 +29,14 @@ void IsisMain() {
   bands = cai.Bands();
 
   string from = ui.GetFilename("FROM");
-  cube->Open(from);
+  cube->open(from);
 
-  ins = cube->Samples();
-  inl = cube->Lines();
+  ins = cube->getSampleCount();
+  inl = cube->getLineCount();
   inb = bands.size();
 
   if(inb == 0) {
-    inb = cube->Bands();
+    inb = cube->getBandCount();
     for(int i = 1; i <= inb; i++) {
       bands.push_back((iString)i);
     }
@@ -74,7 +74,7 @@ void IsisMain() {
   }
   catch(iException &e) {
     // If there is a problem, catch it and close the cube so it isn't open next time around
-    cube->Close();
+    cube->close();
     throw e;
   }
   
@@ -92,7 +92,7 @@ void IsisMain() {
   }
   
   // Cleanup
-  cube->Close();
+  cube->close();
   p.EndProcess();
   
   // Write the results to the log

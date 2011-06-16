@@ -28,7 +28,7 @@ namespace Isis {
    * @param priority Try to make a camera or projection first
    */
   UniversalGroundMap::UniversalGroundMap(Cube &cube, CameraPriority priority) {
-    Init(*(cube.Label()), priority);
+    Init(*(cube.getLabel()), priority);
   }
 
   /**

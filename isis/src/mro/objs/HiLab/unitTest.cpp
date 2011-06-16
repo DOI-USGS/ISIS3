@@ -11,7 +11,7 @@ int main() {
 
   //create a dummy Isis::Progress object
   Cube cube;
-  cube.Open("red3Test.cub");
+  cube.open("red3Test.cub");
 
   cout << "Testing constructor ...\n";
   HiLab hiLab(&cube);

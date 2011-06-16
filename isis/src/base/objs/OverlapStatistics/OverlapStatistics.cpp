@@ -60,21 +60,21 @@ namespace Isis {
     p_sampPercent = sampPercent;
 
     // Extract filenames and band number from cubes
-    p_xFile = x.Filename();
-    p_yFile = y.Filename();
+    p_xFile = x.getFilename();
+    p_yFile = y.getFilename();
 
     // Make sure number of bands match
-    if(x.Bands() != y.Bands()) {
+    if(x.getBandCount() != y.getBandCount()) {
       string msg = "Number of bands do not match between cubes [" +
                    p_xFile.Name() + "] and [" + p_yFile.Name() + "]";
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
-    p_bands = x.Bands();
+    p_bands = x.getBandCount();
     p_stats.resize(p_bands);
 
     //Create projection from each cube
-    Projection *projX = x.Projection();
-    Projection *projY = y.Projection();
+    Projection *projX = x.getProjection();
+    Projection *projY = y.getProjection();
 
     // Test to make sure projection parameters match
     if(*projX != *projY) {
@@ -86,13 +86,13 @@ namespace Isis {
     // Figure out the x/y range for both images to find the overlap
     double Xmin1 = projX->ToProjectionX(0.5);
     double Ymax1 = projX->ToProjectionY(0.5);
-    double Xmax1 = projX->ToProjectionX(x.Samples() + 0.5);
-    double Ymin1 = projX->ToProjectionY(x.Lines() + 0.5);
+    double Xmax1 = projX->ToProjectionX(x.getSampleCount() + 0.5);
+    double Ymin1 = projX->ToProjectionY(x.getLineCount() + 0.5);
 
     double Xmin2 = projY->ToProjectionX(0.5);
     double Ymax2 = projY->ToProjectionY(0.5);
-    double Xmax2 = projY->ToProjectionX(y.Samples() + 0.5);
-    double Ymin2 = projY->ToProjectionY(y.Lines() + 0.5);
+    double Xmax2 = projY->ToProjectionX(y.getSampleCount() + 0.5);
+    double Ymin2 = projY->ToProjectionY(y.getLineCount() + 0.5);
 
     // Find overlap
     if((Xmin1 < Xmax2) && (Xmax1 > Xmin2) && (Ymin1 < Ymax2) && (Ymax1 > Ymin2)) {
@@ -138,15 +138,15 @@ namespace Isis {
 
       // Collect and store off the overlap statistics
       for(int band = 1; band <= p_bands; band++) {
-        Brick b1(p_sampRange, 1, 1, x.PixelType());
-        Brick b2(p_sampRange, 1, 1, y.PixelType());
+        Brick b1(p_sampRange, 1, 1, x.getPixelType());
+        Brick b2(p_sampRange, 1, 1, y.getPixelType());
 
         int i = 0;
         while(i < p_lineRange) {
           b1.SetBasePosition(p_minSampX, (i + p_minLineX), band);
           b2.SetBasePosition(p_minSampY, (i + p_minLineY), band);
-          x.Read(b1);
-          y.Read(b2);
+          x.read(b1);
+          y.read(b2);
           p_stats[band-1].AddData(b1.DoubleBuffer(), b2.DoubleBuffer(), p_sampRange);
 
           // Make sure we consider the last line

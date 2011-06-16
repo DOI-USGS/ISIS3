@@ -115,7 +115,7 @@ namespace Isis {
                 p_brick2->SetBasePosition((int)(x + 0.5), (int)(y + 0.5), p_band);
               }
 
-              this->OutputCubes[1]->Read(*p_brick2);
+              this->OutputCubes[1]->read(*p_brick2);
               double previousPixelCount = (*p_brick2)[0];
 
 
@@ -126,7 +126,7 @@ namespace Isis {
                 (*p_brick2)[0] = 1;
               }
 
-              this->OutputCubes[1]->Write(*p_brick2);
+              this->OutputCubes[1]->write(*p_brick2);
               double currentCount = (*p_brick2)[0];
 
 
@@ -139,7 +139,7 @@ namespace Isis {
               }
               //We need to think about how to handle special pixels in p_values also if
               //the read-in value is a special pixel.
-              this->OutputCubes[0]->Read(*p_brick1);
+              this->OutputCubes[0]->read(*p_brick1);
               double previousPixelValue = (*p_brick1)[0];
               if((*p_brick1)[0] == Isis::Null) {
                 if(Flag == 0) {
@@ -165,7 +165,7 @@ namespace Isis {
               }
 
               /*The new average value is written to the output cube.*/
-              this->OutputCubes[0]->Write(*p_brick1);
+              this->OutputCubes[0]->write(*p_brick1);
             }/*End for each band*/
 
           } /*End for x*/
@@ -247,7 +247,7 @@ namespace Isis {
                 p_brick2->SetBasePosition((int)(x + 0.5), (int)(y + 0.5), p_band);
               }
 
-              this->OutputCubes[1]->Read(*p_brick2);
+              this->OutputCubes[1]->read(*p_brick2);
               double previousPixelCount = (*p_brick2)[0];
 
               if((*p_brick2)[0] != Isis::Null) {
@@ -257,7 +257,7 @@ namespace Isis {
                 (*p_brick2)[0] = 1;
               }
 
-              this->OutputCubes[1]->Write(*p_brick2);
+              this->OutputCubes[1]->write(*p_brick2);
               double currentCount = (*p_brick2)[0];
 
 
@@ -270,7 +270,7 @@ namespace Isis {
               }
               //We need to think about how to handle special pixels in p_values also if
               //the read-in value is a special pixel.
-              this->OutputCubes[0]->Read(*p_brick1);
+              this->OutputCubes[0]->read(*p_brick1);
               double previousPixelValue = (*p_brick1)[0];
               if((*p_brick1)[0] == Isis::Null) {
                 if(Flag == 0) {
@@ -296,7 +296,7 @@ namespace Isis {
               }
 
               /*The new average value is written to the output cube.*/
-              this->OutputCubes[0]->Write(*p_brick1);
+              this->OutputCubes[0]->write(*p_brick1);
             }/*End for each band*/
 
           }/*End if (contains)*/
@@ -349,7 +349,7 @@ namespace Isis {
 
     /*Open the average file with read/write permission*/
     Cube *averageCube = new Cube();
-    averageCube->Open(avgFilename, "rw");
+    averageCube->open(avgFilename, "rw");
     OutputCubes.push_back(averageCube);
 
     /*Now open the count file with read/write permission*/
@@ -359,11 +359,11 @@ namespace Isis {
       /*if the countFilename was set to nothing, then we use the default count
       file name.*/
       std::string openFile = path + "/" + filename + "-count-." + extension;
-      countCube->Open(openFile, "rw");
+      countCube->open(openFile, "rw");
 
     }
     else {
-      countCube->Open(countFilename, "rw");
+      countCube->open(countFilename, "rw");
     }
 
     OutputCubes.push_back(countCube);
@@ -391,10 +391,10 @@ namespace Isis {
     geos::geom::CoordinateArraySequence imagePts;
 
     imagePts.add(geos::geom::Coordinate(0.0, 0.0));
-    imagePts.add(geos::geom::Coordinate(0.0, this->OutputCubes[0]->Lines()));
-    imagePts.add(geos::geom::Coordinate(this->OutputCubes[0]->Samples(),
-                                        this->OutputCubes[0]->Lines()));
-    imagePts.add(geos::geom::Coordinate(this->OutputCubes[0]->Samples(), 0.0));
+    imagePts.add(geos::geom::Coordinate(0.0, this->OutputCubes[0]->getLineCount()));
+    imagePts.add(geos::geom::Coordinate(this->OutputCubes[0]->getSampleCount(),
+                                        this->OutputCubes[0]->getLineCount()));
+    imagePts.add(geos::geom::Coordinate(this->OutputCubes[0]->getSampleCount(), 0.0));
     imagePts.add(geos::geom::Coordinate(0.0, 0.0));
 
     p_imagePoly = Isis::globalFactory.createPolygon(

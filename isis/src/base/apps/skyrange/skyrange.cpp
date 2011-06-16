@@ -12,7 +12,7 @@ void IsisMain() {
   // Set the input image, get the camera model
   Process p;
   Cube *icube = p.SetInputCube("FROM");
-  Camera *cam = icube->Camera();
+  Camera *cam = icube->getCamera();
 
   // Get the ra/dec range and resolution
   double minRa, maxRa, minDec, maxDec;
@@ -20,14 +20,14 @@ void IsisMain() {
   double res = cam->RaDecResolution();
 
   // Get the center ra/dec
-  cam->SetImage(icube->Samples() / 2.0, icube->Lines() / 2.0);
+  cam->SetImage(icube->getSampleCount() / 2.0, icube->getLineCount() / 2.0);
   double centerRa  = cam->RightAscension();
   double centerDec = cam->Declination();
 
   // Compute the rotation
   cam->SetRightAscensionDeclination(centerRa, centerDec + 2.0 * res);
-  double x = cam->Sample() - icube->Samples() / 2.0;
-  double y = cam->Line() - icube->Lines() / 2.0;
+  double x = cam->Sample() - icube->getSampleCount() / 2.0;
+  double y = cam->Line() - icube->getLineCount() / 2.0;
   double rot = atan2(-y, x) * 180.0 / Isis::PI;
   rot = 90.0 - rot;
   if(rot < 0.0) rot += 360.0;
@@ -47,8 +47,8 @@ void IsisMain() {
 
   // Setup and log orientation
   PvlGroup orient("Orientation");
-  orient += PvlKeyword("CenterSample", icube->Samples() / 2.0);
-  orient += PvlKeyword("CenterLine", icube->Lines() / 2.0);
+  orient += PvlKeyword("CenterSample", icube->getSampleCount() / 2.0);
+  orient += PvlKeyword("CenterLine", icube->getLineCount() / 2.0);
   orient += PvlKeyword("CenterRightAscension", centerRa, "degrees");
   orient += PvlKeyword("CenterDeclination", centerDec, "degrees");
   orient += PvlKeyword("CelestialNorthClockAngle", rot, "degrees");

@@ -88,9 +88,9 @@ void IsisMain() {
     archiveXlater.Auto(otherLabels);
 
     // Write the BandBin, Archive, and Mapping groups to the output cube label
-    outcube->PutGroup(otherLabels.FindGroup("BandBin"));
-    outcube->PutGroup(otherLabels.FindGroup("Mapping"));
-    outcube->PutGroup(otherLabels.FindGroup("Archive"));
+    outcube->putGroup(otherLabels.FindGroup("BandBin"));
+    outcube->putGroup(otherLabels.FindGroup("Mapping"));
+    outcube->putGroup(otherLabels.FindGroup("Archive"));
   }
   else {
     // Translate the BandBin group
@@ -115,10 +115,10 @@ void IsisMain() {
 
     // Write the BandBin, Archive, Instrument, and ImageInfo groups
     // to the output cube label
-    outcube->PutGroup(otherLabels.FindGroup("BandBin"));
-    outcube->PutGroup(otherLabels.FindGroup("Archive"));
-    outcube->PutGroup(otherLabels.FindGroup("Instrument"));
-    outcube->PutGroup(otherLabels.FindGroup("ImageInfo"));
+    outcube->putGroup(otherLabels.FindGroup("BandBin"));
+    outcube->putGroup(otherLabels.FindGroup("Archive"));
+    outcube->putGroup(otherLabels.FindGroup("Instrument"));
+    outcube->putGroup(otherLabels.FindGroup("ImageInfo"));
 
     // Make sure the ScaledPixelHeight and ScaledPixelWidth are the same
     PvlGroup &instGrp(otherLabels.FindGroup("Instrument", Pvl::Traverse));
@@ -148,7 +148,7 @@ void IsisMain() {
         frequency = 7140000000.0;
       }
       instGrp.AddKeyword(PvlKeyword("Frequency", frequency));
-      outcube->PutGroup(instGrp);
+      outcube->putGroup(instGrp);
     }
     PvlGroup kerns("Kernels");
     if(id.compare(0, 5, "CHAN1") == 0 || id.compare(0, 3, "CH1") == 0) {
@@ -157,7 +157,7 @@ void IsisMain() {
     else {   // LRO
       kerns += PvlKeyword("NaifFrameCode", -85700);
     }
-    outcube->PutGroup(kerns);
+    outcube->putGroup(kerns);
   }
 
   p.EndProcess();

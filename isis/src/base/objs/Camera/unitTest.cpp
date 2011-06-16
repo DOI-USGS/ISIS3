@@ -60,10 +60,10 @@ int main() {
   Preference::Preferences(true);
   string inputFile = "$mgs/testData/ab102401.lev2.cub";
   Cube cube;
-  cube.Open(inputFile);
+  cube.open(inputFile);
   Camera *c = NULL;
-  c = cube.Camera();
-  Pvl &pvl = *cube.Label();
+  c = cube.getCamera();
+  Pvl pvl = *cube.getLabel();
   MyCamera cam(pvl);
   double line = 453.0;
   double sample = 534.0;
@@ -203,11 +203,11 @@ int main() {
 
   cout << endl << "/---------- Test Polar Boundary Conditions" << endl;
   inputFile = "$clementine1/testData/lub5992r.292.lev1.phot.cub";
-  cube.Close();
-  cube.Open(inputFile);
-  pvl = *cube.Label();
+  cube.close();
+  cube.open(inputFile);
+  pvl = *cube.getLabel();
   Camera *cam2 = CameraFactory::Create(pvl);
-  cube.Close();
+  cube.close();
 
   cout << endl;
   cout << "Camera* from: " << inputFile << endl;
@@ -264,17 +264,17 @@ int main() {
   cout << "Sample = " << cam2->Sample() << endl;
   cout << "Line = " << cam2->Line() << endl << endl;
 
-  cube.Close();
+  cube.close();
   delete cam2;
 
-  cube.Close();
+  cube.close();
   cout << endl << "/---------- Test Local Photometric Angles..." << endl << endl;
   cout << "Flat DEM Surface..." << endl;
   inputFile = "$base/testData/f319b18_ideal_flat.cub";
-  cube.Open(inputFile);
-  pvl = *cube.Label();
+  cube.open(inputFile);
+  pvl = *cube.getLabel();
   Camera *cam3 = CameraFactory::Create(pvl);
-  cube.Close();
+  cube.close();
 
   sample = cam3->Samples() / 2.0;
   line = cam3->Lines() / 2.0;
@@ -301,10 +301,10 @@ int main() {
 
   cout << endl << "45 Degree DEM Surface Facing Left..." << endl;
   inputFile = "$base/testData/f319b18_ideal_45left.cub";
-  cube.Open(inputFile);
-  pvl = *cube.Label();
+  cube.open(inputFile);
+  pvl = *cube.getLabel();
   Camera *cam4 = CameraFactory::Create(pvl);
-  cube.Close();
+  cube.close();
 
   sample = cam4->Samples() / 2.0;
   line = cam4->Lines() / 2.0;
@@ -326,10 +326,10 @@ int main() {
 
   cout << endl << "45 Degree DEM Surface Facing Top..." << endl;
   inputFile = "$base/testData/f319b18_ideal_45top.cub";
-  cube.Open(inputFile);
-  pvl = *cube.Label();
+  cube.open(inputFile);
+  pvl = *cube.getLabel();
   Camera *cam5 = CameraFactory::Create(pvl);
-  cube.Close();
+  cube.close();
 
   sample = cam5->Samples() / 2.0;
   line = cam5->Lines() / 2.0;
@@ -351,10 +351,10 @@ int main() {
 
   cout << endl << "45 Degree DEM Surface Facing Right..." << endl;
   inputFile = "$base/testData/f319b18_ideal_45right.cub";
-  cube.Open(inputFile);
-  pvl = *cube.Label();
+  cube.open(inputFile);
+  pvl = *cube.getLabel();
   Camera *cam6 = CameraFactory::Create(pvl);
-  cube.Close();
+  cube.close();
 
   sample = cam6->Samples() / 2.0;
   line = cam6->Lines() / 2.0;
@@ -376,10 +376,10 @@ int main() {
 
   cout << endl << "45 Degree DEM Surface Facing Bottom..." << endl;
   inputFile = "$base/testData/f319b18_ideal_45bottom.cub";
-  cube.Open(inputFile);
-  pvl = *cube.Label();
+  cube.open(inputFile);
+  pvl = *cube.getLabel();
   Camera *cam7 = CameraFactory::Create(pvl);
-  cube.Close();
+  cube.close();
 
   sample = cam7->Samples() / 2.0;
   line = cam7->Lines() / 2.0;
@@ -401,10 +401,10 @@ int main() {
 
   cout << endl << "80 Degree DEM Surface Facing Left..." << endl;
   inputFile = "$base/testData/f319b18_ideal_80left.cub";
-  cube.Open(inputFile);
-  pvl = *cube.Label();
+  cube.open(inputFile);
+  pvl = *cube.getLabel();
   Camera *cam8 = CameraFactory::Create(pvl);
-  cube.Close();
+  cube.close();
 
   sample = cam8->Samples() / 2.0;
   line = cam8->Lines() / 2.0;
@@ -426,10 +426,10 @@ int main() {
 
   cout << endl << "80 Degree DEM Surface Facing Top..." << endl;
   inputFile = "$base/testData/f319b18_ideal_80top.cub";
-  cube.Open(inputFile);
-  pvl = *cube.Label();
+  cube.open(inputFile);
+  pvl = *cube.getLabel();
   Camera *cam9 = CameraFactory::Create(pvl);
-  cube.Close();
+  cube.close();
 
   sample = cam9->Samples() / 2.0;
   line = cam9->Lines() / 2.0;
@@ -451,10 +451,10 @@ int main() {
 
   cout << endl << "80 Degree DEM Surface Facing Right..." << endl;
   inputFile = "$base/testData/f319b18_ideal_80right.cub";
-  cube.Open(inputFile);
-  pvl = *cube.Label();
+  cube.open(inputFile);
+  pvl = *cube.getLabel();
   Camera *cam10 = CameraFactory::Create(pvl);
-  cube.Close();
+  cube.close();
 
   sample = cam10->Samples() / 2.0;
   line = cam10->Lines() / 2.0;
@@ -476,10 +476,10 @@ int main() {
 
   cout << endl << "80 Degree DEM Surface Facing Bottom..." << endl;
   inputFile = "$base/testData/f319b18_ideal_80bottom.cub";
-  cube.Open(inputFile);
-  pvl = *cube.Label();
+  cube.open(inputFile);
+  pvl = *cube.getLabel();
   Camera *cam11 = CameraFactory::Create(pvl);
-  cube.Close();
+  cube.close();
 
   sample = cam11->Samples() / 2.0;
   line = cam11->Lines() / 2.0;
@@ -501,10 +501,10 @@ int main() {
 
   cout << endl << "Point Does Not Intersect DEM..." << endl;
   inputFile = "$base/testData/f319b18_ideal_flat.cub";
-  cube.Open(inputFile);
-  pvl = *cube.Label();
+  cube.open(inputFile);
+  pvl = *cube.getLabel();
   Camera *cam12 = CameraFactory::Create(pvl);
-  cube.Close();
+  cube.close();
 
   sample = 1.0;
   line = 1.0;

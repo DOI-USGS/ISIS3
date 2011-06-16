@@ -196,7 +196,7 @@ void TranslateMocEdrLabels(Filename &labelFile, Cube *ocube) {
   }
 
   // Add the instrument specific info to the output file
-  ocube->PutGroup(inst);
+  ocube->putGroup(inst);
 
 
   // Transfer the archive group to the output cube
@@ -273,7 +273,7 @@ void TranslateMocEdrLabels(Filename &labelFile, Cube *ocube) {
   }
 
   // Add the archive info to the output file
-  ocube->PutGroup(arch);
+  ocube->putGroup(arch);
 
 
   // Create the BandBin Group and populate it
@@ -321,12 +321,12 @@ void TranslateMocEdrLabels(Filename &labelFile, Cube *ocube) {
   }
 
   // Add the bandbin info to the output file
-  ocube->PutGroup(bandBin);
+  ocube->putGroup(bandBin);
 
 
   // Create the Kernel Group
   PvlGroup kerns("Kernels");
   kerns += PvlKeyword("NaifFrameCode", frameCode);
-  ocube->PutGroup(kerns);
+  ocube->putGroup(kerns);
 }
 

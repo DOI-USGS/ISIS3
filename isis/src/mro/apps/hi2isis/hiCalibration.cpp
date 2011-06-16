@@ -41,7 +41,7 @@ void SaveHiriseCalibrationData(ProcessImportPds &process, Cube *ocube,
   Table calAncillaryTable("HiRISE Calibration Ancillary", calAncillaryRecord);
 
   // Create the Table to hold the calibration lines
-  TableField image("Calibration", TableField::Integer, ocube->Samples());
+  TableField image("Calibration", TableField::Integer, ocube->getSampleCount());
 
   TableRecord calImageRecord;
   calImageRecord += image;
@@ -85,9 +85,9 @@ void SaveHiriseCalibrationData(ProcessImportPds &process, Cube *ocube,
 
     // Pull the calibration pixels out (same type as image data)
     section = 1;
-    calImageRecord[0] = ConvertCalibrationPixels(ocube->Samples(),
+    calImageRecord[0] = ConvertCalibrationPixels(ocube->getSampleCount(),
                         process.PixelType(), header);
-    header += ocube->Samples() * SizeOf(process.PixelType());
+    header += ocube->getSampleCount() * SizeOf(process.PixelType());
     calImageTable += calImageRecord;
 
 
@@ -102,8 +102,8 @@ void SaveHiriseCalibrationData(ProcessImportPds &process, Cube *ocube,
   }
 
   // Add the tables to the output cube
-  ocube->Write(calAncillaryTable);
-  ocube->Write(calImageTable);
+  ocube->write(calAncillaryTable);
+  ocube->write(calImageTable);
 }
 
 

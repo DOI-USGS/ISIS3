@@ -532,7 +532,8 @@ namespace Qisis {
     initData();
 
     // Write out col 8 (the file name)
-    Isis::Filename fname = Isis::Filename(cvp->cube()->Filename()).Expanded();
+    Isis::Filename fname = Isis::Filename(
+        cvp->cube()->getFilename()).Expanded();
     p_path  = fname.Path();
     p_fname = fname.Name();
 

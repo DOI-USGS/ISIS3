@@ -1152,11 +1152,11 @@ namespace Isis {
       //read the coefficient cube into a Brick
       Brick *darkCoefficients;
       Cube dparamCube;
-      dparamCube.Open(p_dparamfile.Expanded());
-      darkCoefficients = new Brick(p_samples, p_lines, 8, dparamCube.PixelType());
+      dparamCube.open(p_dparamfile.Expanded());
+      darkCoefficients = new Brick(p_samples, p_lines, 8, dparamCube.getPixelType());
       darkCoefficients->SetBasePosition(1, 1, 1);
-      dparamCube.Read(*darkCoefficients);
-      dparamCube.Close();
+      dparamCube.read(*darkCoefficients);
+      dparamCube.close();
       // Assume WAC dark current is 0 for 0.005 ms. This is not the case for
       // the NAC where there are negative values near the left edge of the frame:
       if(!p_narrow) {

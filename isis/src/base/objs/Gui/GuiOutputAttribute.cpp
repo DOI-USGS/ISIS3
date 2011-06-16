@@ -224,7 +224,7 @@ namespace Isis {
   // Set the attributes in the dialog
   void GuiOutputAttribute::SetAttributes(const std::string &value) {
     Isis::CubeAttributeOutput att(value);
-    if(att.FileFormat() == Isis::Tile) {
+    if(att.FileFormat() == Cube::Tile) {
       p_tiled->setChecked(true);
     }
     else {

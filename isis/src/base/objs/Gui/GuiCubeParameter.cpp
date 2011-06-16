@@ -149,8 +149,8 @@ namespace Isis {
 
         // Check to make sure the cube can be opened
         Isis::Cube temp;
-        temp.Open(cubeName);
-        temp.Close();
+        temp.open(cubeName);
+        temp.close();
 
         // Open the cube in Qview
         iString command = "$ISISROOT/bin/qview " + cubeName + " &";
@@ -179,14 +179,14 @@ namespace Isis {
 
         // Check to make sure the cube can be opened
         Isis::Cube temp;
-        temp.Open(cubeName);
+        temp.open(cubeName);
 
         // Get the label and write it out to the log
-        Isis::Pvl *label = temp.Label();
+        Isis::Pvl *label = temp.getLabel();
         Isis::Application::GuiLog(*label);
 
         // Close the cube
-        temp.Close();
+        temp.close();
 
       }
       else {

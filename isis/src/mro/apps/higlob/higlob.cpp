@@ -31,23 +31,23 @@ void IsisMain() {
   // Open the input cube
   UserInterface &ui = Application::GetUserInterface();
   string from = ui.GetFilename("FROM");
-  cube.Open(from);
+  cube.open(from);
 
-  samples = cube.Samples();
-  lines = cube.Lines();
-  bands = cube.Bands();
+  samples = cube.getSampleCount();
+  lines = cube.getLineCount();
+  bands = cube.getBandCount();
 
   // Get a cube packet to the input file
   Cube *icube = p.SetInputCube("FROM");
 
   // Get the cube prefix and suffix table
-  icube->Read(hifix);
+  icube->read(hifix);
 
   // Get the calibration prefix and suffix table
-  icube->Read(calfix);
+  icube->read(calfix);
 
   // Get the calibration image table
-  icube->Read(calimg);
+  icube->read(calimg);
 
   // Add the number of buffer pixels and dark pixels to the ouput NS
   samples += hifix[0]["BufferPixels"].Size() + hifix[0]["DarkPixels"].Size();
@@ -57,7 +57,7 @@ void IsisMain() {
 
   // Decide if the calibration and observation data should be flipped.
   flip = false;
-  PvlGroup &ins = icube->GetGroup("Instrument");
+  PvlGroup &ins = icube->getGroup("Instrument");
   int chan = ins["ChannelNumber"];
 
   iString flipChan = ui.GetString("FLIP");
@@ -79,7 +79,7 @@ void IsisMain() {
   // Cleanup
   p.EndProcess();
   delete in;
-  cube.Close();
+  cube.close();
 }
 
 // Line processing routine
@@ -130,7 +130,7 @@ void glob(Buffer &out) {
 
     // Main observation pixels
     in->SetLine(out.Line() - calimg.Records(), 1);
-    cube.Read(*in);
+    cube.read(*in);
 
     if(flip) {
       for(int i = in->size() - 1; i >= 0; i--) {

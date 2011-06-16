@@ -305,7 +305,7 @@ void UpdateLabels(Cube *cube, const string &labels) {
   rx += status;
 
   // Get the labels and add the updated labels to them
-  Pvl *cubeLabels = cube->Label();
+  Pvl *cubeLabels = cube->getLabel();
   cubeLabels->FindObject("IsisCube").AddGroup(inst);
   cubeLabels->FindObject("IsisCube").AddGroup(archive);
   cubeLabels->FindObject("IsisCube").AddGroup(bandBin);
@@ -317,7 +317,7 @@ void UpdateLabels(Cube *cube, const string &labels) {
   Pvl olabel;
   olabel.AddObject(original);
   OriginalLabel ol(olabel);
-  cube->Write(ol);
+  cube->write(ol);
 }
 
 // Translate Isis 2 labels into Isis 3 labels.
@@ -334,7 +334,7 @@ void TranslateIsis2Labels(Filename &labelFile, Cube *oCube) {
 
   // Get the translation manager ready
   PvlTranslationManager translation(inputLabel, transFile.Expanded());
-  Pvl *outputLabel = oCube->Label();
+  Pvl *outputLabel = oCube->getLabel();
   translation.Auto(*(outputLabel));
 
   //Instrument group

@@ -22,20 +22,20 @@ void IsisMain() {
 
   //Opens the cube
   Cube cube;
-  cube.Open(inFile.Expanded());
+  cube.open(inFile.Expanded());
 
   //Loops through, cropping as desired
   int cropNum = 1;
   int startLine = 1;
   bool hasReachedEndOfCube = false;
-  while(startLine <= cube.Lines()  &&  not hasReachedEndOfCube) {
+  while(startLine <= cube.getLineCount()  &&  not hasReachedEndOfCube) {
     //! Sets up the proper paramaters for running the crop program
     string parameters = "FROM=" + inFile.Expanded() +
                         " TO=" + inFile.Path() + "/" + inFile.Basename() + ".segment" + iString(cropNum) + ".cub"
                         + " LINE=" + iString(startLine) + " NLINES=";
 
-    if(startLine + numberOfLines > cube.Lines()) {
-      parameters += iString(cube.Lines() - (startLine - 1));
+    if(startLine + numberOfLines > cube.getLineCount()) {
+      parameters += iString(cube.getLineCount() - (startLine - 1));
       hasReachedEndOfCube = true;
     }
     else {

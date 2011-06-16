@@ -99,7 +99,7 @@ void IsisMain() {
 
   // If there is any pixel in the image with a DN > 1000
   //  then the "left" masked pixels are likely wiped out and useless
-  if(iCube->Statistics()->Maximum() > 1000)
+  if(iCube->getStatistics()->Maximum() > 1000)
     g_maskedLeftOnly = true;
 
   iString darkFile, flatFile, offsetFile, coefficientFile;
@@ -274,7 +274,7 @@ void IsisMain() {
     }
     calgrp += PvlKeyword("SolarDistance", g_solarDistance);
   }
-  ocube->PutGroup(calgrp);
+  ocube->putGroup(calgrp);
   p.EndProcess();
 }
 
@@ -335,12 +335,13 @@ void CopyCubeIntoArray(string &fileString, vector<double> &data) {
     string msg = fileString + " does not exist.";
     throw iException::Message(iException::User, msg, _FILEINFO_);
   }
-  cube.Open(filename.Expanded());
-  Brick brick(cube.Samples(), cube.Lines(), cube.Bands(), cube.PixelType());
+  cube.open(filename.Expanded());
+  Brick brick(cube.getSampleCount(), cube.getLineCount(), cube.getBandCount(),
+              cube.getPixelType());
   brick.SetBasePosition(1, 1, 1);
-  cube.Read(brick);
+  cube.read(brick);
   data.clear();
-  for(int i = 0; i < cube.Samples(); i++)
+  for(int i = 0; i < cube.getSampleCount(); i++)
     data.push_back(brick[i]);
 
   fileString = filename.Expanded();

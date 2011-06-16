@@ -170,17 +170,17 @@ void IsisMain() {
     int numLines   = (int)(uvOutputLineRatio * inputCubeLines + 0.5) + padding[1];
     int numBands   = 2;
 
-    uveven->SetDimensions(numSamples, numLines, numBands);
-    uveven->SetPixelType(Isis::Real);
+    uveven->setDimensions(numSamples, numLines, numBands);
+    uveven->setPixelType(Isis::Real);
 
     string filename = baseFilename.Path() + "/" + baseFilename.Basename() + ".uv.even.cub";
-    uveven->Create(filename);
+    uveven->create(filename);
 
-    uvodd->SetDimensions(numSamples, numLines, numBands);
-    uvodd->SetPixelType(Isis::Real);
+    uvodd->setDimensions(numSamples, numLines, numBands);
+    uvodd->setPixelType(Isis::Real);
 
     filename = baseFilename.Path() + "/" + baseFilename.Basename() + ".uv.odd.cub";
-    uvodd->Create(filename);
+    uvodd->create(filename);
   }
 
   if(viseven && visodd) {
@@ -189,17 +189,17 @@ void IsisMain() {
     int numLines   = (int)(visOutputLineRatio * inputCubeLines + 0.5) + padding[padding.size()-1];
     int numBands   = ((uveven) ? padding.size() - 2 : padding.size());
 
-    viseven->SetDimensions(numSamples, numLines, numBands);
-    viseven->SetPixelType(Isis::Real);
+    viseven->setDimensions(numSamples, numLines, numBands);
+    viseven->setPixelType(Isis::Real);
 
     string filename = baseFilename.Path() + "/" + baseFilename.Basename() + ".vis.even.cub";
-    viseven->Create(filename);
+    viseven->create(filename);
 
-    visodd->SetDimensions(numSamples, numLines, numBands);
-    visodd->SetPixelType(Isis::Real);
+    visodd->setDimensions(numSamples, numLines, numBands);
+    visodd->setPixelType(Isis::Real);
 
     filename = baseFilename.Path() + "/" + baseFilename.Basename() + ".vis.odd.cub";
-    visodd->Create(filename);
+    visodd->create(filename);
   }
 
   Pvl isis3VisEvenLab, isis3VisOddLab, isis3UvEvenLab, isis3UvOddLab;
@@ -217,60 +217,60 @@ void IsisMain() {
 
   if(uveven) {
     for(int grp = 0; grp < isis3UvEvenLab.Groups(); grp++) {
-      uveven->PutGroup(isis3UvEvenLab.Group(grp));
+      uveven->putGroup(isis3UvEvenLab.Group(grp));
     }
 
     History history("IsisCube");
     history.AddEntry();
-    uveven->Write(history);
-    uveven->Write(origLabel);
+    uveven->write(history);
+    uveven->write(origLabel);
 
-    uveven->Close();
+    uveven->close();
     delete uveven;
     uveven = NULL;
   }
 
   if(uvodd) {
     for(int grp = 0; grp < isis3UvOddLab.Groups(); grp++) {
-      uvodd->PutGroup(isis3UvOddLab.Group(grp));
+      uvodd->putGroup(isis3UvOddLab.Group(grp));
     }
 
     History history("IsisCube");
     history.AddEntry();
-    uvodd->Write(history);
-    uvodd->Write(origLabel);
+    uvodd->write(history);
+    uvodd->write(origLabel);
 
-    uvodd->Close();
+    uvodd->close();
     delete uvodd;
     uvodd = NULL;
   }
 
   if(viseven) {
     for(int grp = 0; grp < isis3VisEvenLab.Groups(); grp++) {
-      viseven->PutGroup(isis3VisEvenLab.Group(grp));
+      viseven->putGroup(isis3VisEvenLab.Group(grp));
     }
 
     History history("IsisCube");
     history.AddEntry();
-    viseven->Write(history);
-    viseven->Write(origLabel);
+    viseven->write(history);
+    viseven->write(origLabel);
 
-    viseven->Close();
+    viseven->close();
     delete viseven;
     viseven = NULL;
   }
 
   if(visodd) {
     for(int grp = 0; grp < isis3VisOddLab.Groups(); grp++) {
-      visodd->PutGroup(isis3VisOddLab.Group(grp));
+      visodd->putGroup(isis3VisOddLab.Group(grp));
     }
 
     History history("IsisCube");
     history.AddEntry();
-    visodd->Write(history);
-    visodd->Write(origLabel);
+    visodd->write(history);
+    visodd->write(origLabel);
 
-    visodd->Close();
+    visodd->close();
     delete visodd;
     visodd = NULL;
   }
@@ -402,7 +402,7 @@ void separateFramelets(Buffer &in) {
   }
 
   if(flip) {
-    outLine = outfile->Lines() - (outLine - 1);
+    outLine = outfile->getLineCount() - (outLine - 1);
   }
 
   outLine += frameletLineOffset;
@@ -434,7 +434,7 @@ void separateFramelets(Buffer &in) {
     }
   }
 
-  outfile->Write(mgr);
+  outfile->write(mgr);
 }
 
 /**
@@ -484,7 +484,7 @@ void TranslateLabels(Pvl &pdsLab, Pvl &isis3VisEven, Pvl &isis3VisOdd,
   genericInstrument.push_back(PvlKeyword("DataFlipped", "No"));//(ui.GetBoolean("FLIP")? "Yes" : "No")));
 
   // color offset doesn't apply to BW mode (single band cubes)
-  if(colorOffset && viseven && viseven->Bands() == 1) {
+  if(colorOffset && viseven && viseven->getBandCount() == 1) {
     genericInstrument.push_back(PvlKeyword("ColorOffset", 0));
   }
   else {
@@ -510,14 +510,14 @@ void TranslateLabels(Pvl &pdsLab, Pvl &isis3VisEven, Pvl &isis3VisOdd,
   // add labels unique to particular files
   if(viseven) {
     visEvenInst.AddKeyword(PvlKeyword("Framelets", "Even"));
-    visEvenInst.AddKeyword(PvlKeyword("NumFramelets", viseven->Lines() / 14));
+    visEvenInst.AddKeyword(PvlKeyword("NumFramelets", viseven->getLineCount() / 14));
     visEvenInst.AddKeyword(PvlKeyword("InstrumentId", "WAC-VIS"), Pvl::Replace);
     visEvenInst.AddKeyword(PvlKeyword("InstrumentModeId", (std::string) pdsLab["INSTRUMENT_MODE_ID"]));
   }
 
   if(visodd) {
     visOddInst.AddKeyword(PvlKeyword("Framelets", "Odd"));
-    visOddInst.AddKeyword(PvlKeyword("NumFramelets", visodd->Lines() / 14));
+    visOddInst.AddKeyword(PvlKeyword("NumFramelets", visodd->getLineCount() / 14));
     visOddInst.AddKeyword(PvlKeyword("InstrumentId", "WAC-VIS"), Pvl::Replace);
     visOddInst.AddKeyword(PvlKeyword("InstrumentModeId", (std::string) pdsLab["INSTRUMENT_MODE_ID"]));
   }
@@ -529,7 +529,7 @@ void TranslateLabels(Pvl &pdsLab, Pvl &isis3VisEven, Pvl &isis3VisOdd,
   PvlKeyword visFilterNum("FilterNumber");
   PvlKeyword visBandwidth("Width");
 
-  if(viseven && viseven->Bands() == 1) {
+  if(viseven && viseven->getBandCount() == 1) {
     visWavelength = pdsLab["CENTER_FILTER_WAVELENGTH"][0];
     visFilterNum = pdsLab["FILTER_NUMBER"][0];
 
@@ -567,14 +567,14 @@ void TranslateLabels(Pvl &pdsLab, Pvl &isis3VisEven, Pvl &isis3VisOdd,
 
   if(uveven) {
     uvEvenInst.AddKeyword(PvlKeyword("Framelets", "Even"));
-    uvEvenInst.AddKeyword(PvlKeyword("NumFramelets", uveven->Lines() / 4));
+    uvEvenInst.AddKeyword(PvlKeyword("NumFramelets", uveven->getLineCount() / 4));
     uvEvenInst.AddKeyword(PvlKeyword("InstrumentId", "WAC-UV"), Pvl::Replace);
     uvEvenInst.AddKeyword(PvlKeyword("InstrumentModeId", (std::string) pdsLab["INSTRUMENT_MODE_ID"]));
   }
 
   if(uvodd) {
     uvOddInst.AddKeyword(PvlKeyword("Framelets", "Odd"));
-    uvOddInst.AddKeyword(PvlKeyword("NumFramelets", uvodd->Lines() / 4));
+    uvOddInst.AddKeyword(PvlKeyword("NumFramelets", uvodd->getLineCount() / 4));
     uvOddInst.AddKeyword(PvlKeyword("InstrumentId", "WAC-UV"), Pvl::Replace);
     uvOddInst.AddKeyword(PvlKeyword("InstrumentModeId", (std::string) pdsLab["INSTRUMENT_MODE_ID"]));
   }
@@ -631,8 +631,8 @@ void writeNullsToFile() {
     }
 
     while(!evenLineMgr.end()) {
-      viseven->Write(evenLineMgr);
-      visodd->Write(oddLineMgr);
+      viseven->write(evenLineMgr);
+      visodd->write(oddLineMgr);
       evenLineMgr++;
       oddLineMgr++;
     }
@@ -651,8 +651,8 @@ void writeNullsToFile() {
     }
 
     while(!evenLineMgr.end()) {
-      uveven->Write(evenLineMgr);
-      uvodd->Write(oddLineMgr);
+      uveven->write(evenLineMgr);
+      uvodd->write(oddLineMgr);
       evenLineMgr++;
       oddLineMgr++;
     }

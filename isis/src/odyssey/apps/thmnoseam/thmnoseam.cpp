@@ -82,7 +82,7 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   // Make sure it is a Themis EDR/RDR
   try {
-    if(evenCube->GetGroup("Instrument")["InstrumentID"][0] != "THEMIS_VIS") {
+    if(evenCube->getGroup("Instrument")["InstrumentID"][0] != "THEMIS_VIS") {
       throw iException::Message(iException::User, "", _FILEINFO_);
     }
   }
@@ -94,9 +94,9 @@ void IsisMain() {
     msg += "THEMIS VIS image.";
     throw iException::Message(iException::User, msg, _FILEINFO_);
   }
-  
+
   try {
-    if(oddCube->GetGroup("Instrument")["InstrumentID"][0] != "THEMIS_VIS") {
+    if(oddCube->getGroup("Instrument")["InstrumentID"][0] != "THEMIS_VIS") {
       throw iException::Message(iException::User, "", _FILEINFO_);
     }
   }
@@ -109,19 +109,19 @@ void IsisMain() {
     throw iException::Message(iException::User, msg, _FILEINFO_);
   }
   
-  if (evenCube->GetGroup("Instrument")["Framelets"][0] != "Even") {
+  if (evenCube->getGroup("Instrument")["Framelets"][0] != "Even") {
     string msg = "The image [" + ui.GetFilename("INEVEN") + "] does not appear "
         "to contain the EVEN framelets of a Themis VIS cube";
     throw iException::Message(iException::User, msg, _FILEINFO_);
   }
   
-  if (oddCube->GetGroup("Instrument")["Framelets"][0] != "Odd") {
+  if (oddCube->getGroup("Instrument")["Framelets"][0] != "Odd") {
     string msg = "The image [" + ui.GetFilename("ODDEVEN") + "] does not appear "
         "to contain the ODD framelets of a Themis VIS cube";
     throw iException::Message(iException::User, msg, _FILEINFO_);
   }
   
-  PvlGroup &inputInstrumentGrp = evenCube->GetGroup("Instrument");
+  PvlGroup &inputInstrumentGrp = evenCube->getGroup("Instrument");
   PvlKeyword &spatialSumming = inputInstrumentGrp["SpatialSumming"];
   frameletSize = 192 / (int)spatialSumming[0];
   overlapSize = FrameletOverlapSize();
@@ -132,14 +132,14 @@ void IsisMain() {
     throw iException::Message(iException::Camera, msg, _FILEINFO_);
   }
   
-  p.SetBrickSize(evenCube->Samples(), frameletSize, 1);
+  p.SetBrickSize(evenCube->getSampleCount(), frameletSize, 1);
   
   p.StartProcess(FixSeams);
   
-  PvlGroup &evenInst = outEven->GetGroup("Instrument");
+  PvlGroup &evenInst = outEven->getGroup("Instrument");
   evenInst["Framelets"] = "Even";
   
-  PvlGroup &oddInst = outOdd->GetGroup("Instrument");
+  PvlGroup &oddInst = outOdd->getGroup("Instrument");
   oddInst["Framelets"] = "Odd";
   
   p.EndProcess();
@@ -179,8 +179,8 @@ void RemoveSeam(Buffer &out, int framelet, int band,
   // "badData" is the bottom of the current framelet, what we were given.
   Cube *badDataCube  = (matchIsEven) ? oddCube  : evenCube;
   
-  Camera *goodCam = goodDataCube->Camera();
-  Camera *badCam  = badDataCube->Camera();
+  Camera *goodCam = goodDataCube->getCamera();
+  Camera *badCam  = badDataCube->getCamera();
   
   // Verify we're at the correct band
   goodCam->SetBand(band);
@@ -232,8 +232,6 @@ void RemoveSeam(Buffer &out, int framelet, int band,
         offsetLine = frameletOffsetsForBand[optimizeIndex].LineOffset();
 
         ASSERT(frameletOffsetsForBand[optimizeIndex].Sample() == sample);
-        ASSERT(frameletOffsetsForBand[optimizeIndex].Line() == 
-               (badLine - badDataStart));
       }
       // There is no pre-calculated translation, calculate it
       else if(badCam->SetImage(sample, badLine))
@@ -268,9 +266,9 @@ void RemoveSeam(Buffer &out, int framelet, int band,
       double goodLine = offsetLine + badLine;
 
       // Get the pixel we're missing (good)
-      Portal p(1, 1, goodDataCube->PixelType());
+      Portal p(1, 1, goodDataCube->getPixelType());
       p.SetPosition(goodSample, goodLine, band);
-      goodDataCube->Read(p);
+      goodDataCube->read(p);
       
       // Attempt to apply weighted average
       if(!Isis::IsSpecial(p[0]) && !Isis::IsSpecial(out[outIndex]))
@@ -335,8 +333,8 @@ void FixSeams(vector<Buffer *> &inBuffers, vector<Buffer *> &outBuffers) {
  * This calculates the number of lines of overlap between framelets.
  */
 int FrameletOverlapSize() {
-  Camera *camEven = evenCube->Camera();
-  Camera *camOdd = oddCube->Camera();
+  Camera *camEven = evenCube->getCamera();
+  Camera *camOdd = oddCube->getCamera();
   
   if(camEven == NULL || camOdd == NULL) {
     string msg = "A camera is required to automatically calculate the overlap "

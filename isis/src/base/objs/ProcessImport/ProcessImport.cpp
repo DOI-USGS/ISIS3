@@ -1192,7 +1192,7 @@ namespace Isis {
         if(funct == NULL) {
           // Set the buffer position and write the line to the output file
           ((Isis::LineManager *)out)->SetLine((band * p_nl) + line + 1);
-          OutputCubes[0]->Write(*out);
+          OutputCubes[0]->write(*out);
         }
         else {
           ((Isis::Brick *)out)->SetBaseSample(1);
@@ -1431,7 +1431,7 @@ namespace Isis {
         if(funct == NULL) {
           //Set the buffer position and write the line to the output file
           ((Isis::LineManager *)out)->SetLine((band * p_nl) + line + 1);
-          OutputCubes[0]->Write(*out);
+          OutputCubes[0]->write(*out);
         }
         else {
           funct(*out);
@@ -1661,7 +1661,7 @@ namespace Isis {
         if(funct == NULL) {
           //Set the buffer position and write the line to the output file
           ((Isis::LineManager *)out)->SetLine((band * p_nl) + line + 1);
-          OutputCubes[0]->Write(*out);
+          OutputCubes[0]->write(*out);
         }
         else {
           funct(*out);
@@ -1852,7 +1852,7 @@ namespace Isis {
         if(funct == NULL) {
           //Set the buffer position and write the line to the output file
           ((Isis::LineManager *)out)->SetLine((band * p_nl) + line + 1);
-          OutputCubes[0]->Write(*out);
+          OutputCubes[0]->write(*out);
         }
         else {
           funct(*out);

@@ -110,7 +110,7 @@ void TranslateVikingLabels(Pvl &pdsLabel, Cube *ocube) {
   arch += PvlKeyword("MissonPhaseName", (string)pdsLabel["MISSION_PHASE_NAME"]);
   arch += PvlKeyword("ImageNumber", (string)pdsLabel["IMAGE_NUMBER"]);
   arch += PvlKeyword("OrbitNumber", (string)pdsLabel["ORBIT_NUMBER"]);
-  ocube->PutGroup(arch);
+  ocube->putGroup(arch);
 
   // Setup the instrument group
   // Note SpacecraftClockCount used to be FDS_COUNT
@@ -129,7 +129,7 @@ void TranslateVikingLabels(Pvl &pdsLabel, Cube *ocube) {
   inst += PvlKeyword("FloodModeId", (string)pdsLabel["FLOOD_MODE_ID"]);
   inst += PvlKeyword("GainModeId", (string)pdsLabel["GAIN_MODE_ID"]);
   inst += PvlKeyword("OffsetModeId", (string)pdsLabel["OFFSET_MODE_ID"]);
-  ocube->PutGroup(inst);
+  ocube->putGroup(inst);
 
   // Setup the band bin group
   PvlGroup bandBin("BandBin");
@@ -144,7 +144,7 @@ void TranslateVikingLabels(Pvl &pdsLabel, Cube *ocube) {
   if(filterName == "GREEN") filterId = 5;
   if(filterName == "RED") filterId = 6;
   bandBin += PvlKeyword("FilterId", filterId);
-  ocube->PutGroup(bandBin);
+  ocube->putGroup(bandBin);
 
   // Setup the kernel group
   PvlGroup kern("Kernels");
@@ -169,7 +169,7 @@ void TranslateVikingLabels(Pvl &pdsLabel, Cube *ocube) {
     }
     spn = 2;
   }
-  ocube->PutGroup(kern);
+  ocube->putGroup(kern);
 
   // Set up the nominal reseaus group
   PvlGroup res("Reseaus");
@@ -221,6 +221,6 @@ void TranslateVikingLabels(Pvl &pdsLabel, Cube *ocube) {
   }
   else res += PvlKeyword("Template", "$viking2/reseaus/vo2.visb.template.cub");
   res += PvlKeyword("Status", "Nominal");
-  ocube->PutGroup(res);
+  ocube->putGroup(res);
 }
 

@@ -92,7 +92,7 @@ namespace Isis {
        * @param cube  A valid ISIS Cube object with a label
        */
       MdisEdrKeys(Cube &cube) {
-        _edrLabel = OriginalLabel(cube.Filename()).ReturnLabels();
+        _edrLabel = OriginalLabel(cube.getFilename()).ReturnLabels();
         LoadKeys(_edrLabel, _keys);
       }
 

@@ -113,7 +113,7 @@ void IsisMain() {
 
           // Try to create
           try {
-            cam = cube->Camera();
+            cam = cube->getCamera();
           }
           catch(iException &e) {
             createFail = true;

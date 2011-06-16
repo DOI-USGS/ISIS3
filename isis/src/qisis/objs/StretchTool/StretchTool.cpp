@@ -1074,12 +1074,12 @@ namespace Qisis {
    */
   Isis::Statistics StretchTool::statsFromCube(Isis::Cube *cube, int band) {
     Isis::Statistics stats;
-    Isis::Brick brick(cube->Samples(), 1, 1, cube->PixelType());
+    Isis::Brick brick(cube->getSampleCount(), 1, 1, cube->getPixelType());
 
-    for(int line = 0; line < cube->Lines(); line++) {
+    for(int line = 0; line < cube->getLineCount(); line++) {
       brick.SetBasePosition(0, line, band);
-      cube->Read(brick);
-      stats.AddData(brick.DoubleBuffer(), cube->Samples());
+      cube->read(brick);
+      stats.AddData(brick.DoubleBuffer(), cube->getSampleCount());
     }
 
     return stats;
@@ -1132,12 +1132,12 @@ namespace Qisis {
   Isis::Histogram StretchTool::histFromCube(Isis::Cube *cube, int band,
       double min, double max) {
     Isis::Histogram hist(min, max);
-    Isis::Brick brick(cube->Samples(), 1, 1, cube->PixelType());
+    Isis::Brick brick(cube->getSampleCount(), 1, 1, cube->getPixelType());
 
-    for(int line = 0; line < cube->Lines(); line++) {
+    for(int line = 0; line < cube->getLineCount(); line++) {
       brick.SetBasePosition(0, line, band);
-      cube->Read(brick);
-      hist.AddData(brick.DoubleBuffer(), cube->Samples());
+      cube->read(brick);
+      hist.AddData(brick.DoubleBuffer(), cube->getSampleCount());
     }
 
     return hist;

@@ -25,16 +25,16 @@ void IsisMain() {
 
   // Setup the input and output cubes
   Cube *icube = sProc.SetInputCube("FROM");
-  int numSamples = fft.NextPowerOfTwo(icube->Samples());
-  int numLines = fft.NextPowerOfTwo(icube->Lines());
-  int numBands = icube->Bands();
+  int numSamples = fft.NextPowerOfTwo(icube->getSampleCount());
+  int numLines = fft.NextPowerOfTwo(icube->getLineCount());
+  int numBands = icube->getBandCount();
 
   sProc.SetTileSize(1, numLines);
 
   // create an AlphaCube containing the resizing information
   // which will be used during the inverse
-  AlphaCube aCube(icube->Samples(), icube->Lines(),
-                  icube->Samples(), icube->Lines());
+  AlphaCube aCube(icube->getSampleCount(), icube->getLineCount(),
+                  icube->getSampleCount(), icube->getLineCount());
 
   UserInterface &ui = Application::GetUserInterface();
 
@@ -83,7 +83,7 @@ void IsisMain() {
   lProc.StartProcess(FFT2);
 
   // Add or update the AlphaCube group
-  aCube.UpdateGroup(*ocube->Label());
+  aCube.UpdateGroup(*ocube->getLabel());
 
   // Stop the process and remove the temporary files
   lProc.EndProcess();

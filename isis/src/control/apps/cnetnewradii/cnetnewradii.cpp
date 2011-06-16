@@ -26,7 +26,7 @@ void IsisMain() {
   // Get input cube and get camera model for it
   string from = ui.GetFilename("MODEL");
   Cube cube;
-  cube.Open(from);
+  cube.open(from);
   UniversalGroundMap *ugm = NULL;
   try {
     ugm = new UniversalGroundMap(cube);
@@ -71,10 +71,10 @@ void IsisMain() {
             surfacePt.GetLongitude().GetDegrees());
       }
 
-      Brick b(1, 1, 1, cube.PixelType());
+      Brick b(1, 1, 1, cube.getPixelType());
       if(success) {
         b.SetBasePosition((int)ugm->Sample(), (int)ugm->Line(), 1);
-        cube.Read(b);
+        cube.read(b);
         success = !IsSpecial(b[0]);
       }
 

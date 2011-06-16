@@ -48,7 +48,7 @@ void IsisMain () {
             throw iException::Message(iException::User, msg, _FILEINFO_);
         }
 
-        if (icube->Bands() != 1) {
+        if (icube->getBandCount() != 1) {
             string msg = "Invalid Image: The backplane option can only be used with a single image band at a time.";
             throw iException::Message(iException::User, msg, _FILEINFO_);
         }
@@ -106,7 +106,7 @@ void IsisMain () {
 
     PvlGroup photo("Photometry");
     pho->Report(photo);
-    ocube->PutGroup(photo);
+    ocube->putGroup(photo);
     Application::Log(photo);
     p.EndProcess();
 }

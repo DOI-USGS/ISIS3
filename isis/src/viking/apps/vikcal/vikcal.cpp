@@ -34,13 +34,13 @@ void IsisMain() {
 
   // Open the input cube
   Cube icube;
-  icube.Open(in, "r");
+  icube.open(in, "r");
   Progress prog;
 
   // If the file has already been calibrated, throw an error
-  if(icube.HasGroup("Radiometry")) {
-    string msg = "The Viking image [" + icube.Filename() + "] has already been ";
-    msg += "radiometrically calibrated";
+  if(icube.hasGroup("Radiometry")) {
+    string msg = "The Viking image [" + icube.getFilename() + "] has already "
+        "been radiometrically calibrated";
     throw iException::Message(iException::User, msg, _FILEINFO_);
   }
 
@@ -83,7 +83,7 @@ void IsisMain() {
   calgrp += PvlKeyword("Dcoeff", calParam->Dcoeff());
   calgrp += PvlKeyword("Ecoeff", calParam->Ecoeff());
 
-  ocube->PutGroup(calgrp);
+  ocube->putGroup(calgrp);
 
   // Start the calibration process
   p.StartProcess(cal);

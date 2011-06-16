@@ -21,56 +21,181 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#if !defined(CubeIoHandler_h)
+#ifndef CubeIoHandler_h
 #define CubeIoHandler_h
 
-#include "CubeDef.h"
-#include "Buffer.h"
 #include "Constants.h"
+#include "Endian.h"
+#include "PixelType.h"
+
+class QFile;
+template <typename A> class QList;
 
 namespace Isis {
+  class Buffer;
+  class CubeCachingAlgorithm;
+  class EndianSwapper;
+  class Pvl;
+  class RawCubeChunk;
+
   /**
-   * @brief Pixel value mapper
+   * @ingroup Low Level Cube IO
    *
-   * This class is used to stretch or remap pixel values. For example, it can be
-   * used to apply contrast stretches, color code stretches, or remap from a
-   * double range to 8-bit (0 to 255). The methodology used is straightforward.
-   * The program must set up a list of stretch pairs, input-to-output mappings,
-   * using the AddPair method. For example, (0,0) and (1,255) are two pairs which
-   * would cause an input of 0 to be mapped to 0, 0.5 would be mapped to 127.5
-   * and 1 would be mapped to 255. More than two pairs can be used which
-   * generates piece-wise linear mappings. Special pixels are mapped to themselves
-   * unless overridden with methods such as SetNull. Input values outside the
-   * minimum and maximum input pair values are mapped to LRS and HRS respectively.
+   * @brief Handles converting buffers to and from disk.
    *
-   * If you would like to see Stretch being used in implementation,
-   * see stretch.cpp
+   * This class handles converting buffers to and from disk. This class holds
+   *   the cube chunks in memory and is capable of reading and writing them. It
+   *   asks the caching algorithms to recommend cube chunks to not keep in
+   *   memory. Children need to call setChunkSizes(...) in their constructor.
    *
-   * @ingroup Low Level Cube I/O
+   * This class handles all of the virtual band conversions.
    *
-   * @author  ???
-   *
-   * @internal
-   *  @history 2006-06-12 Tracie Sucharski - Clear stream bits before opening
-   *                             cube.
+   * @author Jai Rideout and Steven Lambright
    */
   class CubeIoHandler {
     public:
-      CubeIoHandler(IsisCubeDef &cube);
+      CubeIoHandler(QFile * dataFile, QList<int> *virtualBandList,
+          const Pvl &label, bool alreadyOnDisk);
       virtual ~CubeIoHandler();
-      void Open();
-      virtual void Create(bool overwrite);
-      virtual void Close(const bool remove = false) = 0;
-      virtual void Read(Isis::Buffer &rbuf) = 0;
-      virtual void Write(Isis::Buffer &wbuf) = 0;
-      virtual void ClearCache() = 0;
-      void ToDouble(Isis::Buffer &buf);
-      void ToRaw(Isis::Buffer &buf);
+
+      void read(Buffer &bufferToFill);
+      void write(const Buffer &bufferToWrite);
+
+      void clearCache();
+      BigInt getDataSize() const;
+      void setVirtualBands(QList<int> *virtualBandList);
+      virtual void updateLabels(Pvl &labels);
 
     protected:
-      IsisCubeDef *p_cube;
-      bool p_native;
+      int getBandCount() const;
+      int getBandCountInChunk() const;
+      BigInt getBytesPerChunk() const;
+      int getChunkCountInBandDimension() const;
+      int getChunkCountInLineDimension() const;
+      int getChunkCountInSampleDimension() const;
+      int getChunkIndex(const RawCubeChunk &)  const;
+      BigInt getDataStartByte() const;
+      QFile * getDataFile() const;
+      int getLineCount() const;
+      int getLineCountInChunk() const;
+      PixelType getPixelType() const;
+      int getSampleCount() const;
+      int getSampleCountInChunk() const;
+
+      void setChunkSizes(int numSamples, int numLines, int numBands);
+
+      /**
+       * This needs to populate the chunkToFill with unswapped raw bytes from
+       *   the disk.
+       *
+       * @param chunkToFill The container that needs to be filled with cube
+       *                    data.
+       */
+      virtual void readRaw(RawCubeChunk &chunkToFill) const = 0;
+
+      /**
+       * This needs to write the chunkToWrite directly to disk with no
+       *   modifications to the data itself.
+       *
+       * @param chunkToWrite The container that needs to be put on disk.
+       */
+      virtual void writeRaw(const RawCubeChunk &chunkToWrite) const = 0;
+
+    private:
+      QList<RawCubeChunk *> findCubeChunks(int startSample,
+          int numSamples, int startLine, int numLines, int startBand,
+          int numBands);
+
+      void findIntersection(const RawCubeChunk &cube1,
+          const Buffer &cube2, int &startX, int &startY, int &startZ,
+          int &endX, int &endY, int &endZ) const;
+
+      void freeChunk(RawCubeChunk *chunkToFree);
+
+      RawCubeChunk *getChunk(int chunkIndex) const;
+
+      int getChunkCount() const;
+
+      void getChunkPlacement(int chunkIndex,
+        int &startSample, int &startLine, int &startBand,
+        int &endSample, int &endLine, int &endBand) const;
+
+      RawCubeChunk *getNullChunk(int chunkIndex);
+
+      void minimizeCache(const QList<RawCubeChunk *> &justUsed,
+                         const Buffer &justRequested);
+
+      void writeIntoDouble(const RawCubeChunk &chunk, Buffer &output) const;
+
+      void writeIntoRaw(const Buffer &buffer, RawCubeChunk &output) const;
+
+      void writeNullDataToDisk();
+
+    private:
+      //! The file containing cube data.
+      QFile * m_dataFile;
+
+      /**
+       * The start byte of the cube data. This is 0-based (i.e. a value of 0
+       *   means write data into the first byte of the file). Usually the label
+       *   is between 0 and m_startByte.
+       */
+      BigInt m_startByte;
+
+      //! The format of each DN in the cube.
+      PixelType m_pixelType;
+
+      //! The additive offset of the data on disk.
+      double m_base;
+
+      //! The multiplicative factor of the data on disk.
+      double m_multiplier;
+
+      //! The byte order (endianness) of the data on disk.
+      ByteOrder m_byteOrder;
+
+      //! A helper that swaps byte order to and from file order.
+      EndianSwapper * m_byteSwapper;
+
+      //! The number of samples in the cube.
+      int m_numSamples;
+
+      //! The number of lines in the cube.
+      int m_numLines;
+
+      //! The number of physical bands in the cube.
+      int m_numBands;
+
+      //! The caching algorithms to use, in order of priority.
+      QList<CubeCachingAlgorithm *> * m_cachingAlgorithms;
+
+      //! The map from chunk index to chunk for cached data.
+      QMap<int, RawCubeChunk *> * m_rawData;
+
+      //! The map from chunk index to on-disk status, all true if not allocated.
+      QMap<int, bool> * m_dataIsOnDiskMap;
+
+      //! Converts from virtual band to physical band.
+      QList<int> * m_virtualBands;
+
+      //! The number of samples in a cube chunk.
+      int m_samplesInChunk;
+
+      //! The number of lines in a cube chunk.
+      int m_linesInChunk;
+
+      //! The number of physical bands in a cube chunk.
+      int m_bandsInChunk;
+
+      /**
+       * This is an optimization for process by line. It relies on chunks found
+       *   often being the exact same between multiple reads or multiple writes.
+       */
+      QList<RawCubeChunk *> *m_lastProcessByLineChunks;
+
+      //! A raw cube chunk's data when it was all NULL's. Used for speed.
+      QByteArray *m_nullChunkData;
   };
-};
+}
 
 #endif

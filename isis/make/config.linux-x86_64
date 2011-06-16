@@ -12,6 +12,7 @@ ISISCPPFLAGS += -DGMM_USES_SUPERLU
 ifeq ($(findstring DEBUG, $(MODE)),DEBUG)
   ISISCPPFLAGS += -g 
   ISISCPPFLAGS += -O0
+  ISISCPPFLAGS += -DDEBUG
   ifeq ($(findstring CWD, $(MODE)),CWD)
     ISISCPPFLAGS += -DCWDEBUG -DLIBCWD_THREAD_SAFE -D_REENTRANT
     ifeq (,$(findstring MEMCHECK, $(MODE)))

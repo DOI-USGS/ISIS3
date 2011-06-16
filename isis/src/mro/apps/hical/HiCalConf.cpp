@@ -243,31 +243,31 @@ namespace Isis {
 
 // Crack the file and read the appropriate band
     Cube cube;
-    cube.Open(mfile);
+    cube.open(mfile);
 
 //  Check for proper size if specifeid
     if(expected_size != 0) {
-      if(cube.Samples() != expected_size) {
+      if(cube.getSampleCount() != expected_size) {
         ostringstream mess;
         mess << "Specifed matrix  (" << name
              << ") from file \"" << mfile
              << "\" does not have expected samples (" << expected_size
-             << ") but has " << cube.Samples();
-        cube.Close();
+             << ") but has " << cube.getSampleCount();
+        cube.close();
         throw iException::Message(iException::User, mess.str(), _FILEINFO_);
       }
     }
 
 //  Read the specifed region
-    Brick bandio(cube.Samples(), 1, 1, Real);
+    Brick bandio(cube.getSampleCount(), 1, 1, Real);
     bandio.SetBasePosition(1, 1, getMatrixBand(profile));
-    cube.Read(bandio);
+    cube.read(bandio);
 
 //  Now create the output buffer with some TNT funny business
-    HiVector temp(cube.Samples(), bandio.DoubleBuffer());
-    HiVector out(cube.Samples());
+    HiVector temp(cube.getSampleCount(), bandio.DoubleBuffer());
+    HiVector out(cube.getSampleCount());
     out.inject(temp);
-    cube.Close();
+    cube.close();
     return (out);
   }
 

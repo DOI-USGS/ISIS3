@@ -136,7 +136,7 @@ void TranslateVoyagerLabels(Pvl &inputLabel, Cube *ocube) {
   PvlTranslationManager labelXlater(inputLabel, transFile.Expanded());
 
   // Pvl output label
-  Pvl *outputLabel = ocube->Label();
+  Pvl *outputLabel = ocube->getLabel();
   labelXlater.Auto(*(outputLabel));
 
   // Add needed keywords that are not in the translation table
@@ -209,7 +209,7 @@ void TranslateVoyagerLabels(Pvl &inputLabel, Cube *ocube) {
                  "] does not match Voyager1 or Voyager2 spacecraft";
     iException::Message(iException::User, msg, _FILEINFO_);
   }
-  ocube->PutGroup(kern);
+  ocube->putGroup(kern);
 
   // Modify time to remove Z from end
   iString time = inst.FindKeyword("StartTime")[0];
@@ -380,6 +380,6 @@ void TranslateVoyagerLabels(Pvl &inputLabel, Cube *ocube) {
                     + spacecraftNumber + "." + instId.DownCase()
                     + ".template.cub");
   res += PvlKeyword("Status", "Nominal");
-  ocube->PutGroup(res);
+  ocube->putGroup(res);
 }
 

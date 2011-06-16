@@ -1,22 +1,21 @@
-Unit test for Isis::Cube
+Unit test for Cube
 Constructing cube ... 
 File   = 
-Samps  = 512
-Lines  = 512
+Samps  = 0
+Lines  = 0
 Bands  = 0
 Base   = 0
 Mult   = 1
 Type   = 7
 Atchd  = 1
-Dtchd  = 0
 Format = 1
 Open   = 0
-R/O    = 0
-R/W    = 1
+R/O    = N/A
+R/W    = N/A
 Lbytes = 65536
 
 Creating 32-bit cube ... 
-File   = /tmp/IsisCube_01.cub
+File   = IsisCube_01.cub
 Samps  = 150
 Lines  = 200
 Bands  = 2
@@ -24,7 +23,6 @@ Base   = 0
 Mult   = 1
 Type   = 7
 Atchd  = 1
-Dtchd  = 0
 Format = 1
 Open   = 1
 R/O    = 0
@@ -33,7 +31,7 @@ Lbytes = 65536
 
 Write cube ... 
 Opening cube ... 
-File   = /tmp/IsisCube_01.cub
+File   = IsisCube_01.cub
 Samps  = 150
 Lines  = 200
 Bands  = 2
@@ -41,7 +39,6 @@ Base   = 0
 Mult   = 1
 Type   = 7
 Atchd  = 1
-Dtchd  = 0
 Format = 1
 Open   = 1
 R/O    = 1
@@ -52,7 +49,7 @@ Comparing cube ...
 
 Creating 8-bit cube ... 
 Comparing cube ... 
-File   = /tmp/IsisCube_02.lbl
+File   = IsisCube_02.lbl
 Samps  = 150
 Lines  = 200
 Bands  = 1
@@ -60,7 +57,6 @@ Base   = 200
 Mult   = -1
 Type   = 1
 Atchd  = 0
-Dtchd  = 1
 Format = 0
 Open   = 1
 R/O    = 1
@@ -69,7 +65,7 @@ Lbytes = 419
 
 Creating 16-bit cube ... 
 Comparing cube ... 
-File   = /tmp/IsisCube_03.cub
+File   = IsisCube_03.cub
 Samps  = 150
 Lines  = 200
 Bands  = 2
@@ -77,7 +73,6 @@ Base   = 30000
 Mult   = -1
 Type   = 4
 Atchd  = 1
-Dtchd  = 0
 Format = 1
 Open   = 1
 R/O    = 1
@@ -134,7 +129,7 @@ Nbands = 1
 Band 1 = 2
 
 ReOpen tests
-File   = /tmp/IsisCube_01.cub
+File   = IsisCube_01.cub
 Samps  = 150
 Lines  = 200
 Bands  = 1
@@ -142,14 +137,13 @@ Base   = 0
 Mult   = 1
 Type   = 7
 Atchd  = 1
-Dtchd  = 0
 Format = 1
 Open   = 1
 R/O    = 1
 R/W    = 0
 Lbytes = 65536
 
-File   = /tmp/IsisCube_01.cub
+File   = IsisCube_01.cub
 Samps  = 150
 Lines  = 200
 Bands  = 1
@@ -157,14 +151,13 @@ Base   = 0
 Mult   = 1
 Type   = 7
 Atchd  = 1
-Dtchd  = 0
 Format = 1
 Open   = 1
 R/O    = 0
 R/W    = 1
 Lbytes = 65536
 
-File   = /tmp/IsisCube_01.cub
+File   = IsisCube_01.cub
 Samps  = 150
 Lines  = 200
 Bands  = 1
@@ -172,7 +165,6 @@ Base   = 0
 Mult   = 1
 Type   = 7
 Atchd  = 1
-Dtchd  = 0
 Format = 1
 Open   = 1
 R/O    = 1
@@ -180,18 +172,19 @@ R/W    = 0
 Lbytes = 65536
 
 Testing errors ... 
-**PROGRAMMER ERROR** Cube::Open - You already have [/tmp/IsisCube_01.cub] opened
-**PROGRAMMER ERROR** Cube::Create - You already have [/tmp/IsisCube_01.cub] opened
-**PROGRAMMER ERROR** The cube [/tmp/IsisCube_01.cub] is opened read-only ... you can't write to it
+**PROGRAMMER ERROR** You already have a cube opened
+**PROGRAMMER ERROR** You already have a cube opened
+**PROGRAMMER ERROR** The cube [IsisCube_01.cub] is opened read-only ... you can't write to it
 **I/O ERROR** Unable to open [blah]
 **PROGRAMMER ERROR** Out of array bounds [2]
 **PROGRAMMER ERROR** Out of array bounds [0]
-**PROGRAMMER ERROR** Cube::Read - Try opening a file before you read it
-**PROGRAMMER ERROR** Cube::Write - Try opening/creating a file before you write it
-**I/O ERROR** Label space is full in [/tmp/IsisCube_04.cub] unable to write labels
-**USER ERROR** The cube you are attempting to create [/tmp/IsisCube_05] is [33527GB] This is larger than the current allowed size of [12GB]. The cube dimensions were (S,L,B) [1000000, 1000000, 9] with [4] bytes per pixel. If you still wish to create this cube, the maximum value can be changed in the file [~/.Isis/IsisPreferences] within the group CubeCustomization, keyword MaximumSize.
-**PROGRAMMER ERROR** Invalid value for argument [access] must be [r,rw]
+**PROGRAMMER ERROR** Try opening a file before you read it
+**PROGRAMMER ERROR** Try opening/creating a file before you write it
+**PROGRAMMER ERROR** Number of samples [0], lines [0], or bands [0] cannot be less than 1
+**I/O ERROR** Label space is full in [IsisCube_04.cub] unable to write labels
+**USER ERROR** The cube you are attempting to create [IsisCube_05] is [33527GB]. This is larger than the current allowed size of [12GB]. The cube dimensions were (S,L,B) [1000000, 1000000, 9] with [4] bytes per pixel. If you still wish to create this cube, the maximum value can be changed in the file [~/.Isis/IsisPreferences] within the group CubeCustomization, keyword MaximumSize.
+**PROGRAMMER ERROR** Unknown value for access [a]. Expected 'r'  or 'rw'
 **PROGRAMMER ERROR** SetDimensions:  Invalid number of sample, lines or bands
 **PROGRAMMER ERROR** SetDimensions:  Invalid number of sample, lines or bands
 **PROGRAMMER ERROR** SetDimensions:  Invalid number of sample, lines or bands
-**PROGRAMMER ERROR** Cannot open read/write [/usgs/cpkgs/isis3/data/base/testData/isisTruth.cub] will be opened read only
+**I/O ERROR** Failed to open [/usgs/cpkgs/isis3/data/base/testData/isisTruth.cub] with read/write access

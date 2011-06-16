@@ -113,10 +113,10 @@ void IsisMain() {
       // Set the input image, get the camera model, and a basic mapping
       // group
       Cube cube;
-      cube.Open(flist[i]);
+      cube.open(flist[i]);
   
-      int lines = cube.Lines();
-      int samples = cube.Samples();
+      int lines = cube.getLineCount();
+      int samples = cube.getSampleCount();
   
   
       PvlObject fmap("File");
@@ -124,7 +124,7 @@ void IsisMain() {
       fmap += PvlKeyword("Lines", lines);
       fmap += PvlKeyword("Samples", samples);
   
-      Camera *cam = cube.Camera();
+      Camera *cam = cube.getCamera();
       Pvl mapping;
       cam->BasicMapping(mapping);
       PvlGroup &mapgrp = mapping.FindGroup("Mapping");

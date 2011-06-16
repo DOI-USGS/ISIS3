@@ -86,5 +86,5 @@ void SaveHiriseAncillaryData(ProcessImportPds &process, Cube *ocube) {
   }
 
   // Add the table to the output cube
-  ocube->Write(table);
+  ocube->write(table);
 }

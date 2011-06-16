@@ -74,7 +74,7 @@ namespace Isis {
 
     // Create a portal buffer for the input file
     Isis::Portal iportal(interp.Samples(), interp.Lines(),
-                         InputCubes[0]->PixelType() ,
+                         InputCubes[0]->getPixelType() ,
                          interp.HotSample(), interp.HotLine());
 
     // Start the progress meter
@@ -82,11 +82,11 @@ namespace Isis {
     p_progress->CheckStatus();
 
     if(p_bandChangeFunct == NULL) {
-      int tilesPerBand = otile.Tiles() / OutputCubes[0]->Bands();
+      int tilesPerBand = otile.Tiles() / OutputCubes[0]->getBandCount();
 
       for(int tile = 1; tile <= tilesPerBand; tile++) {
         bool useLastTileMap = false;
-        for(int band = 1; band <= OutputCubes[0]->Bands(); band++) {
+        for(int band = 1; band <= OutputCubes[0]->getBandCount(); band++) {
           otile.SetTile(tile, band);
 
           if(p_startQuadSize == 2) {
@@ -98,7 +98,7 @@ namespace Isis {
 
           useLastTileMap = true;
 
-          OutputCubes[0]->Write(otile);
+          OutputCubes[0]->write(otile);
           p_progress->CheckStatus();
         }
       }
@@ -121,7 +121,7 @@ namespace Isis {
           QuadTree(otile, iportal, trans, interp, false);
         }
 
-        OutputCubes[0]->Write(otile);
+        OutputCubes[0]->write(otile);
         p_progress->CheckStatus();
       }
     }
@@ -156,14 +156,14 @@ namespace Isis {
       // pixel came from
       if(trans.Xform(inputSamp, inputLine, outputSamp, outputLine)) {
         if((inputSamp < 0.5) || (inputLine < 0.5) ||
-            (inputLine > InputCubes[0]->Lines() + 0.5) ||
-            (inputSamp > InputCubes[0]->Samples() + 0.5)) {
+            (inputLine > InputCubes[0]->getLineCount() + 0.5) ||
+            (inputSamp > InputCubes[0]->getSampleCount() + 0.5)) {
           otile[i] = Isis::NULL8;
         }
         else {
           // Set the position of the portal in the input cube
           iportal.SetPosition(inputSamp, inputLine, outputBand);
-          InputCubes[0]->Read(iportal);
+          InputCubes[0]->read(iportal);
           otile[i] = interp.Interpolate(inputSamp, inputLine, iportal.DoubleBuffer());
         }
       }
@@ -207,7 +207,7 @@ namespace Isis {
         double inputSamp = p_sampMap[line][samp];
         if(inputLine != Isis::NULL8) {
           iportal.SetPosition(inputSamp, inputLine, outputBand);
-          InputCubes[0]->Read(iportal);
+          InputCubes[0]->read(iportal);
           otile[i] = interp.Interpolate(inputSamp, inputLine, iportal.DoubleBuffer());
         }
         else {
@@ -568,8 +568,8 @@ namespace Isis {
         if(trans.Xform(isamp, iline, (double) osamp, (double) oline)) {
           if((isamp >= 0.5) ||
               (iline >= 0.5) ||
-              (iline <= InputCubes[0]->Lines() + 0.5) ||
-              (isamp <= InputCubes[0]->Samples() + 0.5)) {
+              (iline <= InputCubes[0]->getLineCount() + 0.5) ||
+              (isamp <= InputCubes[0]->getSampleCount() + 0.5)) {
             lineMap[lineIndex][sampIndex] = iline;
             sampMap[lineIndex][sampIndex] = isamp;
           }

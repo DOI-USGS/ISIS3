@@ -43,7 +43,7 @@ namespace Isis {
       throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
     }
 
-    if((Isis::IsLsb() &&	inputEndian == "LSB") ||
+    if((Isis::IsLsb() && inputEndian == "LSB") ||
         (Isis::IsMsb()  && inputEndian == "MSB")) {
       p_needSwap = false;
       p_swapDirection = 1;
@@ -69,13 +69,20 @@ namespace Isis {
    * @param buf Input double precision value to swap.
    */
   double EndianSwapper::Double(void *buf) {
-    char *ptr = (char *)buf + (sizeof(double) - 1) * p_needSwap;
+    double result = *(double *)buf;
 
-    for(unsigned int i = 0; i < sizeof(double); i++) {
-      p_swapper.p_char[i] = *ptr;
-      ptr += p_swapDirection;
+    if(p_needSwap) {
+      char *ptr = (char *)buf + (sizeof(double) - 1) * p_needSwap;
+
+      for(unsigned int i = 0; i < sizeof(double); i++) {
+        p_swapper.p_char[i] = *ptr;
+        ptr += p_swapDirection;
+      }
+
+      result = p_swapper.p_double;
     }
-    return p_swapper.p_double;
+
+    return result;
   }
 
 
@@ -85,13 +92,20 @@ namespace Isis {
    * @param buf Input floating point value to swap.
    */
   float EndianSwapper::Float(void *buf) {
-    char *ptr = (char *)buf + (sizeof(float) - 1) * p_needSwap;
+    float result = *(float *)buf;
 
-    for(unsigned int i = 0; i < sizeof(float); i++) {
-      p_swapper.p_char[i] = *ptr;
-      ptr += p_swapDirection;
+    if(p_needSwap) {
+      char *ptr = (char *)buf + (sizeof(float) - 1) * p_needSwap;
+
+      for(unsigned int i = 0; i < sizeof(float); i++) {
+        p_swapper.p_char[i] = *ptr;
+        ptr += p_swapDirection;
+      }
+
+      result = p_swapper.p_float;
     }
-    return p_swapper.p_float;
+
+    return result;
   }
 
 
@@ -108,14 +122,20 @@ namespace Isis {
    * @param buf Input integer value to swap.
    */
   int EndianSwapper::Int(void *buf) {
-    char *ptr = (char *)buf + (sizeof(int) - 1) * p_needSwap;
+    int result = *(int *)buf;
 
-    for(unsigned int i = 0; i < sizeof(int); i++) {
-      p_swapper.p_char[i] = *ptr;
-      ptr += p_swapDirection;
+    if(p_needSwap) {
+      char *ptr = (char *)buf + (sizeof(int) - 1) * p_needSwap;
+
+      for(unsigned int i = 0; i < sizeof(int); i++) {
+        p_swapper.p_char[i] = *ptr;
+        ptr += p_swapDirection;
+      }
+
+      result = p_swapper.p_int;
     }
 
-    return p_swapper.p_int;
+    return result;
   }
 
   /**
@@ -124,14 +144,20 @@ namespace Isis {
    * @param buf Input integer value to swap.
    */
   long long int EndianSwapper::LongLongInt(void *buf) {
-    char *ptr = (char *)buf + (sizeof(long long int) - 1) * p_needSwap;
+    long long int result = *(long long int *)buf;
 
-    for(unsigned int i = 0; i < sizeof(long long int); i++) {
-      p_swapper.p_char[i] = *ptr;
-      ptr += p_swapDirection;
+    if(p_needSwap) {
+      char *ptr = (char *)buf + (sizeof(long long int) - 1) * p_needSwap;
+
+      for(unsigned int i = 0; i < sizeof(long long int); i++) {
+        p_swapper.p_char[i] = *ptr;
+        ptr += p_swapDirection;
+      }
+
+      result = p_swapper.p_longLongInt;
     }
 
-    return p_swapper.p_longLongInt;
+    return result;
   }
 
   /**
@@ -140,13 +166,20 @@ namespace Isis {
    * @param buf Input short integer value to swap.
    */
   short int EndianSwapper::ShortInt(void *buf) {
-    char *ptr = (char *)buf + (sizeof(short int) - 1) * p_needSwap;
+    short int result = *(short int *)buf;
 
-    for(unsigned int i = 0; i < sizeof(short int); i++) {
-      p_swapper.p_char[i] = *ptr;
-      ptr += p_swapDirection;
+    if(p_needSwap) {
+      char *ptr = (char *)buf + (sizeof(short int) - 1) * p_needSwap;
+
+      for(unsigned int i = 0; i < sizeof(short int); i++) {
+        p_swapper.p_char[i] = *ptr;
+        ptr += p_swapDirection;
+      }
+
+      result = p_swapper.p_shortInt;
     }
-    return p_swapper.p_shortInt;
+
+    return result;
   }
 
 
@@ -156,13 +189,20 @@ namespace Isis {
    * @param buf Input unsigned short integer value to swap.
    */
   unsigned short int EndianSwapper::UnsignedShortInt(unsigned short int *buf) {
-    char *ptr = (char *)buf + (sizeof(unsigned short int) - 1) * p_needSwap;
+    unsigned short int result = *(unsigned short int *)buf;
 
-    for(unsigned int i = 0; i < sizeof(unsigned short int); i++) {
-      p_swapper.p_char[i] = *ptr;
-      ptr += p_swapDirection;
+    if(p_needSwap) {
+      char *ptr = (char *)buf + (sizeof(unsigned short int) - 1) * p_needSwap;
+
+      for(unsigned int i = 0; i < sizeof(unsigned short int); i++) {
+        p_swapper.p_char[i] = *ptr;
+        ptr += p_swapDirection;
+      }
+
+      result = p_swapper.p_uShortInt;
     }
-    return p_swapper.p_uShortInt;
+
+    return result;
   }
 }
 

@@ -29,7 +29,7 @@ void IsisMain() {
   // Make sure it is a Themis EDR/RDR
   Filename inFilename = ui.GetFilename("FROM");
   try {
-    if(icube->GetGroup("Instrument")["InstrumentID"][0] != "THEMIS_VIS") {
+    if(icube->getGroup("Instrument")["InstrumentID"][0] != "THEMIS_VIS") {
       string msg = "This program is intended for use on THEMIS VIS images only. [";
       msg += inFilename.Expanded() + "] does not appear to be a THEMIS VIS image.";
       throw iException::Message(iException::User, msg, _FILEINFO_);
@@ -41,7 +41,7 @@ void IsisMain() {
     throw iException::Message(iException::User, msg, _FILEINFO_);
   }
 
-  frameletSize = 192 / (int)icube->GetGroup("Instrument")["SpatialSumming"][0];
+  frameletSize = 192 / (int)icube->getGroup("Instrument")["SpatialSumming"][0];
   frameletTopTrimSize = ui.GetInteger("TOPTRIM");
   frameletLeftTrimSize = ui.GetInteger("LEFTTRIM");
   frameletRightTrimSize = ui.GetInteger("RIGHTTRIM");
@@ -94,7 +94,7 @@ bool NeedsTrimmed(int line) {
 void CalculateBottomTrim(Cube *icube) {
   frameletBottomTrimSize = 0;
 
-  if(icube->Camera() == NULL) {
+  if(icube->getCamera() == NULL) {
     string msg = "A camera is required to automatically ";
     msg += "calculate the bottom trim of a cube. Please run spiceinit on the input cube";
     throw iException::Message(iException::Camera, msg, _FILEINFO_);
@@ -104,7 +104,7 @@ void CalculateBottomTrim(Cube *icube) {
   //   a known even-framelet camera and a known odd-framelet camera. In order
   //   to get these, we change the cube labels in a local copy and create an
   //   odd framelet and an even framelet camera.
-  Pvl cubeLabels = *icube->Label();
+  Pvl cubeLabels = *icube->getLabel();
   PvlKeyword &framelets = cubeLabels.FindGroup("Instrument", Pvl::Traverse)["Framelets"];
   framelets = "Even";
   Camera *camEven = CameraFactory::Create(cubeLabels);

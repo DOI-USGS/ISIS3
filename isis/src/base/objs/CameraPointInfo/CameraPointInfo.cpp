@@ -71,7 +71,7 @@ namespace Isis {
    */
   void CameraPointInfo::SetCube(const std::string   &cubeFilename) {
     currentCube = usedCubes->OpenCube(cubeFilename);
-    camera = currentCube->Camera();
+    camera = currentCube->getCamera();
   }
 
 
@@ -103,7 +103,7 @@ namespace Isis {
    */
   PvlGroup *CameraPointInfo::SetCenter(const bool outside, const bool errors) {
     if(CheckCube()) {
-      bool passed = camera->SetImage(currentCube->Samples() / 2.0, currentCube->Lines() / 2.0);
+      bool passed = camera->SetImage(currentCube->getSampleCount() / 2.0, currentCube->getLineCount() / 2.0);
       return GetPointInfo(passed, outside, errors);
     }
     // Should never get here, error will be thrown in CheckCube()
@@ -121,7 +121,7 @@ namespace Isis {
   PvlGroup *CameraPointInfo::SetSample(const double sample,
                                        const bool outside, const bool errors) {
     if(CheckCube()) {
-      bool passed = camera->SetImage(sample, currentCube->Lines() / 2.0);
+      bool passed = camera->SetImage(sample, currentCube->getLineCount() / 2.0);
       return GetPointInfo(passed, outside, errors);
     }
     // Should never get here, error will be thrown in CheckCube()
@@ -139,7 +139,7 @@ namespace Isis {
   PvlGroup *CameraPointInfo::SetLine(const double line,
                                      const bool outside, const bool errors) {
     if(CheckCube()) {
-      bool passed = camera->SetImage(currentCube->Samples() / 2.0, line);
+      bool passed = camera->SetImage(currentCube->getSampleCount() / 2.0, line);
       return GetPointInfo(passed, outside, errors);
     }
     // Should never get here, error will be thrown in CheckCube()
@@ -266,7 +266,7 @@ namespace Isis {
       }
       // Set all keywords that still have valid information
       gp->FindKeyword("Error").SetValue(error);
-      gp->FindKeyword("Filename").SetValue(currentCube->Filename());
+      gp->FindKeyword("Filename").SetValue(currentCube->getFilename());
       gp->FindKeyword("Sample").SetValue(camera->Sample());
       gp->FindKeyword("Line").SetValue(camera->Line());
       gp->FindKeyword("EphemerisTime").SetValue(camera->Time().Et(), "seconds");
@@ -280,19 +280,19 @@ namespace Isis {
 
     else {
 
-      Brick b(3, 3, 1, currentCube->PixelType());
+      Brick b(3, 3, 1, currentCube->getPixelType());
 
       int intSamp = (int)(camera->Sample() + 0.5);
       int intLine = (int)(camera->Line() + 0.5);
       b.SetBasePosition(intSamp, intLine, 1);
-      currentCube->Read(b);
+      currentCube->read(b);
 
       double pB[3], spB[3], sB[3];
       string utc;
       double ssplat, ssplon, sslat, sslon, pwlon, oglat;
 
       {
-        gp->FindKeyword("Filename").SetValue(currentCube->Filename());
+        gp->FindKeyword("Filename").SetValue(currentCube->getFilename());
         gp->FindKeyword("Sample").SetValue(camera->Sample());
         gp->FindKeyword("Line").SetValue(camera->Line());
         gp->FindKeyword("PixelValue").SetValue(PixelToString(b[0]));

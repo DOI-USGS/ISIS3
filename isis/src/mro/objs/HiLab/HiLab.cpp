@@ -27,7 +27,7 @@ using namespace Isis;
 
 //! Constructs a HiLab Object
 HiLab::HiLab(Cube *cube) {
-  PvlGroup group = cube->GetGroup("Instrument");
+  PvlGroup group = cube->getGroup("Instrument");
   p_cpmmNumber = group["CpmmNumber"];
   p_channel = group["ChannelNumber"];
 

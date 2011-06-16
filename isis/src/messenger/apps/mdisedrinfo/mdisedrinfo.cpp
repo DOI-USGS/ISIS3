@@ -56,10 +56,10 @@ void IsisMain() {
 
 // Ensure a proper target before initialization
       Cube cube;
-      cube.Open(temp.Expanded(), "rw");
-      Pvl *label = cube.Label();
+      cube.open(temp.Expanded(), "rw");
+      Pvl *label = cube.getLabel();
       MdisGeometry::validateTarget(*label, true);
-      cube.Close();
+      cube.close();
 
       //  Run spiceinit on it
       ProgramLauncher::RunIsisProgram("spiceinit", "from=" + temp.Expanded());

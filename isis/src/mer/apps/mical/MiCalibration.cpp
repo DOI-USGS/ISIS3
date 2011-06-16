@@ -24,7 +24,8 @@ namespace Isis {
      */
 
     void MiCalibration::ReadLabels(Cube &image) {
-      PvlGroup labelgrp = image.Label()->FindGroup("Instrument", Pvl::Traverse);
+      PvlGroup labelgrp =
+          image.getLabel()->FindGroup("Instrument", Pvl::Traverse);
       p_exposureDuration = labelgrp["ExposureDuration"];
       p_instrumentSerialNumber = labelgrp["InstrumentSerialNumber"];
       p_CCDTemperature = labelgrp["InstrumentTemperature"][6];

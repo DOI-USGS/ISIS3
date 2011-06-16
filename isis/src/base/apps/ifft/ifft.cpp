@@ -31,16 +31,18 @@ void IsisMain() {
   Cube *magCube = lProc.SetInputCube("MAGNITUDE");
   Cube *phaseCube = lProc.SetInputCube("PHASE");
 
-  int numSamples = magCube->Samples();
-  int numLines = magCube->Lines();
-  int numBands = magCube->Bands();
+  int numSamples = magCube->getSampleCount();
+  int numLines = magCube->getLineCount();
+  int numBands = magCube->getBandCount();
 
   // error checking for valid input cubes
   // i.e. the dimensions of the magnitude and phase cubes
   // are the same and are powers of two
   if(!fft.IsPowerOfTwo(numSamples) || !fft.IsPowerOfTwo(numLines)
-      || magCube->Samples() != phaseCube->Samples() || magCube->Lines() != phaseCube->Lines()) {
-    cerr << "Invalid Cubes: the dimensions of both cubes must be equal powers of 2." << endl;
+      || magCube->getSampleCount() != phaseCube->getSampleCount()
+      || magCube->getLineCount() != phaseCube->getLineCount()) {
+    cerr << "Invalid Cubes: the dimensions of both cubes must be equal"
+            " powers of 2." << endl;
     return;
   }
 

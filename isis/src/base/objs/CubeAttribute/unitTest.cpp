@@ -10,13 +10,13 @@
  */
 
 /***********************************************************************
-*				PLEASE NOTE				*
+*                             PLEASE NOTE                              *
 * This unit test modifies the truth file that it is meant to be tested *
 * against. The reason for this is that the output of the unit test is  *
 * dependent upon the system architecture, so an unchanged truth file   *
 * will only be correct on LSB xor MSB machines. To see the code that   *
-* changes CubeAttriube.truth, go to lines 254 - ###			*
-*									*
+* changes CubeAttriube.truth, go to lines 254 - ###                    *
+*                                                                      *
 ***********************************************************************/
 
 #include <iostream>
@@ -253,7 +253,6 @@ void ReportOutput(Isis::CubeAttributeOutput *att, string orderHint) {
   cout << "Minimum              = " << att->Minimum() << endl;
   cout << "Maximum              = " << att->Maximum() << endl;
   cout << "FileFormatStr        = " << att->FileFormatStr() << endl;
-  cout << "FileFormat enum      = " << CubeFormatName(att->FileFormat()) << endl;
 
 //  cout << "ByteOrderStr         = " << att->ByteOrderStr() << endl;
 //  cout << "ByteOrder enum       = " << Isis::ByteOrderName(att->ByteOrder()) << endl;

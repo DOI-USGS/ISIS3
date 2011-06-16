@@ -46,9 +46,9 @@ void IsisMain() {
   Cube * icube = p.SetInputCube("FROM", OneBand);
 
   // If it is already calibrated then complain
-  if (icube->HasGroup("Radiometry")) {
-    string msg = "This Mariner 10 image [" + icube->Filename() + "] has already been ";
-    msg += "radiometrically calibrated";
+  if (icube->hasGroup("Radiometry")) {
+    string msg = "This Mariner 10 image [" + icube->getFilename() + "] has "
+                 "already been radiometrically calibrated";
     throw iException::Message(iException::User,msg,_FILEINFO_);
   }
 
@@ -56,7 +56,7 @@ void IsisMain() {
   std::string instId = inst["InstrumentId"];
   string camera = instId.substr(instId.size()-1);
 
-  iString filter = (string)(icube->GetGroup("BandBin"))["FilterName"];
+  iString filter = (string)(icube->getGroup("BandBin"))["FilterName"];
   filter = filter.UpCase().substr(0,3);
   
   string target = inst["TargetName"];
@@ -111,14 +111,14 @@ void IsisMain() {
   }
 
   if (ui.WasEntered ("COEFCUBE")) {
-    coCube.Open(ui.GetFilename("COEFCUBE"));
+    coCube.open(ui.GetFilename("COEFCUBE"));
   }
   else {
     Filename coFile("$mariner10/calibration/mariner_10_" + filter + "_" +
         camera + "_coef.cub");
-    coCube.Open(coFile.Expanded());
+    coCube.open(coFile.Expanded());
   }
-  coef = new Brick(icube->Samples(), 1, 6, coCube.PixelType());
+  coef = new Brick(icube->getSampleCount(), 1, 6, coCube.getPixelType());
 
   if (ui.WasEntered("ABSCOEF")) {
     absCoef = ui.GetDouble("ABSCOEF");
@@ -141,12 +141,12 @@ void IsisMain() {
 
   // Get the distance between Mars and the Sun at the given time in
   // Astronomical Units (AU)
-  Camera * cam = icube->Camera();
-  bool camSuccess = cam->SetImage(icube->Samples()/2,icube->Lines()/2);
+  Camera * cam = icube->getCamera();
+  bool camSuccess = cam->SetImage(icube->getSampleCount()/2,icube->getLineCount()/2);
   if (!camSuccess) {
     throw iException::Message(iException::Camera,
         "Unable to calculate the Solar Distance on [" +
-        icube->Filename() + "]", _FILEINFO_);
+        icube->getFilename() + "]", _FILEINFO_);
   }
   sunDist = cam->SolarDistance();
 
@@ -156,12 +156,14 @@ void IsisMain() {
   // Add the radiometry group
   PvlGroup calgrp("Radiometry");
 
-  calgrp += PvlKeyword("DarkCurrentCube", dcCube->Filename());
-  if (useBlem) calgrp += PvlKeyword("BlemishRemovalCube", blemCube->Filename());
-  calgrp += PvlKeyword("CoefficientCube", coCube.Filename());
+  calgrp += PvlKeyword("DarkCurrentCube", dcCube->getFilename());
+  if (useBlem) {
+    calgrp += PvlKeyword("BlemishRemovalCube", blemCube->getFilename());
+  }
+  calgrp += PvlKeyword("CoefficientCube", coCube.getFilename());
   calgrp += PvlKeyword("AbsoluteCoefficient", absCoef);
 
-  ocube->PutGroup(calgrp);
+  ocube->putGroup(calgrp);
   
   // Start the line-by-line calibration sequence
   p.StartProcess(Mar10Cal);
@@ -178,7 +180,7 @@ void Mar10Cal (std::vector<Isis::Buffer *> & inCubes,
   Buffer * blem = (useBlem) ? inCubes[2] : 0;
 
   coef->SetBasePosition(1, in.Line(), 1);
-  coCube.Read(*coef);
+  coCube.read(*coef);
 
   // Loop and apply calibration
   for (int samp = 0; samp < in.size(); samp++) {

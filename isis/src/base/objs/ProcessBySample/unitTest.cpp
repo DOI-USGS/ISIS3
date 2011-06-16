@@ -37,10 +37,10 @@ void IsisMain() {
   p.EndProcess();
 
   Isis::Cube cube;
-  cube.Open("/tmp/isisProcessBySample_01");
-  cube.Close(true);
-  cube.Open("/tmp/isisProcessBySample_02");
-  cube.Close(true);
+  cube.open("/tmp/isisProcessBySample_01");
+  cube.close(true);
+  cube.open("/tmp/isisProcessBySample_02");
+  cube.close(true);
 }
 
 void oneInput(Isis::Buffer &b) {

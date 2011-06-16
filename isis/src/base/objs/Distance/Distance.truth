@@ -67,6 +67,19 @@ Distance 1 = Distance 2... Distance 1 = 1000 meters
 Distance 1 += Distance 2... Distance 1 = 2000 meters
 Distance 1 -= Distance 2... Distance 1 = 1000 meters
 
+Distance 1: 10 meters
+Distance 2: 10 meters
+Distance 1: 10 pixels
+Distance 2: 100 pixels
+Distance 1 > Distance 2 ? 0
+Distance 1 >= Distance 2 ? 1
+Distance 1 == Distance 2 ? 1
+Distance 1 <= Distance 2 ? 1
+Distance 1 < Distance 2 ? 0
+Distance 1 + Distance 2 ? 20 meters
+Distance 1 - Distance 2 ? 0 meters
+Distance 1 = Distance 2... Distance 1 = 10 meters
+
 ----- Testing Error Checking -----
 
 **PROGRAMMER ERROR** Negative distances are not supported, the value [-1.0 meters] cannot be stored in the Distance class

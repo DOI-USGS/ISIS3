@@ -22,488 +22,158 @@
  */
 
 #include "CubeTileHandler.h"
+
+#include <QFile>
+
 #include "iException.h"
-#include "SpecialPixel.h"
-#include <cstdio>
+#include "Pvl.h"
+#include "PvlObject.h"
+#include "PvlKeyword.h"
+#include "RawCubeChunk.h"
 
 using namespace std;
+
 namespace Isis {
-  CubeTileHandler::CubeTileHandler(IsisCubeDef &cube) :
-    Isis::CubeIoHandler(cube) {
+  /**
+   * Construct a tile handler. This will determine a good chunk size to put
+   *   into the output cube.
+   *
+   * @param dataFile The file with cube DN data in it
+   * @param virtualBandList The mapping from virtual band to physical band
+   * @param labels The Pvl labels for the cube
+   * @param alreadyOnDisk True if the cube is allocated on the disk, false
+   *     otherwise
+   */
+  CubeTileHandler::CubeTileHandler(QFile * dataFile,
+      QList<int> *virtualBandList, const Pvl &labels, bool alreadyOnDisk)
+      : CubeIoHandler(dataFile, virtualBandList, labels, alreadyOnDisk) {
 
-
-    Isis::PvlObject &core = p_cube->label.FindObject("IsisCube").FindObject("Core");
+    const PvlObject &core = labels.FindObject("IsisCube").FindObject("Core");
 
     if(core.HasKeyword("Format")) {
-      p_tileSamples = core["TileSamples"];
-      p_tileLines = core["TileLines"];
+      setChunkSizes(core["TileSamples"], core["TileLines"], 1);
     }
     else {
-      core += Isis::PvlKeyword("Format", "Tile");
-      p_tileSamples = 128;
-      p_tileLines = 128;
-      core += Isis::PvlKeyword("TileSamples", p_tileSamples);
-      core += Isis::PvlKeyword("TileLines", p_tileLines);
+      // up to 1MB chunks
+      int sampleChunkSize =
+          findGoodSize(512 * 4 / SizeOf(getPixelType()), getSampleCount());
+      int lineChunkSize =
+          findGoodSize(512 * 4 / SizeOf(getPixelType()), getLineCount());
+
+      setChunkSizes(sampleChunkSize, lineChunkSize, 1);
     }
-
-    p_bytesPerTile = p_tileLines * p_tileSamples * Isis::SizeOf(p_cube->pixelType);
-    p_sampleTiles = (p_cube->samples - 1) / p_tileSamples + 1;
-    p_lineTiles = (p_cube->lines - 1) / p_tileLines + 1;
-
-    p_maxTiles = p_lineTiles;
-    if(p_maxTiles < p_sampleTiles) p_maxTiles = p_sampleTiles;
-    if(p_maxTiles < p_cube->bands) p_maxTiles = p_cube->bands;
-
-    p_cube->dataBytes = (streampos) p_sampleTiles *
-                        (streampos) p_lineTiles *
-                        (streampos) p_cube->bands *
-                        (streampos) p_bytesPerTile;
-
-    p_bufList.clear();
-    p_cacheList.clear();
-    p_lastCache = -1;
-    p_nullCache.buf = NULL;
-    p_tileAllocated.clear();
   }
 
+
+  /**
+   * Writes all data from memory to disk.
+   */
   CubeTileHandler::~CubeTileHandler() {
-    Close();
+    clearCache();
   }
 
-  void CubeTileHandler::Create(bool overwrite) {
-    Isis::CubeIoHandler::Create(overwrite);
 
-    p_tileAllocated.resize(p_sampleTiles * p_lineTiles * p_cube->bands);
-    unsigned int ntiles = p_tileAllocated.size();
-    for(unsigned int i = 0; i < ntiles; i++) {
-      p_tileAllocated[i] = false;
-    }
+  /**
+   * Update the cube labels so that this cube indicates what tile size it used.
+   *
+   * @param labels The "Core" object in this Pvl will be updated
+   */
+  void CubeTileHandler::updateLabels(Pvl &labels) {
+    PvlObject &core = labels.FindObject("IsisCube").FindObject("Core");
+    core.AddKeyword(PvlKeyword("Format", "Tile"),
+                    PvlContainer::Replace);
+    core.AddKeyword(PvlKeyword("TileSamples", getSampleCountInChunk()),
+                    PvlContainer::Replace);
+    core.AddKeyword(PvlKeyword("TileLines", getLineCountInChunk()),
+                    PvlContainer::Replace);
   }
 
-  void CubeTileHandler::Close(const bool removeFile) {
-    // Don't do much if the file wasn't opened
-    if(!p_cube->stream.is_open()) return;
 
-    // Empty the cache
-    unsigned int listSize = p_cacheList.size();
-    for(unsigned int i = 0; i < listSize; i++) {
-      if(p_cacheList[i]->buf != NULL) {
-        InternalCache *cache = p_cacheList[i];
-        WriteCache(cache);
-        delete [] cache->buf;
-        cache->buf = NULL;
-      }
-      delete p_cacheList[i];
-      p_cacheList[i] = NULL;
-    }
-    p_cacheList.clear();
-    p_bufList.clear();
+  void CubeTileHandler::readRaw(RawCubeChunk &chunkToFill) const {
+    BigInt startByte = getTileStartByte(chunkToFill);
 
-    // Write any tiles which where never allocated
-    if(p_nullCache.buf == NULL) MakeNullCache();
-    unsigned int ntiles = p_tileAllocated.size();
-    for(unsigned int i = 0; i < ntiles; i++) {
-      if(!p_tileAllocated[i]) {
-        WriteTile(p_nullCache.buf, i + 1);
+    bool success = false;
+
+    QFile * dataFile = getDataFile();
+    if(dataFile->seek(startByte)) {
+      QByteArray binaryData = dataFile->read(chunkToFill.getByteCount());
+
+      if(binaryData.size() == chunkToFill.getByteCount()) {
+        chunkToFill.setRawData(binaryData);
+        success = true;
       }
     }
 
-    p_tileAllocated.clear();
-    delete [] p_nullCache.buf;
-    p_nullCache.buf = NULL;
-
-    // Close the stream and possible remove
-    p_cube->stream.close();
-    if(removeFile) remove(p_cube->dataFile.c_str());
-  }
-
-  void CubeTileHandler::Read(Isis::Buffer &rbuf) {
-    // See if the cache needs to get bigger
-    GrowCache(rbuf);
-
-    // Starting corner in the Isis::Buffer
-    const int &ssamp = rbuf.Sample();
-    const int &sline = rbuf.Line();
-    const int &sband = rbuf.Band();
-
-    // Ending corner in the Isis::Buffer
-    const int &lastElementIndex = rbuf.size() - 1;
-    const int &esamp = rbuf.Sample(lastElementIndex);
-    const int &eline = rbuf.Line(lastElementIndex);
-    const int &eband = rbuf.Band(lastElementIndex);
-
-    // Current corner of a cache we will work on
-    p_sample = ssamp;
-    p_line = sline;
-    int tempBand = sband;
-
-    InternalCache *cache;
-    char *rawbuf = (char *) rbuf.RawBuffer();
-    int ss, es, sl, el;
-
-    while(tempBand <= eband) {
-      p_band = p_cube->virtualBandList[tempBand-1];
-      cache = FindCache();
-
-      ss = (p_sample > cache->startSamp) ? p_sample : cache->startSamp;
-      es = (esamp < cache->endSamp) ? esamp : cache->endSamp;
-      sl = (p_line > cache->startLine) ? p_line : cache->startLine;
-      el = (eline < cache->endLine) ? eline : cache->endLine;
-
-      // Don't worry about fixing the NULL cache index since everything is
-      // NULL in the buffer
-      int cacheIndex = (sl - cache->startLine) * p_tileSamples +
-                       ss - cache->startSamp;
-      int rawIndex = rbuf.Index(ss, sl, tempBand);
-      int rawAdd = rbuf.SampleDimension();
-      int ns = es - ss + 1;
-
-      for(int line = sl; line <= el; line++) {
-        Move(rawbuf, rawIndex, cache->buf, cacheIndex, ns);
-        cacheIndex += p_tileSamples;
-        rawIndex += rawAdd;
-      }
-
-      p_sample = cache->endSamp + 1;
-      if(p_sample > esamp) {
-        p_sample = ssamp;
-        p_line = cache->endLine + 1;
-        if(p_line > eline) {
-          p_line = sline;
-          tempBand++;
-        }
-      }
-    }
-  }
-
-  void CubeTileHandler::Write(Isis::Buffer &wbuf) {
-    // Put an error check here if the access is ReadOnly
-
-    // See if the cache needs to get bigger
-    GrowCache(wbuf);
-
-    // Starting corner in the Isis::Buffer
-    // We don't care about pixels outside the cube
-    int ssamp = (wbuf.Sample() < 1) ? 1 : wbuf.Sample();
-    int sline = (wbuf.Line() < 1) ? 1 : wbuf.Line();
-    int sband = (wbuf.Band() < 1) ? 1 : wbuf.Band();
-
-    // Ending corner in the Isis::Buffer
-    int esamp = (wbuf.Sample(wbuf.size() - 1) > p_cube->samples) ? p_cube->samples : wbuf.Sample(wbuf.size() - 1);
-    int eline = (wbuf.Line(wbuf.size() - 1) > p_cube->lines) ? p_cube->lines : wbuf.Line(wbuf.size() - 1);
-    int eband = (wbuf.Band(wbuf.size() - 1) > p_cube->bands) ? p_cube->bands : wbuf.Band(wbuf.size() - 1);
-
-    // Current corner of a cache we will work on
-    p_sample = ssamp;
-    p_line = sline;
-    p_band = sband;
-
-    InternalCache *cache;
-    char *rawbuf = (char *) wbuf.RawBuffer();
-    int ss, es, sl, el;
-
-    while(p_band <= eband) {
-      cache = FindCache();
-      cache->dirty = true;
-
-      // Find the samples/lines/bands that are in this cache
-      ss = (p_sample > cache->startSamp) ? p_sample : cache->startSamp;
-      es = (esamp < cache->endSamp) ? esamp : cache->endSamp;
-      sl = (p_line > cache->startLine) ? p_line : cache->startLine;
-      el = (eline < cache->endLine) ? eline : cache->endLine;
-
-      // Don't worry about fixing the NULL cache index since everything is
-      // NULL in the buffer
-      int cacheIndex = (sl - cache->startLine) * p_tileSamples +
-                       ss - cache->startSamp;
-      int rawIndex = wbuf.Index(ss, sl, p_band);
-      int rawAdd = wbuf.SampleDimension();
-      int ns = es - ss + 1;
-
-      for(int line = sl; line <= el; line++) {
-        Move(cache->buf, cacheIndex, rawbuf, rawIndex, ns);
-        cacheIndex += p_tileSamples;
-        rawIndex += rawAdd;
-      }
-
-      p_sample = cache->endSamp + 1;
-      if(p_sample > esamp) {
-        p_sample = ssamp;
-        p_line = cache->endLine + 1;
-        if(p_line > eline) {
-          p_line = sline;
-          p_band++;
-        }
-      }
+    if(!success) {
+      iString msg = "Reading from the file [" + dataFile->fileName() + "] "
+          "failed with reading [" +
+          QString::number(chunkToFill.getByteCount()) +
+          "] bytes at position [" + QString::number(startByte) + "]";
+      throw iException::Message(iException::Io, msg, _FILEINFO_);
     }
   }
 
 
-  void CubeTileHandler::ClearCache() {
-    // Empty the cache
-    unsigned int listSize = p_cacheList.size();
-    for(unsigned int i = 0; i < listSize; i++) {
-      if(p_cacheList[i]->buf != NULL) {
-        InternalCache *cache = p_cacheList[i];
-        WriteCache(cache);
-        delete [] cache->buf;
-        cache->buf = NULL;
+  void CubeTileHandler::writeRaw(const RawCubeChunk &chunkToWrite) const {
+    BigInt startByte = getTileStartByte(chunkToWrite);
+    bool success = false;
+
+    QFile * dataFile = getDataFile();
+    if(dataFile->seek(startByte)) {
+      BigInt dataWritten = dataFile->write(chunkToWrite.getRawData());
+
+      if(dataWritten == chunkToWrite.getByteCount()) {
+        success = true;
       }
-      delete p_cacheList[i];
-      p_cacheList[i] = NULL;
     }
 
-    p_cacheList.clear();
-    p_bufList.clear();
-
-    if(p_nullCache.buf != NULL) {
-      delete [] p_nullCache.buf;
-      p_nullCache.buf = NULL;
+    if(!success) {
+      iString msg = "Writing to the file [" + dataFile->fileName() + "] "
+          "failed with writing [" +
+          QString::number(chunkToWrite.getByteCount()) +
+          "] bytes at position [" + QString::number(startByte) + "]";
+      throw iException::Message(iException::Io, msg, _FILEINFO_);
     }
   }
 
-  void CubeTileHandler::GrowCache(const Isis::Buffer &buf) {
-    // The old method created a new cache for every new buffer used
-    // on a cube
-#if 0
-    if(p_nullCache.buf == NULL) MakeNullCache();
 
-    for(unsigned int i = 0; i < p_bufList.size(); i++) {
-      if(&buf == p_bufList[i]) return;
-    }
-    p_bufList.push_back(&buf);
+  /**
+   * This is a helper method that tries to compute a good tile size for
+   *   one of the cube's dimensions (sample or line). Band tile size is always
+   *   1 for this format currently.
+   *
+   * @param maxSize The largest allowed size
+   * @param dimensionSize The cube's size in the dimension we're figuring out
+   *     (that is, number of samples or number of lines).
+   */
+  int CubeTileHandler::findGoodSize(int maxSize, int dimensionSize) const {
+    int ideal = 128;
 
-    for(int i = 0; i < p_maxTiles; i++) {
-      InternalCache *cache = new InternalCache;
-      cache->buf = NULL;
-      p_cacheList.push_back(cache);
-    }
-#endif
-
-    // The new method makes six tiles sets worth of caches total.
-    // Six was used to ensure large highpass filters don't thrash
-    if(p_nullCache.buf != NULL) return;
-
-    MakeNullCache();
-    for(int j = 0; j < 6; j++) {
-      for(int i = 0; i < p_maxTiles; i++) {
-        InternalCache *cache = new InternalCache;
-        cache->buf = NULL;
-        p_cacheList.push_back(cache);
-      }
-    }
-  }
-
-  CubeTileHandler::InternalCache *CubeTileHandler::FindCache() {
-    // See if its outside the image
-    if((p_sample < 1) || (p_line < 1) || (p_band < 1) ||
-        (p_sample > p_cube->samples) || (p_line > p_cube->lines) || (p_band > p_cube->bands)) {
-
-      if(p_sample <= 0) {
-        p_nullCache.startSamp = (p_sample - p_tileSamples) / p_tileSamples * p_tileSamples + 1;
-      }
-      else {
-        p_nullCache.startSamp = (p_sample - 1) / p_tileSamples * p_tileSamples + 1;
-      }
-
-      if(p_line <= 0) {
-        p_nullCache.startLine = (p_line - p_tileLines) / p_tileLines * p_tileLines + 1;
-      }
-      else {
-        p_nullCache.startLine = (p_line - 1) / p_tileLines * p_tileLines + 1;
-      }
-
-      p_nullCache.endSamp = p_nullCache.startSamp + p_tileSamples - 1;
-      p_nullCache.endLine = p_nullCache.startLine + p_tileLines - 1;
-
-      p_nullCache.band = p_band;
-      p_nullCache.dirty = false;
-      return &p_nullCache;
-    }
-
-    // Look through the cache list to see if we already have the cache
-    // but check the last cache first
-    if(p_lastCache >= 0) {
-      InternalCache *cache;
-      std::vector<InternalCache *>::iterator cacheIterator(p_cacheList.begin()
-          + p_lastCache);
-
-      if(p_lastCache > 0) {
-        cacheIterator --;
-      }
-
-      std::vector<InternalCache *>::iterator cacheEnd(p_cacheList.end());
-
-      // end when we return to start
-      std::vector<InternalCache *>::iterator loopEnd(cacheIterator);
-
-      bool loopStarted = false;
-
-      while(p_cacheList.size() && (!loopStarted || cacheIterator != loopEnd)) {
-        loopStarted = true;
-        cache = *cacheIterator;
-        if(cache->buf != NULL) {
-          if((p_sample >= cache->startSamp) && (p_sample <= cache->endSamp) &&
-              (p_line >= cache->startLine)   && (p_line <= cache->endLine)   &&
-              (p_band == cache->band)) {
-            p_lastCache = cacheIterator - p_cacheList.begin();
-            return cache;
-          }
-        }
-
-        cacheIterator ++;
-
-        if(cacheIterator == cacheEnd)
-          cacheIterator = p_cacheList.begin();
-      }
-    }
-
-    // Ok its not in the cache see if there is an open slot
-    InternalCache *cache = NULL;
-    unsigned int listSize = p_cacheList.size();
-    for(unsigned int i = 0; i < listSize; i++) {
-      if(p_cacheList[i]->buf == NULL) {
-        cache = p_cacheList[i];
-        cache->buf = new char [p_bytesPerTile];
-        cache->dirty = false;
-        p_lastCache = i;
-        break;
-      }
-    }
-
-    // If there are no open slots so chose one to get rid of
-    if(cache == NULL) {
-      p_lastCache++;
-      if(p_lastCache >= (int)p_cacheList.size()) p_lastCache = 0;
-      cache = p_cacheList[p_lastCache];
-    }
-
-    // Write out the tile
-    WriteCache(cache);
-
-    // Set up for reading the  tile
-    cache->startSamp = (p_sample - 1) / p_tileSamples * p_tileSamples + 1;
-    cache->startLine = (p_line - 1)   / p_tileLines   * p_tileLines   + 1;
-    cache->endSamp = cache->startSamp + p_tileSamples - 1;
-    cache->endLine = cache->startLine + p_tileLines - 1;
-    cache->band = p_band;
-    cache->dirty = false;
-
-    int startTile = (cache->band - 1) * p_sampleTiles * p_lineTiles +
-                    (cache->startLine - 1) / p_tileLines * p_sampleTiles +
-                    (cache->startSamp - 1) / p_tileSamples + 1;
-
-    // If this cube is being created the tile may not exist so we
-    // shouldn't try to read it
-    if(p_tileAllocated.size() > 0) {
-      if(!p_tileAllocated[startTile-1]) {
-        memmove(cache->buf, p_nullCache.buf, p_bytesPerTile);
-        p_tileAllocated[startTile-1] = true;
-        cache->dirty = true;
-        return cache;
-      }
-    }
-
-    // Ok looks like we need to read the tile
-    streampos sbyte = (streampos)(p_cube->startByte - 1) +
-                      (streampos)(startTile - 1) * (streampos) p_bytesPerTile;
-    p_cube->stream.seekg(sbyte, std::ios::beg);
-    if(!p_cube->stream.good()) {
-      string msg = "Error preparing to read data from cube";
-      throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
-    }
-
-    int bytes = p_bytesPerTile;
-    p_cube->stream.read(cache->buf, bytes);
-    if(!p_cube->stream.good()) {
-      string msg = "Error reading data from cube";
-      throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
-    }
-
-    // We have a cache containing the line sample
-    return cache;
-  }
-
-  void CubeTileHandler::Move(char *dest, int dindex,
-                             char *src, int sindex,
-                             int nelements) {
-    // Don't change the null cache
-    if(dest == p_nullCache.buf) return;
-
-    int nbytes = Isis::SizeOf(p_cube->pixelType);
-    if((p_native) || (nbytes == 1) || (!p_native && (src == p_nullCache.buf))) {
-      memmove(&dest[dindex*nbytes], &src[sindex*nbytes], nelements * nbytes);
-    }
-    else if(nbytes == 2) {
-      int d = dindex * nbytes;
-      int s = sindex * nbytes;
-      for(int i = 0; i < nelements; i++) {
-        dest[d] = src[s+1];
-        dest[d+1] = src[s];
-        d += 2;
-        s += 2;
-      }
+    if(dimensionSize <= maxSize) {
+      ideal = dimensionSize;
     }
     else {
-      int d = dindex * nbytes;
-      int s = sindex * nbytes;
-      for(int i = 0; i < nelements; i++) {
-        dest[d] = src[s+3];
-        dest[d+1] = src[s+2];
-        dest[d+2] = src[s+1];
-        dest[d+3] = src[s];
-        d += 4;
-        s += 4;
+      int greatestDividend = maxSize;
+
+      while(greatestDividend > ideal) {
+        if(dimensionSize % greatestDividend == 0) {
+          ideal = greatestDividend;
+        }
+
+        greatestDividend --;
       }
     }
+
+    return ideal;
   }
 
-  void CubeTileHandler::MakeNullCache() {
-    p_nullCache.buf = new char[p_bytesPerTile];
 
-    for(int i = 0; i < p_tileSamples * p_tileLines; i++) {
-      if(p_cube->pixelType == Isis::UnsignedByte) {
-        ((unsigned char *)p_nullCache.buf)[i] = Isis::NULL1;
-      }
-      else if(p_cube->pixelType == Isis::SignedWord) {
-        ((short *)p_nullCache.buf)[i] = Isis::NULL2;
-      }
-      else if(p_cube->pixelType == Isis::Real) {
-        ((float *)p_nullCache.buf)[i] = Isis::NULL4;
-      }
-      else {
-        string msg = "Unsupported pixel type";
-        throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
-      }
-    }
-
-  }
-
-  void CubeTileHandler::WriteCache(CubeTileHandler::InternalCache *cache) {
-    // Do nothing if the cache isn't dirty
-    if(!cache->dirty) return;
-
-    // Otherwise compute tile number and write it
-    int tile = (cache->band - 1) * p_sampleTiles * p_lineTiles +
-               (cache->startLine - 1) / p_tileLines * p_sampleTiles +
-               (cache->startSamp - 1) / p_tileSamples + 1;
-    WriteTile(cache->buf, tile);
-  }
-
-  void CubeTileHandler::WriteTile(char *buf, int tile) {
-    streampos sbyte = (streampos)(p_cube->startByte - 1) +
-                      (streampos)(tile - 1) * (streampos)p_bytesPerTile;
-    p_cube->stream.seekp(sbyte, std::ios::beg);
-    if(!p_cube->stream.good()) {
-      string msg = "Error preparing to write data to cube";
-      throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
-    }
-
-    int bytes = p_bytesPerTile;
-    p_cube->stream.write(buf, bytes);
-    if(!p_cube->stream.good()) {
-      string msg = "Error writing data to cube";
-      throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
-    }
+  /**
+   * This is a helper method that goes from chunk to file position.
+   *
+   * @param chunk The chunk to locate in the file.
+   */
+  BigInt CubeTileHandler::getTileStartByte(const RawCubeChunk &chunk) const {
+    return getDataStartByte() + getChunkIndex(chunk) * getBytesPerChunk();
   }
 }

@@ -58,38 +58,38 @@ void IsisMain() {
       // Determine bit size and output range
       if(ui.GetString("BITTYPE") == "8BIT") {
         jp2type = Isis::UnsignedByte;
-        jp2buf[0] = new char[icube->Samples()];
+        jp2buf[0] = new char[icube->getSampleCount()];
         p.SetOutputType(Isis::UnsignedByte);
         p.SetOutputRange(1.0, 255.0);
         p.SetOutputNull(0.0);
-        JP2_encoder = new JP2Encoder(ui.GetFilename("TO"), icube->Samples(),
-                                     icube->Lines(), icube->Bands(), Isis::UnsignedByte);
+        JP2_encoder = new JP2Encoder(ui.GetFilename("TO"), icube->getSampleCount(),
+                                     icube->getLineCount(), icube->getBandCount(), Isis::UnsignedByte);
         datamin = 0;
         datamax = 255;
       }
       else if(ui.GetString("BITTYPE") == "S16BIT") {
         jp2type = Isis::SignedWord;
-        for(int i = 0; i < icube->Bands(); i++) {
-          jp2buf[i] = new char[icube->Samples()*2];
+        for(int i = 0; i < icube->getBandCount(); i++) {
+          jp2buf[i] = new char[icube->getSampleCount()*2];
         }
         p.SetOutputType(Isis::SignedWord);
         p.SetOutputNull(-32768.0);
         p.SetOutputRange(-32752.0, 32767.0);
-        JP2_encoder = new JP2Encoder(ui.GetFilename("TO"), icube->Samples(),
-                                     icube->Lines(), icube->Bands(), Isis::SignedWord);
+        JP2_encoder = new JP2Encoder(ui.GetFilename("TO"), icube->getSampleCount(),
+                                     icube->getLineCount(), icube->getBandCount(), Isis::SignedWord);
         datamin = -32752;
         datamax = 32767;
       }
       else if(ui.GetString("BITTYPE") == "U16BIT") {
         jp2type = Isis::UnsignedWord;
-        for(int i = 0; i < icube->Bands(); i++) {
-          jp2buf[i] = new char[icube->Samples()*2];
+        for(int i = 0; i < icube->getBandCount(); i++) {
+          jp2buf[i] = new char[icube->getSampleCount()*2];
         }
         p.SetOutputType(Isis::UnsignedWord);
         p.SetOutputNull(0.0);
         p.SetOutputRange(3.0, 65522.0);
-        JP2_encoder = new JP2Encoder(ui.GetFilename("TO"), icube->Samples(),
-                                     icube->Lines(), icube->Bands(), Isis::UnsignedWord);
+        JP2_encoder = new JP2Encoder(ui.GetFilename("TO"), icube->getSampleCount(),
+                                     icube->getLineCount(), icube->getBandCount(), Isis::UnsignedWord);
         datamin = 3;
         datamax = 65522;
       }
@@ -124,39 +124,39 @@ void IsisMain() {
       if(ui.GetString("BITTYPE") == "8BIT") {
         jp2type = Isis::UnsignedByte;
         for(int i = 0; i < 3; i++) {
-          jp2buf[i] = new char[redcube->Samples()];
+          jp2buf[i] = new char[redcube->getSampleCount()];
         }
         p.SetOutputType(Isis::UnsignedByte);
         p.SetOutputRange(1.0, 255.0);
         p.SetOutputNull(0.0);
-        JP2_encoder = new JP2Encoder(ui.GetFilename("TO"), redcube->Samples(),
-                                     redcube->Lines(), 3, Isis::UnsignedByte);
+        JP2_encoder = new JP2Encoder(ui.GetFilename("TO"), redcube->getSampleCount(),
+                                     redcube->getLineCount(), 3, Isis::UnsignedByte);
         datamin = 0;
         datamax = 255;
       }
       else if(ui.GetString("BITTYPE") == "S16BIT") {
         jp2type = Isis::SignedWord;
         for(int i = 0; i < 3; i++) {
-          jp2buf[i] = new char[redcube->Samples()*2];
+          jp2buf[i] = new char[redcube->getSampleCount()*2];
         }
         p.SetOutputType(Isis::SignedWord);
         p.SetOutputNull(-32768.0);
         p.SetOutputRange(-32752.0, 32767.0);
-        JP2_encoder = new JP2Encoder(ui.GetFilename("TO"), redcube->Samples(),
-                                     redcube->Lines(), 3, Isis::SignedWord);
+        JP2_encoder = new JP2Encoder(ui.GetFilename("TO"), redcube->getSampleCount(),
+                                     redcube->getLineCount(), 3, Isis::SignedWord);
         datamin = -32752;
         datamax = 32767;
       }
       else if(ui.GetString("BITTYPE") == "U16BIT") {
         jp2type = Isis::UnsignedWord;
         for(int i = 0; i < 3; i++) {
-          jp2buf[i] = new char[redcube->Samples()*2];
+          jp2buf[i] = new char[redcube->getSampleCount()*2];
         }
         p.SetOutputType(Isis::UnsignedWord);
         p.SetOutputNull(0.0);
         p.SetOutputRange(3.0, 65522.0);
-        JP2_encoder = new JP2Encoder(ui.GetFilename("TO"), redcube->Samples(),
-                                     redcube->Lines(), 3, Isis::UnsignedWord);
+        JP2_encoder = new JP2Encoder(ui.GetFilename("TO"), redcube->getSampleCount(),
+                                     redcube->getLineCount(), 3, Isis::UnsignedWord);
         datamin = 3;
         datamax = 65522;
       }
@@ -193,39 +193,39 @@ void IsisMain() {
       if(ui.GetString("BITTYPE") == "8BIT") {
         jp2type = Isis::UnsignedByte;
         for(int i = 0; i < 4; i++) {
-          jp2buf[i] = new char[alphacube->Samples()];
+          jp2buf[i] = new char[alphacube->getSampleCount()];
         }
         p.SetOutputType(Isis::UnsignedByte);
         p.SetOutputRange(1.0, 255.0);
         p.SetOutputNull(0.0);
-        JP2_encoder = new JP2Encoder(ui.GetFilename("TO"), alphacube->Samples(),
-                                     alphacube->Lines(), 4, Isis::UnsignedByte);
+        JP2_encoder = new JP2Encoder(ui.GetFilename("TO"), alphacube->getSampleCount(),
+                                     alphacube->getLineCount(), 4, Isis::UnsignedByte);
         datamin = 0;
         datamax = 255;
       }
       else if(ui.GetString("BITTYPE") == "S16BIT") {
         jp2type = Isis::SignedWord;
         for(int i = 0; i < 4; i++) {
-          jp2buf[i] = new char[alphacube->Samples()*2];
+          jp2buf[i] = new char[alphacube->getSampleCount()*2];
         }
         p.SetOutputType(Isis::SignedWord);
         p.SetOutputNull(-32768.0);
         p.SetOutputRange(-32752.0, 32767.0);
-        JP2_encoder = new JP2Encoder(ui.GetFilename("TO"), alphacube->Samples(),
-                                     alphacube->Lines(), 4, Isis::SignedWord);
+        JP2_encoder = new JP2Encoder(ui.GetFilename("TO"), alphacube->getSampleCount(),
+                                     alphacube->getLineCount(), 4, Isis::SignedWord);
         datamin = -32752;
         datamax = 32767;
       }
       else if(ui.GetString("BITTYPE") == "U16BIT") {
         jp2type = Isis::UnsignedWord;
         for(int i = 0; i < 4; i++) {
-          jp2buf[i] = new char[alphacube->Samples()*2];
+          jp2buf[i] = new char[alphacube->getSampleCount()*2];
         }
         p.SetOutputType(Isis::UnsignedWord);
         p.SetOutputNull(0.0);
         p.SetOutputRange(3.0, 65522.0);
-        JP2_encoder = new JP2Encoder(ui.GetFilename("TO"), alphacube->Samples(),
-                                     alphacube->Lines(), 4, Isis::UnsignedWord);
+        JP2_encoder = new JP2Encoder(ui.GetFilename("TO"), alphacube->getSampleCount(),
+                                     alphacube->getLineCount(), 4, Isis::UnsignedWord);
         datamin = 3;
         datamax = 65522;
       }
@@ -282,8 +282,8 @@ void IsisMain() {
     // Cubes with less than three bands will be greyscale
     if(mode == "GRAYSCALE") {
       Cube *icube = p.SetInputCube("FROM", Isis::OneBand);
-      checkDataSize(icube->Lines(), icube->Samples(), mode);
-      qimage = new QImage(icube->Samples(), icube->Lines(), QImage::Format_Indexed8);
+      checkDataSize(icube->getLineCount(), icube->getSampleCount(), mode);
+      qimage = new QImage(icube->getSampleCount(), icube->getLineCount(), QImage::Format_Indexed8);
       qimage->setNumColors(256);
       QVector<QRgb> colors;
       //  create the color table (black = 0 to white = 255)
@@ -300,10 +300,10 @@ void IsisMain() {
     //     (1st band -> red, 2nd band -> green, 3rd band -> blue)
     else if(mode == "RGB") {
       Cube *redcube = p.SetInputCube("RED", Isis::OneBand);
-      checkDataSize(redcube->Lines(), redcube->Samples(), mode);
+      checkDataSize(redcube->getLineCount(), redcube->getSampleCount(), mode);
       p.SetInputCube("GREEN", Isis::OneBand);
       p.SetInputCube("BLUE", Isis::OneBand);
-      qimage = new QImage(redcube->Samples(), redcube->Lines(), QImage::Format_RGB32);
+      qimage = new QImage(redcube->getSampleCount(), redcube->getLineCount(), QImage::Format_RGB32);
       if(ui.GetString("STRETCH") == "MANUAL") {
         p.SetInputRange(ui.GetDouble("RMIN"), ui.GetDouble("RMAX"), 0);
         p.SetInputRange(ui.GetDouble("GMIN"), ui.GetDouble("GMAX"), 1);
@@ -326,11 +326,11 @@ void IsisMain() {
     }
     else if(mode == "ARGB") {
       Cube *alpha = p.SetInputCube("ALPHA", Isis::OneBand);
-      checkDataSize(alpha->Lines(), alpha->Samples(), mode);
+      checkDataSize(alpha->getLineCount(), alpha->getSampleCount(), mode);
       p.SetInputCube("RED", Isis::OneBand);
       p.SetInputCube("GREEN", Isis::OneBand);
       p.SetInputCube("BLUE", Isis::OneBand);
-      qimage = new QImage(alpha->Samples(), alpha->Lines(), QImage::Format_ARGB32);
+      qimage = new QImage(alpha->getSampleCount(), alpha->getLineCount(), QImage::Format_ARGB32);
       if(ui.GetString("STRETCH") == "MANUAL") {
         p.SetInputRange(ui.GetDouble("AMIN"), ui.GetDouble("AMAX"), 0);
         p.SetInputRange(ui.GetDouble("RMIN"), ui.GetDouble("RMAX"), 1);
@@ -487,7 +487,7 @@ void toARGBImage(vector<Buffer *> &in) {
 // Write a line of data to the JP2 object
 void toJP2(Buffer &in) {
   int dn;
-  for(int i = 0; i < icube->Samples(); i++) {
+  for(int i = 0; i < icube->getSampleCount(); i++) {
     dn = ((int)in[i] < datamin) ? datamin : (int)in[i];
     dn = ((int)in[i] > datamax) ? datamax : (int)in[i];
     if(jp2type == Isis::UnsignedByte) {

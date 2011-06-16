@@ -64,7 +64,7 @@ namespace Isis {
 
   void Histogram::InitializeFromCube(Cube &cube, const int band, Progress *progress) {
     // Make sure band is valid
-    if((band < 0) || (band > cube.Bands())) {
+    if((band < 0) || (band > cube.getBandCount())) {
       string msg = "Invalid band in [Histogram constructor]";
       throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
     }
@@ -72,30 +72,30 @@ namespace Isis {
     double min, max;
     int nbins;
 
-    if(cube.PixelType() == Isis::UnsignedByte) {
-      min = 0.0 * cube.Multiplier() + cube.Base();
-      max = 255.0 * cube.Multiplier() + cube.Base();
+    if(cube.getPixelType() == Isis::UnsignedByte) {
+      min = 0.0 * cube.getMultiplier() + cube.getBase();
+      max = 255.0 * cube.getMultiplier() + cube.getBase();
       nbins = 256;
     }
-    else if(cube.PixelType() == Isis::SignedWord) {
-      min = -32768.0 * cube.Multiplier() + cube.Base();
-      max = 32767.0 * cube.Multiplier() + cube.Base();
+    else if(cube.getPixelType() == Isis::SignedWord) {
+      min = -32768.0 * cube.getMultiplier() + cube.getBase();
+      max = 32767.0 * cube.getMultiplier() + cube.getBase();
       nbins = 65536;
     }
-    else if(cube.PixelType() == Isis::Real) {
+    else if(cube.getPixelType() == Isis::Real) {
       // Determine the band for statistics
       int bandStart = band;
       int bandStop = band;
-      int maxSteps = cube.Lines();
+      int maxSteps = cube.getLineCount();
       if(band == 0) {
         bandStart = 1;
-        bandStop = cube.Bands();
-        maxSteps = cube.Lines() * cube.Bands();
+        bandStop = cube.getBandCount();
+        maxSteps = cube.getLineCount() * cube.getBandCount();
       }
 
       // Construct a line buffer manager and a statistics object
       LineManager line(cube);
-      Statistics stats = Statistics();
+      Statistics stats;
 
       // Prep for reporting progress if necessary
       if(progress != NULL) {
@@ -107,9 +107,9 @@ namespace Isis {
 
       for(int useBand = bandStart ; useBand <= bandStop ; useBand++) {
         // Loop and get the statistics for a good minimum/maximum
-        for(int i = 1; i <= cube.Lines(); i++) {
+        for(int i = 1; i <= cube.getLineCount(); i++) {
           line.SetLine(i, useBand);
-          cube.Read(line);
+          cube.read(line);
           stats.AddData(line.DoubleBuffer(), line.size());
           if(progress != NULL) progress->CheckStatus();
         }

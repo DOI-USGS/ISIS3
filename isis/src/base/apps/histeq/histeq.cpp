@@ -25,8 +25,8 @@ void IsisMain() {
   int increment = ui.GetInteger("INCREMENT");
 
   // Histograms from input cubes
-  Histogram *from = icube->Histogram();
-  Histogram *match = icube->Histogram();
+  Histogram *from = icube->getHistogram();
+  Histogram *match = icube->getHistogram();
 
   double fromMin = from->Percent(minimum);
   double fromMax = from->Percent(maximum);

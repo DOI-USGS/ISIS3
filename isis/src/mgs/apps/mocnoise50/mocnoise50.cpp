@@ -49,7 +49,7 @@ void IsisMain() {
   ProcessByLine p;
   Cube *icube = p.SetInputCube("FROM", OneBand);
   MocLabels moc(Application::GetUserInterface().GetFilename("FROM"));
-  int nlines = icube->Lines();
+  int nlines = icube->getLineCount();
 
   // Must be narrow angle
   if(moc.WideAngle()) {

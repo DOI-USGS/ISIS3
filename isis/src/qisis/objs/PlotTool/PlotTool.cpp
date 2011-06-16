@@ -343,7 +343,7 @@ namespace Qisis {
       p_plotToolWindow->setViewport(cvp);
       connect(cvp, SIGNAL(viewportUpdated()), p_plotToolWindow, SLOT(drawBandMarkers()));
 
-      Pvl &pvl = *cvp->cube()->Label();
+      Pvl &pvl = *cvp->cube()->getLabel();
       PvlGroup &dim = pvl.FindObject("IsisCube")
                       .FindObject("Core")
                       .FindGroup("Dimensions");
@@ -509,7 +509,7 @@ namespace Qisis {
       xMax = labels.size();
       Cube *cube = cvp->cube();
 
-      Pvl &pvl = *cube->Label();
+      Pvl &pvl = *cube->getLabel();
 
       Statistics scalingStats;
       for(unsigned int index = 0; index < labels.size(); index++) {
@@ -852,7 +852,7 @@ namespace Qisis {
     if(samps < 1) samps = 1;
     Cube *cube = cvp->cube();
     Brick *brick = new Brick(*cube, samps, 1, 1);
-    Pvl &pvl = *cvp->cube()->Label();
+    Pvl &pvl = *cvp->cube()->getLabel();
 
     if(RubberBandTool::getMode() == RubberBandTool::Polygon) {
       samps = 1;
@@ -888,14 +888,14 @@ namespace Qisis {
     }
 
 
-    for(int band = 1; band <= cube->Bands(); band++) {
+    for(int band = 1; band <= cube->getBandCount(); band++) {
       Statistics stats;
 
       /*Rectangle*/
       if(RubberBandTool::getMode() == RubberBandTool::Rectangle) {
         for(int line = (int)std::min(sl, el); line <= (int)std::max(sl, el); line++) {
           brick->SetBasePosition((int)ss, line, band);
-          cube->Read(*brick);
+          cube->read(*brick);
           stats.AddData(brick->DoubleBuffer(), samps);
           //if(*brick->DoubleBuffer() == Null) {
           //if(*brick->DoubleBuffer() == NULL) {
@@ -916,7 +916,7 @@ namespace Qisis {
         for(unsigned int j = 0; j < x_contained.size(); j++) {
 
           brick->SetBasePosition(x_contained[j], y_contained[j], band);
-          cube->Read(*brick);
+          cube->read(*brick);
           stats.AddData(*brick->DoubleBuffer());
 
         }
@@ -1005,7 +1005,8 @@ namespace Qisis {
       interp.SetType(Interpolator::NearestNeighborType);
     }
 
-    Portal dataReader(interp.Samples(), interp.Lines(), cvp->cube()->PixelType());
+    Portal dataReader(interp.Samples(), interp.Lines(),
+                      cvp->cube()->getPixelType());
 
     int lineLength = (int)(sqrt(pow(ss - es, 2) + pow(sl - el, 2)) + 0.5); //round to the nearest pixel increment
     int band = ((cvp->isGray()) ? cvp->grayBand() : cvp->redBand());
@@ -1020,7 +1021,7 @@ namespace Qisis {
         y -= (interp.Lines() / 2.0); // move back for interpolation
 
         dataReader.SetPosition(x, y, band);
-        cvp->cube()->Read(dataReader);
+        cvp->cube()->read(dataReader);
         double result = interp.Interpolate(x, y, dataReader.DoubleBuffer());
 
         if(!IsSpecial(result)) {
@@ -1055,7 +1056,7 @@ namespace Qisis {
         // x/y are now the centered on the appropriate place of the green line, i.e. the start of our walk across the rectangle
         for(int walkIndex = 0; walkIndex < numStepsAcross; walkIndex++) {
           dataReader.SetPosition(x, y, band);
-          cvp->cube()->Read(dataReader);
+          cvp->cube()->read(dataReader);
           double result = interp.Interpolate(x, y, dataReader.DoubleBuffer());
 
           if(!IsSpecial(result)) {

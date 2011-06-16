@@ -20,15 +20,15 @@ void IsisMain() {
   
   Isis::PvlGroup &dataDir = Isis::Preference::Preferences().FindGroup("DataDirectory");
   PvlTranslationTable tTable(p.MissionData("base", "translations/MissionName2DataDir.trn"));
-  iString missionDir = dataDir[tTable.Translate("MissionName", (inCube->GetGroup("Instrument")).FindKeyword("SpacecraftName")[0])][0];
-  string camera = (inCube->GetGroup("Instrument")).FindKeyword("InstrumentId")[0];
+  iString missionDir = dataDir[tTable.Translate("MissionName", (inCube->getGroup("Instrument")).FindKeyword("SpacecraftName")[0])][0];
+  string camera = (inCube->getGroup("Instrument")).FindKeyword("InstrumentId")[0];
   
   CubeAttributeInput cai;
   p.SetInputCube(missionDir + "/calibration/" + camera + "_flatfield.cub", cai);
   
   CubeAttributeOutput cao;
   cao.PixelType(Isis::Real);
-  p.SetOutputCube((Filename((Application::GetUserInterface()).GetAsString("TO")).Expanded()), cao, inCube->Samples(), inCube->Lines(), inCube->Bands());
+  p.SetOutputCube((Filename((Application::GetUserInterface()).GetAsString("TO")).Expanded()), cao, inCube->getSampleCount(), inCube->getLineCount(), inCube->getBandCount());
   
   p.StartProcess(cal);
   p.EndProcess();

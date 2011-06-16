@@ -18,8 +18,8 @@ int main(int argc, char *argv[]) {
   // Allocate a cube
   Isis::Cube *cube = new Isis::Cube;
   try {
-    cube->SetDimensions(ns, nl, nb);
-    cube->Create(fname);
+    cube->setDimensions(ns, nl, nb);
+    cube->create(fname);
   }
   catch(Isis::iException &e) {
     delete cube;
@@ -70,5 +70,5 @@ int main(int argc, char *argv[]) {
        << tile2.Line() << ", "
        << tile2.Band() << ")" << endl;
 
-  cube->Close(true);
+  cube->close(true);
 }

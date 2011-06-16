@@ -23,14 +23,21 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include "CubeIoHandler.h"
-#include "Blob.h"
+#include "Endian.h"
+#include "PixelType.h"
 
+class QFile;
 class QMutex;
 
 namespace Isis {
+  class Blob;
+  class Buffer;
   class Camera;
+  class CubeIoHandler;
+  class iString;
   class Projection;
+  class Pvl;
+  class PvlGroup;
   class Statistics;
   class Histogram;
 
@@ -108,7 +115,11 @@ namespace Isis {
    *            projection existance test
    *   @history 2010-03-22 Steven Lambright - Added a mutex for reading and writing,
    *            which makes these methods thread safe.
-   *   @history 2011-03-23 Steven Lambright - Added ClearCache method. 
+   *   @history 2011-03-23 Steven Lambright - Added ClearCache method.
+   *   @history 2011-06-01 Jai Rideout and Steven Lambright - Updated API to
+   *            conform to new Isis standards, re-implemented IO handler and
+   *            implemented new caching algorithms that can automatically apply
+   *            themselves when the behavior of the caller changes.
    *
    */
   class Cube {
@@ -116,233 +127,234 @@ namespace Isis {
       Cube();
       virtual ~Cube();
 
-      void Open(const std::string &cfile, std::string access = "r");
-      void ReOpen(std::string access = "r");
-      void Create(const std::string &cfile);
-
       /**
-       * Returns if the cube is opened.
-       *
-       * @return bool True if the cube is opened, false if it is not.
+       * These are the possible storage formats of Isis3 cubes. There is an
+       *   internal IO handler for each one of these.
        */
-      bool IsOpen() {
-        return p_cube.stream.is_open();
+      enum Format {
+        /**
+         * Cubes are stored in band-sequential format, that is the order of the
+         *   pixels in the file (on disk) is:
+         *     S1,L1,B1
+         *     S2,L1,B1
+         *     and so on until ...
+         *     SN,L1,B1
+         *     S1,L2,B1
+         *     and so on until ...
+         *     S1,LN,B1
+         *     S1,L1,B2
+         *     S2,L1,B2
+         *     and so on until ...
+         *     S1,L1,BN
+         *
+         * The idea is the cubes are stored left-to-right, top-to-bottom, then
+         *   front-to-back.
+         */
+        Bsq,
+        /**
+         * Cubes are stored in tile format, that is the order of the
+         *   pixels in the file (on disk) is BSQ within a given sub-area defined
+         *   by the Tile I/O handler. Typically these tiles are around 1MB for
+         *   efficiency.
+         *
+         * The idea is the cubes are stored left-to-right, top-to-bottom inside
+         *   the tiles (which have 1 band). The tiles are themselves in BSQ
+         *   order also. Please note that this can cause cubes to be larger
+         *   on disk due to the tile size not being evenly divisible into the
+         *   cube size.
+         *
+         * Cube:
+         * ------------------------------
+         * |Tile *Tile *Tile *Tile *Tile|*
+         * |  0  *  1  *  2  *  3  *  4 |*
+         * |     *     *     *     *    |*
+         * |****************************|*
+         * |Tile *Tile *Tile *Tile *Tile|*
+         * |  5  *  6  *  7  *  8  *  9 |*
+         * |     *     *     *     *    |*
+         * |****************************|*
+         * |Tile *Tile *Tile *Tile *Tile|*
+         * ------------------------------*
+         * * 10  * 11  * 12  * 13  * 14  *
+         * *******************************
+         *
+         * The symbol '*' denotes tile boundaries.
+         * The symbols '-' and '|' denote cube boundaries.
+         */
+        Tile
       };
 
-      /**
-       * Returns if the cube is opened readonly. Default more for Open method.
-       *
-       * @return bool True if the cube is opened readonly, false if it is not.
-       */
-      bool IsReadOnly() const {
-        return p_cube.access == IsisCubeDef::ReadOnly;
-      };
+      bool isOpen() const;
+      bool isProjected() const;
+      bool isReadOnly() const;
+      bool isReadWrite() const;
+      bool labelsAttached() const;
 
-      /**
-       * Returns if the cube is opened read/write.
-       *
-       * @return bool True if the cube is opened read/write, false if it is not.
-       */
-      bool IsReadWrite() const {
-        return p_cube.access == IsisCubeDef::ReadWrite;
-      };
+      void close(bool remove = false);
+      void create(const iString &cfile);
+      void open(const iString &cfile, iString access = "r");
+      void reopen(iString access = "r");
 
-      void Close(const bool remove = false);
-      void Read(Isis::Buffer &rbuf);
-      void Write(Isis::Buffer &wbuf);
-      void Read(Isis::Blob &blob);
-      void Write(Isis::Blob &blob);
-      bool BlobDelete(std::string BlobType, std::string BlobName);
+      void read(Blob &blob) const;
+      void read(Buffer &rbuf);
+      void write(Blob &blob);
+      void write(Buffer &wbuf);
 
-      /**
-       * Returns the expanded filename.
-       *
-       * @return std::string The expanded filename.
-       */
-      inline std::string Filename() const {
-        return p_cube.labelFile;
-      };
+      void setBaseMultiplier(double base, double mult);
+      void setMinMax(double min, double max);
+      void setByteOrder(ByteOrder byteOrder);
+      void setDimensions(int ns, int nl, int nb);
+      void setFormat(Format format);
+      void setLabelsAttached(bool attached);
+      void setLabelSize(int labelBytes);
+      void setPixelType(PixelType pixelType);
+      void setVirtualBands(const QList<iString> &vbands);
+      void setVirtualBands(const std::vector<std::string> &vbands);
 
-      /**
-       * Returns a pointer to the IsisLabel object associated with the cube.
-       * Modifications made to the label will be written when the file is closed if
-       * it was opened read-write or created. Take care not to mangle the Core Object
-       * as this can produce unexpected results when a new attempt is made to open
-       * the file.
-       *
-       * @return Isis::Pvl Pointer to the Label object associated with the cube.
-       */
-      inline Isis::Pvl *Label() {
-        return &p_cube.label;
-      };
+      int getBandCount() const;
+      double getBase() const;
+      ByteOrder getByteOrder() const;
+      Camera *getCamera();
+      iString getFilename() const;
+      Format getFormat() const;
+      Histogram *getHistogram(const int &band = 1,
+                               iString msg = "Gathering histogram");
+      Histogram *getHistogram(const int &band, const double &validMin,
+                               const double &validMax,
+                               iString msg = "Gathering histogram");
+      Pvl *getLabel() const;
+      int getLabelSize(bool actual = false) const;
+      int getLineCount() const;
+      double getMultiplier() const;
+      PixelType getPixelType() const;
+      int getPhysicalBand(const int &virtualBand) const;
+      Projection *getProjection();
+      int getSampleCount() const;
+      Statistics *getStatistics(const int &band = 1,
+                                 iString msg = "Gathering statistics");
+      Statistics *getStatistics(const int &band, const double &validMin,
+                                 const double &validMax,
+                                 iString msg = "Gathering statistics");
 
-      void SetLabelBytes(int labelBytes);
-      void SetDimensions(int ns, int nl, int nb);
-      void SetPixelType(Isis::PixelType pixelType);
-      void SetCubeFormat(Isis::CubeFormat cubeFormat);
-      void SetByteOrder(Isis::ByteOrder byteOrder);
-      void SetMinMax(double min, double max);
-      void SetBaseMultiplier(double base, double mult);
-      void SetAttached();
-      void SetDetached();
-
-      /**
-       * Returns the number of bytes reserved for the label.
-       *
-       * @return int The number of bytes used for the label.
-       */
-      inline int LabelBytes() const {
-        return p_cube.labelBytes;
-      };
-      int LabelBytesUsed();
-
-      /**
-       * Returns the number of samples in the cube.
-       *
-       * @return int The number of samples in the cube.
-       */
-      inline int Samples() const {
-        return p_cube.samples;
-      };
-
-      /**
-       * Returns the number of lines in the cube.
-       *
-       * @return int The number of lines in the cube.
-       */
-      inline int Lines() const {
-        return p_cube.lines;
-      };
-      int Bands() const;
-
-      /**
-       * Returns an enumeration of the PixelType.
-       * @see PixelType.h
-       *
-       * return Isis::PixelType An enumeration of the PixelType.
-       */
-      inline Isis::PixelType PixelType() const {
-        return p_cube.pixelType;
-      };
-
-      /**
-       * Returns an enumeration of the cube format (tiled or bsq).
-       * @see CubeFormat.h
-       *
-       * @return Isis::CubeFormat An enumeration of the cube format.
-       */
-      inline Isis::CubeFormat CubeFormat() const {
-        return p_cube.cubeFormat;
-      };
-
-      /**
-       * Returns an enumeration of the byte order (Isb or Msb).
-       * @see Endian.h
-       *
-       * @return Isis::ByteOrder An enumeration of the byte order.
-       */
-      inline Isis::ByteOrder ByteOrder() const {
-        return p_cube.byteOrder;
-      };
-
-      /**
-       * Returns if the cube and label data are in the same file.
-       *
-       * @return bool True if the cube and label data are in the same file,
-       *              false if they are not.
-       */
-      inline bool IsAttached() const {
-        return p_cube.attached;
-      };
-
-      /**
-       * Returns if the cube and label data are in separate files.
-       *
-       * @return bool Returns true if the cube and label data are in separate
-       *              files, false if they are in the same file.
-       */
-      inline bool IsDetached() const {
-        return !p_cube.attached;
-      };
-
-      /**
-       * Returns the base value for converting 8-bit/16-bit pixels to 32-bit.
-       * @f[
-       * out = in * multiplier + base
-       * @f]
-       *
-       * @return double The base value for converting 8-bit/16-bit pixels to
-       *                32-bit.
-       */
-      inline double Base() const {
-        return p_cube.base;
-      };
-
-      /**
-       * Returns the multiplier value for converting 8-bit/16-bit pixels to 32-bit.
-       * @f[
-       * out = in * multiplier + base
-       * @f]
-       *
-       * @return double The multiplier value for converting 8-bit/16-bit pixels
-       *                to 32-bit.
-       */
-      inline double Multiplier() const {
-        return p_cube.multiplier;
-      };
-
-      void SetVirtualBands(const std::vector<std::string> &vbands);
-      int PhysicalBand(const int virtualBand) const;
-
-      bool HasProjection();
-
-      Isis::Camera *Camera();
-      Isis::Projection *Projection();
-      Isis::Statistics *Statistics(const int band = 1, std::string msg = "Gathering statistics");
-      Isis::Statistics *Statistics(const int band, const double validMin, const double validMax, std::string msg = "Gathering statistics");
-      Isis::Histogram *Histogram(const int band = 1, std::string msg = "Gathering histogram");
-      Isis::Histogram *Histogram(const int band, const double validMin, const double validMax, std::string msg = "Gathering histogram");
-
-      // Change a group in the labels
-      void PutGroup(Isis::PvlGroup &group);
-
-      // Return a group in a label
-      Isis::PvlGroup &GetGroup(const std::string &group);
-
-      // Delete a group in the labels
-      void DeleteGroup(const std::string &group);
-
-      // Check to see if a group is in the labels
-      bool HasGroup(const std::string &group);
-
-      bool HasTable(const std::string &name);
-
-      void ClearCache();
+      void clearIoCache();
+      bool deleteBlob(iString BlobType, iString BlobName);
+      void deleteGroup(const iString &group);
+      PvlGroup &getGroup(const iString &group) const;
+      bool hasGroup(const iString &group) const;
+      bool hasTable(const iString &name);
+      void putGroup(PvlGroup &group);
 
     private:
-      IsisCubeDef p_cube;
-      Isis::CubeIoHandler *p_ioHandler;
+      void cleanUp(bool remove);
+      QFile *getDataFile() const;
+      void initialize();
+      void openCheck();
+      void reformatOldIsisLabel(const iString &oldCube);
+      void writeLabels();
 
-      bool p_overwritePreference;
-      bool p_historyPreference;
-      bool p_attachedPreference;
-      BigInt p_maxSizePreference;
+    private:
+      /**
+       * This is the file that contains the labels always; if labels are
+       *   attached then this contains the file data also. The method
+       *   getDataFile() will always give you the appropriate QFile member for
+       *   reading cube data; this should always be used for the labels.
+       *
+       * If isOpen() is true, then this is allocated.
+       */
+      QFile *m_labelFile;
+      /**
+       * This is only sometimes allocated. This is used for when IsOpen is true
+       *   and labels are detached so the QFile for the labels does not give
+       *   us cube data.
+       */
+      QFile *m_dataFile;
 
-      void WriteLabels();
-      void ReformatOldIsisLabel(const std::string &oldCube);
-      void OpenCheck();
+      /**
+       * This does the heavy lifting for cube DN I/O and is always allocated
+       *   when isOpen() is true.
+       */
+      CubeIoHandler *m_ioHandler;
 
-      std::vector<std::string> p_virtualBandList;
-      void SetVirtualBands();
+      /**
+       * The byte order of the opened cube; if there is no open cube then
+       *   this is the byte order that will be used when a new cube is created.
+       *   Defaults to the OS's byte order.
+       */
+      ByteOrder m_byteOrder;
 
-      std::string p_tempCube;
-      std::string p_formatTemplateFile;
+      /**
+       * If isOpen() then this is the I/O format that the cube uses. If there is
+       *   no file opened then this is the I/O format that will be used if a
+       *   cube is created (using create(...)). This defaults to Tile.
+       */
+      Format m_format;
 
-      Isis::Camera *p_camera;
-      Isis::Projection *p_projection;
+      /**
+       * This is the pixel type on disk. If a cube is open, then this will be
+       *   the opened cube's pixel type. Otherwise, if a cube is created with
+       *   create(...) then this pixel type will be used. The default is Real.
+       */
+      PixelType m_pixelType;
 
-      QMutex *p_mutex;
+      //! Basic thread-safety mutex; this class is not optimized for threads.
+      QMutex *m_mutex;
+
+      //! Camera allocated from the getCamera() method.
+      Camera *m_camera;
+
+      //! Projection allocated from the getProjection() method.
+      Projection *m_projection;
+
+      //! The full filename of the label file (.lbl or .cub)
+      iString *m_labelFilename;
+
+      //! The full filename of the data file (.cub)
+      iString *m_dataFilename;
+
+      /**
+       * If open was called with an Isis 2 cube, then this will be
+       *   the name of the imported Isis3 cube. m_labelFilename and
+       *   m_dataFilename will store the Isis 2 cube's information.
+       */
+      iString *m_tempCube;
+
+      //! Label pvl format template file (describes how to format labels)
+      iString *m_formatTemplateFile;
+
+      //! True if labels are attached
+      bool m_attached;
+
+      //! The label if IsOpen(), otherwise NULL
+      Pvl *m_label;
+
+      //! The maximum allowed size of the label; the allocated space.
+      int m_labelBytes;
+
+      //! The sample count of the open cube or the cube that will be created
+      int m_samples;
+
+      //! The line count of the open cube or the cube that will be created
+      int m_lines;
+
+      //! The band count of the open cube or the cube that will be created
+      int m_bands;
+
+      /**
+       * The base of the open cube or the cube that will be created; does not
+       *   apply if m_pixelType is Real.
+       */
+      double m_base;
+
+      /**
+       * The multiplier of the open cube or the cube that will be created; does
+       *   not apply if m_pixelType is Real.
+       */
+      double m_multiplier;
+
+      //! If allocated, converts from physical on-disk band # to virtual band #
+      QList<int> *m_virtualBandList;
   };
 };
 
 #endif
+

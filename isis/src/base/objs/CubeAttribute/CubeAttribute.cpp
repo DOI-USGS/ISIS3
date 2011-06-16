@@ -235,16 +235,19 @@ namespace Isis {
 
 
   string CubeAttributeOutput::FileFormatStr() const {
-    return Isis::CubeFormatName(p_format);
+    if(p_format == Cube::Bsq)
+      return "BandSequential";
+    else
+      return "Tile";
   }
 
 
-  Isis::CubeFormat CubeAttributeOutput::FileFormat() const {
+  Cube::Format CubeAttributeOutput::FileFormat() const {
     return p_format;
   }
 
 
-  void CubeAttributeOutput::Format(const Isis::CubeFormat fmt) {
+  void CubeAttributeOutput::Format(const Cube::Format &fmt) {
     p_format = fmt;
   }
 
@@ -421,10 +424,10 @@ namespace Isis {
 
       // Parse any file formats
       else if(tok == "TILE") {
-        p_format = Isis::Tile;
+        p_format = Cube::Tile;
       }
       else if(tok == "BSQ" || tok == "BANDSEQUENTIAL") {
-        p_format = Isis::Bsq;
+        p_format = Cube::Bsq;
       }
 
       // Parse any byte order
@@ -452,7 +455,7 @@ namespace Isis {
     p_rangeType = Isis::PropagateRange;
     p_minimum = 0.0;
     p_maximum = 0.0;
-    p_format = Isis::Tile;
+    p_format = Cube::Tile;
 
     // The byte order default is dependant on the hardware
     if(Isis::IsLsb()) {

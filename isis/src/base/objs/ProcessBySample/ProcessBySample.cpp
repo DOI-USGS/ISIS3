@@ -86,8 +86,8 @@ namespace Isis {
     }
 
     // Determine if we have an input or output
-    if(InputCubes.size() == 1) SetBrickSize(1, InputCubes[0]->Lines(), 1);
-    else SetBrickSize(1, OutputCubes[0]->Lines(), 1);
+    if(InputCubes.size() == 1) SetBrickSize(1, InputCubes[0]->getLineCount(), 1);
+    else SetBrickSize(1, OutputCubes[0]->getLineCount(), 1);
 
     Isis::ProcessByBrick::StartProcess(funct);
   }
@@ -116,21 +116,21 @@ namespace Isis {
     }
 
     // The samples in the input and output must match
-    if(InputCubes[0]->Samples() != OutputCubes[0]->Samples()) {
+    if(InputCubes[0]->getSampleCount() != OutputCubes[0]->getSampleCount()) {
       string m = "The number of samples in the input and output cubes ";
       m += "must match";
       throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
     }
 
     // The bands in the input and output must match
-    if(InputCubes[0]->Bands() != OutputCubes[0]->Bands()) {
+    if(InputCubes[0]->getBandCount() != OutputCubes[0]->getBandCount()) {
       string m = "The number of bands in the input and output cubes ";
       m += "must match";
       throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
     }
 
-    SetInputBrickSize(1, InputCubes[0]->Lines(), 1);
-    SetOutputBrickSize(1, OutputCubes[0]->Lines(), 1);
+    SetInputBrickSize(1, InputCubes[0]->getLineCount(), 1);
+    SetOutputBrickSize(1, OutputCubes[0]->getLineCount(), 1);
 
     Isis::ProcessByBrick::StartProcess(funct);
   }
@@ -156,12 +156,12 @@ namespace Isis {
     // Make sure all the output images have the same number of bands as
     // the first input/output cube
     for(unsigned int i = 0; i < OutputCubes.size(); i++) {
-      if(OutputCubes[i]->Samples() != OutputCubes[0]->Samples()) {
+      if(OutputCubes[i]->getSampleCount() != OutputCubes[0]->getSampleCount()) {
         string m = "All output cubes must have the same number of samples ";
         m += "as the first input cube or output cube";
         throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
       }
-      if(OutputCubes[i]->Bands() != OutputCubes[0]->Bands()) {
+      if(OutputCubes[i]->getBandCount() != OutputCubes[0]->getBandCount()) {
         string m = "All output cubes must have the same number of bands ";
         m += "as the first input cube or output cube";
         throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
@@ -169,10 +169,10 @@ namespace Isis {
     }
 
     for(unsigned int i = 0; i < InputCubes.size(); i++) {
-      SetInputBrickSize(1, InputCubes[i]->Lines(), 1, i + 1);
+      SetInputBrickSize(1, InputCubes[i]->getLineCount(), 1, i + 1);
     }
     for(unsigned int i = 0; i < OutputCubes.size(); i++) {
-      SetOutputBrickSize(1, OutputCubes[i]->Lines(), 1, i + 1);
+      SetOutputBrickSize(1, OutputCubes[i]->getLineCount(), 1, i + 1);
     }
 
     Isis::ProcessByBrick::StartProcess(funct);

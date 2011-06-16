@@ -16,7 +16,7 @@ void IsisMain() {
 
   ProcessByLine p;
   Cube *icube = p.SetInputCube("FROM");
-  cam = icube->Camera();
+  cam = icube->getCamera();
   maxinc = Application::GetUserInterface().GetDouble("MAXINC");
   p.SetOutputCube("TO");
   p.StartProcess(divide);

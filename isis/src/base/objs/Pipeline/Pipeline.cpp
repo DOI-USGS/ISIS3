@@ -197,7 +197,7 @@ namespace Isis {
             // Nothing special is happening, just execute the program
             try {
               ProgramLauncher::RunIsisProgram(Application(i).Name(), params[j]);
-            } 
+            }
             catch(Isis::iException & Ex) {
               if(!p_continue && !Application(i).Continue()) {
                 throw iException::Message(iException::Programmer, Ex.Errors(), _FILEINFO_);

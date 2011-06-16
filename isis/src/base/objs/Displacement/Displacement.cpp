@@ -47,8 +47,9 @@ namespace Isis {
 
 
   /**
-   * This is the general purpose constructor for Displacement. This will 
-   *   initialize with the given displacement.
+   * This is the general purpose constructor for Displacement. This will
+   *   initialize with the given displacement. If Pixels are supplied as the
+   *   units, then a default pixels/meter = 1.0 will be used.
    *
    * @param displacement The initial displacement; must be in units of
    *     displacementUnit
@@ -56,7 +57,24 @@ namespace Isis {
    *     displacement::Units
    */
   Displacement::Displacement(double displacement, Units displacementUnit) {
+    if(displacementUnit == Pixels)
+      displacementUnit = Meters;
+
     SetDisplacement(displacement, displacementUnit);
+  }
+
+
+  /**
+   * This is a constructor for Displacement given pixels with a conversion
+   *   ratio. This will initialize with the pixels converted to meters.
+   *
+   * @param displacementInPixels The displacement to initialize with, must be in
+   *     units of pixels and should not be negative
+   * @param pixelsPerMeter The pixels/meter conversion factor
+   */
+  Displacement::Displacement(double displacementInPixels,
+                             double pixelsPerMeter) {
+    SetDisplacement(displacementInPixels / pixelsPerMeter, Meters);
   }
 
 
@@ -65,8 +83,7 @@ namespace Isis {
    *
    * @return Current displacement, in meters.
    */
-  double 
-    Displacement::GetMeters() const {
+  double Displacement::GetMeters() const {
     return GetDisplacement(Meters);
   }
 
@@ -104,6 +121,32 @@ namespace Isis {
 
 
   /**
+   * Get the displacement in pixels using the given conversion ratio.
+   *
+   * @param pixelsPerMeter Pixels/Meters conversion ratio to use, stored data
+   *         is always in meters
+   * @return Current displacement, in pixels
+   */
+  double Displacement::GetPixels(double pixelsPerMeter) const {
+    return GetDisplacement(Meters) * pixelsPerMeter;
+  }
+
+
+  /**
+   * Set the displacement in pixels.
+   *
+   * @param displacementInPixels This is the value to set this displacement to,
+   *     given in pixels.
+   * @param pixelsPerMeter Pixels/Meters conversion ratio to use, stored data
+   *         is always in meters
+   */
+  void Displacement::SetPixels(double displacementInPixels,
+                               double pixelsPerMeter) {
+    SetDisplacement(displacementInPixels / pixelsPerMeter, Meters);
+  }
+
+
+  /**
    * Test if this displacement has been initialized or not
    *
    * @return True if this displacement has been initialized.
@@ -121,14 +164,14 @@ namespace Isis {
     * @return True if the length of this displacement is greater than the length 
     *     of the given displacement
     */
-  bool Displacement::operator >(const Displacement &otherdisplacement) const {
-    if(!Valid() || !otherdisplacement.Valid()) {
+  bool Displacement::operator >(const Displacement &otherDisplacement) const {
+    if(!Valid() || !otherDisplacement.Valid()) {
       iString msg = "Displacement has not been initialized, you must initialize "
           "it first before comparing with another displacement using [>]";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
-    return GetMeters() > otherdisplacement.GetMeters();
+    return GetMeters() > otherDisplacement.GetMeters();
   }
 
 
@@ -140,14 +183,14 @@ namespace Isis {
     * @return True if the length of the displacement is less than the length of 
     *     the given displacement
     */
-  bool Displacement::operator <(const Displacement &otherdisplacement) const {
-    if(!Valid() || !otherdisplacement.Valid()) {
+  bool Displacement::operator <(const Displacement &otherDisplacement) const {
+    if(!Valid() || !otherDisplacement.Valid()) {
       iString msg = "Displacement has not been initialized, you must initialize "
           "it first before comparing with another displacement using [<]";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
-    return GetMeters() < otherdisplacement.GetMeters();
+    return GetMeters() < otherDisplacement.GetMeters();
   }
 
 
@@ -168,12 +211,14 @@ namespace Isis {
   /**
    * Subtract another displacement from this displacement (1km - 5m = 995m).
    *
-   * @param displacementToSub This is the displacement we are subtracting from 
+   * @param displacementToSub This is the displacement we are subtracting from
    *      ourself
    * @return Resulting displacement, self not modified
    */
-  Displacement Displacement::operator 
+  Displacement Displacement::operator
                                -(const Displacement &displacementToSub) const {
+    if(!Valid() || !displacementToSub.Valid()) return Displacement();
+
     Displacement result(GetMeters() - displacementToSub.GetMeters(), Meters);
     return result;
   }
@@ -182,12 +227,14 @@ namespace Isis {
   /**
    * Subtract a distance from this displacement (1km - 5m = 995m).
    *
-   * @param displacementToSub This is the displacement we are subtracting from 
+   * @param distanceToSub This is the displacement we are subtracting from
    *      ourself
    * @return Resulting displacement, self not modified
    */
   Displacement Displacement::operator
                                -(const Distance &distanceToSub) const {
+    if(!Valid() || !distanceToSub.Valid()) return Displacement();
+
     Displacement result(GetMeters() - distanceToSub.GetMeters(), Meters);
     return result;
   }
@@ -200,6 +247,8 @@ namespace Isis {
    * @return Resulting value
    */
   double Displacement::operator /(const Displacement &displacementToDiv) const {
+    if(!Valid() || !displacementToDiv.Valid()) return Null;
+
     double result = GetMeters() / displacementToDiv.GetMeters();
     return result;
   }
@@ -212,6 +261,8 @@ namespace Isis {
    * @return Resulting value
    */
   Displacement Displacement::operator /(const double &valueToDiv) const {
+    if(!Valid() || IsSpecial(valueToDiv)) return Displacement();
+
     Displacement result = Displacement(GetMeters() / valueToDiv, Meters);
     return result;
   }
@@ -224,6 +275,8 @@ namespace Isis {
    * @return Resulting value
    */
   Displacement Displacement::operator *(const double &valueToMult) const {
+    if(!Valid() || IsSpecial(valueToMult)) return Displacement();
+
     Displacement result = Displacement(GetMeters() * valueToMult, Meters);
     return result;
   }
@@ -233,7 +286,7 @@ namespace Isis {
    * Multiply displacement by a value (5m * 2 = 10m).
    *
    * @param mult This is the value to multiply by
-   * @param dist This is the distance to multiply into
+   * @param displacement This is the distance to multiply into
    * @return Resulting value
    */
   Displacement operator *(double mult, Displacement displacement) {
@@ -248,7 +301,10 @@ namespace Isis {
    * @param displacementToAdd This is the displacement we are to add
    */
   void Displacement::operator +=(const Displacement &displacementToAdd) {
-    SetDisplacement(GetMeters() + displacementToAdd.GetMeters(), Meters);
+    if(!Valid() || !displacementToAdd.Valid())
+      SetDisplacement(Null, Meters);
+    else
+      SetDisplacement(GetMeters() + displacementToAdd.GetMeters(), Meters);
   }
 
 
@@ -258,7 +314,10 @@ namespace Isis {
    * @param displacementToSub This is the displacement we are to subtract
    */
   void Displacement::operator -=(const Displacement &displacementToSub) {
-    SetDisplacement(GetMeters() - displacementToSub.GetMeters(), Meters);
+    if(!Valid() || !displacementToSub.Valid())
+      SetDisplacement(Null, Meters);
+    else
+      SetDisplacement(GetMeters() - displacementToSub.GetMeters(), Meters);
   }
 
 
@@ -268,7 +327,10 @@ namespace Isis {
    * @param distanceToSub This is the distance we are to subtract
    */
   void Displacement::operator -=(const Distance &distanceToSub) {
-    SetDisplacement(GetMeters() - distanceToSub.GetMeters(), Meters);
+    if(!Valid() || !distanceToSub.Valid())
+      SetDisplacement(Null, Meters);
+    else
+      SetDisplacement(GetMeters() - distanceToSub.GetMeters(), Meters);
   }
 
 
@@ -278,7 +340,10 @@ namespace Isis {
    * @param valueToDiv This is the value we are going to divide by
    */
   void Displacement::operator /=(const double &valueToDiv) {
-    SetDisplacement(GetMeters() / valueToDiv, Meters);
+    if(!Valid() || IsSpecial(valueToDiv))
+      SetDisplacement(Null, Meters);
+    else
+      SetDisplacement(GetMeters() / valueToDiv, Meters);
   }
 
 
@@ -288,7 +353,10 @@ namespace Isis {
    * @param valueToMult This is the value we are going to multiply by
    */
   void Displacement::operator *=(const double &valueToMult) {
-    SetDisplacement(GetMeters() * valueToMult, Meters);
+    if(!Valid() || IsSpecial(valueToMult))
+      SetDisplacement(Null, Meters);
+    else
+      SetDisplacement(GetMeters() * valueToMult, Meters);
   }
 
 
@@ -313,6 +381,12 @@ namespace Isis {
 
       case Kilometers:
         resultingDisplacement = displacementInMeters / 1000.0;
+        break;
+
+      case Pixels:
+        iString msg = "Cannot GetDisplacement with pixels, ask for another "
+            "unit";
+        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
         break;
     }
 
@@ -351,6 +425,12 @@ namespace Isis {
 
       case Kilometers:
         displacementInMeters = displacement * 1000.0;
+        break;
+
+      case Pixels:
+        iString msg = "Cannot SetDisplacement with pixels, must convert to "
+            "another unit first";
+        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
         break;
     }
 

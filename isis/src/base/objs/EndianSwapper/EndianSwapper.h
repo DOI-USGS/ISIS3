@@ -95,7 +95,9 @@ namespace Isis {
       long long int LongLongInt(void *buf);
       short int ShortInt(void *buf);
       unsigned short int UnsignedShortInt(unsigned short int *buf);
-
+      bool willSwap() const {
+        return p_needSwap;
+      }
   };
 };
 

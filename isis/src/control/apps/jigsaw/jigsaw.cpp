@@ -126,16 +126,16 @@ void IsisMain() {
         CubeAttributeInput inAtt;
         Cube *c = p.SetInputCube(b->Filename(i), inAtt, ReadWrite);
         //check for existing polygon, if exists delete it
-        if (c->Label()->HasObject("Polygon")) {
-          c->Label()->DeleteObject("Polygon");
+        if (c->getLabel()->HasObject("Polygon")) {
+          c->getLabel()->DeleteObject("Polygon");
         }
 
         //check for CameraStatistics Table, if exists, delete
-        for (int iobj = 0; iobj < c->Label()->Objects(); iobj++) {
-          PvlObject obj = c->Label()->Object(iobj);
+        for (int iobj = 0; iobj < c->getLabel()->Objects(); iobj++) {
+          PvlObject obj = c->getLabel()->Object(iobj);
           if (obj.Name() != "Table") continue;
           if (obj["Name"][0] != iString("CameraStatistics")) continue;
-          c->Label()->DeleteObject(iobj);
+          c->getLabel()->DeleteObject(iobj);
           break;
         }
 
@@ -147,8 +147,8 @@ void IsisMain() {
         cmatrix.Label().AddComment(jigComment);
         Table spvector = b->SpVector(i);
         spvector.Label().AddComment(jigComment);
-        c->Write(cmatrix);
-        c->Write(spvector);
+        c->write(cmatrix);
+        c->write(spvector);
         p.WriteHistory(*c);
       }
       gp += PvlKeyword("Status", "Camera pointing updated");

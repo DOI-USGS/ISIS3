@@ -12,8 +12,8 @@ int main(int argc, char *argv[]) {
   try {
     cout << "UnitTest for Overlap Statistics" << endl;
     Isis::Cube cube1, cube2;
-    cube1.Open("$odyssey/testData/I00824006RDR.lev2.cub");
-    cube2.Open("$odyssey/testData/I02609002RDR.lev2.cub");
+    cube1.open("$odyssey/testData/I00824006RDR.lev2.cub");
+    cube2.open("$odyssey/testData/I02609002RDR.lev2.cub");
     cout << setprecision(9);
 
     // Check to make sure the overlap calculation is working correctly

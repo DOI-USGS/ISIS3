@@ -42,7 +42,7 @@ int main() {
     AutoReg *ar = AutoRegFactory::Create(pvl);
 
     Cube c;
-    c.Open("$mgs/testData/ab102401.cub");
+    c.open("$mgs/testData/ab102401.cub");
 
     ar->SearchChip()->TackCube(125.0, 50.0);
     ar->SearchChip()->Load(c);

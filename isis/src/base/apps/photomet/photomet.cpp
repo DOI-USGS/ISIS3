@@ -50,7 +50,7 @@ void IsisMain() {
       angleSource == "CENTER_FROM_IMAGE") {
     // Set up the input cube 
     icube = p.SetInputCube("FROM");
-    cam = icube->Camera();
+    cam = icube->getCamera();
   } 
   else {
     p.SetInputCube("FROM");

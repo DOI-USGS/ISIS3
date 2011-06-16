@@ -697,11 +697,11 @@ namespace Qisis {
       double radius;
       //  Update radius
       if (p_demOpen) {
-        Brick pixel(1,1,1,p_demCube->PixelType());
+        Brick pixel(1,1,1,p_demCube->getPixelType());
         int intSamp = (int) (groundMeasure->GetSample() + 0.5);
         int intLine = (int) (groundMeasure->GetLine() + 0.5);
         pixel.SetBasePosition(intSamp,intLine,1);
-        p_demCube->Read(pixel);
+        p_demCube->read(pixel);
         radius = pixel[0];
       }
       else {
@@ -1111,7 +1111,7 @@ namespace Qisis {
     if (cvp  == NULL) return;
     if (cvp->cursorInside()) QPoint p = cvp->cursorPosition();
 
-    iString file = cvp->cube()->Filename();
+    iString file = cvp->cube()->getFilename();
     iString sn = g_serialNumberList->SerialNumber(file);
 
     double samp,line;
@@ -1119,7 +1119,7 @@ namespace Qisis {
 
 
     if (s == Qt::LeftButton) {
-      if (p_groundOpen && file == p_groundCube->Filename()) {
+      if (p_groundOpen && file == p_groundCube->getFilename()) {
         QString message = "Cannot select point for editing on ground source.  Select ";
         message += "point using un-projected images or the Navigator Window.";
         QMessageBox::critical((QWidget *)parent(),"Error",message);
@@ -1140,7 +1140,7 @@ namespace Qisis {
       modifyPoint(point);
     }
     else if (s == Qt::MidButton) {
-      if (p_groundOpen && file == p_groundCube->Filename()) {
+      if (p_groundOpen && file == p_groundCube->getFilename()) {
         QString message = "Cannot select point for deleting on ground source.  Select ";
         message += "point using un-projected images or the Navigator Window.";
         QMessageBox::critical((QWidget *)parent(),"Error",message);
@@ -1164,7 +1164,7 @@ namespace Qisis {
       gmap->SetImage(samp,line);
       double lat = gmap->UniversalLatitude();
       double lon = gmap->UniversalLongitude();
-      if (p_groundOpen && file == p_groundCube->Filename()) {
+      if (p_groundOpen && file == p_groundCube->getFilename()) {
         createFixedPoint (lat,lon);
       }
       else {
@@ -1872,7 +1872,7 @@ namespace Qisis {
     //  If p_leftCube is not null, delete before creating new one
     if (p_leftCube != NULL) delete p_leftCube;
     p_leftCube = new Cube();
-    p_leftCube->Open(file);
+    p_leftCube->open(file);
 
     //  Update left measure of pointEditor
     p_pointEditor->setLeftMeasure (p_leftMeasure, p_leftCube, p_editPoint->GetId());
@@ -1909,7 +1909,7 @@ namespace Qisis {
     //  If p_leftCube is not null, delete before creating new one
     if (p_rightCube != NULL) delete p_rightCube;
     p_rightCube = new Cube();
-    p_rightCube->Open(file);
+    p_rightCube->open(file);
 
     //  Update left measure of pointEditor
     p_pointEditor->setRightMeasure (p_rightMeasure,p_rightCube,p_editPoint->GetId());
@@ -2756,7 +2756,7 @@ namespace Qisis {
       MdiCubeViewport *vp;
       for (int i=0; i<(int)cubeViewportList()->size(); i++) {
         vp = (*(cubeViewportList()))[i];
-        if (vp->cube()->Filename() == ground.toStdString()) {
+        if (vp->cube()->getFilename() == ground.toStdString()) {
           g_vpMainWindow->workspace()->setActiveSubWindow((QMdiSubWindow *)vp->parentWidget());
           QApplication::restoreOverrideCursor();
           return;
@@ -2772,9 +2772,9 @@ namespace Qisis {
     p_groundSourceFile = ground;
     p_groundCube = new Cube();
     try {
-      p_groundCube->Open(ground.toStdString());
+      p_groundCube->open(ground.toStdString());
       p_groundGmap = new UniversalGroundMap(*p_groundCube);
-      p_groundFile = Filename(p_groundCube->Filename()).Name().c_str();
+      p_groundFile = Filename(p_groundCube->getFilename()).Name().c_str();
     }
     catch (iException &e) {
       QString message = e.Errors().c_str();
@@ -2805,7 +2805,7 @@ namespace Qisis {
 
     //  Determine file type of ground for setting AprioriSurfacePointSource
     //  and AprioriRadiusSource.
-    if (p_groundCube->HasTable("ShapeModelStatistics")) {
+    if (p_groundCube->hasTable("ShapeModelStatistics")) {
       p_groundSurfacePointSource = ControlPoint::SurfacePointSource::Basemap;
       if (!p_demOpen) {
         p_groundRadiusSource = ControlPoint::RadiusSource::DEM;
@@ -2823,7 +2823,7 @@ namespace Qisis {
         if (!p_demOpen) {
           // TODO p_groundRadiusSource = ControlPoint::RadiusSource::Basemap;
           p_groundRadiusSource = ControlPoint::RadiusSource::Ellipsoid;
-          PvlGroup mapping = p_groundCube->GetGroup("Mapping");
+          PvlGroup mapping = p_groundCube->getGroup("Mapping");
           p_demFile = QString::fromStdString(mapping ["EquatorialRadius"])
                          + ", " + QString::fromStdString(mapping ["PolarRadius"]);
           //  
@@ -2833,11 +2833,11 @@ namespace Qisis {
       catch (iException &e) {
         e.Clear();
         try {
-          camera = CameraFactory::Create(*(p_groundCube->Label()));
+          camera = CameraFactory::Create(*(p_groundCube->getLabel()));
           p_groundSurfacePointSource = ControlPoint::SurfacePointSource::Reference;
           if (!p_demOpen) {
             //  If level 1, determine the shape model
-            PvlGroup kernels = p_groundCube->GetGroup("Kernels");
+            PvlGroup kernels = p_groundCube->getGroup("Kernels");
             QString shapeFile = QString::fromStdString(kernels ["ShapeModel"]);
             if (shapeFile.contains("dem")) {
               p_groundRadiusSource = ControlPoint::RadiusSource::DEM;
@@ -2909,7 +2909,7 @@ namespace Qisis {
           return;
         }
 
-        p_demCube->Close();
+        p_demCube->close();
         p_demOpen = false;
         delete p_demCube;
         p_demCube = NULL;
@@ -2920,8 +2920,8 @@ namespace Qisis {
       p_demCube = new Cube();
 
       try {
-        p_demCube->Open(demFile.toStdString());
-        p_demFile = Filename(p_demCube->Filename()).Name().c_str();
+        p_demCube->open(demFile.toStdString());
+        p_demFile = Filename(p_demCube->getFilename()).Name().c_str();
       } catch (iException &e) {
         QString message = e.Errors().c_str();
         QMessageBox::critical((QWidget *)parent(),"Error",message);
@@ -2936,10 +2936,10 @@ namespace Qisis {
       p_demOpen = true;
 
       //  Make sure this is a dem
-      if (!p_demCube->HasTable("ShapeModelStatistics")) {
+      if (!p_demCube->hasTable("ShapeModelStatistics")) {
         QString message = p_demFile + " is not a DEM.";
         QMessageBox::critical((QWidget *)parent(),"Error",message);
-        p_demCube->Close();
+        p_demCube->close();
         p_demOpen = false;
         delete p_demCube;
         p_demCube = NULL;
@@ -2984,7 +2984,7 @@ namespace Qisis {
     //  If we could not find the ground source in the open viewports, user might
     //  have closed the viewport , reset ground source variables and re-open.
     p_groundOpen = false;
-//q    p_groundCube->Close();
+//q    p_groundCube->close();
 //    delete p_groundCube;
     p_groundCube = NULL;
     p_groundFile.clear();

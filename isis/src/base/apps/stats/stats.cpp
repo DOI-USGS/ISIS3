@@ -28,12 +28,12 @@ void IsisMain() {
     validMax = ui.GetDouble("VALIDMAX");
   }
 
-  Histogram *stats = icube->Histogram(1, validMin, validMax);
+  Histogram *stats = icube->getHistogram(1, validMin, validMax);
 
   // Construct a label with the results
   PvlGroup results("Results");  
-  results += PvlKeyword("From", icube->Filename());
-  results += PvlKeyword("Band", icube->PhysicalBand(1));
+  results += PvlKeyword("From", icube->getFilename());
+  results += PvlKeyword("Band", icube->getPhysicalBand(1));
   if(stats->ValidPixels() != 0) {
     results += PvlKeyword("Average", stats->Average());
     results += PvlKeyword("StandardDeviation", stats->StandardDeviation());

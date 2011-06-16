@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
   std::cout << "Cube Filenames: " << std::endl;
 
   for(int i = 0; i < (int)cubes.size(); i++) {
-    std::cout << "  " << i + 1 << " : " << Filename(cubes[i]->Filename()).Basename() << std::endl;
+    std::cout << "  " << i + 1 << " : " << Filename(cubes[i]->getFilename()).Basename() << std::endl;
   }
 
   std::cout << std::endl;
@@ -61,6 +61,6 @@ int main(int argc, char *argv[]) {
   std::cout << "Verify cube attributes have been taken into account" << std::endl;
   std::cout << "  Cube # | # of Bands" << std::endl;
   for(int i = 0; i < (int)cubes.size(); i++) {
-    std::cout << "  Cube " << i + 1 << " | " << cubes[i]->Bands() << std::endl;
+    std::cout << "  Cube " << i + 1 << " | " << cubes[i]->getBandCount() << std::endl;
   }
 }

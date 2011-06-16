@@ -65,31 +65,31 @@ void TranslateMerEdrLabels(Filename &labelFile, Cube *ocube) {
   transFile = transDir + "merStructure.trn";
   PvlTranslationManager structXlater(labelPvl, transFile.Expanded());
   structXlater.Auto(outLabel);
-  ocube->PutGroup(outLabel.FindGroup("ARCHIVE", Pvl::Traverse));
+  ocube->putGroup(outLabel.FindGroup("ARCHIVE", Pvl::Traverse));
 
   // Translate the Instrument group
   transFile = transDir + "merInstrument.trn";
   PvlTranslationManager instrumentXlater(labelPvl, transFile.Expanded());
   instrumentXlater.Auto(outLabel);
-  ocube->PutGroup(outLabel.FindGroup("INSTRUMENT", Pvl::Traverse));
+  ocube->putGroup(outLabel.FindGroup("INSTRUMENT", Pvl::Traverse));
 
   // Pull out MiCCD and MiElectronic from the TemperatureName in the instrument group
   void MiFixLab(PvlGroup & instGroup);
-  PvlGroup instGroup = ocube->GetGroup("INSTRUMENT");
+  PvlGroup instGroup = ocube->getGroup("INSTRUMENT");
   MiFixLab(instGroup);
-  ocube->PutGroup(instGroup);
+  ocube->putGroup(instGroup);
 
   // Translate the Image_Request group
   transFile = transDir + "merImageRequest.trn";
   PvlTranslationManager imageReqXlater(labelPvl, transFile.Expanded());
   imageReqXlater.Auto(outLabel);
-  ocube->PutGroup(outLabel.FindGroup("MER_IMAGE_REQUEST_PARMS", Pvl::Traverse));
+  ocube->putGroup(outLabel.FindGroup("MER_IMAGE_REQUEST_PARMS", Pvl::Traverse));
 
   // Translate the Subframe group
   transFile = transDir + "merSubframe.trn";
   PvlTranslationManager subframeXlater(labelPvl, transFile.Expanded());
   subframeXlater.Auto(outLabel);
-  ocube->PutGroup(outLabel.FindGroup("MER_SUBFRAME_REQUEST_PARMS", Pvl::Traverse));
+  ocube->putGroup(outLabel.FindGroup("MER_SUBFRAME_REQUEST_PARMS", Pvl::Traverse));
 }
 
 void MiFixLab(PvlGroup &instGroup) {

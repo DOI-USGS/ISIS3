@@ -73,9 +73,9 @@ void IsisMain() {
   // Testing boxcar size too big
   Isis::ProcessByQuickFilter p2;
   Isis::Cube temp;
-  temp.SetDimensions(3, 3, 1);
-  temp.Create("/tmp/isisfilterprocess_01");
-  temp.Close();
+  temp.setDimensions(3, 3, 1);
+  temp.create("/tmp/isisfilterprocess_01");
+  temp.close();
   try {
     Isis::CubeAttributeInput att;
     p2.SetInputCube("/tmp/isisfilterprocess_01", att);
@@ -90,9 +90,9 @@ void IsisMain() {
 
   // Testing boxcar size too big
   Isis::ProcessByQuickFilter p3;
-  temp.SetDimensions(2, 10, 1);
-  temp.Create("/tmp/isisfilterprocess_01");
-  temp.Close();
+  temp.setDimensions(2, 10, 1);
+  temp.create("/tmp/isisfilterprocess_01");
+  temp.close();
   try {
     Isis::CubeAttributeInput att;
     p3.SetInputCube("/tmp/isisfilterprocess_01", att);
@@ -121,10 +121,10 @@ void IsisMain() {
   p4.StartProcess(filter);
   p4.EndProcess();
 
-  temp.Open("/tmp/isisfilterprocess_01");
-  temp.Close(true);
-  temp.Open("/tmp/isisfilterprocess_02");
-  temp.Close(true);
+  temp.open("/tmp/isisfilterprocess_01");
+  temp.close(true);
+  temp.open("/tmp/isisfilterprocess_02");
+  temp.close(true);
 }
 
 void filter(Isis::Buffer &in, Isis::Buffer &out, Isis::QuickFilter &filt) {

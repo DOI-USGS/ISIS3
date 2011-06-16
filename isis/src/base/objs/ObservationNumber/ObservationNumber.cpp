@@ -55,7 +55,7 @@ namespace Isis {
    * @param cube An opened Isis cube
    */
   std::string ObservationNumber::Compose(Cube &cube, bool def2filename) {
-    return Compose(*cube.Label(), def2filename);
+    return Compose(*cube.getLabel(), def2filename);
   }
 
   /**

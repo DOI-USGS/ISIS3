@@ -126,14 +126,14 @@ void IsisMain() {
     // cube label
     PvlGroup &group =  outLabel.FindGroup("Instrument", Pvl::Traverse);
     group.AddKeyword(PvlKeyword("Unlutted", !needsUnlut));
-    outCube->PutGroup(group);
-    outCube->PutGroup(outLabel.FindGroup("BandBin", Pvl::Traverse));
+    outCube->putGroup(group);
+    outCube->putGroup(outLabel.FindGroup("BandBin", Pvl::Traverse));
 
     group = outLabel.FindGroup("Archive", Pvl::Traverse);
     group.AddKeyword(sourceId, Pvl::Replace);
-    outCube->PutGroup(group);
+    outCube->putGroup(group);
 
-    outCube->PutGroup(outLabel.FindGroup("Kernels", Pvl::Traverse));
+    outCube->putGroup(outLabel.FindGroup("Kernels", Pvl::Traverse));
 
     outCube = NULL;
 
@@ -150,27 +150,27 @@ void IsisMain() {
     lut = LoadLut(lab, lutfile, lutid);
 
     outCube = new Cube();
-    outCube->SetDimensions(p.Samples(), p.Lines(), p.Bands());
-    outCube->Create(ui.GetFilename("TO"));
+    outCube->setDimensions(p.Samples(), p.Lines(), p.Bands());
+    outCube->create(ui.GetFilename("TO"));
 
     PvlGroup &group =  outLabel.FindGroup("Instrument", Pvl::Traverse);
     group.AddKeyword(PvlKeyword("Unlutted", true));
     group.AddKeyword(PvlKeyword("LutInversionTable", lutfile));
-    outCube->Label()->FindObject("IsisCube").AddGroup(group);
+    outCube->getLabel()->FindObject("IsisCube").AddGroup(group);
 
     group = outLabel.FindGroup("Archive", Pvl::Traverse);
     sourceId.AddValue('"' + lutid + '"');
     group.AddKeyword(sourceId);
-    outCube->Label()->FindObject("IsisCube").AddGroup(group);
+    outCube->getLabel()->FindObject("IsisCube").AddGroup(group);
 
-    outCube->Label()->FindObject("IsisCube").AddGroup(outLabel.FindGroup("BandBin", Pvl::Traverse));
-    outCube->Label()->FindObject("IsisCube").AddGroup(outLabel.FindGroup("Kernels", Pvl::Traverse));
+    outCube->getLabel()->FindObject("IsisCube").AddGroup(outLabel.FindGroup("BandBin", Pvl::Traverse));
+    outCube->getLabel()->FindObject("IsisCube").AddGroup(outLabel.FindGroup("Kernels", Pvl::Traverse));
 
     p.StartProcess(UnlutData);
 
     OriginalLabel ol(Pvl(inFile.Expanded()));
-    outCube->Write(ol);
-    outCube->Close();
+    outCube->write(ol);
+    outCube->close();
     delete outCube;
   }
 
@@ -348,7 +348,7 @@ void UnlutData(Buffer &data) {
     out[i] = lut[dnvalue];
   }
 
-  outCube->Write(out);
+  outCube->write(out);
 }
 
 LutTable LoadLut(Pvl &label, std::string &tableused, std::string &froot) {

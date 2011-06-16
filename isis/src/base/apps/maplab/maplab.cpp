@@ -17,7 +17,7 @@ void IsisMain() {
 
   // Open the input cube
   Cube cube;
-  cube.Open(ui.GetFilename("FROM"), "rw");
+  cube.open(ui.GetFilename("FROM"), "rw");
 
   //Get the map projection file provided by the user
   Pvl userMap;
@@ -104,7 +104,7 @@ void IsisMain() {
   // Output the mapping group used to the Gui session log
   Application::GuiLog(userMap);
   // Extract label from cube file
-  Pvl *label = cube.Label();
+  Pvl *label = cube.getLabel();
   PvlObject &o = label->FindObject("IsisCube");
   // Add Mapping Group to input cube
   if(o.HasGroup("Mapping")) {
@@ -115,13 +115,13 @@ void IsisMain() {
   // keep track of change to labels in history
   History hist = History("IsisCube");
   try {
-    cube.Read(hist);
+    cube.read(hist);
   }
   catch(iException &e) {
     e.Clear();
   }
   hist.AddEntry();
-  cube.Write(hist);
+  cube.write(hist);
 
-  cube.Close();
+  cube.close();
 }

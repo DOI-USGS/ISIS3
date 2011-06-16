@@ -39,7 +39,7 @@ void IsisMain() {
   // Get the camera information
   Process p1;
   Cube *icube = p1.SetInputCube("FROM", OneBand);
-  cam = icube->Camera();
+  cam = icube->getCamera();
 
   // We will be processing by brick.
   ProcessByBrick p;
@@ -98,7 +98,7 @@ void IsisMain() {
   // of input cube elements (label, blobs, etc...).  It *must* be cleared
   // prior to systematic processing.
   (void) p.SetInputCube("FROM", OneBand);
-  Cube *ocube = p.SetOutputCube("TO", icube->Samples(), icube->Lines(), nbands);
+  Cube *ocube = p.SetOutputCube("TO", icube->getSampleCount(), icube->getLineCount(), nbands);
   p.SetBrickSize(64, 64, nbands);
   p.ClearInputCubes();     // Toss the input file as stated above
 
@@ -108,7 +108,7 @@ void IsisMain() {
   // Add the bandbin group to the output label.  If a BandBin group already
   // exists, remove all existing keywords and add the keywords for this app.
   // Otherwise, just put the group in.
-  PvlObject &cobj = ocube->Label()->FindObject("IsisCube");
+  PvlObject &cobj = ocube->getLabel()->FindObject("IsisCube");
   if(cobj.HasGroup("BandBin")) {
     PvlGroup &bb = cobj.FindGroup("BandBin");
     bb.Clear();
@@ -119,7 +119,7 @@ void IsisMain() {
     }
   }
   else {
-    ocube->PutGroup(bandBin);
+    ocube->putGroup(bandBin);
   }
 
   p.EndProcess();

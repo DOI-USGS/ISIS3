@@ -40,11 +40,11 @@ void IsisMain() {
   for(unsigned int img = 0; img < imageList.size(); img++) {
 
     Cube cube;
-    cube.Open(imageList[img]);
+    cube.open(imageList[img]);
 
     // Make sure cube has been run through spiceinit
     try {
-      cube.Camera();
+      cube.getCamera();
     }
     catch(iException &e) {
       string msg = "Spiceinit must be run prior to running footprintmerge";
@@ -55,8 +55,8 @@ void IsisMain() {
     //  Make sure cube has been run through footprintinit
     ImagePolygon *poly = new ImagePolygon;
     try {
-      cube.Read(*poly);
-      cube.Close();
+      cube.read(*poly);
+      cube.close();
     }
     catch(iException &e) {
       string msg = "Footprintinit must be run prior to running footprintmerge";

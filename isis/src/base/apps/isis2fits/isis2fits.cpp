@@ -56,7 +56,7 @@ void IsisMain() {
   if(bitpix == "-32") p.SetOutputType(Isis::Real);
 
   // determine core base and multiplier, set up the stretch
-  PvlGroup pix = icube->Label()->FindObject("IsisCube").FindObject("Core").FindGroup("Pixels");
+  PvlGroup pix = icube->getLabel()->FindObject("IsisCube").FindObject("Core").FindGroup("Pixels");
   double scale = pix["Multiplier"][0].ToDouble();
   double base = pix["Base"][0].ToDouble();
 
@@ -83,7 +83,7 @@ void IsisMain() {
 
 
   //////////////////////////////////////////
-  // Write the minimal fits header	  //
+  // Write the minimal fits header        //
   //////////////////////////////////////////
   string header;
 
@@ -96,20 +96,20 @@ void IsisMain() {
 
   // specify the number of data axes (2: samples by lines)
   int axes = 2;
-  if(icube->Bands() > 1) {
+  if(icube->getBandCount() > 1) {
     axes = 3;
   }
 
   header += FitsKeyword("NAXIS", true, iString(axes));
 
   // specify the limit on data axis 1 (number of samples)
-  header += FitsKeyword("NAXIS1", true, iString(icube->Samples()));
+  header += FitsKeyword("NAXIS1", true, iString(icube->getSampleCount()));
 
   // specify the limit on data axis 2 (number of lines)
-  header += FitsKeyword("NAXIS2", true, iString(icube->Lines()));
+  header += FitsKeyword("NAXIS2", true, iString(icube->getLineCount()));
 
   if(axes == 3) {
-    header += FitsKeyword("NAXIS3", true, iString(icube->Bands()));
+    header += FitsKeyword("NAXIS3", true, iString(icube->getBandCount()));
   }
 
   header += FitsKeyword("BZERO", true,  base);
@@ -121,8 +121,8 @@ void IsisMain() {
     iString msg = "cube has not been skymapped";
     PvlGroup map;
 
-    if(icube->HasGroup("mapping")) {
-      map = icube->GetGroup("mapping");
+    if(icube->hasGroup("mapping")) {
+      map = icube->getGroup("mapping");
       msg = (string)map["targetname"];
     }
     // If we have sky we want it
@@ -150,8 +150,8 @@ void IsisMain() {
       // so StopTime can't be calculated off of exposure reliably.
       header += WritePvl("DATE-OBS", "Instrument", "StartTime", icube, true);
       // Some cameras don't have StopTime
-      if(icube->HasGroup("Instrument")) {
-        PvlGroup inst = icube->GetGroup("Instrument");
+      if(icube->hasGroup("Instrument")) {
+        PvlGroup inst = icube->getGroup("Instrument");
         if(inst.HasKeyword("StopTime")) {
           header += WritePvl("TIME_END", "Instrument", "StopTime", icube, true);
         }
@@ -235,8 +235,8 @@ string FitsKeyword(string key, bool isValue, Isis::iString value, Isis::iString 
 }
 
 string WritePvl(string fitsKey, string group, iString key, Cube *icube, bool isString) {
-  if(icube->HasGroup(group)) {
-    PvlGroup theGroup = icube->GetGroup(group);
+  if(icube->hasGroup(group)) {
+    PvlGroup theGroup = icube->getGroup(group);
     iString name = (string)theGroup[key];
     if(isString) {
       name = "'" + name + "'";

@@ -763,7 +763,7 @@ namespace Isis {
         poleLon = Projection::To360Domain((double)poleLon);
     }
 
-    OutputCubes[0]->PutGroup(lab.FindGroup("Mapping"));
+    OutputCubes[0]->putGroup(lab.FindGroup("Mapping"));
   }
 
   /**
@@ -1021,7 +1021,7 @@ namespace Isis {
     if(p_keepOriginalLabel) {
       OriginalLabel ol(p_pdsLabel);
       for(unsigned int i = 0; i < OutputCubes.size(); i++) {
-        OutputCubes[i]->Write(ol);
+        OutputCubes[i]->write(ol);
       }
     }
     Process::EndProcess();

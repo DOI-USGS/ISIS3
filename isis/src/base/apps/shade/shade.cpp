@@ -47,8 +47,8 @@ void IsisMain() {
     pixelResolution = ui.GetDouble("PIXELRESOL");
   }
   else {
-    if(inCube->Label()->FindObject("IsisCube").HasGroup("Mapping")) {
-      pixelResolution = inCube->Label()->FindObject("IsisCube").FindGroup("Mapping")["PixelResolution"];
+    if(inCube->getLabel()->FindObject("IsisCube").HasGroup("Mapping")) {
+      pixelResolution = inCube->getLabel()->FindObject("IsisCube").FindGroup("Mapping")["PixelResolution"];
     }
     else {
       string msg = "The file [" + ui.GetFilename("FROM") + "] does not have a mapping group,"

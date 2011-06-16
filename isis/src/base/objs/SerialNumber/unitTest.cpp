@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
   std::cout << Isis::SerialNumber::Compose(p) << std::endl;
 
   Isis::Cube cube;
-  cube.Open("$base/testData/isisTruth.cub");
+  cube.open("$base/testData/isisTruth.cub");
   std::cout << Isis::SerialNumber::Compose(cube, true) << std::endl;
 
   Isis::Filename file("$lo/testData/3133_h1.cub");

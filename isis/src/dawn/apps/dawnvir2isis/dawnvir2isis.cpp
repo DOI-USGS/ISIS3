@@ -101,9 +101,9 @@ void IsisMain ()
 
   // Write the BandBin, Archive, and Instrument groups
   // to the output cube label
-  outcube->PutGroup(outLabel.FindGroup("BandBin",Pvl::Traverse));
-  outcube->PutGroup(outLabel.FindGroup("Archive",Pvl::Traverse));
-  outcube->PutGroup(outLabel.FindGroup("Instrument",Pvl::Traverse));
+  outcube->putGroup(outLabel.FindGroup("BandBin",Pvl::Traverse));
+  outcube->putGroup(outLabel.FindGroup("Archive",Pvl::Traverse));
+  outcube->putGroup(outLabel.FindGroup("Instrument",Pvl::Traverse));
   
   PvlGroup kerns("Kernels");
   if (instid == "VIS") {
@@ -115,7 +115,7 @@ void IsisMain ()
                  "InstrumentId.";
     throw iException::Message(iException::Io,msg, _FILEINFO_);
   }
-  outcube->PutGroup(kerns);
+  outcube->putGroup(kerns);
 
   p.EndProcess ();
 }

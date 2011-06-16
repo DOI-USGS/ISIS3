@@ -83,14 +83,14 @@ namespace Isis {
 
     int ns, nl, nb;
     if(InputCubes.size() == 1) {
-      ns = InputCubes[0]->Samples();
-      nl = InputCubes[0]->Lines();
-      nb = InputCubes[0]->Bands();
+      ns = InputCubes[0]->getSampleCount();
+      nl = InputCubes[0]->getLineCount();
+      nb = InputCubes[0]->getBandCount();
     }
     else {
-      ns = OutputCubes[0]->Samples();
-      nl = OutputCubes[0]->Lines();
-      nb = OutputCubes[0]->Bands();
+      ns = OutputCubes[0]->getSampleCount();
+      nl = OutputCubes[0]->getLineCount();
+      nb = OutputCubes[0]->getBandCount();
     }
     if(Type() == PerPixel) SetBrickSize(1, 1, nb);
     else if(Type() == ByLine) SetBrickSize(ns, 1, nb);
@@ -123,27 +123,33 @@ namespace Isis {
 
     int numLines = 1, numSamples = 1, numBands = 1;
 
-    if(InputCubes[0]->Bands() > OutputCubes[0]->Bands())
-      numBands = InputCubes[0]->Bands();
-    else numBands = OutputCubes[0]->Bands();
+    if(InputCubes[0]->getBandCount() > OutputCubes[0]->getBandCount())
+      numBands = InputCubes[0]->getBandCount();
+    else numBands = OutputCubes[0]->getBandCount();
     if(Type() == ByLine) {
-      numSamples = std::max(InputCubes[0]->Samples(), OutputCubes[0]->Samples());
+      numSamples = std::max(InputCubes[0]->getSampleCount(),
+                            OutputCubes[0]->getSampleCount());
     }
     else if(Type() == BySample) {
-      numLines = std::max(InputCubes[0]->Lines(), OutputCubes[0]->Lines());
+      numLines = std::max(InputCubes[0]->getLineCount(),
+                          OutputCubes[0]->getLineCount());
     }
 
     if(Type() == PerPixel) {
-      SetInputBrickSize(1, 1, InputCubes[0]->Bands());
-      SetOutputBrickSize(1, 1, OutputCubes[0]->Bands());
+      SetInputBrickSize(1, 1, InputCubes[0]->getBandCount());
+      SetOutputBrickSize(1, 1, OutputCubes[0]->getBandCount());
     }
     else if(Type() == ByLine) {
-      SetInputBrickSize(InputCubes[0]->Samples(), 1, InputCubes[0]->Bands());
-      SetOutputBrickSize(OutputCubes[0]->Samples(), 1, OutputCubes[0]->Bands());
+      SetInputBrickSize(InputCubes[0]->getSampleCount(), 1,
+                        InputCubes[0]->getBandCount());
+      SetOutputBrickSize(OutputCubes[0]->getSampleCount(), 1,
+                         OutputCubes[0]->getBandCount());
     }
     else {
-      SetInputBrickSize(1, InputCubes[0]->Lines(), InputCubes[0]->Bands());
-      SetOutputBrickSize(1, OutputCubes[0]->Lines(), OutputCubes[0]->Bands());
+      SetInputBrickSize(1, InputCubes[0]->getLineCount(),
+                        InputCubes[0]->getBandCount());
+      SetOutputBrickSize(1, OutputCubes[0]->getLineCount(),
+                         OutputCubes[0]->getBandCount());
     }
 
     Isis::ProcessByBrick::StartProcess(funct);
@@ -163,26 +169,26 @@ namespace Isis {
                                       std::vector<Isis::Buffer *> &out)) {
     if(Type() == PerPixel) {
       for(unsigned int i = 0; i < InputCubes.size(); i++) {
-        SetInputBrickSize(1, 1, InputCubes[i]->Bands(), i + 1);
+        SetInputBrickSize(1, 1, InputCubes[i]->getBandCount(), i + 1);
       }
       for(unsigned int i = 0; i < OutputCubes.size(); i++) {
-        SetOutputBrickSize(1, 1, OutputCubes[i]->Bands(), i + 1);
+        SetOutputBrickSize(1, 1, OutputCubes[i]->getBandCount(), i + 1);
       }
     }
     else if(Type() == ByLine) {
       for(unsigned int i = 0; i < InputCubes.size(); i++) {
-        SetInputBrickSize(InputCubes[i]->Samples(), 1, InputCubes[i]->Bands(), i + 1);
+        SetInputBrickSize(InputCubes[i]->getSampleCount(), 1, InputCubes[i]->getBandCount(), i + 1);
       }
       for(unsigned int i = 0; i < OutputCubes.size(); i++) {
-        SetOutputBrickSize(OutputCubes[i]->Samples(), 1, OutputCubes[i]->Bands(), i + 1);
+        SetOutputBrickSize(OutputCubes[i]->getSampleCount(), 1, OutputCubes[i]->getBandCount(), i + 1);
       }
     }
     else {
       for(unsigned int i = 0; i < InputCubes.size(); i++) {
-        SetInputBrickSize(1, InputCubes[i]->Lines(), InputCubes[i]->Bands(), i + 1);
+        SetInputBrickSize(1, InputCubes[i]->getLineCount(), InputCubes[i]->getBandCount(), i + 1);
       }
       for(unsigned int i = 0; i < OutputCubes.size(); i++) {
-        SetOutputBrickSize(1, OutputCubes[i]->Lines(), OutputCubes[i]->Bands(), i + 1);
+        SetOutputBrickSize(1, OutputCubes[i]->getLineCount(), OutputCubes[i]->getBandCount(), i + 1);
       }
     }
 

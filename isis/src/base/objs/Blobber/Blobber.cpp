@@ -28,11 +28,10 @@
 #include "SpecialPixel.h"
 #include "iException.h"
 
+using std::string;
+using std::vector;
+
 namespace Isis {
-
-  using std::string;
-  using std::vector;
-
   /**
    * @brief Default basic constructor that is mostly not useful
    *
@@ -134,10 +133,12 @@ namespace Isis {
    */
   void Blobber::load(const std::string &filename) {
     Cube cube;
-    cube.Open(filename);
+    cube.open(filename);
     load(cube);
     return;
   }
+
+
   /**
    * @brief Loads the contents of a BLOB from a Cube object
    *
@@ -152,7 +153,7 @@ namespace Isis {
    */
   void Blobber::load(Cube &cube) {
     Table tbl(getBlobName());
-    cube.Read(tbl);
+    cube.read(tbl);
     TableField data = tbl[0][getFieldName()];
     if(data.IsDouble()) {
       loadDouble(tbl);

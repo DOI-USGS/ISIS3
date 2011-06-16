@@ -32,9 +32,9 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   string from = ui.GetAsString("FROM");
   CubeAttributeInput inAtt(from);
-  cube.SetVirtualBands(inAtt.Bands());
+  cube.setVirtualBands(inAtt.Bands());
   from = ui.GetFilename("FROM");
-  cube.Open(from);
+  cube.open(from);
 
   cropNulls = ui.GetBoolean("NULL");
   cropHrs = ui.GetBoolean("HRS");
@@ -42,9 +42,9 @@ void IsisMain() {
   cropHis = ui.GetBoolean("HIS");
   cropLis = ui.GetBoolean("LIS");
 
-  minSample = cube.Samples() + 1;
-  minLine = cube.Lines() + 1;
-  numBands = cube.Bands();
+  minSample = cube.getSampleCount() + 1;
+  minLine = cube.getLineCount() + 1;
+  numBands = cube.getBandCount();
 
   // Setup the input cube
   ProcessByLine p1;
@@ -55,8 +55,8 @@ void IsisMain() {
   p1.StartProcess(FindPerimeter);
   p1.EndProcess();
 
-  if(minSample == cube.Samples() + 1) {
-    cube.Close();
+  if(minSample == cube.getSampleCount() + 1) {
+    cube.close();
     string msg = "There are no valid pixels in the [FROM] cube";
     throw iException::Message(iException::User, msg, _FILEINFO_);
   }
@@ -73,7 +73,7 @@ void IsisMain() {
   p2.ClearInputCubes();
 
   // propagate tables manually
-  Pvl &inLabels = *cube.Label();
+  Pvl &inLabels = *cube.getLabel();
 
   // Loop through the labels looking for object = Table
   for(int labelObj = 0; labelObj < inLabels.Objects(); labelObj++) {
@@ -84,13 +84,13 @@ void IsisMain() {
     // Read the table into a table object
     Table table(obj["Name"], from);
 
-    ocube->Write(table);
+    ocube->write(table);
   }
 
   // Construct a label with the results
   PvlGroup results("Results");
-  results += PvlKeyword("InputLines", cube.Lines());
-  results += PvlKeyword("InputSamples", cube.Samples());
+  results += PvlKeyword("InputLines", cube.getLineCount());
+  results += PvlKeyword("InputSamples", cube.getSampleCount());
   results += PvlKeyword("StartingLine", minLine);
   results += PvlKeyword("StartingSample", minSample);
   results += PvlKeyword("EndingLine", maxLine);
@@ -107,12 +107,12 @@ void IsisMain() {
   // Update the Mapping, Instrument, and AlphaCube groups in the output
   // cube label
   SubArea s;
-  s.SetSubArea(cube.Lines(), cube.Samples(), minLine, minSample, minLine + numLines - 1,
+  s.SetSubArea(cube.getLineCount(), cube.getSampleCount(), minLine, minSample, minLine + numLines - 1,
                minSample + numSamples - 1, 1.0, 1.0);
   s.UpdateLabel(&cube, ocube, results);
 
   p2.EndProcess();
-  cube.Close();
+  cube.close();
 
   delete in;
   in = NULL;
@@ -149,7 +149,7 @@ void FindPerimeter(Buffer &in) {
 void SpecialRemoval(Buffer &out) {
   int iline = minLine + (out.Line() - 1);
   in->SetLine(iline, curBand);
-  cube.Read(*in);
+  cube.read(*in);
 
   // Loop and move appropriate samples
   for(int i = 0; i < out.size(); i++) {

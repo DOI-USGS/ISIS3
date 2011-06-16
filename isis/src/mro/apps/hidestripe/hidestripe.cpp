@@ -50,17 +50,17 @@ void IsisMain() {
   Isis::Filename fromFile = ui.GetFilename("FROM");
 
   Isis::Cube inputCube;
-  inputCube.Open(fromFile.Expanded());
+  inputCube.open(fromFile.Expanded());
 
   //Check to make sure we got the cube properly
-  if(!inputCube.IsOpen()) {
+  if(!inputCube.isOpen()) {
     string msg = "Could not open FROM cube" + fromFile.Expanded();
     throw iException::Message(iException::User, msg, _FILEINFO_);
   }
 
   ProcessByLine processByLine;
   Cube *icube = processByLine.SetInputCube("FROM");
-  int totalSamples = icube->Samples();
+  int totalSamples = icube->getSampleCount();
 
   //We'll be going through the cube by line, manually differentiating
   // between phases
@@ -69,7 +69,7 @@ void IsisMain() {
 
 
   Table hifix("HiRISE Ancillary");
-  int channel = icube->GetGroup("Instrument")["ChannelNumber"];
+  int channel = icube->getGroup("Instrument")["ChannelNumber"];
 
   if(channel == 0) {
     phases = channel0Phases;
@@ -77,7 +77,7 @@ void IsisMain() {
   else {
     phases = channel1Phases;
   }
-  int binning_mode = icube->GetGroup("Instrument")["Summing"];
+  int binning_mode = icube->getGroup("Instrument")["Summing"];
   if(binning_mode != 1 && binning_mode != 2) {
     /*iString msg = "You may only use input with binning mode 1 or 2, not";
     msg += binning_mode;

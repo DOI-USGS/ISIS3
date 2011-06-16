@@ -82,7 +82,7 @@ void IsisMain() {
 
           bandBin.AddKeyword(origBand);
           bandBin.AddKeyword(widths);
-          ocube->PutGroup(bandBin);
+          ocube->putGroup(bandBin);
         }
         //Otherwise throw an error
         else {
@@ -105,11 +105,11 @@ void IsisMain() {
       }
       bandBin.AddKeyword(origBand);
       bandBin.AddKeyword(bandName);
-      ocube->PutGroup(bandBin);
+      ocube->putGroup(bandBin);
     }
     //Translate the Mapping group
     p.TranslatePdsProjection(outLabel);
-    ocube->PutGroup(outLabel.FindGroup("Mapping", Pvl::Traverse));
+    ocube->putGroup(outLabel.FindGroup("Mapping", Pvl::Traverse));
   }
   else if(prodType.Equal("TARGETED_RDR")) {
   }
@@ -124,7 +124,7 @@ void IsisMain() {
     }
     bandBin.AddKeyword(origBand);
     bandBin.AddKeyword(bandName);
-    ocube->PutGroup(bandBin);
+    ocube->putGroup(bandBin);
   }
   else {
     string msg = "Unsupported CRISM file type, supported types are: DDR, MRDR, and TRDR";
@@ -141,8 +141,8 @@ void IsisMain() {
   PvlTranslationManager archiveXlater(labelPvl, transFile.Expanded());
   archiveXlater.Auto(outLabel);
 
-  ocube->PutGroup(outLabel.FindGroup("Instrument", Pvl::Traverse));
-  ocube->PutGroup(outLabel.FindGroup("Archive", Pvl::Traverse));
+  ocube->putGroup(outLabel.FindGroup("Instrument", Pvl::Traverse));
+  ocube->putGroup(outLabel.FindGroup("Archive", Pvl::Traverse));
 
   p.StartProcess();
   p.EndProcess();

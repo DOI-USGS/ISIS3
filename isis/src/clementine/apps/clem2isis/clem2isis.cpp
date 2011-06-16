@@ -109,7 +109,7 @@ void TranslateLabels(Filename in, Cube *ocube) {
   PvlTranslationManager labelXlater(pdsLab, transFile.Expanded());
 
   // Pvl outputLabels;
-  Pvl *outputLabel = ocube->Label();
+  Pvl *outputLabel = ocube->getLabel();
   labelXlater.Auto(*(outputLabel));
 
   //Instrument group
@@ -130,7 +130,7 @@ void TranslateLabels(Filename in, Cube *ocube) {
     inst += PvlKeyword("MCPGainModeID", (string)pdsLab["MCP_Gain_Mode_ID"], "");
   }
 
-  ocube->PutGroup(inst);
+  ocube->putGroup(inst);
 
   PvlGroup bBin = outputLabel->FindGroup("BandBin", Pvl::Traverse);
   std::string filter = pdsLab["FilterName"];
@@ -143,7 +143,7 @@ void TranslateLabels(Filename in, Cube *ocube) {
   double width = pdsLab["Bandwidth"];
   width /= 1000.0;
   bBin.FindKeyword("Width").SetValue(width, "micrometers");
-  ocube->PutGroup(bBin);
+  ocube->putGroup(bBin);
 
   //Kernel group
   PvlGroup kern("Kernels");
@@ -159,8 +159,8 @@ void TranslateLabels(Filename in, Cube *ocube) {
   if(((string)inst["InstrumentId"]) == "LWIR") {
     kern += PvlKeyword("NaifFrameCode", "-40004");
   }
-  ocube->PutGroup(kern);
+  ocube->putGroup(kern);
 
   OriginalLabel org(pdsLab);
-  ocube->Write(org);
+  ocube->write(org);
 }

@@ -78,7 +78,7 @@ void IsisMain() {
 
   // Translate the keywords from the original labels that go in this label
   OriginalLabel origBlob;
-  iCube->Read(origBlob);
+  iCube->read(origBlob);
   Pvl origLabel;
   PvlObject origLabelObj = origBlob.ReturnLabels();
   origLabelObj.SetName("OriginalLabelObject");
@@ -176,13 +176,13 @@ void IsisMain() {
 
   // Add to labels boresight or fiducial data
   string bandBinTransFile;
-  if(iCube->Label()->HasKeyword("FiducialId", Pvl::Traverse)) {
+  if(iCube->getLabel()->HasKeyword("FiducialId", Pvl::Traverse)) {
     bandBinTransFile = transDir + "LoFiducialExport.trn";
-    PvlTranslationManager bandLab(*(iCube->Label()), bandBinTransFile);
+    PvlTranslationManager bandLab(*(iCube->getLabel()), bandBinTransFile);
     bandLab.Auto(pdsLabel);
 
     // Change the units of FIDCUAIL_COORDINATE_MICRON from "um" to "<micron>"
-    PvlKeyword &coordMicron = iCube->Label()->FindKeyword(
+    PvlKeyword &coordMicron = iCube->getLabel()->FindKeyword(
         "FiducialCoordinateMicron", Pvl::Traverse);
     string coordMicronStr = coordMicron[0];
     unsigned umPos = coordMicronStr.find("um");
@@ -193,9 +193,9 @@ void IsisMain() {
 
     pdsLabel.AddKeyword(coordMicron, PvlContainer::Replace);
   }
-  else if(iCube->Label()->HasKeyword("BoresightSample", Pvl::Traverse)) {
+  else if(iCube->getLabel()->HasKeyword("BoresightSample", Pvl::Traverse)) {
     bandBinTransFile = transDir + "LoBoresightExport.trn";
-    PvlTranslationManager bandLab(*(iCube->Label()), bandBinTransFile);
+    PvlTranslationManager bandLab(*(iCube->getLabel()), bandBinTransFile);
     bandLab.Auto(pdsLabel);
   }
   else {

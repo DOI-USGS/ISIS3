@@ -228,9 +228,9 @@ void ReadVimsBIL(std::string inFilename, const PvlKeyword &suffixItems, std::str
   multList.push_back(str.ToDouble());
 
   Cube outCube;
-  outCube.SetPixelType(Isis::Real);
-  outCube.SetDimensions(ns, nl, nb);
-  outCube.Create(outFile);
+  outCube.setPixelType(Isis::Real);
+  outCube.setDimensions(ns, nl, nb);
+  outCube.create(outFile);
 
   // Figure out the number of bytes to read for a single line
   int readBytes = Isis::SizeOf(pixelType);
@@ -325,7 +325,7 @@ void ReadVimsBIL(std::string inFilename, const PvlKeyword &suffixItems, std::str
 
       //Set the buffer position and write the line to the output file
       out.SetBasePosition(1, line + 1, band + 1);
-      outCube.Write(out);
+      outCube.write(out);
 
       if((int)suffixItems[0] != 0) {
         pos = fin.tellg();
@@ -383,12 +383,12 @@ void ReadVimsBIL(std::string inFilename, const PvlKeyword &suffixItems, std::str
 
   } // End line loop
 
-  outCube.Write(sideplaneVisTable);
-  outCube.Write(sideplaneIrTable);
+  outCube.write(sideplaneVisTable);
+  outCube.write(sideplaneIrTable);
 
   // Close the file and clean up
   fin.close();
-  outCube.Close();
+  outCube.close();
   delete [] in;
 }
 
@@ -424,7 +424,7 @@ void ProcessBands(Pvl &pdsLab, Cube *vimsCube, VimsType vtype) {
   //input band specific information
   if(vtype == VIS) {
     vims.mi32OrigBandStart   = 1;
-    vims.mi32OrigBinEnd      = vimsCube->Bands();
+    vims.mi32OrigBinEnd      = vimsCube->getBandCount();
     vims.mi32BandCenterStart = 0;
     vims.mi32BandCenterEnd   = 96;
     vims.mi32NaifFrameCode   = -82370;
@@ -452,12 +452,12 @@ void ProcessBands(Pvl &pdsLab, Cube *vimsCube, VimsType vtype) {
   }
   bandbin += center;
 
-  vimsCube->PutGroup(bandbin);
+  vimsCube->putGroup(bandbin);
 
   //Create the Kernels Group
   PvlGroup kern("Kernels");
   kern += PvlKeyword("NaifFrameCode", vims.mi32NaifFrameCode);
-  vimsCube->PutGroup(kern);
+  vimsCube->putGroup(kern);
 }
 
 //************************************************************
@@ -522,11 +522,11 @@ void TranslateVimsLabels(Pvl &pdsLab, Cube *vimscube, VimsType vType) {
     inst += PvlKeyword("GainMode", (string)qube["GainModeId"][1]);
   }
 
-  vimscube->PutGroup(inst);
+  vimscube->putGroup(inst);
 
   //Get Archive
   PvlGroup &archive = outputLabel.FindGroup("Archive", Pvl::Traverse);
-  vimscube->PutGroup(archive);
+  vimscube->putGroup(archive);
 
   ProcessBands(pdsLab, vimscube, vType);
 }

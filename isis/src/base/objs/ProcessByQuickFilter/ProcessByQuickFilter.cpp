@@ -58,19 +58,19 @@ namespace Isis {
     }
 
     // The lines in the input and output must match
-    if(InputCubes[0]->Lines() != OutputCubes[0]->Lines()) {
+    if(InputCubes[0]->getLineCount() != OutputCubes[0]->getLineCount()) {
       string m = "The lines in the input and output cube must match";
       throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
     }
 
     // The samples in the input and output must match
-    if(InputCubes[0]->Samples() != OutputCubes[0]->Samples()) {
+    if(InputCubes[0]->getSampleCount() != OutputCubes[0]->getSampleCount()) {
       string m = "The samples in the input and output cube must match";
       throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
     }
 
     // The bands in the input and output must match
-    if(InputCubes[0]->Bands() != OutputCubes[0]->Bands()) {
+    if(InputCubes[0]->getBandCount() != OutputCubes[0]->getBandCount()) {
       string m = "The bands in the input and output cube must match";
       throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
     }
@@ -81,9 +81,9 @@ namespace Isis {
     Isis::LineManager *botline = new Isis::LineManager(*InputCubes[0]);
     Isis::LineManager *oline = new Isis::LineManager(*OutputCubes[0]);
 
-    int lines = InputCubes[0]->Lines();
-    int samples = InputCubes[0]->Samples();
-    int bands = InputCubes[0]->Bands();
+    int lines = InputCubes[0]->getLineCount();
+    int samples = InputCubes[0]->getSampleCount();
+    int bands = InputCubes[0]->getBandCount();
 
     // See if we need to get parameters from the user
     if(p_getParametersFromUser) GetFilterParameters();
@@ -116,7 +116,7 @@ namespace Isis {
         int iline = bot;
         if(bot <= 0) iline = (-1 * bot + 2);
         botline->SetLine(iline, band);
-        InputCubes[0]->Read(*botline);
+        InputCubes[0]->read(*botline);
         filter.AddLine(botline->DoubleBuffer());
       }
       bot = 1 + filter.HalfHeight() + 1;
@@ -126,9 +126,9 @@ namespace Isis {
         // Process a line
         iline->SetLine(line, band);
         oline->SetLine(line, band);
-        InputCubes[0]->Read(*iline);
+        InputCubes[0]->read(*iline);
         funct(*iline, *oline, filter);
-        OutputCubes[0]->Write(*oline);
+        OutputCubes[0]->write(*oline);
 
         // Remove the top line
         if(top >= 1) {
@@ -137,7 +137,7 @@ namespace Isis {
         else {
           topline->SetLine(-1 * top + 2, band);
         }
-        InputCubes[0]->Read(*topline);
+        InputCubes[0]->read(*topline);
         filter.RemoveLine(topline->DoubleBuffer());
         top++;
 
@@ -145,13 +145,13 @@ namespace Isis {
         p_progress->CheckStatus();
         if(line == lines) continue;
 
-        if(bot <= InputCubes[0]->Lines()) {
+        if(bot <= InputCubes[0]->getLineCount()) {
           botline->SetLine(bot, band);
         }
         else {
           botline->SetLine(lines - (bot - lines), band);
         }
-        InputCubes[0]->Read(*botline);
+        InputCubes[0]->read(*botline);
         filter.AddLine(botline->DoubleBuffer());
         bot++;
 

@@ -99,18 +99,18 @@ void IsisMain() {
     ProcessByLine p;
 
     Cube *hifrom = p.SetInputCube("FROM");
-    int nsamps = hifrom->Samples();
-    int nlines = hifrom->Lines();
+    int nsamps = hifrom->getSampleCount();
+    int nlines = hifrom->getLineCount();
 
 //  Initialize the configuration file
     string conf(ui.GetAsString("CONF"));
-    HiCalConf hiconf(*(hifrom->Label()), conf);
+    HiCalConf hiconf(*(hifrom->getLabel()), conf);
     DbProfile hiprof = hiconf.getMatrixProfile();
 
 // Check for label propagation and set the output cube
     Cube *ocube = p.SetOutputCube("TO");
     if(!IsTrueValue(hiprof, "PropagateTables", "TRUE")) {
-      RemoveHiBlobs(*(ocube->Label()));
+      RemoveHiBlobs(*(ocube->getLabel()));
     }
 
 //  Set specified profile if entered by user
@@ -125,7 +125,7 @@ void IsisMain() {
     }
     else {
       //  Set default to output directory
-      hiconf.add("OPATH", Filename(ocube->Filename()).Path());
+      hiconf.add("OPATH", Filename(ocube->getFilename()).Path());
     }
 
 //  Do I/F output DN conversions
@@ -403,8 +403,8 @@ void IsisMain() {
         ofile << "Version:  " << hical_version << endl;
         ofile << "Revision: " << hical_revision << endl << endl;
 
-        ofile << "FROM:     " << hifrom->Filename() << endl;
-        ofile << "TO:       " << ocube->Filename()  << endl;
+        ofile << "FROM:     " << hifrom->getFilename() << endl;
+        ofile << "TO:       " << ocube->getFilename()  << endl;
         ofile << "CONF:     " << conf_file  << endl << endl;
 
         ofile << "/* " << hical_program << " application equation */" << endl
@@ -429,12 +429,12 @@ void IsisMain() {
 
 //  Ensure the RadiometricCalibration group is out there
     const std::string rcalGroup("RadiometricCalibration");
-    if(!ocube->HasGroup(rcalGroup)) {
+    if(!ocube->hasGroup(rcalGroup)) {
       PvlGroup temp(rcalGroup);
-      ocube->PutGroup(temp);
+      ocube->putGroup(temp);
     }
 
-    PvlGroup &rcal = ocube->GetGroup(rcalGroup);
+    PvlGroup &rcal = ocube->getGroup(rcalGroup);
     rcal += PvlKeyword("Program", hical_program);
     rcal += PvlKeyword("RunTime", hical_runtime);
     rcal += PvlKeyword("Version", hical_version);

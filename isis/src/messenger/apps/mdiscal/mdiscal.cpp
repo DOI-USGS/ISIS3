@@ -93,7 +93,7 @@ void IsisMain() {
   model = 0;
 
   Cube *icube = p.SetInputCube("FROM");
-  PvlGroup &inst = icube->GetGroup("Instrument");
+  PvlGroup &inst = icube->getGroup("Instrument");
   isNarrowAngleCamera = ((string)inst["InstrumentId"] == "MDIS-NAC");
   exposureDuration = inst["ExposureDuration"];
   exposureDuration /= 1000.0;  //  Convert ms to sec
@@ -122,7 +122,7 @@ void IsisMain() {
   nSampsToNull = MIN(MAX(nDarkColumns+1,nSampsToNull), 4);  // No more than 4!
   darkStrip.Reset();
 
-  ccdTemperature = icube->GetGroup("Archive")["CCDTemperature"];
+  ccdTemperature = icube->getGroup("Archive")["CCDTemperature"];
 
   // Binned data only applies to FPUBIN mode.  Pixel binning must be dealt
   // with specially in other calibration support components
@@ -130,7 +130,7 @@ void IsisMain() {
 
   // Get the trusted filter number
   if(!isNarrowAngleCamera) {
-    filterNumber = ((int)(icube->GetGroup("BandBin")["Number"])) - 1;
+    filterNumber = ((int)(icube->getGroup("BandBin")["Number"])) - 1;
   }
   else {
     filterNumber = 1;  // For the NAC
@@ -145,17 +145,17 @@ void IsisMain() {
   g_flatfield = ui.GetBoolean("FLATFIELD");
   g_radiometric = ui.GetBoolean("RADIOMETRIC");
 
-  if(icube->Bands() != 1) {
+  if(icube->getBandCount() != 1) {
     throw iException::Message(iException::User,
                               "MDIS images may only contain one band", _FILEINFO_);
   }
 
-  if(icube->Samples() < 3) {
+  if(icube->getSampleCount() < 3) {
     throw iException::Message(iException::User,
                               "Unable to obtain dark current data. Expected a sample dimension of at least 3", _FILEINFO_);
   }
 
-  if((int)icube->GetGroup("Instrument")["Unlutted"] == false) {
+  if((int)icube->getGroup("Instrument")["Unlutted"] == false) {
     throw iException::Message(iException::User,
                               "Calibration may not be performed on unlutted data.", _FILEINFO_);
   }
@@ -194,11 +194,11 @@ void IsisMain() {
   }
   else if(darkCurr == "STANDARD") {
     darkCurrentMode = DarkCurrentStandard;
-    calibrationValues.resize(icube->Lines());
+    calibrationValues.resize(icube->getLineCount());
   }
   else if(darkCurr == "LINEAR") {
     darkCurrentMode = DarkCurrentLinear;
-    calibrationValues.resize(icube->Lines());
+    calibrationValues.resize(icube->getLineCount());
   }
   else if(darkCurr == "MODEL") {
     if(exposureDuration > 1.0) {
@@ -210,7 +210,7 @@ void IsisMain() {
 
       // set processing to standard
       darkCurrentMode = DarkCurrentLinear;
-      calibrationValues.resize(icube->Lines());
+      calibrationValues.resize(icube->getLineCount());
       darkCurr = "STANDARD";
     }
     else {
@@ -292,7 +292,7 @@ void IsisMain() {
   bool iof_is_good = false;
   string solirrfile("");
   if (do_iof) {
-    PvlGroup &inst = icube->GetGroup("Instrument");
+    PvlGroup &inst = icube->getGroup("Instrument");
     string target = inst["TargetName"];
     string startTime = inst["SpacecraftClockCount"];
     if(sunDistanceAU(startTime, target, solarDist)) {
@@ -424,7 +424,7 @@ void IsisMain() {
   calibrationLog.AddKeyword(PvlKeyword("LeftSamplesNulled", nSampsToNull));
 
   //  Handle updates of ProductId and SourceProduct Id keywords
-  PvlGroup &archive = ocube->GetGroup("Archive");
+  PvlGroup &archive = ocube->getGroup("Archive");
   PvlKeyword key = archive["ProductId"];
   iString orgProdId = key[0];
   iString newProdId = orgProdId + "_" + calibType + "_" + iString(cdr_version);
@@ -455,7 +455,7 @@ void IsisMain() {
   archive.AddKeyword(key, Pvl::Replace);
 
   // Write Calibration group to file and log
-  ocube->PutGroup(calibrationLog);
+  ocube->putGroup(calibrationLog);
   Application::Log(calibrationLog);
   configFile.Clear();
 }

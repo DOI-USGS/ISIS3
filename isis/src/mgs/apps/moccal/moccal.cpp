@@ -65,9 +65,9 @@ void IsisMain() {
   gbl::moc = new MocLabels(ui.GetFilename("FROM"));
 
   // If it is already calibrated then complain
-  if(icube->HasGroup("Radiometry")) {
-    string msg = "The MOC image [" + icube->Filename() + "] has already been ";
-    msg += "radiometrically calibrated";
+  if(icube->hasGroup("Radiometry")) {
+    string msg = "The MOC image [" + icube->getFilename() + "] has already "
+                 "been radiometrically calibrated";
     throw iException::Message(iException::User, msg, _FILEINFO_);
   }
 
@@ -118,7 +118,7 @@ void IsisMain() {
   gbl::g = calCamera["G"];
   gbl::w0 = calCamera["W0"];
   string coefFile = calCamera["CoefFile"];
-  gbl::LoadCoefficients(coefFile, icube->Samples());
+  gbl::LoadCoefficients(coefFile, icube->getSampleCount());
 
 #if 0
   // Override with these with any user selected parameters
@@ -176,7 +176,7 @@ void IsisMain() {
   calgrp += PvlKeyword("s", sunAU);
   calgrp += PvlKeyword("iof", gbl::iof);
 
-  ocube->PutGroup(calgrp);
+  ocube->putGroup(calgrp);
 
   // Start the line-by-line calibration sequence
   p.StartProcess(gbl::Calibrate);
@@ -307,8 +307,8 @@ void gbl::FixWagoLines(string file) {
 
   // Open the cube to repair
   Cube fix;
-  fix.Open(file, "rw");
-  const int nl = fix.Lines();
+  fix.open(file, "rw");
+  const int nl = fix.getLineCount();
 
   // Create a line manager on the cube for I/O
   LineManager lbuf(fix);
@@ -395,7 +395,7 @@ void gbl::FixWagoLines(string file) {
 
       // Read the line
       lbuf.SetLine(line);
-      fix.Read(lbuf);
+      fix.read(lbuf);
 
       // Null it
       if(gbl::nullWago) {
@@ -418,10 +418,10 @@ void gbl::FixWagoLines(string file) {
       }
 
       // Write the line
-      fix.Write(lbuf);
+      fix.write(lbuf);
     }
   }
 
   // Cleanup
-  fix.Close();
+  fix.close();
 }

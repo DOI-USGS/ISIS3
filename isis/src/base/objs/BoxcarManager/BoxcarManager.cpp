@@ -36,8 +36,9 @@ namespace Isis {
    */
   BoxcarManager::BoxcarManager(const Isis::Cube &cube,
                                const int &boxSamples, const int &boxLines) :
-    Isis::BufferManager(cube.Samples(), cube.Lines(), cube.Bands(),
-                        boxSamples, boxLines, 1, cube.PixelType()) {
+    Isis::BufferManager(cube.getSampleCount(), cube.getLineCount(),
+                        cube.getBandCount(), boxSamples, boxLines, 1,
+                        cube.getPixelType()) {
 
     Isis::BufferManager::SetIncrements(1, 1, 1);
     int soff, loff, boff;

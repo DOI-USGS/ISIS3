@@ -23,12 +23,12 @@ void IsisMain() {
 
   // Setup the input and output cubes
   Cube* info = p.SetInputCube("FROM");
-  PvlKeyword &status = info ->GetGroup("RESEAUS")["STATUS"];
+  PvlKeyword &status = info ->getGroup("RESEAUS")["STATUS"];
   UserInterface &ui = Application::GetUserInterface();
   string in = ui.GetFilename("FROM");
   
-  string spacecraft = (info->GetGroup("Instrument")["SpacecraftName"]);
-  string instrument = (info->GetGroup("Instrument")["InstrumentId"]);
+  string spacecraft = (info->getGroup("Instrument")["SpacecraftName"]);
+  string instrument = (info->getGroup("Instrument")["InstrumentId"]);
   Apollo apollo(spacecraft, instrument);
   if (spacecraft.substr(0,6) != "APOLLO") {
     string msg = "This application is for use with Apollo spacecrafts only. ";
@@ -64,9 +64,9 @@ void IsisMain() {
 
   // Open the output cube
   Cube cube;
-  cube.Open(out, "rw");
+  cube.open(out, "rw");
 
-  PvlGroup &res = cube.Label()->FindGroup("RESEAUS",Pvl::Traverse);
+  PvlGroup &res = cube.getLabel()->FindGroup("RESEAUS",Pvl::Traverse);
 
   // Get reseau line, sample, type, and valid Keywords
   PvlKeyword lines = res.FindKeyword("LINE");
@@ -75,14 +75,14 @@ void IsisMain() {
   PvlKeyword valid = res.FindKeyword("VALID");
   int numres = lines.Size();
 
-  Brick brick(dim,dim,1,cube.PixelType());
+  Brick brick(dim,dim,1,cube.getPixelType());
   int width = ui.GetInteger("WIDTH");
   for (int res=0; res<numres; res++) {
     if ((resvalid == 0 || (int)valid[res] == 1)) {
       int baseSamp = (int)((double)samps[res]+0.5) - (dim/2);
       int baseLine = (int)((double)lines[res]+0.5) - (dim/2);
       brick.SetBasePosition(baseSamp,baseLine,1);
-      cube.Read(brick);
+      cube.read(brick);
       if (action == "NULL") {
         // set the three pixels surrounding the reseau to null
         for (int i=0; i<dim; i++) {
@@ -105,9 +105,9 @@ void IsisMain() {
         }
       }
     }
-    cube.Write(brick);
+    cube.write(brick);
   }
-  cube.Close();
+  cube.close();
 }
 
 // Copy the input cube to the output cube

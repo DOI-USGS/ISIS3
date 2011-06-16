@@ -99,14 +99,14 @@ void IsisMain() {
   CubeAttributeOutput &outAtt = ui.GetOutputAttribute("TO");
 
   g_ocube = new Cube();
-  g_ocube->SetByteOrder(outAtt.ByteOrder());
-  g_ocube->SetCubeFormat(outAtt.FileFormat());
-  g_ocube->SetMinMax((double) VALID_MIN2, (double) VALID_MAX2);
-  if(outAtt.DetachedLabel()) g_ocube->SetDetached();
-  if(outAtt.AttachedLabel()) g_ocube->SetAttached();
-  g_ocube->SetDimensions(p.Samples(), p.Lines(), p.Bands());
-  g_ocube->SetPixelType(Isis::Real);
-  g_ocube->Create(ui.GetFilename("TO"));
+  g_ocube->setByteOrder(outAtt.ByteOrder());
+  g_ocube->setFormat(outAtt.FileFormat());
+  g_ocube->setMinMax((double) VALID_MIN2, (double) VALID_MAX2);
+  if(outAtt.DetachedLabel()) g_ocube->setLabelsAttached(false);
+  if(outAtt.AttachedLabel()) g_ocube->setLabelsAttached(true);
+  g_ocube->setDimensions(p.Samples(), p.Lines(), p.Bands());
+  g_ocube->setPixelType(Isis::Real);
+  g_ocube->create(ui.GetFilename("TO"));
 
   // Do 8 bit to 12 bit conversion
   // And if NAC-R, flip the frame
@@ -119,22 +119,24 @@ void IsisMain() {
   // Add History
   History history("IsisCube");
   history.AddEntry();
-  g_ocube->Write(history);
+  g_ocube->write(history);
 
   // Add original label
   OriginalLabel origLabel(pdsLab);
-  g_ocube->Write(origLabel);
+  g_ocube->write(origLabel);
 
-  g_ocube->Close();
+  g_ocube->close();
   delete g_ocube;
 }
 
-// The input buffer has a raw 16 bit buffer but the values are still 0 to 255
-// See "Appendix B - NAC and WAC Companding Schemes" of the LROC_SOC_SPEC document for reference
+// The input buffer has a raw 16 bit buffer but the values are still 0 to 255.
+// See "Appendix B - NAC and WAC Companding Schemes" of the LROC_SOC_SPEC
+// document for reference.
 void Import(Buffer &in) {
   LineManager outLines(*g_ocube);
   outLines.SetLine(in.Line(), in.Band());
-  Buffer buf(in.SampleDimension(), in.LineDimension(), in.BandDimension(), g_ocube->PixelType());
+  Buffer buf(in.SampleDimension(), in.LineDimension(), in.BandDimension(),
+             g_ocube->getPixelType());
 
   // Do the decompanding
   for(int pixin = 0; pixin < in.size(); pixin++) {
@@ -178,7 +180,7 @@ void Import(Buffer &in) {
       buf[i] = tmpbuf[buf.size() - i - 1];
   }
   outLines.Copy(buf);
-  g_ocube->Write(outLines);
+  g_ocube->write(outLines);
 }
 
 //Function to translate the labels
@@ -226,10 +228,10 @@ void TranslateLrocNacLabels(Filename &labelFile, Cube *ocube) {
   }
 
   //Add all groups to the output cube
-  ocube->PutGroup(inst);
-  ocube->PutGroup(outLabel.FindGroup("Archive", Pvl::Traverse));
-  ocube->PutGroup(outLabel.FindGroup("BandBin", Pvl::Traverse));
-  ocube->PutGroup(kern);
+  ocube->putGroup(inst);
+  ocube->putGroup(outLabel.FindGroup("Archive", Pvl::Traverse));
+  ocube->putGroup(outLabel.FindGroup("BandBin", Pvl::Traverse));
+  ocube->putGroup(kern);
 }
 
 void ResetGlobals() {

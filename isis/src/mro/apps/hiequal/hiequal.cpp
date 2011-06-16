@@ -111,7 +111,7 @@ void IsisMain() {
       }
 
       CubeAttributeOutput outAtt;
-      p.SetOutputCube(out, outAtt, icube->Samples(), icube->Lines(), icube->Bands());
+      p.SetOutputCube(out, outAtt, icube->getSampleCount(), icube->getLineCount(), icube->getBandCount());
       p.StartProcess(Apply);
       p.EndProcess();
     }
@@ -222,8 +222,8 @@ void ErrorCheck(FileList &imageList, FileList &outList) {
   for(int i = 0; i < (int)imageList.size(); i++) {
     try {
       Cube cube1;
-      cube1.Open(imageList[i]);
-      PvlGroup &from1Instrument = cube1.GetGroup("INSTRUMENT");
+      cube1.open(imageList[i]);
+      PvlGroup &from1Instrument = cube1.getGroup("INSTRUMENT");
       int cpmmNumber = from1Instrument["CpmmNumber"];
       ccds.push_back(cpmm2ccd[cpmmNumber]);
     }

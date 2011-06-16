@@ -45,7 +45,7 @@ void IsisMain() {
   // Make sure it is not projected
   Projection *proj = NULL;
   try {
-    proj = icube->Projection();
+    proj = icube->getProjection();
   }
   catch(iException &e) {
     proj = NULL;
@@ -57,11 +57,11 @@ void IsisMain() {
     throw iException::Message(iException::User, msg, _FILEINFO_);
   }
 
-  Pvl lab = *icube->Label();
+  Pvl lab = *icube->getLabel();
 
   // if cube has existing polygon delete it
-  if(icube->Label()->HasObject("Polygon")) {
-    icube->Label()->DeleteObject("Polygon");
+  if(icube->getLabel()->HasObject("Polygon")) {
+    icube->getLabel()->DeleteObject("Polygon");
   }
 
   // Set up for getting the mission name
@@ -195,7 +195,7 @@ bool TryKernels(Cube *icube, Process &p,
                 Kernel fk, Kernel ik, Kernel sclk,
                 Kernel spk, Kernel iak,
                 Kernel dem, Kernel exk) {
-  Pvl lab = *icube->Label();
+  Pvl lab = *icube->getLabel();
 
   // Add the new kernel files to the existing kernels group
   PvlKeyword lkKeyword("LeapSecond");
@@ -240,7 +240,7 @@ bool TryKernels(Cube *icube, Process &p,
     exkKeyword.AddValue(exk[i]);
   }
 
-  PvlGroup originalKernels = icube->GetGroup("Kernels");
+  PvlGroup originalKernels = icube->getGroup("Kernels");
   PvlGroup currentKernels = originalKernels;
   currentKernels.AddKeyword(lkKeyword, Pvl::Replace);
   currentKernels.AddKeyword(pckKeyword, Pvl::Replace);
@@ -301,13 +301,13 @@ bool TryKernels(Cube *icube, Process &p,
   currentKernels.AddKeyword(PvlKeyword("CameraVersion", CameraFactory::CameraVersion(lab)), Pvl::Replace);
 
   // Add the modified Kernels group to the input cube labels
-  icube->PutGroup(currentKernels);
+  icube->putGroup(currentKernels);
 
   // Create the camera so we can get blobs if necessary
   try {
     Camera *cam;
     try {
-      cam = icube->Camera();
+      cam = icube->getCamera();
       Application::Log(currentKernels);
     }
     catch(iException &e) {
@@ -318,7 +318,7 @@ bool TryKernels(Cube *icube, Process &p,
       }
 
       Application::Log(currentKernels);
-      icube->PutGroup(originalKernels);
+      icube->putGroup(originalKernels);
       throw e;
     }
     if(ui.GetBoolean("ATTACH")) {
@@ -329,7 +329,7 @@ bool TryKernels(Cube *icube, Process &p,
       for(int i = 0; i < ckKeyword.Size(); i++) {
         ckTable.Label()["Kernels"].AddValue(ckKeyword[i]);
       }
-      icube->Write(ckTable);
+      icube->write(ckTable);
 
       Table spkTable = cam->InstrumentPosition()->Cache("InstrumentPosition");
       spkTable.Label() += PvlKeyword("Description", "Created by spiceinit");
@@ -337,7 +337,7 @@ bool TryKernels(Cube *icube, Process &p,
       for(int i = 0; i < spkKeyword.Size(); i++) {
         spkTable.Label()["Kernels"].AddValue(spkKeyword[i]);
       }
-      icube->Write(spkTable);
+      icube->write(spkTable);
 
       Table bodyTable = cam->BodyRotation()->Cache("BodyRotation");
       bodyTable.Label() += PvlKeyword("Description", "Created by spiceinit");
@@ -350,7 +350,7 @@ bool TryKernels(Cube *icube, Process &p,
       }
       bodyTable.Label() += PvlKeyword("SolarLongitude",
           cam->SolarLongitude().GetDegrees());
-      icube->Write(bodyTable);
+      icube->write(bodyTable);
 
       Table sunTable = cam->SunPosition()->Cache("SunPosition");
       sunTable.Label() += PvlKeyword("Description", "Created by spiceinit");
@@ -358,7 +358,7 @@ bool TryKernels(Cube *icube, Process &p,
       for(int i = 0; i < targetSpkKeyword.Size(); i++) {
         sunTable.Label()["Kernels"].AddValue(targetSpkKeyword[i]);
       }
-      icube->Write(sunTable);
+      icube->write(sunTable);
 
       //  Save original kernels in keyword before changing to Table
       PvlKeyword origCk = currentKernels["InstrumentPointing"];
@@ -377,9 +377,9 @@ bool TryKernels(Cube *icube, Process &p,
       for(int i = 0; i < origTargPos.Size(); i++) {
         currentKernels["TargetPosition"].AddValue(origTargPos[i]);
       }
-      icube->PutGroup(currentKernels);
+      icube->putGroup(currentKernels);
       
-      Pvl *label = icube->Label();
+      Pvl *label = icube->getLabel();
       int i = 0;
       while(i < label->Objects()) {
         PvlObject currObj = label->Object(i);
@@ -391,11 +391,11 @@ bool TryKernels(Cube *icube, Process &p,
         }
       }
       
-      *icube->Label() += cam->getStoredNaifKeywords();
+      *icube->getLabel() += cam->getStoredNaifKeywords();
     }
     //modify Kernels group only
     else {
-      Pvl *label = icube->Label();
+      Pvl *label = icube->getLabel();
       int i = 0;
       while(i < label->Objects()) {
         PvlObject currObj = label->Object(i);
@@ -429,7 +429,7 @@ bool TryKernels(Cube *icube, Process &p,
   }
   catch(iException &e) {
     e.Clear();
-    icube->PutGroup(originalKernels);
+    icube->putGroup(originalKernels);
     return false;
   }
 

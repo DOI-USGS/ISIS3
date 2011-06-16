@@ -62,15 +62,15 @@ void IsisMain() {
 
     // We need the target body
     Cube c;
-    c.Open(filename, "rw");
+    c.open(filename, "rw");
     //check for target name
-    if(c.Label()->HasKeyword("TargetName", PvlObject::Traverse)) {
+    if(c.getLabel()->HasKeyword("TargetName", PvlObject::Traverse)) {
 //       c.Label()->FindKeyword("TargetName");
-      PvlGroup inst = c.Label()->FindGroup("Instrument", PvlObject::Traverse);
+      PvlGroup inst = c.getLabel()->FindGroup("Instrument", PvlObject::Traverse);
       std::string targetName = inst["TargetName"];
       cnet.SetTarget(targetName);
     }
-    c.Close();
+    c.close();
 
   // See if they wanted to solve for twist
   if(ui.GetBoolean("TWIST")) {
@@ -121,11 +121,11 @@ void IsisMain() {
     b.SolveSpecialK();
 
     Cube c;
-    c.Open(filename, "rw");
+    c.open(filename, "rw");
 
     //check for existing polygon, if exists delete it
-    if(c.Label()->HasObject("Polygon")) {
-      c.Label()->DeleteObject("Polygon");
+    if(c.getLabel()->HasObject("Polygon")) {
+      c.getLabel()->DeleteObject("Polygon");
     }
 
     Table cmatrix = b.Cmatrix(0);
@@ -138,12 +138,12 @@ void IsisMain() {
     //cmatrix.Label().FindObject("Table",Pvl::Traverse).AddKeyword(description);
 
     // Update the cube history
-    c.Write(cmatrix);
+    c.write(cmatrix);
     History h("IsisCube");
-    c.Read(h);
+    c.read(h);
     h.AddEntry();
-    c.Write(h);
-    c.Close();
+    c.write(h);
+    c.close();
     PvlGroup gp("DeltackResults");
     gp += PvlKeyword("Status", "Camera pointing updated");
     Application::Log(gp);

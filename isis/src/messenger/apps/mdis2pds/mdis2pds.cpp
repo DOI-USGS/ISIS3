@@ -101,7 +101,7 @@ void IsisMain() {
   ProcessExportPds processPds;
   Cube *incube = processPds.SetInputCube("FROM");
 
-  Histogram *hist = incube->Histogram(0);
+  Histogram *hist = incube->getHistogram(0);
   double minmin = 0.0;
   double maxmax = 0.0;
   if(ui.GetString("TYPE").compare("AUTOMATIC") == 0) {
@@ -182,7 +182,7 @@ void IsisMain() {
   // Translate the keywords from the original EDR PDS label that go in
   // this RDR PDS label
   OriginalLabel origBlob;
-  incube->Read(origBlob);
+  incube->read(origBlob);
   Pvl origLabel;
   PvlObject origLabelObj = origBlob.ReturnLabels();
   origLabelObj.SetName("OriginalLabelObject");
@@ -191,7 +191,7 @@ void IsisMain() {
   p.CheckStatus();
 
   // Translates the ISIS labels along with the original EDR labels
-  origLabel.AddObject(*(incube->Label()));
+  origLabel.AddObject(*(incube->getLabel()));
   PvlTranslationManager labels(origLabel,
                                "$messenger/translations/mdisCdrLabel.trn");
   labels.Auto(pdsLabel);

@@ -27,8 +27,8 @@ void IsisMain() {
   Isis::Cube *icube = p.SetInputCube("FROM");
 
   // get the center pixels coordinates
-  x = (icube->Samples() + 1) / 2;
-  y = (icube->Lines() + 1) / 2;
+  x = (icube->getSampleCount() + 1) / 2;
+  y = (icube->getLineCount() + 1) / 2;
 
   p.SetOutputCube("TO");
 

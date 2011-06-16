@@ -24,7 +24,7 @@ void IsisMain() {
       highSamples = ui.GetInteger("VHNS");
     }
     else {
-      highSamples = icube->Samples();
+      highSamples = icube->getSampleCount();
       if(highSamples % 2 == 0) highSamples -= 1;
     }
 
@@ -32,7 +32,7 @@ void IsisMain() {
       lowLines = ui.GetInteger("VLNL");
     }
     else {
-      lowLines = icube->Lines();
+      lowLines = icube->getLineCount();
       if(lowLines % 2 == 0) lowLines -= 1;
     }
 
@@ -44,7 +44,7 @@ void IsisMain() {
       highLines = ui.GetInteger("HHNL");
     }
     else {
-      highLines = icube->Lines();
+      highLines = icube->getLineCount();
       if(highLines % 2 == 0) highLines -= 1;
     }
 
@@ -52,7 +52,7 @@ void IsisMain() {
       lowSamples = ui.GetInteger("HLNS");
     }
     else {
-      lowSamples = icube->Samples();
+      lowSamples = icube->getSampleCount();
       if(lowSamples % 2 == 0) lowSamples -= 1;
     }
 

@@ -120,11 +120,11 @@ void IsisMain() {
   Cube *outcube = secondpass.SetOutputCube("TO"); // Calibrate() parameter out[0]
 
   // resize 2dimensional vectors
-  gbl::bitweightCorrected.resize(gbl::incube->Samples());
-  gbl::dark_DN.resize(gbl::incube->Samples());
+  gbl::bitweightCorrected.resize(gbl::incube->getSampleCount());
+  gbl::dark_DN.resize(gbl::incube->getSampleCount());
   for(unsigned int i = 0; i < gbl::bitweightCorrected.size(); i++) {
-    gbl::bitweightCorrected[i].resize(gbl::incube->Lines());
-    gbl::dark_DN[i].resize(gbl::incube->Lines());
+    gbl::bitweightCorrected[i].resize(gbl::incube->getLineCount());
+    gbl::dark_DN[i].resize(gbl::incube->getLineCount());
   }
 
   // Add the radiometry group
@@ -230,7 +230,7 @@ void IsisMain() {
   }
   // this pass will call the Calibrate method
   secondpass.Progress()->SetText("Calibrating image...");
-  outcube->PutGroup(gbl::calgrp);
+  outcube->putGroup(gbl::calgrp);
   secondpass.StartProcess(gbl::Calibrate);
   secondpass.EndProcess();
   gbl::calgrp.Clear();
@@ -599,7 +599,7 @@ vector<double> gbl::OverclockFit() {
   //       -if there are 2 overclocks, columns 1 and 2 contain them
   //       -otherwise column 1 is all null and we use column 2
   Table overClkTable("ISS Prefix Pixels");
-  gbl::incube->Read(overClkTable);
+  gbl::incube->read(overClkTable);
   for(int i = 0; i < overClkTable.Records(); i++) {
     overclocks.push_back(overClkTable[i]["OverclockPixels"]);
   }
@@ -1193,11 +1193,11 @@ void gbl::FindShutterOffset() {
   }
   gbl::calgrp += PvlKeyword("ShutterOffsetFile", shutterOffsetFile.Expanded());
   Cube offsetCube;
-  offsetCube.Open(shutterOffsetFile.Expanded());
-  gbl::offset = new Brick(gbl::incube->Samples(), 1, 1, offsetCube.PixelType());
+  offsetCube.open(shutterOffsetFile.Expanded());
+  gbl::offset = new Brick(gbl::incube->getSampleCount(), 1, 1, offsetCube.getPixelType());
   gbl::offset->SetBasePosition(1, 1, 1);
-  offsetCube.Read(*gbl::offset);
-  offsetCube.Close();
+  offsetCube.read(*gbl::offset);
+  offsetCube.close();
   return;
   // Pixel value is now flux (electrons per second)
 }
@@ -1231,7 +1231,7 @@ void gbl::DivideByAreaPixel() {
 
   // sumFactor is the inverse of the square of the summing mode,
   // it was expressed in IDL as the following:
-  //       [gbl::sumFactor = (gbl::incube->Samples()/1024.0)*(gbl::incube->Lines()/1024.0);]
+  //       [gbl::sumFactor = (gbl::incube->getSampleCount()/1024.0)*(gbl::incube->getLineCount()/1024.0);]
   gbl::sumFactor = 1 / pow(gbl::cissLab->SummingMode(), 2.0);
   gbl::calgrp += PvlKeyword("SolidAngle", gbl::solidAngle);
   gbl::calgrp += PvlKeyword("OpticsArea", gbl::opticsArea);
@@ -1430,8 +1430,8 @@ void gbl::FindEfficiencyFactor(string fluxunits) {
     double angstromsToNm = 10.0;
     double distFromSun = 0;
     try {
-      Camera *cam = gbl::incube->Camera();
-      bool camSuccess = cam->SetImage(gbl::incube->Samples() / 2, gbl::incube->Lines() / 2);
+      Camera *cam = gbl::incube->getCamera();
+      bool camSuccess = cam->SetImage(gbl::incube->getSampleCount() / 2, gbl::incube->getLineCount() / 2);
       if(!camSuccess) {// the camera was unable to find the planet at the center of the image
         double lat, lon;
         // find values for lat/lon directly below spacecraft

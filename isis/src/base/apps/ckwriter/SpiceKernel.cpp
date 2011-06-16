@@ -52,7 +52,7 @@ namespace Isis {
 
 void SpiceKernel::add(const std::string &cfile) {
  Cube cube;
- cube.Open(cfile);
+ cube.open(cfile);
  add(cube);
  return;
 }

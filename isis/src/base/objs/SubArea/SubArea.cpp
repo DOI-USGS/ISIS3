@@ -140,7 +140,7 @@ namespace Isis {
    */
   void SubArea::UpdateLabel(Cube *icube, Cube *ocube, PvlGroup &results) {
 
-    Pvl inlabel = *icube->Label();
+    Pvl inlabel = *icube->getLabel();
 
     // If the linc and sinc are not equal, then the Instrument and
     // Mapping groups are no longer valid.
@@ -163,7 +163,7 @@ namespace Isis {
       // Update the upper left corner X,Y values if the starting line or
       // starting sample are changed.
       if(p_sl != 1 || p_ss != 1) {
-        Projection &proj = *icube->Projection();
+        Projection &proj = *icube->getProjection();
         proj.SetWorld(p_ss - 0.5, p_sl - 0.5);
         PvlGroup &mapgroup = inlabel.FindObject("IsisCube").FindGroup("Mapping", Pvl::Traverse);
         mapgroup.AddKeyword(PvlKeyword("UpperLeftCornerX", proj.XCoord()),
@@ -206,28 +206,28 @@ namespace Isis {
     }
 
     // Make changes to the output cube label
-    if(ocube->HasGroup("Instrument")) {
-      ocube->DeleteGroup("Instrument");
+    if(ocube->hasGroup("Instrument")) {
+      ocube->deleteGroup("Instrument");
     }
     if(inlabel.FindObject("IsisCube").HasGroup("Instrument")) {
       PvlGroup inst;
       inst = inlabel.FindObject("IsisCube").FindGroup("Instrument");
-      ocube->PutGroup(inst);
+      ocube->putGroup(inst);
     }
 
-    if(ocube->HasGroup("Mapping")) {
-      ocube->DeleteGroup("Mapping");
+    if(ocube->hasGroup("Mapping")) {
+      ocube->deleteGroup("Mapping");
     }
     if(inlabel.FindObject("IsisCube").HasGroup("Mapping")) {
       PvlGroup mapgrp;
       mapgrp = inlabel.FindObject("IsisCube").FindGroup("Mapping");
-      ocube->PutGroup(mapgrp);
+      ocube->putGroup(mapgrp);
     }
 
     // Update the AlphaCube group - this group will only be updated if
     // a Mapping group does not exist in the labels.
-    AlphaCube aCube(p_ns, p_nl, ocube->Samples(), ocube->Lines(),
+    AlphaCube aCube(p_ns, p_nl, ocube->getSampleCount(), ocube->getLineCount(),
                     p_ss - 0.5, p_sl - 0.5, p_es + 0.5, p_el + 0.5);
-    aCube.UpdateGroup(*ocube->Label());
+    aCube.UpdateGroup(*ocube->getLabel());
   }
 }

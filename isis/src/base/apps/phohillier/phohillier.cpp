@@ -42,7 +42,7 @@ void IsisMain() {
 
   PvlGroup photo("Photometry");
   pho->Report(photo);
-  ocube->PutGroup(photo);
+  ocube->putGroup(photo);
   Application::Log(photo);
   p.EndProcess();
 }

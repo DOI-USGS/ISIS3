@@ -86,7 +86,7 @@ void IsisMain() {
   HiJitCube trans;
   CubeAttributeInput &attTrans = ui.GetInputAttribute("FROM");
   vector<string> bandTrans = attTrans.Bands();
-  trans.SetVirtualBands(bandTrans);
+  trans.setVirtualBands(bandTrans);
   trans.OpenCube(ui.GetFilename("FROM"), stitch);
 
 
@@ -95,11 +95,11 @@ void IsisMain() {
   HiJitCube match;
   CubeAttributeInput &attMatch = ui.GetInputAttribute("MATCH");
   vector<string> bandMatch = attMatch.Bands();
-  match.SetVirtualBands(bandMatch);
+  match.setVirtualBands(bandMatch);
   match.OpenCube(ui.GetFilename("MATCH"), stitch);
 
 //  Ensure only one band
-  if((trans.Bands() != 1) || (match.Bands() != 1)) {
+  if((trans.getBandCount() != 1) || (match.getBandCount() != 1)) {
     string msg = "Input Cubes must have only one band!";
     throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
   }
@@ -186,7 +186,7 @@ void IsisMain() {
   string transSN = SerialNumber::Compose(trans, true);
   string matchSN = SerialNumber::Compose(match, true);
 
-  PvlGroup &instrument = trans.Label()->FindGroup("Instrument", Pvl::Traverse);
+  PvlGroup &instrument = trans.getLabel()->FindGroup("Instrument", Pvl::Traverse);
   cn.SetTarget(instrument["TargetName"][0]);
   cn.SetDescription("Records s/c jitter between two adjacent HiRISE images");
 
@@ -339,8 +339,8 @@ void IsisMain() {
   }
 
   // Don't need the cubes opened anymore
-  trans.Close();
-  match.Close();
+  trans.close();
+  match.close();
 
 
   // Write translation to log

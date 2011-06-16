@@ -110,17 +110,17 @@ namespace Isis {
     p_isProjected = false;
 
     try {
-      cam = cube.Camera();
+      cam = cube.getCamera();
     }
     catch(iException &error) {
       try {
-        proj = cube.Projection();
+        proj = cube.getProjection();
         p_isProjected = true;
         error.Clear();
       }
       catch(iException &error) {
         std::string msg = "Can not create polygon, ";
-        msg += "cube [" + cube.Filename();
+        msg += "cube [" + cube.getFilename();
         msg += "] is not a camera or map projection";
         throw iException::Message(iException::User, msg, _FILEINFO_);
       }
@@ -128,13 +128,13 @@ namespace Isis {
     if(cam != NULL) p_isProjected = cam->HasProjection();
 
     //  Create brick for use in SetImage
-    p_brick = new Brick(1, 1, 1, cube.PixelType());
+    p_brick = new Brick(1, 1, 1, cube.getPixelType());
 
     //------------------------------------------------------------------------
     //  Save cube number of samples and lines for later use.
     //------------------------------------------------------------------------
-    p_cubeSamps = cube.Samples();
-    p_cubeLines = cube.Lines();
+    p_cubeSamps = cube.getSampleCount();
+    p_cubeLines = cube.getLineCount();
 
     if(ns != 0) {
       p_cubeSamps = std::min(p_cubeSamps, ss + ns);
@@ -202,8 +202,8 @@ namespace Isis {
       WalkPoly();
     }
     catch(iException &e) {
-      std::string msg = "Cannot find polygon for image [" + cube.Filename() + "]";
-      msg += " The increment/step size might be too large.";
+      std::string msg = "Cannot find polygon for image [" + cube.getFilename();
+      msg += "] The increment/step size might be too large.";
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
@@ -511,7 +511,7 @@ namespace Isis {
     }
     if (not m_rightCoord) {
       for(int line = p_cubeStartLine; line <= p_cubeLines; line++)
-        for(int sample = p_cube->Samples(); sample >= m_leftCoord->x; sample--)
+        for(int sample = p_cube->getSampleCount(); sample >= m_leftCoord->x; sample--)
           if(SetImage(sample, line)) {
             m_rightCoord = new geos::geom::Coordinate(sample, line);
             break;
@@ -527,7 +527,7 @@ namespace Isis {
     }
     if (not m_botCoord) {
       for(int sample = (int)m_leftCoord->x; sample <= m_rightCoord->x; sample++)
-        for(int line = p_cube->Lines(); line >= m_topCoord->y; line--)
+        for(int line = p_cube->getLineCount(); line >= m_topCoord->y; line--)
           if(SetImage(sample, line)) {
             m_botCoord = new geos::geom::Coordinate(sample, line);
             break;
@@ -759,8 +759,8 @@ namespace Isis {
       }
 
       if(nPoleSample >= 0.5 && nPoleLine >= 0.5 &&
-         nPoleSample <= p_cube->Samples() + 0.5 &&
-         nPoleLine <= p_cube->Lines() + 0.5) {
+         nPoleSample <= p_cube->getSampleCount() + 0.5 &&
+         nPoleLine <= p_cube->getLineCount() + 0.5) {
         hasNorthPole = true;
       }
     }
@@ -779,8 +779,8 @@ namespace Isis {
       }
 
       if(sPoleSample >= 0.5 && sPoleLine >= 0.5 &&
-         sPoleSample <= p_cube->Samples() + 0.5 &&
-         sPoleLine <= p_cube->Lines() + 0.5) {
+         sPoleSample <= p_cube->getSampleCount() + 0.5 &&
+         sPoleLine <= p_cube->getLineCount() + 0.5) {
         hasSouthPole = true;
       }
     }
@@ -1030,7 +1030,7 @@ namespace Isis {
       // If projected, make sure the pixel DN is valid before worrying about
       //  geometry.
       p_brick->SetBasePosition((int)sample, (int)line, 1);
-      p_cube->Read(*p_brick);
+      p_cube->read(*p_brick);
       if(Isis::IsNullPixel((*p_brick)[0])) {
         return false;
       }

@@ -66,7 +66,7 @@ namespace Isis {
    * @return Calculated SerialNumber or Filename
   */
   std::string SerialNumber::Compose(Cube &cube, bool def2filename) {
-    return Compose(*cube.Label(), def2filename);
+    return Compose(*cube.getLabel(), def2filename);
   }
 
   /**

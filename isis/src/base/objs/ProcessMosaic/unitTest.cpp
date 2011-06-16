@@ -30,22 +30,22 @@ void TestIn(int iss, int isl, int isb, int ins, int inl, int inb) {
   Isis::Cube cInCube;
   Isis::UserInterface &ui = Isis::Application::GetUserInterface();
   string sFrom = ui.GetFilename("FROM");
-  cInCube.Open(sFrom);
+  cInCube.open(sFrom);
 
   cout << "\n***  Input Image  ***  ";
-  if(ins == 0) ins = cInCube.Samples() - iss + 1;
-  if(inl == 0) inl = cInCube.Lines()   - isl + 1;
-  if(inb == 0) inb = cInCube.Bands()   - isb + 1 ;
+  if(ins == 0) ins = cInCube.getSampleCount() - iss + 1;
+  if(inl == 0) inl = cInCube.getLineCount()   - isl + 1;
+  if(inb == 0) inb = cInCube.getBandCount()   - isb + 1 ;
 
   printf("Stats %d, %d, %d, %d, %d, %d\n", isl, iss, isb, inl, ins, inb);
 
   int iS;
-  Isis::Portal ciPortal(ins, 1, cInCube.PixelType());
+  Isis::Portal ciPortal(ins, 1, cInCube.getPixelType());
   for(int band = isb; band <= (isb + inb - 1); band++) {
     for(int line = isl; line <= (isl + inl - 1); line++) {
       iS = iss;
       ciPortal.SetPosition(iss, line, band);  //sample, line, band position
-      cInCube.Read(ciPortal);
+      cInCube.read(ciPortal);
       for(int iPixel = 0; iPixel < ciPortal.size(); iPixel++) {
         if(iPixel == 5) {
           cout << endl;
@@ -56,7 +56,7 @@ void TestIn(int iss, int isl, int isb, int ins, int inl, int inb) {
     }
     cout << "\n";
   }
-  cInCube.Close();
+  cInCube.close();
 }
 
 /**
@@ -79,18 +79,18 @@ void TestOut(int piSamples, int piLines, int piBands, int piOffset, int piPriori
     sTo = ui.GetFilename("TO_AVG");
   else
     sTo = ui.GetFilename("TO");
-  cOutCube.Open(sTo);
+  cOutCube.open(sTo);
 
-  int iBands=cOutCube.Bands();
+  int iBands=cOutCube.getBandCount();
   
   cout << "\n***  Mosaic Image  ***  ";
   printf("Start Stats %d, %d, %d\nTotal Bands=%d\n", piLines, piSamples, piBands, iBands);
-  Isis::Portal coPortal(5, 1, cOutCube.PixelType());
+  Isis::Portal coPortal(5, 1, cOutCube.getPixelType());
   int band = piBands;
   while(band <= iBands) {
     for(int line = 1; line <= 5; line++) {
       coPortal.SetPosition(1, line, band);  //sample, line, band position
-      cOutCube.Read(coPortal);
+      cOutCube.read(coPortal);
       for(int iPixel = 0; iPixel < coPortal.size(); iPixel++) {
         iFileIndex = 0;
         if(piPriority != Isis::ProcessMosaic::average && band == 3 && coPortal[iPixel] != giDefault) {
@@ -111,7 +111,7 @@ void TestOut(int piSamples, int piLines, int piBands, int piOffset, int piPriori
     }
     band = (piPriority == Isis::ProcessMosaic::average ? 2 : 3);
   }
-  cOutCube.Close();
+  cOutCube.close();
 }
 /**
  * unitTest for ProcessMosaic

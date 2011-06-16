@@ -118,12 +118,12 @@ namespace Isis {
     Cube *newCube = new Cube();
 
     try {
-      newCube->Open(fileName.Expanded(), "rw");
+      newCube->open(fileName.Expanded(), "rw");
     }
     catch (iException &e) {
       if (!mustOpenReadWrite) {
         e.Clear();
-        newCube->Open(fileName.Expanded(), "r");
+        newCube->open(fileName.Expanded(), "r");
       }
       else {
         throw;
@@ -303,7 +303,7 @@ namespace Isis {
     if (exactIndex == -1) {
       p_threadSafeMutex->lock();
 
-      p_managedCubes->value(cubeId).second->Read(*requestedBrick);
+      p_managedCubes->value(cubeId).second->read(*requestedBrick);
 
       QPair< QReadWriteLock *, Brick * > managedDataEntry;
 
@@ -320,7 +320,7 @@ namespace Isis {
 
       p_threadSafeMutex->unlock();
     }
-    
+
     if (el - sl + 1 != (*p_managedData)[exactIndex].second->LineDimension())
     {
       //abort();
@@ -620,7 +620,7 @@ namespace Isis {
       if (writeLock) {
         p_threadSafeMutex->lock();
         Brick cpy(*brickDone);
-        p_managedCubes->value(cubeId).second->Write(cpy);
+        p_managedCubes->value(cubeId).second->write(cpy);
         p_threadSafeMutex->unlock();
 
         // Unlock the existing lock

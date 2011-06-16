@@ -27,13 +27,13 @@ namespace Isis {
     miBandIndex = 1;
     // Set input image area to defaults
     miStartSample = 1;
-    miEndSample   = mInCube->Samples();
+    miEndSample   = mInCube->getSampleCount();
     miStartLine   = 1;
-    miEndLine     = mInCube->Lines();
+    miEndLine     = mInCube->getLineCount();
   
-    miInputSamples= mInCube->Samples();
-    miInputLines  = mInCube->Lines();
-    miInputBands  = mInCube->Bands();
+    miInputSamples= mInCube->getSampleCount();
+    miInputLines  = mInCube->getLineCount();
+    miInputBands  = mInCube->getBandCount();
       
     // Save off the sample and mdLine magnification
     mdSampleScale = sampleScale;
@@ -44,7 +44,7 @@ namespace Isis {
     miOutputLines   = (int)ceil((double)(miInputLines) / mdLineScale);
     
     // Initialize the input portal
-    m_iPortal = new Isis::Portal(miInputSamples, 1, mInCube->PixelType());
+    m_iPortal = new Isis::Portal(miInputSamples, 1, mInCube->getPixelType());
   }
   
   /**
@@ -111,7 +111,7 @@ namespace Isis {
     resultsGrp += PvlKeyword("OutputSamples",   miOutputLines);
    
     Isis::SubArea subArea;
-    subArea.SetSubArea(mInCube->Lines(), mInCube->Samples(), miStartLine, miStartSample, 
+    subArea.SetSubArea(mInCube->getLineCount(), mInCube->getSampleCount(), miStartLine, miStartSample, 
                        miEndLine, miEndSample, mdLineScale, mdSampleScale);
     subArea.UpdateLabel(mInCube, pOutCube, resultsGrp);
     
@@ -129,7 +129,7 @@ namespace Isis {
     int readLine = (int)(mdLine + 0.5);
 
     m_iPortal->SetPosition(miStartSample, readLine, miBandIndex);
-    mInCube->Read(*m_iPortal);
+    mInCube->read(*m_iPortal);
     
     // Scale down buffer
     for(int os = 0; os < miOutputSamples; os++) {
@@ -176,7 +176,7 @@ namespace Isis {
     while(mdLine <= rline) {
       if((int)mdLine <= miInputLines) {
         m_iPortal->SetPosition(miStartSample, mdLine, miBandIndex);
-        mInCube->Read(*m_iPortal);
+        mInCube->read(*m_iPortal);
       }
       int isamp = 1;
       for(int osamp = 0; osamp < out.size(); osamp++) {
@@ -207,7 +207,7 @@ namespace Isis {
 
     if(mdLine <= miInputLines) {
       m_iPortal->SetPosition(miStartSample, mdLine, miBandIndex);
-      mInCube->Read(*m_iPortal);
+      mInCube->read(*m_iPortal);
     }
     double ldel = (double)mdLine - rline;
     double ldel2 = 1.0 - ldel;

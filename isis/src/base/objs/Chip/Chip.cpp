@@ -225,7 +225,7 @@ namespace Isis {
 
     // Store off the cube address in case someone wants to match
     // this chip
-    p_filename = cube.Filename();
+    p_filename = cube.getFilename();
   }
 
   /**
@@ -271,7 +271,7 @@ namespace Isis {
 
     // Store off the cube address in case someone wants to match
     // this chip
-    p_filename = cube.Filename();
+    p_filename = cube.getFilename();
   }
 
 
@@ -320,16 +320,16 @@ namespace Isis {
     Camera *matchCam = NULL;
     Projection *matchProj = NULL;
     try {
-      matchCam = matchChipCube.Camera();
+      matchCam = matchChipCube.getCamera();
     }
     catch(iException &error) {
       try {
-        matchProj = matchChipCube.Projection();
+        matchProj = matchChipCube.getProjection();
         error.Clear();
       }
       catch(iException &error) {
         string msg = "Can not geom chip.  ";
-        msg += "Match chip cube [" + matchChipCube.Filename();
+        msg += "Match chip cube [" + matchChipCube.getFilename();
         msg += "] is not a camera or map projection";
         throw iException::Message(iException::User, msg, _FILEINFO_);
       }
@@ -339,16 +339,16 @@ namespace Isis {
     Camera *cam = NULL;
     Projection *proj = NULL;
     try {
-      cam = cube.Camera();
+      cam = cube.getCamera();
     }
     catch(iException &error) {
       try {
-        proj = cube.Projection();
+        proj = cube.getProjection();
         error.Clear();
       }
       catch(iException &error) {
         string msg = "Can not geom chip.  ";
-        msg += "Chip cube [" + cube.Filename();
+        msg += "Chip cube [" + cube.getFilename();
         msg += "] is not a camera or map projection";
         throw iException::Message(iException::User, msg, _FILEINFO_);
       }
@@ -473,8 +473,8 @@ namespace Isis {
           line = proj->WorldY();
         }
 
-        //     if (line < 1 || line > cube.Lines()) continue;
-        //     if (samp < 1 || samp > cube.Samples()) continue;
+        //     if (line < 1 || line > cube.getLineCount()) continue;
+        //     if (samp < 1 || samp > cube.getSampleCount()) continue;
 
         // Ok save this control point
         pointfound = true;
@@ -507,8 +507,8 @@ namespace Isis {
 
     if(xp.size() < 3) {
       string msg = "Cannot find enough points to perform Affine transformation.  ";
-      msg += "Unable to load chip from [" + cube.Filename();
-      msg += "] to match chip from [" + matchChipCube.Filename() + "].";
+      msg += "Unable to load chip from [" + cube.getFilename();
+      msg += "] to match chip from [" + matchChipCube.getFilename() + "].";
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
@@ -530,7 +530,7 @@ namespace Isis {
 
     // Store off the cube address in case someone wants to match
     // this chip
-    p_filename = cube.Filename();
+    p_filename = cube.getFilename();
   }
 
 
@@ -975,20 +975,20 @@ namespace Isis {
   void Chip::Read(Cube &cube, const int band) {
     // Create an interpolator and portal for geoming
     Interpolator interp(p_readInterpolator);
-    Portal port(interp.Samples(), interp.Lines(), cube.PixelType(),
+    Portal port(interp.Samples(), interp.Lines(), cube.getPixelType(),
                 interp.HotSample(), interp.HotLine());
     // Loop through the pixels in the chip and geom them
     for(int line = 1; line <= Lines(); line++) {
       for(int samp = 1; samp <= Samples(); samp++) {
         SetChipPosition((double)samp, (double)line);
         if((CubeSample() < 0.5) || (CubeLine() < 0.5) ||
-            (CubeSample() > cube.Samples() + 0.5) ||
-            (CubeLine() > cube.Lines() + 0.5)) {
+            (CubeSample() > cube.getSampleCount() + 0.5) ||
+            (CubeLine() > cube.getLineCount() + 0.5)) {
           p_buf[line-1][samp-1] = Isis::NULL8;
         }
         else if(p_clipPolygon == NULL) {
           port.SetPosition(CubeSample(), CubeLine(), band);
-          cube.Read(port);
+          cube.read(port);
           p_buf[line-1][samp-1] =
             interp.Interpolate(CubeSample(), CubeLine(), port.DoubleBuffer());
         }
@@ -997,7 +997,7 @@ namespace Isis {
                                      geos::geom::Coordinate(CubeSample(), CubeLine()));
           if(pnt->within(p_clipPolygon)) {
             port.SetPosition(CubeSample(), CubeLine(), band);
-            cube.Read(port);
+            cube.read(port);
             p_buf[line-1][samp-1] =
               interp.Interpolate(CubeSample(), CubeLine(), port.DoubleBuffer());
           }
@@ -1018,17 +1018,17 @@ namespace Isis {
    */
   void Chip::Write(const string &filename) {
     Cube c;
-    c.SetDimensions(Samples(), Lines(), 1);
-    c.Create(filename);
+    c.setDimensions(Samples(), Lines(), 1);
+    c.create(filename);
     LineManager line(c);
     for(int i = 1; i <= Lines(); i++) {
       line.SetLine(i);
       for(int j = 1; j <= Samples(); j++) {
         line[j-1] = GetValue(j, i);
       }
-      c.Write(line);
+      c.write(line);
     }
-    c.Close();
+    c.close();
   }
 
 

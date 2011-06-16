@@ -63,7 +63,7 @@ void IsisMain() {
   p.StartProcess();
   p.EndProcess();
 
-  cube.Open(toFile.Expanded(), "rw");
+  cube.open(toFile.Expanded(), "rw");
   
   // Once the image is imported, we need to find and decrypt the code
   if (apollo->IsMetric() && FindCode())
@@ -72,7 +72,7 @@ void IsisMain() {
   CalculateTransform();
   // Once we have decrypted the code, we need to populate the image labels
   TranslateApolloLabels(filename, &cube);
-  cube.Close();
+  cube.close();
 }
 
 // Find the location of the code
@@ -289,11 +289,11 @@ void TranslateApolloLabels (iString filename, Cube *opack) {
   }
   inst += PvlKeyword("StartTime", utcTime);
     
-  opack->PutGroup(inst);
-  opack->PutGroup(bandBin);
-  opack->PutGroup(kern);
-  opack->PutGroup(*reseaus);
-  opack->PutGroup(codeGroup);
+  opack->putGroup(inst);
+  opack->putGroup(bandBin);
+  opack->putGroup(kern);
+  opack->putGroup(*reseaus);
+  opack->putGroup(codeGroup);
 }
 
 // Validates the code based on February 1971 Revision

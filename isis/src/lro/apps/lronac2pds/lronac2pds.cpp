@@ -38,11 +38,11 @@ void IsisMain() {
   ProcessByLine p;
   Cube *inCube = p.SetInputCube("FROM");
 
-  g_isIof = inCube->Label()->FindGroup("Radiometry", Pvl::Traverse).FindKeyword("RadiometricType")[0].Equal("IOF");
+  g_isIof = inCube->getLabel()->FindGroup("Radiometry", Pvl::Traverse).FindKeyword("RadiometricType")[0].Equal("IOF");
 
   Filename scaledCube = ui.GetFilename("FROM");
   scaledCube.Temporary(ui.GetFilename("FROM"), "cub");
-  p.SetOutputCube(scaledCube.Expanded(), CubeAttributeOutput(), inCube->Samples(), inCube->Lines(), inCube->Bands());
+  p.SetOutputCube(scaledCube.Expanded(), CubeAttributeOutput(), inCube->getSampleCount(), inCube->getLineCount(), inCube->getBandCount());
   // Scale image and calculate max and min values
   p.StartProcess(ProcessImage);
   p.EndProcess();
@@ -131,7 +131,7 @@ string MD5Checksum(string filename) {
 }
 
 void OutputLabel(std::ofstream &fout, Cube *cube) {
-  OriginalLabel origLab(cube->Filename());
+  OriginalLabel origLab(cube->getFilename());
   Pvl labelPvl = origLab.ReturnLabels();
 
   //Pvl to store the labels
@@ -184,8 +184,8 @@ void OutputLabel(std::ofstream &fout, Cube *cube) {
   // Update the "IMAGE" Object
   PvlObject &imageObject = labelPvl.FindObject("IMAGE");
   imageObject.Clear();
-  imageObject += PvlKeyword("LINES", cube->Lines());
-  imageObject += PvlKeyword("LINE_SAMPLES", cube->Samples());
+  imageObject += PvlKeyword("LINES", cube->getLineCount());
+  imageObject += PvlKeyword("LINE_SAMPLES", cube->getSampleCount());
   if(g_isIof) {
     imageObject += PvlKeyword("SAMPLE_BITS", 16);
     imageObject += PvlKeyword("SAMPLE_TYPE", "LSB_INTEGER");
@@ -213,14 +213,14 @@ void OutputLabel(std::ofstream &fout, Cube *cube) {
 
   stream << labelPvl;
 
-  int recordBytes = cube->Samples();
+  int recordBytes = cube->getSampleCount();
   int labelRecords = (int)((stream.str().length()) / recordBytes) + 1;
 
   labelPvl["RECORD_BYTES"] = recordBytes;
   if(g_isIof)
-    labelPvl["FILE_RECORDS"] = (int)(cube->Lines() * 2 + labelRecords);
+    labelPvl["FILE_RECORDS"] = (int)(cube->getLineCount() * 2 + labelRecords);
   else
-    labelPvl["FILE_RECORDS"] = (int)(cube->Lines() * 4 + labelRecords);
+    labelPvl["FILE_RECORDS"] = (int)(cube->getLineCount() * 4 + labelRecords);
   labelPvl["LABEL_RECORDS"] = labelRecords;
   labelPvl["^IMAGE"] = (int)(labelRecords + 1);
 

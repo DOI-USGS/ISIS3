@@ -38,12 +38,12 @@ namespace Isis {
    */
   TileManager::TileManager(const Isis::Cube &cube,
                            const int &bufNumSamples, const int &bufNumLines) :
-    Isis::BufferManager(cube.Samples(), cube.Lines(), cube.Bands(),
+    Isis::BufferManager(cube.getSampleCount(), cube.getLineCount(), cube.getBandCount(),
                         bufNumSamples, bufNumLines, 1,
-                        cube.PixelType()) {
+                        cube.getPixelType()) {
 
-    p_numSampTiles = (cube.Samples() - 1) / bufNumSamples + 1;
-    p_numLineTiles = (cube.Lines() - 1) / bufNumLines + 1;
+    p_numSampTiles = (cube.getSampleCount() - 1) / bufNumSamples + 1;
+    p_numLineTiles = (cube.getLineCount() - 1) / bufNumLines + 1;
   }
 
   /**

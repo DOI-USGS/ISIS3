@@ -1,6 +1,8 @@
 #include <iostream>
+
 #include "iException.h"
 #include "Cube.h"
+#include "Filename.h"
 #include "LineManager.h"
 #include "Pvl.h"
 #include "Preference.h"
@@ -8,384 +10,436 @@
 #include "Statistics.h"
 
 using namespace std;
+using namespace Isis;
+
 
 int main(int argc, char *argv[]) {
-  Isis::Preference::Preferences(true);
+  Preference::Preferences(true);
 
   try {
-    void Report(Isis::Cube & c);
-    cout << "Unit test for Isis::Cube" << endl;
+    void Report(Cube & c);
+    cerr << "Unit test for Cube" << endl;
 
-    cout << "Constructing cube ... " << endl;
-    Isis::Cube out;
+    cerr << "Constructing cube ... " << endl;
+    Cube out;
     Report(out);
 
     // Test create and write methods
-    cout << "Creating 32-bit cube ... " << endl;
-    out.SetDimensions(150, 200, 2);
-    out.Create("/tmp/IsisCube_01");
+    cerr << "Creating 32-bit cube ... " << endl;
+    out.setDimensions(150, 200, 2);
+    out.create("IsisCube_01");
     Report(out);
 
-    cout << "Write cube ... " << endl;
-    Isis::LineManager line(out);
-    int j = 0;
+    cerr << "Write cube ... " << endl;
+    LineManager line(out);
+    long j = 0;
     for(line.begin(); !line.end(); line++) {
       for(int i = 0; i < line.size(); i++) {
         line[i] = (double) j;
         j++;
       }
       j--;
-      out.Write(line);
+      out.write(line);
     }
-    out.Close();
+
+    out.close();
 
     // Test the open and read methods
-    cout << "Opening cube ... " << endl;
-    Isis::Cube in;
-    in.Open("/tmp/IsisCube_01");
+    cerr << "Opening cube ... " << endl;
+    Cube in;
+    in.open("IsisCube_01");
     Report(in);
 
-    cout << "Comparing cube ... " << endl;
-    Isis::LineManager inLine(in);
+    cerr << "Comparing cube ... " << endl;
+    LineManager inLine(in);
     j = 0;
     for(inLine.begin(); !inLine.end(); inLine++) {
-      in.Read(inLine);
+      in.read(inLine);
       for(int i = 0; i < inLine.size(); i++) {
         if(inLine[i] != (double) j) {
-          cout << "Problem at line " << inLine.Line()
-               << " sample " << i + 1 << ":  "
+          cerr << "Problem at"
+               << " line " << inLine.Line()
+               << " sample " << i + 1
+               << " band " << inLine.Band() << ":  "
                << inLine[i] << " != " << double(j) << endl;
+          return 1;
         }
         j++;
       }
       j--;
     }
-    in.Close();
-    cout << endl;
+    in.close();
+    cerr << endl;
 
     // Test other options for output
-    cout << "Creating 8-bit cube ... " << endl;
-    Isis::Cube out2;
-    out2.SetDimensions(150, 200, 1);
-    out2.SetDetached();
-    out2.SetBaseMultiplier(200.0, -1.0);
-//  out2.SetByteOrder(Isis::Msb);
-    out2.SetByteOrder(ISIS_LITTLE_ENDIAN ? Isis::Msb : Isis::Lsb);
-    out2.SetCubeFormat(Isis::Bsq);
-    out2.SetLabelBytes(1000);
-    out2.SetPixelType(Isis::UnsignedByte);
-    out2.Create("/tmp/IsisCube_02");
+    cerr << "Creating 8-bit cube ... " << endl;
+    Cube out2;
+    out2.setDimensions(150, 200, 1);
+    out2.setLabelsAttached(false);
+    out2.setBaseMultiplier(200.0, -1.0);
+//  out2.SetByteOrder(Msb);
+    out2.setByteOrder(ISIS_LITTLE_ENDIAN ? Msb : Lsb);
+    out2.setFormat(Cube::Bsq);
+    out2.setLabelSize(1000);
+    out2.setPixelType(UnsignedByte);
+    out2.create("IsisCube_02");
 
     j = 0;
-    Isis::LineManager oline(out2);
+    LineManager oline(out2);
     for(oline.begin(); !oline.end(); oline++) {
       for(int i = 0; i < oline.size(); i++) {
         oline[i] = (double) j;
       }
-      out2.ClearCache();
-      out2.Write(oline);
+      out2.clearIoCache();
+      out2.write(oline);
       j++;
     }
-    out2.Close();
+    out2.close();
 
-    cout << "Comparing cube ... " << endl;
-    Isis::Cube in2;
-    in2.Open("/tmp/IsisCube_02");
+    cerr << "Comparing cube ... " << endl;
+    Cube in2;
+    try {
+      in2.open("IsisCube_02");
+    }
+    catch (iException &e) {
+      e.Report();
+    }
     Report(in2);
     j = 0;
-    Isis::LineManager inLine2(in2);
+    LineManager inLine2(in2);
     for(inLine2.begin(); !inLine2.end(); inLine2++) {
-      in2.Read(inLine2);
+      in2.read(inLine2);
       for(int i = 0; i < inLine2.size(); i++) {
         if(inLine2[i] != (double) j) {
-          cout << "Problem at line " << inLine2.Line()
+          cerr << "Problem at line " << inLine2.Line()
                << " sample " << i + 1 << ":  "
                << inLine2[i] << " != " << double(j) << endl;
+          return 1;
         }
       }
-      in2.ClearCache();
+      in2.clearIoCache();
       j++;
     }
-    in2.Close();
+    in2.close();
 
 
     // Test other options for output
-    cout << "Creating 16-bit cube ... " << endl;
-    Isis::Cube out3;
-    out3.SetDimensions(150, 200, 2);
-    out3.SetBaseMultiplier(30000.0, -1.0);
-//  out3.SetByteOrder(Isis::Msb);
-    out2.SetByteOrder(ISIS_LITTLE_ENDIAN ? Isis::Msb : Isis::Lsb);
-    out3.SetPixelType(Isis::SignedWord);
-    out3.Create("/tmp/IsisCube_03");
+    cerr << "Creating 16-bit cube ... " << endl;
+    Cube out3;
+    out3.setDimensions(150, 200, 2);
+    out3.setBaseMultiplier(30000.0, -1.0);
+//  out3.SetByteOrder(Msb);
+    out2.setByteOrder(ISIS_LITTLE_ENDIAN ? Msb : Lsb);
+    out3.setPixelType(SignedWord);
+    out3.create("IsisCube_03");
 
     j = 0;
-    Isis::LineManager oline3(out3);
+    LineManager oline3(out3);
     for(oline3.begin(); !oline3.end(); oline3++) {
       for(int i = 0; i < oline3.size(); i++) {
         oline3[i] = (double) j;
         j++;
       }
-      out3.Write(oline3);
+      out3.write(oline3);
     }
-    out3.Close();
+    out3.close();
 
-    cout << "Comparing cube ... " << endl;
-    Isis::Cube in3;
-    in3.Open("/tmp/IsisCube_03");
+    cerr << "Comparing cube ... " << endl;
+    Cube in3;
+    in3.open("IsisCube_03");
     Report(in3);
     j = 0;
-    Isis::LineManager inLine3(in3);
+    LineManager inLine3(in3);
     for(inLine3.begin(); !inLine3.end(); inLine3++) {
-      in3.Read(inLine3);
-      in3.ClearCache();
+      in3.read(inLine3);
+      in3.clearIoCache();
       for(int i = 0; i < inLine3.size(); i++) {
         if(inLine3[i] != (double) j) {
-          cout << "Problem at line " << inLine3.Line()
-               << " sample " << i + 1 << ":  "
+          cerr << "Problem at line " << inLine3.Line()
+               << " sample " << i + 1 << " band " << inLine3.Band() << ":  "
                << inLine3[i] << " != " << double(j) << endl;
+          return 1;
         }
         j++;
       }
     }
-    in3.Close();
+    in3.close();
 
 
-    in.Open("/tmp/IsisCube_01");
+    in.open("IsisCube_01");
 
     // Test Histogram object on a single band, 1 by default
-    cout << "Testing histogram method, band 1 ... " << endl;
-    Isis::Histogram *bandOneHist = in.Histogram();
-    cout << "Average:        " << bandOneHist->Average() << endl;
-    cout << "Standard Dev:   " << bandOneHist->StandardDeviation() << endl;
-    cout << "Mode:           " << bandOneHist->Mode() << endl;
-    cout << "Total Pixels:   " << bandOneHist->TotalPixels() << endl;
-    cout << "Null Pixels:    " << bandOneHist->NullPixels() << endl;
-    cout << endl;
+    cerr << "Testing histogram method, band 1 ... " << endl;
+    Histogram *bandOneHist = in.getHistogram();
+    cerr << "Average:        " << bandOneHist->Average() << endl;
+    cerr << "Standard Dev:   " << bandOneHist->StandardDeviation() << endl;
+    cerr << "Mode:           " << bandOneHist->Mode() << endl;
+    cerr << "Total Pixels:   " << bandOneHist->TotalPixels() << endl;
+    cerr << "Null Pixels:    " << bandOneHist->NullPixels() << endl;
+    cerr << endl;
+    delete bandOneHist;
+    bandOneHist = NULL;
 
     // Test histogram object on all bands
-    cout << "Testing histogram method, all bands ... " << endl;
-    Isis::Histogram *allBandsHistogram = in.Histogram(0);
-    cout << "Average:        " << allBandsHistogram->Average() << endl;
-    cout << "Standard Dev:   " << allBandsHistogram->StandardDeviation() << endl;
-    cout << "Mode:           " << allBandsHistogram->Mode() << endl;
-    cout << "Total Pixels:   " << allBandsHistogram->TotalPixels() << endl;
-    cout << "Null Pixels:    " << allBandsHistogram->NullPixels() << endl;
-    cout << endl;
+    cerr << "Testing histogram method, all bands ... " << endl;
+    Histogram *allBandsHistogram = in.getHistogram(0);
+    cerr << "Average:        " << allBandsHistogram->Average() << endl;
+    cerr << "Standard Dev:   " << allBandsHistogram->StandardDeviation() << endl;
+    cerr << "Mode:           " << allBandsHistogram->Mode() << endl;
+    cerr << "Total Pixels:   " << allBandsHistogram->TotalPixels() << endl;
+    cerr << "Null Pixels:    " << allBandsHistogram->NullPixels() << endl;
+    cerr << endl;
+    delete allBandsHistogram;
+    allBandsHistogram = NULL;
 
     // Check error for too few (negative) bands
     try {
-      in.Histogram(-1);
+      in.getHistogram(-1);
     }
-    catch(Isis::iException &e) {
+    catch(iException &e) {
       e.Report(false);
     }
 
     // Test statistics object on a single band, 1 by default
-    cout << "Testing statistics method, band 1 ... " << endl;
-    Isis::Statistics *bandOneStats = in.Statistics();
-    cout << "Average:        " << bandOneStats->Average() << endl;
-    cout << "Standard Dev:   " << bandOneStats->StandardDeviation() << endl;
-    cout << "Total Pixels:   " << bandOneStats->TotalPixels() << endl;
-    cout << "Null Pixels:    " << bandOneStats->NullPixels() << endl;
-    cout << endl;
+    cerr << "Testing statistics method, band 1 ... " << endl;
+    Statistics *bandOneStats = in.getStatistics();
+    cerr << "Average:        " << bandOneStats->Average() << endl;
+    cerr << "Standard Dev:   " << bandOneStats->StandardDeviation() << endl;
+    cerr << "Total Pixels:   " << bandOneStats->TotalPixels() << endl;
+    cerr << "Null Pixels:    " << bandOneStats->NullPixels() << endl;
+    cerr << endl;
+    delete bandOneStats;
+    bandOneStats = NULL;
 
     // Test statistics object on all bands
-    cout << "Testing statistics method, all bands ... " << endl;
-    Isis::Statistics *allBandsStats = in.Statistics(0);
-    cout << "Average:        " << allBandsStats->Average() << endl;
-    cout << "Standard Dev:   " << allBandsStats->StandardDeviation() << endl;
-    cout << "Total Pixels:   " << allBandsStats->TotalPixels() << endl;
-    cout << "Null Pixels:    " << allBandsStats->NullPixels() << endl;
-    cout << endl;
+    cerr << "Testing statistics method, all bands ... " << endl;
+    Statistics *allBandsStats = in.getStatistics(0);
+    cerr << "Average:        " << allBandsStats->Average() << endl;
+    cerr << "Standard Dev:   " << allBandsStats->StandardDeviation() << endl;
+    cerr << "Total Pixels:   " << allBandsStats->TotalPixels() << endl;
+    cerr << "Null Pixels:    " << allBandsStats->NullPixels() << endl;
+    cerr << endl;
+    delete allBandsStats;
+    allBandsStats = NULL;
 
     // Check error for too few (negative) bands
     try {
-      in.Statistics(-1);
+      in.getStatistics(-1);
     }
-    catch(Isis::iException &e) {
+    catch(iException &e) {
       e.Report(false);
     }
 
-    cout << endl;
+    cerr << endl;
 
-    cout << "Virtual band tests" << endl;  // Virtual Band tests
+    cerr << "Virtual band tests" << endl;  // Virtual Band tests
 
-    cout << "Nbands = " << in.Bands() << endl;
-    cout << "Band 1 = " << in.PhysicalBand(1) << endl;
-    cout << "Band 2 = " << in.PhysicalBand(2) << endl;
-    in.Close();
-    cout << endl;
+    cerr << "Nbands = " << in.getBandCount() << endl;
+    cerr << "Band 1 = " << in.getPhysicalBand(1) << endl;
+    cerr << "Band 2 = " << in.getPhysicalBand(2) << endl;
+    in.close();
+    cerr << endl;
 
-    vector<string> vbands;
+    QList<iString> vbands;
     vbands.push_back("2");
-    in.SetVirtualBands(vbands);
-    in.Open("/tmp/IsisCube_01");
-    cout << "Nbands = " << in.Bands() << endl;
-    cout << "Band 1 = " << in.PhysicalBand(1) << endl;
-    cout << endl;
+    in.setVirtualBands(vbands);
+    in.open("IsisCube_01");
+    cerr << "Nbands = " << in.getBandCount() << endl;
+    cerr << "Band 1 = " << in.getPhysicalBand(1) << endl;
+    cerr << endl;
 
 
     //  Test ReOpen
-    cout << "ReOpen tests" << endl;
+    cerr << "ReOpen tests" << endl;
     Report(in);
-    in.ReOpen("rw");
+    in.reopen("rw");
     Report(in);
-    in.ReOpen("r");
+    in.reopen("r");
     Report(in);
 
     // Check errors
-    cout << "Testing errors ... " << endl;
+    cerr << "Testing errors ... " << endl;
     try {
-      in.Open("blah");
+      in.open("blah");
     }
-    catch(Isis::iException &e) {
+    catch(iException &e) {
       e.Report(false);
     }
 
     try {
-      in.Create("blah");
+      in.create("blah");
     }
-    catch(Isis::iException &e) {
+    catch(iException &e) {
       e.Report(false);
     }
 
     try {
-      in.Write(inLine3);
+      in.write(inLine3);
     }
-    catch(Isis::iException &e) {
+    catch(iException &e) {
       e.Report(false);
     }
 
     try {
-      Isis::Cube in;
-      in.Open("blah");
+      Cube in;
+      in.open("blah");
     }
-    catch(Isis::iException &e) {
+    catch(iException &e) {
       e.Report(false);
     }
 
     try {
-      in.PhysicalBand(2);
+      in.getPhysicalBand(2);
     }
-    catch(Isis::iException &e) {
+    catch(iException &e) {
       e.Report(false);
     }
 
     try {
-      in.PhysicalBand(0);
+      in.getPhysicalBand(0);
     }
-    catch(Isis::iException &e) {
+    catch(iException &e) {
       e.Report(false);
     }
 
     try {
-      Isis::Cube in;
-      in.Read(inLine3);
+      Cube in;
+      in.read(inLine3);
     }
-    catch(Isis::iException &e) {
+    catch(iException &e) {
       e.Report(false);
     }
 
     try {
-      Isis::Cube in;
-      in.Write(inLine3);
+      Cube in;
+      in.write(inLine3);
     }
-    catch(Isis::iException &e) {
+    catch(iException &e) {
       e.Report(false);
     }
 
     try {
-      Isis::Cube out;
-      out.SetLabelBytes(15);
-      out.Create("/tmp/IsisCube_04");
-      out.Close();
+      Cube out;
+      out.create("IsisCube_04");
+      out.close();
     }
-    catch(Isis::iException &e) {
-      e.Report(false);
-    }
-    try {
-      Isis::Cube out;
-      out.SetDimensions(1000000, 1000000, 9);
-      out.Create("/tmp/IsisCube_05");
-      out.Close();
-    }
-    catch(Isis::iException &e) {
-      e.Report(false);
-    }
-    try {
-      Isis::Cube in;
-      in.Open("/tmp/IsisCube_01", "a");
-    }
-    catch(Isis::iException &e) {
-      e.Report(false);
-    }
-    try {
-      Isis::Cube in;
-      in.SetDimensions(0, 0, 0);
-    }
-    catch(Isis::iException &e) {
-      e.Report(false);
-    }
-    try {
-      Isis::Cube in;
-      in.SetDimensions(1, 0, 0);
-    }
-    catch(Isis::iException &e) {
-      e.Report(false);
-    }
-    try {
-      Isis::Cube in;
-      in.SetDimensions(1, 1, 0);
-    }
-    catch(Isis::iException &e) {
+    catch(iException &e) {
       e.Report(false);
     }
 
-    Isis::Cube in4;
     try {
-      in4.Open("$base/testData/isisTruth.cub");
+      Cube out;
+      out.setLabelSize(15);
+      out.setDimensions(1, 1, 1);
+      out.create("IsisCube_04");
+      out.close();
     }
-    catch(Isis::iException &e) {
+    catch(iException &e) {
+      e.Report(false);
+    }
+
+    try {
+      Cube out;
+      out.setDimensions(1000000, 1000000, 9);
+      out.create("IsisCube_05");
+      out.close();
+    }
+    catch(iException &e) {
       e.Report(false);
     }
     try {
-      in4.ReOpen("rw");
+      Cube in;
+      in.open("IsisCube_01", "a");
     }
-    catch(Isis::iException &e) {
+    catch(iException &e) {
+      e.Report(false);
+    }
+    try {
+      Cube in;
+      in.setDimensions(0, 0, 0);
+    }
+    catch(iException &e) {
+      e.Report(false);
+    }
+    try {
+      Cube in;
+      in.setDimensions(1, 0, 0);
+    }
+    catch(iException &e) {
+      e.Report(false);
+    }
+    try {
+      Cube in;
+      in.setDimensions(1, 1, 0);
+    }
+    catch(iException &e) {
+      e.Report(false);
+    }
+
+    Cube in4;
+    try {
+      in4.open("$base/testData/isisTruth.cub");
+    }
+    catch(iException &e) {
+      e.Report(false);
+    }
+    try {
+      in4.reopen("rw");
+    }
+    catch(iException &e) {
       e.Report(false);
     }
 
   }
-  catch(Isis::iException &e) {
+  catch(iException &e) {
     e.Report();
   }
 
-  remove("/tmp/IsisCube_01.cub");
-  remove("/tmp/IsisCube_02.cub");
-  remove("/tmp/IsisCube_02.lbl");
-  remove("/tmp/IsisCube_03.cub");
-  remove("/tmp/IsisCube_04.cub");
-  remove("/tmp/IsisCube_05.cub");
+  remove("IsisCube_01.cub");
+  remove("IsisCube_02.cub");
+  remove("IsisCube_02.lbl");
+  remove("IsisCube_03.cub");
+  remove("IsisCube_04.cub");
+  remove("IsisCube_05.cub");
   return 0;
 }
 
 
-void Report(Isis::Cube &c) {
-  cout << "File   = " << c.Filename() << endl;
-  cout << "Samps  = " << c.Samples() << endl;
-  cout << "Lines  = " << c.Lines() << endl;
-  cout << "Bands  = " << c.Bands() << endl;
-  cout << "Base   = " << c.Base() << endl;
-  cout << "Mult   = " << c.Multiplier() << endl;
-  cout << "Type   = " << c.PixelType() << endl;
-//  cout << "Order  = " << c.ByteOrder() << endl; // Needs to be system independent
-  cout << "Atchd  = " << c.IsAttached() << endl;
-  cout << "Dtchd  = " << c.IsDetached() << endl;
-  cout << "Format = " << c.CubeFormat() << endl;
-  cout << "Open   = " << c.IsOpen() << endl;
-  cout << "R/O    = " << c.IsReadOnly() << endl;
-  cout << "R/W    = " << c.IsReadWrite() << endl;
-  cout << "Lbytes = " << c.LabelBytes() << endl;
-  cout << endl;
+void Report(Cube &c) {
+  cerr << "File   = " << iString(QFileInfo(c.getFilename()).fileName()) << endl;
+  cerr << "Samps  = " << c.getSampleCount() << endl;
+  cerr << "Lines  = " << c.getLineCount() << endl;
+  cerr << "Bands  = " << c.getBandCount() << endl;
+  cerr << "Base   = " << c.getBase() << endl;
+  cerr << "Mult   = " << c.getMultiplier() << endl;
+  cerr << "Type   = " << c.getPixelType() << endl;
+//  cerr << "Order  = " << c.ByteOrder() << endl; // Needs to be system independent
+  cerr << "Atchd  = " << c.labelsAttached() << endl;
+  cerr << "Format = " << c.getFormat() << endl;
+  cerr << "Open   = " << c.isOpen() << endl;
+  try {
+    cerr << "R/O    = ";
+    cerr.flush();
+    cerr << c.isReadOnly();
+  }
+  catch(iException &e) {
+    e.Clear();
+    cerr << "N/A";
+  }
+
+  cerr << endl;
+
+  try {
+    cerr << "R/W    = ";
+    cerr.flush();
+    cerr << c.isReadWrite();
+  }
+  catch(iException &e) {
+    e.Clear();
+    cerr << "N/A";
+  }
+
+  cerr << endl;
+  cerr << "Lbytes = " << c.getLabelSize() << endl;
+  cerr << endl;
 }

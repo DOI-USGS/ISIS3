@@ -18,9 +18,12 @@
 #include "Cube.h"
 #include "CubeDisplayProperties.h"
 #include "Filename.h"
+#include "iException.h"
 #include "MosaicFileListWidget.h"
 #include "MosaicSceneWidget.h"
 #include "ProgressBar.h"
+#include "Pvl.h"
+#include "PvlObject.h"
 #include "TextFile.h"
 
 // using namespace Qisis;

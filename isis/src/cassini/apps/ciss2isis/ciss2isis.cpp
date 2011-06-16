@@ -88,7 +88,7 @@ void IsisMain() {
     validMax = 4095;
     CreateStretchPairs();
     // Pvl outputLabels;
-    Pvl *outputLabel = ocube->Label();
+    Pvl *outputLabel = ocube->getLabel();
     //Adjust Table-encoded values from 8 bit back to 12 bit.
     PvlGroup &inst = outputLabel->FindGroup("Instrument", Pvl::Traverse);
     double biasStripMean = inst.FindKeyword("BiasStripMean");
@@ -104,12 +104,12 @@ void IsisMain() {
   vector<char *> prefixBand0 = dataPrefix.at(0); //There is only one band so the outside vector only contains
   // one entry and the inside vector only contains nl entries
   Table linePrefixTable = CreateLinePrefixTable(prefixBand0);
-  ocube->Write(linePrefixTable);
+  ocube->write(linePrefixTable);
   // Compute readout order (roo) and save to output cube's instrument group
   unsigned char *header = (unsigned char *) p.FileHeader();
   int roo = *(header + 50 + vicarLabelBytes) / 32 % 2; //**** THIS MAY NEED TO BE CHANGED,
   // SEE BOTTOM OF THIS FILE FOR IN DEPTH COMMENTS ON READOUTORDER
-  PvlGroup &inst = ocube->Label()->FindGroup("Instrument", Pvl::Traverse);
+  PvlGroup &inst = ocube->getLabel()->FindGroup("Instrument", Pvl::Traverse);
   inst.AddKeyword(PvlKeyword("ReadoutOrder", roo));
   p.EndProcess();
 
@@ -270,7 +270,7 @@ void TranslateCassIssLabels(Filename &labelFile, Cube *ocube) {
   PvlTranslationManager labelXlater(inputLabel, transFile.Expanded());
 
   // Pvl outputLabels;
-  Pvl *outputLabel = ocube->Label();
+  Pvl *outputLabel = ocube->getLabel();
   labelXlater.Auto(*(outputLabel));
 
   //Add needed keywords that are not in translation table to cube's instrument group
@@ -366,7 +366,7 @@ void TranslateCassIssLabels(Filename &labelFile, Cube *ocube) {
     bandBin += PvlKeyword("Center", "None found for filter combination.");
     bandBin += PvlKeyword("Width", "None found for filter combination.");
   }
-  ocube->PutGroup(bandBin);
+  ocube->putGroup(bandBin);
 
   PvlGroup kerns("Kernels");
 
@@ -381,7 +381,7 @@ void TranslateCassIssLabels(Filename &labelFile, Cube *ocube) {
     msg += "angle or wide angle images";
     throw iException::Message(iException::User, msg, _FILEINFO_);
   }
-  ocube->PutGroup(kerns);
+  ocube->putGroup(kerns);
 
   return;
 }

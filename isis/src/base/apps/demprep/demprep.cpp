@@ -29,12 +29,12 @@ void IsisMain() {
   // We will be using a mosaic technique so get the size of the input file
   ProcessByLine p;
   Cube *icube = p.SetInputCube("FROM");
-  int ins = icube->Samples();
-  inl = icube->Lines();
-  int inb = icube->Bands();
+  int ins = icube->getSampleCount();
+  inl = icube->getLineCount();
+  int inb = icube->getBandCount();
   outCubeStats.Reset();
 
-  PvlGroup mapgrp = icube->Label()->FindGroup("Mapping", Pvl::Traverse);
+  PvlGroup mapgrp = icube->getLabel()->FindGroup("Mapping", Pvl::Traverse);
   bool hasExtents = false;
   bool isGlobal = false;
   double minLat,maxLat,minLon,maxLon;
@@ -48,7 +48,7 @@ void IsisMain() {
     if ((maxLat - minLat) >= 180.0 && (maxLon - minLon) >= 360.0) isGlobal = true;
   }
 
-  Projection *proj = icube->Projection();
+  Projection *proj = icube->getProjection();
   if(proj == NULL) {
     iString message = "The input cube must be a DEM file, which means it must be projected. ";
     message += "This file is not map projected.";
@@ -224,12 +224,12 @@ void IsisMain() {
   // We need to create the output file
   ocube = new Cube();
   UserInterface &ui = Application::GetUserInterface();
-  ocube->Open(Filename(ui.GetFilename("TO")).Expanded(), "rw");
+  ocube->open(Filename(ui.GetFilename("TO")).Expanded(), "rw");
 
   p.StartProcess(DoWrap);
 
   // Update mapping grp
-  ocube->PutGroup(mapgrp);
+  ocube->putGroup(mapgrp);
 
   PvlGroup demRange("Results");
   demRange += PvlKeyword("MinimumRadius", outCubeStats.Minimum(), "meters");
@@ -253,10 +253,10 @@ void IsisMain() {
                        Distance::Meters).GetKilometers();
   table += record;
 
-  ocube->Write(table);
+  ocube->write(table);
 
   p.EndProcess();
-  ocube->Close();
+  ocube->close();
   delete ocube;
 }
 
@@ -303,7 +303,7 @@ void DoWrap(Buffer &in) {
     outMan.SetLine(1);
 
     outCubeStats.AddData(&outMan[0], outMan.size());
-    ocube->Write(outMan);
+    ocube->write(outMan);
     outMan.SetLine(2);
   }
 
@@ -322,7 +322,7 @@ void DoWrap(Buffer &in) {
   }
 
   outCubeStats.AddData(&outMan[0], outMan.size());
-  ocube->Write(outMan);
+  ocube->write(outMan);
 
   // Write bottom pad?
   if (bottomPad == 1 && in.Line() == inl) {
@@ -341,6 +341,6 @@ void DoWrap(Buffer &in) {
     }
     outMan.SetLine(inl + topPad + bottomPad);
     outCubeStats.AddData(&outMan[0], outMan.size());
-    ocube->Write(outMan);
+    ocube->write(outMan);
   }
 }

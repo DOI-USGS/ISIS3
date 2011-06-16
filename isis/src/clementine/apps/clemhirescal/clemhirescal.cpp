@@ -24,7 +24,7 @@ void IsisMain() {
   Cube *input = p.SetInputCube("FROM");
 
   // Check for filter type of A-D
-  Pvl *label = input->Label();
+  Pvl *label = input->getLabel();
   iString wave = (string)label->FindGroup("BandBin", Pvl::Traverse)["FilterName"];
   if((wave != "A") && (wave != "B") && (wave != "C") && (wave != "D")) {
     string message = "Invalid FilterName [" + wave + "], can only handle A-D filters";

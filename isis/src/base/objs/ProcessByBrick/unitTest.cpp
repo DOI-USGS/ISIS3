@@ -28,7 +28,7 @@ void IsisMain() {
 
   Isis::Cube *icube =p.SetInputCube("FROM");
   p.SetBrickSize(10, 10, 2);
-  p.SetOutputCube("TO", icube->Samples(), icube->Lines(), icube->Bands());
+  p.SetOutputCube("TO", icube->getSampleCount(), icube->getLineCount(), icube->getBandCount());
   Functor2 func2;
   cout << "\nTesting Functors\nFunctor2\n";
   p.StartProcessIO(func2);
@@ -37,8 +37,8 @@ void IsisMain() {
   icube = p.SetInputCube("FROM");
   p.SetInputCube("FROM2");
   p.SetBrickSize(10, 10, 2);
-  p.SetOutputCube("TO", icube->Samples(), icube->Lines(), icube->Bands());
-  p.SetOutputCube("TO2", icube->Samples(), icube->Lines(), icube->Bands());
+  p.SetOutputCube("TO", icube->getSampleCount(), icube->getLineCount(), icube->getBandCount());
+  p.SetOutputCube("TO2", icube->getSampleCount(), icube->getLineCount(), icube->getBandCount());
 
   Functor3 func3;
   cout << "\nFunctor3\n";
@@ -49,10 +49,10 @@ void IsisMain() {
   p.EndProcess();
   
   Isis::Cube cube;
-  cube.Open("/tmp/isisProcessByBrick_01");
-  cube.Close(true);
-  cube.Open("/tmp/isisProcessByBrick_02");
-  cube.Close(true);
+  cube.open("/tmp/isisProcessByBrick_01");
+  cube.close(true);
+  cube.open("/tmp/isisProcessByBrick_02");
+  cube.close(true);
 }
 
 void oneInAndOut(Isis::Buffer &ib, Isis::Buffer &ob) {
