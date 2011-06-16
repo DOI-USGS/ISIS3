@@ -1,0 +1,81 @@
+----- Testing Constructors -----
+
+Empty constructor
+Constructor given a values in meters
+1500.5,1500.5,1500.5 -> 1500.5,1500.5,1500.5 && Valid = 1
+Constructor given distances
+1500.5,1500.5,1500.5 -> 1500.5,1500.5,1500.5 && Valid = 1
+Copy constructor
+1500.5,1500.5,1500.5 -> 1500.5,1500.5,1500.5 && Valid = 1
+
+----- Testing Operators -----
+
+
+Area3D 1: 0,0,0 -> 1,1,1 && Valid = 1
+Area3D 2: 0,0,0 -> 5,5,5 && Valid = 1
+Area3D 1 == Area3D 2 ? 0
+Area3D 1 != Area3D 2 ? 1
+Area3D 1 intersect Area3D 2... 0,0,0 -> 1,1,1 && Valid = 1
+Area3D 1 = Area3D 2... Area3D 1 = 0,0,0 -> 5,5,5 && Valid = 1
+
+Area3D 1: 0,1,2 -> 1,6,5 && Valid = 1
+Area3D 2: 1,0,2 -> 6,3,3 && Valid = 1
+Area3D 1 == Area3D 2 ? 0
+Area3D 1 != Area3D 2 ? 1
+Area3D 1 intersect Area3D 2... 1,1,2 -> 1,3,3 && Valid = 1
+Area3D 1 = Area3D 2... Area3D 1 = 1,0,2 -> 6,3,3 && Valid = 1
+
+Area3D 1: -5,-5,-5 -> -4,-4,-4 && Valid = 1
+Area3D 2: 0,0,0 -> 5,5,5 && Valid = 1
+Area3D 1 == Area3D 2 ? 0
+Area3D 1 != Area3D 2 ? 1
+Area3D 1 intersect Area3D 2... -1.7976931348623e+308,-1.7976931348623e+308,-1.7976931348623e+308 -> -1.7976931348623e+308,-1.7976931348623e+308,-1.7976931348623e+308 && Valid = 0
+Area3D 1 = Area3D 2... Area3D 1 = 0,0,0 -> 5,5,5 && Valid = 1
+
+Area3D 1: 0,-1.7976931348623e+308,0 -> 0,-1.7976931348623e+308,0 && Valid = 0
+Area3D 2: 0,0,0 -> 5,5,-1.7976931348623e+308 && Valid = 0
+Area3D 1 == Area3D 2 ? 0
+Area3D 1 != Area3D 2 ? 1
+Area3D 1 intersect Area3D 2... -1.7976931348623e+308,-1.7976931348623e+308,-1.7976931348623e+308 -> -1.7976931348623e+308,-1.7976931348623e+308,-1.7976931348623e+308 && Valid = 0
+Area3D 1 = Area3D 2... Area3D 1 = 0,0,0 -> 5,5,-1.7976931348623e+308 && Valid = 0
+
+Area3D 1: 0,-1.7976931348623e+308,0 -> 0,0,0 && Valid = 0
+Area3D 2: 0,0,0 -> 5,5,-1.7976931348623e+308 && Valid = 0
+Area3D 1 == Area3D 2 ? 0
+Area3D 1 != Area3D 2 ? 1
+Area3D 1 intersect Area3D 2... -1.7976931348623e+308,-1.7976931348623e+308,-1.7976931348623e+308 -> -1.7976931348623e+308,-1.7976931348623e+308,-1.7976931348623e+308 && Valid = 0
+Area3D 1 = Area3D 2... Area3D 1 = 0,0,0 -> 5,5,-1.7976931348623e+308 && Valid = 0
+
+Area3D 1: 0,0,0 -> 0,0,0 && Valid = 1
+Area3D 2: 0,0,0 -> 5,5,-1.7976931348623e+308 && Valid = 0
+Area3D 1 == Area3D 2 ? 0
+Area3D 1 != Area3D 2 ? 1
+Area3D 1 intersect Area3D 2... -1.7976931348623e+308,-1.7976931348623e+308,-1.7976931348623e+308 -> -1.7976931348623e+308,-1.7976931348623e+308,-1.7976931348623e+308 && Valid = 0
+Area3D 1 = Area3D 2... Area3D 1 = 0,0,0 -> 5,5,-1.7976931348623e+308 && Valid = 0
+
+Area3D 1: 0,0,0 -> 0,-1.7976931348623e+308,0 && Valid = 0
+Area3D 2: 0,0,0 -> 5,5,-1.7976931348623e+308 && Valid = 0
+Area3D 1 == Area3D 2 ? 0
+Area3D 1 != Area3D 2 ? 1
+Area3D 1 intersect Area3D 2... -1.7976931348623e+308,-1.7976931348623e+308,-1.7976931348623e+308 -> -1.7976931348623e+308,-1.7976931348623e+308,-1.7976931348623e+308 && Valid = 0
+Area3D 1 = Area3D 2... Area3D 1 = 0,0,0 -> 5,5,-1.7976931348623e+308 && Valid = 0
+
+Area3D 1: -1.7976931348623e+308,-1.7976931348623e+308,-1.7976931348623e+308 -> -1.7976931348623e+308,-1.7976931348623e+308,-1.7976931348623e+308 && Valid = 0
+Area3D 2: -1.7976931348623e+308,-1.7976931348623e+308,-1.7976931348623e+308 -> -1.7976931348623e+308,-1.7976931348623e+308,-1.7976931348623e+308 && Valid = 0
+Area3D 1 == Area3D 2 ? 1
+Area3D 1 != Area3D 2 ? 0
+Area3D 1 intersect Area3D 2... -1.7976931348623e+308,-1.7976931348623e+308,-1.7976931348623e+308 -> -1.7976931348623e+308,-1.7976931348623e+308,-1.7976931348623e+308 && Valid = 0
+Area3D 1 = Area3D 2... Area3D 1 = -1.7976931348623e+308,-1.7976931348623e+308,-1.7976931348623e+308 -> -1.7976931348623e+308,-1.7976931348623e+308,-1.7976931348623e+308 && Valid = 0
+
+Area3D 1: -1.7976931348623e+308,0,-1.7976931348623e+308 -> 0,0,-1.7976931348623e+308 && Valid = 0
+Area3D 2: -1.7976931348623e+308,0,-1.7976931348623e+308 -> 0,0,-1.7976931348623e+308 && Valid = 0
+Area3D 1 == Area3D 2 ? 1
+Area3D 1 != Area3D 2 ? 0
+Area3D 1 intersect Area3D 2... -1.7976931348623e+308,-1.7976931348623e+308,-1.7976931348623e+308 -> -1.7976931348623e+308,-1.7976931348623e+308,-1.7976931348623e+308 && Valid = 0
+Area3D 1 = Area3D 2... Area3D 1 = -1.7976931348623e+308,0,-1.7976931348623e+308 -> 0,0,-1.7976931348623e+308 && Valid = 0
+
+----- Testing Error Checking -----
+
+**PROGRAMMER ERROR** Cannot have a 3D area with inverted X coordinates of [1.0 meters] to [0.0 meters]
+**PROGRAMMER ERROR** Cannot have a 3D area with inverted Y coordinates of [1.0 meters] to [0.0 meters]
+**PROGRAMMER ERROR** Cannot have a 3D area with inverted Z coordinates of [1.0 meters] to [0.0 meters]
