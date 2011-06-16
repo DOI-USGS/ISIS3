@@ -171,7 +171,7 @@ namespace Isis {
     // Finally, remove any zeroes before the E and if the exponent is zero
     // then strip it off as well.
 
-    char dblstr[22];
+    char dblstr[23];
 
     if((log10(temp) > 13.0) || (log10(temp) < -3.0)) {
       char fmt[8], buff[8];

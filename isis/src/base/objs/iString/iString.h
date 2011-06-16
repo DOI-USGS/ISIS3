@@ -110,6 +110,8 @@ namespace Isis {
    *  @history 2010-03-18 Sharmila Prasad - Ability to set the exact precision digits for double
    *  @history 2010-09-27 Sharmila Prasad - Moved ParseExpression from ControlNetFilter to iString class
    *  @history 2010-10-04 Sharmila Prasad - Remove redundant ParseExpression
+   *  @history 2011-06-16 Jai Rideout - Fixed size of double string buffer to
+   *                                    work with doubles that are -DBLMAX
    *
    *  @todo  The Token member should consider single and double
    *         quotes seperatly *as of 10/28/09* Token no longer
