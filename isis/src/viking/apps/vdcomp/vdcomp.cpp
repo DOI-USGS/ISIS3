@@ -449,7 +449,10 @@ int get_files(int host)
   if(inname[0] == ' ') {
     printf("\nEnter name of file to be decompressed: ");
     // gets (inname);  JAA - Replaced with scanf
-    scanf("%s", inname);
+    if(!scanf("%s", inname)) {
+      fprintf(stderr, "\ncan't read name of file to be decompressed\n");
+      exit(3);
+    }
   }
 
   if(host == 1 || host == 2) {
@@ -473,7 +476,12 @@ int get_files(int host)
     /****************************************************************/
 
     if(host == 3) {
-      read(infile, &shortint, (size_t) 2);
+      if(read(infile, &shortint, (size_t) 2) == -1) {
+        fprintf(stderr, "\ncan't determine whether vax file is in variable "
+                "length format or not\n");
+        exit(3);
+      }
+
       if(shortint > 0 && shortint < 80) {
         host = 4;              /* change host to 4                */
 //     printf("This is not a VAX variable length file.");
@@ -492,7 +500,11 @@ int get_files(int host)
       printf("\n  4.  Unlabelled binary array.\n");
       printf("\n  Enter format number:");
       // gets(inname); - JAA replaced with scanf
-      scanf("%s", inname);
+      if(!scanf("%s", inname)) {
+        fprintf(stderr, "\ncan't read number indicating the desired output "
+                "format\n");
+        exit(3);
+      }
       output_format = atoi(inname);
     }
     while(output_format < 1 || output_format > 4);
@@ -500,7 +512,11 @@ int get_files(int host)
   if(outname[0] == ' ') {
     printf("\nEnter name of uncompressed output file: ");
     // gets (outname); - JAA replaced with scanf
-    scanf("%s", outname);
+    if(!scanf("%s", outname)) {
+      fprintf(stderr, "\ncan't read name of uncompressed output file that was "
+                      "entered\n");
+      exit(3);
+    }
   }
 
   return(host);
