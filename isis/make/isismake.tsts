@@ -27,9 +27,9 @@ LOCAL_INPUT := input
 LOCAL_TRUTH := truth
 
 ifeq ($(HOST_OS),"")
-  LOCAL_OSTRUTH := $(LOCAL_TRUTH).$(HOST_ARCH).$(HOST_PROC)
+  LOCAL_OSTRUTH := $(LOCAL_TRUTH).$(HOST_ARCH).$(HOST_MACH)
 else
-  LOCAL_OSTRUTH := $(LOCAL_TRUTH).$(HOST_ARCH).$(HOST_PROC).$(HOST_OS)
+  LOCAL_OSTRUTH := $(LOCAL_TRUTH).$(HOST_ARCH).$(HOST_MACH).$(HOST_OS)
 endif
 
 # Sets the TRUTH variable to point to the truth directory to use
@@ -473,9 +473,9 @@ ostruthdata: FORCE
 	osdir="$(TRUTH)"; \
 	if [ "$(TRUTH)" = "truth" ]; then \
 	  if [ "$(HOST_OS)" = "" ]; then \
-	    osdir="$(TRUTH).$(HOST_ARCH).$(HOST_PROC)"; \
+	    osdir="$(TRUTH).$(HOST_ARCH).$(HOST_MACH)"; \
 	  else \
-	    osdir="$(TRUTH).$(HOST_ARCH).$(HOST_PROC).$(HOST_OS)"; \
+	    osdir="$(TRUTH).$(HOST_ARCH).$(HOST_MACH).$(HOST_OS)"; \
 	  fi; \
 	fi; \
 	$(MKDIR) $$osdir; \

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #---------------------------------------------------------------------------
 # This script is used by the Isis make system to execute the unitTest for
 # objects in the Isis API.  It simply builds the unitTest, executes the
@@ -29,12 +29,12 @@ then
 fi
 
 CWD=`pwd`
-if [ "$1" == "" ]; then
-  TRUTH=`basename $CWD`_`uname -s`_`uname -p`.truth || exit 99;
+if [ "$1" = "" ]; then
+  TRUTH=`basename $CWD`_`uname -s`_`uname -m`.truth || exit 99;
 else
-  TRUTH=`basename $CWD`_`uname -s`_`uname -p`_${1}.truth || exit 99;
+  TRUTH=`basename $CWD`_`uname -s`_`uname -m`_${1}.truth || exit 99;
 fi
-  
+ 
 if [ ! -f $TRUTH ]
 then
   TRUTH=`basename $CWD`.truth || exit 99
@@ -71,3 +71,4 @@ else
     exit 5
   fi
 fi
+

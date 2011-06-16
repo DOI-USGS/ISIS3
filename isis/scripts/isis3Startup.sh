@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # This file should be executed within your current shell using the "." command
 # Since this is only a beta version we do not suggest you add this

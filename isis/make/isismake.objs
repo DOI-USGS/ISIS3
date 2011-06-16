@@ -283,7 +283,7 @@ truthdata: unitTest
 	
 ostruthdata: unitTest
 	if [ "$(HOST_OS)" = "" ]; then \
-	  ./unitTest >& `basename $(CURDIR)`_$(HOST_ARCH)_$(HOST_PROC).truth; \
+	  ./unitTest >& `basename $(CURDIR)`_$(HOST_ARCH)_$(HOST_MACH).truth; \
 	else \
-	  ./unitTest >& `basename $(CURDIR)`_$(HOST_ARCH)_$(HOST_PROC)_$(HOST_OS).truth; \
+	  ./unitTest >& `basename $(CURDIR)`_$(HOST_ARCH)_$(HOST_MACH)_$(HOST_OS).truth; \
 	fi
