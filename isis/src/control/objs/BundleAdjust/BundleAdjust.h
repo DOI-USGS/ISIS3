@@ -238,6 +238,7 @@ namespace Isis {
       // output functions
       void IterationSummary(double avErr, double sigmaXY, double sigmaHat, 
                             double sigmaX, double sigmaY);
+      void SpecialKIterationSummary();
       bool Output();
       bool OutputHeader(std::ofstream& fp_out);
       bool OutputWithErrorPropagation();
@@ -246,6 +247,7 @@ namespace Isis {
       bool OutputImagesCSV();
       bool OutputResiduals();
       bool WrapUp();
+      bool ComputeBundleStatistics();
 
                                                              //!< flags...
       bool m_bSolveTwist;                                    //!< to solve for "twist" angle
@@ -295,6 +297,22 @@ namespace Isis {
       double m_drms_rx;                                      //!< rms of x residuals
       double m_drms_ry;                                      //!< rms of y residuals
       double m_drms_rxy;                                     //!< rms of all x and y residuals
+      double m_drms_sigmaLat;                           //!< rms of adjusted Latitude sigmas
+      double m_drms_sigmaLon;                          //!< rms of adjusted Longitude sigmas
+      double m_drms_sigmaRad;                          //!< rms of adjusted Radius sigmas
+      double m_dminSigmaLatitude;
+      std::string m_idMinSigmaLatitude;
+      double m_dmaxSigmaLatitude;
+      std::string m_idMaxSigmaLatitude;
+      double m_dminSigmaLongitude;
+      std::string m_idMinSigmaLongitude;
+      double m_dmaxSigmaLongitude;
+      std::string m_idMaxSigmaLongitude;
+      double m_dminSigmaRadius;
+      std::string m_idMinSigmaRadius;
+      double m_dmaxSigmaRadius;
+      std::string m_idMaxSigmaRadius;
+
       double m_dRejectionLimit;                              //!< current rejection limit
 
       //!< apriori sigmas from user interface
@@ -354,6 +372,16 @@ namespace Isis {
       Statistics m_Statsrx;                                  //!<  x residuals
       Statistics m_Statsry;                                  //!<  y residuals
       Statistics m_Statsrxy;                                 //!< xy residuals
+
+      std::vector<Statistics> m_rmsImageSampleResiduals;
+      std::vector<Statistics> m_rmsImageLineResiduals;
+      std::vector<Statistics> m_rmsImageResiduals;
+      std::vector<Statistics> m_rmsImageXSigmas;
+      std::vector<Statistics> m_rmsImageYSigmas;
+      std::vector<Statistics> m_rmsImageZSigmas;
+      std::vector<Statistics> m_rmsImageRASigmas;
+      std::vector<Statistics> m_rmsImageDECSigmas;
+      std::vector<Statistics> m_rmsImageTWISTSigmas;
 
       CmatrixSolveType m_cmatrixSolveType;                          //!< cmatrix solve type (define)
       SpacecraftPositionSolveType m_spacecraftPositionSolveType;    //!< spacecraft position solve type (define)

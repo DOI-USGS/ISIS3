@@ -463,10 +463,13 @@ namespace Isis {
       bool operator==(const ControlPoint &pPoint) const;
       const ControlPoint &operator=(ControlPoint pPoint);
 
-      // The next 3 methods are specifically to support BundleAdjust
+      // The next 6 methods are specifically to support BundleAdjust
       void ZeroNumberOfRejectedMeasures();
       void SetNumberOfRejectedMeasures(int numRejected);
       int GetNumberOfRejectedMeasures() const;
+      double GetSampleResidualRms() const;
+      double GetLineResidualRms() const;
+      double GetResidualRms() const;
 
       ControlPointFileEntryV0002 ToFileEntry() const;
 

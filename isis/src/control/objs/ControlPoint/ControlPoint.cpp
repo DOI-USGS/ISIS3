@@ -1951,6 +1951,90 @@ namespace Isis {
     return numberOfRejectedMeasures;
   }
 
+  /**
+   * Get rms of sample residuals
+   *
+   * @return The rms of sample residuals
+   *
+   */
+  double ControlPoint::GetSampleResidualRms() const {
+      int nmeasures = measures->size();
+      if( nmeasures <= 0 )
+          return 0.0;
+
+      Statistics stats;
+
+      for( int i = 0; i < nmeasures; i++) {
+          const ControlMeasure* m = GetMeasure(i);
+          if( !m )
+              continue;
+
+          if( !m->IsIgnored() || m->IsRejected() )
+              continue;
+
+          stats.AddData(m->GetSampleResidual());
+      }
+
+      return stats.Rms();
+  }
+
+
+  /**
+   * Get rms of line residuals
+   *
+   * @return The rms of line residuals
+   *
+   */
+  double ControlPoint::GetLineResidualRms() const {
+      int nmeasures = measures->size();
+      if( nmeasures <= 0 )
+          return 0.0;
+
+      Statistics stats;
+
+      for( int i = 0; i < nmeasures; i++) {
+          const ControlMeasure* m = GetMeasure(i);
+          if( !m )
+              continue;
+
+          if( !m->IsIgnored() || m->IsRejected() )
+              continue;
+
+          stats.AddData(m->GetLineResidual());
+      }
+
+      return stats.Rms();
+  }
+
+
+  /**
+   * Get rms of residuals
+   *
+   * @return The rms of residuals
+   *
+   */
+  double ControlPoint::GetResidualRms() const {
+      int nmeasures = measures->size();
+      if( nmeasures <= 0 )
+          return 0.0;
+
+      Statistics stats;
+
+      for( int i = 0; i < nmeasures; i++) {
+          const ControlMeasure* m = GetMeasure(i);
+          if( !m )
+              continue;
+
+          if( m->IsIgnored() || m->IsRejected() )
+              continue;
+
+          stats.AddData(m->GetSampleResidual());
+          stats.AddData(m->GetLineResidual());
+      }
+
+      return stats.Rms();
+  }
+
 
   ControlPointFileEntryV0002 ControlPoint::ToFileEntry() const {
     ControlPointFileEntryV0002 fileEntry;

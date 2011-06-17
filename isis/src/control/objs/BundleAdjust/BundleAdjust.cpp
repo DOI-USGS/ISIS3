@@ -24,9 +24,10 @@
 #include "boost/numeric/ublas/io.hpp"
 #include "boost/numeric/ublas/vector.hpp"
 #include "boost/numeric/ublas/matrix_expression.hpp"
+#include "boost/lexical_cast.hpp"
 
 using namespace boost::numeric::ublas;
-
+//using boost::lexical_cast;
 
 namespace Isis {
 
@@ -812,6 +813,7 @@ namespace Isis {
       if (fabs(dSigma0_previous - m_dSigma0) <= m_dConvergenceThreshold) {
         m_bLastIteration = true;
         m_bConverged = true;
+        printf("Bundle has converged\n");
         break;
       }
 
@@ -828,6 +830,8 @@ namespace Isis {
         break;
       }
 
+      SpecialKIterationSummary();
+
       m_nIteration++;
 
       dSigma0_previous = m_dSigma0;
@@ -835,7 +839,9 @@ namespace Isis {
 
     if (m_bConverged && m_bErrorPropagation) {
       clock_t terror1 = clock();
+      printf("\nStarting Error Propagation\n");
       ErrorPropagation();
+      printf("\nError Propagation Complete\n");
       clock_t terror2 = clock();
       m_dElapsedTimeErrorProp = ((terror2 - terror1) / (double)CLOCKS_PER_SEC);
     }
@@ -845,7 +851,12 @@ namespace Isis {
 
     WrapUp();
 
+    printf("\nGenerating report files\n");
     Output();
+
+    printf("\nBundle complete\n");
+
+    SpecialKIterationSummary();
 
     return true;
 
@@ -3712,32 +3723,135 @@ namespace Isis {
         continue;
 
       point->ComputeResiduals();
-      /*
-            int nMeasures = point->Size();
-            for( int j = 0; j < nMeasures; j++ )
-            {
-              ControlMeasure& measure = point[j];
-              if ( measure.Ignore() )
-                continue;
-
-              // framing camera
-              if( measure.Camera()->GetCameraType() == 0 )
-              {
-                dpixpitch = (measure.Camera())->PixelPitch();
-
-                vx = measure.SampleResidual();
-                vy = measure.LineResidual();
-
-                vx = vx/dpixpitch;
-                vy = vy/dpixpitch;
-              }
-
-              measure.SetResidual(vx,vy);
-            }
-      */
     }
 
+    ComputeBundleStatistics();
+
     return true;
+  }
+
+  bool BundleAdjust::ComputeBundleStatistics() {
+      int nImages = Images();
+       int nMeasures;
+      int nImageIndex;
+      double vsample;
+      double vline;
+
+      m_rmsImageSampleResiduals.resize(nImages);
+      m_rmsImageLineResiduals.resize(nImages);
+      m_rmsImageResiduals.resize(nImages);
+
+      // load image coordinate residuals into statistics vectors
+      int nObservation = 0;
+      int nObjectPoints = m_pCnet->GetNumPoints();
+      for (int i = 0; i < nObjectPoints; i++) {
+
+          const ControlPoint *point = m_pCnet->GetPoint(i);
+          if ( point->IsIgnored() )
+              continue;
+
+          if ( point->IsRejected() )
+              continue;
+
+          nMeasures = point->GetNumMeasures();
+          for (int j = 0; j < nMeasures; j++) {
+
+              const ControlMeasure *measure = point->GetMeasure(j);
+              if ( measure->IsIgnored() )
+                  continue;
+
+              if ( measure->IsRejected() )
+                  continue;
+
+              vsample = fabs(measure->GetSampleResidual());
+              vline = fabs(measure->GetLineResidual());
+
+              // Determine the image index
+              nImageIndex = m_pSnList->SerialNumberIndex(measure->GetCubeSerialNumber());
+
+              // add residuals to pertinent vector
+              m_rmsImageSampleResiduals[nImageIndex].AddData(vsample);
+              m_rmsImageLineResiduals[nImageIndex].AddData(vline);
+              m_rmsImageResiduals[nImageIndex].AddData(vline);
+              m_rmsImageResiduals[nImageIndex].AddData(vsample);
+
+              nObservation++;
+          }
+      }
+
+      if( m_bErrorPropagation )
+      {
+          m_rmsImageXSigmas.resize(nImages);
+          m_rmsImageYSigmas.resize(nImages);
+          m_rmsImageZSigmas.resize(nImages);
+          m_rmsImageRASigmas.resize(nImages);
+          m_rmsImageDECSigmas.resize(nImages);
+          m_rmsImageTWISTSigmas.resize(nImages);
+
+          // compute stats for point sigmas
+          Statistics sigmaLatitude;
+          Statistics sigmaLongitude;
+          Statistics sigmaRadius;
+
+          double dSigmaLat, dSigmaLong, dSigmaRadius;
+
+          int nPoints = m_pCnet->GetNumPoints();
+          for ( int i = 0; i < nPoints; i++ ) {
+
+              const ControlPoint *point = m_pCnet->GetPoint(i);
+              if ( point->IsIgnored() )
+                  continue;
+
+              dSigmaLat = point->GetAdjustedSurfacePoint().GetLatSigmaDistance().GetMeters();
+              dSigmaLong = point->GetAdjustedSurfacePoint().GetLonSigmaDistance().GetMeters();
+              dSigmaRadius = point->GetAdjustedSurfacePoint().GetLocalRadiusSigma().GetMeters();
+
+              sigmaLatitude.AddData(dSigmaLat);
+              sigmaLongitude.AddData(dSigmaLong);
+              sigmaRadius.AddData(dSigmaRadius);
+
+              if ( i > 0 ) {
+                  if ( dSigmaLat > m_dmaxSigmaLatitude ) {
+                      m_dmaxSigmaLatitude = dSigmaLat;
+                      m_idMaxSigmaLatitude = point->GetId();
+                  }
+                  if ( dSigmaLong > m_dmaxSigmaLongitude ) {
+                      m_dmaxSigmaLongitude = dSigmaLong;
+                      m_idMaxSigmaLongitude = point->GetId();
+                  }
+                  if ( dSigmaRadius > m_dmaxSigmaRadius ) {
+                      m_dmaxSigmaRadius = dSigmaRadius;
+                      m_idMaxSigmaRadius = point->GetId();
+                  }
+                  if ( dSigmaLat < m_dminSigmaLatitude ) {
+                      m_dminSigmaLatitude = dSigmaLat;
+                      m_idMinSigmaLatitude = point->GetId();
+                  }
+                  if ( dSigmaLong < m_dminSigmaLongitude ) {
+                      m_dminSigmaLongitude = dSigmaLong;
+                      m_idMinSigmaLongitude = point->GetId();
+                  }
+                  if ( dSigmaRadius < m_dminSigmaRadius ) {
+                      m_dminSigmaRadius = dSigmaRadius;
+                      m_idMinSigmaRadius = point->GetId();
+                  }
+              }
+              else {
+                  m_dmaxSigmaLatitude = dSigmaLat;
+                  m_dmaxSigmaLongitude = dSigmaLong;
+                  m_dmaxSigmaRadius = dSigmaRadius;
+                  m_dminSigmaLatitude = dSigmaLat;
+                  m_dminSigmaLongitude = dSigmaLong;
+                  m_dminSigmaRadius = dSigmaRadius;
+              }
+          }
+
+          m_drms_sigmaLat = sigmaLatitude.Rms();
+          m_drms_sigmaLon = sigmaLongitude.Rms();
+          m_drms_sigmaRad = sigmaRadius.Rms();
+      }
+
+      return true;
   }
 
   bool BundleAdjust::ComputeRejectionLimit() {
@@ -3971,13 +4085,13 @@ namespace Isis {
           // form T
           T = prod(QS, trans(Q));
 
-      // Ask Ken what is happening here...Setting just the sigmas is not very accurate
-      // Shouldn't we be updating and setting the matrix???  TODO
-      SurfacePoint SurfacePoint = point->GetAdjustedSurfacePoint();
+          // Ask Ken what is happening here...Setting just the sigmas is not very accurate
+          // Shouldn't we be updating and setting the matrix???  TODO
+          SurfacePoint SurfacePoint = point->GetAdjustedSurfacePoint();
 
-      dSigmaLat = SurfacePoint.GetLatSigma().GetRadians();
-      dSigmaLong = SurfacePoint.GetLonSigma().GetRadians();
-      dSigmaRadius = SurfacePoint.GetLocalRadiusSigma().GetMeters();
+          dSigmaLat = SurfacePoint.GetLatSigma().GetRadians();
+          dSigmaLong = SurfacePoint.GetLonSigma().GetRadians();
+          dSigmaRadius = SurfacePoint.GetLocalRadiusSigma().GetMeters();
 
 //      dSigmaLat = point->GetAdjustedSurfacePoint().GetLatSigmaDistance().GetMeters();
 //      dSigmaLong = point->GetAdjustedSurfacePoint().GetLonSigmaDistance().GetMeters();
@@ -4261,7 +4375,7 @@ namespace Isis {
 //
   /**
     * This method creates a iteration summary and creates an iteration group for
-    * the BundleAdjust summary.
+    * the Sparse BundleAdjust summary.
     *
     * @param it              Iteration number
     *
@@ -4295,7 +4409,37 @@ namespace Isis {
     Application::Log(gp);
   }
 
-  /**
+  /* This method creates a iteration summary and creates an iteration group for
+  * the SpecialK BundleAdjust summary.
+  */
+void BundleAdjust::SpecialKIterationSummary() {
+    std::string itlog;
+    if ( m_bConverged )
+        itlog = "Iteration" + iString(m_nIteration) + ": Final";
+    else
+        itlog = "Iteration" + iString(m_nIteration);
+    PvlGroup gp(itlog);
+
+    gp += PvlKeyword("Sigma0", m_dSigma0);
+    gp += PvlKeyword("Observations", m_nObservations);
+    gp += PvlKeyword("Constrained_Point_Parameters", m_nConstrainedPointParameters);
+    gp += PvlKeyword("Constrained_Image_Parameters", m_nConstrainedImageParameters);
+    gp += PvlKeyword("Unknown_Parameters", m_nUnknownParameters);
+    gp += PvlKeyword("Degrees_of_Freedom", m_nDegreesOfFreedom);
+    gp += PvlKeyword("Rejected_Measures", m_nRejectedObservations/2);
+
+    if ( m_bConverged ) {
+        gp += PvlKeyword("Converged", "TRUE");
+        gp += PvlKeyword("TotalElapsedTime", m_dElapsedTime);
+
+        if ( m_bErrorPropagation )
+            gp += PvlKeyword("ErrorPropationElapsedTime", m_dElapsedTimeErrorProp);
+    }
+
+    Application::Log(gp);
+}
+
+/**
    * set parameter weighting for SPARSE solution
    *
    * @history 2011-04-19 Debbie A. Cook - Added initialization to m_Point_AprioriSigmas
@@ -4581,26 +4725,33 @@ namespace Isis {
       fp_out << buf;
       sprintf(buf, "\n\nINPUT: GLOBAL IMAGE PARAMETER UNCERTAINTIES\n===========================================\n");
       fp_out << buf;
-      (m_dGlobalLatitudeAprioriSigma == -1) ? sprintf(buf,"\n           POINT LATITUDE SIGMA: N/A"):
-              sprintf(buf,"\n           POINT LATITUDE SIGMA: %lf (meters)",m_dGlobalLatitudeAprioriSigma);
+      (m_dGlobalLatitudeAprioriSigma == -1) ? sprintf(buf,"\n               POINT LATITUDE SIGMA: N/A"):
+              sprintf(buf,"\n               POINT LATITUDE SIGMA: %lf (meters)",m_dGlobalLatitudeAprioriSigma);
       fp_out << buf;
-      (m_dGlobalLongitudeAprioriSigma == -1) ? sprintf(buf,"\n          POINT LONGITUDE SIGMA: N/A"):
-              sprintf(buf,"\n          POINT LONGITUDE SIGMA: %lf (meters)",m_dGlobalLongitudeAprioriSigma);
+      (m_dGlobalLongitudeAprioriSigma == -1) ? sprintf(buf,"\n              POINT LONGITUDE SIGMA: N/A"):
+              sprintf(buf,"\n              POINT LONGITUDE SIGMA: %lf (meters)",m_dGlobalLongitudeAprioriSigma);
       fp_out << buf;
-      (m_dGlobalRadiusAprioriSigma == -1) ? sprintf(buf,"\n             POINT RADIUS SIGMA: N/A"):
-              sprintf(buf,"\n             POINT RADIUS SIGMA: %lf (meters)",m_dGlobalRadiusAprioriSigma);
+      (m_dGlobalRadiusAprioriSigma == -1) ? sprintf(buf,"\n                 POINT RADIUS SIGMA: N/A"):
+              sprintf(buf,"\n                 POINT RADIUS SIGMA: %lf (meters)",m_dGlobalRadiusAprioriSigma);
       fp_out << buf;
-      (m_dGlobalSpacecraftPositionAprioriSigma == -1) ? sprintf(buf,"\n      SPACECRAFT POSITION SIGMA: N/A"):
-              sprintf(buf,"\n      SPACECRAFT POSITION SIGMA: %lf (meters)",m_dGlobalSpacecraftPositionAprioriSigma);
+      (m_dGlobalSpacecraftPositionAprioriSigma == -1) ? sprintf(buf,"\n          SPACECRAFT POSITION SIGMA: N/A"):
+              sprintf(buf,"\n          SPACECRAFT POSITION SIGMA: %lf (meters)",m_dGlobalSpacecraftPositionAprioriSigma);
       fp_out << buf;
-      (m_dGlobalSpacecraftVelocityAprioriSigma == -1) ? sprintf(buf,"\n      SPACECRAFT VELOCITY SIGMA: N/A"):
-              sprintf(buf,"\n      SPACECRAFT VELOCITY SIGMA: %lf (m/s)",m_dGlobalSpacecraftVelocityAprioriSigma);
+      (m_dGlobalSpacecraftVelocityAprioriSigma == -1) ? sprintf(buf,"\n          SPACECRAFT VELOCITY SIGMA: N/A"):
+              sprintf(buf,"\n          SPACECRAFT VELOCITY SIGMA: %lf (m/s)",m_dGlobalSpacecraftVelocityAprioriSigma);
       fp_out << buf;
-      (m_dGlobalSpacecraftAccelerationAprioriSigma == -1) ? sprintf(buf,"\n  SPACECRAFT ACCELERATION SIGMA: N/A"):
-              sprintf(buf,"\n  SPACECRAFT ACCELERATION SIGMA: %lf (m/s/s)",m_dGlobalSpacecraftAccelerationAprioriSigma);
+      (m_dGlobalSpacecraftAccelerationAprioriSigma == -1) ? sprintf(buf,"\n      SPACECRAFT ACCELERATION SIGMA: N/A"):
+              sprintf(buf,"\n      SPACECRAFT ACCELERATION SIGMA: %lf (m/s/s)",m_dGlobalSpacecraftAccelerationAprioriSigma);
       fp_out << buf;
-
-    //      std::vector<double> m_dGlobalCameraAnglesAprioriSigma;              //!< camera angles apriori sigmas: size is # camera coefficients solved
+      (m_dGlobalCameraAnglesAprioriSigma[0] == -1) ? sprintf(buf,"\n                CAMERA ANGLES SIGMA: N/A"):
+              sprintf(buf,"\n                CAMERA ANGLES SIGMA: %lf (dd)",m_dGlobalCameraAnglesAprioriSigma[0]);
+      fp_out << buf;
+      (m_dGlobalCameraAnglesAprioriSigma[1] == -1) ? sprintf(buf,"\n      CAMERA ANGULAR VELOCITY SIGMA: N/A"):
+              sprintf(buf,"\n      CAMERA ANGULAR VELOCITY SIGMA: %lf (dd/s)",m_dGlobalCameraAnglesAprioriSigma[1]);
+      fp_out << buf;
+      (m_dGlobalCameraAnglesAprioriSigma[2] == -1) ? sprintf(buf,"\n  CAMERA ANGULAR ACCELERATION SIGMA: N/A"):
+              sprintf(buf,"\n  CAMERA ANGULAR ACCELERATION SIGMA: %lf (dd/s/s)",m_dGlobalCameraAnglesAprioriSigma[2]);
+      fp_out << buf;
 
       sprintf(buf, "\n\nJIGSAW: RESULTS\n===============\n");
       fp_out << buf;
@@ -4670,14 +4821,21 @@ namespace Isis {
       int nUsed;
       for (int i = 0; i < nImages; i++)
       {
-        nMeasures = m_pCnet->GetNumberOfMeasuresInImage(m_pSnList->SerialNumber(i));
-        nRejectedMeasures = m_pCnet->GetNumberOfJigsawRejectedMeasuresInImage(m_pSnList->SerialNumber(i));
-        nUsed = nMeasures - nRejectedMeasures;
-        if( nUsed == nMeasures)
-            sprintf(buf,"%s   %5d of %5d\n", m_pSnList->Filename(i).c_str(),(nMeasures-nRejectedMeasures),nMeasures);
-        else
-            sprintf(buf,"%s   %5d of %5d*\n", m_pSnList->Filename(i).c_str(),(nMeasures-nRejectedMeasures),nMeasures);
-        fp_out << buf;
+          // ImageIndex(i) retrieves index into the normal equations matrix for Image(i)
+          double rmsSampleResiduals = m_rmsImageSampleResiduals[i].Rms();
+          double rmsLineResiduals = m_rmsImageLineResiduals[i].Rms();
+          double rmsLandSResiduals = m_rmsImageResiduals[i].Rms();
+
+          nMeasures = m_pCnet->GetNumberOfMeasuresInImage(m_pSnList->SerialNumber(i));
+          nRejectedMeasures = m_pCnet->GetNumberOfJigsawRejectedMeasuresInImage(m_pSnList->SerialNumber(i));
+          nUsed = nMeasures - nRejectedMeasures;
+          if( nUsed == nMeasures)
+              sprintf(buf,"%s   %5d of %5d %6.3lf %6.3lf %6.3lf\n", m_pSnList->Filename(i).c_str(),(nMeasures-nRejectedMeasures),nMeasures,
+                      rmsSampleResiduals,rmsLineResiduals,rmsLandSResiduals);
+          else
+              sprintf(buf,"%s   %5d of %5d* %6.3lf %6.3lf %6.3lf\n", m_pSnList->Filename(i).c_str(),(nMeasures-nRejectedMeasures),nMeasures,
+                      rmsSampleResiduals,rmsLineResiduals,rmsLandSResiduals);
+          fp_out << buf;
       }
 
       return true;
@@ -5069,11 +5227,40 @@ namespace Isis {
           }
       }
 
-      fp_out << "\n\n\n";
+      // output point data
+      sprintf(buf, "\n\n\nPOINTS UNCERTAINTY SUMMARY\n==========================\n\n");
+      fp_out << buf;
+      sprintf(buf, " RMS Sigma Latitude(m)%20.8lf\n",
+              m_drms_sigmaLat);
+      fp_out << buf;
+      sprintf(buf, " MIN Sigma Latitude(m)%20.8lf at %s\n",
+              m_dminSigmaLatitude,m_idMinSigmaLatitude.c_str());
+      fp_out << buf;
+      sprintf(buf, " MAX Sigma Latitude(m)%20.8lf at %s\n\n",
+              m_dmaxSigmaLatitude,m_idMaxSigmaLatitude.c_str());
+      fp_out << buf;
+      sprintf(buf, "RMS Sigma Longitude(m)%20.8lf\n",
+              m_drms_sigmaLon);
+      fp_out << buf;
+      sprintf(buf, "MIN Sigma Longitude(m)%20.8lf at %s\n",
+              m_dminSigmaLongitude,m_idMinSigmaLongitude.c_str());
+      fp_out << buf;
+      sprintf(buf, "MAX Sigma Longitude(m)%20.8lf at %s\n\n",
+              m_dmaxSigmaLongitude,m_idMaxSigmaLongitude.c_str());
+      fp_out << buf;
+      sprintf(buf, "   RMS Sigma Radius(m)%20.8lf\n",
+              m_drms_sigmaRad);
+      fp_out << buf;
+      sprintf(buf, "   MIN Sigma Radius(m)%20.8lf at %s\n",
+              m_dminSigmaRadius,m_idMinSigmaRadius.c_str());
+      fp_out << buf;
+      sprintf(buf, "   MAX Sigma Radius(m)%20.8lf at %s\n",
+              m_dmaxSigmaRadius,m_idMaxSigmaRadius.c_str());
+      fp_out << buf;
 
       // output point data
-      sprintf(buf, "\nPOINTS SUMMARY\n==============\n%91sSigma           Sigma             Sigma\n"
-              "           Label   Status     Rays        Latitude       Longitude          Radius"
+      sprintf(buf, "\n\nPOINTS SUMMARY\n==============\n%103sSigma          Sigma              Sigma\n"
+              "           Label         Status     Rays    RMS        Latitude       Longitude          Radius"
               "        Latitude       Longitude          Radius\n", "");
       fp_out << buf;
 
@@ -5084,6 +5271,7 @@ namespace Isis {
       double cor_lat_m, cor_lon_m;
       double dLatInit, dLonInit, dRadiusInit;
       int nGoodRays;
+      double dResidualRms;
       std::string strStatus;
       int nPointIndex = 0;
 
@@ -5095,6 +5283,7 @@ namespace Isis {
               continue;
 
           nRays = point->GetNumMeasures();
+          dResidualRms = point->GetResidualRms();         
           dLat = point->GetAdjustedSurfacePoint().GetLatitude().GetDegrees();
           dLon = point->GetAdjustedSurfacePoint().GetLongitude().GetDegrees();
           dRadius = point->GetAdjustedSurfacePoint().GetLocalRadius().GetMeters();
@@ -5112,9 +5301,9 @@ namespace Isis {
           else
               strStatus = "UNKNOWN";
 
-          sprintf(buf, "%16s%9s%5d of %d%16.8lf%16.8lf%16.8lf%16.8lf%16.8lf%16.8lf\n",
-                  point->GetId().c_str(), strStatus.c_str(), nGoodRays, nRays, dLat, dLon,
-                  dRadius * 0.001, dSigmaLat, dSigmaLong, dSigmaRadius);
+          sprintf(buf, "%16s%15s%5d of %d%6.2lf%16.8lf%16.8lf%16.8lf%16.8lf%16.8lf%16.8lf\n",
+                  point->GetId().c_str(), strStatus.c_str(), nGoodRays, nRays, dResidualRms, dLat,
+                  dLon, dRadius * 0.001, dSigmaLat, dSigmaLong, dSigmaRadius);
           fp_out << buf;
           nPointIndex++;
       }
@@ -5476,12 +5665,13 @@ namespace Isis {
     fp_out << "\n\n\n";
 
     // output point data
-    sprintf(buf,"\nPOINTS SUMMARY\n==============\n%91sSigma           Sigma             Sigma\n"
-                "           Label   Status     Rays        Latitude       Longitude          Radius"
-                "        Latitude       Longitude          Radius\n","");
+    sprintf(buf,"\nPOINTS SUMMARY\n==============\n%99sSigma           Sigma           Sigma\n"
+                "           Label      Status     Rays   RMS        Latitude       Longitude          Radius"
+                "        Latitude        Longitude       Radius\n","");
     fp_out << buf;
 
     int nRays = 0;
+    double dResidualRms;
     double dLat,dLon,dRadius;
     double cor_lat_dd,cor_lon_dd,cor_rad_m;
     double cor_lat_m,cor_lon_m;
@@ -5498,6 +5688,7 @@ namespace Isis {
             continue;
 
         nRays = point->GetNumMeasures();
+        dResidualRms = point->GetResidualRms();
         dLat = point->GetAdjustedSurfacePoint().GetLatitude().GetDegrees();
         dLon = point->GetAdjustedSurfacePoint().GetLongitude().GetDegrees();
         dRadius = point->GetAdjustedSurfacePoint().GetLocalRadius().GetMeters();
@@ -5512,9 +5703,9 @@ namespace Isis {
         else
             strStatus = "UNKNOWN";
 
-        sprintf(buf, "%16s%9s%4d of %d%16.8lf%16.8lf%16.8lf%11s%16s%16s\n",
-                point->GetId().c_str(), strStatus.c_str(), nGoodRays, nRays, dLat, dLon,
-                dRadius * 0.001,"N/A","N/A","N/A");
+        sprintf(buf, "%16s%12s%4d of %d%6.2lf%16.8lf%16.8lf%16.8lf%11s%16s%16s\n",
+                point->GetId().c_str(), strStatus.c_str(), nGoodRays, nRays, dResidualRms, dLat,
+                dLon, dRadius * 0.001,"N/A","N/A","N/A");
 
         fp_out << buf;
     }
@@ -5612,13 +5803,22 @@ namespace Isis {
     double cor_lat_m;
     double cor_lon_m;
     double cor_rad_m;
+    int nMeasures, nRejectedMeasures;
+    double dResidualRms;
 
     // print column headers
     if (m_bErrorPropagation) {
-        sprintf(buf, ",,,,,Sigma,Sigma,Sigma,Correction,Correction,Correction\n,,Latitude,Longitude,Radius,Latitude,Longitude,Radius,Latitude,Longitude,Radius,X,Y,Z\nLabel,Status,(dd),(dd),(km),(m),(m),(m),(m),(m),(m),(km),(km),(km)\n");
+        sprintf(buf, ",,,,,,,Sigma,Sigma,Sigma,Correction,Correction,Correction"
+                "\n,,,Rejected,,Latitude,Longitude,Radius,Latitude,Longitude,"
+                "Radius,Latitude,Longitude,Radius,X,Y,Z\nLabel,Status,Measures,"
+                "Measures,RMS,(dd),(dd),(km),(m),(m),(m),(m),(m),(m),(km),(km),"
+                "(km)\n");
     }
     else {
-        sprintf(buf, ",,,,,Correction,Correction,Correction,,,\n,,Latitude,Longitude,Radius,Latitude,Longitude,Radius,X,Y,Z\nLabel,Status,(dd),(dd),(km),(m),(m),(m),(km),(km),(km)\n");
+        sprintf(buf, ",,,,,Correction,Correction,Correction\n,,,Rejected,,"
+                "Latitude,Longitude,Radius,Latitude,Longitude,Radius,X,Y,Z\n"
+                "Label,Status,Measures,Measures,RMS,(dd),(dd),(km),(m),(m),"
+                "(m),(km),(km),(km)\n");
     }
     fp_out << buf;
 
@@ -5638,6 +5838,9 @@ namespace Isis {
       dX = point->GetAdjustedSurfacePoint().GetX().GetKilometers();
       dY = point->GetAdjustedSurfacePoint().GetY().GetKilometers();
       dZ = point->GetAdjustedSurfacePoint().GetZ().GetKilometers();
+      nMeasures = point->GetNumMeasures();
+      nRejectedMeasures = point->GetNumberOfRejectedMeasures();
+      dResidualRms = point->GetResidualRms();
 
       // point corrections and initial sigmas
       bounded_vector<double,3>& corrections = m_Point_Corrections[nPointIndex];
@@ -5659,15 +5862,14 @@ namespace Isis {
         dSigmaLong = point->GetAdjustedSurfacePoint().GetLonSigmaDistance().GetMeters();
         dSigmaRadius = point->GetAdjustedSurfacePoint().GetLocalRadiusSigma().GetMeters();
 
-        sprintf(buf, "%s,%s,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf\n",
-                point->GetId().c_str(), strStatus.c_str(), dLat, dLon, dRadius,
-                dSigmaLat, dSigmaLong, dSigmaRadius, cor_lat_m,cor_lon_m,cor_rad_m,
-                dX, dY, dZ);
+        sprintf(buf, "%s,%s,%d,%d,%6.2lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf\n",
+                point->GetId().c_str(), strStatus.c_str(), nMeasures, nRejectedMeasures, dResidualRms, dLat, dLon, dRadius,
+                dSigmaLat, dSigmaLong, dSigmaRadius, cor_lat_m, cor_lon_m, cor_rad_m, dX, dY, dZ);
       }
       else
-        sprintf(buf, "%s,%s,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf\n",
-                point->GetId().c_str(), strStatus.c_str(), dLat, dLon, dRadius, cor_lat_m,
-                cor_lon_m,cor_rad_m, dX, dY, dZ);
+        sprintf(buf, "%s,%s,%d,%d,%6.2lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf\n",
+                point->GetId().c_str(), strStatus.c_str(), nMeasures, nRejectedMeasures, dResidualRms, dLat, dLon, dRadius,
+                cor_lat_m, cor_lon_m, cor_rad_m, dX, dY, dZ);
 
       fp_out << buf;
 
@@ -5695,11 +5897,11 @@ namespace Isis {
         return false;
 
     // output column headers
-    sprintf(buf, ",,,x image,y image,sample,line,Residual Vector\n");
+    sprintf(buf, ",,,x image,y image,,,sample,line,Residual Vector\n");
     fp_out << buf;
-    sprintf(buf, "Point,Image,Image,coordinate,coordinate,residual,residual,Magnitude\n");
+    sprintf(buf, "Point,Image,Image,coordinate,coordinate,Sample,Line,residual,residual,Magnitude\n");
     fp_out << buf;
-    sprintf(buf, "Label,Filename,Serial Number,(mm),(mm),(pixels),(pixels),(pixels),Rejected\n");
+    sprintf(buf, "Label,Filename,Serial Number,(mm),(mm),(pixels),(pixels),(pixels),(pixels),(pixels),Rejected\n");
     fp_out << buf;
 
     int nImageIndex;
@@ -5726,13 +5928,16 @@ namespace Isis {
         nImageIndex = m_pSnList->SerialNumberIndex(measure->GetCubeSerialNumber());
 
         if (measure->IsRejected())
-          sprintf(buf, "%s,%s,%s,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,*\n",
+          sprintf(buf, "%s,%s,%s,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,*\n",
                   point->GetId().c_str(), m_pSnList->Filename(nImageIndex).c_str(), m_pSnList->SerialNumber(nImageIndex).c_str(),
-                  measure->GetFocalPlaneMeasuredX(), measure->GetFocalPlaneMeasuredY(), measure->GetSampleResidual(), measure->GetLineResidual(), measure->GetResidualMagnitude());
+                  measure->GetFocalPlaneMeasuredX(), measure->GetFocalPlaneMeasuredY(), measure->GetSample(),
+                  measure->GetLine(), measure->GetSampleResidual(), measure->GetLineResidual(),
+                  measure->GetResidualMagnitude());
         else
-          sprintf(buf, "%s,%s,%s,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf\n",
+          sprintf(buf, "%s,%s,%s,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf\n",
                   point->GetId().c_str(), m_pSnList->Filename(nImageIndex).c_str(), m_pSnList->SerialNumber(nImageIndex).c_str(),
-                  measure->GetFocalPlaneMeasuredX(), measure->GetFocalPlaneMeasuredY(), measure->GetSampleResidual(), measure->GetLineResidual(), measure->GetResidualMagnitude());
+                  measure->GetFocalPlaneMeasuredX(), measure->GetFocalPlaneMeasuredY(), measure->GetSample(),
+                  measure->GetLine(), measure->GetSampleResidual(), measure->GetLineResidual(), measure->GetResidualMagnitude());
         fp_out << buf;
       }
     }
@@ -5745,6 +5950,7 @@ namespace Isis {
   /**
    * output image data to csv file
    */
+/*
   bool BundleAdjust::OutputImagesCSV() {
     char buf[1056];
 
@@ -5811,7 +6017,545 @@ namespace Isis {
 
     return true;
   }
+*/
+  bool BundleAdjust::OutputImagesCSV() {
+      char buf[1056];
 
+      std:: string ofname("bundleout_images.csv");
+      if( !m_strOutputFilePrefix.empty() )
+          ofname = m_strOutputFilePrefix + "_" + ofname;
+
+      std::ofstream fp_out(ofname.c_str(), std::ios::out);
+      if (!fp_out)
+          return false;
+
+      // setup column headers
+      std::vector<std::string> output_columns;
+
+      output_columns.push_back("Image,");
+      output_columns.push_back("rms,");
+      output_columns.push_back("rms,");
+      output_columns.push_back("rms,");
+      if ( m_spacecraftPositionSolveType <= 1 ) {
+          for(int i = 0; i < 5; i++ )
+              output_columns.push_back("X,");
+          for(int i = 0; i < 5; i++ )
+              output_columns.push_back("Y,");
+          for(int i = 0; i < 5; i++ )
+              output_columns.push_back("Z,");
+      }
+      else if ( m_spacecraftPositionSolveType == 2 ) {
+          for(int i = 0; i < 5; i++ )
+              output_columns.push_back("X,");
+          for(int i = 0; i < 5; i++ )
+              output_columns.push_back("Xv,");
+          for(int i = 0; i < 5; i++ )
+              output_columns.push_back("Y,");
+          for(int i = 0; i < 5; i++ )
+              output_columns.push_back("Yv,");
+          for(int i = 0; i < 5; i++ )
+              output_columns.push_back("Z,");
+          for(int i = 0; i < 5; i++ )
+              output_columns.push_back("Zv,");
+      }
+      else if ( m_spacecraftPositionSolveType == 3 ) {
+          for(int i = 0; i < 5; i++ )
+              output_columns.push_back("X,");
+          for(int i = 0; i < 5; i++ )
+              output_columns.push_back("Xv,");
+          for(int i = 0; i < 5; i++ )
+              output_columns.push_back("Xa,");
+          for(int i = 0; i < 5; i++ )
+              output_columns.push_back("Y,");
+          for(int i = 0; i < 5; i++ )
+              output_columns.push_back("Yv,");
+          for(int i = 0; i < 5; i++ )
+              output_columns.push_back("Ya,");
+          for(int i = 0; i < 5; i++ )
+              output_columns.push_back("Z,");
+          for(int i = 0; i < 5; i++ )
+              output_columns.push_back("Zv,");
+          for(int i = 0; i < 5; i++ )
+              output_columns.push_back("Za,");
+      }
+
+      char strcoeff = 'a' + m_nNumberCameraCoefSolved -1;
+      std::ostringstream ostr;
+      for( int i = 0; i < m_nNumberCameraCoefSolved; i++) {
+          if( i ==0 )
+              ostr << strcoeff;
+          else if ( i == 1 )
+              ostr << strcoeff << "t";
+          else
+              ostr << strcoeff << "t" << i;
+          for( int j = 0; j < 5; j++ ) {
+              if( m_nNumberCameraCoefSolved == 1 )
+                  output_columns.push_back("RA,");
+              else {
+                  std::string str = "RA(";
+                  str += ostr.str().c_str();
+                  str += "),";
+                  output_columns.push_back(str);
+              }
+          }
+          ostr.str("");
+          strcoeff--;
+      }
+      strcoeff = 'a' + m_nNumberCameraCoefSolved -1;
+      for( int i = 0; i < m_nNumberCameraCoefSolved; i++) {
+          if( i ==0 )
+              ostr << strcoeff;
+          else if ( i == 1 )
+              ostr << strcoeff << "t";
+          else
+              ostr << strcoeff << "t" << i;
+          for( int j = 0; j < 5; j++ ) {
+              if( m_nNumberCameraCoefSolved == 1 )
+                  output_columns.push_back("DEC,");
+              else {
+                  std::string str = "DEC(";
+                  str += ostr.str().c_str();
+                  str += "),";
+                  output_columns.push_back(str);
+              }
+          }
+          ostr.str("");
+          strcoeff--;
+      }
+      strcoeff = 'a' + m_nNumberCameraCoefSolved -1;
+      for( int i = 0; i < m_nNumberCameraCoefSolved; i++) {
+          if( i ==0 )
+              ostr << strcoeff;
+          else if ( i == 1 )
+              ostr << strcoeff << "t";
+          else
+              ostr << strcoeff << "t" << i;
+          for( int j = 0; j < 5; j++ ) {
+              if( m_nNumberCameraCoefSolved == 1 )
+                  output_columns.push_back("TWIST,");
+              else {
+                  std::string str = "TWIST(";
+                  str += ostr.str().c_str();
+                  str += "),";
+                  output_columns.push_back(str);
+              }
+          }
+          ostr.str("");
+          strcoeff--;
+      }
+
+      // print first column header to buffer and output to file
+      int ncolumns = output_columns.size();
+      for( int i = 0; i < ncolumns; i++) {
+          std::string str = output_columns.at(i);
+          sprintf(buf, "%s", (const char*)str.c_str());
+          fp_out << buf;
+      }
+      sprintf(buf, "\n");
+      fp_out << buf;
+
+      output_columns.clear();
+      output_columns.push_back("Filename,");
+      output_columns.push_back("sample res,");
+      output_columns.push_back("line res,");
+      output_columns.push_back("total res,");
+
+      int nparams = 0;
+      if ( m_spacecraftPositionSolveType <= 1 )
+          nparams = 3;
+      else if ( m_spacecraftPositionSolveType == 2 )
+          nparams = 6;
+      else if ( m_spacecraftPositionSolveType == 3 )
+          nparams = 9;
+      nparams += 3*m_nNumberCameraCoefSolved;
+      for(int i = 0; i < nparams; i++ ) {
+          output_columns.push_back("Initial,");
+          output_columns.push_back("Correction,");
+          output_columns.push_back("Final,");
+          output_columns.push_back("Apriori Sigma,");
+          output_columns.push_back("Adj Sigma,");
+      }
+
+      // print second column header to buffer and output to file
+      ncolumns = output_columns.size();
+      for( int i = 0; i < ncolumns; i++) {
+          std::string str = output_columns.at(i);
+          sprintf(buf, "%s", (const char*)str.c_str());
+          fp_out << buf;
+      }
+      sprintf(buf, "\n");
+      fp_out << buf;
+
+      Camera *pCamera = NULL;
+      SpicePosition *pSpicePosition = NULL;
+      SpiceRotation *pSpiceRotation = NULL;
+
+      int nImages = Images();
+      double dSigma;
+      int nIndex = 0;
+      bool bSolveSparse = false;
+      bool bHeld = false;
+      std::vector<double> PosX(3);
+      std::vector<double> PosY(3);
+      std::vector<double> PosZ(3);
+      std::vector<double> coefRA(m_nNumberCameraCoefSolved);
+      std::vector<double> coefDEC(m_nNumberCameraCoefSolved);
+      std::vector<double> coefTWI(m_nNumberCameraCoefSolved);
+      std::vector<double> angles;
+
+      output_columns.clear();
+
+      gmm::row_matrix<gmm::rsvector<double> > lsqCovMatrix;
+      if( m_strSolutionMethod == "SPARSE" )
+      {
+          lsqCovMatrix = m_pLsq->GetCovarianceMatrix();  // get reference to the covariance matrix from the least-squares object
+          bSolveSparse = true;
+      }
+
+      for ( int i = 0; i < nImages; i++ ) {
+
+          if ( m_nHeldImages > 0 && m_pHeldSnList->HasSerialNumber(m_pSnList->SerialNumber(i)) )
+              bHeld = true;
+
+          pCamera = m_pCnet->Camera(i);
+          if ( !pCamera )
+              continue;
+
+          // ImageIndex(i) retrieves index into the normal equations matrix for Image(i)
+          nIndex = ImageIndex(i) ;
+
+          pSpicePosition = pCamera->InstrumentPosition();
+          if ( !pSpicePosition )
+              continue;
+
+          pSpiceRotation = pCamera->InstrumentRotation();
+          if ( !pSpiceRotation )
+              continue;
+
+          // for frame cameras we directly retrieve the Exterior Orientation (i.e. position
+          // and orientation angles). For others (linescan, radar) we retrieve the polynomial
+          // coefficients from which the Exterior Orientation parameters are derived.
+          if ( m_spacecraftPositionSolveType > 0 )
+              pSpicePosition->GetPolynomial(PosX, PosY, PosZ);
+          else { // frame camera
+              std::vector <double> coordinate(3);
+              coordinate = pSpicePosition->GetCenterCoordinate();
+              PosX[0] = coordinate[0];
+              PosY[0] = coordinate[1];
+              PosZ[0] = coordinate[2];
+          }
+
+          if ( m_cmatrixSolveType > 0 )
+              pSpiceRotation->GetPolynomial(coefRA,coefDEC,coefTWI);
+          //          else { // frame camera
+          else { // This is for m_cmatrixSolveType = None and no polynomial fit has occurred
+            angles = pSpiceRotation->GetCenterAngles();
+            coefRA.push_back(angles.at(0));
+            coefDEC.push_back(angles.at(1));
+            coefTWI.push_back(angles.at(2));
+          }
+
+          // clear column vector
+          output_columns.clear();
+
+          // add filename
+          output_columns.push_back(m_pSnList->Filename(i).c_str());
+
+          // add rms of sample, line, total image coordinate residuals
+          output_columns.push_back(boost::lexical_cast<std::string>(m_rmsImageSampleResiduals[i].Rms()));
+          output_columns.push_back(boost::lexical_cast<std::string>(m_rmsImageLineResiduals[i].Rms()));
+          output_columns.push_back(boost::lexical_cast<std::string>(m_rmsImageResiduals[i].Rms()));
+
+          // add all XYZ(J2000) spacecraft position parameters to column vector
+          if ( m_spacecraftPositionSolveType == 0 ) {
+              output_columns.push_back(boost::lexical_cast<std::string>(PosX[0]));
+              output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+              output_columns.push_back(boost::lexical_cast<std::string>(PosX[0]));
+              output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+              output_columns.push_back("N/A");
+              output_columns.push_back(boost::lexical_cast<std::string>(PosY[0]));
+              output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+              output_columns.push_back(boost::lexical_cast<std::string>(PosY[0]));
+              output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+              output_columns.push_back("N/A");
+              output_columns.push_back(boost::lexical_cast<std::string>(PosZ[0]));
+              output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+              output_columns.push_back(boost::lexical_cast<std::string>(PosZ[0]));
+              output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+              output_columns.push_back("N/A");
+          }
+          else if ( m_spacecraftPositionSolveType == 1 ) {
+              if( bSolveSparse )
+                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+
+              output_columns.push_back(boost::lexical_cast<std::string>(PosX[0] - m_Image_Corrections(nIndex)));
+              output_columns.push_back(boost::lexical_cast<std::string>(m_Image_Corrections(nIndex)));
+              output_columns.push_back(boost::lexical_cast<std::string>(PosX[0]));
+              output_columns.push_back(boost::lexical_cast<std::string>(m_dGlobalSpacecraftPositionAprioriSigma));
+              output_columns.push_back(boost::lexical_cast<std::string>(dSigma));
+
+              nIndex++;
+              if( bSolveSparse )
+                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+
+              output_columns.push_back(boost::lexical_cast<std::string>(PosY[0] - m_Image_Corrections(nIndex)));
+              output_columns.push_back(boost::lexical_cast<std::string>(m_Image_Corrections(nIndex)));
+              output_columns.push_back(boost::lexical_cast<std::string>(PosY[0]));
+              output_columns.push_back(boost::lexical_cast<std::string>(m_dGlobalSpacecraftPositionAprioriSigma));
+              output_columns.push_back(boost::lexical_cast<std::string>(dSigma));
+              nIndex++;
+              if( bSolveSparse )
+                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+
+              output_columns.push_back(boost::lexical_cast<std::string>(PosZ[0] - m_Image_Corrections(nIndex)));
+              output_columns.push_back(boost::lexical_cast<std::string>(m_Image_Corrections(nIndex)));
+              output_columns.push_back(boost::lexical_cast<std::string>(PosZ[0]));
+              output_columns.push_back(boost::lexical_cast<std::string>(m_dGlobalSpacecraftPositionAprioriSigma));
+              output_columns.push_back(boost::lexical_cast<std::string>(dSigma));
+              nIndex++;
+          }
+          else if (m_spacecraftPositionSolveType == 2) {
+              if( bSolveSparse )
+                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+              output_columns.push_back(boost::lexical_cast<std::string>(PosX[0] - m_Image_Corrections(nIndex)));
+              output_columns.push_back(boost::lexical_cast<std::string>(m_Image_Corrections(nIndex)));
+              output_columns.push_back(boost::lexical_cast<std::string>(PosX[0]));
+              output_columns.push_back(boost::lexical_cast<std::string>(m_dGlobalSpacecraftPositionAprioriSigma));
+              output_columns.push_back(boost::lexical_cast<std::string>(dSigma));
+              nIndex++;
+              if( bSolveSparse )
+                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+              output_columns.push_back(boost::lexical_cast<std::string>(PosX[1] - m_Image_Corrections(nIndex)));
+              output_columns.push_back(boost::lexical_cast<std::string>(m_Image_Corrections(nIndex)));
+              output_columns.push_back(boost::lexical_cast<std::string>(PosX[1]));
+              output_columns.push_back(boost::lexical_cast<std::string>(m_dGlobalSpacecraftVelocityAprioriSigma));
+              output_columns.push_back(boost::lexical_cast<std::string>(dSigma));
+              nIndex++;
+              if( bSolveSparse )
+                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+              output_columns.push_back(boost::lexical_cast<std::string>(PosY[0] - m_Image_Corrections(nIndex)));
+              output_columns.push_back(boost::lexical_cast<std::string>(m_Image_Corrections(nIndex)));
+              output_columns.push_back(boost::lexical_cast<std::string>(PosY[0]));
+              output_columns.push_back(boost::lexical_cast<std::string>(m_dGlobalSpacecraftPositionAprioriSigma));
+              output_columns.push_back(boost::lexical_cast<std::string>(dSigma));
+              nIndex++;
+              if( bSolveSparse )
+                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+              output_columns.push_back(boost::lexical_cast<std::string>(PosY[1] - m_Image_Corrections(nIndex)));
+              output_columns.push_back(boost::lexical_cast<std::string>(m_Image_Corrections(nIndex)));
+              output_columns.push_back(boost::lexical_cast<std::string>(PosY[1]));
+              output_columns.push_back(boost::lexical_cast<std::string>(m_dGlobalSpacecraftVelocityAprioriSigma));
+              output_columns.push_back(boost::lexical_cast<std::string>(dSigma));
+              nIndex++;
+              if( bSolveSparse )
+                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+              output_columns.push_back(boost::lexical_cast<std::string>(PosZ[0] - m_Image_Corrections(nIndex)));
+              output_columns.push_back(boost::lexical_cast<std::string>(m_Image_Corrections(nIndex)));
+              output_columns.push_back(boost::lexical_cast<std::string>(PosZ[0]));
+              output_columns.push_back(boost::lexical_cast<std::string>(m_dGlobalSpacecraftPositionAprioriSigma));
+              output_columns.push_back(boost::lexical_cast<std::string>(dSigma));
+              nIndex++;
+              if( bSolveSparse )
+                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+              output_columns.push_back(boost::lexical_cast<std::string>(PosZ[1] - m_Image_Corrections(nIndex)));
+              output_columns.push_back(boost::lexical_cast<std::string>(m_Image_Corrections(nIndex)));
+              output_columns.push_back(boost::lexical_cast<std::string>(PosZ[1]));
+              output_columns.push_back(boost::lexical_cast<std::string>(m_dGlobalSpacecraftVelocityAprioriSigma));
+              output_columns.push_back(boost::lexical_cast<std::string>(dSigma));
+              nIndex++;
+          }
+          else if ( m_spacecraftPositionSolveType == 3 ) {
+              if( bSolveSparse )
+                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+              output_columns.push_back(boost::lexical_cast<std::string>(PosX[0] - m_Image_Corrections(nIndex)));
+              output_columns.push_back(boost::lexical_cast<std::string>(m_Image_Corrections(nIndex)));
+              output_columns.push_back(boost::lexical_cast<std::string>(PosX[0]));
+              output_columns.push_back(boost::lexical_cast<std::string>(m_dGlobalSpacecraftPositionAprioriSigma));
+              output_columns.push_back(boost::lexical_cast<std::string>(dSigma));
+              nIndex++;
+              if( bSolveSparse )
+                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+              output_columns.push_back(boost::lexical_cast<std::string>(PosX[1] - m_Image_Corrections(nIndex)));
+              output_columns.push_back(boost::lexical_cast<std::string>(m_Image_Corrections(nIndex)));
+              output_columns.push_back(boost::lexical_cast<std::string>(PosX[1]));
+              output_columns.push_back(boost::lexical_cast<std::string>(m_dGlobalSpacecraftVelocityAprioriSigma));
+              output_columns.push_back(boost::lexical_cast<std::string>(dSigma));
+              nIndex++;
+              if( bSolveSparse )
+                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+              output_columns.push_back(boost::lexical_cast<std::string>(PosX[2] - m_Image_Corrections(nIndex)));
+              output_columns.push_back(boost::lexical_cast<std::string>(m_Image_Corrections(nIndex)));
+              output_columns.push_back(boost::lexical_cast<std::string>(PosX[2]));
+              output_columns.push_back(boost::lexical_cast<std::string>(m_dGlobalSpacecraftAccelerationAprioriSigma));
+              output_columns.push_back(boost::lexical_cast<std::string>(dSigma));
+              nIndex++;
+              if( bSolveSparse )
+                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+              output_columns.push_back(boost::lexical_cast<std::string>(PosY[0] - m_Image_Corrections(nIndex)));
+              output_columns.push_back(boost::lexical_cast<std::string>(m_Image_Corrections(nIndex)));
+              output_columns.push_back(boost::lexical_cast<std::string>(PosY[0]));
+              output_columns.push_back(boost::lexical_cast<std::string>(m_dGlobalSpacecraftPositionAprioriSigma));
+              output_columns.push_back(boost::lexical_cast<std::string>(dSigma));
+              nIndex++;
+              if( bSolveSparse )
+                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+              output_columns.push_back(boost::lexical_cast<std::string>(PosY[1] - m_Image_Corrections(nIndex)));
+              output_columns.push_back(boost::lexical_cast<std::string>(m_Image_Corrections(nIndex)));
+              output_columns.push_back(boost::lexical_cast<std::string>(PosY[1]));
+              output_columns.push_back(boost::lexical_cast<std::string>(m_dGlobalSpacecraftVelocityAprioriSigma));
+              output_columns.push_back(boost::lexical_cast<std::string>(dSigma));
+              nIndex++;
+              if( bSolveSparse )
+                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+              output_columns.push_back(boost::lexical_cast<std::string>(PosY[2] - m_Image_Corrections(nIndex)));
+              output_columns.push_back(boost::lexical_cast<std::string>(m_Image_Corrections(nIndex)));
+              output_columns.push_back(boost::lexical_cast<std::string>(PosY[2]));
+              output_columns.push_back(boost::lexical_cast<std::string>(m_dGlobalSpacecraftAccelerationAprioriSigma));
+              output_columns.push_back(boost::lexical_cast<std::string>(dSigma));
+              nIndex++;
+              if( bSolveSparse )
+                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+              output_columns.push_back(boost::lexical_cast<std::string>(PosZ[0] - m_Image_Corrections(nIndex)));
+              output_columns.push_back(boost::lexical_cast<std::string>(m_Image_Corrections(nIndex)));
+              output_columns.push_back(boost::lexical_cast<std::string>(PosZ[0]));
+              output_columns.push_back(boost::lexical_cast<std::string>(m_dGlobalSpacecraftPositionAprioriSigma));
+              output_columns.push_back(boost::lexical_cast<std::string>(dSigma));
+              nIndex++;
+              if( bSolveSparse )
+                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+              output_columns.push_back(boost::lexical_cast<std::string>(PosZ[1] - m_Image_Corrections(nIndex)));
+              output_columns.push_back(boost::lexical_cast<std::string>(m_Image_Corrections(nIndex)));
+              output_columns.push_back(boost::lexical_cast<std::string>(PosZ[1]));
+              output_columns.push_back(boost::lexical_cast<std::string>(m_dGlobalSpacecraftVelocityAprioriSigma));
+              output_columns.push_back(boost::lexical_cast<std::string>(dSigma));
+              nIndex++;
+              if( bSolveSparse )
+                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+              output_columns.push_back(boost::lexical_cast<std::string>(PosZ[2] - m_Image_Corrections(nIndex)));
+              output_columns.push_back(boost::lexical_cast<std::string>(m_Image_Corrections(nIndex)));
+              output_columns.push_back(boost::lexical_cast<std::string>(PosZ[2]));
+              output_columns.push_back(boost::lexical_cast<std::string>(m_dGlobalSpacecraftAccelerationAprioriSigma));
+              output_columns.push_back(boost::lexical_cast<std::string>(dSigma));
+              nIndex++;
+          }
+
+          if( m_nNumberCameraCoefSolved > 0 ) {
+              for( int i = 0; i < m_nNumberCameraCoefSolved; i++ ) {
+                  if( bSolveSparse )
+                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                  else
+                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+                  output_columns.push_back(boost::lexical_cast<std::string>((coefRA[i] - m_Image_Corrections(nIndex)) * RAD2DEG));
+                  output_columns.push_back(boost::lexical_cast<std::string>(m_Image_Corrections(nIndex) * RAD2DEG));
+                  output_columns.push_back(boost::lexical_cast<std::string>(coefRA[i] * RAD2DEG));
+                  output_columns.push_back(boost::lexical_cast<std::string>(m_dGlobalCameraAnglesAprioriSigma[i]));
+                  output_columns.push_back(boost::lexical_cast<std::string>(dSigma * RAD2DEG));
+                  nIndex++;
+              }
+              for( int i = 0; i < m_nNumberCameraCoefSolved; i++ ) {
+                  if( bSolveSparse )
+                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                  else
+                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+                  output_columns.push_back(boost::lexical_cast<std::string>((coefDEC[i] - m_Image_Corrections(nIndex)) * RAD2DEG));
+                  output_columns.push_back(boost::lexical_cast<std::string>(m_Image_Corrections(nIndex) * RAD2DEG));
+                  output_columns.push_back(boost::lexical_cast<std::string>(coefDEC[i] * RAD2DEG));
+                  output_columns.push_back(boost::lexical_cast<std::string>(m_dGlobalCameraAnglesAprioriSigma[i]));
+                  output_columns.push_back(boost::lexical_cast<std::string>(dSigma * RAD2DEG));
+                  nIndex++;
+              }
+              if ( !m_bSolveTwist ) {
+                  output_columns.push_back(boost::lexical_cast<std::string>(coefTWI[0]*RAD2DEG));
+                  output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+                  output_columns.push_back(boost::lexical_cast<std::string>(coefTWI[0]*RAD2DEG));
+                  output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+                  output_columns.push_back("N/A");
+              }
+              else {
+                  for( int i = 0; i < m_nNumberCameraCoefSolved; i++ ) {
+                      if( bSolveSparse )
+                          dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                      else
+                          dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+                      output_columns.push_back(boost::lexical_cast<std::string>((coefTWI[i] - m_Image_Corrections(nIndex)) * RAD2DEG));
+                      output_columns.push_back(boost::lexical_cast<std::string>(m_Image_Corrections(nIndex) * RAD2DEG));
+                      output_columns.push_back(boost::lexical_cast<std::string>(coefTWI[i] * RAD2DEG));
+                      output_columns.push_back(boost::lexical_cast<std::string>(m_dGlobalCameraAnglesAprioriSigma[i]));
+                      output_columns.push_back(boost::lexical_cast<std::string>(dSigma * RAD2DEG));
+                      nIndex++;
+                  }
+              }
+          }
+
+          else{
+              output_columns.push_back(boost::lexical_cast<std::string>(coefRA[0]*RAD2DEG));
+              output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+              output_columns.push_back(boost::lexical_cast<std::string>(coefRA[0]*RAD2DEG));
+              output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+              output_columns.push_back("N/A");
+              output_columns.push_back(boost::lexical_cast<std::string>(coefDEC[0]*RAD2DEG));
+              output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+              output_columns.push_back(boost::lexical_cast<std::string>(coefDEC[0]*RAD2DEG));
+              output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+              output_columns.push_back("N/A");
+              output_columns.push_back(boost::lexical_cast<std::string>(coefTWI[0]*RAD2DEG));
+              output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+              output_columns.push_back(boost::lexical_cast<std::string>(coefTWI[0]*RAD2DEG));
+              output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+              output_columns.push_back("N/A");
+          }
+
+          // print column vector to buffer and output to file
+          int ncolumns = output_columns.size();
+          for( int i = 0; i < ncolumns; i++) {
+              std::string str = output_columns.at(i);
+              sprintf(buf, "%s,", (const char*)str.c_str());
+              fp_out << buf;
+          }
+          sprintf(buf, "\n");
+          fp_out << buf;
+      }
+
+      fp_out.close();
+
+      return true;
+  }
 
   /**
    * This method sets the solution method for solving the matrix and fills
