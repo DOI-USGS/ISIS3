@@ -222,6 +222,11 @@ Segment (by file) Summary
       Pad CK records with a small time on each end of CK segment to avoid round 
       off issues.
     </change>
+    <change name="Kris Becker" date="2011-06-16">
+        Added loading of IAK SPICE kernels specifically for support of Cassini; 
+        removed obsolete conditionlized code; removed LocalKernels class 
+        preferring the system version of the Kernels class.
+    </change>
 </history>
 
   <groups>
