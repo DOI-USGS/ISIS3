@@ -308,15 +308,15 @@ namespace Isis {
     }
 
     if(!m_labelFile->open(QIODevice::Truncate | QIODevice::ReadWrite)) {
-      cleanUp(false);
       iString msg = "Failed to create [" + m_labelFile->fileName() + "]";
+      cleanUp(false);
       throw iException::Message(iException::Io, msg, _FILEINFO_);
     }
 
     if (m_dataFile) {
       if(!m_dataFile->open(QIODevice::Truncate | QIODevice::ReadWrite)) {
-        cleanUp(false);
         iString msg = "Failed to create [" + m_dataFile->fileName() + "]";
+        cleanUp(false);
         throw iException::Message(iException::Io, msg, _FILEINFO_);
       }
     }
