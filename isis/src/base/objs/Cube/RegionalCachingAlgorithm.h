@@ -28,7 +28,7 @@
 
 namespace Isis {
   /**
-   * @ingroup Low Level Cube I/O
+   * @ingroup Low Level Cube IO
    *
    * @author
    *

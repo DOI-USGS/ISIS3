@@ -30,7 +30,7 @@ namespace Isis {
    * @internal
    *   @todo CubeBsqHandler doesn't have any documentation.
    *
-   * @brief I/O Handler for Isis Cubes using the BSQ format.
+   * @brief IO Handler for Isis Cubes using the BSQ format.
    *
    * This class is used to open, create, read, and write data from Isis cube
    * files.

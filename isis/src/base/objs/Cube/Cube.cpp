@@ -1278,9 +1278,9 @@ namespace Isis {
 
 
   /**
-   * This will clear excess RAM used for quicker I/O in the cube. This should
+   * This will clear excess RAM used for quicker IO in the cube. This should
    *   only be called if you need hundreds of cubes opened simultaneously. The
-   *   I/O cache will start growing again on future I/O's.
+   *   IO cache will start growing again on future IO's.
    */
   void Cube::clearIoCache() {
     if(m_ioHandler) {

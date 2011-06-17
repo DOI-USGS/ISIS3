@@ -31,11 +31,11 @@ namespace Isis {
   class RawCubeChunk;
 
   /**
-   * @ingroup Low Level Cube I/O
+   * @ingroup Low Level Cube IO
    * @brief This is the parent of the caching algorithms
    *
    * The caching algorithms are given some limited/easy to acquire data about
-   *   recent I/Os and the allocated cube chunks. Their job is to quickly
+   *   recent IOs and the allocated cube chunks. Their job is to quickly
    *   determine which allocated cube chunks should be put on disk or just
    *   freed from memory. These will not be called until there is at least
    *   a few allocated chunks in memory.

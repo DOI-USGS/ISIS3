@@ -114,7 +114,7 @@ namespace Isis {
 
   /**
    * Cleans up all allocated memory. Child destructors must call clearCache()
-   *   because we can no longer do I/O by the time this destructor is called.
+   *   because we can no longer do IO by the time this destructor is called.
    */
   CubeIoHandler::~CubeIoHandler() {
     ASSERT( m_rawData ? m_rawData->size() == 0 : 1 );
@@ -206,7 +206,7 @@ namespace Isis {
   /**
    * Write buffer data into the cube data on disk.
    *
-   * This could do no I/O if the cube chunks required are already in memory
+   * This could do no IO if the cube chunks required are already in memory
    *   and our caching algorithms say to not free any of the cube chunks
    *   afterwards.
    *
@@ -345,7 +345,7 @@ namespace Isis {
 
   /**
    * Children should probably implement this method. This is called to allow the
-   *   I/O Handling algorithm to change the labels to include things like
+   *   IO Handling algorithm to change the labels to include things like
    *   TileSamples/TileLines for example.
    *
    * @param labels The PVL cube label to be updated to reflect information
@@ -556,11 +556,9 @@ namespace Isis {
 
 
   /**
-   * Get the cube chunks that correspond to a cube area. This updates our
-   *   idea of what cube areas have been requested for the caching algorithms
-   *   and so should only be called when an I/O is requested.
-   *
-   * @see findCubeChunks(QMap<CubeBoundary, int>)
+   * Get the cube chunks that correspond to the given cube area.
+   *   This will create and initialize the chunks if they are not already in
+   *   memory.
    *
    * @param startSample The starting sample of the cube data
    * @param numSamples The number of samples of cube data
@@ -666,7 +664,7 @@ namespace Isis {
           int chunkYPos = (chunkRect.top() - 1) / m_linesInChunk;
           int chunkZPos = initialChunkZPos;
 
-          // We now have an X,Y,Z position for the chunk. What's it's index?
+          // We now have an X,Y,Z position for the chunk. What's its index?
           int chunkIndex = chunkXPos +
               (chunkYPos * getChunkCountInSampleDimension()) +
               (chunkZPos * getChunkCountInSampleDimension() *
@@ -913,11 +911,11 @@ namespace Isis {
 
   /**
    * Apply the caching algorithms and get rid of excess cube data in memory.
-   *   This is intended to be called after every I/O operation.
+   *   This is intended to be called after every IO operation.
    *
-   * @param justUsed The cube chunks that were used in the I/O operation that
+   * @param justUsed The cube chunks that were used in the IO operation that
    *     is calling this method.
-   * @param justRequested The buffer that was used in the I/O operation that
+   * @param justRequested The buffer that was used in the IO operation that
    *     is calling this method.
    */
   void CubeIoHandler::minimizeCache(const QList<RawCubeChunk *> &justUsed,
@@ -1301,3 +1299,4 @@ namespace Isis {
     }
   }
 }
+

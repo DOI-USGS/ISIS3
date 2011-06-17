@@ -37,7 +37,7 @@ using namespace std;
 
 namespace Isis {
   /**
-   * Construct a BSQ I/O handler. This will determine a good chunk size to use
+   * Construct a BSQ IO handler. This will determine a good chunk size to use
    *   that does not result in the cube being enlarged or misordered.
    *
    * @param dataFile The file with cube DN data in it

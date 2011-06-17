@@ -29,7 +29,7 @@
 namespace Isis {
 
   /**
-   * @brief I/O Handler for Isis Cubes using the tile format.
+   * @brief IO Handler for Isis Cubes using the tile format.
    *
    * This class is used to open, create, read, and write data from Isis cube
    * files.

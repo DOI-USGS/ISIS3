@@ -42,7 +42,7 @@ namespace Isis {
   class Histogram;
 
   /**
-   * @brief I/O Handler for Isis Cubes.
+   * @brief IO Handler for Isis Cubes.
    *
    * This class is used to open, create, read, and write data from Isis cube
    * files.
@@ -135,6 +135,7 @@ namespace Isis {
         /**
          * Cubes are stored in band-sequential format, that is the order of the
          *   pixels in the file (on disk) is:
+         *   <pre>
          *     S1,L1,B1
          *     S2,L1,B1
          *     and so on until ...
@@ -146,6 +147,7 @@ namespace Isis {
          *     S2,L1,B2
          *     and so on until ...
          *     S1,L1,BN
+         *   </pre>
          *
          * The idea is the cubes are stored left-to-right, top-to-bottom, then
          *   front-to-back.
@@ -153,9 +155,9 @@ namespace Isis {
         Bsq,
         /**
          * Cubes are stored in tile format, that is the order of the
-         *   pixels in the file (on disk) is BSQ within a given sub-area defined
-         *   by the Tile I/O handler. Typically these tiles are around 1MB for
-         *   efficiency.
+         *   pixels in the file (on disk) is BSQ within a given sub-area
+         *   defined by the Tile IO handler. Typically these tiles are around
+         *   1MB for efficiency.
          *
          * The idea is the cubes are stored left-to-right, top-to-bottom inside
          *   the tiles (which have 1 band). The tiles are themselves in BSQ
@@ -164,6 +166,7 @@ namespace Isis {
          *   cube size.
          *
          * Cube:
+         * <pre>
          * ------------------------------
          * |Tile *Tile *Tile *Tile *Tile|*
          * |  0  *  1  *  2  *  3  *  4 |*
@@ -177,6 +180,7 @@ namespace Isis {
          * ------------------------------*
          * * 10  * 11  * 12  * 13  * 14  *
          * *******************************
+         * </pre>
          *
          * The symbol '*' denotes tile boundaries.
          * The symbols '-' and '|' denote cube boundaries.
@@ -270,7 +274,7 @@ namespace Isis {
       QFile *m_dataFile;
 
       /**
-       * This does the heavy lifting for cube DN I/O and is always allocated
+       * This does the heavy lifting for cube DN IO and is always allocated
        *   when isOpen() is true.
        */
       CubeIoHandler *m_ioHandler;
@@ -283,8 +287,8 @@ namespace Isis {
       ByteOrder m_byteOrder;
 
       /**
-       * If isOpen() then this is the I/O format that the cube uses. If there is
-       *   no file opened then this is the I/O format that will be used if a
+       * If isOpen() then this is the IO format that the cube uses. If there is
+       *   no file opened then this is the IO format that will be used if a
        *   cube is created (using create(...)). This defaults to Tile.
        */
       Format m_format;
