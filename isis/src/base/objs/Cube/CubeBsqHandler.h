@@ -54,7 +54,7 @@ namespace Isis {
           const Pvl &label, bool alreadyOnDisk);
       ~CubeBsqHandler();
 
-      void updateLabels(Pvl &label);
+      void updateLabels(Pvl &labels);
 
     protected:
       virtual void readRaw(RawCubeChunk &chunkToFill) const;

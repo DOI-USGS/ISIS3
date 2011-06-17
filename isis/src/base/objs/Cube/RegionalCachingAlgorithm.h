@@ -30,7 +30,12 @@ namespace Isis {
   /**
    * @ingroup Low Level Cube IO
    *
-   * @author
+   * This algorithm recommends chunks to be freed that are not within the last
+   *   IO. Once the 10MB limit is reached, it recommends more chunks to free in
+   *   order to stay below this limit, as long as the chunks weren't in the
+   *   last IO.
+   *
+   * @author Jai Rideout and Steven Lambright
    *
    * @internal
    */

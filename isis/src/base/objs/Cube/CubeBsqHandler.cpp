@@ -70,6 +70,9 @@ namespace Isis {
   }
 
 
+  /**
+   * The destructor writes all cached data to disk.
+   */
   CubeBsqHandler::~CubeBsqHandler() {
     clearCache();
   }
