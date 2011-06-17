@@ -16,8 +16,8 @@ int main(int argc, char *argv[]) {
   try {
     cout << "UnitTest for Camera Statistics" << endl;
     Isis::Cube cube;
-    cube.Open("$Clementine1/testData/lna1391h.cub");
-    Isis::Camera *cam = cube.Camera();
+    cube.open("$Clementine1/testData/lna1391h.cub");
+    Isis::Camera *cam = cube.getCamera();
     cout << setprecision(6);
 
     Isis::CameraStatistics camStats(cam, 1, 1);
