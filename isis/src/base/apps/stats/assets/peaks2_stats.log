@@ -1,0 +1,92 @@
+Group = Results
+  From                    = /work/users/jcrough/peaks.cub
+  Band                    = 2
+  Average                 = 41.065349578857
+  StandardDeviation       = 9.0221086527396
+  Variance                = 81.398444541839
+  Median                  = 39.999389639124
+  Mode                    = 33.999572747387
+  Skew                    = 0.35444926926576
+  Minimum                 = 20.0
+  Maximum                 = 162.0
+  Sum                     = 43060140.0
+  TotalPixels             = 1048576
+  ValidPixels             = 1048576
+  OverValidMaximumPixels  = 0
+  UnderValidMinimumPixels = 0
+  NullPixels              = 0
+  LisPixels               = 0
+  LrsPixels               = 0
+  HisPixels               = 0
+  HrsPixels               = 0
+End_Group
+
+Group = Results
+  From                    = /work/users/jcrough/peaks.cub
+  Band                    = 4
+  Average                 = 66.66695022583
+  StandardDeviation       = 15.650648036503
+  Variance                = 244.94278396249
+  Median                  = 68.001144426642
+  Mode                    = 69.000671396963
+  Skew                    = -0.25574548690259
+  Minimum                 = 13.0
+  Maximum                 = 191.0
+  Sum                     = 69905364.0
+  TotalPixels             = 1048576
+  ValidPixels             = 1048576
+  OverValidMaximumPixels  = 0
+  UnderValidMinimumPixels = 0
+  NullPixels              = 0
+  LisPixels               = 0
+  LrsPixels               = 0
+  HisPixels               = 0
+  HrsPixels               = 0
+End_Group
+
+Group = Results
+  From                    = /work/users/jcrough/peaks.cub
+  Band                    = 5
+  Average                 = 95.398200583275
+  StandardDeviation       = 32.239438846353
+  Variance                = 1039.3814171277
+  Median                  = 95.001556420233
+  Mode                    = 79.001373311971
+  Skew                    = 0.036909218389178
+  Minimum                 = 1.0
+  Maximum                 = 253.0
+  Sum                     = 100030928.0
+  TotalPixels             = 1048576
+  ValidPixels             = 1048562
+  OverValidMaximumPixels  = 0
+  UnderValidMinimumPixels = 0
+  NullPixels              = 0
+  LisPixels               = 0
+  LrsPixels               = 14
+  HisPixels               = 0
+  HrsPixels               = 0
+End_Group
+
+Group = Results
+  From                    = /work/users/jcrough/peaks.cub
+  Band                    = 6
+  Average                 = 179.05471134186
+  StandardDeviation       = 24.529209473845
+  Variance                = 601.68211741175
+  Median                  = 186.00086976425
+  Mode                    = 191.00018310826
+  Skew                    = -0.84953717278946
+  Minimum                 = 36.0
+  Maximum                 = 237.0
+  Sum                     = 187752473.0
+  TotalPixels             = 1048576
+  ValidPixels             = 1048576
+  OverValidMaximumPixels  = 0
+  UnderValidMinimumPixels = 0
+  NullPixels              = 0
+  LisPixels               = 0
+  LrsPixels               = 0
+  HisPixels               = 0
+  HrsPixels               = 0
+End_Group
+End

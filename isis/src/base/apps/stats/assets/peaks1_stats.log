@@ -1,0 +1,23 @@
+Group = Results
+  From                    = /work/users/jcrough/peaks.cub
+  Band                    = 3
+  Average                 = 48.632055282593
+  StandardDeviation       = 14.968403164602
+  Variance                = 224.05309329807
+  Median                  = 46.999160753796
+  Mode                    = 39.000122072175
+  Skew                    = 0.32726828189502
+  Minimum                 = 15.0
+  Maximum                 = 212.0
+  Sum                     = 50994406.0
+  TotalPixels             = 1048576
+  ValidPixels             = 1048576
+  OverValidMaximumPixels  = 0
+  UnderValidMinimumPixels = 0
+  NullPixels              = 0
+  LisPixels               = 0
+  LrsPixels               = 0
+  HisPixels               = 0
+  HrsPixels               = 0
+End_Group
+End
