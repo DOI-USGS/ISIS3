@@ -1,6 +1,7 @@
 #include "Isis.h"
 
 #include <string>
+#include <iostream>
 
 #include "Cube.h"
 #include "Process.h"
@@ -11,6 +12,7 @@ using namespace std;
 using namespace Isis;
 
 void IsisMain() {
+
   UserInterface &ui = Application::GetUserInterface();
   Process p;
 
@@ -27,35 +29,49 @@ void IsisMain() {
   if(ui.WasEntered("VALIDMAX")) {
     validMax = ui.GetDouble("VALIDMAX");
   }
+  
+  // Set a global Pvl for storing results
+  Pvl mainpvl;
+  
+  // Get the number of bands to process
+  int bandcount = icube->getBandCount();
+  
+  for (int i = 1; i <= bandcount; i++) {
+    Histogram *stats = icube->getHistogram(i, validMin, validMax);
 
-  Histogram *stats = icube->getHistogram(1, validMin, validMax);
-
-  // Construct a label with the results
-  PvlGroup results("Results");  
-  results += PvlKeyword("From", icube->getFilename());
-  results += PvlKeyword("Band", icube->getPhysicalBand(1));
-  if(stats->ValidPixels() != 0) {
-    results += PvlKeyword("Average", stats->Average());
-    results += PvlKeyword("StandardDeviation", stats->StandardDeviation());
-    results += PvlKeyword("Variance", stats->Variance());
-    // These statistics only worked on a histogram
-    results += PvlKeyword("Median", stats->Median());
-    results += PvlKeyword("Mode", stats->Mode());
-    results += PvlKeyword("Skew", stats->Skew());
-    results += PvlKeyword("Minimum", stats->Minimum());
-    results += PvlKeyword("Maximum", stats->Maximum());
-    results += PvlKeyword("Sum", stats->Sum());
+    // Construct a label with the results
+    PvlGroup results("Results");  
+    results += PvlKeyword("From", icube->getFilename());
+    results += PvlKeyword("Band", icube->getPhysicalBand(i));
+    if(stats->ValidPixels() != 0) {
+      results += PvlKeyword("Average", stats->Average());
+      results += PvlKeyword("StandardDeviation", stats->StandardDeviation());
+      results += PvlKeyword("Variance", stats->Variance());
+      // These statistics only worked on a histogram
+      results += PvlKeyword("Median", stats->Median());
+      results += PvlKeyword("Mode", stats->Mode());
+      results += PvlKeyword("Skew", stats->Skew());
+      results += PvlKeyword("Minimum", stats->Minimum());
+      results += PvlKeyword("Maximum", stats->Maximum());
+      results += PvlKeyword("Sum", stats->Sum());
+    }
+    results += PvlKeyword("TotalPixels", stats->TotalPixels());
+    results += PvlKeyword("ValidPixels", stats->ValidPixels());
+    results += PvlKeyword("OverValidMaximumPixels", stats->OverRangePixels());
+    results += PvlKeyword("UnderValidMinimumPixels", stats->UnderRangePixels());
+    results += PvlKeyword("NullPixels", stats->NullPixels());
+    results += PvlKeyword("LisPixels", stats->LisPixels());
+    results += PvlKeyword("LrsPixels", stats->LrsPixels());
+    results += PvlKeyword("HisPixels", stats->HisPixels());
+    results += PvlKeyword("HrsPixels", stats->HrsPixels());
+    
+    mainpvl.AddGroup(results);
+    
+    delete stats;
+    // Write the results to the log
+    Application::Log(results);
   }
-  results += PvlKeyword("TotalPixels", stats->TotalPixels());
-  results += PvlKeyword("ValidPixels", stats->ValidPixels());
-  results += PvlKeyword("OverValidMaximumPixels", stats->OverRangePixels());
-  results += PvlKeyword("UnderValidMinimumPixels", stats->UnderRangePixels());
-  results += PvlKeyword("NullPixels", stats->NullPixels());
-  results += PvlKeyword("LisPixels", stats->LisPixels());
-  results += PvlKeyword("LrsPixels", stats->LrsPixels());
-  results += PvlKeyword("HisPixels", stats->HisPixels());
-  results += PvlKeyword("HrsPixels", stats->HrsPixels());
-
+  
   // Write the results to the output file if the user specified one
   if(ui.WasEntered("TO")) {
     string outFile = Filename(ui.GetFilename("TO")).Expanded();
@@ -65,13 +81,11 @@ void IsisMain() {
     bool writeHeader = false;
     //write the results in the requested format.
     if(ui.GetString("FORMAT") == "PVL") {
-      Pvl temp;
-      temp.AddGroup(results);
       if(append) {
-        temp.Append(outFile);
+        mainpvl.Append(outFile);
       }
       else {
-        temp.Write(outFile);
+        mainpvl.Write(outFile);
       }
     }
     else {
@@ -86,26 +100,26 @@ void IsisMain() {
         os.open(outFile.c_str(), ios::out);
         writeHeader = true;
       }
-    }
-    if(writeHeader) {
-      for(int i = 0; i < results.Keywords(); i++) {
-        os << results[i].Name();
-        if(i < results.Keywords() - 1) {
-          os << ",";
-        }
-      }
-      os << endl;
-    }
-    for(int i = 0; i < results.Keywords(); i++) {
-      os << (string)results[i];
-      if(i < results.Keywords() - 1) {
-        os << ",";
-      }
-    }
-    os << endl;
-  }
 
-  delete stats;
-  // Write the results to the log
-  Application::Log(results);
+      if(writeHeader) {
+        for(int i = 0; i < mainpvl.Group(0).Keywords(); i++) {
+          os << mainpvl.Group(0)[i].Name();
+          if( i < mainpvl.Group(0).Keywords() - 1 ) {
+            os << ",";
+          }
+        }
+        os << endl;
+      }
+      
+      for(int i = 0; i < mainpvl.Groups(); i++) {
+        for (int j = 0; j < mainpvl.Group(i).Keywords(); j++) {
+          os << (string)mainpvl.Group(i)[j];
+          if(j < mainpvl.Group(i).Keywords() - 1) {
+            os << ",";
+          }
+        }
+        os << endl;
+      }
+    }
+  }
 }

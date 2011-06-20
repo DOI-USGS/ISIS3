@@ -94,6 +94,11 @@
       Added Band Keyword - displays the first physical band used to get the 
       stats
     </change>
+    <change name="James Alexander Crough" date="2011-06-17">
+      Changed the behavior of the program to process all bands of a cube, or,
+      if an input cube attribute is specified, only those bands will be
+      processed. Previously, the program only processed the first band.
+    </change>
   </history>
 
   <oldName>
@@ -213,15 +218,45 @@
   </groups>
 
   <examples>
+  <example>
+      <brief>Calculating statistics for all bands in a cube</brief>
+      <description>
+        This example shows the statistics gathered from all bands in a single
+        cube. When no band is specified by the user, stats default behavior is
+        to calculate stats for all bands of a cube.
+      </description>
+      <terminalInterface>
+        <commandLine>
+          from=peaks.cub to=peaks0_stats.log
+        </commandLine>
+        <description>
+          Running stats in the command line mode with the only parameter "FROM"
+          set to no particular band of the cube peaks.cub.
+        </description>
+      </terminalInterface>
+      <dataFiles>
+        <dataFile path="assets/peaks0_stats.log">
+          <brief>
+            Output from stats
+          </brief>
+          <description>
+            This is the output captured in "peaks0_stats.log" by the
+            redirection of standard out.
+          </description>
+          <parameterName></parameterName>
+        </dataFile>
+      </dataFiles>
+    </example>
     <example>
       <brief>Calculating statistics for a band in a cube</brief>
       <description>
         This example shows the statistics gathered from a single band of
-        a cube.
+        a cube. Using the plus on the end of the FROM parameter, a user is able
+        to specify a single layer to be processed.
       </description>
       <terminalInterface>
         <commandLine>
-          from=peaks.cub:3 > peaks3_stats.log
+          from=peaks.cub+3 to=peaks1_stats.log
         </commandLine>
         <description>
           Running stats in the command line mode with the only parameter "FROM"
@@ -229,12 +264,41 @@
         </description>
       </terminalInterface>
       <dataFiles>
-        <dataFile path="assets/peaks3_stats.log">
+        <dataFile path="assets/peaks1_stats.log">
           <brief>
             Output from stats
           </brief>
           <description>
             This is the output captured in "peaks3_stats.log" by the
+            redirection of standard out.
+          </description>
+          <parameterName></parameterName>
+        </dataFile>
+      </dataFiles>
+    </example>
+    <example>
+      <brief>Calculating statistics for multiple bands in a cube</brief>
+      <description>
+        This example shows the statistics gathered from a multiple bands
+        of a cube. In addition to the plus suffix, one can use commas and
+        hyphens in order to specify multiple bands of the cube to process.
+      </description>
+      <terminalInterface>
+        <commandLine>
+          from=peaks.cub+2,4-6 in=peaks2_stats.log
+        </commandLine>
+        <description>
+          Running stats in the command line mode with the only parameter "FROM"
+          set to the second, forth, fifth, and sixth bands of the cube peaks.cub.
+        </description>
+      </terminalInterface>
+      <dataFiles>
+        <dataFile path="assets/peaks2_stats.log">
+          <brief>
+            Output from stats
+          </brief>
+          <description>
+            This is the output captured in "peaks2_stats.log" by the
             redirection of standard out.
           </description>
           <parameterName></parameterName>
