@@ -90,17 +90,20 @@ endif
 
 
 # set up HOST_OS
-testFile = $(wildcard /etc/SuSE-release /etc/redhat-release /usr/bin/sw_vers /etc/lsb-release)
+testFile = $(wildcard /etc/SuSE-release)
 ifeq ($(testFile), /etc/SuSE-release)
   HOST_OS := $(shell $(GREP) VERSION /etc/SuSE-release | $(SED) 's/.*= *//g' | $(SED) 's/\./_/g')
   HOST_OS := SUSE$(HOST_OS)
 else
+  testFile = $(wildcard /etc/redhat-release)
   ifeq ($(testFile), /etc/redhat-release)
     HOST_OS = $(shell $(CUT) -d ' ' -f 1,2,7 /etc/redhat-release | $(SED) 's/ //g' | $(SED) 's/\./_/g')
   else
+    testFile = $(wildcard /usr/bin/sw_vers)
     ifeq ($(testFile), /usr/bin/sw_vers)
       HOST_OS = $(shell sw_vers -productVersion | cut -d '.' -f1,2 | $(SED) 's/\./_/g')
     else
+      testFile = $(wildcard /etc/lsb-release)
       ifeq ($(testFile), /etc/lsb-release)
         HOST_OS = $(shell $(GREP) DESCRIPTION /etc/lsb-release | $(SED) 's/\([^"]*"\)\([^"]*\)\(.*\)/\2/' | $(SED) 's/ //' | $(SED) 's/\./_/g')
       endif
