@@ -6,8 +6,7 @@
 
   <description>
     This program will import a PDS formatted Kaguya MI VIS and NIR level 1 (EDR) 
-    image into an Isis cube. The image will be flipped in the line direction if
-    the UPPER_LEFT_LATITUDE and LOWER_LEFT_LATITUDE are inverted.
+    image into an Isis cube.
   </description>
 
   <history>
