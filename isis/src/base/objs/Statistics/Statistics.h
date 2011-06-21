@@ -69,6 +69,7 @@ namespace Isis {
   *                       for a single double value
   * @history 2008-05-06 Steven Lambright - Added AboveRange, BelowRange methods
   * @history 2010-03-18 Sharmila Prasad  - Error message more meaningful for SetValidRange function
+  * @history 2011-06-13 Ken Edmundson - Added Rms method
   *
   * @todo 2005-02-07 Deborah Lee Soltesz - add example using cube data to the
   * class documentation
