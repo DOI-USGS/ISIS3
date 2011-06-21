@@ -35,9 +35,6 @@ void IsisMain() {
 
   p.SetOrganization(Isis::ProcessImport::BSQ);
 
-  double upleftlat = label.FindKeyword("UPPER_LEFT_LATITUDE");
-  double loleftlat = label.FindKeyword("LOWER_LEFT_LATITUDE");
-
   p.StartProcess();
 
   // Get the directory where the Kaguya MI translation tables are.
@@ -63,14 +60,4 @@ void IsisMain() {
   bandBinXlater.Auto(*(outputLabel));
 
   p.EndProcess();
-
-  if (upleftlat < loleftlat) {
-    Filename outFile = ui.GetFilename("TO");
-    string tmpName = "$TEMPORARY/" + inFile.Basename() + ".tmp.cub";
-    Filename tmpFile(tmpName);
-    string pars = "from=" + outFile.Expanded() + " to=" + tmpFile.Expanded();
-    ProgramLauncher::RunIsisProgram("flip",pars);
-    pars = "mv " + tmpFile.Expanded() + " " + outFile.Expanded();
-    ProgramLauncher::RunSystemCommand(pars);
-  }
 }
