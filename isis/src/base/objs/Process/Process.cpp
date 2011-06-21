@@ -88,11 +88,10 @@ namespace Isis {
       }
     }
     catch(Isis::iException &e) {
-      e.Report();
       delete cube;
       throw;
     }
-    
+
     // Test for same size or one in all dimensions
     if(requirements & Isis::AllMatchOrOne) {
       if(InputCubes.size() > 0) {

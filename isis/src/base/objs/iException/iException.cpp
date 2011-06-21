@@ -81,8 +81,6 @@ namespace Isis {
     if(printTrace && p_list.empty()) {
       createStackTrace();
     }
-if(m == "Array subscript [0] is out of array bounds")
-  abort();
 
     Info i;
     i.type = t;
@@ -193,6 +191,7 @@ if(m == "Array subscript [0] is out of array bounds")
     p_reportFileLine = saveFileLine;
     int type = (int) Type(); // Must get type before clear!!
     Clear();
+
     return type;
   }
 
