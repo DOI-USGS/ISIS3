@@ -62,33 +62,60 @@ namespace Isis {
     }
 
     input.seekg(headerStartPos, ios::beg);
-    IstreamInputStream inStream(&input);
-    CodedInputStream codedInStream(&inStream);
+    streampos filePos = input.tellg();
+    IstreamInputStream headerInStream(&input);
+    CodedInputStream headerCodedInStream(&headerInStream);
     // max 512MB, warn at 400MB
-    codedInStream.SetTotalBytesLimit(1024 * 1024 * 512, 1024 * 1024 * 400);
+    headerCodedInStream.SetTotalBytesLimit(1024 * 1024 * 512,
+                                           1024 * 1024 * 400);
 
     // Now stream the rest of the input into the google protocol buffer.
     try {
-      int oldLimit = codedInStream.PushLimit(headerLength);
-      if (!p_networkHeader->ParseFromCodedStream(&codedInStream)) {
+      filePos += headerLength;
+      int oldLimit = headerCodedInStream.PushLimit(headerLength);
+      if (!p_networkHeader->ParseFromCodedStream(&headerCodedInStream)) {
         iString msg = "Failed to read input control net file [" +
             file.fileName() + "]";
         throw iException::Message(iException::Io, msg, _FILEINFO_);
       }
+      headerCodedInStream.PopLimit(oldLimit);
 
-      codedInStream.PopLimit(oldLimit);
+      // Without closing and re-opening the protocol buffers break... no clue
+      //   why other than it's got some static data around keeping track
+      //   maybe. We need to do this for it to reset it's idea of the total
+      //   bytes though. Doing it every time is too expensive - so we're going
+      //   to just do it periodically.
+      IstreamInputStream *pointInStream = NULL;
+      CodedInputStream *pointCodedInStream = NULL;
 
       for(int cp = 0; cp < p_networkHeader->pointmessagesizes_size(); cp ++) {
-        // We can't re-seek because the proto buffer does weird stuff with
-        //   out read position - like it's caching. This would cause problems
-        //   if we weren't reading consecutively in the file.
-        //input.seekg(curPosition, ios::beg);
-        int size = p_networkHeader->pointmessagesizes(cp);
-        oldLimit = codedInStream.PushLimit(size);
+        if(cp % 50000 == 0 && pointCodedInStream && pointInStream) {
+          delete pointCodedInStream;
+          pointCodedInStream = NULL;
 
+          delete pointInStream;
+          pointInStream = NULL;
+        }
+
+        if(pointInStream == NULL) {
+          input.close();
+          input.open(file.Expanded().c_str(), ios::in | ios::binary);
+          input.seekg(filePos, ios::beg);
+
+          pointInStream = new IstreamInputStream(&input);
+          pointCodedInStream = new CodedInputStream(pointInStream);
+          // max 512MB, warn at 400MB
+          pointCodedInStream->SetTotalBytesLimit(1024 * 1024 * 512,
+                                                 1024 * 1024 * 400);
+        }
+
+        int size = p_networkHeader->pointmessagesizes(cp);
+        oldLimit = pointCodedInStream->PushLimit(size);
+
+        filePos += size;
         ControlPointFileEntryV0002 newPoint;
-        newPoint.ParseFromCodedStream(&codedInStream);
-        
+        newPoint.ParseFromCodedStream(pointCodedInStream);
+
         if (newPoint.type() == ControlPointFileEntryV0002::obsolete_Tie ||
             newPoint.type() == ControlPointFileEntryV0002::obsolete_Ground) {
           if (newPoint.aprioricovar_size())
@@ -96,8 +123,17 @@ namespace Isis {
         }
 
         p_controlPoints->append(newPoint);
+        pointCodedInStream->PopLimit(oldLimit);
+      }
 
-        codedInStream.PopLimit(oldLimit);
+      if(pointCodedInStream) {
+        delete pointCodedInStream;
+        pointCodedInStream = NULL;
+      }
+
+      if(pointInStream) {
+        delete pointInStream;
+        pointInStream = NULL;
       }
     }
     catch (...) {

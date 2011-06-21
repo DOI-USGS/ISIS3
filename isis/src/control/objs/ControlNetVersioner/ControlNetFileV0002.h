@@ -50,7 +50,7 @@ namespace Isis {
    * @author 2011-04-07 Steven Lambright
    *
    * @internal
-   *
+   *   @history 2011-06-21 Steven Lambright - Files can have a larger size now
    */
   class ControlNetFileV0002 : public ControlNetFile {
     public:
