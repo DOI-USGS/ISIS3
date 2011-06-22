@@ -156,6 +156,19 @@ namespace Isis {
   QList< ControlMeasure * > ControlCubeGraphNode::getMeasures() const {
     return measures->values();
   }
+  
+  
+  QList< ControlMeasure * > ControlCubeGraphNode::getValidMeasures() const {
+    QList< ControlMeasure * > validMeasures;
+    
+    QList< ControlMeasure * > measureList = measures->values();   
+    foreach(ControlMeasure * measure, measureList) {
+      if (!measure->IsIgnored())
+        validMeasures.append(measure);
+    }
+    
+    return validMeasures; 
+  }
 
 
   QList< ControlCubeGraphNode * > ControlCubeGraphNode::getAdjacentNodes() const {

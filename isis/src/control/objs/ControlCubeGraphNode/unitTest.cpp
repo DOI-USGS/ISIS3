@@ -20,12 +20,13 @@ using namespace Isis;
 int main() {
   Preference::Preferences(true);
 
-  ControlCubeGraphNode controlSN("Image1");
+  ControlCubeGraphNode graphNode("Image1");
 
   ControlPoint point1("Point1");
 
   ControlMeasure *measure1 = new ControlMeasure();
   measure1->SetCubeSerialNumber("Image1");
+  measure1->SetCoordinate(1,2);
   ControlMeasure *measure2 = new ControlMeasure();
   measure2->SetCubeSerialNumber("Image2");
 
@@ -37,7 +38,7 @@ int main() {
   cout << "Value = measure with cube serial number " <<
       measure1->GetCubeSerialNumber() << endl;
   try {
-    controlSN.addMeasure(measure1);
+    graphNode.addMeasure(measure1);
     cout << "Successfully added measure" << endl;
   }
   catch (iException &e) {
@@ -51,7 +52,7 @@ int main() {
   cout << "Value = measure with cube serial number " <<
       measure2->GetCubeSerialNumber() << endl;
   try {
-    controlSN.addMeasure(measure2);
+    graphNode.addMeasure(measure2);
     cout << "Successfully added measure" << endl;
   }
   catch (iException &e) {
@@ -64,6 +65,7 @@ int main() {
 
   ControlMeasure *measure3 = new ControlMeasure();
   measure3->SetCubeSerialNumber("Image1");
+  measure3->SetCoordinate(3,4);
   ControlMeasure *measure4 = new ControlMeasure();
   measure4->SetCubeSerialNumber("Image2");
 
@@ -75,7 +77,7 @@ int main() {
   cout << "Value = measure with cube serial number " <<
       measure3->GetCubeSerialNumber() << endl;
   try {
-    controlSN.addMeasure(measure3);
+    graphNode.addMeasure(measure3);
     cout << "Successfully added measure" << endl;
   }
   catch (iException &e) {
@@ -89,7 +91,7 @@ int main() {
   cout << "Value = measure with cube serial number " <<
       measure4->GetCubeSerialNumber() << endl;
   try {
-    controlSN.addMeasure(measure4);
+    graphNode.addMeasure(measure4);
     cout << "Successfully added measure" << endl;
   }
   catch (iException &e) {
@@ -97,6 +99,21 @@ int main() {
     e.Clear();
   }
   cout << endl;
+  
+  cout << "Testing getMeasures method...\n";
+  QList< ControlMeasure * > measures = graphNode.getMeasures();
+  foreach (ControlMeasure * measure, measures) {
+    cout << "   (" << measure->GetSample() << ", "
+         << measure->GetLine() << ")\n";
+  }
+  
+  cout << "\nTesting getValidMeasures method...\n";
+  measures[0]->SetIgnored(true);
+  measures = graphNode.getValidMeasures();
+  foreach (ControlMeasure * measure, measures) {
+    cout << "   (" << measure->GetSample() << ", "
+         << measure->GetLine() << ")\n";
+  }
 
   return 0;
 }

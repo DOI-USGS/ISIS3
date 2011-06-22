@@ -18,3 +18,9 @@ Key = Point2
 Value = measure with cube serial number Image2
 **USER ERROR** Attempted to add Control Measure with Cube Serial Number [Image2] does not match Serial Number [Image1]
 
+Testing getMeasures method...
+   (1, 2)
+   (3, 4)
+
+Testing getValidMeasures method...
+   (3, 4)

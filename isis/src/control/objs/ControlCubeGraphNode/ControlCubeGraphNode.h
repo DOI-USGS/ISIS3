@@ -57,7 +57,8 @@ namespace Isis {
    *                getAdjacentNodes methods
    *   @history 2011-03-15 Eric Hyer - Connections handled more simply - fixed
    *                connection related bugs
-   *
+   *   @history 2011-06-22 James Alexander Crough and Eric Hyer- Added 
+   *                getValidMeasures method.
    */
   class ControlCubeGraphNode {
     public:
@@ -74,6 +75,7 @@ namespace Isis {
       iString getSerialNumber() const;
       int getMeasureCount() const;
       QList< ControlMeasure * > getMeasures() const;
+      QList< ControlMeasure * > getValidMeasures() const;
       QList< ControlCubeGraphNode * > getAdjacentNodes() const;
       bool isConnected(ControlCubeGraphNode *other) const;
 
