@@ -48,7 +48,7 @@ namespace Isis {
       bool isDirty() const;
 
       /**
-       * This method returns a reference to the raw data in this cube chunk.
+       * @returns a reference to the raw data in this cube chunk.
        */
       QByteArray &getRawData() const {
         return *m_rawBuffer;
@@ -63,42 +63,42 @@ namespace Isis {
       // The following methods are inlined for proven performance gain.
 
       /**
-       * This method returns the first (inclusive) sample of the cube chunk.
+       * @returns the first (inclusive) sample of the cube chunk.
        */
       int getStartSample() const {
         return m_startSample;
       }
 
       /**
-       * This method returns the first (inclusive) line of the cube chunk.
+       * @returns the first (inclusive) line of the cube chunk.
        */
       int getStartLine() const {
         return m_startLine;
       }
 
       /**
-       * This method returns the first (inclusive) band of the cube chunk.
+       * @returns the first (inclusive) band of the cube chunk.
        */
       int getStartBand() const {
         return m_startBand;
       }
 
       /**
-       * This method returns the number of samples in the cube chunk.
+       * @returns the number of samples in the cube chunk.
        */
       int getSampleCount() const {
         return m_sampleCount;
       }
 
       /**
-       * This method returns the number of lines in the cube chunk.
+       * @returns the number of lines in the cube chunk.
        */
       int getLineCount() const {
         return m_lineCount;
       }
 
       /**
-       * This method returns the number of bands in the cube chunk.
+       * @returns the number of bands in the cube chunk.
        */
       int getBandCount() const {
         return m_bandCount;
@@ -123,6 +123,7 @@ namespace Isis {
        * The assignment operator is disabled.
        *
        * @param other the other chunk to be copied from
+       * @returns A reference to *this
        */
       RawCubeChunk& operator=(const RawCubeChunk &other);
 

@@ -145,6 +145,7 @@ namespace Isis {
    * @param maxSize The largest allowed size
    * @param dimensionSize The cube's size in the dimension we're figuring out
    *     (that is, number of samples or number of lines).
+   * @return The tile size that should be used for the dimension
    */
   int CubeTileHandler::findGoodSize(int maxSize, int dimensionSize) const {
     int ideal = 128;
@@ -172,6 +173,7 @@ namespace Isis {
    * This is a helper method that goes from chunk to file position.
    *
    * @param chunk The chunk to locate in the file.
+   * @returns The position to start reading or writing at
    */
   BigInt CubeTileHandler::getTileStartByte(const RawCubeChunk &chunk) const {
     return getDataStartByte() + getChunkIndex(chunk) * getBytesPerChunk();

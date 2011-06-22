@@ -79,7 +79,7 @@ namespace Isis {
 
 
   /**
-   * Returns true if the data in this chunk does not match what is on disk.
+   * @returns true if the data in this chunk does not match what is on disk.
    */
   bool RawCubeChunk::isDirty() const {
     return m_dirty;
@@ -106,18 +106,18 @@ namespace Isis {
 
 
   /**
-   * Returns the char at the position indicated by the given offset. This
-   *   method is currently not in use due to a faster way of getting data
+   * This method is currently not in use due to a faster way of getting data
    *   from the buffer (through the internal pointer).
-   *
+   * 
    * @param offset the offset into the raw data buffer
+   * @returns the char at the position indicated by the given offset. 
    */
   unsigned char RawCubeChunk::getChar(int offset) const {
     return ((unsigned char *)m_rawBuffer->data())[offset];
   }
 
   /**
-   * Returns the short at the position indicated by the given offset. The value
+   * @returns the short at the position indicated by the given offset. The value
    *   returned is not byte swapped. This method is currently not in use due to
    *   a faster way of getting data from the buffer (through the internal
    *   pointer).
@@ -129,7 +129,7 @@ namespace Isis {
   }
 
   /**
-   * Returns the float at the position indicated by the given offset. The value
+   * @returns the float at the position indicated by the given offset. The value
    *   returned is not byte swapped. This method is currently not in use due to
    *   a faster way of getting data from the buffer (through the internal
    *   pointer).
@@ -142,7 +142,7 @@ namespace Isis {
 
 
   /**
-   * Returns the size (in bytes) of the raw data buffer. If the raw data buffer
+   * @returns the size (in bytes) of the raw data buffer. If the raw data buffer
    * is null, -1 is returned.
    */
   int RawCubeChunk::getByteCount() const {

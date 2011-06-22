@@ -102,6 +102,8 @@ namespace Isis {
 
   /**
    * Test if a cube file has been opened/created.
+   * 
+   * @returns True if a cube has been opened and I/O operations are allowed
    */
   bool Cube::isOpen() const {
     bool open = (m_ioHandler != NULL);
@@ -130,6 +132,8 @@ namespace Isis {
   /**
    * Test if the opened cube is read-only, that is write operations will fail
    *   if this is true. A cube must be opened in order to call this method.
+   * 
+   * @returns True if the cube is opened read-only
    */
   bool Cube::isReadOnly() const {
     bool readOnly = false;
@@ -150,6 +154,8 @@ namespace Isis {
    * Test if the opened cube is read-write, that is read and write operations
    *   should succeed if this is true. A cube must be opened in order to call
    *   this method.
+   * 
+   * @returns True if the cube is opened read-write
    */
   bool Cube::isReadWrite() const {
     return !isReadOnly();
@@ -161,6 +167,8 @@ namespace Isis {
    *   whether or not the opened cube's labels are attached. If a cube is not
    *   open, then this indicates whether or not a cube will be created with
    *   attached labels if create(...) is called.
+   * 
+   * @returns True for attached labels, false for detached
    */
   bool Cube::labelsAttached() const {
     return m_attached;
@@ -931,6 +939,8 @@ namespace Isis {
    * Returns the byte order/endian-ness of the cube file. Cubes in a native
    *   byte order are quicker to read/write than those who must correct their
    *   byte order.
+   * 
+   * @returns The byte order/endian-ness of the cube file
    */
   ByteOrder Cube::getByteOrder() const {
     return m_byteOrder;
@@ -941,6 +951,8 @@ namespace Isis {
    * Return a camera associated with the cube.  The generation of
    * the camera can throw an exception, so you might want to catch errors
    * if that interests you.
+   * 
+   * @returns A camera based on the open cube
    */
   Camera *Cube::getCamera() {
     if(m_camera == NULL) {
@@ -953,6 +965,8 @@ namespace Isis {
   /**
    * Returns the opened cube's filename. This is the name of the file which
    *   contains the labels of the cube and not necessarily the cube data.
+   * 
+   * @returns The opened cube's filename
    */
   iString Cube::getFilename() const {
     if(isOpen())
@@ -963,7 +977,7 @@ namespace Isis {
 
 
   /**
-   * Returns the cube's storage format. If no cube is opened yet, then this is
+   * @returns the cube's storage format. If no cube is opened yet, then this is
    *   the storage format that will be used if create(...) is called.
    */
   Cube::Format Cube::getFormat() const {
@@ -1114,7 +1128,7 @@ namespace Isis {
 
 
   /**
-   * Returns the number of lines (y axis/height) in the cube. If no cube is
+   * @returns the number of lines (y axis/height) in the cube. If no cube is
    *   open yet, this is the number of lines that will be written if create(...)
    *   is called.
    */
@@ -1138,7 +1152,7 @@ namespace Isis {
 
 
   /**
-   * This is the accuracy of pixels in the file. If no cube is opened yet, then
+   * @returns the accuracy of pixels in the file. If no cube is opened yet, then
    *   this is the accuracy/number of bytes per pixel that will be used if
    *   create(...) is called.
    */
@@ -1174,7 +1188,7 @@ namespace Isis {
 
 
   /**
-   * Return a projection associated with the cube.  The generation of
+   * @return a projection associated with the cube.  The generation of
    * the projection can throw an exception, so you might want to catch errors
    * if that interests you.
    */
@@ -1187,7 +1201,7 @@ namespace Isis {
 
 
   /**
-   * Returns the number of samples (x axis/width) in the cube. If no cube is
+   * @returns the number of samples (x axis/width) in the cube. If no cube is
    *   open yet, this is the number of samples that will be written if
    *   create(...) is called.
    */
@@ -1461,8 +1475,10 @@ namespace Isis {
   /**
    * This returns the QFile with cube DN data in it. NULL will be returned
    *   if no files are opened.
+   * 
+   * @returns A file for cube pixel data I/O
    */
-  QFile * Cube::getDataFile() const {
+  QFile *Cube::getDataFile() const {
     if (m_dataFile)
       return m_dataFile;
     else

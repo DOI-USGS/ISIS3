@@ -315,7 +315,7 @@ namespace Isis {
 
 
   /**
-   * Get the number of bytes that the cube DNs will take up. This includes
+   * @return the number of bytes that the cube DNs will take up. This includes
    *   padding caused by the cube chunks not aligning with the cube dimensions.
    */
   BigInt CubeIoHandler::getDataSize() const {
@@ -357,7 +357,7 @@ namespace Isis {
 
 
   /**
-   * Get the number of physical bands in the cube.
+   * @return the number of physical bands in the cube.
    */
   int CubeIoHandler::getBandCount() const {
     return m_numBands;
@@ -365,7 +365,7 @@ namespace Isis {
 
 
   /**
-   * Get the number of bands per chunk for this cube.
+   * @return the number of bands per chunk for this cube.
    */
   int CubeIoHandler::getBandCountInChunk() const {
     return m_bandsInChunk;
@@ -373,9 +373,11 @@ namespace Isis {
 
 
   /**
-   * Get the byte size of each chunk in the cube. Currently they must be
+   * @return the byte size of each chunk in the cube. Currently they must be
    *   constant size, but this is planned to be changed at some point in
    *   time.
+   * 
+   * @returns Number of bytes in a cube chunk
    */
   BigInt CubeIoHandler::getBytesPerChunk() const {
     return m_samplesInChunk * m_linesInChunk * m_bandsInChunk *
@@ -384,8 +386,8 @@ namespace Isis {
 
 
   /**
-   * Get the total number of chunks in the band (Z) dimension. This is always
-   *   enough to contain every band in the cube.
+   * @return the total number of chunks in the band (Z) dimension. This is
+   *   always enough to contain every band in the cube.
    */
   int CubeIoHandler::getChunkCountInBandDimension() const {
     return (int)ceil((double)m_numBands / (double)m_bandsInChunk);
@@ -393,8 +395,8 @@ namespace Isis {
 
 
   /**
-   * Get the total number of chunks in the line (Y) dimension. This is always
-   *   enough to contain every line in the cube.
+   * @return the total number of chunks in the line (Y) dimension. This is
+   *   always enough to contain every line in the cube.
    */
   int CubeIoHandler::getChunkCountInLineDimension() const {
     return (int)ceil((double)m_numLines / (double)m_linesInChunk);
@@ -402,8 +404,8 @@ namespace Isis {
 
 
   /**
-   * Get the total number of chunks in the sample (X) dimension. This is always
-   *   enough to contain every sample in the cube.
+   * @return the total number of chunks in the sample (X) dimension. This is
+   *   always enough to contain every sample in the cube.
    */
   int CubeIoHandler::getChunkCountInSampleDimension() const {
     return (int)ceil((double)m_numSamples / (double)m_samplesInChunk);
@@ -418,6 +420,8 @@ namespace Isis {
    *
    * Chunks which sit outside of the cube entirely must not be passed into this
    *   method; the results will be wrong.
+   * 
+   * @return The chunk's index into the file
    */
   int CubeIoHandler::getChunkIndex(const RawCubeChunk &chunk)  const {
 //     ASSERT(chunk.getStartSample() <= getSampleCount());
@@ -438,7 +442,7 @@ namespace Isis {
 
 
   /**
-   * Get the byte offset to the beginning of the cube data.
+   * @return the byte offset to the beginning of the cube data.
    */
   BigInt CubeIoHandler::getDataStartByte() const {
     return m_startByte;
@@ -446,8 +450,10 @@ namespace Isis {
 
 
   /**
-   * Get the QFile containing cube data. This is what should be read from and
+   * @return the QFile containing cube data. This is what should be read from and
    *   written to.
+   * 
+   * @return The data file for I/O
    */
   QFile * CubeIoHandler::getDataFile() const {
     return m_dataFile;
@@ -455,7 +461,7 @@ namespace Isis {
 
 
   /**
-   * Get the number of lines in the cube. This does not include lines created
+   * @return the number of lines in the cube. This does not include lines created
    *   by the chunk overflowing the line dimension.
    */
   int CubeIoHandler::getLineCount() const {
@@ -464,7 +470,7 @@ namespace Isis {
 
 
   /**
-   * Get the number of lines in each chunk of the cube.
+   * @return the number of lines in each chunk of the cube.
    */
   int CubeIoHandler::getLineCountInChunk() const {
     return m_linesInChunk;
@@ -472,7 +478,7 @@ namespace Isis {
 
 
   /**
-   * Get the physical cube DN format.
+   * @return the physical cube DN format.
    */
   PixelType CubeIoHandler::getPixelType() const {
     return m_pixelType;
@@ -480,7 +486,7 @@ namespace Isis {
 
 
   /**
-   * Get the number of samples in the cube. This does not include samples
+   * @return the number of samples in the cube. This does not include samples
    *   created by the chunk overflowing the sample dimension.
    */
   int CubeIoHandler::getSampleCount() const {
@@ -489,7 +495,7 @@ namespace Isis {
 
 
   /**
-   * Get the number of samples in each chunk of the cube.
+   * @return the number of samples in each chunk of the cube.
    */
   int CubeIoHandler::getSampleCountInChunk() const {
     return m_samplesInChunk;
@@ -566,6 +572,7 @@ namespace Isis {
    * @param numLines The number of lines of cube data
    * @param startBand The starting band of the cube data
    * @param numBands The number of bands of cube data
+   * @return The cube chunks that correspond to the given cube area
    */
   QList<RawCubeChunk *> CubeIoHandler::findCubeChunks(int startSample,
       int numSamples, int startLine, int numLines, int startBand,
@@ -813,8 +820,8 @@ namespace Isis {
 
 
   /**
-   * Get the number of chunks that are required to encapsulate all of the cube
-   *   data.
+   * @return The number of chunks that are required to encapsulate all of the
+   *   cube data
    */
   int CubeIoHandler::getChunkCount() const {
     return getChunkCountInSampleDimension() *
@@ -864,6 +871,7 @@ namespace Isis {
    * Ownership of the return value is given to the caller.
    *
    * @param chunkIndex The chunk's index which provides it's positioning.
+   * @return A chunk filled with nulls at the chunkIndex position
    */
   RawCubeChunk *CubeIoHandler::getNullChunk(int chunkIndex) {
     // Shouldn't ask for null chunks when the area has already been allocated

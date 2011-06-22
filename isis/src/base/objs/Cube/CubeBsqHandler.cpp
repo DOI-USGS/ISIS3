@@ -138,6 +138,7 @@ namespace Isis {
    * This is a helper method that goes from chunk to file position.
    *
    * @param chunk The chunk to locate in the file.
+   * @return The file position to start reading or writing at
    */
   BigInt CubeBsqHandler::getChunkStartByte(const RawCubeChunk &chunk) const {
     return getDataStartByte() + getChunkIndex(chunk) * getBytesPerChunk();

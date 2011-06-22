@@ -82,6 +82,7 @@ namespace Isis {
        * @param justUsed This should be the chunks required in the current read
        *   or write. Many algorithms will use this to not clean it up.
        * @param justRequested This must be the buffer area requested
+       * @returns A list of chunks to be freed from memory
        *
        */
       virtual CacheResult recommendChunksToFree(

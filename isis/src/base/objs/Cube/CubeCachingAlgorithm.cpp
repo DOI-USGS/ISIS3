@@ -90,6 +90,8 @@ namespace Isis {
    * If this is true, then the results (be them empty or not) should be
    *   considered valid. If this is false, then the results are empty
    *   and the caching algorithm failed.
+   * 
+   * @returns True if the recommendation is valid
    */
   bool CubeCachingAlgorithm::CacheResult::algorithmUnderstoodData() const {
     return (m_chunksToFree != NULL);
@@ -97,7 +99,7 @@ namespace Isis {
 
 
   /**
-   * Get a list of RawCubeChunks to remove from RAM according to this
+   * @return list of RawCubeChunks to remove from RAM according to this
    *   caching algorithm. Valid if algorithmUnderstoodData() is true.
    */
   QList<RawCubeChunk *> CubeCachingAlgorithm::CacheResult::getChunksToFree()
@@ -116,6 +118,7 @@ namespace Isis {
    *
    * @param other The RHS of the assignment operator; the cache result we're
    *     copying from.
+   * @returns A reference to *this
    */
   CubeCachingAlgorithm::CacheResult &
       CubeCachingAlgorithm::CacheResult::operator=(const CacheResult &other) {
