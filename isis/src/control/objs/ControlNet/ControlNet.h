@@ -143,7 +143,7 @@ namespace Isis {
    *                kept for ignored points and measures
    *   @history 2011-05-25 Eric Hyer - Added getPoints method
    *   @history 2011-06-22 James Alexander Crough and Eric Hyer - Added
-   *                 getGraphNode method.
+   *                getGraphNode method.
    */
   class ControlNet : public QObject {
       Q_OBJECT
