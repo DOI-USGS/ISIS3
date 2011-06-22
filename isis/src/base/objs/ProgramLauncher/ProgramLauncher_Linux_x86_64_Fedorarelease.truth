@@ -48,9 +48,9 @@ Testing non-existant Isis 3 program...
 
 Testing using Isis 3 program as a system program... 
 
-**SYSTEM ERROR** Unable to communicate with parent process with pid [999]
 terminate called after throwing an instance of 'Isis::iException'
   what():  **SYSTEM ERROR** Unable to communicate with parent process with pid [999]
+**SYSTEM ERROR** Unable to communicate with parent process with pid [999]
 **PROGRAMMER ERROR** Executing command [$ISISROOT/bin/stats from=\$base/testData/ab102401_ideal.cub -pid=999 -preference=\$ISISROOT/src/base/objs/Preference/TestPreferences] failed with return status [134]
 
 Testing using Isis 3 program as a system program without pid... 
