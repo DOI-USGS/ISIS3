@@ -23,7 +23,7 @@ documents:
 	echo "        Building Individual Documents"
 	for dirname in $(DOCUMENTS); do \
 	  cd $$dirname ; \
-	  make -f ../Makefile-documents docbuild ; \
+	  $(MAKE) -f ../Makefile-documents docbuild ; \
 	  cd .. ; \
 	done
 	echo "        Finished Building Individual Documents"

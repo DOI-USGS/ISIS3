@@ -35,7 +35,7 @@ docs: documentation toccat tocoldvnew tocalph categories
 documentation:
 	echo "      Creating Documentation"
 	mkdir -p $(ISISROOT)/doc/Application
-	cd data ; make docs ; cd .. ;
+	cd data ; $(MAKE) docs ; cd .. ;
 
 
 #---------------
