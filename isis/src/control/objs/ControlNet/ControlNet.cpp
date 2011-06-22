@@ -1461,6 +1461,18 @@ namespace Isis {
 
     return GetPoint(pointIds->at(index));
   }
+  
+  
+  const ControlCubeGraphNode *ControlNet::getGraphNode(
+      QString serialNumber) const {
+    if (!cubeGraphNodes->contains(serialNumber)) {
+      iString msg = "Serial Number [" + serialNumber + "] does not exist in"
+          " the network.";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    }
+    
+    return cubeGraphNodes->value(serialNumber);
+  }
 
 
   /**

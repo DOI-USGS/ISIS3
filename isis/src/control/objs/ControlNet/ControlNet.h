@@ -142,6 +142,8 @@ namespace Isis {
    *   @history 2011-05-04 Eric Hyer - References in graph data structure now
    *                kept for ignored points and measures
    *   @history 2011-05-25 Eric Hyer - Added getPoints method
+   *   @history 2011-06-22 James Alexander Crough and Eric Hyer - Added
+   *                 getGraphNode method.
    */
   class ControlNet : public QObject {
       Q_OBJECT
@@ -180,6 +182,8 @@ namespace Isis {
       ControlPoint *GetPoint(QString pointId);
       const ControlPoint *GetPoint(int index) const;
       ControlPoint *GetPoint(int index);
+      
+      const ControlCubeGraphNode *getGraphNode(QString serialNumber) const;
 
       double AverageResidual();
       Isis::Camera *Camera(int index);
