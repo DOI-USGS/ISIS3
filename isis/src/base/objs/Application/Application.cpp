@@ -600,7 +600,6 @@ namespace Isis {
    */
   int Application::FunctionError(Isis::iException &e) {
     Pvl errors = e.PvlErrors();
-    e.Report();
     SessionLog::TheLog().AddError(errors);
     SessionLog::TheLog().Write();
 
