@@ -76,6 +76,10 @@
       Swapped the order of to serial number and filename in the NOCONTROL
       output file.
     </change>
+    <change name="James Alexander Crough and Eric Hyer" date="2011-06-15">
+      Added ability to check the ratio between the convex hull of the cnet and
+      its parent cube.
+    </change>
   </history>
 
   <category>
@@ -298,6 +302,21 @@
           If there are no such serial numbers, then no file is created.
 
           Only cubes in both the FROMLIST and CNET are checked.
+        </description>
+      </parameter>
+    </group>
+    <group name="Convex Hull to Cube Ratio Tolerance">
+      <parameter name="TOLERANCE">
+        <type>double</type>
+        <default><item>0.0</item></default>
+        <brief>Check the ratio of the area inside the convex hull of the measures
+                in each image to the area of the image.</brief>
+        <description>
+          At program runtime, a convex hull is calculated based on control points
+          throughtout the cube. This value determines the ratio of the size of
+          the image to that of the entire convex hull. The default value is 1.0
+          so all images (the inner size being smaller than the outer size) and
+          can be changed by the user at will.
         </description>
       </parameter>
     </group>

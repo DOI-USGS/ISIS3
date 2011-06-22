@@ -1,5 +1,8 @@
 #include "Isis.h"
 
+#include "IsisDebug.h"
+
+#include <iostream>
 #include <sstream>
 #include <set>
 
@@ -7,11 +10,22 @@
 #include <QString>
 #include <QVector>
 
+#include "geos_c.h"
+#include "geos/algorithm/ConvexHull.h"
+#include "geos/geom/CoordinateSequence.h"
+#include "geos/geom/CoordinateArraySequence.h"
+#include "geos/geom/Envelope.h"
+#include "geos/geom/Geometry.h"
+#include "geos/geom/GeometryFactory.h"
+#include "geos/geom/Polygon.h"
+
 #include "Camera.h"
 #include "CameraFactory.h"
+#include "ControlCubeGraphNode.h"
 #include "ControlMeasure.h"
 #include "ControlNet.h"
 #include "ControlPoint.h"
+#include "ControlPointList.h"
 #include "CubeManager.h"
 #include "FileList.h"
 #include "Filename.h"
@@ -24,16 +38,24 @@
 #include "UserInterface.h"
 
 using namespace Isis;
+using std::cout;
+using std::cerr;
 
 QMap< iString, std::set<iString> > constructPointSets(
   std::set<iString> &index, ControlNet innet);
 QVector< std::set<iString> > findIslands(
   std::set<iString> &index,
   QMap < iString, std::set<iString> > adjCubes);
+
+QList< ControlCubeGraphNode * > checkSerialList(
+    SerialNumberList * serialNumbers, ControlNet * controlNet);  
+  
 void WriteOutput(SerialNumberList num2cube,
                  std::string filename,
                  std::set<iString> sns,
                  QMap< iString, std::set<iString> > cps);
+                 
+double getControlFitness(const ControlCubeGraphNode * node, double tolerance, Cube * cube);
 
 // Main program
 void IsisMain() {
@@ -102,11 +124,13 @@ void IsisMain() {
       // Loop through all control measures in control points
       for(int cm = 0; cm < controlpt->GetNumMeasures(); cm ++) {
         ControlMeasure *controlms = controlpt->GetMeasure(cm);
-
+        
+        
         // If we have the cube, check it out
         if(num2cube.HasSerialNumber(controlms->GetCubeSerialNumber())) {
           Cube *cube = cbman.OpenCube(num2cube.Filename(
                                         controlms->GetCubeSerialNumber()));
+ 
           Camera *cam = NULL;
           bool createFail = false;
           bool setPassed = true;
@@ -182,7 +206,7 @@ void IsisMain() {
 
     progress.CheckStatus();
   }
-
+  
 
   // Checks/detects islands
   std::set<iString> index;
@@ -215,7 +239,6 @@ void IsisMain() {
       remove(name.c_str());
     }
   }
-
 
   // Output the results to screen and files accordingly
 
@@ -272,6 +295,30 @@ void IsisMain() {
     ss << "These serial numbers, filenames, and control points are listed in [";
     ss << Filename(name).Name() + "]" << std::endl;
   }
+  
+  // Create a convex hull
+  QList< ControlCubeGraphNode * > nodes = innet.GetCubeGraphNodes();
+  foreach (ControlCubeGraphNode * node, nodes) {
+    
+    iString sn = node->getSerialNumber();
+    
+    if (num2cube.HasSerialNumber(sn)) {
+    
+      Cube *cube = cbman.OpenCube(num2cube.Filename(sn));
+      double tolerance = ui.GetDouble("TOLERANCE");
+      double controlFitness = getControlFitness(node, tolerance, cube);
+      
+      if (controlFitness < tolerance) {
+        std::ofstream out_stream;
+        ss << "-------------------------------------------------------------"
+           << "-------------------\nCube "
+           << node->getSerialNumber() << " has a convex hull / format ratio of: "
+           << controlFitness << "\nwhich doesn't meet the tolerance of: "
+           << tolerance << ".\n";
+        out_stream.close();
+      }
+    }
+  }
 
   // At this point, inListNums is the list of cubes NOT included in the
   //  ControlNet, and inListNums are their those cube's serial numbers.
@@ -314,7 +361,10 @@ void IsisMain() {
     out_stream.seekp(0, std::ios::beg);   //Start writing from beginning of file
 
     for(int sn = 0; sn < (int)nonListedSerialNumbers.size(); sn++) {
-      out_stream << nonListedSerialNumbers[sn];
+      int validMeasureCount = innet.getGraphNode(
+          nonListedSerialNumbers[sn])->getValidMeasures().size();
+      out_stream << nonListedSerialNumbers[sn] << " (Valid Measures: "
+                 << validMeasureCount << ")\n";
       out_stream << "\n";
     }
 
@@ -325,7 +375,7 @@ void IsisMain() {
     ss << "There are " << nonListedSerialNumbers.size();
     ss << " serial numbers in the Control Net [";
     ss << Filename(ui.GetFilename("CNET")).Basename();
-    ss << "] which do not exist in the input list [";
+    ss << "] \nwhich do not exist in the  input list [";
     ss << Filename(ui.GetFilename("FROMLIST")).Name() << "]" << std::endl;
     ss << "These serial numbers are listed in [";
     ss << Filename(name).Name() + "]" << std::endl;
@@ -518,3 +568,41 @@ void WriteOutput(SerialNumberList num2cube, std::string filename,
 
   out_stream.close();
 }
+
+double getControlFitness(const ControlCubeGraphNode * node, double tolerance, Cube * cube) {
+  double controlFitness = 0;
+
+  static  geos::geom::GeometryFactory geosFactory;
+  geos::geom::CoordinateSequence * pts = new geos::geom::CoordinateArraySequence();
+  QList< ControlMeasure * > measures = node->getMeasures();
+  
+  // Populate pts with a list of control points
+  foreach (ControlMeasure * measure, measures) {
+    pts->add(geos::geom::Coordinate(measure->GetSample(), measure->GetLine()));
+  }
+  pts->add(geos::geom::Coordinate(measures[0]->GetSample(), measures[0]->GetLine()));
+  
+  if (pts->size() >= 4) {
+  
+    // Calculate the convex hull
+    geos::geom::Geometry * convexHull = geosFactory.createPolygon(
+        geosFactory.createLinearRing(pts), 0)->convexHull();
+    
+    // Calculate the area of the convex hull
+    double convexArea = convexHull->getArea();
+    iString sn = node->getSerialNumber();
+    double cubeArea = cube->getSampleCount() * cube->getLineCount();
+    
+    controlFitness = convexArea / cubeArea;
+    
+    if (pts) {
+      delete pts;
+      pts = NULL;
+    }
+  }
+  
+  return controlFitness;
+  
+}
+    
+
