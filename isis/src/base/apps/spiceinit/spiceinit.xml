@@ -39,6 +39,13 @@
    <p>
        Please note: Kernel Files specified that reside in the current working directory will not have their paths expanded.  This is to allow variables like $msg/ to work correctly.
    </p>
+   <p><b>Troubleshooting:</b> If spiceinit is failing with the error
+     "No Camera Kernel found for the image ..." then try enabling the
+     "CKPREDICTED" or "CKNADIR" option. A similar error exists for SPK kernels,
+     and you can enable "SPKPREDICED" to get past that error. "PREDICTED" and
+     "NADIR" options typically have less accuracy than reconstructed/smithed
+     kernels which is why they are disabled by default.
+   </p>
   </description>
 
   <category>
