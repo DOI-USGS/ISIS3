@@ -242,6 +242,7 @@ THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libsqlite3.*dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/postgresql*/libpq.*dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/mysql5/mysql/libmysqlclient_r*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libkdu_a63R.dylib"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libsuperlu_3.0.dylib"
 
 # libxerces-c depends on these libraries
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libicui18n*.dylib"
