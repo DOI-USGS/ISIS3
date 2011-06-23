@@ -41,28 +41,7 @@ namespace Isis {
 
 
   class Equalization {
-    public:
-      Equalization(std::string fromListName);
-      virtual ~Equalization();
-
-      void addHolds(std::string holdListName);
-
-      std::vector<OverlapStatistics> calculateStatistics(
-          double sampPercent, int mincnt, bool wtopt, int sType);
-      void importStatistics(std::string instatsFileName);
-      void applyCorrection(std::string toListName);
-
-      PvlGroup getResults();
-      void write(std::string outstatsFileName,
-          std::vector<OverlapStatistics> *overlapStats=NULL);
-
     private:
-      void loadOutputs(FileList &outList, std::string toListName);
-      std::vector<int> validateInputStatistics(std::string instatsFileName);
-      Statistics getBandStatistics(Cube &icube, const int band,
-          double sampPercent, std::string maxCubeStr);
-      void apply(Buffer &in, Buffer &out);
-
       class ImageAdjustment {
         public:
           ImageAdjustment() {}
@@ -116,6 +95,30 @@ namespace Isis {
         private:
           const ImageAdjustment *m_adjustment;
       };
+
+    public:
+      Equalization(std::string fromListName);
+      virtual ~Equalization();
+
+      void addHolds(std::string holdListName);
+
+      std::vector<OverlapStatistics> calculateStatistics(
+          double sampPercent, int mincnt, bool wtopt, int sType);
+      void importStatistics(std::string instatsFileName);
+      void applyCorrection(std::string toListName);
+
+      PvlGroup getResults();
+      void write(std::string outstatsFileName,
+          std::vector<OverlapStatistics> *overlapStats=NULL);
+
+      double evaluate(double dn, int imageIndex, int bandIndex) const;
+
+    private:
+      void loadOutputs(FileList &outList, std::string toListName);
+      std::vector<int> validateInputStatistics(std::string instatsFileName);
+      Statistics getBandStatistics(Cube &icube, const int band,
+          double sampPercent, std::string maxCubeStr);
+      void apply(Buffer &in, Buffer &out);
 
       FileList m_imageList;
       std::vector<ImageAdjustment *> adjustments;

@@ -379,6 +379,12 @@ namespace Isis {
   }
 
 
+  double Equalization::evaluate(double dn,
+      int imageIndex, int bandIndex) const {
+    return adjustments[imageIndex]->evaluate(dn, bandIndex);
+  }
+
+
   void Equalization::loadOutputs(FileList &outList, string toListName) {
     outList.Read(toListName);
 
