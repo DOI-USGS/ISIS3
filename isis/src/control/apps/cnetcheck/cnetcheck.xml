@@ -312,11 +312,9 @@
         <brief>Check the ratio of the area inside the convex hull of the measures
                 in each image to the area of the image.</brief>
         <description>
-          At program runtime, a convex hull is calculated based on control points
-          throughtout the cube. This value determines the ratio of the size of
-          the image to that of the entire convex hull. The default value is 1.0
-          so all images (the inner size being smaller than the outer size) and
-          can be changed by the user at will.
+          Takes the ratio of the convex hull (of all measures) over the
+          total area of the image and reports all images under a set ratio,
+          called the tolerance.
         </description>
       </parameter>
     </group>
