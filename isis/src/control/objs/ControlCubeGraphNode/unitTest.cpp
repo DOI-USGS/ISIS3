@@ -103,16 +103,14 @@ int main() {
   cout << "Testing getMeasures method...\n";
   QList< ControlMeasure * > measures = graphNode.getMeasures();
   foreach (ControlMeasure * measure, measures) {
-    cout << "   (" << measure->GetSample() << ", "
-         << measure->GetLine() << ")\n";
+    cout << "   (" << measure->GetCubeSerialNumber() << ")\n";
   }
   
   cout << "\nTesting getValidMeasures method...\n";
   measures[0]->SetIgnored(true);
   measures = graphNode.getValidMeasures();
   foreach (ControlMeasure * measure, measures) {
-    cout << "   (" << measure->GetSample() << ", "
-         << measure->GetLine() << ")\n";
+    cout << "   (" << measure->GetCubeSerialNumber() << ")\n";
   }
 
   return 0;
