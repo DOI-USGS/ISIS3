@@ -57,14 +57,15 @@ namespace Isis {
    *
    * @internal
    *   @history 2003-05-16 Stuart Sides - Modified schema from astrogeology...
-   *                                      isis.astrogeology...
+   *                           isis.astrogeology...
    *   @history 2003-06-02 Jeff Anderson - Fixed a bug where line unfolding at
-   *                                       the bottom of the cube was always
-   *                                        using band 1
+   *                           the bottom of the cube was always using band 1
    *   @history 2003-08-28 Jeff Anderson - Added SetFilterParameters method
    *   @history 2005-02-08 Elizabeth Ribelin - Modified file to support Doxygen
-   *                                           documentation
+   *                           documentation
    *   @history 2006-12-15 Jeff Anderson - Fixed bug for images with 1 line
+   *   @history 2011-06-27 Jai Rideout and Steven Lambright - Now uses
+   *                           FilterCachingAlgorithm
    */
   class ProcessByQuickFilter : public Isis::Process {
 

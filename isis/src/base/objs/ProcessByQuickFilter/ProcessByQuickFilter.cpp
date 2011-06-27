@@ -19,15 +19,17 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-
-#include "Preference.h"
 #include "ProcessByQuickFilter.h"
-#include "QuickFilter.h"
-#include "LineManager.h"
-#include "iException.h"
+
 #include "Application.h"
+#include "FilterCachingAlgorithm.h"
+#include "iException.h"
+#include "LineManager.h"
+#include "Preference.h"
+#include "QuickFilter.h"
 
 using namespace std;
+
 namespace Isis {
 
   //!  Constructs a FilterProcess object
@@ -99,6 +101,8 @@ namespace Isis {
       throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
     }
 
+    InputCubes[0]->addCachingAlgorithm(new FilterCachingAlgorithm(3));
+
     // Create the filter object
     Isis::QuickFilter filter(samples, p_boxcarSamples, p_boxcarLines);
     filter.SetMinMax(p_low, p_high);
@@ -126,6 +130,7 @@ namespace Isis {
         // Process a line
         iline->SetLine(line, band);
         oline->SetLine(line, band);
+
         InputCubes[0]->read(*iline);
         funct(*iline, *oline, filter);
         OutputCubes[0]->write(*oline);
@@ -137,6 +142,7 @@ namespace Isis {
         else {
           topline->SetLine(-1 * top + 2, band);
         }
+
         InputCubes[0]->read(*topline);
         filter.RemoveLine(topline->DoubleBuffer());
         top++;
@@ -151,6 +157,7 @@ namespace Isis {
         else {
           botline->SetLine(lines - (bot - lines), band);
         }
+
         InputCubes[0]->read(*botline);
         filter.AddLine(botline->DoubleBuffer());
         bot++;
