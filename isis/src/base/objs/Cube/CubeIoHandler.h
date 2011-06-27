@@ -51,6 +51,9 @@ namespace Isis {
    * This class handles all of the virtual band conversions.
    *
    * @author Jai Rideout and Steven Lambright
+   *
+   * @internal
+   *   @history 2011-06-27 Steven Lambright - Added addCachingAlgorithm
    */
   class CubeIoHandler {
     public:
@@ -61,6 +64,7 @@ namespace Isis {
       void read(Buffer &bufferToFill);
       void write(const Buffer &bufferToWrite);
 
+      void addCachingAlgorithm(CubeCachingAlgorithm *algorithm);
       void clearCache();
       BigInt getDataSize() const;
       void setVirtualBands(QList<int> *virtualBandList);

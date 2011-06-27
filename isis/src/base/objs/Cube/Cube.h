@@ -33,6 +33,7 @@ namespace Isis {
   class Blob;
   class Buffer;
   class Camera;
+  class CubeCachingAlgorithm;
   class CubeIoHandler;
   class iString;
   class Projection;
@@ -120,6 +121,7 @@ namespace Isis {
    *            conform to new Isis standards, re-implemented IO handler and
    *            implemented new caching algorithms that can automatically apply
    *            themselves when the behavior of the caller changes.
+   *   @history 2011-06-27 Steven Lambright - Added addCachingAlgorithm
    *
    */
   class Cube {
@@ -240,6 +242,7 @@ namespace Isis {
                                  const double &validMax,
                                  iString msg = "Gathering statistics");
 
+      void addCachingAlgorithm(CubeCachingAlgorithm *);
       void clearIoCache();
       bool deleteBlob(iString BlobType, iString BlobName);
       void deleteGroup(const iString &group);

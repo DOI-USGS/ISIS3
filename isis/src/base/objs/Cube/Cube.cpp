@@ -1292,6 +1292,30 @@ namespace Isis {
 
 
   /**
+   * This will add the given caching algorithm to the list of attempted caching
+   *   algorithms. The algorithms are tried in the opposite order that they
+   *   were added - the first algorithm added is the last algorithm tried.
+   *
+   * RegionalCachingAlgorithm is the only initial caching algorithm and works
+   *   well for most cases. The caching algorithm only apply to the opened Cube
+   *   and is reset by any changes to the open status of the Cube.
+   *
+   * This method takes ownership of algorithm.
+   *
+   * @param algorithm The caching algorithm to add to the Cube for I/O
+   */
+  void Cube::addCachingAlgorithm(CubeCachingAlgorithm *algorithm) {
+
+    if(isOpen() && m_ioHandler) {
+      m_ioHandler->addCachingAlgorithm(algorithm);
+    }
+    else if(!isOpen()) {
+      iString msg = "Cannot add a caching algorithm until the cube is open";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    }
+  }
+
+  /**
    * This will clear excess RAM used for quicker IO in the cube. This should
    *   only be called if you need hundreds of cubes opened simultaneously. The
    *   IO cache will start growing again on future IO's.

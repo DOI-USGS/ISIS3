@@ -275,6 +275,20 @@ namespace Isis {
 
 
   /**
+   * This will add the given caching algorithm to the list of attempted caching
+   *   algorithms. The algorithms are tried in the opposite order that they
+   *   were added - the first algorithm added is the last algorithm tried.
+   *
+   * This method takes ownership of algorithm.
+   *
+   * @param algorithm The caching algorithm to add to the Cube for I/O
+   */
+  void CubeIoHandler::addCachingAlgorithm(CubeCachingAlgorithm *algorithm) {
+    m_cachingAlgorithms->prepend(algorithm);
+  }
+
+
+  /**
    * Free all cube chunks (cached cube data) from memory and write them to
    *   disk. Child destructors need to call this method.
    *
