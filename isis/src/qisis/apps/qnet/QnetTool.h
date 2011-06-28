@@ -21,6 +21,7 @@ class QPushButton;
 class QSplitter;
 class QStackedWidget;
 class QString;
+class QTableWidget;
 class QTextEdit;
 class QWidget;
 
@@ -157,6 +158,26 @@ namespace Qisis {
       virtual ~QnetTool ();
       void paintViewport (MdiCubeViewport *cvp,QPainter *painter);
 
+      // measure column values
+      enum MeasureColumns{
+        FILENAME,
+        CUBESN,
+        SAMPLE,
+        LINE,
+        SAMPLERESIDUAL,
+        LINERESIDUAL,
+        RESIDUALMAGNITUDE,
+        IGNORED,
+        EDITLOCK,
+        TYPE,
+        APRIORISAMPLE,
+        APRIORILINE
+      };
+      static const int NUMCOLUMNS = 12;
+
+      QString measureColumnToString(MeasureColumns column);
+
+
     signals:
       void qnetToolSave();
       void refreshNavList();
@@ -230,6 +251,7 @@ namespace Qisis {
       void createMenus();
       void createToolBars();
       void loadPoint();
+      void loadMeasureTable();
       void drawAllMeasurments (MdiCubeViewport *vp,QPainter *painter);
 //      void drawMeasures (MdiCubeViewport *vp,QPainter *painter,Isis::ControlPoint &point);
       void createQnetTool(QWidget *parent);
@@ -308,6 +330,8 @@ namespace Qisis {
 
       QComboBox *p_leftCombo;
       QComboBox *p_rightCombo;
+
+      QTableWidget *p_measureTable;
 
       Isis::ControlPoint *p_editPoint;
 
