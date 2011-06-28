@@ -149,6 +149,11 @@ namespace Qisis {
    *   @history 2011-06-08 Tracie Sucharski - Point types renamed:
    *                   Ground ----> Fixed
    *                   Tie    ----> Free
+   *   @history 2011-06-28 Tracie Sucharski - Added methods, "loadMeasureTable"
+   *                          and "measureColumnToString".  TODO:  If these
+   *                          stay in qnet, they really need cleaning up.  This
+   *                          was a quick & dirty band-aid until cneteditor is
+   *                          ready to be folded into qnet.
    */
   class QnetTool : public Tool {
     Q_OBJECT
@@ -167,6 +172,7 @@ namespace Qisis {
         SAMPLERESIDUAL,
         LINERESIDUAL,
         RESIDUALMAGNITUDE,
+        GOODNESSOFFIT,
         IGNORED,
         EDITLOCK,
         TYPE,
