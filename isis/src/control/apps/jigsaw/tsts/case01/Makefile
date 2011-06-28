@@ -13,9 +13,10 @@ commands:
 	solvedegree=3 \
 	camsolve=all \
 	update=yes \
+	file_pre=t \
 	twist=no | grep -v "100% Processed" | \
 	grep -v "jigsaw" > case01OutLog.txt;
-	cat bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
+	cat t_bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
 	  | sed 's/\/[^,]*\/\([^,\/]*\.cub\)/\1/g' \
 	  | sed 's/\/[^,]*\/\([^,\/]*\.net\)/\1/g' \
 	  | sed 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
@@ -29,15 +30,16 @@ commands:
 	cat case01OutLog.txt \
 	  | sed 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
 	  > $(OUTPUT)/case01OutLog.txt
-	cat residuals.csv | sed 's/\/[^,]*\/\([^,\/]*\.cub\)/\1/g'\
+	cat t_residuals.csv | sed 's/\/[^,]*\/\([^,\/]*\.cub\)/\1/g'\
 	  > $(OUTPUT)/residuals.csv
-	cat bundleout_images.csv | sed 's/\/[^,]*\/\([^,\/]*\.cub\)/\1/g' \
+	cat t_bundleout_images.csv | sed 's/\/[^,]*\/\([^,\/]*\.cub\)/\1/g' \
+	  | sed 's/\([0-9]*\.[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]\)\([0-9]*\)/\1/g' \
 	  > $(OUTPUT)/bundleout_images.csv
-	$(RM) bundleout_images.csv > /dev/null;
-	$(MV) bundleout_points.csv $(OUTPUT)/bundleout_points.csv > /dev/null;
+	$(RM) t_bundleout_images.csv > /dev/null;
+	$(MV) t_bundleout_points.csv $(OUTPUT)/bundleout_points.csv > /dev/null;
 	$(RM) $(OUTPUT)/cube.lis > /dev/null;
-	$(RM) bundleout.txt > /dev/null;
+	$(RM) t_bundleout.txt > /dev/null;
 	$(RM) case01OutLog.txt > /dev/null;
-	$(RM) residuals.csv  > /dev/null;
+	$(RM) t_residuals.csv print.prt > /dev/null;
 	cathist from=$(OUTPUT)/PSP_002733_1880_RED4.crop.cub > $(OUTPUT)/PSP4.pvl;				    
 	cathist from=$(OUTPUT)/PSP_002733_1880_RED5.crop.cub > $(OUTPUT)/PSP5.pvl;

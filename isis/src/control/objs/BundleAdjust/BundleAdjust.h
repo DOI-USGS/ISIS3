@@ -77,6 +77,9 @@
  *                          Ground ------> Fixed
  *                          Tie----------> Free
  *   @history 2011-06-14 Debbie A. Cook added method IsHeld(int index) for preventing any updates to held images
+ *   @history 2011-06-27 Debbie A. Cook and Ken Edmundson Added names to top
+ *                          header fields of .csv output and fixed bugs in
+ *                          sparse output.
  */
 
 #include <vector>

@@ -2372,6 +2372,7 @@ namespace Isis {
           //          printf("end error prop\n");
         }
 
+        ComputeBundleStatistics();
         Output();
 
         return m_dError;
@@ -4592,6 +4593,7 @@ void BundleAdjust::SpecialKIterationSummary() {
       nIndex++;
 
       dSigmaRadius = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+
       nIndex++;
 
       SurfacePoint SurfacePoint = point->GetAdjustedSurfacePoint();
@@ -4819,23 +4821,32 @@ void BundleAdjust::SpecialKIterationSummary() {
       int nMeasures;
       int nRejectedMeasures;
       int nUsed;
-      for (int i = 0; i < nImages; i++)
-      {
-          // ImageIndex(i) retrieves index into the normal equations matrix for Image(i)
-          double rmsSampleResiduals = m_rmsImageSampleResiduals[i].Rms();
-          double rmsLineResiduals = m_rmsImageLineResiduals[i].Rms();
-          double rmsLandSResiduals = m_rmsImageResiduals[i].Rms();
 
-          nMeasures = m_pCnet->GetNumberOfMeasuresInImage(m_pSnList->SerialNumber(i));
-          nRejectedMeasures = m_pCnet->GetNumberOfJigsawRejectedMeasuresInImage(m_pSnList->SerialNumber(i));
-          nUsed = nMeasures - nRejectedMeasures;
-          if( nUsed == nMeasures)
-              sprintf(buf,"%s   %5d of %5d %6.3lf %6.3lf %6.3lf\n", m_pSnList->Filename(i).c_str(),(nMeasures-nRejectedMeasures),nMeasures,
-                      rmsSampleResiduals,rmsLineResiduals,rmsLandSResiduals);
-          else
-              sprintf(buf,"%s   %5d of %5d* %6.3lf %6.3lf %6.3lf\n", m_pSnList->Filename(i).c_str(),(nMeasures-nRejectedMeasures),nMeasures,
-                      rmsSampleResiduals,rmsLineResiduals,rmsLandSResiduals);
-          fp_out << buf;
+      for (int i = 0; i < nImages; i++) {
+        // ImageIndex(i) retrieves index into the normal equations matrix
+        // for Image(i)
+        double rmsSampleResiduals = m_rmsImageSampleResiduals[i].Rms();
+        double rmsLineResiduals = m_rmsImageLineResiduals[i].Rms();
+        double rmsLandSResiduals = m_rmsImageResiduals[i].Rms();
+
+        nMeasures = 
+            m_pCnet->GetNumberOfMeasuresInImage(m_pSnList->SerialNumber(i));
+        nRejectedMeasures =
+            m_pCnet->GetNumberOfJigsawRejectedMeasuresInImage(
+                                              m_pSnList->SerialNumber(i));
+        nUsed = nMeasures - nRejectedMeasures;
+
+        if (nUsed == nMeasures)
+          sprintf(buf,"%s   %5d of %5d %6.3lf %6.3lf %6.3lf\n",
+                  m_pSnList->Filename(i).c_str(),
+                  (nMeasures-nRejectedMeasures), nMeasures,
+                  rmsSampleResiduals,rmsLineResiduals,rmsLandSResiduals);
+        else
+          sprintf(buf,"%s   %5d of %5d* %6.3lf %6.3lf %6.3lf\n",
+                  m_pSnList->Filename(i).c_str(),
+                  (nMeasures-nRejectedMeasures), nMeasures,
+                  rmsSampleResiduals,rmsLineResiduals,rmsLandSResiduals);
+        fp_out << buf;
       }
 
       return true;
@@ -4868,7 +4879,7 @@ void BundleAdjust::SpecialKIterationSummary() {
       SpiceRotation *pSpiceRotation = NULL;
 
       int nImages = Images();
-      double dSigma;
+      double dSigma=0;
       int nIndex = 0;
       bool bSolveSparse = false;
 
@@ -5808,17 +5819,19 @@ void BundleAdjust::SpecialKIterationSummary() {
 
     // print column headers
     if (m_bErrorPropagation) {
-        sprintf(buf, ",,,,,,,Sigma,Sigma,Sigma,Correction,Correction,Correction"
-                "\n,,,Rejected,,Latitude,Longitude,Radius,Latitude,Longitude,"
-                "Radius,Latitude,Longitude,Radius,X,Y,Z\nLabel,Status,Measures,"
-                "Measures,RMS,(dd),(dd),(km),(m),(m),(m),(m),(m),(m),(km),(km),"
-                "(km)\n");
+      sprintf(buf, "Point,Point,Accepted,Rejected,Residual,3-d,3-d,3-d,Sigma,"
+              "Sigma,Sigma,Correction,Correction,Correction,Coordinate,"
+              "Coordinate,Coordinate\nID,,,,,Latitude,Longitude,Radius,"
+              "Latitude,Longitude,Radius,Latitude,Longitude,Radius,X,Y,Z\n"
+              "Label,Status,Measures,Measures,RMS,(dd),(dd),(km),(m),(m),(m),"
+              "(m),(m),(m),(km),(km),(km)\n");
     }
     else {
-        sprintf(buf, ",,,,,Correction,Correction,Correction\n,,,Rejected,,"
-                "Latitude,Longitude,Radius,Latitude,Longitude,Radius,X,Y,Z\n"
-                "Label,Status,Measures,Measures,RMS,(dd),(dd),(km),(m),(m),"
-                "(m),(km),(km),(km)\n");
+      sprintf(buf, "Point,Point,Accepted,Rejected,Residual,3-d,3-d,3-d,"
+              "Correction,Correction,Correction,Coordinate,Coordinate,"
+              "Coordinate\n,,,,,Latitude,Longitude,Radius,Latitude,"
+              "Longitude,Radius,X,Y,Z\nLabel,Status,Measures,Measures,"
+              "RMS,(dd),(dd),(km),(m),(m),(m),(km),(km),(km)\n");
     }
     fp_out << buf;
 
@@ -5897,7 +5910,7 @@ void BundleAdjust::SpecialKIterationSummary() {
         return false;
 
     // output column headers
-    sprintf(buf, ",,,x image,y image,,,sample,line,Residual Vector\n");
+    sprintf(buf, ",,,x image,y image,Measured,Measured,sample,line,Residual Vector\n");
     fp_out << buf;
     sprintf(buf, "Point,Image,Image,coordinate,coordinate,Sample,Line,residual,residual,Magnitude\n");
     fp_out << buf;
@@ -6033,9 +6046,11 @@ void BundleAdjust::SpecialKIterationSummary() {
       std::vector<std::string> output_columns;
 
       output_columns.push_back("Image,");
+
       output_columns.push_back("rms,");
       output_columns.push_back("rms,");
       output_columns.push_back("rms,");
+
       if ( m_spacecraftPositionSolveType <= 1 ) {
           for(int i = 0; i < 5; i++ )
               output_columns.push_back("X,");
@@ -6123,30 +6138,37 @@ void BundleAdjust::SpecialKIterationSummary() {
           strcoeff--;
       }
       strcoeff = 'a' + m_nNumberCameraCoefSolved -1;
-      for( int i = 0; i < m_nNumberCameraCoefSolved; i++) {
-          if( i ==0 )
-              ostr << strcoeff;
-          else if ( i == 1 )
-              ostr << strcoeff << "t";
-          else
-              ostr << strcoeff << "t" << i;
-          for( int j = 0; j < 5; j++ ) {
-              if( m_nNumberCameraCoefSolved == 1 )
-                  output_columns.push_back("TWIST,");
-              else {
-                  std::string str = "TWIST(";
-                  str += ostr.str().c_str();
-                  str += "),";
-                  output_columns.push_back(str);
-              }
+
+      for ( int i = 0; i < m_nNumberCameraCoefSolved; i++) {
+
+        if ( i ==0 )
+          ostr << strcoeff;
+        else if ( i == 1 )
+          ostr << strcoeff << "t";
+        else
+          ostr << strcoeff << "t" << i;
+
+        for ( int j = 0; j < 5; j++ ) {
+
+          if ( m_nNumberCameraCoefSolved == 1 || !m_bSolveTwist) {
+            output_columns.push_back("TWIST,");
+          }       
+          else {
+            std::string str = "TWIST(";
+            str += ostr.str().c_str();
+            str += "),";
+            output_columns.push_back(str);
           }
-          ostr.str("");
-          strcoeff--;
+        }
+
+        ostr.str("");
+        strcoeff--;
+        if (!m_bSolveTwist) break;
       }
 
       // print first column header to buffer and output to file
       int ncolumns = output_columns.size();
-      for( int i = 0; i < ncolumns; i++) {
+      for ( int i = 0; i < ncolumns; i++) {
           std::string str = output_columns.at(i);
           sprintf(buf, "%s", (const char*)str.c_str());
           fp_out << buf;
@@ -6156,6 +6178,7 @@ void BundleAdjust::SpecialKIterationSummary() {
 
       output_columns.clear();
       output_columns.push_back("Filename,");
+
       output_columns.push_back("sample res,");
       output_columns.push_back("line res,");
       output_columns.push_back("total res,");
@@ -6167,7 +6190,10 @@ void BundleAdjust::SpecialKIterationSummary() {
           nparams = 6;
       else if ( m_spacecraftPositionSolveType == 3 )
           nparams = 9;
-      nparams += 3*m_nNumberCameraCoefSolved;
+      int numCameraAnglesSolved = 2;
+      if (m_bSolveTwist) numCameraAnglesSolved++;
+      nparams += numCameraAnglesSolved*m_nNumberCameraCoefSolved;
+      if (!m_bSolveTwist) nparams += 1; // Report on twist only
       for(int i = 0; i < nparams; i++ ) {
           output_columns.push_back("Initial,");
           output_columns.push_back("Correction,");
@@ -6191,7 +6217,7 @@ void BundleAdjust::SpecialKIterationSummary() {
       SpiceRotation *pSpiceRotation = NULL;
 
       int nImages = Images();
-      double dSigma;
+      double dSigma = 0.;
       int nIndex = 0;
       bool bSolveSparse = false;
       bool bHeld = false;
@@ -6206,350 +6232,614 @@ void BundleAdjust::SpecialKIterationSummary() {
       output_columns.clear();
 
       gmm::row_matrix<gmm::rsvector<double> > lsqCovMatrix;
-      if( m_strSolutionMethod == "SPARSE" )
-      {
-          lsqCovMatrix = m_pLsq->GetCovarianceMatrix();  // get reference to the covariance matrix from the least-squares object
-          bSolveSparse = true;
+      if (m_strSolutionMethod == "SPARSE" && m_bErrorPropagation) {
+//      Get reference to the covariance matrix from the least-squares object
+        lsqCovMatrix = m_pLsq->GetCovarianceMatrix();  
+        bSolveSparse = true;
       }
+
+
+    std::vector<double> BFP(3);
+
+
 
       for ( int i = 0; i < nImages; i++ ) {
 
-          if ( m_nHeldImages > 0 && m_pHeldSnList->HasSerialNumber(m_pSnList->SerialNumber(i)) )
-              bHeld = true;
+        if (m_nHeldImages > 0 &&
+            m_pHeldSnList->HasSerialNumber(m_pSnList->SerialNumber(i)) )
+          bHeld = true;
 
-          pCamera = m_pCnet->Camera(i);
-          if ( !pCamera )
-              continue;
+        pCamera = m_pCnet->Camera(i);
+        if ( !pCamera )
+          continue;
 
-          // ImageIndex(i) retrieves index into the normal equations matrix for Image(i)
-          nIndex = ImageIndex(i) ;
+        // ImageIndex(i) retrieves index into the normal equations matrix for
+        //  Image(i)
+        nIndex = ImageIndex(i) ;
 
-          pSpicePosition = pCamera->InstrumentPosition();
-          if ( !pSpicePosition )
-              continue;
+        pSpicePosition = pCamera->InstrumentPosition();
+        if ( !pSpicePosition )
+          continue;
 
-          pSpiceRotation = pCamera->InstrumentRotation();
-          if ( !pSpiceRotation )
-              continue;
+        pSpiceRotation = pCamera->InstrumentRotation();
+        if ( !pSpiceRotation )
+            continue;
 
-          // for frame cameras we directly retrieve the Exterior Orientation (i.e. position
-          // and orientation angles). For others (linescan, radar) we retrieve the polynomial
-          // coefficients from which the Exterior Orientation parameters are derived.
-          if ( m_spacecraftPositionSolveType > 0 )
-              pSpicePosition->GetPolynomial(PosX, PosY, PosZ);
-          else { // frame camera
-              std::vector <double> coordinate(3);
-              coordinate = pSpicePosition->GetCenterCoordinate();
-              PosX[0] = coordinate[0];
-              PosY[0] = coordinate[1];
-              PosZ[0] = coordinate[2];
+        // for frame cameras we directly retrieve the J2000 Exterior Orientation
+        // (i.e. position and orientation angles). For others (linescan, radar)
+        //  we retrieve the polynomial coefficients from which the Exterior 
+        // Orientation parameters are derived.
+        if ( m_spacecraftPositionSolveType > 0 )
+          pSpicePosition->GetPolynomial(PosX, PosY, PosZ);
+        else { // not solving for position so report state at center of image
+          std::vector <double> coordinate(3);
+          coordinate = pSpicePosition->GetCenterCoordinate();
+
+          PosX[0] = coordinate[0];
+          PosY[0] = coordinate[1];
+          PosZ[0] = coordinate[2];
+        }
+
+        if ( m_cmatrixSolveType > 0 )
+          pSpiceRotation->GetPolynomial(coefRA,coefDEC,coefTWI);
+//          else { // frame camera
+        else { 
+// This is for m_cmatrixSolveType = None and no polynomial fit has occurred
+          angles = pSpiceRotation->GetCenterAngles();
+          coefRA.push_back(angles.at(0));
+          coefDEC.push_back(angles.at(1));
+          coefTWI.push_back(angles.at(2));
+        }
+
+        // clear column vector
+        output_columns.clear();
+
+        // add filename
+        output_columns.push_back(m_pSnList->Filename(i).c_str());
+
+        // add rms of sample, line, total image coordinate residuals
+        output_columns.push_back(boost::lexical_cast<std::string>
+            (m_rmsImageSampleResiduals[i].Rms()));
+        output_columns.push_back(boost::lexical_cast<std::string>
+            (m_rmsImageLineResiduals[i].Rms()));
+        output_columns.push_back(boost::lexical_cast<std::string>
+            (m_rmsImageResiduals[i].Rms()));
+
+        // add all XYZ(J2000) spacecraft position parameters to column vector
+        if ( m_spacecraftPositionSolveType == 0 ) {
+            output_columns.push_back(boost::lexical_cast<std::string>(PosX[0]));
+            output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+            output_columns.push_back(boost::lexical_cast<std::string>(PosX[0]));
+            output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+            output_columns.push_back("N/A");
+            output_columns.push_back(boost::lexical_cast<std::string>(PosY[0]));
+            output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+            output_columns.push_back(boost::lexical_cast<std::string>(PosY[0]));
+            output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+            output_columns.push_back("N/A");
+            output_columns.push_back(boost::lexical_cast<std::string>(PosZ[0]));
+            output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+            output_columns.push_back(boost::lexical_cast<std::string>(PosZ[0]));
+            output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+            output_columns.push_back("N/A");
+        }
+        else if ( m_spacecraftPositionSolveType == 1 ) {
+          if (m_bErrorPropagation) {
+            if ( bSolveSparse )
+              dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+            else
+              dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
           }
 
-          if ( m_cmatrixSolveType > 0 )
-              pSpiceRotation->GetPolynomial(coefRA,coefDEC,coefTWI);
-          //          else { // frame camera
-          else { // This is for m_cmatrixSolveType = None and no polynomial fit has occurred
-            angles = pSpiceRotation->GetCenterAngles();
-            coefRA.push_back(angles.at(0));
-            coefDEC.push_back(angles.at(1));
-            coefTWI.push_back(angles.at(2));
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (PosX[0] - m_Image_Corrections(nIndex)));
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (m_Image_Corrections(nIndex)));
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (PosX[0]));
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (m_dGlobalSpacecraftPositionAprioriSigma));
+
+          if (m_bErrorPropagation)
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (dSigma));
+          else
+            output_columns.push_back("N/A");
+
+          nIndex++;
+          if (m_bErrorPropagation) {
+            if (bSolveSparse )
+              dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+            else
+              dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
           }
 
-          // clear column vector
-          output_columns.clear();
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (PosY[0] - m_Image_Corrections(nIndex)));
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (m_Image_Corrections(nIndex)));
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (PosY[0]));
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (m_dGlobalSpacecraftPositionAprioriSigma));
 
-          // add filename
-          output_columns.push_back(m_pSnList->Filename(i).c_str());
+          if (m_bErrorPropagation)
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (dSigma));
+          else
+            output_columns.push_back("N/A");
 
-          // add rms of sample, line, total image coordinate residuals
-          output_columns.push_back(boost::lexical_cast<std::string>(m_rmsImageSampleResiduals[i].Rms()));
-          output_columns.push_back(boost::lexical_cast<std::string>(m_rmsImageLineResiduals[i].Rms()));
-          output_columns.push_back(boost::lexical_cast<std::string>(m_rmsImageResiduals[i].Rms()));
+          nIndex++;
+          if (m_bErrorPropagation) {
+            if (bSolveSparse )
+              dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+            else
+              dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+          }
 
-          // add all XYZ(J2000) spacecraft position parameters to column vector
-          if ( m_spacecraftPositionSolveType == 0 ) {
-              output_columns.push_back(boost::lexical_cast<std::string>(PosX[0]));
-              output_columns.push_back(boost::lexical_cast<std::string>(0.0));
-              output_columns.push_back(boost::lexical_cast<std::string>(PosX[0]));
-              output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (PosZ[0] - m_Image_Corrections(nIndex)));
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (m_Image_Corrections(nIndex)));
+          output_columns.push_back(boost::lexical_cast<std::string>(PosZ[0]));
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (m_dGlobalSpacecraftPositionAprioriSigma));
+          if (m_bErrorPropagation)
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (dSigma));
+          else
+            output_columns.push_back("N/A");
+          nIndex++;
+        }
+        else if (m_spacecraftPositionSolveType == 2) {
+
+          if (m_bErrorPropagation) {
+            if (bSolveSparse )
+              dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+            else
+              dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+          }
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (PosX[0] - m_Image_Corrections(nIndex)));
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (m_Image_Corrections(nIndex)));
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (PosX[0]));
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (m_dGlobalSpacecraftPositionAprioriSigma));
+          if (m_bErrorPropagation)
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (dSigma));
+          else
+            output_columns.push_back("N/A");
+
+          nIndex++;
+
+          if (m_bErrorPropagation) {
+            if (bSolveSparse )
+              dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+            else
+              dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+          }
+
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (PosX[1] - m_Image_Corrections(nIndex)));
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (m_Image_Corrections(nIndex)));
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (PosX[1]));
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (m_dGlobalSpacecraftVelocityAprioriSigma));
+          if (m_bErrorPropagation)
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (dSigma));
+          else
+            output_columns.push_back("N/A");
+            nIndex++;
+
+            if (m_bErrorPropagation) {
+              if (bSolveSparse )
+                dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+            }
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (PosY[0] - m_Image_Corrections(nIndex)));
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (m_Image_Corrections(nIndex)));
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (PosY[0]));
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (m_dGlobalSpacecraftPositionAprioriSigma));
+            if (m_bErrorPropagation)
+              output_columns.push_back(boost::lexical_cast<std::string>
+                  (dSigma));
+            else
               output_columns.push_back("N/A");
-              output_columns.push_back(boost::lexical_cast<std::string>(PosY[0]));
-              output_columns.push_back(boost::lexical_cast<std::string>(0.0));
-              output_columns.push_back(boost::lexical_cast<std::string>(PosY[0]));
-              output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+
+            nIndex++;
+
+            if (m_bErrorPropagation) {
+              if (bSolveSparse )
+                dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+            }
+
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (PosY[1] - m_Image_Corrections(nIndex)));
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (m_Image_Corrections(nIndex)));
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (PosY[1]));
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (m_dGlobalSpacecraftVelocityAprioriSigma));
+            if (m_bErrorPropagation)
+              output_columns.push_back(boost::lexical_cast<std::string>
+                  (dSigma));
+            else
               output_columns.push_back("N/A");
-              output_columns.push_back(boost::lexical_cast<std::string>(PosZ[0]));
-              output_columns.push_back(boost::lexical_cast<std::string>(0.0));
-              output_columns.push_back(boost::lexical_cast<std::string>(PosZ[0]));
-              output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+
+            nIndex++;
+
+            if (m_bErrorPropagation) {
+              if (bSolveSparse )
+                dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+            }
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (PosZ[0] - m_Image_Corrections(nIndex)));
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (m_Image_Corrections(nIndex)));
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (PosZ[0]));
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (m_dGlobalSpacecraftPositionAprioriSigma));
+            if (m_bErrorPropagation)
+              output_columns.push_back(boost::lexical_cast<std::string>
+                  (dSigma));
+            else
               output_columns.push_back("N/A");
+            nIndex++;
+
+            if (m_bErrorPropagation) {
+              if (bSolveSparse )
+                dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+            }
+
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (PosZ[1] - m_Image_Corrections(nIndex)));
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (m_Image_Corrections(nIndex)));
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (PosZ[1]));
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (m_dGlobalSpacecraftVelocityAprioriSigma));
+            if (m_bErrorPropagation)
+              output_columns.push_back(boost::lexical_cast<std::string>
+                  (dSigma));
+            else
+              output_columns.push_back("N/A");
+            nIndex++;
+        }
+        else if ( m_spacecraftPositionSolveType == 3 ) {
+          if (m_bErrorPropagation) {
+            if (bSolveSparse )
+              dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+            else
+              dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
           }
-          else if ( m_spacecraftPositionSolveType == 1 ) {
-              if( bSolveSparse )
-                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (PosX[0] - m_Image_Corrections(nIndex)));
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (m_Image_Corrections(nIndex)));
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (PosX[0]));
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (m_dGlobalSpacecraftPositionAprioriSigma));
+          if (m_bErrorPropagation)
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (dSigma));
+          else
+            output_columns.push_back("N/A");
+          nIndex++;
 
-              output_columns.push_back(boost::lexical_cast<std::string>(PosX[0] - m_Image_Corrections(nIndex)));
-              output_columns.push_back(boost::lexical_cast<std::string>(m_Image_Corrections(nIndex)));
-              output_columns.push_back(boost::lexical_cast<std::string>(PosX[0]));
-              output_columns.push_back(boost::lexical_cast<std::string>(m_dGlobalSpacecraftPositionAprioriSigma));
-              output_columns.push_back(boost::lexical_cast<std::string>(dSigma));
-
-              nIndex++;
-              if( bSolveSparse )
-                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-
-              output_columns.push_back(boost::lexical_cast<std::string>(PosY[0] - m_Image_Corrections(nIndex)));
-              output_columns.push_back(boost::lexical_cast<std::string>(m_Image_Corrections(nIndex)));
-              output_columns.push_back(boost::lexical_cast<std::string>(PosY[0]));
-              output_columns.push_back(boost::lexical_cast<std::string>(m_dGlobalSpacecraftPositionAprioriSigma));
-              output_columns.push_back(boost::lexical_cast<std::string>(dSigma));
-              nIndex++;
-              if( bSolveSparse )
-                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-
-              output_columns.push_back(boost::lexical_cast<std::string>(PosZ[0] - m_Image_Corrections(nIndex)));
-              output_columns.push_back(boost::lexical_cast<std::string>(m_Image_Corrections(nIndex)));
-              output_columns.push_back(boost::lexical_cast<std::string>(PosZ[0]));
-              output_columns.push_back(boost::lexical_cast<std::string>(m_dGlobalSpacecraftPositionAprioriSigma));
-              output_columns.push_back(boost::lexical_cast<std::string>(dSigma));
-              nIndex++;
-          }
-          else if (m_spacecraftPositionSolveType == 2) {
-              if( bSolveSparse )
-                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-              output_columns.push_back(boost::lexical_cast<std::string>(PosX[0] - m_Image_Corrections(nIndex)));
-              output_columns.push_back(boost::lexical_cast<std::string>(m_Image_Corrections(nIndex)));
-              output_columns.push_back(boost::lexical_cast<std::string>(PosX[0]));
-              output_columns.push_back(boost::lexical_cast<std::string>(m_dGlobalSpacecraftPositionAprioriSigma));
-              output_columns.push_back(boost::lexical_cast<std::string>(dSigma));
-              nIndex++;
-              if( bSolveSparse )
-                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-              output_columns.push_back(boost::lexical_cast<std::string>(PosX[1] - m_Image_Corrections(nIndex)));
-              output_columns.push_back(boost::lexical_cast<std::string>(m_Image_Corrections(nIndex)));
-              output_columns.push_back(boost::lexical_cast<std::string>(PosX[1]));
-              output_columns.push_back(boost::lexical_cast<std::string>(m_dGlobalSpacecraftVelocityAprioriSigma));
-              output_columns.push_back(boost::lexical_cast<std::string>(dSigma));
-              nIndex++;
-              if( bSolveSparse )
-                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-              output_columns.push_back(boost::lexical_cast<std::string>(PosY[0] - m_Image_Corrections(nIndex)));
-              output_columns.push_back(boost::lexical_cast<std::string>(m_Image_Corrections(nIndex)));
-              output_columns.push_back(boost::lexical_cast<std::string>(PosY[0]));
-              output_columns.push_back(boost::lexical_cast<std::string>(m_dGlobalSpacecraftPositionAprioriSigma));
-              output_columns.push_back(boost::lexical_cast<std::string>(dSigma));
-              nIndex++;
-              if( bSolveSparse )
-                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-              output_columns.push_back(boost::lexical_cast<std::string>(PosY[1] - m_Image_Corrections(nIndex)));
-              output_columns.push_back(boost::lexical_cast<std::string>(m_Image_Corrections(nIndex)));
-              output_columns.push_back(boost::lexical_cast<std::string>(PosY[1]));
-              output_columns.push_back(boost::lexical_cast<std::string>(m_dGlobalSpacecraftVelocityAprioriSigma));
-              output_columns.push_back(boost::lexical_cast<std::string>(dSigma));
-              nIndex++;
-              if( bSolveSparse )
-                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-              output_columns.push_back(boost::lexical_cast<std::string>(PosZ[0] - m_Image_Corrections(nIndex)));
-              output_columns.push_back(boost::lexical_cast<std::string>(m_Image_Corrections(nIndex)));
-              output_columns.push_back(boost::lexical_cast<std::string>(PosZ[0]));
-              output_columns.push_back(boost::lexical_cast<std::string>(m_dGlobalSpacecraftPositionAprioriSigma));
-              output_columns.push_back(boost::lexical_cast<std::string>(dSigma));
-              nIndex++;
-              if( bSolveSparse )
-                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-              output_columns.push_back(boost::lexical_cast<std::string>(PosZ[1] - m_Image_Corrections(nIndex)));
-              output_columns.push_back(boost::lexical_cast<std::string>(m_Image_Corrections(nIndex)));
-              output_columns.push_back(boost::lexical_cast<std::string>(PosZ[1]));
-              output_columns.push_back(boost::lexical_cast<std::string>(m_dGlobalSpacecraftVelocityAprioriSigma));
-              output_columns.push_back(boost::lexical_cast<std::string>(dSigma));
-              nIndex++;
-          }
-          else if ( m_spacecraftPositionSolveType == 3 ) {
-              if( bSolveSparse )
-                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-              output_columns.push_back(boost::lexical_cast<std::string>(PosX[0] - m_Image_Corrections(nIndex)));
-              output_columns.push_back(boost::lexical_cast<std::string>(m_Image_Corrections(nIndex)));
-              output_columns.push_back(boost::lexical_cast<std::string>(PosX[0]));
-              output_columns.push_back(boost::lexical_cast<std::string>(m_dGlobalSpacecraftPositionAprioriSigma));
-              output_columns.push_back(boost::lexical_cast<std::string>(dSigma));
-              nIndex++;
-              if( bSolveSparse )
-                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-              output_columns.push_back(boost::lexical_cast<std::string>(PosX[1] - m_Image_Corrections(nIndex)));
-              output_columns.push_back(boost::lexical_cast<std::string>(m_Image_Corrections(nIndex)));
-              output_columns.push_back(boost::lexical_cast<std::string>(PosX[1]));
-              output_columns.push_back(boost::lexical_cast<std::string>(m_dGlobalSpacecraftVelocityAprioriSigma));
-              output_columns.push_back(boost::lexical_cast<std::string>(dSigma));
-              nIndex++;
-              if( bSolveSparse )
-                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-              output_columns.push_back(boost::lexical_cast<std::string>(PosX[2] - m_Image_Corrections(nIndex)));
-              output_columns.push_back(boost::lexical_cast<std::string>(m_Image_Corrections(nIndex)));
-              output_columns.push_back(boost::lexical_cast<std::string>(PosX[2]));
-              output_columns.push_back(boost::lexical_cast<std::string>(m_dGlobalSpacecraftAccelerationAprioriSigma));
-              output_columns.push_back(boost::lexical_cast<std::string>(dSigma));
-              nIndex++;
-              if( bSolveSparse )
-                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-              output_columns.push_back(boost::lexical_cast<std::string>(PosY[0] - m_Image_Corrections(nIndex)));
-              output_columns.push_back(boost::lexical_cast<std::string>(m_Image_Corrections(nIndex)));
-              output_columns.push_back(boost::lexical_cast<std::string>(PosY[0]));
-              output_columns.push_back(boost::lexical_cast<std::string>(m_dGlobalSpacecraftPositionAprioriSigma));
-              output_columns.push_back(boost::lexical_cast<std::string>(dSigma));
-              nIndex++;
-              if( bSolveSparse )
-                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-              output_columns.push_back(boost::lexical_cast<std::string>(PosY[1] - m_Image_Corrections(nIndex)));
-              output_columns.push_back(boost::lexical_cast<std::string>(m_Image_Corrections(nIndex)));
-              output_columns.push_back(boost::lexical_cast<std::string>(PosY[1]));
-              output_columns.push_back(boost::lexical_cast<std::string>(m_dGlobalSpacecraftVelocityAprioriSigma));
-              output_columns.push_back(boost::lexical_cast<std::string>(dSigma));
-              nIndex++;
-              if( bSolveSparse )
-                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-              output_columns.push_back(boost::lexical_cast<std::string>(PosY[2] - m_Image_Corrections(nIndex)));
-              output_columns.push_back(boost::lexical_cast<std::string>(m_Image_Corrections(nIndex)));
-              output_columns.push_back(boost::lexical_cast<std::string>(PosY[2]));
-              output_columns.push_back(boost::lexical_cast<std::string>(m_dGlobalSpacecraftAccelerationAprioriSigma));
-              output_columns.push_back(boost::lexical_cast<std::string>(dSigma));
-              nIndex++;
-              if( bSolveSparse )
-                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-              output_columns.push_back(boost::lexical_cast<std::string>(PosZ[0] - m_Image_Corrections(nIndex)));
-              output_columns.push_back(boost::lexical_cast<std::string>(m_Image_Corrections(nIndex)));
-              output_columns.push_back(boost::lexical_cast<std::string>(PosZ[0]));
-              output_columns.push_back(boost::lexical_cast<std::string>(m_dGlobalSpacecraftPositionAprioriSigma));
-              output_columns.push_back(boost::lexical_cast<std::string>(dSigma));
-              nIndex++;
-              if( bSolveSparse )
-                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-              output_columns.push_back(boost::lexical_cast<std::string>(PosZ[1] - m_Image_Corrections(nIndex)));
-              output_columns.push_back(boost::lexical_cast<std::string>(m_Image_Corrections(nIndex)));
-              output_columns.push_back(boost::lexical_cast<std::string>(PosZ[1]));
-              output_columns.push_back(boost::lexical_cast<std::string>(m_dGlobalSpacecraftVelocityAprioriSigma));
-              output_columns.push_back(boost::lexical_cast<std::string>(dSigma));
-              nIndex++;
-              if( bSolveSparse )
-                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-              output_columns.push_back(boost::lexical_cast<std::string>(PosZ[2] - m_Image_Corrections(nIndex)));
-              output_columns.push_back(boost::lexical_cast<std::string>(m_Image_Corrections(nIndex)));
-              output_columns.push_back(boost::lexical_cast<std::string>(PosZ[2]));
-              output_columns.push_back(boost::lexical_cast<std::string>(m_dGlobalSpacecraftAccelerationAprioriSigma));
-              output_columns.push_back(boost::lexical_cast<std::string>(dSigma));
-              nIndex++;
+          if (m_bErrorPropagation) {
+            if (bSolveSparse )
+              dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+            else
+              dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
           }
 
-          if( m_nNumberCameraCoefSolved > 0 ) {
-              for( int i = 0; i < m_nNumberCameraCoefSolved; i++ ) {
-                  if( bSolveSparse )
-                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-                  else
-                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-                  output_columns.push_back(boost::lexical_cast<std::string>((coefRA[i] - m_Image_Corrections(nIndex)) * RAD2DEG));
-                  output_columns.push_back(boost::lexical_cast<std::string>(m_Image_Corrections(nIndex) * RAD2DEG));
-                  output_columns.push_back(boost::lexical_cast<std::string>(coefRA[i] * RAD2DEG));
-                  output_columns.push_back(boost::lexical_cast<std::string>(m_dGlobalCameraAnglesAprioriSigma[i]));
-                  output_columns.push_back(boost::lexical_cast<std::string>(dSigma * RAD2DEG));
-                  nIndex++;
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (PosX[1] - m_Image_Corrections(nIndex)));
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (m_Image_Corrections(nIndex)));
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (PosX[1]));
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (m_dGlobalSpacecraftVelocityAprioriSigma));
+          if (m_bErrorPropagation)
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (dSigma));
+          else
+            output_columns.push_back("N/A");
+          nIndex++;
+
+          if (m_bErrorPropagation) {
+            if (bSolveSparse )
+              dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+            else
+              dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+          }
+
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (PosX[2] - m_Image_Corrections(nIndex)));
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (m_Image_Corrections(nIndex)));
+          output_columns.push_back(boost::lexical_cast<std::string>(PosX[2]));
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (m_dGlobalSpacecraftAccelerationAprioriSigma));
+          if (m_bErrorPropagation)
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (dSigma));
+          else
+            output_columns.push_back("N/A");
+          nIndex++;
+
+          if (m_bErrorPropagation) {
+            if (bSolveSparse )
+              dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+            else
+              dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+          }
+
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (PosY[0] - m_Image_Corrections(nIndex)));
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (m_Image_Corrections(nIndex)));
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (PosY[0]));
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (m_dGlobalSpacecraftPositionAprioriSigma));
+          if (m_bErrorPropagation)
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (dSigma));
+          else
+            output_columns.push_back("N/A");
+          nIndex++;
+
+          if (m_bErrorPropagation) {
+            if (bSolveSparse )
+              dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+            else
+              dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+          }
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (PosY[1] - m_Image_Corrections(nIndex)));
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (m_Image_Corrections(nIndex)));
+          output_columns.push_back(boost::lexical_cast<std::string>(PosY[1]));
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (m_dGlobalSpacecraftVelocityAprioriSigma));
+          if (m_bErrorPropagation)
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (dSigma));
+          else
+            output_columns.push_back("N/A");
+          nIndex++;
+
+          if (m_bErrorPropagation) {
+            if (bSolveSparse )
+              dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+            else
+              dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+          }
+
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (PosY[2] - m_Image_Corrections(nIndex)));
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (m_Image_Corrections(nIndex)));
+          output_columns.push_back(boost::lexical_cast<std::string>(PosY[2]));
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (m_dGlobalSpacecraftAccelerationAprioriSigma));
+          if (m_bErrorPropagation)
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (dSigma));
+          else
+            output_columns.push_back("N/A");
+          nIndex++;
+
+          if (m_bErrorPropagation) {
+            if (bSolveSparse )
+              dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+            else
+              dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+          }
+
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (PosZ[0] - m_Image_Corrections(nIndex)));
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (m_Image_Corrections(nIndex)));
+          output_columns.push_back(boost::lexical_cast<std::string>(PosZ[0]));
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (m_dGlobalSpacecraftPositionAprioriSigma));
+          if (m_bErrorPropagation)
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (dSigma));
+          else
+            output_columns.push_back("N/A");
+          nIndex++;
+
+          if (m_bErrorPropagation) {
+            if (bSolveSparse )
+              dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+            else
+              dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+          }
+
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (PosZ[1] - m_Image_Corrections(nIndex)));
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (m_Image_Corrections(nIndex)));
+          output_columns.push_back(boost::lexical_cast<std::string>(PosZ[1]));
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (m_dGlobalSpacecraftVelocityAprioriSigma));
+          if (m_bErrorPropagation)
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (dSigma));
+          else
+            output_columns.push_back("N/A");
+          nIndex++;
+
+          if (m_bErrorPropagation) {
+            if (bSolveSparse )
+              dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+            else
+              dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+          }
+
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (PosZ[2] - m_Image_Corrections(nIndex)));
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (m_Image_Corrections(nIndex)));
+          output_columns.push_back(boost::lexical_cast<std::string>(PosZ[2]));
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (m_dGlobalSpacecraftAccelerationAprioriSigma));
+          if (m_bErrorPropagation)
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (dSigma));
+          else
+            output_columns.push_back("N/A");
+          nIndex++;
+        }
+
+        if ( m_nNumberCameraCoefSolved > 0 ) {
+          for ( int i = 0; i < m_nNumberCameraCoefSolved; i++ ) {
+
+            if (m_bErrorPropagation) {
+              if (bSolveSparse )
+                dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+            }
+
+            output_columns.push_back(boost::lexical_cast<std::string>
+                ((coefRA[i] - m_Image_Corrections(nIndex)) * RAD2DEG));
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (m_Image_Corrections(nIndex) * RAD2DEG));
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (coefRA[i] * RAD2DEG));
+            output_columns.push_back(boost::lexical_cast<std::string>(
+                m_dGlobalCameraAnglesAprioriSigma[i]));
+            if (m_bErrorPropagation)
+              output_columns.push_back(boost::lexical_cast<std::string>
+                  (dSigma * RAD2DEG));
+            else
+              output_columns.push_back("N/A");
+            nIndex++;
+          }
+          for ( int i = 0; i < m_nNumberCameraCoefSolved; i++ ) {
+
+            if (m_bErrorPropagation) {
+              if (bSolveSparse )
+                dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+            }
+
+            output_columns.push_back(boost::lexical_cast<std::string>
+                ((coefDEC[i] - m_Image_Corrections(nIndex)) * RAD2DEG));
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (m_Image_Corrections(nIndex) * RAD2DEG));
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (coefDEC[i] * RAD2DEG));
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (m_dGlobalCameraAnglesAprioriSigma[i]));
+            if (m_bErrorPropagation)
+              output_columns.push_back(boost::lexical_cast<std::string>
+                  (dSigma * RAD2DEG));
+            else
+              output_columns.push_back("N/A");
+            nIndex++;
+          }
+          if ( !m_bSolveTwist ) {
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (coefTWI[0]*RAD2DEG));
+            output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (coefTWI[0]*RAD2DEG));
+            output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+            output_columns.push_back("N/A");
+          }
+          else {
+            for( int i = 0; i < m_nNumberCameraCoefSolved; i++ ) {
+
+              if (m_bErrorPropagation) {
+                if (bSolveSparse )
+                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                else
+                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
               }
-              for( int i = 0; i < m_nNumberCameraCoefSolved; i++ ) {
-                  if( bSolveSparse )
-                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-                  else
-                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-                  output_columns.push_back(boost::lexical_cast<std::string>((coefDEC[i] - m_Image_Corrections(nIndex)) * RAD2DEG));
-                  output_columns.push_back(boost::lexical_cast<std::string>(m_Image_Corrections(nIndex) * RAD2DEG));
-                  output_columns.push_back(boost::lexical_cast<std::string>(coefDEC[i] * RAD2DEG));
-                  output_columns.push_back(boost::lexical_cast<std::string>(m_dGlobalCameraAnglesAprioriSigma[i]));
-                  output_columns.push_back(boost::lexical_cast<std::string>(dSigma * RAD2DEG));
-                  nIndex++;
-              }
-              if ( !m_bSolveTwist ) {
-                  output_columns.push_back(boost::lexical_cast<std::string>(coefTWI[0]*RAD2DEG));
-                  output_columns.push_back(boost::lexical_cast<std::string>(0.0));
-                  output_columns.push_back(boost::lexical_cast<std::string>(coefTWI[0]*RAD2DEG));
-                  output_columns.push_back(boost::lexical_cast<std::string>(0.0));
-                  output_columns.push_back("N/A");
-              }
-              else {
-                  for( int i = 0; i < m_nNumberCameraCoefSolved; i++ ) {
-                      if( bSolveSparse )
-                          dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-                      else
-                          dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-                      output_columns.push_back(boost::lexical_cast<std::string>((coefTWI[i] - m_Image_Corrections(nIndex)) * RAD2DEG));
-                      output_columns.push_back(boost::lexical_cast<std::string>(m_Image_Corrections(nIndex) * RAD2DEG));
-                      output_columns.push_back(boost::lexical_cast<std::string>(coefTWI[i] * RAD2DEG));
-                      output_columns.push_back(boost::lexical_cast<std::string>(m_dGlobalCameraAnglesAprioriSigma[i]));
-                      output_columns.push_back(boost::lexical_cast<std::string>(dSigma * RAD2DEG));
-                      nIndex++;
-                  }
-              }
-          }
 
-          else{
-              output_columns.push_back(boost::lexical_cast<std::string>(coefRA[0]*RAD2DEG));
-              output_columns.push_back(boost::lexical_cast<std::string>(0.0));
-              output_columns.push_back(boost::lexical_cast<std::string>(coefRA[0]*RAD2DEG));
-              output_columns.push_back(boost::lexical_cast<std::string>(0.0));
-              output_columns.push_back("N/A");
-              output_columns.push_back(boost::lexical_cast<std::string>(coefDEC[0]*RAD2DEG));
-              output_columns.push_back(boost::lexical_cast<std::string>(0.0));
-              output_columns.push_back(boost::lexical_cast<std::string>(coefDEC[0]*RAD2DEG));
-              output_columns.push_back(boost::lexical_cast<std::string>(0.0));
-              output_columns.push_back("N/A");
-              output_columns.push_back(boost::lexical_cast<std::string>(coefTWI[0]*RAD2DEG));
-              output_columns.push_back(boost::lexical_cast<std::string>(0.0));
-              output_columns.push_back(boost::lexical_cast<std::string>(coefTWI[0]*RAD2DEG));
-              output_columns.push_back(boost::lexical_cast<std::string>(0.0));
-              output_columns.push_back("N/A");
+              output_columns.push_back(boost::lexical_cast<std::string>
+                  ((coefTWI[i] - m_Image_Corrections(nIndex)) * RAD2DEG));
+              output_columns.push_back(boost::lexical_cast<std::string>
+                  (m_Image_Corrections(nIndex) * RAD2DEG));
+              output_columns.push_back(boost::lexical_cast<std::string>
+                  (coefTWI[i] * RAD2DEG));
+              output_columns.push_back(boost::lexical_cast<std::string>
+                  (m_dGlobalCameraAnglesAprioriSigma[i]));
+              if (m_bErrorPropagation)
+                output_columns.push_back(boost::lexical_cast<std::string>
+                    (dSigma * RAD2DEG));
+              else
+                output_columns.push_back("N/A");
+              nIndex++;
+            }
           }
+        }
 
-          // print column vector to buffer and output to file
-          int ncolumns = output_columns.size();
-          for( int i = 0; i < ncolumns; i++) {
-              std::string str = output_columns.at(i);
-              sprintf(buf, "%s,", (const char*)str.c_str());
-              fp_out << buf;
-          }
-          sprintf(buf, "\n");
+        else{
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (coefRA[0]*RAD2DEG));
+          output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (coefRA[0]*RAD2DEG));
+          output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+          output_columns.push_back("N/A");
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (coefDEC[0]*RAD2DEG));
+          output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (coefDEC[0]*RAD2DEG));
+          output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+          output_columns.push_back("N/A");
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (coefTWI[0]*RAD2DEG));
+          output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (coefTWI[0]*RAD2DEG));
+          output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+          output_columns.push_back("N/A");
+        }
+
+        // print column vector to buffer and output to file
+        int ncolumns = output_columns.size();
+        for ( int i = 0; i < ncolumns; i++) {
+          std::string str = output_columns.at(i);
+
+          if (i < ncolumns-1)
+            sprintf(buf, "%s,", (const char*)str.c_str());
+          else
+            sprintf(buf, "%s", (const char*)str.c_str());
           fp_out << buf;
+        }
+        sprintf(buf, "\n");
+        fp_out << buf;
       }
 
       fp_out.close();
