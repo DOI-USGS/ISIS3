@@ -757,6 +757,21 @@ namespace Isis {
 
     return islands;
   }
+  
+  
+  /**
+   * @returns The total number of edges in the bi-directional graph for images
+   */
+  int ControlNet::getEdgeCount() const {
+    int total = 0;
+    QList< QList< ControlCubeGraphNode * > > graph = GetNodeConnections();
+    foreach (QList< ControlCubeGraphNode * > adjList, graph) {
+      total += adjList.size();
+    }
+    
+    return total;
+  }
+
 
 
   /**

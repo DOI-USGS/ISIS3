@@ -330,3 +330,5 @@ Testing GetCubeGraphNodes
     ALPHA
 
 Testing getGraphNode: ALPHA
+
+Testing getEdgeCount: 2

@@ -144,6 +144,7 @@ namespace Isis {
    *   @history 2011-05-25 Eric Hyer - Added getPoints method
    *   @history 2011-06-22 James Alexander Crough and Eric Hyer - Added
    *                getGraphNode method.
+   *   @history 2011-06-28 Eric Hyer - Added getEdgeCount() method
    */
   class ControlNet : public QObject {
       Q_OBJECT
@@ -171,6 +172,7 @@ namespace Isis {
       QList< ControlCubeGraphNode * > GetCubeGraphNodes();
       QList< QList< QString > > GetSerialConnections() const;
       QList< QList< ControlCubeGraphNode * > > GetNodeConnections() const;
+      int getEdgeCount() const;
       iString CubeGraphToString() const;
       QList< ControlMeasure * > GetMeasuresInCube(iString serialNumber);
       void DeleteMeasuresWithId(iString serialNumber);
