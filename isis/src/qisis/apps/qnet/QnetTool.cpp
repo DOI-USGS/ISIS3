@@ -170,7 +170,9 @@ namespace Qisis {
         p_pointEditor,
         SIGNAL(stretchChipViewport(Isis::Stretch *, Qisis::CubeViewport *)));
     connect(p_pointEditor, SIGNAL(measureSaved()), this, SLOT(measureSaved()));
-    
+    connect(this, SIGNAL(measureChanged()),
+            p_pointEditor, SLOT(colorizeSaveButton()));
+        
     QPushButton * addMeasure = new QPushButton("Add Measure(s) to Point");
     connect(addMeasure, SIGNAL(clicked()), this, SLOT(addMeasure()));
 
@@ -921,7 +923,9 @@ namespace Qisis {
    *  
    * @author 2011-03-07 Tracie Sucharski 
    *  
-   * @internal
+   * @internal 
+   * @history 2011-06-27 Tracie Sucharski - emit signal indicating a measure 
+   *                        parameter has changed. 
    */
   void QnetTool::setLockLeftMeasure (bool lock) {
     if (p_leftMeasure != NULL) p_leftMeasure->SetEditLock(lock);
@@ -934,7 +938,7 @@ namespace Qisis {
         p_lockRightMeasure->setChecked(lock);
       }
     }
-    colorizeSaveButton();
+    emit measureChanged();
   }
 
 
@@ -952,6 +956,8 @@ namespace Qisis {
    * @history 2010-12-15 Tracie Sucharski - Remove netChanged, the point is 
    *                        not changed in the net unless "Save Point" is
    *                        selected.
+   * @history 2011-06-27 Tracie Sucharski - emit signal indicating a measure 
+   *                        parameter has changed. 
    */
   void QnetTool::setIgnoreLeftMeasure (bool ignore) {
     if (p_leftMeasure != NULL) p_leftMeasure->SetIgnored(ignore);
@@ -964,7 +970,7 @@ namespace Qisis {
         p_ignoreRightMeasure->setChecked(ignore);
       }
     }
-    colorizeSaveButton();
+    emit measureChanged();
   }
 
 
@@ -978,6 +984,8 @@ namespace Qisis {
    * @author 2011-03-07 Tracie Sucharski 
    *  
    * @internal
+   * @history 2011-06-27 Tracie Sucharski - emit signal indicating a measure 
+   *                        parameter has changed. 
    */
   void QnetTool::setLockRightMeasure (bool lock) {
     if (p_rightMeasure != NULL) p_rightMeasure->SetEditLock(lock);
@@ -989,7 +997,7 @@ namespace Qisis {
         p_lockLeftMeasure->setChecked(lock);
       }
     }
-    colorizeSaveButton();
+    emit measureChanged();
   }
 
 
@@ -1007,6 +1015,8 @@ namespace Qisis {
    * @history 2010-12-15 Tracie Sucharski - Remove netChanged, the point is 
    *                        not changed in the net unless "Save Point" is
    *                        selected.
+   * @history 2011-06-27 Tracie Sucharski - emit signal indicating a measure 
+   *                        parameter has changed. 
    */
   void QnetTool::setIgnoreRightMeasure (bool ignore) {
     if (p_rightMeasure != NULL) p_rightMeasure->SetIgnored(ignore);
@@ -1019,7 +1029,7 @@ namespace Qisis {
         p_ignoreLeftMeasure->setChecked(ignore);
       }
     }
-    colorizeSaveButton();
+    emit measureChanged();
   }
 
 
