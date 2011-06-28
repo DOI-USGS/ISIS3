@@ -168,6 +168,7 @@ namespace Qisis {
       void showNavTool();
       void newControlNetwork(Isis::ControlNet *);
       void stretchChipViewport(Isis::Stretch *, Qisis::CubeViewport *);
+      void measureChanged();
 
     public slots:
       void updateList();
