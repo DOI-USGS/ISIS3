@@ -764,9 +764,8 @@ namespace Isis {
    */
   int ControlNet::getEdgeCount() const {
     int total = 0;
-    QList< QList< ControlCubeGraphNode * > > graph = GetNodeConnections();
-    foreach (QList< ControlCubeGraphNode * > adjList, graph) {
-      total += adjList.size();
+    foreach (ControlCubeGraphNode * node, *cubeGraphNodes) {
+      total += node->getAdjacentNodes().size();
     }
     
     return total;

@@ -256,7 +256,7 @@ namespace Isis {
       QHash< QString, ControlPoint * > * points;
 
       //! hash ControlCubeGraphNodes by CubeSerialNumber
-      QHash < QString, ControlCubeGraphNode * > * cubeGraphNodes;
+      QHash< QString, ControlCubeGraphNode * > * cubeGraphNodes;
       QStringList *pointIds;
 
       iString p_targetName;            //!< Name of the target
