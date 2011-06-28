@@ -1763,45 +1763,90 @@ namespace Qisis {
       int col = 0;
       QTableWidgetItem *tableItem = new QTableWidgetItem(QString(file));
       p_measureTable->setItem(row,col++,tableItem);
+
       tableItem = new QTableWidgetItem(QString(m.GetCubeSerialNumber()));
       p_measureTable->setItem(row,col++,tableItem);
-      tableItem = new QTableWidgetItem(QString::number(m.GetSample()));
+
+      tableItem = new QTableWidgetItem();
+      tableItem->setData(0,m.GetSample());
       p_measureTable->setItem(row,col++,tableItem);
-      tableItem = new QTableWidgetItem(QString::number(m.GetLine()));
+
+      tableItem = new QTableWidgetItem();
+      tableItem->setData(0,m.GetLine());
       p_measureTable->setItem(row,col++,tableItem);
-      tableItem = new QTableWidgetItem(QString::number(m.GetSampleResidual()));
+
+      if (m.GetSampleResidual() == Isis::Null) {  
+        tableItem = new QTableWidgetItem(QString("Null"));
+      }
+      else {
+        tableItem = new QTableWidgetItem();
+        tableItem->setData(0,m.GetSampleResidual());
+      }
       p_measureTable->setItem(row,col++,tableItem);
-      tableItem = new QTableWidgetItem(QString::number(m.GetLineResidual()));
+
+      if (m.GetLineResidual() == Isis::Null) {  
+        tableItem = new QTableWidgetItem(QString("Null"));
+      }
+      else {
+        tableItem = new QTableWidgetItem();
+        tableItem->setData(0,m.GetLineResidual());
+      }
       p_measureTable->setItem(row,col++,tableItem);
-      tableItem = new QTableWidgetItem(QString::number(m.GetResidualMagnitude()));
+
+      if (m.GetResidualMagnitude() == Isis::Null) {
+        tableItem = new QTableWidgetItem(QString("Null"));
+      }
+      else {
+        tableItem = new QTableWidgetItem();
+        tableItem->setData(0,m.GetResidualMagnitude());
+      }
       p_measureTable->setItem(row,col++,tableItem);
+
+      double goodnessOfFit = m.GetLogData(
+                      ControlMeasureLogData::GoodnessOfFit).GetNumericalValue();
+      if (goodnessOfFit == Isis::Null) {
+        tableItem = new QTableWidgetItem(QString("Null"));
+      }
+      else {
+        tableItem = new QTableWidgetItem();
+        tableItem->setData(0,goodnessOfFit);
+      }
+      p_measureTable->setItem(row,col++,tableItem);
+
       if (m.IsIgnored()) tableItem = new QTableWidgetItem("True");
       if (!m.IsIgnored()) tableItem = new QTableWidgetItem("False");
       p_measureTable->setItem(row,col++,tableItem);
+
       if (m.IsEditLocked()) tableItem = new QTableWidgetItem("True");
       if (!m.IsEditLocked()) tableItem = new QTableWidgetItem("False");
       p_measureTable->setItem(row,col++,tableItem);
+
       tableItem = new QTableWidgetItem(QString::fromStdString(
                   ControlMeasure::MeasureTypeToString(m.GetType())));
       p_measureTable->setItem(row,col++,tableItem);
+
       if (m.GetAprioriSample() == Isis::Null) {
         tableItem = new QTableWidgetItem("Null");
       }
       else {
-        tableItem = new QTableWidgetItem(QString::number(m.GetAprioriSample()));
+        tableItem = new QTableWidgetItem();
+        tableItem->setData(0,m.GetAprioriSample());
       }
       p_measureTable->setItem(row,col++,tableItem);
+
       if (m.GetAprioriLine() == Isis::Null) {
         tableItem = new QTableWidgetItem("Null");
       }
       else {
-        tableItem = new QTableWidgetItem(QString::number(m.GetAprioriLine()));
+        tableItem = new QTableWidgetItem();
+        tableItem->setData(0,m.GetAprioriLine());
       }
-      p_measureTable->setItem(row,col++,tableItem);
+      p_measureTable->setItem(row,col,tableItem);
     }
+
     p_measureTable->resizeColumnsToContents();
     p_measureTable->resizeRowsToContents();
-    p_measureTable->setMinimumWidth(1500);
+    p_measureTable->setMinimumWidth(1600);
     p_measureTable->setAlternatingRowColors(true);
     p_measureTable->setSortingEnabled(true);
     p_measureTable->show();
@@ -1825,6 +1870,8 @@ namespace Qisis {
         return "Line Residual";
       case RESIDUALMAGNITUDE:
         return "Residual Magnitude";
+      case GOODNESSOFFIT:
+        return "Goodness of Fit";
       case IGNORED:
         return "Ignored";
       case EDITLOCK:
