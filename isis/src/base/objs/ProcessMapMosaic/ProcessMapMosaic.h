@@ -66,6 +66,8 @@ namespace Isis {
    *  @history 2010-10-27 Sharmila Prasad - Read input file attributes
    *  @history 2011-01-18 Sharmila Prasad - Added "Average" priority feature, to double
    *           the number of mosaic bands to get Count info
+   *  @history 2011-06-28 Jai Rideout and Steven Lambright - Now uses a
+   *                          different caching algorithm.
    *  
    *  @todo 2005-02-11 Stuart Sides - add coded example and implementation example
    *                                  to class documentation

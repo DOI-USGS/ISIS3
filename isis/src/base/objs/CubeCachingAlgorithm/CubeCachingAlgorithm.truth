@@ -1,0 +1,6 @@
+This class is pure virtual and does literally nothing.
+So let's test a cache result!
+Test 1 - understood: 0
+Test 2 - copy: 0
+Test 3 - understood: 1
+Test 4 - size: 1

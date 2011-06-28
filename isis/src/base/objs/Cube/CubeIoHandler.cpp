@@ -944,7 +944,8 @@ namespace Isis {
                                     const Buffer &justRequested) {
     // Don't try to minimize the cache every time. Only try if we have 1MB+
     //   in memory.
-    if(m_rawData->size() * getBytesPerChunk() > 1 * 1024 * 1024) {
+    if(m_rawData->size() * getBytesPerChunk() > 1 * 1024 * 1024 ||
+       m_cachingAlgorithms->size() > 1) {
       bool algorithmAccepted = false;
 
       int algorithmIndex = 0;

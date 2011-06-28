@@ -19,16 +19,19 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-#include "Preference.h"
-
 #include "ProcessMapMosaic.h"
+
+#include <QTime>
+
 #include "SpecialPixel.h"
 #include "iException.h"
 #include "Application.h"
 #include "ProcessByLine.h"
 #include "Pvl.h"
+#include "Preference.h"
 #include "Projection.h"
 #include "ProjectionFactory.h"
+#include "UniqueIOCachingAlgorithm.h"
 
 using namespace std;
 
@@ -51,7 +54,7 @@ namespace Isis {
 
     CubeAttributeInput inAtt(inputFile);
     Cube *inCube = ProcessMosaic::SetInputCube(inputFile, inAtt);
-    
+
     Cube *mosaicCube = OutputCubes[0];
     Projection *iproj = inCube->getProjection();
     Projection *oproj = mosaicCube->getProjection();
@@ -107,7 +110,6 @@ namespace Isis {
       try {
         do {
           int outBand = 1;
-
           ProcessMosaic::StartProcess(outSample, outLine, outBand);
 
           // Increment for projections where occurrances may happen multiple times
@@ -324,6 +326,7 @@ namespace Isis {
 
     Cube *mosaicCube = new Cube();
     mosaicCube->open(mosaicFile, "rw");
+    mosaicCube->addCachingAlgorithm(new UniqueIOCachingAlgorithm(2));
 
     OutputCubes.push_back(mosaicCube);
     return mosaicCube;
@@ -364,12 +367,13 @@ namespace Isis {
       else if(GetPriority() == average) {
         bands *= 2;
       }
-      
+
       p.PropagateHistory(false);
       p.PropagateLabels(false);
       Cube *ocube = p.SetOutputCube(mosaicFile, oAtt, samps, lines, bands);
       p.Progress()->SetText("Initializing mosaic");
       p.ClearInputCubes();
+
       p.StartProcess(ProcessMapMosaic::FillNull);
 
       // CreateForCube created some keywords in the mapping group that needs to be added
@@ -380,6 +384,7 @@ namespace Isis {
     Cube *mosaicCube = new Cube();
     OutputCubes.push_back(mosaicCube);
     mosaicCube->open(mosaicFile, "rw");
+    mosaicCube->addCachingAlgorithm(new UniqueIOCachingAlgorithm(2));
 
     return mosaicCube;
   }
