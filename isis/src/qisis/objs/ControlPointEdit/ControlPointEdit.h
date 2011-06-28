@@ -131,6 +131,7 @@ namespace Qisis {
                           Isis::Cube *leftCube, std::string pointId);
       void setRightMeasure(Isis::ControlMeasure *rightMeasure,
                            Isis::Cube *rightCube, std::string pointId);
+      void colorizeSaveButton();
       void saveChips();
 
     protected slots:
@@ -148,7 +149,6 @@ namespace Qisis {
       void updateLeftPositionLabel(double zoomFactor);
       void updateRightGeom();
       void updateRightPositionLabel(double zoomFactor);
-      void colorizeSaveButton();
 
       void blinkStart();
       void blinkStop();
