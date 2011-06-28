@@ -100,6 +100,7 @@ namespace Qisis {
     p_leftMeasure = NULL;
     p_rightMeasure = NULL;
     p_templateModified = false;
+    p_measureTable = NULL;
 
     createQnetTool(parent);
 
@@ -1735,8 +1736,109 @@ namespace Qisis {
     selectRightMeasure(rightIndex);
 
     updateSurfacePointInfo ();
+
+    loadMeasureTable();
   }
 
+
+
+
+  void QnetTool::loadMeasureTable () {
+    if (p_measureTable != NULL) delete p_measureTable;
+    p_measureTable = new QTableWidget();
+    p_measureTable->setRowCount(p_editPoint->GetNumMeasures());
+    p_measureTable->setColumnCount(NUMCOLUMNS);
+
+    QStringList labels;
+    for (int i=0; i<NUMCOLUMNS; i++) {
+      labels<<measureColumnToString((MeasureColumns)i);
+    }
+    p_measureTable->setHorizontalHeaderLabels(labels);
+
+    //  Fill in values
+    for (int row=0; row<p_editPoint->GetNumMeasures(); row++) {
+      ControlMeasure &m = *(*p_editPoint)[row];
+      QString file = QString::fromStdString(
+                       g_serialNumberList->Filename(m.GetCubeSerialNumber()));
+      int col = 0;
+      QTableWidgetItem *tableItem = new QTableWidgetItem(QString(file));
+      p_measureTable->setItem(row,col++,tableItem);
+      tableItem = new QTableWidgetItem(QString(m.GetCubeSerialNumber()));
+      p_measureTable->setItem(row,col++,tableItem);
+      tableItem = new QTableWidgetItem(QString::number(m.GetSample()));
+      p_measureTable->setItem(row,col++,tableItem);
+      tableItem = new QTableWidgetItem(QString::number(m.GetLine()));
+      p_measureTable->setItem(row,col++,tableItem);
+      tableItem = new QTableWidgetItem(QString::number(m.GetSampleResidual()));
+      p_measureTable->setItem(row,col++,tableItem);
+      tableItem = new QTableWidgetItem(QString::number(m.GetLineResidual()));
+      p_measureTable->setItem(row,col++,tableItem);
+      tableItem = new QTableWidgetItem(QString::number(m.GetResidualMagnitude()));
+      p_measureTable->setItem(row,col++,tableItem);
+      if (m.IsIgnored()) tableItem = new QTableWidgetItem("True");
+      if (!m.IsIgnored()) tableItem = new QTableWidgetItem("False");
+      p_measureTable->setItem(row,col++,tableItem);
+      if (m.IsEditLocked()) tableItem = new QTableWidgetItem("True");
+      if (!m.IsEditLocked()) tableItem = new QTableWidgetItem("False");
+      p_measureTable->setItem(row,col++,tableItem);
+      tableItem = new QTableWidgetItem(QString::fromStdString(
+                  ControlMeasure::MeasureTypeToString(m.GetType())));
+      p_measureTable->setItem(row,col++,tableItem);
+      if (m.GetAprioriSample() == Isis::Null) {
+        tableItem = new QTableWidgetItem("Null");
+      }
+      else {
+        tableItem = new QTableWidgetItem(QString::number(m.GetAprioriSample()));
+      }
+      p_measureTable->setItem(row,col++,tableItem);
+      if (m.GetAprioriLine() == Isis::Null) {
+        tableItem = new QTableWidgetItem("Null");
+      }
+      else {
+        tableItem = new QTableWidgetItem(QString::number(m.GetAprioriLine()));
+      }
+      p_measureTable->setItem(row,col++,tableItem);
+    }
+    p_measureTable->resizeColumnsToContents();
+    p_measureTable->resizeRowsToContents();
+    p_measureTable->setMinimumWidth(1500);
+    p_measureTable->setAlternatingRowColors(true);
+    p_measureTable->setSortingEnabled(true);
+    p_measureTable->show();
+  }
+
+
+
+  QString QnetTool::measureColumnToString(QnetTool::MeasureColumns column) {
+    switch (column) {
+      case FILENAME:
+        return "Filename";
+      case CUBESN:
+        return "Serial #";
+      case SAMPLE:
+        return "Sample";
+      case LINE:
+        return "Line";
+      case SAMPLERESIDUAL:
+        return "Sample Residual";
+      case LINERESIDUAL:
+        return "Line Residual";
+      case RESIDUALMAGNITUDE:
+        return "Residual Magnitude";
+      case IGNORED:
+        return "Ignored";
+      case EDITLOCK:
+        return "Edit Lock";
+      case TYPE:
+        return "Measure Type";
+      case APRIORISAMPLE:
+        return "Apriori Sample";
+      case APRIORILINE:
+        return "Apriori Line";
+    }
+    throw iException::Message(iException::Programmer,
+        "Invalid measure column passed to measureColumnToString", _FILEINFO_);
+  }
 
 
 
