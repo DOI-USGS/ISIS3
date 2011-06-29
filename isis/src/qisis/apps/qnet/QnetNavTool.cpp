@@ -697,8 +697,7 @@ namespace Qisis {
    */
   void QnetNavTool::ignorePoints() {
     // do nothing if no cubes are loaded
-    if (g_serialNumberList == NULL)
-      return;
+    if (g_serialNumberList == NULL) return;
 
     int index = p_listBox->currentRow();
     if (index < 0) {

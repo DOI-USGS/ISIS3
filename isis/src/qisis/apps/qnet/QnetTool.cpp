@@ -74,6 +74,7 @@ namespace Qisis {
     p_mw = NULL;
     p_pointEditor = NULL;
     p_ptIdValue = NULL;
+    p_pointType = NULL;
     p_numMeasures = NULL;
     p_pointLatitude = NULL;
     p_pointLongitude = NULL;
@@ -245,6 +246,7 @@ namespace Qisis {
   
     // create left vertical layout
     p_ptIdValue = new QLabel;
+    p_pointType = new QLabel;
     p_numMeasures = new QLabel;
     p_pointAprioriLatitude = new QLabel;
     p_pointAprioriLongitude = new QLabel;
@@ -254,6 +256,7 @@ namespace Qisis {
     p_pointAprioriRadiusSigma = new QLabel;
     QVBoxLayout * leftLayout = new QVBoxLayout;
     leftLayout->addWidget(p_ptIdValue);
+    leftLayout->addWidget(p_pointType);
     leftLayout->addWidget(p_numMeasures);
     leftLayout->addWidget(p_pointAprioriLatitude);
     leftLayout->addWidget(p_pointAprioriLongitude);
@@ -1612,6 +1615,11 @@ namespace Qisis {
     ptId += (QString) CPId;
     p_ptIdValue->setText(ptId);
 
+    //  Write point type
+    QString ptType("Point Type:  ");
+    ptType += (QString) p_editPoint->GetPointTypeString();
+    p_pointType->setText(ptType);
+
     //  Write number of measures
     QString ptsize = "Number of Measures:  " +
                    QString::number(p_editPoint->GetNumMeasures());
@@ -2788,6 +2796,7 @@ namespace Qisis {
    *           IN QNET ***
    */
   void QnetTool::updatePointInfo(QString pointId) {
+    if (p_editPoint == NULL) return;
     if (pointId != p_editPoint->GetId()) return;
     //  The edit point has been changed by SetApriori, so p_editPoint needs
     //  to possibly update some values.  Need to retain measures from p_editPoint

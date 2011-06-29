@@ -305,6 +305,7 @@ namespace Qisis {
       QLabel *p_groundFilenameLabel;
       QLabel *p_radiusFilenameLabel;
       QLabel *p_ptIdValue;
+      QLabel *p_pointType;
       QLabel *p_numMeasures;
       QLabel *p_pointAprioriLatitude;
       QLabel *p_pointAprioriLongitude;

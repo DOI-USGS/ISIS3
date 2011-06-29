@@ -9,7 +9,14 @@
     <p>
       This program will create and edit control networks.  To run qnet, you will
       need to create a text file containing a list of all cubes in the control
-      network. There are 3 core windows used in this application.
+      network. These cubes must be un-projected, level 1 cubes. Optionally, you 
+      can also input an existing control network or when prompted for the 
+      control network, select the "Cancel" button, and a new control network 
+      will be created.  
+    </p>
+
+    <p>
+      There are 3 core windows used in this application.
     </p>
 
     <h3>qnet window</h3>
@@ -155,10 +162,21 @@
     </pre>
     Other point editor functions / options include the following:
     <pre>
-      <i>In the Options menu:</i>
-        <strong>Registration:</strong> Set or view and save registration 
-        templates.
+
+      <i>In the File menu:</i>
+      <strong>
+        
+      </strong>
+      <i>In the Registration menu:</i>
+        <strong>Open registration template</strong> Set registration template. 
       
+      <strong>View/edit registration template</strong> View, edit and save 
+      registration templates.
+
+      <strong>Save registartion chips</strong> Save the cube chips used
+        to perform registration.  These are usually only used for debugging
+        registration parameters.   
+
       <i>Along the left border of the window:</i>
         <strong>Geom:</strong>  Geom the right view to match the left view 
         
@@ -316,6 +334,9 @@
       pad is activated. Modified to draw points selected in the QnetTool last 
       so they are always visible on top of the other points. Added some 
       documentation.
+    </change>
+    <change name="Tracie Sucharski" date="2011-">
+      
     </change>
   </history>
 </application>
