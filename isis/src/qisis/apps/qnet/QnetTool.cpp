@@ -1757,23 +1757,24 @@ namespace Qisis {
 
     //  Fill in values
     for (int row=0; row<p_editPoint->GetNumMeasures(); row++) {
+      int column = 0;
       ControlMeasure &m = *(*p_editPoint)[row];
+
       QString file = QString::fromStdString(
                        g_serialNumberList->Filename(m.GetCubeSerialNumber()));
-      int col = 0;
       QTableWidgetItem *tableItem = new QTableWidgetItem(QString(file));
-      p_measureTable->setItem(row,col++,tableItem);
+      p_measureTable->setItem(row,column++,tableItem);
 
       tableItem = new QTableWidgetItem(QString(m.GetCubeSerialNumber()));
-      p_measureTable->setItem(row,col++,tableItem);
+      p_measureTable->setItem(row,column++,tableItem);
 
       tableItem = new QTableWidgetItem();
       tableItem->setData(0,m.GetSample());
-      p_measureTable->setItem(row,col++,tableItem);
+      p_measureTable->setItem(row,column++,tableItem);
 
       tableItem = new QTableWidgetItem();
       tableItem->setData(0,m.GetLine());
-      p_measureTable->setItem(row,col++,tableItem);
+      p_measureTable->setItem(row,column++,tableItem);
 
       if (m.GetSampleResidual() == Isis::Null) {  
         tableItem = new QTableWidgetItem(QString("Null"));
@@ -1782,7 +1783,7 @@ namespace Qisis {
         tableItem = new QTableWidgetItem();
         tableItem->setData(0,m.GetSampleResidual());
       }
-      p_measureTable->setItem(row,col++,tableItem);
+      p_measureTable->setItem(row,column++,tableItem);
 
       if (m.GetLineResidual() == Isis::Null) {  
         tableItem = new QTableWidgetItem(QString("Null"));
@@ -1791,7 +1792,7 @@ namespace Qisis {
         tableItem = new QTableWidgetItem();
         tableItem->setData(0,m.GetLineResidual());
       }
-      p_measureTable->setItem(row,col++,tableItem);
+      p_measureTable->setItem(row,column++,tableItem);
 
       if (m.GetResidualMagnitude() == Isis::Null) {
         tableItem = new QTableWidgetItem(QString("Null"));
@@ -1800,7 +1801,7 @@ namespace Qisis {
         tableItem = new QTableWidgetItem();
         tableItem->setData(0,m.GetResidualMagnitude());
       }
-      p_measureTable->setItem(row,col++,tableItem);
+      p_measureTable->setItem(row,column++,tableItem);
 
       double goodnessOfFit = m.GetLogData(
                       ControlMeasureLogData::GoodnessOfFit).GetNumericalValue();
@@ -1811,19 +1812,19 @@ namespace Qisis {
         tableItem = new QTableWidgetItem();
         tableItem->setData(0,goodnessOfFit);
       }
-      p_measureTable->setItem(row,col++,tableItem);
+      p_measureTable->setItem(row,column++,tableItem);
 
       if (m.IsIgnored()) tableItem = new QTableWidgetItem("True");
       if (!m.IsIgnored()) tableItem = new QTableWidgetItem("False");
-      p_measureTable->setItem(row,col++,tableItem);
+      p_measureTable->setItem(row,column++,tableItem);
 
       if (m.IsEditLocked()) tableItem = new QTableWidgetItem("True");
       if (!m.IsEditLocked()) tableItem = new QTableWidgetItem("False");
-      p_measureTable->setItem(row,col++,tableItem);
+      p_measureTable->setItem(row,column++,tableItem);
 
       tableItem = new QTableWidgetItem(QString::fromStdString(
                   ControlMeasure::MeasureTypeToString(m.GetType())));
-      p_measureTable->setItem(row,col++,tableItem);
+      p_measureTable->setItem(row,column++,tableItem);
 
       if (m.GetAprioriSample() == Isis::Null) {
         tableItem = new QTableWidgetItem("Null");
@@ -1832,7 +1833,7 @@ namespace Qisis {
         tableItem = new QTableWidgetItem();
         tableItem->setData(0,m.GetAprioriSample());
       }
-      p_measureTable->setItem(row,col++,tableItem);
+      p_measureTable->setItem(row,column++,tableItem);
 
       if (m.GetAprioriLine() == Isis::Null) {
         tableItem = new QTableWidgetItem("Null");
@@ -1841,7 +1842,18 @@ namespace Qisis {
         tableItem = new QTableWidgetItem();
         tableItem->setData(0,m.GetAprioriLine());
       }
-      p_measureTable->setItem(row,col,tableItem);
+      p_measureTable->setItem(row,column,tableItem);
+
+      //  If reference measure set font on this row to bold
+      if (p_editPoint->IsReferenceExplicit() &&
+          (QString)m.GetCubeSerialNumber() == p_editPoint->GetReferenceSN()) {
+        QFont font;
+        font.setBold(true);
+
+        for (int col=0; col<p_measureTable->columnCount(); col++)
+          p_measureTable->item(row, col)->setFont(font);
+      }
+
     }
 
     p_measureTable->resizeColumnsToContents();
