@@ -35,8 +35,7 @@ commands:
 	  > $(OUTPUT)/residuals.csv
 	cat bundleout_images.csv | sed 's/\/[^,]*\/\([^,\/]*\.cub\)/\1/g' \
 	  > $(OUTPUT)/bundleout_images.csv
-	$(MV) residuals.csv $(OUTPUT)/residuals.csv > /dev/null;
-	$(MV) bundleout_images.csv $(OUTPUT)/bundleout_images.csv > /dev/null;
+	$(RM) residuals.csv bundleout_images.csv > /dev/null;
 	$(MV) bundleout_points.csv $(OUTPUT)/bundleout_points.csv > /dev/null;
 	$(RM) $(OUTPUT)/cub.lis $(OUTPUT)/held.lis $(OUTPUT)/case2OutNet.bin print.prt > /dev/null;
 	$(RM) bundleout.txt case2OutLog.txt print.prt > /dev/null
