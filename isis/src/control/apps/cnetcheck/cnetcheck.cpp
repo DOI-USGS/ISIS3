@@ -10,14 +10,14 @@
 #include <QString>
 #include <QVector>
 
-#include "geos_c.h"
-#include "geos/algorithm/ConvexHull.h"
-#include "geos/geom/CoordinateSequence.h"
-#include "geos/geom/CoordinateArraySequence.h"
-#include "geos/geom/Envelope.h"
-#include "geos/geom/Geometry.h"
-#include "geos/geom/GeometryFactory.h"
-#include "geos/geom/Polygon.h"
+#include <geos_c.h>
+#include <geos/algorithm/ConvexHull.h>
+#include <geos/geom/CoordinateSequence.h>
+#include <geos/geom/CoordinateArraySequence.h>
+#include <geos/geom/Envelope.h>
+#include <geos/geom/Geometry.h>
+#include <geos/geom/GeometryFactory.h>
+#include <geos/geom/Polygon.h>
 
 #include "Camera.h"
 #include "CameraFactory.h"
