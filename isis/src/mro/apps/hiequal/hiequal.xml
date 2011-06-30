@@ -75,102 +75,175 @@
       into the directory of the input cube when TOLIST is on the default 
       setting.  Statistic gathering results are now placed in the print file.
     </change>
+    <change name="Travis Addair" date="2011-06-29">
+      Added new INSTATS option in addition to making the program more similar
+      in functionality to "equalizer" all around.
+    </change>
   </history>
 
   <groups>
     <group name="Files">
-        <parameter name="FROMLIST">
-          <type>filename</type>
-          <fileMode>input</fileMode>
-          <brief>
-              List of cubes to equalize
-          </brief>
-          <description>
-              A list of HiRISE cubes to equalize.  The types (i.e., RED, BG, IR) 
-              must match in order to do the equalization. 
-          </description>
+      <parameter name="FROMLIST">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          List of cubes to equalize
+        </brief>
+        <description>
+          A list of HiRISE cubes to equalize.  The types (i.e., RED, BG, IR) 
+          must match in order to do the equalization. 
+        </description>
 
-        </parameter>
-        <parameter name="HOLDLIST">
-            <type>filename</type>
-            <fileMode>input</fileMode>
+      </parameter>
+      <parameter name="HOLDLIST">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          List of filenames to hold 
+        </brief>
+        <description>
+          List of cubes that are to be held in the equalization.  
+          An additive and a multiplicative factor of 0 and 1 will be applied 
+          to all cubes that were held.  All cubes listed in this file must 
+          also be contained in FROMLIST.
+        </description>
+        <internalDefault>None</internalDefault>
+        <filter>
+          *.txt *.lis *.lst
+        </filter>
+      </parameter>  
+
+      <parameter name="TOLIST">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          The list of the equalized cubes to be created
+        </brief>
+        <description>
+          This list of output files should contain a file to correspond to each 
+          input file.  The output files will be written to the exact location 
+          with the exact name specified unless it happens to be identical to 
+          that of its corresponding input file, in which case an error will be 
+          thrown.  If this file is not specified, but the APPLY option is 
+          still selected, the output cubes will be placed in the directory of
+          its input file, and named the same with the exception of ".equ" 
+          extension (e.g. "foobar.cub" becomes foobar.equ.cub").
+        </description>
+        <internalDefault>Automatic</internalDefault>
+        <filter>
+          *.txt *.lis *.lst
+        </filter>
+      </parameter>  
+
+      <parameter name="OUTSTATS">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Text file containing thorough equalization related statistics
+        </brief>
+        <description>
+          This file will contain the statistics of all of the intersecting 
+          areas along with the computed equalizing factors 
+          (BASE and MULT).  Specifying this output file is optional.  
+        </description>
+        <internalDefault>None</internalDefault>
+        <filter>
+          *.txt *.pvl *.lis *.lst
+        </filter>
+      </parameter>
+
+      <parameter name="INSTATS">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input text file containing thorough equalization-related 
+          statistics, used for applying correction
+        </brief>
+        <description>
+          This file must contain the statistics of all of the overlapping 
+          areas in every band along with the computed equalizing factors 
+          (OFFSET and GAIN) for every image in the FROMLIST.  
+        </description>
+        <filter>
+          *.txt *.pvl *.lis *.lst
+        </filter>
+      </parameter>
+    </group>
+
+    <group name="ProcessingOptions">                           
+      <parameter name="PROCESS">
+        <type>string</type>
+        <brief>
+          Calculate statistics, apply correction, or do both 
+        </brief>
+        <description>
+          This option allows the user to decide whether they want to do the 
+          equalization calculations and then go on to apply correction 
+          afterwards, apply correction to the images off of previously 
+          gathered statistics, or do the calculations but not apply 
+          correction.  If the APPLY option is not selected, you must 
+          specify an OUTSTATS file.  If it is selected you can still 
+          optionally specify an OUTSTATS file and the GAIN/OFFSET values 
+          will be applied to each input cube.  The names and locations of 
+          the output cubes are specified by the TOLIST file.  
+        </description>
+        <default><item>BOTH</item></default>
+        <list>
+          <option value="BOTH">
             <brief>
-                List of filenames to hold 
+              Calculate statistics and apply correction 
             </brief>
             <description>
-                List of cubes that are to be held in the equalization.  
-                An additive and a multiplicative factor of 0 and 1 will be applied 
-                to all cubes that were held.  All cubes listed in this file must 
-                also be contained in FROMLIST.
+              This option will calculate statistics on the images, 
+              then apply correction off of those results. 
             </description>
-            <internalDefault>None</internalDefault>
-            <filter>
-              *.txt *.lis *.lst
-            </filter>
-        </parameter>  
-
-        <parameter name="TOLIST">
-            <type>filename</type>
-            <fileMode>input</fileMode>
+            <exclusions>
+              <item>INSTATS</item>
+            </exclusions>
+          </option>
+          <option value="CALCULATE">
             <brief>
-                The list of the equalized cubes to be created
+              Calculate statistics only
             </brief>
             <description>
-                This list of output files should contain a file to correspond to each 
-                input file.  The output files will be written to the exact location 
-                with the exact name specified unless it happens to be identical to 
-                that of its corresponding input file, in which case an error will be 
-                thrown.  If this file is not specified, but the APPLY option is 
-                still selected, the output cubes will be placed in the directory of
-                its input file, and named the same with the exception of ".equ" 
-                extension (e.g. "foobar.cub" becomes foobar.equ.cub").
+              This option will calculate statistics on the images and 
+              print them to an output PVL file, but not correct them.
             </description>
-            <internalDefault>Automatic</internalDefault>
-            <filter>
-              *.txt *.lis *.lst
-            </filter>
-        </parameter>  
-
-        <parameter name="OUTSTATS">
-          <type>filename</type>
-          <fileMode>output</fileMode>
-          <brief>
-               Text file containing thorough equalization related statistics
-          </brief>
-          <description>
-               This file will contain the statistics of all of the intersecting 
-               areas along with the computed equalizing factors 
-               (BASE and MULT).  Specifying this output file is optional.  
-          </description>
-          <internalDefault>None</internalDefault>
-          <filter>
-            *.txt *.pvl *.lis *.lst
-          </filter>
-        </parameter>
-
-        <parameter name="APPLY">
-            <type>boolean</type>
+            <inclusions>
+              <item>OUTSTATS</item>
+            </inclusions>
+            <exclusions>
+              <item>TOLIST</item>
+              <item>INSTATS</item>
+            </exclusions>
+          </option>
+          <option value="APPLY">
             <brief>
-                Apply correction to the cubes
+              Apply correction only
             </brief>
             <description>
-                This option allows the user to decide whether they want to do the 
-                equalization calculations only, or do the calculations and apply the 
-                correction to the images.  If the APPLY option is not selected, you must
-                specify a TO file.  If it is selected you can still optionally specify a TO file and
-                the MULT/BASE values will be applied to each input cube.  The output cubes
-                will be named the same with the exception of ".equ" extension (e.g. "foobar.cub"
-                becomes "foobar.equ.cub").
+              This option will use previously generated statistics to 
+              apply correction to the images.
             </description>
-              <inclusions>
-                <item>TOLIST</item>
-              </inclusions>
-             <default><item>TRUE</item></default>
-        </parameter>
+            <inclusions>
+              <item>INSTATS</item>
+            </inclusions>
+            <exclusions>
+              <item>HOLDLIST</item>
+              <item>OUTSTATS</item>
+              <item>ADJUST</item>
+              <item>MINCOUNT</item>
+              <item>WEIGHT</item>
+              <item>PERCENT</item>
+            </exclusions>
+          </option>
+
+        </list>
+      </parameter>
     </group>
   </groups>
 
-    <examples>
+  <examples>
     <example>
       <brief> RED Images Equalized </brief>
       <description>

@@ -21,41 +21,45 @@
  */
 
 #include "OverlapNormalization.h"
-#include "iException.h"
+
 #include <iomanip>
 
+#include "iException.h"
+
 using namespace std;
+
 namespace Isis {
 
   /**
    * Constructs an OverlapNormalization object.  Compares and
    * stores the vector, and initializes the basis and least
-   * squares functions.
+   * squares functions.  This object will also take ownership of the pointers
+   * in the vector parameter.
    *
    * @param statsList The list of Statistics objects corresponding
    *                  to specific data sets (e.g., cubes)
    */
-  OverlapNormalization::OverlapNormalization(std::vector<Statistics> statsList) {
-    p_gainFunction = NULL;
-    p_gainLsq = NULL;
-    p_offsetFunction = NULL;
-    p_offsetLsq = NULL;
+  OverlapNormalization::OverlapNormalization(std::vector<Statistics *> statsList) {
+    m_gainFunction = NULL;
+    m_gainLsq = NULL;
+    m_offsetFunction = NULL;
+    m_offsetLsq = NULL;
 
-    p_statsList = statsList;
-    p_gainFunction = new BasisFunction("BasisFunction",
+    m_statsList = statsList;
+    m_gainFunction = new BasisFunction("BasisFunction",
                                        statsList.size(), statsList.size());
-    p_gainLsq = new LeastSquares(*p_gainFunction);
-    p_offsetFunction = new BasisFunction("BasisFunction",
+    m_gainLsq = new LeastSquares(*m_gainFunction);
+    m_offsetFunction = new BasisFunction("BasisFunction",
                                          statsList.size(), statsList.size());
-    p_offsetLsq = new LeastSquares(*p_offsetFunction);
+    m_offsetLsq = new LeastSquares(*m_offsetFunction);
 
-    p_gains.resize(statsList.size());
-    p_offsets.resize(statsList.size());
-    for(unsigned int i = 0; i < statsList.size(); i++) {
-      p_gains[i] = 1.0;
-      p_offsets[i] = 0.0;
+    m_gains.resize(statsList.size());
+    m_offsets.resize(statsList.size());
+    for (unsigned int i = 0; i < statsList.size(); i++) {
+      m_gains[i] = 1.0;
+      m_offsets[i] = 0.0;
     }
-    p_solved = false;
+    m_solved = false;
   }
 
   /**
@@ -63,10 +67,11 @@ namespace Isis {
    * pointers
    */
   OverlapNormalization::~OverlapNormalization() {
-    if(p_gainFunction != NULL) delete p_gainFunction;
-    if(p_offsetFunction != NULL) delete p_offsetFunction;
-    if(p_gainLsq != NULL) delete p_gainLsq;
-    if(p_offsetLsq != NULL) delete p_offsetLsq;
+    if (m_gainFunction != NULL) delete m_gainFunction;
+    if (m_offsetFunction != NULL) delete m_offsetFunction;
+    if (m_gainLsq != NULL) delete m_gainLsq;
+    if (m_offsetLsq != NULL) delete m_offsetLsq;
+    for (unsigned int i = 0; i < m_statsList.size(); i++) delete m_statsList[i];
   };
 
   /**
@@ -99,22 +104,22 @@ namespace Isis {
     const Statistics &area1, const unsigned index1,
     const Statistics &area2, const unsigned index2,
     double weight) {
-    if(index1 >= p_statsList.size()) {
+    if (index1 >= m_statsList.size()) {
       string msg = "The index 1 is outside the bounds of the list.";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
-    if(index2 >=  p_statsList.size()) {
+    if (index2 >=  m_statsList.size()) {
       string msg = "The index 2 is outside the bounds of the list.";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
     // If there is no overlapping area, then the overlap is invalid
-    if(area1.ValidPixels() == 0 || area2.ValidPixels() == 0) {
+    if (area1.ValidPixels() == 0 || area2.ValidPixels() == 0) {
       return NoOverlap;
     }
 
     // The weight must be a positive real number
-    if(weight <= 0.0) {
+    if (weight <= 0.0) {
       string msg = "All weights must be positive real numbers.";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
@@ -129,12 +134,12 @@ namespace Isis {
     double avg2 = area2.Average();
 
     // Averages must not be 0 to avoid messing up least squares
-    if(avg1 == 0 || avg2 == 0) return NoContrast;
+    if (avg1 == 0 || avg2 == 0) return NoContrast;
 
-    p_overlapList.push_back(o);
-    p_deltas.push_back(avg2 - avg1);
-    p_weights.push_back(weight);
-    p_solved = false;
+    m_overlapList.push_back(o);
+    m_deltas.push_back(avg2 - avg1);
+    m_weights.push_back(weight);
+    m_solved = false;
     return Success;
   }
 
@@ -153,7 +158,7 @@ namespace Isis {
    */
   void OverlapNormalization::Solve(SolutionType type) {
     // Make sure that there is at least one overlap
-    if(p_overlapList.size() == 0) {
+    if (m_overlapList.size() == 0) {
       std::string msg = "None of the input images overlap";
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
@@ -161,66 +166,66 @@ namespace Isis {
     // Make sure the number of valid overlaps + hold images is greater than the
     // number of input images (otherwise the least squares equation will be
     // unsolvable due to having more unknowns than knowns)
-    if(p_overlapList.size() + p_idHoldList.size() < p_statsList.size()) {
+    if (m_overlapList.size() + m_idHoldList.size() < m_statsList.size()) {
       std::string msg = "The number of overlaps and holds must be greater than";
       msg += " the number of input images";
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
     // Calculate offsets
-    if(type != Gains) {
+    if (type != Gains) {
       // Add knowns to least squares for each overlap
-      for(int overlap = 0; overlap < (int)p_overlapList.size(); overlap++) {
-        Overlap curOverlap = p_overlapList[overlap];
+      for (int overlap = 0; overlap < (int)m_overlapList.size(); overlap++) {
+        Overlap curOverlap = m_overlapList[overlap];
         int id1 = curOverlap.index1;
         int id2 = curOverlap.index2;
 
         vector<double> input;
-        input.resize(p_statsList.size());
-        for(int i = 0; i < (int)input.size(); i++) input[i] = 0.0;
+        input.resize(m_statsList.size());
+        for (int i = 0; i < (int)input.size(); i++) input[i] = 0.0;
         input[id1] = 1.0;
         input[id2] = -1.0;
 
-        p_offsetLsq->AddKnown(input, p_deltas[overlap], p_weights[overlap]);
+        m_offsetLsq->AddKnown(input, m_deltas[overlap], m_weights[overlap]);
       }
 
       // Add a known to the least squares for each hold image
-      for(int h = 0; h < (int)p_idHoldList.size(); h++) {
-        int hold = p_idHoldList[h];
+      for (int h = 0; h < (int)m_idHoldList.size(); h++) {
+        int hold = m_idHoldList[h];
 
         vector<double> input;
-        input.resize(p_statsList.size());
-        for(int i = 0; i < (int)input.size(); i++) input[i] = 0.0;
+        input.resize(m_statsList.size());
+        for (int i = 0; i < (int)input.size(); i++) input[i] = 0.0;
         input[hold] = 1.0;
-        p_offsetLsq->AddKnown(input, 0.0, 1e30);
+        m_offsetLsq->AddKnown(input, 0.0, 1e30);
       }
 
       // Solve the least squares and get the offset coefficients to apply to the
       // images
-      p_offsets.resize(p_statsList.size());
-      p_offsetLsq->Solve(Isis::LeastSquares::QRD);
-      for(int i = 0; i < p_offsetFunction->Coefficients(); i++) {
-        p_offsets[i] = p_offsetFunction->Coefficient(i);
+      m_offsets.resize(m_statsList.size());
+      m_offsetLsq->Solve(Isis::LeastSquares::QRD);
+      for (int i = 0; i < m_offsetFunction->Coefficients(); i++) {
+        m_offsets[i] = m_offsetFunction->Coefficient(i);
       }
     }
 
     // Calculate Gains
-    if(type != Offsets) {
+    if (type != Offsets) {
       // Add knowns to least squares for each overlap
-      for(int overlap = 0; overlap < (int)p_overlapList.size(); overlap++) {
-        Overlap curOverlap = p_overlapList[overlap];
+      for (int overlap = 0; overlap < (int)m_overlapList.size(); overlap++) {
+        Overlap curOverlap = m_overlapList[overlap];
         int id1 = curOverlap.index1;
         int id2 = curOverlap.index2;
 
         vector<double> input;
-        input.resize(p_statsList.size());
-        for(int i = 0; i < (int)input.size(); i++) input[i] = 0.0;
+        input.resize(m_statsList.size());
+        for (int i = 0; i < (int)input.size(); i++) input[i] = 0.0;
         input[id1] = 1.0;
         input[id2] = -1.0;
 
         double tanp;
 
-        if(curOverlap.area1.StandardDeviation() == 0.0) {
+        if (curOverlap.area1.StandardDeviation() == 0.0) {
           tanp = 0.0;    // Set gain to 1.0
         }
         else {
@@ -228,35 +233,35 @@ namespace Isis {
                  / curOverlap.area1.StandardDeviation();
         }
 
-        if(tanp > 0.0) {
-          p_gainLsq->AddKnown(input, log(tanp), p_weights[overlap]);
+        if (tanp > 0.0) {
+          m_gainLsq->AddKnown(input, log(tanp), m_weights[overlap]);
         }
         else {
-          p_gainLsq->AddKnown(input, 0.0, 1e30); // Set gain to 1.0
+          m_gainLsq->AddKnown(input, 0.0, 1e30); // Set gain to 1.0
         }
       }
 
       // Add a known to the least squares for each hold image
-      for(int h = 0; h < (int)p_idHoldList.size(); h++) {
-        int hold = p_idHoldList[h];
+      for (int h = 0; h < (int)m_idHoldList.size(); h++) {
+        int hold = m_idHoldList[h];
 
         vector<double> input;
-        input.resize(p_statsList.size());
-        for(int i = 0; i < (int)input.size(); i++) input[i] = 0.0;
+        input.resize(m_statsList.size());
+        for (int i = 0; i < (int)input.size(); i++) input[i] = 0.0;
         input[hold] = 1.0;
-        p_gainLsq->AddKnown(input, 0.0, 1e30);
+        m_gainLsq->AddKnown(input, 0.0, 1e30);
       }
 
       // Solve the least squares and get the gain coefficients to apply to the
       // images
-      p_gains.resize(p_statsList.size());
-      p_gainLsq->Solve(Isis::LeastSquares::QRD);
-      for(int i = 0; i < p_gainFunction->Coefficients(); i++) {
-        p_gains[i] = exp(p_gainFunction->Coefficient(i));
+      m_gains.resize(m_statsList.size());
+      m_gainLsq->Solve(Isis::LeastSquares::QRD);
+      for (int i = 0; i < m_gainFunction->Coefficients(); i++) {
+        m_gains[i] = exp(m_gainFunction->Coefficient(i));
       }
     }
 
-    p_solved = true;
+    m_solved = true;
   }
 
   /**
@@ -272,12 +277,12 @@ namespace Isis {
    *             exist in the statsList
    */
   double OverlapNormalization::Average(const unsigned index) const {
-    if(index >= p_statsList.size()) {
+    if (index >= m_statsList.size()) {
       string msg = "The index was out of bounds for the list of statistics.";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
-    return p_statsList[index].Average();
+    return m_statsList[index]->Average();
   }
 
   /**
@@ -293,12 +298,12 @@ namespace Isis {
    *             exist in the statsList
    */
   double OverlapNormalization::Gain(const unsigned index) const {
-    if(index >= p_statsList.size()) {
+    if (index >= m_statsList.size()) {
       string msg = "The index was out of bounds for the list of statistics.";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
-    return p_gains[index];
+    return m_gains[index];
   }
 
   /**
@@ -314,12 +319,12 @@ namespace Isis {
    *             exist in the statsList
    */
   double OverlapNormalization::Offset(const unsigned index) const {
-    if(index >= p_statsList.size()) {
+    if (index >= m_statsList.size()) {
       string msg = "The index was out of bounds for the list of statistics.";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
-    return p_offsets[index];
+    return m_offsets[index];
   }
 
   /**
@@ -337,13 +342,13 @@ namespace Isis {
    *             must be solved before returning the gain
    */
   double OverlapNormalization::Evaluate(double dn, unsigned index) const {
-    if(!p_solved) {
+    if (!m_solved) {
       string msg = "The least squares equation has not been successfully ";
       msg += "solved yet.";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
-    if(Isis::IsSpecial(dn)) return dn;
+    if (Isis::IsSpecial(dn)) return dn;
     return (dn - Average(index)) * Gain(index) + Average(index) + Offset(index);
   }
 }

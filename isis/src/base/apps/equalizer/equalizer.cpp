@@ -1,19 +1,21 @@
 #include "Isis.h"
 
-#include "ProcessByLine.h"
-#include "SpecialPixel.h"
+#include <cmath>
+
+#include "jama/jama_svd.h"
+#include "tnt/tnt_array2d.h"
+
+#include "CubeAttribute.h"
 #include "Equalization.h"
 #include "FileList.h"
 #include "Filename.h"
-#include "OverlapStatistics.h"
 #include "LineManager.h"
 #include "MultivariateStatistics.h"
-#include "iString.h"
 #include "OverlapNormalization.h"
-#include "CubeAttribute.h"
-#include "tnt/tnt_array2d.h"
-#include "jama/jama_svd.h"
-#include <cmath>
+#include "OverlapStatistics.h"
+#include "ProcessByLine.h"
+#include "SpecialPixel.h"
+#include "iString.h"
 
 using namespace Isis;
 using namespace std;
@@ -61,8 +63,7 @@ void IsisMain() {
       sType = OverlapNormalization::Offsets;
     }
 
-    vector<OverlapStatistics> overlapStats =
-      equalizer.calculateStatistics(sampPercent, mincnt, wtopt, sType);
+    equalizer.calculateStatistics(sampPercent, mincnt, wtopt, sType);
 
     // Write the results to the log
     PvlGroup results = equalizer.getResults();
@@ -70,7 +71,7 @@ void IsisMain() {
 
     // Setup the output text file if the user requested one
     if (ui.WasEntered("OUTSTATS")) {
-      equalizer.write(ui.GetFilename("OUTSTATS"), &overlapStats);
+      equalizer.write(ui.GetFilename("OUTSTATS"));
     }
   }
   else {

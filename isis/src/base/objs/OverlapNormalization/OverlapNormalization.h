@@ -70,7 +70,7 @@ namespace Isis {
   class OverlapNormalization {
     public:
 
-      OverlapNormalization(std::vector<Statistics> statsList);
+      OverlapNormalization(std::vector<Statistics *> statsList);
 
       virtual ~OverlapNormalization();
 
@@ -110,7 +110,7 @@ namespace Isis {
        *                  Statistics objects to be held
        */
       inline void AddHold(unsigned holdIndex) {
-        p_idHoldList.push_back(holdIndex);
+        m_idHoldList.push_back(holdIndex);
       };
 
       /**
@@ -148,13 +148,13 @@ namespace Isis {
       /**
        * Vector of Statistics objects for each data set
        */
-      std::vector<Statistics> p_statsList;
+      std::vector<Statistics *> m_statsList;
 
       /**
-       * Vector of indices corresponding to the p_statsList vector
+       * Vector of indices corresponding to the m_statsList vector
        * representing data sets to be held in solution
        */
-      std::vector<int> p_idHoldList;
+      std::vector<int> m_idHoldList;
 
       /**
        * Store statistics pertaining to the overlapping areas and
@@ -175,13 +175,13 @@ namespace Isis {
           Statistics area2;
 
           /**
-           * Index corresponding to p_statsList for the first
+           * Index corresponding to m_statsList for the first
            * overlapping data set
            */
           int index1;
 
           /**
-           * Index corresponding to p_statsList for the second
+           * Index corresponding to m_statsList for the second
            * overlapping data set
            */
           int index2;
@@ -190,61 +190,61 @@ namespace Isis {
       /**
        * Vector of valid overlaps collected
        */
-      std::vector<Overlap> p_overlapList;
+      std::vector<Overlap> m_overlapList;
 
       /**
        * Vector of delta values (differences between the averages of
        * two overlapping data sets) for every valid overlap
        */
-      std::vector<double> p_deltas;
+      std::vector<double> m_deltas;
 
       /**
        * Vector of weights for every valid overlap
        */
-      std::vector<double> p_weights;
+      std::vector<double> m_weights;
 
 
       /**
        * Whether or not the least squares solution has been solved
        */
-      bool p_solved;
+      bool m_solved;
 
       /**
        * Whether the user of this class wants to solve for the
        * offsets, the gains, or both
        */
-      SolutionType p_solutionType;
+      SolutionType m_solutionType;
 
       /**
        * Vector of calculated gains filled by the Solve method
        */
-      std::vector<double> p_gains;
+      std::vector<double> m_gains;
 
       /**
        * Vector of calculated offsets filled by the Solve method
        */
-      std::vector<double> p_offsets;
+      std::vector<double> m_offsets;
 
 
       /**
        * The gain function to be solved
        */
-      Isis::BasisFunction *p_gainFunction;
+      Isis::BasisFunction *m_gainFunction;
 
       /**
        * The offset function to be solved
        */
-      Isis::BasisFunction *p_offsetFunction;
+      Isis::BasisFunction *m_offsetFunction;
 
       /**
        * The least squares object that solves for the new gains
        */
-      Isis::LeastSquares *p_gainLsq;
+      Isis::LeastSquares *m_gainLsq;
 
       /**
        * The least squares object that calculates offsets
        */
-      Isis::LeastSquares *p_offsetLsq;
+      Isis::LeastSquares *m_offsetLsq;
 
       //! Cannot copy this object
       OverlapNormalization &operator=(const OverlapNormalization &);

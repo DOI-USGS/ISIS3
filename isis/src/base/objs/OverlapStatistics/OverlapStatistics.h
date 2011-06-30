@@ -77,17 +77,17 @@ namespace Isis {
        * @returns bool Returns true if the cubes overlap in the specified band,
        *               and false if they do not overlap
        */
-      bool HasOverlap(int band) {
+      bool HasOverlap(int band) const {
         return (p_stats[band-1].ValidPixels() > 0);
       };
-      bool HasOverlap();
+      bool HasOverlap() const;
 
       /**
        * Returns the filename of the first cube
        *
        * @return string The name of the first cube
        */
-      Isis::Filename FilenameX() {
+      Isis::Filename FilenameX() const {
         return p_xFile;
       };
 
@@ -96,7 +96,7 @@ namespace Isis {
        *
        * @return string The name of the second cube
        */
-      Isis::Filename FilenameY() {
+      Isis::Filename FilenameY() const {
         return p_yFile;
       };
 
@@ -111,7 +111,7 @@ namespace Isis {
        *         containing all data from both cubes in the overlapping area from
        *         the specified band
        */
-      Isis::MultivariateStatistics GetMStats(int band) {
+      Isis::MultivariateStatistics GetMStats(int band) const {
         return p_stats[band-1];
       };
 
@@ -120,7 +120,7 @@ namespace Isis {
        *
        * @return int The number of lines in the overlapping area
        */
-      int Lines() {
+      int Lines() const {
         return p_lineRange;
       };
 
@@ -129,7 +129,7 @@ namespace Isis {
        *
        * @return int The number of samples in the overlapping area
        */
-      int Samples() {
+      int Samples() const {
         return p_sampRange;
       };
 
@@ -138,7 +138,7 @@ namespace Isis {
        *
        * @return int The number of bands both cubes have
        */
-      int Bands() {
+      int Bands() const {
         return p_bands;
       };
 
@@ -147,7 +147,7 @@ namespace Isis {
        *
        * @return int The percentage of lines sampled
        */
-      double SampPercent() {
+      double SampPercent() const {
         return p_sampPercent;
       };
 
@@ -156,7 +156,7 @@ namespace Isis {
        *
        * @return int The starting sample of the overlap in the first cube
        */
-      int StartSampleX() {
+      int StartSampleX() const {
         return p_minSampX;
       };
 
@@ -165,7 +165,7 @@ namespace Isis {
        *
        * @return int The ending sample of the overlap in the first cube
        */
-      int EndSampleX() {
+      int EndSampleX() const {
         return p_maxSampX;
       };
 
@@ -174,7 +174,7 @@ namespace Isis {
        *
        * @return int The starting line of the overlap in the first cube
        */
-      int StartLineX() {
+      int StartLineX() const {
         return p_minLineX;
       };
 
@@ -183,7 +183,7 @@ namespace Isis {
        *
        * @return int The ending line of the overlap in the first cube
        */
-      int EndLineX() {
+      int EndLineX() const {
         return p_maxLineX;
       };
 
@@ -192,7 +192,7 @@ namespace Isis {
        *
        * @return int The starting sample of the overlap in the second cube
        */
-      int StartSampleY() {
+      int StartSampleY() const {
         return p_minSampY;
       };
 
@@ -201,7 +201,7 @@ namespace Isis {
        *
        * @return int The ending sample of the overlap in the second cube
        */
-      int EndSampleY() {
+      int EndSampleY() const {
         return p_maxSampY;
       };
 
@@ -210,7 +210,7 @@ namespace Isis {
        *
        * @return int The starting line of the overlap in the second cube
        */
-      int StartLineY() {
+      int StartLineY() const {
         return p_minLineY;
       };
 
@@ -219,7 +219,7 @@ namespace Isis {
        *
        * @return int The ending line of the overlap in the second cube
        */
-      int EndLineY() {
+      int EndLineY() const {
         return p_maxLineY;
       };
 
@@ -240,9 +240,11 @@ namespace Isis {
        *
        * @return bool Is minimum requirement met
        */
-      bool IsValid(unsigned int band) {
+      bool IsValid(unsigned int band) const {
         return GetMStats(band).ValidPixels() > p_mincnt;
       };
+
+      PvlObject toPvl() const;
 
 
     private:

@@ -35,13 +35,15 @@ namespace Isis {
   class Buffer;
   class Cube;
   class FileList;
+  class OverlapNormalization;
   class OverlapStatistics;
+  class Pvl;
   class PvlGroup;
   class Statistics;
 
 
   class Equalization {
-    private:
+    protected:
       class ImageAdjustment {
         public:
           ImageAdjustment() {}
@@ -84,9 +86,30 @@ namespace Isis {
           std::vector<double> avgs;
       };
 
-      class EqualizationFunctor {
+      class CalculateFunctor {
         public:
-          EqualizationFunctor(const ImageAdjustment *adjustment) {
+          CalculateFunctor(Statistics *stats, double percent) {
+            m_stats = stats;
+            m_linc = (int) (100.0 / percent + 0.5);
+            m_line = 0;
+          }
+
+          virtual ~CalculateFunctor() {}
+
+          void operator()(Buffer &in);
+
+        protected:
+          virtual void addStats(Buffer &in);
+
+        private:
+          Statistics *m_stats;
+          int m_linc;
+          int m_line;
+      };
+
+      class ApplyFunctor {
+        public:
+          ApplyFunctor(const ImageAdjustment *adjustment) {
             m_adjustment = adjustment;
           }
 
@@ -96,33 +119,52 @@ namespace Isis {
           const ImageAdjustment *m_adjustment;
       };
 
+      Equalization();
+
     public:
       Equalization(std::string fromListName);
       virtual ~Equalization();
 
       void addHolds(std::string holdListName);
 
-      std::vector<OverlapStatistics> calculateStatistics(
-          double sampPercent, int mincnt, bool wtopt, int sType);
+      void calculateStatistics(double sampPercent, int mincnt,
+          bool wtopt, int sType);
       void importStatistics(std::string instatsFileName);
       void applyCorrection(std::string toListName);
 
       PvlGroup getResults();
-      void write(std::string outstatsFileName,
-          std::vector<OverlapStatistics> *overlapStats=NULL);
+      void write(std::string outstatsFileName);
 
       double evaluate(double dn, int imageIndex, int bandIndex) const;
 
-    private:
+    protected:
+      void loadInputs(std::string fromListName);
+      void setInput(int index, std::string value);
+      const FileList & getInputs() const;
+
+      virtual void fillOutList(FileList &outList, std::string toListName);
+      virtual void errorCheck(std::string fromListName);
+
+      void generateOutputs(FileList &outList);
       void loadOutputs(FileList &outList, std::string toListName);
+      void loadHolds(OverlapNormalization *oNorm);
+
+      void setResults(std::vector<OverlapStatistics> &overlapStats);
+      void setResults();
+
+      void clearAdjustments();
+      void addAdjustment(ImageAdjustment *adjustment);
+
+      void addValid(int count);
+      void addInvalid(int count);
+
+    private:
+      void init();
       std::vector<int> validateInputStatistics(std::string instatsFileName);
-      Statistics getBandStatistics(Cube &icube, const int band,
-          double sampPercent, std::string maxCubeStr);
-      void apply(Buffer &in, Buffer &out);
 
       FileList m_imageList;
-      std::vector<ImageAdjustment *> adjustments;
-      std::vector<int> hold;
+      std::vector<ImageAdjustment *> m_adjustments;
+      std::vector<int> m_holdIndices;
 
       int m_validCnt;
       int m_invalidCnt;
@@ -130,9 +172,10 @@ namespace Isis {
       int m_mincnt;
       bool m_wtopt;
 
-      int m_currentImage;
       int m_maxCube;
       int m_maxBand;
+
+      Pvl *m_results;
   };
 };
 

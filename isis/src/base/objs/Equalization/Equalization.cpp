@@ -4,13 +4,13 @@
 
 #include "Buffer.h"
 #include "Cube.h"
-#include "iException.h"
 #include "LineManager.h"
 #include "OverlapNormalization.h"
 #include "OverlapStatistics.h"
 #include "Process.h"
 #include "ProcessByLine.h"
 #include "Projection.h"
+#include "iException.h"
 
 using std::string;
 using std::vector;
@@ -19,60 +19,25 @@ using std::vector;
 namespace Isis {
 
 
+  Equalization::Equalization() {
+    init();
+  }
+
+
   Equalization::Equalization(string fromListName) {
-    m_validCnt = 0;
-    m_invalidCnt = 0;
-
-    m_mincnt = 0;
-    m_wtopt = false;
-
-    m_currentImage = 0;
-    m_maxCube = 0;
-    m_maxBand = 0;
-
-    // Get the list of cubes to mosaic
-    m_imageList.Read(fromListName);
-    if (m_imageList.size() < 1) {
-      string msg = "The list file [" + fromListName +
-        "] does not contain any data";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
-    }
-
-    // Make sure number of bands and projection parameters match for all cubes
-    for (unsigned int i = 0; i < m_imageList.size(); i++) {
-      Cube cube1;
-      cube1.open(m_imageList[i]);
-      m_maxBand = cube1.getBandCount();
-
-      for (unsigned int j = (i + 1); j < m_imageList.size(); j++) {
-        Cube cube2;
-        cube2.open(m_imageList[j]);
-
-        // Make sure number of bands match
-        if (m_maxBand != cube2.getBandCount()) {
-          string msg = "Number of bands do not match between cubes [" +
-            m_imageList[i] + "] and [" + m_imageList[j] + "]";
-          throw iException::Message(iException::User, msg, _FILEINFO_);
-        }
-
-        //Create projection from each cube
-        Projection *proj1 = cube1.getProjection();
-        Projection *proj2 = cube2.getProjection();
-
-        // Test to make sure projection parameters match
-        if (*proj1 != *proj2) {
-          string msg = "Mapping groups do not match between cubes [" +
-            m_imageList[i] + "] and [" + m_imageList[j] + "]";
-          throw iException::Message(iException::User, msg, _FILEINFO_);
-        }
-      }
-    }
+    init();
+    loadInputs(fromListName);
   }
 
 
   Equalization::~Equalization() {
-    adjustments.clear();
-    hold.clear();
+    clearAdjustments();
+    m_holdIndices.clear();
+
+    if (m_results != NULL) {
+      delete m_results;
+      m_results = NULL;
+    }
   }
 
 
@@ -80,13 +45,19 @@ namespace Isis {
     FileList holdList;
     holdList.Read(holdListName);
 
+    if (holdList.size() > m_imageList.size()) {
+      string msg = "The list of identifiers to be held must be less than or ";
+      msg += "equal to the total number of identitifers.";
+      throw iException::Message(iException::User, msg, _FILEINFO_);
+    }
+
     // Make sure each file in the holdlist matches a file in the fromlist
-    for (int i = 0; i < (int) holdList.size(); i++) {
+    for (unsigned int i = 0; i < holdList.size(); i++) {
       bool matched = false;
-      for (int j = 0; j < (int) m_imageList.size(); j++) {
+      for (unsigned int j = 0; j < m_imageList.size(); j++) {
         if (holdList[i] == m_imageList[j]) {
           matched = true;
-          hold.push_back(j);
+          m_holdIndices.push_back(j);
           break;
         }
       }
@@ -99,47 +70,56 @@ namespace Isis {
   }
 
 
-  vector<OverlapStatistics> Equalization::calculateStatistics(
-      double sampPercent, int mincnt, bool wtopt, int sType) {
+  void Equalization::calculateStatistics(double percent, int mincnt,
+      bool wtopt, int sType) {
 
-    adjustments.clear();
+    clearAdjustments();
 
     m_mincnt = mincnt;
     m_wtopt = wtopt;
 
-    // Loop through all the input cubes, calculating statistics for each cube to use later
-    iString maxCubeStr((int) m_imageList.size());
+    // Loop through all the input cubes, calculating statistics for each cube
+    // to use later
     vector<OverlapNormalization *> oNormList;
     for (int band = 1; band <= m_maxBand; band++) {
-      vector<Statistics> statsList;
+      vector<Statistics *> statsList;
       for (int img = 0; img < (int) m_imageList.size(); img++) {
-        Process p;
-        const CubeAttributeInput att;
+        ProcessByLine p;
+        iString bandStr(band);
+        string statMsg = "Calculating Statistics for Band " + bandStr +
+          " of " + iString(m_maxBand) + " in Cube " + iString(img + 1) +
+          " of " + iString(m_maxCube);
+        p.Progress()->SetText(statMsg);
+        CubeAttributeInput att("+" + bandStr);
         const string inp = m_imageList[img];
-        Cube *icube = p.SetInputCube(inp, att);
+        p.SetInputCube(inp, att);
 
-        // Add a Statistics object to the list for every band of every input cube
-        m_currentImage = img;
-        Statistics stats = getBandStatistics(*icube, band, sampPercent, maxCubeStr);
-        statsList.push_back(stats);
+        Statistics *stats = new Statistics();
+
+        CalculateFunctor func(stats, percent);
+        p.StartProcessInPlace(func);
         p.EndProcess();
+
+        statsList.push_back(stats);
       }
 
       // Create a separate OverlapNormalization object for every band
       OverlapNormalization *oNorm = new OverlapNormalization(statsList);
-      for (int h = 0; h < (int)hold.size(); h++) oNorm->AddHold(hold[h]);
+      loadHolds(oNorm);
       oNormList.push_back(oNorm);
     }
 
-    // A list for keeping track of which input cubes are known to overlap another
+    // A list for keeping track of which input cubes are known to overlap
+    // another
     vector<bool> doesOverlapList;
-    for (unsigned int i = 0; i < m_imageList.size(); i++) doesOverlapList.push_back(false);
+    for (unsigned int i = 0; i < m_imageList.size(); i++)
+      doesOverlapList.push_back(false);
 
-    // Find overlapping areas and add them to the set of known overlaps for each
-    // band shared amongst cubes
+    // Find overlapping areas and add them to the set of known overlaps for
+    // each band shared amongst cubes
     vector<OverlapStatistics> overlapList;
     for (unsigned int i = 0; i < m_imageList.size(); i++) {
-      adjustments.push_back(new ImageAdjustment());
+      addAdjustment(new ImageAdjustment());
 
       Cube cube1;
       cube1.open(m_imageList[i]);
@@ -150,10 +130,11 @@ namespace Isis {
         iString cubeStr1((int)(i + 1));
         iString cubeStr2((int)(j + 1));
         string statMsg = "Gathering Overlap Statisitcs for Cube " +
-                         cubeStr1 + " vs " + cubeStr2 + " of " + maxCubeStr;
+                         cubeStr1 + " vs " + cubeStr2 + " of " +
+                         iString(m_maxCube);
 
         // Get overlap statistics for cubes
-        OverlapStatistics oStats(cube1, cube2, statMsg, sampPercent);
+        OverlapStatistics oStats(cube1, cube2, statMsg, percent);
 
         // Only push the stats onto the oList vector if there is an overlap in at
         // least one of the bands
@@ -168,7 +149,7 @@ namespace Isis {
 
             // Make sure overlap has at least MINCOUNT pixels and add
             if (oStats.GetMStats(band).ValidPixels() >= mincnt) {
-              oNormList[band-1]->AddOverlap(
+              oNormList[band - 1]->AddOverlap(
                   oStats.GetMStats(band).X(), i,
                   oStats.GetMStats(band).Y(), j, weight);
               doesOverlapList[i] = true;
@@ -199,22 +180,74 @@ namespace Isis {
     for (int band = 0; band < m_maxBand; band++) {
       oNormList[band]->Solve((OverlapNormalization::SolutionType) sType);
 
-      for (unsigned int img = 0; img < adjustments.size(); img++) {
-        adjustments[img]->addGain(oNormList[band]->Gain(img));
-        adjustments[img]->addOffset(oNormList[band]->Offset(img));
-        adjustments[img]->addAverage(oNormList[band]->Average(img));
+      for (unsigned int img = 0; img < m_adjustments.size(); img++) {
+        m_adjustments[img]->addGain(oNormList[band]->Gain(img));
+        m_adjustments[img]->addOffset(oNormList[band]->Offset(img));
+        m_adjustments[img]->addAverage(oNormList[band]->Average(img));
       }
     }
 
     // Compute the number valid and invalid overlaps
     for (unsigned int o = 0; o < overlapList.size(); o++) {
       for (int band = 1; band <= m_maxBand; band++) {
-        if (overlapList[o].IsValid(band)) m_validCnt++;
-        else m_invalidCnt++;
+        (overlapList[o].IsValid(band)) ? m_validCnt++ : m_invalidCnt++;
       }
     }
 
-    return overlapList;
+    setResults(overlapList);
+  }
+
+
+  void Equalization::setResults(vector<OverlapStatistics> &overlapStats) {
+    setResults();
+
+    for (unsigned int i = 0; i < overlapStats.size(); i++) {
+      m_results->AddObject(overlapStats[i].toPvl());
+    }
+  }
+
+
+  void Equalization::setResults() {
+    if (m_results != NULL) {
+      delete m_results;
+      m_results = NULL;
+    }
+
+    m_results = new Pvl();
+    m_results->SetTerminator("");
+
+    PvlObject equ("EqualizationInformation");
+    PvlGroup gen("General");
+    gen += PvlKeyword("TotalOverlaps", m_validCnt + m_invalidCnt);
+    gen += PvlKeyword("ValidOverlaps", m_validCnt);
+    gen += PvlKeyword("InvalidOverlaps", m_invalidCnt);
+    gen += PvlKeyword("Weighted", (m_wtopt) ? "true" : "false");
+    gen += PvlKeyword("MinCount", m_mincnt);
+    equ.AddGroup(gen);
+    for (unsigned int img = 0; img < m_imageList.size(); img++) {
+      // Format and name information
+      PvlGroup norm("Normalization");
+      norm.AddComment("Formula: newDN = (oldDN - AVERAGE) * GAIN + AVERAGE + OFFSET");
+      norm.AddComment("BandN = (GAIN, OFFSET, AVERAGE)");
+      norm += PvlKeyword("FileName", m_imageList[img]);
+
+      // Band by band statistics
+      for (int band = 1; band <= m_maxBand; band++) {
+        iString mult(m_adjustments[img]->getGain(band - 1));
+        iString base(m_adjustments[img]->getOffset(band - 1));
+        iString avg(m_adjustments[img]->getAverage(band - 1));
+        iString bandNum(band);
+        string bandStr = "Band" + bandNum;
+        PvlKeyword bandStats(bandStr);
+        bandStats += mult;
+        bandStats += base;
+        bandStats += avg;
+        norm += bandStats;
+      }
+      equ.AddGroup(norm);
+    }
+
+    m_results->AddObject(equ);
   }
 
 
@@ -222,7 +255,7 @@ namespace Isis {
     // Check for errors with the input statistics
     vector<int> normIndices = validateInputStatistics(instatsFileName);
 
-    adjustments.clear();
+    clearAdjustments();
     for (int img = 0; img < (int) m_imageList.size(); img++) {
       // Apply correction based on pre-determined statistics information
       Pvl inStats(instatsFileName);
@@ -240,49 +273,35 @@ namespace Isis {
         adjustment->addAverage(normalization[band][2]);
       }
 
-      adjustments.push_back(adjustment);
+      addAdjustment(adjustment);
     }
   }
 
 
   void Equalization::applyCorrection(string toListName="") {
     FileList outList;
-    if (!toListName.empty()) {
-      loadOutputs(outList, toListName);
-    }
+    fillOutList(outList, toListName);
 
     iString maxCubeStr((int) m_imageList.size());
-    for (int img = 0; img < (int) m_imageList.size(); img++) {
+    for (unsigned int img = 0; img < m_imageList.size(); img++) {
       // Set up for progress bar
       ProcessByLine p;
-      iString curCubeStr(img + 1);
-      p.Progress()->SetText("Equalizing Cube " + curCubeStr + " of " + maxCubeStr);
+      p.Progress()->SetText("Equalizing Cube " + iString((int) img + 1) +
+          " of " + maxCubeStr);
 
       // Open input cube
       CubeAttributeInput att;
       const string inp = m_imageList[img];
       Cube *icube = p.SetInputCube(inp, att);
 
-      // Establish the output file depending upon whether or not a to list
-      // was entered
-      // TODO move this out of the loop, don't use file list
-      string out;
-      if (outList.size() > 0) {
-        out = outList[img];
-      }
-      else {
-        Filename file = m_imageList[img];
-        out = file.Path() + "/" + file.Basename() + ".equ." + file.Extension();
-      }
-
       // Allocate output cube
+      string out = outList[img];
       CubeAttributeOutput outAtt;
       p.SetOutputCube(out, outAtt, icube->getSampleCount(),
           icube->getLineCount(), icube->getBandCount());
 
       // Apply gain/offset to the image
-      m_currentImage = img;
-      EqualizationFunctor func(adjustments[m_currentImage]);
+      ApplyFunctor func(m_adjustments[img]);
       p.StartProcessIO(func);
       p.EndProcess();
     }
@@ -295,9 +314,7 @@ namespace Isis {
     results += PvlKeyword("TotalOverlaps", m_validCnt + m_invalidCnt);
     results += PvlKeyword("ValidOverlaps", m_validCnt);
     results += PvlKeyword("InvalidOverlaps", m_invalidCnt);
-    string weightStr = "false";
-    if (m_wtopt) weightStr = "true";
-    results += PvlKeyword("Weighted", weightStr);
+    results += PvlKeyword("Weighted", (m_wtopt) ? "true" : "false");
     results += PvlKeyword("MinCount", m_mincnt);
 
     // Name and band modifiers for each image
@@ -306,9 +323,9 @@ namespace Isis {
 
       // Band by band statistics
       for (int band = 1; band <= m_maxBand; band++) {
-        iString mult(adjustments[img]->getGain(band - 1));
-        iString base(adjustments[img]->getOffset(band - 1));
-        iString avg(adjustments[img]->getAverage(band - 1));
+        iString mult(m_adjustments[img]->getGain(band - 1));
+        iString base(m_adjustments[img]->getOffset(band - 1));
+        iString avg(m_adjustments[img]->getAverage(band - 1));
         iString bandNum(band);
         string bandStr = "Band" + bandNum;
         PvlKeyword bandStats(bandStr);
@@ -323,65 +340,91 @@ namespace Isis {
   }
 
 
-  void Equalization::write(string outstatsFileName,
-      vector<OverlapStatistics> *overlapStats) {
-
-    PvlObject equ("EqualizationInformation");
-    PvlGroup gen("General");
-    gen += PvlKeyword("TotalOverlaps", m_validCnt + m_invalidCnt);
-    gen += PvlKeyword("ValidOverlaps", m_validCnt);
-    gen += PvlKeyword("InvalidOverlaps", m_invalidCnt);
-    string weightStr = "false";
-    if (m_wtopt) weightStr = "true";
-    gen += PvlKeyword("Weighted", weightStr);
-    gen += PvlKeyword("MinCount", m_mincnt);
-    equ.AddGroup(gen);
-    for (unsigned int img = 0; img < m_imageList.size(); img++) {
-      // Format and name information
-      PvlGroup norm("Normalization");
-      norm.AddComment("Formula: newDN = (oldDN - AVERAGE) * GAIN + AVERAGE + OFFSET");
-      norm.AddComment("BandN = (GAIN, OFFSET, AVERAGE)");
-      norm += PvlKeyword("FileName", m_imageList[img]);
-
-      // Band by band statistics
-      for (int band = 1; band <= m_maxBand; band++) {
-        iString mult(adjustments[img]->getGain(band - 1));
-        iString base(adjustments[img]->getOffset(band - 1));
-        iString avg(adjustments[img]->getAverage(band - 1));
-        iString bandNum(band);
-        string bandStr = "Band" + bandNum;
-        PvlKeyword bandStats(bandStr);
-        bandStats += mult;
-        bandStats += base;
-        bandStats += avg;
-        norm += bandStats;
-      }
-      equ.AddGroup(norm);
-    }
-
+  void Equalization::write(string outstatsFileName) {
     // Write the equalization and overlap statistics to the file
-    string out = Filename(outstatsFileName).Expanded();
-    ofstream os;
-    os.open(out.c_str(), ios::app);
-    Pvl p;
-    p.SetTerminator("");
-    p.AddObject(equ);
-    os << p << endl;
-
-    if (overlapStats != NULL) {
-      for (unsigned int i = 0; i < overlapStats->size(); i++) {
-        os << (*overlapStats)[i];
-        if (i != overlapStats->size() - 1) os << endl;
-      }
-    }
-
-    os << "End";
+    m_results->Write(outstatsFileName);
   }
 
 
   double Equalization::evaluate(double dn,
       int imageIndex, int bandIndex) const {
-    return adjustments[imageIndex]->evaluate(dn, bandIndex);
+    return m_adjustments[imageIndex]->evaluate(dn, bandIndex);
+  }
+
+
+  void Equalization::loadInputs(string fromListName) {
+    // Get the list of cubes to mosaic
+    m_imageList.Read(fromListName);
+    m_maxCube = m_imageList.size();
+
+    if (m_imageList.size() < 2) {
+      string msg = "The input file [" + fromListName +
+        "] must contain at least 2 file names";
+      throw iException::Message(iException::User, msg, _FILEINFO_);
+    }
+
+    Cube tempCube;
+    tempCube.open(m_imageList[0]);
+    m_maxBand = tempCube.getBandCount();
+
+    errorCheck(fromListName);
+  }
+
+
+  void Equalization::setInput(int index, string value) {
+    m_imageList[index] = value;
+  }
+
+
+  const FileList & Equalization::getInputs() const {
+    return m_imageList;
+  }
+
+
+  void Equalization::fillOutList(FileList &outList, string toListName) {
+    (toListName.empty()) ? generateOutputs(outList) :
+        loadOutputs(outList, toListName);
+  }
+
+
+  void Equalization::errorCheck(string fromListName) {
+    for (unsigned int i = 0; i < m_imageList.size(); i++) {
+      Cube cube1;
+      cube1.open(m_imageList[i]);
+
+      for (unsigned int j = (i + 1); j < m_imageList.size(); j++) {
+        Cube cube2;
+        cube2.open(m_imageList[j]);
+
+        // Make sure number of bands match
+        if (m_maxBand != cube2.getBandCount()) {
+          string msg = "Number of bands do not match between cubes [" +
+            m_imageList[i] + "] and [" + m_imageList[j] + "]";
+          throw iException::Message(iException::User, msg, _FILEINFO_);
+        }
+
+        //Create projection from each cube
+        Projection *proj1 = cube1.getProjection();
+        Projection *proj2 = cube2.getProjection();
+
+        // Test to make sure projection parameters match
+        if (*proj1 != *proj2) {
+          string msg = "Mapping groups do not match between cubes [" +
+            m_imageList[i] + "] and [" + m_imageList[j] + "]";
+          throw iException::Message(iException::User, msg, _FILEINFO_);
+        }
+      }
+    }
+  }
+
+
+  void Equalization::generateOutputs(FileList &outList) {
+    for (unsigned int img = 0; img < m_imageList.size(); img++) {
+      Filename file = m_imageList[img];
+      string filename = file.Path() + "/" + file.Basename() +
+        ".equ." + file.Extension();
+      outList.push_back(filename);
+    }
   }
 
 
@@ -400,16 +443,54 @@ namespace Isis {
     for (unsigned i = 0; i < outList.size(); i++) {
       if (outList[i].compare(m_imageList[i]) == 0) {
         string msg = "The to list file [" + outList[i] +
-                          "] has the same name as its corresponding from list file.";
+          "] has the same name as its corresponding from list file.";
         throw iException::Message(iException::User, msg, _FILEINFO_);
       }
     }
   }
 
 
-  vector<int> Equalization::validateInputStatistics(
-      string instatsFileName) {
+  void Equalization::loadHolds(OverlapNormalization *oNorm) {
+    for (unsigned int h = 0; h < m_holdIndices.size(); h++)
+      oNorm->AddHold(m_holdIndices[h]);
+  }
 
+
+  void Equalization::clearAdjustments() {
+    m_adjustments.clear();
+  }
+
+
+  void Equalization::addAdjustment(ImageAdjustment *adjustment) {
+    m_adjustments.push_back(adjustment);
+  }
+
+
+  void Equalization::addValid(int count) {
+    m_validCnt += count;
+  }
+
+
+  void Equalization::addInvalid(int count) {
+    m_invalidCnt += count;
+  }
+
+
+  void Equalization::init() {
+    m_validCnt = 0;
+    m_invalidCnt = 0;
+
+    m_mincnt = 1000;
+    m_wtopt = false;
+
+    m_maxCube = 0;
+    m_maxBand = 0;
+
+    m_results = NULL;
+  }
+
+
+  vector<int> Equalization::validateInputStatistics(string instatsFileName) {
     Pvl inStats(instatsFileName);
     PvlObject &equalInfo = inStats.FindObject("EqualizationInformation");
 
@@ -448,69 +529,22 @@ namespace Isis {
   }
 
 
-  // Gather general statistics on a particular band of a cube
-  Statistics Equalization::getBandStatistics(Cube &icube, const int band,
-      double sampPercent, string maxCubeStr) {
-    // Create our progress message
-    iString curCubeStr(m_currentImage + 1);
-    string statMsg = "";
-    if (icube.getBandCount() == 1) {
-      statMsg = "Calculating Statistics for Band 1 in Cube " + curCubeStr +
-        " of " + maxCubeStr;
+  void Equalization::CalculateFunctor::operator()(Buffer &in) {
+    // Make sure we consider the last line
+    if (m_line % m_linc == 0 || m_line == in.LineDimension() - 1) {
+      addStats(in);
     }
-    else {
-      iString curBandStr(band);
-      iString maxBandStr(icube.getBandCount());
-      statMsg = "Calculating Statistics for Band " + curBandStr + " of " +
-        maxBandStr + " in Cube " + curCubeStr + " of " + maxCubeStr;
-    }
-
-    // Calculate our line incrementer
-    int linc = (int) (100.0 / sampPercent + 0.5);
-
-    // Make sure band is valid
-    if ((band <= 0) || (band > icube.getBandCount())) {
-      string msg = "Invalid band in method [getBandStatistics]";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
-    }
-
-    // Construct a line buffer manager and a statistics object
-    LineManager line(icube);
-
-
-    Progress progress;
-    progress.SetText(statMsg);
-
-    // Calculate the number of steps for the Progress object, and add an extra
-    // step if the total lines and incrementer do not divide evenly
-    int maxSteps = icube.getLineCount() / linc;
-    if (icube.getLineCount() % linc != 0) maxSteps += 1;
-    progress.SetMaximumSteps(maxSteps);
-    progress.CheckStatus();
-
-    // Add data to Statistics object by line
-    Statistics stats;
-    int i = 1;
-    while (i <= icube.getLineCount()) {
-      line.SetLine(i, band);
-      icube.read(line);
-      stats.AddData(line.DoubleBuffer(), line.size());
-
-      // Make sure we consider the last line
-      if (i + linc > icube.getLineCount() && i != icube.getLineCount()) {
-        i = icube.getLineCount();
-        progress.AddSteps(1);
-      }
-      else i += linc; // Increment the current line by our incrementer
-
-      progress.CheckStatus();
-    }
-
-    return stats;
+    m_line++;
   }
 
 
-  void Equalization::EqualizationFunctor::operator()(Buffer &in, Buffer &out) {
+  void Equalization::CalculateFunctor::addStats(Buffer &in) {
+    // Add data to Statistics object by line
+    m_stats->AddData(&in[0], in.size());
+  }
+
+
+  void Equalization::ApplyFunctor::operator()(Buffer &in, Buffer &out) {
     int index = in.Band() - 1;
     for (int i = 0; i < in.size(); i++) {
       out[i] = (IsSpecial(in[i])) ?

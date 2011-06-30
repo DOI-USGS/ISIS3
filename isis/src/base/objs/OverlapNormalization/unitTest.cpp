@@ -23,10 +23,10 @@ int main(int argc, char *argv[]) {
     Isis::Statistics *stats2 = cube2.getStatistics();
     Isis::Statistics *stats3 = cube3.getStatistics();
 
-    vector<Isis::Statistics> statsList;
-    statsList.push_back(*stats1);
-    statsList.push_back(*stats2);
-    statsList.push_back(*stats3);
+    vector<Isis::Statistics *> statsList;
+    statsList.push_back(stats1);
+    statsList.push_back(stats2);
+    statsList.push_back(stats3);
     cout << "statsList size: " << statsList.size() << endl;
 
     Isis::OverlapNormalization oNorm(statsList);

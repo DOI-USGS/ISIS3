@@ -1,13 +1,10 @@
 #include <iomanip>
 
 #include "Buffer.h"
-#include "Equalization.h"
-#include "iException.h"
-#include "OverlapNormalization.h"
-#include "OverlapStatistics.h"
-#include "PvlGroup.h"
+#include "HiEqualization.h"
 #include "Preference.h"
 #include "ProcessByLine.h"
+#include "iException.h"
 
 using namespace std;
 using namespace Isis;
@@ -55,15 +52,10 @@ int main(int argc, char *argv[]) {
     string holdList = "HoldList.lst";
 
     cout << "UnitTest for Equalization" << endl;
-    Equalization equalizer(fromList);
+    HiEqualization equalizer(fromList);
     equalizer.addHolds(holdList);
 
-    double percent = 100.0;
-    int mincount = 1000;
-    bool weight = false;
-    OverlapNormalization::SolutionType adjust = OverlapNormalization::Both;
-
-    equalizer.calculateStatistics(percent, mincount, weight, adjust);
+    equalizer.calculateStatistics();
 
     // Open input cube
     FileList imageList(fromList);
