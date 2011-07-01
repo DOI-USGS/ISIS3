@@ -20,6 +20,7 @@
 *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
 *   http://www.usgs.gov/privacy.html.
 */
+
 #include "IsisDebug.h"
 
 #include <string>
@@ -458,7 +459,14 @@ namespace Isis {
     for(int sample = p_cubeStartSamp; sample <= p_cubeSamps; sample++) {
       for(int line = p_cubeStartLine; line <= p_cubeLines; line++) {
         if(SetImage(sample, line)) {
-          return geos::geom::Coordinate(sample, line);
+          // An outlier check.  Make sure that the pixel we use to start
+          // constructing a polygon is not surrounded by a bunch of invalid
+          // positions.
+          geos::geom::Coordinate firstPoint(sample, line);
+          geos::geom::Coordinate lastPoint = firstPoint;
+          if(!firstPoint.equals(FindNextPoint(&firstPoint, lastPoint))) {
+            return firstPoint;
+          }
         }
       }
     }
@@ -561,6 +569,7 @@ namespace Isis {
 
     do {
       tempPoint = FindNextPoint(&currentPoint, lastPoint);
+      //exit(1);
 
 
       // First check if the distance is within range of skipping
@@ -594,7 +603,6 @@ namespace Isis {
           }
         }
       }
-
 
       // Failed to find the next point
       if(tempPoint.equals(currentPoint)) {

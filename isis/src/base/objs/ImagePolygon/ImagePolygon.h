@@ -152,6 +152,9 @@ namespace Isis {
    *  @history 2011-05-11 Steven Lambright - Now works with projected images.
    *  @history 2011-05-12 Christopher Austin - Added validSample/LineDim()
    *                                           functionality.
+   *  @history 2011-07-01 Travis Addair - Added outlier check to
+   *           FindFirstPoint() to avoid choosing a first point without any
+   *           valid neighbors (i.e., an outlier).
    */
 
   class ImagePolygon : public Isis::Blob {
