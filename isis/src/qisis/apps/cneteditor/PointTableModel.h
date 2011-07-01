@@ -21,24 +21,25 @@ namespace Isis
       enum Column
       {
         Id = 0,
-        ChooserName = 1,
-        DateTime = 2,
-        EditLock = 3,
-        Ignored = 4,
-        Reference = 5,
-        AdjustedSPLat = 6,
-        AdjustedSPLon = 7,
-        AdjustedSPRadius = 8,
-        APrioriSPLat = 9,
-        APrioriSPLon = 10,
-        APrioriSPRadius = 11,
-        APrioriSPSource = 12,
-        APrioriSPSourceFile = 13,
-        APrioriRadiusSource = 14,
-        APrioriRadiusSourceFile = 15,
-        JigsawRejected = 16,
+        PointType = 1,
+        ChooserName = 2,
+        DateTime = 3,
+        EditLock = 4,
+        Ignored = 5,
+        Reference = 6,
+        AdjustedSPLat = 7,
+        AdjustedSPLon = 8,
+        AdjustedSPRadius = 9,
+        APrioriSPLat = 10,
+        APrioriSPLon = 11,
+        APrioriSPRadius = 12,
+        APrioriSPSource = 13,
+        APrioriSPSourceFile = 14,
+        APrioriRadiusSource = 15,
+        APrioriRadiusSourceFile = 16,
+        JigsawRejected = 17,
       };
-      static const int COLS = 17;
+      static const int COLS = 18;
 
 
     public:
