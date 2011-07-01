@@ -44,6 +44,7 @@ namespace Isis
     switch (col)
     {
       case Id: return "Point ID";
+      case PointType: return "Point Type";
       case ChooserName: return "Chooser Name";
       case DateTime: return "Date Time";
       case EditLock: return "Edit Lock";
@@ -117,6 +118,8 @@ namespace Isis
         {
           case Id:
             return QVariant::fromValue((QString) point->GetId());
+          case PointType:
+            return QVariant::fromValue((QString) point->GetPointTypeString());
           case ChooserName:
             return QVariant::fromValue((QString) point->GetChooserName());
           case DateTime:
@@ -227,6 +230,7 @@ namespace Isis
           switch (column)
           {
             case Id:
+            case PointType:
             case ChooserName:
             case DateTime:
             case EditLock:
@@ -273,6 +277,9 @@ namespace Isis
         {
           case Id:
             point->SetId(value.toString());
+            break;
+          case PointType:
+            point->SetType(point->StringToPointType(value.toString()));
             break;
           case ChooserName:
             point->SetChooserName(value.toString());
