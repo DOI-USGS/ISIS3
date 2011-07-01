@@ -254,6 +254,7 @@ namespace Isis {
    *   @history 2011-06-07 Debbie A. Cook and Tracie Sucharski - Modified point
    *            types:  Ground ------> Fixed
    *                    Tie----------> Free
+   *   @history 2011-06-30 Eric Hyer - Added StringToPointType() method
    */
   class ControlPoint {
       friend class ControlNet;
@@ -269,12 +270,12 @@ namespace Isis {
           * truth (i.e., ground truth).  A fixed point can be identifed in one or
           * more cubes.  Historically this point was called a "Ground" point.
           */
-        Fixed,
+        Fixed = 0,
         /**
           * A Constrained point is a Control Point whose lat/lon/radius is somewhat
           * established and should not be changed.
           */
-        Constrained,
+        Constrained = 1,
         /**
           * A Free point is a Control Point that identifies common measurements
           * between two or more cubes. While it could have a lat/lon, it is not
@@ -282,8 +283,9 @@ namespace Isis {
           * common type of control point.  This point type floats freely in
           * a bundle adjustment.  Historically this point type was called "Tie".
           */
-        Free
+        Free = 2
       };
+      static const int PointTypeCount = 3;
 
       /**
        * This is a return status for many of the mutating (setter) method calls.
@@ -413,7 +415,6 @@ namespace Isis {
       bool IsIgnored() const;
       bool IsValid() const;
       bool IsInvalid() const;
-      PointType GetType() const;
       bool IsFixed() const;
 
       bool HasAprioriCoordinates();
@@ -424,7 +425,11 @@ namespace Isis {
       int NumberOfConstrainedCoordinates();
 
       static iString PointTypeToString(PointType type);
+      static PointType StringToPointType(iString pointTypeString);
+
       iString GetPointTypeString() const;
+      PointType GetType() const;
+
       static iString RadiusSourceToString(RadiusSource::Source source);
       static RadiusSource::Source StringToRadiusSource(QString str);
       iString GetRadiusSourceString() const;

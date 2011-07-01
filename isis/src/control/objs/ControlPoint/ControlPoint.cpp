@@ -1362,14 +1362,59 @@ namespace Isis {
     return str;
   }
 
+
+  /**
+   *  Obtain a PointType given a string representation of it.
+   *
+   *  @param pointTypeString for the requested PointType
+   *
+   *  @returns the PointType for the given string
+   */
+  ControlPoint::PointType ControlPoint::StringToPointType(
+      iString pointTypeString) {
+
+    //  On failure assume Free
+    ControlPoint::PointType type = ControlPoint::Free;
+
+    iString errMsg  = "There is no PointType that has a string representation"
+                      " of \"";
+            errMsg += pointTypeString;
+            errMsg += "\".";
+
+    if (pointTypeString == "Fixed")
+      type = ControlPoint::Fixed;
+    else
+      if (pointTypeString == "Constrained")
+        type = ControlPoint::Constrained;
+      else
+        if (pointTypeString == "Free")
+          type = ControlPoint::Free;
+        else
+          throw iException::Message(iException::Programmer,
+                                    errMsg, _FILEINFO_);
+
+    return type;
+  }
+
+
   /**
    * Obtain a string representation of the PointType
    *
    * @return A string representation of the PointType
    */
   iString ControlPoint::GetPointTypeString() const {
-    return PointTypeToString(type);
+    return PointTypeToString(GetType());
   }
+
+
+  /**
+   * @returns this point't type
+   *
+   */
+  ControlPoint::PointType ControlPoint::GetType() const {
+    return type;
+  }
+
 
   /**
    *  Obtain a string representation of a given RadiusSource
@@ -1519,12 +1564,6 @@ namespace Isis {
   iString ControlPoint::GetSurfacePointSourceString() const {
     return SurfacePointSourceToString(aprioriSurfacePointSource);
   }
-
-
-  ControlPoint::PointType ControlPoint::GetType() const {
-    return type;
-  }
-
 
 
   bool ControlPoint::IsFixed() const {

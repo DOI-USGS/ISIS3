@@ -428,3 +428,6 @@ testing getMeasures method...
 alpha
 beta
 alpha
+
+testing error handling for StringToPointType...
+  **PROGRAMMER ERROR** There is no PointType that has a string representation of "aoeu".

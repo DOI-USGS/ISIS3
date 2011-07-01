@@ -239,6 +239,15 @@ int main() {
   measures = getMeasuresTestPoint.getMeasures(true);
   foreach (ControlMeasure * measure, measures)
     cout << measure->GetCubeSerialNumber() << "\n";
+
+  cout << "\ntesting error handling for StringToPointType...\n";
+  try {
+    ControlPoint::StringToPointType("aoeu");
+  }
+  catch (iException e) {
+    cout << "  " << e.Errors() << "\n";
+    e.Clear();
+  }
 }
 
 void printPoint(Isis::ControlPoint &p) {
