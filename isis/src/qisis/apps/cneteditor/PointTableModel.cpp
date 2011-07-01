@@ -44,7 +44,7 @@ namespace Isis
     switch (col)
     {
       case Id: return "Point ID";
-      case PointType: return "Point Type";
+      case PointType: return "   Point Type   ";
       case ChooserName: return "Chooser Name";
       case DateTime: return "Date Time";
       case EditLock: return "Edit Lock";

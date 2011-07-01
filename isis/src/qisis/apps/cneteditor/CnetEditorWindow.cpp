@@ -86,6 +86,9 @@ namespace Isis
     readSettings();
 
     setNoFileState();
+    if (QApplication::arguments().size() > 1) {
+      load(QApplication::arguments().at(1));
+    }
   }
 
 
