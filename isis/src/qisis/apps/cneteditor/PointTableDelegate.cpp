@@ -42,6 +42,7 @@ namespace Isis
     {
       switch ((PointTableModel::Column) col)
       {
+        case PointTableModel::PointType:
         case PointTableModel::EditLock:
         case PointTableModel::Ignored:
         case PointTableModel::Reference:
@@ -52,6 +53,14 @@ namespace Isis
 
             switch ((PointTableModel::Column) col)
             {
+              case PointTableModel::PointType:
+                for (int i = 0; i < ControlPoint::PointTypeCount; i++)
+                {
+                  combo->insertItem(i, ControlPoint::PointTypeToString(
+                      (ControlPoint::PointType) i));
+                }
+                combo->setCurrentIndex((int) point->GetType());
+                break;
               case PointTableModel::EditLock:
                 combo->insertItem(0, "Yes");
                 combo->insertItem(1, "No");
@@ -117,6 +126,7 @@ namespace Isis
 
       switch ((PointTableModel::Column) col)
       {
+        case PointTableModel::PointType:
         case PointTableModel::EditLock:
         case PointTableModel::Ignored:
         case PointTableModel::Reference:
@@ -126,6 +136,10 @@ namespace Isis
             QComboBox * combo = static_cast< QComboBox * >(editor);
             switch ((PointTableModel::Column) col)
             {
+              case PointTableModel::PointType:
+                combo->setCurrentIndex(
+                    (int) point->StringToPointType(value));
+                break;
               case PointTableModel::EditLock:
                 combo->setCurrentIndex(point->IsEditLocked() ? 0 : 1);
                 break;
@@ -137,7 +151,7 @@ namespace Isis
                 break;
               case PointTableModel::APrioriSPSource:
                 combo->setCurrentIndex(
-                  (int) point->StringToSurfacePointSource(value));
+                    (int) point->StringToSurfacePointSource(value));
                 break;
               case PointTableModel::APrioriRadiusSource:
                 combo->setCurrentIndex(
@@ -169,6 +183,7 @@ namespace Isis
 
     switch ((PointTableModel::Column) col)
     {
+      case PointTableModel::PointType:
       case PointTableModel::EditLock:
       case PointTableModel::Ignored:
       case PointTableModel::Reference:
@@ -195,7 +210,7 @@ namespace Isis
     if (col != PointTableModel::Reference)
     {
       QList< QModelIndex > selection =
-        tableView->selectionModel()->selectedIndexes();
+          tableView->selectionModel()->selectedIndexes();
       for (int i = 0; i < selection.size(); i++)
         if (selection[i].column() == col)
           model->setData(selection[i], newData, Qt::EditRole);
