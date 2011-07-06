@@ -219,9 +219,9 @@ namespace Qisis {
       void paintAllViewports (QString pointId );
       void saveNet();
       void addMeasure();
+      void setPointType (int pointType);
       void setLockPoint (bool ignore);
       void setIgnorePoint (bool ignore);
-      void setFixedPoint (bool fixed);
       void setLockLeftMeasure (bool ignore);
       void setIgnoreLeftMeasure (bool ignore);
       void setLockRightMeasure (bool ignore);
@@ -305,7 +305,7 @@ namespace Qisis {
       QLabel *p_groundFilenameLabel;
       QLabel *p_radiusFilenameLabel;
       QLabel *p_ptIdValue;
-      QLabel *p_pointType;
+      QComboBox *p_pointType;
       QLabel *p_numMeasures;
       QLabel *p_pointAprioriLatitude;
       QLabel *p_pointAprioriLongitude;
@@ -319,7 +319,6 @@ namespace Qisis {
       
       QCheckBox *p_lockPoint;
       QCheckBox *p_ignorePoint;
-      QCheckBox *p_fixedPoint;
       QLabel *p_leftReference;
       QLabel *p_leftMeasureType;
       QLabel *p_leftSampError;
