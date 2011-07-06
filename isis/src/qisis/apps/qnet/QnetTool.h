@@ -270,6 +270,7 @@ namespace Qisis {
       bool okToContinue();
       void initDem(QString demFile);
       void clearGroundSource();
+      bool IsMeasureLocked(Isis::iString serialNumber);
 
 
       QMainWindow *p_qnetTool;
