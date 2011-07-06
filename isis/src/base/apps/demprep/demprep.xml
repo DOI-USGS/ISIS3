@@ -19,6 +19,9 @@
     in Simple Cylindrical projection. If it is not, then the demprep program will fail. This program will first
     check to see if the DEM has been padded. If padding has already occurred, then no further padding will be
     added. It is not valid to run this program on anything but a DEM.
+
+    This program can be run on files with non-Equatorial projections. If the file is non-Equatorial, then it
+    cannot be padded. However, the program will add the ShapeModelStatistics table blob to the DEM file labels.
   </description>
 
   <history>
@@ -45,6 +48,12 @@
       Fixed handling of special pixels. Now reports the min/max radius
       encountered. A negative radius will now cause this program to fail.
     </change>
+    <change name="Janet Barrett" date="2011-07-05">
+      Modified the program so that it works with files that have non-Equatorial projections. These types
+      of files will not be padded. They will only have the ShapeModelStatistics table blob added to their
+      labels. Several programs are looking for the ShapeModelStatistics table blob to determine if the
+      file is a DEM.
+    </change>
   </history>
 
   <category>
@@ -70,6 +79,7 @@
       <parameter name="TO">
         <type>cube</type>
         <fileMode>output</fileMode>
+        <internalDefault>none</internalDefault>
         <brief>
           Output padded DEM cube
         </brief>
