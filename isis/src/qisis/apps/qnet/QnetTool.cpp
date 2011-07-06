@@ -775,6 +775,7 @@ namespace Qisis {
     // Update measure info
     updateLeftMeasureInfo();
     updateRightMeasureInfo();
+    loadMeasureTable();
 
   }
 
@@ -850,7 +851,9 @@ namespace Qisis {
   void QnetTool::setPointType (int pointType) {
     if (p_editPoint == NULL) return;
 
-    if (p_editPoint->SetType((ControlPoint::PointType) pointType)) {
+    ControlPoint::Status status = 
+         p_editPoint->SetType((ControlPoint::PointType) pointType);
+    if (status == ControlPoint::PointLocked) {
       p_pointType->setCurrentIndex((int) p_editPoint->GetType());
       QString message = "Unable to change the point type.  Set EditLock ";
       message += " to False.";
@@ -893,7 +896,8 @@ namespace Qisis {
   void QnetTool::setIgnorePoint (bool ignore) {
     if (p_editPoint == NULL) return;
 
-    if (p_editPoint->SetIgnored(ignore)) {
+    ControlPoint::Status status = p_editPoint->SetIgnored(ignore);
+    if (status == ControlPoint::PointLocked) {
       p_ignorePoint->setChecked(p_editPoint->IsIgnored());
       QString message = "Unable to change Ignored on point.  Set EditLock ";
       message += " to False.";
@@ -2018,6 +2022,8 @@ namespace Qisis {
    * @internal
    * @history 2010-06-03 Jeannie Walldren - Removed "std::" since "using
    *                          namespace std"
+   * @history 2011-07-06 Tracie Sucharski - If point is Locked, and measure is 
+   *                          reference, lock the measure. 
    */
   void QnetTool::selectLeftMeasure(int index) {
     iString file = p_pointFiles[index];
@@ -2040,9 +2046,10 @@ namespace Qisis {
     p_leftCube->open(file);
 
     //  Update left measure of pointEditor
-    p_pointEditor->setLeftMeasure (p_leftMeasure, p_leftCube, p_editPoint->GetId());
+    p_pointEditor->setLeftMeasure (p_leftMeasure, p_leftCube,
+                                   p_editPoint->GetId());
     updateLeftMeasureInfo ();
-
+      
   }
 
 
@@ -2077,7 +2084,8 @@ namespace Qisis {
     p_rightCube->open(file);
 
     //  Update left measure of pointEditor
-    p_pointEditor->setRightMeasure (p_rightMeasure,p_rightCube,p_editPoint->GetId());
+    p_pointEditor->setRightMeasure (p_rightMeasure,p_rightCube,
+                                    p_editPoint->GetId());
     updateRightMeasureInfo ();
 
   }
@@ -2101,7 +2109,8 @@ namespace Qisis {
   void QnetTool::updateLeftMeasureInfo () {
 
     //  Set editLock measure box correctly
-    p_lockLeftMeasure->setChecked(p_leftMeasure->IsEditLocked());
+    p_lockLeftMeasure->setChecked(IsMeasureLocked(
+                                       p_leftMeasure->GetCubeSerialNumber()));
     //  Set ignore measure box correctly
     p_ignoreLeftMeasure->setChecked(p_leftMeasure->IsIgnored());
 
@@ -2170,7 +2179,8 @@ namespace Qisis {
   void QnetTool::updateRightMeasureInfo () {
 
   //  Set editLock measure box correctly
-    p_lockRightMeasure->setChecked(p_rightMeasure->IsEditLocked());
+    p_lockRightMeasure->setChecked(IsMeasureLocked(
+                                        p_rightMeasure->GetCubeSerialNumber()));
       //  Set ignore measure box correctly
     p_ignoreRightMeasure->setChecked(p_rightMeasure->IsIgnored());
 
@@ -3150,7 +3160,7 @@ namespace Qisis {
     //  If we could not find the ground source in the open viewports, user might
     //  have closed the viewport , reset ground source variables and re-open.
     p_groundOpen = false;
-//q    p_groundCube->close();
+//    p_groundCube->close();
 //    delete p_groundCube;
     p_groundCube = NULL;
     p_groundFile.clear();
@@ -3182,6 +3192,34 @@ namespace Qisis {
   }
 
 
+
+  /**
+   * Check for implicitly locked measure in p_editPoint.  If point is Locked, 
+   * and this measure is the reference, it is implicity Locked.
+   * Because measure is a copy, the ControlPoint::IsEditLocked() which checks 
+   * for implicit Lock on Reference measures does not work because there is 
+   * not a parent point. 
+   *  
+   * @param[in] serialNumber (QString)   Serial number of measure to be checked 
+   *  
+   *  
+   * @author 2011-07-06 Tracie Sucharski 
+   */
+  bool QnetTool::IsMeasureLocked (iString serialNumber) {
+
+    if (p_editPoint == NULL) return false;
+
+    // Reference implicitly editLocked
+    if (p_editPoint->IsEditLocked() && p_editPoint->IsReferenceExplicit() &&
+        (p_editPoint->GetReferenceSN() == serialNumber)) {
+      return true;
+    }
+    // Return measures explicit editLocked value
+    else {
+      return p_editPoint->GetMeasure(serialNumber)->IsEditLocked();
+    }
+
+  }
 
 }
 
