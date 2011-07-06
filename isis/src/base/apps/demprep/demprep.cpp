@@ -15,6 +15,7 @@ using namespace std;
 using namespace Isis;
 
 void DoWrap(Buffer &in);
+void GetStats(Buffer &in);
 
 Cube *ocube;
 
@@ -23,12 +24,15 @@ int rightPad;
 int topPad;
 int bottomPad;
 int inl;
+Statistics inCubeStats;
 Statistics outCubeStats;
 
 void IsisMain() {
   // We will be using a mosaic technique so get the size of the input file
   ProcessByLine p;
-  Cube *icube = p.SetInputCube("FROM");
+  UserInterface &ui = Application::GetUserInterface();
+  CubeAttributeInput cai;
+  Cube *icube = p.SetInputCube(ui.GetFilename("FROM"), cai, ReadWrite);
   int ins = icube->getSampleCount();
   inl = icube->getLineCount();
   int inb = icube->getBandCount();
@@ -56,8 +60,32 @@ void IsisMain() {
   }
 
   if(!proj->IsEquatorialCylindrical()) {
-    iString message = "The input cube must have an equatorial cylindrical projection.";
-    throw iException::Message(iException::User, message, _FILEINFO_);
+    p.StartProcess(GetStats);
+
+    PvlGroup demRange("Results");
+    demRange += PvlKeyword("MinimumRadius", inCubeStats.Minimum(), "meters");
+    demRange += PvlKeyword("MaximumRadius", inCubeStats.Maximum(), "meters");
+    Application::Log(demRange);
+
+    // Store min/max radii values in new ShapeModelStatistics table
+    string shp_name = "ShapeModelStatistics";
+    TableField fmin("MinimumRadius",Isis::TableField::Double);
+    TableField fmax("MaximumRadius",Isis::TableField::Double);
+
+    TableRecord record;
+    record += fmin;
+    record += fmax;
+
+    Table table(shp_name,record);
+ 
+    record[0] = Distance(inCubeStats.Minimum(),
+                         Distance::Meters).GetKilometers();
+    record[1] = Distance(inCubeStats.Maximum(),
+                         Distance::Meters).GetKilometers();
+    table += record;
+
+    icube->write(table);
+    return;
   }
 
   if (proj->LatitudeTypeString() != "Planetocentric") {
@@ -223,7 +251,6 @@ void IsisMain() {
 
   // We need to create the output file
   ocube = new Cube();
-  UserInterface &ui = Application::GetUserInterface();
   ocube->open(Filename(ui.GetFilename("TO")).Expanded(), "rw");
 
   p.StartProcess(DoWrap);
@@ -258,6 +285,10 @@ void IsisMain() {
   p.EndProcess();
   ocube->close();
   delete ocube;
+}
+
+void GetStats(Buffer &in) {
+  inCubeStats.AddData(&in[0], in.size());
 }
 
 void DoWrap(Buffer &in) {
