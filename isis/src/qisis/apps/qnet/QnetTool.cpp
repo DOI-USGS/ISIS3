@@ -81,7 +81,6 @@ namespace Qisis {
     p_pointRadius = NULL;
     p_lockPoint = NULL;
     p_ignorePoint = NULL;
-    p_fixedPoint = NULL;
     p_leftReference = NULL;
     p_leftMeasureType = NULL;
     p_leftSampError = NULL;
@@ -246,7 +245,17 @@ namespace Qisis {
   
     // create left vertical layout
     p_ptIdValue = new QLabel;
-    p_pointType = new QLabel;
+    p_pointType = new QComboBox;
+    for (int i=0; i<ControlPoint::PointTypeCount; i++) {
+      p_pointType->insertItem(i, ControlPoint::PointTypeToString(
+                              (ControlPoint::PointType) i));
+    }
+    QHBoxLayout *pointTypeLayout = new QHBoxLayout;
+    QLabel *pointTypeLabel = new QLabel("PointType:");
+    pointTypeLayout->addWidget(pointTypeLabel);
+    pointTypeLayout->addWidget(p_pointType);
+    connect(p_pointType, SIGNAL(activated(int)),
+            this, SLOT(setPointType(int)));
     p_numMeasures = new QLabel;
     p_pointAprioriLatitude = new QLabel;
     p_pointAprioriLongitude = new QLabel;
@@ -256,7 +265,7 @@ namespace Qisis {
     p_pointAprioriRadiusSigma = new QLabel;
     QVBoxLayout * leftLayout = new QVBoxLayout;
     leftLayout->addWidget(p_ptIdValue);
-    leftLayout->addWidget(p_pointType);
+    leftLayout->addLayout(pointTypeLayout);
     leftLayout->addWidget(p_numMeasures);
     leftLayout->addWidget(p_pointAprioriLatitude);
     leftLayout->addWidget(p_pointAprioriLongitude);
@@ -267,16 +276,11 @@ namespace Qisis {
     
     // create right vertical layout's top layout
     p_lockPoint = new QCheckBox("Edit Lock Point");
-    connect(p_lockPoint, SIGNAL(clicked(bool)),
-            SLOT(setLockPoint(bool)));
+    connect(p_lockPoint, SIGNAL(clicked(bool)), this, SLOT(setLockPoint(bool)));
     p_ignorePoint = new QCheckBox("Ignore Point");
     connect(p_ignorePoint, SIGNAL(clicked(bool)),
             this, SLOT(setIgnorePoint(bool)));
-    connect(this, SIGNAL(ignorePointChanged()),
-            p_ignorePoint, SLOT(toggle()));
-    p_fixedPoint = new QCheckBox("Fixed Point");
-    p_fixedPoint->setEnabled(true);
-    connect(p_fixedPoint,SIGNAL(clicked(bool)),this,SLOT(setFixedPoint(bool)));
+    connect(this, SIGNAL(ignorePointChanged()), p_ignorePoint, SLOT(toggle()));
     p_pointLatitude = new QLabel;
     p_pointLongitude = new QLabel;
     p_pointRadius = new QLabel;
@@ -284,7 +288,6 @@ namespace Qisis {
     QVBoxLayout * rightLayout = new QVBoxLayout;
     rightLayout->addWidget(p_lockPoint);
     rightLayout->addWidget(p_ignorePoint);
-    rightLayout->addWidget(p_fixedPoint);
     rightLayout->addWidget(p_pointLatitude);
     rightLayout->addWidget(p_pointLongitude);
     rightLayout->addWidget(p_pointRadius);
@@ -312,7 +315,7 @@ namespace Qisis {
             this, SLOT(selectLeftMeasure(int)));
     p_lockLeftMeasure = new QCheckBox("Edit Lock Measure");
     connect(p_lockLeftMeasure, SIGNAL(clicked(bool)),
-            SLOT(setLockLeftMeasure(bool)));
+            this, SLOT(setLockLeftMeasure(bool)));
     p_ignoreLeftMeasure = new QCheckBox("Ignore Measure");
     connect(p_ignoreLeftMeasure, SIGNAL(clicked(bool)),
             this, SLOT(setIgnoreLeftMeasure(bool)));
@@ -350,7 +353,7 @@ namespace Qisis {
             this, SLOT(selectRightMeasure(int)));
     p_lockRightMeasure = new QCheckBox("Edit Lock Measure");
     connect(p_lockRightMeasure, SIGNAL(clicked(bool)),
-            SLOT(setLockRightMeasure(bool)));
+            this, SLOT(setLockRightMeasure(bool)));
     p_ignoreRightMeasure = new QCheckBox("Ignore Measure");
     connect(p_ignoreRightMeasure, SIGNAL(clicked(bool)),
             this, SLOT(setIgnoreRightMeasure(bool)));
@@ -554,10 +557,22 @@ namespace Qisis {
    *                          do not save measure.  Remove signals
    *                          EditPointChanged and netChanged, since these
    *                          should only happen when the point is saved.
+   *   @history 2011-07-01 Tracie Sucharski - Fixed bug where the edit measure
+   *                          EditLocked=True, but the original measure was
+   *                          False, and we woouldn't allow the measure to be
+   *                          saved.
    */
   void QnetTool::measureSaved() {
 
-    if (p_rightMeasure->IsEditLocked()) {
+    // Read original measures from the network.
+    ControlMeasure *leftMeasure =
+                p_editPoint->GetMeasure(p_leftMeasure->GetCubeSerialNumber());
+    ControlMeasure *rightMeasure =
+                p_editPoint->GetMeasure(p_rightMeasure->GetCubeSerialNumber());
+
+    //  Check original measure from network, so that a measure that has just
+    //  had EditLocked set to True can be saved.
+    if (rightMeasure->IsEditLocked() && p_rightMeasure->IsEditLocked()) {
       QString message = "You are saving changes to a measure that is locked ";
       message += "for editing.  Do you want to set EditLock = False for this ";
       message += "measure?";
@@ -576,8 +591,9 @@ namespace Qisis {
     }
 
     if (p_editPoint->IsIgnored()) {
-      QString message = "You are saving changes to a measure on an ignored point.  ";
-      message += "Do you want to set Ignore = False on the point and both measures?";
+      QString message = "You are saving changes to a measure on an ignored ";
+      message += "point.  Do you want to set Ignore = False on the point and ";
+      message += "both measures?";
       switch (QMessageBox::question((QWidget *)parent(),
                 "Qnet Tool Save Measure", message,
                 "&Yes", "&No", 0, 0)) {
@@ -613,7 +629,6 @@ namespace Qisis {
         // No was clicked, keep Ignore=true and save point
         case 1: 
           break;
-
       }
     }
     // Check if ControlPoint has reference measure, if reference Measure is
@@ -740,13 +755,9 @@ namespace Qisis {
     // the editPoint The Ignore flag is the only thing that can change on the left
     // measure. First find measure, then replace with the edit Tool measure
     p_rightMeasure->SetChooserName(Application::UserName());
-    ControlMeasure *rightMeasure =
-                p_editPoint->GetMeasure(p_rightMeasure->GetCubeSerialNumber());
     *rightMeasure = *p_rightMeasure;
 
     //  The ignore flag on the left measure has changed from the net file
-    ControlMeasure *leftMeasure =
-                p_editPoint->GetMeasure(p_leftMeasure->GetCubeSerialNumber());
     if (p_leftMeasure->IsIgnored() != leftMeasure->IsIgnored() ||
         p_leftMeasure->IsEditLocked() != leftMeasure->IsEditLocked()) {
       p_leftMeasure->SetChooserName(Application::UserName());
@@ -777,28 +788,13 @@ namespace Qisis {
    * @internal 
    * @history 2011-04-20 Tracie Sucharski - If EditLock set, prompt for changing 
    *                        and do not save point if editLock not changed.
+   * @history 2011-07-05 Tracie Sucharski - Move point EditLock error checking 
+   *                        to individual point parameter setting methods, ie.
+   *                        SetPointType, SetIgnorePoint.
    *      
    */
   void QnetTool::savePoint () {
 
-    if (p_editPoint->IsEditLocked()) {
-      QString message = "You are saving changes to a point that is locked ";
-      message += "for editing.  Do you want to set EditLock = False for this ";
-      message += "point?";
-      switch (QMessageBox::question((QWidget *)parent(),
-                "Qnet Tool Save Point", message,
-                "&Yes", "&No", 0, 0)) {
-        // Yes was clicked or Enter was pressed, set EditLock=false for the point
-        case 0: 
-          p_editPoint->SetEditLock(false);
-          p_lockPoint->setChecked(false);
-        // No was clicked, keep EditLocke=true and DO NOT save point
-        case 1: 
-          return;
-      }
-    }
-
-    p_editPoint->SetChooserName(Application::UserName());
 
     //  Make a copy of edit point for updating the control net since the edit
     //  point is still loaded in the point editor.
@@ -842,6 +838,30 @@ namespace Qisis {
 
 
 
+
+  /**
+   * Set the point type
+   * @param pointType int Index from point type combo box 
+   *  
+   * @author 2011-07-05 Tracie Sucharski 
+   *  
+   * @internal 
+   */
+  void QnetTool::setPointType (int pointType) {
+    if (p_editPoint == NULL) return;
+
+    if (p_editPoint->SetType((ControlPoint::PointType) pointType)) {
+      p_pointType->setCurrentIndex((int) p_editPoint->GetType());
+      QString message = "Unable to change the point type.  Set EditLock ";
+      message += " to False.";
+      QMessageBox::critical((QWidget *)parent(), "Error", message);
+      return;
+    }
+    colorizeSaveButton();
+  }
+
+
+
   /**
    * Set point's "EditLock" keyword to the value of the input parameter. 
    * @param ignore Boolean value that determines the EditLock value for this 
@@ -852,10 +872,10 @@ namespace Qisis {
    * @internal 
    */
   void QnetTool::setLockPoint (bool lock) {
-    if (p_editPoint != NULL) {
-      p_editPoint->SetEditLock(lock);
-      colorizeSaveButton();
-    }
+    if (p_editPoint == NULL) return;
+
+    p_editPoint->SetEditLock(lock);
+    colorizeSaveButton();
   }
 
 
@@ -871,48 +891,16 @@ namespace Qisis {
    *                        selected.
    */
   void QnetTool::setIgnorePoint (bool ignore) {
-    if (p_editPoint != NULL) {
-      p_editPoint->SetIgnored(ignore);
-      colorizeSaveButton();
-    }
-  }
+    if (p_editPoint == NULL) return;
 
-
-
-  /**
-   * Sets the "PointType" keyword of the control point.  If fixed
-   * is true the point type will be set to "Fixed".  If fixed is
-   * false, it will be set to "Free".
-   * 
-   * @param fixed Boolean value that determines whether the PointType will be 
-   *               set to Fixed.  If false, PointType will be set to Free.
-   *  
-   * @author 2010-12-01 Tracie Sucharski 
-   */
-  void QnetTool::setFixedPoint (bool fixed) {
-
-    //  if false, turn back Free
-    if (!fixed) {
-      p_editPoint->SetType(ControlPoint::Free);
-    }
-    else {
-      //  Make sure a ground source is open, if not warn user, set type back to
-      //  Free and return.
-      if (!p_groundOpen) {
-        QString message = "Must open ground source file before changing point ";
-        message += "type to Fixed.  Open the ground source file from the File ";
-        message += "menu on the Control Point Editor.";
-        QMessageBox::critical((QWidget *)parent(),"Error",message);
-        p_fixedPoint->setChecked(false);
-        return;
-      }
-
-
-      p_editPoint->SetType(ControlPoint::Fixed);
+    if (p_editPoint->SetIgnored(ignore)) {
+      p_ignorePoint->setChecked(p_editPoint->IsIgnored());
+      QString message = "Unable to change Ignored on point.  Set EditLock ";
+      message += " to False.";
+      QMessageBox::critical((QWidget *)parent(), "Error", message);
+      return;
     }
     colorizeSaveButton();
-    loadPoint();
-
   }
 
 
@@ -1616,9 +1604,10 @@ namespace Qisis {
     p_ptIdValue->setText(ptId);
 
     //  Write point type
-    QString ptType("Point Type:  ");
-    ptType += (QString) p_editPoint->GetPointTypeString();
-    p_pointType->setText(ptType);
+//    QString ptType("Point Type:  ");
+//    ptType += (QString) p_editPoint->GetPointTypeString();
+//    p_pointType->setText(ptType);
+    p_pointType->setCurrentIndex((int) p_editPoint->GetType());
 
     //  Write number of measures
     QString ptsize = "Number of Measures:  " +
@@ -1630,9 +1619,6 @@ namespace Qisis {
 
     //  Set ignore box correctly
     p_ignorePoint->setChecked(p_editPoint->IsIgnored());
-
-    //  Set fixed box correctly
-    p_fixedPoint->setChecked(p_editPoint->IsFixed());
 
     // Clear combo boxes
     p_leftCombo->clear();
