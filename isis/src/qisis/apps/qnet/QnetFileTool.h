@@ -71,6 +71,8 @@ namespace Qisis {
    *                          loadPointImages.
    *   @history 2011-06-03 Tracie Sucharski - Add Open Ground & Open Dem
    *                          signals.
+   *   @history 2011-07-07 Tracie Sucharski - Disable Open Ground and Open Dem
+   *                          until list & net open.
    *
    */
 
@@ -98,6 +100,8 @@ namespace Qisis {
 
     private:
       bool p_saveNet;
+      QAction *p_openGround;
+      QAction *p_openDem;
   };
 };
 

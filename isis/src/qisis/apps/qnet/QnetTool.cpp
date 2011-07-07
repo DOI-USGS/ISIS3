@@ -572,7 +572,8 @@ namespace Qisis {
 
     //  Check original measure from network, so that a measure that has just
     //  had EditLocked set to True can be saved.
-    if (rightMeasure->IsEditLocked() && p_rightMeasure->IsEditLocked()) {
+    if (IsMeasureLocked(rightMeasure->GetCubeSerialNumber()) &&
+        IsMeasureLocked(p_rightMeasure->GetCubeSerialNumber())) {
       QString message = "You are saving changes to a measure that is locked ";
       message += "for editing.  Do you want to set EditLock = False for this ";
       message += "measure?";
@@ -638,21 +639,19 @@ namespace Qisis {
       ControlMeasure *refMeasure = p_editPoint->GetRefMeasure();
       // Reference Measure not on left.  Ask user if they want to change
       // the reference measure, but only if it is not the ground source on the left
-      if (refMeasure->GetCubeSerialNumber() != p_leftMeasure->GetCubeSerialNumber() ) {
-        if (!p_editPoint->IsFixed() || 
-            (p_editPoint->IsFixed() &&
-            (p_leftMeasure->GetCubeSerialNumber() != p_groundSN))) {
-          QString message = "This point already contains a reference measure.  ";
-          message += "Would you like to replace it with the measure on the left?";
-          switch(QMessageBox::question((QWidget *)parent(),
-                                    "Qnet Tool Save Measure", message,
-                                    "&Yes", "&No", 0, 0)){
-            case 0: // Yes was clicked or Enter was pressed, replace reference
-              p_editPoint->SetRefMeasure(p_leftMeasure->GetCubeSerialNumber());
-              // ??? Need to set rest of measures to Candiate and add more warning. ???//
-            case 1: // No was clicked, keep original reference
-              break;
-          }
+      if (refMeasure->GetCubeSerialNumber() != 
+        p_leftMeasure->GetCubeSerialNumber() &&
+        p_leftMeasure->GetCubeSerialNumber() != p_groundSN) {
+        QString message = "This point already contains a reference measure.  ";
+        message += "Would you like to replace it with the measure on the left?";
+        switch(QMessageBox::question((QWidget *)parent(),
+                                  "Qnet Tool Save Measure", message,
+                                  "&Yes", "&No", 0, 0)){
+          case 0: // Yes was clicked or Enter was pressed, replace reference
+            p_editPoint->SetRefMeasure(p_leftMeasure->GetCubeSerialNumber());
+            // ??? Need to set rest of measures to Candiate and add more warning. ???//
+          case 1: // No was clicked, keep original reference
+            break;
         }
       }
       // If the right measure is the reference, make sure they really want
@@ -668,6 +667,7 @@ namespace Qisis {
           case 0: // Yes was clicked or Enter was pressed, save the measure
             break;
           case 1: // No was clicked, keep original reference, return without saving
+            loadPoint();
             return;
         }
       }
@@ -676,9 +676,9 @@ namespace Qisis {
       p_editPoint->SetRefMeasure(p_leftMeasure->GetCubeSerialNumber());
     }
 
-    // If this is a fixed point, if either measure (left or right) is the
-    // ground source, update the lat,lon,radius.
-    if (p_editPoint->IsFixed() &&
+    // If this is a fixed or constrained point, if either measure (left or
+    // right) is the ground source, update the lat,lon,radius.
+    if (p_editPoint->GetType() != ControlPoint::Free &&
         (p_leftMeasure->GetCubeSerialNumber() == p_groundSN ||
          p_rightMeasure->GetCubeSerialNumber() == p_groundSN)) {
 
@@ -699,6 +699,7 @@ namespace Qisis {
             p_lockPoint->setChecked(false);
           // No was clicked, keep EditLock=true and return
           case 1: 
+            loadPoint();
             return;
 
         }
@@ -759,7 +760,8 @@ namespace Qisis {
 
     //  The ignore flag on the left measure has changed from the net file
     if (p_leftMeasure->IsIgnored() != leftMeasure->IsIgnored() ||
-        p_leftMeasure->IsEditLocked() != leftMeasure->IsEditLocked()) {
+        IsMeasureLocked(p_leftMeasure->GetCubeSerialNumber()) !=
+        IsMeasureLocked(leftMeasure->GetCubeSerialNumber())) {
       p_leftMeasure->SetChooserName(Application::UserName());
       *leftMeasure = *p_leftMeasure;
     }
@@ -802,11 +804,11 @@ namespace Qisis {
     ControlPoint *updatePoint = new ControlPoint;
     *updatePoint = *p_editPoint;
 
-    //  If this is a fixed point, see if there is a temporary
+    //  If this is a fixed or constrained point, see if there is a temporary
     //  measure holding the coordinate information from the ground source. 
     //  If so, delete this measure before saving point.  Clear out the
     //  fixed Measure variable (memory deleted in ControlPoint::Delete).
-    if (updatePoint->GetType() == ControlPoint::Fixed) {
+    if (updatePoint->GetType() != ControlPoint::Free) {
       for (int i=0; i<updatePoint->GetNumMeasures(); i++) {
         if ((*updatePoint)[i]->GetCubeSerialNumber() == p_groundSN) {
           updatePoint->Delete(i);
@@ -829,6 +831,7 @@ namespace Qisis {
     //  Change Save Measure button text back to default
     p_savePoint->setPalette(p_saveDefaultPalette);
 
+    loadPoint();
     // emit signal so the nav tool refreshes the list
     emit refreshNavList();
     // emit signal so the nav tool can update edit point
@@ -860,6 +863,11 @@ namespace Qisis {
       QMessageBox::critical((QWidget *)parent(), "Error", message);
       return;
     }
+
+    //  If ground loaded, readd temporary ground measure to the point
+    if (p_groundOpen) loadPoint();
+
+
     colorizeSaveButton();
   }
 
@@ -1637,7 +1645,7 @@ namespace Qisis {
 
     //  If fixed, add ground source file to combos, create a measure for
     //  the ground source, load reference on left, ground source on right
-    if (p_editPoint->IsFixed() && p_groundOpen) {
+    if (p_groundOpen && (p_editPoint->GetType() != ControlPoint::Free)) {
 
       // TODO:  Does open ground source match point ground source
 
@@ -1705,13 +1713,14 @@ namespace Qisis {
       leftIndex = p_editPoint->IndexOfRefMeasure();
     }
     else {
-      if (!p_editPoint->IsFixed() && (p_leftFile.length() != 0)) {
+      if (p_editPoint->GetType() == ControlPoint::Free &&
+          (p_leftFile.length() != 0)) {
         iString tempFilename = Filename(p_leftFile).Name();
         leftIndex = p_leftCombo->findText(tempFilename);
       }
     }
 
-    if (p_groundOpen && p_editPoint->IsFixed())  {
+    if (p_groundOpen && (p_editPoint->GetType() != ControlPoint::Free))  {
       rightIndex = p_rightCombo->findText((QString)p_groundSN);
     }
     else {
@@ -1816,8 +1825,10 @@ namespace Qisis {
       if (!m.IsIgnored()) tableItem = new QTableWidgetItem("False");
       p_measureTable->setItem(row,column++,tableItem);
 
-      if (m.IsEditLocked()) tableItem = new QTableWidgetItem("True");
-      if (!m.IsEditLocked()) tableItem = new QTableWidgetItem("False");
+      if (IsMeasureLocked(m.GetCubeSerialNumber()))
+        tableItem = new QTableWidgetItem("True");
+      if (!IsMeasureLocked(m.GetCubeSerialNumber()))
+        tableItem = new QTableWidgetItem("False");
       p_measureTable->setItem(row,column++,tableItem);
 
       tableItem = new QTableWidgetItem(QString::fromStdString(
@@ -2424,7 +2435,7 @@ namespace Qisis {
           painter->setPen(QColor(255, 255, 0)); // set point marker yellow
         }
         // Neither point nor measure is not ignored and the measure is fixed,
-        else if (p.GetType() == Isis::ControlPoint::Fixed) {
+        else if (p.GetType() != ControlPoint::Free) {
           painter->setPen(Qt::magenta);// set point marker magenta
         }
         else {
@@ -3043,7 +3054,8 @@ namespace Qisis {
       }
     }
 
-    if (p_editPoint != NULL && p_editPoint->IsFixed()) loadPoint();
+    if (p_editPoint != NULL &&
+        (p_editPoint->GetType() != ControlPoint::Free)) loadPoint();
     p_groundFilenameLabel->setText("Ground Source File:  " + p_groundFile);
     p_radiusFilenameLabel->setText("Radius Source File:  " + p_demFile);
 
@@ -3138,10 +3150,9 @@ namespace Qisis {
     //  If the loaded point is a fixed point, see if there is a temporary measure
     //  holding the coordinate information for the currentground source. If so,
     //  delete this measure.
-    if (p_editPoint->IsFixed()) {
-      if (p_editPoint->HasSerialNumber(p_groundSN)) {
-        p_editPoint->Delete(p_groundSN);
-      }
+    if (p_editPoint->GetType() != ControlPoint::Free &&
+        p_editPoint->HasSerialNumber(p_groundSN)) {
+      p_editPoint->Delete(p_groundSN);
     }
 
     p_leftCombo->removeItem(p_leftCombo->findText(p_groundFile));
