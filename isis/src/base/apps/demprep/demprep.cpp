@@ -15,7 +15,7 @@ using namespace std;
 using namespace Isis;
 
 void DoWrap(Buffer &in);
-void GetStats(Buffer &in);
+void GetStats(Buffer &in, Buffer &out);
 
 Cube *ocube;
 
@@ -31,8 +31,7 @@ void IsisMain() {
   // We will be using a mosaic technique so get the size of the input file
   ProcessByLine p;
   UserInterface &ui = Application::GetUserInterface();
-  CubeAttributeInput cai;
-  Cube *icube = p.SetInputCube(ui.GetFilename("FROM"), cai, ReadWrite);
+  Cube *icube = p.SetInputCube("FROM");
   int ins = icube->getSampleCount();
   inl = icube->getLineCount();
   int inb = icube->getBandCount();
@@ -60,6 +59,7 @@ void IsisMain() {
   }
 
   if(!proj->IsEquatorialCylindrical()) {
+    p.SetOutputCube("TO");
     p.StartProcess(GetStats);
 
     PvlGroup demRange("Results");
@@ -84,7 +84,12 @@ void IsisMain() {
                          Distance::Meters).GetKilometers();
     table += record;
 
-    icube->write(table);
+    ocube = new Cube();
+    ocube->open(Filename(ui.GetFilename("TO")).Expanded(), "rw");
+    ocube->write(table);
+    p.EndProcess();
+    ocube->close();
+    delete ocube;
     return;
   }
 
@@ -287,8 +292,11 @@ void IsisMain() {
   delete ocube;
 }
 
-void GetStats(Buffer &in) {
+void GetStats(Buffer &in, Buffer &out) {
   inCubeStats.AddData(&in[0], in.size());
+  for (int i=0; i<in.size(); i++) {
+    out[i] = in[i];
+  }
 }
 
 void DoWrap(Buffer &in) {
