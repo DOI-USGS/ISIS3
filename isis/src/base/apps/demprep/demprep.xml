@@ -79,7 +79,6 @@
       <parameter name="TO">
         <type>cube</type>
         <fileMode>output</fileMode>
-        <internalDefault>none</internalDefault>
         <brief>
           Output padded DEM cube
         </brief>
