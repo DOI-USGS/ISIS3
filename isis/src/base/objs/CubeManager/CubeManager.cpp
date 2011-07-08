@@ -57,7 +57,14 @@ namespace Isis {
       searchResult = p_cubes.find(fileName);
       // Bands are the only thing input attributes can affect
       (*searchResult)->setVirtualBands(attIn.Bands());
-      (*searchResult)->open(fileName.toStdString());
+
+      try {
+        (*searchResult)->open(fileName.toStdString());
+      }
+      catch(iException &e) {
+        CleanCubes(fileName.toStdString());
+        throw;
+      }
     }
 
     // Keep track of the newly opened cube in our queue

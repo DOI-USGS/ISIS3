@@ -110,18 +110,21 @@ namespace Isis {
    *   @history 2008-08-11 Steven Lambright - Fixed definition of IsisCubeDef,
    *            problem pointed out by "novas0x2a" (Support Board Member)
    *   @history 2008-12-15 Steven Koechle - Added a method to delete blobs from a
-   *            cube
+   *                cube
    *   @history 2008-12-17 Steven Koechle - BlobDelete method was broken, fixed
    *   @history 2009-06-30 Steven Lambright - Added "HasProjection" for uniform
-   *            projection existance test
+   *                projection existance test
    *   @history 2010-03-22 Steven Lambright - Added a mutex for reading and writing,
-   *            which makes these methods thread safe.
+   *                which makes these methods thread safe.
    *   @history 2011-03-23 Steven Lambright - Added ClearCache method.
    *   @history 2011-06-01 Jai Rideout and Steven Lambright - Updated API to
-   *            conform to new Isis standards, re-implemented IO handler and
-   *            implemented new caching algorithms that can automatically apply
-   *            themselves when the behavior of the caller changes.
+   *                conform to new Isis standards, re-implemented IO handler and
+   *                implemented new caching algorithms that can automatically apply
+   *                themselves when the behavior of the caller changes.
    *   @history 2011-06-27 Steven Lambright - Added addCachingAlgorithm
+   *   @history 2011-07-08 Steven Lambright - getProjection() and getCamera()
+   *                will now return NULL if the cube is not open, instead of
+   *                crashing, references #161
    *
    */
   class Cube {

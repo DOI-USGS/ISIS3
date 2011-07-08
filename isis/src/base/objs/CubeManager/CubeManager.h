@@ -45,7 +45,8 @@ namespace Isis {
    *           instance and not just statically. Added optional cube open limits.
    *   @history 2009-11-03 Mackenzie Boyd - Modified to include
    *            cube attributes (input) when opening cubes.
-   *
+   *   @history 2011-06-08 Steven Lambright - Better handles the case when a
+   *                Cube fails to open, fixes #161.
    */
   class CubeManager  {
     public:

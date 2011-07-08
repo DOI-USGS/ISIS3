@@ -955,7 +955,7 @@ namespace Isis {
    * @returns A camera based on the open cube
    */
   Camera *Cube::getCamera() {
-    if(m_camera == NULL) {
+    if(m_camera == NULL && isOpen()) {
       m_camera = CameraFactory::Create(*getLabel());
     }
     return m_camera;
@@ -1193,7 +1193,7 @@ namespace Isis {
    * if that interests you.
    */
   Projection *Cube::getProjection() {
-    if(m_projection == NULL) {
+    if(m_projection == NULL && isOpen()) {
       m_projection =  ProjectionFactory::CreateFromCube(*getLabel());
     }
     return m_projection;
