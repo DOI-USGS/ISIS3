@@ -36,6 +36,8 @@ namespace Isis {
 
     if(cp->IsIgnored())
       setPen(QPen(Qt::red));
+    else if(cp->IsEditLocked())
+      setPen(QPen(Qt::darkMagenta));
     else if(cp->GetType() == ControlPoint::Fixed)
       setPen(QPen(Qt::green));
     else if(cp->GetType() == ControlPoint::Constrained)
@@ -212,6 +214,10 @@ namespace Isis {
         QString::fromStdString(m_controlPoint->GetPointTypeString());
     toolTip += "\nNumber of Measures: ";
     toolTip += QString::number(m_controlPoint->GetNumMeasures());
+    toolTip += "\nIgnored: ";
+    toolTip += m_controlPoint->IsIgnored() ? "Yes" : "No";
+    toolTip += "\nEdit Locked: ";
+    toolTip += m_controlPoint->IsEditLocked() ? "Yes" : "No";
     toolTip += "\n";
 
     if(snList == NULL) {
