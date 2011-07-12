@@ -259,6 +259,9 @@ namespace Isis {
    *                    SetAdjustedSurfacePoint and ComputeResiduals
    *   @history 2011-07-08 Travis Addair - Locked measures can no longer be
    *                    deleted
+   *   @history 2011-07-12 Ken Edmundson - Modified ComputeApriori method
+   *                    to handle radius properly when computing average
+   *                    coordinates
    */
   class ControlPoint {
       friend class ControlNet;

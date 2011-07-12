@@ -1003,6 +1003,7 @@ namespace Isis {
     double xB = 0.0;
     double yB = 0.0;
     double zB = 0.0;
+    double r2B = 0.0;
     int goodMeasures = 0;
 
     // Loop for each measure and compute the sum of the lat/lon/radii
@@ -1031,6 +1032,7 @@ namespace Isis {
           xB += pB[0];
           yB += pB[1];
           zB += pB[2];
+          r2B += pB[0]*pB[0] + pB[1]*pB[1] + pB[2]*pB[2];
 
           double x = cam->DistortionMap()->UndistortedFocalPlaneX();
           double y = cam->DistortionMap()->UndistortedFocalPlaneY();
@@ -1071,10 +1073,16 @@ namespace Isis {
 
     // Compute the averages
     if (NumberOfConstrainedCoordinates() == 0) {
+      double avgX = xB / goodMeasures;
+      double avgY = yB / goodMeasures;
+      double avgZ = zB / goodMeasures;
+      double avgR2 = r2B / goodMeasures;
+      double scale = sqrt(avgR2/(avgX*avgX+avgY*avgY+avgZ*avgZ));
+
       aprioriSurfacePoint.SetRectangular(
-        Displacement((xB / goodMeasures), Displacement::Kilometers),
-        Displacement((yB / goodMeasures), Displacement::Kilometers),
-        Displacement((zB / goodMeasures), Displacement::Kilometers));
+        Displacement((avgX*scale), Displacement::Kilometers),
+        Displacement((avgY*scale), Displacement::Kilometers),
+        Displacement((avgZ*scale), Displacement::Kilometers));
     }
     // Since we are not solving yet for x,y,and z in the bundle directly,
     // longitude must be constrained.  This constrains x and y as well.
