@@ -2,32 +2,33 @@
 
 #include "Isis.h"
 
-#include "UserInterface.h"
 #include "AutoReg.h"
 #include "AutoRegFactory.h"
 #include "Camera.h"
 #include "Chip.h"
-#include "ControlNet.h"
 #include "ControlMeasure.h"
 #include "ControlMeasureLogData.h"
+#include "ControlNet.h"
 #include "ControlPoint.h"
 #include "Cube.h"
 #include "CubeManager.h"
-#include "iException.h"
-#include "iTime.h"
 #include "Pixel.h"
 #include "Progress.h"
 #include "SerialNumberList.h"
+#include "UserInterface.h"
+#include "iException.h"
+#include "iTime.h"
 
 using namespace std;
 using namespace Isis;
 
-void VerifyCube(Cube & cube);
-void PrintTemp();
+void verifyCube(Cube & cube);
+bool outputValue(ofstream &os, double value);
+void printTemp();
 
-map <string, void *> GuiHelpers() {
-  map <string, void *> helper;
-  helper ["PrintTemp"] = (void *) PrintTemp;
+map<string, void *> GuiHelpers() {
+  map<string, void *> helper;
+  helper["PrintTemp"] = (void *) printTemp;
   return helper;
 }
 
@@ -118,14 +119,6 @@ void IsisMain() {
       if (patternCM->IsEditLocked()) {
         locked++;
       }
-      else {
-        // Reference isn't locked, but the point is!
-        if (outPoint->IsEditLocked()) {
-          // TODO
-          // Report as error
-          // Then skip this point
-        }
-      }
 
       if (outPoint->GetRefMeasure() != patternCM) {
         outPoint->SetRefMeasure(patternCM);
@@ -163,8 +156,8 @@ void IsisMain() {
 
           ar->SearchChip()->TackCube(measure->GetSample(), measure->GetLine());
           
-          VerifyCube(patternCube);
-          VerifyCube(searchCube);
+          verifyCube(patternCube);
+          verifyCube(searchCube);
 
           try {
 
@@ -199,18 +192,19 @@ void IsisMain() {
                 else
                   measure->SetType(ControlMeasure::RegisteredPixel);
 
-                // Find the Euclidean distance the pixel moved in image space
-                double sampleDiff = measure->GetSample() - ar->CubeSample();
-                double lineDiff = measure->GetLine() - ar->CubeLine();
-                double pixelShift = sqrt(
-                    pow(sampleDiff, 2) + pow(lineDiff, 2));
+                double sampleShift = measure->GetSample() - ar->CubeSample();
+                double lineShift = measure->GetLine() - ar->CubeLine();
 
                 measure->SetLogData(ControlMeasureLogData(
-                      ControlMeasureLogData::PixelShift, pixelShift));
-                measure->SetCoordinate(ar->CubeSample(), ar->CubeLine());
+                      ControlMeasureLogData::SampleShift, sampleShift));
+                measure->SetLogData(ControlMeasureLogData(
+                      ControlMeasureLogData::LineShift, lineShift));
+
                 measure->SetLogData(ControlMeasureLogData(
                       ControlMeasureLogData::GoodnessOfFit,
                       ar->GoodnessOfFit()));
+
+                measure->SetCoordinate(ar->CubeSample(), ar->CubeLine());
                 measure->SetIgnored(false);
                 goodMeasureCount++;
               }
@@ -235,9 +229,13 @@ void IsisMain() {
                 measure->SetType(ControlMeasure::Candidate);
 
                 if (res == AutoReg::FitChipToleranceNotMet) {
-                  measure->SetResidual(
-                      measure->GetSample() - ar->CubeSample(),
-                      measure->GetLine() - ar->CubeLine());
+                  double sampleShift = measure->GetSample() - ar->CubeSample();
+                  double lineShift = measure->GetLine() - ar->CubeLine();
+
+                  measure->SetLogData(ControlMeasureLogData(
+                        ControlMeasureLogData::SampleShift, sampleShift));
+                  measure->SetLogData(ControlMeasureLogData(
+                        ControlMeasureLogData::LineShift, lineShift));
                   measure->SetLogData(ControlMeasureLogData(
                         ControlMeasureLogData::GoodnessOfFit,
                         ar->GoodnessOfFit()));
@@ -310,8 +308,8 @@ void IsisMain() {
     os.open(fFile.c_str(), ios::out);
     os <<
        "PointId,OriginalMeasurementSample,OriginalMeasurementLine," <<
-       "RegisteredMeasurementSample,RegisteredMeasurementLine,PixelShift," <<
-       "ZScoreMin,ZScoreMax,GoodnessOfFit" << endl;
+       "RegisteredMeasurementSample,RegisteredMeasurementLine,SampleShift," <<
+       "LineShift,PixelShift,ZScoreMin,ZScoreMax,GoodnessOfFit" << endl;
     os << NULL8 << endl;
 
     // Create a ControlNet from the original input file
@@ -344,29 +342,29 @@ void IsisMain() {
           os << pointId << "," << inSamp << "," << inLine << "," <<
             outSamp << "," << outLine;
 
-          os << ",";
-          double pixelShift = cmTrans->GetLogData(
-              ControlMeasureLogData::PixelShift).GetNumericalValue();
-          if (fabs(pixelShift) > DBL_EPSILON && pixelShift != NULL8)
-            os << pixelShift;
+          double sampleShift = cmTrans->GetLogData(
+              ControlMeasureLogData::SampleShift).GetNumericalValue();
+          double lineShift = cmTrans->GetLogData(
+              ControlMeasureLogData::LineShift).GetNumericalValue();
 
-          os << ",";
+          bool hasSampleShift = outputValue(os, sampleShift);
+          bool hasLineShift = outputValue(os, lineShift);
+
+          if (hasSampleShift && hasLineShift)
+            outputValue(os, sqrt(pow(sampleShift, 2) + pow(lineShift, 2)));
+          else
+            os << ",";
+
           double zScoreMin = cmTrans->GetLogData(
               ControlMeasureLogData::MinimumPixelZScore).GetNumericalValue();
-          if (fabs(zScoreMin) > DBL_EPSILON && zScoreMin != NULL8)
-            os << zScoreMin;
-
-          os << ",";
           double zScoreMax = cmTrans->GetLogData(
               ControlMeasureLogData::MaximumPixelZScore).GetNumericalValue();
-          if (fabs(zScoreMax) > DBL_EPSILON && zScoreMax != NULL8)
-            os << zScoreMax;
-
-          os << ",";
           double goodnessOfFit = cmTrans->GetLogData(
               ControlMeasureLogData::GoodnessOfFit).GetNumericalValue();
-          if (fabs(goodnessOfFit) > DBL_EPSILON && goodnessOfFit != NULL8)
-            os << goodnessOfFit;
+
+          outputValue(os, zScoreMin);
+          outputValue(os, zScoreMax);
+          outputValue(os, goodnessOfFit);
 
           os << endl;
         }
@@ -403,7 +401,7 @@ void IsisMain() {
 }
 
 // Verify a cube has either a Camera or a Projection, throw an exception if not
-void VerifyCube(Cube & cube) {
+void verifyCube(Cube & cube) {
   try {
     cube.getCamera();
   }
@@ -414,8 +412,20 @@ void VerifyCube(Cube & cube) {
 }
 
 
+bool outputValue(ofstream &os, double value) {
+  os << ",";
+
+  if (fabs(value) > DBL_EPSILON && value != NULL8) {
+    os << value;
+    return true;
+  }
+
+  return false;
+}
+
+
 // Helper function to print out template to session log
-void PrintTemp() {
+void printTemp() {
   UserInterface &ui = Application::GetUserInterface();
 
   // Get template pvl
@@ -425,3 +435,4 @@ void PrintTemp() {
   //Write template file out to the log
   Isis::Application::GuiLog(userTemp);
 }
+

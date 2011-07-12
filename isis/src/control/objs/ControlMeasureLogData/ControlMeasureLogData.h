@@ -116,16 +116,22 @@ namespace Isis {
         MaximumPixelZScore        = 4,
 
         /**
-         * Pointreg information indicating amount in pixels measure has shifted
+         * Pointreg information indicating amount in samples measure has
+         * shifted from apriori.
+         */
+        SampleShift               = 5,
+
+        /**
+         * Pointreg information indicating amount in lines measure has shifted
          * from apriori.
          */
-        PixelShift                = 5,
+        LineShift                 = 6
       };
       /**
        * This value must be > the largest enumerated value in this type or
        * convertions to and from Pvl will not work.
        */
-      static const int MaximumNumericLogDataType = 6;
+      static const int MaximumNumericLogDataType = 7;
 
 
       ControlMeasureLogData();
