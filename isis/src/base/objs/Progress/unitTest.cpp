@@ -34,7 +34,7 @@ int main() {
 
   // Check for error on setting the Maximum Steps
   try {
-    p.SetMaximumSteps(0);
+    p.SetMaximumSteps(-1);
   }
   catch(Isis::iException &e) {
     e.Report(false);
