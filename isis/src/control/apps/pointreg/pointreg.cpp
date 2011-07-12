@@ -307,7 +307,8 @@ void IsisMain() {
     ofstream os;
     os.open(fFile.c_str(), ios::out);
     os <<
-       "PointId,OriginalMeasurementSample,OriginalMeasurementLine," <<
+       "PointId,MeasureType,Reference,EditLock,Ignore,Registered," <<
+       "OriginalMeasurementSample,OriginalMeasurementLine," <<
        "RegisteredMeasurementSample,RegisteredMeasurementLine,SampleShift," <<
        "LineShift,PixelShift,ZScoreMin,ZScoreMax,GoodnessOfFit" << endl;
     os << NULL8 << endl;
@@ -333,14 +334,33 @@ void IsisMain() {
 
           string pointId = outPoint->GetId();
 
+          string measureType = cmTrans->MeasureTypeToString(
+              cmTrans->GetType());
+          string reference = outPoint->GetRefMeasure() == cmTrans ?
+              "true" : "false";
+          string editLock = cmTrans->IsEditLocked() ? "true" : "false";
+          string ignore = cmTrans->IsIgnored() ? "true" : "false";
+          string registered =
+              !cmOrig->IsRegistered() && cmTrans->IsRegistered() ?
+              "true" : "false";
+
           double inSamp = cmOrig->GetSample();
           double inLine = cmOrig->GetLine();
 
           double outSamp = cmTrans->GetSample();
           double outLine = cmTrans->GetLine();
 
-          os << pointId << "," << inSamp << "," << inLine << "," <<
-            outSamp << "," << outLine;
+          os <<
+              pointId << "," <<
+              measureType << "," <<
+              reference << "," <<
+              editLock << "," <<
+              ignore << "," <<
+              registered << "," <<
+              inSamp << "," <<
+              inLine << "," <<
+              outSamp << "," <<
+              outLine;
 
           double sampleShift = cmTrans->GetLogData(
               ControlMeasureLogData::SampleShift).GetNumericalValue();
@@ -373,6 +393,7 @@ void IsisMain() {
   }
 
   PvlGroup pLog("Points");
+  pLog += PvlKeyword("Total", outNet.GetNumPoints());
   pLog += PvlKeyword("Ignored", ignored);
   // TODO output the z-scores, goodness of fit, eccentricity for each point
   Application::Log(pLog);
