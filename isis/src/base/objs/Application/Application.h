@@ -92,6 +92,7 @@ namespace Isis {
    *            communication to ProgramLauncher.
    *   @history 2011-03-01 Steven Lambright - Fixed Version method
    *   @history 2011-04-01 Eric Hyer - Now inherits from Environment
+   *   @history 2011-07-12 Sharmila Prasad - Fixed bug in "ExecutionDateTime" keyword
    */
   class Application : public Environment {
     public:

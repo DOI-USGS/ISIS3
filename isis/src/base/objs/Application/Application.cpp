@@ -79,7 +79,7 @@ namespace Isis {
     p_appName = argv[0];
 
     // Get the starting wall clock time
-    p_datetime = DateTime(&p_startTime);
+    //p_datetime = DateTime(&p_startTime);
 
     // Init
     p_startClock = 0;
@@ -105,7 +105,7 @@ namespace Isis {
     }
 
     // Get the starting cpu time, direct I/Os, page faults, and swaps
-    p_startClock = clock();
+    //p_startClock = clock();
     p_startDirectIO = DirectIO();
     p_startPageFaults = PageFaults();
     p_startProcessSwaps = ProcessSwaps();
@@ -244,12 +244,13 @@ namespace Isis {
    * @return PvlObject
    */
   PvlObject Application::History() {
+    p_startClock = clock();
     PvlObject history(p_ui->ProgramName());
     history += PvlKeyword("IsisVersion", Version());
     history += PvlKeyword("ProgramVersion", p_ui->Version());
     QString path = QCoreApplication::applicationDirPath();
     history += PvlKeyword("ProgramPath", path);
-    history += PvlKeyword("ExecutionDateTime", p_datetime);
+    history += PvlKeyword("ExecutionDateTime", DateTime(&p_startTime));
     history += PvlKeyword("HostName", HostName());
     history += PvlKeyword("UserName", UserName());
     history += PvlKeyword("Description", p_ui->Brief());
