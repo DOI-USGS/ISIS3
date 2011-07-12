@@ -4745,14 +4745,23 @@ void BundleAdjust::SpecialKIterationSummary() {
       (m_dGlobalSpacecraftAccelerationAprioriSigma == -1) ? sprintf(buf,"\n      SPACECRAFT ACCELERATION SIGMA: N/A"):
               sprintf(buf,"\n      SPACECRAFT ACCELERATION SIGMA: %lf (m/s/s)",m_dGlobalSpacecraftAccelerationAprioriSigma);
       fp_out << buf;
-      (m_dGlobalCameraAnglesAprioriSigma[0] == -1) ? sprintf(buf,"\n                CAMERA ANGLES SIGMA: N/A"):
-              sprintf(buf,"\n                CAMERA ANGLES SIGMA: %lf (dd)",m_dGlobalCameraAnglesAprioriSigma[0]);
+
+      if (m_nNumberCameraCoefSolved < 1 || m_dGlobalCameraAnglesAprioriSigma[0] == -1)
+        sprintf(buf,"\n                CAMERA ANGLES SIGMA: N/A");
+      else
+        sprintf(buf,"\n                CAMERA ANGLES SIGMA: %lf (dd)",m_dGlobalCameraAnglesAprioriSigma[0]);
       fp_out << buf;
-      (m_dGlobalCameraAnglesAprioriSigma[1] == -1) ? sprintf(buf,"\n      CAMERA ANGULAR VELOCITY SIGMA: N/A"):
-              sprintf(buf,"\n      CAMERA ANGULAR VELOCITY SIGMA: %lf (dd/s)",m_dGlobalCameraAnglesAprioriSigma[1]);
+
+      if (m_nNumberCameraCoefSolved < 2 || m_dGlobalCameraAnglesAprioriSigma[1] == -1)
+        sprintf(buf,"\n      CAMERA ANGULAR VELOCITY SIGMA: N/A");
+      else
+        sprintf(buf,"\n      CAMERA ANGULAR VELOCITY SIGMA: %lf (dd/s)",m_dGlobalCameraAnglesAprioriSigma[1]);
       fp_out << buf;
-      (m_dGlobalCameraAnglesAprioriSigma[2] == -1) ? sprintf(buf,"\n  CAMERA ANGULAR ACCELERATION SIGMA: N/A"):
-              sprintf(buf,"\n  CAMERA ANGULAR ACCELERATION SIGMA: %lf (dd/s/s)",m_dGlobalCameraAnglesAprioriSigma[2]);
+
+      if (m_nNumberCameraCoefSolved < 3 || m_dGlobalCameraAnglesAprioriSigma[2] == -1)
+        sprintf(buf,"\n  CAMERA ANGULAR ACCELERATION SIGMA: N/A");
+      else
+        sprintf(buf,"\n  CAMERA ANGULAR ACCELERATION SIGMA: %lf (dd/s/s)",m_dGlobalCameraAnglesAprioriSigma[2]);
       fp_out << buf;
 
       sprintf(buf, "\n\nJIGSAW: RESULTS\n===============\n");

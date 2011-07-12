@@ -80,6 +80,9 @@
  *   @history 2011-06-27 Debbie A. Cook and Ken Edmundson Added names to top
  *                          header fields of .csv output and fixed bugs in
  *                          sparse output.
+ *   @history 2011-07-12 Ken Edmundson Segmentation fault bugfix in OutputHeader
+ *                          method. Previously was attempting to output camera
+ *                          angle sigmas when none had been allocated.
  */
 
 #include <vector>
