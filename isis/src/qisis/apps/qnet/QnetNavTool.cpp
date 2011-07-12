@@ -257,7 +257,7 @@ namespace Qisis {
                                      point.  You can filter for points that \
                                      have an error greater than, or less than \
                                      the entered value.");
-#if 0
+
     QWidget *registrationErrorFilter = new QnetPointRegistrationErrorFilter();
     connect(registrationErrorFilter, SIGNAL(filteredListModified()),
             this, SLOT(filterList()));
@@ -272,7 +272,7 @@ namespace Qisis {
                                      have an error greater than, or less than \
                                      the entered value.  The maximum for all \
                                      measures in the point is used");
-#endif
+
     QWidget *ptIdFilter = new QnetPointIdFilter();
     connect(ptIdFilter, SIGNAL(filteredListModified()),
             this, SLOT(filterList()));

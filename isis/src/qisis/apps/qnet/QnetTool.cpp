@@ -1810,6 +1810,17 @@ namespace Qisis {
       }
       p_measureTable->setItem(row,column++,tableItem);
 
+      double pixelShift = m.GetLogData(
+                      ControlMeasureLogData::PixelShift).GetNumericalValue();
+      if (pixelShift == Isis::Null) {
+        tableItem = new QTableWidgetItem(QString("Null"));
+      }
+      else {
+        tableItem = new QTableWidgetItem();
+        tableItem->setData(0,pixelShift);
+      }
+      p_measureTable->setItem(row,column++,tableItem);
+
       double goodnessOfFit = m.GetLogData(
                       ControlMeasureLogData::GoodnessOfFit).GetNumericalValue();
       if (goodnessOfFit == Isis::Null) {
@@ -1891,6 +1902,8 @@ namespace Qisis {
         return "Line Residual";
       case RESIDUALMAGNITUDE:
         return "Residual Magnitude";
+      case PIXELSHIFT:
+        return "Pixel Shift";
       case GOODNESSOFFIT:
         return "Goodness of Fit";
       case IGNORED:
