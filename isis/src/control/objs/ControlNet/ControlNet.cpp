@@ -192,19 +192,21 @@ namespace Isis {
     QList< ControlPointFileEntryV0002 > &fileDataPoints =
       fileData->GetNetworkPoints();
 
-    if (progress != NULL) {
-      progress->SetText("Loading Control Points...");
-      progress->SetMaximumSteps(fileDataPoints.size());
-      progress->CheckStatus();
-    }
-
-    ControlPointFileEntryV0002 fileDataPoint;
-    foreach(fileDataPoint, fileDataPoints) {
-      AddPoint(new ControlPoint(fileDataPoint,
-          p_targetRadii[0], p_targetRadii[1], p_targetRadii[2]));
-
-      if (progress != NULL)
+    if (fileDataPoints.size() > 0) {
+      if (progress != NULL) {
+        progress->SetText("Loading Control Points...");
+        progress->SetMaximumSteps(fileDataPoints.size());
         progress->CheckStatus();
+      }
+
+      ControlPointFileEntryV0002 fileDataPoint;
+      foreach(fileDataPoint, fileDataPoints) {
+        AddPoint(new ControlPoint(fileDataPoint,
+              p_targetRadii[0], p_targetRadii[1], p_targetRadii[2]));
+
+        if (progress != NULL)
+          progress->CheckStatus();
+      }
     }
 
     delete fileData;
@@ -613,9 +615,9 @@ namespace Isis {
    *
    * @param point The point to delete
    */
-  void ControlNet::DeletePoint(ControlPoint *point) {
+  int ControlNet::DeletePoint(ControlPoint *point) {
     if (points->values().contains(point)) {
-      DeletePoint(point->GetId());
+      return DeletePoint(point->GetId());
     }
     else {
       iString msg = "point [";
@@ -631,13 +633,17 @@ namespace Isis {
    *
    * @param pointId The Point Id of the ControlPoint to be deleted.
    */
-  void ControlNet::DeletePoint(iString pointId) {
+  int ControlNet::DeletePoint(iString pointId) {
     if (!points->contains(pointId)) {
       iString msg = "point Id [" + pointId + "] does not exist in the network";
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
     ControlPoint *point = (*points)[pointId];
+
+    if (point->IsEditLocked())
+      return ControlPoint::PointLocked;
+
     bool wasIgnored = point->IsIgnored();
 
     // notify CubeSerialNumbers of the loss of this point
@@ -675,6 +681,8 @@ namespace Isis {
 
     if (!wasIgnored)
       emit networkStructureModified();
+
+    return ControlPoint::Success;
   }
 
 
@@ -683,13 +691,13 @@ namespace Isis {
    *
    * @param index The index of the Control Point to be deleted.
    */
-  void ControlNet::DeletePoint(int index) {
+  int ControlNet::DeletePoint(int index) {
     if (index < 0 || index >= pointIds->size()) {
       iString msg = "Index [" + iString(index) + "] out of range";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
-    DeletePoint(pointIds->at(index));
+    return DeletePoint(pointIds->at(index));
   }
 
 

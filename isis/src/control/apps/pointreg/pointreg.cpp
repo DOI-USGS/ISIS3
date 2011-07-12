@@ -199,9 +199,14 @@ void IsisMain() {
                 else
                   measure->SetType(ControlMeasure::RegisteredPixel);
 
-                measure->SetResidual(
-                    measure->GetSample() - ar->CubeSample(),
-                    measure->GetLine() - ar->CubeLine());
+                // Find the Euclidean distance the pixel moved in image space
+                double sampleDiff = measure->GetSample() - ar->CubeSample();
+                double lineDiff = measure->GetLine() - ar->CubeLine();
+                double pixelShift = sqrt(
+                    pow(sampleDiff, 2) + pow(lineDiff, 2));
+
+                measure->SetLogData(ControlMeasureLogData(
+                      ControlMeasureLogData::PixelShift, pixelShift));
                 measure->SetCoordinate(ar->CubeSample(), ar->CubeLine());
                 measure->SetLogData(ControlMeasureLogData(
                       ControlMeasureLogData::GoodnessOfFit,
@@ -246,7 +251,6 @@ void IsisMain() {
             }
           }
           catch (iException &e) {
-            std::cout << "catch" << std::endl;
             e.Clear();
             unregistered++;
 
@@ -306,8 +310,8 @@ void IsisMain() {
     os.open(fFile.c_str(), ios::out);
     os <<
        "PointId,OriginalMeasurementSample,OriginalMeasurementLine," <<
-       "RegisteredMeasurementSample,RegisteredMeasurementLine,SampleDifference," <<
-       "LineDifference,ZScoreMin,ZScoreMax,GoodnessOfFit" << endl;
+       "RegisteredMeasurementSample,RegisteredMeasurementLine,PixelShift," <<
+       "ZScoreMin,ZScoreMax,GoodnessOfFit" << endl;
     os << NULL8 << endl;
 
     // Create a ControlNet from the original input file
@@ -341,14 +345,10 @@ void IsisMain() {
             outSamp << "," << outLine;
 
           os << ",";
-          double sampErr = cmTrans->GetSampleResidual();
-          if (!Pixel::IsNull(sampErr))
-            os << sampErr;
-          
-          os << ",";
-          double lineErr = cmTrans->GetLineResidual();
-          if (!Pixel::IsNull(lineErr))
-            os << lineErr;
+          double pixelShift = cmTrans->GetLogData(
+              ControlMeasureLogData::PixelShift).GetNumericalValue();
+          if (fabs(pixelShift) > DBL_EPSILON && pixelShift != NULL8)
+            os << pixelShift;
 
           os << ",";
           double zScoreMin = cmTrans->GetLogData(

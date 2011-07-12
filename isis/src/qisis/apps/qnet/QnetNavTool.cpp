@@ -21,7 +21,8 @@
 #include "QnetNavTool.h"
 #include "QnetPointCubeNameFilter.h"
 #include "QnetPointDistanceFilter.h"
-#include "QnetPointErrorFilter.h"
+#include "QnetPointJigsawErrorFilter.h"
+#include "QnetPointRegistrationErrorFilter.h"
 #include "QnetPointGoodnessFilter.h"
 #include "QnetPointIdFilter.h"
 #include "QnetPointImagesFilter.h"
@@ -43,6 +44,7 @@
 
 #include "qnet.h"
 using namespace Qisis::Qnet;
+using namespace Isis;
 using namespace std;
 
 namespace Qisis {
@@ -244,27 +246,42 @@ namespace Qisis {
     // Set up the point filters
     QTabWidget *pointFilters = new QTabWidget();
 
-    QWidget *errorFilter = new QnetPointErrorFilter();
-    connect(errorFilter, SIGNAL(filteredListModified()),
-        this, SLOT(filterList()));
-    pointFilters->insertTab(Errors, errorFilter, "&Error");
-    pointFilters->setTabToolTip(Errors, "Filter Points by Error");
-    pointFilters->setTabWhatsThis(Errors,
+    QWidget *jigsawErrorFilter = new QnetPointJigsawErrorFilter();
+    connect(jigsawErrorFilter, SIGNAL(filteredListModified()),
+            this, SLOT(filterList()));
+    pointFilters->insertTab(JigsawErrors, jigsawErrorFilter, "&Jigsaw Errors");
+    pointFilters->setTabToolTip(JigsawErrors, "Filter Points by Jigsaw Error");
+    pointFilters->setTabWhatsThis(JigsawErrors,
         "<b>Function: </b> Filter points list by \
                                      the bundle adjust error value at each  \
                                      point.  You can filter for points that \
                                      have an error greater than, or less than \
                                      the entered value.");
-
+#if 0
+    QWidget *registrationErrorFilter = new QnetPointRegistrationErrorFilter();
+    connect(registrationErrorFilter, SIGNAL(filteredListModified()),
+            this, SLOT(filterList()));
+    pointFilters->insertTab(RegistrationErrors, registrationErrorFilter,
+                            "&Registration Errors");
+    pointFilters->setTabToolTip(RegistrationErrors,
+                                "Filter Points by Registration Error");
+    pointFilters->setTabWhatsThis(RegistrationErrors,
+        "<b>Function: </b> Filter points list by \
+                                     the registration pixel shift value at each  \
+                                     point.  You can filter for points that \
+                                     have an error greater than, or less than \
+                                     the entered value.  The maximum for all \
+                                     measures in the point is used");
+#endif
     QWidget *ptIdFilter = new QnetPointIdFilter();
     connect(ptIdFilter, SIGNAL(filteredListModified()),
-        this, SLOT(filterList()));
+            this, SLOT(filterList()));
     pointFilters->insertTab(Id, ptIdFilter, "&Point ID");
     pointFilters->setTabToolTip(Id, "Filter Points by PointID");
 
     QWidget *ptImageFilter = new QnetPointImagesFilter();
     connect(ptImageFilter, SIGNAL(filteredListModified()),
-        this, SLOT(filterList()));
+            this, SLOT(filterList()));
     pointFilters->insertTab(NumberImages, ptImageFilter, "&Number of Measures");
     pointFilters->setTabToolTip(NumberImages, "Filter Points by Number of Images");
     pointFilters->setTabWhatsThis(NumberImages, "<b>Function: </b> Filter points list \
@@ -715,18 +732,29 @@ namespace Qisis {
         "&Yes", "&No", 0, 0)) {
       case 0: // Yes was clicked or Enter was pressed, delete points
         QApplication::setOverrideCursor(Qt::WaitCursor);
+        int lockedPoints = 0;
         for (int i = 0; i < selected.size(); i++) {
           int index = p_listBox->row(selected[i]);
           if (g_filteredPoints.size() == 0) {
-            (*g_controlNetwork)[index]->SetIgnored(true);
+            if ((*g_controlNetwork)[index]->SetIgnored(true) ==
+                ControlPoint::PointLocked) lockedPoints++;
           }
           else {
-            (*g_controlNetwork)[g_filteredPoints[index]]->SetIgnored(true);
+            if ((*g_controlNetwork)[g_filteredPoints[index]]->SetIgnored(true)
+                == ControlPoint::PointLocked) lockedPoints++;
           }
           emit pointChanged((*g_controlNetwork)[g_filteredPoints[index]]->GetId());
         }
+        //  Print info about locked points if there are any
+        if (lockedPoints > 0) {
+          QMessageBox::information((QWidget *)parent(),"EditLocked Points",
+                QString::number(lockedPoints) + " / "
+                + QString::number(selected.size())
+                + " points are EditLocked and were not set to Ignored.");
+        }
         QApplication::restoreOverrideCursor();
-        emit netChanged();
+        if (lockedPoints != selected.size()) emit netChanged();
+
         break;
         //  case 1: // No was clicked, close window and do nothing to points
     }
@@ -872,10 +900,16 @@ namespace Qisis {
     // We're dealing with points
     if (p_listCombo->currentIndex() == Points) {
       PointFilterIndex pointIndex = (PointFilterIndex) tab->currentIndex();
-      // We have an errors filter
-      if (pointIndex == Errors) {
-        QnetPointErrorFilter *widget =
-          (QnetPointErrorFilter *)(tab->currentWidget());
+      // We have a jigsaw errors filter
+      if (pointIndex == JigsawErrors) {
+        QnetPointJigsawErrorFilter *widget =
+          (QnetPointJigsawErrorFilter *)(tab->currentWidget());
+        widget->filter();
+      }
+      // We have a registration errors filter
+      if (pointIndex == RegistrationErrors) {
+        QnetPointRegistrationErrorFilter *widget =
+          (QnetPointRegistrationErrorFilter *)(tab->currentWidget());
         widget->filter();
       }
       // We have a point id filter
@@ -1003,5 +1037,67 @@ namespace Qisis {
   void QnetNavTool::showNavTool() {
     p_navDialog->setShown(true);
   }
+
+#if 0
+  /**
+   * List selected points which are EditLocked and allow user to un-lock
+   */
+  void QnetNavTool::listLockedPoints() {
+
+    QDialog lockDialog = new QDialog();
+    lockDialog.setWindowTitle("Un-lock Points");
+    lockDialog.setModal(true);
+
+    QListWidget editLockPointsListBox = new QListWidget(lockDialog);
+    connect(editLockPointsListBox, SIGNAL(itemChanged(QListWidgetItem *)),
+            this, SLOT(unlockPoint(QListWidgetItem *)));
+
+    QList<QListWidgetItem *> selected = p_listBox->selectedItems();
+    QList<QListWidgetItem *> lockedPoints;
+
+    // Fill editLock List Box
+    for (int i=0; i<selected.size(); i++) {
+      QString id = selected.at(i)->text();
+      ControlPoint *pt = g_controlNetwork->GetPoint(id);
+      if (pt->IsEditLocked()) {
+        QListWidgetItem *item = new QListWidgetItem(*(selected[i]));
+        item->setCheckState(Qt::Checked);
+        editLockPointsListBox->addItem(item);
+      }
+    }
+
+    if (lockDialog.exec()) {
+
+    }
+
+
+
+    switch (QMessageBox::question((QWidget *)parent(),
+        "Control Network Navigator - Ignore Points",
+        "You have chosen to set "
+        + QString::number(selected.size())
+        + " point(s) to ignore. Do you want to continue?",
+        "&Yes", "&No", 0, 0)) {
+      case 0: // Yes was clicked or Enter was pressed, delete points
+        QApplication::setOverrideCursor(Qt::WaitCursor);
+          emit pointChanged((*g_controlNetwork)[g_filteredPoints[index]]->GetId());
+        }
+
+
+  }
+
+  void QnetNavTool::unlockPoint(QListWidgetItem *pointId) {
+    ControlPoint *pt = g_controlNetwork->GetPoint(pointId->text());
+    if (pt->IsEditLocked() && pointId->checkState() == Qt::Unchecked) {
+      pt->SetEditLock(false);
+      editLockPointsListBox->removeItemWidget(pointId);
+      pointId->setHidden(true);
+      editLockPointsListBox->repaint();
+      this->repaint();
+      emit netChanged();
+    }
+
+  }
+#endif
 }
 

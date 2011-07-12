@@ -1,12 +1,16 @@
-#include <QGridLayout>
-#include <QMessageBox>
 #include "QnetPointTypeFilter.h"
+
+#include <QtGui>
+#include <QGroupBox>
+
 #include "ControlMeasure.h"
 #include "QnetNavTool.h"
 #include "ControlNet.h"
 #include "SerialNumberList.h"
+
 #include "qnet.h"
 
+using namespace Isis;
 using namespace Qisis::Qnet;
 
 namespace Qisis {
@@ -26,28 +30,73 @@ namespace Qisis {
    *
    */
   QnetPointTypeFilter::QnetPointTypeFilter(QWidget *parent) : QnetFilter(parent) {
-    p_fixed = NULL;
-    p_ignore = NULL;
+    p_pointType = NULL;
+    p_free = NULL;
     p_constrained = NULL;
+    p_fixed = NULL;
+    p_ignoreStatus = NULL;
+    p_ignored = NULL;
+    p_notIgnored = NULL;
+    p_editLockStatus = NULL;
     p_editLocked = NULL;
+    p_notEditLocked = NULL;
 
     // Create the components for the filter window
-    p_fixed = new QRadioButton("Fixed");
-    p_fixed->setChecked(false);
-    p_ignore = new QRadioButton("Ignored");
-    p_constrained = new QRadioButton("Constrained");
+    p_pointType = new QGroupBox("Filter by Point Type(s)");
+    p_pointType->setCheckable(true);
+    p_free = new QCheckBox("Free");
+    p_constrained = new QCheckBox("Constrained");
+    p_fixed = new QCheckBox("Fixed");
+
+    p_free->setChecked(true);
+
+    QVBoxLayout *typeLayout = new QVBoxLayout();
+    typeLayout->addWidget(p_free);
+    typeLayout->addWidget(p_constrained);
+    typeLayout->addWidget(p_fixed);
+    typeLayout->addStretch(1);
+    p_pointType->setLayout(typeLayout);
+
+    p_ignoreStatus = new QGroupBox("Filter by Ignore Status");
+    p_ignoreStatus->setCheckable(true);
+    p_ignoreStatus->setChecked(false);
+    p_ignored = new QRadioButton("Ignored");
+    p_notIgnored = new QRadioButton("Not Ignored");
+
+    p_ignored->setChecked(true);
+
+    QVBoxLayout *ignoreLayout = new QVBoxLayout();
+    ignoreLayout->addWidget(p_ignored);
+    ignoreLayout->addWidget(p_notIgnored);
+    p_ignoreStatus->setLayout(ignoreLayout);
+
+    p_editLockStatus = new QGroupBox("Filter by Edit Lock Status");
+    p_editLockStatus->setCheckable(true);
+    p_editLockStatus->setChecked(false);
     p_editLocked = new QRadioButton("Edit Locked");
-    QLabel *pad = new QLabel();
+    p_notEditLocked = new QRadioButton("Not Edit Locked");
+
+    p_editLocked->setChecked(true);
+
+    QVBoxLayout *lockLayout = new QVBoxLayout();
+    lockLayout->addWidget(p_editLocked);
+    lockLayout->addWidget(p_notEditLocked);
+    p_editLockStatus->setLayout(lockLayout);
+
+    //QLabel *pad = new QLabel();
 
     // Create the layout and add the components to it
-    QGridLayout *gridLayout = new QGridLayout();
-    gridLayout->addWidget(p_fixed, 0, 0, 1, 4);
-    gridLayout->addWidget(p_ignore, 1, 0, 1, 4);
-    gridLayout->addWidget(p_constrained, 2, 0, 1, 4);
-    gridLayout->addWidget(p_editLocked, 3, 0, 1, 4);
-    gridLayout->addWidget(pad, 4, 0);
-    gridLayout->setRowStretch(4, 50);
-    this->setLayout(gridLayout);
+
+
+    QVBoxLayout *statusLayout = new QVBoxLayout();
+    statusLayout->addWidget(p_ignoreStatus);
+    statusLayout->addWidget(p_editLockStatus);
+
+    QHBoxLayout *layout = new QHBoxLayout();
+    layout->addWidget(p_pointType);
+    layout->addLayout(statusLayout);
+
+    this->setLayout(layout);
   }
 
   /**
@@ -84,57 +133,97 @@ namespace Qisis {
       return;
     }
 
-    // Loop through each value of the filtered points list checking
-    // the types of each control point
-    // Loop in reverse order since removal list of elements affects index number
-    for (int i = g_filteredPoints.size() - 1; i >= 0; i--) {
-      Isis::ControlPoint &cp = *(*g_controlNetwork)[g_filteredPoints[i]];
+    // Make sure something is selected for filtering
+    if (!p_pointType->isChecked() && !p_ignoreStatus->isChecked() &&
+        !p_editLockStatus->isChecked()) {
+      QMessageBox::information((QWidget *)parent(),"Input Error",
+          "You must select something to filter.");
+      return;
+    }
+  
+    // if Filter by Measure Type is selected but no Measure Type is checked, throw error
+    if ((p_pointType->isChecked()) &&
+        !(p_fixed->isChecked() || p_constrained->isChecked() ||
+          p_free->isChecked())) {
+      QMessageBox::information((QWidget *)parent(), "Error",
+          "Filter by Point Type is selected. You must choose at least one "
+          "Point Type to filter");
+      return;
+    }
 
-      if (p_fixed->isChecked()) {
-        if (cp.GetType() == Isis::ControlPoint::Fixed) {
-          continue;
-        }
-        else {
-          g_filteredPoints.removeAt(i);
-        }
+    // Loop through each value of the filtered points list checking the types of
+    // each control point Loop in reverse order since removal list of elements
+    // affects index number
+    for (int i = g_filteredPoints.size() - 1; i >= 0; i--) {
+      ControlPoint &cp = *(*g_controlNetwork)[g_filteredPoints[i]];
+      bool keep = true;
+      if (p_pointType->isChecked()) {
+        if (!PointTypeMatched(cp.GetType())) keep = false;
       }
-      else if (p_ignore->isChecked()) {
-        if (cp.IsIgnored()) {
-          continue;
-        }
-        else {
-          for (int j = 0; j < cp.GetNumMeasures(); j++) {
-            if (!cp[j]->IsIgnored()) {
-              // if any measure is not ignored, remove from filtered list
-              g_filteredPoints.removeAt(i);
-              break;
-            }
+
+      if (keep && p_ignoreStatus->isChecked()) {
+
+        //  First check all measures in point.  if all measures are ignored,
+        //  point is considered ignored.
+        bool allMeasuresIgnored = true;
+        for (int j = 0; j < cp.GetNumMeasures(); j++) {
+          if (!cp[j]->IsIgnored()) {
+            allMeasuresIgnored = false;
+            break;
           }
-          // if all measures have Ignore=True, treat point as ignored
-          // and keep in filtered list
-          continue;
+        }
+        if (p_ignored->isChecked() && !cp.IsIgnored() && !allMeasuresIgnored) {
+          keep = false;
+        }
+        else if (p_notIgnored->isChecked() &&
+                 (cp.IsIgnored() || allMeasuresIgnored)) {
+          keep = false;
         }
       }
-      else if (p_constrained->isChecked()) {
-        if (cp.GetType() == Isis::ControlPoint::Constrained) {
-          continue;
+
+      if (keep && p_editLockStatus->isChecked()) {
+        if (p_editLocked->isChecked() && !cp.IsEditLocked()) {
+          keep = false;
         }
-        else {
-          g_filteredPoints.removeAt(i);
-        }
-      }
-      else if (p_editLocked->isChecked()) {
-        if (cp.IsEditLocked()) {
-          continue;
-        }
-        else {
-          g_filteredPoints.removeAt(i);
+        else if (p_notEditLocked->isChecked() && cp.IsEditLocked()) {
+          keep = false;
         }
       }
+
+      if (!keep) g_filteredPoints.removeAt(i);
     }
 
     // Tell the navtool that a list has been filtered and it needs to update
     emit filteredListModified();
     return;
   }
+
+
+
+  /**
+   * @brief Returns whether the point type passed in matches a type selected by 
+   *        the user.
+   *
+   * This method is called by the filter() method to checks
+   * whether a particular point type matches any of the checkboxes selected by 
+   * the user. 
+   *
+   * @param pointType ControlPoint type to compare with user selection. 
+   * @return <b>bool</b> True if the point type matches a type selected by the 
+   *         user.
+   */
+  bool QnetPointTypeFilter::PointTypeMatched(int pointType) {
+    if (p_fixed->isChecked() && pointType == ControlPoint::Fixed) {
+      return true;;
+    }
+    if (p_constrained->isChecked() && pointType == ControlPoint::Constrained) {
+      return true;;
+    }
+    if (p_free->isChecked() && pointType == ControlPoint::Free) {
+      return true;;
+    }
+    return false;
+  }
+
+
 }

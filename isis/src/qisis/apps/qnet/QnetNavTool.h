@@ -122,7 +122,8 @@ namespace Qisis {
         Cubes
       };
       enum PointFilterIndex {
-        Errors,
+        JigsawErrors,
+        RegistrationErrors,
         Id,
         NumberImages,
         Type,
@@ -173,6 +174,7 @@ namespace Qisis {
     private:
       void createNavigationDialog(QWidget *parent);
       void createFilters();
+//      void listLockedPoints();
 
 
       QDialog *p_navDialog;

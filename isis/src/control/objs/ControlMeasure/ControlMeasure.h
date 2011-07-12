@@ -151,6 +151,14 @@ namespace Isis {
    *   @history 2011-04-07 Steven Lambright - GetResidualMagnitude no longer
    *                              does math on special pixels.
    *   @history 2011-04-11 Steven Lambright - Added GetLogValue for convenience
+   *   @history 2011-07-05 Debbie A. Cook - Removed editLock checks from methods
+   *                              SetCamera, SetRejected, and SetResidual and 
+   *                              changed all other editLock tests to use
+   *                              IsEditLocked method instead of the private
+   *                              member, p_editLock, directly.  Also added
+   *                              a check for an implicit lock if the measure is
+   *                              the reference measure of the parent point in
+   *                              the IsEditLocked method.  
    */
   class ControlMeasure {
       friend class ControlPoint;

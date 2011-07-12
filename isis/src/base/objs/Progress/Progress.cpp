@@ -99,9 +99,9 @@ namespace Isis {
    * @throws Isis::iException::Programmer Invalid value for step (must be >0)
    */
   void Progress::SetMaximumSteps(const int steps) {
-    if(steps <= 0) {
+    if(steps < 0) {
       string m = "Value for [steps] must be greater than ";
-      m += "zero in [Progress::SetMaximumSteps]";
+      m += "or equal to zero in [Progress::SetMaximumSteps]";
       throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
     }
     p_maximumSteps = steps;

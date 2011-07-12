@@ -617,7 +617,7 @@ namespace Qisis {
 
       }
     }
-    if (p_rightMeasure->IsIgnored()) {
+    if (rightMeasure->IsIgnored()) {
       QString message = "You are saving changes to an ignored measure.  ";
       message += "Do you want to set Ignore = False on the right measure?";
       switch(QMessageBox::question((QWidget *)parent(),
@@ -1491,7 +1491,7 @@ namespace Qisis {
       deletePointDialog->fileList->addItem(file.c_str());
     }
 
-    if (deletePointDialog->exec()) {
+      if (deletePointDialog->exec()) {
       //  First see if entire point needs to be deleted
       if (deletePointDialog->deleteAllCheckBox->isChecked()) {
         //  First get rid of deleted point from g_filteredPoints list

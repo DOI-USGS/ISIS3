@@ -234,4 +234,9 @@ MeasureType=RegisteredSubPixel
 Test 8
 5
 5
+
+Test 9
+Testing point editLock on reference measure
+Reference point ok
+Nonreference point ok
 **PROGRAMMER ERROR** Cannot set log data with invalid information stored in the ControlMeasureLogData

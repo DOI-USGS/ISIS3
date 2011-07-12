@@ -1,5 +1,5 @@
-#ifndef QnetPointErrorFilter_h
-#define QnetPointErrorFilter_h
+#ifndef QnetPointRegistrationErrorFilter_h
+#define QnetPointRegistrationErrorFilter_h
 /**
  * @file
  * $Date: 2010/06/03 20:13:53 $
@@ -34,11 +34,10 @@
 
 namespace Qisis {
   /**
-   * Defines the Error filter for the QnetNavTool's Points
-   * section.  The user may enter values for Less Than and/or
-   * Greater Than. This class is designed to remove points from
-   * the current filtered list that lie outside of the given
-   * range.
+   * Defines the Registration Error filter for the QnetNavTool's Points section.
+   * The user may enter values for Less Than and/or Greater Than. This class is 
+   * designed to remove points from the current filtered list that lie outside 
+   * of the given range. 
    *
    * @internal
    *   @history 2009-01-08 Jeannie Walldren - Modified filter()
@@ -50,14 +49,16 @@ namespace Qisis {
    *                          checked.
    *   @history 2010-06-03 Jeannie Walldren - Initialized pointers
    *                          to null in constructor.
-   *   @history  2010-07-14 Tracie Sucharski - ControlPoint::MaximumError
-   *                           renamed to MaximumResiudal.
+   *   @history 2010-07-14 Tracie Sucharski - ControlPoint::MaximumError
+   *                          renamed to MaximumResiudal.
+   *   @history 2011-07-11 Tracie Sucharski - Created from
+   *                          QnetPointJigsawErrorFilter
    */
-  class QnetPointErrorFilter : public QnetFilter {
+  class QnetPointRegistrationErrorFilter : public QnetFilter {
       Q_OBJECT
 
     public:
-      QnetPointErrorFilter(QWidget *parent = 0);
+      QnetPointRegistrationErrorFilter(QWidget *parent = 0);
       virtual void filter();
 
     public slots:

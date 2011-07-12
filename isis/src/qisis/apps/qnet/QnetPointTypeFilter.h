@@ -1,14 +1,11 @@
 #ifndef QnetPointTypeFilter_h
 #define QnetPointTypeFilter_h
 
-#include <QAction>
-#include <QDialog>
-#include <QWidget>
-#include <QLabel>
-#include <QRadioButton>
-#include <QLineEdit>
-#include <QList>
 #include "QnetFilter.h"
+
+class QCheckBox;
+class QGroupBox;
+class QRadioButton;
 
 
 namespace Qisis {
@@ -44,10 +41,20 @@ namespace Qisis {
       virtual void filter();
 
     private:
-      QRadioButton *p_fixed;
-      QRadioButton *p_ignore;
-      QRadioButton *p_constrained;
+      bool PointTypeMatched(int pointType);
+
+      QGroupBox    *p_pointType;
+      QCheckBox    *p_free;
+      QCheckBox    *p_constrained;
+      QCheckBox    *p_fixed;
+
+      QGroupBox    *p_ignoreStatus;
+      QRadioButton *p_ignored;
+      QRadioButton *p_notIgnored;
+
+      QGroupBox    *p_editLockStatus;
       QRadioButton *p_editLocked;
+      QRadioButton *p_notEditLocked;
   };
 };
 

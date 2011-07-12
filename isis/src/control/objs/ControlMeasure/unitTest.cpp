@@ -98,6 +98,33 @@ int main() {
   cout << d.GetLogValue(ControlMeasureLogData::GoodnessOfFit).
       toDouble() << endl;
 
+  // Test parent editLock on reference measure
+  ControlPoint *cp = new ControlPoint("Parent1");
+  cp->SetType(ControlPoint::Free);
+  cp->Add(&d);
+  cp->SetChooserName("Me");
+  cp->SetDateTime("Yesterday");
+  ControlMeasure d2;
+  d2.SetCubeSerialNumber("ReferenceMeasure");
+  d2.SetCoordinate(200.,100.);
+  d2.SetDateTime("2011-07-04T00:00:00");
+  cp->Add(&d2);
+  cp->SetRefMeasure(&d2);
+  cp->SetEditLock(true);
+  cout << endl << "Test 9" << endl;
+  cout << "Testing point editLock on reference measure" << endl;
+  if (d2.IsEditLocked())
+    cout << "Reference point ok" << endl;
+  else
+    cout << "Reference point failed" << endl;
+  if (d.IsEditLocked())
+    cout << "Nonreference point failed" << endl;
+  else
+    cout << "Nonreference point ok" << endl;
+  
+
+
+
   try {
     d.SetLogData(ControlMeasureLogData());
   }

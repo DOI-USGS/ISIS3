@@ -89,6 +89,10 @@
     <change name="Travis Addair" date="2011-05-25">
       Moved writing of TOLIST to occur after filtering for modified.
     </change>
+    <change name="Travis Addair" date="2011-07-07">
+      FROMLIST now optional even when RETRIEVAL=POINT to allow for complete
+      TOLIST.
+    </change>
   </history>
 
   <groups>
@@ -109,6 +113,7 @@
           <filter>
             *.lis
           </filter>
+          <internalDefault>None</internalDefault>
         </parameter>
 
         <parameter name="CNET">
@@ -174,7 +179,7 @@
         <filter>
           *.lis
         </filter>
-        <internalDefault>NONE</internalDefault>
+        <internalDefault>None</internalDefault>
       </parameter>
       
       <parameter name="LOG">
@@ -188,7 +193,7 @@
             added to the control net, which ones were not, and which Serial
             Numbers were in both the FROMLIST and ADDLIST.
           </description>
-          <internalDefault>NONE</internalDefault>
+          <internalDefault>None</internalDefault>
         </parameter>
 
     </group>
@@ -237,9 +242,6 @@
                         measure from its control point in the input control 
                         network.
                     </description>
-                    <exclusions>
-                        <item>FROMLIST</item>
-                    </exclusions>
                 </option>
             </list>
         </parameter>

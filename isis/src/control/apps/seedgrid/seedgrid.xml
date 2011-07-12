@@ -48,6 +48,9 @@
     <change name="Travis Addair" date="2011-04-11">
       Changed parameters PROJECTION to MAP and TO to ONET for consistency.
     </change>
+    <change name="Travis Addair" date="2011-07-08">
+      Added error checking for latitude and longitude ranges
+    </change>
   </history>
 
   <groups>

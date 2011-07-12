@@ -255,6 +255,10 @@ namespace Isis {
    *            types:  Ground ------> Fixed
    *                    Tie----------> Free
    *   @history 2011-06-30 Eric Hyer - Added StringToPointType() method
+   *   @history 2011-07-01 Debbie A. Cook - Removed editLock checks from
+   *                    SetAdjustedSurfacePoint and ComputeResiduals
+   *   @history 2011-07-08 Travis Addair - Locked measures can no longer be
+   *                    deleted
    */
   class ControlPoint {
       friend class ControlNet;
@@ -366,9 +370,9 @@ namespace Isis {
       void Load(PvlObject &p);
 
       void Add(ControlMeasure *measure);
-      void Delete(ControlMeasure *measure);
-      void Delete(iString serialNumber);
-      void Delete(int index);
+      int Delete(ControlMeasure *measure);
+      int Delete(iString serialNumber);
+      int Delete(int index);
       Status ResetApriori();
 
       const ControlMeasure *GetMeasure(iString serialNumber) const;
@@ -454,6 +458,7 @@ namespace Isis {
       QString GetReferenceSN() const;
 
       Statistics GetStatistic(double(ControlMeasure::*statFunc)() const) const;
+      Statistics GetStatistic(long dataType) const;
 
       QList< ControlMeasure * > getMeasures(bool excludeIgnored = false) const;
       QList< QString > getCubeSerialNumbers() const;

@@ -14,18 +14,19 @@
 #include "CameraFocalPlaneMap.h"
 #include "CameraGroundMap.h"
 #include "ControlMeasure.h"
+#include "ControlMeasureLogData.h"
 #include "ControlNet.h"
+#include "ControlNetFile.h"
 #include "ControlNetFile.h"
 #include "ControlNetFileV0002.pb.h"
 #include "Cube.h"
-#include "iString.h"
 #include "Latitude.h"
 #include "Longitude.h"
-#include "ControlNetFile.h"
 #include "PvlObject.h"
 #include "SerialNumberList.h"
 #include "SpecialPixel.h"
 #include "Statistics.h"
+#include "iString.h"
 
 using boost::numeric::ublas::symmetric_matrix;
 using boost::numeric::ublas::upper;
@@ -475,9 +476,12 @@ namespace Isis {
    *
    * @param serialNumber The serial number of the measure to delete
    */
-  void ControlPoint::Delete(iString serialNumber) {
+  int ControlPoint::Delete(iString serialNumber) {
     ValidateMeasure(serialNumber);
     ControlMeasure *cm = (*measures)[serialNumber];
+
+    if (cm->IsEditLocked())
+      return ControlMeasure::MeasureLocked;
 
     // remove measure from the point's data structures
     measures->remove(serialNumber);
@@ -504,6 +508,8 @@ namespace Isis {
     cm = NULL;
 
     PointModified();
+
+    return ControlMeasure::Success;
   }
 
 
@@ -513,9 +519,9 @@ namespace Isis {
    *
    * @param measure The measure to delete
    */
-  void ControlPoint::Delete(ControlMeasure *measure) {
+  int ControlPoint::Delete(ControlMeasure *measure) {
     ASSERT(measure);
-    Delete(measure->GetCubeSerialNumber());
+    return Delete(measure->GetCubeSerialNumber());
   }
 
 
@@ -525,13 +531,13 @@ namespace Isis {
    *
    * @param index The index of the control measure to delete
    */
-  void ControlPoint::Delete(int index) {
+  int ControlPoint::Delete(int index) {
     if (index < 0 || index >= cubeSerials->size()) {
       iString msg = "index [" + iString(index) + "] out of bounds";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
-    Delete(cubeSerials->at(index));
+    return Delete(cubeSerials->at(index));
   }
 
 
@@ -798,17 +804,20 @@ namespace Isis {
 
 
   /**
-   * Set or update the surface point relating to this control point. This is the
-   *   point on the surface of the planet that the measures are tied to. This
-   *   updates the last modified attributes of this point.
+   * Set or update the surface point relating to this control point. This is
+   *   the point on the surface of the planet that the measures are tied to.
+   *   This updates the last modified attributes of this point.
+   *     *** Warning:  Only BundleAdjust and its applications should be
+   *                   using this method.  
    *
    * @param newSurfacePoint The point on the target's surface the measures are
    *                        tied to
+   *
+   * @internal
+   *   @history 2011-07-01 Debbie A. Cook  Removed editLock check 
    */
   ControlPoint::Status ControlPoint::SetAdjustedSurfacePoint(
     SurfacePoint newSurfacePoint) {
-    if (editLock)
-      return PointLocked;
     PointModified();
     adjustedSurfacePoint = newSurfacePoint;
     return Success;
@@ -1085,21 +1094,25 @@ namespace Isis {
 
 
   /**
-   * This method computes the residuals for a point.
+   * This method computes the BundleAdjust residuals for a point.
+   *     *** Warning:  Only BundleAdjust and its applications should be
+   *                   using this method.  
    *
    * @history 2008-07-17 Tracie Sucharski,  Added ptid and measure serial
    *                            number to the unable to map to surface error.
    * @history 2009-12-06 Tracie Sucharski, Renamed from ComputeErrors
    * @history 2010-08-05 Tracie Sucharski, Changed lat/lon/radius to x/y/z
-   * @history 2010-12-10 Debbie A. Cook,  Revised error calculation for radar
+   * @history 2010-12-10 Debbie A. Cook, Revised error calculation for radar
    *                            because it was always reporting line errors=0.
-   * @history 2011-03-17 Debbie A. Cook,  Fixed typo in radar call to get longitude
-   * @history 2011-03-24 Debbie A. Cook - Removed IsMeasured check since it
+   * @history 2011-03-17 Debbie A. Cook, Fixed typo in radar call to get
+   *                            longitude
+   * @history 2011-03-24 Debbie A. Cook, Removed IsMeasured check since it
    *                            was really checking for Candidate measures.
+   * @history 2011-07-01 Debbie A. Cook, Removed editLock check to allow
+   *                            BundleAdjust to compute residuals for
+   *                            editLocked points
    */
   ControlPoint::Status ControlPoint::ComputeResiduals() {
-    if (editLock)
-      return PointLocked;
     if (IsIgnored())
       return Failure;
 
@@ -1216,8 +1229,6 @@ namespace Isis {
    */
 
   ControlPoint::Status ControlPoint::ComputeResiduals_Millimeters() {
-    if (editLock)
-      return PointLocked;
     if (IsIgnored())
       return Failure;
 
@@ -1769,6 +1780,17 @@ namespace Isis {
     foreach(ControlMeasure * cm, *measures) {
       if (!cm->IsIgnored())
         stats.AddData((cm->*statFunc)());
+    }
+
+    return stats;
+  }
+
+
+  Statistics ControlPoint::GetStatistic(long dataType) const {
+    Statistics stats;
+    foreach(ControlMeasure * cm, *measures) {
+      if (!cm->IsIgnored())
+        stats.AddData(cm->GetLogData(dataType).GetNumericalValue());
     }
 
     return stats;

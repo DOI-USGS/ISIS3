@@ -1,6 +1,6 @@
 #include <QGridLayout>
 #include <QMessageBox>
-#include "QnetPointErrorFilter.h"
+#include "QnetPointJigsawErrorFilter.h"
 #include "QnetNavTool.h"
 #include "ControlNet.h"
 #include "ControlMeasure.h"
@@ -30,7 +30,7 @@ namespace Qisis {
   *                          to null.
   *
   */
-  QnetPointErrorFilter::QnetPointErrorFilter(QWidget *parent) : QnetFilter(parent) {
+  QnetPointJigsawErrorFilter::QnetPointJigsawErrorFilter(QWidget *parent) : QnetFilter(parent) {
     p_lessThanCB = NULL;
     p_greaterThanCB = NULL;
     p_lessErrorEdit = NULL;
@@ -87,7 +87,7 @@ namespace Qisis {
    *   @history  2011-04-28 Tracie Sucharski - Sort points in decsending order
    *                           of max residual.
    */
-  void QnetPointErrorFilter::filter() {
+  void QnetPointJigsawErrorFilter::filter() {
     // Make sure we have a list of control points to filter
     if (g_controlNetwork == NULL) {
       QMessageBox::information((QWidget *)parent(),
@@ -172,7 +172,7 @@ namespace Qisis {
    *            edit so the user can not enter a value unless the
    *            corresponding box is checked.
    */
-  void QnetPointErrorFilter::clearEdit() {
+  void QnetPointJigsawErrorFilter::clearEdit() {
 
     if (p_lessThanCB->isChecked()) {
       p_lessErrorEdit->setEnabled(true);

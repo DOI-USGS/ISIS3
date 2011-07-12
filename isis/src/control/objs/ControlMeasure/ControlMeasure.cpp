@@ -214,7 +214,7 @@ namespace Isis {
 
 
   ControlMeasure::Status ControlMeasure::SetAprioriLine(double aprioriLine) {
-    if (p_editLock)
+    if (IsEditLocked())
       return MeasureLocked;
     MeasureModified();
     p_aprioriLine = aprioriLine;
@@ -224,7 +224,7 @@ namespace Isis {
 
   ControlMeasure::Status ControlMeasure::SetAprioriSample(
     double aprioriSample) {
-    if (p_editLock)
+    if (IsEditLocked())
       return MeasureLocked;
     MeasureModified();
     p_aprioriSample = aprioriSample;
@@ -232,9 +232,21 @@ namespace Isis {
   }
 
 
+  /**
+   * @brief Set pointer to camera associated with a measure
+   *
+   * This method is used to set a pointer to the camera associated
+   * with a ControlMeasure.
+   *
+   * @param *camera  Pointer to camera
+   *           
+   * @return Status Success
+   *
+   * @internal
+   *   @history 2011-07-01 Debbie A. Cook  Removed editLock check
+   *
+   */
   ControlMeasure::Status ControlMeasure::SetCamera(Isis::Camera *camera) {
-    if (p_editLock)
-      return MeasureLocked;
     p_camera = camera;
     return Success;
   }
@@ -253,7 +265,7 @@ namespace Isis {
    *
    */
   ControlMeasure::Status ControlMeasure::SetCubeSerialNumber(iString newSerialNumber) {
-    if (p_editLock)
+    if (IsEditLocked())
       return MeasureLocked;
     *p_serialNumber = newSerialNumber;
     return Success;
@@ -262,7 +274,7 @@ namespace Isis {
 
   //! Set chooser name to a user who last changed the coordinate
   ControlMeasure::Status ControlMeasure::SetChooserName() {
-    if (p_editLock)
+    if (IsEditLocked())
       return MeasureLocked;
     *p_chooserName = "";
     return Success;
@@ -271,7 +283,7 @@ namespace Isis {
 
   //! Set the chooser name to an application that last changed the coordinate
   ControlMeasure::Status ControlMeasure::SetChooserName(iString name) {
-    if (p_editLock)
+    if (IsEditLocked())
       return MeasureLocked;
     *p_chooserName = name;
     return Success;
@@ -299,7 +311,7 @@ namespace Isis {
     */
   ControlMeasure::Status ControlMeasure::SetCoordinate(double sample,
       double line, MeasureType type) {
-    if (p_editLock)
+    if (IsEditLocked())
       return MeasureLocked;
     MeasureModified();
     p_sample = sample;
@@ -311,7 +323,7 @@ namespace Isis {
 
   //! Date Time - Creation Time
   ControlMeasure::Status ControlMeasure::SetDateTime() {
-    if (p_editLock)
+    if (IsEditLocked())
       return MeasureLocked;
     *p_dateTime = Application::DateTime();
     return Success;
@@ -320,7 +332,7 @@ namespace Isis {
 
   //! Set date/time the coordinate was last changed to specified date/time
   ControlMeasure::Status ControlMeasure::SetDateTime(iString datetime) {
-    if (p_editLock)
+    if (IsEditLocked())
       return MeasureLocked;
     *p_dateTime = datetime;
     return Success;
@@ -336,7 +348,7 @@ namespace Isis {
    * @param diameter  The diameter of the crater in pixels
    */
   ControlMeasure::Status ControlMeasure::SetDiameter(double diameter) {
-    if (p_editLock)
+    if (IsEditLocked())
       return MeasureLocked;
     MeasureModified();
     p_diameter = diameter;
@@ -350,11 +362,19 @@ namespace Isis {
   }
 
 
-  //! Set the focal plane x/y for the measured line/sample
+  /**
+   * Set the focal plane x/y for the measured line/sample
+   *
+   * @param *camera  Pointer to camera
+   *           
+   * @return Status Success
+   *
+   * @internal
+   *   @history 2011-07-09 Debbie A. Cook  Removed editLock check for jigsaw
+   *
+   */
   ControlMeasure::Status ControlMeasure::SetFocalPlaneMeasured(double x,
       double y) {
-    if (p_editLock)
-      return MeasureLocked;
     p_focalPlaneMeasuredX = x;
     p_focalPlaneMeasuredY = y;
     return Success;
@@ -364,7 +384,7 @@ namespace Isis {
   //! Set the focal plane x/y for the computed (apriori) lat/lon
   ControlMeasure::Status ControlMeasure::SetFocalPlaneComputed(double x,
       double y) {
-    if (p_editLock)
+    if (IsEditLocked())
       return MeasureLocked;
     p_focalPlaneComputedX = x;
     p_focalPlaneComputedY = y;
@@ -372,9 +392,23 @@ namespace Isis {
   }
 
 
+
+
+  /**
+   * @brief Set "jigsaw" rejected flag for a measure
+   *
+   * This method is used to set the "jigsaw"-rejected flag for
+   * the current measure.  It should only be used by jigsaw.
+   *
+   * @param *reject  rejected flag
+   *           
+   * @return Status Success
+   *
+   * @internal
+   *   @history 2011-07-01 Debbie A. Cook  Removed editLock check
+   *
+   */
   ControlMeasure::Status ControlMeasure::SetRejected(bool reject) {
-    if (p_editLock)
-      return MeasureLocked;
     MeasureModified();
     p_jigsawRejected = reject;
     return Success;
@@ -382,7 +416,7 @@ namespace Isis {
 
 
   ControlMeasure::Status ControlMeasure::SetIgnored(bool newIgnoreStatus) {
-    if (p_editLock)
+    if (IsEditLocked())
       return MeasureLocked;
 
     bool oldStatus = p_ignore;
@@ -403,7 +437,7 @@ namespace Isis {
 
 
   ControlMeasure::Status ControlMeasure::SetLineSigma(double lineSigma) {
-    if (p_editLock)
+    if (IsEditLocked())
       return MeasureLocked;
     MeasureModified();
     p_lineSigma = lineSigma;
@@ -412,15 +446,20 @@ namespace Isis {
 
 
   /**
-    * @brief Set the Residual of the coordinate
-    *
-    * @param sampResidual  Sample Residual
-    * @param lineResidual  Line Residual
-    */
+   * Set the BundleAdjust Residual of the coordinate.
+   *   ***Warning:  This method should only be used by BundleAdjust
+   *                and its applications.
+   * 
+   * @param sampResidual  Sample Residual
+   * @param lineResidual  Line Residual
+   * 
+   * @internal
+   *   @history 2011-07-01 Debbie A. Cook  Removed editLock check to
+   *                         allow the residuals of locked points
+   *                         to be reported.
+   */
   ControlMeasure::Status ControlMeasure::SetResidual(double sampResidual,
       double lineResidual) {
-    if (p_editLock)
-      return MeasureLocked;
     MeasureModified();
     p_sampleResidual = sampResidual;
     p_lineResidual   = lineResidual;
@@ -429,7 +468,7 @@ namespace Isis {
 
 
   ControlMeasure::Status ControlMeasure::SetSampleSigma(double sampleSigma) {
-    if (p_editLock)
+    if (IsEditLocked())
       return MeasureLocked;
     MeasureModified();
     p_sampleSigma = sampleSigma;
@@ -439,7 +478,7 @@ namespace Isis {
 
   //! Set how the coordinate was obtained
   ControlMeasure::Status ControlMeasure::SetType(MeasureType type) {
-    if (p_editLock)
+    if (IsEditLocked())
       return MeasureLocked;
     MeasureModified();
     p_measureType = type;
@@ -592,7 +631,27 @@ namespace Isis {
   }
 
 
+  /**
+   * @brief Return value for p_editLock or implicit lock on reference measure
+   *
+   * This method returns p_editLock unless the measure is a reference measure.
+   * In the case of a reference measure the value of the parent point's
+   * editLock is returned.  An editLock on a control point implicitly locks
+   * the points reference measure as well.
+   *
+   * @return value of p_editLock
+   *
+   * @internal
+   *   @history 2011-07-05 Debbie A. Cook  Added check for implicit lock on
+   *                        the reference measure of the parent's reference
+   *                        measure.
+   *
+   */
   bool ControlMeasure::IsEditLocked() const {
+    // Check to see if this measure is the reference measure of the parent
+    if (parentPoint != NULL  &&  parentPoint->IsEditLocked()  &&
+        this == parentPoint->GetRefMeasure())
+      return true;
     return p_editLock;
   }
 

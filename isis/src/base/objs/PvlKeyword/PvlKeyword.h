@@ -85,6 +85,8 @@ namespace Isis {
    *  @history 2011-04-12 Steven Lambright - Lessened the memory footprint by
    *            changing p_comments and p_units to pointers, p_values to a
    *            QVarLengthArray and p_name to a char *.
+   *  @history 2011-07-07 Sharmila Prasad - While validating keyword, display appropriate 
+   *                 error msg when converting string to integer which has a double value.
    */
   class PvlSequence;
   class PvlFormat;

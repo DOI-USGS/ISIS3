@@ -1933,7 +1933,13 @@ namespace Isis {
       for(int i=0; i<iSize; i++) {
         string sValue = iString::DownCase(pvlKwrd[i]);
         if(sValue != "null"){
-          int iValue = iString::ToInteger(sValue);
+          int iValue=0;
+          try {
+            iValue = iString::ToInteger(sValue);
+          } catch(iException & e) {
+            string sErrMsg = "\"" +pvlKwrd.Name() +"\" expects an Integer value";
+            throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_);
+          }
           if(bRange && (iValue < dRangeMin || iValue > dRangeMax)) {
             string sErrMsg = "\"" +pvlKwrd.Name() +"\" is not in the specified Range";
             throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_);
