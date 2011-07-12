@@ -292,7 +292,7 @@ void checkLongitude(double minLon, double maxLon, int lonDomain) {
   }
 
   if (maxLon - minLon > 360) {
-    int range = maxLon - minLon - 1;
+    int range = (int) (maxLon - minLon - 1);
     int loops = range / 360 + 1;
     string msg = "The specified longitude range [" + iString(minLon) +
       "] to [" + iString(maxLon) + "] seeds that same area of the target [" +
