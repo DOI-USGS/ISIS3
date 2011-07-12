@@ -974,18 +974,15 @@ namespace Isis {
    *                               to use 0. instead of nulls.
    *   @history 2011-03-24 Debbie A. Cook - Removed IsMeasured check since it
    *                               was really checking for Candidate measures.
-   *
+   *   @history 2011-07-12 Debbie A. Cook - Removed editLock test.  Users agreed
+   *                               editLock was only for fixed and constrained
+   *                               points, which are already left unchanged by
+   *                               ComputeApriori. If a free point is editLocked
+   *                               the editLock will be ignored by this method.
    *
    * @return Status Success or PointLocked
    */
   ControlPoint::Status ControlPoint::ComputeApriori() {
-
-    if (editLock)
-      return PointLocked;
-    // Should we ignore the point altogether?
-    if (IsIgnored())
-      return Failure;
-
     PointModified();
 
     // Don't goof with fixed points.  The lat/lon is what it is ... if
@@ -1061,6 +1058,8 @@ namespace Isis {
         || IsRadiusConstrained()) {
       // Initialize the adjusted x/y/z to the apriori in this case
       adjustedSurfacePoint = aprioriSurfacePoint;
+
+
       return Success;
     }
 
