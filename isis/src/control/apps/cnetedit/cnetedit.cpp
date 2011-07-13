@@ -289,7 +289,8 @@ bool ShouldDelete(ControlPoint *point) {
  */
 void IgnorePoint(ControlNet &cnet, ControlPoint *point, string cause) {
   ControlPoint::Status result = point->SetIgnored(true);
-  if (keepLog && result == ControlPoint::Success) {
+  if ((keepLog && result == ControlPoint::Success) || 
+      point->IsEditLocked()) {
     // Label the keyword as the Point ID, and make the cause into the value
     ignoredPoints->AddKeyword(PvlKeyword(point->GetId(), cause));
   }
@@ -310,7 +311,8 @@ void IgnoreMeasure(ControlNet &cnet, ControlPoint *point,
                    ControlMeasure *measure, string cause) {
 
   ControlMeasure::Status result = measure->SetIgnored(true);
-  if (keepLog && result == ControlMeasure::Success) {
+  if ((keepLog && result == ControlMeasure::Success) ||
+      measure->IsEditLocked()) {
     // Make the keyword label the measure Serial Number, and the cause into
     // the value
     PvlKeyword ignoredMeasure(
@@ -326,6 +328,7 @@ void IgnoreMeasure(ControlNet &cnet, ControlPoint *point,
     else {
       // Else there is no group for the Point ID of the measure being ignored,
       // so make a new group, add the measure, and insert it into the map
+      
       PvlGroup pointGroup(point->GetId());
       pointGroup.AddKeyword(ignoredMeasure);
       (*ignoredMeasures)[point->GetId()] = pointGroup;
@@ -365,6 +368,13 @@ void DeletePoint(ControlNet &cnet, int cp) {
     }
 
     cnet.DeletePoint(cp);
+  } 
+  else {
+    for (int cm = 0; cm < point->GetNumMeasures(); cm++) {
+      if (point->GetMeasure(cm)->IsEditLocked()) {
+        IgnorePoint(cnet, point, "EditLocked point ignored");
+      }
+    }
   }
 }
 
@@ -500,20 +510,27 @@ void ProcessControlMeasures(string fileName, ControlNet &cnet) {
     // Control Measure for according exclusion
     for (int cm = point->GetNumMeasures() - 1; cm >= 0; cm--) {
       ControlMeasure *measure = point->GetMeasure(cm);
-
+      
+      if (!point->IsIgnored() && point->GetMeasure(cm)->IsEditLocked()) {
+        IgnoreMeasure(cnet, point, measure, "EditLocked measure ignored");
+      }
+    
       string serialNumber = measure->GetCubeSerialNumber();
+      
       if (snl.HasSerialNumber(serialNumber)){
         if (cm == point->IndexOfRefMeasure() && retainRef) {
           comments = true;
           commentPoints->AddKeyword( 
-            PvlKeyword(point->GetId(), "Reference Measure is in the Ignore CubeList"));
-        }
-        else if (!measure->IsIgnored() || (cm == point->IndexOfRefMeasure() && !retainRef)) {
+            PvlKeyword(point->GetId(),
+                "Reference Measure is in the Ignore CubeList"));
+        } 
+        else if (!measure->IsIgnored() || (cm == point->IndexOfRefMeasure() &&
+            !retainRef)) {
           IgnoreMeasure(cnet, point, measure, "Serial Number in CUBELIST");
   
           if (cm == point->IndexOfRefMeasure() && !point->IsIgnored()) {
             IgnorePoint(cnet, point, "Reference measure ignored");
-          }
+          } 
         }
       }
 
@@ -657,4 +674,3 @@ void EditDefFile(void) {
   
   GuiEditFile::EditFile(ui, sDefFile);
 }
-

@@ -91,6 +91,9 @@
     <change name="Debbie A. Cook and Tracie Sucharski" date="2011-06-07">
       Changed point type "ground" to "fixed"
     </change>
+    <change name="James Alexander Crough" date="2011-07-13">
+      Changed output of ignored points to show EditLocked points as ignored.
+    </change>
   </history> 
   
   <category>
