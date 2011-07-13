@@ -36,7 +36,7 @@
 #include "Longitude.h"
 #include "NaifStatus.h"
 
-#include "getSpkAbCorrState.hpp" 
+#include "getSpkAbCorrState.hpp"
 
 using namespace std;
 
@@ -47,7 +47,7 @@ namespace Isis {
    * in the labels.
    *
    * @param lab Label containing Instrument and Kernels groups.
-   *  
+   *
    * @internal
    * @history 2005-10-07 Jim Torson  -   Modified the constructor so it can
    *                                      handle multiple SpacecraftPosition and
@@ -70,9 +70,9 @@ namespace Isis {
     Init(lab, !hasTables);
   }
 
-  /** 
-   * Constructs a Spice object. 
-   *  
+  /**
+   * Constructs a Spice object.
+   *
    * @param lab  Pvl labels.
    * @param noTables Indicates the use of tables.
    */
@@ -82,16 +82,16 @@ namespace Isis {
 
   /**
    * Initialization of Spice object.
-   * 
+   *
    * @param lab  Pvl labels
-   * @param noTables Indicates the use of tables. 
-   * 
-   * @throw Isis::Exception::Io - "Can not find NAIF code for NAIF target" 
+   * @param noTables Indicates the use of tables.
+   *
+   * @throw Isis::Exception::Io - "Can not find NAIF code for NAIF target"
    * @throw Isis::Exception::Camera - "No camera pointing available"
    * @throw Isis::Exception::Camera - "No instrument position available"
-   *  
-   * @internal 
-   *   @history 2011-02-08 Jeannie Walldren - Initialize pointers to null. 
+   *
+   * @internal
+   *   @history 2011-02-08 Jeannie Walldren - Initialize pointers to null.
    */
   void Spice::Init(Pvl &lab, bool noTables) {
     NaifStatus::CheckErrors();
@@ -149,7 +149,7 @@ namespace Isis {
     else {
       *p_endTimePadding = 0.0;
     }
-    
+
     p_usingNaif = !lab.HasObject("NaifKeywords") || noTables;
 
 //  Modified  to load planetary ephemeris SPKs before s/c SPKs since some
@@ -250,20 +250,31 @@ namespace Isis {
       p_bodyRotation = new SpiceRotation(1);
     }
     else {
-      char frameName[32];
+      // JAA - Modified to stored and look for the frame body code in the
+      // cube labels
       SpiceInt frameCode;
-      SpiceBoolean found;
-      cidfrm_c(*p_spkBodyCode, sizeof(frameName), &frameCode, frameName,
-               &found);
+      if((p_usingNaif) || (!p_naifKeywords->HasKeyword("BODY_FRAME_CODE"))) {
+        char frameName[32];
+        SpiceBoolean found;
+        cidfrm_c(*p_spkBodyCode, sizeof(frameName), &frameCode, frameName,
+                 &found);
 
-      if(!found) {
-        iString naifTarget = "IAU_" + iString(*p_target).UpCase();
-        namfrm_c(naifTarget.c_str(), &frameCode);
-        if(frameCode == 0) {
-          string msg = "Can not find NAIF code for [" + naifTarget + "]";
-          throw iException::Message(iException::Io, msg, _FILEINFO_);
+        if(!found) {
+          iString naifTarget = "IAU_" + iString(*p_target).UpCase();
+          namfrm_c(naifTarget.c_str(), &frameCode);
+          if(frameCode == 0) {
+            string msg = "Can not find NAIF code for [" + naifTarget + "]";
+            throw iException::Message(iException::Io, msg, _FILEINFO_);
+          }
         }
+
+        QVariant result = frameCode;
+        storeValue("BODY_FRAME_CODE",0,SpiceIntType,result);
       }
+      else {
+        frameCode = GetInteger("BODY_FRAME_CODE",0);
+      }
+
       p_bodyRotation = new SpiceRotation(frameCode);
     }
 
@@ -332,10 +343,10 @@ namespace Isis {
 
   /**
    * Loads/furnishes NAIF kernel(s)
-   * 
+   *
    * @param key PvlKeyword
    * @param noTables Indicates the use of tables.
-   * 
+   *
    * @throw Isis::iException::Io - "Spice file does not exist."
    */
   void Spice::Load(PvlKeyword &key, bool noTables) {
@@ -482,25 +493,25 @@ namespace Isis {
    * allows multiple instances of the Spice object to be created as the NAIF
    * toolkit can clash if multiple sets of SPICE kernels are loaded. Note that
    * the cache size is specified as an argument. Therefore, times requested via
-   * SetTime() which are not directly loaded in the cache will be interpolated. 
-   * If the instrument position is not cached and cacheSize is greater than 3, 
-   * the tolerance is passed to the SpicePosition Memcache2HermiteCache() 
-   * method. 
-   *  
-   * @b Note:  Before this method is called, the private variables p_cacheSize, 
-   * p_startTime and p_endTime must be set.  This is done in the Camera classes 
-   * using the methods SetCacheSize() and SetStartEndEphemerisTime(). 
+   * SetTime() which are not directly loaded in the cache will be interpolated.
+   * If the instrument position is not cached and cacheSize is greater than 3,
+   * the tolerance is passed to the SpicePosition Memcache2HermiteCache()
+   * method.
+   *
+   * @b Note:  Before this method is called, the private variables p_cacheSize,
+   * p_startTime and p_endTime must be set.  This is done in the Camera classes
+   * using the methods SetCacheSize() and SetStartEndEphemerisTime().
    *
    * @param startTime Starting ephemeris time to cache
    * @param endTime Ending ephemeris time to cache
    * @param size Size of the cache.
    * @param tol Tolerance.
-   *  
-   * @throw Isis::iException::Programmer - "Argument cacheSize must be greater 
+   *
+   * @throw Isis::iException::Programmer - "Argument cacheSize must be greater
    *        than zero"
-   * @throw Isis::iException::Programmer - "Argument startTime must be less than 
+   * @throw Isis::iException::Programmer - "Argument startTime must be less than
    *        or equal to endTime"
-   * @throw Isis::iException::User - "This instrument does not support time 
+   * @throw Isis::iException::User - "This instrument does not support time
    *             padding"
    *
    * @history 2011-04-10 Debbie A. Cook - Updated to only create cache for
@@ -532,7 +543,7 @@ namespace Isis {
     }
 
     string abcorr;
-    if(getSpkAbCorrState(abcorr) ) 
+    if(getSpkAbCorrState(abcorr) )
       InstrumentPosition()->SetAberrationCorrection("NONE");
 
     iTime avgTime((startTime.Et() + endTime.Et()) / 2.0);
@@ -639,10 +650,10 @@ namespace Isis {
    * Sets the ephemeris time and reads the spacecraft and sun position from the
    * kernels at that instant in time.
    *
-   * @param et Ephemeris time (read NAIF documentation for a detailed 
+   * @param et Ephemeris time (read NAIF documentation for a detailed
    *           description)
-   *  
-   * @see http://naif.jpl.nasa.gov/naif/ 
+   *
+   * @see http://naif.jpl.nasa.gov/naif/
    * @internal
    *   @history 2005-11-29 Debbie A. Cook - Added alternate code for processing
    *                                        instruments without a platform
@@ -684,9 +695,9 @@ namespace Isis {
    * Returns the spacecraft position in body-fixed frame km units.
    *
    * @param p[] Spacecraft position
-   *  
-   * @see SetTime() 
-   *  
+   *
+   * @see SetTime()
+   *
    * @throw Isis::iException::Programmer - "You must call SetTime first"
    */
   void Spice::InstrumentPosition(double p[3]) const {
@@ -731,11 +742,11 @@ namespace Isis {
   }
 
   /**
-   * Fills the input vector with sun position information, in either body-fixed 
-   * or J2000 reference frame and km units. 
+   * Fills the input vector with sun position information, in either body-fixed
+   * or J2000 reference frame and km units.
    *
    * @param p[] Sun position
-   *  
+   *
    * @see SetTime()
    */
   void Spice::SunPosition(double p[3]) const {
@@ -818,8 +829,8 @@ namespace Isis {
   }
 
   /**
-   * This returns the NAIF SCLK code to use when reading from instrument 
-   * kernels. 
+   * This returns the NAIF SCLK code to use when reading from instrument
+   * kernels.
    *
    * @return @b SpiceInt NAIF SCLK code
    */
@@ -975,14 +986,14 @@ namespace Isis {
 
   QVariant Spice::getStoredResult(iString name, SpiceValueType type) {
     bool wasDouble = false;
-    
+
     if(type == SpiceDoubleType) {
       wasDouble = true;
       type = SpiceByteCodeType;
     }
-    
+
     QVariant stored = readStoredValue(name + "_COMPUTED", type, 0);
-    
+
     if(wasDouble && !stored.isNull()) {
       EndianSwapper swapper("LSB");
       double doubleVal = swapper.Double((void *)QByteArray::fromHex(
@@ -998,9 +1009,9 @@ namespace Isis {
                          QVariant value) {
     if(!p_naifKeywords->HasKeyword(key))
       p_naifKeywords->AddKeyword(PvlKeyword(key));
-    
+
     PvlKeyword &storedKey = p_naifKeywords->FindKeyword(key);
-    
+
     while(index >= storedKey.Size()) {
       storedKey.AddValue("");
     }
@@ -1031,7 +1042,7 @@ namespace Isis {
 
     if(p_naifKeywords->HasKeyword(key) && !p_usingNaif) {
       PvlKeyword &storedKeyword = p_naifKeywords->FindKeyword(key);
-      
+
       try {
         if(type == SpiceDoubleType)
           result = (double)storedKeyword[index];
@@ -1075,9 +1086,9 @@ namespace Isis {
    * @param lat Sub-spacecraft latitude
    *
    * @param lon Sub-spacecraft longitude
-   *  
-   * @see SetTime() 
-   * @throw Isis::iException::Programmer - "You must call SetTime 
+   *
+   * @see SetTime()
+   * @throw Isis::iException::Programmer - "You must call SetTime
    *             first."
    */
   void Spice::SubSpacecraftPoint(double &lat, double &lon) {
@@ -1122,9 +1133,9 @@ namespace Isis {
    *
    * @param lat Sub-solar latitude
    * @param lon Sub-solar longitude
-   *  
-   * @see SetTime() 
-   * @throw Isis::iException::Programmer - "You must call SetTime 
+   *
+   * @see SetTime()
+   * @throw Isis::iException::Programmer - "You must call SetTime
    *             first."
    */
   void Spice::SubSolarPoint(double &lat, double &lon) {
@@ -1170,9 +1181,9 @@ namespace Isis {
 
 
   /**
-   * Computes the solar longitude for the given ephemeris time.  If the target 
-   * is sky, the longitude is set to -999.0. 
-   *  
+   * Computes the solar longitude for the given ephemeris time.  If the target
+   * is sky, the longitude is set to -999.0.
+   *
    * @param et Ephemeris time
    */
   void Spice::ComputeSolarLongitude(iTime et) {
@@ -1254,7 +1265,7 @@ namespace Isis {
    * Returns true if the kernel group has kernel files
    *
    * @param lab Label containing Instrument and Kernels groups.
-   *  
+   *
    * @return @b bool status of kernel files in the kernel group
    */
   bool Spice::HasKernels(Pvl &lab) {

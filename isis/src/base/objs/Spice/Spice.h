@@ -180,12 +180,20 @@ namespace Isis {
    *                                         quicker. Text kernels are no longer
    *                                         furnished when their data has been
    *                                         stored in the labels.
-   *   @history 2011-05-26 Debbie A. Cook -  Put back the code for spkwriter that 
+   *   @history 2011-05-26 Debbie A. Cook -  Put back the code for spkwriter that
    *                                         was checked in May 25 but disappeared
    *                                         in the May 26 build.  This code turns
    *                                         aberration corrections off for the
    *                                         instrument position if the spk file
    *                                         was created by spkwriter.
+   *   @history 2011-07-08 Jeff Anderson  -  Fixed Init method to record the
+   *                                         integer body frame code in the labels
+   *                                         of the cube. Vesta exposed this
+   *                                         problem because it was not a
+   *                                         instrinsic body in the NAIF toolkit
+   *                                         version 63.
+   *   @history 2011-07-11 Jeff Anderson  -  Added private copy constructors and
+   *                                         operator= methods
    */
   class Spice {
     public:
@@ -226,7 +234,7 @@ namespace Isis {
       bool IsSky() const {
         return p_sky;
       };
-      
+
       iTime getClockTime(iString clockValue,
                          int sclkCode = -1);
       SpiceDouble GetDouble(const iString &key, int index = 0);
@@ -284,7 +292,7 @@ namespace Isis {
       SpiceInt NaifCkCode() const;
       SpiceInt NaifIkCode() const;
       SpiceInt NaifSclkCode() const;
-      
+
       PvlObject getStoredNaifKeywords() const;
 
     protected:
@@ -350,20 +358,24 @@ namespace Isis {
       bool p_allowDownsizing; //!< Indicates whether to allow downsizing
 
       // Constants
-      SpiceInt *p_bodyCode;    /**< The NaifBodyCode value, if it exists in the 
-                                    labels. Otherwise, if the target is sky, 
-                                    it's the SPK code and if not sky then it's 
+      SpiceInt *p_bodyCode;    /**< The NaifBodyCode value, if it exists in the
+                                    labels. Otherwise, if the target is sky,
+                                    it's the SPK code and if not sky then it's
                                     calculated by the NaifBodyCode() method.*/
       SpiceInt *p_spkCode;     //!< Spacecraft and planet ephemeris kernel (SPK) code
       SpiceInt *p_ckCode;      //!< Camera kernel (CK) code
       SpiceInt *p_ikCode;      //!< Instrument kernel (IK) code
       SpiceInt *p_sclkCode;    //!< Spacecraft clock correlation kernel (SCLK) code
       SpiceInt *p_spkBodyCode; //!< Spacecraft and planet ephemeris kernel (SPK) body code
-      
+
       PvlObject *p_naifKeywords;
 
       bool p_sky; //!< Indicates whether the target of the observation is the sky.
       bool p_usingNaif;
+
+      // Don't allow copies
+      Spice(const Spice &other);
+      Spice &operator=(const Spice &other);
   };
 }
 
