@@ -311,7 +311,7 @@ void IsisMain() {
        "OriginalMeasurementSample,OriginalMeasurementLine," <<
        "RegisteredMeasurementSample,RegisteredMeasurementLine,SampleShift," <<
        "LineShift,PixelShift,ZScoreMin,ZScoreMax,GoodnessOfFit" << endl;
-    os << NULL8 << endl;
+    os << Null << endl;
 
     // Create a ControlNet from the original input file
     ControlNet inNet(ui.GetFilename("CNET"));
@@ -436,7 +436,7 @@ void verifyCube(Cube & cube) {
 bool outputValue(ofstream &os, double value) {
   os << ",";
 
-  if (fabs(value) > DBL_EPSILON && value != NULL8 && value != Isis::Null) {
+  if (fabs(value) > DBL_EPSILON && value != Null) {
     os << value;
     return true;
   }
