@@ -436,7 +436,7 @@ void verifyCube(Cube & cube) {
 bool outputValue(ofstream &os, double value) {
   os << ",";
 
-  if (fabs(value) > DBL_EPSILON && value != NULL8) {
+  if (fabs(value) > DBL_EPSILON && value != NULL8 && value != Isis::Null) {
     os << value;
     return true;
   }
