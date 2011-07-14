@@ -144,12 +144,15 @@ namespace Qisis {
       for (int j = 0; j < cp.GetNumMeasures(); j++) {
         //  While keep is true, keep testing for next filter option
         bool keep = true;
-        if (p_measureType->isChecked()) {
-          //  Is this a reference measure
-          bool reference = cp.IsReferenceExplicit() &&
-             ((QString(cp[j]->GetCubeSerialNumber()) == cp.GetReferenceSN()));
-          if (!MeasureTypeMatched(cp[j]->GetType()) && !reference) keep = false;
+        if (p_measureType->isChecked() && !MeasureTypeMatched(cp[j]->GetType())) {
+          keep = false; 
         }
+//     ????? Not sure why this code was here, was introduced for binary, but
+//              it does not work.  TODO:   GET RID OF???
+//        //  Is this a reference measure
+//        bool reference = cp.IsReferenceExplicit() &&
+//           ((QString(cp[j]->GetCubeSerialNumber()) == cp.GetReferenceSN()));
+//        if (!MeasureTypeMatched(cp[j]->GetType()) && !reference) keep = false;
 
         if (keep && p_ignoreStatus->isChecked()) {
           if (p_ignored->isChecked() && !cp[j]->IsIgnored()) keep = false;
@@ -161,11 +164,8 @@ namespace Qisis {
           if (p_notEditLocked->isChecked()&& cp[j]->IsEditLocked()) keep = false;
         }
 
-        //  If at least one criteria matches, break from measure loop, and
-        //  keep the point in the list.
-        if (keep) break;
         // if this measure doesn't match any of the checked values, increment
-        numMeasNotMatching++;
+        if (!keep) numMeasNotMatching++;
       }
 
       int numMeasures = cp.GetNumMeasures();
