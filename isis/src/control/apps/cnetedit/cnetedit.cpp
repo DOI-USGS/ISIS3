@@ -22,8 +22,7 @@
 
 #include "GuiEditFile.h"
 
-using std::map;
-using std::string;
+using namespace std;
 
 using namespace Isis;
 
@@ -70,6 +69,8 @@ bool keepLog;
 PvlObject *ignoredPoints;
 QMap<string, PvlGroup> * ignoredMeasures;
 PvlObject *commentPoints;
+PvlObject * editLockedMeasures;
+PvlObject * editLockedPoints;
 
 ControlNetValidMeasure *validator;
 
@@ -94,6 +95,8 @@ void IsisMain() {
   ignoredPoints = NULL;
   ignoredMeasures = NULL;
   commentPoints = NULL;
+  editLockedMeasures = NULL;
+  editLockedPoints = NULL;
 
   // If the user wants to keep a log, go ahead and populate it with all the
   // existing ignored points and measures
@@ -202,6 +205,8 @@ void IsisMain() {
     outputLog.AddKeyword(PvlKeyword("PointsDeleted", numPointsDeleted));
     outputLog.AddKeyword(PvlKeyword("MeasuresDeleted", numMeasuresDeleted));
 
+      outputLog.AddObject(*editLockedPoints);
+      outputLog.AddObject(*editLockedMeasures);
     if (comments) {
       outputLog.AddObject(*commentPoints);
     }
@@ -238,6 +243,14 @@ void IsisMain() {
     if (commentPoints != NULL) {
       delete commentPoints;
       commentPoints = NULL;
+    }
+    if (editLockedPoints != NULL) {
+      delete editLockedPoints;
+      editLockedPoints = NULL;
+    }
+    if (editLockedMeasures != NULL) {
+      delete editLockedMeasures;
+      editLockedMeasures = NULL;
     }
   }
 
@@ -289,10 +302,14 @@ bool ShouldDelete(ControlPoint *point) {
  */
 void IgnorePoint(ControlNet &cnet, ControlPoint *point, string cause) {
   ControlPoint::Status result = point->SetIgnored(true);
-  if ((keepLog && result == ControlPoint::Success) || 
-      point->IsEditLocked()) {
-    // Label the keyword as the Point ID, and make the cause into the value
-    ignoredPoints->AddKeyword(PvlKeyword(point->GetId(), cause));
+  if (keepLog) {
+    if (result == ControlPoint::Success) {
+      // Label the keyword as the Point ID, and make the cause into the value
+      ignoredPoints->AddKeyword(PvlKeyword(point->GetId(), cause));
+    }
+    else if (point->IsEditLocked() && cause == "EditLocked point skipped") {
+      editLockedPoints->AddKeyword(PvlKeyword(point->GetId(),cause));
+    }
   }
 }
 
@@ -311,8 +328,7 @@ void IgnoreMeasure(ControlNet &cnet, ControlPoint *point,
                    ControlMeasure *measure, string cause) {
 
   ControlMeasure::Status result = measure->SetIgnored(true);
-  if ((keepLog && result == ControlMeasure::Success) ||
-      measure->IsEditLocked()) {
+  if (keepLog && result == ControlMeasure::Success) {
     // Make the keyword label the measure Serial Number, and the cause into
     // the value
     PvlKeyword ignoredMeasure(
@@ -333,6 +349,9 @@ void IgnoreMeasure(ControlNet &cnet, ControlPoint *point,
       pointGroup.AddKeyword(ignoredMeasure);
       (*ignoredMeasures)[point->GetId()] = pointGroup;
     }
+  }
+  else if (measure->IsEditLocked() && cause == "EditLocked measure skipped") {
+    editLockedMeasures->AddKeyword(PvlKeyword(point->GetId(), cause));
   }
 }
 
@@ -372,7 +391,7 @@ void DeletePoint(ControlNet &cnet, int cp) {
   else {
     for (int cm = 0; cm < point->GetNumMeasures(); cm++) {
       if (point->GetMeasure(cm)->IsEditLocked()) {
-        IgnorePoint(cnet, point, "EditLocked point ignored");
+        IgnorePoint(cnet, point, "EditLocked point skipped");
       }
     }
   }
@@ -401,6 +420,10 @@ void PopulateLog(ControlNet &cnet) {
   ignoredMeasures = new QMap<string, PvlGroup>;
   
   commentPoints = new PvlObject("RetainedPointReference");
+  
+  editLockedMeasures = new PvlObject("EditLockedMeasures");
+  editLockedPoints = new PvlObject("EditLockedPoints");
+  
 
   Progress progress;
   progress.SetText("Initializing Log File");
@@ -512,7 +535,7 @@ void ProcessControlMeasures(string fileName, ControlNet &cnet) {
       ControlMeasure *measure = point->GetMeasure(cm);
       
       if (!point->IsIgnored() && point->GetMeasure(cm)->IsEditLocked()) {
-        IgnoreMeasure(cnet, point, measure, "EditLocked measure ignored");
+        IgnoreMeasure(cnet, point, measure, "EditLocked measure skipped");
       }
     
       string serialNumber = measure->GetCubeSerialNumber();

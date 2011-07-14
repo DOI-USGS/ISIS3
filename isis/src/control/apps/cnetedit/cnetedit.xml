@@ -94,6 +94,10 @@
     <change name="James Alexander Crough" date="2011-07-13">
       Changed output of ignored points to show EditLocked points as ignored.
     </change>
+    <change name="James Alexander Crough" date="2011-07-14">
+      Changed output again this time in order to seperate skipping EditLocked
+      points into their own PVL objects.
+    </change>
   </history> 
   
   <category>
