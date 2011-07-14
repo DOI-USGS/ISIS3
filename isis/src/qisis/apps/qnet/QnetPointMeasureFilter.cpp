@@ -34,55 +34,57 @@ namespace Qisis {
     p_ignoreStatus = NULL;
     p_ignored = NULL;
     p_notIgnored = NULL;
+    p_editLockStatus = NULL;
+    p_editLocked = NULL;
+    p_notEditLocked = NULL;
 
     // Create the components for the filter window
-    p_measureType = new QCheckBox("Filter by Measure Type(s)");
+    p_measureType = new QGroupBox("Filter by Measure Type(s)");
+    p_measureType->setCheckable(true);
+    p_measureType->setChecked(false);
     p_candidate = new QCheckBox("Candidate");
     p_manual = new QCheckBox("Manual");
     p_registeredPixel = new QCheckBox("RegisteredPixel");
     p_registeredSubPixel = new QCheckBox("RegisteredSubPixel");
 
-    p_measureType->setChecked(false);
-    p_candidate->setEnabled(false);
-    p_manual->setEnabled(false);
-    p_registeredPixel->setEnabled(false);
-    p_registeredSubPixel->setEnabled(false);
-    connect(p_measureType, SIGNAL(toggled(bool)), this, SLOT(enableTypeFilter()));
-
-    p_ignoreStatus = new QCheckBox("Filter by Ignore Status");
+    p_ignoreStatus = new QGroupBox("Filter by Ignore Status");
+    p_ignoreStatus->setCheckable(true);
+    p_ignoreStatus->setChecked(false);
     p_ignored = new QRadioButton("Ignored");
     p_notIgnored = new QRadioButton("Not Ignored");
 
-    p_ignoreStatus->setChecked(false);
-    p_ignored->setChecked(true);
-    p_ignored->setEnabled(false);
-    p_notIgnored->setEnabled(false);
-    connect(p_ignoreStatus, SIGNAL(toggled(bool)), this, SLOT(enableIgnoreFilter()));
+    p_editLockStatus = new QGroupBox("Filter by Edit Lock Status");
+    p_editLockStatus->setCheckable(true);
+    p_editLockStatus->setChecked(false);
+    p_editLocked = new QRadioButton("Edit Locked");
+    p_notEditLocked = new QRadioButton("Not Edit Locked");
 
-    QLabel *pad = new QLabel();
+    QVBoxLayout *typeLayout = new QVBoxLayout();
+    typeLayout->addWidget(p_candidate);
+    typeLayout->addWidget(p_manual);
+    typeLayout->addWidget(p_registeredPixel);
+    typeLayout->addWidget(p_registeredSubPixel);
+    typeLayout->addStretch(1);
+    p_measureType->setLayout(typeLayout);
 
+    QVBoxLayout *ignoreLayout = new QVBoxLayout();
+    ignoreLayout->addWidget(p_ignored);
+    ignoreLayout->addWidget(p_notIgnored);
+    p_ignoreStatus->setLayout(ignoreLayout);
 
-    // Create the layout and add the components to it
-    QVBoxLayout *ignorelayout = new QVBoxLayout();
-    ignorelayout->addWidget(p_ignoreStatus);
-    ignorelayout->addWidget(p_ignored);
-    ignorelayout->addWidget(p_notIgnored);
-    ignorelayout->addWidget(pad);
-    ignorelayout->addWidget(pad);
-    ignorelayout->addWidget(pad);
+    QVBoxLayout *lockLayout = new QVBoxLayout();
+    lockLayout->addWidget(p_editLocked);
+    lockLayout->addWidget(p_notEditLocked);
+    p_editLockStatus->setLayout(lockLayout);
 
-    QVBoxLayout *typelayout = new QVBoxLayout();
-    typelayout->addWidget(p_measureType);
-    typelayout->addWidget(p_candidate);
-    typelayout->addWidget(p_manual);
-    typelayout->addWidget(p_registeredPixel);
-    typelayout->addWidget(p_registeredSubPixel);
-    typelayout->addWidget(pad);
-    typelayout->addWidget(pad);
+    QVBoxLayout *statusLayout = new QVBoxLayout();
+    statusLayout->addWidget(p_ignoreStatus);
+    statusLayout->addWidget(p_editLockStatus);
 
     QHBoxLayout *layout = new QHBoxLayout();
-    layout->addLayout(typelayout);
-    layout->addLayout(ignorelayout);
+    layout->addWidget(p_measureType);
+    layout->addLayout(statusLayout);
+
     this->setLayout(layout);
   }
 
@@ -114,19 +116,19 @@ namespace Qisis {
     }
 
     // Make sure they selected at least one type to filter for
-    if (!(p_measureType->isChecked()) && !(p_ignoreStatus->isChecked())) {
-      QMessageBox::information((QWidget *)parent(), "Error",
+    if (!p_measureType->isChecked() && !p_ignoreStatus->isChecked() &&
+        !p_editLockStatus->isChecked()) {
+      QMessageBox::information((QWidget *)parent(), "Input Erro",
           "You must select at least one measure property to filter");
       return;
     }
     // if Filter by Measure Type is selected but no Measure Type is checked, throw error
     if ((p_measureType->isChecked()) &&
-        !(p_candidate->isChecked() ||
-            p_manual->isChecked() ||
-            p_registeredPixel->isChecked() ||
-            p_registeredSubPixel->isChecked())) {
-      QMessageBox::information((QWidget *)parent(), "Error",
-          "Filter by Measure Type is selected. You must choose at least one Measure Type to filter");
+        !(p_candidate->isChecked() || p_manual->isChecked() ||
+          p_registeredPixel->isChecked() || p_registeredSubPixel->isChecked())) {
+      QMessageBox::information((QWidget *)parent(), "Input Error",
+          "Filter by Measure Type is selected. You must choose at least one "
+          "Measure Type to filter");
       return;
     }
 
@@ -140,45 +142,28 @@ namespace Qisis {
       Isis::ControlPoint &cp = *(*g_controlNetwork)[g_filteredPoints[i]];
       int numMeasNotMatching = 0;
       for (int j = 0; j < cp.GetNumMeasures(); j++) {
-        if (p_ignoreStatus->isChecked()) {
-          // if the point contains a measure whose ignore status matches
-          // the user's selection, check whether the measure type matches
-          if (p_ignored->isChecked() && cp[j]->IsIgnored()) {
-            if (p_measureType->isChecked()) {
-              if (MeasureTypeMatched(cp[j]->GetType())) {
-                // keep this point in the list and go on to the next point
-                break;
-              }
-            }
-            else {
-              // keep this point in the list and go on to the next point
-              break;
-            }
-          }
-          else if (p_notIgnored->isChecked() && !cp[j]->IsIgnored()) {
-            if (p_measureType->isChecked()) {
-              // keep this point in the list and go on to the next point
-              if (MeasureTypeMatched(cp[j]->GetType())) {
-                break;
-              }
-            }
-            else {
-              // keep this point in the list and go on to the next point
-              break;
-            }
-          }
-        }
-        // ignore status not selected, only filter by measure type, do not
-        // include measure if Reference 
-        else {
+        //  While keep is true, keep testing for next filter option
+        bool keep = true;
+        if (p_measureType->isChecked()) {
           //  Is this a reference measure
           bool reference = cp.IsReferenceExplicit() &&
              ((QString(cp[j]->GetCubeSerialNumber()) == cp.GetReferenceSN()));
-          if (MeasureTypeMatched(cp[j]->GetType()) && reference == false) {
-            // keep this point in the list and go on to the next point
-            break;
-          }
+          if (!MeasureTypeMatched(cp[j]->GetType()) && !reference) keep = false;
         }
+
+        if (keep && p_ignoreStatus->isChecked()) {
+          if (p_ignored->isChecked() && !cp[j]->IsIgnored()) keep = false;
+          if (p_notIgnored->isChecked() && cp[j]->IsIgnored()) keep = false;
+        }
+
+        if (keep && p_editLockStatus->isChecked()) {
+          if (p_editLocked->isChecked() && !cp[j]->IsEditLocked()) keep = false;
+          if (p_notEditLocked->isChecked()&& cp[j]->IsEditLocked()) keep = false;
+        }
+
+        //  If at least one criteria matches, break from measure loop, and
+        //  keep the point in the list.
+        if (keep) break;
         // if this measure doesn't match any of the checked values, increment
         numMeasNotMatching++;
       }
@@ -226,63 +211,6 @@ namespace Qisis {
       return true;;
     }
     return false;
-  }
-
-  /**
-   * @brief Enables ignore status filter when corresponding
-   *        checkbox is selected.
-   *
-   * This slot is connected to the toggle signal of the "Filter by
-   * Ignore Status" checkbox.  When the box is checked, the radio
-   * buttons are enabled.
-   *
-   *
-   * @internal
-   *   @history 2010-06-02 Jeannie Walldren - Original version
-   */
-  void QnetPointMeasureFilter::enableIgnoreFilter() {
-    if (p_ignoreStatus->isChecked()) {
-      p_ignored->setEnabled(true);
-      p_notIgnored->setEnabled(true);
-    }
-    else {
-      p_ignored->setEnabled(false);
-      p_notIgnored->setEnabled(false);
-    }
-
-  }
-
-  /**
-   * @brief Enables measure type filter when corresponding
-   *        checkbox is selected.
-   *
-   * This slot is connected to the toggle signal of the "Filter by
-   * Measure Type" checkbox.  When the box is checked, the
-   * checkboxes below are enabled.
-   *
-   * @internal
-   *   @history 2010-06-02 Jeannie Walldren - Original version
-   *   @history 2010-07-16 Tracie Sucharski - Implemented binary
-   *                          control networks.
-   */
-  void QnetPointMeasureFilter::enableTypeFilter() {
-    if (p_measureType->isChecked()) {
-      p_candidate->setEnabled(true);
-      p_manual->setEnabled(true);
-      p_registeredPixel->setEnabled(true);
-      p_registeredSubPixel->setEnabled(true);
-    }
-    else {
-      p_candidate->setEnabled(false);
-      p_manual->setEnabled(false);
-      p_registeredPixel->setEnabled(false);
-      p_registeredSubPixel->setEnabled(false);
-      p_candidate->setChecked(false);
-      p_manual->setChecked(false);
-      p_registeredPixel->setChecked(false);
-      p_registeredSubPixel->setChecked(false);
-    }
-
   }
 
 }

@@ -1,15 +1,11 @@
 #ifndef QnetPointMeasureFilter_h
 #define QnetPointMeasureFilter_h
 
-#include <QAction>
-#include <QDialog>
-#include <QWidget>
-#include <QLabel>
-#include <QCheckBox>
-#include <QLineEdit>
-#include <QList>
-#include <QRadioButton>
 #include "QnetFilter.h"
+
+class QCheckBox;
+class QGroupBox;
+class QRadioButton;
 
 
 namespace Qisis {
@@ -43,6 +39,9 @@ namespace Qisis {
    *   @history 2011-05-20 Tracie Sucharski - Remove reference as a measure
    *                          type.  Need to add ability to search for
    *                          points without a reference?
+   *   @history 2011-07-12 Tracie Sucharski - Use Group boxes instead of
+   *                          check boxes and reimplement filter to add
+   *                          the edit Lock status.
    *
    */
   class QnetPointMeasureFilter : public QnetFilter {
@@ -51,21 +50,23 @@ namespace Qisis {
     public:
       QnetPointMeasureFilter(QWidget *parent = 0);
       virtual void filter();
-      bool MeasureTypeMatched(int cmType);
-
-    private slots:
-      void enableIgnoreFilter();
-      void enableTypeFilter();
 
     private:
-      QCheckBox *p_measureType;
+      bool MeasureTypeMatched(int cmType);
+
+      QGroupBox *p_measureType;
       QCheckBox *p_candidate;
       QCheckBox *p_manual;
       QCheckBox *p_registeredPixel;
       QCheckBox *p_registeredSubPixel;
-      QCheckBox *p_ignoreStatus;
+
+      QGroupBox *p_ignoreStatus;
       QRadioButton *p_ignored;
       QRadioButton *p_notIgnored;
+
+      QGroupBox *p_editLockStatus;
+      QRadioButton *p_editLocked;
+      QRadioButton *p_notEditLocked;
   };
 };
 

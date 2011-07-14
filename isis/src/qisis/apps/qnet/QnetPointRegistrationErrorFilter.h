@@ -19,18 +19,14 @@
  *  http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *  http://www.usgs.gov/privacy.html.
  */
-
-
-
-#include <QAction>
-#include <QDialog>
-#include <QWidget>
-#include <QLabel>
-#include <QLineEdit>
-#include <QCheckBox>
-#include <QList>
 #include "QnetFilter.h"
 
+class QCheckBox;
+class QLineEdit;
+
+namespace Isis {
+  class ControlPoint;
+}
 
 namespace Qisis {
   /**
@@ -71,6 +67,7 @@ namespace Qisis {
 
     private slots:
       void clearEdit();
+      double calculateMaxError (Isis::ControlPoint &controlPoint);
   };
 };
 

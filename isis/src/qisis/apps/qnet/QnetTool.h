@@ -172,6 +172,8 @@ namespace Qisis {
         SAMPLERESIDUAL,
         LINERESIDUAL,
         RESIDUALMAGNITUDE,
+        SAMPLESHIFT,
+        LINESHIFT,
         PIXELSHIFT,
         GOODNESSOFFIT,
         IGNORED,
@@ -180,7 +182,7 @@ namespace Qisis {
         APRIORISAMPLE,
         APRIORILINE
       };
-      static const int NUMCOLUMNS = 14;
+      static const int NUMCOLUMNS = 16;
 
       QString measureColumnToString(MeasureColumns column);
 

@@ -1810,8 +1810,32 @@ namespace Qisis {
       }
       p_measureTable->setItem(row,column++,tableItem);
 
-      double pixelShift = m.GetLogData(
-                      ControlMeasureLogData::PixelShift).GetNumericalValue();
+      double sampleShift = m.GetLogData(
+                      ControlMeasureLogData::SampleShift).GetNumericalValue();
+      if (sampleShift == Isis::Null) {
+        tableItem = new QTableWidgetItem(QString("Null"));
+      }
+      else {
+        tableItem = new QTableWidgetItem();
+        tableItem->setData(0,sampleShift);
+      }
+      p_measureTable->setItem(row,column++,tableItem);
+
+      double lineShift = m.GetLogData(
+                      ControlMeasureLogData::LineShift).GetNumericalValue();
+      if (lineShift == Isis::Null) {
+        tableItem = new QTableWidgetItem(QString("Null"));
+      }
+      else {
+        tableItem = new QTableWidgetItem();
+        tableItem->setData(0,lineShift);
+      }
+      p_measureTable->setItem(row,column++,tableItem);
+
+      double pixelShift = Isis::Null;
+      if (sampleShift != Isis::Null && lineShift != Isis::Null) {
+        pixelShift = sqrt((sampleShift*sampleShift) + (lineShift*lineShift));
+      }
       if (pixelShift == Isis::Null) {
         tableItem = new QTableWidgetItem(QString("Null"));
       }
@@ -1902,6 +1926,10 @@ namespace Qisis {
         return "Line Residual";
       case RESIDUALMAGNITUDE:
         return "Residual Magnitude";
+      case SAMPLESHIFT:
+        return "Sample Shift";
+      case LINESHIFT:
+        return "Line Shift";
       case PIXELSHIFT:
         return "Pixel Shift";
       case GOODNESSOFFIT:

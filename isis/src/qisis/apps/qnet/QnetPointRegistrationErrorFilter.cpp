@@ -5,7 +5,7 @@
 #include "ControlNet.h"
 #include "ControlMeasure.h"
 #include "ControlMeasureLogData.h"
-#include "SerialNumberList.h"
+#include "ControlPoint.h"
 #include "Statistics.h"
 
 #include "qnet.h"
@@ -120,8 +120,7 @@ namespace Qisis {
     // reverse order since removal list of elements affects index number
     for (int i = g_filteredPoints.size() - 1; i >= 0; i--) {
       Isis::ControlPoint &cp = *(*g_controlNetwork)[g_filteredPoints[i]];
-      double maxPixelError =
-                 cp.GetStatistic(ControlMeasureLogData::PixelShift).Maximum();
+      double maxPixelError = calculateMaxError(cp);
       if (p_lessThanCB->isChecked() && p_greaterThanCB->isChecked()) {
         if (maxPixelError < lessNum && maxPixelError > greaterNum) {
           pointMap.insert(maxPixelError, g_filteredPoints[i]);
@@ -189,5 +188,19 @@ namespace Qisis {
       p_greaterErrorEdit->clear();
       p_greaterErrorEdit->setEnabled(false);
     }
+  }
+
+
+  double QnetPointRegistrationErrorFilter::calculateMaxError(ControlPoint &cp) {
+      // ***** below needs to be updated to whatever is decided on PIXELSHIFT *****
+    double maxError = 0.0;
+    for (int i = 0; i < cp.GetNumMeasures(); i++) {
+      double sampError =
+                 cp[i]->GetLogData(ControlMeasureLogData::SampleShift).GetNumericalValue();
+//    double lineError =
+//               cp[i]->GetLogData(ControlMeasureLogData::LineShift).GetNumericalValue();
+      if (sampError > maxError) maxError = sampError;
+    }
+    return maxError;
   }
 }

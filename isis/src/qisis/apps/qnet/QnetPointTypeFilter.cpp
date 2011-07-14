@@ -145,7 +145,7 @@ namespace Qisis {
     if ((p_pointType->isChecked()) &&
         !(p_fixed->isChecked() || p_constrained->isChecked() ||
           p_free->isChecked())) {
-      QMessageBox::information((QWidget *)parent(), "Error",
+      QMessageBox::information((QWidget *)parent(), "Input Error",
           "Filter by Point Type is selected. You must choose at least one "
           "Point Type to filter");
       return;
@@ -156,6 +156,7 @@ namespace Qisis {
     // affects index number
     for (int i = g_filteredPoints.size() - 1; i >= 0; i--) {
       ControlPoint &cp = *(*g_controlNetwork)[g_filteredPoints[i]];
+      //  While keep is true, keep testing for next filter option
       bool keep = true;
       if (p_pointType->isChecked()) {
         if (!PointTypeMatched(cp.GetType())) keep = false;
