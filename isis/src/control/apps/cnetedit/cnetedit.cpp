@@ -205,8 +205,8 @@ void IsisMain() {
     outputLog.AddKeyword(PvlKeyword("PointsDeleted", numPointsDeleted));
     outputLog.AddKeyword(PvlKeyword("MeasuresDeleted", numMeasuresDeleted));
 
-      outputLog.AddObject(*editLockedPoints);
-      outputLog.AddObject(*editLockedMeasures);
+    outputLog.AddObject(*editLockedPoints);
+    outputLog.AddObject(*editLockedMeasures);
     if (comments) {
       outputLog.AddObject(*commentPoints);
     }
