@@ -921,21 +921,25 @@ namespace Qisis {
         p_rightMeasure->SetType(Isis::ControlMeasure::RegisteredSubPixel);
         //  Save Goodness of Fit to the right measure log entry
         p_rightMeasure->SetLogData(Isis::ControlMeasureLogData(
-                                                              Isis::ControlMeasureLogData::GoodnessOfFit,
-                                                              p_autoRegFact->GoodnessOfFit()));
+                               Isis::ControlMeasureLogData::GoodnessOfFit,
+                               p_autoRegFact->GoodnessOfFit()));
         //  If Apriori sample,line exist, calculate pixel shift, save to log
         if ( p_rightMeasure->GetAprioriSample() != Isis::Null &&
              p_rightMeasure->GetAprioriLine() != Isis::Null ) {
-          double pixelShift = sqrt(
-                                  pow(p_rightMeasure->GetSample() - p_rightMeasure->GetAprioriSample(), 2.0)
-                                  + pow(p_rightMeasure->GetLine() - p_rightMeasure->GetAprioriLine(), 2.0));
+          double sampleShift = p_rightMeasure->GetAprioriSample() -
+                               p_rightMeasure->GetSample();
+          double lineShift = p_rightMeasure->GetAprioriLine() -
+                               p_rightMeasure->GetLine();
           p_rightMeasure->SetLogData(Isis::ControlMeasureLogData(
-                                                                Isis::ControlMeasureLogData::PixelShift,
-                                                                pixelShift));;
+                                 Isis::ControlMeasureLogData::SampleShift,
+                                 sampleShift));;
+          p_rightMeasure->SetLogData(Isis::ControlMeasureLogData(
+                                 Isis::ControlMeasureLogData::LineShift,
+                                 lineShift));;
         }
         p_rightMeasure->SetLogData(Isis::ControlMeasureLogData(
-                                                              Isis::ControlMeasureLogData::GoodnessOfFit,
-                                                              p_autoRegFact->GoodnessOfFit()));
+                                 Isis::ControlMeasureLogData::GoodnessOfFit,
+                                 p_autoRegFact->GoodnessOfFit()));
         p_autoRegShown = false;
         p_autoRegExtension->hide();
         p_autoReg->setText("Register");
@@ -943,7 +947,8 @@ namespace Qisis {
       else {
         p_rightMeasure->SetChooserName(Isis::Application::UserName());
         p_rightMeasure->SetType(Isis::ControlMeasure::Manual);
-        p_rightMeasure->DeleteLogData(Isis::ControlMeasureLogData::PixelShift);
+        p_rightMeasure->DeleteLogData(Isis::ControlMeasureLogData::SampleShift);
+        p_rightMeasure->DeleteLogData(Isis::ControlMeasureLogData::LineShift);
         p_rightMeasure->DeleteLogData(Isis::ControlMeasureLogData::GoodnessOfFit);
         //  TODO  Should AprioriSample/Line be reset?
       }
