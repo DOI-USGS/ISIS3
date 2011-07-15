@@ -363,7 +363,8 @@ namespace Isis {
 
 
   /**
-   * Set the focal plane x/y for the measured line/sample
+   * Set the focal plane x/y for the measured line/sample.  This is a convenience
+   * method for the BundleAdjustment class to avoid having to go redo the calculation.
    *
    * @param *camera  Pointer to camera
    *           
@@ -381,11 +382,20 @@ namespace Isis {
   }
 
 
-  //! Set the focal plane x/y for the computed (apriori) lat/lon
+  /**
+   * Set the computed focal plane x/y for the apriori lat/lon.  This is a convenience
+   * method for the BundleAdjustment class to avoid having to go redo the calculation.
+   *
+   * @param *camera  Pointer to camera
+   *           
+   * @return Status Success
+   *
+   * @internal
+   *   @history 2011-07-14 Debbie A. Cook  Removed editLock check for jigsaw
+   *
+   */
   ControlMeasure::Status ControlMeasure::SetFocalPlaneComputed(double x,
       double y) {
-    if (IsEditLocked())
-      return MeasureLocked;
     p_focalPlaneComputedX = x;
     p_focalPlaneComputedY = y;
     return Success;
