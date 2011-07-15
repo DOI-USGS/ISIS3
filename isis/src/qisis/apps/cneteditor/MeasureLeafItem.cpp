@@ -6,8 +6,8 @@
 namespace Isis
 {
   MeasureLeafItem::MeasureLeafItem(ControlMeasure * cm,
-      AbstractTreeItem * parent) : AbstractTreeItem(parent),
-    AbstractMeasureItem(cm)
+      int avgCharWidth, AbstractTreeItem * parent)
+    : AbstractTreeItem(parent), AbstractMeasureItem(cm, avgCharWidth)
   {
   }
 

@@ -14,25 +14,24 @@
 #include "ControlMeasure.h"
 #include "ControlNet.h"
 
-#include "ConnectionParentItem.h"
-#include "FilterWidget.h"
+#include "CnetView.h"
+#include "CnetViewContent.h"
 #include "PointLeafItem.h"
 #include "RootItem.h"
+#include "SerialLeafItem.h"
 #include "SerialParentItem.h"
 
+
+#include <QTime>
 
 using std::cerr;
 
 
 namespace Isis
 {
-  ConnectionModel::ConnectionModel(ControlNet * cNet, QString name,
-      QTreeView * tv, QObject * parent) : TreeModel(cNet, name, tv, parent)
+  ConnectionModel::ConnectionModel(ControlNet * cNet, CnetView * v,
+      QObject * parent) : TreeModel(cNet, v, parent)
   {
-    watcher = new QFutureWatcher< QAtomicPointer< RootItem > >;
-    connect(watcher, SIGNAL(finished()),
-            this, SLOT(rebuildItemsDone()));
-
     rebuildItems();
   }
 
@@ -40,98 +39,100 @@ namespace Isis
   ConnectionModel::~ConnectionModel()
   {
   }
-  
-  
-  ConnectionModel::CreateRootItemFunctor::CreateRootItemFunctor(
-      FilterWidget * fw) : filter(fw)
+
+
+  ConnectionModel::CreateRootItemFunctor::CreateRootItemFunctor(TreeModel * tm)
   {
+    treeModel = tm;
+    avgCharWidth = QFontMetrics(
+        treeModel->getView()->getContentFont()).averageCharWidth();
   }
-  
-  
-  ConnectionParentItem * ConnectionModel::CreateRootItemFunctor::operator()(
-      ControlCubeGraphNode * const & node) const
+
+
+  ConnectionModel::CreateRootItemFunctor::CreateRootItemFunctor(
+    const CreateRootItemFunctor & other)
   {
-    ConnectionParentItem * parentItem = new ConnectionParentItem(node);
+    treeModel = other.treeModel;
+    avgCharWidth = other.avgCharWidth;
+  }
+
+
+  ConnectionModel::CreateRootItemFunctor::~CreateRootItemFunctor()
+  {
+    treeModel = NULL;
+  }
+
+
+  SerialParentItem * ConnectionModel::CreateRootItemFunctor::operator()(
+    ControlCubeGraphNode * const & node) const
+  {
+    SerialParentItem * parentItem =
+      new SerialParentItem(node, avgCharWidth);
+    parentItem->setSelectable(false);
 
     QList< ControlCubeGraphNode * > connectedNodes = node->getAdjacentNodes();
+
     for (int j = 0; j < connectedNodes.size(); j++)
     {
       ControlCubeGraphNode * connectedNode = connectedNodes[j];
-      SerialParentItem * serialItem = new SerialParentItem(connectedNode,
-          parentItem);
-
-      QList< ControlMeasure * > measures = connectedNode->getMeasures();
-      for (int k = 0; k < measures.size(); k++)
-      {
-        ControlPoint * point = measures[k]->Parent();
-        PointLeafItem * pointItem = new PointLeafItem(point, serialItem);
-        serialItem->addChild(pointItem);
-      }
+      SerialLeafItem * serialItem =
+        new SerialLeafItem(connectedNode, avgCharWidth, parentItem);
+      serialItem->setSelectable(false);
 
       parentItem->addChild(serialItem);
     }
-    
+
     return parentItem;
   }
-  
-  
+
+
   void ConnectionModel::CreateRootItemFunctor::addToRootItem(
-      QAtomicPointer< RootItem > & root, ConnectionParentItem * const & item)
+    QAtomicPointer< RootItem > & root, SerialParentItem * const & item)
   {
     if (!root)
       root = new RootItem;
-    
+
     if (item)
       root->addChild(item);
   }
 
 
+  ConnectionModel::CreateRootItemFunctor &
+  ConnectionModel::CreateRootItemFunctor::operator=(
+    const CreateRootItemFunctor & other)
+  {
+    if (this != &other)
+    {
+      treeModel = other.treeModel;
+      avgCharWidth = other.avgCharWidth;
+    }
+
+    return *this;
+  }
+
+
   void ConnectionModel::rebuildItems()
   {
+//     cerr << "ConnectionModel::rebuildItems called\n";
+    emit filterCountsChanged(-1, getTopLevelItemCount());
     QFuture< QAtomicPointer< RootItem > > futureRoot;
-    if (watcher->isStarted())
+
+    if (getRebuildWatcher()->isStarted())
     {
-      futureRoot = watcher->future();
+      futureRoot = getRebuildWatcher()->future();
       futureRoot.cancel();
 //       futureRoot.waitForFinished();
 //       if (futureRoot.result())
 //         delete futureRoot.result();
     }
-    
-    futureRoot = QtConcurrent::mappedReduced(cNet->GetCubeGraphNodes(),
-        CreateRootItemFunctor(filter),
+
+    futureRoot = QtConcurrent::mappedReduced(
+        getControlNetwork()->GetCubeGraphNodes(),
+        CreateRootItemFunctor(this),
         &CreateRootItemFunctor::addToRootItem,
         QtConcurrent::OrderedReduce | QtConcurrent::SequentialReduce);
 
-    watcher->setFuture(futureRoot);
-  }
-  
-  
-  void ConnectionModel::rebuildItemsDone()
-  {
-    saveViewState();
-    
-    clear();
-    QAtomicPointer< RootItem > newRoot = watcher->future();
-
-    if (newRoot && newRoot->childCount())
-    {
-      beginInsertRows(QModelIndex(), 0, newRoot->childCount() - 1);
-      ASSERT(rootItem);
-      delete rootItem;
-      rootItem = NULL;
-      rootItem = newRoot;
-      endInsertRows();
-    }
-    else
-    {
-      if (newRoot)
-      {
-        delete newRoot;
-        newRoot = NULL;
-      }
-    }
-
-    loadViewState();
+    getRebuildWatcher()->setFuture(futureRoot);
   }
 }
+

@@ -59,15 +59,6 @@ namespace Isis
       void closeNetwork();
 
 
-    private: // data
-      ControlNet * cnet;
-      CnetEditorWidget * editorWidget;
-      QString * curFile;
-      QFont * labelFont;
-      bool dirty;
-      bool saveAsPvl;
-
-
     private: // widgets
       QAction * openAct;
       QAction * saveAct;
@@ -81,7 +72,14 @@ namespace Isis
 
       QToolBar * mainToolBar;
 
-      QButtonGroup * driveViewGrp;
+
+    private: // data
+      ControlNet * cnet;
+      CnetEditorWidget * editorWidget;
+      QString * curFile;
+      QFont * labelFont;
+      bool dirty;
+      bool saveAsPvl;
   };
 }
 

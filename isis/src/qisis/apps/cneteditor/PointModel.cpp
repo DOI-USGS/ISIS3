@@ -6,16 +6,21 @@
 
 #include <QFuture>
 #include <QFutureWatcher>
+#include <QMutex>
 #include <QString>
 #include <QtConcurrentMap>
 
 #include "ControlNet.h"
 #include "ControlPoint.h"
 
-#include "FilterWidget.h"
+#include "CnetView.h"
+#include "CnetViewContent.h"
 #include "PointParentItem.h"
 #include "MeasureLeafItem.h"
 #include "RootItem.h"
+
+#include <QTime>
+#include <QVariant>
 
 
 using std::cerr;
@@ -23,13 +28,9 @@ using std::cerr;
 
 namespace Isis
 {
-  PointModel::PointModel(ControlNet * controlNet, QString name, QTreeView * tv,
-      QObject * parent) : TreeModel(controlNet, name, tv, parent)
+  PointModel::PointModel(ControlNet * controlNet, CnetView * v, QObject * parent)
+    : TreeModel(controlNet, v, parent)
   {
-    watcher = new QFutureWatcher< QAtomicPointer< RootItem > >;
-    connect(watcher, SIGNAL(finished()),
-            this, SLOT(rebuildItemsDone()));
-
     rebuildItems();
   }
 
@@ -37,106 +38,92 @@ namespace Isis
   PointModel::~PointModel()
   {
   }
-  
-  
+
+
+  PointModel::CreateRootItemFunctor::CreateRootItemFunctor(TreeModel * tm)
+  {
+    treeModel = tm;
+    avgCharWidth = QFontMetrics(
+        treeModel->getView()->getContentFont()).averageCharWidth();
+  }
+
+
   PointModel::CreateRootItemFunctor::CreateRootItemFunctor(
-      FilterWidget * fw) : filter(fw)
+    const CreateRootItemFunctor & other)
   {
+    treeModel = other.treeModel;
+    avgCharWidth = other.avgCharWidth;
   }
-  
-  
+
+  PointModel::CreateRootItemFunctor::~CreateRootItemFunctor()
+  {
+    treeModel = NULL;
+  }
+
+
   PointParentItem * PointModel::CreateRootItemFunctor::operator()(
-      ControlPoint * const & point) const
+    ControlPoint * const & point) const
   {
-    PointParentItem * pointItem = NULL;
+    PointParentItem * pointItem = new PointParentItem(point, avgCharWidth);
 
-//     int sum1 = 1;
-
-    if (!filter || filter->evaluate(point))
+    for (int j = 0; j < point->GetNumMeasures(); j++)
     {
-      pointItem = new PointParentItem(point);
-      for (int j = 0; j < point->GetNumMeasures(); j++)
-      {
-        const ControlMeasure * measure = point->GetMeasure(j);
-        ASSERT(measure);
-        if (!filter || filter->evaluate(measure))
-        {
-          MeasureLeafItem * measureItem = new MeasureLeafItem(
-              const_cast< ControlMeasure * >(measure), pointItem);
-          pointItem->addChild(measureItem);
-        }
-        
-//         int sum = 0;
-//         for (int z = 0; z < 99999999; z += 2)
-//           sum += z--;
-//           
-//         sum1 = sum;
-      }
+      const ControlMeasure * measure = point->GetMeasure(j);
+      ASSERT(measure);
+
+      MeasureLeafItem * measureItem = new MeasureLeafItem(
+        const_cast< ControlMeasure * >(measure), avgCharWidth, pointItem);
+      pointItem->addChild(measureItem);
     }
-    
-//     if (sum1)
-      return pointItem;
+
+    return pointItem;
   }
-  
-  
+
+
   void PointModel::CreateRootItemFunctor::addToRootItem(
-      QAtomicPointer< RootItem > & root, PointParentItem * const & item)
+    QAtomicPointer< RootItem > & root, PointParentItem * const & item)
   {
     if (!root)
       root = new RootItem;
-    
+
     if (item)
       root->addChild(item);
   }
 
 
+  PointModel::CreateRootItemFunctor &
+  PointModel::CreateRootItemFunctor::operator=(
+    const CreateRootItemFunctor & other)
+  {
+    if (this != &other)
+    {
+      treeModel = other.treeModel;
+      avgCharWidth = other.avgCharWidth;
+    }
+
+    return *this;
+  }
+
   void PointModel::rebuildItems()
   {
-//     cerr << "rebuildItems called... filter: " << filter << "\n";
-    
-//     cerr << "  returned from clear()\n";
+//     static int aoeu = 0;
+//     aoeu++;
+//     if (aoeu > 3)
+//       return;
+    emit filterCountsChanged(-1, getTopLevelItemCount());
     QFuture< QAtomicPointer< RootItem > > futureRoot;
-    if (watcher->isStarted())
+    if (getRebuildWatcher()->isStarted())
     {
-      futureRoot = watcher->future();
+      futureRoot = getRebuildWatcher()->future();
       futureRoot.cancel();
-//       if (futureRoot.result())
-//         delete futureRoot.result();
     }
-    
-    futureRoot = QtConcurrent::mappedReduced(cNet->getPoints(),
-        CreateRootItemFunctor(filter),
+
+    futureRoot = QtConcurrent::mappedReduced(
+        getControlNetwork()->getPoints(),
+        CreateRootItemFunctor(this),
         &CreateRootItemFunctor::addToRootItem,
         QtConcurrent::OrderedReduce | QtConcurrent::SequentialReduce);
 
-    watcher->setFuture(futureRoot);
-  }
-  
-  
-  void PointModel::rebuildItemsDone()
-  {
-   
-    saveViewState();
-    
-    clear();
-    QAtomicPointer< RootItem > newRoot = watcher->future();
-
-    if (newRoot->childCount())
-    {
-      beginInsertRows(QModelIndex(), 0, newRoot->childCount() - 1);
-      ASSERT(rootItem);
-      delete rootItem;
-      rootItem = NULL;
-      rootItem = newRoot;
-      endInsertRows();
-    }
-    else
-    {
-      ASSERT(newRoot);
-      delete newRoot;
-      newRoot = NULL;
-    }
-
-    loadViewState();
+    getRebuildWatcher()->setFuture(futureRoot);
   }
 }

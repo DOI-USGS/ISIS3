@@ -2,6 +2,7 @@
 
 #include "ConnectionFilterSelector.h"
 
+#include <algorithm>
 #include <iostream>
 
 #include <QComboBox>
@@ -13,6 +14,8 @@
 
 
 using std::cerr;
+using std::swap;
+
 
 namespace Isis
 {
@@ -23,23 +26,41 @@ namespace Isis
   }
 
 
+  ConnectionFilterSelector::ConnectionFilterSelector(
+    const ConnectionFilterSelector & other)
+  {
+    createSelector();
+    getSelector()->setCurrentIndex(other.getSelector()->currentIndex());
+    if (other.getFilter())
+      setFilter(other.getFilter()->clone());
+  }
+
+
   ConnectionFilterSelector::~ConnectionFilterSelector()
   {
   }
- 
- 
+
+
+  ConnectionFilterSelector & ConnectionFilterSelector::operator=(
+    const ConnectionFilterSelector & other)
+  {
+    *((AbstractFilterSelector *) this) = other;
+    return *this;
+  }
+
+
   void ConnectionFilterSelector::createSelector()
   {
     AbstractFilterSelector::createSelector();
-  
+
 //     selector->addItem("Point Id");
   }
 
 
   void ConnectionFilterSelector::changeFilter(int index)
   {
-    AbstractFilterSelector::changeFilter(index);
-    
+    deleteFilter();
+
     if (index != 0)
     {
 //       switch (index)
@@ -51,9 +72,7 @@ namespace Isis
 //           filter = new PointIdFilter;
 //           break;
 //       }
-//       
-//       connect(filter, SIGNAL(filterChanged()), this, SIGNAL(filterChanged()));
-//       mainLayout->insertWidget(2, filter);
+//
     }
   }
 }

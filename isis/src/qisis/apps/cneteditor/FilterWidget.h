@@ -5,7 +5,7 @@
 // parent
 #include <QWidget>
 
-// included because it is needed inside a templated method
+// these are included because it is needed inside a templated method
 #include "FilterGroup.h"
 
 
@@ -30,8 +30,9 @@ namespace Isis
 
     public:
       explicit FilterWidget(QString);
+      FilterWidget(const FilterWidget &);
       virtual ~FilterWidget();
-      
+
       template< typename T >
       bool evaluate(const T * t, bool (AbstractFilter::*meth)() const) const
       {
@@ -45,10 +46,10 @@ namespace Isis
         for (int i = 0; looking && i < filterGroups->size(); i++)
         {
           if (filterGroups->at(i)->hasFilter(meth))
-            looking = !(filterGroups->at(i)->evaluate(t) ^
+            looking = !(filterGroups->at(i)->evaluate(t, meth) ^
                 andGroupsTogether);
         }
-        
+
         // It is good that we are still looking for failures if we were ANDing
         // filters together, but it is bad if we were ORing them since in this
         // case we were looking for success (unless of course there were no
@@ -58,10 +59,12 @@ namespace Isis
       bool evaluate(const ControlCubeGraphNode * node) const;
       bool evaluate(const ControlPoint * point) const;
       bool evaluate(const ControlMeasure * measure) const;
-      
-      bool hasFilter(bool (AbstractFilter::*)() const) const;
-      
-      
+
+      bool hasFilter(bool (AbstractFilter:: *)() const) const;
+
+      FilterWidget & operator=(FilterWidget other);
+
+
     signals:
       void filterChanged();
       void scrollToBottom();
@@ -69,12 +72,14 @@ namespace Isis
 
     private:
       void nullify();
+      void init();
       QList< FilterGroup * > groupsWithCondition(
-          bool (FilterGroup::*)() const) const;
-      void updateDescription(QLabel * label, bool (AbstractFilter::*)() const,
-          QString (AbstractFilter::*)() const, QString);
- 
-  
+        bool (FilterGroup:: *)() const) const;
+      void updateDescription(QLabel * label, bool (AbstractFilter:: *)() const,
+          QString(AbstractFilter:: *)() const, QString);
+      void addGroup(FilterGroup * newGroup);
+
+
     private slots:
       void addGroup();
       void deleteGroup(FilterGroup *);
@@ -85,6 +90,7 @@ namespace Isis
 
     private:
       QPushButton * addGroupButton;
+      QButtonGroup * buttonGroup;
       QLabel * imageDescription;
       QLabel * imageDummy;
       QLabel * pointDescription;
@@ -93,11 +99,11 @@ namespace Isis
       QLabel * measureDummy;
       QVBoxLayout * mainLayout;
       QWidget * logicWidget;
-      
+
       bool andGroupsTogether;
 
       QList< FilterGroup * > * filterGroups;
-      QString filterType;
+      QString * filterType;
   };
 }
 

@@ -1,81 +1,137 @@
 #ifndef TreeModel_H
 #define TreeModel_H
 
-#include <QAbstractItemModel>
+#include <QObject>
 
 
+class QFont;
+template <typename A> class QFutureWatcher;
 class QModelIndex;
-class QTreeView;
+class QMutex;
+template< typename A, typename B > class QPair;
+class QSize;
+class QString;
+
 
 namespace Isis
 {
   class AbstractTreeItem;
+  class BusyLeafItem;
+  class CnetView;
   class ControlNet;
   class FilterWidget;
   class RootItem;
 
-  class TreeModel : public QAbstractItemModel
+  class TreeModel : public QObject
   {
       Q_OBJECT
 
     public:
-      TreeModel(ControlNet * controlNet, QString name, QTreeView * tv,
-          QObject * parent = 0);
+      TreeModel(ControlNet * controlNet, CnetView * v, QObject * parent = 0);
       virtual ~TreeModel();
 
-      QVariant data(const QModelIndex & index, int role) const;
-      QVariant headerData(int section, Qt::Orientation orientation,
-          int role = Qt::DisplayRole) const;
-
-      QModelIndex index(int row, int column,
-          const QModelIndex & parent = QModelIndex()) const;
-
-      QModelIndex parent(const QModelIndex & index) const;
-
-      int rowCount(const QModelIndex & parent) const;
-      int columnCount(const QModelIndex & parent) const;
-
-      Qt::ItemFlags flags(const QModelIndex & index) const;
-
+      QList< AbstractTreeItem * > getItems(int, int) const;
+      QList< AbstractTreeItem * > getItems(AbstractTreeItem *,
+          AbstractTreeItem *) const;
+      QMutex * getMutex() const;
+      QList< AbstractTreeItem * > getSelectedItems() const;
+      int getTopLevelItemCount() const;
+      int getVisibleTopLevelItemCount() const;
+      CnetView * getView() const;
       void setDrivable(bool drivableStatus);
-      bool isDrivable() { return drivable; }
-      
+      bool isDrivable() const;
+      bool isFiltering() const;
       void setFilter(FilterWidget * newFilter);
-
       void saveViewState();
+      void setGlobalSelection(bool selected);
       void loadViewState();
-      
-      
+      QSize getVisibleSize(int indentation) const;
+
+
+    signals:
+      void modelModified();
+      void filterProgressChanged(int);
+      void filterProgressRangeChanged(int, int);
+      void rebuildProgressChanged(int);
+      void rebuildProgressRangeChanged(int, int);
+
+      /**
+       * This signal is emitted after filtering to provide the number of
+       * visible top-level items remaining after the filter was applied,
+       * as well as the total number of items that were possible
+       */
+      void filterCountsChanged(int visibleTopLevelItemCount,
+          int topLevelItemCount);
+
+
     public:
       virtual void rebuildItems() = 0;
 
 
-      // disable copying of this class
     private:
       TreeModel(const TreeModel &);
       const TreeModel & operator=(const TreeModel &);
 
 
+    private:
+      AbstractTreeItem * nextItem(AbstractTreeItem *) const;
+      void selectItems(AbstractTreeItem * item, bool select);
+
+
+    private slots:
+      void applyFilter();
+      void applyFilterDone();
+      void rebuildItemsDone();
+
+
     protected:
       void clear();
+      ControlNet * getControlNetwork() const;
+      FilterWidget * getFilterWidget() const;
+      QFutureWatcher< QAtomicPointer< RootItem > > * getRebuildWatcher() const;
+      RootItem * getRootItem() const;
+
+
+    protected:
+      RootItem * rootItem;
+
+
+    private: // data
+      QFutureWatcher< QAtomicPointer< AbstractTreeItem > > * filterWatcher;
+      QFutureWatcher< QAtomicPointer< RootItem > > * rebuildWatcher;
+      QList< QPair< QString, QString > > * expandedState;
+      QList< QPair< QString, QString > > * selectedState;
+      QMutex * mutex;
+      BusyLeafItem * busyItem;
+      CnetView * view;
+      ControlNet * cNet;
+      FilterWidget * guisFilterWidget;
+      FilterWidget * localFilterWidgetCopy;
+      bool drivable;
+      bool filterAgain;
+      bool filterRunning;
 
 
     private:
-      AbstractTreeItem * indexToItem(const QModelIndex & index) const;
-      QModelIndex itemToIndex(AbstractTreeItem * item) const;
-//       int itemToRow(AbstractTreeItem * item) const;
+      class FilterFunctor
+        : public std::unary_function< AbstractTreeItem * const &, bool >
+      {
+        public:
+          FilterFunctor(FilterWidget * fw);
+          ~FilterFunctor();
+          bool operator()(AbstractTreeItem * const &) const;
+          void filterWorker(AbstractTreeItem *) const;
+
+          static void updateTopLevelLinks(
+            QAtomicPointer< AbstractTreeItem > & root,
+            AbstractTreeItem * const & item);
 
 
-    protected: // data
-      ControlNet * cNet;
-      QString * headerTitle;
-      RootItem * rootItem;
-      QList< QPair< QString, QString > > * expandedState;
-      QList< QPair< QString, QString > > * selectedState;
-      QTreeView * view;
-      bool drivable;
-      FilterWidget * filter;
+        private:
+          FilterWidget * filter;
+      };
   };
 }
 
 #endif
+

@@ -2,16 +2,25 @@
 
 #include "TreeModel.h"
 
+#include <algorithm>
 #include <iostream>
 
+#include <QFutureWatcher>
 #include <QList>
 #include <QModelIndex>
+#include <QMutex>
 #include <QPair>
 #include <QStack>
 #include <QString>
-#include <QTreeView>
+#include <QtConcurrentFilter>
+
+#include <QtConcurrentMap>
+
+#include <QtGlobal>
 #include <QVariant>
 
+#include "BusyLeafItem.h"
+#include "CnetView.h"
 #include "ControlMeasure.h"
 #include "ControlNet.h"
 #include "ControlPoint.h"
@@ -26,32 +35,66 @@ using std::cerr;
 
 namespace Isis
 {
-  TreeModel::TreeModel(ControlNet * controlNet, QString name, QTreeView * tv,
-      QObject * parent) : QAbstractItemModel(parent), cNet(controlNet), view(tv)
+  TreeModel::TreeModel(ControlNet * controlNet, CnetView * v, QObject * parent)
+    : QObject(parent), view(v), cNet(controlNet)
   {
     ASSERT(cNet);
 
-    headerTitle = NULL;
+    filterWatcher = NULL;
+    rebuildWatcher = NULL;
+    busyItem = NULL;
     rootItem = NULL;
     expandedState = NULL;
     selectedState = NULL;
-    filter = NULL;
+    guisFilterWidget = NULL;
+    localFilterWidgetCopy = NULL;
+    mutex = NULL;
 
-    headerTitle = new QString(name);
+    busyItem = new BusyLeafItem(NULL);
     rootItem = new RootItem;
     expandedState = new QList< QPair< QString, QString > >;
     selectedState = new QList< QPair< QString, QString > >;
+    mutex = new QMutex;
+
+    filterWatcher = new QFutureWatcher< QAtomicPointer< AbstractTreeItem > >;
+    rebuildWatcher = new QFutureWatcher< QAtomicPointer< RootItem > >;
+
+    connect(filterWatcher, SIGNAL(finished()), this, SLOT(applyFilterDone()));
+    connect(rebuildWatcher, SIGNAL(finished()), this, SLOT(rebuildItemsDone()));
+
+    connect(filterWatcher, SIGNAL(progressValueChanged(int)),
+        this, SIGNAL(filterProgressChanged(int)));
+    connect(filterWatcher, SIGNAL(progressRangeChanged(int, int)),
+        this, SIGNAL(filterProgressRangeChanged(int, int)));
+    connect(rebuildWatcher, SIGNAL(progressValueChanged(int)),
+        this, SIGNAL(rebuildProgressChanged(int)));
+    connect(rebuildWatcher, SIGNAL(progressRangeChanged(int, int)),
+        this, SIGNAL(rebuildProgressRangeChanged(int, int)));
 
     drivable = false;
+    filterAgain = false;
+    filterRunning = false;
   }
 
 
   TreeModel::~TreeModel()
   {
-    if (headerTitle)
+    if (filterWatcher)
     {
-      delete headerTitle;
-      headerTitle = NULL;
+      delete filterWatcher;
+      filterWatcher = NULL;
+    }
+
+    if (rebuildWatcher)
+    {
+      delete rebuildWatcher;
+      rebuildWatcher = NULL;
+    }
+
+    if (busyItem)
+    {
+      delete busyItem;
+      busyItem = NULL;
     }
 
     if (rootItem)
@@ -72,95 +115,177 @@ namespace Isis
       selectedState = NULL;
     }
 
+    if (mutex)
+    {
+      delete mutex;
+      mutex = NULL;
+    }
+
+    if (localFilterWidgetCopy)
+    {
+      delete localFilterWidgetCopy;
+      localFilterWidgetCopy = NULL;
+    }
+
+    guisFilterWidget = NULL;
     cNet = NULL;
     view = NULL;
-    filter = NULL;
   }
 
 
-  QVariant TreeModel::data(const QModelIndex & index, int role) const
+  QList< AbstractTreeItem * > TreeModel::getItems(int start, int end) const
   {
-    QVariant variant;
+    QList< AbstractTreeItem * > foundItems;
+    int rowCount = end - start;
+    const AbstractTreeItem * lastVisibleFilteredItem =
+      rootItem->getLastVisibleFilteredItem();
 
-    if (index.isValid() && role == Qt::DisplayRole)
+    if (lastVisibleFilteredItem && rowCount > 0 && rootItem->childCount())
     {
-      AbstractTreeItem * item = indexToItem(index);
-      variant = item->data();
+      int row = 0;
+      AbstractTreeItem * currentItem = rootItem->getFirstVisibleChild();
+
+      bool listStillValid = true;
+
+      while (row < start && listStillValid && currentItem)
+      {
+        row++;
+        listStillValid = (currentItem != lastVisibleFilteredItem ||
+            currentItem == currentItem->parent()->getLastVisibleChild());
+
+        if (listStillValid)
+          currentItem = nextItem(currentItem);
+      }
+
+      while (row < end && listStillValid && currentItem)
+      {
+        ASSERT(currentItem);
+        foundItems.append(currentItem);
+        listStillValid = (currentItem != lastVisibleFilteredItem ||
+            currentItem == currentItem->parent()->getLastVisibleChild());
+        row++;
+
+        if (listStillValid)
+          currentItem = nextItem(currentItem);
+      }
+
+      while (isFiltering() && foundItems.size() < rowCount)
+      {
+        foundItems.append(busyItem);
+      }
     }
 
-    return variant;
+    return foundItems;
   }
 
 
-  QVariant TreeModel::headerData(int section, Qt::Orientation orientation,
-      int role) const
+  QList< AbstractTreeItem * > TreeModel::getItems(
+    AbstractTreeItem * item1, AbstractTreeItem * item2) const
   {
-    QVariant header;
+    QList< AbstractTreeItem * > foundItems;
 
-    if (role == Qt::DisplayRole && orientation == Qt::Horizontal &&
-        section == 0)
+    if (rootItem->childCount() && item1 != item2)
     {
-      header = QVariant::fromValue(*headerTitle);
+      AbstractTreeItem * start = NULL;
+
+      AbstractTreeItem * curItem = rootItem->getFirstVisibleChild();
+
+      while (!start && curItem)
+      {
+        if (curItem == item1)
+          start = item1;
+        else
+          if (curItem == item2)
+            start = item2;
+
+        curItem = nextItem(curItem);
+      }
+
+      if (!start)
+      {
+        iString msg = "The first item passed to getItems(AbstractTreeItem*, "
+            "AbstractTreeItem*) does not exist in this model's tree";
+        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      }
+
+      foundItems.append(start);
+
+      AbstractTreeItem * end = item2;
+
+      if (start == item2)
+        end = item1;
+
+      while (curItem && curItem != end)
+      {
+        foundItems.append(curItem);
+        curItem = nextItem(curItem);
+      }
+
+      if (!curItem)
+      {
+        iString msg = "The second item passed to getItems(AbstractTreeItem*, "
+            "AbstractTreeItem*) does not exist in this model's tree";
+        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      }
+
+      foundItems.append(end);
     }
 
-    return header;
+    return foundItems;
   }
 
 
-  QModelIndex TreeModel::index(int row, int column,
-      const QModelIndex & parent) const
+  QMutex * TreeModel::getMutex() const
   {
-    QModelIndex modelIndex;
+    return mutex;
+  }
 
-    if (hasIndex(row, column, parent))
+
+  QList< AbstractTreeItem * > TreeModel::getSelectedItems() const
+  {
+    QList< AbstractTreeItem * > selectedItems;
+
+    if (rootItem)
     {
-      AbstractTreeItem * parentItem = indexToItem(parent);
-      AbstractTreeItem * childItem = parentItem->childAt(row);
+      AbstractTreeItem * currentItem = rootItem;
 
-      modelIndex = createIndex(row, column, childItem);
+      while (currentItem)
+      {
+        if (currentItem->isSelected())
+          selectedItems.append(currentItem);
+
+        currentItem = nextItem(currentItem);
+      }
     }
 
-    return modelIndex;
+    return selectedItems;
   }
 
 
-  QModelIndex TreeModel::parent(const QModelIndex & index) const
+  int TreeModel::getTopLevelItemCount() const
   {
-    AbstractTreeItem * childItem = indexToItem(index);
-    AbstractTreeItem * parentItem = childItem->parent();
-
-    QModelIndex parentIndex;
-
-    int row = parentItem->row();
-    if (row != -1)
-      parentIndex = createIndex(row, 0, parentItem);
-
-    return parentIndex;
+    return rootItem->childCount();
   }
 
 
-  int TreeModel::rowCount(const QModelIndex & parent) const
+  int TreeModel::getVisibleTopLevelItemCount() const
   {
-    AbstractTreeItem * parentItem = indexToItem(parent);
-    return parentItem->childCount();
-  }
+    int visiblePeerCount = -1;
 
+    if (!isFiltering())
+    {
+      AbstractTreeItem * current = rootItem->getFirstVisibleChild();
+      while (current)
+      {
+        current = current->getNextVisiblePeer();
+        visiblePeerCount++;
+      }
 
-  int TreeModel::columnCount(const QModelIndex & parent) const
-  {
-    Q_UNUSED(parent);
-    return 1;
-  }
+      // started at -1 so we were one off.
+      visiblePeerCount++;
+    }
 
-
-  Qt::ItemFlags TreeModel::flags(const QModelIndex & index) const
-  {
-    Qt::ItemFlags flags = Qt::ItemIsSelectable;
-
-    if (index.isValid() && drivable)
-      flags = flags | Qt::ItemIsEnabled;
-
-    return flags;
+    return visiblePeerCount;
   }
 
 
@@ -169,16 +294,35 @@ namespace Isis
     if (drivable != drivableStatus)
     {
       drivable = drivableStatus;
-      emit(dataChanged(QModelIndex(), QModelIndex()));
+      ASSERT(view);
+
+      if (view)
+        view->activate();
     }
   }
-  
-  
+
+
+  bool TreeModel::isDrivable() const
+  {
+    return drivable;
+  }
+
+
+  bool TreeModel::isFiltering() const
+  {
+    return filterRunning;
+  }
+
+
   void TreeModel::setFilter(FilterWidget * fw)
   {
-    ASSERT(fw);
-    filter = fw;
-//     connect(filter, SIGNAL(filterChanged()), this, SLOT(rebuildItems()));
+    guisFilterWidget = fw;
+    if (fw)
+    {
+      connect(guisFilterWidget, SIGNAL(filterChanged()),
+          this, SLOT(applyFilter()));
+      applyFilter();
+    }
   }
 
 
@@ -186,11 +330,40 @@ namespace Isis
   {
     ASSERT(rootItem);
 
-    beginRemoveRows(QModelIndex(), 0, rootItem->childCount() - 1);
     delete rootItem;
     rootItem = NULL;
     rootItem = new RootItem;
-    endRemoveRows();
+  }
+
+
+  ControlNet * TreeModel::getControlNetwork() const
+  {
+    return cNet;
+  }
+
+
+//   FilterWidget * TreeModel::getFilterWidget() const
+//   {
+//     return filter;
+//   }
+
+
+  QFutureWatcher< QAtomicPointer< RootItem > > *
+  TreeModel::getRebuildWatcher() const
+  {
+    return rebuildWatcher;
+  }
+
+
+  RootItem * TreeModel::getRootItem() const
+  {
+    return rootItem;
+  }
+
+
+  CnetView * TreeModel::getView() const
+  {
+    return view;
   }
 
 
@@ -209,8 +382,8 @@ namespace Isis
     {
       AbstractTreeItem * item = stack.pop();
 
-      QPair< QString, QString > newPair = qMakePair(item->data().toString(),
-          item->parent() ? item->parent()->data().toString() : QString());
+      QPair< QString, QString > newPair = qMakePair(item->getData(),
+          item->parent() ? item->parent()->getData() : QString());
 
       if (item->isExpanded())
       {
@@ -230,6 +403,7 @@ namespace Isis
       for (int i = item->childCount() - 1; i >= 0; i--)
         stack.push(item->childAt(i));
     }
+
 //     cerr << "    TreeModel::saveViewState done\n";
   }
 
@@ -254,13 +428,14 @@ namespace Isis
 
       if (item->parent())
       {
-        int row = item->row();
-        ASSERT(row != -1);
+//         int row = item->row();
+//         ASSERT(row != -1);
 
         QPair< QString, QString > occurrence = qMakePair(
-            item->data().toString(), item->parent()->data().toString());
+            item->getData(), item->parent()->getData());
 
-        QModelIndex index = createIndex(row, 0, item);
+//         QModelIndex index = createIndex(row, 0, item);
+
         if (expandedState->contains(occurrence))
         {
 
@@ -268,8 +443,8 @@ namespace Isis
 //               << qPrintable(occurrence.second) << "]\n";
 
           item->setExpanded(true);
-          ASSERT(index.isValid());
-          view->expand(index);
+//           ASSERT(index.isValid());
+//           view->expand(index);
 //           expandedState->removeOne(occurrence);
         }
 
@@ -277,7 +452,7 @@ namespace Isis
         if (selectedState->contains(occurrence))
         {
           item->setSelected(true);
-          view->selectionModel()->select(index, QItemSelectionModel::Select);
+//           view->selectionModel()->select(index, QItemSelectionModel::Select);
           //         selectedState->removeOne(occurrence);
         }
       }
@@ -292,24 +467,281 @@ namespace Isis
   }
 
 
-  AbstractTreeItem * TreeModel::indexToItem(const QModelIndex & index) const
+//! indentation is in pixels
+  QSize TreeModel::getVisibleSize(int indentation) const
   {
-    AbstractTreeItem * item = rootItem;
+    QSize size;
 
-    if (index.isValid())
-      return static_cast< AbstractTreeItem * >(index.internalPointer());
+    if (!isFiltering())
+    {
+      int visibleRowCount = 0;
+      int maxWidth = 0;
 
-    return item;
+      if (rootItem && rootItem->getFirstVisibleChild())
+      {
+        AbstractTreeItem * current = rootItem->getFirstVisibleChild();
+
+        while (current != NULL)
+        {
+          int depth = current->getDepth();
+
+          visibleRowCount++;
+          maxWidth = qMax(maxWidth, current->getDataWidth() + indentation * depth);
+          current = nextItem(current);
+        }
+      }
+
+      size = QSize(maxWidth, visibleRowCount);
+    }
+
+    return size;
   }
 
 
-  QModelIndex TreeModel::itemToIndex(AbstractTreeItem * item) const
+  void TreeModel::applyFilter()
   {
-    QModelIndex index;
-    int row = item->row();
-    if (row != -1)
-      index = createIndex(row, 0, item);
+    // If filterAgain is true, then this method will be recalled later
+    // with filterAgain = false.
+    if (!filterAgain && guisFilterWidget)
+    {
+      QFuture< QAtomicPointer< AbstractTreeItem> > futureRoot;
 
-    return index;
+      if (filterRunning)
+      {
+        filterAgain = true;
+        futureRoot = filterWatcher->future();
+        futureRoot.cancel();
+      }
+      else
+      {
+        // filterCounts are unknown and invalid and this fact is shared to
+        // users of this class by emitting invalid (negative) information.
+        emit filterCountsChanged(-1, getTopLevelItemCount());
+
+        // update our local copy of the gui widget
+        if (localFilterWidgetCopy)
+        {
+          delete localFilterWidgetCopy;
+          localFilterWidgetCopy = NULL;
+        }
+        localFilterWidgetCopy = new FilterWidget(*guisFilterWidget);
+
+        // using the local copy (NOT the GUI's FilterWidget!!!) apply then
+        // the filter using qtconcurrent's filteredReduced.  ApplyFilterDone()
+        // will get called when the filtering is finished.
+        filterRunning = true;
+        rootItem->setLastVisibleFilteredItem(NULL);
+        futureRoot = QtConcurrent::filteredReduced(rootItem->getChildren(),
+            FilterFunctor(localFilterWidgetCopy),
+            &FilterFunctor::updateTopLevelLinks,
+            QtConcurrent::OrderedReduce | QtConcurrent::SequentialReduce);
+
+        filterWatcher->setFuture(futureRoot);
+      }
+    }
+  }
+
+
+  void TreeModel::setGlobalSelection(bool selected)
+  {
+    selectItems(rootItem, selected);
+  }
+
+
+  void TreeModel::selectItems(AbstractTreeItem * item, bool selected)
+  {
+    if (item)
+    {
+      item->setSelected(selected);
+
+      if (item->childCount())
+      {
+        foreach(AbstractTreeItem * childItem, item->getChildren())
+        {
+          selectItems(childItem, selected);
+        }
+      }
+    }
+  }
+
+
+  AbstractTreeItem * TreeModel::nextItem(AbstractTreeItem * current) const
+  {
+    AbstractTreeItem * result = NULL;
+
+    if (current)
+    {
+      if (current->isExpanded() && current->getFirstVisibleChild())
+      {
+        result = current->getFirstVisibleChild();
+      }
+      else
+      {
+        result = current->getNextVisiblePeer();
+
+        if (!result)
+          result = current->parent()->getNextVisiblePeer();
+      }
+    }
+
+    return result;
+  }
+
+
+  void TreeModel::applyFilterDone()
+  {
+//     getMutex()->unlock();
+    filterRunning = false;
+
+    //dudeWheresMyCar(rootItem, 0);
+
+    if (filterAgain)
+    {
+      filterAgain = false;
+      applyFilter();
+    }
+    else
+    {
+      emit modelModified();
+      emit filterCountsChanged(getVisibleTopLevelItemCount(),
+          getTopLevelItemCount());
+    }
+  }
+
+
+  void TreeModel::rebuildItemsDone()
+  {
+    saveViewState();
+    clear();
+    QAtomicPointer< RootItem > newRoot = rebuildWatcher->future();
+
+    if (newRoot->childCount())
+    {
+      ASSERT(rootItem);
+      delete rootItem;
+      rootItem = NULL;
+      rootItem = newRoot;
+    }
+    else
+    {
+      ASSERT(newRoot);
+      delete newRoot;
+      newRoot = NULL;
+    }
+
+//     loadViewState();
+
+    applyFilter();
+  }
+
+
+  TreeModel::FilterFunctor::FilterFunctor(FilterWidget * fw) : filter(fw)
+  {
+  }
+
+
+  TreeModel::FilterFunctor::~FilterFunctor()
+  {
+  }
+
+
+  bool TreeModel::FilterFunctor::operator()(
+    AbstractTreeItem * const & item) const
+  {
+    filterWorker(item);
+    return true;
+  }
+
+
+  void TreeModel::FilterFunctor::filterWorker(
+    AbstractTreeItem * item) const
+  {
+    switch (item->getPointerType())
+    {
+
+      case AbstractTreeItem::Point:
+        item->setVisible((!filter || filter->evaluate(
+            (ControlPoint *) item->getPointer())) ? true : false);
+        break;
+
+      case AbstractTreeItem::Measure:
+        item->setVisible((!filter || filter->evaluate(
+            (ControlMeasure *) item->getPointer())) ? true : false);
+        break;
+
+      case AbstractTreeItem::CubeGraphNode:
+        item->setVisible((!filter || filter->evaluate(
+            (ControlCubeGraphNode *) item->getPointer())) ? true : false);
+        break;
+
+      case AbstractTreeItem::None:
+        item->setVisible(true);
+        break;
+    }
+
+    // Destroy peer link because it will need to be recreated later.
+    if (item->getFirstVisibleChild())
+      item->setFirstVisibleChild(NULL);
+
+    if (item->getLastVisibleChild())
+      item->setLastVisibleChild(NULL);
+
+    item->setNextVisiblePeer(NULL);
+
+    // Update each tree item's visible flag based on whether or not it is
+    // accepted by the filter.
+    if (item->childCount())
+    {
+      for (int i = 0; i < item->childCount(); i++)
+      {
+        AbstractTreeItem * child = item->childAt(i);
+        filterWorker(child);
+
+        if (child->isVisible())
+        {
+          if (!item->getFirstVisibleChild())
+          {
+            item->setFirstVisibleChild(child);
+            item->setLastVisibleChild(child);
+          }
+          else
+          {
+            item->getLastVisibleChild()->setNextVisiblePeer(child);
+            item->setLastVisibleChild(child);
+          }
+        }
+      }
+    }
+  }
+
+
+  void TreeModel::FilterFunctor::updateTopLevelLinks(
+    QAtomicPointer< AbstractTreeItem > & root,
+    AbstractTreeItem * const & item)
+  {
+    if (!root)
+    {
+      root = item->parent();
+      root->setFirstVisibleChild(NULL);
+      root->setLastVisibleChild(NULL);
+      root->setLastVisibleFilteredItem(NULL);
+    }
+
+    if (item->isVisible())
+    {
+      if (!root->getFirstVisibleChild())
+      {
+        root->setFirstVisibleChild(item);
+        root->setLastVisibleChild(item);
+      }
+      else
+      {
+        root->getLastVisibleChild()->setNextVisiblePeer(item);
+        root->setLastVisibleChild(item);
+      }
+
+      root->setLastVisibleFilteredItem(item);
+    }
   }
 }
+

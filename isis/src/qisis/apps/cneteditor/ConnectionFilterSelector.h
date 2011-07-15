@@ -15,7 +15,10 @@ namespace Isis
 
     public:
       ConnectionFilterSelector();
+      ConnectionFilterSelector(const ConnectionFilterSelector & other);
       virtual ~ConnectionFilterSelector();
+      ConnectionFilterSelector & operator=(
+        const ConnectionFilterSelector & other);
 
 
     protected:

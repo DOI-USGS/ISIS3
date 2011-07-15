@@ -15,7 +15,10 @@ namespace Isis
 
     public:
       PointMeasureFilterSelector();
+      PointMeasureFilterSelector(const PointMeasureFilterSelector & other);
       virtual ~PointMeasureFilterSelector();
+      PointMeasureFilterSelector & operator=(
+        const PointMeasureFilterSelector & other);
 
 
     protected:

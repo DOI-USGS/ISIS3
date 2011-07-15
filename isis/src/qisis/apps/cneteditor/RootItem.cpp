@@ -2,7 +2,7 @@
 
 #include "RootItem.h"
 
-#include <QVariant>
+#include <QString>
 
 #include "iException.h"
 #include "iString.h"
@@ -12,19 +12,22 @@ namespace Isis
 {
   RootItem::RootItem() : AbstractParentItem(NULL)
   {
+    lastVisibleFilteredItem = NULL;
+    setExpanded(true);
   }
 
 
   RootItem::~RootItem()
   {
+    lastVisibleFilteredItem = NULL;
   }
 
 
-  QVariant RootItem::data() const
+  QString RootItem::getData() const
   {
 //     iString msg = "data called on a RootItem!";
 //     throw iException::Message(iException::Programmer, msg, _FILEINFO_);
-    return QVariant();
+    return QString();
   }
 
 
@@ -35,8 +38,26 @@ namespace Isis
   }
 
 
-  AbstractTreeItem::InternalPointerType RootItem::pointerType() const
+  AbstractTreeItem::InternalPointerType RootItem::getPointerType() const
   {
     return AbstractTreeItem::None;
+  }
+
+
+  void * RootItem::getPointer() const
+  {
+    return NULL;
+  }
+
+
+  void RootItem::setLastVisibleFilteredItem(AbstractTreeItem * item)
+  {
+    lastVisibleFilteredItem = item;
+  }
+
+
+  const AbstractTreeItem * RootItem::getLastVisibleFilteredItem() const
+  {
+    return lastVisibleFilteredItem;
   }
 }

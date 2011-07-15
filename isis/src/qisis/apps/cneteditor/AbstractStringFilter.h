@@ -22,19 +22,23 @@ namespace Isis
 
     public:
       AbstractStringFilter(AbstractFilter::FilterEffectivenessFlag,
-          AbstractFilterSelector *, int minimumForSuccess = -1);
+          int minimumForSuccess = -1);
+      AbstractStringFilter(const AbstractStringFilter & other);
       virtual ~AbstractStringFilter();
-      
+
 
     protected:
-      virtual void nullify();
-      virtual void createWidget();
       bool evaluate(QString) const;
       QString descriptionSuffix() const;
-      
-      
+
+
     private slots:
       void updateLineEditText(QString);
+
+
+    private:
+      void createWidget();
+      void nullify();
 
 
     private:

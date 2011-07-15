@@ -36,22 +36,18 @@ namespace Isis
         APrioriSample = 12,
         APrioriLine = 13,
         Diameter = 14,
-        FocalPlaneMeasuredX = 15,
-        FocalPlaneMeasuredY = 16,
-        FocalPlaneComputedX = 17,
-        FocalPlaneComputedY = 18,
-        JigsawRejected = 19,
-        ResidualSample = 20,
-        ResidualLine = 21,
-        ResidualMagnitude = 22
+        JigsawRejected = 15,
+        ResidualSample = 16,
+        ResidualLine = 17,
+        ResidualMagnitude = 18
       };
-      static const int COLS = 23;
+      static const int COLS = 19;
 
 
     public:
       explicit MeasureTableModel(QObject * parent = 0);
       virtual ~MeasureTableModel();
-      
+
       static QString getColName(Column);
 
       void setMeasures(QList< ControlMeasure * > newMeasures);

@@ -14,7 +14,6 @@
 #include <QMenu>
 #include <QMenuBar>
 #include <QRadioButton>
-#include <QReadWriteLock>
 #include <QSpinBox>
 #include <QString>
 #include <QVBoxLayout>
@@ -22,25 +21,42 @@
 
 #include "ControlCubeGraphNode.h"
 #include "ControlMeasure.h"
+#include "ControlPoint.h"
 
 #include "AbstractFilterSelector.h"
-#include <ControlPoint.h>
+
 
 using std::cerr;
+
 
 
 namespace Isis
 {
   AbstractFilter::AbstractFilter(FilterEffectivenessFlag effectiveness,
-      AbstractFilterSelector * parent, int minimumForSuccess) :
-      minForSuccess(minimumForSuccess)
+      int minimumForSuccess)
   {
-    parentSelector = parent;
-    lock = NULL;
-    effectivenessFlags = NULL;
-    
-    lock = new QReadWriteLock;
+    nullify();
+
+    minForSuccess = minimumForSuccess;
+
     effectivenessFlags = new FilterEffectivenessFlag(effectiveness);
+
+    createWidget();
+  }
+
+
+  AbstractFilter::AbstractFilter(const AbstractFilter & other)
+  {
+    nullify();
+
+    minForSuccess = other.minForSuccess;
+
+    effectivenessFlags = new FilterEffectivenessFlag(*other.effectivenessFlags);
+
+    createWidget();
+
+    inclusiveExclusiveGroup->button(
+      other.inclusiveExclusiveGroup->checkedId())->click();
   }
 
 
@@ -51,39 +67,51 @@ namespace Isis
       delete effectivenessFlags;
       effectivenessFlags = NULL;
     }
+
+    if (inclusiveExclusiveGroup)
+    {
+      delete inclusiveExclusiveGroup;
+      inclusiveExclusiveGroup = NULL;
+    }
   }
-  
-  
+
+
   bool AbstractFilter::canFilterImages() const
   {
     return effectivenessFlags->testFlag(Images);
   }
-  
-  
+
+
   bool AbstractFilter::canFilterPoints() const
   {
     return effectivenessFlags->testFlag(Points);
   }
-  
-  
+
+
   bool AbstractFilter::canFilterMeasures() const
   {
     return effectivenessFlags->testFlag(Measures);
   }
 
-  
+
   QString AbstractFilter::getImageDescription() const
   {
     return "have at least " + QString::number(getMinForSuccess()) + " ";
   }
-  
-  
-  QString AbstractFilter::getPointDescription() const { return QString(); }
-  
-  
-  QString AbstractFilter::getMeasureDescription() const { return QString(); }
-  
-  
+
+
+  QString AbstractFilter::getPointDescription() const
+  {
+    return QString();
+  }
+
+
+  QString AbstractFilter::getMeasureDescription() const
+  {
+    return QString();
+  }
+
+
   void AbstractFilter::nullify()
   {
     effectivenessMenu = NULL;
@@ -91,9 +119,10 @@ namespace Isis
     inclusiveExclusiveLayout = NULL;
     mainLayout = NULL;
     minWidget = NULL;
+    effectivenessFlags = NULL;
   }
-  
-  
+
+
   void AbstractFilter::createWidget()
   {
     QFont inclusiveExclusiveFont("SansSerif", 9);
@@ -107,7 +136,7 @@ namespace Isis
         this, SIGNAL(filterChanged()));
     inclusiveExclusiveGroup->addButton(inclusiveButton, 0);
     inclusiveExclusiveGroup->addButton(exclusiveButton, 1);
-    
+
     inclusiveExclusiveLayout = new QHBoxLayout;
     QMargins margins = inclusiveExclusiveLayout->contentsMargins();
     margins.setTop(0);
@@ -115,7 +144,7 @@ namespace Isis
     inclusiveExclusiveLayout->setContentsMargins(margins);
     inclusiveExclusiveLayout->addWidget(inclusiveButton);
     inclusiveExclusiveLayout->addWidget(exclusiveButton);
-    
+
     QHBoxLayout * controlsLayout = new QHBoxLayout;
     margins = controlsLayout->contentsMargins();
     margins.setTop(0);
@@ -124,17 +153,17 @@ namespace Isis
 
     controlsLayout->addLayout(inclusiveExclusiveLayout);
 
-    
+
     effectivenessMenu = new QMenu("Effect");
     connect(effectivenessMenu, SIGNAL(aboutToHide()),
-            this, SLOT(showHideEffectivenessMenu()));
-    
+        this, SLOT(showHideEffectivenessMenu()));
+
     if (effectivenessFlags->testFlag(Images))
       effectivenessMenu->addAction(createEffectivenessAction("&Images"));
-    
+
     if (effectivenessFlags->testFlag(Points))
       effectivenessMenu->addAction(createEffectivenessAction("&Points"));
-    
+
     if (effectivenessFlags->testFlag(Measures))
       effectivenessMenu->addAction(createEffectivenessAction("&Measures"));
 
@@ -145,7 +174,7 @@ namespace Isis
       firstMenuEntry = effectivenessMenu->actions()[0]->text();
       firstMenuEntry.remove(0, 1);
     }
-    
+
     if (effectivenessMenu->actions().size() >= 2)
     {
       QMenuBar * bar = new QMenuBar;
@@ -168,7 +197,7 @@ namespace Isis
       spinBox->setRange(1, std::numeric_limits< int >::max());
       spinBox->setValue(1);  // FIXME: QSettings should handle this
       connect(spinBox, SIGNAL(valueChanged(int)),
-              this, SLOT(updateMinForSuccess(int)));
+          this, SLOT(updateMinForSuccess(int)));
       QHBoxLayout * minLayout = new QHBoxLayout;
       margins = minLayout->contentsMargins();
       margins.setTop(0);
@@ -178,29 +207,29 @@ namespace Isis
       minLayout->addWidget(spinBox);
       minWidget = new QWidget;
       minWidget->setLayout(minLayout);
-      
+
       controlsLayout->addWidget(minWidget);
       controlsLayout->setAlignment(minWidget, Qt::AlignTop);
       minWidget->setVisible(true); // FIXME: QSettings should handle this
     }
-    
+
     controlsLayout->addStretch();
-    
+
     mainLayout = new QVBoxLayout;
     margins = mainLayout->contentsMargins();
     margins.setTop(0);
     margins.setBottom(0);
     mainLayout->setContentsMargins(margins);
     mainLayout->addLayout(controlsLayout);
-    
+
 
     setLayout(mainLayout);
 
     // FIXME: QSettings should handle this
     inclusiveButton->click();
   }
-  
-  
+
+
   QAction * AbstractFilter::createEffectivenessAction(QString text)
   {
     QAction * act = new QAction(text, this);
@@ -215,40 +244,40 @@ namespace Isis
   {
     return inclusiveExclusiveGroup->checkedId() == 0;
   }
-  
-  
+
+
   AbstractFilter::FilterEffectivenessFlag *
-      AbstractFilter::getEffectivenessFlags() const
+  AbstractFilter::getEffectivenessFlags() const
   {
     return effectivenessFlags;
   }
-  
-  
+
+
   QBoxLayout * AbstractFilter::getMainLayout() const
   {
     ASSERT(mainLayout);
-    
+
     return mainLayout;
   }
-  
-  
+
+
   QBoxLayout * AbstractFilter::getInclusiveExclusiveLayout() const
   {
     ASSERT(inclusiveExclusiveLayout);
-    
+
     return inclusiveExclusiveLayout;
   }
-  
-  
+
+
   bool AbstractFilter::evaluateFromCount(QList< ControlMeasure * > measures,
       bool usePoints) const
   {
     int passedCount = 0;
-      
-    foreach (ControlMeasure * measure, measures)
+
+    foreach(ControlMeasure * measure, measures)
     {
       ASSERT(measure);
-      
+
       if (usePoints)
       {
         ControlPoint * point = measure->Parent();
@@ -262,62 +291,62 @@ namespace Isis
           passedCount++;
       }
     }
-    
+
     return passedCount >= getMinForSuccess();
   }
 
-  
+
   bool AbstractFilter::evaluateImageFromPointFilter(
-      const ControlCubeGraphNode * node) const
+    const ControlCubeGraphNode * node) const
   {
     ASSERT(node);
-    
+
     bool evaluation = true;
-    
+
     if (canFilterImages())
       evaluation = evaluateFromCount(node->getMeasures(), true);
-      
+
     return evaluation;
   }
-  
-  
+
+
   bool AbstractFilter::evaluateImageFromMeasureFilter(
-      const ControlCubeGraphNode * node) const
+    const ControlCubeGraphNode * node) const
   {
     ASSERT(node);
-    
+
     bool evaluation = true;
-    
+
     if (canFilterImages())
       evaluation = evaluateFromCount(node->getMeasures(), false);
-    
+
     return evaluation;
   }
-  
-  
+
+
   bool AbstractFilter::evaluatePointFromMeasureFilter(
-      const ControlPoint * point) const
+    const ControlPoint * point) const
   {
     ASSERT(point);
-    
+
     bool evaluation = true;
-    
+
     if (canFilterPoints())
       evaluation = evaluateFromCount(point->getMeasures(), false);
-    
+
     return evaluation;
   }
-  
-  
+
+
   bool AbstractFilter::evaluate(const ControlPoint * point,
       bool (ControlPoint::*meth)() const) const
   {
     ASSERT(point);
-    
+
     return !((point->*meth)() ^ inclusive());
   }
-  
-  
+
+
   bool AbstractFilter::evaluate(const ControlMeasure * measure,
       bool (ControlMeasure::*meth)() const) const
   {
@@ -325,17 +354,17 @@ namespace Isis
 
     return !((measure->*meth)() ^ inclusive());
   }
-  
-  
+
+
   void AbstractFilter::showHideEffectivenessMenu()
   {
     ASSERT(effectivenessMenu);
-    
+
     if (effectivenessMenu)
     {
       QRect menuRect(effectivenessMenu->pos(), effectivenessMenu->size());
       QPoint cursorPos = effectivenessMenu->cursor().pos();
-      
+
       if (menuRect.contains(cursorPos))
       {
         effectivenessMenu->show();
@@ -343,40 +372,25 @@ namespace Isis
       else
       {
         effectivenessMenu->hide();
-        
-        // if there are no checked actions when the menu closes then close
-        // this filter
-        bool noCheckedActions = true;
-        QList< QAction * > actions = effectivenessMenu->actions();
-        for (int i = 0; noCheckedActions && i < actions.size(); i++)
-        {
-          if (actions[i]->isChecked())
-            noCheckedActions = false;
-        }
-        
-        if (noCheckedActions)
-          parentSelector->sendClose();
-        else
-          emit filterChanged();
+        emit filterChanged();
       }
     }
   }
 
-  
+
   void AbstractFilter::updateEffectiveness()
   {
     ASSERT(effectivenessMenu);
-    
+
     if (effectivenessMenu)
     {
       FilterEffectivenessFlag newFlags;
-      
-      QWriteLocker locker(lock);
+
       QList< QAction * > actions = effectivenessMenu->actions();
-      
+
       if (minWidget)
         minWidget->setVisible(false);
-      
+
       for (int i = 0; i < actions.size(); i++)
       {
         if (actions[i]->isChecked())
@@ -389,12 +403,12 @@ namespace Isis
             else
               if (actions[i]->text() == "&Measures")
                 newFlags |= Measures;
-              
+
           if (i == 0 && minWidget)
             minWidget->setVisible(true);
         }
       }
-      
+
       *effectivenessFlags = newFlags;
     }
   }
@@ -402,9 +416,7 @@ namespace Isis
 
   void AbstractFilter::updateMinForSuccess(int newMin)
   {
-    QWriteLocker locker(lock);
     minForSuccess = newMin;
-    locker.unlock();
     emit filterChanged();
   }
 }

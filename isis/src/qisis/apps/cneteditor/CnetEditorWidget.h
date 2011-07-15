@@ -12,11 +12,10 @@ class QScrollArea;
 class QSplitter;
 class QString;
 class QTableView;
-class QTreeView;
-
 
 namespace Isis
 {
+  class CnetView;
   class ConnectionModel;
   class ControlNet;
   class FilterWidget;
@@ -29,7 +28,7 @@ namespace Isis
 
   class CnetEditorWidget : public QWidget
   {
-    Q_OBJECT
+      Q_OBJECT
 
     public:
       enum View
@@ -50,6 +49,9 @@ namespace Isis
 
     public slots:
       void setDriverView(int);
+      void activatePointView();
+      void activateSerialView();
+      void activateConnectionView();
 
 
     signals:
@@ -65,20 +67,15 @@ namespace Isis
       void createFilterArea();
       void createEditPointView();
       void createEditMeasureView();
-      void focusView(QTreeView * view, QStringList label);
+      void focusView(CnetView * view, QStringList label);
       void syncFilterWidgets();
-      void updateTreeItemsWithNewSelection(const QItemSelection & newSelected,
-          const QItemSelection & newDeselected);
       void upgradeVersion();
 
 
     private slots:
-      void pointViewSelectionChanged(const QItemSelection &,
-          const QItemSelection &);
-      void serialViewSelectionChanged(const QItemSelection &,
-          const QItemSelection &);
-      void connectionViewSelectionChanged(const QItemSelection &,
-          const QItemSelection &);
+      void pointViewSelectionChanged();
+      void serialViewSelectionChanged();
+      void connectionViewSelectionChanged();
 
       void itemExpanded(const QModelIndex & index);
       void itemCollapsed(const QModelIndex & index);
@@ -91,16 +88,16 @@ namespace Isis
 
     private: // data
       bool updatingSelection;
-      Isis::ControlNet * controlNet;
+      ControlNet * controlNet;
       QByteArray * topSplitterDefault;
       QString * workingVersion;
-      QString * VERSION;
+      static const QString VERSION;
 
 
     private: // widgets
-      QTreeView * pointView;
-      QTreeView * serialView;
-      QTreeView * connectionView;
+      CnetView * pointView;
+      CnetView * serialView;
+      CnetView * connectionView;
 
       QScrollArea * filterArea;
 
@@ -123,7 +120,7 @@ namespace Isis
 
       QSplitter * topSplitter;
       QSplitter * mainSplitter;
-      
+
       QString * settingsPath;
   };
 }

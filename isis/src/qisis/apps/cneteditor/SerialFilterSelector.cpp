@@ -1,5 +1,7 @@
 #include "IsisDebug.h"
 
+#include <algorithm>
+
 #include "SerialFilterSelector.h"
 
 #include <QComboBox>
@@ -17,6 +19,8 @@
 #include "SampleResidualFilter.h"
 
 
+using std::swap;
+
 
 namespace Isis
 {
@@ -27,74 +31,88 @@ namespace Isis
   }
 
 
+  SerialFilterSelector::SerialFilterSelector(const SerialFilterSelector & other)
+  {
+    createSelector();
+    getSelector()->setCurrentIndex(other.getSelector()->currentIndex());
+    if (other.getFilter())
+      setFilter(other.getFilter()->clone());
+  }
+
+
   SerialFilterSelector::~SerialFilterSelector()
   {
   }
- 
- 
+
+
+  SerialFilterSelector & SerialFilterSelector::operator=(
+    const SerialFilterSelector & other)
+  {
+    *((AbstractFilterSelector *) this) = other;
+    return *this;
+  }
+
+
   void SerialFilterSelector::createSelector()
   {
     AbstractFilterSelector::createSelector();
-  
-    selector->addItem("Cube Serial Number");
-    selector->insertSeparator(selector->count());
-    selector->addItem("Chooser Name");
-    selector->addItem("Edit Locked Points");
-    selector->addItem("Ignored Points");
-    selector->addItem("Point Id");
-    selector->insertSeparator(selector->count());
-    selector->addItem("Ignored Measures");
-    selector->addItem("Line Residual");
-    selector->addItem("Residual Magnitude");
-    selector->addItem("Sample Residual");
+
+    getSelector()->addItem("Cube Serial Number");
+    getSelector()->insertSeparator(getSelector()->count());
+    getSelector()->addItem("Chooser Name");
+    getSelector()->addItem("Edit Locked Points");
+    getSelector()->addItem("Ignored Points");
+    getSelector()->addItem("Point Id");
+    getSelector()->insertSeparator(getSelector()->count());
+    getSelector()->addItem("Ignored Measures");
+    getSelector()->addItem("Line Residual");
+    getSelector()->addItem("Residual Magnitude");
+    getSelector()->addItem("Sample Residual");
   }
 
 
   void SerialFilterSelector::changeFilter(int index)
   {
-    AbstractFilterSelector::changeFilter(index);
-    
+    deleteFilter();
+
     if (index != 0)
     {
       switch (index)
       {
         case 2:
-          filter = new CubeSerialNumberFilter(AbstractFilter::Images, this);
+          setFilter(new CubeSerialNumberFilter(AbstractFilter::Images));
           break;
         case 4:
-          filter = new ChooserNameFilter(AbstractFilter::Images |
-              AbstractFilter::Points, this, 1);
+          setFilter(new ChooserNameFilter(AbstractFilter::Images |
+              AbstractFilter::Points, 1));
           break;
         case 5:
-          filter = new PointEditLockedFilter(AbstractFilter::Images |
-              AbstractFilter::Points, this, 1);
+          setFilter(new PointEditLockedFilter(AbstractFilter::Images |
+              AbstractFilter::Points, 1));
           break;
         case 6:
-          filter = new PointIgnoredFilter(AbstractFilter::Images |
-              AbstractFilter::Points, this, 1);
+          setFilter(new PointIgnoredFilter(AbstractFilter::Images |
+              AbstractFilter::Points, 1));
           break;
         case 7:
-          filter = new PointIdFilter(AbstractFilter::Images |
-              AbstractFilter::Points, this, 1);
+          setFilter(new PointIdFilter(AbstractFilter::Images |
+              AbstractFilter::Points, 1));
           break;
         case 9:
-          filter = new MeasureIgnoredFilter(AbstractFilter::Images, this, 1);
+          setFilter(new MeasureIgnoredFilter(AbstractFilter::Images, 1));
           break;
         case 10:
-          filter = new LineResidualFilter(AbstractFilter::Images, this, 1);
+          setFilter(new LineResidualFilter(AbstractFilter::Images, 1));
           break;
         case 11:
-          filter = new ResidualMagnitudeFilter(AbstractFilter::Images, this, 1);
+          setFilter(new ResidualMagnitudeFilter(AbstractFilter::Images, 1));
           break;
         case 12:
-          filter = new SampleResidualFilter(AbstractFilter::Images, this, 1);
+          setFilter(new SampleResidualFilter(AbstractFilter::Images, 1));
           break;
       }
-      
-      connect(filter, SIGNAL(filterChanged()), this, SIGNAL(filterChanged()));
-      mainLayout->insertWidget(2, filter);
     }
-    
+
     emit sizeChanged();
     emit filterChanged();
   }

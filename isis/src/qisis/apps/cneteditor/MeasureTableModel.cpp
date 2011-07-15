@@ -17,8 +17,6 @@
 #include "SpecialPixel.h"
 
 
-const int COLS = 22;
-
 using std::cerr;
 
 namespace Isis
@@ -40,37 +38,52 @@ namespace Isis
       measures = NULL;
     }
   }
-  
-  
+
+
   QString MeasureTableModel::getColName(MeasureTableModel::Column col)
   {
     switch (col)
     {
-      case PointId: return "Point ID";
-      case CubeSerialNumber: return "Cube Serial Number";
-      case Sample: return "Sample";
-      case Line: return "Line";
-      case EditLock: return "Edit Locked";
-      case Ignored: return "Ignored";
-      case Type: return "Measure Type";
-      case Eccentricity: return "Eccentricity";
-      case GoodnessOfFit: return "Goodness of Fit";
-      case MinPixelZScore: return "Minimum Pixel Z-Score";
-      case MaxPixelZScore: return "Maximum Pixel Z-Score";
-      case PixelShift: return "Pixel Shift";
-      case APrioriSample: return "A Priori Sample";
-      case APrioriLine: return "A Priori Line";
-      case Diameter: return "Diameter";
-      case FocalPlaneMeasuredX: return "Focal Plane Measured X";
-      case FocalPlaneMeasuredY: return "Focal Plane Measured Y";
-      case FocalPlaneComputedX: return "Focal Plane Computed X";
-      case FocalPlaneComputedY: return "Focal Plane Computed Y";
-      case JigsawRejected: return "Jigsaw Rejected";
-      case ResidualSample: return "Residual Sample";
-      case ResidualLine: return "Residual Line";
-      case ResidualMagnitude: return "Residual Magnitude";
+      case PointId:
+        return "Point ID";
+      case CubeSerialNumber:
+        return "Cube Serial Number";
+      case Sample:
+        return "Sample";
+      case Line:
+        return "Line";
+      case EditLock:
+        return "Edit Locked";
+      case Ignored:
+        return "Ignored";
+      case Type:
+        return "Measure Type";
+      case Eccentricity:
+        return "Eccentricity";
+      case GoodnessOfFit:
+        return "Goodness of Fit";
+      case MinPixelZScore:
+        return "Minimum Pixel Z-Score";
+      case MaxPixelZScore:
+        return "Maximum Pixel Z-Score";
+      case PixelShift:
+        return "Pixel Shift";
+      case APrioriSample:
+        return "A Priori Sample";
+      case APrioriLine:
+        return "A Priori Line";
+      case Diameter:
+        return "Diameter";
+      case JigsawRejected:
+        return "Jigsaw Rejected";
+      case ResidualSample:
+        return "Residual Sample";
+      case ResidualLine:
+        return "Residual Line";
+      case ResidualMagnitude:
+        return "Residual Magnitude";
     }
-    
+
     ASSERT(0);
     return QString();
   }
@@ -156,18 +169,6 @@ namespace Isis
             return QVariant::fromValue(catchNULL(measure->GetAprioriLine()));
           case Diameter:
             return QVariant::fromValue(catchNULL(measure->GetDiameter()));
-          case FocalPlaneMeasuredX:
-            return QVariant::fromValue(catchNULL(
-                measure->GetFocalPlaneMeasuredX()));
-          case FocalPlaneMeasuredY:
-            return QVariant::fromValue(catchNULL(
-                measure->GetFocalPlaneMeasuredY()));
-          case FocalPlaneComputedX:
-            return QVariant::fromValue(catchNULL(
-                measure->GetFocalPlaneComputedX()));
-          case FocalPlaneComputedY:
-            return QVariant::fromValue(catchNULL(
-                measure->GetFocalPlaneComputedY()));
           case JigsawRejected:
             if (measure->IsRejected())
               return QVariant::fromValue(QString("Yes"));
@@ -248,10 +249,6 @@ namespace Isis
             case APrioriSample:
             case APrioriLine:
             case Diameter:
-            case FocalPlaneMeasuredX:
-            case FocalPlaneMeasuredY:
-            case FocalPlaneComputedX:
-            case FocalPlaneComputedY:
             case ResidualSample:
             case ResidualLine:
               flags = flags | Qt::ItemIsEditable | Qt::ItemIsEnabled |
@@ -325,7 +322,7 @@ namespace Isis
             {
               QString newDataStr = value.toString().toLower();
               ControlMeasureLogData::NumericLogDataType type =
-                  (ControlMeasureLogData::NumericLogDataType)(col - 4);
+                (ControlMeasureLogData::NumericLogDataType)(col - 4);
               if (newDataStr == "null")
               {
                 measure->DeleteLogData(type);
@@ -350,22 +347,6 @@ namespace Isis
             break;
           case Diameter:
             measure->SetDiameter(catchNULL(value.toString()));
-            break;
-          case FocalPlaneMeasuredX:
-            measure->SetFocalPlaneMeasured(
-              catchNULL(value.toString()), measure->GetFocalPlaneMeasuredY());
-            break;
-          case FocalPlaneMeasuredY:
-            measure->SetFocalPlaneMeasured(
-              measure->GetFocalPlaneMeasuredX(), catchNULL(value.toString()));
-            break;
-          case FocalPlaneComputedX:
-            measure->SetFocalPlaneComputed(
-              catchNULL(value.toString()), measure->GetFocalPlaneComputedY());
-            break;
-          case FocalPlaneComputedY:
-            measure->SetFocalPlaneComputed(
-              measure->GetFocalPlaneComputedX(), catchNULL(value.toString()));
             break;
           case JigsawRejected:
             // jigsaw rejected is not editable!

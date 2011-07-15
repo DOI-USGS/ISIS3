@@ -1,11 +1,10 @@
 #ifndef AbstractPointItem_H
 #define AbstractPointItem_H
 
-
 #include "AbstractTreeItem.h"
 
 
-class QVariant;
+class QString;
 
 
 namespace Isis
@@ -15,13 +14,14 @@ namespace Isis
   class AbstractPointItem : public virtual AbstractTreeItem
   {
     public:
-      AbstractPointItem(Isis::ControlPoint * cp,
+      AbstractPointItem(Isis::ControlPoint * cp, int avgCharWidth,
           AbstractTreeItem * parent = 0);
       virtual ~AbstractPointItem();
 
-      QVariant data() const;
+      QString getData() const;
       void deleteSource();
-      InternalPointerType pointerType() const;
+      InternalPointerType getPointerType() const;
+      void * getPointer() const;
       bool hasPoint(ControlPoint *) const;
 
 
@@ -31,7 +31,7 @@ namespace Isis
 
 
     private:
-      Isis::ControlPoint * point;
+      ControlPoint * point;
   };
 }
 

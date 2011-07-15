@@ -5,9 +5,9 @@
 
 namespace Isis
 {
-  PointLeafItem::PointLeafItem(ControlPoint * cp,
+  PointLeafItem::PointLeafItem(ControlPoint * cp, int avgCharWidth,
       AbstractTreeItem * parent) : AbstractTreeItem(parent),
-    AbstractPointItem(cp)
+    AbstractPointItem(cp, avgCharWidth)
   {
   }
 

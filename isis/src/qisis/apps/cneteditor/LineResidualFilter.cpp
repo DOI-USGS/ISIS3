@@ -9,38 +9,47 @@
 namespace Isis
 {
   LineResidualFilter::LineResidualFilter(
-      AbstractFilter::FilterEffectivenessFlag flag,
-      AbstractFilterSelector * parent, int minimumForSuccess) :
-      AbstractNumberFilter(flag, parent, minimumForSuccess)
+    AbstractFilter::FilterEffectivenessFlag flag,
+    int minimumForSuccess) : AbstractNumberFilter(flag, minimumForSuccess)
   {
-    nullify();
-    createWidget();
+  }
+
+
+  LineResidualFilter::LineResidualFilter(const LineResidualFilter & other)
+    : AbstractNumberFilter(other)
+  {
   }
 
 
   LineResidualFilter::~LineResidualFilter()
   {
   }
-  
-  
+
+
   bool LineResidualFilter::evaluate(const ControlCubeGraphNode * node) const
   {
     return evaluateImageFromMeasureFilter(node);
   }
-  
-  
+
+
   bool LineResidualFilter::evaluate(const ControlPoint * point) const
   {
     return evaluatePointFromMeasureFilter(point);
   }
-  
-  
+
+
   bool LineResidualFilter::evaluate(const ControlMeasure * measure) const
   {
     return AbstractNumberFilter::evaluate(measure->GetLineResidual());
   }
-  
-  
+
+
+  AbstractFilter * LineResidualFilter::clone() const
+  {
+    return new LineResidualFilter(*this);
+  }
+
+
   QString LineResidualFilter::getImageDescription() const
   {
     QString description = AbstractFilter::getImageDescription();
@@ -48,18 +57,18 @@ namespace Isis
       description += "measure that has a line residual which is ";
     else
       description += "measures that have line residuals which are ";
-    
+
     description += descriptionSuffix();
     return description;
   }
-  
-  
+
+
   QString LineResidualFilter::getPointDescription() const
   {
     return getImageDescription();
   }
-  
-  
+
+
   QString LineResidualFilter::getMeasureDescription() const
   {
     return "that have line residuals which are " + descriptionSuffix();

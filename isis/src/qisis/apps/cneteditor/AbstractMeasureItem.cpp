@@ -2,7 +2,7 @@
 
 #include "AbstractMeasureItem.h"
 
-#include <QVariant>
+#include <QString>
 
 #include "ControlMeasure.h"
 #include "ControlPoint.h"
@@ -11,10 +11,12 @@
 namespace Isis
 {
   AbstractMeasureItem::AbstractMeasureItem(ControlMeasure * cm,
-      AbstractTreeItem * parent) : AbstractTreeItem(parent)
+      int avgCharWidth, AbstractTreeItem * parent)
+    : AbstractTreeItem(parent)
   {
     ASSERT(cm);
     measure = cm;
+    calcDataWidth(avgCharWidth);
   }
 
 
@@ -24,10 +26,10 @@ namespace Isis
   }
 
 
-  QVariant AbstractMeasureItem::data() const
+  QString AbstractMeasureItem::getData() const
   {
     ASSERT(measure);
-    return QVariant((QString) measure->GetCubeSerialNumber());
+    return (QString) measure->GetCubeSerialNumber();
   }
 
 
@@ -39,9 +41,16 @@ namespace Isis
   }
 
 
-  AbstractTreeItem::InternalPointerType AbstractMeasureItem::pointerType() const
+  AbstractTreeItem::InternalPointerType AbstractMeasureItem::getPointerType()
+  const
   {
     return AbstractTreeItem::Measure;
+  }
+
+
+  void * AbstractMeasureItem::getPointer() const
+  {
+    return measure;
   }
 
 

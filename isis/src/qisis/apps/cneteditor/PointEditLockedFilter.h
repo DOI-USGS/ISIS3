@@ -16,12 +16,16 @@ namespace Isis
 
     public:
       PointEditLockedFilter(AbstractFilter::FilterEffectivenessFlag flag,
-          AbstractFilterSelector *, int minimumForSuccess = -1);
+          int minimumForSuccess = -1);
+      PointEditLockedFilter(const AbstractFilter & other);
       virtual ~PointEditLockedFilter();
 
       bool evaluate(const ControlCubeGraphNode *) const;
       bool evaluate(const ControlPoint *) const;
-      bool evaluate(const ControlMeasure *) const { return true; }
+      bool evaluate(const ControlMeasure *) const;
+
+      AbstractFilter * clone() const;
+
       QString getImageDescription() const;
       QString getPointDescription() const;
   };

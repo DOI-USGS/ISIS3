@@ -12,51 +12,60 @@
 namespace Isis
 {
   PointIdFilter::PointIdFilter(AbstractFilter::FilterEffectivenessFlag flag,
-      AbstractFilterSelector * parent, int minimumForSuccess) :
-      AbstractStringFilter(flag, parent, minimumForSuccess)
+      int minimumForSuccess) : AbstractStringFilter(flag, minimumForSuccess)
   {
-    nullify();
-    createWidget();
+  }
+
+
+  PointIdFilter::PointIdFilter(const PointIdFilter & other)
+    : AbstractStringFilter(other)
+  {
   }
 
 
   PointIdFilter::~PointIdFilter()
   {
   }
-  
-  
+
+
   bool PointIdFilter::evaluate(const ControlCubeGraphNode * node) const
   {
     return evaluateImageFromPointFilter(node);
   }
-  
-  
+
+
   bool PointIdFilter::evaluate(const ControlPoint * point) const
   {
     return AbstractStringFilter::evaluate((QString) point->GetId());
   }
-  
-  
+
+
   bool PointIdFilter::evaluate(const ControlMeasure *) const
   {
     return true;
   }
-  
-  
+
+
+  AbstractFilter * PointIdFilter::clone() const
+  {
+    return new PointIdFilter(*this);
+  }
+
+
   QString PointIdFilter::getImageDescription() const
   {
     QString description = AbstractFilter::getImageDescription();
-    
+
     if (getMinForSuccess() == 1)
       description += "point with it's ID ";
     else
       description += "points with IDs ";
-    
+
     description += descriptionSuffix();
     return description;
   }
-  
-  
+
+
   QString PointIdFilter::getPointDescription() const
   {
     return "have IDs " + descriptionSuffix();

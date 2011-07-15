@@ -5,7 +5,7 @@
 #include "AbstractTreeItem.h"
 
 
-class QVariant;
+class QString;
 
 
 namespace Isis
@@ -15,13 +15,14 @@ namespace Isis
   class AbstractMeasureItem : public virtual AbstractTreeItem
   {
     public:
-      AbstractMeasureItem(ControlMeasure * cm,
+      AbstractMeasureItem(ControlMeasure * cm, int avgCharWidth,
           AbstractTreeItem * parent = 0);
       virtual ~AbstractMeasureItem();
 
-      QVariant data() const;
+      QString getData() const;
       void deleteSource();
-      InternalPointerType pointerType() const;
+      InternalPointerType getPointerType() const;
+      void * getPointer() const;
       bool hasMeasure(ControlMeasure *) const;
 
 
@@ -31,7 +32,7 @@ namespace Isis
 
 
     private:
-      Isis::ControlMeasure * measure;
+      ControlMeasure * measure;
   };
 }
 

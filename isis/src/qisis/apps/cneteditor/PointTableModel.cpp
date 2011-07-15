@@ -37,33 +37,51 @@ namespace Isis
       points = NULL;
     }
   }
-  
-  
+
+
   QString PointTableModel::getColName(PointTableModel::Column col)
   {
     switch (col)
     {
-      case Id: return "Point ID";
-      case PointType: return "   Point Type   ";
-      case ChooserName: return "Chooser Name";
-      case DateTime: return "Date Time";
-      case EditLock: return "Edit Lock";
-      case Ignored: return "Ignored";
-      case Reference: return "Reference";
-      case AdjustedSPLat: return "Adjusted SP Lat";
-      case AdjustedSPLon: return "Adjusted SP Lon";
-      case AdjustedSPRadius: return "Adjusted SP Radius";
-      case APrioriSPLat: return "A Priori SP Lat";
-      case APrioriSPLon: return "A Priori SP Lon";
-      case APrioriSPRadius: return "A Priori SP Radius";
-      case APrioriSPSource: return "A Priori SP Source";
-      case APrioriSPSourceFile: return "A Priori SP Source File";
-      case APrioriRadiusSource: return "A Priori Radius Source";
-      case APrioriRadiusSourceFile: return "A Priori Radius Source File";
-      case JigsawRejected: return "JigsawRejected";
-      
+      case Id:
+        return "Point ID";
+      case PointType:
+        return "   Point Type   ";
+      case ChooserName:
+        return "Chooser Name";
+      case DateTime:
+        return "Date Time";
+      case EditLock:
+        return "Edit Lock";
+      case Ignored:
+        return "Ignored";
+      case Reference:
+        return "Reference";
+      case AdjustedSPLat:
+        return "Adjusted SP Lat";
+      case AdjustedSPLon:
+        return "Adjusted SP Lon";
+      case AdjustedSPRadius:
+        return "Adjusted SP Radius";
+      case APrioriSPLat:
+        return "A Priori SP Lat";
+      case APrioriSPLon:
+        return "A Priori SP Lon";
+      case APrioriSPRadius:
+        return "A Priori SP Radius";
+      case APrioriSPSource:
+        return "A Priori SP Source";
+      case APrioriSPSourceFile:
+        return "A Priori SP Source File";
+      case APrioriRadiusSource:
+        return "A Priori Radius Source";
+      case APrioriRadiusSourceFile:
+        return "A Priori Radius Source File";
+      case JigsawRejected:
+        return "JigsawRejected";
+
     }
-    
+
     ASSERT(0);
     return QString();
   }
@@ -187,7 +205,7 @@ namespace Isis
       Qt::Orientation orientation, int role) const
   {
     QVariant result;
-    
+
     if (role == Qt::DisplayRole)
     {
       if (orientation == Qt::Horizontal)
@@ -200,7 +218,7 @@ namespace Isis
         result = QVariant::fromValue(label);
       }
     }
-    
+
     return result;
   }
 

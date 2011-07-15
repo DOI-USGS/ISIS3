@@ -13,12 +13,15 @@
 namespace Isis
 {
   ChooserNameFilter::ChooserNameFilter(
-      AbstractFilter::FilterEffectivenessFlag flag,
-      AbstractFilterSelector * parent, int minimumForSuccess) :
-      AbstractStringFilter(flag, parent, minimumForSuccess)
+    AbstractFilter::FilterEffectivenessFlag flag,
+    int minimumForSuccess) : AbstractStringFilter(flag, minimumForSuccess)
   {
-    nullify();
-    createWidget();
+  }
+
+
+  ChooserNameFilter::ChooserNameFilter(const ChooserNameFilter & other)
+    : AbstractStringFilter(other)
+  {
   }
 
 
@@ -37,28 +40,34 @@ namespace Isis
   {
     return AbstractStringFilter::evaluate((QString) point->GetChooserName());
   }
-  
-  
+
+
   bool ChooserNameFilter::evaluate(const ControlMeasure *) const
   {
     return true;
   }
-  
-  
+
+
+  AbstractFilter * ChooserNameFilter::clone() const
+  {
+    return new ChooserNameFilter(*this);
+  }
+
+
   QString ChooserNameFilter::getImageDescription() const
   {
     QString description = AbstractFilter::getImageDescription();
-    
+
     if (getMinForSuccess() == 1)
       description += "point with it's chooser name ";
     else
       description += "points with chooser names ";
-    
+
     description += descriptionSuffix();
     return description;
   }
-  
-  
+
+
   QString ChooserNameFilter::getPointDescription() const
   {
     return "have chooser names " + descriptionSuffix();

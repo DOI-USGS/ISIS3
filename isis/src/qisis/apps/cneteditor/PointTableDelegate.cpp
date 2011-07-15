@@ -138,7 +138,7 @@ namespace Isis
             {
               case PointTableModel::PointType:
                 combo->setCurrentIndex(
-                    (int) point->StringToPointType(value));
+                  (int) point->StringToPointType(value));
                 break;
               case PointTableModel::EditLock:
                 combo->setCurrentIndex(point->IsEditLocked() ? 0 : 1);
@@ -151,7 +151,7 @@ namespace Isis
                 break;
               case PointTableModel::APrioriSPSource:
                 combo->setCurrentIndex(
-                    (int) point->StringToSurfacePointSource(value));
+                  (int) point->StringToSurfacePointSource(value));
                 break;
               case PointTableModel::APrioriRadiusSource:
                 combo->setCurrentIndex(
@@ -210,7 +210,7 @@ namespace Isis
     if (col != PointTableModel::Reference)
     {
       QList< QModelIndex > selection =
-          tableView->selectionModel()->selectedIndexes();
+        tableView->selectionModel()->selectedIndexes();
       for (int i = 0; i < selection.size(); i++)
         if (selection[i].column() == col)
           model->setData(selection[i], newData, Qt::EditRole);

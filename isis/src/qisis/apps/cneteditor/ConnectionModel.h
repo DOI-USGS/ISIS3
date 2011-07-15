@@ -11,23 +11,21 @@
 
 template <typename A> class QFutureWatcher;
 class QString;
-class QTreeView;
 
 
 namespace Isis
 {
-  class ConnectionParentItem;
+  class CnetView;
   class ControlCubeGraphNode;
   class ControlNet;
-  class FilterWidget;
+  class SerialParentItem;
 
   class ConnectionModel : public TreeModel
   {
       Q_OBJECT
 
     public:
-      ConnectionModel(Isis::ControlNet * cNet, QString name, QTreeView * tv,
-          QObject * parent = 0);
+      ConnectionModel(Isis::ControlNet * cNet, CnetView * v, QObject * parent = 0);
       virtual ~ConnectionModel();
 
       // This is a slot!!!  There is no "pubic slots:" because it has already
@@ -35,30 +33,26 @@ namespace Isis
       // keyword here would do nothing except make more work for both MOC and
       // the compiler!
       void rebuildItems();
-      
 
-    private slots:
-      void rebuildItemsDone();
-      
-      
-    private:
-      QFutureWatcher< QAtomicPointer< RootItem > > * watcher;
 
-      
     private:
-      class CreateRootItemFunctor : public std::unary_function<
-          ControlCubeGraphNode * const &, ConnectionParentItem * >
+      class CreateRootItemFunctor : public std::unary_function <
+        ControlCubeGraphNode * const &, SerialParentItem * >
       {
         public:
-          CreateRootItemFunctor(FilterWidget * fw);
-          ConnectionParentItem * operator()(ControlCubeGraphNode * const &)
-              const;
-          
+          CreateRootItemFunctor(TreeModel * tm);
+          CreateRootItemFunctor(const CreateRootItemFunctor &);
+          ~CreateRootItemFunctor();
+          SerialParentItem * operator()(ControlCubeGraphNode * const &)
+          const;
+          CreateRootItemFunctor & operator=(const CreateRootItemFunctor &);
+
           static void addToRootItem(QAtomicPointer< RootItem > &,
-              ConnectionParentItem * const &);
-          
+              SerialParentItem * const &);
+
         private:
-          FilterWidget * filter;
+          int avgCharWidth;
+          TreeModel * treeModel;
       };
   };
 }

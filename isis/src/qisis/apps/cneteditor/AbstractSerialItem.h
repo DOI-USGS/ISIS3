@@ -5,7 +5,7 @@
 #include "AbstractTreeItem.h"
 
 
-class QVariant;
+class QString;
 
 
 namespace Isis
@@ -15,13 +15,14 @@ namespace Isis
   class AbstractSerialItem : public virtual AbstractTreeItem
   {
     public:
-      AbstractSerialItem(Isis::ControlCubeGraphNode * cubeGraphNode,
-          AbstractTreeItem * parent = 0);
+      AbstractSerialItem(ControlCubeGraphNode * cubeGraphNode,
+          int avgCharWidth, AbstractTreeItem * parent = 0);
       virtual ~AbstractSerialItem();
 
-      QVariant data() const;
+      QString getData() const;
       void deleteSource();
-      InternalPointerType pointerType() const;
+      InternalPointerType getPointerType() const;
+      void * getPointer() const;
       bool hasNode(ControlCubeGraphNode *) const;
 
 
@@ -31,7 +32,7 @@ namespace Isis
 
 
     private:
-      Isis::ControlCubeGraphNode * ccgn;
+      ControlCubeGraphNode * ccgn;
   };
 }
 

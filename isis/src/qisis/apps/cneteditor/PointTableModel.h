@@ -45,7 +45,7 @@ namespace Isis
     public:
       explicit PointTableModel(QObject * parent = 0);
       virtual ~PointTableModel();
-      
+
       static QString getColName(Column);
 
       void setPoints(QList< ControlPoint * > newPoints);

@@ -2,6 +2,9 @@
 
 #include "PointMeasureFilterSelector.h"
 
+#include <algorithm>
+#include <iostream>
+
 #include <QComboBox>
 #include <QHBoxLayout>
 
@@ -17,83 +20,100 @@
 #include "SampleResidualFilter.h"
 
 
+using std::swap;
+
+
 namespace Isis
 {
   PointMeasureFilterSelector::PointMeasureFilterSelector()
   {
-    nullify();
     createSelector();
+  }
+
+
+  PointMeasureFilterSelector::PointMeasureFilterSelector(
+    const PointMeasureFilterSelector & other)
+  {
+    createSelector();
+    getSelector()->setCurrentIndex(other.getSelector()->currentIndex());
+    if (other.getFilter())
+      setFilter(other.getFilter()->clone());
   }
 
 
   PointMeasureFilterSelector::~PointMeasureFilterSelector()
   {
   }
- 
- 
+
+
+  PointMeasureFilterSelector & PointMeasureFilterSelector::operator=(
+    const PointMeasureFilterSelector & other)
+  {
+    *((AbstractFilterSelector *) this) = other;
+    return *this;
+  }
+
+
   void PointMeasureFilterSelector::createSelector()
   {
     AbstractFilterSelector::createSelector();
-  
-    selector->addItem("Chooser Name");
-    selector->addItem("Edit Locked Points");
-    selector->addItem("Ignored Points");
-    selector->addItem("Point Id");
-    selector->insertSeparator(selector->count());
-    selector->addItem("Cube Serial Number");
-    selector->addItem("Ignored Measures");
-    selector->addItem("Line Residual");
-    selector->addItem("Residual Magnitude");
-    selector->addItem("Sample Residual");
+
+    getSelector()->addItem("Chooser Name");
+    getSelector()->addItem("Edit Locked Points");
+    getSelector()->addItem("Ignored Points");
+    getSelector()->addItem("Point Id");
+    getSelector()->insertSeparator(getSelector()->count());
+    getSelector()->addItem("Cube Serial Number");
+    getSelector()->addItem("Ignored Measures");
+    getSelector()->addItem("Line Residual");
+    getSelector()->addItem("Residual Magnitude");
+    getSelector()->addItem("Sample Residual");
   }
 
 
   void PointMeasureFilterSelector::changeFilter(int index)
   {
-    AbstractFilterSelector::changeFilter(index);
-    
+    deleteFilter();
+
     if (index != 0)
     {
       switch (index)
       {
         case 2:
-          filter = new ChooserNameFilter(AbstractFilter::Points, this);
+          setFilter(new ChooserNameFilter(AbstractFilter::Points));
           break;
         case 3:
-          filter = new PointEditLockedFilter(AbstractFilter::Points, this);
+          setFilter(new PointEditLockedFilter(AbstractFilter::Points));
           break;
         case 4:
-          filter = new PointIgnoredFilter(AbstractFilter::Points, this);
+          setFilter(new PointIgnoredFilter(AbstractFilter::Points));
           break;
         case 5:
-          filter = new PointIdFilter(AbstractFilter::Points, this);
+          setFilter(new PointIdFilter(AbstractFilter::Points));
           break;
         case 7:
-          filter = new CubeSerialNumberFilter(AbstractFilter::Points |
-              AbstractFilter::Measures, this, 1);
+          setFilter(new CubeSerialNumberFilter(AbstractFilter::Points |
+              AbstractFilter::Measures, 1));
           break;
         case 8:
-          filter = new MeasureIgnoredFilter(AbstractFilter::Points |
-              AbstractFilter::Measures, this, 1);
+          setFilter(new MeasureIgnoredFilter(AbstractFilter::Points |
+              AbstractFilter::Measures, 1));
           break;
         case 9:
-          filter = new LineResidualFilter(AbstractFilter::Points |
-              AbstractFilter::Measures, this, 1);
+          setFilter(new LineResidualFilter(AbstractFilter::Points |
+              AbstractFilter::Measures, 1));
           break;
         case 10:
-          filter = new ResidualMagnitudeFilter(AbstractFilter::Points |
-              AbstractFilter::Measures, this, 1);
+          setFilter(new ResidualMagnitudeFilter(AbstractFilter::Points |
+              AbstractFilter::Measures, 1));
           break;
         case 11:
-          filter = new SampleResidualFilter(AbstractFilter::Points |
-              AbstractFilter::Measures, this, 1);
+          setFilter(new SampleResidualFilter(AbstractFilter::Points |
+              AbstractFilter::Measures, 1));
           break;
       }
-      
-      connect(filter, SIGNAL(filterChanged()), this, SIGNAL(filterChanged()));
-      mainLayout->insertWidget(2, filter);
     }
-    
+
     emit sizeChanged();
     emit filterChanged();
   }

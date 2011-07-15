@@ -6,8 +6,6 @@
 #include "AbstractLeafItem.h"
 
 
-class QVariant;
-
 namespace Isis
 {
   class ControlMeasure;
@@ -15,7 +13,8 @@ namespace Isis
   class MeasureLeafItem : public AbstractMeasureItem, public AbstractLeafItem
   {
     public:
-      MeasureLeafItem(ControlMeasure * cm, AbstractTreeItem * parent = 0);
+      MeasureLeafItem(ControlMeasure * cm, int avgCharWidth,
+          AbstractTreeItem * parent = 0);
       virtual ~MeasureLeafItem();
 
 

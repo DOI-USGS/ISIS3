@@ -14,10 +14,8 @@ namespace Isis
   {
     public:
       SerialParentItem(Isis::ControlCubeGraphNode * node,
-          AbstractTreeItem * parent = 0);
+          int avgCharWidth, AbstractTreeItem * parent = 0);
       virtual ~SerialParentItem();
-
-      void addChild(AbstractTreeItem * child);
 
 
     private: // Disallow copying of this class

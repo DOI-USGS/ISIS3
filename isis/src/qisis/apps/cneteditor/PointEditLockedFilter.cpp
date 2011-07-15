@@ -16,20 +16,23 @@ using std::cerr;
 namespace Isis
 {
   PointEditLockedFilter::PointEditLockedFilter(
-      AbstractFilter::FilterEffectivenessFlag flag,
-      AbstractFilterSelector * parent, int minimumForSuccess) :
-      AbstractFilter(flag, parent, minimumForSuccess)
+    AbstractFilter::FilterEffectivenessFlag flag,
+    int minimumForSuccess) : AbstractFilter(flag, minimumForSuccess)
   {
-    nullify();
-    createWidget();
+  }
+
+
+  PointEditLockedFilter::PointEditLockedFilter(const AbstractFilter & other)
+    : AbstractFilter(other)
+  {
   }
 
 
   PointEditLockedFilter::~PointEditLockedFilter()
   {
   }
-  
-  
+
+
   bool PointEditLockedFilter::evaluate(const ControlCubeGraphNode * node) const
   {
     return AbstractFilter::evaluateImageFromPointFilter(node);
@@ -41,11 +44,23 @@ namespace Isis
     return AbstractFilter::evaluate(point, &ControlPoint::IsEditLocked);
   }
 
-  
+
+  bool PointEditLockedFilter::evaluate(const ControlMeasure * measure) const
+  {
+    return true;
+  }
+
+
+  AbstractFilter * PointEditLockedFilter::clone() const
+  {
+    return new PointEditLockedFilter(*this);
+  }
+
+
   QString PointEditLockedFilter::getImageDescription() const
   {
     QString description = AbstractFilter::getImageDescription();
-    
+
     if (getMinForSuccess() == 1)
       description += "point that is ";
     else
@@ -55,20 +70,20 @@ namespace Isis
       description += "edit locked";
     else
       description += "not edit locked";
-    
+
     return description;
   }
-  
-  
+
+
   QString PointEditLockedFilter::getPointDescription() const
   {
     QString description = "are ";
-    
+
     if (inclusive())
       description += "edit locked";
     else
       description += "not edit locked";
-    
+
     return description;
   }
 }

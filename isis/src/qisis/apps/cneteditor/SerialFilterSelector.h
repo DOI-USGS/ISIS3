@@ -15,7 +15,9 @@ namespace Isis
 
     public:
       SerialFilterSelector();
+      SerialFilterSelector(const SerialFilterSelector & other);
       virtual ~SerialFilterSelector();
+      SerialFilterSelector & operator=(const SerialFilterSelector & other);
 
 
     protected:

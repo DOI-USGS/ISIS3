@@ -15,7 +15,7 @@ namespace Isis
   class PointParentItem : public AbstractPointItem, public AbstractParentItem
   {
     public:
-      PointParentItem(Isis::ControlPoint * cp,
+      PointParentItem(Isis::ControlPoint * cp, int avgCharWidth,
           AbstractTreeItem * parent = 0);
       virtual ~PointParentItem();
 

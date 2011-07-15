@@ -12,7 +12,7 @@
 class QComboBox;
 class QHBoxLayout;
 class QPushButton;
-
+class QReadWriteLock;
 
 namespace Isis
 {
@@ -34,41 +34,51 @@ namespace Isis
     public:
       AbstractFilterSelector();
       virtual ~AbstractFilterSelector();
-      
+
       template< typename Evaluatable >
       bool evaluate(const Evaluatable * evaluatable) const
       {
         return filter && filter->evaluate(evaluatable);
       }
-      
+
       bool hasFilter() const;
-      bool hasFilter(bool (AbstractFilter::*)() const) const;
-      
-      QString getDescription(QString (AbstractFilter::*)() const) const;
-      
-      
+      bool hasFilter(bool (AbstractFilter:: *)() const) const;
+
+      QString getDescription(QString(AbstractFilter:: *)() const) const;
+
+      AbstractFilterSelector & operator=(const AbstractFilterSelector & other);
+
+
     public slots:
       void sendClose();
 
 
     protected:
-      virtual void nullify();
+      void nullify();
       virtual void createSelector();
-      
-      
-    protected slots:
-      virtual void changeFilter(int);
-      
+      QComboBox * getSelector() const;
+      QHBoxLayout * getMainLayout() const;
+      AbstractFilter * getFilter() const;
+      void setFilter(AbstractFilter *);
 
-    protected:
-      QComboBox * selector;
-      QHBoxLayout * mainLayout;
-      AbstractFilter * filter;
-      
+
+    protected slots:
+      virtual void changeFilter(int index) = 0;
+      virtual void deleteFilter();
+
+
+      // disable copying of this class which can't exist anyway ....uhhuh...yeah
+    private:
+      AbstractFilterSelector(const AbstractFilterSelector & other);
+
 
     private:
+      QComboBox * selector;
+      QHBoxLayout * mainLayout;
       QPushButton * closeButton;
+      AbstractFilter * filter;
   };
 }
 
 #endif
+

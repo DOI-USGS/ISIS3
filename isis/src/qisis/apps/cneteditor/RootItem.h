@@ -5,7 +5,7 @@
 #include "AbstractParentItem.h"
 
 
-class QVariant;
+class QString;
 
 
 namespace Isis
@@ -18,14 +18,22 @@ namespace Isis
       RootItem();
       virtual ~RootItem();
 
-      QVariant data() const;
+      QString getData() const;
       void deleteSource();
-      InternalPointerType pointerType() const;
+      InternalPointerType getPointerType() const;
+      void * getPointer() const;
+
+      void setLastVisibleFilteredItem(AbstractTreeItem * item);
+      const AbstractTreeItem * getLastVisibleFilteredItem() const;
 
 
     private: // disable copying of this class
       RootItem(const RootItem & other);
       const RootItem & operator=(const RootItem & other);
+
+
+    private:
+      AbstractTreeItem * lastVisibleFilteredItem;
   };
 }
 

@@ -17,11 +17,15 @@ namespace Isis
       AbstractLeafItem(AbstractTreeItem * parent = 0);
       virtual ~AbstractLeafItem();
 
-      AbstractTreeItem * childAt(int row) const;
-      int indexOf(AbstractTreeItem * child) const;
-      int childCount() const;
+      virtual AbstractTreeItem * childAt(int row) const;
+      virtual QList< AbstractTreeItem * > getChildren() const;
+      virtual int indexOf(AbstractTreeItem * child) const;
+      virtual int childCount() const;
       virtual void addChild(AbstractTreeItem * child);
-      virtual void removeChild(int row);
+      virtual AbstractTreeItem * getFirstVisibleChild() const;
+      virtual AbstractTreeItem * getLastVisibleChild() const;
+      virtual void setFirstVisibleChild(AbstractTreeItem *);
+      virtual void setLastVisibleChild(AbstractTreeItem *);
 
 
     private: // disable copying of this class

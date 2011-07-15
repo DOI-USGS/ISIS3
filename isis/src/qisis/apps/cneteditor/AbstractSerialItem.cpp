@@ -2,7 +2,9 @@
 
 #include "AbstractSerialItem.h"
 
-#include <QVariant>
+#include <iostream>
+
+#include <QString>
 
 #include "ControlCubeGraphNode.h"
 #include "ControlNet.h"
@@ -11,10 +13,12 @@
 namespace Isis
 {
   AbstractSerialItem::AbstractSerialItem(ControlCubeGraphNode * cubeGraphNode,
-      AbstractTreeItem * parent) : AbstractTreeItem(parent)
+      int avgCharWidth, AbstractTreeItem * parent)
+    : AbstractTreeItem(parent)
   {
     ASSERT(cubeGraphNode);
     ccgn = cubeGraphNode;
+    calcDataWidth(avgCharWidth);
   }
 
 
@@ -24,10 +28,10 @@ namespace Isis
   }
 
 
-  QVariant AbstractSerialItem::data() const
+  QString AbstractSerialItem::getData() const
   {
     ASSERT(ccgn);
-    return QVariant((QString) ccgn->getSerialNumber());
+    return (QString) ccgn->getSerialNumber();
   }
 
 
@@ -38,9 +42,15 @@ namespace Isis
   }
 
 
-  AbstractTreeItem::InternalPointerType AbstractSerialItem::pointerType() const
+  AbstractTreeItem::InternalPointerType AbstractSerialItem::getPointerType() const
   {
     return AbstractTreeItem::CubeGraphNode;
+  }
+
+
+  void * AbstractSerialItem::getPointer() const
+  {
+    return ccgn;
   }
 
 

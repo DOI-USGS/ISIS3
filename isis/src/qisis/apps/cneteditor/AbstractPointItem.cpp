@@ -2,7 +2,7 @@
 
 #include "AbstractPointItem.h"
 
-#include <QVariant>
+#include <QString>
 
 #include "ControlNet.h"
 #include "ControlPoint.h"
@@ -11,10 +11,12 @@
 namespace Isis
 {
   AbstractPointItem::AbstractPointItem(ControlPoint * cp,
-      AbstractTreeItem * parent) : AbstractTreeItem(parent)
+      int avgCharWidth, AbstractTreeItem * parent)
+    : AbstractTreeItem(parent)
   {
     ASSERT(cp);
     point = cp;
+    calcDataWidth(avgCharWidth);
   }
 
 
@@ -24,10 +26,10 @@ namespace Isis
   }
 
 
-  QVariant AbstractPointItem::data() const
+  QString AbstractPointItem::getData() const
   {
     ASSERT(point);
-    return QVariant((QString) point->GetId());
+    return (QString) point->GetId();
   }
 
 
@@ -39,9 +41,15 @@ namespace Isis
   }
 
 
-  AbstractTreeItem::InternalPointerType AbstractPointItem::pointerType() const
+  AbstractTreeItem::InternalPointerType AbstractPointItem::getPointerType() const
   {
     return AbstractTreeItem::Point;
+  }
+
+
+  void * AbstractPointItem::getPointer() const
+  {
+    return point;
   }
 
 

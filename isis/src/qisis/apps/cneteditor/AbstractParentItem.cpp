@@ -13,6 +13,8 @@ namespace Isis
     AbstractTreeItem(parent)
   {
     children = NULL;
+    firstVisibleChild = NULL;
+    lastVisibleChild = NULL;
     children = new QList< AbstractTreeItem * >;
   }
 
@@ -29,6 +31,16 @@ namespace Isis
       delete children;
       children = NULL;
     }
+
+    if (firstVisibleChild)
+    {
+      firstVisibleChild = NULL;
+    }
+
+    if (lastVisibleChild)
+    {
+      lastVisibleChild = NULL;
+    }
   }
 
 
@@ -37,6 +49,25 @@ namespace Isis
     ASSERT(children);
     ASSERT(row >= 0 && row < children->size());
     return children->value(row);
+  }
+
+
+  QList< AbstractTreeItem * > AbstractParentItem::getChildren() const
+  {
+    ASSERT(children);
+    return *children;
+  }
+
+
+  AbstractTreeItem * AbstractParentItem::getFirstVisibleChild() const
+  {
+    return firstVisibleChild;
+  }
+
+
+  AbstractTreeItem * AbstractParentItem::getLastVisibleChild() const
+  {
+    return lastVisibleChild;
   }
 
 
@@ -60,14 +91,39 @@ namespace Isis
     ASSERT(child);
     ASSERT(children);
     ASSERT(!dynamic_cast< RootItem * >(child));
+
+    if (!firstVisibleChild && child->isVisible())
+    {
+      firstVisibleChild = child;
+      lastVisibleChild = child;
+    }
+
+    AbstractTreeItem * childWithNewNext = NULL;
+    if (lastVisibleChild && firstVisibleChild != child)
+    {
+      childWithNewNext = lastVisibleChild;
+    }
+
     children->append(child);
     child->setParent(this);
+
+    if (childWithNewNext && child->isVisible())
+    {
+      childWithNewNext->setNextVisiblePeer(child);
+      lastVisibleChild = child;
+    }
   }
 
 
-  void AbstractParentItem::removeChild(int row)
+  void AbstractParentItem::setFirstVisibleChild(AbstractTreeItem * child)
   {
-    ASSERT(row >= 0 && row < children->size());
-    children->removeAt(row);
+    firstVisibleChild = child;
+  }
+
+
+  void AbstractParentItem::setLastVisibleChild(AbstractTreeItem * child)
+  {
+    lastVisibleChild = child;
   }
 }
+

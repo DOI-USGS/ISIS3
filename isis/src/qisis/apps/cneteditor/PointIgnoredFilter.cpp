@@ -16,36 +16,51 @@ using std::cerr;
 namespace Isis
 {
   PointIgnoredFilter::PointIgnoredFilter(
-      AbstractFilter::FilterEffectivenessFlag flag,
-      AbstractFilterSelector * parent, int minimumForSuccess) :
-      AbstractFilter(flag, parent, minimumForSuccess)
+    AbstractFilter::FilterEffectivenessFlag flag,
+    int minimumForSuccess) : AbstractFilter(flag, minimumForSuccess)
   {
-    nullify();
-    createWidget();
+  }
+
+
+  PointIgnoredFilter::PointIgnoredFilter(const AbstractFilter & other)
+    : AbstractFilter(other)
+  {
   }
 
 
   PointIgnoredFilter::~PointIgnoredFilter()
   {
   }
-  
-  
+
+
   bool PointIgnoredFilter::evaluate(const ControlCubeGraphNode * node) const
   {
     return AbstractFilter::evaluateImageFromPointFilter(node);
   }
-  
-  
+
+
   bool PointIgnoredFilter::evaluate(const ControlPoint * point) const
   {
     return AbstractFilter::evaluate(point, &ControlPoint::IsIgnored);
   }
-  
-  
+
+
+  bool PointIgnoredFilter::evaluate(const ControlMeasure * measure) const
+  {
+    return true;
+  }
+
+
+  AbstractFilter * PointIgnoredFilter::clone() const
+  {
+    return new PointIgnoredFilter(*this);
+  }
+
+
   QString PointIgnoredFilter::getImageDescription() const
   {
     QString description = AbstractFilter::getImageDescription();
-    
+
     if (getMinForSuccess() == 1)
       description += "point that is ";
     else
@@ -55,20 +70,20 @@ namespace Isis
       description += "ignored";
     else
       description += "not ignored";
-    
+
     return description;
   }
-  
-  
+
+
   QString PointIgnoredFilter::getPointDescription() const
   {
     QString description = "are ";
-    
+
     if (inclusive())
       description += "ignored";
     else
       description += "not ignored";
-    
+
     return description;
   }
 }

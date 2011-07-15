@@ -2,57 +2,73 @@
 
 #include "AbstractFilterSelector.h"
 
+#include <algorithm>
 #include <iostream>
 
 #include <QComboBox>
 #include <QHBoxLayout>
 #include <QIcon>
 #include <QPushButton>
+#include <QWriteLocker>
 
 #include "AbstractFilter.h"
 #include "PointIdFilter.h"
 
 
 using std::cerr;
+using std::nothrow;
+using std::swap;
+
 
 namespace Isis
 {
   AbstractFilterSelector::AbstractFilterSelector()
   {
+    nullify();
   }
-  
-  
+
+
   AbstractFilterSelector::~AbstractFilterSelector()
   {
-    if (selector)
-      selector->setCurrentIndex(0);
+    deleteFilter();
   }
-  
-  
+
+
   bool AbstractFilterSelector::hasFilter() const
   {
     return filter != NULL;
   }
-  
-  
+
+
   bool AbstractFilterSelector::hasFilter(
-      bool (AbstractFilter::*meth)() const) const
+    bool (AbstractFilter::*meth)() const) const
   {
     return filter && (filter->*meth)();
   }
-  
-  
+
+
   QString AbstractFilterSelector::getDescription(
-      QString (AbstractFilter::*meth)() const) const
+    QString(AbstractFilter::*meth)() const) const
   {
     QString description;
     if (filter)
       description = (filter->*meth)();
-    
+
     return description;
   }
-  
-  
+
+
+  AbstractFilterSelector & AbstractFilterSelector::operator=(
+    const AbstractFilterSelector & other)
+  {
+    getSelector()->setCurrentIndex(other.getSelector()->currentIndex());
+    if (filter && other.filter)
+      setFilter(other.filter->clone());
+
+    return *this;
+  }
+
+
   void AbstractFilterSelector::nullify()
   {
     closeButton = NULL;
@@ -60,8 +76,8 @@ namespace Isis
     mainLayout = NULL;
     selector = NULL;
   }
-  
-  
+
+
   void AbstractFilterSelector::createSelector()
   {
     closeButton = new QPushButton;
@@ -81,24 +97,57 @@ namespace Isis
     mainLayout->addStretch();
     mainLayout->setAlignment(closeButton, Qt::AlignTop);
     mainLayout->setAlignment(selector, Qt::AlignTop);
-    
+
 
     setLayout(mainLayout);
   }
-  
-  
-  void AbstractFilterSelector::changeFilter(int index)
+
+
+  QComboBox * AbstractFilterSelector::getSelector() const
+  {
+    return selector;
+  }
+
+
+  QHBoxLayout * AbstractFilterSelector::getMainLayout() const
+  {
+    return mainLayout;
+  }
+
+
+  AbstractFilter * AbstractFilterSelector::getFilter() const
+  {
+    return filter;
+  }
+
+
+  void AbstractFilterSelector::setFilter(AbstractFilter * someFilter)
   {
     if (filter)
     {
-      QWidget * widget = mainLayout->takeAt(2)->widget();
-      ASSERT(widget && widget == filter);
-      delete widget;
+      delete filter;
+      filter = NULL;
+    }
+
+    filter = someFilter;
+    connect(getFilter(), SIGNAL(filterChanged()),
+        this, SIGNAL(filterChanged()));
+    getMainLayout()->insertWidget(2, getFilter());
+  }
+
+
+  void AbstractFilterSelector::deleteFilter()
+  {
+    if (filter)
+    {
+//       QWidget * widget = mainLayout->takeAt(2)->widget();
+//       ASSERT(widget && widget == filter);
+      delete filter;
       filter = NULL;
     }
   }
-  
-  
+
+
   void AbstractFilterSelector::sendClose()
   {
     emit close(this);

@@ -10,11 +10,11 @@
 
 template <typename A> class QFutureWatcher;
 class QString;
-class QTreeView;
 
 
 namespace Isis
 {
+  class CnetView;
   class ControlCubeGraphNode;
   class ControlNet;
   class SerialParentItem;
@@ -24,8 +24,7 @@ namespace Isis
       Q_OBJECT
 
     public:
-      SerialModel(Isis::ControlNet * cNet, QString name, QTreeView * tv,
-          QObject * parent = 0);
+      SerialModel(Isis::ControlNet * cNet, CnetView * v, QObject * parent = 0);
       virtual ~SerialModel();
 
       // This is a slot!!!  There is no "pubic slots:" because it has already
@@ -33,29 +32,25 @@ namespace Isis
       // keyword here would do nothing except make more work for both MOC and
       // the compiler!
       void rebuildItems();
-      
-      
-    private slots:
-      void rebuildItemsDone();
-      
-      
+
+
     private:
-      QFutureWatcher< QAtomicPointer< RootItem > > * watcher;
-      
-      
-    private:
-      class CreateRootItemFunctor : public std::unary_function<
-          ControlCubeGraphNode * const &, SerialParentItem * >
+      class CreateRootItemFunctor : public std::unary_function <
+        ControlCubeGraphNode * const &, SerialParentItem * >
       {
         public:
-          CreateRootItemFunctor(FilterWidget * fw);
+          CreateRootItemFunctor(TreeModel * tm);
+          CreateRootItemFunctor(const CreateRootItemFunctor &);
+          ~CreateRootItemFunctor();
           SerialParentItem * operator()(ControlCubeGraphNode * const &) const;
-          
+          CreateRootItemFunctor & operator=(const CreateRootItemFunctor &);
+
           static void addToRootItem(QAtomicPointer< RootItem > &,
               SerialParentItem * const &);
-          
+
         private:
-          FilterWidget * filter;
+          int avgCharWidth;
+          TreeModel * treeModel;
       };
   };
 }

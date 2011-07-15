@@ -86,7 +86,8 @@ namespace Isis
     readSettings();
 
     setNoFileState();
-    if (QApplication::arguments().size() > 1) {
+    if (QApplication::arguments().size() > 1)
+    {
       load(QApplication::arguments().at(1));
     }
   }
@@ -94,6 +95,54 @@ namespace Isis
 
   CnetEditorWindow::~CnetEditorWindow()
   {
+    if (openAct)
+    {
+      delete openAct;
+      openAct = NULL;
+    }
+
+    if (saveAct)
+    {
+      delete saveAct;
+      saveAct = NULL;
+    }
+
+    if (saveAsAct)
+    {
+      delete saveAsAct;
+      saveAsAct = NULL;
+    }
+
+    if (aboutAct)
+    {
+      delete aboutAct;
+      aboutAct = NULL;
+    }
+
+    if (closeAct)
+    {
+      delete closeAct;
+      closeAct = NULL;
+    }
+
+    if (quitAct)
+    {
+      delete quitAct;
+      quitAct = NULL;
+    }
+
+    if (cnet)
+    {
+      delete cnet;
+      cnet = NULL;
+    }
+
+    if (editorWidget)
+    {
+      delete editorWidget;
+      editorWidget = NULL;
+    }
+
     if (curFile)
     {
       delete curFile;
@@ -208,31 +257,6 @@ namespace Isis
     mainToolBar->addAction(closeAct);
     mainToolBar->addSeparator();
 
-    QFont boldFont(*labelFont);
-    boldFont.setBold(true);
-
-    QLabel * driverSelectionLabel = new QLabel("   Driver View:  ");
-    driverSelectionLabel->setFont(boldFont);
-    driverSelectionLabel->setAlignment(Qt::AlignCenter);
-
-    QRadioButton * drivePointViewButton = new QRadioButton("Point View");
-    QRadioButton * driveSerialViewButton = new QRadioButton("Cube View");
-    QRadioButton * driveConnectionViewButton = new QRadioButton(
-      "Cube Connection View");
-
-    driveViewGrp = new QButtonGroup(this);
-    driveViewGrp->addButton(drivePointViewButton,
-        (int) CnetEditorWidget::PointView);
-    driveViewGrp->addButton(driveSerialViewButton,
-        (int) CnetEditorWidget::SerialView);
-    driveViewGrp->addButton(driveConnectionViewButton,
-        (int) CnetEditorWidget::ConnectionView);
-
-    mainToolBar->addWidget(driverSelectionLabel);
-    mainToolBar->addWidget(drivePointViewButton);
-    mainToolBar->addWidget(driveSerialViewButton);
-    mainToolBar->addWidget(driveConnectionViewButton);
-
     addToolBar(Qt::TopToolBarArea, mainToolBar);
   }
 
@@ -278,12 +302,17 @@ namespace Isis
 
     if (dirty)
     {
+      QString name = QFileInfo(*curFile).fileName();
       int r = QMessageBox::warning(this, tr("cneteditor"),
-          tr("There are unsaved changes!\n\nContinue anyway?"),
-          QMessageBox::Yes | QMessageBox::No);
+          "The network \"" + name + "\" has been modified.\n"
+          "Do you want to save your changes or discard them?",
+          QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
 
-      if (r == QMessageBox::No)
+      if (r == QMessageBox::Cancel)
         ok = false;
+      else
+        if (r == QMessageBox::Save)
+          save();
     }
 
     return ok;
@@ -298,9 +327,7 @@ namespace Isis
 
   void CnetEditorWindow::setSaveAsPvl(int state)
   {
-//     cerr << "CnetEditorWindow::setSaveAsPvl... changing from " << saveAsPvl;
     saveAsPvl = (bool) state;
-//     cerr << " to " << saveAsPvl << "\n";
   }
 
 
@@ -324,7 +351,6 @@ namespace Isis
     setDirty(false);
     *curFile = filename;
     setWindowTitle(filename + "[*] - cneteditor");
-    driveViewGrp->button(editorWidget->getDriverView())->click();
   }
 
 
@@ -349,8 +375,6 @@ namespace Isis
       editorWidget = new CnetEditorWidget(cnet, Filename(
           "$HOME/.Isis/cneteditor/cneteditor.config").Expanded().c_str());
       connect(editorWidget, SIGNAL(cnetModified()), this, SLOT(setDirty()));
-      connect(driveViewGrp, SIGNAL(buttonClicked(int)), editorWidget,
-          SLOT(setDriverView(int)));
       setCentralWidget(editorWidget);
       setHasFileState(filename);
       saveAsPvl = !Pvl((iString) filename).HasObject("ProtoBuffer");
@@ -426,8 +450,6 @@ namespace Isis
     if (okToContinue())
     {
       disconnect(editorWidget, SIGNAL(cnetModified()), this, SLOT(setDirty()));
-      disconnect(driveViewGrp, SIGNAL(buttonClicked(int)), editorWidget,
-          SLOT(setDriverView(int)));
       delete editorWidget;
       editorWidget = NULL;
       delete cnet;
@@ -444,5 +466,5 @@ namespace Isis
     saveAct->setEnabled(state);
     setWindowModified(state);
   }
-
 }
+
