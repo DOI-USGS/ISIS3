@@ -5,13 +5,13 @@ include $(ISISROOT)/make/isismake.tsts
 
 commands:
 	$(CP) $(INPUT)/*.cub $(OUTPUT)
-	$(APPNAME) from=$(OUTPUT)/I20042001RDR_driftcosi.cub \
+	$(APPNAME) from=$(OUTPUT)/vik.cub \
 	twist=false \
-	maxit=4 \
-	samp1=21. \
-	line1=1177. \
-	lat1=32.53 \
-	lon1=79.72 > /dev/null;
+	maxit=10 \
+	samp1=731.875 \
+	line1=669.375 \
+	lat1=-26.439008370134 \
+	lon1= 352.19745020451 > /dev/null;
 	cat bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
 	  | sed 's/\/[^,]*\/\([^,\/]*\.cub\)/\1/g' \
 	  | sed 's/\/[^,]*\/\([^,\/]*\.net\)/\1/g' \

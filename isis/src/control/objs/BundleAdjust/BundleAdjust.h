@@ -83,6 +83,10 @@
  *   @history 2011-07-12 Ken Edmundson Segmentation fault bugfix in OutputHeader
  *                          method. Previously was attempting to output camera
  *                          angle sigmas when none had been allocated.
+ *   @history 2011-07-14 Ken Edmundson and Debbie Cook Added new member,
+ *                          m_bDeltack to indicate calling application
+ *                          was deltack (or qtie) and has potential to have
+ *                          a single ControlPoint and ControlMeasure.
  */
 
 #include <vector>
@@ -269,6 +273,8 @@ namespace Isis {
       bool m_bSimulatedData;                                 //!< indicating simulated (i.e. 'perfect' data)
       bool m_bLastIteration;
       bool m_bMaxIterationsReached;
+      bool m_bDeltack;                                       //!< flag indicating deltack was calling app
+      // This will become obsolete once we have a dedicated resection class.
 
       int m_nIteration;                                      //!< current iteration
       int m_nMaxIterations;                                  //!< maximum iterations

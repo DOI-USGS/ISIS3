@@ -42,6 +42,7 @@ namespace Isis {
     m_bPrintSummary = bPrintSummary;
     m_strCnetFilename = cnetFile;
     m_strOutputFilePrefix = "";
+    m_bDeltack = false;
 
     Init(&progress);
   }
@@ -58,6 +59,7 @@ namespace Isis {
     m_bPrintSummary = bPrintSummary;
     m_strCnetFilename = cnetFile;
     m_strOutputFilePrefix = "";
+    m_bDeltack = false;
 
     Init(&progress);
   }
@@ -73,6 +75,7 @@ namespace Isis {
     m_dConvergenceThreshold = 0.;    // This is needed for deltack???
     m_strCnetFilename = "";
     m_strOutputFilePrefix = "";
+    m_bDeltack = true;
 
     Init();
   }
@@ -88,6 +91,7 @@ namespace Isis {
     m_bPrintSummary = bPrintSummary;
     m_strCnetFilename = "";
     m_strOutputFilePrefix = "";
+    m_bDeltack = false;
 
     Init();
   }
@@ -799,7 +803,15 @@ namespace Isis {
       m_nDegreesOfFreedom =
         m_nObservations + (m_nConstrainedPointParameters + m_nConstrainedImageParameters) - m_nUnknownParameters;
 
-      m_dSigma0 = dvtpv / m_nDegreesOfFreedom;
+      if (m_nDegreesOfFreedom > 0) 
+        m_dSigma0 = dvtpv / m_nDegreesOfFreedom;
+      else if (m_bDeltack && m_nDegreesOfFreedom == 0)
+        m_dSigma0 = dvtpv;
+      else {
+        std::string msg = "Degrees of Freedom " + iString(m_nDegreesOfFreedom) 
+            + " is invalid ( <= 0)!";
+      throw Isis::iException::Message(iException::Io, msg, _FILEINFO_);
+    }
 
       std::cout << "degrees of freedom = " << m_nDegreesOfFreedom << std::endl;
 
@@ -810,12 +822,29 @@ namespace Isis {
              m_nObservations, m_nConstrainedPointParameters, m_nUnknownParameters, m_nDegreesOfFreedom);
 
       // check for convergence
-      if (fabs(dSigma0_previous - m_dSigma0) <= m_dConvergenceThreshold) {
-        m_bLastIteration = true;
-        m_bConverged = true;
-        printf("Bundle has converged\n");
-        break;
+      if (!m_bDeltack) {
+        if (fabs(dSigma0_previous - m_dSigma0) <= m_dConvergenceThreshold) {
+          m_bLastIteration = true;
+
+          m_bConverged = true;
+          printf("Bundle has converged\n");
+          break;
+        }
       }
+      else {
+        int numimgparam = m_Image_Solution.size();
+        for (int ij = 0; ij < numimgparam; ij++) {
+          if (fabs(m_Image_Solution(ij)) > m_dConvergenceThreshold) 
+            break;
+          m_bConverged = true;
+        }
+
+        if  (m_bConverged == true) {
+          m_bLastIteration = true;
+          printf("Bundle has converged\n");
+          break;
+        }
+      }  
 
       clock_t iterationclock2 = clock();
       double dIterationTime = ((iterationclock2 - iterationclock1) / (double)CLOCKS_PER_SEC);
@@ -3422,6 +3451,7 @@ namespace Isis {
               m_Image_Corrections(index) += m_Image_Solution(index);
           index++;
 
+
           if (m_spacecraftPositionSolveType == PositionVelocityAcceleration) {
             abcX[2] += m_Image_Solution(index);
             if ( !bsameindex )
@@ -4643,7 +4673,11 @@ void BundleAdjust::SpecialKIterationSummary() {
       int nDegreesOfFreedom = m_nObservations + m_nConstrainedPointParameters + m_nConstrainedImageParameters - m_nUnknownParameters;
       int nConvergenceCriteria = 1;
 
-      sprintf(buf, "JIGSAW: BUNDLE ADJUSTMENT\n=========================\n");
+      if (!m_bDeltack)
+        sprintf(buf, "JIGSAW: BUNDLE ADJUSTMENT\n=========================\n");
+      else
+        sprintf(buf, "JIGSAW (DELTACK or QTIE): BUNDLE ADJUSTMENT\n=========================\n");
+
       fp_out << buf;
       sprintf(buf, "\n                       Run Time: %s", Isis::iTime::CurrentLocalTime().c_str());
       fp_out << buf;
@@ -4932,7 +4966,7 @@ void BundleAdjust::SpecialKIterationSummary() {
           // coefficients from which the Exterior Orientation parameters are derived.
           if ( m_spacecraftPositionSolveType > 0 )
               pSpicePosition->GetPolynomial(PosX, PosY, PosZ);
-          else { // frame camera
+          else { // not solving for position
               std::vector <double> coordinate(3);
               coordinate = pSpicePosition->GetCenterCoordinate();
               PosX[0] = coordinate[0];
@@ -6283,6 +6317,10 @@ void BundleAdjust::SpecialKIterationSummary() {
         else { // not solving for position so report state at center of image
           std::vector <double> coordinate(3);
           coordinate = pSpicePosition->GetCenterCoordinate();
+
+      BFP = pCamera->BodyRotation()->ReferenceVector(pSpicePosition->Coordinate());
+      std::cout << "**body-fixed = " << BFP[0] <<" "<<BFP[1] <<" "<<BFP[2] << std::endl;
+
 
           PosX[0] = coordinate[0];
           PosY[0] = coordinate[1];

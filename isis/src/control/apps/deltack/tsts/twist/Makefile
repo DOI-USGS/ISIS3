@@ -9,12 +9,12 @@ commands:
 	$(APPNAME) from=$(OUTPUT)/I08526015RDR_band9.cub \
 	maxits=25 \
 	twist=true \
-	samp1=58.5 \
-	line1=11603. \
+	samp1=336.30 \
+	line1=11842.33 \
 	lat1=-6.3533854373815 \
 	lon1=354.86255739295 \
-	samp2=99.25 \
-	line2=8044.75 \
+	samp2=366.79 \
+	line2=8264.78 \
 	lat2=-0.3270664209085 \
 	lon2=355.70986410595 > /dev/null;
 	cat bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
