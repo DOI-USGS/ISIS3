@@ -268,7 +268,7 @@ namespace Isis {
           }
         }
 
-        QVariant result = frameCode;
+        QVariant result = (int)frameCode;
         storeValue("BODY_FRAME_CODE",0,SpiceIntType,result);
       }
       else {
