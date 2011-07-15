@@ -6318,10 +6318,6 @@ void BundleAdjust::SpecialKIterationSummary() {
           std::vector <double> coordinate(3);
           coordinate = pSpicePosition->GetCenterCoordinate();
 
-      BFP = pCamera->BodyRotation()->ReferenceVector(pSpicePosition->Coordinate());
-      std::cout << "**body-fixed = " << BFP[0] <<" "<<BFP[1] <<" "<<BFP[2] << std::endl;
-
-
           PosX[0] = coordinate[0];
           PosY[0] = coordinate[1];
           PosZ[0] = coordinate[2];
