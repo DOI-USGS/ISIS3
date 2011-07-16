@@ -2,12 +2,18 @@
 #--------------------------------------------------------------------------
 # Compiler options
 #---------------------------------------------------------------------------
+#  Set all builds to 32-bit architecture until support for others is added
+MAC_ARCH = -arch i386
+MAC_OS_MIN = -mmacosx-version-min=10.5
+
 #  Basically is GNU g++/gcc
 CXX           = c++
 CC            = cc
 
 ISISCPPFLAGS  = -Wall
 ISISCPPFLAGS += -ansi
+ISISCPPFLAGS += $(MAC_ARCH)
+ISISCPPFLAGS += $(MAC_OS_MIN)
 ifeq ($(HOST_PROC), powerpc)
   # Powerpc support
   ISISCPPFLAGS += -DISIS_LITTLE_ENDIAN=0
@@ -32,7 +38,7 @@ ISISCFLAGS =
 #---------------------------------------------------------------------------
 # Linker options.  Runtime paths for Mac is rooted to $ISISROOT
 #---------------------------------------------------------------------------
-ISISLDFLAGS = -headerpad_max_install_names -arch $(HOST_MACH) -bind_at_load -Wl,-w
+ISISLDFLAGS = -headerpad_max_install_names $(MAC_ARCH) $(MAC_OS_MIN) -bind_at_load -Wl,-w
 ISISLDRPATH = -Wl,-rpath,@loader_path/..  -Wl,-rpath,$(ISISROOT)
 ISISSYSLIBS = -lz -lm -framework ApplicationServices
 ISISSTATIC  = 
