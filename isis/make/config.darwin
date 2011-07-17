@@ -51,9 +51,10 @@ RANLIB          = /usr/bin/ranlib
 SHAREDLIBEXT    = dylib
 DYLIBVERSION    = -compatibility_version $(ISISMAJOR).$(ISISMINOR) \
                   -current_version $(ISISLIBVERSION)
-DYLIBFLAGS      = -dynamiclib -flat_namespace  -single_module \
-                  -undefined suppress
-ISISSHAREDFLAGS = -bundle -flat_namespace -dynamic -undefined suppress 
+DYLIBFLAGS      = $(MAC_ARCH) $(MAC_OS_MIN)  -dynamiclib -flat_namespace \
+	   	   -single_module -undefined suppress
+ISISSHAREDFLAGS = $(MAC_ARCH) $(MAC_OS_MIN) -bundle -flat_namespace -dynamic \
+		  -undefined suppress 
 ISISSHAREDON    = 
 ISISSHAREDOFF   =
 ISISARFLAGS     =
