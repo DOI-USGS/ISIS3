@@ -41,13 +41,14 @@ namespace Isis {
    *   that does not result in the cube being enlarged or misordered.
    *
    * @param dataFile The file with cube DN data in it
-   * @param virtualBandList The mapping from virtual band to physical band
+   * @param virtualBandList The mapping from virtual band to physical band, see
+   *        CubeIoHandler's description.
    * @param labels The Pvl labels for the cube
    * @param alreadyOnDisk True if the cube is allocated on the disk, false
    *     otherwise
    */
-  CubeBsqHandler::CubeBsqHandler(QFile * dataFile,  QList<int> *virtualBandList,
-      const Pvl &labels, bool alreadyOnDisk)
+  CubeBsqHandler::CubeBsqHandler(QFile * dataFile,
+      const QList<int> *virtualBandList, const Pvl &labels, bool alreadyOnDisk)
       : CubeIoHandler(dataFile, virtualBandList, labels, alreadyOnDisk) {
     int numSamplesInChunk = getSampleCount();
     int numLinesInChunk = 1;

@@ -39,13 +39,14 @@ namespace Isis {
    *   into the output cube.
    *
    * @param dataFile The file with cube DN data in it
-   * @param virtualBandList The mapping from virtual band to physical band
+   * @param virtualBandList The mapping from virtual band to physical band, see
+   *          CubeIoHandler's description.
    * @param labels The Pvl labels for the cube
    * @param alreadyOnDisk True if the cube is allocated on the disk, false
-   *     otherwise
+   *          otherwise
    */
   CubeTileHandler::CubeTileHandler(QFile * dataFile,
-      QList<int> *virtualBandList, const Pvl &labels, bool alreadyOnDisk)
+      const QList<int> *virtualBandList, const Pvl &labels, bool alreadyOnDisk)
       : CubeIoHandler(dataFile, virtualBandList, labels, alreadyOnDisk) {
 
     const PvlObject &core = labels.FindObject("IsisCube").FindObject("Core");

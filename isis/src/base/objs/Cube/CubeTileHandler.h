@@ -51,7 +51,7 @@ namespace Isis {
 
   class CubeTileHandler : public CubeIoHandler {
     public:
-      CubeTileHandler(QFile * dataFile, QList<int> *virtualBandList,
+      CubeTileHandler(QFile * dataFile, const QList<int> *virtualBandList,
           const Pvl &label, bool alreadyOnDisk);
       ~CubeTileHandler();
 

@@ -48,7 +48,9 @@ namespace Isis {
    *   asks the caching algorithms to recommend cube chunks to not keep in
    *   memory. Children need to call setChunkSizes() in their constructor.
    *
-   * This class handles all of the virtual band conversions.
+   * This class handles all of the virtual band conversions. This class also
+   *   guarantees that unwritten cube data ends up read and written as NULLs.
+   *   The default caching algorithm is a RegionalCachingAlgorithm.
    *
    * @author Jai Rideout and Steven Lambright
    *
@@ -63,7 +65,7 @@ namespace Isis {
    */
   class CubeIoHandler {
     public:
-      CubeIoHandler(QFile * dataFile, QList<int> *virtualBandList,
+      CubeIoHandler(QFile * dataFile, const QList<int> *virtualBandList,
           const Pvl &label, bool alreadyOnDisk);
       virtual ~CubeIoHandler();
 
@@ -73,7 +75,7 @@ namespace Isis {
       void addCachingAlgorithm(CubeCachingAlgorithm *algorithm);
       void clearCache();
       BigInt getDataSize() const;
-      void setVirtualBands(QList<int> *virtualBandList);
+      void setVirtualBands(const QList<int> *virtualBandList);
       virtual void updateLabels(Pvl &labels);
 
     protected:
@@ -98,6 +100,7 @@ namespace Isis {
        * This needs to populate the chunkToFill with unswapped raw bytes from
        *   the disk.
        *
+       * @see CubeTileHandler::readRaw()
        * @param chunkToFill The container that needs to be filled with cube
        *                    data.
        */
@@ -107,6 +110,7 @@ namespace Isis {
        * This needs to write the chunkToWrite directly to disk with no
        *   modifications to the data itself.
        *
+       * @see CubeTileHandler::writeRaw()
        * @param chunkToWrite The container that needs to be put on disk.
        */
       virtual void writeRaw(const RawCubeChunk &chunkToWrite) = 0;

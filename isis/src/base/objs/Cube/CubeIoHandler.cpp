@@ -52,17 +52,23 @@ using namespace std;
 
 namespace Isis {
   /**
-   * This is the constructor.
+   * Creates a new CubeIoHandler using a RegionalCachingAlgorithm. The chunk
+   *   sizes must be set by a child in its constructor.
    *
-   * @param dataFile The file that contains cube data.
+   * @param dataFile The file that contains cube data. This should be a valid,
+   *          opened QFile and may not be NULL. The file should have at least
+   *          read permissions.
    * @param virtualBandList A list where the indices are the vbands and the
-   *          values are the physical bands.
+   *          values are the physical bands. The values are 1-based. This can
+   *          be specified as NULL, in which case the vbands are the physical
+   *          bands. The virtual band list is copied (the pointer provided isn't
+   *          remembered).
    * @param label The label which contains the "Pixels" and "Core" groups.
    * @param alreadyOnDisk True if the cube exists; false ensures all NULLs are
-   *          initialized into the file.
+   *          initialized into the file before this object is destructed.
    */
-  CubeIoHandler::CubeIoHandler(QFile * dataFile,  QList<int> *virtualBandList,
-      const Pvl &label, bool alreadyOnDisk) {
+  CubeIoHandler::CubeIoHandler(QFile * dataFile,
+      const QList<int> *virtualBandList, const Pvl &label, bool alreadyOnDisk) {
     m_byteSwapper = NULL;
     m_cachingAlgorithms = NULL;
     m_dataIsOnDiskMap = NULL;
@@ -71,44 +77,58 @@ namespace Isis {
     m_nullChunkData = NULL;
     m_lastProcessByLineChunks = NULL;
 
-    m_cachingAlgorithms = new QList<CubeCachingAlgorithm *>;
-    m_rawData = new QMap<int, RawCubeChunk *>;
+    try {
+      if (!dataFile) {
+        iString msg = "Cannot create a CubeIoHandler with a NULL data file";
+        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      }
 
-    m_cachingAlgorithms->append(new RegionalCachingAlgorithm);
+      m_cachingAlgorithms = new QList<CubeCachingAlgorithm *>;
+      m_rawData = new QMap<int, RawCubeChunk *>;
 
-    m_dataFile = dataFile;
+      m_cachingAlgorithms->append(new RegionalCachingAlgorithm);
 
-    const PvlObject &core = label.FindObject("IsisCube").FindObject("Core");
-    const PvlGroup &pixelGroup = core.FindGroup("Pixels");
+      m_dataFile = dataFile;
 
-    iString byteOrderStr = pixelGroup.FindKeyword("ByteOrder")[0];
-    m_byteSwapper = new EndianSwapper(
-        byteOrderStr.UpCase());
-    m_base = pixelGroup.FindKeyword("Base");
-    m_multiplier = pixelGroup.FindKeyword("Multiplier");
-    m_pixelType = PixelTypeEnumeration(pixelGroup.FindKeyword("Type"));
+      const PvlObject &core = label.FindObject("IsisCube").FindObject("Core");
+      const PvlGroup &pixelGroup = core.FindGroup("Pixels");
 
-    if(!m_byteSwapper->willSwap()) {
-      delete m_byteSwapper;
-      m_byteSwapper = NULL;
+      iString byteOrderStr = pixelGroup.FindKeyword("ByteOrder")[0];
+      m_byteSwapper = new EndianSwapper(
+          byteOrderStr.UpCase());
+      m_base = pixelGroup.FindKeyword("Base");
+      m_multiplier = pixelGroup.FindKeyword("Multiplier");
+      m_pixelType = PixelTypeEnumeration(pixelGroup.FindKeyword("Type"));
+
+      // If the byte swapper isn't going to do anything, then get rid of it
+      //   because it's quicker to check for a NULL byte swapper member than to
+      //   call a swap that won't do anything.
+      if(!m_byteSwapper->willSwap()) {
+        delete m_byteSwapper;
+        m_byteSwapper = NULL;
+      }
+
+      const PvlGroup &dimensions = core.FindGroup("Dimensions");
+      m_numSamples = dimensions.FindKeyword("Samples");
+      m_numLines = dimensions.FindKeyword("Lines");
+      m_numBands = dimensions.FindKeyword("Bands");
+
+      m_startByte = (int)core.FindKeyword("StartByte") - 1;
+
+      m_samplesInChunk = -1;
+      m_linesInChunk = -1;
+      m_bandsInChunk = -1;
+
+      if(!alreadyOnDisk) {
+        m_dataIsOnDiskMap = new QMap<int, bool>;
+      }
+
+      setVirtualBands(virtualBandList);
     }
-
-    const PvlGroup &dimensions = core.FindGroup("Dimensions");
-    m_numSamples = dimensions.FindKeyword("Samples");
-    m_numLines = dimensions.FindKeyword("Lines");
-    m_numBands = dimensions.FindKeyword("Bands");
-
-    m_startByte = (int)core.FindKeyword("StartByte") - 1;
-
-    m_samplesInChunk = -1;
-    m_linesInChunk = -1;
-    m_bandsInChunk = -1;
-
-    if(!alreadyOnDisk) {
-      m_dataIsOnDiskMap = new QMap<int, bool>;
+    catch(...) {
+      iString msg = "Constructing CubeIoHandler failed";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
-
-    setVirtualBands(virtualBandList);
   }
 
 
@@ -344,9 +364,12 @@ namespace Isis {
    * This changes the virtual band list.
    *
    * @param virtualBandList A list where the indices are the vbands and the
-   *          values are the physical bands.
+   *          values are the physical bands. The values are 1-based. This can
+   *          be specified as NULL, in which case the vbands are the physical
+   *          bands. The virtual band list is copied
+   *          (the pointer provided isn't remembered).
    */
-  void CubeIoHandler::setVirtualBands(QList<int> *virtualBandList) {
+  void CubeIoHandler::setVirtualBands(const QList<int> *virtualBandList) {
     if(m_virtualBands) {
       delete m_virtualBands;
       m_virtualBands = NULL;

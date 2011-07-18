@@ -52,7 +52,7 @@ namespace Isis {
    */
   class CubeBsqHandler : public CubeIoHandler {
     public:
-      CubeBsqHandler(QFile * dataFile, QList<int> *virtualBandList,
+      CubeBsqHandler(QFile * dataFile, const QList<int> *virtualBandList,
           const Pvl &label, bool alreadyOnDisk);
       ~CubeBsqHandler();
 
