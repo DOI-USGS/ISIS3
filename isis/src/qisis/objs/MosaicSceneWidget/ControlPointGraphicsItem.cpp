@@ -37,7 +37,7 @@ namespace Isis {
     if(cp->IsIgnored())
       setPen(QPen(Qt::red));
     else if(cp->IsEditLocked())
-      setPen(QPen(Qt::darkMagenta));
+      setPen(QPen(Qt::magenta));
     else if(cp->GetType() == ControlPoint::Fixed)
       setPen(QPen(Qt::green));
     else if(cp->GetType() == ControlPoint::Constrained)
