@@ -46,14 +46,17 @@ namespace Isis {
    * This class handles converting buffers to and from disk. This class holds
    *   the cube chunks in memory and is capable of reading and writing them. It
    *   asks the caching algorithms to recommend cube chunks to not keep in
-   *   memory. Children need to call setChunkSizes(...) in their constructor.
+   *   memory. Children need to call setChunkSizes() in their constructor.
    *
    * This class handles all of the virtual band conversions.
    *
    * @author Jai Rideout and Steven Lambright
    *
    * @internal
-   *   @history 2011-06-27 Steven Lambright - Added addCachingAlgorithm
+   *   @history 2011-06-27 Steven Lambright - Added addCachingAlgorithm()
+   *   @history 2011-07-18 Jai Rideout and Steven Lambright - Added
+   *                           unimplemented copy constructor and assignment
+   *                           operator.
    */
   class CubeIoHandler {
     public:
@@ -106,6 +109,22 @@ namespace Isis {
       virtual void writeRaw(const RawCubeChunk &chunkToWrite) const = 0;
 
     private:
+      /**
+       * Disallow copying of this object.
+       *
+       * @param other The object to copy.
+       */
+      CubeIoHandler(const CubeIoHandler &other);
+
+      /**
+       * Disallow assignments of this object
+       *
+       * @param other The CubeIoHandler on the right-hand side of the assignment
+       *              that we are copying into *this.
+       * @return A reference to *this.
+       */
+      CubeIoHandler &operator=(const CubeIoHandler &other);
+
       QList<RawCubeChunk *> findCubeChunks(int startSample,
           int numSamples, int startLine, int numLines, int startBand,
           int numBands);

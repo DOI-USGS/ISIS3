@@ -27,9 +27,6 @@
 
 namespace Isis {
   /**
-   * @internal
-   *   @todo CubeBsqHandler doesn't have any documentation.
-   *
    * @brief IO Handler for Isis Cubes using the BSQ format.
    *
    * This class is used to open, create, read, and write data from Isis cube
@@ -46,7 +43,12 @@ namespace Isis {
    *   @history 2007-10-11 Stuart Sides - Fixed bug introduced with
    *            previous bug fix.
    *   @history 2008-09-03 Steven Lambright - Fixed MSB/LSB problem with
-   *            the Move(...) method
+   *            the Move() method
+   *   @history 2011-06-16 Jai Rideout and Steven Lambright - Refactored to
+   *                           work with the new parent.
+   *   @history 2011-07-18 Jai Rideout and Steven Lambright - Added
+   *                           unimplemented copy constructor and assignment
+   *                           operator.
    */
   class CubeBsqHandler : public CubeIoHandler {
     public:
@@ -61,6 +63,22 @@ namespace Isis {
       virtual void writeRaw(const RawCubeChunk &chunkToWrite) const;
 
     private:
+      /**
+       * Disallow copying of this object.
+       *
+       * @param other The object to copy.
+       */
+      CubeBsqHandler(const CubeBsqHandler &other);
+
+      /**
+       * Disallow assignments of this object
+       *
+       * @param other The CubeBsqHandler on the right-hand side of the
+       *              assignment that we are copying into *this.
+       * @return A reference to *this.
+       */
+      CubeBsqHandler &operator=(const CubeBsqHandler &other);
+
       BigInt getChunkStartByte(const RawCubeChunk &chunk) const;
   };
 }

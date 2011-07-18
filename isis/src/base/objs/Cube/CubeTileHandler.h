@@ -42,6 +42,11 @@ namespace Isis {
    *   @history 2007-09-14 Stuart Sides - Fixed bug where pixels
    *            from a buffer outside the ns/nl were being
    *            transfered to the right most and bottom most tiles
+   *   @history 2011-06-16 Jai Rideout and Steven Lambright - Refactored to
+   *                           work with the new parent.
+   *   @history 2011-07-18 Jai Rideout and Steven Lambright - Added
+   *                           unimplemented copy constructor and assignment
+   *                           operator.
    */
 
   class CubeTileHandler : public CubeIoHandler {
@@ -57,6 +62,22 @@ namespace Isis {
       virtual void writeRaw(const RawCubeChunk &chunkToWrite) const;
 
     private:
+      /**
+       * Disallow copying of this object.
+       *
+       * @param other The object to copy.
+       */
+      CubeTileHandler(const CubeTileHandler &other);
+
+      /**
+       * Disallow assignments of this object
+       *
+       * @param other The CubeTileHandler on the right-hand side of the
+       *              assignment that we are copying into *this.
+       * @return A reference to *this.
+       */
+      CubeTileHandler &operator=(const CubeTileHandler &other);
+
       int findGoodSize(int maxSize, int dimensionSize) const;
       BigInt getTileStartByte(const RawCubeChunk &chunk) const;
   };
