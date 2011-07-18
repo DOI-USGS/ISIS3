@@ -20,11 +20,12 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include "Process.h"
+#include "BoxcarCachingAlgorithm.h"
+#include "BoxcarManager.h"
 #include "Buffer.h"
 #include "LineManager.h"
+#include "Process.h"
 #include "ProcessByBoxcar.h"
-#include "BoxcarManager.h"
 
 using namespace std;
 namespace Isis {
@@ -97,6 +98,9 @@ namespace Isis {
     Isis::LineManager line(*OutputCubes[0]);
     double out;
 
+    InputCubes[0]->addCachingAlgorithm(new BoxcarCachingAlgorithm());
+    OutputCubes[0]->addCachingAlgorithm(new BoxcarCachingAlgorithm());
+
     // Loop and let the app programmer use the boxcar to change output pixel
     p_progress->SetMaximumSteps(InputCubes[0]->getLineCount()*InputCubes[0]->getBandCount());
     p_progress->CheckStatus();
@@ -105,7 +109,7 @@ namespace Isis {
     for(line.begin(); !line.end(); line.next()) {
       for(int i = 0; i < line.size(); i++) {
         InputCubes[0]->read(box);
-        funct(box, out);
+        //funct(box, out);
         line[i] = out;
         box++;
       }
