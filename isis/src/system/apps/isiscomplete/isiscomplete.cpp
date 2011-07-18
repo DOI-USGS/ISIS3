@@ -48,6 +48,11 @@ void MakeCompletion(const string &appName) {
 
   if(appName.compare("qnet") == 0) return;
 
+  if(appName.compare("cneteditor") == 0) {
+    cout << "complete cneteditor 'n@*@f:*.[nN][eE][tT]@'; ";
+    return;
+  }
+
   if(appName.compare("isisui") == 0) {
     string binPath = Filename("$ISISROOT/bin").Expanded();
     cout << "complete isisui 'n@*@F:" << binPath << "/@'; ";

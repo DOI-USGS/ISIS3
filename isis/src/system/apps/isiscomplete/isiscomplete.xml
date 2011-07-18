@@ -31,8 +31,11 @@
       This program now handles isisui properly
     </change>
     <change name="Kris Becker" date="2009-11-27">
-        Changed the call to Application to provide compatability withg Qt 
-        startup requirements.
+      Changed the call to Application to provide compatability withg Qt 
+      startup requirements.
+    </change>
+    <change name="Jai Rideout" date="2011-07-18">
+      This program now handles cneteditor properly
     </change>
   </history>
 </application>
