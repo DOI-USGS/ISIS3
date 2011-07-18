@@ -41,15 +41,16 @@ void MakeCompletion(const string &appName) {
   strcpy(argv[1], "-nogui");
 
   // Do not complete image-viewer applications
-  if(appName.compare("qview") == 0) {
-    cout << "complete qview 'c/-/(new)/'; ";
+  if(appName.compare("qview") == 0 || appName.compare("./qview") == 0) {
+    cout << "complete " << appName << " 'c/-/(new)/'; ";
     return;
   }
 
   if(appName.compare("qnet") == 0) return;
 
-  if(appName.compare("cneteditor") == 0) {
-    cout << "complete cneteditor 'n@*@f:*.[nN][eE][tT]@'; ";
+  if(appName.compare("cneteditor") == 0 ||
+     appName.compare("./cneteditor") == 0) {
+    cout << "complete " << appName << " 'n@*@f:*.[nN][eE][tT]@'; ";
     return;
   }
 
