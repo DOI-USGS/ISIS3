@@ -57,6 +57,9 @@ namespace Isis {
    *   @history 2011-07-18 Jai Rideout and Steven Lambright - Added
    *                           unimplemented copy constructor and assignment
    *                           operator.
+   *   @history 2011-07-18 Jai Rideout and Steven Lambright -getDataFile() is
+   *                           no longer const, along with readRaw() and
+   *                           writeRaw().
    */
   class CubeIoHandler {
     public:
@@ -82,7 +85,7 @@ namespace Isis {
       int getChunkCountInSampleDimension() const;
       int getChunkIndex(const RawCubeChunk &)  const;
       BigInt getDataStartByte() const;
-      QFile * getDataFile() const;
+      QFile * getDataFile();
       int getLineCount() const;
       int getLineCountInChunk() const;
       PixelType getPixelType() const;
@@ -98,7 +101,7 @@ namespace Isis {
        * @param chunkToFill The container that needs to be filled with cube
        *                    data.
        */
-      virtual void readRaw(RawCubeChunk &chunkToFill) const = 0;
+      virtual void readRaw(RawCubeChunk &chunkToFill) = 0;
 
       /**
        * This needs to write the chunkToWrite directly to disk with no
@@ -106,7 +109,7 @@ namespace Isis {
        *
        * @param chunkToWrite The container that needs to be put on disk.
        */
-      virtual void writeRaw(const RawCubeChunk &chunkToWrite) const = 0;
+      virtual void writeRaw(const RawCubeChunk &chunkToWrite) = 0;
 
     private:
       /**

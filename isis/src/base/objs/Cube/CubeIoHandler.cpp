@@ -469,7 +469,7 @@ namespace Isis {
    * 
    * @return The data file for I/O
    */
-  QFile * CubeIoHandler::getDataFile() const {
+  QFile * CubeIoHandler::getDataFile() {
     return m_dataFile;
   }
 

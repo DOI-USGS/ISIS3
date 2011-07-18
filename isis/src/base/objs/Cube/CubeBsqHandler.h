@@ -59,8 +59,8 @@ namespace Isis {
       void updateLabels(Pvl &labels);
 
     protected:
-      virtual void readRaw(RawCubeChunk &chunkToFill) const;
-      virtual void writeRaw(const RawCubeChunk &chunkToWrite) const;
+      virtual void readRaw(RawCubeChunk &chunkToFill);
+      virtual void writeRaw(const RawCubeChunk &chunkToWrite);
 
     private:
       /**

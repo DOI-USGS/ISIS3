@@ -89,7 +89,7 @@ namespace Isis {
   }
 
 
-  void CubeTileHandler::readRaw(RawCubeChunk &chunkToFill) const {
+  void CubeTileHandler::readRaw(RawCubeChunk &chunkToFill) {
     BigInt startByte = getTileStartByte(chunkToFill);
 
     bool success = false;
@@ -114,7 +114,7 @@ namespace Isis {
   }
 
 
-  void CubeTileHandler::writeRaw(const RawCubeChunk &chunkToWrite) const {
+  void CubeTileHandler::writeRaw(const RawCubeChunk &chunkToWrite) {
     BigInt startByte = getTileStartByte(chunkToWrite);
     bool success = false;
 
