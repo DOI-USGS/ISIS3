@@ -109,7 +109,7 @@ namespace Isis {
     for(line.begin(); !line.end(); line.next()) {
       for(int i = 0; i < line.size(); i++) {
         InputCubes[0]->read(box);
-        //funct(box, out);
+        funct(box, out);
         line[i] = out;
         box++;
       }
