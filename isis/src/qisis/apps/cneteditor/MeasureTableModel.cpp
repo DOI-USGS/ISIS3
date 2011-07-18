@@ -66,8 +66,10 @@ namespace Isis
         return "Minimum Pixel Z-Score";
       case MaxPixelZScore:
         return "Maximum Pixel Z-Score";
-      case PixelShift:
-        return "Pixel Shift";
+      case SampleShift:
+        return "Sample Shift";
+      case LineShift:
+        return "Line Shift";
       case APrioriSample:
         return "A Priori Sample";
       case APrioriLine:
@@ -157,12 +159,29 @@ namespace Isis
             return QVariant::fromValue(
                 (QString) measure->MeasureTypeToString(measure->GetType()));
           case Eccentricity:
-          case GoodnessOfFit:
-          case MinPixelZScore:
-          case MaxPixelZScore:
-          case PixelShift:
             return QVariant::fromValue(catchNULL(
-                measure->GetLogData(index.column() - 4).GetNumericalValue()));
+                measure->GetLogData(
+                  ControlMeasureLogData::Eccentricity).GetNumericalValue()));
+          case GoodnessOfFit:
+            return QVariant::fromValue(catchNULL(
+                measure->GetLogData(
+                  ControlMeasureLogData::GoodnessOfFit).GetNumericalValue()));
+          case MinPixelZScore:
+            return QVariant::fromValue(catchNULL(
+                measure->GetLogData(ControlMeasureLogData::MinimumPixelZScore).
+                  GetNumericalValue()));
+          case MaxPixelZScore:
+            return QVariant::fromValue(catchNULL(
+                measure->GetLogData(ControlMeasureLogData::MaximumPixelZScore).
+                  GetNumericalValue()));
+          case SampleShift:
+            return QVariant::fromValue(catchNULL(
+                measure->GetLogData(
+                  ControlMeasureLogData::SampleShift).GetNumericalValue()));
+          case LineShift:
+            return QVariant::fromValue(catchNULL(
+                measure->GetLogData(
+                  ControlMeasureLogData::LineShift).GetNumericalValue()));
           case APrioriSample:
             return QVariant::fromValue(catchNULL(measure->GetAprioriSample()));
           case APrioriLine:
@@ -245,7 +264,8 @@ namespace Isis
             case GoodnessOfFit:
             case MinPixelZScore:
             case MaxPixelZScore:
-            case PixelShift:
+            case SampleShift:
+            case LineShift:
             case APrioriSample:
             case APrioriLine:
             case Diameter:
@@ -314,30 +334,24 @@ namespace Isis
             measure->SetType(measure->StringToMeasureType(value.toString()));
             break;
           case Eccentricity:
+            setLogData(measure, ControlMeasureLogData::Eccentricity, value);
+            break;
           case GoodnessOfFit:
+            setLogData(measure, ControlMeasureLogData::GoodnessOfFit, value);
+            break;
           case MinPixelZScore:
+            setLogData(measure, ControlMeasureLogData::MinimumPixelZScore,
+                       value);
+            break;
           case MaxPixelZScore:
-          case PixelShift:
-//             try
-            {
-              QString newDataStr = value.toString().toLower();
-              ControlMeasureLogData::NumericLogDataType type =
-                (ControlMeasureLogData::NumericLogDataType)(col - 4);
-              if (newDataStr == "null")
-              {
-                measure->DeleteLogData(type);
-              }
-              else
-              {
-                measure->SetLogData(ControlMeasureLogData(type,
-                    value.toDouble()));
-              }
-//             }
-//             catch (iException e)
-//             {
-//               cerr << "MeasureTableModel::setData... FAILED!!!\n";
-//               e.Clear();
-            }
+            setLogData(measure, ControlMeasureLogData::MaximumPixelZScore,
+                       value);
+            break;
+          case SampleShift:
+            setLogData(measure, ControlMeasureLogData::SampleShift, value);
+            break;
+          case LineShift:
+            setLogData(measure, ControlMeasureLogData::LineShift, value);
             break;
           case APrioriSample:
             measure->SetAprioriSample(catchNULL(value.toString()));
@@ -368,6 +382,23 @@ namespace Isis
       }
     }
     return success;
+  }
+
+
+  void MeasureTableModel::setLogData(ControlMeasure * measure,
+      int measureLogDataEnum, const QVariant & value) {
+    QString newDataStr = value.toString().toLower();
+    ControlMeasureLogData::NumericLogDataType type =
+        (ControlMeasureLogData::NumericLogDataType) measureLogDataEnum;
+    if (newDataStr == "null")
+    {
+      measure->DeleteLogData(type);
+    }
+    else
+    {
+      measure->SetLogData(ControlMeasureLogData(type,
+          value.toDouble()));
+    }
   }
 
 

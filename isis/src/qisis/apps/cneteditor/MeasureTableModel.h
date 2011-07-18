@@ -32,16 +32,17 @@ namespace Isis
         GoodnessOfFit = 8,
         MinPixelZScore = 9,
         MaxPixelZScore = 10,
-        PixelShift = 11,
-        APrioriSample = 12,
-        APrioriLine = 13,
-        Diameter = 14,
-        JigsawRejected = 15,
-        ResidualSample = 16,
-        ResidualLine = 17,
-        ResidualMagnitude = 18
+        SampleShift = 11,
+        LineShift = 12,
+        APrioriSample = 13,
+        APrioriLine = 14,
+        Diameter = 15,
+        JigsawRejected = 16,
+        ResidualSample = 17,
+        ResidualLine = 18,
+        ResidualMagnitude = 19
       };
-      static const int COLS = 19;
+      static const int COLS = 20;
 
 
     public:
@@ -73,6 +74,8 @@ namespace Isis
 
 
     private:
+      void setLogData(ControlMeasure * measure, int measureLogDataEnum,
+                      const QVariant & value);
       bool validateRowColumn(int row, int column,
           bool checkMeasure = true) const;
       double catchNULL(QString) const;
