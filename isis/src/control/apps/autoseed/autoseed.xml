@@ -105,6 +105,10 @@
     <change name="Debbie A. Cook and Tracie Sucharski" date="2011-06-07">
       Changed point type "tie" to "free"
     </change>
+    <change name="Travis Addair" date="2011-07-18">
+      AprioriSample and AprioriLine are now set to the same values as Sample and
+      Line when creating a new Control Measure.
+    </change>
   </history>
 
   <groups>

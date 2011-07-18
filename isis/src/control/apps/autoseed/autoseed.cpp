@@ -5,30 +5,30 @@
 
 #include <QString>
 
+#include "geos/util/GEOSException.h"
+
 #include "Brick.h"
 #include "CameraFactory.h"
-#include "ControlNet.h"
 #include "ControlMeasure.h"
+#include "ControlNet.h"
 #include "ControlPoint.h"
 #include "Cube.h"
-#include "geos/util/GEOSException.h"
 #include "ID.h"
-#include "iException.h"
-#include "iString.h"
 #include "ImageOverlap.h"
 #include "ImageOverlapSet.h"
+#include "ImagePolygon.h"
 #include "PolygonSeeder.h"
 #include "PolygonSeederFactory.h"
 #include "PolygonTools.h"
 #include "Process.h"
 #include "Pvl.h"
-#include "PvlKeyword.h"
 #include "PvlGroup.h"
+#include "PvlKeyword.h"
 #include "SerialNumberList.h"
-#include "UniversalGroundMap.h"
 #include "SpecialPixel.h"
-
-#include "ImagePolygon.h"
+#include "UniversalGroundMap.h"
+#include "iException.h"
+#include "iString.h"
 
 enum SeedDomain {
   XY,
@@ -410,20 +410,22 @@ void IsisMain() {
         }
 
         // Put the line/samp into a measurment
-        ControlMeasure *measurment = new ControlMeasure();
-        measurment->SetCoordinate(gmap->Sample(), gmap->Line(),
+        ControlMeasure *measurement = new ControlMeasure();
+        measurement->SetAprioriSample(gmap->Sample());
+        measurement->SetAprioriLine(gmap->Line());
+        measurement->SetCoordinate(gmap->Sample(), gmap->Line(),
                                   ControlMeasure::Candidate);
 
-        measurment->SetType(ControlMeasure::Candidate);
-        measurment->SetCubeSerialNumber((*(overlaps[ov]))[sn]);
-        measurment->SetIgnored(ignore);
+        measurement->SetType(ControlMeasure::Candidate);
+        measurement->SetCubeSerialNumber((*(overlaps[ov]))[sn]);
+        measurement->SetIgnored(ignore);
 
         if(ignore) {
           cmIgnoredCount ++;
         }
 
-        controlpt->Add(measurment); //controlpt takes ownership
-        measurment = NULL;
+        controlpt->Add(measurement); //controlpt takes ownership
+        measurement = NULL;
       }
 
       if(controlpt->GetNumValidMeasures() < 2) {
