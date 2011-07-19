@@ -120,7 +120,9 @@ namespace Qisis {
     // reverse order since removal list of elements affects index number
     for (int i = g_filteredPoints.size() - 1; i >= 0; i--) {
       Isis::ControlPoint &cp = *(*g_controlNetwork)[g_filteredPoints[i]];
-      double maxPixelError = calculateMaxError(cp);
+//      double maxPixelError = calculateMaxError(cp);
+      double maxPixelError =
+                  cp.GetStatistic(&ControlMeasure::GetPixelShift).Maximum();
       if (p_lessThanCB->isChecked() && p_greaterThanCB->isChecked()) {
         if (maxPixelError < lessNum && maxPixelError > greaterNum) {
           pointMap.insert(maxPixelError, g_filteredPoints[i]);
@@ -193,14 +195,17 @@ namespace Qisis {
 
   double QnetPointRegistrationErrorFilter::calculateMaxError(ControlPoint &cp) {
       // ***** below needs to be updated to whatever is decided on PIXELSHIFT *****
+#if 0
     double maxError = 0.0;
     for (int i = 0; i < cp.GetNumMeasures(); i++) {
-      double sampError =
-                 cp[i]->GetLogData(ControlMeasureLogData::SampleShift).GetNumericalValue();
+      double sampError = cp[i]->GetSampleShift();
 //    double lineError =
 //               cp[i]->GetLogData(ControlMeasureLogData::LineShift).GetNumericalValue();
       if (sampError > maxError) maxError = sampError;
     }
     return maxError;
+    
+#endif
+    return 0;
   }
 }
