@@ -106,11 +106,19 @@ namespace Isis {
       case ResidualMagnitude:
         optString += "Residual Magnitude";
         break;
+      case SampleShift:
+        optString += "Sample Shift";
+        break;
+      case LineShift:
+        optString += "Line Shift";
+        break;
+      case PixelShift:
+        optString += "Pixel Shift";
+        break;
     }
     optString += " ";
 
     return ((errorMsg->isEmpty()) ? "failed: " : "") + optString;
   }
-
 };
 

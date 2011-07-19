@@ -6,7 +6,7 @@ using namespace std;
 using namespace Isis;
 
 int main(void) {
-  Isis::Preference::Preferences(true);
+  Preference::Preferences(true);
   try {
     try {
       Pvl pvlLog;
@@ -29,7 +29,7 @@ int main(void) {
       ControlNetValidMeasure cnetVM(pvlLog);
       cout << cnetVM.GetLogPvl();
     }
-    catch(Isis::iException e) {
+    catch(iException e) {
       e.Report(false);
     }
 
@@ -49,7 +49,7 @@ int main(void) {
       ControlNetValidMeasure cnetVM(pvlLog);
       cout << cnetVM.GetLogPvl();
     }
-    catch(Isis::iException e) {
+    catch(iException e) {
       e.Report(false);
     }
 
@@ -74,7 +74,7 @@ int main(void) {
       ControlNetValidMeasure cnetVM(pvlLog);
       cout << cnetVM.GetLogPvl();
     }
-    catch(Isis::iException e) {
+    catch(iException e) {
       e.Report(false);
     }
 
@@ -96,36 +96,94 @@ int main(void) {
       ControlNetValidMeasure cnetVM(pvlLog);
       cout << cnetVM.GetLogPvl();
     }
-    catch(Isis::iException e) {
+    catch(iException e) {
       e.Report(false);
     }
 
     try {
       Pvl pvlLog;
       PvlGroup op("ValidMeasure");
-      op += PvlKeyword("Name",             "None");
-      op += PvlKeyword("MinDN",            -1.0);
-      op += PvlKeyword("MaxDN",             1.0);
-      op += PvlKeyword("MinEmission",       0.0);
-      op += PvlKeyword("MaxEmission",       135.0);
-      op += PvlKeyword("MinIncidence",      0.0);
-      op += PvlKeyword("MaxIncidence",      135.0);
-      op += PvlKeyword("MinResolution",     100.0);
-      op += PvlKeyword("MaxResolution",     500.0);
-      op += PvlKeyword("SampleResidual",    5.0);
-      op += PvlKeyword("LineResidual",      5.0);
+      op += PvlKeyword("Name", "None");
+      op += PvlKeyword("MinDN", -1.0);
+      op += PvlKeyword("MaxDN", 1.0);
+      op += PvlKeyword("MinEmission", 0.0);
+      op += PvlKeyword("MaxEmission", 135.0);
+      op += PvlKeyword("MinIncidence", 0.0);
+      op += PvlKeyword("MaxIncidence", 135.0);
+      op += PvlKeyword("MinResolution", 100.0);
+      op += PvlKeyword("MaxResolution", 500.0);
+      op += PvlKeyword("SampleResidual", 5.0);
+      op += PvlKeyword("LineResidual", 5.0);
+      op += PvlKeyword("ResidualMagnitude", 10.0);
+      op += PvlKeyword("SampleShift", 5.0);
+      op += PvlKeyword("LineShift", 5.0);
 
       pvlLog += op;
 
       ControlNetValidMeasure cnetVM(pvlLog);
       cout << cnetVM.GetLogPvl();
     }
-    catch(Isis::iException e) {
+    catch(iException e) {
+      e.Report(false);
+    }
+
+    try {
+      Pvl pvlLog;
+      PvlGroup op("ValidMeasure");
+      op += PvlKeyword("Name", "None");
+      op += PvlKeyword("MinDN", -1.0);
+      op += PvlKeyword("MaxDN", 1.0);
+      op += PvlKeyword("MinEmission", 0.0);
+      op += PvlKeyword("MaxEmission", 135.0);
+      op += PvlKeyword("MinIncidence", 0.0);
+      op += PvlKeyword("MaxIncidence", 135.0);
+      op += PvlKeyword("MinResolution", 100.0);
+      op += PvlKeyword("MaxResolution", 500.0);
+      op += PvlKeyword("SampleResidual", 5.0);
+      op += PvlKeyword("LineResidual", 5.0);
+      op += PvlKeyword("SampleShift", 5.0);
+      op += PvlKeyword("LineShift", 5.0);
+      op += PvlKeyword("PixelShift", 10.0);
+
+      pvlLog += op;
+
+      ControlNetValidMeasure cnetVM(pvlLog);
+      cout << cnetVM.GetLogPvl();
+    }
+    catch(iException e) {
+      e.Report(false);
+    }
+
+    try {
+      Pvl pvlLog;
+      PvlGroup op("ValidMeasure");
+      op += PvlKeyword("Name", "None");
+      op += PvlKeyword("MinDN", -1.0);
+      op += PvlKeyword("MaxDN", 1.0);
+      op += PvlKeyword("MinEmission", 0.0);
+      op += PvlKeyword("MaxEmission", 135.0);
+      op += PvlKeyword("MinIncidence", 0.0);
+      op += PvlKeyword("MaxIncidence", 135.0);
+      op += PvlKeyword("MinResolution", 100.0);
+      op += PvlKeyword("MaxResolution", 500.0);
+      op += PvlKeyword("SampleResidual", 5.0);
+      op += PvlKeyword("LineResidual", 5.0);
+      op += PvlKeyword("SampleShift", 5.0);
+      op += PvlKeyword("LineShift", 5.0);
+
+      pvlLog += op;
+
+      ControlNetValidMeasure cnetVM(pvlLog);
+      cout << cnetVM.GetLogPvl();
+    }
+    catch(iException e) {
       e.Report(false);
     }
   }
-  catch(Isis::iException e) {
-    throw Isis::iException::Message(Isis::iException::Programmer, "ControlNetValidMeasure Unit test Exception", _FILEINFO_);
+  catch(iException e) {
+    throw iException::Message(
+        iException::Programmer, "ControlNetValidMeasure Unit test Exception",
+        _FILEINFO_);
   }
 
   return 0;

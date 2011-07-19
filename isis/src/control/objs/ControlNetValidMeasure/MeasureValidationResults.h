@@ -1,8 +1,6 @@
 #ifndef _MeasureValidationResults_h_
 #define _MeasureValidationResults_h_
 
-#include <string.h>
-
 class QString;
 template< class T > class QVector;
 
@@ -52,7 +50,10 @@ namespace Isis {
         MetersFromEdge,
         SampleResidual,
         LineResidual,
-        ResidualMagnitude
+        ResidualMagnitude,
+        SampleShift,
+        LineShift,
+        PixelShift
       };
 
       MeasureValidationResults();

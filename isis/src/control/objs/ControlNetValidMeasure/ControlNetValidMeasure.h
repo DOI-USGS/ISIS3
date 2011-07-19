@@ -106,6 +106,9 @@ namespace Isis {
       //! Validate whether the Residuals are within the set Tolerance
       bool ValidResidualTolerances(double pdSampleResidual, double pdLineResidual, 
                      double pdResidualMagnitude, MeasureValidationResults & pResults);
+
+      bool ValidShiftTolerances(double sampleShift, double lineShift,
+          double pixelShift, MeasureValidationResults &results);
       
       //! Validate the Lat/Lon
       bool ValidLatLon(Isis::Camera *pCamera, int piSample, int piLine); 
@@ -201,6 +204,8 @@ namespace Isis {
       
       //! Validate Pvl Sample, Line, Residual Magnitude Tolerances
       void ValidatePvlResidualTolerances(void);
+
+      void ValidatePvlShiftTolerances();
       
       //! Read the Serial Numbers from the file and open assocaited cubes
       void ReadSerialNumbers(std::string psSerialNumfile);
@@ -243,6 +248,10 @@ namespace Isis {
       double mdLineResTolerance;       //!< Standard Option Line Residual
       double mdResidualTolerance;      //!< Standard Option Residual Magnitude
 
+      double m_sampleShiftTolerance;   //!< Standard Option Sample Shift
+      double m_lineShiftTolerance;     //!< Standard Option Line Shift
+      double m_pixelShiftTolerance;    //!< Standard Option Pixel Shift
+
       double mdEmissionAngle;          //!< Store current Measure's Emission Angle
       double mdIncidenceAngle;         //!< Store current Measure's Incidence Angle
       double mdResolution;             //!< Store current Measure's Resolution
@@ -250,6 +259,10 @@ namespace Isis {
       double mdSampleResidual;         //!< Store current Measure's Sample Residual
       double mdLineResidual;           //!< Store current Measure's Line Residual
       double mdResidualMagnitude;      //!< Store current Measure's Residual Magnitude
+
+      double m_sampleShift;            //!< Store current Measure's Sample Shift
+      double m_lineShift;              //!< Store current Measure's Line Shift
+      double m_pixelShift;             //!< Store current Measure's Pixel Shift
 
       PvlGroup mPvlOpGrp;              //!< Pvl Operator Group
       PvlGroup mStdOptionsGrp;         //!< Pvl Standard Options Group

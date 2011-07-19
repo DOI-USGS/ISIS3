@@ -2,6 +2,10 @@
 **USER ERROR** Min EmissionAngle must be less than Max EmissionAngle
 **USER ERROR** Invalid Max Incidence Angle, Valid Range is [0-135]
 **USER ERROR** Invalid Resolution value(s), Resolution must be greater than zero
+**USER ERROR** Cannot have both Sample/Line Residuals and Residual Magnitude.
+Choose either Sample/Line Residual or Residual Magnitude
+**USER ERROR** Cannot have both Sample/Line Shift and Pixel Shift tolerances.
+Choose either Sample/Line Shift or Pixel Shift to validate on
 Group = StandardOptions
   MinDN             = -1.0
   MaxDN             = 1.0
@@ -14,5 +18,8 @@ Group = StandardOptions
   SampleResidual    = 5.0
   LineResidual      = 5.0
   ResidualMagnitude = 1.79769313486232e+308
+  SampleShift       = 5.0
+  LineShift         = 5.0
+  PixelShift        = 1.79769313486232e+308
 End_Group
 End
