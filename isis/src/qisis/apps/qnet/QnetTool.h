@@ -169,6 +169,8 @@ namespace Qisis {
         CUBESN,
         SAMPLE,
         LINE,
+        APRIORISAMPLE,
+        APRIORILINE,
         SAMPLERESIDUAL,
         LINERESIDUAL,
         RESIDUALMAGNITUDE,
@@ -178,9 +180,7 @@ namespace Qisis {
         GOODNESSOFFIT,
         IGNORED,
         EDITLOCK,
-        TYPE,
-        APRIORISAMPLE,
-        APRIORILINE
+        TYPE
       };
       static const int NUMCOLUMNS = 16;
 

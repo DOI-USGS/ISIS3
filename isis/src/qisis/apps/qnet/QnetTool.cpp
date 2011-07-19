@@ -676,10 +676,11 @@ namespace Qisis {
       p_editPoint->SetRefMeasure(p_leftMeasure->GetCubeSerialNumber());
     }
 
-    // If this is a fixed or constrained point, if right measure 
-    // is the ground source, update the lat,lon,radius.
+    // If this is a fixed or constrained point, if either measure (left or
+    // right) is the ground source, update the lat,lon,radius.
     if (p_editPoint->GetType() != ControlPoint::Free &&
-        p_rightMeasure->GetCubeSerialNumber() == p_groundSN) {
+        (p_leftMeasure->GetCubeSerialNumber() == p_groundSN ||
+         p_rightMeasure->GetCubeSerialNumber() == p_groundSN)) {
 
       //  Point is editLocked.  Print warning if the point already exists in the
       //  network.  If it is a new point with the editLock keyword set, do not
@@ -715,9 +716,22 @@ namespace Qisis {
 //                                groundMeasure->GetLine())) {
 //      //  TODO  error??? This should never happen
 //    }
-      if (!p_groundGmap->SetImage(p_rightMeasure->GetSample(),
-                                  p_rightMeasure->GetLine())) {
-        //  TODO  error??? This should never happen
+      
+      // Is ground on right or left?  Use ground measure to update apriori
+      //  surface point.
+      if (p_leftMeasure->GetCubeSerialNumber() == p_groundSN) {
+        if (!p_groundGmap->SetImage(p_leftMeasure->GetSample(),
+                                    p_leftMeasure->GetLine())) {
+          // TODO :  should never happen, either add error check or
+         //        get rid of
+        }
+      }
+      else {
+        if (!p_groundGmap->SetImage(p_rightMeasure->GetSample(),
+                                    p_rightMeasure->GetLine())) {
+          // TODO :  should never happen, either add error check or
+           //      get rid of
+        }
       }
 
       double lat = p_groundGmap->UniversalLatitude();
@@ -1257,24 +1271,6 @@ namespace Qisis {
         }
       }
     }
-
-    //  If point is on a single file, print error and return, do not create
-    //  point.
-    //     ????  Need to allow a point to be created w/single measure.  Display
-    //     ????  measure on right or left?
-//  if(pointFiles.size() == 1) {
-//    try {
-//      throw iException::Message(iException::User,
-//              "Cannot add point, it only exists on 1 image. Point will not be added to control network.",
-//                                      _FILEINFO_);
-//    }
-//    catch (iException &e) {
-//      QString message = e.Errors().c_str();
-//      QMessageBox::warning((QWidget *)parent(), "Warning", message);
-//      e.Clear();
-//      return;
-//    }
-//  }
 
     QnetNewPointDialog *newPointDialog = new QnetNewPointDialog();
     newPointDialog->SetFiles(pointFiles);
@@ -1865,8 +1861,7 @@ namespace Qisis {
       }
       p_measureTable->setItem(row,column++,tableItem);
 
-      double sampleShift = m.GetLogData(
-                      ControlMeasureLogData::SampleShift).GetNumericalValue();
+      double sampleShift = m.GetSampleShift();
       if (sampleShift == Isis::Null) {
         tableItem = new QTableWidgetItem(QString("Null"));
       }
@@ -1876,8 +1871,7 @@ namespace Qisis {
       }
       p_measureTable->setItem(row,column++,tableItem);
 
-      double lineShift = m.GetLogData(
-                      ControlMeasureLogData::LineShift).GetNumericalValue();
+      double lineShift = m.GetLineShift();
       if (lineShift == Isis::Null) {
         tableItem = new QTableWidgetItem(QString("Null"));
       }
@@ -1887,10 +1881,7 @@ namespace Qisis {
       }
       p_measureTable->setItem(row,column++,tableItem);
 
-      double pixelShift = Isis::Null;
-      if (sampleShift != Isis::Null && lineShift != Isis::Null) {
-        pixelShift = sqrt((sampleShift*sampleShift) + (lineShift*lineShift));
-      }
+      double pixelShift = m.GetPixelShift();
       if (pixelShift == Isis::Null) {
         tableItem = new QTableWidgetItem(QString("Null"));
       }
