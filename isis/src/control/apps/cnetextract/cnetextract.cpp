@@ -38,6 +38,8 @@ bool NotInLatLonRange(SurfacePoint surfacePt, Latitude minlat,
                       Latitude maxlat, Longitude minlon, Longitude maxlon);
 void WriteCubeOutList(ControlNet cnet, QMap<iString, iString> sn2file);
 void WriteResults(iString filename, QVector<iString> results);
+void omit(ControlNet &cnet, int cp);
+void omit(ControlPoint *point, int cm);
 
 // Main program
 void IsisMain() {
@@ -137,12 +139,12 @@ void IsisMain() {
     // Do preliminary exclusion checks
     if(noIgnore && controlpt->IsIgnored()) {
       ignoredPoints.append(controlpt->GetId());
-      outNet.DeletePoint(cp);
+      omit(outNet, cp);
       continue;
     }
     if(fixed && !(controlpt->GetType() == ControlPoint::Fixed)) {
       nonFixedPoints.append(controlpt->GetId());
-      outNet.DeletePoint(cp);
+      omit(outNet, cp);
       continue;
     }
 
@@ -153,13 +155,18 @@ void IsisMain() {
 
       if(invalidPoint) {
         singleMeasurePoints.append(controlpt->GetId());
-        outNet.DeletePoint(cp);
+        omit(outNet, cp);
         continue;
       }
     }
 
     // Change the current point into a new point by manipulation of its control measures
     ControlPoint *newPoint = outNet.GetPoint(cp);
+    bool replaceLock = false;
+    if (newPoint->IsEditLocked()) {
+      newPoint->SetEditLock(false);
+      replaceLock = true;
+    }
 
     bool shouldDeleteReferenceMeasure = false;
     for(int cm = newPoint->GetNumMeasures() - 1; cm >= 0; cm --) {
@@ -169,13 +176,13 @@ void IsisMain() {
         ignoredMeasures.append(newPoint->GetId() + "," + newMeasure->GetCubeSerialNumber());
         //New error with deleting Reference Measures
         if(newPoint->GetRefMeasure() != newMeasure)
-          newPoint->Delete(cm);
+          omit(newPoint, cm);
         else
           shouldDeleteReferenceMeasure = true;
       }
       else if(reference && newPoint->GetRefMeasure() != newMeasure) {
         nonReferenceMeasures.append(newPoint->GetId() + "," + newMeasure->GetCubeSerialNumber());
-        newPoint->Delete(cm);
+        omit(newPoint, cm);
       }
       else if(cubeMeasures) {
         bool hasSerialNumber = false;
@@ -192,7 +199,7 @@ void IsisMain() {
           //Delete Reference Measures not in the list, if retainReference is turned off
           if(newPoint->GetRefMeasure() != newMeasure || 
              (newPoint->GetRefMeasure() == newMeasure && !retainReference))
-            newPoint->Delete(cm);
+            omit(newPoint, cm);
           else {
             shouldDeleteReferenceMeasure = true;
             if(newPoint->GetRefMeasure() == newMeasure && retainReference) {
@@ -204,6 +211,9 @@ void IsisMain() {
         }
       }
     }
+
+    if (replaceLock)
+      newPoint->SetEditLock(true);
 
     //outNet.UpdatePoint(newPoint); // Fixed by redesign
 
@@ -221,7 +231,7 @@ void IsisMain() {
 
       if(hasLowTolerance) {
         tolerancePoints.append(newPoint->GetId());
-        outNet.DeletePoint(cp);
+        omit(outNet, cp);
         continue;
       }
     }
@@ -234,7 +244,7 @@ void IsisMain() {
 
       if(invalidPoint) {
         singleMeasurePoints.append(controlpt->GetId());
-        outNet.DeletePoint(cp);
+        omit(outNet, cp);
         continue;
       }
     }
@@ -252,14 +262,14 @@ void IsisMain() {
 
       if(!hasSerialNumber) {
         nonCubePoints.append(newPoint->GetId());
-        outNet.DeletePoint(cp);
+        omit(outNet, cp);
         continue;
       }
     }
 
     if(noMeasureless && newPoint->GetNumMeasures() == 0) {
       noMeasurePoints.append(newPoint->GetId());
-      outNet.DeletePoint(cp);
+      omit(outNet, cp);
       continue;
     }
   } //! Finished with simple comparisons
@@ -460,7 +470,7 @@ void ExtractPointList(ControlNet &outNet, QVector<iString> nonListedPoints) {
 
     if(!isInList) {
       nonListedPoints.append(controlpt->GetId());
-      outNet.DeletePoint(cp);
+      omit(outNet, cp);
     }
   }
 }
@@ -511,7 +521,7 @@ void ExtractLatLonRange(ControlNet &outNet, QVector<iString> nonLatLonPoints,
     if(controlPt->GetType() == Isis::ControlPoint::Fixed || surfacePt.Valid()) {
       if(NotInLatLonRange(surfacePt, minlat, maxlat, minlon, maxlon)) {
         nonLatLonPoints.push_back(controlPt->GetId());
-        outNet.DeletePoint(cp);
+        omit(outNet, cp);
       }
     }
 
@@ -547,7 +557,7 @@ void ExtractLatLonRange(ControlNet &outNet, QVector<iString> nonLatLonPoints,
       // Connot fine a cube to get the lat/lon from
       if(sn.empty()) {
         cannotGenerateLatLonPoints.push_back(controlPt->GetId());
-        outNet.DeletePoint(cp);
+        omit(outNet, cp);
       }
 
       // Calculate the lat/lon and check for validity
@@ -605,7 +615,7 @@ void ExtractLatLonRange(ControlNet &outNet, QVector<iString> nonLatLonPoints,
 
         if(remove || notInRange) {
           nonLatLonPoints.push_back(controlPt->GetId());
-          outNet.DeletePoint(cp);
+          omit(outNet, cp);
         }
         else if(validLatLonRadius) { // Add the reference lat/lon/radius to the Control Point
           outNet.GetPoint(cp)->SetAprioriSurfacePoint(SurfacePoint(lat, lon, radius));
@@ -614,7 +624,7 @@ void ExtractLatLonRange(ControlNet &outNet, QVector<iString> nonLatLonPoints,
     }
     else {
       cannotGenerateLatLonPoints.push_back(controlPt->GetId());
-      outNet.DeletePoint(cp);
+      omit(outNet, cp);
     }
 
   }
@@ -733,3 +743,18 @@ void WriteResults(iString filename, QVector<iString> results) {
 
   out_stream.close();
 }
+
+
+void omit(ControlNet &cnet, int cp) {
+  ControlPoint *point = cnet.GetPoint(cp);
+  if (point->IsEditLocked()) point->SetEditLock(false);
+  cnet.DeletePoint(cp);
+}
+
+
+void omit(ControlPoint *point, int cm) {
+  ControlMeasure *measure = point->GetMeasure(cm);
+  if (measure->IsEditLocked()) measure->SetEditLock(false);
+  point->Delete(cm);
+}
+
