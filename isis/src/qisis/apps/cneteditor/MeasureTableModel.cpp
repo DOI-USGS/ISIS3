@@ -175,13 +175,9 @@ namespace Isis
                 measure->GetLogData(ControlMeasureLogData::MaximumPixelZScore).
                   GetNumericalValue()));
           case SampleShift:
-            return QVariant::fromValue(catchNULL(
-                measure->GetLogData(
-                  ControlMeasureLogData::SampleShift).GetNumericalValue()));
+            return QVariant::fromValue(catchNULL(measure->GetSampleShift()));
           case LineShift:
-            return QVariant::fromValue(catchNULL(
-                measure->GetLogData(
-                  ControlMeasureLogData::LineShift).GetNumericalValue()));
+            return QVariant::fromValue(catchNULL(measure->GetLineShift()));
           case APrioriSample:
             return QVariant::fromValue(catchNULL(measure->GetAprioriSample()));
           case APrioriLine:
@@ -264,8 +260,6 @@ namespace Isis
             case GoodnessOfFit:
             case MinPixelZScore:
             case MaxPixelZScore:
-            case SampleShift:
-            case LineShift:
             case APrioriSample:
             case APrioriLine:
             case Diameter:
@@ -278,6 +272,8 @@ namespace Isis
               // READ ONLY
             case PointId:
             case ResidualMagnitude:
+            case SampleShift:
+            case LineShift:
             case JigsawRejected:
               break;
           }
@@ -348,10 +344,10 @@ namespace Isis
                        value);
             break;
           case SampleShift:
-            setLogData(measure, ControlMeasureLogData::SampleShift, value);
+            // This is not editable anymore.
             break;
           case LineShift:
-            setLogData(measure, ControlMeasureLogData::LineShift, value);
+            // This is not editable anymore.
             break;
           case APrioriSample:
             measure->SetAprioriSample(catchNULL(value.toString()));
