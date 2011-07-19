@@ -2,6 +2,7 @@
 
 #include "CameraPointInfo.h"
 #include "ControlMeasure.h"
+#include "ControlMeasureLogData.h"
 #include "ControlNet.h"
 #include "ControlPoint.h"
 #include "Displacement.h"
@@ -143,6 +144,24 @@ void IsisMain() {
       measureLabels += "MaximumSamlpeResidual,";
       measureLabels += "MinimumLineResidual,";
       measureLabels += "MaximumLineResidual,";
+
+      measureLabels += "MaximumSampleShift,";
+      measureLabels += "MinimumSampleShift,";
+      measureLabels += "AverageSampleShift,";
+      measureLabels += "MaximumLineShift,";
+      measureLabels += "MinimumLineShift,";
+      measureLabels += "AverageLineShift,";
+      measureLabels += "MaximumPixelShift,";
+      measureLabels += "MinimumPixelShift,";
+      measureLabels += "AveragePixelShift,";
+      measureLabels += "MinimumPixelZScore,";
+      measureLabels += "AveragePixelZScore,";
+      measureLabels += "MaximumEccentricity,";
+      measureLabels += "MinimumEccentricity,";
+      measureLabels += "AverageEccentricity,";
+      measureLabels += "MaximumGoodnessOfFit,";
+      measureLabels += "MinimumGoodnessOfFit,";
+      measureLabels += "AverageGoodnessOfFit,";
     }
 
     // Always add data
@@ -221,6 +240,44 @@ void IsisMain() {
         &ControlMeasure::GetLineResidual).Minimum())) + ",";
     measureInfo += iString(CheckValue(cpoint->GetStatistic(
         &ControlMeasure::GetLineResidual).Maximum())) + ",";
+
+
+    measureInfo += iString(CheckValue(cpoint->GetStatistic(
+        &ControlMeasure::GetSampleShift).Maximum())) + ",";
+    measureInfo += iString(CheckValue(cpoint->GetStatistic(
+        &ControlMeasure::GetSampleShift).Minimum())) + ",";
+    measureInfo += iString(CheckValue(cpoint->GetStatistic(
+        &ControlMeasure::GetSampleShift).Average())) + ",";
+    measureInfo += iString(CheckValue(cpoint->GetStatistic(
+        &ControlMeasure::GetLineShift).Maximum())) + ",";
+    measureInfo += iString(CheckValue(cpoint->GetStatistic(
+        &ControlMeasure::GetLineShift).Minimum())) + ",";
+    measureInfo += iString(CheckValue(cpoint->GetStatistic(
+        &ControlMeasure::GetLineShift).Average())) + ",";
+
+    measureInfo += iString(CheckValue(cpoint->GetStatistic(
+        &ControlMeasure::GetPixelShift).Maximum())) + ",";
+    measureInfo += iString(CheckValue(cpoint->GetStatistic(
+        &ControlMeasure::GetPixelShift).Minimum())) + ",";
+    measureInfo += iString(CheckValue(cpoint->GetStatistic(
+        &ControlMeasure::GetPixelShift).Average())) + ",";  
+    
+    measureInfo += iString(CheckValue(cpoint->GetStatistic(
+        ControlMeasureLogData::MaximumPixelZScore).Maximum())) + ",";
+    measureInfo += iString(CheckValue(cpoint->GetStatistic(
+        ControlMeasureLogData::MinimumPixelZScore).Minimum())) + ",";
+    measureInfo += iString(CheckValue(cpoint->GetStatistic(
+        ControlMeasureLogData::Eccentricity).Maximum())) + ",";
+    measureInfo += iString(CheckValue(cpoint->GetStatistic(
+        ControlMeasureLogData::Eccentricity).Minimum())) + ",";
+    measureInfo += iString(CheckValue(cpoint->GetStatistic(
+        ControlMeasureLogData::Eccentricity).Average())) + ",";
+    measureInfo += iString(CheckValue(cpoint->GetStatistic(
+        ControlMeasureLogData::GoodnessOfFit).Maximum())) + ",";
+    measureInfo += iString(CheckValue(cpoint->GetStatistic(
+        ControlMeasureLogData::GoodnessOfFit).Minimum())) + ",";
+    measureInfo += iString(CheckValue(cpoint->GetStatistic(
+        ControlMeasureLogData::GoodnessOfFit).Average())) + ",";
     
     // Loop through all measures in controlpoint
     for(int j = 0; j < cpoint->GetNumMeasures(); j++) {

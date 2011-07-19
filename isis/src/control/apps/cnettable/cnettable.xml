@@ -118,6 +118,10 @@
       Modified outputs which would have been Isis::Null double values to now
       be empty strings.
     </change>
+    <change name="James Alexander Crough" date="2011-07-19">
+      Made the software output all of the log values in addition to the normal
+      output of the software.
+    </change>
   </history>
 
   <category>
