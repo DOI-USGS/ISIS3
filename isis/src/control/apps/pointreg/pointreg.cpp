@@ -192,18 +192,12 @@ void IsisMain() {
                 else
                   measure->SetType(ControlMeasure::RegisteredPixel);
 
-                double sampleShift = measure->GetSample() - ar->CubeSample();
-                double lineShift = measure->GetLine() - ar->CubeLine();
-
-                measure->SetLogData(ControlMeasureLogData(
-                      ControlMeasureLogData::SampleShift, sampleShift));
-                measure->SetLogData(ControlMeasureLogData(
-                      ControlMeasureLogData::LineShift, lineShift));
-
                 measure->SetLogData(ControlMeasureLogData(
                       ControlMeasureLogData::GoodnessOfFit,
                       ar->GoodnessOfFit()));
 
+                measure->SetAprioriSample(measure->GetSample());
+                measure->SetAprioriLine(measure->GetLine());
                 measure->SetCoordinate(ar->CubeSample(), ar->CubeLine());
                 measure->SetIgnored(false);
                 goodMeasureCount++;
@@ -229,13 +223,6 @@ void IsisMain() {
                 measure->SetType(ControlMeasure::Candidate);
 
                 if (res == AutoReg::FitChipToleranceNotMet) {
-                  double sampleShift = measure->GetSample() - ar->CubeSample();
-                  double lineShift = measure->GetLine() - ar->CubeLine();
-
-                  measure->SetLogData(ControlMeasureLogData(
-                        ControlMeasureLogData::SampleShift, sampleShift));
-                  measure->SetLogData(ControlMeasureLogData(
-                        ControlMeasureLogData::LineShift, lineShift));
                   measure->SetLogData(ControlMeasureLogData(
                         ControlMeasureLogData::GoodnessOfFit,
                         ar->GoodnessOfFit()));
@@ -362,18 +349,13 @@ void IsisMain() {
               outSamp << "," <<
               outLine;
 
-          double sampleShift = cmTrans->GetLogData(
-              ControlMeasureLogData::SampleShift).GetNumericalValue();
-          double lineShift = cmTrans->GetLogData(
-              ControlMeasureLogData::LineShift).GetNumericalValue();
+          double sampleShift = cmTrans->GetSampleShift();
+          double lineShift = cmTrans->GetLineShift();
+          double pixelShift = cmTrans->GetPixelShift();
 
-          bool hasSampleShift = outputValue(os, sampleShift);
-          bool hasLineShift = outputValue(os, lineShift);
-
-          if (hasSampleShift && hasLineShift)
-            outputValue(os, sqrt(pow(sampleShift, 2) + pow(lineShift, 2)));
-          else
-            os << ",";
+          outputValue(os, sampleShift);
+          outputValue(os, lineShift);
+          outputValue(os, pixelShift);
 
           double zScoreMin = cmTrans->GetLogData(
               ControlMeasureLogData::MinimumPixelZScore).GetNumericalValue();
