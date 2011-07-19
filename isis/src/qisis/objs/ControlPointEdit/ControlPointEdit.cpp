@@ -737,6 +737,11 @@ namespace Qisis {
           p_rightGroundMap->Line() != p_rightMeasure->GetLine())
         colorizeSaveButton();
     }
+    else {
+      QString message = "Latitude: " + QString::number(lat) + "  Longitude: " +
+        QString::number(lon) + "not on right image. Right measure was not moved.";
+      QMessageBox::warning((QWidget *)parent(),"Warning",message);
+    }
 
   }
 
@@ -787,13 +792,13 @@ namespace Qisis {
 
     try {
       p_autoRegFact->PatternChip()->TackCube(
-                                            p_leftMeasure->GetSample(), p_leftMeasure->GetLine());
+                          p_leftMeasure->GetSample(), p_leftMeasure->GetLine());
       p_autoRegFact->PatternChip()->Load(*p_leftCube);
       p_autoRegFact->SearchChip()->TackCube(
-                                           p_rightMeasure->GetSample(),
-                                           p_rightMeasure->GetLine());
-      p_autoRegFact->SearchChip()->Load(
-                                       *p_rightCube, *(p_autoRegFact->PatternChip()), *p_leftCube);
+                          p_rightMeasure->GetSample(),
+                          p_rightMeasure->GetLine());
+      p_autoRegFact->SearchChip()->Load(*p_rightCube,
+                          *(p_autoRegFact->PatternChip()), *p_leftCube);
     }
     catch ( Isis::iException &e ) {
       QString msg = "Cannot register this point, unable to Load chips.";
@@ -906,40 +911,44 @@ namespace Qisis {
    *                          and get rid of goodness of fit.
    *   @history 2011-06-14 Tracie Sucharski - Change Save Measure button text
    *                          back to black.
+   *   @history 2011-07-19 Tracie Sucharski - Updated for new functionality
+   *                          of registration pixel shift.  ControlMeasure
+   *                          will now calculate based on aprioriSample/Line
+   *                          and current coordinate.  If autoreg has been
+   *                          calculated, save coordinate to apriori before
+   *                          updating to subpixel registered coordinate.
    *  
    */
   void ControlPointEdit::saveMeasure() {
 
-    //  Get cube position at right chipViewport crosshair
     if ( p_rightMeasure != NULL ) {
-      p_rightMeasure->SetCoordinate(p_rightView->tackSample(),
-                                    p_rightView->tackLine());
-      p_rightMeasure->SetDateTime();
 
       if ( p_autoRegShown ) {
+        //  Reset AprioriSample/Line to the current coordinate, before the
+        //  coordinate is updated with the registered coordinate.
+        p_rightMeasure->SetAprioriSample(p_rightMeasure->GetSample());
+        p_rightMeasure->SetAprioriLine(p_rightMeasure->GetLine());
+
         p_rightMeasure->SetChooserName("Application qnet");
         p_rightMeasure->SetType(Isis::ControlMeasure::RegisteredSubPixel);
-        //  Save Goodness of Fit to the right measure log entry
+        //  Save  autoreg parameters to the right measure log entry
+        //  Eccentricity may be invalid, check before writing.
         p_rightMeasure->SetLogData(Isis::ControlMeasureLogData(
                                Isis::ControlMeasureLogData::GoodnessOfFit,
                                p_autoRegFact->GoodnessOfFit()));
-        //  If Apriori sample,line exist, calculate pixel shift, save to log
-        if ( p_rightMeasure->GetAprioriSample() != Isis::Null &&
-             p_rightMeasure->GetAprioriLine() != Isis::Null ) {
-          double sampleShift = p_rightMeasure->GetAprioriSample() -
-                               p_rightMeasure->GetSample();
-          double lineShift = p_rightMeasure->GetAprioriLine() -
-                               p_rightMeasure->GetLine();
-          p_rightMeasure->SetLogData(Isis::ControlMeasureLogData(
-                                 Isis::ControlMeasureLogData::SampleShift,
-                                 sampleShift));;
-          p_rightMeasure->SetLogData(Isis::ControlMeasureLogData(
-                                 Isis::ControlMeasureLogData::LineShift,
-                                 lineShift));;
-        }
+        if (p_autoRegFact->Eccentricity() != Isis::Null)
+             p_rightMeasure->SetLogData(Isis::ControlMeasureLogData(
+                                 Isis::ControlMeasureLogData::Eccentricity,
+                                 p_autoRegFact->Eccentricity()));
+        double minZScore, maxZScore;
+        p_autoRegFact->ZScores(minZScore,maxZScore);
         p_rightMeasure->SetLogData(Isis::ControlMeasureLogData(
-                                 Isis::ControlMeasureLogData::GoodnessOfFit,
-                                 p_autoRegFact->GoodnessOfFit()));
+                                 Isis::ControlMeasureLogData::MinimumPixelZScore,
+                                 minZScore));
+        p_rightMeasure->SetLogData(Isis::ControlMeasureLogData(
+                                 Isis::ControlMeasureLogData::MaximumPixelZScore,
+                                 maxZScore));
+
         p_autoRegShown = false;
         p_autoRegExtension->hide();
         p_autoReg->setText("Register");
@@ -947,11 +956,21 @@ namespace Qisis {
       else {
         p_rightMeasure->SetChooserName(Isis::Application::UserName());
         p_rightMeasure->SetType(Isis::ControlMeasure::Manual);
-        p_rightMeasure->DeleteLogData(Isis::ControlMeasureLogData::SampleShift);
-        p_rightMeasure->DeleteLogData(Isis::ControlMeasureLogData::LineShift);
-        p_rightMeasure->DeleteLogData(Isis::ControlMeasureLogData::GoodnessOfFit);
-        //  TODO  Should AprioriSample/Line be reset?
+        p_rightMeasure->DeleteLogData(
+                               Isis::ControlMeasureLogData::GoodnessOfFit);
+        p_rightMeasure->DeleteLogData(
+                               Isis::ControlMeasureLogData::Eccentricity);
+        p_rightMeasure->DeleteLogData(
+                               Isis::ControlMeasureLogData::MinimumPixelZScore);
+        p_rightMeasure->DeleteLogData(
+                               Isis::ControlMeasureLogData::MaximumPixelZScore);
       }
+
+      //  Get cube position at right chipViewport crosshair
+      p_rightMeasure->SetCoordinate(p_rightView->tackSample(),
+                                    p_rightView->tackLine());
+      p_rightMeasure->SetDateTime();
+
     }
 
     if ( p_allowLeftMouse ) {
