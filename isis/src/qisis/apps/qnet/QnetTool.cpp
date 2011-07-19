@@ -1834,6 +1834,24 @@ namespace Qisis {
       tableItem->setData(0,m.GetLine());
       p_measureTable->setItem(row,column++,tableItem);
 
+      if (m.GetAprioriSample() == Isis::Null) {
+        tableItem = new QTableWidgetItem("Null");
+      }
+      else {
+        tableItem = new QTableWidgetItem();
+        tableItem->setData(0,m.GetAprioriSample());
+      }
+      p_measureTable->setItem(row,column++,tableItem);
+
+      if (m.GetAprioriLine() == Isis::Null) {
+        tableItem = new QTableWidgetItem("Null");
+      }
+      else {
+        tableItem = new QTableWidgetItem();
+        tableItem->setData(0,m.GetAprioriLine());
+      }
+      p_measureTable->setItem(row,column++,tableItem);
+
       if (m.GetSampleResidual() == Isis::Null) {  
         tableItem = new QTableWidgetItem(QString("Null"));
       }
@@ -1914,24 +1932,6 @@ namespace Qisis {
 
       tableItem = new QTableWidgetItem(QString::fromStdString(
                   ControlMeasure::MeasureTypeToString(m.GetType())));
-      p_measureTable->setItem(row,column++,tableItem);
-
-      if (m.GetAprioriSample() == Isis::Null) {
-        tableItem = new QTableWidgetItem("Null");
-      }
-      else {
-        tableItem = new QTableWidgetItem();
-        tableItem->setData(0,m.GetAprioriSample());
-      }
-      p_measureTable->setItem(row,column++,tableItem);
-
-      if (m.GetAprioriLine() == Isis::Null) {
-        tableItem = new QTableWidgetItem("Null");
-      }
-      else {
-        tableItem = new QTableWidgetItem();
-        tableItem->setData(0,m.GetAprioriLine());
-      }
       p_measureTable->setItem(row,column,tableItem);
 
       //  If reference measure set font on this row to bold
