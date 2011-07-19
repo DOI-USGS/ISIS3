@@ -804,17 +804,22 @@ namespace Isis {
 
 
   double ControlMeasure::GetSampleShift() const {
-    return p_sample - p_aprioriSample;
+    return (p_sample != Null && p_aprioriSample != Null) ?
+        p_sample - p_aprioriSample : Null;
   }
 
 
   double ControlMeasure::GetLineShift() const {
-    return p_line - p_aprioriLine;
+    return (p_line != Null && p_aprioriLine != Null) ?
+        p_line - p_aprioriLine : Null;
   }
 
 
   double ControlMeasure::GetPixelShift() const {
-    return sqrt(pow(GetSampleShift(), 2) + pow(GetLineShift(), 2));
+    double sampleShift = GetSampleShift();
+    double lineShift = GetLineShift();
+    return (sampleShift != Null && lineShift != Null) ?
+        sqrt(pow(GetSampleShift(), 2) + pow(GetLineShift(), 2)) : Null;
   }
 
 
