@@ -53,7 +53,8 @@ namespace Isis {
 
     iString name = keywordRep.Name();
     p_dataType = NameToDataType(name);
-    p_numericalValue = keywordRep[0];
+    if (p_dataType != InvalidNumericLogDataType)
+      p_numericalValue = keywordRep[0];
   }
 
 
