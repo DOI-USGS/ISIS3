@@ -739,7 +739,8 @@ namespace Qisis {
     }
     else {
       QString message = "Latitude: " + QString::number(lat) + "  Longitude: " +
-        QString::number(lon) + "not on right image. Right measure was not moved.";
+        QString::number(lon) + " is not on the right image. Right measure " +
+        "was not moved.";
       QMessageBox::warning((QWidget *)parent(),"Warning",message);
     }
 
