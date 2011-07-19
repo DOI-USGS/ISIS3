@@ -676,11 +676,10 @@ namespace Qisis {
       p_editPoint->SetRefMeasure(p_leftMeasure->GetCubeSerialNumber());
     }
 
-    // If this is a fixed or constrained point, if either measure (left or
-    // right) is the ground source, update the lat,lon,radius.
+    // If this is a fixed or constrained point, if right measure 
+    // is the ground source, update the lat,lon,radius.
     if (p_editPoint->GetType() != ControlPoint::Free &&
-        (p_leftMeasure->GetCubeSerialNumber() == p_groundSN ||
-         p_rightMeasure->GetCubeSerialNumber() == p_groundSN)) {
+        p_rightMeasure->GetCubeSerialNumber() == p_groundSN) {
 
       //  Point is editLocked.  Print warning if the point already exists in the
       //  network.  If it is a new point with the editLock keyword set, do not
@@ -708,9 +707,16 @@ namespace Qisis {
       //  file, print warning.
 
       //  Find temporary ground measure
-      ControlMeasure *groundMeasure = p_editPoint->GetMeasure(p_groundSN);
-      if (!p_groundGmap->SetImage(groundMeasure->GetSample(),
-                                  groundMeasure->GetLine())) {
+
+      //  Do not know why this code was necessary. Commented out on 7/18/2011
+      //  TODO:  If not needed, delete!
+//    ControlMeasure *groundMeasure = p_editPoint->GetMeasure(p_groundSN);
+//    if (!p_groundGmap->SetImage(groundMeasure->GetSample(),
+//                                groundMeasure->GetLine())) {
+//      //  TODO  error??? This should never happen
+//    }
+      if (!p_groundGmap->SetImage(p_rightMeasure->GetSample(),
+                                  p_rightMeasure->GetLine())) {
         //  TODO  error??? This should never happen
       }
 
@@ -720,8 +726,8 @@ namespace Qisis {
       //  Update radius
       if (p_demOpen) {
         Brick pixel(1,1,1,p_demCube->getPixelType());
-        int intSamp = (int) (groundMeasure->GetSample() + 0.5);
-        int intLine = (int) (groundMeasure->GetLine() + 0.5);
+        int intSamp = (int) (p_rightMeasure->GetSample() + 0.5);
+        int intLine = (int) (p_rightMeasure->GetLine() + 0.5);
         pixel.SetBasePosition(intSamp,intLine,1);
         p_demCube->read(pixel);
         radius = pixel[0];
@@ -1463,6 +1469,8 @@ namespace Qisis {
    * @history 2011-04-04 Tracie Sucharski - Move code that was after the exec 
    *                          block within, so that if the Cancel button is
    *                          selected, nothing else happens.
+   * @history 2011-07-15 Tracie Sucharski - Print info about deleting editLock 
+   *                          points and reference measures. 
    *  
    */
   void QnetTool::deletePoint(ControlPoint *point) {
@@ -1491,8 +1499,9 @@ namespace Qisis {
       deletePointDialog->fileList->addItem(file.c_str());
     }
 
-      if (deletePointDialog->exec()) {
-      //  First see if entire point needs to be deleted
+    if (deletePointDialog->exec()) {
+
+      //  Delete entire control point
       if (deletePointDialog->deleteAllCheckBox->isChecked()) {
         //  First get rid of deleted point from g_filteredPoints list
         //  need index in control net for pt
@@ -1500,7 +1509,12 @@ namespace Qisis {
         //g_filteredPoints.
         p_qnetTool->setShown(false);
         // remove this point from the control network
-        g_controlNetwork->DeletePoint(p_editPoint->GetId());
+        if (g_controlNetwork->DeletePoint(p_editPoint->GetId()) ==
+                                          ControlPoint::PointLocked) {
+          QMessageBox::information((QWidget *)parent(),"EditLocked Point",
+              "This point is EditLocked and cannot be deleted.");
+          return;
+        }
         if (p_editPoint != NULL && p_editPoint->Parent() == NULL) {
           delete p_editPoint;
           p_editPoint = NULL;
@@ -1508,15 +1522,42 @@ namespace Qisis {
         //  emit signal so the nav tool refreshes the list
         emit refreshNavList();
       }
-      //  Otherwise, delete measures located on images chosen
+
+      //  Delete specific measures from control point
       else {
+        //  Keep track of editLocked measures for reporting
+        int lockedMeasures = 0;
         for (int i=0; i<deletePointDialog->fileList->count(); i++) {
           QListWidgetItem *item = deletePointDialog->fileList->item(i);
-          if (! deletePointDialog->fileList->isItemSelected(item)) continue;
+          if (!deletePointDialog->fileList->isItemSelected(item)) continue;
 
-          //  TODO:  If measure is GroundReference , make Point Free???
-          //  Delete measure from ControlPoint
-          p_editPoint->Delete(i);
+          //  Do not delete reference without asking user
+          if (p_editPoint->IsReferenceExplicit() &&
+                (p_editPoint->GetRefMeasure()->GetCubeSerialNumber() ==
+                (*p_editPoint)[i]->GetCubeSerialNumber())) {
+            QString message = "You are trying to delete the Reference measure."
+                "  Do you really want to delete the Reference measure?";
+            switch (QMessageBox::question((QWidget *)parent(),
+                    "Delete Reference measure?", message, "&Yes", "&No", 0, 0)) {
+              //  Yes or Enter pressed, skip to end of switch todelete the measure
+              case 0:
+                break;
+              //  No, continue to next measure in the loop
+              case 1:
+                continue;
+            }
+          }
+
+          if (p_editPoint->Delete(i) == ControlMeasure::MeasureLocked) {
+            lockedMeasures++;
+          }
+        }
+
+        if (lockedMeasures > 0) {
+          QMessageBox::information((QWidget *)parent(),"EditLocked Measures",
+                QString::number(lockedMeasures) + " / "
+                + QString::number(deletePointDialog->fileList->selectedItems().size())
+                + " measures are EditLocked and were not deleted.");
         }
 
         p_leftFile = "";
@@ -1527,6 +1568,7 @@ namespace Qisis {
         loadTemplateFile(QString::fromStdString(
             p_pointEditor->templateFilename()));
       }
+
       // emit a signal to alert user to save when exiting 
       emit netChanged();
   
@@ -1605,6 +1647,12 @@ namespace Qisis {
    *                          namespace std"
    *   @history 2010-10-29 Tracie Sucharski - Changed pointfiles to QStringList
    *   @history 2011-04-20 Tracie Sucharski - Was not setting EditLock check box
+   *   @history 2011-07-18 Tracie Sucharski - Do not load ground source on left,
+   *                          we do not want to allow the reference to be set
+   *                          to the ground source.  Fixed bug with loading
+   *                          ground measure-use AprioriSurface point, not
+   *                          lat,lon of reference measure unless there is no
+   *                          apriori surface point.
    *
    */
   void QnetTool::loadPoint () {
@@ -1650,15 +1698,24 @@ namespace Qisis {
       // TODO:  Does open ground source match point ground source
 
 
-
-      // Find lat/lon of reference measure, otherwise use 1st measure
-      ControlMeasure m = *(p_editPoint->GetRefMeasure());
-      int camIndex = g_serialNumberList->SerialNumberIndex(m.GetCubeSerialNumber());
-      Camera *cam;
-      cam = g_controlNetwork->Camera(camIndex);
-      cam->SetImage(m.GetSample(),m.GetLine());
-      double lat = cam->UniversalLatitude();
-      double lon = cam->UniversalLongitude();
+      // Use apriori surface point to find location on ground source.  If
+      // apriori surface point does not exist use reference measure
+      double lat = 0.;
+      double lon = 0.;
+      if (p_editPoint->HasAprioriCoordinates()) {
+        SurfacePoint sPt = p_editPoint->GetAprioriSurfacePoint();
+        lat = sPt.GetLatitude().GetDegrees();
+        lon = sPt.GetLongitude().GetDegrees();
+      }
+      else {
+        ControlMeasure m = *(p_editPoint->GetRefMeasure());
+        int camIndex = g_serialNumberList->SerialNumberIndex(m.GetCubeSerialNumber());
+        Camera *cam;
+        cam = g_controlNetwork->Camera(camIndex);
+        cam->SetImage(m.GetSample(),m.GetLine());
+        lat = cam->UniversalLatitude();
+        lon = cam->UniversalLongitude();
+      }
 
       //  Try to locate point position on current ground source,
       //  TODO ???if doesn't exist,???
@@ -1688,7 +1745,8 @@ namespace Qisis {
       iString file = g_serialNumberList->Filename(m.GetCubeSerialNumber());
       p_pointFiles<<file;
       QString tempFilename = Filename(file).Name().c_str();
-      p_leftCombo->addItem(tempFilename);
+      //  Do not load ground source on the left side
+      if (file != p_groundSourceFile) p_leftCombo->addItem(tempFilename);
       p_rightCombo->addItem(tempFilename);
       if (p_editPoint->IsReferenceExplicit() &&
           (QString)m.GetCubeSerialNumber() == p_editPoint->GetReferenceSN()) {

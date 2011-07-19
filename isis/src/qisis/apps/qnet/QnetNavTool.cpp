@@ -795,6 +795,7 @@ namespace Qisis {
         QApplication::setOverrideCursor(Qt::WaitCursor);
 
         int editPointIndex = 0;
+        int lockedPoints = 0;
         vector<int> deletedRows;
         for (int i = 0; i < selected.size(); i++) {
           QString id = selected.at(i)->text();
@@ -803,8 +804,18 @@ namespace Qisis {
           if (id == p_editPointId) {
             editPointIndex = deletedRows[i];
           }
-          g_controlNetwork->DeletePoint(id);
+          if (g_controlNetwork->DeletePoint(id) == ControlPoint::PointLocked)
+            lockedPoints++;
         }
+
+        //  Print info about locked points if there are any
+        if (lockedPoints > 0) {
+          QMessageBox::information((QWidget *)parent(),"EditLocked Points",
+                QString::number(lockedPoints) + " / "
+                + QString::number(selected.size())
+                + " points are EditLocked and were not deleted.");
+        }
+
         QApplication::restoreOverrideCursor();
         emit deletedPoints();
         emit netChanged();
