@@ -291,6 +291,10 @@ namespace Isis {
       MeasureType GetType() const;
       QString GetPointId() const;
 
+      double GetSampleShift() const;
+      double GetLineShift() const;
+      double GetPixelShift() const;
+
       static QVector<iString> GetMeasureDataNames();
 
       QList<QStringList> PrintableClassData() const;

@@ -113,25 +113,13 @@ namespace Isis {
         /**
          * @see MinimumPixelZScore
          */
-        MaximumPixelZScore        = 4,
-
-        /**
-         * Pointreg information indicating amount in samples measure has
-         * shifted from apriori.
-         */
-        SampleShift               = 5,
-
-        /**
-         * Pointreg information indicating amount in lines measure has shifted
-         * from apriori.
-         */
-        LineShift                 = 6
+        MaximumPixelZScore        = 4
       };
       /**
        * This value must be > the largest enumerated value in this type or
        * convertions to and from Pvl will not work.
        */
-      static const int MaximumNumericLogDataType = 7;
+      static const int MaximumNumericLogDataType = 5;
 
 
       ControlMeasureLogData();
@@ -157,6 +145,7 @@ namespace Isis {
       ControlPointFileEntryV0002_Measure_MeasureLogData
           ToProtocolBuffer() const;
 
+      NumericLogDataType NameToDataType(iString name) const;
       iString DataTypeToName(NumericLogDataType) const;
 
     private:

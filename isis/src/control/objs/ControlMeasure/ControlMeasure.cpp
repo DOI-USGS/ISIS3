@@ -803,6 +803,21 @@ namespace Isis {
   }
 
 
+  double ControlMeasure::GetSampleShift() const {
+    return p_sample - p_aprioriSample;
+  }
+
+
+  double ControlMeasure::GetLineShift() const {
+    return p_line - p_aprioriLine;
+  }
+
+
+  double ControlMeasure::GetPixelShift() const {
+    return sqrt(pow(GetSampleShift(), 2) + pow(GetLineShift(), 2));
+  }
+
+
   ControlMeasureLogData ControlMeasure::GetLogData(long dataType) const {
     int foundIndex = 0;
     ControlMeasureLogData::NumericLogDataType typedDataType =

@@ -52,23 +52,8 @@ namespace Isis {
     Init();
 
     iString name = keywordRep.Name();
-
-    for(int i = InvalidNumericLogDataType + 1;
-            i < MaximumNumericLogDataType; i++) {
-      try {
-        iString thisTypeName = DataTypeToName((NumericLogDataType)i);
-
-        if(name == thisTypeName) {
-          p_dataType = (NumericLogDataType)i;
-          p_numericalValue = keywordRep[0];
-          // There is no reason to keep searching
-          break;
-        }
-      }
-      catch(iException &e) {
-        e.Clear();
-      }
-    }
+    p_dataType = NameToDataType(name);
+    p_numericalValue = keywordRep[0];
   }
 
 
@@ -228,6 +213,32 @@ namespace Isis {
 
     return protoBufDataEntry;
   }
+  
+
+  /**
+   * This converts a string to a log data type and is useful for converting Pvl
+   * keywords to Numeric Log Data Type.
+   *
+   * @param name The string to convert to data type
+   * @return The data type converted from a string
+   */
+  ControlMeasureLogData::NumericLogDataType ControlMeasureLogData::NameToDataType(iString name) const {
+    for (int i = InvalidNumericLogDataType + 1;
+         i < MaximumNumericLogDataType; i++) {
+      try {
+        iString thisTypeName = DataTypeToName((NumericLogDataType) i);
+
+        if (name == thisTypeName) {
+          return (NumericLogDataType) i;
+        }
+      }
+      catch (iException &e) {
+        e.Clear();
+      }
+    }
+
+    return InvalidNumericLogDataType;
+  }
 
 
   /**
@@ -255,12 +266,6 @@ namespace Isis {
 
       case MaximumPixelZScore:
         return "MaximumPixelZScore";
-
-      case SampleShift:
-        return "SampleShift";
-
-      case LineShift:
-        return "LineShift";
     }
 
     iString msg = "Unknown data type [" + iString(type) + "]";
