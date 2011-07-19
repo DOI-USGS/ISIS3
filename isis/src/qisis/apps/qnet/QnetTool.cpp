@@ -1647,12 +1647,10 @@ namespace Qisis {
    *                          namespace std"
    *   @history 2010-10-29 Tracie Sucharski - Changed pointfiles to QStringList
    *   @history 2011-04-20 Tracie Sucharski - Was not setting EditLock check box
-   *   @history 2011-07-18 Tracie Sucharski - Do not load ground source on left,
-   *                          we do not want to allow the reference to be set
-   *                          to the ground source.  Fixed bug with loading
-   *                          ground measure-use AprioriSurface point, not
-   *                          lat,lon of reference measure unless there is no
-   *                          apriori surface point.
+   *   @history 2011-07-18 Tracie Sucharski - Fixed bug with loading
+   *                          ground measure-use AprioriSurface point, not lat,lon
+   *                          of reference measure unless there is no apriori
+   *                          surface point.
    *
    */
   void QnetTool::loadPoint () {
@@ -1745,8 +1743,7 @@ namespace Qisis {
       iString file = g_serialNumberList->Filename(m.GetCubeSerialNumber());
       p_pointFiles<<file;
       QString tempFilename = Filename(file).Name().c_str();
-      //  Do not load ground source on the left side
-      if (file != p_groundSourceFile) p_leftCombo->addItem(tempFilename);
+      p_leftCombo->addItem(tempFilename);
       p_rightCombo->addItem(tempFilename);
       if (p_editPoint->IsReferenceExplicit() &&
           (QString)m.GetCubeSerialNumber() == p_editPoint->GetReferenceSN()) {
