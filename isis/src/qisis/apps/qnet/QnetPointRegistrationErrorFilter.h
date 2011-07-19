@@ -67,7 +67,6 @@ namespace Qisis {
 
     private slots:
       void clearEdit();
-      double calculateMaxError (Isis::ControlPoint &controlPoint);
   };
 };
 

@@ -266,7 +266,6 @@ namespace Qisis {
     QVBoxLayout * leftLayout = new QVBoxLayout;
     leftLayout->addWidget(p_ptIdValue);
     leftLayout->addLayout(pointTypeLayout);
-    leftLayout->addWidget(p_numMeasures);
     leftLayout->addWidget(p_pointAprioriLatitude);
     leftLayout->addWidget(p_pointAprioriLongitude);
     leftLayout->addWidget(p_pointAprioriRadius);
@@ -286,6 +285,7 @@ namespace Qisis {
     p_pointRadius = new QLabel;
 
     QVBoxLayout * rightLayout = new QVBoxLayout;
+    rightLayout->addWidget(p_numMeasures);
     rightLayout->addWidget(p_lockPoint);
     rightLayout->addWidget(p_ignorePoint);
     rightLayout->addWidget(p_pointLatitude);
@@ -325,6 +325,8 @@ namespace Qisis {
     p_leftMeasureType = new QLabel();
     p_leftSampError = new QLabel();
     p_leftLineError = new QLabel();
+    p_leftSampShift = new QLabel();
+    p_leftLineShift = new QLabel();
     p_leftGoodness = new QLabel();
     QVBoxLayout * leftLayout = new QVBoxLayout;
     leftLayout->addWidget(p_leftCombo);
@@ -334,6 +336,8 @@ namespace Qisis {
     leftLayout->addWidget(p_leftMeasureType);
     leftLayout->addWidget(p_leftSampError);
     leftLayout->addWidget(p_leftLineError);
+    leftLayout->addWidget(p_leftSampShift);
+    leftLayout->addWidget(p_leftLineShift);
     leftLayout->addWidget(p_leftGoodness);
 
     QGroupBox * leftGroupBox = new QGroupBox("Left Measure");
@@ -363,6 +367,8 @@ namespace Qisis {
     p_rightMeasureType = new QLabel();
     p_rightSampError = new QLabel();
     p_rightLineError = new QLabel();
+    p_rightSampShift = new QLabel();
+    p_rightLineShift = new QLabel();
     p_rightGoodness = new QLabel();
     
     // create right groupbox
@@ -374,6 +380,8 @@ namespace Qisis {
     rightLayout->addWidget(p_rightMeasureType);
     rightLayout->addWidget(p_rightSampError);
     rightLayout->addWidget(p_rightLineError);
+    rightLayout->addWidget(p_rightSampShift);
+    rightLayout->addWidget(p_rightLineShift);
     rightLayout->addWidget(p_rightGoodness);
     
     QGroupBox * rightGroupBox = new QGroupBox("Right Measure");
@@ -1247,6 +1255,9 @@ namespace Qisis {
    *                           hit "Cancel".
    *   @history 2011-04-08 Tracie Sucharski - Added check for NULL pointer
    *                           before deleting p_editPOint if parent is NULL.
+   *   @history 2011-07-19 Tracie Sucharski - Remove call to
+   *                           SetAprioriSurfacePoint, this should only be
+   *                           done for constrained or fixed points.
    *  
    */
   void QnetTool::createPoint(double lat,double lon) {
@@ -1278,10 +1289,6 @@ namespace Qisis {
 
       ControlPoint *newPoint =
         new ControlPoint(newPointDialog->ptIdValue->text().toStdString());
-      SurfacePoint surfPt = newPoint->GetAprioriSurfacePoint();
-      vector<Distance> targRadii = g_controlNetwork->GetTargetRadii();
-      surfPt.SetRadii(targRadii[0],targRadii[1],targRadii[2]);
-      newPoint->SetAprioriSurfacePoint(surfPt);
 
       // If this ControlPointId already exists, message box pops up and user is 
       // asked to enter a new value.
@@ -2202,6 +2209,8 @@ namespace Qisis {
    *                           the numeric Null for sample & line residuals.
    * @history 2011-04-20  Tracie Sucharski - Set EditLock check box correctly 
    * @history 2011-05-20  Tracie Sucharski - Added Reference output 
+   * @history 2011-07-19  Tracie Sucharski - Did some re-arranging and added 
+   *                           sample/line shifts. 
    * 
    */
   void QnetTool::updateLeftMeasureInfo () {
@@ -2244,6 +2253,22 @@ namespace Qisis {
     }
     p_leftLineError->setText(s);
 
+    if (p_leftMeasure->GetSampleShift() == Isis::Null) {
+      s = "Sample Shift: Null";
+    }
+    else {
+      s = "Sample Shift: " + QString::number(p_leftMeasure->GetSampleShift());
+    }
+    p_leftSampShift->setText(s);
+
+    if (p_leftMeasure->GetLineShift() == Isis::Null) {
+      s = "Line Shift: Null";
+    }
+    else {
+      s = "Line Shift: " + QString::number(p_leftMeasure->GetLineShift());
+    }
+    p_leftLineShift->setText(s);
+
     double goodnessOfFit = p_leftMeasure->GetLogData(
                     ControlMeasureLogData::GoodnessOfFit).GetNumericalValue();
     if (goodnessOfFit == Isis::Null) {
@@ -2271,6 +2296,8 @@ namespace Qisis {
    *                           the numeric Null for sample & line residuals. 
    * @history 2011-04-20  Tracie Sucharski - Set EditLock check box correctly 
    * @history 2011-05-20  Tracie Sucharski - Added Reference output 
+   * @history 2011-07-19  Tracie Sucharski - Did some re-arranging and added 
+   *                           sample/line shifts. 
    * 
    */
 
@@ -2314,6 +2341,23 @@ namespace Qisis {
       s = "Line Residual: " + QString::number(p_rightMeasure->GetLineResidual());
     }
     p_rightLineError->setText(s);
+
+    if (p_rightMeasure->GetSampleShift() == Isis::Null) {
+      s = "Sample Shift: Null";
+    }
+    else {
+      s = "Sample Shift: " + QString::number(p_rightMeasure->GetSampleShift());
+    }
+    p_rightSampShift->setText(s);
+
+    if (p_rightMeasure->GetLineShift() == Isis::Null) {
+      s = "Line Shift: Null";
+    }
+    else {
+      s = "Line Shift: " + QString::number(p_rightMeasure->GetLineShift());
+    }
+    p_rightLineShift->setText(s);
+
     double goodnessOfFit = p_rightMeasure->GetLogData(
                     ControlMeasureLogData::GoodnessOfFit).GetNumericalValue();
     if (goodnessOfFit == Isis::Null) {

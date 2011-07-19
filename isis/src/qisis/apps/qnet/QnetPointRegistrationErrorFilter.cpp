@@ -191,21 +191,4 @@ namespace Qisis {
       p_greaterErrorEdit->setEnabled(false);
     }
   }
-
-
-  double QnetPointRegistrationErrorFilter::calculateMaxError(ControlPoint &cp) {
-      // ***** below needs to be updated to whatever is decided on PIXELSHIFT *****
-#if 0
-    double maxError = 0.0;
-    for (int i = 0; i < cp.GetNumMeasures(); i++) {
-      double sampError = cp[i]->GetSampleShift();
-//    double lineError =
-//               cp[i]->GetLogData(ControlMeasureLogData::LineShift).GetNumericalValue();
-      if (sampError > maxError) maxError = sampError;
-    }
-    return maxError;
-    
-#endif
-    return 0;
-  }
 }
