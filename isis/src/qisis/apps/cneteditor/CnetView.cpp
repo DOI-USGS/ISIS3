@@ -70,6 +70,9 @@ namespace Isis
         header, SLOT(updateRebuildProgressRange(int, int)));
     connect(someModel, SIGNAL(filterCountsChanged(int, int)),
         header, SLOT(handleFilterCountsChanged(int, int)));
+    
+    connect(someModel, SIGNAL(modelModified()),
+            this, SIGNAL(selectionChanged()));
   }
 
 

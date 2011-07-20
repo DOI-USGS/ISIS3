@@ -245,10 +245,12 @@ namespace Isis
   {
     QList< AbstractTreeItem * > selectedItems;
 
-    if (rootItem)
+    ASSERT(rootItem);
+    
+    if (!isFiltering())
     {
-      AbstractTreeItem * currentItem = rootItem;
-
+      AbstractTreeItem * currentItem = rootItem->getFirstVisibleChild();
+      
       while (currentItem)
       {
         if (currentItem->isSelected())
@@ -590,7 +592,6 @@ namespace Isis
 
   void TreeModel::applyFilterDone()
   {
-//     getMutex()->unlock();
     filterRunning = false;
 
     //dudeWheresMyCar(rootItem, 0);
@@ -615,7 +616,7 @@ namespace Isis
     clear();
     QAtomicPointer< RootItem > newRoot = rebuildWatcher->future();
 
-    if (newRoot->childCount())
+    if (newRoot && newRoot->childCount())
     {
       ASSERT(rootItem);
       delete rootItem;
@@ -624,11 +625,10 @@ namespace Isis
     }
     else
     {
-      ASSERT(newRoot);
       delete newRoot;
       newRoot = NULL;
     }
-
+      
 //     loadViewState();
 
     applyFilter();
