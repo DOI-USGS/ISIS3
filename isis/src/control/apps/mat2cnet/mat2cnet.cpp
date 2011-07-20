@@ -2,18 +2,24 @@
 
 #include <map>
 
+#include "Application.h"
 #include "ControlMeasure.h"
 #include "ControlNet.h"
 #include "ControlPoint.h"
 #include "FileList.h"
-#include "ID.h"
 #include "iException.h"
+#include "iString.h"
 #include "Latitude.h"
 #include "Longitude.h"
-#include "Process.h"
+#include "Preference.h"
+#include "Progress.h"
 #include "Pvl.h"
+#include "PvlGroup.h"
+#include "PvlObject.h"
 #include "SerialNumberList.h"
+#include "SurfacePoint.h"
 #include "TextFile.h"
+#include "UserInterface.h"
 
 using namespace std;
 using namespace Isis;
@@ -24,7 +30,7 @@ std::map <int, string> snMap;
 void IsisMain() {
   // The following steps can take a significant amount of time, so
   // set up a progress object, incrementing at 1%, to keep the user informed
-  Isis::PvlGroup &uip = Isis::Preference::Preferences().FindGroup("UserInterface");
+  PvlGroup &uip = Preference::Preferences().FindGroup("UserInterface");
   uip["ProgressBarPercent"] = 1;
   UserInterface &ui = Application::GetUserInterface();
   Progress progress;
@@ -37,15 +43,21 @@ void IsisMain() {
   progress.CheckStatus();
 
   if (list2.size() != (unsigned)snl.Size()) {
-    iString msg = "Invalid input file number of lines. The ISIS 2 file list [";
+    iString msg = "Invalid input file number of lines. The ISIS2 file list [";
     msg += ui.GetAsString("LIST2") + "] must contain the same number of lines ";
-    msg += "as the ISIS 3 file list [" + ui.GetAsString("LIST3") + "]";
-    throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+    msg += "as the ISIS3 file list [" + ui.GetAsString("LIST3") + "]";
+    throw iException::Message(iException::User, msg, _FILEINFO_);
   }
 
-  progress.SetText("Mapping Isis 2 fsc numbers to Isis 3 serial numbers.");
+  progress.SetText("Mapping ISIS2 fsc numbers to ISIS3 serial numbers.");
   progress.SetMaximumSteps(list2.size());
   // Setup a map between ISIS2 image number (fsc) and ISIS3 sn
+  // **NOTE:
+  //   The order of the ISIS2 and ISIS3 lists MUST correspond so that we can map
+  //   each ISIS2 FSC to the proper ISIS3 Serial Number.
+  //   Otherwise, we would be required to write a separate routine for each
+  //   mission to determine the corresponding serial number for a given FSC.
+  //   Jeannie Backer 2011-06-30
   for (unsigned int f = 0; f < list2.size(); f++) {
     progress.CheckStatus();
     iString currFile(list2[f]);
@@ -61,7 +73,8 @@ void IsisMain() {
     }
     else {
       throw iException::Message(iException::Pvl,
-          "Can not find required keyword IMAGE_NUMBER or IMAGE_ID in [" + currFile + "]",
+          "Can not find required keyword IMAGE_NUMBER or IMAGE_ID "
+          "in [" + currFile + "]",
           _FILEINFO_);
     }
 
@@ -74,8 +87,8 @@ void IsisMain() {
   ControlNet cnet;
   cnet.SetNetworkId(ui.GetString("NETWORKID"));
   cnet.SetTarget(ui.GetString("TARGET"));
-  cnet.SetUserName(Isis::Application::UserName());
-  cnet.SetCreatedDate(Isis::Application::DateTime());
+  cnet.SetUserName(Application::UserName());
+  cnet.SetCreatedDate(Application::DateTime());
   cnet.SetDescription(ui.GetString("DESCRIPTION"));
 
   // Open the match point file
@@ -90,11 +103,12 @@ void IsisMain() {
   try {
     inTotalMeas = int(currLine);
   }
-  catch (Isis::iException &e) {
-    throw iException::Message(iException::User, "Invalid match point file header for ["
-        + ui.GetAsString("MATCH")
-        + "]. First line does not contain number of measurements."
-        , _FILEINFO_);
+  catch (iException &e) {
+    throw iException::Message(iException::User, "Invalid match point file "
+                                "header for [" + ui.GetAsString("MATCH") 
+                                + "]. First line does not contain number of "
+                                "measurements.",
+                              _FILEINFO_);
   }
 
   // Read line 2, the column header line
@@ -108,12 +122,13 @@ void IsisMain() {
     try {
       error = label;
       // if we are able to convert label to a double, we have an error
-      throw iException::Message(iException::User, "Invalid match point file header for ["
-          + ui.GetAsString("MATCH")
-          + "]. Second line does not contain proper non-numerical column labels."
-          , _FILEINFO_);
+      throw iException::Message(iException::User, "Invalid match point file "
+                                  "header for [" + ui.GetAsString("MATCH")
+                                  + "]. Second line does not contain proper "
+                                  "non-numerical column labels.", 
+                                _FILEINFO_);
     }
-    catch (Isis::iException e) {
+    catch (iException e) {
       // if this line does not contain a double, continue
       if (error == 0) {
         e.Clear();// not really an error, this is text value, as expected
@@ -138,12 +153,14 @@ void IsisMain() {
     try {
       progress.CheckStatus();
     }
-    catch (Isis::iException e) {
-      string msg = "\"Matchpoint total\" keyword at the top of the match point file [";
+    catch (iException e) {
+      string msg = "\"Matchpoint total\" keyword at the top of the match point "
+                   "file [";
       msg += ui.GetAsString("MATCH") + "] equals [" + iString(inTotalMeas);
-      msg += "] and is likely incorrect. Number of measures in match point file exceeds this value at line [";
+      msg += "] and is likely incorrect. Number of measures in match point file"
+             " exceeds this value at line [";
       msg += iString(line) + "].";
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
 
@@ -160,7 +177,7 @@ void IsisMain() {
     string matClass = "";
     try {
       pid = currLine.Token(" ");      // ID of the point
-      fsc = currLine.Token(" ");      // FSC of the Isis 2 cube
+      fsc = currLine.Token(" ");      // FSC of the ISIS2 cube
       lineNum = currLine.Token(" ");  // line number
       sampNum = currLine.Token(" ");  // sample number
       matClass = currLine.Token(" "); // Match Point Class
@@ -170,7 +187,7 @@ void IsisMain() {
       iString msg = "Invalid value(s) in match point file [";
       msg += ui.GetAsString("MATCH") + "] at line [" + iString(line);
       msg += "]. Verify line, sample, diameter values are doubles.";
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
     // Set the coordinate and serial number for this measure
@@ -178,7 +195,7 @@ void IsisMain() {
     cmeasure->SetCubeSerialNumber(snMap[(int)fsc]);
 
     if (snMap[(int)fsc].empty()) {
-      std::string msg = "None of the images specified in the ISIS 2 file list [";
+      std::string msg = "None of the images specified in the ISIS2 file list [";
       msg += ui.GetAsString("LIST2");
       msg += "] have an IMAGE_NUMBER or IMAGE_ID that matches the FSC [" + fsc;
       msg += "], from the match point file [" + ui.GetAsString("MATCH");
@@ -189,40 +206,30 @@ void IsisMain() {
     bool isReferenceMeasure = false;
 
     //Set the Measure Type
-    if (iString::Equal(matClass, "U"))
-      //Unmeasured - these are ignored in isis2
-    {
+    if (iString::Equal(matClass, "U")) {//Unmeasured -these are ignored in isis2
       cmeasure->SetType(ControlMeasure::Candidate);
       cmeasure->SetIgnored(true);
     }
-    else if (iString::Equal(matClass, "T"))
-      //Truth
-    {
+    else if (iString::Equal(matClass, "T")) {
       // Truth type, aka reference measure, is no longer a measure type
       // what this means is it has to be handled by the control point.
       // So, further down the boolean set here will be used.
       isReferenceMeasure = true;
     }
-    else if (iString::Equal(matClass, "S"))
-      //SubPixel
-    {
+    else if (iString::Equal(matClass, "S")) { //SubPixel
       cmeasure->SetType(ControlMeasure::RegisteredSubPixel);
     }
-    else if (iString::Equal(matClass, "M"))
-      //Measured
-    {
+    else if (iString::Equal(matClass, "M")) { //Measured
       cmeasure->SetType(ControlMeasure::RegisteredPixel);
     }
-    else if (iString::Equal(matClass, "A"))
-      //Approximate
-    {
+    else if (iString::Equal(matClass, "A")) { //Approximate
       cmeasure->SetType(ControlMeasure::Candidate);
     }
     else {
       iString msg = "Unknown measurment type [" + matClass + "] ";
       msg += "in match point file [" + ui.GetAsString("MATCH") + "] ";
       msg += "at line [" + iString(line) + "]";
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
     //Set Diameter
@@ -236,6 +243,9 @@ void IsisMain() {
       // but the error is not important otherwise
       e.Clear();
     }
+
+    // Check whether we should lock all measures
+    cmeasure->SetEditLock(ui.GetBoolean("MEASURELOCK"));
 
     //Find the point that matches the PointID, create point if it does not exist
 
@@ -256,10 +266,10 @@ void IsisMain() {
       }
     }
     catch (iException &e) {
-      iString msg = "Invalid match point file [" + ui.GetAsString("MATCH") + "]";
+      iString msg = "Invalid match point file [" + ui.GetAsString("MATCH") +"]";
       msg += ".  Repeated PointID/FSC combination [" + pid + ", " + fsc;
       msg += "] in match point file at line [" + iString(line) + "].";
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      throw iException::Message(iException::User, msg, _FILEINFO_);
     }
   }
 
@@ -267,17 +277,19 @@ void IsisMain() {
   try {
     progress.CheckStatus();
   }
-  catch (Isis::iException e) {
-    string msg = "\"Matchpoint total\" keyword at the top of the match point file [";
+  catch (iException e) {
+    string msg = "\"Matchpoint total\" keyword at the top of the match point "
+                 "file [";
     msg += ui.GetAsString("MATCH") + "] equals [" + iString(inTotalMeas);
-    msg += "] and is likely incorrect. Number of measures in match point file exceeds this value at line [";
+    msg += "] and is likely incorrect. Number of measures in match point file "
+           "exceeds this value at line [";
     msg += iString(line) + "].";
-    throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+    throw iException::Message(iException::User, msg, _FILEINFO_);
   }
 
 
-  // 10/5/2009 - Jeannie Walldren //////////////////////////////
-  // Added RAND PPP file as input     //////////////////////////////
+  // 10/5/2009 Jeannie Walldren - Added RAND PPP file as input 
+  // 7/12/2011 Jeannie Backer - Added option to lock all points in RAND PPP file
 
   // Open the RAND PPP file
   if (ui.GetBoolean("INPUTPPP")) {
@@ -298,11 +310,12 @@ void IsisMain() {
       try {
         progress.CheckStatus();
       }
-      catch (Isis::iException e) {
-        iString msg = "RAND PPP file may not be valid.  Line count calculated [";
-        msg += iString(inTotalLine) + "] for RAND PPP file [" + ui.GetAsString("PPP");
-        msg += "] appears invalid at line [" + iString(line) + "].";
-        throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      catch (iException e) {
+        iString msg = "RAND PPP file may not be valid. Line count calculated [";
+        msg += iString(inTotalLine) + "] for RAND PPP file [";
+        msg += ui.GetAsString("PPP") + "] appears invalid at line [";
+        msg += iString(line) + "].";
+        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
       }
 
       // Declare the Point
@@ -310,15 +323,18 @@ void IsisMain() {
 
       // if end of valid data, break, stop processing
       if (currLine.find("JULIAN") != string::npos) {
-        // Since Progress MaximumSteps was approximated using the number of lines in the RAND PPP file,
-        // we need to subtract the number of lines left from the Progress steps
-        // since the following lines are not going to be processed
-        progress.AddSteps(line - inTotalLine); // line < inTotalLine, so this is negative
+        // Since Progress MaximumSteps was approximated using the number of
+        // lines in the RAND PPP file, we need to subtract the number of lines
+        // left from the Progress steps since the following lines are not going
+        // to be processed
+        progress.AddSteps(line - inTotalLine); // line < inTotalLine, 
+                                               //so this is negative
         break;
       }
 
-      // break columns into substrings since some files have colunms that can't be tokenized easily.
-      // This is because some files have columns running into each other without spaces separating them
+      // break columns into substrings since some files have colunms that can't
+      // be tokenized easily. This is because some files have columns running
+      // into each other without spaces separating them
 
       // column 1 = latitude, begins the line and is 24 characters
       double lat;
@@ -330,11 +346,11 @@ void IsisMain() {
         // convert to double
         lat = col1;
       }
-      catch (Isis::iException &e) {
+      catch (iException &e) {
         iString msg = "Invalid value(s) in RAND PPP file [";
         msg += ui.GetAsString("PPP") + "] at line [" + iString(line);
         msg += "]. Verify latitude value is a double.";
-        throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+        throw iException::Message(iException::User, msg, _FILEINFO_);
       }
 
       // column 2 = longitude, begins at 25th char and is 24 characters
@@ -346,11 +362,11 @@ void IsisMain() {
         // convert to double
         lon = col2;
       }
-      catch (Isis::iException &e) {
+      catch (iException &e) {
         iString msg = "Invalid value(s) in RAND PPP file [";
         msg += ui.GetAsString("PPP") + "] at line [" + iString(line);
         msg += "]. Verify longitude value is a double.";
-        throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+        throw iException::Message(iException::User, msg, _FILEINFO_);
       }
 
       // column 3 = radius, begins at 49th char and is 24 characters
@@ -363,11 +379,11 @@ void IsisMain() {
         rad = col3;
         rad = rad * 1000;
       }
-      catch (Isis::iException &e) {
+      catch (iException &e) {
         iString msg = "Invalid value(s) in RAND PPP file [";
         msg += ui.GetAsString("PPP") + "] at line [" + iString(line);
         msg += "]. Verify radius value is a double.";
-        throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+        throw iException::Message(iException::User, msg, _FILEINFO_);
       }
 
       // column 4 = point id, begins at 73rd char and is 7 characters
@@ -378,10 +394,11 @@ void IsisMain() {
         iString msg = "Invalid value(s) in RAND PPP file [";
         msg += ui.GetAsString("PPP") + "] at line [" + iString(line);
         msg += "]. Point ID [" + pid + "] has more than 7 characters.";
-        throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+        throw iException::Message(iException::User, msg, _FILEINFO_);
       }
 
-      //Find the point that matches the PointID, if it does not exist alert the user
+      //Find the point that matches the PointID, if it does not exist alert the 
+      //user
       if (!cnet.ContainsPoint(pid)) {
         numRandOnly++;
         randOnlyIDs.push_back(currLine);
@@ -410,23 +427,28 @@ void IsisMain() {
               Longitude(lon, Angle::Degrees),
               Distance(rad, Distance::Meters));
           cpoint->SetAprioriSurfacePoint(surfacePt);
+          cpoint->SetEditLock(ui.GetBoolean("POINTLOCK"));
         }
         catch (iException &e) {
-          iString msg = "Unable to set universal ground point to control network from line [";
-          msg += iString(line) + "] of RAND PPP file [" + ui.GetAsString("PPP") + "]";
-          throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+          iString msg = "Unable to set universal ground point to control "
+                        "network from line [";
+          msg += iString(line) + "] of RAND PPP file [";
+          msg += ui.GetAsString("PPP") + "]";
+          throw iException::Message(iException::User, msg, _FILEINFO_);
         }
       }
     }
+    
     // Update the Progress object
     try {
       progress.CheckStatus();
     }
-    catch (Isis::iException e) {
+    catch (iException e) {
       iString msg = "RAND PPP file may not be valid.  Line count calculated [";
-      msg += iString(inTotalLine) + "] for RAND PPP file [" + ui.GetAsString("PPP");
+      msg += iString(inTotalLine) + "] for RAND PPP file [";
+      msg += ui.GetAsString("PPP");
       msg += "] appears invalid at line [" + iString(line) + "].";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
     // Write results to Logs
@@ -442,13 +464,13 @@ void IsisMain() {
       logFile = ui.GetFilename("LOG");
     }
     // if no filename was entered, but there were some RAND PPP only points,
-    // create an log named "randOnlyPoints" in the current directory
+    // create an log named "pppOnlyPoints" in the current directory
     else if (numRandOnly > 0) {
       log = true;
-      logFile = "randOnlyPoints.log";
+      logFile = "pppOnlyPoints.log";
     }
-    // if all RAND PPP points are found in the MATCH file and no log file is named,
-    // only output summary to application log
+    // if all RAND PPP points are found in the MATCH file and no log file is
+    // named, only output summary to application log
     else {
       log = false;
     }
@@ -461,14 +483,17 @@ void IsisMain() {
       if (numRandOnly > 0) {
         // if there are any RAND PPP only points,
         // add comment to the summary log to alert user
-        summaryGroup.AddComment("Some Point IDs in the RAND PPP file have no measures in the MATCH file.");
-        summaryGroup.AddComment("These Point IDs are contained in [" + logFile.Name() + "].");
+        summaryGroup.AddComment("Some Point IDs in the RAND PPP file have no "
+                                "measures in the MATCH file.");
+        summaryGroup.AddComment("These Point IDs are contained "
+                                "in [" + logFile.Name() + "].");
         TextFile outlog(logFile.Expanded(), "overwrite", randOnlyIDs);
       }
       else {
         // if there are no RAND PPP only points and user wanted to create a log,
         // add comment to the summary log to alert user
-        summaryGroup.AddComment("All Point IDs in the RAND PPP file have measures in the MATCH file.");
+        summaryGroup.AddComment("All Point IDs in the RAND PPP file have "
+                                "measures in the MATCH file.");
         summaryGroup.AddComment("No RAND PPP log was created.");
       }
     }

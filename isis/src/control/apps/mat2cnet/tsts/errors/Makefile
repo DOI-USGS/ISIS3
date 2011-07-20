@@ -1,3 +1,5 @@
+# Test for output errors in mat2cnet.  No control net will be output, instead
+# we will have a text file containing the errors.
 .IGNORE:
 
 APPNAME = mat2cnet
