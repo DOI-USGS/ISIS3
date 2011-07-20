@@ -87,35 +87,38 @@ namespace Isis
   {
     writeSettings();
 
-    if (topSplitterDefault)
-    {
-      delete topSplitterDefault;
-      topSplitterDefault = NULL;
-    }
+    delete topSplitterDefault;
+    topSplitterDefault = NULL;
 
-    if (workingVersion)
-    {
-      delete workingVersion;
-      workingVersion = NULL;
-    }
+    delete workingVersion;
+    workingVersion = NULL;
 
-    if (editPointDelegate)
-    {
-      delete editPointDelegate;
-      editPointDelegate = NULL;
-    }
+    delete editPointDelegate;
+    editPointDelegate = NULL;
 
-    if (editMeasureDelegate)
-    {
-      delete editMeasureDelegate;
-      editMeasureDelegate = NULL;
-    }
+    delete editMeasureDelegate;
+    editMeasureDelegate = NULL;
 
-    if (settingsPath)
-    {
-      delete settingsPath;
-      settingsPath = NULL;
-    }
+    delete settingsPath;
+    settingsPath = NULL;
+
+    delete pointView;
+    pointView = NULL;
+
+    delete serialView;
+    serialView = NULL;
+
+    delete connectionView;
+    connectionView = NULL;
+
+    delete pointFilterWidget;
+    pointFilterWidget = NULL;
+
+    delete serialFilterWidget;
+    serialFilterWidget = NULL;
+
+    delete connectionFilterWidget;
+    connectionFilterWidget = NULL;
   }
 
 
@@ -169,8 +172,6 @@ namespace Isis
 //
 //     connectionView->selectionModel()->clear();
 //     connectionView->collapseAll();
-
-    syncFilterWidgets();
   }
 
 
@@ -189,31 +190,6 @@ namespace Isis
   void CnetEditorWidget::activateConnectionView()
   {
     setDriverView(2);
-  }
-
-
-  void CnetEditorWidget::syncFilterWidgets()
-  {
-    pointFilterWidget->setVisible(false);
-    serialFilterWidget->setVisible(false);
-    connectionFilterWidget->setVisible(false);
-
-    switch ((View) getDriverView())
-    {
-      case PointView:
-        pointFilterWidget->show();
-        break;
-      case SerialView:
-        serialFilterWidget->show();
-        break;
-      case ConnectionView:
-        connectionFilterWidget->show();
-    }
-
-//     topSplitter->addWidget(pointFilterArea);
-//     topSplitter->addWidget(serialFilterArea);
-//     topSplitter->addWidget(connectionFilterArea);
-
   }
 
 
@@ -279,10 +255,10 @@ namespace Isis
 
     topSplitter = new QSplitter(Qt::Horizontal);
 //     topSplitter->setChildrenCollapsible(false);
-    topSplitter->addWidget(pointView);
-    topSplitter->addWidget(serialView);
-    topSplitter->addWidget(connectionView);
-    topSplitter->addWidget(filterArea);
+//     topSplitter->addWidget(pointView);
+//     topSplitter->addWidget(serialView);
+//     topSplitter->addWidget(connectionView);
+//     topSplitter->addWidget(filterArea);
 
     mainSplitter = new QSplitter(Qt::Vertical);
     mainSplitter->addWidget(topSplitter);
@@ -339,41 +315,50 @@ namespace Isis
     ASSERT(serialModel);
     ASSERT(connectionModel);
 
-    pointFilterWidget = new FilterWidget("Points and Measures");
+    FilterWidget * pointFilter = new FilterWidget("Points and Measures");
     if (pointModel)
     {
-      pointModel->setFilter(pointFilterWidget);
+      pointModel->setFilter(pointFilter);
     }
 
-    serialFilterWidget = new FilterWidget("Images and Points");
+    QHBoxLayout * pointFilterLayout = new QHBoxLayout;
+    pointFilterLayout->addWidget(pointFilter);
+    QWidget * pointArea = new QWidget;
+    pointArea->setLayout(pointFilterLayout);
+    QScrollArea * pointFilterScrollArea = new QScrollArea;
+    pointFilterScrollArea->setWidget(pointArea);
+    pointFilterScrollArea->setWidgetResizable(true);
+    pointFilterWidget = pointFilterScrollArea;
+
+    FilterWidget * serialFilter = new FilterWidget("Images and Points");
     if (serialModel)
     {
-      serialModel->setFilter(serialFilterWidget);
+      serialModel->setFilter(serialFilter);
     }
 
-    connectionFilterWidget = new FilterWidget("Connections");
+    QHBoxLayout * serialFilterLayout = new QHBoxLayout;
+    serialFilterLayout->addWidget(serialFilter);
+    QWidget * serialArea = new QWidget;
+    serialArea->setLayout(serialFilterLayout);
+    QScrollArea * serialFilterScrollArea = new QScrollArea;
+    serialFilterScrollArea->setWidget(serialArea);
+    serialFilterScrollArea->setWidgetResizable(true);
+    serialFilterWidget = serialFilterScrollArea;
+
+    FilterWidget * connectionFilter = new FilterWidget("Connections");
     if (connectionModel)
     {
-      connectionModel->setFilter(connectionFilterWidget);
+      connectionModel->setFilter(connectionFilter);
     }
 
-    QHBoxLayout * layout = new QHBoxLayout;
-    layout->addWidget(pointFilterWidget);
-    layout->addWidget(serialFilterWidget);
-    layout->addWidget(connectionFilterWidget);
-
-    QWidget * filterAreaWidget = new QWidget;
-    filterAreaWidget->setLayout(layout);
-    connect(pointFilterWidget, SIGNAL(scrollToBottom()),
-        this, SLOT(scrollFilterAreaToBottom()));
-    connect(serialFilterWidget, SIGNAL(scrollToBottom()),
-        this, SLOT(scrollFilterAreaToBottom()));
-    connect(connectionFilterWidget, SIGNAL(scrollToBottom()),
-        this, SLOT(scrollFilterAreaToBottom()));
-
-    filterArea = new QScrollArea;
-    filterArea->setWidget(filterAreaWidget);
-    filterArea->setWidgetResizable(true);
+    QHBoxLayout * connectionFilterLayout = new QHBoxLayout;
+    connectionFilterLayout->addWidget(connectionFilter);
+    QWidget * connectionArea = new QWidget;
+    connectionArea->setLayout(connectionFilterLayout);
+    QScrollArea * connectionFilterScrollArea = new QScrollArea;
+    connectionFilterScrollArea->setWidget(connectionArea);
+    connectionFilterScrollArea->setWidgetResizable(true);
+    connectionFilterWidget = connectionFilterScrollArea;
   }
 
 
@@ -653,22 +638,22 @@ namespace Isis
   }
 
 
-  void CnetEditorWidget::scrollFilterAreaToBottom()
-  {
-    QTimer::singleShot(100, this, SLOT(doScroll()));
-  }
+//   void CnetEditorWidget::scrollFilterAreaToBottom()
+//   {
+//     QTimer::singleShot(100, this, SLOT(doScroll()));
+//   }
 
 
-  void CnetEditorWidget::doScroll()
-  {
-    ASSERT(filterArea);
-
-    if (filterArea)
-    {
-      QScrollBar * vsb = filterArea->verticalScrollBar();
-      vsb->setValue(vsb->maximum());
-    }
-  }
+//   void CnetEditorWidget::doScroll()
+//   {
+//     ASSERT(filterArea);
+//
+//     if (filterArea)
+//     {
+//       QScrollBar * vsb = filterArea->verticalScrollBar();
+//       vsb->setValue(vsb->maximum());
+//     }
+//   }
 
 
   void CnetEditorWidget::pointColToggled()
@@ -786,5 +771,40 @@ namespace Isis
           PointTableModel::getColName((PointTableModel::Column) i),
           actions[i]->isChecked());
     }
+  }
+
+  QWidget * CnetEditorWidget::getPointTreeView()
+  {
+    return pointView;
+  }
+
+
+  QWidget * CnetEditorWidget::getSerialTreeView()
+  {
+    return serialView;
+  }
+
+
+  QWidget * CnetEditorWidget::getConnectionTreeView()
+  {
+    return connectionView;
+  }
+
+
+  QWidget * CnetEditorWidget::getPointFilterWidget()
+  {
+    return pointFilterWidget;
+  }
+
+
+  QWidget * CnetEditorWidget::getSerialFilterWidget()
+  {
+    return serialFilterWidget;
+  }
+
+
+  QWidget * CnetEditorWidget::getConnectionFilterWidget()
+  {
+    return connectionFilterWidget;
   }
 }

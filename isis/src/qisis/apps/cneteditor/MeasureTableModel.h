@@ -77,7 +77,7 @@ namespace Isis
 
     private:
       void setLogData(ControlMeasure * measure, int measureLogDataEnum,
-                      const QVariant & value);
+          const QVariant & value);
       bool validateRowColumn(int row, int column,
           bool checkMeasure = true) const;
       double catchNULL(QString) const;

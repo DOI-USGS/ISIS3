@@ -46,6 +46,13 @@ namespace Isis
       void readSettings();
       void writeSettings();
 
+      QWidget * getPointTreeView();
+      QWidget * getSerialTreeView();
+      QWidget * getConnectionTreeView();
+      QWidget * getPointFilterWidget();
+      QWidget * getSerialFilterWidget();
+      QWidget * getConnectionFilterWidget();
+
 
     public slots:
       void setDriverView(int);
@@ -68,7 +75,6 @@ namespace Isis
       void createEditPointView();
       void createEditMeasureView();
       void focusView(CnetView * view, QStringList label);
-      void syncFilterWidgets();
       void upgradeVersion();
 
 
@@ -80,8 +86,8 @@ namespace Isis
       void itemExpanded(const QModelIndex & index);
       void itemCollapsed(const QModelIndex & index);
       void rebuildModels();
-      void scrollFilterAreaToBottom();
-      void doScroll();
+//       void scrollFilterAreaToBottom();
+//       void doScroll();
       void pointColToggled();
       void measureColToggled();
 
@@ -101,9 +107,9 @@ namespace Isis
 
       QScrollArea * filterArea;
 
-      FilterWidget * pointFilterWidget;
-      FilterWidget * serialFilterWidget;
-      FilterWidget * connectionFilterWidget;
+      QWidget * pointFilterWidget;
+      QWidget * serialFilterWidget;
+      QWidget * connectionFilterWidget;
 
       PointModel * pointModel;
       SerialModel * serialModel;

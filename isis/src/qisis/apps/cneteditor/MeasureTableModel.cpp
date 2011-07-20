@@ -166,19 +166,19 @@ namespace Isis
           case Eccentricity:
             return QVariant::fromValue(catchNULL(
                 measure->GetLogData(
-                  ControlMeasureLogData::Eccentricity).GetNumericalValue()));
+                    ControlMeasureLogData::Eccentricity).GetNumericalValue()));
           case GoodnessOfFit:
             return QVariant::fromValue(catchNULL(
                 measure->GetLogData(
-                  ControlMeasureLogData::GoodnessOfFit).GetNumericalValue()));
+                    ControlMeasureLogData::GoodnessOfFit).GetNumericalValue()));
           case MinPixelZScore:
             return QVariant::fromValue(catchNULL(
                 measure->GetLogData(ControlMeasureLogData::MinimumPixelZScore).
-                  GetNumericalValue()));
+                GetNumericalValue()));
           case MaxPixelZScore:
             return QVariant::fromValue(catchNULL(
                 measure->GetLogData(ControlMeasureLogData::MaximumPixelZScore).
-                  GetNumericalValue()));
+                GetNumericalValue()));
           case SampleShift:
             return QVariant::fromValue(catchNULL(measure->GetSampleShift()));
           case LineShift:
@@ -357,11 +357,11 @@ namespace Isis
             break;
           case MinPixelZScore:
             setLogData(measure, ControlMeasureLogData::MinimumPixelZScore,
-                       value);
+                value);
             break;
           case MaxPixelZScore:
             setLogData(measure, ControlMeasureLogData::MaximumPixelZScore,
-                       value);
+                value);
             break;
           case SampleShift:
             // This is not editable anymore.
@@ -409,10 +409,11 @@ namespace Isis
 
 
   void MeasureTableModel::setLogData(ControlMeasure * measure,
-      int measureLogDataEnum, const QVariant & value) {
+      int measureLogDataEnum, const QVariant & value)
+  {
     QString newDataStr = value.toString().toLower();
     ControlMeasureLogData::NumericLogDataType type =
-        (ControlMeasureLogData::NumericLogDataType) measureLogDataEnum;
+      (ControlMeasureLogData::NumericLogDataType) measureLogDataEnum;
     if (newDataStr == "null")
     {
       measure->DeleteLogData(type);

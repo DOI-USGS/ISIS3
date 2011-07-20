@@ -9,6 +9,7 @@
 #include <QButtonGroup>
 #include <QCheckBox>
 #include <QCloseEvent>
+#include <QDockWidget>
 #include <QHBoxLayout>
 #include <QLayout>
 #include <QFont>
@@ -38,8 +39,10 @@ using std::cerr;
 
 namespace Isis
 {
+
   class CnetEditorFileDialog : public QFileDialog
   {
+
     public:
       CnetEditorFileDialog(QLayout * l, QWidget * parent = NULL);
   };
@@ -51,6 +54,7 @@ namespace Isis
     setNameFilter("Control Network files (*.net *.bin);;All files (*)");
     QGridLayout * mainLayout = qobject_cast< QGridLayout * >(layout());
     ASSERT(mainLayout);
+
     if (mainLayout)
       mainLayout->addLayout(l, mainLayout->rowCount(), 0, 1, -1);
   }
@@ -77,13 +81,14 @@ namespace Isis
     labelFont = new QFont("Sansserif", 9);
 
     createActions();
+    createDockWidgets();
     createMenus();
     createToolBars();
     createStatusBar();
     readSettings();
 
     setFileState(NoFile, "");
-    
+
     if (QApplication::arguments().size() > 1)
     {
       load(QApplication::arguments().at(1));
@@ -113,7 +118,7 @@ namespace Isis
 
     delete cnet;
     cnet = NULL;
-    
+
     delete cnetReader;
     cnetReader = NULL;
 
@@ -125,7 +130,7 @@ namespace Isis
 
     delete labelFont;
     labelFont = NULL;
-    
+
     delete loadingProgressBar;
     loadingProgressBar = NULL;
 
@@ -152,8 +157,16 @@ namespace Isis
     helpMenu = NULL;
 
     mainToolBar = NULL;
-    
+
     loadingProgressBar = NULL;
+
+    pointTreeDockWidget = NULL;
+    serialTreeDockWidget = NULL;
+    connectionTreeDockWidget = NULL;
+
+    pointFilterDockWidget = NULL;
+    serialFilterDockWidget = NULL;
+    connectionFilterDockWidget = NULL;
   }
 
 
@@ -162,8 +175,10 @@ namespace Isis
     if (okToContinue())
     {
       writeSettings();
+
       if (editorWidget)
         editorWidget->writeSettings();
+
       event->accept();
     }
     else
@@ -204,6 +219,62 @@ namespace Isis
   }
 
 
+  void CnetEditorWindow::createDockWidgets()
+  {
+    setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
+    setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
+    setCorner(Qt::TopLeftCorner, Qt::LeftDockWidgetArea);
+    setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
+
+
+    pointTreeDockWidget = new QDockWidget("Point View", this, Qt::SubWindow);
+    pointTreeDockWidget->setObjectName("PointTreeDock");
+    pointTreeDockWidget->setFeatures(QDockWidget::DockWidgetFloatable |
+        QDockWidget::DockWidgetMovable);
+    addDockWidget(Qt::BottomDockWidgetArea, pointTreeDockWidget);
+
+    serialTreeDockWidget = new QDockWidget("Serial View", this, Qt::SubWindow);
+    serialTreeDockWidget->setObjectName("SerialTreeDock");
+    serialTreeDockWidget->setFeatures(QDockWidget::DockWidgetFloatable |
+        QDockWidget::DockWidgetMovable);
+    addDockWidget(Qt::BottomDockWidgetArea, serialTreeDockWidget);
+    tabifyDockWidget(pointTreeDockWidget, serialTreeDockWidget);
+
+    connectionTreeDockWidget = new QDockWidget("Connection View",
+        this, Qt::SubWindow);
+    connectionTreeDockWidget->setObjectName("ConnectionTreeDock");
+    connectionTreeDockWidget->setFeatures(QDockWidget::DockWidgetFloatable |
+        QDockWidget::DockWidgetMovable);
+    addDockWidget(Qt::BottomDockWidgetArea, connectionTreeDockWidget);
+    tabifyDockWidget(serialTreeDockWidget, connectionTreeDockWidget);
+    pointTreeDockWidget->raise();
+
+    pointFilterDockWidget = new QDockWidget("Filter Points and Measures",
+        this, Qt::SubWindow);
+    pointFilterDockWidget->setObjectName("PointFilterDock");
+    pointFilterDockWidget->setFeatures(QDockWidget::DockWidgetFloatable |
+        QDockWidget::DockWidgetMovable);
+    addDockWidget(Qt::BottomDockWidgetArea, pointFilterDockWidget);
+
+    serialFilterDockWidget = new QDockWidget("Filter Images and Points",
+        this, Qt::SubWindow);
+    serialFilterDockWidget->setObjectName("SerialFilterDock");
+    serialFilterDockWidget->setFeatures(QDockWidget::DockWidgetFloatable |
+        QDockWidget::DockWidgetMovable);
+    addDockWidget(Qt::BottomDockWidgetArea, serialFilterDockWidget);
+    tabifyDockWidget(pointFilterDockWidget, serialFilterDockWidget);
+
+    connectionFilterDockWidget = new QDockWidget("Filter Connections",
+        this, Qt::SubWindow);
+    connectionFilterDockWidget->setObjectName("ConnectionFilterDock");
+    connectionFilterDockWidget->setFeatures(QDockWidget::DockWidgetFloatable |
+        QDockWidget::DockWidgetMovable);
+    addDockWidget(Qt::BottomDockWidgetArea, connectionFilterDockWidget);
+    tabifyDockWidget(serialFilterDockWidget, connectionFilterDockWidget);
+    pointFilterDockWidget->raise();
+  }
+
+
   void CnetEditorWindow::createMenus()
   {
     fileMenu = menuBar()->addMenu("&File");
@@ -224,6 +295,7 @@ namespace Isis
   void CnetEditorWindow::createToolBars()
   {
     mainToolBar = addToolBar(tr("Main ToolBar"));
+    mainToolBar->setObjectName("main toolbar");
     mainToolBar->setFloatable(false);
     //mainToolBar->setAllowedAreas(Qt::TopToolBarArea);
     mainToolBar->addAction(openAct);
@@ -260,6 +332,7 @@ namespace Isis
     move(pos);
 
     setWindowIcon(QIcon(":usgs"));
+    restoreState(settings.value("windowState").toByteArray());
   }
 
 
@@ -272,6 +345,7 @@ namespace Isis
     // save window position and size
     settings.setValue("pos", pos());
     settings.setValue("size", size());
+    settings.setValue("windowState", saveState());
   }
 
 
@@ -322,11 +396,19 @@ namespace Isis
 
 
   void CnetEditorWindow::setFileState(CnetEditorWindow::FileState state,
-                                      QString filename)
+      QString filename)
   {
+    if (centralWidget() && centralWidget() != editorWidget)
+      setCentralWidget(NULL);
+
     switch (state)
     {
       case HasFile:
+//         setDockWidgetsVisible(true);
+        
+        if (centralWidget() != editorWidget)
+          setCentralWidget(editorWidget);
+
         openAct->setEnabled(false);
         saveAsAct->setEnabled(true);
         closeAct->setEnabled(true);
@@ -335,8 +417,10 @@ namespace Isis
         setWindowTitle(filename + "[*] - cneteditor");
         loadingProgressBar->setVisible(false);
         break;
-        
+
       case NoFile:
+//         setDockWidgetsVisible(false);
+        setCentralWidget(new QWidget());
         openAct->setEnabled(true);
         saveAsAct->setEnabled(false);
         closeAct->setEnabled(false);
@@ -346,8 +430,10 @@ namespace Isis
         setWindowTitle("cneteditor");
         loadingProgressBar->setVisible(false);
         break;
-        
+
       case FileLoading:
+//         setDockWidgetsVisible(false);
+        setCentralWidget(new QWidget());
         openAct->setEnabled(false);
         saveAsAct->setEnabled(false);
         closeAct->setEnabled(false);
@@ -365,17 +451,17 @@ namespace Isis
     try
     {
       cnetReader = new ConcurrentControlNetReader;
-      
+
       // progress for reading the network
       connect(cnetReader, SIGNAL(progressRangeChanged(int, int)),
-              loadingProgressBar, SLOT(setRange(int, int)));
+          loadingProgressBar, SLOT(setRange(int, int)));
       connect(cnetReader, SIGNAL(progressValueChanged(int)),
-              loadingProgressBar, SLOT(setValue(int)));
-      
+          loadingProgressBar, SLOT(setValue(int)));
+
       // call networkLoaded when the reading is complete
       connect(cnetReader, SIGNAL(networkReadFinished(ControlNet *)),
-              this, SLOT(networkLoaded(ControlNet *)));
-      
+          this, SLOT(networkLoaded(ControlNet *)));
+
       cnetReader->read(filename);
       setFileState(FileLoading, filename);
     }
@@ -429,10 +515,13 @@ namespace Isis
       binButton->click();
 
     QHBoxLayout * buttonLayout = new QHBoxLayout;
+
     buttonLayout->addWidget(binButton);
+
     buttonLayout->addWidget(pvlButton);
 
     CnetEditorFileDialog * fileDialog = new CnetEditorFileDialog(buttonLayout);
+
     if (fileDialog->exec() == QDialog::Accepted)
     {
       QString filename = fileDialog->selectedFiles().value(0);
@@ -461,18 +550,29 @@ namespace Isis
       setFileState(NoFile, "");
     }
   }
-  
-  
+
+
   void CnetEditorWindow::networkLoaded(ControlNet * net)
   {
     cnet = net;
-    setFileState(CnetEditorWindow::HasFile, *curFile);
     editorWidget = new CnetEditorWidget(cnet, Filename(
         "$HOME/.Isis/cneteditor/cneteditor.config").Expanded().c_str());
     connect(editorWidget, SIGNAL(cnetModified()), this, SLOT(setDirty()));
-    setCentralWidget(editorWidget);
+    setFileState(CnetEditorWindow::HasFile, *curFile);
+
+    pointTreeDockWidget->setWidget(editorWidget->getPointTreeView());
+    serialTreeDockWidget->setWidget(editorWidget->getSerialTreeView());
+    connectionTreeDockWidget->setWidget(editorWidget->getConnectionTreeView());
+
+    pointFilterDockWidget->setWidget(
+      editorWidget->getPointFilterWidget());
+    serialFilterDockWidget->setWidget(
+      editorWidget->getSerialFilterWidget());
+    connectionFilterDockWidget->setWidget(
+      editorWidget->getConnectionFilterWidget());
+
     setFileState(HasFile, *curFile);
-    saveAsPvl = !Pvl((iString) *curFile).HasObject("ProtoBuffer");
+    saveAsPvl = !Pvl((iString) * curFile).HasObject("ProtoBuffer");
   }
 
 
@@ -481,6 +581,17 @@ namespace Isis
     dirty = state;
     saveAct->setEnabled(state);
     setWindowModified(state);
+  }
+  
+  
+  void CnetEditorWindow::setDockWidgetsVisible(bool visibilityState)
+  {
+    pointTreeDockWidget->setVisible(visibilityState);
+    serialTreeDockWidget->setVisible(visibilityState);
+    connectionTreeDockWidget->setVisible(visibilityState);
+    pointFilterDockWidget->setVisible(visibilityState);
+    serialFilterDockWidget->setVisible(visibilityState);
+    connectionFilterDockWidget->setVisible(visibilityState);
   }
 }
 

@@ -22,7 +22,7 @@ namespace Isis
   class CnetEditorWindow : public QMainWindow
   {
       Q_OBJECT
-      
+
     public:
       enum FileState
       {
@@ -30,7 +30,7 @@ namespace Isis
         NoFile,
         FileLoading
       };
-      
+
 
     public:
       CnetEditorWindow();
@@ -49,6 +49,7 @@ namespace Isis
     private:
       void nullify();
       void createActions();
+      void createDockWidgets();
       void createMenus();
       void createToolBars();
       void createStatusBar();
@@ -58,6 +59,7 @@ namespace Isis
       void load(QString filename);
       void setFileState(FileState state, QString filename);
       void setDirty(bool);
+      void setDockWidgetsVisible(bool visibilityState);
 
 
     private slots:
@@ -82,8 +84,16 @@ namespace Isis
       QMenu * helpMenu;
 
       QToolBar * mainToolBar;
-      
+
       ProgressBar * loadingProgressBar;
+
+      QDockWidget * pointTreeDockWidget;
+      QDockWidget * serialTreeDockWidget;
+      QDockWidget * connectionTreeDockWidget;
+
+      QDockWidget * pointFilterDockWidget;
+      QDockWidget * serialFilterDockWidget;
+      QDockWidget * connectionFilterDockWidget;
 
 
     private: // data
@@ -94,8 +104,8 @@ namespace Isis
       QFont * labelFont;
       bool dirty;
       bool saveAsPvl;
-      
-      
+
+
     private: // constants
       static const int defaultWindowWidth = 1100;
       static const int defaultWindowHeight = 700;

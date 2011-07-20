@@ -246,11 +246,11 @@ namespace Isis
     QList< AbstractTreeItem * > selectedItems;
 
     ASSERT(rootItem);
-    
+
     if (!isFiltering())
     {
       AbstractTreeItem * currentItem = rootItem->getFirstVisibleChild();
-      
+
       while (currentItem)
       {
         if (currentItem->isSelected())
@@ -628,7 +628,7 @@ namespace Isis
       delete newRoot;
       newRoot = NULL;
     }
-      
+
 //     loadViewState();
 
     applyFilter();
