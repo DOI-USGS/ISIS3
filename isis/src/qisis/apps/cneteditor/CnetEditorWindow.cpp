@@ -23,20 +23,17 @@
 #include <QString>
 #include <QToolBar>
 
+#include "ConcurrentControlNetReader.h"
 #include "ControlNet.h"
 #include "Filename.h"
 #include "iException.h"
+#include "ProgressBar.h"
 #include "Pvl.h"
 
 #include "CnetEditorWidget.h"
 
 
 using std::cerr;
-
-
-// FIXME
-const int defaultWindowWidth = 1100;
-const int defaultWindowHeight = 700;
 
 
 namespace Isis
@@ -52,7 +49,7 @@ namespace Isis
   {
     setAcceptMode(AcceptSave);
     setNameFilter("Control Network files (*.net *.bin);;All files (*)");
-    QGridLayout * mainLayout = dynamic_cast< QGridLayout * >(layout());
+    QGridLayout * mainLayout = qobject_cast< QGridLayout * >(layout());
     ASSERT(mainLayout);
     if (mainLayout)
       mainLayout->addLayout(l, mainLayout->rowCount(), 0, 1, -1);
@@ -85,7 +82,8 @@ namespace Isis
     createStatusBar();
     readSettings();
 
-    setNoFileState();
+    setFileState(NoFile, "");
+    
     if (QApplication::arguments().size() > 1)
     {
       load(QApplication::arguments().at(1));
@@ -95,65 +93,41 @@ namespace Isis
 
   CnetEditorWindow::~CnetEditorWindow()
   {
-    if (openAct)
-    {
-      delete openAct;
-      openAct = NULL;
-    }
+    delete openAct;
+    openAct = NULL;
 
-    if (saveAct)
-    {
-      delete saveAct;
-      saveAct = NULL;
-    }
+    delete saveAct;
+    saveAct = NULL;
 
-    if (saveAsAct)
-    {
-      delete saveAsAct;
-      saveAsAct = NULL;
-    }
+    delete saveAsAct;
+    saveAsAct = NULL;
 
-    if (aboutAct)
-    {
-      delete aboutAct;
-      aboutAct = NULL;
-    }
+    delete aboutAct;
+    aboutAct = NULL;
 
-    if (closeAct)
-    {
-      delete closeAct;
-      closeAct = NULL;
-    }
+    delete closeAct;
+    closeAct = NULL;
 
-    if (quitAct)
-    {
-      delete quitAct;
-      quitAct = NULL;
-    }
+    delete quitAct;
+    quitAct = NULL;
 
-    if (cnet)
-    {
-      delete cnet;
-      cnet = NULL;
-    }
+    delete cnet;
+    cnet = NULL;
+    
+    delete cnetReader;
+    cnetReader = NULL;
 
-    if (editorWidget)
-    {
-      delete editorWidget;
-      editorWidget = NULL;
-    }
+    delete editorWidget;
+    editorWidget = NULL;
 
-    if (curFile)
-    {
-      delete curFile;
-      curFile = NULL;
-    }
+    delete curFile;
+    curFile = NULL;
 
-    if (labelFont)
-    {
-      delete labelFont;
-      labelFont = NULL;
-    }
+    delete labelFont;
+    labelFont = NULL;
+    
+    delete loadingProgressBar;
+    loadingProgressBar = NULL;
 
     nullify();
   }
@@ -162,6 +136,7 @@ namespace Isis
   void CnetEditorWindow::nullify()
   {
     cnet = NULL;
+    cnetReader = NULL;
     editorWidget = NULL;
     curFile = NULL;
     labelFont = NULL;
@@ -177,6 +152,8 @@ namespace Isis
     helpMenu = NULL;
 
     mainToolBar = NULL;
+    
+    loadingProgressBar = NULL;
   }
 
 
@@ -263,7 +240,9 @@ namespace Isis
 
   void CnetEditorWindow::createStatusBar()
   {
-    statusBar()->showMessage(tr("Ready"));
+    loadingProgressBar = new ProgressBar("Reading network");
+    statusBar()->addPermanentWidget(loadingProgressBar);
+    loadingProgressBar->setVisible(false);
   }
 
 
@@ -342,28 +321,42 @@ namespace Isis
   }
 
 
-  void CnetEditorWindow::setHasFileState(QString filename)
+  void CnetEditorWindow::setFileState(CnetEditorWindow::FileState state,
+                                      QString filename)
   {
-    openAct->setEnabled(false);
-
-    saveAsAct->setEnabled(true);
-    closeAct->setEnabled(true);
-    setDirty(false);
-    *curFile = filename;
-    setWindowTitle(filename + "[*] - cneteditor");
-  }
-
-
-  void CnetEditorWindow::setNoFileState()
-  {
-    openAct->setEnabled(true);
-
-    saveAsAct->setEnabled(false);
-    closeAct->setEnabled(false);
-    setDirty(false);
-    saveAsPvl = false;
-    *curFile = "";
-    setWindowTitle("cneteditor");
+    switch (state)
+    {
+      case HasFile:
+        openAct->setEnabled(false);
+        saveAsAct->setEnabled(true);
+        closeAct->setEnabled(true);
+        setDirty(false);
+        *curFile = filename;
+        setWindowTitle(filename + "[*] - cneteditor");
+        loadingProgressBar->setVisible(false);
+        break;
+        
+      case NoFile:
+        openAct->setEnabled(true);
+        saveAsAct->setEnabled(false);
+        closeAct->setEnabled(false);
+        setDirty(false);
+        saveAsPvl = false;
+        *curFile = "";
+        setWindowTitle("cneteditor");
+        loadingProgressBar->setVisible(false);
+        break;
+        
+      case FileLoading:
+        openAct->setEnabled(false);
+        saveAsAct->setEnabled(false);
+        closeAct->setEnabled(false);
+        *curFile = filename;
+        setWindowTitle("cneteditor (loading " + filename + "...)");
+        loadingProgressBar->setValue(loadingProgressBar->minimum());
+        loadingProgressBar->setVisible(true);
+        break;
+    }
   }
 
 
@@ -371,19 +364,27 @@ namespace Isis
   {
     try
     {
-      cnet = new ControlNet(filename);
-      editorWidget = new CnetEditorWidget(cnet, Filename(
-          "$HOME/.Isis/cneteditor/cneteditor.config").Expanded().c_str());
-      connect(editorWidget, SIGNAL(cnetModified()), this, SLOT(setDirty()));
-      setCentralWidget(editorWidget);
-      setHasFileState(filename);
-      saveAsPvl = !Pvl((iString) filename).HasObject("ProtoBuffer");
+      cnetReader = new ConcurrentControlNetReader;
+      
+      // progress for reading the network
+      connect(cnetReader, SIGNAL(progressRangeChanged(int, int)),
+              loadingProgressBar, SLOT(setRange(int, int)));
+      connect(cnetReader, SIGNAL(progressValueChanged(int)),
+              loadingProgressBar, SLOT(setValue(int)));
+      
+      // call networkLoaded when the reading is complete
+      connect(cnetReader, SIGNAL(networkReadFinished(ControlNet *)),
+              this, SLOT(networkLoaded(ControlNet *)));
+      
+      cnetReader->read(filename);
+      setFileState(FileLoading, filename);
     }
     catch (iException e)
     {
       QMessageBox::critical(this, tr("cneteditor"),
           tr("Failed to open the file provided"));
       e.Clear();
+      setFileState(NoFile, "");
     }
   }
 
@@ -438,7 +439,7 @@ namespace Isis
 
       if (!filename.isEmpty())
       {
-        setHasFileState(filename);
+        setFileState(CnetEditorWindow::HasFile, filename);
         save();
       }
     }
@@ -454,9 +455,24 @@ namespace Isis
       editorWidget = NULL;
       delete cnet;
       cnet = NULL;
+      delete cnetReader;
+      cnetReader = NULL;
 
-      setNoFileState();
+      setFileState(NoFile, "");
     }
+  }
+  
+  
+  void CnetEditorWindow::networkLoaded(ControlNet * net)
+  {
+    cnet = net;
+    setFileState(CnetEditorWindow::HasFile, *curFile);
+    editorWidget = new CnetEditorWidget(cnet, Filename(
+        "$HOME/.Isis/cneteditor/cneteditor.config").Expanded().c_str());
+    connect(editorWidget, SIGNAL(cnetModified()), this, SLOT(setDirty()));
+    setCentralWidget(editorWidget);
+    setFileState(HasFile, *curFile);
+    saveAsPvl = !Pvl((iString) *curFile).HasObject("ProtoBuffer");
   }
 
 

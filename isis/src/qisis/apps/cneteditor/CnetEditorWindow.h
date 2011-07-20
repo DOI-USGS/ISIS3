@@ -14,12 +14,23 @@ class QToolBar;
 
 namespace Isis
 {
+  class ConcurrentControlNetReader;
   class ControlNet;
   class CnetEditorWidget;
+  class ProgressBar;
 
   class CnetEditorWindow : public QMainWindow
   {
       Q_OBJECT
+      
+    public:
+      enum FileState
+      {
+        HasFile,
+        NoFile,
+        FileLoading
+      };
+      
 
     public:
       CnetEditorWindow();
@@ -45,8 +56,7 @@ namespace Isis
       void writeSettings();
       bool okToContinue();
       void load(QString filename);
-      void setHasFileState(QString filename);
-      void setNoFileState();
+      void setFileState(FileState state, QString filename);
       void setDirty(bool);
 
 
@@ -57,6 +67,7 @@ namespace Isis
       void save();
       void saveAs();
       void closeNetwork();
+      void networkLoaded(ControlNet *);
 
 
     private: // widgets
@@ -71,15 +82,23 @@ namespace Isis
       QMenu * helpMenu;
 
       QToolBar * mainToolBar;
+      
+      ProgressBar * loadingProgressBar;
 
 
     private: // data
       ControlNet * cnet;
+      ConcurrentControlNetReader * cnetReader;
       CnetEditorWidget * editorWidget;
       QString * curFile;
       QFont * labelFont;
       bool dirty;
       bool saveAsPvl;
+      
+      
+    private: // constants
+      static const int defaultWindowWidth = 1100;
+      static const int defaultWindowHeight = 700;
   };
 }
 
