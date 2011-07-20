@@ -412,7 +412,7 @@ comparefiles: FORCE
 	          from2=$(OUTPUT)/$$FILE                                      \
 	          to=compare.txt diff=$$DIFFFILE >& /dev/null;                \
 	                                                                      \
-	      compResult=`$(ISISROOT)/bin/getkey from=compare.txt grp=Results \
+	      COMPRESULT=`$(ISISROOT)/bin/getkey from=compare.txt grp=Results \
 	          keyword=Compare | tr '[:upper:]' '[:lower:]'`;              \
 	                                                                      \
 	      if [ "$$COMPRESULT" == "different" ]; then                      \
