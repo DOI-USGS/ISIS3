@@ -70,6 +70,10 @@ namespace Isis
         return "Sample Shift";
       case LineShift:
         return "Line Shift";
+      case SampleSigma:
+        return "Sample Sigma";
+      case LineSigma:
+        return "Line Sigma";
       case APrioriSample:
         return "A Priori Sample";
       case APrioriLine:
@@ -178,6 +182,10 @@ namespace Isis
             return QVariant::fromValue(catchNULL(measure->GetSampleShift()));
           case LineShift:
             return QVariant::fromValue(catchNULL(measure->GetLineShift()));
+          case SampleSigma:
+            return QVariant::fromValue(catchNULL(measure->GetSampleSigma()));
+          case LineSigma:
+            return QVariant::fromValue(catchNULL(measure->GetLineSigma()));
           case APrioriSample:
             return QVariant::fromValue(catchNULL(measure->GetAprioriSample()));
           case APrioriLine:
@@ -260,6 +268,8 @@ namespace Isis
             case GoodnessOfFit:
             case MinPixelZScore:
             case MaxPixelZScore:
+            case SampleSigma:
+            case LineSigma:
             case APrioriSample:
             case APrioriLine:
             case Diameter:
@@ -348,6 +358,12 @@ namespace Isis
             break;
           case LineShift:
             // This is not editable anymore.
+            break;
+          case SampleSigma:
+            measure->SetSampleSigma(catchNULL(value.toString()));
+            break;
+          case LineSigma:
+            measure->SetLineSigma(catchNULL(value.toString()));
             break;
           case APrioriSample:
             measure->SetAprioriSample(catchNULL(value.toString()));

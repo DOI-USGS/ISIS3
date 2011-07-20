@@ -34,15 +34,17 @@ namespace Isis
         MaxPixelZScore = 10,
         SampleShift = 11,
         LineShift = 12,
-        APrioriSample = 13,
-        APrioriLine = 14,
-        Diameter = 15,
-        JigsawRejected = 16,
-        ResidualSample = 17,
-        ResidualLine = 18,
-        ResidualMagnitude = 19
+        SampleSigma = 13,
+        LineSigma = 14,
+        APrioriSample = 15,
+        APrioriLine = 16,
+        Diameter = 17,
+        JigsawRejected = 18,
+        ResidualSample = 19,
+        ResidualLine = 20,
+        ResidualMagnitude = 21
       };
-      static const int COLS = 20;
+      static const int COLS = 22;
 
 
     public:
