@@ -10,6 +10,7 @@
 #include "AbstractFilter.h"
 #include "ChooserNameFilter.h"
 #include "CubeSerialNumberFilter.h"
+#include "GoodnessOfFitFilter.h"
 #include "LineResidualFilter.h"
 #include "MeasureIgnoredFilter.h"
 #include "PointEditLockedFilter.h"
@@ -64,6 +65,7 @@ namespace Isis
     getSelector()->addItem("Ignored Points");
     getSelector()->addItem("Point Id");
     getSelector()->insertSeparator(getSelector()->count());
+    getSelector()->addItem("Goodness Of Fit");
     getSelector()->addItem("Ignored Measures");
     getSelector()->addItem("Line Residual");
     getSelector()->addItem("Residual Magnitude");
@@ -99,15 +101,18 @@ namespace Isis
               AbstractFilter::Points, 1));
           break;
         case 9:
-          setFilter(new MeasureIgnoredFilter(AbstractFilter::Images, 1));
+          setFilter(new GoodnessOfFitFilter(AbstractFilter::Images, 1));
           break;
         case 10:
-          setFilter(new LineResidualFilter(AbstractFilter::Images, 1));
+          setFilter(new MeasureIgnoredFilter(AbstractFilter::Images, 1));
           break;
         case 11:
-          setFilter(new ResidualMagnitudeFilter(AbstractFilter::Images, 1));
+          setFilter(new LineResidualFilter(AbstractFilter::Images, 1));
           break;
         case 12:
+          setFilter(new ResidualMagnitudeFilter(AbstractFilter::Images, 1));
+          break;
+        case 13:
           setFilter(new SampleResidualFilter(AbstractFilter::Images, 1));
           break;
       }
