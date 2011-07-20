@@ -350,9 +350,14 @@ namespace Isis {
     p_settings.beginGroup("MosaicMainWindow");
     QByteArray state = p_settings.value("state", QByteArray("0")).toByteArray();
     restoreState(state);
-    QByteArray geom = p_settings.value("geometry",
-        QByteArray("0")).toByteArray();
-    restoreGeometry(geom);
+
+    // load window position and size
+    QPoint pos = p_settings.value("pos", QPoint(100, 100)).toPoint();
+    QSize size = p_settings.value("size", QSize(750,
+        600)).toSize();
+    resize(size);
+    move(pos);
+
     p_settings.endGroup();
   }
 
@@ -368,7 +373,7 @@ namespace Isis {
 
 
   /**
-   * This overriden method is called when the Mosaicmainwindow
+   * This overriden method is called when the MosaicMainWindow
    * is closed or hidden to write the size and location settings
    * (and tool bar location) to a config file in the user's home
    * directory.
@@ -378,9 +383,11 @@ namespace Isis {
     // Now write the settings that are specific to this window.
     p_settings.beginGroup("MosaicMainWindow");
     p_settings.setValue("state", saveState());
-    p_settings.setValue("geometry", saveGeometry());
-    p_settings.endGroup();
 
+    p_settings.setValue("pos", pos());
+    p_settings.setValue("size", size());
+
+    p_settings.endGroup();
     closeMosaic();
   }
 
