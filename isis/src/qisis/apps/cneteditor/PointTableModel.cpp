@@ -5,6 +5,7 @@
 #include <iostream>
 
 #include <QList>
+#include <QMessageBox>
 
 #include "ControlMeasure.h"
 #include "ControlPoint.h"
@@ -306,7 +307,20 @@ namespace Isis
             point->SetDateTime(value.toString());
             break;
           case EditLock:
-            point->SetEditLock(value.toString() == "Yes");
+            if (value.toString() == "Yes" && !point->IsEditLocked()) {
+              point->SetEditLock(true);
+            }
+            else if (value.toString() == "No" && point->IsEditLocked()) {
+              // Prompt the user for confirmation before turning off edit lock
+              // on a point.
+              int status = QMessageBox::warning(NULL, tr("cneteditor"),
+                  "You requested to turn edit lock OFF for this"
+                  " point. Are you sure you want to continue?",
+                  QMessageBox::Yes | QMessageBox::No);
+
+              if (status == QMessageBox::Yes)
+                point->SetEditLock(false);
+            }
             break;
           case Ignored:
             point->SetIgnored(value.toString() == "Yes");

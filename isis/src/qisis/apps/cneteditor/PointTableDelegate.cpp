@@ -211,6 +211,11 @@ namespace Isis
     {
       QList< QModelIndex > selection =
         tableView->selectionModel()->selectedIndexes();
+
+      // Remove our index from the list, since setData(...) was already called
+      // for it.
+      selection.removeOne(index);
+
       for (int i = 0; i < selection.size(); i++)
         if (selection[i].column() == col)
           model->setData(selection[i], newData, Qt::EditRole);
