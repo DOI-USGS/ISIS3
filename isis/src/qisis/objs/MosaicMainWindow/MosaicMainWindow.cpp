@@ -73,6 +73,25 @@ namespace Isis {
 
     p_mosaicController = NULL;
     createController();
+    installEventFilter(this);
+  }
+
+
+  /**
+   * This event filter is installed in the constructor.
+   * @param o
+   * @param e
+   *
+   * @return bool
+   */
+  bool MosaicMainWindow::eventFilter(QObject *o, QEvent *e) {
+    switch(e->type()) {
+      case QEvent::Close:
+        saveSettings2();
+
+      default:
+        return false;
+    }
   }
 
 
@@ -359,6 +378,9 @@ namespace Isis {
     move(pos);
 
     p_settings.endGroup();
+
+    p_fileListDock->setVisible(true);
+    p_mosaicPreviewDock->setVisible(true);
   }
 
 

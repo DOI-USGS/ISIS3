@@ -30,7 +30,7 @@ namespace Isis {
       Q_OBJECT
     public:
       MosaicMainWindow(QString title, QWidget *parent = 0);
-      ~MosaicMainWindow() { saveSettings2(); }
+      ~MosaicMainWindow() { }
 
       QToolBar *permanentToolBar() {
         return p_permToolbar;
@@ -69,6 +69,9 @@ namespace Isis {
       void loadProject();
       void closeMosaic();
       void updateMenuVisibility();
+
+    protected:
+      bool eventFilter(QObject *o, QEvent *e);
 
     private:
       void setupMenus();
