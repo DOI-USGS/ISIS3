@@ -1,0 +1,78 @@
+
+
+Testing ImportPdsTable class using file data/VIR_IR_1A_1_332974737_1_HK.LBL
+
+
+List of Columns found - Total: 34
+VersionTypeSecondaryHeaderFlag
+Apid
+PacketSequenceControl
+PacketsLength
+ScetTimeClock
+ScetTimeUtc
+FrameNumber
+FrameCount
+SubframeCount
+PacketsCount
+ShutterStatus
+ChannelId
+CompressionMode
+SpectralRange
+CurrentMode
+SubCurrentMode
+IrExpo
+IrTemp
+CcdExpo
+CcdTemp
+MirrorSin
+Mirror
+SpectTemp
+TeleTemp
+ColdTipTemp
+RadiatorTemp
+SuMotorCurr
+LedgeTemp
+StartNoisyBits
+EndNoisyBits
+CrOrw
+NofNoisyBits
+SubframeData
+SeqStep
+
+
+Now without Name Conversion: 
+VERSION, TYPE, SECONDARY HEADER FLAG
+APID
+PACKET SEQUENCE CONTROL
+PACKETS LENGTH
+SCET TIME (CLOCK)
+SCET TIME (UTC)
+FRAME NUMBER
+FRAME COUNT
+SUBFRAME COUNT
+PACKETS COUNT
+SHUTTER STATUS
+CHANNEL ID
+COMPRESSION MODE
+SPECTRAL RANGE
+CURRENT MODE
+SUB CURRENT MODE
+IR EXPO
+IR TEMP
+CCD EXPO
+CCD TEMP
+MIRROR SIN
+MIRROR
+SPECT TEMP
+TELE TEMP
+COLD TIP TEMP
+RADIATOR TEMP
+SU MOTOR CURR
+LEDGE TEMP
+START NOISY BITS
+END NOISY BITS
+CR ORW
+NOF NOISY BITS
+SUBFRAME DATA
+SEQ STEP
+Getting ISIS Table...
