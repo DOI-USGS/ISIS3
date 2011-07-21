@@ -1,24 +1,48 @@
 #include "Isis.h"
 
-#include <sstream>
 #include <cfloat>
+#include <sstream>
 
 #include "ControlMeasure.h"
 #include "ControlNet.h"
 #include "ControlPoint.h"
 #include "FileList.h"
+#include "Progress.h"
+#include "PvlGroup.h"
+#include "PvlKeyword.h"
+#include "PvlObject.h"
 #include "iException.h"
 #include "iTime.h"
-#include "Progress.h"
 
 using namespace std;
 using namespace Isis;
 
-ControlPoint * MergePoints(ControlPoint *addPoint, ControlPoint *basePoint,
-    bool allowMeasureOverride, bool allowReferenceOverride,
-    bool &mergeHasConflicts);
 
-// Main program
+void mergeNetwork(
+    ControlNet &baseNet, ControlNet &newNet, bool mergePoints,
+    bool overwritePoints, bool overwriteMeasures,
+    bool overwriteReference, bool overwriteMissing, PvlObject &cnetLog);
+ControlPoint * mergePoint(
+    ControlPoint *basePoint, ControlPoint *newPoint,
+    bool overwritePoints, bool overwriteMeasures,
+    bool overwriteReference, bool overwriteMissing, PvlObject &cnetLog);
+void replacePoint(ControlPoint *basePoint, ControlPoint *newPoint,
+    PvlObject &pointLog);
+void mergeMeasure(
+    ControlPoint *basePoint, ControlPoint *newPoint,
+    ControlMeasure *baseMeasure, ControlMeasure *newMeasure,
+    bool overwriteMeasures, bool overwriteReference, PvlGroup &measureLog);
+ControlMeasure * replaceMeasure(ControlPoint *basePoint,
+    ControlMeasure *baseMeasure, ControlMeasure *newMeasure);
+ControlMeasure * addMeasure(ControlPoint *basePoint,
+    ControlMeasure *newMeasure);
+void reportConflict(PvlObject &pointLog, iString conflict);
+void reportConflict(PvlGroup &measureLog, iString conflict);
+
+
+bool report;
+
+
 void IsisMain() {
   // Get user parameters
   UserInterface &ui = Application::GetUserInterface();
@@ -32,13 +56,15 @@ void IsisMain() {
   }
   Filename outfile(ui.GetFilename("ONET"));
 
-  bool allowPointOverride = false;
-  bool allowMeasureOverride = false;
-  bool allowReferenceOverride = false;
+  bool overwritePoints = false;
+  bool overwriteMeasures = false;
+  bool overwriteReference = false;
+  bool overwriteMissing = false;
   if (ui.GetString("DUPLICATEPOINTS") == "MERGE") {
-    allowPointOverride = ui.GetBoolean("OVERWRITEPOINTS");
-    allowMeasureOverride = ui.GetBoolean("OVERWRITEMEASURES");
-    allowReferenceOverride  = ui.GetBoolean("OVERWRITEREFERENCE");
+    overwritePoints = ui.GetBoolean("OVERWRITEPOINTS");
+    overwriteMeasures = ui.GetBoolean("OVERWRITEMEASURES");
+    overwriteReference = ui.GetBoolean("OVERWRITEREFERENCE");
+    overwriteMissing = ui.GetBoolean("OVERWRITEMISSING");
   }
 
   // Creates a Progress
@@ -56,203 +82,212 @@ void IsisMain() {
 
   progress.CheckStatus();
 
-  ofstream ss;
-  bool report = false;
-  if (ui.WasEntered("LOG")) {
-    report = true;
-    string report = ui.GetFilename("LOG");
-    ss.open(report.c_str(), ios::out);
-  }
+  Pvl conflictLog;
+  report = ui.WasEntered("LOG");
 
   bool mergePoints = (ui.GetString("DUPLICATEPOINTS") == "MERGE");
-
   for (int cnetIndex = 1; cnetIndex < (int)filelist.size(); cnetIndex ++) {
-    ControlNet addNet(Filename(filelist[cnetIndex]).Expanded());
+    ControlNet newNet(Filename(filelist[cnetIndex]).Expanded());
 
     // Checks to make sure the ControlNets are valid to merge
-    if (baseNet.GetTarget().DownCase() != addNet.GetTarget().DownCase()) {
-      string msg = "Input [" + addNet.GetNetworkId() + "] does not target the "
+    if (baseNet.GetTarget().DownCase() != newNet.GetTarget().DownCase()) {
+      string msg = "Input [" + newNet.GetNetworkId() + "] does not target the "
           "same target as other Control Network(s)";
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
-    // Adds currentnet to the ControlNet if it does not exist in cnet
-    for (int cp = 0; cp < addNet.GetNumPoints(); cp++) {
-      ControlPoint *sourcePoint = addNet.GetPoint(cp);
-
-      // Duplicate point in the input
-      ControlPoint *dupPoint = NULL;
-
-      //TODO: This functionality needs to be reworked for the redesign
-      try {
-        // Find if there is a duplicate point. This will throw an exception if
-        //   the control network doesn't have a duplicate point.
-        dupPoint = baseNet.GetPoint(QString(sourcePoint->GetId()));
-      }
-      catch (iException &e) {
-        e.Clear();
-
-        // There was no duplicate point so transfer the point directly
-        ControlPoint *cp = new ControlPoint(*sourcePoint);
-        baseNet.AddPoint(cp);
-        // dupPoint should be null if this happened
-      }
-
-      if (dupPoint) {
-        // We can't merge points, throw an exception!
-        if (!mergePoints) {
-          string msg = "Inputs contain the same ControlPoint. [Id=";
-          msg += sourcePoint->GetId() + "] Set DUPLICATEPOINTS=MERGE to";
-          msg += " merge conflicting Control Points.";
-          throw iException::Message(iException::User, msg, _FILEINFO_);
-        }
-
-        // Default to the duplicate with the merged point; handle more
-        //   difficult cases below
-        ControlPoint *mergedPoint = dupPoint;
-
-        bool doMergePoint = true;
-
-        if (report) {
-          ss << "Control Point " << sourcePoint->GetId() << " was merged from "
-             << addNet.GetNetworkId() << endl;
-        }
-
-        // Merge the Control Points correctly
-        if (dupPoint->GetType() == ControlPoint::Fixed &&
-            sourcePoint->GetType() == ControlPoint::Fixed) {
-          // See if there are conflicts in merging the two points
-          bool pointHasConflict = false;
-          SurfacePoint surfPt(dupPoint->GetAprioriSurfacePoint());
-          if (surfPt.Valid() &&
-              surfPt == sourcePoint->GetAprioriSurfacePoint()) {
-            pointHasConflict = true;
-          }
-
-          // Merge the Control Points as best we can
-          if (pointHasConflict && !allowPointOverride) {
-            doMergePoint = false;
-
-            if (report) {
-              ss << "    The merge of Control Point " << sourcePoint->GetId()
-                 << " was canceled due to conflicts." << endl;
-            }
-          }
-        }
-
-        if (doMergePoint) {
-          bool mergeHasConflicts = false;
-
-          mergedPoint = MergePoints(sourcePoint,
-              dupPoint,
-              allowMeasureOverride,
-              allowReferenceOverride,
-              mergeHasConflicts);
-
-          if (report && mergeHasConflicts) {
-            ss << "    Control Measures from " << sourcePoint->GetId()
-               << " were not merged due to conflicts." << endl;
-          }
-        }
-
-        dupPoint = NULL;
-
-        baseNet.DeletePoint(sourcePoint->GetId());
-        baseNet.AddPoint(mergedPoint);
-      }
-    }
+    PvlObject cnetLog(newNet.GetNetworkId());
+    mergeNetwork(baseNet, newNet, mergePoints,
+        overwritePoints, overwriteMeasures,
+        overwriteReference, overwriteMissing, cnetLog);
+    if (cnetLog.Objects() > 0) conflictLog.AddObject(cnetLog);
 
     progress.CheckStatus();
   }
 
   // Writes out the final Control Net
   baseNet.Write(outfile.Expanded());
+
+  if (report)
+    conflictLog.Write(ui.GetFilename("LOG"));
 }
 
 
-ControlPoint *MergePoints(ControlPoint *addPoint, ControlPoint *basePoint,
-    bool allowMeasureOverride, bool allowReferenceOverride,
-    bool &mergeHasConflicts) {
+void mergeNetwork(
+    ControlNet &baseNet, ControlNet &newNet, bool mergePoints,
+    bool overwritePoints, bool overwriteMeasures,
+    bool overwriteReference, bool overwriteMissing, PvlObject &cnetLog) {
 
-  // Start with a copy of the base point, which we will attempt to add to in
-  // order to create the new merged point
-  ControlPoint *mergedPoint = new ControlPoint(*basePoint);
-
-  // Loop through every measure in the add point, attempting to add it to the
-  // resulting merged point.  If there are conflicts, attempt to resolve them
-  // using rules defined by the program user.
-  mergeHasConflicts = false;
-  for (int addIndex = 0; addIndex < addPoint->GetNumMeasures(); addIndex++) {
-    bool merged = false;
-    ControlMeasure *addMeasure = addPoint->GetMeasure(addIndex);
-
-    // Try to get the mergee equivalent and merge this control measure in
-    try {
-      ControlMeasure *mergedMeasure =
-        mergedPoint->GetMeasure(addMeasure->GetCubeSerialNumber());
-
-      // If we have found the equivalent control measures in the merger and
-      //   mergee
-      if (addMeasure->GetCubeSerialNumber() ==
-          mergedMeasure->GetCubeSerialNumber()) {
-
-        // If we have a fixed point in our merger then try to propagate it to
-        //   the mergee.
-        if (addPoint->GetType() == ControlPoint::Fixed) {
-          if (!allowMeasureOverride) {
-            // Allow reference override refers to the merger's reference, not
-            //   the mergee's reference. If we can't change the reference then
-            //   keep the merger's reference status.
-            if (mergedPoint->IsReferenceExplicit() &&
-                mergedMeasure != mergedPoint->GetRefMeasure() &&
-                addMeasure != addPoint->GetRefMeasure()) {
-              ControlMeasure *origReference = mergedPoint->GetRefMeasure();
-              origReference->SetType(ControlMeasure::Candidate);
-              //mergee.UpdateMeasure(origReference); // Redesign fixed this
-            }
-
-            // Copy the rest of merger's information to mergee, mergee will be
-            //   a reference since merger is a reference.
-            mergedPoint->Delete(mergedMeasure);
-            ControlMeasure *newMeasure = new ControlMeasure(*addMeasure);
-            mergedPoint->Add(newMeasure);
-
-            mergeHasConflicts = true; // lost some information
-          }
-        }
-
-        // If SNs match, but not fixed, then keep mergee's version
-        merged = true;
+  for (int newIndex = 0; newIndex < newNet.GetNumPoints(); newIndex++) {
+    ControlPoint *newPoint = newNet.GetPoint(newIndex);
+    if (baseNet.ContainsPoint(newPoint->GetId())) {
+      if (mergePoints) {
+        ControlPoint *basePoint = baseNet.GetPoint(QString(newPoint->GetId()));
+        ControlPoint *outPoint = 
+          mergePoint(
+              basePoint, newPoint,
+              overwritePoints, overwriteMeasures,
+              overwriteReference, overwriteMissing, cnetLog);
+        baseNet.DeletePoint(basePoint);
+        baseNet.AddPoint(outPoint);
       }
-
-      //mergee.UpdateMeasure(mergeeMeasure); // Redesign fixed this
+      else {
+        string msg = "Inputs contain the same ControlPoint. [Id=";
+        msg += newPoint->GetId() + "] Set DUPLICATEPOINTS=MERGE to";
+        msg += " merge conflicting Control Points.";
+        throw iException::Message(iException::User, msg, _FILEINFO_);
+      }
     }
-    catch (iException &e) {
-      // No matching serial number was found, we need to pull over this measure
-      e.Clear();
+    else {
+      ControlPoint *outPoint = new ControlPoint(*newPoint);
+      baseNet.AddPoint(outPoint);
+    }
+  }
+}
 
-      ControlMeasure *newMeasure = new ControlMeasure(*addMeasure);
 
-      // We have a new reference
-      if (mergedPoint->IsReferenceExplicit() &&
-          addPoint->GetRefMeasure() != addMeasure) {
-        if (allowReferenceOverride) {
-          // Use the new reference
-          ControlMeasure *origReference = mergedPoint->GetRefMeasure();
-          origReference->SetType(ControlMeasure::Candidate);
-          //mergee.UpdateMeasure(origReference); // Redesign fixed this
-          // new measure is already a reference since merger is a reference
-        }
-        else {
-          // Don't allow the new point to be a reference
-          newMeasure->SetType(ControlMeasure::Candidate);
-          mergeHasConflicts = true;
-        }
+ControlPoint * mergePoint(
+    ControlPoint *basePoint, ControlPoint *newPoint,
+    bool overwritePoints, bool overwriteMeasures,
+    bool overwriteReference, bool overwriteMissing, PvlObject &cnetLog) {
+
+  ControlPoint *outPoint = new ControlPoint(*basePoint);
+
+  PvlObject pointLog(newPoint->GetId());
+  if (overwritePoints) {
+    replacePoint(outPoint, newPoint, pointLog);
+  }
+  else {
+    reportConflict(pointLog, "Retained: OVERWRITEPOINTS=false");
+  }
+
+  if (overwriteMissing) {
+    for (int baseIndex = 0; baseIndex < basePoint->GetNumMeasures(); baseIndex++) {
+      ControlMeasure *baseMeasure = basePoint->GetMeasure(baseIndex);
+      PvlGroup measureLog(baseMeasure->GetCubeSerialNumber());
+
+      if (!newPoint->HasSerialNumber(baseMeasure->GetCubeSerialNumber())) {
+        outPoint->Delete(baseMeasure);
+        reportConflict(measureLog, "Removed: OVERWRITEMISSING=true");
       }
 
-      mergedPoint->Add(newMeasure);
+      if (measureLog.Keywords() > 0) pointLog.AddGroup(measureLog);
     }
   }
 
-  return mergedPoint;
+  for (int newIndex = 0; newIndex < newPoint->GetNumMeasures(); newIndex++) {
+    ControlMeasure *newMeasure = newPoint->GetMeasure(newIndex);
+    if (outPoint->HasSerialNumber(newMeasure->GetCubeSerialNumber())) {
+      ControlMeasure *baseMeasure =
+          outPoint->GetMeasure(newMeasure->GetCubeSerialNumber());
+      PvlGroup measureLog(baseMeasure->GetCubeSerialNumber());
+      mergeMeasure(
+          basePoint, newPoint,
+          baseMeasure, newMeasure,
+          overwriteMeasures, overwriteReference, measureLog);
+      if (measureLog.Keywords() > 0) pointLog.AddGroup(measureLog);
+    }
+    else {
+      addMeasure(outPoint, newMeasure);
+    }
+  }
+
+  if (pointLog.Keywords() > 0 || pointLog.Groups() > 0)
+    cnetLog.AddObject(pointLog);
+
+  return outPoint;
 }
+
+
+void replacePoint(ControlPoint *basePoint, ControlPoint *newPoint,
+    PvlObject &pointLog) {
+
+  if (!basePoint->IsEditLocked()) {
+    basePoint->SetId(newPoint->GetId());
+    basePoint->SetType(newPoint->GetType());
+    basePoint->SetChooserName(newPoint->GetChooserName());
+    basePoint->SetEditLock(newPoint->IsEditLocked());
+    basePoint->SetIgnored(newPoint->IsIgnored());
+    basePoint->SetAprioriSurfacePointSource(
+        newPoint->GetAprioriSurfacePointSource());
+    basePoint->SetAprioriSurfacePointSourceFile(
+        newPoint->GetAprioriSurfacePointSourceFile());
+    basePoint->SetAprioriSurfacePointSourceFile(
+        newPoint->GetAprioriSurfacePointSourceFile());
+    basePoint->SetAprioriRadiusSource(newPoint->GetAprioriRadiusSource());
+    basePoint->SetAprioriRadiusSourceFile(
+        newPoint->GetAprioriRadiusSourceFile());
+    basePoint->SetAprioriSurfacePoint(newPoint->GetAprioriSurfacePoint());
+    basePoint->SetAdjustedSurfacePoint(newPoint->GetAdjustedSurfacePoint());
+    // TODO basePoint->SetInvalid(newPoint->GetInvalid());
+    reportConflict(pointLog, "Replaced: OVERWRITEPOINTS=true");
+  }
+  else {
+    reportConflict(pointLog, "Retained: Edit Lock");
+  }
+}
+
+
+void mergeMeasure(
+    ControlPoint *basePoint, ControlPoint *newPoint,
+    ControlMeasure *baseMeasure, ControlMeasure *newMeasure,
+    bool overwriteMeasures, bool overwriteReference, PvlGroup &measureLog) {
+
+  if (!baseMeasure->IsEditLocked()) {
+    if (newPoint->GetRefMeasure() == newMeasure) {
+      if (overwriteReference) {
+        ControlMeasure *outMeasure = replaceMeasure(
+            basePoint, baseMeasure, newMeasure);
+        basePoint->SetRefMeasure(outMeasure);
+        reportConflict(measureLog, "Replaced: OVERWRITEREFERENCE=true");
+      }
+      else {
+        reportConflict(measureLog, "Retained: OVERWRITEREFERENCE=false");
+      }
+    }
+    else if (overwriteMeasures) {
+      replaceMeasure(basePoint, baseMeasure, newMeasure);
+      reportConflict(measureLog, "Replaced: OVERWRITEMEASURES=true");
+    }
+    else {
+      reportConflict(measureLog, "Retained: OVERWRITEMEASURES=false");
+    }
+  }
+  else {
+    reportConflict(measureLog, "Retained: Edit Lock");
+  }
+}
+
+
+ControlMeasure * replaceMeasure(ControlPoint *basePoint,
+    ControlMeasure *baseMeasure, ControlMeasure *newMeasure) {
+
+  basePoint->Delete(baseMeasure);
+  return addMeasure(basePoint, newMeasure);
+}
+
+
+ControlMeasure * addMeasure(ControlPoint *basePoint,
+    ControlMeasure *newMeasure) {
+
+  ControlMeasure *outMeasure = new ControlMeasure(*newMeasure);
+  basePoint->Add(outMeasure);
+  return outMeasure;
+}
+
+
+void reportConflict(PvlObject &pointLog, iString conflict) {
+  if (report) {
+    PvlKeyword resolution("Resolution", conflict);
+    pointLog.AddKeyword(resolution);
+  }
+}
+
+
+void reportConflict(PvlGroup &measureLog, iString conflict) {
+  if (report) {
+    PvlKeyword resolution("Resolution", conflict);
+    measureLog.AddKeyword(resolution);
+  }
+}
+

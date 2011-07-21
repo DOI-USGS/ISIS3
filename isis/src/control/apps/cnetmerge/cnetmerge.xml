@@ -77,6 +77,20 @@
     <change name="Debbie A. Cook and Tracie Sucharski" date="2011-06-07">
       Change point type "Ground" to "Fixed"
     </change>
+    <change name="Travis Addair" date="2011-05-27">
+      Overhauled the application to reflect functional changes to the program,
+      and fix inconsistencies between the documentation and the code.  The
+      program now operates without regard for point type, and properly honors
+      all OVERWRITE options in all situations, which fixes #230.  A fourth
+      option has been added, OVERWRITEMISSING, which will remove measures that
+      do not appear in newer networks being added to the base, which fixes #228.
+      The log file has been revamped to print out a PVL report for each network,
+      and each conflicting point or measure.  Every conflict will be reported
+      along with a reason (based on user parameter options) for the ultimate
+      resolution.  This is in reference to issue #229, but more logging will
+      need to be done in order to warn the user of potential pitfalls in their
+      selected options.
+    </change>
   </history> 
 
   <category>
@@ -261,6 +275,7 @@
               <item>OVERWRITEPOINTS</item>
               <item>OVERWRITEMEASURES</item>
               <item>OVERWRITEREFERENCE</item>
+              <item>OVERWRITEMISSING</item>
             </exclusions>
           </option>
           <option value="MERGE">
@@ -327,6 +342,22 @@
           network.  If FALSE, the base reference will be retained.  In both
           cases, both measures make it into the final network, but only one
           will be listed as the reference for that point.
+        </description>
+      </parameter>
+
+      <parameter name="OVERWRITEMISSING">
+        <type>boolean</type>
+        <default><item>False</item></default>
+        <brief>
+          Measures missing in newer networks will not appear in the output
+        </brief>
+        <description>
+          When this parameter is true, if a measure exists in a conflicting
+          point in the base network, but not the new network being added to it,
+          then the missing measure will not appear in that point in the output
+          Control Network.  By default, this option is set to false, and if a
+          measure exists in either the base or the new network, it will appear
+          in the output as well.
         </description>
       </parameter>
     </group>
