@@ -216,9 +216,9 @@ ControlPoint * mergePoint(
           // New point does not have the current measure, so delete it from the
           // output point if it's not the reference, or if we're overwriting the
           // reference
-          outPoint->Delete(baseMeasure);
           reportConflict(measureLog, baseMeasure->GetCubeSerialNumber(),
               "Removed: OVERWRITEMISSING=true");
+          outPoint->Delete(baseMeasure);
         }
         else {
           // Missing measure in the new point is the reference in the base
