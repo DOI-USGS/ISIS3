@@ -424,11 +424,13 @@ namespace Isis {
    *                quaternion/time values
    */
   void SpiceRotation::LoadCache(Table &table) {
-    // Make sure cache isn't already loaded
-    if(p_source == Memcache  ||  p_source == Function) {
-      std::string msg = "A SpiceRotation cache has already been created";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
-    }
+    // Clear any existing cached data to make it reentrant (KJB 2011-07-20).
+    p_timeFrames.clear();
+    p_TC.clear();
+    p_cache.clear();
+    p_cacheTime.clear();
+    p_cacheAv.clear();
+    p_hasAngularVelocity = false;
 
     // Load the constant and time-based frame traces and the constant rotation
     if(table.Label().HasKeyword("TimeDependentFrames")) {

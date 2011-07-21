@@ -116,6 +116,8 @@ namespace Isis {
    *                        method DCJdt (derivative was with respect to scaled et instead of et)
    *  @history 2011-02-22 Debbie A. Cook - Corrected Extrapolation method
    *  @history 2011-03-25 Debbie A. Cook - Added method GetCenterAngles()
+   *  @history 2011-07-20 Kris J Becker - Modified  SpiceRotation::LoadCache(Table &table) to be
+   *                        reentrant.  This mod was necessitated by the Dawn VIR instrument.
    *  @todo Downsize using Hermite cubic spline and allow Nadir tables to be downsized again.
    */
   class SpiceRotation {
