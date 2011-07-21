@@ -239,7 +239,7 @@ ControlPoint * mergePoint(
       // conflict, so go ahead and try to resolve it.
       ControlMeasure *baseMeasure =
           outPoint->GetMeasure(newMeasure->GetCubeSerialNumber());
-      mergeMeasure(basePoint, newPoint, baseMeasure, newMeasure, measureLog);
+      mergeMeasure(outPoint, newPoint, baseMeasure, newMeasure, measureLog);
     }
     else {
       // New measure not currently in the base point, so add it to the output
@@ -298,11 +298,11 @@ void mergeMeasure(
       // automatically by addMeasure().
       if (overwriteReference) {
         replaceMeasure(basePoint, newPoint, baseMeasure, newMeasure);
-        reportConflict(measureLog, baseMeasure->GetCubeSerialNumber(),
+        reportConflict(measureLog, newMeasure->GetCubeSerialNumber(),
             "Replaced: OVERWRITEREFERENCE=true");
       }
       else {
-        reportConflict(measureLog, baseMeasure->GetCubeSerialNumber(),
+        reportConflict(measureLog, newMeasure->GetCubeSerialNumber(),
             "Retained: OVERWRITEREFERENCE=false");
       }
     }
@@ -310,18 +310,18 @@ void mergeMeasure(
       // The base measure is not the reference, OVERWRITEMEASURES=TRUE, so
       // replace the base measure with the new measure
       replaceMeasure(basePoint, newPoint, baseMeasure, newMeasure);
-      reportConflict(measureLog, baseMeasure->GetCubeSerialNumber(),
+      reportConflict(measureLog, newMeasure->GetCubeSerialNumber(),
           "Replaced: OVERWRITEMEASURES=true");
     }
     else {
       // The base measure is not the reference, and OVERWRITEMEASURES=false, so
       // retain the base measure
-      reportConflict(measureLog, baseMeasure->GetCubeSerialNumber(),
+      reportConflict(measureLog, newMeasure->GetCubeSerialNumber(),
           "Retained: OVERWRITEMEASURES=false");
     }
   }
   else {
-    reportConflict(measureLog, baseMeasure->GetCubeSerialNumber(),
+    reportConflict(measureLog, newMeasure->GetCubeSerialNumber(),
         "Retained: Edit Lock");
   }
 }
