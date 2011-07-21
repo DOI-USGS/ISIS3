@@ -48,6 +48,12 @@ void MakeCompletion(const string &appName) {
 
   if(appName.compare("qnet") == 0) return;
 
+  if(appName.compare("qmos") == 0 ||
+     appName.compare("./qmos") == 0) {
+    cout << "complete " << appName << " 'n@*@f:*.[mM][oO][sS]@'; ";
+    return;
+  }
+
   if(appName.compare("cneteditor") == 0 ||
      appName.compare("./cneteditor") == 0) {
     cout << "complete " << appName << " 'n@*@f:*.[nN][eE][tT]@'; ";

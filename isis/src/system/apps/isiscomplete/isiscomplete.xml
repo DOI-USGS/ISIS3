@@ -37,6 +37,9 @@
     <change name="Jai Rideout" date="2011-07-18">
       This program now handles cneteditor properly
     </change>
+    <change name="Steven Lambright" date="2011-07-20">
+      This program now handles qmos properly
+    </change>
   </history>
 </application>
 
