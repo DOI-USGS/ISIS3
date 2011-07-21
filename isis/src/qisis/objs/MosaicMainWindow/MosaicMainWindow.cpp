@@ -55,13 +55,15 @@ namespace Isis {
     p_fileListDock = new QDockWidget("File List", this, Qt::SubWindow);
     p_fileListDock->setObjectName("FileListDock");
     p_fileListDock->setFeatures(QDockWidget::DockWidgetFloatable |
-                              QDockWidget::DockWidgetMovable);
+                                QDockWidget::DockWidgetMovable |
+                                QDockWidget::DockWidgetClosable);
 
     p_mosaicPreviewDock = new QDockWidget("Mosaic World View",
                                           this, Qt::SubWindow);
     p_mosaicPreviewDock->setObjectName("MosaicPreviewDock");
     p_mosaicPreviewDock->setFeatures(QDockWidget::DockWidgetFloatable |
-                                     QDockWidget::DockWidgetMovable);
+                                     QDockWidget::DockWidgetMovable |
+                                     QDockWidget::DockWidgetClosable);
 
     addDockWidget(Qt::LeftDockWidgetArea, p_fileListDock);
     addDockWidget(Qt::LeftDockWidgetArea, p_mosaicPreviewDock);
@@ -378,9 +380,6 @@ namespace Isis {
     move(pos);
 
     p_settings.endGroup();
-
-    p_fileListDock->setVisible(true);
-    p_mosaicPreviewDock->setVisible(true);
   }
 
 
