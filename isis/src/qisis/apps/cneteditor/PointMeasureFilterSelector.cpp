@@ -33,7 +33,7 @@ namespace Isis
 
 
   PointMeasureFilterSelector::PointMeasureFilterSelector(
-    const PointMeasureFilterSelector & other)
+      const PointMeasureFilterSelector & other)
   {
     createSelector();
     getSelector()->setCurrentIndex(other.getSelector()->currentIndex());
@@ -48,7 +48,7 @@ namespace Isis
 
 
   PointMeasureFilterSelector & PointMeasureFilterSelector::operator=(
-    const PointMeasureFilterSelector & other)
+      const PointMeasureFilterSelector & other)
   {
     *((AbstractFilterSelector *) this) = other;
     return *this;

@@ -41,14 +41,14 @@ namespace Isis
 
 
   bool AbstractFilterSelector::hasFilter(
-    bool (AbstractFilter::*meth)() const) const
+      bool (AbstractFilter::*meth)() const) const
   {
     return filter && (filter->*meth)();
   }
 
 
   QString AbstractFilterSelector::getDescription(
-    QString(AbstractFilter::*meth)() const) const
+      QString(AbstractFilter::*meth)() const) const
   {
     QString description;
     if (filter)

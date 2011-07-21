@@ -67,7 +67,7 @@ namespace Isis
 
     private:
       PointTableModel(const PointTableModel &);
-      const PointTableModel & operator=(PointTableModel);
+      PointTableModel & operator=(PointTableModel);
 
 
     private:

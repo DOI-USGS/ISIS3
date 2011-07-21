@@ -25,6 +25,17 @@ namespace Isis
   class TreeModel : public QObject
   {
       Q_OBJECT
+      
+    public:
+      enum InterestingItems
+      {
+        AllItems = 1,
+        PointItems = 2,
+        MeasureItems = 4,
+        SerialItems = 8
+      };
+      Q_DECLARE_FLAGS(InterestingItemsFlag, InterestingItems)
+      
 
     public:
       TreeModel(ControlNet * controlNet, CnetView * v, QObject * parent = 0);
@@ -70,11 +81,12 @@ namespace Isis
 
     private:
       TreeModel(const TreeModel &);
-      const TreeModel & operator=(const TreeModel &);
+      TreeModel & operator=(const TreeModel &);
 
 
     private:
-      AbstractTreeItem * nextItem(AbstractTreeItem *) const;
+      AbstractTreeItem * nextItem(AbstractTreeItem * current,
+          InterestingItemsFlag flags = AllItems) const;
       void selectItems(AbstractTreeItem * item, bool select);
 
 
@@ -131,6 +143,8 @@ namespace Isis
           FilterWidget * filter;
       };
   };
+  
+  Q_DECLARE_OPERATORS_FOR_FLAGS(TreeModel::InterestingItemsFlag)
 }
 
 #endif

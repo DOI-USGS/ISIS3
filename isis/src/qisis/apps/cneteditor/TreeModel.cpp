@@ -16,6 +16,7 @@
 
 #include <QtConcurrentMap>
 
+#include <QFlags>
 #include <QtGlobal>
 #include <QVariant>
 
@@ -36,7 +37,7 @@ using std::cerr;
 namespace Isis
 {
   TreeModel::TreeModel(ControlNet * controlNet, CnetView * v, QObject * parent)
-    : QObject(parent), view(v), cNet(controlNet)
+      : QObject(parent), view(v), cNet(controlNet)
   {
     ASSERT(cNet);
 
@@ -79,53 +80,29 @@ namespace Isis
 
   TreeModel::~TreeModel()
   {
-    if (filterWatcher)
-    {
-      delete filterWatcher;
-      filterWatcher = NULL;
-    }
+    delete filterWatcher;
+    filterWatcher = NULL;
 
-    if (rebuildWatcher)
-    {
-      delete rebuildWatcher;
-      rebuildWatcher = NULL;
-    }
+    delete rebuildWatcher;
+    rebuildWatcher = NULL;
 
-    if (busyItem)
-    {
-      delete busyItem;
-      busyItem = NULL;
-    }
+    delete busyItem;
+    busyItem = NULL;
 
-    if (rootItem)
-    {
-      delete rootItem;
-      rootItem = NULL;
-    }
+    delete rootItem;
+    rootItem = NULL;
 
-    if (expandedState)
-    {
-      delete expandedState;
-      expandedState = NULL;
-    }
+    delete expandedState;
+    expandedState = NULL;
 
-    if (selectedState)
-    {
-      delete selectedState;
-      selectedState = NULL;
-    }
+    delete selectedState;
+    selectedState = NULL;
 
-    if (mutex)
-    {
-      delete mutex;
-      mutex = NULL;
-    }
+    delete mutex;
+    mutex = NULL;
 
-    if (localFilterWidgetCopy)
-    {
-      delete localFilterWidgetCopy;
-      localFilterWidgetCopy = NULL;
-    }
+    delete localFilterWidgetCopy;
+    localFilterWidgetCopy = NULL;
 
     guisFilterWidget = NULL;
     cNet = NULL;
@@ -138,7 +115,7 @@ namespace Isis
     QList< AbstractTreeItem * > foundItems;
     int rowCount = end - start;
     const AbstractTreeItem * lastVisibleFilteredItem =
-      rootItem->getLastVisibleFilteredItem();
+        rootItem->getLastVisibleFilteredItem();
 
     if (lastVisibleFilteredItem && rowCount > 0 && rootItem->childCount())
     {
@@ -567,7 +544,8 @@ namespace Isis
   }
 
 
-  AbstractTreeItem * TreeModel::nextItem(AbstractTreeItem * current) const
+  AbstractTreeItem * TreeModel::nextItem(AbstractTreeItem * current,
+      InterestingItemsFlag flags) const
   {
     AbstractTreeItem * result = NULL;
 
@@ -583,6 +561,23 @@ namespace Isis
 
         if (!result)
           result = current->parent()->getNextVisiblePeer();
+      }
+    }
+    
+    if (result)
+    {
+      if (!flags.testFlag(AllItems))
+      {
+        AbstractTreeItem::InternalPointerType pointerType;
+        pointerType = result->getPointerType();
+        
+        if ((pointerType == AbstractTreeItem::Point &&
+            !flags.testFlag(PointItems)) ||
+            (pointerType == AbstractTreeItem::Measure &&
+            !flags.testFlag(MeasureItems)) ||
+            (pointerType == AbstractTreeItem::CubeGraphNode &&
+            !flags.testFlag(SerialItems)))
+          result = nextItem(result, flags);
       }
     }
 
