@@ -1,6 +1,6 @@
 #include "IsisDebug.h"
 
-#include "CnetViewContent.h"
+#include "CnetTreeViewContent.h"
 
 #include <cmath>
 #include <iostream>
@@ -28,12 +28,12 @@ using std::cerr;
 namespace Isis
 {
 
-  CnetViewContent::CnetViewContent(QWidget * parent) :
+  CnetTreeViewContent::CnetTreeViewContent(QWidget * parent) :
     QAbstractScrollArea(parent)
   {
     nullify();
 
-    parentView = (CnetView *) parent;
+    parentView = (CnetTreeView *) parent;
 
     items = new QList< AbstractTreeItem * >;
     mousePressPos = new QPoint;
@@ -57,7 +57,7 @@ namespace Isis
   }
 
 
-  CnetViewContent::~CnetViewContent()
+  CnetTreeViewContent::~CnetTreeViewContent()
   {
     if (items)
     {
@@ -85,25 +85,25 @@ namespace Isis
   }
 
 
-  QSize CnetViewContent::minimumSizeHint() const
+  QSize CnetTreeViewContent::minimumSizeHint() const
   {
     return QWidget::minimumSizeHint();
   }
 
 
-  QSize CnetViewContent::sizeHint()
+  QSize CnetTreeViewContent::sizeHint()
   {
     return minimumSizeHint();
   }
 
 
-  TreeModel * CnetViewContent::getModel()
+  TreeModel * CnetTreeViewContent::getModel()
   {
     return model;
   }
 
 
-  void CnetViewContent::setModel(TreeModel * someModel)
+  void CnetTreeViewContent::setModel(TreeModel * someModel)
   {
     if (!someModel)
     {
@@ -127,7 +127,7 @@ namespace Isis
   }
 
 
-  void CnetViewContent::refresh()
+  void CnetTreeViewContent::refresh()
   {
     if (model)
     {
@@ -148,13 +148,13 @@ namespace Isis
   }
 
 
-  bool CnetViewContent::eventFilter(QObject * target, QEvent * event)
+  bool CnetTreeViewContent::eventFilter(QObject * target, QEvent * event)
   {
     return QObject::eventFilter(target, event);
   }
 
 
-  void CnetViewContent::mouseDoubleClickEvent(QMouseEvent * event)
+  void CnetTreeViewContent::mouseDoubleClickEvent(QMouseEvent * event)
   {
     QPoint pressPos = event->pos();
     int index = pressPos.y() / rowHeight;
@@ -167,7 +167,7 @@ namespace Isis
     }
   }
 
-  void CnetViewContent::mousePressEvent(QMouseEvent * event)
+  void CnetTreeViewContent::mousePressEvent(QMouseEvent * event)
   {
     QPoint pressPos = event->pos();
     int index = pressPos.y() / rowHeight;
@@ -236,7 +236,7 @@ namespace Isis
   }
 
 
-  void CnetViewContent::mouseReleaseEvent(QMouseEvent * event)
+  void CnetTreeViewContent::mouseReleaseEvent(QMouseEvent * event)
   {
     AbstractTreeItem * item = pressedItem->first;
     if (item && getArrowRect(item).contains(event->pos()))
@@ -253,7 +253,7 @@ namespace Isis
   }
 
 
-  void CnetViewContent::mouseMoveEvent(QMouseEvent * event)
+  void CnetTreeViewContent::mouseMoveEvent(QMouseEvent * event)
   {
     QPoint cursorPos = event->pos();
     int index = cursorPos.y() / rowHeight;
@@ -282,7 +282,7 @@ namespace Isis
   }
 
 
-  void CnetViewContent::leaveEvent(QEvent * event)
+  void CnetTreeViewContent::leaveEvent(QEvent * event)
   {
     hoveredItem->first = NULL;
     hoveredItem->second = false;
@@ -290,7 +290,7 @@ namespace Isis
   }
 
 
-  void CnetViewContent::keyPressEvent(QKeyEvent * event)
+  void CnetTreeViewContent::keyPressEvent(QKeyEvent * event)
   {
     if (event->key() == Qt::Key_A &&
         event->modifiers() == Qt::ControlModifier)
@@ -306,7 +306,7 @@ namespace Isis
   }
 
 
-  void CnetViewContent::paintEvent(QPaintEvent * event)
+  void CnetTreeViewContent::paintEvent(QPaintEvent * event)
   {
     if (model)
     {
@@ -374,7 +374,7 @@ namespace Isis
   }
 
 
-  void CnetViewContent::resizeEvent(QResizeEvent * event)
+  void CnetTreeViewContent::resizeEvent(QResizeEvent * event)
   {
     QAbstractScrollArea::resizeEvent(event);
     horizontalScrollBar()->setRange(0, contentWidth - viewport()->width()
@@ -383,14 +383,14 @@ namespace Isis
   }
 
 
-  void CnetViewContent::scrollContentsBy(int dx, int dy)
+  void CnetTreeViewContent::scrollContentsBy(int dx, int dy)
   {
     QAbstractScrollArea::scrollContentsBy(dx, dy);
     updateItemList();
   }
 
 
-  void CnetViewContent::nullify()
+  void CnetTreeViewContent::nullify()
   {
     parentView = NULL;
     model = NULL;
@@ -402,7 +402,7 @@ namespace Isis
   }
 
 
-  void CnetViewContent::paintItemText(QPainter * painter,
+  void CnetTreeViewContent::paintItemText(QPainter * painter,
       int index, QPoint absolutePosition, QPoint relativePosition)
   {
     ASSERT(items);
@@ -494,7 +494,7 @@ namespace Isis
   }
 
 
-  void CnetViewContent::drawCollapsedArrow(QPainter * painter, QRect rect)
+  void CnetTreeViewContent::drawCollapsedArrow(QPainter * painter, QRect rect)
   {
     rect.setTopLeft(rect.topLeft() + QPoint(4, 3));
     rect.setBottomRight(rect.bottomRight() - QPoint(4, 2));
@@ -515,7 +515,7 @@ namespace Isis
   }
 
 
-  void CnetViewContent::drawExpandedArrow(QPainter * painter, QRect rect)
+  void CnetTreeViewContent::drawExpandedArrow(QPainter * painter, QRect rect)
   {
     rect.setTopLeft(rect.topLeft() + QPoint(3, 4));
     rect.setBottomRight(rect.bottomRight() - QPoint(2, 4));
@@ -536,14 +536,14 @@ namespace Isis
   }
 
 
-  void CnetViewContent::setAlternatingRowColors(bool newStatus)
+  void CnetTreeViewContent::setAlternatingRowColors(bool newStatus)
   {
     alternatingRowColors = newStatus;
     viewport()->update();
   }
 
 
-  void CnetViewContent::updateItemList()
+  void CnetTreeViewContent::updateItemList()
   {
     int startRow = verticalScrollBar()->value();
     int rowCount = (int) ceil(viewport()->height() / (double) rowHeight);
@@ -553,7 +553,7 @@ namespace Isis
   }
 
 
-  QRect CnetViewContent::getArrowRect(AbstractTreeItem * item) const
+  QRect CnetTreeViewContent::getArrowRect(AbstractTreeItem * item) const
   {
     QRect arrowRect;
     if (item)

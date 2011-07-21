@@ -1,5 +1,5 @@
-#ifndef CnetViewContent_H
-#define CnetViewContent_H
+#ifndef CnetTreeViewContent_H
+#define CnetTreeViewContent_H
 
 #include <QAbstractScrollArea>
 
@@ -15,16 +15,16 @@ class QResizeEvent;
 namespace Isis
 {
   class AbstractTreeItem;
-  class CnetView;
+  class CnetTreeView;
   class TreeModel;
 
-  class CnetViewContent : public QAbstractScrollArea
+  class CnetTreeViewContent : public QAbstractScrollArea
   {
       Q_OBJECT
 
     public:
-      CnetViewContent(QWidget * parent);
-      virtual ~CnetViewContent();
+      CnetTreeViewContent(QWidget * parent);
+      virtual ~CnetTreeViewContent();
       QSize minimumSizeHint() const;
       QSize sizeHint();
       TreeModel * getModel();
@@ -53,8 +53,8 @@ namespace Isis
 
 
     private:
-      CnetViewContent(const CnetViewContent & other);
-      CnetViewContent & operator=(const CnetViewContent & other);
+      CnetTreeViewContent(const CnetTreeViewContent & other);
+      CnetTreeViewContent & operator=(const CnetTreeViewContent & other);
 
 
     private:
@@ -71,7 +71,7 @@ namespace Isis
 
 
     private:
-      CnetView * parentView;
+      CnetTreeView * parentView;
       TreeModel * model;
       QList< AbstractTreeItem * > * items;
 

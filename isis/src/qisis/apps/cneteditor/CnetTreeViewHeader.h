@@ -1,5 +1,5 @@
-#ifndef CnetViewHeader_H
-#define CnetViewHeader_H
+#ifndef CnetTreeViewHeader_H
+#define CnetTreeViewHeader_H
 
 #include <QWidget>
 
@@ -12,17 +12,18 @@ class QString;
 namespace Isis
 {
 
-  class CnetViewContent;
+  class CnetTreeViewContent;
 
-  class CnetViewHeader : public QWidget
+  class CnetTreeViewHeader : public QWidget
   {
 
       Q_OBJECT
 
     public:
-      explicit CnetViewHeader(CnetViewContent * someContent, QWidget * parent);
-      CnetViewHeader(const CnetViewHeader & other);
-      virtual ~CnetViewHeader();
+      explicit CnetTreeViewHeader(CnetTreeViewContent * someContent,
+          QWidget * parent);
+      CnetTreeViewHeader(const CnetTreeViewHeader & other);
+      virtual ~CnetTreeViewHeader();
       QSize minimumSizeHint() const;
       QString getText();
       void setText(QString text);
@@ -30,7 +31,7 @@ namespace Isis
       {
         return minimumSizeHint();
       }
-      CnetViewHeader & operator=(const CnetViewHeader & other);
+      CnetTreeViewHeader & operator=(const CnetTreeViewHeader & other);
 
 
     public slots:
@@ -63,7 +64,7 @@ namespace Isis
 
 
     private: // data
-      CnetViewContent * content;
+      CnetTreeViewContent * content;
       QString * headerText;
       int filterProgress;
       int filterProgressMin;

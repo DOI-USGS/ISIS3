@@ -15,7 +15,7 @@ class QString;
 
 namespace Isis
 {
-  class CnetView;
+  class CnetTreeView;
   class ControlNet;
   class ControlPoint;
   class PointParentItem;
@@ -26,7 +26,8 @@ namespace Isis
       Q_OBJECT
 
     public:
-      PointModel(Isis::ControlNet * cNet, CnetView * v, QObject * parent = 0);
+      PointModel(Isis::ControlNet * cNet, CnetTreeView * v,
+          QObject * parent = 0);
       virtual ~PointModel();
 
       // These are slots!!!  There is no "pubic slots:" because it has already

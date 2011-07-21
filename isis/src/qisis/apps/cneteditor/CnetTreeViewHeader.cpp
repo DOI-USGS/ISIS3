@@ -1,6 +1,6 @@
 #include "IsisDebug.h"
 
-#include "CnetViewHeader.h"
+#include "CnetTreeViewHeader.h"
 
 #include <iostream>
 
@@ -15,8 +15,8 @@
 #include <QString>
 #include <QVBoxLayout>
 
-#include "CnetView.h"
-#include "CnetViewContent.h"
+#include "CnetTreeView.h"
+#include "CnetTreeViewContent.h"
 #include "TreeModel.h"
 
 using std::cerr;
@@ -25,7 +25,7 @@ using std::cerr;
 namespace Isis
 {
 
-  CnetViewHeader::CnetViewHeader(CnetViewContent * someContent,
+  CnetTreeViewHeader::CnetTreeViewHeader(CnetTreeViewContent * someContent,
       QWidget * parent) : QWidget(parent), content(someContent)
   {
     nullify();
@@ -45,7 +45,7 @@ namespace Isis
   }
 
 
-  CnetViewHeader::CnetViewHeader(const CnetViewHeader & other)
+  CnetTreeViewHeader::CnetTreeViewHeader(const CnetTreeViewHeader & other)
   {
     nullify();
 
@@ -53,7 +53,7 @@ namespace Isis
   }
 
 
-  CnetViewHeader::~CnetViewHeader()
+  CnetTreeViewHeader::~CnetTreeViewHeader()
   {
     if (headerText)
     {
@@ -63,20 +63,20 @@ namespace Isis
   }
 
 
-  QSize CnetViewHeader::minimumSizeHint() const
+  QSize CnetTreeViewHeader::minimumSizeHint() const
   {
     return QSize(QFontMetrics(font()).width(*headerText) + 15,
         QFontMetrics(font()).height() + 6);
   }
 
-  QString CnetViewHeader::getText()
+  QString CnetTreeViewHeader::getText()
   {
     ASSERT(headerText);
     return *headerText;
   }
 
 
-  void CnetViewHeader::setText(QString text)
+  void CnetTreeViewHeader::setText(QString text)
   {
     ASSERT(headerText);
     *headerText = text;
@@ -85,8 +85,8 @@ namespace Isis
   }
 
 
-  CnetViewHeader & CnetViewHeader::operator=(
-    const CnetViewHeader & other)
+  CnetTreeViewHeader & CnetTreeViewHeader::operator=(
+    const CnetTreeViewHeader & other)
   {
     if (this != &other)
     {
@@ -103,14 +103,14 @@ namespace Isis
   }
 
 
-  void CnetViewHeader::setActive(bool newActiveState)
+  void CnetTreeViewHeader::setActive(bool newActiveState)
   {
     active = newActiveState;
   }
 
 
-  void CnetViewHeader::handleFilterCountsChanged(int visibleTopLevelItemCount,
-      int topLevelItemCount)
+  void CnetTreeViewHeader::handleFilterCountsChanged(
+      int visibleTopLevelItemCount, int topLevelItemCount)
   {
     visibleCount = visibleTopLevelItemCount;
     totalCount = topLevelItemCount;
@@ -119,7 +119,7 @@ namespace Isis
   }
 
 
-  void CnetViewHeader::mouseReleaseEvent(QMouseEvent * event)
+  void CnetTreeViewHeader::mouseReleaseEvent(QMouseEvent * event)
   {
     setActive(true);
     emit(activated());
@@ -127,7 +127,7 @@ namespace Isis
   }
 
 
-  void CnetViewHeader::paintEvent(QPaintEvent * event)
+  void CnetTreeViewHeader::paintEvent(QPaintEvent * event)
   {
     QPainter painter(this);
     painter.setRenderHints(QPainter::Antialiasing |
@@ -138,13 +138,13 @@ namespace Isis
   }
 
 
-  void CnetViewHeader::nullify()
+  void CnetTreeViewHeader::nullify()
   {
     headerText = NULL;
   }
 
 
-  void CnetViewHeader::paintHeader(QPainter * painter, int rowHeight)
+  void CnetTreeViewHeader::paintHeader(QPainter * painter, int rowHeight)
   {
     QRect rect(0, 0, width(), rowHeight);
 
@@ -203,7 +203,7 @@ namespace Isis
   }
 
 
-  void CnetViewHeader::paintProgress(QPainter * painter, const QRect & rect,
+  void CnetTreeViewHeader::paintProgress(QPainter * painter, const QRect & rect,
       int min, int max, int value)
   {
     // draw filter progress if not at 100%
@@ -221,14 +221,14 @@ namespace Isis
   }
 
 
-  void CnetViewHeader::updateFilterProgress(int newProgress)
+  void CnetTreeViewHeader::updateFilterProgress(int newProgress)
   {
     filterProgress = newProgress;
     update();
   }
 
 
-  void CnetViewHeader::updateFilterProgressRange(int min, int max)
+  void CnetTreeViewHeader::updateFilterProgressRange(int min, int max)
   {
     filterProgressMin = min;
     filterProgressMax = max;
@@ -236,26 +236,14 @@ namespace Isis
   }
 
 
-  void CnetViewHeader::updateRebuildProgress(int newProgress)
+  void CnetTreeViewHeader::updateRebuildProgress(int newProgress)
   {
-//     if (*headerText == "Point View")
-//     {
-//       std::cerr << "CnetViewHeadder::updateRebuildProgress called on Point View!\n";
-//     }
-//     if (*headerText == "Cube View")
-//     {
-//       std::cerr << "CnetViewHeadder::updateRebuildProgress called on Cube View!\n";
-//     }
-//     if (*headerText == "Cube Connection View")
-//     {
-//       std::cerr << "CnetViewHeadder::updateRebuildProgress called on Cube Connection View!\n";
-//     }
     rebuildProgress = newProgress;
     update();
   }
 
 
-  void CnetViewHeader::updateRebuildProgressRange(int min, int max)
+  void CnetTreeViewHeader::updateRebuildProgressRange(int min, int max)
   {
     rebuildProgressMin = min;
     rebuildProgressMax = max;

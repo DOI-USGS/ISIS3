@@ -1,16 +1,16 @@
-#ifndef CnetView_H
-#define CnetView_H
+#ifndef CnetTreeView_H
+#define CnetTreeView_H
 
 #include <QWidget>
 
 
 namespace Isis
 {
-  class CnetViewContent;
-  class CnetViewHeader;
+  class CnetTreeViewContent;
+  class CnetTreeViewHeader;
   class TreeModel;
 
-  class CnetView : public QWidget
+  class CnetTreeView : public QWidget
   {
       Q_OBJECT
 
@@ -20,8 +20,8 @@ namespace Isis
 
 
     public:
-      CnetView(QWidget * parent = 0);
-      virtual ~CnetView();
+      CnetTreeView(QWidget * parent = 0);
+      virtual ~CnetTreeView();
       QSize sizeHint();
       QFont getContentFont() const;
       void setModel(TreeModel * someModel);
@@ -37,8 +37,8 @@ namespace Isis
 
 
     private: // disable copying and assigning of this class
-      CnetView(const CnetView &);
-      CnetView & operator=(const CnetView & other);
+      CnetTreeView(const CnetTreeView &);
+      CnetTreeView & operator=(const CnetTreeView & other);
 
 
     private: // methods
@@ -46,8 +46,8 @@ namespace Isis
 
 
     private: // data
-      CnetViewHeader * header;
-      CnetViewContent * content;
+      CnetTreeViewHeader * header;
+      CnetTreeViewContent * content;
       bool active;
   };
 }

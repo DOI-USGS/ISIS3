@@ -1,29 +1,30 @@
 #include "IsisDebug.h"
 
-#include "CnetView.h"
+#include "CnetTreeView.h"
 
 #include <QLabel>
 #include <QVariant>
 #include <QVBoxLayout>
 
-#include "CnetViewContent.h"
-#include "CnetViewHeader.h"
+#include "CnetTreeViewContent.h"
+#include "CnetTreeViewHeader.h"
 #include "TreeModel.h"
 
 
 namespace Isis
 {
 
-  CnetView::CnetView(QWidget * parent) : QWidget(parent)
+  CnetTreeView::CnetTreeView(QWidget * parent) : QWidget(parent)
   {
     nullify();
 
     active = false;
 
-    content = new CnetViewContent(this);
-    header = new CnetViewHeader(content, this);
+    content = new CnetTreeViewContent(this);
+    header = new CnetTreeViewHeader(content, this);
     connect(header, SIGNAL(activated()), this, SIGNAL(activated()));
-    connect(content, SIGNAL(selectionChanged()), this, SIGNAL(selectionChanged()));
+    connect(content, SIGNAL(selectionChanged()),
+        this, SIGNAL(selectionChanged()));
 
     QVBoxLayout * layout = new QVBoxLayout;
     layout->addWidget(header);
@@ -35,12 +36,12 @@ namespace Isis
   }
 
 
-  CnetView::~CnetView()
+  CnetTreeView::~CnetTreeView()
   {
   }
 
 
-  QSize CnetView::sizeHint()
+  QSize CnetTreeView::sizeHint()
   {
     if (parentWidget())
       return QSize(parentWidget()->width() / 4, parentWidget()->height() / 2);
@@ -49,13 +50,13 @@ namespace Isis
   }
 
 
-  QFont CnetView::getContentFont() const
+  QFont CnetTreeView::getContentFont() const
   {
     return content->font();
   }
 
 
-  void CnetView::setModel(TreeModel * someModel)
+  void CnetTreeView::setModel(TreeModel * someModel)
   {
     ASSERT(content);
     content->setModel(someModel);
@@ -76,31 +77,31 @@ namespace Isis
   }
 
 
-  TreeModel * CnetView::getModel() const
+  TreeModel * CnetTreeView::getModel() const
   {
     return content->getModel();
   }
 
 
-  bool CnetView::isActive() const
+  bool CnetTreeView::isActive() const
   {
     return active;
   }
 
 
-  QString CnetView::getTitle() const
+  QString CnetTreeView::getTitle() const
   {
     return header->getText();
   }
 
 
-  void CnetView::setTitle(QString someTitle)
+  void CnetTreeView::setTitle(QString someTitle)
   {
     header->setText(someTitle);
   }
 
 
-  void CnetView::deactivate()
+  void CnetTreeView::deactivate()
   {
     active = false;
 
@@ -111,7 +112,7 @@ namespace Isis
   }
 
 
-  void CnetView::activate()
+  void CnetTreeView::activate()
   {
     active = true;
 
@@ -122,7 +123,7 @@ namespace Isis
   }
 
 
-  void CnetView::nullify()
+  void CnetTreeView::nullify()
   {
     header = NULL;
     content = NULL;

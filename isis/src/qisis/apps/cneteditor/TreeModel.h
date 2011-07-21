@@ -17,7 +17,7 @@ namespace Isis
 {
   class AbstractTreeItem;
   class BusyLeafItem;
-  class CnetView;
+  class CnetTreeView;
   class ControlNet;
   class FilterWidget;
   class RootItem;
@@ -38,7 +38,8 @@ namespace Isis
       
 
     public:
-      TreeModel(ControlNet * controlNet, CnetView * v, QObject * parent = 0);
+      TreeModel(ControlNet * controlNet, CnetTreeView * v,
+          QObject * parent = 0);
       virtual ~TreeModel();
 
       QList< AbstractTreeItem * > getItems(int, int) const;
@@ -48,7 +49,7 @@ namespace Isis
       QList< AbstractTreeItem * > getSelectedItems() const;
       int getTopLevelItemCount() const;
       int getVisibleTopLevelItemCount() const;
-      CnetView * getView() const;
+      CnetTreeView * getView() const;
       void setDrivable(bool drivableStatus);
       bool isDrivable() const;
       bool isFiltering() const;
@@ -115,7 +116,7 @@ namespace Isis
       QList< QPair< QString, QString > > * selectedState;
       QMutex * mutex;
       BusyLeafItem * busyItem;
-      CnetView * view;
+      CnetTreeView * view;
       ControlNet * cNet;
       FilterWidget * guisFilterWidget;
       FilterWidget * localFilterWidgetCopy;

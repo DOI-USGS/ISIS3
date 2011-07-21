@@ -13,8 +13,8 @@
 #include "ControlNet.h"
 #include "ControlPoint.h"
 
-#include "CnetView.h"
-#include "CnetViewContent.h"
+#include "CnetTreeView.h"
+#include "CnetTreeViewContent.h"
 #include "PointParentItem.h"
 #include "MeasureLeafItem.h"
 #include "RootItem.h"
@@ -28,8 +28,8 @@ using std::cerr;
 
 namespace Isis
 {
-  PointModel::PointModel(ControlNet * controlNet, CnetView * v, QObject * parent)
-    : TreeModel(controlNet, v, parent)
+  PointModel::PointModel(ControlNet * controlNet, CnetTreeView * v,
+      QObject * parent) : TreeModel(controlNet, v, parent)
   {
     rebuildItems();
   }

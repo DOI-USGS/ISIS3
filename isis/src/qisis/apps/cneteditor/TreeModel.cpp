@@ -21,7 +21,7 @@
 #include <QVariant>
 
 #include "BusyLeafItem.h"
-#include "CnetView.h"
+#include "CnetTreeView.h"
 #include "ControlMeasure.h"
 #include "ControlNet.h"
 #include "ControlPoint.h"
@@ -36,8 +36,8 @@ using std::cerr;
 
 namespace Isis
 {
-  TreeModel::TreeModel(ControlNet * controlNet, CnetView * v, QObject * parent)
-      : QObject(parent), view(v), cNet(controlNet)
+  TreeModel::TreeModel(ControlNet * controlNet, CnetTreeView * v,
+      QObject * parent) : QObject(parent), view(v), cNet(controlNet)
   {
     ASSERT(cNet);
 
@@ -340,7 +340,7 @@ namespace Isis
   }
 
 
-  CnetView * TreeModel::getView() const
+  CnetTreeView * TreeModel::getView() const
   {
     return view;
   }

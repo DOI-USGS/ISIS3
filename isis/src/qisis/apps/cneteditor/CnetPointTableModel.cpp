@@ -88,7 +88,7 @@ namespace Isis
   }
 
 
-  int CnetPointTableModel::columnCount() const
+  int CnetPointTableModel::getColumnCount() const
   {
     return COLS;
   }
@@ -225,5 +225,5 @@ namespace Isis
 
     return d;
   }
-
 }
+

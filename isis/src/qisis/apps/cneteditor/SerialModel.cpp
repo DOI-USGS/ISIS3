@@ -16,8 +16,8 @@
 #include "ControlNet.h"
 #include "ControlPoint.h"
 
-#include "CnetView.h"
-#include "CnetViewContent.h"
+#include "CnetTreeView.h"
+#include "CnetTreeViewContent.h"
 #include "PointLeafItem.h"
 #include "RootItem.h"
 #include "SerialParentItem.h"
@@ -30,7 +30,7 @@ using std::cerr;
 
 namespace Isis
 {
-  SerialModel::SerialModel(ControlNet * controlNet, CnetView * v,
+  SerialModel::SerialModel(ControlNet * controlNet, CnetTreeView * v,
       QObject * parent) : TreeModel(controlNet, v, parent)
   {
     rebuildItems();

@@ -29,7 +29,7 @@
 #include "ControlPoint.h"
 
 #include "AbstractTreeItem.h"
-#include "CnetView.h"
+#include "CnetTreeView.h"
 #include "ConnectionModel.h"
 #include "FilterWidget.h"
 #include "MeasureTableDelegate.h"
@@ -102,14 +102,14 @@ namespace Isis
     delete settingsPath;
     settingsPath = NULL;
 
-    delete pointView;
-    pointView = NULL;
+    delete pointTreeView;
+    pointTreeView = NULL;
 
-    delete serialView;
-    serialView = NULL;
+    delete serialTreeView;
+    serialTreeView = NULL;
 
-    delete connectionView;
-    connectionView = NULL;
+    delete connectionTreeView;
+    connectionTreeView = NULL;
 
     delete pointFilterWidget;
     pointFilterWidget = NULL;
@@ -124,9 +124,9 @@ namespace Isis
 
   void CnetEditorWidget::nullify()
   {
-    pointView = NULL;
-    serialView = NULL;
-    connectionView = NULL;
+    pointTreeView = NULL;
+    serialTreeView = NULL;
+    connectionTreeView = NULL;
 
     pointModel = NULL;
     serialModel = NULL;
@@ -164,14 +164,14 @@ namespace Isis
     serialModel->setDrivable(view == SerialView);
     connectionModel->setDrivable(view == ConnectionView);
 
-//     pointView->selectionModel()->clear();
-//     pointView->collapseAll();
+//     pointTreeView->selectionModel()->clear();
+//     pointTreeView->collapseAll();
 
-//     serialView->selectionModel()->clear();
-//     serialView->collapseAll();
+//     serialTreeView->selectionModel()->clear();
+//     serialTreeView->collapseAll();
 //
-//     connectionView->selectionModel()->clear();
-//     connectionView->collapseAll();
+//     connectionTreeView->selectionModel()->clear();
+//     connectionTreeView->collapseAll();
   }
 
 
@@ -224,20 +224,24 @@ namespace Isis
 
   QBoxLayout * CnetEditorWidget::createMainLayout()
   {
-    createPointView();
-    createSerialView();
-    createConnectionView();
+    createPointTreeView();
+    createSerialTreeView();
+    createConnectionTreeView();
 
-    connect(pointView, SIGNAL(activated()), serialView, SLOT(deactivate()));
-    connect(pointView, SIGNAL(activated()), connectionView, SLOT(deactivate()));
+    connect(pointTreeView, SIGNAL(activated()),
+        serialTreeView, SLOT(deactivate()));
+    connect(pointTreeView, SIGNAL(activated()),
+        connectionTreeView, SLOT(deactivate()));
 
-    connect(serialView, SIGNAL(activated()), pointView, SLOT(deactivate()));
-    connect(serialView, SIGNAL(activated()),
-        connectionView, SLOT(deactivate()));
+    connect(serialTreeView, SIGNAL(activated()),
+        pointTreeView, SLOT(deactivate()));
+    connect(serialTreeView, SIGNAL(activated()),
+        connectionTreeView, SLOT(deactivate()));
 
-    connect(connectionView, SIGNAL(activated()), pointView, SLOT(deactivate()));
-    connect(connectionView, SIGNAL(activated()),
-        serialView, SLOT(deactivate()));
+    connect(connectionTreeView, SIGNAL(activated()),
+        pointTreeView, SLOT(deactivate()));
+    connect(connectionTreeView, SIGNAL(activated()),
+        serialTreeView, SLOT(deactivate()));
 
     createFilterArea();
 
@@ -255,9 +259,9 @@ namespace Isis
 
     topSplitter = new QSplitter(Qt::Horizontal);
 //     topSplitter->setChildrenCollapsible(false);
-//     topSplitter->addWidget(pointView);
-//     topSplitter->addWidget(serialView);
-//     topSplitter->addWidget(connectionView);
+//     topSplitter->addWidget(pointTreeView);
+//     topSplitter->addWidget(serialTreeView);
+//     topSplitter->addWidget(connectionTreeView);
 //     topSplitter->addWidget(filterArea);
 
     mainSplitter = new QSplitter(Qt::Vertical);
@@ -272,40 +276,42 @@ namespace Isis
   }
 
 
-  void CnetEditorWidget::createPointView()
+  void CnetEditorWidget::createPointTreeView()
   {
-    pointView = new CnetView();
-    pointView->setTitle("Point View");
-    pointModel = new PointModel(controlNet, pointView, qApp);
-    pointView->setModel(pointModel);
-    connect(pointView, SIGNAL(activated()), this, SLOT(activatePointView()));
-    connect(pointView, SIGNAL(selectionChanged()),
-        this, SLOT(pointViewSelectionChanged()));
+    pointTreeView = new CnetTreeView();
+    pointTreeView->setTitle("Point View");
+    pointModel = new PointModel(controlNet, pointTreeView, qApp);
+    pointTreeView->setModel(pointModel);
+    connect(pointTreeView, SIGNAL(activated()),
+        this, SLOT(activatePointView()));
+    connect(pointTreeView, SIGNAL(selectionChanged()),
+        this, SLOT(pointTreeViewSelectionChanged()));
   }
 
 
-  void CnetEditorWidget::createSerialView()
+  void CnetEditorWidget::createSerialTreeView()
   {
-    serialView = new CnetView();
-    serialView->setTitle("Cube View");
-    serialModel = new SerialModel(controlNet, serialView, qApp);
-    serialView->setModel(serialModel);
-    connect(serialView, SIGNAL(activated()), this, SLOT(activateSerialView()));
-    connect(serialView, SIGNAL(selectionChanged()),
-        this, SLOT(serialViewSelectionChanged()));
+    serialTreeView = new CnetTreeView();
+    serialTreeView->setTitle("Cube View");
+    serialModel = new SerialModel(controlNet, serialTreeView, qApp);
+    serialTreeView->setModel(serialModel);
+    connect(serialTreeView, SIGNAL(activated()),
+        this, SLOT(activateSerialView()));
+    connect(serialTreeView, SIGNAL(selectionChanged()),
+        this, SLOT(serialTreeViewSelectionChanged()));
   }
 
 
-  void CnetEditorWidget::createConnectionView()
+  void CnetEditorWidget::createConnectionTreeView()
   {
-    connectionView = new CnetView();
-    connectionView->setTitle("Cube Connection View");
-    connectionModel = new ConnectionModel(controlNet, connectionView, qApp);
-    connectionView->setModel(connectionModel);
-    connect(connectionView, SIGNAL(activated()),
+    connectionTreeView = new CnetTreeView();
+    connectionTreeView->setTitle("Cube Connection View");
+    connectionModel = new ConnectionModel(controlNet, connectionTreeView, qApp);
+    connectionTreeView->setModel(connectionModel);
+    connect(connectionTreeView, SIGNAL(activated()),
         this, SLOT(activateConnectionView()));
-    connect(connectionView, SIGNAL(selectionChanged()),
-        this, SLOT(connectionViewSelectionChanged()));
+    connect(connectionTreeView, SIGNAL(selectionChanged()),
+        this, SLOT(connectionTreeViewSelectionChanged()));
   }
 
 
@@ -426,7 +432,7 @@ namespace Isis
   }
 
 
-  void CnetEditorWidget::pointViewSelectionChanged()
+  void CnetEditorWidget::pointTreeViewSelectionChanged()
   {
     QList< ControlPoint * > points;
     QList< ControlMeasure * > measures;
@@ -472,15 +478,15 @@ namespace Isis
     editMeasureModel->setMeasures(measures);
 
 //    if (pointModel->isDrivable()) {
-//      focusView(serialView, cubeSerialNumbers);
-//      focusView(connectionView, cubeSerialNumbers);
+//      focusView(serialTreeView, cubeSerialNumbers);
+//      focusView(connectionTreeView, cubeSerialNumbers);
 //    }
 //
 //    updatingSelection = false;
   }
 
 
-  void CnetEditorWidget::serialViewSelectionChanged()
+  void CnetEditorWidget::serialTreeViewSelectionChanged()
   {
 //     if (updatingSelection)
 //       return;
@@ -493,7 +499,7 @@ namespace Isis
 //     QStringList pointIds;
 //     QStringList cubeSerialNumbers;
 //     QList< QModelIndex > indexes =
-//         serialView->selectionModel()->selectedIndexes();
+//         serialTreeView->selectionModel()->selectedIndexes();
 //     for (int i = 0; i < indexes.size(); i++)
 //     {
 //       AbstractTreeItem * item = static_cast< AbstractTreeItem * >(
@@ -527,8 +533,8 @@ namespace Isis
 //
 //     if (serialModel->isDrivable())
 //     {
-// //       focusView(pointView, pointIds);
-//       focusView(connectionView, cubeSerialNumbers);
+// //       focusView(pointTreeView, pointIds);
+//       focusView(connectionTreeView, cubeSerialNumbers);
 //     }
 //
 //     updatingSelection = false;
@@ -536,7 +542,7 @@ namespace Isis
 
 
 
-  void CnetEditorWidget::connectionViewSelectionChanged()
+  void CnetEditorWidget::connectionTreeViewSelectionChanged()
   {
 //     if (updatingSelection)
 //       return;
@@ -549,7 +555,7 @@ namespace Isis
 //     QStringList pointIds;
 //     QStringList cubeSerialNumbers;
 //     QList< QModelIndex > indexes =
-//       connectionView->selectionModel()->selectedIndexes();
+//       connectionTreeView->selectionModel()->selectedIndexes();
 //     for (int i = 0; i < indexes.size(); i++)
 //     {
 //       AbstractTreeItem * item = static_cast< AbstractTreeItem * >(
@@ -584,8 +590,8 @@ namespace Isis
 //
 //     if (connectionModel->isDrivable())
 //     {
-// //       focusView(pointView, pointIds);
-//       focusView(serialView, cubeSerialNumbers);
+// //       focusView(pointTreeView, pointIds);
+//       focusView(serialTreeView, cubeSerialNumbers);
 //     }
 //
 //     updatingSelection = false;
@@ -672,7 +678,7 @@ namespace Isis
   }
 
 
-  void CnetEditorWidget::focusView(CnetView * view, QStringList labels)
+  void CnetEditorWidget::focusView(CnetTreeView * treeView, QStringList labels)
   {
 //     QAbstractItemModel * model = view->model();
 //     for (int i = 0; i < model->rowCount(); i++)
@@ -775,19 +781,19 @@ namespace Isis
 
   QWidget * CnetEditorWidget::getPointTreeView()
   {
-    return pointView;
+    return pointTreeView;
   }
 
 
   QWidget * CnetEditorWidget::getSerialTreeView()
   {
-    return serialView;
+    return serialTreeView;
   }
 
 
   QWidget * CnetEditorWidget::getConnectionTreeView()
   {
-    return connectionView;
+    return connectionTreeView;
   }
 
 

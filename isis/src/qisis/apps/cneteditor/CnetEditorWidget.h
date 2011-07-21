@@ -15,7 +15,7 @@ class QTableView;
 
 namespace Isis
 {
-  class CnetView;
+  class CnetTreeView;
   class ConnectionModel;
   class ControlNet;
   class FilterWidget;
@@ -68,20 +68,20 @@ namespace Isis
     private:
       void nullify();
       QBoxLayout * createMainLayout();
-      void createPointView();
-      void createSerialView();
-      void createConnectionView();
+      void createPointTreeView();
+      void createSerialTreeView();
+      void createConnectionTreeView();
       void createFilterArea();
       void createEditPointView();
       void createEditMeasureView();
-      void focusView(CnetView * view, QStringList label);
+      void focusView(CnetTreeView * treeView, QStringList label);
       void upgradeVersion();
 
 
     private slots:
-      void pointViewSelectionChanged();
-      void serialViewSelectionChanged();
-      void connectionViewSelectionChanged();
+      void pointTreeViewSelectionChanged();
+      void serialTreeViewSelectionChanged();
+      void connectionTreeViewSelectionChanged();
 
       void itemExpanded(const QModelIndex & index);
       void itemCollapsed(const QModelIndex & index);
@@ -101,9 +101,9 @@ namespace Isis
 
 
     private: // widgets
-      CnetView * pointView;
-      CnetView * serialView;
-      CnetView * connectionView;
+      CnetTreeView * pointTreeView;
+      CnetTreeView * serialTreeView;
+      CnetTreeView * connectionTreeView;
 
       QScrollArea * filterArea;
 

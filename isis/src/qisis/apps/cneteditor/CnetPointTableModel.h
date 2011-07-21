@@ -2,7 +2,7 @@
 #define CnetPointTableModel_H
 
 
-#include <QAbstractTableModel>
+#include <QObject>
 
 
 template< class T > class QList;
@@ -50,7 +50,7 @@ namespace Isis
       virtual ~CnetPointTableModel();
 
       static QString getColName(Column);
-      int columnCount() const;
+      int getColumnCount() const;
       
       QList< AbstractTreeItem * > getItems(int, int) const;
       QList< AbstractTreeItem * > getItems(AbstractTreeItem *,

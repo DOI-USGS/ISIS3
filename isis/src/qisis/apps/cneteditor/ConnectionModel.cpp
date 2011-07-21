@@ -14,8 +14,8 @@
 #include "ControlMeasure.h"
 #include "ControlNet.h"
 
-#include "CnetView.h"
-#include "CnetViewContent.h"
+#include "CnetTreeView.h"
+#include "CnetTreeViewContent.h"
 #include "PointLeafItem.h"
 #include "RootItem.h"
 #include "SerialLeafItem.h"
@@ -29,7 +29,7 @@ using std::cerr;
 
 namespace Isis
 {
-  ConnectionModel::ConnectionModel(ControlNet * cNet, CnetView * v,
+  ConnectionModel::ConnectionModel(ControlNet * cNet, CnetTreeView * v,
       QObject * parent) : TreeModel(cNet, v, parent)
   {
     rebuildItems();

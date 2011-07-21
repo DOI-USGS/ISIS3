@@ -15,7 +15,7 @@ class QString;
 
 namespace Isis
 {
-  class CnetView;
+  class CnetTreeView;
   class ControlCubeGraphNode;
   class ControlNet;
   class SerialParentItem;
@@ -25,7 +25,8 @@ namespace Isis
       Q_OBJECT
 
     public:
-      ConnectionModel(Isis::ControlNet * cNet, CnetView * v, QObject * parent = 0);
+      ConnectionModel(Isis::ControlNet * cNet, CnetTreeView * v,
+                      QObject * parent = 0);
       virtual ~ConnectionModel();
 
       // This is a slot!!!  There is no "pubic slots:" because it has already
