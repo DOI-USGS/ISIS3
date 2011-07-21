@@ -8,7 +8,7 @@
 #include "SpecialPixel.h"
 #include "UniversalGroundMap.h"
 
-using std::string;
+using namespace std;
 
 namespace Isis {
 
@@ -268,6 +268,7 @@ namespace Isis {
       }
     }
 
+
     if(mbValidateDN) {
       if(!ValidDnValue(mdDnValue)) {
         results.addFailure(MeasureValidationResults::DNValue,
@@ -289,8 +290,8 @@ namespace Isis {
     if(pMeasure != NULL) {
       ValidResidualTolerances(mdSampleResidual, mdLineResidual, 
                               mdResidualMagnitude, results);
-      ValidShiftTolerances(mdSampleResidual, mdLineResidual, 
-                           mdResidualMagnitude, results);
+      ValidShiftTolerances(m_sampleShift, m_lineShift, 
+                           m_pixelShift, results);
     }
 
     return results;
