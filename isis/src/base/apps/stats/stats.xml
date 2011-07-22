@@ -6,8 +6,8 @@
 
   <description>
     This program computes statistics for
-    the pixels in a single band. If the band specification (e.g., file.cub:3)
-    is not given the program will default to the first band. The statistics
+    the pixels in a multiple bands. If the band specification (e.g., file.cub+3)
+    is not given the program will default to all bands. The statistics
     calculated include:
 <pre>
         Average
@@ -138,7 +138,8 @@
           This ascii file will contain the statistics of the individual
           band.  It is written in such a format that the values can be
           read using the getkey program.  This is useful for when developing
-          scripts.
+          scripts. In order to generate an output file, an output filename
+          must be included. To specify format, use the format parameter.
         </description>
         <filter>
           *.txt
@@ -151,25 +152,25 @@
           Output Format
         </brief>
         <description>
-          Format type for output file.  Pvl format is default.
+          Format type for output file.  PVL format is default.
         </description>  
         <default><item>PVL</item></default>
         <list>
           <option value="PVL">
             <brief>
-              Pvl Format
+              Format the output file as PVL.
             </brief>
             <description>
-              Output file will be in pvl format
+              Output file will be in PVL format.
             </description>
           </option>
           <option value="FLAT">
             <brief>
-              FlatFile Format
+              Firnat the output file as comma delimited flat.
             </brief>
             <description>
               Output file will be a comma deliminated flatfile.  This file format can easily be 
-              imported into excel.
+              imported into excel. The format is ignored unless the TO parameter is specified.
             </description>
           </option>
         </list>
@@ -285,7 +286,7 @@
       </description>
       <terminalInterface>
         <commandLine>
-          from=peaks.cub+2,4-6 in=peaks2_stats.log
+          from=peaks.cub+2,4-6 to=peaks2_stats.log
         </commandLine>
         <description>
           Running stats in the command line mode with the only parameter "FROM"
