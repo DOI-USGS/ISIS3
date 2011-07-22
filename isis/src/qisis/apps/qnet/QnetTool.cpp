@@ -578,8 +578,10 @@ namespace Qisis {
     ControlMeasure *rightMeasure =
                 p_editPoint->GetMeasure(p_rightMeasure->GetCubeSerialNumber());
 
-    //  Check original measure from network, so that a measure that has just
-    //  had EditLocked set to True can be saved.
+
+    //  Only print error if both original measure in network and the current
+    //  edit measure are both editLocked.  If only the edit measure is 
+    //  locked, then user just locked and it needs to be saved.
     if (IsMeasureLocked(rightMeasure->GetCubeSerialNumber()) &&
         IsMeasureLocked(p_rightMeasure->GetCubeSerialNumber())) {
       QString message = "You are saving changes to a measure that is locked ";
@@ -684,7 +686,7 @@ namespace Qisis {
       p_editPoint->SetRefMeasure(p_leftMeasure->GetCubeSerialNumber());
     }
 
-    // If this is a fixed or constrained point, if either measure (left or
+    // If this is a fixed or constrained point, and either measure (left or
     // right) is the ground source, update the lat,lon,radius.
     if (p_editPoint->GetType() != ControlPoint::Free &&
         (p_leftMeasure->GetCubeSerialNumber() == p_groundSN ||
@@ -802,6 +804,8 @@ namespace Qisis {
     //  Change Save Point button text to red
     colorizeSaveButton();
 
+    editPointChanged(p_editPoint->GetId());
+
     // Update measure info
     updateLeftMeasureInfo();
     updateRightMeasureInfo();
@@ -859,7 +863,7 @@ namespace Qisis {
     //  Change Save Measure button text back to default
     p_savePoint->setPalette(p_saveDefaultPalette);
 
-    loadPoint();
+    //  ????  Why was this here??? loadPoint();
     // emit signal so the nav tool refreshes the list
     emit refreshNavList();
     // emit signal so the nav tool can update edit point
@@ -3045,7 +3049,9 @@ namespace Qisis {
 
 
   /**
-   * Open a ground source for selecting fixed points
+   * Open a ground source for selecting fixed points.  This file could be 
+   * a DEM, a shaded version of a DEM or a level1 image with corrected pointing 
+   * or some other type of basemap. 
    * 
    * @author  2009-07-20 Tracie Sucharski
    * 
@@ -3202,6 +3208,12 @@ namespace Qisis {
    * 
    */
   void QnetTool::openDem() {
+
+      if (p_groundFile.isEmpty()) {
+        QString message = "You must enter a ground source before opening a Dem.";
+        QMessageBox::critical((QWidget *)parent(),"Error",message);
+        return;
+      }
 
       QString filter = "Isis cubes (*.cub *.cub.*);;";
       filter += "Detached labels (*.lbl);;";

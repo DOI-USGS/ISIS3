@@ -870,6 +870,9 @@ namespace Qisis {
 
     if (p_aprioriDialog == NULL) return;
 
+    //  If cubes selected, return
+    if (p_listCombo->currentIndex() == Cubes) return;
+
     int index = p_listBox->currentRow();
     if (index < 0) return;
 

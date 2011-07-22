@@ -51,7 +51,6 @@ namespace Qisis {
       "This can be level1, level2 or dem cube.";
     p_openGround->setWhatsThis(whatsThis);
     p_openGround->setEnabled(false);
-    p_openGround->setVisible(false);
     connect (p_openGround,SIGNAL(activated()),this,SIGNAL(newGroundFile()));
 
     p_openDem = new QAction(parent);
@@ -63,12 +62,7 @@ namespace Qisis {
       "determine the radius value.";
     p_openDem->setWhatsThis(whatsThis);
     p_openDem->setEnabled(false);
-    p_openDem->setVisible(false);
     connect (p_openDem,SIGNAL(activated()),this,SIGNAL(newDemFile()));
-
-    //  Only activate openDem if ground source is opened
-    //connect (p_openGround,SIGNAL(activated()),p_openDem,SLOT(setEnabled(true)));
-    //connect (p_openGround,SIGNAL(activated()),p_openDem,SLOT(setVisible(true)));
 
     QMenu *menu = g_vpMainWindow->getMenu(menuName());
     menu->addAction(p_openGround);
@@ -199,9 +193,7 @@ namespace Qisis {
     }
     
     p_openGround->setEnabled(true);
-    p_openGround->setVisible(true);
     p_openDem->setEnabled(true);
-    p_openDem->setVisible(true);
 
     QApplication::restoreOverrideCursor();
 
