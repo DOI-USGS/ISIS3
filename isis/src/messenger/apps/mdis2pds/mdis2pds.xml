@@ -51,6 +51,9 @@
         Added ORBIT_NUMBER to translation table for inclusion in output RDR 
         (CDR) file.
     </change>
+    <change name="Kris Becker" date="2011-07-21">
+        Added quotes to the SITE_ID keyword.
+    </change>
   </history>
 
   <category>

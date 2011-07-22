@@ -310,10 +310,14 @@ void IsisMain() {
   data_quality_id.SetValue(Quote(data_quality_id));
   PvlKeyword &sequence_name = pdsLabel.FindKeyword("SEQUENCE_NAME", Pvl::Traverse);
   sequence_name.SetValue(Quote(sequence_name));
+ 
   PvlKeyword &start_count = pdsLabel.FindKeyword("SPACECRAFT_CLOCK_START_COUNT", Pvl::Traverse);
   start_count.SetValue(Quote(start_count));
   PvlKeyword &stop_count = pdsLabel.FindKeyword("SPACECRAFT_CLOCK_STOP_COUNT", Pvl::Traverse);
   stop_count.SetValue(Quote(stop_count));
+
+  PvlKeyword &site_id = pdsLabel.FindKeyword("SITE_ID", Pvl::Traverse);
+  site_id.SetValue(Quote(site_id));
   PvlKeyword &source_product_id = pdsLabel.FindKeyword("SOURCE_PRODUCT_ID", Pvl::Traverse);
   for(int i = 0; i < source_product_id.Size(); i++) {
     source_product_id[i] = Quote(source_product_id[i]);
