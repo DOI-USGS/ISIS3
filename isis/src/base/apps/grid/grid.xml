@@ -98,7 +98,7 @@
     <group name = "Grid type">
       <parameter name = "MODE">
         <type>string</type>
-        <default><item>IMAGE</item></default> 
+        <default><item>GROUND</item></default> 
         <brief>Grid options</brief>
         <description>
           This allows the user to decide which grid option to use.
@@ -251,7 +251,7 @@
 
       <parameter name="LATINC">
         <type>double</type>
-        <default><item>1.0</item></default>
+        <default><item>10.0</item></default>
         <brief>Latitude increment</brief>
         <description>
           This defines the latitudinal spacing between gridlines 
@@ -261,7 +261,7 @@
 
       <parameter name="LONINC">
         <type>double</type>
-        <default><item>1.0</item></default>
+        <default><item>10.0</item></default>
         <brief>Longitude increment</brief>
         <description>
           This defines the longitudinal spacing between gridlines 
