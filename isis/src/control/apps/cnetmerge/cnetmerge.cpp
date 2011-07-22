@@ -15,6 +15,8 @@ using std::string;
 using namespace Isis;
 
 
+ControlNet * mergeNetworks(FileList &filelist, PvlObject &conflictLog,
+    iString networkId, iString description);
 void mergeNetwork(ControlNet &baseNet, ControlNet &newNet, PvlObject &cnetLog);
 
 ControlPoint * mergePoint(
@@ -23,6 +25,11 @@ ControlPoint * mergePoint(
 void replacePoint(
     ControlPoint *basePoint, ControlPoint *newPoint,
     PvlObject &pointLog);
+
+void removeMissing(ControlPoint *basePoint, ControlPoint *newPoint,
+    PvlGroup &measureLog);
+void mergeMeasures(ControlPoint *basePoint, ControlPoint *newPoint,
+    PvlGroup &measureLog);
 
 void mergeMeasure(
     ControlPoint *basePoint, ControlPoint *newPoint,
@@ -33,8 +40,13 @@ void replaceMeasure(ControlPoint *basePoint, ControlPoint *newPoint,
 void addMeasure(ControlPoint *basePoint, ControlPoint *newPoint,
     ControlMeasure *newMeasure);
 
+PvlObject createNetworkLog(ControlNet &cnet);
+PvlObject createPointLog(ControlPoint *point);
+PvlGroup createMeasureLog();
+
 void reportConflict(PvlObject &pointLog, iString conflict);
 void reportConflict(PvlGroup &measureLog, iString cn, iString conflict);
+
 void addLog(PvlObject &conflictLog, PvlObject &cnetLog);
 void addLog(PvlObject &cnetLog, PvlObject &pointLog, PvlGroup &measureLog);
 
@@ -91,6 +103,26 @@ void IsisMain() {
   // throw an error
   mergePoints = ui.GetString("DUPLICATEPOINTS") == "MERGE";
 
+  ControlNet *outNet = mergeNetworks(filelist, conflictLog,
+      ui.GetString("NETWORKID"), ui.GetString("DESCRIPTION"));
+
+  // If the user wishes to report on conflicts, write them out to a file
+  if (report) {
+    Pvl outPvl;
+    outPvl.AddObject(conflictLog);
+    outPvl.Write(ui.GetFilename("LOG"));
+  }
+
+  // Writes out the final Control Net
+  Filename outfile(ui.GetFilename("ONET"));
+  outNet->Write(outfile.Expanded());
+  delete outNet;
+}
+
+
+ControlNet * mergeNetworks(FileList &filelist, PvlObject &conflictLog,
+    iString networkId, iString description) {
+
   // Creates a Progress bar for the entire merging process
   Progress progress;
   progress.SetMaximumSteps(filelist.size());
@@ -98,12 +130,12 @@ void IsisMain() {
 
   // The original base network is the first in the list, all successive 
   // networks will be added to the base in descending order
-  ControlNet baseNet(Filename(filelist[0]).Expanded());
-  baseNet.SetNetworkId(ui.GetString("NETWORKID"));
-  baseNet.SetUserName(Isis::Application::UserName());
-  baseNet.SetCreatedDate(Isis::Application::DateTime());
-  baseNet.SetModifiedDate(Isis::iTime::CurrentLocalTime());
-  baseNet.SetDescription(ui.GetString("DESCRIPTION"));
+  ControlNet *baseNet = new ControlNet(Filename(filelist[0]).Expanded());
+  baseNet->SetNetworkId(networkId);
+  baseNet->SetUserName(Isis::Application::UserName());
+  baseNet->SetCreatedDate(Isis::Application::DateTime());
+  baseNet->SetModifiedDate(Isis::iTime::CurrentLocalTime());
+  baseNet->SetDescription(description);
 
   progress.CheckStatus();
 
@@ -113,34 +145,23 @@ void IsisMain() {
     ControlNet newNet(Filename(filelist[cnetIndex]).Expanded());
 
     // Networks can only be merged if the targets are the same
-    if (baseNet.GetTarget().DownCase() != newNet.GetTarget().DownCase()) {
+    if (baseNet->GetTarget().DownCase() != newNet.GetTarget().DownCase()) {
       string msg = "Input [" + newNet.GetNetworkId() + "] does not target the "
           "same target as other Control Network(s)";
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
     // Setup a conflict log object for this new network
-    PvlObject cnetLog("Network");
-    PvlKeyword networkId("NetworkId", newNet.GetNetworkId());
-    cnetLog.AddKeyword(networkId);
+    PvlObject cnetLog = createNetworkLog(newNet);
 
     // Merge the network, add the resulting conflicts to the log
-    mergeNetwork(baseNet, newNet, cnetLog);
+    mergeNetwork(*baseNet, newNet, cnetLog);
     addLog(conflictLog, cnetLog);
 
     progress.CheckStatus();
   }
 
-  // Writes out the final Control Net
-  Filename outfile(ui.GetFilename("ONET"));
-  baseNet.Write(outfile.Expanded());
-
-  // If the user wishes to report on conflicts, write them out to a file
-  if (report) {
-    Pvl outPvl;
-    outPvl.AddObject(conflictLog);
-    outPvl.Write(ui.GetFilename("LOG"));
-  }
+  return baseNet;
 }
 
 
@@ -187,9 +208,7 @@ ControlPoint * mergePoint(
   ControlPoint *outPoint = new ControlPoint(*basePoint);
 
   // Setup the conflict log for this point
-  PvlObject pointLog("Point");
-  PvlKeyword pointId("PointId", newPoint->GetId());
-  pointLog.AddKeyword(pointId);
+  PvlObject pointLog = createPointLog(newPoint);
 
   // Overwrite the point info if the user wishes to do so, otherwise report that
   // the info was retained
@@ -199,53 +218,9 @@ ControlPoint * mergePoint(
     reportConflict(pointLog, "Retained: OVERWRITEPOINTS=false");
 
   // Setup the log reporting all measure conflicts in the point
-  PvlGroup measureLog("Measures");
-
-  // If the user wishes to remove measures not existing in the new point from
-  // the base, then go ahead and do that cleanup upfront so we have a smaller
-  // point to contend with later
-  if (overwriteMissing) {
-    for (int baseIndex = 0;
-         baseIndex < basePoint->GetNumMeasures();
-         baseIndex++) {
-
-      ControlMeasure *baseMeasure = basePoint->GetMeasure(baseIndex);
-      if (!newPoint->HasSerialNumber(baseMeasure->GetCubeSerialNumber())) {
-
-        if (baseMeasure != basePoint->GetRefMeasure() || overwriteReference) {
-          // New point does not have the current measure, so delete it from the
-          // output point if it's not the reference, or if we're overwriting the
-          // reference
-          reportConflict(measureLog, baseMeasure->GetCubeSerialNumber(),
-              "Removed: OVERWRITEMISSING=true");
-          outPoint->Delete(baseMeasure);
-        }
-        else {
-          // Missing measure in the new point is the reference in the base
-          // point, and we're not overwriting reference, so don't remove it
-          reportConflict(measureLog, baseMeasure->GetCubeSerialNumber(),
-              "Removed: OVERWRITEREFERENCE=false");
-        }
-      }
-    }
-  }
-
-  // Loop through the new point looking for new measures to add and conflicts to
-  // resolve
-  for (int newIndex = 0; newIndex < newPoint->GetNumMeasures(); newIndex++) {
-    ControlMeasure *newMeasure = newPoint->GetMeasure(newIndex);
-    if (outPoint->HasSerialNumber(newMeasure->GetCubeSerialNumber())) {
-      // Both points have a measure with the same serial number.  This implies a
-      // conflict, so go ahead and try to resolve it.
-      ControlMeasure *baseMeasure =
-          outPoint->GetMeasure(newMeasure->GetCubeSerialNumber());
-      mergeMeasure(outPoint, newPoint, baseMeasure, newMeasure, measureLog);
-    }
-    else {
-      // New measure not currently in the base point, so add it to the output
-      addMeasure(outPoint, newPoint, newMeasure);
-    }
-  }
+  PvlGroup measureLog = createMeasureLog();
+  removeMissing(outPoint, newPoint, measureLog);
+  mergeMeasures(outPoint, newPoint, measureLog);
 
   // Report on all conflicts
   addLog(cnetLog, pointLog, measureLog);
@@ -276,10 +251,67 @@ void replacePoint(ControlPoint *basePoint, ControlPoint *newPoint,
     basePoint->SetAprioriSurfacePoint(newPoint->GetAprioriSurfacePoint());
     basePoint->SetAdjustedSurfacePoint(newPoint->GetAdjustedSurfacePoint());
     // TODO basePoint->SetInvalid(newPoint->GetInvalid());
+
     reportConflict(pointLog, "Replaced: OVERWRITEPOINTS=true");
   }
   else {
     reportConflict(pointLog, "Retained: Edit Lock");
+  }
+}
+
+
+void removeMissing(ControlPoint *basePoint, ControlPoint *newPoint,
+    PvlGroup &measureLog) {
+
+  // If the user wishes to remove measures not existing in the new point from
+  // the base, then go ahead and do that cleanup upfront so we have a smaller
+  // point to contend with later
+  if (overwriteMissing) {
+    for (int baseIndex = 0;
+         baseIndex < basePoint->GetNumMeasures();
+         baseIndex++) {
+
+      ControlMeasure *baseMeasure = basePoint->GetMeasure(baseIndex);
+      if (!newPoint->HasSerialNumber(baseMeasure->GetCubeSerialNumber())) {
+
+        if (baseMeasure != basePoint->GetRefMeasure() || overwriteReference) {
+          // New point does not have the current measure, so delete it from the
+          // output point if it's not the reference, or if we're overwriting the
+          // reference
+          reportConflict(measureLog, baseMeasure->GetCubeSerialNumber(),
+              "Removed: OVERWRITEMISSING=true");
+          basePoint->Delete(baseMeasure);
+        }
+        else {
+          // Missing measure in the new point is the reference in the base
+          // point, and we're not overwriting reference, so don't remove it
+          reportConflict(measureLog, baseMeasure->GetCubeSerialNumber(),
+              "Retained: OVERWRITEREFERENCE=false");
+        }
+      }
+    }
+  }
+}
+
+
+void mergeMeasures(ControlPoint *basePoint, ControlPoint *newPoint,
+    PvlGroup &measureLog) {
+
+  // Loop through the new point looking for new measures to add and conflicts to
+  // resolve
+  for (int newIndex = 0; newIndex < newPoint->GetNumMeasures(); newIndex++) {
+    ControlMeasure *newMeasure = newPoint->GetMeasure(newIndex);
+    if (basePoint->HasSerialNumber(newMeasure->GetCubeSerialNumber())) {
+      // Both points have a measure with the same serial number.  This implies a
+      // conflict, so go ahead and try to resolve it.
+      ControlMeasure *baseMeasure =
+          basePoint->GetMeasure(newMeasure->GetCubeSerialNumber());
+      mergeMeasure(basePoint, newPoint, baseMeasure, newMeasure, measureLog);
+    }
+    else {
+      // New measure not currently in the base point, so add it to the output
+      addMeasure(basePoint, newPoint, newMeasure);
+    }
   }
 }
 
@@ -350,9 +382,8 @@ void addMeasure(ControlPoint *basePoint, ControlPoint *newPoint,
   // Finally, set the output measure to be the reference of the base point if
   // the new measure is the reference in the new point and
   // OVERWRITEREFERENCE=true
-  if (overwriteReference && newMeasure == newPoint->GetRefMeasure()) {
+  if (overwriteReference && newMeasure == newPoint->GetRefMeasure())
     basePoint->SetRefMeasure(outMeasure);
-  }
 }
 
 
@@ -363,6 +394,28 @@ void reportConflict(PvlObject &pointLog, iString conflict) {
     PvlKeyword resolution("Resolution", conflict);
     pointLog.AddKeyword(resolution);
   }
+}
+
+
+PvlObject createNetworkLog(ControlNet &cnet) {
+  PvlObject cnetLog("Network");
+  PvlKeyword networkId("NetworkId", cnet.GetNetworkId());
+  cnetLog.AddKeyword(networkId);
+  return cnetLog;
+}
+
+
+PvlObject createPointLog(ControlPoint *point) {
+  PvlObject pointLog("Point");
+  PvlKeyword pointId("PointId", point->GetId());
+  pointLog.AddKeyword(pointId);
+  return pointLog;
+}
+
+
+PvlGroup createMeasureLog() {
+  PvlGroup measureLog("Measures");
+  return measureLog;
 }
 
 
@@ -387,7 +440,8 @@ void addLog(PvlObject &conflictLog, PvlObject &cnetLog) {
 void addLog(PvlObject &cnetLog, PvlObject &pointLog, PvlGroup &measureLog) {
   // If the measure log has at least one keyword, then it has at least one
   // conflict, so add it to the point log
-  if (measureLog.Keywords() > 0) pointLog.AddGroup(measureLog);
+  if (measureLog.Keywords() > 0)
+    pointLog.AddGroup(measureLog);
 
   // If the point log has more keywords than the PointId keyword, then it has a
   // conflict and should be added to the network log.  Likewise, if it has a
