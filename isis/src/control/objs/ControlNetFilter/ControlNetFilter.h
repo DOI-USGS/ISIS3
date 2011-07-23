@@ -34,8 +34,6 @@ namespace Isis {
   class ControlPoint;
   class ControlMeasure;
 
-#define TOTAL_FILTERS 12
-
   /**
    * @brief Filter Control Network
    *
@@ -63,7 +61,8 @@ namespace Isis {
    *   @history 2011-06-07 Debbie A. Cook and Tracie Sucharski - Modified point types
    *                          Ground ------> Fixed
    *                          Tie----------> Free
-   *
+   *  @history 2011-07-22 Sharmila Prasad - modified for new keywords in binary control net and added new
+   *                               filters for ResidualTolerance, PixelShift and EditLock(Point & Measure)
    */
   class ControlNetFilter : public ControlNetStatistics {
     public:
@@ -74,9 +73,21 @@ namespace Isis {
       ~ControlNetFilter();
 
       // Point Filters
-      //! Filter Points by Error Magnitude
-      void PointErrorFilter(const PvlGroup &pvlGrp, bool pbLastFilter);
+      //! Filter Points by Pixel Shift
+      void PointPixelShiftFilter(const PvlGroup &pvlGrp, bool pbLastFilter);
+      
+      //! Filter Points by Edit Lock
+      void PointEditLockFilter(const PvlGroup &pvlGrp, bool pbLastFilter);
 
+      //! Filter Points by Measure Edit Lock number
+      void PointMeasureEditLockFilter(const PvlGroup &pvlGrp, bool pbLastFilter);
+      
+      //! Filter Points by Residual Magnitude
+      void PointResMagnitudeFilter(const PvlGroup &pvlGrp, bool pbLastFilter);
+
+      //! Filter Points by GoodnessOfFit
+      //void PointGoodnessOfFitFilter(const PvlGroup & pvlGrp, bool pbLastFilter);
+      
       //! Filter Points by Point ID Expression
       void PointIDFilter(const PvlGroup &pvlGrp, bool pbLastFilter);
 
@@ -125,6 +136,8 @@ namespace Isis {
     private:
       ofstream mOstm;                     //!< output stream for printing to output file
       SerialNumberList mSerialNumFilter;  //!< Serial Number List file
+      
+      void FilterOutPoint(int pindex);
   };
 }
 #endif

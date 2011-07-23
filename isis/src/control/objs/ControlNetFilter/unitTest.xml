@@ -46,7 +46,7 @@
         <filter>
           *.net
         </filter>
-        <default><item>$base/testData/cnet/cnet.net</item></default>
+        <default><item>$base/testData/cnet/cnetbin.net</item></default>
       </parameter>
     </group>
   </groups>

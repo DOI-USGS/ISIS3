@@ -1,4 +1,3 @@
-
 #include "Isis.h"
 #include "IsisDebug.h"
 #include "Application.h"
@@ -30,150 +29,277 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
   ControlNet cnetOrig(ui.GetFilename("CNET"));
-  ControlNet cnet = cnetOrig;
+  ControlNet *cnet = new ControlNet(ui.GetFilename("CNET"));
 
   //test filters
   std::string sSerialFile = ui.GetFilename("FROMLIST");
-  ControlNetFilter cnetFilter(&cnet, sSerialFile);
+  ControlNetFilter *cnetFilter = new ControlNetFilter(cnet, sSerialFile);
 
-  // PointError Filter
-  PvlGroup filterGrp("Point_ErrorMagnitude");
+  // Point ResidualMagnitude Filter
+  cout << "****************** Point_ResidualMagnitude Filter ******************" << endl;  
+  PvlGroup filterGrp("Point_ResidualMagnitude");
   PvlKeyword keyword("LessThan", 1);
   filterGrp += keyword;
-  cnetFilter.PointErrorFilter(filterGrp, false);
+  cnetFilter->PointResMagnitudeFilter(filterGrp, false);
   filterGrp.Clear();
-  cout << "****************** PointError Filter ******************" << endl;
-  PrintControlNetInfo(cnet);
-  cout << "************************************************************************\n";
-
-  // PointID Filter
-  filterGrp = PvlGroup("Point_IdExpression");
-  keyword = PvlKeyword("Expression", "P0*");
+  PrintControlNetInfo(*cnet);
+  delete (cnet);
+  delete (cnetFilter);
+  cnetFilter = NULL;
+  cnet = NULL;
+  cout << "************************************************************************\n\n";
+  
+  // PointEditLock Filter
+  cout << "****************** Point_EditLock Filter ******************" << endl; 
+  cnet = new ControlNet(ui.GetFilename("CNET"));
+  cnetFilter = new ControlNetFilter(cnet, sSerialFile);
+  filterGrp = PvlGroup("Point_EditLock");
+  keyword= PvlKeyword("EditLock", false);
   filterGrp += keyword;
-  cnetFilter.PointIDFilter(filterGrp, false);
+  cnetFilter->PointEditLockFilter(filterGrp, false);
   filterGrp.Clear();
-  cout << "******************  PointID Filter ******************" << endl;
-  PrintControlNetInfo(cnet);
-  cout << "************************************************************************\n";
+  PrintControlNetInfo(*cnet);
+  delete (cnet);
+  delete (cnetFilter);
+  cnetFilter = NULL;
+  cnet = NULL;
+  cout << "************************************************************************\n\n";  
+  
+  // PointMeasureEditLock Filter
+  cout << "****************** Point_MeasureEditLock Filter ******************" << endl;  
+  cnet = new ControlNet(ui.GetFilename("CNET"));
+  cnetFilter = new ControlNetFilter(cnet, sSerialFile);
+  filterGrp = PvlGroup("Point_MeasureEditLock");
+  keyword = PvlKeyword("LessThan", 1);
+  filterGrp += keyword;
+  cnetFilter->PointMeasureEditLockFilter(filterGrp, false);
+  filterGrp.Clear();
+  PrintControlNetInfo(*cnet);
+  delete (cnet);
+  delete (cnetFilter);
+  cnetFilter = NULL;
+  cnet = NULL;
+  cout << "************************************************************************\n\n";
+  
+  // Pixel Shift
+  cout << "****************** Point_PixelShift Filter ******************" << endl;
+  cnet = new ControlNet(ui.GetFilename("CNET"));
+  cnetFilter = new ControlNetFilter(cnet, sSerialFile);
+  filterGrp = PvlGroup("Point_PixelShift");
+  keyword = PvlKeyword("LessThan", 10);
+  filterGrp += keyword;
+  keyword = PvlKeyword("GreaterThan", 1);
+  filterGrp += keyword;
+  cnetFilter->PointPixelShiftFilter(filterGrp, false);
+  filterGrp.Clear();
+  PrintControlNetInfo(*cnet);
+  delete (cnet);
+  delete (cnetFilter);
+  cnetFilter = NULL;
+  cnet = NULL;
+  cout << "************************************************************************\n\n";
+  
+  // PointID Filter
+  cout << "******************  Point_ID Filter ******************" << endl;
+  cnet = new ControlNet(ui.GetFilename("CNET"));
+  cnetFilter = new ControlNetFilter(cnet, sSerialFile);
+  filterGrp = PvlGroup("Point_IdExpression");
+  keyword = PvlKeyword("Expression", "P01*");
+  filterGrp += keyword;
+  cnetFilter->PointIDFilter(filterGrp, false);
+  filterGrp.Clear();
+  PrintControlNetInfo(*cnet);
+  delete (cnet);
+  delete (cnetFilter);
+  cnetFilter = NULL;
+  cnet = NULL;
+  cout << "************************************************************************\n\n";
 
   // PointNumMeasures Filter
-  filterGrp = PvlGroup("Point_NumMeasures");
+  cout << "****************** Point_NumMeasures Filter ******************" << endl;
+  cnet = new ControlNet(ui.GetFilename("CNET"));
+  cnetFilter = new ControlNetFilter(cnet, sSerialFile);
+  filterGrp = PvlGroup("Point_NumMeasures");  
   keyword = PvlKeyword("GreaterThan", 2);
   filterGrp += keyword;
-  cnetFilter.PointMeasuresFilter(filterGrp,  false);
+  keyword = PvlKeyword("LessThan", 2);
+  filterGrp += keyword;
+  cnetFilter->PointMeasuresFilter(filterGrp,  false);
   filterGrp.Clear();
-  cout << "****************** PointNumMeasures Filter ******************" << endl;
-  PrintControlNetInfo(cnet);
-  cout << "************************************************************************\n";
+  PrintControlNetInfo(*cnet);
+  delete (cnet);
+  delete (cnetFilter);
+  cnetFilter = NULL;
+  cnet = NULL;
+  cout << "************************************************************************\n\n";
 
   // PointsProperties Filter
+  cout << "****************** Points_Properties Filter ******************" << endl;
+  cnet = new ControlNet(ui.GetFilename("CNET"));
+  cnetFilter = new ControlNetFilter(cnet, sSerialFile);
   filterGrp = PvlGroup("Point_Properties");
   keyword = PvlKeyword("Ignore", false);
   filterGrp += keyword;
-  cnetFilter.PointPropertiesFilter(filterGrp,  false);
+  keyword = PvlKeyword("PointType", "constraineD");
+  filterGrp += keyword;
+  cnetFilter->PointPropertiesFilter(filterGrp,  false);
   filterGrp.Clear();
-  cout << "****************** PointsProperties Filter ******************" << endl;
-  PrintControlNetInfo(cnet);
-  cout << "************************************************************************\n";
+  PrintControlNetInfo(*cnet);
+  delete (cnet);
+  delete (cnetFilter);
+  cnetFilter = NULL;
+  cnet = NULL;
+  cout << "************************************************************************\n\n";
 
   // Point_LatLon  Filter
+  cout << "****************** Point_LatLon Filter ******************" << endl;
+  cnet = new ControlNet(ui.GetFilename("CNET"));
+  cnetFilter = new ControlNetFilter(cnet, sSerialFile);
   filterGrp = PvlGroup("Point_LatLon");
-  PvlKeyword keyword1("MinLat", -180);
+  PvlKeyword keyword1("MinLat", -100);
   filterGrp += keyword1;
 
-  PvlKeyword keyword2("MaxLat", 180);
+  PvlKeyword keyword2("MaxLat", 100);
   filterGrp += keyword2;
 
   PvlKeyword keyword3("MinLon", 0);
   filterGrp += keyword3;
 
-  PvlKeyword keyword4("MaxLon", 240);
+  PvlKeyword keyword4("MaxLon", 238);
   filterGrp += keyword4;
 
-  cnetFilter.PointLatLonFilter(filterGrp,  false);
+  cnetFilter->PointLatLonFilter(filterGrp,  false);
   filterGrp.Clear();
-  cout << "****************** Point_LatLon Filter ******************" << endl;
-  PrintControlNetInfo(cnet);
-  cout << "************************************************************************\n";
+  PrintControlNetInfo(*cnet);
+  delete (cnet);
+  delete (cnetFilter);
+  cnetFilter = NULL;
+  cnet = NULL;
+  cout << "************************************************************************\n\n";
 
   // Point_Distance Filter
-  filterGrp = PvlGroup("Point_Distance");
-  keyword1 = PvlKeyword("MaxDistance", 100000);
-  filterGrp += keyword1;
-  keyword2 = PvlKeyword("Units", "meters");
-  filterGrp += keyword2;
-  cnetFilter.PointDistanceFilter(filterGrp,  false);
-  filterGrp.Clear();
   cout << "****************** Point_Distance Filter ******************" << endl;
-  PrintControlNetInfo(cnet);
-  cout << "************************************************************************\n";
+  cnet = new ControlNet(ui.GetFilename("CNET"));
+  cnetFilter = new ControlNetFilter(cnet, sSerialFile);
+  filterGrp = PvlGroup("Point_Distance");
+  keyword = PvlKeyword("MaxDistance", 50000);
+  filterGrp += keyword;
+  keyword = PvlKeyword("Units", "meters");
+  filterGrp += keyword;
+  cnetFilter->PointDistanceFilter(filterGrp,  false);
+  filterGrp.Clear();
+  PrintControlNetInfo(*cnet);
+  delete (cnet);
+  delete (cnetFilter);
+  cnetFilter = NULL;
+  cnet = NULL;
+  cout << "************************************************************************\n\n";
 
   // Points_MeasureProperties Filter
+  cout << "****************** Points_MeasureProperties Filter ******************" << endl;
+  cnet = new ControlNet(ui.GetFilename("CNET"));
+  cnetFilter = new ControlNetFilter(cnet, sSerialFile);
   filterGrp = PvlGroup("Point_MeasureProperties");
   keyword = PvlKeyword("MeasureType", "Candidate");
   filterGrp += keyword;
-  cnetFilter.PointMeasurePropertiesFilter(filterGrp,  false);
+  cnetFilter->PointMeasurePropertiesFilter(filterGrp,  false);
   filterGrp.Clear();
-  cout << "****************** Points_MeasureProperties Filter ******************" << endl;
-  PrintControlNetInfo(cnet);
-  cout << "************************************************************************\n";
+  PrintControlNetInfo(*cnet);
+  delete (cnet);
+  delete (cnetFilter);
+  cnetFilter = NULL;
+  cnet = NULL;
+  cout << "************************************************************************\n\n";
 
   // Filter Points by Goodness of Fit
-  /*filterGrp = PvlGroup("Point_GoodnessOfFit");
+  /* 
+  cnet = new ControlNet(ui.GetFilename("CNET"));
+  cnetFilter = new ControlNetFilter(cnet, sSerialFile);
+  filterGrp = PvlGroup("Point_GoodnessOfFit");
   keyword = PvlKeyword("LessThan", 5);
   filterGrp += keyword;
-  cnetFilter.PointGoodnessOfFitFilter(filterGrp,  false);
-  filterGrp.Clear();*/
+  cnetFilter->PointGoodnessOfFitFilter(filterGrp,  false);
+  filterGrp.Clear()                                      ;
+  delete (cnet);
+  delete (cnetFilter);
+  cnetFilter = NULL;
+  cnet = NULL;*/
+  
 
   // Point_CubeNames Filter
-  filterGrp = PvlGroup("Point_CubeNames");
-  keyword1 = PvlKeyword("Cube1", "Clementine1/UVVIS/1994-04-05T12:17:21.337");
-  filterGrp += keyword1;
-  keyword2 = PvlKeyword("Cube2", "Clementine1/UVVIS/1994-03-08T20:03:40.056");
-  filterGrp += keyword2;
-  keyword3 = PvlKeyword("Cube3", "Clementine1/UVVIS/1994-03-08T20:04:59.856");
-  filterGrp += keyword3;
-  keyword4 = PvlKeyword("Cube4", "Clementine1/UVVIS/1994-04-05T12:18:07.957");
-  filterGrp += keyword4;
-  cnetFilter.PointCubeNamesFilter(filterGrp,  false);
-  filterGrp.Clear();
   cout << "****************** Point_CubeNames Filter ******************" << endl;
-  PrintControlNetInfo(cnet);
-  cout << "************************************************************************\n";
+  cnet = new ControlNet(ui.GetFilename("CNET"));
+  cnetFilter = new ControlNetFilter(cnet, sSerialFile);
+  filterGrp = PvlGroup("Point_CubeNames");
+  //keyword = PvlKeyword("Cube1", "Clementine1/UVVIS/1994-04-05T12:17:21.337");
+  //filterGrp += keyword;
+  //keyword = PvlKeyword("Cube2", "Clementine1/UVVIS/1994-03-08T20:03:40.056");
+  //filterGrp += keyword;
+  keyword = PvlKeyword("Cube3", "Clementine1/UVVIS/1994-03-08T20:04:59.856");
+  filterGrp += keyword;
+  keyword = PvlKeyword("Cube4", "Clementine1/UVVIS/1994-04-05T12:18:07.957");
+  filterGrp += keyword;
+  cnetFilter->PointCubeNamesFilter(filterGrp,  false);
+  filterGrp.Clear();
+  PrintControlNetInfo(*cnet);
+  delete (cnet);
+  delete (cnetFilter);
+  cnetFilter = NULL;
+  cnet = NULL;
+  cout << "************************************************************************\n\n";
 
   // Cube Filters
   // Cube_NameExpression Filter
+  cout << "****************** Cube_NameExpression Filter ******************" << endl;
+  cnet = new ControlNet(ui.GetFilename("CNET"));
+  cnetFilter = new ControlNetFilter(cnet, sSerialFile);
   filterGrp = PvlGroup("Cube_NameExpression");
   keyword = PvlKeyword("Expression", "Clementine1/UVVIS/1994-04*");
   filterGrp += keyword;
-  cnetFilter.CubeNameExpressionFilter(filterGrp,  false);
+  cnetFilter->CubeNameExpressionFilter(filterGrp,  false);
   filterGrp.Clear();
-  cout << "****************** Cube_NameExpression Filter ******************" << endl;
-  PrintControlNetInfo(cnet);
-  cout << "************************************************************************\n";
+  PrintControlNetInfo(*cnet);
+  delete (cnet);
+  delete (cnetFilter);
+  cnetFilter = NULL;
+  cnet = NULL;
+  cout << "************************************************************************\n\n";
 
   // Cube_NumPoints Filter
-  filterGrp = PvlGroup("Cube_NumPoints");
-  keyword = PvlKeyword("GreaterThan", 2);
-  filterGrp += keyword;
-  cnetFilter.CubeNumPointsFilter(filterGrp,  false);
-  filterGrp.Clear();
   cout << "****************** Cube_NumPoints Filter ******************" << endl;
-  PrintControlNetInfo(cnet);
-  cout << "************************************************************************\n";
+  cnet = new ControlNet(ui.GetFilename("CNET"));
+  cnetFilter = new ControlNetFilter(cnet, sSerialFile);
+  filterGrp = PvlGroup("Cube_NumPoints");
+  keyword = PvlKeyword("GreaterThan", 3);
+  filterGrp += keyword;
+  keyword = PvlKeyword("LessThan", 3);
+  filterGrp += keyword;
+  cnetFilter->CubeNumPointsFilter(filterGrp,  false);
+  filterGrp.Clear();
+  PrintControlNetInfo(*cnet);
+  delete (cnet);
+  delete (cnetFilter);
+  cnetFilter = NULL;
+  cnet = NULL;
+  cout << "************************************************************************\n\n";
 
   // Cube_Distance Filter
-  filterGrp = PvlGroup("Cube_Distance");
-  keyword1 = PvlKeyword("MaxDistance", 100000);
-  filterGrp += keyword1;
-  keyword2 = PvlKeyword("Units=", "meters");
-  filterGrp += keyword2;
-  cnetFilter.CubeDistanceFilter(filterGrp,  false);
-  filterGrp.Clear();
   cout << "****************** Cube_Distance Filter ******************" << endl;
-  PrintControlNetInfo(cnet);
-  cout << "************************************************************************\n";
-
+  cnet = new ControlNet(ui.GetFilename("CNET"));
+  cnetFilter = new ControlNetFilter(cnet, sSerialFile);
+  filterGrp = PvlGroup("Cube_Distance");
+  keyword = PvlKeyword("MaxDistance", 100000);
+  filterGrp += keyword;
+  keyword = PvlKeyword("Units=", "meters");
+  filterGrp += keyword;
+  cnetFilter->CubeDistanceFilter(filterGrp,  false);
+  filterGrp.Clear();
+  PrintControlNetInfo(*cnet);
+  delete (cnet);
+  delete (cnetFilter);
+  cnetFilter = NULL;
+  cnet = NULL;
+  cout << "************************************************************************\n\n";
 }
 
 /**
@@ -201,5 +327,4 @@ void PrintControlNetInfo(ControlNet &pCNet) {
     }
     cerr << endl;
   }
-
 }
