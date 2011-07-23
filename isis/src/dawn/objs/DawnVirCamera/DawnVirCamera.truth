@@ -1,0 +1,31 @@
+Unit Test for DawnVirCamera...
+Filename: VIR_VIS_1B_1_362681635_1.cub
+CK Frame: -203221
+
+Kernel IDs: 
+CK Frame ID = -203000
+CK Reference ID = 1
+SPK Target ID = -203
+SPK Reference ID = 1
+
+Start Time: 362681643.867317557
+End Time:   362682567.867271602
+For upper left corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For upper right corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For lower left corner ...
+DeltaSample = ERROR
+DeltaLine = ERROR
+
+For lower right corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For center pixel position ...
+Latitude OK
+Longitude OK
