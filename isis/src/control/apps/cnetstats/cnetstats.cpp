@@ -4,7 +4,7 @@
 #include "Pvl.h"
 #include "ControlNet.h"
 #include "ControlNetFilter.h"
-#include "ControlNetStatistics.h"
+#include "ControlNetStatistics.h" 
 #include "PvlGroup.h"
 #include "Progress.h"
 
@@ -40,6 +40,7 @@ void IsisMain() {
       
       // Verify DefFile comparing with the Template
       Pvl pvlTemplate("$ISIS3DATA/base/templates/cnetstats/cnetstats.def");
+      //Pvl pvlTemplate("/home/sprasad/isis3/isis/src/control/apps/cnetstats/cnetstats.def");
       Pvl pvlResults;
       pvlTemplate.ValidatePvl(pvlDefFile, pvlResults);
       if(pvlResults.Objects() != 0 || pvlResults.Groups() != 0 || pvlResults.Keywords() != 0){
@@ -139,14 +140,31 @@ void ReadDefFile(ControlNetFilter & pcNetFilter, Pvl & pvlDefFile)
 void (ControlNetFilter::*GetPtr2Filter(const string psFilter)) (const PvlGroup & pvlGrp, bool pbLastFilter)
 {  
   // Point Filters
-  if (psFilter == "Point_ErrorMagnitude")
-    return &ControlNetFilter::PointErrorFilter;
-
-  if (psFilter == "Point_IdExpression") 
-    return &ControlNetFilter::PointIDFilter; 
+  if (psFilter == "Point_PixelShift") {
+    return &ControlNetFilter::PointPixelShiftFilter;
+  }
+  if (psFilter == "Point_EditLock")
+    return &ControlNetFilter::PointEditLockFilter;
   
-  if (psFilter == "Point_NumMeasures")
+  if (psFilter == "Point_MeasureEditLock") {
+    return &ControlNetFilter::PointMeasureEditLockFilter;
+  }
+  
+  if (psFilter == "Point_ResidualMagnitude"){
+    return &ControlNetFilter::PointResMagnitudeFilter;
+  }
+  
+  //if (psFilter == "Point_GoodnessOfFit"){
+  //  return &ControlNetFilter::PointGoodnessOfFitFilter;
+  //}
+
+  if (psFilter == "Point_IdExpression") {
+    return &ControlNetFilter::PointIDFilter;
+  }
+  
+  if (psFilter == "Point_NumMeasures"){
     return &ControlNetFilter::PointMeasuresFilter;
+  }
   
   if (psFilter == "Point_Properties") {
     return &ControlNetFilter::PointPropertiesFilter;
