@@ -1,21 +1,32 @@
 UnitTest for ControlNetStatistics ....
 
-CNET=/usgs/cpkgs/isis3/data/base/testData/cnet/cnet.net
+CNET=/usgs/cpkgs/isis3/data/base/testData/cnet/cnetbin.net
 Serial File=/usgs/cpkgs/isis3/data/base/testData/cnet/serialNum.lis
 Group = ControlNetSummary
   TotalImages       = 5
   TotalPoints       = 26
-  ValidPoints       = 26
-  IgnoredPoints     = 0
-  FixedPoints       = 0
-  AverageResidual   = -1.79769313486232e+308
-  MinimumResidual   = -1.79769313486231e+308
-  MaximumResidual   = N/A
+  ValidPoints       = 23
+  IgnoredPoints     = 3
+  FixedPoints       = 4
+  ConstrainedPoints = 4
+  FreePoints        = 18
+  EditLockPoints    = 6
+  AverageResidual   = 0.22463925467053
+  MinimumResidual   = 0.0
+  MaximumResidual   = 1.3044618001498
   TotalMeasures     = 67
   ValidMeasures     = 67
   IgnoredMeasures   = 0
-  MinLineResidual   = -1.79769313486231e+308
-  MinSampleResidual = -1.79769313486231e+308
-  MaxLineResidual   = N/A
-  MaxSampleResidual = N/A
+  EditLockMeasures  = 55
+  MinLineResidual   = 0.0
+  MinSampleResidual = 0.0
+  MaxLineResidual   = 0.78582173003339
+  MaxSampleResidual = 1.2365890243586
+  MinPixelShift     = 0.0
+  MaxPixelShift     = 0.0
+  AvgPixelShift     = 0.0
+  MinLineShift      = 0.0
+  MinSampleShift    = 0.0
+  MaxLineShift      = 0.0
+  MaxSampleShift    = 0.0
 End_Group

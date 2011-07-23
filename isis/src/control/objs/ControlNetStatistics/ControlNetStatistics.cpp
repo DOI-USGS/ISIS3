@@ -3,12 +3,13 @@
 #include "ControlNet.h"
 #include "ControlPoint.h"
 #include "ControlMeasure.h"
+#include "ControlMeasureLogData.h"
 #include "Filename.h"
 #include "iString.h"
 #include "Progress.h"
 #include "Pvl.h"
 #include "SpecialPixel.h"
-#include "Statistics.h"
+#include "Statistics.h" 
 
 using namespace std;
 
@@ -33,6 +34,8 @@ namespace Isis {
     mCNet = pCNet;
     mSerialNumList = SerialNumberList(psSerialNumFile);
     mProgress = pProgress;
+    GetPointIntStats();
+    GetPointDoubleStats();
   }
 
   /**
@@ -46,7 +49,10 @@ namespace Isis {
   ControlNetStatistics::ControlNetStatistics(ControlNet *pCNet, Progress *pProgress) {
     mCNet = pCNet;
     mProgress = pProgress;
+    GetPointIntStats();
+    GetPointDoubleStats();
   }
+  
   /**
    * Destructor
    *
@@ -75,29 +81,57 @@ namespace Isis {
     pStatsGrp += PvlKeyword("ValidPoints",       NumValidPoints());
     pStatsGrp += PvlKeyword("IgnoredPoints",     mCNet->GetNumPoints() - NumValidPoints());
     pStatsGrp += PvlKeyword("FixedPoints",       NumFixedPoints());
-    pStatsGrp += PvlKeyword("AverageResidual",   AverageResidual());
+    pStatsGrp += PvlKeyword("ConstrainedPoints", NumConstrainedPoints());
+    pStatsGrp += PvlKeyword("FreePoints",        NumFreePoints());
+    pStatsGrp += PvlKeyword("EditLockPoints",    mCNet->GetNumEditLockPoints());
+    
+    double dError = GetAverageResidual();
+    pStatsGrp += PvlKeyword("AverageResidual",   (dError == Isis::NULL8 ? "N/A" : iString(dError)));
 
-    double dError = MinimumResidual();
-    pStatsGrp += PvlKeyword("MinimumResidual", (dError == VALID_MAX4 ? "N/A" : iString(dError)));
+    dError = GetMinimumResidual();
+    pStatsGrp += PvlKeyword("MinimumResidual",   (dError == Isis::NULL8 ? "N/A" : iString(dError)));
 
-    dError = MaximumResidual();
-    pStatsGrp += PvlKeyword("MaximumResidual", (dError == 0 ? "N/A" : iString(dError)));
+    dError = GetMaximumResidual();
+    pStatsGrp += PvlKeyword("MaximumResidual",   (dError == Isis::NULL8 ? "N/A" : iString(dError)));
 
     pStatsGrp += PvlKeyword("TotalMeasures",     NumMeasures());
     pStatsGrp += PvlKeyword("ValidMeasures",     NumValidMeasures());
     pStatsGrp += PvlKeyword("IgnoredMeasures",   NumIgnoredMeasures());
+    pStatsGrp += PvlKeyword("EditLockMeasures",  mCNet->GetNumEditLockMeasures());
 
-    dError = MinimumLineResidual();
-    pStatsGrp += PvlKeyword("MinLineResidual", (dError == 0 ? "N/A" : iString(dError)));
+    dError = GetMinLineResidual();
+    pStatsGrp += PvlKeyword("MinLineResidual",   (dError == Isis::NULL8 ? "N/A" : iString(dError)));
 
-    dError = MinimumSampleResidual();
-    pStatsGrp += PvlKeyword("MinSampleResidual", (dError == 0 ? "N/A" : iString(dError)));
+    dError = GetMinSampleResidual();
+    pStatsGrp += PvlKeyword("MinSampleResidual", (dError == Isis::NULL8 ? "N/A" : iString(dError)));
 
-    dError = MaximumLineResidual();
-    pStatsGrp += PvlKeyword("MaxLineResidual", (dError == 0 ? "N/A" : iString(dError)));
+    dError = GetMaxLineResidual();
+    pStatsGrp += PvlKeyword("MaxLineResidual",   (dError == Isis::NULL8 ? "N/A" : iString(dError)));
 
-    dError = MaximumSampleResidual();
-    pStatsGrp += PvlKeyword("MaxSampleResidual", (dError == 0 ? "N/A" : iString(dError)));
+    dError = GetMaxSampleResidual();
+    pStatsGrp += PvlKeyword("MaxSampleResidual", (dError == Isis::NULL8 ? "N/A" : iString(dError)));
+    
+    // Shifts - Line, Sample, Pixel
+    dError = GetMinPixelShift();
+    pStatsGrp += PvlKeyword("MinPixelShift",     (dError == Isis::NULL8 ? "N/A" : iString(dError)));
+    
+    dError = GetMaxPixelShift();
+    pStatsGrp += PvlKeyword("MaxPixelShift",     (dError == Isis::NULL8 ? "N/A" : iString(dError)));
+    
+    dError = GetAvgPixelShift();
+    pStatsGrp += PvlKeyword("AvgPixelShift",     (dError == Isis::NULL8 ? "N/A" : iString(dError)));
+    
+    dError = GetMinLineShift();
+    pStatsGrp += PvlKeyword("MinLineShift",      (dError == Isis::NULL8 ? "N/A" : iString(dError)));
+
+    dError = GetMinSampleShift();
+    pStatsGrp += PvlKeyword("MinSampleShift",    (dError == Isis::NULL8 ? "N/A" : iString(dError)));
+
+    dError = GetMaxLineShift();
+    pStatsGrp += PvlKeyword("MaxLineShift",      (dError == Isis::NULL8 ? "N/A" : iString(dError)));
+
+    dError = GetMaxSampleShift(); 
+    pStatsGrp += PvlKeyword("MaxSampleShift",    (dError == Isis::NULL8 ? "N/A" : iString(dError)));
   }
 
   /**
@@ -127,6 +161,9 @@ namespace Isis {
       int iNumMeasures = cPoint->GetNumMeasures();
       bool bIgnore = cPoint->IsIgnored();
       bool bFixed = (cPoint->GetType() == ControlPoint::Fixed ? true : false);
+      bool bConstrained = (cPoint->GetType() == ControlPoint::Constrained ? true : false);
+      bool bFree = (cPoint->GetType() == ControlPoint::Free ? true : false);
+      bool bLocked = cPoint->IsEditLocked();
 
       for (int j = 0; j < iNumMeasures; j++) {
         const ControlMeasure *cMeasure = cPoint->GetMeasure(j);
@@ -134,15 +171,31 @@ namespace Isis {
         it = mImageTotalPointMap.find(sMeasureSN);
         // initialize the maps
         if (mImageTotalPointMap.find(sMeasureSN) == mImageTotalPointMap.end()) {
-          mImageTotalPointMap [sMeasureSN]  = 0;
-          mImageIgnorePointMap[sMeasureSN]  = 0;
-          mImageFixedPointMap[sMeasureSN]  = 0;
+          mImageTotalPointMap [sMeasureSN] = 0;
+          mImageIgnorePointMap[sMeasureSN] = 0;
+          mImageFixedPointMap [sMeasureSN] = 0;
+          mImageConstPointMap [sMeasureSN] = 0;
+          mImageFreePointMap  [sMeasureSN] = 0;
+          mImageLockedPointMap[sMeasureSN] = 0;
+          mImageLockedMap     [sMeasureSN] = 0;
         }
         mImageTotalPointMap[sMeasureSN]++;
         if (bIgnore)
           mImageIgnorePointMap[sMeasureSN]++;
         if (bFixed)
           mImageFixedPointMap[sMeasureSN]++;
+        if (bConstrained)
+          mImageConstPointMap[sMeasureSN]++;
+        if (bFree) 
+          mImageFreePointMap[sMeasureSN]++;
+        
+        // Point Locked
+        if (bLocked)
+          mImageLockedPointMap[sMeasureSN]++;
+        
+        // Measure Locked
+        if (cMeasure->IsEditLocked())
+          mImageLockedMap[sMeasureSN]++;
       }
       // Update Progress
       if (mProgress != NULL)
@@ -154,7 +207,9 @@ namespace Isis {
    * Print the Image Stats into specified output file
    *
    * @author Sharmila Prasad (9/1/2010)
-   *
+   *  
+   * Header: Filename, SerialNumber, TotalPoints, PointsIgnored, PointsLocked, Fixed, Constrained, Free 
+   *  
    * @param psImageFile - Output Image Stats File
    */
   void ControlNetStatistics::PrintImageStats(const string &psImageFile) {
@@ -168,14 +223,16 @@ namespace Isis {
     ofstream ostm;
     string outName(outFile.Expanded());
     ostm.open(outName.c_str(), std::ios::out);
-
+    
     map<string, int>::iterator it;
 
     // Log into the output file
-    ostm << "Filename" << ", " << "SerialNumber" << ", " << "Total Points" << ", " << "Ignore" << ", " << "Fixed" << ", " <<  endl;
+    ostm << "Filename, SerialNumber, TotalPoints, PointsIgnored, PointsEditLocked, Fixed, Constrained, Free" <<  endl;
     for (it = mImageTotalPointMap.begin(); it != mImageTotalPointMap.end(); it++) {
       ostm << mSerialNumList.Filename((*it).first) << ", " << (*it).first << ", ";
-      ostm << (*it).second << ", " << mImageIgnorePointMap[(*it).first] << ", " << mImageFixedPointMap[(*it).first] << endl;
+      ostm << (*it).second << ", " << mImageIgnorePointMap[(*it).first] << ", " ;
+      ostm << mImageLockedPointMap[(*it).first] << ", " << mImageFixedPointMap[(*it).first] << ", " ;
+      ostm << mImageConstPointMap[(*it).first] << ", " << mImageFreePointMap[(*it).first] << endl;
     }
     ostm.close();
   }
@@ -190,12 +247,15 @@ namespace Isis {
    * @param piSize        - array size
    */
   void ControlNetStatistics::GetImageStatsBySerialNum(string psSerialNum, int *piPointDetail, int piSize) {
-    if (piSize < IMAGE_POINT_SIZE) {
+    if (piSize < numPointDetails) {
       return;
     }
-    piPointDetail[total]  = mImageTotalPointMap[psSerialNum];
-    piPointDetail[ignore] = mImageIgnorePointMap[psSerialNum];
-    piPointDetail[fixed] = mImageFixedPointMap[psSerialNum];
+    piPointDetail[total]       = mImageTotalPointMap [psSerialNum];
+    piPointDetail[ignore]      = mImageIgnorePointMap[psSerialNum];
+    piPointDetail[locked]      = mImageLockedPointMap[psSerialNum];
+    piPointDetail[fixed]       = mImageFixedPointMap [psSerialNum];
+    piPointDetail[constrained] = mImageConstPointMap [psSerialNum];
+    piPointDetail[freed]       = mImageFreePointMap  [psSerialNum]; 
   }
 
   /**
@@ -213,7 +273,7 @@ namespace Isis {
     ofstream ostm;
     string outName(outFile.Expanded());
     ostm.open(outName.c_str(), std::ios::out);
-    ostm << "Point Id, " << "Type, " << " Ignore, " << "Num Measures, " << "Ignored Measures" << endl;
+    ostm << " PointId, PointType, PointIgnore, PointEditLock, TotalMeasures, MeasuresValid, MeasuresIgnore, MeasuresEditLock," << endl;
 
     int iNumPoints = mCNet->GetNumPoints();
 
@@ -226,17 +286,14 @@ namespace Isis {
 
     for (int i = 0; i < iNumPoints; i++) {
       const ControlPoint *cPoint = mCNet->GetPoint(i);
-      int iNumMeasures = cPoint->GetNumMeasures();
-      int iIgnored = 0;
-      for (int j = 0; j < iNumMeasures; j++) {
-        const ControlMeasure *cMeasure = cPoint->GetMeasure(j);
-        if (cMeasure->IsIgnored()) {
-          iIgnored++;
-        }
-      }
+      int iNumMeasures     = cPoint->GetNumMeasures();
+      int iValidMeasures   = cPoint->GetNumValidMeasures();
+      int iIgnoredMeasures = iNumMeasures - iValidMeasures;
+      
       // Log into the output file
-      ostm << cPoint->GetId()   << ", " << sPointType[(int)cPoint->GetType()] << ", " <<  sBoolean[(int)cPoint->IsIgnored()] << ", " ;
-      ostm << iNumMeasures << ", " << iIgnored << endl;
+      ostm << cPoint->GetId()   << ", " << sPointType[(int)cPoint->GetType()] << ", " << sBoolean[(int)cPoint->IsIgnored()] << ", " ;
+      ostm << sBoolean[(int)cPoint->IsEditLocked()] << ", " << iNumMeasures << ", " << iValidMeasures << ", ";
+      ostm << iIgnoredMeasures << ", " << cPoint->GetNumLockedMeasures() << endl;
 
       // Update Progress
       if (mProgress != NULL)
@@ -244,261 +301,176 @@ namespace Isis {
     }
     ostm.close();
   }
-
+  
   /**
-   * Returns the Number of Valid (Not Ignored) Points in the Control Net
-   * Moved from ControlNet class
-   *
-   * @author Sharmila Prasad (9/8/2010)
-   *
-   * @return int - Total Valid Points
+   * Get network statistics for total, valid, ignored, locked points and measures
+   * 
+   * @author sprasad (7/19/2011)
    */
-  int ControlNetStatistics::NumValidPoints() {
-    int iCount = 0;
-    int iNumPoints = mCNet->GetNumPoints();
-
-    for (int i = 0; i < iNumPoints; i++) {
-      if (!mCNet->GetPoint(i)->IsIgnored())
-        iCount ++;
+  void ControlNetStatistics::GetPointIntStats() {
+    // Init all the entries
+    // totalPoints, validPoints, ignoredPoints, fixedPoints, constrainedPoints, editLockedPoints, 
+    // totalMeasures, validMeasures, ignoredMeasures, editLockedMeasures
+    for (int i=0; i<numPointIntStats; i++) {
+      mPointIntStats[i] = 0;
     }
-
-    return iCount;
-  }
-
-  /**
-   * Returns the total number of Fixed Points in the Control Network
-   * Moved from ControlNet class
-   *
-   * @author Sharmila Prasad (9/8/2010)
-   *
-   * @return int - Total Fixed Points
-   */
-  int ControlNetStatistics::NumFixedPoints() {
-    int iCount = 0;
+    
     int iNumPoints = mCNet->GetNumPoints();
+      
+    // totalPoints
+    mPointIntStats[totalPoints] = iNumPoints;
 
     for (int i = 0; i < iNumPoints; i++) {
+      if (!mCNet->GetPoint(i)->IsIgnored()) {
+        // validPoints
+        mPointIntStats[validPoints]++;
+      } 
+      else {
+        // ignoredPoints
+        mPointIntStats[ignoredPoints]++;
+      }
+
+      // fixedPoints
       if (mCNet->GetPoint(i)->GetType() == ControlPoint::Fixed)
-        iCount ++;
+        mPointIntStats[fixedPoints]++;
+
+      // constrainedPoints
+      if (mCNet->GetPoint(i)->GetType() == ControlPoint::Constrained)
+        mPointIntStats[constrainedPoints]++;
+      
+      // free points
+      if (mCNet->GetPoint(i)->GetType() == ControlPoint::Free)
+        mPointIntStats[freePoints]++;
+      
+      // editLockedPoints
+      if (mCNet->GetPoint(i)->IsEditLocked()) {
+        mPointIntStats[editLockedPoints]++;
+      } 
+
+      // totalMeasures
+      mPointIntStats[totalMeasures] += mCNet->GetPoint(i)->GetNumMeasures();
+      
+      // validMeasures
+      mPointIntStats[validMeasures] += mCNet->GetPoint(i)->GetNumValidMeasures();
+      
+      // editLockedMeasures
+      mPointIntStats[editLockedMeasures] +=  mCNet->GetPoint(i)->GetNumLockedMeasures();
     }
-    return iCount;
+    // ignoredMeasures
+    mPointIntStats[ignoredMeasures] = mPointIntStats[totalMeasures] -  mPointIntStats[validMeasures];
   }
-
+  
   /**
-   * Return the total number of measures for all control points
-   * in the network
-   * Moved from ControlNet class
-   *
-   * @author Sharmila Prasad (9/8/2010)
-   *
-   * @return int - Total Measures
+   * Get the Network Statistics for Residuals (line, sample, magnitude) and 
+   * Shifts (line, sample, pixel)
+   * 
+   * @author Sharmila Prasad (7/19/2011)
    */
-  int ControlNetStatistics::NumMeasures() {
-    int iNumMeasures = 0;
-    int iNumPoints = mCNet->GetNumPoints();
-
-    for (int i = 0; i < iNumPoints; i++) {
-      iNumMeasures += mCNet->GetPoint(i)->GetNumMeasures();
-    }
-    return iNumMeasures;
-  }
-
-  /**
-   * Return the number of valid (non-ignored) measures for
-   * all control points in the network
-   *
-   * Moved from ControlNet class
-   *
-   * @author Sharmila Prasad (9/8/2010)
-   *
-   * @return int - Total Valid Measures
-   */
-  int ControlNetStatistics::NumValidMeasures() {
-    int iNumValidMeasures = 0;
-    int iNumPoints = mCNet->GetNumPoints();
-
-    for (int i = 0; i < iNumPoints; i++) {
-      iNumValidMeasures += mCNet->GetPoint(i)->GetNumValidMeasures();
+  void ControlNetStatistics::GetPointDoubleStats(void) {
+    // avgResidual, maxResidual, minResidual, minLineResidual, maxLineResidual, minSampleResidual, maxSampleResidual,
+    // avgShift, maxShift, minShift, minLineShift, maxLineShift, minSampleShift, maxSampleShift
+    for (int i=0; i<numPointDblStats; i++) {
+      mPointDoubleStats[i] = 0;
     }
 
-    return iNumValidMeasures;
-  }
-
-  /**
-   * Return the total number of ignored measures for all
-   * control points in the network
-   *
-   * Moved from ControlNet class
-   *
-   * @author Sharmila Prasad (9/8/2010)
-   *
-   * @return int - Total Ignored Measures
-   */
-  int ControlNetStatistics::NumIgnoredMeasures() {
-    int iNumIgnoredMeasures = 0;
     int iNumPoints = mCNet->GetNumPoints();
-
+    double dValue = 0;
+    
     for (int i = 0; i < iNumPoints; i++) {
-      const ControlPoint *cPoint = mCNet->GetPoint(i);
-      iNumIgnoredMeasures +=
-        cPoint->GetNumMeasures() - cPoint->GetNumValidMeasures();
-    }
+      Statistics resMagStats = mCNet->GetPoint(i)->GetStatistic(&ControlMeasure::GetResidualMagnitude);
 
-    return iNumIgnoredMeasures;
-  }
-
-  /**
-   * Compute the average error of all points in the network
-   *
-   * Moved from ControlNet class
-   *
-   * @author Sharmila Prasad (9/8/2010)
-   *
-   * @return double - Average Error
-   */
-  double ControlNetStatistics::AverageResidual() {
-    double dAvgError = 0.0;
-    int iPointsCount = 0;
-    int iNumPoints = mCNet->GetNumPoints();
-
-    for (int i = 0; i < iNumPoints; i++) {
-      if (mCNet->GetPoint(i)->IsIgnored())
-        continue;
-      dAvgError += mCNet->GetPoint(i)->GetStatistic(
-          &ControlMeasure::GetResidualMagnitude).Average();
-      iPointsCount++;
-    }
-
-    if (iPointsCount == 0)
-      return dAvgError;
-
-    return dAvgError / iPointsCount;
-  }
-
-  /**
-   * Determine the minimum error of all points in the network
-   * Moved from ControlNet class
-   *
-   * @author Sharmila Prasad (9/8/2010)
-   *
-   * @return double - Minimum Error
-   */
-  double ControlNetStatistics::MinimumResidual() {
-    double dMinError = VALID_MAX4;
-    int iNumPoints = mCNet->GetNumPoints();
-
-    for (int i = 0; i < iNumPoints; i++) {
-      double dError = mCNet->GetPoint(i)->GetStatistic(
-          &ControlMeasure::GetResidualMagnitude).Minimum();
-      if (dError < dMinError)
-        dMinError = dError;
-    }
-
-    return dMinError;
-  }
-
-  /**
-   * Determine the maximum error of all points in the network
-   * Moved from ControlNet class
-   *
-   * @author Sharmila Prasad (9/8/2010)
-   *
-   * @return double - Max Error
-   */
-  double ControlNetStatistics::MaximumResidual() {
-    double dMaxError = 0.0;
-    int iNumPoints = mCNet->GetNumPoints();
-
-    for (int i = 0; i < iNumPoints; i++) {
-      double dError = mCNet->GetPoint(i)->GetStatistic(
-          &ControlMeasure::GetResidualMagnitude).Maximum();
-      if (dError > dMaxError)
-        dMaxError = dError;
-    }
-    return dMaxError;
-  }
-
-  /**
-   * Get the Minimum ErrorLine for the Control Network
-   *
-   * @author Sharmila Prasad (9/8/2010)
-   *
-   * @return double - Min Line Error
-   */
-  double ControlNetStatistics::MinimumLineResidual() {
-    double dMinError = VALID_MAX4;
-    int iNumPoints = mCNet->GetNumPoints();
-
-    for (int i = 0; i < iNumPoints; i++) {
-      double dError = mCNet->GetPoint(i)->GetStatistic(
-          &ControlMeasure::GetLineResidual).Minimum();
-      if (dError < dMinError)
-        dMinError = dError;
-    }
-
-    return dMinError;
-  }
-
-  /**
-   * Get the Minimum ErrorSample for the Control Network
-   *
-   * @author Sharmila Prasad (9/8/2010)
-   *
-   * @return double - Min Sample Error
-   */
-  double ControlNetStatistics::MinimumSampleResidual() {
-    double dMinError = VALID_MAX4;
-    int iNumPoints = mCNet->GetNumPoints();
-
-    for (int i = 0; i < iNumPoints; i++) {
-      double dError = mCNet->GetPoint(i)->GetStatistic(
-          &ControlMeasure::GetSampleResidual).Minimum();
-      if (dError < dMinError)
-        dMinError = dError;
-    }
-
-    return dMinError;
-  }
-
-  /**
-   * Get the Maximum ErrorLine for the Control Network
-   *
-   * @author Sharmila Prasad (9/8/2010)
-   *
-   * @return double - Max Line Error
-   */
-  double ControlNetStatistics::MaximumLineResidual() {
-    double dMaxError = 0.0;
-    int iNumPoints = mCNet->GetNumPoints();
-
-    for (int i = 0; i < iNumPoints; i++) {
-      double dError = mCNet->GetPoint(i)->GetStatistic(
-          &ControlMeasure::GetLineResidual).Maximum();
-      if (dError > dMaxError)
-        dMaxError = dError;
-    }
-
-    return dMaxError;
-  }
-
-  /**
-   * Get the Maximum ErrorSample for the Control Network
-   *
-   * @author Sharmila Prasad (9/8/2010)
-   *
-   * @return double - Max Sample Error
-   */
-  double ControlNetStatistics::MaximumSampleResidual() {
-    double dMaxError = 0.0;
-    int iNumPoints = mCNet->GetNumPoints();
-
-    for (int i = 0; i < iNumPoints; i++) {
-      double dError = mCNet->GetPoint(i)->GetStatistic(
-          &ControlMeasure::GetSampleResidual).Maximum();
-      if (dError > dMaxError)
-        dMaxError = dError;
-    }
-
-    return dMaxError;
+      // avgResidual
+      if (resMagStats.Average() != Isis::NULL8 ) {
+        mPointDoubleStats[avgResidual] += abs(resMagStats.Average());
+      }
+      
+      // maxResidual
+      dValue = abs(resMagStats.Maximum());
+      if (resMagStats.Maximum() != Isis::NULL8 && mPointDoubleStats[maxResidual] < dValue)
+        mPointDoubleStats[maxResidual] = dValue;
+    
+      // minResidual
+      dValue = abs(resMagStats.Minimum());
+      if (resMagStats.Minimum() != Isis::NULL8 && mPointDoubleStats[minResidual] > dValue)
+        mPointDoubleStats[minResidual] = dValue;
+    
+      // Line Residual
+      Statistics resLineStats = mCNet->GetPoint(i)->GetStatistic(&ControlMeasure::GetLineResidual);
+    
+      // minLineResidual
+      dValue = abs(resLineStats.Minimum());
+      if (resLineStats.Minimum() != Isis::NULL8 && mPointDoubleStats[minLineResidual] > dValue)
+        mPointDoubleStats[minLineResidual] = dValue;
+    
+      // maxLineResidual
+      dValue = abs(resLineStats.Maximum());
+      if (resLineStats.Maximum() != Isis::NULL8 && mPointDoubleStats[maxLineResidual] < dValue)
+        mPointDoubleStats[maxLineResidual] = dValue;
+    
+      // Sample Residual
+      Statistics resSampStats = mCNet->GetPoint(i)->GetStatistic(&ControlMeasure::GetSampleResidual);
+    
+      // minSampleResidual
+      dValue = abs(resSampStats.Minimum());
+      if (resSampStats.Minimum() != Isis::NULL8 && mPointDoubleStats[minSampleResidual] > dValue)
+        mPointDoubleStats[minSampleResidual] = dValue;
+    
+      // maxSampleResidual
+      dValue = abs(resSampStats.Maximum());
+      if (resSampStats.Maximum() != Isis::NULL8 && mPointDoubleStats[maxSampleResidual] < dValue)
+        mPointDoubleStats[maxSampleResidual] = dValue;
+    
+      // Pixel Shift
+      Statistics pixShiftStats = mCNet->GetPoint(i)->GetStatistic(&ControlMeasure::GetPixelShift);
+    
+      // avgShift
+      if (pixShiftStats.Average() !=  Isis::NULL8) {
+        mPointDoubleStats[avgPixelShift] += abs(pixShiftStats.Average());
+      }
+    
+      // maxShift
+      dValue = abs(pixShiftStats.Maximum());
+      if (pixShiftStats.Maximum() != Isis::NULL8 && mPointDoubleStats[maxPixelShift] < dValue)
+        mPointDoubleStats[maxPixelShift] = dValue;
+    
+      // minShift
+      dValue = abs(pixShiftStats.Minimum());
+      if (pixShiftStats.Minimum() != Isis::NULL8 && mPointDoubleStats[minPixelShift] > dValue)  
+        mPointDoubleStats[minPixelShift] = dValue;
+    
+      // Line Shift
+      Statistics lineShiftStats = mCNet->GetPoint(i)->GetStatistic(&ControlMeasure::GetLineShift);
+    
+      // minLineShift
+      dValue = abs(lineShiftStats.Minimum());
+      if (lineShiftStats.Minimum() != Isis::NULL8 && mPointDoubleStats[minLineShift] > dValue)
+          mPointDoubleStats[minLineShift] = dValue;
+    
+      // maxLineShift
+      dValue = abs(lineShiftStats.Maximum());
+      if (lineShiftStats.Maximum() != Isis::NULL8 && mPointDoubleStats[maxLineShift] < dValue)
+        mPointDoubleStats[maxLineShift] = dValue;
+    
+      // Sample Shift
+      Statistics sampShiftStats = mCNet->GetPoint(i)->GetStatistic(&ControlMeasure::GetSampleShift);
+    
+      // minSampleShift
+      dValue = abs(sampShiftStats.Minimum());
+      if (sampShiftStats.Minimum() != Isis::NULL8 && mPointDoubleStats[minSampleShift] > dValue)
+        mPointDoubleStats[minSampleShift] = dValue;
+    
+      // maxSampleShift
+      dValue = abs(sampShiftStats.Maximum());
+      if (sampShiftStats.Maximum() != Isis::NULL8 && mPointDoubleStats[maxSampleShift] < dValue)
+        mPointDoubleStats[maxSampleShift] = dValue;
+    } 
+    
+    int iValidPoints = mPointIntStats[validPoints];
+     
+    // Residuals
+    mPointDoubleStats[avgResidual] /= iValidPoints;
+  
+    // Shift
+    mPointDoubleStats[avgPixelShift] /= iValidPoints;
   }
 }

@@ -36,13 +36,7 @@ namespace Isis {
   class ControlNet;
   class Progress;
   class PvlGroup;
-
-  //! Size of the PointDetails Array
-  const int IMAGE_POINT_SIZE = 3;
-
-  //! Enumeration for Point Statistics
-  enum ePointDetails { total, ignore, fixed };
-
+  
   /**
    * @brief Control Network Stats
    *
@@ -65,6 +59,7 @@ namespace Isis {
    *   @history 2011-06-07 Debbie A. Cook and Tracie Sucharski - Modified point types
    *                          Ground ------> Fixed
    *                          Tie----------> Free
+   *   @history 2011-07-19 Sharmila Prasad - Modified for new keywords in binary control net
    */
   class ControlNetStatistics {
     public:
@@ -76,6 +71,20 @@ namespace Isis {
 
       //! Destructor
       ~ControlNetStatistics();
+      
+      //! Enumeration for Point Statistics
+      enum ePointDetails { total, ignore, locked, fixed, constrained, freed };
+      static const int numPointDetails = 6;
+  
+      //! Enumeration for Point int stats for counts such as valid points, measures etc.
+      enum ePointIntStats { totalPoints, validPoints, ignoredPoints, fixedPoints, constrainedPoints, freePoints, editLockedPoints, 
+                            totalMeasures, validMeasures, ignoredMeasures, editLockedMeasures };
+      static const int numPointIntStats = 11;
+  
+      //! Enumeration for Point stats like Tolerances, PixelShifts which have double data
+      enum ePointDoubleStats { avgResidual, maxResidual, minResidual, minLineResidual, maxLineResidual, minSampleResidual, maxSampleResidual,
+                               avgPixelShift, maxPixelShift, minPixelShift, minLineShift, maxLineShift, minSampleShift, maxSampleShift};
+      static const int numPointDblStats = 14;
 
       //! Generate stats like Total, Ignored, Fixed Points in an Image
       void GenerateImageStats(void);
@@ -93,41 +102,125 @@ namespace Isis {
       void GenerateControlNetStats(PvlGroup &pStatsGrp);
 
       //! Returns the Number of Valid (Not Ignored) Points in the Control Net
-      int NumValidPoints();
+      int NumValidPoints(){
+          return mPointIntStats[validPoints];
+      };
 
       //! Returns the Number of Fixed Points in the Control Net
-      int NumFixedPoints();
+      int NumFixedPoints(){
+          return mPointIntStats[fixedPoints];
+      };
+      
+      //! Returns the number of Constrained Points in Control Net
+      int NumConstrainedPoints(){
+          return mPointIntStats[constrainedPoints];
+      };
+      
+      //! Returns the number of Constrained Points in Control Net
+      int NumFreePoints(){
+          return mPointIntStats[freePoints];
+      };
+      
+      //! Returns the number of ignored points
+      int NumIgnoredPoints(){
+          return mPointIntStats[ignoredPoints];
+      };
+      
+      //! Returns total number of edit locked points
+      int NumEditLockedPoints() {
+          return mPointIntStats[editLockedPoints];
+      };
 
       //! Returns the total Number of Measures in the Control Net
-      int NumMeasures();
+      int NumMeasures(){
+          return mPointIntStats[totalMeasures];
+      };
 
       //!< Returns the total Number of valid Measures in the Control Net
-      int NumValidMeasures();
+      int NumValidMeasures(){
+          return mPointIntStats[validMeasures];
+      };
 
       //! Returns the total Number of Ignored Measures in the Control Net
-      int NumIgnoredMeasures();
+      int NumIgnoredMeasures(){
+          return mPointIntStats[ignoredMeasures];
+      };
 
+      //! Returns total number of edit locked measures in the network
+      int NumEditLockedMeasures() {
+          return mPointIntStats[editLockedMeasures];
+      };
+      
       //! Determine the average error of all points in the network
-      double AverageResidual();
+      double GetAverageResidual(){
+          return mPointDoubleStats[avgResidual];
+      };
 
       //! Determine the minimum error of all points in the network
-      double MinimumResidual();
+      double GetMinimumResidual(){
+          return mPointDoubleStats[minResidual];
+      };
 
       //! Determine the maximum error of all points in the network
-      double MaximumResidual();
+      double GetMaximumResidual(){
+          return mPointDoubleStats[maxResidual];
+      };
 
       //! Determine the minimum line error of all points in the network
-      double MinimumLineResidual();
+      double GetMinLineResidual(){
+          return mPointDoubleStats[minLineResidual];
+      };
 
       //! Determine the minimum sample error of all points in the network
-      double MinimumSampleResidual();
+      double GetMinSampleResidual(){
+          return mPointDoubleStats[minSampleResidual];
+      };
 
       //! Determine the maximum line error of all points in the network
-      double MaximumLineResidual();
+      double GetMaxLineResidual(){
+          return mPointDoubleStats[maxLineResidual];
+      };
 
       //! Determine the maximum sample error of all points in the network
-      double MaximumSampleResidual();
+      double GetMaxSampleResidual(){
+          return mPointDoubleStats[maxSampleResidual]; 
+      };
+      
+      //! Get Min and Max LineShift
+      double GetMinLineShift(void) {
+          return mPointDoubleStats[minLineShift];
+      };
+      
+      //! Get network Max LineShift
+      double GetMaxLineShift(void) {
+      return mPointDoubleStats[maxLineShift];
+      };      
+      
+      //! Get network Min SampleShift
+      double GetMinSampleShift(){
+          return mPointDoubleStats[minSampleShift]; 
+      };
+            
+      //! Get network Max SampleShift
+      double GetMaxSampleShift(){
+          return mPointDoubleStats[maxSampleShift]; 
+      };
+      
+      //! Get network Min PixelShift
+      double GetMinPixelShift(){
+          return mPointDoubleStats[minPixelShift]; 
+      };
 
+      //! Get network Max PixelShift
+      double GetMaxPixelShift(){
+          return mPointDoubleStats[maxPixelShift]; 
+      };
+      
+      //! Get network Avg PixelShift
+      double GetAvgPixelShift(){
+          return mPointDoubleStats[avgPixelShift]; 
+      };
+      
     protected:
       SerialNumberList mSerialNumList;    //!< Serial Number List
       ControlNet *mCNet;                  //!< Control Network
@@ -137,6 +230,18 @@ namespace Isis {
       map <string, int> mImageTotalPointMap;   //!< Contains map of serial num and Total points
       map <string, int> mImageIgnorePointMap;  //!< Contains map of serial num and Ignored points
       map <string, int> mImageFixedPointMap;   //!< Contains map of serial num and Fixed points
+      map <string, int> mImageConstPointMap;   //!< Contains map of serial num and Constrained points
+      map <string, int> mImageFreePointMap;    //!< Contains map of serial num and Free points
+      map <string, int> mImageLockedPointMap;  //!< Contains map of serial num and Locked points
+      map <string, int> mImageLockedMap;       //!< Contains map of serial num and Locked Measures
+      map <int, int> mPointIntStats;           //!< Contains map of different count stats
+      map <int, double> mPointDoubleStats;     //!< Contains map of different computed stats
+      
+      //! Get point count stats
+      void GetPointIntStats(void);
+      
+      //! Get Point stats for Residuals and Shifts 
+      void GetPointDoubleStats(void);
   };
 }
 #endif
