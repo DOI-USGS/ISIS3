@@ -8,6 +8,7 @@
 #include "UserInterface.h"
 #include "Table.h"
 #include "Filename.h"
+#include "ImportPdsTable.h"
 
 using namespace std; 
 using namespace Isis;
@@ -22,6 +23,27 @@ void IsisMain ()
   string imageFile("");
   if (ui.WasEntered("IMAGE")) {
     imageFile = ui.GetFilename("IMAGE");
+  }
+
+
+  // Generate the housekeeping filenames 
+  string hkLabel("");
+  string hkData("");
+  if (ui.WasEntered("HKFROM") ) {
+    hkLabel = ui.GetFilename("HKFROM");
+  }
+  else {
+    hkLabel = inFile.OriginalPath() + "/" + inFile.Basename() + "_HK.LBL";
+    // Determine the housekeeping file
+    Filename hkFile = hkLabel; 
+    if (!hkFile.Exists()) {
+      hkFile = iString::Replace(hkLabel, "_1B_", "_1A_", false);
+      if (hkFile.Exists()) hkLabel = hkFile.Expanded();
+    }
+  }
+
+  if (ui.WasEntered("HKTABLE")) {
+    hkData = ui.GetFilename("HKTABLE");
   }
 
   iString instid;
@@ -63,11 +85,6 @@ void IsisMain ()
 //  p.SaveFileHeader();
 
   Pvl labelPvl (inFile.Expanded());
-
-  // Save off line suffix data
-//  TableField lineClock("
-//  p.SetDataSuffixBytes(4);
-//  p.SaveDataSuffix();
 
   p.StartProcess ();
 
@@ -116,6 +133,24 @@ void IsisMain ()
     throw iException::Message(iException::Io,msg, _FILEINFO_);
   }
   outcube->putGroup(kerns);
+
+  // Now handle generation of housekeeping data
+ try {
+   ImportPdsTable hktable(hkLabel, hkData);
+   hktable.setType("ScetTimeClock", "CHARACTER");
+   hktable.setType("ShutterStatus", "CHARACTER");
+   hktable.setType("MirrorSin", "DOUBLE");
+   hktable.setType("MirrorCos", "DOUBLE");
+   Table hktab = hktable.exportAsTable("ScetTimeClock,ShutterStatus,MirrorSin,MirrorCos",
+                                        "VIRHouseKeeping");
+   hktab.Label().AddKeyword(PvlKeyword("SourceFile", hkLabel));
+   outcube->write(hktab);
+ }
+ catch (iException &ie) {
+   string mess = "Cannot read/open housekeeping data";
+   ie.Message(iException::User, mess, _FILEINFO_);
+   throw;
+ }
 
   p.EndProcess ();
 }

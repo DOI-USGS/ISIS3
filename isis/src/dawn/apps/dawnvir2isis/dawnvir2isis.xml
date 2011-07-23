@@ -26,6 +26,9 @@
           Removed HorixontalPixelScale and VerticalPixelScale compliancy test; 
           Added optional TARGET parameter to allow TargetName specification 
      </change>
+     <change name="Kris Becker" date="2011-06-29">
+          Added ingestion of PDS table data file for camera model support
+     </change>
   </history>
 
   <category>
@@ -64,6 +67,80 @@
         </description>
         <internalDefault>
           Cube data embedded with label or file pointer in label file.
+        </internalDefault>
+        <filter>
+          *.img *.qub *.QUB
+        </filter>
+      </parameter>
+
+      <parameter name="HKFROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          VIR 1A/1B housekeeping (HK) data (label)
+        </brief>
+        <description>
+            <p>
+                This parameters is optional but the file is not.  It must be 
+                provided.  The application will derive the expected name of the 
+                input file which will always be the .LBL file describing the 
+                contents of the housekeeping (HK) table file.
+            </p>
+            <p>
+                The file is derived from the input file by first, stripping the 
+                extention off the FROM file , replacing it with _HK.LBL.  It 
+                will then detemine if it exists.  If it doesn't exist, then the 
+                filename is scanned for '_1B_' and it is replaced with '_1A'. 
+                This is because the table data for 1A (uncalibrated) images can 
+                be used with 1B (calibrated) images.  
+            </p>
+            <p>
+                If the above file determination effort fails, then the user must 
+                provide the name of the housekeeping label file as this data is 
+                required.
+            </p>
+            <p>
+                For example, if the input image label file is 
+                VIR_IR_1B_1_358284474_1.LBL, then the housekeeping file name 
+                derived from this is VIR_IR_1B_1_358284474_1_HK.LBL.  This file 
+                is unlikely to not exist so the second file name generated is 
+                VIR_IR_1A_1_358284474_1_HK.LBL.  If this one does not exist, the 
+                user is required to provide this in the HKFROM parameter.
+            </p>
+            <p>
+                Note that this file is assumed to exist in the same directory as 
+                the image data.  If this is not the case, then the user must 
+                provide the filename.
+            </p>
+        </description>
+        <internalDefault>Derived from input image</internalDefault>
+        <filter>
+          *.LBL *.TAB
+        </filter>
+      </parameter>
+
+      <parameter name="HKTABLE">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Detached housekeeping (HK) table data file
+        </brief>
+        <description>
+            <p>
+                This parameter is provided in the event where the table data is not 
+                readily determined from the input file.  As described in the HKFROM 
+                parameter, this filename is typically contained with the KHFROM 
+                label.  If for some reason, it cannot be resolved/found, this 
+                parameter allows the user to provide it directly.
+            </p>
+            <p>
+                This table contains data that is required in order for the 
+                camera model to work properly.  Uncalibrated (1A) tables can be 
+                used for calibrated (1B) table.
+            </p>
+        </description>
+        <internalDefault>
+          Deterministic from input files
         </internalDefault>
         <filter>
           *.img *.qub *.QUB
