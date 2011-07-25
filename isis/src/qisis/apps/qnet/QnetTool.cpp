@@ -1397,7 +1397,12 @@ namespace Qisis {
       ControlPoint *fixedPoint = 
       new ControlPoint(fixedPointDialog->ptIdValue->text().toStdString()); 
 
-      fixedPoint->SetType(ControlPoint::Fixed);
+      if (fixedPointDialog->fixed->isChecked()) {
+        fixedPoint->SetType(ControlPoint::Fixed);
+      }
+      else {
+        fixedPoint->SetType(ControlPoint::Constrained);
+      }
 
       //  ??????       What radius , check for dem or shape model
       double radius = p_groundGmap->Projection()->LocalRadius();
@@ -2542,14 +2547,14 @@ namespace Qisis {
   void QnetTool::drawAllMeasurments(MdiCubeViewport *vp, QPainter *painter) {
     
     // Without a controlnetwork there are no points
-    if(g_controlNetwork == 0) return;
+    if (g_controlNetwork == 0) return;
 
     // Don't show the measurments on cubes not in the serial number list
     // TODO: Should we show them anyway
     // TODO: Should we add the SN to the viewPort
     string serialNumber = Isis::SerialNumber::Compose(*vp->cube());
 
-    if(!g_serialNumberList->HasSerialNumber(serialNumber)) return;
+    if (!g_serialNumberList->HasSerialNumber(serialNumber)) return;
 
     // loop through all points in the control net
     for (int i = 0; i < g_controlNetwork->GetNumPoints(); i++) {

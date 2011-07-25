@@ -51,6 +51,15 @@ namespace Qisis {
     connect(ptIdValue,SIGNAL(textChanged(const QString &)),
             this,SLOT(enableOkButton(const QString &)));
 
+    QGroupBox *pointTypeGroup = new QGroupBox("Point Type");
+    fixed = new QRadioButton("Fixed");
+    constrained = new QRadioButton("Constrained");
+    constrained->setChecked(true);
+    QVBoxLayout *pointTypeLayout = new QVBoxLayout;
+    pointTypeLayout->addWidget(fixed);
+    pointTypeLayout->addWidget(constrained);
+    pointTypeGroup->setLayout(pointTypeLayout);
+
     QLabel *listLabel = new QLabel("Select Files:");
 
     fileList = new QListWidget();
@@ -74,12 +83,13 @@ namespace Qisis {
 
     QVBoxLayout *vLayout = new QVBoxLayout;
     vLayout->addLayout(ptIdLayout);
+    vLayout->addWidget(pointTypeGroup);
     vLayout->addWidget(listLabel);
     vLayout->addWidget(fileList);
     vLayout->addLayout(buttonLayout);
 
     setLayout(vLayout);
-    setWindowTitle("Create Fixed ControlPoint");
+    setWindowTitle("Create Fixed or Constrained ControlPoint");
 
   }
 

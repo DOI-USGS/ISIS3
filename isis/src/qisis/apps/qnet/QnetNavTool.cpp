@@ -770,21 +770,24 @@ namespace Qisis {
    * @internal
    *   @history 2008-12-29 Jeannie Walldren - Added question box to verify that
    *                          the user wants to delete the selected points.
+   *   @history 2011-07-25 Tracie Sucharski - Fixed bug in refreshing list 
+   *                          changed to delete starting at end of list so
+   *                          indices stay accurate.
    */
   void QnetNavTool::deletePoints() {
     // do nothing if no cubes are loaded
     if (g_serialNumberList == NULL)
       return;
 
-    int index = p_listBox->currentRow();
-    if (index < 0) {
+    QList<QListWidgetItem *> selected = p_listBox->selectedItems();
+
+    if (selected.size() < 1) {
       QApplication::restoreOverrideCursor();
       QMessageBox::information((QWidget *)parent(),
           "Error", "No point selected to delete");
       return;
     }
 
-    QList<QListWidgetItem *> selected = p_listBox->selectedItems();
     switch (QMessageBox::question((QWidget *)parent(),
         "Control Network Navigator - Delete Points",
         "You have chosen to delete "
@@ -797,16 +800,24 @@ namespace Qisis {
         int editPointIndex = 0;
         int lockedPoints = 0;
         vector<int> deletedRows;
-        for (int i = 0; i < selected.size(); i++) {
+        //  Delete starting from end of list so that entries can be deleted
+        //  from filtered list as points are deleted from network
+        for (int i = selected.size() - 1; i >= 0; i--) {
+//          for (int i = 0; i < selected.size(); i++) {
           QString id = selected.at(i)->text();
           //  Keep track of rows #'s that are being deleted.
           deletedRows.push_back(p_listBox->row(selected.at(i)));
           if (id == p_editPointId) {
             editPointIndex = deletedRows[i];
           }
-          if (g_controlNetwork->DeletePoint(id) == ControlPoint::PointLocked)
+          if (g_controlNetwork->DeletePoint(id) == ControlPoint::PointLocked) {
             lockedPoints++;
+          }
+          else {
+            g_filteredPoints.removeAt(i);
+          }
         }
+        QApplication::restoreOverrideCursor();
 
         //  Print info about locked points if there are any
         if (lockedPoints > 0) {
@@ -816,8 +827,12 @@ namespace Qisis {
                 + " points are EditLocked and were not deleted.");
         }
 
-        QApplication::restoreOverrideCursor();
-        emit deletedPoints();
+        if (g_filteredPoints.size() == 0) {
+          filterList();
+        }
+        else {
+          emit deletedPoints();
+        }
         emit netChanged();
         break;
         //  case 1: // No was clicked, close window and do nothing to points

@@ -40,6 +40,9 @@ namespace Qisis {
       QLineEdit *ptIdValue;
       void SetFiles (QStringList &pointFiles);
 
+      QRadioButton *fixed;
+      QRadioButton *constrained;
+
       QListWidget *fileList;
 
     signals:

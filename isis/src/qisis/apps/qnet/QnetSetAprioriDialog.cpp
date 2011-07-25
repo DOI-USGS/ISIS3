@@ -90,6 +90,10 @@ void QnetSetAprioriDialog::fillLineEdits() {
   QString id = p_points.at(0)->text();
   ControlPoint *pt = g_controlNetwork->GetPoint(id);
   SurfacePoint sPt = pt->GetAprioriSurfacePoint();
+  vector<Distance> targetRadii = g_controlNetwork->GetTargetRadii();
+  sPt.SetRadii(Distance(targetRadii[0]), 
+               Distance(targetRadii[1]),
+               Distance(targetRadii[2]));
   if (sPt.GetLatitude().GetDegrees() != Isis::Null) {
     aprioriLatEdit->setText(
       QString::number(sPt.GetLatitude().GetDegrees()));
@@ -175,33 +179,36 @@ void QnetSetAprioriDialog::setApriori() {
     }
   }
 
-  //  Set aprioriSurfacePoint for those points not editLocked
+  //  If the SetAprioriPoint group box selected, set aprioriSurfacePoint for
+  //  those points not editLocked.
   for (int i = 0; i < p_points.size(); i++) {
     QString id = p_points.at(i)->text();
     ControlPoint *pt = g_controlNetwork->GetPoint(id);
     if (pt->IsEditLocked()) continue;
 
-    if (referenceMeasureRadioButton->isChecked()) {
-      ControlMeasure *m = pt->GetRefMeasure();
-      // Find camera from network camera list
-      int camIndex = g_serialNumberList->SerialNumberIndex(m->GetCubeSerialNumber());
-      Camera *cam = g_controlNetwork->Camera(camIndex);
-      cam->SetImage(m->GetSample(),m->GetLine());
-      pt->SetAprioriSurfacePoint(cam->GetSurfacePoint());
-      pt->SetAprioriSurfacePointSource(ControlPoint::SurfacePointSource::Reference);
-    }
-    else if (averageMeasuresRadioButton->isChecked()) {
-      pt->ComputeApriori();
-      // Do not need to set AprioriSurfacePointSource or AprioriRadiusSource,
-      // ComputeApriori does this for us.
-    }
-    else if (userEnteredRadioButton->isChecked()) {
-      pt->SetAprioriSurfacePoint(SurfacePoint(
-                                 Latitude(lat, Angle::Degrees),
-                                 Longitude(lon, Angle::Degrees),
-                                 Distance(radius,Distance::Meters)));
-      pt->SetAprioriSurfacePointSource(ControlPoint::SurfacePointSource::User);
-      pt->SetAprioriRadiusSource(ControlPoint::RadiusSource::User);
+    if (pointSourceGroupBox->isChecked()) {
+      if (referenceMeasureRadioButton->isChecked()) {
+        ControlMeasure *m = pt->GetRefMeasure();
+        // Find camera from network camera list
+        int camIndex = g_serialNumberList->SerialNumberIndex(m->GetCubeSerialNumber());
+        Camera *cam = g_controlNetwork->Camera(camIndex);
+        cam->SetImage(m->GetSample(),m->GetLine());
+        pt->SetAprioriSurfacePoint(cam->GetSurfacePoint());
+        pt->SetAprioriSurfacePointSource(ControlPoint::SurfacePointSource::Reference);
+      }
+      else if (averageMeasuresRadioButton->isChecked()) {
+        pt->ComputeApriori();
+        // Do not need to set AprioriSurfacePointSource or AprioriRadiusSource,
+        // ComputeApriori does this for us.
+      }
+      else if (userEnteredRadioButton->isChecked()) {
+        pt->SetAprioriSurfacePoint(SurfacePoint(
+                                   Latitude(lat, Angle::Degrees),
+                                   Longitude(lon, Angle::Degrees),
+                                   Distance(radius,Distance::Meters)));
+        pt->SetAprioriSurfacePointSource(ControlPoint::SurfacePointSource::User);
+        pt->SetAprioriRadiusSource(ControlPoint::RadiusSource::User);
+      }
     }
 
     try {
@@ -217,7 +224,9 @@ void QnetSetAprioriDialog::setApriori() {
                                      Distance(radiusSigma,Distance::Meters));
       //  Write the surface point back out to the controlPoint
       pt->SetAprioriSurfacePoint(spt);
-      pt->SetType(ControlPoint::Free);
+      //  TODO:  Is the following line necessary, should error be thrown
+      //  for free or fixed pts?
+      //pt->SetType(ControlPoint::Constrained);
       emit pointChanged(id);
       emit netChanged();
     }
