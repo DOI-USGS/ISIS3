@@ -100,6 +100,8 @@ namespace Isis {
                Angle::Units latitudeUnits,
                ErrorChecking errors = ThrowAllErrors);
 
+      Latitude(Angle latitude, ErrorChecking errors = ThrowAllErrors);
+
       Latitude(Angle latitude,
                PvlGroup mapping,
                ErrorChecking errors = ThrowAllErrors);
@@ -125,6 +127,8 @@ namespace Isis {
       double GetPlanetographic(Angle::Units units = Angle::Radians) const;
       void SetPlanetographic(double latitude,
                            Angle::Units units = Angle::Radians);
+
+      bool IsInRange(Latitude min, Latitude max) const;
 
       Latitude& operator=(const Latitude & latitudeToCopy);
     

@@ -130,7 +130,6 @@ void IsisMain() {
   outNet.SetUserName(Isis::Application::UserName());
   outNet.SetDescription(ui.GetString("DESCRIPTION"));
 
-
   for(int cp = outNet.GetNumPoints() - 1; cp >= 0; cp --) {
     progress.CheckStatus();
 
@@ -273,7 +272,6 @@ void IsisMain() {
       continue;
     }
   } //! Finished with simple comparisons
-
 
   /**
    * Use another pass to check for Ids
@@ -498,8 +496,8 @@ void ExtractLatLonRange(ControlNet &outNet, QVector<iString> nonLatLonPoints,
   // Get the lat/lon and fix the range for the internal 0/360
   Latitude minlat(ui.GetDouble("MINLAT"), Angle::Degrees);
   Latitude maxlat(ui.GetDouble("MAXLAT"), Angle::Degrees);
-  Longitude minlon = Longitude(ui.GetDouble("MINLON"), Angle::Degrees).Force360Domain();
-  Longitude maxlon = Longitude(ui.GetDouble("MAXLON"), Angle::Degrees).Force360Domain();
+  Longitude minlon = Longitude(ui.GetDouble("MINLON"), Angle::Degrees);
+  Longitude maxlon = Longitude(ui.GetDouble("MAXLON"), Angle::Degrees);
 
   Progress progress;
   progress.SetText("Calculating lat/lon");
@@ -509,16 +507,14 @@ void ExtractLatLonRange(ControlNet &outNet, QVector<iString> nonLatLonPoints,
   CubeManager manager;
   manager.SetNumOpenCubes(50);   //Should keep memory usage to around 1GB
 
+  bool hasFromList = ui.WasEntered("FROMLIST");
   for(int cp = outNet.GetNumPoints() - 1; cp >= 0; cp --) {
     progress.CheckStatus();
     const ControlPoint *controlPt = outNet.GetPoint(cp);
     SurfacePoint surfacePt = controlPt->GetBestSurfacePoint();
 
     // If the Contorl Network takes priority, use it
-    //Latitude pointLat(controlPt.UniversalLatitude(),Angle::Degrees);
-    //Longitude pointLon(controlPt.UniversalLongitude(),Angle::Degrees);
-    //bool hasLatLon = pointLat != Isis::Null && pointLon != Isis::Null;
-    if(controlPt->GetType() == Isis::ControlPoint::Fixed || surfacePt.Valid()) {
+    if(surfacePt.Valid()) {
       if(NotInLatLonRange(surfacePt, minlat, maxlat, minlon, maxlon)) {
         nonLatLonPoints.push_back(controlPt->GetId());
         omit(outNet, cp);
@@ -529,7 +525,7 @@ void ExtractLatLonRange(ControlNet &outNet, QVector<iString> nonLatLonPoints,
      * If the lat/lon cannot be determined from the point, then we need to calculate
      * lat/lon on our own
      */
-    else if(ui.WasEntered("FROMLIST")) {
+    else if(hasFromList) {
 
       // Find a cube in the Control Point to get the lat/lon from
       int cm = 0;
@@ -647,27 +643,9 @@ void ExtractLatLonRange(ControlNet &outNet, QVector<iString> nonLatLonPoints,
  */
 bool NotInLatLonRange(SurfacePoint surfacePtToTest, Latitude minlat,
                       Latitude maxlat, Longitude minlon, Longitude maxlon) {
-  bool inRange = true;
   Latitude lat = surfacePtToTest.GetLatitude();
   Longitude lon = surfacePtToTest.GetLongitude();
-
-  // Check latitude range
-  if(inRange && minlat > maxlat) {
-    inRange &= (lat <= maxlat || lat >= minlat);
-  }
-  else if(inRange) {
-    inRange &= (lat >= minlat && lat <= maxlat);
-  }
-
-  // Check longitude range
-  if(inRange && minlon > maxlon) {
-    inRange &= (lon <= maxlon || lon >= minlon);
-  }
-  else if(inRange) {
-    inRange &= (lon >= minlon && lon <= maxlon);
-  }
-
-  return !inRange;
+  return !lat.IsInRange(minlat, maxlat) || !lon.IsInRange(minlon, maxlon);
 }
 
 

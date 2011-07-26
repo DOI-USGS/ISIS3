@@ -92,6 +92,8 @@ namespace Isis {
       Longitude Force180Domain() const;
       Longitude Force360Domain() const;
 
+      bool IsInRange(Longitude min, Longitude max) const;
+
       /**
        * Same as GetPositiveEast.
        *

@@ -286,4 +286,77 @@ namespace Isis {
 
     return forced;
   }
+
+
+  /**
+   * Checks if this longitude value is within the given range.  Defines the
+   * range as the change from the minimum longitude to the maximum longitude (an
+   * angle), and returns whether the change from the minimum longitude to this
+   * longitude is less than or equal to the maximum change allowed (the range).
+   *
+   * All longitude values are restricted to a 0-360 range for the sake of
+   * comparison.  If the provided min and max longitude values are nominally
+   * different, but resolve to the same value when clamped to the 0-360 range,
+   * (for example: min=0 and max=360 => adjustedMin=0 and adjustedMax=0), then
+   * every point will be considered valid (because the whole planet is the
+   * range).
+   *
+   * @param min The beginning of the valid longitude range
+   * @param max The end of the valid longitude range
+   *
+   * @return Whether the longitude is in the given range
+   */
+  bool Longitude::IsInRange(Longitude min, Longitude max) const {
+    // Get around the "wrapping around the planet" problem by clamping the
+    // longitudes to a strict 0-360 range.  Now we're simply dealing with angles
+    // on a circle from an origin.
+    Longitude adjustedMin = min.Force360Domain();
+    Longitude adjustedMax = max.Force360Domain();
+
+    bool inRange = false;
+    if (adjustedMin == adjustedMax && min != max) {
+      // The beginning and end of the range is the same point, but the
+      // originally provided begin and end were nominally different, implying
+      // that the entire 0-360 range is valid.  For example, if the user entered
+      // 0-0 for the range, we assume they mean that only longitude 0 is valid.
+      // If, however, 0-360 was entered, then forcing the 360 results in 0-0,
+      // but we assume that they intended to cover the entire planet, because
+      // 0-360 is inherently an exclusive range in concept, but not in practice.
+      inRange = true;
+    }
+    else {
+      // Define the angle 0 degrees as the origin
+      Angle origin = Angle(0.0, Angle::Degrees);
+
+      // Define the angle 360 degrees as the maximal, "boundary" angle
+      Angle boundary = Angle(360.0, Angle::Degrees);
+
+      // Find the change in angle from the min to the max
+      Longitude deltaMax = adjustedMax - adjustedMin;
+
+      // Add back the boundary value if the change is less than 0 (the range
+      // crossed over the origin, so offset it to account for this)
+      if (deltaMax < origin)
+        deltaMax += boundary;
+
+      // Add a small amount of wriggle room to the maximum change to account for
+      // precision error
+      deltaMax += Angle(DBL_EPSILON, Angle::Degrees);
+
+      // Clamp this longitude to the same 0-360 domain
+      Longitude adjusted = Force360Domain();
+
+      // Apply the same adjustment for the change from the min longitude to this
+      // longitude as was applied to the maximal change
+      Longitude delta = adjusted - adjustedMin;
+      if (delta < origin)
+        delta += boundary;
+
+      // If the change in angle is less than or equal to the maximal change, it
+      // is within the valid range
+      inRange = delta <= deltaMax;
+    }
+
+    return inRange;
+  }
 }

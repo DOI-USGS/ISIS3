@@ -166,6 +166,18 @@ namespace Isis {
 
 
     /**
+     * Test if another angle is not equal to this angle. Takes the negated
+     * result of the '==' operator.
+     *
+     * @param angle2 The comparison angle (on right-hand-side of != operator)
+     * @return true if the angle does not equal the comparision angle 
+     */
+    bool operator!=(const Angle& angle2) const {
+      return !(*this == angle2);
+    }
+
+
+    /**
      * Test if the other angle is less than or equal to the current angle
      *
      * @param angle2 The comparison angle (on right-hand-side of < operator) 

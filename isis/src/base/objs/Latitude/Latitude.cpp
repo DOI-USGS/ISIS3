@@ -60,6 +60,24 @@ namespace Isis {
     SetPlanetocentric(latitude, latitudeUnits);
   }
 
+
+  /**
+   * Create and initialize a Latitude value in the planetocentric domain within
+   * the given angle.
+   *
+   * @param latitude The latitude value this instance will represent
+   * @param errors Error checking conditions
+   */
+  Latitude::Latitude(Angle latitude, ErrorChecking errors) : Angle() {
+    p_equatorialRadius = NULL;
+    p_polarRadius = NULL;
+
+    p_errors = errors;
+
+    SetPlanetocentric(latitude.GetRadians(), Radians);
+  }
+
+
   /**
    * Create and initialize a Latitude value using the mapping group's latitude
    * units and radii.
@@ -312,6 +330,32 @@ namespace Isis {
         (*p_polarRadius / *p_equatorialRadius));
 
     SetAngle(ocentricLatitude, Angle::Radians);
+  }
+
+
+  /**
+   * Checks if this latitude value is within the given range.  Defines the
+   * range as the change from the minimum latitude to the maximum latitude (an
+   * angle), and returns whether the change from the minimum latitude to this
+   * latitude is less than or equal to the maximum change allowed (the range).
+   *
+   * @param min The beginning of the valid latitude range
+   * @param max The end of the valid latitude range
+   *
+   * @return Whether the latitude is in the given range
+   */
+  bool Latitude::IsInRange(Latitude min, Latitude max) const {
+    // Maximal change in angle allowed
+    Latitude deltaMax = max - min;
+
+    // Provide a little wriggle room for precision problems
+    deltaMax += Angle(DBL_EPSILON, Angle::Degrees);
+
+    // Define the change in this angle from the min
+    Latitude delta = *this - min;
+
+    // If this change is less than or equal to the max, it is within range
+    return delta <= deltaMax;
   }
 
 
