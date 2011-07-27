@@ -8,7 +8,11 @@
     This program will compare two control network files.
     The purpose of this program is for application tests that output a control
     network formatted file, to be able to compare binary control networks with
-    tolerances in numerical values of keywords.
+    tolerances in numerical values of keywords.  
+    <strong>Note: </strong> This application only checks the ControlNet 
+    keywords Network ID and Target Name, other keywords for the network, such 
+    as UserName and Description, are not compared.  For points and measures, 
+    the DateTime keyword is always ignored.
   </description>
 
   <history>
@@ -17,6 +21,9 @@
     </change>
     <change name="Christopher Austin" date="2011-01-18">
       Altered to compile with the new Control redesign.
+    </change>
+    <change name="Jeannie Backer" date="2011-07-27">
+      Added documentation.
     </change>
   </history>
 
