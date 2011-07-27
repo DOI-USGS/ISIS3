@@ -86,7 +86,8 @@ for i in range(len(csv_1_header)):
   column_2 = csv_2_header[i]
 
   if column_1 != column_2:
-    sys.exit("FAILURE Columns %s and %s do not match!" % (column_1, column_2))
+    sys.exit("FAILURE Columns " +
+        "'%s' and '%s' do not match!" % (column_1, column_2))
 
 # Build a map of tolerances if the user specified one
 tolerance_map = {}
@@ -106,8 +107,15 @@ if len(sys.argv) >= 4:
 # Diff the CSV files
 for i in range(len(csv_1)):
   # Break each row up into a set of cells
-  cells_1 = csv_1[i].split(",")
-  cells_2 = csv_2[i].split(",")
+  cells_1 = csv_1[i].strip().split(",")
+  cells_2 = csv_2[i].strip().split(",")
+
+  # Header was removed, 0-based indexing, so we need to increment by 2 for
+  # accurate line number
+  line_num = i + 2
+  if len(cells_1) != len(cells_2):
+    sys.exit("FAILURE Rows have a different number of cells (line %d)!" %
+        (line_num))
 
   # Compare the cells one at a time
   for j in range(len(cells_1)):
@@ -115,10 +123,10 @@ for i in range(len(csv_1)):
     value_1 = cells_1[j]
     value_2 = cells_2[j]
 
-    if is_number(value_1) and is_number(value_2):
-      # Get the name of the column for this cell
-      column_1 = csv_1_header[j]
+    # Get the name of the column for this cell
+    column_1 = csv_1_header[j] if j < len(csv_1_header) else j + 1
 
+    if is_number(value_1) and is_number(value_2):
       # Generate the error and get the tolerance if provided, else assume 0.0
       error = math.fabs(float(value_1) - float(value_2))
       tolerance = 0.0
@@ -127,14 +135,13 @@ for i in range(len(csv_1)):
 
       # If the error is greater than the tolerance, fail the program
       if error > tolerance:
-        line_num = i + 2
-        sys.exit("FAILURE Error %.14f is greater than tolerance %.14f " %
+        sys.exit("FAILURE Error '%.14f' is greater than tolerance '%.14f' " %
             (error, tolerance) + "(line %d, column %s)!" % (line_num, column_1))
     else:
       # At least one of the values is a non-numeric type, so compare as strings
       if value_1 != value_2:
-        line_num = i + 2
-        sys.exit("FAILURE Value %s does not equal %s " % (value_1, value_2) +
+        sys.exit("FAILURE Value " +
+            "'%s' does not equal '%s' " % (value_1, value_2) +
             "(line %d, column %s)!" % (line_num, column_1))
 
 # No errors, all was good
