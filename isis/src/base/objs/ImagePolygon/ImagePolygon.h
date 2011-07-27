@@ -163,8 +163,10 @@ namespace Isis {
       ImagePolygon();
       ~ImagePolygon();
 
-      void Create(Cube &cube, int sampinc = 1, int lineinc = 1,
-                  int ss = 1, int sl = 1, int ns = 0, int nl = 0, int band = 1);
+      void Create(Cube &cube, int sinc = 1, int linc = 1,
+          int ss = 1, int sl = 1, int ns = 0, int nl = 0, int band = 1,
+          bool increasePrecision = false);
+
       Camera * initCube(Cube &cube, int ss = 1, int sl = 1,
                         int ns = 0, int nl = 0, int band = 1);
 
@@ -215,6 +217,16 @@ namespace Isis {
 
       double validSampleDim();
       double validLineDim();
+
+      //!  Return the sample increment used the create this polygon
+      int getSinc() const {
+        return p_sampinc;
+      }
+
+      //!  Return the line increment used the create this polygon
+      int getLinc() const {
+        return p_lineinc;
+      }
 
     protected:
       void ReadData(std::istream &is);

@@ -62,29 +62,13 @@ void IsisMain() {
   }
 
   bool precision = ui.GetBoolean("INCREASEPRECISION");
-  // Reduce the increment size to find a valid polygon
-  while(true) {
-    try {
-      poly.Create(cube, sinc, linc);
-      break;
-    }
-    catch(iException &e) {
-      if(precision && (sinc > 1 || linc > 1)) {
-        if(sinc > 1)
-          sinc = sinc * 2 / 3;
-        if(linc > 1)
-          linc = linc * 2 / 3;
-        e.Clear();
-      }
-      else {
-        e.Report(); // This should be an NAIF error
-        string msg = "Cannot generate polygon for [";
-        msg += ui.GetFilename("FROM") + "]";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
-      }
-    }
+  try {
+    poly.Create(cube, sinc, linc, 1, 1, 0, 0, 1, precision);
   }
-
+  catch (iException &e) {
+    string msg = "Cannot generate polygon for [" + ui.GetFilename("FROM") + "]";
+    throw iException::Message(iException::User, msg, _FILEINFO_);
+  }
 
   if(ui.GetBoolean("TESTXY")) {
     Pvl cubeLab(ui.GetFilename("FROM"));
@@ -112,37 +96,40 @@ void IsisMain() {
     if(!mapping.HasKeyword("CenterLongitude"))
       mapping += Isis::PvlKeyword("CenterLongitude", 0);
 
-    while(true) {
+    sinc = poly.getSinc();
+    linc = poly.getLinc();
+    bool polygonGenerated = false;
+    while (!polygonGenerated) {
+      Projection *proj = NULL;
+      geos::geom::MultiPolygon *xyPoly = NULL;
+
       try {
-        Projection *proj = ProjectionFactory::Create(map, true);
-        geos::geom::MultiPolygon *xyPoly = PolygonTools::LatLonToXY(*poly.Polys(), proj);
+        proj = ProjectionFactory::Create(map, true);
+        xyPoly = PolygonTools::LatLonToXY(*poly.Polys(), proj);
 
-        delete proj;
-        proj = NULL;
-        delete xyPoly;
-        xyPoly = NULL;
-
-        break;
+        polygonGenerated = true;
       }
-      catch(iException &e) {
-        if(precision && sinc > 1 && linc > 1) {
+      catch (iException &e) {
+        if (precision && sinc > 1 && linc > 1) {
           sinc = sinc * 2 / 3;
           linc = linc * 2 / 3;
           poly.Create(cube, sinc, linc);
           e.Clear();
         }
         else {
-          e.Report(); // This should be an NAIF error
+          delete proj;
+          delete xyPoly;
+          e.Report(); // This should be a NAIF error
           string msg = "Cannot calculate XY for [";
           msg += ui.GetFilename("FROM") + "]";
           throw iException::Message(iException::User, msg, _FILEINFO_);
         }
       }
+
+      delete proj;
+      delete xyPoly;
     }
-
   }
-
-
 
   cube.deleteBlob("Polygon", sn);
   cube.write(poly);

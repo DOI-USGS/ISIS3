@@ -388,6 +388,10 @@ End
      <change name="Christopher Austin" date="2011-05-12">
       Added smarts to the VERTICES option.
     </change>
+     <change name="Travis Addair" date="2011-07-27">
+       Added INCREASEPRECISION option for creating an Image Polygon, the same
+       one as used by "footprintinit".
+    </change>
   </history>
 
   <category>
@@ -664,6 +668,7 @@ End
         </description>
         <inclusions>
           <item>INCTYPE</item>
+          <item>INCREASEPRECISION</item>
           <item>NUMVERTICES</item>
           <item>POLYLINC</item>
           <item>POLYSINC</item>
@@ -711,6 +716,22 @@ End
             </exclusions>
           </option>
         </list>
+      </parameter>
+
+      <parameter name="INCREASEPRECISION">
+        <type>boolean</type>
+        <default><item>FALSE</item></default>
+        <brief>Allow automatic adjustments to fix invalid polygons</brief>
+        <description>
+          Enabeling this option will allow the automatic reduction of the SINC
+          and LINC parameters whenever their current values result in an invalid
+          polygon. In addition, a results group will be created with the
+          keywords SINC/LINC which reveal what SINC/LINC values were actually
+          used for the creation of the footprint.
+
+          NOTE: This parameter can result in a drastic increase in running time
+          as well as a change to user input values.
+        </description>
       </parameter>
           
       <parameter name="POLYLINC">

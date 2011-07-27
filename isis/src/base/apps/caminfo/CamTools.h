@@ -170,7 +170,8 @@ namespace Isis {
       }
       bool hasCenterGeometry() const;
       bool hasLimb() const;
-      void collect(Camera &camera, Cube &cube, bool doGeometry, bool doPolygon);
+      void collect(Camera &camera, Cube &cube, bool doGeometry, bool doPolygon,
+          bool increasePrecision);
       void generateGeometryKeys(PvlObject &pband);
       void generatePolygonKeys(PvlObject &pband);
 

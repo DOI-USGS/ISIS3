@@ -169,9 +169,9 @@ namespace Isis {
    *
    * @param[in]  cube                 (Cube &)    Cube used to create polygon
    *
-   * @param[in]  sampinc (Default=1)  (in)       Pixel increment to define the
+   * @param[in]  sinc (Default=1)  (in)       Pixel increment to define the
    *       granularity of the resulting polygon in the sample direction
-   * @param[in]  lineinc (Default=1)  (in)       Pixel increment to define the
+   * @param[in]  linc (Default=1)  (in)       Pixel increment to define the
    *       granularity of the resulting polygon in the line direction
    *
    * @param[in]  ss    (Default=1)    (in)       Starting sample number
@@ -183,6 +183,8 @@ namespace Isis {
    *       the polygon. Default of 0 will cause nl to be set to the number of
    *       lines in the cube.
    * @param[in]  band  (Default=1)    (in)       Image band number
+   * @param increasePrecision Iteratively refine sinc and linc (defaults to
+   *     false)
    *
    * @history 2008-04-28 Tracie Sucharski, When calculating p_pixInc, set
    *                             to 1 if values calculated is 0.
@@ -190,22 +192,51 @@ namespace Isis {
    *                        sure it is actually on the image.
    * @history 2009-05-28 Stuart Sides - Added the quality argument.
    */
-  void ImagePolygon::Create(Cube &cube, int sampinc, int lineinc,
-                            int ss, int sl, int ns, int nl, int band) {
+  void ImagePolygon::Create(Cube &cube, int sinc, int linc,
+                            int ss, int sl, int ns, int nl, int band,
+                            bool increasePrecision) {
 
-    p_sampinc = sampinc;
-    p_lineinc = lineinc;
-    p_pts = new geos::geom::CoordinateArraySequence();
+    Camera *cam = NULL;
 
-    Camera *cam = initCube(cube, ss, sl, ns, nl, band);
-
-    try {
-      WalkPoly();
-    }
-    catch(iException &e) {
-      std::string msg = "Cannot find polygon for image [" + cube.getFilename();
-      msg += "] The increment/step size might be too large.";
+    if (sinc < 1 || linc < 1) {
+      std::string msg = "Sample and line increments must be 1 or greater";
       throw iException::Message(iException::User, msg, _FILEINFO_);
+    }
+
+    cam = initCube(cube, ss, sl, ns, nl, band);
+
+    // Reduce the increment size to find a valid polygon
+    bool polygonGenerated = false;
+    while (!polygonGenerated) {
+      try {
+        p_sampinc = sinc;
+        p_lineinc = linc;
+
+        p_pts = NULL;
+        p_pts = new geos::geom::CoordinateArraySequence();
+
+        WalkPoly();
+
+        polygonGenerated = true;
+      }
+      catch (iException &e) {
+        delete p_pts;
+
+        sinc = sinc * 2 / 3;
+        linc = linc * 2 / 3;
+
+        if (increasePrecision && (sinc > 1 || linc > 1)) {
+          e.Clear();
+        }
+        else {
+          e.Report(); // This should be a NAIF error
+          std::string msg = "Cannot find polygon for image "
+            "[" + cube.getFilename() + "]: ";
+          msg += increasePrecision ? "Cannot increase precision any further" : 
+              "The increment/step size might be too large";
+          throw iException::Message(iException::User, msg, _FILEINFO_);
+        }
+      }
     }
 
     /*------------------------------------------------------------------------

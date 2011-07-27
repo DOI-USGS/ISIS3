@@ -157,7 +157,7 @@ namespace Isis {
   }
 
   void BandGeometry::collect(Camera &camera, Cube &cube, bool doGeometry,
-                             bool doPolygon) {
+                             bool doPolygon, bool increasePrecision) {
     destruct();
 
     _nLines  = cube.getLineCount();
@@ -304,7 +304,8 @@ namespace Isis {
         poly.Incidence(_maxIncidence);
         poly.Emission(_maxEmission);
         poly.EllipsoidLimb(true);  // Allow disabling of shape model for limbs
-        poly.Create(cube, _sampleInc, _lineInc, 1, 1, 0, 0, band + 1);
+        poly.Create(cube, _sampleInc, _lineInc, 1, 1, 0, 0, band + 1,
+            increasePrecision);
         geos::geom::MultiPolygon *multiP = poly.Polys();
         _polys.push_back(multiP->clone());
         if(_combined == 0) {

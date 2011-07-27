@@ -192,7 +192,9 @@ void IsisMain() {
     bandGeom->setLineInc(polyLinc);
     bandGeom->setMaxIncidence(ui.GetDouble("MAXINCIDENCE"));
     bandGeom->setMaxEmission(ui.GetDouble("MAXEMISSION"));
-    bandGeom->collect(*cam, *incube, doGeometry, doPolygon);
+
+    bool precision = ui.GetBoolean("INCREASEPRECISION");
+    bandGeom->collect(*cam, *incube, doGeometry, doPolygon, precision);
 
     // Check if the user requires valid image center geometry
     if(ui.GetBoolean("VCAMERA") && (!bandGeom->hasCenterGeometry())) {
