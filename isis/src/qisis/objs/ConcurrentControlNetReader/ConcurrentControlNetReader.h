@@ -47,6 +47,11 @@ namespace Isis {
    * the progress will hang at zero percent for a while.
    * 
    * @author Eric Hyer, Steven Lambright, Jai Rideout
+   *
+   * @internal
+   *   @history 2011-07-27 Jai Rideout - The original thread count is now
+   *                           restored after reading has finished.
+   *     
    */
   class ConcurrentControlNetReader : public QObject {
       Q_OBJECT
@@ -81,6 +86,13 @@ namespace Isis {
       
       //! This is the binary container when reading a network
       LatestControlNetFile *m_versionerFile;
+
+      /** 
+       * This is needed to store off the original QtConcurrent thread count so
+       * that it can later be restored. This class uses a single thread to do
+       * the reading, as no performance gains were realized with more threads.
+       */
+      int m_originalThreadCount;
 
 
     private:

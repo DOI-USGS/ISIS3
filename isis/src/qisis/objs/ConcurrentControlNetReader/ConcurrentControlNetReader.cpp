@@ -54,6 +54,8 @@ namespace Isis {
   ConcurrentControlNetReader::ConcurrentControlNetReader() {
     nullify();
 
+    m_originalThreadCount = 1;
+
     m_readWatcher = new QFutureWatcher<LatestControlNetFile *>;
     m_builderWatcher = new QFutureWatcher< QAtomicPointer< ControlNet > >;
 
@@ -100,6 +102,7 @@ namespace Isis {
    * @param filename The filename of the network to read
    */
   void ConcurrentControlNetReader::read(QString filename) {
+    m_originalThreadCount = QThreadPool::globalInstance()->maxThreadCount();
     QThreadPool::globalInstance()->setMaxThreadCount(1);
     QFuture<LatestControlNetFile *> result =
         QtConcurrent::run(ReadNetworkFunctor(filename));
@@ -157,6 +160,7 @@ namespace Isis {
     delete m_versionerFile;
     m_versionerFile = NULL;
 
+    QThreadPool::globalInstance()->setMaxThreadCount(m_originalThreadCount);
     emit networkReadFinished(m_builderWatcher->result());
   }
 
