@@ -569,6 +569,9 @@ namespace Qisis {
    *                          EditLocked=True, but the original measure was
    *                          False, and we woouldn't allow the measure to be
    *                          saved.
+   *   @history 2011-07-25 Tracie Sucharski - Removed editPointChanged signal
+   *                          since the editPoint is not changed.  This helped
+   *                          with qnet windows blinking due to refresh.
    */
   void QnetTool::measureSaved() {
 
