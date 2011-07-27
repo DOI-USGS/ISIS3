@@ -145,4 +145,4 @@ for i in range(len(csv_1)):
             "(line %d, column %s)!" % (line_num, column_1))
 
 # No errors, all was good
-print "SUCCESS all error values are within expected tolerance!"
+print "SUCCESS All error values are within expected tolerance!"
