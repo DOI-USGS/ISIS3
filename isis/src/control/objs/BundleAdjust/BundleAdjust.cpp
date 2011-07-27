@@ -5444,6 +5444,8 @@ void BundleAdjust::SpecialKIterationSummary() {
    *                      consistent for comparer   
    * @history 2011-06-05 Debbie A. Cook - Fixed output of spacecraft position
    *                      when it is not part of the bundle
+   * @history 2011-07-26 Debbie A. Cook - Omitted output of camera angles for 
+   *                      radar, which only has spacecraft position
    */
   bool BundleAdjust::OutputNoErrorPropagation() {
 
@@ -6326,8 +6328,9 @@ void BundleAdjust::SpecialKIterationSummary() {
         if ( m_cmatrixSolveType > 0 )
           pSpiceRotation->GetPolynomial(coefRA,coefDEC,coefTWI);
 //          else { // frame camera
-        else { 
-// This is for m_cmatrixSolveType = None and no polynomial fit has occurred
+        else if (pCamera->GetCameraType() != 3) { 
+// This is for m_cmatrixSolveType = None (except Radar which has no pointing) 
+// and no polynomial fit has occurred
           angles = pSpiceRotation->GetCenterAngles();
           coefRA.push_back(angles.at(0));
           coefDEC.push_back(angles.at(1));
@@ -6846,7 +6849,8 @@ void BundleAdjust::SpecialKIterationSummary() {
           }
         }
 
-        else{
+        else if ( pCamera->GetCameraType() != 3 ) {
+        // don't print anything for radar 
           output_columns.push_back(boost::lexical_cast<std::string>
               (coefRA[0]*RAD2DEG));
           output_columns.push_back(boost::lexical_cast<std::string>(0.0));
