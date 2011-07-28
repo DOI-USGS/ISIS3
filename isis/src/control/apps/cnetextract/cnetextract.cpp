@@ -41,6 +41,7 @@ void WriteResults(iString filename, QVector<iString> results);
 void omit(ControlNet &cnet, int cp);
 void omit(ControlPoint *point, int cm);
 
+
 // Main program
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
@@ -80,6 +81,11 @@ void IsisMain() {
   if(ui.WasEntered("FROMLIST")) {
     inList = ui.GetFilename("FROMLIST");
   }
+
+  int inputPoints = outNet.GetNumPoints();
+  int inputMeasures = 0;
+  for (int cp = 0; cp < outNet.GetNumPoints(); cp++)
+    inputMeasures += outNet.GetPoint(cp)->GetNumMeasures();
 
   // Set up the Serial Number to Filename mapping
   QMap<iString, iString> sn2filename;
@@ -306,6 +312,17 @@ void IsisMain() {
   // Adds the remove history to the summary and results group
   PvlGroup summary("ResultSummary");
   PvlGroup results("Results");
+
+  summary.AddKeyword(PvlKeyword("InputPoints", iString(inputPoints)));
+  summary.AddKeyword(PvlKeyword("InputMeasures", iString(inputMeasures)));
+
+  int outputPoints = outNet.GetNumPoints();
+  int outputMeasures = 0;
+  for (int cp = 0; cp < outNet.GetNumPoints(); cp++)
+    outputMeasures += outNet.GetPoint(cp)->GetNumMeasures();
+
+  summary.AddKeyword(PvlKeyword("OutputPoints", iString(outputPoints)));
+  summary.AddKeyword(PvlKeyword("OutputMeasures", iString(outputMeasures)));
 
   if(noIgnore) {
     summary.AddKeyword(PvlKeyword("IgnoredPoints", iString((int)ignoredPoints.size())));
@@ -645,7 +662,17 @@ bool NotInLatLonRange(SurfacePoint surfacePtToTest, Latitude minlat,
                       Latitude maxlat, Longitude minlon, Longitude maxlon) {
   Latitude lat = surfacePtToTest.GetLatitude();
   Longitude lon = surfacePtToTest.GetLongitude();
-  return !lat.IsInRange(minlat, maxlat) || !lon.IsInRange(minlon, maxlon);
+
+  bool outRange = false;
+  try {
+    outRange = !lat.IsInRange(minlat, maxlat) || !lon.IsInRange(minlon, maxlon);
+  }
+  catch (iException &e) {
+    iString msg = "Cannot complete lat/lon range test with given filters";
+    throw iException::Message(iException::User, msg, _FILEINFO_);
+  }
+
+  return outRange;
 }
 
 

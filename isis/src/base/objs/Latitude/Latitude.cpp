@@ -345,17 +345,21 @@ namespace Isis {
    * @return Whether the latitude is in the given range
    */
   bool Latitude::IsInRange(Latitude min, Latitude max) const {
-    // Maximal change in angle allowed
-    Latitude deltaMax = max - min;
+    // Validity check on the range
+    if (min > max) {
+      iString msg = "Minimum latitude [" + iString(min.GetDegrees()) +
+        "] degrees is greater than maximum latitude [" +
+        iString(max.GetDegrees()) + "] degrees";
+      throw iException::Message(iException::User, msg, _FILEINFO_);
+    }
 
     // Provide a little wriggle room for precision problems
-    deltaMax += Angle(DBL_EPSILON, Angle::Degrees);
+    Angle epsilon(DBL_EPSILON, Angle::Degrees);
+    Latitude adjustedMin = min - epsilon;
+    Latitude adjustedMax = max + epsilon;
 
-    // Define the change in this angle from the min
-    Latitude delta = *this - min;
-
-    // If this change is less than or equal to the max, it is within range
-    return delta <= deltaMax;
+    // Is this latitude between the min and the max
+    return *this >= adjustedMin && *this <= adjustedMax;
   }
 
 
