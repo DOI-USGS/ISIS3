@@ -154,6 +154,8 @@ namespace Qisis {
    *                          stay in qnet, they really need cleaning up.  This
    *                          was a quick & dirty band-aid until cneteditor is
    *                          ready to be folded into qnet.
+   *   @history 2011-07-27 Tracie Sucharski - Added method to return the radius
+   *                          from a Dem if one is open.
    */
   class QnetTool : public Tool {
     Q_OBJECT
@@ -272,6 +274,7 @@ namespace Qisis {
       void loadTemplateFile(QString);
       bool okToContinue();
       void initDem(QString demFile);
+      double demRadius(double latitude, double longitude);
       void clearGroundSource();
       bool IsMeasureLocked(Isis::iString serialNumber);
 

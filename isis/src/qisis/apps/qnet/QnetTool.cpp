@@ -720,31 +720,19 @@ namespace Qisis {
       //  TODO:  If groundSource file opened does not match the SurfacePoint Source
       //  file, print warning.
 
-      //  Find temporary ground measure
-
-      //  Do not know why this code was necessary. Commented out on 7/18/2011
-      //  TODO:  If not needed, delete!
-//    ControlMeasure *groundMeasure = p_editPoint->GetMeasure(p_groundSN);
-//    if (!p_groundGmap->SetImage(groundMeasure->GetSample(),
-//                                groundMeasure->GetLine())) {
-//      //  TODO  error??? This should never happen
-//    }
-      
       // Is ground on right or left?  Use ground measure to update apriori
       //  surface point.
+      ControlMeasure *groundMeasure = NULL;
       if (p_leftMeasure->GetCubeSerialNumber() == p_groundSN) {
-        if (!p_groundGmap->SetImage(p_leftMeasure->GetSample(),
-                                    p_leftMeasure->GetLine())) {
-          // TODO :  should never happen, either add error check or
-         //        get rid of
-        }
+        groundMeasure = p_leftMeasure;
       }
       else {
-        if (!p_groundGmap->SetImage(p_rightMeasure->GetSample(),
-                                    p_rightMeasure->GetLine())) {
-          // TODO :  should never happen, either add error check or
-           //      get rid of
-        }
+        groundMeasure = p_rightMeasure;
+      }
+      if (!p_groundGmap->SetImage(groundMeasure->GetSample(),
+                                  groundMeasure->GetLine())) {
+        // TODO :  should never happen, either add error check or
+         //      get rid of
       }
 
       double lat = p_groundGmap->UniversalLatitude();
@@ -752,15 +740,22 @@ namespace Qisis {
       double radius;
       //  Update radius
       if (p_demOpen) {
-        Brick pixel(1,1,1,p_demCube->getPixelType());
-        int intSamp = (int) (p_rightMeasure->GetSample() + 0.5);
-        int intLine = (int) (p_rightMeasure->GetLine() + 0.5);
-        pixel.SetBasePosition(intSamp,intLine,1);
-        p_demCube->read(pixel);
-        radius = pixel[0];
+        radius = demRadius(lat,lon);
       }
       else {
-        radius = p_groundGmap->Projection()->LocalRadius();
+        //  Get radius from reference image
+        if (p_editPoint->GetRefMeasure()->Camera()->SetGround(
+                  Latitude(lat, Angle::Degrees), Longitude(lon, Angle::Degrees))) {
+          radius = p_editPoint->GetRefMeasure()->Camera()->LocalRadius().GetMeters();
+          //radius = p_groundGmap->Projection()->LocalRadius();
+        }
+        else {
+          QString message = "Error trying to get radius at this pt.  "
+              "Lat/Lon does not fall on the reference measure.  "
+              "Cannot save this measure.";
+          QMessageBox::critical((QWidget *)parent(),"Error",message);
+          return;
+        }
       }
       try {
         p_editPoint->SetAprioriSurfacePoint(SurfacePoint(
@@ -1408,7 +1403,13 @@ namespace Qisis {
       }
 
       //  ??????       What radius , check for dem or shape model
-      double radius = p_groundGmap->Projection()->LocalRadius();
+      double radius = 0;
+      if (p_demOpen) {
+        radius = demRadius(lat,lon);
+      }
+      else {
+        radius = p_groundGmap->Projection()->LocalRadius();
+      }
 
       fixedPoint->SetAprioriSurfacePoint(SurfacePoint(
                                           Latitude(lat, Angle::Degrees),
@@ -3336,6 +3337,26 @@ namespace Qisis {
     g_serialNumberList->Delete(p_groundSN);
   }
 
+
+
+
+
+  double QnetTool::demRadius(double latitude, double longitude) {
+
+    if (!p_demOpen) return Isis::Null;
+
+    UniversalGroundMap *demMap = new UniversalGroundMap(*p_demCube);
+    demMap->SetGround(Latitude(latitude, Angle::Degrees),
+                      Longitude(longitude, Angle::Degrees));
+    Brick pixel(1,1,1,p_demCube->getPixelType());
+    int intSamp = (int) (demMap->Sample() + 0.5);
+    int intLine = (int) (demMap->Line() + 0.5);
+    pixel.SetBasePosition(intSamp,intLine,1);
+    p_demCube->read(pixel);
+    double radius = pixel[0];
+
+    return radius;
+  }
 
 
 
