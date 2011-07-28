@@ -74,6 +74,11 @@ void IsisMain() {
     Progress statsProgress;
     ControlNetFilter cNetFilter(&cNet, sSerialNumFile, &statsProgress);
     
+    // Log the summary of the input Control Network
+    PvlGroup statsGrp;
+    cNetFilter.GenerateControlNetStats(statsGrp);
+    Application::Log(statsGrp); 
+    
     // Run Filters using Deffile
     if (ui.WasEntered("DEFFILE")) {
       cNetFilter.SetOutputFile(sOutFile);
@@ -90,12 +95,6 @@ void IsisMain() {
     if (ui.WasEntered("CREATE_POINT_STATS") && ui.GetBoolean("CREATE_POINT_STATS")) {
       cNetFilter.GeneratePointStats(sPointFile);
     }
-    
-    // Log the summary of Control Network
-    PvlGroup statsGrp;
-    cNetFilter.GenerateControlNetStats(statsGrp);
-    Application::Log(statsGrp);
-     
   } // REFORMAT THESE ERRORS INTO ISIS TYPES AND RETHROW
   catch(Isis::iException &e) {
     throw;

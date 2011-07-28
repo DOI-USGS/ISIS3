@@ -21,9 +21,9 @@
      TotalMeasures, ValidMeasures, IgnoredMeasures, EditLockMeasures, 
      MinLineResidual, MinSampleResidual, MaxLineResidual, MaxSampleResidual, 
      MinPixelShift, MaxPixleShift, AvgPixelShift, MinLineShift, MaxLineShift, 
-     MinSampleShift, MaxSampleShift. This is displayed in PVL format in the 
-     Application Gui and also logged in the print.prt file. This Statistics is 
-     generated irrespective of the options chosen. 
+     MinSampleShift, MaxSampleShift on the input ControlNet. This is displayed 
+     in PVL format in the Application Gui and also logged in the print.prt file. 
+     This Statistics is generated irrespective of the options chosen. 
     </p>
     <p>
     Additional Statistics can be generated if required based on Images and/or 
@@ -375,6 +375,9 @@
     <change name="Sharmila Prasad" date="2011-07-21"> Report and filter 
       by new data members edit lock, residual tolerance and pixelshift
     </change>
+     <change name="Sharmila Prasad" date="2011-07-28"> Report the stats for the 
+    input controlnet for now
+     </change>
   </history>
       
   <groups>
