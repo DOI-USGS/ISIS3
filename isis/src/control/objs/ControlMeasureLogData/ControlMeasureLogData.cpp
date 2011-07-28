@@ -267,6 +267,9 @@ namespace Isis {
 
       case MaximumPixelZScore:
         return "MaximumPixelZScore";
+
+      case PixelShift:
+        return "PixelShift";
     }
 
     iString msg = "Unknown data type [" + iString(type) + "]";

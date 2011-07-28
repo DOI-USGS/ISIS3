@@ -113,13 +113,19 @@ namespace Isis {
         /**
          * @see MinimumPixelZScore
          */
-        MaximumPixelZScore        = 4
+        MaximumPixelZScore        = 4,
+
+        /**
+         * Deprecated keyword kept for backwards compatability with older
+         * Control Networks.  DO NOT USE!!
+         */
+        PixelShift                = 5
       };
       /**
        * This value must be > the largest enumerated value in this type or
        * convertions to and from Pvl will not work.
        */
-      static const int MaximumNumericLogDataType = 5;
+      static const int MaximumNumericLogDataType = 6;
 
 
       ControlMeasureLogData();
