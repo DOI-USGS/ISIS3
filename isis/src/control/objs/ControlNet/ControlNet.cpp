@@ -1057,7 +1057,7 @@ namespace Isis {
   int ControlNet::GetNumEditLockMeasures() {
     int numLockedMeasures = 0;
     foreach(ControlPoint * p, *points) {
-      numLockedMeasures += p->GetNumMeasures() - p->GetNumLockedMeasures();
+      numLockedMeasures += p->GetNumLockedMeasures();
     }
 
     return numLockedMeasures;

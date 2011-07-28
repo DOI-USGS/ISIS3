@@ -147,6 +147,7 @@ namespace Isis {
    *   @history 2011-06-28 Eric Hyer - Added getEdgeCount() method
    *   @history 2011-07-08 Travis Addair - Locked points can no longer be
    *                deleted
+   *    @history 2011-07-27 Sharmila Prasad - Fixed bug in GetNumEditLockMeasures()
    */
   class ControlNet : public QObject {
       Q_OBJECT
