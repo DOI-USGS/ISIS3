@@ -84,51 +84,51 @@ namespace Isis {
     pStatsGrp += PvlKeyword("ConstrainedPoints", NumConstrainedPoints());
     pStatsGrp += PvlKeyword("FreePoints",        NumFreePoints());
     pStatsGrp += PvlKeyword("EditLockPoints",    mCNet->GetNumEditLockPoints());
-    
-    double dError = GetAverageResidual();
-    pStatsGrp += PvlKeyword("AverageResidual",   (dError == Isis::NULL8 ? "N/A" : iString(dError)));
-
-    dError = GetMinimumResidual();
-    pStatsGrp += PvlKeyword("MinimumResidual",   (dError == Isis::NULL8 ? "N/A" : iString(dError)));
-
-    dError = GetMaximumResidual();
-    pStatsGrp += PvlKeyword("MaximumResidual",   (dError == Isis::NULL8 ? "N/A" : iString(dError)));
 
     pStatsGrp += PvlKeyword("TotalMeasures",     NumMeasures());
     pStatsGrp += PvlKeyword("ValidMeasures",     NumValidMeasures());
     pStatsGrp += PvlKeyword("IgnoredMeasures",   NumIgnoredMeasures());
     pStatsGrp += PvlKeyword("EditLockMeasures",  mCNet->GetNumEditLockMeasures());
 
+    double dError = GetAverageResidual();
+    pStatsGrp += PvlKeyword("AvgResidual",       (dError == Isis::NULL8 ? "N/A" : iString(dError)));
+
+    dError = GetMinimumResidual();
+    pStatsGrp += PvlKeyword("MinResidual",       (dError == Isis::NULL8 ? "N/A" : iString(dError)));
+
+    dError = GetMaximumResidual();
+    pStatsGrp += PvlKeyword("MaxResidual",       (dError == Isis::NULL8 ? "N/A" : iString(dError)));
+    
     dError = GetMinLineResidual();
     pStatsGrp += PvlKeyword("MinLineResidual",   (dError == Isis::NULL8 ? "N/A" : iString(dError)));
-
-    dError = GetMinSampleResidual();
-    pStatsGrp += PvlKeyword("MinSampleResidual", (dError == Isis::NULL8 ? "N/A" : iString(dError)));
 
     dError = GetMaxLineResidual();
     pStatsGrp += PvlKeyword("MaxLineResidual",   (dError == Isis::NULL8 ? "N/A" : iString(dError)));
 
+    dError = GetMinSampleResidual();
+    pStatsGrp += PvlKeyword("MinSampleResidual", (dError == Isis::NULL8 ? "N/A" : iString(dError)));
+    
     dError = GetMaxSampleResidual();
     pStatsGrp += PvlKeyword("MaxSampleResidual", (dError == Isis::NULL8 ? "N/A" : iString(dError)));
     
     // Shifts - Line, Sample, Pixel
+    dError = GetAvgPixelShift();
+    pStatsGrp += PvlKeyword("AvgPixelShift",     (dError == Isis::NULL8 ? "N/A" : iString(dError)));
+    
     dError = GetMinPixelShift();
     pStatsGrp += PvlKeyword("MinPixelShift",     (dError == Isis::NULL8 ? "N/A" : iString(dError)));
     
     dError = GetMaxPixelShift();
     pStatsGrp += PvlKeyword("MaxPixelShift",     (dError == Isis::NULL8 ? "N/A" : iString(dError)));
     
-    dError = GetAvgPixelShift();
-    pStatsGrp += PvlKeyword("AvgPixelShift",     (dError == Isis::NULL8 ? "N/A" : iString(dError)));
-    
     dError = GetMinLineShift();
     pStatsGrp += PvlKeyword("MinLineShift",      (dError == Isis::NULL8 ? "N/A" : iString(dError)));
+    
+    dError = GetMaxLineShift();
+    pStatsGrp += PvlKeyword("MaxLineShift",      (dError == Isis::NULL8 ? "N/A" : iString(dError)));
 
     dError = GetMinSampleShift();
     pStatsGrp += PvlKeyword("MinSampleShift",    (dError == Isis::NULL8 ? "N/A" : iString(dError)));
-
-    dError = GetMaxLineShift();
-    pStatsGrp += PvlKeyword("MaxLineShift",      (dError == Isis::NULL8 ? "N/A" : iString(dError)));
 
     dError = GetMaxSampleShift(); 
     pStatsGrp += PvlKeyword("MaxSampleShift",    (dError == Isis::NULL8 ? "N/A" : iString(dError)));
