@@ -45,12 +45,12 @@ namespace Qisis {
       //Disconnecting both buttons from all their old connection so we have complete control.
       disconnect(p_allPButtons[i], 0, 0, 0);
       if(p_allPButtons[i]->text().contains("Open", Qt::CaseInsensitive)) {
-        connect(p_allPButtons[i], SIGNAL(pressed()), this, SLOT(done()));
+        connect(p_allPButtons[i], SIGNAL(clicked()), this, SLOT(done()));
       }
       if(p_allPButtons[i]->text() == "Cancel") {
         ///I had to disconnect this buttons signal because I overwrote the
         //done method from QDialog which is what this used to be connected to.
-        connect(p_allPButtons[i], SIGNAL(pressed()), this, SLOT(cancel()));
+        connect(p_allPButtons[i], SIGNAL(clicked()), this, SLOT(cancel()));
       }
     }
 

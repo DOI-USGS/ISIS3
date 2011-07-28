@@ -8,24 +8,23 @@
 
 namespace Qisis {
   /**
-  * @brief Class for browsing cubes.
-  *
-  * @ingroup Visualization Tools
-  *
-  * @author Stacy Alley
-  *
-  * @internal
-  *
-   * @history 2008-01-18 Stacy Alley - Changed the constructor to
-   * accept a QStringList which serves as the default filters for
-   * the file dialog boxes.
+   * @brief Class for browsing cubes.
    *
-   * @history 2008-01-28 Stacy Alley - Changed the constructor
-   *          again to accept a QDir which is the default directory
-   *          the file dialog box should point to.
-  */
-
-
+   * @ingroup Visualization Tools
+   *
+   * @author Stacy Alley
+   *
+   * @internal
+   *   @history 2008-01-18 Stacy Alley - Changed the constructor to
+   *                           accept a QStringList which serves as the default
+   *                           filters for the file dialog boxes.
+   *   @history 2008-01-28 Stacy Alley - Changed the constructor
+   *                           again to accept a QDir which is the default
+   *                           directory the file dialog box should point to.
+   *   @history 2011-07-28 Steven Lambright - Now connects to the buttons'
+   *                           clicked signals instead of pressed, clicked is
+   *                           the appropriate signal. Fixes #270
+   */
   class FileDialog : public QFileDialog {
       Q_OBJECT
     public:
