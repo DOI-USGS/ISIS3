@@ -64,6 +64,9 @@ namespace Isis {
       if (!bPntEditLock) {
         newPnt->SetDateTime(Application::DateTime());
       }
+      else {
+        pvlPointObj += Isis::PvlKeyword("Reference", "No Change, PointEditLock"); 
+      }
 
       int iNumMeasuresLocked = newPnt->GetNumLockedMeasures();
       bool bRefLocked = newPnt->GetRefMeasure()->IsEditLocked();
@@ -177,24 +180,33 @@ namespace Isis {
         }
       } // end Free
       else {
-        int iComment = 1;
+        int iComment = 0;
         if (iRefIndex < 0) {
-          std::string sComment = "Comment" + iComment++;
+          iString sComment = "Comment";
+          sComment += iString(++iComment);
           pvlPointObj += Isis::PvlKeyword(sComment, "No Measures in the Point");
         }
 
         if (newPnt->IsIgnored()) {
-          std::string sComment = "Comment" + iComment++;
+          iString sComment = "Comment";
+          sComment += iString(++iComment);
           pvlPointObj += Isis::PvlKeyword(sComment, "Point was originally Ignored");
         }
 
         if (origPnt->GetType() == ControlPoint::Fixed) {
-          std::string sComment = "Comment" + iComment++;
-          pvlPointObj += Isis::PvlKeyword(sComment, "Not a Free Point");
+          iString sComment = "Comment";
+          sComment += iString(++iComment);
+          pvlPointObj += Isis::PvlKeyword(sComment, "Fixed Point");
+        }
+        else if (newPnt->GetType() == ControlPoint::Constrained) {
+          iString sComment = "Comment";
+          sComment += iString(++iComment);
+          pvlPointObj += Isis::PvlKeyword(sComment, "Constrained Point");
         }
 
         if (iNumMeasuresLocked > 0 && !bRefLocked) {
-          pvlPointObj += Isis::PvlKeyword("Error", "Point has Measure(s) with EditLock set to true but not the Reference");
+          pvlPointObj += Isis::PvlKeyword("Error", "Point has a Measure with EditLock set to true "
+                                          "but the Reference is not Locked");
         }
 
         for (int measure = 0; measure < newPnt->GetNumMeasures(); measure++) {
