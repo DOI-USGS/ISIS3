@@ -452,20 +452,23 @@ namespace Isis
               columns->getVisibleXRange(activeCell->second));
 
             editWidget->move(
-              QPoint(xRange.first - horizontalScrollBar()->value() - 1,
-                  relativeTopLeft.y() + 1));
-            editWidget->resize(xRange.second - xRange.first, rowHeight + 1);
+                QPoint((int) (xRange.first -
+                horizontalScrollBar()->value() - 1),
+                relativeTopLeft.y() + 1));
+            editWidget->resize((int) (xRange.second - xRange.first),
+                rowHeight + 1);
             editWidget->setVisible(true);
             editWidgetVisible = true;
           }
           else
+          {
             if (activeCell->first == items->at(i))
             {
               QPair<double, double> activeXArea =
                 columns->getVisibleXRange(activeCell->second);
 
-              QRect activeArea(activeXArea.first, relativeTopLeft.y(),
-                  activeXArea.second - activeXArea.first, rowHeight);
+              QRect activeArea((int) activeXArea.first, relativeTopLeft.y(),
+                  (int) (activeXArea.second - activeXArea.first), (int) rowHeight);
 
               activeArea.moveLeft(
                 activeArea.left() - horizontalScrollBar()->value());
@@ -477,6 +480,7 @@ namespace Isis
               painter.setPen(pen);
               painter.drawRect(activeArea);
             }
+          }
         }
       }
 
@@ -628,8 +632,8 @@ namespace Isis
       {
         // draw text
         QPair<double, double> cellXRange(visibleCols.getVisibleXRange(i));
-        QRect cellRect(cellXRange.first, point.y(),
-            cellXRange.second - cellXRange.first, rowHeight);
+        QRect cellRect((int) cellXRange.first, point.y(),
+            (int) (cellXRange.second - cellXRange.first), (int) rowHeight);
         cellRect.moveLeft(cellRect.left() - horizontalScrollBar()->value() - 1);
 
         QString columnTitle = visibleCols.at(i)->getTitle();
@@ -759,8 +763,8 @@ namespace Isis
       for (int i = 0; i < visibleCols.size(); i++)
       {
         QPair<double, double> cellXRange(columns->getVisibleXRange(i));
-        QRect cellRect(cellXRange.first, rowHeight * rowNum,
-            cellXRange.second - cellXRange.first, rowHeight);
+        QRect cellRect((int) cellXRange.first, rowHeight * rowNum,
+            (int) (cellXRange.second - cellXRange.first), rowHeight);
         
         cellRect.moveLeft(cellRect.left() - horizontalScrollBar()->value());
 
