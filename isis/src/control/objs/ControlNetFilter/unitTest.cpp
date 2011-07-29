@@ -54,7 +54,7 @@ void IsisMain() {
   cnet = new ControlNet(ui.GetFilename("CNET"));
   cnetFilter = new ControlNetFilter(cnet, sSerialFile);
   filterGrp = PvlGroup("Point_EditLock");
-  keyword= PvlKeyword("EditLock", false);
+  keyword= PvlKeyword("EditLock", true);
   filterGrp += keyword;
   cnetFilter->PointEditLockFilter(filterGrp, false);
   filterGrp.Clear();
@@ -66,13 +66,13 @@ void IsisMain() {
   cout << "************************************************************************\n\n";  
   
   // PointMeasureEditLock Filter
-  cout << "****************** Point_MeasureEditLock Filter ******************" << endl;  
+  cout << "****************** Point_NumMeasuresEditLock Filter ******************" << endl;  
   cnet = new ControlNet(ui.GetFilename("CNET"));
   cnetFilter = new ControlNetFilter(cnet, sSerialFile);
-  filterGrp = PvlGroup("Point_MeasureEditLock");
+  filterGrp = PvlGroup("Point_NumMeasuresEditLock");
   keyword = PvlKeyword("LessThan", 1);
   filterGrp += keyword;
-  cnetFilter->PointMeasureEditLockFilter(filterGrp, false);
+  cnetFilter->PointNumMeasuresEditLockFilter(filterGrp, false);
   filterGrp.Clear();
   PrintControlNetInfo(*cnet);
   delete (cnet);
@@ -212,18 +212,18 @@ void IsisMain() {
   cout << "************************************************************************\n\n";
 
   // Filter Points by Goodness of Fit
-  /* 
-  cnet = new ControlNet(ui.GetFilename("CNET"));
-  cnetFilter = new ControlNetFilter(cnet, sSerialFile);
-  filterGrp = PvlGroup("Point_GoodnessOfFit");
-  keyword = PvlKeyword("LessThan", 5);
-  filterGrp += keyword;
-  cnetFilter->PointGoodnessOfFitFilter(filterGrp,  false);
-  filterGrp.Clear()                                      ;
-  delete (cnet);
-  delete (cnetFilter);
-  cnetFilter = NULL;
-  cnet = NULL;*/
+   
+  //cnet = new ControlNet(ui.GetFilename("CNET"));
+  //cnetFilter = new ControlNetFilter(cnet, sSerialFile);
+  //filterGrp = PvlGroup("Point_GoodnessOfFit");
+  //keyword = PvlKeyword("LessThan", 5);
+ // filterGrp += keyword;
+ // cnetFilter->PointGoodnessOfFitFilter(filterGrp,  false);
+ // filterGrp.Clear()                                      ;
+ // delete (cnet);
+ // delete (cnetFilter);
+ // cnetFilter = NULL;
+ // cnet = NULL;
   
 
   // Point_CubeNames Filter

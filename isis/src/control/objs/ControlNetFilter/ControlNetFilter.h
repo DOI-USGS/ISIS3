@@ -80,7 +80,7 @@ namespace Isis {
       void PointEditLockFilter(const PvlGroup &pvlGrp, bool pbLastFilter);
 
       //! Filter Points by Measure Edit Lock number
-      void PointMeasureEditLockFilter(const PvlGroup &pvlGrp, bool pbLastFilter);
+      void PointNumMeasuresEditLockFilter(const PvlGroup &pvlGrp, bool pbLastFilter);
       
       //! Filter Points by Residual Magnitude
       void PointResMagnitudeFilter(const PvlGroup &pvlGrp, bool pbLastFilter);

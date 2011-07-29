@@ -154,7 +154,7 @@ namespace Isis {
 
     if (pbLastFilter) {
       mOstm << "PointID, PointType, PointIgnore, PointEditLock, Filename, SerialNum, PixelShift, MeasureType, MeasureIgnore, MeasureEditLock, Reference, ";
-      mOstm << endl << endl;
+      mOstm << endl;
     }
 
     int iNumPoints = mCNet->GetNumPoints();
@@ -176,7 +176,8 @@ namespace Isis {
 
           const ControlMeasure *measure = cPoint->GetMeasure(j);
           PrintCubeFileSerialNum(*measure);
-          mOstm << ", " << measure->GetPixelShift() << ", "
+          double dPixelShift = measure->GetPixelShift();
+          mOstm << ", " <<  (dPixelShift == Null ? "Null" : iString(dPixelShift)) << ", "
                 << measure->GetMeasureTypeString() << ", "
                 << sBoolean[measure->IsIgnored()] << ", "
                 << sBoolean[measure->IsEditLocked()] << ", "
@@ -197,7 +198,7 @@ namespace Isis {
    * @param pvlGrp - Deffile Input group
    * @param pbLastFilter - Is this the last filter - for printing purposes. 
    */
-  void ControlNetFilter::PointMeasureEditLockFilter(const PvlGroup &pvlGrp, bool pbLastFilter){
+  void ControlNetFilter::PointNumMeasuresEditLockFilter(const PvlGroup &pvlGrp, bool pbLastFilter){
     int iLesser  = VALID_MAX2;
     int iGreater = 0;
 
@@ -217,7 +218,7 @@ namespace Isis {
     
     if (pbLastFilter) {
       PointStatsHeader();
-      mOstm << "Filename, SerialNum, MeasureType, MeasureIgnore, MeasureEditLock, Reference" << endl << endl;
+      mOstm << "Filename, SerialNum, MeasureType, MeasureIgnore, MeasureEditLock, Reference" << endl;
     }
     
     int iNumPoints = mCNet->GetNumPoints();
@@ -260,8 +261,9 @@ namespace Isis {
     bool editLock = false;
     
     if (pvlGrp.HasKeyword("EditLock")) {
-      if (pvlGrp["EditLock"][0] == "true")
+      if(pvlGrp["EditLock"][0] == "1" || iString(pvlGrp["EditLock"][0]).DownCase() == "true")
         editLock = true;
+      //cerr << "Pvl Flag=" << pvlGrp["EditLock"][0] <<  endl;
     }
     
     if (pbLastFilter) {
@@ -269,10 +271,13 @@ namespace Isis {
       mOstm << endl;
     }
     
+    //cerr << "Point Lock Flag=" << editLock << endl;
+    
     int iNumPoints = mCNet->GetNumPoints();
     for (int i = (iNumPoints - 1); i >= 0; i--) {
       ControlPoint *cPoint = mCNet->GetPoint(i);
       if (cPoint->IsEditLocked() != editLock) {
+        //cerr << i << ". Point Locked=" << cPoint->IsEditLocked() << "\n";
         FilterOutPoint(i);
         continue;
       }
@@ -320,7 +325,7 @@ namespace Isis {
 
     if (pbLastFilter) {
       mOstm << "PointID, PointType, PointIgnore,PointEditLock, Filename, SerialNum, ResidualMagnitude, MeasureType, MeasureIgnore, MeasureEditLock, Reference, ";
-      mOstm << endl << endl;
+      mOstm << endl;
     }
     
     int iNumPoints = mCNet->GetNumPoints();
@@ -342,7 +347,8 @@ namespace Isis {
 
           const ControlMeasure *measure = cPoint->GetMeasure(j);
           PrintCubeFileSerialNum(*measure);
-          mOstm << ", " << measure->GetResidualMagnitude() << ", "
+          double dResMag = measure->GetResidualMagnitude();
+          mOstm << ", " << (dResMag == Null ? "Null" : iString(dResMag) ) << ", "
                 << measure->GetMeasureTypeString() << ", "
                 << sBoolean[measure->IsIgnored()] << ", "
                 << sBoolean[measure->IsEditLocked()] << ", "
@@ -384,7 +390,7 @@ namespace Isis {
 
     if (pbLastFilter) {
       PointStatsHeader();
-      mOstm << endl << endl;
+      mOstm << endl;
     }
 
     for (int i = (iNumPoints - 1); i >= 0; i--) {
@@ -441,7 +447,7 @@ namespace Isis {
 
     if (pbLastFilter) {
       PointStatsHeader();
-      mOstm << "Filename, SerialNum, MeasureType, MeasureIgnore, MeasureEditLock, Reference" << endl << endl;
+      mOstm << "Filename, SerialNum, MeasureType, MeasureIgnore, MeasureEditLock, Reference" << endl;
     }
 
     int iNumPoints = mCNet->GetNumPoints();
@@ -481,7 +487,7 @@ namespace Isis {
     bool bIgnoredFlag = false;
     int iSetIgnoreFlag = 0;
     iString sType = "";
-    string sTemp = "";
+    iString sTemp = "";
 
     if (pvlGrp.HasKeyword("PointType")) {
       sType = pvlGrp["PointType"][0];
@@ -491,14 +497,14 @@ namespace Isis {
     if (pvlGrp.HasKeyword("Ignore")) {
       iSetIgnoreFlag = 1;
       sTemp = pvlGrp["Ignore"][0];
-      if (sTemp == "true") {
+      if (sTemp == "1" || sTemp.DownCase() == "true") {
         bIgnoredFlag = true;
       }
     }
 
     if (pbLastFilter) {
       PointStatsHeader();
-      mOstm << endl << endl;
+      mOstm << endl;
     }
 
     int iNumPoints = mCNet->GetNumPoints();
@@ -578,7 +584,7 @@ namespace Isis {
 
     if (pbLastFilter) {
       PointStatsHeader();
-      mOstm << "Latitude, Longitude, Radius" << endl << endl;
+      mOstm << "Latitude, Longitude, Radius" << endl;
     }
 
     int iNumPoints = mCNet->GetNumPoints();
@@ -839,13 +845,12 @@ namespace Isis {
 
     if (pvlGrp.HasKeyword("Ignore")) {
       iIgnoredFlag = 0;
-      if (pvlGrp["Ignore"][0] == "true")
+      if (iString(pvlGrp["Ignore"][0]).DownCase() == "true")
         iIgnoredFlag = 1;
     }
 
     if (pvlGrp.HasKeyword("MeasureType")) {
-      sType = pvlGrp["MeasureType"][0];
-      sType = isType.DownCase(sType);
+      sType = iString(pvlGrp["MeasureType"][0]).DownCase();
     }
 
     if (pbLastFilter) {
