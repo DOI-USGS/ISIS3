@@ -84,8 +84,6 @@ void IsisMain() {
                          Distance::Meters).GetKilometers();
     table += record;
 
-//    ocube = new Cube();
-//    ocube->open(Filename(ui.GetFilename("TO")).Expanded(), "rw");
     ocube->write(table);
     p.EndProcess();
     return;
