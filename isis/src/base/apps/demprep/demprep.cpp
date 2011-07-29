@@ -59,7 +59,7 @@ void IsisMain() {
   }
 
   if(!proj->IsEquatorialCylindrical()) {
-    p.SetOutputCube("TO");
+    ocube = p.SetOutputCube("TO");
     p.StartProcess(GetStats);
 
     PvlGroup demRange("Results");
@@ -84,12 +84,10 @@ void IsisMain() {
                          Distance::Meters).GetKilometers();
     table += record;
 
-    ocube = new Cube();
-    ocube->open(Filename(ui.GetFilename("TO")).Expanded(), "rw");
+//    ocube = new Cube();
+//    ocube->open(Filename(ui.GetFilename("TO")).Expanded(), "rw");
     ocube->write(table);
     p.EndProcess();
-    ocube->close();
-    delete ocube;
     return;
   }
 
