@@ -79,8 +79,8 @@ namespace Isis {
     p_appName = argv[0];
 
     // Get the starting wall clock time
-    //p_datetime = DateTime(&p_startTime);
-
+    // p_datetime = DateTime(&p_startTime);
+        
     // Init
     p_startClock = 0;
     p_startDirectIO = 0;
@@ -128,6 +128,10 @@ namespace Isis {
 
       p_ui = new UserInterface(xmlfile, argc, argv);
       if (!p_ui->IsInteractive()) {
+        // Get the starting wall clock time
+        p_datetime = DateTime(&p_startTime);
+        p_startClock = clock();
+        //cerr << "Application NonGUI start clock=" << (long)p_startClock << " time=" << p_startTime << endl;
         new QCoreApplication(argc, argv);
 
         // Add the Qt plugin directory to the library path
@@ -173,10 +177,10 @@ namespace Isis {
   int Application::Run(void (*funct)()) {
     int status = 0;
     try {
-      if (p_ui->IsInteractive()) {
+      if (p_ui->IsInteractive()) {        
         p_ui->TheGui()->Exec(funct);
       }
-      else {
+      else {        
         if (p_ui->BatchListSize() > 0) {
           for (int i = 0; i < p_ui->BatchListSize(); i++) {
             try {
@@ -244,13 +248,17 @@ namespace Isis {
    * @return PvlObject
    */
   PvlObject Application::History() {
-    p_startClock = clock();
+    if (p_ui->IsInteractive()) {
+      p_startClock = clock();
+      p_datetime = DateTime(&p_startTime);
+      //cerr << "History GUI start clock=" << p_startClock << " time=" << p_startTime << endl;
+    }
     PvlObject history(p_ui->ProgramName());
     history += PvlKeyword("IsisVersion", Version());
     history += PvlKeyword("ProgramVersion", p_ui->Version());
     QString path = QCoreApplication::applicationDirPath();
     history += PvlKeyword("ProgramPath", path);
-    history += PvlKeyword("ExecutionDateTime", DateTime(&p_startTime));
+    history += PvlKeyword("ExecutionDateTime", p_datetime);
     history += PvlKeyword("HostName", HostName());
     history += PvlKeyword("UserName", UserName());
     history += PvlKeyword("Description", p_ui->Brief());
@@ -280,6 +288,8 @@ namespace Isis {
     sprintf(temp, "%02d:%02d:%04.1f", hours, minutes, seconds);
     string conTime = temp;
 
+    //cerr << "Accounting GUI end time=" << endTime <<  " start time=" << p_startTime << "  total=" << seconds << endl;
+    
     // Grab the ending cpu time to compute total cpu time
     clock_t endClock = clock();
     seconds = (double(endClock) - (double)p_startClock) / CLOCKS_PER_SEC;
@@ -289,7 +299,7 @@ namespace Isis {
     minutes = minutes - hours * 60;
     sprintf(temp, "%02d:%02d:%04.1f", hours, minutes, seconds);
     string cpuTime = temp;
-
+    
     // Add this information to the log
     PvlGroup acct("Accounting");
     acct += PvlKeyword("ConnectTime", conTime);
