@@ -74,11 +74,18 @@ namespace Isis {
 
         QTreeWidgetItem *newCubeGrp = p_tree->addGroup(cubes.Name().c_str());
 
+        if (cubes.HasKeyword("Expanded")) {
+          bool expanded = (cubes["Expanded"][0] != "No");
+          newCubeGrp->setExpanded(expanded);
+        }
+
         for(int cubeFilenameIndex = 0;
             cubeFilenameIndex < cubes.Keywords();
             cubeFilenameIndex ++) {
-          iString cubeFilename = cubes[cubeFilenameIndex][0];
-          newCubeGrp->addChild(takeItem(cubeFilename, allCubes));
+          if (cubes[cubeFilenameIndex].IsNamed("Cube")) {
+            iString cubeFilename = cubes[cubeFilenameIndex][0];
+            newCubeGrp->addChild(takeItem(cubeFilename, allCubes));
+          }
         }
       }
 
@@ -118,6 +125,7 @@ namespace Isis {
       QTreeWidgetItem *group = p_tree->topLevelItem(i);
       PvlObject cubeGroup(
           group->text(MosaicTreeWidgetItem::NameColumn).toStdString());
+      cubeGroup += PvlKeyword("Expanded", group->isExpanded() ? "Yes" : "No");
 
       for(int j = 0; j < group->childCount(); j++) {
         QTreeWidgetItem *item = group->child(j);

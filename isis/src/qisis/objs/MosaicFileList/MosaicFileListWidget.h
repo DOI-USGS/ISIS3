@@ -13,6 +13,17 @@ namespace Isis {
   class MosaicTreeWidgetItem;
   class PvlObject;
 
+  /**
+   * @brief A colored, grouped cube list
+   *
+   * @author 2011-07-29 Steven Lambright
+   *
+   * @internal
+   *    @history 2011-07-29 Steven Lambright - Expansion state is now stored in
+   *                            the project file. This change will cause older
+   *                            versions of qmos to fail to read newer project
+   *                            files. References #275.
+   */
   class MosaicFileListWidget : public QWidget {
       Q_OBJECT
     public:
