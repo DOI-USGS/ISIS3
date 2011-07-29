@@ -115,11 +115,14 @@ namespace Isis {
             newMsr->SetDateTime(Application::DateTime());
             newMsr->SetChooserName("Application cnetref(Resolution)");
           }
-
+         
           // Log
           PvlGroup pvlMeasureGrp("MeasureDetails");
           pvlMeasureGrp += Isis::PvlKeyword("SerialNum", sn);
           pvlMeasureGrp += Isis::PvlKeyword("OriginalLocation", LocationString(dSample, dLine));
+
+          if (bMeasureLocked)
+            pvlMeasureGrp += Isis::PvlKeyword("EditLock", "True");
 
           if (!newMsr->IsIgnored()) {
             Cube *measureCube = mCubeMgr.OpenCube(mSerialNumbers.Filename(sn));
