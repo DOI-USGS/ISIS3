@@ -338,6 +338,16 @@ namespace Isis {
           output += toolObj;
         }
       }
+
+      PvlObject zOrders("ZOrdering");
+      foreach(MosaicSceneItem * mosaicSceneItem, *m_mosaicSceneItems) {
+        PvlKeyword zValue("ZValue");
+        zValue += (iString)mosaicSceneItem->cubeDisplay()->fileName();
+        zValue += mosaicSceneItem->zValue();
+        zOrders += zValue;
+      }
+
+      output += zOrders;
     }
     else {
       throw iException::Message(iException::User,
@@ -358,6 +368,31 @@ namespace Isis {
       if(tool->projectPvlObjectName() != "") {
         if(project.HasObject(tool->projectPvlObjectName())) {
           tool->fromPvl(project.FindObject(tool->projectPvlObjectName()));
+        }
+      }
+
+      if (project.HasObject("ZOrdering")) {
+        PvlObject &zOrders = project.FindObject("ZOrdering");
+
+        for (int zOrderIndex = 0;
+             zOrderIndex < zOrders.Keywords();
+             zOrderIndex ++) {
+          PvlKeyword &zOrder = zOrders[zOrderIndex];
+
+          QString filenameToFind = zOrder[0];
+
+          bool found = false;
+          for (int itemIndex = 0;
+               itemIndex < m_mosaicSceneItems->size() && !found;
+               itemIndex++) {
+            MosaicSceneItem * mosaicSceneItem =
+                (*m_mosaicSceneItems)[itemIndex];
+
+            if (mosaicSceneItem->cubeDisplay()->fileName() == filenameToFind) {
+              mosaicSceneItem->setZValue(zOrder[1]);
+              found = true;
+            }
+          }
         }
       }
     }

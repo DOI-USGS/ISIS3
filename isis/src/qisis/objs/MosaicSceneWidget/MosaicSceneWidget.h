@@ -37,18 +37,20 @@ namespace Isis {
    *
    * @internal
    *  @history 2010-05-10 Christopher Austin - Added cnet connectivity
-   *                                functionality and fixed a few design issues
+   *                          functionality and fixed a few design issues
    *  @history 2011-04-01 Steven Lambright - Separated this class from the
-   *                                MosaicWidget class.
+   *                          MosaicWidget class.
    *  @history 2011-05-10 Steven Lambright - Reduced unnecessary code, fixed
-   *                                toolTips to work on everything (not just
-   *                                cubes). 
+   *                          toolTips to work on everything (not just
+   *                          cubes). 
    *  @history 2011-05-17 Steven Lambright - More robust createInitialProj 
    *  @history 2011-05-17 Steven Lambright - Target radii recalculated when
-   *                                the user specifies a map file, if they
-   *                                are missing. 
+   *                          the user specifies a map file, if they
+   *                          are missing. 
    *  @history 2011-05-20 Steven Lambright - Improved error handling when
-   *                                reprojecting. 
+   *                          reprojecting. 
+   *  @history 2011-07-29 Steven Lambright - Z-ordering is now saved and
+   *                          restored in the project files. references #275
    */
   class MosaicSceneWidget : public QWidget {
       Q_OBJECT
