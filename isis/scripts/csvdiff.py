@@ -124,7 +124,9 @@ for i in range(len(csv_1)):
     value_2 = cells_2[j]
 
     # Get the name of the column for this cell
-    column_1 = csv_1_header[j] if j < len(csv_1_header) else j + 1
+    column_1 = j + 1
+    if j < len(csv_1_header):
+      column_1 = csv_1_header[j]
 
     if is_number(value_1) and is_number(value_2):
       # Generate the error and get the tolerance if provided, else assume 0.0
