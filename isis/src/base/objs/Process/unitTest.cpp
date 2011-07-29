@@ -3,15 +3,17 @@
 #include <string>
 #include <iostream>
 
+#include "Application.h"
+#include "Cube.h"
+#include "Filename.h"
+#include "ImagePolygon.h"
 #include "OriginalLabel.h"
 #include "Process.h"
-#include "Cube.h"
 #include "Pvl.h"
-#include "Cube.h"
-#include "Application.h"
-#include "ImagePolygon.h"
 
 using namespace std;
+using namespace Isis;
+
 void IsisMain() {
   Isis::Preference::Preferences(true);
 
@@ -90,12 +92,12 @@ void IsisMain() {
   cout << "Testing SetInputWorkCube SizeMatch error for lines ..." << endl;
   Isis::Cube cube;
   cube.setDimensions(126, 100, 2);
-  cube.create("/tmp/isisprocess_01");
+  cube.create(Filename("$TEMPORARY/isisprocess_01").Expanded());
   cube.close();
   try {
     Isis::Process p2;
     Isis::CubeAttributeInput att;
-    p2.SetInputCube("/tmp/isisprocess_01", att);
+    p2.SetInputCube(Filename("$TEMPORARY/isisprocess_01").Expanded(), att);
     p2.SetInputCube("unitTest.cub", att,
                     Isis::SizeMatch);
   }
@@ -106,12 +108,12 @@ void IsisMain() {
 
   cout << "Testing SetInputWorkCube SizeMatch error for samples ..." << endl;
   cube.setDimensions(100, 126, 2);
-  cube.create("/tmp/isisprocess_02");
+  cube.create(Filename("$TEMPORARY/isisprocess_02").Expanded());
   cube.close();
   try {
     Isis::Process p2;
     Isis::CubeAttributeInput att;
-    p2.SetInputCube("/tmp/isisprocess_02", att);
+    p2.SetInputCube(Filename("$TEMPORARY/isisprocess_02").Expanded(), att);
     p2.SetInputCube("unitTest.cub", att,
                     Isis::SizeMatch);
   }
@@ -124,7 +126,7 @@ void IsisMain() {
   try {
     Isis::Process p2;
     Isis::CubeAttributeInput att;
-    p2.SetInputCube("/tmp/isisprocess_01", att);
+    p2.SetInputCube(Filename("$TEMPORARY/isisprocess_01").Expanded(), att);
     p2.SetInputCube("unitTest.cub", att,
                     Isis::SpatialMatch);
   }
@@ -137,7 +139,7 @@ void IsisMain() {
   try {
     Isis::Process p2;
     Isis::CubeAttributeInput att;
-    p2.SetInputCube("/tmp/isisprocess_02", att);
+    p2.SetInputCube(Filename("$TEMPORARY/isisprocess_02").Expanded(), att);
     p2.SetInputCube("unitTest.cub", att,
                     Isis::SpatialMatch);
   }
@@ -148,12 +150,12 @@ void IsisMain() {
 
   cout << "Testing SetInputWorkCube BandMatchOrOne error ..." << endl;
   cube.setDimensions(126, 126, 3);
-  cube.create("/tmp/isisprocess_03");
+  cube.create(Filename("$TEMPORARY/isisprocess_03").Expanded());
   cube.close();
   try {
     Isis::Process p2;
     Isis::CubeAttributeInput att;
-    p2.SetInputCube("/tmp/isisprocess_03", att);
+    p2.SetInputCube(Filename("$TEMPORARY/isisprocess_03").Expanded(), att);
     p2.SetInputCube("unitTest.cub", att,
                     Isis::BandMatchOrOne);
   }
@@ -164,12 +166,12 @@ void IsisMain() {
 
   cout << "Testing SetInputWorkCube AllMatchOrOne error ..." << endl;
   cube.setDimensions(126, 126, 3);
-  cube.create("/tmp/isisprocess_03");
+  cube.create(Filename("$TEMPORARY/isisprocess_03").Expanded());
   cube.close();
   try {
     Isis::Process p2;
     Isis::CubeAttributeInput att;
-    p2.SetInputCube("/tmp/isisprocess_03", att);
+    p2.SetInputCube(Filename("$TEMPORARY/isisprocess_03").Expanded(), att);
     p2.SetInputCube("unitTest.cub", att,
                     Isis::AllMatchOrOne);
   }
@@ -271,12 +273,13 @@ void IsisMain() {
   p6.EndProcess();
   cout << endl;
 
-  cube.open("/tmp/isisprocess_01");
+  cube.open(Filename("$TEMPORARY/isisprocess_01").Expanded());
   cube.close(true);
-  cube.open("/tmp/isisprocess_02");
+  cube.open(Filename("$TEMPORARY/isisprocess_02").Expanded());
   cube.close(true);
-  cube.open("/tmp/isisprocess_03");
+  cube.open(Filename("$TEMPORARY/isisprocess_03").Expanded());
   cube.close(true);
-  cube.open("/tmp/isisprocess_04");
+  cube.open(Filename("$TEMPORARY/isisprocess_04").Expanded());
   cube.close(true);
 }
+
