@@ -226,17 +226,16 @@ namespace Isis
     setCorner(Qt::TopLeftCorner, Qt::LeftDockWidgetArea);
     setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
 
-
     pointTreeDockWidget = new QDockWidget("Point View", this, Qt::SubWindow);
     pointTreeDockWidget->setObjectName("PointTreeDock");
     pointTreeDockWidget->setFeatures(QDockWidget::DockWidgetFloatable |
-        QDockWidget::DockWidgetMovable);
+        QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetClosable);
     addDockWidget(Qt::BottomDockWidgetArea, pointTreeDockWidget);
 
     serialTreeDockWidget = new QDockWidget("Serial View", this, Qt::SubWindow);
     serialTreeDockWidget->setObjectName("SerialTreeDock");
     serialTreeDockWidget->setFeatures(QDockWidget::DockWidgetFloatable |
-        QDockWidget::DockWidgetMovable);
+        QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetClosable);
     addDockWidget(Qt::BottomDockWidgetArea, serialTreeDockWidget);
     tabifyDockWidget(pointTreeDockWidget, serialTreeDockWidget);
 
@@ -244,7 +243,7 @@ namespace Isis
         this, Qt::SubWindow);
     connectionTreeDockWidget->setObjectName("ConnectionTreeDock");
     connectionTreeDockWidget->setFeatures(QDockWidget::DockWidgetFloatable |
-        QDockWidget::DockWidgetMovable);
+        QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetClosable);
     addDockWidget(Qt::BottomDockWidgetArea, connectionTreeDockWidget);
     tabifyDockWidget(serialTreeDockWidget, connectionTreeDockWidget);
     pointTreeDockWidget->raise();
@@ -253,14 +252,14 @@ namespace Isis
         this, Qt::SubWindow);
     pointFilterDockWidget->setObjectName("PointFilterDock");
     pointFilterDockWidget->setFeatures(QDockWidget::DockWidgetFloatable |
-        QDockWidget::DockWidgetMovable);
+        QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetClosable);
     addDockWidget(Qt::BottomDockWidgetArea, pointFilterDockWidget);
 
     serialFilterDockWidget = new QDockWidget("Filter Images and Points",
         this, Qt::SubWindow);
     serialFilterDockWidget->setObjectName("SerialFilterDock");
     serialFilterDockWidget->setFeatures(QDockWidget::DockWidgetFloatable |
-        QDockWidget::DockWidgetMovable);
+        QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetClosable);
     addDockWidget(Qt::BottomDockWidgetArea, serialFilterDockWidget);
     tabifyDockWidget(pointFilterDockWidget, serialFilterDockWidget);
 
@@ -268,7 +267,7 @@ namespace Isis
         this, Qt::SubWindow);
     connectionFilterDockWidget->setObjectName("ConnectionFilterDock");
     connectionFilterDockWidget->setFeatures(QDockWidget::DockWidgetFloatable |
-        QDockWidget::DockWidgetMovable);
+        QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetClosable);
     addDockWidget(Qt::BottomDockWidgetArea, connectionFilterDockWidget);
     tabifyDockWidget(serialFilterDockWidget, connectionFilterDockWidget);
     pointFilterDockWidget->raise();
@@ -405,7 +404,7 @@ namespace Isis
     {
       case HasFile:
 //         setDockWidgetsVisible(true);
-        
+
         if (centralWidget() != editorWidget)
           setCentralWidget(editorWidget);
 
@@ -582,8 +581,8 @@ namespace Isis
     saveAct->setEnabled(state);
     setWindowModified(state);
   }
-  
-  
+
+
   void CnetEditorWindow::setDockWidgetsVisible(bool visibilityState)
   {
     pointTreeDockWidget->setVisible(visibilityState);

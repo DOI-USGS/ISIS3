@@ -39,7 +39,7 @@ namespace Isis
 
     private:
       class CreateRootItemFunctor : public std::unary_function <
-          ControlPoint * const &, PointParentItem * >
+        ControlPoint * const &, PointParentItem * >
       {
         public:
           CreateRootItemFunctor(TreeModel * tm);

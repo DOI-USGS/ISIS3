@@ -48,7 +48,7 @@ namespace Isis
       goodness = measure->GetLogData(
           ControlMeasureLogData::GoodnessOfFit).GetNumericalValue();
     }
-          
+
     return AbstractNumberFilter::evaluate(goodness);
   }
 

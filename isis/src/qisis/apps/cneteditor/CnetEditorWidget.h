@@ -4,25 +4,21 @@
 
 #include <QWidget>
 
-
 class QBoxLayout;
-class QItemSelection;
-class QModelIndex;
 class QScrollArea;
 class QSplitter;
 class QString;
-class QTableView;
 
 namespace Isis
 {
+  class CnetMeasureTableModel;
+  class CnetPointTableModel;
+  class CnetTableView;
   class CnetTreeView;
   class ConnectionModel;
   class ControlNet;
   class FilterWidget;
-  class MeasureTableDelegate;
-  class MeasureTableModel;
   class PointModel;
-  class PointTableDelegate;
   class PointTableModel;
   class SerialModel;
 
@@ -72,19 +68,17 @@ namespace Isis
       void createSerialTreeView();
       void createConnectionTreeView();
       void createFilterArea();
-      void createEditPointView();
-      void createEditMeasureView();
+      void createPointTableView();
+      void createMeasureTableView();
       void focusView(CnetTreeView * treeView, QStringList label);
       void upgradeVersion();
 
 
     private slots:
-      void pointTreeViewSelectionChanged();
+//      void pointTreeViewSelectionChanged();
       void serialTreeViewSelectionChanged();
       void connectionTreeViewSelectionChanged();
 
-      void itemExpanded(const QModelIndex & index);
-      void itemCollapsed(const QModelIndex & index);
       void rebuildModels();
 //       void scrollFilterAreaToBottom();
 //       void doScroll();
@@ -105,6 +99,9 @@ namespace Isis
       CnetTreeView * serialTreeView;
       CnetTreeView * connectionTreeView;
 
+      CnetTableView * pointTableView;
+      CnetTableView * measureTableView;
+
       QScrollArea * filterArea;
 
       QWidget * pointFilterWidget;
@@ -115,14 +112,8 @@ namespace Isis
       SerialModel * serialModel;
       ConnectionModel * connectionModel;
 
-      PointTableModel * editPointModel;
-      MeasureTableModel * editMeasureModel;
-
-      PointTableDelegate * editPointDelegate;
-      MeasureTableDelegate * editMeasureDelegate;
-
-      QTableView * editPointView;
-      QTableView * editMeasureView;
+      CnetPointTableModel * pointTableModel;
+      CnetMeasureTableModel * measureTableModel;
 
       QSplitter * topSplitter;
       QSplitter * mainSplitter;

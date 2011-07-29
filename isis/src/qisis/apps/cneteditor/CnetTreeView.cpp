@@ -25,7 +25,8 @@ namespace Isis
     connect(header, SIGNAL(activated()), this, SIGNAL(activated()));
     connect(content, SIGNAL(selectionChanged()),
         this, SIGNAL(selectionChanged()));
-
+//     content->setContextMenuPolicy(Qt::CustomContextMenu);
+    
     QVBoxLayout * layout = new QVBoxLayout;
     layout->addWidget(header);
     layout->addWidget(content);
@@ -120,6 +121,12 @@ namespace Isis
     if (header)
       header->setActive(true);
     update();
+  }
+
+
+  void CnetTreeView::onModelSelectionChanged()
+  {
+    content->refresh();
   }
 
 

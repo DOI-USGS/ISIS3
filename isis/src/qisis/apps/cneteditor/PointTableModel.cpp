@@ -158,22 +158,22 @@ namespace Isis
             return QVariant::fromValue(
                 (QString) point->GetRefMeasure()->GetCubeSerialNumber());
           case AdjustedSPLat:
-            return QVariant::fromValue(catchNULL(
+            return QVariant::fromValue(catchNull(
                 point->GetAdjustedSurfacePoint().GetLatitude().GetDegrees()));
           case AdjustedSPLon:
-            return QVariant::fromValue(catchNULL(
+            return QVariant::fromValue(catchNull(
                 point->GetAdjustedSurfacePoint().GetLongitude().GetDegrees()));
           case AdjustedSPRadius:
-            return QVariant::fromValue(catchNULL(
+            return QVariant::fromValue(catchNull(
                 point->GetAdjustedSurfacePoint().GetLocalRadius().GetMeters()));
           case APrioriSPLat:
-            return QVariant::fromValue(catchNULL(
+            return QVariant::fromValue(catchNull(
                 point->GetAprioriSurfacePoint().GetLatitude().GetDegrees()));
           case APrioriSPLon:
-            return QVariant::fromValue(catchNULL(
+            return QVariant::fromValue(catchNull(
                 point->GetAprioriSurfacePoint().GetLongitude().GetDegrees()));
           case APrioriSPRadius:
-            return QVariant::fromValue(catchNULL(
+            return QVariant::fromValue(catchNull(
                 point->GetAprioriSurfacePoint().GetLocalRadius().GetMeters()));
           case APrioriSPSource:
             return QVariant::fromValue(
@@ -307,20 +307,23 @@ namespace Isis
             point->SetDateTime(value.toString());
             break;
           case EditLock:
-            if (value.toString() == "Yes" && !point->IsEditLocked()) {
+            if (value.toString() == "Yes" && !point->IsEditLocked())
+            {
               point->SetEditLock(true);
             }
-            else if (value.toString() == "No" && point->IsEditLocked()) {
-              // Prompt the user for confirmation before turning off edit lock
-              // on a point.
-              int status = QMessageBox::warning(NULL, tr("cneteditor"),
-                  "You requested to turn edit lock OFF for this"
-                  " point. Are you sure you want to continue?",
-                  QMessageBox::Yes | QMessageBox::No);
+            else
+              if (value.toString() == "No" && point->IsEditLocked())
+              {
+                // Prompt the user for confirmation before turning off edit lock
+                // on a point.
+                int status = QMessageBox::warning(NULL, tr("cneteditor"),
+                    "You requested to turn edit lock OFF for this"
+                    " point. Are you sure you want to continue?",
+                    QMessageBox::Yes | QMessageBox::No);
 
-              if (status == QMessageBox::Yes)
-                point->SetEditLock(false);
-            }
+                if (status == QMessageBox::Yes)
+                  point->SetEditLock(false);
+              }
             break;
           case Ignored:
             point->SetIgnored(value.toString() == "Yes");
@@ -331,39 +334,39 @@ namespace Isis
             break;
           case AdjustedSPLat:
             point->SetAdjustedSurfacePoint(SurfacePoint(
-                Latitude(catchNULL(value.toString()), Angle::Degrees),
+                Latitude(catchNull(value.toString()), Angle::Degrees),
                 point->GetAdjustedSurfacePoint().GetLongitude(),
                 point->GetAdjustedSurfacePoint().GetLocalRadius()));
             break;
           case AdjustedSPLon:
             point->SetAdjustedSurfacePoint(SurfacePoint(
                 point->GetAdjustedSurfacePoint().GetLatitude(),
-                Longitude(catchNULL(value.toString()), Angle::Degrees),
+                Longitude(catchNull(value.toString()), Angle::Degrees),
                 point->GetAdjustedSurfacePoint().GetLocalRadius()));
             break;
           case AdjustedSPRadius:
             point->SetAdjustedSurfacePoint(SurfacePoint(
                 point->GetAdjustedSurfacePoint().GetLatitude(),
                 point->GetAdjustedSurfacePoint().GetLongitude(),
-                Distance(catchNULL(value.toString()), Distance::Meters)));
+                Distance(catchNull(value.toString()), Distance::Meters)));
             break;
           case APrioriSPLat:
             point->SetAprioriSurfacePoint(SurfacePoint(
-                Latitude(catchNULL(value.toString()), Angle::Degrees),
+                Latitude(catchNull(value.toString()), Angle::Degrees),
                 point->GetAprioriSurfacePoint().GetLongitude(),
                 point->GetAprioriSurfacePoint().GetLocalRadius()));
             break;
           case APrioriSPLon:
             point->SetAprioriSurfacePoint(SurfacePoint(
                 point->GetAprioriSurfacePoint().GetLatitude(),
-                Longitude(catchNULL(value.toString()), Angle::Degrees),
+                Longitude(catchNull(value.toString()), Angle::Degrees),
                 point->GetAprioriSurfacePoint().GetLocalRadius()));
             break;
           case APrioriSPRadius:
             point->SetAprioriSurfacePoint(SurfacePoint(
                 point->GetAprioriSurfacePoint().GetLatitude(),
                 point->GetAprioriSurfacePoint().GetLongitude(),
-                Distance(catchNULL(value.toString()), Distance::Meters)));
+                Distance(catchNull(value.toString()), Distance::Meters)));
             break;
           case APrioriSPSource:
             point->SetAprioriSurfacePointSource(
@@ -405,23 +408,22 @@ namespace Isis
   }
 
 
-  QString PointTableModel::catchNULL(double d) const
+  QString PointTableModel::catchNull(double d) const
   {
     QString str = "NULL";
-    if (d != Isis::Null)
+    if (d != Null)
       str = QString::number(d);
 
     return str;
   }
 
 
-  double PointTableModel::catchNULL(QString str) const
+  double PointTableModel::catchNull(QString str) const
   {
-    double d = Isis::Null;
+    double d = Null;
     if (str.toLower() != "null")
       d = str.toDouble();
 
     return d;
   }
-
 }

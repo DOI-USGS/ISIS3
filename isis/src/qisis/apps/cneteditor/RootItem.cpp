@@ -31,6 +31,19 @@ namespace Isis
   }
 
 
+  QString RootItem::getData(QString columnTitle) const
+  {
+    return QString();
+  }
+
+
+  void RootItem::setData(QString columnTitle, QString newData)
+  {
+    iString msg = "Cannot set data on RootItem";
+    throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+  }
+
+
   void RootItem::deleteSource()
   {
     iString msg = "deleteSource called on a RootItem!";

@@ -25,29 +25,33 @@ namespace Isis
   class TreeModel : public QObject
   {
       Q_OBJECT
-      
+
     public:
       enum InterestingItems
       {
-        AllItems = 1,
-        PointItems = 2,
-        MeasureItems = 4,
-        SerialItems = 8
+        PointItems = 1,
+        MeasureItems = 2,
+        SerialItems = 4,
+        AllItems = PointItems | MeasureItems | SerialItems
       };
       Q_DECLARE_FLAGS(InterestingItemsFlag, InterestingItems)
-      
+
 
     public:
       TreeModel(ControlNet * controlNet, CnetTreeView * v,
           QObject * parent = 0);
       virtual ~TreeModel();
 
-      QList< AbstractTreeItem * > getItems(int, int) const;
+      QList< AbstractTreeItem * > getItems(int, int,
+          InterestingItemsFlag = AllItems, bool = false);
       QList< AbstractTreeItem * > getItems(AbstractTreeItem *,
-          AbstractTreeItem *) const;
+          AbstractTreeItem *, InterestingItemsFlag = AllItems, bool = false);
+      QList< AbstractTreeItem * > getSelectedItems(
+        InterestingItemsFlag = AllItems, bool = false);
       QMutex * getMutex() const;
-      QList< AbstractTreeItem * > getSelectedItems() const;
+      int getItemCount(InterestingItemsFlag) const;
       int getTopLevelItemCount() const;
+      int getVisibleItemCount(InterestingItemsFlag, bool) const;
       int getVisibleTopLevelItemCount() const;
       CnetTreeView * getView() const;
       void setDrivable(bool drivableStatus);
@@ -55,7 +59,7 @@ namespace Isis
       bool isFiltering() const;
       void setFilter(FilterWidget * newFilter);
       void saveViewState();
-      void setGlobalSelection(bool selected);
+      void setGlobalSelection(bool selected, InterestingItemsFlag = AllItems);
       void loadViewState();
       QSize getVisibleSize(int indentation) const;
 
@@ -87,8 +91,12 @@ namespace Isis
 
     private:
       AbstractTreeItem * nextItem(AbstractTreeItem * current,
-          InterestingItemsFlag flags = AllItems) const;
-      void selectItems(AbstractTreeItem * item, bool select);
+          InterestingItemsFlag flags, bool ignoreExpansion) const;
+      void selectItems(AbstractTreeItem * item, bool select,
+          InterestingItemsFlag flags);
+      static bool itemIsInteresting(
+        AbstractTreeItem *, InterestingItemsFlag);
+      int getItemCount(AbstractTreeItem *, InterestingItemsFlag) const;
 
 
     private slots:
@@ -144,7 +152,7 @@ namespace Isis
           FilterWidget * filter;
       };
   };
-  
+
   Q_DECLARE_OPERATORS_FOR_FLAGS(TreeModel::InterestingItemsFlag)
 }
 

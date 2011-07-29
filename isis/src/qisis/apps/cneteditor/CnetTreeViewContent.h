@@ -81,7 +81,9 @@ namespace Isis
       //! The bool is true if the mouse is hovering over the arrow
       QPair< AbstractTreeItem *, bool > * hoveredItem;
 
-      AbstractTreeItem * prevSelectedItem;
+      AbstractTreeItem * lastDirectlySelectedItem;
+      QList<AbstractTreeItem *> * lastShiftSelection;
+
       QPoint * mousePressPos;
       int rowHeight;
       int contentWidth;

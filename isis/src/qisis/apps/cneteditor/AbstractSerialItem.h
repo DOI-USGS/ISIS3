@@ -20,6 +20,8 @@ namespace Isis
       virtual ~AbstractSerialItem();
 
       QString getData() const;
+      QString getData(QString columnTitle) const;
+      void setData(QString columnTitle, QString newData);
       void deleteSource();
       InternalPointerType getPointerType() const;
       void * getPointer() const;

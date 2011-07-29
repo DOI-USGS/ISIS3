@@ -12,14 +12,15 @@
 #include <QPaintEvent>
 #include <QScrollBar>
 #include <QSize>
+#include <QtCore/qtextstream.h>
 #include <QVBoxLayout>
 
 #include "iException.h"
 #include "iString.h"
 
 #include "AbstractTreeItem.h"
+#include "CnetTableColumn.h"
 #include "TreeModel.h"
-#include <QtCore/qtextstream.h>
 
 
 using std::cerr;
@@ -39,6 +40,7 @@ namespace Isis
     mousePressPos = new QPoint;
     pressedItem = new QPair< AbstractTreeItem *, bool >(NULL, false);
     hoveredItem = new QPair< AbstractTreeItem *, bool >(NULL, false);
+    lastShiftSelection = new QList<AbstractTreeItem *>;
 
     verticalScrollBar()->setSingleStep(1);
     horizontalScrollBar()->setSingleStep(10);
@@ -59,29 +61,20 @@ namespace Isis
 
   CnetTreeViewContent::~CnetTreeViewContent()
   {
-    if (items)
-    {
-      delete items;
-      items = NULL;
-    }
+    delete items;
+    items = NULL;
 
-    if (mousePressPos)
-    {
-      delete mousePressPos;
-      mousePressPos = NULL;
-    }
+    delete mousePressPos;
+    mousePressPos = NULL;
 
-    if (pressedItem)
-    {
-      delete pressedItem;
-      pressedItem = NULL;
-    }
+    delete pressedItem;
+    pressedItem = NULL;
 
-    if (hoveredItem)
-    {
-      delete hoveredItem;
-      hoveredItem = NULL;
-    }
+    delete hoveredItem;
+    hoveredItem = NULL;
+
+    delete lastShiftSelection;
+    lastShiftSelection = NULL;
   }
 
 
@@ -202,15 +195,28 @@ namespace Isis
             {
               item->setSelected(true);
             }
-            prevSelectedItem = item;
+            lastDirectlySelectedItem = item;
+            lastShiftSelection->clear();
           }
           else
-          {
             if (event->modifiers() & Qt::ShiftModifier)
             {
-              QList< AbstractTreeItem * > selectedItems(
-                model->getItems(prevSelectedItem, item));
-              foreach(AbstractTreeItem * i, selectedItems)
+              foreach(AbstractTreeItem * i, *lastShiftSelection)
+              {
+                i->setSelected(false);
+              }
+
+              if (lastDirectlySelectedItem)
+              {
+                *lastShiftSelection =
+                  model->getItems(lastDirectlySelectedItem, item);
+              }
+              else
+              {
+                lastShiftSelection->clear();
+              }
+
+              foreach(AbstractTreeItem * i, *lastShiftSelection)
               {
                 i->setSelected(true);
               }
@@ -219,9 +225,9 @@ namespace Isis
             {
               model->setGlobalSelection(false);
               item->setSelected(true);
-              prevSelectedItem = item;
+              lastDirectlySelectedItem = item;
+              lastShiftSelection->clear();
             }
-          }
 
           emit selectionChanged();
         }
@@ -319,14 +325,14 @@ namespace Isis
 
       for (int i = 0; i < rowCount; i++)
       {
-        // Assume the background color should be white.  Then set odd rows
-        // to be somewhat darker if alternatingRowColors is set to true.
-        QColor backgroundColor = Qt::white;
+        // Assume the background color should be the base.  Then set odd rows
+        // to be the alternate row color if alternatingRowColors is set to true.
+        QColor backgroundColor = palette().base().color();
 
         if (i < items->size())
         {
           if (alternatingRowColors && (startRow + i) % 2 == 1)
-            backgroundColor = backgroundColor.darker(108);
+            backgroundColor = palette().alternateBase().color();
 
           if (items->at(i)->isSelected())
             backgroundColor = palette().highlight().color();
@@ -397,7 +403,8 @@ namespace Isis
     items = NULL;
     pressedItem = NULL;
     hoveredItem = NULL;
-    prevSelectedItem = NULL;
+    lastDirectlySelectedItem = NULL;
+    lastShiftSelection = NULL;
     mousePressPos = NULL;
   }
 

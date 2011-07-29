@@ -324,20 +324,23 @@ namespace Isis
                 catchNULL(value.toString()));
             break;
           case EditLock:
-            if (value.toString() == "Yes" && !measure->IsEditLocked()) {
+            if (value.toString() == "Yes" && !measure->IsEditLocked())
+            {
               measure->SetEditLock(true);
             }
-            else if (value.toString() == "No" && measure->IsEditLocked()) {
-              // Prompt the user for confirmation before turning off edit lock
-              // on a measure.
-              int status = QMessageBox::warning(NULL, tr("cneteditor"),
-                  "You requested to turn edit lock OFF for this"
-                  " measure. Are you sure you want to continue?",
-                  QMessageBox::Yes | QMessageBox::No);
+            else
+              if (value.toString() == "No" && measure->IsEditLocked())
+              {
+                // Prompt the user for confirmation before turning off edit lock
+                // on a measure.
+                int status = QMessageBox::warning(NULL, tr("cneteditor"),
+                    "You requested to turn edit lock OFF for this"
+                    " measure. Are you sure you want to continue?",
+                    QMessageBox::Yes | QMessageBox::No);
 
-              if (status == QMessageBox::Yes)
-                measure->SetEditLock(false);
-            }
+                if (status == QMessageBox::Yes)
+                  measure->SetEditLock(false);
+              }
             break;
           case Ignored:
             if (value.toString() == "Yes")

@@ -110,17 +110,23 @@ namespace Isis
   }
 
 
-  QList< AbstractTreeItem * > TreeModel::getItems(int start, int end) const
+  QList< AbstractTreeItem * > TreeModel::getItems(int start, int end,
+      InterestingItemsFlag flags, bool ignoreExpansion)
   {
     QList< AbstractTreeItem * > foundItems;
     int rowCount = end - start;
     const AbstractTreeItem * lastVisibleFilteredItem =
-        rootItem->getLastVisibleFilteredItem();
+      rootItem->getLastVisibleFilteredItem();
 
     if (lastVisibleFilteredItem && rowCount > 0 && rootItem->childCount())
     {
       int row = 0;
       AbstractTreeItem * currentItem = rootItem->getFirstVisibleChild();
+
+      if (!itemIsInteresting(currentItem, flags))
+      {
+        currentItem = nextItem(currentItem, flags, ignoreExpansion);
+      }
 
       bool listStillValid = true;
 
@@ -131,7 +137,7 @@ namespace Isis
             currentItem == currentItem->parent()->getLastVisibleChild());
 
         if (listStillValid)
-          currentItem = nextItem(currentItem);
+          currentItem = nextItem(currentItem, flags, ignoreExpansion);
       }
 
       while (row < end && listStillValid && currentItem)
@@ -143,7 +149,7 @@ namespace Isis
         row++;
 
         if (listStillValid)
-          currentItem = nextItem(currentItem);
+          currentItem = nextItem(currentItem, flags, ignoreExpansion);
       }
 
       while (isFiltering() && foundItems.size() < rowCount)
@@ -156,12 +162,13 @@ namespace Isis
   }
 
 
-  QList< AbstractTreeItem * > TreeModel::getItems(
-    AbstractTreeItem * item1, AbstractTreeItem * item2) const
+  QList< AbstractTreeItem * > TreeModel::getItems(AbstractTreeItem * item1,
+      AbstractTreeItem * item2, InterestingItemsFlag flags,
+      bool ignoreExpansion)
   {
     QList< AbstractTreeItem * > foundItems;
 
-    if (rootItem->childCount() && item1 != item2)
+    if (rootItem->childCount())
     {
       AbstractTreeItem * start = NULL;
 
@@ -175,17 +182,16 @@ namespace Isis
           if (curItem == item2)
             start = item2;
 
-        curItem = nextItem(curItem);
+        if (!start)
+          curItem = nextItem(curItem, flags, ignoreExpansion);
       }
 
       if (!start)
       {
         iString msg = "The first item passed to getItems(AbstractTreeItem*, "
-            "AbstractTreeItem*) does not exist in this model's tree";
+            "AbstractTreeItem*) is not visible in this model's tree";
         throw iException::Message(iException::Programmer, msg, _FILEINFO_);
       }
-
-      foundItems.append(start);
 
       AbstractTreeItem * end = item2;
 
@@ -195,13 +201,13 @@ namespace Isis
       while (curItem && curItem != end)
       {
         foundItems.append(curItem);
-        curItem = nextItem(curItem);
+        curItem = nextItem(curItem, flags, ignoreExpansion);
       }
 
       if (!curItem)
       {
         iString msg = "The second item passed to getItems(AbstractTreeItem*, "
-            "AbstractTreeItem*) does not exist in this model's tree";
+            "AbstractTreeItem*) is not visible in this model's tree";
         throw iException::Message(iException::Programmer, msg, _FILEINFO_);
       }
 
@@ -212,13 +218,8 @@ namespace Isis
   }
 
 
-  QMutex * TreeModel::getMutex() const
-  {
-    return mutex;
-  }
-
-
-  QList< AbstractTreeItem * > TreeModel::getSelectedItems() const
+  QList< AbstractTreeItem * > TreeModel::getSelectedItems(
+    InterestingItemsFlag flags, bool ignoreExpansion)
   {
     QList< AbstractTreeItem * > selectedItems;
 
@@ -228,16 +229,31 @@ namespace Isis
     {
       AbstractTreeItem * currentItem = rootItem->getFirstVisibleChild();
 
+      if (!itemIsInteresting(currentItem, flags))
+        currentItem = nextItem(currentItem, flags, ignoreExpansion);
+
       while (currentItem)
       {
         if (currentItem->isSelected())
           selectedItems.append(currentItem);
 
-        currentItem = nextItem(currentItem);
+        currentItem = nextItem(currentItem, flags, ignoreExpansion);
       }
     }
 
     return selectedItems;
+  }
+
+
+  QMutex * TreeModel::getMutex() const
+  {
+    return mutex;
+  }
+
+
+  int TreeModel::getItemCount(InterestingItemsFlag flags) const
+  {
+    return getItemCount(rootItem, flags);
   }
 
 
@@ -246,25 +262,48 @@ namespace Isis
     return rootItem->childCount();
   }
 
-
-  int TreeModel::getVisibleTopLevelItemCount() const
+  int TreeModel::getVisibleItemCount(InterestingItemsFlag flags,
+      bool ignoreExpansion) const
   {
-    int visiblePeerCount = -1;
+    AbstractTreeItem * currentItem = rootItem->getFirstVisibleChild();
+    int count = -1;
 
     if (!isFiltering())
     {
-      AbstractTreeItem * current = rootItem->getFirstVisibleChild();
-      while (current)
-      {
-        current = current->getNextVisiblePeer();
-        visiblePeerCount++;
-      }
+      count = 0;
 
-      // started at -1 so we were one off.
-      visiblePeerCount++;
+      while (currentItem)
+      {
+        if (itemIsInteresting(currentItem, flags))
+        {
+          count++;
+        }
+
+        currentItem = nextItem(currentItem, flags, ignoreExpansion);
+      }
     }
 
-    return visiblePeerCount;
+    return count;
+  }
+
+
+  int TreeModel::getVisibleTopLevelItemCount() const
+  {
+    AbstractTreeItem * currentItem = rootItem->getFirstVisibleChild();
+    int count = -1;
+
+    if (!isFiltering())
+    {
+      count = 0;
+
+      while (currentItem)
+      {
+        count++;
+        currentItem = currentItem->getNextVisiblePeer();
+      }
+    }
+
+    return count;
   }
 
 
@@ -446,7 +485,7 @@ namespace Isis
   }
 
 
-//! indentation is in pixels
+  //! indentation is in pixels
   QSize TreeModel::getVisibleSize(int indentation) const
   {
     QSize size;
@@ -465,8 +504,9 @@ namespace Isis
           int depth = current->getDepth();
 
           visibleRowCount++;
-          maxWidth = qMax(maxWidth, current->getDataWidth() + indentation * depth);
-          current = nextItem(current);
+          maxWidth = qMax(maxWidth,
+              current->getDataWidth() + indentation * depth);
+          current = nextItem(current, AllItems, false);
         }
       }
 
@@ -521,37 +561,82 @@ namespace Isis
   }
 
 
-  void TreeModel::setGlobalSelection(bool selected)
+  void TreeModel::setGlobalSelection(bool selected, InterestingItemsFlag flags)
   {
-    selectItems(rootItem, selected);
+    selectItems(rootItem, selected, flags);
   }
 
 
-  void TreeModel::selectItems(AbstractTreeItem * item, bool selected)
+  void TreeModel::selectItems(
+    AbstractTreeItem * item, bool selected, InterestingItemsFlag flags)
   {
-    if (item)
+    if (item && itemIsInteresting(item, flags))
     {
       item->setSelected(selected);
+    }
 
-      if (item->childCount())
+    if (item->childCount())
+    {
+      foreach(AbstractTreeItem * childItem, item->getChildren())
       {
-        foreach(AbstractTreeItem * childItem, item->getChildren())
-        {
-          selectItems(childItem, selected);
-        }
+        selectItems(childItem, selected, flags);
       }
     }
   }
 
 
-  AbstractTreeItem * TreeModel::nextItem(AbstractTreeItem * current,
+  bool TreeModel::itemIsInteresting(AbstractTreeItem * item,
+      InterestingItemsFlag flags)
+  {
+    AbstractTreeItem::InternalPointerType pointerType = item->getPointerType();
+
+    if ((pointerType == AbstractTreeItem::Point &&
+        !flags.testFlag(PointItems)) ||
+        (pointerType == AbstractTreeItem::Measure &&
+            !flags.testFlag(MeasureItems)) ||
+        (pointerType == AbstractTreeItem::CubeGraphNode &&
+            !flags.testFlag(SerialItems)))
+    {
+      return false;
+    }
+    else
+    {
+      return true;
+    }
+  }
+
+
+  int TreeModel::getItemCount(AbstractTreeItem * item,
       InterestingItemsFlag flags) const
+  {
+    int count = 0;
+
+    if (item && itemIsInteresting(item, flags))
+    {
+      count++;
+    }
+
+    if (item->childCount())
+    {
+      foreach(AbstractTreeItem * childItem, item->getChildren())
+      {
+        count += getItemCount(childItem, flags);
+      }
+    }
+
+    return count;
+  }
+
+
+  AbstractTreeItem * TreeModel::nextItem(AbstractTreeItem * current,
+      InterestingItemsFlag flags, bool ignoreExpansion) const
   {
     AbstractTreeItem * result = NULL;
 
     if (current)
     {
-      if (current->isExpanded() && current->getFirstVisibleChild())
+      if ((ignoreExpansion || current->isExpanded()) &&
+          current->getFirstVisibleChild())
       {
         result = current->getFirstVisibleChild();
       }
@@ -563,22 +648,10 @@ namespace Isis
           result = current->parent()->getNextVisiblePeer();
       }
     }
-    
-    if (result)
+
+    if (result && !itemIsInteresting(result, flags))
     {
-      if (!flags.testFlag(AllItems))
-      {
-        AbstractTreeItem::InternalPointerType pointerType;
-        pointerType = result->getPointerType();
-        
-        if ((pointerType == AbstractTreeItem::Point &&
-            !flags.testFlag(PointItems)) ||
-            (pointerType == AbstractTreeItem::Measure &&
-            !flags.testFlag(MeasureItems)) ||
-            (pointerType == AbstractTreeItem::CubeGraphNode &&
-            !flags.testFlag(SerialItems)))
-          result = nextItem(result, flags);
-      }
+      result = nextItem(result, flags, ignoreExpansion);
     }
 
     return result;
@@ -588,8 +661,6 @@ namespace Isis
   void TreeModel::applyFilterDone()
   {
     filterRunning = false;
-
-    //dudeWheresMyCar(rootItem, 0);
 
     if (filterAgain)
     {
@@ -623,8 +694,6 @@ namespace Isis
       delete newRoot;
       newRoot = NULL;
     }
-
-//     loadViewState();
 
     applyFilter();
   }

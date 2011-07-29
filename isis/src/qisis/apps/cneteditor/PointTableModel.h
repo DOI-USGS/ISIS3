@@ -72,8 +72,8 @@ namespace Isis
 
     private:
       bool validateRowColumn(int row, int column, bool checkPoint = true) const;
-      double catchNULL(QString) const;
-      QString catchNULL(double) const;
+      double catchNull(QString) const;
+      QString catchNull(double) const;
 
 
     private:

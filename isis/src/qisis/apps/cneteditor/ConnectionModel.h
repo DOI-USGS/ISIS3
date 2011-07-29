@@ -26,7 +26,7 @@ namespace Isis
 
     public:
       ConnectionModel(Isis::ControlNet * cNet, CnetTreeView * v,
-                      QObject * parent = 0);
+          QObject * parent = 0);
       virtual ~ConnectionModel();
 
       // This is a slot!!!  There is no "pubic slots:" because it has already

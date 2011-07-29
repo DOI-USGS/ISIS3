@@ -9,6 +9,7 @@
 
 #include "iException.h"
 #include "iString.h"
+#include "SpecialPixel.h"
 
 namespace Isis
 {
@@ -198,6 +199,26 @@ namespace Isis
     }
 
     dataWidth = (avgCharWidth + 1) * getData().size();
+  }
+
+
+  QString AbstractTreeItem::catchNull(double d)
+  {
+    QString str = "NULL";
+    if (d != Null)
+      str = QString::number(d);
+
+    return str;
+  }
+
+
+  double AbstractTreeItem::catchNull(QString str)
+  {
+    double d = Null;
+    if (str.toLower() != "null")
+      d = str.toDouble();
+
+    return d;
   }
 }
 

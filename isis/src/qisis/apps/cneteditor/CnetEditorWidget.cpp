@@ -20,7 +20,6 @@
 #include <QSplitter>
 #include <QString>
 #include <QStringList>
-#include <QTableView>
 #include <QTime>
 #include <QTimer>
 #include <QVBoxLayout>
@@ -28,7 +27,13 @@
 #include "ControlNet.h"
 #include "ControlPoint.h"
 
+#include "AbstractMeasureItem.h"
+#include "AbstractPointItem.h"
 #include "AbstractTreeItem.h"
+#include "CnetMeasureTableModel.h"
+#include "CnetPointTableModel.h"
+#include "CnetTableView.h"
+#include "CnetTableViewHeader.h"
 #include "CnetTreeView.h"
 #include "ConnectionModel.h"
 #include "FilterWidget.h"
@@ -93,12 +98,6 @@ namespace Isis
     delete workingVersion;
     workingVersion = NULL;
 
-    delete editPointDelegate;
-    editPointDelegate = NULL;
-
-    delete editMeasureDelegate;
-    editMeasureDelegate = NULL;
-
     delete settingsPath;
     settingsPath = NULL;
 
@@ -132,14 +131,11 @@ namespace Isis
     serialModel = NULL;
     connectionModel = NULL;
 
-    editPointModel = NULL;
-    editMeasureModel = NULL;
+    pointTableModel = NULL;
+    measureTableModel = NULL;
 
-    editPointDelegate = NULL;
-    editMeasureDelegate = NULL;
-
-    editPointView = NULL;
-    editMeasureView = NULL;
+    pointTableView = NULL;
+    measureTableView = NULL;
 
     topSplitter = NULL;
     mainSplitter = NULL;
@@ -245,17 +241,17 @@ namespace Isis
 
     createFilterArea();
 
-    createEditPointView();
-    QGroupBox * editPointBox = new QGroupBox(tr("Control Point Table"));
-    QHBoxLayout * editPointLayout = new QHBoxLayout;
-    editPointLayout->addWidget(editPointView);
-    editPointBox->setLayout(editPointLayout);
+    createPointTableView();
+    QGroupBox * pointTableBox = new QGroupBox(tr("Control Point Table"));
+    QHBoxLayout * pointTableLayout = new QHBoxLayout;
+    pointTableLayout->addWidget(pointTableView);
+    pointTableBox->setLayout(pointTableLayout);
 
-    createEditMeasureView();
-    QGroupBox * editMeasureBox = new QGroupBox(tr("Control Measure Table"));
-    QHBoxLayout * editMeasureLayout = new QHBoxLayout;
-    editMeasureLayout->addWidget(editMeasureView);
-    editMeasureBox->setLayout(editMeasureLayout);
+    createMeasureTableView();
+    QGroupBox * measureTableBox = new QGroupBox(tr("Control Measure Table"));
+    QHBoxLayout * measureTableLayout = new QHBoxLayout;
+    measureTableLayout->addWidget(measureTableView);
+    measureTableBox->setLayout(measureTableLayout);
 
     topSplitter = new QSplitter(Qt::Horizontal);
 //     topSplitter->setChildrenCollapsible(false);
@@ -266,8 +262,8 @@ namespace Isis
 
     mainSplitter = new QSplitter(Qt::Vertical);
     mainSplitter->addWidget(topSplitter);
-    mainSplitter->addWidget(editPointBox);
-    mainSplitter->addWidget(editMeasureBox);
+    mainSplitter->addWidget(pointTableBox);
+    mainSplitter->addWidget(measureTableBox);
 
     QBoxLayout * mainLayout = new QHBoxLayout;
     mainLayout->addWidget(mainSplitter);
@@ -284,8 +280,8 @@ namespace Isis
     pointTreeView->setModel(pointModel);
     connect(pointTreeView, SIGNAL(activated()),
         this, SLOT(activatePointView()));
-    connect(pointTreeView, SIGNAL(selectionChanged()),
-        this, SLOT(pointTreeViewSelectionChanged()));
+//    connect(pointTreeView, SIGNAL(selectionChanged()),
+//        this, SLOT(pointTreeViewSelectionChanged()));
   }
 
 
@@ -368,122 +364,106 @@ namespace Isis
   }
 
 
-  void CnetEditorWidget::createEditPointView()
+  void CnetEditorWidget::createPointTableView()
   {
-    editPointView = new QTableView();
-    editPointModel = new PointTableModel(qApp);
+    pointTableView = new CnetTableView;
+    pointTableModel = new CnetPointTableModel(pointModel);
+    pointTableView->setModel(pointTableModel);
+    connect(pointTreeView, SIGNAL(selectionChanged()),
+        pointTableView, SLOT(onModelSelectionChanged()));
+    connect(pointTableView, SIGNAL(selectionChanged()),
+        pointTreeView, SLOT(onModelSelectionChanged()));
 
-    for (int i = 0; i < PointTableModel::COLS; i++)
+    for (int i = 0; i < AbstractPointItem::COLS; i++)
     {
       QAction * act = new QAction(
-        PointTableModel::getColName((PointTableModel::Column) i), this);
+        AbstractPointItem::getColumnName((AbstractPointItem::Column) i), this);
       act->setCheckable(true);
       connect(act, SIGNAL(toggled(bool)), this, SLOT(pointColToggled()));
-      editPointView->horizontalHeader()->addAction(act);
+      pointTableView->getHorizontalHeader()->addAction(act);
     }
 
-    editPointView->horizontalHeader()->setContextMenuPolicy(
+    pointTableView->getHorizontalHeader()->setContextMenuPolicy(
       Qt::ActionsContextMenu);
-
-    editPointView->setModel(editPointModel);
-    connect(editPointModel, SIGNAL(dataChanged(const QModelIndex &,
-        const QModelIndex &)), editPointView, SLOT(resizeColumnsToContents()));
-    editPointDelegate = new PointTableDelegate(editPointModel, editPointView);
-    connect(editPointDelegate, SIGNAL(dataEdited()),
-        this, SIGNAL(cnetModified()));
-    editPointView->setItemDelegate(editPointDelegate);
-    editPointView->resizeColumnsToContents();
-    editPointView->setEditTriggers(QAbstractItemView::SelectedClicked |
-        QAbstractItemView::DoubleClicked | QAbstractItemView::AnyKeyPressed);
-    editPointView->setSelectionMode(QAbstractItemView::ExtendedSelection);
   }
 
 
-  void CnetEditorWidget::createEditMeasureView()
+  void CnetEditorWidget::createMeasureTableView()
   {
-    editMeasureView = new QTableView();
-    editMeasureModel = new MeasureTableModel(qApp);
+    measureTableView = new CnetTableView();
+    measureTableModel = new CnetMeasureTableModel(pointModel);
+    measureTableView->setModel(measureTableModel);
+    connect(pointTreeView, SIGNAL(selectionChanged()),
+        measureTableView, SLOT(onModelSelectionChanged()));
+    connect(measureTableView, SIGNAL(selectionChanged()),
+        pointTreeView, SLOT(onModelSelectionChanged()));
 
-    for (int i = 0; i < MeasureTableModel::COLS; i++)
+    for (int i = 0; i < AbstractMeasureItem::COLS; i++)
     {
-      QAction * act = new QAction(
-        MeasureTableModel::getColName((MeasureTableModel::Column) i), this);
+      QAction * act = new QAction(AbstractMeasureItem::getColumnName(
+          (AbstractMeasureItem::Column) i), this);
       act->setCheckable(true);
       connect(act, SIGNAL(toggled(bool)), this, SLOT(measureColToggled()));
-      editMeasureView->horizontalHeader()->addAction(act);
+      measureTableView->getHorizontalHeader()->addAction(act);
     }
 
-    editMeasureView->horizontalHeader()->setContextMenuPolicy(
+    measureTableView->getHorizontalHeader()->setContextMenuPolicy(
       Qt::ActionsContextMenu);
-
-    editMeasureView->setModel(editMeasureModel);
-    connect(editMeasureModel, SIGNAL(dataChanged(const QModelIndex &,
-        const QModelIndex &)),
-        editMeasureView, SLOT(resizeColumnsToContents()));
-    editMeasureDelegate = new MeasureTableDelegate(editMeasureModel,
-        editMeasureView);
-    connect(editMeasureDelegate, SIGNAL(dataEdited()),
-        this, SIGNAL(cnetModified()));
-    editMeasureView->setItemDelegate(editMeasureDelegate);
-    editMeasureView->resizeColumnsToContents();
-    editMeasureView->setEditTriggers(QAbstractItemView::SelectedClicked |
-        QAbstractItemView::DoubleClicked | QAbstractItemView::AnyKeyPressed);
-    editMeasureView->setSelectionMode(QAbstractItemView::ExtendedSelection);
   }
 
 
-  void CnetEditorWidget::pointTreeViewSelectionChanged()
-  {
-    QList< ControlPoint * > points;
-    QList< ControlMeasure * > measures;
-    QStringList cubeSerialNumbers;
-
-    QList< AbstractTreeItem * > selectedItems = pointModel->getSelectedItems();
-
-    for (int i = 0; i < selectedItems.size(); i++)
-    {
-      AbstractTreeItem * currentItem = selectedItems.at(i);
-      AbstractTreeItem::InternalPointerType type =
-        currentItem->getPointerType();
-
-      if (type == AbstractTreeItem::Point)
-      {
-        ControlPoint * point =
-          (*controlNet)[currentItem->getData()];
-        points << point;
-
-        // Grab all of the point's measures.
-        for (int i = 0; i < currentItem->childCount(); i++)
-          if (currentItem->childAt(i)->isVisible())
-            measures <<
-                (*point)[currentItem->childAt(i)->getData()];
-      }
-      else
-        if (type == AbstractTreeItem::Measure)
-        {
-          QString pointId = currentItem->parent()->getData();
-          QString serial = currentItem->getData();
-
-          measures << controlNet->GetPoint(pointId)->GetMeasure(serial);
-          cubeSerialNumbers << serial;
-        }
-        else
-        {
-          ASSERT(0);
-        }
-    }
-
-    // populate editor tables
-    editPointModel->setPoints(points);
-    editMeasureModel->setMeasures(measures);
-
-//    if (pointModel->isDrivable()) {
+//  void CnetEditorWidget::pointTreeViewSelectionChanged()
+//  {
+//    QList< ControlPoint * > points;
+//    QList< ControlMeasure * > measures;
+//    QStringList cubeSerialNumbers;
+//
+//    QList< AbstractTreeItem * > selectedItems = pointModel->getSelectedItems();
+//
+//    for (int i = 0; i < selectedItems.size(); i++)
+//    {
+//      AbstractTreeItem * currentItem = selectedItems.at(i);
+//      AbstractTreeItem::InternalPointerType type =
+//        currentItem->getPointerType();
+//
+//      if (type == AbstractTreeItem::Point)
+//      {
+//        ControlPoint * point =
+//          (*controlNet)[currentItem->getData()];
+//        points << point;
+//
+//        // Grab all of the point's measures.
+//        for (int i = 0; i < currentItem->childCount(); i++)
+//          if (currentItem->childAt(i)->isVisible())
+//            measures <<
+//                (*point)[currentItem->childAt(i)->getData()];
+//      }
+//      else if (type == AbstractTreeItem::Measure)
+//      {
+//        QString pointId = currentItem->parent()->getData();
+//        QString serial = currentItem->getData();
+//
+//        measures << controlNet->GetPoint(pointId)->GetMeasure(serial);
+//        cubeSerialNumbers << serial;
+//      }
+//      else
+//      {
+//        ASSERT(0);
+//      }
+//    }
+//
+//    // populate editor tables
+////    editPointModel->setPoints(points);
+//    measureTableModel->setMeasures(measures);
+//
+//    if (pointModel->isDrivable())
+//    {
 //      focusView(serialTreeView, cubeSerialNumbers);
 //      focusView(connectionTreeView, cubeSerialNumbers);
 //    }
 //
 //    updatingSelection = false;
-  }
+//  }
 
 
   void CnetEditorWidget::serialTreeViewSelectionChanged()
@@ -529,7 +509,7 @@ namespace Isis
 //     }
 //
 //     editPointModel->setPoints(points);
-//     editMeasureModel->setMeasures(measures);
+//     measureTableModel->setMeasures(measures);
 //
 //     if (serialModel->isDrivable())
 //     {
@@ -586,7 +566,7 @@ namespace Isis
 //     }
 //
 //     editPointModel->setPoints(points);
-//     editMeasureModel->setMeasures(measures);
+//     measureTableModel->setMeasures(measures);
 //
 //     if (connectionModel->isDrivable())
 //     {
@@ -595,20 +575,6 @@ namespace Isis
 //     }
 //
 //     updatingSelection = false;
-  }
-
-
-  void CnetEditorWidget::itemExpanded(const QModelIndex & index)
-  {
-    static_cast< AbstractTreeItem * >(
-      index.internalPointer())->setExpanded(true);
-  }
-
-
-  void CnetEditorWidget::itemCollapsed(const QModelIndex & index)
-  {
-    static_cast< AbstractTreeItem * >(
-      index.internalPointer())->setExpanded(false);
   }
 
 
@@ -664,17 +630,24 @@ namespace Isis
 
   void CnetEditorWidget::pointColToggled()
   {
-    QList< QAction * > actions = editPointView->horizontalHeader()->actions();
+    QList< QAction * > actions =
+      pointTableView->getHorizontalHeader()->actions();
+
     for (int i = 0; i < actions.size(); i++)
-      editPointView->setColumnHidden(i, !actions[i]->isChecked());
+    {
+      pointTableView->setColumnVisible(actions[i]->text(),
+          actions[i]->isChecked());
+    }
   }
 
 
   void CnetEditorWidget::measureColToggled()
   {
-    QList< QAction * > actions = editMeasureView->horizontalHeader()->actions();
+    QList< QAction * > actions =
+      measureTableView->getHorizontalHeader()->actions();
     for (int i = 0; i < actions.size(); i++)
-      editMeasureView->setColumnHidden(i, !actions[i]->isChecked());
+      measureTableView->setColumnVisible(actions[i]->text(),
+          actions[i]->isChecked());
   }
 
 
@@ -722,7 +695,7 @@ namespace Isis
     ASSERT(topSplitter);
     ASSERT(workingVersion);
     ASSERT(settingsPath);
-    ASSERT(editMeasureView);
+    ASSERT(measureTableView);
 
     QSettings settings(*settingsPath, QSettings::NativeFormat);
     *workingVersion = settings.value("version", "").toString();
@@ -731,7 +704,8 @@ namespace Isis
     topSplitter->restoreState(settings.value("topSplitter").toByteArray());
     mainSplitter->restoreState(settings.value("mainSplitter").toByteArray());
 
-    QList< QAction * > actions = editMeasureView->horizontalHeader()->actions();
+    QList< QAction * > actions =
+      measureTableView->getHorizontalHeader()->actions();
     for (int i = 0; i < actions.size(); i++)
     {
       actions[i]->setChecked(settings.value("measure table column: " +
@@ -739,11 +713,11 @@ namespace Isis
           true).toBool());
     }
 
-    actions = editPointView->horizontalHeader()->actions();
+    actions = pointTableView->getHorizontalHeader()->actions();
     for (int i = 0; i < actions.size(); i++)
     {
       actions[i]->setChecked(settings.value("point table column: " +
-          PointTableModel::getColName((PointTableModel::Column) i),
+          AbstractPointItem::getColumnName((AbstractPointItem::Column) i),
           true).toBool());
     }
   }
@@ -754,7 +728,7 @@ namespace Isis
     ASSERT(topSplitter);
     ASSERT(mainSplitter);
     ASSERT(settingsPath);
-    ASSERT(editMeasureView);
+    ASSERT(measureTableView);
 
     QSettings settings(*settingsPath, QSettings::NativeFormat);
     settings.setValue("version", VERSION);
@@ -762,7 +736,8 @@ namespace Isis
     settings.setValue("mainSplitter", mainSplitter->saveState());
     settings.setValue("driverView", getDriverView());
 
-    QList< QAction * > actions = editMeasureView->horizontalHeader()->actions();
+    QList< QAction * > actions =
+      measureTableView->getHorizontalHeader()->actions();
     for (int i = 0; i < actions.size(); i++)
     {
       settings.setValue("measure table column: " +
@@ -770,13 +745,12 @@ namespace Isis
           actions[i]->isChecked());
     }
 
-    actions = editPointView->horizontalHeader()->actions();
-    for (int i = 0; i < actions.size(); i++)
-    {
-      settings.setValue("point table column: " +
-          PointTableModel::getColName((PointTableModel::Column) i),
-          actions[i]->isChecked());
-    }
+//     actions = pointTableView->getHorizontalHeader()->actions();
+//     for (int i = 0; i < actions.size(); i++) {
+//       settings.setValue("point table column: " +
+//           AbstractPointItem::getColName((AbstractPointItem::Column) i),
+//           actions[i]->isChecked());
+//     }
   }
 
   QWidget * CnetEditorWidget::getPointTreeView()

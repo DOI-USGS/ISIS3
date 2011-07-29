@@ -50,6 +50,8 @@ namespace Isis
       // These methods are designed to be implemented either by
       // AbstractPointItem, AbstractMeasureItem, or AbstractSerialItem.
       virtual QString getData() const = 0;
+      virtual QString getData(QString columnTitle) const = 0;
+      virtual void setData(QString columnTitle, QString newData) = 0;
       virtual void deleteSource() = 0;
       virtual InternalPointerType getPointerType() const = 0;
       virtual void * getPointer() const = 0;
@@ -82,7 +84,8 @@ namespace Isis
 
     protected:
       virtual void calcDataWidth(int avgCharWidth);
-
+      static double catchNull(QString);
+      static QString catchNull(double);
 
       // disable copying of this class
     private:

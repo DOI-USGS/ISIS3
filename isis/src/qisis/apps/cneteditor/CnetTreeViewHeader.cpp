@@ -110,7 +110,7 @@ namespace Isis
 
 
   void CnetTreeViewHeader::handleFilterCountsChanged(
-      int visibleTopLevelItemCount, int topLevelItemCount)
+    int visibleTopLevelItemCount, int topLevelItemCount)
   {
     visibleCount = visibleTopLevelItemCount;
     totalCount = topLevelItemCount;

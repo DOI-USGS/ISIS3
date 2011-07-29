@@ -35,6 +35,17 @@ namespace Isis
   }
 
 
+  QString AbstractSerialItem::getData(QString columnTitle) const
+  {
+    return QString();
+  }
+
+
+  void AbstractSerialItem::setData(QString columnTitle, QString newData)
+  {
+  }
+
+
   void AbstractSerialItem::deleteSource()
   {
     // Shouldn't be deleting ControlCubeGraphNode's!

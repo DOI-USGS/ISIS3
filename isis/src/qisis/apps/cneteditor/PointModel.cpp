@@ -106,10 +106,6 @@ namespace Isis
 
   void PointModel::rebuildItems()
   {
-//     static int aoeu = 0;
-//     aoeu++;
-//     if (aoeu > 3)
-//       return;
     emit filterCountsChanged(-1, getTopLevelItemCount());
     QFuture< QAtomicPointer< RootItem > > futureRoot;
     if (getRebuildWatcher()->isStarted())

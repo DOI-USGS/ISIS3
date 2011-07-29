@@ -27,6 +27,19 @@ namespace Isis
   }
 
 
+  QString BusyLeafItem::getData(QString columnTitle) const
+  {
+    return QString();
+  }
+
+
+  void BusyLeafItem::setData(QString columnTitle, QString newData)
+  {
+    iString msg = "Cannot set data on BusyLeafItem";
+    throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+  }
+
+
   void BusyLeafItem::deleteSource()
   {
     iString msg = "Cannot delete source on BusyLeafItem";
