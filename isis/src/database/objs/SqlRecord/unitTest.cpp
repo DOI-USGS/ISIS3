@@ -64,6 +64,6 @@ int main(int argc, char *argv[]) {
 
   }
 
-  remove("$TEMPORARY/test.db");
+  remove(Filename("$TEMPORARY/test.db").Expanded().c_str());
   return 0;
 }
