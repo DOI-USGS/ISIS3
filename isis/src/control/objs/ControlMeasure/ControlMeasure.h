@@ -23,6 +23,7 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+#include <QObject>
 
 template< class A> class QVector;
 template< class A> class QList;
@@ -159,8 +160,14 @@ namespace Isis {
    *                              a check for an implicit lock if the measure is
    *                              the reference measure of the parent point in
    *                              the IsEditLocked method.  
+   *   @history 2011-07-29 Jai Rideout, Steven Lambright, and Eric Hyer - Made
+   *                           this inherit from QObject to get destroyed()
+   *                           signal
    */
-  class ControlMeasure {
+  class ControlMeasure : public QObject {
+
+      Q_OBJECT
+
       friend class ControlPoint;
       friend class ControlCubeGraphNode;
     public:

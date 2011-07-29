@@ -1,3 +1,6 @@
+#ifndef ControlPoint_h
+#define ControlPoint_h
+
 /**
  * @file
  * $Revision: 1.14 $
@@ -21,10 +24,9 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#ifndef ControlPoint_h
-#define ControlPoint_h
-
 #include <bitset>
+
+#include <QObject>
 
 #include "iString.h"
 #include "SurfacePoint.h"
@@ -262,8 +264,14 @@ namespace Isis {
    *   @history 2011-07-12 Ken Edmundson - Modified ComputeApriori method
    *                    to handle radius properly when computing average
    *                    coordinates
+   *   @history 2011-07-29 Jai Rideout, Steven Lambright, and Eric Hyer - Made
+   *                           this inherit from QObject to get destroyed()
+   *                           signal
    */
-  class ControlPoint {
+  class ControlPoint : public QObject {
+
+      Q_OBJECT
+
       friend class ControlNet;
     public:
       /**

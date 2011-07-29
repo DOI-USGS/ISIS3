@@ -23,6 +23,8 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+#include <QObject>
+
 template< typename A, typename B > class QHash;
 template< typename T > class QList;
 
@@ -59,8 +61,14 @@ namespace Isis {
    *                connection related bugs
    *   @history 2011-06-22 James Alexander Crough and Eric Hyer- Added 
    *                getValidMeasures method.
+   *   @history 2011-07-29 Jai Rideout, Steven Lambright, and Eric Hyer - Made
+   *                           this inherit from QObject to get destroyed()
+   *                           signal
    */
-  class ControlCubeGraphNode {
+  class ControlCubeGraphNode : public QObject {
+
+      Q_OBJECT
+
     public:
       explicit ControlCubeGraphNode(iString sn);
       ControlCubeGraphNode(const ControlCubeGraphNode &other);
