@@ -11,7 +11,7 @@ int main(int argc, char *argv[]) {
   Isis::Preference::Preferences(true);
 
   // SQLite
-  Filename dbfile("/tmp/test.db");
+  Filename dbfile("$TEMPORARY/test.db");
   Database testdb("testdb", "SQLite");
   string dbfileName(dbfile.Expanded());
   testdb.setDatabaseName(dbfileName.c_str());
@@ -64,6 +64,6 @@ int main(int argc, char *argv[]) {
 
   }
 
-  remove("/tmp/test.db");
+  remove("$TEMPORARY/test.db");
   return 0;
 }
