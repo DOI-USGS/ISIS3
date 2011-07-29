@@ -21,6 +21,9 @@
     <change name="Sharmila Prasad" date="2010-12-21">
       Updated to make the app compatible for binary cnet
     </change>
+    <change name="Sharmila Prasad" date="2011-07-29">
+      changed ONET_FORMAT to ONET_PREFIX
+    </change>
   </history>
 
 <groups>
@@ -39,7 +42,7 @@
         </filter>
       </parameter>
 
-      <parameter name="ONET_FORMAT">
+      <parameter name="ONET_PREFIX">
         <type>string</type>
         <brief>Enter the output file name pattern</brief>
         <description>

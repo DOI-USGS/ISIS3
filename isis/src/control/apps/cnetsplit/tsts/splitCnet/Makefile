@@ -4,7 +4,7 @@ include $(ISISROOT)/make/isismake.tsts
 
 commands:
 	$(APPNAME) cnet=$(INPUT)/autoseed.net \
-	  onet_format=$(OUTPUT)/outsplit?? \
+	  onet_prefix=$(OUTPUT)/outsplit?? \
 	  num_output_files=2 > /dev/null;
 	  cnetmerge inputtype=cnets \
 	  cnet=$(OUTPUT)/outsplit01.net \

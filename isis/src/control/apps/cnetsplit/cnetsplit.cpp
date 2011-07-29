@@ -26,7 +26,7 @@ void IsisMain() {
     
     // Get the output file pattern string
     // Set up an automatic id generator for the point ids
-    ID outFileID = ID(ui.GetString("ONET_FORMAT"));
+    ID outFileID = ID(ui.GetString("ONET_PREFIX"));
     
     int numOutputFiles = ui.GetInteger("NUM_OUTPUT_FILES");
     
