@@ -257,12 +257,16 @@ namespace Isis {
    * @param pPvlObj - Output log Pvl
    */
   void InterestOperator::ProcessLocked_Point_Reference(
-    ControlPoint &pCPoint, PvlObject &pPvlObj,
-    int &piMeasuresModified) {
+    ControlPoint &pCPoint, PvlObject &pPvlObj, int &piMeasuresModified) {
     int iNumMeasures  = pCPoint.GetNumMeasures();
     bool bPntEditLock = pCPoint.IsEditLocked();
     int iMsrIgnored   = 0;
 
+    // Log Point Details
+    if (bPntEditLock) {
+      pPvlObj += Isis::PvlKeyword("Reference", "No Change, PointEditLock"); 
+    }
+    
     for (int measure = 0; measure < iNumMeasures; measure++) {
       ControlMeasure *newMeasure = new ControlMeasure(*pCPoint[measure]);
       newMeasure->SetDateTime();
@@ -279,6 +283,10 @@ namespace Isis {
       pvlMeasureGrp += Isis::PvlKeyword("OriginalLocation",
                    LocationString(newMeasure->GetSample(), newMeasure->GetLine()));
 
+      if (bMeasureLocked) {
+        pvlMeasureGrp += Isis::PvlKeyword("EditLock", "True");
+      }
+      
       if (!newMeasure->IsIgnored()) {
         Cube *measureCube = mCubeMgr.OpenCube(mSerialNumbers.Filename(sn));
 
@@ -290,7 +298,7 @@ namespace Isis {
                                               "Ignored as Point EditLock is True");
           }
           else if (bMeasureLocked == measure) {
-            pvlMeasureGrp += Isis::PvlKeyword("Error", "Reference failed the Validation Test "
+            pvlMeasureGrp += Isis::PvlKeyword("Error", "Failed the Validation Test "
                                               "but is Locked");
           }
           else {
@@ -560,26 +568,34 @@ namespace Isis {
       }
       else {
         // Process Ignored, non Free points or Measures=0
-        int iComment = 1;
+        int iComment = 0;
 
         if (iOrigRefIndex < 0) {
-          std::string sComment = "Comment" + iComment++;
+          iString sComment = "Comment";
+          sComment += iString(++iComment);
           pvlPointObj += Isis::PvlKeyword(sComment, "No Measures in the Point");
         }
 
         if (newPnt->IsIgnored()) {
-          std::string sComment = "Comment" + iComment++;
+          iString sComment = "Comment";
+          sComment += iString(++iComment);
           pvlPointObj += Isis::PvlKeyword(sComment, "Point was originally Ignored");
         }
 
-        if (newPnt->GetType() == ControlPoint::Free) {
-          std::string sComment = "Comment" + iComment++;
-          pvlPointObj += Isis::PvlKeyword(sComment, "Not a Free Point");
+        if (newPnt->GetType() == ControlPoint::Fixed) {
+          iString sComment = "Comment";
+          sComment += iString(++iComment);
+          pvlPointObj += Isis::PvlKeyword(sComment, "Fixed Point");
+        }
+        else if (newPnt->GetType() == ControlPoint::Constrained) {
+          iString sComment = "Comment";
+          sComment += iString(++iComment);
+          pvlPointObj += Isis::PvlKeyword(sComment, "Constrained Point");
         }
 
         if (iNumMeasuresLocked > 0 && !bRefLocked) {
           pvlPointObj += Isis::PvlKeyword("Error", "Point has a Measure with EditLock set to true "
-                                          "but not a Reference");
+                                          "but the Reference is not Locked");
         }
 
         for (int measure = 0; measure < newPnt->GetNumMeasures(); measure++) {
