@@ -45,7 +45,7 @@ def open_file(filename, mode):
   try:
     file = open(filename, mode)
   except IOError:
-    sys.exit("FAILURE Unable to open '" + filename + "!")
+    sys.exit("FAILURE Unable to open '" + filename + "'!")
   else:
     return file
 
