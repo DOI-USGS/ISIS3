@@ -145,8 +145,8 @@ void (ControlNetFilter::*GetPtr2Filter(const string psFilter)) (const PvlGroup &
   if (psFilter == "Point_EditLock")
     return &ControlNetFilter::PointEditLockFilter;
   
-  if (psFilter == "Point_MeasureEditLock") {
-    return &ControlNetFilter::PointMeasureEditLockFilter;
+  if (psFilter == "Point_NumMeasuresEditLock") {
+    return &ControlNetFilter::PointNumMeasuresEditLockFilter;
   }
   
   if (psFilter == "Point_ResidualMagnitude"){

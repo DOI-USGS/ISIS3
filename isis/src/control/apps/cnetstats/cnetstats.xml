@@ -255,7 +255,7 @@
     it can be deleted from the group.<br/> 
     <table border="1" cellpadding="2" cellspacing="0" bgcolor="#f0f0f0">
      <tr><td><table border="0" cellpadding="3" cellspacing="0"> 
-             <tr><td colspan="2"> Group = Point_MeasureEditLock</td></tr>
+             <tr><td colspan="2"> Group = Point_NumMeasuresEditLock</td></tr>
              <tr><td width="10"></td><td>  LessThan = integer</td></tr> 
               <tr><td width="10"></td><td> GreaterThan = integer</td></tr>
              <tr><td colspan="2"> EndGroup</td></tr> </table> 
