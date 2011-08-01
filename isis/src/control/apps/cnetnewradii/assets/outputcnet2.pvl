@@ -1,294 +1,450 @@
 Object = ControlNetwork
-  NetworkId    = TestNetwork2
-  NetworkType  = ImageToGround
+  NetworkId    = AS15_Rev4_AutoSeed
   TargetName   = MOON
-  UserName     = jwalldren
-  Created      = 2010-05-27T08:50:20
-  LastModified = 2010-05-27T08:50:20
+  UserName     = tbecker
+  Created      = 2010-03-25T17:06:31
+  LastModified = 2010-03-26T05:55:56
   Description  = AS15_Rev4_AutoSeed
+  Version      = 3
 
   Object = ControlPoint
-    PointType = Tie
-    PointId   = AS15R4_0003
-    Latitude  = -26.725494037818
-    Longitude = 178.2671495273
-    Radius    = 1734723.8455167
+    PointType   = Free
+    PointId     = AS15R4_0003
+    ChooserName = cnetnewradii
+    DateTime    = 2011-08-01T12:54:28
+
+    # AprioriLatitude = -26.725494037818 <degrees>
+    AprioriX    = -1548697.115442 <meters>
+
+    # AprioriLongitude = 178.2671495273 <degrees>
+    AprioriY    = 46852.998521601 <meters>
+
+    # AprioriRadius = 1734723.8455167 <meters>
+    AprioriZ    = -780133.87399565 <meters>
+
+    # AdjustedLatitude = -26.725494037818 <degrees>
+    AdjustedX   = -1548697.115442 <meters>
+
+    # AdjustedLongitude = 178.2671495273 <degrees>
+    AdjustedY   = 46852.998521601 <meters>
+
+    # AdjustedRadius = 1734723.8455167 <meters>
+    AdjustedZ   = -780133.87399565 <meters>
 
     Group = ControlMeasure
       SerialNumber   = APOLLO15/METRIC/1971-07-30T02:17:20.758
-      MeasureType    = Estimated
+      MeasureType    = Candidate
+      ChooserName    = tbecker
+      DateTime       = 2010-03-26T10:22:13
       Sample         = 16641.066683342
       Line           = 18441.299208028
-      ErrorLine      = 31.371961396097
-      ErrorSample    = -16.188068399169
-      ErrorMagnitude = 35.302316076065
-      DateTime       = 2010-03-26T10:22:13
-      ChooserName    = tbecker
+      SampleResidual = -16.188068399169 <pixels>
+      LineResidual   = 31.371961396097 <pixels>
       Reference      = True
     End_Group
 
     Group = ControlMeasure
       SerialNumber   = APOLLO15/METRIC/1971-07-30T02:17:41.097
-      MeasureType    = Automatic
+      MeasureType    = RegisteredPixel
+      ChooserName    = tbecker
+      DateTime       = 2010-03-26T11:41:48
       Sample         = 21165.339298552
       Line           = 18388.043343993
-      ErrorLine      = -31.468088376383
-      ErrorSample    = 16.087134599038
-      ErrorMagnitude = 35.341710282206
-      ZScore         = (-1.8265233914471, 1.7170948216629)
-      DateTime       = 2010-03-26T11:41:48
-      ChooserName    = tbecker
+      SampleResidual = 16.087134599038 <pixels>
+      LineResidual   = -31.468088376383 <pixels>
       GoodnessOfFit  = 0.95831193693118
-      Reference      = False
     End_Group
   End_Object
 
   Object = ControlPoint
-    PointType = Tie
-    PointId   = AS15R4_0005
-    Latitude  = -25.016910097201
-    Longitude = 178.21447560641
-    Radius    = 1734024.7049447
+    PointType   = Free
+    PointId     = AS15R4_0005
+    ChooserName = cnetnewradii
+    DateTime    = 2011-08-01T12:54:28
+
+    # AprioriLatitude = -25.016910097201 <degrees>
+    AprioriX    = -1570580.7957759 <meters>
+
+    # AprioriLongitude = 178.21447560641 <degrees>
+    AprioriY    = 48960.298674132 <meters>
+
+    # AprioriRadius = 1734024.7049447 <meters>
+    AprioriZ    = -733294.30002711 <meters>
+
+    # AdjustedLatitude = -25.016910097201 <degrees>
+    AdjustedX   = -1570580.7957759 <meters>
+
+    # AdjustedLongitude = 178.21447560641 <degrees>
+    AdjustedY   = 48960.298674132 <meters>
+
+    # AdjustedRadius = 1734024.7049447 <meters>
+    AdjustedZ   = -733294.30002711 <meters>
 
     Group = ControlMeasure
       SerialNumber   = APOLLO15/METRIC/1971-07-30T02:17:20.758
-      MeasureType    = Estimated
+      MeasureType    = Candidate
+      ChooserName    = tbecker
+      DateTime       = 2010-03-26T11:42:21
       Sample         = 15537.131784551
       Line           = 11119.450685981
-      ErrorLine      = 23.000341737652
-      ErrorSample    = -18.957401500413
-      ErrorMagnitude = 29.806019386973
-      DateTime       = 2010-03-26T11:42:21
-      ChooserName    = tbecker
+      SampleResidual = -18.957401500413 <pixels>
+      LineResidual   = 23.000341737652 <pixels>
       Reference      = True
     End_Group
 
     Group = ControlMeasure
       SerialNumber   = APOLLO15/METRIC/1971-07-30T02:17:41.097
-      MeasureType    = Estimated
+      MeasureType    = Candidate
+      ChooserName    = tbecker
+      DateTime       = 2010-03-26T11:42:33
       Sample         = 20081.654717586
       Line           = 11092.839678099
-      ErrorLine      = -22.947521239779
-      ErrorSample    = 18.63295081292
-      ErrorMagnitude = 29.559695313836
-      ZScore         = (-3.8453926445342, 2.9646044014384)
-      DateTime       = 2010-03-26T11:42:33
-      ChooserName    = tbecker
+      SampleResidual = 18.63295081292 <pixels>
+      LineResidual   = -22.947521239779 <pixels>
       GoodnessOfFit  = 0.46819498859581
-      Reference      = False
     End_Group
   End_Object
 
   Object = ControlPoint
-    PointType = Ground
-    PointId   = LOLA_FEB1
-    Latitude  = -22.405161656842
-    Longitude = 175.13615189262
-    Radius    = 1735887.0
+    PointType   = Fixed
+    PointId     = LOLA_FEB1
+    ChooserName = cnetnewradii
+    DateTime    = 2011-08-01T12:54:28
+
+    # AprioriLatitude = -22.405161656842 <degrees>
+    AprioriX    = -1599012.0681482 <meters>
+
+    # AprioriLongitude = 175.13615189262 <degrees>
+    AprioriY    = 136067.40282043 <meters>
+
+    # AprioriRadius = 1735825.4427101 <meters>
+    AprioriZ    = -661616.22967225 <meters>
+
+    # AdjustedLatitude = -22.405161656842 <degrees>
+    AdjustedX   = -0.92118252723139 <meters>
+
+    # AdjustedLongitude = 175.13615189262 <degrees>
+    AdjustedY   = 0.078387722332259 <meters>
+
+    # AdjustedRadius = 1.0 <meters>
+    AdjustedZ   = -0.38115366522067 <meters>
 
     Group = ControlMeasure
-      SerialNumber   = APOLLO15/METRIC/1971-07-30T02:17:20.758
-      MeasureType    = Estimated
-      Sample         = 1748.4133699751
-      Line           = 1275.0785012628
-      ErrorLine      = 0.0
-      ErrorSample    = 0.0
-      ErrorMagnitude = 0.0
-      DateTime       = 2010-04-01T16:22:20
-      ChooserName    = tbecker
-      Reference      = False
+      SerialNumber = APOLLO15/METRIC/1971-07-30T02:17:20.758
+      MeasureType  = Candidate
+      ChooserName  = tbecker
+      DateTime     = 2010-04-01T16:22:20
+      Sample       = 1748.4133699751
+      Line         = 1275.0785012628
     End_Group
   End_Object
 
   Object = ControlPoint
-    PointType = Ground
-    PointId   = LOLA_FEB2
-    Latitude  = -26.739277441672
-    Longitude = 175.25974417689
-    Radius    = 1733416.0
+    PointType   = Fixed
+    PointId     = LOLA_FEB2
+    ChooserName = cnetnewradii
+    DateTime    = 2011-08-01T12:54:28
+
+    # AprioriLatitude = -26.739277441672 <degrees>
+    AprioriX    = -1543168.3685033 <meters>
+
+    # AprioriLongitude = 175.25974417689 <degrees>
+    AprioriY    = 127963.1513487 <meters>
+
+    # AprioriRadius = 1733880.4799591 <meters>
+    AprioriZ    = -780127.12882642 <meters>
+
+    # AdjustedLatitude = -26.739277441672 <degrees>
+    AdjustedX   = -0.89000850193532 <meters>
+
+    # AdjustedLongitude = 175.25974417689 <degrees>
+    AdjustedY   = 0.073801598684426 <meters>
+
+    # AdjustedRadius = 1.0 <meters>
+    AdjustedZ   = -0.44993131755243 <meters>
 
     Group = ControlMeasure
-      SerialNumber   = APOLLO15/METRIC/1971-07-30T02:17:20.758
-      MeasureType    = Estimated
-      Sample         = 4866.542991192
-      Line           = 19934.177686413
-      ErrorLine      = 0.0
-      ErrorSample    = 0.0
-      ErrorMagnitude = 0.0
-      DateTime       = 2010-04-01T16:24:19
-      ChooserName    = tbecker
-      Reference      = False
+      SerialNumber = APOLLO15/METRIC/1971-07-30T02:17:20.758
+      MeasureType  = Candidate
+      ChooserName  = tbecker
+      DateTime     = 2010-04-01T16:24:19
+      Sample       = 4866.542991192
+      Line         = 19934.177686413
     End_Group
   End_Object
 
   Object = ControlPoint
-    PointType = Ground
-    PointId   = LOLA_FEB3
-    Latitude  = -26.71892681544
-    Longitude = 178.70609470425
-    Radius    = 0.0
-    Ignore    = True
+    PointType   = Fixed
+    PointId     = LOLA_FEB3
+    ChooserName = cnetnewradii
+    DateTime    = 2011-08-01T12:54:28
+    Ignore      = True
+
+    # AprioriLatitude = -26.71892681544 <degrees>
+    AprioriX    = -0.89299515700809 <meters>
+
+    # AprioriLongitude = 178.70609470425 <degrees>
+    AprioriY    = 0.020169856045193 <meters>
+
+    # AprioriRadius = 1.0 <meters>
+    AprioriZ    = -0.44961408615302 <meters>
+
+    # AdjustedLatitude = -26.71892681544 <degrees>
+    AdjustedX   = -0.89299515700809 <meters>
+
+    # AdjustedLongitude = 178.70609470425 <degrees>
+    AdjustedY   = 0.020169856045193 <meters>
+
+    # AdjustedRadius = 1.0 <meters>
+    AdjustedZ   = -0.44961408615302 <meters>
 
     Group = ControlMeasure
-      SerialNumber   = APOLLO15/METRIC/1971-07-30T02:17:20.758
-      MeasureType    = Estimated
-      Sample         = 18375.381858411
-      Line           = 18227.026515154
-      ErrorLine      = 0.0
-      ErrorSample    = 0.0
-      ErrorMagnitude = 0.0
-      DateTime       = 2010-04-01T16:26:34
-      ChooserName    = tbecker
-      Reference      = False
+      SerialNumber = APOLLO15/METRIC/1971-07-30T02:17:20.758
+      MeasureType  = Candidate
+      ChooserName  = tbecker
+      DateTime     = 2010-04-01T16:26:34
+      Sample       = 18375.381858411
+      Line         = 18227.026515154
     End_Group
   End_Object
 
   Object = ControlPoint
-    PointType = Ground
-    PointId   = LOLA_FEB4
-    Latitude  = -25.24563284454
-    Longitude = 178.6731813868
-    Radius    = 0.0
-    Ignore    = True
+    PointType   = Fixed
+    PointId     = LOLA_FEB4
+    ChooserName = cnetnewradii
+    DateTime    = 2011-08-01T12:54:28
+    Ignore      = True
+
+    # AprioriLatitude = -25.24563284454 <degrees>
+    AprioriX    = -0.9042451456248 <meters>
+
+    # AprioriLongitude = 178.6731813868 <degrees>
+    AprioriY    = 0.020943668282167 <meters>
+
+    # AprioriRadius = 1.0 <meters>
+    AprioriZ    = -0.42649979996814 <meters>
+
+    # AdjustedLatitude = -25.24563284454 <degrees>
+    AdjustedX   = -0.9042451456248 <meters>
+
+    # AdjustedLongitude = 178.6731813868 <degrees>
+    AdjustedY   = 0.020943668282167 <meters>
+
+    # AdjustedRadius = 1.0 <meters>
+    AdjustedZ   = -0.42649979996814 <meters>
 
     Group = ControlMeasure
-      SerialNumber   = APOLLO15/METRIC/1971-07-30T02:17:20.758
-      MeasureType    = Estimated
-      Sample         = 17618.053743943
-      Line           = 11634.768048021
-      ErrorLine      = 0.0
-      ErrorSample    = 0.0
-      ErrorMagnitude = 0.0
-      DateTime       = 2010-04-01T16:27:57
-      ChooserName    = tbecker
-      Reference      = False
+      SerialNumber = APOLLO15/METRIC/1971-07-30T02:17:20.758
+      MeasureType  = Candidate
+      ChooserName  = tbecker
+      DateTime     = 2010-04-01T16:27:57
+      Sample       = 17618.053743943
+      Line         = 11634.768048021
     End_Group
   End_Object
 
   Object = ControlPoint
-    PointType = Ground
-    PointId   = LOLA_FEB5
-    Latitude  = -22.517216023506
-    Longitude = 167.84166695506
-    Radius    = 1736570.0
+    PointType   = Fixed
+    PointId     = LOLA_FEB5
+    ChooserName = cnetnewradii
+    DateTime    = 2011-08-01T12:54:28
+
+    # AprioriLatitude = -22.517216023506 <degrees>
+    AprioriX    = -1568197.7086304 <meters>
+
+    # AprioriLongitude = 167.84166695506 <degrees>
+    AprioriY    = 337862.78952718 <meters>
+
+    # AprioriRadius = 1736568.7565679 <meters>
+    AprioriZ    = -665038.14055053 <meters>
+
+    # AdjustedLatitude = -22.517216023506 <degrees>
+    AdjustedX   = -0.90304383440007 <meters>
+
+    # AdjustedLongitude = 167.84166695506 <degrees>
+    AdjustedY   = 0.19455768062701 <meters>
+
+    # AdjustedRadius = 1.0 <meters>
+    AdjustedZ   = -0.38296101898372 <meters>
 
     Group = ControlMeasure
-      SerialNumber   = APOLLO15/METRIC/1971-07-30T02:20:44.876
-      MeasureType    = Estimated
-      Sample         = 18350.011205256
-      Line           = 6574.6967095522
-      ErrorLine      = 0.0
-      ErrorSample    = 0.0
-      ErrorMagnitude = 0.0
-      DateTime       = 2010-04-01T16:11:32
-      ChooserName    = tbecker
-      Reference      = False
+      SerialNumber = APOLLO15/METRIC/1971-07-30T02:20:44.876
+      MeasureType  = Candidate
+      ChooserName  = tbecker
+      DateTime     = 2010-04-01T16:11:32
+      Sample       = 18350.011205256
+      Line         = 6574.6967095522
     End_Group
   End_Object
 
   Object = ControlPoint
-    PointType = Ground
-    PointId   = LOLA_FEB6
-    Latitude  = -24.371395530564
-    Longitude = 164.89045242137
-    Radius    = 1737721.5
+    PointType   = Fixed
+    PointId     = LOLA_FEB6
+    ChooserName = cnetnewradii
+    DateTime    = 2011-08-01T12:54:28
+
+    # AprioriLatitude = -24.371395530564 <degrees>
+    AprioriX    = -1528263.0526449 <meters>
+
+    # AprioriLongitude = 164.89045242137 <degrees>
+    AprioriY    = 412630.23597659 <meters>
+
+    # AprioriRadius = 1737848.2364116 <meters>
+    AprioriZ    = -717122.59975365 <meters>
+
+    # AdjustedLatitude = -24.371395530564 <degrees>
+    AdjustedX   = -0.87939960499687 <meters>
+
+    # AdjustedLongitude = 164.89045242137 <degrees>
+    AdjustedY   = 0.23743743977817 <meters>
+
+    # AdjustedRadius = 1.0 <meters>
+    AdjustedZ   = -0.41264972667256 <meters>
 
     Group = ControlMeasure
-      SerialNumber   = APOLLO15/METRIC/1971-07-30T02:20:44.876
-      MeasureType    = Estimated
-      Sample         = 7538.376041843
-      Line           = 17849.107247623
-      ErrorLine      = 0.0
-      ErrorSample    = 0.0
-      ErrorMagnitude = 0.0
-      DateTime       = 2010-04-01T16:12:37
-      ChooserName    = tbecker
-      Reference      = False
+      SerialNumber = APOLLO15/METRIC/1971-07-30T02:20:44.876
+      MeasureType  = Candidate
+      ChooserName  = tbecker
+      DateTime     = 2010-04-01T16:12:37
+      Sample       = 7538.376041843
+      Line         = 17849.107247623
     End_Group
   End_Object
 
   Object = ControlPoint
-    PointType = Ground
-    PointId   = LOLA_FEB7
-    Latitude  = -22.141261108836
-    Longitude = 164.86824950122
-    Radius    = 1737969.0
+    PointType   = Fixed
+    PointId     = LOLA_FEB7
+    ChooserName = cnetnewradii
+    DateTime    = 2011-08-01T12:54:28
+
+    # AprioriLatitude = -22.141261108836 <degrees>
+    AprioriX    = -1554038.1012515 <meters>
+
+    # AprioriLongitude = 164.86824950122 <degrees>
+    AprioriY    = 420235.6661208 <meters>
+
+    # AprioriRadius = 1738020.8678866 <meters>
+    AprioriZ    = -655045.11446756 <meters>
+
+    # AdjustedLatitude = -22.141261108836 <degrees>
+    AdjustedX   = -0.89414237191594 <meters>
+
+    # AdjustedLongitude = 164.86824950122 <degrees>
+    AdjustedY   = 0.24178977012618 <meters>
+
+    # AdjustedRadius = 1.0 <meters>
+    AdjustedZ   = -0.37689139789449 <meters>
 
     Group = ControlMeasure
-      SerialNumber   = APOLLO15/METRIC/1971-07-30T02:20:44.876
-      MeasureType    = Estimated
-      Sample         = 5246.5491442556
-      Line           = 7445.4873882713
-      ErrorLine      = 0.0
-      ErrorSample    = 0.0
-      ErrorMagnitude = 0.0
-      DateTime       = 2010-04-01T16:13:59
-      ChooserName    = tbecker
-      Reference      = False
+      SerialNumber = APOLLO15/METRIC/1971-07-30T02:20:44.876
+      MeasureType  = Candidate
+      ChooserName  = tbecker
+      DateTime     = 2010-04-01T16:13:59
+      Sample       = 5246.5491442556
+      Line         = 7445.4873882713
     End_Group
   End_Object
 
   Object = ControlPoint
-    PointType = Ground
-    PointId   = LOLA_FEB8
-    Latitude  = -15.815860550749
-    Longitude = 143.85339030177
-    Radius    = 0.0
-    Ignore    = True
+    PointType   = Fixed
+    PointId     = LOLA_FEB8
+    ChooserName = cnetnewradii
+    DateTime    = 2011-08-01T12:54:28
+    Ignore      = True
+
+    # AprioriLatitude = -15.815860550749 <degrees>
+    AprioriX    = -0.77694005624129 <meters>
+
+    # AprioriLongitude = 143.85339030177 <degrees>
+    AprioriY    = 0.56752312873897 <meters>
+
+    # AprioriRadius = 1.0 <meters>
+    AprioriZ    = -0.27254659666579 <meters>
+
+    # AdjustedLatitude = -15.815860550749 <degrees>
+    AdjustedX   = -0.77694005624129 <meters>
+
+    # AdjustedLongitude = 143.85339030177 <degrees>
+    AdjustedY   = 0.56752312873897 <meters>
+
+    # AdjustedRadius = 1.0 <meters>
+    AdjustedZ   = -0.27254659666579 <meters>
 
     Group = ControlMeasure
-      SerialNumber   = APOLLO15/METRIC/1971-07-30T02:27:53.464
-      MeasureType    = Estimated
-      Sample         = 9677.951478109
-      Line           = 3420.4384955915
-      ErrorLine      = 0.0
-      ErrorSample    = 0.0
-      ErrorMagnitude = 0.0
-      DateTime       = 2010-04-01T16:41:43
-      ChooserName    = tbecker
-      Reference      = False
+      SerialNumber = APOLLO15/METRIC/1971-07-30T02:27:53.464
+      MeasureType  = Candidate
+      ChooserName  = tbecker
+      DateTime     = 2010-04-01T16:41:43
+      Sample       = 9677.951478109
+      Line         = 3420.4384955915
     End_Group
   End_Object
 
   Object = ControlPoint
-    PointType = Ground
-    PointId   = LOLA_FEB9
-    Latitude  = -18.656246410701
-    Longitude = 142.57663890403
-    Radius    = 1742204.0
+    PointType   = Fixed
+    PointId     = LOLA_FEB9
+    ChooserName = cnetnewradii
+    DateTime    = 2011-08-01T12:54:28
+
+    # AprioriLatitude = -18.656246410701 <degrees>
+    AprioriX    = -1310623.0320068 <meters>
+
+    # AprioriLongitude = 142.57663890403 <degrees>
+    AprioriY    = 1002893.9830851 <meters>
+
+    # AprioriRadius = 1741836.9178219 <meters>
+    AprioriZ    = -557195.45489203 <meters>
+
+    # AdjustedLatitude = -18.656246410701 <degrees>
+    AdjustedX   = -0.75243727963102 <meters>
+
+    # AdjustedLongitude = 142.57663890403 <degrees>
+    AdjustedY   = 0.57576801411418 <meters>
+
+    # AdjustedRadius = 1.0 <meters>
+    AdjustedZ   = -0.31988956554486 <meters>
 
     Group = ControlMeasure
-      SerialNumber   = APOLLO15/METRIC/1971-07-30T02:27:53.464
-      MeasureType    = Estimated
-      Sample         = 8663.5116124686
-      Line           = 21584.797333383
-      ErrorLine      = 0.0
-      ErrorSample    = 0.0
-      ErrorMagnitude = 0.0
-      DateTime       = 2010-04-01T16:43:28
-      ChooserName    = tbecker
-      Reference      = False
+      SerialNumber = APOLLO15/METRIC/1971-07-30T02:27:53.464
+      MeasureType  = Candidate
+      ChooserName  = tbecker
+      DateTime     = 2010-04-01T16:43:28
+      Sample       = 8663.5116124686
+      Line         = 21584.797333383
     End_Group
   End_Object
 
   Object = ControlPoint
-    PointType = Ground
-    PointId   = LOLA_FEB10
-    Latitude  = -18.518634429218
-    Longitude = 144.51633135074
-    Radius    = 1742642.5
+    PointType   = Fixed
+    PointId     = LOLA_FEB10
+    ChooserName = cnetnewradii
+    DateTime    = 2011-08-01T12:54:28
+
+    # AprioriLatitude = -18.518634429218 <degrees>
+    AprioriX    = -1345457.2672931 <meters>
+
+    # AprioriLongitude = 144.51633135074 <degrees>
+    AprioriY    = 959126.83435198 <meters>
+
+    # AprioriRadius = 1742554.2442047 <meters>
+    AprioriZ    = -553457.99434997 <meters>
+
+    # AdjustedLatitude = -18.518634429218 <degrees>
+    AdjustedX   = -0.77211786764617 <meters>
+
+    # AdjustedLongitude = 144.51633135074 <degrees>
+    AdjustedY   = 0.55041433432663 <meters>
+
+    # AdjustedRadius = 1.0 <meters>
+    AdjustedZ   = -0.31761306495372 <meters>
 
     Group = ControlMeasure
-      SerialNumber   = APOLLO15/METRIC/1971-07-30T02:27:53.464
-      MeasureType    = Estimated
-      Sample         = 18870.679628564
-      Line           = 17207.772627622
-      ErrorLine      = 0.0
-      ErrorSample    = 0.0
-      ErrorMagnitude = 0.0
-      DateTime       = 2010-04-01T16:44:31
-      ChooserName    = tbecker
-      Reference      = False
+      SerialNumber = APOLLO15/METRIC/1971-07-30T02:27:53.464
+      MeasureType  = Candidate
+      ChooserName  = tbecker
+      DateTime     = 2010-04-01T16:44:31
+      Sample       = 18870.679628564
+      Line         = 17207.772627622
     End_Group
   End_Object
 End_Object

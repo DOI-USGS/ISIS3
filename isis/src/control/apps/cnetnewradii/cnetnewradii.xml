@@ -8,15 +8,14 @@
   <description>
     <p>
       This application will go through an existing ControlNet and copy it to a new 
-      one. When it encounters a PointType Fixed it will give the latitude and 
-      longitude to a Universal Ground Map that is generated from the DEM and ask 
-      it for a value back. The Radius of that ControlPoint is updated with the DN 
-      value recieved from the DEM. 
+      one. When it encounters a point type of Fixed or Constrained it will use the 
+      control point latitude and longitude to get the radius from the DEM.  The 
+      radius will be calculated based on a bilinear interpolation of the closest
+      pixels in the DEM. 
     </p>
     <p>
-      If, for a particular point, the application fails to set the Univeral 
-      Ground or if the Radius calculated using the DEM returns Null (or any 
-      other special pixel value), then the input Radius value is kept and the 
+      If, for a particular point, the application fails to calculated a radius using
+      the DEM, then the input Radius value is kept and the 
       point is set to Ignore=true.  The number of these failures 
       are recorded in the application's log.  The Point IDs for the 
       corresponding control points will be listed in the ERRORS log output file.  
@@ -61,6 +60,16 @@
     <change name="Debbie A. Cook and Tracie Sucharski" date="2011-06-07">
       Changed the point type "Ground" to "Fixed"
     </change>
+    <change name="Tracie Sucharski" date="2011-07-28">
+      Change radii values for both Fixed and Constrained points.   Use bilinear
+      interpolation to get the correct radius from the DEM.  This uses the same
+      interpolation as the camera.  Print error  if there are no Fixed or Constrained
+      points in the network.  Change input parameter names to be consistent with
+      those suggested on the Astrogeology wiki page.  Removed NETWORKID
+      as user parameter since it should carry the ID from the input control net.
+      Set Apriori as the default for the GETLATLON parameter.  Update examples
+      documentation  .
+    </change>
   </history>
 
   <groups>
@@ -76,7 +85,7 @@
           output from.
         </description>
         <filter>
-          *.net *.pvl *.ctl *.cnet
+          *.net
         </filter>
       </parameter>
 
@@ -95,7 +104,7 @@
         </filter>
       </parameter>
 
-      <parameter name="TO">
+      <parameter name="ONET">
         <type>filename</type>
         <fileMode>output</fileMode>
         <brief>
@@ -105,7 +114,7 @@
           Use this parameter to specify the name of the output ControlNet.
         </description>
         <filter>
-          *.net *.pvl *.ctl *.cnet
+          *.net
         </filter>
       </parameter>
 
@@ -129,19 +138,9 @@
     </group>
 
     <group name="Parameters">
-      <parameter name="NETWORKID">
-        <type>string</type>
-        <brief>
-          Network Id for output ControlNet
-        </brief>
-        <description>
-          The user must specify the Network Id for the ouput ControlNet
-        </description>
-      </parameter>
-      
       <parameter name="GETLATLON">
         <type>string</type>
-        <default><item>NONE</item></default>
+        <default><item>APRIORI</item></default>
         <brief>The lat/lon used to set the new radii</brief>
         <description>
         Specify the Surface Point to use when setting the new radii.
@@ -176,14 +175,14 @@
       </description>
       <terminalInterface>
         <commandLine>
-          cnet=../IN/inputcnet.pvl dem=../IN/inputDEM1.cub 
-          to=../OUT/ouputcnet1.pvl networkid=TestNetwork1 
+          cnet=../IN/inputcnet.net model=../IN/inputDEM1.cub 
+          onet=../OUT/ouputcnet1.net getlatlon=APRIORI
         </commandLine>
         <description>
           In this example, cnetnewradii will take the input control network and 
           copy it to the output network with new Radius values calculated for 
-          all fixed points using the DN value recieved from the DEM cube.  
-          No error log will be generated.
+          all fixed points using an interpolated  DN value from the DEM cube. 
+          The apriori values will be updated.  No error log will be generated.
         </description>
       </terminalInterface>
       <guiInterfaces>
@@ -201,14 +200,14 @@
         </guiInterface>
       </guiInterfaces>
       <dataFiles>
-        <dataFile path="assets/inputcnet.pvl">
+        <dataFile path="assets/inputcnet.net.pvl">
           <brief>Input ControlNet for cnetnewradii </brief>
           <description>
             Example of an input ControlNet whose Radius values will be updated
           </description>
           <parameterName>CNET</parameterName>
         </dataFile>
-        <dataFile path="assets/outputcnet1.pvl">
+        <dataFile path="assets/outputcnet1.net.pvl">
           <brief>Output ControlNet for cnetnewradii </brief>
           <description>
             Example of an output ControlNet corresponding to the input example 
@@ -238,9 +237,8 @@
       </description>
       <terminalInterface>
         <commandLine>
-          cnet=../IN/inputcnet.pvl dem=../IN/inputDEM2.cub 
-          to=../OUT/ouputcnet2.pvl networkid=TestNetwork2 
-          errors=../OUT/failures.pvl
+          cnet=../IN/inputcnet.pvl model=../IN/inputDEM2.cub 
+          onet=../OUT/ouputcnet2.pvl errors=../OUT/failures.pvl
         </commandLine>
         <description>
           In this example, cnetnewradii will take the input control network and 
@@ -265,7 +263,7 @@
         </guiInterface>
       </guiInterfaces>
       <dataFiles>
-        <dataFile path="assets/inputcnet.pvl">
+        <dataFile path="assets/inputcnet.net.pvl">
           <brief>Input ControlNet for cnetnewradii </brief>
           <description>
             Example of an input ControlNet whose Radius values will be updated
@@ -280,7 +278,7 @@
           </description>
           <parameterName>ERRORS</parameterName>
         </dataFile>
-        <dataFile path="assets/outputcnet2.pvl">
+        <dataFile path="assets/outputcnet2.net.pvl">
           <brief>Output ControlNet for cnetnewradii </brief>
           <description>
             Example of an output ControlNet corresponding to the input example 
