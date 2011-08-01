@@ -323,8 +323,9 @@ namespace Isis {
     // make sure there is a node for every measure in this measure's parent
     for (int i = 0; i < point->GetNumMeasures(); i++) {
       QString sn = point->GetMeasure(i)->GetCubeSerialNumber();
-      if (!cubeGraphNodes->contains(sn))
+      if (!cubeGraphNodes->contains(sn)) {
         cubeGraphNodes->insert(sn, new ControlCubeGraphNode(sn));
+      }
     }
 
     // add the measure to the corresponding node
@@ -430,22 +431,14 @@ namespace Isis {
   void ControlNet::measureDeleted(ControlMeasure *measure) {
     ASSERT(measure);
 
-    ControlPoint *point = measure->Parent();
-    ASSERT(point);
     QString serial = measure->GetCubeSerialNumber();
     ASSERT(cubeGraphNodes->contains(serial));
     ControlCubeGraphNode *node = (*cubeGraphNodes)[serial];
 
     // remove connections to and from this node
-    for (int i = 0; i < point->GetNumMeasures(); i++) {
-      QString sn = point->GetMeasure(i)->GetCubeSerialNumber();
-      if (cubeGraphNodes->contains(sn)) {
-        ControlCubeGraphNode *neighborNode = (*cubeGraphNodes)[sn];
-        if (node != neighborNode) {
-          neighborNode->removeConnection(node, point);
-          node->removeConnection(neighborNode, point);
-        }
-      }
+    if (!measure->IsIgnored() && !measure->Parent()->IsIgnored()) {
+      // Break connections
+      measureIgnored(measure);
     }
 
     // Remove the measure from the node.  If this caused the node to be empty,
@@ -471,18 +464,14 @@ namespace Isis {
           "ControlNet::AddControlCubeGraphNode!";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
-
-    // make sure there is a node for every measure in this measure's parent
-    for (int i = 0; i < point->GetNumMeasures(); i++) {
-      QString sn = point->GetMeasure(i)->GetCubeSerialNumber();
-      if (!cubeGraphNodes->contains(sn)) {
-        iString msg = "Node does not exist for [";
-        msg += measure->GetCubeSerialNumber() + "]";
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
-      }
+    
+    iString serial = measure->GetCubeSerialNumber();
+    if (!cubeGraphNodes->contains(serial)) {
+      iString msg = "Node does not exist for [";
+      msg += serial + "]";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
-    QString serial = measure->GetCubeSerialNumber();
     ControlCubeGraphNode *node = (*cubeGraphNodes)[serial];
 
     // remove connections to and from this node
@@ -647,12 +636,8 @@ namespace Isis {
     bool wasIgnored = point->IsIgnored();
 
     // notify CubeSerialNumbers of the loss of this point
-
-    if (!wasIgnored) {
-      foreach(ControlMeasure * measure, point->getMeasures()) {
-        if (!measure->IsIgnored())
-          measureDeleted(measure);
-      }
+    foreach(ControlMeasure * measure, point->getMeasures()) {
+      measureDeleted(measure);
     }
 
     // See if removing this point qualifies for a re-check of validity
