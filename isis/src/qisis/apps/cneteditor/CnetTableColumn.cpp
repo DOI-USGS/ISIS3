@@ -12,13 +12,15 @@ using std::swap;
 
 namespace Isis
 {
-  CnetTableColumn::CnetTableColumn(QString text, bool readOnlyStatus)
+  CnetTableColumn::CnetTableColumn(QString text, bool readOnlyStatus,
+      bool affectsNetStructure)
   {
     nullify();
 
     title = new QString(text);
     visible = true;
     readOnly = readOnlyStatus;
+    affectsNetworkStructure = affectsNetStructure;
   }
 
 
@@ -92,6 +94,12 @@ namespace Isis
   bool CnetTableColumn::isReadOnly() const
   {
     return readOnly;
+  }
+  
+  
+  bool CnetTableColumn::hasNetworkStructureEffect() const
+  {
+    return affectsNetworkStructure;
   }
 
 

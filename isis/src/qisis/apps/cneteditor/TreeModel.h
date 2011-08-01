@@ -61,7 +61,11 @@ namespace Isis
       void saveViewState();
       void setGlobalSelection(bool selected, InterestingItemsFlag = AllItems);
       void loadViewState();
+      void stopWorking();
       QSize getVisibleSize(int indentation) const;
+
+    public slots:
+      void applyFilter();
 
 
     signals:
@@ -100,7 +104,6 @@ namespace Isis
 
 
     private slots:
-      void applyFilter();
       void applyFilterDone();
       void rebuildItemsDone();
 

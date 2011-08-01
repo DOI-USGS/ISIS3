@@ -40,9 +40,12 @@ namespace Isis
   }
 
 
-  PointModel::CreateRootItemFunctor::CreateRootItemFunctor(TreeModel * tm)
+  PointModel::CreateRootItemFunctor::CreateRootItemFunctor(TreeModel * tm,
+                                                           QThread * tt
+  )
   {
     treeModel = tm;
+    targetThread = tt;
     avgCharWidth = QFontMetrics(
         treeModel->getView()->getContentFont()).averageCharWidth();
   }
@@ -52,6 +55,7 @@ namespace Isis
     const CreateRootItemFunctor & other)
   {
     treeModel = other.treeModel;
+    targetThread = other.targetThread;
     avgCharWidth = other.avgCharWidth;
   }
 
@@ -65,6 +69,7 @@ namespace Isis
     ControlPoint * const & point) const
   {
     PointParentItem * pointItem = new PointParentItem(point, avgCharWidth);
+    pointItem->moveToThread(targetThread);
 
     for (int j = 0; j < point->GetNumMeasures(); j++)
     {
@@ -73,6 +78,8 @@ namespace Isis
 
       MeasureLeafItem * measureItem = new MeasureLeafItem(
         const_cast< ControlMeasure * >(measure), avgCharWidth, pointItem);
+      measureItem->moveToThread(targetThread);
+
       pointItem->addChild(measureItem);
     }
 
@@ -83,8 +90,10 @@ namespace Isis
   void PointModel::CreateRootItemFunctor::addToRootItem(
     QAtomicPointer< RootItem > & root, PointParentItem * const & item)
   {
-    if (!root)
+    if (!root) {
       root = new RootItem;
+      root->moveToThread(item->thread());
+    }
 
     if (item)
       root->addChild(item);
@@ -92,8 +101,8 @@ namespace Isis
 
 
   PointModel::CreateRootItemFunctor &
-  PointModel::CreateRootItemFunctor::operator=(
-    const CreateRootItemFunctor & other)
+      PointModel::CreateRootItemFunctor::operator=(
+      const CreateRootItemFunctor & other)
   {
     if (this != &other)
     {
@@ -106,6 +115,7 @@ namespace Isis
 
   void PointModel::rebuildItems()
   {
+//     cerr << "PointModel::rebuildItems\n";
     emit filterCountsChanged(-1, getTopLevelItemCount());
     QFuture< QAtomicPointer< RootItem > > futureRoot;
     if (getRebuildWatcher()->isStarted())
@@ -113,13 +123,17 @@ namespace Isis
       futureRoot = getRebuildWatcher()->future();
       futureRoot.cancel();
     }
+    
+//     cerr << "PointModel::rebulidItems... getPoints has size : "
+//          << getControlNetwork()->getPoints().size() << "\n";
 
     futureRoot = QtConcurrent::mappedReduced(
         getControlNetwork()->getPoints(),
-        CreateRootItemFunctor(this),
+        CreateRootItemFunctor(this, QThread::currentThread()),
         &CreateRootItemFunctor::addToRootItem,
         QtConcurrent::OrderedReduce | QtConcurrent::SequentialReduce);
 
     getRebuildWatcher()->setFuture(futureRoot);
+//     cerr << "/PointModel::rebuildItems\n";
   }
 }

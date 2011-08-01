@@ -72,8 +72,8 @@ namespace Isis
     updatingSelection = false;
 
     controlNet = cNet;
-    connect(controlNet, SIGNAL(networkStructureModified()),
-        this, SLOT(rebuildModels()));
+//     connect(controlNet, SIGNAL(networkStructureModified()),
+//         this, SLOT(rebuildModels()));
 
     settingsPath = new QString(pathForSettings);
 
@@ -186,6 +186,26 @@ namespace Isis
   void CnetEditorWidget::activateConnectionView()
   {
     setDriverView(2);
+  }
+
+
+  void CnetEditorWidget::rebuildModels(QList<AbstractTreeItem *> itemsToDelete)
+  {
+    pointModel->stopWorking();
+    serialModel->stopWorking();
+    connectionModel->stopWorking();
+
+    foreach (AbstractTreeItem * item, itemsToDelete) {
+//       cerr << "CnetEditorWidget::rebuildModels deleting "
+//            << item->getPointer() << " (type is pt? "
+//            << (item->getPointerType() == AbstractTreeItem::Point)
+//            << ")\n";
+      item->deleteSource();
+    }
+    
+    pointModel->rebuildItems();
+    serialModel->rebuildItems();
+    connectionModel->rebuildItems();
   }
 
 
@@ -369,10 +389,14 @@ namespace Isis
     pointTableView = new CnetTableView;
     pointTableModel = new CnetPointTableModel(pointModel);
     pointTableView->setModel(pointTableModel);
+    connect(pointTableView, SIGNAL(modelDataChanged()),
+            this, SIGNAL(cnetModified()));
     connect(pointTreeView, SIGNAL(selectionChanged()),
-        pointTableView, SLOT(onModelSelectionChanged()));
+            pointTableView, SLOT(onModelSelectionChanged()));
     connect(pointTableView, SIGNAL(selectionChanged()),
-        pointTreeView, SLOT(onModelSelectionChanged()));
+            pointTreeView, SLOT(onModelSelectionChanged()));
+    connect(pointTableView, SIGNAL(rebuildModels(QList<AbstractTreeItem *>)),
+            this, SLOT(rebuildModels(QList<AbstractTreeItem *>)));
 
     for (int i = 0; i < AbstractPointItem::COLS; i++)
     {
@@ -393,10 +417,14 @@ namespace Isis
     measureTableView = new CnetTableView();
     measureTableModel = new CnetMeasureTableModel(pointModel);
     measureTableView->setModel(measureTableModel);
+    connect(measureTableView, SIGNAL(modelDataChanged()),
+            this, SIGNAL(cnetModified()));
     connect(pointTreeView, SIGNAL(selectionChanged()),
         measureTableView, SLOT(onModelSelectionChanged()));
     connect(measureTableView, SIGNAL(selectionChanged()),
         pointTreeView, SLOT(onModelSelectionChanged()));
+    connect(measureTableView, SIGNAL(rebuildModels(QList<AbstractTreeItem *>)),
+            this, SLOT(rebuildModels(QList<AbstractTreeItem *>)));
 
     for (int i = 0; i < AbstractMeasureItem::COLS; i++)
     {
@@ -580,33 +608,39 @@ namespace Isis
 
   void CnetEditorWidget::rebuildModels()
   {
-    QTime timer;
-    timer.start();
-    cerr << "CnetEditorWidget::rebuildModels called\n";
-    ASSERT(pointModel);
-    ASSERT(serialModel);
-    ASSERT(connectionModel);
-
-    updatingSelection = true;
-
-//     cerr << "CnetEditorWidget::rebuildModels one\n";
-//     pointModel->saveViewState();
-    pointModel->rebuildItems();
-//     pointModel->loadViewState();
-
-//     cerr << "CnetEditorWidget::rebuildModels two\n";
-//     serialModel->saveViewState();
-    serialModel->rebuildItems();
-//     serialModel->loadViewState();
-
-//     cerr << "CnetEditorWidget::rebuildModels three\n";
-//     connectionModel->saveViewState();
-    connectionModel->rebuildItems();
-//     connectionModel->loadViewState();
-
-    updatingSelection = false;
-    cerr << "CnetEditorWidget::rebuildModels done\n";
-    cerr << "rebuildModels elapsed time: " << timer.elapsed() << "\n";
+    rebuildModels(QList< AbstractTreeItem * >());
+    
+    
+    
+    
+    
+//     QTime timer;
+//     timer.start();
+//     cerr << "CnetEditorWidget::rebuildModels called\n";
+//     ASSERT(pointModel);
+//     ASSERT(serialModel);
+//     ASSERT(connectionModel);
+// 
+//     updatingSelection = true;
+// 
+// //     cerr << "CnetEditorWidget::rebuildModels one\n";
+// //     pointModel->saveViewState();
+//     pointModel->rebuildItems();
+// //     pointModel->loadViewState();
+// 
+// //     cerr << "CnetEditorWidget::rebuildModels two\n";
+// //     serialModel->saveViewState();
+//     serialModel->rebuildItems();
+// //     serialModel->loadViewState();
+// 
+// //     cerr << "CnetEditorWidget::rebuildModels three\n";
+// //     connectionModel->saveViewState();
+//     connectionModel->rebuildItems();
+// //     connectionModel->loadViewState();
+// 
+//     updatingSelection = false;
+//     cerr << "CnetEditorWidget::rebuildModels done\n";
+//     cerr << "rebuildModels elapsed time: " << timer.elapsed() << "\n";
   }
 
 

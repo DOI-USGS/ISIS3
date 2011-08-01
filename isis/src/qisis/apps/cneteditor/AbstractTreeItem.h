@@ -1,6 +1,7 @@
 #ifndef AbstractTreeItem_H
 #define AbstractTreeItem_H
 
+#include <QObject>
 
 class QFontMetrics;
 template< typename T > class QList;
@@ -14,8 +15,11 @@ namespace Isis
   class ControlPoint;
   class ControlMeasure;
 
-  class AbstractTreeItem
+  class AbstractTreeItem : public QObject
   {
+
+      Q_OBJECT
+
     public:
       enum InternalPointerType
       {
@@ -51,7 +55,8 @@ namespace Isis
       // AbstractPointItem, AbstractMeasureItem, or AbstractSerialItem.
       virtual QString getData() const = 0;
       virtual QString getData(QString columnTitle) const = 0;
-      virtual void setData(QString columnTitle, QString newData) = 0;
+      virtual void setData(QString const & columnTitle,
+                           QString const & newData) = 0;
       virtual void deleteSource() = 0;
       virtual InternalPointerType getPointerType() const = 0;
       virtual void * getPointer() const = 0;

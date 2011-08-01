@@ -19,11 +19,11 @@ namespace Isis
   /**
    * @returns minX, maxX in a pair
    */
-  QPair<double, double> CnetTableColumnList::getVisibleXRange(
+  QPair<int, int> CnetTableColumnList::getVisibleXRange(
     int visibleColumn) const
   {
-    double minX = 0;
-    double maxX = 0;
+    int minX = 0;
+    int maxX = 0;
 
     QList<const CnetTableColumn *> visibleCols = getVisibleColumns();
 
@@ -38,7 +38,7 @@ namespace Isis
       maxX = minX + visibleCols.at(visibleColumn)->getWidth() - 1;
     }
 
-    return QPair<double, double>(minX, maxX);
+    return QPair<int, int>(minX, maxX);
   }
 
 

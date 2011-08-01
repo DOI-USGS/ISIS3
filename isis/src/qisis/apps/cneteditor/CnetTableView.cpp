@@ -24,13 +24,19 @@ namespace Isis
 
     content = new CnetTableViewContent(columns);
     header = new CnetTableViewHeader(columns);
+
     connect(content, SIGNAL(selectionChanged()),
         this, SIGNAL(selectionChanged()));
+    connect(content, SIGNAL(rebuildModels(QList<AbstractTreeItem *>)),
+        this, SIGNAL(rebuildModels(QList<AbstractTreeItem *>)));
     connect(content, SIGNAL(horizontalScrollBarValueChanged(int)),
         header, SLOT(updateHeaderOffset(int)));
+    connect(content, SIGNAL(modelDataChanged()),
+            this, SIGNAL(modelDataChanged()));
+
     connect(header, SIGNAL(columnResized(bool)),
         content, SLOT(updateHorizontalScrollBar(bool)));
-
+    
     QVBoxLayout * layout = new QVBoxLayout;
     layout->addWidget(header);
     layout->addWidget(content);
@@ -119,7 +125,7 @@ namespace Isis
       *columns = newModel->createColumns();
 
       // Add a column for row numbers and global selection.
-      columns->prepend(new CnetTableColumn("", true));
+      columns->prepend(new CnetTableColumn("", true, false));
 
       foreach(CnetTableColumn * column, *columns)
       {

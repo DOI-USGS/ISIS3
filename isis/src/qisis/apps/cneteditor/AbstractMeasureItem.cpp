@@ -81,7 +81,6 @@ namespace Isis
         return (Column)i;
     }
 
-    abort();
     iString msg = "Column title [" + columnTitle + "] does not match any of "
         "the defined column types";
     throw iException::Message(iException::Programmer, msg, _FILEINFO_);
@@ -92,30 +91,45 @@ namespace Isis
   {
     CnetTableColumnList columnList;
 
-    columnList.append(new CnetTableColumn(getColumnName(PointId), true));
-    columnList.append(new CnetTableColumn(getColumnName(CubeSerialNumber),
-        true));
-    columnList.append(new CnetTableColumn(getColumnName(Sample), true));
-    columnList.append(new CnetTableColumn(getColumnName(Line), true));
-    columnList.append(new CnetTableColumn(getColumnName(EditLock), false));
-    columnList.append(new CnetTableColumn(getColumnName(Ignored), false));
-    columnList.append(new CnetTableColumn(getColumnName(Type), false));
-    columnList.append(new CnetTableColumn(getColumnName(Eccentricity), true));
-    columnList.append(new CnetTableColumn(getColumnName(GoodnessOfFit), true));
-    columnList.append(new CnetTableColumn(getColumnName(MinPixelZScore), true));
-    columnList.append(new CnetTableColumn(getColumnName(MaxPixelZScore), true));
-    columnList.append(new CnetTableColumn(getColumnName(SampleShift), true));
-    columnList.append(new CnetTableColumn(getColumnName(LineShift), true));
-    columnList.append(new CnetTableColumn(getColumnName(SampleSigma), false));
-    columnList.append(new CnetTableColumn(getColumnName(LineSigma), false));
-    columnList.append(new CnetTableColumn(getColumnName(APrioriSample), true));
-    columnList.append(new CnetTableColumn(getColumnName(APrioriLine), true));
-    columnList.append(new CnetTableColumn(getColumnName(Diameter), false));
-    columnList.append(new CnetTableColumn(getColumnName(JigsawRejected), true));
-    columnList.append(new CnetTableColumn(getColumnName(ResidualSample), true));
-    columnList.append(new CnetTableColumn(getColumnName(ResidualLine), true));
+    columnList.append(new CnetTableColumn(getColumnName(PointId), true, false));
+    columnList.append(new CnetTableColumn(getColumnName(CubeSerialNumber), true,
+                                          true));
+    columnList.append(new CnetTableColumn(getColumnName(Sample), true, false));
+    columnList.append(new CnetTableColumn(getColumnName(Line), true, false));
+    columnList.append(new CnetTableColumn(getColumnName(EditLock), false,
+                                          false));
+    columnList.append(new CnetTableColumn(getColumnName(Ignored), false, true));
+    columnList.append(new CnetTableColumn(getColumnName(Type), false, false));
+    columnList.append(new CnetTableColumn(getColumnName(Eccentricity), true,
+                                          false));
+    columnList.append(new CnetTableColumn(getColumnName(GoodnessOfFit), true,
+                                          false));
+    columnList.append(new CnetTableColumn(getColumnName(MinPixelZScore), true,
+                                          false));
+    columnList.append(new CnetTableColumn(getColumnName(MaxPixelZScore), true,
+                                          false));
+    columnList.append(new CnetTableColumn(getColumnName(SampleShift), true,
+                                          false));
+    columnList.append(new CnetTableColumn(getColumnName(LineShift), true,
+                                          false));
+    columnList.append(new CnetTableColumn(getColumnName(SampleSigma), false,
+                                          false));
+    columnList.append(new CnetTableColumn(getColumnName(LineSigma), false,
+                                          false));
+    columnList.append(new CnetTableColumn(getColumnName(APrioriSample), true,
+                                          false));
+    columnList.append(new CnetTableColumn(getColumnName(APrioriLine), true,
+                                          false));
+    columnList.append(new CnetTableColumn(getColumnName(Diameter), false,
+                                          false));
+    columnList.append(new CnetTableColumn(getColumnName(JigsawRejected), true,
+                                          false));
+    columnList.append(new CnetTableColumn(getColumnName(ResidualSample), true,
+                                          false));
+    columnList.append(new CnetTableColumn(getColumnName(ResidualLine), true,
+                                          false));
     columnList.append(new CnetTableColumn(getColumnName(ResidualMagnitude),
-        true));
+                                          true, false));
 
     return columnList;
   }
@@ -127,6 +141,8 @@ namespace Isis
     ASSERT(cm);
     measure = cm;
     calcDataWidth(avgCharWidth);
+
+    connect(measure, SIGNAL(destroyed(QObject *)), this, SLOT(sourceDeleted()));
   }
 
 
@@ -138,15 +154,12 @@ namespace Isis
 
   QString AbstractMeasureItem::getData() const
   {
-    ASSERT(measure);
-    return (QString) measure->GetCubeSerialNumber();
+    return getData(getColumnName(CubeSerialNumber));
   }
 
 
   QString AbstractMeasureItem::getData(QString columnTitle) const
   {
-    ASSERT(measure);
-
     if (measure)
     {
       Column column = getColumn(columnTitle);
@@ -220,118 +233,124 @@ namespace Isis
       }
     }
 
-    ASSERT(0);
     return QString();
   }
 
 
-  void AbstractMeasureItem::setData(QString columnTitle, QString newData)
+  void AbstractMeasureItem::setData(QString const & columnTitle,
+                                    QString const & newData)
   {
-    Column column = getColumn(columnTitle);
-
-    switch ((Column) column)
+    if (measure)
     {
-      case PointId:
-        // PointId is not editable in the measure table
-        break;
-      case CubeSerialNumber:
-        measure->SetCubeSerialNumber(newData);
-        break;
-      case Sample:
-        measure->SetCoordinate(catchNull(newData),
-            measure->GetLine());
-        break;
-      case Line:
-        measure->SetCoordinate(measure->GetSample(),
-            catchNull(newData));
-        break;
-      case EditLock:
-        if (newData == "Yes" && !measure->IsEditLocked())
-        {
-          measure->SetEditLock(true);
-        }
-        else
-          if (newData == "No" && measure->IsEditLocked())
-          {
-            // Prompt the user for confirmation before turning off edit lock
-            // on a measure.
-            int status = QMessageBox::warning(NULL, "cneteditor",
-                "You requested to turn edit lock OFF for this"
-                " measure. Are you sure you want to continue?",
-                QMessageBox::Yes | QMessageBox::No);
+      Column column = getColumn(columnTitle);
 
-            if (status == QMessageBox::Yes)
-              measure->SetEditLock(false);
+      switch ((Column) column)
+      {
+        case PointId:
+          // PointId is not editable in the measure table
+          break;
+        case CubeSerialNumber:
+          measure->SetCubeSerialNumber(newData);
+          break;
+        case Sample:
+          measure->SetCoordinate(catchNull(newData),
+              measure->GetLine());
+          break;
+        case Line:
+          measure->SetCoordinate(measure->GetSample(),
+              catchNull(newData));
+          break;
+        case EditLock:
+          if (newData == "Yes" && !measure->IsEditLocked())
+          {
+            measure->SetEditLock(true);
           }
-        break;
-      case Ignored:
-        if (newData == "Yes")
-          measure->SetIgnored(true);
-        else
-          if (newData == "No")
-            measure->SetIgnored(false);
-        break;
-      case Type:
-        measure->SetType(measure->StringToMeasureType(newData));
-        break;
-      case Eccentricity:
-        setLogData(measure, ControlMeasureLogData::Eccentricity, newData);
-        break;
-      case GoodnessOfFit:
-        setLogData(measure, ControlMeasureLogData::GoodnessOfFit, newData);
-        break;
-      case MinPixelZScore:
-        setLogData(measure, ControlMeasureLogData::MinimumPixelZScore,
-            newData);
-        break;
-      case MaxPixelZScore:
-        setLogData(measure, ControlMeasureLogData::MaximumPixelZScore,
-            newData);
-        break;
-      case SampleShift:
-        // This is not editable anymore.
-        break;
-      case LineShift:
-        // This is not editable anymore.
-        break;
-      case SampleSigma:
-        measure->SetSampleSigma(catchNull(newData));
-        break;
-      case LineSigma:
-        measure->SetLineSigma(catchNull(newData));
-        break;
-      case APrioriSample:
-        measure->SetAprioriSample(catchNull(newData));
-        break;
-      case APrioriLine:
-        measure->SetAprioriLine(catchNull(newData));
-        break;
-      case Diameter:
-        measure->SetDiameter(catchNull(newData));
-        break;
-      case JigsawRejected:
-        // jigsaw rejected is not editable!
-        break;
-      case ResidualSample:
-        measure->SetResidual(
-          catchNull(newData), measure->GetLineResidual());
-        break;
-      case ResidualLine:
-        measure->SetResidual(
-          measure->GetSampleResidual(), catchNull(newData));
-        break;
-      case ResidualMagnitude:
-        // residual magnitude is not editable!
-        break;
+          else
+            if (newData == "No" && measure->IsEditLocked())
+            {
+              // Prompt the user for confirmation before turning off edit lock
+              // on a measure.
+              int status = QMessageBox::warning(NULL, "cneteditor",
+                  "You requested to turn edit lock OFF for this"
+                  " measure. Are you sure you want to continue?",
+                  QMessageBox::Yes | QMessageBox::No);
+
+              if (status == QMessageBox::Yes)
+                measure->SetEditLock(false);
+            }
+          break;
+        case Ignored:
+          if (newData == "Yes")
+            measure->SetIgnored(true);
+          else
+            if (newData == "No")
+              measure->SetIgnored(false);
+          break;
+        case Type:
+          measure->SetType(measure->StringToMeasureType(newData));
+          break;
+        case Eccentricity:
+          setLogData(measure, ControlMeasureLogData::Eccentricity, newData);
+          break;
+        case GoodnessOfFit:
+          setLogData(measure, ControlMeasureLogData::GoodnessOfFit, newData);
+          break;
+        case MinPixelZScore:
+          setLogData(measure, ControlMeasureLogData::MinimumPixelZScore,
+              newData);
+          break;
+        case MaxPixelZScore:
+          setLogData(measure, ControlMeasureLogData::MaximumPixelZScore,
+              newData);
+          break;
+        case SampleShift:
+          // This is not editable anymore.
+          break;
+        case LineShift:
+          // This is not editable anymore.
+          break;
+        case SampleSigma:
+          measure->SetSampleSigma(catchNull(newData));
+          break;
+        case LineSigma:
+          measure->SetLineSigma(catchNull(newData));
+          break;
+        case APrioriSample:
+          measure->SetAprioriSample(catchNull(newData));
+          break;
+        case APrioriLine:
+          measure->SetAprioriLine(catchNull(newData));
+          break;
+        case Diameter:
+          measure->SetDiameter(catchNull(newData));
+          break;
+        case JigsawRejected:
+          // jigsaw rejected is not editable!
+          break;
+        case ResidualSample:
+          measure->SetResidual(
+            catchNull(newData), measure->GetLineResidual());
+          break;
+        case ResidualLine:
+          measure->SetResidual(
+            measure->GetSampleResidual(), catchNull(newData));
+          break;
+        case ResidualMagnitude:
+          // residual magnitude is not editable!
+          break;
+      }
     }
   }
 
 
   void AbstractMeasureItem::deleteSource()
   {
-    ASSERT(measure);
-    measure->Parent()->Delete(measure);
-    measure = NULL;
+    if (measure)
+    {
+      ControlMeasure * tempMeasure = measure;
+      measure = NULL;
+      tempMeasure->Parent()->Delete(tempMeasure);
+    }
   }
 
 
@@ -354,9 +373,17 @@ namespace Isis
   }
 
 
+  void AbstractMeasureItem::sourceDeleted() {
+//     std::cerr << "Measure item - " << measure << " lost\n";
+    measure = NULL;
+  }
+
+
   void AbstractMeasureItem::setLogData(ControlMeasure * measure,
       int measureLogDataEnum, const QString & value)
   {
+    ASSERT(measure);
+
     QString newDataStr = value.toLower();
     ControlMeasureLogData::NumericLogDataType type =
       (ControlMeasureLogData::NumericLogDataType) measureLogDataEnum;

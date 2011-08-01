@@ -42,7 +42,7 @@ namespace Isis
         ControlPoint * const &, PointParentItem * >
       {
         public:
-          CreateRootItemFunctor(TreeModel * tm);
+          CreateRootItemFunctor(TreeModel * tm, QThread * tt);
           CreateRootItemFunctor(const CreateRootItemFunctor &);
           ~CreateRootItemFunctor();
           PointParentItem * operator()(ControlPoint * const &) const;
@@ -55,6 +55,7 @@ namespace Isis
         private:
           int avgCharWidth;
           TreeModel * treeModel;
+          QThread * targetThread;
       };
   };
 }

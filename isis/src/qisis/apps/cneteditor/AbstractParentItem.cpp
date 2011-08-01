@@ -92,26 +92,26 @@ namespace Isis
     ASSERT(children);
     ASSERT(!dynamic_cast< RootItem * >(child));
 
-    if (!firstVisibleChild && child->isVisible())
-    {
-      firstVisibleChild = child;
-      lastVisibleChild = child;
-    }
-
-    AbstractTreeItem * childWithNewNext = NULL;
-    if (lastVisibleChild && firstVisibleChild != child)
-    {
-      childWithNewNext = lastVisibleChild;
-    }
+//     if (!firstVisibleChild && child->isVisible())
+//     {
+//       firstVisibleChild = child;
+//       lastVisibleChild = child;
+//     }
+// 
+//     AbstractTreeItem * childWithNewNext = NULL;
+//     if (lastVisibleChild && firstVisibleChild != child)
+//     {
+//       childWithNewNext = lastVisibleChild;
+//     }
 
     children->append(child);
     child->setParent(this);
 
-    if (childWithNewNext && child->isVisible())
-    {
-      childWithNewNext->setNextVisiblePeer(child);
-      lastVisibleChild = child;
-    }
+//     if (childWithNewNext && child->isVisible())
+//     {
+//       childWithNewNext->setNextVisiblePeer(child);
+//       lastVisibleChild = child;
+//     }
   }
 
 

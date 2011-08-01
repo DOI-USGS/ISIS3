@@ -50,10 +50,15 @@ namespace Isis
   }
 
 
-  const AbstractCnetTableDelegate * AbstractCnetTableModel::getDelegate()
-  const
+  const AbstractCnetTableDelegate * AbstractCnetTableModel::getDelegate() const
   {
     return delegate;
+  }
+  
+  
+  void AbstractCnetTableModel::applyFilter()
+  {
+    getDataModel()->applyFilter();
   }
 
 

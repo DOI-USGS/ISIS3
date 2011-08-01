@@ -4,9 +4,11 @@
 #include <QAbstractScrollArea>
 
 
+class QAction;
 class QEvent;
 class QKeyEvent;
 template< typename T > class QList;
+class QMenu;
 class QMouseEvent;
 class QPoint;
 class QResizeEvent;
@@ -15,6 +17,7 @@ class QResizeEvent;
 namespace Isis
 {
   class AbstractTreeItem;
+  class CnetTableColumn;
   class CnetTableColumnList;
   class CnetTableView;
   class AbstractCnetTableModel;
@@ -33,8 +36,11 @@ namespace Isis
 
 
     signals:
+      void rebuildModels(QList<AbstractTreeItem *>);
+      void modelDataChanged();
       void selectionChanged();
       void horizontalScrollBarValueChanged(int);
+
 
     public slots:
       void refresh();
@@ -61,12 +67,18 @@ namespace Isis
 
     private:
       void nullify();
+      void cellDataChanged(CnetTableColumn const * col);
       void clearColumnSelection();
+      void copyCellSelection(bool);
+      void createActions();
+      void createMenus();
       int getColumnFromScreenX(int screenX) const;
       int getRowFromScreenY(int screenY) const;
+      bool hasActiveCell() const;
       bool isRowValid(int rowNum) const;
       bool isColumnValid(int colNum) const;
       bool isCellEditable(int, int) const;
+      bool isDataColumn(int) const;
       void paintRow(QPainter *, int, QPoint, QPoint);
       void updateActiveCell(QPoint);
       void updateHoveredCell(QPoint, bool);
@@ -75,6 +87,9 @@ namespace Isis
 
 
     private slots:
+      void copySelection();
+      void copyAll();
+      void deleteSelectedRows();
       void updateItemList();
       void showContextMenu(QPoint);
 
@@ -103,6 +118,23 @@ namespace Isis
       QList<AbstractTreeItem *> * lastShiftSelection;
       QPoint * mousePressPos;
       int rowHeight;
+
+      /**
+       * This action applies (copies) the contents of the active cell to the
+       * current selection.
+       */
+      QAction * applyToSelectionAct;
+
+      /**
+       * This action applies (copies) the contents of the active cell to all of
+       * the cells in the active cell's column.
+       */
+      QAction * applyToAllAct;
+
+      /**
+       * This action deletes the selected rows.
+       */
+      QAction * deleteSelectedRowsAct;
 
 
     private:

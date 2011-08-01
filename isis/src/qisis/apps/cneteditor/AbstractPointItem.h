@@ -14,6 +14,9 @@ namespace Isis
 
   class AbstractPointItem : public virtual AbstractTreeItem
   {
+
+      Q_OBJECT
+
     public:
       // If a column is added or removed then make sure you also update
       // the COLS constant that immediately follows this enum.
@@ -52,11 +55,15 @@ namespace Isis
 
       QString getData() const;
       QString getData(QString columnTitle) const;
-      void setData(QString columnTitle, QString newData);
+      void setData(QString const & columnTitle, QString const & newData);
       void deleteSource();
       InternalPointerType getPointerType() const;
       void * getPointer() const;
       bool hasPoint(ControlPoint *) const;
+
+
+    private slots:
+      void sourceDeleted();
 
 
     private: // disable copying of this class

@@ -33,7 +33,8 @@ namespace Isis
   }
 
 
-  void BusyLeafItem::setData(QString columnTitle, QString newData)
+  void BusyLeafItem::setData(QString const & columnTitle,
+                             QString const & newData)
   {
     iString msg = "Cannot set data on BusyLeafItem";
     throw iException::Message(iException::Programmer, msg, _FILEINFO_);

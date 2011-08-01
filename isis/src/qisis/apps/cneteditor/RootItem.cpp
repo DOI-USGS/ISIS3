@@ -37,7 +37,7 @@ namespace Isis
   }
 
 
-  void RootItem::setData(QString columnTitle, QString newData)
+  void RootItem::setData(QString const & columnTitle, QString const & newData)
   {
     iString msg = "Cannot set data on RootItem";
     throw iException::Message(iException::Programmer, msg, _FILEINFO_);

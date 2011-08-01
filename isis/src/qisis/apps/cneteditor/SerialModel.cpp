@@ -42,9 +42,12 @@ namespace Isis
   }
 
 
-  SerialModel::CreateRootItemFunctor::CreateRootItemFunctor(TreeModel * tm)
+  SerialModel::CreateRootItemFunctor::CreateRootItemFunctor(TreeModel * tm,
+                                                            QThread * tt
+  )
   {
     treeModel = tm;
+    targetThread = tt;
     avgCharWidth = QFontMetrics(
         treeModel->getView()->getContentFont()).averageCharWidth();
   }
@@ -54,12 +57,14 @@ namespace Isis
     const CreateRootItemFunctor & other)
   {
     treeModel = other.treeModel;
+    targetThread = other.targetThread;
     avgCharWidth = other.avgCharWidth;
   }
 
 
   SerialModel::CreateRootItemFunctor::~CreateRootItemFunctor()
   {
+    targetThread = NULL;
     treeModel = NULL;
   }
 
@@ -71,15 +76,19 @@ namespace Isis
 
     serialItem = new SerialParentItem(node, avgCharWidth);
     serialItem->setSelectable(false);
+    serialItem->moveToThread(targetThread);
     QList< ControlMeasure * > measures = node->getMeasures();
     for (int j = 0; j < measures.size(); j++)
     {
       ASSERT(measures[j]);
       ControlPoint * point = measures[j]->Parent();
+      
       ASSERT(point);
       PointLeafItem * pointItem = new PointLeafItem(
         point, avgCharWidth, serialItem);
       pointItem->setSelectable(false);
+      pointItem->moveToThread(targetThread);
+
       serialItem->addChild(pointItem);
     }
 
@@ -90,8 +99,10 @@ namespace Isis
   void SerialModel::CreateRootItemFunctor::addToRootItem(
     QAtomicPointer< RootItem > & root, SerialParentItem * const & item)
   {
-    if (!root)
+    if (!root) {
       root = new RootItem;
+      root->moveToThread(item->thread());
+    }
 
     if (item)
       root->addChild(item);
@@ -114,6 +125,7 @@ namespace Isis
 
   void SerialModel::rebuildItems()
   {
+//     cerr << "SerialModel::rebuildItems\n";
     emit filterCountsChanged(-1, getTopLevelItemCount());
     QFuture< QAtomicPointer< RootItem > > futureRoot;
     if (getRebuildWatcher()->isStarted())
@@ -127,11 +139,12 @@ namespace Isis
 
     futureRoot = QtConcurrent::mappedReduced(
         getControlNetwork()->GetCubeGraphNodes(),
-        CreateRootItemFunctor(this),
+        CreateRootItemFunctor(this, QThread::currentThread()),
         &CreateRootItemFunctor::addToRootItem,
         QtConcurrent::OrderedReduce | QtConcurrent::SequentialReduce);
 
     getRebuildWatcher()->setFuture(futureRoot);
+//     cerr << "/SerialModel::rebuildItems\n";
   }
 }
 

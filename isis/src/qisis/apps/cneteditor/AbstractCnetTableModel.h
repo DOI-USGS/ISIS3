@@ -36,6 +36,7 @@ namespace Isis
 
     public slots:
       virtual void setGlobalSelection(bool selected) = 0;
+      virtual void applyFilter();
 
 
     signals:

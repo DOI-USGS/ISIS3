@@ -12,6 +12,7 @@ class QString;
 namespace Isis
 {
   class AbstractCnetTableModel;
+  class AbstractTreeItem;
   class CnetTableViewContent;
   class CnetTableViewHeader;
   class CnetTableColumnList;
@@ -42,7 +43,9 @@ namespace Isis
 
     signals:
       void activated();
+      void rebuildModels(QList<AbstractTreeItem *>);
       void selectionChanged();
+      void modelDataChanged();
 
 
     private: // disable copying and assigning of this class

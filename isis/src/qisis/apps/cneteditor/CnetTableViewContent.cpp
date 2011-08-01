@@ -7,6 +7,7 @@
 
 #include <QAction>
 #include <QLabel>
+#include <QMenu>
 #include <QMessageBox>
 #include <QMutex>
 #include <QPainter>
@@ -72,7 +73,9 @@ namespace Isis
 
     columns = cols;
     updateHorizontalScrollBar();
-    
+
+    createActions();
+
     setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, SIGNAL(customContextMenuRequested(QPoint)),
             this, SLOT(showContextMenu(QPoint)));
@@ -95,6 +98,15 @@ namespace Isis
 
     delete lastShiftSelection;
     lastShiftSelection = NULL;
+
+    delete applyToSelectionAct;
+    applyToSelectionAct = NULL;
+
+    delete applyToAllAct;
+    applyToAllAct = NULL;
+
+    delete deleteSelectedRowsAct;
+    deleteSelectedRowsAct = NULL;
 
     columns = NULL;
   }
@@ -137,6 +149,8 @@ namespace Isis
     connect(model, SIGNAL(modelModified()), this, SLOT(refresh()));
     connect(model, SIGNAL(filterProgressChanged(int)),
         this, SLOT(updateItemList()));
+    connect(this, SIGNAL(modelDataChanged()),
+            model, SLOT(applyFilter()));
 
     refresh();
   }
@@ -144,6 +158,7 @@ namespace Isis
 
   void CnetTableViewContent::refresh()
   {
+//     cerr << "CnetTableViewContent::refresh called\n";
     if (model)
     {
       if (!model->isFiltering())
@@ -151,7 +166,13 @@ namespace Isis
         int rowCount = model->getVisibleRowCount();
         verticalScrollBar()->setRange(0, qMax(rowCount - 1, 0));
       }
+      
       updateItemList();
+      activeCell->first = NULL;
+      activeCell->second = -1;
+      clearColumnSelection();
+      lastDirectlySelectedRow = NULL;
+      lastShiftSelection->clear();
 
       if (model->getSelectedItems().size() &&
           rowsWithActiveColumnSelected->size())
@@ -162,6 +183,7 @@ namespace Isis
 
       viewport()->update();
     }
+//     cerr << "CnetTableViewContent::refresh done\n";
   }
 
 
@@ -448,27 +470,24 @@ namespace Isis
           QPoint relativeTopLeft(0, i * rowHeight);
           if (editWidget && activeCell->first == items->at(i))
           {
-            QPair<double, double> xRange(
-              columns->getVisibleXRange(activeCell->second));
+            QPair<int, int> xRange(
+                columns->getVisibleXRange(activeCell->second));
 
             editWidget->move(
-                QPoint((int) (xRange.first -
-                horizontalScrollBar()->value() - 1),
-                relativeTopLeft.y() + 1));
-            editWidget->resize((int) (xRange.second - xRange.first),
-                rowHeight + 1);
+              QPoint(xRange.first - horizontalScrollBar()->value() - 1,
+                  relativeTopLeft.y() + 1));
+            editWidget->resize(xRange.second - xRange.first, rowHeight + 1);
             editWidget->setVisible(true);
             editWidgetVisible = true;
           }
           else
-          {
             if (activeCell->first == items->at(i))
             {
-              QPair<double, double> activeXArea =
+              QPair<int, int> activeXArea =
                 columns->getVisibleXRange(activeCell->second);
 
-              QRect activeArea((int) activeXArea.first, relativeTopLeft.y(),
-                  (int) (activeXArea.second - activeXArea.first), (int) rowHeight);
+              QRect activeArea(activeXArea.first, relativeTopLeft.y(),
+                  activeXArea.second - activeXArea.first, rowHeight);
 
               activeArea.moveLeft(
                 activeArea.left() - horizontalScrollBar()->value());
@@ -480,7 +499,6 @@ namespace Isis
               painter.setPen(pen);
               painter.drawRect(activeArea);
             }
-          }
         }
       }
 
@@ -498,16 +516,16 @@ namespace Isis
   {
     QAbstractScrollArea::resizeEvent(event);
     updateHorizontalScrollBar();
-//    updateItemList();
-    refresh();
+    updateItemList();
+//     refresh();
   }
 
 
   void CnetTableViewContent::scrollContentsBy(int dx, int dy)
   {
     QAbstractScrollArea::scrollContentsBy(dx, dy);
-    refresh();
-//    updateItemList();
+//     refresh();
+   updateItemList();
   }
 
 
@@ -523,12 +541,79 @@ namespace Isis
     mousePressPos = NULL;
     columns = NULL;
     rowsWithActiveColumnSelected = NULL;
+    applyToSelectionAct = NULL;
+    applyToAllAct = NULL;
+    deleteSelectedRowsAct = NULL;
+  }
+
+
+  void CnetTableViewContent::cellDataChanged(const CnetTableColumn * col)
+  {
+    if (col->hasNetworkStructureEffect())
+      emit rebuildModels(QList<AbstractTreeItem *>());
+    else
+      emit modelDataChanged();
   }
 
 
   void CnetTableViewContent::clearColumnSelection()
   {
     rowsWithActiveColumnSelected->clear();
+  }
+
+
+  void CnetTableViewContent::copyCellSelection(bool allCells) {
+    
+    if (hasActiveCell()) {
+      const CnetTableColumn * col = columns->getVisibleColumns().at(
+          activeCell->second);
+
+      QString colTitle = col->getTitle();
+
+      // Is impossible unless bug exists.
+      ASSERT(colTitle.size());
+
+      // Grab the active cell's data and copy it to the selected cells that are
+      // in the same column as the active cell.
+      QString cellData = activeCell->first->getData(colTitle);
+
+      if (allCells) {
+        QList< AbstractTreeItem * > items = model->getItems(0, model->getVisibleRowCount());
+        
+        foreach (AbstractTreeItem * row, items) {
+          row->setData(colTitle, cellData);
+        }
+      }
+      else {
+        foreach (AbstractTreeItem * row, *rowsWithActiveColumnSelected) {
+          row->setData(colTitle, cellData);
+        }
+      }
+
+      viewport()->update();
+      cellDataChanged(col);
+    }
+  }
+
+
+  void CnetTableViewContent::createActions() {
+    applyToSelectionAct = new QAction(tr("Copy to selected cells"), this);
+    applyToSelectionAct->setStatusTip(tr("Copy the contents of this cell to the"
+                                         "selected cells"));
+    connect(applyToSelectionAct, SIGNAL(triggered()),
+            this, SLOT(copySelection()));
+
+    applyToAllAct = new QAction(tr("Copy to all cells"), this);
+    applyToAllAct->setStatusTip(tr("Copy the contents of this cell to all"
+                                   "cells in the current column"));
+    connect(applyToAllAct, SIGNAL(triggered()),
+            this, SLOT(copyAll()));
+
+    deleteSelectedRowsAct = new QAction(tr("Delete selected rows"), this);
+    deleteSelectedRowsAct->setStatusTip(
+        tr("Delete the currently selected rows"));
+    connect(deleteSelectedRowsAct, SIGNAL(triggered()),
+            this, SLOT(deleteSelectedRows()));
   }
 
 
@@ -539,7 +624,7 @@ namespace Isis
     for (int i = 0; column == -1 &&
         i < columns->getVisibleColumns().size(); i++)
     {
-      QPair<double, double> cellXRange(columns->getVisibleXRange(i));
+      QPair<int, int> cellXRange(columns->getVisibleXRange(i));
       int deltaX = -horizontalScrollBar()->value();
 
       if (cellXRange.first + deltaX < screenX &&
@@ -563,6 +648,11 @@ namespace Isis
       rowNum = calculatedRowNum;
     
     return rowNum;
+  }
+
+
+  bool CnetTableViewContent::hasActiveCell() const {
+    return (activeCell->first && activeCell->second >= 0);
   }
   
   
@@ -601,6 +691,11 @@ namespace Isis
   }
 
 
+  bool CnetTableViewContent::isDataColumn(int colNum) const {
+    return columns->getVisibleColumns().at(colNum)->getTitle().size();
+  }
+
+
   void CnetTableViewContent::paintRow(QPainter * painter, int rowNum,
       QPoint absolutePosition, QPoint relativePosition)
   {
@@ -631,9 +726,9 @@ namespace Isis
       for (int i = 0; i < visibleCols.size(); i++)
       {
         // draw text
-        QPair<double, double> cellXRange(visibleCols.getVisibleXRange(i));
-        QRect cellRect((int) cellXRange.first, point.y(),
-            (int) (cellXRange.second - cellXRange.first), (int) rowHeight);
+        QPair<int, int> cellXRange(visibleCols.getVisibleXRange(i));
+        QRect cellRect(cellXRange.first, point.y(),
+            cellXRange.second - cellXRange.first, rowHeight);
         cellRect.moveLeft(cellRect.left() - horizontalScrollBar()->value() - 1);
 
         QString columnTitle = visibleCols.at(i)->getTitle();
@@ -738,8 +833,12 @@ namespace Isis
     {
       try
       {
+        const CnetTableColumn * col =
+            columns->getVisibleColumns().at(activeCell->second);
         model->getDelegate()->saveData(editWidget, activeCell->first,
-            columns->getVisibleColumns().at(activeCell->second)->getTitle());
+            col->getTitle());
+        
+        cellDataChanged(col);
       }
       catch (iException & e)
       {
@@ -762,9 +861,9 @@ namespace Isis
       CnetTableColumnList visibleCols = columns->getVisibleColumns();
       for (int i = 0; i < visibleCols.size(); i++)
       {
-        QPair<double, double> cellXRange(columns->getVisibleXRange(i));
-        QRect cellRect((int) cellXRange.first, rowHeight * rowNum,
-            (int) (cellXRange.second - cellXRange.first), rowHeight);
+        QPair<int, int> cellXRange(columns->getVisibleXRange(i));
+        QRect cellRect(cellXRange.first, rowHeight * rowNum,
+            cellXRange.second - cellXRange.first, rowHeight);
         
         cellRect.moveLeft(cellRect.left() - horizontalScrollBar()->value());
 
@@ -839,6 +938,28 @@ namespace Isis
   }
 
 
+  void CnetTableViewContent::copySelection() {
+    copyCellSelection(false);
+  }
+
+
+  void CnetTableViewContent::copyAll() {
+    copyCellSelection(true);
+  }
+
+
+  void CnetTableViewContent::deleteSelectedRows()
+  {
+    QList<AbstractTreeItem *> selectedRows = model->getSelectedItems();
+
+//     selectedRows.clear();
+//     cerr << "emit rebuildModels with " << selectedRows.size() << " items to delete\n";
+    emit rebuildModels(selectedRows);
+
+    lastShiftSelection->clear();
+  }
+
+
   void CnetTableViewContent::updateItemList()
   {
     ASSERT(items);
@@ -856,6 +977,21 @@ namespace Isis
   
   void CnetTableViewContent::showContextMenu(QPoint mouseLocation)
   {
-    cerr << "CnetTableViewContent::showContextMenu called\n";
+    int colNum = getColumnFromScreenX(mouseLocation.x());
+    QMenu contextMenu(this);
+
+    if (hasActiveCell() && isDataColumn(colNum))
+    {
+      if (rowsWithActiveColumnSelected->size() > 1)
+        contextMenu.addAction(applyToSelectionAct);
+      contextMenu.addAction(applyToAllAct);
+      contextMenu.exec(mapToGlobal(mouseLocation));
+    }
+    else if (!isDataColumn(colNum))
+    {
+      contextMenu.addAction(deleteSelectedRowsAct);
+      contextMenu.exec(mapToGlobal(mouseLocation));
+    }
   }
 }
+

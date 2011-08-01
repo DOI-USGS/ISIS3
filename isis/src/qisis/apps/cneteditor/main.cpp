@@ -1,11 +1,13 @@
 #include "IsisDebug.h"
 
-#include <QApplication>
+// #include <QApplication>
+#include "QIsisApplication.h"
 
 #include "CnetEditorWindow.h"
 
 
 using namespace Isis;
+using namespace Qisis;
 
 void startMonitoringMemory();
 void stopMonitoringMemory();
@@ -18,7 +20,7 @@ int main(int argc, char ** argv)
 #endif
 
 
-  QApplication app(argc, argv);
+  QIsisApplication app(argc, argv);
   CnetEditorWindow * window = new CnetEditorWindow;
   window->show();
 

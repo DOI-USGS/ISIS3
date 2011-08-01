@@ -14,7 +14,7 @@ namespace Isis
       Q_OBJECT
 
     public:
-      explicit CnetTableColumn(QString, bool);
+      explicit CnetTableColumn(QString, bool, bool);
       CnetTableColumn(const CnetTableColumn &);
       virtual ~CnetTableColumn();
       QString getTitle() const;
@@ -26,6 +26,8 @@ namespace Isis
       void setWidth(int);
       bool isReadOnly() const;
       void setReadOnly(bool);
+      bool hasNetworkStructureEffect() const;
+
 
     public:
       static const int EDGE_WIDTH = 4;
@@ -46,6 +48,7 @@ namespace Isis
       bool visible;
       bool readOnly;
       int width;
+      bool affectsNetworkStructure;
   };
 }
 

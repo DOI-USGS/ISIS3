@@ -17,7 +17,7 @@ namespace Isis
       CnetTableColumnList();
       virtual ~CnetTableColumnList();
 
-      QPair<double, double> getVisibleXRange(int visibleColumn)
+      QPair<int, int> getVisibleXRange(int visibleColumn)
       const;
       CnetTableColumnList getVisibleColumns();
       QList< const CnetTableColumn * > getVisibleColumns() const;

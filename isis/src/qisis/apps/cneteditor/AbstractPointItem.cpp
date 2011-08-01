@@ -72,7 +72,6 @@ namespace Isis
         return (Column)i;
     }
 
-    abort();
     iString msg = "Column title [" + columnTitle + "] does not match any of "
         "the defined column types";
     throw iException::Message(iException::Programmer, msg, _FILEINFO_);
@@ -83,30 +82,41 @@ namespace Isis
   {
     CnetTableColumnList columnList;
 
-    columnList.append(new CnetTableColumn(getColumnName(Id), false));
-    columnList.append(new CnetTableColumn(getColumnName(PointType), false));
-    columnList.append(new CnetTableColumn(getColumnName(ChooserName), false));
-    columnList.append(new CnetTableColumn(getColumnName(DateTime), true));
-    columnList.append(new CnetTableColumn(getColumnName(EditLock), false));
-    columnList.append(new CnetTableColumn(getColumnName(Ignored), false));
-    columnList.append(new CnetTableColumn(getColumnName(Reference), false));
-    columnList.append(new CnetTableColumn(getColumnName(AdjustedSPLat), true));
-    columnList.append(new CnetTableColumn(getColumnName(AdjustedSPLon), true));
-    columnList.append(new CnetTableColumn(getColumnName(AdjustedSPRadius),
-        true));
-    columnList.append(new CnetTableColumn(getColumnName(APrioriSPLat), false));
-    columnList.append(new CnetTableColumn(getColumnName(APrioriSPLon), false));
-    columnList.append(new CnetTableColumn(getColumnName(APrioriSPRadius),
-        false));
-    columnList.append(new CnetTableColumn(getColumnName(APrioriSPSource),
-        false));
-    columnList.append(new CnetTableColumn(getColumnName(APrioriSPSourceFile),
-        false));
-    columnList.append(new CnetTableColumn(getColumnName(APrioriRadiusSource),
-        false));
+    columnList.append(new CnetTableColumn(getColumnName(Id), false, false));
+    columnList.append(
+        new CnetTableColumn(getColumnName(PointType), false, false));
+    columnList.append(
+        new CnetTableColumn(getColumnName(ChooserName), false, false));
+    columnList.append(
+        new CnetTableColumn(getColumnName(DateTime), true, false));
+    columnList.append(
+        new CnetTableColumn(getColumnName(EditLock), false, false));
+    columnList.append(
+        new CnetTableColumn(getColumnName(Ignored), false, true));
+    columnList.append(
+        new CnetTableColumn(getColumnName(Reference), false, false));
+    columnList.append(
+        new CnetTableColumn(getColumnName(AdjustedSPLat), true, false));
+    columnList.append(
+        new CnetTableColumn(getColumnName(AdjustedSPLon), true, false));
+    columnList.append(
+        new CnetTableColumn(getColumnName(AdjustedSPRadius), true, false));
+    columnList.append(
+        new CnetTableColumn(getColumnName(APrioriSPLat), false, false));
+    columnList.append(
+        new CnetTableColumn(getColumnName(APrioriSPLon), false, false));
+    columnList.append(
+        new CnetTableColumn(getColumnName(APrioriSPRadius), false, false));
+    columnList.append(
+        new CnetTableColumn(getColumnName(APrioriSPSource), false, false));
+    columnList.append(
+        new CnetTableColumn(getColumnName(APrioriSPSourceFile), false, false));
+    columnList.append(
+        new CnetTableColumn(getColumnName(APrioriRadiusSource), false, false));
     columnList.append(new CnetTableColumn(
-        getColumnName(APrioriRadiusSourceFile), false));
-    columnList.append(new CnetTableColumn(getColumnName(JigsawRejected), true));
+        getColumnName(APrioriRadiusSourceFile), false, false));
+    columnList.append(
+        new CnetTableColumn(getColumnName(JigsawRejected), true, false));
 
     return columnList;
   }
@@ -114,11 +124,13 @@ namespace Isis
 
   AbstractPointItem::AbstractPointItem(ControlPoint * cp,
       int avgCharWidth, AbstractTreeItem * parent)
-    : AbstractTreeItem(parent)
+      : AbstractTreeItem(parent)
   {
     ASSERT(cp);
     point = cp;
     calcDataWidth(avgCharWidth);
+
+    connect(point, SIGNAL(destroyed(QObject *)), this, SLOT(sourceDeleted()));
   }
 
 
@@ -130,15 +142,12 @@ namespace Isis
 
   QString AbstractPointItem::getData() const
   {
-    ASSERT(point);
     return getData(getColumnName(Id));
   }
 
 
   QString AbstractPointItem::getData(QString columnTitle) const
   {
-    ASSERT(point);
-
     if (point)
     {
       Column column = getColumn(columnTitle);
@@ -200,119 +209,125 @@ namespace Isis
       }
     }
 
-    ASSERT(0);
     return QString();
   }
 
 
-  void AbstractPointItem::setData(QString columnTitle, QString newData)
+  void AbstractPointItem::setData(QString const & columnTitle,
+                                  QString const & newData)
   {
-    Column column = getColumn(columnTitle);
-
-    switch ((Column) column)
+    if (point)
     {
-      case Id:
-        point->SetId(newData);
-        break;
-      case PointType:
-        point->SetType(point->StringToPointType(newData));
-        break;
-      case ChooserName:
-        point->SetChooserName(newData);
-        break;
-      case DateTime:
-        point->SetDateTime(newData);
-        break;
-      case EditLock:
-        if (newData == "Yes")
-        {
-          point->SetEditLock(true);
-        }
-        else
-        {
-          if (newData == "No" && point->IsEditLocked())
-          {
-            // Prompt the user for confirmation before turning off edit lock
-            // on a point.
-            QMessageBox::StandardButton status = QMessageBox::warning(
-                NULL, "cneteditor", "You requested to turn edit lock OFF "
-                "for this point.  Are you sure you want to continue?",
-                QMessageBox::Yes | QMessageBox::No);
+      Column column = getColumn(columnTitle);
 
-            if (status == QMessageBox::Yes)
-              point->SetEditLock(false);
+      switch ((Column) column)
+      {
+        case Id:
+          point->SetId(newData);
+          break;
+        case PointType:
+          point->SetType(point->StringToPointType(newData));
+          break;
+        case ChooserName:
+          point->SetChooserName(newData);
+          break;
+        case DateTime:
+          point->SetDateTime(newData);
+          break;
+        case EditLock:
+          if (newData == "Yes")
+          {
+            point->SetEditLock(true);
           }
-        }
-        break;
-      case Ignored:
-        point->SetIgnored(newData == "Yes");
-        break;
-      case Reference:
-        ASSERT(point->HasSerialNumber(newData));
-        point->SetRefMeasure(newData);
-        break;
-      case AdjustedSPLat:
-        point->SetAdjustedSurfacePoint(SurfacePoint(
-            Latitude(catchNull(newData), Angle::Degrees),
-            point->GetAdjustedSurfacePoint().GetLongitude(),
-            point->GetAdjustedSurfacePoint().GetLocalRadius()));
-        break;
-      case AdjustedSPLon:
-        point->SetAdjustedSurfacePoint(SurfacePoint(
-            point->GetAdjustedSurfacePoint().GetLatitude(),
-            Longitude(catchNull(newData), Angle::Degrees),
-            point->GetAdjustedSurfacePoint().GetLocalRadius()));
-        break;
-      case AdjustedSPRadius:
-        point->SetAdjustedSurfacePoint(SurfacePoint(
-            point->GetAdjustedSurfacePoint().GetLatitude(),
-            point->GetAdjustedSurfacePoint().GetLongitude(),
-            Distance(catchNull(newData), Distance::Meters)));
-        break;
-      case APrioriSPLat:
-        point->SetAprioriSurfacePoint(SurfacePoint(
-            Latitude(catchNull(newData), Angle::Degrees),
-            point->GetAprioriSurfacePoint().GetLongitude(),
-            point->GetAprioriSurfacePoint().GetLocalRadius()));
-        break;
-      case APrioriSPLon:
-        point->SetAprioriSurfacePoint(SurfacePoint(
-            point->GetAprioriSurfacePoint().GetLatitude(),
-            Longitude(catchNull(newData), Angle::Degrees),
-            point->GetAprioriSurfacePoint().GetLocalRadius()));
-        break;
-      case APrioriSPRadius:
-        point->SetAprioriSurfacePoint(SurfacePoint(
-            point->GetAprioriSurfacePoint().GetLatitude(),
-            point->GetAprioriSurfacePoint().GetLongitude(),
-            Distance(catchNull(newData), Distance::Meters)));
-        break;
-      case APrioriSPSource:
-        point->SetAprioriSurfacePointSource(
-          point->StringToSurfacePointSource(newData));
-        break;
-      case APrioriSPSourceFile:
-        point->SetAprioriSurfacePointSourceFile(newData);
-        break;
-      case APrioriRadiusSource:
-        point->SetAprioriRadiusSource(
-          point->StringToRadiusSource(newData));
-        break;
-      case APrioriRadiusSourceFile:
-        point->SetAprioriRadiusSourceFile(newData);
-        break;
-      case JigsawRejected:
-        // jigsaw rejected is not editable!
-        break;
+          else
+          {
+            if (newData == "No" && point->IsEditLocked())
+            {
+              // Prompt the user for confirmation before turning off edit lock
+              // on a point.
+              QMessageBox::StandardButton status = QMessageBox::warning(
+                  NULL, "cneteditor", "You requested to turn edit lock OFF "
+                  "for this point.  Are you sure you want to continue?",
+                  QMessageBox::Yes | QMessageBox::No);
+
+              if (status == QMessageBox::Yes)
+                point->SetEditLock(false);
+            }
+          }
+          break;
+        case Ignored:
+          point->SetIgnored(newData == "Yes");
+          break;
+        case Reference:
+          ASSERT(point->HasSerialNumber(newData));
+          point->SetRefMeasure(newData);
+          break;
+        case AdjustedSPLat:
+          point->SetAdjustedSurfacePoint(SurfacePoint(
+              Latitude(catchNull(newData), Angle::Degrees),
+              point->GetAdjustedSurfacePoint().GetLongitude(),
+              point->GetAdjustedSurfacePoint().GetLocalRadius()));
+          break;
+        case AdjustedSPLon:
+          point->SetAdjustedSurfacePoint(SurfacePoint(
+              point->GetAdjustedSurfacePoint().GetLatitude(),
+              Longitude(catchNull(newData), Angle::Degrees),
+              point->GetAdjustedSurfacePoint().GetLocalRadius()));
+          break;
+        case AdjustedSPRadius:
+          point->SetAdjustedSurfacePoint(SurfacePoint(
+              point->GetAdjustedSurfacePoint().GetLatitude(),
+              point->GetAdjustedSurfacePoint().GetLongitude(),
+              Distance(catchNull(newData), Distance::Meters)));
+          break;
+        case APrioriSPLat:
+          point->SetAprioriSurfacePoint(SurfacePoint(
+              Latitude(catchNull(newData), Angle::Degrees),
+              point->GetAprioriSurfacePoint().GetLongitude(),
+              point->GetAprioriSurfacePoint().GetLocalRadius()));
+          break;
+        case APrioriSPLon:
+          point->SetAprioriSurfacePoint(SurfacePoint(
+              point->GetAprioriSurfacePoint().GetLatitude(),
+              Longitude(catchNull(newData), Angle::Degrees),
+              point->GetAprioriSurfacePoint().GetLocalRadius()));
+          break;
+        case APrioriSPRadius:
+          point->SetAprioriSurfacePoint(SurfacePoint(
+              point->GetAprioriSurfacePoint().GetLatitude(),
+              point->GetAprioriSurfacePoint().GetLongitude(),
+              Distance(catchNull(newData), Distance::Meters)));
+          break;
+        case APrioriSPSource:
+          point->SetAprioriSurfacePointSource(
+            point->StringToSurfacePointSource(newData));
+          break;
+        case APrioriSPSourceFile:
+          point->SetAprioriSurfacePointSourceFile(newData);
+          break;
+        case APrioriRadiusSource:
+          point->SetAprioriRadiusSource(
+            point->StringToRadiusSource(newData));
+          break;
+        case APrioriRadiusSourceFile:
+          point->SetAprioriRadiusSourceFile(newData);
+          break;
+        case JigsawRejected:
+          // jigsaw rejected is not editable!
+          break;
+      }
     }
   }
 
 
   void AbstractPointItem::deleteSource()
   {
-    ASSERT(point);
-    point->Parent()->DeletePoint(point);
-    point = NULL;
+    if (point)
+    {
+      ControlPoint * tempPoint = point;
+      point = NULL;
+      tempPoint->Parent()->DeletePoint(tempPoint);
+    }
   }
 
 
@@ -331,6 +346,11 @@ namespace Isis
   bool AbstractPointItem::hasPoint(ControlPoint * p) const
   {
     return point == p;
+  }
+
+  void AbstractPointItem::sourceDeleted() {
+//     std::cerr << "Point item - " << point << " lost\n";
+    point = NULL;
   }
 }
 

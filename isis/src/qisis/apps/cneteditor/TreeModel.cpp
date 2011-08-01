@@ -123,7 +123,7 @@ namespace Isis
       int row = 0;
       AbstractTreeItem * currentItem = rootItem->getFirstVisibleChild();
 
-      if (!itemIsInteresting(currentItem, flags))
+      if (currentItem && !itemIsInteresting(currentItem, flags))
       {
         currentItem = nextItem(currentItem, flags, ignoreExpansion);
       }
@@ -229,7 +229,7 @@ namespace Isis
     {
       AbstractTreeItem * currentItem = rootItem->getFirstVisibleChild();
 
-      if (!itemIsInteresting(currentItem, flags))
+      if (currentItem && !itemIsInteresting(currentItem, flags))
         currentItem = nextItem(currentItem, flags, ignoreExpansion);
 
       while (currentItem)
@@ -485,6 +485,15 @@ namespace Isis
   }
 
 
+  void TreeModel::stopWorking()
+  {
+    filterWatcher->cancel();
+    filterWatcher->waitForFinished();
+    rebuildWatcher->cancel();
+    rebuildWatcher->waitForFinished();
+  }
+
+
   //! indentation is in pixels
   QSize TreeModel::getVisibleSize(int indentation) const
   {
@@ -519,6 +528,7 @@ namespace Isis
 
   void TreeModel::applyFilter()
   {
+//     cerr << "TreeModel::applyFilter\n";
     // If filterAgain is true, then this method will be recalled later
     // with filterAgain = false.
     if (!filterAgain && guisFilterWidget)
@@ -533,6 +543,7 @@ namespace Isis
       }
       else
       {
+//         cerr << "rootItem->getFirstVisibleChild : " << rootItem->getFirstVisibleChild  ( )<< "\n";
         // filterCounts are unknown and invalid and this fact is shared to
         // users of this class by emitting invalid (negative) information.
         emit filterCountsChanged(-1, getTopLevelItemCount());
@@ -543,6 +554,7 @@ namespace Isis
           delete localFilterWidgetCopy;
           localFilterWidgetCopy = NULL;
         }
+          
         localFilterWidgetCopy = new FilterWidget(*guisFilterWidget);
 
         // using the local copy (NOT the GUI's FilterWidget!!!) apply then
@@ -558,6 +570,7 @@ namespace Isis
         filterWatcher->setFuture(futureRoot);
       }
     }
+//     cerr << "/TreeModel::applyFilter\n";
   }
 
 
@@ -631,30 +644,24 @@ namespace Isis
   AbstractTreeItem * TreeModel::nextItem(AbstractTreeItem * current,
       InterestingItemsFlag flags, bool ignoreExpansion) const
   {
-    AbstractTreeItem * result = NULL;
-
     if (current)
     {
-      if ((ignoreExpansion || current->isExpanded()) &&
-          current->getFirstVisibleChild())
+      do
       {
-        result = current->getFirstVisibleChild();
+        if ((ignoreExpansion || current->isExpanded()) &&
+            current->getFirstVisibleChild())
+          current = current->getFirstVisibleChild();
+        else if (current->getNextVisiblePeer())
+          current = current->getNextVisiblePeer();
+        else if (current->parent())
+          current = current->parent()->getNextVisiblePeer();
+        else
+          current = NULL;
       }
-      else
-      {
-        result = current->getNextVisiblePeer();
-
-        if (!result)
-          result = current->parent()->getNextVisiblePeer();
-      }
+      while (current && !itemIsInteresting(current, flags));
     }
 
-    if (result && !itemIsInteresting(result, flags))
-    {
-      result = nextItem(result, flags, ignoreExpansion);
-    }
-
-    return result;
+    return current;
   }
 
 
@@ -678,8 +685,10 @@ namespace Isis
 
   void TreeModel::rebuildItemsDone()
   {
+//     cerr << "TreeModel::rebuildItemsDone\n";
     saveViewState();
     clear();
+
     QAtomicPointer< RootItem > newRoot = rebuildWatcher->future();
 
     if (newRoot && newRoot->childCount())
@@ -696,6 +705,7 @@ namespace Isis
     }
 
     applyFilter();
+//     cerr << "/TreeModel::rebuildItemsDone\n";
   }
 
 

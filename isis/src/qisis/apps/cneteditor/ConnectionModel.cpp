@@ -41,9 +41,11 @@ namespace Isis
   }
 
 
-  ConnectionModel::CreateRootItemFunctor::CreateRootItemFunctor(TreeModel * tm)
+  ConnectionModel::CreateRootItemFunctor::CreateRootItemFunctor(TreeModel * tm,
+                                                                QThread * tt)
   {
     treeModel = tm;
+    targetThread = tt;
     avgCharWidth = QFontMetrics(
         treeModel->getView()->getContentFont()).averageCharWidth();
   }
@@ -53,6 +55,7 @@ namespace Isis
     const CreateRootItemFunctor & other)
   {
     treeModel = other.treeModel;
+    targetThread = other.targetThread;
     avgCharWidth = other.avgCharWidth;
   }
 
@@ -60,6 +63,7 @@ namespace Isis
   ConnectionModel::CreateRootItemFunctor::~CreateRootItemFunctor()
   {
     treeModel = NULL;
+    targetThread = NULL;
   }
 
 
@@ -69,6 +73,7 @@ namespace Isis
     SerialParentItem * parentItem =
       new SerialParentItem(node, avgCharWidth);
     parentItem->setSelectable(false);
+    parentItem->moveToThread(targetThread);
 
     QList< ControlCubeGraphNode * > connectedNodes = node->getAdjacentNodes();
 
@@ -78,6 +83,7 @@ namespace Isis
       SerialLeafItem * serialItem =
         new SerialLeafItem(connectedNode, avgCharWidth, parentItem);
       serialItem->setSelectable(false);
+      serialItem->moveToThread(targetThread);
 
       parentItem->addChild(serialItem);
     }
@@ -89,8 +95,10 @@ namespace Isis
   void ConnectionModel::CreateRootItemFunctor::addToRootItem(
     QAtomicPointer< RootItem > & root, SerialParentItem * const & item)
   {
-    if (!root)
+    if (!root) {
       root = new RootItem;
+      root->moveToThread(item->thread());
+    }
 
     if (item)
       root->addChild(item);
@@ -128,11 +136,12 @@ namespace Isis
 
     futureRoot = QtConcurrent::mappedReduced(
         getControlNetwork()->GetCubeGraphNodes(),
-        CreateRootItemFunctor(this),
+        CreateRootItemFunctor(this, QThread::currentThread()),
         &CreateRootItemFunctor::addToRootItem,
         QtConcurrent::OrderedReduce | QtConcurrent::SequentialReduce);
 
     getRebuildWatcher()->setFuture(futureRoot);
+//     cerr << "/ConnectionModel::rebuildItems\n";
   }
 }
 

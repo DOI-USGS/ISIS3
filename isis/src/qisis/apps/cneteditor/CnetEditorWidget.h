@@ -11,6 +11,7 @@ class QString;
 
 namespace Isis
 {
+  class AbstractTreeItem;
   class CnetMeasureTableModel;
   class CnetPointTableModel;
   class CnetTableView;
@@ -80,6 +81,7 @@ namespace Isis
       void connectionTreeViewSelectionChanged();
 
       void rebuildModels();
+      void rebuildModels(QList<AbstractTreeItem *> itemsToDelete);
 //       void scrollFilterAreaToBottom();
 //       void doScroll();
       void pointColToggled();

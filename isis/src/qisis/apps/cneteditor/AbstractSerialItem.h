@@ -14,6 +14,9 @@ namespace Isis
 
   class AbstractSerialItem : public virtual AbstractTreeItem
   {
+
+      Q_OBJECT
+
     public:
       AbstractSerialItem(ControlCubeGraphNode * cubeGraphNode,
           int avgCharWidth, AbstractTreeItem * parent = 0);
@@ -21,11 +24,15 @@ namespace Isis
 
       QString getData() const;
       QString getData(QString columnTitle) const;
-      void setData(QString columnTitle, QString newData);
+      void setData(QString const & columnTitle, QString const & newData);
       void deleteSource();
       InternalPointerType getPointerType() const;
       void * getPointer() const;
       bool hasNode(ControlCubeGraphNode *) const;
+
+
+    private slots:
+      void sourceDeleted();
 
 
     private: // disable copying of this class

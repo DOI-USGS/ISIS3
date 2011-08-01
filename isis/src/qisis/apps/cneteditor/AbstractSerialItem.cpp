@@ -19,6 +19,8 @@ namespace Isis
     ASSERT(cubeGraphNode);
     ccgn = cubeGraphNode;
     calcDataWidth(avgCharWidth);
+
+    connect(ccgn, SIGNAL(destroyed(QObject *)), this, SLOT(sourceDeleted()));
   }
 
 
@@ -30,8 +32,10 @@ namespace Isis
 
   QString AbstractSerialItem::getData() const
   {
-    ASSERT(ccgn);
-    return (QString) ccgn->getSerialNumber();
+    if (ccgn)
+      return (QString) ccgn->getSerialNumber();
+    else
+      return QString();
   }
 
 
@@ -41,7 +45,8 @@ namespace Isis
   }
 
 
-  void AbstractSerialItem::setData(QString columnTitle, QString newData)
+  void AbstractSerialItem::setData(QString const & columnTitle,
+                                   QString const & newData)
   {
   }
 
@@ -70,4 +75,10 @@ namespace Isis
     return ccgn == node || AbstractTreeItem::hasNode(node);
   }
 
+
+  void AbstractSerialItem::sourceDeleted() {
+//     std::cerr << "Serial item - " << ccgn << " lost\n";
+    ccgn = NULL;
+  }
 }
+

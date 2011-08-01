@@ -20,7 +20,7 @@ namespace Isis
 
       QString getData() const;
       QString getData(QString columnTitle) const;
-      void setData(QString columnTitle, QString newData);
+      void setData(QString const & columnTitle, QString const & newData);
       void deleteSource();
       InternalPointerType getPointerType() const;
       void * getPointer() const;

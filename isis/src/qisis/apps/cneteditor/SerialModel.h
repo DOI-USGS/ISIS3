@@ -40,7 +40,7 @@ namespace Isis
         ControlCubeGraphNode * const &, SerialParentItem * >
       {
         public:
-          CreateRootItemFunctor(TreeModel * tm);
+          CreateRootItemFunctor(TreeModel * tm, QThread * tt);
           CreateRootItemFunctor(const CreateRootItemFunctor &);
           ~CreateRootItemFunctor();
           SerialParentItem * operator()(ControlCubeGraphNode * const &) const;
@@ -52,6 +52,7 @@ namespace Isis
         private:
           int avgCharWidth;
           TreeModel * treeModel;
+          QThread * targetThread;
       };
   };
 }
