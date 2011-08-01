@@ -495,6 +495,7 @@ namespace Isis {
       ControlPointFileEntryV0002 ToFileEntry() const;
 
     private:
+      void SetExplicitReference(ControlMeasure *measure);
       void ValidateMeasure(iString serialNumber) const;
       void AddMeasure(ControlMeasure *measure);
       void PointModified();

@@ -440,6 +440,10 @@ namespace Isis {
       ASSERT(referenceMeasure == NULL);
       referenceMeasure = measure;
     }
+    else if (referenceMeasure->IsIgnored() &&
+        !IsReferenceExplicit() && !IsEditLocked()) {
+      referenceMeasure = measure;
+    }
 
     measure->parentPoint = this;
     QString newSerial = measure->GetCubeSerialNumber();
@@ -722,8 +726,7 @@ namespace Isis {
       return PointLocked;
 
     ASSERT(cm);
-    referenceExplicitlySet = true;
-    referenceMeasure = cm;
+    SetExplicitReference(cm);
     return Success;
   }
 
@@ -743,8 +746,7 @@ namespace Isis {
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
-    referenceExplicitlySet = true;
-    referenceMeasure = (*measures)[cubeSerials->at(index)];
+    SetExplicitReference((*measures)[cubeSerials->at(index)]);
     return Success;
   }
 
@@ -764,9 +766,23 @@ namespace Isis {
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
-    referenceExplicitlySet = true;
-    referenceMeasure = (*measures)[sn];
+    SetExplicitReference((*measures)[sn]);
     return Success;
+  }
+
+
+  /**
+   * Explicitly defines a new reference measure by pointer.  This assumes the
+   * point already has ownership over this pointer.  As part of the explicit
+   * definition process, the reference will attempt to be made ignored if the
+   * measure will allow it.
+   *
+   * @param measure The new reference measure
+   */
+  void ControlPoint::SetExplicitReference(ControlMeasure *measure) {
+    referenceExplicitlySet = true;
+    referenceMeasure = measure;
+    referenceMeasure->SetIgnored(false);
   }
 
 

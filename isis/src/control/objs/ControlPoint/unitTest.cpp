@@ -258,7 +258,21 @@ void printPoint(Isis::ControlPoint &p) {
   p.SetEditLock(wasLocked);
 
   ControlNet net;
-  net.AddPoint(new ControlPoint(p));
+
+  ControlPoint *copyPoint = new ControlPoint(p);
+  wasLocked = copyPoint->IsEditLocked();
+  copyPoint->SetEditLock(false);
+  for (int i = 0; i < copyPoint->GetNumMeasures(); i++) {
+    ControlMeasure *measure = copyPoint->GetMeasure(i);
+    bool explicitLock = measure->IsEditLocked();
+    measure->SetEditLock(false);
+    measure->SetChooserName("seedgrid");
+    measure->SetDateTime("2005-05-03T00:00:00");
+    measure->SetEditLock(explicitLock);
+  }
+  copyPoint->SetEditLock(wasLocked);
+
+  net.AddPoint(copyPoint);
   net.SetNetworkId("Identifier");
   net.SetCreatedDate("Yesterday");
   net.SetModifiedDate("Yesterday");

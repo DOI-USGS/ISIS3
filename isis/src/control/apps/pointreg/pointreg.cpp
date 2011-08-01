@@ -113,6 +113,10 @@ void IsisMain() {
       Cube &patternCube = *cubeMgr.OpenCube(
           files.Filename(patternCM->GetCubeSerialNumber()));
 
+      // In case this is an implicit reference, make it explicit since we'll be
+      // registering measures to it
+      outPoint->SetRefMeasure(patternCM);
+
       ar->PatternChip()->TackCube(patternCM->GetSample(), patternCM->GetLine());
       ar->PatternChip()->Load(patternCube);
 
