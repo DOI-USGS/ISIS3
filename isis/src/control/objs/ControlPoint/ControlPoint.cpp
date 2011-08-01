@@ -440,8 +440,11 @@ namespace Isis {
       ASSERT(referenceMeasure == NULL);
       referenceMeasure = measure;
     }
-    else if (referenceMeasure->IsIgnored() &&
+    else if (referenceMeasure->IsIgnored() && !measure->IsIgnored() &&
         !IsReferenceExplicit() && !IsEditLocked()) {
+      // The current "implicit" reference is ignored, but this new measure
+      // isn't, and the point is not edit locked, so make this measure the new
+      // reference
       referenceMeasure = measure;
     }
 
