@@ -468,6 +468,7 @@
           <item>MAXLON</item>
         </inclusions>
       </parameter>
+
       <parameter name="MINLAT">
         <type>double</type>
         <default><item>-90.0</item></default>
@@ -478,16 +479,19 @@
           Any Control Point with a latitude less than LATMIN will be removed.
         </description>
       </parameter>
+
       <parameter name="MAXLAT">
         <type>double</type>
         <default><item>90.0</item></default>
         <minimum inclusive="yes">-90.0</minimum>
         <maximum inclusive="yes">90.0</maximum>
+        <greaterThanOrEqual><item>MINLAT</item></greaterThanOrEqual>
         <brief>Maximum Control Point Latitude</brief>
         <description>
           Any Control Point with a latitude greater than LATMAX will be removed.
         </description>
       </parameter>
+
       <parameter name="MINLON">
         <type>double</type>
         <default><item>0.0</item></default>
@@ -495,15 +499,20 @@
         <maximum inclusive="yes">360.0</maximum>
         <brief>Minimum Control Point Longitude</brief>
         <description>
-          <p>Any Control Point with a longitude less than LONMIN will be
-          removed.</p>
+          <p>
+            Any Control Point with a longitude less than LONMIN will be
+            removed.
+          </p>
 
-           <p>If MINLON is greater than MAXLON than the latitude range is
-           assumed to cross the 0/360 latitude boundry, where points with
-           latitudes greater than MINLON or less than MAXLON will be
-           included.</p>
+          <p>
+            If MINLON is greater than MAXLON than the latitude range is
+            assumed to cross the 0/360 latitude boundry, where points with
+            latitudes greater than MINLON or less than MAXLON will be
+            included.
+          </p>
         </description>
       </parameter>
+
       <parameter name="MAXLON">
         <type>double</type>
         <default><item>360.0</item></default>
