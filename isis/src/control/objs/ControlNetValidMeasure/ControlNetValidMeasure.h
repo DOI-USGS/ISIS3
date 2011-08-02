@@ -186,6 +186,10 @@ namespace Isis {
       MeasureValidationResults ValidStandardOptions(double pSample, double pLine, 
                                           Cube *pCube, PvlGroup *pMeasureGrp = NULL);
 
+      bool IsCubeRequired() {
+        return IsCameraRequired() || mbValidateDN || mbValidateFromEdge;
+      }
+
     protected:
       //! Validate PVL Min & Max DN Standard Options
       void ValidatePvlDN(void);

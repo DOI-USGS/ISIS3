@@ -44,8 +44,8 @@ void ProcessControlMeasures(string fileName, ControlNet &cnet);
 void CheckAllMeasureValidity(ControlNet &cnet, string cubeList);
 
 // Validity test
-MeasureValidationResults ValidateMeasure(const ControlMeasure *curMeasure,
-    string filename);
+MeasureValidationResults ValidateMeasure(const ControlMeasure *measure,
+    SerialNumberList &serialNumbers);
 
 void PrintTemp();
 void EditDefFile();
@@ -599,16 +599,10 @@ void CheckAllMeasureValidity(ControlNet &cnet, string cubeList) {
     for (int cm = point->GetNumMeasures() - 1; cm >= 0; cm--) {
       ControlMeasure *measure = point->GetMeasure(cm);
 
-      string serialNumber = measure->GetCubeSerialNumber();
-      if (!serialNumbers.HasSerialNumber(serialNumber)) {
-        string msg = "Serial Number [" + serialNumber + "] contains no ";
-        msg += "matching cube in FROMLIST [" + cubeList + "]";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
-      }
-
       if (!measure->IsIgnored()) {
         MeasureValidationResults results =
-            ValidateMeasure(measure, serialNumbers.Filename(serialNumber));
+            ValidateMeasure(measure, serialNumbers);
+
         if (!results.isValid()) {
           if (cm == point->IndexOfRefMeasure() && retainRef) {
             comments = true;
@@ -660,12 +654,27 @@ void CheckAllMeasureValidity(ControlNet &cnet, string cubeList) {
  * @return The results of validating the measure as an object containing the
  *         validity and a formatted error (or success) message
  */
-MeasureValidationResults ValidateMeasure(const ControlMeasure *curMeasure,
-    string cubeName) {
-  Cube curCube;
-  curCube.open(cubeName);
+MeasureValidationResults ValidateMeasure(const ControlMeasure *measure,
+    SerialNumberList &serialNumbers) {
 
-  MeasureValidationResults results = validator->ValidStandardOptions(curMeasure, &curCube);
+  Cube *measureCube = NULL;
+
+  if (validator->IsCubeRequired()) {
+    string serialNumber = measure->GetCubeSerialNumber();
+    if (!serialNumbers.HasSerialNumber(serialNumber)) {
+      string msg = "Serial Number [" + serialNumber + "] contains no ";
+      msg += "matching cube in FROMLIST";
+      throw iException::Message(iException::User, msg, _FILEINFO_);
+    }
+
+    measureCube = new Cube;
+    measureCube->open(serialNumbers.Filename(serialNumber));
+  }
+
+  MeasureValidationResults results =
+      validator->ValidStandardOptions(measure, measureCube);
+
+  delete measureCube;
 
   return results;
 }
