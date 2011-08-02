@@ -40,6 +40,7 @@
 using namespace Isis;
 using std::cout;
 using std::cerr;
+using std::endl;
 
 QMap< iString, std::set<iString> > constructPointSets(
   std::set<iString> &index, ControlNet innet);
@@ -56,6 +57,10 @@ void WriteOutput(SerialNumberList num2cube,
                  QMap< iString, std::set<iString> > cps);
                  
 double getControlFitness(const ControlCubeGraphNode * node, double tolerance, Cube * cube);
+void noLatLonCheck(ControlNet &cnet, CubeManager &manager, Progress &progress,
+    bool ignore, SerialNumberList &num2cube,
+    std::set<iString> &noLatLonSerialNumbers,
+    QMap< iString, std::set<iString> > &noLatLonControlPoints);
 
 // Main program
 void IsisMain() {
@@ -102,6 +107,15 @@ void IsisMain() {
 
   QMap< iString, int > cubeMeasureCount;
 
+  // Manage cubes used in NOLATLON
+  CubeManager cbman;
+  cbman.SetNumOpenCubes(50);
+
+  if (ui.GetBoolean("NOLATLON")) {
+    noLatLonCheck(innet, cbman, progress, ignore, num2cube,
+        noLatLonSerialNumbers, noLatLonControlPoints);
+  }
+
   // Set calculating progress
   if(innet.GetNumPoints() > 0) {
     progress.SetText("Calculating");
@@ -109,54 +123,11 @@ void IsisMain() {
     progress.CheckStatus();
   }
 
-  // Manage cubes used in NOLATLON
-  CubeManager cbman;
-  cbman.SetNumOpenCubes(50);
-
   // Loop through all control points in control net
   for(int cp = 0; cp < innet.GetNumPoints(); cp ++) {
     if(ignore && innet.GetPoint(cp)->IsIgnored()) continue;
     ControlPoint *controlpt = innet.GetPoint(cp);
 
-    // Checks for lat/Lon production
-    if(ui.GetBoolean("NOLATLON")) {
-
-      // Loop through all control measures in control points
-      for(int cm = 0; cm < controlpt->GetNumMeasures(); cm ++) {
-        ControlMeasure *controlms = controlpt->GetMeasure(cm);
-        
-        
-        // If we have the cube, check it out
-        if(num2cube.HasSerialNumber(controlms->GetCubeSerialNumber())) {
-          Cube *cube = cbman.OpenCube(num2cube.Filename(
-                                        controlms->GetCubeSerialNumber()));
- 
-          Camera *cam = NULL;
-          bool createFail = false;
-          bool setPassed = true;
-
-          // Try to create
-          try {
-            cam = cube->getCamera();
-          }
-          catch(iException &e) {
-            createFail = true;
-            e.Clear();
-          }
-
-          // Check the exact measure location
-          if(!createFail) {
-            setPassed = cam->SetImage(controlms->GetSample(), controlms->GetLine());
-          }
-
-          // Record it if it failed at anything
-          if(createFail || !setPassed) {
-            noLatLonSerialNumbers.insert(controlms->GetCubeSerialNumber());
-            noLatLonControlPoints[controlms->GetCubeSerialNumber()].insert(controlpt->GetId());
-          }
-        }
-      }
-    }
     // Checks of the ControlPoint has only 1 Measure
     if(controlpt->GetNumValidMeasures() == 1) {
       iString sn = controlpt->GetMeasure(0)->GetCubeSerialNumber();
@@ -604,5 +575,61 @@ double getControlFitness(const ControlCubeGraphNode * node, double tolerance, Cu
   return controlFitness;
   
 }
-    
+
+
+void noLatLonCheck(ControlNet &cnet, CubeManager &manager, Progress &progress,
+    bool ignore, SerialNumberList &num2cube,
+    std::set<iString> &noLatLonSerialNumbers,
+    QMap< iString, std::set<iString> > &noLatLonControlPoints) {
+
+  // Set calculating progress
+  QList<ControlCubeGraphNode *> graphNodes = cnet.GetCubeGraphNodes();
+  if (graphNodes.size() > 0) {
+    progress.SetText("Checking for No Lat/Lon");
+    progress.SetMaximumSteps(graphNodes.size());
+    progress.CheckStatus();
+  }
+
+  for (int sn = 0; sn < graphNodes.size(); sn++) {
+    ControlCubeGraphNode *graphNode = graphNodes[sn];
+    iString serialNumber = graphNode->getSerialNumber();
+
+    if (num2cube.HasSerialNumber(serialNumber)) {
+      Cube *cube = manager.OpenCube(num2cube.Filename(serialNumber));
+
+      // Try to create
+      Camera *cam = NULL;
+      bool createdCamera = true;
+      try {
+        cam = cube->getCamera();
+      }
+      catch(iException &e) {
+        createdCamera = false;
+        e.Clear();
+      }
+
+      QList<ControlMeasure *> measures = graphNode->getMeasures();
+      for (int cm = 0; cm < measures.size(); cm++) {
+        ControlMeasure *measure = measures[cm];
+        ControlPoint *point = measure->Parent();
+
+        if (ignore && point->IsIgnored()) continue;
+
+        // Check the exact measure location
+        bool setCamera = false;
+        if (createdCamera) {
+          setCamera = cam->SetImage(measure->GetSample(), measure->GetLine());
+        }
+
+        // Record it if it failed at anything
+        if (!createdCamera || !setCamera) {
+          noLatLonSerialNumbers.insert(serialNumber);
+          noLatLonControlPoints[serialNumber].insert(point->GetId());
+        }
+      }
+    }
+
+    progress.CheckStatus();
+  }
+}
 
