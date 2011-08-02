@@ -261,23 +261,10 @@ namespace Isis
               catchNull(newData));
           break;
         case EditLock:
-          if (newData == "Yes" && !measure->IsEditLocked())
-          {
+          if (newData == "Yes")
             measure->SetEditLock(true);
-          }
           else
-            if (newData == "No" && measure->IsEditLocked())
-            {
-              // Prompt the user for confirmation before turning off edit lock
-              // on a measure.
-              int status = QMessageBox::warning(NULL, "cneteditor",
-                  "You requested to turn edit lock OFF for this"
-                  " measure. Are you sure you want to continue?",
-                  QMessageBox::Yes | QMessageBox::No);
-
-              if (status == QMessageBox::Yes)
-                measure->SetEditLock(false);
-            }
+            measure->SetEditLock(false);
           break;
         case Ignored:
           if (newData == "Yes")

@@ -6,6 +6,7 @@
 
 #include <QComboBox>
 #include <QLineEdit>
+#include <QMessageBox>
 #include <QString>
 #include <QWidget>
 
@@ -15,6 +16,8 @@
 
 #include "AbstractPointItem.h"
 #include "AbstractTreeItem.h"
+#include "CnetPointTableModel.h"
+#include "CnetTableColumn.h"
 
 namespace Isis
 {
@@ -28,10 +31,10 @@ namespace Isis
   }
 
 
-  QWidget * CnetPointTableDelegate::getWidget(QString columnTitle) const
+  QWidget * CnetPointTableDelegate::getWidget(CnetTableColumn const * col) const
   {
     AbstractPointItem::Column column =
-      AbstractPointItem::getColumn(columnTitle);
+      AbstractPointItem::getColumn(col->getTitle());
 
     switch (column)
     {
@@ -94,16 +97,17 @@ namespace Isis
     }
 
     iString msg = "Could not create delegate widget for column ["
-        + columnTitle + "]";
+        + col->getTitle() + "]";
     throw iException::Message(iException::Programmer, msg, _FILEINFO_);
   }
 
 
   void CnetPointTableDelegate::readData(QWidget * widget,
-      AbstractTreeItem * row, QString columnTitle) const
+      AbstractTreeItem * row, CnetTableColumn const * col) const
   {
+    QString columnTitle = col->getTitle();
     AbstractPointItem::Column column =
-      AbstractPointItem::getColumn(columnTitle);
+        AbstractPointItem::getColumn(columnTitle);
 
     QString data = row->getData(columnTitle);
     ASSERT(row->getPointerType() == AbstractTreeItem::Point);
@@ -163,10 +167,11 @@ namespace Isis
 
 
   void CnetPointTableDelegate::saveData(QWidget * widget,
-      AbstractTreeItem * row, QString columnTitle) const
+      AbstractTreeItem * row, const CnetTableColumn * col) const
   {
     AbstractPointItem::Column column =
-      AbstractPointItem::getColumn(columnTitle);
+      AbstractPointItem::getColumn(col->getTitle());
+
     QString newData;
 
     switch (column)
@@ -189,7 +194,21 @@ namespace Isis
         }
     }
 
-    row->setData(columnTitle, newData);
+    QString warningText = CnetPointTableModel::getPointWarningMessage(
+        row, col, newData);
+
+    bool changeData = true;
+
+    if (!warningText.isEmpty()) {
+      QMessageBox::StandardButton status = QMessageBox::warning(
+          NULL, "Change cell?", warningText, QMessageBox::Yes |
+          QMessageBox::No);
+
+      changeData = (status == QMessageBox::Yes);
+    }
+
+    if (changeData)
+      row->setData(col->getTitle(), newData);
   }
 }
 

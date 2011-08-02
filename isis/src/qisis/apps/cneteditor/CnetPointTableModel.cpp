@@ -19,6 +19,7 @@
 
 #include "AbstractCnetTableDelegate.h"
 #include "AbstractPointItem.h"
+#include "CnetTableColumn.h"
 #include "CnetTableColumnList.h"
 #include "CnetPointTableDelegate.h"
 #include "TreeModel.h"
@@ -76,13 +77,32 @@ namespace Isis
 
   QString CnetPointTableModel::getWarningMessage(AbstractTreeItem const * row,
       CnetTableColumn const * column, QString valueToSave) const {
-    return QString();
+    return getPointWarningMessage(row, column, valueToSave);
   }
 
 
   void CnetPointTableModel::setGlobalSelection(bool selected)
   {
     return getDataModel()->setGlobalSelection(selected, TreeModel::PointItems);
+  }
+  
+  
+  QString CnetPointTableModel::getPointWarningMessage(
+      AbstractTreeItem const * row, CnetTableColumn const * column,
+      QString valueToSave) {
+    QString colTitle = column->getTitle();
+    AbstractPointItem::Column colType = AbstractPointItem::getColumn(colTitle);
+
+    QString warningText;
+
+    if (colType == AbstractPointItem::EditLock &&
+        valueToSave.toLower() == "no" &&
+        row->getData(colTitle).toLower() == "yes") {
+      warningText = "Are you sure you want to unlock control point [" +
+          row->getData() + "] for editing?";
+    }
+
+    return warningText;
   }
 }
 

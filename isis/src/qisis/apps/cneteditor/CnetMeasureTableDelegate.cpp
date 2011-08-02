@@ -6,6 +6,7 @@
 
 #include <QComboBox>
 #include <QLineEdit>
+#include <QMessageBox>
 #include <QString>
 #include <QWidget>
 
@@ -16,6 +17,8 @@
 
 #include "AbstractMeasureItem.h"
 #include "AbstractTreeItem.h"
+#include "CnetMeasureTableModel.h"
+#include "CnetTableColumn.h"
 
 namespace Isis
 {
@@ -29,10 +32,11 @@ namespace Isis
   }
 
 
-  QWidget * CnetMeasureTableDelegate::getWidget(QString columnTitle) const
+  QWidget * CnetMeasureTableDelegate::getWidget(CnetTableColumn const * col)
+      const
   {
     AbstractMeasureItem::Column column =
-      AbstractMeasureItem::getColumn(columnTitle);
+      AbstractMeasureItem::getColumn(col->getTitle());
 
     switch (column)
     {
@@ -63,18 +67,18 @@ namespace Isis
     }
 
     iString msg = "Could not create delegate widget for column ["
-        + columnTitle + "]";
+        + col->getTitle() + "]";
     throw iException::Message(iException::Programmer, msg, _FILEINFO_);
   }
 
 
   void CnetMeasureTableDelegate::readData(QWidget * widget,
-      AbstractTreeItem * row, QString columnTitle) const
+      AbstractTreeItem * row, CnetTableColumn const * col) const
   {
     AbstractMeasureItem::Column column =
-      AbstractMeasureItem::getColumn(columnTitle);
+      AbstractMeasureItem::getColumn(col->getTitle());
 
-    QString data = row->getData(columnTitle);
+    QString data = row->getData(col->getTitle());
     ASSERT(row->getPointerType() == AbstractTreeItem::Measure);
     ControlMeasure * measure = (ControlMeasure *)row->getPointer();
 
@@ -114,10 +118,10 @@ namespace Isis
 
 
   void CnetMeasureTableDelegate::saveData(QWidget * widget,
-      AbstractTreeItem * row, QString columnTitle) const
+      AbstractTreeItem * row, CnetTableColumn const * col) const
   {
     AbstractMeasureItem::Column column =
-      AbstractMeasureItem::getColumn(columnTitle);
+      AbstractMeasureItem::getColumn(col->getTitle());
     QString newData;
 
     switch (column)
@@ -137,7 +141,21 @@ namespace Isis
         }
     }
 
-    row->setData(columnTitle, newData);
+    QString warningText = CnetMeasureTableModel::getMeasureWarningMessage(
+        row, col, newData);
+
+    bool changeData = true;
+
+    if (!warningText.isEmpty()) {
+      QMessageBox::StandardButton status = QMessageBox::warning(
+          NULL, "Change cell?", warningText, QMessageBox::Yes |
+          QMessageBox::No);
+
+      changeData = (status == QMessageBox::Yes);
+    }
+
+    if (changeData)
+      row->setData(col->getTitle(), newData);
   }
 }
 

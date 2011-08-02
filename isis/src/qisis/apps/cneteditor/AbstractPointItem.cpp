@@ -239,24 +239,9 @@ namespace Isis
           break;
         case EditLock:
           if (newData == "Yes")
-          {
             point->SetEditLock(true);
-          }
           else
-          {
-            if (newData == "No" && point->IsEditLocked())
-            {
-              // Prompt the user for confirmation before turning off edit lock
-              // on a point.
-              QMessageBox::StandardButton status = QMessageBox::warning(
-                  NULL, "cneteditor", "You requested to turn edit lock OFF "
-                  "for this point.  Are you sure you want to continue?",
-                  QMessageBox::Yes | QMessageBox::No);
-
-              if (status == QMessageBox::Yes)
-                point->SetEditLock(false);
-            }
-          }
+            point->SetEditLock(false);
           break;
         case Ignored:
           point->SetIgnored(newData == "Yes");

@@ -19,6 +19,7 @@
 
 #include "AbstractCnetTableDelegate.h"
 #include "AbstractMeasureItem.h"
+#include "CnetTableColumn.h"
 #include "CnetTableColumnList.h"
 #include "CnetMeasureTableDelegate.h"
 #include "TreeModel.h"
@@ -77,7 +78,7 @@ namespace Isis
 
   QString CnetMeasureTableModel::getWarningMessage(AbstractTreeItem const * row,
       CnetTableColumn const * column, QString valueToSave) const {
-    return QString();
+    return getMeasureWarningMessage(row, column, valueToSave);
   }
 
 
@@ -95,6 +96,29 @@ namespace Isis
     int total = getDataModel()->getItemCount(TreeModel::MeasureItems);
 
     emit filterCountsChanged(visible, total);
+  }
+
+  
+  QString CnetMeasureTableModel::getMeasureWarningMessage(
+      AbstractTreeItem const * row, CnetTableColumn const * column,
+      QString valueToSave) {
+    QString colTitle = column->getTitle();
+    AbstractMeasureItem::Column colType =
+        AbstractMeasureItem::getColumn(colTitle);
+
+    QString warningText;
+
+    if (colType == AbstractMeasureItem::EditLock &&
+        valueToSave.toLower() == "no" &&
+        row->getData(colTitle).toLower() == "yes") {
+      QString pointColTitle =
+          AbstractMeasureItem::getColumnName(AbstractMeasureItem::PointId);
+      warningText = "Are you sure you want to unlock control measure [" +
+          row->getData() + "] in point [" + row->getData(pointColTitle) +
+          "] for editing?";
+    }
+
+    return warningText;
   }
 }
 

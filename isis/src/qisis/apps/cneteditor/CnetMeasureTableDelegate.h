@@ -9,6 +9,7 @@ class QWidget;
 namespace Isis
 {
   class AbstractTreeItem;
+  class CnetTableColumn;
 
   class CnetMeasureTableDelegate : public AbstractCnetTableDelegate
   {
@@ -16,9 +17,11 @@ namespace Isis
       CnetMeasureTableDelegate();
       virtual ~CnetMeasureTableDelegate();
 
-      QWidget * getWidget(QString) const;
-      void readData(QWidget *, AbstractTreeItem *, QString) const;
-      void saveData(QWidget *, AbstractTreeItem *, QString) const;
+      QWidget * getWidget(CnetTableColumn const *) const;
+      void readData(QWidget *, AbstractTreeItem *, CnetTableColumn const *)
+          const;
+      void saveData(QWidget *, AbstractTreeItem *, CnetTableColumn const *)
+          const;
 
 
     private:

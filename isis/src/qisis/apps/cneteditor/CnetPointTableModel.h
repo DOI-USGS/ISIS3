@@ -32,6 +32,8 @@ namespace Isis
           CnetTableColumn const *, QString valueToSave) const;
       virtual void setGlobalSelection(bool selected);
 
+      static QString getPointWarningMessage(AbstractTreeItem const *,
+          CnetTableColumn const *, QString valueToSave);
 
     private:
       CnetPointTableModel(const CnetPointTableModel &);

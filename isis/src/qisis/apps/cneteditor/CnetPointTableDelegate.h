@@ -16,9 +16,11 @@ namespace Isis
       CnetPointTableDelegate();
       virtual ~CnetPointTableDelegate();
 
-      QWidget * getWidget(QString) const;
-      void readData(QWidget *, AbstractTreeItem *, QString) const;
-      void saveData(QWidget *, AbstractTreeItem *, QString) const;
+      QWidget * getWidget(CnetTableColumn const *) const;
+      void readData(QWidget *, AbstractTreeItem *, CnetTableColumn const *)
+          const;
+      void saveData(QWidget *, AbstractTreeItem *, CnetTableColumn const *)
+          const;
 
 
     private:

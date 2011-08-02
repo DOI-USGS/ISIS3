@@ -32,6 +32,8 @@ namespace Isis
           CnetTableColumn const *, QString valueToSave) const;
       virtual void setGlobalSelection(bool selected);
 
+      static QString getMeasureWarningMessage(AbstractTreeItem const *,
+          CnetTableColumn const *, QString valueToSave);
 
     private slots:
       void calculateFilterCounts();

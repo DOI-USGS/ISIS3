@@ -221,13 +221,14 @@ namespace Isis
       if (activeCell->first && isCellEditable(rowNum, activeCell->second))
       {
         const AbstractCnetTableDelegate * delegate = model->getDelegate();
-        QString colTitle =
-          columns->getVisibleColumns().at(activeCell->second)->getTitle();
+        CnetTableColumn * col =
+            columns->getVisibleColumns().at(activeCell->second);
+//        QString colTitle = col->getTitle();
 
         delete editWidget;
         editWidget = NULL;
-        editWidget = delegate->getWidget(colTitle);
-        delegate->readData(editWidget, activeCell->first, colTitle);
+        editWidget = delegate->getWidget(col);
+        delegate->readData(editWidget, activeCell->first, col);
         editWidget->setParent(this);
         editWidget->setFocus(Qt::OtherFocusReason);
       }
@@ -424,9 +425,18 @@ namespace Isis
       if (hasRowSelection())
         deleteSelectedRows();
     }
-    else if (event->key() == Qt::Key_Down)
-    {
+    else if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter) {
+      if (editWidget) {
+        CnetTableColumn * col =
+            columns->getVisibleColumns().at(activeCell->second);
+        getModel()->getDelegate()->saveData(
+            editWidget, activeCell->first, col);
+        delete editWidget;
+        editWidget = NULL;
 
+        cellDataChanged(col);
+        viewport()->update();
+      }
     }
     else
     {
@@ -597,20 +607,37 @@ namespace Isis
           0, model->getVisibleRowCount()) : *rowsWithActiveColumnSelected;
       ASSERT(selection.size());
 
-      QString warningText =
-          model->getWarningMessage(selection.at(0), col, cellData);
 
-      // Prompt the user for confirmation before setting data (if necessary).
-//      QMessageBox::StandardButton status = QMessageBox::warning(
-//          this, "Change cells?", warningText, QMessageBox::Yes |
-//          QMessageBox::No | QMessageBox::YesToAll | QMessageBox::NoToAll);
-
-//      if (status == QMessageBox::Yes)
-//      {
-
-
+      bool autoAccept = false;
       foreach (AbstractTreeItem * row, selection) {
-        row->setData(colTitle, cellData);
+        bool changeData = false;
+
+        if (!autoAccept) {
+          QString warningText =
+              model->getWarningMessage(row, col, cellData);
+          if (warningText.isEmpty()) {
+            changeData = true;
+          }
+          else {
+            // Prompt the user for confirmation before setting data (if necessary).
+            QMessageBox::StandardButton status = QMessageBox::warning(
+                this, "Change cells?", warningText, QMessageBox::Yes |
+                QMessageBox::No | QMessageBox::YesToAll | QMessageBox::NoToAll);
+
+            if (status == QMessageBox::YesToAll)
+              autoAccept = true;
+            else if (status == QMessageBox::NoToAll)
+              break;
+            else if (status == QMessageBox::Yes)
+              changeData = true;
+          }
+        }
+
+        if (autoAccept)
+          changeData = true;
+
+        if (changeData)
+          row->setData(colTitle, cellData);
       }
 
       viewport()->update();
@@ -880,7 +907,7 @@ namespace Isis
         const CnetTableColumn * col =
             columns->getVisibleColumns().at(activeCell->second);
         model->getDelegate()->saveData(editWidget, activeCell->first,
-            col->getTitle());
+            col);
         
         cellDataChanged(col);
       }
