@@ -506,9 +506,11 @@ namespace Isis {
     }
 
     // notify parent network of the change
-    if (!IsIgnored() && parentNetwork && !cm->IsIgnored()) {
+    if (parentNetwork) {
       parentNetwork->measureDeleted(cm);
-      parentNetwork->emitNetworkStructureModified();
+
+      if (!IsIgnored() && !cm->IsIgnored())
+        parentNetwork->emitNetworkStructureModified();
     }
 
     delete cm;

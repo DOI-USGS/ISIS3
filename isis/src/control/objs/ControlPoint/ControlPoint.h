@@ -267,6 +267,7 @@ namespace Isis {
    *   @history 2011-07-29 Jai Rideout, Steven Lambright, and Eric Hyer - Made
    *                           this inherit from QObject to get destroyed()
    *                           signal
+   *   @history 2011-07-29 Eric Hyer - Changed some graph code in Delete()
    */
   class ControlPoint : public QObject {
 
