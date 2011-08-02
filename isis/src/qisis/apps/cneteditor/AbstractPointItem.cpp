@@ -312,6 +312,12 @@ namespace Isis
   {
     if (point)
     {
+      if (point->IsEditLocked()) {
+        iString msg = "Point [" + getData() + "] is edit locked and cannot be "
+            "deleted";
+        throw iException::Message(iException::User, msg, _FILEINFO_);
+      }
+
       ControlPoint * tempPoint = point;
       point = NULL;
       tempPoint->Parent()->DeletePoint(tempPoint);

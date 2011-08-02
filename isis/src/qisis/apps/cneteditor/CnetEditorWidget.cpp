@@ -191,14 +191,33 @@ namespace Isis
     serialModel->stopWorking();
     connectionModel->stopWorking();
 
+    bool ignoreAll = false;
     foreach (AbstractTreeItem * item, itemsToDelete) {
 //       cerr << "CnetEditorWidget::rebuildModels deleting "
 //            << item->getPointer() << " (type is pt? "
 //            << (item->getPointerType() == AbstractTreeItem::Point)
 //            << ")\n";
-      item->deleteSource();
+      try {
+        item->deleteSource();
+      }
+      catch (iException & e) {
+        if (!ignoreAll) {
+          QString message = e.what();
+          message += "\n\nOkay to continue?";
+          e.Clear();
+
+          QMessageBox::StandardButton status = QMessageBox::warning(
+              this, "Failed to delete row", message, QMessageBox::Yes |
+              QMessageBox::YesToAll | QMessageBox::No);
+
+          if (status == QMessageBox::YesToAll)
+            ignoreAll = true;
+          else if (status == QMessageBox::No)
+            break;
+        }
+      }
     }
-    
+
     pointModel->rebuildItems();
     serialModel->rebuildItems();
     connectionModel->rebuildItems();
