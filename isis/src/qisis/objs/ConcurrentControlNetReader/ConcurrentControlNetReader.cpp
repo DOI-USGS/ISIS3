@@ -149,6 +149,9 @@ namespace Isis {
    */
   void ConcurrentControlNetReader::networkBuilt() {
     ControlNet *net = m_builderWatcher->result();
+    if (!net)
+      net = new ControlNet;
+
     ControlNetFileHeaderV0002 &header = m_versionerFile->GetNetworkHeader();
 
     net->SetTarget(header.targetname());
@@ -162,7 +165,7 @@ namespace Isis {
     m_versionerFile = NULL;
 
     QThreadPool::globalInstance()->setMaxThreadCount(m_originalThreadCount);
-    emit networkReadFinished(m_builderWatcher->result());
+    emit networkReadFinished(net);
   }
 
 

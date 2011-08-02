@@ -74,6 +74,12 @@ namespace Isis
   }
 
 
+  QString CnetPointTableModel::getWarningMessage(AbstractTreeItem const * row,
+      CnetTableColumn const * column, QString valueToSave) const {
+    return QString();
+  }
+
+
   void CnetPointTableModel::setGlobalSelection(bool selected)
   {
     return getDataModel()->setGlobalSelection(selected, TreeModel::PointItems);

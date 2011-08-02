@@ -174,7 +174,10 @@ namespace Isis
           else
             return QString("No");
         case Reference:
-          return (QString) point->GetRefMeasure()->GetCubeSerialNumber();
+          if (point->GetNumMeasures())
+            return (QString) point->GetRefMeasure()->GetCubeSerialNumber();
+          else
+            return QString();
         case AdjustedSPLat:
           return catchNull(
               point->GetAdjustedSurfacePoint().GetLatitude().GetDegrees());

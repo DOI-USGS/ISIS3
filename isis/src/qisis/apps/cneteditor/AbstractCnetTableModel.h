@@ -12,6 +12,7 @@ namespace Isis
 {
   class AbstractCnetTableDelegate;
   class AbstractTreeItem;
+  class CnetTableColumn;
   class CnetTableColumnList;
   class TreeModel;
 
@@ -31,6 +32,8 @@ namespace Isis
       virtual bool isFiltering();
       virtual CnetTableColumnList createColumns() = 0;
       virtual int getVisibleRowCount() const = 0;
+      virtual QString getWarningMessage(AbstractTreeItem const *,
+          CnetTableColumn const *, QString valueToSave) const = 0;
       virtual const AbstractCnetTableDelegate * getDelegate() const;
 
 

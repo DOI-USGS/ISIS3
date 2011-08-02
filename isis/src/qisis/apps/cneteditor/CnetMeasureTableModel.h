@@ -28,6 +28,8 @@ namespace Isis
       virtual CnetTableColumnList createColumns();
       virtual int getVisibleRowCount() const;
       virtual QList< AbstractTreeItem * > getSelectedItems();
+      virtual QString getWarningMessage(AbstractTreeItem const *,
+          CnetTableColumn const *, QString valueToSave) const;
       virtual void setGlobalSelection(bool selected);
 
 

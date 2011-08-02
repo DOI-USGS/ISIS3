@@ -75,6 +75,12 @@ namespace Isis
   }
 
 
+  QString CnetMeasureTableModel::getWarningMessage(AbstractTreeItem const * row,
+      CnetTableColumn const * column, QString valueToSave) const {
+    return QString();
+  }
+
+
   void CnetMeasureTableModel::setGlobalSelection(bool selected)
   {
     return getDataModel()->setGlobalSelection(selected,

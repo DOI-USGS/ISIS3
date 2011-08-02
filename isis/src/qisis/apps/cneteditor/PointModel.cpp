@@ -127,6 +127,7 @@ namespace Isis
 //     cerr << "PointModel::rebulidItems... getPoints has size : "
 //          << getControlNetwork()->getPoints().size() << "\n";
 
+    ASSERT(getControlNetwork());
     futureRoot = QtConcurrent::mappedReduced(
         getControlNetwork()->getPoints(),
         CreateRootItemFunctor(this, QThread::currentThread()),

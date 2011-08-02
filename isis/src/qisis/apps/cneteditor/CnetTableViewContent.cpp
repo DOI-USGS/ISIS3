@@ -580,7 +580,6 @@ namespace Isis
 
 
   void CnetTableViewContent::copyCellSelection(bool allCells) {
-    
     if (hasActiveCell()) {
       const CnetTableColumn * col = columns->getVisibleColumns().at(
           activeCell->second);
@@ -594,17 +593,24 @@ namespace Isis
       // in the same column as the active cell.
       QString cellData = activeCell->first->getData(colTitle);
 
-      if (allCells) {
-        QList< AbstractTreeItem * > items = model->getItems(0, model->getVisibleRowCount());
-        
-        foreach (AbstractTreeItem * row, items) {
-          row->setData(colTitle, cellData);
-        }
-      }
-      else {
-        foreach (AbstractTreeItem * row, *rowsWithActiveColumnSelected) {
-          row->setData(colTitle, cellData);
-        }
+      QList<AbstractTreeItem *> selection = allCells ? model->getItems(
+          0, model->getVisibleRowCount()) : *rowsWithActiveColumnSelected;
+      ASSERT(selection.size());
+
+      QString warningText =
+          model->getWarningMessage(selection.at(0), col, cellData);
+
+      // Prompt the user for confirmation before setting data (if necessary).
+//      QMessageBox::StandardButton status = QMessageBox::warning(
+//          this, "Change cells?", warningText, QMessageBox::Yes |
+//          QMessageBox::No | QMessageBox::YesToAll | QMessageBox::NoToAll);
+
+//      if (status == QMessageBox::Yes)
+//      {
+
+
+      foreach (AbstractTreeItem * row, selection) {
+        row->setData(colTitle, cellData);
       }
 
       viewport()->update();

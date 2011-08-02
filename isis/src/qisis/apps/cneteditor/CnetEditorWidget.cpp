@@ -37,10 +37,6 @@
 #include "CnetTreeView.h"
 #include "ConnectionModel.h"
 #include "FilterWidget.h"
-#include "MeasureTableDelegate.h"
-#include "MeasureTableModel.h"
-#include "PointTableDelegate.h"
-#include "PointTableModel.h"
 #include "PointModel.h"
 #include "SerialModel.h"
 
@@ -743,7 +739,7 @@ namespace Isis
     for (int i = 0; i < actions.size(); i++)
     {
       actions[i]->setChecked(settings.value("measure table column: " +
-          MeasureTableModel::getColName((MeasureTableModel::Column) i),
+          AbstractMeasureItem::getColumnName((AbstractMeasureItem::Column) i),
           true).toBool());
     }
 
@@ -775,16 +771,16 @@ namespace Isis
     for (int i = 0; i < actions.size(); i++)
     {
       settings.setValue("measure table column: " +
-          MeasureTableModel::getColName((MeasureTableModel::Column) i),
+          AbstractMeasureItem::getColumnName((AbstractMeasureItem::Column) i),
           actions[i]->isChecked());
     }
 
-//     actions = pointTableView->getHorizontalHeader()->actions();
-//     for (int i = 0; i < actions.size(); i++) {
-//       settings.setValue("point table column: " +
-//           AbstractPointItem::getColName((AbstractPointItem::Column) i),
-//           actions[i]->isChecked());
-//     }
+    actions = pointTableView->getHorizontalHeader()->actions();
+    for (int i = 0; i < actions.size(); i++) {
+      settings.setValue("point table column: " +
+          AbstractPointItem::getColumnName((AbstractPointItem::Column) i),
+          actions[i]->isChecked());
+    }
   }
 
   QWidget * CnetEditorWidget::getPointTreeView()
