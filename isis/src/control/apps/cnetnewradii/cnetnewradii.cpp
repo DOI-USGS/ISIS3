@@ -26,16 +26,16 @@ void IsisMain() {
   ControlNet cnet(ui.GetFilename("CNET"));
 
   // Get input DEM cube and get ground map for it
-  string from = ui.GetFilename("MODEL");
+  string demFile = ui.GetFilename("MODEL");
   Cube demCube;
-  demCube.open(from);
+  demCube.open(demFile);
   UniversalGroundMap *ugm = NULL;
   try {
     ugm = new UniversalGroundMap(demCube);
   }
   catch (iException e) {
     iString msg = "Cannot initalize UniversalGroundMap for DEM cube [" +
-                   from + "]";
+                   demFile + "]";
     throw iException::Message(iException::User, msg, _FILEINFO_);
   }
 
@@ -109,10 +109,15 @@ void IsisMain() {
       else {
         numSuccesses++;
         surfacePt.ResetLocalRadius(Distance(radius, Distance::Meters));
-        if (newRadiiSource == Adjusted)
+        if (newRadiiSource == Adjusted) {
           cp->SetAdjustedSurfacePoint(surfacePt);
-        else if (newRadiiSource == Apriori)
+        }
+        else if (newRadiiSource == Apriori) {
           cp->SetAprioriSurfacePoint(surfacePt);
+          // Update radius source and radius source file
+          cp->SetAprioriRadiusSource(ControlPoint::RadiusSource::DEM);
+          cp->SetAprioriRadiusSourceFile(demFile);
+        }
       }
     }
   }
