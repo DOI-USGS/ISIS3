@@ -13,6 +13,7 @@
 #include <QHeaderView>
 #include <QItemSelection>
 #include <QMenu>
+#include <QMessageBox>
 #include <QModelIndex>
 #include <QScrollArea>
 #include <QScrollBar>
@@ -26,6 +27,7 @@
 
 #include "ControlNet.h"
 #include "ControlPoint.h"
+#include "iException.h"
 
 #include "AbstractMeasureItem.h"
 #include "AbstractPointItem.h"
@@ -201,19 +203,26 @@ namespace Isis
         item->deleteSource();
       }
       catch (iException & e) {
+        QString message = e.what();
+        e.Clear();
+
         if (!ignoreAll) {
-          QString message = e.what();
-          message += "\n\nOkay to continue?";
-          e.Clear();
+          if (item == itemsToDelete.last()) {
+            QMessageBox::warning(
+                this, "Failed to delete row", message, QMessageBox::Ok);
+          }
+          else {
+            message += "\n\nOkay to continue?";
 
-          QMessageBox::StandardButton status = QMessageBox::warning(
-              this, "Failed to delete row", message, QMessageBox::Yes |
-              QMessageBox::YesToAll | QMessageBox::No);
+            QMessageBox::StandardButton status = QMessageBox::warning(
+                this, "Failed to delete row", message, QMessageBox::Yes |
+                QMessageBox::YesToAll | QMessageBox::No);
 
-          if (status == QMessageBox::YesToAll)
-            ignoreAll = true;
-          else if (status == QMessageBox::No)
-            break;
+            if (status == QMessageBox::YesToAll)
+              ignoreAll = true;
+            else if (status == QMessageBox::No)
+              break;
+          }
         }
       }
     }

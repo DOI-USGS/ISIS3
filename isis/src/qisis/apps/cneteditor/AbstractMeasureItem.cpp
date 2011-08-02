@@ -334,6 +334,24 @@ namespace Isis
   {
     if (measure)
     {
+      if (measure->Parent()->IsEditLocked()) {
+        iString msg = "Measures in point [" + getData(getColumnName(PointId)) +
+            "] cannot be deleted because point is edit locked";
+        throw iException::Message(iException::User, msg, _FILEINFO_);
+      }
+      else if (measure->IsEditLocked()) {
+        iString msg = "Measure [" + getData() + "] in point [" +
+            getData(getColumnName(PointId)) + "] cannot be deleted because "
+            "measure is edit locked";
+        throw iException::Message(iException::User, msg, _FILEINFO_);
+      }
+      else if (measure->Parent()->GetRefMeasure() == measure) {
+        iString msg = "Measure [" + getData() + "] in point [" +
+            getData(getColumnName(PointId)) + "] cannot be deleted because "
+            "it is the reference";
+        throw iException::Message(iException::User, msg, _FILEINFO_);
+      }
+
       ControlMeasure * tempMeasure = measure;
       measure = NULL;
       tempMeasure->Parent()->Delete(tempMeasure);
