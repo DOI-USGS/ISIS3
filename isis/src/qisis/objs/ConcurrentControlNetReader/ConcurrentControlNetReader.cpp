@@ -32,6 +32,7 @@
 #include <QtConcurrentRun>
 #include <QtConcurrentMap>
 
+#include "ControlMeasure.h"
 #include "ControlNet.h"
 #include "ControlNetFileV0002.pb.h"
 #include "ControlNetVersioner.h"
@@ -132,7 +133,7 @@ namespace Isis {
     QFuture< QAtomicPointer< ControlNet > > result;
 
     result = QtConcurrent::mappedReduced(m_versionerFile->GetNetworkPoints(),
-        NetworkBuilder(targetName),
+        NetworkBuilder(targetName, QThread::currentThread()),
         &NetworkBuilder::addToNetwork,
         QtConcurrent::SequentialReduce |
         QtConcurrent::OrderedReduce
@@ -186,8 +187,11 @@ namespace Isis {
   }
 
 
-  ConcurrentControlNetReader::NetworkBuilder::NetworkBuilder(QString target) {
+  ConcurrentControlNetReader::NetworkBuilder::NetworkBuilder(QString target,
+      QThread *targetThread) {
     nullify();
+
+    m_targetThread = targetThread;
 
     PvlGroup pvlRadii = Projection::TargetRadii(target.toStdString());
     m_majorRad = new Distance(pvlRadii["EquatorialRadius"], Distance::Meters);
@@ -199,6 +203,8 @@ namespace Isis {
   ConcurrentControlNetReader::NetworkBuilder::NetworkBuilder(
     NetworkBuilder const &other) {
     nullify();
+
+    m_targetThread = other.m_targetThread;
 
     m_majorRad = new Distance(*other.m_majorRad);
     m_minorRad = new Distance(*other.m_minorRad);
@@ -226,14 +232,25 @@ namespace Isis {
 
   ControlPoint *ConcurrentControlNetReader::NetworkBuilder::operator()(
     const ControlPointFileEntryV0002 &versionerPoint) const {
-    return new ControlPoint(versionerPoint, *m_majorRad, *m_minorRad,
+    ControlPoint * cp = new ControlPoint(versionerPoint, *m_majorRad, *m_minorRad,
         *m_polarRad);
+    cp->moveToThread(m_targetThread);
+
+    for (int measureIndex = 0;
+         measureIndex < cp->GetNumMeasures();
+         measureIndex++) {
+      cp->GetMeasure(measureIndex)->moveToThread(m_targetThread);
+    }
+
+    return cp;
   }
 
 
   ConcurrentControlNetReader::NetworkBuilder &
   ConcurrentControlNetReader::NetworkBuilder::operator=(
     NetworkBuilder other) {
+    swap(m_targetThread, other.m_targetThread);
+
     swap(*m_majorRad, *other.m_majorRad);
     swap(*m_minorRad, *other.m_minorRad);
     swap(*m_polarRad, *other.m_polarRad);
@@ -245,8 +262,10 @@ namespace Isis {
   void ConcurrentControlNetReader::NetworkBuilder::addToNetwork(
     QAtomicPointer< ControlNet > & network,
     ControlPoint *const &item) {
-    if (!network)
+    if (!network) {
       network = new ControlNet;
+      network->moveToThread(item->thread());
+    }
 
     network->AddPoint(item);
   }
@@ -256,6 +275,7 @@ namespace Isis {
     m_majorRad = NULL;
     m_minorRad = NULL;
     m_polarRad = NULL;
+    m_targetThread = NULL;
   }
 }
 

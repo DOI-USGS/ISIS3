@@ -51,6 +51,8 @@ namespace Isis {
    * @internal
    *   @history 2011-07-27 Jai Rideout - The original thread count is now
    *                           restored after reading has finished.
+   *   @history 2011-08-01 Steven Lambright - Fixed signals/slots not being
+   *                           in correct thread.
    *     
    */
   class ConcurrentControlNetReader : public QObject {
@@ -129,7 +131,7 @@ namespace Isis {
           const ControlPointFileEntryV0002 &, ControlPoint *> {
 
         public:
-          NetworkBuilder(QString);
+          NetworkBuilder(QString, QThread *);
           NetworkBuilder(NetworkBuilder const &);
           ~NetworkBuilder();
           ControlPoint * operator()(const ControlPointFileEntryV0002 &) const;
@@ -146,12 +148,14 @@ namespace Isis {
         private:
           //! Needed for construction of ControlPoints
           Distance *m_majorRad;
-          
+
           //! Needed for construction of ControlPoints
           Distance *m_minorRad;
-          
+
           //! Needed for construction of ControlPoints
           Distance *m_polarRad;
+
+          QThread *m_targetThread;
       };
   };
 }
