@@ -531,7 +531,7 @@ namespace Isis
 //     cerr << "TreeModel::applyFilter\n";
     // If filterAgain is true, then this method will be recalled later
     // with filterAgain = false.
-    if (!filterAgain && guisFilterWidget)
+    if (!filterAgain && guisFilterWidget && rebuildWatcher->isFinished())
     {
       QFuture< QAtomicPointer< AbstractTreeItem> > futureRoot;
 

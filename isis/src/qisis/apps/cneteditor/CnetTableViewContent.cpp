@@ -562,8 +562,7 @@ namespace Isis
   {
     if (col->hasNetworkStructureEffect())
       emit rebuildModels(QList<AbstractTreeItem *>());
-    else
-      emit modelDataChanged();
+    emit modelDataChanged();
   }
 
 
@@ -989,13 +988,21 @@ namespace Isis
 
   void CnetTableViewContent::deleteSelectedRows()
   {
-    // TODO should we store off the selected rows for efficiency?
-    QList<AbstractTreeItem *> selectedRows = model->getSelectedItems();
+    // Prompt the user for confirmation before deletion.
+    QMessageBox::StandardButton status = QMessageBox::warning(
+        this, "Delete row(s)?", "Delete selected row(s)?",
+        QMessageBox::Yes | QMessageBox::No);
 
-//     cerr << "emit rebuildModels with " << selectedRows.size() << " items to delete\n";
-    emit rebuildModels(selectedRows);
+    if (status == QMessageBox::Yes)
+    {
+      // TODO should we store off the selected rows for efficiency?
+      QList<AbstractTreeItem *> selectedRows = model->getSelectedItems();
 
-    lastShiftSelection->clear();
+      emit rebuildModels(selectedRows);
+      emit modelDataChanged();
+
+      lastShiftSelection->clear();
+    }
   }
 
 
