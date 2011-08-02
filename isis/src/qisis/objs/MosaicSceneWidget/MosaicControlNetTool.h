@@ -47,16 +47,16 @@ namespace Isis {
       QAction *getPrimaryAction();
       QWidget *getToolBarWidget();
 
-    protected slots:
+    private slots:
       void updateTool();
       void openControlNet();
       void displayArrows();
       void displayConnectivity();
       void displayControlNet();
       void closeNetwork();
-
-    private slots:
       void loadNetwork();
+      void randomizeColors();
+
       void objectDestroyed(QObject *);
 
     private:
@@ -70,6 +70,7 @@ namespace Isis {
       QPushButton *m_displayConnectivity;
       QPushButton *m_displayArrows;
       QPushButton *m_closeNetwork;
+      QPushButton *m_randomizeColors;
       QAction *m_connectivity;
       ControlNet *m_controlNet;
       ControlNetGraphicsItem *m_controlNetGraphics;

@@ -29,6 +29,7 @@ namespace Isis {
     m_displayConnectivity = NULL;
     m_closeNetwork = NULL;
     m_controlNetFileLabel = NULL;
+    m_randomizeColors = NULL;
 
     // Create the action buttons
     m_loadControlNetButton = new QPushButton();
@@ -44,11 +45,16 @@ namespace Isis {
     connect(m_displayControlNetButton, SIGNAL(destroyed(QObject *)),
             this, SLOT(objectDestroyed(QObject *)));
 
-    m_displayConnectivity = new QPushButton("Color Connectivity");
+    m_displayConnectivity = new QPushButton("Color Islands");
     connect(m_displayConnectivity, SIGNAL(clicked()), this, SLOT(displayConnectivity()));
     connect(m_displayConnectivity, SIGNAL(destroyed(QObject *)),
             this, SLOT(objectDestroyed(QObject *)));
     m_displayConnectivity->setEnabled(false);
+
+    m_randomizeColors = new QPushButton("Color Images");
+    connect(m_randomizeColors, SIGNAL(clicked()), this, SLOT(randomizeColors()));
+    connect(m_randomizeColors, SIGNAL(destroyed(QObject *)),
+            this, SLOT(objectDestroyed(QObject *)));
 
     m_displayArrows = new QPushButton("Show Movement");
     m_displayArrows->setCheckable(true);
@@ -73,23 +79,13 @@ namespace Isis {
   MosaicControlNetTool::~MosaicControlNetTool() {
     m_controlNetGraphics = NULL; // the scene cleans/cleaned this up
 
-    if(m_loadControlNetButton)
-      delete m_loadControlNetButton;
-
-    if(m_displayControlNetButton)
-      delete m_displayControlNetButton;
-
-    if(m_displayConnectivity)
-      delete m_displayConnectivity;
-
-    if(m_displayArrows)
-      delete m_displayArrows;
-
-    if(m_closeNetwork)
-      delete m_closeNetwork;
-
-    if(m_controlNetFileLabel)
-      delete m_controlNetFileLabel;
+    delete m_loadControlNetButton;
+    delete m_displayControlNetButton;
+    delete m_displayConnectivity;
+    delete m_displayArrows;
+    delete m_closeNetwork;
+    delete m_controlNetFileLabel;
+    delete m_randomizeColors;
 
     closeNetwork();
   }
@@ -97,13 +93,13 @@ namespace Isis {
 
   CubeDisplayProperties *MosaicControlNetTool::takeDisplay(
       QString sn, QList<CubeDisplayProperties *> &displays) {
-    if(m_controlNet && m_controlNetGraphics) {
+    if (m_controlNet && m_controlNetGraphics) {
       QString filename = m_controlNetGraphics->snToFilename(sn);
 
       for(int i = 0; i < displays.size(); i++) {
         CubeDisplayProperties *display = displays[i];
 
-        if(display->fileName() == filename) {
+        if (display->fileName() == filename) {
           return displays.takeAt(i);
         }
       }
@@ -126,12 +122,12 @@ namespace Isis {
 
   void MosaicControlNetTool::fromPvl(PvlObject &obj) {
     m_controlNetFile = QString::fromStdString(obj["Filename"][0]);
-    if(m_controlNetFile == "Null")
+    if (m_controlNetFile == "Null")
       m_controlNetFile = "";
 
     loadNetwork();
 
-    if(m_controlNetGraphics && m_displayControlNetButton) {
+    if (m_controlNetGraphics && m_displayControlNetButton) {
       m_displayControlNetButton->setChecked( (int)obj["Visible"][0] );
       displayControlNet();
     }
@@ -166,22 +162,25 @@ namespace Isis {
   QWidget *MosaicControlNetTool::getToolBarWidget() {
     // Put the buttons in a horizontal orientation
     QHBoxLayout *actionLayout = new QHBoxLayout();
-    if(m_loadControlNetButton)
+    if (m_loadControlNetButton)
       actionLayout->addWidget(m_loadControlNetButton);
 
-    if(m_displayControlNetButton)
+    if (m_displayControlNetButton)
       actionLayout->addWidget(m_displayControlNetButton);
 
-    if(m_displayConnectivity)
+    if (m_displayConnectivity)
       actionLayout->addWidget(m_displayConnectivity);
 
-    if(m_displayArrows)
+    if (m_randomizeColors)
+      actionLayout->addWidget(m_randomizeColors);
+
+    if (m_displayArrows)
       actionLayout->addWidget(m_displayArrows);
 
-    if(m_closeNetwork)
+    if (m_closeNetwork)
       actionLayout->addWidget(m_closeNetwork);
 
-    if(m_controlNetFileLabel)
+    if (m_controlNetFileLabel)
       actionLayout->addWidget(m_controlNetFileLabel);
 
     actionLayout->setMargin(0);
@@ -197,7 +196,7 @@ namespace Isis {
    * This slot opens and reopens this tool properly
    */
   void MosaicControlNetTool::updateTool() {
-    if(isActive() && m_controlNetFile == "") {
+    if (isActive() && m_controlNetFile == "") {
       openControlNet();
     }
   }
@@ -208,7 +207,7 @@ namespace Isis {
    *   with the action.
    */
   void MosaicControlNetTool::displayArrows() {
-    if(m_controlNetGraphics && m_displayArrows)
+    if (m_controlNetGraphics && m_displayArrows)
       m_controlNetGraphics->setArrowsVisible(m_displayArrows->isChecked());
   }
 
@@ -218,7 +217,7 @@ namespace Isis {
    *
    */
   void MosaicControlNetTool::displayConnectivity() {
-    if(m_controlNet) {
+    if (m_controlNet) {
       QList<CubeDisplayProperties *> displays = getWidget()->cubeDisplays();
 
       QList<QColor> colorsUsed;
@@ -234,25 +233,27 @@ namespace Isis {
         foreach(cubeSn, island) {
           CubeDisplayProperties *display = takeDisplay(cubeSn, displays);
 
-          while(!color.isValid()) {
-            QColor displayColor =
-                display->getValue(CubeDisplayProperties::Color).value<QColor>();
+          if (display) {
+            while(!color.isValid()) {
+              QColor displayColor = display->getValue(
+                  CubeDisplayProperties::Color).value<QColor>();
 
-            if(colorsUsed.indexOf(displayColor) == -1) {
-              colorsUsed.append(displayColor);
-              color = displayColor;
-            }
-            else {
-              QColor ranColor = CubeDisplayProperties::randomColor();
+              if (colorsUsed.indexOf(displayColor) == -1) {
+                colorsUsed.append(displayColor);
+                color = displayColor;
+              }
+              else {
+                QColor ranColor = CubeDisplayProperties::randomColor();
 
-              if(colorsUsed.indexOf(ranColor) == -1) {
-                colorsUsed.append(ranColor);
-                color = ranColor;
+                if (colorsUsed.indexOf(ranColor) == -1) {
+                  colorsUsed.append(ranColor);
+                  color = ranColor;
+                }
               }
             }
-          }
 
-          display->setColor(color);
+            display->setColor(color);
+          }
         }
       }
     }
@@ -264,36 +265,36 @@ namespace Isis {
    *   empty string.
    */
   void MosaicControlNetTool::closeNetwork() {
-    if(m_controlNetGraphics) {
+    if (m_controlNetGraphics) {
       getWidget()->getScene()->removeItem(m_controlNetGraphics);
 
       delete m_controlNetGraphics;
     }
 
-    if(m_controlNet) {
+    if (m_controlNet) {
       delete m_controlNet;
       m_controlNet = NULL;
     }
 
-    if(m_displayControlNetButton)
+    if (m_displayControlNetButton)
       m_displayControlNetButton->setChecked(false);
 
-    if(m_displayControlNetButton)
+    if (m_displayControlNetButton)
       m_displayControlNetButton->setEnabled(false);
 
-    if(m_displayConnectivity)
+    if (m_displayConnectivity)
       m_displayConnectivity->setEnabled(false);
 
-    if(m_displayArrows)
+    if (m_displayArrows)
       m_displayArrows->setChecked(false);
 
-    if(m_displayArrows)
+    if (m_displayArrows)
       m_displayArrows->setEnabled(false);
 
-    if(m_closeNetwork)
+    if (m_closeNetwork)
       m_closeNetwork->setEnabled(false);
 
-    if(m_controlNetFileLabel)
+    if (m_controlNetFileLabel)
       m_controlNetFileLabel->setText("");
 
     m_controlNetFile = "";
@@ -304,20 +305,22 @@ namespace Isis {
    * An object was destroyed, NULL it out.
    */
   void MosaicControlNetTool::objectDestroyed(QObject *obj) {
-    if(obj == m_loadControlNetButton)
+    if (obj == m_loadControlNetButton)
       m_loadControlNetButton = NULL;
-    else if(obj == m_displayControlNetButton)
+    else if (obj == m_displayControlNetButton)
       m_displayControlNetButton = NULL;
-    else if(obj == m_displayConnectivity)
+    else if (obj == m_displayConnectivity)
       m_displayConnectivity = NULL;
-    else if(obj == m_closeNetwork)
+    else if (obj == m_closeNetwork)
       m_closeNetwork = NULL;
-    else if(obj == m_controlNetGraphics)
+    else if (obj == m_controlNetGraphics)
       m_controlNetGraphics = NULL;
-    else if(obj == m_displayArrows)
+    else if (obj == m_displayArrows)
       m_displayArrows = NULL;
-    else if(obj == m_controlNetFileLabel)
+    else if (obj == m_controlNetFileLabel)
       m_controlNetFileLabel = NULL;
+    else if (obj == m_randomizeColors)
+      m_randomizeColors = NULL;
   }
 
 
@@ -337,12 +340,12 @@ namespace Isis {
     // if the file is not empty attempt to load in the control points
     // for each mosaic item
     //---------------------------------------------------------------
-    if(!netFile.isEmpty()) {
+    if (!netFile.isEmpty()) {
       Filename controlNetFile(netFile.toStdString());
       m_controlNetFile = QString::fromStdString(controlNetFile.Expanded());
       loadNetwork();
 
-      if(m_displayControlNetButton)
+      if (m_displayControlNetButton)
         m_displayControlNetButton->setChecked(true);
     }
   }
@@ -358,7 +361,7 @@ namespace Isis {
     m_controlNetFile = netFile;
     m_controlNetFileLabel->setText( QFileInfo(netFile).fileName() );
 
-    if(m_controlNetFile.size() > 0) {
+    if (m_controlNetFile.size() > 0) {
       try {
         m_controlNet = new ControlNet(
             m_controlNetFile.toStdString());
@@ -376,17 +379,24 @@ namespace Isis {
         return;
       }
 
-      if(m_displayControlNetButton)
+      if (m_displayControlNetButton)
         m_displayControlNetButton->setEnabled(true);
 
-      if(m_displayConnectivity)
+      if (m_displayConnectivity)
         m_displayConnectivity->setEnabled(true);
 
-      if(m_displayArrows)
+      if (m_displayArrows)
         m_displayArrows->setEnabled(true);
 
-      if(m_closeNetwork)
+      if (m_closeNetwork)
         m_closeNetwork->setEnabled(true);
+    }
+  }
+
+
+  void MosaicControlNetTool::randomizeColors() {
+    foreach (CubeDisplayProperties * display, getWidget()->cubeDisplays()) {
+      display->setColor(CubeDisplayProperties::randomColor());
     }
   }
 
@@ -396,7 +406,7 @@ namespace Isis {
    *   with the action.
    */
   void MosaicControlNetTool::displayControlNet() {
-    if(m_controlNetGraphics && m_displayControlNetButton)
+    if (m_controlNetGraphics && m_displayControlNetButton)
       m_controlNetGraphics->setVisible(m_displayControlNetButton->isChecked());
   }
 }
