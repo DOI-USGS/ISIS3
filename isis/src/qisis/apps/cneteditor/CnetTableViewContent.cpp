@@ -409,18 +409,29 @@ namespace Isis
 
   void CnetTableViewContent::keyPressEvent(QKeyEvent * event)
   {
-//     if (event->key() == Qt::Key_A &&
-//         event->modifiers() == Qt::ControlModifier)
-//     {
-//       model->setGlobalSelection(true);
-//       viewport()->update();
-//       emit selectionChanged();
-//     }
-//     else
-//     {
-//       QWidget::keyPressEvent(event);
-//     }
+    // Ctrl-A selects all rows.
+    if (event->key() == Qt::Key_A && event->modifiers() == Qt::ControlModifier)
+    {
+      clearActiveCell();
+      clearColumnSelection();
+      model->setGlobalSelection(true);
+      viewport()->update();
 
+      emit selectionChanged();
+    }
+    else if (event->key() == Qt::Key_Delete)
+    {
+      if (hasRowSelection())
+        deleteSelectedRows();
+    }
+    else if (event->key() == Qt::Key_Down)
+    {
+
+    }
+    else
+    {
+      QWidget::keyPressEvent(event);
+    }
   }
 
 
@@ -556,6 +567,13 @@ namespace Isis
   }
 
 
+  void CnetTableViewContent::clearActiveCell()
+  {
+    activeCell->first = NULL;
+    activeCell->second = -1;
+  }
+
+
   void CnetTableViewContent::clearColumnSelection()
   {
     rowsWithActiveColumnSelected->clear();
@@ -653,6 +671,27 @@ namespace Isis
 
   bool CnetTableViewContent::hasActiveCell() const {
     return (activeCell->first && activeCell->second >= 0);
+  }
+
+
+  bool CnetTableViewContent::hasRowSelection() const {
+    return (model->getSelectedItems().size());
+  }
+
+
+  bool CnetTableViewContent::mouseInCellSelection(QPoint mousePos) const {
+    int colNum = getColumnFromScreenX(mousePos.x());
+    AbstractTreeItem * row = items->at(getRowFromScreenY(mousePos.y()));
+
+    return (rowsWithActiveColumnSelected->contains(row) &&
+            activeCell->second == colNum);
+  }
+
+
+  bool CnetTableViewContent::isMouseInRowSelection(QPoint mousePos) const {
+    AbstractTreeItem * row = items->at(getRowFromScreenY(mousePos.y()));
+
+    return (model->getSelectedItems().contains(row));
   }
   
   
@@ -950,9 +989,9 @@ namespace Isis
 
   void CnetTableViewContent::deleteSelectedRows()
   {
+    // TODO should we store off the selected rows for efficiency?
     QList<AbstractTreeItem *> selectedRows = model->getSelectedItems();
 
-//     selectedRows.clear();
 //     cerr << "emit rebuildModels with " << selectedRows.size() << " items to delete\n";
     emit rebuildModels(selectedRows);
 
@@ -977,19 +1016,22 @@ namespace Isis
   
   void CnetTableViewContent::showContextMenu(QPoint mouseLocation)
   {
-    int colNum = getColumnFromScreenX(mouseLocation.x());
     QMenu contextMenu(this);
 
-    if (hasActiveCell() && isDataColumn(colNum))
+    // If there is a row selection, show a context menu if the user clicked
+    // anywhere on any of the selected row(s).
+    if (hasRowSelection() && isMouseInRowSelection(mouseLocation))
+    {
+      contextMenu.addAction(deleteSelectedRowsAct);
+      contextMenu.exec(mapToGlobal(mouseLocation));
+    }
+    // Only show the context menu for cells if the user right-clicked on the
+    // active cell.
+    else if (hasActiveCell() && mouseInCellSelection(mouseLocation))
     {
       if (rowsWithActiveColumnSelected->size() > 1)
         contextMenu.addAction(applyToSelectionAct);
       contextMenu.addAction(applyToAllAct);
-      contextMenu.exec(mapToGlobal(mouseLocation));
-    }
-    else if (!isDataColumn(colNum))
-    {
-      contextMenu.addAction(deleteSelectedRowsAct);
       contextMenu.exec(mapToGlobal(mouseLocation));
     }
   }

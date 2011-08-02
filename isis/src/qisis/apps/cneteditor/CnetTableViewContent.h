@@ -68,13 +68,16 @@ namespace Isis
     private:
       void nullify();
       void cellDataChanged(CnetTableColumn const * col);
+      void clearActiveCell();
       void clearColumnSelection();
       void copyCellSelection(bool);
       void createActions();
-      void createMenus();
       int getColumnFromScreenX(int screenX) const;
       int getRowFromScreenY(int screenY) const;
       bool hasActiveCell() const;
+      bool hasRowSelection() const;
+      bool mouseInCellSelection(QPoint) const;
+      bool isMouseInRowSelection(QPoint) const;
       bool isRowValid(int rowNum) const;
       bool isColumnValid(int colNum) const;
       bool isCellEditable(int, int) const;
