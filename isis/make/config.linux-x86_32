@@ -203,6 +203,12 @@ BOOSTLIB    =
 #              -lboost_regex -lboost_serialization -lboost_signals -lboost_system \
 #              -lboost_thread -lboost_unit_test_framework -lboost_wave -lboost_wserialization
 
+#---------------------------------------------------------------------------
+# Set up for Cholmod libraries 
+#---------------------------------------------------------------------------
+CHOLMODINCDIR = -I$(ISIS3LOCAL)/include/CHOLMOD/CHOLMOD1.7.3
+CHOLMODLIBDIR = -L$(ISIS3LOCAL)/lib
+CHOLMODLIB    = -lcholmod -lamd -lcolamd -llapack
 
 #---------------------------------------------------------------------------
 #  Define the third party distribution libraries (patterns)

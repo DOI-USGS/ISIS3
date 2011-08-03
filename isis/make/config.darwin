@@ -217,6 +217,13 @@ BOOSTLIBDIR = -L$(ISIS3OPT)/lib
 BOOSTLIB   =
 
 #---------------------------------------------------------------------------
+# Set up for Cholmod Libraries
+#---------------------------------------------------------------------------
+CHOLMODINCDIR = -I$(ISIS3LOCAL)/include/CHOLMOD/CHOLMOD1.7.3
+CHOLMODLIBDIR = -L$(ISIS3LOCAL)/lib
+CHOLMODLIB   = -lcholmod -lamd -lcolamd -framework Accelerate
+
+#---------------------------------------------------------------------------
 #  Define the third party distribution libraries (patterns)
 #---------------------------------------------------------------------------
 
@@ -250,6 +257,7 @@ THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/postgresql*/libpq.*dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/mysql5/mysql/libmysqlclient_r*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libkdu_a63R.dylib"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libsuperlu_3.0.dylib"
+THIRDPARTYLIBS    += "/System/Library/Frameworks/Accelerate.framework"
 
 # libxerces-c depends on these libraries
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libicui18n*.dylib"

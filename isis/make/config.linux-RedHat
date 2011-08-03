@@ -173,6 +173,13 @@ PROTOBUFLIB    = -lprotobuf
 PROTOC         = $(ISIS3LOCAL)/bin/protoc
 
 #---------------------------------------------------------------------------
+# Set up for Cholmod libraries 
+#---------------------------------------------------------------------------
+CHOLMODINCDIR = -I$(ISIS3LOCAL)/include/CHOLMOD/CHOLMOD1.7.3
+CHOLMODLIBDIR = -L$(ISIS3LOCAL)/lib
+CHOLMODLIB    = -lcholmod -lamd -lcolamd -llapack
+
+#---------------------------------------------------------------------------
 #  Define the third party distribution libraries (patterns)
 #---------------------------------------------------------------------------
 
