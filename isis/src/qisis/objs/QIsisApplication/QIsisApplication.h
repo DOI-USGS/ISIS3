@@ -32,7 +32,7 @@
 #include "iException.h"
 #include "iString.h"
 
-namespace Qisis {
+namespace Isis {
   /**
    * @brief Handles exceptions which the QT event handlers and
    *        QApplication do not handle.

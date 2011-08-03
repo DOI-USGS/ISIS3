@@ -4,7 +4,7 @@
 
 #include <QObject>
 
-namespace Qisis {
+namespace Isis {
   /**
    * Constructor
    *
