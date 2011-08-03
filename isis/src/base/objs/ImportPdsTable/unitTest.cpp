@@ -53,6 +53,6 @@ int main(int argc, char *argv[]) {
   cout << "Getting ISIS Table...\n";
   Table newTable = myTable.exportAsTable("VIR_DATA");
 
-//  newTable.Write("vir_data.tbl");
+  // newTable.Write("vir_data.tbl");
   return (0);
 }

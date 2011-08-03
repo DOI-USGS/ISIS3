@@ -46,6 +46,8 @@ namespace Isis {
    * @ingroup Utility
    *
    * @author 2011-07-20 Kris Becker
+   * @history 2011-08-02 Kris Becker Modified to ensure the proper size of strings are
+   *                       exported to the TableRecord
    *
    */
 class ImportPdsTable {

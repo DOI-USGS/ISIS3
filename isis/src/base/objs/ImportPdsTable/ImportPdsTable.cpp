@@ -221,13 +221,13 @@ Table ImportPdsTable::exportAsTable(const std::string &tname) const {
  *  
  * This method extracts columns specified by the caller in a string.  It is 
  * typically used for a single column, but any number of columns can be 
- * provided.  The strings 
+ * provided.  colnames is a comma delimited string that contains the name of
+ * the columns that will be exported in the table.
  * 
+ * @param colNames String containing comma delimited column names to export
+ * @param tname    Name of table to create
  * 
- * @param colNames 
- * @param tname 
- * 
- * @return Table 
+ * @return Table  Table containing the specified columns
  */
 Table ImportPdsTable::exportAsTable(const std::string &colnames, 
                                     const std::string &tname) const {
@@ -237,13 +237,14 @@ Table ImportPdsTable::exportAsTable(const std::string &colnames,
 }
 
 /**
- * @brief Populate ISIS Table with specifiec columns 
+ * @brief Populate ISIS Table with specific columns 
  *  
- * This method extracts columns specified by the caller 
+ * This method extracts columns specified by the caller.  If the requested
+ * column does not exist, an exception is thrown.
  * 
  * 
- * @param colNames 
- * @param tname 
+ * @param colNames Vector column names to convert to a table.
+ * @param tname  Name of the table to create.
  * 
  * @return Table 
  */
@@ -606,7 +607,9 @@ TableField &ImportPdsTable::extract(const Columns &columns,
       tfield = data.ToDouble();
     }
     else {  // Its a text field
-      tfield = data.Trim(" \t\r\n");
+      string str(tfield.Size(), ' ');
+      str.insert(0, data.Trim(" \t\r\n"));
+      tfield = str;
     }
   }
   catch (iException &ie) {
