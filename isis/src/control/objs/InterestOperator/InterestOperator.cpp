@@ -597,11 +597,12 @@ namespace Isis {
           pvlPointObj += Isis::PvlKeyword("Error", "Point has a Measure with EditLock set to true "
                                           "but the Reference is not Locked");
         }
-
-        for (int measure = 0; measure < newPnt->GetNumMeasures(); measure++) {
-          ControlMeasure *cm = newPnt->GetMeasure(measure);
-          cm->SetDateTime();
-          cm->SetChooserName("Application cnetref(Interest)");
+        else {
+          for (int measure = 0; measure < newPnt->GetNumMeasures(); measure++) {
+            ControlMeasure *cm = newPnt->GetMeasure(measure);
+            cm->SetDateTime();
+            cm->SetChooserName("Application cnetref(Interest)");
+          }
         }
       } // End of if point is of type free
 
@@ -610,12 +611,9 @@ namespace Isis {
       mStatus.CheckStatus();
     } // Point loop
 
-    // Basic Statistics
-    mStatisticsGrp += Isis::PvlKeyword("TotalPoints",      pNewNet.GetNumMeasures());
-    mStatisticsGrp += Isis::PvlKeyword("PointsIgnored", (pNewNet.GetNumMeasures() - pNewNet.GetNumValidPoints()));
+    // CnetRef Change Statistics
     mStatisticsGrp += Isis::PvlKeyword("PointsModified",   iPointsModified);
     mStatisticsGrp += Isis::PvlKeyword("ReferenceChanged", iRefChanged);
-    mStatisticsGrp += Isis::PvlKeyword("TotalMeasures",    pNewNet.GetNumMeasures());
     mStatisticsGrp += Isis::PvlKeyword("MeasuresModified", iMeasuresModified);
 
     mPvlLog += mStatisticsGrp;
