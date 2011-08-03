@@ -167,6 +167,28 @@ namespace Isis {
   MeasureValidationResults ControlNetValidMeasure::ValidStandardOptions(
       double pSample, double pLine, const ControlMeasure *pMeasure, Cube *pCube,
       PvlGroup *pMeasureGrp) {
+
+    // Get the Camera
+    Camera *measureCamera = NULL;
+    if(mbCameraRequired) {
+      try {
+        measureCamera = pCube->getCamera();
+      }
+      catch(Isis::iException &e) {
+        string msg = "Cannot Create Camera for Image:" + pCube->getFilename();
+        throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      }
+    }
+
+    return ValidStandardOptions(pSample, pLine, pMeasure,
+        pCube, measureCamera, pMeasureGrp);
+  }
+
+
+  MeasureValidationResults ControlNetValidMeasure::ValidStandardOptions(
+      double pSample, double pLine, const ControlMeasure *pMeasure, Cube *pCube,
+      Camera *measureCamera, PvlGroup *pMeasureGrp) {
+
     mdEmissionAngle  = 0;
     mdIncidenceAngle = 0;
     mdResolution     = 0;
@@ -177,17 +199,7 @@ namespace Isis {
     m_lineShift = 0;
     m_pixelShift = 0;
 
-    // Get the Camera
-    if(mbCameraRequired) {
-      Camera *measureCamera;
-      try {
-        measureCamera = pCube->getCamera();
-      }
-      catch(Isis::iException &e) {
-        string msg = "Cannot Create Camera for Image:" + pCube->getFilename();
-        throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
-      }
-  
+    if (measureCamera != NULL) {
       measureCamera->SetImage(pSample, pLine);
   
       mdEmissionAngle     = measureCamera->EmissionAngle();
@@ -317,6 +329,8 @@ namespace Isis {
     return ValidStandardOptions(pSample, pLine, NULL, pCube, pMeasureGrp);
     
   }
+
+
   /**
    * Validate a measure for all the Standard Options
    *
@@ -330,13 +344,26 @@ namespace Isis {
    * @return bool
    */
   MeasureValidationResults ControlNetValidMeasure::ValidStandardOptions(
-    const ControlMeasure * pMeasure,Cube *pCube, PvlGroup *pMeasureGrp) {
+    const ControlMeasure * pMeasure, Cube *pCube, PvlGroup *pMeasureGrp) {
 
     double dSample, dLine;
     dSample = pMeasure->GetSample();
     dLine   = pMeasure->GetLine();
     
     return (ValidStandardOptions(dSample, dLine, pMeasure, pCube, pMeasureGrp));
+  }
+
+
+  MeasureValidationResults ControlNetValidMeasure::ValidStandardOptions(
+    const ControlMeasure * pMeasure, Cube *pCube, Camera *camera,
+    PvlGroup *pMeasureGrp) {
+
+    double dSample, dLine;
+    dSample = pMeasure->GetSample();
+    dLine   = pMeasure->GetLine();
+    
+    return ValidStandardOptions(dSample, dLine, pMeasure,
+          pCube, camera, pMeasureGrp);
   }
 
   /**

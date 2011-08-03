@@ -5,6 +5,7 @@
 #include <QList>
 #include <QMap>
 
+#include "ControlCubeGraphNode.h"
 #include "ControlMeasure.h"
 #include "ControlNet.h"
 #include "ControlNetValidMeasure.h"
@@ -45,7 +46,7 @@ void CheckAllMeasureValidity(ControlNet &cnet, string cubeList);
 
 // Validity test
 MeasureValidationResults ValidateMeasure(const ControlMeasure *measure,
-    SerialNumberList &serialNumbers);
+    Cube *cube, Camera *camera);
 
 void PrintTemp();
 void EditDefFile();
@@ -586,59 +587,93 @@ void ProcessControlMeasures(string fileName, ControlNet &cnet) {
 void CheckAllMeasureValidity(ControlNet &cnet, string cubeList) {
   SerialNumberList serialNumbers(cubeList);
 
+  QList<ControlCubeGraphNode *> graphNodes = cnet.GetCubeGraphNodes();
   Progress progress;
   progress.SetText("Checking Measure Validity");
-  progress.SetMaximumSteps(cnet.GetNumPoints());
+  progress.SetMaximumSteps(graphNodes.size());
   progress.CheckStatus();
 
-  for (int cp = cnet.GetNumPoints() - 1; cp >= 0; cp--) {
-    ControlPoint *point = cnet.GetPoint(cp);
+  for (int sn = 0; sn < graphNodes.size(); sn++) {
+    ControlCubeGraphNode *graphNode = graphNodes[sn];
+    iString serialNumber = graphNode->getSerialNumber();
 
-    // Compare each Serial Number listed with the serial number in the
-    // Control Measure for according exclusion
-    for (int cm = point->GetNumMeasures() - 1; cm >= 0; cm--) {
-      ControlMeasure *measure = point->GetMeasure(cm);
+    Cube *cube = NULL;
+    Camera *camera = NULL;
+    if (validator->IsCubeRequired()) {
+      if (!serialNumbers.HasSerialNumber(serialNumber)) {
+        string msg = "Serial Number [" + serialNumber + "] contains no ";
+        msg += "matching cube in FROMLIST";
+        throw iException::Message(iException::User, msg, _FILEINFO_);
+      }
+
+      cube = new Cube;
+      cube->open(serialNumbers.Filename(serialNumber));
+
+      if (validator->IsCameraRequired()) {
+        try {
+          camera = cube->getCamera();
+        }
+        catch (Isis::iException &e) {
+          string msg = "Cannot Create Camera for Image:" + cube->getFilename();
+          throw iException::Message(iException::User, msg, _FILEINFO_);
+        }
+      }
+    }
+
+    QList<ControlMeasure *> measures = graphNode->getMeasures();
+    for (int cm = 0; cm < measures.size(); cm++) {
+      ControlMeasure *measure = measures[cm];
+      ControlPoint *point = measure->Parent();
 
       if (!measure->IsIgnored()) {
         MeasureValidationResults results =
-            ValidateMeasure(measure, serialNumbers);
+            ValidateMeasure(measure, cube, camera);
 
         if (!results.isValid()) {
-          if (cm == point->IndexOfRefMeasure() && retainRef) {
+          if (measure == point->GetRefMeasure() && retainRef) {
             comments = true;
             if (commentPoints->HasKeyword(point->GetId())) {
               PvlKeyword & key = commentPoints->FindKeyword(point->GetId());
               key += "\nReference Measure is not Validated";
             }
             else {
-              commentPoints->AddKeyword(
-                PvlKeyword(point->GetId(), "Reference Measure is not Validated"));
+              commentPoints->AddKeyword(PvlKeyword(point->GetId(),
+                    "Reference Measure is not Validated"));
             }
           }
           else {
             string failure = results.toString().toStdString();
             IgnoreMeasure(cnet, point, measure, "Validity Check " + failure);
   
-            if (cm == point->IndexOfRefMeasure()) {
+            if (measure == point->GetRefMeasure()) {
               IgnorePoint(cnet, point, "Reference measure ignored");
             }
           }
         }
       }
+    }
 
-      //also look for previously ignored control measures
+    delete cube;
+    progress.CheckStatus();
+  }
+
+  for (int cp = cnet.GetNumPoints() - 1; cp >= 0; cp--) {
+    ControlPoint *point = cnet.GetPoint(cp);
+
+    for (int cm = point->GetNumMeasures() - 1; cm >= 0; cm--) {
+      ControlMeasure *measure = point->GetMeasure(cm);
+
+      // Also look for previously ignored control measures
       if (deleteIgnored && measure->IsIgnored() &&
-          cm != point->IndexOfRefMeasure()) {
+          measure != point->GetRefMeasure()) {
         DeleteMeasure(point, cm);
       }
     }
 
     // Check if there are too few measures in the point or the point was
     // previously ignored
-    if (ShouldDelete(point)) {
+    if (ShouldDelete(point))
       DeletePoint(cnet, cp);
-    }
-    progress.CheckStatus();
   }
 }
 
@@ -655,26 +690,10 @@ void CheckAllMeasureValidity(ControlNet &cnet, string cubeList) {
  *         validity and a formatted error (or success) message
  */
 MeasureValidationResults ValidateMeasure(const ControlMeasure *measure,
-    SerialNumberList &serialNumbers) {
-
-  Cube *measureCube = NULL;
-
-  if (validator->IsCubeRequired()) {
-    string serialNumber = measure->GetCubeSerialNumber();
-    if (!serialNumbers.HasSerialNumber(serialNumber)) {
-      string msg = "Serial Number [" + serialNumber + "] contains no ";
-      msg += "matching cube in FROMLIST";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
-    }
-
-    measureCube = new Cube;
-    measureCube->open(serialNumbers.Filename(serialNumber));
-  }
+    Cube *cube, Camera *camera) {
 
   MeasureValidationResults results =
-      validator->ValidStandardOptions(measure, measureCube);
-
-  delete measureCube;
+      validator->ValidStandardOptions(measure, cube, camera);
 
   return results;
 }

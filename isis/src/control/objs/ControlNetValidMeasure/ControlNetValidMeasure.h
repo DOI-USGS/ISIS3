@@ -177,10 +177,18 @@ namespace Isis {
       //! Validate Standard options to pick a reference based on a particular criteria
       MeasureValidationResults ValidStandardOptions(const ControlMeasure *pMeasure,
           Cube *pCube, PvlGroup *pMeasureGrp = NULL);
+
+      //! Validate Standard options to pick a reference based on a particular criteria
+      MeasureValidationResults ValidStandardOptions(const ControlMeasure *pMeasure,
+          Cube *pCube, Camera *camera, PvlGroup *pMeasureGrp = NULL);
       
       //! Validate Standard options to pick a reference based on a particular criteria
       MeasureValidationResults ValidStandardOptions(double pSample, double pLine, 
           const ControlMeasure *pMeasure, Cube *pCube, PvlGroup *pMeasureGrp = NULL);
+
+      MeasureValidationResults ValidStandardOptions(double pSample, double pLine, 
+          const ControlMeasure *pMeasure, Cube *pCube, Camera *measureCamera,
+          PvlGroup *pMeasureGrp = NULL);
       
       //! Validate Standard options to pick a reference based on a particular criteria
       MeasureValidationResults ValidStandardOptions(double pSample, double pLine, 
@@ -188,6 +196,17 @@ namespace Isis {
 
       bool IsCubeRequired() {
         return IsCameraRequired() || mbValidateDN || mbValidateFromEdge;
+      }
+
+      /**
+       * API to get status of CameraRequired flag
+       * 
+       * @author Sharmila Prasad (5/19/2011)
+       * 
+       * @return bool 
+       */
+      bool IsCameraRequired() {
+        return mbCameraRequired;
       }
 
     protected:
@@ -225,17 +244,6 @@ namespace Isis {
        */
       void SetCameraRequiredFlag(bool pbFlag){
         mbCameraRequired = pbFlag;
-      }
-
-      /**
-       * API to get status of CameraRequired flag
-       * 
-       * @author Sharmila Prasad (5/19/2011)
-       * 
-       * @return bool 
-       */
-      bool IsCameraRequired(void){
-        return mbCameraRequired;
       }
       
       double mdMinDN;                  //!< Standard Option MinDN
