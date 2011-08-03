@@ -43,12 +43,13 @@ namespace Isis {
           bool   m_isDarkCurrent;
         };
 
-        double m_lineRate;
-        int    m_summing;
+        bool   m_is1BCalibrated; ///!< is determined by Archive/ProcessingLevelId
+        char   m_slitMode;       ///!< Slit mode of the instrument
+        double m_lineRate;       ///!< Scan line rate
+        int    m_summing;        ///!< Summing/binnning mode
         std::vector<LineRateChange> m_lineRates;
         std::vector<ScanMirrorInfo> m_mirrorData;
-        bool m_is1BCalibrated; ///!< is determined by Archive/ProcessingLevelId
-        int  m_nDarkCurrent;   ///!< Number of dark current lines in table
+        int    m_nDarkCurrent;   ///!< Number of dark current lines in table
 
         void readHouseKeeping(const std::string &filename, double lineRate);
         std::string scrub(const std::string &text) const;

@@ -35,6 +35,9 @@ namespace Isis {
       PvlGroup &inst = lab.FindGroup("Instrument", Isis::Pvl::Traverse);
       string channelId = inst["ChannelId"];
 
+      string instMode = inst["InstrumentModeId"];
+      m_slitMode = instMode[14];   // "F" for full slit, Q for quarter slit
+
       // Check for presence of articulation kernel
       bool hasArtCK = hasArticulationKernel(lab);
 
@@ -60,8 +63,8 @@ namespace Isis {
 
       // Get other info from labels
       PvlKeyword &frameParam = inst["FrameParameter"];
-      double m_lineRate = frameParam[0].ToDouble();
-      double m_summing  = frameParam[1].ToDouble();
+      m_lineRate = frameParam[0].ToDouble();
+      m_summing  = frameParam[1].ToInteger();
 
       // Setup detector map
       //  Get the line scane rates/times
@@ -215,6 +218,7 @@ namespace Isis {
       }
     }
 
+    //  Gut check on housekeeping contents and cube lines
     if ((int) m_lineRates.size() != Lines()) {
       ostringstream mess;
       mess << "Number housekeeping lines determined (" << m_lineRates.size() 
@@ -262,11 +266,31 @@ namespace Isis {
     string virId = "DAWN_VIR_" + virChannel;
     string virZero = virId + "_ZERO";
 
+
+    // Retrieve the bore sight FOV
+    SpiceDouble bsight[3];
+    SpiceChar shape[80], frame[80];
+    SpiceDouble bounds[4][3];
+    SpiceInt n;  // Number bound vectors
+    getfov_c(NaifIkCode(), 4, sizeof(shape), sizeof(frame), shape, frame,
+             bsight, &n, bounds);
+
+    SpiceDouble scan_pix_vec[3];
+    vsub_c(bounds[1], bounds[0], scan_pix_vec);
+    vscl_c(4.0, scan_pix_vec, scan_pix_vec);
+    
+    SpiceDouble smpl_pix_vec[3];
+    vsub_c(bounds[0], bounds[3], smpl_pix_vec);
+    //  Will have only 256 or 64 samples in full slit mode - always have
+    //  64 samples in quarter slit (thus the 256 scale).
+    double sampScale = (m_slitMode == 'F') ? Samples() : 256.0;
+    vscl_c(1.0/sampScale, smpl_pix_vec, smpl_pix_vec);
+
     // Allocate output arrays
     int nvals = nfields - 1;
     int nlines = m_lineRates.size();
 
-    SpiceDouble eulang[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
+    SpiceDouble eulang[6] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
     SpiceDouble xform[6][6], xform2[6][6];
     SpiceDouble m[3][3];
     SpiceDouble q_av[7], *av(&q_av[4]);
@@ -279,7 +303,7 @@ namespace Isis {
         SMatrix state = getStateRotation("J2000", virZero, etTime);
 
         // Set rotation of optical scan mirror (in radians)
-        eulang[1] = optAng;
+        eulang[1] = -optAng;
         eul2xf_c(eulang, 1, 2, 3, xform);
         mxmg_c(xform, &state[0][0], 6, 6, 6, xform2);
       
