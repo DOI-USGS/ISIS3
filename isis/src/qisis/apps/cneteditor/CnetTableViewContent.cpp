@@ -848,7 +848,8 @@ namespace Isis
         }
         else
         {
-          text = QString::number(rowNum + verticalScrollBar()->value());
+          // Draw the row number.
+          text = QString::number(rowNum + verticalScrollBar()->value() + 1);
           textCentered = true;
 
           // We need to paint the row number column.
