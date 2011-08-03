@@ -6,6 +6,7 @@
 #include "CnetRefByIncidence.h"
 #include "CnetRefByResolution.h"
 #include "ControlNet.h"
+#include "ControlNetStatistics.h"
 #include "GuiEditFile.h"
 #include "InterestOperatorFactory.h"
 #include "InterestOperator.h"
@@ -160,10 +161,16 @@ void IsisMain() {
       Application::Log(interestOp->GetStdOptions());
       Application::Log(interestOp->GetStatistics());
     }
-
+    
     // Write the new control network out
     cNet.Write(ui.GetFilename("ONET"));
 
+    // Get Control Net Stats Summary
+    PvlGroup statsGrp;
+    ControlNetStatistics cnetStats(&cNet);
+    cnetStats.GenerateControlNetStats(statsGrp);
+    Application::Log(statsGrp);
+    
     if (cnetValidMeas) {
       Pvl pvlLog = cnetValidMeas->GetLogPvl();
       if (bLogFile) {
