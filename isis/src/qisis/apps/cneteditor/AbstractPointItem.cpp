@@ -41,12 +41,24 @@ namespace Isis
         return "Adjusted SP Lon";
       case AdjustedSPRadius:
         return "Adjusted SP Radius";
+      case AdjustedSPLatSigma:
+        return "Adjusted SP Lat Sigma";
+      case AdjustedSPLonSigma:
+        return "Adjusted SP Lon Sigma";
+      case AdjustedSPRadiusSigma:
+        return "Adjusted SP Radius Sigma";
       case APrioriSPLat:
         return "A Priori SP Lat";
       case APrioriSPLon:
         return "A Priori SP Lon";
       case APrioriSPRadius:
         return "A Priori SP Radius";
+      case APrioriSPLatSigma:
+        return "A Priori SP Lat Sigma";
+      case APrioriSPLonSigma:
+        return "A Priori SP Lon Sigma";
+      case APrioriSPRadiusSigma:
+        return "A Priori SP Radius Sigma";
       case APrioriSPSource:
         return "A Priori SP Source";
       case APrioriSPSourceFile:
@@ -102,11 +114,23 @@ namespace Isis
     columnList.append(
         new CnetTableColumn(getColumnName(AdjustedSPRadius), true, false));
     columnList.append(
+        new CnetTableColumn(getColumnName(AdjustedSPLatSigma), true, false));
+    columnList.append(
+        new CnetTableColumn(getColumnName(AdjustedSPLonSigma), true, false));
+    columnList.append(
+        new CnetTableColumn(getColumnName(AdjustedSPRadiusSigma), true, false));
+    columnList.append(
         new CnetTableColumn(getColumnName(APrioriSPLat), false, false));
     columnList.append(
         new CnetTableColumn(getColumnName(APrioriSPLon), false, false));
     columnList.append(
         new CnetTableColumn(getColumnName(APrioriSPRadius), false, false));
+    columnList.append(
+        new CnetTableColumn(getColumnName(APrioriSPLatSigma), true, false));
+    columnList.append(
+        new CnetTableColumn(getColumnName(APrioriSPLonSigma), true, false));
+    columnList.append(
+        new CnetTableColumn(getColumnName(APrioriSPRadiusSigma), true, false));
     columnList.append(
         new CnetTableColumn(getColumnName(APrioriSPSource), false, false));
     columnList.append(
@@ -187,6 +211,18 @@ namespace Isis
         case AdjustedSPRadius:
           return catchNull(
               point->GetAdjustedSurfacePoint().GetLocalRadius().GetMeters());
+        case AdjustedSPLatSigma:
+          return catchNull(
+              point->GetAdjustedSurfacePoint().
+                GetLatSigmaDistance().GetMeters());
+        case AdjustedSPLonSigma:
+          return catchNull(
+              point->GetAdjustedSurfacePoint().
+                GetLonSigmaDistance().GetMeters());
+        case AdjustedSPRadiusSigma:
+          return catchNull(
+              point->GetAdjustedSurfacePoint().
+                GetLocalRadiusSigma().GetMeters());
         case APrioriSPLat:
           return catchNull(
               point->GetAprioriSurfacePoint().GetLatitude().GetDegrees());
@@ -196,6 +232,18 @@ namespace Isis
         case APrioriSPRadius:
           return catchNull(
               point->GetAprioriSurfacePoint().GetLocalRadius().GetMeters());
+        case APrioriSPLatSigma:
+          return catchNull(
+              point->GetAprioriSurfacePoint().
+                GetLatSigmaDistance().GetMeters());
+        case APrioriSPLonSigma:
+          return catchNull(
+              point->GetAprioriSurfacePoint().
+                GetLonSigmaDistance().GetMeters());
+        case APrioriSPRadiusSigma:
+          return catchNull(
+              point->GetAprioriSurfacePoint().
+                GetLocalRadiusSigma().GetMeters());
         case APrioriSPSource:
           return (QString) point->GetSurfacePointSourceString();
         case APrioriSPSourceFile:
@@ -268,6 +316,36 @@ namespace Isis
               point->GetAdjustedSurfacePoint().GetLongitude(),
               Distance(catchNull(newData), Distance::Meters)));
           break;
+        case AdjustedSPLatSigma: {
+          SurfacePoint newSurfacePoint(point->GetAdjustedSurfacePoint());
+          newSurfacePoint.SetSphericalSigmasDistance(
+              Distance(catchNull(newData), Distance::Meters),
+              newSurfacePoint.GetLonSigmaDistance(),
+              newSurfacePoint.GetLocalRadiusSigma());
+
+          point->SetAdjustedSurfacePoint(newSurfacePoint);
+          break;
+        }
+        case AdjustedSPLonSigma: {
+          SurfacePoint newSurfacePoint(point->GetAdjustedSurfacePoint());
+          newSurfacePoint.SetSphericalSigmasDistance(
+              newSurfacePoint.GetLatSigmaDistance(),
+              Distance(catchNull(newData), Distance::Meters),
+              newSurfacePoint.GetLocalRadiusSigma());
+
+          point->SetAdjustedSurfacePoint(newSurfacePoint);
+          break;
+        }
+        case AdjustedSPRadiusSigma: {
+          SurfacePoint newSurfacePoint(point->GetAdjustedSurfacePoint());
+          newSurfacePoint.SetSphericalSigmasDistance(
+              newSurfacePoint.GetLatSigmaDistance(),
+              newSurfacePoint.GetLonSigmaDistance(),
+              Distance(catchNull(newData), Distance::Meters));
+
+          point->SetAdjustedSurfacePoint(newSurfacePoint);
+          break;
+        }
         case APrioriSPLat:
           point->SetAprioriSurfacePoint(SurfacePoint(
               Latitude(catchNull(newData), Angle::Degrees),
@@ -286,6 +364,36 @@ namespace Isis
               point->GetAprioriSurfacePoint().GetLongitude(),
               Distance(catchNull(newData), Distance::Meters)));
           break;
+        case APrioriSPLatSigma: {
+          SurfacePoint newSurfacePoint(point->GetAprioriSurfacePoint());
+          newSurfacePoint.SetSphericalSigmasDistance(
+              Distance(catchNull(newData), Distance::Meters),
+              newSurfacePoint.GetLonSigmaDistance(),
+              newSurfacePoint.GetLocalRadiusSigma());
+
+          point->SetAprioriSurfacePoint(newSurfacePoint);
+          break;
+        }
+        case APrioriSPLonSigma: {
+          SurfacePoint newSurfacePoint(point->GetAprioriSurfacePoint());
+          newSurfacePoint.SetSphericalSigmasDistance(
+              newSurfacePoint.GetLatSigmaDistance(),
+              Distance(catchNull(newData), Distance::Meters),
+              newSurfacePoint.GetLocalRadiusSigma());
+
+          point->SetAprioriSurfacePoint(newSurfacePoint);
+          break;
+        }
+        case APrioriSPRadiusSigma: {
+          SurfacePoint newSurfacePoint(point->GetAprioriSurfacePoint());
+          newSurfacePoint.SetSphericalSigmasDistance(
+              newSurfacePoint.GetLatSigmaDistance(),
+              newSurfacePoint.GetLonSigmaDistance(),
+              Distance(catchNull(newData), Distance::Meters));
+
+          point->SetAprioriSurfacePoint(newSurfacePoint);
+          break;
+        }
         case APrioriSPSource:
           point->SetAprioriSurfacePointSource(
             point->StringToSurfacePointSource(newData));

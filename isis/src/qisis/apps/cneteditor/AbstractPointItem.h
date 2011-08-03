@@ -32,16 +32,22 @@ namespace Isis
         AdjustedSPLat = 7,
         AdjustedSPLon = 8,
         AdjustedSPRadius = 9,
-        APrioriSPLat = 10,
-        APrioriSPLon = 11,
-        APrioriSPRadius = 12,
-        APrioriSPSource = 13,
-        APrioriSPSourceFile = 14,
-        APrioriRadiusSource = 15,
-        APrioriRadiusSourceFile = 16,
-        JigsawRejected = 17
+        AdjustedSPLatSigma = 10,
+        AdjustedSPLonSigma = 11,
+        AdjustedSPRadiusSigma = 12,
+        APrioriSPLat = 13,
+        APrioriSPLon = 14,
+        APrioriSPRadius = 15,
+        APrioriSPLatSigma = 16,
+        APrioriSPLonSigma = 17,
+        APrioriSPRadiusSigma = 18,
+        APrioriSPSource = 19,
+        APrioriSPSourceFile = 20,
+        APrioriRadiusSource = 21,
+        APrioriRadiusSourceFile = 22,
+        JigsawRejected = 23
       };
-      static const int COLS = 18;
+      static const int COLS = 24;
 
       static QString getColumnName(Column);
       static Column getColumn(QString);
