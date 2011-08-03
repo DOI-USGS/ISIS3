@@ -17,9 +17,9 @@ Group = StandardOptions
   MaxResolution     = 500.0
   SampleResidual    = 5.0
   LineResidual      = 5.0
-  ResidualMagnitude = 1.79769313486232e+308
+  ResidualMagnitude = MAX_TOLERANCE
   SampleShift       = 5.0
   LineShift         = 5.0
-  PixelShift        = 1.79769313486232e+308
+  PixelShift        = MAX_SHIFT
 End_Group
 End
