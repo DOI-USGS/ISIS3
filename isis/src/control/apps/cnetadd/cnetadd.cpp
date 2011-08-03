@@ -102,6 +102,7 @@ void IsisMain() {
     Cube cube;
     cube.open(addList[img]);
     Pvl *cubepvl = cube.getLabel();
+    std::string sn = SerialNumber::Compose(*cubepvl);
     Camera *cam = cube.getCamera();
 
     //loop through all the control points
@@ -115,7 +116,6 @@ void IsisMain() {
         continue;
       }
 
-      std::string sn = SerialNumber::Compose(*cubepvl);
       if (point->HasSerialNumber(sn)) continue;
 
       SurfacePoint cpSurfacePoint;
