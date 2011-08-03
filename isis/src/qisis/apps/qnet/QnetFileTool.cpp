@@ -71,6 +71,18 @@ namespace Qisis {
 
   }
 
+
+  QnetFileTool::~QnetFileTool() {
+    delete g_serialNumberList;
+    g_serialNumberList = NULL;
+    delete g_controlNetwork;
+    g_controlNetwork = NULL;
+
+  }
+
+
+
+
   /**
    *  Open a list of cubes
    *

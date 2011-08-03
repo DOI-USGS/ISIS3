@@ -79,16 +79,17 @@ namespace Qisis {
   class QnetFileTool : public FileTool {
       Q_OBJECT
 
+    public:
+      QnetFileTool(QWidget *parent);
+      ~QnetFileTool();
+      QString cNetFilename;
+
     signals:
       void serialNumberListUpdated();
       void controlNetworkUpdated(QString cNetName);
       void newControlNetwork(Isis::ControlNet *);
       void newGroundFile();
       void newDemFile();
-
-    public:
-      QnetFileTool(QWidget *parent);
-      QString cNetFilename;
 
     public slots:
       virtual void open();

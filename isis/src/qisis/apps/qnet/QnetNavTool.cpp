@@ -115,8 +115,7 @@ namespace Qisis {
     p_filterCountLabel = new QLabel("Filter Count: ");
 
     // Create action options
-    QWidget *actionArea = new QWidget();
-    QPushButton *load = new QPushButton("&View Cube(s)", actionArea);
+    QPushButton *load = new QPushButton("&View Cube(s)");
     load->setAutoDefault(false);
     load->setToolTip("Open Selected Images");
     load->setWhatsThis("<b>Function: </b> Opens all selected images, or images \
@@ -125,7 +124,7 @@ namespace Qisis {
                         the list by using the shift or control key.</p>");
     connect(load, SIGNAL(clicked()),
         this, SLOT(load()));
-    p_tie = new QPushButton("&Modify Point", actionArea);
+    p_tie = new QPushButton("&Modify Point");
     p_tie->setAutoDefault(false);
     p_tie->setToolTip("Modify Selected Point");
     p_tie->setWhatsThis("<b>Function: </b> Opens the tie tool to modify the \
@@ -134,7 +133,7 @@ namespace Qisis {
     connect(p_tie, SIGNAL(clicked()),
         this, SLOT(tie()));
 
-    p_multiIgnore = new QPushButton("&Ignore Points", actionArea);
+    p_multiIgnore = new QPushButton("&Ignore Points");
     p_multiIgnore->setAutoDefault(false);
     p_multiIgnore->setToolTip("Set selected points to Ignore");
     p_multiIgnore->setWhatsThis("<b>Function: </b> Sets the selected points \
@@ -147,7 +146,7 @@ namespace Qisis {
     connect(p_multiIgnore, SIGNAL(clicked()),
         this, SLOT(ignorePoints()));
 
-    p_multiDelete = new QPushButton("&Delete Points", actionArea);
+    p_multiDelete = new QPushButton("&Delete Points");
     p_multiDelete->setAutoDefault(false);
     p_multiIgnore->setToolTip("Set selected points to Delete");
     p_multiIgnore->setWhatsThis("<b>Function: </b> Delete the selected points \
@@ -160,7 +159,7 @@ namespace Qisis {
     connect(p_multiDelete, SIGNAL(clicked()),
         this, SLOT(deletePoints()));
 
-    p_setApriori = new QPushButton("&Set Apriori/Sigmas", actionArea);
+    p_setApriori = new QPushButton("&Set Apriori/Sigmas");
     p_setApriori->setAutoDefault(false);
     p_setApriori->setToolTip("Set selected points apriori/sigmas");
     p_setApriori->setWhatsThis("<b>Function: </b> Set the apriori points \
@@ -170,7 +169,7 @@ namespace Qisis {
                                key.</p>");
     connect(p_setApriori, SIGNAL(clicked()), this, SLOT(aprioriDialog()));
 
-    p_filter = new QPushButton("&Filter", actionArea);
+    p_filter = new QPushButton("&Filter");
     p_filter->setAutoDefault(true);
     p_filter->setToolTip("Filter Current List");
     p_filter->setWhatsThis("<b>Function: </b> Filters the current list by user \
@@ -180,7 +179,7 @@ namespace Qisis {
     connect(p_filter, SIGNAL(clicked()),
         this, SLOT(filter()));
 
-    QPushButton *reset = new QPushButton("&Show All", actionArea);
+    QPushButton *reset = new QPushButton("&Show All");
     reset->setAutoDefault(false);
     reset->setToolTip("Reset the Current List to show all the values in the list");
     reset->setWhatsThis("<b>Function: </b> Resets the list of points, \

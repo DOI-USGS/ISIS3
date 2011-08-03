@@ -94,12 +94,12 @@ int main(int argc, char *argv[]) {
 
     // adds hist tool button to toolpad on left
     // adds PlotTool to "Options" dropdown of Menu toolbar
-    Qisis::Tool *histtool = new Qisis::HistogramTool(Qisis::Qnet::g_vpMainWindow);
-    histtool->addTo(Qisis::Qnet::g_vpMainWindow);
+    Qisis::Tool *histTool = new Qisis::HistogramTool(Qisis::Qnet::g_vpMainWindow);
+    histTool->addTo(Qisis::Qnet::g_vpMainWindow);
 
     // adds stats tool button to toolpad on left
-    Qisis::Tool *statstool = new Qisis::StatisticsTool(Qisis::Qnet::g_vpMainWindow);
-    statstool->addTo(Qisis::Qnet::g_vpMainWindow);
+    Qisis::Tool *statsTool = new Qisis::StatisticsTool(Qisis::Qnet::g_vpMainWindow);
+    statsTool->addTo(Qisis::Qnet::g_vpMainWindow);
 
     // adds tie tool button to toolpad on left
     // sets tie tool to active button
@@ -208,7 +208,41 @@ int main(int argc, char *argv[]) {
     //-----------------------------------------------------------------
 
     Qisis::Qnet::g_vpMainWindow->show();
-    return app->exec();
+    int status = app->exec();
+
+    delete ftool;
+    ftool = NULL;
+    delete ntool;
+    ntool = NULL;
+    delete btool;
+    btool = NULL;
+    delete ztool;
+    ztool = NULL;
+    delete ptool;
+    ptool = NULL;
+    delete stool;
+    stool = NULL;
+    delete findTool;
+    findTool = NULL;
+    delete histTool;
+    histTool = NULL;
+    delete statsTool;
+    statsTool = NULL;
+    delete qnetTool;
+    qnetTool = NULL;
+    delete ttool;
+    ttool = NULL;
+    delete wtool;
+    wtool = NULL;
+    delete htool;
+    htool = NULL;
+    delete Qisis::Qnet::g_vpMainWindow;
+    Qisis::Qnet::g_vpMainWindow = NULL;
+    delete app;
+    app = NULL;
+
+    return status;
+
   }
   catch (Isis::iException &e) {
     e.Report();

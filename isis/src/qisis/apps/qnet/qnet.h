@@ -8,6 +8,7 @@
 #ifdef IN_QNET
 #define EXTERN
 #else
+
 #define EXTERN extern
 #endif
 

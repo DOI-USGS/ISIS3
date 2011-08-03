@@ -2,6 +2,7 @@
 
 #include <sstream>
 #include <vector>
+#include <iomanip>
 
 #include <QtGui>
 #include <QComboBox>
@@ -108,24 +109,20 @@ namespace Qisis {
 
 
   QnetTool::~QnetTool () {
-#if 0
-    if (p_editPoint) {
-      delete p_editPoint;
-      p_editPoint = NULL;
-    }
-    if (p_leftMeasure) {
-      delete p_leftMeasure;
-      p_leftMeasure = NULL;
-    }
-    if (p_rightMeasure) {
-      delete p_rightMeasure;
-      p_rightMeasure = NULL;
-    }
-#endif
-    if (p_groundGmap) {
-      delete p_groundGmap;
-      p_groundGmap = NULL;
-    }
+    delete p_editPoint;
+    p_editPoint = NULL;
+    delete p_leftMeasure;
+    p_leftMeasure = NULL;
+    delete p_rightMeasure;
+    p_rightMeasure = NULL;
+    delete p_groundGmap;
+    p_groundGmap = NULL;
+    delete p_leftCube;
+    p_leftCube = NULL;
+    delete p_rightCube;
+    p_rightCube = NULL;
+    delete p_measureTable;
+    p_measureTable = NULL;
   }
 
 
@@ -657,15 +654,38 @@ namespace Qisis {
         p_leftMeasure->GetCubeSerialNumber() != p_groundSN) {
         QString message = "This point already contains a reference measure.  ";
         message += "Would you like to replace it with the measure on the left?";
-        switch(QMessageBox::question((QWidget *)parent(),
+        int  response = QMessageBox::question((QWidget *)parent(),
                                   "Qnet Tool Save Measure", message,
-                                  "&Yes", "&No", 0, 0)){
-          case 0: // Yes was clicked or Enter was pressed, replace reference
-            p_editPoint->SetRefMeasure(p_leftMeasure->GetCubeSerialNumber());
-            // ??? Need to set rest of measures to Candiate and add more warning. ???//
-          case 1: // No was clicked, keep original reference
-            break;
+                                  QMessageBox::Yes | QMessageBox::No,
+                                  QMessageBox::Yes);
+        // Replace reference measure
+        if (response == QMessageBox::Yes) {
+          //  Update measure file combo boxes:  old reference normal font,
+          //    new reference bold font
+          iString file = g_serialNumberList->Filename(p_leftMeasure->GetCubeSerialNumber());
+          QString fname = Filename(file).Name().c_str();
+          int iref = p_leftCombo->findText(fname);
+
+          //  Save normal font from new reference measure
+          QVariant font = p_leftCombo->itemData(iref,Qt::FontRole);
+          p_leftCombo->setItemData(iref,QFont("DejaVu Sans", 12, QFont::Bold), Qt::FontRole);
+          iref = p_rightCombo->findText(fname);
+          p_rightCombo->setItemData(iref,QFont("DejaVu Sans", 12, QFont::Bold), Qt::FontRole);
+
+          file = g_serialNumberList->Filename(refMeasure->GetCubeSerialNumber());
+          fname = Filename(file).Name().c_str();
+          iref = p_leftCombo->findText(fname);
+          p_leftCombo->setItemData(iref,font,Qt::FontRole);
+          iref = p_rightCombo->findText(fname);
+          p_rightCombo->setItemData(iref,font,Qt::FontRole);
+
+          p_editPoint->SetRefMeasure(p_leftMeasure->GetCubeSerialNumber());
+          // Update reference measure to new reference measure
+          refMeasure = p_editPoint->GetRefMeasure();
+
         }
+            
+            // ??? Need to set rest of measures to Candiate and add more warning. ???//
       }
       // If the right measure is the reference, make sure they really want
       // to move the reference.
@@ -737,16 +757,44 @@ namespace Qisis {
 
       double lat = p_groundGmap->UniversalLatitude();
       double lon = p_groundGmap->UniversalLongitude();
+//    cout<<"lat = "<<setprecision(15)<<lat<<endl;
+//    cout<<"lon = "<<lon<<endl;
       double radius;
       //  Update radius
       if (p_demOpen) {
         radius = demRadius(lat,lon);
+        if (radius == Isis::Null) {
+          QString msg = "Could not read radius from DEM, will default to "
+            "local radius of reference measure.";
+          QMessageBox::warning((QWidget *)parent(), "Warning", msg);
+          if (p_editPoint->GetRefMeasure()->Camera()->SetGround(
+              Latitude(lat, Angle::Degrees), Longitude(lon, Angle::Degrees))) {
+            radius =
+              p_editPoint->GetRefMeasure()->Camera()->LocalRadius().GetMeters();
+              p_editPoint->SetAprioriRadiusSource(
+                  ControlPoint::RadiusSource::None);
+              //p_editPoint->SetAprioriRadiusSourceFile(p_radiusSourceFile);
+          }
+          else {
+            QString message = "Error trying to get radius at this pt.  "
+                "Lat/Lon does not fall on the reference measure.  "
+                "Cannot save this measure.";
+            QMessageBox::critical((QWidget *)parent(),"Error",message);
+            return;
+          }
+        }
+        p_editPoint->SetAprioriRadiusSource(p_groundRadiusSource);
+        p_editPoint->SetAprioriRadiusSourceFile(p_radiusSourceFile);
       }
       else {
         //  Get radius from reference image
         if (p_editPoint->GetRefMeasure()->Camera()->SetGround(
-                  Latitude(lat, Angle::Degrees), Longitude(lon, Angle::Degrees))) {
-          radius = p_editPoint->GetRefMeasure()->Camera()->LocalRadius().GetMeters();
+              Latitude(lat, Angle::Degrees), Longitude(lon, Angle::Degrees))) {
+          radius =
+              p_editPoint->GetRefMeasure()->Camera()->LocalRadius().GetMeters();
+//        cout.width(15);
+//        cout.precision(4);
+//        cout<<"Camera Radius = "<<fixed<<radius<<endl;
           //radius = p_groundGmap->Projection()->LocalRadius();
         }
         else {
@@ -774,8 +822,6 @@ namespace Qisis {
       }
       p_editPoint->SetAprioriSurfacePointSource(p_groundSurfacePointSource);
       p_editPoint->SetAprioriSurfacePointSourceFile(p_groundSourceFile);
-      p_editPoint->SetAprioriRadiusSource(p_groundRadiusSource);
-      p_editPoint->SetAprioriRadiusSourceFile(p_radiusSourceFile);
 
       updateSurfacePointInfo ();
     }
@@ -1402,20 +1448,6 @@ namespace Qisis {
         fixedPoint->SetType(ControlPoint::Constrained);
       }
 
-      //  ??????       What radius , check for dem or shape model
-      double radius = 0;
-      if (p_demOpen) {
-        radius = demRadius(lat,lon);
-      }
-      else {
-        radius = p_groundGmap->Projection()->LocalRadius();
-      }
-
-      fixedPoint->SetAprioriSurfacePoint(SurfacePoint(
-                                          Latitude(lat, Angle::Degrees),
-                                          Longitude(lon, Angle::Degrees),
-                                          Distance(radius, Distance::Meters)));
-
       // If this ControlPointId already exists, message box pops up and user is 
       // asked to enter a new value.
       if (g_controlNetwork->ContainsPoint(fixedPoint->GetId())) {
@@ -1441,7 +1473,7 @@ namespace Qisis {
         g_serialNumberList->SerialNumber(item->text().toStdString());
         m->SetCubeSerialNumber(sn);
         int camIndex =
-        g_serialNumberList->FilenameIndex(item->text().toStdString());
+                 g_serialNumberList->FilenameIndex(item->text().toStdString());
         cam = g_controlNetwork->Camera(camIndex);
         cam->SetUniversalGround(lat,lon);
         m->SetCoordinate(cam->Sample(),cam->Line());
@@ -1450,6 +1482,57 @@ namespace Qisis {
         m->SetCamera(cam);
         fixedPoint->Add(m);
       }
+
+      //  ??????       What radius , check for dem or shape model
+      double radius = 0;
+      if (p_demOpen) {
+        radius = demRadius(lat,lon);
+        if (radius == Isis::Null) {
+          QString msg = "Could not read radius from DEM, will default to the "
+            "local radius of the first measure in the control point.  This "
+            "will be updated to the local radius of the chosen reference "
+            "measure.";
+          QMessageBox::warning((QWidget *)parent(), "Warning", msg);
+          if ((*fixedPoint)[0]->Camera()->SetGround(
+               Latitude(lat, Angle::Degrees), Longitude(lon, Angle::Degrees))) {
+            radius = (*fixedPoint)[0]->Camera()->LocalRadius().GetMeters();
+          }
+          else {
+            QString msg = "Error trying to get radius at this pt.  "
+                "Lat/Lon does not fall on the reference measure.  "
+                "Cannot create this point.";
+            QMessageBox::critical((QWidget *)parent(),"Error",msg);
+            delete fixedPoint;
+            fixedPoint = NULL;
+            delete fixedPointDialog;
+            fixedPointDialog = NULL;
+            return;
+          }
+        }
+      }
+      else {
+        if ((*fixedPoint)[0]->Camera()->SetGround(
+             Latitude(lat, Angle::Degrees), Longitude(lon, Angle::Degrees))) {
+          radius = (*fixedPoint)[0]->Camera()->LocalRadius().GetMeters();
+        }
+        else {
+          QString msg = "Error trying to get radius at this pt.  "
+              "Lat/Lon does not fall on the reference measure.  "
+              "Cannot create this point.";
+          QMessageBox::critical((QWidget *)parent(),"Error",msg);
+          delete fixedPoint;
+          fixedPoint = NULL;
+          delete fixedPointDialog;
+          fixedPointDialog = NULL;
+          return;
+        }
+      }
+
+      fixedPoint->SetAprioriSurfacePoint(SurfacePoint(
+                                          Latitude(lat, Angle::Degrees),
+                                          Longitude(lon, Angle::Degrees),
+                                          Distance(radius, Distance::Meters)));
+
       if (p_editPoint != NULL && p_editPoint->Parent() == NULL) {
         delete p_editPoint;
         p_editPoint = NULL;
@@ -1460,6 +1543,9 @@ namespace Qisis {
       loadPoint();
       p_qnetTool->setShown(true);
       p_qnetTool->raise();
+
+      delete fixedPointDialog;
+      fixedPointDialog = NULL;
 
       // emit signal so the nave tool refreshes the list
       emit refreshNavList();
@@ -3341,20 +3427,46 @@ namespace Qisis {
 
 
 
+  /**
+   * Return a radius values from the dem using bilinear interpolation
+   * 
+   * @author  2011-08-01 Tracie Sucharski
+   * 
+   * @internal 
+   */
   double QnetTool::demRadius(double latitude, double longitude) {
 
     if (!p_demOpen) return Isis::Null;
 
     UniversalGroundMap *demMap = new UniversalGroundMap(*p_demCube);
-    demMap->SetGround(Latitude(latitude, Angle::Degrees),
-                      Longitude(longitude, Angle::Degrees));
-    Brick pixel(1,1,1,p_demCube->getPixelType());
-    int intSamp = (int) (demMap->Sample() + 0.5);
-    int intLine = (int) (demMap->Line() + 0.5);
-    pixel.SetBasePosition(intSamp,intLine,1);
-    p_demCube->read(pixel);
-    double radius = pixel[0];
+    if (!demMap->SetUniversalGround(latitude, longitude)) {
+      delete demMap;
+      demMap = NULL;
+      return Isis::Null;
+    }
 
+    //  Use bilinear interpolation to read radius from DEM
+    //   Use bilinear interpolation from dem
+    Interpolator *interp = new Interpolator(Interpolator::BiLinearType);
+
+    //   Buffer used to read from the model
+    Portal *portal = new Portal(interp->Samples(), interp->Lines(),
+                                p_demCube->getPixelType(),
+                                interp->HotSample(), interp->HotLine());
+    portal->SetPosition(demMap->Sample(), demMap->Line(), 1);
+    p_demCube->read(*portal);
+    double radius = interp->Interpolate(demMap->Sample(), demMap->Line(),
+                                        portal->DoubleBuffer());
+    delete demMap;
+    demMap = NULL;
+    delete interp;
+    interp = NULL;
+    delete portal;
+    portal = NULL;
+
+//  cout.width(15);
+//  cout.precision(4);
+//  cout<<"DEM Radius = "<<fixed<<radius<<endl;
     return radius;
   }
 

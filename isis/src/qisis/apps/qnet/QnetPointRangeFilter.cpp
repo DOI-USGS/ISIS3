@@ -1,24 +1,20 @@
+#include "QnetPointRangeFilter.h"
+
 #include <QGridLayout>
 #include <QMessageBox>
-#include "QnetPointRangeFilter.h"
-#include "QnetNavTool.h"
-#include "ControlNet.h"
-#include "SerialNumberList.h"
-//#include "geos.h"
-#include "qnet.h"
 
-#include "geos/geom/Coordinate.h"
-#include "geos/geom/GeometryFactory.h"
-#include "geos/geom/CoordinateSequenceFactory.h"
-#include "geos/geom/LinearRing.h"
-#include "geos/geom/Polygon.h"
-#include "geos/geom/Point.h"
+#include "ControlNet.h"
+#include "ControlPoint.h"
 #include "Latitude.h"
 #include "Longitude.h"
+#include "SerialNumberList.h"
 #include "SurfacePoint.h"
+
+#include "qnet.h"
 
 
 using namespace Qisis::Qnet;
+using namespace Isis;
 using namespace std;
 
 namespace Qisis {
@@ -122,51 +118,23 @@ namespace Qisis {
         return;
       }
 
-      // Set up a polygon with the range values the user entered
-
-      // Create all the coordinates we will need
-      vector<geos::geom::Coordinate> *coords = new vector<geos::geom::Coordinate>;
-      geos::geom::Coordinate *c1 = new geos::geom::Coordinate(minlat, minlon);
-      geos::geom::Coordinate *c2 = new geos::geom::Coordinate(maxlat, minlon);
-      geos::geom::Coordinate *c3 = new geos::geom::Coordinate(maxlat, maxlon);
-      geos::geom::Coordinate *c4 = new geos::geom::Coordinate(minlat, maxlon);
-      geos::geom::Coordinate *c5 = new geos::geom::Coordinate(minlat, minlon);
-
-      // create the coordinate sequence
-      coords->push_back(*c1);
-      coords->push_back(*c2);
-      coords->push_back(*c3);
-      coords->push_back(*c4);
-      coords->push_back(*c5);
-      geos::geom::GeometryFactory *factory = new geos::geom::GeometryFactory();
-      const geos::geom::CoordinateSequenceFactory *csFact =
-        factory->getCoordinateSequenceFactory();
-      geos::geom::CoordinateSequence *seq = csFact->create(coords);
-
-      // Create the polygon with the coordinate sequence
-      geos::geom::LinearRing *ring = factory->createLinearRing(seq);
-      geos::geom::Polygon *poly = factory->createPolygon(ring,
-          new vector<geos::geom::Geometry *>);
-
       // Loop through each value of the filtered points list
-      // checking to see if each point is in the polygon we created above
+      // checking to see if each point falls within the rangee
       // Loop in reverse order since removal list of elements affects index number
       for (int i = g_filteredPoints.size() - 1; i >= 0; i--) {
         // Get the current control point
-        Isis::ControlPoint &cp = *(*g_controlNetwork)[g_filteredPoints[i]];
+        ControlPoint &cp = *(*g_controlNetwork)[g_filteredPoints[i]];
 
-        // Create a new point
-        const geos::geom::Coordinate *coord = new geos::geom::Coordinate(
-            cp.GetBestSurfacePoint().GetLatitude().GetDegrees(),
-            cp.GetBestSurfacePoint().GetLongitude().GetDegrees());
-        geos::geom::Point *pt = factory->createPoint(*coord);
-
-        // See if the point is in the polygon & add it if it is
-        if (poly->contains(pt)) {
+        Latitude lat = cp.GetBestSurfacePoint().GetLatitude();
+        Longitude lon = cp.GetBestSurfacePoint().GetLongitude();
+        if (lat.IsInRange(Latitude(minlat,Angle::Degrees),Latitude(maxlat,Angle::Degrees)) &&
+            lon.IsInRange(Longitude(minlon,Angle::Degrees),Longitude(maxlon,Angle::Degrees))) {
           continue;
         }
-        else
+        else {
           g_filteredPoints.removeAt(i);
+        }
+
       }
     }
 
