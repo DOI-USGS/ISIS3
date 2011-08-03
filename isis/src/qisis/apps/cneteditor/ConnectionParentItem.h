@@ -14,7 +14,7 @@ namespace Isis
     public AbstractParentItem
   {
     public:
-      ConnectionParentItem(Isis::ControlCubeGraphNode * node,
+      ConnectionParentItem(ControlCubeGraphNode * node,
           int avgCharWidth, AbstractTreeItem * parent = 0);
       virtual ~ConnectionParentItem();
 

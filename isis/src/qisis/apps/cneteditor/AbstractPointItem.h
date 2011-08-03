@@ -49,7 +49,7 @@ namespace Isis
 
 
     public:
-      AbstractPointItem(Isis::ControlPoint * cp, int avgCharWidth,
+      AbstractPointItem(ControlPoint * cp, int avgCharWidth,
           AbstractTreeItem * parent = 0);
       virtual ~AbstractPointItem();
 

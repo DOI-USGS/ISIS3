@@ -13,7 +13,7 @@ namespace Isis
   class SerialLeafItem : public AbstractSerialItem, public AbstractLeafItem
   {
     public:
-      SerialLeafItem(Isis::ControlCubeGraphNode * node,
+      SerialLeafItem(ControlCubeGraphNode * node,
           int avgCharWidth, AbstractTreeItem * parent = 0);
       virtual ~SerialLeafItem();
 

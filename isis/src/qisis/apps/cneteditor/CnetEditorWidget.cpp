@@ -60,7 +60,7 @@ namespace Isis
 //**************************************************************
 
 
-  CnetEditorWidget::CnetEditorWidget(Isis::ControlNet * cNet,
+  CnetEditorWidget::CnetEditorWidget(ControlNet * cNet,
       QString pathForSettings)
   {
     nullify();

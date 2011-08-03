@@ -13,7 +13,7 @@ namespace Isis
   class SerialParentItem : public AbstractSerialItem, public AbstractParentItem
   {
     public:
-      SerialParentItem(Isis::ControlCubeGraphNode * node,
+      SerialParentItem(ControlCubeGraphNode * node,
           int avgCharWidth, AbstractTreeItem * parent = 0);
       virtual ~SerialParentItem();
 

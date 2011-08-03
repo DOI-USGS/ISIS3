@@ -25,7 +25,7 @@ namespace Isis
       Q_OBJECT
 
     public:
-      ConnectionModel(Isis::ControlNet * cNet, CnetTreeView * v,
+      ConnectionModel(ControlNet * cNet, CnetTreeView * v,
           QObject * parent = 0);
       virtual ~ConnectionModel();
 

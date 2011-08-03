@@ -26,7 +26,7 @@ namespace Isis
       Q_OBJECT
 
     public:
-      PointModel(Isis::ControlNet * cNet, CnetTreeView * v,
+      PointModel(ControlNet * cNet, CnetTreeView * v,
           QObject * parent = 0);
       virtual ~PointModel();
 

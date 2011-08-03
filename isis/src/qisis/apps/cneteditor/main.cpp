@@ -7,7 +7,7 @@
 
 
 using namespace Isis;
-using namespace Qisis;
+
 
 void startMonitoringMemory();
 void stopMonitoringMemory();

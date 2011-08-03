@@ -37,7 +37,7 @@ namespace Isis
 
 
     public:
-      CnetEditorWidget(Isis::ControlNet *, QString);
+      CnetEditorWidget(ControlNet *, QString);
       virtual ~CnetEditorWidget();
       int getDriverView() const;
       void readSettings();

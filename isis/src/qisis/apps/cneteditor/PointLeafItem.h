@@ -13,7 +13,7 @@ namespace Isis
   class PointLeafItem : public AbstractPointItem, public AbstractLeafItem
   {
     public:
-      PointLeafItem(Isis::ControlPoint * cp, int avgCharWidth,
+      PointLeafItem(ControlPoint * cp, int avgCharWidth,
           AbstractTreeItem * parent = 0);
       virtual ~PointLeafItem();
 

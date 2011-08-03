@@ -24,7 +24,7 @@ namespace Isis
       Q_OBJECT
 
     public:
-      SerialModel(Isis::ControlNet * cNet, CnetTreeView * v,
+      SerialModel(ControlNet * cNet, CnetTreeView * v,
           QObject * parent = 0);
       virtual ~SerialModel();
 
