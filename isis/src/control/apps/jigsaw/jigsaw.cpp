@@ -110,8 +110,17 @@ void IsisMain() {
   // Bundle adjust the network
   try {
 
-    if(ui.GetString("METHOD") == "SPECIALK" )
-      b->SolveSpecialK();
+    if(ui.GetString("METHOD") == "SPECIALK") {
+      b->SetDecompositionMethod(BundleAdjust::SPECIALK);
+      b->SolveCholesky();
+    }
+    else if(ui.GetString("METHOD") == "CHOLMOD") {
+      b->SetDecompositionMethod(BundleAdjust::CHOLMOD);
+      b->SolveCholesky();
+    }
+    // the Solve method below is the old, LU Sparse routine, not explicitly used
+    // in Jigsaw now, but retained indefinitely as a additional approach to
+    // check against
     else
       b->Solve();
 

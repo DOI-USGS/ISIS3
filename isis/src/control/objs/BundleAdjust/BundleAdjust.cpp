@@ -1,12 +1,9 @@
 #include "BundleAdjust.h"
 
-#include <iomanip>
-
 #include "SpecialPixel.h"
 #include "BasisFunction.h"
 #include "LeastSquares.h"
 #include "CameraGroundMap.h"
-
 #include "CameraDetectorMap.h"
 #include "CameraFocalPlaneMap.h"
 #include "CameraDistortionMap.h"
@@ -21,15 +18,32 @@
 #include "iTime.h"
 
 #include "boost/numeric/ublas/matrix_sparse.hpp"
-#include "boost/numeric/ublas/io.hpp"
-#include "boost/numeric/ublas/vector.hpp"
-#include "boost/numeric/ublas/matrix_expression.hpp"
+#include "boost/numeric/ublas/vector_proxy.hpp"
 #include "boost/lexical_cast.hpp"
 
 using namespace boost::numeric::ublas;
-//using boost::lexical_cast;
 
 namespace Isis {
+
+static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
+      const char* message) {
+
+    std::string errlog;
+
+    errlog = "CHOLMOD: ";
+    errlog += message;
+
+    PvlGroup gp(errlog);
+
+    gp += PvlKeyword("File",file);
+    gp += PvlKeyword("Line_Number", nLineNo);
+    gp += PvlKeyword("Status", nStatus);
+
+    Application::Log(gp);
+
+    errlog += ". (See print.prt for details)";
+    throw iException::Message(iException::Math, errlog, _FILEINFO_);
+  }
 
   BundleAdjust::BundleAdjust(const std::string &cnetFile,
                              const std::string &cubeList,
@@ -111,6 +125,9 @@ namespace Isis {
 
     if ( m_pLsq )
       delete m_pLsq;
+
+    if ( m_strSolutionMethod == "CHOLMOD" )
+      freeCholMod();
   }
 
   bool BundleAdjust::ReadSCSigmas(const std::string &scsigmasList) {
@@ -177,15 +194,13 @@ namespace Isis {
     m_nHeldImages = 0;
     int nImages = m_pSnList->Size();
 
-    int count;
-
     // Create the image index
     if (m_pHeldSnList != NULL) {
       //Check to make sure held images are in the control net
       CheckHeldList();
 
       // Get a count of held images too
-      count = 0;
+      int count = 0;
       for ( int i = 0; i < nImages; i++ ) {
         if ( m_pHeldSnList->HasSerialNumber(m_pSnList->SerialNumber(i)) )
           m_nHeldImages++;
@@ -268,8 +283,78 @@ namespace Isis {
     // networks, images without any points, and points on images removed from
     // the control net (when we start adding software to remove points with high
     // residuals) and ?.
+    validateNetwork();
   }
 
+  /**
+   * control network validation - on the very real chance that the net
+   * has not been checked before running the bundle
+   *
+   * checks implemented for ...
+   *  (1) images with 0 or 1 measures
+   */
+  bool BundleAdjust::validateNetwork() {
+    printf("Validating network...\n");
+
+    // verify measures exist for all images
+    int nimagesWithInsufficientMeasures = 0;
+    std::string msg = "Images with no measures:\n";
+    int nImages = m_pSnList->Size();
+    for (int i = 0; i < nImages; i++) {
+      int nMeasures =
+        m_pCnet->GetNumberOfMeasuresInImage(m_pSnList->SerialNumber(i));
+
+      if ( nMeasures > 1 )
+        continue;
+
+      nimagesWithInsufficientMeasures++;
+      msg += m_pSnList->Filename(i) + ": " + iString(nMeasures) + "\n";
+    }
+    if ( nimagesWithInsufficientMeasures > 0 ) {
+        throw iException::Message(iException::User, msg, _FILEINFO_);
+    }
+
+    return true;
+  }
+
+  /**
+   * Initializations for Cholmod sparse matrix package
+   */
+  bool BundleAdjust::initializeCholMod() {
+
+      if( m_nRank <= 0 )
+          return false;
+
+      m_pTriplet = NULL;
+
+      cholmod_start(&m_cm);
+
+      // set user-defined cholmod error handler
+      m_cm.error_handler = cholmod_error_handler;
+
+      // testing not using metis
+      m_cm.nmethods = 1;
+      m_cm.method[0].ordering = CHOLMOD_AMD;
+
+      // set size of sparse block normal equations matrix
+      m_SparseNormals.setNumberOfColumns( Images() );
+
+      return true;
+  }
+
+  /**
+   * Initializations for Cholmod sparse matrix package
+   */
+  bool BundleAdjust::freeCholMod() {
+
+    cholmod_free_triplet(&m_pTriplet, &m_cm);
+    cholmod_free_sparse(&m_N, &m_cm);
+    cholmod_free_factor(&m_L, &m_cm);
+
+    cholmod_finish(&m_cm);
+
+    return true;
+  }
 
   /**
    * This method fills the point index map and needs to know the solution
@@ -295,7 +380,9 @@ namespace Isis {
       else if (point->GetType() == ControlPoint::Fixed) {
         m_nFixedPoints++;
 
-        if (m_strSolutionMethod == "SPECIALK"  ||  m_strSolutionMethod == "SPARSE") {
+        if ( m_strSolutionMethod == "SPECIALK"  ||
+             m_strSolutionMethod == "CHOLMOD" ||
+             m_strSolutionMethod == "SPARSE" ) {
           m_nPointIndexMap.push_back(count);
           count++;
         }
@@ -370,7 +457,9 @@ namespace Isis {
 
 
     // Test code to match old test runs which don't solve for radius
-    if (m_strSolutionMethod != "SPECIALK"  &&  m_strSolutionMethod != "SPARSE") {
+    if ( m_strSolutionMethod != "SPECIALK"  &&
+        m_strSolutionMethod != "CHOLMOD" &&
+        m_strSolutionMethod != "SPARSE" ) {
       m_nNumPointPartials = 2;
 
       if (m_bSolveRadii) 
@@ -487,6 +576,15 @@ namespace Isis {
   }
 
   /**
+   * Set decomposition method. Choices are...
+   * SpecialK (dense normal equations matrix)
+   * Cholmod (sparse normal equations matrix)
+   */
+  void BundleAdjust::SetDecompositionMethod(DecompositionMethod method) {
+    m_decompositionMethod = method;
+  }
+
+  /**
    * For which camera angle coefficients do we solve?
    */
   void BundleAdjust::SetSolveCmatrix(CmatrixSolveType type) {
@@ -534,7 +632,9 @@ namespace Isis {
 
     int nPointParameterColumns = m_pCnet->GetNumValidPoints() * m_nNumPointPartials;
 
-    if (m_strSolutionMethod != "SPECIALK"  &&  m_strSolutionMethod != "SPARSE")
+    if (m_strSolutionMethod != "SPECIALK" &&
+        m_strSolutionMethod != "CHOLMOD" &&
+        m_strSolutionMethod != "SPARSE")
       nPointParameterColumns -= m_nFixedPoints * m_nNumPointPartials;
 
     return m_nImageParameters + nPointParameterColumns;
@@ -544,12 +644,20 @@ namespace Isis {
    * Initializes matrices and parameters for bundle adjustment
    */
   void BundleAdjust::Initialize() {
-    m_nRank = m_nNumImagePartials * Observations();   // determine size of reduced normal equations matrix
 
-    m_Normals.resize(m_nRank);                        // set size of reduced normal equations matrix
-    m_Normals.clear();                                // zero all elements
+    // size of reduced normals matrix
+    m_nRank = m_nNumImagePartials * Observations();
 
     int n3DPoints = m_pCnet->GetNumValidPoints();
+
+    if ( m_decompositionMethod == SPECIALK ) {
+      m_Normals.resize(m_nRank);           // set size of reduced normals matrix
+      m_Normals.clear();                   // zero all elements
+      m_Qs_SPECIALK.resize(n3DPoints);
+    }
+    else if ( m_decompositionMethod == CHOLMOD ) {
+      m_Qs_CHOLMOD.resize(n3DPoints);
+    }
 
     m_nUnknownParameters = m_nRank + 3 * n3DPoints;
 
@@ -561,22 +669,32 @@ namespace Isis {
     m_Point_Corrections.resize(n3DPoints);
     m_Point_Weights.resize(n3DPoints);
     m_Point_AprioriSigmas.resize(n3DPoints);
-    m_Qs.resize(n3DPoints);
 
     // initialize NICS, Qs, and point correction vectors to zero
     for (int i = 0; i < n3DPoints; i++) {
       m_NICs[i].clear();
-      m_Qs[i].clear();
+
+      // TODO_CHOLMOD: is this needed with new cholmod implementation?
+      if ( m_decompositionMethod == SPECIALK )
+        m_Qs_SPECIALK[i].clear();
+      else if ( m_decompositionMethod == CHOLMOD )
+        m_Qs_CHOLMOD[i].clear();
+
       m_Point_Corrections[i].clear();
       m_Point_Weights[i].clear();
       m_Point_AprioriSigmas[i].clear();
     }
 
-    m_bConverged = false;                             // flag indicating convergence
-    m_bError = false;                                 // flag indicating general bundle error
+    m_bConverged = false;                // flag indicating convergence
+    m_bError = false;                    // flag indicating general bundle error
 
     // convert apriori sigmas into weights (if they're negative or zero, we don't use them)
     SetSpaceCraftWeights();
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // initializations for cholmod
+    if ( m_strSolutionMethod == "CHOLMOD" )
+      initializeCholMod();
   }
 
   void BundleAdjust::SetSpaceCraftWeights() {
@@ -635,7 +753,7 @@ namespace Isis {
    * @param maxIterations   Maximum iterations, if tolerance is never
    *                        met an iException will be thrown.
    */
-  bool BundleAdjust::SolveSpecialK() {
+  bool BundleAdjust::SolveCholesky() {
 //   double averageError;
     std::vector<int> observationInitialValueIndex;  // image index for observation inital values
     int iIndex = -1;                                // image index for initial spice for an observation
@@ -748,14 +866,18 @@ namespace Isis {
       // UI.Notify(BundleEvent.NEW_ITERATION);
 
       // zero normals (after iteration 0)
-      if (m_nIteration != 1)
-        m_Normals.clear();
+      if (m_nIteration != 1) {
+        if ( m_decompositionMethod == SPECIALK )
+          m_Normals.clear();
+        else if ( m_decompositionMethod == CHOLMOD )
+          m_SparseNormals.zeroBlocks();
+      }
 
       // form normal equations
 //      clock_t formNormalsclock1 = clock();
 //      printf("starting FormNormals\n");
 
-      if (!FormNormalEquations()) {
+      if (!formNormalEquations()) {
         m_bConverged = false;
         m_bError = true;
         break;
@@ -768,19 +890,20 @@ namespace Isis {
 //      clock_t Solveclock1 = clock();
 //      printf("Starting Solve System\n");
 
-      if (!SolveSystem()) {
+      if (!solveSystem()) {
         printf("solve failed!\n");
         m_bConverged = false;
         m_bError = true;
         break;
       }
+
 //      clock_t Solveclock2 = clock();
 //      double dSolveTime = ((Solveclock2-Solveclock1)/(double)CLOCKS_PER_SEC);
 //      printf("Solve Elapsed Time: %20.10lf\n",dSolveTime);
 
       // apply parameter corrections
 //      clock_t Correctionsclock1 = clock();
-      ApplyParameterCorrections();
+      applyParameterCorrections();
 //      clock_t Correctionsclock2 = clock();
 //      double dCorrectionsTime = ((Correctionsclock2-Correctionsclock1)/(double)CLOCKS_PER_SEC);
 //      printf("Corrections Elapsed Time: %20.10lf\n",dCorrectionsTime);
@@ -866,10 +989,10 @@ namespace Isis {
       dSigma0_previous = m_dSigma0;
     }
 
-    if (m_bConverged && m_bErrorPropagation) {
+    if ( m_bConverged && m_bErrorPropagation ) {
       clock_t terror1 = clock();
       printf("\nStarting Error Propagation\n");
-      ErrorPropagation();
+      errorPropagation();
       printf("\nError Propagation Complete\n");
       clock_t terror2 = clock();
       m_dElapsedTimeErrorProp = ((terror2 - terror1) / (double)CLOCKS_PER_SEC);
@@ -898,7 +1021,31 @@ namespace Isis {
   /**
    * Forming the least-squares normal equations matrix.
    */
-  bool BundleAdjust::FormNormalEquations() {
+  bool BundleAdjust::formNormalEquations() {
+    if ( m_decompositionMethod == CHOLMOD )
+      return formNormalEquations_CHOLMOD();
+    else
+      return formNormalEquations_SPECIALK();
+
+    return false;
+  }
+
+  /**
+   * solve normal equations system.
+   */
+  bool BundleAdjust::solveSystem() {
+    if ( m_decompositionMethod == CHOLMOD )
+      return solveSystem_CHOLMOD();
+    else
+      return solveSystem_SPECIALK();
+
+    return false;
+  }
+
+  /**
+   * Forming the least-squares normal equations matrix via cholmod.
+   */
+  bool BundleAdjust::formNormalEquations_CHOLMOD() {
 //    if (m_pProgressBar != NULL)
 //    {
 //      m_pProgressBar->SetText("Forming Normal Equations...");
@@ -914,7 +1061,9 @@ namespace Isis {
     static matrix<double> coeff_point3D(2, 3);
     static vector<double> coeff_RHS(2);
     static symmetric_matrix<double, upper> N22(3);                // 3x3 upper triangular
-    static matrix<double> N12;                                    // image parameters x 3 (should this be compressed? We only make one, so probably not)
+//    static compressed_matrix< double> N12(m_nRank, 3);            // image parameters x 3 (should this be compressed? We only make one, so probably not)
+//    static SparseBlockColumnMatrix N12;
+    SparseBlockColumnMatrix N12;
     static vector<double> n2(3);                                  // 3x1 vector
     compressed_vector<double> n1(m_nRank);                        // image parameters x 1
 //  vector<double> nj(m_nRank);                                   // image parameters x 1
@@ -922,7 +1071,7 @@ namespace Isis {
     m_nj.resize(m_nRank);
 
     coeff_image.resize(2, m_nNumImagePartials);
-    N12.resize(m_nRank, 3);
+    //N12.resize(m_nRank, 3);
 
     // clear N12, n1, and nj
     N12.clear();
@@ -948,6 +1097,8 @@ namespace Isis {
 //    m_fp_log << buf;
 //    printf("%s", buf);
 
+    printf("\n\n");
+
     for (int i = 0; i < n3DPoints; i++) {
 
         const ControlPoint *point = m_pCnet->GetPoint(i);
@@ -970,19 +1121,12 @@ namespace Isis {
 
         if ( i != 0 ) {
             N22.clear();
-            N12.clear();
+//            N12.clear();
+            N12.wipe();
             n2.clear();
         }
 
       int nMeasures = point->GetNumMeasures();
-
-      // set up non-zero indices for Q matrix - Q will be sparse matrix - do we have to do this?
-//    if( m_nIterations == 0 )
-//    {
-//      m_nonZeroColumns = m_nNumImagePartials * nMeasures;
-//      nonZeroIndices = new int[3][m_nonZeroColumns];
-//    }
-
       // loop over measures for this point
       for (int j = 0; j < nMeasures; j++) {
 
@@ -1018,11 +1162,11 @@ namespace Isis {
         // update number of observations
         m_nObservations += 2;
 
-        FormNormalEquations1(N22, N12, n1, n2, coeff_image, coeff_point3D,
+      formNormals1_CHOLMOD(N22, N12, n1, n2, coeff_image, coeff_point3D,
                              coeff_RHS, nImageIndex);
     } // end loop over this points measures
 
-      FormNormalEquations2(N22, N12, n2, m_nj, nPointIndex, i);
+      formNormals2_CHOLMOD(N22, N12, n2, m_nj, nPointIndex, i);
       nPointIndex++;
 
 //      if (m_pProgressBar != NULL)
@@ -1033,18 +1177,10 @@ namespace Isis {
   } // end loop over 3D points
 
     // finally, form the reduced normal equations
-    FormNormalEquations3(n1, m_nj);
-
-    // count zeroes
-//    int nzeroes = 0;
-//    for( int i = 0; i < m_nRank; i++ )
-//      for( int j = i; j < m_nRank; j++ )
-//        if( m_Normals(i,j) == 0.0 )
-//          nzeroes++;
-
-//    printf("Zeros: %d of %d\n",nzeroes,(m_nRank*(m_nRank+1)/2));
+    formNormals3_CHOLMOD(n1, m_nj);
 
 //    std::cout << m_Normals << std::endl;
+//    m_SparseNormals.print();
 
     // update number of unknown parameters
     m_nUnknownParameters = m_nRank + 3 * nGood3DPoints;
@@ -1052,10 +1188,356 @@ namespace Isis {
     return bStatus;
 }
 
-  bool BundleAdjust::FormNormalEquations1(symmetric_matrix<double, upper>&N22, matrix<double>& N12,
-                                          compressed_vector<double>& n1, vector<double>& n2,
-                                          matrix<double>& coeff_image, matrix<double>& coeff_point3D,
-                                          vector<double>& coeff_RHS, int nImageIndex) {
+  bool BundleAdjust::formNormals1_CHOLMOD(symmetric_matrix<double, upper>&N22,
+      SparseBlockColumnMatrix& N12, compressed_vector<double>& n1,
+      vector<double>& n2, matrix<double>& coeff_image,
+      matrix<double>& coeff_point3D, vector<double>& coeff_RHS,
+                                          int nImageIndex) {
+    int i;
+
+    static vector<double> n1_image(m_nNumImagePartials);
+    n1_image.clear();
+
+    // form N11 (normals for photo)
+    static symmetric_matrix<double, upper> N11(m_nNumImagePartials);
+    N11.clear();
+
+//    std::cout << "image" << std::endl << coeff_image << std::endl;
+//    std::cout << "point" << std::endl << coeff_point3D << std::endl;
+//    std::cout << "rhs" << std::endl << coeff_RHS << std::endl;
+
+    N11 = prod(trans(coeff_image), coeff_image);
+
+//    std::cout << "N11" << std::endl << N11 << std::endl;
+
+    int t = m_nNumImagePartials * nImageIndex;
+
+    // insert submatrix at column, row
+    m_SparseNormals.InsertMatrixBlock(nImageIndex, nImageIndex,
+        m_nNumImagePartials, m_nNumImagePartials );
+
+    (*(*m_SparseNormals[nImageIndex])[nImageIndex]) += N11;
+
+//    std::cout << (*(*m_SparseNormals[nImageIndex])[nImageIndex]) << std::endl;
+
+    // form N12_Image
+    static matrix<double> N12_Image(m_nNumImagePartials, 3);
+    N12_Image.clear();
+
+    N12_Image = prod(trans(coeff_image), coeff_point3D);
+
+
+//    printf("N12 before insert\n");
+//    std::cout << N12 << std::endl;
+
+//    std::cout << "N12_Image" << std::endl << N12_Image << std::endl;
+
+    // insert N12_Image into N12
+//    for (i = 0; i < m_nNumImagePartials; i++)
+//      for (j = 0; j < 3; j++)
+//        N12(i + t, j) += N12_Image(i, j);
+    N12.InsertMatrixBlock(nImageIndex, m_nNumImagePartials, 3);
+    *N12[nImageIndex] += N12_Image;
+
+//    printf("N12\n");
+//    std::cout << N12 << std::endl;
+
+    // form n1
+    n1_image = prod(trans(coeff_image), coeff_RHS);
+
+//    std::cout << "n1_image" << std::endl << n1_image << std::endl;
+
+    // insert n1_image into n1
+    for (i = 0; i < m_nNumImagePartials; i++)
+      n1(i + t) += n1_image(i);
+
+    // form N22
+    N22 += prod(trans(coeff_point3D), coeff_point3D);
+
+//    std::cout << "N22" << std::endl << N22 << std::endl;
+
+    // form n2
+    n2 += prod(trans(coeff_point3D), coeff_RHS);
+
+//    std::cout << "n2" << std::endl << n2 << std::endl;
+
+    return true;
+  }
+
+  bool BundleAdjust::formNormals2_CHOLMOD(symmetric_matrix<double, upper>&N22,
+      SparseBlockColumnMatrix& N12, vector<double>& n2, vector<double>& nj,
+      int nPointIndex, int i) {
+
+    bounded_vector<double, 3>& NIC = m_NICs[nPointIndex];
+    SparseBlockRowMatrix& Q = m_Qs_CHOLMOD[nPointIndex];
+
+    NIC.clear();
+    Q.zeroBlocks();
+
+    // weighting of 3D point parameters
+//    const ControlPoint *point = m_pCnet->GetPoint(i);
+    ControlPoint *point = m_pCnet->GetPoint(i); //TODO: what about this const business, regarding SetAdjustedSurfacePoint below???
+
+    bounded_vector<double, 3>& weights = m_Point_Weights[nPointIndex];
+    bounded_vector<double, 3>& corrections = m_Point_Corrections[nPointIndex];
+
+//    std::cout << "Point" << point->GetId() << "weights" << std::endl << weights << std::endl;
+
+//    std::cout << "corrections" << std::endl << corrections << std::endl;
+
+    if (weights[0] > 0.0) {
+      N22(0, 0) += weights[0];
+      n2(0) += (-weights[0] * corrections(0));
+      m_nConstrainedPointParameters++;
+    }
+
+    if (weights[1] > 0.0) {
+      N22(1, 1) += weights[1];
+      n2(1) += (-weights[1] * corrections(1));
+      m_nConstrainedPointParameters++;
+    }
+
+    if (weights[2] > 0.0) {
+      N22(2, 2) += weights[2];
+      n2(2) += (-weights[2] * corrections(2));
+      m_nConstrainedPointParameters++;
+    }
+
+//    std::cout << "N22 before inverse" << std::endl << N22 << std::endl;
+    // invert N22
+    Invert_3x3(N22);
+//    std::cout << "N22 after inverse" << std::endl << N22 << std::endl;
+
+    // save upper triangular covariance matrix for error propagation
+    // TODO:  The following method does not exist yet (08-13-2010)
+    SurfacePoint SurfacePoint = point->GetAdjustedSurfacePoint();
+    SurfacePoint.SetSphericalMatrix(N22);
+    point->SetAdjustedSurfacePoint(SurfacePoint);
+//    point->GetAdjustedSurfacePoint().SetSphericalMatrix(N22);
+
+// TODO  Test to make sure spherical matrix is truly set.  Try to read it back
+
+    // Next 3 lines obsolete because only the matrix is stored and sigmas are calculated from it.
+//    point->SetSigmaLatitude(N22(0,0));
+//    point->SetSigmaLongitude(N22(1,1));
+//    point->SetSigmaRadius(N22(2,2));
+
+    // form Q (this is N22{-1} * N12{T})
+//    clock_t FormQ1 = clock();
+//    Q = prod(N22, trans(N12));
+    product_ATransB(N22, N12, Q);
+//    clock_t FormQ2 = clock();
+//    double dFormQTime = ((FormQ2-FormQ1)/(double)CLOCKS_PER_SEC);
+//    printf("FormQ Elapsed Time: %20.10lf\n",dFormQTime);
+
+//    std::cout << "Q: " << Q << std::endl;
+//    Q.print();
+
+    // form product of N22(inverse) and n2; store in NIC
+//    clock_t FormNIC1 = clock();
+    NIC = prod(N22, n2);
+//    clock_t FormNIC2 = clock();
+//    double dFormNICTime = ((FormNIC2-FormNIC1)/(double)CLOCKS_PER_SEC);
+//    printf("FormNIC Elapsed Time: %20.10lf\n",dFormNICTime);
+
+    // accumulate -R directly into reduced normal equations
+//  clock_t AccumIntoNormals1 = clock();
+//  m_Normals -= prod(N12,Q);
+//  printf("starting AmultAdd_CNZRows\n");
+//    AmultAdd_CNZRows(-1.0, N12, Q, m_Normals);
+    AmultAdd_CNZRows_CHOLMOD(-1.0, N12, Q);
+//  clock_t AccumIntoNormals2 = clock();
+//  double dAccumIntoNormalsTime = ((AccumIntoNormals2-AccumIntoNormals1)/(double)CLOCKS_PER_SEC);
+//  printf("Accum Into Normals Elapsed Time: %20.10lf\n",dAccumIntoNormalsTime);
+
+    // accumulate -nj
+//    clock_t Accum_nj_1 = clock();
+//    m_nj -= prod(trans(Q),n2);
+    transA_NZ_multAdd_CHOLMOD(-1.0, Q, n2, m_nj);
+//    clock_t Accum_nj_2 = clock();
+//    double dAccumnjTime = ((Accum_nj_2-Accum_nj_1)/(double)CLOCKS_PER_SEC);
+//    printf("Accum nj Elapsed Time: %20.10lf\n",dAccumnjTime);
+
+    return true;
+  }
+
+  /**
+   * apply weighting for spacecraft position, velocity, acceleration and camera
+   * angles, angular velocities, angular accelerations
+   * if so stipulated (legalese)
+   */
+  bool BundleAdjust::formNormals3_CHOLMOD(compressed_vector<double>& n1,
+                                  vector<double>& nj) {
+
+    //  std::cout << m_dImageParameterWeights << std::endl;
+
+    m_nConstrainedImageParameters = 0;
+
+    int n = 0;
+
+    for ( int i = 0; i < m_SparseNormals.size(); i++ ) {
+      matrix<double>* diagonalBlock = m_SparseNormals.getBlock(i,i);
+      if ( !diagonalBlock )
+        continue;
+
+      for (int j = 0; j < m_nNumImagePartials; j++) {
+        if (m_dImageParameterWeights[j] > 0.0) {
+          (*diagonalBlock)(j,j) += m_dImageParameterWeights[j];
+          m_nj[n] -= m_dImageParameterWeights[j] * m_Image_Corrections[n];
+          m_nConstrainedImageParameters++;
+        }
+
+        n++;
+      }
+    }
+
+    // add n1 to nj
+    m_nj += n1;
+
+    return true;
+  }
+
+  /**
+   * Forming the least-squares normal equations matrix via specialk.
+   */
+  bool BundleAdjust::formNormalEquations_SPECIALK() {
+//    if (m_pProgressBar != NULL)
+//    {
+//      m_pProgressBar->SetText("Forming Normal Equations...");
+//      m_pProgressBar->SetMaximumSteps(m_pCnet->Size());
+//      m_pProgressBar->CheckStatus();
+//    }
+    bool bStatus = false;
+
+    m_nObservations = 0;
+    m_nConstrainedPointParameters = 0;
+
+    static matrix<double> coeff_image;
+    static matrix<double> coeff_point3D(2, 3);
+    static vector<double> coeff_RHS(2);
+    static symmetric_matrix<double, upper> N22(3);     // 3x3 upper triangular
+    static matrix< double> N12(m_nRank, 3);            // image parameters x 3 (should this be compressed? We only make one, so probably not)
+    static vector<double> n2(3);                       // 3x1 vector
+    compressed_vector<double> n1(m_nRank);             // image parameters x 1
+
+    m_nj.resize(m_nRank);
+
+    coeff_image.resize(2, m_nNumImagePartials);
+    N12.resize(m_nRank, 3);
+
+    // clear N12, n1, and nj
+    N12.clear();
+    n1.clear();
+    m_nj.clear();
+
+    // clear static matrices
+    coeff_point3D.clear();
+    coeff_RHS.clear();
+    N22.clear();
+    n2.clear();
+
+    // loop over 3D points
+    int nGood3DPoints = 0;
+    int nRejected3DPoints = 0;
+    int nPointIndex = 0;
+    int nImageIndex;
+    int n3DPoints = m_pCnet->GetNumPoints();
+
+//    char buf[1056];
+//    sprintf(buf,"\n\t                      Points:%10d\n", n3DPoints);
+//    m_fp_log << buf;
+//    printf("%s", buf);
+
+    for (int i = 0; i < n3DPoints; i++) {
+      const ControlPoint *point = m_pCnet->GetPoint(i);
+
+      if ( point->IsIgnored() )
+        continue;
+
+      if( point->IsRejected() ) {
+        nRejected3DPoints++;
+//      sprintf(buf, "\tRejected %s - 3D Point %d of %d RejLimit = %lf\n", point.Id().c_str(),nPointIndex,n3DPoints,m_dRejectionLimit);
+//      m_fp_log << buf;
+
+        nPointIndex++;
+        continue;
+      }
+
+      // send notification to UI indicating index of point currently being processed
+      // m_nProcessedPoint = i+1;
+      // UI.Notify(BundleEvent.NEW_POINT_PROCESSED);
+
+      if ( i != 0 ) {
+          N22.clear();
+          N12.clear();
+          n2.clear();
+      }
+
+      // loop over measures for this point
+      int nMeasures = point->GetNumMeasures();
+      for (int j = 0; j < nMeasures; j++) {
+        const ControlMeasure *measure = point->GetMeasure(j);
+        if ( measure->IsIgnored() )
+          continue;
+
+        // flagged as "JigsawFail" implies this measure has been rejected
+        // TODO  IsRejected is obsolete -- replace code or add to ControlMeasure
+        if (measure->IsRejected())
+          continue;
+
+        // printf("   Processing Measure %d of %d\n", j,nMeasures);
+
+        // fill non-zero indices for this point - do we have to do this?
+        // see BundleDistanceConstraints.java for code snippet (line 926)
+
+        // Determine the image index
+        nImageIndex = m_pSnList->SerialNumberIndex(measure->GetCubeSerialNumber());
+        if ( m_bObservationMode )
+          nImageIndex = ImageIndex(nImageIndex)/m_nNumImagePartials;
+
+        bStatus = ComputePartials_DC(coeff_image, coeff_point3D, coeff_RHS,
+                                  *measure, *point);
+
+//        std::cout << coeff_image << std::endl;
+//        std::cout << coeff_point3D << std::endl;
+//        std::cout << coeff_RHS << std::endl;
+
+        if ( !bStatus )
+          continue;     // this measure should be flagged as rejected
+
+        // update number of observations
+        m_nObservations += 2;
+
+        formNormals1_SPECIALK(N22, N12, n1, n2, coeff_image, coeff_point3D,
+                             coeff_RHS, nImageIndex);
+      } // end loop over this points measures
+
+      formNormals2_SPECIALK(N22, N12, n2, m_nj, nPointIndex, i);
+      nPointIndex++;
+
+//    if (m_pProgressBar != NULL)
+//      m_pProgressBar->CheckStatus();
+
+      nGood3DPoints++;
+
+    } // end loop over 3D points
+
+    // finally, form the reduced normal equations
+    formNormals3_SPECIALK(n1, m_nj);
+
+//  std::cout << m_Normals << std::endl;
+//  m_SparseNormals.print();
+
+    // update number of unknown parameters
+    m_nUnknownParameters = m_nRank + 3 * nGood3DPoints;
+
+    return bStatus;
+  }
+
+  bool BundleAdjust::formNormals1_SPECIALK(symmetric_matrix<double, upper>&N22,
+      matrix<double>& N12, compressed_vector<double>& n1, vector<double>& n2,
+      matrix<double>& coeff_image, matrix<double>& coeff_point3D,
+      vector<double>& coeff_RHS, int nImageIndex) {
     int i, j;
 
     static vector<double> n1_image(m_nNumImagePartials);
@@ -1121,97 +1603,133 @@ namespace Isis {
     return true;
   }
 
-  bool BundleAdjust::FormNormalEquations2(symmetric_matrix<double, upper>&N22, matrix<double>& N12,
-                                          vector<double>& n2, vector<double>& nj, int nPointIndex, int i) {
-    bounded_vector<double, 3>& NIC = m_NICs[nPointIndex];
-    compressed_matrix<double>& Q = m_Qs[nPointIndex];
+  bool BundleAdjust::formNormals2_SPECIALK(symmetric_matrix<double, upper>&N22,
+      matrix<double>& N12, vector<double>& n2, vector<double>& nj,
+      int nPointIndex, int i) {
 
-    NIC.clear();
-    Q.clear();
+      bounded_vector<double, 3>& NIC = m_NICs[nPointIndex];
+      compressed_matrix<double>& Q = m_Qs_SPECIALK[nPointIndex];
 
-    // weighting of 3D point parameters
-//    const ControlPoint *point = m_pCnet->GetPoint(i);
-    ControlPoint *point = m_pCnet->GetPoint(i); //TODO: what about this const business, regarding SetAdjustedSurfacePoint below???
+      NIC.clear();
+      Q.clear();
 
-    bounded_vector<double, 3>& weights = m_Point_Weights[nPointIndex];
-    bounded_vector<double, 3>& corrections = m_Point_Corrections[nPointIndex];
+      // weighting of 3D point parameters
+  //    const ControlPoint *point = m_pCnet->GetPoint(i);
+      ControlPoint *point = m_pCnet->GetPoint(i); //TODO: what about this const business, regarding SetAdjustedSurfacePoint below???
 
-//    std::cout << "Point" << point->GetId() << "weights" << std::endl << weights << std::endl;
+      bounded_vector<double, 3>& weights = m_Point_Weights[nPointIndex];
+      bounded_vector<double, 3>& corrections = m_Point_Corrections[nPointIndex];
 
-//    std::cout << "corrections" << std::endl << corrections << std::endl;
+  //    std::cout << "Point" << point->GetId() << "weights" << std::endl << weights << std::endl;
 
-    if (weights[0] > 0.0) {
-      N22(0, 0) += weights[0];
-      n2(0) += (-weights[0] * corrections(0));
-      m_nConstrainedPointParameters++;
+  //    std::cout << "corrections" << std::endl << corrections << std::endl;
+
+      if (weights[0] > 0.0) {
+        N22(0, 0) += weights[0];
+        n2(0) += (-weights[0] * corrections(0));
+        m_nConstrainedPointParameters++;
+      }
+
+      if (weights[1] > 0.0) {
+        N22(1, 1) += weights[1];
+        n2(1) += (-weights[1] * corrections(1));
+        m_nConstrainedPointParameters++;
+      }
+
+      if (weights[2] > 0.0) {
+        N22(2, 2) += weights[2];
+        n2(2) += (-weights[2] * corrections(2));
+        m_nConstrainedPointParameters++;
+      }
+
+  //    std::cout << "N22 before inverse" << std::endl << N22 << std::endl;
+      // invert N22
+      Invert_3x3(N22);
+  //    std::cout << "N22 after inverse" << std::endl << N22 << std::endl;
+
+      // save upper triangular covariance matrix for error propagation
+      // TODO:  The following method does not exist yet (08-13-2010)
+      SurfacePoint SurfacePoint = point->GetAdjustedSurfacePoint();
+      SurfacePoint.SetSphericalMatrix(N22);
+      point->SetAdjustedSurfacePoint(SurfacePoint);
+  //    point->GetAdjustedSurfacePoint().SetSphericalMatrix(N22);
+
+  // TODO  Test to make sure spherical matrix is truly set.  Try to read it back
+
+      // Next 3 lines obsolete because only the matrix is stored and sigmas are calculated from it.
+  //    point->SetSigmaLatitude(N22(0,0));
+  //    point->SetSigmaLongitude(N22(1,1));
+  //    point->SetSigmaRadius(N22(2,2));
+
+      // form Q (this is N22{-1} * N12{T})
+  //    clock_t FormQ1 = clock();
+      Q = prod(N22, trans(N12));
+  //    clock_t FormQ2 = clock();
+  //    double dFormQTime = ((FormQ2-FormQ1)/(double)CLOCKS_PER_SEC);
+  //    printf("FormQ Elapsed Time: %20.10lf\n",dFormQTime);
+
+  //    std::cout << "Q: " << Q << std::endl;
+
+      // form product of N22(inverse) and n2; store in NIC
+  //    clock_t FormNIC1 = clock();
+      NIC = prod(N22, n2);
+  //    clock_t FormNIC2 = clock();
+  //    double dFormNICTime = ((FormNIC2-FormNIC1)/(double)CLOCKS_PER_SEC);
+  //    printf("FormNIC Elapsed Time: %20.10lf\n",dFormNICTime);
+
+      // accumulate -R directly into reduced normal equations
+  //  clock_t AccumIntoNormals1 = clock();
+  //  m_Normals -= prod(N12,Q);
+  //  printf("starting AmultAdd_CNZRows\n");
+      AmultAdd_CNZRows_SPECIALK(-1.0, N12, Q, m_Normals);
+  //  clock_t AccumIntoNormals2 = clock();
+  //  double dAccumIntoNormalsTime = ((AccumIntoNormals2-AccumIntoNormals1)/(double)CLOCKS_PER_SEC);
+  //  printf("Accum Into Normals Elapsed Time: %20.10lf\n",dAccumIntoNormalsTime);
+
+      // accumulate -nj
+  //    clock_t Accum_nj_1 = clock();
+  //    m_nj -= prod(trans(Q),n2);
+      transA_NZ_multAdd_SPECIALK(-1.0, Q, n2, m_nj);
+  //    clock_t Accum_nj_2 = clock();
+  //    double dAccumnjTime = ((Accum_nj_2-Accum_nj_1)/(double)CLOCKS_PER_SEC);
+  //    printf("Accum nj Elapsed Time: %20.10lf\n",dAccumnjTime);
+
+      return true;
     }
 
-    if (weights[1] > 0.0) {
-      N22(1, 1) += weights[1];
-      n2(1) += (-weights[1] * corrections(1));
-      m_nConstrainedPointParameters++;
+  /**
+   * apply weighting for spacecraft position, velocity, acceleration and camera
+   * angles, angular velocities, angular accelerations
+   * if so stipulated (legalese)
+   */
+  bool BundleAdjust::formNormals3_SPECIALK(compressed_vector<double>& n1,
+      vector<double>& nj) {
+
+  //  std::cout << m_dImageParameterWeights << std::endl;
+
+    m_nConstrainedImageParameters = 0;
+
+    int n = 0;
+    do {
+      for (int j = 0; j < m_nNumImagePartials; j++) {
+        if (m_dImageParameterWeights[j] > 0.0) {
+          m_Normals(n, n) += m_dImageParameterWeights[j];
+          m_nj[n] -= m_dImageParameterWeights[j] * m_Image_Corrections[n];
+          m_nConstrainedImageParameters++;
+        }
+
+        n++;
+      }
+
     }
+    while (n < m_nRank);
 
-    if (weights[2] > 0.0) {
-      N22(2, 2) += weights[2];
-      n2(2) += (-weights[2] * corrections(2));
-      m_nConstrainedPointParameters++;
-    }
-
-//    std::cout << "N22 before inverse" << std::endl << N22 << std::endl;
-    // invert N22
-    Invert_3x3(N22);
-//    std::cout << "N22 after inverse" << std::endl << N22 << std::endl;
-
-    // save upper triangular covariance matrix for error propagation
-    // TODO:  The following method does not exist yet (08-13-2010)
-    SurfacePoint SurfacePoint = point->GetAdjustedSurfacePoint();
-    SurfacePoint.SetSphericalMatrix(N22);
-    point->SetAdjustedSurfacePoint(SurfacePoint);
-//    point->GetAdjustedSurfacePoint().SetSphericalMatrix(N22);
-
-// TODO  Test to make sure spherical matrix is truly set.  Try to read it back
-
-    // Next 3 lines obsolete because only the matrix is stored and sigmas are calculated from it.
-//    point->SetSigmaLatitude(N22(0,0));
-//    point->SetSigmaLongitude(N22(1,1));
-//    point->SetSigmaRadius(N22(2,2));
-
-    // form Q (this is N22{-1} * N12{T})
-//    clock_t FormQ1 = clock();
-    Q = prod(N22, trans(N12));
-//    clock_t FormQ2 = clock();
-//    double dFormQTime = ((FormQ2-FormQ1)/(double)CLOCKS_PER_SEC);
-//    printf("FormQ Elapsed Time: %20.10lf\n",dFormQTime);
-
-//    std::cout << "Q: " << Q << std::endl;
-
-    // form product of N22(inverse) and n2; store in NIC
-//    clock_t FormNIC1 = clock();
-    NIC = prod(N22, n2);
-//    clock_t FormNIC2 = clock();
-//    double dFormNICTime = ((FormNIC2-FormNIC1)/(double)CLOCKS_PER_SEC);
-//    printf("FormNIC Elapsed Time: %20.10lf\n",dFormNICTime);
-
-    // accumulate -R directly into reduced normal equations
-//  clock_t AccumIntoNormals1 = clock();
-//  m_Normals -= prod(N12,Q);
-//  printf("starting AmultAdd_CNZRows\n");
-    AmultAdd_CNZRows(-1.0, N12, Q, m_Normals);
-//  clock_t AccumIntoNormals2 = clock();
-//  double dAccumIntoNormalsTime = ((AccumIntoNormals2-AccumIntoNormals1)/(double)CLOCKS_PER_SEC);
-//  printf("Accum Into Normals Elapsed Time: %20.10lf\n",dAccumIntoNormalsTime);
-
-    // accumulate -nj
-//    clock_t Accum_nj_1 = clock();
-//    m_nj -= prod(trans(Q),n2);
-    transA_NZ_multAdd(-1.0, Q, n2, m_nj);
-//    clock_t Accum_nj_2 = clock();
-//    double dAccumnjTime = ((Accum_nj_2-Accum_nj_1)/(double)CLOCKS_PER_SEC);
-//    printf("Accum nj Elapsed Time: %20.10lf\n",dAccumnjTime);
+    // add n1 to nj
+    m_nj += n1;
 
     return true;
   }
+
 
   bool BundleAdjust::InitializePointWeights() {
     // TODO:  Get working as is then convert to use new classes (Angles, etc.) and xyz with radius constraints
@@ -1372,11 +1890,84 @@ namespace Isis {
 
   }
 
+  void BundleAdjust::product_AV(double alpha, bounded_vector<double,3>& v2,
+      SparseBlockRowMatrix& Q, vector< double >& v1) {
 
-  void BundleAdjust::AmultAdd_CNZRows(double alpha, matrix<double>& A, compressed_matrix<double>& B,
+    QMapIterator<int, matrix<double>*> iQ(Q);
+
+    while ( iQ.hasNext() ) {
+      iQ.next();
+
+      int ncol = iQ.key();
+
+      int t = ncol*m_nNumImagePartials;
+
+      v2 += alpha * prod(*(iQ.value()),subrange(v1,t,t+m_nNumImagePartials));
+    }
+  }
+
+  // C = A x B(transpose) where
+  //    A is a boost matrix
+  //    B is a SparseBlockColumn matrix
+  //    C is a SparseBlockRowMatrix
+  //    each block of B and C are boost matrices
+  bool BundleAdjust::product_ATransB(symmetric_matrix <double,upper>& N22,
+      SparseBlockColumnMatrix& N12, SparseBlockRowMatrix& Q) {
+
+    QMapIterator<int, matrix<double>*> iN12(N12);
+
+    while ( iN12.hasNext() ) {
+      iN12.next();
+
+      int ncol = iN12.key();
+
+      // insert submatrix in Q at block "ncol"
+      Q.InsertMatrixBlock(ncol, 3, m_nNumImagePartials);
+
+      *(Q[ncol]) = prod(N22,trans(*(iN12.value())));
+    }
+
+    return true;
+  }
+
+  // NOTE: A = N12, B = Q
+  void BundleAdjust::AmultAdd_CNZRows_CHOLMOD(double alpha,
+      SparseBlockColumnMatrix& N12, SparseBlockRowMatrix& Q) {
+
+    if (alpha == 0.0)
+      return;
+
+    // now multiply blocks and subtract from m_SparseNormals
+    QMapIterator<int, matrix<double>*> iN12(N12);
+    QMapIterator<int, matrix<double>*> iQ(Q);
+
+    while ( iN12.hasNext() ) {
+      iN12.next();
+
+      int nrow = iN12.key();
+//      matrix<double> a = *(iN12.value());
+      matrix<double> *a = iN12.value();
+
+      while ( iQ.hasNext() ) {
+        iQ.next();
+
+        int ncol = iQ.key();
+        if ( nrow > ncol )
+          continue;
+
+        // insert submatrix at column, row
+        m_SparseNormals.InsertMatrixBlock(ncol, nrow,
+            m_nNumImagePartials, m_nNumImagePartials );
+
+        (*(*m_SparseNormals[ncol])[nrow]) -= prod(*a,*(iQ.value()));
+      }
+      iQ.toFront();
+    }
+  }
+
+
+  void BundleAdjust::AmultAdd_CNZRows_SPECIALK(double alpha, matrix<double>& A, compressed_matrix<double>& B,
                                       symmetric_matrix<double, upper, column_major>& C)
-//  void BundleAdjust::AmultAdd_CNZRows(double alpha, matrix<double>& A, compressed_matrix<double>& B,
-//                                      symmetric_matrix<double, lower>& C)
   {
     if (alpha == 0.0)
       return;
@@ -1400,21 +1991,6 @@ namespace Isis {
       nIndex++;
     }
 
-//    std::cout << nz << std::endl;
-
-    /*
-          for( it_row itr = cmd.begin1(); itr != cmd.end1(); ++itr )
-        }
-        {
-          for( it_col itc = itr.begin(); itc != itr.end(); ++itc )
-          {
-            std::cout << "(" << itc.index1() << "," << itc.index2()
-                      << ":" << *itc << ")  ";
-          }
-          std::cout << endl;
-        }
-    */
-
     int nzlength = nz.size();
     for (i = 0; i < nzlength; ++i) {
       ii = nz[i];
@@ -1430,8 +2006,32 @@ namespace Isis {
     }
   }
 
-  void BundleAdjust::transA_NZ_multAdd(double alpha, compressed_matrix<double>& A, vector<double>& B,
-                                       vector<double>& C) {
+  void BundleAdjust::transA_NZ_multAdd_CHOLMOD(double alpha,
+      SparseBlockRowMatrix& Q, vector<double>& n2, vector<double>& m_nj) {
+
+    if (alpha == 0.0)
+      return;
+
+    QMapIterator<int, matrix<double>*> iQ(Q);
+
+    while ( iQ.hasNext() ) {
+      iQ.next();
+
+      int nrow = iQ.key();
+      matrix<double>* m = iQ.value();
+
+      vector<double> v = prod(trans(*m),n2);
+
+      int t = nrow*m_nNumImagePartials;
+
+      for( unsigned i = 0; i < v.size(); i++ )
+        m_nj(t+i) += alpha*v(i);
+    }
+  }
+
+  void BundleAdjust::transA_NZ_multAdd_SPECIALK(double alpha, compressed_matrix<double>& A,
+  vector<double>& B, vector<double>& C) {
+
     if (alpha == 0.0)
       return;
 
@@ -1443,7 +2043,6 @@ namespace Isis {
     // create array of non-zero indices of matrix A
     std::vector<int> nz(A.nnz() / A.size1());
 
-    // iterators for A
     typedef compressed_matrix<double>::iterator1 it_row;
     typedef compressed_matrix<double>::iterator2 it_col;
 
@@ -1466,43 +2065,283 @@ namespace Isis {
     }
   }
 
-  bool BundleAdjust::FormNormalEquations3(compressed_vector<double>& n1, vector<double>& nj) {
-    // apply weighting for spacecraft position, velocity, acceleration
-    // and camera angles, angular velocities, angular accelerations
-    // if so stipulated (legalese)
+  // new
+  void BundleAdjust::AmulttransBNZ(matrix<double>& A,
+      compressed_matrix<double>& B, matrix<double> &C, double alpha) {
 
-//  std::cout << m_dImageParameterWeights << std::endl;
+    if ( alpha == 0.0 )
+      return;
 
-    m_nConstrainedImageParameters = 0;
+    register int i,j,k,kk;
+    double d;
 
-    int n = 0;
-    do {
-      for (int j = 0; j < m_nNumImagePartials; j++) {
-        if (m_dImageParameterWeights[j] > 0.0) {
-          m_Normals(n, n) += m_dImageParameterWeights[j];
-          m_nj[n] -= m_dImageParameterWeights[j] * m_Image_Corrections[n];
-          m_nConstrainedImageParameters++;
+    int nRowsB = B.size1();
+
+    // create array of non-zero indices of matrix B
+    std::vector<int> nz(B.nnz() / nRowsB);
+
+    typedef compressed_matrix<double>::iterator1 it_row;
+    typedef compressed_matrix<double>::iterator2 it_col;
+
+    it_row itr = B.begin1();
+    int nIndex = 0;
+    for (it_col itc = itr.begin(); itc != itr.end(); ++itc) {
+      nz[nIndex] = itc.index2();
+      nIndex++;
+    }
+
+    int nzlength = nz.size();
+
+    int nRowsA = A.size1();
+    int nColsC = C.size2();
+
+    for ( i = 0; i < nRowsA; ++i ) {
+      for (j = 0; j < nColsC; ++j) {
+        d = 0;
+
+        for (k = 0; k < nzlength; ++k) {
+          kk = nz[k];
+          d += A(i, kk) * B(j, kk);
         }
 
-        n++;
+        C(i,j) += alpha * d;
       }
-
     }
-    while (n < m_nRank);
 
-    // add n1 to nj
-    m_nj += n1;
+  }
+
+  // new
+  void BundleAdjust::ANZmultAdd(compressed_matrix<double>& A,
+      symmetric_matrix<double, upper, column_major>& B,
+      matrix<double>& C, double alpha) {
+
+    if ( alpha == 0.0 )
+      return;
+
+    register int i,j,k,kk;
+    double d;
+
+    int nRowsA = A.size1();
+
+    // create array of non-zero indices of matrix A
+    std::vector<int> nz(A.nnz() /nRowsA);
+
+    typedef compressed_matrix<double>::iterator1 it_row;
+    typedef compressed_matrix<double>::iterator2 it_col;
+
+    it_row itr = A.begin1();
+    int nIndex = 0;
+    for (it_col itc = itr.begin(); itc != itr.end(); ++itc) {
+      nz[nIndex] = itc.index2();
+      nIndex++;
+    }
+
+    int nzlength = nz.size();
+
+    int nColsC = C.size2();    
+    for ( i = 0; i < nRowsA; ++i ) {
+      for ( j = 0; j < nColsC; ++j ) {
+        d = 0;
+
+        for ( k = 0; k < nzlength; ++k ) {
+          kk = nz[k];
+          d += A(i, kk) * B(kk, j);
+        }
+
+        C(i, j) += alpha * d;
+      }
+    }
+
+  }
+
+  bool BundleAdjust::solveSystem_CHOLMOD() {
+
+    // load cholmod triplet
+    if ( !loadCholmodTriplet() ) {
+      std::string msg = "CHOLMOD: Failed to load Triplet matrix";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    }
+
+    // convert triplet to sparse matrix
+//      FILE * pFile1;
+//      pFile1 = fopen ("//work//users//kedmundson//Normals.txt" , "w");
+    m_N = cholmod_triplet_to_sparse(m_pTriplet,  m_pTriplet->nnz, &m_cm);
+//      cholmod_write_sparse(pFile1, m_N, 0, 0, &m_cm);
+//      fclose(pFile1);
+
+    // analyze matrix
+    clock_t t1 = clock();
+    m_L = cholmod_analyze(m_N, &m_cm); // should we analyze just 1st iteration?
+    clock_t t2 = clock();
+    double delapsedtime = ((t2-t1)/(double)CLOCKS_PER_SEC);
+    printf("cholmod Analyze Elapsed Time: %20.10lf\n",delapsedtime);
+
+    // create cholmod cholesky factor (LDLT?)
+    t1 = clock();
+    cholmod_factorize(m_N, m_L, &m_cm);
+    t2 = clock();
+    delapsedtime = ((t2-t1)/(double)CLOCKS_PER_SEC);
+    printf("cholmod Factorize Elapsed Time: %20.10lf\n",delapsedtime);
+
+    // check for "matrix not positive definite" error
+    if ( m_cm.status == CHOLMOD_NOT_POSDEF ) {
+      std::string msg = "matrix NOT positive-definite: failure at column "
+          + m_L->minor;
+      throw iException::Message(iException::User, msg, _FILEINFO_);
+    }
+
+//      FILE * pFile2;
+//      pFile2 = fopen ("//work1//kedmundson//factor.txt" , "w");
+//      cholmod_sparse* factor   = cholmod_factor_to_sparse(L, &c);
+//      cholmod_write_sparse(pFile2, factor, 0, 0, &c);
+//      fclose(pFile2);
+
+    // cholmod solution and right-hand side vectors
+    cholmod_dense *x, *b;
+
+    // initialize right-hand side vector
+    b = cholmod_zeros (m_N->nrow, 1, m_N->xtype, &m_cm);
+
+    // copy right-hand side vector into b
+    double *px = (double*)b->x;
+    for ( int i = 0; i < m_nRank; i++ )
+      px[i] = m_nj[i];
+
+//      FILE * pFile3;
+//      pFile3 = fopen ("//work1//kedmundson//rhs.txt" , "w");
+//      cholmod_write_dense(pFile3, b, 0, &c);
+//      fclose(pFile3);
+
+    // cholmod solve
+    t1 = clock();
+    x = cholmod_solve (CHOLMOD_A, m_L, b, &m_cm) ;
+    t2 = clock();
+    delapsedtime = ((t2-t1)/(double)CLOCKS_PER_SEC);
+    printf("cholmod Solution Elapsed Time: %20.10lf\n",delapsedtime);
+
+//      FILE * pFile4;
+//      pFile4 = fopen ("//work//users//kedmundson//solution.txt" , "w");
+//      cholmod_write_dense(pFile4, x, 0, &m_cm);
+//      fclose(pFile4);
+
+    // copy solution vector x out into m_Image_Solution
+    double *sx = (double*)x->x;
+    for ( int i = 0; i < m_nRank; i++ )
+      m_Image_Solution[i] = sx[i];
+
+    // free cholmod structures
+    cholmod_free_sparse(&m_N, &m_cm); // necessary?
+    cholmod_free_dense(&b, &m_cm);
+    cholmod_free_dense(&x, &m_cm);
 
     return true;
   }
 
-  bool BundleAdjust::SolveSystem() {
+  bool BundleAdjust::loadCholmodTriplet() {
+    printf("Starting CholMod conversion to triplet\n");
+    double d;
+
+    if ( m_nIteration == 1 ) {
+      int nelements = m_SparseNormals.numberOfElements();
+      printf("Matrix rank: %d # of Triplet elements: %d", m_nRank,nelements);
+      m_pTriplet = cholmod_allocate_triplet(m_nRank, m_nRank, nelements,
+          -1, CHOLMOD_REAL, &m_cm);
+
+      if ( !m_pTriplet ) {
+        printf("Triplet allocation failure");
+        return false;
+      }
+
+      m_pTriplet->nnz = 0;
+    }
+
+    int* Ti = (int*) m_pTriplet->i;
+    int* Tj = (int*) m_pTriplet->j;
+    double* v = (double*)m_pTriplet->x;
+
+    int nentries = 0;
+
+    int nblockcolumns = m_SparseNormals.size();
+    for ( int ncol = 0; ncol < nblockcolumns; ncol++ ) {
+
+      SparseBlockColumnMatrix* sbc = m_SparseNormals[ncol];
+
+      if ( !sbc ) {
+        printf("SparseBlockColumnMatrix retrieval failure at column %d", ncol);
+        return false;
+      }
+
+      QMapIterator<int, matrix<double>*> it(*sbc);
+
+      while ( it.hasNext() ) {
+        it.next();
+
+        int nrow = it.key();
+
+        matrix<double>* m = it.value();
+        if ( !m ) {
+          printf("matrix block retrieval failure at column %d, row %d", ncol,nrow);
+          printf("Total # of block columns: %d", nblockcolumns);
+          printf("Total # of blocks: %d", m_SparseNormals.numberOfBlocks());
+          return false;
+        }
+
+        if ( ncol == nrow )  {   // diagonal block (upper-triangular)
+          for ( unsigned ii = 0; ii < m->size1(); ii++ ) {
+            for (unsigned jj = ii; jj < m->size2(); jj++) {
+              d = m->at_element(ii,jj);
+              int ncolindex = jj+ncol*m_nNumImagePartials;
+              int nrowindex = ii+nrow*m_nNumImagePartials;
+
+              if ( m_nIteration == 1 ) {
+                Ti[nentries] = ncolindex;
+                Tj[nentries] = nrowindex;
+                m_pTriplet->nnz++;
+              }
+
+//              printf("UT - writing to row: %d column: %d\n", ncolindex, nrowindex);
+              v[nentries] = d;
+
+              nentries++;
+            }
+          }
+//          printf("\n");
+        }
+        else {                // off-diagonal block (square)
+          for ( unsigned ii = 0; ii < m->size1(); ii++ ) {
+            for ( unsigned jj = 0; jj < m->size2(); jj++ ) {
+              d = m->at_element(ii,jj);
+              int ncolindex = jj+ncol*m_nNumImagePartials;
+              int nrowindex = ii+nrow*m_nNumImagePartials;
+
+              if ( m_nIteration ==1 ) {
+                Ti[nentries] = nrowindex;
+                Tj[nentries] = ncolindex;
+                m_pTriplet->nnz++;
+              }
+
+              v[nentries] = d;
+
+//              printf("     writing to row: %d column: %d\n", ncolindex, nrowindex);
+
+              nentries++;
+            }
+          }
+//          printf("\n");
+        }
+      }
+    }
+
+    return true;
+  }
+
+  bool BundleAdjust::solveSystem_SPECIALK() {
     // decomposition (this is UTDU - need to test row vs column major
     // storage and access, and use of matrix iterators)
 //    clock_t CholeskyUtDUclock1 = clock();
 //    printf("Starting Cholesky\n");
 //    cholesky_decompose(m_Normals);
-    if (!CholeskyUT_NOSQR())
+    if ( !CholeskyUT_NOSQR() )
       return false;
 //    clock_t CholeskyUtDUclock2 = clock();
 //    double dCholeskyTime = ((CholeskyUtDUclock2-CholeskyUtDUclock1)/(double)CLOCKS_PER_SEC);
@@ -1531,16 +2370,16 @@ namespace Isis {
     double d1, d2;
 
     int nRows = m_Normals.size1();
-    /*
-        for( i = 0; i < nRows; i++ )
-        {
-          for( j = i; j < nRows; j++ )
-          {
-            printf("%lf ",m_Normals(i,j));
-          }
-          printf("\n");
-        }
-    */
+//    comment here
+//        for( i = 0; i < nRows; i++ )
+//        {
+//          for( j = i; j < nRows; j++ )
+//          {
+//            printf("%lf ",m_Normals(i,j));
+//          }
+//          printf("\n");
+//        }
+//    comment here
     for (i = 0; i < nRows; i++) {
 //    printf("Cholesky Row %d of %d\n",i+1,nRows);
       sum = 0.0;
@@ -1687,10 +2526,43 @@ namespace Isis {
       if (!CholeskyUT_NOSQR_BackSub(tmp, s, column))
         return false;
 
-      // store solution in corresponding column of inverse (replacing column in m_Normals)
+      // store solution in corresponding column of inverse (replacing column in
+      // m_Normals)
       for (j = 0; j <= i; j++)
         m_Normals(j, i) = s(j);
     }
+
+    return true;
+  }
+
+  bool BundleAdjust::cholmod_Inverse() {
+    int i, j;
+
+    // allocate matrix inverse
+    m_Normals.resize(m_nRank);
+
+    cholmod_dense *x;        // solution vector
+    cholmod_dense *b;        // right-hand side (column vectors of identity)
+
+    b = cholmod_zeros ( m_nRank, 1, CHOLMOD_REAL, &m_cm ) ;
+    double* pb = (double*)b->x;
+
+    for ( i = 0; i < m_nRank; i++ ) {
+      if ( i > 0 )
+        pb[i-1] = 0.0;
+      pb[i] = 1.0;
+
+      x = cholmod_solve ( CHOLMOD_A, m_L, b, &m_cm ) ;
+      double* px = (double*)x->x;
+
+      // store solution in corresponding column of inverse (replacing column in
+      // m_Normals)
+      for (j = 0; j <= i; j++)
+        m_Normals(j, i) = px[j];
+    }
+
+    cholmod_free_dense(&x,&m_cm);
+    cholmod_free_dense(&b,&m_cm);
 
     return true;
   }
@@ -2679,6 +3551,7 @@ namespace Isis {
       // partials for 3D point
       if (point->GetType() != ControlPoint::Fixed  ||
           m_strSolutionMethod == "SPECIALK"  ||
+          m_strSolutionMethod == "CHOLMOD"  ||
           m_strSolutionMethod == "SPARSE") {
         nIndex = PointIndex(nPointIndex);
         pCamera->GroundMap()->GetdXYdPoint(d_lookB_WRT_LAT, &px[nIndex],
@@ -3395,19 +4268,19 @@ namespace Isis {
   }
 
   /**
-   * Convenience method for quotient rule
+   * apply parameter corrections
    */
-//double BundleAdjust::LowDHigh(std::vector<double> &lookC,
-//                            std::vector<double> &dlookC,
-//                            int index) {
-//  return (lookC[2] * dlookC[index] - lookC[index] * dlookC[2]) /
-//         (lookC[2] * lookC[2]);
-//}
-//
+  void BundleAdjust::applyParameterCorrections() {
+    if ( m_decompositionMethod == CHOLMOD )
+      return applyParameterCorrections_CHOLMOD();
+    else
+      return applyParameterCorrections_SPECIALK();
+  }
+
   /**
    * apply parameter corrections
    */
-  void BundleAdjust::ApplyParameterCorrections() {
+  void BundleAdjust::applyParameterCorrections_CHOLMOD() {
 //    std::cout << "image corrections: " << m_Image_Corrections << std::endl;
 //    std::cout << "   image solution: " << m_Image_Solution << std::endl;
 
@@ -3450,7 +4323,6 @@ namespace Isis {
           if ( !bsameindex )
               m_Image_Corrections(index) += m_Image_Solution(index);
           index++;
-
 
           if (m_spacecraftPositionSolveType == PositionVelocityAcceleration) {
             abcX[2] += m_Image_Solution(index);
@@ -3556,7 +4428,233 @@ namespace Isis {
 
       // get NIC, Q, and correction vector for this point
       bounded_vector<double, 3>& NIC = m_NICs[nPointIndex];
-      compressed_matrix<double>& Q = m_Qs[nPointIndex];
+      SparseBlockRowMatrix& Q = m_Qs_CHOLMOD[nPointIndex];
+      bounded_vector<double, 3>& corrections = m_Point_Corrections[nPointIndex];
+
+//      printf("Q\n");
+//      std::cout << Q << std::endl;
+
+//      printf("NIC\n");
+//      std::cout << NIC << std::endl;
+
+//      std::cout << m_Image_Solution << std::endl;
+
+      // subtract product of Q and nj from NIC
+//      NIC -= prod(Q, m_Image_Solution);
+      product_AV(-1.0, NIC, Q, m_Image_Solution);
+
+      // get point parameter corrections
+      dLatCorr = NIC(0);
+      dLongCorr = NIC(1);
+      dRadCorr = NIC(2);
+
+//      printf("Point %s Corrections\n Latitude: %20.10lf\nLongitude: %20.10lf\n   Radius: %20.10lf\n",point->GetId().c_str(),dLatCorr, dLongCorr, dRadCorr);
+//      std::cout <<"Point " <<  point->GetId().c_str() << " Corrections\n" << "Latitude: " << dLatCorr << std::endl << "Longitude: " << dLongCorr << std::endl << "Radius: " << dRadCorr << std::endl;
+
+      double dLat = point->GetAdjustedSurfacePoint().GetLatitude().GetDegrees();
+      double dLon = point->GetAdjustedSurfacePoint().GetLongitude().GetDegrees();
+      double dRad = point->GetAdjustedSurfacePoint().GetLocalRadius().GetMeters();
+
+      dLat += RAD2DEG * dLatCorr;
+      dLon += RAD2DEG * dLongCorr;
+
+      // Make sure updated values are still in valid range.
+      // TODO What is the valid lon range?
+      if (dLat < -90.0) {
+        dLat = -180.0 - dLat;
+        dLon = dLon + 180.0;
+      }
+      if (dLat > 90.0) {
+        dLat = 180.0 - dLat;
+        dLon = dLon + 180.0;
+      }
+      while (dLon > 360.0) dLon = dLon - 360.0;
+      while (dLon < 0.0) dLon = dLon + 360.0;
+
+      dRad += 1000.*dRadCorr;
+
+//      std::cout << corrections << std::endl;
+
+      // sum and save corrections
+      corrections(0) += dLatCorr;
+      corrections(1) += dLongCorr;
+      corrections(2) += dRadCorr;
+
+//      std::cout << corrections << std::endl;
+
+      SurfacePoint surfacepoint = point->GetAdjustedSurfacePoint();
+
+      surfacepoint.SetSphericalCoordinates(Latitude(dLat, Angle::Degrees),
+                                              Longitude(dLon, Angle::Degrees),
+                                              Distance(dRad, Distance::Meters));
+
+      point->SetAdjustedSurfacePoint(surfacepoint);
+
+      nPointIndex++;
+
+      // testing
+      // Compute fixed point in body-fixed coordinates
+//      double pB[3];
+//      latrec_c( dRad * 0.001,
+//               (dLon * DEG2RAD),
+//               (dLat * DEG2RAD),
+//               pB);
+//      printf("%s %lf %lf %lf\n",point->Id().c_str(),pB[0],pB[1],pB[2]);
+    } // end loop over point corrections
+  }
+
+  /**
+   * apply parameter corrections
+   */
+  void BundleAdjust::applyParameterCorrections_SPECIALK() {
+//    std::cout << "image corrections: " << m_Image_Corrections << std::endl;
+//    std::cout << "   image solution: " << m_Image_Solution << std::endl;
+
+      int index;
+      int currentindex = -1;
+      bool bsameindex = false;
+
+      // Update selected spice for each image
+      int nImages = Images();
+      for (int i = 0; i < nImages; i++) {
+
+          if ( m_nHeldImages > 0 )
+              if ((m_pHeldSnList->HasSerialNumber(m_pSnList->SerialNumber(i))))
+                  continue;
+
+          Camera *pCamera = m_pCnet->Camera(i);
+          index = ImageIndex(i);
+          if( index == currentindex )
+              bsameindex = true;
+          else
+              bsameindex = false;
+
+          currentindex = index;
+
+      if (m_spacecraftPositionSolveType != Nothing) {
+        SpicePosition *pInstPos = pCamera->InstrumentPosition();
+        std::vector<double> abcX(3), abcY(3), abcZ(3);
+        pInstPos->GetPolynomial(abcX, abcY, abcZ);
+
+//        printf("X0:%20.10lf X1:%20.10lf X2:%20.10lf\n",abcX[0],abcX[1],abcX[2]);
+
+        // Update the X coordinate coefficient(s) and sum parameter correction
+        abcX[0] += m_Image_Solution(index);
+        if ( !bsameindex )
+            m_Image_Corrections(index) += m_Image_Solution(index);
+        index++;
+
+        if (m_spacecraftPositionSolveType > PositionOnly) {
+          abcX[1] += m_Image_Solution(index);
+          if ( !bsameindex )
+              m_Image_Corrections(index) += m_Image_Solution(index);
+          index++;
+
+          if (m_spacecraftPositionSolveType == PositionVelocityAcceleration) {
+            abcX[2] += m_Image_Solution(index);
+            if ( !bsameindex )
+                m_Image_Corrections(index) += m_Image_Solution(index);
+            index++;
+          }
+        }
+
+        // Update the Y coordinate coefficient(s)
+        abcY[0] += m_Image_Solution(index);
+        if ( !bsameindex )
+            m_Image_Corrections(index) += m_Image_Solution(index);
+        index++;
+
+        if (m_spacecraftPositionSolveType > PositionOnly) {
+          abcY[1] += m_Image_Solution(index);
+          if ( !bsameindex )
+              m_Image_Corrections(index) += m_Image_Solution(index);
+          index++;
+
+          if (m_spacecraftPositionSolveType == PositionVelocityAcceleration) {
+            abcY[2] += m_Image_Solution(index);
+            if ( !bsameindex )
+                m_Image_Corrections(index) += m_Image_Solution(index);
+            index++;
+          }
+        }
+
+        // Update the Z coordinate coefficient(s)
+        abcZ[0] += m_Image_Solution(index);
+        if ( !bsameindex )
+            m_Image_Corrections(index) += m_Image_Solution(index);
+        index++;
+
+        if (m_spacecraftPositionSolveType > PositionOnly) {
+          abcZ[1] += m_Image_Solution(index);
+          if ( !bsameindex )
+              m_Image_Corrections(index) += m_Image_Solution(index);
+          index++;
+
+          if (m_spacecraftPositionSolveType == PositionVelocityAcceleration) {
+            abcZ[2] += m_Image_Solution(index);
+            if ( !bsameindex )
+                m_Image_Corrections(index) += m_Image_Solution(index);
+            index++;
+          }
+        }
+
+        pInstPos->SetPolynomial(abcX, abcY, abcZ);
+      }
+
+      if (m_cmatrixSolveType != None) {
+        SpiceRotation *pInstRot = pCamera->InstrumentRotation();
+        std::vector<double> coefRA(m_nNumberCameraCoefSolved),
+            coefDEC(m_nNumberCameraCoefSolved),
+            coefTWI(m_nNumberCameraCoefSolved);
+        pInstRot->GetPolynomial(coefRA, coefDEC, coefTWI);
+
+        // Update right ascension coefficient(s)
+        for (int icoef = 0; icoef < m_nNumberCameraCoefSolved; icoef++) {
+          coefRA[icoef] += m_Image_Solution(index);
+          if ( !bsameindex )
+              m_Image_Corrections(index) += m_Image_Solution(index);
+          index++;
+        }
+
+        // Update declination coefficient(s)
+        for (int icoef = 0; icoef < m_nNumberCameraCoefSolved; icoef++) {
+          coefDEC[icoef] += m_Image_Solution(index);
+          if ( !bsameindex )
+              m_Image_Corrections(index) += m_Image_Solution(index);
+          index++;
+        }
+
+        if (m_bSolveTwist) {
+          // Update twist coefficient(s)
+          for (int icoef = 0; icoef < m_nNumberCameraCoefSolved; icoef++) {
+            coefTWI[icoef] += m_Image_Solution(index);
+            if ( !bsameindex )
+                m_Image_Corrections(index) += m_Image_Solution(index);
+            index++;
+          }
+        }
+
+        pInstRot->SetPolynomial(coefRA, coefDEC, coefTWI);
+      }
+    }
+
+    // Update lat/lon for each control point
+    double dLatCorr, dLongCorr, dRadCorr;
+    int nPointIndex = 0;
+    int nObjectPoints = m_pCnet->GetNumPoints();
+    for (int i = 0; i < nObjectPoints; i++) {
+      ControlPoint *point = m_pCnet->GetPoint(i);
+      if (point->IsIgnored())
+        continue;
+
+      if( point->IsRejected() ) {
+          nPointIndex++;
+          continue;
+      }
+
+      // get NIC, Q, and correction vector for this point
+      bounded_vector<double, 3>& NIC = m_NICs[nPointIndex];
+      compressed_matrix<double>& Q = m_Qs_SPECIALK[nPointIndex];
       bounded_vector<double, 3>& corrections = m_Point_Corrections[nPointIndex];
 
 //      printf("Q\n");
@@ -4080,49 +5178,158 @@ namespace Isis {
     return true;
 }
 
-  bool BundleAdjust::ErrorPropagation() {
+  /**
+   * error propagation.
+   */
+  bool BundleAdjust::errorPropagation() {
+    if ( m_decompositionMethod == CHOLMOD )
+      return errorPropagation_CHOLMOD();
+    else
+      return errorPropagation_SPECIALK();
 
-      // create inverse of normal equations matrix
-      if ( !CholeskyUT_NOSQR_Inverse() )
-          return false;
+    return false;
+  }
 
-      matrix<double> T(3, 3);
-      matrix<double> QS(3, m_nRank);
-      double dSigmaLat, dSigmaLong, dSigmaRadius;
-      double t;
+  bool BundleAdjust::errorPropagation_SPECIALK() {
 
-      double dSigma02 = m_dSigma0 * m_dSigma0;
+    // create inverse of normal equations matrix
+    if ( !CholeskyUT_NOSQR_Inverse() )
+        return false;
 
-      int nPointIndex = 0;
-      int nObjectPoints = m_pCnet->GetNumPoints();
-      for (int i = 0; i < nObjectPoints; i++) {
-//          const ControlPoint *point = m_pCnet->GetPoint(i);
-          ControlPoint *point = m_pCnet->GetPoint(i);
-          if ( point->IsIgnored() )
-              continue;
+    matrix<double> T(3, 3);
+    matrix<double> QS(3, m_nRank);
+    double dSigmaLat, dSigmaLong, dSigmaRadius;
+    double t;
 
-          if ( point->IsRejected() )
-              continue;
+    double dSigma02 = m_dSigma0 * m_dSigma0;
 
-          T.clear();
-          QS.clear();
+    int nPointIndex = 0;
+    int nObjectPoints = m_pCnet->GetNumPoints();
+    for (int i = 0; i < nObjectPoints; i++) {
+      ControlPoint *point = m_pCnet->GetPoint(i);
+        if ( point->IsIgnored() )
+            continue;
 
-          // get corresponding Q matrix
-          compressed_matrix<double>& Q = m_Qs[nPointIndex];
+        if ( point->IsRejected() )
+            continue;
 
-          // form QS
-          QS = prod(Q, m_Normals);
+        T.clear();
+        QS.clear();
 
-          // form T
-          T = prod(QS, trans(Q));
+        // get corresponding Q matrix
+        compressed_matrix<double>& Q = m_Qs_SPECIALK[nPointIndex];
 
-          // Ask Ken what is happening here...Setting just the sigmas is not very accurate
-          // Shouldn't we be updating and setting the matrix???  TODO
-          SurfacePoint SurfacePoint = point->GetAdjustedSurfacePoint();
+        // form QS
+        QS = prod(Q, m_Normals);
 
-          dSigmaLat = SurfacePoint.GetLatSigma().GetRadians();
-          dSigmaLong = SurfacePoint.GetLonSigma().GetRadians();
-          dSigmaRadius = SurfacePoint.GetLocalRadiusSigma().GetMeters();
+        // form T
+        T = prod(QS, trans(Q));
+
+        // Ask Ken what is happening here...Setting just the sigmas is not very accurate
+        // Shouldn't we be updating and setting the matrix???  TODO
+        SurfacePoint SurfacePoint = point->GetAdjustedSurfacePoint();
+
+        dSigmaLat = SurfacePoint.GetLatSigma().GetRadians();
+        dSigmaLong = SurfacePoint.GetLonSigma().GetRadians();
+        dSigmaRadius = SurfacePoint.GetLocalRadiusSigma().GetMeters();
+
+//      std::cout << dSigmaLat << " " << dSigmaLong << " " << dSigmaRadius << std::endl;
+
+//      dSigmaLat = point->GetAdjustedSurfacePoint().GetLatSigmaDistance().GetMeters();
+//      dSigmaLong = point->GetAdjustedSurfacePoint().GetLonSigmaDistance().GetMeters();
+//      dSigmaRadius = point->GetAdjustedSurfacePoint().GetLocalRadiusSigma().GetMeters();
+
+        t = dSigmaLat*dSigmaLat + T(0, 0);
+        Distance tLatSig(sqrt(dSigma02 * t) * m_dRTM, Distance::Meters);
+
+        t = dSigmaLong*dSigmaLong + T(1, 1);
+        t = sqrt(dSigma02 * t) * m_dRTM;
+        Distance tLonSig(
+            t * cos(point->GetAdjustedSurfacePoint().GetLatitude().GetRadians()),
+            Distance::Meters);
+
+        t = dSigmaRadius*dSigmaRadius + T(2, 2);
+        t = sqrt(dSigma02 * t) * 1000.0;
+
+        SurfacePoint.SetSphericalSigmasDistance(tLatSig, tLonSig,
+            Distance(t, Distance::Meters));
+
+        point->SetAdjustedSurfacePoint(SurfacePoint);
+
+       nPointIndex++;
+    }
+
+    return true;
+  }
+
+  bool BundleAdjust::errorPropagation_CHOLMOD() {
+
+    // free unneeded memory
+    cholmod_free_triplet(&m_pTriplet, &m_cm);
+    cholmod_free_sparse(&m_N, &m_cm);
+    m_SparseNormals.wipe();
+
+    // create inverse of normal equations matrix
+    if ( !cholmod_Inverse() )
+      return false;
+
+    matrix<double> T(3, 3);
+    matrix<double> QS(3, m_nRank);
+    double dSigmaLat, dSigmaLong, dSigmaRadius;
+    double t;
+
+    // TODO_CHOLMOD: would rather not make copies like this
+    // must be a better way????
+    compressed_matrix<double> Q(3,m_nRank);
+
+    double dSigma02 = m_dSigma0 * m_dSigma0;
+
+    int nPointIndex = 0;
+    int nObjectPoints = m_pCnet->GetNumPoints();
+    for (int i = 0; i < nObjectPoints; i++) {
+
+      ControlPoint *point = m_pCnet->GetPoint(i);
+      if ( point->IsIgnored() )
+        continue;
+
+      if ( point->IsRejected() )
+        continue;
+
+      T.clear();
+      QS.clear();
+
+      // get corresponding Q matrix
+      SparseBlockRowMatrix& Qblock = m_Qs_CHOLMOD[nPointIndex];
+
+      // copy into compressed boost matrix
+      // TODO_CHOLMOD: don't want to do this
+      Qblock.copyToBoost(Q);
+
+//      Qblock.print();
+//      std::cout << "Copy of Q" << Q << std::endl;
+
+      // form QS
+      QS = prod(Q, m_Normals);
+
+//      ANZmultAdd(Q, m_Normals, QS);
+
+      // form T
+      T = prod(QS, trans(Q));
+
+//      AmulttransBNZ(QS, Q, T);
+
+//      std::cout << "T" << std::endl << T << std::endl;
+
+      // Ask Ken what is happening here...Setting just the sigmas is not very
+      // accurate
+      // Shouldn't we be updating and setting the matrix???  TODO
+      SurfacePoint SurfacePoint = point->GetAdjustedSurfacePoint();
+
+      dSigmaLat = SurfacePoint.GetLatSigma().GetRadians();
+      dSigmaLong = SurfacePoint.GetLonSigma().GetRadians();
+      dSigmaRadius = SurfacePoint.GetLocalRadiusSigma().GetMeters();
+
+//    std::cout << dSigmaLat << " " << dSigmaLong << " " << dSigmaRadius << std::endl;
 
 //      dSigmaLat = point->GetAdjustedSurfacePoint().GetLatSigmaDistance().GetMeters();
 //      dSigmaLong = point->GetAdjustedSurfacePoint().GetLonSigmaDistance().GetMeters();
@@ -4254,6 +5461,7 @@ namespace Isis {
       if (point->IsIgnored())
         continue;
       if (m_strSolutionMethod != "SPECIALK" &&
+          m_strSolutionMethod != "CHOLMOD"  &&
           m_strSolutionMethod != "SPARSE"  &&
           point->GetType() == ControlPoint::Fixed)
         continue;
@@ -6850,7 +8058,6 @@ void BundleAdjust::SpecialKIterationSummary() {
         }
 
         else if ( pCamera->GetCameraType() != 3 ) {
-        // don't print anything for radar 
           output_columns.push_back(boost::lexical_cast<std::string>
               (coefRA[0]*RAD2DEG));
           output_columns.push_back(boost::lexical_cast<std::string>(0.0));
@@ -6904,4 +8111,3 @@ void BundleAdjust::SpecialKIterationSummary() {
   }
 
 }
-

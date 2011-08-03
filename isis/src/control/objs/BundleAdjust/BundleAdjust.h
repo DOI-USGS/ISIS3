@@ -89,6 +89,8 @@
  *                          a single ControlPoint and ControlMeasure.
  */
 
+#include <QObject> // parent class
+
 #include <vector>
 #include <fstream>
 
@@ -101,8 +103,13 @@
 #include "Progress.h"
 #include "CameraGroundMap.h"
 #include "ControlMeasure.h"
+#include "SparseBlockMatrix.h"
 
-#include "boost/numeric/ublas/symmetric.hpp"
+#include <CHOLMOD/cholmod.h>
+#include <CHOLMOD/UFconfig.h>
+
+template< typename T > class QList;
+template< typename A, typename B > class QMap;
 
 #if !defined(__sun__)
 #include "gmm/gmm.h"
@@ -110,8 +117,6 @@
 
 namespace Isis {
 
-//  class Latitude;
-//  class Longitude;
   class LeastSquares;
   class BasisFunction;
 
@@ -130,7 +135,7 @@ namespace Isis {
       bool ReadSCSigmas(const std::string &scsigmasList);
 
       double Solve();
-      bool SolveSpecialK();
+      bool SolveCholesky();
 
       Isis::ControlNet *ControlNet() { return m_pCnet; }
 
@@ -171,6 +176,12 @@ namespace Isis {
       void SetResidualOutput(bool b) { m_bOutputResiduals = b; }
       void SetOutputFilePrefix(const std::string &str) { m_strOutputFilePrefix = str; }
 
+      enum DecompositionMethod {
+        NoneSelected,
+        SPECIALK,
+        CHOLMOD,
+      };
+
       enum CmatrixSolveType {
         None,
         AnglesOnly,
@@ -191,6 +202,8 @@ namespace Isis {
         std::string InstrumentId;
         std::vector<double> weights;
       };
+
+      void SetDecompositionMethod(DecompositionMethod method);
 
       void SetSolveCmatrix(CmatrixSolveType type);
       void SetSolveSpacecraftPosition(SpacecraftPositionSolveType type) { m_spacecraftPositionSolveType = type; }
@@ -221,6 +234,7 @@ namespace Isis {
     private:
 
       void Init(Progress *progress = 0);
+      bool validateNetwork();
 
       void ComputeNumberPartials();
       void ComputeImageParameterWeights();
@@ -395,6 +409,8 @@ namespace Isis {
       std::vector<Statistics> m_rmsImageDECSigmas;
       std::vector<Statistics> m_rmsImageTWISTSigmas;
 
+      DecompositionMethod m_decompositionMethod; //!< matrix decomp method
+
       CmatrixSolveType m_cmatrixSolveType;                          //!< cmatrix solve type (define)
       SpacecraftPositionSolveType m_spacecraftPositionSolveType;    //!< spacecraft position solve type (define)
 
@@ -416,7 +432,8 @@ namespace Isis {
       boost::numeric::ublas::vector< double > m_nj;
 
       //!< array of Qs   (see Brown, 1976)
-      std::vector< boost::numeric::ublas::compressed_matrix< double> > m_Qs;
+      std::vector< boost::numeric::ublas::compressed_matrix< double> > m_Qs_SPECIALK;
+      std::vector< SparseBlockRowMatrix > m_Qs_CHOLMOD;
 
 //      vector<bounded_vector<double,3> >  m_NICs;                         //!< array of NICs (see Brown, 1976)
       //!< array of NICs (see Brown, 1976)
@@ -434,23 +451,82 @@ namespace Isis {
       bool InitializePointWeights();
       void InitializePoints();
 
-      bool FormNormalEquations();
+      bool formNormalEquations();
+      void applyParameterCorrections();
+      bool errorPropagation();
+      bool solveSystem();
 
-      bool ComputePartials_DC(boost::numeric::ublas::matrix<double>& coeff_image, boost::numeric::ublas::matrix<double>& coeff_point3D,
-                           boost::numeric::ublas::vector<double>& coeff_RHS, const ControlMeasure &measure,
-                           const ControlPoint &point);
+      // solution, error propagation, and matrix methods for cholmod approach
+      bool formNormalEquations_CHOLMOD();
 
-      bool FormNormalEquations1(boost::numeric::ublas::symmetric_matrix<double, boost::numeric::ublas::upper>&N22, boost::numeric::ublas::matrix<double>& N12,
-                                boost::numeric::ublas::compressed_vector<double>& n1, boost::numeric::ublas::vector<double>& n2,
-                                boost::numeric::ublas::matrix<double>& coeff_image, boost::numeric::ublas::matrix<double>& coeff_point3D,
-                                boost::numeric::ublas::vector<double>& coeff_RHS, int nImageIndex);
+      bool formNormals1_CHOLMOD(boost::numeric::ublas::symmetric_matrix<double, boost::numeric::ublas::upper>&N22,
+          SparseBlockColumnMatrix& N12,
+          boost::numeric::ublas::compressed_vector<double>& n1,
+          boost::numeric::ublas::vector<double>& n2,
+          boost::numeric::ublas::matrix<double>& coeff_image,
+          boost::numeric::ublas::matrix<double>& coeff_point3D,
+          boost::numeric::ublas::vector<double>& coeff_RHS, int nImageIndex);
 
-      bool FormNormalEquations2(boost::numeric::ublas::symmetric_matrix<double, boost::numeric::ublas::upper>&N22, boost::numeric::ublas::matrix<double>& N12,
-                                boost::numeric::ublas::vector<double>& n2, boost::numeric::ublas::vector<double>& nj, int nPointIndex, int i);
+      bool formNormals2_CHOLMOD(boost::numeric::ublas::symmetric_matrix<double, boost::numeric::ublas::upper>&N22,
+          SparseBlockColumnMatrix& N12,
+          boost::numeric::ublas::vector<double>& n2,
+          boost::numeric::ublas::vector<double>& nj, int nPointIndex, int i);
 
-      bool FormNormalEquations3(boost::numeric::ublas::compressed_vector<double>& n1, boost::numeric::ublas::vector<double>& nj);
+      bool formNormals3_CHOLMOD(boost::numeric::ublas::compressed_vector<double>& n1,
+          boost::numeric::ublas::vector<double>& nj);
 
-      bool SolveSystem();
+      bool solveSystem_CHOLMOD();
+
+      void AmultAdd_CNZRows_CHOLMOD(double alpha, SparseBlockColumnMatrix& A,
+          SparseBlockRowMatrix& B);
+
+      void transA_NZ_multAdd_CHOLMOD(double alpha, SparseBlockRowMatrix &A,
+          boost::numeric::ublas::vector< double > &B,
+          boost::numeric::ublas::vector< double > &C);
+
+      void applyParameterCorrections_CHOLMOD();
+
+      bool errorPropagation_CHOLMOD();
+
+      // solution, error propagation, and matrix methods for specialk approach
+      // TODO: this may be able to go away if I can verify cholmod behaviour for
+      // a truly dense matrix
+      bool formNormalEquations_SPECIALK();
+
+      bool formNormals1_SPECIALK(boost::numeric::ublas::symmetric_matrix<double, boost::numeric::ublas::upper>&N22,
+          boost::numeric::ublas::matrix<double>& N12,
+          boost::numeric::ublas::compressed_vector<double>& n1,
+          boost::numeric::ublas::vector<double>& n2,
+          boost::numeric::ublas::matrix<double>& coeff_image,
+          boost::numeric::ublas::matrix<double>& coeff_point3D,
+          boost::numeric::ublas::vector<double>& coeff_RHS, int nImageIndex);
+
+      bool formNormals2_SPECIALK(boost::numeric::ublas::symmetric_matrix<double, boost::numeric::ublas::upper>&N22,
+          boost::numeric::ublas::matrix<double>& N12,
+          boost::numeric::ublas::vector<double>& n2,
+          boost::numeric::ublas::vector<double>& nj, int nPointIndex, int i);
+
+      bool formNormals3_SPECIALK(boost::numeric::ublas::compressed_vector<double>& n1,
+          boost::numeric::ublas::vector<double>& nj);
+
+      bool solveSystem_SPECIALK();
+
+      void AmultAdd_CNZRows_SPECIALK(double alpha,
+          boost::numeric::ublas::matrix< double > &A,
+          boost::numeric::ublas::compressed_matrix< double > &B,
+          boost::numeric::ublas::symmetric_matrix < double,
+          boost::numeric::ublas::upper,
+          boost::numeric::ublas::column_major > &C);
+
+      void transA_NZ_multAdd_SPECIALK(double alpha,
+          boost::numeric::ublas::compressed_matrix< double > &A,
+          boost::numeric::ublas::vector< double > &B,
+          boost::numeric::ublas::vector< double > &C);
+
+      void applyParameterCorrections_SPECIALK();
+
+      bool errorPropagation_SPECIALK();
+
       bool CholeskyUT_NOSQR();
       bool CholeskyUT_NOSQR_Inverse();
       bool CholeskyUT_NOSQR_BackSub(
@@ -460,29 +536,50 @@ namespace Isis {
         boost::numeric::ublas::vector< double > &s,
         boost::numeric::ublas::vector< double > &rhs);
 
+      bool ComputePartials_DC(boost::numeric::ublas::matrix<double>& coeff_image,
+          boost::numeric::ublas::matrix<double>& coeff_point3D,
+          boost::numeric::ublas::vector<double>& coeff_RHS,
+          const ControlMeasure &measure, const ControlPoint &point);
+
 //      bool CholeskyUT_NOSQR_BackSub(symmetric_matrix<double,lower>& m, vector<double>& s, vector<double>& rhs);
-      void ApplyParameterCorrections();
       double ComputeResiduals();
-      bool ErrorPropagation();
 
       // dedicated matrix functions
-      void transA_NZ_multAdd(double alpha,
-                             boost::numeric::ublas::compressed_matrix< double > &A,
-                             boost::numeric::ublas::vector< double > &B,
-                             boost::numeric::ublas::vector< double > &C);
-      void AmultAdd_CNZRows(double alpha,
-                            boost::numeric::ublas::matrix< double > &A,
-                            boost::numeric::ublas::compressed_matrix< double > &B,
-                            boost::numeric::ublas::symmetric_matrix < double,
-                            boost::numeric::ublas::upper,
-                            boost::numeric::ublas::column_major > &C);
-//      void AmultAdd_CNZRows(double alpha, matrix<double>& A, compressed_matrix<double>& B,
-//                            symmetric_matrix<double, lower>& C);
+      void AmulttransBNZ(boost::numeric::ublas::matrix<double>& A,
+          boost::numeric::ublas::compressed_matrix<double>& B,
+          boost::numeric::ublas::matrix<double> &C, double alpha=1.0);
+      void ANZmultAdd(boost::numeric::ublas::compressed_matrix<double>& A,
+          boost::numeric::ublas::symmetric_matrix < double,
+          boost::numeric::ublas::upper,boost::numeric::ublas::column_major >& B,
+          boost::numeric::ublas::matrix<double>& C, double alpha=1.0) ;
+
       bool Invert_3x3(boost::numeric::ublas::symmetric_matrix < double,
                       boost::numeric::ublas::upper > &m);
+
+      bool product_ATransB(boost::numeric::ublas::symmetric_matrix < double,
+          boost::numeric::ublas::upper > &N22, SparseBlockColumnMatrix& N12,
+          SparseBlockRowMatrix& Q);
+      void product_AV(double alpha, boost::numeric::ublas::bounded_vector< double,3 >& v2,
+          SparseBlockRowMatrix& Q, boost::numeric::ublas::vector< double >& v1);
+
       bool ComputeRejectionLimit();
       bool FlagOutliers();
+
+      //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      // variables and methods for cholmod
+      cholmod_common m_cm;
+      cholmod_factor *m_L;
+      cholmod_sparse* m_N;
+
+      SparseBlockMatrix m_SparseNormals;
+      cholmod_triplet* m_pTriplet;
+
+      bool initializeCholMod();
+      bool freeCholMod();
+      bool cholmod_Inverse();
+      bool loadCholmodTriplet();
   };
+
 }
 
 #endif
