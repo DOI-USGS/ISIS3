@@ -173,6 +173,14 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     return true;
   }
 
+/**
+   * Initialize solution parameters
+   *
+   * @internal
+   *   @history 2011-08-14 Debbie A. Cook - Opt out of network validation
+   *                      for deltack network in order to allow
+   *                      a single measure on a point
+   */
   void BundleAdjust::Init(Progress *progress) {
 //printf("BOOST_UBLAS_CHECK_ENABLE = %d\n", BOOST_UBLAS_CHECK_ENABLE);
 //printf("BOOST_UBLAS_TYPE_CHECK = %d\n", BOOST_UBLAS_TYPE_CHECK);
@@ -282,8 +290,9 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     // on the up-and-up with the control network.  Add checks for multiple
     // networks, images without any points, and points on images removed from
     // the control net (when we start adding software to remove points with high
-    // residuals) and ?.
-    validateNetwork();
+    // residuals) and ?.  For "deltack" a single measure on a point is allowed
+    // so skip the test.
+    if (!m_bDeltack) validateNetwork();
   }
 
   /**
@@ -292,13 +301,17 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
    *
    * checks implemented for ...
    *  (1) images with 0 or 1 measures
+   * @internal
+   *   @history  2011-08-4 Debbie A. Cook - Changed error message to 
+   *                        indicate it fails with one measure as 
+   *                        well as no measures.
    */
   bool BundleAdjust::validateNetwork() {
     printf("Validating network...\n");
 
     // verify measures exist for all images
     int nimagesWithInsufficientMeasures = 0;
-    std::string msg = "Images with no measures:\n";
+    std::string msg = "Images with one or less measures:\n";
     int nImages = m_pSnList->Size();
     for (int i = 0; i < nImages; i++) {
       int nMeasures =
