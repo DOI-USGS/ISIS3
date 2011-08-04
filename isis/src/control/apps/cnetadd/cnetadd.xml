@@ -200,6 +200,27 @@
 
     <group name="RetrievalOptions">                           
 
+      <parameter name="POLYGON">
+        <type>boolean</type>
+        <default><item>False</item></default>
+        <brief>Prune points outside image polygon in adding process</brief>
+        <description>
+          <p>
+            When enabled, this optimization will prune points that fall outside
+            the latitude/longitude bounding box of the polygon for the image
+            being added.  By performing this check up front, no expensive camera
+            calculations to find a point's location on an image will be
+            performed for points that fail this test.  In most cases, the vast
+            majority of points fall outside of any given image during the adding
+            process, so performance gains can be orders of magnitude.
+          </p>
+          <p>
+            This optimization requires that all images have had "footprintinit"
+            run beforehand in order to find the image polygons.
+          </p>
+        </description>
+      </parameter>
+
         <parameter name="RETRIEVAL">
             <type>string</type>
             <brief>

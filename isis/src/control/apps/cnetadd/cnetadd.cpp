@@ -3,6 +3,12 @@
 #include <map>
 #include <set>
 
+#include "geos/geom/Coordinate.h"
+#include "geos/geom/Envelope.h"
+#include "geos/geom/Geometry.h"
+#include "geos/geom/MultiPolygon.h"
+#include "geos/geom/Point.h"
+
 #include "Camera.h"
 #include "CameraFactory.h"
 #include "ControlNet.h"
@@ -21,13 +27,21 @@
 #include "SerialNumberList.h"
 #include "SurfacePoint.h"
 #include "UserInterface.h"
+#include "ImagePolygon.h"
+
+using geos::geom::Coordinate;
+using geos::geom::Envelope;
+using geos::geom::Geometry;
+using geos::geom::MultiPolygon;
+using geos::geom::Point;
 
 using namespace Isis;
 
-void SetControlPointLatLon(const std::string &incubes, const std::string &cnet);
+void SetControlPointLatLon(SerialNumberList &snl, ControlNet &cnet);
 
 std::map< std::string, SurfacePoint > p_surfacePoints;
 std::map< int, std::set<std::string> > p_modifiedMeasures;
+
 
 void IsisMain() {
 
@@ -57,6 +71,10 @@ void IsisMain() {
   SerialNumberList *fromSerials = ui.WasEntered("FROMLIST") ?
     new SerialNumberList(ui.GetFilename("FROMLIST")) : new SerialNumberList();
 
+  ControlNet inNet = ControlNet(ui.GetFilename("CNET"));
+  inNet.SetUserName(Application::UserName());
+  inNet.SetModifiedDate(iTime::CurrentLocalTime()); //This should be done in ControlNet's Write fn
+
   std::string retrievalOpt = ui.GetString("RETRIEVAL");
   PvlKeyword duplicates("DupSerialNumbers");
   if (retrievalOpt == "REFERENCE") {
@@ -81,14 +99,27 @@ void IsisMain() {
       }
     }
 
-    SetControlPointLatLon(ui.GetFilename("FROMLIST"), ui.GetFilename("CNET"));
+    // Get the lat/long coords from the existing reference measure
+    SetControlPointLatLon(*fromSerials, inNet);
+  }
+  else {
+    for (int cp = 0; cp < inNet.GetNumPoints(); cp++) {
+      // Get the surface point from the current control point
+      ControlPoint *point = inNet.GetPoint(cp);
+      SurfacePoint surfacePoint = point->GetBestSurfacePoint();
+
+      if (!surfacePoint.Valid()) {
+        std::string msg = "Unable to retreive lat/lon from Control Point [";
+        msg += point->GetId() + "]. RETREIVAL=POINT cannot be used unless ";
+        msg += "all Control Points have Latitude/Longitude keywords.";
+        throw iException::Message(iException::User, msg, _FILEINFO_);
+      }
+
+      p_surfacePoints[point->GetId()] = surfacePoint;
+    }
   }
 
   Filename outNetFile(ui.GetFilename("ONET"));
-
-  ControlNet inNet = ControlNet(ui.GetFilename("CNET"));
-  inNet.SetUserName(Application::UserName());
-  inNet.SetModifiedDate(iTime::CurrentLocalTime()); //This should be done in ControlNet's Write fn
 
   Progress progress;
   progress.SetText("Adding Images");
@@ -96,7 +127,23 @@ void IsisMain() {
   progress.CheckStatus();
 
   // loop through all the images
+  bool usePolygon = ui.GetBoolean("POLYGON");
   std::vector<int> modPoints;
+
+  QList<Coordinate> geomPoints;
+  if (usePolygon) {
+    for (int cp = 0; cp < inNet.GetNumPoints(); cp++) {
+      ControlPoint *point = inNet.GetPoint(cp);
+      SurfacePoint surfacePoint = p_surfacePoints[point->GetId()];
+
+      Longitude lon = surfacePoint.GetLongitude();
+      Latitude lat = surfacePoint.GetLatitude();
+
+      Coordinate coord(lon.GetDegrees(), lat.GetDegrees());
+      geomPoints.append(coord);
+    }
+  }
+
   for (unsigned int img = 0; img < addList.size(); img++) {
     bool imageAdded = false;
     Cube cube;
@@ -105,7 +152,19 @@ void IsisMain() {
     std::string sn = SerialNumber::Compose(*cubepvl);
     Camera *cam = cube.getCamera();
 
-    //loop through all the control points
+    ImagePolygon poly;
+    if (usePolygon) {
+      try {
+        cube.read(poly);
+      }
+      catch (iException &e) {
+        std::string msg = "Footprintinit must be run prior to running cnetadd";
+        msg += " with POLYGON=TRUE for cube [" + cube.getFilename() + "]";
+        throw iException::Message(iException::User, msg, _FILEINFO_);
+      }
+    }
+
+    // Loop through all the control points
     for (int cp = 0; cp < inNet.GetNumPoints(); cp++) {
       ControlPoint *point = inNet.GetPoint(cp);
 
@@ -118,24 +177,20 @@ void IsisMain() {
 
       if (point->HasSerialNumber(sn)) continue;
 
-      SurfacePoint cpSurfacePoint;
-      if (retrievalOpt == "REFERENCE") {
-        // Get the lat/long coords from the existing reference measure
-        cpSurfacePoint = p_surfacePoints[point->GetId()];
-      }
-      else {
-        // Get the surface point from the current control point
-        cpSurfacePoint = point->GetBestSurfacePoint();
-        if (not cpSurfacePoint.Valid()) {
-          std::string msg = "Unable to retreive lat/lon from Control Point [";
-          msg += point->GetId() + "]. RETREIVAL=POINT cannot be used unless ";
-          msg += "all Control Points have Latitude/Longitude keywords.";
-          throw iException::Message(iException::User, msg, _FILEINFO_);
+      bool containsPoint = false;
+      if (usePolygon) {
+        MultiPolygon *polys = poly.Polys();
+        for (unsigned int i = 0; i < polys->getNumGeometries() && !containsPoint; i++) {
+          const Geometry *geometry = polys->getGeometryN(i);
+          const Envelope *boundingBox = geometry->getEnvelopeInternal();
+          containsPoint = boundingBox->contains(geomPoints[cp]);
         }
+
+        if (!containsPoint) continue;
       }
 
-      //if (cam->SetUniversalGround(latitude, longitude)) {
-      if (cam->SetGround(cpSurfacePoint)) {
+      SurfacePoint surfacePoint = p_surfacePoints[point->GetId()];;
+      if (cam->SetGround(surfacePoint)) {
 
         // Make sure the samp & line are inside the image
         if (cam->InCube()) {
@@ -180,8 +235,6 @@ void IsisMain() {
 
           // Record the modified Point and Measure
           p_modifiedMeasures[cp].insert(newCm->GetCubeSerialNumber());
-          newCm = NULL;
-
           newCm = NULL; // Do not delete because the point has ownership
 
           if (retrievalOpt == "POINT" && inNet.GetPoint(cp)->GetNumMeasures() == 1) {
@@ -215,7 +268,6 @@ void IsisMain() {
 
     progress.CheckStatus();
   }
-
 
   if (log) {
 
@@ -331,20 +383,17 @@ void IsisMain() {
  * @param incubes The filename of the list of cubes in the ControlNet
  * @param cnet    The filename of the ControlNet
  */
-void SetControlPointLatLon(const std::string &incubes, const std::string &cnet) {
-  SerialNumberList snl(incubes);
-  ControlNet net(cnet);
-
+void SetControlPointLatLon(SerialNumberList &snl, ControlNet &cnet) {
   CubeManager manager;
   manager.SetNumOpenCubes(50);   //Should keep memory usage to around 1GB
 
   Progress progress;
   progress.SetText("Calculating Lat/Lon");
-  progress.SetMaximumSteps(net.GetNumPoints());
+  progress.SetMaximumSteps(cnet.GetNumPoints());
   progress.CheckStatus();
 
-  for (int cp = 0; cp < net.GetNumPoints(); cp++) {
-    ControlPoint *point = net.GetPoint(cp);
+  for (int cp = 0; cp < cnet.GetNumPoints(); cp++) {
+    ControlPoint *point = cnet.GetPoint(cp);
     ControlMeasure *cm = point->GetRefMeasure();
 
     Cube *cube = manager.OpenCube(snl.Filename(cm->GetCubeSerialNumber()));
@@ -364,3 +413,4 @@ void SetControlPointLatLon(const std::string &incubes, const std::string &cnet) 
 
   manager.CleanCubes();
 }
+
