@@ -324,8 +324,6 @@ namespace Isis
     pointTreeView->setModel(pointModel);
     connect(pointTreeView, SIGNAL(activated()),
         this, SLOT(activatePointView()));
-//    connect(pointTreeView, SIGNAL(selectionChanged()),
-//        this, SLOT(pointTreeViewSelectionChanged()));
   }
 
 

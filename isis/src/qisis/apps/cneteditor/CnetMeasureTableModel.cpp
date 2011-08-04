@@ -35,6 +35,8 @@ namespace Isis
   {
     connect(model, SIGNAL(filterCountsChanged(int, int)),
         this, SLOT(calculateFilterCounts()));
+    connect(model, SIGNAL(selectionChanged(QList< AbstractTreeItem * >)),
+            this, SLOT(handleSelectionChanged(QList< AbstractTreeItem * >)));
   }
 
 

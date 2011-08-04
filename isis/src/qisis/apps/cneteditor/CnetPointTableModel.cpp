@@ -31,7 +31,7 @@ using std::cerr;
 namespace Isis
 {
   CnetPointTableModel::CnetPointTableModel(TreeModel * model) :
-    AbstractCnetTableModel(model, new CnetPointTableDelegate)
+      AbstractCnetTableModel(model, new CnetPointTableDelegate)
   {
     connect(model, SIGNAL(filterCountsChanged(int, int)),
             this, SIGNAL(filterCountsChanged(int, int)));
@@ -46,14 +46,14 @@ namespace Isis
 
 
   QList< AbstractTreeItem * > CnetPointTableModel::getItems(
-    int start, int end)
+      int start, int end)
   {
     return getDataModel()->getItems(start, end, TreeModel::PointItems, true);
   }
 
 
   QList< AbstractTreeItem * > CnetPointTableModel::getItems(
-    AbstractTreeItem * item1, AbstractTreeItem * item2)
+      AbstractTreeItem * item1, AbstractTreeItem * item2)
   {
     return getDataModel()->getItems(item1, item2, TreeModel::PointItems, true);
   }
