@@ -143,6 +143,10 @@ namespace Isis
       disconnect(model, SIGNAL(modelModified()), this, SLOT(refresh()));
       disconnect(model, SIGNAL(filterProgressChanged(int)),
                  this, SLOT(updateItemList()));
+      disconnect(this,
+                 SIGNAL(tableSelectionChanged(QList< AbstractTreeItem * >)),
+                 model,
+                 SIGNAL(tableSelectionChanged(QList< AbstractTreeItem * >)));
       disconnect(model, SIGNAL(selectionChanged(QList<AbstractTreeItem*>)),
                  this, SLOT(scrollTo(QList<AbstractTreeItem*>)));
     }
@@ -150,10 +154,12 @@ namespace Isis
     model = someModel;
     connect(model, SIGNAL(modelModified()), this, SLOT(refresh()));
     connect(model, SIGNAL(filterProgressChanged(int)),
-        this, SLOT(updateItemList()));
+            this, SLOT(updateItemList()));
     connect(this, SIGNAL(modelDataChanged()),
             model, SLOT(applyFilter()));
-    connect(model, SIGNAL(selectionChanged(QList<AbstractTreeItem*>)),
+    connect(this, SIGNAL(tableSelectionChanged(QList< AbstractTreeItem * >)),
+            model, SIGNAL(tableSelectionChanged(QList< AbstractTreeItem * >)));
+    connect(model, SIGNAL(treeSelectionChanged(QList<AbstractTreeItem*>)),
             this, SLOT(scrollTo(QList<AbstractTreeItem*>)));
 
     refresh();
@@ -335,7 +341,6 @@ namespace Isis
         // row selections
         if (rowNum >= 0 && rowNum < items->size())
         {
-          // There is no active cell, maybe they clicked on the row number column.
           int columnNum = getColumnFromScreenX(event->pos().x());
 
           if (columnNum != -1)
@@ -344,25 +349,47 @@ namespace Isis
             if (column->getTitle().isEmpty())
             {
               clearColumnSelection();
+              
+              AbstractTreeItem * const & item = items->at(rowNum);
+              QList< AbstractTreeItem * > newlySelectedItems;
 
               if (event->modifiers() & Qt::ControlModifier)
               {
-                items->at(rowNum)->setSelected(!items->at(rowNum)->isSelected());
-                lastDirectlySelectedRow = items->at(rowNum);
+                item->setSelected(!item->isSelected());
+                lastDirectlySelectedRow = item;
+                newlySelectedItems.append(item);
               }
               else
               {
                 if (event->modifiers() & Qt::ShiftModifier)
                 {
-                  updateRowGroupSelection(rowNum);
+                  newlySelectedItems = updateRowGroupSelection(rowNum);
                 }
                 else
                 {
                   model->setGlobalSelection(false);
-                  items->at(rowNum)->setSelected(true);
-                  lastDirectlySelectedRow = items->at(rowNum);
+                  item->setSelected(true);
+                  lastDirectlySelectedRow = item;
+                  newlySelectedItems.append(item);
                 }
               }
+              
+              QList< AbstractTreeItem * > tmp = newlySelectedItems;
+              newlySelectedItems.clear();
+              foreach (AbstractTreeItem * i, tmp)
+              {
+                newlySelectedItems.append(i);
+                if (i->getPointerType() == AbstractTreeItem::Point)
+                {
+                  foreach (AbstractTreeItem * child, i->getChildren())
+                  {
+                    child->setSelected(true);
+                    newlySelectedItems.append(child);
+                  }
+                }
+              }
+              
+              emit tableSelectionChanged(newlySelectedItems);
             }
           }
         }
@@ -372,7 +399,7 @@ namespace Isis
       editWidget = NULL;
 
       viewport()->update();
-      emit selectionChanged();
+      emit tableSelectionChanged();
     }
   }
 
@@ -412,7 +439,23 @@ namespace Isis
             if (columnNum != -1)
             {
               clearColumnSelection();
-              updateRowGroupSelection(rowNum);
+              
+              QList< AbstractTreeItem * > tmp = updateRowGroupSelection(rowNum);
+              QList< AbstractTreeItem * > newlySelectedItems;
+              foreach (AbstractTreeItem * i, tmp)
+              {
+                newlySelectedItems.append(i);
+                if (i->getPointerType() == AbstractTreeItem::Point)
+                {
+                  foreach (AbstractTreeItem * child, i->getChildren())
+                  {
+                    child->setSelected(true);
+                    newlySelectedItems.append(child);
+                  }
+                }
+              }
+              
+              emit tableSelectionChanged(newlySelectedItems);
             }
           }
         }
@@ -431,7 +474,7 @@ namespace Isis
         }
 
         viewport()->update();
-        emit selectionChanged();
+        emit tableSelectionChanged();
       }
     }
   }
@@ -453,7 +496,7 @@ namespace Isis
       model->setGlobalSelection(true);
       viewport()->update();
 
-      emit selectionChanged();
+      emit tableSelectionChanged();
     }
     else if (event->key() == Qt::Key_Delete)
     {
@@ -1018,7 +1061,7 @@ namespace Isis
       lastShiftSelection->clear();
     }
 
-    foreach(AbstractTreeItem * row, *lastShiftSelection)
+    foreach (AbstractTreeItem * row, *lastShiftSelection)
     {
       if (rowsWithActiveColumnSelected->indexOf(row) == -1)
         rowsWithActiveColumnSelected->append(row);
@@ -1026,10 +1069,15 @@ namespace Isis
   }
 
 
-  void CnetTableViewContent::updateRowGroupSelection(int lastRow)
+  QList< AbstractTreeItem * >
+      CnetTableViewContent::updateRowGroupSelection(int lastRow)
   {
-    foreach(AbstractTreeItem * row, *lastShiftSelection)
+    foreach (AbstractTreeItem * row, *lastShiftSelection)
     {
+      if (row->getPointerType() == AbstractTreeItem::Point)
+        foreach (AbstractTreeItem * child, row->getChildren())
+          child->setSelected(false);
+          
       row->setSelected(false);
     }
 
@@ -1043,10 +1091,14 @@ namespace Isis
       lastShiftSelection->clear();
     }
 
-    foreach(AbstractTreeItem * row, *lastShiftSelection)
+    QList< AbstractTreeItem * > newlySelectedItems;
+    foreach (AbstractTreeItem * row, *lastShiftSelection)
     {
       row->setSelected(true);
+      newlySelectedItems.append(row);
     }
+    
+    return newlySelectedItems;
   }
 
 

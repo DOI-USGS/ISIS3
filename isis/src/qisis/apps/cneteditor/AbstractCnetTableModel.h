@@ -4,6 +4,9 @@
 
 #include <QObject>
 
+// can't forward declare the InternalPointerType enum
+#include "AbstractTreeItem.h"
+
 
 template< class T > class QList;
 
@@ -11,7 +14,6 @@ template< class T > class QList;
 namespace Isis
 {
   class AbstractCnetTableDelegate;
-  class AbstractTreeItem;
   class CnetTableColumn;
   class CnetTableColumnList;
   class TreeModel;
@@ -52,12 +54,16 @@ namespace Isis
       void rebuildProgressRangeChanged(int, int);
       void filterCountsChanged(int visibleTopLevelItemCount,
           int topLevelItemCount);
-      void selectionChanged(QList<AbstractTreeItem *>);
-
-
+      void treeSelectionChanged(QList<AbstractTreeItem *>);
+      void tableSelectionChanged(QList<AbstractTreeItem *>);
+      
+      
     protected:
       TreeModel * getDataModel();
       const TreeModel * getDataModel() const;
+      void handleTreeSelectionChanged(
+          QList< AbstractTreeItem * > newlySelectedItems,
+          AbstractTreeItem::InternalPointerType);
 
 
     private:

@@ -32,8 +32,8 @@ namespace Isis
 
 
     signals:
-      void selectionChanged();
-      void selectionChanged(QList< AbstractTreeItem * >);
+      void treeSelectionChanged();
+      void treeSelectionChanged(QList< AbstractTreeItem * >);
 
 
     public slots:
@@ -67,6 +67,8 @@ namespace Isis
 
 
     private slots:
+      void scrollTo(QList< AbstractTreeItem * >);
+      void scrollTo(AbstractTreeItem *);
       void setAlternatingRowColors(bool);
       void updateItemList();
 

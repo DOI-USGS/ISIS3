@@ -23,7 +23,7 @@ namespace Isis
     content = new CnetTreeViewContent(this);
     header = new CnetTreeViewHeader(content, this);
     connect(header, SIGNAL(activated()), this, SIGNAL(activated()));
-    connect(content, SIGNAL(selectionChanged()),
+    connect(content, SIGNAL(treeSelectionChanged()),
         this, SIGNAL(selectionChanged()));
 //     content->setContextMenuPolicy(Qt::CustomContextMenu);
     

@@ -35,11 +35,14 @@ namespace Isis
 
       static QString getMeasureWarningMessage(AbstractTreeItem const *,
           CnetTableColumn const *, QString valueToSave);
+      
+      
+    public slots:
+      void handleTreeSelectionChanged(QList< AbstractTreeItem * >);
 
 
     private slots:
       void calculateFilterCounts();
-      void handleSelectionChanged(QList< AbstractTreeItem * >);
 
 
     private:

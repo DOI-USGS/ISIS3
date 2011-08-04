@@ -38,16 +38,17 @@ namespace Isis
     signals:
       void rebuildModels(QList<AbstractTreeItem *>);
       void modelDataChanged();
-      void selectionChanged();
+      void tableSelectionChanged();
+      void tableSelectionChanged(QList< AbstractTreeItem * >);
       void horizontalScrollBarValueChanged(int);
 
 
     public slots:
-      void refresh();
-      void updateHorizontalScrollBar(bool scrollRight = false);
       void scrollTo(QList< AbstractTreeItem * >);
       void scrollTo(AbstractTreeItem *);
-
+      void refresh();
+      void updateHorizontalScrollBar(bool scrollRight = false);
+      
 
     protected:
       bool eventFilter(QObject * target, QEvent * event);
@@ -88,7 +89,7 @@ namespace Isis
       void updateActiveCell(QPoint);
       void updateHoveredCell(QPoint, bool);
       void updateColumnGroupSelection(AbstractTreeItem *);
-      void updateRowGroupSelection(int lastRow);
+      QList< AbstractTreeItem * > updateRowGroupSelection(int lastRow);
 
 
     private slots:

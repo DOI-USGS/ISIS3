@@ -25,17 +25,19 @@ namespace Isis
     content = new CnetTableViewContent(columns);
     header = new CnetTableViewHeader(columns);
 
-    connect(content, SIGNAL(selectionChanged()),
-        this, SIGNAL(selectionChanged()));
+    connect(content, SIGNAL(tableSelectionChanged()),
+            this, SIGNAL(selectionChanged()));
     connect(content, SIGNAL(rebuildModels(QList<AbstractTreeItem *>)),
-        this, SIGNAL(rebuildModels(QList<AbstractTreeItem *>)));
+            this, SIGNAL(rebuildModels(QList<AbstractTreeItem *>)));
     connect(content, SIGNAL(horizontalScrollBarValueChanged(int)),
-        header, SLOT(updateHeaderOffset(int)));
+            header, SLOT(updateHeaderOffset(int)));
     connect(content, SIGNAL(modelDataChanged()),
             this, SIGNAL(modelDataChanged()));
+    connect(content, SIGNAL(tableSelectionChanged(QList<AbstractTreeItem*>)),
+            this, SIGNAL(tableSelectionChanged(QList<AbstractTreeItem*>)));
 
     connect(header, SIGNAL(columnResized(bool)),
-        content, SLOT(updateHorizontalScrollBar(bool)));
+            content, SLOT(updateHorizontalScrollBar(bool)));
     
     QVBoxLayout * layout = new QVBoxLayout;
     layout->addWidget(header);

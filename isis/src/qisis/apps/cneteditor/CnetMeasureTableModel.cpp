@@ -35,8 +35,8 @@ namespace Isis
   {
     connect(model, SIGNAL(filterCountsChanged(int, int)),
         this, SLOT(calculateFilterCounts()));
-    connect(model, SIGNAL(selectionChanged(QList< AbstractTreeItem * >)),
-            this, SLOT(handleSelectionChanged(QList< AbstractTreeItem * >)));
+    connect(model, SIGNAL(treeSelectionChanged(QList< AbstractTreeItem * >)),
+            this, SLOT(handleTreeSelectionChanged(QList< AbstractTreeItem * >)));
   }
 
 
@@ -120,7 +120,8 @@ namespace Isis
 
     if (colType == AbstractMeasureItem::EditLock &&
         valueToSave.toLower() == "no" &&
-        row->getData(colTitle).toLower() == "yes") {
+        row->getData(colTitle).toLower() == "yes")
+    {
       QString pointColTitle =
           AbstractMeasureItem::getColumnName(AbstractMeasureItem::PointId);
       warningText = "Are you sure you want to unlock control measure [" +
@@ -132,17 +133,11 @@ namespace Isis
   }
   
   
-  void CnetMeasureTableModel::handleSelectionChanged(
+  void CnetMeasureTableModel::handleTreeSelectionChanged(
       QList< AbstractTreeItem * > newlySelectedItems)
   {
-    QList< AbstractTreeItem * > interestingSelectedItems;
-    foreach (AbstractTreeItem * item, newlySelectedItems)
-    {
-      if (item->getPointerType() == AbstractTreeItem::Measure)
-        interestingSelectedItems.append(item);
-    }
-    
-    emit selectionChanged(interestingSelectedItems);
+    AbstractCnetTableModel::handleTreeSelectionChanged(
+        newlySelectedItems, AbstractTreeItem::Measure);
   }
 }
 

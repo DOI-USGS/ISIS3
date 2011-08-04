@@ -78,7 +78,8 @@ namespace Isis
       void filterProgressRangeChanged(int, int);
       void rebuildProgressChanged(int);
       void rebuildProgressRangeChanged(int, int);
-      void selectionChanged(QList<AbstractTreeItem *>);
+      void treeSelectionChanged(QList<AbstractTreeItem *>);
+      void tableSelectionChanged(QList<AbstractTreeItem *>);
 
       /**
        * This signal is emitted after filtering to provide the number of

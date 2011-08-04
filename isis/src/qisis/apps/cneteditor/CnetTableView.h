@@ -47,7 +47,8 @@ namespace Isis
       void rebuildModels(QList<AbstractTreeItem *>);
       void selectionChanged();
       void modelDataChanged();
-
+      void tableSelectionChanged(QList< AbstractTreeItem * >);
+      
 
     private: // disable copying and assigning of this class
       CnetTableView(const CnetTableView &);

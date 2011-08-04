@@ -421,7 +421,7 @@ namespace Isis
     
     connect(pointTableView, SIGNAL(rebuildModels(QList<AbstractTreeItem *>)),
             this, SLOT(rebuildModels(QList<AbstractTreeItem *>)));
-
+    
     for (int i = 0; i < AbstractPointItem::COLS; i++)
     {
       QAction * act = new QAction(
@@ -440,6 +440,12 @@ namespace Isis
   {
     measureTableView = new CnetTableView();
     measureTableModel = new CnetMeasureTableModel(pointModel);
+    ASSERT(pointTableView);
+    connect(pointTableView,
+            SIGNAL(tableSelectionChanged(QList< AbstractTreeItem * >)),
+            measureTableModel,
+            SLOT(handleTreeSelectionChanged(QList<AbstractTreeItem*>)));
+    
     measureTableView->setModel(measureTableModel);
     connect(measureTableView, SIGNAL(modelDataChanged()),
             this, SIGNAL(cnetModified()));

@@ -35,8 +35,8 @@ namespace Isis
   {
     connect(model, SIGNAL(filterCountsChanged(int, int)),
             this, SIGNAL(filterCountsChanged(int, int)));
-    connect(model, SIGNAL(selectionChanged(QList< AbstractTreeItem * >)),
-            this, SLOT(handleSelectionChanged(QList< AbstractTreeItem * >)));
+    connect(model, SIGNAL(treeSelectionChanged(QList< AbstractTreeItem * >)),
+            this, SLOT(handleTreeSelectionChanged(QList< AbstractTreeItem * >)));
   }
 
 
@@ -116,17 +116,11 @@ namespace Isis
   }
   
   
-  void CnetPointTableModel::handleSelectionChanged(
+  void CnetPointTableModel::handleTreeSelectionChanged(
       QList< AbstractTreeItem * > newlySelectedItems)
   {
-    QList< AbstractTreeItem * > interestingSelectedItems;
-    foreach (AbstractTreeItem * item, newlySelectedItems)
-    {
-      if (item->getPointerType() == AbstractTreeItem::Point)
-        interestingSelectedItems.append(item);
-    }
-    
-    emit selectionChanged(interestingSelectedItems);
+    AbstractCnetTableModel::handleTreeSelectionChanged(
+        newlySelectedItems, AbstractTreeItem::Point);
   }
 }
 

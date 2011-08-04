@@ -108,16 +108,24 @@ namespace Isis
     {
       disconnect(model, SIGNAL(modelModified()), this, SLOT(refresh()));
       disconnect(model, SIGNAL(filterProgressChanged(int)),
-          this, SLOT(updateItemList()));
+                 this, SLOT(updateItemList()));
+      disconnect(this,
+                 SIGNAL(treeSelectionChanged(QList< AbstractTreeItem * >)),
+                 model,
+                 SIGNAL(treeSelectionChanged(QList< AbstractTreeItem * >)));
+      disconnect(model, SIGNAL(tableSelectionChanged(QList<AbstractTreeItem*>)),
+                 this, SLOT(scrollTo(QList<AbstractTreeItem*>)));
     }
 
     model = someModel;
     connect(model, SIGNAL(modelModified()), this, SLOT(refresh()));
     connect(model, SIGNAL(filterProgressChanged(int)),
-        this, SLOT(updateItemList()));
-    connect(this, SIGNAL(selectionChanged(QList<AbstractTreeItem*>)),
-            model, SIGNAL(selectionChanged(QList<AbstractTreeItem*>)));
-
+            this, SLOT(updateItemList()));
+    connect(this, SIGNAL(treeSelectionChanged(QList< AbstractTreeItem * >)),
+            model, SIGNAL(treeSelectionChanged(QList< AbstractTreeItem * >)));
+    connect(model, SIGNAL(tableSelectionChanged(QList<AbstractTreeItem*>)),
+            this, SLOT(scrollTo(QList<AbstractTreeItem*>)));
+    
     refresh();
   }
 
@@ -265,7 +273,7 @@ namespace Isis
             }
           }
           
-          emit selectionChanged(newlySelectedItems);
+          emit treeSelectionChanged(newlySelectedItems);
         }
       }
     }
@@ -339,7 +347,7 @@ namespace Isis
     {
       model->setGlobalSelection(true);
       viewport()->update();
-      emit selectionChanged();
+      emit treeSelectionChanged();
     }
     else
     {
@@ -611,5 +619,40 @@ namespace Isis
     }
 
     return arrowRect;
+  }
+  
+  void CnetTreeViewContent::scrollTo(
+      QList< AbstractTreeItem * > newlySelectedItems)
+  {
+    if (newlySelectedItems.size())
+      scrollTo(newlySelectedItems.last());
+  }
+  
+  
+  void CnetTreeViewContent::scrollTo(AbstractTreeItem * newlySelectedItem)
+  {
+    if (newlySelectedItem->getPointerType() == AbstractTreeItem::Measure)
+      newlySelectedItem->parent()->setExpanded(true);
+    
+    int row = getModel()->indexOfVisibleItem(newlySelectedItem);
+    
+    if (row >= 0)
+    {
+      int topRow = verticalScrollBar()->value();
+      
+      if (row < topRow)
+      {
+        verticalScrollBar()->setValue(row);
+      }
+      else
+      {
+        int wholeVisibleRowCount = viewport()->height() / rowHeight;
+        int bottomRow = topRow + wholeVisibleRowCount;
+        if (row > bottomRow)
+          verticalScrollBar()->setValue(row - wholeVisibleRowCount + 1);
+      }
+    }
+    
+    viewport()->update();
   }
 }

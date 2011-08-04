@@ -37,13 +37,13 @@ namespace Isis
           CnetTableColumn const *, QString valueToSave);
       
       
+    public slots:
+      void handleTreeSelectionChanged(QList< AbstractTreeItem * >);
+      
+      
     private:
       CnetPointTableModel(const CnetPointTableModel &);
       CnetPointTableModel & operator=(CnetPointTableModel);
-      
-      
-    private slots:
-      void handleSelectionChanged(QList< AbstractTreeItem * >);
   };
 }
 
