@@ -19,7 +19,7 @@ namespace Isis {
   class iString;
 }
 
-namespace Qisis {
+namespace Isis {
   class MdiCubeViewport;
 
   /**
@@ -167,10 +167,10 @@ namespace Qisis {
 
 
       int p_numLinked;//!< number of linked viewports
-      Isis::iString p_path;//!< filename path
-      Isis::iString p_fname;//!< filename
+      iString p_path;//!< filename path
+      iString p_fname;//!< filename
 
-      Qisis::TableMainWindow *p_tableWin;//!< table window
+      TableMainWindow *p_tableWin;//!< table window
       RubberBandComboBox *p_rubberBand;//!< rubberband combo box
       QCheckBox *p_showAllSegments;
   };

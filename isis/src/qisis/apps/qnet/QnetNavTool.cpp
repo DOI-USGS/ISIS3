@@ -43,11 +43,10 @@
 #include "SurfacePoint.h"
 
 #include "qnet.h"
-using namespace Qisis::Qnet;
-using namespace Isis;
+using namespace Isis::Qnet;
 using namespace std;
 
-namespace Qisis {
+namespace Isis {
   /**
    * Consructs the Navigation Tool window
    *
@@ -60,7 +59,7 @@ namespace Qisis {
    *   @history 2010-06-03 Jeannie Walldren - Initialized pointers to null.
    *
    */
-  QnetNavTool::QnetNavTool(QWidget *parent) : Qisis::Tool(parent) {
+  QnetNavTool::QnetNavTool(QWidget *parent) : Tool(parent) {
     p_navDialog = NULL;
     p_filter = NULL;
     p_tie = NULL;
@@ -465,7 +464,7 @@ namespace Qisis {
           this, SLOT(load(QListWidgetItem *)));
       //p_listBox->setSelectionMode(QAbstractItemView::ExtendedSelection);
       for (int i = 0; i < g_serialNumberList->Size(); i++) {
-        Isis::Filename filename = Isis::Filename(g_serialNumberList->Filename(i));
+        Filename filename = Filename(g_serialNumberList->Filename(i));
         string tempFilename = filename.Name();
         p_listBox->insertItem(i, tempFilename.c_str());
       }
@@ -566,7 +565,7 @@ namespace Qisis {
     // We are dealing with images so write out the cube names
     else if (p_listCombo->currentIndex() == Cubes) {
       for (int i = 0; i < g_filteredImages.size(); i++) {
-        Isis::Filename filename = Isis::Filename(g_serialNumberList->Filename(g_filteredImages[i]));
+        Filename filename = Filename(g_serialNumberList->Filename(g_filteredImages[i]));
         string tempFilename = filename.Name();
         p_listBox->insertItem(i, tempFilename.c_str());
       }

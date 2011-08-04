@@ -16,9 +16,7 @@
 #include "Histogram.h"
 #include "HistogramWidget.h"
 
-using namespace Isis;
-
-namespace Qisis {
+namespace Isis {
   /**
    * This constructs a stretch type. It provides a main layout,
    * sizing policies, and a few widgets. Children should insert
@@ -29,8 +27,8 @@ namespace Qisis {
    * @param name
    * @param color
    */
-  StretchType::StretchType(const Isis::Histogram &hist,
-                           const Isis::Stretch &stretch,
+  StretchType::StretchType(const Histogram &hist,
+                           const Stretch &stretch,
                            const QString &name, const QColor &color) {
     p_stretch = NULL;
     p_table = NULL;
@@ -89,7 +87,7 @@ namespace Qisis {
    *
    * @param hist
    */
-  void StretchType::setHistogram(const Isis::Histogram &hist) {
+  void StretchType::setHistogram(const Histogram &hist) {
     p_graph->setHistogram(hist);
     *p_cubeHist = hist;
     setStretch(*p_stretch);
@@ -161,7 +159,7 @@ namespace Qisis {
     QString currentText;
     QTextStream stream(&outfile);
 
-    Isis::Stretch stretch = getStretch();
+    Stretch stretch = getStretch();
 
     //Add the pairs to the file
     stream << stretch.Text().c_str() << endl;
@@ -173,9 +171,9 @@ namespace Qisis {
   /**
    * Returns the current stretch object
    *
-   * @return Isis::Stretch
+   * @return Stretch
    */
-  Isis::Stretch StretchType::getStretch() {
+  Stretch StretchType::getStretch() {
     return *p_stretch;
   }
 }

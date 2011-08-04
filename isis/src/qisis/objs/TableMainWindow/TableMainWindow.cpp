@@ -5,14 +5,14 @@
 #include <iostream>
 #include "TableMainWindow.h"
 
-namespace Qisis {
+namespace Isis {
   /**
    * Constructs a new TableMainWindow object
    *
    * @param title
    * @param parent
    */
-  TableMainWindow::TableMainWindow(QString title, QWidget *parent) : Qisis::MainWindow(title, parent) {
+  TableMainWindow::TableMainWindow(QString title, QWidget *parent) : MainWindow(title, parent) {
     p_parent = parent;
     connect(p_parent, SIGNAL(closeWindow()), this, SLOT(writeSettings()));
     p_title = title;
@@ -512,7 +512,7 @@ namespace Qisis {
     //Now read the settings that are specific to this window.
     std::string instanceName = this->windowTitle().toStdString();
 
-    Isis::Filename config("$HOME/.Isis/" + appName + "/" + instanceName + ".config");
+    Filename config("$HOME/.Isis/" + appName + "/" + instanceName + ".config");
     //if(p_settings != 0) delete p_settings;
     p_settings = new QSettings(QString::fromStdString(config.Expanded()), QSettings::NativeFormat);
     bool docFloats = p_settings->value("docFloat", false).toBool();
@@ -546,7 +546,7 @@ namespace Qisis {
     //Now read the settings that are specific to this window.
     std::string instanceName = this->windowTitle().toStdString();
 
-    Isis::Filename config("$HOME/.Isis/" + appName + "/" + instanceName + ".config");
+    Filename config("$HOME/.Isis/" + appName + "/" + instanceName + ".config");
     QSettings settings(QString::fromStdString(config.Expanded()), QSettings::NativeFormat);
 
     QString itemTitle = "item-" + item->text();
@@ -574,7 +574,7 @@ namespace Qisis {
     /*Now read the settings that are specific to this window.*/
     std::string instanceName = this->windowTitle().toStdString();
 
-    Isis::Filename config("$HOME/.Isis/" + appName + "/" + instanceName + ".config");
+    Filename config("$HOME/.Isis/" + appName + "/" + instanceName + ".config");
     QSettings settings(QString::fromStdString(config.Expanded()), QSettings::NativeFormat);
 
     settings.setValue("docFloat", p_dock->isFloating());

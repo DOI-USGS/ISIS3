@@ -5,7 +5,7 @@
 
 #include "MainWindow.h"
 
-namespace Qisis {
+namespace Isis {
   class ToolPad;
 }
 
@@ -26,7 +26,7 @@ namespace Isis {
   *  @history 2010-05-10 Christopher Austin - added cnet connectivity
   *           functionality
   */
-  class MosaicMainWindow : public Qisis::MainWindow {
+  class MosaicMainWindow : public MainWindow {
       Q_OBJECT
     public:
       MosaicMainWindow(QString title, QWidget *parent = 0);
@@ -40,7 +40,7 @@ namespace Isis {
         return p_activeToolbar;
       }
 
-      Qisis::ToolPad *toolPad() {
+      ToolPad *toolPad() {
         return p_toolpad;
       }
 
@@ -85,7 +85,7 @@ namespace Isis {
 
       bool m_controllerVisible;
       
-      Qisis::ToolPad *p_toolpad; //!< Tool pad on this mainwindow
+      ToolPad *p_toolpad; //!< Tool pad on this mainwindow
 
       QToolBar *p_permToolbar; //!< Tool bar attached to mainwindow
       QToolBar *p_activeToolbar; //!< The active toolbar

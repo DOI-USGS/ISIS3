@@ -3,9 +3,8 @@
 #include "SerialNumberList.h"
 
 #include "qnet.h"
-using namespace Qisis::Qnet;
 
-namespace Qisis {
+namespace Isis {
   // Constructor
   QnetFilter::QnetFilter(QWidget *parent) : QWidget(parent) {
   }

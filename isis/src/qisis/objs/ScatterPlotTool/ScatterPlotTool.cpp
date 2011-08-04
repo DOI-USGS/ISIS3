@@ -5,14 +5,14 @@
 #include "ScatterPlotWindow.h"
 #include "ToolPad.h"
 
-namespace Qisis {
+namespace Isis {
 
   /**
    * ScatterPlotTool constructor.
    *
    * @param parent
    */
-  ScatterPlotTool::ScatterPlotTool(QWidget *parent): Qisis::Tool(parent) {
+  ScatterPlotTool::ScatterPlotTool(QWidget *parent): Tool(parent) {
     p_parent = parent;
     createWindow();
   }

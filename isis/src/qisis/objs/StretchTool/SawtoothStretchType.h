@@ -13,7 +13,7 @@ class QLineEdit;
 class QColor;
 class QString;
 
-namespace Qisis {
+namespace Isis {
   /**
    * @brief This handles the advanced sawtooth stretch
    *
@@ -35,11 +35,11 @@ namespace Qisis {
       Q_OBJECT
 
     public:
-      SawtoothStretchType(const Isis::Histogram &, const Isis::Stretch &,
+      SawtoothStretchType(const Histogram &, const Stretch &,
                           const QString &name, const QColor &color);
       ~SawtoothStretchType();
 
-      virtual void setStretch(Isis::Stretch);
+      virtual void setStretch(Stretch);
 
 
     private slots:
@@ -49,8 +49,8 @@ namespace Qisis {
       void widthEditChanged(const QString &);
 
     private:
-      Isis::Stretch calculateNewStretch();
-      Isis::Stretch calculateNewStretch(double, double);
+      Stretch calculateNewStretch();
+      Stretch calculateNewStretch(double, double);
 
     private:
       QSlider *p_offsetSlider; //!< Offset slider

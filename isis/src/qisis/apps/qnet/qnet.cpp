@@ -26,103 +26,105 @@
 
 void startMonitoringMemory();
 void stopMonitoringMemory();
+
+using namespace Isis;
 using namespace std;
 
 int main(int argc, char *argv[]) {
 #ifdef CWDEBUG
   startMonitoringMemory();
 #endif
-  Qisis::Qnet::g_controlNetwork = NULL;
-  Qisis::Qnet::g_serialNumberList = NULL;
+  Qnet::g_controlNetwork = NULL;
+  Qnet::g_serialNumberList = NULL;
 
   try {
-    Qisis::QIsisApplication *app = new Qisis::QIsisApplication(argc,argv);
+    QIsisApplication *app = new QIsisApplication(argc,argv);
     QApplication::setApplicationName("qnet");
 
     // check for forcing of gui style
-    Isis::PvlGroup &uiPref = Isis::Preference::Preferences().FindGroup(
+    PvlGroup &uiPref = Preference::Preferences().FindGroup(
         "UserInterface");
     if (uiPref.HasKeyword("GuiStyle")) {
       string style = uiPref["GuiStyle"];
-      QApplication::setStyle((Isis::iString) style);
+      QApplication::setStyle((iString) style);
     }
 
     // Add the Qt plugin directory to the library path
-    Isis::Filename qtpluginpath("$ISISROOT/3rdParty/plugins");
+    Filename qtpluginpath("$ISISROOT/3rdParty/plugins");
     QCoreApplication::addLibraryPath(qtpluginpath.Expanded().c_str());
 
-    Qisis::Qnet::g_vpMainWindow = new Qisis::ViewportMainWindow("qnet");
+    Qnet::g_vpMainWindow = new ViewportMainWindow("qnet");
 
-    Qisis::Tool *rubberBandTool = Qisis::RubberBandTool::getInstance(Qisis::Qnet::g_vpMainWindow);
-    rubberBandTool->addTo(Qisis::Qnet::g_vpMainWindow);
+    Tool *rubberBandTool = RubberBandTool::getInstance(Qnet::g_vpMainWindow);
+    rubberBandTool->addTo(Qnet::g_vpMainWindow);
 
     /**** ADD FILE TOOL FIRST SO THAT IT APPEARS FIRST IN THE PERMANENT AND MENU TOOLBARS ****/
     // adds file tool buttons and separator on permanent toolbar
     // adds to "File" dropdown of Menu toolbar
-    Qisis::QnetFileTool *ftool = new Qisis::QnetFileTool(Qisis::Qnet::g_vpMainWindow);
-    ftool->Tool::addTo(Qisis::Qnet::g_vpMainWindow);
-    Qisis::Qnet::g_vpMainWindow->permanentToolBar()->addSeparator();
+    QnetFileTool *ftool = new QnetFileTool(Qnet::g_vpMainWindow);
+    ftool->Tool::addTo(Qnet::g_vpMainWindow);
+    Qnet::g_vpMainWindow->permanentToolBar()->addSeparator();
 
-    Qisis::QnetNavTool *ntool = new Qisis::QnetNavTool(Qisis::Qnet::g_vpMainWindow);
-    ntool->Tool::addTo(Qisis::Qnet::g_vpMainWindow);
+    QnetNavTool *ntool = new QnetNavTool(Qnet::g_vpMainWindow);
+    ntool->Tool::addTo(Qnet::g_vpMainWindow);
 
     /**** ADD TOOLS TO TOOL PAD ON LEFT/RIGHT ****/
     // adds band tool button to toolpad on left
-    Qisis::Tool *btool = new Qisis::BandTool(Qisis::Qnet::g_vpMainWindow);
-    btool->addTo(Qisis::Qnet::g_vpMainWindow);
+    Tool *btool = new BandTool(Qnet::g_vpMainWindow);
+    btool->addTo(Qnet::g_vpMainWindow);
 
     // adds zoom tool button to toolpad on left
     // adds to "View" dropdown of Menu toolbar with seperator
-    Qisis::Tool *ztool = new Qisis::ZoomTool(Qisis::Qnet::g_vpMainWindow);
-    ztool->addTo(Qisis::Qnet::g_vpMainWindow);
-    Qisis::Qnet::g_vpMainWindow->getMenu("&View")->addSeparator();
+    Tool *ztool = new ZoomTool(Qnet::g_vpMainWindow);
+    ztool->addTo(Qnet::g_vpMainWindow);
+    Qnet::g_vpMainWindow->getMenu("&View")->addSeparator();
 
     // adds pan tool button to toolpad on left
     // adds to "View" dropdown of Menu toolbar with seperator
-    Qisis::Tool *ptool = new Qisis::PanTool(Qisis::Qnet::g_vpMainWindow);
-    ptool->addTo(Qisis::Qnet::g_vpMainWindow);
-    Qisis::Qnet::g_vpMainWindow->getMenu("&View")->addSeparator();
+    Tool *ptool = new PanTool(Qnet::g_vpMainWindow);
+    ptool->addTo(Qnet::g_vpMainWindow);
+    Qnet::g_vpMainWindow->getMenu("&View")->addSeparator();
 
     // adds stretch tool button to toolpad on left
-    Qisis::Tool *stool = new Qisis::StretchTool(Qisis::Qnet::g_vpMainWindow);
-    stool->addTo(Qisis::Qnet::g_vpMainWindow);
+    Tool *stool = new StretchTool(Qnet::g_vpMainWindow);
+    stool->addTo(Qnet::g_vpMainWindow);
 
     // adds find tool button to toolpad on left
     // adds to "Options" dropdown of Menu toolbar
-    Qisis::Tool *findTool = new Qisis::FindTool(Qisis::Qnet::g_vpMainWindow);
-    findTool->addTo(Qisis::Qnet::g_vpMainWindow);
+    Tool *findTool = new FindTool(Qnet::g_vpMainWindow);
+    findTool->addTo(Qnet::g_vpMainWindow);
 
     // adds hist tool button to toolpad on left
     // adds PlotTool to "Options" dropdown of Menu toolbar
-    Qisis::Tool *histTool = new Qisis::HistogramTool(Qisis::Qnet::g_vpMainWindow);
-    histTool->addTo(Qisis::Qnet::g_vpMainWindow);
+    Tool *histTool = new HistogramTool(Qnet::g_vpMainWindow);
+    histTool->addTo(Qnet::g_vpMainWindow);
 
     // adds stats tool button to toolpad on left
-    Qisis::Tool *statsTool = new Qisis::StatisticsTool(Qisis::Qnet::g_vpMainWindow);
-    statsTool->addTo(Qisis::Qnet::g_vpMainWindow);
+    Tool *statsTool = new StatisticsTool(Qnet::g_vpMainWindow);
+    statsTool->addTo(Qnet::g_vpMainWindow);
 
     // adds tie tool button to toolpad on left
     // sets tie tool to active button
-    Qisis::Tool *qnetTool = new Qisis::QnetTool(Qisis::Qnet::g_vpMainWindow);
-    qnetTool->addTo(Qisis::Qnet::g_vpMainWindow);
+    Tool *qnetTool = new QnetTool(Qnet::g_vpMainWindow);
+    qnetTool->addTo(Qnet::g_vpMainWindow);
     qnetTool->activate(true);
 
     /**** ADD REMAINING TOOLS TO PERMANENT TOOL PAD ON TOP/BOTTOM ****/
     // adds adv track tool button permanent toolbar
     // adds to "Options" dropdown of Menu toolbar
-    Qisis::Tool *ttool = new Qisis::AdvancedTrackTool(Qisis::Qnet::g_vpMainWindow);
-    ttool->addTo(Qisis::Qnet::g_vpMainWindow);
+    Tool *ttool = new AdvancedTrackTool(Qnet::g_vpMainWindow);
+    ttool->addTo(Qnet::g_vpMainWindow);
 
     // adds window tool (Link viewports) button and seperator to permanent toolbar
     // adds "Windows" dropdown of Menu toolbar
-    Qisis::Tool *wtool = new Qisis::WindowTool(Qisis::Qnet::g_vpMainWindow);
-    wtool->addTo(Qisis::Qnet::g_vpMainWindow);
-    Qisis::Qnet::g_vpMainWindow->permanentToolBar()->addSeparator();
+    Tool *wtool = new WindowTool(Qnet::g_vpMainWindow);
+    wtool->addTo(Qnet::g_vpMainWindow);
+    Qnet::g_vpMainWindow->permanentToolBar()->addSeparator();
 
     // adds help tool button to permanent toolbar
     // adds "Help" dropdown of Menu toolbar
-    Qisis::Tool *htool = new Qisis::HelpTool(Qisis::Qnet::g_vpMainWindow);
-    htool->addTo(Qisis::Qnet::g_vpMainWindow);
+    Tool *htool = new HelpTool(Qnet::g_vpMainWindow);
+    htool->addTo(Qnet::g_vpMainWindow);
 
     /**** MAKE CONNECTIONS ****/
     /**** LOADING IMAGES ****/
@@ -130,8 +132,8 @@ int main(int argc, char *argv[]) {
     QObject::connect(ntool, SIGNAL(loadImage(const QString &)),
         ftool, SLOT(loadImage(const QString &)));
     // The fileTool needs to know when to load the images associated with a point
-    QObject::connect(ntool,SIGNAL(loadPointImages(Isis::ControlPoint *)),
-                     ftool,SLOT(loadPointImages(Isis::ControlPoint *)));
+    QObject::connect(ntool,SIGNAL(loadPointImages(ControlPoint *)),
+                     ftool,SLOT(loadPointImages(ControlPoint *)));
 
     /**** UPDATING LIST ****/
     // The navTool needs to know when the file tool has changed the serialNumberList
@@ -160,8 +162,8 @@ int main(int argc, char *argv[]) {
 
     /**** MODIFYING POINTS ****/
     // Qnet Tool needs to know when navTool modifies/ignores/deletes points
-    QObject::connect(ntool, SIGNAL(modifyPoint(Isis::ControlPoint *)),
-                     qnetTool, SLOT(modifyPoint(Isis::ControlPoint *)));
+    QObject::connect(ntool, SIGNAL(modifyPoint(ControlPoint *)),
+                     qnetTool, SLOT(modifyPoint(ControlPoint *)));
     QObject::connect(ntool, SIGNAL(ignoredPoints()), qnetTool, SLOT(refresh()));
     QObject::connect(ntool, SIGNAL(deletedPoints()), qnetTool, SLOT(refresh()));
     QObject::connect(ntool, SIGNAL(pointChanged(QString)),
@@ -179,8 +181,8 @@ int main(int argc, char *argv[]) {
     // 2008-11-26 Jeannie Walldren
     QObject::connect(ftool, SIGNAL(controlNetworkUpdated(QString)),
                      qnetTool, SLOT(updateNet(QString)));
-    QObject::connect(ftool, SIGNAL(newControlNetwork(Isis::ControlNet *)),
-                     qnetTool, SIGNAL(newControlNetwork(Isis::ControlNet *)));
+    QObject::connect(ftool, SIGNAL(newControlNetwork(ControlNet *)),
+                     qnetTool, SIGNAL(newControlNetwork(ControlNet *)));
     QObject::connect(qnetTool, SIGNAL(editPointChanged(QString)),
                      ntool, SLOT(updateEditPoint(QString)));
     QObject::connect(qnetTool, SIGNAL(refreshNavList()),
@@ -195,19 +197,19 @@ int main(int argc, char *argv[]) {
 
     // First hop for signal from StretchTool to ChipViewport
     QObject::connect(stool,
-        SIGNAL(stretchChipViewport(Isis::Stretch *, Qisis::CubeViewport *)),
+        SIGNAL(stretchChipViewport(Stretch *, CubeViewport *)),
         qnetTool,
-        SIGNAL(stretchChipViewport(Isis::Stretch *, Qisis::CubeViewport *)));
+        SIGNAL(stretchChipViewport(Stretch *, CubeViewport *)));
 
 
     /**** EXITING ****/
     // Connect the viewport's close signal to the file tool's exit method
     // Added 2008-12-04 by Jeannie Walldren
-    QObject::connect(Qisis::Qnet::g_vpMainWindow , SIGNAL(closeWindow()),
+    QObject::connect(Qnet::g_vpMainWindow , SIGNAL(closeWindow()),
                      ftool, SLOT(exit()));
     //-----------------------------------------------------------------
 
-    Qisis::Qnet::g_vpMainWindow->show();
+    Qnet::g_vpMainWindow->show();
     int status = app->exec();
 
     delete ftool;
@@ -236,15 +238,15 @@ int main(int argc, char *argv[]) {
     wtool = NULL;
     delete htool;
     htool = NULL;
-    delete Qisis::Qnet::g_vpMainWindow;
-    Qisis::Qnet::g_vpMainWindow = NULL;
+    delete Qnet::g_vpMainWindow;
+    Qnet::g_vpMainWindow = NULL;
     delete app;
     app = NULL;
 
     return status;
 
   }
-  catch (Isis::iException &e) {
+  catch (iException &e) {
     e.Report();
   }
 }

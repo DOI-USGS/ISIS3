@@ -13,7 +13,7 @@
 #include <qwt_plot_zoomer.h>
 #include <qwt_scale_engine.h>
 
-namespace Qisis {
+namespace Isis {
   /**
    * HistogramWidget constructor. Initializes all of the widgets and sets the plot
    * title, histogram curve's color and stretch curve's color.
@@ -62,7 +62,7 @@ namespace Qisis {
    *
    * @param hist
    */
-  void HistogramWidget::setHistogram(const Isis::Histogram &hist) {
+  void HistogramWidget::setHistogram(const Histogram &hist) {
     std::vector<double> xarray, yarray;
     for(int i = 0; i < hist.Bins(); i++) {
       if(hist.BinCount(i) > 0) {
@@ -120,7 +120,7 @@ namespace Qisis {
    *
    * @param stretch
    */
-  void HistogramWidget::setStretch(Isis::Stretch stretch) {
+  void HistogramWidget::setStretch(Stretch stretch) {
     std::vector<double> xarray, yarray;
     for(int i = 0; i < stretch.Pairs(); i++) {
       xarray.push_back(stretch.Input(i));

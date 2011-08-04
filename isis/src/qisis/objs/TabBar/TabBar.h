@@ -32,7 +32,7 @@ class QWidget;
 template< class A > class QVector;
 
 
-namespace Qisis {
+namespace Isis {
   class Tab;
 
   /**

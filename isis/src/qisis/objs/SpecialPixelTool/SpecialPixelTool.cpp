@@ -19,14 +19,14 @@
 #include "Stretch.h"
 #include "Workspace.h"
 
-namespace Qisis {
+namespace Isis {
   /**
    * SpecialPixelTool constructor
    *
    *
    * @param parent
    */
-  SpecialPixelTool::SpecialPixelTool(QWidget *parent) : Qisis::Tool(parent) {
+  SpecialPixelTool::SpecialPixelTool(QWidget *parent) : Tool(parent) {
     // Create the SpecialPixel window
     p_parent = parent;
 
@@ -198,9 +198,9 @@ namespace Qisis {
       MdiCubeViewport *cvp = (*(cubeViewportList()))[i];
 
       // Get the Stretch objects from the cubeViewport
-      Isis::Stretch redStretch = cvp->redStretch();
-      Isis::Stretch greenStretch = cvp->greenStretch();
-      Isis::Stretch blueStretch = cvp->blueStretch();
+      Stretch redStretch = cvp->redStretch();
+      Stretch greenStretch = cvp->greenStretch();
+      Stretch blueStretch = cvp->blueStretch();
 
       // Apply selected null color
       QPalette palette = p_nullColor->palette();
@@ -451,7 +451,7 @@ namespace Qisis {
     /*Now read the settings that are specific to this window.*/
     std::string instanceName = p_dialog->windowTitle().toStdString();
 
-    Isis::Filename config("$HOME/.Isis/" + appName + "/" + instanceName + ".config");
+    Filename config("$HOME/.Isis/" + appName + "/" + instanceName + ".config");
     p_settings = new QSettings(QString::fromStdString(config.Expanded()), QSettings::NativeFormat);
 
     //For each special pixel value, if it exists set it, otherwise set
@@ -535,7 +535,7 @@ namespace Qisis {
     std::string instanceName = p_dialog->windowTitle().toStdString();
 
     //Write all of the special pixel value colors
-    Isis::Filename config("$HOME/.Isis/" + appName + "/" + instanceName + ".config");
+    Filename config("$HOME/.Isis/" + appName + "/" + instanceName + ".config");
     QSettings settings(QString::fromStdString(config.Expanded()), QSettings::NativeFormat);
     settings.setValue("defaultNull", p_nullDefault);
     settings.setValue("defaultLis", p_lisDefault);

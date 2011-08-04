@@ -8,7 +8,7 @@ class QGroupBox;
 class QRadioButton;
 
 
-namespace Qisis {
+namespace Isis {
   /**
    * Defines the Measure Properties filter for the QnetNavTool's
    * Points section.  This class filters points whose

@@ -3,7 +3,7 @@
 #include "BandSpinBox.h"
 #include "iException.h"
 
-namespace Qisis {
+namespace Isis {
   /**
    * BandSpinBox constructor
    *
@@ -30,13 +30,13 @@ namespace Qisis {
    * @param pvl
    * @param key
    */
-  void BandSpinBox::setBandBin(Isis::Pvl &pvl, const QString &key) {
+  void BandSpinBox::setBandBin(Pvl &pvl, const QString &key) {
     // Remove all connections and clear the keyword map
     disconnect(this, 0, 0, 0);
     p_map.clear();
 
     // Get the number of bands and setup the spin box
-    Isis::PvlGroup &dim = pvl.FindObject("IsisCube")
+    PvlGroup &dim = pvl.FindObject("IsisCube")
                           .FindObject("Core")
                           .FindGroup("Dimensions");
     p_bands = dim["Bands"];
@@ -50,7 +50,7 @@ namespace Qisis {
 
     // Add any other lists
     if(pvl.FindObject("IsisCube").HasGroup("BandBin")) {
-      Isis::PvlGroup &bandBin = pvl.FindObject("IsisCube")
+      PvlGroup &bandBin = pvl.FindObject("IsisCube")
                                 .FindGroup("BandBin");
       for(int i = 0; i < bandBin.Keywords(); i++) {
         list.clear();
@@ -101,7 +101,7 @@ namespace Qisis {
       }
     }
     else {
-      throw Isis::iException::Message(Isis::iException::Programmer,
+      throw iException::Message(iException::Programmer,
                                       "Invalid key", _FILEINFO_);
     }
   }
@@ -115,7 +115,7 @@ namespace Qisis {
    */
   void BandSpinBox::setKey(int key) {
     if((key < 0) || (key >= (int) p_map.size())) {
-      throw Isis::iException::Message(Isis::iException::Programmer,
+      throw iException::Message(iException::Programmer,
                                       "Invalid key", _FILEINFO_);
     }
     else {

@@ -40,7 +40,7 @@ class QToolBar;
 template< class T > class QVector;
 
 
-namespace Qisis {
+namespace Isis {
   class CubeViewport;
   class MdiCubeViewport;
   class ToolPad;
@@ -80,9 +80,9 @@ namespace Qisis {
     public:
       Tool(QWidget *parent);
 
-      void addTo(Qisis::ViewportMainWindow *mw);
+      void addTo(ViewportMainWindow *mw);
 
-      void addTo(Qisis::ToolPad *toolpad);
+      void addTo(ToolPad *toolpad);
 
       /**
        * requires the programmer to have this member
@@ -106,7 +106,7 @@ namespace Qisis {
        *
        * @param ws
        */
-      virtual void addTo(Qisis::Workspace *ws);
+      virtual void addTo(Workspace *ws);
 
 
       /**
@@ -132,7 +132,7 @@ namespace Qisis {
     public slots:
       void activate(bool);
       virtual void updateTool();
-      void setCubeViewport(Qisis::MdiCubeViewport *cvp);
+      void setCubeViewport(MdiCubeViewport *cvp);
 
 
     signals:
@@ -184,7 +184,7 @@ namespace Qisis {
       /**
        * @param viewport
        */
-      void registerTool(Qisis::MdiCubeViewport *viewport);
+      void registerTool(MdiCubeViewport *viewport);
 
 
     signals:
@@ -196,9 +196,9 @@ namespace Qisis {
       /**
        * Return the current cubeviewport
        *
-       * @return Qisis::CubeViewport*
+       * @return CubeViewport*
        */
-      inline Qisis::MdiCubeViewport *cubeViewport() const {
+      inline MdiCubeViewport *cubeViewport() const {
         return p_cvp;
       };
 
@@ -206,7 +206,7 @@ namespace Qisis {
       /**
        * A list of cubeviewports.
        */
-      typedef QVector< Qisis::MdiCubeViewport * > CubeViewportList;
+      typedef QVector< MdiCubeViewport * > CubeViewportList;
 
       CubeViewportList *cubeViewportList() const;
 
@@ -265,7 +265,7 @@ namespace Qisis {
       //! Anytime a tool is created, you may use the rubber band tool.
       virtual void enableRubberBandTool();
 
-      Qisis::MdiCubeViewport *p_cvp;  //!< current cubeviewport
+      MdiCubeViewport *p_cvp;  //!< current cubeviewport
       Workspace *p_workspace;
 
     private:

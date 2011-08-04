@@ -18,15 +18,15 @@ int main(int argc, char *argv[]) {
 #endif
 
   try {
-    QApplication *app = new Qisis::QIsisApplication(argc, argv);
+    QApplication *app = new QIsisApplication(argc, argv);
     QApplication::setApplicationName("qmos");
 
     // check for forcing of gui style
-//     PvlGroup &uiPref = Isis::Preference::Preferences().FindGroup(
+//     PvlGroup &uiPref = Preference::Preferences().FindGroup(
 //                                "UserInterface");
 //     if(uiPref.HasKeyword("GuiStyle")) {
 //       string style = uiPref["GuiStyle"];
-//       QApplication::setStyle((Isis::iString) style);
+//       QApplication::setStyle((iString) style);
 //     }
 
     MosaicMainWindow *mainWindow = new MosaicMainWindow("qmos");

@@ -18,7 +18,7 @@
 #include <QToolButton>
 #include <QVBoxLayout>
 
-namespace Qisis {
+namespace Isis {
 
   /**
    * Blink Tool Constructor
@@ -26,7 +26,7 @@ namespace Qisis {
    *
    * @param parent
    */
-  BlinkTool::BlinkTool(QWidget *parent) : Qisis::Tool(parent) {
+  BlinkTool::BlinkTool(QWidget *parent) : Tool(parent) {
     // Create the blink window
     p_dialog = new QDialog(parent);
     p_dialog->setWindowTitle("Blink Comparator");
@@ -173,9 +173,9 @@ namespace Qisis {
    *
    */
   void BlinkTool::updateTool() {
-    std::string unlinkedIcon = Isis::Filename("$base/icons/unlinked.png").Expanded();
+    std::string unlinkedIcon = Filename("$base/icons/unlinked.png").Expanded();
     static QIcon unlinked(unlinkedIcon.c_str());
-    std::string linkedIcon = Isis::Filename("$base/icons/linked.png").Expanded();
+    std::string linkedIcon = Filename("$base/icons/linked.png").Expanded();
     static QIcon linked(linkedIcon.c_str());
     p_listWidget->clear();
     for(int i = 0; i < (int)cubeViewportList()->size(); i++) {
@@ -313,7 +313,7 @@ namespace Qisis {
    */
   void BlinkTool::writeSettings() {
     std::string instanceName = p_dialog->windowTitle().toStdString();
-    Isis::Filename config("$HOME/.Isis/qview/" + instanceName + ".config");
+    Filename config("$HOME/.Isis/qview/" + instanceName + ".config");
     QSettings settings(QString::fromStdString(config.Expanded()), QSettings::NativeFormat);
     settings.setValue("rate", p_timeBox->value());
     settings.setValue("size", p_dialog->size());
@@ -328,7 +328,7 @@ namespace Qisis {
   void BlinkTool::readSettings() {
 
     std::string instanceName = p_dialog->windowTitle().toStdString();
-    Isis::Filename config("$HOME/.Isis/qview/" + instanceName + ".config");
+    Filename config("$HOME/.Isis/qview/" + instanceName + ".config");
     QSettings settings(QString::fromStdString(config.Expanded()), QSettings::NativeFormat);
     double rate = settings.value("rate", 0.5).toDouble();
     QSize size = settings.value("size", QSize(492, 492)).toSize();

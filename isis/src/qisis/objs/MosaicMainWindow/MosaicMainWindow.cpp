@@ -14,7 +14,6 @@
 #include "TextFile.h"
 #include "ToolPad.h"
 
-using namespace Qisis;
 
 namespace Isis {
   MosaicMainWindow::MosaicMainWindow(QString title, QWidget *parent) :
@@ -41,7 +40,7 @@ namespace Isis {
     QStatusBar *sbar = statusBar();
     sbar->showMessage("Ready");
 
-    p_toolpad = new Qisis::ToolPad("Tool Pad", this);
+    p_toolpad = new ToolPad("Tool Pad", this);
     p_toolpad->setObjectName("Tool Pad");
     // default to the right hand side for qview-like behavior... we might
     //   want to do something different here

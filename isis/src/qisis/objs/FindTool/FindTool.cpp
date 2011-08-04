@@ -22,16 +22,13 @@
 #include "UniversalGroundMap.h"
 
 
-using namespace Isis;
-
-
-namespace Qisis {
+namespace Isis {
   /**
    * Constructs a FindTool object
    *
    * @param parent
    */
-  FindTool::FindTool(QWidget *parent) : Qisis::Tool(parent) {
+  FindTool::FindTool(QWidget *parent) : Tool(parent) {
     p_dialog = NULL;
     p_findPoint = NULL;
     p_showDialogButton = NULL;

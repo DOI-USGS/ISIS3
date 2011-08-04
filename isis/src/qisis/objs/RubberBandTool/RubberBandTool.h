@@ -15,7 +15,7 @@ namespace geos {
 }
 
 
-namespace Qisis {
+namespace Isis {
   class MdiCubeViewport;
 
   /**

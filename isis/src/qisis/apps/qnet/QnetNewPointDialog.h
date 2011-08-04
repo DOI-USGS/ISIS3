@@ -10,7 +10,7 @@ class QPushButton;
 class QString;
 class QStringList;
 
-namespace Qisis {
+namespace Isis {
   /**
    * @internal
    *   @history 2008-11-26 Jeannie Walldren - Added functionality

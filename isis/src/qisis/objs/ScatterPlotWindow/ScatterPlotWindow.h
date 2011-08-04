@@ -11,7 +11,7 @@
 #include <qwt_scale_widget.h>
 
 
-namespace Qisis {
+namespace Isis {
 
   class MyZoomer: public QwtPlotZoomer {
     public:
@@ -38,7 +38,7 @@ namespace Qisis {
    */
   class ScatterPlotTool;
 
-  class ScatterPlotWindow : public Qisis::MainWindow {
+  class ScatterPlotWindow : public MainWindow {
       Q_OBJECT
 
     public:

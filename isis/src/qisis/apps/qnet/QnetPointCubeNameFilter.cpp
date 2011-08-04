@@ -7,10 +7,10 @@
 #include "SerialNumberList.h"
 #include "qnet.h"
 
-using namespace Qisis::Qnet;
+using namespace Isis::Qnet;
 using namespace std;
 
-namespace Qisis {
+namespace Isis {
   /**
    * Contructor for the Point Cube Name filter.  It creates the
    * Cube Name filter window found in the navtool
@@ -84,7 +84,7 @@ namespace Qisis {
       // it from the filtered list
       // Loop in reverse order since removal list of elements affects index number
       for (int i = g_filteredPoints.size() - 1; i >= 0; i--) {
-        Isis::ControlPoint &cp = *(*g_controlNetwork)[g_filteredPoints[i]];
+        ControlPoint &cp = *(*g_controlNetwork)[g_filteredPoints[i]];
         int numMeasNotMatching = 0;
         for (int j = 0; j < cp.GetNumMeasures(); j++) {
           // if the point contains a measure that matches a checked type,
@@ -120,7 +120,7 @@ namespace Qisis {
     p_listBox->clear();
 
     for (int i = 0; i < g_serialNumberList->Size(); i++) {
-      Isis::Filename filename = Isis::Filename(g_serialNumberList->Filename(i));
+      Filename filename = Filename(g_serialNumberList->Filename(i));
       string tempFilename = filename.Name();
       p_listBox->insertItem(i, tempFilename.c_str());
     }

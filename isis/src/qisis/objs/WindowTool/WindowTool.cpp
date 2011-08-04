@@ -6,14 +6,14 @@
 #include "MainWindow.h"
 #include "Workspace.h"
 
-namespace Qisis {
+namespace Isis {
   /**
    * WindowTool constructor.
    *
    *
    * @param parent
    */
-  WindowTool::WindowTool(QWidget *parent) : Qisis::Tool(parent) {
+  WindowTool::WindowTool(QWidget *parent) : Tool(parent) {
     p_cascadeWindows = new QAction(parent);
     p_cascadeWindows->setText("&Cascade");
     p_cascadeWindows->setEnabled(false);

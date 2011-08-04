@@ -10,11 +10,10 @@
 #include "Workspace.h"
 #include "Preference.h"
 
-using namespace Isis;
 
-namespace Qisis {
+namespace Isis {
   // Constructor
-  HelpTool::HelpTool(QWidget *parent) : Qisis::Tool(parent) {
+  HelpTool::HelpTool(QWidget *parent) : Tool(parent) {
     p_whatsThis = new QAction(parent);
     p_whatsThis->setShortcut(Qt::SHIFT + Qt::Key_F1);
     p_whatsThis->setText("&What's This?");

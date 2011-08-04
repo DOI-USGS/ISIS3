@@ -45,7 +45,7 @@
 class QDockWidget;
 class QListWidgetItem;
 
-namespace Qisis {
+namespace Isis {
   /**
    * @ingroup Visualization Tools
    *
@@ -57,7 +57,7 @@ namespace Qisis {
    *  @history 2011-03-23 Sharmila Prasad - PlotWindow to be ontop even when it
    *           loses focus. This works for both histogram and plot tools.
    */
-  class PlotWindow : public Qisis::MainWindow {
+  class PlotWindow : public MainWindow {
       Q_OBJECT
 
     public:
@@ -114,12 +114,12 @@ namespace Qisis {
         return "&Options";
       };
       bool eventFilter(QObject *o, QEvent *e);
-      Qisis::TableMainWindow *p_tableWindow;//!< Table window
+      TableMainWindow *p_tableWindow;//!< Table window
       QList <PlotCurve *> p_plotCurves; //!< List of the plot curves in this window
       QToolBar *p_toolBar;//!< Tool bar on the plot window
       std::string p_header;//!< Header name
       std::string p_axisTitle;//!< Header name and axis title
-      Qisis::MainWindow  *p_mainWindow;
+      MainWindow  *p_mainWindow;
 
     protected slots:
       void cancelConfig();
@@ -143,20 +143,20 @@ namespace Qisis {
        *
        * @param pc
        */
-      void curveCopied(Qisis::PlotCurve *pc);
+      void curveCopied(PlotCurve *pc);
       /**
        *  Emitted when a curve has been requested to be pasted.
        *
        * @param pw
        */
-      void curvePaste(Qisis::PlotWindow *pw);
+      void curvePaste(PlotWindow *pw);
       /**
        * Emitted when a curve needs to be pasted with a new random
        * color.
        *
        * @param pw
        */
-      void curvePasteSpecial(Qisis::PlotWindow *pw);
+      void curvePasteSpecial(PlotWindow *pw);
       //! Emitted every time there is a change to the plot window.
       void plotChanged();
 

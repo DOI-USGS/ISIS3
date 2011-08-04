@@ -11,7 +11,7 @@
 #include "QnetFilter.h"
 
 
-namespace Qisis {
+namespace Isis {
   /**
    * Defines the Point ID filter for the QnetNavTool's Points
    * section.  The user must enter a string. This class is

@@ -5,7 +5,7 @@
 #include "ViewportBufferAction.h"
 
 
-namespace Qisis {
+namespace Isis {
   class ViewportBufferTransform : public ViewportBufferAction {
     public:
       ViewportBufferTransform();

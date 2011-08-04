@@ -5,7 +5,7 @@
 
 class QAction;
 
-namespace Qisis {
+namespace Isis {
   class MdiCubeViewport;
 
   /**
@@ -13,7 +13,7 @@ namespace Qisis {
    *   @history 2010-06-26 Eric Hyer - Now uses MdiCubeViewport instead of
    *            CubeViewPort.  Fixed include issues
    */
-  class WindowTool : public Qisis::Tool {
+  class WindowTool : public Tool {
       Q_OBJECT
 
     public:

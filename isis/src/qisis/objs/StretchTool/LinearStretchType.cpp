@@ -11,9 +11,7 @@
 #include "Statistics.h"
 #include "Stretch.h"
 
-using namespace Isis;
-
-namespace Qisis {
+namespace Isis {
   /**
    * This constructs a linear stretch type.
    *
@@ -22,8 +20,8 @@ namespace Qisis {
    * @param name
    * @param color
    */
-  LinearStretchType::LinearStretchType(const Isis::Histogram &hist,
-                                       const Isis::Stretch &stretch,
+  LinearStretchType::LinearStretchType(const Histogram &hist,
+                                       const Stretch &stretch,
                                        const QString &name, const QColor &color)
     : StretchType(hist, stretch, name, color) {
     p_startSlider = NULL;
@@ -97,7 +95,7 @@ namespace Qisis {
    *
    * @param newStretch Stretch to interpret
    */
-  void LinearStretchType::setStretch(Isis::Stretch newStretch) {
+  void LinearStretchType::setStretch(Stretch newStretch) {
     Stretch interpretted;
 
     if(newStretch.Pairs() >= 2) {
@@ -251,7 +249,7 @@ namespace Qisis {
   }
 
 
-  Isis::Stretch LinearStretchType::getStretch() {
+  Stretch LinearStretchType::getStretch() {
     return *p_stretch;
   }
 }

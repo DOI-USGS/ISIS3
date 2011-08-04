@@ -10,7 +10,7 @@
 #include "QnetFilter.h"
 
 
-namespace Qisis {
+namespace Isis {
   /**
    * Defines the Distance filter for the QnetNavTool's Points
    * section.  The user must enter a Minimum Distance value. This

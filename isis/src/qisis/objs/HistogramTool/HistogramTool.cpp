@@ -10,14 +10,14 @@
 #include "ToolPad.h"
 
 
-namespace Qisis {
+namespace Isis {
 
   /**
    * Constructor creates a new HistogramTool object.
    *
    * @param parent
    */
-  HistogramTool::HistogramTool(QWidget *parent) : Qisis::PlotTool(parent) {
+  HistogramTool::HistogramTool(QWidget *parent) : PlotTool(parent) {
     p_rubberBand = NULL;
     RubberBandTool::allowPoints(1);
     p_parent = parent;
@@ -161,8 +161,8 @@ namespace Qisis {
     p_histToolWindow->setDestroyOnClose(false);
     p_histToolWindow->setDeletable(false);
     p_histToolWindow->setPasteable(false);
-    //connect(p_histToolWindow, SIGNAL(curveCopied(Qisis::HistogramItem *)), this,
-    //SLOT(copyCurve(Qisis::HistogramItem *)));
+    //connect(p_histToolWindow, SIGNAL(curveCopied(HistogramItem *)), this,
+    //SLOT(copyCurve(HistogramItem *)));
 
     QList<QMenu *> menu;
     QList<QAction *> actionButtons;
@@ -218,12 +218,12 @@ namespace Qisis {
   void HistogramTool::newPlotWindow() {
     HistogramToolWindow *blankWindow = new HistogramToolWindow("Histogram Window", p_parent);
     blankWindow->setDestroyOnClose(true);
-    connect(blankWindow, SIGNAL(curvePaste(Qisis::PlotWindow *)), this,
-            SLOT(pasteCurve(Qisis::PlotWindow *)));
-    connect(blankWindow, SIGNAL(curvePasteSpecial(Qisis::PlotWindow *)), this,
-            SLOT(pasteCurveSpecial(Qisis::PlotWindow *)));
-    connect(blankWindow, SIGNAL(curveCopied(Qisis::PlotCurve *)), this,
-            SLOT(copyCurve(Qisis::PlotCurve *)));
+    connect(blankWindow, SIGNAL(curvePaste(PlotWindow *)), this,
+            SLOT(pasteCurve(PlotWindow *)));
+    connect(blankWindow, SIGNAL(curvePasteSpecial(PlotWindow *)), this,
+            SLOT(pasteCurveSpecial(PlotWindow *)));
+    connect(blankWindow, SIGNAL(curveCopied(PlotCurve *)), this,
+            SLOT(copyCurve(PlotCurve *)));
     connect(blankWindow, SIGNAL(destroyed(QObject *)), this,
             SLOT(removeWindow(QObject *)));
     connect(blankWindow, SIGNAL(plotChanged()), this, SLOT(updateViewPort()));
@@ -275,9 +275,9 @@ namespace Qisis {
 
     if(vertices.size() < 1) return;
 
-    Isis::Cube *cube = cvp->cube();
+    Cube *cube = cvp->cube();
     int band = cvp->grayBand();
-    Isis::Histogram hist(*cube, 1);
+    Histogram hist(*cube, 1);
 
     //If the rubber band is a line
     if(RubberBandTool::getMode() == RubberBandTool::Line) {
@@ -359,7 +359,7 @@ namespace Qisis {
         return;
       }
 
-      Isis::Brick *brick = new Isis::Brick(*cube, 1, 1, 1);
+      Brick *brick = new Brick(*cube, 1, 1, 1);
 
       //For each point read that value from the cube and add it to the histogram
       for(int i = 0; linePts && i < (int)linePts->size(); i++) {
@@ -391,7 +391,7 @@ namespace Qisis {
       int nsamps = (int)(esamp - ssamp + 1);
       if(nsamps < 1) nsamps = -nsamps;
 
-      Isis::Brick *brick = new Isis::Brick(*cube, nsamps, 1, 1);
+      Brick *brick = new Brick(*cube, nsamps, 1, 1);
 
       //For each line read nsamps and add it to the histogram
       for(int line = (int)std::min(sline, eline); line <= (int)std::max(sline, eline); line++) {
@@ -418,7 +418,7 @@ namespace Qisis {
             int x1, y1;
             cvp->cubeToViewport(x, y, x1, y1);
             geos::geom::Coordinate c(x1, y1);
-            geos::geom::Point *p = Isis::globalFactory.createPoint(c);
+            geos::geom::Point *p = globalFactory.createPoint(c);
             bool contains = p->within(polygon);
             delete p;
 
@@ -431,7 +431,7 @@ namespace Qisis {
 
         delete polygon;
 
-        Isis::Brick *brick = new Isis::Brick(*cube, 1, 1, 1);
+        Brick *brick = new Brick(*cube, 1, 1, 1);
 
         //Read each point from the cube and add it to the histogram
         for(unsigned int j = 0; j < x_contained.size(); j++) {
@@ -532,7 +532,7 @@ namespace Qisis {
    *
    * @param pc
    */
-  void HistogramTool::copyCurve(Qisis::PlotCurve *pc) {
+  void HistogramTool::copyCurve(PlotCurve *pc) {
     p_copyCurve = new HistogramItem();
     p_copyCurve->copyCurveProperties(p_histCurve);
   }
@@ -549,7 +549,7 @@ namespace Qisis {
    * command has taken place inside the window.
    * @param pw
    */
-  void HistogramTool::pasteCurve(Qisis::PlotWindow *pw) {
+  void HistogramTool::pasteCurve(PlotWindow *pw) {
     p_cvp = cubeViewport();
     ((HistogramToolWindow *)pw)->add(p_copyCurve);
     updateViewPort(p_cvp);
@@ -562,7 +562,7 @@ namespace Qisis {
    * curve a different color than the copied curve.
    * @param pw
    */
-  void HistogramTool::pasteCurveSpecial(Qisis::PlotWindow *pw) {
+  void HistogramTool::pasteCurveSpecial(PlotWindow *pw) {
     p_cvp = cubeViewport();
     if(p_color < p_colors.size()) {
       p_copyCurve->setColor(p_colors[p_color]);

@@ -17,7 +17,7 @@ namespace Isis {
   class Workspace;
 }
 
-namespace Qisis {
+namespace Isis {
   /**
    * @brief Sets the colors for the special pixel values
    *
@@ -31,7 +31,7 @@ namespace Qisis {
    *   @history 2010-06-26 Eric Hyer - Now uses MdiCubeViewport instead of
    *            CubeViewport.  Also fixed some include issues.
    */
-  class SpecialPixelTool : public Qisis::Tool {
+  class SpecialPixelTool : public Tool {
       Q_OBJECT
 
     public:

@@ -43,11 +43,11 @@
 #include "ToolPad.h"
 #include "UniversalGroundMap.h"
 
-using namespace Isis;
+
 using namespace std;
 
 
-namespace Qisis {
+namespace Isis {
   // initialize static
   QString QtieTool::lastPtIdValue = "";
 
@@ -59,7 +59,7 @@ namespace Qisis {
    * @history  2010-05-11 Tracie Sucharski - Moved the creation of control net
    *                           to the QtieFileTool::open.
    */
-  QtieTool::QtieTool(QWidget *parent) : Qisis::Tool(parent) {
+  QtieTool::QtieTool(QWidget *parent) : Tool(parent) {
 
 #if 0
     p_createPoint = new QAction(parent);
@@ -74,7 +74,7 @@ namespace Qisis {
     p_deletePoint->setShortcut(Qt::Key_D);
     connect(p_deletePoint, SIGNAL(triggered()), this, SLOT(deletePoint()));
 #endif
-    p_serialNumberList = new Isis::SerialNumberList(false);
+    p_serialNumberList = new SerialNumberList(false);
     p_controlNet = NULL;
     p_controlPoint = NULL;
 
@@ -146,14 +146,14 @@ namespace Qisis {
     p_ptIdValue = new QLabel();
     gridLayout->addWidget(p_ptIdValue, row++, 0);
 
-    p_pointEditor = new Qisis::ControlPointEdit(NULL, parent, true);
+    p_pointEditor = new ControlPointEdit(NULL, parent, true);
     gridLayout->addWidget(p_pointEditor, row++, 0, 1, 3);
     connect(p_pointEditor, SIGNAL(pointSaved()), this, SLOT(pointSaved()));
     p_pointEditor->show();
     connect(this,
-            SIGNAL(stretchChipViewport(Isis::Stretch *, Qisis::CubeViewport *)),
+            SIGNAL(stretchChipViewport(Stretch *, CubeViewport *)),
             p_pointEditor,
-            SIGNAL(stretchChipViewport(Isis::Stretch *, Qisis::CubeViewport *)));
+            SIGNAL(stretchChipViewport(Stretch *, CubeViewport *)));
 
 
     QPushButton *solve = new QPushButton("Solve");
@@ -165,8 +165,8 @@ namespace Qisis {
     p_tieTool->setCentralWidget(cw);
 
     connect(this, SIGNAL(editPointChanged()), this, SLOT(drawMeasuresOnViewports()));
-    connect(this, SIGNAL(newSolution(Isis::Table *)),
-            this, SLOT(writeNewCmatrix(Isis::Table *)));
+    connect(this, SIGNAL(newSolution(Table *)),
+            this, SLOT(writeNewCmatrix(Table *)));
 
   }
 
@@ -247,21 +247,21 @@ namespace Qisis {
    * @param matchCube  Input  Match cube
    *
    */
-  void QtieTool::setFiles(Isis::Cube &baseCube, Isis::Cube &matchCube, Isis::ControlNet &cnet) {
+  void QtieTool::setFiles(Cube &baseCube, Cube &matchCube, ControlNet &cnet) {
     //  Save off base map cube, but add matchCube to serial number list
     p_baseCube = &baseCube;
     p_matchCube = &matchCube;
     p_controlNet = &cnet;
-    p_baseSN = Isis::SerialNumber::Compose(*p_baseCube, true);
-    p_matchSN = Isis::SerialNumber::Compose(*p_matchCube);
+    p_baseSN = SerialNumber::Compose(*p_baseCube, true);
+    p_matchSN = SerialNumber::Compose(*p_matchCube);
 
     p_serialNumberList->Add(matchCube.getFilename());
 
     //  Save off universal ground maps
     try {
-      p_baseGM = new Isis::UniversalGroundMap(*p_baseCube);
+      p_baseGM = new UniversalGroundMap(*p_baseCube);
     }
-    catch (Isis::iException &e) {
+    catch (iException &e) {
       QString message = "Cannot initialize universal ground map for basemap.\n";
       string errors = e.Errors();
       message += errors.c_str();
@@ -270,9 +270,9 @@ namespace Qisis {
       return;
     }
     try {
-      p_matchGM = new Isis::UniversalGroundMap(matchCube);
+      p_matchGM = new UniversalGroundMap(matchCube);
     }
-    catch (Isis::iException &e) {
+    catch (iException &e) {
       QString message = "Cannot initialize universal ground map for match cube.\n";
       string errors = e.Errors();
       message += errors.c_str();
@@ -285,7 +285,7 @@ namespace Qisis {
     //  saved in the net file.
     if (cnet.GetNumPoints() != 0) {
       for (int i = 0; i < cnet.GetNumPoints(); i++) {
-        Isis::ControlPoint &p = *cnet[i];
+        ControlPoint &p = *cnet[i];
         double baseSamp, baseLine;
 
 
@@ -311,10 +311,10 @@ namespace Qisis {
           return;
         }
 
-        Isis::ControlMeasure *mB = new Isis::ControlMeasure;
+        ControlMeasure *mB = new ControlMeasure;
         mB->SetCubeSerialNumber(p_baseSN);
         mB->SetCoordinate(baseSamp, baseLine);
-//        mB->SetType(Isis::ControlMeasure::Estimated);
+//        mB->SetType(ControlMeasure::Estimated);
         mB->SetDateTime();
         mB->SetChooserName();
         mB->SetIgnored(true);
@@ -341,7 +341,7 @@ namespace Qisis {
     //  delete p_matchCube;
 
     delete p_serialNumberList;
-    p_serialNumberList = new Isis::SerialNumberList(false);
+    p_serialNumberList = new SerialNumberList(false);
 
     delete p_controlNet;
 
@@ -412,7 +412,7 @@ namespace Qisis {
 
     if (s == Qt::LeftButton) {
       //  Find closest control point in network
-      Isis::ControlPoint *point =
+      ControlPoint *point =
         p_controlNet->FindClosest(sn, samp, line);
       //  TODO:  test for errors and reality
       if (point == NULL) {
@@ -425,7 +425,7 @@ namespace Qisis {
     }
     else if (s == Qt::MidButton) {
       //  Find closest control point in network
-      Isis::ControlPoint *point =
+      ControlPoint *point =
         p_controlNet->FindClosest(sn, samp, line);
       //  TODO:  test for errors and reality
       if (point == NULL) {
@@ -493,7 +493,7 @@ namespace Qisis {
 //    double radius = p_baseGM->Projection()->LocalRadius();
 
     //  Point is on both base and match, create new control point
-    Isis::ControlPoint *newPoint = NULL;
+    ControlPoint *newPoint = NULL;
     // First prompt for pointId
     bool goodId = false;
     while (!goodId) {
@@ -515,7 +515,7 @@ namespace Qisis {
       }
       else {
         // Make sure Id doesn't already exist
-        newPoint = new Isis::ControlPoint(id.toStdString());
+        newPoint = new ControlPoint(id.toStdString());
         if (p_controlNet->ContainsPoint(newPoint->GetId())) {
           iString message = "A ControlPoint with Point Id = [" +
                             newPoint->GetId() +
@@ -531,13 +531,13 @@ namespace Qisis {
 
 
 //    newPoint->SetUniversalGround(lat, lon, radius);
-//    newPoint->SetType(Isis::ControlPoint::Ground);
+//    newPoint->SetType(ControlPoint::Ground);
 
     // Set first measure to match
     ControlMeasure *mM = new ControlMeasure;
     mM->SetCubeSerialNumber(p_matchSN);
     mM->SetCoordinate(matchSamp, matchLine);
-//    mM->SetType(Isis::ControlMeasure::Estimated);
+//    mM->SetType(ControlMeasure::Estimated);
     mM->SetDateTime();
     mM->SetChooserName();
     newPoint->Add(mM);
@@ -575,7 +575,7 @@ namespace Qisis {
    *                        smartened up to load another Point?
    *
    */
-  void QtieTool::deletePoint(Isis::ControlPoint *point) {
+  void QtieTool::deletePoint(ControlPoint *point) {
 
     p_controlPoint = point;
     //  Change point in viewport to red so user can see what point they are
@@ -598,7 +598,7 @@ namespace Qisis {
    * @param point Input  Control Point to modify
    *
    */
-  void QtieTool::modifyPoint(Isis::ControlPoint *point) {
+  void QtieTool::modifyPoint(ControlPoint *point) {
 
     p_controlPoint = point;
     loadPoint();
@@ -655,9 +655,9 @@ namespace Qisis {
       return;
 
     //  Draw all measures
-    std::string serialNumber = Isis::SerialNumber::Compose(*vp->cube(), true);
+    std::string serialNumber = SerialNumber::Compose(*vp->cube(), true);
     for (int i = 0; i < p_controlNet->GetNumPoints(); i++) {
-      Isis::ControlPoint &p = *p_controlNet->GetPoint(i);
+      ControlPoint &p = *p_controlNet->GetPoint(i);
       if (p_controlPoint != NULL && p.GetId() == p_controlPoint->GetId()) {
         painter->setPen(QColor(200, 0, 0));
       }
@@ -704,7 +704,7 @@ namespace Qisis {
         return;
       }
     }
-    Isis::ControlNet net;
+    ControlNet net;
 
     // Bundle adjust to solve for new pointing
     try {
@@ -739,7 +739,7 @@ namespace Qisis {
       msgBox.exec();
       if (msgBox.clickedButton() == update) {
         p_matchCube->reopen("rw");
-        Isis::Table cmatrix = b.Cmatrix(0);
+        Table cmatrix = b.Cmatrix(0);
         //cmatrix = b.Cmatrix(0);
         emit newSolution(&cmatrix);
       }
@@ -748,7 +748,7 @@ namespace Qisis {
       }
 
     }
-    catch (Isis::iException &e) {
+    catch (iException &e) {
       QString message = "Bundle Solution failed.\n";
       string errors = e.Errors();
       message += errors.c_str();
@@ -769,7 +769,7 @@ namespace Qisis {
    * @param cmatrix    Input  New adjusted cmatrix
    *
    */
-  void QtieTool::writeNewCmatrix(Isis::Table *cmatrix) {
+  void QtieTool::writeNewCmatrix(Table *cmatrix) {
 
     //check for existing polygon, if exists delete it
     if (p_matchCube->getLabel()->HasObject("Polygon")) {
@@ -778,11 +778,11 @@ namespace Qisis {
 
     // Update the cube history
     p_matchCube->write(*cmatrix);
-    Isis::History h("IsisCube");
+    History h("IsisCube");
     try {
       p_matchCube->read(h);
     }
-    catch (Isis::iException &e) {
+    catch (iException &e) {
       QString message = "Could not read cube history, "
                         "will not update history.\n";
       string errors = e.Errors();
@@ -791,17 +791,17 @@ namespace Qisis {
       e.Clear();
       return;
     }
-    Isis::PvlObject history("qtie");
-    history += Isis::PvlKeyword("IsisVersion", Isis::Application::Version());
+    PvlObject history("qtie");
+    history += PvlKeyword("IsisVersion", Application::Version());
     QString path = QCoreApplication::applicationDirPath();
-    history += Isis::PvlKeyword("ProgramPath", path);
-    history += Isis::PvlKeyword("ExecutionDateTime",
-                                Isis::Application::DateTime());
-    history += Isis::PvlKeyword("HostName", Isis::Application::HostName());
-    history += Isis::PvlKeyword("UserName", Isis::Application::UserName());
-    Isis::PvlGroup results("Results");
-    results += Isis::PvlKeyword("CameraAnglesUpdated", "True");
-    results += Isis::PvlKeyword("BaseMap", p_baseCube->getFilename());
+    history += PvlKeyword("ProgramPath", path);
+    history += PvlKeyword("ExecutionDateTime",
+                                Application::DateTime());
+    history += PvlKeyword("HostName", Application::HostName());
+    history += PvlKeyword("UserName", Application::UserName());
+    PvlGroup results("Results");
+    results += PvlKeyword("CameraAnglesUpdated", "True");
+    results += PvlKeyword("BaseMap", p_baseCube->getFilename());
     history += results;
 
     h.AddEntry(history);
@@ -836,7 +836,7 @@ namespace Qisis {
    * @author 2008-12-10 Jeannie Walldren
    * @internal
    *   @history 2008-12-10 Jeannie Walldren - Original Version
-   *   @history 2008-12-10 Jeannie Walldren - Added "Isis::"
+   *   @history 2008-12-10 Jeannie Walldren - Added ""
    *            namespace to PvlEditDialog reference and changed
    *            registrationDialog from pointer to object
    *   @history 2008-12-15 Jeannie Walldren - Added QMessageBox
@@ -845,16 +845,16 @@ namespace Qisis {
   void QtieTool::viewTemplateFile() {
     try {
       // Get the template file from the ControlPointEditor object
-      Isis::Pvl templatePvl(p_pointEditor->templateFilename());
+      Pvl templatePvl(p_pointEditor->templateFilename());
       // Create registration dialog window using PvlEditDialog class
       // to view and/or edit the template
-      Isis::PvlEditDialog registrationDialog(templatePvl);
+      PvlEditDialog registrationDialog(templatePvl);
       registrationDialog.setWindowTitle("View or Edit Template File: "
                                         + QString::fromStdString(templatePvl.Filename()));
       registrationDialog.resize(550, 360);
       registrationDialog.exec();
     }
-    catch (Isis::iException &e) {
+    catch (iException &e) {
       QString message = e.Errors().c_str();
       e.Clear();
       QMessageBox::warning((QWidget *)parent(), "Error", message);
@@ -879,26 +879,26 @@ namespace Qisis {
       try {
         //  Create new control net for bundle adjust , deleting ignored measures
         // which are the basemap measures.
-        Isis::ControlNet net;
+        ControlNet net;
         for (int p = 0; p < p_controlNet->GetNumPoints(); p++) {
           ControlPoint *pt = new ControlPoint(*p_controlNet->GetPoint(p));
           for (int m = 0; m < pt->GetNumMeasures(); m++) {
             if (pt->GetMeasure(m)->IsIgnored())
               pt->Delete(m);
           }
-//          net.SetType(Isis::ControlNet::ImageToGround);
+//          net.SetType(ControlNet::ImageToGround);
           net.SetTarget(p_matchCube->getCamera()->Target());
           net.SetNetworkId("Qtie");
-          net.SetUserName(Isis::Application::UserName());
-          net.SetCreatedDate(Isis::Application::DateTime());
-          net.SetModifiedDate(Isis::iTime::CurrentLocalTime());
+          net.SetUserName(Application::UserName());
+          net.SetCreatedDate(Application::DateTime());
+          net.SetModifiedDate(iTime::CurrentLocalTime());
           net.SetDescription("Qtie Ground Points");
           net.AddPoint(pt);
         }
 
         net.Write(fn.toStdString());
       }
-      catch (Isis::iException &e) {
+      catch (iException &e) {
         QString message = "Error saving control network.  \n";
         string errors = e.Errors();
         message += errors.c_str();

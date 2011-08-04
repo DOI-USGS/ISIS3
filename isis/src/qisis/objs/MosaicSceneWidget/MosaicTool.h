@@ -14,7 +14,7 @@ class QPixmap;
 class QPoint;
 class QToolBar;
 
-namespace Qisis {
+namespace Isis {
   class ToolPad;
 }
 
@@ -61,7 +61,7 @@ namespace Isis {
       QPixmap getIcon(iString iconName) const;
 
       virtual void addTo(QMenu *menu) {}
-      virtual void addTo(Qisis::ToolPad *toolPad);
+      virtual void addTo(ToolPad *toolPad);
       virtual void addTo(QToolBar *toolBar);
 
       virtual PvlObject toPvl() const;

@@ -35,14 +35,14 @@
 #include "Workspace.h"
 #include "ZoomTool.h"
 
-namespace Qisis {
+namespace Isis {
   /**
    * ZoomTool constructor
    *
    *
    * @param parent Parent widget
    */
-  ZoomTool::ZoomTool(QWidget *parent) : Qisis::Tool(parent) {
+  ZoomTool::ZoomTool(QWidget *parent) : Tool(parent) {
     p_userCursor = QCursor();
 
     p_zoomIn2X = new QAction(parent);
@@ -633,15 +633,15 @@ namespace Qisis {
     double oldScale = d->scale();
     try {
       if (newScale <= 0.0) {
-        throw Isis::iException::Message(Isis::iException::User,
+        throw iException::Message(iException::User,
           "Scale value must be greater than 0.", _FILEINFO_);
       }
       d->setScale(newScale);
     }
-    catch (Isis::iException &e) {
-      e.Message(Isis::iException::User, 
+    catch (iException &e) {
+      e.Message(iException::User, 
         "Unable to rescale image to [" 
-        + Isis::iString(newScale*100) + "]", _FILEINFO_);
+        + iString(newScale*100) + "]", _FILEINFO_);
       QString message = e.Errors().c_str();
       QMessageBox::warning((QWidget *)parent(), "Warning", message);
       e.Clear();
@@ -676,15 +676,15 @@ namespace Qisis {
     double oldScale = d->scale();
     try {
       if (newScale <= 0.0) {
-        throw Isis::iException::Message(Isis::iException::User,
+        throw iException::Message(iException::User,
           "Scale value must be greater than 0.", _FILEINFO_);
       }
       d->setScale(newScale, x, y);
     }
-    catch (Isis::iException &e) {
-      e.Message(Isis::iException::User, 
+    catch (iException &e) {
+      e.Message(iException::User, 
         "Unable to rescale image to [" 
-        + Isis::iString(newScale*100) + "]", _FILEINFO_);
+        + iString(newScale*100) + "]", _FILEINFO_);
       QString message = e.Errors().c_str();
       QMessageBox::warning((QWidget *)parent(), "Warning", message);
       e.Clear();
@@ -718,15 +718,15 @@ namespace Qisis {
     double oldScale = d->scale();
     try {
       if (newScale <= 0.0) {
-        throw Isis::iException::Message(Isis::iException::User,
+        throw iException::Message(iException::User,
           "Scale value must be greater than 0.", _FILEINFO_);
       }
       d->setScale(newScale, samp, line);
     }
-    catch (Isis::iException &e) {
-      e.Message(Isis::iException::User, 
+    catch (iException &e) {
+      e.Message(iException::User, 
         "Unable to rescale image to [" 
-        + Isis::iString(newScale*100) + "]", _FILEINFO_);
+        + iString(newScale*100) + "]", _FILEINFO_);
       QString message = e.Errors().c_str();
       QMessageBox::warning((QWidget *)parent(), "Warning", message);
       e.Clear();

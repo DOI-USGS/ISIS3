@@ -40,7 +40,7 @@ namespace Isis {
   class Cube;
 }
 
-namespace Qisis {
+namespace Isis {
 
   /**
    * @brief Qtie File operations
@@ -59,7 +59,7 @@ namespace Qisis {
       Q_OBJECT
 
     signals:
-      void cubesOpened(Isis::Cube &baseCube, Isis::Cube &matchCube, Isis::ControlNet &cnet);
+      void cubesOpened(Cube &baseCube, Cube &matchCube, ControlNet &cnet);
       void newFiles();
 
     public:

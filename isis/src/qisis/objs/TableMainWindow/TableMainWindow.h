@@ -5,7 +5,7 @@
 #include "MainWindow.h"
 
 
-namespace Qisis {
+namespace Isis {
   /**
   * @brief a subclass of the qisis mainwindow, tablemainwindow
   *        handles all of the table tasks.
@@ -28,7 +28,7 @@ namespace Qisis {
   */
 
 
-  class TableMainWindow : public Qisis::MainWindow {
+  class TableMainWindow : public MainWindow {
       Q_OBJECT
     public:
       /**

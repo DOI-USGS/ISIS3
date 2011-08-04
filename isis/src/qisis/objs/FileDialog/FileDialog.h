@@ -6,7 +6,7 @@
 #include "Filename.h"
 #include "FileTool.h"
 
-namespace Qisis {
+namespace Isis {
   /**
    * @brief Class for browsing cubes.
    *

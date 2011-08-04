@@ -6,13 +6,13 @@
 
 #include "Pvl.h"
 
-namespace Qisis {
+namespace Isis {
   class BandSpinBox : public QSpinBox {
       Q_OBJECT
 
     public:
       BandSpinBox(QWidget *parent = 0);
-      void setBandBin(Isis::Pvl &pvl, const QString &key = "BandNumber");
+      void setBandBin(Pvl &pvl, const QString &key = "BandNumber");
       QStringList BandBinKeys();
       QSize sizeHint() const;
       QValidator::State validate(QString &input, int &pos) const;

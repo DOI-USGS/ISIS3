@@ -13,11 +13,10 @@
 #include "qnet.h"
 
 
-using namespace Qisis::Qnet;
-using namespace Isis;
+using namespace Isis::Qnet;
 using namespace std;
 
-namespace Qisis {
+namespace Isis {
   /**
    * Contructor for the Point Range filter.  It creates the
    * Range filter window found in the navtool

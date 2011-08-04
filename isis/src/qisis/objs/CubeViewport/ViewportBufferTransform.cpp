@@ -3,7 +3,7 @@
 
 #include <QRect>
 
-namespace Qisis {
+namespace Isis {
   /**
    * Constructor
    */

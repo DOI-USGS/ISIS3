@@ -42,7 +42,7 @@
 #include "ToolPad.h"
 
 
-namespace Qisis {
+namespace Isis {
   /**
    * Constructs and EditTool object.
    *
@@ -50,8 +50,8 @@ namespace Qisis {
    *
    *
    */
-  EditTool::EditTool(QWidget *parent) : Qisis::Tool(parent) {
-    p_dn = Isis::Null;
+  EditTool::EditTool(QWidget *parent) : Tool(parent) {
+    p_dn = Null;
   }
 
   /**
@@ -208,11 +208,11 @@ namespace Qisis {
     else {
       p_dnLineEdit->setEnabled(false);
 
-      if(index == 1) p_dn = Isis::Null;
-      if(index == 2) p_dn = Isis::Hrs;
-      if(index == 3) p_dn = Isis::Lrs;
-      if(index == 4) p_dn = Isis::His;
-      if(index == 5) p_dn = Isis::Lis;
+      if(index == 1) p_dn = Null;
+      if(index == 2) p_dn = Hrs;
+      if(index == 3) p_dn = Lrs;
+      if(index == 4) p_dn = His;
+      if(index == 5) p_dn = Lis;
     }
   }
 
@@ -280,7 +280,7 @@ namespace Qisis {
       try {
         vp->cube()->reopen("rw");
       }
-      catch(Isis::iException &e) {
+      catch(iException &e) {
         QMessageBox::information((QWidget *)parent(), "Error", "Cannot open cube read/write");
         return;
       }
@@ -397,7 +397,7 @@ namespace Qisis {
       try {
         vp->cube()->reopen("rw");
       }
-      catch(Isis::iException &e) {
+      catch(iException &e) {
         QMessageBox::information((QWidget *)parent(), "Error", "Cannot open cube read/write");
         return;
       }
@@ -417,7 +417,7 @@ namespace Qisis {
       vp->viewportToCube(p.x(), p.y(), ssamp, sline);
       issamp = (int)(ssamp + 0.5);
       isline = (int)(sline + 0.5);
-      Isis::Brick *pntBrick = new Isis::Brick(1, 1, 1,
+      Brick *pntBrick = new Brick(1, 1, 1,
                                               vp->cube()->getPixelType());
       pntBrick->SetBasePosition(issamp, isline, vp->grayBand());
       vp->cube()->read(*pntBrick);
@@ -466,33 +466,33 @@ namespace Qisis {
    *                         line.
    */
   void EditTool::writeToCube(int iesamp, int issamp, int ieline, int isline, QList<QPoint *> *linePts) {
-    Isis::Brick *brick = NULL;
+    Brick *brick = NULL;
     try {
       MdiCubeViewport *vp = cubeViewport();
 
       int nsamps = iesamp - issamp + 1;
       int nlines = ieline - isline + 1;
 
-      brick = new Isis::Brick(nsamps, nlines, 1, vp->cube()->getPixelType());
+      brick = new Brick(nsamps, nlines, 1, vp->cube()->getPixelType());
       brick->SetBasePosition(issamp, isline, vp->grayBand());
       vp->cube()->read(*brick);
 
       //  Save for Undo operation,  See if viewport has undo entry.  If it
       //  does, get Stack, push new undo and put stack back in hash.  If not,
       //  create stack, push new undo and add to hash.
-      QStack<Isis::Brick *> *s;
+      QStack<Brick *> *s;
       if(p_undoEdit.contains(vp)) {
         s = p_undoEdit.value(vp);
       }
       else {
-        s = new QStack<Isis::Brick *>;
+        s = new QStack<Brick *>;
       }
       s->push(brick);
       p_undoEdit[vp] = s;
 
       //Remove any redo stack if it exists
       if(p_redoEdit.contains(vp)) {
-        QStack<Isis::Brick *> *temp = p_redoEdit.value(vp);
+        QStack<Brick *> *temp = p_redoEdit.value(vp);
         while(!temp->isEmpty()) {
           delete temp->pop();
         }
@@ -501,7 +501,7 @@ namespace Qisis {
       }
 
       //  no deep copy constructor so re-read brick for editing....
-      brick = new Isis::Brick(nsamps, nlines, 1, vp->cube()->getPixelType());
+      brick = new Brick(nsamps, nlines, 1, vp->cube()->getPixelType());
       brick->SetBasePosition(issamp, isline, vp->grayBand());
       vp->cube()->read(*brick);
 
@@ -549,7 +549,7 @@ namespace Qisis {
    *
    */
   void EditTool::undoEdit() {
-    Isis::Brick *redoBrick = NULL;
+    Brick *redoBrick = NULL;
     try {
       MdiCubeViewport *vp = cubeViewport();
       if(vp == NULL) return;
@@ -567,20 +567,20 @@ namespace Qisis {
       }
 
 
-      QStack<Isis::Brick *> *s = p_undoEdit.value(vp);
-      Isis::Brick *brick = s->top();
+      QStack<Brick *> *s = p_undoEdit.value(vp);
+      Brick *brick = s->top();
 
       //Write the current cube to the a brick and add it to the redo stack
-      redoBrick = new Isis::Brick(brick->SampleDimension(), brick->LineDimension(), 1, vp->cube()->getPixelType());
+      redoBrick = new Brick(brick->SampleDimension(), brick->LineDimension(), 1, vp->cube()->getPixelType());
       redoBrick->SetBasePosition(brick->Sample(), brick->Line(), vp->grayBand());
       vp->cube()->read(*(redoBrick));
 
-      QStack<Isis::Brick *> *redo;
+      QStack<Brick *> *redo;
       if(p_redoEdit.contains(vp)) {
         redo = p_redoEdit.value(vp);
       }
       else {
-        redo = new QStack<Isis::Brick *>;
+        redo = new QStack<Brick *>;
       }
       redo->push(redoBrick);
       p_redoEdit[vp] = redo;
@@ -634,8 +634,8 @@ namespace Qisis {
         return;
       }
 
-      QStack<Isis::Brick *> *undo;
-      QStack<Isis::Brick *> *redo;
+      QStack<Brick *> *undo;
+      QStack<Brick *> *redo;
       int marker = 0;
       //If edits have been made
       if(p_undoEdit.contains(vp)) {
@@ -648,7 +648,7 @@ namespace Qisis {
 
         //Undo up to the save point
         for(int i = undo->count() - 1; i >= marker; i--) {
-          Isis::Brick *brick = undo->at(i);
+          Brick *brick = undo->at(i);
 
           //  Write the saved brick to the cube
           vp->cube()->write(*(brick));
@@ -665,7 +665,7 @@ namespace Qisis {
 
         //If undos have been made past a save point, we need to redo them
         for(int i = redo->count() - 1; i >= redo->count() - marker; i--) {
-          Isis::Brick *brick = redo->at(i);
+          Brick *brick = redo->at(i);
 
           //  Write the saved brick to the cube
           vp->cube()->write(*(brick));
@@ -684,7 +684,7 @@ namespace Qisis {
    *
    */
   void EditTool::redoEdit() {
-    Isis::Brick *undoBrick = NULL;
+    Brick *undoBrick = NULL;
     try {
       MdiCubeViewport *vp = cubeViewport();
       if(vp == NULL) return;
@@ -701,22 +701,22 @@ namespace Qisis {
         return;
       }
 
-      QStack<Isis::Brick *> *s = p_redoEdit.value(vp);
-      Isis::Brick *brick = s->top();
+      QStack<Brick *> *s = p_redoEdit.value(vp);
+      Brick *brick = s->top();
 
       //Write the current cube to the a brick and add it to the undo stack
-      undoBrick = new Isis::Brick(brick->SampleDimension(),
+      undoBrick = new Brick(brick->SampleDimension(),
                                   brick->LineDimension(), 1,
                                   vp->cube()->getPixelType());
       undoBrick->SetBasePosition(brick->Sample(), brick->Line(), vp->grayBand());
       vp->cube()->read(*(undoBrick));
 
-      QStack<Isis::Brick *> *undo;
+      QStack<Brick *> *undo;
       if(p_undoEdit.contains(vp)) {
         undo = p_undoEdit.value(vp);
       }
       else {
-        undo = new QStack<Isis::Brick *>;
+        undo = new QStack<Brick *>;
       }
       undo->push(undoBrick);
       p_undoEdit[vp] = undo;
@@ -789,14 +789,14 @@ namespace Qisis {
     //  Connect destruction of CubeViewport to Remove slot to remove viewport
     //  from the undo and redo Hashes.
     if(p_undoEdit.contains((MdiCubeViewport *) vp)) {
-      QStack<Isis::Brick *> *temp = p_undoEdit.value((MdiCubeViewport *) vp);
+      QStack<Brick *> *temp = p_undoEdit.value((MdiCubeViewport *) vp);
       while(!temp->isEmpty()) {
         delete temp->pop();
       }
       p_undoEdit.remove((MdiCubeViewport *) vp);
     }
     if(p_redoEdit.contains((MdiCubeViewport *) vp)) {
-      QStack<Isis::Brick *> *temp = p_redoEdit.value((MdiCubeViewport *) vp);
+      QStack<Brick *> *temp = p_redoEdit.value((MdiCubeViewport *) vp);
       while(!temp->isEmpty()) {
         delete temp->pop();
       }

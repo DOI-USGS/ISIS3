@@ -35,7 +35,7 @@
 #include <qwt_plot_zoomer.h>
 
 using namespace std;
-namespace Qisis {
+namespace Isis {
 
 
   /**
@@ -74,7 +74,7 @@ namespace Qisis {
    *
    * @param hist The Isis Histogram to plot
    */
-  void QHistogram::Load(Isis::Histogram &hist) {
+  void QHistogram::Load(Histogram &hist) {
     p_histCurve = new QwtPlotCurve();
     p_histCurve->setStyle(QwtPlotCurve::Lines);
 

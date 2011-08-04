@@ -4,7 +4,7 @@
 #include <QToolBar>
 #include <QActionGroup>
 
-namespace Qisis {
+namespace Isis {
   class ToolPad : public QToolBar {
       Q_OBJECT
 

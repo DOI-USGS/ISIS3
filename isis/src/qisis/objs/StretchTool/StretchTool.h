@@ -41,7 +41,7 @@ namespace Isis {
  *   http://www.usgs.gov/privacy.html.
  */
 
-namespace Qisis {
+namespace Isis {
   class CubeViewport;
   class AdvancedStretchDialog;
   class ViewportBuffer;
@@ -81,7 +81,7 @@ namespace Qisis {
    *      emitted.
    *  @history 2011-03-22 Sharmila Prasad - Add option to stretch All Bands
    */
-  class StretchTool : public Qisis::Tool {
+  class StretchTool : public Tool {
       Q_OBJECT
 
     public:
@@ -100,15 +100,15 @@ namespace Qisis {
         All    //!< All Bands
       };
 
-      static Isis::Stretch stretchBuffer(ViewportBuffer *buffer, QRect rect);
-      static Isis::Stretch stretchBand(CubeViewport *cvp, StretchBand band);
+      static Stretch stretchBuffer(ViewportBuffer *buffer, QRect rect);
+      static Stretch stretchBand(CubeViewport *cvp, StretchBand band);
       
-      static Isis::Statistics statsFromCube(Isis::Cube *cube, int band);
-      static Isis::Statistics statsFromBuffer(ViewportBuffer *buffer, QRect rect);
-      static Isis::Histogram histFromCube(Isis::Cube *cube, int band,
+      static Statistics statsFromCube(Cube *cube, int band);
+      static Statistics statsFromBuffer(ViewportBuffer *buffer, QRect rect);
+      static Histogram histFromCube(Cube *cube, int band,
                                           double min, double max);
-      static Isis::Histogram histFromBuffer(ViewportBuffer *buffer);
-      static Isis::Histogram histFromBuffer(ViewportBuffer *buffer, QRect rect,
+      static Histogram histFromBuffer(ViewportBuffer *buffer);
+      static Histogram histFromBuffer(ViewportBuffer *buffer, QRect rect,
                                             double min, double max);
       void updateAdvStretchDialogforAll(void);
       
@@ -118,7 +118,7 @@ namespace Qisis {
        * when a viewport is stretched, send the stretch and the viewport
        * associated with it to any ChipViewport's that might be listening
        */
-      void stretchChipViewport(Isis::Stretch *, Qisis::CubeViewport *);
+      void stretchChipViewport(Stretch *, CubeViewport *);
       
       /**
        * Shows a warning. This sends a signal (meant for when an
@@ -195,9 +195,9 @@ namespace Qisis {
       StretchBand p_stretchBand;         //!< Current stretch band
 
       //! Stretches before global button pressed
-      Isis::Stretch *p_preGlobalStretches;
+      Stretch *p_preGlobalStretches;
       
-      Isis::Stretch *p_chipViewportStretch; //!< ChipViewport's stretch
+      Stretch *p_chipViewportStretch; //!< ChipViewport's stretch
   };
 };
 

@@ -14,7 +14,7 @@ namespace Isis {
 }
 
 
-namespace Qisis {
+namespace Isis {
   /**
    *
    * @internal
@@ -37,7 +37,7 @@ namespace Qisis {
 
     public:
       QnetNewMeasureDialog(QWidget *parent = 0);
-      void SetFiles(Isis::ControlPoint point, QStringList pointFiles);
+      void SetFiles(ControlPoint point, QStringList pointFiles);
 
       // FIXME: Make this private
       QListWidget *fileList;

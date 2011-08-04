@@ -10,10 +10,9 @@
 
 #include "qnet.h"
 
-using namespace Isis;
-using namespace Qisis::Qnet;
+using namespace Isis::Qnet;
 
-namespace Qisis {
+namespace Isis {
   /**
    * Contructor for the Point Type filter.  It creates the
    * Type filter window found in the navtool
@@ -117,7 +116,7 @@ namespace Qisis {
    *                          a point as ignored if all of its
    *                          measures have Ignore=True
    *   @history 2010-06-03 Jeannie Walldren - Replaced "0" with
-   *                          Isis::ControlPoint::Ground in case
+   *                          ControlPoint::Ground in case
    *                          enumeration changes.
    *   @history 2010-07-16 Tracie Sucharski - Implemented binary
    *                          control networks.

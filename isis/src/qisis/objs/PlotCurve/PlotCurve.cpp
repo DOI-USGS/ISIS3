@@ -9,7 +9,7 @@
 #include "PlotTool.h"
 #include "SpecialPixel.h"
 
-namespace Qisis {
+namespace Isis {
   /**
    * Constructs and instance of a PlotCurve with some default
    * properties.
@@ -39,7 +39,7 @@ namespace Qisis {
     }
     p_plotMarkers.clear();
     for(unsigned int i = 0; i < data.size(); i++) {
-      if(data.y(i) != Isis::Null) {
+      if(data.y(i) != Null) {
         QwtPlotMarker *marker = new QwtPlotMarker();
         marker->setValue(data.x(i), data.y(i));
         marker->setAxis(this->xAxis(), this->yAxis());

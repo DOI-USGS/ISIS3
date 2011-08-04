@@ -15,9 +15,7 @@
 #include "SerialNumber.h"
 #include "Stretch.h"
 
-using namespace Isis;
-
-namespace Qisis {
+namespace Isis {
 
   //!  Construct an empty viewport
   ChipViewport::ChipViewport(int width, int height, QWidget *parent) :
@@ -90,10 +88,10 @@ namespace Qisis {
    *                             before allocating new.
    */
 
-  void ChipViewport::setChip(Isis::Chip *chip, Isis::Cube *chipCube) {
+  void ChipViewport::setChip(Chip *chip, Cube *chipCube) {
     // Is the chip usable?
     if (chip == NULL || chipCube == NULL) {
-      throw Isis::iException::Message(Isis::iException::Programmer,
+      throw iException::Message(iException::Programmer,
                                       "Can not view NULL chip pointer",
                                       _FILEINFO_);
     }
@@ -121,8 +119,8 @@ namespace Qisis {
   }
 
 
-  void ChipViewport::stretchFromCubeViewport(Isis::Stretch *newStretch,
-      Qisis::CubeViewport *cvp) {
+  void ChipViewport::stretchFromCubeViewport(Stretch *newStretch,
+      CubeViewport *cvp) {
 
     ASSERT(cvp != NULL);
 
@@ -160,12 +158,12 @@ namespace Qisis {
 
 
   //! Compute automatic stretch for a portion of the cube
-  void ChipViewport::computeStretch(Isis::Stretch &stretch, bool force) {
+  void ChipViewport::computeStretch(Stretch &stretch, bool force) {
     if (p_stretchLocked && !force) {
       stretch = *p_stretch;
     }
     else {
-      Isis::Statistics stats;
+      Statistics stats;
       for (int line = 1; line < p_chip->Lines(); line++) {
         for (int samp = 1; samp < p_chip->Samples(); samp++) {
           double value = p_chip->GetValue(samp, line);
@@ -173,7 +171,7 @@ namespace Qisis {
         }
       }
 
-      Isis::Histogram hist(stats.BestMinimum(), stats.BestMaximum());
+      Histogram hist(stats.BestMinimum(), stats.BestMaximum());
       for (int line = 1; line <= p_chip->Lines(); line++) {
         for (int samp = 1; samp <= p_chip->Samples(); samp++) {
           double value = p_chip->GetValue(samp, line);
@@ -239,7 +237,7 @@ namespace Qisis {
 
     // draw measure locations if we have a control network
     if (p_controlNet) {
-      string serialNumber = Isis::SerialNumber::Compose(*p_chipCube);
+      string serialNumber = SerialNumber::Compose(*p_chipCube);
 
       // loop through all points in the control net
       for (int i = 0; i < p_controlNet->GetNumPoints(); i++) {
@@ -262,7 +260,7 @@ namespace Qisis {
             painter.setPen(QColor(255, 255, 0)); // set point marker yellow
           }
           // check for ground measure
-          else if (p->GetType() == Isis::ControlPoint::Fixed) {
+          else if (p->GetType() == ControlPoint::Fixed) {
             painter.setPen(Qt::magenta);// set point marker magenta
           }
           else {
@@ -487,7 +485,7 @@ namespace Qisis {
    * @history 2010-06-16 Jeannie Walldren - Catch possible iException from Chip's
    *                        Load() method and display in QMessageBox
    */
-  void ChipViewport::geomChip(Isis::Chip *matchChip, Isis::Cube *matchChipCube) {
+  void ChipViewport::geomChip(Chip *matchChip, Cube *matchChipCube) {
 
     p_geomIt = true;
     p_matchChip = matchChip;
@@ -496,7 +494,7 @@ namespace Qisis {
       p_chip->Load(*p_chipCube, *matchChip, *matchChipCube);
 //    p_chip->ReLoad(*matchChip,p_zoomFactor);
     }
-    catch (Isis::iException &e) {
+    catch (iException &e) {
       QString msg = "Cannot geom chip.\n";
       msg += e.Errors().c_str();
       QMessageBox::information((QWidget *)parent(), "Error", msg);
@@ -520,7 +518,7 @@ namespace Qisis {
     try {
       p_chip->Load(*p_chipCube, p_rotation, p_zoomFactor);
     }
-    catch (Isis::iException &e) {
+    catch (iException &e) {
       QString msg = "Cannot load no geom chip.\n";
       msg += e.Errors().c_str();
       QMessageBox::information((QWidget *)parent(), "Error", msg);
@@ -550,7 +548,7 @@ namespace Qisis {
     try {
       p_chip->Load(*p_chipCube, -rotation, p_zoomFactor);
     }
-    catch (Isis::iException &e) {
+    catch (iException &e) {
       QString msg = "Cannot load rotated chip.\n";
       msg += e.Errors().c_str();
       QMessageBox::information((QWidget *)parent(), "Error", msg);
@@ -576,7 +574,7 @@ namespace Qisis {
 
     // Is the chip usable?
     if (p_chip == NULL) {
-      throw Isis::iException::Message(Isis::iException::Programmer,
+      throw iException::Message(iException::Programmer,
                                       "Can not view NULL chip pointer",
                                       _FILEINFO_);
     }
@@ -585,13 +583,13 @@ namespace Qisis {
       p_chip->TackCube(tackSample, tackLine);
     if (p_geomIt) {
       if (p_matchChip == NULL) {
-        throw Isis::iException::Message(Isis::iException::User,
+        throw iException::Message(iException::User,
                                         "Invalid match chip", _FILEINFO_);
       }
       try {
         p_chip->Load(*p_chipCube, *p_matchChip, *p_matchChipCube);
       }
-      catch (Isis::iException &e) {
+      catch (iException &e) {
         QString msg = "Cannot reload chip.\n";
         msg += e.Errors().c_str();
         QMessageBox::information((QWidget *)parent(), "Error", msg);
@@ -604,7 +602,7 @@ namespace Qisis {
       try {
         p_chip->Load(*p_chipCube, p_rotation, p_zoomFactor);
       }
-      catch (Isis::iException &e) {
+      catch (iException &e) {
         QString msg = "Cannot reload chip.\n";
         msg += e.Errors().c_str();
         QMessageBox::information((QWidget *)parent(), "Error", msg);

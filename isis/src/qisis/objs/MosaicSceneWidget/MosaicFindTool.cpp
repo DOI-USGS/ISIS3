@@ -59,10 +59,10 @@ namespace Isis {
       return;
     }
 
-    double lat = Isis::iString(latitude.toStdString()).ToDouble();
-    double lon = Isis::iString(longitude.toStdString()).ToDouble();
+    double lat = iString(latitude.toStdString()).ToDouble();
+    double lon = iString(longitude.toStdString()).ToDouble();
 
-    Isis::Projection *projection = getWidget()->getProjection();
+    Projection *projection = getWidget()->getProjection();
 
     if(projection && projection->SetGround(lat, lon)) {
       QPointF scenePos(projection->XCoord(), -1 * projection->YCoord());
@@ -198,7 +198,7 @@ namespace Isis {
       return;
 
     if(s == Qt::LeftButton) {
-      Isis::Projection *proj = getWidget()->getProjection();
+      Projection *proj = getWidget()->getProjection();
 
       if(proj && getWidget()->getView()->sceneRect().contains(mouseLoc)) {
         if(proj->SetCoordinate(mouseLoc.x(), -1 * mouseLoc.y())) {

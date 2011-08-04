@@ -13,7 +13,7 @@ class QLineEdit;
 class QString;
 class QColor;
 
-namespace Qisis {
+namespace Isis {
   /**
    * @brief This handles the advanced binary stretch
    *
@@ -32,11 +32,11 @@ namespace Qisis {
       Q_OBJECT
 
     public:
-      BinaryStretchType(const Isis::Histogram &, const Isis::Stretch &,
+      BinaryStretchType(const Histogram &, const Stretch &,
                         const QString &name, const QColor &color);
       ~BinaryStretchType();
 
-      virtual void setStretch(Isis::Stretch);
+      virtual void setStretch(Stretch);
 
     private slots:
       void startSliderMoved(int);
@@ -45,7 +45,7 @@ namespace Qisis {
       void endEditChanged(const QString &);
 
     private:
-      Isis::Stretch calculateNewStretch();
+      Stretch calculateNewStretch();
 
     private:
       QSlider *p_startSlider; //!< Start point slider

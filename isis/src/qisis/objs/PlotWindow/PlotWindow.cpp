@@ -8,7 +8,7 @@
 #include <qwt_scale_engine.h>
 #include <algorithm>
 
-namespace Qisis {
+namespace Isis {
   /*Static variables*/
   PlotCurve *PlotWindow::p_dragCurve = NULL;
   bool PlotWindow::p_curveCopied = false;
@@ -21,7 +21,7 @@ namespace Qisis {
    * @param title
    * @param parent
    */
-  PlotWindow::PlotWindow(QString title, QWidget *parent) : Qisis::MainWindow(title, parent) {
+  PlotWindow::PlotWindow(QString title, QWidget *parent) : MainWindow(title, parent) {
     p_selected = -1;
     p_toolBar = NULL;
     p_menubar = NULL;
@@ -77,7 +77,7 @@ namespace Qisis {
     p_zoomer->setTrackerPen(QPen(Qt::lightGray));
 
     /* Create the Plot window*/
-    p_mainWindow = new Qisis::MainWindow(this->windowTitle(), p_parent);
+    p_mainWindow = new MainWindow(this->windowTitle(), p_parent);
     p_mainWindow->installEventFilter(this);
     p_mainWindow->setCentralWidget(p_plot);
     setupDefaultMenu();
@@ -1475,12 +1475,12 @@ namespace Qisis {
       for(unsigned int r = 0; r < p_plotCurves[c]->data().size(); r++) {
         //creates a widget item with the data from the curves.
         QTableWidgetItem *item = new QTableWidgetItem
-        (Isis::iString(p_plotCurves[c]->data().y(r)).ToQt());
+        (iString(p_plotCurves[c]->data().y(r)).ToQt());
         p_tableWindow->table()->setItem(r, c + 1, item);
         //p_tableWindow->table()->resizeColumnToContents(c-1);
 
         QTableWidgetItem *xAxisItem = new QTableWidgetItem
-        (Isis::iString(p_plotCurves[c]->data().x(r)).ToQt());
+        (iString(p_plotCurves[c]->data().x(r)).ToQt());
         p_tableWindow->table()->setItem(r, 0, xAxisItem);
         //p_tableWindow->table()->resizeColumnToContents(0);
       }//end rows
@@ -1508,8 +1508,8 @@ namespace Qisis {
     if(p_plotCurves.size() < 1) return;
 
     if(p_tableWindow == NULL) {
-      //p_tableWindow = new Qisis::TableMainWindow("Plot Table", this);
-      p_tableWindow = new Qisis::TableMainWindow("Plot Table", p_parent);
+      //p_tableWindow = new TableMainWindow("Plot Table", this);
+      p_tableWindow = new TableMainWindow("Plot Table", p_parent);
       p_tableWindow->setTrackListItems(false);
     }
     fillTable();
@@ -1685,7 +1685,7 @@ namespace Qisis {
     std::string appName = p_parent->windowTitle().toStdString();
     /*Now read the settings that are specific to this window.*/
     std::string instanceName = this->windowTitle().toStdString();
-    Isis::Filename config("$HOME/.Isis/" + appName + "/" + instanceName + ".config");
+    Filename config("$HOME/.Isis/" + appName + "/" + instanceName + ".config");
 
     QSettings settings(QString::fromStdString(config.Expanded()), QSettings::NativeFormat);
     QByteArray state = settings.value("state", QByteArray("0")).toByteArray();
@@ -1706,7 +1706,7 @@ namespace Qisis {
     std::string appName = p_parent->windowTitle().toStdString();
     /*Now write the settings that are specific to this window.*/
     std::string instanceName = this->windowTitle().toStdString();
-    Isis::Filename config("$HOME/.Isis/" + appName + "/" + instanceName + ".config");
+    Filename config("$HOME/.Isis/" + appName + "/" + instanceName + ".config");
 
     QSettings settings(QString::fromStdString(config.Expanded()), QSettings::NativeFormat);
     settings.setValue("state", p_mainWindow->saveState());

@@ -4,9 +4,7 @@
 
 #include "iString.h"
 
-using namespace Isis;
-
-namespace Qisis {
+namespace Isis {
   /**
    * Mainwindow constructor
    *
@@ -66,7 +64,7 @@ namespace Qisis {
     }
 
     std::string instanceName = this->windowTitle().toStdString();
-    Isis::Filename config("$HOME/.Isis/" + p_appName + "/" + instanceName + ".config");
+    Filename config("$HOME/.Isis/" + p_appName + "/" + instanceName + ".config");
     QSettings settings(QString::fromStdString(config.Expanded()), QSettings::NativeFormat);
     QPoint pos = settings.value("pos", QPoint(300, 100)).toPoint();
     QSize size = settings.value("size", QSize(900, 500)).toSize();
@@ -92,7 +90,7 @@ namespace Qisis {
     }
 
     std::string instanceName = windowTitle().toStdString();
-    Isis::Filename config("$HOME/.Isis/" + appName + "/" + instanceName + ".config");
+    Filename config("$HOME/.Isis/" + appName + "/" + instanceName + ".config");
     QSettings settings(QString::fromStdString(config.Expanded()), QSettings::NativeFormat);
     settings.setValue("pos", pos());
     settings.setValue("size", size());

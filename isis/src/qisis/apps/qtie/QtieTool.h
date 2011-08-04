@@ -23,7 +23,7 @@
 class QLineEdit;
 class QMainWindow;
 
-namespace Qisis {
+namespace Isis {
   class MdiCubeViewport;
 
   /**
@@ -48,7 +48,7 @@ namespace Qisis {
     *                          registration template now in this class, not in
     *                          ControlPointEdit
     */
-  class QtieTool : public Qisis::Tool {
+  class QtieTool : public Tool {
       Q_OBJECT
 
     public:
@@ -60,15 +60,15 @@ namespace Qisis {
     signals:
       void tieToolSave();
       void editPointChanged();
-      void newSolution(Isis::Table *cmatrix);
-      void stretchChipViewport(Isis::Stretch *, Qisis::CubeViewport *);
+      void newSolution(Table *cmatrix);
+      void stretchChipViewport(Stretch *, CubeViewport *);
 
     public slots:
-      void setFiles(Isis::Cube &baseCube, Isis::Cube &matchCube, Isis::ControlNet &cnet);
+      void setFiles(Cube &baseCube, Cube &matchCube, ControlNet &cnet);
       void clearFiles();
       void createPoint(double lat, double lon);
-      void modifyPoint(Isis::ControlPoint *point);
-      void deletePoint(Isis::ControlPoint *point);
+      void modifyPoint(ControlPoint *point);
+      void deletePoint(ControlPoint *point);
 
     protected:
       QAction *toolPadAction(ToolPad *pad);
@@ -79,7 +79,7 @@ namespace Qisis {
     private slots:
       void drawMeasuresOnViewports();
       void solve();
-      void writeNewCmatrix(Isis::Table *cmatrix);
+      void writeNewCmatrix(Table *cmatrix);
       void saveNet();
 
       void pointSaved();
@@ -116,20 +116,20 @@ namespace Qisis {
         Base
       };
 
-      Isis::SerialNumberList *p_serialNumberList;
-      Isis::ControlNet *p_controlNet;
+      SerialNumberList *p_serialNumberList;
+      ControlNet *p_controlNet;
 
-      Isis::ControlPoint *p_controlPoint;
+      ControlPoint *p_controlPoint;
       int p_ptIdIndex;
 
-      Isis::ControlMeasure *p_baseMeasure;
-      Isis::ControlMeasure *p_matchMeasure;
-      Isis::Cube *p_baseCube;
-      Isis::Cube *p_matchCube;
+      ControlMeasure *p_baseMeasure;
+      ControlMeasure *p_matchMeasure;
+      Cube *p_baseCube;
+      Cube *p_matchCube;
       std::string p_baseSN;
       std::string p_matchSN;
-      Isis::UniversalGroundMap *p_baseGM;
-      Isis::UniversalGroundMap *p_matchGM;
+      UniversalGroundMap *p_baseGM;
+      UniversalGroundMap *p_matchGM;
 
       bool p_twist;
       double p_tolerance;

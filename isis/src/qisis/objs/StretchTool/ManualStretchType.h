@@ -13,7 +13,7 @@ class QLineEdit;
 class QString;
 class QColor;
 
-namespace Qisis {
+namespace Isis {
 
   /**
    * @brief This handles arbitrary user-input stretches
@@ -31,11 +31,11 @@ namespace Qisis {
       Q_OBJECT
 
     public:
-      ManualStretchType(const Isis::Histogram &, const Isis::Stretch &,
+      ManualStretchType(const Histogram &, const Stretch &,
                         const QString &name, const QColor &color);
       ~ManualStretchType();
 
-      virtual void setStretch(Isis::Stretch);
+      virtual void setStretch(Stretch);
 
     private slots:
       void addButtonPressed(bool);

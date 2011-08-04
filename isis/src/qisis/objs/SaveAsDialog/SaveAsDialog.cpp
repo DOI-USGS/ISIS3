@@ -4,9 +4,8 @@
 #include <iostream>
 
 using namespace std;
-using namespace Isis;
 
-namespace Qisis {
+namespace Isis {
 
   /**
    * Constructor - Displays FileDialog with different save options

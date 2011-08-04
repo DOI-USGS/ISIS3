@@ -6,7 +6,7 @@
 class QRect;
 class QPoint;
 
-namespace Qisis {
+namespace Isis {
   /**
    * @internal
    *   @history 2011-04-25 Steven Lambright Fixed a problem where 1 too few

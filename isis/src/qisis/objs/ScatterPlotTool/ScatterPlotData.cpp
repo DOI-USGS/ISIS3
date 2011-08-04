@@ -1,6 +1,6 @@
 #include "ScatterPlotData.h"
 
-namespace Qisis {
+namespace Isis {
 
   /**
    * ScatterPlotDataConstructor
@@ -42,8 +42,8 @@ namespace Qisis {
                                     esamp, eline);
 
 
-    Isis::Statistics stats;
-    Isis::Brick brick(1, 1, 1, p_cube1->getPixelType());
+    Statistics stats;
+    Brick brick(1, 1, 1, p_cube1->getPixelType());
 
     int bufns1 = (int)esamp - (int)ssamp + 1;
     brick.Resize(bufns1, 1, 1);
@@ -91,8 +91,8 @@ namespace Qisis {
 
     setBoundingRect(QwtDoubleRect(p_min1, p_min2, p_max1, p_max2));
 
-    Isis::Brick brick1(1, 1, 1, p_cube1->getPixelType());
-    Isis::Brick brick2(1, 1, 1, p_cube2->getPixelType());
+    Brick brick1(1, 1, 1, p_cube1->getPixelType());
+    Brick brick2(1, 1, 1, p_cube2->getPixelType());
 
     // -----------------------------------------------
     // If the actual cube size is smaller than the

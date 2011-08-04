@@ -3,7 +3,7 @@
 
 #include <QThread>
 
-namespace Qisis {
+namespace Isis {
   class SocketThread : public QThread {
       Q_OBJECT
 

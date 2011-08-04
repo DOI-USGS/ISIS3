@@ -30,7 +30,7 @@ namespace Isis {
   class UniversalGroundMap;
 }
 
-namespace Qisis {
+namespace Isis {
   class ChipViewport;
   class CubeViewport;
   class Tool;
@@ -111,7 +111,7 @@ namespace Qisis {
       Q_OBJECT
 
     public:
-      ControlPointEdit(Isis::ControlNet * cnetQ, QWidget *parent = 0,
+      ControlPointEdit(ControlNet * cnetQ, QWidget *parent = 0,
                        bool allowLeftMouse = false);
       std::string templateFilename() {
         return p_templateFilename;
@@ -123,14 +123,14 @@ namespace Qisis {
       void updateLeftView(double sample, double line);
       void updateRightView(double sample, double line);
       void measureSaved();
-      void newControlNetwork(Isis::ControlNet *);
-      void stretchChipViewport(Isis::Stretch *, Qisis::CubeViewport *);
+      void newControlNetwork(ControlNet *);
+      void stretchChipViewport(Stretch *, CubeViewport *);
 
     public slots:
-      void setLeftMeasure(Isis::ControlMeasure *leftMeasure,
-                          Isis::Cube *leftCube, std::string pointId);
-      void setRightMeasure(Isis::ControlMeasure *rightMeasure,
-                           Isis::Cube *rightCube, std::string pointId);
+      void setLeftMeasure(ControlMeasure *leftMeasure,
+                          Cube *leftCube, std::string pointId);
+      void setRightMeasure(ControlMeasure *rightMeasure,
+                           Cube *rightCube, std::string pointId);
       void colorizeSaveButton();
       void saveChips();
 
@@ -199,16 +199,16 @@ namespace Qisis {
       ChipViewport *p_leftView;
       ChipViewport *p_rightView;
 
-      Isis::Cube *p_leftCube;
-      Isis::Cube *p_rightCube;
-      Isis::ControlMeasure *p_leftMeasure;
-      Isis::ControlMeasure *p_rightMeasure;
-      Isis::Chip *p_leftChip;
-      Isis::Chip *p_rightChip;
-      Isis::UniversalGroundMap *p_leftGroundMap;
-      Isis::UniversalGroundMap *p_rightGroundMap;
+      Cube *p_leftCube;
+      Cube *p_rightCube;
+      ControlMeasure *p_leftMeasure;
+      ControlMeasure *p_rightMeasure;
+      Chip *p_leftChip;
+      Chip *p_rightChip;
+      UniversalGroundMap *p_leftGroundMap;
+      UniversalGroundMap *p_rightGroundMap;
 
-      Isis::AutoReg *p_autoRegFact;
+      AutoReg *p_autoRegFact;
       std::string p_pointId;
 
       int p_rotation;

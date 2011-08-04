@@ -31,7 +31,7 @@
 #include "QnetFilter.h"
 
 
-namespace Qisis {
+namespace Isis {
   /**
    * Defines the Cube Name filter for the QnetNavTool's
    * Points section. The user must choose from a list of cubes.

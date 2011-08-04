@@ -6,7 +6,7 @@
 
 #include "Stretch.h"
 
-namespace Qisis {
+namespace Isis {
   /**
    * @brief Abstract class for complex stretch objects
    *
@@ -101,9 +101,9 @@ namespace Qisis {
        *
        * This method returns the stretch.
        *
-       * @return Isis::Stretch
+       * @return Stretch
        */
-      Isis::Stretch stretch() {
+      Stretch stretch() {
         return p_stretch;
       }
 
@@ -131,7 +131,7 @@ namespace Qisis {
       double p_min; //!< The minimum value a stretch input pair can be set to
       double p_max; //!< The maximum value a stretch input pair can be set to
       QGroupBox *p_parametersBox; //!< The QGroupBox that holds this QStretch's parameters
-      Isis::Stretch p_stretch; //!< The stretch that this QStretch modifies
+      Stretch p_stretch; //!< The stretch that this QStretch modifies
   };
 };
 

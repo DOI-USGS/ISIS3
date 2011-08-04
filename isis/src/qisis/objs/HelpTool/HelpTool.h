@@ -23,7 +23,7 @@
 #include <QAction>
 #include "Tool.h"
 
-namespace Qisis {
+namespace Isis {
   /**
   * @brief Qisis Help Tool
   *

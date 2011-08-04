@@ -42,7 +42,7 @@ namespace Isis {
   class Brick;
 }
 
-namespace Qisis {
+namespace Isis {
   class CubeViewport;
   class ViewportBufferAction;
   class ViewportBufferFill;
@@ -82,7 +82,7 @@ namespace Qisis {
       Q_OBJECT
 
     public:
-      ViewportBuffer(CubeViewport *viewport, Isis::CubeDataThread *cubeData,
+      ViewportBuffer(CubeViewport *viewport, CubeDataThread *cubeData,
                      int cubeId);
       virtual ~ViewportBuffer();
 
@@ -94,7 +94,7 @@ namespace Qisis {
       void scaleChanged();
 
       void fillBuffer(QRect rect);
-      void fillBuffer(QRect rect, const Isis::Brick *data);
+      void fillBuffer(QRect rect, const Brick *data);
 
       void emptyBuffer(bool force = false);
 
@@ -128,7 +128,7 @@ namespace Qisis {
       bool hasEntireCube();
 
     public slots:
-      void DataReady(void *requester, int cubeId, const Isis::Brick *brick);
+      void DataReady(void *requester, int cubeId, const Brick *brick);
 
     signals:
       /**
@@ -146,7 +146,7 @@ namespace Qisis {
                     int endSample, int endLine, int band, void *caller);
 
       //! Tell cube data thread we're done with a brick
-      void DoneWithData(int, const Isis::Brick *);
+      void DoneWithData(int, const Brick *);
 
     private:
       QRect getXYBoundingRect();
@@ -155,7 +155,7 @@ namespace Qisis {
       void doQueuedActions();
       void doTransformAction(ViewportBufferTransform *action);
       void doStretchAction(ViewportBufferStretch *action);
-      void startFillAction(Qisis::ViewportBufferFill *action);
+      void startFillAction(ViewportBufferFill *action);
 
       ViewportBufferFill *createViewportBufferFill(QRect, bool);
 
@@ -170,7 +170,7 @@ namespace Qisis {
 
       CubeViewport *p_viewport;  //!< The CubeViewport which created this buffer
       int p_cubeId; //!< Id associated with the cube in this viewport buffer
-      Isis::CubeDataThread *p_dataThread;  //!< manages cube io
+      CubeDataThread *p_dataThread;  //!< manages cube io
 
       int p_band; //!< The band to read from
 

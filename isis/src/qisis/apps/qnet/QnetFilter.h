@@ -8,7 +8,7 @@
 #include <QList>
 
 
-namespace Qisis {
+namespace Isis {
   class QnetFilter : public QWidget {
       Q_OBJECT
 

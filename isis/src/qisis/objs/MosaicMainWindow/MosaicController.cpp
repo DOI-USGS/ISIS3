@@ -26,7 +26,6 @@
 #include "PvlObject.h"
 #include "TextFile.h"
 
-// using namespace Qisis;
 
 namespace Isis {
 

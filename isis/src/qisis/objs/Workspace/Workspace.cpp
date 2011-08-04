@@ -11,8 +11,7 @@
 #include "MdiCubeViewport.h"
 
 
-
-namespace Qisis {
+namespace Isis {
 
   /**
    * Workspace constructor
@@ -50,11 +49,11 @@ namespace Qisis {
    */
   void Workspace::activateViewport(QMdiSubWindow *w) {
     if(w) {
-      emit cubeViewportActivated((Qisis::MdiCubeViewport *) w->widget()->layout()->itemAt(0)->widget());
+      emit cubeViewportActivated((MdiCubeViewport *) w->widget()->layout()->itemAt(0)->widget());
     }
     //Check if there is no current window (on close)
     else if(!currentSubWindow()) {
-      emit cubeViewportActivated((Qisis::MdiCubeViewport *)NULL);
+      emit cubeViewportActivated((MdiCubeViewport *)NULL);
     }
   }
 
@@ -101,10 +100,10 @@ namespace Qisis {
    *
    */
   void Workspace::addCubeViewport(QString cubename) {
-    Isis::Cube *cube = new Isis::Cube;
+    Cube *cube = new Cube;
 
     //Read in the CubeAttribueInput from the cube name
-    Isis::CubeAttributeInput inAtt(cubename.toStdString());
+    CubeAttributeInput inAtt(cubename.toStdString());
     std::vector<std::string> bands = inAtt.Bands();
 
     //Set the virtual bands to the bands specified by the input
@@ -115,11 +114,11 @@ namespace Qisis {
 
     // Check for RGB format (#R,#G,#B)
     if(bands.size() == 3) {
-      Isis::iString st = Isis::iString(bands.at(0));
+      iString st = iString(bands.at(0));
       int index_red = st.ToInteger();
-      st = Isis::iString(bands.at(1));
+      st = iString(bands.at(1));
       int index_green = st.ToInteger();
-      st = Isis::iString(bands.at(2));
+      st = iString(bands.at(2));
       int index_blue = st.ToInteger();
       cvp->viewRGB(index_red, index_green, index_blue);
     }
@@ -128,7 +127,7 @@ namespace Qisis {
   /**
    * Add a cubeViewport to the workspace.
    *
-   * @param cube[in]  (Isis::Cube *)  cube information
+   * @param cube[in]  (Cube *)  cube information
    *
    * @internal
    *
@@ -143,8 +142,8 @@ namespace Qisis {
    *          close the MdiCubeViewport if showCube() is not
    *          successful.
    */
-  MdiCubeViewport *Workspace::addCubeViewport(Isis::Cube *cube) {
-    Qisis::MdiCubeViewport *cvp = NULL;
+  MdiCubeViewport *Workspace::addCubeViewport(Cube *cube) {
+    MdiCubeViewport *cvp = NULL;
 
     QMdiSubWindow *window = new QMdiSubWindow;
     window->setOption(QMdiSubWindow::RubberBandResize, true);
@@ -154,7 +153,7 @@ namespace Qisis {
       QWidget *centralWidget = new QWidget(this);
       QVBoxLayout *layout = new QVBoxLayout();
 
-      cvp = new Qisis::MdiCubeViewport(cube, centralWidget);
+      cvp = new MdiCubeViewport(cube, centralWidget);
       QProgressBar *progress = new QProgressBar();
       connect(cvp, SIGNAL(progressChanged(int)), progress, SLOT(setValue(int)));
       progress->setRange(0, 100);
@@ -171,11 +170,11 @@ namespace Qisis {
 
       window->show();
     }
-    catch(Isis::iException &e) {
+    catch(iException &e) {
       // close MdiCubeViewport window
       cvp->close();
       // add a new message to the caught exception and throw
-      throw e.Message(Isis::iException::Programmer,
+      throw e.Message(iException::Programmer,
                       "Exception caught when attempting to show cube "
                       + cube->getFilename(),
                       _FILEINFO_);

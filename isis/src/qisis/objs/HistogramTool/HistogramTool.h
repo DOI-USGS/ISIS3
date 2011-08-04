@@ -16,7 +16,7 @@ namespace Isis {
 }
 
 
-namespace Qisis {
+namespace Isis {
   class HistogramItem;
   class HistogramToolWindow;
   class MdiCubeViewport;
@@ -55,11 +55,11 @@ namespace Qisis {
 
     public slots:
       void changePlot();
-      void updateViewPort(Qisis::MdiCubeViewport *);
-      void copyCurve(Qisis::PlotCurve *);
+      void updateViewPort(MdiCubeViewport *);
+      void copyCurve(PlotCurve *);
       void copyCurve();
-      void pasteCurve(Qisis::PlotWindow *);
-      void pasteCurveSpecial(Qisis::PlotWindow *);
+      void pasteCurve(PlotWindow *);
+      void pasteCurveSpecial(PlotWindow *);
       void showPlotWindow();
 
     private slots:

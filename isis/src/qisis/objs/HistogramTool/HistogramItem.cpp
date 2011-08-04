@@ -10,7 +10,7 @@
 
 #include <iostream>
 
-namespace Qisis {
+namespace Isis {
 
   class HistogramItem::PrivateData {
     public:

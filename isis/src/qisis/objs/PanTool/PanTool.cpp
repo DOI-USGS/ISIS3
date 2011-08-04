@@ -13,8 +13,8 @@
 #include "MdiCubeViewport.h"
 #include "ToolPad.h"
 
-namespace Qisis {
-  PanTool::PanTool(QWidget *parent) : Qisis::Tool(parent) {
+namespace Isis {
+  PanTool::PanTool(QWidget *parent) : Tool(parent) {
     p_panRight = new QAction(parent);
     p_panRight->setShortcut(Qt::CTRL + Qt::Key_Right);
     p_panRight->setText("&Pan Right");
@@ -255,14 +255,14 @@ namespace Qisis {
   }
 
   void PanTool::writeSettings() {
-    Isis::Filename config("$HOME/.Isis/qview/Pan Tool.config");
+    Filename config("$HOME/.Isis/qview/Pan Tool.config");
     QSettings settings(QString::fromStdString(config.Expanded()),
                        QSettings::NativeFormat);
     settings.setValue("rate", p_lineEdit->text());
   }
 
   void PanTool::readSettings() {
-    Isis::Filename config("$HOME/.Isis/qview/Pan Tool.config");
+    Filename config("$HOME/.Isis/qview/Pan Tool.config");
     QSettings settings(QString::fromStdString(config.Expanded()),
                        QSettings::NativeFormat);
     QString rate = settings.value("rate", "75").toString();

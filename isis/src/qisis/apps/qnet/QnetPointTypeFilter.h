@@ -8,7 +8,7 @@ class QGroupBox;
 class QRadioButton;
 
 
-namespace Qisis {
+namespace Isis {
   /**
    * Filter for control point type. The user must choose Ground,
    * Ignore, or Hold.  This class is designed to remove points
@@ -26,7 +26,7 @@ namespace Qisis {
    *                          if all of its measures have
    *                          Ignore=True.
    *   @history 2010-06-03 Jeannie Walldren - Replaced "0" with
-   *                          "Isis::ControlPoint::Ground" in
+   *                          "ControlPoint::Ground" in
    *                          filter().  Initialized pointers to
    *                          null in constructor
    *   @history 2011-06-08 Tracie Sucharski - Change for new point types and

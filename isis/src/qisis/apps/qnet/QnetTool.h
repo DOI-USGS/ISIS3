@@ -34,7 +34,7 @@ namespace Isis {
   class UniversalGroundMap;
 }
 
-namespace Qisis {
+namespace Isis {
   class ControlPointEdit;
   class CubeViewport;
   class MdiCubeViewport;
@@ -198,8 +198,8 @@ namespace Qisis {
       void ignoreLeftChanged();
       void ignoreRightChanged();
       void showNavTool();
-      void newControlNetwork(Isis::ControlNet *);
-      void stretchChipViewport(Isis::Stretch *, Qisis::CubeViewport *);
+      void newControlNetwork(ControlNet *);
+      void stretchChipViewport(Stretch *, CubeViewport *);
       void measureChanged();
 
     public slots:
@@ -207,8 +207,8 @@ namespace Qisis {
       void updateNet(QString cNetFilename);
       void createPoint(double lat,double lon);
       void createFixedPoint(double lat,double lon);
-      void modifyPoint(Isis::ControlPoint *point);
-      void deletePoint(Isis::ControlPoint *point);
+      void modifyPoint(ControlPoint *point);
+      void deletePoint(ControlPoint *point);
       void updatePointInfo(QString pointId);
       void refresh();
 
@@ -264,7 +264,7 @@ namespace Qisis {
       void loadPoint();
       void loadMeasureTable();
       void drawAllMeasurments (MdiCubeViewport *vp,QPainter *painter);
-//      void drawMeasures (MdiCubeViewport *vp,QPainter *painter,Isis::ControlPoint &point);
+//      void drawMeasures (MdiCubeViewport *vp,QPainter *painter,ControlPoint &point);
       void createQnetTool(QWidget *parent);
       QSplitter * createTopSplitter();
       QGroupBox * createControlPointGroupBox();
@@ -276,7 +276,7 @@ namespace Qisis {
       void initDem(QString demFile);
       double demRadius(double latitude, double longitude);
       void clearGroundSource();
-      bool IsMeasureLocked(Isis::iString serialNumber);
+      bool IsMeasureLocked(iString serialNumber);
 
 
       QMainWindow *p_qnetTool;
@@ -350,31 +350,31 @@ namespace Qisis {
 
       QTableWidget *p_measureTable;
 
-      Isis::ControlPoint *p_editPoint;
+      ControlPoint *p_editPoint;
 
       QStringList p_pointFiles;
 
       std::string p_leftFile;
-      Isis::ControlMeasure *p_leftMeasure;
-      Isis::ControlMeasure *p_rightMeasure;
-      Isis::Cube *p_leftCube;
-      Isis::Cube *p_rightCube;
+      ControlMeasure *p_leftMeasure;
+      ControlMeasure *p_rightMeasure;
+      Cube *p_leftCube;
+      Cube *p_rightCube;
 
       QString p_groundFile;
-      Isis::Cube *p_groundCube;
-      Isis::iString p_groundSN;
-      Isis::UniversalGroundMap *p_groundGmap;
+      Cube *p_groundCube;
+      iString p_groundSN;
+      UniversalGroundMap *p_groundGmap;
       bool p_groundOpen;
-      Isis::ControlPoint::SurfacePointSource::Source p_groundSurfacePointSource;
-      Isis::ControlPoint::RadiusSource::Source p_groundRadiusSource;
+      ControlPoint::SurfacePointSource::Source p_groundSurfacePointSource;
+      ControlPoint::RadiusSource::Source p_groundRadiusSource;
       //  TODO:  Combine the following p_groundSourceFile, p_radiusSourceFile
       //           with p_groundFile and p_demFile.  Is it just a matter of
       //           full path vs filename only?
-      Isis::iString p_groundSourceFile;
-      Isis::iString p_radiusSourceFile;
+      iString p_groundSourceFile;
+      iString p_radiusSourceFile;
       QString p_demFile;
       bool p_demOpen;
-      Isis::Cube *p_demCube;
+      Cube *p_demCube;
   };
 };
 

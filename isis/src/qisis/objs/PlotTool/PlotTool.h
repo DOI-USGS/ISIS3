@@ -26,7 +26,7 @@ namespace Isis {
   class Statistics;
 }
 
-namespace Qisis {
+namespace Isis {
   class PlotToolCurve;
   class PlotToolWindow;
   class PlotWindow;
@@ -79,10 +79,10 @@ namespace Qisis {
     public slots:
       void changePlot();
       void showPlotWindow();
-      void updateViewPort(Qisis::PlotToolCurve *);
-      void copyCurve(Qisis::PlotCurve *);
-      void pasteCurve(Qisis::PlotWindow *);
-      void pasteCurveSpecial(Qisis::PlotWindow *);
+      void updateViewPort(PlotToolCurve *);
+      void copyCurve(PlotCurve *);
+      void pasteCurve(PlotWindow *);
+      void pasteCurveSpecial(PlotWindow *);
       void removeWindow(QObject *);
       void removeWindow(void);
 
@@ -97,7 +97,7 @@ namespace Qisis {
 
     private:
       void getSpectralStatistics(std::vector< double > & labels,
-                                 std::vector< Isis::Statistics > & data);
+                                 std::vector< Statistics > & data);
       void getSpatialStatistics(std::vector< double >  & labels,
                                 std::vector< double > & data, double &xmax,
                                 MdiCubeViewport *);

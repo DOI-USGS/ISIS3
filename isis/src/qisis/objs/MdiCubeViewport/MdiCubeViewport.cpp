@@ -32,11 +32,10 @@
 #include "StretchTool.h"
 
 
-using namespace Isis;
 using namespace std;
 
 
-namespace Qisis {
+namespace Isis {
   MdiCubeViewport::MdiCubeViewport(Cube *cube, QWidget *parent) :
     CubeViewport(cube, parent) {
     p_linked = false;

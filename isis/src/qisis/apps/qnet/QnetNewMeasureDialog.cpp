@@ -11,10 +11,9 @@
 
 #include "qnet.h"
 
-using namespace Qisis::Qnet;
-using namespace Isis;
+using namespace Isis::Qnet;
 
-namespace Qisis {
+namespace Isis {
   /**
    * Contructor.
    *
@@ -64,7 +63,7 @@ namespace Qisis {
    *   @history 2010-10-29 Tracie Sucharski - Changed std::vector<std::string>
    *            to QSringList
    */
-  void QnetNewMeasureDialog::SetFiles(Isis::ControlPoint point,
+  void QnetNewMeasureDialog::SetFiles(ControlPoint point,
       QStringList pointFiles) {
     int bottomMostSelectedItemIndex = 0;
 

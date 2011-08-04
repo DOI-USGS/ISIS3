@@ -11,7 +11,7 @@
 #include "QnetFilter.h"
 
 
-namespace Qisis {
+namespace Isis {
   /**
    * Defines the Images filter for the QnetNavTool's Points
    * section, i.e. the number of measures in control point. The

@@ -13,7 +13,7 @@
 #include "ViewportMainWindow.h"
 
 
-namespace Qisis {
+namespace Isis {
   QStackedWidget *Tool::p_activeToolBarStack = NULL;
 
   /**
@@ -27,7 +27,7 @@ namespace Qisis {
     p_active = false;
     p_toolPadAction = NULL;
     p_toolBarWidget = NULL;
-    std::string tempFilename = Isis::Filename("$base/icons").Expanded();
+    std::string tempFilename = Filename("$base/icons").Expanded();
     p_toolIconDir = tempFilename.c_str();
   }
 
@@ -37,15 +37,15 @@ namespace Qisis {
    *
    * @param ws
    */
-  void Tool::addTo(Qisis::Workspace *ws) {
+  void Tool::addTo(Workspace *ws) {
     p_workspace = ws;
 
-    connect(ws, SIGNAL(cubeViewportAdded(Qisis::MdiCubeViewport *)),
-            this, SLOT(setCubeViewport(Qisis::MdiCubeViewport *)));
-    connect(ws, SIGNAL(cubeViewportActivated(Qisis::MdiCubeViewport *)),
-            this, SLOT(setCubeViewport(Qisis::MdiCubeViewport *)));
-    connect(ws, SIGNAL(cubeViewportAdded(Qisis::MdiCubeViewport *)),
-            this, SLOT(registerTool(Qisis::MdiCubeViewport *)));
+    connect(ws, SIGNAL(cubeViewportAdded(MdiCubeViewport *)),
+            this, SLOT(setCubeViewport(MdiCubeViewport *)));
+    connect(ws, SIGNAL(cubeViewportActivated(MdiCubeViewport *)),
+            this, SLOT(setCubeViewport(MdiCubeViewport *)));
+    connect(ws, SIGNAL(cubeViewportAdded(MdiCubeViewport *)),
+            this, SLOT(registerTool(MdiCubeViewport *)));
   }
 
   /**
@@ -53,7 +53,7 @@ namespace Qisis {
    *
    * @param pViewPortMnWin
    */
-  void Tool::addTo(Qisis::ViewportMainWindow *pViewPortMnWin) {
+  void Tool::addTo(ViewportMainWindow *pViewPortMnWin) {
     addTo(pViewPortMnWin->workspace());
     addToPermanent(pViewPortMnWin->permanentToolBar());
     addToActive(pViewPortMnWin->activeToolBar());
@@ -73,7 +73,7 @@ namespace Qisis {
    *
    * @param toolpad
    */
-  void Tool::addTo(Qisis::ToolPad *toolpad) {
+  void Tool::addTo(ToolPad *toolpad) {
     p_toolPadAction = toolPadAction(toolpad);
     if(p_toolPadAction != NULL) {
       toolpad->addAction(p_toolPadAction);
@@ -134,7 +134,7 @@ namespace Qisis {
    *
    * @param cvp
    */
-  void Tool::setCubeViewport(Qisis::MdiCubeViewport *cvp) {
+  void Tool::setCubeViewport(MdiCubeViewport *cvp) {
     if(cvp == p_cvp) {
       updateTool();
       return;
@@ -294,7 +294,7 @@ namespace Qisis {
    *
    * @param viewport
    */
-  void Tool::registerTool(Qisis::MdiCubeViewport *viewport) {
+  void Tool::registerTool(MdiCubeViewport *viewport) {
     viewport->registerTool(this);
 
     connect(p_cvp, SIGNAL(requestRestretch(MdiCubeViewport *, int)),

@@ -28,7 +28,7 @@ namespace Isis {
   class ControlPoint;
 }
 
-namespace Qisis {
+namespace Isis {
   /**
    * Defines the Registration Error filter for the QnetNavTool's Points section.
    * The user may enter values for Less Than and/or Greater Than. This class is 

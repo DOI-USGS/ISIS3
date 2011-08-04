@@ -8,7 +8,7 @@
 class QLabel;
 class QStatusBar;
 
-namespace Qisis {
+namespace Isis {
   class MdiCubeViewport;
   class WarningWidget;
 

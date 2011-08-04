@@ -39,7 +39,7 @@ namespace Isis {
 
 class QImage;
 
-namespace Qisis {
+namespace Isis {
   class CubeViewport;
 
   /**
@@ -85,13 +85,13 @@ namespace Qisis {
       bool cubeToViewport(double samp, double line, int &x, int &y);
 
       //!  Set chip
-      void setChip(Isis::Chip *chip, Isis::Cube *chipCube);
+      void setChip(Chip *chip, Cube *chipCube);
 
       //!  Load with another ChipViewport
       void loadView(ChipViewport &newView);
 
       //!  Return chip
-      Isis::Chip *chip() const {
+      Chip *chip() const {
         return p_chip;
       };
 
@@ -119,7 +119,7 @@ namespace Qisis {
 
 
       //! Return the gray band stretch
-      Isis::Stretch grayStretch() const {
+      Stretch grayStretch() const {
         return p_gray.stretch;
       };
 
@@ -135,14 +135,14 @@ namespace Qisis {
     public slots:
 
       void autoStretch();
-      void stretchFromCubeViewport(Isis::Stretch *, Qisis::CubeViewport *);
+      void stretchFromCubeViewport(Stretch *, CubeViewport *);
       void changeStretchLock(int);
       void setCross(bool checked);
       void rotateChip(int rotation);
       void setCircle(bool checked);
       void setCircleSize(int size);
 
-      void geomChip(Isis::Chip *matchChip, Isis::Cube *matchChipCube);
+      void geomChip(Chip *matchChip, Cube *matchChipCube);
       void nogeomChip();
 
       void panUp();
@@ -161,7 +161,7 @@ namespace Qisis {
        *
        * @param newControlNet The new ControlNet to be used
        */
-      void setControlNet(Isis::ControlNet *newControlNet) {
+      void setControlNet(ControlNet *newControlNet) {
         p_controlNet = newControlNet;
       }
 
@@ -178,13 +178,13 @@ namespace Qisis {
     private:
       void reloadChip(double tackSample = 0., double tackLine = 0.);
 
-      void computeStretch(Isis::Stretch &stretch, bool force = false);
+      void computeStretch(Stretch &stretch, bool force = false);
       void paintImage();
 
       class BandInfo {
         public:
           int band;
-          Isis::Stretch stretch;
+          Stretch stretch;
           BandInfo() {
             band = 1;
             stretch.SetNull(0.0);
@@ -196,15 +196,15 @@ namespace Qisis {
       };
 
       BandInfo p_gray;//!< info for the gray bands.
-      Isis::Chip *p_chip;  //!< The chip
-      Isis::Cube *p_chipCube;  //!< The chip's cube
+      Chip *p_chip;  //!< The chip
+      Cube *p_chipCube;  //!< The chip's cube
 
       int p_width;//!< Chip width
       int p_height;//!< Chip height
 
       bool p_geomIt;//!< geomIt?
-      Isis::Chip *p_matchChip;  //!< The matching chip.
-      Isis::Cube *p_matchChipCube;  //!< The matching chip's cube
+      Chip *p_matchChip;  //!< The matching chip.
+      Cube *p_matchChipCube;  //!< The matching chip's cube
 
       double p_zoomFactor;//!< Zoom Factor
       int p_rotation;//!< Rotation
@@ -224,10 +224,10 @@ namespace Qisis {
       // After construction, it is the responsibility of the user of this class
       // to maintain this pointer with the setControlNet method (to make sure
       // that either NULL or a valid ControlNet is being pointed to).
-      Isis::ControlNet *p_controlNet;
+      ControlNet *p_controlNet;
 
       bool p_stretchLocked;
-      Isis::Stretch *p_stretch;
+      Stretch *p_stretch;
   };
 };
 

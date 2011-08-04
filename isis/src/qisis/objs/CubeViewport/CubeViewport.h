@@ -43,7 +43,7 @@ namespace Isis {
   class UniversalGroundMap;
 }
 
-namespace Qisis {
+namespace Isis {
   class ViewportBuffer;
 
   /**
@@ -113,7 +113,7 @@ namespace Qisis {
 
 
     public:
-      CubeViewport(Isis::Cube *cube, QWidget *parent = 0);
+      CubeViewport(Cube *cube, QWidget *parent = 0);
       virtual ~CubeViewport();
 
 
@@ -123,14 +123,14 @@ namespace Qisis {
           BandInfo(const BandInfo &other);
           ~BandInfo();
           const BandInfo &operator=(BandInfo other);
-          Isis::Stretch getStretch() const;
-          void setStretch(const Isis::Stretch &newStretch);
+          Stretch getStretch() const;
+          void setStretch(const Stretch &newStretch);
           int band;
         private:
-          Isis::Stretch *stretch;
+          Stretch *stretch;
       };
 
-      void setCube(Isis::Cube *cube);
+      void setCube(Cube *cube);
       int cubeSamples() const;
       int cubeLines() const;
       int cubeBands() const;
@@ -195,28 +195,28 @@ namespace Qisis {
       double bluePixel(int sample, int line);
       double grayPixel(int sample, int line);
 
-      Isis::Stretch grayStretch() const;
-      Isis::Stretch redStretch() const;
-      Isis::Stretch greenStretch() const;
-      Isis::Stretch blueStretch() const;
+      Stretch grayStretch() const;
+      Stretch redStretch() const;
+      Stretch greenStretch() const;
+      Stretch blueStretch() const;
 
       //! Return the cube associated with viewport
-      Isis::Cube *cube() const {
+      Cube *cube() const {
         return p_cube;
       };
 
       //! Return the projection associated with cube (NULL implies none)
-      Isis::Projection *projection() const {
+      Projection *projection() const {
         return p_projection;
       };
 
       //! Return the camera associated with the cube (NULL implies none)
-      Isis::Camera *camera() const {
+      Camera *camera() const {
         return p_camera;
       };
 
       //! Return the universal ground map associated with the cube (NULL implies none)
-      Isis::UniversalGroundMap *universalGroundMap() const {
+      UniversalGroundMap *universalGroundMap() const {
         return p_groundMap;
       };
 
@@ -307,14 +307,14 @@ namespace Qisis {
        *
        * @param stretch
        */
-      void setAllBandStretches(Isis::Stretch stretch);
+      void setAllBandStretches(Stretch stretch);
 
       /**
        * Get All WhatsThis info - viewport, cube, area in PVL format
        *
        * @param pWhatsThisPvl - Pvl for all whatsthis info
        */
-      void getAllWhatsThisInfo(Isis::Pvl & pWhatsThisPvl);
+      void getAllWhatsThisInfo(Pvl & pWhatsThisPvl);
 
       /**
        * Get Band Filter name from the Isis cube label
@@ -322,7 +322,7 @@ namespace Qisis {
        * @param pFilterNameKey - FilterName keyword containing the
        *              corresponding keyword from the Isis Cube label
        */
-      void getBandFilterName(Isis::PvlKeyword & pFilterNameKey);
+      void getBandFilterName(PvlKeyword & pFilterNameKey);
 
       /**
        * Get Cube area corresponding to the viewport's dimension
@@ -360,7 +360,7 @@ namespace Qisis {
        * Emitted when a brick is no longer needed, should only be sent
        * to cube data thread
        */
-      void doneWithData(int, const Isis::Brick *);
+      void doneWithData(int, const Brick *);
 
 
     public slots:
@@ -379,10 +379,10 @@ namespace Qisis {
       void stretchGreen(const QString &string);
       void stretchBlue(const QString &string);
 
-      void stretchGray(const Isis::Stretch &stretch);
-      void stretchRed(const Isis::Stretch &stretch);
-      void stretchGreen(const Isis::Stretch &stretch);
-      void stretchBlue(const Isis::Stretch &stretch);
+      void stretchGray(const Stretch &stretch);
+      void stretchRed(const Stretch &stretch);
+      void stretchGreen(const Stretch &stretch);
+      void stretchBlue(const Stretch &stretch);
 
       void stretchKnownGlobal();
 
@@ -408,7 +408,7 @@ namespace Qisis {
 
 
     private slots:
-      void cubeDataChanged(int cubeId, const Isis::Brick *);
+      void cubeDataChanged(int cubeId, const Brick *);
 
 
     private:
@@ -419,10 +419,10 @@ namespace Qisis {
       void updateScrollBars(int x, int y);
       void paintPixmapRects();
 
-      //void computeStretch(Isis::Brick *brick, int band,
+      //void computeStretch(Brick *brick, int band,
       //                    int ssamp, int esamp,
       //                    int sline, int eline, int linerate,
-      //                    Isis::Stretch &stretch);
+      //                    Stretch &stretch);
 
 
 
@@ -438,10 +438,10 @@ namespace Qisis {
 
       QColor p_bgColor; //!< The color to paint the background of the viewport
 
-      Isis::Cube *p_cube;  //!< The cube associated with the viewport.
-      Isis::Camera *p_camera;  //!< The camera from the cube.
-      Isis::Projection *p_projection;  //!< The projection from the cube.
-      Isis::UniversalGroundMap *p_groundMap;  //!< The universal ground map from the cube.
+      Cube *p_cube;  //!< The cube associated with the viewport.
+      Camera *p_camera;  //!< The camera from the cube.
+      Projection *p_projection;  //!< The projection from the cube.
+      UniversalGroundMap *p_groundMap;  //!< The universal ground map from the cube.
 
       //! Activated to update progress bar
       QTimer *p_progressTimer;
@@ -455,16 +455,16 @@ namespace Qisis {
       BandInfo p_blue;//!< Blue band info
 
       //! Stretches for each previously stretched band
-      QVector< Isis::Stretch * > * p_knownStretches;
+      QVector< Stretch * > * p_knownStretches;
 
       //! Global stretches for each stretched band
-      QVector< Isis::Stretch * > * p_globalStretches;
+      QVector< Stretch * > * p_globalStretches;
 
-      Isis::Brick *p_redBrick;  //!< Bricks for every color.
-      Isis::Brick *p_grnBrick;  //!< Bricks for every color.
-      Isis::Brick *p_bluBrick;  //!< Bricks for every color.
-      Isis::Brick *p_gryBrick;  //!< Bricks for every color.
-      Isis::Brick *p_pntBrick;  //!< Bricks for every color.
+      Brick *p_redBrick;  //!< Bricks for every color.
+      Brick *p_grnBrick;  //!< Bricks for every color.
+      Brick *p_bluBrick;  //!< Bricks for every color.
+      Brick *p_gryBrick;  //!< Bricks for every color.
+      Brick *p_pntBrick;  //!< Bricks for every color.
       bool p_saveEnabled; //!< Has the cube changed?
       bool p_cubeShown;//!< Is the cube visible?
       QImage *p_image;  //!< The qimage.
@@ -479,7 +479,7 @@ namespace Qisis {
       //! A list of rects that the viewport buffers have requested painted
       QList< QRect * > *p_pixmapPaintRects;
 
-      Isis::CubeDataThread *p_cubeData;  //!< Does all the cube I/O
+      CubeDataThread *p_cubeData;  //!< Does all the cube I/O
       int p_cubeId; //!< Cube ID given from cube data thread for I/O
 
   };

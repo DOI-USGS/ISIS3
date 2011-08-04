@@ -9,7 +9,7 @@
 
 using namespace std;
 
-namespace Qisis {
+namespace Isis {
   /**
    * Constructor.
    *

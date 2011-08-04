@@ -19,7 +19,7 @@ namespace Isis {
   //class Pvl;
 }
 
-namespace Qisis {
+namespace Isis {
   class ToolPad;
   /**
    * @internal
@@ -28,7 +28,7 @@ namespace Qisis {
    *   @history 2010-12-01 Steven Lambright - No longer calls setBandBin() if
    *            the viewport doesn't change.
    */
-  class BandTool : public Qisis::Tool {
+  class BandTool : public Tool {
       Q_OBJECT
 
     public:
@@ -51,7 +51,7 @@ namespace Qisis {
     private slots:
       void changeView();
       void setList();
-      void setBandBin(Isis::Pvl &pvl);
+      void setBandBin(Pvl &pvl);
       void setDisplay();
       void copyLinkedViewports();
       void copyAllViewports();
@@ -73,7 +73,7 @@ namespace Qisis {
       CubeViewport *p_bandBinViewport;
 
       int p_bands;//!< Number of possible bands
-      Isis::Pvl p_pvl;//!< pvl
+      Pvl p_pvl;//!< pvl
       QStringList p_lineEditValueList;//!< Value list
   };
 };

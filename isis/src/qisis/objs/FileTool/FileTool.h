@@ -15,7 +15,7 @@ namespace Isis {
   class CubeAttributeOutput;
 }
 
-namespace Qisis {
+namespace Isis {
   class MdiCubeViewport;
   class SaveAsDialog;
   /**
@@ -88,7 +88,7 @@ namespace Qisis {
       void updateTool();
 
     private:
-      static void copy(Isis::Buffer &in, Isis::Buffer &out);
+      static void copy(Buffer &in, Buffer &out);
       QAction *p_open;   //!< Action to open a file
       QAction *p_browse; //!< Action to browse and open files
       QAction *p_print;  //!< Action to print the current view
@@ -105,24 +105,24 @@ namespace Qisis {
       SaveAsDialog *p_saveAsDialog;    //!< SaveAs Dialog with different save options
       
       //! Save Image in its entirety to an output file
-      void saveAsFullImage(Isis::Cube *icube, Isis::Cube *ocube); 
+      void saveAsFullImage(Cube *icube, Cube *ocube); 
       
       //! Copy input cube details into output file given its dimensions
-      void copyCubeDetails(const QString & psFilename, Isis::Cube *icube, 
-           Isis::Cube *ocube, int piNumSamples, int piNumLines, int piNumBands);
+      void copyCubeDetails(const QString & psFilename, Cube *icube, 
+           Cube *ocube, int piNumSamples, int piNumLines, int piNumBands);
       
       //! Save image AsIs (As viewed in the viewport window) into output file
-      void saveAs_AsIs(Isis::Cube *icube, const QString & psOutFile);
+      void saveAs_AsIs(Cube *icube, const QString & psOutFile);
       
       //! Save image Full Resolution (image viewed in the viewport window) into output
-      void saveAs_FullResolution(Isis::Cube *pInCube, Isis::Cube *pOutCube, 
+      void saveAs_FullResolution(Cube *pInCube, Cube *pOutCube, 
                                  int pNumSamples, int pNumLines);
       
       //! Save image AsIs Enlarged into output
-      void saveAsEnlargedCube(Isis::Cube *icube, const QString & psOutFile);
+      void saveAsEnlargedCube(Cube *icube, const QString & psOutFile);
       
       //! Save image AsIs Reduced into output
-      void saveAsReducedCube (Isis::Cube *icube, const QString & psOutFile);
+      void saveAsReducedCube (Cube *icube, const QString & psOutFile);
   };
 };
 

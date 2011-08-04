@@ -7,9 +7,9 @@
 
 #include "qnet.h"
 
-using namespace Qisis::Qnet;
+using namespace Isis::Qnet;
 
-namespace Qisis {
+namespace Isis {
   /**
    * Contructor for the Point Images filter.
    * It creates the Images filter window found
@@ -84,7 +84,7 @@ namespace Qisis {
     // remove it from the list if it is outside the filtering value range
     // Loop in reverse order since removal list of elements affects index number
     for (int i = g_filteredPoints.size() - 1; i >= 0; i--) {
-      Isis::ControlPoint &cp = *(*g_controlNetwork)[g_filteredPoints[i]];
+      ControlPoint &cp = *(*g_controlNetwork)[g_filteredPoints[i]];
       if (p_lessThanRB->isChecked()) {
         if (cp.GetNumMeasures() < num)
           continue;

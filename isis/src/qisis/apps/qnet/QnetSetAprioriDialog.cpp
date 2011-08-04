@@ -13,8 +13,7 @@
 #include "SpecialPixel.h"
 
 using namespace Isis;
-using namespace Qisis;
-using namespace Qnet;
+using namespace Isis::Qnet;
 using namespace std;
 
 
@@ -94,27 +93,27 @@ void QnetSetAprioriDialog::fillLineEdits() {
   sPt.SetRadii(Distance(targetRadii[0]), 
                Distance(targetRadii[1]),
                Distance(targetRadii[2]));
-  if (sPt.GetLatitude().GetDegrees() != Isis::Null) {
+  if (sPt.GetLatitude().GetDegrees() != Null) {
     aprioriLatEdit->setText(
       QString::number(sPt.GetLatitude().GetDegrees()));
   }
-  if (sPt.GetLatSigmaDistance().GetMeters() != Isis::Null) {
+  if (sPt.GetLatSigmaDistance().GetMeters() != Null) {
     latSigmaEdit->setText(
       QString::number(sPt.GetLatSigmaDistance().GetMeters()));
   }
-  if (sPt.GetLongitude().GetDegrees() != Isis::Null) {
+  if (sPt.GetLongitude().GetDegrees() != Null) {
     aprioriLonEdit->setText(
       QString::number(sPt.GetLongitude().GetDegrees()));
   }
-  if (sPt.GetLonSigmaDistance().GetMeters() != Isis::Null) {
+  if (sPt.GetLonSigmaDistance().GetMeters() != Null) {
     lonSigmaEdit->setText(
       QString::number(sPt.GetLonSigmaDistance().GetMeters()));
   }
-  if (sPt.GetLocalRadius().GetMeters() != Isis::Null) {
+  if (sPt.GetLocalRadius().GetMeters() != Null) {
     aprioriRadiusEdit->setText(
       QString::number(sPt.GetLocalRadius().GetMeters()));
   }
-  if (sPt.GetLocalRadiusSigma().GetMeters() != Isis::Null) {
+  if (sPt.GetLocalRadiusSigma().GetMeters() != Null) {
     radiusSigmaEdit->setText(
       QString::number(sPt.GetLocalRadiusSigma().GetMeters()));
   }
@@ -143,12 +142,12 @@ void QnetSetAprioriDialog::fillLineEdits() {
  */ 
 void QnetSetAprioriDialog::setApriori() {
 
-  double latSigma = Isis::Null;
-  double lat = Isis::Null;
-  double lonSigma = Isis::Null;
-  double lon = Isis::Null;
-  double radiusSigma = Isis::Null;
-  double radius = Isis::Null;
+  double latSigma = Null;
+  double lat = Null;
+  double lonSigma = Null;
+  double lon = Null;
+  double radiusSigma = Null;
+  double radius = Null;
 
   if (latitudeConstraintsGroupBox->isChecked()) {
 

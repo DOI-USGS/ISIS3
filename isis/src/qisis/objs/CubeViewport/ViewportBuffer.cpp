@@ -21,10 +21,9 @@
 
 
 using namespace std;
-using namespace Isis;
 
 
-namespace Qisis {
+namespace Isis {
   /**
    * ViewportBuffer constructor. Viewport and Cube can not be null.
    * Band is not initialized
@@ -34,7 +33,7 @@ namespace Qisis {
    * @param cubeId The identifier for the cube in the data thread
    */
   ViewportBuffer::ViewportBuffer(CubeViewport *viewport,
-                                 Isis::CubeDataThread *cubeData,
+                                 CubeDataThread *cubeData,
                                  int cubeId) {
     p_dataThread = cubeData;
     p_cubeId = cubeId;
@@ -57,11 +56,11 @@ namespace Qisis {
     connect(this, SIGNAL(ReadCube(int, int, int, int, int, int, void *)),
             p_dataThread, SLOT(ReadCube(int, int, int, int, int, int, void *)));
 
-    connect(p_dataThread, SIGNAL(ReadReady(void *, int, const Isis::Brick *)),
-            this, SLOT(DataReady(void *, int, const Isis::Brick *)));
+    connect(p_dataThread, SIGNAL(ReadReady(void *, int, const Brick *)),
+            this, SLOT(DataReady(void *, int, const Brick *)));
 
-    connect(this, SIGNAL(DoneWithData(int, const Isis::Brick *)), p_dataThread,
-            SLOT(DoneWithData(int, const Isis::Brick *)));
+    connect(this, SIGNAL(DoneWithData(int, const Brick *)), p_dataThread,
+            SLOT(DoneWithData(int, const Brick *)));
   }
 
   /**
@@ -72,11 +71,11 @@ namespace Qisis {
     disconnect(this, SIGNAL(ReadCube(int, int, int, int, int, int, void *)),
                p_dataThread, SLOT(ReadCube(int, int, int, int, int, int, void *)));
 
-    disconnect(p_dataThread, SIGNAL(ReadReady(void *, int, const Isis::Brick *)),
-               this, SLOT(DataReady(void *, int, const Isis::Brick *)));
+    disconnect(p_dataThread, SIGNAL(ReadReady(void *, int, const Brick *)),
+               this, SLOT(DataReady(void *, int, const Brick *)));
 
-    disconnect(this, SIGNAL(DoneWithData(int, const Isis::Brick *)),
-               p_dataThread, SLOT(DoneWithData(int, const Isis::Brick *)));
+    disconnect(this, SIGNAL(DoneWithData(int, const Brick *)),
+               p_dataThread, SLOT(DoneWithData(int, const Brick *)));
 
     p_dataThread = NULL;
 
@@ -122,7 +121,7 @@ namespace Qisis {
    * @param rect
    * @param data
    */
-  void ViewportBuffer::fillBuffer(QRect rect, const Isis::Brick *data) {
+  void ViewportBuffer::fillBuffer(QRect rect, const Brick *data) {
     if(p_band == -1) {
       throw iException::Message(iException::Programmer, "invalid band",
                                 _FILEINFO_);
@@ -177,7 +176,7 @@ namespace Qisis {
    * @param brick
    */
   void ViewportBuffer::DataReady(void *requester, int cubeId,
-                                 const Isis::Brick *brick) {
+                                 const Brick *brick) {
     if(this != requester)
       return;
 
@@ -1342,4 +1341,4 @@ namespace Qisis {
       throw iException::Message(iException::Programmer, "Unable to resize and fill buffer.", _FILEINFO_);
     }
   }
-} // of namespace Qisis
+}

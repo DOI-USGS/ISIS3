@@ -12,7 +12,7 @@
 #include "WarningWidget.h"
 
 
-namespace Qisis {
+namespace Isis {
   /**
    * TrackTool constructor
    *
@@ -75,7 +75,7 @@ namespace Qisis {
     p_bluLabel->setToolTip("Blue Pixel Value");
     p_sbar->addPermanentWidget(p_bluLabel);
 
-    mWarningWidget = new Qisis::WarningWidget(p_sbar);
+    mWarningWidget = new WarningWidget(p_sbar);
     connect(p_sbar, SIGNAL(messageChanged(const QString &)), mWarningWidget, SLOT(checkMessage()));
 
     clearLabels();
@@ -220,7 +220,7 @@ namespace Qisis {
             p.y() >= 0 && p.y() <= rect.bottom()) {
           const int bufX = p.x() - rect.left();
           const int bufY = p.y() - rect.top();
-          QString pixelString = Isis::iString(Isis::PixelToString(
+          QString pixelString = iString(PixelToString(
                                                 grayBuf->getLine(bufY)[bufX])).ToQt();
           p_grayLabel->setText(pixelString);
         }
@@ -245,7 +245,7 @@ namespace Qisis {
           const int rBufX = p.x() - rRect.left();
           const int rBufY = p.y() - rRect.top();
           QString rLab = "R ";
-          rLab += Isis::iString(Isis::PixelToString(
+          rLab += iString(PixelToString(
                                   redBuf->getLine(rBufY)[rBufX])).ToQt();
           p_redLabel->setText(rLab);
         }
@@ -264,7 +264,7 @@ namespace Qisis {
           const int gBufX = p.x() - gRect.left();
           const int gBufY = p.y() - gRect.top();
           QString gLab = "G ";
-          gLab += Isis::iString(Isis::PixelToString(
+          gLab += iString(PixelToString(
                                   greenBuf->getLine(gBufY)[gBufX])).ToQt();
           p_grnLabel->setText(gLab);
         }
@@ -283,7 +283,7 @@ namespace Qisis {
           const int bBufX = p.x() - bRect.left();
           const int bBufY = p.y() - bRect.top();
           QString bLab = "B ";
-          bLab += Isis::iString(Isis::PixelToString(
+          bLab += iString(PixelToString(
                                   blueBuf->getLine(bBufY)[bBufX])).ToQt();
           p_bluLabel->setText(bLab);
         }

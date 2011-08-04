@@ -53,11 +53,10 @@
 #include "ViewportBuffer.h"
 
 
-using namespace Isis;
 using namespace std;
 
 
-namespace Qisis {
+namespace Isis {
   /**
    * Construct a cube viewport
    *
@@ -65,7 +64,7 @@ namespace Qisis {
    * @param cube
    * @param parent
    */
-  CubeViewport::CubeViewport(Isis::Cube *cube, QWidget *parent) :
+  CubeViewport::CubeViewport(Cube *cube, QWidget *parent) :
     QAbstractScrollArea(parent) {
     // Is the cube usable?
     if(cube == NULL) {
@@ -84,14 +83,14 @@ namespace Qisis {
     p_cubeData = new CubeDataThread();
     p_cubeId = p_cubeData->AddCube(p_cube);
 
-    connect(p_cubeData, SIGNAL(BrickChanged(int, const Isis::Brick *)),
-            this, SLOT(cubeDataChanged(int, const Isis::Brick *)));
-    connect(this, SIGNAL(doneWithData(int, const Isis::Brick *)),
-            p_cubeData, SLOT(DoneWithData(int, const Isis::Brick *)));
+    connect(p_cubeData, SIGNAL(BrickChanged(int, const Brick *)),
+            this, SLOT(cubeDataChanged(int, const Brick *)));
+    connect(this, SIGNAL(doneWithData(int, const Brick *)),
+            p_cubeData, SLOT(DoneWithData(int, const Brick *)));
 
     p_cubeData->AddChangeListener();
 
-    void doneWithData(int, const Isis::Brick *);
+    void doneWithData(int, const Brick *);
 
     // Set up the scroll area
     setAttribute(Qt::WA_DeleteOnClose);
@@ -193,8 +192,8 @@ namespace Qisis {
     p_progressTimer = new QTimer();
     p_progressTimer->setInterval(250);
 
-    p_knownStretches = new QVector< Isis::Stretch * >();
-    p_globalStretches = new QVector< Isis::Stretch * >();
+    p_knownStretches = new QVector< Stretch * >();
+    p_globalStretches = new QVector< Stretch * >();
 
     while(p_cube->getBandCount() > p_knownStretches->size()) {
       p_knownStretches->push_back(NULL);
@@ -402,7 +401,7 @@ namespace Qisis {
    *
    * @param cube
    */
-  void CubeViewport::setCube(Isis::Cube *cube) {
+  void CubeViewport::setCube(Cube *cube) {
     p_cube = cube;
     setCaption();
   }
@@ -433,7 +432,7 @@ namespace Qisis {
    * @param cubeId Cube that the changed brick belongs to
    * @param data New data
    */
-  void CubeViewport::cubeDataChanged(int cubeId, const Isis::Brick *data) {
+  void CubeViewport::cubeDataChanged(int cubeId, const Brick *data) {
     if(cubeId == p_cubeId) {
       double ss, sl, es, el;
       ss = data->Sample();
@@ -1634,19 +1633,19 @@ namespace Qisis {
 
 
   //! Return the red band stretch
-  Isis::Stretch CubeViewport::redStretch() const {
+  Stretch CubeViewport::redStretch() const {
     return p_red.getStretch();
   };
 
 
   //! Return the green band stretch
-  Isis::Stretch CubeViewport::greenStretch() const {
+  Stretch CubeViewport::greenStretch() const {
     return p_green.getStretch();
   };
 
 
   //! Return the blue band stretch
-  Isis::Stretch CubeViewport::blueStretch() const {
+  Stretch CubeViewport::blueStretch() const {
     return p_blue.getStretch();
   };
 
@@ -1934,7 +1933,7 @@ namespace Qisis {
   }
 
 
-  void CubeViewport::setAllBandStretches(Isis::Stretch stretch) {
+  void CubeViewport::setAllBandStretches(Stretch stretch) {
     for(int index = 0; index < p_knownStretches->size(); index ++) {
       if((*p_knownStretches)[index]) {
         delete(*p_knownStretches)[index];
@@ -2135,7 +2134,7 @@ namespace Qisis {
    *
    * @param stretch
    */
-  void CubeViewport::stretchGray(const Isis::Stretch &stretch) {
+  void CubeViewport::stretchGray(const Stretch &stretch) {
     p_gray.setStretch(stretch);
     p_red.setStretch(stretch);
     p_green.setStretch(stretch);
@@ -2156,7 +2155,7 @@ namespace Qisis {
    *
    * @param stretch
    */
-  void CubeViewport::stretchRed(const Isis::Stretch &stretch) {
+  void CubeViewport::stretchRed(const Stretch &stretch) {
     p_red.setStretch(stretch);
 
     // Assume first stretch is always the global stretch (and it should be)
@@ -2174,7 +2173,7 @@ namespace Qisis {
    *
    * @param stretch
    */
-  void CubeViewport::stretchGreen(const Isis::Stretch &stretch) {
+  void CubeViewport::stretchGreen(const Stretch &stretch) {
     p_green.setStretch(stretch);
 
     // Assume first stretch is always the global stretch (and it should be)
@@ -2192,7 +2191,7 @@ namespace Qisis {
    *
    * @param stretch
    */
-  void CubeViewport::stretchBlue(const Isis::Stretch &stretch) {
+  void CubeViewport::stretchBlue(const Stretch &stretch) {
     p_blue.setStretch(stretch);
 
     // Assume first stretch is always the global stretch (and it should be)

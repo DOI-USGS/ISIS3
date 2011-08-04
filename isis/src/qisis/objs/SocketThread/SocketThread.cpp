@@ -12,7 +12,7 @@
 #include <QObject>
 #include <QThread>
 
-namespace Qisis {
+namespace Isis {
 
   /**
    * Constructor for the SocketThread
@@ -30,7 +30,7 @@ namespace Qisis {
 
   //! Starts the socket thread
   void SocketThread::run() {
-    std::string p_socketFile = "/tmp/isis_qview_" + Isis::Application::UserName();
+    std::string p_socketFile = "/tmp/isis_qview_" + Application::UserName();
     struct sockaddr_un p_socketName;
     p_socketName.sun_family = AF_UNIX;
     strcpy(p_socketName.sun_path, p_socketFile.c_str());
@@ -88,10 +88,10 @@ namespace Qisis {
       }
 
       // Push everything onto our string buffer
-      Isis::iString buffer;
+      iString buffer;
       for(int i = 0; i < bytes; i++) buffer += buf[i];
       while(buffer.size() > 0) {
-        Isis::iString token = buffer.Token(" ");
+        iString token = buffer.Token(" ");
         if(token == "raise") {
           emit focusApp();
         }

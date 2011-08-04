@@ -6,7 +6,7 @@
 // FIXME: Remove this include!
 #include "RubberBandTool.h"
 
-namespace Qisis {
+namespace Isis {
   /**
   * @brief Combo box for choosing a rubber band type
   *

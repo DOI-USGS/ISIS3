@@ -2,7 +2,7 @@
 #define ViewportBufferAction_h
 
 
-namespace Qisis {
+namespace Isis {
   class ViewportBufferAction {
     public:
       ViewportBufferAction();

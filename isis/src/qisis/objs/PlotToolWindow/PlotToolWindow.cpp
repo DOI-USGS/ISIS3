@@ -7,10 +7,7 @@
 #include "PvlGroup.h"
 
 
-
-using namespace Isis;
-
-namespace Qisis {
+namespace Isis {
 
 
   /**
@@ -21,7 +18,7 @@ namespace Qisis {
   * area called the band lines.
   */
   PlotToolWindow::PlotToolWindow(QString title, QWidget *parent) :
-    Qisis::PlotWindow(title, parent) {
+    PlotWindow(title, parent) {
 
     p_grayBandLine = NULL;
     p_redBandLine = NULL;

@@ -15,9 +15,7 @@
 #include "BinaryStretchType.h"
 #include "ManualStretchType.h"
 
-using namespace Isis;
-
-namespace Qisis {
+namespace Isis {
   /**
    * This constructs an advanced stretch.
    *
@@ -26,8 +24,8 @@ namespace Qisis {
    * @param name Graph name
    * @param color Graph color
    */
-  AdvancedStretch::AdvancedStretch(Isis::Histogram &hist,
-                                   const Isis::Stretch &curStretch,
+  AdvancedStretch::AdvancedStretch(Histogram &hist,
+                                   const Stretch &curStretch,
                                    const QString &name, const QColor &color) {
     setLayout(new QVBoxLayout());
 
@@ -83,9 +81,9 @@ namespace Qisis {
   /**
    * This returns the current stretch type's stretch.
    *
-   * @return Isis::Stretch
+   * @return Stretch
    */
-  Isis::Stretch AdvancedStretch::getStretch() {
+  Stretch AdvancedStretch::getStretch() {
     return ((StretchType *)p_stretchTypeStack->currentWidget())->getStretch();
   }
 
@@ -98,7 +96,7 @@ namespace Qisis {
    *
    * @param newStretch
    */
-  void AdvancedStretch::setStretch(Isis::Stretch newStretch) {
+  void AdvancedStretch::setStretch(Stretch newStretch) {
     StretchType *stretchType = (StretchType *)
                                p_stretchTypeStack->currentWidget();
     stretchType->setStretch(newStretch);
@@ -113,7 +111,7 @@ namespace Qisis {
    *
    * @param newHist
    */
-  void AdvancedStretch::setHistogram(const Isis::Histogram &newHist) {
+  void AdvancedStretch::setHistogram(const Histogram &newHist) {
     for(int stretch = 0; stretch < p_stretchTypeStack->count(); stretch ++) {
       StretchType *stretchType = (StretchType *)
                                  p_stretchTypeStack->widget(stretch);

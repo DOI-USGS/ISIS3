@@ -9,9 +9,9 @@
 #include "qnet.h"
 
 using namespace std;
-using namespace Qisis::Qnet;
+using namespace Isis::Qnet;
 
-namespace Qisis {
+namespace Isis {
   /**
    * Contructor for the Point Measure filter.  It creates the
    * Measure filter window found in the navtool
@@ -139,7 +139,7 @@ namespace Qisis {
     // it from the filtered list
     // Loop in reverse order since removal list of elements affects index number
     for (int i = g_filteredPoints.size() - 1; i >= 0; i--) {
-      Isis::ControlPoint &cp = *(*g_controlNetwork)[g_filteredPoints[i]];
+      ControlPoint &cp = *(*g_controlNetwork)[g_filteredPoints[i]];
       int numMeasNotMatching = 0;
       for (int j = 0; j < cp.GetNumMeasures(); j++) {
         //  While keep is true, keep testing for next filter option
@@ -198,16 +198,16 @@ namespace Qisis {
    *                         control networks.
    */
   bool QnetPointMeasureFilter::MeasureTypeMatched(int cmType) {
-    if (p_candidate->isChecked() && cmType == Isis::ControlMeasure::Candidate) {
+    if (p_candidate->isChecked() && cmType == ControlMeasure::Candidate) {
       return true;;
     }
-    if (p_manual->isChecked() && cmType == Isis::ControlMeasure::Manual) {
+    if (p_manual->isChecked() && cmType == ControlMeasure::Manual) {
       return true;;
     }
-    if (p_registeredPixel->isChecked() && cmType == Isis::ControlMeasure::RegisteredPixel) {
+    if (p_registeredPixel->isChecked() && cmType == ControlMeasure::RegisteredPixel) {
       return true;;
     }
-    if (p_registeredSubPixel->isChecked() && cmType == Isis::ControlMeasure::RegisteredSubPixel) {
+    if (p_registeredSubPixel->isChecked() && cmType == ControlMeasure::RegisteredSubPixel) {
       return true;;
     }
     return false;

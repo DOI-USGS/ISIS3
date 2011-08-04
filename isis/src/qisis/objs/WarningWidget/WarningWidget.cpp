@@ -8,7 +8,7 @@
 #include <QPushButton>
 #include <QFont>
 
-namespace Qisis {
+namespace Isis {
   /**
    * Warning widget constructor, initializes and creates the
    * Nowarning, Warning objects and objects associated with them
@@ -20,7 +20,7 @@ namespace Qisis {
   WarningWidget::WarningWidget(QStatusBar *pParent): QObject(pParent) {
     mSBar = pParent;
 
-    std::string sToolIconDir = Isis::Filename("$base/icons").Expanded();
+    std::string sToolIconDir = Filename("$base/icons").Expanded();
     QString qsIconFile(sToolIconDir.c_str());
 
     // default Action - No warning
@@ -45,7 +45,7 @@ namespace Qisis {
     mDialog->setWindowTitle("Warning");
     mDialog->setSizeGripEnabled(true);
     mWindow = new QWidget(mDialog);
-    mWindow->installEventFilter(this);	//receive events directed to this object
+    mWindow->installEventFilter(this);//receive events directed to this object
 
     mTextEdit = new QTextEdit(mDialog);
     mTextEdit->setReadOnly(true);
@@ -55,7 +55,7 @@ namespace Qisis {
     // OK button for the dialog window
     QPushButton *okButton = new QPushButton("Ok", mDialog);
     okButton->setShortcut(Qt::Key_Enter);
-    connect(okButton, SIGNAL(clicked()),  this, SLOT(resetWarning()));	  //when clicked close dialog and display Nowarning icon
+    connect(okButton, SIGNAL(clicked()),  this, SLOT(resetWarning()));  //when clicked close dialog and display Nowarning icon
 
     QGridLayout *layout = new QGridLayout();
     layout->addWidget(mTextEdit, 0, 0, 1, 3);

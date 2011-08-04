@@ -23,11 +23,9 @@
 #include "ViewportMainWindow.h"
 #include "Workspace.h"
 
-
-using namespace Isis;
 using namespace std;
 
-namespace Qisis {
+namespace Isis {
   /**
    * StretchTool constructor
    *
@@ -65,7 +63,7 @@ namespace Qisis {
     // Emit a signal when an exception occurs and connect to the Warning object 
     // to display Warning icon and the message
     connect(this, SIGNAL(warningSignal(std::string &, const std::string)),
-            (Qisis::ViewportMainWindow *)parent,
+            (ViewportMainWindow *)parent,
             SLOT(displayWarning(std::string &, const std::string &)));
   }
 
@@ -299,7 +297,7 @@ namespace Qisis {
           updateTool();
         }
         else {
-          Isis::Histogram hist(histFromBuffer(cvp->grayBuffer()));
+          Histogram hist(histFromBuffer(cvp->grayBuffer()));
 
           if(hist.ValidPixels() > 0) {
             p_advancedStretch->updateHistogram(hist);
@@ -315,9 +313,9 @@ namespace Qisis {
           updateTool();
         }
         else {
-          Isis::Histogram redHist(histFromBuffer(cvp->redBuffer()));
-          Isis::Histogram grnHist(histFromBuffer(cvp->greenBuffer()));
-          Isis::Histogram bluHist(histFromBuffer(cvp->blueBuffer()));
+          Histogram redHist(histFromBuffer(cvp->redBuffer()));
+          Histogram grnHist(histFromBuffer(cvp->greenBuffer()));
+          Histogram bluHist(histFromBuffer(cvp->blueBuffer()));
 
           if(redHist.ValidPixels() > 0 &&
               grnHist.ValidPixels() > 0 &&
@@ -345,12 +343,12 @@ namespace Qisis {
          !cvp->greenBuffer()->working() &&
          !cvp->blueBuffer()->working()) {
 
-        Isis::Histogram redHist(histFromBuffer(cvp->redBuffer()));
-        Isis::Histogram grnHist(histFromBuffer(cvp->greenBuffer()));
-        Isis::Histogram bluHist(histFromBuffer(cvp->blueBuffer()));
-        Isis::Stretch redStretch(cvp->redStretch());
-        Isis::Stretch grnStretch(cvp->greenStretch());
-        Isis::Stretch bluStretch(cvp->blueStretch());
+        Histogram redHist(histFromBuffer(cvp->redBuffer()));
+        Histogram grnHist(histFromBuffer(cvp->greenBuffer()));
+        Histogram bluHist(histFromBuffer(cvp->blueBuffer()));
+        Stretch redStretch(cvp->redStretch());
+        Stretch grnStretch(cvp->greenStretch());
+        Stretch bluStretch(cvp->blueStretch());
 
         p_advancedStretch->updateForRGBMode(redStretch, redHist,
                                             grnStretch, grnHist,
@@ -377,8 +375,8 @@ namespace Qisis {
       p_advancedStretch->enable(true);
       //If the viewport is in gray mode
       if(cvp->isGray() && !cvp->grayBuffer()->working()) {
-        Isis::Histogram hist(histFromBuffer(cvp->grayBuffer()));
-        Isis::Stretch stretch(cvp->grayStretch());
+        Histogram hist(histFromBuffer(cvp->grayBuffer()));
+        Stretch stretch(cvp->grayStretch());
         p_advancedStretch->enableGrayMode(stretch, hist);
       }
       //Otherwise it is in color mode
@@ -386,12 +384,12 @@ namespace Qisis {
               !cvp->redBuffer()->working() &&
               !cvp->greenBuffer()->working() &&
               !cvp->blueBuffer()->working()) {
-        Isis::Histogram redHist(histFromBuffer(cvp->redBuffer()));
-        Isis::Histogram grnHist(histFromBuffer(cvp->greenBuffer()));
-        Isis::Histogram bluHist(histFromBuffer(cvp->blueBuffer()));
-        Isis::Stretch redStretch(cvp->redStretch());
-        Isis::Stretch grnStretch(cvp->greenStretch());
-        Isis::Stretch bluStretch(cvp->blueStretch());
+        Histogram redHist(histFromBuffer(cvp->redBuffer()));
+        Histogram grnHist(histFromBuffer(cvp->greenBuffer()));
+        Histogram bluHist(histFromBuffer(cvp->blueBuffer()));
+        Stretch redStretch(cvp->redStretch());
+        Stretch grnStretch(cvp->greenStretch());
+        Stretch bluStretch(cvp->blueStretch());
         p_advancedStretch->enableRgbMode(redStretch, redHist,
                                          grnStretch, grnHist,
                                          bluStretch, bluHist);
@@ -556,16 +554,16 @@ namespace Qisis {
     //If the viewport is in gray mode
     if(cvp->isGray()) {
       //Get the min/max from the current stretch
-      Isis::Stretch stretch = cvp->grayStretch();
+      Stretch stretch = cvp->grayStretch();
       min = stretch.Input(0);
       max = stretch.Input(stretch.Pairs() - 1);
     }
 
     //Otherwise it is in color mode
     else {
-      Isis::Stretch rstretch = cvp->redStretch();
-      Isis::Stretch gstretch = cvp->greenStretch();
-      Isis::Stretch bstretch = cvp->blueStretch();
+      Stretch rstretch = cvp->redStretch();
+      Stretch gstretch = cvp->greenStretch();
+      Stretch bstretch = cvp->blueStretch();
       
       //Get the min/max from the current stretch
       if(p_stretchBand == Red) {
@@ -667,7 +665,7 @@ namespace Qisis {
 
     //The viewport is in gray mode
     if(cvp->isGray()) {
-      Isis::Stretch stretch = cvp->grayStretch();
+      Stretch stretch = cvp->grayStretch();
       stretch.ClearPairs();
       stretch.AddPair(min, 0.0);
       stretch.AddPair(max, 255.0);
@@ -680,9 +678,9 @@ namespace Qisis {
     }
     //Otherwise the viewport is in color mode
     else {
-      Isis::Stretch redStretch = cvp->redStretch();
-      Isis::Stretch greenStretch = cvp->greenStretch();
-      Isis::Stretch blueStretch = cvp->blueStretch();
+      Stretch redStretch = cvp->redStretch();
+      Stretch greenStretch = cvp->greenStretch();
+      Stretch blueStretch = cvp->blueStretch();
 
       if(p_stretchBand == Red) {
         redStretch.ClearPairs();
@@ -876,7 +874,7 @@ namespace Qisis {
 
     // Call the parent Tool function to reset the Warning as different activity is
     // taking place
-    Qisis::Tool::mouseButtonRelease(start, s);
+    Tool::mouseButtonRelease(start, s);
 
     if(s == Qt::RightButton) {
       stretchGlobal(cvp);
@@ -911,7 +909,7 @@ namespace Qisis {
     double min = p_stretchMinEdit->text().toDouble();
     double max = p_stretchMaxEdit->text().toDouble();
 
-    Isis::Stretch stretch;
+    Stretch stretch;
     if(cvp->isGray()) {
       stretch = cvp->grayStretch();
       stretch.ClearPairs();
@@ -999,13 +997,13 @@ namespace Qisis {
    * @param buffer
    * @param rect
    */
-  Isis::Stretch StretchTool::stretchBuffer(ViewportBuffer *buffer, QRect rect) {
+  Stretch StretchTool::stretchBuffer(ViewportBuffer *buffer, QRect rect) {
     //Get the statistics and histogram from the region
-    Isis::Statistics stats = statsFromBuffer(buffer, rect);
-    Isis::Stretch stretch;
+    Statistics stats = statsFromBuffer(buffer, rect);
+    Stretch stretch;
     if(stats.ValidPixels() > 1 &&
         fabs(stats.Minimum() - stats.Maximum()) > DBL_EPSILON) {
-      Isis::Histogram hist = histFromBuffer(buffer, rect,
+      Histogram hist = histFromBuffer(buffer, rect,
                                             stats.BestMinimum(), stats.BestMaximum());
 
       if(fabs(hist.Percent(0.5) - hist.Percent(99.5)) > DBL_EPSILON) {
@@ -1029,10 +1027,10 @@ namespace Qisis {
    * @param cvp
    * @param band Band to stretch
    */
-  Isis::Stretch StretchTool::stretchBand(CubeViewport *cvp, StretchBand band) {
+  Stretch StretchTool::stretchBand(CubeViewport *cvp, StretchBand band) {
      
     int bandNum = cvp->grayBand();
-    Isis::Stretch stretch = cvp->grayStretch();
+    Stretch stretch = cvp->grayStretch();
     if(band == Red) {
       bandNum = cvp->redBand();
       stretch = cvp->redStretch();
@@ -1046,8 +1044,8 @@ namespace Qisis {
       stretch = cvp->blueStretch();
     }
 
-    Isis::Statistics stats = statsFromCube(cvp->cube(), bandNum);
-    Isis::Histogram  hist = histFromCube(cvp->cube(), bandNum,
+    Statistics stats = statsFromCube(cvp->cube(), bandNum);
+    Histogram  hist = histFromCube(cvp->cube(), bandNum,
                                          stats.BestMinimum(), stats.BestMaximum());
 
     stretch.ClearPairs();
@@ -1070,11 +1068,11 @@ namespace Qisis {
    * @param cube
    * @param band
    *
-   * @return Isis::Statistics
+   * @return Statistics
    */
-  Isis::Statistics StretchTool::statsFromCube(Isis::Cube *cube, int band) {
-    Isis::Statistics stats;
-    Isis::Brick brick(cube->getSampleCount(), 1, 1, cube->getPixelType());
+  Statistics StretchTool::statsFromCube(Cube *cube, int band) {
+    Statistics stats;
+    Brick brick(cube->getSampleCount(), 1, 1, cube->getPixelType());
 
     for(int line = 0; line < cube->getLineCount(); line++) {
       brick.SetBasePosition(0, line, band);
@@ -1093,9 +1091,9 @@ namespace Qisis {
    * @param buffer
    * @param rect
    *
-   * @return Isis::Statistics
+   * @return Statistics
    */
-  Isis::Statistics StretchTool::statsFromBuffer(ViewportBuffer *buffer,
+  Statistics StretchTool::statsFromBuffer(ViewportBuffer *buffer,
       QRect rect) {
     if(buffer->working()) {
       throw iException::Message(iException::User,
@@ -1103,7 +1101,7 @@ namespace Qisis {
     }
 
     QRect dataArea = QRect(buffer->bufferXYRect().intersected(rect));
-    Isis::Statistics stats;
+    Statistics stats;
 
     for(int y = dataArea.top();
         !dataArea.isNull() && y <= dataArea.bottom();
@@ -1127,12 +1125,12 @@ namespace Qisis {
    * @param min
    * @param max
    *
-   * @return Isis::Histogram
+   * @return Histogram
    */
-  Isis::Histogram StretchTool::histFromCube(Isis::Cube *cube, int band,
+  Histogram StretchTool::histFromCube(Cube *cube, int band,
       double min, double max) {
-    Isis::Histogram hist(min, max);
-    Isis::Brick brick(cube->getSampleCount(), 1, 1, cube->getPixelType());
+    Histogram hist(min, max);
+    Brick brick(cube->getSampleCount(), 1, 1, cube->getPixelType());
 
     for(int line = 0; line < cube->getLineCount(); line++) {
       brick.SetBasePosition(0, line, band);
@@ -1149,10 +1147,10 @@ namespace Qisis {
    *
    * @param buffer
    *
-   * @return Isis::Histogram
+   * @return Histogram
    */
-  Isis::Histogram StretchTool::histFromBuffer(ViewportBuffer *buffer) {
-    Isis::Statistics stats = statsFromBuffer(buffer, buffer->bufferXYRect());
+  Histogram StretchTool::histFromBuffer(ViewportBuffer *buffer) {
+    Statistics stats = statsFromBuffer(buffer, buffer->bufferXYRect());
     return histFromBuffer(buffer, buffer->bufferXYRect(),
                           stats.BestMinimum(), stats.BestMaximum());
 
@@ -1168,14 +1166,14 @@ namespace Qisis {
    * @param min
    * @param max
    *
-   * @return Isis::Histogram
+   * @return Histogram
    */
-  Isis::Histogram StretchTool::histFromBuffer(ViewportBuffer *buffer,
+  Histogram StretchTool::histFromBuffer(ViewportBuffer *buffer,
       QRect rect, double min, double max) {
     QRect dataArea = QRect(buffer->bufferXYRect().intersected(rect));
 
     try {
-      Isis::Histogram hist(min, max);
+      Histogram hist(min, max);
 
       for(int y = dataArea.top(); !dataArea.isNull() && y <= dataArea.bottom(); y++) {
         const std::vector<double> &line = buffer->getLine(y - buffer->bufferXYRect().top());
@@ -1184,17 +1182,17 @@ namespace Qisis {
 
       return hist;
     }
-    catch(Isis::iException &e) {
+    catch(iException &e) {
       // get the min and max DN values of the data area
-      Isis::iString sMin(min);
-      Isis::iString sMax(max);
+      iString sMin(min);
+      iString sMax(max);
       std::string msg = "Insufficient data Min [" + sMin + "], Max [" + sMax + "]";
       msg += " in the stretch area.";
 
       // Emit signal to the parent tool to display Warning object with the warning message
       //emit warningSignal(msg, e.Errors());
 
-      throw Isis::iException::Message(Isis::iException::None, msg, _FILEINFO_);
+      throw iException::Message(iException::None, msg, _FILEINFO_);
     }
   }
 
@@ -1302,9 +1300,9 @@ namespace Qisis {
       QTextStream grnStream(&grnFile);
       QTextStream bluStream(&bluFile);
 
-      Isis::Stretch red = p_advancedStretch->getRedStretch();
-      Isis::Stretch grn = p_advancedStretch->getGrnStretch();
-      Isis::Stretch blu = p_advancedStretch->getBluStretch();
+      Stretch red = p_advancedStretch->getRedStretch();
+      Stretch grn = p_advancedStretch->getGrnStretch();
+      Stretch blu = p_advancedStretch->getBluStretch();
 
       redStream << red.Text().c_str() << endl;
       grnStream << grn.Text().c_str() << endl;
@@ -1327,7 +1325,7 @@ namespace Qisis {
 
       QTextStream stream(&file);
 
-      Isis::Stretch stretch = p_advancedStretch->getGrayStretch();
+      Stretch stretch = p_advancedStretch->getGrayStretch();
 
       //Add the pairs to the file
       stream << stretch.Text().c_str() << endl;

@@ -27,7 +27,7 @@
 
 class QAction;
 
-namespace Qisis {
+namespace Isis {
   class TableMainWindow;
   class MdiCubeViewport;
 
@@ -146,7 +146,7 @@ namespace Qisis {
       QAction *p_action;                   //!< Action to bring up the track tool
       int p_numRows;                       //!< The number of rows in the table
       int p_id;                            //!< The record id
-      Qisis::TableMainWindow *p_tableWin;  //!< The table window
+      TableMainWindow *p_tableWin;  //!< The table window
 
   };
 

@@ -11,7 +11,7 @@
 class QwtIntervalData;
 class QString;
 
-namespace Qisis {
+namespace Isis {
 
   class HistogramItem: public QwtPlotItem {
     public:

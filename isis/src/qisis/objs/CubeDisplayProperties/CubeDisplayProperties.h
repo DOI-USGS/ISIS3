@@ -175,7 +175,7 @@ namespace Isis {
       CubeDisplayProperties &operator=(const CubeDisplayProperties &);
 
       void setValue(Property prop, QVariant value);
-      static QList<Isis::CubeDisplayProperties *> senderToData(QObject *sender);
+      static QList<CubeDisplayProperties *> senderToData(QObject *sender);
 
       void createManualFootprint(QMutex *cameraMutex);
 

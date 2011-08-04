@@ -8,9 +8,9 @@
 
 #include "qnet.h"
 
-using namespace Qisis::Qnet;
+using namespace Isis::Qnet;
 
-namespace Qisis {
+namespace Isis {
   /**
    * Contructor for the Cube Points filter.  It
    * creates the Points filter window found in
@@ -90,7 +90,7 @@ namespace Qisis {
 
       // Loop through each control point in the network
       for (int c = 0; c < g_controlNetwork->GetNumPoints(); c++) {
-        Isis::ControlPoint &cp = *(*g_controlNetwork)[c];
+        ControlPoint &cp = *(*g_controlNetwork)[c];
 
         // Check to see if it has a measure on the current image
         for (int cm = 0; cm < cp.GetNumMeasures(); cm++) {

@@ -45,7 +45,7 @@ namespace Isis {
   }
 
 
-  void MosaicTool::addTo(Qisis::ToolPad *toolPad) {
+  void MosaicTool::addTo(ToolPad *toolPad) {
     if(!p_primaryAction) {
       p_primaryAction = getPrimaryAction();
 

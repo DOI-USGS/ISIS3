@@ -11,7 +11,7 @@
 #include "QnetFilter.h"
 
 
-namespace Qisis {
+namespace Isis {
   /**
    * Defines the Name filter for the QnetNavTool's Cubes
    * section.  The user must enter a string. This class is

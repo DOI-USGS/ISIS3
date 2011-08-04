@@ -32,7 +32,7 @@
 #include "Pvl.h"
 #include "UniversalGroundMap.h"
 
-namespace Qisis {
+namespace Isis {
 
   const int VIEWSIZE = 301;
 
@@ -45,10 +45,10 @@ namespace Qisis {
    * @author Tracie Sucharski
    * @internal
    *   @history 2008-15-2008  Jeannie Walldren - Added error
-   *                            string to Isis::iException::Message before
+   *                            string to iException::Message before
    *                            creating QMessageBox
    */
-  ControlPointEdit::ControlPointEdit(Isis::ControlNet * cnet, QWidget *parent,
+  ControlPointEdit::ControlPointEdit(ControlNet * cnet, QWidget *parent,
                                      bool allowLeftMouse) : QWidget(parent) {
 
     p_rotation = 0;
@@ -64,12 +64,12 @@ namespace Qisis {
 
     try {
       p_templateFilename = "$base/templates/autoreg/qnetReg.def";
-      Isis::Pvl pvl(p_templateFilename);
-      p_autoRegFact = Isis::AutoRegFactory::Create(pvl);
+      Pvl pvl(p_templateFilename);
+      p_autoRegFact = AutoRegFactory::Create(pvl);
     }
-    catch ( Isis::iException &e ) {
+    catch ( iException &e ) {
       p_autoRegFact = NULL;
-      e.Message(Isis::iException::Io,
+      e.Message(iException::Io,
                 "Cannot create AutoRegFactory.  As a result, sub-pixel registration will not work.",
                 _FILEINFO_);
       QString message = e.Errors().c_str();
@@ -109,7 +109,7 @@ namespace Qisis {
     //  grid row
     int row = 0;
 
-    std::string tempFilename = Isis::Filename("$base/icons").Expanded();
+    std::string tempFilename = Filename("$base/icons").Expanded();
     QString toolIconDir = tempFilename.c_str();
 
     QSize isize(27, 27);
@@ -142,25 +142,25 @@ namespace Qisis {
     if ( p_allowLeftMouse ) {
       //  Add arrows for panning
       leftPanUp = new QToolButton(parent);
-      leftPanUp->setIcon(QIcon(Isis::Filename("$base/icons/up.png").
+      leftPanUp->setIcon(QIcon(Filename("$base/icons/up.png").
                                Expanded().c_str()));
       leftPanUp->setIconSize(isize);
       leftPanUp->setToolTip("Move up 1 screen pixel");
 
       leftPanDown = new QToolButton(parent);
-      leftPanDown->setIcon(QIcon(Isis::Filename("$base/icons/down.png").
+      leftPanDown->setIcon(QIcon(Filename("$base/icons/down.png").
                                  Expanded().c_str()));
       leftPanDown->setIconSize(isize);
       leftPanDown->setToolTip("Move down 1 screen pixel");
 
       leftPanLeft = new QToolButton(parent);
-      leftPanLeft->setIcon(QIcon(Isis::Filename("$base/icons/back.png").
+      leftPanLeft->setIcon(QIcon(Filename("$base/icons/back.png").
                                  Expanded().c_str()));
       leftPanLeft->setIconSize(isize);
       leftPanLeft->setToolTip("Move left 1 screen pixel");
 
       leftPanRight = new QToolButton(parent);
-      leftPanRight->setIcon(QIcon(Isis::Filename("$base/icons/forward.png").
+      leftPanRight->setIcon(QIcon(Filename("$base/icons/forward.png").
                                   Expanded().c_str()));
       leftPanRight->setIconSize(isize);
       leftPanRight->setToolTip("Move right 1 screen pixel");
@@ -182,7 +182,7 @@ namespace Qisis {
     p_rightZoomIn->setWhatsThis(text);
 
     p_rightZoomOut = new QToolButton();
-    p_rightZoomOut->setIcon(QIcon(Isis::Filename("$base/icons/viewmag-.png").
+    p_rightZoomOut->setIcon(QIcon(Filename("$base/icons/viewmag-.png").
                                   Expanded().c_str()));
     p_rightZoomOut->setIconSize(isize);
     p_rightZoomOut->setToolTip("Zoom Out");
@@ -203,25 +203,25 @@ namespace Qisis {
 
     //  Add arrows for panning
     QToolButton *rightPanUp = new QToolButton(parent);
-    rightPanUp->setIcon(QIcon(Isis::Filename("$base/icons/up.png").
+    rightPanUp->setIcon(QIcon(Filename("$base/icons/up.png").
                               Expanded().c_str()));
     rightPanUp->setIconSize(isize);
     rightPanUp->setToolTip("Move up 1 screen pixel");
 
     QToolButton *rightPanDown = new QToolButton(parent);
-    rightPanDown->setIcon(QIcon(Isis::Filename("$base/icons/down.png").
+    rightPanDown->setIcon(QIcon(Filename("$base/icons/down.png").
                                 Expanded().c_str()));
     rightPanDown->setIconSize(isize);
     rightPanDown->setToolTip("Move down 1 screen pixel");
 
     QToolButton *rightPanLeft = new QToolButton(parent);
-    rightPanLeft->setIcon(QIcon(Isis::Filename("$base/icons/back.png").
+    rightPanLeft->setIcon(QIcon(Filename("$base/icons/back.png").
                                 Expanded().c_str()));
     rightPanLeft->setIconSize(isize);
     rightPanLeft->setToolTip("Move left 1 screen pixel");
 
     QToolButton *rightPanRight = new QToolButton(parent);
-    rightPanRight->setIcon(QIcon(Isis::Filename("$base/icons/forward.png").
+    rightPanRight->setIcon(QIcon(Filename("$base/icons/forward.png").
                                  Expanded().c_str()));
     rightPanRight->setIconSize(isize);
     rightPanRight->setToolTip("Move right 1 screen pixel");
@@ -264,13 +264,13 @@ namespace Qisis {
 
     gridLayout->addWidget(p_leftView, row, 0);
 
-    connect(this, SIGNAL(newControlNetwork(Isis::ControlNet *)),
-            p_leftView, SLOT(setControlNet(Isis::ControlNet *)));
+    connect(this, SIGNAL(newControlNetwork(ControlNet *)),
+            p_leftView, SLOT(setControlNet(ControlNet *)));
 
     connect(this,
-            SIGNAL(stretchChipViewport(Isis::Stretch *, Qisis::CubeViewport *)),
+            SIGNAL(stretchChipViewport(Stretch *, CubeViewport *)),
             p_leftView,
-            SLOT(stretchFromCubeViewport(Isis::Stretch *, Qisis::CubeViewport *)));
+            SLOT(stretchFromCubeViewport(Stretch *, CubeViewport *)));
 
     connect(leftLockStretch, SIGNAL(stateChanged(int)),
             p_leftView,
@@ -316,12 +316,12 @@ namespace Qisis {
     p_rightView = new ChipViewport(VIEWSIZE, VIEWSIZE, this);
     gridLayout->addWidget(p_rightView, row, 1);
 
-    connect(this, SIGNAL(newControlNetwork(Isis::ControlNet *)),
-            p_rightView, SLOT(setControlNet(Isis::ControlNet *)));
+    connect(this, SIGNAL(newControlNetwork(ControlNet *)),
+            p_rightView, SLOT(setControlNet(ControlNet *)));
     connect(this,
-            SIGNAL(stretchChipViewport(Isis::Stretch *, Qisis::CubeViewport *)),
+            SIGNAL(stretchChipViewport(Stretch *, CubeViewport *)),
             p_rightView,
-            SLOT(stretchFromCubeViewport(Isis::Stretch *, Qisis::CubeViewport *)));
+            SLOT(stretchFromCubeViewport(Stretch *, CubeViewport *)));
     connect(rightLockStretch, SIGNAL(stateChanged(int)),
             p_rightView,
             SLOT(changeStretchLock(int)));
@@ -353,8 +353,8 @@ namespace Qisis {
     connect(rightPanRight, SIGNAL(clicked()), this, SLOT(colorizeSaveButton()));
 
     //  Create chips for left and right
-    p_leftChip = new Isis::Chip(VIEWSIZE, VIEWSIZE);
-    p_rightChip = new Isis::Chip(VIEWSIZE, VIEWSIZE);
+    p_leftChip = new Chip(VIEWSIZE, VIEWSIZE);
+    p_rightChip = new Chip(VIEWSIZE, VIEWSIZE);
 
     p_nogeom = new QRadioButton("No geom");
     p_nogeom->setChecked(true);
@@ -529,8 +529,8 @@ namespace Qisis {
    *   @history 2008-11-19  Tracie Sucharski - If left cube changes, get new
    *                           universalGroundMap.
    */
-  void ControlPointEdit::setLeftMeasure(Isis::ControlMeasure *leftMeasure,
-                                        Isis::Cube *leftCube, std::string pointId) {
+  void ControlPointEdit::setLeftMeasure(ControlMeasure *leftMeasure,
+                                        Cube *leftCube, std::string pointId) {
 
     //  Make sure registration is turned off
     if ( p_autoRegShown ) {
@@ -545,7 +545,7 @@ namespace Qisis {
 
     //  get new ground map
     if ( p_leftGroundMap != 0 ) delete p_leftGroundMap;
-    p_leftGroundMap = new Isis::UniversalGroundMap(*leftCube);
+    p_leftGroundMap = new UniversalGroundMap(*leftCube);
     p_leftCube = leftCube;
 
     p_leftChip->TackCube(p_leftMeasure->GetSample(), p_leftMeasure->GetLine());
@@ -569,7 +569,7 @@ namespace Qisis {
    *   @history 2008-11-19  Tracie Sucharski - If right cube changes, get new
    *                           universalGroundMap.
    *   @history 2008-15-2008 Jeannie Walldren - Added error string to
-  *                             Isis::iException::Message before
+  *                             iException::Message before
   *                             creating QMessageBox
    *   @history 2009-09-14  Tracie Sucharski - Call geomChip to make
    *                           sure left chip is initialized in the
@@ -578,8 +578,8 @@ namespace Qisis {
    *                           class where the Cube info is no longer stored.
   *
     */
-  void ControlPointEdit::setRightMeasure(Isis::ControlMeasure *rightMeasure,
-                                         Isis::Cube *rightCube, std::string pointId) {
+  void ControlPointEdit::setRightMeasure(ControlMeasure *rightMeasure,
+                                         Cube *rightCube, std::string pointId) {
 
     //  Make sure registration is turned off
     if ( p_autoRegShown ) {
@@ -595,7 +595,7 @@ namespace Qisis {
 
     //  get new ground map
     if ( p_rightGroundMap != 0 ) delete p_rightGroundMap;
-    p_rightGroundMap = new Isis::UniversalGroundMap(*rightCube);
+    p_rightGroundMap = new UniversalGroundMap(*rightCube);
     p_rightCube = rightCube;
 
     p_rightChip->TackCube(p_rightMeasure->GetSample(),
@@ -608,8 +608,8 @@ namespace Qisis {
         p_rightChip->Load(*p_rightCube, *p_leftChip, *p_leftCube);
 
       }
-      catch ( Isis::iException &e ) {
-        e.Message(Isis::iException::User, "Geom failed.", _FILEINFO_);
+      catch ( iException &e ) {
+        e.Message(iException::User, "Geom failed.", _FILEINFO_);
         QString message = e.Errors().c_str();
         e.Clear();
         QMessageBox::information((QWidget *)parent(), "Error", message);
@@ -801,7 +801,7 @@ namespace Qisis {
       p_autoRegFact->SearchChip()->Load(*p_rightCube,
                           *(p_autoRegFact->PatternChip()), *p_leftCube);
     }
-    catch ( Isis::iException &e ) {
+    catch ( iException &e ) {
       QString msg = "Cannot register this point, unable to Load chips.";
       msg += e.Errors().c_str();
       QMessageBox::information((QWidget *)parent(), "Error", msg);
@@ -809,31 +809,31 @@ namespace Qisis {
       return;
     }
 
-    Isis::AutoReg::RegisterStatus status = p_autoRegFact->Register();
+    AutoReg::RegisterStatus status = p_autoRegFact->Register();
     if ( !p_autoRegFact->Success() ) {
       QString msg = "Cannot sub-pixel register this point.\n";
-      if ( status == Isis::AutoReg::PatternChipNotEnoughValidData ) {
+      if ( status == AutoReg::PatternChipNotEnoughValidData ) {
         msg += "\n\nNot enough valid data in Pattern Chip.\n";
         msg += "  PatternValidPercent = ";
         msg += QString::number(p_autoRegFact->PatternValidPercent()) + "%";
       }
-      else if ( status == Isis::AutoReg::FitChipNoData ) {
+      else if ( status == AutoReg::FitChipNoData ) {
         msg += "\n\nNo valid data in Fit Chip.";
       }
-      else if ( status == Isis::AutoReg::FitChipToleranceNotMet ) {
+      else if ( status == AutoReg::FitChipToleranceNotMet ) {
         msg += "\n\nGoodness of Fit Tolerance not met.\n";
         msg += "\nGoodnessOfFit = " + QString::number(p_autoRegFact->GoodnessOfFit());
         msg += "\nGoodnessOfFitTolerance = ";
         msg += QString::number(p_autoRegFact->Tolerance());
       }
-      else if ( status == Isis::AutoReg::SurfaceModelNotEnoughValidData ) {
+      else if ( status == AutoReg::SurfaceModelNotEnoughValidData ) {
         msg += "\n\nNot enough points to fit a surface model for sub-pixel ";
         msg += "accuracy.  Probably too close to edge.\n";
       }
-      else if ( status == Isis::AutoReg::SurfaceModelSolutionInvalid ) {
+      else if ( status == AutoReg::SurfaceModelSolutionInvalid ) {
         msg += "\n\nCould not model surface for sub-pixel accuracy.\n";
       }
-      else if ( status == Isis::AutoReg::SurfaceModelDistanceInvalid ) {
+      else if ( status == AutoReg::SurfaceModelDistanceInvalid ) {
         double sampDist, lineDist;
         p_autoRegFact->Distance(sampDist, lineDist);
         msg += "\n\nSurface model moves registartion more than tolerance.\n";
@@ -842,14 +842,14 @@ namespace Qisis {
         msg += "\nDistanceTolerance = " +
                QString::number(p_autoRegFact->DistanceTolerance());
       }
-      else if ( status == Isis::AutoReg::PatternZScoreNotMet ) {
+      else if ( status == AutoReg::PatternZScoreNotMet ) {
         double score1, score2;
         p_autoRegFact->ZScores(score1, score2);
         msg += "\n\nPattern data max or min does not pass z-score test.\n";
         msg += "\nMinimumZScore = " + QString::number(p_autoRegFact->MinimumZScore());
         msg += "\nCalculatedZscores = " + QString::number(score1) + ", " + QString::number(score2);
       }
-      else if ( status == Isis::AutoReg::SurfaceModelEccentricityRatioNotMet ) {
+      else if ( status == AutoReg::SurfaceModelEccentricityRatioNotMet ) {
         msg += "\n\nEccentricity of surface model exceeds tolerance.";
         QString calcEccentricity = QString::number(p_autoRegFact->EccentricityRatio(), 'f', 5);
         msg += "\nCalculated Eccentricity Ratio = " +
@@ -858,7 +858,7 @@ namespace Qisis {
         msg += "\nEccentricity Ratio Tolerance (i.e., EccentricityRatio) = " +
                tolEccentricity + " (" + tolEccentricity + ":1)";
       }
-      else if ( status == Isis::AutoReg::AdaptiveAlgorithmFailed ) {
+      else if ( status == AutoReg::AdaptiveAlgorithmFailed ) {
         msg += "\n\nError occured in Adaptive algorithm.";
       }
       else {
@@ -931,23 +931,23 @@ namespace Qisis {
         p_rightMeasure->SetAprioriLine(p_rightMeasure->GetLine());
 
         p_rightMeasure->SetChooserName("Application qnet");
-        p_rightMeasure->SetType(Isis::ControlMeasure::RegisteredSubPixel);
+        p_rightMeasure->SetType(ControlMeasure::RegisteredSubPixel);
         //  Save  autoreg parameters to the right measure log entry
         //  Eccentricity may be invalid, check before writing.
-        p_rightMeasure->SetLogData(Isis::ControlMeasureLogData(
-                               Isis::ControlMeasureLogData::GoodnessOfFit,
+        p_rightMeasure->SetLogData(ControlMeasureLogData(
+                               ControlMeasureLogData::GoodnessOfFit,
                                p_autoRegFact->GoodnessOfFit()));
-        if (p_autoRegFact->Eccentricity() != Isis::Null)
-             p_rightMeasure->SetLogData(Isis::ControlMeasureLogData(
-                                 Isis::ControlMeasureLogData::Eccentricity,
+        if (p_autoRegFact->Eccentricity() != Null)
+             p_rightMeasure->SetLogData(ControlMeasureLogData(
+                                 ControlMeasureLogData::Eccentricity,
                                  p_autoRegFact->Eccentricity()));
         double minZScore, maxZScore;
         p_autoRegFact->ZScores(minZScore,maxZScore);
-        p_rightMeasure->SetLogData(Isis::ControlMeasureLogData(
-                                 Isis::ControlMeasureLogData::MinimumPixelZScore,
+        p_rightMeasure->SetLogData(ControlMeasureLogData(
+                                 ControlMeasureLogData::MinimumPixelZScore,
                                  minZScore));
-        p_rightMeasure->SetLogData(Isis::ControlMeasureLogData(
-                                 Isis::ControlMeasureLogData::MaximumPixelZScore,
+        p_rightMeasure->SetLogData(ControlMeasureLogData(
+                                 ControlMeasureLogData::MaximumPixelZScore,
                                  maxZScore));
 
         p_autoRegShown = false;
@@ -955,16 +955,16 @@ namespace Qisis {
         p_autoReg->setText("Register");
       }
       else {
-        p_rightMeasure->SetChooserName(Isis::Application::UserName());
-        p_rightMeasure->SetType(Isis::ControlMeasure::Manual);
+        p_rightMeasure->SetChooserName(Application::UserName());
+        p_rightMeasure->SetType(ControlMeasure::Manual);
         p_rightMeasure->DeleteLogData(
-                               Isis::ControlMeasureLogData::GoodnessOfFit);
+                               ControlMeasureLogData::GoodnessOfFit);
         p_rightMeasure->DeleteLogData(
-                               Isis::ControlMeasureLogData::Eccentricity);
+                               ControlMeasureLogData::Eccentricity);
         p_rightMeasure->DeleteLogData(
-                               Isis::ControlMeasureLogData::MinimumPixelZScore);
+                               ControlMeasureLogData::MinimumPixelZScore);
         p_rightMeasure->DeleteLogData(
-                               Isis::ControlMeasureLogData::MaximumPixelZScore);
+                               ControlMeasureLogData::MaximumPixelZScore);
       }
 
       //  Get cube position at right chipViewport crosshair
@@ -978,8 +978,8 @@ namespace Qisis {
       if ( p_leftMeasure != NULL )
         p_leftMeasure->SetCoordinate(p_leftView->tackSample(), p_leftView->tackLine());
       p_leftMeasure->SetDateTime();
-      p_leftMeasure->SetChooserName(Isis::Application::UserName());
-      p_leftMeasure->SetType(Isis::ControlMeasure::Manual);
+      p_leftMeasure->SetChooserName(Application::UserName());
+      p_leftMeasure->SetType(ControlMeasure::Manual);
     }
 
     //  If the right chip is the same as the left chip, copy right into left and
@@ -1005,7 +1005,7 @@ namespace Qisis {
    * operations
    * @internal
    *   @history 2008-15-2008  Jeannie Walldren - Added error string to
-   *                            Isis::iException::Message before
+   *                            iException::Message before
    *                            creating QMessageBox
    */
   void ControlPointEdit::updateRightGeom() {
@@ -1015,8 +1015,8 @@ namespace Qisis {
         p_rightView->geomChip(p_leftChip, p_leftCube);
 
       }
-      catch ( Isis::iException &e ) {
-        e.Message(Isis::iException::User, "Geom failed.", _FILEINFO_);
+      catch ( iException &e ) {
+        e.Message(iException::User, "Geom failed.", _FILEINFO_);
         QString message = e.Errors().c_str();
         e.Clear();
         QMessageBox::information((QWidget *)parent(), "Error", message);
@@ -1045,7 +1045,7 @@ namespace Qisis {
    * @internal
    *   @history  2007-06-15 Tracie Sucharski - Grey out zoom buttons
    *   @history 2008-15-2008 Jeannie Walldren - Added error string to
-   *                            Isis::iException::Message before
+   *                            iException::Message before
    *                            creating QMessageBox
    **/
   void ControlPointEdit::setGeom() {
@@ -1078,8 +1078,8 @@ namespace Qisis {
       p_rightView->geomChip(p_leftChip, p_leftCube);
 
     }
-    catch ( Isis::iException &e ) {
-      e.Message(Isis::iException::User, "Geom failed.", _FILEINFO_);
+    catch ( iException &e ) {
+      e.Message(iException::User, "Geom failed.", _FILEINFO_);
       QString message = e.Errors().c_str();
       e.Clear();
       QMessageBox::information((QWidget *)parent(), "Error", message);
@@ -1227,7 +1227,7 @@ namespace Qisis {
    */
   bool ControlPointEdit::setTemplateFile(QString fn) {
 
-    Isis::AutoReg *reg = NULL;
+    AutoReg *reg = NULL;
     // save original template filename
     std::string temp = p_templateFilename;
     try {
@@ -1235,10 +1235,10 @@ namespace Qisis {
       p_templateFilename = fn.toStdString();
 
       // Create PVL object with this file
-      Isis::Pvl pvl(fn.toStdString());
+      Pvl pvl(fn.toStdString());
 
       // try to register file
-      reg = Isis::AutoRegFactory::Create(pvl);
+      reg = AutoRegFactory::Create(pvl);
       if ( p_autoRegFact != NULL )
         delete p_autoRegFact;
       p_autoRegFact = reg;
@@ -1246,10 +1246,10 @@ namespace Qisis {
       p_templateFilename = fn.toStdString();
       return true;
     }
-    catch ( Isis::iException &e ) {
+    catch ( iException &e ) {
       // set templateFilename back to its original value
       p_templateFilename = temp;
-      e.Message(Isis::iException::Io, "Cannot create AutoRegFactory for " +
+      e.Message(iException::Io, "Cannot create AutoRegFactory for " +
                 fn.toStdString() +
                 ".  As a result, current template file will remain set to " +
                 p_templateFilename, _FILEINFO_);
@@ -1293,10 +1293,10 @@ namespace Qisis {
 
     //  Save chips - pattern, search and fit
     std::string baseFile = p_pointId + "_" +
-                           Isis::iString((int)(p_leftMeasure ->GetSample())) + "_" +
-                           Isis::iString((int)(p_leftMeasure ->GetLine()))   + "_" +
-                           Isis::iString((int)(p_rightMeasure->GetSample())) + "_" +
-                           Isis::iString((int)(p_rightMeasure->GetLine()))   + "_";
+                           iString((int)(p_leftMeasure ->GetSample())) + "_" +
+                           iString((int)(p_leftMeasure ->GetLine()))   + "_" +
+                           iString((int)(p_rightMeasure->GetSample())) + "_" +
+                           iString((int)(p_rightMeasure->GetLine()))   + "_";
     std::string fname = baseFile + "Search.cub";
     std::string command = "$ISISROOT/bin/qview " + fname;
     p_autoRegFact->RegistrationSearchChip()->Write(fname);
@@ -1306,7 +1306,7 @@ namespace Qisis {
     fname = baseFile + "Fit.cub";
     command += " " + fname + "&";
     p_autoRegFact->FitChip()->Write(fname);
-    Isis::ProgramLauncher::RunSystemCommand(command);
+    ProgramLauncher::RunSystemCommand(command);
   }
 
 #if 0

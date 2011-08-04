@@ -294,7 +294,7 @@ namespace Isis {
   }
 
 
-  void MosaicSceneWidget::addTo(Qisis::ToolPad *toolPad) {
+  void MosaicSceneWidget::addTo(ToolPad *toolPad) {
     MosaicTool *tool;
     foreach(tool, *m_tools) {
       tool->addTo(toolPad);
@@ -630,7 +630,7 @@ namespace Isis {
       m_projectionFootprint->show();
 
     }
-    catch(Isis::iException &e) {
+    catch(iException &e) {
       std::string msg = e.Errors();
       QMessageBox::information(this, "Error", QString::fromStdString(msg),
                                QMessageBox::Ok);
@@ -678,7 +678,7 @@ namespace Isis {
     if(mapFile.isEmpty()) return;
 
     try {
-      Isis::Pvl pvl;
+      Pvl pvl;
       pvl.Read(mapFile.toStdString());
 
       PvlGroup &mapping = pvl.FindGroup("Mapping", Pvl::Traverse);
@@ -705,7 +705,7 @@ namespace Isis {
 
       setProjection(mapping);
     }
-    catch(Isis::iException &e) {
+    catch(iException &e) {
       std::string msg = e.Errors();
       QMessageBox::information(this, "Error", QString::fromStdString(msg), QMessageBox::Ok);
       return;

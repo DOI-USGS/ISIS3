@@ -32,7 +32,7 @@
 #include "QnetFilter.h"
 
 
-namespace Qisis {
+namespace Isis {
   /**
    * Defines the Jigsaw Error filter for the QnetNavTool's Points
    * section.  The user may enter values for Less Than and/or

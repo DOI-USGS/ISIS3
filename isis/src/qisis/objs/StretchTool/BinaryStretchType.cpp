@@ -11,9 +11,7 @@
 #include "Statistics.h"
 #include "Stretch.h"
 
-using namespace Isis;
-
-namespace Qisis {
+namespace Isis {
   /**
    * This constructs a binary stretch type.
    *
@@ -22,8 +20,8 @@ namespace Qisis {
    * @param name
    * @param color
    */
-  BinaryStretchType::BinaryStretchType(const Isis::Histogram &hist,
-                                       const Isis::Stretch &stretch,
+  BinaryStretchType::BinaryStretchType(const Histogram &hist,
+                                       const Stretch &stretch,
                                        const QString &name, const QColor &color)
     : StretchType(hist, stretch, name, color) {
     p_startSlider = NULL;
@@ -98,7 +96,7 @@ namespace Qisis {
    *
    * @param newStretch Stretch to interpret
    */
-  void BinaryStretchType::setStretch(Isis::Stretch newStretch) {
+  void BinaryStretchType::setStretch(Stretch newStretch) {
     double epsilon = p_cubeHist->BinSize();
 
     Stretch interpretted;
@@ -331,9 +329,9 @@ namespace Qisis {
    * This uses the GUI elements to calculate the current binary
    * stretch.
    *
-   * @return Isis::Stretch
+   * @return Stretch
    */
-  Isis::Stretch BinaryStretchType::calculateNewStretch() {
+  Stretch BinaryStretchType::calculateNewStretch() {
     double epsilon = p_cubeHist->BinSize();
 
     if(epsilon == 0) {

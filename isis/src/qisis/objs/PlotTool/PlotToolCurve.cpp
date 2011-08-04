@@ -3,7 +3,7 @@
 #include <iostream>
 
 
-namespace Qisis {
+namespace Isis {
   /**
    * This constructs a PlotToolCurve... a subclass of PlotCurve.
    * This class was created specifically for use withthe plot

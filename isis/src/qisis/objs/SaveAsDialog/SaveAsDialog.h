@@ -23,7 +23,7 @@
 #include <QRadioButton>
 #include "FileDialog.h"
 
-namespace Qisis {
+namespace Isis {
 
   /**
   * @brief Widget to save(Save As) Isis cubes(used in qview) to display the 

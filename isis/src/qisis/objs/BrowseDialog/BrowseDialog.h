@@ -3,7 +3,7 @@
 
 #include "FileDialog.h"
 
-namespace Qisis {
+namespace Isis {
   /**
   * @brief Class for browsing cubes.
   *

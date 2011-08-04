@@ -7,13 +7,13 @@
 class QComboBox;
 class QLineEdit;
 
-namespace Qisis {
+namespace Isis {
   /**
    * @internal
    *   @history 2010-06-26 Eric Hyer - Now uses MdiCubeViewport
    *                                 - Fixed multiple include problems
    */
-  class PanTool : public Qisis::Tool {
+  class PanTool : public Tool {
       Q_OBJECT
 
     public:

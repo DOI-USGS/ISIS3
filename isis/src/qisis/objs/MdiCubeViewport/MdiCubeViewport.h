@@ -36,7 +36,7 @@ namespace Isis {
   class Cube;
 }
 
-namespace Qisis {
+namespace Isis {
   class Tool;
   class ViewportBuffer;
 
@@ -55,7 +55,7 @@ namespace Qisis {
       Q_OBJECT
 
     public:
-      MdiCubeViewport(Isis::Cube *cube, QWidget *parent = 0);
+      MdiCubeViewport(Cube *cube, QWidget *parent = 0);
       ~MdiCubeViewport();
 
       void forceAbstract() {}

@@ -42,6 +42,8 @@
 void startMonitoringMemory();
 void stopMonitoringMemory();
 
+using namespace Isis;
+
 int main(int argc, char *argv[]) {
 #ifdef CWDEBUG
   startMonitoringMemory();
@@ -50,19 +52,19 @@ int main(int argc, char *argv[]) {
   // Check to see if the user wants to force a new window
   int newWindow = -1;
   for(int i = 1; i < argc; i++) {
-    if(Isis::iString(argv[i]).UpCase() == "-NEW") {
+    if(iString(argv[i]).UpCase() == "-NEW") {
       newWindow = i;
     }
   }
 
   if(newWindow < 0) {
-    std::string p_socketFile = "/tmp/isis_qview_" + Isis::Application::UserName();
+    std::string p_socketFile = "/tmp/isis_qview_" + Application::UserName();
     struct sockaddr_un p_socketName;
     p_socketName.sun_family = AF_UNIX;
     strcpy(p_socketName.sun_path, p_socketFile.c_str());
     int p_socket;
 
-    if(((Isis::Filename)p_socketFile).Exists()) {
+    if(((Filename)p_socketFile).Exists()) {
       // Create a socket
       if((p_socket = socket(PF_UNIX, SOCK_STREAM, 0)) < 0) {
         std::string msg = "Unable to create socket";
@@ -75,7 +77,7 @@ int main(int argc, char *argv[]) {
                   sizeof(p_socketName))) >= 0) {
         std::string temp;
         for(int i = 1; i < argc; i++) {
-          temp +=  Isis::Filename(argv[i]).Expanded() + " ";
+          temp +=  Filename(argv[i]).Expanded() + " ";
         }
         temp += "raise ";
 
@@ -98,76 +100,76 @@ int main(int argc, char *argv[]) {
   }
 
   // Creates the qview application window
-  Qisis::QIsisApplication *app = new Qisis::QIsisApplication(argc, argv);
+  QIsisApplication *app = new QIsisApplication(argc, argv);
   QApplication::setApplicationName("qview");
 
   // check for forcing of gui style
-  Isis::PvlGroup &uiPref = Isis::Preference::Preferences().FindGroup(
+  PvlGroup &uiPref = Preference::Preferences().FindGroup(
                              "UserInterface");
   if(uiPref.HasKeyword("GuiStyle")) {
     std::string style = uiPref["GuiStyle"];
-    QApplication::setStyle((Isis::iString) style);
+    QApplication::setStyle((iString) style);
   }
 
   // Add the Qt plugin directory to the library path
-  Isis::Filename qtpluginpath("$ISISROOT/3rdParty/plugins");
+  Filename qtpluginpath("$ISISROOT/3rdParty/plugins");
   QCoreApplication::addLibraryPath(qtpluginpath.Expanded().c_str());
 
-  Qisis::ViewportMainWindow *vw = new Qisis::ViewportMainWindow("qview");
+  ViewportMainWindow *vw = new ViewportMainWindow("qview");
 
-  Qisis::Tool *rubberBandTool = Qisis::RubberBandTool::getInstance(vw);
+  Tool *rubberBandTool = RubberBandTool::getInstance(vw);
   rubberBandTool->addTo(vw);
 
-  Qisis::Tool *ftool = new Qisis::FileTool(vw);
+  Tool *ftool = new FileTool(vw);
   ftool->addTo(vw);
   vw->permanentToolBar()->addSeparator();
 
-  Qisis::Tool *btool = new Qisis::BandTool(vw);
+  Tool *btool = new BandTool(vw);
   btool->addTo(vw);
 
-  Qisis::Tool *ztool = new Qisis::ZoomTool(vw);
+  Tool *ztool = new ZoomTool(vw);
   ztool->addTo(vw);
   ztool->activate(true);
   vw->getMenu("&View")->addSeparator();
 
-  Qisis::Tool *ptool = new Qisis::PanTool(vw);
+  Tool *ptool = new PanTool(vw);
   ptool->addTo(vw);
   vw->getMenu("&View")->addSeparator();
 
-  Qisis::Tool *stool = new Qisis::StretchTool(vw);
+  Tool *stool = new StretchTool(vw);
   stool->addTo(vw);
 
-  Qisis::Tool *findtool = new Qisis::FindTool(vw);
+  Tool *findtool = new FindTool(vw);
   findtool->addTo(vw);
 
-  Qisis::Tool *blinktool = new Qisis::BlinkTool(vw);
+  Tool *blinktool = new BlinkTool(vw);
   blinktool->addTo(vw);
 
-  Qisis::Tool *attool = new Qisis::AdvancedTrackTool(vw);
+  Tool *attool = new AdvancedTrackTool(vw);
   attool->addTo(vw);
 
-  Qisis::Tool *edittool = new Qisis::EditTool(vw);
+  Tool *edittool = new EditTool(vw);
   edittool->addTo(vw);
 
-  Qisis::Tool *wtool = new Qisis::WindowTool(vw);
+  Tool *wtool = new WindowTool(vw);
   wtool->addTo(vw);
 
-  Qisis::Tool *mtool = new Qisis::MeasureTool(vw);
+  Tool *mtool = new MeasureTool(vw);
   mtool->addTo(vw);
 
-  Qisis::Tool *sptool = new Qisis::SpecialPixelTool(vw);
+  Tool *sptool = new SpecialPixelTool(vw);
   sptool->addTo(vw);
 
-  Qisis::Tool *pltool = new Qisis::PlotTool(vw);
+  Tool *pltool = new PlotTool(vw);
   pltool->addTo(vw);
 
-  Qisis::Tool *histtool = new Qisis::HistogramTool(vw);
+  Tool *histtool = new HistogramTool(vw);
   histtool->addTo(vw);
 
-  Qisis::Tool *statstool = new Qisis::StatisticsTool(vw);
+  Tool *statstool = new StatisticsTool(vw);
   statstool->addTo(vw);
 
-  Qisis::Tool *htool = new Qisis::HelpTool(vw);
+  Tool *htool = new HelpTool(vw);
   htool->addTo(vw);
 
   // Show the application window & open the cubes
@@ -180,7 +182,7 @@ int main(int argc, char *argv[]) {
         vw->workspace()->addCubeViewport(QString(argv[i]));
         openingAFileSucceeded = true;
       }
-      catch(Isis::iException &e) {
+      catch(iException &e) {
         e.Report();
         e.Clear();
 
@@ -193,12 +195,12 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  Qisis::SocketThread *temp = NULL;
+  SocketThread *temp = NULL;
 //  Doesn't yet work on Mac OS X 10.4 (Tiger) systems for some reason.
 #if !defined(__APPLE__)
   // We don't want to start a thread if the user is forcing a new window
   if(newWindow < 0) {
-    temp = new Qisis::SocketThread();
+    temp = new SocketThread();
     temp->connect(temp, SIGNAL(newImage(const QString &)),
                   vw->workspace(), SLOT(addCubeViewport(const QString &)));
     temp->connect(temp, SIGNAL(focusApp()), vw, SLOT(raise()));

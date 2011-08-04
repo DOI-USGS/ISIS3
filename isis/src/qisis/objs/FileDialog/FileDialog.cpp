@@ -2,7 +2,7 @@
 #include <QFile>
 #include <iostream>
 
-namespace Qisis {
+namespace Isis {
   FileDialog::FileDialog(QString title, QStringList &filterList, QDir &directory, QWidget *parent) :
     QFileDialog(parent), p_filterList(filterList), p_dir(directory) {
 
@@ -135,7 +135,7 @@ namespace Qisis {
     }
 
     std::string instanceName = this->windowTitle().toStdString();
-    Isis::Filename config("$HOME/.Isis/" + p_appName + "/" + instanceName + ".config");
+    Filename config("$HOME/.Isis/" + p_appName + "/" + instanceName + ".config");
     QSettings settings(QString::fromStdString(config.Expanded()), QSettings::NativeFormat);
     QPoint pos = settings.value("pos", QPoint(300, 100)).toPoint();
     QSize size = settings.value("size", QSize(355, 350)).toSize();
@@ -159,7 +159,7 @@ namespace Qisis {
     }
 
     std::string instanceName = this->windowTitle().toStdString();
-    Isis::Filename config("$HOME/.Isis/" + p_appName + "/" + instanceName + ".config");
+    Filename config("$HOME/.Isis/" + p_appName + "/" + instanceName + ".config");
     QSettings settings(QString::fromStdString(config.Expanded()), QSettings::NativeFormat);
     settings.setValue("pos", pos());
     settings.setValue("size", size());

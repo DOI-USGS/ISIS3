@@ -13,7 +13,7 @@ namespace Isis {
   class Histogram;
 };
 
-namespace Qisis {
+namespace Isis {
   class AdvancedStretch;
   class CubeViewport;
 
@@ -34,12 +34,12 @@ namespace Qisis {
       Q_OBJECT
 
     public:
-      AdvancedStretch(Isis::Histogram &, const Isis::Stretch &,
+      AdvancedStretch(Histogram &, const Stretch &,
                       const QString &, const QColor &);
       ~AdvancedStretch();
-      Isis::Stretch getStretch();
-      void setStretch(Isis::Stretch newStretch);
-      void setHistogram(const Isis::Histogram &newHist);
+      Stretch getStretch();
+      void setStretch(Stretch newStretch);
+      void setHistogram(const Histogram &newHist);
 
     signals:
       //! Emitted when a new stretch is available

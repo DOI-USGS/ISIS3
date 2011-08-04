@@ -9,10 +9,9 @@
 
 #include "qnet.h"
 
-using namespace Qisis::Qnet;
-using namespace Isis;
+using namespace Isis::Qnet;
 
-namespace Qisis {
+namespace Isis {
   /**
   * Contructor for the Point Error filter.  It
   * creates the Error filter window found in the
@@ -119,7 +118,7 @@ namespace Qisis {
     // the filtered list if it is outside the filtering range
     // Loop in reverse order since removal list of elements affects index number
     for (int i = g_filteredPoints.size() - 1; i >= 0; i--) {
-      Isis::ControlPoint &cp = *(*g_controlNetwork)[g_filteredPoints[i]];
+      ControlPoint &cp = *(*g_controlNetwork)[g_filteredPoints[i]];
       double maxResidual = cp.GetStatistic(&ControlMeasure::GetResidualMagnitude).Maximum();
       if (p_lessThanCB->isChecked() && p_greaterThanCB->isChecked()) {
         if (maxResidual < lessNum && maxResidual > greaterNum) {

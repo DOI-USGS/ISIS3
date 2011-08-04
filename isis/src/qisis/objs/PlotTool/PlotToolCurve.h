@@ -30,7 +30,7 @@
  */
 
 
-namespace Qisis {
+namespace Isis {
   class PlotToolCurve : public PlotCurve {
 
     public:

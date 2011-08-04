@@ -674,7 +674,7 @@ namespace Isis {
    * This is for the slots that have a list of display properties as associated
    *   data. This gets that list out of the data.
    */
-  QList<Isis::CubeDisplayProperties *> CubeDisplayProperties::senderToData(
+  QList<CubeDisplayProperties *> CubeDisplayProperties::senderToData(
       QObject *senderObj) {
     QList<CubeDisplayProperties *> data;
 

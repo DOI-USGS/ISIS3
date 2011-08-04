@@ -32,7 +32,7 @@
 #include <qwt_symbol.h>
 #include <qwt_plot_marker.h>
 
-namespace Qisis {
+namespace Isis {
   class PlotCurve : public QwtPlotCurve {
 
     public:

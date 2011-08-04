@@ -8,8 +8,8 @@
 
 #include <QDockWidget>
 
-namespace Qisis {
-  class HistogramToolWindow : public Qisis::PlotWindow {
+namespace Isis {
+  class HistogramToolWindow : public PlotWindow {
       Q_OBJECT
 
     public:

@@ -13,7 +13,7 @@ class QLineEdit;
 class QString;
 class QColor;
 
-namespace Qisis {
+namespace Isis {
 
   /**
    * @brief This handles the advanced linear stretch
@@ -32,12 +32,12 @@ namespace Qisis {
       Q_OBJECT
 
     public:
-      LinearStretchType(const Isis::Histogram &, const Isis::Stretch &,
+      LinearStretchType(const Histogram &, const Stretch &,
                         const QString &name, const QColor &color);
       ~LinearStretchType();
 
-      virtual Isis::Stretch getStretch();
-      virtual void setStretch(Isis::Stretch);
+      virtual Stretch getStretch();
+      virtual void setStretch(Stretch);
 
 
     private slots:

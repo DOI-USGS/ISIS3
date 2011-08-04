@@ -12,9 +12,7 @@
 #include "Statistics.h"
 #include "Stretch.h"
 
-using namespace Isis;
-
-namespace Qisis {
+namespace Isis {
   /**
    * This constructs a manual stretch type.
    *
@@ -23,8 +21,8 @@ namespace Qisis {
    * @param name
    * @param color
    */
-  ManualStretchType::ManualStretchType(const Isis::Histogram &hist,
-                                       const Isis::Stretch &stretch,
+  ManualStretchType::ManualStretchType(const Histogram &hist,
+                                       const Stretch &stretch,
                                        const QString &name, const QColor &color)
     : StretchType(hist, stretch, name, color) {
     p_inputEdit = NULL;
@@ -90,7 +88,7 @@ namespace Qisis {
    *
    * @param newStretch Stretch to interpret
    */
-  void ManualStretchType::setStretch(Isis::Stretch newStretch) {
+  void ManualStretchType::setStretch(Stretch newStretch) {
     if(newStretch.Text() != p_stretch->Text()) {
       p_stretch->CopyPairs(newStretch);
       emit stretchChanged();

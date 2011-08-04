@@ -10,10 +10,10 @@
 
 #include "qnet.h"
 
-using namespace Qisis::Qnet;
+using namespace Isis::Qnet;
 using namespace std;
 
-namespace Qisis {
+namespace Isis {
   // initialize static variable
   QString QnetFixedPointDialog::lastPtIdValue = "";
 

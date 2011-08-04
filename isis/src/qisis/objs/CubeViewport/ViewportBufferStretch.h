@@ -5,7 +5,7 @@
 
 class QRect;
 
-namespace Qisis {
+namespace Isis {
   class ViewportBufferStretch : public ViewportBufferAction {
     public:
       ViewportBufferStretch();

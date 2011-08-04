@@ -20,10 +20,9 @@
 #include "Statistics.h"
 #include "ToolPad.h"
 
-using namespace Isis;
 using std::cerr;
 
-namespace Qisis {
+namespace Isis {
 
   /**
    * This constructs a plot tool. The plot tool graphs either DN values across a
@@ -32,7 +31,7 @@ namespace Qisis {
    *
    * @param parent
    */
-  PlotTool::PlotTool(QWidget *parent) : Qisis::Tool(parent) {
+  PlotTool::PlotTool(QWidget *parent) : Tool(parent) {
     p_spectralRubberBand = NULL;
     p_spacialRubberBand = NULL;
     RubberBandTool::allowPoints(1);
@@ -400,8 +399,8 @@ namespace Qisis {
     p_plotToolWindow->setPlotBackground(Qt::black);
     p_plotToolWindow->setDeletable(false);
     p_plotToolWindow->setPasteable(false);
-    connect(p_plotToolWindow, SIGNAL(curveCopied(Qisis::PlotCurve *)), this,
-            SLOT(copyCurve(Qisis::PlotCurve *)));
+    connect(p_plotToolWindow, SIGNAL(curveCopied(PlotCurve *)), this,
+            SLOT(copyCurve(PlotCurve *)));
 
 
     /* Our configuring the plot window depends on this combo box*/
@@ -451,12 +450,12 @@ namespace Qisis {
   void PlotTool::newPlotWindow() {
     PlotToolWindow *blankWindow = new PlotToolWindow("Plot Window", p_parent);
     blankWindow->setDestroyOnClose(true);
-    connect(blankWindow, SIGNAL(curvePaste(Qisis::PlotWindow *)), this,
-            SLOT(pasteCurve(Qisis::PlotWindow *)));
-    connect(blankWindow, SIGNAL(curvePasteSpecial(Qisis::PlotWindow *)), this,
-            SLOT(pasteCurveSpecial(Qisis::PlotWindow *)));
-    connect(blankWindow, SIGNAL(curveCopied(Qisis::PlotCurve *)), this,
-            SLOT(copyCurve(Qisis::PlotCurve *)));
+    connect(blankWindow, SIGNAL(curvePaste(PlotWindow *)), this,
+            SLOT(pasteCurve(PlotWindow *)));
+    connect(blankWindow, SIGNAL(curvePasteSpecial(PlotWindow *)), this,
+            SLOT(pasteCurveSpecial(PlotWindow *)));
+    connect(blankWindow, SIGNAL(curveCopied(PlotCurve *)), this,
+            SLOT(copyCurve(PlotCurve *)));
     connect(blankWindow, SIGNAL(destroyed(QObject *)), this,
             SLOT(removeWindow(QObject *)));
     connect(blankWindow, SIGNAL(plotChanged()), this, SLOT(updateViewPort()));
@@ -662,7 +661,7 @@ namespace Qisis {
    * been requested to be copied.
    * @param pc
    */
-  void PlotTool::copyCurve(Qisis::PlotCurve *pc) {
+  void PlotTool::copyCurve(PlotCurve *pc) {
     p_copyCurve = new PlotToolCurve();
     p_copyCurve->copyCurveProperties((PlotToolCurve *)pc);
   }
@@ -674,7 +673,7 @@ namespace Qisis {
    * command has taken place inside the window.
    * @param pw
    */
-  void PlotTool::pasteCurve(Qisis::PlotWindow *pw) {
+  void PlotTool::pasteCurve(PlotWindow *pw) {
      p_cvp = cubeViewport();
     pw->add(p_copyCurve);
     updateViewPort(p_copyCurve);
@@ -686,7 +685,7 @@ namespace Qisis {
    * curve a differenet color than the copied curve.
    * @param pw
    */
-  void PlotTool::pasteCurveSpecial(Qisis::PlotWindow *pw) {
+  void PlotTool::pasteCurveSpecial(PlotWindow *pw) {
      p_cvp = cubeViewport();
     if(p_color < p_colors.size()) {
       p_copyCurve->setColor(p_colors[p_color]);
@@ -1187,7 +1186,7 @@ namespace Qisis {
    * The paintViewport() method is called.
    * @param pc
    */
-  void PlotTool::updateViewPort(Qisis::PlotToolCurve *pc) {
+  void PlotTool::updateViewPort(PlotToolCurve *pc) {
     pc->getViewPort()->repaint();
   }
 

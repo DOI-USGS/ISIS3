@@ -8,10 +8,10 @@
 
 #include "qnet.h"
 
-using namespace Qisis::Qnet;
+using namespace Isis::Qnet;
 using namespace std;
 
-namespace Qisis {
+namespace Isis {
   /**
    * Contructor for the Cube Image filter.  It creates the Cube Name filter window
    * found in the navtool

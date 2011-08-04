@@ -109,7 +109,7 @@ void IsisMain() {
 
     // Create the QHistogram, set the title & load the Isis::Histogram into it
 
-    Qisis::HistogramToolWindow *plot = new Qisis::HistogramToolWindow(title.c_str(), ui.TheGui());
+    HistogramToolWindow *plot = new HistogramToolWindow(title.c_str(), ui.TheGui());
 
     // Set the xaxis title if they entered one
     if(ui.WasEntered("XAXIS")) {
@@ -143,11 +143,11 @@ void IsisMain() {
       }
     }
 
-    Qisis::HistogramItem *histCurve = new Qisis::HistogramItem();
+    HistogramItem *histCurve = new HistogramItem();
     histCurve->setColor(Qt::darkCyan);
     histCurve->setTitle("Frequency");
 
-    Qisis::PlotToolCurve *cdfCurve = new Qisis::PlotToolCurve();
+    PlotToolCurve *cdfCurve = new PlotToolCurve();
     cdfCurve->setStyle(QwtPlotCurve::Lines);
     cdfCurve->setTitle("Percentage");
 

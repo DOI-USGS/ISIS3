@@ -13,7 +13,7 @@ class QRubberBand;
 class QStatusBar;
 class QToolBar;
 
-namespace Qisis {
+namespace Isis {
   class ToolPad;
 }
 
@@ -76,7 +76,7 @@ namespace Isis {
       }
 
       void addTo(QMenu *menu);
-      void addTo(Qisis::ToolPad *toolPad);
+      void addTo(ToolPad *toolPad);
       void addToPermanent(QToolBar *toolBar);
       void addTo(QToolBar *toolBar);
 

@@ -11,7 +11,7 @@ namespace Isis {
   class Preference;
 }
 
-namespace Qisis {
+namespace Isis {
   /**
   * @brief This was called the Qisis MainWindow.  Now this is
   *        being subclassed from the mainwindow class which keeps
@@ -27,15 +27,15 @@ namespace Qisis {
   *
   *  @history 2008-06-19 Noah Hilt - Added a method for sending a signal to qview
   *           when this window recieves a close event. This signal calls the file
-  *  		  tool's exit method and ignores this class's close method.
+  *           tool's exit method and ignores this class's close method.
   *  @history 2010-18-03 Sharmila Prasad - Added ability to handle exception and display warning status
-  *  		  when exception occured
+  *           when exception occured
   */
   class Workspace;
   class ToolPad;
   class TrackTool;
 
-  class ViewportMainWindow : public Qisis::MainWindow {
+  class ViewportMainWindow : public MainWindow {
       Q_OBJECT
 
     signals:
@@ -50,7 +50,7 @@ namespace Qisis {
       virtual ~ViewportMainWindow();
 
       //! Returns the current workspace
-      Qisis::Workspace *workspace() {
+      Workspace *workspace() {
         return p_workspace;
       };
 
@@ -65,12 +65,12 @@ namespace Qisis {
       };
 
       //! Returns the toolpad
-      Qisis::ToolPad *toolPad() {
+      ToolPad *toolPad() {
         return p_toolpad;
       };
 
       QMenu *getMenu(const QString &name);
-      Qisis::TrackTool *getTrackTool() {
+      TrackTool *getTrackTool() {
         return mTrackTool;
       };
 
@@ -81,13 +81,13 @@ namespace Qisis {
       virtual void closeEvent(QCloseEvent *event);
 
     private:
-      Qisis::Workspace *p_workspace;       //!< The current workspace
+      Workspace *p_workspace;       //!< The current workspace
       QToolBar *p_permToolbar;             //!< The permanent toolbar
       QToolBar *p_activeToolbar;           //!< The active toolbar
-      Qisis::ToolPad *p_toolpad;           //!< The toolpad
+      ToolPad *p_toolpad;           //!< The toolpad
       std::map<QString, QMenu *> p_menus;  //!< Map of qstrings to menus
       std::string p_appName;               //!< The app name
-      Qisis::TrackTool *mTrackTool;        //!< Pointer to application's Status bar
+      TrackTool *mTrackTool;        //!< Pointer to application's Status bar
   };
 };
 

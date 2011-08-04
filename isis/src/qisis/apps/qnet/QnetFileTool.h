@@ -34,7 +34,7 @@ namespace Isis {
   class ControlPoint;
 }
 
-namespace Qisis {
+namespace Isis {
 
   /**
    * @brief Qnet File operations
@@ -87,7 +87,7 @@ namespace Qisis {
     signals:
       void serialNumberListUpdated();
       void controlNetworkUpdated(QString cNetName);
-      void newControlNetwork(Isis::ControlNet *);
+      void newControlNetwork(ControlNet *);
       void newGroundFile();
       void newDemFile();
 
@@ -95,7 +95,7 @@ namespace Qisis {
       virtual void open();
       virtual void exit();
       virtual void saveAs();
-      void loadPointImages(Isis::ControlPoint *point);
+      void loadPointImages(ControlPoint *point);
       void loadImage(const QString &serialNumber);
       void setSaveNet();
 

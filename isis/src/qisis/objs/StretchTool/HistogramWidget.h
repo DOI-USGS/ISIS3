@@ -19,7 +19,7 @@
 
 class QwtPlotZoomer;
 
-namespace Qisis {
+namespace Isis {
   /**
    * @brief Histogram widget used by AdvancedStretchTool
    *
@@ -37,8 +37,8 @@ namespace Qisis {
 
     public:
       HistogramWidget(const QString title, const QColor histColor = Qt::gray, const QColor stretchColor = Qt::darkGray);
-      void setHistogram(const Isis::Histogram &hist);
-      void setStretch(Isis::Stretch stretch);
+      void setHistogram(const Histogram &hist);
+      void setStretch(Stretch stretch);
 
       void clearStretch();
 

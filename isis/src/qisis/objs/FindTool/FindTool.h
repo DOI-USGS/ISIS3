@@ -32,7 +32,7 @@ class QLineEdit;
 class QTabWidget;
 class QToolButton;
 
-namespace Qisis {
+namespace Isis {
   class MdiCubeViewport;
 
   /**
@@ -60,7 +60,7 @@ namespace Qisis {
    *  @history 2010-03-08 - Jeannie Walldren - The recordAction()
    *           slot and recordPoint() signal were created to
    *           connect in qview to the AdvancedTrackTool record()
-   *  		   slot.
+   *           slot.
    *  @history 2010-03-24 Sharmila Prasad - Enable FindTool for no camera and/or
    *           projection image
    *  @history 2010-05-06 Eric Hyer - Class redesigned to work with new
@@ -90,7 +90,7 @@ namespace Qisis {
       QLineEdit *p_lineLineEdit;  //!< Input for line
   };
 
-  class FindTool : public Qisis::Tool {
+  class FindTool : public Tool {
       Q_OBJECT
 
     public:

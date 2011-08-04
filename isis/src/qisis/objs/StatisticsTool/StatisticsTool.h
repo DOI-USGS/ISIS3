@@ -38,7 +38,7 @@ class QLineEdit;
 class QCheckBox;
 class QGroupBox;
 
-namespace Qisis {
+namespace Isis {
   /**
    * @brief Tool to visualize statistics in an n * m box.
    *
@@ -118,8 +118,8 @@ namespace Qisis {
       bool p_showDeviation; //!< Display deviation?
 
       QPixmap p_pixmap; //!< Pixmap used for drawing
-      Isis::Stretch p_stretch; //!< Stretch used to display pixels
-      Isis::Statistics p_stats; //!< Stats used for calculating stretch and deviation
+      Stretch p_stretch; //!< Stretch used to display pixels
+      Statistics p_stats; //!< Stats used for calculating stretch and deviation
       QVector<QVector<double> > p_pixelData; //!< Stored pixel values
   };
 

@@ -15,9 +15,9 @@
 #include "SerialNumberList.h"
 #include "SurfacePoint.h"
 
-using namespace Qisis::Qnet;
+using namespace Isis::Qnet;
 
-namespace Qisis {
+namespace Isis {
   /**
    * Contructor for the Point Distance filter.  It creates the
    * Distance filter window found in the navtool
@@ -97,17 +97,17 @@ namespace Qisis {
     // Loop through each value of the filtered points list
     // Loop in reverse order for consistency with other filter methods
     for (int i = g_filteredPoints.size() - 1; i >= 0; i--) {
-      Isis::ControlPoint &cp1 = *(*g_controlNetwork)[g_filteredPoints[i]];
+      ControlPoint &cp1 = *(*g_controlNetwork)[g_filteredPoints[i]];
       // Get necessary info from the control point for later use
       //  First check if an adjusted point from jigsaw exists.  If not, use
       //  the apriori values.
       
-      Isis::SurfacePoint sp1 = cp1.GetBestSurfacePoint();
+      SurfacePoint sp1 = cp1.GetBestSurfacePoint();
 
       // If no lat/lon for this point, use lat/lon of first measure
       if (!sp1.Valid()) {
-        Isis::Camera *cam1;
-        Isis::ControlMeasure cm1;
+        Camera *cam1;
+        ControlMeasure cm1;
 
         cm1 = *cp1.GetRefMeasure();
 
@@ -123,13 +123,13 @@ namespace Qisis {
           // cp1 = cp2, go to next value of j
           continue;
         }
-        Isis::ControlPoint cp2 = *(*g_controlNetwork)[j];
-        Isis::SurfacePoint sp2 = cp2.GetBestSurfacePoint();
+        ControlPoint cp2 = *(*g_controlNetwork)[j];
+        SurfacePoint sp2 = cp2.GetBestSurfacePoint();
 
         // If no lat/lon for this point, use lat/lon of first measure
         if (!sp2.Valid()) {
-          Isis::Camera *cam2;
-          Isis::ControlMeasure cm2;
+          Camera *cam2;
+          ControlMeasure cm2;
           cm2 = *cp2.GetRefMeasure();
           int camIndex2 = g_serialNumberList->SerialNumberIndex(cm2.GetCubeSerialNumber());
           cam2 = g_controlNetwork->Camera(camIndex2);

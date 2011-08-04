@@ -31,7 +31,7 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-namespace Qisis {
+namespace Isis {
   /**
    * @brief Displays the NoWarning icon as default and the Warning
    *        icon in case of exception and also pops up a a menu
@@ -62,13 +62,13 @@ namespace Qisis {
       void checkMessage(void);
 
     private:
-      QDialog  *mDialog;			 // Dialog that pops up when Warning icon is clicked
+      QDialog  *mDialog;// Dialog that pops up when Warning icon is clicked
       QWidget  *mWindow;                  // Dialog Window
       QPushButton *mNoWarning, *mWarning; // Tool buttons displaying Warning and Nowarning icons
-      bool mbWarningFlag;		 // Flag to indicate Warning or Nowarning status
-      QStatusBar *mSBar;			 // Pointer to application's Status Bar
-      QString mMsgStr;			 // Message displayed on the status bar
-      QTextEdit *mTextEdit;		 // Textedit which contains detailed error message in the Dialog window
+      bool mbWarningFlag;// Flag to indicate Warning or Nowarning status
+      QStatusBar *mSBar;// Pointer to application's Status Bar
+      QString mMsgStr;// Message displayed on the status bar
+      QTextEdit *mTextEdit;// Textedit which contains detailed error message in the Dialog window
   };
 };
 #endif

@@ -9,7 +9,7 @@ class QAction;
 template< class T > class QVector;
 class QWidget;
 
-namespace Qisis {
+namespace Isis {
   class MdiCubeViewport;
   class ScatterPlotWindow;
 

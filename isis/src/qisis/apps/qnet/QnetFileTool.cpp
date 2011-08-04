@@ -15,10 +15,10 @@
 #include "Workspace.h"
 
 #include "qnet.h"
-using namespace Qisis::Qnet;
+using namespace Isis::Qnet;
 using namespace std;
 
-namespace Qisis {
+namespace Isis {
   /**
    * Constructor
    *
@@ -27,7 +27,7 @@ namespace Qisis {
    *                          for saveAs action. Changed "Save As" action text to
    *                          match QnetTool's "Save As" action
    */
-  QnetFileTool::QnetFileTool(QWidget *parent) : Qisis::FileTool(parent) {
+  QnetFileTool::QnetFileTool(QWidget *parent) : FileTool(parent) {
     openAction()->setText("Open control network & cube list");
     openAction()->setToolTip("Open control network & cube list");
     QString whatsThis =
@@ -131,7 +131,7 @@ namespace Qisis {
       return;
 
     // Find directory and save for use in file dialog for net file
-    Isis::Filename file(list.toStdString());
+    Filename file(list.toStdString());
     QString dir = file.absolutePath();
 
     QApplication::setOverrideCursor(Qt::WaitCursor);
@@ -141,14 +141,14 @@ namespace Qisis {
         delete g_serialNumberList;
         g_serialNumberList = NULL;
       }
-      g_serialNumberList = new Isis::SerialNumberList(list.toStdString());
+      g_serialNumberList = new SerialNumberList(list.toStdString());
 
       if (g_controlNetwork != NULL) {
         delete g_controlNetwork;
         g_controlNetwork = NULL;
       }
     }
-    catch (Isis::iException &e) {
+    catch (iException &e) {
       QString message = "Error processing cube list.  \n";
       string errors = e.Errors();
       message += errors.c_str();
@@ -169,16 +169,16 @@ namespace Qisis {
         filter);
     QApplication::setOverrideCursor(Qt::WaitCursor);
     if (cNetFilename.isEmpty()) {
-      g_controlNetwork = new Isis::ControlNet();
-      g_controlNetwork->SetUserName(Isis::Application::UserName());
+      g_controlNetwork = new ControlNet();
+      g_controlNetwork->SetUserName(Application::UserName());
     }
     else {
       try {
-        Isis::Progress progress;
-        g_controlNetwork = new Isis::ControlNet(cNetFilename.toStdString(),
+        Progress progress;
+        g_controlNetwork = new ControlNet(cNetFilename.toStdString(),
                                                 &progress);
       }
-      catch (Isis::iException &e) {
+      catch (iException &e) {
         QString message = "Invalid control network.  \n";
         string errors = e.Errors();
         message += errors.c_str();
@@ -191,10 +191,10 @@ namespace Qisis {
 
     //  Initialize cameras for control net
     try {
-      Isis::Progress progress;
+      Progress progress;
       g_controlNetwork->SetImages(*g_serialNumberList,&progress);
     }
-    catch (Isis::iException &e) {
+    catch (iException &e) {
       QString message = "Cannot initialize images in control network.  \n";
       string errors = e.Errors();
       message += errors.c_str();
@@ -256,7 +256,7 @@ namespace Qisis {
       try {
         g_controlNetwork->Write(fn.toStdString());
       } 
-      catch (Isis::iException &e) {
+      catch (iException &e) {
         QString message = "Error saving control network.  \n";
         string errors = e.Errors();
         message += errors.c_str();
@@ -299,7 +299,7 @@ namespace Qisis {
       g_vpMainWindow->workspace()->cubeViewportList();
     bool found = false;
     for (int i = 0; i < (int)cvpList->size(); i++) {
-      string sn = Isis::SerialNumber::Compose(*((*cvpList)[i]->cube()));
+      string sn = SerialNumber::Compose(*((*cvpList)[i]->cube()));
       if (sn == serialNumber.toStdString()) {
         g_vpMainWindow->workspace()->
         setActiveSubWindow((QMdiSubWindow *)(*cvpList)[i]->parentWidget()->parent());
@@ -320,7 +320,7 @@ namespace Qisis {
    *   @history 2010-12-10 Tracie Sucharski - Renamed slot loadPoint to
    *                          loadPointImages.
    */
-  void QnetFileTool::loadPointImages(Isis::ControlPoint *point) {
+  void QnetFileTool::loadPointImages(ControlPoint *point) {
     for (int i = 0; i < point->GetNumMeasures(); i++) {
       string cubeSN = (*point)[i]->GetCubeSerialNumber();
       loadImage(cubeSN.c_str());

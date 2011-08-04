@@ -14,9 +14,7 @@
 #include "SpecialPixel.h"
 #include "TableMainWindow.h"
 
-using namespace Isis;
-
-namespace Qisis {
+namespace Isis {
 
   // For mosaic tracking
 #define FLOAT_MIN         -16777215
@@ -28,7 +26,7 @@ namespace Qisis {
    * @param parent
    */
   AdvancedTrackTool::AdvancedTrackTool(QWidget *parent) : Tool(parent) {
-    p_tableWin = new Qisis::TableMainWindow("Advanced Tracking", parent);
+    p_tableWin = new TableMainWindow("Advanced Tracking", parent);
     p_tableWin->setTrackListItems(true);
     connect(p_tableWin, SIGNAL(fileLoaded()), this, SLOT(updateID()));
 
@@ -259,12 +257,12 @@ namespace Qisis {
     }
 
     // Write out the path, filename, and serial number
-    Isis::Filename fname = Isis::Filename(cvp->cube()->getFilename()).Expanded();
+    Filename fname = Filename(cvp->cube()->getFilename()).Expanded();
     std::string fnamePath = fname.Path();
     std::string fnameName = fname.Name();
     p_tableWin->table()->item(row, PATH)->setText(fnamePath.c_str());
     p_tableWin->table()->item(row, FILENAME)->setText(fnameName.c_str());
-    //p_tableWin->table()->item(row,34)->setText(Isis::SerialNumber::Compose(*cvp->cube()).c_str());
+    //p_tableWin->table()->item(row,34)->setText(SerialNumber::Compose(*cvp->cube()).c_str());
 
     // If we are outside of the image then we are done
     if((sample < 0.5) || (line < 0.5) ||
@@ -275,12 +273,12 @@ namespace Qisis {
 
     // Otherwise write out col 4 (Pixel value)
     if(cvp->isGray()) {
-      std::string grayPixel = Isis::PixelToString(cvp->grayPixel(isample, iline));
+      std::string grayPixel = PixelToString(cvp->grayPixel(isample, iline));
       QString p = grayPixel.c_str();
       p_tableWin->table()->item(row, PIXEL)->setText(p);
     }
     else {
-      std::string redPixel = Isis::PixelToString(cvp->redPixel(isample, iline));
+      std::string redPixel = PixelToString(cvp->redPixel(isample, iline));
       QString p = redPixel.c_str();
       p_tableWin->table()->item(row, PIXEL)->setText(p);
     }
@@ -298,19 +296,19 @@ namespace Qisis {
         p_tableWin->table()->item(row, RADIUS)->setText(QString::number(radius, 'f', 15));
 
         /* 180 Positive East Lon. */
-        p_tableWin->table()->item(row, EAST_LON_180)->setText(QString::number(Isis::Projection::To180Domain(lon), 'f', 15));
+        p_tableWin->table()->item(row, EAST_LON_180)->setText(QString::number(Projection::To180Domain(lon), 'f', 15));
 
         // Write out the planetographic and positive west values
         lon = -lon;
         while(lon < 0.0) lon += 360.0;
         Distance radii[3];
         cvp->camera()->Radii(radii);
-        lat = Isis::Projection::ToPlanetographic(lat, radii[0].GetMeters(), radii[2].GetMeters());
+        lat = Projection::ToPlanetographic(lat, radii[0].GetMeters(), radii[2].GetMeters());
         p_tableWin->table()->item(row, PLANETOGRAPHIC_LAT)->setText(QString::number(lat, 'f', 15));
         p_tableWin->table()->item(row, WEST_LON_360)->setText(QString::number(lon, 'f', 15));
 
         /*180 Positive West Lon.  */
-        p_tableWin->table()->item(row, WEST_LON_180)->setText(QString::number(Isis::Projection::To180Domain(lon), 'f', 15));
+        p_tableWin->table()->item(row, WEST_LON_180)->setText(QString::number(Projection::To180Domain(lon), 'f', 15));
 
         // Next write out columns, the x/y/z position of the lat/lon
         double pos[3];
@@ -371,7 +369,7 @@ namespace Qisis {
       p_tableWin->table()->item(row, DECLINATION)->setText(QString::number(dec));
 
       // Always write out columns et and utc
-      Isis::iTime time(cvp->camera()->Time());
+      iTime time(cvp->camera()->Time());
       p_tableWin->table()->item(row, EPHEMERIS_TIME)->setText(QString::number(time.Et(), 'f', 15));
       std::string time_utc = time.UTC();
       p_tableWin->table()->item(row, UTC)->setText(time_utc.c_str());
@@ -402,9 +400,9 @@ namespace Qisis {
           p_tableWin->table()->item(row, PLANETOCENTRIC_LAT)->setText(QString::number(lat, 'f', 15));
           p_tableWin->table()->item(row, PLANETOGRAPHIC_LAT)->setText(QString::number(glat, 'f', 15));
           p_tableWin->table()->item(row, EAST_LON_360)->setText(QString::number(lon, 'f', 15));
-          p_tableWin->table()->item(row, EAST_LON_180)->setText(QString::number(Isis::Projection::To180Domain(lon), 'f', 15));
+          p_tableWin->table()->item(row, EAST_LON_180)->setText(QString::number(Projection::To180Domain(lon), 'f', 15));
           p_tableWin->table()->item(row, WEST_LON_360)->setText(QString::number(wlon, 'f', 15));
-          p_tableWin->table()->item(row, WEST_LON_180)->setText(QString::number(Isis::Projection::To180Domain(wlon), 'f', 15));
+          p_tableWin->table()->item(row, WEST_LON_180)->setText(QString::number(Projection::To180Domain(wlon), 'f', 15));
           p_tableWin->table()->item(row, RADIUS)->setText(QString::number(radius, 'f', 15));
         }
       }
@@ -468,7 +466,7 @@ namespace Qisis {
       }
 
       if(iTrackBand > 0 && iTrackBand <= cCube->getBandCount()) {
-        Isis::Portal cOrgPortal(cCube->getSampleCount(), 1,
+        Portal cOrgPortal(cCube->getSampleCount(), 1,
                                 cCube->getPixelType());
         cOrgPortal.SetPosition(piSample, piLine, iTrackBand + 1); // 1 based
         cCube->read(cOrgPortal);

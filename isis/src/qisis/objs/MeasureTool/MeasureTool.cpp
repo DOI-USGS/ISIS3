@@ -22,16 +22,14 @@
 #include "SurfacePoint.h"
 #include "ToolPad.h"
 
-using namespace Isis;
-
-namespace Qisis {
+namespace Isis {
   /**
    * MeasureTool constructor
    *
    *
    * @param parent
    */
-  MeasureTool::MeasureTool(QWidget *parent) : Qisis::Tool(parent) {
+  MeasureTool::MeasureTool(QWidget *parent) : Tool(parent) {
     p_rubberBand = NULL;
     p_tableWin = new TableMainWindow("Measurements", parent);
     p_tableWin->setTrackListItems(true);
@@ -345,7 +343,7 @@ namespace Qisis {
     }
 
     // Write all the new info to the current row
-    if(p_startLat != Isis::Null && p_startLon != Isis::Null) {
+    if(p_startLat != Null && p_startLon != Null) {
       p_tableWin->table()->item(row, StartLatIndex)->setText(QString::number(p_startLat));
       p_tableWin->table()->item(row, StartLonIndex)->setText(QString::number(p_startLon));
     }
@@ -354,7 +352,7 @@ namespace Qisis {
       p_tableWin->table()->item(row, StartLonIndex)->setText("N/A");
     }
 
-    if(p_endLat != Isis::Null && p_endLon != Isis::Null) {
+    if(p_endLat != Null && p_endLon != Null) {
       p_tableWin->table()->item(row, EndLatIndex)->setText(QString::number(p_endLat));
       p_tableWin->table()->item(row, EndLonIndex)->setText(QString::number(p_endLon));
       p_tableWin->table()->item(row, DistanceKmIndex)->setText(QString::number(p_kmDist));
@@ -367,7 +365,7 @@ namespace Qisis {
       p_tableWin->table()->item(row, DistanceMIndex)->setText("N/A");
     }
 
-    if(p_degAngle != Isis::Null && p_radAngle != Isis::Null) {
+    if(p_degAngle != Null && p_radAngle != Null) {
       p_tableWin->table()->item(row, AngleDegIndex)->setText(QString::number(p_degAngle));
       p_tableWin->table()->item(row, AngleRadIndex)->setText(QString::number(p_radAngle));
     }
@@ -376,7 +374,7 @@ namespace Qisis {
       p_tableWin->table()->item(row, AngleRadIndex)->setText("N/A");
     }
 
-    if(p_startSamp != Isis::Null && p_startLine != Isis::Null) {
+    if(p_startSamp != Null && p_startLine != Null) {
       p_tableWin->table()->item(row, StartSampIndex)->setText(QString::number(p_startSamp));
       p_tableWin->table()->item(row, StartLineIndex)->setText(QString::number(p_startLine));
     }
@@ -385,7 +383,7 @@ namespace Qisis {
       p_tableWin->table()->item(row, StartLineIndex)->setText("N/A");
     }
 
-    if(p_endSamp != Isis::Null && p_endLine != Isis::Null) {
+    if(p_endSamp != Null && p_endLine != Null) {
       p_tableWin->table()->item(row, EndSampIndex)->setText(QString::number(p_endSamp));
       p_tableWin->table()->item(row, EndLineIndex)->setText(QString::number(p_endLine));
       p_tableWin->table()->item(row, DistancePixIndex)->setText(QString::number(p_pixDist));
@@ -396,14 +394,14 @@ namespace Qisis {
       p_tableWin->table()->item(row, DistancePixIndex)->setText("N/A");
     }
 
-    if(p_pixArea != Isis::Null) {
+    if(p_pixArea != Null) {
       p_tableWin->table()->item(row, AreaPixIndex)->setText(QString::number(p_pixArea));
     }
     else {
       p_tableWin->table()->item(row, AreaPixIndex)->setText("N/A");
     }
 
-    if(p_mArea != Isis::Null) {
+    if(p_mArea != Null) {
       p_tableWin->table()->item(row, AreaKmIndex)->setText(QString::number(p_kmArea));
       p_tableWin->table()->item(row, AreaMIndex)->setText(QString::number(p_mArea));
     }
@@ -500,22 +498,22 @@ namespace Qisis {
    */
   void MeasureTool::initData(void) {
     // Initialize the class data
-    p_startSamp = Isis::Null;
-    p_endSamp   = Isis::Null;
-    p_startLine = Isis::Null;
-    p_endLine   = Isis::Null;
-    p_kmDist    = Isis::Null;
-    p_mDist     = Isis::Null;
-    p_pixDist   = Isis::Null;
-    p_startLon  = Isis::Null;
-    p_startLat  = Isis::Null;
-    p_endLon    = Isis::Null;
-    p_endLat    = Isis::Null;
-    p_radAngle  = Isis::Null;
-    p_degAngle  = Isis::Null;
-    p_pixArea   = Isis::Null;
-    p_kmArea    = Isis::Null;
-    p_mArea     = Isis::Null;
+    p_startSamp = Null;
+    p_endSamp   = Null;
+    p_startLine = Null;
+    p_endLine   = Null;
+    p_kmDist    = Null;
+    p_mDist     = Null;
+    p_pixDist   = Null;
+    p_startLon  = Null;
+    p_startLat  = Null;
+    p_endLon    = Null;
+    p_endLat    = Null;
+    p_radAngle  = Null;
+    p_degAngle  = Null;
+    p_pixArea   = Null;
+    p_kmArea    = Null;
+    p_mArea     = Null;
   }
 
   /**
@@ -567,8 +565,8 @@ namespace Qisis {
             (p_endSamp > cvp->cubeSamples() + 0.5) ||
             (p_startLine > cvp->cubeLines() + 0.5) ||
             (p_endLine > cvp->cubeLines() + 0.5)) {
-          p_mDist   = Isis::Null;
-          p_kmDist  = Isis::Null;
+          p_mDist   = Null;
+          p_kmDist  = Null;
           p_pixDist = 0;
           return;
         }
@@ -666,13 +664,13 @@ namespace Qisis {
       }
       // Distance was not calculated
       if(!p_mDist) {
-        p_mDist   = Isis::Null;
-        p_kmDist  = Isis::Null;
+        p_mDist   = Null;
+        p_kmDist  = Null;
       }
     }
     else if(RubberBandTool::getMode() == RubberBandTool::Angle) {
       p_radAngle = RubberBandTool::getAngle();
-      p_degAngle = p_radAngle * 180.0 / Isis::PI;
+      p_degAngle = p_radAngle * 180.0 / PI;
     }
     else {
       geos::geom::Geometry *polygon = RubberBandTool::geometry();
@@ -717,7 +715,7 @@ namespace Qisis {
     if(RubberBandTool::getMode() == RubberBandTool::Line ||
         RubberBandTool::getMode() == RubberBandTool::SegmentedLine) {
       if(p_unitsComboBox->currentIndex() == 0) {
-        if(p_kmDist == Isis::Null) {
+        if(p_kmDist == Null) {
           p_distLineEdit->setText("N/A");
         }
         else {
@@ -725,7 +723,7 @@ namespace Qisis {
         }
       }
       else if(p_unitsComboBox->currentIndex() == 1) {
-        if(p_mDist == Isis::Null) {
+        if(p_mDist == Null) {
           p_distLineEdit->setText("N/A");
         }
         else {
@@ -746,7 +744,7 @@ namespace Qisis {
     }
     else {
       if(p_unitsComboBox->currentIndex() == 0) {
-        if(p_kmArea == Isis::Null) {
+        if(p_kmArea == Null) {
           p_distLineEdit->setText("N/A");
         }
         else {
@@ -754,7 +752,7 @@ namespace Qisis {
         }
       }
       else if(p_unitsComboBox->currentIndex() == 1) {
-        if(p_mArea == Isis::Null) {
+        if(p_mArea == Null) {
           p_distLineEdit->setText("N/A");
         }
         else {
@@ -762,7 +760,7 @@ namespace Qisis {
         }
       }
       else {
-        if(p_pixArea != Isis::Null) {
+        if(p_pixArea != Null) {
           p_distLineEdit->setText(QString::number(p_pixArea));
         }
         else {

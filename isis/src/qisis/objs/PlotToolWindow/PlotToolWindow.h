@@ -35,7 +35,7 @@ namespace Isis {
   class PvlKeyword;
 }
 
-namespace Qisis {
+namespace Isis {
   /**
    * @brief Widget to display Isis cubes for qt apps
    *
@@ -77,7 +77,7 @@ namespace Qisis {
       QwtPlotMarker *p_blueBandLine;
       CubeViewport   *p_cvp;
       QString *p_plotType;
-      Isis::PvlKeyword *p_wavelengths;
+      PvlKeyword *p_wavelengths;
       bool p_autoScale;
       QVector< double > * p_stdDevArray;
   };

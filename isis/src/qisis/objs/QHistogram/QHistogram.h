@@ -29,7 +29,7 @@
 #include <qwt_plot_zoomer.h>
 #include <qwt_plot_curve.h>
 
-namespace Qisis {
+namespace Isis {
   /**
    * @brief Plot Histograms
    *
@@ -51,7 +51,7 @@ namespace Qisis {
       //! Destroys the QHistogram object
       ~QHistogram() {};
 
-      void Load(Isis::Histogram &hist);
+      void Load(Histogram &hist);
 
     public slots:
       void trackerEnabled();

@@ -41,7 +41,7 @@ namespace Isis {
   class Cube;
 }
 
-namespace Qisis {
+namespace Isis {
   class MdiCubeViewport;
 
   /**
@@ -76,7 +76,7 @@ namespace Qisis {
    *               must now be >= 1 instead of >= 5
    *
    */
-  class EditTool : public Qisis::Tool {
+  class EditTool : public Tool {
       Q_OBJECT
 
     signals:
@@ -144,8 +144,8 @@ namespace Qisis {
 
       double p_dn; //!< DN value
 
-      QMap <MdiCubeViewport *, QStack <Isis::Brick *> *> p_undoEdit; //!< Viewport to brick map for undo
-      QMap <MdiCubeViewport *, QStack <Isis::Brick *> *> p_redoEdit; //!< Viewport to brick map for redo
+      QMap <MdiCubeViewport *, QStack <Brick *> *> p_undoEdit; //!< Viewport to brick map for undo
+      QMap <MdiCubeViewport *, QStack <Brick *> *> p_redoEdit; //!< Viewport to brick map for redo
       QMap <MdiCubeViewport *, int> p_saveMarker; //!< Marker for last save
   };
 };

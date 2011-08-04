@@ -5,7 +5,7 @@
 #include <QSettings>
 #include "Filename.h"
 
-namespace Qisis {
+namespace Isis {
   /**
   * @brief Base class for the Qisis main windows
   *

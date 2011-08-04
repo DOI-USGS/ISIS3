@@ -16,13 +16,13 @@ class QAction;
 class QListWidget;
 class QListWidgetItem;
 
-namespace Qisis {
+namespace Isis {
   /**
    * @internal
    *   @history 2010-06-26 Eric Hyer - Now uses MdiCubeViewport instead of
    *            CubeViewport.  Fixed misuse of includes.
    */
-  class BlinkTool : public Qisis::Tool {
+  class BlinkTool : public Tool {
       Q_OBJECT
 
     public:

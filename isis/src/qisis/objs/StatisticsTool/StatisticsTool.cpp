@@ -20,14 +20,14 @@
 #include "MdiCubeViewport.h"
 #include "ToolPad.h"
 
-namespace Qisis {
+namespace Isis {
 
   /**
    * Constructor, creates and sets up widgets for this tool.
    *
    * @param parent
    */
-  StatisticsTool::StatisticsTool(QWidget *parent) : Qisis::Tool(parent) {
+  StatisticsTool::StatisticsTool(QWidget *parent) : Tool(parent) {
     p_boxSamps = 3;
     p_boxLines = 3;
 
@@ -302,8 +302,8 @@ namespace Qisis {
     int isamp = (int)(sample + 0.5);
     int iline = (int)(line + 0.5);
 
-    Isis::Statistics stats;
-    Isis::Brick *brick = new Isis::Brick(1, 1, 1, cvp->cube()->getPixelType());
+    Statistics stats;
+    Brick *brick = new Brick(1, 1, 1, cvp->cube()->getPixelType());
 
 
     QVector<QVector<double> > pixelData(p_boxLines, QVector<double>(p_boxSamps, 0));
@@ -580,7 +580,7 @@ namespace Qisis {
     }
 
     if(fabs(p_stats.BestMinimum()) < DBL_MAX && fabs(p_stats.BestMaximum()) < DBL_MAX) {
-      Isis::Histogram hist(p_stats.BestMinimum(), p_stats.BestMaximum());
+      Histogram hist(p_stats.BestMinimum(), p_stats.BestMaximum());
       for(int i = 0; i < data.size(); i++) {
         hist.AddData(data[i].data(), data[i].size());
       }
@@ -628,7 +628,7 @@ namespace Qisis {
         QColor c;
         if(p_showPixels || p_showDeviation) {
           if(p_showDeviation) {
-            if(!Isis::IsSpecial(dn) && p_stats.TotalPixels() > 0 && p_stats.StandardDeviation() != 0) {
+            if(!IsSpecial(dn) && p_stats.TotalPixels() > 0 && p_stats.StandardDeviation() != 0) {
               double diff;
 
               if(dn < p_stats.Average()) {
@@ -712,8 +712,8 @@ namespace Qisis {
       emit setSample(QString("Sample: %1").arg(p_ulSamp + x - 1));
       emit setLine(QString("Line: %1").arg(p_ulLine + y - 1));
       double dn = p_pixelData[y-1][x-1];
-      if(Isis::IsSpecial(dn))
-        emit setDn(QString("DN: %1").arg(Isis::PixelToString(dn).c_str()));
+      if(IsSpecial(dn))
+        emit setDn(QString("DN: %1").arg(PixelToString(dn).c_str()));
       else
         emit setDn(QString("DN: %1").arg(dn));
     }

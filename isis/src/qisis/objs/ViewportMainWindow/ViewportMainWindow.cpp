@@ -8,16 +8,16 @@
 #include "TrackTool.h"
 #include "ToolPad.h"
 
-namespace Qisis {
+namespace Isis {
   /**
    * Constructs a ViewportMainWindow object with windowTitle = title.
    *
    * @param title
    * @param parent
    */
-  ViewportMainWindow::ViewportMainWindow(QString title, QWidget *parent) : Qisis::MainWindow(title, parent) {
+  ViewportMainWindow::ViewportMainWindow(QString title, QWidget *parent) : MainWindow(title, parent) {
     installEventFilter(this);
-    p_workspace = new Qisis::Workspace(this);
+    p_workspace = new Workspace(this);
     setCentralWidget(p_workspace);
     this->setWindowTitle(title);
 
@@ -109,7 +109,7 @@ namespace Qisis {
     this->MainWindow::readSettings();
     /*Now read the settings that are specific to this window.*/
     std::string instanceName = this->windowTitle().toStdString();
-    Isis::Filename config("$HOME/.Isis/" + instanceName + "/" + instanceName + ".config");
+    Filename config("$HOME/.Isis/" + instanceName + "/" + instanceName + ".config");
     QSettings settings(QString::fromStdString(config.Expanded()), QSettings::NativeFormat);
     QByteArray state = settings.value("state", QByteArray("0")).toByteArray();
     restoreState(state);
@@ -128,7 +128,7 @@ namespace Qisis {
     this->MainWindow::writeSettings();
     /*Now write the settings that are specific to this window.*/
     std::string instanceName = this->windowTitle().toStdString();
-    Isis::Filename config("$HOME/.Isis/" + instanceName + "/" + instanceName + ".config");
+    Filename config("$HOME/.Isis/" + instanceName + "/" + instanceName + ".config");
     QSettings settings(QString::fromStdString(config.Expanded()), QSettings::NativeFormat);
     settings.setValue("state", this->saveState());
   }

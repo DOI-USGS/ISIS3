@@ -2,7 +2,7 @@
 
 #include <qwt_scale_engine.h>
 
-namespace Qisis {
+namespace Isis {
   /**
    * Constructor, creates a new HistogramToolWindow
    *

@@ -38,7 +38,7 @@ class QWidget;
 class QnetSetAprioriDialog;
 
 using namespace std;
-namespace Qisis {
+namespace Isis {
   /**
    * @brief Qnet Navigation Tool
    *
@@ -162,9 +162,9 @@ namespace Qisis {
       void setAprioriDialogPoints();
 
     signals:
-      void loadPointImages (Isis::ControlPoint *);
+      void loadPointImages (ControlPoint *);
       void loadImage(const QString &);
-      void modifyPoint(Isis::ControlPoint *);
+      void modifyPoint(ControlPoint *);
       void ignoredPoints();
       void deletedPoints();
       void pointChanged(QString pointId);

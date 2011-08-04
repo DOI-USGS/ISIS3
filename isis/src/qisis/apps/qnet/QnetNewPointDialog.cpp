@@ -8,10 +8,9 @@
 
 #include "qnet.h"
 
-using namespace Qisis::Qnet;
-using namespace Isis;
+using namespace Isis::Qnet;
 
-namespace Qisis {
+namespace Isis {
   // initialize static variable
   QString QnetNewPointDialog::lastPtIdValue = "";
 

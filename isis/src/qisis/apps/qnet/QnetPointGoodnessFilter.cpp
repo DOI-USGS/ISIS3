@@ -11,11 +11,10 @@
 #include "SpecialPixel.h"
 #include "qnet.h"
 
-using namespace Isis;
+using namespace Isis::Qnet;
 using namespace std;
-using namespace Qisis::Qnet;
 
-namespace Qisis {
+namespace Isis {
   /**
    * Contructor for the Point Goodness of Fit filter.  It creates 
    * the Goodness of Fit filter window found in the navtool 
@@ -110,7 +109,7 @@ namespace Qisis {
 
         double goodnessOfFit = cp[j]->GetLogData(
                     ControlMeasureLogData::GoodnessOfFit).GetNumericalValue();
-        if (goodnessOfFit == Isis::Null) {
+        if (goodnessOfFit == Null) {
           numMeasOutsideRange++;
         }
         else if (p_lessThanCB->isChecked() && p_greaterThanCB->isChecked()) {

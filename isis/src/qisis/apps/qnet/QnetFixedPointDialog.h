@@ -16,7 +16,7 @@ namespace Isis {
 }
 
 
-namespace Qisis {
+namespace Isis {
   /**
    * @internal
    *   @history 2008-11-26 Jeannie Walldren - Added functionality
@@ -46,7 +46,7 @@ namespace Qisis {
       QListWidget *fileList;
 
     signals:
-      void fixedPoint (Isis::ControlPoint &point);
+      void fixedPoint (ControlPoint &point);
       
     private:
 

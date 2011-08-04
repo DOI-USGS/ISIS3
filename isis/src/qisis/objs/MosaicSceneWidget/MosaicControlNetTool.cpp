@@ -331,7 +331,7 @@ namespace Isis {
   void MosaicControlNetTool::openControlNet() {
 
     // Bring up a file dialog for user to select their cnet file.
-    QString netFile = Qisis::FileDialog::getOpenFileName(getWidget(),
+    QString netFile = FileDialog::getOpenFileName(getWidget(),
                       "Select Control Net. File",
                       QDir::current().dirName(),
                       "Control Networks (*.net);;All Files (*.*)");

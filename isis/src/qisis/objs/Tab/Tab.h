@@ -31,7 +31,7 @@
 class QWidget;
 class QPaintEvent;
 
-namespace Qisis {
+namespace Isis {
   /**
    * A Tab is simply a QToolButton which shows or hides some other QWidget,
    * which we call associatedWidget.  The Tab does not own this widget, it

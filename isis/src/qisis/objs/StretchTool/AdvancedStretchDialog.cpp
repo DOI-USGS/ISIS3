@@ -6,9 +6,7 @@
 #include "Stretch.h"
 #include "AdvancedStretch.h"
 
-using namespace Isis;
-
-namespace Qisis {
+namespace Isis {
   /**
    * This constructs an advanced stretch.
    *
@@ -45,10 +43,10 @@ namespace Qisis {
    * @param bluStretch
    * @param bluHist
    */
-  void AdvancedStretchDialog::enableRgbMode(Isis::Stretch &redStretch,
-      Isis::Histogram &redHist,
-      Isis::Stretch &grnStretch, Isis::Histogram &grnHist,
-      Isis::Stretch &bluStretch, Isis::Histogram &bluHist) {
+  void AdvancedStretchDialog::enableRgbMode(Stretch &redStretch,
+      Histogram &redHist,
+      Stretch &grnStretch, Histogram &grnHist,
+      Stretch &bluStretch, Histogram &bluHist) {
     destroyCurrentStretches();
 
     p_redStretch = new AdvancedStretch(redHist, redStretch,
@@ -84,10 +82,10 @@ namespace Qisis {
    * @param bluStretch - Updated Blue Stretch
    * @param bluHist    - Updated Blue Histogram
    */
-  void AdvancedStretchDialog::updateForRGBMode(Isis::Stretch &redStretch,
-      Isis::Histogram &redHist,
-      Isis::Stretch &grnStretch, Isis::Histogram &grnHist,
-      Isis::Stretch &bluStretch, Isis::Histogram &bluHist) 
+  void AdvancedStretchDialog::updateForRGBMode(Stretch &redStretch,
+      Histogram &redHist,
+      Stretch &grnStretch, Histogram &grnHist,
+      Stretch &bluStretch, Histogram &bluHist) 
   {
     if(p_redStretch) {
       p_redStretch->setStretch(redStretch);
@@ -113,8 +111,8 @@ namespace Qisis {
    * @param grayStretch
    * @param grayHist
    */
-  void AdvancedStretchDialog::enableGrayMode(Isis::Stretch &grayStretch,
-      Isis::Histogram &grayHist) {
+  void AdvancedStretchDialog::enableGrayMode(Stretch &grayStretch,
+      Histogram &grayHist) {
     destroyCurrentStretches();
     
     p_grayStretch = new AdvancedStretch(grayHist, grayStretch,
@@ -195,9 +193,9 @@ namespace Qisis {
    * @param grnHist Histogram of visible area on green band
    * @param bluHist Histogram of visible area on blue band
    */
-  void AdvancedStretchDialog::updateHistograms(const Isis::Histogram &redHist,
-      const Isis::Histogram &grnHist,
-      const Isis::Histogram &bluHist) {
+  void AdvancedStretchDialog::updateHistograms(const Histogram &redHist,
+      const Histogram &grnHist,
+      const Histogram &bluHist) {
 
     if(p_redStretch){
       p_redStretch->setHistogram(redHist);
@@ -217,7 +215,7 @@ namespace Qisis {
    *
    * @param grayHist Histogram of visible area on gray band
    */
-  void AdvancedStretchDialog::updateHistogram(const Isis::Histogram &grayHist) {
+  void AdvancedStretchDialog::updateHistogram(const Histogram &grayHist) {
     if(p_grayStretch)
       p_grayStretch->setHistogram(grayHist);
   }
@@ -259,9 +257,9 @@ namespace Qisis {
   /**
    * This returns the advanced stretch's stretch for gray.
    *
-   * @return Isis::Stretch
+   * @return Stretch
    */
-  Isis::Stretch AdvancedStretchDialog::getGrayStretch() {
+  Stretch AdvancedStretchDialog::getGrayStretch() {
     if(p_grayStretch) {
       return p_grayStretch->getStretch();
     }
@@ -275,9 +273,9 @@ namespace Qisis {
   /**
    * This returns the advanced stretch's stretch for red.
    *
-   * @return Isis::Stretch
+   * @return Stretch
    */
-  Isis::Stretch AdvancedStretchDialog::getRedStretch() {
+  Stretch AdvancedStretchDialog::getRedStretch() {
     if(p_redStretch) {
       return p_redStretch->getStretch();
     }
@@ -291,9 +289,9 @@ namespace Qisis {
   /**
    * This returns the advanced stretch's stretch for green.
    *
-   * @return Isis::Stretch
+   * @return Stretch
    */
-  Isis::Stretch AdvancedStretchDialog::getGrnStretch() {
+  Stretch AdvancedStretchDialog::getGrnStretch() {
     if(p_grnStretch) {
       return p_grnStretch->getStretch();
     }
@@ -307,9 +305,9 @@ namespace Qisis {
   /**
    * This returns the advanced stretch's stretch for blue.
    *
-   * @return Isis::Stretch
+   * @return Stretch
    */
-  Isis::Stretch AdvancedStretchDialog::getBluStretch() {
+  Stretch AdvancedStretchDialog::getBluStretch() {
     if(p_bluStretch) {
       return p_bluStretch->getStretch();
     }

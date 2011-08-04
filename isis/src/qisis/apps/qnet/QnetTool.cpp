@@ -39,10 +39,9 @@
 
 #include "qnet.h"
 
-using namespace Isis;  
 using namespace std;
 
-namespace Qisis {
+namespace Isis {
 
   const int VIEWSIZE = 301;
   using namespace Qnet;
@@ -59,7 +58,7 @@ namespace Qisis {
    * @history 2010-06-03 Jeannie Walldren - Initialized pointers to null.
    * 
    */
-  QnetTool::QnetTool (QWidget *parent) : Qisis::Tool(parent) {
+  QnetTool::QnetTool (QWidget *parent) : Tool(parent) {
 
     p_leftCube = NULL;
     p_rightCube = NULL;
@@ -160,13 +159,13 @@ namespace Qisis {
     
     // create p_pointEditor first since we need to get its templateFilename
     // later
-    p_pointEditor = new Qisis::ControlPointEdit(g_controlNetwork, parent);
-    connect(this, SIGNAL(newControlNetwork(Isis::ControlNet *)),
-        p_pointEditor, SIGNAL(newControlNetwork(Isis::ControlNet *)));
+    p_pointEditor = new ControlPointEdit(g_controlNetwork, parent);
+    connect(this, SIGNAL(newControlNetwork(ControlNet *)),
+        p_pointEditor, SIGNAL(newControlNetwork(ControlNet *)));
     connect(this,
-        SIGNAL(stretchChipViewport(Isis::Stretch *, Qisis::CubeViewport *)),
+        SIGNAL(stretchChipViewport(Stretch *, CubeViewport *)),
         p_pointEditor,
-        SIGNAL(stretchChipViewport(Isis::Stretch *, Qisis::CubeViewport *)));
+        SIGNAL(stretchChipViewport(Stretch *, CubeViewport *)));
     connect(p_pointEditor, SIGNAL(measureSaved()), this, SLOT(measureSaved()));
     connect(this, SIGNAL(measureChanged()),
             p_pointEditor, SLOT(colorizeSaveButton()));
@@ -763,7 +762,7 @@ namespace Qisis {
       //  Update radius
       if (p_demOpen) {
         radius = demRadius(lat,lon);
-        if (radius == Isis::Null) {
+        if (radius == Null) {
           QString msg = "Could not read radius from DEM, will default to "
             "local radius of reference measure.";
           QMessageBox::warning((QWidget *)parent(), "Warning", msg);
@@ -1487,7 +1486,7 @@ namespace Qisis {
       double radius = 0;
       if (p_demOpen) {
         radius = demRadius(lat,lon);
-        if (radius == Isis::Null) {
+        if (radius == Null) {
           QString msg = "Could not read radius from DEM, will default to the "
             "local radius of the first measure in the control point.  This "
             "will be updated to the local radius of the chosen reference "
@@ -1830,7 +1829,7 @@ namespace Qisis {
         // Create a temporary measure to hold the ground point info for ground source
         // This measure will be deleted when the ControlPoint is saved to the
         // ControlNet.
-        Isis::ControlMeasure *groundMeasure = new ControlMeasure;
+        ControlMeasure *groundMeasure = new ControlMeasure;
         groundMeasure->SetCubeSerialNumber(p_groundSN);
         groundMeasure->SetType(ControlMeasure::Candidate);
         groundMeasure->SetCoordinate(p_groundGmap->Sample(),p_groundGmap->Line());
@@ -1940,7 +1939,7 @@ namespace Qisis {
       tableItem->setData(0,m.GetLine());
       p_measureTable->setItem(row,column++,tableItem);
 
-      if (m.GetAprioriSample() == Isis::Null) {
+      if (m.GetAprioriSample() == Null) {
         tableItem = new QTableWidgetItem("Null");
       }
       else {
@@ -1949,7 +1948,7 @@ namespace Qisis {
       }
       p_measureTable->setItem(row,column++,tableItem);
 
-      if (m.GetAprioriLine() == Isis::Null) {
+      if (m.GetAprioriLine() == Null) {
         tableItem = new QTableWidgetItem("Null");
       }
       else {
@@ -1958,7 +1957,7 @@ namespace Qisis {
       }
       p_measureTable->setItem(row,column++,tableItem);
 
-      if (m.GetSampleResidual() == Isis::Null) {  
+      if (m.GetSampleResidual() == Null) {  
         tableItem = new QTableWidgetItem(QString("Null"));
       }
       else {
@@ -1967,7 +1966,7 @@ namespace Qisis {
       }
       p_measureTable->setItem(row,column++,tableItem);
 
-      if (m.GetLineResidual() == Isis::Null) {  
+      if (m.GetLineResidual() == Null) {  
         tableItem = new QTableWidgetItem(QString("Null"));
       }
       else {
@@ -1976,7 +1975,7 @@ namespace Qisis {
       }
       p_measureTable->setItem(row,column++,tableItem);
 
-      if (m.GetResidualMagnitude() == Isis::Null) {
+      if (m.GetResidualMagnitude() == Null) {
         tableItem = new QTableWidgetItem(QString("Null"));
       }
       else {
@@ -1986,7 +1985,7 @@ namespace Qisis {
       p_measureTable->setItem(row,column++,tableItem);
 
       double sampleShift = m.GetSampleShift();
-      if (sampleShift == Isis::Null) {
+      if (sampleShift == Null) {
         tableItem = new QTableWidgetItem(QString("Null"));
       }
       else {
@@ -1996,7 +1995,7 @@ namespace Qisis {
       p_measureTable->setItem(row,column++,tableItem);
 
       double lineShift = m.GetLineShift();
-      if (lineShift == Isis::Null) {
+      if (lineShift == Null) {
         tableItem = new QTableWidgetItem(QString("Null"));
       }
       else {
@@ -2006,7 +2005,7 @@ namespace Qisis {
       p_measureTable->setItem(row,column++,tableItem);
 
       double pixelShift = m.GetPixelShift();
-      if (pixelShift == Isis::Null) {
+      if (pixelShift == Null) {
         tableItem = new QTableWidgetItem(QString("Null"));
       }
       else {
@@ -2017,7 +2016,7 @@ namespace Qisis {
 
       double goodnessOfFit = m.GetLogData(
                       ControlMeasureLogData::GoodnessOfFit).GetNumericalValue();
-      if (goodnessOfFit == Isis::Null) {
+      if (goodnessOfFit == Null) {
         tableItem = new QTableWidgetItem(QString("Null"));
       }
       else {
@@ -2119,7 +2118,7 @@ namespace Qisis {
     QString s;
   
     SurfacePoint aprioriPoint = p_editPoint->GetAprioriSurfacePoint();
-    if (aprioriPoint.GetLatitude().GetDegrees() == Isis::Null) {
+    if (aprioriPoint.GetLatitude().GetDegrees() == Null) {
       s = "AprioriLatitude:  Null";
     }
     else {
@@ -2127,7 +2126,7 @@ namespace Qisis {
           QString::number(aprioriPoint.GetLatitude().GetDegrees());
     }
     p_pointAprioriLatitude->setText(s);
-    if (aprioriPoint.GetLongitude().GetDegrees() == Isis::Null) {
+    if (aprioriPoint.GetLongitude().GetDegrees() == Null) {
       s = "Apriori Longitude:  Null";
     }
     else {
@@ -2135,7 +2134,7 @@ namespace Qisis {
           QString::number(aprioriPoint.GetLongitude().GetDegrees());
     }
     p_pointAprioriLongitude->setText(s);
-    if (aprioriPoint.GetLocalRadius().GetMeters() == Isis::Null) {
+    if (aprioriPoint.GetLocalRadius().GetMeters() == Null) {
       s = "Apriori Radius:  Null";
     }
     else {
@@ -2149,7 +2148,7 @@ namespace Qisis {
       vector<Distance> targRadii = g_controlNetwork->GetTargetRadii();
       aprioriPoint.SetRadii(targRadii[0],targRadii[1],targRadii[2]);
 
-      if (aprioriPoint.GetLatSigmaDistance().GetMeters() == Isis::Null) {
+      if (aprioriPoint.GetLatSigmaDistance().GetMeters() == Null) {
         s = "Apriori Latitude Sigma:  Null";
       }
       else {
@@ -2158,7 +2157,7 @@ namespace Qisis {
             " <meters>";
       }
       p_pointAprioriLatitudeSigma->setText(s);
-      if (aprioriPoint.GetLonSigmaDistance().GetMeters() == Isis::Null) {
+      if (aprioriPoint.GetLonSigmaDistance().GetMeters() == Null) {
         s = "Apriori Longitude Sigma:  Null";
       }
       else {
@@ -2167,7 +2166,7 @@ namespace Qisis {
             " <meters>";
       }
       p_pointAprioriLongitudeSigma->setText(s);
-      if (aprioriPoint.GetLocalRadiusSigma().GetMeters() == Isis::Null) {
+      if (aprioriPoint.GetLocalRadiusSigma().GetMeters() == Null) {
         s = "Apriori Radius Sigma:  Null";
       }
       else {
@@ -2188,21 +2187,21 @@ namespace Qisis {
       
           
     SurfacePoint point = p_editPoint->GetAdjustedSurfacePoint();
-    if (point.GetLatitude().GetDegrees() == Isis::Null) {
+    if (point.GetLatitude().GetDegrees() == Null) {
       s = "Adjusted Latitude:  Null";
     }
     else {
       s = "Adjusted Latitude:  " + QString::number(point.GetLatitude().GetDegrees());
     }
     p_pointLatitude->setText(s);
-    if (point.GetLongitude().GetDegrees() == Isis::Null) {
+    if (point.GetLongitude().GetDegrees() == Null) {
       s = "Adjusted Longitude:  Null";
     }
     else {
       s = "Adjusted Longitude:  " + QString::number(point.GetLongitude().GetDegrees());
     }
     p_pointLongitude->setText(s);
-    if (point.GetLocalRadius().GetMeters() == Isis::Null) {
+    if (point.GetLocalRadius().GetMeters() == Null) {
       s = "Adjusted Radius:  Null";
     }
     else {
@@ -2337,14 +2336,14 @@ namespace Qisis {
     if (p_leftMeasure->GetType() == ControlMeasure::RegisteredSubPixel) s+= "RegisteredSubPixel";
     p_leftMeasureType->setText(s);
 
-    if (p_leftMeasure->GetSampleResidual() == Isis::Null) {
+    if (p_leftMeasure->GetSampleResidual() == Null) {
       s = "Sample Residual: Null";
     }
     else {
       s = "Sample Residual: " + QString::number(p_leftMeasure->GetSampleResidual());
     }
     p_leftSampError->setText(s);
-    if (p_leftMeasure->GetLineResidual() == Isis::Null) {
+    if (p_leftMeasure->GetLineResidual() == Null) {
       s = "Line Residual: Null";
     }
     else {
@@ -2352,7 +2351,7 @@ namespace Qisis {
     }
     p_leftLineError->setText(s);
 
-    if (p_leftMeasure->GetSampleShift() == Isis::Null) {
+    if (p_leftMeasure->GetSampleShift() == Null) {
       s = "Sample Shift: Null";
     }
     else {
@@ -2360,7 +2359,7 @@ namespace Qisis {
     }
     p_leftSampShift->setText(s);
 
-    if (p_leftMeasure->GetLineShift() == Isis::Null) {
+    if (p_leftMeasure->GetLineShift() == Null) {
       s = "Line Shift: Null";
     }
     else {
@@ -2370,7 +2369,7 @@ namespace Qisis {
 
     double goodnessOfFit = p_leftMeasure->GetLogData(
                     ControlMeasureLogData::GoodnessOfFit).GetNumericalValue();
-    if (goodnessOfFit == Isis::Null) {
+    if (goodnessOfFit == Null) {
       s = "Goodness of Fit: Null";
     }
     else {
@@ -2426,14 +2425,14 @@ namespace Qisis {
     if (p_rightMeasure->GetType() == ControlMeasure::RegisteredSubPixel) s+= "RegisteredSubPixel";
     p_rightMeasureType->setText(s);
 
-    if (p_rightMeasure->GetSampleResidual() == Isis::Null) {
+    if (p_rightMeasure->GetSampleResidual() == Null) {
       s = "Sample Residual: Null";
     }
     else {
       s = "Sample Residual: " + QString::number(p_rightMeasure->GetSampleResidual());
     }
     p_rightSampError->setText(s);
-    if (p_rightMeasure->GetLineResidual() == Isis::Null) {
+    if (p_rightMeasure->GetLineResidual() == Null) {
       s = "Line Residual: Null";
     }
     else {
@@ -2441,7 +2440,7 @@ namespace Qisis {
     }
     p_rightLineError->setText(s);
 
-    if (p_rightMeasure->GetSampleShift() == Isis::Null) {
+    if (p_rightMeasure->GetSampleShift() == Null) {
       s = "Sample Shift: Null";
     }
     else {
@@ -2449,7 +2448,7 @@ namespace Qisis {
     }
     p_rightSampShift->setText(s);
 
-    if (p_rightMeasure->GetLineShift() == Isis::Null) {
+    if (p_rightMeasure->GetLineShift() == Null) {
       s = "Line Shift: Null";
     }
     else {
@@ -2459,7 +2458,7 @@ namespace Qisis {
 
     double goodnessOfFit = p_rightMeasure->GetLogData(
                     ControlMeasureLogData::GoodnessOfFit).GetNumericalValue();
-    if (goodnessOfFit == Isis::Null) {
+    if (goodnessOfFit == Null) {
       s = "Goodness of Fit: Null";
     }
     else {
@@ -2642,13 +2641,13 @@ namespace Qisis {
     // Don't show the measurments on cubes not in the serial number list
     // TODO: Should we show them anyway
     // TODO: Should we add the SN to the viewPort
-    string serialNumber = Isis::SerialNumber::Compose(*vp->cube());
+    string serialNumber = SerialNumber::Compose(*vp->cube());
 
     if (!g_serialNumberList->HasSerialNumber(serialNumber)) return;
 
     // loop through all points in the control net
     for (int i = 0; i < g_controlNetwork->GetNumPoints(); i++) {
-      Isis::ControlPoint &p = *((*g_controlNetwork)[i]);
+      ControlPoint &p = *((*g_controlNetwork)[i]);
       // check whether this point is contained in the image
       if (p.HasSerialNumber(serialNumber)) {
         // Find the measurments on the viewport
@@ -2972,7 +2971,7 @@ namespace Qisis {
    * @author 2008-12-10 Jeannie Walldren 
    * @internal 
    *   @history 2008-12-10 Jeannie Walldren - Original Version
-   *   @history 2008-12-10 Jeannie Walldren - Added "Isis::" namespace to
+   *   @history 2008-12-10 Jeannie Walldren - Added "" namespace to
    *                          PvlEditDialog reference and changed
    *                          registrationDialog from pointer to object
    *   @history 2008-12-15 Jeannie Walldren - Added QMessageBox warning in case
@@ -3436,13 +3435,13 @@ namespace Qisis {
    */
   double QnetTool::demRadius(double latitude, double longitude) {
 
-    if (!p_demOpen) return Isis::Null;
+    if (!p_demOpen) return Null;
 
     UniversalGroundMap *demMap = new UniversalGroundMap(*p_demCube);
     if (!demMap->SetUniversalGround(latitude, longitude)) {
       delete demMap;
       demMap = NULL;
-      return Isis::Null;
+      return Null;
     }
 
     //  Use bilinear interpolation to read radius from DEM

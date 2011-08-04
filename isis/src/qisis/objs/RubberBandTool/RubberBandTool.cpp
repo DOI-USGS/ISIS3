@@ -21,10 +21,9 @@
 #include "PolygonTools.h"
 #include "SerialNumberList.h"
 
-
 using namespace std;
 
-namespace Qisis {
+namespace Isis {
   RubberBandTool *RubberBandTool::p_instance = NULL;
 
 
@@ -58,7 +57,7 @@ namespace Qisis {
    *
    * @param parent
    */
-  RubberBandTool::RubberBandTool(QWidget *parent) : Qisis::Tool(parent) {
+  RubberBandTool::RubberBandTool(QWidget *parent) : Tool(parent) {
     p_mouseLoc = NULL;
     p_vertices = NULL;
 
@@ -807,15 +806,15 @@ namespace Qisis {
 
       // Force the angle into [0,2PI]
       while(angle < 0.0) {
-        angle += Isis::PI * 2;
+        angle += PI * 2;
       }
-      while(angle > Isis::PI * 2) {
-        angle -= Isis::PI * 2;
+      while(angle > PI * 2) {
+        angle -= PI * 2;
       }
 
       // With our [0,2PI] angle, let's make it [0,PI] to get the interior angle.
-      if(angle > Isis::PI) {
-        angle = (Isis::PI * 2.0) - angle;
+      if(angle > PI) {
+        angle = (PI * 2.0) - angle;
       }
     }
 
@@ -853,13 +852,13 @@ namespace Qisis {
           points2->add(geos::geom::Coordinate(vertices[1].x(), vertices[1].y()));
           points2->add(geos::geom::Coordinate(vertices[2].x(), vertices[2].y()));
 
-          geos::geom::LineString *line1 = Isis::globalFactory.createLineString(points1);
-          geos::geom::LineString *line2 = Isis::globalFactory.createLineString(points2);
+          geos::geom::LineString *line1 = globalFactory.createLineString(points1);
+          geos::geom::LineString *line2 = globalFactory.createLineString(points2);
           std::vector<geos::geom::Geometry *> *lines = new std::vector<geos::geom::Geometry *>;
           lines->push_back(line1);
           lines->push_back(line2);
 
-          geos::geom::MultiLineString *angle = Isis::globalFactory.createMultiLineString(lines);
+          geos::geom::MultiLineString *angle = globalFactory.createMultiLineString(lines);
           geometry = angle;
         }
         break;
@@ -908,8 +907,8 @@ namespace Qisis {
 
           points->add(geos::geom::Coordinate(originalX, originalY));
 
-          geometry = Isis::globalFactory.createPolygon(
-                       Isis::globalFactory.createLinearRing(points), NULL
+          geometry = globalFactory.createPolygon(
+                       globalFactory.createLinearRing(points), NULL
                      );
         }
         break;
@@ -928,7 +927,7 @@ namespace Qisis {
 
           points->add(geos::geom::Coordinate(vertices[0].x(), vertices[0].y()));
 
-          geometry = Isis::globalFactory.createPolygon(Isis::globalFactory.createLinearRing(points), NULL);
+          geometry = globalFactory.createPolygon(globalFactory.createLinearRing(points), NULL);
 
         }
         break;
@@ -940,7 +939,7 @@ namespace Qisis {
           geos::geom::CoordinateSequence *points = new geos::geom::CoordinateArraySequence();
           points->add(geos::geom::Coordinate(vertices[0].x(), vertices[0].y()));
           points->add(geos::geom::Coordinate(vertices[1].x(), vertices[1].y()));
-          geos::geom::LineString *line = Isis::globalFactory.createLineString(points);
+          geos::geom::LineString *line = globalFactory.createLineString(points);
           geometry = line;
         }
         break;
@@ -954,7 +953,7 @@ namespace Qisis {
             points->add(geos::geom::Coordinate(vertices[vertex].x(), vertices[vertex].y()));
           }
 
-          geos::geom::LineString *line = Isis::globalFactory.createLineString(points);
+          geos::geom::LineString *line = globalFactory.createLineString(points);
           geometry = line;
         }
         break;

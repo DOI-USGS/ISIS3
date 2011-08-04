@@ -11,7 +11,7 @@
 #include "QnetFilter.h"
 
 
-namespace Qisis {
+namespace Isis {
   /**
    * Defines the Goodness of Fit filter for the QnetNavTool's 
    * Points section. The user may enter Less Than and Greater 

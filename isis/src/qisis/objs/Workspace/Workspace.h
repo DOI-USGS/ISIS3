@@ -31,7 +31,7 @@ namespace Isis {
   class Cube;
 }
 
-namespace Qisis {
+namespace Isis {
   class MdiCubeViewport;
 
   /**
@@ -73,12 +73,12 @@ namespace Qisis {
       const Workspace &operator=(Workspace other);
 
     signals:
-      void cubeViewportAdded(Qisis::MdiCubeViewport *);
-      void cubeViewportActivated(Qisis::MdiCubeViewport *);
+      void cubeViewportAdded(MdiCubeViewport *);
+      void cubeViewportActivated(MdiCubeViewport *);
 
     public slots:
       void addCubeViewport(QString cube);
-      MdiCubeViewport *addCubeViewport(Isis::Cube *cube);
+      MdiCubeViewport *addCubeViewport(Cube *cube);
 
       void addBrowseView(QString cube);
 

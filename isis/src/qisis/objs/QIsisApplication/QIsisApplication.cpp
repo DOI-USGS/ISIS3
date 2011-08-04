@@ -39,7 +39,7 @@ namespace Isis {
     try {
       return QApplication::notify(rec, ev);
     }
-    catch(Isis::iException &e) {
+    catch(iException &e) {
       QString message = e.what();
       QMessageBox::critical(NULL,"Error",message);
       e.Clear();

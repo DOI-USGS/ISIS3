@@ -31,7 +31,7 @@
 class QAction;
 class QLineEdit;
 
-namespace Qisis {
+namespace Isis {
   /**
    * @brief Handles zoom operations for Isis qt apps
    *

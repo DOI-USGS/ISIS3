@@ -1,6 +1,6 @@
 #include "ViewportBufferAction.h"
 
-namespace Qisis {
+namespace Isis {
   /**
    * Creates a new viewport buffer action
    */

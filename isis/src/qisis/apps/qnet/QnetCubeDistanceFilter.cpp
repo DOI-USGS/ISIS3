@@ -19,9 +19,9 @@
 
 #include "qnet.h"
 
-using namespace Qisis::Qnet;
+using namespace Isis::Qnet;
 
-namespace Qisis {
+namespace Isis {
   /**
    * Contructor for the Cube Distance filter.  It
    * creates the Distance filter window found in
@@ -111,8 +111,8 @@ namespace Qisis {
 
       // Loop through every control point in the control net
       for (int cp1 = 0; cp1 < g_controlNetwork->GetNumPoints(); cp1++) {
-        Isis::ControlPoint controlPt1 = *(*g_controlNetwork)[cp1];
-        Isis::ControlMeasure controlMeas1;
+        ControlPoint controlPt1 = *(*g_controlNetwork)[cp1];
+        ControlMeasure controlMeas1;
         // Loop through each control measure of this point until we find this image
         for (int cm1 = 0; cm1 < controlPt1.GetNumMeasures(); cm1++) {
           // Check control measure to see if this point is in the current image
@@ -133,7 +133,7 @@ namespace Qisis {
         // if the user chooses distance in meters, create camera to find lat/lon for this measure
         double rad = 0, lat1 = 0, lon1 = 0;
         if (p_meters->isChecked()) {
-          Isis::Camera *cam1;
+          Camera *cam1;
           cam1  = g_controlNetwork->Camera(g_filteredImages[i]);
           // try to set image using sample/line values
           if (cam1->SetImage(controlMeas1.GetSample(), controlMeas1.GetLine())) {
@@ -149,8 +149,8 @@ namespace Qisis {
         }
         // Loop through the remaining control points to compute distances
         for (int cp2 = (cp1 + 1); cp2 < g_controlNetwork->GetNumPoints(); cp2++) {
-          Isis::ControlPoint &controlPt2 = *(*g_controlNetwork)[cp2];
-          Isis::ControlMeasure controlMeas2;
+          ControlPoint &controlPt2 = *(*g_controlNetwork)[cp2];
+          ControlMeasure controlMeas2;
           // Loop through each measure of the second point until we find this image
           for (int cm2 = 0; cm2 < controlPt2.GetNumMeasures(); cm2++) {
             // Check to see if this point is in the image
@@ -181,7 +181,7 @@ namespace Qisis {
           {
             // create camera to find lat/lon for this measure
             double lat2 = 0, lon2 = 0;
-            Isis::Camera *cam2;
+            Camera *cam2;
             cam2 = g_controlNetwork->Camera(g_filteredImages[i]);
             // try to set image using sample/line values
             if (cam2->SetImage(controlMeas2.GetSample(), controlMeas2.GetLine())) {
@@ -195,16 +195,16 @@ namespace Qisis {
             }
             // Calculate the distance between the two points
             // Get the distance from the camera class
-            Isis::SurfacePoint point1(
-                Isis::Latitude(lat1, Isis::Angle::Degrees),
-                Isis::Longitude(lon1, Isis::Angle::Degrees),
-                Isis::Distance(rad, Isis::Distance::Meters));
-            Isis::SurfacePoint point2(
-                Isis::Latitude(lat2, Isis::Angle::Degrees),
-                Isis::Longitude(lon2, Isis::Angle::Degrees),
-                Isis::Distance(rad, Isis::Distance::Meters));
+            SurfacePoint point1(
+                Latitude(lat1, Angle::Degrees),
+                Longitude(lon1, Angle::Degrees),
+                Distance(rad, Distance::Meters));
+            SurfacePoint point2(
+                Latitude(lat2, Angle::Degrees),
+                Longitude(lon2, Angle::Degrees),
+                Distance(rad, Distance::Meters));
             dist = point1.GetDistanceToPoint(point2,
-                Isis::Distance(rad, Isis::Distance::Meters)).GetMeters();
+                Distance(rad, Distance::Meters)).GetMeters();
           }
 
           if (dist == 0) {

@@ -11,9 +11,7 @@
 #include "Statistics.h"
 #include "Stretch.h"
 
-using namespace Isis;
-
-namespace Qisis {
+namespace Isis {
   /**
    * This initializes a sawtooth stretch type
    *
@@ -22,8 +20,8 @@ namespace Qisis {
    * @param name
    * @param color
    */
-  SawtoothStretchType::SawtoothStretchType(const Isis::Histogram &hist,
-      const Isis::Stretch &stretch, const QString &name, const QColor &color) :
+  SawtoothStretchType::SawtoothStretchType(const Histogram &hist,
+      const Stretch &stretch, const QString &name, const QColor &color) :
     StretchType(hist, stretch, name, color) {
     p_offsetSlider = NULL;
     p_widthSlider = NULL;
@@ -102,7 +100,7 @@ namespace Qisis {
    *
    * @param newStretch Stretch to interpret
    */
-  void SawtoothStretchType::setStretch(const Isis::Stretch newStretch) {
+  void SawtoothStretchType::setStretch(const Stretch newStretch) {
     Stretch interpretted;
     double offset = 0.0;
     double width = 0.0;
@@ -250,11 +248,11 @@ namespace Qisis {
    *               range)
    * @param width How wide the sawtooth is
    *
-   * @return Isis::Stretch
+   * @return Stretch
    */
-  Isis::Stretch SawtoothStretchType::calculateNewStretch(double offset,
+  Stretch SawtoothStretchType::calculateNewStretch(double offset,
       double width) {
-    Isis::Stretch stretch;
+    Stretch stretch;
     width = fabs(width);
 
     if(width < p_cubeHist->BinSize())
@@ -307,9 +305,9 @@ namespace Qisis {
   /**
    * This calculates a new stretch using the GUI edits.
    *
-   * @return Isis::Stretch
+   * @return Stretch
    */
-  Isis::Stretch SawtoothStretchType::calculateNewStretch() {
+  Stretch SawtoothStretchType::calculateNewStretch() {
     return calculateNewStretch(p_offsetEdit->text().toDouble(),
                                p_widthEdit->text().toDouble());
   }

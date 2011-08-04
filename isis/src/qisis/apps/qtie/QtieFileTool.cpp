@@ -23,11 +23,11 @@
 #include "Workspace.h"
 
 
-using namespace Qisis;
 
-namespace Qisis {
+
+namespace Isis {
   // Constructor
-  QtieFileTool::QtieFileTool(QWidget *parent) : Qisis::FileTool(parent) {
+  QtieFileTool::QtieFileTool(QWidget *parent) : FileTool(parent) {
     openAction()->setToolTip("Open images");
     QString whatsThis =
       "<b>Function:</b> Open a <i>images</i> \
@@ -68,7 +68,7 @@ namespace Qisis {
     filter += "Detached labels (*.lbl);;";
     filter += "All (*)";
 
-    Isis::Cube *baseCube = new Isis::Cube;
+    Cube *baseCube = new Cube;
     while (!baseCube->isOpen()) {
       baseFile = QFileDialog::getOpenFileName((QWidget *)parent(),
                                               "Select basemap cube (projected)",
@@ -79,7 +79,7 @@ namespace Qisis {
       }
 
       // Find directory and save for use in file dialog for match cube
-      Isis::Filename fname(baseFile.toStdString());
+      Filename fname(baseFile.toStdString());
       dir = fname.absolutePath();
 
       //  Make sure base is projected
@@ -88,14 +88,14 @@ namespace Qisis {
         try {
           baseCube->getProjection();
         }
-        catch (Isis::iException &e) {
+        catch (iException &e) {
           baseCube->close();
           QString message = "Base must be projected";
           QMessageBox::critical((QWidget *)parent(), "Error", message);
           baseCube->close();
         }
       }
-      catch (Isis::iException &e) {
+      catch (iException &e) {
         QString message = "Unable to open base cube";
         QMessageBox::critical((QWidget *)parent(), "Error", message);
       }
@@ -103,7 +103,7 @@ namespace Qisis {
     baseCube->close();
 
 
-    Isis::Cube *matchCube = new Isis::Cube;
+    Cube *matchCube = new Cube;
 
     while (!matchCube->isOpen()) {
       // Get match cube
@@ -129,13 +129,13 @@ namespace Qisis {
             continue;
           }
         }
-        catch (Isis::iException &e) {
+        catch (iException &e) {
           QString message = "Error reading match cube labels.";
           QMessageBox::critical((QWidget *)parent(), "Error", message);
           matchCube->close();
         }
       }
-      catch (Isis::iException &e) {
+      catch (iException &e) {
         QString message = "Unable to open match cube";
         QMessageBox::critical((QWidget *)parent(), "Error", message);
       }
@@ -143,7 +143,7 @@ namespace Qisis {
     matchCube->close();
 
     // Find directory and save for use in file dialog for match cube
-    Isis::Filename fname(matchFile.toStdString());
+    Filename fname(matchFile.toStdString());
     dir = fname.absolutePath();
 
     //Open control net
@@ -154,18 +154,18 @@ namespace Qisis {
                        "Select a control network",
                        dir, filter);
     QApplication::setOverrideCursor(Qt::WaitCursor);
-    Isis::ControlNet *cnet;
+    ControlNet *cnet;
     if (cnetFile.isEmpty()) {
-      cnet = new Isis::ControlNet();
-      //cnet->SetType(Isis::ControlNet::ImageToGround);
+      cnet = new ControlNet();
+      //cnet->SetType(ControlNet::ImageToGround);
       cnet->SetNetworkId("Qtie");
-      cnet->SetUserName(Isis::Application::UserName());
+      cnet->SetUserName(Application::UserName());
     }
     else {
       try {
-        cnet = new Isis::ControlNet(cnetFile.toStdString());
+        cnet = new ControlNet(cnetFile.toStdString());
       }
-      catch (Isis::iException &e) {
+      catch (iException &e) {
         QString message = "Invalid control network.  \n";
         std::string errors = e.Errors();
         message += errors.c_str();

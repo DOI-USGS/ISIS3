@@ -17,7 +17,7 @@
 #include "ViewportMainWindow.h"
 #include "Workspace.h"
 
-namespace Qisis {
+namespace Isis {
 
 
   /**
@@ -28,7 +28,7 @@ namespace Qisis {
    * @param tool
    * @param parent
    */
-  ScatterPlotWindow::ScatterPlotWindow(QString title, ScatterPlotTool *tool, QWidget *parent): Qisis::MainWindow(title, parent) {
+  ScatterPlotWindow::ScatterPlotWindow(QString title, ScatterPlotTool *tool, QWidget *parent): MainWindow(title, parent) {
     p_parent = parent;
     p_tool = tool;
 

@@ -10,7 +10,7 @@
 #include "QnetFilter.h"
 
 
-namespace Qisis {
+namespace Isis {
   /**
    * Defines the Range filter for the QnetNavTool's Points
    * section.  The user must enter values for Minimum Latitude,

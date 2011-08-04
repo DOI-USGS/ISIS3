@@ -1,7 +1,7 @@
 #include "ViewportBufferStretch.h"
 
 
-namespace Qisis {
+namespace Isis {
   /**
    * Constructor
    */

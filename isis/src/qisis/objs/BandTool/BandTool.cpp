@@ -16,7 +16,7 @@
 #include "Pvl.h"
 #include "ToolPad.h"
 
-namespace Qisis {
+namespace Isis {
 
   /**
    * BandTool constructor.
@@ -24,7 +24,7 @@ namespace Qisis {
    *
    * @param parent
    */
-  BandTool::BandTool(QWidget *parent) : Qisis::Tool(parent) {
+  BandTool::BandTool(QWidget *parent) : Tool(parent) {
     p_bandBinViewport = NULL;
   }
 
@@ -211,7 +211,7 @@ namespace Qisis {
     if(p_pvl.FindObject("IsisCube").HasGroup("BandBin") &&
         p_comboBox->count() > 0) {
 
-      Isis::PvlGroup &bandBin = p_pvl.FindObject("IsisCube")
+      PvlGroup &bandBin = p_pvl.FindObject("IsisCube")
                                 .FindGroup("BandBin");
       p_comboBox->setVisible(true);
       p_grayDisplay->setVisible(true);
@@ -248,10 +248,10 @@ namespace Qisis {
    *
    * @param pvl
    */
-  void BandTool::setBandBin(Isis::Pvl &pvl) {
+  void BandTool::setBandBin(Pvl &pvl) {
 
     // Get the number of bands and setup the spin box
-    Isis::PvlGroup &dim = pvl.FindObject("IsisCube")
+    PvlGroup &dim = pvl.FindObject("IsisCube")
                           .FindObject("Core")
                           .FindGroup("Dimensions");
     p_pvl = pvl;
@@ -276,7 +276,7 @@ namespace Qisis {
 
     p_comboBox->clear();
     if(pvl.FindObject("IsisCube").HasGroup("BandBin")) {
-      Isis::PvlGroup &bandBin = pvl.FindObject("IsisCube")
+      PvlGroup &bandBin = pvl.FindObject("IsisCube")
                                 .FindGroup("BandBin");
       for(int i = 0; i < bandBin.Keywords(); i++) {
         //only add band bin keywords have a size that equals the number of bands

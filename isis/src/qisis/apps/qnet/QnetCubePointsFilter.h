@@ -7,7 +7,7 @@ class QRadioButton;
 class QLineEdit;
 
 
-namespace Qisis {
+namespace Isis {
   /**
    * Defines the Points filter for the QnetNavTool's Cubes
    * section.  The user may choose to enter a maximum or minimum

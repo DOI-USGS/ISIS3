@@ -3,7 +3,7 @@
 #include <QFileDialog>
 #include <iostream>
 
-namespace Qisis {
+namespace Isis {
 
   /**
    * BrowseDialog constructor

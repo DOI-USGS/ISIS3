@@ -13,7 +13,7 @@
 
 #include <vector>
 
-namespace Qisis {
+namespace Isis {
 
   class ScatterPlotData: public QwtRasterData {
 
@@ -49,21 +49,21 @@ namespace Qisis {
         return p_max2;
       };
 
-      Isis::Cube *cubeOne() const {
+      Cube *cubeOne() const {
         return p_cube1;
       };
-      Isis::Cube *cubeTwo() const {
+      Cube *cubeTwo() const {
         return p_cube2;
       };
 
 
     private:
-      Isis::Cube *p_cube1; //!< Cube 1
-      Isis::Cube *p_cube2; //!< Cube 2
+      Cube *p_cube1; //!< Cube 1
+      Cube *p_cube2; //!< Cube 2
       CubeViewport *p_cube1Viewport; //!< CubeViewport 1
       CubeViewport *p_cube2Viewport; //!< CubeViewport 2
-      Isis::Stretch p_str1; //!< Stretch 1
-      Isis::Stretch p_str2; //!< Stretch 2
+      Stretch p_str1; //!< Stretch 1
+      Stretch p_str2; //!< Stretch 2
       std::vector< std::vector<int> > p_counts; //!< 2D Vector of ints.
       double p_min1; //!< Minimum for cube 1
       double p_min2; //!< Minimum for cube 2

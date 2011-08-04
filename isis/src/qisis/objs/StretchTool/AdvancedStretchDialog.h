@@ -11,7 +11,7 @@ namespace Isis {
   class Histogram;
 };
 
-namespace Qisis {
+namespace Isis {
   class AdvancedStretch;
   class CubeViewport;
 
@@ -33,26 +33,26 @@ namespace Qisis {
       AdvancedStretchDialog(QWidget *parent);
       ~AdvancedStretchDialog();
 
-      void enableRgbMode(Isis::Stretch &redStretch, Isis::Histogram &redHist,
-                         Isis::Stretch &grnStretch, Isis::Histogram &grnHist,
-                         Isis::Stretch &bluStretch, Isis::Histogram &bluHist);
-      void updateHistograms(const Isis::Histogram &redHist,
-                            const Isis::Histogram &grnHist,
-                            const Isis::Histogram &bluHist);
+      void enableRgbMode(Stretch &redStretch, Histogram &redHist,
+                         Stretch &grnStretch, Histogram &grnHist,
+                         Stretch &bluStretch, Histogram &bluHist);
+      void updateHistograms(const Histogram &redHist,
+                            const Histogram &grnHist,
+                            const Histogram &bluHist);
 
-      void updateForRGBMode(Isis::Stretch &redStretch, Isis::Histogram &redHist,
-                            Isis::Stretch &grnStretch, Isis::Histogram &grnHist,
-                            Isis::Stretch &bluStretch, Isis::Histogram &bluHist);
+      void updateForRGBMode(Stretch &redStretch, Histogram &redHist,
+                            Stretch &grnStretch, Histogram &grnHist,
+                            Stretch &bluStretch, Histogram &bluHist);
 
-      void enableGrayMode(Isis::Stretch &grayStretch,
-                          Isis::Histogram &grayHist);
-      void updateHistogram(const Isis::Histogram &grayHist);
+      void enableGrayMode(Stretch &grayStretch,
+                          Histogram &grayHist);
+      void updateHistogram(const Histogram &grayHist);
       bool isRgbMode() const;
 
-      Isis::Stretch getGrayStretch();
-      Isis::Stretch getRedStretch();
-      Isis::Stretch getGrnStretch();
-      Isis::Stretch getBluStretch();
+      Stretch getGrayStretch();
+      Stretch getRedStretch();
+      Stretch getGrnStretch();
+      Stretch getBluStretch();
 
       /**
        * Returns true if the advanced stretch is enabled
