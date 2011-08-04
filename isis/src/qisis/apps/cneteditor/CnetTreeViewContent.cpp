@@ -190,8 +190,16 @@ namespace Isis
         {
           if (event->modifiers() & Qt::ControlModifier)
           {
+            foreach (AbstractTreeItem * child, item->getChildren())
+            {
+              child->setSelected(!item->isSelected());
+              if (child->isSelected())
+                newlySelectedItems.append(child);
+            }
+            
             item->setSelected(!item->isSelected());
-            newlySelectedItems.append(item);
+            if (item->isSelected())
+              newlySelectedItems.append(item);
             
             lastDirectlySelectedItem = item;
             lastShiftSelection->clear();
@@ -200,22 +208,38 @@ namespace Isis
           {
             if (event->modifiers() & Qt::ShiftModifier)
             {
-              foreach(AbstractTreeItem * i, *lastShiftSelection)
-              {
+              foreach (AbstractTreeItem * i, *lastShiftSelection)
                 i->setSelected(false);
-              }
 
               if (lastDirectlySelectedItem)
               {
-                *lastShiftSelection =
-                  model->getItems(lastDirectlySelectedItem, item);
+                // gets the new shift selection without selecting children
+                QList< AbstractTreeItem * > tmp =
+                    model->getItems(lastDirectlySelectedItem, item);
+                
+                // use tmp to create a new lastShiftSelection with children
+                // selected as well
+                foreach (AbstractTreeItem * i, tmp)
+                {
+                  lastShiftSelection->append(i);
+                  
+                  // if this item is a point item then select its children
+                  if (i->getPointerType() == AbstractTreeItem::Point)
+                  {
+                    foreach (AbstractTreeItem * child, i->getChildren())
+                    {
+                      child->setSelected(true);
+                      lastShiftSelection->append(child);
+                    }
+                  }
+                }
               }
               else
               {
                 lastShiftSelection->clear();
               }
 
-              foreach(AbstractTreeItem * i, *lastShiftSelection)
+              foreach (AbstractTreeItem * i, *lastShiftSelection)
               {
                 i->setSelected(true);
                 newlySelectedItems.append(i);
@@ -226,8 +250,17 @@ namespace Isis
               model->setGlobalSelection(false);
               item->setSelected(true);
               newlySelectedItems.append(item);
-              
               lastDirectlySelectedItem = item;
+              
+              if (item->getPointerType() == AbstractTreeItem::Point)
+              {
+                foreach (AbstractTreeItem * child, item->getChildren())
+                {
+                  child->setSelected(true);
+                  newlySelectedItems.append(child);
+                }
+              }
+              
               lastShiftSelection->clear();
             }
           }

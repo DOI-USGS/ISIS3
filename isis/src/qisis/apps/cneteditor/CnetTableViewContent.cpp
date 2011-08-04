@@ -242,7 +242,6 @@ namespace Isis
   }
 
 
-
   bool CnetTableViewContent::eventFilter(QObject * target, QEvent * event)
   {
     return QObject::eventFilter(target, event);
@@ -253,7 +252,6 @@ namespace Isis
   {
     if (event->buttons() & Qt::LeftButton)
     {
-//       updateActiveCell(event->pos());
       int rowNum = event->pos().y() / rowHeight;
 
       if (activeCell->first && isCellEditable(rowNum, activeCell->second))
@@ -261,7 +259,6 @@ namespace Isis
         const AbstractCnetTableDelegate * delegate = model->getDelegate();
         CnetTableColumn * col =
             columns->getVisibleColumns().at(activeCell->second);
-//        QString colTitle = col->getTitle();
 
         delete editWidget;
         editWidget = NULL;
@@ -463,8 +460,10 @@ namespace Isis
       if (hasRowSelection())
         deleteSelectedRows();
     }
-    else if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter) {
-      if (editWidget) {
+    else if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter)
+    {
+      if (editWidget)
+      {
         CnetTableColumn * col =
             columns->getVisibleColumns().at(activeCell->second);
         getModel()->getDelegate()->saveData(
@@ -540,6 +539,7 @@ namespace Isis
             editWidgetVisible = true;
           }
           else
+          {
             if (activeCell->first == items->at(i))
             {
               QPair<int, int> activeXArea =
@@ -549,15 +549,14 @@ namespace Isis
                   activeXArea.second - activeXArea.first, rowHeight);
 
               activeArea.moveLeft(
-                activeArea.left() - horizontalScrollBar()->value());
-//          activeArea.setRight(activeArea.right() - 1);
-//          activeArea.setBottom(activeArea.bottom() - 1);
+                  activeArea.left() - horizontalScrollBar()->value());
               activeArea.adjust(-1, -1, -2, -1);
               QPen pen(Qt::black);
               pen.setWidth(3);
               painter.setPen(pen);
               painter.drawRect(activeArea);
             }
+          }
         }
       }
 
@@ -576,15 +575,13 @@ namespace Isis
     QAbstractScrollArea::resizeEvent(event);
     updateHorizontalScrollBar();
     updateItemList();
-//     refresh();
   }
 
 
   void CnetTableViewContent::scrollContentsBy(int dx, int dy)
   {
     QAbstractScrollArea::scrollContentsBy(dx, dy);
-//     refresh();
-   updateItemList();
+    updateItemList();
   }
 
 
@@ -610,6 +607,7 @@ namespace Isis
   {
     if (col->hasNetworkStructureEffect())
       emit rebuildModels(QList<AbstractTreeItem *>());
+    
     emit modelDataChanged();
   }
 
@@ -627,53 +625,52 @@ namespace Isis
   }
 
 
-  void CnetTableViewContent::copyCellSelection(bool allCells) {
-    if (hasActiveCell()) {
+  void CnetTableViewContent::copyCellSelection(bool allCells)
+  {
+    if (hasActiveCell())
+    {
       const CnetTableColumn * col = columns->getVisibleColumns().at(
           activeCell->second);
 
       QString colTitle = col->getTitle();
-
-      // Is impossible unless bug exists.
       ASSERT(colTitle.size());
 
       // Grab the active cell's data and copy it to the selected cells that are
       // in the same column as the active cell.
       QString cellData = activeCell->first->getData(colTitle);
 
-      QList<AbstractTreeItem *> selection = allCells ? model->getItems(
+      QList< AbstractTreeItem * > selection = allCells ? model->getItems(
           0, model->getVisibleRowCount()) : *rowsWithActiveColumnSelected;
       ASSERT(selection.size());
 
+      bool needsDialog = true;
+      bool done = false;
+      for (int i = 0; !done && i < selection.size(); i++)
+      {
+        AbstractTreeItem * row = selection[i];
+        bool changeData = true;
 
-      bool autoAccept = false;
-      foreach (AbstractTreeItem * row, selection) {
-        bool changeData = false;
-
-        if (!autoAccept) {
-          QString warningText =
-              model->getWarningMessage(row, col, cellData);
-          if (warningText.isEmpty()) {
-            changeData = true;
-          }
-          else {
-            // Prompt the user for confirmation before setting data (if necessary).
-            QMessageBox::StandardButton status = QMessageBox::warning(
-                this, "Change cells?", warningText, QMessageBox::Yes |
-                QMessageBox::No | QMessageBox::YesToAll | QMessageBox::NoToAll);
-
-            if (status == QMessageBox::YesToAll)
-              autoAccept = true;
-            else if (status == QMessageBox::NoToAll)
+        QString warningText =
+            model->getWarningMessage(row, col, cellData);
+        if (needsDialog && warningText.size())
+        {
+          QMessageBox::StandardButton status = QMessageBox::warning(
+              this, "Change cells?", warningText, QMessageBox::Yes |
+              QMessageBox::No | QMessageBox::YesToAll | QMessageBox::NoToAll);
+          
+          switch (status)
+          {
+            case QMessageBox::YesToAll:
+              needsDialog = false;
               break;
-            else if (status == QMessageBox::Yes)
-              changeData = true;
+            case QMessageBox::NoToAll:
+              done = true;
+            case QMessageBox::No:
+              changeData = false;
+            default:;
           }
         }
-
-        if (autoAccept)
-          changeData = true;
-
+        
         if (changeData)
           row->setData(colTitle, cellData);
       }
@@ -684,7 +681,8 @@ namespace Isis
   }
 
 
-  void CnetTableViewContent::createActions() {
+  void CnetTableViewContent::createActions()
+  {
     applyToSelectionAct = new QAction(tr("Copy to selected cells"), this);
     applyToSelectionAct->setStatusTip(tr("Copy the contents of this cell to the"
                                          "selected cells"));
@@ -739,17 +737,20 @@ namespace Isis
   }
 
 
-  bool CnetTableViewContent::hasActiveCell() const {
+  bool CnetTableViewContent::hasActiveCell() const
+  {
     return (activeCell->first && activeCell->second >= 0);
   }
 
 
-  bool CnetTableViewContent::hasRowSelection() const {
+  bool CnetTableViewContent::hasRowSelection() const
+  {
     return (model->getSelectedItems().size());
   }
 
 
-  bool CnetTableViewContent::mouseInCellSelection(QPoint mousePos) const {
+  bool CnetTableViewContent::mouseInCellSelection(QPoint mousePos) const
+  {
     int colNum = getColumnFromScreenX(mousePos.x());
     AbstractTreeItem * row = items->at(getRowFromScreenY(mousePos.y()));
 
@@ -758,14 +759,16 @@ namespace Isis
   }
 
 
-  bool CnetTableViewContent::isMouseInRowSelection(QPoint mousePos) const {
+  bool CnetTableViewContent::isMouseInRowSelection(QPoint mousePos) const
+  {
     AbstractTreeItem * row = items->at(getRowFromScreenY(mousePos.y()));
 
     return (model->getSelectedItems().contains(row));
   }
   
   
-  bool CnetTableViewContent::isRowValid(int rowNum) const {
+  bool CnetTableViewContent::isRowValid(int rowNum) const
+  {
     bool valid = false;
     
     if (rowNum >= 0 && rowNum < items->size())
@@ -775,7 +778,8 @@ namespace Isis
   }
   
   
-  bool CnetTableViewContent::isColumnValid(int colNum) const {
+  bool CnetTableViewContent::isColumnValid(int colNum) const
+  {
     bool valid = false;
     
     if (colNum >= 0 && colNum < columns->getVisibleColumns().size())
@@ -800,7 +804,8 @@ namespace Isis
   }
 
 
-  bool CnetTableViewContent::isDataColumn(int colNum) const {
+  bool CnetTableViewContent::isDataColumn(int colNum) const
+  {
     return columns->getVisibleColumns().at(colNum)->getTitle().size();
   }
 
@@ -958,7 +963,6 @@ namespace Isis
     }
 
     int rowNum = getRowFromScreenY(screenPos.y());
-//     int colNum = getColumnFromScreenX(screenPos.x());
     int oldActiveColumn = activeCell->second;
 
     activeCell->first = NULL;
@@ -977,13 +981,11 @@ namespace Isis
         
         cellRect.moveLeft(cellRect.left() - horizontalScrollBar()->value());
 
-        if (cellRect.contains(screenPos))
+        if (cellRect.contains(screenPos) &&
+            (oldActiveColumn != -1 || !visibleCols.at(i)->getTitle().isEmpty()))
         {
-          if (oldActiveColumn != -1 || !visibleCols.at(i)->getTitle().isEmpty())
-          {
-            activeCell->first = item;
-            activeCell->second = i;
-          }
+          activeCell->first = item;
+          activeCell->second = i;
         }
       }
     }
@@ -1048,12 +1050,14 @@ namespace Isis
   }
 
 
-  void CnetTableViewContent::copySelection() {
+  void CnetTableViewContent::copySelection()
+  {
     copyCellSelection(false);
   }
 
 
-  void CnetTableViewContent::copyAll() {
+  void CnetTableViewContent::copyAll()
+  {
     copyCellSelection(true);
   }
 
@@ -1104,12 +1108,14 @@ namespace Isis
       contextMenu.addAction(deleteSelectedRowsAct);
       contextMenu.exec(mapToGlobal(mouseLocation));
     }
+    
     // Only show the context menu for cells if the user right-clicked on the
     // active cell.
-    else if (hasActiveCell() && mouseInCellSelection(mouseLocation))
+    if (hasActiveCell() && mouseInCellSelection(mouseLocation))
     {
       if (rowsWithActiveColumnSelected->size() > 1)
         contextMenu.addAction(applyToSelectionAct);
+      
       contextMenu.addAction(applyToAllAct);
       contextMenu.exec(mapToGlobal(mouseLocation));
     }
