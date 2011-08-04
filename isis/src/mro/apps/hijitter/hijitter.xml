@@ -44,6 +44,12 @@
     <change name="Debbie A. Cook" date="2009-01-14">
       Added documentation
     </change>
+    <change name="Jai Rideout" date="2011-08-04">
+      Made a small modification to the code in FindRed(...) that created a Pvl
+      object for each file in the file list. FileList's overloaded
+      '[]' operator that was used inside of the call to Filename's constructor
+      confused the compiler on Ubuntu 10.04 systems.
+    </change>
   </history>
 
   <groups>
