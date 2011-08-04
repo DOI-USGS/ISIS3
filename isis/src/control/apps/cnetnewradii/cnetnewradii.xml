@@ -11,7 +11,8 @@
       one. When it encounters a point type of Fixed or Constrained it will use the 
       control point latitude and longitude to get the radius from the DEM.  The 
       radius will be calculated based on a bilinear interpolation of the closest
-      pixels in the DEM. 
+      pixels in the DEM.  The AprioriRadius source and AprioriRadiusSourceFile
+      will be updated for control points which successfully update the radius.
     </p>
     <p>
       If, for a particular point, the application fails to calculated a radius using
