@@ -97,6 +97,14 @@ namespace Isis
 
     emit filterCountsChanged(visible, total);
   }
+  
+  
+  int CnetMeasureTableModel::indexOfVisibleItem(
+      AbstractTreeItem const * item) const
+  {
+    return getDataModel()->indexOfVisibleItem(item, TreeModel::MeasureItems,
+                                              true);
+  }
 
   
   QString CnetMeasureTableModel::getMeasureWarningMessage(
@@ -119,6 +127,20 @@ namespace Isis
     }
 
     return warningText;
+  }
+  
+  
+  void CnetMeasureTableModel::handleSelectionChanged(
+      QList< AbstractTreeItem * > newlySelectedItems)
+  {
+    QList< AbstractTreeItem * > interestingSelectedItems;
+    foreach (AbstractTreeItem * item, newlySelectedItems)
+    {
+      if (item->getPointerType() == AbstractTreeItem::Measure)
+        interestingSelectedItems.append(item);
+    }
+    
+    emit selectionChanged(interestingSelectedItems);
   }
 }
 

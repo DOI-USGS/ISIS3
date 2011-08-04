@@ -415,10 +415,12 @@ namespace Isis
     pointTableView->setModel(pointTableModel);
     connect(pointTableView, SIGNAL(modelDataChanged()),
             this, SIGNAL(cnetModified()));
+    
     connect(pointTreeView, SIGNAL(selectionChanged()),
             pointTableView, SLOT(onModelSelectionChanged()));
     connect(pointTableView, SIGNAL(selectionChanged()),
             pointTreeView, SLOT(onModelSelectionChanged()));
+    
     connect(pointTableView, SIGNAL(rebuildModels(QList<AbstractTreeItem *>)),
             this, SLOT(rebuildModels(QList<AbstractTreeItem *>)));
 

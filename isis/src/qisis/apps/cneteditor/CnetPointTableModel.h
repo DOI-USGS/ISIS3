@@ -31,13 +31,19 @@ namespace Isis
       virtual QString getWarningMessage(AbstractTreeItem const *,
           CnetTableColumn const *, QString valueToSave) const;
       virtual void setGlobalSelection(bool selected);
+      virtual int indexOfVisibleItem(AbstractTreeItem const * item) const;
 
       static QString getPointWarningMessage(AbstractTreeItem const *,
           CnetTableColumn const *, QString valueToSave);
-
+      
+      
     private:
       CnetPointTableModel(const CnetPointTableModel &);
       CnetPointTableModel & operator=(CnetPointTableModel);
+      
+      
+    private slots:
+      void handleSelectionChanged(QList< AbstractTreeItem * >);
   };
 }
 

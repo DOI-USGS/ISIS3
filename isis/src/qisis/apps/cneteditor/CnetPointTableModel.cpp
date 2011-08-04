@@ -34,7 +34,9 @@ namespace Isis
     AbstractCnetTableModel(model, new CnetPointTableDelegate)
   {
     connect(model, SIGNAL(filterCountsChanged(int, int)),
-        this, SIGNAL(filterCountsChanged(int, int)));
+            this, SIGNAL(filterCountsChanged(int, int)));
+    connect(model, SIGNAL(selectionChanged(QList< AbstractTreeItem * >)),
+            this, SLOT(handleSelectionChanged(QList< AbstractTreeItem * >)));
   }
 
 
@@ -87,6 +89,14 @@ namespace Isis
   }
   
   
+  int CnetPointTableModel::indexOfVisibleItem(
+      AbstractTreeItem const * item) const
+  {
+    return getDataModel()->indexOfVisibleItem(item, TreeModel::PointItems,
+                                              true);
+  }
+  
+  
   QString CnetPointTableModel::getPointWarningMessage(
       AbstractTreeItem const * row, CnetTableColumn const * column,
       QString valueToSave) {
@@ -103,6 +113,20 @@ namespace Isis
     }
 
     return warningText;
+  }
+  
+  
+  void CnetPointTableModel::handleSelectionChanged(
+      QList< AbstractTreeItem * > newlySelectedItems)
+  {
+    QList< AbstractTreeItem * > interestingSelectedItems;
+    foreach (AbstractTreeItem * item, newlySelectedItems)
+    {
+      if (item->getPointerType() == AbstractTreeItem::Point)
+        interestingSelectedItems.append(item);
+    }
+    
+    emit selectionChanged(interestingSelectedItems);
   }
 }
 

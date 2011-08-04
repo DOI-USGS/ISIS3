@@ -45,6 +45,8 @@ namespace Isis
     public slots:
       void refresh();
       void updateHorizontalScrollBar(bool scrollRight = false);
+      void scrollTo(QList< AbstractTreeItem * >);
+      void scrollTo(AbstractTreeItem *);
 
 
     protected:

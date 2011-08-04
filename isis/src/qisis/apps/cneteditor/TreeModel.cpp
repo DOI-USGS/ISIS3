@@ -194,13 +194,24 @@ namespace Isis
       }
 
       AbstractTreeItem * end = item2;
-
+      
+      // Sometimes we need to build the list forwards and sometimes backwards.
+      // This is accomplished by using either append or prepend.  We abstract
+      // away which of these we should use (why should we care) by using the
+      // variable "meth" which is a method pointer to the appropriate method.
+      void (QList<AbstractTreeItem*>::*someKindaPend)(
+          AbstractTreeItem * const &);
+      
+      someKindaPend = &QList<AbstractTreeItem *>::append;
       if (start == item2)
+      {
         end = item1;
+        someKindaPend = &QList<AbstractTreeItem *>::prepend;
+      }
 
       while (curItem && curItem != end)
       {
-        foundItems.append(curItem);
+        (foundItems.*someKindaPend)(curItem);
         curItem = nextItem(curItem, flags, ignoreExpansion);
       }
 
@@ -211,7 +222,7 @@ namespace Isis
         throw iException::Message(iException::Programmer, msg, _FILEINFO_);
       }
 
-      foundItems.append(end);
+      (foundItems.*someKindaPend)(end);
     }
 
     return foundItems;
@@ -219,7 +230,7 @@ namespace Isis
 
 
   QList< AbstractTreeItem * > TreeModel::getSelectedItems(
-    InterestingItemsFlag flags, bool ignoreExpansion)
+      InterestingItemsFlag flags, bool ignoreExpansion)
   {
     QList< AbstractTreeItem * > selectedItems;
 
@@ -304,6 +315,33 @@ namespace Isis
     }
 
     return count;
+  }
+  
+  
+  int TreeModel::indexOfVisibleItem(AbstractTreeItem const * item,
+                                    InterestingItemsFlag flags,
+                                    bool ignoreExpansion) const
+  {
+    AbstractTreeItem * currentItem = rootItem->getFirstVisibleChild();
+    int index = -1;
+
+    if (!isFiltering())
+    {
+      while (currentItem && currentItem != item)
+      {
+        if (itemIsInteresting(currentItem, flags))
+          index++;
+
+        currentItem = nextItem(currentItem, flags, ignoreExpansion);
+      }
+      
+      index++;
+      
+      if (!currentItem)
+        index = -1;
+    }
+
+    return index;
   }
 
 

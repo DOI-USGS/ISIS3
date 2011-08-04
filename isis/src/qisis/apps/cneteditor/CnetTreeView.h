@@ -4,8 +4,12 @@
 #include <QWidget>
 
 
+template< typename t > class QList;
+
+
 namespace Isis
 {
+  class AbstractTreeItem;
   class CnetTreeViewContent;
   class CnetTreeViewHeader;
   class TreeModel;

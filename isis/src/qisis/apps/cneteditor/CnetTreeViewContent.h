@@ -33,6 +33,7 @@ namespace Isis
 
     signals:
       void selectionChanged();
+      void selectionChanged(QList< AbstractTreeItem * >);
 
 
     public slots:

@@ -39,6 +39,7 @@ namespace Isis
 
     public slots:
       void onModelSelectionChanged();
+      void onModelSelectionChanged(QList< AbstractTreeItem * >);
 
 
     signals:

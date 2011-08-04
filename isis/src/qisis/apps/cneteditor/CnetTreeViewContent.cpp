@@ -115,6 +115,8 @@ namespace Isis
     connect(model, SIGNAL(modelModified()), this, SLOT(refresh()));
     connect(model, SIGNAL(filterProgressChanged(int)),
         this, SLOT(updateItemList()));
+    connect(this, SIGNAL(selectionChanged(QList<AbstractTreeItem*>)),
+            model, SIGNAL(selectionChanged(QList<AbstractTreeItem*>)));
 
     refresh();
   }
@@ -173,7 +175,7 @@ namespace Isis
       AbstractTreeItem * item = (*items)[index];
       if (item->isSelectable() ||
           (item->getFirstVisibleChild() &&
-              getArrowRect(item).contains(pressPos)))
+          getArrowRect(item).contains(pressPos)))
       {
         pressedItem->first = item;
 
@@ -183,22 +185,19 @@ namespace Isis
           pressedItem->second = arrowRect.contains(pressPos);
         }
 
+        QList< AbstractTreeItem * > newlySelectedItems;
         if (!pressedItem->second)
         {
           if (event->modifiers() & Qt::ControlModifier)
           {
-            if (item->isSelected())
-            {
-              item->setSelected(false);
-            }
-            else
-            {
-              item->setSelected(true);
-            }
+            item->setSelected(!item->isSelected());
+            newlySelectedItems.append(item);
+            
             lastDirectlySelectedItem = item;
             lastShiftSelection->clear();
           }
           else
+          {
             if (event->modifiers() & Qt::ShiftModifier)
             {
               foreach(AbstractTreeItem * i, *lastShiftSelection)
@@ -219,17 +218,21 @@ namespace Isis
               foreach(AbstractTreeItem * i, *lastShiftSelection)
               {
                 i->setSelected(true);
+                newlySelectedItems.append(i);
               }
             }
             else
             {
               model->setGlobalSelection(false);
               item->setSelected(true);
+              newlySelectedItems.append(item);
+              
               lastDirectlySelectedItem = item;
               lastShiftSelection->clear();
             }
-
-          emit selectionChanged();
+          }
+          
+          emit selectionChanged(newlySelectedItems);
         }
       }
     }

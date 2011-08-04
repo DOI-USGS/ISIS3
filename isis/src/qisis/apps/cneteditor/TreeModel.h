@@ -63,6 +63,10 @@ namespace Isis
       void loadViewState();
       void stopWorking();
       QSize getVisibleSize(int indentation) const;
+      int indexOfVisibleItem(AbstractTreeItem const * item,
+                             InterestingItemsFlag = AllItems,
+                             bool = false) const;
+      
 
     public slots:
       void applyFilter();
@@ -74,6 +78,7 @@ namespace Isis
       void filterProgressRangeChanged(int, int);
       void rebuildProgressChanged(int);
       void rebuildProgressRangeChanged(int, int);
+      void selectionChanged(QList<AbstractTreeItem *>);
 
       /**
        * This signal is emitted after filtering to provide the number of

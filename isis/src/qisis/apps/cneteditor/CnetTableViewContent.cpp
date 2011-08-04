@@ -142,7 +142,9 @@ namespace Isis
     {
       disconnect(model, SIGNAL(modelModified()), this, SLOT(refresh()));
       disconnect(model, SIGNAL(filterProgressChanged(int)),
-          this, SLOT(updateItemList()));
+                 this, SLOT(updateItemList()));
+      disconnect(model, SIGNAL(selectionChanged(QList<AbstractTreeItem*>)),
+                 this, SLOT(scrollTo(QList<AbstractTreeItem*>)));
     }
 
     model = someModel;
@@ -151,6 +153,8 @@ namespace Isis
         this, SLOT(updateItemList()));
     connect(this, SIGNAL(modelDataChanged()),
             model, SLOT(applyFilter()));
+    connect(model, SIGNAL(selectionChanged(QList<AbstractTreeItem*>)),
+            this, SLOT(scrollTo(QList<AbstractTreeItem*>)));
 
     refresh();
   }
@@ -203,6 +207,40 @@ namespace Isis
         horizontalScrollBar()->setValue(horizontalScrollBar()->maximum());
     }
   }
+  
+  
+  void CnetTableViewContent::scrollTo(
+      QList< AbstractTreeItem * > newlySelectedItems)
+  {
+    if (newlySelectedItems.size())
+      scrollTo(newlySelectedItems.last());
+  }
+  
+  
+  void CnetTableViewContent::scrollTo(AbstractTreeItem * newlySelectedItem)
+  {
+    int row = getModel()->indexOfVisibleItem(newlySelectedItem);
+    
+    if (row >= 0)
+    {
+      int topRow = verticalScrollBar()->value();
+      
+      if (row < topRow)
+      {
+        verticalScrollBar()->setValue(row);
+      }
+      else
+      {
+        int wholeVisibleRowCount = viewport()->height() / rowHeight;
+        int bottomRow = topRow + wholeVisibleRowCount;
+        if (row > bottomRow)
+          verticalScrollBar()->setValue(row - wholeVisibleRowCount + 1);
+      }
+    }
+    
+    viewport()->update();
+  }
+
 
 
   bool CnetTableViewContent::eventFilter(QObject * target, QEvent * event)

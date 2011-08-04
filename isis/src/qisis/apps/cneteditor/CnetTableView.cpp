@@ -149,6 +149,14 @@ namespace Isis
   }
 
 
+  void CnetTableView::onModelSelectionChanged(
+      QList< AbstractTreeItem * > newlySelectedItems)
+  {
+    content->refresh();
+    content->scrollTo(newlySelectedItems);
+  }
+
+
   void CnetTableView::nullify()
   {
     header = NULL;

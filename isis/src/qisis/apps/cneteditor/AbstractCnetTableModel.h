@@ -34,8 +34,10 @@ namespace Isis
       virtual int getVisibleRowCount() const = 0;
       virtual QString getWarningMessage(AbstractTreeItem const *,
           CnetTableColumn const *, QString valueToSave) const = 0;
-      virtual const AbstractCnetTableDelegate * getDelegate() const;
+      virtual int indexOfVisibleItem(AbstractTreeItem const * item) const = 0;
 
+      virtual const AbstractCnetTableDelegate * getDelegate() const;
+      
 
     public slots:
       virtual void setGlobalSelection(bool selected) = 0;
@@ -50,6 +52,7 @@ namespace Isis
       void rebuildProgressRangeChanged(int, int);
       void filterCountsChanged(int visibleTopLevelItemCount,
           int topLevelItemCount);
+      void selectionChanged(QList<AbstractTreeItem *>);
 
 
     protected:
@@ -58,8 +61,8 @@ namespace Isis
 
 
     private:
-      AbstractCnetTableModel(const AbstractCnetTableModel &);
-      AbstractCnetTableModel & operator=(const AbstractCnetTableModel &);
+      AbstractCnetTableModel(AbstractCnetTableModel const &);
+      AbstractCnetTableModel & operator=(AbstractCnetTableModel const &);
 
 
     private:

@@ -31,17 +31,20 @@ namespace Isis
       virtual QString getWarningMessage(AbstractTreeItem const *,
           CnetTableColumn const *, QString valueToSave) const;
       virtual void setGlobalSelection(bool selected);
+      virtual int indexOfVisibleItem(AbstractTreeItem const * item) const;
 
       static QString getMeasureWarningMessage(AbstractTreeItem const *,
           CnetTableColumn const *, QString valueToSave);
 
+
     private slots:
       void calculateFilterCounts();
+      void handleSelectionChanged(QList< AbstractTreeItem * >);
 
 
     private:
-      CnetMeasureTableModel(const CnetMeasureTableModel &);
-      CnetMeasureTableModel & operator=(CnetMeasureTableModel);
+      CnetMeasureTableModel(CnetMeasureTableModel const &);
+      CnetMeasureTableModel & operator=(CnetMeasureTableModel const &);
   };
 }
 
