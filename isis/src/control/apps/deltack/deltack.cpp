@@ -118,7 +118,8 @@ void IsisMain() {
     b.SetConvergenceThreshold(ui.GetDouble("SIGMA0"));
     b.SetMaxIterations(ui.GetInteger("MAXITS"));
 
-    b.SolveSpecialK();
+    b.SetDecompositionMethod(BundleAdjust::SPECIALK);
+    b.SolveCholesky();
 
     Cube c;
     c.open(filename, "rw");
