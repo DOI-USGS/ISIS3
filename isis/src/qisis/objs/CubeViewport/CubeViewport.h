@@ -360,7 +360,7 @@ namespace Isis {
        * Emitted when a brick is no longer needed, should only be sent
        * to cube data thread
        */
-      void doneWithData(int, const Brick *);
+      void doneWithData(int, const Isis::Brick *);
 
 
     public slots:
@@ -408,7 +408,7 @@ namespace Isis {
 
 
     private slots:
-      void cubeDataChanged(int cubeId, const Brick *);
+      void cubeDataChanged(int cubeId, const Isis::Brick *);
 
 
     private:

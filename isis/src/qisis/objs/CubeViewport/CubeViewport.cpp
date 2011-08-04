@@ -35,11 +35,12 @@
 #include <QScrollBar>
 #include <QString>
 #include <QTimer>
-#include "iString.h"
 
+#include "Brick.h"
 #include "Camera.h"
 #include "CubeDataThread.h"
 #include "iException.h"
+#include "iString.h"
 #include "Filename.h"
 #include "Histogram.h"
 #include "Pvl.h"
@@ -83,10 +84,10 @@ namespace Isis {
     p_cubeData = new CubeDataThread();
     p_cubeId = p_cubeData->AddCube(p_cube);
 
-    connect(p_cubeData, SIGNAL(BrickChanged(int, const Brick *)),
-            this, SLOT(cubeDataChanged(int, const Brick *)));
-    connect(this, SIGNAL(doneWithData(int, const Brick *)),
-            p_cubeData, SLOT(DoneWithData(int, const Brick *)));
+    connect(p_cubeData, SIGNAL(BrickChanged(int, const Isis::Brick *)),
+            this, SLOT(cubeDataChanged(int, const Isis::Brick *)));
+    connect(this, SIGNAL(doneWithData(int, const Isis::Brick *)),
+            p_cubeData, SLOT(DoneWithData(int, const Isis::Brick *)));
 
     p_cubeData->AddChangeListener();
 

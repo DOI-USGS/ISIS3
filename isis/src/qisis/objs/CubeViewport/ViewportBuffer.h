@@ -128,7 +128,7 @@ namespace Isis {
       bool hasEntireCube();
 
     public slots:
-      void DataReady(void *requester, int cubeId, const Brick *brick);
+      void DataReady(void *requester, int cubeId, const Isis::Brick *brick);
 
     signals:
       /**
@@ -146,7 +146,7 @@ namespace Isis {
                     int endSample, int endLine, int band, void *caller);
 
       //! Tell cube data thread we're done with a brick
-      void DoneWithData(int, const Brick *);
+      void DoneWithData(int, const Isis::Brick *);
 
     private:
       QRect getXYBoundingRect();

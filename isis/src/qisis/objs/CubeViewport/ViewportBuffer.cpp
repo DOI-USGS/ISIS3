@@ -11,6 +11,7 @@
 #include <QRect>
 #include <QScrollBar>
 
+#include "Brick.h"
 #include "CubeDataThread.h"
 #include "CubeViewport.h"
 #include "SpecialPixel.h"
@@ -56,11 +57,11 @@ namespace Isis {
     connect(this, SIGNAL(ReadCube(int, int, int, int, int, int, void *)),
             p_dataThread, SLOT(ReadCube(int, int, int, int, int, int, void *)));
 
-    connect(p_dataThread, SIGNAL(ReadReady(void *, int, const Brick *)),
-            this, SLOT(DataReady(void *, int, const Brick *)));
+    connect(p_dataThread, SIGNAL(ReadReady(void *, int, const Isis::Brick *)),
+            this, SLOT(DataReady(void *, int, const Isis::Brick *)));
 
-    connect(this, SIGNAL(DoneWithData(int, const Brick *)), p_dataThread,
-            SLOT(DoneWithData(int, const Brick *)));
+    connect(this, SIGNAL(DoneWithData(int, const Isis::Brick *)),
+            p_dataThread, SLOT(DoneWithData(int, const Isis::Brick *)));
   }
 
   /**
@@ -71,11 +72,11 @@ namespace Isis {
     disconnect(this, SIGNAL(ReadCube(int, int, int, int, int, int, void *)),
                p_dataThread, SLOT(ReadCube(int, int, int, int, int, int, void *)));
 
-    disconnect(p_dataThread, SIGNAL(ReadReady(void *, int, const Brick *)),
-               this, SLOT(DataReady(void *, int, const Brick *)));
+    disconnect(p_dataThread, SIGNAL(ReadReady(void *, int, const Isis::Brick *)),
+               this, SLOT(DataReady(void *, int, const Isis::Brick *)));
 
-    disconnect(this, SIGNAL(DoneWithData(int, const Brick *)),
-               p_dataThread, SLOT(DoneWithData(int, const Brick *)));
+    disconnect(this, SIGNAL(DoneWithData(int, const Isis::Brick *)),
+               p_dataThread, SLOT(DoneWithData(int, const Isis::Brick *)));
 
     p_dataThread = NULL;
 
