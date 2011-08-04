@@ -91,6 +91,12 @@
       need to be done in order to warn the user of potential pitfalls in their
       selected options.
     </change>
+    <change name="Jai Rideout" date="2011-08-04">
+      Made a small modification to the code in mergeNetworks(...) that created a
+      new control network for each file in the file list. FileList's overloaded
+      '[]' operator that was used inside of the call to Filename's constructor
+      confused the compiler on Ubuntu10.04 systems.
+    </change>
   </history> 
 
   <category>

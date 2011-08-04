@@ -142,7 +142,8 @@ ControlNet * mergeNetworks(FileList &filelist, PvlObject &conflictLog,
   // Loop through each network in the list and attempt to merge it into the
   // base
   for (int cnetIndex = 1; cnetIndex < (int) filelist.size(); cnetIndex++) {
-    ControlNet newNet(Filename(filelist[cnetIndex]).Expanded());
+    Filename currentCnetFilename(filelist[cnetIndex]);
+    ControlNet newNet(currentCnetFilename.Expanded());
 
     // Networks can only be merged if the targets are the same
     if (baseNet->GetTarget().DownCase() != newNet.GetTarget().DownCase()) {
