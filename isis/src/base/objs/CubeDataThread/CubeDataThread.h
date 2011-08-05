@@ -1,15 +1,7 @@
 #ifndef CubeDataThread_h
 #define CubeDataThread_h
 
-#include <QObject>
 #include <QThread>
-
-namespace Isis {
-  class Cube;
-  class Filename;
-  class Brick;
-  class UniversalGroundMap;
-};
 
 template<typename T> class QList;
 
@@ -20,6 +12,10 @@ class QReadWriteLock;
 class QMutex;
 
 namespace Isis {
+  class Cube;
+  class Filename;
+  class Brick;
+  class UniversalGroundMap;
 
   /**
    * @brief Encapsulation of Cube I/O with Change Notifications
