@@ -5,6 +5,7 @@
 #include <iostream>
 
 #include <QFontMetrics>
+#include <QLocale>
 #include <QVariant>
 
 #include "iException.h"
@@ -205,8 +206,10 @@ namespace Isis
   QString AbstractTreeItem::catchNull(double d)
   {
     QString str = "NULL";
-    if (d != Null)
-      str = QString::number(d);
+    if (d != Null) {
+      QLocale locale;
+      str = locale.toString(d, 'f');
+    }
 
     return str;
   }
@@ -215,8 +218,10 @@ namespace Isis
   double AbstractTreeItem::catchNull(QString str)
   {
     double d = Null;
-    if (str.toLower() != "null")
-      d = str.toDouble();
+    if (str.toLower() != "null") {
+      QLocale locale;
+      d = locale.toDouble(str);
+    }
 
     return d;
   }
