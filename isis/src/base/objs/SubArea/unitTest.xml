@@ -60,7 +60,7 @@
         <filter>
           *.cub
         </filter>
-        <default><item>/tmp/isissubarea_01.cub</item></default>
+        <default><item>$TEMPORARY/isissubarea_01.cub</item></default>
       </parameter>
     </group>
   </groups>
