@@ -28,25 +28,32 @@ using namespace std;
 using namespace Isis;
 
 // Deletion test
-bool ShouldDelete(ControlPoint *point);
+bool shouldDelete(ControlPoint *point);
 
 // Mutator methods
-void IgnorePoint(ControlNet &cnet, ControlPoint *point, string cause);
-void IgnoreMeasure(ControlNet &cnet, ControlPoint *point,
+void ignorePoint(ControlNet &cnet, ControlPoint *point, string cause);
+void ignoreMeasure(ControlNet &cnet, ControlPoint *point,
                    ControlMeasure *measure, string cause);
-void DeletePoint(ControlNet &cnet, int cp);
-//void DeleteMeasure(ControlNet & cnet, ControlPoint * point, int cm);
-void DeleteMeasure(ControlPoint *point, int cm);
+void deletePoint(ControlNet &cnet, int cp);
+void deleteMeasure(ControlPoint *point, int cm);
 
 // Edit passes
-void PopulateLog(ControlNet &cnet);
-void ProcessControlPoints(string fileName, ControlNet &cnet);
-void ProcessControlMeasures(string fileName, ControlNet &cnet);
-void CheckAllMeasureValidity(ControlNet &cnet, string cubeList);
+void populateLog(ControlNet &cnet);
+void processControlPoints(string fileName, ControlNet &cnet);
+void processControlMeasures(string fileName, ControlNet &cnet);
+void checkAllMeasureValidity(ControlNet &cnet, string cubeList);
 
 // Validity test
-MeasureValidationResults ValidateMeasure(const ControlMeasure *measure,
+MeasureValidationResults validateMeasure(const ControlMeasure *measure,
     Cube *cube, Camera *camera);
+
+// Logging helpers
+void logResult(QMap<string, string> *pointsLog, string pointId, string cause);
+void logResult(QMap<string, PvlGroup> *measuresLog,
+    string pointId, string serial, string cause);
+PvlObject createLog(string label, QMap<string, string> *pointsMap);
+PvlObject createLog(string label,
+    QMap<string, string> *pointsMap, QMap<string, PvlGroup> *measuresMap);
 
 void PrintTemp();
 void EditDefFile();
@@ -65,13 +72,13 @@ int numMeasuresDeleted;
 bool deleteIgnored;
 bool preservePoints;
 bool retainRef;
-bool comments;
 bool keepLog;
-PvlObject *ignoredPoints;
+
+QMap<string, string> * ignoredPoints;
 QMap<string, PvlGroup> * ignoredMeasures;
-PvlObject *commentPoints;
-PvlObject * editLockedMeasures;
-PvlObject * editLockedPoints;
+QMap<string, string> * retainedReferences;
+QMap<string, string> * editLockedPoints;
+QMap<string, PvlGroup> * editLockedMeasures;
 
 ControlNetValidMeasure *validator;
 
@@ -81,7 +88,6 @@ void IsisMain() {
   // Reset the counts of points and measures deleted
   numPointsDeleted = 0;
   numMeasuresDeleted = 0;
-  comments = false;
 
   // Interface for getting user parameters
   UserInterface &ui = Application::GetUserInterface();
@@ -95,15 +101,15 @@ void IsisMain() {
   keepLog = ui.WasEntered("LOG");
   ignoredPoints = NULL;
   ignoredMeasures = NULL;
-  commentPoints = NULL;
-  editLockedMeasures = NULL;
+  retainedReferences = NULL;
   editLockedPoints = NULL;
+  editLockedMeasures = NULL;
 
   // If the user wants to keep a log, go ahead and populate it with all the
   // existing ignored points and measures
   ControlNet cnet(ui.GetFilename("CNET"));
   if (keepLog && cnet.GetNumPoints() > 0)
-    PopulateLog(cnet);
+    populateLog(cnet);
 
   /*
    * As a first pass, just try and delete anything that's already ignored
@@ -126,27 +132,26 @@ void IsisMain() {
     for (int cp = cnet.GetNumPoints() - 1; cp >= 0; cp--) {
       ControlPoint *point = cnet.GetPoint(cp);
       if (point->IsIgnored()) {
-        DeletePoint(cnet, cp);
+        deletePoint(cnet, cp);
       }
       else {
         for (int cm = point->GetNumMeasures() - 1; cm >= 0; cm--) {
           if (point->GetMeasure(cm)->IsIgnored()) {
             if (cm == point->IndexOfRefMeasure()) {
               // If the reference is ignored, the point must ignored too
-              IgnorePoint(cnet, point, "Reference measure ignored");
+              ignorePoint(cnet, point, "Reference measure ignored");
             }
             else {
               // Can't delete the reference without deleting the whole point
-              //DeleteMeasure(cnet, point, cm);
-              DeleteMeasure(point, cm);
+              deleteMeasure(point, cm);
             }
           }
         }
 
         // Check if the number of measures in the point is zero or there are too
         // few measures in the point and we don't want to preserve them.
-        if (ShouldDelete(point)) {
-          DeletePoint(cnet, cp);
+        if (shouldDelete(point)) {
+          deletePoint(cnet, cp);
         }
       }
 
@@ -157,13 +162,13 @@ void IsisMain() {
   //List has Points Ids
   if (ui.WasEntered("POINTLIST") && cnet.GetNumPoints() > 0) {
     string pointlistFilename = ui.GetFilename("POINTLIST");
-    ProcessControlPoints(pointlistFilename, cnet);
+    processControlPoints(pointlistFilename, cnet);
   }
 
   //List has Cube file names
   if (ui.WasEntered("CUBELIST") && cnet.GetNumPoints() > 0) {
     string ignorelistFilename = ui.GetFilename("CUBELIST");
-    ProcessControlMeasures(ignorelistFilename, cnet);
+    processControlMeasures(ignorelistFilename, cnet);
   }
 
   // Perform validity check
@@ -187,7 +192,7 @@ void IsisMain() {
     // User also provided a list of all serial numbers corresponding to every
     // cube in the control network
     string cubeList = ui.GetFilename("FROMLIST");
-    CheckAllMeasureValidity(cnet, cubeList);
+    checkAllMeasureValidity(cnet, cubeList);
 
     // Delete the validator
     if (validator != NULL) {
@@ -206,53 +211,38 @@ void IsisMain() {
     outputLog.AddKeyword(PvlKeyword("PointsDeleted", numPointsDeleted));
     outputLog.AddKeyword(PvlKeyword("MeasuresDeleted", numMeasuresDeleted));
 
-    outputLog.AddObject(*editLockedPoints);
-    outputLog.AddObject(*editLockedMeasures);
-    if (comments) {
-      outputLog.AddObject(*commentPoints);
-    }
+    PvlObject lockedLog = createLog(
+        "EditLocked", editLockedPoints, editLockedMeasures);
+    outputLog.AddObject(lockedLog);
+
+    outputLog.AddObject(createLog("RetainedReferences", retainedReferences));
+
     // Depending on whether the user chose to delete ignored points and
     // measures, the log will either contain reasons for being ignored, or
     // reasons for being deleted
-    PvlObject editLog((deleteIgnored) ? "Deleted" : "Ignored");
-    editLog.AddObject(*ignoredPoints);
-
-    // Get all the groups of measures from the map
-    PvlObject measuresLog("Measures");
-    QList<PvlGroup> measureGroups = ignoredMeasures->values();
-
-    for (int i = 0; i < measureGroups.size(); i++) {
-      measuresLog.AddGroup(measureGroups.at(i));
-    }
-
-    editLog.AddObject(measuresLog);
-    outputLog.AddObject(editLog);
+    PvlObject ignoredLog = createLog(
+        deleteIgnored ? "Deleted" : "Ignored", ignoredPoints, ignoredMeasures);
+    outputLog.AddObject(ignoredLog);
 
     // Write the log
     string logFilename = ui.GetFilename("LOG");
     outputLog.Write(logFilename);
 
     // Delete the structures keeping track of the ignored points and measures
-    if (ignoredPoints != NULL) {
-      delete ignoredPoints;
-      ignoredPoints = NULL;
-    }
-    if (ignoredMeasures != NULL) {
-      delete ignoredMeasures;
-      ignoredMeasures = NULL;
-    }
-    if (commentPoints != NULL) {
-      delete commentPoints;
-      commentPoints = NULL;
-    }
-    if (editLockedPoints != NULL) {
-      delete editLockedPoints;
-      editLockedPoints = NULL;
-    }
-    if (editLockedMeasures != NULL) {
-      delete editLockedMeasures;
-      editLockedMeasures = NULL;
-    }
+    delete ignoredPoints;
+    ignoredPoints = NULL;
+
+    delete ignoredMeasures;
+    ignoredMeasures = NULL;
+
+    delete retainedReferences;
+    retainedReferences = NULL;
+
+    delete editLockedPoints;
+    editLockedPoints = NULL;
+
+    delete editLockedMeasures;
+    editLockedMeasures = NULL;
   }
 
   // Write the network
@@ -269,7 +259,7 @@ void IsisMain() {
  *
  * @return Whether or not the point should be deleted
  */
-bool ShouldDelete(ControlPoint *point) {
+bool shouldDelete(ControlPoint *point) {
   // If the point only has one measure, then unless it's a fixed point or the
   // user wishes to preserve such points, it should be deleted. As a side
   // effect, this check will also delete empty points that satisfy this
@@ -301,17 +291,11 @@ bool ShouldDelete(ControlPoint *point) {
  * @param point The Control Point we wish to ignore
  * @param cause A prose description of why the point was ignored (for logging)
  */
-void IgnorePoint(ControlNet &cnet, ControlPoint *point, string cause) {
+void ignorePoint(ControlNet &cnet, ControlPoint *point, string cause) {
   ControlPoint::Status result = point->SetIgnored(true);
-  if (keepLog) {
-    if (result == ControlPoint::Success) {
-      // Label the keyword as the Point ID, and make the cause into the value
-      ignoredPoints->AddKeyword(PvlKeyword(point->GetId(), cause));
-    }
-    else if (point->IsEditLocked() && cause == "EditLocked point skipped") {
-      editLockedPoints->AddKeyword(PvlKeyword(point->GetId(),cause));
-    }
-  }
+
+  logResult(result == ControlPoint::Success ? ignoredPoints : editLockedPoints,
+      point->GetId(), cause);
 }
 
 
@@ -325,35 +309,14 @@ void IgnorePoint(ControlNet &cnet, ControlPoint *point, string cause) {
  * @param cause   A prose description of why the measure was ignored (for
  *                logging)
  */
-void IgnoreMeasure(ControlNet &cnet, ControlPoint *point,
+void ignoreMeasure(ControlNet &cnet, ControlPoint *point,
                    ControlMeasure *measure, string cause) {
 
   ControlMeasure::Status result = measure->SetIgnored(true);
-  if (keepLog && result == ControlMeasure::Success) {
-    // Make the keyword label the measure Serial Number, and the cause into
-    // the value
-    PvlKeyword ignoredMeasure(
-      PvlKeyword(measure->GetCubeSerialNumber(), cause));
 
-    // Using a map to make accessing by Point ID a O(1) to O(lg n) operation
-    if (ignoredMeasures->contains(point->GetId())) {
-      // If the map already has a group for the given Point ID, simply add the
-      // new measure to it
-      PvlGroup &pointGroup = (*ignoredMeasures)[point->GetId()];
-      pointGroup.AddKeyword(ignoredMeasure);
-    }
-    else {
-      // Else there is no group for the Point ID of the measure being ignored,
-      // so make a new group, add the measure, and insert it into the map
-      
-      PvlGroup pointGroup(point->GetId());
-      pointGroup.AddKeyword(ignoredMeasure);
-      (*ignoredMeasures)[point->GetId()] = pointGroup;
-    }
-  }
-  else if (measure->IsEditLocked() && cause == "EditLocked measure skipped") {
-    editLockedMeasures->AddKeyword(PvlKeyword(point->GetId(), cause));
-  }
+  logResult(
+      result == ControlMeasure::Success ? ignoredMeasures : editLockedMeasures,
+      point->GetId(), measure->GetCubeSerialNumber(), cause);
 }
 
 
@@ -363,7 +326,7 @@ void IgnoreMeasure(ControlNet &cnet, ControlPoint *point,
  * @param cnet The Control Network being modified
  * @param cp   Index into the Control Network for the point we wish to delete
  */
-void DeletePoint(ControlNet &cnet, int cp) {
+void deletePoint(ControlNet &cnet, int cp) {
   ControlPoint *point = cnet.GetPoint(cp);
 
   // Do the edit lock check up front so we don't accidentally log that a point
@@ -376,14 +339,14 @@ void DeletePoint(ControlNet &cnet, int cp) {
       // If the point's being deleted but it wasn't set to ignore, it can only
       // be because the point has two few measures remaining
       if (!point->IsIgnored())
-        IgnorePoint(cnet, point, "Too few measures");
+        ignorePoint(cnet, point, "Too few measures");
 
       // For any measures not ignored, mark their cause for deletion as being
       // caused by the point's deletion
       for (int cm = 0; cm < point->GetNumMeasures(); cm++) {
         ControlMeasure *measure = point->GetMeasure(cm);
         if (!measure->IsIgnored())
-          IgnoreMeasure(cnet, point, measure, "Point deleted");
+          ignoreMeasure(cnet, point, measure, "Point deleted");
       }
     }
 
@@ -392,7 +355,7 @@ void DeletePoint(ControlNet &cnet, int cp) {
   else {
     for (int cm = 0; cm < point->GetNumMeasures(); cm++) {
       if (point->GetMeasure(cm)->IsEditLocked()) {
-        IgnorePoint(cnet, point, "EditLocked point skipped");
+        ignorePoint(cnet, point, "EditLocked point skipped");
       }
     }
   }
@@ -406,7 +369,7 @@ void DeletePoint(ControlNet &cnet, int cp) {
  * @param point The Control Point of the Control Measure we wish to delete
  * @param cm    Index into the Control Network for the measure we wish to delete
  */
-void DeleteMeasure(ControlPoint *point, int cm) {
+void deleteMeasure(ControlPoint *point, int cm) {
   if (point->Delete(cm) == ControlMeasure::Success) numMeasuresDeleted++;
 }
 
@@ -416,15 +379,14 @@ void DeleteMeasure(ControlPoint *point, int cm) {
  *
  * @param cnet The Control Network being modified
  */
-void PopulateLog(ControlNet &cnet) {
-  ignoredPoints = new PvlObject("Points");
+void populateLog(ControlNet &cnet) {
+  ignoredPoints = new QMap<string, string>;
   ignoredMeasures = new QMap<string, PvlGroup>;
+
+  retainedReferences = new QMap<string, string>;
   
-  commentPoints = new PvlObject("RetainedPointReference");
-  
-  editLockedMeasures = new PvlObject("EditLockedMeasures");
-  editLockedPoints = new PvlObject("EditLockedPoints");
-  
+  editLockedPoints = new QMap<string, string>;
+  editLockedMeasures = new QMap<string, PvlGroup>;
 
   Progress progress;
   progress.SetText("Initializing Log File");
@@ -435,7 +397,7 @@ void PopulateLog(ControlNet &cnet) {
     ControlPoint *point = cnet.GetPoint(cp);
 
     if (point->IsIgnored()) {
-      IgnorePoint(cnet, point, "Ignored from input");
+      ignorePoint(cnet, point, "Ignored from input");
     }
 
     for (int cm = 0; cm < point->GetNumMeasures(); cm++) {
@@ -445,11 +407,11 @@ void PopulateLog(ControlNet &cnet) {
         if (cm == point->IndexOfRefMeasure()) {
           // If the reference is ignored, the point must ignored too
           if (!point->IsIgnored()) {
-            IgnorePoint(cnet, point, "Reference measure ignored");
+            ignorePoint(cnet, point, "Reference measure ignored");
           }
         }
 
-        IgnoreMeasure(cnet, point, measure, "Ignored from input");
+        ignoreMeasure(cnet, point, measure, "Ignored from input");
       }
     }
 
@@ -467,7 +429,7 @@ void PopulateLog(ControlNet &cnet) {
  * @param fileName Name of the file containing the list of Control Points
  * @param cnet     The Control Network being modified
  */
-void ProcessControlPoints(string fileName, ControlNet &cnet) {
+void processControlPoints(string fileName, ControlNet &cnet) {
   ControlPointList cpList(fileName);
 
   Progress progress;
@@ -481,25 +443,25 @@ void ProcessControlPoints(string fileName, ControlNet &cnet) {
     // Compare each Point Id listed with the Point in the
     // Control Network for according exclusion
     if (!point->IsIgnored() && cpList.HasControlPoint(point->GetId())) {
-      IgnorePoint(cnet, point, "Point ID in POINTLIST");
+      ignorePoint(cnet, point, "Point ID in POINTLIST");
     }
 
     if (deleteIgnored) {
       //look for previously ignored control points
       if (point->IsIgnored() || point->GetRefMeasure()->IsIgnored()) {
-        DeletePoint(cnet, cp);
+        deletePoint(cnet, cp);
       }
       else {
         //look for previously ignored control measures
         for (int cm = point->GetNumMeasures() - 1; cm >= 0; cm--) {
           if (point->GetMeasure(cm)->IsIgnored() && deleteIgnored) {
-            DeleteMeasure(point, cm);
+            deleteMeasure(point, cm);
           }
         }
         // Check if there are too few measures in the point or the point was
         // previously ignored
-        if (ShouldDelete(point)) {
-          DeletePoint(cnet, cp);
+        if (shouldDelete(point)) {
+          deletePoint(cnet, cp);
         }
       }
     }
@@ -519,7 +481,7 @@ void ProcessControlPoints(string fileName, ControlNet &cnet) {
  *                 ignored
  * @param cnet     The Control Network being modified
  */
-void ProcessControlMeasures(string fileName, ControlNet &cnet) {
+void processControlMeasures(string fileName, ControlNet &cnet) {
   SerialNumberList snl = fileName;
 
   Progress progress;
@@ -536,24 +498,21 @@ void ProcessControlMeasures(string fileName, ControlNet &cnet) {
       ControlMeasure *measure = point->GetMeasure(cm);
       
       if (!point->IsIgnored() && point->GetMeasure(cm)->IsEditLocked()) {
-        IgnoreMeasure(cnet, point, measure, "EditLocked measure skipped");
+        ignoreMeasure(cnet, point, measure, "EditLocked measure skipped");
       }
     
       string serialNumber = measure->GetCubeSerialNumber();
       
-      if (snl.HasSerialNumber(serialNumber)){
+      if (snl.HasSerialNumber(serialNumber)) {
+        string cause = "Serial Number in CUBELIST";
         if (cm == point->IndexOfRefMeasure() && retainRef) {
-          comments = true;
-          commentPoints->AddKeyword( 
-            PvlKeyword(point->GetId(),
-                "Reference Measure is in the Ignore CubeList"));
+          logResult(retainedReferences, point->GetId(), cause);
         } 
-        else if (!measure->IsIgnored() || (cm == point->IndexOfRefMeasure() &&
-            !retainRef)) {
-          IgnoreMeasure(cnet, point, measure, "Serial Number in CUBELIST");
+        else if (!measure->IsIgnored() || cm == point->IndexOfRefMeasure()) {
+          ignoreMeasure(cnet, point, measure, cause);
   
           if (cm == point->IndexOfRefMeasure() && !point->IsIgnored()) {
-            IgnorePoint(cnet, point, "Reference measure ignored");
+            ignorePoint(cnet, point, "Reference measure ignored");
           } 
         }
       }
@@ -561,13 +520,13 @@ void ProcessControlMeasures(string fileName, ControlNet &cnet) {
       //also look for previously ignored control measures
       if (deleteIgnored && measure->IsIgnored() &&
           cm != point->IndexOfRefMeasure()) {
-        DeleteMeasure(point, cm);
+        deleteMeasure(point, cm);
       }
     }
     // Check if there are too few measures in the point or the point was
     // previously ignored
-    if (ShouldDelete(point)) {
-      DeletePoint(cnet, cp);
+    if (shouldDelete(point)) {
+      deletePoint(cnet, cp);
     }
 
     progress.CheckStatus();
@@ -584,7 +543,7 @@ void ProcessControlMeasures(string fileName, ControlNet &cnet) {
  * @param cubeList Name of the file containing the list of all Serial Numbers
  *                 in the network
  */
-void CheckAllMeasureValidity(ControlNet &cnet, string cubeList) {
+void checkAllMeasureValidity(ControlNet &cnet, string cubeList) {
   SerialNumberList serialNumbers(cubeList);
 
   QList<ControlCubeGraphNode *> graphNodes = cnet.GetCubeGraphNodes();
@@ -627,26 +586,20 @@ void CheckAllMeasureValidity(ControlNet &cnet, string cubeList) {
 
       if (!measure->IsIgnored()) {
         MeasureValidationResults results =
-            ValidateMeasure(measure, cube, camera);
+            validateMeasure(measure, cube, camera);
 
         if (!results.isValid()) {
+          string failure = results.toString().toStdString();
+          string cause = "Validity Check " + failure;
+
           if (measure == point->GetRefMeasure() && retainRef) {
-            comments = true;
-            if (commentPoints->HasKeyword(point->GetId())) {
-              PvlKeyword & key = commentPoints->FindKeyword(point->GetId());
-              key += "\nReference Measure is not Validated";
-            }
-            else {
-              commentPoints->AddKeyword(PvlKeyword(point->GetId(),
-                    "Reference Measure is not Validated"));
-            }
+            logResult(retainedReferences, point->GetId(), cause);
           }
           else {
-            string failure = results.toString().toStdString();
-            IgnoreMeasure(cnet, point, measure, "Validity Check " + failure);
+            ignoreMeasure(cnet, point, measure, cause);
   
             if (measure == point->GetRefMeasure()) {
-              IgnorePoint(cnet, point, "Reference measure ignored");
+              ignorePoint(cnet, point, "Reference measure ignored");
             }
           }
         }
@@ -666,14 +619,14 @@ void CheckAllMeasureValidity(ControlNet &cnet, string cubeList) {
       // Also look for previously ignored control measures
       if (deleteIgnored && measure->IsIgnored() &&
           measure != point->GetRefMeasure()) {
-        DeleteMeasure(point, cm);
+        deleteMeasure(point, cm);
       }
     }
 
     // Check if there are too few measures in the point or the point was
     // previously ignored
-    if (ShouldDelete(point))
-      DeletePoint(cnet, cp);
+    if (shouldDelete(point))
+      deletePoint(cnet, cp);
   }
 }
 
@@ -689,13 +642,80 @@ void CheckAllMeasureValidity(ControlNet &cnet, string cubeList) {
  * @return The results of validating the measure as an object containing the
  *         validity and a formatted error (or success) message
  */
-MeasureValidationResults ValidateMeasure(const ControlMeasure *measure,
+MeasureValidationResults validateMeasure(const ControlMeasure *measure,
     Cube *cube, Camera *camera) {
 
   MeasureValidationResults results =
       validator->ValidStandardOptions(measure, cube, camera);
 
   return results;
+}
+
+
+void logResult(QMap<string, string> *pointsLog, string pointId, string cause) {
+  if (keepLog) {
+    // Label the keyword as the Point ID, and make the cause into the value
+    (*pointsLog)[pointId] = cause;
+  }
+}
+
+
+void logResult(QMap<string, PvlGroup> *measuresLog,
+    string pointId, string serial, string cause) {
+
+  if (keepLog) {
+    // Make the keyword label the measure Serial Number, and the cause into the
+    // value
+    PvlKeyword measureMessage(PvlKeyword(serial, cause));
+
+    // Using a map to make accessing by Point ID a O(1) to O(lg n) operation
+    if (measuresLog->contains(pointId)) {
+      // If the map already has a group for the given Point ID, simply add the
+      // new measure to it
+      PvlGroup &pointGroup = (*measuresLog)[pointId];
+      pointGroup.AddKeyword(measureMessage);
+    }
+    else {
+      // Else there is no group for the Point ID of the measure being ignored,
+      // so make a new group, add the measure, and insert it into the map
+      PvlGroup pointGroup(pointId);
+      pointGroup.AddKeyword(measureMessage);
+      (*measuresLog)[pointId] = pointGroup;
+    }
+  }
+}
+
+
+PvlObject createLog(string label, QMap<string, string> *pointsMap) {
+  PvlObject pointsLog(label);
+
+  QList<string> pointIds = pointsMap->keys();
+  for (int i = 0; i < pointIds.size(); i++) {
+    string pointId = pointIds.at(i);
+    pointsLog.AddKeyword(PvlKeyword(pointId, (*pointsMap)[pointId]));
+  }
+
+  return pointsLog;
+}
+
+
+PvlObject createLog(string label,
+    QMap<string, string> *pointsMap, QMap<string, PvlGroup> *measuresMap) {
+
+  PvlObject editLog(label);
+
+  PvlObject pointsLog = createLog("Points", pointsMap);
+  editLog.AddObject(pointsLog);
+
+  // Get all the groups of measures from the map
+  PvlObject measuresLog("Measures");
+  QList<PvlGroup> measureGroups = measuresMap->values();
+
+  for (int i = 0; i < measureGroups.size(); i++)
+    measuresLog.AddGroup(measureGroups.at(i));
+
+  editLog.AddObject(measuresLog);
+  return editLog;
 }
 
 
