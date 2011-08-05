@@ -116,8 +116,8 @@ namespace Isis {
           "Please run camstats with the attach option. "
           "Camera statistics will be unavailable for [" +
               m_filename.toStdString() + "]", _FILEINFO_);
-      e.Report();
 
+      e.Report();
       e.Clear();
     }
   }

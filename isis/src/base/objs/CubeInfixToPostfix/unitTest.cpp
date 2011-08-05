@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
     }
     catch(iException e) {
       e.Report(false);
-      iException::Clear();
+      e.Clear();
     }
   }
 }

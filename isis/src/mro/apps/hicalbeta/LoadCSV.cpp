@@ -173,7 +173,7 @@ namespace Isis {
 
     // Check for errors
     if (errors.size() > 0) {
-      iException::Clear();
+      //iException::Clear(); Not sure how this could ever do anything
       std::ostringstream mess;
       mess << "Conversion errors in CSV file " + csvfile + ": Errors: ";
       std::copy(errors.begin(), errors.end(), 

@@ -205,7 +205,7 @@ namespace Isis {
           (double)data;
         }
         catch(iException e) {
-          iException::Clear();
+          e.Clear();
           throw iException::Message(iException::User, "The operator '" + data + "' is not recognized.", _FILEINFO_);
         }
 

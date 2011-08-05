@@ -291,7 +291,7 @@ void CompareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2) {
       }
     }
     catch(iException e) {
-      iException::Clear();
+      e.Clear();
 
       if(!val1.Equal(val2)) {
         filesMatch = false;

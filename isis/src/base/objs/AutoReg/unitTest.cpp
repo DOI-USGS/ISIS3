@@ -349,8 +349,8 @@ void Doit(Isis::PvlObject &obj) {
     p_ar->SetResidualTesting(true);
   }
   catch(Isis::iException &error) {
-    error.Clear();
     iString err = error.what();
+    error.Clear();
 
     // We need to get rid of the contents of the second [] on each line to
     // ensure file paths do not persist.

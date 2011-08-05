@@ -25,6 +25,9 @@
 
 #include <sstream>
 
+#include <QReadWriteLock>
+#include <QThread>
+
 #include "iException.h"
 #include "iString.h"
 #include "Pvl.h"
@@ -34,6 +37,41 @@
 
 using namespace std;
 namespace Isis {
+  QReadWriteLock *iException::p_exceptionsLock = new QReadWriteLock;
+  iException *iException::p_exception = NULL;
+  QMap<QThread *, QList<iException::Info> > *iException::p_list = NULL;
+
+
+  iException::iException(const iException &other) : exception(other) {
+    p_what = NULL;
+
+    if (other.p_what) {
+      // We really need to not copy this
+      // p_what = new string(*other.p_what);
+    }
+
+    p_reportFileLine = other.p_reportFileLine;
+    p_pvlFormat = other.p_pvlFormat;
+  }
+
+
+  iException &iException::operator=(const iException &other) {
+    if (this != &other) {
+      delete p_what;
+      p_what = NULL;
+
+      if (other.p_what) {
+      // We really need to not copy this
+      //    p_what = new string(*other.p_what);
+      }
+
+      p_reportFileLine = other.p_reportFileLine;
+      p_pvlFormat = other.p_pvlFormat;
+    }
+
+    return *this;
+  }
+
   /**
    * Constructs a blank iException. Checks if file and line number should be
    * output, and whether the exception should be reported in PVL format.
@@ -48,13 +86,12 @@ namespace Isis {
     p_pvlFormat = false;
     Isis::iString pvlForm = (std::string) ef["Format"];
     p_pvlFormat = (pvlForm.UpCase() == "PVL");
+
+    p_what = NULL;
+
     atexit(Shutdown);
   }
 
-  //! Exception object pointer (Default is NULL)
-  iException *iException::p_exception = NULL;
-  //! The list of exception information (From Info class)
-  QList<iException::Info> iException::p_list;
 
   /**
    * Adds a message to an existing iException object (or creates a new one if
@@ -67,19 +104,53 @@ namespace Isis {
    */
   iException &iException::Message(iException::errType t, const std::string &m,
                                   const char *f, int l) {
-    if(p_exception == NULL) {
-      p_exception = new iException();
+    // We're making p_exceptions (the Map) thread-safe, not the exceptions
+    //   inside of it. This means the exceptions are now on a per-thread basis
+    //   and it's still dangerous to access an instance of iException in a
+    //   multi-threaded way.
+    p_exceptionsLock->lockForRead();
+
+    QThread *thisThread = QThread::currentThread();
+    if (!p_list || !p_list->contains(thisThread)) {
+
+      p_exceptionsLock->unlock();
+      // p_exceptions can do anything between the above line and the next... so
+      //   we need to re-check states after we've re-locked.
+      p_exceptionsLock->lockForWrite();
+
+      if (!p_list) {
+        p_list = new QMap< QThread *, QList<Info> >;
+        p_exception = new iException;
+      }
+
+      if (!p_list->contains(thisThread)) {
+        p_list->insert(thisThread, QList<Info>());
+      }
+      else {
+        // This shouldn't be possible, another thread isn't going to insert
+        //   this thread into the map.
+        ASSERT(0);
+      }
     }
 
+    // This is in here because the preferences singleton isn't thread-safe
+    //   or re-entrant on instantiation.
     PvlGroup &errPref = Preference::Preferences().FindGroup("ErrorFacility");
+
     bool printTrace = false;
 
     if(errPref.HasKeyword("StackTrace")) {
       printTrace = (((iString)errPref["StackTrace"][0]).UpCase() == "ON");
     }
 
-    if(printTrace && p_list.empty()) {
-      createStackTrace();
+    if(printTrace && p_list->value(thisThread).empty()) {
+      QList<Info> newList = (*p_list)[thisThread];
+      Info trace = createStackTrace();
+
+      if (trace.message.size()) {
+        newList.append(trace);
+        (*p_list)[thisThread] = newList;
+      }
     }
 
     Info i;
@@ -88,7 +159,11 @@ namespace Isis {
     i.filename = f;
     i.lineNumber = l;
 
-    p_list.push_back(i);
+    QList<Info> newList = (*p_list)[thisThread];
+    newList.append(i);
+    (*p_list)[thisThread] = newList;
+
+    p_exceptionsLock->unlock();
 
     p_exception->describe();
 
@@ -102,23 +177,27 @@ namespace Isis {
   /**
    * Stores what happened in a member std::string.
    */
-  void iException::describe() {
-    if(p_list.size() > 0) {
-      std::string message;
-      for(int i = p_list.size() - 1; i >= 0; i--) {
-        message += "**" + enumString(p_list[i].type) + "** " +
-                   p_list[i].message;
-        if(p_reportFileLine) {
-          message += " in " + p_list[i].filename +
-                     " at " + Isis::iString(p_list[i].lineNumber);
-        }
-        if(i != 0) message += "\n";
-      }
+  void iException::describe() const {
+    QThread *thisThread = QThread::currentThread();
 
-      p_what = message;
-    }
-    else {
-      p_what = "";
+    if (!p_what) {
+      QReadLocker lock(p_exceptionsLock);
+      if(p_list) {
+        QList<Info> messages = (*p_list)[thisThread];
+        std::string message;
+        for(int i = messages.size() - 1; i >= 0; i--) {
+
+          message += "**" + enumString(messages[i].type) + "** " +
+                    messages[i].message;
+          if(p_reportFileLine) {
+            message += " in " + messages[i].filename +
+                      " at " + Isis::iString(messages[i].lineNumber);
+          }
+          if(i != 0) message += "\n";
+        }
+
+        p_what = new string(message);
+      }
     }
   }
 
@@ -130,8 +209,10 @@ namespace Isis {
    * @return The message stating what happened and where.
    */
   const char *iException::what() const throw() {
-    if(p_what != "") {
-      return p_what.c_str();
+    describe();
+
+    if(p_what && *p_what != "") {
+      return p_what->c_str();
     }
     else {
       return NULL;
@@ -143,13 +224,17 @@ namespace Isis {
    * @return The type of exception (None if no type).
    */
   iException::errType iException::Type() const {
-    if(p_list.size() > 0) {
-      int i = p_list.size() - 1;
-      return p_list[i].type;
+    QThread *thisThread = QThread::currentThread();
+    QReadLocker lock(p_exceptionsLock);
+    if(p_list) {
+      QList<Info> messages = (*p_list)[thisThread];
+
+      if(!messages.isEmpty()) {
+        return messages.last().type;
+      }
     }
-    else {
-      return iException::None;
-    }
+
+    return None;
   }
 
   /**
@@ -161,13 +246,18 @@ namespace Isis {
     return p_pvlFormat;
   }
 
+
   void iException::Shutdown() {
-    if(p_exception) {
-      ASSERT_PTR(p_exception);
-      delete p_exception;
-      p_exception = NULL;
-    }
+    delete p_list;
+    p_list = NULL;
+
+    delete p_exception;
+    p_exception = NULL;
+
+    delete p_exceptionsLock;
+    p_exceptionsLock = NULL;
   }
+
 
   /**
    * Reports the exception to output.
@@ -202,17 +292,22 @@ namespace Isis {
   Pvl iException::PvlErrors() {
     Isis::Pvl errors;
 
-    for(int i = p_list.size() - 1; i >= 0; i--) {
-      PvlGroup errGroup("Error");
+    QReadLocker lock(p_exceptionsLock);
+    if(p_list) {
+      QList<Info> messages = (*p_list)[QThread::currentThread()];
 
-      errGroup += Isis::PvlKeyword("Program", Isis::Application::Name());
-      errGroup += Isis::PvlKeyword("Class", enumString(p_list[i].type));
-      errGroup += Isis::PvlKeyword("Code", (int)p_list[i].type);
-      errGroup += Isis::PvlKeyword("Message", p_list[i].message);
-      errGroup += Isis::PvlKeyword("File", p_list[i].filename);
-      errGroup += Isis::PvlKeyword("Line", p_list[i].lineNumber);
+      for(int i = messages.size() - 1; i >= 0; i--) {
+        PvlGroup errGroup("Error");
 
-      errors.AddGroup(errGroup);
+        errGroup += Isis::PvlKeyword("Program", Isis::Application::Name());
+        errGroup += Isis::PvlKeyword("Class", enumString(messages[i].type));
+        errGroup += Isis::PvlKeyword("Code", (int)messages[i].type);
+        errGroup += Isis::PvlKeyword("Message", messages[i].message);
+        errGroup += Isis::PvlKeyword("File", messages[i].filename);
+        errGroup += Isis::PvlKeyword("Line", messages[i].lineNumber);
+
+        errors.AddGroup(errGroup);
+      }
     }
 
     return errors;
@@ -223,22 +318,30 @@ namespace Isis {
    */
   std::string iException::Errors() {
     std::string message;
-    for(int i = p_list.size() - 1; i >= 0; i--) {
-      // Construct the line-based message
-      message += "**" + enumString(p_list[i].type) + "** " +
-                 p_list[i].message;
-      if(p_reportFileLine) {
-        message += " in " + p_list[i].filename +
-                   " at " + Isis::iString(p_list[i].lineNumber);
+
+    QReadLocker lock(p_exceptionsLock);
+    if(p_list) {
+      QList<Info> messages = (*p_list)[QThread::currentThread()];
+      for(int i = messages.size() - 1; i >= 0; i--) {
+        // Construct the line-based message
+        message += "**" + enumString(messages[i].type) + "** " +
+                  messages[i].message;
+        if(p_reportFileLine) {
+          message += " in " + messages[i].filename +
+                    " at " + iString(messages[i].lineNumber);
+        }
+        if(i != 0) message += "\n";
       }
-      if(i != 0) message += "\n";
     }
     return message;
   }
 
   //! Clears the list of exceptions
   void iException::Clear() {
-    p_list.clear();
+    QReadLocker lock(p_exceptionsLock);
+    if(p_list) {
+      (*p_list)[QThread::currentThread()] = QList<Info>();
+    }
   }
 
   /**
@@ -249,37 +352,26 @@ namespace Isis {
     switch(t) {
       case User:
         return "USER ERROR";
-
       case Programmer:
         return "PROGRAMMER ERROR";
-
       case Pvl:
         return "PVL ERROR";
-
       case Io:
         return "I/O ERROR";
-
       case Camera:
         return "CAMERA ERROR";
-
       case Projection:
         return "PROJECTION ERROR";
-
       case Parse:
         return "PARSE ERROR";
-
       case Math:
         return "MATH ERROR";
-
       case Spice:
         return "SPICE ERROR";
-
       case Cancel:
         return "CANCEL";
-
       case System:
         return "SYSTEM ERROR";
-
       default:
         return "UNKNOWN ERROR";
     }
@@ -303,7 +395,7 @@ namespace Isis {
     return None;
   }
 
-  void iException::createStackTrace() {
+  iException::Info iException::createStackTrace() {
     Info stackTraceInfo;
     stackTraceInfo.type = iException::Programmer;
     stackTraceInfo.filename = "N/A";
@@ -318,7 +410,10 @@ namespace Isis {
     }
 
     if(theStack.size() != 0) {
-      p_list.push_back(stackTraceInfo);
+      return stackTraceInfo;
+    }
+    else {
+      return Info();
     }
   }
 }

@@ -29,6 +29,11 @@
 #include <vector>
 #include <QList>
 
+class QReadWriteLock;
+class QThread;
+
+template <typename A, typename B> class QMap;
+
 #define _FILEINFO_ __FILE__,__LINE__
 
 namespace Isis {
@@ -46,22 +51,28 @@ namespace Isis {
    *   @history 2005-12-28 Elizabeth Miller - Fixed bug in Pvl error output
    *   @history 2006-06-12 Tracie Sucharski - Change clear method to static
    *   @history 2006-11-02 Jeff Anderson - Fixed bug in Report method for
-   *                                       exit status
+   *                           exit status
    *   @history 2007-12-31 Steven Lambright - Added stack trace
    *   @history 2008-05-23 Steven Lambright - Added stack trace
    *   @history 2008-06-18 Stuart Sides - Fixed doc error
    *   @history 2008-07-08 Steven Lambright - Changed memory cleanup; now uses
-   *                                       atexit
+   *                           atexit
    *   @history 2008-10-30 Steven Lambright - iException::Message now takes a
-   *            const char* for the filename, instead of a chat*, issue pointed
-   *            out by "novus0x2a" (Support Board Member)
+   *                           const char* for the filename, instead of a chat*, 
+   *                           issue pointed out by "novus0x2a" (Support Board
+   *                           Member)
    *   @history 2008-12-15 Steven Lambright - iException::what no longer returns
-   *            deleted memory.
+   *                           deleted memory.
    *   @history 2009-07-29 Steven Lambright - Stack trace calculations moved to
-   *            IsisDebug.h
+   *                           IsisDebug.h
+   *   @history 2011-08-05 Steven Lambright - Hacked to make multi-threaded
+   *                           code which throws exceptions work.
    */
   class iException : public std::exception {
     public:
+      iException(const iException &other);
+      iException &operator=(const iException &other);
+
       //! Contains a set of throwable exception types.
       enum errType {
         None       = 0,
@@ -78,7 +89,8 @@ namespace Isis {
         System     = 255
       };
 
-      static iException &Message(errType t, const std::string &m, const char *f, int l);
+      static iException &Message(errType t, const std::string &m, const char *f,
+                                 int l);
 
       const char *what() const throw();
       errType Type() const;
@@ -86,14 +98,13 @@ namespace Isis {
       Isis::Pvl PvlErrors();
       std::string Errors();
       bool IsPvlFormat();
-      static void Clear();
+      void Clear();
+
       ~iException() throw();
 
     private:
+      // This class really, really isn't a singleton... promise...
       static iException *p_exception;
-      iException();
-
-      static void Shutdown();
 
       /**
        * @brief Exception information
@@ -116,14 +127,21 @@ namespace Isis {
           int lineNumber;
       };
 
-      //! List of iExceptions
-      static QList<Info> p_list;
+      iException();
 
-      static void createStackTrace();
+      static void Shutdown();
+
+      // This lock is for the QMap of p_list, NOT for the elements inside.
+      //   The elements inside of p_list should only be accessed by its
+      //   current thread - never anything else!
+      static QReadWriteLock * p_exceptionsLock;
+      static QMap< QThread *, QList<Info> > * p_list;
+
+      static Info createStackTrace();
       std::string enumString(errType t) const;
       errType enumString(const std::string &s) const;
 
-      void describe();
+      void describe() const;
 
       /**
        * True or false, depending on whether the filename and line number
@@ -139,9 +157,10 @@ namespace Isis {
 
       /**
        * This is the return value of what(). Calculate and keep track of it
-       * in order to prevent the caller from using deleted memory.
+       * in order to prevent the caller from using deleted memory (what()
+       * returns a char *, and we need to guarantee the char * is good).
        */
-      std::string p_what;
+      mutable std::string *p_what;
   };
 };
 
