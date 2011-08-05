@@ -189,8 +189,14 @@ void IsisMain() {
         if (!containsPoint) continue;
       }
 
-      SurfacePoint surfacePoint = p_surfacePoints[point->GetId()];;
-      if (cam->SetGround(surfacePoint)) {
+      // Only use the surface point's latitude and longitude, rely on the DEM
+      // for computing the radius.  We do this because otherwise we will receive
+      // inconsistent results from successive runs of this program if the
+      // different DEMs are used, or the point X, Y, Z was generated from the
+      // ellipsoid.
+      SurfacePoint surfacePoint = p_surfacePoints[point->GetId()];
+      if (cam->SetGround(
+            surfacePoint.GetLatitude(), surfacePoint.GetLongitude())) {
 
         // Make sure the samp & line are inside the image
         if (cam->InCube()) {
