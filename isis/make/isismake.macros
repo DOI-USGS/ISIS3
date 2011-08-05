@@ -105,7 +105,7 @@ else
     else
       testFile = $(wildcard /etc/lsb-release)
       ifeq ($(testFile), /etc/lsb-release)
-        HOST_OS = $(shell $(GREP) DESCRIPTION /etc/lsb-release | $(SED) 's/\([^"]*"\)\([^"]*\)\(.*\)/\2/' | $(SED) 's/ //' | $(SED) 's/\./_/g')
+        HOST_OS = $(shell $(GREP) DESCRIPTION /etc/lsb-release | $(SED) 's/\([^"]*"\)\([^"]*\)\(.*\)/\2/' | $(SED) 's/\.[^\.]* LTS//' | $(SED) 's/ //g' | $(SED) 's/\./_/g')
       endif
     endif
   endif
