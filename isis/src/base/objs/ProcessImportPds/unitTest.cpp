@@ -1,13 +1,16 @@
 #include "Isis.h"
 #include "ProcessImportPds.h"
 #include "Application.h"
+#include "iString.h"
 #include "OriginalLabel.h"
 #include "Statistics.h"
 
 using namespace std;
+using namespace Isis;
 void IsisMain() {
 
   Isis::Preference::Preferences(true);
+  void ReportError(iString err);
 
   // Test an IMAGE file
   try {
@@ -58,11 +61,14 @@ void IsisMain() {
     cout << stat->Average() << endl;
     cout << stat->Variance() << endl;
     p2.EndProcess();
+    
+    // Check input file error
     try {
       Isis::OriginalLabel ol(file);
     }
     catch(Isis::iException &e) {
-      e.Report(false);
+      ReportError(iString(e.Errors()));
+      e.Clear();
     }
     remove(file.c_str());
   }
@@ -91,3 +97,49 @@ void IsisMain() {
     e.Report(false);
   }
 }
+
+/**
+ * Reports error messages from Isis:iException without full paths of filenames
+ * @param err Error string of iException
+ * @author Jeannie Walldren
+ * @internal
+ *   @history 2011-08-05 Jeannie Backer - Copied from Cube class.
+ */
+void ReportError(iString err) {
+  iString report = ""; // report will be modified error message
+  iString errorLine = ""; // read message one line at a time
+  Filename expandedfile;
+  while(err != "") {
+    // pull off first line
+    errorLine = err.Token("\n");
+    while(errorLine != "") {
+      size_t openBrace = errorLine.find('[');
+      if(openBrace != string::npos) {
+        // if open brace is found, look to see if a filename is inside (indicated by '/')
+        if(errorLine.at(openBrace + 1) == '/') {
+          // add message up to and including [
+          report += errorLine.Token("[");
+          report += "[";
+          // read entire path into Filename object
+          expandedfile = errorLine.Token("]");
+          report += expandedfile.Name(); // only report base name, rather than fully expanded path
+          report += "]";
+        }
+        else {
+          // not a filename inside braces, add message up to and including ]
+          report += errorLine.Token("]");
+          report += "]";
+          continue;
+        }
+      }
+      else {
+        // no more braces are found, add rest of error message
+        report += errorLine;
+        break;
+      }
+    }
+    report += "\n";
+  }
+  cout << report << endl;
+}
+
