@@ -117,6 +117,73 @@ namespace Isis
   }
 
 
+  void CnetMeasureTableDelegate::readData(QWidget * widget,
+      AbstractTreeItem * row, CnetTableColumn const * col,
+      QString newData) const
+  {
+    AbstractMeasureItem::Column column =
+      AbstractMeasureItem::getColumn(col->getTitle());
+
+    QString data = row->getData(col->getTitle());
+    ASSERT(row->getPointerType() == AbstractTreeItem::Measure);
+    ControlMeasure * measure = (ControlMeasure *) row->getPointer();
+
+    switch (column)
+    {
+      case AbstractMeasureItem::EditLock:
+        {
+          QComboBox * combo = static_cast< QComboBox * >(widget);
+          
+          if (measure->IsEditLocked())
+            combo->setCurrentIndex(0);
+          else
+            combo->setCurrentIndex(1);
+          
+          if (QString("yes").startsWith(newData.toLower()))
+            combo->setCurrentIndex(0);
+          else if (QString("no").startsWith(newData.toLower()))
+            combo->setCurrentIndex(1);
+          
+        }
+        break;
+        
+      case AbstractMeasureItem::Ignored:
+        {
+          QComboBox * combo = static_cast< QComboBox * >(widget);
+      
+          if (measure->IsIgnored())
+            combo->setCurrentIndex(0);
+          else
+            combo->setCurrentIndex(1);
+          
+          if (QString("yes").startsWith(newData.toLower()))
+            combo->setCurrentIndex(0);
+          if (QString("no").startsWith(newData.toLower()))
+            combo->setCurrentIndex(1);
+        }
+        break;
+        
+      case AbstractMeasureItem::Type:
+        {
+          QComboBox * combo = static_cast< QComboBox * >(widget);
+
+          combo->setCurrentIndex((int) measure->StringToMeasureType(data));
+
+          for (int i = combo->count() - 1; i >= 0; --i)
+            if (combo->itemText(i).toLower().startsWith(newData.toLower()))
+              combo->setCurrentIndex(i);
+        }
+        break;
+        
+      default:
+        {
+          QLineEdit * lineEdit = static_cast< QLineEdit * >(widget);
+          lineEdit->setText(newData);
+        }
+    }
+  }
+
+
   void CnetMeasureTableDelegate::saveData(QWidget * widget,
       AbstractTreeItem * row, CnetTableColumn const * col) const
   {

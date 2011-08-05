@@ -488,8 +488,10 @@ namespace Isis
 
   void CnetTableViewContent::keyPressEvent(QKeyEvent * event)
   {
+    Qt::Key key = (Qt::Key) event->key();
+    
     // Ctrl-A selects all rows.
-    if (event->key() == Qt::Key_A && event->modifiers() == Qt::ControlModifier)
+    if (key == Qt::Key_A && event->modifiers() == Qt::ControlModifier)
     {
       clearActiveCell();
       clearColumnSelection();
@@ -498,12 +500,12 @@ namespace Isis
 
       emit tableSelectionChanged();
     }
-    else if (event->key() == Qt::Key_Delete)
+    else if (key == Qt::Key_Delete)
     {
       if (hasRowSelection())
         deleteSelectedRows();
     }
-    else if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter)
+    else if (key == Qt::Key_Return || key == Qt::Key_Enter)
     {
       if (editWidget)
       {
@@ -520,7 +522,31 @@ namespace Isis
     }
     else
     {
-      QWidget::keyPressEvent(event);
+      if (hasActiveCell())
+      {
+        if (!items->contains(activeCell->first))
+          scrollTo(activeCell->first);
+        
+        ASSERT(items->contains(activeCell->first));
+        
+        if (items->contains(activeCell->first) &&
+            isCellEditable(items->indexOf(activeCell->first),
+            activeCell->second))
+        {
+          AbstractCnetTableDelegate const * delegate = model->getDelegate();
+          CnetTableColumn * col =
+              columns->getVisibleColumns().at(activeCell->second);
+
+          delete editWidget;
+          editWidget = NULL;
+          editWidget = delegate->getWidget(col);
+          delegate->readData(editWidget, activeCell->first, col, event->text());
+          editWidget->setParent(this);
+          editWidget->setFocus(Qt::OtherFocusReason);
+        }
+
+        viewport()->update();
+      }
     }
   }
 

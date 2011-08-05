@@ -122,8 +122,9 @@ namespace Isis
           for (int i = 0; i < point->GetNumMeasures(); i++)
             combo->insertItem(i, point->GetMeasure(i)->GetCubeSerialNumber());
           combo->setCurrentIndex(point->IndexOfRefMeasure());
-          break;
         }
+        break;
+        
       case AbstractPointItem::PointType:
       case AbstractPointItem::EditLock:
       case AbstractPointItem::Ignored:
@@ -136,7 +137,7 @@ namespace Isis
           {
             case AbstractPointItem::PointType:
               combo->setCurrentIndex(
-                (int) point->StringToPointType(data));
+                  (int) point->StringToPointType(data));
               break;
             case AbstractPointItem::EditLock:
               combo->setCurrentIndex(point->IsEditLocked() ? 0 : 1);
@@ -146,11 +147,11 @@ namespace Isis
               break;
             case AbstractPointItem::APrioriSPSource:
               combo->setCurrentIndex(
-                (int) point->StringToSurfacePointSource(data));
+                  (int) point->StringToSurfacePointSource(data));
               break;
             case AbstractPointItem::APrioriRadiusSource:
               combo->setCurrentIndex(
-                (int) point->StringToRadiusSource(data));
+                  (int) point->StringToRadiusSource(data));
               break;
             default:
               break;
@@ -161,6 +162,81 @@ namespace Isis
         {
           QLineEdit * lineEdit = static_cast< QLineEdit * >(widget);
           lineEdit->setText(data);
+        }
+    }
+  }
+
+
+  void CnetPointTableDelegate::readData(QWidget * widget,
+      AbstractTreeItem * row, CnetTableColumn const * col,
+      QString newData) const
+  {
+    QString columnTitle = col->getTitle();
+    AbstractPointItem::Column column =
+        AbstractPointItem::getColumn(columnTitle);
+
+    QString data = row->getData(columnTitle);
+    ASSERT(row->getPointerType() == AbstractTreeItem::Point);
+    ControlPoint * point = (ControlPoint *)row->getPointer();
+
+    switch (column)
+    {
+      case AbstractPointItem::Reference:
+        {
+          QComboBox * combo = static_cast< QComboBox * >(widget);
+
+          for (int i = 0; i < point->GetNumMeasures(); i++)
+            combo->insertItem(i, point->GetMeasure(i)->GetCubeSerialNumber());
+          
+          combo->setCurrentIndex(point->IndexOfRefMeasure());
+          
+          for (int i = combo->count() - 1; i >= 0; --i)
+            if (combo->itemText(i).toLower().startsWith(newData.toLower()))
+              combo->setCurrentIndex(i);
+        }
+        break;
+        
+      case AbstractPointItem::PointType:
+      case AbstractPointItem::EditLock:
+      case AbstractPointItem::Ignored:
+      case AbstractPointItem::APrioriSPSource:
+      case AbstractPointItem::APrioriRadiusSource:
+        {
+          QComboBox * combo = static_cast< QComboBox * >(widget);
+
+          switch (column)
+          {
+            case AbstractPointItem::PointType:
+              combo->setCurrentIndex(
+                  (int) point->StringToPointType(data));
+              break;
+            case AbstractPointItem::EditLock:
+              combo->setCurrentIndex(point->IsEditLocked() ? 0 : 1);
+              break;
+            case AbstractPointItem::Ignored:
+              combo->setCurrentIndex(point->IsIgnored() ? 0 : 1);
+              break;
+            case AbstractPointItem::APrioriSPSource:
+              combo->setCurrentIndex(
+                  (int) point->StringToSurfacePointSource(data));
+              break;
+            case AbstractPointItem::APrioriRadiusSource:
+              combo->setCurrentIndex(
+                  (int) point->StringToRadiusSource(data));
+              break;
+            default:
+              break;
+          }
+          
+          for (int i = combo->count() - 1; i >= 0; --i)
+            if (combo->itemText(i).toLower().startsWith(newData.toLower()))
+              combo->setCurrentIndex(i);
+        }
+        break;
+      default:
+        {
+          QLineEdit * lineEdit = static_cast< QLineEdit * >(widget);
+          lineEdit->setText(newData);
         }
     }
   }

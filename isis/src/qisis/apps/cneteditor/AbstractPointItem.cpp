@@ -120,11 +120,11 @@ namespace Isis
     columnList.append(
         new CnetTableColumn(getColumnName(AdjustedSPRadiusSigma), true, false));
     columnList.append(
-        new CnetTableColumn(getColumnName(APrioriSPLat), false, false));
+        new CnetTableColumn(getColumnName(APrioriSPLat), true, false));
     columnList.append(
-        new CnetTableColumn(getColumnName(APrioriSPLon), false, false));
+        new CnetTableColumn(getColumnName(APrioriSPLon), true, false));
     columnList.append(
-        new CnetTableColumn(getColumnName(APrioriSPRadius), false, false));
+        new CnetTableColumn(getColumnName(APrioriSPRadius), true, false));
     columnList.append(
         new CnetTableColumn(getColumnName(APrioriSPLatSigma), true, false));
     columnList.append(

@@ -85,7 +85,7 @@ namespace Isis
 
   void CnetPointTableModel::setGlobalSelection(bool selected)
   {
-    return getDataModel()->setGlobalSelection(selected, TreeModel::PointItems);
+    return getDataModel()->setGlobalSelection(selected, TreeModel::AllItems);
   }
   
   

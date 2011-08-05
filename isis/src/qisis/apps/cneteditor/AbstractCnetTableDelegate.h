@@ -23,6 +23,8 @@ namespace Isis
       virtual QWidget * getWidget(CnetTableColumn const *) const = 0;
       virtual void readData(QWidget *, AbstractTreeItem *,
           CnetTableColumn const *) const = 0;
+      virtual void readData(QWidget *, AbstractTreeItem *,
+          CnetTableColumn const *, QString) const = 0;
       virtual void saveData(QWidget *, AbstractTreeItem *,
           CnetTableColumn const *) const = 0;
 
