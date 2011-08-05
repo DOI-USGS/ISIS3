@@ -252,7 +252,6 @@
             </description>
           </option>
 -->
-<!--
           <option value="SPARSE">
             <brief> Sparse matrix solver</brief>
             <description> 
@@ -261,7 +260,6 @@
                           used.
             </description>
           </option>
--->
         </list>
       </parameter>
 
