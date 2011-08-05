@@ -27,6 +27,5 @@ void mirror(Buffer &in, Buffer &out) {
   for(int i = 0; i < in.size(); i++) {
     out[i] = in[index - i];
   }
-
-
 }
+
