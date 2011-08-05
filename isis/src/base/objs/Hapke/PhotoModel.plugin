@@ -1,0 +1,4 @@
+Group = HapkeHen
+  Library = Hapke
+  Routine = HapkePlugin
+End_Group
