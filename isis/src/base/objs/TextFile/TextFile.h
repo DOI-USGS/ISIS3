@@ -29,9 +29,9 @@ namespace Isis {
   /**
    * @brief Provides access to sequential ASCII stream I/O
    *
-   * Provides access to sequential ASCII stream I/O. Checks for errors in opening,
-   * reading, and writing ASCII files. Can check for 'comment lines' while reading
-   * a text file.
+   * Provides access to sequential ASCII stream I/O. Checks for errors in 
+   * opening, reading, and writing ASCII files. Can check for 'comment lines' 
+   * while reading a text file. 
    *
    * @ingroup Utility
    *
@@ -39,25 +39,26 @@ namespace Isis {
    *
    * @internal
    *  @history 2005-02-16 Elizabeth Ribelin - Modified file to support Doxygen
-   *                                          documentation
+   *                          documentation
    *  @history 2010-03-30 Mackenzie Boyd - Modified open method append option to
-   *                                       create the file if it doesn't exist,
-   *                                       changed file existence check to use
-   *                                       Filename class.
+   *                          create the file if it doesn't exist, changed file
+   *                          existence check to use Filename class.
+   *  @history 2011-08-08 Jeannie Backer - Modified unitTest to use $temporary
+   *                          variable instead of /tmp directory
    *
-   *  @todo 2005-02-16  Glenn Bennett - add coded and implementation examples, and
-   *                                    finish documentation
+   *  @todo 2005-02-16 Glenn Bennett - add coded and implementation examples,
+   *                       and finish documentation
    */
   class TextFile {
 
     protected:
-      std::fstream p_stream;           //!<File stream handle
-      int     p_openmode;              /**<openmode of file: Input, Output,
+      std::fstream p_stream;           //!< File stream handle
+      int     p_openmode;              /**< openmode of file: Input, Output,
                                            Overwrite, Append*/
-      std::string  p_filename;         //!<Filename of the opened file.
-      std::string  p_commentString;    /**<'comment' string used by GetLine and
+      std::string  p_filename;         //!< Filename of the opened file.
+      std::string  p_commentString;    /**< 'comment' string used by GetLine and
                                            PutLineComment*/
-      std::string  p_newLineString;    /**<'newline' string used by PutLine and
+      std::string  p_newLineString;    /**< 'newline' string used by PutLine and
                                            PutLineComment*/
 
       bool p_GetLine(std::string &line, bool chkComment);
@@ -98,10 +99,14 @@ namespace Isis {
       void Rewind();
       void Close();
 
-      void GetFile(std::vector<std::string> &lines, const int &maxLinesToRead = 0, const bool skipComments = true);
-      void GetFile(std::string *lines, const int &maxLinesToRead, const bool skipComments = true);
+      void GetFile(std::vector<std::string> &lines, 
+                   const int &maxLinesToRead = 0, 
+                   const bool skipComments = true);
+      void GetFile(std::string *lines, const int &maxLinesToRead, 
+                   const bool skipComments = true);
 
-      void PutFile(std::vector<std::string> &lines, const int &maxLinesToWrite = 0);
+      void PutFile(std::vector<std::string> &lines, 
+                   const int &maxLinesToWrite = 0);
       void PutFile(const std::string *lines, const int &maxLinesToWrite);
 
       bool GetLine(std::string &line, const bool skipComments = true);

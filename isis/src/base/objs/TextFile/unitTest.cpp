@@ -1,5 +1,7 @@
 #include "TextFile.h"
+#include "Filename.h"
 #include "iException.h"
+#include "iString.h"
 #include "Preference.h"
 #include <iostream>
 #include <stdio.h>
@@ -10,13 +12,14 @@ using namespace Isis;
 
 int main(int argc, char *argv[]) {
   Isis::Preference::Preferences(true);
+  void ReportError(iString err);
 
   cout << "Unit test for TextFile" << endl << endl;
 
 
 // ----------------------------------------------------------------------------------
 
-  string testFile = "/tmp/TextFile.tmp";
+  string testFile = "$temporary/TextFile.tmp";
   // setup test data
   string testLines[21];
 
@@ -192,7 +195,7 @@ int main(int argc, char *argv[]) {
 
 // ----------------------------------------------------------------------------------
 
-  cout << "6) Overwrite file and write 6 lines /tmp/TextFile.tmp" << endl;
+  cout << "6) Overwrite file and write 6 lines $temporary/TextFile.tmp" << endl;
 
   try {
     Isis::TextFile f(testFile, "OverWrite");               // open overwrite
@@ -246,7 +249,7 @@ int main(int argc, char *argv[]) {
 
 // ----------------------------------------------------------------------------------
 
-  cout << "7) Append 6 lines to file /tmp/TextFile.tmp" << endl;
+  cout << "7) Append 6 lines to file $temporary/TextFile.tmp" << endl;
 
   try {
     Isis::TextFile f(testFile, "Append");
@@ -285,7 +288,7 @@ int main(int argc, char *argv[]) {
 
 // ----------------------------------------------------------------------------------
 
-  cout << "8) Input (read) file /tmp/TextFile.tmp" << endl;
+  cout << "8) Input (read) file $temporary/TextFile.tmp" << endl;
 
   try {
     Isis::TextFile f(testFile, "Input");
@@ -361,7 +364,7 @@ int main(int argc, char *argv[]) {
 // you want to open append and then rewind is lame.
 // ----------------------------------------------------------------------------------
 
-  cout << "9) Replace Lines and Verify Replacement in /tmp/TextFile.tmp" << endl;
+  cout << "9) Replace Lines and Verify Replacement in $temporary/TextFile.tmp" << endl;
 
 
   try {
@@ -422,20 +425,22 @@ int main(int argc, char *argv[]) {
     Isis::TextFile f(testFile, "Input");
   }
   catch(Isis::iException &e) {
-    e.Report(false);
+    ReportError(iString(e.Errors()));
+    e.Clear();
   }
   cout << endl;
 
 
   cout << "  b) Try open as output to pre-existing file" << endl;
 
-  testFile = "/tmp/TextFile.tmp";
+  testFile = "$temporary/TextFile.tmp";//???
 
   try {
     Isis::TextFile f(testFile, "Output");
   }
   catch(Isis::iException &e) {
-    e.Report(false);
+    ReportError(iString(e.Errors()));
+    e.Clear();
   }
   cout << endl;
 
@@ -446,7 +451,8 @@ int main(int argc, char *argv[]) {
     Isis::TextFile fxText(testFile, "xxxInputxxx");
   }
   catch(Isis::iException &e) {
-    e.Report(false);
+    ReportError(iString(e.Errors()));
+    e.Clear();
   }
   cout << endl;
 
@@ -458,7 +464,8 @@ int main(int argc, char *argv[]) {
     f.PutLine("Line 1");
   }
   catch(Isis::iException &e) {
-    e.Report(false);
+    ReportError(iString(e.Errors()));
+    e.Clear();
   }
   cout << endl;
 
@@ -471,7 +478,8 @@ int main(int argc, char *argv[]) {
     f.PutLine("Line 1");
   }
   catch(Isis::iException &e) {
-    e.Report(false);
+    ReportError(iString(e.Errors()));
+    e.Clear();
   }
   cout << endl;
 
@@ -484,15 +492,16 @@ int main(int argc, char *argv[]) {
     f.GetLine();
   }
   catch(Isis::iException &e) {
-    e.Report(false);
+    ReportError(iString(e.Errors()));
+    e.Clear();
   }
   cout << endl;
 
-
   // create file that doesn't end in a newline and then test GetLine
   FILE *fp;
-  fp = fopen(testFile.c_str(), "w");
-  fprintf(fp, "this file has no newline chars in it!");
+  Filename testFileName(testFile);
+  fp = fopen(testFileName.Expanded().c_str(), "w");
+  fprintf(fp, "this file has no newline chars in it!");   //???SEG FAULT HERE!!!!!!!
   fclose(fp);
   TextFile tf;
   tf.Open(testFile);
@@ -520,7 +529,61 @@ int main(int argc, char *argv[]) {
 
   cout << "11) Remove temp file -> " << testFile << " <-\n" << endl;
 
-  if(std::remove(testFile.c_str())) {                    // cleanup tmp file
+  if(std::remove(testFileName.Expanded().c_str())) {                    // cleanup tmp file
     cout << "*** Failed to remove tmp file: " << testFile << endl;
   }
 }
+
+/**
+ * Reports error messages from Isis:iException without full paths of filenames
+ * @param err Error string of iException
+ * @author Jeannie Walldren
+ * @internal
+ *   @history 2011-08-05 Jeannie Backer - Copied from Cube class.
+ */
+void ReportError(iString err) {
+  iString report = ""; // report will be modified error message
+  iString errorLine = ""; // read message one line at a time
+  Filename expandedfile;
+  while(err != "") {
+    // pull off first line
+    errorLine = err.Token("\n");
+    while(errorLine != "") {
+      size_t openBrace = errorLine.find('[');
+      if(openBrace != string::npos) {
+        // if open brace is found, look to see if a filename is inside (indicated by '/')
+        if(errorLine.at(openBrace + 1) == '/') {
+          // add message up to
+          report += errorLine.Token("[");
+          // and including [
+          report += "[";
+          // read entire path into Filename object
+          expandedfile = errorLine.Token("]");
+          // only keep the name of the immediate directory
+          iString path = expandedfile.OriginalPath();
+          while (path.find("/") != string::npos) {
+            path.Token("/");
+          }
+          // only report immediate directory and file name, (rather than fully
+          // expanded path since this may differ on each system
+          report += "../" + path + "/" + expandedfile.Name();
+          report += "]";
+        }
+        else {
+          // not a filename inside braces, add message up to and including ]
+          report += errorLine.Token("]");
+          report += "]";
+          continue;
+        }
+      }
+      else {
+        // no more braces are found, add rest of error message
+        report += errorLine;
+        break;
+      }
+    }
+    report += "\n";
+  }
+  cout << report << endl;
+}
+
