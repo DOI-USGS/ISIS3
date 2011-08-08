@@ -4,8 +4,10 @@
 #include <QString>
 
 #include "Application.h"
+#include "Camera.h"
 #include "ControlMeasure.h"
 #include "ControlPoint.h"
+#include "Cube.h"
 #include "Filename.h"
 #include "MdiCubeViewport.h"
 #include "Progress.h"
@@ -101,6 +103,7 @@ namespace Isis {
    *                         input control network
    *  @history 2010-11-09 Tracie Sucharski - "emit" was missing from the signal
    *                         serialNumberListUpdated.
+   *  @history 2011-08-08 Tracie Sucharski - If new network, set the Target
    *
    */
   void QnetFileTool::open() {
@@ -169,8 +172,15 @@ namespace Isis {
         filter);
     QApplication::setOverrideCursor(Qt::WaitCursor);
     if (cNetFilename.isEmpty()) {
+      //  Create new control net
       g_controlNetwork = new ControlNet();
       g_controlNetwork->SetUserName(Application::UserName());
+      //  Determine target from first file in cube list
+      Cube *cube = new Cube;
+      cube->open(g_serialNumberList->Filename(0));
+      g_controlNetwork->SetTarget(cube->getCamera()->Target());
+      delete cube;
+      cube = NULL;
     }
     else {
       try {
