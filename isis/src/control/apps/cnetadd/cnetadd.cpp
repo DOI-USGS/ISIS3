@@ -3,23 +3,28 @@
 #include <map>
 #include <set>
 
+#include <QList>
+#include <QMap>
+#include <QSet>
+#include <QString>
+
 #include "geos/geom/Coordinate.h"
 #include "geos/geom/Envelope.h"
 #include "geos/geom/Geometry.h"
 #include "geos/geom/MultiPolygon.h"
 #include "geos/geom/Point.h"
+#include "geos/index/strtree/STRtree.h"
 
 #include "Camera.h"
 #include "CameraFactory.h"
+#include "ControlMeasure.h"
 #include "ControlNet.h"
 #include "ControlNetValidMeasure.h"
-#include "ControlMeasure.h"
 #include "ControlPoint.h"
 #include "CubeManager.h"
 #include "FileList.h"
 #include "Filename.h"
-#include "iException.h"
-#include "iTime.h"
+#include "ImagePolygon.h"
 #include "Latitude.h"
 #include "Longitude.h"
 #include "Pvl.h"
@@ -27,20 +32,23 @@
 #include "SerialNumberList.h"
 #include "SurfacePoint.h"
 #include "UserInterface.h"
-#include "ImagePolygon.h"
+#include "iException.h"
+#include "iTime.h"
 
 using geos::geom::Coordinate;
 using geos::geom::Envelope;
 using geos::geom::Geometry;
 using geos::geom::MultiPolygon;
 using geos::geom::Point;
+using geos::index::strtree::STRtree;
 
 using namespace Isis;
 
 void SetControlPointLatLon(SerialNumberList &snl, ControlNet &cnet);
+QList<ControlPoint *> getValidPoints(Cube &cube, STRtree &coordTree);
 
-std::map< std::string, SurfacePoint > p_surfacePoints;
-std::map< int, std::set<std::string> > p_modifiedMeasures;
+std::map< std::string, SurfacePoint > surfacePoints;
+QMap< QString, QSet<QString> > modifications;
 
 
 void IsisMain() {
@@ -115,7 +123,7 @@ void IsisMain() {
         throw iException::Message(iException::User, msg, _FILEINFO_);
       }
 
-      p_surfacePoints[point->GetId()] = surfacePoint;
+      surfacePoints[point->GetId()] = surfacePoint;
     }
   }
 
@@ -126,77 +134,62 @@ void IsisMain() {
   progress.SetMaximumSteps(addList.size());
   progress.CheckStatus();
 
-  // loop through all the images
+  STRtree coordTree;
+  QList<ControlPoint *> pointList;
   bool usePolygon = ui.GetBoolean("POLYGON");
-  std::vector<int> modPoints;
-
-  QList<Coordinate> geomPoints;
   if (usePolygon) {
     for (int cp = 0; cp < inNet.GetNumPoints(); cp++) {
       ControlPoint *point = inNet.GetPoint(cp);
-      SurfacePoint surfacePoint = p_surfacePoints[point->GetId()];
+      SurfacePoint surfacePoint = surfacePoints[point->GetId()];
 
       Longitude lon = surfacePoint.GetLongitude();
       Latitude lat = surfacePoint.GetLatitude();
 
-      Coordinate coord(lon.GetDegrees(), lat.GetDegrees());
-      geomPoints.append(coord);
+      Coordinate *coord = new Coordinate(lon.GetDegrees(), lat.GetDegrees());
+      Envelope *envelope = new Envelope(*coord);
+      coordTree.insert(envelope, point);
+    }
+  }
+  else {
+    for (int cp = 0; cp < inNet.GetNumPoints(); cp++) {
+      pointList.append(inNet.GetPoint(cp));
     }
   }
 
+  // Loop through all the images
   for (unsigned int img = 0; img < addList.size(); img++) {
-    bool imageAdded = false;
     Cube cube;
     cube.open(addList[img]);
     Pvl *cubepvl = cube.getLabel();
     std::string sn = SerialNumber::Compose(*cubepvl);
     Camera *cam = cube.getCamera();
 
-    ImagePolygon poly;
-    if (usePolygon) {
-      try {
-        cube.read(poly);
-      }
-      catch (iException &e) {
-        std::string msg = "Footprintinit must be run prior to running cnetadd";
-        msg += " with POLYGON=TRUE for cube [" + cube.getFilename() + "]";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
-      }
-    }
-
     // Loop through all the control points
-    for (int cp = 0; cp < inNet.GetNumPoints(); cp++) {
-      ControlPoint *point = inNet.GetPoint(cp);
+    QList<ControlPoint *> validPoints = usePolygon ?
+        getValidPoints(cube, coordTree) : pointList;
+
+    bool imageAdded = false;
+    for (int cp = 0; cp < validPoints.size(); cp++) {
+      ControlPoint *point = validPoints[cp];
 
       // If the point is locked and Apriori source is "AverageOfMeasures"
       // then do not add the measures.
       if (point->IsEditLocked() &&
-          point->GetAprioriSurfacePointSource() == ControlPoint::SurfacePointSource::AverageOfMeasures) {
+          point->GetAprioriSurfacePointSource() ==
+              ControlPoint::SurfacePointSource::AverageOfMeasures) {
         continue;
       }
 
       if (point->HasSerialNumber(sn)) continue;
-
-      bool containsPoint = false;
-      if (usePolygon) {
-        MultiPolygon *polys = poly.Polys();
-        for (unsigned int i = 0; i < polys->getNumGeometries() && !containsPoint; i++) {
-          const Geometry *geometry = polys->getGeometryN(i);
-          const Envelope *boundingBox = geometry->getEnvelopeInternal();
-          containsPoint = boundingBox->contains(geomPoints[cp]);
-        }
-
-        if (!containsPoint) continue;
-      }
 
       // Only use the surface point's latitude and longitude, rely on the DEM
       // for computing the radius.  We do this because otherwise we will receive
       // inconsistent results from successive runs of this program if the
       // different DEMs are used, or the point X, Y, Z was generated from the
       // ellipsoid.
-      SurfacePoint surfacePoint = p_surfacePoints[point->GetId()];
+      SurfacePoint surfacePoint = surfacePoints[point->GetId()];
       if (cam->SetGround(
-            surfacePoint.GetLatitude(), surfacePoint.GetLongitude())) {
+              surfacePoint.GetLatitude(), surfacePoint.GetLongitude())) {
 
         // Make sure the samp & line are inside the image
         if (cam->InCube()) {
@@ -240,26 +233,13 @@ void IsisMain() {
           point->Add(newCm); // Point takes ownership
 
           // Record the modified Point and Measure
-          p_modifiedMeasures[cp].insert(newCm->GetCubeSerialNumber());
+          modifications[point->GetId()].insert(newCm->GetCubeSerialNumber());
           newCm = NULL; // Do not delete because the point has ownership
 
-          if (retrievalOpt == "POINT" && inNet.GetPoint(cp)->GetNumMeasures() == 1) {
+          if (retrievalOpt == "POINT" && point->GetNumMeasures() == 1)
             point->SetIgnored(false);
-          }
 
-          if (log) {
-            // If we can't find this control point in the list of control points
-            // that have already been modified, then add it to the list
-            bool doesntContainPoint = true;
-            for (unsigned int i = 0; i < modPoints.size() && doesntContainPoint; i++) {
-              if (modPoints[i] == cp) doesntContainPoint = false;
-            }
-            if (doesntContainPoint) {
-              modPoints.push_back(cp);
-            }
-
-            imageAdded = true;
-          }
+          imageAdded = true;
         }
       }
     }
@@ -268,36 +248,18 @@ void IsisMain() {
     cam = NULL;
 
     if (log) {
-      if (imageAdded) added.AddValue(Filename(addList[img]).Basename());
-      else omitted.AddValue(Filename(addList[img]).Basename());
+      PvlKeyword &logKeyword = (imageAdded) ? added : omitted;
+      logKeyword.AddValue(Filename(addList[img]).Basename());
     }
 
     progress.CheckStatus();
   }
 
   if (log) {
-
-    // Shell sort the list of modified control points
-    int increments[] = { 1391376, 463792, 198768, 86961, 33936, 13776, 4592, 1968,
-                         861, 336, 112, 48, 21, 7, 3, 1
-                       };
-    for (unsigned int k = 0; k < 16; k++) {
-      int inc = increments[k];
-      for (unsigned int i = inc; i < modPoints.size(); i++) {
-        int temp = modPoints[i];
-        int j = i;
-        while (j >= inc && modPoints[j - inc] > temp) {
-          modPoints[j] = modPoints[j - inc];
-          j -= inc;
-        }
-        modPoints[j] = temp;
-      }
-    }
-
     // Add the list of modified points to the output log file
-    for (unsigned int i = 0; i < modPoints.size(); i++) {
-      pointsModified += inNet.GetPoint(modPoints[i])->GetId();
-    }
+    QList<QString> modifiedPointsList = modifications.keys();
+    for (int i = 0; i < modifiedPointsList.size(); i++)
+      pointsModified += modifiedPointsList[i];
 
     results.AddKeyword(added);
     results.AddKeyword(omitted);
@@ -318,33 +280,31 @@ void IsisMain() {
     out_stream.open(pointList.Expanded().c_str(), std::ios::out);
     out_stream.seekp(0, std::ios::beg);   //Start writing from beginning of file
 
-    for (std::map< int, std::set<std::string> >::iterator it = p_modifiedMeasures.begin();
-        it != p_modifiedMeasures.end(); it ++) {
-      out_stream << inNet.GetPoint(it->first)->GetId() << std::endl;
-    }
+    QList<QString> modifiedPointsList = modifications.keys();
+    for (int i = 0; i < modifiedPointsList.size(); i++)
+      out_stream << modifiedPointsList[i].toStdString() << std::endl;
 
     out_stream.close();
   }
 
   // Modify the inNet to only have modified points/measures
   if (ui.GetString("EXTRACT") == "MODIFIED") {
-    for (int cp = inNet.GetNumPoints() - 1; cp >= 0; cp --) {
-      std::map< int, std::set<std::string> >::iterator it = p_modifiedMeasures.find(cp);
+    for (int cp = inNet.GetNumPoints() - 1; cp >= 0; cp--) {
+      ControlPoint *point = inNet.GetPoint(cp);
+
       // If the point was not modified, delete
-      if (it == p_modifiedMeasures.end()) {
+      if (!modifications.contains(point->GetId())) {
         inNet.DeletePoint(cp);
       }
       // Else, remove the unwanted measures from the modified point
       else {
-        ControlPoint *controlpt = inNet.GetPoint(cp);
+        for (int cm = point->GetNumMeasures() - 1; cm >= 0; cm--) {
+          ControlMeasure *measure = point->GetMeasure(cm);
 
-        for (int cm = controlpt->GetNumMeasures() - 1; cm >= 0; cm --) {
-          ControlMeasure *controlms = controlpt->GetMeasure(cm);
-
-          if (controlpt->GetRefMeasure() != controlms &&
-              it->second.find(controlms->GetCubeSerialNumber()) == it->second.end()) {
-            controlpt->Delete(cm);
-          }
+          if (point->GetRefMeasure() != measure &&
+              !modifications[point->GetId()].contains(
+                  measure->GetCubeSerialNumber()))
+            point->Delete(cm);
         }
       }
     }
@@ -371,7 +331,7 @@ void IsisMain() {
     out_stream.open(name.c_str(), std::ios::out);
     out_stream.seekp(0, std::ios::beg); //Start writing from beginning of file
 
-    for (int f = 0; f < (int)toList.Size(); f++)
+    for (int f = 0; f < (int) toList.Size(); f++)
       out_stream << toList.Filename(f) << std::endl;
 
     out_stream.close();
@@ -405,7 +365,7 @@ void SetControlPointLatLon(SerialNumberList &snl, ControlNet &cnet) {
     Cube *cube = manager.OpenCube(snl.Filename(cm->GetCubeSerialNumber()));
     try {
       cube->getCamera()->SetImage(cm->GetSample(), cm->GetLine());
-      p_surfacePoints[point->GetId()] = cube->getCamera()->GetSurfacePoint();
+      surfacePoints[point->GetId()] = cube->getCamera()->GetSurfacePoint();
     }
     catch (iException &e) {
       std::string msg = "Unable to create camera for cube file [";
@@ -418,5 +378,34 @@ void SetControlPointLatLon(SerialNumberList &snl, ControlNet &cnet) {
   }
 
   manager.CleanCubes();
+}
+
+
+QList<ControlPoint *> getValidPoints(Cube &cube, STRtree &coordTree) {
+  ImagePolygon poly;
+  try {
+    cube.read(poly);
+  }
+  catch (iException &e) {
+    std::string msg = "Footprintinit must be run prior to running cnetadd";
+    msg += " with POLYGON=TRUE for cube [" + cube.getFilename() + "]";
+    throw iException::Message(iException::User, msg, _FILEINFO_);
+  }
+
+  std::vector<void *> matches;
+  MultiPolygon *polys = poly.Polys();
+  for (unsigned int i = 0; i < polys->getNumGeometries(); i++) {
+    const Geometry *geometry = polys->getGeometryN(i);
+    const Envelope *boundingBox = geometry->getEnvelopeInternal();
+
+    coordTree.query(boundingBox, matches);
+  }
+
+  QList<ControlPoint *> results;
+  for (unsigned int i = 0; i < matches.size(); i++) {
+    results.append((ControlPoint *) matches[i]);
+  }
+
+  return results;
 }
 
