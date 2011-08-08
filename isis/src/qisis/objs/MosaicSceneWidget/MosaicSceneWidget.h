@@ -93,7 +93,8 @@ namespace Isis {
 
       QProgressBar *getProgress();
       PvlObject toPvl() const;
-      void fromPvl(PvlObject);
+      void fromPvl(const PvlObject &);
+      void preloadFromPvl(const PvlObject &);
 
       QRectF cubesBoundingRect() const;
       QStringList cubeFilenames();

@@ -165,7 +165,7 @@ namespace Isis {
   }
 
 
-  void MosaicFindTool::fromPvl(PvlObject &obj) {
+  void MosaicFindTool::fromPvl(const PvlObject &obj) {
     p_latLineEdit->setText(obj["Latitude"][0]);
     p_lonLineEdit->setText(obj["Longitude"][0]);
     if((int)obj["Visible"][0] != 0) {

@@ -22,9 +22,10 @@ namespace Isis {
   * @author Stacy Alley
   *
   * @internal
-  *
   *  @history 2010-05-10 Christopher Austin - added cnet connectivity
-  *           functionality
+  *                          functionality
+  *  @history 2011-08-08 Steven Lambright - Refectored for new qmos. Mosaic
+  *                          controller is now always visible.
   */
   class MosaicMainWindow : public MainWindow {
       Q_OBJECT
@@ -33,19 +34,19 @@ namespace Isis {
       ~MosaicMainWindow() { }
 
       QToolBar *permanentToolBar() {
-        return p_permToolbar;
+        return m_permToolbar;
       }
 
       QToolBar *activeToolBar() {
-        return p_activeToolbar;
+        return m_activeToolbar;
       }
 
       ToolPad *toolPad() {
-        return p_toolpad;
+        return m_toolpad;
       }
 
       QProgressBar *progressBar() {
-        return p_progressBar;
+        return m_progressBar;
       }
 
       /**
@@ -55,7 +56,7 @@ namespace Isis {
       * @return QMenu*
       */
       QMenu *viewMenu() const {
-        return p_viewMenu;
+        return m_viewMenu;
       };
 
       void saveSettings();
@@ -85,26 +86,26 @@ namespace Isis {
 
       bool m_controllerVisible;
       
-      ToolPad *p_toolpad; //!< Tool pad on this mainwindow
+      ToolPad *m_toolpad; //!< Tool pad on this mainwindow
 
-      QToolBar *p_permToolbar; //!< Tool bar attached to mainwindow
-      QToolBar *p_activeToolbar; //!< The active toolbar
-      QString p_filename;
+      QToolBar *m_permToolbar; //!< Tool bar attached to mainwindow
+      QToolBar *m_activeToolbar; //!< The active toolbar
+      QString m_filename;
 
-      QProgressBar *p_progressBar; //!< The mainwindow's progress bar.
+      QProgressBar *m_progressBar; //!< The mainwindow's progress bar.
 
-      QMenu *p_viewMenu;
-      QMenu *p_settingsMenu;
-      QMenu *p_fileMenu;
-      QMenu *p_exportMenu;
-      MosaicController *p_mosaicController;
-      QList<QAction *> p_actionsRequiringOpen;
-      QList<QAction *> p_actionsRequiringClosed;
-      QList<Cube *> p_openCubes;
-      QFileInfo p_lastOpenedFile;
-      QSettings p_settings;
-      QDockWidget *p_fileListDock;
-      QDockWidget *p_mosaicPreviewDock;
+      QMenu *m_viewMenu;
+      QMenu *m_settingsMenu;
+      QMenu *m_fileMenu;
+      QMenu *m_exportMenu;
+      MosaicController *m_mosaicController;
+      QList<QAction *> m_actionsRequiringOpen;
+      QList<QAction *> m_actionsRequiringClosed;
+      QList<Cube *> m_openCubes;
+      QFileInfo m_lastOpenedFile;
+      QSettings m_settings;
+      QDockWidget *m_fileListDock;
+      QDockWidget *m_mosaicPreviewDock;
   };
 };
 

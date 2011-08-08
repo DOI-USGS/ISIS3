@@ -287,7 +287,7 @@ namespace Isis {
   }
 
 
-  void MosaicAreaTool::fromPvl(PvlObject &obj) {
+  void MosaicAreaTool::fromPvl(const PvlObject &obj) {
     if(obj.HasKeyword("Visible")) {
       if(obj.HasKeyword("Latitude") && obj["Latitude"][0] != "Null")
         m_latLineEdit->setText(obj["Latitude"][0]);

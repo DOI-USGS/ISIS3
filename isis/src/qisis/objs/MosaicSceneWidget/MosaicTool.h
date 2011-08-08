@@ -65,7 +65,7 @@ namespace Isis {
       virtual void addTo(QToolBar *toolBar);
 
       virtual PvlObject toPvl() const;
-      virtual void fromPvl(PvlObject &obj);
+      virtual void fromPvl(const PvlObject &obj);
       virtual iString projectPvlObjectName() const;
 
     signals:

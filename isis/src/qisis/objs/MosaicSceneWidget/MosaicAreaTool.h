@@ -27,7 +27,7 @@ namespace Isis {
       void addToMenu(QMenu *menu);
 
       PvlObject toPvl() const;
-      void fromPvl(PvlObject &obj);
+      void fromPvl(const PvlObject &obj);
       iString projectPvlObjectName() const;
 
     protected:

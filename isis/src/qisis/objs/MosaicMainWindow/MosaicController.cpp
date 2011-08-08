@@ -427,6 +427,9 @@ namespace Isis {
         QThreadPool::globalInstance()->setMaxThreadCount(
             QThread::idealThreadCount());
 
+      if(m_projectPvl && m_projectPvl->HasObject("MosaicScene"))
+        p_scene->preloadFromPvl(m_projectPvl->FindObject("MosaicScene"));
+
       QFuture< CubeDisplayProperties * > displays = QtConcurrent::mapped(
           cubes.BeginObject(), cubes.EndObject(),
           ProjectToDisplayFunctor(m_mutex, QThread::currentThread()));

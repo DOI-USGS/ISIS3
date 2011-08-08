@@ -120,7 +120,7 @@ namespace Isis {
   }
 
 
-  void MosaicControlNetTool::fromPvl(PvlObject &obj) {
+  void MosaicControlNetTool::fromPvl(const PvlObject &obj) {
     m_controlNetFile = QString::fromStdString(obj["Filename"][0]);
     if (m_controlNetFile == "Null")
       m_controlNetFile = "";

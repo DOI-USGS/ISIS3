@@ -18,62 +18,63 @@
 namespace Isis {
   MosaicMainWindow::MosaicMainWindow(QString title, QWidget *parent) :
       MainWindow(title, parent),
-      p_settings(Filename("$HOME/.Isis/qmos/qmos.config").Expanded().c_str(),
+      m_settings(Filename("$HOME/.Isis/qmos/qmos.config").Expanded().c_str(),
                  QSettings::NativeFormat) {
-    p_filename = "";
-    p_fileMenu = NULL;
-    p_settingsMenu = NULL;
-    p_viewMenu = NULL;
+    m_filename = "";
+    m_fileMenu = NULL;
+    m_settingsMenu = NULL;
+    m_viewMenu = NULL;
 
     m_controllerVisible = false;
 
     setWindowTitle(title);
 
-    p_permToolbar = new QToolBar("Standard Tools", this);
-    p_permToolbar->setObjectName("Standard Tools");
-    addToolBar(p_permToolbar);
+    m_permToolbar = new QToolBar("Standard Tools", this);
+    m_permToolbar->setObjectName("Standard Tools");
+    addToolBar(m_permToolbar);
 
-    p_activeToolbar = new QToolBar("Active Tool", this);
-    p_activeToolbar->setObjectName("Active Tool");
-    addToolBar(p_activeToolbar);
+    m_activeToolbar = new QToolBar("Active Tool", this);
+    m_activeToolbar->setObjectName("Active Tool");
+    addToolBar(m_activeToolbar);
 
     QStatusBar *sbar = statusBar();
     sbar->showMessage("Ready");
 
-    p_toolpad = new ToolPad("Tool Pad", this);
-    p_toolpad->setObjectName("Tool Pad");
+    m_toolpad = new ToolPad("Tool Pad", this);
+    m_toolpad->setObjectName("Tool Pad");
     // default to the right hand side for qview-like behavior... we might
     //   want to do something different here
-    addToolBar(Qt::RightToolBarArea, p_toolpad);
+    addToolBar(Qt::RightToolBarArea, m_toolpad);
 
-    p_progressBar = new QProgressBar(parent);
-    p_progressBar->setOrientation(Qt::Horizontal);
-    sbar->addWidget(p_progressBar);
+    m_progressBar = new QProgressBar(parent);
+    m_progressBar->setOrientation(Qt::Horizontal);
+    sbar->addWidget(m_progressBar);
     setupMenus();
 
-    p_fileListDock = new QDockWidget("File List", this, Qt::SubWindow);
-    p_fileListDock->setObjectName("FileListDock");
-    p_fileListDock->setFeatures(QDockWidget::DockWidgetFloatable |
+    m_fileListDock = new QDockWidget("File List", this, Qt::SubWindow);
+    m_fileListDock->setObjectName("FileListDock");
+    m_fileListDock->setFeatures(QDockWidget::DockWidgetFloatable |
                                 QDockWidget::DockWidgetMovable |
                                 QDockWidget::DockWidgetClosable);
 
-    p_mosaicPreviewDock = new QDockWidget("Mosaic World View",
+    m_mosaicPreviewDock = new QDockWidget("Mosaic World View",
                                           this, Qt::SubWindow);
-    p_mosaicPreviewDock->setObjectName("MosaicPreviewDock");
-    p_mosaicPreviewDock->setFeatures(QDockWidget::DockWidgetFloatable |
+    m_mosaicPreviewDock->setObjectName("MosaicPreviewDock");
+    m_mosaicPreviewDock->setFeatures(QDockWidget::DockWidgetFloatable |
                                      QDockWidget::DockWidgetMovable |
                                      QDockWidget::DockWidgetClosable);
 
-    addDockWidget(Qt::LeftDockWidgetArea, p_fileListDock);
-    addDockWidget(Qt::LeftDockWidgetArea, p_mosaicPreviewDock);
+    addDockWidget(Qt::LeftDockWidgetArea, m_fileListDock);
+    addDockWidget(Qt::LeftDockWidgetArea, m_mosaicPreviewDock);
 
     readSettings();
 
     setCentralWidget(new QWidget());
     centralWidget()->setLayout(new QHBoxLayout());
 
-    p_mosaicController = NULL;
+    m_mosaicController = NULL;
     createController();
+    displayController();
     installEventFilter(this);
   }
 
@@ -106,7 +107,7 @@ namespace Isis {
    */
   void MosaicMainWindow::setupMenus() {
     // Create the file menu
-    p_fileMenu = menuBar()->addMenu("&File");
+    m_fileMenu = menuBar()->addMenu("&File");
 
     iString iconDir = Filename("$base/icons").Expanded();
 
@@ -124,25 +125,23 @@ namespace Isis {
     saveProject->setText("Save Project");
     saveProject->setShortcut(Qt::CTRL + Qt::Key_S);
     saveProject->setIcon(QPixmap(QString::fromStdString(iconDir.c_str()) + "/mActionFileSave.png"));
-    p_actionsRequiringOpen.append(saveProject);
+    m_actionsRequiringOpen.append(saveProject);
     connect(saveProject, SIGNAL(activated()), this, SLOT(saveProject()));
 
     QAction *saveProjectAs = new QAction(this);
     saveProjectAs->setText("Save Project As...");
     saveProjectAs->setIcon(QPixmap(QString::fromStdString(iconDir.c_str()) + "/mActionFileSaveAs.png"));
-    p_actionsRequiringOpen.append(saveProjectAs);
+    m_actionsRequiringOpen.append(saveProjectAs);
     connect(saveProjectAs, SIGNAL(activated()), this, SLOT(saveProjectAs()));
 
     QAction *loadProject = new QAction(this);
     loadProject->setText("Load Project...");
     loadProject->setIcon(QPixmap(QString::fromStdString(iconDir.c_str()) + "/mActionExportMapServer.png"));
-    p_actionsRequiringClosed.append(loadProject);
     connect(loadProject, SIGNAL(activated()), this, SLOT(loadProject()));
-    
 
     QAction *closeProject = new QAction(this);
     closeProject->setText("Close Project");
-    p_actionsRequiringOpen.append(closeProject);
+    m_actionsRequiringOpen.append(closeProject);
     connect(closeProject, SIGNAL(activated()), this, SLOT(closeMosaic()));
 
     QAction *exit = new QAction(this);
@@ -150,25 +149,25 @@ namespace Isis {
     connect(exit, SIGNAL(activated()), this, SLOT(close()));
 
     QAction *actionRequiringOpen = NULL;
-    foreach(actionRequiringOpen, p_actionsRequiringOpen) {
+    foreach(actionRequiringOpen, m_actionsRequiringOpen) {
       actionRequiringOpen->setEnabled(false);
     }
 
     QAction *actionRequiringClosed = NULL;
-    foreach(actionRequiringClosed, p_actionsRequiringClosed) {
+    foreach(actionRequiringClosed, m_actionsRequiringClosed) {
       actionRequiringClosed->setEnabled(true);
     }
 
-    p_fileMenu->addAction(open);
-    p_fileMenu->addAction(openList);
-    p_fileMenu->addSeparator();
-    p_fileMenu->addAction(loadProject);
-    p_fileMenu->addAction(saveProject);
-    p_fileMenu->addAction(saveProjectAs);
-    p_fileMenu->addAction(closeProject);
-    p_fileMenu->addSeparator();
-    p_exportMenu = p_fileMenu->addMenu("&Export");
-    p_fileMenu->addAction(exit);
+    m_fileMenu->addAction(open);
+    m_fileMenu->addAction(openList);
+    m_fileMenu->addSeparator();
+    m_fileMenu->addAction(loadProject);
+    m_fileMenu->addAction(saveProject);
+    m_fileMenu->addAction(saveProjectAs);
+    m_fileMenu->addAction(closeProject);
+    m_fileMenu->addSeparator();
+    m_exportMenu = m_fileMenu->addMenu("&Export");
+    m_fileMenu->addAction(exit);
 
     permanentToolBar()->addAction(loadProject);
     permanentToolBar()->addAction(saveProject);
@@ -178,8 +177,8 @@ namespace Isis {
     permanentToolBar()->addAction(openList);
     permanentToolBar()->addSeparator();
 
-    p_viewMenu = menuBar()->addMenu("&View");
-    p_settingsMenu = menuBar()->addMenu("&Settings");
+    m_viewMenu = menuBar()->addMenu("&View");
+    m_settingsMenu = menuBar()->addMenu("&Settings");
 
     updateMenuVisibility();
   }
@@ -195,12 +194,12 @@ namespace Isis {
     filterList.append("Isis cubes (*.cub)");
     filterList.append("All Files (*)");
 
-    QDir directory = p_lastOpenedFile.dir();
+    QDir directory = m_lastOpenedFile.dir();
 
     QStringList selected = QFileDialog::getOpenFileNames(this, "Open Cubes",
         directory.path(), filterList.join(";;"));
 
-    if(!selected.empty()) {
+    if (!selected.empty()) {
       openFiles(selected);
     }
   }
@@ -213,7 +212,7 @@ namespace Isis {
     foreach(rootAction, rootMenu->actions()) {
       QMenu *rootMenu = rootAction->menu();
 
-      if(rootMenu) {
+      if (rootMenu) {
         rootAction->setVisible(updateMenuVisibility(rootAction->menu()));
       }
     }
@@ -221,18 +220,17 @@ namespace Isis {
 
 
   void MosaicMainWindow::createController() {
-    if(p_mosaicController == NULL) {
-      p_mosaicController = new MosaicController(statusBar(), p_settings);
-      
-      
-      QList<QAction *> settingsActs = p_mosaicController->getSettingsActions();
-      
+    if (m_mosaicController == NULL) {
+      m_mosaicController = new MosaicController(statusBar(), m_settings);
+
+      QList<QAction *> settingsActs = m_mosaicController->getSettingsActions();
+
       QAction *settingsAct;
       foreach(settingsAct, settingsActs) {
         connect(settingsAct, SIGNAL(destroyed(QObject *)),
                 this, SLOT(updateMenuVisibility()));
 
-        p_settingsMenu->addAction(settingsAct);
+        m_settingsMenu->addAction(settingsAct);
       }
 
       updateMenuVisibility();
@@ -241,49 +239,47 @@ namespace Isis {
 
 
   void MosaicMainWindow::displayController() {
-    createController();
-    
-    if(p_mosaicController && !m_controllerVisible) {
+    if (m_mosaicController && !m_controllerVisible) {
       m_controllerVisible = true;
-      p_mosaicController->addExportActions(*p_exportMenu);
+      m_mosaicController->addExportActions(*m_exportMenu);
 
-      p_fileListDock->setWidget(p_mosaicController->getMosaicFileList());
-      p_mosaicPreviewDock->setWidget(p_mosaicController->getMosaicWorldScene());
+      m_fileListDock->setWidget(m_mosaicController->getMosaicFileList());
+      m_mosaicPreviewDock->setWidget(m_mosaicController->getMosaicWorldScene());
 
       centralWidget()->layout()->addWidget(
-          p_mosaicController->getMosaicScene());
+          m_mosaicController->getMosaicScene());
 
       QAction *actionRequiringOpen = NULL;
-      foreach(actionRequiringOpen, p_actionsRequiringOpen) {
+      foreach(actionRequiringOpen, m_actionsRequiringOpen) {
         actionRequiringOpen->setEnabled(true);
       }
 
       QAction *actionRequiringClosed = NULL;
-      foreach(actionRequiringClosed, p_actionsRequiringClosed) {
+      foreach(actionRequiringClosed, m_actionsRequiringClosed) {
         actionRequiringClosed->setEnabled(false);
       }
 
-      p_mosaicController->getMosaicScene()->addTo(p_toolpad);
-      p_mosaicController->getMosaicScene()->addToPermanent(p_permToolbar);
-      p_mosaicController->getMosaicScene()->addTo(p_activeToolbar);
+      m_mosaicController->getMosaicScene()->addTo(m_toolpad);
+      m_mosaicController->getMosaicScene()->addToPermanent(m_permToolbar);
+      m_mosaicController->getMosaicScene()->addTo(m_activeToolbar);
 
-      statusBar()->addWidget(p_mosaicController->getProgress());
+      statusBar()->addWidget(m_mosaicController->getProgress());
       statusBar()->addWidget(
-          p_mosaicController->getMosaicScene()->getProgress());
+          m_mosaicController->getMosaicScene()->getProgress());
       statusBar()->addWidget(
-          p_mosaicController->getMosaicWorldScene()->getProgress());
+          m_mosaicController->getMosaicWorldScene()->getProgress());
       statusBar()->addWidget(
-          p_mosaicController->getMosaicFileList()->getProgress());
+          m_mosaicController->getMosaicFileList()->getProgress());
 
       QList<QAction *> viewActs =
-          p_mosaicController->getMosaicFileList()->getViewActions();
+          m_mosaicController->getMosaicFileList()->getViewActions();
 
       QAction *viewAct;
       foreach(viewAct, viewActs) {
         connect(viewAct, SIGNAL(destroyed(QObject *)),
                 this, SLOT(updateMenuVisibility()));
 
-        p_viewMenu->addAction(viewAct);
+        m_viewMenu->addAction(viewAct);
       }
 
       updateMenuVisibility();
@@ -294,7 +290,7 @@ namespace Isis {
   bool MosaicMainWindow::updateMenuVisibility(QMenu *menu) {
     bool anythingVisible = false;
 
-    if(menu) {
+    if (menu) {
       QList<QAction *> actions = menu->actions();
 
       // Recursively search the menu for other menus to show or hide and handle
@@ -303,14 +299,14 @@ namespace Isis {
       foreach(menuAction, menu->actions()) {
         bool thisVisible = true;
 
-        if(menuAction->menu() != NULL) {
+        if (menuAction->menu() != NULL) {
           thisVisible = updateMenuVisibility(menuAction->menu());
         }
         else {
           thisVisible = menuAction->isVisible();
         }
 
-        if(thisVisible)
+        if (thisVisible)
           anythingVisible = true;
       }
 
@@ -332,12 +328,12 @@ namespace Isis {
     filterList.append("Text Files (*.txt)");
     filterList.append("All files (*)");
 
-    QDir directory = p_lastOpenedFile.dir();
+    QDir directory = m_lastOpenedFile.dir();
 
     QString selected = QFileDialog::getOpenFileName(this, "Open Cube List",
         directory.path(), filterList.join(";;"));
 
-    if(selected != "") {
+    if (selected != "") {
       TextFile fileList((iString) selected);
 
       QStringList filesInList;
@@ -347,7 +343,7 @@ namespace Isis {
         filesInList.append(line);
       }
 
-      if(filesInList.empty()) {
+      if (filesInList.empty()) {
         iString msg = "No files were found inside the file list";
         throw iException::Message(iException::Io, msg, _FILEINFO_);
       }
@@ -367,28 +363,28 @@ namespace Isis {
     // Call the base class function to read the size and location
     MainWindow::readSettings();
 
-    p_settings.beginGroup("MosaicMainWindow");
-    QByteArray state = p_settings.value("state", QByteArray("0")).toByteArray();
+    m_settings.beginGroup("MosaicMainWindow");
+    QByteArray state = m_settings.value("state", QByteArray("0")).toByteArray();
     restoreState(state);
 
     // load window position and size
-    QPoint pos = p_settings.value("pos", QPoint(100, 100)).toPoint();
-    QSize size = p_settings.value("size", QSize(750,
+    QPoint pos = m_settings.value("pos", QPoint(100, 100)).toPoint();
+    QSize size = m_settings.value("size", QSize(750,
         600)).toSize();
     resize(size);
     move(pos);
 
-    p_settings.endGroup();
+    m_settings.endGroup();
   }
 
 
   void MosaicMainWindow::openFiles(QStringList cubeNames) {
     // Create a mosaic widget if we don't have one
-    if(!cubeNames.empty())
+    if (!cubeNames.empty())
       displayController();
 
-    if(p_mosaicController)
-      p_mosaicController->openCubes(cubeNames);
+    if (m_mosaicController)
+      m_mosaicController->openCubes(cubeNames);
   }
 
 
@@ -401,13 +397,13 @@ namespace Isis {
    */
   void MosaicMainWindow::saveSettings2() {
     // Now write the settings that are specific to this window.
-    p_settings.beginGroup("MosaicMainWindow");
-    p_settings.setValue("state", saveState());
+    m_settings.beginGroup("MosaicMainWindow");
+    m_settings.setValue("state", saveState());
 
-    p_settings.setValue("pos", pos());
-    p_settings.setValue("size", size());
+    m_settings.setValue("pos", pos());
+    m_settings.setValue("size", size());
 
-    p_settings.endGroup();
+    m_settings.endGroup();
     closeMosaic();
   }
 
@@ -416,14 +412,14 @@ namespace Isis {
    * Allows the user to save a project file.
    */
   void MosaicMainWindow::saveProjectAs() {
-    if(p_mosaicController) {
+    if (m_mosaicController) {
       QString fn =  QFileDialog::getSaveFileName(this, "Save Project",
                     QDir::currentPath() + "/untitled.mos",
                     "Mosaic (*.mos)");
-      if(fn.isEmpty()) return;
+      if (fn.isEmpty()) return;
 
-      p_mosaicController->saveProject(fn);
-      p_filename = fn;
+      m_mosaicController->saveProject(fn);
+      m_filename = fn;
     }
   }
 
@@ -433,11 +429,11 @@ namespace Isis {
    *
    */
   void MosaicMainWindow::saveProject() {
-    if(p_filename == "") {
+    if (m_filename == "") {
       saveProjectAs();
     }
     else {
-      p_mosaicController->saveProject(p_filename);
+      m_mosaicController->saveProject(m_filename);
     }
   }
 
@@ -448,7 +444,9 @@ namespace Isis {
    *
    */
   void MosaicMainWindow::loadProject() {
-    if(!m_controllerVisible) {
+    closeMosaic();
+
+    if (!m_controllerVisible) {
       QString fn =  QFileDialog::getOpenFileName(this, "Load Project",
                     QDir::currentPath(),
                     "Mosaic (*.mos)");
@@ -458,39 +456,38 @@ namespace Isis {
 
 
   void MosaicMainWindow::loadProject(QString fn) {
-    if(!fn.isEmpty()) {
+    if (!fn.isEmpty()) {
+      createController();
       displayController();
 
-      if(p_mosaicController)
-        p_mosaicController->readProject(fn);
+      if (m_mosaicController)
+        m_mosaicController->readProject(fn);
 
-      p_filename = fn;
+      m_filename = fn;
     }
   }
 
 
   void MosaicMainWindow::closeMosaic() {
-    if(p_mosaicController) {
+    if (m_mosaicController) {
       QAction *actionRequiringOpen = NULL;
-      foreach(actionRequiringOpen, p_actionsRequiringOpen) {
+      foreach(actionRequiringOpen, m_actionsRequiringOpen) {
         actionRequiringOpen->setEnabled(false);
       }
 
       QAction *actionRequiringClosed = NULL;
-      foreach(actionRequiringClosed, p_actionsRequiringClosed) {
+      foreach(actionRequiringClosed, m_actionsRequiringClosed) {
         actionRequiringClosed->setEnabled(true);
       }
 
-      p_mosaicController->saveSettings(p_settings);
-      delete p_mosaicController;
-      p_mosaicController = NULL;
+      m_mosaicController->saveSettings(m_settings);
+      delete m_mosaicController;
+      m_mosaicController = NULL;
 
-      p_filename = "";
+      m_filename = "";
       m_controllerVisible = false;
     }
 
-    // Create a non-visible controller... so we have things like the settings
-    //   menu
     createController();
   }
 }

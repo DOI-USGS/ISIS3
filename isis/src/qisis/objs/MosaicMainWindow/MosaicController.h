@@ -39,6 +39,8 @@ namespace Isis {
    *                                functionality and fixed a few design issues
    *  @history 2010-10-26 Tracie Sucharski Added missing includes to cpp after
    *                                removing includes from ControlNet.h.
+   *  @history 2011-08-08 Steven Lambright - Refactored. Now uses scene widget's
+   *                                preloadFromPvl. 
    */
 
   class MosaicController : public QObject {

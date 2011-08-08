@@ -89,7 +89,7 @@ namespace Isis {
   }
 
 
-  void MosaicTool::fromPvl(PvlObject &obj) {
+  void MosaicTool::fromPvl(const PvlObject &obj) {
     if(projectPvlObjectName() != "") {
       throw iException::Message(
           iException::Programmer, "Please re-implement fromPvl in your tool",

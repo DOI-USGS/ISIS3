@@ -358,26 +358,30 @@ namespace Isis {
     return output;
   }
 
-  void MosaicSceneWidget::fromPvl(PvlObject project) {
-    setProjection(project.FindGroup("Mapping"));
 
-    recalcSceneRect();
-
+  /**
+   * Call this method after loading any cubes when loading a project.
+   * 
+   * @param project The project Pvl
+   */
+  void MosaicSceneWidget::fromPvl(const PvlObject &project) {
     MosaicTool *tool;
     foreach(tool, *m_tools) {
       if(tool->projectPvlObjectName() != "") {
         if(project.HasObject(tool->projectPvlObjectName())) {
-          tool->fromPvl(project.FindObject(tool->projectPvlObjectName()));
+          const PvlObject &toolSettings(
+              project.FindObject(tool->projectPvlObjectName()));
+          tool->fromPvl(toolSettings);
         }
       }
 
       if (project.HasObject("ZOrdering")) {
-        PvlObject &zOrders = project.FindObject("ZOrdering");
+        const PvlObject &zOrders = project.FindObject("ZOrdering");
 
         for (int zOrderIndex = 0;
              zOrderIndex < zOrders.Keywords();
              zOrderIndex ++) {
-          PvlKeyword &zOrder = zOrders[zOrderIndex];
+          const PvlKeyword &zOrder = zOrders[zOrderIndex];
 
           QString filenameToFind = zOrder[0];
 
@@ -396,6 +400,17 @@ namespace Isis {
         }
       }
     }
+  }
+
+
+  /**
+   * Call this method before loading any cubes when loading a project.
+   * 
+   * @param project The project Pvl
+   */
+  void MosaicSceneWidget::preloadFromPvl(const PvlObject &project) {
+    setProjection(project.FindGroup("Mapping"));
+    recalcSceneRect();
   }
 
 
