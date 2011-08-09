@@ -10,11 +10,10 @@
     <p>
       This program attempts to merge a set of (two or more) Control Networks
       into a single network.  The merging process starts with a "base" network
-      into which each successive network is "added".  When conflicts arise
-      between the base network and the network being added, a set of
+      into which each successive, "new" network is added.  When conflicts arise
+      between the base network and the new network being added, a set of
       user-defined rules are used to determine how the conflicts are resolved.
-      Each network must share the same target and be of the same type (i.e.,
-      Singleton, ImageToImage, ImageToGround).
+      Each network must share the same target.
     </p>
   </description>
 
@@ -141,10 +140,24 @@
               as the network being "added".
             </description>
             <exclusions>
+              <item>REVERSE</item>
               <item>CLIST</item>
             </exclusions>
           </option>
         </list>
+      </parameter>
+
+      <parameter name="REVERSE">
+        <type>boolean</type>
+        <default><item>False</item></default>
+        <brief>Reverse the order of CLIST, making last network the base</brief>
+        <description>
+          By default, the first network in CLIST will be the base network, and
+          each network below it will be added to it in descending order.  By
+          enabling this option, the input CLIST will be reversed, making the
+          last item in the list the base network, and the second-to-last item
+          the first to be added, etc.
+        </description>
       </parameter>
 
       <parameter name = "CLIST">

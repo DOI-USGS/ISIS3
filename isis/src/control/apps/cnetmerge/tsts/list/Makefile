@@ -11,4 +11,14 @@ commands:
 	LOG=$(OUTPUT)/report.txt \
 	NETWORKID=testReplaceMerge DESCRIPTION=NewTextCtl \
 	> /dev/null;
+
+	$(APPNAME) INPUTTYPE=list \
+	REVERSE=true \
+	CLIST=$(OUTPUT)/list.lis \
+	ONET=$(OUTPUT)/testReplaceReverse.net \
+	DUPLICATEPOINTS=merge \
+	LOG=$(OUTPUT)/reportReverse.txt \
+	NETWORKID=testReplaceMerge DESCRIPTION=NewTextCtl \
+	> /dev/null;
+
 	$(RM) $(OUTPUT)/list.lis;

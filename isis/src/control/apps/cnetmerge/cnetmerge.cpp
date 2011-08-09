@@ -1,5 +1,7 @@
 #include "Isis.h"
 
+#include <algorithm>
+
 #include "ControlMeasure.h"
 #include "ControlNet.h"
 #include "ControlPoint.h"
@@ -69,6 +71,10 @@ void IsisMain() {
       string msg = "CLIST [" + ui.GetFilename("CLIST") + "] must contain at "
           "least two filenames: a base network and a new network";
       throw iException::Message(iException::User, msg, _FILEINFO_);
+    }
+
+    if (ui.GetBoolean("REVERSE")) {
+      std::reverse(filelist.begin(), filelist.end());
     }
   }
   else if (ui.GetString("INPUTTYPE") == "CNETS") {
@@ -388,16 +394,6 @@ void addMeasure(ControlPoint *basePoint, ControlPoint *newPoint,
 }
 
 
-void reportConflict(PvlObject &pointLog, iString conflict) {
-  // Add a point conflict message to the point log if we're reporting these
-  // conflicts to a log file
-  if (report) {
-    PvlKeyword resolution("Resolution", conflict);
-    pointLog.AddKeyword(resolution);
-  }
-}
-
-
 PvlObject createNetworkLog(ControlNet &cnet) {
   PvlObject cnetLog("Network");
   PvlKeyword networkId("NetworkId", cnet.GetNetworkId());
@@ -417,6 +413,16 @@ PvlObject createPointLog(ControlPoint *point) {
 PvlGroup createMeasureLog() {
   PvlGroup measureLog("Measures");
   return measureLog;
+}
+
+
+void reportConflict(PvlObject &pointLog, iString conflict) {
+  // Add a point conflict message to the point log if we're reporting these
+  // conflicts to a log file
+  if (report) {
+    PvlKeyword resolution("Resolution", conflict);
+    pointLog.AddKeyword(resolution);
+  }
 }
 
 
