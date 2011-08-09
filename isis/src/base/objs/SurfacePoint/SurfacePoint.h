@@ -69,6 +69,9 @@ namespace Isis {
    * @history 2011-04-18 Steven Lambright GetLatSigmaDistance and
    *           GetLonSigmaDistance now return appropriate results when the
    *           point is invalid but has radii. 
+   * @history 2011-08-08 Steven Lambright and Jai Rideout -
+   *                         SetSphericalSigmas() called with invalid parameters
+   *                         will clear the sigmas. Improved some safety checks.
    */
 
   class SurfacePoint {

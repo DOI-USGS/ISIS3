@@ -361,8 +361,7 @@ namespace Isis {
   void SurfacePoint::SetRectangularMatrix(
        const symmetric_matrix<double, upper> &covar) {
     // Make sure the point is set first
-    if (!p_x || !p_y || !p_z || !p_x->Valid() || !p_y->Valid() ||
-        !p_z->Valid()) {
+    if (!Valid()) {
       iString msg = "A point must be set before a variance/covariance matrix "
         "can be set.";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
@@ -518,19 +517,27 @@ namespace Isis {
   void SurfacePoint::SetSphericalSigmas(const Angle &latSigma,
                                         const Angle &lonSigma,
                                         const Distance &radiusSigma) {
-    // Is any error checking necessary beyond Angle and Distance????
+    if (latSigma.Valid() && lonSigma.Valid() && radiusSigma.Valid()) {
+      symmetric_matrix<double,upper> covar(3);
+      covar.clear();
 
-    symmetric_matrix<double,upper> covar(3);
-    covar.clear();
-    double sphericalCoordinate;
-    sphericalCoordinate = (double) latSigma.GetRadians();
-    covar(0,0) =  sphericalCoordinate*sphericalCoordinate;
-    sphericalCoordinate = (double) lonSigma.GetRadians();
-    covar(1,1) = sphericalCoordinate*sphericalCoordinate;
-    sphericalCoordinate = (double) radiusSigma.GetMeters();
-    covar(2,2) = sphericalCoordinate*sphericalCoordinate;
+      double sphericalCoordinate;
+      sphericalCoordinate = (double) latSigma.GetRadians();
+      covar(0,0) =  sphericalCoordinate*sphericalCoordinate;
+      sphericalCoordinate = (double) lonSigma.GetRadians();
+      covar(1,1) = sphericalCoordinate*sphericalCoordinate;
+      sphericalCoordinate = (double) radiusSigma.GetMeters();
+      covar(2,2) = sphericalCoordinate*sphericalCoordinate;
 
-    SetSphericalMatrix(covar);
+      SetSphericalMatrix(covar);
+    }
+    else {
+      delete p_sphereCovar;
+      p_sphereCovar = NULL;
+
+      delete p_rectCovar;
+      p_rectCovar = NULL;
+    }
   }
 
 
@@ -556,6 +563,11 @@ namespace Isis {
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
+    if (!Valid()) {
+      iString msg = "Cannot set spherical sigmas on an invalid surface point";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    }
+ 
     double scaledLatSig = latSigma / *p_majorAxis;
     double scaledLonSig = lonSigma * cos((double)GetLatitude().GetRadians())
                                    / *p_majorAxis;
@@ -575,8 +587,7 @@ namespace Isis {
      const symmetric_matrix<double, upper> & covar) {
 
     // Make sure the point is set first
-    if (!p_x || !p_y || !p_z || !p_x->Valid() || !p_y->Valid() ||
-        !p_z->Valid()) {
+    if (!Valid()) {
       iString msg = "A point must be set before a variance/covariance matrix "
         "can be set.";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
