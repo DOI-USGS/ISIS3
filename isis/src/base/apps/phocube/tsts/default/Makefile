@@ -7,19 +7,4 @@ include $(ISISROOT)/make/isismake.tsts
 
 commands:
 	 $(APPNAME) from=$(INPUT)/ab102401.cropped.cub \
-	  to=$(OUTPUT)/phocubeTruth.cub \
-	  phase=true \
-	  emission=true \
-	  incidence=true \
-	  latitude=true \
-	  longitude=true \
-	  pixelresolution=true \
-	  lineresolution=true \
-	  sampleresolution=true \
-	  detectorresolution=true \
-	  northazimuth=true \
-	  sunazimuth=true \
-	  spacecraftazimuth=true \
-	  offnadirangle=true \
-	  subspacecraftgroundazimuth=true \
-	  subsolargroundazimuth=true > /dev/null;  
+	  to=$(OUTPUT)/phocubeTruth.cub  > /dev/null;

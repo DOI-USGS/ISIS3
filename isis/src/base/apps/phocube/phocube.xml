@@ -3,7 +3,7 @@
 <application name="phocube" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>
-    Creates phase, incidence, and/or emmision angle bands for a cube
+    Creates phase, incidence, and/or emission angle bands for a cube
   </brief>
 
   <description>
@@ -79,6 +79,14 @@
     <change name="Travis Addair" date="2011-02-10">
       Added parameters LOCALINCIDENCE and LOCALEMISSION.
     </change>
+   <change name="Kris Becker" date="2011-08-08">
+      Added the option to propagate the input pixel value (DN) as the first 
+      plane (however, this, by default, will not be invoked as default so as to 
+      preserve preexisting behavior). Ensure the Center, OriginalBand, Name, and 
+      Width BandBin  keyword values are populated properly and propagated to 
+      the output label (should support camera models). Added MORPHOLOGY and 
+      ALBEDO backplane options for special mosaic options.
+    </change>
 </history>
 
   <category>
@@ -117,6 +125,18 @@
     </group>
 
     <group name="Photometry">
+      <parameter name="DN">
+        <type>boolean</type>
+        <default><item>FALSE</item></default>
+        <brief>Propagate the input pixel to the output file.</brief>
+        <description>
+          If this parameter is true then the input pixel value will be
+          propagated to the output file.  This will help alleviate potential 
+          additional runs of cubeit when necessary.  When this option is 
+          selected, the BandBin values are retained for this band so that 
+          geometry operations are preserved.
+        </description>
+      </parameter>
       <parameter name="PHASE">
         <type>boolean</type>
         <default><item>TRUE</item></default>
@@ -259,6 +279,53 @@
           This is the clockwise angle on the ground between a line drawn from
           the ground point to the North pole of the body and a line drawn from
           the ground point to the sub solar point.
+        </description>
+      </parameter>
+     <parameter name="MORPHOLOGY">
+        <type>boolean</type>
+        <default><item>FALSE</item></default>
+        <brief>Create a morphology index band</brief>
+        <description>
+          <p>
+            This plane is computed from the resolution and emission angle using 
+            the following formula:  MORPHOLOGY = PIXELRESOLUTION/ cos(EMISSION) .  
+            The resulting backplane can then be used automos to create a 
+            morphology-based mosaic product.  This option will always use the 
+            local emission angle if a DEM exists.   If not, it will use the 
+            default calculation (from the ellipsoid).    All values are tested 
+            for zero values and set to a constant very close to zero so all 
+            pixels should have real values.
+          </p>
+          <p>
+            To utilize the this backplane in automos, add the parameters 
+            <b>priority=band type=keyword keyname=Name keyvalue=morphology 
+              criteria=lesser</b>.  
+            See <b>automos</b> documentation for further details.
+          </p>
+        </description>
+      </parameter>
+     <parameter name="ALBEDO">
+        <type>boolean</type>
+        <default><item>FALSE</item></default>
+        <brief>Create an albedo index band</brief>
+        <description>
+          <p>
+            This plane is computed from the resolution,  incidence and emission 
+            angles using the following formula: ALBEDO = PIXELRESOLUTION * [  (1 
+            / cos(EMISSION)) + (1 / cos(INCIDENCE)) ] .  The resulting backplane 
+            can then be used automos to create an albedo-based mosaic product. 
+            This option will always use the local emission and incidence angles 
+            if a DEM exists.   If not, it will use the default calculation 
+            (from the ellipsoid).  All values are tested for zero values and set 
+            to a constant very close to zero so all pixels should have real 
+            values.
+          </p>
+          <p>
+            To utilize the this backplane in automos, add the parameters 
+            <b>priority=band type=keyword keyname=Name keyvalue=albedo 
+              criteria=lesser</b>.  
+            See <b>automos</b> documentation for further details.
+          </p>
         </description>
       </parameter>
     </group>
