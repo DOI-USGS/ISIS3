@@ -66,23 +66,38 @@ void noLatLonCheck(ControlNet &cnet, CubeManager &manager, Progress &progress,
     set<iString> &noLatLonSerialNumbers,
     QMap< iString, set<iString> > &noLatLonControlPoints);
 
-string buildRow(SerialNumberList &serials, string sn, string delimiter="\t");
-string buildRow(SerialNumberList &serials, string sn, set<iString> &cps,
-    string delimiter="\t");
-string buildRow(SerialNumberList &serials, string sn, double value,
-    string delimiter="\t");
+string buildRow(SerialNumberList &serials, string sn);
+string buildRow(SerialNumberList &serials, string sn, set<iString> &cps);
+string buildRow(SerialNumberList &serials, string sn, double value);
 void outputRow(ofstream &outStream, string rowText);
+
+
+iString delimiter;
+
 
 // Main program
 void IsisMain() {
 
   Progress progress;
   UserInterface &ui = Application::GetUserInterface();
-  // This constructor was removed in the Control redesign
-  //ControlNet innet(ui.GetFilename("CNET"), NULL, true);
+
   ControlNet innet(ui.GetFilename("CNET"));
   iString prefix(ui.GetString("PREFIX"));
   bool ignore = ui.GetBoolean("IGNORE");
+
+  // Set the character to separate the entries
+  if(ui.GetString("DELIMIT") == "TAB") {
+    delimiter = "\t";
+  }
+  else if(ui.GetString("DELIMIT") == "COMMA") {
+    delimiter = ",";
+  }
+  else if(ui.GetString("DELIMIT") == "SPACE") {
+    delimiter = " ";
+  }
+  else {
+    delimiter = ui.GetString("CUSTOM");
+  }
 
   // Sets up the list of serial numbers for
   FileList inlist(ui.GetFilename("FROMLIST"));
@@ -519,23 +534,6 @@ QVector< set<iString> > findIslands(set<iString> & index,
 void WriteOutput(SerialNumberList num2cube, string filename,
                  set<iString> sns, QMap< iString, set<iString> > cps) {
 
-  UserInterface &ui = Application::GetUserInterface();
-
-  // Set the character to separate the entries
-  iString delimit;
-  if(ui.GetString("DELIMIT") == "TAB") {
-    delimit = "\t";
-  }
-  else if(ui.GetString("DELIMIT") == "COMMA") {
-    delimit = ",";
-  }
-  else if(ui.GetString("DELIMIT") == "SPACE") {
-    delimit = " ";
-  }
-  else {
-    delimit = ui.GetString("CUSTOM");
-  }
-
   // Set up the output file for writing
   ofstream out_stream;
   out_stream.open(filename.c_str(), std::ios::out);
@@ -543,7 +541,7 @@ void WriteOutput(SerialNumberList num2cube, string filename,
 
   for(set<iString>::iterator sn = sns.begin();
       sn != sns.end(); sn++) {
-    outputRow(out_stream, buildRow(num2cube, *sn, cps[*sn], delimit));
+    outputRow(out_stream, buildRow(num2cube, *sn, cps[*sn]));
   }
 
   out_stream.close();
@@ -644,17 +642,15 @@ void noLatLonCheck(ControlNet &cnet, CubeManager &manager, Progress &progress,
 }
 
 
-string buildRow(SerialNumberList &serials, string sn, string delimiter) {
+string buildRow(SerialNumberList &serials, string sn) {
   string cubeName = serials.HasSerialNumber(sn) ?
       Filename(serials.Filename(sn)).Expanded() : "UnknownFilename";
   return cubeName + delimiter + sn;
 }
 
 
-string buildRow(SerialNumberList &serials, string sn, set<iString> &cps,
-    string delimiter) {
-
-  string rowText = buildRow(serials, sn, delimiter);
+string buildRow(SerialNumberList &serials, string sn, set<iString> &cps) {
+  string rowText = buildRow(serials, sn);
 
   // Control Points where the cube was found to have the issue
   for (set<iString>::iterator cp = cps.begin(); cp != cps.end(); cp++) {
@@ -665,9 +661,7 @@ string buildRow(SerialNumberList &serials, string sn, set<iString> &cps,
 }
 
 
-string buildRow(SerialNumberList &serials, string sn, double value,
-    string delimiter) {
-
+string buildRow(SerialNumberList &serials, string sn, double value) {
   return buildRow(serials, sn) + delimiter + iString(value);
 }
 

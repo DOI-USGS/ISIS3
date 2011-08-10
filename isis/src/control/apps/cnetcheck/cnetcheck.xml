@@ -80,6 +80,9 @@
       Added ability to check the ratio between the convex hull of the cnet and
       its parent cube.
     </change>
+    <change name="Travis Addair" date="2011-08-10">
+      Added LOWCOVERAGE option to make convex hull check optional.
+    </change>
   </history>
 
   <category>
@@ -320,7 +323,9 @@
             the Control Points in a Control Network.  By enabling this option, a
             file named [PREFIX]LowCoverage.txt will be created containing all
             images (with corresponding serial numbers) whose convex hull
-            coverage is less than the given user-specified TOLERANCE.
+            coverage is less than the given user-specified TOLERANCE.  A third
+            column will also be output, showing the actual coverage value that
+            failed this test for the given image.
           </p>
           <p>
             The default, minimal tolerance of 0.0 effectively makes the test
