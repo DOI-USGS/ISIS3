@@ -207,7 +207,7 @@
         <type>boolean</type>
         <default><item>True</item></default>
         <brief>
-          Ignores ignored Control Points when checking the Control Net.
+          Ignores ignored Control Points when checking the Control Net
         </brief>
         <description>
   	       When true, all ignored Control Points and all ignored Control
@@ -215,12 +215,14 @@
            calculations.
         </description>
       </parameter>
+    </group>
 
+    <group name="Checks">
       <parameter name="NOCONTROL">
         <type>boolean</type>
         <default><item>True</item></default>
         <brief>
-          Check for Cubes in the FROMLIST which are not in the Control Net.
+          Check for images in the FROMLIST that are not in the Control Net
         </brief>
         <description>
   	       When true, a file named [PREFIX]NoMatch.txt will be created, which 
@@ -234,7 +236,7 @@
         <type>boolean</type>
         <default><item>True</item></default>
         <brief>
-          Checks for cubes in the Control Net that are not listed in the FROMLIST.
+          Checks for images in the Control Net that are not in the FROMLIST
         </brief>
         <description>
             When true, a file named [PREFIX]NoCube.txt will be created, which 
@@ -248,7 +250,7 @@
         <type>boolean</type>
         <default><item>True</item></default>
         <brief>
-          Check for Control Points which contain a single Control Measure.
+          Check for Control Points that contain only a single Control Measure
         </brief>
         <description>
           When true, a file named [PREFIX]SinglePointCubes.txt will be created, 
@@ -262,7 +264,7 @@
         <type>boolean</type>
         <default><item>True</item></default>
         <brief>
-          Check for Control Points which contain the same cube in more than one Control Measure.
+          Check for Control Points containing same image in multiple Measures
         </brief>
         <description>
           When true, a file named [PREFIX]DuplicateMeasures.txt will be created, 
@@ -276,7 +278,7 @@
         <type>boolean</type>
         <default><item>True</item></default>
         <brief>
-          Check for Cubes which have only a single Control Measure.
+          Check for images referenced by only a single Control Measure
         </brief>
         <description>
           When true, a file named [PREFIX]SingleCubes.txt will be created, 
@@ -290,8 +292,7 @@
         <type>boolean</type>
         <default><item>True</item></default>
         <brief>
-          Check for measures for which latitudes and longitudes cannot be 
-          computed for. 
+          Check for measures whose latitudes and longitudes cannot be computed
         </brief>
         <description>
           When true, a file named [PREFIX]NoLatLon.txt will be created, which
@@ -304,17 +305,57 @@
           Only cubes in both the FROMLIST and CNET are checked.
         </description>
       </parameter>
-    </group>
-    <group name="Convex Hull to Cube Ratio Tolerance">
+
+      <parameter name="CONVEXHULL">
+        <type>boolean</type>
+        <default><item>True</item></default>
+        <brief>
+          Check for images whose convex hull coverages are below given TOLERANCE
+        </brief>
+        <description>
+          <p>
+            A convex hull is constructed from all Control Measures falling on
+            the image in "image space".  The purpose of the convex hull is to
+            give a rough estimation of how much a given image is "covered" by
+            the Control Points in a Control Network.  By enabling this option, a
+            file named [PREFIX]ConvexHull.txt will be created containing all
+            images (with corresponding serial numbers) whose convex hull
+            coverage is less than the given user-specified TOLERANCE.
+          </p>
+          <p>
+            The default, minimal tolerance of 0.0 effectively makes the test
+            meaningless, allowing images to "pass" this test without having any
+            coverage.  A maximal tolerance of 1.0 will effectively cause every
+            image to fail, as it is highly unlikely that a convex hull will
+            cover all of its corresponding image.  With a tolerance of 0.25,
+            any image whose convex hull covers less than a quarter of the image
+            area will "fail" the test.
+          </p>
+          <p>
+            Only cubes in both the FROMLIST and CNET are checked.
+          </p>
+        </description>
+        <inclusions>
+          <item>TOLERANCE</item>
+        </inclusions>
+      </parameter>
+
       <parameter name="TOLERANCE">
         <type>double</type>
         <default><item>0.0</item></default>
-        <brief>Check the ratio of the area inside the convex hull of the measures
-                in each image to the area of the image.</brief>
+        <minimum inclusive="yes">0.0</minimum>
+        <maximum inclusive="yes">1.0</maximum>
+        <brief>
+          Maximum ratio of convex hull coverage to cube area allowed
+        </brief>
         <description>
-          Takes the ratio of the convex hull (of all measures) over the
-          total area of the image and reports all images under a set ratio,
-          called the tolerance.
+          Given the area of the convex hull, generated from all measures in an
+          image, divide by the total area of the image.  The resulting value
+          from 0.0 to 1.0 shows roughly what percentage of the image is covered
+          by its measures.  If this coverage value is less than the tolerance
+          specified by this parameter, then the image will fail the CONVEXHULL
+          check and be reported as such.  This value must be between 0.0 and
+          1.0, inclusive, and defaults to 0.0.
         </description>
       </parameter>
     </group>

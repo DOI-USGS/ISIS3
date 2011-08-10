@@ -275,26 +275,30 @@ void IsisMain() {
   }
   
   // Create a convex hull
-  QList< ControlCubeGraphNode * > nodes = innet.GetCubeGraphNodes();
-  foreach (ControlCubeGraphNode * node, nodes) {
-    
-    iString sn = node->getSerialNumber();
-    
-    if (num2cube.HasSerialNumber(sn)) {
-    
-      Cube *cube = cbman.OpenCube(num2cube.Filename(sn));
-      double tolerance = ui.GetDouble("TOLERANCE");
-      double controlFitness = getControlFitness(node, tolerance, cube);
-      
-      if (controlFitness < tolerance) {
-        ofstream out_stream;
-        ss << "-------------------------------------------------------------"
-           << "-------------------\nCube "
-           << node->getSerialNumber() << " has a convex hull / format ratio of: "
-           << controlFitness << "\nwhich doesn't meet the tolerance of: "
-           << tolerance << ".\n";
-        out_stream.close();
+  if (ui.GetBoolean("CONVEXHULL")) {
+    QList< ControlCubeGraphNode * > nodes = innet.GetCubeGraphNodes();
+
+    if (nodes.size() > 0) {
+      iString name(Filename(prefix + "ConvexHull.txt").Expanded());
+      ofstream out_stream;
+      out_stream.open(name.c_str(), std::ios::out);
+      out_stream.seekp(0, std::ios::beg); // Start writing from file beginning
+
+      foreach (ControlCubeGraphNode * node, nodes) {
+        iString sn = node->getSerialNumber();
+
+        if (num2cube.HasSerialNumber(sn)) {
+          Cube *cube = cbman.OpenCube(num2cube.Filename(sn));
+          double tolerance = ui.GetDouble("TOLERANCE");
+          double controlFitness = getControlFitness(node, tolerance, cube);
+
+          if (controlFitness < tolerance) {
+            outputRow(out_stream, buildRow(num2cube, sn));
+          }
+        }
       }
+
+      out_stream.close();
     }
   }
 
