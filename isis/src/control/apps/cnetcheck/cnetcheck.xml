@@ -306,7 +306,7 @@
         </description>
       </parameter>
 
-      <parameter name="CONVEXHULL">
+      <parameter name="LOWCOVERAGE">
         <type>boolean</type>
         <default><item>True</item></default>
         <brief>
@@ -318,7 +318,7 @@
             the image in "image space".  The purpose of the convex hull is to
             give a rough estimation of how much a given image is "covered" by
             the Control Points in a Control Network.  By enabling this option, a
-            file named [PREFIX]ConvexHull.txt will be created containing all
+            file named [PREFIX]LowCoverage.txt will be created containing all
             images (with corresponding serial numbers) whose convex hull
             coverage is less than the given user-specified TOLERANCE.
           </p>
@@ -346,14 +346,14 @@
         <minimum inclusive="yes">0.0</minimum>
         <maximum inclusive="yes">1.0</maximum>
         <brief>
-          Maximum ratio of convex hull coverage to cube area allowed
+          Minimum ratio of convex hull coverage to cube area allowed
         </brief>
         <description>
           Given the area of the convex hull, generated from all measures in an
           image, divide by the total area of the image.  The resulting value
           from 0.0 to 1.0 shows roughly what percentage of the image is covered
           by its measures.  If this coverage value is less than the tolerance
-          specified by this parameter, then the image will fail the CONVEXHULL
+          specified by this parameter, then the image will fail the LOWCOVERAGE
           check and be reported as such.  This value must be between 0.0 and
           1.0, inclusive, and defaults to 0.0.
         </description>

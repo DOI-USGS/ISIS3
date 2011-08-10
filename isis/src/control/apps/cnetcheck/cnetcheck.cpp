@@ -69,6 +69,8 @@ void noLatLonCheck(ControlNet &cnet, CubeManager &manager, Progress &progress,
 string buildRow(SerialNumberList &serials, string sn, string delimiter="\t");
 string buildRow(SerialNumberList &serials, string sn, set<iString> &cps,
     string delimiter="\t");
+string buildRow(SerialNumberList &serials, string sn, double value,
+    string delimiter="\t");
 void outputRow(ofstream &outStream, string rowText);
 
 // Main program
@@ -274,31 +276,48 @@ void IsisMain() {
     ss << Filename(name).Name() + "]" << endl;
   }
   
-  // Create a convex hull
-  if (ui.GetBoolean("CONVEXHULL")) {
+  // Perform Low Coverage check if it was selected
+  iString coverageOp = "LowCoverage";
+  int failedCoverageCheck = 0;
+  if (ui.GetBoolean(iString(coverageOp).UpCase())) {
     QList< ControlCubeGraphNode * > nodes = innet.GetCubeGraphNodes();
 
     if (nodes.size() > 0) {
-      iString name(Filename(prefix + "ConvexHull.txt").Expanded());
+      iString name(Filename(prefix + coverageOp + ".txt").Expanded());
       ofstream out_stream;
       out_stream.open(name.c_str(), std::ios::out);
       out_stream.seekp(0, std::ios::beg); // Start writing from file beginning
 
+      double tolerance = ui.GetDouble("TOLERANCE");
       foreach (ControlCubeGraphNode * node, nodes) {
         iString sn = node->getSerialNumber();
 
         if (num2cube.HasSerialNumber(sn)) {
+          // Create a convex hull
           Cube *cube = cbman.OpenCube(num2cube.Filename(sn));
-          double tolerance = ui.GetDouble("TOLERANCE");
           double controlFitness = getControlFitness(node, tolerance, cube);
 
           if (controlFitness < tolerance) {
-            outputRow(out_stream, buildRow(num2cube, sn));
+            outputRow(out_stream, buildRow(num2cube, sn, controlFitness));
+            failedCoverageCheck++;
           }
         }
       }
 
       out_stream.close();
+
+      // Represent the user-specified tolerance as a percentage value
+      double tolerancePercent = tolerance * 100.0;
+      ss << "----------------------------------------"
+        "----------------------------------------" << endl;
+      ss << "There are " << failedCoverageCheck << " images in both the "
+        "input list and Control Network whose convex hulls cover less than " <<
+        tolerancePercent << "\% of the image" << endl;
+      ss << "The names of these images, along with the failing convex hull "
+        "coverages, are listed in [" << Filename(name).Name() << "]" << endl;
+
+      results.AddKeyword(
+          PvlKeyword(coverageOp, iString((BigInt) failedCoverageCheck)));
     }
   }
 
@@ -530,6 +549,7 @@ void WriteOutput(SerialNumberList num2cube, string filename,
   out_stream.close();
 }
 
+
 double getControlFitness(const ControlCubeGraphNode * node, double tolerance, Cube * cube) {
   double controlFitness = 0;
 
@@ -642,6 +662,13 @@ string buildRow(SerialNumberList &serials, string sn, set<iString> &cps,
   }
 
   return rowText;
+}
+
+
+string buildRow(SerialNumberList &serials, string sn, double value,
+    string delimiter) {
+
+  return buildRow(serials, sn) + delimiter + iString(value);
 }
 
 

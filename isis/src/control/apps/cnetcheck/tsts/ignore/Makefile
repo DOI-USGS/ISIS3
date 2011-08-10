@@ -5,7 +5,7 @@ include $(ISISROOT)/make/isismake.tsts
 commands:
 	$(LS) $(INPUT)/*.cub > $(OUTPUT)/list.lis;
 	$(APPNAME) fromlist=$(OUTPUT)/list.lis prefix=$(OUTPUT)/cat \
-	nolatlon=false convexhull=false \
+	nolatlon=false tolerance=0.25 \
 	cnet=$(INPUT)/NearSide_All.net | grep -v "Processed" \
 	> $(OUTPUT)/output.txt;
 	$(RM) $(OUTPUT)/list.lis;
