@@ -38,6 +38,10 @@
     <change name="Steven Lambright" date="2010-06-29">
       Updated check for PVL labels to reflect changes in PvlKeyword 
     </change>
+    <change name="Jai Rideout" date="2011-08-10">
+      Changed redirection method in the vdcomp command string to work on the
+      new Ubuntu 10.04 OS.
+    </change>
   </history>
 
   <category>

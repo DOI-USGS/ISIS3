@@ -42,7 +42,7 @@ void IsisMain() {
     e.Clear();
     tempFile = true;
     string command = "$ISISROOT/bin/vdcomp " + in.Expanded() + " " +
-                     temp.Expanded() + " &> /dev/null";
+                     temp.Expanded() + " > /dev/null 2>&1";
     int returnValue = system(command.c_str()) >> 8;
     if(returnValue) {
       string msg = "Error running vdcomp";
