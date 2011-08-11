@@ -1020,8 +1020,14 @@ namespace Isis {
     double halfEcc = 0.5 * Eccentricity();
     double difference = DBL_MAX;
     int iteration = 0;
+    // a failure in this loop means an exception will be thrown, which is
+    //   an expensive operation. So letting let the loop iterate quite a bit
+    //   is not a big deal. Also, the user will be unable to project at all
+    //   if this fails so more reason to let this loop iterate: better to
+    //   function slow than not at all.
+    const int MAX_ITERATIONS = 45;
 
-    while((iteration < 15) && (difference > 0.0000000001))  {
+    while((iteration < MAX_ITERATIONS) && (difference > 0.0000000001))  {
       double eccTimesSinphi = Eccentricity() * sin(localPhi);
       double newPhi = Isis::HALFPI -
                       2.0 * atan(t * pow((1.0 - eccTimesSinphi) /
@@ -1031,7 +1037,7 @@ namespace Isis {
       iteration++;
     }
 
-    if(iteration >= 15) {
+    if(iteration >= MAX_ITERATIONS) {
       string msg = "Failed to converge in Projection::tCompute";
       throw Isis::iException::Message(Isis::iException::Projection, msg, _FILEINFO_);
     }

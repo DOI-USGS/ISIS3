@@ -116,6 +116,8 @@ namespace Isis {
    *                                    PixelResolution, and Scale to original
    *                                    mapping group so that cam2map can
    *                                    properly display a clean mapping group.
+   *  @history 2011-08-11 Steven Lambright - phi2Compute was running out of
+   *                          iterations for vesta (an asteroid). Fixes #279
    *
    */
   class Projection {
