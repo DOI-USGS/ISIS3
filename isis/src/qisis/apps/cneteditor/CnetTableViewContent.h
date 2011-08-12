@@ -27,12 +27,12 @@ namespace Isis
       Q_OBJECT
 
     public:
-      CnetTableViewContent(CnetTableColumnList * cols);
+      CnetTableViewContent(AbstractCnetTableModel * someModel);
       virtual ~CnetTableViewContent();
       QSize minimumSizeHint() const;
       QSize sizeHint();
       AbstractCnetTableModel * getModel();
-      void setModel(AbstractCnetTableModel * someModel);
+//       void setModel(AbstractCnetTableModel * someModel);
 
 
     signals:

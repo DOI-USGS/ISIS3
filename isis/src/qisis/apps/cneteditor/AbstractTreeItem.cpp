@@ -4,6 +4,7 @@
 
 #include <iostream>
 
+#include <QDateTime>
 #include <QFontMetrics>
 #include <QLocale>
 #include <QVariant>
@@ -11,6 +12,10 @@
 #include "iException.h"
 #include "iString.h"
 #include "SpecialPixel.h"
+
+#include "AbstractCnetTableModel.h"
+#include "CnetTableColumn.h"
+
 
 namespace Isis
 {
@@ -191,6 +196,39 @@ namespace Isis
   }
 
 
+  bool AbstractTreeItem::operator<(AbstractTreeItem const & other)
+  {
+    // first get column
+    CnetTableColumn * col = NULL;
+    
+    if (getPointerType() != other.getPointerType())
+    {
+      iString msg = "Tried to compare apples to oranges";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    }
+    
+    QString data = getData(col->getTitle());
+    QString otherData = other.getData(col->getTitle());
+    
+    QString format = "yyyy-MM-ddTHH:mm:ss";
+    QDateTime dateTime = QDateTime::fromString(data, format);
+    QDateTime otherDateTime = QDateTime::fromString(otherData, format);
+    if (dateTime.isValid() && otherDateTime.isValid())
+      return dateTime < otherDateTime;
+    
+    bool doubleDataOk, otherDoubleDataOk;
+    double doubleData = data.toDouble(&doubleDataOk);
+    double otherDoubleData = otherData.toDouble(&otherDoubleDataOk);
+    if (doubleDataOk && otherDoubleDataOk)
+      return doubleData < otherDoubleData;
+    
+    if (doubleDataOk || otherDoubleDataOk)
+      return data.toLower() == "null";
+    
+    return data < otherData;
+  }
+
+
   void AbstractTreeItem::calcDataWidth(int avgCharWidth)
   {
     if (avgCharWidth <= 0)
@@ -206,7 +244,8 @@ namespace Isis
   QString AbstractTreeItem::catchNull(double d)
   {
     QString str = "NULL";
-    if (d != Null) {
+    if (d != Null)
+    {
       QLocale locale;
       str = locale.toString(d, 'f');
     }
@@ -218,7 +257,8 @@ namespace Isis
   double AbstractTreeItem::catchNull(QString str)
   {
     double d = Null;
-    if (str.toLower() != "null") {
+    if (str.toLower() != "null")
+    {
       QLocale locale;
       d = locale.toDouble(str);
     }

@@ -50,7 +50,7 @@ namespace Isis
 
       static QString getColumnName(Column);
       static Column getColumn(QString);
-      static CnetTableColumnList createColumns();
+      static CnetTableColumnList * createColumns();
 
 
     public:
@@ -58,24 +58,26 @@ namespace Isis
           AbstractTreeItem * parent = 0);
       virtual ~AbstractMeasureItem();
 
-      QString getData() const;
-      QString getData(QString columnTitle) const;
-      void setData(QString const & columnTitle, QString const & newData);
-      void deleteSource();
-      InternalPointerType getPointerType() const;
-      void * getPointer() const;
-      bool hasMeasure(ControlMeasure *) const;
+      virtual QString getData() const;
+      virtual QString getData(QString columnTitle) const;
+      virtual void setData(QString const & columnTitle, QString const & newData);
+      virtual void deleteSource();
+      virtual InternalPointerType getPointerType() const;
+      virtual void * getPointer() const;
+      virtual bool hasMeasure(ControlMeasure *) const;
+      
 
     private slots:
       void sourceDeleted();
 
+      
     private: // disable copying of this class
       AbstractMeasureItem(const AbstractMeasureItem & other);
       const AbstractMeasureItem & operator=(const AbstractMeasureItem & other);
 
+      
     private:
       static void setLogData(ControlMeasure *, int, const QString &);
-
 
 
     private:

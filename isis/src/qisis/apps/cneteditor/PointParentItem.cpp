@@ -9,7 +9,7 @@ namespace Isis
 {
   PointParentItem::PointParentItem(ControlPoint * cp,
       int avgCharWidth, AbstractTreeItem * parent)
-    : AbstractTreeItem(parent), AbstractPointItem(cp, avgCharWidth)
+      : AbstractTreeItem(parent), AbstractPointItem(cp, avgCharWidth)
   {
   }
 

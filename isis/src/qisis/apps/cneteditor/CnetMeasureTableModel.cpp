@@ -34,9 +34,11 @@ namespace Isis
     AbstractCnetTableModel(model, new CnetMeasureTableDelegate)
   {
     connect(model, SIGNAL(filterCountsChanged(int, int)),
-        this, SLOT(calculateFilterCounts()));
-    connect(model, SIGNAL(treeSelectionChanged(QList< AbstractTreeItem * >)),
-            this, SLOT(handleTreeSelectionChanged(QList< AbstractTreeItem * >)));
+            this, SLOT(calculateFilterCounts()));
+    connect(model,
+            SIGNAL(treeSelectionChanged(QList< AbstractTreeItem * >)),
+            this,
+            SLOT(handleTreeSelectionChanged(QList< AbstractTreeItem * >)));
   }
 
 
@@ -48,21 +50,14 @@ namespace Isis
   QList< AbstractTreeItem * > CnetMeasureTableModel::getItems(
     int start, int end)
   {
-    return getDataModel()->getItems(start, end, TreeModel::MeasureItems, true);
+    return getSortedItems(start, end, TreeModel::MeasureItems);
   }
 
 
   QList< AbstractTreeItem * > CnetMeasureTableModel::getItems(
     AbstractTreeItem * item1, AbstractTreeItem * item2)
   {
-    return getDataModel()->getItems(item1, item2, TreeModel::MeasureItems,
-        true);
-  }
-
-
-  CnetTableColumnList CnetMeasureTableModel::createColumns()
-  {
-    return AbstractMeasureItem::createColumns();
+    return getSortedItems(item1, item2, TreeModel::MeasureItems);
   }
 
 
@@ -138,6 +133,12 @@ namespace Isis
   {
     AbstractCnetTableModel::handleTreeSelectionChanged(
         newlySelectedItems, AbstractTreeItem::Measure);
+  }
+
+
+  CnetTableColumnList * CnetMeasureTableModel::createColumns()
+  {
+    return AbstractMeasureItem::createColumns();
   }
 }
 

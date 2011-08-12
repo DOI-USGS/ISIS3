@@ -25,7 +25,6 @@ namespace Isis
       virtual QList< AbstractTreeItem * > getItems(int, int);
       virtual QList< AbstractTreeItem * > getItems(AbstractTreeItem *,
           AbstractTreeItem *);
-      virtual CnetTableColumnList createColumns();
       virtual int getVisibleRowCount() const;
       virtual QList< AbstractTreeItem * > getSelectedItems();
       virtual QString getWarningMessage(AbstractTreeItem const *,
@@ -40,7 +39,10 @@ namespace Isis
     public slots:
       void handleTreeSelectionChanged(QList< AbstractTreeItem * >);
 
-
+    protected:
+      virtual CnetTableColumnList * createColumns();
+      
+      
     private slots:
       void calculateFilterCounts();
 

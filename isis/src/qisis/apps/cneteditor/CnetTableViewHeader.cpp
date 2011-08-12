@@ -20,6 +20,7 @@
 #include "CnetTableColumnList.h"
 #include "CnetTableView.h"
 #include "TreeModel.h"
+#include "AbstractCnetTableModel.h"
 
 using std::cerr;
 
@@ -27,11 +28,9 @@ using std::cerr;
 namespace Isis
 {
 
-  CnetTableViewHeader::CnetTableViewHeader(CnetTableColumnList * cols)
+  CnetTableViewHeader::CnetTableViewHeader(AbstractCnetTableModel * someModel)
   {
     nullify();
-
-    columns = cols;
 
     horizontalOffset = 0;
     filterProgress = 0;
@@ -46,12 +45,35 @@ namespace Isis
     clickedColumnEdge = -1;
 
     setMouseTracking(true);
+    
+    connect(someModel, SIGNAL(filterProgressChanged(int)),
+            this, SLOT(updateFilterProgress(int)));
+    connect(someModel, SIGNAL(rebuildProgressChanged(int)),
+            this, SLOT(updateRebuildProgress(int)));
+    connect(someModel, SIGNAL(filterProgressRangeChanged(int, int)),
+            this, SLOT(updateFilterProgressRange(int, int)));
+    connect(someModel, SIGNAL(rebuildProgressRangeChanged(int, int)),
+            this, SLOT(updateRebuildProgressRange(int, int)));
+    connect(someModel, SIGNAL(filterCountsChanged(int, int)),
+            this, SLOT(handleFilterCountsChanged(int, int)));
+    connect(this, SIGNAL(requestedGlobalSelection(bool)),
+            someModel, SLOT(setGlobalSelection(bool)));
+    
+    columns = someModel->getColumns();
+    
+    for (int i = 0; i < columns->size(); i++)
+      connect((*columns)[i], SIGNAL(visibilityChanged()), this, SLOT(update()));
   }
 
 
   CnetTableViewHeader::~CnetTableViewHeader()
   {
     columns = NULL;
+  }
+
+
+  void CnetTableViewHeader::setColumns(CnetTableColumnList * cols) {
+    columns = cols;
   }
 
 
@@ -72,8 +94,10 @@ namespace Isis
     if (visibleCount >= 0)
     {
       CnetTableColumnList visibleCols = columns->getVisibleColumns();
-      foreach(CnetTableColumn * col, visibleCols)
+      for (int i = 0; i < visibleCols.size(); i++)
       {
+        CnetTableColumn *& col = visibleCols[i];
+        
         if (col->getTitle().isEmpty())
           col->setWidth(QFontMetrics(font()).width(
               QString::number(visibleCount)) + 22);
@@ -127,18 +151,31 @@ namespace Isis
   void CnetTableViewHeader::mousePressEvent(QMouseEvent * event)
   {
     QPoint mousePos = event->pos();
-
+    
+    int columnNum = getMousedColumn(mousePos);
+    
+//     QRect priorityRect = getSortingPriorityRect(columnNum);
+//     QRect arrowRect = getSortingArrowRect(columnNum);
+    
+    
     if (event->buttons() == Qt::LeftButton)
     {
       clickedColumnEdge = getMousedColumnEdge(mousePos);
-      int columnNum = getMousedColumn(mousePos);
       if (clickedColumnEdge == -1 && columnNum != -1)
       {
         // The click wasn't on a column edge.
-        if (columns->getVisibleColumns().at(columnNum)->getTitle().isEmpty())
+        if (columns->getVisibleColumns()[columnNum]->getTitle().isEmpty())
+        {
           emit requestedGlobalSelection(true);
+        }
         else
-          emit requestedColumnSelection(columnNum, true);
+        {
+//           if (priorityRect.contains(mousePos))
+          {
+            emit requestedColumnSelection(columnNum, true);
+          }
+          
+        }
       }
     }
   }
@@ -184,10 +221,10 @@ namespace Isis
       int indent = 1;
 
       for (int i = 0; i < column; i++)
-        indent += visibleCols.at(i)->getWidth() - 1;
+        indent += visibleCols[i]->getWidth() - 1;
 
       colRect = QRect(indent - horizontalOffset, 0,
-          visibleCols.at(column)->getWidth(), height());
+          visibleCols[column]->getWidth(), height());
     }
 
     return colRect;
@@ -261,14 +298,16 @@ namespace Isis
 
     return isAtColumnEdge;
   }
+  
 
   void CnetTableViewHeader::paintHeader(QPainter * painter, int rowHeight)
   {
+//     cerr << "CnetTableViewHeader::paintHeader called\n";
     int visibleColWidth = -horizontalOffset;
-    foreach(CnetTableColumn * col, columns->getVisibleColumns())
-    {
-      visibleColWidth += col->getWidth() - 1;
-    }
+    CnetTableColumnList visibleCols = columns->getVisibleColumns();
+//     cerr << "columns: [" << columns << "], " << columns->size() << "\nvisibleCols->size(): " << visibleCols.size() << "\n";
+    for (int i = 0; i < visibleCols.size(); i++)
+      visibleColWidth += visibleCols[i]->getWidth() - 1;
 
     QRect rect(0, 0, qMin(width(), visibleColWidth), rowHeight);
 
@@ -307,11 +346,12 @@ namespace Isis
     painter->setBrush(brush);
     painter->setCompositionMode(compMode);
 
-    foreach(CnetTableColumn * visibleCol, columns->getVisibleColumns())
+    for (int i = 0; i < visibleCols.size(); i++)
     {
+      CnetTableColumn * visibleCol = visibleCols[i];
+      
       QString columnText = visibleCol->getTitle();
-      QRect columnRect(
-        getColumnRect(columns->getVisibleColumns().indexOf(visibleCol)));
+      QRect columnRect(getColumnRect(visibleCols.indexOf(visibleCol)));
       QPen pen(palette().dark().color().darker(150));
       pen.setCapStyle(Qt::RoundCap);
       painter->setPen(pen);
@@ -335,6 +375,8 @@ namespace Isis
       // Move the column rect to the position of the next column.
       columnRect.moveLeft(columnRect.right());
     }
+    
+//     cerr << "CnetTableViewHeader::paintHeader done\n";
   }
 
 

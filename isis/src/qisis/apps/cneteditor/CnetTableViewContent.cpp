@@ -19,6 +19,7 @@
 #include <QStyleOptionViewItemV4>
 #include <QVBoxLayout>
 
+#include "ControlMeasure.h"
 #include "iException.h"
 #include "iString.h"
 
@@ -27,6 +28,7 @@
 #include "AbstractTreeItem.h"
 #include "CnetTableColumn.h"
 #include "CnetTableColumnList.h"
+#include <ControlPoint.h>
 
 
 using std::cerr;
@@ -35,12 +37,23 @@ using std::cerr;
 namespace Isis
 {
 
-  CnetTableViewContent::CnetTableViewContent(CnetTableColumnList * cols)
+  CnetTableViewContent::CnetTableViewContent(AbstractCnetTableModel * someModel)
   {
     nullify();
-
-//     parentView = (CnetTableView *) parent;
-
+    
+    model = someModel;
+    
+    columns = getModel()->getColumns();
+    for (int i = 0; i < columns->size(); i++)
+    {
+      CnetTableColumn * column = (*columns)[i];
+      
+      connect(column, SIGNAL(visibilityChanged()), this, SLOT(refresh()));
+      connect(column, SIGNAL(visibilityChanged()),
+              this, SLOT(updateHorizontalScrollBar()));
+      connect(column, SIGNAL(widthChanged()), this, SLOT(refresh()));
+    }
+    
     items = new QList< AbstractTreeItem * >;
     mousePressPos = new QPoint;
     activeCell = new QPair<AbstractTreeItem *, int>(NULL, -1);
@@ -48,30 +61,14 @@ namespace Isis
     lastShiftSelection = new QList<AbstractTreeItem *>;
 
     verticalScrollBar()->setSingleStep(1);
-//     horizontalScrollBar()->setSingleStep(10);
 
     rowHeight = QFontMetrics(font()).height() + ITEM_PADDING;
     ASSERT(rowHeight > 0);
 
     connect(horizontalScrollBar(), SIGNAL(valueChanged(int)),
-        this, SIGNAL(horizontalScrollBarValueChanged(int)));
+            this, SIGNAL(horizontalScrollBarValueChanged(int)));
 
     setMouseTracking(true);
-//     setContextMenuPolicy(Qt::ActionsContextMenu);
-//     QAction * alternateRowsAct = new QAction("&Alternate row colors", this);
-//     alternateRowsAct->setCheckable(true);
-//     connect(alternateRowsAct, SIGNAL(toggled(bool)),
-//         this, SLOT(setAlternatingRowColors(bool)));
-//     addAction(alternateRowsAct);
-//     alternateRowsAct->setChecked(true);
-    if (!cols)
-    {
-      iString msg = "NULL column list passed to CnetTableViewContent "
-          "constructor!";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
-    }
-
-    columns = cols;
     updateHorizontalScrollBar();
 
     createActions();
@@ -126,44 +123,47 @@ namespace Isis
 
   AbstractCnetTableModel * CnetTableViewContent::getModel()
   {
+    ASSERT(model);
     return model;
   }
 
 
-  void CnetTableViewContent::setModel(AbstractCnetTableModel * someModel)
-  {
-    if (!someModel)
-    {
-      iString msg = "Attempted to set a NULL model!";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
-    }
-
-    if (model)
-    {
-      disconnect(model, SIGNAL(modelModified()), this, SLOT(refresh()));
-      disconnect(model, SIGNAL(filterProgressChanged(int)),
-                 this, SLOT(updateItemList()));
-      disconnect(this,
-                 SIGNAL(tableSelectionChanged(QList< AbstractTreeItem * >)),
-                 model,
-                 SIGNAL(tableSelectionChanged(QList< AbstractTreeItem * >)));
-      disconnect(model, SIGNAL(selectionChanged(QList<AbstractTreeItem*>)),
-                 this, SLOT(scrollTo(QList<AbstractTreeItem*>)));
-    }
-
-    model = someModel;
-    connect(model, SIGNAL(modelModified()), this, SLOT(refresh()));
-    connect(model, SIGNAL(filterProgressChanged(int)),
-            this, SLOT(updateItemList()));
-    connect(this, SIGNAL(modelDataChanged()),
-            model, SLOT(applyFilter()));
-    connect(this, SIGNAL(tableSelectionChanged(QList< AbstractTreeItem * >)),
-            model, SIGNAL(tableSelectionChanged(QList< AbstractTreeItem * >)));
-    connect(model, SIGNAL(treeSelectionChanged(QList<AbstractTreeItem*>)),
-            this, SLOT(scrollTo(QList<AbstractTreeItem*>)));
-
-    refresh();
-  }
+//   void CnetTableViewContent::setModel(AbstractCnetTableModel * someModel)
+//   {
+//     if (!someModel)
+//     {
+//       iString msg = "Attempted to set a NULL model!";
+//       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+//     }
+// 
+//     if (getModel())
+//     {
+//       disconnect(getModel(), SIGNAL(modelModified()), this, SLOT(refresh()));
+//       disconnect(getModel(), SIGNAL(filterProgressChanged(int)),
+//                  this, SLOT(updateItemList()));
+//       disconnect(this,
+//                  SIGNAL(tableSelectionChanged(QList< AbstractTreeItem * >)),
+//                  getModel(),
+//                  SIGNAL(tableSelectionChanged(QList< AbstractTreeItem * >)));
+//       disconnect(getModel(), SIGNAL(selectionChanged(QList<AbstractTreeItem*>)),
+//                  this, SLOT(scrollTo(QList<AbstractTreeItem*>)));
+//     }
+// 
+//     model = someModel;
+//     columns = someModel->getColumns();
+// 
+//     connect(model, SIGNAL(modelModified()), this, SLOT(refresh()));
+//     connect(model, SIGNAL(filterProgressChanged(int)),
+//             this, SLOT(updateItemList()));
+//     connect(this, SIGNAL(modelDataChanged()),
+//             model, SLOT(applyFilter()));
+//     connect(this, SIGNAL(tableSelectionChanged(QList< AbstractTreeItem * >)),
+//             model, SIGNAL(tableSelectionChanged(QList< AbstractTreeItem * >)));
+//     connect(model, SIGNAL(treeSelectionChanged(QList<AbstractTreeItem*>)),
+//             this, SLOT(scrollTo(QList<AbstractTreeItem*>)));
+// 
+//     refresh();
+//   }
 
 
   void CnetTableViewContent::refresh()
@@ -202,8 +202,10 @@ namespace Isis
     if (columns)
     {
       int range = 0;
-      foreach(CnetTableColumn * col, columns->getVisibleColumns())
-      range += col->getWidth() - 1;
+      CnetTableColumnList visibleCols = columns->getVisibleColumns();
+      for (int i = 0; i < visibleCols.size(); i++)
+        range += visibleCols[i]->getWidth() - 1;
+      
       // For the border...
       range -= 2;
       horizontalScrollBar()->setRange(0, range - viewport()->width());
@@ -264,7 +266,7 @@ namespace Isis
       {
         const AbstractCnetTableDelegate * delegate = model->getDelegate();
         CnetTableColumn * col =
-            columns->getVisibleColumns().at(activeCell->second);
+            columns->getVisibleColumns()[activeCell->second];
 
         delete editWidget;
         editWidget = NULL;
@@ -345,7 +347,7 @@ namespace Isis
 
           if (columnNum != -1)
           {
-            CnetTableColumn * column = columns->getVisibleColumns().at(columnNum);
+            CnetTableColumn * column = columns->getVisibleColumns()[columnNum];
             if (column->getTitle().isEmpty())
             {
               clearColumnSelection();
@@ -510,7 +512,7 @@ namespace Isis
       if (editWidget)
       {
         CnetTableColumn * col =
-            columns->getVisibleColumns().at(activeCell->second);
+            columns->getVisibleColumns()[activeCell->second];
         getModel()->getDelegate()->saveData(
             editWidget, activeCell->first, col);
         delete editWidget;
@@ -522,7 +524,8 @@ namespace Isis
     }
     else
     {
-      if (hasActiveCell())
+      // event->text() will be empty if a modifier was pressed.
+      if (hasActiveCell() && !event->text().isEmpty())
       {
         if (!items->contains(activeCell->first))
           scrollTo(activeCell->first);
@@ -535,7 +538,7 @@ namespace Isis
         {
           AbstractCnetTableDelegate const * delegate = model->getDelegate();
           CnetTableColumn * col =
-              columns->getVisibleColumns().at(activeCell->second);
+              columns->getVisibleColumns()[activeCell->second];
 
           delete editWidget;
           editWidget = NULL;
@@ -553,6 +556,8 @@ namespace Isis
 
   void CnetTableViewContent::paintEvent(QPaintEvent * event)
   {
+    ASSERT(model);
+    ASSERT(columns);
     if (model && columns)
     {
 //       int startRow = verticalScrollBar()->value();
@@ -577,6 +582,45 @@ namespace Isis
 
         if (i < items->size())
         {
+          
+          
+          
+          
+          
+          
+          // ********************************************************
+          // HACK: FIXME: ask tree items if background needs to be 
+          // darkened, instead figuring that out here.  Also, change
+          // composition mode so that ref measure rows look different
+          // when they are highlighted as well
+          /*
+          if (items->at(i)->getPointerType() == AbstractTreeItem::Measure)
+          {
+            ControlMeasure * cm = (ControlMeasure *) items->at(i)->getPointer();
+            if (cm->Parent()->GetRefMeasure() == cm)
+            {
+              QPoint selectionTopLeft(-absoluteTopLeft.x(), relativeTopLeft.y());
+              QSize selectionSize(columns->getVisibleWidth(), (int) rowHeight);
+
+              QRect selectionRect(selectionTopLeft, selectionSize);
+              QColor color = palette().base().color();
+              painter.fillRect(selectionRect, color.darker(110));
+            }
+          }
+          */
+          //*********************************************************
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+        
           if (items->at(i)->isSelected())
           {
             QPoint selectionTopLeft(-absoluteTopLeft.x(), relativeTopLeft.y());
@@ -585,7 +629,7 @@ namespace Isis
             QRect selectionRect(selectionTopLeft, selectionSize);
             painter.fillRect(selectionRect, palette().highlight().color());
           }
-
+          
           paintRow(&painter, i, absoluteTopLeft, relativeTopLeft);
         }
       }
@@ -698,8 +742,7 @@ namespace Isis
   {
     if (hasActiveCell())
     {
-      const CnetTableColumn * col = columns->getVisibleColumns().at(
-          activeCell->second);
+      CnetTableColumn * col = columns->getVisibleColumns()[activeCell->second];
 
       QString colTitle = col->getTitle();
       ASSERT(colTitle.size());
@@ -776,8 +819,9 @@ namespace Isis
   {
     int column = -1;
 
-    for (int i = 0; column == -1 &&
-        i < columns->getVisibleColumns().size(); i++)
+    for (int i = 0;
+         column == -1 && i < columns->getVisibleColumns().size();
+         i++)
     {
       QPair<int, int> cellXRange(columns->getVisibleXRange(i));
       int deltaX = -horizontalScrollBar()->value();
@@ -866,7 +910,7 @@ namespace Isis
     bool editable = false;
 
     if (items->at(rowNum)->isSelectable() &&
-        !columns->getVisibleColumns().at(colNum)->isReadOnly())
+        !columns->getVisibleColumns()[colNum]->isReadOnly())
       editable = true;
 
     return editable;
@@ -875,13 +919,14 @@ namespace Isis
 
   bool CnetTableViewContent::isDataColumn(int colNum) const
   {
-    return columns->getVisibleColumns().at(colNum)->getTitle().size();
+    return columns->getVisibleColumns()[colNum]->getTitle().size();
   }
 
 
   void CnetTableViewContent::paintRow(QPainter * painter, int rowNum,
       QPoint absolutePosition, QPoint relativePosition)
   {
+//     cerr << "CnetTableViewContent::paintRow called\n";
     ASSERT(items);
     ASSERT(rowNum >= 0 && rowNum < items->size());
 
@@ -906,6 +951,7 @@ namespace Isis
 
       ASSERT(columns);
       CnetTableColumnList visibleCols = columns->getVisibleColumns();
+//       cerr << "CnetTableViewContent::paintRow.. visibleCols.size() : " << visibleCols.size() << "\n";
       for (int i = 0; i < visibleCols.size(); i++)
       {
         // draw text
@@ -914,7 +960,7 @@ namespace Isis
             cellXRange.second - cellXRange.first, rowHeight);
         cellRect.moveLeft(cellRect.left() - horizontalScrollBar()->value() - 1);
 
-        QString columnTitle = visibleCols.at(i)->getTitle();
+        QString columnTitle = visibleCols[i]->getTitle();
         QRect textRect(textPoint, QSize(cellRect.right() - textPoint.x(),
             textHeight));
         QString text;
@@ -986,9 +1032,25 @@ namespace Isis
         if (textCentered)
           flags |= Qt::AlignCenter;
 
+        // TODO this shouldn't be here... an item should be able to tell whether
+        // or not it should be bolded.
+        QFont normalFont = painter->font();
+
+        if (item->getPointerType() == AbstractTreeItem::Measure)
+        {
+          ControlMeasure * cm = (ControlMeasure *) item->getPointer();
+          if (cm && cm->Parent() && cm->Parent()->GetRefMeasure() == cm)
+          {
+            QFont boldFont(normalFont);
+            boldFont.setBold(true);
+            painter->setFont(boldFont);
+          }
+        }
+
         painter->drawText(textRect, flags,
             metrics.elidedText(text, Qt::ElideRight,
-                textRect.width() - ITEM_INDENTATION));
+            textRect.width() - ITEM_INDENTATION));
+        painter->setFont(normalFont);
 
         textPoint.setX(cellRect.right() + ITEM_INDENTATION);
         painter->setPen(originalPen);
@@ -1018,7 +1080,7 @@ namespace Isis
       try
       {
         const CnetTableColumn * col =
-            columns->getVisibleColumns().at(activeCell->second);
+            columns->getVisibleColumns()[activeCell->second];
         model->getDelegate()->saveData(editWidget, activeCell->first,
             col);
         
@@ -1051,7 +1113,7 @@ namespace Isis
         cellRect.moveLeft(cellRect.left() - horizontalScrollBar()->value());
 
         if (cellRect.contains(screenPos) &&
-            (oldActiveColumn != -1 || !visibleCols.at(i)->getTitle().isEmpty()))
+            (oldActiveColumn != -1 || !visibleCols[i]->getTitle().isEmpty()))
         {
           activeCell->first = item;
           activeCell->second = i;

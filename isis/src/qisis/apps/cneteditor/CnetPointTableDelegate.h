@@ -31,6 +31,9 @@ namespace Isis
     private:
       CnetPointTableDelegate(const CnetPointTableDelegate &);
       CnetPointTableDelegate & operator=(const CnetPointTableDelegate &);
+
+    private:
+      static bool const warnOnSigmaEdit = true;
   };
 }
 

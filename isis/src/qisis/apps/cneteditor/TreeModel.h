@@ -148,8 +148,10 @@ namespace Isis
       {
         public:
           FilterFunctor(FilterWidget * fw);
+          FilterFunctor(FilterFunctor const & other);
           ~FilterFunctor();
           bool operator()(AbstractTreeItem * const &) const;
+          FilterFunctor & operator=(FilterFunctor const &);
           void filterWorker(AbstractTreeItem *) const;
 
           static void updateTopLevelLinks(

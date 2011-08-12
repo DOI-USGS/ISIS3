@@ -9,7 +9,7 @@
 namespace Isis
 {
   AbstractLeafItem::AbstractLeafItem(AbstractTreeItem * parent) :
-    AbstractTreeItem(parent)
+      AbstractTreeItem(parent)
   {
   }
 

@@ -24,7 +24,6 @@
 using std::nothrow;
 using std::swap;
 
-
 namespace Isis
 {
   FilterGroup::FilterGroup(QString type)

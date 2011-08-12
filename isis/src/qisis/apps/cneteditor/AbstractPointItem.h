@@ -11,6 +11,8 @@ namespace Isis
 {
   class CnetTableColumnList;
   class ControlPoint;
+  class Distance;
+  class SurfacePoint;
 
   class AbstractPointItem : public virtual AbstractTreeItem
   {
@@ -51,7 +53,7 @@ namespace Isis
 
       static QString getColumnName(Column);
       static Column getColumn(QString);
-      static CnetTableColumnList createColumns();
+      static CnetTableColumnList * createColumns();
 
 
     public:
@@ -72,9 +74,11 @@ namespace Isis
       void sourceDeleted();
 
 
-    private: // disable copying of this class
+    private:
       AbstractPointItem(const AbstractPointItem & other);
       const AbstractPointItem & operator=(const AbstractPointItem & other);
+
+      SurfacePoint prepareSigmas(Distance newSigma, SurfacePoint surfacePoint);
 
 
     private:

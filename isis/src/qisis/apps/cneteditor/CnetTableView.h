@@ -22,7 +22,7 @@ namespace Isis
       Q_OBJECT
 
     public:
-      CnetTableView();
+      CnetTableView(AbstractCnetTableModel * someModel);
       virtual ~CnetTableView();
       QSize sizeHint();
       QFont getContentFont() const;
@@ -34,7 +34,7 @@ namespace Isis
       void setColumnVisible(QString, bool);
 
       AbstractCnetTableModel * getModel();
-      void setModel(AbstractCnetTableModel * newModel);
+//       void setModel(AbstractCnetTableModel * newModel);
 
 
     public slots:
@@ -63,7 +63,6 @@ namespace Isis
       CnetTableViewHeader * header;
       CnetTableViewContent * content;
       CnetTableColumnList * columns;
-      bool active;
   };
 }
 

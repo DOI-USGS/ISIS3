@@ -4,6 +4,14 @@
 #include <QAbstractScrollArea>
 
 
+
+
+#include <QPointer>
+
+
+
+
+
 class QEvent;
 class QKeyEvent;
 template< typename T > class QList;

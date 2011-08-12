@@ -13,6 +13,7 @@ template<typename T> class QList;
 
 namespace Isis
 {
+  class AbstractCnetTableModel;
   class CnetTableColumnList;
 
   class CnetTableViewHeader : public QWidget
@@ -21,8 +22,9 @@ namespace Isis
       Q_OBJECT
 
     public:
-      explicit CnetTableViewHeader(CnetTableColumnList * cols);
+      explicit CnetTableViewHeader(AbstractCnetTableModel * someModel);
       virtual ~CnetTableViewHeader();
+      virtual void setColumns(CnetTableColumnList *);
       QSize minimumSizeHint() const;
       QSize sizeHint() { return minimumSizeHint(); }
 
@@ -61,6 +63,8 @@ namespace Isis
       void paintHeader(QPainter * painter, int rowheight);
       void paintProgress(QPainter * painter, const QRect & rect, int min,
           int max, int value);
+      QRect getSortingPriorityRect(int visColIndex);
+      QRect getSortingArrowRect(int visColIndex);
 
 
     private: // data

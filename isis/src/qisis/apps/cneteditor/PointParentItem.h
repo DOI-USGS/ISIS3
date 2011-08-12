@@ -2,8 +2,8 @@
 #define PointParentItem_H
 
 
-#include "AbstractPointItem.h"
 #include "AbstractParentItem.h"
+#include "AbstractPointItem.h"
 
 
 class QVariant;

@@ -42,9 +42,9 @@ namespace Isis
       }
 
       bool hasFilter() const;
-      bool hasFilter(bool (AbstractFilter:: *)() const) const;
+      bool hasFilter(bool (AbstractFilter::*)() const) const;
 
-      QString getDescription(QString(AbstractFilter:: *)() const) const;
+      QString getDescription(QString(AbstractFilter::*)() const) const;
 
       AbstractFilterSelector & operator=(const AbstractFilterSelector & other);
 

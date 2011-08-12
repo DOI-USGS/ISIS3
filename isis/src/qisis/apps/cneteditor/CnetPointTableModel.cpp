@@ -48,20 +48,14 @@ namespace Isis
   QList< AbstractTreeItem * > CnetPointTableModel::getItems(
       int start, int end)
   {
-    return getDataModel()->getItems(start, end, TreeModel::PointItems, true);
+    return getSortedItems(start, end, TreeModel::PointItems);
   }
 
 
   QList< AbstractTreeItem * > CnetPointTableModel::getItems(
       AbstractTreeItem * item1, AbstractTreeItem * item2)
   {
-    return getDataModel()->getItems(item1, item2, TreeModel::PointItems, true);
-  }
-
-
-  CnetTableColumnList CnetPointTableModel::createColumns()
-  {
-    return AbstractPointItem::createColumns();
+    return getSortedItems(item1, item2, TreeModel::PointItems);
   }
 
 
@@ -105,11 +99,41 @@ namespace Isis
 
     QString warningText;
 
-    if (colType == AbstractPointItem::EditLock &&
-        valueToSave.toLower() == "no" &&
-        row->getData(colTitle).toLower() == "yes") {
-      warningText = "Are you sure you want to unlock control point [" +
-          row->getData() + "] for editing?";
+    switch (colType)
+    {
+      case AbstractPointItem::EditLock:
+        if (valueToSave.toLower() == "no" &&
+            row->getData(colTitle).toLower() == "yes") {
+          warningText = "Are you sure you want to unlock control point [" +
+              row->getData() + "] for editing?";
+        }
+        break;
+      case AbstractPointItem::APrioriSPLatSigma:
+      case AbstractPointItem::APrioriSPLonSigma:
+      case AbstractPointItem::APrioriSPRadiusSigma:
+        {
+          ASSERT(row->getPointerType() == AbstractTreeItem::Point);
+          ControlPoint * point = (ControlPoint *) row->getPointer();
+
+          // Check to see if any of the sigma values are null.
+          bool latSigmaValid = (point->GetAprioriSurfacePoint().
+              GetLatSigmaDistance().Valid());
+          bool lonSigmaValid = (point->GetAprioriSurfacePoint().
+              GetLonSigmaDistance().Valid());
+          bool radiusSigmaValid = (point->GetAprioriSurfacePoint().
+              GetLocalRadiusSigma().Valid());
+
+          if (!latSigmaValid && !lonSigmaValid && !radiusSigmaValid &&
+              valueToSave.toLower() != "null")
+          {
+            warningText = "The sigma values are currently null. The other "
+                "sigmas will be set to 10,000, which currently represents "
+                "'free'. Is this okay?";
+          }
+          break;
+        }
+      default:
+        break;
     }
 
     return warningText;
@@ -121,6 +145,12 @@ namespace Isis
   {
     AbstractCnetTableModel::handleTreeSelectionChanged(
         newlySelectedItems, AbstractTreeItem::Point);
+  }
+
+
+  CnetTableColumnList * CnetPointTableModel::createColumns()
+  {
+    return AbstractPointItem::createColumns();
   }
 }
 

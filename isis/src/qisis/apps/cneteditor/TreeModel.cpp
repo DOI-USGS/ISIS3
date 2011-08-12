@@ -110,6 +110,8 @@ namespace Isis
   }
 
 
+  // If a negative end is passed in, grabs all items from start to the end of
+  // the tree. No busy leaf items will be inserted.
   QList< AbstractTreeItem * > TreeModel::getItems(int start, int end,
       InterestingItemsFlag flags, bool ignoreExpansion)
   {
@@ -118,7 +120,10 @@ namespace Isis
     const AbstractTreeItem * lastVisibleFilteredItem =
       rootItem->getLastVisibleFilteredItem();
 
-    if (lastVisibleFilteredItem && rowCount > 0 && rootItem->childCount())
+    bool grabToEnd = (start >= 0 && end < 0);
+
+    if (lastVisibleFilteredItem && (rowCount > 0 || grabToEnd) &&
+        rootItem->childCount())
     {
       int row = 0;
       AbstractTreeItem * currentItem = rootItem->getFirstVisibleChild();
@@ -140,7 +145,7 @@ namespace Isis
           currentItem = nextItem(currentItem, flags, ignoreExpansion);
       }
 
-      while (row < end && listStillValid && currentItem)
+      while ((row < end || grabToEnd) && listStillValid && currentItem)
       {
         ASSERT(currentItem);
         foundItems.append(currentItem);
@@ -152,7 +157,10 @@ namespace Isis
           currentItem = nextItem(currentItem, flags, ignoreExpansion);
       }
 
-      while (isFiltering() && foundItems.size() < rowCount)
+      // Fill in the rest with busy items if needed. If we are grabbing all
+      // items to the end of the visible tree, we do not want any busy items
+      // added to our found items list.
+      while (!grabToEnd && isFiltering() && foundItems.size() < rowCount)
       {
         foundItems.append(busyItem);
       }
@@ -342,25 +350,6 @@ namespace Isis
     }
 
     return index;
-  }
-
-
-  void TreeModel::setDrivable(bool drivableStatus)
-  {
-    if (drivable != drivableStatus)
-    {
-      drivable = drivableStatus;
-      ASSERT(view);
-
-      if (view)
-        view->activate();
-    }
-  }
-
-
-  bool TreeModel::isDrivable() const
-  {
-    return drivable;
   }
 
 
@@ -723,8 +712,7 @@ namespace Isis
 
   void TreeModel::rebuildItemsDone()
   {
-//     cerr << "TreeModel::rebuildItemsDone\n";
-    saveViewState();
+//     cerr << "TreeModel::rebuildItemsDone called\n";
     clear();
 
     QAtomicPointer< RootItem > newRoot = rebuildWatcher->future();
@@ -741,14 +729,21 @@ namespace Isis
       delete newRoot;
       newRoot = NULL;
     }
-
+    
     applyFilter();
-//     cerr << "/TreeModel::rebuildItemsDone\n";
+    emit modelModified();
+
+//     cerr << "/TreeModel::rebuildItemsDone done\n";
   }
 
 
   TreeModel::FilterFunctor::FilterFunctor(FilterWidget * fw) : filter(fw)
   {
+  }
+
+
+  TreeModel::FilterFunctor::FilterFunctor(FilterFunctor const & other) {
+    filter = other.filter;
   }
 
 
@@ -762,6 +757,16 @@ namespace Isis
   {
     filterWorker(item);
     return true;
+  }
+
+
+  TreeModel::FilterFunctor &
+      TreeModel::FilterFunctor::operator=(FilterFunctor const & other) {
+    if (this != &other) {
+      filter = other.filter;
+    }
+
+    return *this;
   }
 
 

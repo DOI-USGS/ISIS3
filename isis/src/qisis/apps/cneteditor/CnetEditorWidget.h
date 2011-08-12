@@ -39,7 +39,6 @@ namespace Isis
     public:
       CnetEditorWidget(ControlNet *, QString);
       virtual ~CnetEditorWidget();
-      int getDriverView() const;
       void readSettings();
       void writeSettings();
 
@@ -49,13 +48,6 @@ namespace Isis
       QWidget * getPointFilterWidget();
       QWidget * getSerialFilterWidget();
       QWidget * getConnectionFilterWidget();
-
-
-    public slots:
-      void setDriverView(int);
-      void activatePointView();
-      void activateSerialView();
-      void activateConnectionView();
 
 
     signals:

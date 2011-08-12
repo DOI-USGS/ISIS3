@@ -2,6 +2,7 @@
 #define BusyLeafItem_H
 
 #include "AbstractLeafItem.h"
+#include "AbstractNullDataItem.h"
 
 
 class QString;
@@ -9,20 +10,16 @@ class QString;
 
 namespace Isis
 {
-  class BusyLeafItem : public AbstractLeafItem
+  class BusyLeafItem : public AbstractNullDataItem, public AbstractLeafItem
   {
+      Q_OBJECT
+    
     public:
       BusyLeafItem(AbstractTreeItem * parent = 0);
       virtual ~BusyLeafItem();
-
-      QString getData() const;
-      QString getData(QString columnTitle) const;
-      void setData(QString const & columnTitle, QString const & newData);
-      void deleteSource();
-      InternalPointerType getPointerType() const;
-      void * getPointer() const;
-      bool isSelectable() const;
-
+      virtual QString getData() const;
+      virtual bool isSelectable() const;
+      
 
     private: // Disallow copying of this class
       BusyLeafItem(const BusyLeafItem & other);

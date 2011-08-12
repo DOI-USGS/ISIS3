@@ -2,6 +2,7 @@
 #define RootItem_H
 
 
+#include "AbstractNullDataItem.h"
 #include "AbstractParentItem.h"
 
 
@@ -12,19 +13,13 @@ namespace Isis
 {
   class ControlPoint;
 
-  class RootItem : public AbstractParentItem
+  class RootItem : public AbstractNullDataItem, public AbstractParentItem
   {
+      Q_OBJECT
+    
     public:
       RootItem();
       virtual ~RootItem();
-
-      QString getData() const;
-      QString getData(QString columnTitle) const;
-      void setData(QString const & columnTitle, QString const & newData);
-      void deleteSource();
-      InternalPointerType getPointerType() const;
-      void * getPointer() const;
-
       void setLastVisibleFilteredItem(AbstractTreeItem * item);
       const AbstractTreeItem * getLastVisibleFilteredItem() const;
 

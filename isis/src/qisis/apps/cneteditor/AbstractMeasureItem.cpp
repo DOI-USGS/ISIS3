@@ -87,48 +87,48 @@ namespace Isis
   }
 
 
-  CnetTableColumnList AbstractMeasureItem::createColumns()
+  CnetTableColumnList * AbstractMeasureItem::createColumns()
   {
-    CnetTableColumnList columnList;
+    CnetTableColumnList * columnList = new CnetTableColumnList;
 
-    columnList.append(new CnetTableColumn(getColumnName(PointId), true, false));
-    columnList.append(new CnetTableColumn(getColumnName(CubeSerialNumber), true,
+    columnList->append(new CnetTableColumn(getColumnName(PointId), true, false));
+    columnList->append(new CnetTableColumn(getColumnName(CubeSerialNumber), true,
                                           true));
-    columnList.append(new CnetTableColumn(getColumnName(Sample), true, false));
-    columnList.append(new CnetTableColumn(getColumnName(Line), true, false));
-    columnList.append(new CnetTableColumn(getColumnName(EditLock), false,
+    columnList->append(new CnetTableColumn(getColumnName(Sample), true, false));
+    columnList->append(new CnetTableColumn(getColumnName(Line), true, false));
+    columnList->append(new CnetTableColumn(getColumnName(EditLock), false,
                                           false));
-    columnList.append(new CnetTableColumn(getColumnName(Ignored), false, true));
-    columnList.append(new CnetTableColumn(getColumnName(Type), false, false));
-    columnList.append(new CnetTableColumn(getColumnName(Eccentricity), true,
+    columnList->append(new CnetTableColumn(getColumnName(Ignored), false, true));
+    columnList->append(new CnetTableColumn(getColumnName(Type), false, false));
+    columnList->append(new CnetTableColumn(getColumnName(Eccentricity), true,
                                           false));
-    columnList.append(new CnetTableColumn(getColumnName(GoodnessOfFit), true,
+    columnList->append(new CnetTableColumn(getColumnName(GoodnessOfFit), true,
                                           false));
-    columnList.append(new CnetTableColumn(getColumnName(MinPixelZScore), true,
+    columnList->append(new CnetTableColumn(getColumnName(MinPixelZScore), true,
                                           false));
-    columnList.append(new CnetTableColumn(getColumnName(MaxPixelZScore), true,
+    columnList->append(new CnetTableColumn(getColumnName(MaxPixelZScore), true,
                                           false));
-    columnList.append(new CnetTableColumn(getColumnName(SampleShift), true,
+    columnList->append(new CnetTableColumn(getColumnName(SampleShift), true,
                                           false));
-    columnList.append(new CnetTableColumn(getColumnName(LineShift), true,
+    columnList->append(new CnetTableColumn(getColumnName(LineShift), true,
                                           false));
-    columnList.append(new CnetTableColumn(getColumnName(SampleSigma), false,
+    columnList->append(new CnetTableColumn(getColumnName(SampleSigma), false,
                                           false));
-    columnList.append(new CnetTableColumn(getColumnName(LineSigma), false,
+    columnList->append(new CnetTableColumn(getColumnName(LineSigma), false,
                                           false));
-    columnList.append(new CnetTableColumn(getColumnName(APrioriSample), true,
+    columnList->append(new CnetTableColumn(getColumnName(APrioriSample), true,
                                           false));
-    columnList.append(new CnetTableColumn(getColumnName(APrioriLine), true,
+    columnList->append(new CnetTableColumn(getColumnName(APrioriLine), true,
                                           false));
-    columnList.append(new CnetTableColumn(getColumnName(Diameter), false,
+    columnList->append(new CnetTableColumn(getColumnName(Diameter), false,
                                           false));
-    columnList.append(new CnetTableColumn(getColumnName(JigsawRejected), true,
+    columnList->append(new CnetTableColumn(getColumnName(JigsawRejected), true,
                                           false));
-    columnList.append(new CnetTableColumn(getColumnName(ResidualSample), true,
+    columnList->append(new CnetTableColumn(getColumnName(ResidualSample), true,
                                           false));
-    columnList.append(new CnetTableColumn(getColumnName(ResidualLine), true,
+    columnList->append(new CnetTableColumn(getColumnName(ResidualLine), true,
                                           false));
-    columnList.append(new CnetTableColumn(getColumnName(ResidualMagnitude),
+    columnList->append(new CnetTableColumn(getColumnName(ResidualMagnitude),
                                           true, false));
 
     return columnList;
@@ -370,7 +370,7 @@ namespace Isis
   {
     return measure;
   }
-
+  
 
   bool AbstractMeasureItem::hasMeasure(ControlMeasure * m) const
   {

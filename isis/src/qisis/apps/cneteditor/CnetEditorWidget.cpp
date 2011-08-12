@@ -151,42 +151,6 @@ namespace Isis
   }
 
 
-  void CnetEditorWidget::setDriverView(int driverView)
-  {
-    View view = (View) driverView;
-    pointModel->setDrivable(view == PointView);
-    serialModel->setDrivable(view == SerialView);
-    connectionModel->setDrivable(view == ConnectionView);
-
-//     pointTreeView->selectionModel()->clear();
-//     pointTreeView->collapseAll();
-
-//     serialTreeView->selectionModel()->clear();
-//     serialTreeView->collapseAll();
-//
-//     connectionTreeView->selectionModel()->clear();
-//     connectionTreeView->collapseAll();
-  }
-
-
-  void CnetEditorWidget::activatePointView()
-  {
-    setDriverView(0);
-  }
-
-
-  void CnetEditorWidget::activateSerialView()
-  {
-    setDriverView(1);
-  }
-
-
-  void CnetEditorWidget::activateConnectionView()
-  {
-    setDriverView(2);
-  }
-
-
   void CnetEditorWidget::rebuildModels(QList<AbstractTreeItem *> itemsToDelete)
   {
     pointModel->stopWorking();
@@ -230,35 +194,6 @@ namespace Isis
     pointModel->rebuildItems();
     serialModel->rebuildItems();
     connectionModel->rebuildItems();
-  }
-
-
-  int CnetEditorWidget::getDriverView() const
-  {
-    View driverView;
-    if (pointModel->isDrivable())
-    {
-      driverView = PointView;
-      ASSERT(!serialModel->isDrivable());
-      ASSERT(!connectionModel->isDrivable());
-    }
-    else
-    {
-      if (serialModel->isDrivable())
-      {
-        driverView = SerialView;
-        ASSERT(!pointModel->isDrivable());
-        ASSERT(!connectionModel->isDrivable());
-      }
-      else
-      {
-        driverView = ConnectionView;
-        ASSERT(connectionModel->isDrivable());
-        ASSERT(!pointModel->isDrivable());
-        ASSERT(!serialModel->isDrivable());
-      }
-    }
-    return (int) driverView;
   }
 
 
@@ -322,8 +257,6 @@ namespace Isis
     pointTreeView->setTitle("Point View");
     pointModel = new PointModel(controlNet, pointTreeView, qApp);
     pointTreeView->setModel(pointModel);
-    connect(pointTreeView, SIGNAL(activated()),
-        this, SLOT(activatePointView()));
   }
 
 
@@ -333,8 +266,6 @@ namespace Isis
     serialTreeView->setTitle("Cube View");
     serialModel = new SerialModel(controlNet, serialTreeView, qApp);
     serialTreeView->setModel(serialModel);
-    connect(serialTreeView, SIGNAL(activated()),
-        this, SLOT(activateSerialView()));
     connect(serialTreeView, SIGNAL(selectionChanged()),
         this, SLOT(serialTreeViewSelectionChanged()));
   }
@@ -346,8 +277,6 @@ namespace Isis
     connectionTreeView->setTitle("Cube Connection View");
     connectionModel = new ConnectionModel(controlNet, connectionTreeView, qApp);
     connectionTreeView->setModel(connectionModel);
-    connect(connectionTreeView, SIGNAL(activated()),
-        this, SLOT(activateConnectionView()));
     connect(connectionTreeView, SIGNAL(selectionChanged()),
         this, SLOT(connectionTreeViewSelectionChanged()));
   }
@@ -408,9 +337,8 @@ namespace Isis
 
   void CnetEditorWidget::createPointTableView()
   {
-    pointTableView = new CnetTableView;
     pointTableModel = new CnetPointTableModel(pointModel);
-    pointTableView->setModel(pointTableModel);
+    pointTableView = new CnetTableView(pointTableModel);
     connect(pointTableView, SIGNAL(modelDataChanged()),
             this, SIGNAL(cnetModified()));
     
@@ -438,15 +366,14 @@ namespace Isis
 
   void CnetEditorWidget::createMeasureTableView()
   {
-    measureTableView = new CnetTableView();
     measureTableModel = new CnetMeasureTableModel(pointModel);
+    measureTableView = new CnetTableView(measureTableModel);
     ASSERT(pointTableView);
     connect(pointTableView,
             SIGNAL(tableSelectionChanged(QList< AbstractTreeItem * >)),
             measureTableModel,
             SLOT(handleTreeSelectionChanged(QList<AbstractTreeItem*>)));
     
-    measureTableView->setModel(measureTableModel);
     connect(measureTableView, SIGNAL(modelDataChanged()),
             this, SIGNAL(cnetModified()));
     connect(pointTreeView, SIGNAL(selectionChanged()),
@@ -763,7 +690,6 @@ namespace Isis
 
     QSettings settings(*settingsPath, QSettings::NativeFormat);
     *workingVersion = settings.value("version", "").toString();
-    setDriverView(settings.value("driverView", PointView).toInt());
 
     topSplitter->restoreState(settings.value("topSplitter").toByteArray());
     mainSplitter->restoreState(settings.value("mainSplitter").toByteArray());
@@ -798,7 +724,6 @@ namespace Isis
     settings.setValue("version", VERSION);
     settings.setValue("topSplitter", topSplitter->saveState());
     settings.setValue("mainSplitter", mainSplitter->saveState());
-    settings.setValue("driverView", getDriverView());
 
     QList< QAction * > actions =
       measureTableView->getHorizontalHeader()->actions();

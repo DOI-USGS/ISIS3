@@ -132,6 +132,7 @@ namespace Isis
 
   void CnetTreeViewContent::refresh()
   {
+    ASSERT(model);
     if (model)
     {
       if (!model->isFiltering())
@@ -378,6 +379,7 @@ namespace Isis
           if (alternatingRowColors && (startRow + i) % 2 == 1)
             backgroundColor = palette().alternateBase().color();
 
+          ASSERT(items->at(i));
           if (items->at(i)->isSelected())
             backgroundColor = palette().highlight().color();
         }
@@ -598,8 +600,9 @@ namespace Isis
   {
     int startRow = verticalScrollBar()->value();
     int rowCount = (int) ceil(viewport()->height() / (double) rowHeight);
-    *items = model->getItems(startRow, startRow + rowCount);
-
+    *items = model->getItems(startRow, startRow + rowCount,
+                             TreeModel::AllItems, false);
+    
     viewport()->update();
   }
 

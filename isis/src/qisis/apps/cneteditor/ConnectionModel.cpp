@@ -71,7 +71,7 @@ namespace Isis
     ControlCubeGraphNode * const & node) const
   {
     SerialParentItem * parentItem =
-      new SerialParentItem(node, avgCharWidth);
+        new SerialParentItem(node, avgCharWidth);
     parentItem->setSelectable(false);
     parentItem->moveToThread(targetThread);
 

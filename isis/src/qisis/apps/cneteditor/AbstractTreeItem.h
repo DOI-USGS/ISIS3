@@ -52,7 +52,8 @@ namespace Isis
       virtual void setLastVisibleChild(AbstractTreeItem * child) = 0;
 
       // These methods are designed to be implemented either by
-      // AbstractPointItem, AbstractMeasureItem, or AbstractSerialItem.
+      // AbstractPointItem, AbstractMeasureItem, AbstractSerialItem,
+      // or AbstractNullDataItem.
       virtual QString getData() const = 0;
       virtual QString getData(QString columnTitle) const = 0;
       virtual void setData(QString const & columnTitle,
@@ -85,6 +86,8 @@ namespace Isis
 
       virtual void setLastVisibleFilteredItem(AbstractTreeItem * item);
       virtual const AbstractTreeItem * getLastVisibleFilteredItem() const;
+      
+      virtual bool operator<(AbstractTreeItem const & other);
 
 
     protected:
