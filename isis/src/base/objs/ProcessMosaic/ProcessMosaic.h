@@ -265,9 +265,6 @@ namespace Isis {
       void BandComparison(int piIndex, int piIns, int piInl, int piIss, 
                           int piIsl, int piOss, int piOsl);
 
-      //! Get the origin of the pixel given sample, line
-      int GetPixelOrigin(int piLineNum, int piStartSample, int piSampleNum);
-
       //! Get the default origin value based on pixel type for the origin band
       int GetOriginDefaultByPixelType(void);
 

@@ -325,7 +325,7 @@ namespace Isis {
           }
           // Band Priority
           else if(mtTrackInfo.bTrack && mePriority == band) {
-            int iPixelOrigin = GetPixelOrigin(ol, outSample, pixel);
+            int iPixelOrigin = (int) origPortal[pixel];
             if(iPixelOrigin == iIndex) {
               oPortal[pixel] = iPortal[pixel];
               iChanged++;
@@ -706,32 +706,7 @@ namespace Isis {
 
     outLab->FindObject("IsisCube").AddGroup(cOutBin);
   }
-  /**
-   *  This method gets the origin of a pixel in the mosaic from
-   *  the origin band given the line, sample and starting mosaic
-   *  sample numbers
-   *
-   *  @piLineNum   - Input Line #
-   *  @piSS        - Starting Mosaic Sample #
-   *  @piSampleNum - Pixel index (Sample #)
-   *
-   *  returns the pixel origin
-   *
-   *  @author Sharmila Prasad (8/28/2009)
-   */
-  int ProcessMosaic::GetPixelOrigin(int piLineNum, int piSS, int piSampleNum) {
-    Isis::Portal origPortal((piSampleNum + 1), 1, OutputCubes[0]->getPixelType());
 
-    //Get the last band set aside for "Origin"
-    int iOriginBand = OutputCubes[0]->getBandCount();
-
-    // 1 based
-    origPortal.SetPosition(piSS, piLineNum, iOriginBand);
-    OutputCubes[0]->read(origPortal);
-
-    return (int) origPortal[piSampleNum];
-
-  }
 
   /**
    * Given filetype(input or output) returns the band index in that file for the
