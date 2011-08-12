@@ -23,6 +23,8 @@ namespace Isis {
    *                            the project file. This change will cause older
    *                            versions of qmos to fail to read newer project
    *                            files. References #275.
+   *    @history 2011-08-12 Steven Lambright - Added export options,
+   *                            references #342
    */
   class MosaicFileListWidget : public QWidget {
       Q_OBJECT
@@ -35,9 +37,13 @@ namespace Isis {
       PvlObject toPvl() const;
 
       QList<QAction *> getViewActions();
+      QList<QAction *> getExportActions();
 
     public slots:
       void addCubes(QList<CubeDisplayProperties *>);
+
+    private slots:
+      void saveList();
 
     private:
       MosaicTreeWidgetItem *takeItem(QString filename,

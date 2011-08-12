@@ -34,13 +34,15 @@ namespace Isis {
    * @author Stacy Alley
    *
    * @internal
-   *
-   *  @history 2010-05-10 Christopher Austin - added cnet connectivity
-   *                                functionality and fixed a few design issues
-   *  @history 2010-10-26 Tracie Sucharski Added missing includes to cpp after
-   *                                removing includes from ControlNet.h.
-   *  @history 2011-08-08 Steven Lambright - Refactored. Now uses scene widget's
-   *                                preloadFromPvl. 
+   *   @history 2010-05-10 Christopher Austin - added cnet connectivity
+   *                                 functionality and fixed a few design issues
+   *   @history 2010-10-26 Tracie Sucharski Added missing includes to cpp after
+   *                                  removing includes from ControlNet.h.
+   *   @history 2011-08-08 Steven Lambright - Refactored. Now uses scene widget's
+   *                                 preloadFromPvl.
+   *   @history 2011-08-12 Steven Lambright - Export options now come from the
+   *                           scene and the file list, not directly from this
+   *                           controller. Fixes #342
    */
 
   class MosaicController : public QObject {
@@ -66,7 +68,7 @@ namespace Isis {
 
       QProgressBar *getProgress();
       void saveProject();
-      
+
       QList<QAction *> getSettingsActions();
       void saveSettings(QSettings &settings);
 
@@ -89,7 +91,6 @@ namespace Isis {
       void changeMaxThreads();
       void cubeClosed(QObject * cubeDisplay);
       void defaultFillChanged(bool);
-      void exportView();
       void loadFinished();
       void saveList();
       void updateProgress(int);

@@ -37,6 +37,7 @@
 #include "ProjectionFactory.h"
 #include "PvlObject.h"
 #include "Pvl.h"
+#include "TextFile.h"
 
 namespace Isis {
   MosaicSceneWidget::MosaicSceneWidget(QStatusBar *status,
@@ -431,6 +432,63 @@ namespace Isis {
     return boundingRect;
   }
 
+
+  MosaicSceneItem *MosaicSceneWidget::cubeToMosaic(
+      CubeDisplayProperties *cubeDisplay) {
+    MosaicSceneItem *mosaicSceneItem;
+    foreach(mosaicSceneItem, *m_mosaicSceneItems) {
+      if(mosaicSceneItem->cubeDisplay() == cubeDisplay)
+        return mosaicSceneItem;
+    }
+
+    iString msg = "Cube is not in the mosaic";
+    throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+  }
+
+
+  QStringList MosaicSceneWidget::cubeFilenames() {
+    QStringList cubes;
+
+    MosaicSceneItem *mosaicSceneItem;
+    foreach(mosaicSceneItem, *m_mosaicSceneItems) {
+      if(mosaicSceneItem->cubeDisplay())
+        cubes.append(mosaicSceneItem->cubeDisplay()->fileName());
+    }
+
+    return cubes;
+  }
+
+
+  QList<CubeDisplayProperties *> MosaicSceneWidget::cubeDisplays() {
+    QList<CubeDisplayProperties *> displays;
+
+    MosaicSceneItem *mosaicSceneItem;
+    foreach(mosaicSceneItem, *m_mosaicSceneItems) {
+      if(mosaicSceneItem->cubeDisplay())
+        displays.append(mosaicSceneItem->cubeDisplay());
+    }
+
+    return displays;
+  }
+
+
+  QList<QAction *> MosaicSceneWidget::getExportActions() {
+    QList<QAction *> exportActs;
+
+    QAction *exportView = new QAction(this);
+    exportView->setText("&Export View...");
+    connect(exportView, SIGNAL(activated()), this, SLOT(exportView()));
+
+    QAction *saveList = new QAction(this);
+    saveList->setText("Save Cube List (sorted by &Z-Order)...");
+    connect(saveList, SIGNAL(activated()), this, SLOT(saveList()));
+
+    exportActs.append(exportView);
+    exportActs.append(saveList);
+
+    return exportActs;
+  }
+
   MosaicSceneItem *MosaicSceneWidget::addCube(CubeDisplayProperties *cube) {
     if(m_projection == NULL) {
       setProjection(createInitialProjection(cube));
@@ -550,6 +608,53 @@ namespace Isis {
 
     m_progress->setVisible(false);
     emit cubesChanged();
+  }
+
+
+  /**
+   * Saves the scene as a png, jpg, or tif file.
+   */
+  void MosaicSceneWidget::exportView() {
+    QString output =
+      QFileDialog::getSaveFileName((QWidget *)parent(),
+                                   "Choose output file",
+                                   QDir::currentPath() + "/untitled.png",
+                                   QString("Images (*.png *.jpg *.tif)"));
+    if(output.isEmpty()) return;
+
+    // Use png format is the user did not add a suffix to their output filename.
+    if(QFileInfo(output).suffix().isEmpty()) {
+      output = output + ".png";
+    }
+
+    QString format = QFileInfo(output).suffix();
+    QPixmap pm = QPixmap::grabWidget(getScene()->views().last());
+
+    std::string formatString = format.toStdString();
+    if(!pm.save(output, formatString.c_str())) {
+      QMessageBox::information(this, "Error",
+                               "Unable to save [" + output + "]");
+    }
+  }
+
+
+  void MosaicSceneWidget::saveList() {
+    QString output =
+        QFileDialog::getSaveFileName((QWidget *)parent(),
+          "Choose output file",
+          QDir::currentPath() + "/files.lis",
+          QString("List File (*.lis);;Text File (*.txt);;All Files (*.*)"));
+    if(output.isEmpty()) return;
+
+    TextFile file(output.toStdString(), "overwrite");
+
+    QList<MosaicSceneItem *> sorted = *m_mosaicSceneItems;
+    qSort(sorted.begin(), sorted.end(), zOrderGreaterThan);
+
+    MosaicSceneItem *sceneItem;
+    foreach(sceneItem, sorted) {
+      file.PutLine( sceneItem->cubeDisplay()->fileName().toStdString() );
+    }
   }
 
 
@@ -1065,43 +1170,9 @@ namespace Isis {
     return nextZValueItem;
   }
 
-
-  MosaicSceneItem *MosaicSceneWidget::cubeToMosaic(
-      CubeDisplayProperties *cubeDisplay) {
-    MosaicSceneItem *mosaicSceneItem;
-    foreach(mosaicSceneItem, *m_mosaicSceneItems) {
-      if(mosaicSceneItem->cubeDisplay() == cubeDisplay)
-        return mosaicSceneItem;
-    }
-
-    iString msg = "Cube is not in the mosaic";
-    throw iException::Message(iException::Programmer, msg, _FILEINFO_);
-  }
-
-
-  QStringList MosaicSceneWidget::cubeFilenames() {
-    QStringList cubes;
-
-    MosaicSceneItem *mosaicSceneItem;
-    foreach(mosaicSceneItem, *m_mosaicSceneItems) {
-      if(mosaicSceneItem->cubeDisplay())
-        cubes.append(mosaicSceneItem->cubeDisplay()->fileName());
-    }
-
-    return cubes;
-  }
-
-
-  QList<CubeDisplayProperties *> MosaicSceneWidget::cubeDisplays() {
-    QList<CubeDisplayProperties *> displays;
-
-    MosaicSceneItem *mosaicSceneItem;
-    foreach(mosaicSceneItem, *m_mosaicSceneItems) {
-      if(mosaicSceneItem->cubeDisplay())
-        displays.append(mosaicSceneItem->cubeDisplay());
-    }
-
-    return displays;
+  bool MosaicSceneWidget::zOrderGreaterThan(MosaicSceneItem *first,
+                                            MosaicSceneItem *second) {
+    return first->zValue() > second->zValue();
   }
 }
 

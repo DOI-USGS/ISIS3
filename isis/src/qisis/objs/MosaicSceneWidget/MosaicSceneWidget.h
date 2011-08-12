@@ -36,21 +36,23 @@ namespace Isis {
    * @author Stacy Alley
    *
    * @internal
-   *  @history 2010-05-10 Christopher Austin - Added cnet connectivity
-   *                          functionality and fixed a few design issues
-   *  @history 2011-04-01 Steven Lambright - Separated this class from the
-   *                          MosaicWidget class.
-   *  @history 2011-05-10 Steven Lambright - Reduced unnecessary code, fixed
-   *                          toolTips to work on everything (not just
-   *                          cubes). 
-   *  @history 2011-05-17 Steven Lambright - More robust createInitialProj 
-   *  @history 2011-05-17 Steven Lambright - Target radii recalculated when
-   *                          the user specifies a map file, if they
-   *                          are missing. 
-   *  @history 2011-05-20 Steven Lambright - Improved error handling when
-   *                          reprojecting. 
-   *  @history 2011-07-29 Steven Lambright - Z-ordering is now saved and
-   *                          restored in the project files. references #275
+   *   @history 2010-05-10 Christopher Austin - Added cnet connectivity
+   *                           functionality and fixed a few design issues
+   *   @history 2011-04-01 Steven Lambright - Separated this class from the
+   *                           MosaicWidget class.
+   *   @history 2011-05-10 Steven Lambright - Reduced unnecessary code, fixed
+   *                           toolTips to work on everything (not just
+   *                           cubes). 
+   *   @history 2011-05-17 Steven Lambright - More robust createInitialProj 
+   *   @history 2011-05-17 Steven Lambright - Target radii recalculated when
+   *                           the user specifies a map file, if they
+   *                           are missing. 
+   *   @history 2011-05-20 Steven Lambright - Improved error handling when
+   *                           reprojecting. 
+   *   @history 2011-07-29 Steven Lambright - Z-ordering is now saved and
+   *                           restored in the project files. references #275
+   *   @history 2011-08-12 Steven Lambright - Added export options,
+   *                           references #342
    */
   class MosaicSceneWidget : public QWidget {
       Q_OBJECT
@@ -100,6 +102,8 @@ namespace Isis {
       QStringList cubeFilenames();
       QList<CubeDisplayProperties *> cubeDisplays();
 
+      QList<QAction *> getExportActions();
+
     signals:
       void mouseEnter();
       void mouseMove(QPointF);
@@ -122,6 +126,9 @@ namespace Isis {
       void setOutlineRect(QRectF);
 
     private slots:
+      void exportView();
+      void saveList();
+
       void removeMosItem(QObject *);
 
       void moveDownOne();
@@ -154,6 +161,9 @@ namespace Isis {
       MosaicSceneItem *cubeToMosaic(CubeDisplayProperties *);
 
       QList<CubeDisplayProperties *> getSelectedCubes() const;
+
+      static bool zOrderGreaterThan(MosaicSceneItem *first,
+                                    MosaicSceneItem *second);
 
       bool m_cubesSelectable;
       bool m_customRubberBandEnabled;

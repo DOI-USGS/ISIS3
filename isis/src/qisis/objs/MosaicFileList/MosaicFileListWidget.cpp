@@ -2,7 +2,9 @@
 
 #include <iostream>
 
+#include <QAction>
 #include <QHBoxLayout>
+#include <QFileDialog>
 #include <QSettings>
 
 #include "CubeDisplayProperties.h"
@@ -11,6 +13,7 @@
 #include "MosaicTreeWidget.h"
 #include "MosaicTreeWidgetItem.h"
 #include "PvlObject.h"
+#include "TextFile.h"
 
 namespace Isis {
   MosaicFileListWidget::MosaicFileListWidget(QSettings &settings,
@@ -149,8 +152,47 @@ namespace Isis {
   }
 
 
+  QList<QAction *> MosaicFileListWidget::getExportActions() {
+    QList<QAction *> exportActs;
+
+    QAction *saveList = new QAction(this);
+    saveList->setText("Save Cube List (sorted by &file list)...");
+    connect(saveList, SIGNAL(activated()), this, SLOT(saveList()));
+
+    exportActs.append(saveList);
+
+    return exportActs;
+  }
+
+
   void MosaicFileListWidget::addCubes(QList<CubeDisplayProperties *> cubes) {
     p_tree->addCubes(cubes);
+  }
+
+
+
+  void MosaicFileListWidget::saveList() {
+    QString output =
+        QFileDialog::getSaveFileName((QWidget *)parent(),
+          "Choose output file",
+          QDir::currentPath() + "/files.lis",
+          QString("List File (*.lis);;Text File (*.txt);;All Files (*.*)"));
+    if(output.isEmpty()) return;
+
+    TextFile file(output.toStdString(), "overwrite");
+
+    for(int i = 0; i < p_tree->topLevelItemCount(); i++) {
+      QTreeWidgetItem *group = p_tree->topLevelItem(i);
+
+      for(int j = 0; j < group->childCount(); j++) {
+        QTreeWidgetItem *item = group->child(j);
+
+        if(item->type() == QTreeWidgetItem::UserType) {
+          MosaicTreeWidgetItem *cubeItem = (MosaicTreeWidgetItem *)item;
+          file.PutLine(cubeItem->cubeDisplay()->fileName().toStdString());
+        }
+      }
+    }
   }
 
 

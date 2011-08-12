@@ -91,45 +91,27 @@ namespace Isis {
 
 
   /**
-   * Saves the graphics view as a png, jpg, of tif file.
-   */
-  void MosaicController::exportView() {
-    QString output =
-      QFileDialog::getSaveFileName((QWidget *)parent(),
-                                   "Choose output file",
-                                   QDir::currentPath() + "/untitled.png",
-                                   QString("Images (*.png *.jpg *.tif)"));
-    if(output.isEmpty()) return;
-
-    // Use png format is the user did not add a suffix to their output filename.
-    if(QFileInfo(output).suffix().isEmpty()) {
-      output = output + ".png";
-    }
-
-    QString format = QFileInfo(output).suffix();
-    QPixmap pm = QPixmap::grabWidget(p_scene->getScene()->views().last());
-
-    std::string formatString = format.toStdString();
-    if(!pm.save(output, formatString.c_str())) {
-      QMessageBox::information(p_scene, "Error", "Unable to save " + output);
-    }
-  }
-
-
-  /**
    * Add actions that are export-related to the menu
    */
   void MosaicController::addExportActions(QMenu &fileMenu) {
-    QAction *saveList = new QAction(this);
-    saveList->setText("Save Cube List...");
-    connect(saveList, SIGNAL(activated()), this, SLOT(saveList()));
+    QList<QAction *> exportActions = p_scene->getExportActions();
 
-    QAction *exportView = new QAction(this);
-    exportView->setText("Export View...");
-    connect(exportView, SIGNAL(activated()), this, SLOT(exportView()));
+    foreach (QAction * exportAct, exportActions) {
+      fileMenu.addAction(exportAct);
+    }
 
-    fileMenu.addAction(saveList);
-    fileMenu.addAction(exportView);
+    exportActions = p_fileList->getExportActions();
+
+    foreach (QAction * exportAct, exportActions) {
+      fileMenu.addAction(exportAct);
+    }
+
+//     QAction *exportView = new QAction(this);
+//     exportView->setText("Export View...");
+//     connect(exportView, SIGNAL(activated()), this, SLOT(exportView()));
+
+//     fileMenu.addAction(saveList);
+//     fileMenu.addAction(exportView);
   }
 
 
