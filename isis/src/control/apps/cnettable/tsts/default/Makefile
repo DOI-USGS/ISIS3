@@ -3,12 +3,12 @@ APPNAME = cnettable
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
-	find $(INPUT)/*.cub > $(INPUT)/cubeList.lst; \
-	$(APPNAME) FROMLIST=$(INPUT)/cubeList.lst \
+	find $(INPUT)/*.cub > $(OUTPUT)/cubeList.lst; \
+	$(APPNAME) FROMLIST=$(OUTPUT)/cubeList.lst \
 	CNET=$(INPUT)/testNet.net \
 	FLATFILE=$(OUTPUT)/cnetstats.txt \
         > /dev/null;
-	rm -f $(INPUT)/cubeList.lst > /dev/null;
+	rm -f $(OUTPUT)/cubeList.lst > /dev/null;
 	cat $(OUTPUT)/cnetstats.txt | sed s/,\[^,]\*\.cub,/,file.cub,/ \
 	  | sed 's/\([0-9][0-9]*\.[0-9]\)\([0-9][0-9]*\)/\1/g' \
 	  | sed s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
