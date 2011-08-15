@@ -958,7 +958,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
              m_nObservations, m_nConstrainedPointParameters, m_nUnknownParameters, m_nDegreesOfFreedom);
 
       // check for convergence
-      if (!m_bDeltack) {
+      if ( !m_bDeltack ) {
         if (fabs(dSigma0_previous - m_dSigma0) <= m_dConvergenceThreshold) {
           m_bLastIteration = true;
 
@@ -968,16 +968,19 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         }
       }
       else {
+        int nconverged = 0;
         int numimgparam = m_Image_Solution.size();
         for (int ij = 0; ij < numimgparam; ij++) {
           if (fabs(m_Image_Solution(ij)) > m_dConvergenceThreshold) 
             break;
-          m_bConverged = true;
+          else
+            nconverged++;
         }
 
-        if  (m_bConverged == true) {
+        if ( nconverged == numimgparam ) {
+          m_bConverged = true;
           m_bLastIteration = true;
-          printf("Bundle has converged\n");
+          printf("Deltack Bundle has converged\n");
           break;
         }
       }  
