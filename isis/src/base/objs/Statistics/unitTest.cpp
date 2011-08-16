@@ -31,6 +31,7 @@ int main(int argc, char *argv[]) {
   s.AddData(a, 8);
   cout << "Average:        " << s.Average() << endl;
   cout << "Variance:       " << s.Variance() << endl;
+  cout << "Rms:            " << s.Rms() << endl;
   cout << "Std Deviation:  " << s.StandardDeviation() << endl;
   cout << "Minimum:        " << s.Minimum() << endl;
   cout << "Maximum:        " << s.Maximum() << endl;
@@ -58,6 +59,7 @@ int main(int argc, char *argv[]) {
   s.AddData(b, 4);
   cout << "Average:        " << s.Average() << endl;
   cout << "Variance:       " << s.Variance() << endl;
+  cout << "Rms:            " << s.Rms() << endl;
   cout << "Std Deviation:  " << s.StandardDeviation() << endl;
   cout << "Minimum:        " << s.Minimum() << endl;
   cout << "Maximum:        " << s.Maximum() << endl;
@@ -79,6 +81,7 @@ int main(int argc, char *argv[]) {
   s.RemoveData(a, 3);
   cout << "Average:        " << s.Average() << endl;
   cout << "Variance:       " << s.Variance() << endl;
+  cout << "Rms:            " << s.Rms() << endl;
   cout << "Std Deviation:  " << s.StandardDeviation() << endl;
   cout << "ChebyShev Min:  " << s.ChebyshevMinimum() << endl;
   cout << "ChebyShev Max:  " << s.ChebyshevMaximum() << endl;
@@ -96,6 +99,7 @@ int main(int argc, char *argv[]) {
   s.Reset();
   cout << "Average:        " << s.Average() << endl;
   cout << "Variance:       " << s.Variance() << endl;
+  cout << "Rms:            " << s.Rms() << endl;
   cout << "Std Deviation:  " << s.StandardDeviation() << endl;
   cout << "ChebyShev Min:  " << s.ChebyshevMinimum() << endl;
   cout << "ChebyShev Max:  " << s.ChebyshevMaximum() << endl;

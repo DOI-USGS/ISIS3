@@ -1,6 +1,7 @@
 Average:        5
 Average:        2
 Variance:       1
+Rms:            2.16025
 Std Deviation:  1
 Minimum:        1
 Maximum:        3
@@ -20,6 +21,7 @@ SumSquare:      14
 
 Average:        3.5
 Variance:       3.5
+Rms:            3.89444
 Std Deviation:  1.87083
 Minimum:        1
 Maximum:        6
@@ -39,6 +41,7 @@ SumSquare:      91
 
 Average:        5
 Variance:       1
+Rms:            5.06623
 Std Deviation:  1
 ChebyShev Min:  -9.14214
 ChebyShev Max:  19.1421
@@ -54,6 +57,7 @@ SumSquare:      77
 
 Average:        -1.79769e+308
 Variance:       -1.79769e+308
+Rms:            -1.79769e+308
 Std Deviation:  -1.79769e+308
 ChebyShev Min:  -1.79769e+308
 ChebyShev Max:  -1.79769e+308
