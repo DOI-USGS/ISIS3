@@ -144,6 +144,11 @@ namespace Isis {
    *            from disabled branches
    *   @history 2011-02-09 Sharmila Prasad - Added option continue to proceed with execution
    *            even if an application in the pipeline encounters an exception.
+   *   @history 2011-08-15 Debbie A. Cook - Added member p_pausePosition and 
+   *            method AddPause and modified method Run to allow the pipeline to
+   8            be stopped temporarily and resumed.  When AddPause is used, Run 
+   *            will need to be called an additional time for each AddPause 
+   *            included in the pipeline to resume the execution of the pipeline.
    */
   class Pipeline {
     public:
@@ -169,6 +174,7 @@ namespace Isis {
         return p_keepTemporary;
       }
 
+      void AddPause();
       void AddToPipeline(const iString &appname);
       void AddToPipeline(const iString &appname, const iString &identifier);
       PipelineApplication &Application(const iString &identifier);
@@ -264,6 +270,7 @@ namespace Isis {
       };
 
     private:
+      int p_pausePosition;
       iString p_procAppName; //!< The name of the pipeline
       vector<iString> p_originalInput; //!< The original input file
       vector<iString> p_inputBranches; //!< Branches for input list

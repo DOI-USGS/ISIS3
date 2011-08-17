@@ -20,8 +20,12 @@ namespace Isis {
    * pipeline object.
    *
    * @param procAppName This is an option parameter that gives the pipeline a name
+   * @internal
+   *   @history 2011-08-15 Debbie A. Cook Added initialization for new member
+   *                                       p_pausePosition
    */
   Pipeline::Pipeline(const iString &procAppName) {
+    p_pausePosition = -1;
     p_procAppName = procAppName;
     p_addedCubeatt = false;
     p_outputListNeedsModifiers = false;
@@ -48,6 +52,10 @@ namespace Isis {
    * execution calls, etc... Pipeline error checking happens in here, so if a
    * Pipeline is invalid this method will throw the iException.
    *
+   * @internal
+   *   @history 2011-08-15 Debbie A. Cook Added check for NULL pointers in p_apps 
+   *                                       vector since a [ause is added as a
+   *                                       NULL pointer.
    */
   void Pipeline::Prepare() {
     // Nothing in the pipeline? quit
@@ -76,6 +84,7 @@ namespace Isis {
       //   bands and tell the apps the prepare themselves. Double check the first program
       //   is not branched (expecting multiple inputs).
       for(int i = 0; i < (int)p_apps.size() && successfulPrepare; i++) {
+        if (p_apps[i] == NULL) continue;
         if(mustElimBands && p_apps[i]->SupportsVirtualBands()) {
           if(i != 0 && p_virtualBands.size() != 1) {
             iString message = "If multiple original inputs were set in the pipeline, the first application must support virtual bands.";
@@ -155,7 +164,11 @@ namespace Isis {
         successfulPrepare = false;
       }
 
-      if(p_apps[p_apps.size()-1]->GetOutputs().size() == 0) {
+      int lastApp = p_apps.size()-1;
+      if (p_apps[p_apps.size()-1] == NULL) 
+        lastApp = p_apps.size() - 2;
+
+      if(p_apps[lastApp]->GetOutputs().size() == 0) {
         string msg = "There are no outputted files in the pipeline. At least one program must generate an output file.";
         throw iException::Message(iException::Programmer, msg, _FILEINFO_);
       }
@@ -166,13 +179,30 @@ namespace Isis {
   /**
    * This method executes the pipeline. When you're ready to start your proc
    * program, call this method.
+   *
+   * @internal
+   *   @history 2011-08-15 Debbie A. Cook Added check for NULL pointers in p_apps 
+   *                                       vector since a pause is added as a
+   *                                       NULL pointer.  Also adjusted 
+   *                                       application loops for potential
+   *                                       pauses.
    */
   void Pipeline::Run() {
     // Prepare the pipeline programs
     Prepare();
 
+    // Get the starting point
+    p_pausePosition++;
+
     // Go through these programs, executing them
-    for(int i = 0; i < Size(); i++) {
+    for(int i = p_pausePosition; i < Size(); i++) {
+
+      // Return to caller for a pause
+      if (p_apps[i] == NULL) {
+        p_pausePosition = i;
+        return;
+      }
+
       if(Application(i).Enabled()) {
         // grab the sets of parameters this program needs to be run with
         const vector<iString> &params = Application(i).ParamString();
@@ -216,6 +246,7 @@ namespace Isis {
     // Remove temporary files now
     if(!KeepTemporaryFiles()) {
       for(int i = 0; i < Size(); i++) {
+        if (p_apps[i] == NULL) continue;
         if(Application(i).Enabled()) {
           vector<iString> tmpFiles = Application(i).TemporaryFiles();
           for(int file = 0; file < (int)tmpFiles.size(); file++) {
@@ -224,6 +255,9 @@ namespace Isis {
         }
       }
     }
+
+    // Reset pause position
+    p_pausePosition = -1;
   }
 
 
@@ -436,6 +470,23 @@ namespace Isis {
 
 
   /**
+   * Add a pause to the pipeline. 
+   *
+   *
+   * @internal
+   *   @history 2011-08-15 Debbie A. Cook Original version 
+   */
+  void Pipeline::AddPause() {
+    // Add the pause
+    iString pauseAppId = "";
+    PipelineApplication *pauseApp = NULL;
+
+    p_apps.push_back(pauseApp);
+    p_appIdentifiers.push_back(pauseAppId);
+  }
+
+
+  /**
    * Add a new program to the pipeline. This method must be called before calling
    * Pipeline::Application(...) to access it. The string identifier will access
    * this program.
@@ -443,6 +494,10 @@ namespace Isis {
    * @param appname The name of the new application
    * @param identifier The program's identifier for when calling
    *                   Pipeline::Application
+   *
+   * @internal
+   *   @history 2011-08-15 Debbie A. Cook Added check for NULL pointers in p_apps 
+   *
    */
   void Pipeline::AddToPipeline(const iString &appname, const iString &identifier) {
     // Check uniqueness first
@@ -465,12 +520,22 @@ namespace Isis {
       p_apps[p_apps.size()-1]->SetNext(NULL);
     }
 
+    //Check for non nulls instead of size ie. find last non null or use this
+    int appsSize = 0;
+    iString pauseAppId = "";
+
+    for (int iapp = 0; iapp < (int) p_apps.size(); iapp++)
+      if (p_apps[iapp] != NULL) appsSize++;
+
     // Add the new application
     if(p_apps.size() == 0) {
       p_apps.push_back(new PipelineApplication(appname, this));
     }
     else {
-      p_apps.push_back(new PipelineApplication(appname, p_apps[p_apps.size()-1]));
+      if (p_apps[p_apps.size()-1] != NULL)
+        p_apps.push_back(new PipelineApplication(appname, p_apps[p_apps.size()-1]));
+      else // We know we have app NULL before this new app
+        p_apps.push_back(new PipelineApplication(appname, p_apps[p_apps.size()-2]));
     }
 
     p_appIdentifiers.push_back(identifier);
@@ -491,6 +556,10 @@ namespace Isis {
    * program will be the program's name.
    *
    * @param appname The name of the new application
+   *
+   * @internal
+   *   @history 2011-08-15 Debbie A. Cook Added check for NULL pointers in p_apps 
+   *
    */
   void Pipeline::AddToPipeline(const iString &appname) {
     // Check uniqueness first
@@ -518,7 +587,10 @@ namespace Isis {
       p_apps.push_back(new PipelineApplication(appname, this));
     }
     else {
-      p_apps.push_back(new PipelineApplication(appname, p_apps[p_apps.size()-1]));
+      if (p_apps[p_apps.size()-1] != NULL)
+        p_apps.push_back(new PipelineApplication(appname, p_apps[p_apps.size()-1]));
+      else // We know we have app NULL before this new app
+        p_apps.push_back(new PipelineApplication(appname, p_apps[p_apps.size()-2]));
     }
 
     p_appIdentifiers.push_back(appname);
@@ -589,12 +661,21 @@ namespace Isis {
    * before it will be run.
    *
    * @param appname The program to start with
+   *
+   * @internal
+   *   @history 2011-08-15 Debbie A. Cook Added check for NULL pointers in p_apps 
+   *
    */
   void Pipeline::SetFirstApplication(const iString &appname) {
     int appIndex = 0;
-    for(appIndex = 0; appIndex < (int)p_apps.size() && p_apps[appIndex]->Name() != appname; appIndex++) {
+    for(appIndex = 0; appIndex < (int)p_apps.size() && 
+                      p_apps[appIndex]->Name() != appname; appIndex++) {
+      if (p_apps[appIndex] == NULL) continue;
       p_apps[appIndex]->Disable();
     }
+    // for(appIndex = 0; appIndex < (int)p_apps.size() && p_apps[appIndex]->Name() != appname; appIndex++) {
+    //   p_apps[appIndex]->Disable();
+    // }
 
     if(appIndex >= (int)p_apps.size()) {
       string msg = "Pipeline could not find application [" + appname + "]";
@@ -610,10 +691,15 @@ namespace Isis {
    * after it will be run.
    *
    * @param appname The program to end with
+   *
+   * @internal
+   *   @history 2011-08-15 Debbie A. Cook Added check for NULL pointers in p_apps 
+   *
    */
   void Pipeline::SetLastApplication(const iString &appname) {
     int appIndex = p_apps.size() - 1;
     for(appIndex = p_apps.size() - 1; appIndex >= 0 && p_apps[appIndex]->Name() != appname; appIndex --) {
+      if (p_apps[appIndex] == NULL) continue;
       p_apps[appIndex]->Disable();
     }
 
@@ -632,6 +718,10 @@ namespace Isis {
    * @param addModifiers Whether or not to add the last name modifier
    *
    * @return iString The final output string
+   *
+   * @internal
+   *   @history 2011-08-15 Debbie A. Cook Added check for NULL pointers in p_apps 
+   *
    */
   iString Pipeline::FinalOutput(int branch, bool addModifiers) {
     iString output = ((p_finalOutput.size() != 0) ? p_finalOutput[0] : "");
@@ -654,6 +744,7 @@ namespace Isis {
     }
 
     PipelineApplication *last = p_apps[p_apps.size()-1];
+    if (last == NULL) last = p_apps[p_apps.size()-2];
     if(!last->Enabled()) last = last->Previous();
 
     if(output == "" || p_finalOutput.size() > 1) {
@@ -672,7 +763,7 @@ namespace Isis {
         output += "." + last->OutputExtension();
       }
       else {
-        // If we have multuple final outputs, rely on them to
+        // If we have multiple final outputs, rely on them to
         //   differentiate the branches
         if(p_finalOutput.size() <= 1) {
           output += "." + last->OutputBranches()[branch];
@@ -719,10 +810,13 @@ namespace Isis {
    * This method re-enables all applications. This resets the effects of
    * PipelineApplication::Disable, SetFirstApplication and SetLastApplication.
    *
+   * @internal
+   *   @history 2011-08-15 Debbie A. Cook Added check for NULL pointers in p_apps 
+   *
    */
   void Pipeline::EnableAllApplications() {
     for(int i = 0; i < Size(); i++) {
-      p_apps[i]->Enable();
+      if (p_apps[i] != NULL) p_apps[i]->Enable();
     }
   }
 
@@ -738,6 +832,10 @@ namespace Isis {
    * @param pipeline The pipeline object to output
    *
    * @return ostream& The modified output stream
+   *
+   * @internal
+   *   @history 2011-08-15 Debbie A. Cook Added check for NULL pointers in p_apps 
+   *
    */
   ostream &operator<<(ostream &os, Pipeline &pipeline) {
     pipeline.Prepare();
@@ -747,6 +845,7 @@ namespace Isis {
     }
 
     for(int i = 0; i < pipeline.Size(); i++) {
+      if (&(pipeline.Application(i)) == NULL) continue;
       if(pipeline.Application(i).Enabled()) {
         const vector<iString> &params = pipeline.Application(i).ParamString();
         for(int j = 0; j < (int)params.size(); j++) {
@@ -765,6 +864,7 @@ namespace Isis {
 
     if(!pipeline.KeepTemporaryFiles()) {
       for(int i = 0; i < pipeline.Size(); i++) {
+        if (&(pipeline.Application(i)) == NULL) continue;
         if(pipeline.Application(i).Enabled()) {
           vector<iString> tmpFiles = pipeline.Application(i).TemporaryFiles();
           for(int file = 0; file < (int)tmpFiles.size(); file++) {

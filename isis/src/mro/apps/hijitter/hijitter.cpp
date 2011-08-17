@@ -125,6 +125,8 @@ void IsisMain() {
   p.Application("appjit").AddParameter("JITTER", "JITTER");
   p.Application("appjit").AddParameter("DEGREE", "DEGREE");
 
+  if (ui.WasEntered("JITTERCK"))  p.AddPause();
+
   p.AddToPipeline("noproj");
   p.Application("noproj").SetInputParameter("FROM", true);
   p.Application("noproj").AddConstParameter("MATCH", Filename("$TEMPORARY/matchMaster.cub").Expanded());
@@ -134,14 +136,13 @@ void IsisMain() {
 
   iString masterFile = p.Application("cubeatt").GetOutputs()[masterFileNum - firstFilter];
   p.Application("appjit").AddConstParameter("MASTER", masterFile);
-
   p.Run();
 
+  if (ui.WasEntered("JITTERCK"))  p.Run();
 
   // the outputs are temporary files
-  for(int redNum = 0; redNum < numFiles; redNum++) {
+  for(int redNum = 0; redNum < numFiles; redNum++) 
     tempFiles.push_back(Filename("$TEMPORARY/noproj.FROM" + iString(redNum + 1) + ".cub").Expanded());
-  }
 
   // Do some calculations, delete the final outputs from the pipeline
   ProcessNoprojFiles(p);
@@ -156,10 +157,23 @@ void IsisMain() {
 
   p.Run();
 
+  if (ui.WasEntered("JITTERCK")) {
+    iString params = "FROM=" + masterFile + " TO=" + ui.GetFilename("JITTERCK");
 
-  for(unsigned int tempFile = 0; tempFile < tempFiles.size(); tempFile++) {
-    remove(tempFiles[tempFile].c_str());
+    try {
+      ProgramLauncher::RunIsisProgram("ckwriter", params);
+    }
+    catch(iException &e) {
+      iString message = "Creation of the output ck, " +
+        ui.GetFilename("JITTERCK") + " failed.";
+      throw iException::Message(iException::Programmer, message, _FILEINFO_);
+    }
+
+    p.Run();
   }
+
+  for(unsigned int tempFile = 0; tempFile < tempFiles.size(); tempFile++) 
+    remove(tempFiles[tempFile].c_str());
 
   tempFiles.clear();
   redFiles.clear();
