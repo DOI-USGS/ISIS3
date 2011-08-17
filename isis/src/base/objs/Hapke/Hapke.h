@@ -69,6 +69,18 @@ namespace Isis {
         return p_photoHg2;
       };
 
+      void SetPhotoBh(const double bh);
+      //! Return photometric Bh value
+      inline double PhotoBh() const {
+        return p_photoBh;
+      };
+
+      void SetPhotoCh(const double ch);
+      //! Return photometric Ch value
+      inline double PhotoCh() const {
+        return p_photoCh;
+      };
+
     protected:
       virtual double PhotoModelAlgorithm(double phase, double incidence,
                                          double emission);
@@ -76,11 +88,14 @@ namespace Isis {
     private:
       double p_photoHg1;
       double p_photoHg2;
+      double p_photoBh;
+      double p_photoCh;
       double p_photoCott;
       double p_photoCot2t;
       double p_photoTant;
       double p_photoSr;
       double p_photoOsr;
+      iString p_algName;
   };
 };
 

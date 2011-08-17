@@ -16,12 +16,8 @@ namespace Isis {
 
     PvlGroup &algorithm = pvl.FindObject("PhotometricModel").FindGroup("Algorithm", Pvl::Traverse);
 
-/*    iString algname = (string) algorithm.FindKeyword("Name");
-    algname.UpCase();
-cout << "Algorithm name: " << algname << endl;
-    algname = AlgorithmName();
-cout << "Algorithm name: " << algname << endl;
-*/
+    p_algName = AlgorithmName();
+    p_algName.UpCase();
 
     if(algorithm.HasKeyword("Hg1")) {
       SetPhotoHg1(algorithm["Hg1"]);
@@ -29,6 +25,14 @@ cout << "Algorithm name: " << algname << endl;
 
     if(algorithm.HasKeyword("Hg2")) {
       SetPhotoHg2(algorithm["Hg2"]);
+    }
+
+    if(algorithm.HasKeyword("Bh")) {
+      SetPhotoBh(algorithm["Bh"]);
+    }
+
+    if(algorithm.HasKeyword("Ch")) {
+      SetPhotoCh(algorithm["Ch"]);
     }
   }
 
@@ -67,7 +71,7 @@ cout << "Algorithm name: " << algname << endl;
    */
   double Hapke::PhotoModelAlgorithm(double phase, double incidence,
                                        double emission) {
-    static double pht_hapkehen;
+    static double pht_hapke;
     double pharad;  //phase angle in radians
     double incrad;  // incidence angle in radians
     double emarad; // emission angle in radians
@@ -121,7 +125,7 @@ cout << "Algorithm name: " << algname << endl;
     static double old_emission= -9999;
 
     if (old_phase == phase && old_incidence == incidence && old_emission == emission) {
-      return pht_hapkehen;
+      return pht_hapke;
     }
 
     old_phase = phase;
@@ -147,8 +151,8 @@ cout << "Algorithm name: " << algname << endl;
     }
 
     if(incidence >= 90.0) {
-      pht_hapkehen = 0.0;
-      return pht_hapkehen;
+      pht_hapke = 0.0;
+      return pht_hapke;
     }
 
     gamma = sqrt(1.0 - p_photoWh);
@@ -165,16 +169,21 @@ cout << "Algorithm name: " << algname << endl;
       bg = p_photoB0 / (1.0 + tang2 / p_photoHh);
     }
 
-    pg1 = (1.0 - p_photoHg2) * (1.0 - hgs) / pow((1.0 + hgs + 2.0 *
-          p_photoHg1 * cosg), 1.5);
-    pg2 = p_photoHg2 * (1.0 - hgs) / pow((1.0 + hgs - 2.0 *
-                                          p_photoHg1 * cosg), 1.5);
-    pg = pg1 + pg2;
+    if (p_algName == "HAPKEHEN") {
+      pg1 = (1.0 - p_photoHg2) * (1.0 - hgs) / pow((1.0 + hgs + 2.0 *
+            p_photoHg1 * cosg), 1.5);
+      pg2 = p_photoHg2 * (1.0 - hgs) / pow((1.0 + hgs - 2.0 *
+                                            p_photoHg1 * cosg), 1.5);
+      pg = pg1 + pg2;
+    } else {  // Hapke Legendre
+      pg = 1.0 + p_photoBh * cosg + p_photoCh * (1.5 * pow(cosg, 2.0) - .5);
+    }
 
+    // If smooth Hapke is wanted then set Theta<=0.0
     if(p_photoTheta <= 0.0) {
-      pht_hapkehen = p_photoWh / 4.0 * munot / (munot + mu) * ((1.0 + bg) *
+      pht_hapke = p_photoWh / 4.0 * munot / (munot + mu) * ((1.0 + bg) *
                      pg - 1.0 + Hfunc(munot, gamma) * Hfunc(mu, gamma));
-      return pht_hapkehen;
+      return pht_hapke;
     }
 
     sini = sin(incrad);
@@ -247,9 +256,9 @@ cout << "Algorithm name: " << algname << endl;
     rr1 = p_photoWh / 4.0 * u0p / (u0p + up) * ((1.0 + bg) * pg -
           1.0 + Hfunc(u0p, gamma) * Hfunc(up, gamma));
     rr2 = up * munot / (up0 * u0p0 * p_photoSr * (1.0 - faz + faz * q));
-    pht_hapkehen = rr1 * rr2;
+    pht_hapke = rr1 * rr2;
 
-    return pht_hapkehen;
+    return pht_hapke;
   }
 
   /**
@@ -284,6 +293,40 @@ cout << "Algorithm name: " << algname << endl;
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
     p_photoHg2 = hg2;
+  }
+
+  /**
+    * Set the Hapke Legendre coefficient for the single
+    * particle phase function. This is one of two coefficients
+    * needed for the single particle phase function. This parameter
+    * is limited to values that are >=-1 and <=1.
+    *
+    * @param bh  Hapke Legendre coefficient, default is 0.0
+    */
+  void Hapke::SetPhotoBh(const double bh) {
+    if(bh < -1.0 || bh > 1.0) {
+      string msg = "Invalid value of Hapke Legendre bh [" +
+                   iString(bh) + "]";
+      throw iException::Message(iException::User, msg, _FILEINFO_);
+    }
+    p_photoBh = bh;
+  }
+
+  /**
+    * Set the Hapke Legendre coefficient for the single
+    * particle phase function. This is one of two coefficients
+    * needed for the single particle phase function. This parameter
+    * is limited to values that are >=-1 and <=1.
+    *
+    * @param ch  Hapke Legendre coefficient, default is 0.0
+    */
+  void Hapke::SetPhotoCh(const double ch) {
+    if(ch < -1.0 || ch > 1.0) {
+      string msg = "Invalid value of Hapke Legendre ch [" +
+                   iString(ch) + "]";
+      throw iException::Message(iException::User, msg, _FILEINFO_);
+    }
+    p_photoCh = ch;
   }
 }
 
