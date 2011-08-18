@@ -49,6 +49,7 @@ namespace Isis {
    *            with AtmosModel::G11Prime(), and
    *            NumericalMethods::r8ei() with AtmosModel::Ei().
    *            Added documentation from Isis2.
+   *  @history 2011-08-17 Sharmila Prasad - Moved common HNORM to base AtmosModel
    */
   class Anisotropic2 : public AtmosModel {
     public:
@@ -60,10 +61,6 @@ namespace Isis {
                                        double emission);
 
     private:
-      void SetAtmosHnorm(const double hnorm);
-
-      double p_atmosHnorm;
-
       double p_wha2;
       double p_wham;
       double p_e1, p_e1_2, p_e2, p_e3, p_e4, p_e5;

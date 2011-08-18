@@ -12,34 +12,6 @@ using std::max;
 
 namespace Isis {
   Anisotropic2::Anisotropic2(Pvl &pvl, PhotoModel &pmodel) : AtmosModel(pvl, pmodel) {
-
-    // Set default value
-    SetAtmosHnorm(0.003);
-
-    // Get value from user
-    PvlGroup &algorithm = pvl.FindObject("AtmosphericModel").FindGroup("Algorithm", Pvl::Traverse);
-    if(algorithm.HasKeyword("Hnorm")) {
-      SetAtmosHnorm(algorithm["Hnorm"]);
-    }
-  }
-
-  /**
-   * Set the Atmospheric function parameter. This is the
-   * atmospheric shell thickness normalized to the planet radius
-   * and is used to modify angles to get more accurate path
-   * lengths near the terminator (ratio of scale height to the
-   * planetary radius). This parameter is limited to values that
-   * are >=0.
-   *
-   * @param hnorm  Atmospheric function parameter, default is 0.003
-   */
-  void Anisotropic2::SetAtmosHnorm(const double hnorm) {
-    if(hnorm < 0.0) {
-      std::string msg = "Invalid value of Atmospheric hnorm [" + iString(hnorm) + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
-    }
-
-    p_atmosHnorm = hnorm;
   }
 
   /**
