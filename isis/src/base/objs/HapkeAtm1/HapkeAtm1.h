@@ -46,24 +46,17 @@ namespace Isis {
    *  @history 2008-11-05 Jeannie Walldren - Modified references
    *           to NumericalMethods class. Added documentation from
    *           Isis2.
+   *  @history 2011-08-18 Sharmila Prasad Moved common HNORM to base AtmosModel
    */
   class HapkeAtm1 : public AtmosModel {
     public:
       HapkeAtm1(Pvl &pvl, PhotoModel &pmodel);
       virtual ~HapkeAtm1() {};
-
-      //! Return atmospheric Hnorm value
-      double AtmosHnorm() const {
-        return p_atmosHnorm;
-      };
-
+      
     protected:
       virtual void AtmosModelAlgorithm(double phase, double incidence, double emission);
 
     private:
-      void SetAtmosHnorm(const double hnorm);
-
-      double p_atmosHnorm;
       double p_e2, p_e3, p_e4, p_e5;
 
       double p_x0, p_y0;
