@@ -46,6 +46,7 @@ namespace Isis {
    *  @history 2008-11-05 Jeannie Walldren - Replaced reference to
    *           NumericalMethods::r8expint() with AtmosModel::En().
    *           Added documentation from Isis2.
+   *  @history 2011-08-17 Sharmila Prasad - Moved common HNORM to base AtmosModel
    */
   class Anisotropic1 : public AtmosModel {
     public:
@@ -57,8 +58,6 @@ namespace Isis {
                                        double emission);
 
     private:
-      void SetAtmosHnorm(const double hnorm);
-
       double p_atmosE2;
       double p_atmosE3;
       double p_atmosE4;
@@ -83,7 +82,6 @@ namespace Isis {
       double p_atmosP1;
       double p_atmosQ02p02;
       double p_atmosQ12p12;
-      double p_atmosHnorm;
   };
 };
 
