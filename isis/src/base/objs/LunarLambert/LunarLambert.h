@@ -57,12 +57,14 @@ namespace Isis {
         return p_photoL;
       };
 
+      virtual double PhotoModelAlgorithm(double phase, double incidence,
+                                         double emission);
+      
     private:
       double p_photoL;
 
     protected:
-      virtual double PhotoModelAlgorithm(double phase, double incidence,
-                                         double emission);
+      
 
   };
 };
