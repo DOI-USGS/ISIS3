@@ -45,26 +45,18 @@ namespace Isis {
    *          NumericalMethods::r8expint() with AtmosModel::En(),
    *          NumericalMethods::G11Prime() with
    *          AtmosModel::G11Prime(), and NumericalMethods::r8ei()
-   *            with AtmosModel::Ei().  Added documentation from
-   *            Isis2.
+   *          with AtmosModel::Ei().  Added documentation from Isis2.
+   *  @history 2011-08-18 Sharmila Prasad Moved common HNORM to base AtmosModel
    */
   class Isotropic2 : public AtmosModel {
     public:
       Isotropic2(Pvl &pvl, PhotoModel &pmodel);
       virtual ~Isotropic2() {};
 
-      //! Return atmospheric Hnorm value
-      double AtmosHnorm() const {
-        return p_atmosHnorm;
-      };
-
     protected:
       virtual void AtmosModelAlgorithm(double phase, double incidence, double emission);
 
     private:
-      void SetAtmosHnorm(const double hnorm);
-
-      double p_atmosHnorm;
       double p_delta;
       double p_fixcon;
       double p_gammax, p_gammay;
