@@ -11,7 +11,7 @@ INCS  := $(wildcard *.h)
 
 # QT - get all header files with 'Q_OBJECT' Output: '%.h: QOBJECT'
 ifneq ($(INCS), $(BLANK))
-  QOBJ  := $(shell grep -HI -m1 'Q_OBJECT' $(INCS))
+  QOBJ  := $(shell grep -HI -m1 '^ *Q_OBJECT *$$' $(INCS))
 
   # filter out 'Q_OBJECT' from '%.h: QOBJECT'
   QCOLN := $(filter-out Q_OBJECT, $(QOBJ))
@@ -131,7 +131,7 @@ protos: $(PROTOS:%.proto=%.pb.h) $(PROTOS:%.proto=%.pb.cc)
 qtmoc: $(MOCINC:%.h=moc_%.cpp)
 
 moc_%.cpp: %.h
-	if [ "$(filter-out ' ', $(shell grep -sIE -m1 'Q_OBJECT' $(<F)))" == "Q_OBJECT" ]; \
+	if [ "$(filter-out ' ', $(shell grep -sIE -m1 '^ *Q_OBJECT *$$' $(<F)))" == "Q_OBJECT" ]; \
 	then \
 	  $(MOC) $(MOCDEFINES) -o $@ $(<F); \
 	fi
