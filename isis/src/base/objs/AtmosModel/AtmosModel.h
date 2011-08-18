@@ -61,6 +61,7 @@ namespace Isis {
    *           Removed "Isis::" and "std::" in AtmosModel.cpp
    *           since that file uses std and Isis namespaces.
    *  @history 2008-11-07 Jeannie Walldren - Fixed documentation
+   *  @history 2011-08-17 Sharmila Prasad -Added API's for HNORM, Additive Offset
    */
   class AtmosModel {
     public:
@@ -94,12 +95,24 @@ namespace Isis {
       void SetAtmosTauref(const double tauref);
       void SetAtmosWha(const double wha);
       void SetAtmosWharef(const double wharef);
-
+      void SetAtmosHnorm(const double hnorm);
+      void SetAtmosIord(const string offset);
+      
       //! Return atmospheric algorithm name
       string AlgorithmName() const {
         return p_atmosAlgorithmName;
       };
 
+      //! Allow additive offset in fit? 
+      bool AtmosAdditiveOffset() const {
+        return p_atmosAddOffset;
+      };
+
+      //! Return atmospheric Hnorm value
+      double AtmosHnorm() const {
+        return p_atmosHnorm;
+      };
+      
       //! Return atmospheric Bha value
       double AtmosBha() const {
         return p_atmosBha;
@@ -148,7 +161,7 @@ namespace Isis {
       int AtmosNinc() const {
         return p_atmosNinc;
       };
-
+      
       //! Return atmospheric IncTable value
       vector <double> AtmosIncTable() {
         return p_atmosIncTable;
@@ -224,7 +237,7 @@ namespace Isis {
       void SetOldWha(double wha) {
         p_atmosWhaold = wha;
       }
-
+      
       PhotoModel *GetPhotoModel() const {
         return p_atmosPM;
       }
@@ -249,14 +262,16 @@ namespace Isis {
       double p_atmosWharef;
       double p_atmosWhasave;
 
-      double p_pstd;   //!Pure atmospheric-scattering term.
-      double p_trans;  //!Transmission of surface reflected light through the atmosphere overall.
-      double p_trans0; //!Transmission of surface reflected light through the atmosphere with no scatterings in the atmosphere.
-      double p_sbar;   //!Illumination of the ground by the sky.
+      double p_pstd;      //!< Pure atmospheric-scattering term.
+      double p_trans;     //!< Transmission of surface reflected light through the atmosphere overall.
+      double p_trans0;    //!< Transmission of surface reflected light through the atmosphere with no scatterings in the atmosphere.
+      double p_sbar;      //!< Illumination of the ground by the sky.
       double p_atmosHga;
       double p_atmosTau;
       double p_atmosWha;
       double p_atmosAb;
+      double p_atmosHnorm;     //!< Atmospheric shell thickness normalized to planet radius.
+      bool   p_atmosAddOffset; //!< Allow additive offset in fit
       vector <double> p_atmosIncTable;
       vector <double> p_atmosAhTable;
       double p_atmosHahgsb;

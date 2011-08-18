@@ -57,6 +57,7 @@ namespace Isis {
     p_atmosWha = 0.95;
     p_atmosWhaold = 1.0e30;
     p_atmosBha = 0.85;
+    p_atmosHnorm = 0.003;
     p_pstd = 0.0;
     p_sbar = 0.0;
     p_trans = 0.0;
@@ -124,10 +125,17 @@ namespace Isis {
     if(algorithm.HasKeyword("Phi")) {
       SetAtmosPhi(algorithm["Phi"]);
     }
+
+    if(algorithm.HasKeyword("Hnorm")) {
+      SetAtmosHnorm(algorithm["Hnorm"]);
+    }
+    
+    if(algorithm.HasKeyword("IORD")) {
+      SetAtmosIord(algorithm["IORD"][0]);
+    }
   }
 
-
-  /**
+ /**
    * Perform Chandra and Van de Hulst's series approximation
    * for the g'11 function needed in second order scattering
    * theory.
@@ -139,7 +147,7 @@ namespace Isis {
    *   @history 1998-12-21 Randy Kirk, USGS - Flagstaff - Original
    *            code in Isis2 pht_am_functions
    *   @history 1999-03-12 K Teal Thompson - Port to Unix/ISIS;
-   *            declare vars; c	add implicit none.
+   *            declare vars; cadd implicit none.
    *   @history 2007-02-20 Janet Barrett - Imported from Isis2 to
    *            Isis3 in NumericalMethods class.
    *   @history 2008-11-05 Jeannie Walldren - Moved this method from
@@ -951,5 +959,37 @@ namespace Isis {
    */
   bool AtmosModel::TauOrWhaChanged() const {
     return (AtmosTau() != p_atmosTauold) || (AtmosWha() != p_atmosWhaold);
+  }
+  
+  /**
+   * Set the Atmospheric function parameter. This is the
+   * atmospheric shell thickness normalized to the planet radius
+   * and is used to modify angles to get more accurate path
+   * lengths near the terminator (ratio of scale height to the
+   * planetary radius). This parameter is limited to values that
+   * are >=0.
+   *
+   * @param hnorm  Atmospheric function parameter, default is 0.003
+   */
+  void AtmosModel::SetAtmosHnorm(const double hnorm) {
+    if(hnorm < 0.0) {
+      std::string msg = "Invalid value of Atmospheric hnorm [" + iString(hnorm) + "]";
+      throw iException::Message(iException::User, msg, _FILEINFO_);
+    }
+    p_atmosHnorm = hnorm;
+  }
+  
+  /**
+   * Set additive offset in fit
+   * 
+   * @author Sharmila Prasad (8/18/2011)
+   * 
+   * @param offset true/false
+   */
+  void AtmosModel::SetAtmosIord(const string offset){
+    p_atmosAddOffset = false;
+    if(offset == "true") {
+      p_atmosAddOffset = true;
+    }
   }
 }
