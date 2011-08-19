@@ -8,6 +8,36 @@
 
 namespace Isis {
     /** 
+     * @brief Camera model for both Danw VIR VIS and IR instruments 
+     *  
+     * This class provides the camera model for the Dawn VIR VIS and 
+     * IR instrumetns.  These instruments are on the Dawn spacecraft
+     * which will orbit the astroids Vesta (2011) and Ceres (2013). 
+     *  
+     * The ISIS cubes must contain a table called VIRHouseKeeping 
+     * that contains critical information.  Stored here is a row for 
+     * each line in the cube which contains the time (scan lines are 
+     * not strictly contiguous), electrical scan angles and shutter 
+     * state (closed == dark current).  The VIR instrument team will 
+     * provide a dynamic articulation kernel that has the physical 
+     * scan angle of the mirror but the contents of the tabel can be 
+     * used to compute it should it not exist (determined by the 
+     * file name pattern of the CK kernels). 
+     *  
+     * Without the articulation kernel, this camera model will 
+     * create a CK SpiceRotation table from the contents of the 
+     * houskeeping table.  This table is create only when spiceinit 
+     * is run for the first time on the image. 
+     *  
+     * Note that it works for calibrated (1B) and uncalibrated (1A). 
+     * One major issue is the dark current is typically collected at 
+     * the start and end of an observation.  The dark current 
+     * appears to always slew to a specific position, crossing the 
+     * observation scans.  This is the apparent cause of loss of 
+     * mapping lat/lons to line/samp.  To fix this, a Cubic spline 
+     * is fit to all scan angles and  all closed shutter scan line 
+     * mirror angles are replaced by the (typcially extrapolated) 
+     * values of the spline. 
      *  
      * @ingroup SpiceInstrumentsAndCameras 
      * @ingroup Dawn 

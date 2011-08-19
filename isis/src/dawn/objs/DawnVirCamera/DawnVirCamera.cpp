@@ -14,9 +14,9 @@
 #include "iTime.h"
 #include "LineScanCameraDetectorMap.h"
 #include "CameraFocalPlaneMap.h"
-#include "DawnVirCameraDistortionMap.h"
 #include "LineScanCameraGroundMap.h"
 #include "LineScanCameraSkyMap.h"
+#include "NumericalApproximation.h"
 #include "Kernels.h"
 
 #include "tnt/tnt_array2d_utils.h"
@@ -25,7 +25,6 @@ using namespace std;
 namespace Isis {
     // constructors
     DawnVirCamera::DawnVirCamera(Pvl &lab) : LineScanCamera(lab) {
-
 
       PvlGroup &archive = lab.FindGroup("Archive", Isis::Pvl::Traverse);
       int procLevel = archive["ProcessingLevelId"];
@@ -85,7 +84,8 @@ namespace Isis {
       FocalPlaneMap()->SetDetectorOrigin(sampleBoreSight, lineBoreSight);
 
       // Setup distortion map
-      new DawnVirCameraDistortionMap(this);
+//      new DawnVirCameraDistortionMap(this);
+      new CameraDistortionMap(this);
 
       // Setup the ground and sky map
       new LineScanCameraGroundMap(this);
@@ -110,6 +110,21 @@ namespace Isis {
       else {
         LoadCache();
       }
+
+#if defined(DUMP_CACHE)
+      Table cache = InstrumentRotation()->Cache("Loaded");
+      cout << "Total Records: " << cache.Records() << "\n";
+
+      for (int i = 0 ; i < cache.Records() ; i++) {
+        TableRecord rec = cache[i];
+        string separator("");
+        for (int f = 0 ; f < rec.Fields() ; f++) {
+          cout << separator << (double) rec[f];
+          separator = ", ";
+        }
+        cout << "\n";
+      }
+#endif
     }
 
     /** Returns CK frame identifier  */
@@ -186,12 +201,13 @@ namespace Isis {
 
     m_lineRates.clear();
     int lineno(1);
+    NumericalApproximation angFit;
     for (int i = 0; i < hktable.Records(); i++) {
       TableRecord &trec = hktable[i];
       string scet = scrub(trec["ScetTimeClock"]);
       string shutterMode = scrub(trec["ShutterStatus"]);
 
-
+      // Compute the optical mirror ange=eeeeee
       double mirrorSin = trec["MirrorSin"];
       double mirrorCos = trec["MirrorCos"];
       double scanElecDeg = atan(mirrorSin/mirrorCos) * dpr_c();
@@ -204,6 +220,10 @@ namespace Isis {
       lineStart = getClockTime(scet, NaifSpkCode()).Et();
       bool isDark = iString::Equal("closed", shutterMode);
 
+      // Add fit data for all open angles
+      if (!isDark) {  angFit.AddData(lineno, optAng);   }
+
+      // Store line, 
       smInfo.m_lineNum = lineno;
       smInfo.m_scanLineEt = lineStart;
       smInfo.m_mirrorSin = mirrorSin;
@@ -215,6 +235,16 @@ namespace Isis {
         m_lineRates.push_back(LineRateChange(lineno, lineStart, lineRate));
         m_mirrorData.push_back(smInfo);
         lineno++;
+      }
+    }
+
+    //  Run through replacing all closed optical angles with fitted data.
+    //  These are mostly first/last lines so must set proper extrapolation
+    //  option.
+    for (unsigned int a = 0 ; a < m_mirrorData.size() ; a++) {
+      if (m_mirrorData[a].m_isDarkCurrent) {
+        m_mirrorData[a].m_opticalAngle = angFit.Evaluate(a+1,
+                                      NumericalApproximation::NearestEndpoint);
       }
     }
 
@@ -295,9 +325,11 @@ namespace Isis {
     SpiceDouble m[3][3];
     SpiceDouble q_av[7], *av(&q_av[4]);
 
+    double halfExpTime = exposureTime() / 2.0;
     for (int i = 0 ; i < nlines ; i++) {
-      double etTime = m_mirrorData[i].m_scanLineEt;
-      double optAng = m_mirrorData[i].m_opticalAngle;
+      int index = min(i, nlines-1);
+      double etTime = m_mirrorData[index].m_scanLineEt;  //  - halfExpTime;;
+      double optAng = m_mirrorData[index].m_opticalAngle;
       try {
         // J2000 -> DAWN_VIR_{channel}_ZERO
         SMatrix state = getStateRotation("J2000", virZero, etTime);
@@ -329,8 +361,8 @@ namespace Isis {
     }
 
     // Add some necessary keywords
-    quats.Label() += PvlKeyword("CkTableStartTime", startTime()-(exposureTime()/2.0));
-    quats.Label() += PvlKeyword("CkTableEndTime", endTime()+(exposureTime()/2.0));
+    quats.Label() += PvlKeyword("CkTableStartTime", startTime()-halfExpTime);
+    quats.Label() += PvlKeyword("CkTableEndTime", endTime()+halfExpTime);
     quats.Label() += PvlKeyword("CkTableOriginalSize", quats.Records());
 
     // Create the time dependant frames keyword
