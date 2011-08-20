@@ -10,6 +10,7 @@ using namespace std;
 using namespace Isis;
 
 int main(int argc, char *argv[]) {
+  void ReportError(iString err);
   Preference::Preferences(true);
 
   try {
@@ -212,7 +213,7 @@ int main(int argc, char *argv[]) {
     }
 
     cout << "Testing filename operator= with a c++ string" << endl;
-    Filename l("/tmp/uid/name.ext+16bit");
+    Filename l("$temporary/uid/name.ext+16bit");
     string x = "/home/me/new.extension+0:255";
     l = x;
     cout << "Original filename: " << "/home/me/new.extension+0:255" << endl;
@@ -225,7 +226,7 @@ int main(int argc, char *argv[]) {
     cout << endl;
 
     cout << "Testing filename operator= with a c string" << endl;
-    Filename m("/tmp/uid/name.ext+16bit");
+    Filename m("$temporary/uid/name.ext+16bit");
     m = "/home/me/new.extension+0:255";
     cout << "Original filename: " << "/home/me/new.extension+0:255" << endl;
     cout << "New filename:      " << m.Expanded() << endl;
@@ -460,8 +461,8 @@ int main(int argc, char *argv[]) {
   }
 
   // Test the makeDirectory method
-  Filename d("/tmp/IsisFilenameTest");
-  cout << "Testing MakeDirctory for " << d.Expanded() << endl;
+  Filename d("$temporary/IsisFilenameTest");
+  cout << "Testing MakeDirectory for " << d.OriginalPath() << d.Name() << endl;
   try {
     d.MakeDirectory();
     cout << "  The directory create succeed" << endl;
@@ -472,12 +473,13 @@ int main(int argc, char *argv[]) {
   cout << endl;
 
   // Test the makeDirectory method when the dir already exists
-  cout << "Testing MakeDirectory for " << d.Expanded() << endl;
+  cout << "Testing MakeDirectory for " << d.OriginalPath() << d.Name() << endl;
   try {
     d.MakeDirectory();
   }
   catch(iException &error) {
-    error.Report(false);
+    ReportError(iString(error.Errors()) ); //shorten path
+    error.Clear();
   }
   cout << endl;
 
@@ -486,3 +488,57 @@ int main(int argc, char *argv[]) {
 
   return 0;
 }
+
+/**
+ * Reports error messages from Isis:iException without full paths of filenames
+ * @param err Error string of iException
+ * @author Jeannie Walldren
+ * @internal
+ *   @history 2011-08-19 Jeannie Backer - Copied from Cube class.
+ */
+void ReportError(iString err) {
+  iString report = ""; // report will be modified error message
+  iString errorLine = ""; // read message one line at a time
+  Filename expandedfile;
+  while(err != "") {
+    // pull off first line
+    errorLine = err.Token("\n");
+    while(errorLine != "") {
+      size_t openBrace = errorLine.find('[');
+      if(openBrace != string::npos) {
+        // if open brace is found, look to see if a filename is inside (indicated by '/')
+        if(errorLine.at(openBrace + 1) == '/') {
+          // add message up to
+          report += errorLine.Token("[");
+          // and including [
+          report += "[";
+          // read entire path into Filename object
+          expandedfile = errorLine.Token("]");
+          // only keep the name of the immediate directory
+          iString path = expandedfile.OriginalPath();
+          while (path.find("/") != string::npos) {
+            path.Token("/");
+          }
+          // only report immediate directory and file name, (rather than fully
+          // expanded path since this may differ on each system
+          report += "../" + path + "/" + expandedfile.Name();
+          report += "]";
+        }
+        else {
+          // not a filename inside braces, add message up to and including ]
+          report += errorLine.Token("]");
+          report += "]";
+          continue;
+        }
+      }
+      else {
+        // no more braces are found, add rest of error message
+        report += errorLine;
+        break;
+      }
+    }
+    report += "\n";
+  }
+  cout << report << endl;
+}
+

@@ -51,41 +51,45 @@ namespace Isis {
    * @internal
    *   @todo This class needs an example.
    *   @history 2002-11-27 Stuart Sides - added capability to expand environment
-   *                       variables within a filename.
+   *                           variables within a filename.
    *   @history 2003-01-27 Jeff Anderson - added a method to allow full file
-   *                       specification to be extracted (includes the attributes.
+   *                           specification to be extracted (includes the
+   *                        attributes.
    *   @history 2002-02-12 Stuart Sides - fixed bug with incorrect parsing when
-   *                       filename did not have a path.
+   *                           filename did not have a path.
    *   @history 2003-05-16 Stuart Sides - modified schema from
-   *                       astrogeology...isis.astrogeology.
+   *                           astrogeology...isis.astrogeology.
    *   @history 2003-07-21 Stuart Sides - modified to use "+" as the attribute
-   *                       delimiter instead of a ":".
+   *                           delimiter instead of a ":".
    *   @history 2003-10-17 Added default constructor, operator "=" and temporary
-   *                       members.
+   *                           members.
    *   @history 2003-10-30 Added new members: HighestVersion and Exists.
    *   @history 2003-12-03 Added capability to expand Preferences in the
-   *                       DataDirectory group only.
+   *                           DataDirectory group only.
    *   @history 2004-01-14 Added new member OriginalPath.
    *   @history 2004-01-22 Added new member Name. Name returns the filename only
-   *                       without any path, extension or attributes.
+   *                           without any path, extension or attributes.
    *   @history 2004-01-27 Tool all references to attributes out. IsisFilename
-   *                       now ignores all cube attributes.
+   *                           now ignores all cube attributes.
    *   @history 2004-01-27 Removed the member FullSpecification, because
-   *                       FullSpecification without the cube attributes now does
-   *                       the same thing as Filename.
+   *                           FullSpecification without the cube attributes now
+   *                           does the same thing as Filename.
    *   @history 2004-01-27 Added a new constructor with two parameters. This new
-   *                       constructor will create a temporary filename using the
-   *                       path from the Preference DataDirectory/Temporary the
-   *                       filename from argument one appended with a number from
-   *                       100000 to 199999 and the extension of argument two.
+   *                           constructor will create a temporary filename using
+   *                           the path from the Preference
+   *                           DataDirectory/Temporary the filename from argument
+   *                           one appended with a number from 100000 to 199999
+   *                           and the extension of argument two.
    *   @history 2004-05-17 Added new member MakeDirectory.
    *   @history 2005-07-28 Drew Davidson - added new member NewVersion.
    *   @history 2007-10-03 Steven Koechle - Fixed Temporary() so if a path was
-   *                       specified it will have the cwd put on in front of it.
+   *                           specified it will have the cwd put on in front of
+   *                           it.
    *   @history 2009-01-07 Steven Lambright - Expanded(...) no longer behaves
-   *                       differently for unit tests
-   *
-   *
+   *                           differently for unit tests
+   *   @history 2011-08-19 Jeannie Backer - Modified unitTest to use
+   *                           $temporary variable instead of /tmp directory.
+   *                           Added some documentation to methods.
    */
   class Filename : public QFileInfo {
     public:
@@ -121,7 +125,8 @@ namespace Isis {
       std::string Extension() const;  // equiv to qt extension
 
       // Return the expanded filename (path, name & extension)
-      std::string Expanded() const;  // mostly qt absFilePath without $ expansion
+      std::string Expanded() const;  // mostly qt absFilePath without $ 
+                                     // expansion
 
       // Return the original path without "$" expansion if any
       std::string OriginalPath() const;

@@ -183,9 +183,10 @@ Testing Exists() for a file that should exist:
 Testing Exists() for a file that does NOT exist:
   The test file for "!Exists()" was not located (this is correct)
 
-Testing MakeDirctory for /tmp/IsisFilenameTest
+Testing MakeDirectory for $temporaryIsisFilenameTest
   The directory create succeed
 
-Testing MakeDirectory for /tmp/IsisFilenameTest
-**PROGRAMMER ERROR** Unable to create directory [/tmp/IsisFilenameTest]
+Testing MakeDirectory for $temporaryIsisFilenameTest
+**PROGRAMMER ERROR** Unable to create directory [../Filename/IsisFilenameTest]
+
 

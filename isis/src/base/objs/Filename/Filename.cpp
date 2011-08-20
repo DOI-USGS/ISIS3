@@ -24,10 +24,11 @@
 #include <fstream>
 #include <iostream>
 
-#include "Preference.h"
+#include "Filename.h"
 #include "iString.h"
 #include "iException.h"
-#include "Filename.h"
+#include "Preference.h"
+#include "PvlGroup.h"
 
 using namespace std;
 namespace Isis {
@@ -88,8 +89,8 @@ namespace Isis {
     QFileInfo::setFile((iString)Expand(file));
   }
 
-  /**
-   * Returns the path
+  /** 
+   * @brief Returns the path. 
    * Returns the path portion of a filename. For *nix operating
    * systems this includes everything upto but not including the
    * last slash "/". For file names created without any slashes
@@ -99,19 +100,25 @@ namespace Isis {
    *   "/home/me/img/picture.jpg"
    *   Path() gives:
    *   "/home/me/img"
-   * </pre>
+   * </pre> 
+   *  
+   * @return @b string - The directory path where the file is 
+   *         located.
    */
   std::string Filename::Path() const {
     return QFileInfo::absolutePath().toStdString();
   }
 
-  /**
-   * Returns the basename
+  /** 
+   * @brief Returns the basename. 
+   *  
    * Returns the file name only. This excludes any path and the last extension.
    * For *nix operating systems this includes everything following the last slash
    * "/" and upto the last dot ".". If a file name contains multiple extensions,
    * all but the last one will be returned. If a file name has no extension,
-   * Basename returns the same as Name
+   * Basename returns the same as Name 
+   *  
+   * @return @b string - The name of the file without path or extension.
    */
   std::string Filename::Basename() const {
     if(QFileInfo::suffix().length() == 0) {
@@ -123,30 +130,42 @@ namespace Isis {
   }
 
   /**
-   * Returns the filename.
+   * @brief Returns the filename. 
+   *  
    * Returns the file name and all extensions of the filename. For
    * *nix operating systems this includes everything following the
-   * last slash "/".
+   * last slash "/". 
+   *  
+   * @return @b string - The name of the file with extensions and 
+   *         without path.
    */
   std::string Filename::Name() const {
     return QFileInfo::fileName().toStdString();
   }
 
   /**
-   * Returns the extension (Does not include .)
+   * @brief Returns the extension (Does not include .) 
+   *  
    * Returns the extension of the filename. If multiple extensions
-   * exist, then only the last one will be returned.
+   * exist, then only the last one will be returned. 
+   *  
+   * @return @b string - The last extension of the file. 
    */
   std::string Filename::Extension() const {
     return QFileInfo::suffix().toStdString();
   }
 
   /**
-   * Returns the full filename (path, basename and extension(s))
-   * Returns a fully expanded version of the file name. This will
-   * include the expansion of any Isis Preference variables,
-   * environment variables and operating system shortcuts such as
-   * ".", "..", or "~"
+   * @brief Returns the full filename (path, basename and 
+   * extension(s)). 
+   *  
+   * Returns a fully expanded version of the file name. This will 
+   * include the expansion of any Isis Preference variables, 
+   * environment variables and operating system shortcuts such as 
+   * ".", "..", or "~" 
+   *  
+   * @return @b string - The full path and file name with 
+   *         extensions.
    */
   std::string Filename::Expanded() const {
     return QFileInfo::absoluteFilePath().toStdString();
@@ -155,14 +174,16 @@ namespace Isis {
   /**
    * Returns whether the file exists or not.
    *
-   * @return True if the file exists, false if it doesn't.
+   * @return @b bool - True if the file exists, false if it doesn't.
    */
   bool Filename::Exists() {
     return QFileInfo::exists();
   }
 
   /**
-   * Returns the path used to initialize the Filename object, if any.
+   * Returns the path used to initialize the Filename object, if any. 
+   *  
+   * @return @b string - The original file path name. 
    */
   std::string Filename::OriginalPath() const {
     QFileInfo fi(p_original.c_str());
@@ -213,13 +234,13 @@ namespace Isis {
     CheckVersion();
 
     int highestVersion = -1;
-    Isis::iString highestVersionStr;
+    iString highestVersionStr;
 
     // Get the path of the current file and make sure it exists
     QDir dir((QString)(iString)Path());
     if(!dir.exists()) {
       string msg = "The path [" + Path() + "] does not exist";
-      throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+      throw iException::Message(iException::Io, msg, _FILEINFO_);
     }
 
     // Find the beginning and end of the "?"s in the versioned filename
@@ -241,7 +262,7 @@ namespace Isis {
 
       if(leftSide && rightSide) {
 
-        Isis::iString version = file.substr(start, file.length() - charsAfterVersion - start);
+        iString version = file.substr(start, file.length() - charsAfterVersion - start);
 
         if((version.length() > 0) &&
             (version.find_first_not_of("0123456789") == string::npos) &&
@@ -255,7 +276,7 @@ namespace Isis {
     // Make sure we got a version number
     if(highestVersion == -1) {
       string msg = "No versions available for file [" + Expanded() + "]";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
     string temp = Path() + "/" + Name().substr(0, start) +
@@ -286,7 +307,7 @@ namespace Isis {
     QDir dir((QString)(iString)Path());
     if(!dir.exists()) {
       string msg = "The path [" + Path() + "] does not exist";
-      throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+      throw iException::Message(iException::Io, msg, _FILEINFO_);
     }
 
     // Find the beginning and end of the "?"s in the versioned filename
@@ -308,7 +329,7 @@ namespace Isis {
 
       if(leftSide && rightSide) {
 
-        Isis::iString version = file.substr(start, file.length() - charsAfterVersion - start);
+        iString version = file.substr(start, file.length() - charsAfterVersion - start);
 
         if((version.length() > 0) &&
             (version.find_first_not_of("0123456789") == string::npos) &&
@@ -318,7 +339,7 @@ namespace Isis {
       }
     }
     //create a string with the new version number
-    Isis::iString newVersion = ++highestVersion;
+    iString newVersion = ++highestVersion;
 
 
 
@@ -344,7 +365,7 @@ namespace Isis {
     QDir dir;
     if(!dir.mkdir(iString(Expanded()))) {
       string msg = "Unable to create directory [" + Expanded() + "]";
-      throw Isis::iException::Message(Isis::iException::Programmer,
+      throw iException::Message(iException::Programmer,
                                       msg, _FILEINFO_);
     }
 
@@ -368,8 +389,8 @@ namespace Isis {
     string tempDir;
     tempDir.clear();
     // If the IsisPreference exists use it otherwise just use name as is
-    if(!(name.at(0) == '/') && Isis::Preference::Preferences().HasGroup("DataDirectory")) {
-      Isis::PvlGroup &dataDir = Isis::Preference::Preferences().FindGroup("DataDirectory");
+    if(!(name.at(0) == '/') && Preference::Preferences().HasGroup("DataDirectory")) {
+      PvlGroup &dataDir = Preference::Preferences().FindGroup("DataDirectory");
       if(dataDir.HasKeyword("Temporary")) {
         tempDir = (string) dataDir["Temporary"];
       }
@@ -381,7 +402,7 @@ namespace Isis {
     string tfile;
 
     do {
-      Isis::iString num(add);
+      iString num(add);
       tfile = tempDir + "/" + name + num + "." + extension;
       QFileInfo f(tfile.c_str());
       if(f.exists()) {
@@ -396,7 +417,7 @@ namespace Isis {
     while(add < 1000000);
 
     string msg = "No temporary files available for [" + name + extension + "]";
-    throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+    throw iException::Message(iException::Io, msg, _FILEINFO_);
 
   }
 
@@ -406,18 +427,18 @@ namespace Isis {
    *
    * @param file The file to be expanded.
    *
-   * @return string
+   * @return @b string Expanded file name
    */
   string Filename::Expand(const std::string &file) {
 
     // Setup an index for searching strings
-    std::string::size_type pos, pos2;
+    string::size_type pos, pos2;
 
     // Work with a tempory copy
     string temp = file;
 
     // Strip off any cube attributes
-    if((pos = temp.find("+")) != std::string::npos) temp.erase(pos);
+    if((pos = temp.find("+")) != string::npos) temp.erase(pos);
 
 
     // Expand any $xxxxx into ISIS preferences and environment variables
@@ -428,15 +449,15 @@ namespace Isis {
 
     // Loop while there are any "$" at the current position or after
     // Some "$" might be skipped if no translation can be found
-    while((pos = temp.find("$", pos)) != std::string::npos) {
+    while((pos = temp.find("$", pos)) != string::npos) {
       pos2 = temp.find("/", pos);
       var = temp.substr(pos + 1, pos2 - pos - 1);
       string value;
       value.clear();
 
       // Find the corresponding Isis Preference if one exists
-      if(Isis::Preference::Preferences().HasGroup("DataDirectory")) {
-        Isis::PvlGroup &dataDir = Isis::Preference::Preferences().FindGroup("DataDirectory");
+      if(Preference::Preferences().HasGroup("DataDirectory")) {
+        PvlGroup &dataDir = Preference::Preferences().FindGroup("DataDirectory");
         if(dataDir.HasKeyword(var)) {
           value = (string) dataDir[var];
         }
@@ -475,14 +496,14 @@ namespace Isis {
     // Find the series of "?"
     string name = Expanded();
 
-    std::string::size_type start = name.find_first_of("?");
-    std::string::size_type end = name.find_last_of("?");
+    string::size_type start = name.find_first_of("?");
+    string::size_type end = name.find_last_of("?");
 
     // Make sure there was at least one "?" for a version number
     if(start == string::npos || end == string::npos) {
       string msg = "Filename [" + Expanded() +
                    "] does not contain a version sequence";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
     // Make sure all chars between start and end are "?"
@@ -490,7 +511,7 @@ namespace Isis {
       if(name[pos] != '?') {
         string msg = "Only one version sequence is allowed per filename [" +
                      Expanded() + "]";
-        throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
       }
     }
   }
