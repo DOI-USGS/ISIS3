@@ -43,30 +43,42 @@ namespace Isis {
    * @author 2006-03-24 Jacob Danton
    *
    * @internal
-   *  @history 2005-02-08 Jacob Danton - Original Version
-   *  @history 2006-08-08 Debbie A. Cook - Added overloaded method
-   *           SetInputCube
-   *  @history 2007-12-14 Steven Lambright - Same band is now forced
-   *           on input cubes when there are multiple input cubes
-   *  @history 2008-01-09 Steven Lambright - Fixed a memory leak
-   *  @history 2008-06-18 Steven Koechle - Fixed Documentation
-   *  @history 2011-04-22 Sharmila Prasad - Extended StartProcess functionality
-   *     to be able to be called from any Object class by using Functors
-   *  @history 2011-05-07 Sharmila Prasad - 1. Added API SetInputCube(Cube*) to take opened cube
-   *           2. Edited StartProcess using Functors take reference to Functors
+   *   @history 2005-02-08 Jacob Danton - Original Version
+   *   @history 2006-08-08 Debbie A. Cook - Added overloaded method SetInputCube
+   *   @history 2007-12-14 Steven Lambright - Same band is now forced on input
+   *                           cubes when there are multiple input cubes
+   *   @history 2008-01-09 Steven Lambright - Fixed a memory leak
+   *   @history 2008-06-18 Steven Koechle - Fixed Documentation
+   *   @history 2011-04-22 Sharmila Prasad - Extended StartProcess functionality
+   *                           to be able to be called from any Object class by
+   *                           using Functors
+   *   @history 2011-05-07 Sharmila Prasad - 1. Added API SetInputCube(Cube*) to
+   *                           take opened cube 2. Edited StartProcess using
+   *                           Functors take reference to Functors
+   *   @history 2011-08-19 Jeannie Backer - Modified unitTest to use
+   *                           $temporary variable instead of /tmp directory.
+   *                           Added some documentation to methods.
    */
   class ProcessByBrick : public Isis::Process {
     
     private:
-      bool p_wrapOption;    //!<Indicates whether the brick manager will wrap
-      bool p_inputBrickSizeSet;  //!<Indicates whether the brick size has been set
-      bool p_outputBrickSizeSet;  //!<Indicates whether the brick size has been set
-      std::vector<int> p_inputBrickSamples;   //!<Number of samples in the input bricks
-      std::vector<int> p_inputBrickLines;     //!<Number of lines in the input bricks
-      std::vector<int> p_inputBrickBands;     //!<Number of bands in the input bricks
-      std::vector<int> p_outputBrickSamples;   //!<Number of samples in the output bricks
-      std::vector<int> p_outputBrickLines;     //!<Number of lines in the output bricks
-      std::vector<int> p_outputBrickBands;     //!<Number of bands in the output bricks
+      bool p_wrapOption;    //!< Indicates whether the brick manager will wrap
+      bool p_inputBrickSizeSet;  /**< Indicates whether the brick size has been 
+                                      set*/
+      bool p_outputBrickSizeSet; /**< Indicates whether the brick size has been 
+                                      set*/
+      std::vector<int> p_inputBrickSamples;  /**< Number of samples in the input
+                                                  bricks*/
+      std::vector<int> p_inputBrickLines;    /**< Number of lines in the input 
+                                                  bricks*/
+      std::vector<int> p_inputBrickBands;    /**< Number of bands in the input 
+                                                  bricks*/
+      std::vector<int> p_outputBrickSamples; /**< Number of samples in the 
+                                                  output bricks*/
+      std::vector<int> p_outputBrickLines;   /**< Number of lines in the output 
+                                                  bricks*/
+      std::vector<int> p_outputBrickBands;   /**< Number of bands in the output 
+                                                  bricks*/
 
     public:
       //! Constructs a ProcessByBrick object
@@ -85,10 +97,12 @@ namespace Isis {
       void SetBrickSize(const int ns, const int nl, const int nb);
 
       void SetInputBrickSize(const int ns, const int nl, const int nb);
-      void SetInputBrickSize(const int ns, const int nl, const int nb, const int tile);
+      void SetInputBrickSize(const int ns, const int nl, const int nb, 
+                             const int tile);
 
       void SetOutputBrickSize(const int ns, const int nl, const int nb);
-      void SetOutputBrickSize(const int ns, const int nl, const int nb, const int tile);
+      void SetOutputBrickSize(const int ns, const int nl, const int nb, 
+                              const int tile);
 
       /**
       * This wrapping option only applys when there are two or more input cubes.
@@ -127,9 +141,10 @@ namespace Isis {
       
       /**
        * Same functionality as StartProcess(void funct(Isis::Buffer &inout)) 
-       * using Functors. The Functor operator(), takes the parameter (Isis::Buffer &)
+       * using Functors. The Functor operator(), takes the parameter 
+       * (Isis::Buffer &)
        * 
-       * @author Sharmila Prasad (4/22/2011)
+       * @author 2011-04-22 Sharmila Prasad
        * 
        * @param funct - Functor with overloaded operator()(Isis::Buffer &) 
        */
@@ -164,12 +179,15 @@ namespace Isis {
       int ProcessIO(Isis::Brick **ibrick, Isis::Brick **obrick);
       
       /**
-       * Same functionality as StartProcess(void funct(Isis::Buffer &in, Isis::Buffer &out)) 
-       * using Functors.The Functor operator(), takes the parameter (Isis::Buffer &, Isis::Buffer &)
+       * Same functionality as 
+       * StartProcess(void funct(Isis::Buffer &in, Isis::Buffer &out)) using 
+       * Functors.The Functor operator(), takes the parameter 
+       * (Isis::Buffer &, Isis::Buffer &)
        * 
-       * @author Sharmila Prasad (4/22/2011)
+       * @author 2011-04-22 Sharmila Prasad
        * 
-       * @param funct - Functor with overloaded operator()(Isis::Buffer &, Isis::Buffer &) 
+       * @param funct - Functor with overloaded operator() 
+       *                (Isis::Buffer &, Isis::Buffer &) 
        */
       template <typename FunctorIO>
       void StartProcessIO(FunctorIO & funct) {
@@ -196,20 +214,30 @@ namespace Isis {
         delete obrick;
       }
       
-      //! Prepare and check to run "function" parameter for 
-      //! StartProcess(void funct(vector<Isis::Buffer *> &in, vector<Isis::Buffer *> &out)), 
-      //! StartProcessIOList(Functor funct)
-      int ProcessIOList(std::vector<Isis::Buffer *> & ibufs, std::vector<Isis::Buffer *> & obufs,
-                        std::vector<Isis::Brick *> & imgrs,  std::vector<Isis::Brick *> & omgrs);
+      /** 
+       * Prepare and check to run 
+       * "function" parameter for 
+       * StartProcess(void funct(vector<Isis::Buffer *> &in, 
+       * vector<Isis::Buffer *> &out)), 
+       * StartProcessIOList(Functor funct) 
+       */  
+      int ProcessIOList(std::vector<Isis::Buffer *> & ibufs, 
+                        std::vector<Isis::Buffer *> & obufs,
+                        std::vector<Isis::Brick *> & imgrs,  
+                        std::vector<Isis::Brick *> & omgrs);
       
       /**
-       * Same functionality as StartProcess(void funct(vector<Isis::Buffer *> &in,
-       * vector<Isis::Buffer *> &out)) using Functors.The Functor operator(), takes the 
-       * parameter (vector<Isis::Buffer *> &in, vector<Isis::Buffer *> &out)
+       * Same functionality as 
+       * StartProcess(void funct(vector<Isis::Buffer *> &in,
+       * vector<Isis::Buffer *> &out)) using Functors. 
+       * The Functor operator(), takes the parameter 
+       * (vector<Isis::Buffer *> 
+       * &in, vector<Isis::Buffer *> &out) 
        * 
-       * @author Sharmila Prasad (4/22/2011)
+       * @author 2011-04-22 Sharmila Prasad 
        * 
-       * @param funct - Functor with overloaded operator()(vector<Isis::Buffer *> &in, 
+       * @param funct - Functor with overloaded operator() 
+       *               (vector<Isis::Buffer *> &in, 
        *                vector<Isis::Buffer *> &out) 
        */
       template <typename FunctorIOList>
