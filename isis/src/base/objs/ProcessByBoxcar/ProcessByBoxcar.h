@@ -37,11 +37,13 @@ namespace Isis {
    * @author 2003-01-03 Tracie Sucharski
    *
    * @internal
-   *  @history 2003-04-02 Tracie Sucharski - Added unitTest
-   *  @history 2003-05-16 Stuart Sides - Modified schema from astrogeology...
-   *                                     isis.astrogeology...
-   *  @history 2005-02-08 Elizabeth Ribelin - Modified file to support Doxygen
-   *                                          documentation
+   *   @history 2003-04-02 Tracie Sucharski - Added unitTest
+   *   @history 2003-05-16 Stuart Sides - Modified schema from astrogeology...
+   *                           isis.astrogeology...
+   *   @history 2005-02-08 Elizabeth Ribelin - Modified file to support Doxygen
+   *                           documentation
+   *   @history 2011-08-19 Jeannie Backer - Modified unitTest to use
+   *                           $temporary variable instead of /tmp directory.
    *
    *  @todo 2005-02-08 Tracie Sucharski - add code example and implementation
    *                                      example to class documentation

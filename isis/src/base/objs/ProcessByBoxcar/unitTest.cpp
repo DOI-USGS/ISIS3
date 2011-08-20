@@ -133,9 +133,9 @@ void IsisMain() {
   }
 
   Isis::Cube cube;
-  cube.open("/tmp/isisProcessByBoxcar_01");
+  cube.open("$temporary/isisProcessByBoxcar_01");
   cube.close(true);
-  cube.open("/tmp/isisProcessByBoxcar_02");
+  cube.open("$temporary/isisProcessByBoxcar_02");
   cube.close(true);
 
 }
