@@ -40,21 +40,25 @@ namespace Isis {
    * @author 2004-05-14 Jeff Anderson
    *
    * @internal
-   *  @history 2005-02-08 Elizabeth Ribelin - Modified file to support Doxygen
-   *                                          documentation
-   *  @history 2005-11-28 Jacob Danton - Modified file to allow processing
-   *                                     with multiple input and output cubes.
-   *  @history 2006-04-03 Jacob Danton - Rewrote the code to extend ProcessByBrick class
-   *
+   *   @history 2005-02-08 Elizabeth Ribelin - Modified file to support Doxygen
+   *                           documentation
+   *   @history 2005-11-28 Jacob Danton - Modified file to allow processing
+   *                           with multiple input and output cubes.
+   *   @history 2006-04-03 Jacob Danton - Rewrote the code to extend
+   *                           ProcessByBrick class
+   *   @history 2011-08-19 Jeannie Backer - Modified unitTest to use
+   *                           $temporary variable instead of /tmp directory.
+   *  
+   *  
    *  @todo 2005-02-08 Jeff Anderson - add coded example, and implementation
-   *                                   example to class documentation
+   *                       example to class documentation
    */
   class ProcessByTile : public Isis::ProcessByBrick {
 
     private:
-      bool p_tileSizeSet;  //!<Indicates whether the tile size has been set
-      int p_tileSamples;   //!<Number of samples in the tile
-      int p_tileLines;     //!<Number of lines in the tile
+      bool p_tileSizeSet;  //!< Indicates whether the tile size has been set
+      int p_tileSamples;   //!< Number of samples in the tile
+      int p_tileLines;     //!< Number of lines in the tile
 
     public:
 
