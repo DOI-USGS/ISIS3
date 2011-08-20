@@ -32,9 +32,9 @@ void IsisMain() {
   p.EndProcess();
 
   Isis::Cube cube;
-  cube.open("/tmp/isisProcessBySpectra_01");
+  cube.open("$temporary/isisProcessBySpectra_01");
   cube.close(true);
-  cube.open("/tmp/isisProcessBySpectra_02");
+  cube.open("$temporary/isisProcessBySpectra_02");
   cube.close(true);
 }
 

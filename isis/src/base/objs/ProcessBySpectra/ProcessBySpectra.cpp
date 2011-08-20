@@ -23,22 +23,30 @@
 
 #include "ProcessBySpectra.h"
 
+#include "Buffer.h"
+#include "Cube.h"
+#include "iException.h"
+#include "Process.h"
+#include "ProcessByBrick.h"
+
 using namespace std;
 namespace Isis {
   /**
-   * Opens an input cube specified by the user and verifies requirements are met.
-   * This method is overloaded and adds the requirements of ic_base::SpatialMatch
-   * which requires all input cubes to have the same number of samples and lines.
-   * It also added the requirement ic_base::BandMatchOrOne which forces 2nd, 3rd,
-   * 4th, etc input cubes to match the number of bands in the 1st input cube
-   * or to have exactly one band. For more information see Process::SetInputCube
+   * Opens an input cube specified by the user and verifies requirements are 
+   * met. This method is overloaded and adds the requirements of
+   * ic_base::SpatialMatch which requires all input cubes to have the same 
+   * number of samples and lines. It also added the requirement 
+   * ic_base::BandMatchOrOne which forces 2nd, 3rd, 4th, etc input cubes to 
+   * match the number of bands in the 1st input cube or to have exactly one 
+   * band. For more information see Process::SetInputCube
    *
    * @return Cube*
    *
-   * @param parameter User parameter to obtain file to open. Typically, the value
-   *                  is "FROM". For example, the user can specify on the command
-   *                  line FROM=myfile.cub and this method will attempt to open
-   *                  the cube "myfile.cub" if the parameter was set to "FROM".
+   * @param parameter User parameter to obtain file to open. Typically, the 
+   *                  value is "FROM". For example, the user can specify on the
+   *                  command line FROM=myfile.cub and this method will attempt
+   *                  to open the cube "myfile.cub" if the parameter was set to
+   *                  "FROM".
    *
    * @param requirements See Process::SetInputCube for more information.
    *                     Defaults to 0
@@ -47,23 +55,36 @@ namespace Isis {
    */
   Isis::Cube *ProcessBySpectra::SetInputCube(const std::string &parameter,
       const int requirements) {
-    return Isis::ProcessByBrick::SetInputCube(parameter, Isis::SpatialMatch | requirements);
+    return ProcessByBrick::SetInputCube(parameter, 
+                                        Isis::SpatialMatch | requirements);
   }
 
-
+  /**
+   * Opens an input cube specified by the user with cube attributes and  
+   * requirements. For more information see Process::SetInputCube 
+   *
+   * @return Cube*
+   *
+   * @param file Name of cube file 
+   * @param att Cube attributes 
+   * @param requirements See Process::SetInputCube for more information.
+   *                     Defaults to 0
+   *
+   */
   Isis::Cube *ProcessBySpectra::SetInputCube(const std::string &file,
       Isis::CubeAttributeInput &att,
       const int requirements) {
-    return Isis::ProcessByBrick::SetInputCube(file, att, Isis::SpatialMatch | requirements);
+    return ProcessByBrick::SetInputCube(file, att, 
+                                        Isis::SpatialMatch | requirements);
   }
 
   /**
    * This method invokes the process by spectra operation over a single input or
-   * output cube. It will be an input cube if the method SetInputCube was invoked
-   * exactly one time before calling StartProcess. It will be an output cube if
-   * the SetOutputCube method was invoked exactly one time. Typically this method
-   * can be used to obtain statistics, histograms, or other information from
-   * an input cube.
+   * output cube. It will be an input cube if the method SetInputCube was 
+   * invoked exactly one time before calling StartProcess. It will be an output 
+   * cube if the SetOutputCube method was invoked exactly one time. Typically 
+   * this method can be used to obtain statistics, histograms, or other 
+   * information from an input cube. 
    *
    * @param funct (Isis::Buffer &b) Name of your processing function
    *
@@ -74,11 +95,11 @@ namespace Isis {
     // Error checks
     if((InputCubes.size() + OutputCubes.size()) > 1) {
       string m = "You can only specify exactly one input or output cube";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw iException::Message(iException::Programmer, m, _FILEINFO_);
     }
     else if((InputCubes.size() + OutputCubes.size()) == 0) {
       string m = "You haven't specified an input or output cube";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw iException::Message(iException::Programmer, m, _FILEINFO_);
     }
 
     int ns, nl, nb;
@@ -95,14 +116,14 @@ namespace Isis {
     if(Type() == PerPixel) SetBrickSize(1, 1, nb);
     else if(Type() == ByLine) SetBrickSize(ns, 1, nb);
     else SetBrickSize(1, nl, nb);
-    Isis::ProcessByBrick::StartProcess(funct);
+    ProcessByBrick::StartProcess(funct);
   }
 
   /**
-   * This method invokes the process by spectra operation over exactly one input and
-   * one output cube. Typically, this method is used for simple operations such
-   * as stretching a cube or applying various operators to a cube (add constant,
-   * multiply by constant, etc).
+   * This method invokes the process by spectra operation over exactly one input 
+   * and one output cube. Typically, this method is used for simple operations 
+   * such as stretching a cube or applying various operators to a cube (add 
+   * constant, multiply by constant, etc). 
    *
    * @param funct (Isis::Buffer &in, Isis::Buffer &out) Name of your processing
    *                                                    function
@@ -110,15 +131,16 @@ namespace Isis {
    * @throws Isis::iException::Message
    */
   void ProcessBySpectra::StartProcess(void
-                                      funct(Isis::Buffer &in, Isis::Buffer &out)) {
+                                      funct(Isis::Buffer &in, 
+                                            Isis::Buffer &out)) {
     // Error checks ... there must be one input and output
     if(InputCubes.size() != 1) {
       string m = "You must specify exactly one input cube";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw iException::Message(iException::Programmer, m, _FILEINFO_);
     }
     else if(OutputCubes.size() != 1) {
       string m = "You must specify exactly one output cube";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw iException::Message(iException::Programmer, m, _FILEINFO_);
     }
 
     int numLines = 1, numSamples = 1, numBands = 1;
@@ -152,12 +174,12 @@ namespace Isis {
                          OutputCubes[0]->getBandCount());
     }
 
-    Isis::ProcessByBrick::StartProcess(funct);
+    ProcessByBrick::StartProcess(funct);
   }
 
   /**
-   * This method invokes the process by spectra operation over multiple input and
-   * output cubes. Typically, this method is used when two input cubes are
+   * This method invokes the process by spectra operation over multiple input 
+   * and output cubes. Typically, this method is used when two input cubes are
    * required for operations like ratios, differences, masking, etc.
    *
    * @param funct (vector<Isis::Buffer *> &in, vector<Isis::Buffer *> &out) Name
@@ -177,28 +199,41 @@ namespace Isis {
     }
     else if(Type() == ByLine) {
       for(unsigned int i = 0; i < InputCubes.size(); i++) {
-        SetInputBrickSize(InputCubes[i]->getSampleCount(), 1, InputCubes[i]->getBandCount(), i + 1);
+        SetInputBrickSize(InputCubes[i]->getSampleCount(), 1, 
+                          InputCubes[i]->getBandCount(), i + 1);
       }
       for(unsigned int i = 0; i < OutputCubes.size(); i++) {
-        SetOutputBrickSize(OutputCubes[i]->getSampleCount(), 1, OutputCubes[i]->getBandCount(), i + 1);
+        SetOutputBrickSize(OutputCubes[i]->getSampleCount(), 1, 
+                           OutputCubes[i]->getBandCount(), i + 1);
       }
     }
     else {
       for(unsigned int i = 0; i < InputCubes.size(); i++) {
-        SetInputBrickSize(1, InputCubes[i]->getLineCount(), InputCubes[i]->getBandCount(), i + 1);
+        SetInputBrickSize(1, InputCubes[i]->getLineCount(), 
+                          InputCubes[i]->getBandCount(), i + 1);
       }
       for(unsigned int i = 0; i < OutputCubes.size(); i++) {
-        SetOutputBrickSize(1, OutputCubes[i]->getLineCount(), OutputCubes[i]->getBandCount(), i + 1);
+        SetOutputBrickSize(1, OutputCubes[i]->getLineCount(), 
+                           OutputCubes[i]->getBandCount(), i + 1);
       }
     }
 
-    Isis::ProcessByBrick::StartProcess(funct);
+    ProcessByBrick::StartProcess(funct);
   }
 
+  /**
+   * Sets the spectra type to one of the following: 
+   * <UL> 
+   *   <LI> 0 = PerPixel
+   *   <LI> 1 = ByLine
+   *   <LI> 2 = BySample
+   * </UL>
+   * @param type Integer value representing the spectra type.
+   */
   void ProcessBySpectra::SetType(const int type) {
     if(type != PerPixel && type != ByLine && type != BySample) {
-      string m = "The specified type is invalid";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      string m = "The specified spectra type is invalid";
+      throw iException::Message(iException::Programmer, m, _FILEINFO_);
     }
     else p_spectraType = type;
   }
