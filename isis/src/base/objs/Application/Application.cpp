@@ -43,15 +43,18 @@ extern int errno;
 #include <QString>
 
 #include "Application.h"
-#include "Constants.h"
+#include "Constants.h"    //is this still used in this class?
 #include "CubeManager.h"
 #include "Filename.h"
 #include "iException.h"
 #include "iString.h"
-#include "Gui.h"
+#include "Gui.h"  //is this still used?
 #include "Message.h"
 #include "Preference.h"
 #include "ProgramLauncher.h"
+#include "Pvl.h"
+#include "PvlGroup.h"
+#include "PvlObject.h"
 #include "SessionLog.h"
 #include "TextFile.h"
 #include "UserInterface.h"
@@ -487,6 +490,10 @@ namespace Isis {
   }
 
 
+  /**
+   * @param code 
+   * @param message 
+   */
   void Application::SendParentData(const string code,
       const string &message) {
     // See if we need to connect to the parent
@@ -723,13 +730,13 @@ namespace Isis {
     e.Clear();
   }
 
+  iString Application::p_appName("Unknown"); //!< 
   /**
    * Returns the name of the application.  Returns 'Unknown' if the application
    * or gui equal NULL
    *
    * @return string The application name
    */
-  iString Application::p_appName("Unknown");
   iString Application::Name() {
     return p_appName;
   }
@@ -830,6 +837,11 @@ namespace Isis {
     return hostName();
   }
 
+  /**
+   * The Isis Version for this application.
+   * @return @b iString 
+   * 
+   */
   iString Application::Version() {
     return isisVersion();
   }
@@ -843,7 +855,7 @@ namespace Isis {
   PvlGroup Application::GetUnameInfo() {
     // Create a temporary file to store console output to
     Filename temp;
-    temp.Temporary("/tmp/UnameConsoleInfo", "txt");
+    temp.Temporary("$temporary/UnameConsoleInfo", "txt");
     iString tempFile = temp.Expanded();
 
     // Uname commands output to temp file with each of the following
@@ -924,7 +936,7 @@ namespace Isis {
   PvlGroup Application::GetEnviromentInfo() {
     // Create a temporary file to store console output to
     Filename temp;
-    temp.Temporary("/tmp/EnviromentInfo", "txt");
+    temp.Temporary("$temporary/EnviromentInfo", "txt");
     iString tempFile = temp.Expanded();
     PvlGroup envGroup("EnviromentVariables");
     ifstream readTemp;
@@ -966,7 +978,7 @@ namespace Isis {
    */
   iString Application::GetSystemDiskSpace() {
     Filename temp;
-    temp.Temporary("/tmp/SystemDiskSpace", "txt");
+    temp.Temporary("$temporary/SystemDiskSpace", "txt");
     iString tempFile = temp.Expanded();
     ifstream readTemp;
     string diskspace = "df > " + tempFile;
@@ -994,7 +1006,7 @@ namespace Isis {
    */
   iString Application::GetLibraryDependencies(iString file) {
     Filename temp;
-    temp.Temporary("/tmp/LibraryDependencies", "txt");
+    temp.Temporary("$temporary/LibraryDependencies", "txt");
     iString tempFile = temp.Expanded();
     ifstream readTemp;
     string dependencies = "";
