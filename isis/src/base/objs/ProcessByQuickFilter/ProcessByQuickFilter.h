@@ -66,13 +66,16 @@ namespace Isis {
    *   @history 2006-12-15 Jeff Anderson - Fixed bug for images with 1 line
    *   @history 2011-06-27 Jai Rideout and Steven Lambright - Now uses
    *                           FilterCachingAlgorithm
+   *   @history 2011-08-19 Jeannie Backer - Modified unitTest to use
+   *                           $temporary variable instead of /tmp directory.
    */
   class ProcessByQuickFilter : public Isis::Process {
 
     public:
       ProcessByQuickFilter();
 
-      void StartProcess(void funct(Isis::Buffer &in, Isis::Buffer &out, Isis::QuickFilter &filter));
+      void StartProcess(void funct(Isis::Buffer &in, Isis::Buffer &out, 
+                                   Isis::QuickFilter &filter));
       void SetFilterParameters(int samples, int lines,
                                double low = -DBL_MAX, double high = DBL_MAX,
                                int minimum = 0);
