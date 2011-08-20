@@ -20,39 +20,61 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
+#include "History.h"
+
 #include <fstream>
 #include <sstream>
 #include <string>
-#include "History.h"
+
 #include "Application.h"
 #include "PvlObject.h"
 
 using namespace std;
+
 namespace Isis {
-  // Constructor for creating a history blob
+
+  /** 
+   *  Constructor for reading a history blob
+   *  @param name
+   */
   History::History(const std::string &name) : Isis::Blob(name, "History") {
     p_history.SetTerminator("");
   }
 
-  // Constructor for reading a history blob
+  /** 
+   *  Constructor for reading a history blob
+   *  @param name
+   *  @param file
+   */
   History::History(const std::string &name, const std::string &file) :
     Isis::Blob(name, "History") {
     Blob::Read(file);
   }
 
-  // Destructor
+  //! Destructor
   History::~History() {
   }
 
+  /**
+   *   Adds History PvlObject
+   */
   void History::AddEntry() {
     PvlObject hist = Isis::iApp->History();
     AddEntry(hist);
   }
 
+  /** 
+   * Adds given PvlObject to History Pvl 
+   *  
+   * @param obj PvlObject to be added
+   */
   void History::AddEntry(Isis::PvlObject &obj) {
     p_history.AddObject(obj);
   }
 
+  /**
+   *   
+   */
   void History::WriteInit() {
     ostringstream ostr;
     if(p_nbytes > 0) ostr << std::endl;
@@ -70,6 +92,11 @@ namespace Isis {
     if(temp != NULL) delete [] temp;
   }
 
+  /** 
+   * Reads p_buffer into a pvl 
+   *  
+   * @return @b Pvl 
+   */
   Pvl History::ReturnHist() {
     Pvl pvl;
     stringstream os;
@@ -78,6 +105,12 @@ namespace Isis {
     return pvl;
   }
 
+  /**
+   * Reads input stream into Pvl. 
+   *  
+   * @param pvl Pvl into which the input stream will be read.
+   * @param is Input stream.
+   */
   void History::Read(const Isis::Pvl &pvl, std::istream &is) {
     try {
       Blob::Read(pvl, is);

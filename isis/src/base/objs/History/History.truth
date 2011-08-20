@@ -9,10 +9,10 @@ Object = Root
 
     Group = UserParameters
       FROM = unitTest.cub
-      TO   = /tmp/isisprocess_01.cub
-      TO2  = /tmp/isisprocess_02.cub
-      TO3  = /tmp/isisprocess_03.cub
-      TO4  = /tmp/isisprocess_04.cub
+      TO   = $temporary/isisprocess_01.cub
+      TO2  = $temporary/isisprocess_02.cub
+      TO3  = $temporary/isisprocess_03.cub
+      TO4  = $temporary/isisprocess_04.cub
     End_Group
   End_Object
 End_Object

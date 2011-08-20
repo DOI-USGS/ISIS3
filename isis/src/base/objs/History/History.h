@@ -1,3 +1,6 @@
+#if !defined(History_h)
+#define History_h
+
 /**
  * @file
  * $Revision: 1.3 $
@@ -20,18 +23,20 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-#if !defined(History_h)
-#define History_h
 
 #include "Blob.h"
 
 namespace Isis {
   /**
-   *
-   * @history 2006-12-11 Kris Becker Fixed bug in WriteInit method using a
-   *                                 temporary string to reference a char pointer
-   *                                 to its contents.  The string remain after the
-   *                                 reference or its toast.
+   *  
+   * @internal 
+   *   @history 2006-12-11 Kris Becker Fixed bug in WriteInit method using a
+   *                           temporary string to reference a char pointer to
+   *                           its contents.  The string remain after the
+   *                           reference or its toast.
+   *   @history 2011-08-19 Jeannie Backer - Modified unitTest to use
+   *                           $temporary variable instead of /tmp directory.
+   *                           Added some documentation to methods.
    *
    * @internal
    * @todo This class needs documentation.
@@ -51,7 +56,7 @@ namespace Isis {
       void WriteInit();
 
     private:
-      Pvl p_history;
+      Pvl p_history; //!< History Pvl
   };
 };
 
