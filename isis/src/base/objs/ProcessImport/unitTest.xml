@@ -22,6 +22,9 @@
     <change name="Christopher Austin" date="2008-09-16">
       Added the special pixel range error throwing.
     </change>
+    <change name="Jeannie Backer" date="2011-08-19">
+      Replaced test cube path /tmp/... with $temporary/...
+    </change>
   </history>
 
   <groups>
@@ -38,7 +41,7 @@
         <filter>
           *.cub
         </filter>
-        <default><item>/tmp/isisImport.cub</item></default>
+        <default><item>$temporary/isisImport.cub</item></default>
       </parameter>
     </group>
 

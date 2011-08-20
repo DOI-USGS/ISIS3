@@ -19,25 +19,26 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
+#include "ProcessImport.h"
 
 #include <float.h>
 #include <iostream>
 #include <string>
 #include <sstream>
 
-#include "Preference.h"
+#include "Application.h"
+#include "Cube.h"
+#include "CubeAttribute.h"
 #include "Brick.h"
-#include "ProcessImport.h"
 #include "iException.h"
+#include "iString.h"
+#include "JP2Decoder.h"
 #include "LineManager.h"
+#include "PixelType.h"
+#include "Process.h"
 #include "Pvl.h"
 #include "PvlTokenizer.h"
-#include "PixelType.h"
 #include "SpecialPixel.h"
-#include "iString.h"
-#include "PixelType.h"
-#include "Application.h"
-#include "JP2Decoder.h"
 
 using namespace std;
 namespace Isis {
@@ -127,7 +128,7 @@ namespace Isis {
     else {
       string msg = "Unsupported pixel type [" +
                    Isis::PixelTypeName(type) + "]";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
   };
 
@@ -153,7 +154,7 @@ namespace Isis {
     else {
       string msg = "Illegal dimension [" + Isis::iString(ns) + ", " +
                    Isis::iString(nl) + ", " + Isis::iString(nb) + "]";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
   };
 
@@ -193,7 +194,7 @@ namespace Isis {
     }
     else {
       string msg = "Illegal file header size [" + Isis::iString(bytes) + "]";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
   };
 
@@ -222,7 +223,7 @@ namespace Isis {
     }
     else {
       string msg = "Illegal file trailer size [" + Isis::iString(bytes) + "]";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
   };
 
@@ -250,7 +251,7 @@ namespace Isis {
     }
     else {
       string msg = "Illegal data header size [" + Isis::iString(bytes) + "]";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
   };
 
@@ -280,7 +281,7 @@ namespace Isis {
     }
     else {
       string msg = "Illegal data trailer size [" + Isis::iString(bytes) + "]";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
   };
 
@@ -309,7 +310,7 @@ namespace Isis {
     }
     else {
       string msg = "Illegal data prefix size [" + Isis::iString(bytes) + "]";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
   };
 
@@ -338,7 +339,7 @@ namespace Isis {
     }
     else {
       string msg = "Illegal data suffix size [" + Isis::iString(bytes) + "]";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
   };
 
@@ -361,8 +362,10 @@ namespace Isis {
   */
   void ProcessImport::SaveFileHeader() {
     if(p_fileHeaderBytes == 0) {
-      iString msg = "File header bytes equals 0.  There is nothing to save.  Use SetFileHeaderBytes() first.";
-      throw iException::Message(iException::Programmer, msg.c_str(), _FILEINFO_);
+      iString msg = "File header bytes equals 0.  There is nothing to save.  "
+                    "Use SetFileHeaderBytes() first.";
+      throw iException::Message(iException::Programmer, msg.c_str(), 
+                                _FILEINFO_);
     }
     p_saveFileHeader = true;
   };
@@ -386,8 +389,10 @@ namespace Isis {
    */
   void ProcessImport::SaveFileTrailer() {
     if(p_fileTrailerBytes == 0) {
-      iString msg = "File trailer bytes equals 0.  There is nothing to save.  Use SetFileTrailerBytes() first.";
-      throw iException::Message(iException::Programmer, msg.c_str(), _FILEINFO_);
+      iString msg = "File trailer bytes equals 0.  There is nothing to save.  "
+                    "Use SetFileTrailerBytes() first.";
+      throw iException::Message(iException::Programmer, msg.c_str(), 
+                                _FILEINFO_);
     }
     p_saveFileTrailer = true;
   };
@@ -412,8 +417,10 @@ namespace Isis {
    */
   void ProcessImport::SaveDataHeader() {
     if(p_dataHeaderBytes == 0) {
-      iString msg = "Data header bytes equals 0.  There is nothing to save.  Use SetDataHeaderBytes() first.";
-      throw iException::Message(iException::Programmer, msg.c_str(), _FILEINFO_);
+      iString msg = "Data header bytes equals 0.  There is nothing to save.  "
+                    "Use SetDataHeaderBytes() first.";
+      throw iException::Message(iException::Programmer, msg.c_str(), 
+                                _FILEINFO_);
     }
     p_saveDataHeader = true;
   };
@@ -438,8 +445,10 @@ namespace Isis {
    */
   void ProcessImport::SaveDataTrailer() {
     if(p_dataTrailerBytes == 0) {
-      iString msg = "Data trailer bytes equals 0.  There is nothing to save.  Use SetDataTrailerBytes() first.";
-      throw iException::Message(iException::Programmer, msg.c_str(), _FILEINFO_);
+      iString msg = "Data trailer bytes equals 0.  There is nothing to save.  "
+                    "Use SetDataTrailerBytes() first.";
+      throw iException::Message(iException::Programmer, msg.c_str(), 
+                                _FILEINFO_);
     }
     p_saveDataTrailer = true;
   };
@@ -463,8 +472,10 @@ namespace Isis {
    */
   void ProcessImport::SaveDataPrefix() {
     if(p_dataPreBytes == 0) {
-      iString msg = "Data prefix bytes equals 0.  There is nothing to save.  Use SetDataPrefixBytes() first.";
-      throw iException::Message(iException::Programmer, msg.c_str(), _FILEINFO_);
+      iString msg = "Data prefix bytes equals 0.  There is nothing to save.  "
+                    "Use SetDataPrefixBytes() first.";
+      throw iException::Message(iException::Programmer, msg.c_str(), 
+                                _FILEINFO_);
     }
     p_saveDataPre = true;
   };
@@ -489,8 +500,10 @@ namespace Isis {
    */
   void ProcessImport::SaveDataSuffix() {
     if(p_dataPostBytes == 0) {
-      iString msg = "Data suffix bytes equals 0.  There is nothing to save.  Use SetDataSuffixBytes() first.";
-      throw iException::Message(iException::Programmer, msg.c_str(), _FILEINFO_);
+      iString msg = "Data suffix bytes equals 0.  There is nothing to save.  "
+                    "Use SetDataSuffixBytes() first.";
+      throw iException::Message(iException::Programmer, msg.c_str(), 
+                                _FILEINFO_);
     }
     p_saveDataPost = true;
   };
@@ -518,7 +531,7 @@ namespace Isis {
       return p_fileHeader;
     }
     std::string msg = "File header was not saved.  Use SaveFileHeader().";
-    throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+    throw iException::Message(iException::Programmer, msg, _FILEINFO_);
   };
 
   /**
@@ -543,7 +556,7 @@ namespace Isis {
       return p_fileTrailer;
     }
     std::string msg = "File trailer was not saved.  Use SaveFileTrailer()";
-    throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+    throw iException::Message(iException::Programmer, msg, _FILEINFO_);
   };
 
 
@@ -571,7 +584,7 @@ namespace Isis {
       return p_dataHeader;
     }
     std::string msg = "Data header was not saved.  Use SaveDataHeader()";
-    throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+    throw iException::Message(iException::Programmer, msg, _FILEINFO_);
   };
 
   /**
@@ -598,7 +611,7 @@ namespace Isis {
       return p_dataTrailer;
     }
     std::string msg = "Data trailer was not saved.  Use SaveDataTrailer()";
-    throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+    throw iException::Message(iException::Programmer, msg, _FILEINFO_);
   };
 
   /**
@@ -625,7 +638,7 @@ namespace Isis {
       return p_dataPre;
     }
     std::string msg = "Data prefix was not saved.  Use SaveDataPrefix()";
-    throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+    throw iException::Message(iException::Programmer, msg, _FILEINFO_);
   };
 
   /**
@@ -652,7 +665,7 @@ namespace Isis {
       return p_dataPost;
     }
     std::string msg = "Data suffix was not saved.  Use SaveDataSuffix()";
-    throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+    throw iException::Message(iException::Programmer, msg, _FILEINFO_);
   };
 
   /**
@@ -817,22 +830,24 @@ namespace Isis {
    * Checks the special pixel range of the given against all other special pixel
    * value ranges, making sure none overlap.
    *
-   * @param pixelName Name of the special pixel type to be displayed in the error
-   *                  message.
+   * @param pixelName Name of the special pixel type to be displayed in the 
+   *               error message.
    * @param pixelMin The minimum value of the special pixel range
    * @param pixelMax The maximum value of the special pixel range
    */
-  void ProcessImport::CheckPixelRange(std::string pixelName, double pixelMin, double pixelMax) {
+  void ProcessImport::CheckPixelRange(std::string pixelName, double pixelMin, 
+                                      double pixelMax) {
     if(pixelMin == DBL_MAX || pixelMax == -DBL_MAX) return;
 
-    if(p_null_min != DBL_MAX && p_null_max != -DBL_MAX && (   // Checks if null has been set
-          (pixelMin > p_null_min && pixelMin < p_null_max) ||      // Checks for min crossing
-          (pixelMax > p_null_min && pixelMax < p_null_max) ||      // Checks for max crossing
-          (pixelMin < p_null_min && pixelMax > p_null_max))) {     // Checks for straddling values
+    if(p_null_min != DBL_MAX && p_null_max != -DBL_MAX && ( //-null has been set
+          (pixelMin > p_null_min && pixelMin < p_null_max) ||  // --min crossing
+          (pixelMax > p_null_min && pixelMax < p_null_max) ||  // --max crossing
+          (pixelMin < p_null_min && pixelMax > p_null_max))) { // --straddling
+                                                               //   values
       string msg = "The " + pixelName + " range [" + iString(pixelMin) +
                    "," + iString(pixelMax) + "] overlaps the NULL range [" +
                    iString(p_null_min) + "," + iString(p_null_max) + "]";
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
     if(p_lrs_min != DBL_MAX && p_lrs_max != -DBL_MAX && (
@@ -842,7 +857,7 @@ namespace Isis {
       string msg = "The " + pixelName + " range [" + iString(pixelMin) +
                    "," + iString(pixelMax) + "] overlaps the LRS range [" +
                    iString(p_lrs_min) + "," + iString(p_lrs_max) + "]";
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
     if(p_lis_min != DBL_MAX && p_lis_max != -DBL_MAX && (
@@ -852,7 +867,7 @@ namespace Isis {
       string msg = "The " + pixelName + " range [" + iString(pixelMin) +
                    "," + iString(pixelMax) + "] overlaps the LIS range [" +
                    iString(p_lis_min) + "," + iString(p_lis_max) + "]";
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
     if(p_hrs_min != DBL_MAX && p_hrs_max != -DBL_MAX && (
@@ -862,7 +877,7 @@ namespace Isis {
       string msg = "The " + pixelName + " range [" + iString(pixelMin) +
                    "," + iString(pixelMax) + "] overlaps the HRS range [" +
                    iString(p_hrs_min) + "," + iString(p_hrs_max) + "]";
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
     if(p_his_min != DBL_MAX && p_his_max != -DBL_MAX && (
@@ -872,7 +887,7 @@ namespace Isis {
       string msg = "The " + pixelName + " range [" + iString(pixelMin) +
                    "," + iString(pixelMax) + "] overlaps the HIS range [" +
                    iString(p_his_min) + "," + iString(p_his_max) + "]";
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
   }
@@ -914,11 +929,14 @@ namespace Isis {
    * SetDimensions and SetPixelType should be made prior to calling this method.
    *
    * @param parameter The parameter name that holds the output file name.
-   *
+   *  
+   * @return @b Isis::Cube Output cube. 
+   *  
    * @throws Isis::iException::Message "Unsupported pixel type."
    */
   Isis::Cube *ProcessImport::SetOutputCube(const std::string &parameter) {
-    Isis::CubeAttributeOutput &att = Application::GetUserInterface().GetOutputAttribute(parameter);
+    CubeAttributeOutput &att = 
+      Application::GetUserInterface().GetOutputAttribute(parameter);
 
     if(att.PropagateMinimumMaximum()) {
       double min, max;
@@ -942,7 +960,7 @@ namespace Isis {
       else {
         string msg = "Unsupported pixel type [" +
                      Isis::PixelTypeName(p_pixelType) + "]";
-        throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
       }
       att.Minimum(min);
       att.Maximum(max);
@@ -960,8 +978,7 @@ namespace Isis {
       }
     }
 
-    return Isis::Process::SetOutputCube(Application::GetUserInterface().GetFilename(parameter),
-                                        att, p_ns, p_nl, p_nb);
+    return Process::SetOutputCube(Application::GetUserInterface().GetFilename(parameter), att, p_ns, p_nl, p_nb);
   }
 
   /**
@@ -972,7 +989,8 @@ namespace Isis {
    *
    * @param att An output cube attribute to define the characteristics of the
    *            output cube.
-   *
+   *  
+   * @return @b Isis::Cube Output cube. 
    * @throws Isis::iException::Message "File is not in a supported
    *             organization."
    */
@@ -997,8 +1015,9 @@ namespace Isis {
       ProcessBip();
     }
     else {
-      string msg = "File [" + p_inFile + "] is not in a supported organization.";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      string msg = "File [" + p_inFile 
+                   + "] is not in a supported organization.";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
   }
 
@@ -1027,7 +1046,7 @@ namespace Isis {
     }
     else {
       string msg = "File [" + p_inFile + "] is not in a supported organization.";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
   }
 
@@ -1060,7 +1079,7 @@ namespace Isis {
     fin.open(inFilename.c_str(), ios::in | ios::binary);
     if(!fin.is_open()) {
       string msg = "Cannot open input file [" + p_inFile + "]";
-      throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+      throw iException::Message(iException::Io, msg, _FILEINFO_);
     }
 
     // Handle the file header
@@ -1078,7 +1097,7 @@ namespace Isis {
       string msg = "Cannot read file [" + p_inFile + "]. Position [" +
                    Isis::iString((int)pos) + "]. Byte count [" +
                    Isis::iString(p_fileHeaderBytes) + "]" ;
-      throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+      throw iException::Message(iException::Io, msg, _FILEINFO_);
     }
 
     // Construct a line buffer manager
@@ -1123,7 +1142,7 @@ namespace Isis {
         string msg = "Cannot read file [" + p_inFile + "]. Position [" +
                      Isis::iString((int)pos) + "]. Byte count [" +
                      Isis::iString(p_dataHeaderBytes) + "]" ;
-        throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+        throw iException::Message(iException::Io, msg, _FILEINFO_);
       }
 
       // Space for storing prefix and suffix data pointers
@@ -1147,7 +1166,7 @@ namespace Isis {
           string msg = "Cannot read file [" + p_inFile + "]. Position [" +
                        Isis::iString((int)pos) + "]. Byte count [" +
                        Isis::iString(p_dataPreBytes) + "]" ;
-          throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+          throw iException::Message(iException::Io, msg, _FILEINFO_);
         }
 
 
@@ -1158,7 +1177,7 @@ namespace Isis {
           string msg = "Cannot read file [" + p_inFile + "]. Position [" +
                        Isis::iString((int)pos) + "]. Byte count [" +
                        Isis::iString(readBytes) + "]" ;
-          throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+          throw iException::Message(iException::Io, msg, _FILEINFO_);
         }
 
         // Swap the bytes if necessary and convert any out of bounds pixels
@@ -1169,13 +1188,14 @@ namespace Isis {
               (*out)[samp] = (double)((unsigned char *)in)[samp];
               break;
             case Isis::UnsignedWord:
-              (*out)[samp] = (double)swapper.UnsignedShortInt((unsigned short int *)in + samp);
+              (*out)[samp] = 
+                (double)swapper.UnsignedShortInt((unsigned short int *)in+samp);
               break;
             case Isis::SignedWord:
-              (*out)[samp] = (double)swapper.ShortInt((short int *)in + samp);
+              (*out)[samp] = (double)swapper.ShortInt((short int *)in+samp);
               break;
             case Isis::Real:
-              (*out)[samp] = (double)swapper.Float((float *)in + samp);
+              (*out)[samp] = (double)swapper.Float((float *)in+samp);
               break;
             default:
               break;
@@ -1218,7 +1238,7 @@ namespace Isis {
           string msg = "Cannot read file [" + p_inFile + "]. Position [" +
                        Isis::iString((int)pos) + "]. Byte count [" +
                        Isis::iString(p_dataPreBytes) + "]" ;
-          throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+          throw iException::Message(iException::Io, msg, _FILEINFO_);
         }
       } // End line loop
 
@@ -1249,7 +1269,7 @@ namespace Isis {
         string msg = "Cannot read file [" + p_inFile + "]. Position [" +
                      Isis::iString((int)pos) + "]. Byte count [" +
                      Isis::iString(p_fileHeaderBytes) + "]" ;
-        throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+        throw iException::Message(iException::Io, msg, _FILEINFO_);
       }
 
     } // End band loop
@@ -1269,7 +1289,7 @@ namespace Isis {
         string msg = "Cannot read file [" + p_inFile + "]. Position [" +
                      Isis::iString((int)pos) + "]. Byte count [" +
                      Isis::iString(p_fileTrailerBytes) + "]" ;
-        throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+        throw iException::Message(iException::Io, msg, _FILEINFO_);
       }
 
     }
@@ -1309,7 +1329,7 @@ namespace Isis {
     fin.open(inFilename.c_str(), ios::in | ios::binary);
     if(!fin.is_open()) {
       string msg = "Cannot open input file [" + p_inFile + "]";
-      throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+      throw iException::Message(iException::Io, msg, _FILEINFO_);
     }
 
     // Handle the file header
@@ -1327,7 +1347,7 @@ namespace Isis {
       string msg = "Cannot read file [" + p_inFile + "]. Position [" +
                    Isis::iString((int)pos) + "]. Byte count [" +
                    Isis::iString(p_fileHeaderBytes) + "]" ;
-      throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+      throw iException::Message(iException::Io, msg, _FILEINFO_);
     }
 
     // Construct a line buffer manager
@@ -1364,7 +1384,7 @@ namespace Isis {
           string msg = "Cannot read file [" + p_inFile + "]. Position [" +
                        Isis::iString((int)pos) + "]. Byte count [" +
                        Isis::iString(p_dataHeaderBytes) + "]" ;
-          throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+          throw iException::Message(iException::Io, msg, _FILEINFO_);
         }
 
         // Space for storing prefix and suffix data pointers
@@ -1386,7 +1406,7 @@ namespace Isis {
           string msg = "Cannot read file [" + p_inFile + "]. Position [" +
                        Isis::iString((int)pos) + "]. Byte count [" +
                        Isis::iString(p_dataPreBytes) + "]" ;
-          throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+          throw iException::Message(iException::Io, msg, _FILEINFO_);
         }
 
 
@@ -1397,7 +1417,7 @@ namespace Isis {
           string msg = "Cannot read file [" + p_inFile + "]. Position [" +
                        Isis::iString((int)pos) + "]. Byte count [" +
                        Isis::iString(readBytes) + "]" ;
-          throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+          throw iException::Message(iException::Io, msg, _FILEINFO_);
         }
 
         // Swap the bytes if necessary and convert any out of bounds pixels
@@ -1408,13 +1428,14 @@ namespace Isis {
               (*out)[samp] = (double)((unsigned char *)in)[samp];
               break;
             case Isis::UnsignedWord:
-              (*out)[samp] = (double)swapper.UnsignedShortInt((unsigned short int *)in + samp);
+              (*out)[samp] = 
+                (double)swapper.UnsignedShortInt((unsigned short int *)in+samp);
               break;
             case Isis::SignedWord:
-              (*out)[samp] = (double)swapper.ShortInt((short int *)in + samp);
+              (*out)[samp] = (double)swapper.ShortInt((short int *)in+samp);
               break;
             case Isis::Real:
-              (*out)[samp] = (double)swapper.Float((float *)in + samp);
+              (*out)[samp] = (double)swapper.Float((float *)in+samp);
               break;
             default:
               break;
@@ -1454,7 +1475,7 @@ namespace Isis {
           string msg = "Cannot read file [" + p_inFile + "]. Position [" +
                        Isis::iString((int)pos) + "]. Byte count [" +
                        Isis::iString(p_dataPreBytes) + "]" ;
-          throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+          throw iException::Message(iException::Io, msg, _FILEINFO_);
         }
 
 
@@ -1475,7 +1496,7 @@ namespace Isis {
           string msg = "Cannot read file [" + p_inFile + "]. Position [" +
                        Isis::iString((int)pos) + "]. Byte count [" +
                        Isis::iString(p_fileHeaderBytes) + "]" ;
-          throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+          throw iException::Message(iException::Io, msg, _FILEINFO_);
         }
 
       } // End band loop
@@ -1497,7 +1518,7 @@ namespace Isis {
         string msg = "Cannot read file [" + p_inFile + "]. Position [" +
                      Isis::iString((int)pos) + "]. Byte count [" +
                      Isis::iString(p_fileTrailerBytes) + "]" ;
-        throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+        throw iException::Message(iException::Io, msg, _FILEINFO_);
       }
 
     }
@@ -1538,7 +1559,7 @@ namespace Isis {
     fin.open(inFilename.c_str(), ios::in | ios::binary);
     if(!fin.is_open()) {
       string msg = "Cannot open input file [" + p_inFile + "]";
-      throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+      throw iException::Message(iException::Io, msg, _FILEINFO_);
     }
 
     // Handle the file header
@@ -1556,7 +1577,7 @@ namespace Isis {
       string msg = "Cannot read file [" + p_inFile + "]. Position [" +
                    Isis::iString((int)pos) + "]. Byte count [" +
                    Isis::iString(p_fileHeaderBytes) + "]" ;
-      throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+      throw iException::Message(iException::Io, msg, _FILEINFO_);
     }
 
     // Construct a line buffer manager
@@ -1580,7 +1601,7 @@ namespace Isis {
         string msg = "Cannot read file [" + p_inFile + "]. Position [" +
                      Isis::iString((int)pos) + "]. Byte count [" +
                      Isis::iString(p_dataHeaderBytes) + "]" ;
-        throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+        throw iException::Message(iException::Io, msg, _FILEINFO_);
       }
 
       // Space for storing prefix and suffix data pointers
@@ -1602,7 +1623,7 @@ namespace Isis {
         string msg = "Cannot read file [" + p_inFile + "]. Position [" +
                      Isis::iString((int)pos) + "]. Byte count [" +
                      Isis::iString(p_dataPreBytes) + "]" ;
-        throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+        throw iException::Message(iException::Io, msg, _FILEINFO_);
       }
 
       // Get a line of data from the input file
@@ -1612,7 +1633,7 @@ namespace Isis {
         string msg = "Cannot read file [" + p_inFile + "]. Position [" +
                      Isis::iString((int)pos) + "]. Byte count [" +
                      Isis::iString(readBytes) + "]" ;
-        throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+        throw iException::Message(iException::Io, msg, _FILEINFO_);
       }
 
       // Loop for each band
@@ -1637,13 +1658,14 @@ namespace Isis {
               (*out)[osamp] = (double)((unsigned char *)in)[samp];
               break;
             case Isis::UnsignedWord:
-              (*out)[osamp] = (double)swapper.UnsignedShortInt((unsigned short int *)in + samp);
+              (*out)[osamp] = 
+                (double)swapper.UnsignedShortInt((unsigned short int *)in+samp);
               break;
             case Isis::SignedWord:
-              (*out)[osamp] = (double)swapper.ShortInt((short int *)in + samp);
+              (*out)[osamp] = (double)swapper.ShortInt((short int *)in+samp);
               break;
             case Isis::Real:
-              (*out)[osamp] = (double)swapper.Float((float *)in + samp);
+              (*out)[osamp] = (double)swapper.Float((float *)in+samp);
               break;
             default:
               break;
@@ -1682,7 +1704,7 @@ namespace Isis {
           string msg = "Cannot read file [" + p_inFile + "]. Position [" +
                        Isis::iString((int)pos) + "]. Byte count [" +
                        Isis::iString(p_dataPreBytes) + "]" ;
-          throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+          throw iException::Message(iException::Io, msg, _FILEINFO_);
         }
 
 
@@ -1703,7 +1725,7 @@ namespace Isis {
           string msg = "Cannot read file [" + p_inFile + "]. Position [" +
                        Isis::iString((int)pos) + "]. Byte count [" +
                        Isis::iString(p_fileHeaderBytes) + "]" ;
-          throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+          throw iException::Message(iException::Io, msg, _FILEINFO_);
         }
 
       } // End band loop
@@ -1727,7 +1749,7 @@ namespace Isis {
         string msg = "Cannot read file [" + p_inFile + "]. Position [" +
                      Isis::iString((int)pos) + "]. Byte count [" +
                      Isis::iString(p_fileTrailerBytes) + "]" ;
-        throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+        throw iException::Message(iException::Io, msg, _FILEINFO_);
       }
 
     }
@@ -1773,7 +1795,8 @@ namespace Isis {
     int sizeofpixel = Isis::SizeOf(p_pixelType);
     int startsamp = p_dataPreBytes / sizeofpixel;
     int endsamp = startsamp + p_ns;
-    int readBytes = sizeofpixel * p_ns * p_nb + p_dataPreBytes + p_dataPostBytes;
+    int readBytes = sizeofpixel * p_ns * p_nb 
+                    + p_dataPreBytes + p_dataPostBytes;
     char **in = new char* [p_nb];
     for(int i = 0; i < p_nb; i++) {
       in[i] = new char [readBytes];
@@ -1863,7 +1886,8 @@ namespace Isis {
         // Handle any line suffix bytes
         if(p_saveDataPost) {
           tempPost.push_back(new char[p_dataPostBytes]);
-          memcpy(&tempPost[0], &in[band][p_dataPreBytes+p_ns*sizeofpixel], p_dataPostBytes);
+          memcpy(&tempPost[0], &in[band][p_dataPreBytes+p_ns*sizeofpixel], 
+                 p_dataPostBytes);
         }
 
         // Save off the prefix bytes vector
@@ -1891,8 +1915,8 @@ namespace Isis {
 #if 0
 
   /**
-   * Adds a label to the Cube section of the existing cube label using a supplied
-   * Pvl
+   * Adds a label to the Cube section of the existing cube label using a
+   * supplied Pvl
    *
    * @param label The Pvl containing the label to be added.
    */
@@ -1908,7 +1932,8 @@ namespace Isis {
   /**
    * Adds an ImportLabel to the output cube using a supplied Pvl
    *
-   * @param importlab The Pvl containing the original labels from the import file.
+   * @param importlab The Pvl containing the original labels from the import
+   * file.
    */
   void ProcessImport::AddImportLabel(Isis::Pvl &importLab) {
 
@@ -1923,8 +1948,8 @@ namespace Isis {
 
 
   /**
-   * Sets the name of the input file to be read in the import StartProcess method
-   * and verifies its existance.
+   * Sets the name of the input file to be read in the import StartProcess 
+   * method and verifies its existance.
    *
    * @param file The name of the input file to import.
    *
@@ -1934,7 +1959,7 @@ namespace Isis {
     p_inFile = file;
     if(!Isis::Filename(file).Exists()) {
       string msg = "File [" + file + "] does not exist";
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      throw iException::Message(iException::User, msg, _FILEINFO_);
     }
   }
 }
