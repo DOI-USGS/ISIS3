@@ -25,6 +25,11 @@
 
 #include <string>
 #include <vector>
+#include <gsl/gsl_errno.h>
+#include <gsl/gsl_math.h>
+#include <gsl/gsl_min.h>
+
+#define GOLD  1.618034
 
 namespace Isis {
   class Pvl;
@@ -39,10 +44,12 @@ namespace Isis {
    *                      use by MoonAlbedo normalization.
    *  @history 2008-06-18 Steven Koechle - Fixed Documentation Errors
    *  @history 2008-07-09 Steven Lambright - Fixed unit test
+   *  @history 2011-08-19 Sharmila Prasad - Implemented r8mnbrak and GSL's r8brent Functions
    */
   class Photometry {
     public:
       Photometry(Pvl &pvl);
+      Photometry() {};
       virtual ~Photometry();
 
       //! Calculate the surface brightness
@@ -55,6 +62,24 @@ namespace Isis {
       //! Set the wavelength
       virtual void SetPhotomWl(double wl);
 
+      /**
+       * Double precision version of MNBRAK, 
+       * Solution bracketing for 1-D minimization routine.
+       * 
+       * @author Sharmila Prasad (8/20/2011)
+       * 
+       * @param x_lower - lower starting interval 
+       * @param x_upper - upper starting interval
+       * 
+       * @return double - starting minimum
+       */
+      static double r8mnbrak(double x_lower, double x_upper) {
+        return (x_upper + GOLD * (x_upper - x_lower));
+      }
+
+      //! Brent's method 1-D minimization routine using GSL's r8Brent minimization Algorithm
+      static int r8brent(double x_lower, double x_upper, gsl_function *Func, double & x_minimum);
+      
     protected:
       AtmosModel *p_phtAmodel;
       PhotoModel *p_phtPmodel;

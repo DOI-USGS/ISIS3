@@ -88,4 +88,60 @@ namespace Isis {
     p_phtNmodel->CalcNrmAlbedo(pha, inc, ema, deminc, demema, dn, albedo, mult, base);
     return;
   }
+  
+  /**
+   * The Brent minimization algorithm combines a parabolic interpolation with the golden section algorithm.
+   * This produces a fast algorithm which is still robust. The outline of the algorithm can be summarized as 
+   * follows: on each iteration Brent's method approximates the function using an interpolating parabola 
+   * through three existing points. The minimum of the parabola is taken as a guess for the minimum. 
+   * If it lies within the bounds of the current interval then the interpolating point is accepted, 
+   * and used to generate a smaller interval. If the interpolating point is not accepted then the 
+   * algorithm falls back to an ordinary golden section step. The full details of Brent's method 
+   * include some additional checks to improve convergence. 
+   * 
+   * @author Sharmila Prasad (8/15/2011)
+   * 
+   * @param x_lower - x_lower interval
+   * @param x_upper - x_upper interval
+   * @param Func - gsl_function, high-level driver for the algorithm 
+   *               Continuous function of one variable for the minimizers to operate on
+   * @param x_minimum - x_minimum calculated parabola min value
+   * @return double - status
+   */
+  int Photometry::r8brent(double x_lower, double x_upper, gsl_function *Func, double & x_minimum){
+    int status;
+    int iter=0, max_iter=100;
+    
+    const gsl_min_fminimizer_type *T;
+    gsl_min_fminimizer *s;
+    //double m_expected = M_PI;
+    
+    T = gsl_min_fminimizer_brent;
+    s = gsl_min_fminimizer_alloc(T);
+
+    // This function sets, or resets, an existing minimizer s to use the function Func and 
+    // the initial search interval [x_lower, x_upper], with a guess for the location of 
+    // the minimum x_minimum. If the interval given does not contain a minimum, then 
+    // the function returns an error code of GSL_EINVAL.
+    gsl_min_fminimizer_set(s, Func, x_minimum, x_lower, x_upper);
+    
+    do {
+      iter++;
+      status    = gsl_min_fminimizer_iterate(s);
+      x_minimum = gsl_min_fminimizer_x_minimum(s);
+      x_lower   = gsl_min_fminimizer_x_lower(s);
+      x_upper   = gsl_min_fminimizer_x_upper(s);
+      
+      status = gsl_min_test_interval(x_lower, x_upper, 0.001, 0.0);
+      
+      if(status == GSL_SUCCESS) {
+        cerr << "Converged low=" << x_lower << " min=" << x_minimum << " upper=" << x_upper << endl;
+      }
+    } while(status == GSL_CONTINUE && iter < max_iter);
+
+    // This function frees all the memory associated with the minimizer s.
+    gsl_min_fminimizer_free(s);
+    
+    return status;
+  }
 }

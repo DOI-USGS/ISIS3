@@ -6,7 +6,15 @@
 #include "iException.h"
 #include "Preference.h"
 
+#include </usr/include/gsl/gsl_errno.h>
+#include </usr/include/gsl/gsl_math.h>
+#include </usr/include/gsl/gsl_min.h>
+
+
 using namespace Isis;
+
+// Function f(x) = \cos(x) + 1 
+double fn1 (double x, void *params);
 
 int main() {
   Isis::Preference::Preferences(true);
@@ -155,6 +163,26 @@ int main() {
 //        std::endl;
     std::cout << "Photometric brightness value = " << albedo << std::endl <<
               std::endl;
+
+    std::cerr << "\n***** Testing One dimensional Minimizations using GSL's r8brent *****\n";
+    
+    gsl_function F;
+    
+    F.function = &fn1;
+    F.params = 0;
+  
+    double x_lower = 0, x_upper = 6;
+    std::cerr << "x_lower=" << x_lower << " x_upper = " << x_upper << "\n\n";
+    double x_minimum = 2;
+    std::cerr << "Without using r8mnbrak, Starting Minimum\nTest Minimum=" << x_minimum << "\n";
+    Photometry::r8brent(x_lower, x_upper, &F, x_minimum);
+    std::cerr << "r8brent's Converged Minimum = " << x_minimum << std::endl;
+    
+    std::cerr << "\nUsing r8mnbrak for Starting Minimum\n";
+    x_minimum = Photometry::r8mnbrak(x_lower, x_upper);
+    std::cerr << "r8mnbrk Minimum=" << x_minimum << "\n";
+    Photometry::r8brent(x_lower, x_upper, &F, x_minimum);
+    std::cerr << "r8brent's Converged Minimum = " << x_minimum << std::endl;
   }
   catch(iException &e) {
     e.Report(false);
@@ -162,3 +190,11 @@ int main() {
 
   return 0;
 }
+
+// Function f(x) = \cos(x) + 1
+// r8Brent's Minimization finds the minimum for this function
+double fn1 (double x, void *params) {
+  
+  return cos (x) + 1.0;
+}
+
