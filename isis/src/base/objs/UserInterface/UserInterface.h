@@ -44,71 +44,78 @@ namespace Isis {
    * @author 2002-05-29 Jeff Anderson
    *
    * @internal
-   *  @history 2002-10-25 Jeff Anderson - Command line mode was not fully
-   *                                      verifying the AML object. Invoked the
-   *                                      VerifyAll method after loading each of
-   *                                      the command line tokens.
-   *  @history 2003-02-07 Jeff Anderson - Modified constructor so that it will not
-   *                                      start the GUI if the program name is
-   *                                      unitTest.
-   *  @history 2003-02-12 Jeff Anderson - Strip off leading directory in front of
-   *                                      argv[0] so that unit tests run with
-   *                                      pathnames do not start the Isis Gui.
-   *  @history 2003-05-16 Stuart Sides - Modified schema from astrogeology...
-   *                                     isis.astrogeology...
-   *  @history 2003-12-16 Jeff Anderson - Added command line option -LAST and
-   *                                      -RESTORE=file.par
-   *  @history 2004-02-26 Jeff Anderson - Added command line option -HELP
-   *  @history 2004-02-26 Jeff Anderson - Modified to allow a parameter to appear
-   *                                      multiple times on the command line
-   *  @history 2004-02-29 Jeff Anderson - Added the -PID command line switch which
-   *                                      allows interprocess communication to
-   *                                      occur with the parent so that the
-   *                                      parents GUI can be properly updated.
-   *  @history 2005-02-22 Elizabeth Ribelin - Modified file to support Doxygen
-   *                                          documentation
-   *  @history 2005-10-03 Elizabeth Miller - changed @ingroup tag
-   *  @history 2005-12-21 Elizabeth Miller - Added command line options -BATCHLIST,
-   *                                         -SAVE, -ERRLIST, -ONERROR,
-   *                                         -PREFERENCE, and -PRINTFILE
-   *  @history 2006-01-23 Elizabeth Miller - Renamed -HELP to -WEBHELP and made it
-   *                                        accept abbreviations of reserve params
-   *  @history 2007-07-12 Steven Koechle - Added -NOGUI flag
-   *  @history 2007-10-04 Steven Koechle - Added -info flag. Debugging option to
-   *                                    create a log of system info.
-   *  @history 2008-02-22 Steven Koechle - Modified batchlist to take tab,
-   *                                      command, and space characters as
-   *                                      delimiters but also allow special cases
-   *                                      like tab, as a single delimiter leaves
-   *                                      quoted strings alone.
-   *  @history 2008-04-16 Steven Lambright - Moved parameter verification call
-   *  @history 2008-06-06 Steven Lambright - Changed corrupt history file message
-   *  @history 2008-06-18 Steven Lambright - Fixed documentation
-   *  @history 2008-09-23 Christopher Austin - Added a try/catch to SaveHistory(),
-   *                                      where if the history file is corrupt, it
-   *                                      simply overwrites it with the new single
-   *                                      valid entry.
-   *  @history 2008-01-07 Steven Lambright - Changed unit test and error on
-   *           invalid parameter history files to conform with a Filename class
-   *           change where Expanded(...) always returns a full path.
-   *  @history 2009-08-17 Steven Lambright - Parameters are now more correctly
-   *           interpretted from argv resulting in fewer escape characters and
-   *           problems such as "  " (2 spaces) being interpretted properly. Array
-   *           parameter values support improved.
-   *  @history 2009-11-19 Kris Becker - Made argc pass by reference since Qt's
-   *           QApplication/QCoreApplication requires it
-   *  @history 2010-03-26 Sharmila Prasad - Remove the restriction of the number of
-   *           columns in the batchlist file to 10.
-   *  @history 2010-05-28 Steven Lambright - History fails silently now
-   *  @history 2010-07-20 Steven Lambright - Array format on the command line is
-   *           more tolerant to white space now.
-   *  @history 2010-07-28 Steven Lambright - Fixed complicated escape sequence
-   *           cases on array format parsing that have existed for a while now
-   *  @history 2010-07-28 Christopher Austin - Fixed a -LAST issue causing IsisAml
-   *                                           to throw an incorrect exception.
-   *  @history 2010-10-28 Mackenzie Boyd - Modified error messages in LoadHistory()
-   *  @todo 2005-02-22 Jeff Anderson - add coded and implementation examples to
-   *                                   class documentation
+   *   @history 2002-10-25 Jeff Anderson - Command line mode was not fully
+   *                           verifying the AML object. Invoked the VerifyAll
+   *                           method after loading each of the command line
+   *                           tokens.
+   *   @history 2003-02-07 Jeff Anderson - Modified constructor so that it will
+   *                           not start the GUI if the program name is
+   *                           unitTest.
+   *   @history 2003-02-12 Jeff Anderson - Strip off leading directory in front
+   *                           of argv[0] so that unit tests run with
+   *                           pathnames do not start the Isis Gui.
+   *   @history 2003-05-16 Stuart Sides - Modified schema from astrogeology...
+   *                           isis.astrogeology...
+   *   @history 2003-12-16 Jeff Anderson - Added command line option -LAST and
+   *                           RESTORE=file.par
+   *   @history 2004-02-26 Jeff Anderson - Added command line option -HELP
+   *   @history 2004-02-26 Jeff Anderson - Modified to allow a parameter to
+   *                           appear multiple times on the command line
+   *   @history 2004-02-29 Jeff Anderson - Added the -PID command line switch
+   *                           which allows interprocess communication to
+   *                           occur with the parent so that the parents GUI can
+   *                           be properly updated.
+   *   @history 2005-02-22 Elizabeth Ribelin - Modified file to support Doxygen
+   *                           documentation
+   *   @history 2005-10-03 Elizabeth Miller - changed @ingroup tag
+   *   @history 2005-12-21 Elizabeth Miller - Added command line options
+   *                           -BATCHLIST, -SAVE, -ERRLIST, -ONERROR, 
+   *                           -PREFERENCE, and -PRINTFILE
+   *   @history 2006-01-23 Elizabeth Miller - Renamed -HELP to -WEBHELP and made
+   *                           it accept abbreviations of reserve params
+   *   @history 2007-07-12 Steven Koechle - Added -NOGUI flag
+   *   @history 2007-10-04 Steven Koechle - Added -info flag. Debugging option
+   *                           to create a log of system info.
+   *   @history 2008-02-22 Steven Koechle - Modified batchlist to take tab,
+   *                           command, and space characters as delimiters but
+   *                           also allow special cases like tab, as a single
+   *                           delimiter leaves quoted strings alone.
+   *   @history 2008-04-16 Steven Lambright - Moved parameter verification call
+   *   @history 2008-06-06 Steven Lambright - Changed corrupt history file
+   *                           message
+   *   @history 2008-06-18 Steven Lambright - Fixed documentation
+   *   @history 2008-09-23 Christopher Austin - Added a try/catch to
+   *                           SaveHistory(), where if the history file is
+   *                           corrupt, it simply overwrites it with the new
+   *                           single valid entry.
+   *   @history 2008-01-07 Steven Lambright - Changed unit test and error on
+   *                           invalid parameter history files to conform with a
+   *                           Filename class change where Expanded(...) always
+   *                           returns a full path.
+   *   @history 2009-08-17 Steven Lambright - Parameters are now more correctly
+   *                           interpretted from argv resulting in fewer escape
+   *                           characters and problems such as "  " (2 spaces)
+   *                           being interpretted properly. Array parameter
+   *                           values support improved.
+   *   @history 2009-11-19 Kris Becker - Made argc pass by reference since Qt's
+   *                           QApplication/QCoreApplication requires it
+   *   @history 2010-03-26 Sharmila Prasad - Remove the restriction of the
+   *                           number of columns in the batchlist file to 10.
+   *   @history 2010-05-28 Steven Lambright - History fails silently now
+   *   @history 2010-07-20 Steven Lambright - Array format on the command line
+   *                           is more tolerant to white space now.
+   *   @history 2010-07-28 Steven Lambright - Fixed complicated escape sequence
+   *                           cases on array format parsing that have existed
+   *                           for a while now
+   *   @history 2010-07-28 Christopher Austin - Fixed a -LAST issue causing
+   *                           IsisAml to throw an incorrect exception.
+   *   @history 2010-10-28 Mackenzie Boyd - Modified error messages in
+   *                           LoadHistory()\
+   *   @history 2011-08-19 Jeannie Backer - Modified unitTest to use
+   *                           $temporary variable instead of /tmp directory.
+   *  
+   *   @todo 2005-02-22 Jeff Anderson - add coded and implementation examples to
+   *                       class documentation
    *
    */
 
@@ -127,7 +134,7 @@ namespace Isis {
       };
 
       /**
-       * return the Gui
+       * @return the Gui
        */
       Gui *TheGui() {
         return p_gui;
@@ -171,8 +178,8 @@ namespace Isis {
       std::string GetInfoFileName();
 
     private:
-      std::vector<char *> p_cmdline; /**<This variable will contain argv.*/
-      int p_parentId;               /**<This is a status to indicate if the GUI
+      std::vector<char *> p_cmdline; /**< This variable will contain argv.*/
+      int p_parentId;               /**< This is a status to indicate if the GUI
                                         is running or not.*/
 
       void LoadCommandLine(int argc, char *argv[]);
@@ -185,8 +192,8 @@ namespace Isis {
 
       //! Boolean value representing whether to abort or continue on error
       bool p_abortOnError;
-      std::string p_saveFile;        //!<Filename to save last history to
-      std::string p_progName;        //!<Name of program to run
+      std::string p_saveFile;        //!< Filename to save last history to
+      std::string p_progName;        //!< Name of program to run
 
       //!Filename to write batchlist line that caused error on
       std::string p_errList;
@@ -194,11 +201,11 @@ namespace Isis {
       //!Vector of batchlist data
       std::vector<std::vector<std::string> > p_batchList;
 
-      bool p_interactive;          /**<Boolean value representing whether the
-                                       program is interactive or not.*/
-      bool p_info;                 //!<Boolean value representing if its in debug mode.
-      std::string p_infoFileName;  //!<Filename to save debugging info
-      Gui *p_gui;                 //!<Pointer to the gui object
+      bool p_interactive;  /**< Boolean value representing whether the
+                                program is interactive or not.*/
+      bool p_info;  //!< Boolean value representing if its in debug mode.
+      std::string p_infoFileName;  //!< Filename to save debugging info
+      Gui *p_gui;                  //!< Pointer to the gui object
   };
 };
 

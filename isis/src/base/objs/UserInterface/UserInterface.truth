@@ -11,7 +11,7 @@ GUI:     0
 
 Testing No Arguments (Defaults)
 FROM:    /ISISROOT/testData/base/isisTruth.cub
-TO:      /tmp/junk.dat
+TO:      $temporary/junk.dat
 GUI:     0
 
 Testing Basic Array Argument

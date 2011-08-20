@@ -1038,7 +1038,9 @@ namespace Isis {
 
   /**
    * This method returns the flag state of info. This returns if
-   * its in debugging mode(the -info tag was specified).
+   * its in debugging mode(the -info tag was specified). 
+   *  
+   * @return @b bool Flag state on info. 
    */
   bool UserInterface::GetInfoFlag() {
     return p_info;
@@ -1046,7 +1048,9 @@ namespace Isis {
 
   /**
    * This method returns the filename where the debugging info is
-   * stored when the "-info" tag is used.
+   * stored when the "-info" tag is used. 
+   *  
+   * @return @b string Name of file containing debugging ingo. 
    */
   std::string UserInterface::GetInfoFileName() {
     return p_infoFileName;

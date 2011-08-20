@@ -19,6 +19,9 @@
     <change name="Stuart Sides" date="2003-05-16">
       Modified schema from astrogeology... isis.astrogeology...
     </change>
+    <change name="Jeannie Backer" date="2011-08-19">
+      Replaced test cube path /tmp/... with $temporary/...
+    </change>
   </history>
 
   <groups>
@@ -47,7 +50,7 @@
         <filter>
           *.cub
         </filter>
-        <default><item>/tmp/junk.dat</item></default>
+        <default><item>$temporary/junk.dat</item></default>
       </parameter>
     </group>
   </groups>
