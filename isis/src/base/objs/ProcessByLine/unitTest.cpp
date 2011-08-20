@@ -213,9 +213,9 @@ void IsisMain() {
 
 
   Isis::Cube cube;
-  cube.open("/tmp/isisProcessByLine_01");
+  cube.open("$temporary/isisProcessByLine_01");
   cube.close(true);
-  cube.open("/tmp/isisProcessByLine_02");
+  cube.open("$temporary/isisProcessByLine_02");
   cube.close(true);
 }
 
