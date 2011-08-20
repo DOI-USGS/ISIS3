@@ -95,7 +95,7 @@ void IsisMain() {
 
   delete trans;
   delete interp;
-  remove("/tmp/isisRubberSheet_01.cub");
+  remove("$temporary/isisRubberSheet_01.cub");
 }
 
 

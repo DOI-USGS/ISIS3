@@ -34,61 +34,65 @@ namespace Isis {
    * @brief Derivative of Process, designed for geometric transformations
    *
    * This is the processing class for geometric transformations of cube data.
-   * Objects of this class can be used to apply rubber sheet transformations from
-   * one space to another, such as converting from one map projection to another
-   * or from instrument space to ground space. Each pixel position in the output
-   * cube will be processed by querying a transformer to find what input pixel
-   * should be used and an interpolator to find the value of the pixel. Any
-   * application using this class must supply a Transform object and an
-   * Interpolator object. This class allows only one input cube and one output
-   * cube.
+   * Objects of this class can be used to apply rubber sheet transformations 
+   * from one space to another, such as converting from one map projection to 
+   * another or from instrument space to ground space. Each pixel position in 
+   * the output cube will be processed by querying a transformer to find what 
+   * input pixel should be used and an interpolator to find the value of the 
+   * pixel. Any application using this class must supply a Transform object and 
+   * an Interpolator object. This class allows only one input cube and one 
+   * output cube. 
    *
    * @ingroup HighLevelCubeIO
    *
    * @author 2002-10-22 Stuart Sides
    *
    * @internal
-   *  @history 2003-02-13 Stuart Sides - Created a unit test for the object.
-   *  @history 2003-03-31 Stuart Sides - Added false argument to IsisError.report
-   *                                     call in the unit test.
-   *  @history 2003-05-16 Stuart Sides - Modified schema from astrogeology...
-   *                                     isis.astrogeology...
-   *  @history 2003-05-28 Stuart Sides - Added a new member function to allow an
-   *                                     application to be notified when the
-   *                                     current band number of the output cube
-   *                                     changes (BandChange).
-   *  @history 2003-10-23 Jeff Anderson - Modified StartProcess method to use a
-   *                                      quadtree mechanism to speed processing
-   *                                      of cubes. Essentially it generates an
-   *                                      internalized file
-   *  @history 2004-03-09 Stuart Sides - Modified quadtree mechanism to not give
-   *                                     up on a quad unless none of the edge
-   *                                     pixels transform. This needs to be
-   *                                     refined even more.
-   *  @history 2005-02-11 Elizabeth Ribelin - Modified file to support Doxygen
-   *                                          documentation
-   *  @history 2006-03-28 Tracie Sucharski - Modified the StartProcess to
-   *                                         process multi-band cubes using the
-   *                                         same tile map if there is no Band
-   *                                         dependent function.
-   *  @history 2006-04-04 Tracie Sucharski - Added ForceTile method and two
-   *                                         private variables to hold the
-   *                                         sample/line of the input cube position
-   *                                         which will force tile containing that
-   *                                         position to be processed in ProcessQuad
-   *                                         even if all 4 corners of tile are bad.
-   *  @history 2008-09-10 Steven Lambright - Made tiling start and end sizes
-   *           variable
-   *  @history 2009-05-21 Steven Lambright - A tiling hint starting at 2 will now
-   *           automatically jump to doing a SlowGeom instead of not working/being
-   *           a valid option. This fixes 2-line push frame cameras.
-   *  @history 2008-10-30 Steven Lambright - Fixed problem with definition
-   *            of class Quad, pointed out by "novus0x2a" (Support Board Member)
-   *  @todo 2005-02-11 Stuart Sides - finish documentation and add coded and
-   *                                 implementation example to class documentation
-   *  @history 2009-06-05 Steven Lambright - Added TestLine(...) method and made the checking
-   *             for inserting a null tile more strict (checks the outline of a 2x2 box instead
-   *             of just the outline of the quad).
+   *   @history 2003-02-13 Stuart Sides - Created a unit test for the object.
+   *   @history 2003-03-31 Stuart Sides - Added false argument to
+   *                           IsisError.report call in the unit test.
+   *   @history 2003-05-16 Stuart Sides - Modified schema from astrogeology...
+   *                           isis.astrogeology...
+   *   @history 2003-05-28 Stuart Sides - Added a new member function to allow
+   *                           an application to be notified when the current
+   *                           band number of the output cube changes
+   *                           (BandChange).
+   *   @history 2003-10-23 Jeff Anderson - Modified StartProcess method to use a
+   *                           quadtree mechanism to speed processing of cubes.
+   *                           Essentially it generates an internalized file
+   *   @history 2004-03-09 Stuart Sides - Modified quadtree mechanism to not
+   *                           give up on a quad unless none of the edge pixels
+   *                           transform. This needs to be refined even more.
+   *   @history 2005-02-11 Elizabeth Ribelin - Modified file to support Doxygen
+   *                           documentation
+   *   @history 2006-03-28 Tracie Sucharski - Modified the StartProcess to
+   *                           process multi-band cubes using the same tile map
+   *                           if there is no Band dependent function.
+   *   @history 2006-04-04 Tracie Sucharski - Added ForceTile method and two
+   *                           private variables to hold the sample/line of the
+   *                           input cube position which will force tile
+   *                           containing that position to be processed in
+   *                           ProcessQuad even if all 4 corners of tile are
+   *                           bad.
+   *   @history 2008-09-10 Steven Lambright - Made tiling start and end sizes
+   *                           variable
+   *   @history 2009-05-21 Steven Lambright - A tiling hint starting at 2 will
+   *                           now automatically jump to doing a SlowGeom
+   *                           instead of not working/being a valid option. This
+   *                           fixes 2-line push frame cameras.
+   *   @history 2008-10-30 Steven Lambright - Fixed problem with definition
+   *                           of class Quad, pointed out by "novus0x2a"
+   *                           (Support Board Member)
+   *   @history 2009-06-05 Steven Lambright - Added TestLine(...) method and
+   *                           made the checking for inserting a null tile more
+   *                           strict (checks the outline of a 2x2 box instead
+   *                           of just the outline of the quad).
+   *   @history 2011-08-19 Jeannie Backer - Modified unitTest to use
+   *                            $temporary variable instead of /tmp directory.
+   *  
+   *  
+   *   @todo 2005-02-11 Stuart Sides - finish documentation and add coded and
+   *                        implementation example to class documentation
    */
 
   class ProcessRubberSheet : public Isis::Process {
@@ -117,11 +121,12 @@ namespace Isis {
       }
 
       /**
-       * This sets the start and end tile sizes for the rubber sheet; numbers are
-       * inclusive and must be powers of 2.
+       * This sets the start and end tile sizes for the rubber sheet; numbers 
+       * are inclusive and must be powers of 2.
        *
        * @param start Start position; must be at least 4 and a power of 2
-       * @param end End position; must be at least 4, a power of 2 and less than start
+       * @param end End position; must be at least 4, a power of 2 and less than 
+       *          start
        */
       void SetTiling(int start, int end) {
         p_startQuadSize = start;
@@ -129,14 +134,19 @@ namespace Isis {
       }
 
     private:
+
+      /** 
+       *  
+       *  
+       */
       class Quad {
         public:
-          int slineTile;
-          int ssampTile;
-          int sline;
-          int ssamp;
-          int eline;
-          int esamp;
+          int slineTile; //!< 
+          int ssampTile; //!< 
+          int sline;     //!< 
+          int ssamp;     //!< 
+          int eline;     //!< 
+          int esamp;     //!< 
       };
 
       void ProcessQuad(std::vector<Quad *> &quadTree, Isis::Transform &trans,
@@ -145,7 +155,8 @@ namespace Isis {
 
       void SplitQuad(std::vector<Quad *> &quadTree);
       void SlowQuad(std::vector<Quad *> &quadTree, Isis::Transform &trans,
-                    std::vector< std::vector<double> > &lineMap, std::vector< std::vector<double> > &sampMap);
+                    std::vector< std::vector<double> > &lineMap, 
+                    std::vector< std::vector<double> > &sampMap);
       double Det4x4(double m[4][4]);
       double Det3x3(double m[3][3]);
 
@@ -156,18 +167,19 @@ namespace Isis {
                     Isis::Transform &trans, Isis::Interpolator &interp,
                     bool useLastTileMap);
 
-      bool TestLine(Isis::Transform &trans, int ssamp, int esamp, int sline, int eline, int increment);
+      bool TestLine(Isis::Transform &trans, int ssamp, int esamp, int sline, 
+                    int eline, int increment);
 
       void (*p_bandChangeFunct)(const int band);
 
-      std::vector< std::vector<double> > p_sampMap;
-      std::vector< std::vector<double> > p_lineMap;
+      std::vector< std::vector<double> > p_sampMap; //!< 
+      std::vector< std::vector<double> > p_lineMap; //!< 
 
-      double p_forceSamp;
-      double p_forceLine;
+      double p_forceSamp; //!< 
+      double p_forceLine; //!< 
 
-      int p_startQuadSize;
-      int p_endQuadSize;
+      int p_startQuadSize; //!< 
+      int p_endQuadSize;   //!< 
   };
 };
 
