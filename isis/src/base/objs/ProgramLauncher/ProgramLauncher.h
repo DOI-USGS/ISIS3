@@ -36,6 +36,9 @@ namespace Isis {
    *
    * @internal
    *   @history 2010-12-03 Steven Lambright - Original version
+   *   @history 2011-08-19 Jeannie Backer - Modified unitTest to use
+   *                           $temporary variable instead of
+   *                           /tmp directory.
    */
   class ProgramLauncher {
     public:
