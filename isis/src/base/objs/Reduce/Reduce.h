@@ -22,17 +22,22 @@ namespace Isis {
    * @author 1995-11-06 Jeff Anderson
    *
    * @internal
-   *  @history 2011-04-15 Sharmila Prasad - Ported the class from "reduce" app
-   *                                        to base object class.
-   *  @history 2011-05-10 Sharmila Prasad - Fixed error while setting input bands and
-   *                            moved static members to data members in Average class.
-   *  @history 2011-05-11 Sharmila Prasad - Use Portal instead of LineMgr to read Line &
-   *                          added API setInputBoundary to reduce subarea of an image
+   *   @history 2011-04-15 Sharmila Prasad - Ported the class from "reduce"
+   *                           app to base object class.
+   *   @history 2011-05-10 Sharmila Prasad - Fixed error while setting input
+   *                           bands and moved static members to data members
+   *                           in Average class.
+   *   @history 2011-05-11 Sharmila Prasad - Use Portal instead of LineMgr to
+   *                           read Line & added API setInputBoundary to
+   *                           reduce subarea of an image
+   *   @history 2011-08-19 Jeannie Backer - Modified unitTest to use
+   *                           $temporary variable instead of /tmp directory.
    */
   class Reduce {
   public:
     //! Constructor
-    Reduce(Isis::Cube *pInCube, vector<string>psBands, const double sampleScale, const double lineScale);
+    Reduce(Isis::Cube *pInCube, vector<string>psBands, const double sampleScale,
+           const double lineScale);
     
     //! Destructor
     ~Reduce();
@@ -41,7 +46,8 @@ namespace Isis {
     Isis::PvlGroup  UpdateOutputLabel(Isis::Cube *pOutCube);
     
     //! Parameters to input image sub area
-    void setInputBoundary(int startSample, int endSample, int startLine, int endLine);
+    void setInputBoundary(int startSample, int endSample, 
+                          int startLine, int endLine);
     
     protected:
       Isis::Cube *mInCube;        //!< Input image

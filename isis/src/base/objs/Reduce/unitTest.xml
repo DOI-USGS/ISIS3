@@ -16,6 +16,9 @@
     <change name="Sharmila Prasad" date="2011-04-25">
       Original Version
     </change>
+    <change name="Jeannie Backer" date="2011-08-19">
+      Replaced test cube path /tmp/... with $temporary/...
+    </change>
   </history>
 
   <groups>
@@ -48,7 +51,7 @@
         <filter>
           *.cub
         </filter>
-        <default><item>/tmp/reduce_near.cub</item></default>
+        <default><item>$temporary/reduce_near.cub</item></default>
       </parameter>
 
       <parameter name="TO2">
@@ -64,7 +67,7 @@
         <filter>
           *.cub
         </filter>
-        <default><item>/tmp/reduce_avg.cub</item></default>
+        <default><item>$temporary/reduce_avg.cub</item></default>
       </parameter>
 
     </group>
