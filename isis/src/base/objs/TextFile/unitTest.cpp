@@ -419,7 +419,7 @@ int main(int argc, char *argv[]) {
 
   cout << "  a) Try to open non-existent file" << endl;
 
-  testFile = "/tmp/NoSuchDir/TextFile.tmp";
+  testFile = "$temporary/NoSuchDir/TextFile.tmp";
 
   try {
     Isis::TextFile f(testFile, "Input");
@@ -433,7 +433,7 @@ int main(int argc, char *argv[]) {
 
   cout << "  b) Try open as output to pre-existing file" << endl;
 
-  testFile = "$temporary/TextFile.tmp";//???
+  testFile = "$temporary/TextFile.tmp";
 
   try {
     Isis::TextFile f(testFile, "Output");
