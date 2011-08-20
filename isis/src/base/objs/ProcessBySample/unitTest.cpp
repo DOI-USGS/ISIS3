@@ -37,9 +37,9 @@ void IsisMain() {
   p.EndProcess();
 
   Isis::Cube cube;
-  cube.open("/tmp/isisProcessBySample_01");
+  cube.open("$temporary/isisProcessBySample_01");
   cube.close(true);
-  cube.open("/tmp/isisProcessBySample_02");
+  cube.open("$temporary/isisProcessBySample_02");
   cube.close(true);
 }
 
