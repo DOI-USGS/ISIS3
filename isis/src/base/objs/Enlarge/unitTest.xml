@@ -16,6 +16,9 @@
     <change name="Sharmila Prasad" date="2011-04-14">
       Original Version
     </change>
+    <change name="Jeannie Backer" date="2011-08-19">
+      Replaced test cube path /tmp/... with $temporary/...
+    </change>
   </history>
 
   <groups>
@@ -47,7 +50,7 @@
         <filter>
           *.cub
         </filter>
-        <default><item>/tmp/enlarged.cub</item></default>
+        <default><item>$temporary/enlarged.cub</item></default>
       </parameter>
     </group>
   </groups>

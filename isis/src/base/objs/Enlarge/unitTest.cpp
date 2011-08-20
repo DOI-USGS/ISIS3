@@ -36,7 +36,7 @@ void IsisMain() {
 
   delete trans;
   delete interp;
-  remove("/tmp/enlarged.cub");
+  remove("$temporary/enlarged.cub");
 }
 
 

@@ -1,25 +1,44 @@
+/**
+ * @file
+ *   Unless noted otherwise, the portions of Isis written by the USGS are
+ *   public domain. See individual third-party library and package descriptions
+ *   for intellectual property information, user agreements, and related
+ *   information.
+ *
+ *   Although Isis has been used by the USGS, no warranty, expressed or
+ *   implied, is made by the USGS as to the accuracy and functioning of such
+ *   software and related material nor shall the fact of distribution
+ *   constitute any such warranty, and no responsibility is assumed by the
+ *   USGS in connection therewith.
+ *
+ *   For additional information, launch
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
+ *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
+ *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
+ *   http://www.usgs.gov/privacy.html.
+ */
 #include "Enlarge.h"
 
+#include <cmath>
+
+#include "Cube.h"
 #include "iException.h"
 #include "PvlGroup.h"
 #include "SubArea.h"
 
-#include <cmath>
-
 using namespace std;
 
 namespace Isis {
+
   /**
-   * constructor
+   * Constructs an Enlarge object.
    * 
    * @param pInCube       - Input cube to be enlarged
    * @param sampleScale   - Sample scale
    * @param lineScale     - Line scale
-   * @param outputSamples - Number of output samples
-   * @param outputLines   - Number of output lines
    */
-  Enlarge::Enlarge(Isis::Cube *pInCube, const double sampleScale, const double lineScale) 
-  {
+  Enlarge::Enlarge(Cube *pInCube, const double sampleScale, 
+                   const double lineScale) {
     // Input Cube
     mInCube = pInCube;
   
@@ -49,8 +68,7 @@ namespace Isis {
    * @return bool 
    */
   bool Enlarge::Xform(double &inSample, double &inLine,
-                      const double outSample, const double outLine) 
-  {
+                      const double outSample, const double outLine) {
     inSample = (outSample - 0.5) / mdSampleScale + 0.5 + (mdStartSample - 1);
     inLine   = (outLine - 0.5) / mdLineScale + 0.5 + (mdStartLine - 1);
     
@@ -69,12 +87,11 @@ namespace Isis {
    * @param pdEndLine     - Input end line
    */
   void Enlarge::SetInputArea(double pdStartSample, double pdEndSample, 
-                             double pdStartLine, double pdEndLine)
-  {
+                             double pdStartLine, double pdEndLine) {
     // Check for the right image dimensions
     if (pdStartSample > pdEndSample || pdStartLine > pdEndLine) {
       string sErrMsg = "Error in Input Area Dimesions";
-      throw Isis::iException::Message(Isis::iException::Programmer, sErrMsg, _FILEINFO_); 
+      throw iException::Message(iException::Programmer, sErrMsg, _FILEINFO_); 
     }
     
     if (pdStartSample >= 1) {
@@ -98,14 +115,16 @@ namespace Isis {
    * Update the Mapping, Instrument, and AlphaCube groups in the output
    * cube label
    * 
-   * @param pOutCube  - Resulting enlarged output cube
-   * @param pResultsGrp - This is the Results group that will go into the application
-   *                 log file. This group must be created by the calling application.
-   *                 Information will be added to it if the Mapping or Instrument
-   *                 groups are deleted from the output image label
+   * @param pOutCube  - Resulting enlarged output cube 
+   *  
+   * @return @b PvlGroup - This is the Results group that 
+   *                 will go into the application log file. This group
+   *                 must be created by the calling application.
+   *                 Information will be added to it if the Mapping or
+   *                 Instrument groups are deleted from the output
+   *                 image label
    */
-  Isis::PvlGroup Enlarge::UpdateOutputLabel(Isis::Cube *pOutCube)
-  {
+  PvlGroup Enlarge::UpdateOutputLabel(Cube *pOutCube) {
     int iNumSamples= mInCube->getSampleCount();
     int iNumLines  = mInCube->getLineCount();
     // Construct a label with the results
@@ -125,7 +144,7 @@ namespace Isis {
     resultsGrp += PvlKeyword("OutputLines",     miOutputSamples);
     resultsGrp += PvlKeyword("OutputSamples",   miOutputLines);
   
-    Isis::SubArea subArea;
+    SubArea subArea;
     subArea.SetSubArea(mInCube->getLineCount(), mInCube->getSampleCount(), (int)mdStartLine, (int)mdStartSample, 
                        (int)mdEndLine, (int)mdEndSample, 1.0 / mdLineScale, 1.0 / mdSampleScale);
     subArea.UpdateLabel(mInCube, pOutCube, resultsGrp);
