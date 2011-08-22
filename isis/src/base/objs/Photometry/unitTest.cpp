@@ -6,11 +6,6 @@
 #include "iException.h"
 #include "Preference.h"
 
-#include </usr/include/gsl/gsl_errno.h>
-#include </usr/include/gsl/gsl_math.h>
-#include </usr/include/gsl/gsl_min.h>
-
-
 using namespace Isis;
 
 // Function f(x) = \cos(x) + 1 
