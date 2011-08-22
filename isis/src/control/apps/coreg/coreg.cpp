@@ -128,10 +128,12 @@ void IsisMain() {
   // Initialize control point network and set target name (only required
   // field)
   ControlNet cn;
-  PvlGroup inst = match.getGroup("Instrument");
-  PvlKeyword &targname = inst.FindKeyword("TargetName");
-  string targetname = targname;
-  cn.SetTarget(targetname);
+  if (match.hasGroup("Instrument")) {
+    PvlGroup inst = match.getGroup("Instrument");
+    PvlKeyword &targname = inst.FindKeyword("TargetName");
+    string targetname = targname;
+    cn.SetTarget(targetname);
+  }
 
   // Loop through grid of points and get statistics to compute
   // translation values
