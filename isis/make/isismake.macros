@@ -87,8 +87,6 @@ else
   AWK         ?= awk
 endif
 
-
-
 # set up HOST_OS
 testFile = $(wildcard /etc/SuSE-release)
 ifeq ($(testFile), /etc/SuSE-release)
@@ -111,6 +109,9 @@ else
   endif
 endif
 
+ifeq ($(HOST_OS),Ubuntu10_04)
+  XALAN := xalan
+endif
 
 #---------------------------------------------------------------------------
 #  Set up ISIS versioning
