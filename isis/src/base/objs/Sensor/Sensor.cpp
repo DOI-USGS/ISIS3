@@ -37,6 +37,7 @@
 #include "Projection.h"
 #include "SpecialPixel.h"
 #include "SurfacePoint.h"
+#include "UniqueIOCachingAlgorithm.h"
 
 #define MAX(x,y) (((x) > (y)) ? (x) : (y))
 
@@ -79,6 +80,14 @@ namespace Isis {
     if(demCube != "") {
       p_hasElevationModel = true;
       p_demCube = CubeManager::Open(demCube);
+
+      // This caching algorithm works much better for DEMs than the default,
+      //   regional. This is because the uniqueIOCachingAlgorithm keeps track
+      //   of a history, which for something that isn't linearly processing a
+      //   cube is worth it. The regional caching algorithm tosses out results
+      //   from iteration 1 of setlookdirection (first algorithm) at iteration
+      //   4 and the next setimage has to re-read the data.
+      p_demCube->addCachingAlgorithm(new UniqueIOCachingAlgorithm(5));
       p_demProj = p_demCube->getProjection();
 
       p_interp = new Interpolator(Interpolator::BiLinearType);

@@ -158,6 +158,9 @@ namespace Isis {
    *                                      ownership of the DEM projection to
    *                                      the DEM cube which is owned by
    *                                      CubeManager.
+   *   @history 2011-08-22 Steven Lambright - The DEM cube now uses a
+   *                           UniqueIOCachingAlgorithm(5). This will probably
+   *                           behave better in all cases. Fixes #364
    */
   class Sensor : public Spice {
     public:
