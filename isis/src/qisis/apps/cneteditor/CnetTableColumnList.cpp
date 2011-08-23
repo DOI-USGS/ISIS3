@@ -21,7 +21,7 @@ namespace Isis
     nullify();
     
     cols = new QList< CnetTableColumn * >;
-    sortingOrder = new QList< CnetTableColumn const * >;
+    sortingOrder = new QList< CnetTableColumn * >;
   }
   
   
@@ -30,7 +30,7 @@ namespace Isis
     nullify();
     
     cols = new QList< CnetTableColumn * >(*other.cols);
-    sortingOrder = new QList< CnetTableColumn const * >(*other.sortingOrder);
+    sortingOrder = new QList< CnetTableColumn * >(*other.sortingOrder);
   }
 
 
@@ -44,18 +44,38 @@ namespace Isis
   }
   
   
-  CnetTableColumn *& CnetTableColumnList::operator[](int index)
+  CnetTableColumn * & CnetTableColumnList::operator[](int index)
   {
     checkIndexRange(index);
     
     return (*cols)[index];
   }
 
+
+  CnetTableColumn * & CnetTableColumnList::operator[](QString title)
+  {
+    for (int i = 0; i < cols->size(); i++)
+      if (cols->at(i)->getTitle() == title)
+        return (*cols)[i];
+      
+    iString msg = "There is no column with a title of [";
+    msg += iString(title);
+    msg += "] inside this column list";
+    throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+  }
+
   
   void CnetTableColumnList::append(CnetTableColumn * newCol)
   {
+    if (!newCol)
+    {
+      iString msg = "Attempted to add NULL column to the columnlist";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    }
+    
     cols->append(newCol);
     sortingOrder->append(newCol);
+    connect(newCol, SIGNAL(sortOutDated()), this, SIGNAL(sortOutDated()));
   }
   
   
@@ -83,7 +103,7 @@ namespace Isis
   }
   
   
-  void CnetTableColumnList::lower(CnetTableColumn const * col)
+  void CnetTableColumnList::lower(CnetTableColumn * col, bool emitSortOutDated)
   {
     int oldIndex = sortingOrder->indexOf(col);
     checkIndexRange(oldIndex);
@@ -94,16 +114,19 @@ namespace Isis
       sortingOrder->removeAt(oldIndex);
       sortingOrder->insert(oldIndex + 1, col);
     }
+    
+    if (emitSortOutDated)
+      emit sortOutDated();
   }
   
   
-  void CnetTableColumnList::lower(int visibleColumnIndex)
+  void CnetTableColumnList::lower(int visibleColumnIndex, bool emitSortOutDated)
   {
-    lower(indexOf(getVisibleColumns()[visibleColumnIndex]));
+    lower(indexOf(getVisibleColumns()[visibleColumnIndex]), emitSortOutDated);
   }
   
   
-  void CnetTableColumnList::raise(CnetTableColumn const * col)
+  void CnetTableColumnList::raise(CnetTableColumn * col, bool emitSortOutDated)
   {
     int oldIndex = sortingOrder->indexOf(col);
     checkIndexRange(oldIndex);
@@ -114,15 +137,33 @@ namespace Isis
       sortingOrder->removeAt(oldIndex);
       sortingOrder->insert(oldIndex - 1, col);
     }
+    
+    if (emitSortOutDated)
+      emit sortOutDated();
   }
   
   
-  void CnetTableColumnList::raise(int visibleColumnIndex)
+  void CnetTableColumnList::raise(int visibleColumnIndex, bool emitSortOutDated)
   {
-    raise(indexOf(getVisibleColumns()[visibleColumnIndex]));
+    raise(indexOf(getVisibleColumns()[visibleColumnIndex]), emitSortOutDated);
+  }
+  
+  
+  void CnetTableColumnList::raiseToTop(CnetTableColumn * col)
+  {
+    while (sortingOrder->at(0) != col)
+      raise(col, false);
+    
+    emit sortOutDated();
+  }
+  
+  
+  void CnetTableColumnList::raiseToTop(int visibleColumnIndex)
+  {
+    raiseToTop(indexOf(getVisibleColumns()[visibleColumnIndex]));
   }
 
-  
+
   int CnetTableColumnList::size() const
   {
     ASSERT(cols);
@@ -204,12 +245,36 @@ namespace Isis
   }
   
   
-  QList< CnetTableColumn const * > CnetTableColumnList::getSortingOrder() const
+  QList< CnetTableColumn * > CnetTableColumnList::getSortingOrder()
   {
     ASSERT(sortingOrder);
-    return *sortingOrder;
+    
+    QList< CnetTableColumn * > validSortingOrder;
+    for (int i = 0; i < sortingOrder->size(); i++)
+      if (sortingOrder->at(i)->getTitle().size())
+        validSortingOrder.append(sortingOrder->at(i));
+      
+    return validSortingOrder;
   }
   
+  
+  QStringList CnetTableColumnList::getSortingOrderAsStrings() const
+  {
+    QStringList sortingOrderStrings;
+    for (int i = 0; i < sortingOrder->size(); i++)
+      if (sortingOrder->at(i)->getTitle().size())
+        sortingOrderStrings.append(sortingOrder->at(i)->getTitle());
+    
+    return sortingOrderStrings;
+  }
+
+
+  void CnetTableColumnList::setSortingOrder(QStringList newOrder)
+  {
+    for (int i = newOrder.size() - 1; i >= 0; i--)
+      raiseToTop(operator[](newOrder[i]));
+  }
+
   
   void CnetTableColumnList::checkIndexRange(int index)
   {

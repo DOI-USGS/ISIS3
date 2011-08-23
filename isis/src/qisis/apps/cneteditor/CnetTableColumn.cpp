@@ -21,6 +21,7 @@ namespace Isis
     visible = true;
     readOnly = readOnlyStatus;
     affectsNetworkStructure = affectsNetStructure;
+    ascendingSortOrder = true;
   }
 
 
@@ -100,6 +101,19 @@ namespace Isis
   bool CnetTableColumn::hasNetworkStructureEffect() const
   {
     return affectsNetworkStructure;
+  }
+  
+  
+  bool CnetTableColumn::sortAscending() const
+  {
+    return ascendingSortOrder;
+  }
+  
+  
+  void CnetTableColumn::setSortAscending(bool ascending)
+  {
+    ascendingSortOrder = ascending;
+    emit sortOutDated();
   }
 
 

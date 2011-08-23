@@ -38,6 +38,7 @@ namespace Isis
       
     public slots:
       void handleTreeSelectionChanged(QList< AbstractTreeItem * >);
+      
 
     protected:
       virtual CnetTableColumnList * createColumns();

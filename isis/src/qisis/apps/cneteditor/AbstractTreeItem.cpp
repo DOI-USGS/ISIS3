@@ -17,6 +17,9 @@
 #include "CnetTableColumn.h"
 
 
+using std::cerr;
+
+
 namespace Isis
 {
   AbstractTreeItem::AbstractTreeItem(AbstractTreeItem * parent) : parentItem(
@@ -198,14 +201,16 @@ namespace Isis
 
   bool AbstractTreeItem::operator<(AbstractTreeItem const & other)
   {
-    // first get column
-    CnetTableColumn * col = NULL;
-    
     if (getPointerType() != other.getPointerType())
     {
       iString msg = "Tried to compare apples to oranges";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
+    
+    bool lessThan = false;
+    
+    // first get column
+    CnetTableColumn * col = NULL;
     
     QString data = getData(col->getTitle());
     QString otherData = other.getData(col->getTitle());
@@ -214,18 +219,35 @@ namespace Isis
     QDateTime dateTime = QDateTime::fromString(data, format);
     QDateTime otherDateTime = QDateTime::fromString(otherData, format);
     if (dateTime.isValid() && otherDateTime.isValid())
-      return dateTime < otherDateTime;
+    {
+      lessThan = dateTime < otherDateTime;
+    }
+    else
+    {
+      bool doubleDataOk, otherDoubleDataOk;
+      double doubleData = data.toDouble(&doubleDataOk);
+      double otherDoubleData = otherData.toDouble(&otherDoubleDataOk);
+      if (doubleDataOk && otherDoubleDataOk)
+      {
+        lessThan = doubleData < otherDoubleData;
+      }
+      else
+      {
+        if (doubleDataOk || otherDoubleDataOk)
+          lessThan = data.toLower() == "null";
+      }
+    }
     
-    bool doubleDataOk, otherDoubleDataOk;
-    double doubleData = data.toDouble(&doubleDataOk);
-    double otherDoubleData = otherData.toDouble(&otherDoubleDataOk);
-    if (doubleDataOk && otherDoubleDataOk)
-      return doubleData < otherDoubleData;
+    lessThan = data < otherData;
+    cerr << "col \"" << qPrintable(col->getTitle())
+         << "\" [" << col << "] ascending: " << col->sortAscending() << "\n";
+    if (!col->sortAscending())
+    {
+      cerr << "!col->sortAscending\n";
+      lessThan = !lessThan;
+    }
     
-    if (doubleDataOk || otherDoubleDataOk)
-      return data.toLower() == "null";
-    
-    return data < otherData;
+    return lessThan;
   }
 
 

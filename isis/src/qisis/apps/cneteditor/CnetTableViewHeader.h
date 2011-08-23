@@ -81,6 +81,11 @@ namespace Isis
       int totalCount;
 
       int clickedColumnEdge;
+      int clickedColumn;
+      
+      static int const SORT_ARROW_MARGIN = 10;
+      int ARROW_HEIGHT;
+      int ARROW_WIDTH;
   };
 }
 

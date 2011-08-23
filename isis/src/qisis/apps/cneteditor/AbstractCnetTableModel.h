@@ -33,15 +33,15 @@ namespace Isis
       virtual QList< AbstractTreeItem * > getItems(AbstractTreeItem *,
           AbstractTreeItem *) = 0;
       virtual QList< AbstractTreeItem * > getSelectedItems() = 0;
-      virtual bool isFiltering() const;
-      virtual bool isSortingEnabled() const;
-      virtual void setSortingEnabled(bool);
-      virtual CnetTableColumnList * getColumns();
       virtual int getVisibleRowCount() const = 0;
       virtual QString getWarningMessage(AbstractTreeItem const *,
           CnetTableColumn const *, QString valueToSave) const = 0;
       virtual int indexOfVisibleItem(AbstractTreeItem const * item) const = 0;
 
+      virtual bool isFiltering() const;
+      virtual bool sortingIsEnabled() const;
+      virtual void setSortingEnabled(bool);
+      virtual CnetTableColumnList * getColumns();
       virtual const AbstractCnetTableDelegate * getDelegate() const;
       
 
@@ -51,6 +51,7 @@ namespace Isis
       virtual void sort();
       virtual void reverseOrder(CnetTableColumn *);
       virtual void updateSort();
+      virtual void rebuildSort();
 
 
     signals:
@@ -69,9 +70,9 @@ namespace Isis
       virtual CnetTableColumnList * createColumns() = 0;
       TreeModel * getDataModel();
       const TreeModel * getDataModel() const;
-      virtual QList<AbstractTreeItem *> getSortedItems(int, int,
+      virtual QList< AbstractTreeItem * > getSortedItems(int, int,
           TreeModel::InterestingItems);
-      virtual QList<AbstractTreeItem *> getSortedItems(
+      virtual QList< AbstractTreeItem * > getSortedItems(
           AbstractTreeItem *, AbstractTreeItem *, TreeModel::InterestingItems);
       void handleTreeSelectionChanged(
           QList< AbstractTreeItem * > newlySelectedItems,
@@ -85,12 +86,12 @@ namespace Isis
 
     private:
       void nullify();
-
-
+      
+      
     private:
       TreeModel * dataModel;
       AbstractCnetTableDelegate * delegate;
-      QList<AbstractTreeItem *> * sortedRows;
+      QList< AbstractTreeItem * > * sortedItems;
       BusyLeafItem * busyItem;
       CnetTableColumnList * columns;
       bool sortingEnabled;

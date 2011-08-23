@@ -107,6 +107,12 @@ namespace Isis
 
     delete connectionTreeView;
     connectionTreeView = NULL;
+    
+    delete pointTableView;
+    pointTableView = NULL;
+    
+    delete measureTableView;
+    measureTableView = NULL;
 
     delete pointFilterWidget;
     pointFilterWidget = NULL;
@@ -338,14 +344,15 @@ namespace Isis
   void CnetEditorWidget::createPointTableView()
   {
     pointTableModel = new CnetPointTableModel(pointModel);
-    pointTableView = new CnetTableView(pointTableModel);
+    pointTableView = new CnetTableView(pointTableModel, *settingsPath,
+        "pointTableView");
     connect(pointTableView, SIGNAL(modelDataChanged()),
             this, SIGNAL(cnetModified()));
     
     connect(pointTreeView, SIGNAL(selectionChanged()),
-            pointTableView, SLOT(onModelSelectionChanged()));
+            pointTableView, SLOT(handleModelSelectionChanged()));
     connect(pointTableView, SIGNAL(selectionChanged()),
-            pointTreeView, SLOT(onModelSelectionChanged()));
+            pointTreeView, SLOT(handleModelSelectionChanged()));
     
     connect(pointTableView, SIGNAL(rebuildModels(QList<AbstractTreeItem *>)),
             this, SLOT(rebuildModels(QList<AbstractTreeItem *>)));
@@ -353,21 +360,22 @@ namespace Isis
     for (int i = 0; i < AbstractPointItem::COLS; i++)
     {
       QAction * act = new QAction(
-        AbstractPointItem::getColumnName((AbstractPointItem::Column) i), this);
+          AbstractPointItem::getColumnName((AbstractPointItem::Column) i), this);
       act->setCheckable(true);
       connect(act, SIGNAL(toggled(bool)), this, SLOT(pointColToggled()));
       pointTableView->getHorizontalHeader()->addAction(act);
     }
 
     pointTableView->getHorizontalHeader()->setContextMenuPolicy(
-      Qt::ActionsContextMenu);
+        Qt::ActionsContextMenu);
   }
 
 
   void CnetEditorWidget::createMeasureTableView()
   {
     measureTableModel = new CnetMeasureTableModel(pointModel);
-    measureTableView = new CnetTableView(measureTableModel);
+    measureTableView = new CnetTableView(measureTableModel, *settingsPath,
+        "measureTableView");
     ASSERT(pointTableView);
     connect(pointTableView,
             SIGNAL(tableSelectionChanged(QList< AbstractTreeItem * >)),
@@ -377,9 +385,9 @@ namespace Isis
     connect(measureTableView, SIGNAL(modelDataChanged()),
             this, SIGNAL(cnetModified()));
     connect(pointTreeView, SIGNAL(selectionChanged()),
-        measureTableView, SLOT(onModelSelectionChanged()));
+            measureTableView, SLOT(handleModelSelectionChanged()));
     connect(measureTableView, SIGNAL(selectionChanged()),
-        pointTreeView, SLOT(onModelSelectionChanged()));
+            pointTreeView, SLOT(handleModelSelectionChanged()));
     connect(measureTableView, SIGNAL(rebuildModels(QList<AbstractTreeItem *>)),
             this, SLOT(rebuildModels(QList<AbstractTreeItem *>)));
 
@@ -393,7 +401,7 @@ namespace Isis
     }
 
     measureTableView->getHorizontalHeader()->setContextMenuPolicy(
-      Qt::ActionsContextMenu);
+        Qt::ActionsContextMenu);
   }
 
 
@@ -694,21 +702,25 @@ namespace Isis
     topSplitter->restoreState(settings.value("topSplitter").toByteArray());
     mainSplitter->restoreState(settings.value("mainSplitter").toByteArray());
 
+    QString key;
+    
     QList< QAction * > actions =
-      measureTableView->getHorizontalHeader()->actions();
+        measureTableView->getHorizontalHeader()->actions();
     for (int i = 0; i < actions.size(); i++)
     {
-      actions[i]->setChecked(settings.value("measure table column: " +
-          AbstractMeasureItem::getColumnName((AbstractMeasureItem::Column) i),
-          true).toBool());
+      key = measureTableView->objectName() + " " +
+            AbstractMeasureItem::getColumnName((AbstractMeasureItem::Column) i);
+      key.replace(" ", "_");
+      actions[i]->setChecked(settings.value(key, true).toBool());
     }
 
     actions = pointTableView->getHorizontalHeader()->actions();
     for (int i = 0; i < actions.size(); i++)
     {
-      actions[i]->setChecked(settings.value("point table column: " +
-          AbstractPointItem::getColumnName((AbstractPointItem::Column) i),
-          true).toBool());
+      key = pointTableView->objectName() + " " +
+            AbstractPointItem::getColumnName((AbstractPointItem::Column) i);
+      key.replace(" ", "_");
+      actions[i]->setChecked(settings.value(key, true).toBool());
     }
   }
 
@@ -725,20 +737,25 @@ namespace Isis
     settings.setValue("topSplitter", topSplitter->saveState());
     settings.setValue("mainSplitter", mainSplitter->saveState());
 
+    QString key;
+    
     QList< QAction * > actions =
-      measureTableView->getHorizontalHeader()->actions();
+        measureTableView->getHorizontalHeader()->actions();
     for (int i = 0; i < actions.size(); i++)
     {
-      settings.setValue("measure table column: " +
-          AbstractMeasureItem::getColumnName((AbstractMeasureItem::Column) i),
-          actions[i]->isChecked());
+      key = measureTableView->objectName() + " " +
+            AbstractMeasureItem::getColumnName((AbstractMeasureItem::Column) i);
+      key.replace(" ", "_");
+      settings.setValue(key, actions[i]->isChecked());
     }
 
     actions = pointTableView->getHorizontalHeader()->actions();
-    for (int i = 0; i < actions.size(); i++) {
-      settings.setValue("point table column: " +
-          AbstractPointItem::getColumnName((AbstractPointItem::Column) i),
-          actions[i]->isChecked());
+    for (int i = 0; i < actions.size(); i++)
+    {
+      key = pointTableView->objectName() + " " +
+            AbstractPointItem::getColumnName((AbstractPointItem::Column) i);
+      key.replace(" ", "_");
+      settings.setValue(key, actions[i]->isChecked());
     }
   }
 

@@ -38,7 +38,7 @@ namespace Isis
     public slots:
       void deactivate();
       void activate();
-      void onModelSelectionChanged();
+      void handleModelSelectionChanged();
 
 
     private: // disable copying and assigning of this class

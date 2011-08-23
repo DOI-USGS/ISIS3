@@ -27,6 +27,8 @@ namespace Isis
       bool isReadOnly() const;
       void setReadOnly(bool);
       bool hasNetworkStructureEffect() const;
+      bool sortAscending() const;
+      void setSortAscending(bool ascending);
 
 
     public:
@@ -35,6 +37,7 @@ namespace Isis
 
     signals:
       void selected(CnetTableColumn *);
+      void sortOutDated();
       void widthChanged();
       void visibilityChanged();
 
@@ -49,6 +52,7 @@ namespace Isis
       bool readOnly;
       int width;
       bool affectsNetworkStructure;
+      bool ascendingSortOrder;
   };
 }
 

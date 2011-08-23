@@ -12,34 +12,66 @@
 #include "CnetTableViewContent.h"
 #include "CnetTableColumn.h"
 #include "CnetTableColumnList.h"
+#include <QSettings>
+
+
+using std::cerr;
 
 
 namespace Isis
 {
-  CnetTableView::CnetTableView(AbstractCnetTableModel * someModel)
+  CnetTableView::CnetTableView(AbstractCnetTableModel * someModel,
+                               QString pathForSettings,
+                               QString objName)
   {
     nullify();
     
-    columns = someModel->getColumns();
-
+    settingsPath = new QString(pathForSettings);
+    setObjectName(objName);
+    
+    model = someModel;
+    
+    columns = model->getColumns();
+    
     // Add a column for row numbers and global selection.
     columns->prepend(new CnetTableColumn("", true, false));
     
+    QSettings settings(*settingsPath, QSettings::NativeFormat);
+    QString key;
     for (int i = 0; i < columns->size(); i++)
     {
-      (*columns)[i]->setWidth(
-          QFontMetrics(font()).width((*columns)[i]->getTitle()) + 25);
+      CnetTableColumn * const & col = (*columns)[i];
+      QString colTitle = col->getTitle();
+      int defaultWidth = QFontMetrics(font()).width(colTitle) + 40;
+      if (colTitle.size())
+      {
+        key = objectName() + " " + colTitle + " width";
+        key.replace(" ", "_");
+        col->setWidth(settings.value(key, defaultWidth).toInt());
+        
+        key = objectName() + " " + colTitle + " ascending";
+        key.replace(" ", "_");
+        col->setSortAscending(settings.value(key, true).toBool());
+      }
+      else
+      {
+        col->setWidth(defaultWidth);
+        
+        // no need to set sort order since it is already ascending by default
+      }
     }
     
+    key = objectName() + " sorting order";
+    key.replace(" ", "_");
+    columns->setSortingOrder(settings.value(key, QStringList()).toStringList());
     
-    header = new CnetTableViewHeader(someModel);
+    header = new CnetTableViewHeader(model);
     connect(header, SIGNAL(requestedGlobalSelection(bool)),
-            this, SLOT(onModelSelectionChanged()));
+            this, SLOT(handleModelSelectionChanged()));
     connect(header, SIGNAL(requestedGlobalSelection(bool)),
             this, SIGNAL(selectionChanged()));
-//     header->update();
     
-    content = new CnetTableViewContent(someModel);
+    content = new CnetTableViewContent(model);
     connect(content, SIGNAL(tableSelectionChanged()),
             this, SIGNAL(selectionChanged()));
     connect(content, SIGNAL(rebuildModels(QList<AbstractTreeItem *>)),
@@ -66,6 +98,36 @@ namespace Isis
 
   CnetTableView::~CnetTableView()
   {
+    // save column widths
+    ASSERT(objectName().size());
+    if (settingsPath->size() && objectName().size())
+    {
+      QSettings settings(*settingsPath, QSettings::NativeFormat);
+      QString key;
+      for (int i = 0; i < columns->size(); i++)
+      {
+        CnetTableColumn * const & col = (*columns)[i];
+        QString colTitle = col->getTitle();
+        if (colTitle.size())
+        {
+          key = objectName() + " " + colTitle + " width";
+          key.replace(" ", "_");
+          settings.setValue(key, col->getWidth());
+          
+          key = objectName() + " " + colTitle + " ascending";
+          key.replace(" ", "_");
+          settings.setValue(key, col->sortAscending());
+        }
+      }
+      
+      key = objectName() + " sorting order";
+      key.replace(" ", "_");
+      settings.setValue(key, columns->getSortingOrderAsStrings());
+    }
+    
+    delete model;
+    model = NULL;
+    
     columns = NULL;
   }
 
@@ -141,13 +203,13 @@ namespace Isis
 //   }
 
 
-  void CnetTableView::onModelSelectionChanged()
+  void CnetTableView::handleModelSelectionChanged()
   {
     content->refresh();
   }
 
 
-  void CnetTableView::onModelSelectionChanged(
+  void CnetTableView::handleModelSelectionChanged(
       QList< AbstractTreeItem * > newlySelectedItems)
   {
     content->refresh();
@@ -160,6 +222,8 @@ namespace Isis
     header = NULL;
     content = NULL;
     columns = NULL;
+    model = NULL;
+    settingsPath = NULL;
   }
 }
 

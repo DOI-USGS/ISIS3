@@ -22,7 +22,8 @@ namespace Isis
       Q_OBJECT
 
     public:
-      CnetTableView(AbstractCnetTableModel * someModel);
+      CnetTableView(AbstractCnetTableModel * someModel,
+                    QString pathForSettigs, QString objName);
       virtual ~CnetTableView();
       QSize sizeHint();
       QFont getContentFont() const;
@@ -35,11 +36,13 @@ namespace Isis
 
       AbstractCnetTableModel * getModel();
 //       void setModel(AbstractCnetTableModel * newModel);
+      void readSettings();
+      void writeSettings();
 
 
     public slots:
-      void onModelSelectionChanged();
-      void onModelSelectionChanged(QList< AbstractTreeItem * >);
+      void handleModelSelectionChanged();
+      void handleModelSelectionChanged(QList< AbstractTreeItem * >);
 
 
     signals:
@@ -63,6 +66,8 @@ namespace Isis
       CnetTableViewHeader * header;
       CnetTableViewContent * content;
       CnetTableColumnList * columns;
+      AbstractCnetTableModel * model;
+      QString * settingsPath;
   };
 }
 

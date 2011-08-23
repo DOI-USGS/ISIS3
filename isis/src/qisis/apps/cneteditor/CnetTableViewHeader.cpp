@@ -43,6 +43,7 @@ namespace Isis
     totalCount = -1;
 
     clickedColumnEdge = -1;
+    clickedColumn = -1;
 
     setMouseTracking(true);
     
@@ -63,6 +64,9 @@ namespace Isis
     
     for (int i = 0; i < columns->size(); i++)
       connect((*columns)[i], SIGNAL(visibilityChanged()), this, SLOT(update()));
+    
+    ARROW_HEIGHT = 3;
+    ARROW_WIDTH = 5;
   }
 
 
@@ -116,6 +120,39 @@ namespace Isis
   }
 
 
+  void CnetTableViewHeader::mousePressEvent(QMouseEvent * event)
+  {
+    QPoint mousePos = event->pos();
+    
+    clickedColumn = getMousedColumn(mousePos);
+    
+//     QRect priorityRect = getSortingPriorityRect(columnNum);
+//     QRect arrowRect = getSortingArrowRect(columnNum);
+    
+    
+    if (event->buttons() == Qt::LeftButton)
+    {
+      clickedColumnEdge = getMousedColumnEdge(mousePos);
+      if (clickedColumnEdge == -1 && clickedColumn != -1)
+      {
+        // The click wasn't on a column edge.
+        if (columns->getVisibleColumns()[clickedColumn]->getTitle().isEmpty())
+        {
+          emit requestedGlobalSelection(true);
+        }
+        else
+        {
+//           if (priorityRect.contains(mousePos))
+//           {
+//             emit requestedColumnSelection(columnNum, true);
+//           }
+          
+        }
+      }
+    }
+  }
+
+
   void CnetTableViewHeader::mouseMoveEvent(QMouseEvent * event)
   {
     QPoint mousePos = event->pos();
@@ -125,11 +162,15 @@ namespace Isis
       // edge == column that we want to resize
       QRect columnToResizeRect(getColumnRect(clickedColumnEdge));
       columnToResizeRect.setRight(mousePos.x());
+      
+      CnetTableColumn * col = columns->getVisibleColumns()[clickedColumnEdge];
 
       int newWidth = 1;
       if (columnToResizeRect.width() > 1)
       {
         newWidth = columnToResizeRect.width();
+        if (columns->getSortingOrder()[0] == col)
+          newWidth = qMax(newWidth, ARROW_WIDTH + SORT_ARROW_MARGIN * 2);
       }
 
       columns->getVisibleColumns()[clickedColumnEdge]->setWidth(newWidth);
@@ -148,47 +189,33 @@ namespace Isis
   }
 
 
-  void CnetTableViewHeader::mousePressEvent(QMouseEvent * event)
-  {
-    QPoint mousePos = event->pos();
-    
-    int columnNum = getMousedColumn(mousePos);
-    
-//     QRect priorityRect = getSortingPriorityRect(columnNum);
-//     QRect arrowRect = getSortingArrowRect(columnNum);
-    
-    
-    if (event->buttons() == Qt::LeftButton)
-    {
-      clickedColumnEdge = getMousedColumnEdge(mousePos);
-      if (clickedColumnEdge == -1 && columnNum != -1)
-      {
-        // The click wasn't on a column edge.
-        if (columns->getVisibleColumns()[columnNum]->getTitle().isEmpty())
-        {
-          emit requestedGlobalSelection(true);
-        }
-        else
-        {
-//           if (priorityRect.contains(mousePos))
-          {
-            emit requestedColumnSelection(columnNum, true);
-          }
-          
-        }
-      }
-    }
-  }
-
-
   void CnetTableViewHeader::mouseReleaseEvent(QMouseEvent * event)
   {
     bool wasLastCol =
       clickedColumnEdge >= columns->getVisibleColumns().size() - 2;
     if (clickedColumnEdge != -1)
+    {
       emit columnResized(wasLastCol);
-
+    }
+    else
+    {
+      if (clickedColumn == getMousedColumn(event->pos()))
+      {
+        CnetTableColumn * col = columns->getVisibleColumns()[clickedColumn];
+        
+        CnetTableColumn const * sortCol =
+            columns->getVisibleColumns().getSortingOrder()[0];
+            
+        if (col == sortCol)
+          col->setSortAscending(!col->sortAscending());
+        else
+          columns->raiseToTop(col);
+      }
+    }
+    
     clickedColumnEdge = -1;
+    clickedColumn = -1;
+    
     update();
   }
 
@@ -197,7 +224,12 @@ namespace Isis
   {
     QPainter painter(this);
     painter.setRenderHints(QPainter::Antialiasing |
-        QPainter::TextAntialiasing);
+                           QPainter::TextAntialiasing);
+
+    ARROW_HEIGHT = qMax(height() / 5, 3);
+    ASSERT(height() > 8);
+    ARROW_WIDTH = ARROW_HEIGHT * 2 - 1;
+
     paintHeader(&painter, height());
 //    painter.drawRect(0, 0, width(), height());
     painter.end();
@@ -356,21 +388,74 @@ namespace Isis
       pen.setCapStyle(Qt::RoundCap);
       painter->setPen(pen);
       painter->drawLine(columnRect.topLeft() + QPoint(0, 1),
-          columnRect.bottomLeft() + QPoint(0, 1));
+                        columnRect.bottomLeft() + QPoint(0, 1));
+      
       painter->drawLine(columnRect.topLeft() + QPoint(1, 0),
-          columnRect.topRight() - QPoint(0, 0));
+                        columnRect.topRight() - QPoint(0, 0));
+      
       painter->drawLine(columnRect.topLeft() + QPoint(1, 1),
-          columnRect.topRight() + QPoint(0, 1));
+                        columnRect.topRight() + QPoint(0, 1));
+      
       painter->drawLine(columnRect.bottomLeft() + QPoint(1, 1),
-          columnRect.bottomRight() + QPoint(0, 1));
+                        columnRect.bottomRight() + QPoint(0, 1));
+      
       painter->drawLine(columnRect.bottomLeft() + QPoint(1, 1),
-          columnRect.bottomRight() + QPoint(0, 1));
+                        columnRect.bottomRight() + QPoint(0, 1));
+      
       painter->drawLine(columnRect.topRight() + QPoint(0, 1),
-          columnRect.bottomRight() - QPoint(0, 0));
+                        columnRect.bottomRight() - QPoint(0, 0));
+      
       painter->setPen(selected ? palette().highlightedText().color() :
           palette().buttonText().color());
-      painter->drawText(columnRect, Qt::AlignCenter | Qt::TextSingleLine,
+      
+      QRect textRect(columnRect.x(),
+                     columnRect.y(),
+                     columnRect.width() - (SORT_ARROW_MARGIN * 2 + ARROW_WIDTH),
+                     columnRect.height());
+      painter->drawText(textRect , Qt::AlignCenter | Qt::TextSingleLine,
           columnText);
+
+      if (visibleCol == visibleCols.getSortingOrder()[0] &&
+          visibleCol->getWidth() >= SORT_ARROW_MARGIN * 2 + ARROW_WIDTH)
+      {
+        ASSERT(SORT_ARROW_MARGIN > 0);
+        
+        QRect arrowRect(textRect.right() + 1,
+                        textRect.y(),
+                        SORT_ARROW_MARGIN * 2 + ARROW_WIDTH,
+                        textRect.height());
+        
+        ASSERT(arrowRect.width() + textRect.width() == columnRect.width());
+        ASSERT(arrowRect.right() == columnRect.right());
+        
+        
+        // assume ascending order (arrow looks like v)
+        QPoint left(arrowRect.left() + SORT_ARROW_MARGIN,
+                    arrowRect.center().y() - ((ARROW_HEIGHT - 1) / 2));
+        
+        int yOffSet = ((ARROW_HEIGHT - 1) / 2);
+        if (ARROW_HEIGHT % 2 == 0)
+          yOffSet++;
+        QPoint center(left.x() + ((ARROW_WIDTH - 1) / 2),
+                      arrowRect.center().y() + yOffSet);
+        
+        QPoint right(center.x() + ((ARROW_WIDTH - 1) / 2),
+                     arrowRect.center().y() - ((ARROW_HEIGHT - 1) / 2));
+        
+        ASSERT(right.x() == arrowRect.right() - SORT_ARROW_MARGIN);
+        ASSERT(right.x() - center.x() == center.x() - left.x());
+        
+        if (!visibleCol->sortAscending())
+        {
+          // flip arrow (to look like ^)
+          left.setY(center.y());
+          center.setY(right.y());
+          right.setY(left.y());
+        }
+        
+//         painter->drawLine(left, center);
+//         painter->drawLine(center, right);
+      }
 
       // Move the column rect to the position of the next column.
       columnRect.moveLeft(columnRect.right());

@@ -11,14 +11,17 @@ namespace Isis
   class CnetTableColumn;
   
 
-  class CnetTableColumnList
+  class CnetTableColumnList : public QObject
   {
+      Q_OBJECT
+      
     public:
       CnetTableColumnList();
       CnetTableColumnList(CnetTableColumnList const &);
       virtual ~CnetTableColumnList();
       
       CnetTableColumn *& operator[](int index);
+      CnetTableColumn *& operator[](QString title);
       
       void append(CnetTableColumn * newCol);
       void prepend(CnetTableColumn * newCol);
@@ -31,15 +34,23 @@ namespace Isis
       
       int getVisibleWidth() const;
       
-      QList< CnetTableColumn const * > getSortingOrder() const;
-      void lower(CnetTableColumn const *);
-      void lower(int visibleColumnIndex);
-      void raise(CnetTableColumn const *);
-      void raise(int visibleColumnIndex);
+      QList< CnetTableColumn * > getSortingOrder();
+      QStringList getSortingOrderAsStrings() const;
+      void setSortingOrder(QStringList newOrder);
+      void lower(CnetTableColumn * col, bool emitSortOutDated = true);
+      void lower(int visibleColumnIndex, bool emitSortOutDated = true);
+      void raise(CnetTableColumn * col, bool emitSortOutDated = true);
+      void raise(int visibleColumnIndex, bool emitSortOutDated = true);
+      void raiseToTop(CnetTableColumn * col);
+      void raiseToTop(int visibleColumnIndex);
       
       int size() const;
       
       CnetTableColumnList & operator=(CnetTableColumnList other);
+      
+      
+    signals:
+      void sortOutDated();
       
       
     private:
@@ -49,7 +60,7 @@ namespace Isis
       
     private:
       QList< CnetTableColumn * > * cols;
-      QList< CnetTableColumn const * > * sortingOrder;
+      QList< CnetTableColumn * > * sortingOrder;
   };
 }
 

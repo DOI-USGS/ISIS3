@@ -206,7 +206,7 @@ namespace Isis
       // Sometimes we need to build the list forwards and sometimes backwards.
       // This is accomplished by using either append or prepend.  We abstract
       // away which of these we should use (why should we care) by using the
-      // variable "meth" which is a method pointer to the appropriate method.
+      // variable "someKindaPend" to store the appropriate method.
       void (QList<AbstractTreeItem*>::*someKindaPend)(
           AbstractTreeItem * const &);
       

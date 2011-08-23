@@ -42,6 +42,15 @@ namespace Isis
     nullify();
     
     model = someModel;
+    connect(model, SIGNAL(modelModified()), this, SLOT(refresh()));
+    connect(model, SIGNAL(filterProgressChanged(int)),
+            this, SLOT(updateItemList()));
+    connect(this, SIGNAL(modelDataChanged()),
+            model, SLOT(applyFilter()));
+    connect(this, SIGNAL(tableSelectionChanged(QList< AbstractTreeItem * >)),
+            model, SIGNAL(tableSelectionChanged(QList< AbstractTreeItem * >)));
+    connect(model, SIGNAL(treeSelectionChanged(QList< AbstractTreeItem * >)),
+            this, SLOT(scrollTo(QList< AbstractTreeItem * >)));
     
     columns = getModel()->getColumns();
     for (int i = 0; i < columns->size(); i++)

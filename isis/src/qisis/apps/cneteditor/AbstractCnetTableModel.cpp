@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include <QDateTime>
+#include <QSettings>
 
 #include "iException.h"
 #include "iString.h"
@@ -12,7 +13,11 @@
 #include "BusyLeafItem.h"
 #include "CnetTableColumn.h"
 #include "CnetTableColumnList.h"
+#include "CnetTableView.h"
 #include "TreeModel.h"
+
+
+using std::cerr;
 
 
 namespace Isis
@@ -24,11 +29,12 @@ namespace Isis
 
     dataModel = model;
     delegate = someDelegate;
-    sortedRows = new QList<AbstractTreeItem *>;
+    sortedItems = new QList<AbstractTreeItem *>;
     busyItem = new BusyLeafItem;
     sortingEnabled = false;
-
+    
     // Signal forwarding
+    connect(model, SIGNAL(modelModified()), SLOT(rebuildSort()));
     connect(model, SIGNAL(modelModified()), this, SIGNAL(modelModified()));
 
     connect(model, SIGNAL(filterProgressChanged(int)),
@@ -55,8 +61,8 @@ namespace Isis
     delete delegate;
     delegate = NULL;
 
-    delete sortedRows;
-    sortedRows = NULL;
+    delete sortedItems;
+    sortedItems = NULL;
 
     delete busyItem;
     busyItem = NULL;
@@ -78,7 +84,7 @@ namespace Isis
   }
 
 
-  bool AbstractCnetTableModel::isSortingEnabled() const
+  bool AbstractCnetTableModel::sortingIsEnabled() const
   {
     return sortingEnabled;
   }
@@ -95,6 +101,7 @@ namespace Isis
     if (!columns)
     {
       columns = createColumns();
+      connect(columns, SIGNAL(sortOutDated()), this, SLOT(sort()));
     }
 
     return columns;
@@ -113,14 +120,25 @@ namespace Isis
   }
 
 
-  void AbstractCnetTableModel::sort() {
+  void AbstractCnetTableModel::sort()
+  {
+//     cerr << "AbstractCnetTableModel::sort called\n";
+    
     // Go through the columns in reverse order of priority and sort on each
     // one.
-    QList<CnetTableColumn const *> columnsToSortOn = columns->getSortingOrder();
-    if (isSortingEnabled())
-      for (int i = columnsToSortOn.size() - 1; i >= 0; i--)
-        qStableSort(sortedRows->begin(), sortedRows->end(),
-                    LessThanFunctor(columnsToSortOn.at(i)));
+    QList< CnetTableColumn * > columnsToSortOn = columns->getSortingOrder();
+    if (sortingIsEnabled())
+    {
+      qStableSort(sortedItems->begin(), sortedItems->end(),
+                  LessThanFunctor(columnsToSortOn.at(0)));
+      
+//       for (int i = columnsToSortOn.size() - 1; i >= 0; i--)
+//         qStableSort(sortedItems->begin(), sortedItems->end(),
+//                     LessThanFunctor(columnsToSortOn.at(i)));
+    }
+    
+    emit modelModified();
+//     cerr << "AbstractCnetTableModel::sort done\n";
   }
 
 
@@ -148,41 +166,41 @@ namespace Isis
   }
 
 
-  QList<AbstractTreeItem *> AbstractCnetTableModel::getSortedItems(
+  QList< AbstractTreeItem * > AbstractCnetTableModel::getSortedItems(
       int start, int end, TreeModel::InterestingItems flags)
-  { 
-    QList<AbstractTreeItem *> sortedItems;
+  {
+    QList< AbstractTreeItem * > sortedSubsetOfItems;
 
-    if (!isSortingEnabled())
-    {
-      sortedItems = getDataModel()->getItems(start, end, flags, true);
-    }
-    else
+    if (sortingIsEnabled())
     {
       while (start <= end)
       {
-        if (start < sortedRows->size())
-          sortedItems.append(sortedRows->at(start));
+        if (start < sortedItems->size())
+          sortedSubsetOfItems.append(sortedItems->at(start));
         else if (isFiltering())
-          sortedItems.append(busyItem);
+          sortedSubsetOfItems.append(busyItem);
 
         start++;
       }
     }
-
-    return sortedItems;
+    else
+    {
+      sortedSubsetOfItems = getDataModel()->getItems(start, end, flags, true);
+    }
+    
+    return sortedSubsetOfItems;
   }
   
   
-  QList<AbstractTreeItem *> AbstractCnetTableModel::getSortedItems(
+  QList< AbstractTreeItem * > AbstractCnetTableModel::getSortedItems(
       AbstractTreeItem * item1, AbstractTreeItem * item2,
       TreeModel::InterestingItems flags)
   {
-    QList<AbstractTreeItem *> sortedItems;
+    QList< AbstractTreeItem * > sortedSubsetOfItems;
 
-    if (!isSortingEnabled())
+    if (!sortingIsEnabled())
     {
-      sortedItems = getDataModel()->getItems(item1, item2, flags, true);
+      sortedSubsetOfItems = getDataModel()->getItems(item1, item2, flags, true);
     }
     else
     {
@@ -190,9 +208,9 @@ namespace Isis
 
       int currentIndex = 0;
 
-      while (!start && currentIndex < sortedRows->size())
+      while (!start && currentIndex < sortedItems->size())
       {
-        AbstractTreeItem * current = sortedRows->at(currentIndex);
+        AbstractTreeItem * current = sortedItems->at(currentIndex);
         if (current == item1)
           start = item1;
         else if (current == item2)
@@ -213,34 +231,34 @@ namespace Isis
       // Sometimes we need to build the list forwards and sometimes backwards.
       // This is accomplished by using either append or prepend.  We abstract
       // away which of these we should use (why should we care) by using the
-      // variable "meth" which is a method pointer to the appropriate method.
-      void (QList<AbstractTreeItem*>::*someKindaPend)(
+      // variable "someKindaPend" to store the appropriate method.
+      void (QList< AbstractTreeItem * >::*someKindaPend)(
           AbstractTreeItem * const &);
+      someKindaPend = &QList< AbstractTreeItem * >::append;
       
-      someKindaPend = &QList<AbstractTreeItem *>::append;
       if (start == item2)
       {
         end = item1;
-        someKindaPend = &QList<AbstractTreeItem *>::prepend;
+        someKindaPend = &QList< AbstractTreeItem * >::prepend;
       }
 
-      while (currentIndex < sortedRows->size() &&
-             sortedRows->at(currentIndex) != end)
+      while (currentIndex < sortedItems->size() &&
+             sortedItems->at(currentIndex) != end)
       {
-        (sortedItems.*someKindaPend)(sortedRows->at(currentIndex));
+        (sortedSubsetOfItems.*someKindaPend)(sortedItems->at(currentIndex));
         currentIndex++;
       }
 
-      if (currentIndex >= sortedRows->size())
+      if (currentIndex >= sortedItems->size())
       {
         iString msg = "Could not find the second item";
         throw iException::Message(iException::Programmer, msg, _FILEINFO_);
       }
 
-      (sortedItems.*someKindaPend)(end);
+      (sortedSubsetOfItems.*someKindaPend)(end);
     }
 
-    return sortedItems;
+    return sortedSubsetOfItems;
   }
   
   
@@ -264,9 +282,24 @@ namespace Isis
   {
     dataModel = NULL;
     delegate = NULL;
-    sortedRows = NULL;
+    sortedItems = NULL;
     busyItem = NULL;
     columns = NULL;
+  }
+  
+  
+  void AbstractCnetTableModel::rebuildSort()
+  {
+//     cerr << "AbstractCnetTableModel::rebuildSort called\n";
+    ASSERT(dataModel);
+    ASSERT(sortedItems);
+    if (sortingEnabled)
+    {
+      sortingEnabled = false;
+      *sortedItems = getItems(0, -1);
+      sortingEnabled = true;
+      sort();
+    }
   }
 
  
@@ -304,28 +337,21 @@ namespace Isis
     QString leftData = left->getData(column->getTitle());
     QString rightData = right->getData(column->getTitle());
 
-    QString format = "yyyy-MM-ddTHH:mm:ss";
+    bool leftOk;
+    double doubleData = leftData.toDouble(&leftOk);
+    
+    bool rightOk;
+    double rightDoubleData = rightData.toDouble(&rightOk);
+    
+    QString busy = BusyLeafItem().getData();
+    
+    bool lessThan =
+        (leftOk && rightOk && doubleData < rightDoubleData) ||
+        ((leftOk || rightOk) && leftData.toLower() == "null") ||
+        ((leftData == busy || rightData == busy) && leftData == busy) ||
+        (leftData < rightData);
 
-    QDateTime leftDateTime = QDateTime::fromString(leftData, format);
-    QDateTime rightDateTime = QDateTime::fromString(rightData, format);
-
-    if (leftDateTime.isValid() && rightDateTime.isValid())
-      return leftDateTime < rightDateTime;
-
-    bool doubleDataOk, rightDoubleDataOk;
-    double doubleData = leftData.toDouble(&doubleDataOk);
-    double rightDoubleData = rightData.toDouble(&rightDoubleDataOk);
-    if (doubleDataOk && rightDoubleDataOk)
-      return doubleData < rightDoubleData;
-
-    if (doubleDataOk || rightDoubleDataOk)
-      return leftData.toLower() == "null";
-
-    QString busyData = BusyLeafItem().getData();
-    if (leftData == busyData || rightData == busyData)
-      return leftData == busyData;
-
-    return leftData < rightData;
+    return lessThan ^ column->sortAscending();
   }
 
 

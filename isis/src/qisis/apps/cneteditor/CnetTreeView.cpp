@@ -124,7 +124,7 @@ namespace Isis
   }
 
 
-  void CnetTreeView::onModelSelectionChanged()
+  void CnetTreeView::handleModelSelectionChanged()
   {
     content->refresh();
   }
