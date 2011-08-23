@@ -7,7 +7,7 @@ End_Group
 
 Object = unittest
   IsisVersion       = "3.2.2.0 | 2010-11-05"
-  ProgramVersion    = 2006-03-30
+  ProgramVersion    = 2011-08-19
   ProgramPath       = /work/users/jwalldren/jisis/prog/isis3/trunk/isis/src/b-
                       ase/objs/Application
   ExecutionDateTime = 2011-08-19T13:08:55
@@ -38,7 +38,7 @@ In myFunct
 
 Object = unittest
   IsisVersion       = "3.2.2.0 | 2010-11-05"
-  ProgramVersion    = 2006-03-30
+  ProgramVersion    = 2011-08-19
   ProgramPath       = /work/users/jwalldren/jisis/prog/isis3/trunk/isis/src/b-
                       ase/objs/Application
   ExecutionDateTime = 2011-08-19T13:08:55
@@ -67,7 +67,7 @@ End_Object
 
 Object = unittest
   IsisVersion       = "3.2.2.0 | 2010-11-05"
-  ProgramVersion    = 2006-03-30
+  ProgramVersion    = 2011-08-19
   ProgramPath       = /work/users/jwalldren/jisis/prog/isis3/trunk/isis/src/b-
                       ase/objs/Application
   ExecutionDateTime = 2011-08-19T13:08:55
