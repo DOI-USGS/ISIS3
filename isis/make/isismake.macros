@@ -104,6 +104,12 @@ else
       testFile = $(wildcard /etc/lsb-release)
       ifeq ($(testFile), /etc/lsb-release)
         HOST_OS = $(shell $(GREP) DESCRIPTION /etc/lsb-release | $(SED) 's/\([^"]*"\)\([^"]*\)\(.*\)/\2/' | $(SED) 's/\.[^\.]* LTS//' | $(SED) 's/ //g' | $(SED) 's/\./_/g')
+      else
+        testFile = $(wildcard /etc/debian_version)
+        ifeq ($(testFile), /etc/debian_version)
+          HOST_OS := $(shell $(CAT) /etc/debian_version | $(SED) 's/\./_/g')
+          HOST_OS := Debian$(HOST_OS)
+        endif
       endif
     endif
   endif
