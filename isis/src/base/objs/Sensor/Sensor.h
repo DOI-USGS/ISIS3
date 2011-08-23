@@ -149,8 +149,8 @@ namespace Isis {
    *                                      meant primarily for readability and
    *                                      reducing error-proneness of the code.
    *   @history 2011-03-28 Janet Barrett - Fixed the SetLookDirection routine so that it checks to
-   *                                      make sure that the projection of the DEM is in an 
-   *                                      Equatorial cylindrical projection before using the new ray 
+   *                                      make sure that the projection of the DEM is in an
+   *                                      Equatorial cylindrical projection before using the new ray
    *                                      tracing routine. The check for this was moved when other
    *                                      code was added. This was causing a problem with footprintinit.
    *   @history 2011-05-03 Jeannie Walldren - Added Isis Disclaimer to files.
@@ -161,6 +161,10 @@ namespace Isis {
    *   @history 2011-08-22 Steven Lambright - The DEM cube now uses a
    *                           UniqueIOCachingAlgorithm(5). This will probably
    *                           behave better in all cases. Fixes #364
+   *   @history 2011-08-16 Jeff Anderson - Fixed a problem with an infinite
+   *                           loop in the ray tracing algorithm.  The problem
+   *                           was first exposed when trying to intersect the
+   *                           Vesta DEM on the limb.
    */
   class Sensor : public Spice {
     public:
@@ -182,8 +186,8 @@ namespace Isis {
        * SetUniversalGround had a valid intersection with the target. If so then
        * other methods such as Coordinate, UniversalLatitude, UniversalLongitude,
        * etc can be used with confidence.
-       *  
-       * @return @b bool True if the look direction intersects with the 
+       *
+       * @return @b bool True if the look direction intersects with the
        *         target.
        */
       inline bool HasSurfaceIntersection() const {
@@ -193,9 +197,9 @@ namespace Isis {
       void Coordinate(double p[3]) const;
 
       /**
-       * Returns the planetocentric latitude at the surface intersection point 
+       * Returns the planetocentric latitude at the surface intersection point
        * in body fixed.
-       *  
+       *
        * @return @b double Universal latitude value
        */
       double UniversalLatitude() const;
@@ -206,9 +210,9 @@ namespace Isis {
       Latitude GetLatitude() const;
 
       /**
-       * Returns a positive east, 0-360 domain longitude at the surface 
-       * intersection point in body fixed. 
-       *  
+       * Returns a positive east, 0-360 domain longitude at the surface
+       * intersection point in body fixed.
+       *
        * @return @b double Universal longitude value
        */
       double UniversalLongitude() const;
@@ -251,9 +255,9 @@ namespace Isis {
       Distance DemRadius(const Latitude &lat, const Longitude &lon);
 
       /**
-       * Indicates whether the Kernels PvlGroup has an ElevationModel or 
-       * ShapeModel PvlKeyword value. 
-       * 
+       * Indicates whether the Kernels PvlGroup has an ElevationModel or
+       * ShapeModel PvlKeyword value.
+       *
        * @return @b bool True if an elevation model exists.
        */
       bool HasElevationModel() {
@@ -261,9 +265,9 @@ namespace Isis {
       };
 
       /**
-       * Virtual method that returns the pixel resolution of the sensor in 
-       * meters/pix. 
-       *  
+       * Virtual method that returns the pixel resolution of the sensor in
+       * meters/pix.
+       *
        * @return @b double Resolution value of 1.0
        */
       virtual double Resolution() {

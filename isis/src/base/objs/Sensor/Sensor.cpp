@@ -189,8 +189,8 @@ namespace Isis {
    * @param v[] A look vector in camera coordinates. For example, (0,0,1) is
    *            usually the look direction out of the boresight of a camera.
    *
-   * @return @b bool True if the look direction intersected the target. 
-   * @internal 
+   * @return @b bool True if the look direction intersected the target.
+   * @internal
    *   @history  2009-09-23  Tracie Sucharski - Convert negative longitudes
    *                           returned my reclat.
    *   @history  2010-09-15  Janet Barrett - Modified this method to use a new
@@ -199,7 +199,7 @@ namespace Isis {
    *                           were encountered at the poles of global DEM files. The
    *                           algorithm that is being used was taken from "Intersection
    *                           between spacecraft viewing vectors and digital elevation
-   *                           models" by N.A. Teanby. This algorithm only works on 
+   *                           models" by N.A. Teanby. This algorithm only works on
    *                           Equatorial Cylindrical projections. Other projections still
    *                           use the previous algorithm.
    *   @history  2010-10-26  Janet Barrett - The tolerance value of 1E-5 was too
@@ -210,6 +210,11 @@ namespace Isis {
    *                           we are dealing with).
    *   @history 2011-01-24   Janet Barrett - Got rid of extra loop that wasn't
    *                         needed for the new ray tracing algorithm.
+   *
+   *   @history 2011-08-16  Jeff Anderson - Fixed a problem with an infinite
+   *                           loop in the ray tracing algorithm.  The problem
+   *                           was first exposed when trying to intersect the
+   *                           Vesta DEM on the limb.
    * @return bool
    */
   bool Sensor::SetLookDirection(const double v[3]) {
@@ -229,7 +234,7 @@ namespace Isis {
     // p_lookB[0] = lookB[0];
     // p_lookB[1] = lookB[1];
     // p_lookB[2] = lookB[2];
-    memcpy(p_lookB, &lookB[0], sizeof(double) * 3); 
+    memcpy(p_lookB, &lookB[0], sizeof(double) * 3);
     p_newLookB = true;
 
     // Don't try to intersect the sky
@@ -252,6 +257,15 @@ namespace Isis {
     surfpt_c((SpiceDouble *) &sB[0], p_lookB, a, b, c, pBOutput, &found);
     NaifStatus::CheckErrors();
 
+    // TIDBIT:  From the code below we have historically tested to see if we
+    // can intersect the ellipsoid.  If we can't then we made the assumption
+    // that we could not intersect the DEM.  This of course isn't always true
+    // as the DEM could be above the surface of the ellipsoid.  For most images
+    // we really wouldn't notice.  It has recently (Aug 2011) come into play
+    // when we try to intersect images containing a limb and spiceinit'ed
+    // with a DEM (e.g., Vesta and soon Mercury).  This implies that info
+    // at the limb will not always be computed.  In the future we may want
+    // to do a better job at handling this special case.
     if(!found) {
       p_hasIntersection = false;
       return p_hasIntersection;
@@ -336,7 +350,7 @@ namespace Isis {
         double plen=0.0;
         SpiceDouble plat, plon, pradius;
         SpiceDouble pB[3];
-        double maxRadiusMetersSquared = 
+        double maxRadiusMetersSquared =
             p_maxRadius->GetKilometers() * p_maxRadius->GetKilometers();
         double cmin = cos((90.0 - 1.0 / (2.0*p_demScale)) * PI/180.0);
 
@@ -373,7 +387,7 @@ namespace Isis {
           p_hasIntersection = false;
           return p_hasIntersection;
         }
-        
+
         // Calculate the vector to the tangent point
         SpiceDouble tvec[3];
         double observerdist = vnorm_c(observer);
@@ -430,6 +444,16 @@ namespace Isis {
 
           // Calculate the step size
           double dd = g1len * sin(dalpha) / sin(PI-psi2);
+
+          // JAA:  If we are moving along the vector at a smaller increment than the pixel
+          // tolerance we will be in an infinite loop.  The infinite loop is elimnated by
+          // this test.  Now the algorithm produces a jagged limb in phocube.  This may
+          // be a function of the very low resolution of the Vesta DEM and could
+          // improve in the future
+          if(dd < tolerance) {
+            p_hasIntersection = false;
+            return p_hasIntersection;
+          }
 
           // Calculate the vector to the current test point from the planet center
           d = d + dd;
@@ -528,6 +552,15 @@ namespace Isis {
           g1len = g2len;
           r1 = r2;
           psi1 = psi2;
+
+          // TODO:  Examine how dalpha is computed at the limb for Vesta.  It
+          // appears that eventually it gets really small and causes the loop
+          // to be neverending.  Of course this could be happening for other
+          // limb images and we just have never tested the code.  For example,
+          // Messenger with a DEM could cause the problem.  As a result JAA
+          // put in a test (above) for dd being smaller than the pixel
+          // convergence tolerance.  If so the loop exits without an
+          // intersection
           dalpha = MAX(cos(g2lat*(PI/180.0)),cmin) / (2.0*p_demScale*(PI/180.0));
         }
 
@@ -592,12 +625,12 @@ namespace Isis {
   }
 
 
-  /** 
+  /**
    * Returns the local radius at the intersection point. This is either the
    * radius on the ellipsoid, the radius from the surface model passed into
    * the constructor, or the radius set with SetUniversalGround.
-   *  
-   * @return @b Distance The distance from the center of the planet to this 
+   *
+   * @return @b Distance The distance from the center of the planet to this
    *          lat,lon in meters
    */
   Distance Sensor::LocalRadius(Latitude lat, Longitude lon) {
@@ -605,12 +638,12 @@ namespace Isis {
   }
 
 
-   /** 
+   /**
     * Returns the local radius at the intersection point. This is either the
     * radius on the ellipsoid, the radius from the surface model passed into
     * the constructor, or the radius set with SetUniversalGround.
-    *  
-    * @return @b Distance The distance from the center of the planet to this 
+    *
+    * @return @b Distance The distance from the center of the planet to this
     *          lat,lon in meters
     */
   Distance Sensor::LocalRadius(double lat, double lon) {
@@ -879,7 +912,7 @@ namespace Isis {
 
   /**
    * Returns the declination angle (sky latitude)
-   * @return @b double Declination angle. 
+   * @return @b double Declination angle.
    */
   double Sensor::Declination() {
     if(p_newLookB) computeRaDec();
@@ -942,7 +975,7 @@ namespace Isis {
 
   /**
    * Return the local solar time in hours
-   * @return @b double Local solar time, in hours 
+   * @return @b double Local solar time, in hours
    */
   double Sensor::LocalSolarTime() {
     double slat, slon;
@@ -977,7 +1010,7 @@ namespace Isis {
 
   /**
    * Returns the distance from the spacecraft to the subspacecraft point in km.
-   * It uses the ellipsoid, not the shape model 
+   * It uses the ellipsoid, not the shape model
    * @return @b double Spacecraft altitude.
    */
   double Sensor::SpacecraftAltitude() {
@@ -1009,7 +1042,7 @@ namespace Isis {
   }
 
 
-  /** 
+  /**
    * Gets the radius from the DEM, if we have one.
 
    * @return @b double Local radius from the DEM
@@ -1019,7 +1052,7 @@ namespace Isis {
   }
 
 
-  /** 
+  /**
    * Gets the radius from the DEM, if we have one.
    * @param lat Latitude
    * @param lon Longitude
