@@ -69,6 +69,9 @@ namespace Isis {
       void saveProjectAs();
       void loadProject();
       void closeMosaic();
+
+    private slots:
+      void showOverview();
       void updateMenuVisibility();
 
     protected:
@@ -85,7 +88,7 @@ namespace Isis {
       void displayController();
 
       bool m_controllerVisible;
-      
+
       ToolPad *m_toolpad; //!< Tool pad on this mainwindow
 
       QToolBar *m_permToolbar; //!< Tool bar attached to mainwindow
@@ -98,6 +101,7 @@ namespace Isis {
       QMenu *m_settingsMenu;
       QMenu *m_fileMenu;
       QMenu *m_exportMenu;
+
       MosaicController *m_mosaicController;
       QList<QAction *> m_actionsRequiringOpen;
       QList<QAction *> m_actionsRequiringClosed;

@@ -146,6 +146,7 @@ namespace Isis {
 
     QAction *exit = new QAction(this);
     exit->setText("Exit");
+    exit->setIcon(QIcon::fromTheme("window-close"));
     connect(exit, SIGNAL(activated()), this, SLOT(close()));
 
     QAction *actionRequiringOpen = NULL;
@@ -180,6 +181,13 @@ namespace Isis {
     m_viewMenu = menuBar()->addMenu("&View");
     m_settingsMenu = menuBar()->addMenu("&Settings");
 
+    QMenu *helpMenu = menuBar()->addMenu("&Help");
+    QAction *showOverviewAct = new QAction("qmos &Overview", this);
+    showOverviewAct->setIcon(QIcon::fromTheme("help-contents"));
+    connect(showOverviewAct, SIGNAL(triggered()),
+            this, SLOT(showOverview()));
+    helpMenu->addAction(showOverviewAct);
+
     updateMenuVisibility();
   }
 
@@ -202,6 +210,115 @@ namespace Isis {
     if (!selected.empty()) {
       openFiles(selected);
     }
+  }
+
+
+  void MosaicMainWindow::showOverview() {
+    QDialog *helpDialog = new QDialog(this);
+
+    QVBoxLayout *mainLayout = new QVBoxLayout;
+    helpDialog->setLayout(mainLayout);
+
+    // There's a text area at the top
+    QWidget *textArea = new QWidget;
+    mainLayout->addWidget(textArea);
+
+    // The text area's items are placed vertically
+    QVBoxLayout *textLayout = new QVBoxLayout;
+    textArea->setLayout(textLayout);
+
+    // Let's add some text
+    QLabel *qmosTitle = new QLabel("<h1>qmos</h1>");
+    qmosTitle->setMinimumSize(QSize(800, qmosTitle->minimumSize().height()));
+    textLayout->addWidget(qmosTitle);
+
+    QLabel *qmosSubtitle = new QLabel("A mosaic visualization tool");
+    textLayout->addWidget(qmosSubtitle);
+
+    QLabel *overviewTitle = new QLabel("<h2>Overview</h2>");
+    textLayout->addWidget(overviewTitle);
+
+    QLabel *overviewText = new QLabel("<p>qmos is designed "
+        "specifically for visualizing large amounts of images, how images "
+        "overlap, where control points lie on the images, and how jigsaw has "
+        "moved control points.");
+    overviewText->setWordWrap(true);
+    textLayout->addWidget(overviewText);
+
+    QLabel *overviewWarnings = new QLabel("<p>The known shortcomings of qmos "
+        "include:<ul>"
+        "<li>All input files are read-only, you cannot edit your input "
+            "data</li>"
+        "<li>Large control networks are slow and memory intensive</li>"
+        "<li>Show cube DN data is extremely slow</li>"
+        "<li>Warnings are not displayed graphically</li>"
+        "<li>Zooming in too far causes you to pan off of your data</li></ul>");
+    overviewWarnings->setWordWrap(true);
+    textLayout->addWidget(overviewWarnings);
+
+    QLabel *preparationTitle = new QLabel("<h2>Before Using qmos</h2>");
+    textLayout->addWidget(preparationTitle);
+
+    QLabel *preparationText = new QLabel("<p>qmos only supports files which "
+        "have latitude and longitude information associated with them. Global "
+        "projections are also not supported. If your files meet these "
+        "requirements, it is beneficial to run a couple of Isis programs on "
+        "your files before loading them into qmos. The programs you should run "
+        "are:<ul>"
+        "<li><i>camstats from=future_input_to_qmos.cub attach=true "
+            "sinc=... linc=...</i></li>"
+        "  <br>This enables qmos to give you the emission angle, incidence "
+               "angle, and resolution in the <b>File List</b>"
+        "<li><i>footprintinit from=future_input_to_qmos.cub "
+            "sinc=... linc=...</i></li>"
+        "  <br>This enables qmos to use the given footprints instead of trying "
+               "to calculate its own. The 'linc' and 'sinc' parameters can "
+               "have a significant effect on your image's footprint. Also, "
+               "images without footprints cannot be opened more than one at a "
+               "time. Running footprintinit will significantly speed up "
+               "loading images into qmos."
+        "</ul>");
+    preparationText->setWordWrap(true);
+    textLayout->addWidget(preparationText);
+
+    QLabel *projectsTitle = new QLabel("<h2>Projects</h2>");
+    textLayout->addWidget(projectsTitle);
+
+    QLabel *projectsText = new QLabel("<p>qmos can save and restore its state "
+        "back to where it was at any given time. The stored files are qmos "
+        "project files (*.mos). To load a project, you can specify the project "
+        "file's name on the command line (qmos myProject.mos) or go to "
+        "File -> Load Project once qmos is already started. When "
+        "loading a project, all current data is lost (your cubes are closed)."
+        "These project files store input file location information and their "
+        "qmos properties (color, group information, and similar attributes). "
+        "As a result, the qmos projects are relatively small files. You can "
+        "save your current project any time by going to File -> Save Project. "
+        "When you initially open qmos you start with a blank project.");
+    projectsText->setWordWrap(true);
+    textLayout->addWidget(projectsText);
+
+    // Allow blank space directly below textual area
+    mainLayout->addStretch();
+
+    // Now add close option
+    QWidget *buttonsArea = new QWidget;
+    mainLayout->addWidget(buttonsArea);
+
+    QHBoxLayout *buttonsLayout = new QHBoxLayout;
+    buttonsArea->setLayout(buttonsLayout);
+
+    // Flush the buttons to the right
+    buttonsLayout->addStretch();
+
+    QPushButton *closeButton = new QPushButton(QIcon::fromTheme("window-close"),
+        "&Close");
+    closeButton->setDefault(true);
+    connect(closeButton, SIGNAL(clicked()),
+            helpDialog, SLOT(close()));
+    buttonsLayout->addWidget(closeButton);
+
+    helpDialog->show();
   }
 
 

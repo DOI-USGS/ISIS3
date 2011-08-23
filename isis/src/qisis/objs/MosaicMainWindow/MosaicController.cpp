@@ -148,7 +148,7 @@ namespace Isis {
             this, SLOT(defaultFillChanged(bool)));
     settingsActs.append(defaultFill);
 
-    QAction *setAlpha = new QAction("Set Default &Alpha", this);
+    QAction *setAlpha = new QAction("Set Default &Transparency", this);
     connect(setAlpha, SIGNAL(triggered(bool)),
             this, SLOT(changeDefaultAlpha()));
     settingsActs.append(setAlpha);
@@ -333,8 +333,9 @@ namespace Isis {
 
   void MosaicController::changeDefaultAlpha() {
     bool ok = false;
-    int alpha = QInputDialog::getInt(NULL, "Alpha Value",
-        "Set the default transparency value",
+    int alpha = QInputDialog::getInt(NULL, "Transparency Value",
+        "Set the default transparency value\n"
+        "Values are 0 (invisible) to 255 (solid)",
         m_defaultAlpha, 0, 255, 1, &ok);
 
     if(ok) {

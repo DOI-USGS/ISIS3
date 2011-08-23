@@ -316,7 +316,8 @@ namespace Isis {
 
     if(allSupport(Color, cubeDisplays)) {
 
-      QAction *alphaAction = new QAction("Change Alpha", cubeDisplays[0]);
+      QAction *alphaAction = new QAction("Change Transparency",
+                                         cubeDisplays[0]);
 
       alphaAction->setData( QVariant::fromValue(cubeDisplays) );
       connect(alphaAction, SIGNAL(triggered()),
@@ -535,8 +536,9 @@ namespace Isis {
     QList<CubeDisplayProperties *> displays = senderToData(sender());
 
     bool ok = false;
-    int alpha = QInputDialog::getInt(NULL, "Alpha Value",
-        "Set the transparency value",
+    int alpha = QInputDialog::getInt(NULL, "Transparency Value",
+        "Set the cube's transparency\n"
+        "Values are 0 (invisible) to 255 (solid)",
         getValue(Color).value<QColor>().alpha(), 0, 255, 1, &ok);
 
     if(ok) {
