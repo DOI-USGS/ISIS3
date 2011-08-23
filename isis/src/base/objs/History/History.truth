@@ -1,7 +1,7 @@
 Object = Root
   Object = hist
     IsisVersion       = "3.0.16 beta | 2006-03-22"
-    ProgramVersion    = 2005-03-28
+    ProgramVersion    = 2011-08-19
     ExecutionDateTime = 2006-03-29T14:39:39
     HostName          = orkin
     UserName          = janderso
