@@ -70,7 +70,7 @@ namespace Isis {
 
       virtual void Set(iString newValue) = 0;
 
-      void SetEnabled(bool enabled);
+      void SetEnabled(bool enabled, bool isParentCombo=false);
 
       //! Is the parameter enabled
       bool IsEnabled() const {
@@ -89,7 +89,7 @@ namespace Isis {
 
       enum ParameterType { IntegerWidget, DoubleWidget, StringWidget,
                            ListWidget, FilenameWidget, CubeWidget,
-                           BooleanWidget
+                           BooleanWidget, ComboWidget
                          };
       ParameterType Type() {
         return p_type;

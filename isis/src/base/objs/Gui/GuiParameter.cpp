@@ -46,11 +46,10 @@ namespace Isis {
     p_param = param;
 
     p_name = ui.ParamName(group, param);
-
     p_fileButton = new QToolButton();
     p_lineEdit = new QLineEdit();
 
-    p_label = new QLabel((iString)p_ui->ParamName(group, param));
+    p_label = new QLabel(p_name);
     p_label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
     p_label->setToolTip((iString)p_ui->ParamBrief(group, param));
     grid->addWidget(p_label, param, 0, Qt::AlignCenter);
@@ -231,10 +230,24 @@ namespace Isis {
   }
 
   //! Enable or disable the parameter
-  void GuiParameter::SetEnabled(bool enabled) {
-    p_label->setEnabled(enabled);
-    for(int i = 0; i < p_widgetList.size(); i++) {
-      p_widgetList[i]->setEnabled(enabled);
+  void GuiParameter::SetEnabled(bool enabled, bool isParentCombo) {
+    if(p_type != ComboWidget) {
+      p_label->setEnabled(enabled);
+      p_label->setVisible(true);
+      if(isParentCombo && !enabled) {
+        p_label->setVisible(false);
+      }
+      for(int i = 0; i < p_widgetList.size(); i++) {
+        p_widgetList[i]->setEnabled(enabled);
+        p_widgetList[i]->setVisible(true);
+        if(isParentCombo && !enabled) {
+          p_widgetList[i]->setVisible(false);
+        }
+      }
+    }
+    else {
+      p_label->setEnabled(enabled);
+      p_widgetList[0]->setEnabled(enabled);
     }
   }
 

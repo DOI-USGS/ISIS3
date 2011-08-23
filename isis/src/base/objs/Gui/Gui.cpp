@@ -714,8 +714,8 @@ namespace Isis {
       for(int i = 0; i < (int)excludeList.size(); i++) {
         for(unsigned int e = 0; e < p_parameters.size(); e++) {
           GuiParameter &exclude = *(p_parameters[e]);
-          if(exclude.Name() != excludeList[i]) continue;
-          exclude.SetEnabled(false);
+          if(exclude.Name() != excludeList[i]) continue; 
+          exclude.SetEnabled(false, (param.Type()==GuiParameter::ComboWidget));
         }
       }
     }

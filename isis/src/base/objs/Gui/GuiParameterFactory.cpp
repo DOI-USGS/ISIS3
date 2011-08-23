@@ -1,4 +1,5 @@
 #include "GuiListParameter.h"
+#include "GuiComboBoxParameter.h"
 #include "GuiCubeParameter.h"
 #include "GuiFilenameParameter.h"
 #include "GuiStringParameter.h"
@@ -17,7 +18,11 @@ namespace Isis {
 
     GuiParameter *p = NULL;
     if(ui.ParamListSize(group, param) > 0) {
-      p = new GuiListParameter(grid, ui, group, param);
+      if (paramType == "combo") {
+        p = new GuiComboBoxParameter(grid, ui, group, param);
+      } else {
+        p = new GuiListParameter(grid, ui, group, param);
+      }
     }
     else if(paramType == "cube") {
       p = new GuiCubeParameter(grid, ui, group, param);
