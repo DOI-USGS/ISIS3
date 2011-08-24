@@ -35,7 +35,9 @@ namespace Isis {
    * @code
    * Object = AtmosphericModel
    *   Group = Algorithm
-   *     Name = Isotropic1
+   *     # Use 'PHTNAME' instead of 'NAME' if using the Gui combo box
+   *     # for unique Pvl keyword in DefFile
+   *     PhtName/Name = Isotropic1
    *     Tau = 0.7
    *     Tauref = 0.0
    *     Wha = 0.5
@@ -61,7 +63,14 @@ namespace Isis {
     // Get the algorithm name to create
     PvlGroup &algo = pvl.FindObject("AtmosphericModel")
                      .FindGroup("Algorithm", Pvl::Traverse);
-    std::string algorithm = algo["Name"];
+    
+     std::string algorithm = "";
+    if(algo.HasKeyword("PHTNAME")) {
+      algorithm = string(algo["PHTNAME"]);
+    }
+    else if(algo.HasKeyword("Name")) {
+      algorithm = string(algo["Name"]);
+    }
 
     // Open the factory plugin file
     Plugin *p = new Plugin;
