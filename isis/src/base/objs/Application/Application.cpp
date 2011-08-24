@@ -115,7 +115,7 @@ namespace Isis {
 
     // Create user interface and log
     try {
-      Filename f = string(argv[0]) + ".xml";
+      Filename f(string(argv[0]) + ".xml");
 
       // Create preferences
       Preference::Preferences(f.Name() == "unitTest.xml");

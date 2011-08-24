@@ -57,7 +57,7 @@ void IsisMain() {
         PvlKeyword widths = PvlKeyword("Width");
         iString tablePath = (string)labelPvl.FindKeyword("MRO:WAVELENGTH_FILE_NAME");
         tablePath = tablePath.DownCase();
-        Filename tableFile = inFile.Path() + "/" + tablePath;
+        Filename tableFile(inFile.Path() + "/" + tablePath);
         //Check if the wavelength file exists
         if(tableFile.Exists()) {
           TextFile *fin = new TextFile(tableFile.Expanded());

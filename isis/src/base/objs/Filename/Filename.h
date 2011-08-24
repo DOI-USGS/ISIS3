@@ -20,14 +20,12 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-#ifndef Isis_Filename_h
-#define Isis_Filename_h
-
-#include <string>
-#include <vector>
+#ifndef Filename_h
+#define Filename_h
 
 #include <QFileInfo>
-#include <QDir>
+
+#include "iString.h"
 
 namespace Isis {
   /**
@@ -53,43 +51,48 @@ namespace Isis {
    *   @history 2002-11-27 Stuart Sides - added capability to expand environment
    *                           variables within a filename.
    *   @history 2003-01-27 Jeff Anderson - added a method to allow full file
-   *                           specification to be extracted (includes the
-   *                        attributes.
+   *                           specification to be extracted (includes the 
+   *                           attributes).
    *   @history 2002-02-12 Stuart Sides - fixed bug with incorrect parsing when
    *                           filename did not have a path.
    *   @history 2003-05-16 Stuart Sides - modified schema from
    *                           astrogeology...isis.astrogeology.
    *   @history 2003-07-21 Stuart Sides - modified to use "+" as the attribute
    *                           delimiter instead of a ":".
-   *   @history 2003-10-17 Added default constructor, operator "=" and temporary
-   *                           members.
-   *   @history 2003-10-30 Added new members: HighestVersion and Exists.
-   *   @history 2003-12-03 Added capability to expand Preferences in the
-   *                           DataDirectory group only.
-   *   @history 2004-01-14 Added new member OriginalPath.
-   *   @history 2004-01-22 Added new member Name. Name returns the filename only
+   *   @history 2003-10-17 ?????? - Added default constructor, operator "=" and
+   *                           temporary members.
+   *   @history 2003-10-30 ?????? - Added new members: HighestVersion and
+   *                           Exists.
+   *   @history 2003-12-03 ?????? - Added capability to expand Preferences in
+   *                           the DataDirectory group only.
+   *   @history 2004-01-14 ?????? - Added new member OriginalPath.
+   *   @history 2004-01-22 ?????? - Added new member Name. Name returns the
+   *                           filename only
    *                           without any path, extension or attributes.
-   *   @history 2004-01-27 Tool all references to attributes out. IsisFilename
-   *                           now ignores all cube attributes.
-   *   @history 2004-01-27 Removed the member FullSpecification, because
-   *                           FullSpecification without the cube attributes now
-   *                           does the same thing as Filename.
-   *   @history 2004-01-27 Added a new constructor with two parameters. This new
-   *                           constructor will create a temporary filename using
-   *                           the path from the Preference
-   *                           DataDirectory/Temporary the filename from argument
-   *                           one appended with a number from 100000 to 199999
-   *                           and the extension of argument two.
-   *   @history 2004-05-17 Added new member MakeDirectory.
+   *   @history 2004-01-27 ?????? - Tool all references to attributes out.
+   *                           IsisFilename now ignores all cube attributes.
+   *   @history 2004-01-27 ?????? - Removed the member FullSpecification,
+   *                           because FullSpecification without the cube
+   *                           attributes now does the same thing as Filename.
+   *   @history 2004-01-27 ?????? - Added a new constructor with two parameters.
+   *                           This new constructor will create a temporary
+   *                           filename using the path from the Preference
+   *                           DataDirectory/Temporary the filename from
+   *                           argument one appended with a number from 100000
+   *                           to 199999 and the extension of argument two.
+   *   @history 2004-05-17 ?????? - Added new member MakeDirectory.
    *   @history 2005-07-28 Drew Davidson - added new member NewVersion.
    *   @history 2007-10-03 Steven Koechle - Fixed Temporary() so if a path was
-   *                           specified it will have the cwd put on in front of
-   *                           it.
-   *   @history 2009-01-07 Steven Lambright - Expanded(...) no longer behaves
+   *                           specified it will have the cwd put on in front of it.
+   *   @history 2009-01-07 Steven Lambright - Expanded() no longer behaves
    *                           differently for unit tests
    *   @history 2011-08-19 Jeannie Backer - Modified unitTest to use
    *                           $temporary variable instead of /tmp directory.
    *                           Added some documentation to methods.
+   *   @history 2011-08-24 Steven Lambright and Tracie Sucharski - Uses iString
+   *                           instead of std::string for simplicity when used
+   *                           with our GUI applications. Removed extra includes
+   *                           and cleaned up code a little.
    */
   class Filename : public QFileInfo {
     public:
@@ -97,43 +100,42 @@ namespace Isis {
       Filename();
 
       // Create a new Filename with the string
-      Filename(const std::string &filename);
+      Filename(const iString &filename);
 
       // Create a new Filename using the users temporary directory
       // preference with the name and extension specified
-      Filename(const std::string &Name, const std::string &extension);
+      Filename(const iString &Name, const iString &extension);
 
       // Destroys the Filename Object
       ~Filename();
 
       // Set the filename to the argument
-      void operator=(const std::string &filename);
+      void operator=(const iString &filename);
       void operator=(const char *filename);
 
       // Return only the path
-      std::string Path() const;
+      iString Path() const;
 
       // Return the name without the extension or path
-      std::string Basename() const;  // equiv to qt baseName
+      iString Basename() const;  // equiv to qt baseName
       // renamed from Name
 
       // Return only the name with extension and without the path
-      std::string Name() const;  // equiv to qt fileName
+      iString Name() const;  // equiv to qt fileName
       // renamed from Basename
 
       // Return only the extension (no path, name or ".")
-      std::string Extension() const;  // equiv to qt extension
+      iString Extension() const;  // equiv to qt extension
 
       // Return the expanded filename (path, name & extension)
-      std::string Expanded() const;  // mostly qt absFilePath without $ 
-                                     // expansion
+      iString Expanded() const;  // mostly qt absFilePath without $ expansion
 
       // Return the original path without "$" expansion if any
-      std::string OriginalPath() const;
+      iString OriginalPath() const;
 
       // Add an extension to an existing Filename
       // Doesn't do anything if an extension already exists
-      void AddExtension(const std::string &extension);
+      void AddExtension(const iString &extension);
 
       // Remove the extension
       void RemoveExtension();
@@ -153,17 +155,17 @@ namespace Isis {
       // Create a temporary filename using the
       // Isis::Preference DataDirectory/Temporary
       // directory with the name and extension of the arguments
-      void Temporary(const std::string &name, const std::string &extension);
+      void Temporary(const iString &name, const iString &extension);
 
     private:
 
       // Expand any "$xxxx" into Isis preferences and environment variables
       // THe "DataDirectory" is the only group searched in IsisPreferences
-      std::string Expand(const std::string &file);
+      iString Expand(const iString &file);
 
       void CheckVersion() const;
 
-      std::string p_original; //!< The original filename saved at construction
+      iString p_original; //!< The original filename saved at construction
 
   };
 };

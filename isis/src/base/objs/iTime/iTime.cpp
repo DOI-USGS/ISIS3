@@ -428,7 +428,7 @@ namespace Isis {
     Isis::PvlGroup &dataDir = Isis::Preference::Preferences().FindGroup("DataDirectory");
     string baseDir = dataDir["Base"];
     baseDir += "/kernels/lsk/";
-    Filename leapSecond = baseDir + "naif????.tls";
+    Filename leapSecond(baseDir + "naif????.tls");
     leapSecond.HighestVersion();
 
     string leapSecondName(leapSecond.Expanded());

@@ -616,7 +616,7 @@ void IsisAml::GetAsString(const std::string &paramName,
  *
  * @return The value of the parameter.
  */
-string IsisAml::GetFilename(const std::string &paramName, std::string extension) const {
+Isis::iString IsisAml::GetFilename(const std::string &paramName, std::string extension) const {
 
   const IsisParameterData *param = ReturnParam(paramName);
 

@@ -420,7 +420,7 @@ namespace Isis {
 
   void Equalization::generateOutputs(FileList &outList) {
     for (unsigned int img = 0; img < m_imageList.size(); img++) {
-      Filename file = m_imageList[img];
+      Filename file(m_imageList[img]);
       string filename = file.Path() + "/" + file.Basename() +
         ".equ." + file.Extension();
       outList.push_back(filename);

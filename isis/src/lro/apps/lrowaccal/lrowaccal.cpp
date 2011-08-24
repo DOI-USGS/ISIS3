@@ -1,4 +1,9 @@
 #include "Isis.h"
+
+#include <vector>
+
+#include <QDir>
+
 #include "SpecialPixel.h"
 #include "CubeAttribute.h"
 #include "Cube.h"
@@ -8,7 +13,6 @@
 #include "ProcessByBrick.h"
 #include "Brick.h"
 #include "iTime.h"
-#include <vector>
 
 using namespace Isis;
 using namespace std;

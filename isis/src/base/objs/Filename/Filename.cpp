@@ -20,15 +20,13 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-#include <cstdlib>
-#include <fstream>
-#include <iostream>
-
 #include "Filename.h"
-#include "iString.h"
+
+#include <QDir>
+
 #include "iException.h"
+#include "iString.h"
 #include "Preference.h"
-#include "PvlGroup.h"
 
 using namespace std;
 namespace Isis {
@@ -38,17 +36,19 @@ namespace Isis {
     p_original.clear();
   }
 
+
   /**
    * Constructs a Filename object and expands environment variables and
    * Preferences from the DataDirectory group embedded in the filename.
    *
    * @param file A string containing a filename.
    */
-  Filename::Filename(const std::string &file)
+  Filename::Filename(const iString &file)
     : QFileInfo() {
     p_original = file;
     QFileInfo::setFile((iString)Expand(file));
   }
+
 
   /**
    * Creates a temporary filename from the arguments. The new filename is checked
@@ -60,12 +60,15 @@ namespace Isis {
    *
    * @param extension Extension of the temporary file.
    */
-  Filename::Filename(const std::string &name, const std::string &extension) {
+  Filename::Filename(const iString &name, const iString &extension) {
     Temporary(name, extension);
   }
 
+
   //! Destroys the Filename object.
-  Filename::~Filename() {}
+  Filename::~Filename() {
+  }
+
 
   /**
    * Clears the current contents of the Filename object and reinitializes it with
@@ -73,10 +76,11 @@ namespace Isis {
    *
    * @param file File name to replace the current contents of the object.
    */
-  void Filename::operator=(const std::string &file) {
+  void Filename::operator=(const iString &file) {
     p_original = file;
     QFileInfo::setFile((iString)Expand(file));
   }
+
 
   /**
    * Clears the current contents of the Filename object and reinitializes it with
@@ -89,9 +93,10 @@ namespace Isis {
     QFileInfo::setFile((iString)Expand(file));
   }
 
-  /** 
+
+  /**
    * @brief Returns the path. 
-   * Returns the path portion of a filename. For *nix operating
+   * @returns the path portion of a filename. For *nix operating
    * systems this includes everything upto but not including the
    * last slash "/". For file names created without any slashes
    * the current working directory will be returned.
@@ -100,27 +105,22 @@ namespace Isis {
    *   "/home/me/img/picture.jpg"
    *   Path() gives:
    *   "/home/me/img"
-   * </pre> 
-   *  
-   * @return @b string - The directory path where the file is 
-   *         located.
+   * </pre>
    */
-  std::string Filename::Path() const {
+  iString Filename::Path() const {
     return QFileInfo::absolutePath().toStdString();
   }
 
-  /** 
+
+  /**
    * @brief Returns the basename. 
-   *  
-   * Returns the file name only. This excludes any path and the last extension.
+   * @returns the file name only. This excludes any path and the last extension.
    * For *nix operating systems this includes everything following the last slash
    * "/" and upto the last dot ".". If a file name contains multiple extensions,
    * all but the last one will be returned. If a file name has no extension,
-   * Basename returns the same as Name 
-   *  
-   * @return @b string - The name of the file without path or extension.
+   * Basename returns the same as Name
    */
-  std::string Filename::Basename() const {
+  iString Filename::Basename() const {
     if(QFileInfo::suffix().length() == 0) {
       return QFileInfo::baseName().toStdString();
     }
@@ -129,66 +129,59 @@ namespace Isis {
     }
   }
 
+
   /**
    * @brief Returns the filename. 
-   *  
-   * Returns the file name and all extensions of the filename. For
+   * @returns the file name and all extensions of the filename. For
    * *nix operating systems this includes everything following the
-   * last slash "/". 
-   *  
-   * @return @b string - The name of the file with extensions and 
-   *         without path.
+   * last slash "/".
    */
-  std::string Filename::Name() const {
+  iString Filename::Name() const {
     return QFileInfo::fileName().toStdString();
   }
 
+
   /**
    * @brief Returns the extension (Does not include .) 
-   *  
-   * Returns the extension of the filename. If multiple extensions
-   * exist, then only the last one will be returned. 
-   *  
-   * @return @b string - The last extension of the file. 
+   * @returns the extension of the filename. If multiple extensions
+   * exist, then only the last one will be returned.
    */
-  std::string Filename::Extension() const {
+  iString Filename::Extension() const {
     return QFileInfo::suffix().toStdString();
   }
+
 
   /**
    * @brief Returns the full filename (path, basename and 
    * extension(s)). 
-   *  
-   * Returns a fully expanded version of the file name. This will 
-   * include the expansion of any Isis Preference variables, 
-   * environment variables and operating system shortcuts such as 
-   * ".", "..", or "~" 
-   *  
-   * @return @b string - The full path and file name with 
-   *         extensions.
+   * @returns a fully expanded version of the file name. This will
+   * include the expansion of any Isis Preference variables,
+   * environment variables and operating system shortcuts such as
+   * ".", "..", or "~"
    */
-  std::string Filename::Expanded() const {
+  iString Filename::Expanded() const {
     return QFileInfo::absoluteFilePath().toStdString();
   }
+
 
   /**
    * Returns whether the file exists or not.
    *
-   * @return @b bool - True if the file exists, false if it doesn't.
+   * @return True if the file exists, false if it doesn't.
    */
   bool Filename::Exists() {
     return QFileInfo::exists();
   }
 
+
   /**
-   * Returns the path used to initialize the Filename object, if any. 
-   *  
-   * @return @b string - The original file path name. 
+   * @returns the path used to initialize the Filename object, if any.
    */
-  std::string Filename::OriginalPath() const {
+  iString Filename::OriginalPath() const {
     QFileInfo fi(p_original.c_str());
     return fi.path().toStdString();
   }
+
 
   /**
    * Adds an extension to the filename. If the existing extension is the same
@@ -200,7 +193,7 @@ namespace Isis {
    *
    * @param ext Extention to add.
    */
-  void Filename::AddExtension(const std::string &ext) {
+  void Filename::AddExtension(const iString &ext) {
     // Don't modify the extension if it is already there
     if(Extension() == ext) return;
 
@@ -210,12 +203,14 @@ namespace Isis {
     }
   }
 
+
   /**
   * Removes all extensions from the file name.
   */
   void Filename::RemoveExtension() {
     QFileInfo::setFile(iString(this->Path() + "/" + this->Basename()));
   }
+
 
   /**
    * Searches for a filename with the highest integer version number. Version
@@ -226,11 +221,10 @@ namespace Isis {
    * original name stored in the Filename object will be overwritten with the
    * results of the search.
    *
-   * @throws Isis::iException::Io - The path does not exist
-   * @throws Isis::iException::Programmer - No versions available for the file
+   * @throws iException::Io - The path does not exist
+   * @throws iException::Programmer - No versions available for the file
    */
   void Filename::HighestVersion() {
-
     CheckVersion();
 
     int highestVersion = -1;
@@ -284,6 +278,7 @@ namespace Isis {
     QFileInfo::setFile(temp.c_str());
   }
 
+
   /**
    * Creates a filename with a version number one higher than the previous highest
    * integer version number. Version numbers are defined as a sequence of question
@@ -296,8 +291,8 @@ namespace Isis {
    * question marks to the highest version, or the new version, but may not do
    * both operations on the same Filename.
    *
-   * @throws Isis::iException::Io - The path does not exist
-   * @throws Isis::iException::Programmer - No versions available for the file
+   * @throws iException::Io - The path does not exist
+   * @throws iException::Programmer - No versions available for the file
    */
   void Filename::NewVersion() {
 
@@ -355,10 +350,11 @@ namespace Isis {
     QFileInfo::setFile(temp.c_str());
   }
 
+
   /**
    * Makes a directory.
    *
-   * @throws Isis::iException::Programmer - Unable to create the directory
+   * @throws iException::Programmer - Unable to create the directory
    */
   void Filename::MakeDirectory() {
 
@@ -371,6 +367,7 @@ namespace Isis {
 
   }
 
+
   /**
    * Create a temporary file. If the Preference "DataDirectory-&gt;Temporary"
    * exists then the file will be created there. If not the file will be created
@@ -382,10 +379,10 @@ namespace Isis {
    *
    * @param extension The extension of the temporary file.
    *
-   * @throws Isis::iException::Io - No temporary files available for the given
+   * @throws iException::Io - No temporary files available for the given
    *                                name and extension
    */
-  void Filename::Temporary(const std::string &name, const std::string &extension) {
+  void Filename::Temporary(const iString &name, const iString &extension) {
     string tempDir;
     tempDir.clear();
     // If the IsisPreference exists use it otherwise just use name as is
@@ -421,6 +418,7 @@ namespace Isis {
 
   }
 
+
   /**
    * Expand any $xxxxx into Isis preference and environment variables.
    * Note: "DataDirectory" is the only group search in Preferences.
@@ -429,16 +427,16 @@ namespace Isis {
    *
    * @return @b string Expanded file name
    */
-  string Filename::Expand(const std::string &file) {
+  iString Filename::Expand(const iString &file) {
 
     // Setup an index for searching strings
-    string::size_type pos, pos2;
+    std::string::size_type pos, pos2;
 
     // Work with a tempory copy
     string temp = file;
 
     // Strip off any cube attributes
-    if((pos = temp.find("+")) != string::npos) temp.erase(pos);
+    if((pos = temp.find("+")) != std::string::npos) temp.erase(pos);
 
 
     // Expand any $xxxxx into ISIS preferences and environment variables
@@ -449,7 +447,7 @@ namespace Isis {
 
     // Loop while there are any "$" at the current position or after
     // Some "$" might be skipped if no translation can be found
-    while((pos = temp.find("$", pos)) != string::npos) {
+    while((pos = temp.find("$", pos)) != std::string::npos) {
       pos2 = temp.find("/", pos);
       var = temp.substr(pos + 1, pos2 - pos - 1);
       string value;
@@ -484,11 +482,12 @@ namespace Isis {
     return temp;
   }
 
+
   /**
    *  Check the current filename for a valid version sequence of "?"s
    *
-   * @throws Isis::iException::Programmer - File does not contain a version
-   * @throws Isis::iException::Programmer - File has too many version sequences,
+   * @throws iException::Programmer - File does not contain a version
+   * @throws iException::Programmer - File has too many version sequences,
    *                                        only one is allowed
    */
   void Filename::CheckVersion() const {

@@ -12,6 +12,8 @@
 #include "ControlPoint.h"
 #include "ControlPointList.h"
 #include "Cube.h"
+#include "Filename.h"
+#include "iException.h"
 #include "MeasureValidationResults.h"
 #include "Progress.h"
 #include "Pvl.h"
@@ -19,7 +21,6 @@
 #include "PvlKeyword.h"
 #include "PvlObject.h"
 #include "SerialNumberList.h"
-#include "iException.h"
 
 #include "GuiEditFile.h"
 
@@ -430,7 +431,7 @@ void populateLog(ControlNet &cnet) {
  * @param cnet     The Control Network being modified
  */
 void processControlPoints(string fileName, ControlNet &cnet) {
-  ControlPointList cpList(fileName);
+  ControlPointList cpList((Filename)fileName);
 
   Progress progress;
   progress.SetText("Comparing Points to POINTLIST");

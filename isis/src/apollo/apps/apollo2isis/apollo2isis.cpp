@@ -269,7 +269,8 @@ void TranslateApolloLabels (iString filename, Cube *opack) {
   // Set up the nominal reseaus group
   Isis::PvlGroup &dataDir = Isis::Preference::Preferences().FindGroup("DataDirectory");
   Process p;
-  PvlTranslationTable tTable(p.MissionData("base", "translations/MissionName2DataDir.trn"));
+  PvlTranslationTable tTable(
+      (iString)p.MissionData("base", "translations/MissionName2DataDir.trn"));
   iString missionDir = dataDir[tTable.Translate("MissionName", apollo->SpacecraftName())][0];
   Pvl resTemplate(missionDir + "/reseaus/" + apollo->InstrumentId() + "_NOMINAL.pvl");
   PvlGroup *reseaus = &resTemplate.FindGroup("Reseaus");

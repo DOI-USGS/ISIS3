@@ -35,7 +35,7 @@ void IsisMain ()
   else {
     hkLabel = inFile.OriginalPath() + "/" + inFile.Basename() + "_HK.LBL";
     // Determine the housekeeping file
-    Filename hkFile = hkLabel; 
+    Filename hkFile(hkLabel);
     if (!hkFile.Exists()) {
       hkFile = iString::Replace(hkLabel, "_1B_", "_1A_", false);
       if (hkFile.Exists()) hkLabel = hkFile.Expanded();

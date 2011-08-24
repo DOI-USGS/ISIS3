@@ -123,7 +123,8 @@ namespace Isis {
     // If we don't succeed, create one
     if(translationIterator == missionTranslators.end()) {
       // Get the file
-      Filename snFile = (std::string) dataDir[mission] + "/translations/" + instrument + "SerialNumber????.trn";
+      Filename snFile((std::string) dataDir[mission] + "/translations/" +
+                                    instrument + "SerialNumber????.trn");
       snFile.HighestVersion();
 
       // use the translation file to generate keywords

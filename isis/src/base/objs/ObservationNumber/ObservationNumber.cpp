@@ -101,7 +101,8 @@ namespace Isis {
 
     if(translationIterator == missionTranslators.end()) {
       // Get the file
-      Filename snFile = (std::string) dataDir[mission] + "/translations/" + instrument + "SerialNumber????.trn";
+      Filename snFile((std::string) dataDir[mission] + "/translations/" +
+                                    instrument + "SerialNumber????.trn");
       snFile.HighestVersion();
 
       // Delets the extra

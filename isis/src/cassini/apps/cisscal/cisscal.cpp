@@ -496,7 +496,7 @@ Filename gbl::FindBitweightFile() {
   else {
     bitweightName += "p25_bwt.tab";
   }
-  return gbl::GetCalibrationDirectory("bitweight") + bitweightName;
+  return Filename(gbl::GetCalibrationDirectory("bitweight") + bitweightName);
 }
 //=====End Bitweight Methods=====================================================================//
 

@@ -130,7 +130,7 @@ void TranslateVoyagerLabels(Pvl &inputLabel, Cube *ocube) {
   // Get the directory where the Voyager translation tables are
   PvlGroup &dataDir = Preference::Preferences().FindGroup("DataDirectory");
   iString missionDir = (string) dataDir[(string)inputLabel["SpacecraftName"]];
-  Filename transFile = (missionDir + "/translations/voyager.trn");
+  Filename transFile(missionDir + "/translations/voyager.trn");
 
   // Get the translation manager ready
   PvlTranslationManager labelXlater(inputLabel, transFile.Expanded());

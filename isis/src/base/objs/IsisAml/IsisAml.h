@@ -34,6 +34,10 @@
 #include "iString.h"
 #include "Pvl.h"
 
+namespace Isis {
+  class iString;
+}
+
 /**
  * @brief Application program XML file parameter manager.
  *
@@ -171,7 +175,7 @@ class IsisAml : protected IsisAmlData {
     std::string GetAsString(const std::string &paramName) const;
     void GetAsString(const std::string &paramName, std::vector<std::string> &values) const;
 
-    std::string GetFilename(const std::string &paramName, std::string extension = "") const;
+    Isis::iString GetFilename(const std::string &paramName, std::string extension = "") const;
     void GetFilename(const std::string &paramName, std::vector<std::string> &values) const;
 
     std::string GetString(const std::string &paramName) const;

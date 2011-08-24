@@ -22,6 +22,9 @@
 
 #include <iostream>
 #include <algorithm>
+
+#include <QDir>
+
 #include "SpiceDbGen.h"
 #include "NaifStatus.h"
 
@@ -83,7 +86,7 @@ PvlObject SpiceDbGen::Direct(iString quality, iString location,
     }
 
     for(int fileNum = 0 ; fileNum < files.size() ; fileNum++) {
-      Filename currFile = ((string) location + "/" + files[fileNum].toStdString());
+      Filename currFile((string) location + "/" + files[fileNum].toStdString());
       PvlGroup selection = AddSelection(currFile);
       selection += PvlKeyword("Type", quality);
       result.AddGroup(selection);

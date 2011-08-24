@@ -453,7 +453,7 @@ namespace Isis {
     try {
       PvlObject &core = m_label->FindObject("IsisCube").FindObject("Core");
       if(core.HasKeyword("^Core")) {
-        Filename temp(core["^Core"]);
+        Filename temp(core["^Core"][0]);
 
         if(temp.OriginalPath() == ".") {
           m_dataFilename = new iString(realName.Path() + "/" + temp.Name());

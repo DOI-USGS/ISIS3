@@ -89,8 +89,8 @@ namespace Isis {
 
     // Get the two kernels for time computations
     PvlGroup &kerns = lab.FindGroup("Kernels", Pvl::Traverse);
-    p_lsk = kerns["LeapSecond"];
-    p_sclk = kerns["SpacecraftClock"];
+    p_lsk = Filename(kerns["LeapSecond"][0]);
+    p_sclk = Filename(kerns["SpacecraftClock"][0]);
   }
 
   /**

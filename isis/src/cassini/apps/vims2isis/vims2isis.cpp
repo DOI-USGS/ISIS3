@@ -69,7 +69,7 @@ void IsisMain() {
     throw iException::Message(iException::Io, msg, _FILEINFO_);
   }
 
-  Filename tempname = in.Basename() + ".bsq.cub";
+  Filename tempname(in.Basename() + ".bsq.cub");
   Pvl pdsLab(in.Expanded());
 
   // It's VIMS, let's figure out if it has the suffix data or not

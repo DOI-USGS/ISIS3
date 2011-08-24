@@ -15,21 +15,28 @@ void IsisMain() {
   // We will be processing by line
   ProcessByTile p;
   p.SetTileSize(128, 128);
-  
+
   Cube *inCube = p.SetInputCube("FROM");
-  
-  Isis::PvlGroup &dataDir = Isis::Preference::Preferences().FindGroup("DataDirectory");
-  PvlTranslationTable tTable(p.MissionData("base", "translations/MissionName2DataDir.trn"));
-  iString missionDir = dataDir[tTable.Translate("MissionName", (inCube->getGroup("Instrument")).FindKeyword("SpacecraftName")[0])][0];
-  string camera = (inCube->getGroup("Instrument")).FindKeyword("InstrumentId")[0];
-  
+
+  PvlGroup &dataDir =
+      Preference::Preferences().FindGroup("DataDirectory");
+  PvlTranslationTable tTable(
+      (iString)p.MissionData("base", "translations/MissionName2DataDir.trn"));
+  iString missionDir = dataDir[tTable.Translate("MissionName",
+      (inCube->getGroup("Instrument")).FindKeyword("SpacecraftName")[0])][0];
+  string camera =
+      (inCube->getGroup("Instrument")).FindKeyword("InstrumentId")[0];
+
   CubeAttributeInput cai;
   p.SetInputCube(missionDir + "/calibration/" + camera + "_flatfield.cub", cai);
-  
+
   CubeAttributeOutput cao;
-  cao.PixelType(Isis::Real);
-  p.SetOutputCube((Filename((Application::GetUserInterface()).GetAsString("TO")).Expanded()), cao, inCube->getSampleCount(), inCube->getLineCount(), inCube->getBandCount());
-  
+  cao.PixelType(Real);
+  p.SetOutputCube(
+      Filename(Application::GetUserInterface().GetAsString("TO")).Expanded(),
+      cao, inCube->getSampleCount(), inCube->getLineCount(),
+      inCube->getBandCount());
+
   p.StartProcess(cal);
   p.EndProcess();
 }
@@ -46,7 +53,7 @@ void cal (vector<Buffer *> &in, vector<Buffer *> &out) {
       outp[i] = inp[i];
     }
     else if (IsSpecial(fff[i])) {
-      outp[i] = Isis::Null;
+      outp[i] = Null;
     }
     else {
       outp[i] = 65535.0*(1.0 - log(65536 - inp[i])/log(2.0)/16.0);    // Log Filter the film negative (and multiply by 2^16/16 to maintain the range of values)
