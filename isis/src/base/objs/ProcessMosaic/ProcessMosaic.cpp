@@ -190,7 +190,7 @@ namespace Isis {
     if (mbMatchDEM){
       MatchDEMShapeModel();
     }
-    
+
     // Check to make sure the bandbins match if necessary
     if(mbBandbinMatch) {
       Pvl *outLab = OutputCubes[0]->getLabel();
@@ -536,7 +536,7 @@ namespace Isis {
       if(inBin.HasKeyword(sOutName)) {
         PvlKeyword &inKey = inBin[sOutName];
         for(int j = iOsb, k = iIsb; j < outKey.Size() && k < inKey.Size(); j++, k++) {
-          piInb++;
+//           piInb++;
           if(outKey[j] == "NA") {
             outKey[j] = inKey[k];
             if(mePriority == average) {
@@ -562,7 +562,11 @@ namespace Isis {
         throw Isis::iException::Message(iException::User, msg, _FILEINFO_);
       }
     }
-    piInb /= outBin.Keywords();
+//     piInb /= outBin.Keywords();
+
+    int inputRange = InputCubes[0]->getBandCount() - iIsb;
+    int outputRange = OutputCubes[0]->getBandCount() - iOsb;
+    piInb = min(inputRange, outputRange);
   }
 
   /**
