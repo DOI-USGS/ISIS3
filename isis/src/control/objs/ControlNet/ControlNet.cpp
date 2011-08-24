@@ -871,6 +871,8 @@ namespace Isis {
 
   /**
    * Compute aprior values for each point in the network
+   *
+   * @history 2010-08-23  Ken Edmundson, skipping ignored points
    */
   void ControlNet::ComputeApriori() {
     // TODO:  Make sure the cameras have been initialized
