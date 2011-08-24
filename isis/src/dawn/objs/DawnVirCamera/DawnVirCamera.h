@@ -45,6 +45,9 @@ namespace Isis {
      * @internal
      *
      *   @history 2011-03-10 Kris Becker Original Version
+     *   @history 2011-08-23 Kris Becker - Correct length of scan
+     *            line to be the EXTERNAL_REPETITION_TIME of the
+     *            FRAME_PARAMETER[2] value.
      */
     class DawnVirCamera : public LineScanCamera {
       public:
@@ -75,15 +78,19 @@ namespace Isis {
 
         bool   m_is1BCalibrated; ///!< is determined by Archive/ProcessingLevelId
         char   m_slitMode;       ///!< Slit mode of the instrument
-        double m_lineRate;       ///!< Scan line rate
+        double m_exposureTime;   ///!< Line exposure time
         int    m_summing;        ///!< Summing/binnning mode
+        double m_scanRate;       ///!< Line scan rate
+
         std::vector<LineRateChange> m_lineRates;
         std::vector<ScanMirrorInfo> m_mirrorData;
+
         int    m_nDarkCurrent;   ///!< Number of dark current lines in table
 
         void readHouseKeeping(const std::string &filename, double lineRate);
         std::string scrub(const std::string &text) const;
         double exposureTime() const;
+        double scanLineTime() const;
         int    pixelSumming() const;
         double startTime() const;
         double endTime() const;

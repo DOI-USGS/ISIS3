@@ -62,12 +62,14 @@ namespace Isis {
 
       // Get other info from labels
       PvlKeyword &frameParam = inst["FrameParameter"];
-      m_lineRate = frameParam[0].ToDouble();
+      m_exposureTime = frameParam[0].ToDouble();
       m_summing  = frameParam[1].ToInteger();
+      m_scanRate = frameParam[2].ToDouble();
+
 
       // Setup detector map
       //  Get the line scane rates/times
-      readHouseKeeping(lab.Filename(), m_lineRate);
+      readHouseKeeping(lab.Filename(), m_scanRate);
       new VariableLineScanCameraDetectorMap(this, m_lineRates);
       DetectorMap()->SetDetectorSampleSumming(m_summing);
 
@@ -161,9 +163,14 @@ namespace Isis {
      return (m_summing);
    }
 
-   /** Return the line scan rate */ 
+   /** Return the exposure time */
    double DawnVirCamera::exposureTime() const {
-     return (m_lineRate);
+     return (m_exposureTime);
+   }
+
+   /** Return the line scan rate */ 
+   double DawnVirCamera::scanLineTime() const {
+     return (m_scanRate);
    }
 
    /** Return start time */
