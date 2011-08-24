@@ -877,7 +877,9 @@ namespace Isis {
     QHashIterator< QString, ControlPoint * > i(*points);
     while (i.hasNext()) {
       i.next();
-      i.value()->ComputeApriori();
+      ControlPoint *point = i.value();
+      if ( !point->IsIgnored() )
+        point->ComputeApriori();
     }
   }
 
