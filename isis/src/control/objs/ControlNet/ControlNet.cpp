@@ -335,14 +335,17 @@ namespace Isis {
 
     // in this measure's node add connections to the other nodes reachable from
     // its point
-    for (int i = 0; i < point->GetNumMeasures(); i++) {
-      ControlMeasure *cm = point->GetMeasure(i);
-      if (!cm->IsIgnored()) {
-        QString sn = cm->GetCubeSerialNumber();
-        ControlCubeGraphNode *neighborNode = (*cubeGraphNodes)[sn];
-        if (neighborNode != node) {
-          node->addConnection(neighborNode, point);
-          neighborNode->addConnection(node, point);
+    if (!point->IsIgnored() && !measure->IsIgnored()) {
+      for (int i = 0; i < point->GetNumMeasures(); i++) {
+        ControlMeasure *cm = point->GetMeasure(i);
+        if (!cm->IsIgnored()) {
+          QString sn = cm->GetCubeSerialNumber();
+          ControlCubeGraphNode *neighborNode = (*cubeGraphNodes)[sn];
+
+          if (neighborNode != node) {
+            node->addConnection(neighborNode, point);
+            neighborNode->addConnection(node, point);
+          }
         }
       }
     }

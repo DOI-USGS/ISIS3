@@ -149,6 +149,7 @@ namespace Isis {
    *                deleted
    *   @history 2011-07-27 Sharmila Prasad - Fixed bug in GetNumEditLockMeasures()
    *   @history 2011-08-01 Eric Hyer - Addressed some graphing issues
+   *   @history 2011-08-24 Steven Lambright - Fixed bug in graph code
    */
   class ControlNet : public QObject {
       Q_OBJECT
