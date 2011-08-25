@@ -35,7 +35,7 @@ namespace Isis {
    * @code
    * Object = AtmosphericModel
    *   Group = Algorithm
-   *     # Use 'ATMNAME' instead of 'NAME' if using the Gui combo box
+   *     # Use 'AtmName' instead of 'Name' if using the Gui combo box
    *     # for unique Pvl keyword in DefFile
    *     AtmName/Name = Isotropic1
    *     Tau = 0.7
@@ -66,7 +66,7 @@ namespace Isis {
     
     std::string algorithm = "";
     if(algo.HasKeyword("AtmName")) {
-      algorithm = string(algo["PHTNAME"]);
+      algorithm = string(algo["AtmName"]);
     }
     else if(algo.HasKeyword("Name")) {
       algorithm = string(algo["Name"]);
