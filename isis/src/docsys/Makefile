@@ -76,7 +76,7 @@ upperlevel:
 
 	echo "        [home page]"
 	#rsync -lHptr --delete --rsh=ssh --cvs-exclude *.html $(DOCDIR)/
-	$(XALAN) -v -p menuPath "'./'" -o $(DOCDIR)/index.html build/homepage.xml build/main.xsl
+	$(XALAN) $(XALAN_VALIDATE_OPTION) $(XALAN_PARAM_OPTION) menuPath "'./'" $(XALAN_OUTFILE_OPTION) $(DOCDIR)/index.html $(XALAN_INFILE_OPTION) build/homepage.xml $(XALAN_XSL_OPTION) build/main.xsl
 
 	echo "      Finished Updating Directories"
 

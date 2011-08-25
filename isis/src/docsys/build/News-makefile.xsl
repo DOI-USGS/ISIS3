@@ -32,7 +32,7 @@ all: <xsl:for-each select="newsItem[info/item = '3' or info/item = 'both']"><xsl
 <xsl:sort select="newsDate" order="descending"/>
 Isis3-<xsl:value-of select="normalize-space(newsDate)"/>_<xsl:value-of select="position()"/>.html: ../build/News.xsl isisnews.xml
 <xsl:text>	</xsl:text>echo "          Constructing News [Isis3-<xsl:value-of select="normalize-space(newsDate)"/>_<xsl:value-of select="position()"/>]"
-<xsl:text>	</xsl:text>$(XALAN) -p filenameParam "'Isis3-<xsl:value-of select="normalize-space(newsDate)"/>_<xsl:value-of select="position()"/>'" -o Isis3-<xsl:value-of select="normalize-space(newsDate)"/>_<xsl:value-of select="position()"/>.html<xsl:text> </xsl:text>isisnews.xml ../build/News.xsl
+<xsl:text>	</xsl:text>$(XALAN) $(XALAN_PARAM_OPTION) filenameParam "'Isis3-<xsl:value-of select="normalize-space(newsDate)"/>_<xsl:value-of select="position()"/>'" $(XALAN_OUTFILE_OPTION) Isis3-<xsl:value-of select="normalize-space(newsDate)"/>_<xsl:value-of select="position()"/>.html<xsl:text> $(XALAN_INFILE_OPTION) </xsl:text>isisnews.xml $(XALAN_XSL_OPTION) ../build/News.xsl
 <xsl:text>&#xa;</xsl:text>
 </xsl:for-each>
 
@@ -40,7 +40,7 @@ Isis3-<xsl:value-of select="normalize-space(newsDate)"/>_<xsl:value-of select="p
 <xsl:sort select="newsDate" order="descending"/>
 Isis2-<xsl:value-of select="normalize-space(newsDate)"/>_<xsl:value-of select="position()"/>.html: ../build/News.xsl isisnews.xml
 <xsl:text>	</xsl:text>echo "          Constructing News [Isis2-<xsl:value-of select="normalize-space(newsDate)"/>_<xsl:value-of select="position()"/>]"
-<xsl:text>	</xsl:text>$(XALAN) -p filenameParam "'Isis2-<xsl:value-of select="normalize-space(newsDate)"/>_<xsl:value-of select="position()"/>'" -o Isis2-<xsl:value-of select="normalize-space(newsDate)"/>_<xsl:value-of select="position()"/>.html<xsl:text> </xsl:text>isisnews.xml ../build/News.xsl
+<xsl:text>	</xsl:text>$(XALAN) $(XALAN_PARAM_OPTION) filenameParam "'Isis2-<xsl:value-of select="normalize-space(newsDate)"/>_<xsl:value-of select="position()"/>'" $(XALAN_OUTFILE_OPTION) Isis2-<xsl:value-of select="normalize-space(newsDate)"/>_<xsl:value-of select="position()"/>.html<xsl:text> $(XALAN_INFILE_OPTION) </xsl:text>isisnews.xml $(XALAN_XSL_OPTION) ../build/News.xsl
 <xsl:text>&#xa;</xsl:text>
 </xsl:for-each>
 </xsl:template>

@@ -45,22 +45,22 @@ documentation:
 tocalph: $(TOCDIR)/alpha.html
 $(TOCDIR)/alpha.html: build/toc.xml build/TOCindex_alpha.xsl
 	echo "      Creating Alphabetical Applications List"
-	$(XALAN) -p menuPath "'../'" -o $(TOCDIR)/alpha.html build/toc.xml build/TOCindex_alpha.xsl
+	$(XALAN) $(XALAN_PARAM_OPTION) menuPath "'../'" $(XALAN_OUTFILE_OPTION) $(TOCDIR)/alpha.html $(XALAN_INFILE_OPTION) build/toc.xml $(XALAN_XSL_OPTION) build/TOCindex_alpha.xsl
 
 toccat: $(TOCDIR)/index.html
 $(TOCDIR)/index.html: build/toc.xml build/TOCindex_category.xsl
 	echo "      Creating Categorical Applications List"
-	$(XALAN) -p menuPath "'../'" -o $(TOCDIR)/index.html build/toc.xml build/TOCindex_category.xsl
+	$(XALAN) $(XALAN_PARAM_OPTION) menuPath "'../'" $(XALAN_OUTFILE_OPTION) $(TOCDIR)/index.html $(XALAN_INFILE_OPTION) build/toc.xml $(XALAN_XSL_OPTION) build/TOCindex_category.xsl
 
 tocoldvnew: $(TOCDIR)/oldvnew.html
 $(TOCDIR)/oldvnew.html: build/toc.xml build/TOCindex_oldvnew.xsl
 	echo "      Creating Old vs. New Applications List"
-	$(XALAN) -p menuPath "'../'" -o $(TOCDIR)/oldvnew.html build/toc.xml build/TOCindex_oldvnew.xsl
+	$(XALAN) $(XALAN_PARAM_OPTION) menuPath "'../'" $(XALAN_OUTFILE_OPTION) $(TOCDIR)/oldvnew.html $(XALAN_INFILE_OPTION) build/toc.xml $(XALAN_XSL_OPTION) build/TOCindex_oldvnew.xsl
 
 categories: ../Schemas/Application/application.xsd build/IsisApplicationCategoriesbuild.xsl
 	echo "      Generating list of categories from the AML Schema"
 	mkdir -p $(ISISROOT)/bin/xml/
-	$(XALAN) -o $(ISISROOT)/bin/xml/applicationCategories.xml ../Schemas/Application/application.xsd build/IsisApplicationCategoriesbuild.xsl
+	$(XALAN) $(XALAN_OUTFILE_OPTION) $(ISISROOT)/bin/xml/applicationCategories.xml $(XALAN_INFILE_OPTION) ../Schemas/Application/application.xsd $(XALAN_XSL_OPTION) build/IsisApplicationCategoriesbuild.xsl
 	
 
 

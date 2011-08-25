@@ -24,7 +24,7 @@ $(DOCDIR)/$(DOC): $(DOC).xml ../../build/IsisInlineDocumentBuild.xsl ../../build
 	mkdir -p $(DOCDIR)/$(DOC) 
 	touch $(DOCDIR)/$(DOC) 
 	touch $(DOCDIR) 
-	$(XALAN) -p menuPath "'../../'" -p dirParam "'$(DOC)'" -o Makefile-temp $(DOC).xml ../../build/IsisInlineDocumentBuild.xsl 
+	$(XALAN) $(XALAN_PARAM_OPTION) menuPath "'../../'" $(XALAN_PARAM_OPTION) dirParam "'$(DOC)'" $(XALAN_OUTFILE_OPTION) Makefile-temp $(XALAN_INFILE_OPTION) $(DOC).xml $(XALAN_XSL_OPTION) ../../build/IsisInlineDocumentBuild.xsl 
 	make -f Makefile-temp docs 
 	rsync -lHptr --delete --rsh=ssh * $(DOCDIR)/$(DOC)/
 

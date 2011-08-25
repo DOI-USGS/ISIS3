@@ -41,7 +41,7 @@ $(PFDIR)/$(APP)/$(APP).html: $(APP).xml $(PFSTYLEDIR)/IsisApplicationDocStyle.xs
 	then \
 	  rsync -lHptr --delete --rsh=ssh assets $(PFDIR)/$(APP) ; \
 	fi 
-	$(XALAN) -p menuPath "'../../../../'" -o $(PFDIR)/$(APP)/$(APP).html $(APP).xml $(PFSTYLEDIR)/IsisApplicationDocStyle.xsl ; \
+	$(XALAN) $(XALAN_PARAM_OPTION) menuPath "'../../../../'" $(XALAN_OUTFILE_OPTION) $(PFDIR)/$(APP)/$(APP).html $(XALAN_INFILE_OPTION) $(APP).xml $(XALAN_XSL_OPTION) $(PFSTYLEDIR)/IsisApplicationDocStyle.xsl ; \
 	touch $(APPSDIR)
 	
 
@@ -61,6 +61,6 @@ $(TABDIR)/$(APP)/$(APP).html: $(APP).xml $(TABSTYLEDIR)/IsisApplicationDocStyle.
 	then \
 	  rsync -lHptr --delete --rsh=ssh assets $(TABDIR)/$(APP) ; \
 	fi 
-	$(XALAN) -p menuPath "'../../../../'" -o $(TABDIR)/$(APP)/$(APP).html $(APP).xml $(TABSTYLEDIR)/IsisApplicationDocStyle.xsl 
+	$(XALAN) $(XALAN_PARAM_OPTION) menuPath "'../../../../'" $(XALAN_OUTFILE_OPTION) $(TABDIR)/$(APP)/$(APP).html $(XALAN_INFILE_OPTION) $(APP).xml $(XALAN_XSL_OPTION) $(TABSTYLEDIR)/IsisApplicationDocStyle.xsl 
 	touch $(APPSDIR)
 

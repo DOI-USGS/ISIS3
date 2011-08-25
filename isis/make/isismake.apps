@@ -85,7 +85,7 @@ $(BINS): $(UIHEADERS) $(QTRESOURCEFILES) protos $(OBJS)
 	$(CXX) $(ALLINCDIRS) $(ISISCPPFLAGS) -c -o $@ $?
 
 .xml.html :
-	$(XALAN) -v -o $@ $? $(ISISROOT)/src/docsys/Application/presentation/ProgTester/IsisApplicationDocStyle.xsl
+	$(XALAN) $(XALAN_VALIDATE_OPTION) $(XALAN_OUTFILE_OPTION) $@ $(XALAN_INFILE_OPTION) $? $(XALAN_XSL_OPTION) $(ISISROOT)/src/docsys/Application/presentation/ProgTester/IsisApplicationDocStyle.xsl
 
 protos: $(PROTOS:%.proto=%.pb.h) $(PROTOS:%.proto=%.pb.cc)
 
@@ -158,7 +158,7 @@ install: app
 
 
 validxml:
-	$(XALAN) -v -o /dev/null $(BINS).xml $(ISISROOT)/src/docsys/Application/presentation/ProgTester/IsisApplicationDocStyle.xsl;
+	$(XALAN) $(XALAN_VALIDATE_OPTION) $(XALAN_OUTFILE_OPTION) /dev/null $(XALAN_INFILE_OPTION) $(BINS).xml $(XALAN_XSL_OPTION) $(ISISROOT)/src/docsys/Application/presentation/ProgTester/IsisApplicationDocStyle.xsl;
 
 docs:
 	mkdir -p $(ISISROOT)/src/docsys/Application/data/`basename $(CURDIR)`

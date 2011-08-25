@@ -130,7 +130,7 @@ doApps:
 	echo "        ...building apps documentation"
 	doxygen build/apps_tag_temp.conf
 #	cp build/apps/apps.tag $(ISISROOT)/doc/Object/apps/
-	$(XALAN) -o build/apps/apps_fix.tag build/apps/apps.tag build/IsisApplicationTagFix.xsl
+	$(XALAN) $(XALAN_OUTFILE_OPTION) build/apps/apps_fix.tag $(XALAN_INFILE_OPTION) build/apps/apps.tag $(XALAN_XSL_OPTION) build/IsisApplicationTagFix.xsl
 	cp build/apps/apps_fix.tag $(ISISROOT)/doc/Object/apps/
 
 doProg:

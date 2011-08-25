@@ -65,7 +65,7 @@ toc: ../build/toc.xml
 	cat ../build/toc_header.xml > ../build/toc.xml
 	for dirname in $(APPLICATIONS); do \
 	  echo "          Adding [$$dirname]" ; \
-	  $(XALAN) $$dirname/$$dirname.xml ../build/IsisApplicationTOCbuild.xsl >> ../build/toc.xml ; \
+	  $(XALAN) $(XALAN_INFILE_OPTION) $$dirname/$$dirname.xml $(XALAN_XSL_OPTION) ../build/IsisApplicationTOCbuild.xsl >> ../build/toc.xml ; \
 	done
 	cat ../build/toc_footer.xml >> ../build/toc.xml
 	mkdir -p $(ISISROOT)/bin/xml/

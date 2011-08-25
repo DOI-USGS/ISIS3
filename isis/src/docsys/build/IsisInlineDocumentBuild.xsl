@@ -30,8 +30,8 @@ include $(ISISROOT)/make/isismake.macros
 docs:
 <xsl:text>	</xsl:text>echo "          Constructing [<xsl:value-of select="$dirParam"/>]"
 <xsl:for-each select="files/file"><xsl:if test="body"><xsl:choose>
-<xsl:when test="@primary = 'true'"><xsl:text>	</xsl:text>$(XALAN)  -p menuPath "'../../'" -p filenameParam "'<xsl:value-of select="normalize-space(source/filename)"/>'" -o <xsl:value-of select="normalize-space(source/filename)"/><xsl:text> </xsl:text><xsl:value-of select="$dirParam"/>.xml ../../build/IsisPrimaryPageBuild.xsl</xsl:when>
-<xsl:otherwise><xsl:text>	</xsl:text>$(XALAN) -p menuPath "'../../'" -p filenameParam "'<xsl:value-of select="normalize-space(source/filename)"/>'" -o <xsl:value-of select="normalize-space(source/filename)"/><xsl:text> </xsl:text><xsl:value-of select="$dirParam"/>.xml ../../build/IsisSubPageBuild.xsl</xsl:otherwise>
+<xsl:when test="@primary = 'true'"><xsl:text>	</xsl:text>$(XALAN)  $(XALAN_PARAM_OPTION) menuPath "'../../'" $(XALAN_PARAM_OPTION) filenameParam "'<xsl:value-of select="normalize-space(source/filename)"/>'" $(XALAN_OUTFILE_OPTION) <xsl:value-of select="normalize-space(source/filename)"/><xsl:text> $(XALAN_INFILE_OPTION) </xsl:text><xsl:value-of select="$dirParam"/>.xml $(XALAN_XSL_OPTION) ../../build/IsisPrimaryPageBuild.xsl</xsl:when>
+<xsl:otherwise><xsl:text>	</xsl:text>$(XALAN) $(XALAN_PARAM_OPTION) menuPath "'../../'" $(XALAN_PARAM_OPTION) filenameParam "'<xsl:value-of select="normalize-space(source/filename)"/>'" $(XALAN_OUTFILE_OPTION) <xsl:value-of select="normalize-space(source/filename)"/><xsl:text> $(XALAN_INFILE_OPTION) </xsl:text><xsl:value-of select="$dirParam"/>.xml  $(XALAN_XSL_OPTION) ../../build/IsisSubPageBuild.xsl</xsl:otherwise>
 </xsl:choose>
 <xsl:text>&#xa;</xsl:text>
 </xsl:if>
