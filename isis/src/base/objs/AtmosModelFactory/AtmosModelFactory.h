@@ -38,7 +38,7 @@ namespace Isis {
    *
    * @code
    *  Object = AtmosphericModel Group = Algorithm
-   *    Name = Isotropic1 ...
+   *    AstName/Name = Isotropic1 ...
    *  EndGroup ...
    *EndObject End
    * @endcode
@@ -58,6 +58,9 @@ namespace Isis {
    *
    * @internal
    *  @history 2008-06-18 Christopher Austin - Fixed documentation errors
+   *  @history 2011-08-25 Sharmila Prasad - Use 'AstName' for Model name to be able to be
+   *             used in combo Gui which requires unique parameter name. Maintaining 'Name'
+   *             to support existing apps using this keyword.
    */
   class AtmosModelFactory {
     public:

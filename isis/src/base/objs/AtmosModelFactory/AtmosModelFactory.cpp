@@ -35,9 +35,9 @@ namespace Isis {
    * @code
    * Object = AtmosphericModel
    *   Group = Algorithm
-   *     # Use 'PHTNAME' instead of 'NAME' if using the Gui combo box
+   *     # Use 'ASTNAME' instead of 'NAME' if using the Gui combo box
    *     # for unique Pvl keyword in DefFile
-   *     PhtName/Name = Isotropic1
+   *     AstName/Name = Isotropic1
    *     Tau = 0.7
    *     Tauref = 0.0
    *     Wha = 0.5
@@ -65,13 +65,17 @@ namespace Isis {
                      .FindGroup("Algorithm", Pvl::Traverse);
     
      std::string algorithm = "";
-    if(algo.HasKeyword("PHTNAME")) {
-      algorithm = string(algo["PHTNAME"]);
+    if(algo.HasKeyword("ASTNAME")) {
+      algorithm = string(algo["ASTNAME"]);
     }
     else if(algo.HasKeyword("Name")) {
       algorithm = string(algo["Name"]);
     }
-
+    else {
+      string errMsg = "**PVL ERROR** Keyword [Name] or [ASTNAME] does not exist in [Group = Algorithm]";
+      throw Isis::iException::Message(iException::User, errMsg, _FILEINFO_);
+    }
+    
     // Open the factory plugin file
     Plugin *p = new Plugin;
     Filename f("AtmosModel.plugin");
