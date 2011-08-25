@@ -21,10 +21,14 @@
 
 #include "tnt/tnt_array2d_utils.h"
 
+// #define DUMP_INFO 1
+
 using namespace std;
 namespace Isis {
     // constructors
     DawnVirCamera::DawnVirCamera(Pvl &lab) : LineScanCamera(lab) {
+
+ //     cout << "Testing DawnVirCamera...\n";
 
       PvlGroup &archive = lab.FindGroup("Archive", Isis::Pvl::Traverse);
       int procLevel = archive["ProcessingLevelId"];
@@ -66,9 +70,8 @@ namespace Isis {
       m_summing  = frameParam[1].ToInteger();
       m_scanRate = frameParam[2].ToDouble();
 
-
       // Setup detector map
-      //  Get the line scane rates/times
+      //  Get the line scan rates/times
       readHouseKeeping(lab.Filename(), m_scanRate);
       new VariableLineScanCameraDetectorMap(this, m_lineRates);
       DetectorMap()->SetDetectorSampleSumming(m_summing);
@@ -86,7 +89,6 @@ namespace Isis {
       FocalPlaneMap()->SetDetectorOrigin(sampleBoreSight, lineBoreSight);
 
       // Setup distortion map
-//      new DawnVirCameraDistortionMap(this);
       new CameraDistortionMap(this);
 
       // Setup the ground and sky map
@@ -94,12 +96,12 @@ namespace Isis {
       new LineScanCameraSkyMap(this);
 
       // Set initial start time always (label start time is inaccurate)
-      SetTime(iTime(startTime()-(exposureTime()/2.0)));    // Isis3nightly
-//      SetEphemerisTime(startTime()-(exposureTime()/2.0));  // Isis3.2.1
+      SetTime(iTime(startTime()));    // Isis3nightly
+//      SetEphemerisTime(startTime());  // Isis3.2.1
 
       //  Now check to determine if we have a cache already.  If we have a cache
       //  table, we are beyond spiceinit and have already computed the proper
-      //  point table from the housekeeping data
+      //  point table from the housekeeping data or articulation kernel.
       if (!InstrumentRotation()->IsCached() && !hasArtCK) {
 
         // Create new table here prior to creating normal caches
@@ -113,7 +115,7 @@ namespace Isis {
         LoadCache();
       }
 
-#if defined(DUMP_CACHE)
+#if defined(DUMP_INFO)
       Table cache = InstrumentRotation()->Cache("Loaded");
       cout << "Total Records: " << cache.Records() << "\n";
 
@@ -173,20 +175,30 @@ namespace Isis {
      return (m_scanRate);
    }
 
+  /** Return the start time for a given line exposure time  */
+   double DawnVirCamera::lineStartTime(const double midExpTime) const {
+     return (midExpTime-(exposureTime()/2.0));
+   }
+
+  /** Return the start time for a given line exposure time  */
+   double DawnVirCamera::lineEndTime(const double midExpTime) const {
+     return (midExpTime+(exposureTime()/2.0));
+   }
+
    /** Return start time */
    double DawnVirCamera::startTime() const {
-     return (m_mirrorData[0].m_scanLineEt);
+     return (lineStartTime(m_mirrorData[0].m_scanLineEt));
    }
 
 
    /** Return end time after all lines are acquired */
    double DawnVirCamera::endTime() const {
-    return (m_mirrorData[hkLineCount()-1].m_scanLineEt);
+    return (lineEndTime(m_mirrorData[hkLineCount()-1].m_scanLineEt));
    }
 
 
    /** Returns number of housekeeping records found in the cube Table */
-   int    DawnVirCamera::hkLineCount() const {
+   int DawnVirCamera::hkLineCount() const {
      return (m_mirrorData.size());
    }
 
@@ -214,36 +226,52 @@ namespace Isis {
       string scet = scrub(trec["ScetTimeClock"]);
       string shutterMode = scrub(trec["ShutterStatus"]);
 
-      // Compute the optical mirror ange=eeeeee
+      // Compute the optical mirror angle
       double mirrorSin = trec["MirrorSin"];
       double mirrorCos = trec["MirrorCos"];
       double scanElecDeg = atan(mirrorSin/mirrorCos) * dpr_c();
       double optAng = ((scanElecDeg - 3.7996979) * 0.25/0.257812);
-      optAng /= 1000.0;  // Convert mrads to radians
+      optAng /= 1000.0;  
+
 
       ScanMirrorInfo smInfo;
-      double lineStart;
-     //scs2e_c(NaifSpkCode(), scet.c_str(), &lineStart);
-      lineStart = getClockTime(scet, NaifSpkCode()).Et();
+      double lineMidTime;
+      //  scs2e_c(NaifSpkCode(), scet.c_str(), &lineMidTime);
+      lineMidTime = getClockTime(scet, NaifSpkCode()).Et();
       bool isDark = iString::Equal("closed", shutterMode);
 
       // Add fit data for all open angles
-      if (!isDark) {  angFit.AddData(lineno, optAng);   }
+      if ( ! isDark ) {  angFit.AddData(lineno, optAng);   }
+
+#if defined(DUMP_INFO)
+      cout << "Line(" << ((isDark) ? "C): " : "O): ") << i 
+           << ", OptAng(D): " << setprecision(12) << optAng * dpr_c() 
+           << ", MidExpTime(ET): " <<  lineMidTime
+           << "\n";
+#endif
 
       // Store line, 
       smInfo.m_lineNum = lineno;
-      smInfo.m_scanLineEt = lineStart;
+      smInfo.m_scanLineEt = lineMidTime;
       smInfo.m_mirrorSin = mirrorSin;
       smInfo.m_mirrorCos = mirrorCos;
       smInfo.m_opticalAngle = optAng;
       smInfo.m_isDarkCurrent = isDark;
 
       if ((!m_is1BCalibrated) || (!(m_is1BCalibrated && isDark))) {
-        m_lineRates.push_back(LineRateChange(lineno, lineStart, lineRate));
+        m_lineRates.push_back(LineRateChange(lineno, 
+                                             lineStartTime(lineMidTime), 
+                                             lineRate));
         m_mirrorData.push_back(smInfo);
         lineno++;
       }
     }
+
+    // Adjust the last time
+    LineRateChange  lastR = m_lineRates.back();
+    m_lineRates.back() = LineRateChange(lastR.GetStartLine(),
+                                        lastR.GetStartEt(),
+                                        exposureTime());
 
     //  Run through replacing all closed optical angles with fitted data.
     //  These are mostly first/last lines so must set proper extrapolation
@@ -303,26 +331,6 @@ namespace Isis {
     string virId = "DAWN_VIR_" + virChannel;
     string virZero = virId + "_ZERO";
 
-
-    // Retrieve the bore sight FOV
-    SpiceDouble bsight[3];
-    SpiceChar shape[80], frame[80];
-    SpiceDouble bounds[4][3];
-    SpiceInt n;  // Number bound vectors
-    getfov_c(NaifIkCode(), 4, sizeof(shape), sizeof(frame), shape, frame,
-             bsight, &n, bounds);
-
-    SpiceDouble scan_pix_vec[3];
-    vsub_c(bounds[1], bounds[0], scan_pix_vec);
-    vscl_c(4.0, scan_pix_vec, scan_pix_vec);
-    
-    SpiceDouble smpl_pix_vec[3];
-    vsub_c(bounds[0], bounds[3], smpl_pix_vec);
-    //  Will have only 256 or 64 samples in full slit mode - always have
-    //  64 samples in quarter slit (thus the 256 scale).
-    double sampScale = (m_slitMode == 'F') ? Samples() : 256.0;
-    vscl_c(1.0/sampScale, smpl_pix_vec, smpl_pix_vec);
-
     // Allocate output arrays
     int nvals = nfields - 1;
     int nlines = m_lineRates.size();
@@ -332,10 +340,9 @@ namespace Isis {
     SpiceDouble m[3][3];
     SpiceDouble q_av[7], *av(&q_av[4]);
 
-    double halfExpTime = exposureTime() / 2.0;
     for (int i = 0 ; i < nlines ; i++) {
       int index = min(i, nlines-1);
-      double etTime = m_mirrorData[index].m_scanLineEt;  //  - halfExpTime;;
+      double etTime = m_mirrorData[index].m_scanLineEt;  // mid exposure ET
       double optAng = m_mirrorData[index].m_opticalAngle;
       try {
         // J2000 -> DAWN_VIR_{channel}_ZERO
@@ -368,8 +375,8 @@ namespace Isis {
     }
 
     // Add some necessary keywords
-    quats.Label() += PvlKeyword("CkTableStartTime", startTime()-halfExpTime);
-    quats.Label() += PvlKeyword("CkTableEndTime", endTime()+halfExpTime);
+    quats.Label() += PvlKeyword("CkTableStartTime", startTime());
+    quats.Label() += PvlKeyword("CkTableEndTime", endTime());
     quats.Label() += PvlKeyword("CkTableOriginalSize", quats.Records());
 
     // Create the time dependant frames keyword
@@ -405,7 +412,13 @@ namespace Isis {
    * @brief Compute the state rotation at a given time for given frames
    *
    *  Compute a 6x6 rotation state matrix between the two frames at the
-   *  specified time.
+   *  specified time. This method actually computes the complete
+   *  pointing rotations at the given time (typically the mid
+   *  exposure time).
+   *  
+   *  If acceleration vectors are not present, then only the
+   *  rotation properties are retrived from the CK kernels.  The
+   *  acceleration vectors are then set to 0.
    *
    *
    * @history 2011-07-22 Kris Becker

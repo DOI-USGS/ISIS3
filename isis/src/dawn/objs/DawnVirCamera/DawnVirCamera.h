@@ -85,16 +85,18 @@ namespace Isis {
         std::vector<LineRateChange> m_lineRates;
         std::vector<ScanMirrorInfo> m_mirrorData;
 
-        int    m_nDarkCurrent;   ///!< Number of dark current lines in table
-
         void readHouseKeeping(const std::string &filename, double lineRate);
         std::string scrub(const std::string &text) const;
         double exposureTime() const;
         double scanLineTime() const;
         int    pixelSumming() const;
+
+        int    hkLineCount() const;
+        double lineStartTime(const double midExpTime) const;
+        double lineEndTime(const double midExpTime) const;
+
         double startTime() const;
         double endTime() const;
-        int    hkLineCount() const;
 
         Table getPointingTable(const std::string &channelId, 
                                const int zeroFrame);

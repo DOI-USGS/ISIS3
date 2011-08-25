@@ -43,8 +43,13 @@ int main(void) {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
     // and "Longitude off by: " values directly into these variables.
-    double knownLat = 10.0318264323263371;
-    double knownLon = 272.0561372647773055;
+#if 1
+    double knownLat = 10.0378774577082908;
+    double knownLon = 272.2778420892259419;
+#else
+    double knownLat = 0.0;
+    double knownLon = 0.0;
+#endif
 
     Pvl p("$ISIS3TESTDATA/isis/src/dawn/objs/DawnVirCamera/VIR_VIS_1B_1_362681635_1.cub");
     DawnVirCamera *cam = (DawnVirCamera *) CameraFactory::Create(p);
