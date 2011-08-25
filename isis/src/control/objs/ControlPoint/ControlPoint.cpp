@@ -782,12 +782,21 @@ namespace Isis {
    * definition process, the reference will attempt to be made ignored if the
    * measure will allow it.
    *
+   * In the past, setting an explicit reference would also attempt to set the
+   * new reference to un-ignored (this would only fail if the measure was "Edit
+   * Locked").  This blanket rule was removed, however, because the bundle
+   * adjustment processing phase could often intentionally set references to
+   * ignored, and in some instances (e.g., merging a partial network back into
+   * the base network) this rule would mistakenly set those properly ignored
+   * references back to un-ignored.  While this rule made sense for the
+   * registration phase of processing, it clearly caused problems during bundle
+   * adjustment and merging.
+   *
    * @param measure The new reference measure
    */
   void ControlPoint::SetExplicitReference(ControlMeasure *measure) {
     referenceExplicitlySet = true;
     referenceMeasure = measure;
-    referenceMeasure->SetIgnored(false);
   }
 
 
