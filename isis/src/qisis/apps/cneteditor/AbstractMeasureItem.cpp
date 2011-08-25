@@ -345,12 +345,12 @@ namespace Isis
             "measure is edit locked";
         throw iException::Message(iException::User, msg, _FILEINFO_);
       }
-      else if (measure->Parent()->GetRefMeasure() == measure) {
-        iString msg = "Measure [" + getData() + "] in point [" +
-            getData(getColumnName(PointId)) + "] cannot be deleted because "
-            "it is the reference";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
-      }
+//       else if (measure->Parent()->GetRefMeasure() == measure) {
+//         iString msg = "Measure [" + getData() + "] in point [" +
+//             getData(getColumnName(PointId)) + "] cannot be deleted because "
+//             "it is the reference";
+//         throw iException::Message(iException::User, msg, _FILEINFO_);
+//       }
 
       ControlMeasure * tempMeasure = measure;
       measure = NULL;

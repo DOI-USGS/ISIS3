@@ -14,7 +14,7 @@ namespace Isis
 {
   AbstractSerialItem::AbstractSerialItem(ControlCubeGraphNode * cubeGraphNode,
       int avgCharWidth, AbstractTreeItem * parent)
-    : AbstractTreeItem(parent)
+      : AbstractTreeItem(parent)
   {
     ASSERT(cubeGraphNode);
     ccgn = cubeGraphNode;
