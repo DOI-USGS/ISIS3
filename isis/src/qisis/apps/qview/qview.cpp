@@ -32,7 +32,6 @@
 #include "SocketThread.h"
 #include "iString.h"
 #include "MeasureTool.h"
-#include "ScatterPlotTool.h"
 #include "SpecialPixelTool.h"
 #include "PlotTool.h"
 #include "HistogramTool.h"
@@ -47,7 +46,7 @@ using namespace Isis;
 
 int main(int argc, char *argv[]) {
 #ifdef CWDEBUG
-  //startMonitoringMemory();
+  startMonitoringMemory();
 #endif
 
   // Check to see if the user wants to force a new window
@@ -164,9 +163,6 @@ int main(int argc, char *argv[]) {
   Tool *pltool = new PlotTool(vw);
   pltool->addTo(vw);
 
-  Tool *scattertool = new ScatterPlotTool(vw);
-  scattertool->addTo(vw);
-
   Tool *histtool = new HistogramTool(vw);
   histtool->addTo(vw);
 
@@ -224,7 +220,6 @@ int main(int argc, char *argv[]) {
   //Connect the viewport's close signal to the all windows/subwindows
   QObject::connect(vw , SIGNAL(closeWindow()), histtool, SLOT(removeWindow()));
   QObject::connect(vw , SIGNAL(closeWindow()), pltool,   SLOT(removeWindow()));
-  QObject::connect(vw , SIGNAL(closeWindow()), scattertool,   SLOT(removeWindow()));
   QObject::connect(vw , SIGNAL(closeWindow()), ftool,    SLOT(exit()));
 
   int status = app->exec();
@@ -239,7 +234,6 @@ int main(int argc, char *argv[]) {
   delete htool;
   delete histtool;
   delete pltool;
-  delete scattertool;
   delete sptool;
   delete mtool;
   delete wtool;
