@@ -32,6 +32,10 @@
 #include "IsisXMLChTrans.h"
 #include "iString.h"
 #include "Preference.h"
+#include "Pvl.h"
+#include "PvlGroup.h"
+#include "PvlKeyword.h"
+#include "PvlObject.h"
 
 using namespace std;
 
@@ -47,7 +51,7 @@ namespace XERCES = XERCES_CPP_NAMESPACE;
  *
  * @param xmlfile Indicates the pull path of the XML file to be parsed.
  */
-IsisAml::IsisAml(const std::string &xmlfile) {
+IsisAml::IsisAml(const string &xmlfile) {
   StartParser(xmlfile.c_str());
 }
 
@@ -74,8 +78,8 @@ IsisAml::~IsisAml() {
  * to erase all values in the value data member instead of overwriting an
  * existing value.
  */
-void IsisAml::PutAsString(const std::string &paramName,
-                          const std::string &value) {
+void IsisAml::PutAsString(const string &paramName,
+                          const string &value) {
 
   IsisParameterData *param = const_cast <IsisParameterData *>(ReturnParam(paramName));
 
@@ -102,8 +106,8 @@ void IsisAml::PutAsString(const std::string &paramName,
  * must be one of: (TRUE, FALSE, YES, NO, or a partial match of any of these
  * beginning with the first character).
  */
-void IsisAml::PutAsString(const std::string &paramName,
-                          const std::vector<std::string> &value) {
+void IsisAml::PutAsString(const string &paramName,
+                          const vector<string> &value) {
 
   IsisParameterData *param = const_cast <IsisParameterData *>(ReturnParam(paramName));
 
@@ -137,11 +141,11 @@ void IsisAml::PutAsString(const std::string &paramName,
  * beginning with the first character).
  *
  */
-void IsisAml::PutString(const std::string &paramName, const std::string &value) {
+void IsisAml::PutString(const string &paramName, const string &value) {
 
   IsisParameterData *param = const_cast <IsisParameterData *>(ReturnParam(paramName));
 
-  if(param->type != "string") {
+  if(param->type != "string" && param->type != "combo") {
     string message = "Parameter [" + paramName + "] is not a string.";
     throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
   }
@@ -169,12 +173,12 @@ void IsisAml::PutString(const std::string &paramName, const std::string &value) 
  * @param paramName The partial or full name of the parameter to be modified.
  * @param value The string value to be placed in the string's value data member.
  */
-void IsisAml::PutString(const std::string &paramName,
-                        const std::vector<std::string> &value) {
+void IsisAml::PutString(const string &paramName,
+                        const vector<string> &value) {
 
   IsisParameterData *param = const_cast <IsisParameterData *>(ReturnParam(paramName));
 
-  if(param->type != "string") {
+  if(param->type != "string" && param->type != "combo") {
     string message = "Parameter [" + paramName + "] is not a string.";
     throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
   }
@@ -204,8 +208,8 @@ void IsisAml::PutString(const std::string &paramName,
  * @param value The string representation of the value to be placed in the
  * filename's value data member.
  */
-void IsisAml::PutFilename(const std::string &paramName,
-                          const std::string &value) {
+void IsisAml::PutFilename(const string &paramName,
+                          const string &value) {
 
   IsisParameterData *param = const_cast <IsisParameterData *>(ReturnParam(paramName));
 
@@ -246,8 +250,8 @@ void IsisAml::PutFilename(const std::string &paramName,
  * Use "Clear" to erase all values in the value data member instead of
  * overwriting an existing value.
  */
-void IsisAml::PutFilename(const std::string &paramName,
-                          const std::vector<std::string> &value) {
+void IsisAml::PutFilename(const string &paramName,
+                          const vector<string> &value) {
 
   IsisParameterData *param = const_cast <IsisParameterData *>(ReturnParam(paramName));
 
@@ -284,7 +288,7 @@ void IsisAml::PutFilename(const std::string &paramName,
  * @throws iException (IsisProgrammerError) The parameter is not of type
  * "int".
  */
-void IsisAml::PutInteger(const std::string &paramName,
+void IsisAml::PutInteger(const string &paramName,
                          const int &value) {
 
   IsisParameterData *param = const_cast <IsisParameterData *>(ReturnParam(paramName));
@@ -325,8 +329,8 @@ void IsisAml::PutInteger(const std::string &paramName,
  * an existing value.
  * @throws iException (IsisProgrammerError) The parameter is not of type "int".
  */
-void IsisAml::PutInteger(const std::string &paramName,
-                         const std::vector<int> &value) {
+void IsisAml::PutInteger(const string &paramName,
+                         const vector<int> &value) {
 
   IsisParameterData *param = const_cast <IsisParameterData *>(ReturnParam(paramName));
 
@@ -370,7 +374,7 @@ void IsisAml::PutInteger(const std::string &paramName,
  * @throws iException (IsisProgrammerError) The parameter is not of type
  * "double".
  */
-void IsisAml::PutDouble(const std::string &paramName,
+void IsisAml::PutDouble(const string &paramName,
                         const double &value) {
 
   IsisParameterData *param = const_cast <IsisParameterData *>(ReturnParam(paramName));
@@ -411,8 +415,8 @@ void IsisAml::PutDouble(const std::string &paramName,
  * @throws iException (IsisProgrammerError) The parameter is not of type
  * "double".
  */
-void IsisAml::PutDouble(const std::string &paramName,
-                        const std::vector<double> &value) {
+void IsisAml::PutDouble(const string &paramName,
+                        const vector<double> &value) {
 
   IsisParameterData *param = const_cast <IsisParameterData *>(ReturnParam(paramName));
 
@@ -455,7 +459,7 @@ void IsisAml::PutDouble(const std::string &paramName,
  * @throws iException (IsisProgrammerError) The parameter is not of type
  * "boolean".
  */
-void IsisAml::PutBoolean(const std::string &paramName,
+void IsisAml::PutBoolean(const string &paramName,
                          const bool &value) {
 
   IsisParameterData *param = const_cast <IsisParameterData *>(ReturnParam(paramName));
@@ -501,8 +505,8 @@ void IsisAml::PutBoolean(const std::string &paramName,
  * @throws iException (IsisProgrammerError) The parameter is not of type
  * "boolean".
  */
-void IsisAml::PutBoolean(const std::string &paramName,
-                         const std::vector<bool> &value) {
+void IsisAml::PutBoolean(const string &paramName,
+                         const vector<bool> &value) {
 
   IsisParameterData *param = const_cast <IsisParameterData *>(ReturnParam(paramName));
 
@@ -546,7 +550,7 @@ void IsisAml::PutBoolean(const std::string &paramName,
  *
  * @throws iException (IsisProgrammerError) The parameter has no value.
  */
-string IsisAml::GetAsString(const std::string &paramName) const {
+string IsisAml::GetAsString(const string &paramName) const {
 
   const IsisParameterData *param = ReturnParam(paramName);
   string value;
@@ -578,8 +582,8 @@ string IsisAml::GetAsString(const std::string &paramName) const {
  *
  * @throws iException (IsisProgrammerError) The parameter has no value.
  */
-void IsisAml::GetAsString(const std::string &paramName,
-                          std::vector<std::string> &values) const {
+void IsisAml::GetAsString(const string &paramName,
+                          vector<string> &values) const {
 
   const IsisParameterData *param = ReturnParam(paramName);
 
@@ -616,7 +620,7 @@ void IsisAml::GetAsString(const std::string &paramName,
  *
  * @return The value of the parameter.
  */
-Isis::iString IsisAml::GetFilename(const std::string &paramName, std::string extension) const {
+Isis::iString IsisAml::GetFilename(const string &paramName, string extension) const {
 
   const IsisParameterData *param = ReturnParam(paramName);
 
@@ -656,8 +660,8 @@ Isis::iString IsisAml::GetFilename(const std::string &paramName, std::string ext
  * @param values The value membet of the parameter whose name starts with
  * paramName.
  */
-void IsisAml::GetFilename(const std::string &paramName,
-                          std::vector<std::string> &values) const {
+void IsisAml::GetFilename(const string &paramName,
+                          vector<string> &values) const {
 
   const IsisParameterData *param = ReturnParam(paramName);
 
@@ -701,12 +705,12 @@ void IsisAml::GetFilename(const std::string &paramName,
  *
  * @throws iException::Programmer (IsisErrorUser) The parameter has no value.
  */
-string IsisAml::GetString(const std::string &paramName) const {
+string IsisAml::GetString(const string &paramName) const {
 
   const IsisParameterData *param = ReturnParam(paramName);
   Isis::iString value;
 
-  if(param->type != "string") {
+  if(param->type != "string" && param->type != "combo") {
     string message = "Parameter [" + paramName + "] is not a string.";
     throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
   }
@@ -767,12 +771,12 @@ string IsisAml::GetString(const std::string &paramName) const {
  *
  * @throws iException::Programmer (IsisErrorUser) The parameter has no value.
  */
-void IsisAml::GetString(const std::string &paramName,
-                        std::vector<std::string> &values) const {
+void IsisAml::GetString(const string &paramName,
+                        vector<string> &values) const {
 
   const IsisParameterData *param = ReturnParam(paramName);
 
-  if(param->type != "string") {
+  if(param->type != "string" && param->type != "combo") {
     string message = "Parameter [" + paramName + "] is not a string.";
     throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
   }
@@ -810,7 +814,7 @@ void IsisAml::GetString(const std::string &paramName,
  *
  * @throws iException::Programmer (IsisErrorUser) The parameter has no value.
  */
-int IsisAml::GetInteger(const std::string &paramName) const {
+int IsisAml::GetInteger(const string &paramName) const {
 
   const IsisParameterData *param = ReturnParam(paramName);
 
@@ -849,8 +853,8 @@ int IsisAml::GetInteger(const std::string &paramName) const {
  *
  * @throws iException::Programmer (IsisErrorUser) The parameter has no value.
  */
-void IsisAml::GetInteger(const std::string &paramName,
-                         std::vector<int> &values) const {
+void IsisAml::GetInteger(const string &paramName,
+                         vector<int> &values) const {
 
   const IsisParameterData *param = ReturnParam(paramName);
 
@@ -894,7 +898,7 @@ void IsisAml::GetInteger(const std::string &paramName,
  *
  * @throws iException::Programmer (IsisErrorUser) The parameter has no value.
  */
-double IsisAml::GetDouble(const std::string &paramName) const {
+double IsisAml::GetDouble(const string &paramName) const {
 
   const IsisParameterData *param = ReturnParam(paramName);
 
@@ -932,8 +936,8 @@ double IsisAml::GetDouble(const std::string &paramName) const {
  *
  * @throws iException::Programmer (IsisErrorUser) The parameter has no value.
  */
-void IsisAml::GetDouble(const std::string &paramName,
-                        std::vector<double> &values) const {
+void IsisAml::GetDouble(const string &paramName,
+                        vector<double> &values) const {
 
   const IsisParameterData *param = ReturnParam(paramName);
 
@@ -976,7 +980,7 @@ void IsisAml::GetDouble(const std::string &paramName,
  *
  * @throws iException::Programmer (IsisErrorUser) The parameter has no value.
  */
-bool IsisAml::GetBoolean(const std::string &paramName) const {
+bool IsisAml::GetBoolean(const string &paramName) const {
 
   const IsisParameterData *param = ReturnParam(paramName);
 
@@ -1016,8 +1020,8 @@ bool IsisAml::GetBoolean(const std::string &paramName) const {
  *
  * @throws iException::Programmer (IsisErrorUser) The parameter has no value.
  */
-void IsisAml::GetBoolean(const std::string &paramName,
-                         std::vector<bool> &values) const {
+void IsisAml::GetBoolean(const string &paramName,
+                         vector<bool> &values) const {
 
   const IsisParameterData *param = ReturnParam(paramName);
 
@@ -1108,6 +1112,103 @@ string IsisAml::GroupName(const int &index) const {
   return s;
 }
 
+/**
+ * Given group name return its index in the Gui
+ * 
+ * @author Sharmila Prasad (8/11/2011)
+ * 
+ * @param grpName 
+ * 
+ * @return int 
+ */
+int IsisAml::GroupIndex(const string & grpName) const {
+  for(int i=0; i<(int)groups.size(); i++) {
+    if(Isis::iString(grpName).DownCase() == Isis::iString(groups[i].name).DownCase()) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+/**
+ * Create a PVL file from the parameters in a Group given the Gui group name, 
+ * Pvl Object and Group names and the list of parameters to be included in the 
+ * Pvl 
+ * 
+ * @author Sharmila Prasad (8/11/2011)
+ * 
+ * @param pvlDef      - output PVL 
+ * @param guiGrpName  - Gui Group name
+ * @param pvlObjName  - output PVL Object name
+ * @param pvlGrpName  - output PVL Group name
+ * @param include     - vector of parameter names to be part of the output PVL
+ */
+void IsisAml::CreatePVL(Isis::Pvl &pvlDef , string guiGrpName, string pvlObjName, string pvlGrpName, vector<string> & include) {
+  
+  Isis::PvlObject *pvlObj = NULL;
+  if (pvlObjName != "") {
+    pvlObj = new Isis::PvlObject(pvlObjName);
+  }
+  
+  // Get Gui Group index
+  int grpIndex= GroupIndex(guiGrpName);
+  
+  if (pvlGrpName == "" || grpIndex == -1 ) {
+    string errMsg = "Must provide Group Name\n";
+    throw Isis::iException::Message(Isis::iException::User, errMsg, _FILEINFO_); 
+  }
+  
+  Isis::PvlGroup grp(pvlGrpName);
+  for(int i=0; i<NumParams(grpIndex); i++) {
+    string paramName = ParamName(grpIndex, i); 
+
+    if(IsParamInPvlInclude(paramName,include)) {
+      Isis::iString paramType = Isis::iString(ParamType(grpIndex, i)).DownCase();
+      if(paramType == "double") {
+        grp += Isis::PvlKeyword(paramName, GetDouble(paramName));
+      }
+      if(paramType == "integer") {
+        grp += Isis::PvlKeyword(paramName, GetInteger(paramName));
+      }
+      if(paramType == "boolean") {
+        grp += Isis::PvlKeyword(paramName, GetBoolean(paramName));
+      }
+      if(paramType == "string" || paramType == "filename" || paramType == "combo") {
+        grp += Isis::PvlKeyword(paramName, GetAsString(paramName));
+      }
+    }
+  }
+
+  if(pvlObj != NULL) {
+    *pvlObj += grp;
+    pvlDef  += *pvlObj;
+    delete (pvlObj);
+    pvlObj = NULL;
+  }
+  else {
+    pvlDef += grp;
+  }
+}
+
+/**
+ * Verify if the Parameter is in the Included list
+ * 
+ * @author Sharmila Prasad (8/11/2011)
+ * 
+ * @param paramName - parameter name
+ * @param include   - include list
+ * 
+ * @return bool 
+ */
+bool IsisAml::IsParamInPvlInclude(string & paramName, vector<string> & include) {
+
+  for(int i=0; i<(int)include.size(); i++) {
+    if(Isis::iString(paramName).DownCase() == Isis::iString(include[i]).DownCase()) {
+      return true;
+    }
+  }
+  return false;
+}
 /**
  * Returns the number of parameters in a group.
  *
@@ -1744,7 +1845,7 @@ string IsisAml::HelperIcon(const int &group, const int &param,
  *
  * @return True if the parameter was entered, and false if it was not
  */
-bool IsisAml::WasEntered(const std::string &paramName) const {
+bool IsisAml::WasEntered(const string &paramName) const {
 
   const IsisParameterData *param = ReturnParam(paramName);
 
@@ -1760,7 +1861,7 @@ bool IsisAml::WasEntered(const std::string &paramName) const {
  *
  * @param paramName The name of the parameter to clear
  */
-void IsisAml::Clear(const std::string &paramName) {
+void IsisAml::Clear(const string &paramName) {
 
   IsisParameterData *param = const_cast <IsisParameterData *>(ReturnParam(paramName));
   param->values.clear();
@@ -1783,7 +1884,7 @@ void IsisAml::Clear(const std::string &paramName) {
  * @throws iException::Programmer "Parameter is not a cube."
  * @throws iException::Programmer "Parameter in not an input cube" 
  */
-Isis::CubeAttributeInput &IsisAml::GetInputAttribute(const std::string &paramName) {
+Isis::CubeAttributeInput &IsisAml::GetInputAttribute(const string &paramName) {
 
   IsisParameterData *param = const_cast <IsisParameterData *>(ReturnParam(paramName));
 
@@ -1829,7 +1930,7 @@ Isis::CubeAttributeInput &IsisAml::GetInputAttribute(const std::string &paramNam
  * @throws iException::Programmer "Parameter is not a cube"
  * @throws iException::Programmer "Parameter in not an output"
  */
-Isis::CubeAttributeOutput &IsisAml::GetOutputAttribute(const std::string &paramName) {
+Isis::CubeAttributeOutput &IsisAml::GetOutputAttribute(const string &paramName) {
 
   IsisParameterData *param = const_cast <IsisParameterData *>(ReturnParam(paramName));
 
@@ -1876,7 +1977,7 @@ Isis::CubeAttributeOutput &IsisAml::GetOutputAttribute(const std::string &paramN
  * @throws iException::User (Parameter is not unique)
  * @throws iException::User (Unknown Parameter)
  */
-const IsisParameterData *IsisAml::ReturnParam(const std::string &paramName) const {
+const IsisParameterData *IsisAml::ReturnParam(const string &paramName) const {
   Isis::iString pn = paramName;
   pn.UpCase();
   int found = 0;
@@ -2282,7 +2383,7 @@ void IsisAml::Verify(const IsisParameterData *param) {
  * @internal 
  *   @history 2010-07-19 Jeannie Walldren - Original version. 
  */
-void IsisAml::CheckFilenamePreference(std::string filename, std::string paramname) {
+void IsisAml::CheckFilenamePreference(string filename, string paramname) {
   Isis::PvlGroup fileCustomization = Isis::Preference::Preferences().FindGroup("FileCustomization");
   Isis::iString overwritePreference = fileCustomization.FindKeyword("Overwrite")[0];
   overwritePreference.ConvertWhiteSpace();
@@ -2617,7 +2718,7 @@ void IsisAml::VerifyAll() {
       if(((param->values.size() > 0) || (param->defaultValues.size())) > 0) {
         for(unsigned int o2 = 0; o2 < param->listOptions.size(); o2++) {
           Isis::iString value, option;
-          if(param->type == "string") {
+          if(param->type == "string"  || param->type == "combo") {
             value = GetString(param->name);
             value = value.UpCase();
             option = param->listOptions[o2].value;
@@ -2650,7 +2751,7 @@ void IsisAml::VerifyAll() {
       if(((param->values.size() > 0) || (param->defaultValues.size())) > 0) {
         for(unsigned int o2 = 0; o2 < param->listOptions.size(); o2++) {
           Isis::iString value, option;
-          if(param->type == "string") {
+          if(param->type == "string"  || param->type == "combo") {
             value = GetString(param->name);
             value = value.UpCase();
             option = param->listOptions[o2].value;
@@ -2868,7 +2969,7 @@ void IsisAml::CommandLine(Isis::Pvl &cont) const {
       if(((param->values.size() > 0) || (param->defaultValues.size())) > 0) {
         for(unsigned int o2 = 0; o2 < param->listOptions.size(); o2++) {
           Isis::iString value, option;
-          if(param->type == "string") {
+          if(param->type == "string"  || param->type == "combo") {
             value = GetAsString(param->name);
             value = value.UpCase();
             option = param->listOptions[o2].value;

@@ -140,6 +140,8 @@ namespace Isis {
  *                                         Warning
  *   @history 2010-07-22 Steven Lambright - Array values for parameters are now
  *                                         written to the history file
+ *   @history 2011-08-16 Sharmila Prasad - Added API to CreatePVL from a GUI Group and
+ *                                         Get GUI Group index given the Group name
  */
 class IsisAml : protected IsisAmlData {
 
@@ -209,6 +211,9 @@ class IsisAml : protected IsisAmlData {
     int  NumGroups() const;
 
     std::string GroupName(const int &group) const;
+    
+    //! Given the group name get its index in group array
+    int GroupIndex(const std::string & grpName) const;
 
     int NumParams(const int &) const;
 
@@ -316,6 +321,14 @@ class IsisAml : protected IsisAmlData {
     std::string HelperIcon(const int &group, const int &param,
                            const int &helper) const;
 
+    //! Verify whether Parameter name is in the Include list
+    //! Used in creation of DefFile 
+    bool IsParamInPvlInclude(std::string & paramName, std::vector<std::string> & exclude);
+    
+    //! Create Pvl with the parameters in a user defined group given the Pvl object and group name
+    void CreatePVL(Isis::Pvl &pvlDef , std::string guiGrpName, std::string pvlObjName, 
+                   std::string pvlGrpName, std::vector<std::string> & exclude);
+    
     // Test all parameters for valid values and conditions
     void VerifyAll();
 
