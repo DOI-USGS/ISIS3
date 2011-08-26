@@ -136,6 +136,8 @@ namespace Isis {
    *  @history 2011-05-07 Sharmila Prasad - 1. Added API SetInputCube(Cube*) to take opened cube
    *           2. Added API to ClearOutputCubes()
    *           3. Added additional testing while writing history to output files
+   *  @history 2011-08-26 Steven Lambright - The NaifKeywords object is now
+   *                          being propagated.
    *
    *  @todo 2005-02-08 Jeff Anderson - add an example to the class documentation.
    */

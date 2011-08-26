@@ -406,6 +406,11 @@ namespace Isis {
         for(int i = 0; i < incube.Groups(); i++) {
           outcube.AddGroup(incube.Group(i));
         }
+
+        if (InputCubes[0]->getLabel()->HasObject("NaifKeywords")) {
+          cube->getLabel()->AddObject(
+              InputCubes[0]->getLabel()->FindObject("NaifKeywords"));
+        }
       }
 
       // Transfer tables from the first input cube
@@ -503,15 +508,21 @@ namespace Isis {
    */
   void Process::PropagateLabels(const std::string &cube) {
     // Open the Pvl file
-    Isis::Pvl pvl(cube);
+    Isis::Pvl inLabels(cube);
 
     // Loop for each output cube
     for(int i = 0; i < (int)OutputCubes.size(); i++) {
-      Isis::PvlObject &incube = pvl.FindObject("IsisCube");
-      Isis::PvlObject &outcube =
-          OutputCubes[i]->getLabel()->FindObject("IsisCube");
-      for(int g = 0; g < incube.Groups(); g++) {
-        outcube.AddGroup(incube.Group(g));
+      Isis::PvlObject &inCubeLabels = inLabels.FindObject("IsisCube");
+
+      Isis::Pvl &outLabels(*OutputCubes[i]->getLabel());
+      Isis::PvlObject &outCubeLabels = outLabels.FindObject("IsisCube");
+
+      for(int g = 0; g < inCubeLabels.Groups(); g++) {
+        outCubeLabels.AddGroup(inCubeLabels.Group(g));
+      }
+
+      if (inLabels.HasObject("NaifKeywords")) {
+        outLabels.AddObject(inLabels.FindObject("NaifKeywords"));
       }
     }
   }
