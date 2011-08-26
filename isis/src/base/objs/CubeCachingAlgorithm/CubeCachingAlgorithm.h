@@ -53,6 +53,10 @@ namespace Isis {
        * @brief This stores the results of the caching algorithm.
        *
        * @author Jai Rideout and Steven Lambright
+       *
+       * @internal
+       *   @history 2011-08-26 Steven Lambright and Jai Rideout - Fixed memory
+       *                           leak.
        */
       class CacheResult {
         public:

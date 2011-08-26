@@ -122,6 +122,7 @@ namespace Isis {
    */
   CubeCachingAlgorithm::CacheResult &
       CubeCachingAlgorithm::CacheResult::operator=(const CacheResult &other) {
+    delete m_chunksToFree;
     m_chunksToFree = NULL;
 
     if(other.m_chunksToFree) {
