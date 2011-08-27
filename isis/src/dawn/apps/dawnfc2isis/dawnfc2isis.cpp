@@ -162,10 +162,10 @@ void IsisMain() {
 
   PvlGroup kerns("Kernels");
   if(instid == "FC1") {
-    kerns += PvlKeyword("NaifFrameCode", -203110);
+    kerns += PvlKeyword("NaifFrameCode", -203110-filtno);
   }
   else if(instid == "FC2") {
-    kerns += PvlKeyword("NaifFrameCode", -203120);
+    kerns += PvlKeyword("NaifFrameCode", -203120-filtno);
   }
   else {
     string msg = "Input file [" + inFile.Expanded() + "] has an invalid " +

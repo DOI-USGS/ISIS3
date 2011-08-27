@@ -28,6 +28,13 @@
         Removed tests on HorizontalPixelScale and VerticalPixelScale; Added 
         optional TARGET parameter to allow TargetName specification.
     </change>
+    <change name="Jeff Anderson" date="2011-07-26">
+    	Changed the program to write the NaifFrameCode in the labels to include
+    	the filter number.  This was done because the Dawn FC team provided a new
+    	instrument kernel (IK) with band dependent focal lengths and optical
+    	distortion parameters. The camera model then uses this update label 
+    	keyword to read the correct camera parameters.
+    </change>
   </history>
 
   <category>
