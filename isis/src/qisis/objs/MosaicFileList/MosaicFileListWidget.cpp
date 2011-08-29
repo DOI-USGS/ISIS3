@@ -156,7 +156,8 @@ namespace Isis {
     QList<QAction *> exportActs;
 
     QAction *saveList = new QAction(this);
-    saveList->setText("Save Cube List (sorted by &file list)...");
+    saveList->setText(
+        "Save Entire Cube List (ordered by &file list/groups)...");
     connect(saveList, SIGNAL(activated()), this, SLOT(saveList()));
 
     exportActs.append(saveList);

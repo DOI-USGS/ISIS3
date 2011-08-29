@@ -53,6 +53,8 @@ namespace Isis {
    *                           restored in the project files. references #275
    *   @history 2011-08-12 Steven Lambright - Added export options,
    *                           references #342
+   *   @history 2011-08-29 Steven Lambright - Re-worded export file list option,
+   *                           references #342
    */
   class MosaicSceneWidget : public QWidget {
       Q_OBJECT

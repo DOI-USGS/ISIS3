@@ -480,7 +480,7 @@ namespace Isis {
     connect(exportView, SIGNAL(activated()), this, SLOT(exportView()));
 
     QAction *saveList = new QAction(this);
-    saveList->setText("Save Cube List (sorted by &Z-Order)...");
+    saveList->setText("Save Entire Cube List (ordered by &view)...");
     connect(saveList, SIGNAL(activated()), this, SLOT(saveList()));
 
     exportActs.append(exportView);
