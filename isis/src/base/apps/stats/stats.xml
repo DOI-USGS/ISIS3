@@ -5,10 +5,9 @@
   </brief>
 
   <description>
-    This program computes statistics for
-    the pixels in a multiple bands. If the band specification (e.g., file.cub+3)
-    is not given the program will default to all bands. The statistics
-    calculated include:
+    This program computes statistics for the pixels in each band of a multiple
+    band cube. if the band specification (e.g., file.cub+3) is not given the
+    program will default to all bands. The statistics calculated include:
 <pre>
         Average
         Standard deviation
@@ -118,7 +117,7 @@
         <description>
   	      The file specification for the input cube. The statistics will be
           calculated for one band only. The default band is one but can be
-          overridden using the band specifier (e.g., file.cub:3).
+          overridden using the band specifier (e.g., file.cub+3).
         </description>
         <filter>
           *.cub
