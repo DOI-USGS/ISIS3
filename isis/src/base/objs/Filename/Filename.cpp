@@ -369,18 +369,27 @@ namespace Isis {
 
 
   /**
-   * Create a temporary file. If the Preference "DataDirectory-&gt;Temporary"
-   * exists then the file will be created there. If not the file will be created
-   * using only what is specified in the current filename. The filename will
-   * consist of the current name with a number between 100000 and 999999 appended
-   * to the name portion.
+   * Create a temporary file.
+   *
+   * If an absolute path is specified, then the file will be placed in
+   *   the given folder and the DataDirectory-&gt;Temporary preference
+   *   will be ignored.
+   *
+   * If only a relative path is specified, and the DataDirectory-&gt;Temporary
+   *   preference is set, then the temporary file will be placed relative
+   *   to the folder specified by DataDirectory-&gt;Temporary.
+   *
+   * If a relative path is specified, and the DataDirectory-&gt;Temporary
+   *   preference is not set, then the file will be created relative to the
+   *   current directory. 
+   *
+   * The temporary file's filename will be modified to be unique; the final
+   *   filename will consist of the current name with a number between 100,000
+   *   and 999,999 appended. An exception will be thrown if a unique name cannot
+   *   be found. This does not guarantee O_EXCL (see man open).
    *
    * @param name The name of the temporary file.
-   *
    * @param extension The extension of the temporary file.
-   *
-   * @throws iException::Io - No temporary files available for the given
-   *                                name and extension
    */
   void Filename::Temporary(const iString &name, const iString &extension) {
     string tempDir;
@@ -393,6 +402,9 @@ namespace Isis {
       }
     }
 
+    if (!tempDir.empty())
+      tempDir += "/";
+
     // Start off by appending "100000" to the name if that file exists
     // increment it and try again
     int add = 100000;
@@ -400,7 +412,7 @@ namespace Isis {
 
     do {
       iString num(add);
-      tfile = tempDir + "/" + name + num + "." + extension;
+      tfile = tempDir + name + num + "." + extension;
       QFileInfo f(tfile.c_str());
       if(f.exists()) {
         add++;
@@ -415,7 +427,6 @@ namespace Isis {
 
     string msg = "No temporary files available for [" + name + extension + "]";
     throw iException::Message(iException::Io, msg, _FILEINFO_);
-
   }
 
 
