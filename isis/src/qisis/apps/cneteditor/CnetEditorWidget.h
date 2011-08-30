@@ -4,10 +4,14 @@
 
 #include <QWidget>
 
+class QAction;
 class QBoxLayout;
+template< typename T > class QList;
+class QMenu;
 class QScrollArea;
 class QSplitter;
 class QString;
+class QToolBar;
 
 namespace Isis
 {
@@ -48,34 +52,35 @@ namespace Isis
       QWidget * getPointFilterWidget();
       QWidget * getSerialFilterWidget();
       QWidget * getConnectionFilterWidget();
+      
+      QMap< QAction *, QList< QString > > getMenuActions();
+      QMap< QString, QList< QAction * > > getToolBarActions();
+      
+      
+    public slots:
+      void setSortingEnabled(bool);
 
 
     signals:
       void cnetModified();
-
+      
 
     private:
       void nullify();
       QBoxLayout * createMainLayout();
+      void createActions();
       void createPointTreeView();
       void createSerialTreeView();
       void createConnectionTreeView();
       void createFilterArea();
       void createPointTableView();
       void createMeasureTableView();
-      void focusView(CnetTreeView * treeView, QStringList label);
       void upgradeVersion();
 
 
     private slots:
-//      void pointTreeViewSelectionChanged();
-      void serialTreeViewSelectionChanged();
-      void connectionTreeViewSelectionChanged();
-
       void rebuildModels();
-      void rebuildModels(QList<AbstractTreeItem *> itemsToDelete);
-//       void scrollFilterAreaToBottom();
-//       void doScroll();
+      void rebuildModels(QList< AbstractTreeItem * > itemsToDelete);
       void pointColToggled();
       void measureColToggled();
 
@@ -111,6 +116,11 @@ namespace Isis
 
       QSplitter * topSplitter;
       QSplitter * mainSplitter;
+
+      QAction * enableSortAct;
+
+      QMap< QAction *, QList< QString > > * menuActions;
+      QMap< QString, QList< QAction * > > * toolBarActions;
 
       QString * settingsPath;
   };

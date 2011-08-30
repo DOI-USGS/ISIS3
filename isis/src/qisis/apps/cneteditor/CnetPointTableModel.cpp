@@ -145,6 +145,18 @@ namespace Isis
   {
     AbstractCnetTableModel::handleTreeSelectionChanged(
         newlySelectedItems, AbstractTreeItem::Point);
+
+    QList<AbstractTreeItem *> measureParentItems;
+    foreach (AbstractTreeItem * item, newlySelectedItems) {
+      if (item->getPointerType() == AbstractTreeItem::Measure) {
+        measureParentItems.append(item->parent());
+      }
+    }
+
+    if (measureParentItems.size()) {
+      AbstractCnetTableModel::handleTreeSelectionChanged(
+          measureParentItems, AbstractTreeItem::Point);
+    }
   }
 
 

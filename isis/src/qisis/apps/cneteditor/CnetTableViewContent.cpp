@@ -366,6 +366,9 @@ namespace Isis
 
               if (event->modifiers() & Qt::ControlModifier)
               {
+                if (item->getPointerType() == AbstractTreeItem::Measure)
+                  item->parent()->setSelected(!item->isSelected());
+
                 item->setSelected(!item->isSelected());
                 lastDirectlySelectedRow = item;
                 newlySelectedItems.append(item);
@@ -378,7 +381,20 @@ namespace Isis
                 }
                 else
                 {
+                  QList<AbstractTreeItem *> selectedItems =
+                      model->getSelectedItems();
+
+                  foreach (AbstractTreeItem * selectedItem, selectedItems) {
+                    if (selectedItem->getPointerType() ==
+                        AbstractTreeItem::Measure)
+                      selectedItem->parent()->setSelected(false);
+                  }
+
                   model->setGlobalSelection(false);
+
+                  if (item->getPointerType() == AbstractTreeItem::Measure)
+                    item->parent()->setSelected(true);
+
                   item->setSelected(true);
                   lastDirectlySelectedRow = item;
                   newlySelectedItems.append(item);
@@ -1175,6 +1191,9 @@ namespace Isis
         foreach (AbstractTreeItem * child, row->getChildren())
           child->setSelected(false);
           
+      if (row->getPointerType() == AbstractTreeItem::Measure)
+        row->parent()->setSelected(false);
+
       row->setSelected(false);
     }
 
@@ -1192,6 +1211,10 @@ namespace Isis
     foreach (AbstractTreeItem * row, *lastShiftSelection)
     {
       row->setSelected(true);
+
+      if (row->getPointerType() == AbstractTreeItem::Measure)
+        row->parent()->setSelected(true);
+
       newlySelectedItems.append(row);
     }
     

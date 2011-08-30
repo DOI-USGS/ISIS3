@@ -79,6 +79,8 @@ namespace Isis
     nullify();
     curFile = new QString;
     labelFont = new QFont("Sansserif", 9);
+    
+    toolBars = new QList< QToolBar * >;
 
     createActions();
     createDockWidgets();
@@ -133,6 +135,9 @@ namespace Isis
 
     delete loadingProgressBar;
     loadingProgressBar = NULL;
+    
+    delete toolBars;
+    toolBars = NULL;
 
     nullify();
   }
@@ -157,6 +162,7 @@ namespace Isis
     helpMenu = NULL;
 
     mainToolBar = NULL;
+    toolBars = NULL;
 
     loadingProgressBar = NULL;
 
@@ -293,7 +299,7 @@ namespace Isis
 
   void CnetEditorWindow::createToolBars()
   {
-    mainToolBar = addToolBar(tr("Main ToolBar"));
+    mainToolBar = new QToolBar(tr("Main ToolBar"));
     mainToolBar->setObjectName("main toolbar");
     mainToolBar->setFloatable(false);
     //mainToolBar->setAllowedAreas(Qt::TopToolBarArea);
@@ -556,6 +562,8 @@ namespace Isis
     cnet = net;
     editorWidget = new CnetEditorWidget(cnet, Filename(
         "$HOME/.Isis/cneteditor/cneteditor.config").Expanded().c_str());
+    populateMenus();
+//     populateToolBars(); FIXME: THIS METHOD IS BROKEN
     connect(editorWidget, SIGNAL(cnetModified()), this, SLOT(setDirty()));
     setFileState(CnetEditorWindow::HasFile, *curFile);
 
@@ -564,14 +572,124 @@ namespace Isis
     connectionTreeDockWidget->setWidget(editorWidget->getConnectionTreeView());
 
     pointFilterDockWidget->setWidget(
-      editorWidget->getPointFilterWidget());
+        editorWidget->getPointFilterWidget());
     serialFilterDockWidget->setWidget(
-      editorWidget->getSerialFilterWidget());
+        editorWidget->getSerialFilterWidget());
     connectionFilterDockWidget->setWidget(
-      editorWidget->getConnectionFilterWidget());
+        editorWidget->getConnectionFilterWidget());
 
     setFileState(HasFile, *curFile);
     saveAsPvl = !Pvl((iString) * curFile).HasObject("ProtoBuffer");
+  }
+  
+  
+  void CnetEditorWindow::populateMenus()
+  {
+    QMap< QAction *, QList< QString > > actionMap;
+    actionMap = editorWidget->getMenuActions();
+    QMapIterator< QAction *, QList< QString > > i(actionMap);
+
+    QWidget * widget = NULL;
+    
+    while (i.hasNext())
+    {
+      i.next();
+      QAction * act = i.key();
+      QList< QString > location = i.value();
+      
+      widget = menuBar();
+      
+      while (location.size())
+      {
+        QString menuName = location.takeFirst();
+        
+        // if menuName not found in current widget's actions,
+        // then add needed submenu
+        if (indexOfActionList(widget->actions(), menuName) == -1)
+        {
+          QMenuBar * mb = qobject_cast< QMenuBar * >(widget);
+          QMenu * m = qobject_cast< QMenu * >(widget);
+          ASSERT((mb != NULL) ^ (m != NULL));
+          
+          if (mb)
+          {
+            mb->addMenu(menuName);
+            int index = indexOfActionList(mb->actions(), menuName);
+            widget = mb->actions()[index]->menu();
+          }
+          else
+          {
+            m->addMenu(menuName);
+            int index = indexOfActionList(m->actions(), menuName);
+            widget = mb->actions()[index]->menu();
+          }
+          
+        }
+      }
+      
+      widget->addAction(act);
+    }
+  }
+  
+  
+  int CnetEditorWindow::indexOfActionList(QList< QAction * > actionList,
+                                          QString actionText)
+  {
+    int index = -1;
+    for (int i = 0; index == -1 && i < actionList.size(); i++)
+      if (actionList[i]->text() == actionText)
+        index = i;
+      
+    return index;
+  }
+
+
+  void CnetEditorWindow::populateToolBars() //FIXME: BROKEN METHOD
+  {
+    QMap< QString, QList< QAction * > > actionMap;
+    actionMap = editorWidget->getToolBarActions();
+    QMapIterator< QString, QList< QAction * > > i(actionMap);
+
+    while (i.hasNext())
+    {
+      i.next();
+      QString objName = i.key();
+      QList< QAction * > actionList = i.value();
+      
+      int index = indexOfToolBar(objName);
+      if (index != -1)
+      {
+        foreach (QAction * action, actionList)
+          (*toolBars)[index]->addAction(action);
+      }
+      else
+      {
+        if (objName != mainToolBar->objectName())
+        {
+          QToolBar * newToolBar = new QToolBar(objName);
+          newToolBar->setObjectName(objName);
+          newToolBar->setFloatable(false);
+          foreach (QAction * action, actionList)
+            newToolBar->addAction(action);
+          
+          addToolBar(Qt::TopToolBarArea, newToolBar);
+        }
+      }
+    }
+  }
+  
+  
+  int CnetEditorWindow::indexOfToolBar(QString objName)
+  {
+    ASSERT(toolBars);
+    
+    int index = -1;
+    
+    for (int i = 0; index == -1 && i < toolBars->size(); i++)
+      if (toolBars->at(i)->objectName() == objName)
+        index = i;
+
+    return index;
   }
 
 

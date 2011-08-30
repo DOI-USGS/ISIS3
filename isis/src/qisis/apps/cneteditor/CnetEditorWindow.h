@@ -57,6 +57,10 @@ namespace Isis
       void writeSettings();
       bool okToContinue();
       void load(QString filename);
+      void populateMenus();
+      int indexOfActionList(QList< QAction * > actionList, QString actionText);
+      void populateToolBars();
+      int indexOfToolBar(QString objName);
       void setFileState(FileState state, QString filename);
       void setDirty(bool);
       void setDockWidgetsVisible(bool visibilityState);
@@ -84,6 +88,7 @@ namespace Isis
       QMenu * helpMenu;
 
       QToolBar * mainToolBar;
+      QList< QToolBar * > * toolBars;
 
       ProgressBar * loadingProgressBar;
 

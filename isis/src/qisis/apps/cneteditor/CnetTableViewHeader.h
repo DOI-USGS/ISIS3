@@ -26,13 +26,16 @@ namespace Isis
       virtual ~CnetTableViewHeader();
       virtual void setColumns(CnetTableColumnList *);
       QSize minimumSizeHint() const;
-      QSize sizeHint() { return minimumSizeHint(); }
+      QSize sizeHint();
+      
+      void setModel(AbstractCnetTableModel * someModel);
 
 
     signals:
       void columnResized(bool lastColumn);
       void requestedGlobalSelection(bool select);
       void requestedColumnSelection(int columnNum, bool select);
+      void sortingEnabled(bool);
 
 
     public slots:
@@ -86,6 +89,8 @@ namespace Isis
       static int const SORT_ARROW_MARGIN = 10;
       int ARROW_HEIGHT;
       int ARROW_WIDTH;
+      
+      AbstractCnetTableModel * model;
   };
 }
 

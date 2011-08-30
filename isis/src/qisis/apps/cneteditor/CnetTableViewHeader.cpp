@@ -47,23 +47,7 @@ namespace Isis
 
     setMouseTracking(true);
     
-    connect(someModel, SIGNAL(filterProgressChanged(int)),
-            this, SLOT(updateFilterProgress(int)));
-    connect(someModel, SIGNAL(rebuildProgressChanged(int)),
-            this, SLOT(updateRebuildProgress(int)));
-    connect(someModel, SIGNAL(filterProgressRangeChanged(int, int)),
-            this, SLOT(updateFilterProgressRange(int, int)));
-    connect(someModel, SIGNAL(rebuildProgressRangeChanged(int, int)),
-            this, SLOT(updateRebuildProgressRange(int, int)));
-    connect(someModel, SIGNAL(filterCountsChanged(int, int)),
-            this, SLOT(handleFilterCountsChanged(int, int)));
-    connect(this, SIGNAL(requestedGlobalSelection(bool)),
-            someModel, SLOT(setGlobalSelection(bool)));
-    
-    columns = someModel->getColumns();
-    
-    for (int i = 0; i < columns->size(); i++)
-      connect((*columns)[i], SIGNAL(visibilityChanged()), this, SLOT(update()));
+    setModel(someModel);
     
     ARROW_HEIGHT = 3;
     ARROW_WIDTH = 5;
@@ -87,10 +71,69 @@ namespace Isis
     /*QFontMetrics(font()).width(text->join("")) + 15,
         QFontMetrics(font()).height() + 6);*/
   }
+  
+  
+  QSize CnetTableViewHeader::sizeHint()
+  {
+    return minimumSizeHint();
+  }
+  
+  
+  void CnetTableViewHeader::setModel(AbstractCnetTableModel * someModel)
+  {
+    if (model)
+    {
+      disconnect(model, SIGNAL(filterProgressChanged(int)),
+                 this, SLOT(updateFilterProgress(int)));
+      disconnect(model, SIGNAL(rebuildProgressChanged(int)),
+                 this, SLOT(updateRebuildProgress(int)));
+      disconnect(model, SIGNAL(filterProgressRangeChanged(int, int)),
+                 this, SLOT(updateFilterProgressRange(int, int)));
+      disconnect(model, SIGNAL(rebuildProgressRangeChanged(int, int)),
+                 this, SLOT(updateRebuildProgressRange(int, int)));
+      disconnect(model, SIGNAL(filterCountsChanged(int, int)),
+                 this, SLOT(handleFilterCountsChanged(int, int)));
+      disconnect(this, SIGNAL(requestedGlobalSelection(bool)),
+                 model, SLOT(setGlobalSelection(bool)));
+      disconnect(model, SIGNAL(modelModified()),
+                 this, SLOT(update()));
+    }
+    
+    model = someModel;
+    
+    connect(model, SIGNAL(filterProgressChanged(int)),
+            this, SLOT(updateFilterProgress(int)));
+    connect(model, SIGNAL(rebuildProgressChanged(int)),
+            this, SLOT(updateRebuildProgress(int)));
+    connect(model, SIGNAL(filterProgressRangeChanged(int, int)),
+            this, SLOT(updateFilterProgressRange(int, int)));
+    connect(model, SIGNAL(rebuildProgressRangeChanged(int, int)),
+            this, SLOT(updateRebuildProgressRange(int, int)));
+    connect(model, SIGNAL(filterCountsChanged(int, int)),
+            this, SLOT(handleFilterCountsChanged(int, int)));
+    connect(this, SIGNAL(requestedGlobalSelection(bool)),
+            model, SLOT(setGlobalSelection(bool)));
+    connect(model, SIGNAL(modelModified()), this, SLOT(update()));
+
+    
+    if (columns)
+    {
+      for (int i = 0; i < columns->size(); i++)
+      {
+        disconnect((*columns)[i], SIGNAL(visibilityChanged()),
+                    this, SLOT(update()));
+      }
+    }
+    
+    columns = model->getColumns();
+    
+    for (int i = 0; i < columns->size(); i++)
+      connect((*columns)[i], SIGNAL(visibilityChanged()), this, SLOT(update()));
+  }
 
 
   void CnetTableViewHeader::handleFilterCountsChanged(
-    int visibleTopLevelItemCount, int topLevelItemCount)
+      int visibleTopLevelItemCount, int topLevelItemCount)
   {
     visibleCount = visibleTopLevelItemCount;
     totalCount = topLevelItemCount;
@@ -126,8 +169,8 @@ namespace Isis
     
     clickedColumn = getMousedColumn(mousePos);
     
-//     QRect priorityRect = getSortingPriorityRect(columnNum);
-//     QRect arrowRect = getSortingArrowRect(columnNum);
+//     QRect priorityRect = getSortingPriorityRect(clickedColumn);
+//     QRect arrowRect = getSortingArrowRect(clickedColumn);
     
     
     if (event->buttons() == Qt::LeftButton)
@@ -144,7 +187,7 @@ namespace Isis
         {
 //           if (priorityRect.contains(mousePos))
 //           {
-//             emit requestedColumnSelection(columnNum, true);
+//             emit requestedColumnSelection(clickedColumn, true);
 //           }
           
         }
@@ -238,6 +281,7 @@ namespace Isis
 
   void CnetTableViewHeader::nullify()
   {
+    model = NULL;
     columns = NULL;
   }
 
@@ -453,8 +497,11 @@ namespace Isis
           right.setY(left.y());
         }
         
-//         painter->drawLine(left, center);
-//         painter->drawLine(center, right);
+        if (model->sortingIsEnabled())
+        {
+          painter->drawLine(left, center);
+          painter->drawLine(center, right);
+        }
       }
 
       // Move the column rect to the position of the next column.

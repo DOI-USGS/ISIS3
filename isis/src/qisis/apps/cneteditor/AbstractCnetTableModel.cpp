@@ -92,7 +92,11 @@ namespace Isis
 
   void AbstractCnetTableModel::setSortingEnabled(bool enabled)
   {
-    sortingEnabled = enabled;
+    if (sortingEnabled != enabled)
+    {
+      sortingEnabled = enabled;
+      rebuildSort();
+    }
   }
 
 
@@ -272,9 +276,10 @@ namespace Isis
       if (item->getPointerType() == pointerType)
         interestingSelectedItems.append(item);
     }
-    
-    if (interestingSelectedItems.size())
+
+    if (interestingSelectedItems.size()) {
       emit treeSelectionChanged(interestingSelectedItems);
+    }
   }
 
  
@@ -299,6 +304,10 @@ namespace Isis
       *sortedItems = getItems(0, -1);
       sortingEnabled = true;
       sort();
+    }
+    else
+    {
+      emit modelModified();
     }
   }
 

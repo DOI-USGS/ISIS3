@@ -31,7 +31,7 @@ using std::cerr;
 namespace Isis
 {
   CnetMeasureTableModel::CnetMeasureTableModel(TreeModel * model) :
-    AbstractCnetTableModel(model, new CnetMeasureTableDelegate)
+      AbstractCnetTableModel(model, new CnetMeasureTableDelegate)
   {
     connect(model, SIGNAL(filterCountsChanged(int, int)),
             this, SLOT(calculateFilterCounts()));
@@ -48,14 +48,14 @@ namespace Isis
 
 
   QList< AbstractTreeItem * > CnetMeasureTableModel::getItems(
-    int start, int end)
+      int start, int end)
   {
     return getSortedItems(start, end, TreeModel::MeasureItems);
   }
 
 
   QList< AbstractTreeItem * > CnetMeasureTableModel::getItems(
-    AbstractTreeItem * item1, AbstractTreeItem * item2)
+      AbstractTreeItem * item1, AbstractTreeItem * item2)
   {
     return getSortedItems(item1, item2, TreeModel::MeasureItems);
   }
@@ -74,7 +74,8 @@ namespace Isis
 
 
   QString CnetMeasureTableModel::getWarningMessage(AbstractTreeItem const * row,
-      CnetTableColumn const * column, QString valueToSave) const {
+      CnetTableColumn const * column, QString valueToSave) const
+  {
     return getMeasureWarningMessage(row, column, valueToSave);
   }
 
@@ -106,7 +107,8 @@ namespace Isis
   
   QString CnetMeasureTableModel::getMeasureWarningMessage(
       AbstractTreeItem const * row, CnetTableColumn const * column,
-      QString valueToSave) {
+      QString valueToSave)
+  {
     QString colTitle = column->getTitle();
     AbstractMeasureItem::Column colType =
         AbstractMeasureItem::getColumn(colTitle);
