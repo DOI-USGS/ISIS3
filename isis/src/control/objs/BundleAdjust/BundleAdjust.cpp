@@ -2190,14 +2190,14 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     m_L = cholmod_analyze(m_N, &m_cm); // should we analyze just 1st iteration?
     clock_t t2 = clock();
     double delapsedtime = ((t2-t1)/(double)CLOCKS_PER_SEC);
-    printf("cholmod Analyze Elapsed Time: %20.10lf\n",delapsedtime);
+    //printf("cholmod Analyze Elapsed Time: %20.10lf\n",delapsedtime);
 
     // create cholmod cholesky factor (LDLT?)
     t1 = clock();
     cholmod_factorize(m_N, m_L, &m_cm);
     t2 = clock();
     delapsedtime = ((t2-t1)/(double)CLOCKS_PER_SEC);
-    printf("cholmod Factorize Elapsed Time: %20.10lf\n",delapsedtime);
+    //printf("cholmod Factorize Elapsed Time: %20.10lf\n",delapsedtime);
 
     // check for "matrix not positive definite" error
     if ( m_cm.status == CHOLMOD_NOT_POSDEF ) {
@@ -2233,7 +2233,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     x = cholmod_solve (CHOLMOD_A, m_L, b, &m_cm) ;
     t2 = clock();
     delapsedtime = ((t2-t1)/(double)CLOCKS_PER_SEC);
-    printf("cholmod Solution Elapsed Time: %20.10lf\n",delapsedtime);
+    //printf("cholmod Solution Elapsed Time: %20.10lf\n",delapsedtime);
 
 //      FILE * pFile4;
 //      pFile4 = fopen ("//work//users//kedmundson//solution.txt" , "w");
@@ -2254,12 +2254,12 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
   }
 
   bool BundleAdjust::loadCholmodTriplet() {
-    printf("Starting CholMod conversion to triplet\n");
+    //printf("Starting CholMod conversion to triplet\n");
     double d;
 
     if ( m_nIteration == 1 ) {
       int nelements = m_SparseNormals.numberOfElements();
-      printf("Matrix rank: %d # of Triplet elements: %d", m_nRank,nelements);
+      //printf("Matrix rank: %d # of Triplet elements: %d", m_nRank,nelements);
       m_pTriplet = cholmod_allocate_triplet(m_nRank, m_nRank, nelements,
           -1, CHOLMOD_REAL, &m_cm);
 
