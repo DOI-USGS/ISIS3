@@ -9,7 +9,10 @@
   <description>
     This program will replace the user specified pixels to Isis special pixel
     values.  Overlap between the ranges of differing special pixel values is
-    not allowed. Each special pixel range must be unique.
+    not allowed. Each special pixel range must be unique.  If the min and max
+    for a given range is the same, then only that exact DN will be converted.
+    Consequently, all ranges are fully inclusive for their minimums and
+    maximums.
   </description>
 
   <history>
@@ -34,6 +37,9 @@
     </change>
     <change name="Stuart Sides" date="2003-11-07">
       Modified results pvl to not include the results group
+    </change>
+    <change name="Travis Addair" date="2011-08-31">
+      Changed to allow ranges of a single DN
     </change>
 
   </history>
@@ -90,9 +96,9 @@
           This defines the minimum value of the defined range of pixels to
           be replaced with the Isis Null value.
         </description>
-        <lessThan>
+        <lessThanOrEqual>
           <item>NULLMAX</item>
-        </lessThan>
+        </lessThanOrEqual>
         <inclusions>
           <item>NULLMAX</item>
         </inclusions>
@@ -106,9 +112,9 @@
           This defines the maximum value of the defined range of pixels to
           be replaced with the Isis Null value.
         </description>
-        <greaterThan>
+        <greaterThanOrEqual>
           <item>NULLMIN</item>
-        </greaterThan>
+        </greaterThanOrEqual>
         <inclusions>
           <item>NULLMIN</item>
         </inclusions>
@@ -122,9 +128,9 @@
           This defines the minimum value of the defined range of pixels to
           be replaced with the Isis LRS value.
         </description>
-        <lessThan>
+        <lessThanOrEqual>
           <item>LRSMAX</item>
-        </lessThan>
+        </lessThanOrEqual>
         <inclusions>
           <item>LRSMAX</item>
         </inclusions>
@@ -138,9 +144,9 @@
           This defines the maximum value of the defined range of pixels to
           be replaced with the Isis LRS value.
         </description>
-        <greaterThan>
+        <greaterThanOrEqual>
           <item>LRSMIN</item>
-        </greaterThan>
+        </greaterThanOrEqual>
         <inclusions>
           <item>LRSMIN</item>
         </inclusions>
@@ -154,9 +160,9 @@
           This defines the minimum value of the defined range of pixels to
           be replaced with the Isis HRS value.
         </description>
-        <lessThan>
+        <lessThanOrEqual>
           <item>HRSMAX</item>
-        </lessThan>
+        </lessThanOrEqual>
         <inclusions>
           <item>HRSMAX</item>
         </inclusions>
@@ -170,9 +176,9 @@
           This defines the maximum value of the defined range of pixels to
           be replaced with the Isis HRS value.
         </description>
-        <greaterThan>
+        <greaterThanOrEqual>
           <item>HRSMIN</item>
-        </greaterThan>
+        </greaterThanOrEqual>
         <inclusions>
           <item>HRSMIN</item>
         </inclusions>
@@ -186,9 +192,9 @@
           This defines the minimum value of the defined range of pixels to
           be replaced with the Isis LIS value.
         </description>
-        <lessThan>
+        <lessThanOrEqual>
           <item>LISMAX</item>
-        </lessThan>
+        </lessThanOrEqual>
         <inclusions>
           <item>LISMAX</item>
         </inclusions>
@@ -202,9 +208,9 @@
           This defines the maximum value of the defined range of pixels to
           be replaced with the Isis LIS value.
         </description>
-        <greaterThan>
+        <greaterThanOrEqual>
           <item>LISMIN</item>
-        </greaterThan>
+        </greaterThanOrEqual>
         <inclusions>
           <item>LISMIN</item>
         </inclusions>
@@ -218,9 +224,9 @@
           This defines the minimum value of the defined range of pixels to
           be replaced with the Isis HIS value.
         </description>
-        <lessThan>
+        <lessThanOrEqual>
           <item>HISMAX</item>
-        </lessThan>
+        </lessThanOrEqual>
         <inclusions>
           <item>HISMAX</item>
         </inclusions>
@@ -234,9 +240,9 @@
           This defines the maximum value of the defined range of pixels to
           be replaced with the Isis HIS value.
         </description>
-        <greaterThan>
+        <greaterThanOrEqual>
           <item>HISMIN</item>
-        </greaterThan>
+        </greaterThanOrEqual>
         <inclusions>
           <item>HISMIN</item>
         </inclusions>

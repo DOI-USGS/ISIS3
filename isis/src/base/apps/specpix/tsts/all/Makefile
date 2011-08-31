@@ -15,3 +15,16 @@ commands:
 	  lismax=8 \
 	  hismin=9 \
 	  hismax=10 > /dev/null;
+
+	$(APPNAME) from=$(INPUT)/isisTruth.cub \
+	  to=$(OUTPUT)/outputSingleDN.cub \
+	  nullmin=1 \
+	  nullmax=1 \
+	  lrsmin=3 \
+	  lrsmax=3 \
+	  hrsmin=5 \
+	  hrsmax=5 \
+	  lismin=7 \
+	  lismax=7 \
+	  hismin=9 \
+	  hismax=9 > /dev/null;
