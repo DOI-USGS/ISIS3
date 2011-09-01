@@ -35,7 +35,7 @@ namespace Isis {
    * @code
    * Object = PhotometricModel
    *   Group = Algorithm
-   *     Name = Minnaert
+   *     PhtName/Name = Minnaert
    *     K = 0.7
    *   EndGroup
    * EndObject
@@ -52,7 +52,19 @@ namespace Isis {
     // Get the algorithm name to create
     PvlGroup &algo = pvl.FindObject("PhotometricModel")
                      .FindGroup("Algorithm", Pvl::Traverse);
-    std::string algorithm = algo["Name"];
+
+    std::string algorithm = "";
+    if (algo.HasKeyword("PhtName")) {
+      algorithm = std::string(algo["PhtName"]);
+    }
+    else if (algo.HasKeyword("Name")) {
+      algorithm = std::string(algo["Name"]);
+    }
+    else {
+      iString msg = "Keyword [Name] or keyword [PhtName] must ";
+      msg += "exist in [Group = Algorithm]";
+      throw iException::Message(iException::User, msg, _FILEINFO_);
+    }
 
     // Open the factory plugin file
     Plugin *p = new Plugin;
