@@ -59,10 +59,12 @@ namespace Isis {
         emission == 90.0) {
       pht_minnaert = 0.0;
     }
+//    else if(PhotoK() == 1.0) {
     else if(p_photoK == 1.0) {
       pht_minnaert = munot;
     }
     else {
+//      pht_minnaert = munot * pow((munot * mu), (PhotoK() - 1.0));
       pht_minnaert = munot * pow((munot * mu), (p_photoK - 1.0));
     }
 

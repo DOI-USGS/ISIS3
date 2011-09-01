@@ -62,17 +62,16 @@ namespace Isis {
 
       void SetPhotoK(const double k);
       //! Return photometric K value
-      inline double PhotoK() const {
-        return p_photoK;
-      };
-
-      virtual double PhotoModelAlgorithm(double phase, double incidence,
-                                         double emission);
-    private:
-      double p_photoK;
+//      inline double PhotoK() const {
+//        return p_photoK;
+//      };
 
     protected:
-      
+      virtual double PhotoModelAlgorithm(double phase, double incidence,
+                                         double emission);
+
+    private:
+//      double p_photoK;
 
   };
 };
