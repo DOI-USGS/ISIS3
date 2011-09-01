@@ -20,13 +20,18 @@ namespace Isis {
   PhotoModel::PhotoModel(Pvl &pvl) {
     PvlGroup &algorithm = pvl.FindObject("PhotometricModel").FindGroup("Algorithm", Pvl::Traverse);
 
-    // Use 'PHTNAME' instead of 'NAME' if using the Gui combo box
+    // Use 'PhtName' instead of 'Name' if using the Gui combo box
     // for unique Pvl keyword in DefFile
-    if(algorithm.HasKeyword("PHTNAME")) {
-      p_photoAlgorithmName = string(algorithm["PHTNAME"]);
+    if(algorithm.HasKeyword("PhtName")) {
+      p_photoAlgorithmName = string(algorithm["PhtName"]);
     }
-    else if(algorithm.HasKeyword("Name")) {
+    else if(algorithm.HasKeyword("Name")) { 
       p_photoAlgorithmName = string(algorithm["Name"]);
+    }
+    else {
+      iString msg = "Keyword [Name] or keyword [PhtName] must ";
+      msg += "exist in [Group = Algorithm]";
+      throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
     p_standardConditions = false;
@@ -176,4 +181,36 @@ namespace Isis {
     double albedo = PhotoModelAlgorithm(pha, inc, ema);
     return albedo;
   }
+
+  /**
+   * Set the Lunar-Lambert function weight.  This is used to govern the
+   * limb-darkening in the Lunar-Lambert photometric function.  Values of
+   * the Lunar-Lambert weight generally fall in the range from 0.0
+   * (Lambert function) to 1.0 (Lommel-Seeliger or "lunar" function).
+   * There are no limits on the value of this parameter, but values far
+   * outside the 0 to 1 range will not be very useful.
+   *
+   * @param l  Lunar-Lambert function weight, default is 1.0
+   */
+//  void PhotoModel::SetPhotoL(const double l) {
+//    p_photoL = l;
+//  }
+
+  /**
+    * Set the Minnaert function exponent.  This is used to govern the limb-
+    * darkening in the Minnaert photometric function.  Values of the
+    * Minnaert exponent generally fall in the range from 0.5 ("lunar-like",
+    * almost no limb darkening) to 1.0 (Lambert function).  This
+    * parameter is limited to values that are >=0.
+    *
+    * @param k  Minnaert function exponent, default is 1.0
+    */
+//  void PhotoModel::SetPhotoK(const double k) {
+//    if(k < 0.0) {
+//      std::string msg = "Invalid value of Minnaert k [" +
+//                        iString(k) + "]";
+//      throw iException::Message(iException::User, msg, _FILEINFO_);
+//    }
+//    p_photoK = k;
+//  }
 }

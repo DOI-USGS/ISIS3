@@ -76,9 +76,112 @@ namespace Isis {
       // Calculate the surface brightness
       double CalcSurfAlbedo(double pha, double inc, double ema);
 
+      virtual void SetPhotoL(const double l) {};
+
+      //! Return photometric L value
+      inline double PhotoL() const {
+        return p_photoL;
+      };
+
+      virtual void SetPhotoK(const double k) {};
+
+      //! Return photometric K value
+      inline double PhotoK() const {
+        return p_photoK;
+      };
+
+      virtual void SetPhotoHg1(const double hg1) {};
+
+      //! Return photometric Hg1 value
+      inline double PhotoHg1() const {
+        return p_photoHg1;
+      };
+
+      virtual void SetPhotoHg2(const double hg2) {};
+
+      //! Return photometric Hg2 value
+      inline double PhotoHg2() const {
+        return p_photoHg2;
+      };
+
+      virtual void SetPhotoBh(const double bh) {};
+
+      //! Return photometric Bh value
+      inline double PhotoBh() const {
+        return p_photoBh;
+      };
+
+      virtual void SetPhotoCh(const double ch) {};
+
+      //! Return photometric Ch value
+      inline double PhotoCh() const {
+        return p_photoCh;
+      };
+
+      virtual void SetPhotoWh(const double wh) {};
+
+      //! Return photometric Wh value
+      inline double PhotoWh() const {
+        return p_photoWh;
+      };
+
+      virtual void SetPhotoHh(const double hh) {};
+
+      //! Return photometric Hh value
+      inline double PhotoHh() const {
+        return p_photoHh;
+      };
+
+      virtual void SetPhotoB0(const double b0) {};
+
+      //! Return photometric B0 value
+      inline double PhotoB0() const {
+        return p_photoB0;
+      };
+
+      virtual void SetPhotoTheta(const double theta) {};
+
+      //! Return photometric Theta value
+      inline double PhotoTheta() const {
+        return p_photoTheta;
+      };
+
+      virtual void SetOldTheta(double theta) {};
+
+      virtual void SetPhoto0B0Standard(const std::string &b0standard) {};
+
+      //! Return photometric B0 standardization value
+      inline std::string Photo0B0Standard() const {
+        return p_photo0B0Standard;
+      }
+
+      //! Hapke's approximation to Chandra's H function
+      inline double Hfunc(double u, double gamma) {
+        return (1.0 + 2.0 * u) / (1.0 + 2.0 * u * gamma);
+      }
+
     protected:
       virtual double PhotoModelAlgorithm(double phase,
                                          double incidence, double emission) = 0;
+      double p_photoL;
+      double p_photoK;
+      double p_photoHg1;
+      double p_photoHg2;
+      double p_photoBh;
+      double p_photoCh;
+      double p_photoCott;
+      double p_photoCot2t;
+      double p_photoTant;
+      double p_photoSr;
+      double p_photoOsr;
+      iString p_algName;
+      std::string p_photo0B0Standard;
+      double p_photoWh;
+      double p_photoHh;
+      double p_photoB0;
+      double p_photoB0save;
+      double p_photoTheta;
+      double p_photoThetaold;
 
     private:
       //! Unique name of the photometric model
