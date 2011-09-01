@@ -53,18 +53,16 @@ namespace Isis {
       void SetPhotoL(const double l);
 
       //! Return photometric L value
-      inline double PhotoL() const {
-        return p_photoL;
-      };
+//      inline double PhotoL() const {
+//        return p_photoL;
+//      };
 
+    protected:
       virtual double PhotoModelAlgorithm(double phase, double incidence,
                                          double emission);
       
     private:
-      double p_photoL;
-
-    protected:
-      
+//      double p_photoL;
 
   };
 };

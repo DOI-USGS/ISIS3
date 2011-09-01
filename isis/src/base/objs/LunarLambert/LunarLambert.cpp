@@ -55,13 +55,17 @@ namespace Isis {
         emission == 90.0) {
       pht_lunlam = 0.0;
     }
+//    else if(PhotoL() == 0.0) {
     else if(p_photoL == 0.0) {
       pht_lunlam = munot;
     }
+//    else if(PhotoL() == 1.0) {
     else if(p_photoL == 1.0) {
       pht_lunlam = 2.0 * munot / (munot + mu);
     }
     else {
+//      pht_lunlam = munot * ((1.0 - PhotoL()) + 2.0 *
+//                            PhotoL() / (munot + mu));
       pht_lunlam = munot * ((1.0 - p_photoL) + 2.0 *
                             p_photoL / (munot + mu));
     }
