@@ -79,8 +79,20 @@ namespace Isis {
 
       //! Brent's method 1-D minimization routine using GSL's r8Brent minimization Algorithm
       static int r8brent(double x_lower, double x_upper, gsl_function *Func, double & x_minimum);
-      
-    protected:
+
+      PhotoModel *GetPhotoModel() const {
+        return p_phtPmodel;
+      }
+
+      AtmosModel *GetAtmosModel() const {
+        return p_phtAmodel;
+      }
+
+      NormModel *GetNormModel() const {
+        return p_phtNmodel;
+      }
+
+    protected:      
       AtmosModel *p_phtAmodel;
       PhotoModel *p_phtPmodel;
       NormModel *p_phtNmodel;

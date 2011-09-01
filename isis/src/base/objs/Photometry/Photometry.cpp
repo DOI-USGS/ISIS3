@@ -1,3 +1,4 @@
+#include "iException.h"
 #include "Pvl.h"
 #include "Photometry.h"
 #include "PhotoModelFactory.h"
@@ -21,14 +22,21 @@ namespace Isis {
     p_phtAmodel = NULL;
     p_phtPmodel = NULL;
     p_phtNmodel = NULL;
-    p_phtPmodel = PhotoModelFactory::Create(pvl);
+    if(pvl.HasObject("PhotometricModel")) {
+      p_phtPmodel = PhotoModelFactory::Create(pvl);
+    } else {
+      std::string msg = "A Photometric model must be specified to do any type of photometry";
+      throw iException::Message(iException::User, msg, _FILEINFO_);
+    }
     if(pvl.HasObject("AtmosphericModel")) {
       p_phtAmodel = AtmosModelFactory::Create(pvl, *p_phtPmodel);
-      p_phtNmodel = NormModelFactory::Create(pvl, *p_phtPmodel,
-                                             *p_phtAmodel);
     }
-    else {
-      p_phtNmodel = NormModelFactory::Create(pvl, *p_phtPmodel);
+    if (pvl.HasObject("NormalizationModel")) {
+      if (p_phtAmodel != NULL) {
+        p_phtNmodel = NormModelFactory::Create(pvl, *p_phtPmodel, *p_phtAmodel);
+      } else {
+        p_phtNmodel = NormModelFactory::Create(pvl, *p_phtPmodel);
+      }
     }
   }
 
@@ -133,10 +141,6 @@ namespace Isis {
       x_upper   = gsl_min_fminimizer_x_upper(s);
       
       status = gsl_min_test_interval(x_lower, x_upper, 0.001, 0.0);
-      
-      if(status == GSL_SUCCESS) {
-        cerr << "Converged low=" << x_lower << " min=" << x_minimum << " upper=" << x_upper << endl;
-      }
     } while(status == GSL_CONTINUE && iter < max_iter);
 
     // This function frees all the memory associated with the minimizer s.
