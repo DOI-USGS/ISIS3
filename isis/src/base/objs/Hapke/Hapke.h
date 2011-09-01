@@ -24,7 +24,7 @@
  */
 
 #include <string>
-#include "HapkePhotoModel.h"
+#include "PhotoModel.h"
 
 namespace Isis {
   class Pvl;
@@ -52,34 +52,75 @@ namespace Isis {
    *          from Isis2 files
    *
    */
-  class Hapke : public HapkePhotoModel {
+  class Hapke : public PhotoModel {
     public:
       Hapke(Pvl &pvl);
       virtual ~Hapke() {};
 
       void SetPhotoHg1(const double hg1);
       //! Return photometric Hg1 value
-      inline double PhotoHg1() const {
+/*      inline double PhotoHg1() const {
         return p_photoHg1;
-      };
+      };*/
 
       void SetPhotoHg2(const double hg2);
       //! Return photometric Hg2 value
-      inline double PhotoHg2() const {
+/*      inline double PhotoHg2() const {
         return p_photoHg2;
-      };
+      };*/
 
       void SetPhotoBh(const double bh);
       //! Return photometric Bh value
-      inline double PhotoBh() const {
+/*      inline double PhotoBh() const {
         return p_photoBh;
-      };
+      };*/
 
       void SetPhotoCh(const double ch);
       //! Return photometric Ch value
-      inline double PhotoCh() const {
+/*      inline double PhotoCh() const {
         return p_photoCh;
-      };
+      };*/
+
+      void SetPhotoWh(const double wh);
+      //! Return photometric Wh value
+/*      inline double PhotoWh() const {
+        return p_photoWh;
+      };*/
+
+      void SetPhotoHh(const double hh);
+      //! Return photometric Hh value
+/*      inline double PhotoHh() const {
+        return p_photoHh;
+      };*/
+
+      void SetPhotoB0(const double b0);
+      //! Return photometric B0 value
+/*      inline double PhotoB0() const {
+        return p_photoB0;
+      };*/
+
+      void SetPhotoTheta(const double theta);
+      //! Return photometric Theta value
+/*      inline double PhotoTheta() const {
+        return p_photoTheta;
+      };*/
+
+      void SetOldTheta(double theta) {
+        p_photoThetaold = theta;
+      }
+
+      void SetPhoto0B0Standard(const std::string &b0standard);
+      //! Return photometric B0 standardization value
+/*      inline std::string Photo0B0Standard() const {
+        return p_photo0B0Standard;
+      }*/
+
+      //! Hapke's approximation to Chandra's H function
+/*      inline double Hfunc(double u, double gamma) {
+        return (1.0 + 2.0 * u) / (1.0 + 2.0 * u * gamma);
+      }*/
+
+      void SetStandardConditions(bool standard);
 
       virtual double PhotoModelAlgorithm(double phase, double incidence,
                                          double emission);
@@ -87,7 +128,7 @@ namespace Isis {
     protected:
       
     private:
-      double p_photoHg1;
+/*      double p_photoHg1;
       double p_photoHg2;
       double p_photoBh;
       double p_photoCh;
@@ -97,6 +138,14 @@ namespace Isis {
       double p_photoSr;
       double p_photoOsr;
       iString p_algName;
+      std::string p_photo0B0Standard;
+      double p_photoWh;
+      double p_photoHh;
+      double p_photoB0;
+      double p_photoB0save;
+      double p_photoTheta;
+      double p_photoThetaold;*/
+
   };
 };
 
