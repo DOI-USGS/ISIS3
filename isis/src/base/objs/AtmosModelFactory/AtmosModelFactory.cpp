@@ -66,10 +66,10 @@ namespace Isis {
     
     std::string algorithm = "";
     if(algo.HasKeyword("AtmName")) {
-      algorithm = string(algo["AtmName"]);
+      algorithm = std::string(algo["AtmName"]);
     }
     else if(algo.HasKeyword("Name")) {
-      algorithm = string(algo["Name"]);
+      algorithm = std::string(algo["Name"]);
     }
     else {
       iString msg = "Keyword [Name] or keyword [AtmName] must ";
