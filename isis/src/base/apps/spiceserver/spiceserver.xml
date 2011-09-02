@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="spiceserver" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Spiceinit Server
+  </brief>
+
+  <description>
+    This is the server-side program to handle spiceinit web requests. The input
+    is the spiceinit program's hex-encoded message (POSTED to a web server). The
+    output file is what needs to be sent back to the client. This program is
+    generally run by a web server and not by hand. The script:
+      "isis/src/base/apps/spiceserver/assets/spiceinit.cgi"
+    is an example of a perl script wrapper for running a spice server and using
+    this program.
+  </description>
+
+  <category>
+    <categoryItem>Cameras</categoryItem>
+  </category>
+
+  <history>
+    <change name="Steven Lambright and Jai Rideout" date="2011-09-02">
+      Original Version
+    </change>
+  </history>
+
+  <groups>
+    <group name="Input Files">
+      <parameter name="FROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          The input hex file POSTed by spiceinit
+        </brief>
+        <description>
+          This is the content of the request sent by spiceinit. It contains cube
+            labels and parameters used for initializing naif kernels to get
+            camera information. There is no personally identifiable information
+            in this file.
+        </description>
+        <filter>*.dat</filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>
+          The output hex file to be sent back to spiceinit.
+        </brief>
+        <description>
+          The output hex file which contains the necessary information for
+            spiceinit to complete. This contains binary data with Isis
+            compressed SPICE data, labels, and source file names.
+        </description>
+        <filter>*.dat</filter>
+      </parameter>
+    </group>
+  </groups>
+</application>
