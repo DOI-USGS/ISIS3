@@ -50,6 +50,7 @@ conf:
 	echo "        ...building apps configuration"
 	mkdir -p build/apps
 	cat build/apps_tag.conf                                     >  build/apps_tag_temp.conf
+	echo "LATEX_CMD_NAME   = $(LATEX)"                          >> build/apps_tag_temp.conf
 	echo "OUTPUT_DIRECTORY = $(ISISROOT)/doc/Object/"           >> build/apps_tag_temp.conf
 	echo "STRIP_FROM_PATH  = $(ISISROOT)/"                      >> build/apps_tag_temp.conf
 	echo "INPUT            = $(ISISROOT)/src/ \\"               >> build/apps_tag_temp.conf
@@ -58,6 +59,11 @@ conf:
 	echo "HTML_FOOTER      = build/IsisObjectFooter.html"       >> build/apps_tag_temp.conf
 	echo "HTML_OUTPUT      = apps"                              >> build/apps_tag_temp.conf
 	echo "HTML_STYLESHEET  = build/doxygen_apps.css"            >> build/apps_tag_temp.conf
+
+	if [[ "$(DOT_PATH)" != "" ]];                                          \
+	then                                                                   \
+	  echo "DOT_PATH  = /opt/local/bin" >> build/apps_tag_temp.conf;       \
+	fi
 
 	echo "        ...building Programmer configuration"
 	cat build/Programmer.conf                                        >  build/Programmer_temp.conf
@@ -89,12 +95,18 @@ conf:
 	  echo "WARN_NO_PARAMDOC       = YES"                        >> build/Programmer_temp.conf; \
 	fi
 
+	if [[ "$(DOT_PATH)" != "" ]];                                          \
+	then                                                                   \
+	  echo "DOT_PATH  = /opt/local/bin" >> build/Programmer_temp.conf;     \
+	fi
+
 	for dirname in "$(OBJECTASSETS)"; do \
 	  echo "$$dirname \\"                                          >> build/Programmer_temp.conf ; \
 	done
 
 	echo "        ...building Developer configuration"
 	cat build/Developer.conf                                    >  build/Developer_temp.conf
+	echo "LATEX_CMD_NAME   = $(LATEX)"                          >> build/Developer_temp.conf
 	echo "OUTPUT_DIRECTORY = $(ISISROOT)/doc/Object/"           >> build/Developer_temp.conf
 	echo "STRIP_FROM_PATH  = $(ISISROOT)/"                      >> build/Developer_temp.conf
 	echo "INPUT            = $(ISISROOT)/src/ \\"               >> build/Developer_temp.conf
@@ -128,19 +140,19 @@ conf:
 render: doApps doProg doDev
 doApps:
 	echo "        ...building apps documentation"
-	doxygen build/apps_tag_temp.conf
+	$(DOXYGEN) build/apps_tag_temp.conf
 #	cp build/apps/apps.tag $(ISISROOT)/doc/Object/apps/
 	$(XALAN) $(XALAN_OUTFILE_OPTION) build/apps/apps_fix.tag $(XALAN_INFILE_OPTION) build/apps/apps.tag $(XALAN_XSL_OPTION) build/IsisApplicationTagFix.xsl
 	cp build/apps/apps_fix.tag $(ISISROOT)/doc/Object/apps/
 
 doProg:
 	echo "        ...building Programmer documentation"
-	doxygen build/Programmer_temp.conf
+	$(DOXYGEN) build/Programmer_temp.conf
 	cd $(ISISROOT)/doc/Object/Programmer ; perl installdox -l apps_fix.tag@../apps/ -q ; cd $(ISISROOT)/src/docsys/Object/
 	
 doDev:
 	echo "        ...building Developer documentation"
-	doxygen build/Developer_temp.conf
+	$(DOXYGEN) build/Developer_temp.conf
 	cd $(ISISROOT)/doc/Object/Developer ; perl installdox -l apps_fix.tag@../apps/ -q ; cd $(ISISROOT)/src/docsys/Object/
 
 doProgTest:
@@ -159,6 +171,7 @@ doProgTest:
 	echo "HTML_OUTPUT      = html"                                   >> docbuild/ProgTester_temp.conf
 	echo "TAGFILES         = "                                       >> docbuild/ProgTester_temp.conf
 	echo "HTML_STYLESHEET  = $(ISISROOT)/src/docsys/Object/build/doxygen.css"                     >> docbuild/ProgTester_temp.conf
+	echo "LATEX_CMD_NAME   = $(LATEX)"                               >> docbuild/ProgTester_temp.conf
 	if [ "$(findstring LOUD,$(MODE))" = "LOUD" ]; \
 	then \
 	  echo "QUIET                  = NO"                           >> build/ProgTester_temp.conf; \
@@ -173,7 +186,7 @@ doProgTest:
 	  echo "WARN_IF_DOC_ERROR      = NO"                           >> build/ProgTester_temp.conf; \
 	  echo "WARN_NO_PARAMDOC       = NO"                           >> build/ProgTester_temp.conf; \
 	fi
-	doxygen docbuild/ProgTester_temp.conf
+	$(DOXYGEN) docbuild/ProgTester_temp.conf
 	echo "View your documentation by opening the file html/index.html in a browser"
 #do the following on a clean, as well as whacking the html directory created in this dir by doxy
 	rm -r docbuild

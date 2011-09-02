@@ -87,6 +87,15 @@ else
   AWK         ?= awk
 endif
 
+ifeq ($(HOST_ARCH),Darwin)
+  DOXYGEN     ?= /opt/local/bin/doxygen
+  DOT_PATH    ?= /opt/local/bin
+  LATEX       ?= /opt/local/bin/latex
+else
+  DOXYGEN     ?= doxygen
+  LATEX       ?= latex
+endif
+
 # Set up Xalan's command-line option names. Some version of Xalan use different
 # option names (e.g. Ubuntu's Xalan).
 XALAN_VALIDATE_OPTION := -v
