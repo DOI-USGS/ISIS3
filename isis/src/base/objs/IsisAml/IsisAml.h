@@ -339,9 +339,11 @@ class IsisAml : protected IsisAmlData {
     std::string Version() const;
 
 
-// Private section
-  private:
+  protected:
+    const IsisParameterData *ReturnParam(const std::string &paramName) const;
 
+
+  private:
     //! The XML file parser.
     XERCES::SAX2XMLReader *parser;
     //! The application handler.
@@ -350,7 +352,6 @@ class IsisAml : protected IsisAmlData {
     // Member functions
     void StartParser(const char *xmlfile);
 
-    const IsisParameterData *ReturnParam(const std::string &paramName) const;
 
     void Verify(const IsisParameterData *param);
     

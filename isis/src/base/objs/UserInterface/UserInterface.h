@@ -113,10 +113,12 @@ namespace Isis {
    *                           LoadHistory()\
    *   @history 2011-08-19 Jeannie Backer - Modified unitTest to use
    *                           $temporary variable instead of /tmp directory.
-   *  
-   *   @todo 2005-02-22 Jeff Anderson - add coded and implementation examples to
-   *                       class documentation
-   *
+   *   @history 2011-08-31 Jai Rideout and Steven Lambright - Loading the
+   *                           history with -last no longer causes us to call
+   *                           PutAsString for parameters which match the
+   *                           defaults. This fixes an issue with the new
+   *                           spiceinit GUI with "WEB" added... -last would
+   *                           always throw an error.
    */
 
   class UserInterface : public IsisAml {

@@ -830,7 +830,24 @@ namespace Isis {
               values.push_back(up[k][i]);
             }
 
-            PutAsString(keyword, values);
+            const IsisParameterData *paramData = ReturnParam(keyword);
+
+            bool matchesDefault = false;
+            if (values.size() == 1 && paramData->internalDefault == values[0])
+              matchesDefault = true;
+
+            if (!matchesDefault) {
+              matchesDefault =
+                  (values.size() == paramData->defaultValues.size());
+
+              for (int i = 0; matchesDefault && i < (int)values.size(); i++) {
+                matchesDefault = matchesDefault &&
+                                 values[i] == paramData->defaultValues[i]; 
+              }
+            }
+
+            if (!matchesDefault)
+              PutAsString(keyword, values);
           }
           return;
         }

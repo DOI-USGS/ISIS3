@@ -181,6 +181,9 @@
     <change name="Janet Barrett and Steven Lambright" date="2011-05-25">
       Added support for storing text spice kernel values in the cube labels
     </change>
+    <change name="Steven Lambright and Jai Rideout" date="2011-08-30">
+      Added support for using a spiceinit web service
+    </change>
   </history>
 
   <oldName>
@@ -202,6 +205,46 @@
         </description>
         <filter>*.cub</filter>
       </parameter>
+    </group>
+
+    <group name="Spice Data">
+      <parameter name="WEB">
+        <type>boolean</type>
+        <default><item>false</item></default>
+        <brief>
+          Use the ISIS Spice Web Service
+        </brief>
+        <description>
+          This option enables using the ISIS Spice Website to get the most up to
+          date kernels available. ATTACH must be enabled for this, and manually
+          specifying files with this option on is not allowed. This service may
+          be temporarily unavailable when new Isis releases are being
+          distributed. Any mismatch in Isis version between the latest version
+          and the version you are running will cause this option to fail; only
+          the most recent version of Isis is supported. An active internet
+          connection is required to use this service and downloading SPICE data
+          will be slower than if you had run this with local files (downloaded
+          all of $ISIS3DATA). The size of the download will depend heavily on
+          the mission and instrument of your input file.
+        </description>
+        <exclusions>
+          <item>ATTACH</item>
+          <item>LS</item>
+          <item>PCK</item>
+          <item>TSPK</item>
+          <item>IK</item>
+          <item>SCLK</item>
+          <item>CK</item>
+          <item>FK</item>
+          <item>SPK</item>
+          <item>IAK</item>
+          <item>EXTRA</item>
+        </exclusions>
+        <inclusions>
+          <item>URL</item>
+          <item>PORT</item>
+        </inclusions>
+      </parameter>
 
       <parameter name="ATTACH">
         <type>boolean</type>
@@ -214,7 +257,6 @@
           This is the prefered initialization option as it allows the pointing to be updated by further programs.
         </description>
       </parameter>
-
     </group>
 
     <group name="Instrument Orientation Kernel (CK) quality">
@@ -607,6 +649,28 @@
           image end time. This option should always be zero for framing cameras.
         </description>
         <default><item>0.0</item></default>
+      </parameter>
+    </group>
+
+    <group name="Spice Service Parameters">
+      <parameter name="URL">
+        <type>string</type>
+        <brief>The Spice Service URL</brief>
+        <description>
+          This is where a request for spice data is sent. The default is the
+          USGS SPICE server.
+        </description>
+        <default><item>http://services.isis.astrogeology.usgs.gov/cgi-bin/spiceinit.cgi</item></default>
+      </parameter>
+      <parameter name="PORT">
+        <type>integer</type>
+        <brief>The Spice Service Port</brief>
+        <description>
+          This is the port on which a request for spice data is sent. The USGS
+          server works on port 80.
+        </description>
+        <default><item>80</item></default>
+        <minimum inclusive="yes">0</minimum>
       </parameter>
     </group>
   </groups>
