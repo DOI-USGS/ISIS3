@@ -231,6 +231,9 @@ namespace Isis {
       void SetAtmosNulneg(bool nulneg) {
         p_atmosNulneg = nulneg;
       }
+      void SetAtmosIord(bool offset) {
+        p_atmosAddOffset = offset;
+      }
       void SetOldTau(double tau) {
         p_atmosTauold = tau;
       }

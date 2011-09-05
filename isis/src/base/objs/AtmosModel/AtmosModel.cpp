@@ -130,8 +130,11 @@ namespace Isis {
       SetAtmosHnorm(algorithm["Hnorm"]);
     }
     
-    if(algorithm.HasKeyword("IORD")) {
-      SetAtmosIord(algorithm["IORD"][0]);
+    if(algorithm.HasKeyword("Iord")) {
+      SetAtmosIord(((string)algorithm["Iord"]).compare("1") == 0);
+    }
+    else {
+      p_atmosAddOffset = false;
     }
   }
 
@@ -986,10 +989,15 @@ namespace Isis {
    * 
    * @param offset true/false
    */
-  void AtmosModel::SetAtmosIord(const string offset){
-    p_atmosAddOffset = false;
-    if(offset == "true") {
-      p_atmosAddOffset = true;
+  void AtmosModel::SetAtmosIord(const string offset) {
+    iString temp(offset);
+    temp = temp.UpCase();
+
+    if(temp != "NO" && temp != "YES") {
+      string msg = "Invalid value of Atmospheric additive offset[" + temp + "]";
+      throw iException::Message(iException::User, msg, _FILEINFO_);
     }
+
+    SetAtmosIord(temp.compare("YES") == 0);
   }
 }
