@@ -93,16 +93,10 @@ int main() {
   AddKeyword(PvlKeyword("Tauref", "0.001"));
   labdem.FindObject("AtmosphericModel").FindGroup("Algorithm").
   AddKeyword(PvlKeyword("Wha", "0.95"));
-//  labdem.FindObject("AtmosphericModel").FindGroup("Algorithm").
-//      AddKeyword(PvlKeyword("Wharef","0.95"));
   labdem.FindObject("AtmosphericModel").FindGroup("Algorithm").
   AddKeyword(PvlKeyword("Bha", "0.85"));
-//  labdem.FindObject("AtmosphericModel").FindGroup("Algorithm").
-//      AddKeyword(PvlKeyword("Bharef","0.85"));
   labdem.FindObject("AtmosphericModel").FindGroup("Algorithm").
   AddKeyword(PvlKeyword("Hga", "0.68"));
-//  labdem.FindObject("AtmosphericModel").FindGroup("Algorithm").
-//      AddKeyword(PvlKeyword("Hgaref","0.68"));
   labdem.FindObject("AtmosphericModel").FindGroup("Algorithm").
   AddKeyword(PvlKeyword("Hnorm", "0.003"));
   labdem.FindObject("AtmosphericModel").FindGroup("Algorithm").
@@ -121,63 +115,49 @@ int main() {
 
   std::cout << "Testing creation of photometry object ..." << std::endl;
   try {
-//    double result;
     double albedo, mult, base;
     Photometry *pho = new Photometry(lab);
     Photometry *phodem = new Photometry(labdem);
     std::cout << "Testing photometry method without dem ..." << std::endl;
-//    result = pho->Compute(86.722672229212051,51.7002388445338,38.94144389777756,
-//        0.080061890184879303);
     pho->Compute(86.722672229212051, 51.7002388445338, 38.94144389777756,
                  51.7002388445338, 38.94144389777756, 0.080061890184879303, albedo, mult, base);
-//    std::cout << "Photometric brightness value = " << result << std::endl <<
-//        std::endl;
     std::cout << "Photometric brightness value = " << albedo << std::endl <<
               std::endl;
-//    result = pho->Compute(86.7207248,51.7031305,38.9372914,.0797334611);
     pho->Compute(86.7207248, 51.7031305, 38.9372914, 51.7031305, 38.9372914, .0797334611, albedo, mult,
                  base);
-//    std::cout << "Photometric brightness value = " << result << std::endl <<
-//        std::endl;
     std::cout << "Photometric brightness value = " << albedo << std::endl <<
               std::endl;
     std::cout << "Testing photometry method with dem ..." << std::endl;
-//    result = phodem->Compute(86.7226722,51.7002388,38.9414439,51.7910076,
-//        39.0176048,.0800618902);
     phodem->Compute(86.7226722, 51.7002388, 38.9414439, 51.7002388, 38.9414439,
                     .0800618902, albedo, mult, base);
-//    std::cout << "Photometric brightness value = " << result << std::endl <<
-//        std::endl;
     std::cout << "Photometric brightness value = " << albedo << std::endl <<
               std::endl;
-//    result = phodem->Compute(86.7207248,51.7031305,38.9372914,51.8776595,
-//        38.9719125,.0797334611);
     phodem->Compute(86.7207248, 51.7031305, 38.9372914, 51.7031305, 38.9372914,
                     .0797334611, albedo, mult, base);
-//    std::cout << "Photometric brightness value = " << result << std::endl <<
-//        std::endl;
     std::cout << "Photometric brightness value = " << albedo << std::endl <<
               std::endl;
 
-    std::cerr << "\n***** Testing One dimensional Minimizations using GSL's r8brent *****\n";
+    std::cerr << "\n***** Testing One dimensional Minimizations using GSL's brentsolver *****\n";
     
     gsl_function F;
     
     F.function = &fn1;
     F.params = 0;
   
-    double x_lower = 0, x_upper = 6;
-    std::cerr << "x_lower=" << x_lower << " x_upper = " << x_upper << "\n\n";
+    double xa = 0, xb = 6;
+    std::cerr << "xa = " << xa << " xb = " << xb << "\n\n";
     double x_minimum = 2;
-    std::cerr << "Without using r8mnbrak, Starting Minimum\nTest Minimum=" << x_minimum << "\n";
-    Photometry::r8brent(x_lower, x_upper, &F, x_minimum);
-    std::cerr << "r8brent's Converged Minimum = " << x_minimum << std::endl;
+    std::cerr << "Without using minbracket, Starting Minimum\nTest Minimum=" << x_minimum << "\n";
+    Photometry::brentsolver(xa, xb, &F, x_minimum);
+    std::cerr << "brentsolver's Converged Minimum = " << x_minimum << std::endl;
     
-    std::cerr << "\nUsing r8mnbrak for Starting Minimum\n";
-    x_minimum = Photometry::r8mnbrak(x_lower, x_upper);
-    std::cerr << "r8mnbrk Minimum=" << x_minimum << "\n";
-    Photometry::r8brent(x_lower, x_upper, &F, x_minimum);
-    std::cerr << "r8brent's Converged Minimum = " << x_minimum << std::endl;
+    std::cerr << "\nUsing minbracket for Starting Minimum\n";
+    double xc = 0;
+    double fxa, fxb, fxc;
+    Photometry::minbracket(xa, xb, xc, fxa, fxb, fxc, F.function, F.params);
+    std::cerr << "minbracket Minimum=" << xb << "\n";
+    Photometry::brentsolver(xa, xc, &F, xb);
+    std::cerr << "brentsolver's Converged Minimum = " << xb << std::endl;
   }
   catch(iException &e) {
     e.Report(false);

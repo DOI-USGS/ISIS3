@@ -1,4 +1,5 @@
 #include "iException.h"
+#include "iString.h"
 #include "Pvl.h"
 #include "Photometry.h"
 #include "PhotoModelFactory.h"
@@ -116,7 +117,7 @@ namespace Isis {
    * @param x_minimum - x_minimum calculated parabola min value
    * @return double - status
    */
-  int Photometry::r8brent(double x_lower, double x_upper, gsl_function *Func, double & x_minimum){
+  int Photometry::brentsolver(double x_lower, double x_upper, gsl_function *Func, double & x_minimum){
     int status;
     int iter=0, max_iter=100;
     
@@ -148,4 +149,91 @@ namespace Isis {
     
     return status;
   }
+
+  /**
+   * This bracketing algorithm was taken from 
+   *    http://cxc.harvard.edu/sherpa/methods/fminpowell.py.txt
+   * and converted to C++.
+   */
+  void Photometry::minbracket(double &xa, double &xb, double &xc, double &fa, double &fb,
+      double &fc, double Func(double par, void *params), void *params) {
+    double eps = 1.0e-21;
+    double Gold = 1.618034;
+    double GrowLimit = 110;
+    int maxiter = 1000;
+
+    fa = Func(xa, params);
+    fb = Func(xb, params);
+    if (fa < fb) {
+      double tmp = xa;
+      xa = xb;
+      xb = tmp;
+      tmp = fa;
+      fa = fb;
+      fb = tmp;
+    }
+    xc = xb + Gold * (xb - xa);
+    fc = Func(xc, params);
+    int iter = 0;
+
+    while (fc < fb) {
+      double tmp1 = (xb - xa) * (fb - fc);
+      double tmp2 = (xb - xc) * (fb - fa);
+      double val = tmp2 - tmp1;
+      double denom;
+      if (fabs(val) < eps) {
+        denom = 2.0 * eps;
+      } else {
+        denom = 2.0 * val;
+      }
+      double w = xb - ((xb -xc) * tmp2 - (xb - xa) * tmp1) / denom;
+      double wlim = xb + GrowLimit * (xc - xb);
+      if (iter > maxiter) {
+        iString msg = "Maximum iterations exceeded in minimum bracketing ";
+        msg += "algorithm (minbracket) - root cannot be bracketed";
+        throw iException::Message(iException::User, msg, _FILEINFO_);
+      }
+      iter = iter + 1;
+      double fw;
+      if (((w-xc)*(xb-w)) > 0.0) {
+        fw = Func(w, params);
+        if (fw < fc) {
+          xa = xb;
+          xb = w;
+          fa = fb;
+          fb = fw;
+          return;
+        } else if (fw > fb) {
+          xc = w;
+          fc = fw;
+          return;
+        }
+        w = xc + Gold * (xc - xb);
+        fw = Func(w, params);
+      } else if (((w-wlim)*(wlim-xc)) >= 0.0) {
+        w = wlim;
+        fw = Func(w, params);
+      } else if (((w-wlim)*(xc-w)) > 0.0) {
+        fw = Func(w, params);
+        if (fw < fc) {
+          xb = xc;
+          xc = w;
+          w = xc + Gold * (xc - xb);
+          fb = fc;
+          fc = fw;
+          fw = Func(w, params);
+        }
+      } else {
+        w = xc + Gold * (xc - xb);
+        fw = Func(w, params);
+      }
+      xa = xb;
+      xb = xc;
+      xc = w;
+      fa = fb;
+      fb = fc;
+      fc = fw;
+    }
+    return;
+  } 
 }
