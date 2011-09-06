@@ -1,0 +1,4 @@
+Group = MinnaertEmpirical
+  Library = MinnaertEmpirical
+  Routine = MinnaertEmpiricalPlugin
+End_Group

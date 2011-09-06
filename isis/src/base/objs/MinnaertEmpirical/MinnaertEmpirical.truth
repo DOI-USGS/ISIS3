@@ -1,0 +1,28 @@
+UNIT TEST for Minnaert Empirical photometric function
+
+Object = PhotometricModel
+  Group = Algorithm
+    Name           = MinnaertEmpirical
+    PhaseList      = "0.,10.,20.,30.,40.,50.,60.,70.,80.,90.,100.,110.,120.,1-
+                      30.,140.,150.,160.,170.,180."
+    KList          = "0.505,0.584,0.650,0.700,0.744,0.787,0.828,0.865,0.894,0-
+                      .912,0.918,0.926,0.944,0.973,1.004,1.045,1.083,1.088,1.0-
+                      92"
+    PhaseCurveList = "0.03335,0.03366,0.03328,0.03220,0.03074,0.02909,0.02737-
+                      ,0.02559,0.02369,0.02152,0.01902,0.01651,0.01427,0.01244-
+                      ,0.01079,0.009452,0.007869,0.004866,0."
+  End_Group
+End_Object
+End
+
+Test phase=0.0, incidence=0.0, emission=0.0 ...
+Albedo = 0.03335
+Test phase=38.0, incidence=11.0, emission=20.0 ...
+Albedo = 0.0311397
+Test phase=65.0, incidence=45.0, emission=30.0 ...
+Albedo = 0.020188
+Test phase=127.0, incidence=52.0, emission=33.0 ...
+Albedo = 0.008174
+Test phase=180.0, incidence=90.0, emission=90.0 ...
+Albedo = 0
+
