@@ -1,0 +1,4 @@
+Group = LunarLambertEmpirical
+  Library = LunarLambertEmpirical
+  Routine = LunarLambertEmpiricalPlugin
+End_Group

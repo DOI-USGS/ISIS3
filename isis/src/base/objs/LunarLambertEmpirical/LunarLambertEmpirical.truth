@@ -1,0 +1,28 @@
+UNIT TEST for Lunar Lambert Empirical photometric function
+
+Object = PhotometricModel
+  Group = Algorithm
+    Name           = LunarLambertEmpirical
+    PhaseList      = "0.,10.,20.,30.,40.,50.,60.,70.,80.,90.,100.,110.,120.,1-
+                      30.,140.,150.,160.,170.,180."
+    LList          = "0.986,0.778,0.641,0.545,0.457,0.372,0.289,0.211,0.143,0-
+                      .086,0.041,0.009,-0.009,-0.020,-0.025,-0.029,-0.027,-0.0-
+                      11,-0.010"
+    PhaseCurveList = "0.03338,0.03386,0.03350,0.03247,0.03109,0.02949,0.02780-
+                      ,0.02608,0.02432,0.02246,0.02050,0.01832,0.01599,0.01363-
+                      ,0.01134,0.009113,0.006710,0.003510,0."
+  End_Group
+End_Object
+End
+
+Test phase=0.0, incidence=0.0, emission=0.0 ...
+Albedo = 0.03338
+Test phase=38.0, incidence=11.0, emission=20.0 ...
+Albedo = 0.0314089
+Test phase=65.0, incidence=45.0, emission=30.0 ...
+Albedo = 0.0203387
+Test phase=127.0, incidence=52.0, emission=33.0 ...
+Albedo = 0.0087672
+Test phase=180.0, incidence=90.0, emission=90.0 ...
+Albedo = -0
+
