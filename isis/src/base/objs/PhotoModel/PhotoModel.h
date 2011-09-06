@@ -25,6 +25,7 @@
 
 #include <string>
 #include <vector>
+#include "NumericalApproximation.h"
 #include "Pvl.h"
 
 namespace Isis {
@@ -159,6 +160,31 @@ namespace Isis {
       inline double Hfunc(double u, double gamma) {
         return (1.0 + 2.0 * u) / (1.0 + 2.0 * u * gamma);
       }
+ 
+      virtual void SetPhotoPhaseList(const std::string phasestrlist) {};
+      virtual void SetPhotoKList(const std::string kstrlist) {};
+      virtual void SetPhotoLList(const std::string kstrlist) {};
+      virtual void SetPhotoPhaseCurveList(const std::string phasecurvestrlist) {};
+
+      //! Return photometric phase angle list
+      inline std::vector<double> PhotoPhaseList() const {
+        return p_photoPhaseList;
+      };
+
+      //! Return photometric k value list
+      inline std::vector<double> PhotoKList() const {
+        return p_photoKList;
+      };
+
+      //! Return photometric l value list
+      inline std::vector<double> PhotoLList() const {
+        return p_photoLList;
+      };
+
+      //! Return photometric phase curve value list
+      inline std::vector<double> PhotoPhaseCurveList() const {
+        return p_photoPhaseCurveList;
+      };
 
     protected:
       virtual double PhotoModelAlgorithm(double phase,
@@ -182,6 +208,15 @@ namespace Isis {
       double p_photoB0save;
       double p_photoTheta;
       double p_photoThetaold;
+
+      std::vector<double> p_photoPhaseList;
+      std::vector<double> p_photoKList;
+      std::vector<double> p_photoLList;
+      std::vector<double> p_photoPhaseCurveList;
+      int p_photoPhaseAngleCount;
+      NumericalApproximation p_photoKSpline;
+      NumericalApproximation p_photoLSpline;
+      NumericalApproximation p_photoBSpline;
 
     private:
       //! Unique name of the photometric model
