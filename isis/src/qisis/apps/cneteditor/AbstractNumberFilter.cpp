@@ -23,8 +23,8 @@ using std::cerr;
 namespace Isis
 {
   AbstractNumberFilter::AbstractNumberFilter(
-    AbstractFilter::FilterEffectivenessFlag flag,
-    int minimumForSuccess) : AbstractFilter(flag, minimumForSuccess)
+      AbstractFilter::FilterEffectivenessFlag flag,
+      int minimumForSuccess) : AbstractFilter(flag, minimumForSuccess)
   {
     nullify();
     createWidget();
@@ -32,25 +32,22 @@ namespace Isis
 
 
   AbstractNumberFilter::AbstractNumberFilter(const AbstractNumberFilter & other)
-    : AbstractFilter(other)
+      : AbstractFilter(other)
   {
     nullify();
     createWidget();
 
     lineEdit->setText(other.lineEdit->text());
     greaterThanLessThan->button(
-      other.greaterThanLessThan->checkedId())->click();
+        other.greaterThanLessThan->checkedId())->click();
   }
 
 
 
   AbstractNumberFilter::~AbstractNumberFilter()
   {
-    if (lineEditText)
-    {
-      delete lineEditText;
-      lineEditText = NULL;
-    }
+    delete lineEditText;
+    lineEditText = NULL;
   }
 
 
@@ -73,7 +70,7 @@ namespace Isis
 
     greaterThanLessThan = new QButtonGroup;
     connect(greaterThanLessThan, SIGNAL(buttonClicked(int)),
-        this, SIGNAL(filterChanged()));
+            this, SIGNAL(filterChanged()));
     greaterThanLessThan->addButton(lessThanButton, 0);
     greaterThanLessThan->addButton(greaterThanButton, 1);
 
@@ -89,9 +86,9 @@ namespace Isis
     lineEdit = new QLineEdit;
     lineEdit->setMinimumWidth(75);
     connect(lineEdit, SIGNAL(textChanged(QString)),
-        this, SLOT(updateLineEditText(QString)));
+            this, SLOT(updateLineEditText(QString)));
     connect(lineEdit, SIGNAL(textChanged(QString)),
-        this, SIGNAL(filterChanged()));
+            this, SIGNAL(filterChanged()));
 
 
     QHBoxLayout * layout = new QHBoxLayout;
@@ -120,7 +117,7 @@ namespace Isis
     double d = text.toDouble(&ok);
 
     if (ok)
-      evaluation = !(inclusive() ^ lessThan() ^(d <= number));
+      evaluation = !(inclusive() ^ lessThan() ^ (d <= number));
 
     return evaluation;
   }

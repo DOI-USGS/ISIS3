@@ -20,7 +20,7 @@ namespace Isis
 
     public:
       ResidualMagnitudeFilter(AbstractFilter::FilterEffectivenessFlag flag,
-          int minimumForSuccess = -1);
+                              int minimumForSuccess = -1);
       ResidualMagnitudeFilter(const ResidualMagnitudeFilter & other);
       virtual ~ResidualMagnitudeFilter();
 

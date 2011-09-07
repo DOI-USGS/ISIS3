@@ -9,14 +9,14 @@
 namespace Isis
 {
   ResidualMagnitudeFilter::ResidualMagnitudeFilter(
-    AbstractFilter::FilterEffectivenessFlag flag,
-    int minimumForSuccess) : AbstractNumberFilter(flag, minimumForSuccess)
+      AbstractFilter::FilterEffectivenessFlag flag,
+      int minimumForSuccess) : AbstractNumberFilter(flag, minimumForSuccess)
   {
   }
 
 
   ResidualMagnitudeFilter::ResidualMagnitudeFilter(
-    const ResidualMagnitudeFilter & other) : AbstractNumberFilter(other)
+      const ResidualMagnitudeFilter & other) : AbstractNumberFilter(other)
   {
   }
 
