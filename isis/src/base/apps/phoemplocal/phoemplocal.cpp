@@ -17,8 +17,6 @@
 #include "AtmosModelFactory.h"
 #include "GuiEditFile.h"
 #include "iException.h"
-#include "LunarLambert.h"
-#include "Minnaert.h"
 #include "PhotoModel.h"
 #include "PhotoModelFactory.h"
 #include "Photometry.h"
