@@ -122,25 +122,32 @@ namespace Isis
   void ConnectionModel::rebuildItems()
   {
 //     cerr << "ConnectionModel::rebuildItems called\n";
-    emit filterCountsChanged(-1, getTopLevelItemCount());
-    QFuture< QAtomicPointer< RootItem > > futureRoot;
-
-    if (getRebuildWatcher()->isStarted())
+    if (!isFrozen())
     {
-      futureRoot = getRebuildWatcher()->future();
-      futureRoot.cancel();
-//       futureRoot.waitForFinished();
-//       if (futureRoot.result())
-//         delete futureRoot.result();
+      emit filterCountsChanged(-1, getTopLevelItemCount());
+      QFuture< QAtomicPointer< RootItem > > futureRoot;
+
+      if (getRebuildWatcher()->isStarted())
+      {
+        futureRoot = getRebuildWatcher()->future();
+        futureRoot.cancel();
+  //       futureRoot.waitForFinished();
+  //       if (futureRoot.result())
+  //         delete futureRoot.result();
+      }
+
+      futureRoot = QtConcurrent::mappedReduced(
+          getControlNetwork()->GetCubeGraphNodes(),
+          CreateRootItemFunctor(this, QThread::currentThread()),
+          &CreateRootItemFunctor::addToRootItem,
+          QtConcurrent::OrderedReduce | QtConcurrent::SequentialReduce);
+
+      getRebuildWatcher()->setFuture(futureRoot);
     }
-
-    futureRoot = QtConcurrent::mappedReduced(
-        getControlNetwork()->GetCubeGraphNodes(),
-        CreateRootItemFunctor(this, QThread::currentThread()),
-        &CreateRootItemFunctor::addToRootItem,
-        QtConcurrent::OrderedReduce | QtConcurrent::SequentialReduce);
-
-    getRebuildWatcher()->setFuture(futureRoot);
+    else
+    {
+      queueRebuild();
+    }
 //     cerr << "/ConnectionModel::rebuildItems\n";
   }
 }

@@ -75,6 +75,8 @@ namespace Isis
     drivable = false;
     filterAgain = false;
     filterRunning = false;
+    frozen = false;
+    rebuildPending = false;
   }
 
 
@@ -351,6 +353,36 @@ namespace Isis
 
     return index;
   }
+  
+  
+  void TreeModel::setFrozen(bool newFrozenState)
+  {
+    frozen = newFrozenState;
+    if (!frozen)
+    {
+      if (rebuildPending)
+      {
+        rebuildItems();
+        rebuildPending = false;
+      }
+      else
+      {
+        applyFilter();
+      }
+    }
+  }
+  
+  
+  bool TreeModel::isFrozen() const
+  {
+    return frozen;
+  }
+
+
+  void TreeModel::queueRebuild()
+  {
+    rebuildPending = true;
+  }
 
 
   bool TreeModel::isFiltering() const
@@ -558,7 +590,8 @@ namespace Isis
 //     cerr << "TreeModel::applyFilter\n";
     // If filterAgain is true, then this method will be recalled later
     // with filterAgain = false.
-    if (!filterAgain && guisFilterWidget && rebuildWatcher->isFinished())
+    if (!frozen && !filterAgain && guisFilterWidget &&
+        rebuildWatcher->isFinished())
     {
       QFuture< QAtomicPointer< AbstractTreeItem> > futureRoot;
 
@@ -760,18 +793,18 @@ namespace Isis
   }
 
 
-  TreeModel::FilterFunctor &
-      TreeModel::FilterFunctor::operator=(FilterFunctor const & other) {
-    if (this != &other) {
+  TreeModel::FilterFunctor & TreeModel::FilterFunctor::operator=(
+      FilterFunctor const & other)
+  {
+    if (this != &other)
       filter = other.filter;
-    }
 
     return *this;
   }
 
 
   void TreeModel::FilterFunctor::filterWorker(
-    AbstractTreeItem * item) const
+      AbstractTreeItem * item) const
   {
     switch (item->getPointerType())
     {
@@ -833,8 +866,8 @@ namespace Isis
 
 
   void TreeModel::FilterFunctor::updateTopLevelLinks(
-    QAtomicPointer< AbstractTreeItem > & root,
-    AbstractTreeItem * const & item)
+      QAtomicPointer< AbstractTreeItem > & root,
+      AbstractTreeItem * const & item)
   {
     if (!root)
     {

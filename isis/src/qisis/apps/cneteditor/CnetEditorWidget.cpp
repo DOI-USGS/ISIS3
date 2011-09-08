@@ -104,9 +104,6 @@ namespace Isis
     delete settingsPath;
     settingsPath = NULL;
 
-    delete enableSortAct;
-    enableSortAct = NULL;
-
     delete pointTreeView;
     pointTreeView = NULL;
 
@@ -158,8 +155,6 @@ namespace Isis
     topSplitter = NULL;
     mainSplitter = NULL;
 
-    enableSortAct = NULL;
-    
     menuActions = NULL;
     toolBarActions = NULL;
     
@@ -284,10 +279,12 @@ namespace Isis
 
   void CnetEditorWidget::createActions()
   {
-    enableSortAct = new QAction(QIcon(":sort"), tr("&Enable Sorting"), this);
+    QAction * enableSortAct = new QAction(QIcon(":sort"),
+                                          tr("&Enable Sorting"), this);
     enableSortAct->setCheckable(true);
     enableSortAct->setStatusTip(tr("Enable Sorting on Table Columns"));
-    connect(enableSortAct, SIGNAL(toggled(bool)), SLOT(setSortingEnabled(bool)));
+    connect(enableSortAct, SIGNAL(toggled(bool)),
+            this, SLOT(setSortingEnabled(bool)));
     
     ASSERT(menuActions);
     
@@ -296,7 +293,17 @@ namespace Isis
     menuActions->insert(enableSortAct, enableSortLocation);
     
     QList< QAction * > actionList;
-    actionList.append(enableSortAct);
+//     actionList.append(enableSortAct);
+    
+    QAction * freezeTablesAct = new QAction(tr("&Freeze Tables"), this);
+    freezeTablesAct->setCheckable(true);
+    freezeTablesAct->setToolTip(tr("Freeze tables (filters will not take "
+                                   "effect until unfrozen)"));
+    freezeTablesAct->setWhatsThis("When editing cells in the tables, it is ");
+    connect(freezeTablesAct, SIGNAL(toggled(bool)),
+            this, SLOT(setTablesFrozen(bool)));
+    
+    actionList.append(freezeTablesAct);
     toolBarActions->insert("settingsToolBar", actionList);
   }
   
@@ -460,7 +467,7 @@ namespace Isis
   void CnetEditorWidget::pointColToggled()
   {
     QList< QAction * > actions =
-      pointTableView->getHorizontalHeader()->actions();
+        pointTableView->getHorizontalHeader()->actions();
 
     for (int i = 0; i < actions.size(); i++)
     {
@@ -473,7 +480,7 @@ namespace Isis
   void CnetEditorWidget::measureColToggled()
   {
     QList< QAction * > actions =
-      measureTableView->getHorizontalHeader()->actions();
+        measureTableView->getHorizontalHeader()->actions();
     for (int i = 0; i < actions.size(); i++)
       measureTableView->setColumnVisible(actions[i]->text(),
           actions[i]->isChecked());
@@ -624,6 +631,24 @@ namespace Isis
     
     if (measureTableModel)
       measureTableModel->setSortingEnabled(sortingIsEnabled);
+  }
+  
+  
+  void CnetEditorWidget::setTablesFrozen(bool freezeTables)
+  {
+    cerr << "slot! " << freezeTables << "\n";
+    if (freezeTables)
+    {
+      connectionModel->setFrozen(true);
+      serialModel->setFrozen(true);
+      pointModel->setFrozen(true);
+    }
+    else
+    {
+      pointModel->setFrozen(false);
+      serialModel->setFrozen(false);
+      connectionModel->setFrozen(false);
+    }
   }
 }
 

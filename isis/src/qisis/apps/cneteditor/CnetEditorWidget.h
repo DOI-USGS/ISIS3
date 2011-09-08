@@ -59,6 +59,7 @@ namespace Isis
       
     public slots:
       void setSortingEnabled(bool);
+      void setTablesFrozen(bool);
 
 
     signals:
@@ -116,8 +117,6 @@ namespace Isis
 
       QSplitter * topSplitter;
       QSplitter * mainSplitter;
-
-      QAction * enableSortAct;
 
       QMap< QAction *, QList< QString > > * menuActions;
       QMap< QString, QList< QAction * > > * toolBarActions;

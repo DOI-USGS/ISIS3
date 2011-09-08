@@ -66,6 +66,9 @@ namespace Isis
       int indexOfVisibleItem(AbstractTreeItem const * item,
                              InterestingItemsFlag = AllItems,
                              bool = false) const;
+      void setFrozen(bool);
+      bool isFrozen() const;
+      void queueRebuild();
       
 
     public slots:
@@ -140,11 +143,13 @@ namespace Isis
       bool drivable;
       bool filterAgain;
       bool filterRunning;
+      bool frozen;
+      bool rebuildPending;
 
 
     private:
       class FilterFunctor
-        : public std::unary_function< AbstractTreeItem * const &, bool >
+          : public std::unary_function< AbstractTreeItem * const &, bool >
       {
         public:
           FilterFunctor(FilterWidget * fw);

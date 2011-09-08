@@ -116,25 +116,32 @@ namespace Isis
   void PointModel::rebuildItems()
   {
 //     cerr << "PointModel::rebuildItems\n";
-    emit filterCountsChanged(-1, getTopLevelItemCount());
-    QFuture< QAtomicPointer< RootItem > > futureRoot;
-    if (getRebuildWatcher()->isStarted())
+    if (!isFrozen())
     {
-      futureRoot = getRebuildWatcher()->future();
-      futureRoot.cancel();
+      emit filterCountsChanged(-1, getTopLevelItemCount());
+      QFuture< QAtomicPointer< RootItem > > futureRoot;
+      if (getRebuildWatcher()->isStarted())
+      {
+        futureRoot = getRebuildWatcher()->future();
+        futureRoot.cancel();
+      }
+      
+  //     cerr << "PointModel::rebulidItems... getPoints has size : "
+  //          << getControlNetwork()->getPoints().size() << "\n";
+
+      ASSERT(getControlNetwork());
+      futureRoot = QtConcurrent::mappedReduced(
+          getControlNetwork()->getPoints(),
+          CreateRootItemFunctor(this, QThread::currentThread()),
+          &CreateRootItemFunctor::addToRootItem,
+          QtConcurrent::OrderedReduce | QtConcurrent::SequentialReduce);
+
+      getRebuildWatcher()->setFuture(futureRoot);
     }
-    
-//     cerr << "PointModel::rebulidItems... getPoints has size : "
-//          << getControlNetwork()->getPoints().size() << "\n";
-
-    ASSERT(getControlNetwork());
-    futureRoot = QtConcurrent::mappedReduced(
-        getControlNetwork()->getPoints(),
-        CreateRootItemFunctor(this, QThread::currentThread()),
-        &CreateRootItemFunctor::addToRootItem,
-        QtConcurrent::OrderedReduce | QtConcurrent::SequentialReduce);
-
-    getRebuildWatcher()->setFuture(futureRoot);
+    else
+    {
+      queueRebuild();
+    }
 //     cerr << "/PointModel::rebuildItems\n";
   }
 }

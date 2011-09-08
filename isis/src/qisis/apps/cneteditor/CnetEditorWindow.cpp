@@ -563,7 +563,7 @@ namespace Isis
     editorWidget = new CnetEditorWidget(cnet, Filename(
         "$HOME/.Isis/cneteditor/cneteditor.config").Expanded().c_str());
     populateMenus();
-//     populateToolBars(); FIXME: THIS METHOD IS BROKEN
+    populateToolBars();
     connect(editorWidget, SIGNAL(cnetModified()), this, SLOT(setDirty()));
     setFileState(CnetEditorWindow::HasFile, *curFile);
 
@@ -644,7 +644,7 @@ namespace Isis
   }
 
 
-  void CnetEditorWindow::populateToolBars() //FIXME: BROKEN METHOD
+  void CnetEditorWindow::populateToolBars()
   {
     QMap< QString, QList< QAction * > > actionMap;
     actionMap = editorWidget->getToolBarActions();
@@ -656,25 +656,30 @@ namespace Isis
       QString objName = i.key();
       QList< QAction * > actionList = i.value();
       
-      int index = indexOfToolBar(objName);
-      if (index != -1)
+      foreach (QAction * action, actionList)
       {
-        foreach (QAction * action, actionList)
-          (*toolBars)[index]->addAction(action);
+        mainToolBar->addAction(action);
       }
-      else
-      {
-        if (objName != mainToolBar->objectName())
-        {
-          QToolBar * newToolBar = new QToolBar(objName);
-          newToolBar->setObjectName(objName);
-          newToolBar->setFloatable(false);
-          foreach (QAction * action, actionList)
-            newToolBar->addAction(action);
-          
-          addToolBar(Qt::TopToolBarArea, newToolBar);
-        }
-      }
+      
+//       int index = indexOfToolBar(objName);
+//       if (index != -1)
+//       {
+//         foreach (QAction * action, actionList)
+//           (*toolBars)[index]->addAction(action);
+//       }
+//       else
+//       {
+//         if (objName != mainToolBar->objectName())
+//         {
+//           QToolBar * newToolBar = new QToolBar(objName);
+//           newToolBar->setObjectName(objName);
+//           newToolBar->setFloatable(false);
+//           foreach (QAction * action, actionList)
+//             newToolBar->addAction(action);
+//           
+//           addToolBar(Qt::TopToolBarArea, newToolBar);
+//         }
+//       }
     }
   }
   
