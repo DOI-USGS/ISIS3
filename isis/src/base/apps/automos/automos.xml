@@ -237,6 +237,10 @@
       Option to match DEM and also added new group "mosaic" to hold ShapeModel 
       attributes for the mosaic
     </change>
+    <change name="Sharmila Prasad" date="2011-09-07">
+      Fixed bug 0000390 - tracking should continue even if the first image does 
+    not map onto the mosaic  
+    </change>
   </history>
 
   <groups>

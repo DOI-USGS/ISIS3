@@ -97,7 +97,8 @@ void IsisMain() {
   
   // Get the MatchDEM Flag
   m.SetMatchDEM(ui.GetBoolean("MATCHDEM"));
-
+  
+  bool mosaicCreated = false;
   for(unsigned int i = 0; i < list.size(); i++) {
     if(!m.StartProcess(list[i])) {
       PvlGroup outsiders("Outside");
@@ -112,8 +113,9 @@ void IsisMain() {
       imgPosition += PvlKeyword("StartSample", iStartSample);
       imgPosition += PvlKeyword("StartLine", iStartLine);
       Application::Log(imgPosition);
+      mosaicCreated = true;
     }
-    if(!i) {
+    if(mosaicCreated) {
       // Mosaic is already created, use the existing mosaic
       m.SetCreateFlag(false);
     }
