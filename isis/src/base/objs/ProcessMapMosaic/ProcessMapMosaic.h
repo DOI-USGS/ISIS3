@@ -68,6 +68,8 @@ namespace Isis {
    *           the number of mosaic bands to get Count info
    *  @history 2011-06-28 Jai Rideout and Steven Lambright - Now uses a
    *                          different caching algorithm.
+   *  @history 2011-09-08 Sharmila Prasad - Fixed Bug #406, Additional boundary checks similar to
+   *            ProcessMosaic so that there will be no interruption for applications like automos
    *  
    *  @todo 2005-02-11 Stuart Sides - add coded example and implementation example
    *                                  to class documentation

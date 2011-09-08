@@ -70,8 +70,10 @@ namespace Isis {
     outSample = (int)(oproj->ToWorldX(iproj->ToProjectionX(1.0)) + 0.5);
     outLine   = (int)(oproj->ToWorldY(iproj->ToProjectionY(1.0)) + 0.5);
 
-    outSampleEnd = outSample + InputCubes[0]->getSampleCount();
-    outLineEnd   = outLine + InputCubes[0]->getLineCount();
+    int ins = InputCubes[0]->getSampleCount();
+    int inl =  InputCubes[0]->getLineCount();
+    outSampleEnd = outSample + ins;
+    outLineEnd   = outLine + inl;
 
     bool wrapPossible = iproj->IsEquatorialCylindrical();
     int worldSize = 0;
@@ -98,7 +100,29 @@ namespace Isis {
       }
     }
 
-    if(outSampleEnd < 1 || outLineEnd < 1 || outSample > nsMosaic || outLine > nlMosaic) {
+    // Check overlaps of input image along the mosaic edges before 
+    // calling ProcessMosaic::StartProcess
+    // Left edge
+    if(outSample < 1) {
+      ins = ins + outSample - 1;
+    }
+    
+    // Top edge
+    if(outLine < 1) {
+      inl = inl + outLine - 1;
+    }
+    
+    // Right edge
+    if((outSample + ins - 1) > nsMosaic) {
+      ins = nsMosaic - outSample + 1;
+    }
+    
+    // Bottom edge
+    if((outLine + inl - 1) > nlMosaic) {
+      inl = nlMosaic - outLine + 1;
+    }
+
+    if(outSampleEnd < 1 || outLineEnd < 1 || outSample > nsMosaic || outLine > nlMosaic || ins < 1 || inl < 1) {
       // Add a PvlKeyword naming which files are not included in output mosaic
       ClearInputCubes();
       return false;
