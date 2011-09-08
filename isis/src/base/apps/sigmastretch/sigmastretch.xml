@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<application name="sigmastretch" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Apply a Davinci "Sigma Stretch" (sstretch) to a cube.
+  </brief>
+
+  <description>
+    Stretch a cube according to the following formula for each pixel in the
+    image:
+    <pre>
+      new_dn = (old_dn - avg) * (variance / stddev)
+    </pre>
+    Here, <i>avg</i> and <i>stddev</i> stand for the statistical average and
+    standard deviation of all valid pixels in the current pixel's band,
+    respectively.  The <i>variance</i> mentioned is not actually the statistical
+    variance of the band, but a user-specified parameter, VARIANCE, that affects
+    how much the histogram of the image is widened.
+  </description>
+
+  <category>
+    <categoryItem>Math and Statistics</categoryItem>
+  </category>
+
+    <seeAlso>
+    <applications>
+      <item>stretch</item>
+      <item>decorstretch</item>
+      <item>gaussstretch</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Travis Addair" date="2011-09-08">
+      Original translation of Davinci's "sstretch" script into Isis 3.
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file to stretch
+        </brief>
+        <description>
+          The input cube which will have the sigma stretch applied.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <pixelType>real</pixelType>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          The resultant cube containing the image after being stretched.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+    <group name="Parameters">
+      <parameter name="VARIANCE">
+        <type>double</type>
+        <brief>
+          Non-uniformity of the output's histogram
+        </brief>
+        <description>
+          The nonuniformity of the output image's histogram.  For values less
+          than 1.0, the distribution will be closer to uniform.  This value must
+          be greater than 0.0.
+        </description>
+        <default><item>40.0</item></default>
+        <minimum inclusive="no">0.0</minimum>
+      </parameter>
+    </group>
+  </groups>
+</application>
