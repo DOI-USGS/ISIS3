@@ -636,7 +636,6 @@ namespace Isis
   
   void CnetEditorWidget::setTablesFrozen(bool freezeTables)
   {
-    cerr << "slot! " << freezeTables << "\n";
     if (freezeTables)
     {
       connectionModel->setFrozen(true);
