@@ -117,7 +117,7 @@ namespace Isis {
    * @param x_minimum - x_minimum calculated parabola min value
    * @return double - status
    */
-  int Photometry::brentsolver(double x_lower, double x_upper, gsl_function *Func, double & x_minimum){
+  int Photometry::brentminimizer(double x_lower, double x_upper, gsl_function *Func, double & x_minimum){
     int status;
     int iter=0, max_iter=100;
     

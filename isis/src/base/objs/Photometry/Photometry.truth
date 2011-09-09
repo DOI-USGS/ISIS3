@@ -12,13 +12,13 @@ Photometric brightness value = 0.0531455
 Photometric brightness value = 0.0524591
 
 
-***** Testing One dimensional Minimizations using GSL's brentsolver *****
+***** Testing One dimensional Minimizations using GSL's brentminimizer *****
 xa = 0 xb = 6
 
 Without using minbracket, Starting Minimum
 Test Minimum=2
-brentsolver's Converged Minimum = 3.14159
+brentminimizer's Converged Minimum = 3.14159
 
 Using minbracket for Starting Minimum
 minbracket Minimum=15.7082
-brentsolver's Converged Minimum = 15.708
+brentminimizer's Converged Minimum = 15.708

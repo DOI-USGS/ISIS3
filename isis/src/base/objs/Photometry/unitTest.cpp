@@ -137,7 +137,7 @@ int main() {
     std::cout << "Photometric brightness value = " << albedo << std::endl <<
               std::endl;
 
-    std::cerr << "\n***** Testing One dimensional Minimizations using GSL's brentsolver *****\n";
+    std::cerr << "\n***** Testing One dimensional Minimizations using GSL's brentminimizer *****\n";
     
     gsl_function F;
     
@@ -148,16 +148,16 @@ int main() {
     std::cerr << "xa = " << xa << " xb = " << xb << "\n\n";
     double x_minimum = 2;
     std::cerr << "Without using minbracket, Starting Minimum\nTest Minimum=" << x_minimum << "\n";
-    Photometry::brentsolver(xa, xb, &F, x_minimum);
-    std::cerr << "brentsolver's Converged Minimum = " << x_minimum << std::endl;
+    Photometry::brentminimizer(xa, xb, &F, x_minimum);
+    std::cerr << "brentminimizer's Converged Minimum = " << x_minimum << std::endl;
     
     std::cerr << "\nUsing minbracket for Starting Minimum\n";
     double xc = 0;
     double fxa, fxb, fxc;
     Photometry::minbracket(xa, xb, xc, fxa, fxb, fxc, F.function, F.params);
     std::cerr << "minbracket Minimum=" << xb << "\n";
-    Photometry::brentsolver(xa, xc, &F, xb);
-    std::cerr << "brentsolver's Converged Minimum = " << xb << std::endl;
+    Photometry::brentminimizer(xa, xc, &F, xb);
+    std::cerr << "brentminimizer's Converged Minimum = " << xb << std::endl;
   }
   catch(iException &e) {
     e.Report(false);
