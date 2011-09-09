@@ -283,7 +283,7 @@ void IsisMain() {
   Photometry::minbracket(xa, xb, xc, fa, fb, fc, 
       &LinearFitPhotometricToHapke, &lFitParams); // minimum parabola (approximation)
   
-  Photometry::brentsolver(xa, xc, &Func, xb);
+  Photometry::brentminimizer(xa, xc, &Func, xb);
   
   double parmin = LinearFitPhotometricToHapke(xb, &lFitParams);
  
@@ -356,7 +356,7 @@ void IsisMain() {
  * squares fit at a contant given value of the limb-darkening parameter pPar.
  * The RMS error of the fit is returned.
  *  
- * The prototype is set to match the gsl_function data type to use gsl's brentsolver function. 
+ * The prototype is set to match the gsl_function data type to use gsl's brentminimizer function. 
  *  
  * The gsl_function is a pointer to function of the following prototype:
  * double (* function) (double x, void * params) 
