@@ -117,7 +117,8 @@ namespace Isis {
    * @param x_minimum - x_minimum calculated parabola min value
    * @return double - status
    */
-  int Photometry::brentminimizer(double x_lower, double x_upper, gsl_function *Func, double & x_minimum){
+  int Photometry::brentminimizer(double x_lower, double x_upper, gsl_function *Func, 
+      double & x_minimum, double tolerance) {
     int status;
     int iter=0, max_iter=100;
     
@@ -141,7 +142,7 @@ namespace Isis {
       x_lower   = gsl_min_fminimizer_x_lower(s);
       x_upper   = gsl_min_fminimizer_x_upper(s);
       
-      status = gsl_min_test_interval(x_lower, x_upper, 0.001, 0.0);
+      status = gsl_min_test_interval(x_lower, x_upper, tolerance, 0.0);
     } while(status == GSL_CONTINUE && iter < max_iter);
 
     // This function frees all the memory associated with the minimizer s.

@@ -77,7 +77,8 @@ namespace Isis {
           void *params);
 
       //! Brent's method 1-D minimization routine using GSL's r8Brent minimization Algorithm
-      static int brentminimizer(double x_lower, double x_upper, gsl_function *Func, double & x_minimum);
+      static int brentminimizer(double x_lower, double x_upper, gsl_function *Func, 
+          double & x_minimum, double tolerance);
 
       PhotoModel *GetPhotoModel() const {
         return p_phtPmodel;

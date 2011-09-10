@@ -148,7 +148,7 @@ int main() {
     std::cerr << "xa = " << xa << " xb = " << xb << "\n\n";
     double x_minimum = 2;
     std::cerr << "Without using minbracket, Starting Minimum\nTest Minimum=" << x_minimum << "\n";
-    Photometry::brentminimizer(xa, xb, &F, x_minimum);
+    Photometry::brentminimizer(xa, xb, &F, x_minimum, .001);
     std::cerr << "brentminimizer's Converged Minimum = " << x_minimum << std::endl;
     
     std::cerr << "\nUsing minbracket for Starting Minimum\n";
@@ -156,7 +156,7 @@ int main() {
     double fxa, fxb, fxc;
     Photometry::minbracket(xa, xb, xc, fxa, fxb, fxc, F.function, F.params);
     std::cerr << "minbracket Minimum=" << xb << "\n";
-    Photometry::brentminimizer(xa, xc, &F, xb);
+    Photometry::brentminimizer(xa, xc, &F, xb, .001);
     std::cerr << "brentminimizer's Converged Minimum = " << xb << std::endl;
   }
   catch(iException &e) {
