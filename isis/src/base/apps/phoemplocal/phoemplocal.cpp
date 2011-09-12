@@ -282,8 +282,9 @@ void IsisMain() {
   double xc,fa,fb,fc;
   Photometry::minbracket(xa, xb, xc, fa, fb, fc, 
       &LinearFitPhotometricToHapke, &lFitParams); // minimum parabola (approximation)
-  
-  Photometry::brentminimizer(xa, xc, &Func, xb);
+
+  double tolerance = 1e-6;  
+  Photometry::brentminimizer(xa, xc, &Func, xb, tolerance);
   
   double parmin = LinearFitPhotometricToHapke(xb, &lFitParams);
  
