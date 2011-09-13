@@ -1025,7 +1025,14 @@ namespace Isis {
     return MeasureTypeToString(p_measureType);
   }
 
-  //! Assignment operator
+
+  /**
+   * Assignment operator
+   *
+   * @internal
+   *   @history 2011-09-01 Tracie Sucharski - Do not set parentPoint to NULL or
+   *                           copy, retain the current parentPoint.
+   */
   const ControlMeasure &ControlMeasure::operator=(const ControlMeasure &other) {
     if (this == &other)
       return *this;
@@ -1047,8 +1054,6 @@ namespace Isis {
       p_loggedData = NULL;
     }
 
-    parentPoint = NULL;
-
     p_serialNumber = new iString;
     p_chooserName = new iString;
     p_dateTime = new iString;
@@ -1060,8 +1065,11 @@ namespace Isis {
     *p_loggedData = *other.p_loggedData;
 
     p_measureType = other.p_measureType;
+    //  Call SetIgnored to update the ControlGraphNode.  However, SetIgnored
+    //  will return if EditLock is true, so set to false temporarily.
+    p_editLock = false;
+    p_ignore = SetIgnored(other.p_ignore);
     p_editLock = other.p_editLock;
-    p_ignore = other.p_ignore;
     p_sample = other.p_sample;
     p_line = other.p_line;
     p_diameter = other.p_diameter;
