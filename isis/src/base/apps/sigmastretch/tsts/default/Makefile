@@ -1,5 +1,7 @@
 APPNAME = sigmastretch
 
+output.cub.TOLERANCE = .00001
+
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
