@@ -268,6 +268,10 @@ namespace Isis {
    *                           this inherit from QObject to get destroyed()
    *                           signal
    *   @history 2011-07-29 Eric Hyer - Changed some graph code in Delete()
+   *   @history 2011-09-13 Eric Hyer,Tracie Sucharski - operator= changes:
+   *                          Change input parameter to const &.
+   *                          Re-wrote to use Delete and AddMeasure methods, so
+   *                          that the ControlGraphNode is updated correctly.
    */
   class ControlPoint : public QObject {
 
@@ -483,7 +487,7 @@ namespace Isis {
 
       bool operator!=(const ControlPoint &pPoint) const;
       bool operator==(const ControlPoint &pPoint) const;
-      const ControlPoint &operator=(ControlPoint pPoint);
+      const ControlPoint &operator=(const ControlPoint &pPoint);
 
       // The next 6 methods are specifically to support BundleAdjust
       void ZeroNumberOfRejectedMeasures();

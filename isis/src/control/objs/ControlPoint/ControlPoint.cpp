@@ -70,6 +70,7 @@ namespace Isis {
     measures = NULL;
     cubeSerials = NULL;
     referenceMeasure = NULL;
+    parentNetwork = NULL;
 
     measures = new QHash< QString, ControlMeasure * >;
     cubeSerials = new QStringList;
@@ -80,16 +81,13 @@ namespace Isis {
       ControlMeasure *newMeasure = new ControlMeasure(*i.value());
       if (other.referenceMeasure == i.value())
         referenceMeasure = newMeasure;
-      QString newSerial = newMeasure->GetCubeSerialNumber();
       newMeasure->parentPoint = this;
-      measures->insert(newSerial, newMeasure);
-      cubeSerials->append(newSerial);
+      AddMeasure(newMeasure);
     }
 
     if (referenceMeasure == NULL && cubeSerials->size() != 0)
       referenceMeasure = measures->value(cubeSerials->at(0));
 
-    parentNetwork = NULL;
     id = other.id;
     chooserName = other.chooserName;
     dateTime = other.dateTime;
@@ -1927,7 +1925,8 @@ namespace Isis {
    *
    * @param other The other point to compare to
    *
-   * @returns true if the two points are equal, and false otherwise
+   * @returns true if the two points are equal, and false otherwise 
+   * 
    */
   bool ControlPoint::operator==(const ControlPoint &other) const {
     return other.GetNumMeasures() == GetNumMeasures() &&
@@ -1953,63 +1952,55 @@ namespace Isis {
    * @param pPoint
    *
    * @return ControlPoint&
+   *  
+   * @internal
+   *   @history 2011-09-13 Eric Hyer,Tracie Sucharski - Changed input parameter
+   *                          to const &.  Re-wrote using Delete and AddMeasure
+   *                          methods, so that the ControlGraphNode is updated
+   *                          correctly.
    */
-  const ControlPoint &ControlPoint::operator=(ControlPoint other) {
+  const ControlPoint &ControlPoint::operator=(const ControlPoint &other) {
 
-    if (measures) {
-      QList< QString > keys = measures->keys();
-      for (int i = 0; i < keys.size(); i++) {
-        delete(*measures)[keys[i]];
-        (*measures)[keys[i]] = NULL;
+    if (this != &other) {
+      for (int i = cubeSerials->size() - 1; i >= 0; i--) {
+        Delete(cubeSerials->at(i));
       }
 
-      delete measures;
-      measures = NULL;
+      measures = new QHash< QString, ControlMeasure * >;
+
+      QHashIterator< QString, ControlMeasure * > i(*other.measures);
+      while (i.hasNext()) {
+        i.next();
+        ControlMeasure *newMeasure = new ControlMeasure;
+        *newMeasure = *i.value();
+        if (other.referenceMeasure == i.value())
+          referenceMeasure = newMeasure;
+        QString newSerial = newMeasure->GetCubeSerialNumber();
+        newMeasure->parentPoint = this;
+        AddMeasure(newMeasure);
+      }
+
+      if (referenceMeasure == NULL && cubeSerials->size() != 0)
+        referenceMeasure = measures->value(cubeSerials->at(0));
+
+      id             = other.id;
+      chooserName    = other.chooserName;
+      dateTime       = other.dateTime;
+      type           = other.type;
+      invalid        = other.invalid;
+      editLock       = other.editLock;
+      jigsawRejected = other.jigsawRejected;
+      referenceExplicitlySet = other.referenceExplicitlySet;
+      ignore         = other.ignore;
+      aprioriSurfacePointSource      = other.aprioriSurfacePointSource;
+      aprioriSurfacePointSourceFile  = other.aprioriSurfacePointSourceFile;
+      aprioriRadiusSource            = other.aprioriRadiusSource;
+      aprioriRadiusSourceFile        = other.aprioriRadiusSourceFile;
+      aprioriSurfacePoint            = other.aprioriSurfacePoint;
+      adjustedSurfacePoint = other.adjustedSurfacePoint;
+      numberOfRejectedMeasures = other.numberOfRejectedMeasures;
+      constraintStatus = other.constraintStatus;
     }
-
-    if (cubeSerials) {
-      delete cubeSerials;
-      cubeSerials = NULL;
-    }
-
-    measures = new QHash< QString, ControlMeasure * >;
-    cubeSerials = new QStringList;
-
-    QHashIterator< QString, ControlMeasure * > i(*other.measures);
-    while (i.hasNext()) {
-      i.next();
-      ControlMeasure *newMeasure = new ControlMeasure;
-      *newMeasure = *i.value();
-      if (other.referenceMeasure == i.value())
-        referenceMeasure = newMeasure;
-      QString newSerial = newMeasure->GetCubeSerialNumber();
-      newMeasure->parentPoint = this;
-      measures->insert(newSerial, newMeasure);
-      cubeSerials->append(newSerial);
-    }
-
-    if (referenceMeasure == NULL && cubeSerials->size() != 0)
-      referenceMeasure = measures->value(cubeSerials->at(0));
-
-    parentNetwork = NULL;
-
-    id             = other.id;
-    chooserName    = other.chooserName;
-    dateTime       = other.dateTime;
-    type           = other.type;
-    invalid        = other.invalid;
-    editLock       = other.editLock;
-    jigsawRejected = other.jigsawRejected;
-    referenceExplicitlySet = other.referenceExplicitlySet;
-    ignore         = other.ignore;
-    aprioriSurfacePointSource      = other.aprioriSurfacePointSource;
-    aprioriSurfacePointSourceFile  = other.aprioriSurfacePointSourceFile;
-    aprioriRadiusSource            = other.aprioriRadiusSource;
-    aprioriRadiusSourceFile        = other.aprioriRadiusSourceFile;
-    aprioriSurfacePoint            = other.aprioriSurfacePoint;
-    adjustedSurfacePoint = other.adjustedSurfacePoint;
-    numberOfRejectedMeasures = other.numberOfRejectedMeasures;
-    constraintStatus = other.constraintStatus;
 
     return *this;
   }
