@@ -15,9 +15,6 @@ Albedo = 0.707107
 Test phase=180.0, incidence=90.0, emission=90.0 ...
 Albedo = 0
 
-Test negative K value ...
-**USER ERROR** Invalid value of Minnaert k [-1.0]
-
 PhotoK = 0
 Test phase=0.0, incidence=0.0, emission=0.0 ...
 Albedo = 1

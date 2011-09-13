@@ -16,17 +16,11 @@ namespace Isis {
     * Set the Minnaert function exponent.  This is used to govern the limb-
     * darkening in the Minnaert photometric function.  Values of the
     * Minnaert exponent generally fall in the range from 0.5 ("lunar-like",
-    * almost no limb darkening) to 1.0 (Lambert function).  This
-    * parameter is limited to values that are >=0.
+    * almost no limb darkening) to 1.0 (Lambert function). 
     *
     * @param k  Minnaert function exponent, default is 1.0
     */
   void Minnaert::SetPhotoK(const double k) {
-    if(k < 0.0) {
-      std::string msg = "Invalid value of Minnaert k [" +
-                        iString(k) + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
-    }
     p_photoK = k;
   }
 

@@ -43,14 +43,14 @@ int main() {
     std::cout << "Albedo = " << pm->CalcSurfAlbedo(180.0, 90.0, 90.0) <<
               std::endl << std::endl;
 
-    std::cout << "Test negative K value ..." << std::endl;
+/*    std::cout << "Test negative K value ..." << std::endl;
     try {
       pm->SetPhotoK(-1.0);
     }
     catch(Isis::iException &e) {
       e.Report(false);
     }
-    std::cout << std::endl;
+    std::cout << std::endl;*/
 
     pm->SetPhotoK(0.0);
     std::cout << "PhotoK = " << pm->PhotoK() << std::endl;
