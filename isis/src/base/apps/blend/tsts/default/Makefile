@@ -1,5 +1,9 @@
 APPNAME = blend
 
+I00824006RDR.lev2.blend.cub.TOLERANCE = 0.001
+I01523019RDR.lev2.blend.cub.TOLERANCE = 0.001
+I02609002RDR.lev2.blend.cub.TOLERANCE = 0.001
+
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
