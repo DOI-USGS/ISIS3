@@ -1,0 +1,12 @@
+APPNAME = blend
+
+include $(ISISROOT)/make/isismake.tsts
+
+commands:
+	$(APPNAME) fromlist=$(INPUT)/fromlist.lis \
+	  tolist=$(INPUT)/tolist.lis \
+	  stop=200 \
+	  > /dev/null;
+	$(MV) I00824006RDR.lev2.blend.cub $(OUTPUT)/I00824006RDR.lev2.blend.cub;
+	$(MV) I01523019RDR.lev2.blend.cub $(OUTPUT)/I01523019RDR.lev2.blend.cub;
+	$(MV) I02609002RDR.lev2.blend.cub $(OUTPUT)/I02609002RDR.lev2.blend.cub;

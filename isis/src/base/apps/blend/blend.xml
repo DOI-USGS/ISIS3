@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="blend" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Blends a list of images together along the overlapping areas.
+  </brief>
+
+  <description>
+    <p>
+      This application is a translation of the Davinci script "blend" into Isis
+      3.  The blending process itself takes a list of map-projected cubes and
+      blends them together along their overlapping areas by creating a "ramp"
+      from one image to the other.
+    </p>
+    <p>
+      The ramp-creation process creates a smooth, qualitative transition from
+      one image to the other, but sacrifices all scientific value of the pixel
+      values in the process.  Only the pixel values of the overlapping area will
+      be changed, however.  Consequently, this application is best suited to
+      blend images that have relatively low contrast between them.
+    </p>
+    <p>
+      Each output pixel value is simply a weighted average of the pixel values
+      taken from the two input images being examined.  The closer a pixel is to
+      one image over the other, the more heavily its value will be weighted in
+      favor of that image.
+    </p>
+    <p>
+      The output of this application is a list of images, setup nicely to move
+      on to mosaicking as a logical next step.  All the overlaps on between
+      these images will share the same pixel values.
+    </p>
+  </description>
+
+  <category>
+    <categoryItem>Mosaicking</categoryItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>noseam</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Travis Addair" date="2011-09-08">
+      Original translation of Davinci's "blend" script into Isis 3.
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROMLIST">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          List of cubes to blend
+        </brief>
+        <description>
+          A list of map projected cubes to blend.  The Mapping groups must match
+          in order to do the blending. 
+        </description>
+      </parameter>
+
+      <parameter name="TOLIST">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          List of the blended cubes to be created
+        </brief>
+        <description>
+          This list of output files must contain a file name to correspond to
+          each input file in the FROMLIST.  Input files will be associated with
+          output files by index, so that the equalized product of the first file
+          in the FROMLIST will be written to the name and location of the first
+          file in the TOLIST, and so on.  Each output file will be written to
+          the exact location with the exact name specified, unless the location
+          and name happen to be identical to those of its corresponding input
+          file, in which case an error will be thrown.  If this list is not
+          specified, the output files will be placed in the directories of their
+          input files, and named the same with the exception of an added
+          ".blend" extension (e.g. "foobar.cub" becomes "foobar.blend.cub").
+        </description>
+        <internalDefault>Automatic</internalDefault>
+      </parameter>
+    </group>
+
+    <group name="Options">
+      <parameter name="STOP">
+        <type>integer</type>
+        <brief>
+          Maximum number of pixels away from edge to search
+        </brief>
+        <description>
+          Defines how large the "blend ramp" will be between two images.  Tells
+          the algorithm to stop searching this number of pixels from the edge.
+          By choosing a lower value, the algorithm will work much faster, but
+          the ramp will also be much sharper and shorter.
+        </description>
+        <default><item>100000</item></default>
+      </parameter>
+    </group>
+  </groups>
+</application>
