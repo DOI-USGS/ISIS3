@@ -1,5 +1,6 @@
 #include "Isis.h"
 
+#include <QFile>
 #include <QVector>
 
 #include "Buffer.h"
@@ -18,7 +19,7 @@ using namespace Isis;
 using std::string;
 
 
-void blend(Buffer &in, Buffer &out);
+void blend(Buffer &in);
 bool inIntersection(int sample, int line);
 bool validValue(int oSample, int oLine);
 Chip * createRamp(Chip *pic1, Chip *pic2, int stop);
@@ -56,14 +57,25 @@ void IsisMain() {
       readOutputs(ui.GetFilename("TOLIST"), inputs, outputs) :
       generateOutputs(inputs, outputs);
 
-  for (unsigned int i = 0; i < inputs.size() - 1; i++) {
+  for (unsigned int i = 0; i < inputs.size(); i++) {
+    QString input(Filename(inputs[i]).Expanded());
+    QString output(Filename(outputs[i]).Expanded());
+
+    QFile::remove(output);
+    if (!QFile::copy(input, output)) {
+      string msg = "Cannot create output cube [" + output.toStdString() + "]";
+      throw iException::Message(Isis::iException::User, msg, _FILEINFO_);
+    }
+  }
+
+  for (unsigned int i = 0; i < outputs.size() - 1; i++) {
     Cube from1;
-    from1.open(inputs[i]);
+    from1.open(outputs[i]);
 
     bool hasOverlap = false;
-    for (unsigned int j = i + 1; j < inputs.size(); j++) {
+    for (unsigned int j = i + 1; j < outputs.size(); j++) {
       Cube from2;
-      from2.open(inputs[j]);
+      from2.open(outputs[j]);
 
       OverlapStatistics oStats(from1, from2);
 
@@ -100,15 +112,10 @@ void IsisMain() {
 
         // We will be processing by line
         ProcessByLine p;
-        iString inputName = inputs[i];
         CubeAttributeInput att;
-        Cube *icube = p.SetInputCube(inputName, att);
 
-        // Allocate output cube
-        iString out = outputs[i];
-        CubeAttributeOutput outAtt;
-        p.SetOutputCube(out, outAtt, icube->getSampleCount(),
-            icube->getLineCount(), icube->getBandCount());
+        iString cubeName = outputs[i];
+        p.SetInputCube(cubeName, att, ReadWrite);
 
         p.StartProcess(blend);
         p.EndProcess();
@@ -121,13 +128,8 @@ void IsisMain() {
 
         line = 1;
 
-        inputName = inputs[j];
-        icube = p.SetInputCube(inputName, att);
-
-        // Allocate output cube
-        out = outputs[j];
-        p.SetOutputCube(out, outAtt, icube->getSampleCount(),
-            icube->getLineCount(), icube->getBandCount());
+        cubeName = outputs[j];
+        p.SetInputCube(cubeName, att, ReadWrite);
 
         p.StartProcess(blend);
         p.EndProcess();
@@ -154,7 +156,7 @@ void IsisMain() {
 }
 
 
-void blend(Buffer &in, Buffer &out) {
+void blend(Buffer &in) {
   for (int i = 0; i < in.size(); i++) {
     int sample = i + 1;
     int oSample = sample - s1 + 1;
@@ -162,12 +164,12 @@ void blend(Buffer &in, Buffer &out) {
 
     if (inIntersection(oSample, oLine) && validValue(oSample, oLine)) {
       double blendValue = blendRamp->GetValue(oSample, oLine);
-      out[i] =
+      in[i] =
           i2->GetValue(oSample, oLine) * blendValue +
           i1->GetValue(oSample, oLine) * (1.0 - blendValue);
     }
     else {
-      out[i] = in[i];
+      in[i] = in[i];
     }
   }
 
@@ -208,6 +210,7 @@ Chip * createRamp(Chip *pic1, Chip *pic2, int stop) {
   int c2 = 0;
 
   // Extract profiles of images
+//   QQueue<int> nodes;
   int sum = 0;
   for (int i = 0; i < x; i++) {
     for (int j = 0; j < y; j++) {
