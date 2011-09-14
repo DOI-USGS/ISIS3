@@ -58,8 +58,10 @@ void IsisMain() {
       generateOutputs(inputs, outputs);
 
   for (unsigned int i = 0; i < inputs.size(); i++) {
-    QString input(Filename(inputs[i]).Expanded());
-    QString output(Filename(outputs[i]).Expanded());
+    Filename inputFilename(inputs[i]);
+    Filename outputFilename(outputs[i]);
+    QString input(inputFilename.Expanded());
+    QString output(outputFilename.Expanded());
 
     QFile::remove(output);
     if (!QFile::copy(input, output)) {
