@@ -134,6 +134,19 @@
       </parameter>
     </group>
 
+    <group name="User Note">
+       <parameter name="NOTE">
+        <type>string</type>
+        <brief>
+            User note to be added to output file
+        </brief>
+        <internalDefault>None</internalDefault>
+        <description>
+          The user can specify a note to be added to the output file using this parameter.
+        </description>
+       </parameter>
+    </group>
+
      <group name="HAPKE">
       <parameter name="PHTNAME">
         <type>combo</type>
@@ -169,9 +182,7 @@
        <parameter name="WH">
         <type>double</type>
         <brief>Single Scattering Albedo</brief>
-        <default>
-          <item>0.52</item>
-        </default>
+        <internalDefault>None</internalDefault>
         <description>Single-scattering albedo of surface particles. See Hapke 
         (1981).  Not to be confused with albedo WHA of the atmospheric 
         particles.</description> 
@@ -180,9 +191,7 @@
        <parameter name="HH">
         <type>double</type>
         <brief>Opposition Surge Width</brief>
-        <default>
-          <item>0</item>
-        </default>
+        <internalDefault>None</internalDefault>
         <description>Opposition Surge Width. ZEROs are strongly advised as the simple models 
         #do not fit the opposition effect well. See Hapke (1984)</description> 
       </parameter>
@@ -190,9 +199,7 @@
        <parameter name="B0">
         <type>double</type>
         <brief>Opposition Surge Strength</brief>
-        <default>
-          <item>0</item>
-        </default>
+        <internalDefault>None</internalDefault>
         <description>Opposition Surge Strength. Magnitude of the opposition 
         effect for the surface. ZEROs are strongly advised as the simple models 
         #do not fit the opposition effect well. See Hapke (1984)
@@ -202,9 +209,7 @@
        <parameter name="THETA">
         <type>double</type>
         <brief>Surface roughness in degrees</brief>
-        <default>
-          <item>8.0</item>
-        </default>
+        <internalDefault>None</internalDefault>
         <description>Small scale surface roughness in degrees. "Macroscopic roughness" of the surface as it affects the
         photometric behavior.  This is the RMS slope at scales larger than the  
         distance photons penetrate the surface but smaller than a pixel.  See 
@@ -214,9 +219,7 @@
        <parameter name="HG1">
         <type>double</type>
         <brief>Henyey-Greenstein coefficient 1</brief>
-        <default>
-          <item>0.213</item>
-        </default>
+        <internalDefault>None</internalDefault>
         <description>Asymmetry parameter used in the Henyey-Greenstein model
         for the scattering phase function of single particles in the surface, 
         used if PHASEFUNC=HENYEY-GREENSTEIN.  See Hapke (1981).  The 
@@ -229,9 +232,7 @@
        <parameter name="HG2">
         <type>double</type>
         <brief>Henyey-Greenstein coefficient 2</brief> 
-        <default>
-          <item>1.0</item>
-        </default>
+        <internalDefault>None</internalDefault>
         <description>Second parameter of the two-parameter Henyey-Greenstein
         model for the scattering phase function of single particles in the 
         surface, used if PHASEFUNC=HENYEY-GREENSTEIN.  This parameter controls a 
@@ -244,9 +245,7 @@
        <parameter name="BH">
         <type>double</type>
         <brief>Legendre coefficient 1</brief>
-        <default>
-          <item>0</item>
-        </default>
+        <internalDefault>None</internalDefault>
         <description>Coefficient of P1(cos(phase)) in single particle phase
         for Legendre Function. When PHASEFUNC=LEGENDRE, a two-term Legendre 
         polynomial is used for the scattering phase function of single 
@@ -258,9 +257,7 @@
        <parameter name="CH">
         <type>double</type>
         <brief>Legendre coefficient 2</brief>
-        <default>
-          <item>0</item>
-        </default>
+        <internalDefault>None</internalDefault>
         <description>Coefficient of P1(cos(phase)) in single particle phase
         for Legendre Function. When PHASEFUNC=LEGENDRE, a two-term Legendre polynomial
         is used for the scattering phase function of single particles in the 
@@ -334,7 +331,7 @@
               <item>BHA</item>
             </exclusions>
           </option>
-            <option value="ISOTROPIC_1">
+            <option value="ISOTROPIC1">
             <brief>First Order Isotropic</brief>
             <description> </description> 
             <inclusions> 
@@ -348,7 +345,7 @@
                 <item>BHA</item>
               </exclusions>
           </option>
-          <option value="ISOTROPIC_2">
+          <option value="ISOTROPIC2">
             <brief>Second Isotropic</brief>
             <description>
             </description>
@@ -363,7 +360,7 @@
                 <item>BHA</item>
              </exclusions>
           </option>
-          <option value="ANISOTROPIC_1">
+          <option value="ANISOTROPIC1">
             <brief>First Order Anisotropic</brief>
             <description>
             </description>
@@ -378,7 +375,7 @@
                 <item>HGA</item>
              </exclusions>
           </option>
-          <option value="ANISOTROPIC_2">
+          <option value="ANISOTROPIC2">
             <brief>Second Order Anisotropic</brief>
             <description>
             </description>
@@ -393,7 +390,7 @@
                 <item>HGA</item>
             </exclusions>
           </option>
-          <option value="HEN_GREEN_1">
+          <option value="HAPKEATM1">
             <brief>First Order Henyey-Greenstein</brief>
             <description>
             </description>
@@ -408,7 +405,7 @@
                 <item>BHA</item>
             </exclusions>
           </option>
-          <option value="HEN_GREEN_2">
+          <option value="HAPKEATM2">
             <brief>Second Order Henyey-Greenstein</brief>
             <description>
             </description>
@@ -429,18 +426,14 @@
       <parameter name="TAU">
         <type>double</type>
         <brief>Normal atmospheric optical depth</brief>
-        <default>
-          <item>0.5</item>
-        </default>
+        <internalDefault>None</internalDefault>
         <description>Normal atmospheric optical depth</description>
       </parameter>
 
       <parameter name="WHA">
         <type>double</type>
         <brief>Single-scattering albedo</brief>
-        <default>
-          <item>0.9</item>
-        </default>
+        <internalDefault>None</internalDefault>
         <description>Single-scattering albedo of atmospheric 
           particles</description>
       </parameter>
@@ -448,9 +441,7 @@
       <parameter name="HGA">
         <type>double</type>
         <brief>Coeff of atmospheric particle Henyey-Greenstein</brief>
-        <default>
-          <item>0.7</item>
-        </default>
+        <internalDefault>None</internalDefault>
         <description>Coeff of atmospheric particle Henyey-Greenstein phase 
           function. Henyey-Greenestein asymmetry parameter for atmospheric particle
           phase function, Not to be confused with corresponding parameter HG1 
@@ -460,10 +451,8 @@
       <parameter name="BHA">
         <type>double</type>
         <brief>Coeff of atmospheric particle Legendre phase function
-          </brief>
-        <default>
-          <item>0.95</item>
-        </default>
+        </brief>
+        <internalDefault>None</internalDefault>
         <description>Coeff of atmospheric particle Legendre phase function. This 
         parameter is limited to values that are  GreaterThan Equal to -1 and 
         LessThanEqual to 1.</description>
@@ -472,9 +461,7 @@
       <parameter name="HNORM">
         <type>double</type>
         <brief>Atmospheric shell thickness</brief>
-        <default>
-          <item>0.003</item>
-        </default>
+        <internalDefault>None</internalDefault>
         <description>Atmospheric shell thickness normalized to planet radius.
         Default 0.003 is for Mars.</description>
       </parameter>
@@ -496,7 +483,7 @@
         <parameter name="EMAMIN">
           <type>double</type>
           <brief>Minimum Emission Angle</brief>
-          <default><item>0.0</item></default>
+          <internalDefault>None</internalDefault>
           <description>Minimum emission angle included in the fit
           </description>
         </parameter>
@@ -504,9 +491,7 @@
         <parameter name="EMAMAX">
           <type>double</type>
           <brief>Maximum Emission Angle</brief>
-          <default>
-            <item>70.0</item>
-          </default>
+          <internalDefault>None</internalDefault>
           <description>Maximum emission angle included in the fit
           </description>
         </parameter>
@@ -515,9 +500,7 @@
           <type>double</type>
           <brief>Fraction of phase angle to add to maximum emission 
             angle</brief> 
-          <default>
-            <item>0.111111111111</item>
-          </default>
+          <internalDefault>None</internalDefault>
           <description>EMAMAX_PCOEFF allows the range of emission angles included
           in the fit to increase slightly at high phase angles, because 
           otherwise the region of fit becomes very small. 
@@ -527,9 +510,7 @@
          <parameter name="INCMIN">
           <brief>Minimum Incidence Angle</brief>
           <type>double</type>
-          <default>
-            <item>0.0</item>
-          </default>
+          <internalDefault>None</internalDefault>
           <description>Minimum incidence angle included in the fit. The 
           empirical photometric function will be fitted to the Hapke model over 
           a portion of the visible hemisphere of an idealized planet, with 
@@ -546,9 +527,7 @@
         <parameter name="INCMAX">
           <brief>Maximum Incidence Angle</brief>
           <type>double</type>
-          <default>
-            <item>89.0</item>
-          </default>
+          <internalDefault>None</internalDefault>
           <description>Maximum incidence angle included in the fit
           </description>
         </parameter>
@@ -556,9 +535,7 @@
         <parameter name="PHMIN">
           <brief>Minimum Phase Angle</brief>
           <type>double</type>
-          <default>
-            <item>0.0</item>
-          </default>
+          <internalDefault>None</internalDefault>
           <description>Minimum phase angle at which a fit will be performed, 
           corresponding to the first row of the output table.</description>
         </parameter>
@@ -566,9 +543,7 @@
       <parameter name="PHMAX">
           <brief>Maximum Phase Angle</brief>
           <type>double</type>
-          <default>
-            <item>170.0</item>
-          </default>
+          <internalDefault>None</internalDefault>
           <description>Maximum phase angle at which a fit will be performed, 
           corresponding to the last row of the output table.</description>
         </parameter>
@@ -576,9 +551,7 @@
         <parameter name="NPH">
           <brief>Number of phase angles</brief>
           <type>integer</type>
-          <default>
-            <item>18</item>
-          </default>
+          <internalDefault>None</internalDefault>
           <description>Number of phase angles at which a fit will be performed,
           equal to the number of rows in the output table.</description>
         </parameter>

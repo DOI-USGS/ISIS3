@@ -138,10 +138,10 @@ void IsisMain() {
     inclusion.push_back("HNORM");
     //inclusion.push_back("IORD");
 
-    if (sAsmType=="ANISOTROPIC_1" || sAsmType=="ANISOTROPIC_2" ){
+    if (sAsmType=="ANISOTROPIC1" || sAsmType=="ANISOTROPIC2" ){
       inclusion.push_back("BHA");
     }
-    else if (sAsmType=="HEN_GREEN_1" || sAsmType=="HEN_GREEN_2" ) {
+    else if (sAsmType=="HAPKEATM1" || sAsmType=="HAPKEATM2" ) {
       inclusion.push_back("HGA");
     }
     
@@ -276,6 +276,12 @@ void IsisMain() {
     photoGrp += phaseAngle;
     photoGrp += limbValue;
     photoGrp += phaseCurve;
+    if (ui.WasEntered("NOTE")) {
+      PvlGroup note("Note");
+      note.AddComment("NOTE DESCRIBING THE FOLLOWING PHOTOMETRIC MODEL");
+      note += PvlKeyword("NOTE", ui.GetString("NOTE"));
+      photoObj += note;
+    }
     photoObj += photoGrp;
     mainPvl.AddObject(photoObj);
     mainPvl.Write(sOutfile);
