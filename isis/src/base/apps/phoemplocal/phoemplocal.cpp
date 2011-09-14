@@ -186,10 +186,10 @@ void IsisMain() {
     inclusion.push_back("HNORM");
     inclusion.push_back("IORD");
 
-    if (sAsmType=="ANISOTROPIC_1" || sAsmType=="ANISOTROPIC_2" ){
+    if (sAsmType=="ANISOTROPIC1" || sAsmType=="ANISOTROPIC2" ){
       inclusion.push_back("BHA");
     }
-    else if (sAsmType=="HEN_GREEN_1" || sAsmType=="HEN_GREEN_2" ) {
+    else if (sAsmType=="HAPKEATM1" || sAsmType=="HAPKEATM2" ) {
       inclusion.push_back("HGA");
     }
 
@@ -200,17 +200,17 @@ void IsisMain() {
     Application::Log(asmGrp);
 
     asmModel = AtmosModelFactory::Create(asmPvl, *hapkeModel);
-    if (sAsmType=="ISOTROPIC_1") {
+    if (sAsmType=="ISOTROPIC1") {
       os << "# FIRST ORDER ISOTROPIC ATMOSPHERIC SCATTERING MODEL" << endl;
-    } else if (sAsmType=="ANISOTROPIC_1") {
+    } else if (sAsmType=="ANISOTROPIC1") {
       os << "# FIRST ORDER ANISOTROPIC ATMOSPHERIC SCATTERING MODEL" << endl;
-    } else if (sAsmType=="HEN_GREEN_1") {
+    } else if (sAsmType=="HAPKEATM1") {
       os << "# FIRST ORDER HAPKE ATMOSPHERIC SCATTERING MODEL" << endl;
-    } else if (sAsmType=="ISOTROPIC_2") {
+    } else if (sAsmType=="ISOTROPIC2") {
       os << "# SECOND ORDER ISOTROPIC ATMOSPHERIC SCATTERING MODEL" << endl;
-    } else if (sAsmType=="ANISOTROPIC_2") {
+    } else if (sAsmType=="ANISOTROPIC2") {
       os << "# SECOND ORDER ANISOTROPIC ATMOSPHERIC SCATTERING MODEL" << endl;
-    } else if (sAsmType=="HEN_GREEN_2") {
+    } else if (sAsmType=="HAPKEATM2") {
       os << "# SECOND ORDER HAPKE ATMOSPHERIC SCATTERING MODEL" << endl;
     }
     else {
@@ -534,7 +534,7 @@ void GetHapkeImgLocation(PhotoModel *pHapke, AtmosModel *pAsmModel, HapkeArrs & 
       pHapkeArrs.m_emaImg[i][j]   = ema;
       
       // Note that incidence and emission Datum replace inc and ema in Atmospheric Models
-      //ISOTROPIC_1, ISOTROPIC_2, ANISOTROPIC_1, ANISOTROPIC_2
+      //ISOTROPIC1, ISOTROPIC2, ANISOTROPIC1, ANISOTROPIC2
       double pstd=0, trans=0, trans0=0, sbar=0;
       double ahi=0;
       if (pAsmModel != NULL) {

@@ -90,7 +90,7 @@
           If this option is selected, the output from the application will be appended to the file.
           If it is not selected, any information in the TO file will be overwritten.
         </description>
-        <default><item>TRUE</item></default>
+        <default><item>FALSE</item></default>
       </parameter>
     </group>
 
@@ -143,18 +143,14 @@
        <parameter name="WH">
         <type>double</type>
         <brief>Single Scattering Albedo</brief>
-        <default>
-          <item>0.52</item>
-        </default>
+        <internalDefault>None</internalDefault>
         <description>Single Scattering Albedo</description> 
       </parameter>
 
        <parameter name="HH">
         <type>double</type>
         <brief>Opposition Surge Width</brief>
-        <default>
-          <item>0</item>
-        </default>
+        <internalDefault>None</internalDefault>
         <description>Opposition Surge Width. ZEROs are strongly advised as the simple models 
         #do not fit the opposition effect well</description> 
       </parameter>
@@ -162,9 +158,7 @@
        <parameter name="B0">
         <type>double</type>
         <brief>Opposition Surge Strength</brief>
-        <default>
-          <item>0</item>
-        </default>
+        <internalDefault>None</internalDefault>
         <description>Opposition Surge Strength. ZEROs are strongly advised as 
         the simple models #do not fit the opposition effect well
         </description>
@@ -173,18 +167,14 @@
        <parameter name="THETA">
         <type>double</type>
         <brief>Surface roughness in degrees</brief>
-        <default>
-          <item>8.0</item>
-        </default>
+        <internalDefault>None</internalDefault>
         <description>Small scale surface roughness in degrees</description> 
       </parameter> 
 
        <parameter name="HG1">
         <type>double</type>
         <brief>Henyey-Greenstein coefficient 1</brief>
-        <default>
-          <item>0.213</item>
-        </default>
+        <internalDefault>None</internalDefault>
         <description>Henyey-Greenstein coefficients for alternate phase 
           function</description>
       </parameter>
@@ -192,9 +182,7 @@
        <parameter name="HG2">
         <type>double</type>
         <brief>Henyey-Greenstein coefficient 2</brief> 
-        <default>
-          <item>1.0</item>
-        </default>
+        <internalDefault>None</internalDefault>
         <description>Henyey-Greenstein coefficients for alternate phase 
           function</description>
       </parameter>
@@ -202,9 +190,7 @@
        <parameter name="BH">
         <type>double</type>
         <brief>Legendre coefficient 1</brief>
-        <default>
-          <item>0</item>
-        </default>
+        <internalDefault>None</internalDefault>
         <description>Coefficient of P1(cos(phase)) in single particle phase
         for Legendre Function </description> 
       </parameter>
@@ -212,9 +198,7 @@
        <parameter name="CH">
         <type>double</type>
         <brief>Legendre coefficient 2</brief>
-        <default>
-          <item>0</item>
-        </default>
+        <internalDefault>None</internalDefault>
         <description>Coefficient of P1(cos(phase)) in single particle phase
         for Legendre Function</description>
       </parameter>
@@ -270,7 +254,7 @@
               <item>BHA</item>
             </exclusions>
           </option>
-            <option value="ISOTROPIC_1">
+            <option value="ISOTROPIC1">
             <brief>First Order Isotropic</brief>
             <description> </description> 
             <inclusions> 
@@ -284,7 +268,7 @@
                 <item>BHA</item>
               </exclusions>
           </option>
-          <option value="ISOTROPIC_2">
+          <option value="ISOTROPIC2">
             <brief>Second Isotropic</brief>
             <description>
             </description>
@@ -299,7 +283,7 @@
                 <item>BHA</item>
              </exclusions>
           </option>
-          <option value="ANISOTROPIC_1">
+          <option value="ANISOTROPIC1">
             <brief>First Order Anisotropic</brief>
             <description>
             </description>
@@ -314,7 +298,7 @@
                 <item>HGA</item>
              </exclusions>
           </option>
-          <option value="ANISOTROPIC_2">
+          <option value="ANISOTROPIC2">
             <brief>Second Order Anisotropic</brief>
             <description>
             </description>
@@ -329,7 +313,7 @@
                 <item>HGA</item>
             </exclusions>
           </option>
-          <option value="HEN_GREEN_1">
+          <option value="HAPKEATM1">
             <brief>First Order Henyey-Greenstein</brief>
             <description>
             </description>
@@ -344,7 +328,7 @@
                 <item>BHA</item>
             </exclusions>
           </option>
-          <option value="HEN_GREEN_2">
+          <option value="HAPKEATM2">
             <brief>Second Order Henyey-Greenstein</brief>
             <description>
             </description>
@@ -365,18 +349,14 @@
       <parameter name="TAU">
         <type>double</type>
         <brief>Normal atmospheric optical depth</brief>
-        <default>
-          <item>0.5</item>
-        </default>
+        <internalDefault>None</internalDefault>
         <description>Normal atmospheric optical depth</description>
       </parameter>
 
       <parameter name="WHA">
         <type>double</type>
         <brief>Single-scattering albedo</brief>
-        <default>
-          <item>0.9</item>
-        </default>
+        <internalDefault>None</internalDefault>
         <description>Single-scattering albedo of atmospheric 
           particles</description>
       </parameter>
@@ -384,9 +364,7 @@
       <parameter name="HGA">
         <type>double</type>
         <brief>Coeff of atmospheric particle Henyey-Greenstein</brief>
-        <default>
-          <item>0.7</item>
-        </default>
+        <internalDefault>None</internalDefault>
         <description>Coeff of atmospheric particle Henyey-Greenstein phase 
           function</description>
       </parameter>
@@ -394,10 +372,8 @@
       <parameter name="BHA">
         <type>double</type>
         <brief>Coeff of atmospheric particle Legendre phase function
-          </brief>
-        <default>
-          <item>0.95</item>
-        </default>
+        </brief>
+        <internalDefault>None</internalDefault>
         <description>Coeff of atmospheric particle Legendre phase function. This 
         parameter is limited to values that are  GreaterThan Equal to -1 and 
         LessThanEqual to 1.</description>
@@ -406,9 +382,7 @@
       <parameter name="HNORM">
         <type>double</type>
         <brief>Atmospheric shell thickness</brief>
-        <default>
-          <item>0.003</item>
-        </default>
+        <internalDefault>None</internalDefault>
         <description>Atmospheric shell thickness normalized to planet radius.
         Default 0.003 is for Mars.</description>
       </parameter>
@@ -429,9 +403,7 @@
     <group name="Mean Ground Plane(Datum) Geometry">
       <parameter name="EMISSION">
         <type>double</type>
-        <default>
-          <item>0.0</item>
-        </default>
+        <internalDefault>None</internalDefault>
         <brief>
         </brief>
         <description>
@@ -440,9 +412,7 @@
 
       <parameter name="PHASE">
         <type>double</type>
-        <default>
-          <item>45.0</item>
-        </default>
+        <internalDefault>None</internalDefault>
         <brief>
         </brief>
         <description>
@@ -451,9 +421,7 @@
 
       <parameter name="INCIDENCE">
         <type>double</type>
-        <default>
-          <item>45.0</item>
-        </default>
+        <internalDefault>None</internalDefault>
         <brief>
         </brief>
         <description>
@@ -461,10 +429,8 @@
       </parameter>
 
       <parameter name="RMS_SLOPE">
-       <type>double</type>
-        <default>
-          <item>10.0</item>
-        </default>
+        <type>double</type>
+        <internalDefault>None</internalDefault>
         <brief>
         </brief>
         <description>
@@ -488,8 +454,8 @@
         <brief>Starting Seed Number</brief>
         <description>
           Starting seed number for randomn number generator
-          </description> 
-        <default><item>0</item></default> 
+        </description> 
+        <internalDefault>None</internalDefault>
       </parameter>
     </group>
   </groups>
