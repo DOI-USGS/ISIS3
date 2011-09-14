@@ -2,21 +2,21 @@ Object = AutoRegistration
   Group = Algorithm
     Name                       = Gruen
     Tolerance                  = 100.0
-    AffineTranslationTolerance = 0.2
-    AffineScaleTolerance       = 0.7
+    AffineTranslationTolerance = 0.15
+    AffineScaleTolerance       = 0.3
     MaximumIterations          = 30
   End_Group
 
   Group = PatternChip
-    Samples = 15
-    Lines   = 15
+    Samples = 19
+    Lines   = 19
   End_Group
 
   Group = SearchChip
-    Samples = 30
-    Lines   = 30
+    Samples = 25
+    Lines   = 25
   End_Group
 End_Object
 End
 Register = 1
-Position = 512.195 512.085
+Position = 512.389 511.774

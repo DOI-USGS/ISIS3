@@ -20,57 +20,128 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
+#include "Chip.h"
+#include "GruenTypes.h"
+#include "Gruen.h"
+#include "DbProfile.h"
+#include "Pvl.h"
+
+#include "tnt/tnt_array1d_utils.h"
 
 #include <cmath>
 #include <iostream>
 #include <sstream>
 #include <iomanip>
 
-#include "Gruen.h"
-#include "Chip.h"
-
-#include <gsl/gsl_linalg.h>
-#include <gsl/gsl_eigen.h>
+#include <QTime>
 
 
-namespace Isis {
+using namespace std;
 
-  using namespace GSL;
+namespace Isis { 
 
-  /** Basic Gruen algorithm constructor */
+  /**
+   * @brief Default constructor sets up default Gruen parameters
+   * 
+   * @author Kris Becker - 5/22/2011
+   */
+  Gruen::Gruen() : AutoReg(Gruen::getDefaultParameters()) {
+    init(Gruen::getDefaultParameters());
+  }
+
+  /**
+   * @brief Construct a Gruen search algorithm
+   *
+   * This will construct a minimum difference search algorith.  It is
+   * recommended that you use a AutoRegFactory class as opposed to
+   * this constructor.  Direct construction is used commonly in stereo 
+   * matching. 
+   *
+   * @param pvl  A Pvl object that contains a valid automatic registration
+   * definition
+   */
   Gruen::Gruen(Pvl &pvl) : AutoReg(pvl) {
     init(pvl);
   }
 
   /**
-   * @brief Sets established radiometric parameters for registration processes
+   * @brief Set up for writing subsearch for a a given registration call
    *
-   * This method provides a mechanism for establishing predetermined values for
-   * registration activities.  This is intended to be used for the DEM
-   * generation processing where points are grown around seed points.  This is
-   * intended to lead to rapid convergence of points surrounding established
-   * seed points.
+   * This method is provided to request the write of the subsearch chip at each
+   * iteration.  This must be invoked prior to every call to AutoReg::Register()
+   * method.  It will only write subchips from the Register() interface as it
+   * interates to a solution.  Direct calls to Gruen methods don't iterate in
+   * the same fashion.
    *
-   * This should be used in conjuction with the resulting Affine transform as
-   * determined from the seed point.
+   * The "pattern" parameter is optional but is provided to direct the location
+   * and naming convention of each subsearch chip.  The format for the output
+   * file name for each subsearch chip is comprised of the pattern parameter,
+   * call number, which can be retrieved by the CallCount() method and pertains
+   * to the call after the Register() method is invoked and the interation
+   * count.  Below is a code example:
    *
-   * Note that once this is established, it remains constant for all subsequent
-   * registration processes.  To reset the default, all this method with no
-   * arguments.
+   * @code
    *
-   * Also note that these defaults can be established in the input AutoReg
-   * definition file.
+   * Gruen gruen(myPvldef);
    *
-   * These values are set when reset() is called - typically at the start of any
-   * adaptive application of the Gruen algorithm.
+   * // Set up pattern and search chips here
    *
-   * @param gain Precomputed radiometric gain value to use as default
-   * @param shift Precomputed radiometric shift value to use as default
+   * gruen.WriteSubsearchChips("/mydata/subchip");
+   * gruen.Register();
+   *
+   * @endcode
+   *
+   * Note that prior to each call to Register(), it must be called again in
+   * order for the subchips to be written.  The last part of the parameter
+   * above, "subchip", cannot be a directory, but is a filename prefix.
+   * Assuming this is the first call to Register(), a series of cube subsearch
+   * chips will be written with the pattern
+   * "/work1/kbecker/subchipC000001IXXX.cub" where "C" indicates call count and
+   * the next 6 digits are the return of CallCount() method, "I" indicates the
+   * iteration count "XXX" of the algorithm() method.  Note that the chip
+   * written for a particular iteration is what is provided as a parameter into
+   * the algorithm() method.
+   *
+   * @param pattern Specifies an optional directory and file pattern to write
+   *                the subsearch chip at each algorithm iteration.
    */
-  void Gruen::SetRadiometrics(const double &gain, const double &shift) {
-    _defGain = gain;
-    _defShift = shift;
+  void Gruen::WriteSubsearchChips(const std::string &pattern) {
+    m_filePattern = pattern;
     return;
+  }
+
+  /**
+   * @brief Sets initial chip transformation 
+   *  
+   * This method can be used with AutoReg registration to set initial affine 
+   * transform parameters.  This initial condition will be applied to the whole 
+   * search chip extraction for the first subsearch chip.  The caller must 
+   * define the contents of the affine and radiometric parameters. See the 
+   * AffineRadio construct for details. 
+   * 
+   * @author kbecker (5/14/2011)
+   * 
+   * @param affrad Initial Affine/Radio parameters to apply on registration 
+   *               entry
+   */
+  void Gruen::setAffineRadio(const AffineRadio &affrad) {
+    m_affine = affrad;
+    return;
+  }
+
+  /**
+   * @brief Set affine parameters to defaults 
+   *  
+   * This method differs from the one above in that it uses the defaults as 
+   * defined at construction.  The basic difference is that this call sets the 
+   * affine portion to the identity and the radiometric parameters to the 
+   * defaults as provided in the user input auto-regististration parameters. 
+   * It may have default shift and gain values to use. 
+   * 
+   * @author Kris Becker - 6/4/2011
+   */
+  void Gruen::setAffineRadio() {
+    m_affine = getDefaultAffineRadio();
   }
 
   /**
@@ -95,26 +166,32 @@ namespace Isis {
    * @param pattern   Fixed pattern chip which subsearch is trying to match
    * @param subsearch Affined extraction of the search chip
    *
-   * @return GruenResult Container storing the results and helper methods of the
-   *         solution
+   * @return Returns 0 if successful, otherwise returns the error number 
+   *         associated with the problem encountered (see ErrorTypes)
    */
-  GruenResult Gruen::algorithm(Chip &pattern, Chip &subsearch) {
+  int Gruen::algorithm(Chip &pattern, Chip &subsearch, 
+                       const Radiometric &radio, BigInt &ptsUsed,
+                       double &resid, GMatrix &atai, AffineRadio &affrad) {
 
-    _totalIterations++;  //  Bump iteration counter
+    m_totalIterations++;  //  Bump iteration counter
 
     // Initialize loop variables
     int tackSamp = pattern.TackSample();
     int tackLine = pattern.TackLine();
 
     //  Internal variables
-    GruenResult result;
-    result.nIters = _nIters + 1;
-    BigInt npts(0);
+    double rshift = radio.Shift();
+    double rgain  = radio.Gain();
+
+    int maxPnts((pattern.Samples()-2) * (pattern.Lines()-2));
+    GMatrix a(maxPnts, 8);
+    GVector lvec(maxPnts);
 
     //  pattern chip is rh image , subsearch chip is lh image
-    GSLVector a(8);
-    for(int line = 2 ; line <= pattern.Lines() - 1; line++) {
-      for(int samp = 2; samp <= pattern.Samples() - 1; samp++) {
+    resid = 0.0;
+    int npts = 0;
+    for(int line = 2 ; line < pattern.Lines() ; line++) {
+      for(int samp = 2; samp < pattern.Samples() ; samp++) {
 
         if(!pattern.IsValid(samp, line)) continue;
         if(!subsearch.IsValid(samp, line)) continue;
@@ -123,152 +200,403 @@ namespace Isis {
         if(!subsearch.IsValid(samp, line - 1)) continue;
         if(!subsearch.IsValid(samp, line + 1)) continue;
 
-        //  Compute parameters
-        npts++;
+        //  Sample/Line numbers
         double x0 = (double)(samp - tackSamp);
         double y0 = (double)(line - tackLine);
 
+        // Discrete derivatives (delta sample #)
         double gxtemp = subsearch.GetValue(samp + 1, line) -
                         subsearch.GetValue(samp - 1, line);
         double gytemp = subsearch.GetValue(samp, line + 1) -
                         subsearch.GetValue(samp, line - 1);
 
-        a[0] = gxtemp * x0;
-        a[1] = gxtemp * y0;
-        a[2] = gxtemp;
-        a[3] = gytemp * x0;
-        a[4] = gytemp * y0;
-        a[5] = gytemp;
-        a[6] = 1.0;
-        a[7] = subsearch.GetValue(samp, line);
+        a[npts][0] = gxtemp;
+        a[npts][1] = gxtemp * x0;
+        a[npts][2] = gxtemp * y0;
+        a[npts][3] = gytemp;
+        a[npts][4] = gytemp * x0;
+        a[npts][5] = gytemp * y0;
+        a[npts][6] = 1.0;
+        a[npts][7] = subsearch.GetValue(samp, line);
+
         double ell = pattern.GetValue(samp, line) -
-                     (((1.0 + Gain()) * subsearch.GetValue(samp, line)) +
-                      Shift());
+                     (((1.0 + rgain) * subsearch.GetValue(samp, line)) +
+                      rshift);
 
-        //  Compute residual
-        result.resid += (ell * ell);
-
-        // Add this point to the ATA and ATL summation matrices.
-        // This eliminates the need to store all the points as was
-        // in the original ISIS2 algorithm.
-        for(int i = 0 ; i < 8 ; i++) {
-          for(int j = 0 ; j < 8 ; j++) {
-            result.ata[i][j] += (a[i] * a[j]);
-          }
-          result.atl[i] += (a[i] * ell);
-        }
+        lvec[npts] = ell;
+        resid += (ell * ell);
+        npts++;
       }
     }
 
     // Check for enough points
-    result.npts = npts;
-    BigInt tPnts = (pattern.Lines() - 1) * (pattern.Samples() - 1);
-    if(!ValidPoints(tPnts, npts)) {
-      result.gerrno = NotEnoughPoints;
+    ptsUsed = npts;
+    if(!ValidPoints(maxPnts, npts)) {
       std::ostringstream mess;
-      mess << "Minimum points (" << MinValidPoints(tPnts)
-           << ") criteria not met (" << result.npts << ")";
-      result.gerrmsg = mess.str();
-      result.isGood = false;
-      logError(result.gerrno, result.gerrmsg);
-      return (result);
+      mess << "Minimum points (" << MinValidPoints(maxPnts)
+           << ") criteria not met (" << npts << ")";
+      return (logError(NotEnoughPoints, string(mess.str())));
     }
 
-    //  Compute error analysis
-    solve(result);
-//    GSLMatrix aff(2,3, &result.alpha[0]);
-//    std::cout << "DAffine = " << aff << std::endl;
-    return (result);
+    // Create the ATA array
+    GMatrix ata(8,8);
+    for(int i = 0 ; i < 8 ; i++) {
+      for(int j = 0 ; j < 8 ; j++) {
+        double temp(0.0);
+        for (int k = 0 ; k < npts ; k++) {
+          temp += (a[k][i] * a[k][j]);
+        }
+        ata[i][j] = temp;
+      }
+    }
+
+    // Solve the ATAI with Cholesky
+    try {
+      GVector p(8);
+      atai = Choldc(ata, p);
+      GMatrix b = Identity(8);
+      GMatrix x = b;
+      atai = Cholsl(atai, p, b, x);
+    }
+    catch(iException &ie) {
+      string mess = "Cholesky Failed:: " + ie.Errors();
+      ie.Clear();
+      return (logError(CholeskyFailed, string(mess.c_str())));
+    }
+
+    // Compute the affine update if result are requested by caller.
+    GVector atl(8);
+    for (int i = 0 ; i < 8 ; i++) {
+      double temp(0.0);
+      for (int k = 0 ; k < npts ; k++) {
+        temp += a[k][i] * lvec[k];
+      }
+      atl[i] = temp;
+    }
+
+    GVector alpha(8, 0.0);
+    for (int i = 0 ; i < 8 ; i++) {
+      for (int k = 0 ; k < 8 ; k++) {
+        alpha[i] += atai[i][k] * atl[k];
+      }
+    }
+
+   try {
+     affrad = AffineRadio(alpha);
+    }
+    catch(iException &ie) {
+      string mess = "Affine failed: " + ie.Errors();
+      ie.Clear();
+      return (logError(AffineNotInvertable, mess));
+    }
+
+    return (0);
   }
 
   /**
-   * @brief Computes solution and error analysis using Cholesky/Jacobi methods
-   *
-   * This method computes the affine and radiometric parameter solution and
-   * associated errors/uncertainty from the algorithm() processing.
-   *
-   * The affine parameters are solved using Cholesky decomposition.  Error
-   * analysis is computed using Jacobian eigenvector methods.  The GNU
-   * Scientific Library (GSL) is used to apply these routines.
-   *
-   * See http://www.gnu.org/software/gsl/ for additional details on the GNU
-   * Scientific Library.
-   *
-   * @param result Input parameters provided to compute solution.  This
-   *               container is also updated by this method with the solution
-   *               and error analysis.
-   *
-   * @return bool True if successful, false if an error occurs
+   * @brief Compute the error analysis of convergent Gruen matrix
+   * 
+   * @author kbecker (5/15/2011)
+   * 
+   * @param npts 
+   * @param resid 
+   * @param atai 
+   * 
+   * @return Analysis 
    */
-  bool Gruen::solve(GruenResult &result) {
-    GSLUtility *gsl = GSLUtility::getInstance();
+  Analysis Gruen::errorAnalysis(const BigInt &npts, const double &resid,
+                                const GMatrix &atai) {
 
-    size_t nRows = gsl->Rows(result.ata);
-    size_t nCols = gsl->Columns(result.ata);
-//    std::cout << "Ata = " << result.ata << std::endl;
-//    std::cout << "Resid = " << result.resid << std::endl;
-//    std::cout << "npts = " << result.npts << std::endl;
-//    std::cout << "Atl = " << result.atl << std::endl;
+    Analysis results;
+    results.m_npts = npts;
 
-    // Compute variance
-    double variance = result.Variance();
-    gsl_matrix *A, *atai;
-    try {
-      A = gsl->GSLTogsl(result.ata);
-      gsl->check(gsl_linalg_cholesky_decomp(A));
-      atai = gsl->identity(nRows, nCols);
-
-      for(size_t i = 0 ; i < nRows ; i++) {
-        gsl_vector_view x = gsl_vector_view_array(gsl_matrix_ptr(atai, i, 0),
-                            nCols);
-        gsl->check(gsl_linalg_cholesky_svx(A, &x.vector));
+    // Converged, compute error anaylsis
+    double variance = resid / DegreesOfFreedom(npts);
+    GMatrix kmat(8,8);
+    for(int r = 0 ; r < 8 ; r++) {
+      for(int c = 0 ; c < 8 ; c++) {
+        kmat[r][c] = variance * atai[r][c];
       }
     }
-    catch(iException &ie) {
-      result.gerrno = CholeskyFailed;
-      result.gerrmsg = "Cholesky Failed:: " + ie.Errors();
-      result.isGood = false;
-      ie.Clear();
-      logError(result.gerrno, result.gerrmsg);
-      return (false);
-    }
-
-    //  Solve Gruen parameter contributions
-    for(size_t r = 0 ; r < nRows ; r++) {
-      result.alpha[r] = 0.0;
-      for(size_t c = 0 ; c < nCols ; c++) {
-        double ataiV = gsl_matrix_get(atai, r, c);
-        result.alpha[r] += ataiV * result.atl[c];
-        result.kmat[r][c] = variance * ataiV;
-      }
-    }
+    results.m_variance = variance;
+  
 
     // Set up submatrix
-    result.skmat[0][0] = result.kmat[2][2];
-    result.skmat[0][1] = result.kmat[2][5];
-    result.skmat[1][0] = result.kmat[5][2];
-    result.skmat[1][1] = result.kmat[5][5];
+    GMatrix skmat(2,2);
+    skmat[0][0] = kmat[0][0];
+    skmat[0][1] = kmat[0][3];
+    skmat[1][0] = kmat[3][0];
+    skmat[1][1] = kmat[3][3];
     try {
-      gsl_matrix_view skmat  = gsl_matrix_view_array(&result.skmat[0][0], 2, 2);
-      gsl_vector_view evals = gsl_vector_view_array(&result.eigen[0], 2);
-      gsl_eigen_symm_workspace *w = gsl_eigen_symm_alloc(2);
-      gsl->check(gsl_eigen_symm(&skmat.matrix, &evals.vector, w));
-      gsl_eigen_symm_free(w);
-      gsl_eigen_symmv_sort(&evals.vector, &skmat.matrix, GSL_EIGEN_SORT_VAL_DESC);
-      gsl->free(A);
-      gsl->free(atai);
+      GVector eigen(2);
+      Jacobi(skmat, eigen, skmat);
+      EigenSort(eigen, skmat);
+      for (int i = 0 ; i < 2 ; i++) {
+        results.m_sevals[i] = eigen[i];
+        results.m_kmat[i] = kmat[i*3][i*3];
+      }
     }
     catch(iException &ie) {
-      result.gerrno = EigenSolutionFailed;
-      result.gerrmsg = "Eigen Solution Failed:: " + ie.Errors();
-      result.isGood = false;
+      string errmsg = "Eigen Solution Failed:: " + ie.Errors();
       ie.Clear();
-      logError(result.gerrno, result.gerrmsg);
-      return (false);
+      results.m_status = logError(EigenSolutionFailed, errmsg);
+      return (results);
     }
-    result.isGood = true;
-    return (result.isGood);
+
+    results.m_status = 0;
+    return (results);
   }
+
+  /**
+   * @brief Compute Cholesky solution
+   * 
+   * @author kbecker (5/15/2011)
+   * 
+   * @param a 
+   * @param p 
+   * 
+   * @return Gruen::GMatrix 
+   */
+  GMatrix Gruen::Choldc(const GMatrix &a, GVector &p) const {
+    int nrows(a.dim1());
+    int ncols(a.dim2());
+
+    GMatrix aa = a.copy();
+    p = GVector(ncols);
+
+    for(int i = 0 ; i < nrows ; i++) {
+      for(int j = i ; j < ncols ; j++) {
+        double sum = aa[i][j];
+        for(int k = i-1 ; k >= 0 ; k--) {
+          sum -= (aa[i][k] * aa[j][k]);
+        }
+        // Handle diagonal special
+        if (i == j) {
+          if (sum <= 0.0) {
+            throw iException::Message(iException::Programmer,
+                                  "Choldc failed - matrix not postive definite",
+                                      _FILEINFO_);
+          }
+          p[i] = sqrt(sum);
+        }
+        else {
+          aa[j][i] = sum / p[i];
+        }
+      }
+    }
+    return (aa);
+  }
+
+  /**
+   * @brief Compute Cholesky solution matrix from correlation
+   * 
+   * @author kbecker (5/15/2011)
+   * 
+   * @param a 
+   * @param p 
+   * @param b 
+   * @param x 
+   * 
+   * @return Gruen::GMatrix 
+   */
+  GMatrix Gruen::Cholsl(const GMatrix &a,const GVector &p, const GMatrix &b,
+                        const GMatrix &x) const {
+    assert(b.dim1() == x.dim1());
+    assert(b.dim2() == x.dim2());
+    assert(p.dim1() == b.dim2());
+
+    int nrows(a.dim1());
+    int ncols(a.dim2());
+
+    GMatrix xout = x.copy();
+    for(int j = 0 ; j < nrows ; j++) {
+
+      for(int i = 0 ; i < ncols ; i++) {
+        double sum = b[j][i];
+        for(int k = i-1 ; k >= 0 ; k--) {
+          sum -= (a[i][k] * xout[j][k]);
+        }
+        xout[j][i] = sum / p[i];
+      }
+
+      for (int i = ncols-1 ; i >= 0 ; i--) {
+        double sum = xout[j][i];
+        for(int k = i+1 ; k < ncols ; k++) {
+          sum -= (a[k][i] * xout[j][k]);
+        }
+        xout[j][i] = sum / p[i];
+      }
+
+    }
+    return (xout);
+  }
+
+  /**
+   * @brief Compute the Jacobian of a covariance matrix
+   * 
+   * @author kbecker (5/15/2011)
+   * 
+   * @param a 
+   * @param evals 
+   * @param evecs 
+   * @param MaxIters 
+   * 
+   * @return int 
+   */
+  int Gruen::Jacobi(const GMatrix &a, GVector &evals,
+                    GMatrix &evecs, const int &MaxIters) const {
+
+    int nrows(a.dim1());
+    int ncols(a.dim2());
+    GMatrix v = Identity(nrows);
+    GVector d(nrows),b(nrows), z(nrows);
+
+    for(int ip = 0 ; ip < nrows ; ip++) {
+      b[ip] = a[ip][ip];
+      d[ip] = b[ip];
+      z[ip] = 0.0;
+    }
+
+    double n2(double(nrows) * double(nrows));
+    GMatrix aa = a.copy();
+    int nrot(0);
+    for ( ; nrot < MaxIters ; nrot++) {
+      double sm(0.0);
+      for(int ip = 0 ; ip < nrows-1 ; ip++) {
+        for(int iq = ip+1 ; iq < nrows ; iq++) {
+          sm += fabs(aa[ip][iq]);
+        }
+      }
+
+      //  Test for termination condition
+      if (sm == 0.0) {
+        evals = d;
+        evecs = v;
+        return (nrot);
+      }
+
+      double thresh = (nrot < 3) ? (0.2 * sm/n2 ): 0.0;
+      for (int ip = 0 ; ip < nrows-1 ; ip++) {
+        for (int iq = ip+1 ; iq < nrows ; iq++) {
+          double g = 100.0 * fabs(aa[ip][iq]);
+          if ( (nrot > 3) &&
+               ( (fabs(d[ip]+g) == fabs(d[ip])) ) &&
+               ( (fabs(d[iq]+g) == fabs(d[iq])) ) ) {
+              aa[ip][iq] = 0.0;
+          }
+          else if ( fabs(aa[ip][iq]) > thresh ) {
+            double h = d[iq] - d[ip];
+            double t;
+            if ( (fabs(h)+g) == fabs(h) ) {
+              t = aa[ip][iq]/h;
+            }
+            else {
+              double theta = 0.5 * h / aa[ip][iq];
+              t = 1.0 / (fabs(theta) + sqrt(1.0 + theta * theta));
+              if (theta < 0.0)  t = -1.0 * t;
+            }
+            double c = 1./sqrt(1.0 + t * t);
+            double s = t * c;
+            double tau = s / (1.0 + c);
+
+            h = t * aa[ip][iq];
+            z[ip] = z[ip] - h;
+            z[iq] = z[iq] + h;
+            d[ip] = d[ip] - h;
+            d[iq] = d[iq] + h;
+            aa[ip][iq] = 0.0;
+
+            double g;
+            for (int j = 0 ; j < ip-1 ; j++) {
+              g = aa[j][ip];
+              h = aa[j][iq];
+              aa[j][ip] = g - s * (h + g * tau);
+              aa[j][iq] = h + s * (g - h * tau);
+            }
+
+            for (int j = ip+1 ; j < iq-1 ; j++) {
+              g = aa[ip][j];
+              h = aa[j][iq];
+              aa[ip][j] = g - s * (h + g * tau);
+              aa[j][iq] = h + s * (g - h * tau);
+            }
+
+            for (int j = iq+1 ; j < ncols ; j++) {
+              g = aa[ip][j];
+              h = aa[j][iq];
+              aa[ip][j] = g - s * (h + g * tau);
+              aa[j][iq] = h + s * (g - h * tau);
+            }
+
+            for (int j = 0 ; j < ncols ; j++) {
+              g = v[j][ip];
+              h = v[j][iq];
+              v[j][ip] = g - s * (h + g * tau);
+              v[j][iq] = h + s * (g - h * tau);
+            }
+            nrot++;
+          }
+        }
+      }
+
+      for (int ip = 0 ; ip < nrows ; ip++) {
+        b[ip] = b[ip] + z[ip];
+        d[ip] = b[ip];
+        z[ip] = 0.0;
+      }
+    }
+
+    // Reach here and we have too many iterations
+    evals = d;
+    evecs = v;
+    throw iException::Message(iException::Programmer,
+                              "Too many iterations in Jacobi",
+                              _FILEINFO_);
+    return (nrot);
+  }
+
+
+  GMatrix Gruen::Identity(const int &ndiag) const {
+    GMatrix ident(ndiag, ndiag, 0.0);
+    for (int i = 0 ; i < ndiag ; i++) {
+      ident[i][i] = 1.0;
+    }
+    return (ident);
+  }
+
+  /**
+   * @brief Sort eigenvectors from highest to lowest
+   * 
+   * @author kbecker (5/15/2011)
+   * 
+   * @param evals 
+   * @param evecs 
+   */
+  void Gruen::EigenSort(GVector &evals, GMatrix &evecs) const {
+    assert(evals.dim1() == evecs.dim1());
+    int n(evals.dim1());
+    for (int i = 0 ; i < n-1 ; i++ ) {
+      int k = i;
+      double p = evals[i];
+      for (int j = i+1 ; j < n ; j++) {
+        if (evals[j] >= p) {
+          k = j;
+          p = evals[j];
+        }
+      }
+      if (k != i) {
+        evals[k] = evals[i];
+        evals[i] = p;
+        for (int j = 0 ; j < n ; j++) {
+          p = evecs[j][i];
+          evecs[j][i] = evecs[j][k];
+          evecs[j][k] = p;
+        }
+      }
+    }
+    return;
+  }
+
 
   /**
    * @brief Minimization of data set using Gruen algorithm
@@ -290,17 +618,30 @@ namespace Isis {
    * @param pattern [in] A Chip object usually containing an nxm area of a cube.
    *                     Must be the same diminsions as \b subsearch.
    * @param subsearch [in] A Chip object usually containing an nxm area of a cube.
-   *                  Must be the same diminsions as \b pattern. This is normally
-   *                  a subarea of a larger portion of the image.
+   *                  Must be the same dimensions as \b pattern. This is
+   *                  normally a subarea of a larger portion of the image.
    *
    * @return The square root of the eigen values of DN differences OR Isis::NULL
    *         if the Gruen algorithm fails.
    */
   double Gruen::MatchAlgorithm(Chip &pattern, Chip &subsearch) {
-    reset();
-    GruenResult result  = algorithm(pattern, subsearch);
-    _result.update(result);
-    if(IsGood()) return (_result.Eigen());
+    // reset();
+
+    BigInt npts;
+    double resid;
+    GMatrix atai;
+    AffineRadio affrad;
+    int status = algorithm(pattern, subsearch, getDefaultRadio(),
+                           npts, resid, atai, affrad);
+    if (status == 0) {
+      //  Compute fit quality
+      Analysis analysis = errorAnalysis(npts, resid, atai);
+      if (analysis.isValid()) {
+        return (analysis.getEigen());
+      }
+    }
+
+    // Error conditions return failure
     return (Null);
   }
 
@@ -361,105 +702,129 @@ namespace Isis {
       int startLine, int endSamp,
       int endLine, int bestSamp,
       int bestLine) {
-#if defined(WRITE_CHIPS)
-    static int callNo(0);
-    callNo++;
-#endif
+    // Set conditions for writing subsearch chip states per call.  This code
+    // implementation ensures caller must request it per call to this routine.
+    //  See the WriteSubsearchChips() method.
+    m_callCount++;
+    string chipOut = m_filePattern;
+    m_filePattern = "";
 
-    // Reset internal parameters
-    reset();
+    //  Initialize match point.  Ensure points are centered to get real cube
+    //  line/sample positions
+    pChip.SetChipPosition(pChip.TackSample(), pChip.TackLine());
+    sChip.SetChipPosition(sChip.TackSample(), sChip.TackLine());
+    MatchPoint matchpt = MatchPoint(PointPair(Coordinate(pChip), 
+                                              Coordinate(sChip)));
 
-    // Set initial chip location
-    sChip.SetChipPosition(bestSamp, bestLine);
-    _result.setStartImage(sChip.CubeSample(), sChip.CubeLine());
-
-    // Ok create a fit chip whose size is the same as the search chip
-    // and then fill it with nulls.  Then adjust the Affine mapping such that
-    // it scales to the user specified precision (1/10th) so that fits can
-    // be recorded
-    fChip.SetSize(sChip.Samples(), sChip.Lines());
-    fChip.SetAllValues(Null);
-    Affine faffine = sChip.GetTransform();
-    faffine.Translate(bestSamp - sChip.TackSample(), bestLine - sChip.TackLine());
-    faffine.Scale(_fitChipScale);
-    fChip.SetTransform(faffine, false);
-
-    // Create a chip the same size as the pattern chip.  It is critical to use
-    // the original search chip to create the subsearch.  Copying the orginal
-    // search chip and then resizing preserves established minimum/maximum
-    // value ranges.
-    Chip subsearch = sChip;
-    subsearch.SetSize(pChip.Samples(), pChip.Lines());
+    // Create the fit chip whose size is the same as the pattern chip.
+    // This chip will contain the final image at the last iteration.  This
+    // usage differs from the non-adaptive purpose.
+    // It is critical to use the original search chip to create the subsearch.
+    // Copying the original search chip and then resizing preserves established
+    // minimum/maximum value ranges.  Then, establish chip convergence
+    // condition for Gruen's affine.
+    fChip = sChip;
+    fChip.SetSize(pChip.Samples(), pChip.Lines());
+    Threshold thresh(fChip, getAffineTolerance());
 
     // Set up Affine transform by establishing search tack point
-    Affine tform;
-    tform.Translate(bestSamp - sChip.TackSample(), bestLine - sChip.TackLine());
+    AffineRadio affine = m_affine;
+    m_affine = AffineRadio();  // Reset initial condition for next call
 
-    bool done(false);
-    GSLVector alpha(GruenResult::Constraints(), 0.0);
-    GSLVector threshold = getThreshHold(subsearch);
-    for(_nIters = 0 ; _nIters < _maxIters ; _nIters++) {
+    //  Set up bestLine/bestSample position.  Do this using the local affine
+    // and not the search chip.
+    Coordinate best(bestLine-sChip.TackLine(), bestSamp-sChip.TackSample());
+    affine.Translate(best);
+
+
+    //  Algorithm parameters
+    bool done = false;
+    m_nIters = 0;
+    do {
+
       // Extract the sub search chip.  The algorithm method handles the
       // determination of good data volumes
-      sChip.Extract(subsearch, tform);
+      Affine extractor(affine.m_affine);
+      sChip.Extract(fChip, extractor);
 
-#if defined(WRITE_CHIPS)
-      std::ostringstream ss;
-      ss << "C" << callNo << "I" << _nIters;
-      std::string sfname = "subchip" + ss.str() + ".cub";
-      subsearch.Write(sfname);
-#endif
+      //  If requested for this run, write the current subsearch chip state
+      if (!chipOut.empty()) {
+        std::ostringstream ss;
+        ss << "C" << std::setw(6) << std::setfill('0') << m_callCount << "I"
+           << std::setw(3) << std::setfill('0') << m_nIters;
+        std::string sfname = chipOut + ss.str() + ".cub";
+        fChip.Write(sfname);
+      }
 
       // Try to match the two subchips
-      GruenResult result = algorithm(pChip, subsearch);
-      if(!result.IsGood()) {
-        return (Status(result));
+      AffineRadio alpha;
+      BigInt npts(0);
+      GMatrix atai;
+      double resid;
+      int status = algorithm(pChip, fChip, affine.m_radio, npts, resid,
+                             atai, alpha);
+      if (status != 0) {
+        //  Set failed return condition and give up!
+        return (Status(matchpt.setStatus(status)));
       }
 
       //  Test for termination conditions - errors or convergence
-      if(_nIters > 0) {
-        if((done = HasConverged(alpha, threshold, result)) == true) {
-          ErrorAnalysis(result);
-          break;
+      matchpt.m_nIters = ++m_nIters;
+      if (m_nIters > m_maxIters) {
+        string errmsg = "Maximum Iterations exceeded";
+        matchpt.setStatus(logError(MaxIterationsExceeded, errmsg));
+        return (Status(matchpt));  //  Error condition
+      }
+
+      //  Check for convergence after the first pass
+      if (m_nIters > 1) {
+        if(thresh.hasConverged(alpha)) {
+          //  Compute error analysis
+          matchpt.m_affine = affine;
+          matchpt.m_analysis = errorAnalysis(npts, resid, atai);
+          matchpt.setStatus(matchpt.m_analysis.m_status);
+          if (matchpt.isValid()) {
+            //  Update the point even if constraints don't pass
+            Coordinate uCoord = getChipUpdate(sChip, matchpt);
+            SetChipSample(uCoord.getSample());
+            SetChipLine(uCoord.getLine());
+            SetGoodnessOfFit(matchpt.getEigen());
+
+            // Check constraints
+            matchpt.setStatus(CheckConstraints(matchpt));
+          }
+
+          //  Set output point 
+          m_point = matchpt;
+          return (Status(matchpt));  // with AutoReg status
         }
       }
-
-      // Update the affine transform, other internal parameters
-      alpha = result.Alpha().copy();
+        //  Not done yet - update the affine transform for next loop
       try {
-        tform = UpdateAffine(result, tform);
+        affine += alpha;
       }
-      catch(iException &ie) {
-        result.gerrno = AffineNotInvertable;
-        result.gerrmsg = "Affine invalid/not invertable";
-        result.isGood = false;
-        logError(result.gerrno, result.gerrmsg);
+      catch (iException &ie) {
+        string mess = "Affine invalid/not invertable";
+        matchpt.setStatus(logError(AffineNotInvertable, mess));
         ie.Clear();
-        return (Status(result));
+        return (Status(matchpt));  //  Another error condition to return
       }
+    } while (!done);
 
-      // Set output to result
-      subsearch.SetChipPosition(subsearch.TackSample(), subsearch.TackLine());
-      fChip.SetCubePosition(subsearch.CubeSample(), subsearch.CubeLine());
-      if(fChip.IsInsideChip(fChip.ChipSample(), fChip.ChipLine())) {
-        fChip.SetValue((int) fChip.ChipSample(), (int) fChip.ChipLine(),
-                       result.Eigen());
-      }
-    }    // Adaptive Loop Terminate
+    return (Status(matchpt));
+  }
 
-    // Test for solution constraints and update chip if valid
-    if(TestConstraints(done, _result)) {
-      UpdateChip(sChip, tform);
-      SetChipSample(sChip.TackSample());
-      SetChipLine(sChip.TackLine());
-      _result.setChipTransform(sChip.GetTransform());
-      SetGoodnessOfFit(_result.Eigen());
-      sChip.SetChipPosition(bestSamp, bestLine);
-      _result.setFinalImage(sChip.CubeSample(), sChip.CubeLine());
-      CheckAffineTolerance();
-    }
-
-    return (Status());
+  /**
+   * @brief Load default Gruen parameter file in $ISIS3DATA/base/templates
+   * 
+   * @author Kris Becker - 5/22/2011
+   * 
+   * @return Pvl Contents of default file
+   */
+  Pvl &Gruen::getDefaultParameters() {
+    static Pvl regdef;
+    regdef = Pvl("$base/templates/autoreg/coreg.adaptgruen.p1515s3030.def");
+    return (regdef);
   }
 
   /**
@@ -483,12 +848,12 @@ namespace Isis {
     algo += PvlKeyword("Mode", (IsAdaptive() ? "Adaptive" : "NonAdaptive"));
 
     //  Log errors
-    for(int e = 0 ; e <  _errors.size() ; e++) {
-      algo += _errors.getNth(e).LogIt();
+    for (int e = 0 ; e <  m_errors.size() ; e++) {
+      algo += m_errors.getNth(e).LogIt();
     }
 
-    if(_unclassified > 0) {
-      algo += PvlKeyword("UnclassifiedErrors", _unclassified);
+    if (m_unclassified > 0) {
+      algo += PvlKeyword("UnclassifiedErrors", m_unclassified);
     }
     pvl.AddGroup(algo);
     pvl.AddGroup(StatsLog());
@@ -509,26 +874,26 @@ namespace Isis {
   PvlGroup Gruen::StatsLog() const {
     PvlGroup stats("GruenStatistics");
 
-    stats += PvlKeyword("TotalIterations", _totalIterations);
-    stats += ValidateKey("IterationMinimum", _iterStat.Minimum());
-    stats += ValidateKey("IterationAverage", _iterStat.Average());
-    stats += ValidateKey("IterationMaximum", _iterStat.Maximum());
-    stats += ValidateKey("IterationStandardDeviation", _iterStat.StandardDeviation());
+    stats += PvlKeyword("TotalIterations", m_totalIterations);
+    stats += ValidateKey("IterationMinimum", m_iterStat.Minimum());
+    stats += ValidateKey("IterationAverage", m_iterStat.Average());
+    stats += ValidateKey("IterationMaximum", m_iterStat.Maximum());
+    stats += ValidateKey("IterationStandardDeviation", m_iterStat.StandardDeviation());
 
-    stats += ValidateKey("EigenMinimum", _eigenStat.Minimum());
-    stats += ValidateKey("EigenAverage", _eigenStat.Average());
-    stats += ValidateKey("EigenMaximum", _eigenStat.Maximum());
-    stats += ValidateKey("EigenStandardDeviation", _eigenStat.StandardDeviation());
+    stats += ValidateKey("EigenMinimum", m_eigenStat.Minimum());
+    stats += ValidateKey("EigenAverage", m_eigenStat.Average());
+    stats += ValidateKey("EigenMaximum", m_eigenStat.Maximum());
+    stats += ValidateKey("EigenStandardDeviation", m_eigenStat.StandardDeviation());
 
-    stats += ValidateKey("RadioShiftMinimum", _shiftStat.Minimum());
-    stats += ValidateKey("RadioShiftAverage", _shiftStat.Average());
-    stats += ValidateKey("RadioShiftMaximum", _shiftStat.Maximum());
-    stats += ValidateKey("RadioShiftStandardDeviation", _shiftStat.StandardDeviation());
+    stats += ValidateKey("RadioShiftMinimum", m_shiftStat.Minimum());
+    stats += ValidateKey("RadioShiftAverage", m_shiftStat.Average());
+    stats += ValidateKey("RadioShiftMaximum", m_shiftStat.Maximum());
+    stats += ValidateKey("RadioShiftStandardDeviation", m_shiftStat.StandardDeviation());
 
-    stats += ValidateKey("RadioGainMinimum", _gainStat.Minimum());
-    stats += ValidateKey("RadioGainAverage", _gainStat.Average());
-    stats += ValidateKey("RadioGainMaximum", _gainStat.Maximum());
-    stats += ValidateKey("RadioGainStandardDeviation", _gainStat.StandardDeviation());
+    stats += ValidateKey("RadioGainMinimum", m_gainStat.Minimum());
+    stats += ValidateKey("RadioGainAverage", m_gainStat.Average());
+    stats += ValidateKey("RadioGainMaximum", m_gainStat.Maximum());
+    stats += ValidateKey("RadioGainStandardDeviation", m_gainStat.StandardDeviation());
 
     return (stats);
 
@@ -546,22 +911,21 @@ namespace Isis {
   PvlGroup Gruen::ParameterLog() const {
     PvlGroup parms("GruenParameters");
 
-    parms += PvlKeyword("MaximumIterations", _maxIters);
-    parms += ValidateKey("AffineScaleTolerance", _scaleTol);
-    parms += ValidateKey("AffineShearTolerance", _shearTol);
-    parms += ValidateKey("AffineTranslationTolerance", _transTol);
+    parms += PvlKeyword("MaximumIterations", m_maxIters);
+    parms += ValidateKey("AffineScaleTolerance", m_scaleTol);
+    parms += ValidateKey("AffineShearTolerance", m_shearTol);
+    parms += ValidateKey("AffineTranslationTolerance", m_transTol);
 
-    parms += ParameterKey("AffineTolerance", _affineTol);
-    parms += ParameterKey("SpiceTolerance", _spiceTol);
+    parms += ParameterKey("AffineTolerance", m_affineTol);
+    parms += ParameterKey("SpiceTolerance", m_spiceTol);
 
-    parms += ParameterKey("RadioShiftTolerance", _rshiftTol);
+    parms += ParameterKey("RadioShiftTolerance", m_shiftTol);
 
-    parms += ParameterKey("RadioGainMinTolerance", _rgainMinTol);
-    parms += ParameterKey("RadioGainMaxTolerance", _rgainMaxTol);
+    parms += ParameterKey("RadioGainMinTolerance", m_rgainMinTol);
+    parms += ParameterKey("RadioGainMaxTolerance", m_rgainMaxTol);
 
-    parms += ValidateKey("FitChipScale", _fitChipScale, "pixels");
-    parms += ValidateKey("DefaultRadioGain", _defGain);
-    parms += ValidateKey("DefaultRadioShift", _defShift);
+    parms += ValidateKey("DefaultRadioGain", m_defGain);
+    parms += ValidateKey("DefaultRadioShift", m_defShift);
 
     return (parms);
   }
@@ -572,7 +936,7 @@ namespace Isis {
    *
    * This method creates the list of known/expected Gruen errors that might
    * occur during processing.  This should be closely maintained with the
-   * GruenErrors enum list.
+   * ErrorTypes enum list.
    *
    * @return Gruen::ErrorList Error list container
    */
@@ -602,14 +966,14 @@ namespace Isis {
    * @param gerrno  One of the errors as defined by GruenError enum
    * @param gerrmsg  Optional message although it is ignored in this context
    */
-  void Gruen::logError(int gerrno, const std::string &gerrmsg) {
-    if(!_errors.exists(gerrno)) {
-      _unclassified++;
+  int Gruen::logError(int gerrno, const std::string &gerrmsg) {
+    if (!m_errors.exists(gerrno)) {
+      m_unclassified++;
     }
     else {
-      _errors.get(gerrno).BumpIt();
+      m_errors.get(gerrno).BumpIt();
     }
-    return;
+    return (gerrno);
   }
 
   /**
@@ -623,140 +987,62 @@ namespace Isis {
    */
   void Gruen::init(Pvl &pvl) {
     //  Establish the parameters
-    if(pvl.HasObject("AutoRegistration")) {
-      _prof = DbProfile(pvl.FindGroup("Algorithm", Pvl::Traverse));
+    if (pvl.HasObject("AutoRegistration")) {
+      m_prof = DbProfile(pvl.FindGroup("Algorithm", Pvl::Traverse));
     }
     else {
-      _prof = DbProfile(pvl);
+      m_prof = DbProfile(pvl);
     }
 
-    if(_prof.Name().empty())  _prof.setName("Gruen");
+    if (m_prof.Name().empty())  m_prof.setName("Gruen");
 
     // Define internal parameters
-    _maxIters = ConfKey(_prof, "MaximumIterations", 25);
+    m_maxIters = ConfKey(m_prof, "MaximumIterations", 30);
 
-    _transTol = ConfKey(_prof, "AffineTranslationTolerance", 0.1);
-    _scaleTol = ConfKey(_prof, "AffineScaleTolerance", 0.5);
-    _shearTol = ConfKey(_prof, "AffineShearTolerance", _scaleTol);
-    _affineTol = ConfKey(_prof, "AffineTolerance", DBL_MAX);
+    m_transTol = ConfKey(m_prof, "AffineTranslationTolerance", 0.1);
+    m_scaleTol = ConfKey(m_prof, "AffineScaleTolerance", 0.3);
+    m_shearTol = ConfKey(m_prof, "AffineShearTolerance", m_scaleTol);
+    m_affineTol = ConfKey(m_prof, "AffineTolerance", DBL_MAX);
 
-    _spiceTol = ConfKey(_prof, "SpiceTolerance", DBL_MAX);
+    m_spiceTol = ConfKey(m_prof, "SpiceTolerance", DBL_MAX);
 
-    _rshiftTol = ConfKey(_prof, "RadioShiftTolerance", DBL_MAX);
-    _rgainMinTol = ConfKey(_prof, "RadioGainMinTolerance", -DBL_MAX);
-    _rgainMaxTol = ConfKey(_prof, "RadioGainMaxTolerance", DBL_MAX);
-
-    _fitChipScale = ConfKey(_prof, "FitChipScale", 0.1); // Set to 10th pixel
+    m_shiftTol = ConfKey(m_prof, "RadioShiftTolerance", DBL_MAX);
+    m_rgainMinTol = ConfKey(m_prof, "RadioGainMinTolerance", -DBL_MAX);
+    m_rgainMaxTol = ConfKey(m_prof, "RadioGainMaxTolerance", DBL_MAX);
 
     // Set radiometric defaults
-    SetRadiometrics();
-    _defGain  =  ConfKey(_prof, "DefaultRadioGain", _defGain);
-    _defShift =  ConfKey(_prof, "DefaultRadioShift", _defShift);
+    m_defGain  =  ConfKey(m_prof, "DefaultRadioGain", 0.0);
+    m_defShift =  ConfKey(m_prof, "DefaultRadioShift", 0.0);
 
-    _nIters = 0;
-    _totalIterations = 0;
-    _errors = initErrorList();
-    _unclassified = 0;
+    m_callCount = 0;
+    m_filePattern = "";
 
-    reset();
+    m_nIters = 0;
+    m_totalIterations = 0;
+
+    m_errors = initErrorList();
+    m_unclassified = 0;
+
+    m_defAffine = AffineRadio(getDefaultRadio());
+    m_affine = getAffineRadio();
+    m_point  = MatchPoint(m_affine);
+
+    //reset();
     return;
   }
 
-
-  /**
-   * @brief Reset registration-dependant counters only
-   *
-   * This method is intended to be invoked to reset interal variables that track
-   * or govern behavior pertaining to the registration of two chips. It should
-   * be invoked as the first call prior to calling the algorithm method for a
-   * new registration.
-   */
-  void Gruen::reset() {
-    _result = GruenResult();
-    _result.setGain(getDefaultGain());
-    _result.setShift(getDefaultShift());
-    _nIters = 0;
-    return;
-  }
 
   /**
    * @brief Reset Gruen statistics as needed
    *
    */
   void Gruen::resetStats() {
-    _eigenStat.Reset();
-    _iterStat.Reset();
-    _shiftStat.Reset();
-    _gainStat.Reset();
+    m_eigenStat.Reset();
+    m_iterStat.Reset();
+    m_shiftStat.Reset();
+    m_gainStat.Reset();
     return;
   }
-
-  /**
-   * @brief Compute the Affine convergence parameters
-   *
-   * This method should be invoked using either the subsearch or pattern chip
-   * since they are both the same size.  The six Affine convergence parameters
-   * are computed from the size of the chip and the AffineThreshHold1 and
-   * AffineThreshHold2 registration parameters.
-   *
-   * AffineThreshHold1 governs the shift in line and sample and is used directly
-   * as specified in the registration config file.
-   *
-   * AffineThreshHold2 governs scaling of sample and line as a function of the
-   * number of lines and samples in the chip provided. The value from the
-   * registration config file is divided by half the samples for the X Affine
-   * component;  the Y Affine component is divided by half the number of lines
-   * in the chip.
-   *
-   *
-   * @param chip Chip to use to compute affine convergence threshholds
-   *
-   * @see HasConverged().
-   *
-   * @return Gruen::GSLVector Returns a vector of convergence thresholds that
-   *         coincides with the linear order of the affine transform components.
-   */
-  Gruen::GSLVector Gruen::getThreshHold(const Chip &chip) const {
-    GSLVector thresh(6);
-    thresh[0] = _scaleTol / (((double)(chip.Samples() - 1)) / 2.0);
-    thresh[1] = _shearTol / (((double)(chip.Lines() - 1)) / 2.0);
-    thresh[2] = _transTol;
-    thresh[3] = _shearTol / (((double)(chip.Samples() - 1)) / 2.0);
-    thresh[4] = _scaleTol / (((double)(chip.Lines() - 1)) / 2.0);
-    thresh[5] = _transTol;
-    return (thresh);
-  }
-
-  /**
-   * @brief Tests Affine parameters for convergence
-   *
-   * This method is invoked after the first iteration to test for convergence
-   * of the affine transform components of the Gruen registration algorithm.
-   * When the absolute value of all the affine components are less than or equal
-   * to its coinciding limit, convergence has been reached.
-   *
-   * This method does not consider the radiometric shift and gain parameters in
-   * its determination of convergence.
-   *
-   * @param alpha  Affine transform change from last iteration to test
-   * @param thresh Six element array of affine threshholds to test against
-   * @param results Results container should any information be needed from it
-   *
-   * @return bool  True if we have converged, false if convergence is not yet
-   *         reached.
-   *
-   * @internal
-   *   @history 2009-09-17 Kris Becker Test should be >= rather than >.
-   */
-  bool Gruen::HasConverged(const GSLVector &alpha, const GSLVector &thresh,
-                           const GruenResult &results) const {
-    int maxholds = std::min(alpha.dim(), thresh.dim());
-    for(int nhold = 0 ; nhold < maxholds ; nhold++) {
-      if(fabs(alpha[nhold]) >= thresh[nhold]) return (false);
-    }
-    return (true);
-  }
-
 
   /**
    * @brief Computes the number of minimum valid points
@@ -792,22 +1078,14 @@ namespace Isis {
   }
 
   /**
-   * @brief Computes/determines error analysis after the solution converges
-   *
-   * This method maintains the error analysis computed from the Gruen algorithm
-   * when a convergent condition is encountered.  This essentially is a copy of
-   * the iterative analysis that takes place at each application of the Gruen
-   * algorithm.  It ensures the error analysis is current by making a copy of
-   * the last error analysis perform as found in the results container.
-   *
-   * It moves the iterative error analysis to the cummulative result container.
-   *
-   * @param result Iterative solution container with last error analysis that is
-   *               to be preserved
+   * @brief Return set of tolerances for affine convergence
+   * 
+   * @author kbecker (5/15/2011)
+   * 
+   * @return Tolerance Affine tolerances from PVL setup
    */
-  void Gruen::ErrorAnalysis(GruenResult &result) {
-    _result.setErrorAnalysis(result);
-    return;
+  AffineTolerance Gruen::getAffineTolerance() const {
+    return (AffineTolerance(m_transTol, m_scaleTol, m_shearTol));
   }
 
   /**
@@ -825,141 +1103,70 @@ namespace Isis {
    * The result container is altered should a constraint not be meet which
    * indicates the registration failed.
    *
-   * @param done   Input parameter that indicates convergence has occurred
-   * @param result Container with results update by status of contraint check
+   * @param point Container with point information
    *
-   * @return bool Returns true if all constraints tests are valid, otherwise
-   *         returns false indicating an error.
+   * @return int Returns the status of the point.  If all constraints tests are
+   *         valid, 0 is return, otherwise returns error number.
    */
-  bool Gruen::TestConstraints(const bool &done, GruenResult &result) {
+  int Gruen::CheckConstraints(MatchPoint &point) {
 
-    if(!done) {
-      result.isGood = false;
-      result.gerrno = MaxIterationsExceeded;
-      result.gerrmsg = "Maximum Iterations exceeded";
-      logError(result.gerrno, result.gerrmsg);
-      return (false);
-    }
-    else {
-
-
-      if(result.Iterations() > _maxIters) {
-        result.isGood = false;
-        result.gerrno = MaxIterationsExceeded;
-        result.gerrmsg = "Maximum Iterations exceeded";
-        logError(result.gerrno, result.gerrmsg);
-        return (false);
+    //  Point must be good for check to occur
+    if (point.isValid()) {
+      if (point.m_nIters > m_maxIters) {
+        string errmsg = "Maximum Iterations exceeded";
+        return (logError(MaxIterationsExceeded, errmsg));
       }
-      _iterStat.AddData(result.Iterations());
+      m_iterStat.AddData(point.m_nIters);
 
-      if(result.Shift() > _rshiftTol) {
-        result.isGood = false;
-        result.gerrno = RadShiftExceeded;
-        result.gerrmsg = "Radiometric shift exceeds tolerance";
-        logError(result.gerrno, result.gerrmsg);
-        return (false);
+      if (point.getEigen() > Tolerance()) {
+        string errmsg = "Maximum Eigenvalue exceeded";
+        return (logError(MaxEigenExceeded, errmsg));
       }
-      _shiftStat.AddData(result.Shift());
+      m_eigenStat.AddData(point.getEigen());
 
-      if(((1.0 + result.Gain()) > _rgainMaxTol) ||
-          ((1.0 + result.Gain()) < _rgainMinTol)) {
-        result.isGood = false;
-        result.gerrno = RadGainExceeded;
-        result.gerrmsg = "Radiometric gain exceeds tolerances";
-        logError(result.gerrno, result.gerrmsg);
-        return (false);
+      double shift = point.m_affine.m_radio.Shift();
+      if ( shift > m_shiftTol) {
+        string errmsg = "Radiometric shift exceeds tolerance";
+        return (logError(RadShiftExceeded, errmsg));
       }
-      _gainStat.AddData(result.Gain());
+      m_shiftStat.AddData(shift);
 
-      if(result.Eigen() > Tolerance()) {
-        result.isGood = false;
-        result.gerrno = MaxEigenExceeded;
-        result.gerrmsg = "Eigen value exceeds tolerance";
-        logError(result.gerrno, result.gerrmsg);
-        return (false);
+      double gain = point.m_affine.m_radio.Gain();
+      if (((1.0 + gain) > m_rgainMaxTol) ||
+          ((1.0 + gain) < m_rgainMinTol)) {
+        string errmsg = "Radiometric gain exceeds tolerances";
+        return (logError(RadGainExceeded, errmsg));
       }
-      _eigenStat.AddData(result.Eigen());
-    }
-
-    return (result.IsGood());
-  }
+      m_gainStat.AddData(gain);
 
 
-  /**
-   * @brief Updates the affine transform with the final iterative solution
-   *
-   * This method is called at the end of each iteration that updates the affine
-   * transform with the sum of all prior affine changes.  The affine for the
-   * current result is added to the cummulative result container and the
-   * incremental affine is added to the cummulate transform.
-   *
-   * @param result Container representing the last iteration solution
-   * @param gtrans Accumulating affine transform for search chip
-   *
-   * @return Affine Returns the newly updated Affine transform
-   */
-  Affine Gruen::UpdateAffine(GruenResult &result, const Affine &gtrans) {
-    _result.update(result);
-    const GSLVector &alpha = result.Alpha();
-    Affine::AMatrix dAffine = gtrans.Forward();
-    for(int i = 0, a = 0 ; i < 2 ; i++) {
-      for(int j = 0 ; j < 3 ; j++, a++) {
-        dAffine[i][j] += alpha[a];
+      double dist = point.getAffinePoint(Coordinate(0.0, 0.0)).getDistance();
+      if (dist > getAffineConstraint()) {
+        string errmsg = "Affine distance exceeded";
+        return (logError(AffineDistExceeded, errmsg));
       }
     }
-    return (Affine(dAffine));
+    return (point.getStatus());
   }
 
   /**
-   * @brief Updates the (search) chip with the final Affine transform
-   *
-   * This method applies the convergent Affine transform parameters to the chip
-   * provided.  The accummulated transform only represents the result of the
-   * Gruen algorithm.  Therefore, any existing Affine transform used to load the
-   * orginal chip will be added to it for the final resulting solution.
-   *
-   * When completed, in theory, the chip can be used to reload from the file and
-   * it should match well with the original pattern chip on the final iteration
-   * of the Gruen algorithm which converged.
-   *
-   * @param chip   Chip to update with accummulated Affine transform
-   * @param affine Gruen accummulated Affine transform to add to chip
+   * @brief Compute the chip coordinate of the registered pixel
+   * 
+   * @author Kris Becker - 5/19/2011
+   * 
+   * @param chip  Chip to update with registration parameters
+   * @param point Registration match information
+   * 
+   * @return Coordinate 
    */
-  void Gruen::UpdateChip(Chip &chip, const Affine &affine) {
-    Affine::AMatrix c = chip.GetTransform().Forward() +
-                        (affine.Forward() - Affine::getIdentity());
-    chip.SetTransform(Affine(c));
-    return;
+  Coordinate Gruen::getChipUpdate(Chip &chip, MatchPoint &point) const {
+    Coordinate chippt = point.getAffinePoint(Coordinate(0.0, 0.0));
+    chip.SetChipPosition(chip.TackSample(), chip.TackLine());
+    chip.TackCube(chip.CubeSample()+chippt.getSample(),
+                  chip.CubeLine()+chippt.getLine());
+    return (Coordinate(chip.ChipLine(), chip.ChipSample()));
   }
 
-  /**
-   * @brief Check affine tolerance for validity
-   *
-   * This method checks for a convergent solution that travels to far from the
-   * original tack point (best point in most cases).  The user can control this
-   * tolerance with the AffineTolerance parameter in the registration config
-   * file.  The check is a sample/line magnitude check from the original
-   * starting pixel location to the one after the affine transform has
-   * converged to match to a new cube pixel coordinate.
-   *
-   * Note this check is independant of TestConstraints() method since the update
-   * of the chip only occurs after other limits pass.  The chip must be updated
-   * and the new tack point cube pixel location must be determined prior to
-   * calling this method.
-   *
-   * @return bool True if the new pixel location does not exceed the defined
-   *         tolerance, otherwise returns false.
-   */
-  bool Gruen::CheckAffineTolerance() {
-    if(_result.ErrorMagnitude() > AffineTolerance()) {
-      _result.isGood = false;
-      _result.gerrno = AffineDistExceeded;
-      _result.gerrmsg = "Affine tolerance exceeded";
-      logError(_result.gerrno, _result.gerrmsg);
-      return (false);
-    }
-    return (true);
-  }
 
   /**
    * @brief Returns the proper status given a Gruen result container
@@ -972,10 +1179,9 @@ namespace Isis {
    *         registration is successful, otherwise returns
    *         AutoReg::AdaptiveAlgorithmFailed.
    */
-  AutoReg::RegisterStatus Gruen::Status(const GruenResult &result) const {
-    if(result.IsGood()) {
-      return (AutoReg::SuccessSubPixel);
-    }
+  AutoReg::RegisterStatus Gruen::Status(const MatchPoint &mpt) {
+    if ( mpt.isValid() ) { return (AutoReg::SuccessSubPixel);  }
     return (AutoReg::AdaptiveAlgorithmFailed);
   }
-}
+
+} // namespace Isis

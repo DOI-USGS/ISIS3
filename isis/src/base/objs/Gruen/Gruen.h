@@ -25,14 +25,17 @@
 
 
 #include "AutoReg.h"
-#include "GruenResult.h"
+#include "tnt/tnt_array2d.h"
+#include "tnt/tnt_array1d.h"
+#include "Affine.h"
 #include "DbProfile.h"
+#include "GruenTypes.h"
 #include "CollectorMap.h"
 #include "Statistics.h"
+#include "Pvl.h"
 #include "PvlGroup.h"
 
 namespace Isis {
-  class Pvl;
   class Chip;
 
   /**
@@ -81,88 +84,79 @@ namespace Isis {
    *            shift
    *   @history 2010-06-14 Jeannie Walldren - Capitalized getTransform and
    *            setTransform to match changes in Chip class
-   *   @history 2010-10-07 Travis Addair - Now returns "SuccessSubPixel" on
-   *            success given that Gruen inherently computes to sub-pixel
-   *            accuracy.
+   *   @history 2011-05-23 Kris Becker - Reworked major portions of
+   *            implementation for a more modular support.
    */
   class Gruen : public AutoReg {
     public:
-      /**
-       * @brief Construct a GruenMinimization search algorithm
-       *
-       * This will construct a minimum difference search algorith.  It is
-       * recommended that you use a AutoRegFactory class as opposed to
-       * this constructor
-       *
-       * @param pvl  A Pvl object that contains a valid automatic registration
-       * definition
-       */
+
+      /** Default constructor */
+      Gruen();
       Gruen(Pvl &pvl);
 
       //! Destructor
       virtual ~Gruen() { }
 
-      /**
-       * Gruen default mode is adaptive
-       */
-      virtual bool IsAdaptive() {
-        return true;
-      }
+      /**  Gruen default mode is adaptive  */
+      virtual bool IsAdaptive() { return (true); }
 
-      /** Returns the radiometric gain value from the last solution */
-      inline double Gain() const {
-        return (_result.Gain());
-      }
-      /** Returns the radiometric shift value from the last solution */
-      inline double Shift() const {
-        return (_result.Shift());
-      }
+      /** Returns the current call count */
+      BigInt CallCount() const { return (m_callCount); }
 
-      void SetRadiometrics(const double &gain = 0.0, const double &shift = 0.0);
+      void WriteSubsearchChips(const std::string &pattern = "SubChip");
+
+      AffineTolerance getAffineTolerance() const;
 
       /** Returns the SPICE tolerance constraint as read from config file */
-      inline double SpiceTolerance() const {
-        return (_spiceTol);
-      }
+      inline double getSpiceConstraint() const { return (m_spiceTol); }
 
       /** Returns the Affine tolerance constraint as read from config file */
-      inline double AffineTolerance() const {
-        return (_affineTol);
-      }
+      inline double getAffineConstraint() const { return (m_affineTol); }
 
-      GruenResult algorithm(Chip &pattern, Chip &subsearch);
-      /** Returns the results container from the last solution */
-      const GruenResult &Results() const {
-        return (_result);
-      }
+      void setAffineRadio(const AffineRadio &affrad);
+      void setAffineRadio();
 
-      /** Returns status of the last registration result */
-      bool IsGood() const {
-        return (IsGood(_result));
-      }
-      /** Returns the status of the given Gruen result container */
-      bool IsGood(const GruenResult &result) const {
-        return (result.IsGood());
-      }
+      /** Returns default settings for Affine/Radiometric parameters */
+      const AffineRadio &getDefaultAffineRadio() const { return (m_defAffine);}
+
+      /** Return current state of Affine/Radio state  */
+      const AffineRadio &getAffineRadio() const { return (m_affine);  }
+
+      /**
+       * @brief Returns the register state of the last successful Gruen match 
+       *  
+       * This method returns the full match condition of the last call to Gruen 
+       * Register function that was successful. 
+       *  
+       * BEWARE:  This is only valid if Register returns successfully!  This is 
+       * due to AutoReg returning conditions that occur prior to the actual 
+       * Gruen algorithm being called.
+       * 
+       * @author Kris Becker - 6/4/2011
+       * 
+       * @return MatchPoint 
+       */
+      MatchPoint getLastMatch() const { return (m_point);   }
 
     protected:
-      typedef GSL::GSLUtility::GSLMatrix GSLMatrix;
-      typedef GSL::GSLUtility::GSLVector GSLVector;
-
       /** Returns the default name of the algorithm as Gruen */
       virtual iString AlgorithmName() const {
         return ("Gruen");
       }
 
-      bool solve(GruenResult &result);
+      int algorithm(Chip &pattern, Chip &subsearch, const Radiometric &radio, 
+                    BigInt &ptsUsed, double &resid, GMatrix &atai, 
+                    AffineRadio &affrad); 
+
+      Analysis errorAnalysis(const BigInt &npts, const double &resid,
+                             const GMatrix &atai);
 
       //  These methods are for AutoReg non-adaptive requirements
       virtual double MatchAlgorithm(Chip &pattern, Chip &subsearch);
       virtual bool CompareFits(double fit1, double fit2);
+
       /** Returns the ideal fit for a perfect Gruen result */
-      virtual double IdealFit() const {
-        return (0.0);
-      }
+      virtual double IdealFit() const {  return (0.0); }
 
       // AutoReg adaptive method
       virtual AutoReg::RegisterStatus AdaptiveRegistration(Chip &sChip,
@@ -178,71 +172,74 @@ namespace Isis {
       virtual Pvl AlgorithmStatistics(Pvl &pvl);
 
     private:
-
       /** Error enumeration values */
-      enum GruenErrors { NotEnoughPoints = 1, CholeskyFailed = 2,
+      enum ErrorTypes {  NotEnoughPoints = 1, CholeskyFailed = 2,
                          EigenSolutionFailed = 3, AffineNotInvertable = 4,
                          MaxIterationsExceeded = 5, RadShiftExceeded = 6,
                          RadGainExceeded = 7, MaxEigenExceeded = 8,
                          AffineDistExceeded = 9
                        };
 
-      /** Structure that maintains error counts */
+
+      /** Struct that maintains error counts */
       struct ErrorCounter {
-        ErrorCounter() : _gerrno(0), _keyname("Unknown"), _count(0) { }
-        ErrorCounter(int gerrno, const std::string &keyname) : _gerrno(gerrno),
-          _keyname(keyname), _count(0) { }
-        inline int  Errno() const {
-          return (_gerrno);
-        }
-        inline BigInt Count() const {
-          return (_count);
-        }
-        inline void BumpIt() {
-          _count++;
-        }
-        PvlKeyword LogIt() const {
-          return (PvlKeyword(_keyname, _count));
-        }
-        int _gerrno;
-        std::string _keyname;
-        BigInt _count;
+        ErrorCounter() : m_gerrno(0), m_keyname("Unknown"), m_count(0) { }
+        ErrorCounter(int gerrno, const std::string &keyname) : m_gerrno(gerrno),
+          m_keyname(keyname), m_count(0) { }
+    
+        inline int  Errno() const {  return (m_gerrno); }
+        inline BigInt Count() const { return (m_count); }
+        inline void BumpIt() { m_count++; }
+        PvlKeyword LogIt() const { return (PvlKeyword(m_keyname, m_count)); }
+    
+        int         m_gerrno;
+        std::string m_keyname;
+        BigInt      m_count;
       };
 
       /// Declaration of error count list
       typedef CollectorMap<int, ErrorCounter> ErrorList;
 
-      DbProfile _prof;
-      int    _maxIters;
-      double _transTol;
-      double _scaleTol;
-      double _shearTol;
-
-      double _affineTol;
-      double _spiceTol;
-
-      double _rgainMinTol;
-      double _rgainMaxTol;
-      double _rshiftTol;
-      double _fitChipScale;
-
       // Iteration loop variables
-      int _nIters;
-      GruenResult _result;  //!< last result, cummulative
-      BigInt    _totalIterations;
-      ErrorList _errors;
-      BigInt    _unclassified;
+      BigInt       m_callCount;
+      std::string  m_filePattern;
 
+      ErrorList    m_errors;            // Error logger
+      BigInt       m_unclassified;      // Unclassified errors
+
+      // Tolerance and count parameters
+      int          m_maxIters;          // Maximum iterations
+      int          m_nIters;            // Number iterations
+      BigInt       m_totalIterations;   // Running total iteration count
+
+      DbProfile    m_prof;              //  Parameter profile
+      double       m_transTol;          //  Affine translation tolerance
+      double       m_scaleTol;          //  Affine scale tolerance
+      double       m_shearTol;          //  Affine shear tolerance
+      double       m_spiceTol;          // SPICE tolerance
+      double       m_affineTol;         // Affine Tolerance
+      
+      double       m_shiftTol;          // Radiometric shift tolerance
+      double       m_rgainMinTol;       // Radiometric Gain minimum
+      double       m_rgainMaxTol;       // Radiometric Gain maximum
+
+      double       m_defGain;           // Default Radiometric gain
+      double       m_defShift;          // Default Radiometric shift
+      
       // These are for recomputing SMTK points
-      double _defGain;
-      double _defShift;
+      AffineRadio  m_defAffine;         // Default affine/radiometric settings
+      AffineRadio  m_affine;            // Incoming affine setting
+      MatchPoint   m_point;             // Last resuting registration result
 
-      //  Statistics gathered during process
-      Statistics _eigenStat;
-      Statistics _iterStat;
-      Statistics _shiftStat;
-      Statistics _gainStat;
+      //  Statistics gathered during processing
+      Statistics   m_eigenStat;
+      Statistics   m_iterStat;
+      Statistics   m_shiftStat;
+      Statistics   m_gainStat;
 
+
+      //  Static init of default PVL parameters
+      static Pvl &getDefaultParameters();
 
       /**
        * @brief Helper method to initialize parameters
@@ -291,7 +288,7 @@ namespace Isis {
       PvlKeyword ParameterKey(const std::string &keyname,
                               const T &value,
                               const std::string &unit = "") const {
-        if(_prof.exists(keyname)) {
+        if(m_prof.exists(keyname)) {
           return(ValidateKey(keyname, value, unit));
         }
         return (PvlKeyword(keyname, "Unbounded"));
@@ -322,37 +319,37 @@ namespace Isis {
       }
 
       ErrorList initErrorList() const;
-      void logError(int gerrno, const std::string &gerrmsg);
+      int logError(int gerrno, const std::string &gerrmsg);
       PvlGroup StatsLog() const;
       PvlGroup ParameterLog() const;
 
       void init(Pvl &pvl);
+
       /** Returns the default radiometric gain value */
-      inline double getDefaultGain() const {
-        return (_defGain);
+      inline Radiometric getDefaultRadio() const {
+        return (Radiometric(m_defShift, m_defGain));
       }
-      /** Returns the default radiometric shift value */
-      inline double getDefaultShift() const {
-        return (_defShift);
+
+      /** Returns number of degrees of freedom of points */
+      inline double DegreesOfFreedom(const int npts) const {
+        return ((double) (npts - NCONSTR));
       }
-      void reset();
+
       void resetStats();
 
-      GSLVector getThreshHold(const Chip &chip) const;
-      bool HasConverged(const GSLVector &alpha, const GSLVector &thresh,
-                        const GruenResult &results) const;
+      GMatrix Identity(const int &ndiag = 3) const;
+      GMatrix Choldc(const GMatrix &a, GVector &p) const;
+      GMatrix Cholsl(const GMatrix &a, const GVector &p, 
+                     const GMatrix &b, const GMatrix &x) const;
+      int Jacobi(const GMatrix &a, GVector &evals, GMatrix &evecs,
+                  const int &MaxIters = 50) const;
+      void EigenSort(GVector &evals, GMatrix &evecs) const;
       BigInt MinValidPoints(BigInt totalPoints) const;
       bool ValidPoints(BigInt totalPoints, BigInt nPoints) const;
-      void ErrorAnalysis(GruenResult &result);
-      bool TestConstraints(const bool &done, GruenResult &result);
-      Affine UpdateAffine(GruenResult &result, const Affine &gtrans);
-      void UpdateChip(Chip &sChip, const Affine &affine);
-      bool CheckAffineTolerance();
-      AutoReg::RegisterStatus Status(const GruenResult &result) const;
-      /** Returns status of the last Gruen registration result */
-      AutoReg::RegisterStatus Status() const {
-        return (Status(_result));
-      }
+ 
+      int CheckConstraints(MatchPoint &point);
+      Coordinate getChipUpdate(Chip &sChip, MatchPoint &point) const;
+      AutoReg::RegisterStatus Status(const MatchPoint &result);
   };
 
 }  // namespace Isis
