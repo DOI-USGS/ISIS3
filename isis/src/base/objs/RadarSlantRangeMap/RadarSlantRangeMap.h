@@ -50,6 +50,11 @@ namespace Isis {
    *  @history 2010-03-19 Debbie A. Cook - Added comments about the units
    *                      and corrected slant in SetUndistortedFocalPlane
    *                      to be in meters instead of km
+   *  @history 2011-09-14 Randy Kirk - Fixed the ComputeA method so that it
+   *                      is handling the range coefficients properly. A
+   *                      linear fit is used to obtain the range coefficients
+   *                      if the current time falls between 2 points with
+   *                      known range coefficients.
    *
    */
   class RadarSlantRangeMap : public CameraDistortionMap {

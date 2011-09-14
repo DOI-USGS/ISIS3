@@ -224,25 +224,30 @@ namespace Isis {
     std::vector<double>::iterator pos = lower_bound(p_time.begin(), p_time.end(), currentEt);
 
     int index;
-    if(pos == p_time.end()) {
-      index = p_time.size() - 1;
+    if(pos == p_time.begin()) {
+      p_a[0] = p_a0[0];
+      p_a[1] = p_a1[0];
+      p_a[2] = p_a2[0];
+      p_a[3] = p_a3[0];
     }
     else {
       index = pos - p_time.begin();
-      if((currentEt - p_time[index]) > (p_time[index+1] - currentEt)) {
-        index++;
+      if((pos == p_time.end()) && (currentEt >= p_time[index])) {
+        index = p_time.size() - 1;
+        p_a[0] = p_a0[index];
+        p_a[1] = p_a1[index];
+        p_a[2] = p_a2[index];
+        p_a[3] = p_a3[index];
+      } 
+      else {
+        double weight = (currentEt - p_time[index-1]) / 
+                        (p_time[index] - p_time[index-1]);
+        p_a[0] = p_a0[index-1] * (1.0 - weight) + p_a0[index] * weight;
+        p_a[1] = p_a1[index-1] * (1.0 - weight) + p_a1[index] * weight;
+        p_a[2] = p_a2[index-1] * (1.0 - weight) + p_a2[index] * weight;
+        p_a[3] = p_a3[index-1] * (1.0 - weight) + p_a3[index] * weight;
       }
     }
-
-    int tsize = p_time.size();
-    if(index >= tsize) {
-      index = p_time.size() - 1;
-    }
-
-    p_a[0] = p_a0[index];
-    p_a[1] = p_a1[index];
-    p_a[2] = p_a2[index];
-    p_a[3] = p_a3[index];
   }
 
   /** Set the weight factors for slant range and Doppler shift
