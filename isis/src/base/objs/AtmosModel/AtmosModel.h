@@ -62,6 +62,8 @@ namespace Isis {
    *           since that file uses std and Isis namespaces.
    *  @history 2008-11-07 Jeannie Walldren - Fixed documentation
    *  @history 2011-08-17 Sharmila Prasad -Added API's for HNORM, Additive Offset
+   *  @history 2011-09-14 Janet Barrett - Got rid of bharef, hgaref,
+   *           and wharef variables and supporting methods.
    */
   class AtmosModel {
     public:
@@ -75,7 +77,7 @@ namespace Isis {
       static double En(unsigned int n, double x) throw(iException &);
       // Calculate atmospheric scattering effect
       void CalcAtmEffect(double pha, double inc, double ema, double *pstd,
-                         double *trans, double *trans0, double *sbar);
+                         double *trans, double *trans0, double *sbar, double *transs);
       // Used to calculate atmosphere at standard conditions
       virtual void SetStandardConditions(bool standard);
       // Obtain hemispheric and bihemispheric albedo by integrating the photometric function
@@ -85,16 +87,13 @@ namespace Isis {
       // Set parameters needed for atmospheric correction
       void SetAtmosAtmSwitch(const int atmswitch);
       void SetAtmosBha(const double bha);
-      void SetAtmosBharef(const double bharef);
       void SetAtmosHga(const double hga);
-      void SetAtmosHgaref(const double hgaref);
       void SetAtmosInc(const double inc);
       void SetAtmosNulneg(const string nulneg);
       void SetAtmosPhi(const double phi);
       void SetAtmosTau(const double tau);
       void SetAtmosTauref(const double tauref);
       void SetAtmosWha(const double wha);
-      void SetAtmosWharef(const double wharef);
       void SetAtmosHnorm(const double hnorm);
       void SetAtmosIord(const string offset);
       
@@ -129,21 +128,9 @@ namespace Isis {
       double AtmosHga() const {
         return p_atmosHga;
       };
-      //! Return atmospheric Bharef value
-      double AtmosBharef() const {
-        return p_atmosBharef;
-      };
-      //! Return atmospheric Hgaref value
-      double AtmosHgaref() const {
-        return p_atmosHgaref;
-      };
       //! Return atmospheric Tauref value
       double AtmosTauref() const {
         return p_atmosTauref;
-      };
-      //! Return atmospheric Wharef value
-      double AtmosWharef() const {
-        return p_atmosWharef;
       };
       //! Return atmospheric Nulneg value
       bool AtmosNulneg() const {
@@ -256,18 +243,16 @@ namespace Isis {
       int p_atmosNinc;
 
       double p_atmosBha;
-      double p_atmosBharef;
       double p_atmosBhasave;
-      double p_atmosHgaref;
       double p_atmosHgasave;
       double p_atmosTauref;
       double p_atmosTausave;
-      double p_atmosWharef;
       double p_atmosWhasave;
 
       double p_pstd;      //!< Pure atmospheric-scattering term.
       double p_trans;     //!< Transmission of surface reflected light through the atmosphere overall.
       double p_trans0;    //!< Transmission of surface reflected light through the atmosphere with no scatterings in the atmosphere.
+      double p_transs;    //!< Transmission of light that must be subtracted from the flat surface model to get the shadow model.
       double p_sbar;      //!< Illumination of the ground by the sky.
       double p_atmosHga;
       double p_atmosTau;

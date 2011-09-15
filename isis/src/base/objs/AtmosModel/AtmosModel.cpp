@@ -62,6 +62,7 @@ namespace Isis {
     p_sbar = 0.0;
     p_trans = 0.0;
     p_trans0 = 0.0;
+    p_transs = 0.0;
     p_standardConditions = false;
 
     PvlGroup &algorithm = pvl.FindObject("AtmosphericModel").FindGroup("Algorithm", Pvl::Traverse);
@@ -87,36 +88,15 @@ namespace Isis {
     }
     p_atmosWhasave = p_atmosWha;
 
-    if(algorithm.HasKeyword("Wharef")) {
-      SetAtmosWharef(algorithm["Wharef"]);
-    }
-    else {
-      p_atmosWharef = p_atmosWha;
-    }
-
     if(algorithm.HasKeyword("Hga")) {
       SetAtmosHga(algorithm["Hga"]);
     }
     p_atmosHgasave = p_atmosHga;
 
-    if(algorithm.HasKeyword("Hgaref")) {
-      SetAtmosHgaref(algorithm["Hgaref"]);
-    }
-    else {
-      p_atmosHgaref = p_atmosHga;
-    }
-
     if(algorithm.HasKeyword("Bha")) {
       SetAtmosBha(algorithm["Bha"]);
     }
     p_atmosBhasave = p_atmosBha;
-
-    if(algorithm.HasKeyword("Bharef")) {
-      SetAtmosBharef(algorithm["Bharef"]);
-    }
-    else {
-      p_atmosBharef = p_atmosBha;
-    }
 
     if(algorithm.HasKeyword("Inc")) {
       SetAtmosInc(algorithm["Inc"]);
@@ -481,7 +461,8 @@ namespace Isis {
    * @throw Isis::iException::User "Invalid photometric angles"
    */
   void AtmosModel::CalcAtmEffect(double pha, double inc, double ema,
-                                 double *pstd, double *trans, double *trans0, double *sbar) {
+                                 double *pstd, double *trans, double *trans0, double *sbar,
+                                 double *transs) {
 
     // Check validity of photometric angles
     //if (pha > 180.0 || inc > 90.0 || ema > 90.0 || pha < 0.0 ||
@@ -496,6 +477,7 @@ namespace Isis {
     *trans = p_trans;
     *trans0 = p_trans0;
     *sbar = p_sbar;
+    *transs = p_transs;
   }
 
   /**
@@ -504,20 +486,11 @@ namespace Isis {
   void AtmosModel::SetStandardConditions(bool standard) {
     p_standardConditions = standard;
     if(p_standardConditions) {
-      p_atmosBhasave = p_atmosBha;
-      p_atmosBha = p_atmosBharef;
-      p_atmosHgasave = p_atmosHga;
-      p_atmosHga = p_atmosHgaref;
       p_atmosTausave = p_atmosTau;
       p_atmosTau = p_atmosTauref;
-      p_atmosWhasave = p_atmosWha;
-      p_atmosWha = p_atmosWharef;
     }
     else {
-      p_atmosBha = p_atmosBhasave;
-      p_atmosHga = p_atmosHgasave;
       p_atmosTau = p_atmosTausave;
-      p_atmosWha = p_atmosWhasave;
     }
   }
 
@@ -757,26 +730,6 @@ namespace Isis {
   }
 
   /**
-   * Set the Atmospheric function parameter. This specifies the
-   * reference value of Bha to which the image will be normalized.
-   * If no value is given, then this parameter defaults to the
-   * value provided for Bha. This parameter is limited to values
-   * that are >=-1 and <=1.
-   *
-   * @param bharef  Atmospheric function parameter, no default
-   * @throw Isis::iException::User "Invalid value of atmospheric
-   *        bharef"
-   */
-  void AtmosModel::SetAtmosBharef(const double bharef) {
-    if(bharef < -1.0 || bharef > 1.0) {
-      string msg = "Invalid value of Atmospheric bharef [" + iString(bharef) + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
-    }
-
-    p_atmosBharef = bharef;
-  }
-
-  /**
    * Set the Hapke atmospheric function parameter. This is the
    * coefficient of the single particle Henyey-Greenstein phase
    * function. This parameter is limited to values that are >-1
@@ -794,26 +747,6 @@ namespace Isis {
     }
 
     p_atmosHga = hga;
-  }
-
-  /**
-   * Set the Atmospheric function parameter. This specifies the
-   * reference value of Hga to which the image will be normalized.
-   * If no value is given, then this parameter defaults to the
-   * value provided for Hga. This parameter is limited to values
-   * that are >-1 and <1.
-   *
-   * @param hgaref  Hapke atmospheric function parameter, no default
-   * @throw Isis::iException::User "Invalid value of atmospheric
-   *        hgaref"
-   */
-  void AtmosModel::SetAtmosHgaref(const double hgaref) {
-    if(hgaref <= -1.0 || hgaref >= 1.0) {
-      string msg = "Invalid value of Atmospheric hgaref [" + iString(hgaref) + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
-    }
-
-    p_atmosHgaref = hgaref;
   }
 
   /**
@@ -935,25 +868,6 @@ namespace Isis {
     }
 
     p_atmosWha = wha;
-  }
-
-  /**
-   * Set the Atmospheric function parameter. This is the reference
-   * single-scattering albedo of atmospheric particles to which
-   * the image will be normalized. This parameter is limited to
-   * values that are >0 and <=1.
-   *
-   * @param wharef  Atmospheric function parameter, no default
-   * @throw Isis::iException::User "Invalid value of atmospheric
-   *        wharef"
-   */
-  void AtmosModel::SetAtmosWharef(const double wharef) {
-    if(wharef <= 0.0 || wharef > 1.0) {
-      string msg = "Invalid value of Atmospheric wharef [" + iString(wharef) + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
-    }
-
-    p_atmosWharef = wharef;
   }
 
   /**

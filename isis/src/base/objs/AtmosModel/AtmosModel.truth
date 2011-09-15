@@ -22,7 +22,7 @@ AtmosNinc = 91
 Testing atmospheric model get methods in standard conditions...
 AlgorithmName = Unknown
 AtmosTau = 0
-AtmosWha = 0.95
+AtmosWha = 0.98
 AtmosHga = 0.68
 AtmosNulneg = 0
 AtmosNinc = 91
