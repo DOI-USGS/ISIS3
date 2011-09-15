@@ -55,26 +55,26 @@ namespace Isis {
    * @author  2006-06-09  Tracie Sucharski
    *
    * @internal
-   *  @todo  The following fix is a bandaid- there is probably a bug in
-   *         tiling class, buffer class?  The following fix is for rectangle
-   *         option only, the start/end line still has a problem when going
-   *         off the right side of image.
    *  @history 2006-10-20 Tracie Sucharski - If rubberband for rectangle
-   *                                         option goes off the right side
-   *                                         or bottom of image, set
-   *                                         esamp/eline to image
-   *                                         nsamps/nlines.
+   *                          option goes off the right side
+   *                          or bottom of image, set
+   *                          esamp/eline to image
+   *                          nsamps/nlines.
    *  @history 2008-05-23 Noah Hilt - Added RubberBandToolfunctionality and
-   *           changed the mouseButtonReleased method. Also added a writeToCube
-   *           method that is used by both the rubberBandComplete and
-   *           mouseButtonRelease methods.
+   *                          changed the mouseButtonReleased method. Also added
+   *                          a writeToCube method that is used by both the
+   *                          rubberBandComplete and mouseButtonRelease methods.
    *  @history 2008-06-19 Noah Hilt - Added methods and signals for saving and
-   *           discarding changes to the current cube.
+   *                          discarding changes to the current cube.
    *  @history 2010-06-26 Eric Hyer - uses MdiCubeViewport instead of
-   *           CubeViewport.  Fixed many include issues but some still remain!
+   *                          CubeViewport.  Fixed many include issues but some
+   *                          still remain!
    *  @history 2010-11-15 Eric Hyer - valid rectangle dimensions for banding
-   *               must now be >= 1 instead of >= 5
-   *
+   *                          must now be >= 1 instead of >= 5
+   *  @history 2011-09-15 Steven Lambright - Enumerated values no longer
+   *                          conflict with global variable names and increased
+   *                          safety with usage of the valType combo box to make
+   *                          it less likely to break in the future. Fixes #345.
    */
   class EditTool : public Tool {
       Q_OBJECT
@@ -103,12 +103,12 @@ namespace Isis {
        * Enum for DN values
        */
       enum ReplacementValue {
-        UserDn,//!< User Selected DN value
-        Null,//!< Null DN value
-        Hrs,//!< High representation saturation DN value
-        Lrs,//!< Low representation saturation DN value
-        His,//!< High instrument saturation DN value
-        Lis//!< Low instrument satruation DN value
+        UserDnComboValue, //!< User Selected DN value
+        NullComboValue, //!< Null DN value
+        HrsComboValue, //!< High representation saturation DN value
+        LrsComboValue, //!< Low representation saturation DN value
+        HisComboValue, //!< High instrument saturation DN value
+        LisComboValue //!< Low instrument satruation DN value
       };
 
     protected:

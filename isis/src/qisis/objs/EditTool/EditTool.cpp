@@ -110,17 +110,18 @@ namespace Isis {
     p_valTypeComboBox = new QComboBox(hbox);
     p_valTypeComboBox->setEditable(false);
     p_valTypeComboBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-    p_valTypeComboBox->addItem("Dn");
-    p_valTypeComboBox->addItem("Null");
-    p_valTypeComboBox->addItem("Hrs");
-    p_valTypeComboBox->addItem("Lrs");
-    p_valTypeComboBox->addItem("His");
-    p_valTypeComboBox->addItem("Lis");
+    p_valTypeComboBox->addItem("Dn", UserDnComboValue);
+    p_valTypeComboBox->addItem("Null", NullComboValue);
+    p_valTypeComboBox->addItem("Hrs", HrsComboValue);
+    p_valTypeComboBox->addItem("Lrs", LrsComboValue);
+    p_valTypeComboBox->addItem("His", HisComboValue);
+    p_valTypeComboBox->addItem("Lis", LisComboValue);
     p_valTypeComboBox->setToolTip("Value used to replace image data");
     text =
       "<b>Function:</b> The value which will be used to replace image data. ";
     p_valTypeComboBox->setWhatsThis(text);
-    p_valTypeComboBox->setCurrentIndex(1);
+    p_valTypeComboBox->setCurrentIndex(
+        p_valTypeComboBox->findData(NullComboValue));
     connect(p_valTypeComboBox, SIGNAL(activated(int)), this,
             SLOT(selectValType(int)));
 
@@ -201,18 +202,17 @@ namespace Isis {
    *
    */
   void EditTool::selectValType(int index) {
-
-    if(index == 0) {
+    if (p_valTypeComboBox->itemData(index) == UserDnComboValue) {
       p_dnLineEdit->setEnabled(true);
     }
     else {
       p_dnLineEdit->setEnabled(false);
 
-      if(index == 1) p_dn = Null;
-      if(index == 2) p_dn = Hrs;
-      if(index == 3) p_dn = Lrs;
-      if(index == 4) p_dn = His;
-      if(index == 5) p_dn = Lis;
+      if (p_valTypeComboBox->itemData(index) == NullComboValue) p_dn = Null;
+      if (p_valTypeComboBox->itemData(index) == HrsComboValue) p_dn = Hrs;
+      if (p_valTypeComboBox->itemData(index) == LrsComboValue) p_dn = Lrs;
+      if (p_valTypeComboBox->itemData(index) == HisComboValue) p_dn = His;
+      if (p_valTypeComboBox->itemData(index) == LisComboValue) p_dn = Lis;
     }
   }
 
@@ -235,9 +235,9 @@ namespace Isis {
    */
   void EditTool::updateTool() {
     MdiCubeViewport *vp = cubeViewport();
-    if(vp != NULL) {
+    if (vp != NULL) {
       //If the current viewport has no undo history
-      if(!p_undoEdit.contains(cubeViewport()) || p_undoEdit.value(vp)->empty()) {
+      if (!p_undoEdit.contains(cubeViewport()) || p_undoEdit.value(vp)->empty()) {
         p_undoButton->setEnabled(false);
         p_saveButton->setEnabled(false);
         connect(vp, SIGNAL(destroyed(QObject *)),
@@ -249,7 +249,7 @@ namespace Isis {
         p_saveButton->setEnabled(true);
       }
       //If the current viewport has no redo history
-      if(!p_redoEdit.contains(cubeViewport()) || p_redoEdit.value(vp)->empty()) {
+      if (!p_redoEdit.contains(cubeViewport()) || p_redoEdit.value(vp)->empty()) {
         p_redoButton->setEnabled(false);
         connect(vp, SIGNAL(destroyed(QObject *)),
                 this, SLOT(removeViewport(QObject *)));
@@ -272,9 +272,9 @@ namespace Isis {
    */
   void EditTool::rubberBandComplete() {
     MdiCubeViewport *vp = cubeViewport();
-    if(vp == NULL) return;
+    if (vp == NULL) return;
 
-    if(vp->cube()->isReadOnly()) {
+    if (vp->cube()->isReadOnly()) {
       //  ReOpen cube as read/write
       //  If cube readonly print error
       try {
@@ -285,7 +285,7 @@ namespace Isis {
         return;
       }
     }
-    if(vp->isColor()) {
+    if (vp->isColor()) {
       QMessageBox::information((QWidget *)parent(),
                                "Error", "Cannot edit in color mode");
       return;
@@ -296,12 +296,12 @@ namespace Isis {
     QList<QPoint *> *linePts = NULL;
 
     // Rectangle is selected
-    if(p_shapeComboBox->currentIndex() == Rectangle) {
+    if (p_shapeComboBox->currentIndex() == Rectangle) {
 
-      if(!RubberBandTool::isValid()) return;
+      if (!RubberBandTool::isValid()) return;
       
       QRect r = RubberBandTool::rectangle();
-      if((r.width() < 1) || (r.height() < 1)) return;
+      if ((r.width() < 1) || (r.height() < 1)) return;
 
       vp->viewportToCube(r.left(), r.top(), ssamp, sline);
       vp->viewportToCube(r.right(), r.bottom(), esamp, eline);
@@ -312,27 +312,27 @@ namespace Isis {
       ieline = (int)(eline + 0.5);
 
       //Clamp the rectangles coordinates to within the cube's dimensions
-      if(issamp < 0) issamp = 0;
-      if(iesamp < 0) iesamp = 0;
-      if(isline < 0) isline = 0;
-      if(ieline < 0) ieline = 0;
+      if (issamp < 0) issamp = 0;
+      if (iesamp < 0) iesamp = 0;
+      if (isline < 0) isline = 0;
+      if (ieline < 0) ieline = 0;
 
-      if(issamp > vp->cubeSamples()) issamp = vp->cubeSamples();
-      if(iesamp > vp->cubeSamples()) iesamp = vp->cubeSamples();
-      if(isline > vp->cubeLines()) isline = vp->cubeLines();
-      if(ieline > vp->cubeLines()) ieline = vp->cubeLines();
+      if (issamp > vp->cubeSamples()) issamp = vp->cubeSamples();
+      if (iesamp > vp->cubeSamples()) iesamp = vp->cubeSamples();
+      if (isline > vp->cubeLines()) isline = vp->cubeLines();
+      if (ieline > vp->cubeLines()) ieline = vp->cubeLines();
 
       //If the rectangle is completely out of bounds on either side, display an error and return
-      if(issamp > iesamp || isline > ieline) {
+      if (issamp > iesamp || isline > ieline) {
         QMessageBox::information((QWidget *)parent(),
                                  "Error", "Rectangle is out of bounds");
         return;
       }
     }
     // Line is selected
-    else if(p_shapeComboBox->currentIndex() == StartEndLine) {
+    else if (p_shapeComboBox->currentIndex() == StartEndLine) {
       //  Convert rubber band line to cube coordinates
-      if(!RubberBandTool::isValid()) return;
+      if (!RubberBandTool::isValid()) return;
       vp->viewportToCube(RubberBandTool::getVertices()[0].rx(), RubberBandTool::getVertices()[0].ry(),
                          ssamp, sline);
       vp->viewportToCube(RubberBandTool::getVertices()[1].rx(), RubberBandTool::getVertices()[1].ry(),
@@ -343,7 +343,7 @@ namespace Isis {
       linePts = EditTool::LineToPoints(l);
 
       //If the line is completely out of bounds, display an error and return
-      if(linePts->empty()) {
+      if (linePts->empty()) {
         QMessageBox::information((QWidget *)parent(),
                                  "Error", "No points in edit line");
         return;
@@ -362,7 +362,7 @@ namespace Isis {
 
     // Write the data to the cube
     writeToCube(iesamp, issamp, ieline, isline, linePts);
-    if(linePts) delete linePts;
+    if (linePts) delete linePts;
   }
   /**
    * This is a slot called when any mouse button is released inside of a
@@ -388,10 +388,13 @@ namespace Isis {
    */
   void EditTool::mouseButtonRelease(QPoint p, Qt::MouseButton m) {
     MdiCubeViewport *vp = cubeViewport();
-    if(vp == NULL) return;
-    if(p_valTypeComboBox->currentIndex() == UserDn && p_dnLineEdit->text() == "" && m != Qt::RightButton) return;
+    if (vp == NULL) return;
+    if (p_valTypeComboBox->itemData(p_valTypeComboBox->currentIndex()) ==
+        UserDnComboValue && p_dnLineEdit->text() == "" && m != Qt::RightButton)
+      return;
+
     //  If cube readonly try to open read/write
-    if(vp->cube()->isReadOnly()) {
+    if (vp->cube()->isReadOnly()) {
       //  ReOpen cube as read/write
       //  If cube readonly print error
       try {
@@ -402,7 +405,7 @@ namespace Isis {
         return;
       }
     }
-    if(vp->isColor()) {
+    if (vp->isColor()) {
       QMessageBox::information((QWidget *)parent(),
                                "Error", "Cannot edit in color mode");
       return;
@@ -413,7 +416,9 @@ namespace Isis {
 
     //  If right mouse button, pick up dn value under the cursor which will be
     //  used as the edit value.
-    if(m == Qt::RightButton && p_valTypeComboBox->currentIndex() == UserDn) {
+    if (m == Qt::RightButton &&
+        p_valTypeComboBox->itemData(p_valTypeComboBox->currentIndex()) ==
+        UserDnComboValue) {
       vp->viewportToCube(p.x(), p.y(), ssamp, sline);
       issamp = (int)(ssamp + 0.5);
       isline = (int)(sline + 0.5);
@@ -427,12 +432,13 @@ namespace Isis {
       return;
     }
 
-    else if(p_shapeComboBox->currentIndex() == Point || p_shapeComboBox->currentIndex() == HorizLine ||
-            p_shapeComboBox->currentIndex() == VertLine) {
+    else if (p_shapeComboBox->currentIndex() == Point ||
+        p_shapeComboBox->currentIndex() == HorizLine ||
+        p_shapeComboBox->currentIndex() == VertLine) {
       vp->viewportToCube(p.x(), p.y(), ssamp, sline);
       esamp = ssamp;
       eline = sline;
-      if((ssamp < 0.5) || (sline < 0.5) ||
+      if ((ssamp < 0.5) || (sline < 0.5) ||
           (ssamp > vp->cubeSamples() + 0.5) || (sline > vp->cubeLines() + 0.5)) {
         QApplication::beep();
         return;
@@ -441,11 +447,11 @@ namespace Isis {
       isline = (int)(sline + 0.5);
       iesamp = issamp;
       ieline = isline;
-      if(p_shapeComboBox->currentIndex() == HorizLine) {
+      if (p_shapeComboBox->currentIndex() == HorizLine) {
         issamp = 1;
         iesamp = vp->cube()->getSampleCount();
       }
-      if(p_shapeComboBox->currentIndex() == VertLine) {
+      if (p_shapeComboBox->currentIndex() == VertLine) {
         isline = 1;
         ieline = vp->cube()->getLineCount();
       }
@@ -481,7 +487,7 @@ namespace Isis {
       //  does, get Stack, push new undo and put stack back in hash.  If not,
       //  create stack, push new undo and add to hash.
       QStack<Brick *> *s;
-      if(p_undoEdit.contains(vp)) {
+      if (p_undoEdit.contains(vp)) {
         s = p_undoEdit.value(vp);
       }
       else {
@@ -491,7 +497,7 @@ namespace Isis {
       p_undoEdit[vp] = s;
 
       //Remove any redo stack if it exists
-      if(p_redoEdit.contains(vp)) {
+      if (p_redoEdit.contains(vp)) {
         QStack<Brick *> *temp = p_redoEdit.value(vp);
         while(!temp->isEmpty()) {
           delete temp->pop();
@@ -506,7 +512,7 @@ namespace Isis {
       vp->cube()->read(*brick);
 
       //  Now that we have where, do the actual edits
-      if(p_shapeComboBox->currentIndex() == StartEndLine) {
+      if (p_shapeComboBox->currentIndex() == StartEndLine) {
         for(int i = 0; linePts && i < (int)linePts->size(); i++) {
           QPoint *pt = (*linePts)[i];
           int is = pt->x();
@@ -534,7 +540,7 @@ namespace Isis {
       delete brick;
     }
     catch(...) {
-      if(brick) {
+      if (brick) {
         delete brick;
       }
       //If the brick failed to initialize due to insufficient memory
@@ -552,16 +558,16 @@ namespace Isis {
     Brick *redoBrick = NULL;
     try {
       MdiCubeViewport *vp = cubeViewport();
-      if(vp == NULL) return;
+      if (vp == NULL) return;
 
       //  If viewport not in hash, beep
-      if(p_undoEdit.empty() || p_undoEdit.count(vp) == 0) {
+      if (p_undoEdit.empty() || p_undoEdit.count(vp) == 0) {
         QApplication::beep();
         return;
       }
 
       //  If cube readonly print error
-      if(vp->cube()->isReadOnly()) {
+      if (vp->cube()->isReadOnly()) {
         QMessageBox::information((QWidget *)parent(), "Error", "Cube is Read Only");
         return;
       }
@@ -576,7 +582,7 @@ namespace Isis {
       vp->cube()->read(*(redoBrick));
 
       QStack<Brick *> *redo;
-      if(p_redoEdit.contains(vp)) {
+      if (p_redoEdit.contains(vp)) {
         redo = p_redoEdit.value(vp);
       }
       else {
@@ -602,13 +608,13 @@ namespace Isis {
 
       //Pop this element off the stack, if the undo stack is empty, disable the undo button
       s->pop();
-      if(s->empty()) {
+      if (s->empty()) {
         p_undoButton->setEnabled(false);
       }
       delete brick;
     }
     catch(...) {
-      if(redoBrick) {
+      if (redoBrick) {
         delete redoBrick;
       }
       //If the brick failed to initialize due to insufficient memory
@@ -626,10 +632,10 @@ namespace Isis {
    */
   void EditTool::undoAll(MdiCubeViewport *vp) {
     try {
-      if(vp == NULL) return;
+      if (vp == NULL) return;
 
       //  If cube readonly print error
-      if(vp->cube()->isReadOnly()) {
+      if (vp->cube()->isReadOnly()) {
         QMessageBox::information((QWidget *)parent(), "Error", "Cube is Read Only");
         return;
       }
@@ -638,11 +644,11 @@ namespace Isis {
       QStack<Brick *> *redo;
       int marker = 0;
       //If edits have been made
-      if(p_undoEdit.contains(vp)) {
+      if (p_undoEdit.contains(vp)) {
         undo = p_undoEdit.value(vp);
 
         //If a save has been made
-        if(p_saveMarker.contains(vp)) {
+        if (p_saveMarker.contains(vp)) {
           marker = p_saveMarker.value(vp);
         }
 
@@ -660,7 +666,7 @@ namespace Isis {
       }
 
       //If undos have been made
-      if(p_redoEdit.contains(vp)) {
+      if (p_redoEdit.contains(vp)) {
         redo = p_redoEdit.value(vp);
 
         //If undos have been made past a save point, we need to redo them
@@ -687,16 +693,16 @@ namespace Isis {
     Brick *undoBrick = NULL;
     try {
       MdiCubeViewport *vp = cubeViewport();
-      if(vp == NULL) return;
+      if (vp == NULL) return;
 
       //  If viewport not in hash, beep
-      if(p_redoEdit.empty() || p_redoEdit.count(vp) == 0) {
+      if (p_redoEdit.empty() || p_redoEdit.count(vp) == 0) {
         QApplication::beep();
         return;
       }
 
       //  If cube readonly print error
-      if(vp->cube()->isReadOnly()) {
+      if (vp->cube()->isReadOnly()) {
         QMessageBox::information((QWidget *)parent(), "Error", "Cube is Read Only");
         return;
       }
@@ -712,7 +718,7 @@ namespace Isis {
       vp->cube()->read(*(undoBrick));
 
       QStack<Brick *> *undo;
-      if(p_undoEdit.contains(vp)) {
+      if (p_undoEdit.contains(vp)) {
         undo = p_undoEdit.value(vp);
       }
       else {
@@ -737,13 +743,13 @@ namespace Isis {
 
       //Pop this element off the stack, if the redo stack is empty, disable the redo button
       s->pop();
-      if(s->empty()) {
+      if (s->empty()) {
         p_redoButton->setEnabled(false);
       }
       delete brick;
     }
     catch(...) {
-      if(undoBrick) {
+      if (undoBrick) {
         delete undoBrick;
       }
       //If the brick failed to initialize due to insufficient memory
@@ -760,11 +766,11 @@ namespace Isis {
    * @param vp
    */
   void EditTool::save(MdiCubeViewport *vp) {
-    if(vp == NULL) return;
+    if (vp == NULL) return;
     //Set the 'save point' for this viewport, if we undo discard any changes
     //We will only discard to this point
     int marker;
-    if(p_undoEdit.contains(vp)) {
+    if (p_undoEdit.contains(vp)) {
       marker = p_undoEdit.value(vp)->count();
     }
     else {
@@ -788,14 +794,14 @@ namespace Isis {
   void EditTool::removeViewport(QObject *vp) {
     //  Connect destruction of CubeViewport to Remove slot to remove viewport
     //  from the undo and redo Hashes.
-    if(p_undoEdit.contains((MdiCubeViewport *) vp)) {
+    if (p_undoEdit.contains((MdiCubeViewport *) vp)) {
       QStack<Brick *> *temp = p_undoEdit.value((MdiCubeViewport *) vp);
       while(!temp->isEmpty()) {
         delete temp->pop();
       }
       p_undoEdit.remove((MdiCubeViewport *) vp);
     }
-    if(p_redoEdit.contains((MdiCubeViewport *) vp)) {
+    if (p_redoEdit.contains((MdiCubeViewport *) vp)) {
       QStack<Brick *> *temp = p_redoEdit.value((MdiCubeViewport *) vp);
       while(!temp->isEmpty()) {
         delete temp->pop();
@@ -823,7 +829,7 @@ namespace Isis {
    */
   QList<QPoint *> *EditTool::LineToPoints(const QLine &line) {
     MdiCubeViewport *vp = cubeViewport();
-    if(vp == NULL) return new QList<QPoint *>();
+    if (vp == NULL) return new QList<QPoint *>();
     double slope;
     int i;
     int x, y, xinc, yinc;
@@ -836,7 +842,7 @@ namespace Isis {
     int ex = line.p2().x();
     int sy = line.p1().y();
     int ey = line.p2().y();
-    if(sx > ex) {
+    if (sx > ex) {
       xsize = sx - ex + 1;
       xinc = -1;
     }
@@ -845,7 +851,7 @@ namespace Isis {
       xinc = 1;
     }
 
-    if(sy > ey) {
+    if (sy > ey) {
       ysize = sy - ey + 1;
       yinc = -1;
     }
@@ -854,14 +860,14 @@ namespace Isis {
       yinc = 1;
     }
 
-    if(ysize > xsize) {
+    if (ysize > xsize) {
       slope = (double)(ex - sx) / (double)(ey - sy);
       y = sy;
       for(i = 0; i < ysize; i++) {
         x = (int)(slope * (double)(y - sy) + (double) sx + 0.5);
 
         //If the x or y coordinates are not within the cube dimensions, don't add them
-        if(x >= 0 && y >= 0 && x <= vp->cubeSamples() && y <= vp->cubeLines()) {
+        if (x >= 0 && y >= 0 && x <= vp->cubeSamples() && y <= vp->cubeLines()) {
           QPoint *pt = new QPoint;
           pt->setX(x);
           pt->setY(y);
@@ -870,9 +876,9 @@ namespace Isis {
         y += yinc;
       }
     }
-    else if(xsize == 1) {
+    else if (xsize == 1) {
       //If the x or y coordinates are not within the cube dimensions, don't add them
-      if(sx >= 0 && sy >= 0 && sx <= vp->cubeSamples() && sy <= vp->cubeLines()) {
+      if (sx >= 0 && sy >= 0 && sx <= vp->cubeSamples() && sy <= vp->cubeLines()) {
         QPoint *pt = new QPoint;
         pt->setX(sx);
         pt->setY(sy);
@@ -886,7 +892,7 @@ namespace Isis {
         y = (int)(slope * (double)(x - sx) + (double) sy + 0.5);
 
         //If the x or y coordinates are not within the cube dimensions, don't add them
-        if(x >= 0 && y >= 0 && x <= vp->cubeSamples() && y <= vp->cubeLines()) {
+        if (x >= 0 && y >= 0 && x <= vp->cubeSamples() && y <= vp->cubeLines()) {
           QPoint *pt = new QPoint;
           pt->setX(x);
           pt->setY(y);
@@ -908,10 +914,10 @@ namespace Isis {
 
   void EditTool::enableRubberBandTool() {
     int index = p_shapeComboBox->currentIndex();
-    if(index == 3) {
+    if (index == 3) {
       RubberBandTool::enable(RubberBandTool::Line);
     }
-    else if(index == 4) {
+    else if (index == 4) {
       RubberBandTool::enable(RubberBandTool::Rectangle);
     }
     else {
