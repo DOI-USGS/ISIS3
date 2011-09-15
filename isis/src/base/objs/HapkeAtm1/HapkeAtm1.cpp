@@ -81,6 +81,7 @@ namespace Isis {
       p_trans = 1.0;
       p_trans0 = 1.0;
       p_sbar = 0.0;
+      p_transs = 1.0;
       return;
     }
 
@@ -224,6 +225,12 @@ namespace Isis {
     // but not on the way up) as tabulated in hahgt0Table
     hahgt0 = p_atmosHahgt0Spline.Evaluate(incidence, NumericalApproximation::Extrapolate);
     p_trans0 = (emunot + hahgt0) * emu;
+
+    // Calculate the transmission of light that must be subtracted from a shadow. This
+    // includes direct flux and the scattered flux in the upsun half of the sky
+    // downwelling onto the surface, and the usual transmission upward.
+    hahgt = p_atmosHahgtSpline.Evaluate(incidence, NumericalApproximation::Extrapolate);
+    p_transs = (emunot + hahgt) * emu;
   }
 }
 
