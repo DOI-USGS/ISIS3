@@ -231,6 +231,8 @@ namespace Isis {
 
       void GetSparseParameterCorrections();
 
+      bool IsConverged() { return m_bConverged; }
+
     private:
 
       void Init(Progress *progress = 0);
