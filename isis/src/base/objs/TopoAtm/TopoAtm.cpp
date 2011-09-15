@@ -18,6 +18,7 @@ namespace Isis {
     double pstdref;
     double transref;
     double trans0ref;
+    double transs;
     double sbar;
 
     PvlGroup &algorithm = pvl.FindObject("NormalizationModel").FindGroup("Algorithm", Pvl::Traverse);
@@ -71,7 +72,8 @@ namespace Isis {
 
     // Now calculate atmosphere at standard conditions
     GetAtmosModel()->SetStandardConditions(true);
-    GetAtmosModel()->CalcAtmEffect(p_normPharef, p_normIncref, p_normEmaref, &pstdref, &transref, &trans0ref, &sbar);
+    GetAtmosModel()->CalcAtmEffect(p_normPharef, p_normIncref, p_normEmaref, &pstdref, &transref, 
+                                   &trans0ref, &sbar, &transs);
     GetAtmosModel()->SetStandardConditions(false);
 
     // Finally, calculate the additive and multiplicative parts of the
@@ -99,6 +101,7 @@ namespace Isis {
     double pstd;
     double trans;
     double trans0;
+    double transs;
     double sbar;
     double rhotlt;
     double dpo;
@@ -132,7 +135,8 @@ namespace Isis {
       old_dememission = dememission;
     }
 
-    GetAtmosModel()->CalcAtmEffect(phase, incidence, emission, &pstd, &trans, &trans0, &sbar);
+    GetAtmosModel()->CalcAtmEffect(phase, incidence, emission, &pstd, &trans, &trans0, &sbar,
+                                   &transs);
     pflat = pstd + p_normRhobar * (trans * ahInterp * munot /
                                    (1.0 - p_normRhobar * GetAtmosModel()->AtmosAb() * sbar) + trans0 * (psurf -
                                        ahInterp * munot));

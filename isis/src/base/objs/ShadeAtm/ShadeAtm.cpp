@@ -57,6 +57,7 @@ namespace Isis {
     double pstd;
     double trans;
     double trans0;
+    double transs;
     double sbar;
 
     static double old_phase = -9999;
@@ -96,7 +97,8 @@ namespace Isis {
       old_dememission = dememission;
     }
 
-    GetAtmosModel()->CalcAtmEffect(phase, incidence, emission, &pstd, &trans, &trans0, &sbar);
+    GetAtmosModel()->CalcAtmEffect(phase, incidence, emission, &pstd, &trans, &trans0, &sbar,
+                                   &transs);
 
     albedo = pstd + rho * (ahInterp * munot * trans /
                            (1.0 - rho * GetAtmosModel()->AtmosAb() * sbar) + (psurf - ahInterp * munot) * trans0);

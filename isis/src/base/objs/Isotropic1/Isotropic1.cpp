@@ -75,6 +75,7 @@ namespace Isis {
       p_trans = 1.0;
       p_trans0 = 1.0;
       p_sbar = 0.0;
+      p_transs = 1.0;
       return;
     }
 
@@ -179,6 +180,11 @@ namespace Isis {
 
     // finally, never-scattered term is given by pure attenuation
     p_trans0 = emunot * emu;
+
+    // Calculate the transmission of light that must be subtracted from a shadow.
+    // This includes direct flux and the scattered flux in the upsun half of the
+    // sky downwelling onto the surface, and the usual transmission upward.
+    p_transs = (emunot + 0.5 * (p_gammax * xmunot + p_gammay * ymunot - emunot)) * emu;
   }
 }
 
