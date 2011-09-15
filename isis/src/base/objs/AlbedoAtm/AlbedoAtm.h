@@ -78,6 +78,7 @@ namespace Isis {
       double p_normMunotref;
       double p_normTransref;
       double p_normTrans0ref;
+      double p_normTranss;
       double p_normSbar;
   };
 };

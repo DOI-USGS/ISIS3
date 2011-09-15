@@ -61,7 +61,8 @@ namespace Isis {
     GetAtmosModel()->SetStandardConditions(true);
     GetAtmosModel()->CalcAtmEffect(p_normPharef, p_normIncref, p_normEmaref,
                                    &p_normPstdref, &p_normTransref,
-                                   &p_normTrans0ref, &p_normSbar);
+                                   &p_normTrans0ref, &p_normSbar,
+                                   &p_normTranss);
     GetAtmosModel()->SetStandardConditions(false);
   }
 
@@ -87,6 +88,7 @@ namespace Isis {
     double pstd;
     double trans;
     double trans0;
+    double transs;
     double rho;
     double dpo;
     double q;
@@ -120,7 +122,8 @@ namespace Isis {
       old_dememission = dememission;
     }
 
-    GetAtmosModel()->CalcAtmEffect(phase, incidence, emission, &pstd, &trans, &trans0, &p_normSbar);
+    GetAtmosModel()->CalcAtmEffect(phase, incidence, emission, &pstd, &trans, &trans0, &p_normSbar,
+                                   &transs);
 
     // With model at actual geometry, calculate rho from dn
     dpo = dn - pstd;
