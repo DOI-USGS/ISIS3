@@ -79,6 +79,9 @@ void IsisMain() {
   p.StartProcess(*transform, *interp);
   PvlGroup resultsGrp = transform->UpdateOutputLabel(ocube);
   
+  // Cleanup
+  icube->close();
+  ocube->close();
   p.EndProcess();
 
   delete transform;

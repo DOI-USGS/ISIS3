@@ -71,6 +71,9 @@
     <change name="Sharmila Prasad" date="2011-04-14">
       Ported the enlarge functionality to base/objs/Enlarge class
     </change>
+    <change name="Sharmila Prasad" date="2011-09-15">
+      Fixed issue 0000280 - enlarge fails when run with a batchlist
+    </change>
   </history>
 
   <category>
