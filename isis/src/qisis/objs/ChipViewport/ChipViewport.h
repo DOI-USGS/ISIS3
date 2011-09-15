@@ -73,6 +73,8 @@ namespace Isis {
     *     userMovedTackPoint.  TODO:  Could not use tackPointChanged signal
     *     because that signal is emitted whenever the measure is loaded not
     *     just when the user initiates the move.  This should be cleaned up.
+    * @history 2011-09-14 Tracie Sucharski - Added user option to determine 
+    *     whether control points are drawn. 
     */
   class ChipViewport : public QWidget {
       Q_OBJECT
@@ -137,6 +139,7 @@ namespace Isis {
       void autoStretch();
       void stretchFromCubeViewport(Stretch *, CubeViewport *);
       void changeStretchLock(int);
+      void setPoints(bool checked);
       void setCross(bool checked);
       void rotateChip(int rotation);
       void setCircle(bool checked);
@@ -211,6 +214,7 @@ namespace Isis {
 
       QImage *p_image;  //!< The image
       bool p_paintImage;//!< Paint Image?
+      bool p_showPoints;//!< Draw control points
       bool p_cross;//!< Draw crosshair
       bool p_circle;//!< Draw circle
       int p_circleSize;//!<Circle size

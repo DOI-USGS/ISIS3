@@ -211,7 +211,15 @@ namespace Isis {
   }
 
 
-  //! Repaint the viewport
+
+  /**
+   * Repaint the viewport
+   *
+   * @internal
+   *   @history 2011-08-23  Tracie Sucharski - Use the GetMeasuresInCube method
+   *                           from ControlNet to get list of measures rather
+   *                           than searching through entire net.
+   */
   void ChipViewport::paintEvent(QPaintEvent *e) {
     QPainter painter(this);
 
@@ -235,43 +243,41 @@ namespace Isis {
                           p_circleSize, p_circleSize);
     }
 
+    string serialNumber = SerialNumber::Compose(*p_chipCube);
     // draw measure locations if we have a control network
-    if (p_controlNet) {
-      string serialNumber = SerialNumber::Compose(*p_chipCube);
-
+    //  If the serial number is Unknown, we probably have a ground source
+    //  file or level 2 which means it does not exist in the network
+    //  TODO:  Is there a better way to handle this?
+    if (p_controlNet && p_showPoints && serialNumber.compare("Unknown")) {
+      QList<ControlMeasure *> measures =
+                                 p_controlNet->GetMeasuresInCube(serialNumber);
       // loop through all points in the control net
-      for (int i = 0; i < p_controlNet->GetNumPoints(); i++) {
-        const ControlPoint *p = p_controlNet->GetPoint(i);
+      for (int i = 0; i < measures.count(); i++) {
+        ControlMeasure *m = measures[i];
+        // Find the measurments on the viewport
+        double samp = m->GetSample();
+        double line = m->GetLine();
+        int x, y;
 
-        // if this point is contained in the image
-        if (p->HasSerialNumber(serialNumber)) {
-          const ControlMeasure *measure = p->GetMeasure(serialNumber);
+        cubeToViewport(samp, line, x, y);
+        // Determine pen color
+        // if the point or measure is ignored set to yellow
+        if (m->Parent()->IsIgnored() ||
+           (!m->Parent()->IsIgnored() && m->IsIgnored())) {
+          painter.setPen(QColor(255, 255, 0)); // set point marker yellow
+        }
+        // check for ground measure
+        else if (m->Parent()->GetType() == ControlPoint::Fixed) {
+          painter.setPen(Qt::magenta);// set point marker magenta
+        }
+        else {
+          painter.setPen(Qt::green); // set all other point markers green
+        }
 
-          // Find the measurments on the viewport
-          double samp = measure->GetSample();
-          double line = measure->GetLine();
-          int x, y;
-
-          cubeToViewport(samp, line, x, y);
-
-          // Determine pen color
-          // if the point or measure is ignored set to yellow
-          if (p->IsIgnored() || (!p->IsIgnored() && measure->IsIgnored())) {
-            painter.setPen(QColor(255, 255, 0)); // set point marker yellow
-          }
-          // check for ground measure
-          else if (p->GetType() == ControlPoint::Fixed) {
-            painter.setPen(Qt::magenta);// set point marker magenta
-          }
-          else {
-            painter.setPen(Qt::green); // set all other point markers green
-          }
-
-          // draw points which are not under cross
-          if (x != (p_width - 1) / 2 || y != (p_height - 1) / 2) {
-            painter.drawLine(x - 5, y, x + 5, y);
-            painter.drawLine(x, y - 5, x, y + 5);
-          }
+        // draw points which are not under cross
+        if (x != (p_width - 1) / 2 || y != (p_height - 1) / 2) {
+          painter.drawLine(x - 5, y, x + 5, y);
+          painter.drawLine(x, y - 5, x, y + 5);
         }
       }
     }
@@ -445,6 +451,18 @@ namespace Isis {
       reloadChip(p_chip->CubeSample(), p_chip->CubeLine());
       emit userMovedTackPoint();
     }
+  }
+
+
+  //!<  Slot to set whether control points are drawn
+  void ChipViewport::setPoints(bool checked) {
+
+    if (checked == p_showPoints)
+      return;
+
+    p_showPoints = checked;
+    repaint();
+
   }
 
 
