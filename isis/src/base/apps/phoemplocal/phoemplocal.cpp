@@ -535,11 +535,11 @@ void GetHapkeImgLocation(PhotoModel *pHapke, AtmosModel *pAsmModel, HapkeArrs & 
       
       // Note that incidence and emission Datum replace inc and ema in Atmospheric Models
       //ISOTROPIC1, ISOTROPIC2, ANISOTROPIC1, ANISOTROPIC2
-      double pstd=0, trans=0, trans0=0, sbar=0;
+      double pstd=0, trans=0, trans0=0, sbar=0, transs=0;
       double ahi=0;
       if (pAsmModel != NULL) {
         pAsmModel->CalcAtmEffect(pDatum.m_phase, pDatum.m_incidence, pDatum.m_emission,
-                                 &pstd, &trans, &trans0, &sbar);
+                                 &pstd, &trans, &trans0, &sbar, &transs);
         
         //R8SPLINT(INCTABLE,AHTABLE,AHTABLE2,NINC,INCDAT,AHI)
         ahi = (pAsmModel->AtmosAhSpline()).Evaluate(pDatum.m_incidence, NumericalApproximation::Extrapolate);

@@ -452,14 +452,14 @@ void GetHapkeImage(PhotoModel *hapkeModel, AtmosModel *pAsmModel, double **hapke
   double inc=0e0;
   double ema=0e0;
   double ahi;
-  double pstd=0e0, trans=0e0, trans0=0e0, sbar=0e0;
+  double pstd=0e0, trans=0e0, trans0=0e0, sbar=0e0, transs=0e0;
 
   for (int j=0; j<NL; j++) {
     for (int i=0; i<NS; i++) {
       if (PhaseGetAngles(j, i, phase, inc, ema) && ema <= emaMax) {
         hapkeImg[i][j] = hapkeModel->CalcSurfAlbedo(phase, inc, ema);
         if (pAsmModel != NULL) {
-          pAsmModel->CalcAtmEffect(phase, inc, ema, &pstd, &trans, &trans0, &sbar);
+          pAsmModel->CalcAtmEffect(phase, inc, ema, &pstd, &trans, &trans0, &sbar, &transs);
           ahi = (pAsmModel->AtmosAhSpline()).Evaluate(inc, NumericalApproximation::Extrapolate);
           munot = cos(DEG2RAD * inc);
           hapkeImg[i][j] = pstd + trans * munot * ahi / 
