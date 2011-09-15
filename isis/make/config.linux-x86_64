@@ -56,7 +56,7 @@ ISISARFLAGS     =
 #---------------------------------------------------------------------------
 ISIS3SYSINC ?= /usr/include
 ISIS3SYSLIB ?= /usr/lib64
-ISIS3LOCAL  ?= /usgs/pkgs/local/isis$(ISISVERSION)
+ISIS3LOCAL  ?= /usgs/pkgs/local/$(ISISLOCALVERSION)
 
 #---------------------------------------------------------------------------
 # Set up for cwd

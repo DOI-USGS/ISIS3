@@ -63,7 +63,7 @@ ISISARFLAGS     =
 #  3rd party directory root
 #---------------------------------------------------------------------------
 ISIS3OPT       ?= /opt/local
-ISIS3LOCAL     ?= /usgs/pkgs/local/isis$(ISISVERSION)
+ISIS3LOCAL     ?= /usgs/pkgs/local/$(ISISLOCALVERSION)
 
 #---------------------------------------------------------------------------
 # Set up for cwd

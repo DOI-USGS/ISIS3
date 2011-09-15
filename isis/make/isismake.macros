@@ -155,6 +155,7 @@ ISISMINORMINOR       := $(shell $(ECHO) $(ISISVERSIONFULL) | $(CUT) -d"." -f3)
 ISISMINORMINORMINOR  := $(shell $(ECHO) $(ISISVERSIONFULL) | $(CUT) -d"." -f4)
 ISISVERSION          := $(ISISMAJOR).$(ISISMINOR).$(ISISMINORMINOR).$(ISISMINORMINORMINOR)
 ISISLIBVERSION       := $(shell echo $(ISISMAJOR).$(ISISMINOR).$(ISISMINORMINOR) | sed 's/[a-z].*$$//')
+ISISLOCALVERSION     := $(shell head -n 3 $(ISISROOT)/version | tail -n 1)
 ISISRELEASE          := REL_0_0
 
 #---------------------------------------------------------------------------
