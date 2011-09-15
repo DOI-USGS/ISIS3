@@ -41,7 +41,6 @@ namespace Isis {
    *     Tau = 0.7
    *     Tauref = 0.0
    *     Wha = 0.5
-   *     Wharef = 0.0
    *     Hnorm = 0.003
    *     Nulneg = NO
    *   EndGroup
