@@ -97,6 +97,7 @@ namespace Isis {
       p_trans = 1.0;
       p_trans0 = 1.0;
       p_sbar = 0.0;
+      p_transs = 1.0;
       return;
     }
 
@@ -255,6 +256,17 @@ namespace Isis {
 
     // finally, never-scattered term is given by pure attenuation
     p_trans0 = emunot * emu;
+
+    // Calculate the transmission of light that must be subtracted from a
+    // shadow. This includes direct flux and the scattered flux in the 
+    // upsun half of the sky downwelling onto the surface, and the usual
+    // transmission upward. NOTE: We need to derive the analytic expression
+    // for the light from half the sky in the Legendre scattering model. Until
+    // we do so, we are setting the shadow transmission to the purely 
+    // unscattered part (same as trans0). This will give a result but is
+    // not fully consistent with how the other scattering models are
+    // implemented.
+    p_transs = p_trans0;
   }
 }
 

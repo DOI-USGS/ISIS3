@@ -16,6 +16,7 @@ int main() {
   double pstd;
   double trans;
   double trans0;
+  double transs;
   double sbar;
 
   std::cout << "UNIT TEST for Anisotropic1 atmospheric function" <<
@@ -47,7 +48,7 @@ int main() {
 
     am->SetStandardConditions(true);
     std::cout << "Test phase=0.0, incidence=0.0, emission=0.0 (standard conditions) ..." << std::endl;
-    am->CalcAtmEffect(0.0, 0.0, 0.0, &pstd, &trans, &trans0, &sbar);
+    am->CalcAtmEffect(0.0, 0.0, 0.0, &pstd, &trans, &trans0, &sbar, &transs);
     std::cout << "Pstd = " << pstd << std::endl;
     std::cout << "Trans = " << trans << std::endl;
     std::cout << "Trans0 = " << trans0 << std::endl;
@@ -55,14 +56,14 @@ int main() {
     am->SetStandardConditions(false);
 
     std::cout << "Test phase=86.7226722, incidence=51.7002388, emission=38.9414439 ..." << std::endl;
-    am->CalcAtmEffect(86.7226722, 51.7002388, 38.9414439, &pstd, &trans, &trans0, &sbar);
+    am->CalcAtmEffect(86.7226722, 51.7002388, 38.9414439, &pstd, &trans, &trans0, &sbar, &transs);
     std::cout << "Pstd = " << pstd << std::endl;
     std::cout << "Trans = " << trans << std::endl;
     std::cout << "Trans0 = " << trans0 << std::endl;
     std::cout << "Sbar = " << sbar << std::endl << std::endl;
 
     std::cout << "Test phase=180.0, incidence=90.0, emission=90.0 ..." << std::endl;
-    am->CalcAtmEffect(180.0, 90.0, 90.0, &pstd, &trans, &trans0, &sbar);
+    am->CalcAtmEffect(180.0, 90.0, 90.0, &pstd, &trans, &trans0, &sbar, &transs);
     std::cout << "Pstd = " << pstd << std::endl;
     std::cout << "Trans = " << trans << std::endl;
     std::cout << "Trans0 = " << trans0 << std::endl;
