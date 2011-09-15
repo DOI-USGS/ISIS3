@@ -43,7 +43,8 @@ namespace Isis {
    *                      use by MoonAlbedo normalization.
    *  @history 2008-06-18 Steven Koechle - Fixed Documentation Errors
    *  @history 2008-07-09 Steven Lambright - Fixed unit test
-   *  @history 2011-08-19 Sharmila Prasad - Implemented r8mnbrak and r8brent Functions
+   *  @history 2011-08-19 Sharmila Prasad - Implemented brentminimizer using GSL
+   *  @history 2011-09-15 Sharmila Prasad - Implemented brent's root solver using GSL
    */
   class Photometry {
     public:
@@ -61,17 +62,8 @@ namespace Isis {
       //! Set the wavelength
       virtual void SetPhotomWl(double wl);
 
-      /**
-       * Double precision version of bracketing algorithm ported from Python.
-       * Solution bracketing for 1-D minimization routine.
-       * 
-       * @author Sharmila Prasad (8/20/2011)
-       * 
-       * @param x_lower - lower starting interval 
-       * @param x_upper - upper starting interval
-       * 
-       * @return double - starting minimum
-       */
+      //! Double precision version of bracketing algorithm ported from Python.
+      //! Solution bracketing for 1-D minimization routine.
       static void minbracket(double &xa, double &xb, double &xc, double &fa,
           double &fb, double &fc, double Func(double par, void *params),
           void *params);
@@ -79,6 +71,10 @@ namespace Isis {
       //! Brent's method 1-D minimization routine using GSL's r8Brent minimization Algorithm
       static int brentminimizer(double x_lower, double x_upper, gsl_function *Func, 
           double & x_minimum, double tolerance);
+      
+      //! GSL's the Brent-Dekker method (Brent's method) combines an interpolation strategy 
+      //! with the bisection algorithm to estimate the root of the quadratic function.
+      static int brentsolver(double x_lo, double x_hi, gsl_function *Func, double tolerance, double &root);
 
       PhotoModel *GetPhotoModel() const {
         return p_phtPmodel;

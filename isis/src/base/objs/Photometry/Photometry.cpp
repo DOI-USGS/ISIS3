@@ -99,6 +99,58 @@ namespace Isis {
   }
   
   /**
+   * GSL's the Brent-Dekker method (referred to here as Brent's method) combines an
+   * interpolation strategy with the bisection algorithm. This produces a fast algorithm
+   * which is still robust.On each iteration Brent's method approximates the function
+   * using an interpolating curve. On the first iteration this is a linear interpolation
+   * of the two endpoints. For subsequent iterations the algorithm uses an inverse quadratic
+   * fit to the last three points, for higher accuracy. The intercept of the interpolating
+   * curve with the x-axis is taken as a guess for the root. If it lies within the bounds
+   * of the current interval then the interpolating point is accepted, and used to generate
+   * a smaller interval. If the interpolating point is not accepted then the algorithm falls
+   * back to an ordinary bisection step. 
+   *  
+   * The best estimate of the root is taken from the most recent interpolation or bisection. 
+   * 
+   * @author Sharmila Prasad (9/15/2011)
+   * 
+   * @param x_lo      - Initial lower search interval 
+   * @param x_hi      - Initial higher search interval 
+   * @param Func      - Continuous function of one variable for the root finders to operate on
+   * @param tolerance - Root Error Tolerance
+   * @param root      - Output calculated root
+   * 
+   * @return int      - Algorithm status
+   */
+  int Photometry::brentsolver(double x_lo, double x_hi, gsl_function *Func, double tolerance, double &root){
+    int status;
+    int iter=0, max_iter=100;
+    const gsl_root_fsolver_type *T;
+    gsl_root_fsolver *s;
+    
+    T = gsl_root_fsolver_brent;
+    s = gsl_root_fsolver_alloc (T);
+    gsl_root_fsolver_set(s, Func, x_lo, x_hi);
+    
+    do {
+      iter++;
+      status = gsl_root_fsolver_iterate(s);
+      root   = gsl_root_fsolver_x_lower(s);
+      x_lo   = gsl_root_fsolver_x_lower(s);
+      x_hi   = gsl_root_fsolver_x_upper(s);
+      status = gsl_root_test_interval(x_lo, x_hi, 0, tolerance);
+      
+      if (status == GSL_SUCCESS) {
+        cerr << "Converged\n";
+      }
+      
+    } while (status != GSL_SUCCESS && iter < max_iter);
+    
+    gsl_root_fsolver_free(s);
+    return status;
+  }
+  
+  /**
    * The Brent minimization algorithm combines a parabolic interpolation with the golden section algorithm.
    * This produces a fast algorithm which is still robust. The outline of the algorithm can be summarized as 
    * follows: on each iteration Brent's method approximates the function using an interpolating parabola 
