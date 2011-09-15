@@ -5,7 +5,6 @@
 #include "iTime.h"
 #include "iException.h"
 #include "TextFile.h"
-#include "LineManager.h"
 #include "Brick.h"
 #include "Table.h"
 #include "Statistics.h"

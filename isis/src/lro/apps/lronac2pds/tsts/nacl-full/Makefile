@@ -1,5 +1,5 @@
 APPNAME = lronac2pds
-FILE=nacl00015d79
+FILE=nacl00020d3a
 
 include $(ISISROOT)/make/isismake.tsts
 
