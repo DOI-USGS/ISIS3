@@ -113,6 +113,7 @@ namespace Isis {
     public:
       ControlPointEdit(ControlNet * cnetQ, QWidget *parent = 0,
                        bool allowLeftMouse = false);
+      ~ControlPointEdit();
       std::string templateFilename() {
         return p_templateFilename;
       };
@@ -132,6 +133,7 @@ namespace Isis {
       void setRightMeasure(ControlMeasure *rightMeasure,
                            Cube *rightCube, std::string pointId);
       void colorizeSaveButton();
+      void refreshChips();
       void saveChips();
 
     protected slots:

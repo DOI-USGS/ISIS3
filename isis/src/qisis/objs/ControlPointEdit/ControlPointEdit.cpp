@@ -82,6 +82,17 @@ namespace Isis {
   }
 
 
+
+  ControlPointEdit::~ControlPointEdit () {
+
+    delete p_leftChip;
+    p_leftChip = NULL;
+    delete p_rightChip;
+    p_rightChip = NULL;
+  }
+
+
+
   /**
    * Design the PointEdit widget
    *
@@ -387,6 +398,11 @@ namespace Isis {
     connect(p_dial, SIGNAL(valueChanged(int)), p_dialNumber, SLOT(display(int)));
     connect(p_dial, SIGNAL(valueChanged(int)), p_rightView, SLOT(rotateChip(int)));
 
+    QCheckBox *showPoints = new QCheckBox("Show control points");
+    connect(showPoints, SIGNAL(toggled(bool)), p_leftView, SLOT(setPoints(bool)));
+    connect(showPoints, SIGNAL(toggled(bool)), p_rightView, SLOT(setPoints(bool)));
+    showPoints->setChecked(true);
+
     QCheckBox *cross = new QCheckBox("Show crosshair");
     connect(cross, SIGNAL(toggled(bool)), p_leftView, SLOT(setCross(bool)));
     connect(cross, SIGNAL(toggled(bool)), p_rightView, SLOT(setCross(bool)));
@@ -411,6 +427,7 @@ namespace Isis {
     vlayout->addWidget(rotate);
     vlayout->addWidget(p_dial);
     vlayout->addWidget(p_dialNumber);
+    vlayout->addWidget(showPoints);
     vlayout->addWidget(cross);
     vlayout->addWidget(circle);
     vlayout->addWidget(p_slider);
@@ -1271,6 +1288,12 @@ namespace Isis {
     p_allowLeftMouse = allowMouse;
   }
 
+
+
+  void ControlPointEdit::refreshChips() {
+    p_leftView->update();
+    p_rightView->update();
+  }
 
 
 
