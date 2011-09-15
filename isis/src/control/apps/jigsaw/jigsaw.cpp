@@ -127,40 +127,43 @@ void IsisMain() {
     b->ControlNet()->Write(ui.GetFilename("ONET"));
     PvlGroup gp("JigsawResults");
 
-    // Update the cube pointing if requested
-    if (ui.GetBoolean("UPDATE")) {
+    // Update the cube pointing if requested but ONLY if bundle has converged
+    if (ui.GetBoolean("UPDATE") ) {
+      if ( !b->IsConverged() )
+        gp += PvlKeyword("Status","Bundle did not converge, camera pointing NOT updated");
+      else {
+        for (int i = 0; i < b->Images(); i++) {
+          Process p;
+          CubeAttributeInput inAtt;
+          Cube *c = p.SetInputCube(b->Filename(i), inAtt, ReadWrite);
+          //check for existing polygon, if exists delete it
+          if (c->getLabel()->HasObject("Polygon")) {
+            c->getLabel()->DeleteObject("Polygon");
+          }
 
-      for (int i = 0; i < b->Images(); i++) {
-        Process p;
-        CubeAttributeInput inAtt;
-        Cube *c = p.SetInputCube(b->Filename(i), inAtt, ReadWrite);
-        //check for existing polygon, if exists delete it
-        if (c->getLabel()->HasObject("Polygon")) {
-          c->getLabel()->DeleteObject("Polygon");
+          // check for CameraStatistics Table, if exists, delete
+          for (int iobj = 0; iobj < c->getLabel()->Objects(); iobj++) {
+            PvlObject obj = c->getLabel()->Object(iobj);
+            if (obj.Name() != "Table") continue;
+            if (obj["Name"][0] != iString("CameraStatistics")) continue;
+            c->getLabel()->DeleteObject(iobj);
+            break;
+          }
+
+          //  Get Kernel group and add or replace LastModifiedInstrumentPointing
+          //  keyword.
+          if (b->IsHeld(i)) continue;   // Don't update held images at all
+          Table cmatrix = b->Cmatrix(i);
+          std::string jigComment = "Jigged = " + Isis::iTime::CurrentLocalTime();
+          cmatrix.Label().AddComment(jigComment);
+          Table spvector = b->SpVector(i);
+          spvector.Label().AddComment(jigComment);
+          c->write(cmatrix);
+          c->write(spvector);
+          p.WriteHistory(*c);
         }
-
-        //check for CameraStatistics Table, if exists, delete
-        for (int iobj = 0; iobj < c->getLabel()->Objects(); iobj++) {
-          PvlObject obj = c->getLabel()->Object(iobj);
-          if (obj.Name() != "Table") continue;
-          if (obj["Name"][0] != iString("CameraStatistics")) continue;
-          c->getLabel()->DeleteObject(iobj);
-          break;
-        }
-
-        //  Get Kernel group and add or replace LastModifiedInstrumentPointing
-        //  keyword.
-        if (b->IsHeld(i)) continue;   // Don't update held images at all
-        Table cmatrix = b->Cmatrix(i);
-        std::string jigComment = "Jigged = " + Isis::iTime::CurrentLocalTime();
-        cmatrix.Label().AddComment(jigComment);
-        Table spvector = b->SpVector(i);
-        spvector.Label().AddComment(jigComment);
-        c->write(cmatrix);
-        c->write(spvector);
-        p.WriteHistory(*c);
+        gp += PvlKeyword("Status", "Camera pointing updated");
       }
-      gp += PvlKeyword("Status", "Camera pointing updated");
     }
     else {
       gp += PvlKeyword("Status", "Camera pointing NOT updated");
