@@ -122,6 +122,32 @@ namespace Isis {
     return (pnt2.isValid());
   }
 
+  /**
+   * @brief Set file pattern for output subsearch chips 
+   *  
+   * This method should be used to set the output subsearch chip 
+   * file pattern that will be used to write the transformed chip 
+   * at each Gruen iteration.  This is handy to test the pattern 
+   * chip with the Gruen algorithm search chip.  A chip will be 
+   * generated for each search chip that is transformed for the 
+   * current iteration. 
+   *  
+   * Note this pattern is only validate for the next call to 
+   * Register().  It will be reset so that chips are not 
+   * automatically written for every call to Register().
+   *  
+   * The pattern can be complete directory path and a file 
+   * pattern.  See Gruen for a complete description. 
+   * 
+   * @author kbecker (9/15/2011)
+   * 
+   * @param pattern Set the file pattern of the output cube search 
+   *                chips.
+   */
+  void SmtkMatcher::setWriteSubsearchChipPattern(const std::string &fileptrn) {
+    validate();
+    m_gruen->WriteSubsearchChips(fileptrn);
+  }
 
   /**
    * @brief Find the smallest eigen value on the given stack

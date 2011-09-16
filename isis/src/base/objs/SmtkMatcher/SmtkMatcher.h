@@ -81,6 +81,8 @@ class SmtkMatcher {
       return (m_gruen->FitChip());
     }
 
+    void setWriteSubsearchChipPattern(const std::string &fileptrn = "SmtkMatcher");
+
     SmtkQStackIter FindSmallestEV(SmtkQStack &stack);
     SmtkQStackIter FindExpDistEV(SmtkQStack &stack, const double &seedsample, 
                                  const double &minEV, const double &maxEV);
