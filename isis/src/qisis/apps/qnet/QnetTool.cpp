@@ -1478,6 +1478,12 @@ namespace Isis {
       }
     }
 
+    if (pointFiles.count() == 0) {
+      QString message = "Point does not intersect any images.";
+      QMessageBox::critical(p_qnetTool, "No intersection", message);
+      return;
+    }
+
     QnetFixedPointDialog *fixedPointDialog = new QnetFixedPointDialog();
     fixedPointDialog->SetFiles(pointFiles);
     if (fixedPointDialog->exec()) {

@@ -100,22 +100,33 @@ namespace Isis {
    *  
    * @author 2010-11-10 Tracie Sucharski 
    *  
-   * @internal
+   * @internal 
+   * @history 2011-09-16 Tracie Sucharski - List images that insersect 
+   *                        point at the top of the list. 
    */
   void QnetFixedPointDialog::SetFiles (QStringList &pointFiles) {
     //  TODO::  make pointFiles const???
     p_pointFiles = &pointFiles;
 
+    int bottomMostSelectedItemIndex = 0;
+
     //  Add all files to list , selecting those in pointFiles which are
     //  those files which contain the point.
     for (int i=0; i<g_serialNumberList->Size(); i++) {
-      QListWidgetItem *item = new QListWidgetItem(fileList);
-      item->setText(g_serialNumberList->Filename(i).c_str());
-      if (p_pointFiles->contains(g_serialNumberList->Filename(i).c_str())) {
-        fileList->setItemSelected(item,true);
+      iString label = g_serialNumberList->Filename(i);
+      QListWidgetItem *item = new QListWidgetItem(label);
+
+      // if this entry of the SerialNumberList is also in the pointFiles then
+      // mark it as selected and insert after the last selected item (toward
+      // the top of the list).  Otherwise just add the item to the end of the
+      // list
+      if (pointFiles.contains(label)) {
+        fileList->insertItem(bottomMostSelectedItemIndex++, item);
+        item->setSelected(true);
       }
-//        int pos = p_pointFiles->indexOf(g_serialNumberList->Filename(i).c_str());
-//        if (pos != -1) fileList->setItemSelected(item,true);
+      else {
+        fileList->addItem(item);
+      }
     }
   }
 
