@@ -22,25 +22,12 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-
-#include <QAction>
-#include <QListWidget>
-#include <QComboBox>
-#include <QDialog>
-#include <QStackedWidget>
-#include <QLabel>
-#include <QStringList>
-#include "Tool.h"
 #include "FileTool.h"
-#include "SerialNumberList.h"
-#include "ControlNet.h"
-#include "Projection.h"
+
 
 namespace Isis {
+  class ControlNet;
   class Cube;
-}
-
-namespace Isis {
 
   /**
    * @brief Qtie File operations
@@ -59,7 +46,7 @@ namespace Isis {
       Q_OBJECT
 
     signals:
-      void cubesOpened(Cube &baseCube, Cube &matchCube, ControlNet &cnet);
+      void cubesOpened(Cube *baseCube, Cube *matchCube, ControlNet *cnet);
       void newFiles();
 
     public:

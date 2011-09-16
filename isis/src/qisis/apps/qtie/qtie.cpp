@@ -65,8 +65,8 @@ int main(int argc, char *argv[]) {
     tieTool->addTo(mw);
     tieTool->activate(true);
 
-    QObject::connect(ftool, SIGNAL(cubesOpened(Cube &, Cube &, ControlNet &)),
-                     tieTool, SLOT(setFiles(Cube &, Cube &, ControlNet &)));
+    QObject::connect(ftool, SIGNAL(cubesOpened(Cube *, Cube *, ControlNet *)),
+                     tieTool, SLOT(setFiles(Cube *, Cube *, ControlNet *)));
 
     QObject::connect(ftool, SIGNAL(newFiles()), tieTool, SLOT(clearFiles()));
 

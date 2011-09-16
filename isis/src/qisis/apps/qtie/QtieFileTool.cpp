@@ -15,6 +15,8 @@
 #include <QPainter>
 
 #include "Application.h"
+#include "Camera.h"
+#include "ControlNet.h"
 #include "Cube.h"
 #include "Filename.h"
 #include "MainWindow.h"
@@ -140,6 +142,8 @@ namespace Isis {
         QMessageBox::critical((QWidget *)parent(), "Error", message);
       }
     }
+    // Find target
+    iString target = matchCube->getCamera()->Target();
     matchCube->close();
 
     // Find directory and save for use in file dialog for match cube
@@ -157,9 +161,10 @@ namespace Isis {
     ControlNet *cnet;
     if (cnetFile.isEmpty()) {
       cnet = new ControlNet();
-      //cnet->SetType(ControlNet::ImageToGround);
       cnet->SetNetworkId("Qtie");
       cnet->SetUserName(Application::UserName());
+      //  Set control net target
+      cnet->SetTarget(target);
     }
     else {
       try {
@@ -175,6 +180,7 @@ namespace Isis {
         return;
       }
     }
+
     QApplication::restoreOverrideCursor();
 
     QApplication::setOverrideCursor(Qt::WaitCursor);
@@ -182,11 +188,10 @@ namespace Isis {
     baseCube = (*(cubeViewportList()))[0]->cube();
     QApplication::restoreOverrideCursor();
 
-
     QApplication::setOverrideCursor(Qt::WaitCursor);
     emit fileSelected(matchFile);
     matchCube = (*(cubeViewportList()))[1]->cube();
-    emit cubesOpened(*baseCube, *matchCube, *cnet);
+    emit cubesOpened(baseCube, matchCube, cnet);
     QApplication::restoreOverrideCursor();
 
     return;

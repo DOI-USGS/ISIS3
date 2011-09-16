@@ -27,6 +27,7 @@
 #include "AutoRegFactory.h"
 #include "BundleAdjust.h"
 #include "ControlMeasure.h"
+#include "Distance.h"
 #include "Filename.h"
 #include "History.h"
 #include "iString.h"
@@ -79,7 +80,7 @@ namespace Isis {
     p_controlPoint = NULL;
 
     p_twist = true;
-    p_tolerance = 5;
+    p_sigma0 = 1.0e-10;
     p_maxIterations = 10;
     p_ptIdIndex = 0;
     createQtieTool(parent);
@@ -124,7 +125,7 @@ namespace Isis {
     itLayout->addWidget(iteration);
 
 
-    QLabel *tolLabel = new QLabel("Tolerance");
+    QLabel *tolLabel = new QLabel("Sigma0");
     p_tolValue = new QLineEdit();
     tolLabel->setBuddy(p_tolValue);
     QHBoxLayout *tolLayout = new QHBoxLayout();
@@ -132,9 +133,9 @@ namespace Isis {
     tolLayout->addWidget(p_tolValue);
 //    QDoubleValidator *dval = new QDoubleValidator
     QString tolStr;
-    tolStr.setNum(p_tolerance);
+    tolStr.setNum(p_sigma0);
     p_tolValue->setText(tolStr);
-//    connect(p_tolValue,SIGNAL(valueChanged()),this,SLOT(setTolerance()));
+//    connect(p_tolValue,SIGNAL(valueChanged()),this,SLOT(setSigma0()));
 
     QHBoxLayout *options = new QHBoxLayout();
     options->addWidget(twist);
@@ -148,7 +149,7 @@ namespace Isis {
 
     p_pointEditor = new ControlPointEdit(NULL, parent, true);
     gridLayout->addWidget(p_pointEditor, row++, 0, 1, 3);
-    connect(p_pointEditor, SIGNAL(pointSaved()), this, SLOT(pointSaved()));
+    connect(p_pointEditor, SIGNAL(measureSaved()), this, SLOT(measureSaved()));
     p_pointEditor->show();
     connect(this,
             SIGNAL(stretchChipViewport(Stretch *, CubeViewport *)),
@@ -247,15 +248,15 @@ namespace Isis {
    * @param matchCube  Input  Match cube
    *
    */
-  void QtieTool::setFiles(Cube &baseCube, Cube &matchCube, ControlNet &cnet) {
+  void QtieTool::setFiles(Cube *baseCube, Cube *matchCube, ControlNet *cnet) {
     //  Save off base map cube, but add matchCube to serial number list
-    p_baseCube = &baseCube;
-    p_matchCube = &matchCube;
-    p_controlNet = &cnet;
+    p_baseCube = baseCube;
+    p_matchCube = matchCube;
+    p_controlNet = cnet;
     p_baseSN = SerialNumber::Compose(*p_baseCube, true);
     p_matchSN = SerialNumber::Compose(*p_matchCube);
 
-    p_serialNumberList->Add(matchCube.getFilename());
+    p_serialNumberList->Add(matchCube->getFilename());
 
     //  Save off universal ground maps
     try {
@@ -270,7 +271,7 @@ namespace Isis {
       return;
     }
     try {
-      p_matchGM = new UniversalGroundMap(matchCube);
+      p_matchGM = new UniversalGroundMap(*matchCube);
     }
     catch (iException &e) {
       QString message = "Cannot initialize universal ground map for match cube.\n";
@@ -283,9 +284,9 @@ namespace Isis {
 
     //  If Control Net has points, set the basemap measures, since they are not
     //  saved in the net file.
-    if (cnet.GetNumPoints() != 0) {
-      for (int i = 0; i < cnet.GetNumPoints(); i++) {
-        ControlPoint &p = *cnet[i];
+    if (cnet->GetNumPoints() != 0) {
+      for (int i = 0; i < cnet->GetNumPoints(); i++) {
+        ControlPoint &p = *(*cnet)[i];
         double baseSamp, baseLine;
 
 
@@ -314,9 +315,8 @@ namespace Isis {
         ControlMeasure *mB = new ControlMeasure;
         mB->SetCubeSerialNumber(p_baseSN);
         mB->SetCoordinate(baseSamp, baseLine);
-//        mB->SetType(ControlMeasure::Estimated);
         mB->SetDateTime();
-        mB->SetChooserName();
+        mB->SetChooserName(Application::UserName());
         mB->SetIgnored(true);
 
         p.Add(mB);
@@ -352,20 +352,43 @@ namespace Isis {
 
 
   /**
-   * Save control point under crosshairs of ChipViewports
+   * Save control measures under crosshairs of ChipViewports
    *
    */
-  void QtieTool::pointSaved() {
+  void QtieTool::measureSaved() {
     //  Get sample/line from base map and find lat/lon
     double samp = p_controlPoint->GetMeasure(Base)->GetSample();
     double line = p_controlPoint->GetMeasure(Base)->GetLine();
-
     p_baseGM->SetImage(samp, line);
-    Latitude lat(p_baseGM->UniversalLatitude(), Angle::Degrees);
-    Longitude lon(p_baseGM->UniversalLongitude(), Angle::Degrees);
-    Distance radius(p_baseGM->Projection()->LocalRadius(), Distance::Meters);
+    double lat = p_baseGM->UniversalLatitude();
+    double lon = p_baseGM->UniversalLongitude();
 
-    p_controlPoint->SetAprioriSurfacePoint(SurfacePoint(lat, lon, radius));
+    //  TODO:  Do not know if radius came from DEM (if cube spiceinit'ed
+    //   with DEM) or from ellipsoid.  Once change made to camera to return
+    //   DEM filename, update the point aprioiRadiusSource parameters.
+    p_matchGM->SetGround(
+              Latitude(lat, Angle::Degrees), Longitude(lon, Angle::Degrees));
+    Distance radius = p_matchGM->Camera()->LocalRadius();
+    if (!radius.Valid()) {
+      QString message = "Could not determine radius from DEM at lat/lon ["
+          + QString::number(lat) + "," + QString::number(lon) + "]";
+      QMessageBox::critical((QWidget *)parent(),"Error",message);
+      return;
+    }
+    try {
+      p_controlPoint->SetAprioriSurfacePoint(SurfacePoint(
+                Latitude(lat, Angle::Degrees), Longitude(lon, Angle::Degrees),
+                radius));
+    }
+    catch (iException &e) {
+      QString message = "Unable to set Apriori Surface Point.\n";
+      message += "Latitude = " + QString::number(lat);
+      message += "  Longitude = " + QString::number(lon);
+      message += "  Radius = " + QString::number(radius.GetMeters()) + "\n";
+      message += e.Errors().c_str();
+      QMessageBox::critical((QWidget *)parent(),"Error",message);
+      e.Clear();
+    }
 
     emit editPointChanged();
   }
@@ -529,25 +552,23 @@ namespace Isis {
       }
     }
 
-
-//    newPoint->SetUniversalGround(lat, lon, radius);
-//    newPoint->SetType(ControlPoint::Ground);
+    newPoint->SetType(ControlPoint::Fixed);
 
     // Set first measure to match
     ControlMeasure *mM = new ControlMeasure;
     mM->SetCubeSerialNumber(p_matchSN);
     mM->SetCoordinate(matchSamp, matchLine);
-//    mM->SetType(ControlMeasure::Estimated);
+    mM->SetType(ControlMeasure::Manual);
     mM->SetDateTime();
-    mM->SetChooserName();
+    mM->SetChooserName(Application::UserName());
     newPoint->Add(mM);
     //  Second measure is base measure, set to Ignore=yes
     ControlMeasure *mB = new ControlMeasure;
     mB->SetCubeSerialNumber(p_baseSN);
     mB->SetCoordinate(baseSamp, baseLine);
-//    mB->SetType(ControlMeasure::Estimated);
+    mB->SetType(ControlMeasure::Manual);
     mB->SetDateTime();
-    mB->SetChooserName();
+    mB->SetChooserName(Application::UserName());
     mB->SetIgnored(true);
     newPoint->Add(mB);
 
@@ -693,8 +714,8 @@ namespace Isis {
    */
   void QtieTool::solve() {
 
-    //  First off , get tolerance,  NEED to VALIDATE
-    p_tolerance = p_tolValue->text().toDouble();
+    //  First off , get sigma0,  NEED to VALIDATE
+    p_sigma0 = p_tolValue->text().toDouble();
 
     //  Need at least 2 points to solve for twist
     if (p_twist) {
@@ -704,38 +725,54 @@ namespace Isis {
         return;
       }
     }
+
+    //  Create temporary network for solution which will not contain measures for
+    //  the basemap.
     ControlNet net;
+    net.SetTarget(p_matchCube->getCamera()->Target());
 
     // Bundle adjust to solve for new pointing
     try {
       //  Create new control net for bundle adjust , deleting ignored measures
       for (int p = 0; p < p_controlNet->GetNumPoints(); p++) {
         ControlPoint *pt = new ControlPoint(*p_controlNet->GetPoint(p));
-        for (int m = 0; m < pt->GetNumMeasures(); m++) {
-          if (pt->GetMeasure(m)->SetIgnored(true))
-            pt->Delete(m);
-        }
+        pt->Delete(p_baseSN);
         net.AddPoint(pt);
       }
 
       BundleAdjust b(net, *p_serialNumberList, false);
       b.SetSolveTwist(p_twist);
-      //b.Solve(p_tolerance, p_maxIterations);
-      b.Solve();
+      b.SetSolveCmatrix(BundleAdjust::AnglesOnly);
+      b.SetSolveSpacecraftPosition(BundleAdjust::Nothing);
+      b.SetErrorPropagation(false);
+      b.SetOutlierRejection(false);
+      b.SetSolutionMethod("SPECIALK");
+      b.SetStandardOutput(false);
+      b.SetCSVOutput(false);
+      b.SetResidualOutput(false);
+      b.SetConvergenceThreshold(p_sigma0);
+      b.SetMaxIterations(p_maxIterations);
+
+      b.SetDecompositionMethod(BundleAdjust::SPECIALK);
+      b.SolveCholesky();
 
       // Print results and give user option of updating cube pointin
-//      double maxError = net.MaximumResidual();
-//      double avgError = net.AverageResidual();
       double maxError = net.GetMaximumResidual();
       double avgError = net.AverageResidual();
 
       QString message = "Maximum Error = " + QString::number(maxError);
       message += "\nAverage Error = " + QString::number(avgError);
       QString msgTitle = "Update camera pointing?";
-      QMessageBox msgBox(QMessageBox::Question, msgTitle, message, 0, p_tieTool);
+//      QDialog resultsDialog((QWidget *)parent(),"Bundle Adjust Summary",true);
+
+      QMessageBox msgBox(QMessageBox::Question, msgTitle, message, 0, p_tieTool,
+                         Qt::Dialog);
       QPushButton *update = msgBox.addButton("Update", QMessageBox::AcceptRole);
       QPushButton *close = msgBox.addButton("Close", QMessageBox::RejectRole);
+      msgBox.setDetailedText(b.IterationSummaryGroup());
       msgBox.setDefaultButton(close);
+      msgBox.setMinimumWidth(5000);
+      //msgBox.setSizeGripEnabled(true);
       msgBox.exec();
       if (msgBox.clickedButton() == update) {
         p_matchCube->reopen("rw");
@@ -886,7 +923,6 @@ namespace Isis {
             if (pt->GetMeasure(m)->IsIgnored())
               pt->Delete(m);
           }
-//          net.SetType(ControlNet::ImageToGround);
           net.SetTarget(p_matchCube->getCamera()->Target());
           net.SetNetworkId("Qtie");
           net.SetUserName(Application::UserName());

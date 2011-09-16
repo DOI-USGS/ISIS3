@@ -64,7 +64,7 @@ namespace Isis {
       void stretchChipViewport(Stretch *, CubeViewport *);
 
     public slots:
-      void setFiles(Cube &baseCube, Cube &matchCube, ControlNet &cnet);
+      void setFiles(Cube *baseCube, Cube *matchCube, ControlNet *cnet);
       void clearFiles();
       void createPoint(double lat, double lon);
       void modifyPoint(ControlPoint *point);
@@ -82,7 +82,7 @@ namespace Isis {
       void writeNewCmatrix(Table *cmatrix);
       void saveNet();
 
-      void pointSaved();
+      void measureSaved();
 
       void setTemplateFile();
       void viewTemplateFile();
@@ -93,7 +93,7 @@ namespace Isis {
       void setIterations(int maxIterations) {
         p_maxIterations = maxIterations;
       };
-      //void setTolerance () { p_tolerance = p_tolValue->text().toDouble(); };
+      //void setSigma0 () { p_sigma0 = p_tolValue->text().toDouble(); };
 
     private:
       void createQtieTool(QWidget *parent);
@@ -132,7 +132,7 @@ namespace Isis {
       UniversalGroundMap *p_matchGM;
 
       bool p_twist;
-      double p_tolerance;
+      double p_sigma0;
       int p_maxIterations;
 
   };
