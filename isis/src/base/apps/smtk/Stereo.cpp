@@ -178,7 +178,7 @@ namespace Isis {
 
    double *Stereo::StdVec2Array(const std::vector<double> &v, double *d) {
      if ( d == NULL ) {
-       d = new double(v.size());
+       d = new double[v.size()];
      }
 
      for ( unsigned int i = 0 ; i < v.size() ; i++ ) {
