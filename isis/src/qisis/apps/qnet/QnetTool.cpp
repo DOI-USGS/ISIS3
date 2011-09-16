@@ -581,7 +581,7 @@ namespace Isis {
    *                          with qnet windows blinking due to refresh.
    */
   void QnetTool::measureSaved() {
-
+    cout<<"QnetTool::measureSaved()"<<endl;
     // Read original measures from the network for comparison with measures
     // that have been edited
     ControlMeasure *origLeftMeasure =
@@ -818,24 +818,20 @@ namespace Isis {
         //  Read apriori surface point if it exists so that point is
         //  replaced, but sigmas are retained.  Save sigmas because the
         //  SurfacePoint class will change them if the coordinates change.
+        vector<Distance> targetRadii = g_controlNetwork->GetTargetRadii();
         if (p_editPoint->HasAprioriCoordinates()) {
           SurfacePoint aprioriPt = p_editPoint->GetAprioriSurfacePoint();
+          aprioriPt.SetRadii(Distance(targetRadii[0]), 
+                                Distance(targetRadii[1]),
+                                Distance(targetRadii[2]));
           Distance latSigma = aprioriPt.GetLatSigmaDistance();
           Distance lonSigma = aprioriPt.GetLonSigmaDistance();
           Distance radiusSigma = aprioriPt.GetLocalRadiusSigma();
-          SurfacePoint newAprioriPt;
-          //  Create new surface point, I don't trust the SurfacePoint class
-          //  to start fresh.
-          newAprioriPt.SetSphericalCoordinates(Latitude(lat, Angle::Degrees),
+          aprioriPt.SetSphericalCoordinates(Latitude(lat, Angle::Degrees),
                                             Longitude(lon, Angle::Degrees),
                                             Distance(radius, Distance::Meters));
-          vector<Distance> targetRadii = g_controlNetwork->GetTargetRadii();
-          newAprioriPt.SetRadii(Distance(targetRadii[0]), 
-                                Distance(targetRadii[1]),
-                                Distance(targetRadii[2]));
-          newAprioriPt.SetSphericalSigmasDistance(latSigma, lonSigma,
-                                                  radiusSigma);
-          p_editPoint->SetAprioriSurfacePoint(newAprioriPt);
+          aprioriPt.SetSphericalSigmasDistance(latSigma, lonSigma, radiusSigma);
+          p_editPoint->SetAprioriSurfacePoint(aprioriPt);
         }
         else {
           p_editPoint->SetAprioriSurfacePoint(SurfacePoint(
@@ -2561,6 +2557,7 @@ namespace Isis {
 
     for (int i=0; i<g_serialNumberList->Size(); i++) {
       cam = g_controlNetwork->Camera(i);
+      if (g_serialNumberList->SerialNumber(i) == p_groundSN) continue;
       if (cam->SetUniversalGround(lat,lon)) {
         //  Make sure point is within image boundary
         double samp = cam->Sample();
