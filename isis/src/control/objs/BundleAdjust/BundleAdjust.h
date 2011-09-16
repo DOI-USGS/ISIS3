@@ -87,6 +87,12 @@
  *                          m_bDeltack to indicate calling application
  *                          was deltack (or qtie) and has potential to have
  *                          a single ControlPoint and ControlMeasure.
+ *   @history 2011-08-08 Tracie Sucharski, Added method to return the iteration
+ *                          summary to be used in qtie which does not have a log
+ *                          file. In SetImages, clear the cameraMap and
+ *                          cameraList.  Added this back in (was originally
+ *                          added on 2011-01-19), was deleted somewhere along
+ *                          the line.
  */
 
 #include <QObject> // parent class
@@ -231,7 +237,9 @@ namespace Isis {
 
       void GetSparseParameterCorrections();
 
-      bool IsConverged() { return m_bConverged; }
+      QString IterationSummaryGroup () const {
+        return m_iterationSummary;
+      }
 
     private:
 
@@ -452,6 +460,8 @@ namespace Isis {
       void Initialize();
       bool InitializePointWeights();
       void InitializePoints();
+
+      QString m_iterationSummary;
 
       bool formNormalEquations();
       void applyParameterCorrections();

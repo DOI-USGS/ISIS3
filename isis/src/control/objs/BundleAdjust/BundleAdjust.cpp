@@ -1,5 +1,9 @@
 #include "BundleAdjust.h"
 
+#include <iomanip>
+#include <iostream>
+#include <sstream>
+
 #include "SpecialPixel.h"
 #include "BasisFunction.h"
 #include "LeastSquares.h"
@@ -3251,8 +3255,8 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 //       printf("Iteration #%d\n\tAverage Error: %lf\n\tSigmaXY: %lf\n\tSigmaHat: %lf\n\tSigmaX: %lf\n\tSigmaY: %lf\n",
 //              m_nIteration, averageError, sigmaXY, sigmaHat, sigmaX, sigmaY);
 
-      if (m_bPrintSummary)
-        IterationSummary(averageError, sigmaXY, sigmaHat, sigmaX, sigmaY);
+//      if (m_bPrintSummary)
+      IterationSummary(averageError, sigmaXY, sigmaHat, sigmaX, sigmaY);
 
       // these vectors hold statistics for right-hand sides (observed - computed)
       m_Statsx.Reset();
@@ -5661,13 +5665,16 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     gp += PvlKeyword("SigmaX", sigmaX, "mm");
     gp += PvlKeyword("SigmaY", sigmaY, "mm");
 
-    Application::Log(gp);
+    std::ostringstream ostr;
+    ostr<<gp<<endl;
+    m_iterationSummary += QString::fromStdString(ostr.str());
+    if (m_bPrintSummary) Application::Log(gp);
   }
 
   /* This method creates a iteration summary and creates an iteration group for
   * the SpecialK BundleAdjust summary.
   */
-void BundleAdjust::SpecialKIterationSummary() {
+  void BundleAdjust::SpecialKIterationSummary() {
     std::string itlog;
     if ( m_bConverged )
         itlog = "Iteration" + iString(m_nIteration) + ": Final";
@@ -5691,10 +5698,13 @@ void BundleAdjust::SpecialKIterationSummary() {
             gp += PvlKeyword("ErrorPropationElapsedTime", m_dElapsedTimeErrorProp);
     }
 
-    Application::Log(gp);
-}
+    std::ostringstream ostr;
+    ostr<<gp<<endl;
+    m_iterationSummary += QString::fromStdString(ostr.str());
+    if (m_bPrintSummary) Application::Log(gp);
+  }
 
-/**
+  /**
    * set parameter weighting for SPARSE solution
    *
    * @history 2011-04-19 Debbie A. Cook - Added initialization to m_Point_AprioriSigmas
