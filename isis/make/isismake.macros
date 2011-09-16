@@ -97,7 +97,7 @@ else
 endif
 
 # Set up Xalan's command-line option names. Some version of Xalan use different
-# option names (e.g. Ubuntu's Xalan).
+# option names (e.g. Ubuntu's and Debian's Xalan).
 XALAN_VALIDATE_OPTION := -v
 XALAN_OUTFILE_OPTION := -o
 XALAN_PARAM_OPTION := -p
@@ -132,11 +132,11 @@ else
   endif
 endif
 
-# Ubuntu has a different executable name for Xalan, and it also does not accept
-# the same command-line argument names as the version of Xalan available on the
-# other systems. So, set up some variables to match the argument names that
-# this version of Xalan is expecting.
-ifeq ($(HOST_OS),Ubuntu10_04)
+# Ubuntu and Debian have a different executable name for Xalan, and it also
+# does not accept the same command-line argument names as the version of Xalan
+# available on the other systems. So, set up some variables to match the
+# argument names that this version of Xalan is expecting.
+ifneq "$(or $(findstring Ubuntu10_04, $(HOST_OS)), $(findstring Debian, $(HOST_OS)))" ""
   XALAN := xalan
   XALAN_VALIDATE_OPTION := -validate
   XALAN_OUTFILE_OPTION := -out
