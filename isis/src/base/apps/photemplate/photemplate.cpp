@@ -43,124 +43,123 @@ void LoadPvl() {
   inPvl.Read(inFile);
   iString phtName = ui.GetAsString("PHTNAME");
   phtName = phtName.UpCase();
-  if (phtName == "NONE") {
-    return;
-  }
-  if (inPvl.HasObject("PhotometricModel")) {
-    PvlObject phtObj = inPvl.FindObject("PhotometricModel");
-    iString phtVal;
-    if (phtObj.HasGroup("Algorithm")) {
-      PvlObject::PvlGroupIterator phtGrp = phtObj.BeginGroup();
-      bool wasFound = false;
-      if (ui.WasEntered("PHTNAME")) {
-        phtName = ui.GetAsString("PHTNAME");
-        phtName = phtName.UpCase();
-        while (phtGrp != phtObj.EndGroup()) {
-          if (phtGrp->HasKeyword("PHTNAME")) {
-            phtVal = (string)phtGrp->FindKeyword("PHTNAME");
-            phtVal = phtVal.UpCase();
-            if (phtName == phtVal) {
-              wasFound = true;
-              break;
+  if (phtName != "NONE") {
+    if (inPvl.HasObject("PhotometricModel")) {
+      PvlObject phtObj = inPvl.FindObject("PhotometricModel");
+      iString phtVal;
+      if (phtObj.HasGroup("Algorithm")) {
+        PvlObject::PvlGroupIterator phtGrp = phtObj.BeginGroup();
+        bool wasFound = false;
+        if (ui.WasEntered("PHTNAME")) {
+          phtName = ui.GetAsString("PHTNAME");
+          phtName = phtName.UpCase();
+          while (phtGrp != phtObj.EndGroup()) {
+            if (phtGrp->HasKeyword("PHTNAME")) {
+              phtVal = (string)phtGrp->FindKeyword("PHTNAME");
+              phtVal = phtVal.UpCase();
+              if (phtName == phtVal) {
+                wasFound = true;
+                break;
+              }
+            }
+            phtGrp++;
+          }
+        }
+        if (!wasFound) {
+          return;
+        }
+        ui.Clear("PHTNAME");
+        ui.Clear("THETA");
+        ui.Clear("WH");
+        ui.Clear("HG1");
+        ui.Clear("HG2");
+        ui.Clear("HH");
+        ui.Clear("B0");
+        ui.Clear("BH");
+        ui.Clear("CH");
+        ui.Clear("L");
+        ui.Clear("K");
+        ui.Clear("PHASELIST");
+        ui.Clear("KLIST");
+        ui.Clear("LLIST");
+        ui.Clear("PHASECURVELIST");
+        phtVal = (string)phtGrp->FindKeyword("PHTNAME");
+        phtVal = phtVal.UpCase();
+        if (phtVal == "HAPKEHEN" || phtVal == "HAPKELEG") {
+          if (phtGrp->HasKeyword("THETA")) {
+            double theta = phtGrp->FindKeyword("THETA");
+            ui.PutDouble("THETA", theta);
+          }
+          if (phtGrp->HasKeyword("WH")) {
+            double wh = phtGrp->FindKeyword("WH");
+            ui.PutDouble("WH", wh);
+          }
+          if (phtGrp->HasKeyword("HH")) {
+            double hh = phtGrp->FindKeyword("HH");
+            ui.PutDouble("HH", hh);
+          } 
+          if (phtGrp->HasKeyword("B0")) {
+            double b0 = phtGrp->FindKeyword("B0");
+            ui.PutDouble("B0", b0);
+          }
+          if (phtVal == "HAPKEHEN") {
+            if (phtGrp->HasKeyword("HG1")) {
+              double hg1 = phtGrp->FindKeyword("HG1");
+              ui.PutDouble("HG1", hg1);
+            }
+            if (phtGrp->HasKeyword("HG2")) {
+              double hg2 = phtGrp->FindKeyword("HG2");
+              ui.PutDouble("HG2", hg2);
             }
           }
-          phtGrp++;
+          if (phtVal == "HAPKELEG") {
+            if (phtGrp->HasKeyword("BH")) {
+              double bh = phtGrp->FindKeyword("BH");
+              ui.PutDouble("BH", bh);
+            }
+            if (phtGrp->HasKeyword("CH")) {
+              double ch = phtGrp->FindKeyword("CH");
+              ui.PutDouble("CH", ch);
+            }
+          }
+        } else if (phtVal == "LUNARLAMBERTEMPIRICAL" || phtVal == "MINNAERTEMPIRICAL") {
+          if (phtGrp->HasKeyword("PHASELIST")) {
+            string phaselist = (string)phtGrp->FindKeyword("PHASELIST");
+            ui.PutAsString("PHASELIST", phaselist);
+          } 
+          if (phtGrp->HasKeyword("PHASECURVELIST")) {
+            string phasecurvelist = (string)phtGrp->FindKeyword("PHASECURVELIST");
+            ui.PutAsString("PHASECURVELIST", phasecurvelist);
+          }
+          if (phtVal == "LUNARLAMBERTEMPIRICAL") {
+            if (phtGrp->HasKeyword("LLIST")) {
+              string llist = (string)phtGrp->FindKeyword("LLIST");
+              ui.PutAsString("LLIST", llist);
+            }
+          }
+          if (phtVal == "MINNAERTEMPIRICAL") {
+            if (phtGrp->HasKeyword("KLIST")) {
+              string klist = (string)phtGrp->FindKeyword("KLIST");
+              ui.PutAsString("KLIST", klist);
+            }
+          }
+        } else if (phtVal == "LUNARLAMBERT") {
+          if (phtGrp->HasKeyword("L")) {
+            double l = phtGrp->FindKeyword("L");
+            ui.PutDouble("L", l);
+          } 
+        } else if (phtVal == "MINNAERT") {
+          if (phtGrp->HasKeyword("K")) {
+            double k = phtGrp->FindKeyword("K");
+            ui.PutDouble("K", k);
+          }
+        } else if (phtVal != "LAMBERT" && phtVal != "LOMMELSEELIGER" &&
+                   phtVal != "LUNARLAMBERTMCEWEN") {
+          string message = "Unsupported photometric model [" + phtVal + "].";
+          throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
         }
+        ui.PutAsString("PHTNAME", phtVal);
       }
-      if (!wasFound) {
-        return;
-      }
-      ui.Clear("PHTNAME");
-      ui.Clear("THETA");
-      ui.Clear("WH");
-      ui.Clear("HG1");
-      ui.Clear("HG2");
-      ui.Clear("HH");
-      ui.Clear("B0");
-      ui.Clear("BH");
-      ui.Clear("CH");
-      ui.Clear("L");
-      ui.Clear("K");
-      ui.Clear("PHASELIST");
-      ui.Clear("KLIST");
-      ui.Clear("LLIST");
-      ui.Clear("PHASECURVELIST");
-      phtVal = (string)phtGrp->FindKeyword("PHTNAME");
-      phtVal = phtVal.UpCase();
-      if (phtVal == "HAPKEHEN" || phtVal == "HAPKELEG") {
-        if (phtGrp->HasKeyword("THETA")) {
-          double theta = phtGrp->FindKeyword("THETA");
-          ui.PutDouble("THETA", theta);
-        }
-        if (phtGrp->HasKeyword("WH")) {
-          double wh = phtGrp->FindKeyword("WH");
-          ui.PutDouble("WH", wh);
-        }
-        if (phtGrp->HasKeyword("HH")) {
-          double hh = phtGrp->FindKeyword("HH");
-          ui.PutDouble("HH", hh);
-        }
-        if (phtGrp->HasKeyword("B0")) {
-          double b0 = phtGrp->FindKeyword("B0");
-          ui.PutDouble("B0", b0);
-        }
-        if (phtVal == "HAPKEHEN") {
-          if (phtGrp->HasKeyword("HG1")) {
-            double hg1 = phtGrp->FindKeyword("HG1");
-            ui.PutDouble("HG1", hg1);
-          }
-          if (phtGrp->HasKeyword("HG2")) {
-            double hg2 = phtGrp->FindKeyword("HG2");
-            ui.PutDouble("HG2", hg2);
-          }
-        }
-        if (phtVal == "HAPKELEG") {
-          if (phtGrp->HasKeyword("BH")) {
-            double bh = phtGrp->FindKeyword("BH");
-            ui.PutDouble("BH", bh);
-          }
-          if (phtGrp->HasKeyword("CH")) {
-            double ch = phtGrp->FindKeyword("CH");
-            ui.PutDouble("CH", ch);
-          }
-        }
-      } else if (phtVal == "LUNARLAMBERTEMPIRICAL" || phtVal == "MINNAERTEMPIRICAL") {
-        if (phtGrp->HasKeyword("PHASELIST")) {
-          string phaselist = (string)phtGrp->FindKeyword("PHASELIST");
-          ui.PutAsString("PHASELIST", phaselist);
-        }
-        if (phtGrp->HasKeyword("PHASECURVELIST")) {
-          string phasecurvelist = (string)phtGrp->FindKeyword("PHASECURVELIST");
-          ui.PutAsString("PHASECURVELIST", phasecurvelist);
-        }
-        if (phtVal == "LUNARLAMBERTEMPIRICAL") {
-          if (phtGrp->HasKeyword("LLIST")) {
-            string llist = (string)phtGrp->FindKeyword("LLIST");
-            ui.PutAsString("LLIST", llist);
-          }
-        }
-        if (phtVal == "MINNAERTEMPIRICAL") {
-          if (phtGrp->HasKeyword("KLIST")) {
-            string klist = (string)phtGrp->FindKeyword("KLIST");
-            ui.PutAsString("KLIST", klist);
-          }
-        }
-      } else if (phtVal == "LUNARLAMBERT") {
-        if (phtGrp->HasKeyword("L")) {
-          double l = phtGrp->FindKeyword("L");
-          ui.PutDouble("L", l);
-        }
-      } else if (phtVal == "MINNAERT") {
-        if (phtGrp->HasKeyword("K")) {
-          double k = phtGrp->FindKeyword("K");
-          ui.PutDouble("K", k);
-        }
-      } else if (phtVal != "LAMBERT" && phtVal != "LOMMELSEELIGER" &&
-                 phtVal != "LUNARLAMBERTMCEWEN") {
-        string message = "Unsupported photometric model [" + phtVal + "].";
-        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
-      }
-      ui.PutAsString("PHTNAME", phtVal);
     }
   }
   iString atmName = ui.GetAsString("ATMNAME");
