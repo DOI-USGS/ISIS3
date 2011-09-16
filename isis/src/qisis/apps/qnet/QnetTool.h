@@ -159,6 +159,8 @@ namespace Isis {
    *                          ready to be folded into qnet.
    *   @history 2011-07-27 Tracie Sucharski - Added method to return the radius
    *                          from a Dem if one is open.
+   *   @history 2011-09-16 Tracie Sucharski - Added method to draw Fixed and
+   *                          Constrained points on the ground source viewport.
    */
   class QnetTool : public Tool {
     Q_OBJECT
@@ -267,6 +269,7 @@ namespace Isis {
       void loadPoint();
       void loadMeasureTable();
       void drawAllMeasurments (MdiCubeViewport *vp,QPainter *painter);
+      void drawGroundMeasures (MdiCubeViewport *vp,QPainter *painter);
 //      void drawMeasures (MdiCubeViewport *vp,QPainter *painter,ControlPoint &point);
       void createQnetTool(QWidget *parent);
       QSplitter * createTopSplitter();

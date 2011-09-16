@@ -1243,7 +1243,7 @@ namespace Isis {
 
 
     if (s == Qt::LeftButton) {
-      if (p_groundOpen && file == p_groundCube->getFilename()) {
+      if (sn == p_groundSN) {
         QString message = "Cannot select point for editing on ground source.  Select ";
         message += "point using un-projected images or the Navigator Window.";
         QMessageBox::critical(p_qnetTool, "Error", message);
@@ -2700,7 +2700,12 @@ namespace Isis {
     // Don't show the measurments on cubes not in the serial number list
     // TODO: Should we show them anyway
     // TODO: Should we add the SN to the viewPort
-    string serialNumber = SerialNumber::Compose(*vp->cube());
+    string serialNumber = SerialNumber::Compose(*vp->cube(), true);
+
+    if (serialNumber == p_groundSN) {
+      drawGroundMeasures(vp, painter);
+      return;
+    }
 
     if (!g_serialNumberList->HasSerialNumber(serialNumber)) return;
     QList<ControlMeasure *> measures = 
@@ -2754,107 +2759,54 @@ namespace Isis {
   }
 
 
-#if 0
-  /** 
-   * Draw all measurments which are on this viewPort
+
+
+  /**
+   * Draw all Fixed or Constrained points on the ground source viewport
    * @param vp Viewport whose measurements will be drawn
-   * @param painter
+   * @param painter 
+   *  
+   * @author 2011-09-16  Tracie Sucharski 
+   *  
    * @internal
-   *   @history 2010-06-03 Jeannie Walldren - Removed "std::" since "using
-   *                          namespace std"
-   *   @history 2010-06-08 Jeannie Walldren - Fixed bug that was causing ignored
-   *                          measures not be drawn as yellow unless QnetTool was
-   *                          open
-   *   @history 2010-07-01 Jeannie Walldren - Modified to draw points selected in
-   *                          QnetTool last so they lay on top of all other points
-   *                          in the image.
-   *   @history 2010-10-28 Tracie Sucharski - Cleaned up code.
-   *   @history 2010-11-02 Tracie Sucharski - Added ground point cabability,
    */
-  void QnetTool::drawAllMeasurments (MdiCubeViewport *vp,QPainter *painter) {
-    // Without a controlnetwork there are no points
-    if (g_controlNetwork == 0) return;
+  void QnetTool::drawGroundMeasures(MdiCubeViewport *vp, QPainter *painter) {
 
-    bool isGround = false;
-    if (vp->cube() == p_groundCube) isGround = true;
-    // Don't show the measurments on cubes not in the serial number list
-    // TODO: Should we show them anyway
-    // TODO: Should we add the SN to the viewPort
-    iString serialNumber = SerialNumber::Compose(*vp->cube(),true);
-    if (!g_serialNumberList->HasSerialNumber(serialNumber) && !isGround) return;
-    // loop through all points in the control net
-    for (int i=0; i<g_controlNetwork->GetNumPoints(); i++) {
-      drawMeasures (vp, painter, *((*g_controlNetwork)[i]));
-    }
-    //drawMeasures (vp, painter, *p_editPoint);
+    // loop through control network looking for fixed and constrained points
+    for (int i = 0; i < g_controlNetwork->GetNumPoints(); i++) {
+      ControlPoint &p = *((*g_controlNetwork)[i]);
+      if (p.GetType() == ControlPoint::Free) continue;
+      if (!p.HasAprioriCoordinates()) continue;
 
-    // If ground cube, return since there are probably not a dense # of ground
-    // pts and don't need to redraw current edit point.
-    if (isGround) return;
-
-    // if QnetTool is open, redraw selected point so it is on top.  This is
-    // done because the selected point was hidden under a mass of crosshairs
-    // for dense networks.
-    if (p_editPoint != NULL) {
-      // and the selected point is in the image, 
-      if (p_editPoint->HasSerialNumber(serialNumber)) {
-        // find the measurement
-        double samp = (*p_editPoint)[serialNumber]->GetSample();
-        double line = (*p_editPoint)[serialNumber]->GetLine();
-        int x,y;
-        vp->cubeToViewport(samp,line,x,y);
-        // set point marker red
-        QBrush brush(Qt::red);
-        // set point marker bold - line width 2
-        QPen pen(brush, 2);
-        // draw the selected point in each image last so it's on top of the rest of the points
-        painter->setPen(pen);
-        painter->drawLine(x-5,y,x+5,y);
-        painter->drawLine(x,y-5,x,y+5);
+      // Find the measure on the ground image
+      if (p_groundGmap->SetGround(p.GetAprioriSurfacePoint().GetLatitude(),
+                                  p.GetAprioriSurfacePoint().GetLongitude())) {
+        double samp = p_groundGmap->Sample();
+        double line = p_groundGmap->Line();
+        int x, y;
+        vp->cubeToViewport(samp, line, x, y);
+        // if the point is ignored,
+        if (p.IsIgnored()) {
+          painter->setPen(QColor(255, 255, 0)); // set point marker yellow
+        }
+        else if (p.GetType() != ControlPoint::Free) {
+          painter->setPen(Qt::magenta);// set point marker magenta
+        }
+        else if (&p == p_editPoint) {
+          // set point marker red
+          QBrush brush(Qt::red);
+          // set point marker bold - line width 2
+          QPen pen(brush, 2);
+        }
+        else {
+          painter->setPen(Qt::green); // set all other point markers green
+        }
+        // draw points
+        painter->drawLine(x - 5, y, x + 5, y);
+        painter->drawLine(x, y - 5, x, y + 5);
       }
     }
   }
-
-
-  void QnetTool::drawMeasures (MdiCubeViewport *vp,QPainter *painter,ControlPoint &point) {
-
-    //  IF cubes are opened before a point has been loaded into editor, this
-    //  point could be NULL.
-    if (&point == NULL) return;
-
-    // Don't show the measurments on cubes not in the serial number list
-    // TODO: Should we show them anyway
-    // TODO: Should we add the SN to the viewPort
-    string serialNumber = SerialNumber::Compose(*vp->cube(),true);
-
-    double samp, line;
-
-    // Does cube exist in ControlPoint
-    if (!point.HasSerialNumber(serialNumber)) return;
-
-    samp = point[serialNumber]->GetSample();
-    line = point[serialNumber]->GetLine();
-    int x,y;
-    vp->cubeToViewport(samp,line,x,y);
-
-    // Determine pen color
-    // if the point or measure is ignored    
-    if (point.IsIgnored() || (!point.IsIgnored() && point[serialNumber]->IsIgnored())) {
-      painter->setPen(QColor(255,255,0)); // set point marker yellow
-    }
-    // Point & Measure are valid (not ignored) and it's a ground point
-    else if (point.GetType() == ControlPoint::Ground) {
-      painter->setPen(Qt::magenta);// set point marker magenta
-    }
-    else {
-      painter->setPen(Qt::green); // set all other point markers green
-    }
-
-    // draw points
-    painter->drawLine(x-5,y,x+5,y);
-    painter->drawLine(x,y-5,x,y+5);
-  }
-#endif
 
 
 
