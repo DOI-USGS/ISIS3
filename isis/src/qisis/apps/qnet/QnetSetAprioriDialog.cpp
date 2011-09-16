@@ -183,6 +183,13 @@ void QnetSetAprioriDialog::setApriori() {
   for (int i = 0; i < p_points.size(); i++) {
     QString id = p_points.at(i)->text();
     ControlPoint *pt = g_controlNetwork->GetPoint(id);
+    if (!pt->HasAprioriCoordinates()) {
+      QString msg = "Point [" + id + "] does not have an Apriori coordinate.  "
+        "Make sure to save the ground source measurement then the Point before "
+        "setting the sigmas.  The sigmas for this point will not be set.";
+      QMessageBox::warning((QWidget *)parent(), "Warning", msg);
+      continue;
+    }
     if (pt->IsEditLocked()) continue;
 
     if (pointSourceGroupBox->isChecked()) {

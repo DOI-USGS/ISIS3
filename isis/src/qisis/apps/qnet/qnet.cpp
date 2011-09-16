@@ -1,5 +1,8 @@
 #include "IsisDebug.h"
+#include <signal.h>
+
 #include <QApplication>
+
 #include "AdvancedTrackTool.h"
 #include "BandTool.h"
 #include "Filename.h"
@@ -26,6 +29,9 @@
 
 void startMonitoringMemory();
 void stopMonitoringMemory();
+void SegmentationFault(int);
+void Abort(int);
+void InterruptSignal(int);
 
 using namespace Isis;
 using namespace std;
@@ -33,6 +39,9 @@ using namespace std;
 int main(int argc, char *argv[]) {
 #ifdef CWDEBUG
   startMonitoringMemory();
+  signal(SIGSEGV, SegmentationFault);
+  signal(SIGABRT, Abort);
+  signal(SIGINT, InterruptSignal);
 #endif
   Qnet::g_controlNetwork = NULL;
   Qnet::g_serialNumberList = NULL;
@@ -211,7 +220,6 @@ int main(int argc, char *argv[]) {
 
     Qnet::g_vpMainWindow->show();
     int status = app->exec();
-
     delete ftool;
     ftool = NULL;
     delete ntool;
@@ -242,7 +250,6 @@ int main(int argc, char *argv[]) {
     Qnet::g_vpMainWindow = NULL;
     delete app;
     app = NULL;
-
     return status;
 
   }
@@ -251,8 +258,8 @@ int main(int argc, char *argv[]) {
   }
 }
 
-void startMonitoringMemory() {
 #ifdef CWDEBUG
+void startMonitoringMemory() {
 #ifndef NOMEMCHECK
   MyMutex *mutex = new MyMutex();
   std::fstream *alloc_output = new std::fstream("/dev/null");
@@ -264,12 +271,10 @@ void startMonitoringMemory() {
   Debug(libcw_do.set_ostream(alloc_output, mutex));
   atexit(stopMonitoringMemory);
 #endif
-#endif
 }
 
 
 void stopMonitoringMemory() {
-#ifdef CWDEBUG
 #ifndef NOMEMCHECK
   Debug(
     alloc_filter_ct alloc_filter;
@@ -289,6 +294,37 @@ void stopMonitoringMemory() {
     libcw_do.off()
   );
 #endif
-#endif
 }
+
+
+void SegmentationFault(int) {
+  std::vector<std::string> currentStack;
+  StackTrace::GetStackTrace(&currentStack);
+
+  std::cerr << "Segmentation Fault" << std::endl;
+  for(unsigned int i = 1; i < currentStack.size(); i++) {
+    std::cerr << currentStack[i] << std::endl;
+  }
+
+  exit(1);
+}
+
+void Abort(int) {
+  std::vector<std::string> currentStack;
+  StackTrace::GetStackTrace(&currentStack);
+
+  std::cerr << "Abort" << std::endl;
+  for(unsigned int i = 1; i < currentStack.size(); i++) {
+    std::cerr << currentStack[i] << std::endl;
+  }
+
+  exit(1);
+}
+
+
+void InterruptSignal(int) {
+  exit(1);
+}
+
+#endif
 

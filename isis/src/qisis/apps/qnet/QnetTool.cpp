@@ -5,7 +5,6 @@
 #include <iomanip>
 
 #include <QtGui>
-#include <QComboBox>
 
 #include "QnetDeletePointDialog.h"
 #include "QnetNewMeasureDialog.h"
@@ -26,6 +25,7 @@
 #include "iException.h"
 #include "Latitude.h"
 #include "Longitude.h"
+#include "MainWindow.h"
 #include "MdiCubeViewport.h"
 #include "Projection.h"
 #include "ProjectionFactory.h"
@@ -100,6 +100,7 @@ namespace Isis {
     p_leftMeasure = NULL;
     p_rightMeasure = NULL;
     p_templateModified = false;
+    p_measureWindow = NULL;
     p_measureTable = NULL;
 
     createQnetTool(parent);
@@ -108,6 +109,7 @@ namespace Isis {
 
 
   QnetTool::~QnetTool () {
+    writeSettings();
     delete p_editPoint;
     p_editPoint = NULL;
     delete p_leftMeasure;
@@ -122,6 +124,8 @@ namespace Isis {
     p_rightCube = NULL;
     delete p_measureTable;
     p_measureTable = NULL;
+    delete p_measureWindow;
+    p_measureWindow = NULL;
   }
 
 
@@ -151,7 +155,7 @@ namespace Isis {
    */
   void QnetTool::createQnetTool(QWidget *parent) {
 
-    p_qnetTool = new QMainWindow(parent);
+    p_qnetTool = new MainWindow("Qnet Tool",parent);
 
     createActions();
     createMenus();
@@ -197,13 +201,20 @@ namespace Isis {
     centralLayout->addStretch();
     centralLayout->addWidget(p_pointEditor);
     centralLayout->addLayout(addMeasureLayout);
-    
     QWidget * centralWidget = new QWidget;
     centralWidget->setLayout(centralLayout);
-    p_qnetTool->setCentralWidget(centralWidget);
+
+    QScrollArea *scrollArea = new QScrollArea();
+    scrollArea->setWidget(centralWidget);
+    scrollArea->setWidgetResizable(true);
+    centralWidget->adjustSize();
+    p_qnetTool->setCentralWidget(scrollArea);
+//    p_qnetTool->setCentralWidget(centralWidget);
     
     connect(this, SIGNAL(editPointChanged(QString)),
             this, SLOT(paintAllViewports(QString)));
+
+    readSettings();
   }
   
   
@@ -571,30 +582,29 @@ namespace Isis {
    */
   void QnetTool::measureSaved() {
 
-    // Read original measures from the network.
-    ControlMeasure *leftMeasure =
+    // Read original measures from the network for comparison with measures
+    // that have been edited
+    ControlMeasure *origLeftMeasure =
                 p_editPoint->GetMeasure(p_leftMeasure->GetCubeSerialNumber());
-    ControlMeasure *rightMeasure =
+    ControlMeasure *origRightMeasure =
                 p_editPoint->GetMeasure(p_rightMeasure->GetCubeSerialNumber());
 
 
     //  Only print error if both original measure in network and the current
     //  edit measure are both editLocked.  If only the edit measure is 
     //  locked, then user just locked and it needs to be saved.
-    if (IsMeasureLocked(rightMeasure->GetCubeSerialNumber()) &&
+    if (IsMeasureLocked(origRightMeasure->GetCubeSerialNumber()) &&
         IsMeasureLocked(p_rightMeasure->GetCubeSerialNumber())) {
       QString message = "You are saving changes to a measure that is locked ";
       message += "for editing.  Do you want to set EditLock = False for this ";
       message += "measure?";
-      switch (QMessageBox::question((QWidget *)parent(),
-                "Qnet Tool Save Measure", message,
-                "&Yes", "&No", 0, 0)) {
-        // Yes was clicked or Enter was pressed, set EditLock=false for the right
-        // measure
+      switch (QMessageBox::question(p_qnetTool, "Qnet Tool Save Measure",
+                                    message, "&Yes", "&No", 0, 0)) {
+        // Yes:  set EditLock=false for the right measure
         case 0: 
           p_rightMeasure->SetEditLock(false);
           p_lockRightMeasure->setChecked(false);
-        // No was clicked, keep EditLock=true and do NOT save measure
+        // No:  keep EditLock=true and do NOT save measure
         case 1: 
           return;
       }
@@ -604,11 +614,9 @@ namespace Isis {
       QString message = "You are saving changes to a measure on an ignored ";
       message += "point.  Do you want to set Ignore = False on the point and ";
       message += "both measures?";
-      switch (QMessageBox::question((QWidget *)parent(),
-                "Qnet Tool Save Measure", message,
-                "&Yes", "&No", 0, 0)) {
-        // Yes was clicked or Enter was pressed, set Ignore=false for the point
-        // and measures and save point
+      switch (QMessageBox::question(p_qnetTool, "Qnet Tool Save Measure",
+                                    message, "&Yes", "&No", 0, 0)) {
+        // Yes:  set Ignore=false for the point and measures and save point
         case 0: 
           p_editPoint->SetIgnored(false);
           emit ignorePointChanged();
@@ -620,23 +628,22 @@ namespace Isis {
             p_rightMeasure->SetIgnored(false);
             emit ignoreRightChanged();
           }
-        // No was clicked, keep Ignore=true and save measure
+        // No: keep Ignore=true and save measure
         case 1: 
           break;
 
       }
     }
-    if (rightMeasure->IsIgnored()) {
+    if (origRightMeasure->IsIgnored()) {
       QString message = "You are saving changes to an ignored measure.  ";
       message += "Do you want to set Ignore = False on the right measure?";
-      switch(QMessageBox::question((QWidget *)parent(),
-                                "Qnet Tool Save Measure", message,
-                                "&Yes", "&No", 0, 0)){
-        // Yes was clicked, set Ignore=false for the right measure and save point
+      switch(QMessageBox::question(p_qnetTool, "Qnet Tool Save Measure",
+                                   message, "&Yes", "&No", 0, 0)){
+        // Yes:  set Ignore=false for the right measure and save point
         case 0: 
             p_rightMeasure->SetIgnored(false);
             emit ignoreRightChanged();
-        // No was clicked, keep Ignore=true and save point
+        // No:  keep Ignore=true and save point
         case 1: 
           break;
       }
@@ -653,7 +660,7 @@ namespace Isis {
         p_leftMeasure->GetCubeSerialNumber() != p_groundSN) {
         QString message = "This point already contains a reference measure.  ";
         message += "Would you like to replace it with the measure on the left?";
-        int  response = QMessageBox::question((QWidget *)parent(),
+        int  response = QMessageBox::question(p_qnetTool,
                                   "Qnet Tool Save Measure", message,
                                   QMessageBox::Yes | QMessageBox::No,
                                   QMessageBox::Yes);
@@ -693,13 +700,18 @@ namespace Isis {
         message += "may need to move all of the other measures to match the new ";
         message += " coordinate of the reference measure.  Do you really want to ";
         message += " change the reference measure? ";
-        switch(QMessageBox::question((QWidget *)parent(),
-                                  "Qnet Tool Save Measure", message,
-                                  "&Yes", "&No", 0, 0)){
-          case 0: // Yes was clicked or Enter was pressed, save the measure
+        switch(QMessageBox::question(p_qnetTool, "Qnet Tool Save Measure",
+                                     message, "&Yes", "&No", 0, 0)){
+          // Yes:  Save measure
+          case 0:
             break;
-          case 1: // No was clicked, keep original reference, return without saving
+          // No:  keep original reference, return without saving
+          case 1:
             loadPoint();
+//          p_pointEditor->setLeftMeasure (p_leftMeasure, p_leftCube,
+//                                         p_editPoint->GetId());
+//          p_pointEditor->setRightMeasure (p_rightMeasure, p_rightCube,
+//                                         p_editPoint->GetId());
             return;
         }
       }
@@ -721,15 +733,13 @@ namespace Isis {
                                           p_editPoint->GetId())) {
         QString message = "This point is locked for editing.  Do want to set ";
         message += "EditLock = False?";
-        switch (QMessageBox::question((QWidget *)parent(),
-                  "Qnet Tool Save Measure", message,
-                  "&Yes", "&No", 0, 0)) {
-          // Yes was clicked or Enter was pressed, set EditLock=false for the
-          // point and save point
+        switch (QMessageBox::question(p_qnetTool, "Qnet Tool Save Measure",
+                                      message, "&Yes", "&No", 0, 0)) {
+          // Yes:  set EditLock=false for the point and save point
           case 0: 
             p_editPoint->SetEditLock(false);
             p_lockPoint->setChecked(false);
-          // No was clicked, keep EditLock=true and return
+          // No:  keep EditLock=true and return
           case 1: 
             loadPoint();
             return;
@@ -765,7 +775,7 @@ namespace Isis {
         if (radius == Null) {
           QString msg = "Could not read radius from DEM, will default to "
             "local radius of reference measure.";
-          QMessageBox::warning((QWidget *)parent(), "Warning", msg);
+          QMessageBox::warning(p_qnetTool, "Warning", msg);
           if (p_editPoint->GetRefMeasure()->Camera()->SetGround(
               Latitude(lat, Angle::Degrees), Longitude(lon, Angle::Degrees))) {
             radius =
@@ -778,7 +788,7 @@ namespace Isis {
             QString message = "Error trying to get radius at this pt.  "
                 "Lat/Lon does not fall on the reference measure.  "
                 "Cannot save this measure.";
-            QMessageBox::critical((QWidget *)parent(),"Error",message);
+            QMessageBox::critical(p_qnetTool,"Error",message);
             return;
           }
         }
@@ -800,15 +810,39 @@ namespace Isis {
           QString message = "Error trying to get radius at this pt.  "
               "Lat/Lon does not fall on the reference measure.  "
               "Cannot save this measure.";
-          QMessageBox::critical((QWidget *)parent(),"Error",message);
+          QMessageBox::critical(p_qnetTool,"Error",message);
           return;
         }
       }
       try {
-        p_editPoint->SetAprioriSurfacePoint(SurfacePoint(
-                                            Latitude(lat, Angle::Degrees),
+        //  Read apriori surface point if it exists so that point is
+        //  replaced, but sigmas are retained.  Save sigmas because the
+        //  SurfacePoint class will change them if the coordinates change.
+        if (p_editPoint->HasAprioriCoordinates()) {
+          SurfacePoint aprioriPt = p_editPoint->GetAprioriSurfacePoint();
+          Distance latSigma = aprioriPt.GetLatSigmaDistance();
+          Distance lonSigma = aprioriPt.GetLonSigmaDistance();
+          Distance radiusSigma = aprioriPt.GetLocalRadiusSigma();
+          SurfacePoint newAprioriPt;
+          //  Create new surface point, I don't trust the SurfacePoint class
+          //  to start fresh.
+          newAprioriPt.SetSphericalCoordinates(Latitude(lat, Angle::Degrees),
                                             Longitude(lon, Angle::Degrees),
-                                            Distance(radius, Distance::Meters)));
+                                            Distance(radius, Distance::Meters));
+          vector<Distance> targetRadii = g_controlNetwork->GetTargetRadii();
+          newAprioriPt.SetRadii(Distance(targetRadii[0]), 
+                                Distance(targetRadii[1]),
+                                Distance(targetRadii[2]));
+          newAprioriPt.SetSphericalSigmasDistance(latSigma, lonSigma,
+                                                  radiusSigma);
+          p_editPoint->SetAprioriSurfacePoint(newAprioriPt);
+        }
+        else {
+          p_editPoint->SetAprioriSurfacePoint(SurfacePoint(
+                                          Latitude(lat, Angle::Degrees),
+                                          Longitude(lon, Angle::Degrees),
+                                          Distance(radius, Distance::Meters)));
+        }
       }
       catch (iException &e) {
         QString message = "Unable to set Apriori Surface Point.\n";
@@ -816,7 +850,7 @@ namespace Isis {
         message += "  Longitude = " + QString::number(lon);
         message += "  Radius = " + QString::number(radius) + "\n";
         message += e.Errors().c_str();
-        QMessageBox::critical((QWidget *)parent(),"Error",message);
+        QMessageBox::critical(p_qnetTool,"Error",message);
         e.Clear();
       }
       p_editPoint->SetAprioriSurfacePointSource(p_groundSurfacePointSource);
@@ -827,21 +861,25 @@ namespace Isis {
 
     // Save the right measure and left (if ignore or edit lock flag changed) to
     // the editPoint The Ignore flag is the only thing that can change on the left
-    // measure. First find measure, then replace with the edit Tool measure
+    // measure.
     p_rightMeasure->SetChooserName(Application::UserName());
-    *rightMeasure = *p_rightMeasure;
+    *origRightMeasure = *p_rightMeasure;
 
-    //  The ignore flag on the left measure has changed from the net file
-    if (p_leftMeasure->IsIgnored() != leftMeasure->IsIgnored() ||
+    //  Only save the left measure if the ignore flag or editLock has changed
+    if (p_leftMeasure->IsIgnored() != origLeftMeasure->IsIgnored() ||
         IsMeasureLocked(p_leftMeasure->GetCubeSerialNumber()) !=
-        IsMeasureLocked(leftMeasure->GetCubeSerialNumber())) {
+        IsMeasureLocked(origLeftMeasure->GetCubeSerialNumber())) {
       p_leftMeasure->SetChooserName(Application::UserName());
-      *leftMeasure = *p_leftMeasure;
+      *origLeftMeasure = *p_leftMeasure;
     }
 
     // If left measure == right measure, update left
-    if (p_leftMeasure->GetCubeSerialNumber() == p_rightMeasure->GetCubeSerialNumber()) {
+    if (p_leftMeasure->GetCubeSerialNumber() ==
+        p_rightMeasure->GetCubeSerialNumber()) {
       *p_leftMeasure = *p_rightMeasure;
+      //  Update left measure of pointEditor
+      p_pointEditor->setLeftMeasure (p_leftMeasure, p_leftCube,
+                                     p_editPoint->GetId());
     }
 
     //  Change Save Point button text to red
@@ -853,7 +891,6 @@ namespace Isis {
     updateLeftMeasureInfo();
     updateRightMeasureInfo();
     loadMeasureTable();
-
   }
 
 
@@ -873,7 +910,6 @@ namespace Isis {
    */
   void QnetTool::savePoint () {
 
-
     //  Make a copy of edit point for updating the control net since the edit
     //  point is still loaded in the point editor.
     ControlPoint *updatePoint = new ControlPoint;
@@ -883,13 +919,9 @@ namespace Isis {
     //  measure holding the coordinate information from the ground source. 
     //  If so, delete this measure before saving point.  Clear out the
     //  fixed Measure variable (memory deleted in ControlPoint::Delete).
-    if (updatePoint->GetType() != ControlPoint::Free) {
-      for (int i=0; i<updatePoint->GetNumMeasures(); i++) {
-        if ((*updatePoint)[i]->GetCubeSerialNumber() == p_groundSN) {
-          updatePoint->Delete(i);
-          break;
-        }
-      }
+    if (updatePoint->GetType() != ControlPoint::Free &&
+        updatePoint->HasSerialNumber(p_groundSN)) {
+      updatePoint->Delete(p_groundSN);
     }
 
     //  If edit point exists in the network, save the updated point.  If it
@@ -898,6 +930,8 @@ namespace Isis {
       ControlPoint *p;
       p = g_controlNetwork->GetPoint(QString(updatePoint->GetId()));
       *p = *updatePoint;
+      delete updatePoint;
+      updatePoint = NULL;
     }
     else {
       g_controlNetwork->AddPoint(updatePoint);
@@ -913,6 +947,8 @@ namespace Isis {
     emit editPointChanged(p_editPoint->GetId());
     // emit a signal to alert user to save when exiting 
     emit netChanged();
+    //   Refresh chipViewports to show new positions of controlPoints
+    p_pointEditor->refreshChips();
   }
 
 
@@ -935,12 +971,15 @@ namespace Isis {
       p_pointType->setCurrentIndex((int) p_editPoint->GetType());
       QString message = "Unable to change the point type.  Set EditLock ";
       message += " to False.";
-      QMessageBox::critical((QWidget *)parent(), "Error", message);
+      QMessageBox::critical(p_qnetTool, "Error", message);
       return;
     }
 
     //  If ground loaded, readd temporary ground measure to the point
-    if (p_groundOpen) loadPoint();
+    if (p_groundOpen) {
+      loadPoint();
+      p_pointEditor->colorizeSaveButton();
+    }
 
 
     colorizeSaveButton();
@@ -984,7 +1023,7 @@ namespace Isis {
       p_ignorePoint->setChecked(p_editPoint->IsIgnored());
       QString message = "Unable to change Ignored on point.  Set EditLock ";
       message += " to False.";
-      QMessageBox::critical((QWidget *)parent(), "Error", message);
+      QMessageBox::critical(p_qnetTool, "Error", message);
       return;
     }
     colorizeSaveButton();
@@ -1211,7 +1250,7 @@ namespace Isis {
       if (p_groundOpen && file == p_groundCube->getFilename()) {
         QString message = "Cannot select point for editing on ground source.  Select ";
         message += "point using un-projected images or the Navigator Window.";
-        QMessageBox::critical((QWidget *)parent(),"Error",message);
+        QMessageBox::critical(p_qnetTool, "Error", message);
         return;
       }
       //  Find closest control point in network
@@ -1221,7 +1260,7 @@ namespace Isis {
       if (point == NULL) {
         QString message = "No points exist for editing.  Create points ";
         message += "using the right mouse button.";
-        QMessageBox::warning((QWidget *)parent(),"Warning",message);
+        QMessageBox::warning(p_qnetTool, "Warning", message);
         return;
       }
       p_leftFile = file;
@@ -1232,7 +1271,7 @@ namespace Isis {
       if (p_groundOpen && file == p_groundCube->getFilename()) {
         QString message = "Cannot select point for deleting on ground source.  Select ";
         message += "point using un-projected images or the Navigator Window.";
-        QMessageBox::critical((QWidget *)parent(),"Error",message);
+        QMessageBox::critical(p_qnetTool, "Error", message);
         return;
       }
       //  Find closest control point in network
@@ -1241,7 +1280,7 @@ namespace Isis {
       if (point == NULL) {
         QString message = "No points exist for deleting.  Create points ";
         message += "using the right mouse button.";
-        QMessageBox::warning((QWidget *)parent(),"Warning",message);
+        QMessageBox::warning(p_qnetTool, "Warning", message);
         return;
       }
 
@@ -1342,7 +1381,7 @@ namespace Isis {
       if (g_controlNetwork->ContainsPoint(newPoint->GetId())) {
         iString message = "A ControlPoint with Point Id = [" + newPoint->GetId();
         message += "] already exists.  Re-enter Point Id for this ControlPoint.";
-        QMessageBox::warning((QWidget *)parent(), "New Point Id", message.c_str());
+        QMessageBox::warning(p_qnetTool, "New Point Id", message.c_str());
         pointFiles.clear();
         delete newPoint;
         newPoint = NULL;
@@ -1355,7 +1394,7 @@ namespace Isis {
 
       for (int i=0; i<newPointDialog->fileList->count(); i++) {
         QListWidgetItem *item = newPointDialog->fileList->item(i);
-        if (!newPointDialog->fileList->isItemSelected(item)) continue;
+        if (!item->isSelected()) continue;
         //  Create measure for any file selected
         ControlMeasure *m = new ControlMeasure;
         //  Find serial number for this file
@@ -1374,9 +1413,18 @@ namespace Isis {
         m->SetCamera(cam);
         newPoint->Add(m);
       }
-      if (p_editPoint != NULL && p_editPoint->Parent() == NULL) delete p_editPoint;
+      if (p_editPoint != NULL && p_editPoint->Parent() == NULL) {
+        delete p_editPoint;
+        p_editPoint = NULL;
+      }
       p_editPoint = newPoint;
 
+      //  If the image that the user clicked on to select the point is not
+      //  included, clear out the leftFile value.
+      QString leftFile = p_leftFile.c_str();
+      QList<QListWidgetItem *> leftFileItem =
+        newPointDialog->fileList->findItems(leftFile, Qt::MatchFixedString);
+      if (!(leftFileItem.at(0)->isSelected())) p_leftFile = "";
       //  Load new point in QnetTool
       loadPoint();
       p_qnetTool->setShown(true);
@@ -1452,7 +1500,7 @@ namespace Isis {
       if (g_controlNetwork->ContainsPoint(fixedPoint->GetId())) {
         string message = "A ControlPoint with Point Id = [" + fixedPoint->GetId();
         message += "] already exists.  Re-enter Point Id for this ControlPoint.";
-        QMessageBox::warning((QWidget *)parent(),"New Point Id",message.c_str());
+        QMessageBox::warning(p_qnetTool, "New Point Id", message.c_str());
         pointFiles.clear();
         delete fixedPoint;
         fixedPoint = NULL;
@@ -1491,7 +1539,7 @@ namespace Isis {
             "local radius of the first measure in the control point.  This "
             "will be updated to the local radius of the chosen reference "
             "measure.";
-          QMessageBox::warning((QWidget *)parent(), "Warning", msg);
+          QMessageBox::warning(p_qnetTool, "Warning", msg);
           if ((*fixedPoint)[0]->Camera()->SetGround(
                Latitude(lat, Angle::Degrees), Longitude(lon, Angle::Degrees))) {
             radius = (*fixedPoint)[0]->Camera()->LocalRadius().GetMeters();
@@ -1500,7 +1548,7 @@ namespace Isis {
             QString msg = "Error trying to get radius at this pt.  "
                 "Lat/Lon does not fall on the reference measure.  "
                 "Cannot create this point.";
-            QMessageBox::critical((QWidget *)parent(),"Error",msg);
+            QMessageBox::critical(p_qnetTool, "Error", msg);
             delete fixedPoint;
             fixedPoint = NULL;
             delete fixedPointDialog;
@@ -1518,7 +1566,7 @@ namespace Isis {
           QString msg = "Error trying to get radius at this pt.  "
               "Lat/Lon does not fall on the reference measure.  "
               "Cannot create this point.";
-          QMessageBox::critical((QWidget *)parent(),"Error",msg);
+          QMessageBox::critical(p_qnetTool, "Error", msg);
           delete fixedPoint;
           fixedPoint = NULL;
           delete fixedPointDialog;
@@ -1612,7 +1660,7 @@ namespace Isis {
         // remove this point from the control network
         if (g_controlNetwork->DeletePoint(p_editPoint->GetId()) ==
                                           ControlPoint::PointLocked) {
-          QMessageBox::information((QWidget *)parent(),"EditLocked Point",
+          QMessageBox::information(p_qnetTool, "EditLocked Point",
               "This point is EditLocked and cannot be deleted.");
           return;
         }
@@ -1638,12 +1686,13 @@ namespace Isis {
                 (*p_editPoint)[i]->GetCubeSerialNumber())) {
             QString message = "You are trying to delete the Reference measure."
                 "  Do you really want to delete the Reference measure?";
-            switch (QMessageBox::question((QWidget *)parent(),
-                    "Delete Reference measure?", message, "&Yes", "&No", 0, 0)) {
-              //  Yes or Enter pressed, skip to end of switch todelete the measure
+            switch (QMessageBox::question(p_qnetTool,
+                                          "Delete Reference measure?", message,
+                                          "&Yes", "&No", 0, 0)) {
+              //  Yes:  skip to end of switch todelete the measure
               case 0:
                 break;
-              //  No, continue to next measure in the loop
+              //  No:  continue to next measure in the loop
               case 1:
                 continue;
             }
@@ -1655,10 +1704,11 @@ namespace Isis {
         }
 
         if (lockedMeasures > 0) {
-          QMessageBox::information((QWidget *)parent(),"EditLocked Measures",
+          QMessageBox::information(p_qnetTool,"EditLocked Measures",
                 QString::number(lockedMeasures) + " / "
-                + QString::number(deletePointDialog->fileList->selectedItems().size())
-                + " measures are EditLocked and were not deleted.");
+                + QString::number(
+                  deletePointDialog->fileList->selectedItems().size()) +
+                " measures are EditLocked and were not deleted.");
         }
 
         p_leftFile = "";
@@ -1701,7 +1751,7 @@ namespace Isis {
     //  If no measures, print info and return
     if (point->GetNumMeasures() == 0) {
       QString message = "This point has no measures.";
-      QMessageBox::warning((QWidget *)parent(),"Warning",message);
+      QMessageBox::warning(p_qnetTool, "Warning", message);
       // update nav list to re-highlight old point
       if (p_editPoint != NULL) {
         // emit signal so the nav tool can update edit point
@@ -1823,7 +1873,7 @@ namespace Isis {
         message += "Latitude = " + QString::number(lat);
         message += "  Longitude = " + QString::number(lon);
         message += "\n A ground measure will not be created.";
-        QMessageBox::warning((QWidget *)parent(),"Warning",message);
+        QMessageBox::warning(p_qnetTool, "Warning", message);
       }
       else {
         // Create a temporary measure to hold the ground point info for ground source
@@ -1907,8 +1957,17 @@ namespace Isis {
 
 
   void QnetTool::loadMeasureTable () {
-    if (p_measureTable != NULL) delete p_measureTable;
-    p_measureTable = new QTableWidget();
+    if (p_measureWindow == NULL) { 
+      p_measureWindow = new QMainWindow();
+      p_measureTable = new QTableWidget();
+      p_measureTable->setMinimumWidth(1600);
+      p_measureTable->setAlternatingRowColors(true);
+      p_measureTable->setSortingEnabled(true);
+      p_measureWindow->setCentralWidget(p_measureTable);
+    }
+    else {
+      p_measureTable->clear();
+    }
     p_measureTable->setRowCount(p_editPoint->GetNumMeasures());
     p_measureTable->setColumnCount(NUMCOLUMNS);
 
@@ -2053,10 +2112,7 @@ namespace Isis {
 
     p_measureTable->resizeColumnsToContents();
     p_measureTable->resizeRowsToContents();
-    p_measureTable->setMinimumWidth(1600);
-    p_measureTable->setAlternatingRowColors(true);
-    p_measureTable->setSortingEnabled(true);
-    p_measureTable->show();
+    p_measureWindow->show();
   }
 
 
@@ -2644,41 +2700,39 @@ namespace Isis {
     string serialNumber = SerialNumber::Compose(*vp->cube());
 
     if (!g_serialNumberList->HasSerialNumber(serialNumber)) return;
-
-    // loop through all points in the control net
-    for (int i = 0; i < g_controlNetwork->GetNumPoints(); i++) {
-      ControlPoint &p = *((*g_controlNetwork)[i]);
-      // check whether this point is contained in the image
-      if (p.HasSerialNumber(serialNumber)) {
-        // Find the measurments on the viewport
-        double samp = p[serialNumber]->GetSample();
-        double line = p[serialNumber]->GetLine();
-        int x, y;
-        vp->cubeToViewport(samp, line, x, y);
-        // if the point is ignored,
-        if (p.IsIgnored()) {
-          painter->setPen(QColor(255, 255, 0)); // set point marker yellow
-        }
-        // point is not ignored, but measure matching this image is ignored,
-        else if (p[serialNumber]->IsIgnored()) {
-          painter->setPen(QColor(255, 255, 0)); // set point marker yellow
-        }
-        // Neither point nor measure is not ignored and the measure is fixed,
-        else if (p.GetType() != ControlPoint::Free) {
-          painter->setPen(Qt::magenta);// set point marker magenta
-        }
-        else {
-          painter->setPen(Qt::green); // set all other point markers green
-        }
-        // draw points
-        painter->drawLine(x - 5, y, x + 5, y);
-        painter->drawLine(x, y - 5, x, y + 5);
+    QList<ControlMeasure *> measures = 
+        g_controlNetwork->GetMeasuresInCube(serialNumber);
+    // loop through all measures contained in this cube
+    for (int i = 0; i < measures.count(); i++) {
+      ControlMeasure *m = measures[i];
+      // Find the measurments on the viewport
+      double samp = m->GetSample();
+      double line = m->GetLine();
+      int x, y;
+      vp->cubeToViewport(samp, line, x, y);
+      // if the point is ignored,
+      if (m->Parent()->IsIgnored()) {
+        painter->setPen(QColor(255, 255, 0)); // set point marker yellow
       }
+      // point is not ignored, but measure matching this image is ignored,
+      else if (m->IsIgnored()) {
+        painter->setPen(QColor(255, 255, 0)); // set point marker yellow
+      }
+      // Neither point nor measure is not ignored and the measure is fixed,
+      else if (m->Parent()->GetType() != ControlPoint::Free) {
+        painter->setPen(Qt::magenta);// set point marker magenta
+      }
+      else {
+        painter->setPen(Qt::green); // set all other point markers green
+      }
+      // draw points
+      painter->drawLine(x - 5, y, x + 5, y);
+      painter->drawLine(x, y - 5, x, y + 5);
     }
     // if QnetTool is open,
     if (p_editPoint != NULL) {
       // and the selected point is in the image,
-      if(p_editPoint->HasSerialNumber(serialNumber)) {
+      if (p_editPoint->HasSerialNumber(serialNumber)) {
         // find the measurement
         double samp = (*p_editPoint)[serialNumber]->GetSample();
         double line = (*p_editPoint)[serialNumber]->GetLine();
@@ -2992,7 +3046,7 @@ namespace Isis {
     catch (iException &e) {
       QString message = e.Errors().c_str();
       e.Clear ();
-      QMessageBox::information((QWidget *)parent(),"Error",message);
+      QMessageBox::information(p_qnetTool, "Error", message);
     }
   }
 
@@ -3196,7 +3250,7 @@ namespace Isis {
     }
     catch (iException &e) {
       QString message = e.Errors().c_str();
-      QMessageBox::critical((QWidget *)parent(),"Error",message);
+      QMessageBox::critical(p_qnetTool, "Error", message);
       e.Clear();
       if (p_groundCube) {
         delete p_groundCube;
@@ -3276,7 +3330,7 @@ namespace Isis {
           message += "for the ground source file.  Check the validity of the ";
           message += " cube labels.  The cube must either be projected or ";
           message += " run through spiceinit.";
-          QMessageBox::critical((QWidget *)parent(),"Error",message);
+          QMessageBox::critical(p_qnetTool, "Error", message);
           //  Clear out everything relating to ground source
           clearGroundSource ();
           QApplication::restoreOverrideCursor();
@@ -3305,7 +3359,7 @@ namespace Isis {
 
       if (p_groundFile.isEmpty()) {
         QString message = "You must enter a ground source before opening a Dem.";
-        QMessageBox::critical((QWidget *)parent(),"Error",message);
+        QMessageBox::critical(p_qnetTool, "Error", message);
         return;
       }
 
@@ -3349,7 +3403,7 @@ namespace Isis {
         p_demFile = Filename(p_demCube->getFilename()).Name().c_str();
       } catch (iException &e) {
         QString message = e.Errors().c_str();
-        QMessageBox::critical((QWidget *)parent(),"Error",message);
+        QMessageBox::critical(p_qnetTool, "Error", message);
         e.Clear();
         if (p_demCube) {
           delete p_demCube;
@@ -3363,7 +3417,7 @@ namespace Isis {
       //  Make sure this is a dem
       if (!p_demCube->hasTable("ShapeModelStatistics")) {
         QString message = p_demFile + " is not a DEM.";
-        QMessageBox::critical((QWidget *)parent(),"Error",message);
+        QMessageBox::critical(p_qnetTool, "Error", message);
         p_demCube->close();
         p_demOpen = false;
         delete p_demCube;
@@ -3514,6 +3568,42 @@ namespace Isis {
     }
 
   }
+
+
+
+  /**
+   * This method is called from the constructor so that when the
+   * Main window is created, it know's it's size and location.
+   *
+   */
+  void QnetTool::readSettings() {
+    Filename config("$HOME/.Isis/qnet/QnetTool.config");
+    QSettings settings(QString::fromStdString(config.Expanded()),
+                       QSettings::NativeFormat);
+    QPoint pos = settings.value("pos", QPoint(300, 100)).toPoint();
+    QSize size = settings.value("size", QSize(900, 500)).toSize();
+    p_qnetTool->resize(size);
+    p_qnetTool->move(pos);
+  }
+
+
+  /**
+   * This method is called when the Main window is closed or
+   * hidden to write the size and location settings to a config
+   * file in the user's home directory.
+   *
+   */
+  void QnetTool::writeSettings() const {
+    /*We do not want to write the settings unless the window is
+      visible at the time of closing the application*/
+    if(!p_qnetTool->isVisible()) return;
+    Filename config("$HOME/.Isis/qnet/QnetTool.config");
+    QSettings settings(QString::fromStdString(config.Expanded()),
+                       QSettings::NativeFormat);
+    settings.setValue("pos", p_qnetTool->pos());
+    settings.setValue("size", p_qnetTool->size());
+  }
+
 
 }
 

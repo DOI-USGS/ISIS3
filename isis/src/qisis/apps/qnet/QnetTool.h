@@ -4,6 +4,8 @@
 #include "Tool.h"
 #include "ControlPoint.h"
 
+#include <QCloseEvent>
+#include <QHideEvent>
 #include <QPalette>
 #include <QStringList>
 
@@ -37,6 +39,7 @@ namespace Isis {
 namespace Isis {
   class ControlPointEdit;
   class CubeViewport;
+  class MainWindow;
   class MdiCubeViewport;
   class QnetHoldPointDialog;
   class ToolPad;
@@ -278,8 +281,10 @@ namespace Isis {
       void clearGroundSource();
       bool IsMeasureLocked(iString serialNumber);
 
+      void readSettings();
+      void writeSettings() const;
 
-      QMainWindow *p_qnetTool;
+      MainWindow *p_qnetTool;
 
       QStringList findPointFiles(double lat, double lon);
 
@@ -348,6 +353,7 @@ namespace Isis {
       QComboBox *p_leftCombo;
       QComboBox *p_rightCombo;
 
+      QMainWindow *p_measureWindow;
       QTableWidget *p_measureTable;
 
       ControlPoint *p_editPoint;
