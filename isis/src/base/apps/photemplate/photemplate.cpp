@@ -261,12 +261,15 @@ void IsisMain() {
     output += ".pvl";
   }
 
-  string input = ui.GetFilename("FROMPVL");
-
   //The PVL to be written out
   Pvl p;
   Pvl op;
-  p.Read(input);
+
+  if (ui.WasEntered("FROMPVL")) {
+    string input = ui.GetFilename("FROMPVL");
+
+    p.Read(input);
+  }
 
   //Add the different models to the PVL
   if (ui.GetAsString("PHTNAME") != "NONE") {
