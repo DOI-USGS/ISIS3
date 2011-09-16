@@ -1,3 +1,4 @@
+#define GUIHELPERS
 
 #include "Isis.h"
 #include "PvlGroup.h"
@@ -7,486 +8,677 @@
 using namespace std;
 using namespace Isis;
 
+void PrintPvl();
+void LoadPvl();
+
+map <string, void *> GuiHelpers() {
+  map <string, void *> helper;
+  helper ["PrintPvl"] = (void *) PrintPvl;
+  helper ["LoadPvl"] = (void *) LoadPvl;
+  return helper;
+}
 
 //functions in the code
-void addPhoModel(Pvl &pvl);
-void addAtmosModel(Pvl &pvl);
-void addNormalModel(Pvl &pvl);
+void addPhoModel(Pvl &pvl, Pvl &outPvl);
+void addAtmosModel(Pvl &pvl, Pvl &outPvl);
+
+// Helper function to print the input pvl file to session log
+void PrintPvl() {
+  UserInterface &ui = Application::GetUserInterface();
+
+  // Write file out to log
+  string inFile(ui.GetFilename("FROMPVL"));
+  Pvl inPvl;
+  inPvl.Read(ui.GetFilename("FROMPVL"));
+  string Ostring = "***** Output of [" + inFile + "] *****";
+  Application::GuiLog(Ostring);
+  Application::GuiLog(inPvl);
+}
+
+// Helper function to load the input pvl file into the GUI
+void LoadPvl() {
+  UserInterface &ui = Application::GetUserInterface();
+  string inFile(ui.GetFilename("FROMPVL"));
+  Pvl inPvl;
+  inPvl.Read(inFile);
+  iString phtName = ui.GetAsString("PHTNAME");
+  phtName = phtName.UpCase();
+  if (phtName == "NONE") {
+    return;
+  }
+  if (inPvl.HasObject("PhotometricModel")) {
+    PvlObject phtObj = inPvl.FindObject("PhotometricModel");
+    iString phtVal;
+    if (phtObj.HasGroup("Algorithm")) {
+      PvlObject::PvlGroupIterator phtGrp = phtObj.BeginGroup();
+      bool wasFound = false;
+      if (ui.WasEntered("PHTNAME")) {
+        phtName = ui.GetAsString("PHTNAME");
+        phtName = phtName.UpCase();
+        while (phtGrp != phtObj.EndGroup()) {
+          if (phtGrp->HasKeyword("PHTNAME")) {
+            phtVal = (string)phtGrp->FindKeyword("PHTNAME");
+            phtVal = phtVal.UpCase();
+            if (phtName == phtVal) {
+              wasFound = true;
+              break;
+            }
+          }
+          phtGrp++;
+        }
+      }
+      if (!wasFound) {
+        return;
+      }
+      ui.Clear("PHTNAME");
+      ui.Clear("THETA");
+      ui.Clear("WH");
+      ui.Clear("HG1");
+      ui.Clear("HG2");
+      ui.Clear("HH");
+      ui.Clear("B0");
+      ui.Clear("BH");
+      ui.Clear("CH");
+      ui.Clear("L");
+      ui.Clear("K");
+      ui.Clear("PHASELIST");
+      ui.Clear("KLIST");
+      ui.Clear("LLIST");
+      ui.Clear("PHASECURVELIST");
+      phtVal = (string)phtGrp->FindKeyword("PHTNAME");
+      phtVal = phtVal.UpCase();
+      if (phtVal == "HAPKEHEN" || phtVal == "HAPKELEG") {
+        if (phtGrp->HasKeyword("THETA")) {
+          double theta = phtGrp->FindKeyword("THETA");
+          ui.PutDouble("THETA", theta);
+        }
+        if (phtGrp->HasKeyword("WH")) {
+          double wh = phtGrp->FindKeyword("WH");
+          ui.PutDouble("WH", wh);
+        }
+        if (phtGrp->HasKeyword("HH")) {
+          double hh = phtGrp->FindKeyword("HH");
+          ui.PutDouble("HH", hh);
+        }
+        if (phtGrp->HasKeyword("B0")) {
+          double b0 = phtGrp->FindKeyword("B0");
+          ui.PutDouble("B0", b0);
+        }
+        if (phtVal == "HAPKEHEN") {
+          if (phtGrp->HasKeyword("HG1")) {
+            double hg1 = phtGrp->FindKeyword("HG1");
+            ui.PutDouble("HG1", hg1);
+          }
+          if (phtGrp->HasKeyword("HG2")) {
+            double hg2 = phtGrp->FindKeyword("HG2");
+            ui.PutDouble("HG2", hg2);
+          }
+        }
+        if (phtVal == "HAPKELEG") {
+          if (phtGrp->HasKeyword("BH")) {
+            double bh = phtGrp->FindKeyword("BH");
+            ui.PutDouble("BH", bh);
+          }
+          if (phtGrp->HasKeyword("CH")) {
+            double ch = phtGrp->FindKeyword("CH");
+            ui.PutDouble("CH", ch);
+          }
+        }
+      } else if (phtVal == "LUNARLAMBERTEMPIRICAL" || phtVal == "MINNAERTEMPIRICAL") {
+        if (phtGrp->HasKeyword("PHASELIST")) {
+          string phaselist = (string)phtGrp->FindKeyword("PHASELIST");
+          ui.PutAsString("PHASELIST", phaselist);
+        }
+        if (phtGrp->HasKeyword("PHASECURVELIST")) {
+          string phasecurvelist = (string)phtGrp->FindKeyword("PHASECURVELIST");
+          ui.PutAsString("PHASECURVELIST", phasecurvelist);
+        }
+        if (phtVal == "LUNARLAMBERTEMPIRICAL") {
+          if (phtGrp->HasKeyword("LLIST")) {
+            string llist = (string)phtGrp->FindKeyword("LLIST");
+            ui.PutAsString("LLIST", llist);
+          }
+        }
+        if (phtVal == "MINNAERTEMPIRICAL") {
+          if (phtGrp->HasKeyword("KLIST")) {
+            string klist = (string)phtGrp->FindKeyword("KLIST");
+            ui.PutAsString("KLIST", klist);
+          }
+        }
+      } else if (phtVal == "LUNARLAMBERT") {
+        if (phtGrp->HasKeyword("L")) {
+          double l = phtGrp->FindKeyword("L");
+          ui.PutDouble("L", l);
+        }
+      } else if (phtVal == "MINNAERT") {
+        if (phtGrp->HasKeyword("K")) {
+          double k = phtGrp->FindKeyword("K");
+          ui.PutDouble("K", k);
+        }
+      } else if (phtVal != "LAMBERT" && phtVal != "LOMMELSEELIGER" &&
+                 phtVal != "LUNARLAMBERTMCEWEN") {
+        string message = "Unsupported photometric model [" + phtVal + "].";
+        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+      }
+      ui.PutAsString("PHTNAME", phtVal);
+    }
+  }
+  iString atmName = ui.GetAsString("ATMNAME");
+  atmName = atmName.UpCase();
+  if (atmName == "NONE") {
+    return;
+  }
+  if (inPvl.HasObject("AtmosphericModel")) {
+    PvlObject atmObj = inPvl.FindObject("AtmosphericModel");
+    iString atmVal;
+    if (atmObj.HasGroup("Algorithm")) {
+      PvlObject::PvlGroupIterator atmGrp = atmObj.BeginGroup();
+      bool wasFound = false;
+      if (ui.WasEntered("ATMNAME")) {
+        while (atmGrp != atmObj.EndGroup()) {
+          if (atmGrp->HasKeyword("ATMNAME")) {
+            atmVal = (string)atmGrp->FindKeyword("ATMNAME");
+            atmVal = atmVal.UpCase();
+            if (atmName == atmVal) {
+              wasFound = true;
+              break;
+            }
+          }
+          atmGrp++;
+        }
+      }
+      if (!wasFound) {
+        return;
+      }
+      ui.Clear("ATMNAME");
+      ui.Clear("HNORM");
+      ui.Clear("BHA");
+      ui.Clear("TAU");
+      ui.Clear("TAUREF");
+      ui.Clear("WHA");
+      ui.Clear("HGA");
+      atmVal = (string)atmGrp->FindKeyword("ATMNAME");
+      atmVal = atmVal.UpCase();
+      if (atmVal == "ANISOTROPIC1" || atmVal == "ANISOTROPIC2" ||
+          atmVal == "HAPKEATM1" || atmVal == "HAPKEATM2" ||
+          atmVal == "ISOTROPIC1" || atmVal == "ISOTROPIC2") {
+        if (atmGrp->HasKeyword("HNORM")) {
+          double hnorm = atmGrp->FindKeyword("HNORM");
+          ui.PutDouble("HNORM", hnorm);
+        }
+        if (atmGrp->HasKeyword("TAU")) {
+          double tau = atmGrp->FindKeyword("TAU");
+          ui.PutDouble("TAU", tau);
+        }
+        if (atmGrp->HasKeyword("TAUREF")) {
+          double tauref = atmGrp->FindKeyword("TAUREF");
+          ui.PutDouble("TAUREF", tauref);
+        }
+        if (atmGrp->HasKeyword("WHA")) {
+          double wha = atmGrp->FindKeyword("WHA");
+          ui.PutDouble("WHA", wha);
+        }
+/*        if (atmGrp->HasKeyword("NULNEG")) {
+          string nulneg = (string)atmGrp->FindKeyword("NULNEG");
+          if (nulneg.compare("YES")) {
+            ui.PutBoolean("NULNEG", true);
+          } else {
+            ui.PutBoolean("NULNEG", false);
+          }
+        }*/
+      }
+      if (atmVal == "ANISOTROPIC1" || atmVal == "ANISOTROPIC2") {
+        if (atmGrp->HasKeyword("BHA")) {
+          double bha = atmGrp->FindKeyword("BHA");
+          ui.PutDouble("BHA", bha);
+        }
+      } 
+      if (atmVal == "HAPKEATM1" || atmVal == "HAPKEATM2") {
+        if (atmGrp->HasKeyword("HGA")) {
+          double hga = atmGrp->FindKeyword("HGA");
+          ui.PutDouble("HGA", hga);
+        }
+      }
+
+      if (atmVal != "ANISOTROPIC1" && atmVal != "ANISOTROPIC2" &&
+          atmVal != "HAPKEATM1" && atmVal != "HAPKEATM2" &&
+          atmVal != "ISOTROPIC1" && atmVal != "ISOTROPIC2") {
+        string message = "Unsupported atmospheric model [" + atmVal + "].";
+        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+      }
+      ui.PutAsString("ATMNAME", atmVal);
+    }
+  }
+}
 
 void IsisMain() {
-  //The PVL to be written out
-  Pvl p;
-
-  //Add the different models to the PVL
-  addPhoModel(p);
-  addAtmosModel(p);
-  addNormalModel(p);
-
   // Get the output file name from the GUI and write the pvl
   // to the file. If no extension is given, '.pvl' will be used.
   UserInterface &ui = Application::GetUserInterface();
-  Filename out = ui.GetFilename("PVL");
-  string output = ui.GetFilename("PVL");
+  Filename out = ui.GetFilename("TOPVL");
+  string output = ui.GetFilename("TOPVL");
   if(out.Extension() == "") {
     output += ".pvl";
   }
 
-  p.Write(output);
+  string input = ui.GetFilename("FROMPVL");
+
+  //The PVL to be written out
+  Pvl p;
+  Pvl op;
+  p.Read(input);
+
+  //Add the different models to the PVL
+  if (ui.GetAsString("PHTNAME") != "NONE") {
+    addPhoModel(p, op);
+  }
+
+  if (ui.GetAsString("ATMNAME") != "NONE") {
+    addAtmosModel(p, op);
+  }
+
+  op.Write(output);
 }
 
 //Function to add photometric model to the PVL
-void addPhoModel(Pvl &pvl) {
+void addPhoModel(Pvl &pvl, Pvl &outPvl) {
+  UserInterface &ui = Application::GetUserInterface();
+
+  bool wasFound = false;
   //Create an object for the photometric model
   PvlObject phoModel("PhotometricModel");
   //Create an algorithm group
   PvlGroup phoAlgo("Algorithm");
-
-  UserInterface &ui = Application::GetUserInterface();
+  PvlObject::PvlGroupIterator phtGrp;
+  PvlObject phtObj;
+  if (pvl.HasObject("PhotometricModel")) {
+    phtObj = pvl.FindObject("PhotometricModel");
+    if (phtObj.HasGroup("Algorithm")) {
+      phtGrp = phtObj.BeginGroup();
+      if (ui.WasEntered("PHTNAME")) {
+        iString phtName = ui.GetAsString("PHTNAME");
+        phtName = phtName.UpCase();
+        int index = 0;
+        while (phtGrp != phtObj.EndGroup()) {
+          if (phtGrp->HasKeyword("PHTNAME")) {
+            iString phtVal = (string)phtGrp->FindKeyword("PHTNAME");
+            phtVal = phtVal.UpCase();
+            if (phtName == phtVal) {
+              phtObj.DeleteGroup(index);
+              wasFound = true;
+            }
+          }
+          phtGrp++;
+          index++;
+        }
+      }
+    }
+  } 
 
   //Get the photometric model and any parameters specific to that
   //model and write it to the algorithm group
 
   //Hapke Henyey Greenstein Photometric Model
-  if(ui.GetString("PHOTOMETRIC") == "HAPKEHEN") {
-    phoAlgo.AddKeyword(PvlKeyword("Name", "Hapkehen"));
-
+  if(ui.GetString("PHTNAME") == "HAPKEHEN") {
     double theta = ui.GetDouble("THETA");
-    phoAlgo.AddKeyword(PvlKeyword("Theta", theta));
-
     double wh = ui.GetDouble("WH");
-    phoAlgo.AddKeyword(PvlKeyword("Wh", wh));
-
     double hg1 = ui.GetDouble("HG1");
-    phoAlgo.AddKeyword(PvlKeyword("Hg1", hg1));
-
     double hg2 = ui.GetDouble("HG2");
-    phoAlgo.AddKeyword(PvlKeyword("Hg2", hg2));
-
     double hh = ui.GetDouble("HH");
-    phoAlgo.AddKeyword(PvlKeyword("Hh", hh));
-
     double b0 = ui.GetDouble("B0");
-    phoAlgo.AddKeyword(PvlKeyword("B0", b0));
+
+    if (!wasFound) {
+      phoAlgo.AddKeyword(PvlKeyword("PhtName", "Hapkehen"));
+      phoAlgo.AddKeyword(PvlKeyword("Theta", theta));
+      phoAlgo.AddKeyword(PvlKeyword("Wh", wh));
+      phoAlgo.AddKeyword(PvlKeyword("Hg1", hg1));
+      phoAlgo.AddKeyword(PvlKeyword("Hg2", hg2));
+      phoAlgo.AddKeyword(PvlKeyword("Hh", hh));
+      phoAlgo.AddKeyword(PvlKeyword("B0", b0));
+    } else {
+      PvlGroup pg("Algorithm");
+      pg.AddKeyword(PvlKeyword("PhtName", "HapkeHen"));
+      pg.AddKeyword(PvlKeyword("Theta", theta));
+      pg.AddKeyword(PvlKeyword("Wh", wh));
+      pg.AddKeyword(PvlKeyword("Hg1", hg1));
+      pg.AddKeyword(PvlKeyword("Hg2", hg2));
+      pg.AddKeyword(PvlKeyword("Hh", hh));
+      pg.AddKeyword(PvlKeyword("B0", b0));
+      phtObj.AddGroup(pg);
+    }
+  }
+  //Hapke Legendre Photometric Model
+  else if(ui.GetString("PHTNAME") == "HAPKELEG") {
+    double theta = ui.GetDouble("THETA");
+    double wh = ui.GetDouble("WH");
+    double bh = ui.GetDouble("BH");
+    double ch = ui.GetDouble("CH");
+    double hh = ui.GetDouble("HH");
+    double b0 = ui.GetDouble("B0");
+
+    if (!wasFound) {
+      phoAlgo.AddKeyword(PvlKeyword("PhtName", "HapkeLeg"));
+      phoAlgo.AddKeyword(PvlKeyword("Theta", theta));
+      phoAlgo.AddKeyword(PvlKeyword("Wh", wh));
+      phoAlgo.AddKeyword(PvlKeyword("Bh", bh));
+      phoAlgo.AddKeyword(PvlKeyword("Ch", ch));
+      phoAlgo.AddKeyword(PvlKeyword("Hh", hh));
+      phoAlgo.AddKeyword(PvlKeyword("B0", b0));
+    } else {
+      PvlGroup pg("Algorithm");
+      pg.AddKeyword(PvlKeyword("PhtName", "HapkeLeg"));
+      pg.AddKeyword(PvlKeyword("Theta", theta));
+      pg.AddKeyword(PvlKeyword("Wh", wh));
+      pg.AddKeyword(PvlKeyword("Bh", bh));
+      pg.AddKeyword(PvlKeyword("Ch", ch));
+      pg.AddKeyword(PvlKeyword("Hh", hh));
+      pg.AddKeyword(PvlKeyword("B0", b0));
+      phtObj.AddGroup(pg);
+    }
   }
   //Lunar Lambert Photometric Model
-  else if(ui.GetString("PHOTOMETRIC") == "LUNARLAMBERT") {
-    phoAlgo.AddKeyword(PvlKeyword("Name", "LunarLambert"));
-
+  else if(ui.GetString("PHTNAME") == "LUNARLAMBERT") {
     double l = ui.GetDouble("L");
-    phoAlgo.AddKeyword(PvlKeyword("L", l));
+
+    if (!wasFound) {
+      phoAlgo.AddKeyword(PvlKeyword("PhtName", "LunarLambert"));
+      phoAlgo.AddKeyword(PvlKeyword("L", l));
+    } else {
+      PvlGroup pg("Algorithm");
+      pg.AddKeyword(PvlKeyword("PhtName", "LunarLambert"));
+      pg.AddKeyword(PvlKeyword("L", l));
+      phtObj.AddGroup(pg);
+    }
+  }
+  //Lunar Lambert Empirical Photometric Model
+  else if(ui.GetString("PHTNAME") == "LUNARLAMBERTEMPIRICAL") {
+    string phaselist = ui.GetString("PHASELIST");
+    string llist = ui.GetString("LLIST");
+    string phasecurvelist = ui.GetString("PHASECURVELIST");
+
+    if (!wasFound) {
+      phoAlgo.AddKeyword(PvlKeyword("PhtName", "LunarLambertEmpirical"));
+      phoAlgo.AddKeyword(PvlKeyword("PhaseList", phaselist));
+      phoAlgo.AddKeyword(PvlKeyword("LList", llist));
+      phoAlgo.AddKeyword(PvlKeyword("PhaseCurveList", phasecurvelist));
+    } else {
+      PvlGroup pg("Algorithm");
+      pg.AddKeyword(PvlKeyword("PhtName", "LunarLambertEmpirical"));
+      pg.AddKeyword(PvlKeyword("PhaseList", phaselist));
+      pg.AddKeyword(PvlKeyword("LList", llist));
+      pg.AddKeyword(PvlKeyword("PhaseCurveList", phasecurvelist));
+      phtObj.AddGroup(pg);
+    }
   }
   //Minnaert Photometric Model
-  else if(ui.GetString("PHOTOMETRIC") == "MINNAERT") {
-    phoAlgo.AddKeyword(PvlKeyword("Name", "Minnaert"));
-
+  else if(ui.GetString("PHTNAME") == "MINNAERT") {
     double k = ui.GetDouble("K");
-    phoAlgo.AddKeyword(PvlKeyword("K", k));
+
+    if (!wasFound) {
+      phoAlgo.AddKeyword(PvlKeyword("PhtName", "Minnaert"));
+      phoAlgo.AddKeyword(PvlKeyword("K", k));
+    } else {
+      PvlGroup pg("Algorithm");
+      pg.AddKeyword(PvlKeyword("PhtName", "Minnaert"));
+      pg.AddKeyword(PvlKeyword("K", k));
+      phtObj.AddGroup(pg);
+    }
+  }
+  //Minnaert Empirical Photometric Model
+  else if(ui.GetString("PHTNAME") == "MINNAERTEMPIRICAL") {
+    string phaselist = ui.GetString("PHASELIST");
+    string klist = ui.GetString("KLIST");
+    string phasecurvelist = ui.GetString("PHASECURVELIST");
+
+    if (!wasFound) {
+      phoAlgo.AddKeyword(PvlKeyword("PhtName", "MinnaertEmpirical"));
+      phoAlgo.AddKeyword(PvlKeyword("PhaseList", phaselist));
+      phoAlgo.AddKeyword(PvlKeyword("KList", klist));
+      phoAlgo.AddKeyword(PvlKeyword("PhaseCurveList", phasecurvelist));
+    } else {
+      PvlGroup pg("Algorithm");
+      pg.AddKeyword(PvlKeyword("PhtName", "MinnaertEmpirical"));
+      pg.AddKeyword(PvlKeyword("PhaseList", phaselist));
+      pg.AddKeyword(PvlKeyword("KList", klist));
+      pg.AddKeyword(PvlKeyword("PhaseCurveList", phasecurvelist));
+      phtObj.AddGroup(pg);
+    }
   }
   //Lambert Photometric Model
-  else if(ui.GetString("PHOTOMETRIC") == "LAMBERT") {
-    phoAlgo.AddKeyword(PvlKeyword("Name", "Lambert"));
+  else if(ui.GetString("PHTNAME") == "LAMBERT") {
+    if (!wasFound) {
+      phoAlgo.AddKeyword(PvlKeyword("PhtName", "Lambert"));
+    } else {
+      PvlGroup pg("Algorithm");
+      pg.AddKeyword(PvlKeyword("PhtName", "Lambert"));
+      phtObj.AddGroup(pg);
+    }
   }
   //Lommel Seeliger Photometric Model
-  else if(ui.GetString("PHOTOMETRIC") == "LOMMELSEELIGER") {
-    phoAlgo.AddKeyword(PvlKeyword("Name", "LommelSeeliger"));
+  else if(ui.GetString("PHTNAME") == "LOMMELSEELIGER") {
+    if (!wasFound) {
+      phoAlgo.AddKeyword(PvlKeyword("PhtName", "LommelSeeliger"));
+    } else {
+      PvlGroup pg("Algorithm");
+      pg.AddKeyword(PvlKeyword("PhtName", "LommelSeeliger"));
+      phtObj.AddGroup(pg);
+    }
   }
   //Lunar Lambert McEwen Photometric Model
-  else if(ui.GetString("PHOTOMETRIC") == "LUNARLAMBERTMCEWEN") {
-    phoAlgo.AddKeyword(PvlKeyword("Name", "LunarLambertMcEwen"));
+  else if(ui.GetString("PHTNAME") == "LUNARLAMBERTMCEWEN") {
+    if (!wasFound) {
+      phoAlgo.AddKeyword(PvlKeyword("PhtName", "LunarLambertMcEwen"));
+    } else {
+      PvlGroup pg("Algorithm");
+      pg.AddKeyword(PvlKeyword("PhtName", "LunarLambertMcEwen"));
+      phtObj.AddGroup(pg);
+    }
   }
 
   //Add the algorithm group to the photometric model object and add it to the PVL
-  phoModel.AddGroup(phoAlgo);
-  pvl.AddObject(phoModel);
+  if (!wasFound) {
+    phoModel.AddGroup(phoAlgo);
+    outPvl.AddObject(phoModel);
+  } else {
+    outPvl.AddObject(phtObj);
+  }
 }
 
 //Function to add atmospheric model to the PVL
-void addAtmosModel(Pvl &pvl) {
+void addAtmosModel(Pvl &pvl, Pvl &outPvl) {
   UserInterface &ui = Application::GetUserInterface();
 
-  //If the normalization model is one with an atmospheric model
-  //then create an atmospheric model and add it to the PVL.
-  if((ui.GetString("NORMALIZATION") == "ATMALBEDO" ||
-      ui.GetString("NORMALIZATION") == "ATMSHADE" ||
-      ui.GetString("NORMALIZATION") == "ATMTOPO")) {
-
-    //Create an object for the atmospheric model
-    PvlObject atmosModel("AtmosphericModel");
-    //Create an algorithm group
-    PvlGroup atmosAlgo("Algorithm");
-
-    //Get the atmospheric model and any parameters specific to that
-    //model and write it to the algorithm group
-
-    //Anisotropic 1 Atmospheric Model
-    if(ui.GetString("ATMOSPHERIC") == "ANISOTROPIC1") {
-      atmosAlgo.AddKeyword(PvlKeyword("Name", "Anisotropic1"));
-
-      bool nulneg = ui.GetBoolean("NULNEG");
-
-      //if NULNEG is checked add it to the group, otherwise the
-      //default is to leave it out
-      if(nulneg) {
-        atmosAlgo.AddKeyword(PvlKeyword("Nulneg", "YES"));
-      }
-
-      double tau = ui.GetDouble("TAU");
-      atmosAlgo.AddKeyword(PvlKeyword("Tau", tau));
-
-      double tauref = ui.GetDouble("TAUREF");
-      atmosAlgo.AddKeyword(PvlKeyword("Tauref", tauref));
-
-      double wha = ui.GetDouble("WHA");
-      atmosAlgo.AddKeyword(PvlKeyword("Wha", wha));
-
-      //if WHAREF was entered add it to the group, otherwise the
-      //default is to leave it out
-      if(ui.WasEntered("WHAREF")) {
-        double wharef = ui.GetDouble("WHAREF");
-        atmosAlgo.AddKeyword(PvlKeyword("Wharef", wharef));
-      }
-
-      double bha = ui.GetDouble("BHA");
-      atmosAlgo.AddKeyword(PvlKeyword("Bha", bha));
-
-      //if BHAREF was entered add it to the group, otherwise the
-      //default is to leave it out
-      if(ui.WasEntered("BHAREF")) {
-        double bharef = ui.GetDouble("BHAREF");
-        atmosAlgo.AddKeyword(PvlKeyword("Bharef", bharef));
-      }
-
-      double hnorm = ui.GetDouble("HNORM");
-      atmosAlgo.AddKeyword(PvlKeyword("Hnorm", hnorm));
-    }
-    //Anisotropic 2 Atmospheric Model
-    else if(ui.GetString("ATMOSPHERIC") == "ANISOTROPIC2") {
-      atmosAlgo.AddKeyword(PvlKeyword("Name", "Anisotropic2"));
-
-      bool nulneg = ui.GetBoolean("NULNEG");
-
-      //if NULNEG is checked add it to the group, otherwise the
-      //default is to leave it out
-      if(nulneg) {
-        atmosAlgo.AddKeyword(PvlKeyword("Nulneg", "Yes"));
-      }
-
-      double tau = ui.GetDouble("TAU");
-      atmosAlgo.AddKeyword(PvlKeyword("Tau", tau));
-
-      double tauref = ui.GetDouble("TAUREF");
-      atmosAlgo.AddKeyword(PvlKeyword("Tauref", tauref));
-
-      double wha = ui.GetDouble("WHA");
-      atmosAlgo.AddKeyword(PvlKeyword("Wha", wha));
-
-      //if WHAREF was entered add it to the group, otherwise the
-      //default is to leave it out
-      if(ui.WasEntered("WHAREF")) {
-        double wharef = ui.GetDouble("WHAREF");
-        atmosAlgo.AddKeyword(PvlKeyword("Wharef", wharef));
-      }
-
-      double bha = ui.GetDouble("BHA");
-      atmosAlgo.AddKeyword(PvlKeyword("Bha", bha));
-
-      //if BHAREF was entered add it to the group, otherwise the
-      //default is to leave it out
-      if(ui.WasEntered("BHAREF")) {
-        double bharef = ui.GetDouble("BHAREF");
-        atmosAlgo.AddKeyword(PvlKeyword("Bharef", bharef));
-      }
-
-      double hnorm = ui.GetDouble("HNORM");
-      atmosAlgo.AddKeyword(PvlKeyword("Hnorm", hnorm));
-    }
-    //Hapke 1 Atmospheric Model
-    else if(ui.GetString("ATMOSPHERIC") == "HAPKEATM1") {
-      atmosAlgo.AddKeyword(PvlKeyword("Name", "HapkeAtm1"));
-
-      bool nulneg = ui.GetBoolean("NULNEG");
-
-      //if NULNEG is checked add it to the group, otherwise the
-      //default is to leave it out
-      if(nulneg) {
-        atmosAlgo.AddKeyword(PvlKeyword("Nulneg", "Yes"));
-      }
-
-      double tau = ui.GetDouble("TAU");
-      atmosAlgo.AddKeyword(PvlKeyword("Tau", tau));
-
-      double tauref = ui.GetDouble("TAUREF");
-      atmosAlgo.AddKeyword(PvlKeyword("Tauref", tauref));
-
-      double wha = ui.GetDouble("WHA");
-      atmosAlgo.AddKeyword(PvlKeyword("Wha", wha));
-
-      //if WHAREF was entered add it to the group, otherwise the
-      //default is to leave it out
-      if(ui.WasEntered("WHAREF")) {
-        double wharef = ui.GetDouble("WHAREF");
-        atmosAlgo.AddKeyword(PvlKeyword("Wharef", wharef));
-      }
-
-      double hga = ui.GetDouble("HGA");
-      atmosAlgo.AddKeyword(PvlKeyword("Hga", hga));
-
-      //if HGAREF was entered add it to the group, otherwise the
-      //default is to leave it out
-      if(ui.WasEntered("HGAREF")) {
-        double hgaref = ui.GetDouble("HGAREF");
-        atmosAlgo.AddKeyword(PvlKeyword("Hgaref", hgaref));
-      }
-
-      double hnorm = ui.GetDouble("HNORM");
-      atmosAlgo.AddKeyword(PvlKeyword("Hnorm", hnorm));
-    }
-    //Hapke 2 Atmospheric Model
-    else if(ui.GetString("ATMOSPHERIC") == "HAPKEATM2") {
-      atmosAlgo.AddKeyword(PvlKeyword("Name", "HapkeAtm2"));
-
-      bool nulneg = ui.GetBoolean("NULNEG");
-
-      //if NULNEG is checked add it to the group, otherwise the
-      //default is to leave it out
-      if(nulneg) {
-        atmosAlgo.AddKeyword(PvlKeyword("Nulneg", "Yes"));
-      }
-
-      double tau = ui.GetDouble("TAU");
-      atmosAlgo.AddKeyword(PvlKeyword("Tau", tau));
-
-      double tauref = ui.GetDouble("TAUREF");
-      atmosAlgo.AddKeyword(PvlKeyword("Tauref", tauref));
-
-      double wha = ui.GetDouble("WHA");
-      atmosAlgo.AddKeyword(PvlKeyword("Wha", wha));
-
-      //if WHAREF was entered add it to the group, otherwise the
-      //default is to leave it out
-      if(ui.WasEntered("WHAREF")) {
-        double wharef = ui.GetDouble("WHAREF");
-        atmosAlgo.AddKeyword(PvlKeyword("Wharef", wharef));
-      }
-
-      double hga = ui.GetDouble("HGA");
-      atmosAlgo.AddKeyword(PvlKeyword("Hga", hga));
-
-      //if HGAREF was entered add it to the group, otherwise the
-      //default is to leave it out
-      if(ui.WasEntered("HGAREF")) {
-        double hgaref = ui.GetDouble("HGAREF");
-        atmosAlgo.AddKeyword(PvlKeyword("Hgaref", hgaref));
-      }
-
-      double hnorm = ui.GetDouble("HNORM");
-      atmosAlgo.AddKeyword(PvlKeyword("Hnorm", hnorm));
-    }
-    //Isotropic 1 Atmospheric Model
-    else if(ui.GetString("ATMOSPHERIC") == "ISOTROPIC1") {
-      atmosAlgo.AddKeyword(PvlKeyword("Name", "Isotropic1"));
-
-      bool nulneg = ui.GetBoolean("NULNEG");
-
-      //if NULNEG is checked add it to the group, otherwise the
-      //default is to leave it out
-      if(nulneg) {
-        atmosAlgo.AddKeyword(PvlKeyword("Nulneg", "Yes"));
-      }
-
-      double tau = ui.GetDouble("TAU");
-      atmosAlgo.AddKeyword(PvlKeyword("Tau", tau));
-
-      double tauref = ui.GetDouble("TAUREF");
-      atmosAlgo.AddKeyword(PvlKeyword("Tauref", tauref));
-
-      double wha = ui.GetDouble("WHA");
-      atmosAlgo.AddKeyword(PvlKeyword("Wha", wha));
-
-      //if WHAREF was entered add it to the group, otherwise the
-      //default is to leave it out
-      if(ui.WasEntered("WHAREF")) {
-        double wharef = ui.GetDouble("WHAREF");
-        atmosAlgo.AddKeyword(PvlKeyword("Wharef", wharef));
-      }
-
-      double hnorm = ui.GetDouble("HNORM");
-      atmosAlgo.AddKeyword(PvlKeyword("Hnorm", hnorm));
-    }
-    //Isotropic 2 Atmospheric Model
-    else if(ui.GetString("ATMOSPHERIC") == "ISOTROPIC2") {
-      atmosAlgo.AddKeyword(PvlKeyword("Name", "Isotropic2"));
-
-      bool nulneg = ui.GetBoolean("NULNEG");
-
-      //if NULNEG is checked add it to the group, otherwise the
-      //default is to leave it out
-      if(nulneg) {
-        atmosAlgo.AddKeyword(PvlKeyword("Nulneg", "Yes"));
-      }
-
-      double tau = ui.GetDouble("TAU");
-      atmosAlgo.AddKeyword(PvlKeyword("Tau", tau));
-
-      double tauref = ui.GetDouble("TAUREF");
-      atmosAlgo.AddKeyword(PvlKeyword("Tauref", tauref));
-
-      double wha = ui.GetDouble("WHA");
-      atmosAlgo.AddKeyword(PvlKeyword("Wha", wha));
-
-      //if WHAREF was entered add it to the group, otherwise the
-      //default is to leave it out
-      if(ui.WasEntered("WHAREF")) {
-        double wharef = ui.GetDouble("WHAREF");
-        atmosAlgo.AddKeyword(PvlKeyword("Wharef", wharef));
-      }
-
-      double hnorm = ui.GetDouble("HNORM");
-      atmosAlgo.AddKeyword(PvlKeyword("Hnorm", hnorm));
-    }
-
-    //Add the algorithm group to the atmospheric model object and add it to the PVL
-    atmosModel.AddGroup(atmosAlgo);
-    pvl.AddObject(atmosModel);
-  }
-}
-
-//Function to add normalization model to the PVL
-void addNormalModel(Pvl &pvl) {
-  //Create an object for the normalization model
-  PvlObject normalModel("NormalizationModel");
+  bool wasFound = false;
+  //Create an object for the atmospheric model
+  PvlObject atmosModel("AtmosphericModel");
   //Create an algorithm group
-  PvlGroup normalAlgo("Algorithm");
+  PvlGroup atmosAlgo("Algorithm");
+  PvlObject::PvlGroupIterator atmGrp;
+  PvlObject atmObj;
+  if (pvl.HasObject("AtmosphericModel")) {
+    atmObj = pvl.FindObject("AtmosphericModel");
+    if (atmObj.HasGroup("Algorithm")) {
+      atmGrp = atmObj.BeginGroup();
+      if (ui.WasEntered("ATMNAME")) {
+        iString atmName = ui.GetAsString("ATMNAME");
+        atmName = atmName.UpCase();
+        int index = 0;
+        while (atmGrp != atmObj.EndGroup()) {
+          if (atmGrp->HasKeyword("ATMNAME")) {
+            iString atmVal = (string)atmGrp->FindKeyword("ATMNAME");
+            atmVal = atmVal.UpCase();
+            if (atmName == atmVal) {
+              atmObj.DeleteGroup(index);
+              wasFound = true;
+            }
+          }
+          atmGrp++;
+          index++;
+        }
+      }
+    }
+  } 
 
-  UserInterface &ui = Application::GetUserInterface();
-
-  //Get the normalization model and any parameters specific to that
+  //Get the atmospheric model and any parameters specific to that
   //model and write it to the algorithm group
 
-  //Albedo Normalization Model
-  if(ui.GetString("NORMALIZATION") == "ALBEDO") {
-    normalAlgo.AddKeyword(PvlKeyword("Name", "Albedo"));
+  //Anisotropic 1 Atmospheric Model
+  if(ui.GetString("ATMNAME") == "ANISOTROPIC1") {
+    double tau = ui.GetDouble("TAU");
+    double tauref = ui.GetDouble("TAUREF");
+    double wha = ui.GetDouble("WHA");
+    double bha = ui.GetDouble("BHA");
+    double hnorm = ui.GetDouble("HNORM");
 
-    double incref = ui.GetDouble("INCREF");
-    normalAlgo.AddKeyword(PvlKeyword("Incref", incref));
-
-    double incmat = ui.GetDouble("INCMAT");
-    normalAlgo.AddKeyword(PvlKeyword("Incmat", incmat));
-
-    double thresh = ui.GetDouble("THRESH");
-    normalAlgo.AddKeyword(PvlKeyword("Thresh", thresh));
-
-    double albedo = ui.GetDouble("ALBEDO");
-    normalAlgo.AddKeyword(PvlKeyword("Albedo", albedo));
+    if (!wasFound) {
+      atmosAlgo.AddKeyword(PvlKeyword("AtmName", "Anisotropic1"));
+      atmosAlgo.AddKeyword(PvlKeyword("Tau", tau));
+      atmosAlgo.AddKeyword(PvlKeyword("Tauref", tauref));
+      atmosAlgo.AddKeyword(PvlKeyword("Wha", wha));
+      atmosAlgo.AddKeyword(PvlKeyword("Bha", bha));
+      atmosAlgo.AddKeyword(PvlKeyword("Hnorm", hnorm));
+    } else {
+      PvlGroup pg("Algorithm");
+      pg.AddKeyword(PvlKeyword("AtmName", "Anisotropic1"));
+      pg.AddKeyword(PvlKeyword("Tau", tau));
+      pg.AddKeyword(PvlKeyword("Tauref", tauref));
+      pg.AddKeyword(PvlKeyword("Wha", wha));
+      pg.AddKeyword(PvlKeyword("Bha", bha));
+      pg.AddKeyword(PvlKeyword("Hnorm", hnorm));
+      atmObj.AddGroup(pg);
+    }
   }
-  //Mixed Normalization Model
-  else if(ui.GetString("NORMALIZATION") == "MIXED") {
-    normalAlgo.AddKeyword(PvlKeyword("Name", "Mixed"));
+  //Anisotropic 2 Atmospheric Model
+  else if(ui.GetString("ATMNAME") == "ANISOTROPIC2") {
+    double tau = ui.GetDouble("TAU");
+    double tauref = ui.GetDouble("TAUREF");
+    double wha = ui.GetDouble("WHA");
+    double bha = ui.GetDouble("BHA");
+    double hnorm = ui.GetDouble("HNORM");
 
-    double incref = ui.GetDouble("INCREF");
-    normalAlgo.AddKeyword(PvlKeyword("Incref", incref));
+    if (!wasFound) {
+      atmosAlgo.AddKeyword(PvlKeyword("AtmName", "Anisotropic2"));
+      atmosAlgo.AddKeyword(PvlKeyword("Tau", tau));
+      atmosAlgo.AddKeyword(PvlKeyword("Tauref", tauref));
+      atmosAlgo.AddKeyword(PvlKeyword("Wha", wha));
+      atmosAlgo.AddKeyword(PvlKeyword("Bha", bha));
+      atmosAlgo.AddKeyword(PvlKeyword("Hnorm", hnorm));
+    } else {
+      PvlGroup pg("Algorithm");
+      pg.AddKeyword(PvlKeyword("AtmName", "Anisotropic2"));
+      pg.AddKeyword(PvlKeyword("Tau", tau));
+      pg.AddKeyword(PvlKeyword("Tauref", tauref));
+      pg.AddKeyword(PvlKeyword("Wha", wha));
+      pg.AddKeyword(PvlKeyword("Bha", bha));
+      pg.AddKeyword(PvlKeyword("Hnorm", hnorm));
+      atmObj.AddGroup(pg);
+    }
 
-    double incmat = ui.GetDouble("INCMAT");
-    normalAlgo.AddKeyword(PvlKeyword("Incmat", incmat));
-
-    double thresh = ui.GetDouble("THRESH");
-    normalAlgo.AddKeyword(PvlKeyword("Thresh", thresh));
-
-    double albedo = ui.GetDouble("ALBEDO");
-    normalAlgo.AddKeyword(PvlKeyword("Albedo", albedo));
   }
-  //Moon Albedo Normalization Model
-  else if(ui.GetString("NORMALIZATION") == "MOONALBEDO") {
-    normalAlgo.AddKeyword(PvlKeyword("Name", "MoonAlbedo"));
+  //Hapke 1 Atmospheric Model
+  else if(ui.GetString("ATMNAME") == "HAPKEATM1") {
+    double tau = ui.GetDouble("TAU");
+    double tauref = ui.GetDouble("TAUREF");
+    double wha = ui.GetDouble("WHA");
+    double hga = ui.GetDouble("HGA");
+    double hnorm = ui.GetDouble("HNORM");
 
-    double d = ui.GetDouble("D");
-    normalAlgo.AddKeyword(PvlKeyword("D", d));
-
-    double e = ui.GetDouble("E");
-    normalAlgo.AddKeyword(PvlKeyword("E", e));
-
-    double f = ui.GetDouble("F");
-    normalAlgo.AddKeyword(PvlKeyword("F", f));
-
-    double g2 = ui.GetDouble("G2");
-    normalAlgo.AddKeyword(PvlKeyword("G2", g2));
-
-    double h = ui.GetDouble("H");
-    normalAlgo.AddKeyword(PvlKeyword("H", h));
-
-    double xmul = ui.GetDouble("XMUL");
-    normalAlgo.AddKeyword(PvlKeyword("Xmul", xmul));
-
-    double wl = ui.GetDouble("WL");
-    normalAlgo.AddKeyword(PvlKeyword("Wl", wl));
-
-    double bsh1 = ui.GetDouble("BSH1");
-    normalAlgo.AddKeyword(PvlKeyword("Bsh1", bsh1));
-
-    double xb1 = ui.GetDouble("XB1");
-    normalAlgo.AddKeyword(PvlKeyword("Xb1", xb1));
-
-    double xb2 = ui.GetDouble("XB2");
-    normalAlgo.AddKeyword(PvlKeyword("Xb2", xb2));
+    if (!wasFound) {
+      atmosAlgo.AddKeyword(PvlKeyword("AtmName", "HapkeAtm1"));
+      atmosAlgo.AddKeyword(PvlKeyword("Tau", tau));
+      atmosAlgo.AddKeyword(PvlKeyword("Tauref", tauref));
+      atmosAlgo.AddKeyword(PvlKeyword("Wha", wha));
+      atmosAlgo.AddKeyword(PvlKeyword("Hga", hga));
+      atmosAlgo.AddKeyword(PvlKeyword("Hnorm", hnorm));
+    } else {
+      PvlGroup pg("Algorithm");
+      pg.AddKeyword(PvlKeyword("AtmName", "HapkeAtm1"));
+      pg.AddKeyword(PvlKeyword("Tau", tau));
+      pg.AddKeyword(PvlKeyword("Tauref", tauref));
+      pg.AddKeyword(PvlKeyword("Wha", wha));
+      pg.AddKeyword(PvlKeyword("Hga", hga));
+      pg.AddKeyword(PvlKeyword("Hnorm", hnorm));
+      atmObj.AddGroup(pg);
+    }
   }
-  //Shade Normalization Model
-  else if(ui.GetString("NORMALIZATION") == "SHADE") {
-    normalAlgo.AddKeyword(PvlKeyword("Name", "Shade"));
+  //Hapke 2 Atmospheric Model
+  else if(ui.GetString("ATMNAME") == "HAPKEATM2") {
+    double tau = ui.GetDouble("TAU");
+    double tauref = ui.GetDouble("TAUREF");
+    double wha = ui.GetDouble("WHA");
+    double hga = ui.GetDouble("HGA");
+    double hnorm = ui.GetDouble("HNORM");
 
-    double incref = ui.GetDouble("INCREF");
-    normalAlgo.AddKeyword(PvlKeyword("Incref", incref));
-
-    double albedo = ui.GetDouble("ALBEDO");
-    normalAlgo.AddKeyword(PvlKeyword("Albedo", albedo));
+    if (!wasFound) {
+      atmosAlgo.AddKeyword(PvlKeyword("AtmName", "HapkeAtm2"));
+      atmosAlgo.AddKeyword(PvlKeyword("Tau", tau));
+      atmosAlgo.AddKeyword(PvlKeyword("Tauref", tauref));
+      atmosAlgo.AddKeyword(PvlKeyword("Wha", wha));
+      atmosAlgo.AddKeyword(PvlKeyword("Hga", hga));
+      atmosAlgo.AddKeyword(PvlKeyword("Hnorm", hnorm));
+    } else {
+      PvlGroup pg("Algorithm");
+      pg.AddKeyword(PvlKeyword("AtmName", "HapkeAtm2"));
+      pg.AddKeyword(PvlKeyword("Tau", tau));
+      pg.AddKeyword(PvlKeyword("Tauref", tauref));
+      pg.AddKeyword(PvlKeyword("Wha", wha));
+      pg.AddKeyword(PvlKeyword("Hga", hga));
+      pg.AddKeyword(PvlKeyword("Hnorm", hnorm));
+      atmObj.AddGroup(pg);
+    }
   }
-  //Topographic Normalization Model
-  else if(ui.GetString("NORMALIZATION") == "TOPO") {
-    normalAlgo.AddKeyword(PvlKeyword("Name", "Topo"));
+  //Isotropic 1 Atmospheric Model
+  else if(ui.GetString("ATMNAME") == "ISOTROPIC1") {
+    double tau = ui.GetDouble("TAU");
+    double tauref = ui.GetDouble("TAUREF");
+    double wha = ui.GetDouble("WHA");
+    double hnorm = ui.GetDouble("HNORM");
 
-    double incref = ui.GetDouble("INCREF");
-    normalAlgo.AddKeyword(PvlKeyword("Incref", incref));
-
-    double thresh = ui.GetDouble("THRESH");
-    normalAlgo.AddKeyword(PvlKeyword("Thresh", thresh));
-
-    double albedo = ui.GetDouble("ALBEDO");
-    normalAlgo.AddKeyword(PvlKeyword("Albedo", albedo));
+    if (!wasFound) {
+      atmosAlgo.AddKeyword(PvlKeyword("AtmName", "Isotropic1"));
+      atmosAlgo.AddKeyword(PvlKeyword("Tau", tau));
+      atmosAlgo.AddKeyword(PvlKeyword("Tauref", tauref));
+      atmosAlgo.AddKeyword(PvlKeyword("Wha", wha));
+      atmosAlgo.AddKeyword(PvlKeyword("Hnorm", hnorm));
+    } else {
+      PvlGroup pg("Algorithm");
+      pg.AddKeyword(PvlKeyword("AtmName", "Isotropic1"));
+      pg.AddKeyword(PvlKeyword("Tau", tau));
+      pg.AddKeyword(PvlKeyword("Tauref", tauref));
+      pg.AddKeyword(PvlKeyword("Wha", wha));
+      pg.AddKeyword(PvlKeyword("Hnorm", hnorm));
+      atmObj.AddGroup(pg);
+    }
   }
-  //Albedo Atmospheric Normalization Model
-  else if(ui.GetString("NORMALIZATION") == "ATMALBEDO") {
-    normalAlgo.AddKeyword(PvlKeyword("Name", "AlbedoAtm"));
+  //Isotropic 2 Atmospheric Model
+  else if(ui.GetString("ATMNAME") == "ISOTROPIC2") {
+    double tau = ui.GetDouble("TAU");
+    double tauref = ui.GetDouble("TAUREF");
+    double wha = ui.GetDouble("WHA");
+    double hnorm = ui.GetDouble("HNORM");
 
-    double incref = ui.GetDouble("INCREF");
-    normalAlgo.AddKeyword(PvlKeyword("Incref", incref));
-  }
-  else if(ui.GetString("NORMALIZATION") == "ATMSHADE") {
-    normalAlgo.AddKeyword(PvlKeyword("Name", "ShadeAtm"));
-
-    double incref = ui.GetDouble("INCREF");
-    normalAlgo.AddKeyword(PvlKeyword("Incref", incref));
-
-    double albedo = ui.GetDouble("ALBEDO");
-    normalAlgo.AddKeyword(PvlKeyword("Albedo", albedo));
-  }
-  //Topographic Atmospheric Normalization Model
-  else if(ui.GetString("NORMALIZATION") == "ATMTOPO") {
-    normalAlgo.AddKeyword(PvlKeyword("Name", "TopoAtm"));
-
-    double incref = ui.GetDouble("INCREF");
-    normalAlgo.AddKeyword(PvlKeyword("Incref", incref));
-
-    double albedo = ui.GetDouble("ALBEDO");
-    normalAlgo.AddKeyword(PvlKeyword("Albedo", albedo));
-  }
-  //No Normalization
-  else if(ui.GetString("NORMALIZATION") == "NONORMALIZATION") {
-    normalAlgo.AddKeyword(PvlKeyword("Name", "NoNormalization"));
+    if (!wasFound) {
+      atmosAlgo.AddKeyword(PvlKeyword("AtmName", "Isotropic2"));
+      atmosAlgo.AddKeyword(PvlKeyword("Tau", tau));
+      atmosAlgo.AddKeyword(PvlKeyword("Tauref", tauref));
+      atmosAlgo.AddKeyword(PvlKeyword("Wha", wha));
+      atmosAlgo.AddKeyword(PvlKeyword("Hnorm", hnorm));
+    } else {
+      PvlGroup pg("Algorithm");
+      pg.AddKeyword(PvlKeyword("AtmName", "Isotropic2"));
+      pg.AddKeyword(PvlKeyword("Tau", tau));
+      pg.AddKeyword(PvlKeyword("Tauref", tauref));
+      pg.AddKeyword(PvlKeyword("Wha", wha));
+      pg.AddKeyword(PvlKeyword("Hnorm", hnorm));
+      atmObj.AddGroup(pg);
+    }
   }
 
-  //Add the algorithm group to the normalization model object and add it to the PVL
-  normalModel.AddGroup(normalAlgo);
-  pvl.AddObject(normalModel);
+  //Add the algorithm group to the atmospheric model object and add it to the PVL
+  if (!wasFound) {
+    atmosModel.AddGroup(atmosAlgo);
+    outPvl.AddObject(atmosModel);
+  } else {
+    outPvl.AddObject(atmObj);
+  }
 }
-
-
-
