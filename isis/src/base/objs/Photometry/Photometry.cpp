@@ -140,10 +140,6 @@ namespace Isis {
       x_hi   = gsl_root_fsolver_x_upper(s);
       status = gsl_root_test_interval(x_lo, x_hi, 0, tolerance);
       
-      if (status == GSL_SUCCESS) {
-        cerr << "Converged\n";
-      }
-      
     } while (status != GSL_SUCCESS && iter < max_iter);
     
     gsl_root_fsolver_free(s);

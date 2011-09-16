@@ -24,7 +24,6 @@ minbracket Minimum=15.7082
 brentminimizer's Converged Minimum = 15.708
 
 ***** Testing Brent's Root Bracketing Algorithm *****
-Converged
 Initial lower search interval = 0
 Initial higher search interval = 5
 Tolerance = 0.001
