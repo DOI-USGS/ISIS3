@@ -1,9 +1,9 @@
-//  $Id: hical.cpp,v 1.9 2009/09/16 03:37:23 kbecker Exp $
+//  $Id: hical.cpp,v 1.14 2009/09/15 21:56:44 kbecker Exp $
 #include "Isis.h"
 
 #include <cstdio>
 #include <string>
-#include <vector>
+#include <vector> 
 #include <algorithm>
 #include <sstream>
 #include <iostream>
@@ -19,15 +19,19 @@
 #include "HiCalTypes.h"
 #include "HiCalUtil.h"
 #include "HiCalData.h"
-#include "SplineFillComp.h"
-#include "LowPassFilterComp.h"
-#include "DriftBuffer.h"
-#include "DriftCorrect.h"
-#include "OffsetCorrect.h"
-#include "DarkSubtractComp.h"
-#include "GainVLineComp.h"
-#include "FlatFieldComp.h"
-#include "TempGainCorrect.h"
+#include "Statistics.h"
+#include "SplineFill.h"              // SpineFillComp.h 
+#include "LowPassFilter.h"           // LowPassFilterComp.h
+#include "ZeroBufferSmooth.h"        // DriftBuffer.h  (Zf)
+#include "ZeroBufferFit.h"           // DriftCorrect.h (Zd)
+#include "ZeroReverse.h"             // OffsetCorrect.h (Zz)
+#include "ZeroDark.h"                // DarkSubtractComp.h (Zb)
+#include "GainLineDrift.h"           // GainVLineComp.h (Zg)
+#include "GainNonLinearity.h"        // Non-linear gain (new)
+#include "GainChannelNormalize.h"    // ZggModule.h (Zgg)
+#include "GainFlatField.h"           // FlatFieldComp.h (Za)
+#include "GainTemperature.h"         // TempGainCorrect.h (Zt)
+#include "GainUnitConversion.h"      // ZiofModule.h (Ziof)
 
 
 using namespace Isis;
@@ -39,56 +43,73 @@ typedef CollectorMap<std::string, HiVector, NoCaseStringCompare> MatrixList;
 //  Calibration parameter container
 MatrixList *calVars = 0;
 
+
 /**
  * @brief Apply calibration to each HiRISE image line
- *
+ * 
  * This function applies the calbration equation to each input image line.  It
  * gets matrices and constants from the \b calVars container that is established
  * in the main with some user input via the configuration (CONF) parameter.
- *
+ * 
  * @param in  Input raw image line buffer
  * @param out Output calibrated image line buffer
  */
 void calibrate(Buffer &in, Buffer &out) {
-  const HiVector &Zd    = calVars->get("Zd");
-  const HiVector &Zz    = calVars->get("Zz");
-  const HiVector &Zb    = calVars->get("Zb");
-  const HiVector &Zg    = calVars->get("Zg");
-  const HiVector &Zgg   = calVars->get("Zgg");
-  const HiVector &Za    = calVars->get("Za");
-  const HiVector &Zt    = calVars->get("Zt");
-  double Ziof           = calVars->get("Ziof")[0];
+  const HiVector &ZBF    = calVars->get("ZeroBufferFit");
+  const HiVector &ZRev   = calVars->get("ZeroReverse");
+  const HiVector &ZD     = calVars->get("ZeroDark");
+  const HiVector &GLD    = calVars->get("GainLineDrift");
+  const HiVector &GCN    = calVars->get("GainChannelNormalize");
+  const double GNL       = calVars->get("GainNonLinearity")[0];
+  const HiVector &GFF    = calVars->get("GainFlatField");
+  const HiVector &GT     = calVars->get("GainTemperature");
+  const double GUC       = calVars->get("GainUnitConversion")[0];
 
   //  Set current line (index)
-  int line(in.Line() - 1);
-  if(calVars->exists("LastGoodLine")) {
-    int lastline = ((int)(calVars->get("LastGoodLine"))[0]) - 1;
-    if(line > lastline) {
-      line = lastline;
-    }
+  int line(in.Line()-1);
+  if (calVars->exists("LastGoodLine")) {
+    int lastline = ((int) (calVars->get("LastGoodLine"))[0]) - 1;
+    if ( line > lastline ) { line = lastline; }
   }
 
-  //  Apply correction
-  for(int i = 0 ; i < in.size() ; i++) {
-    if(IsSpecial(in[i])) {
+  //  Apply correction to point of non-linearity accumulating average
+  vector<double> data;
+  for (int i = 0 ; i < in.size() ; i++) {
+    if (IsSpecial(in[i])) {
       out[i] = in[i];
     }
     else {
       double hdn;
-      hdn = (in[i] - Zd[line] - Zz[i] - Zb[i]); // Drift, Offset, Dark
-      hdn = hdn / Zg[line] * Zgg[i] * Za[i] * Zt[i];  // GainVLine, Gain, FlatField, TempGain
-      out[i] = hdn / Ziof;                   // I/F or DN or DN/US
+      hdn = (in[i] - ZBF[line] - ZRev[i] - ZD[i]); // Drift, Reverse, Dark
+      hdn = hdn / GLD[line];  // GainLineDrift 
+      data.push_back(hdn);   // Accumulate average for non-linearity
+      out[i] = hdn;
+    }
+  }
+
+  // Second loop require to apply non-linearity gain correction from average
+  if ( data.size() > 0 ) {  // No valid pixels means just that - done
+    // See HiCalUtil.h for the function that returns this stat.
+    double NLGain = 1.0 - (GNL * GainLineStat(data));
+    for (int i = 0 ; i < out.size() ; i++) {
+      if (!IsSpecial(out[i])) {
+        double hdn = out[i];
+        hdn = hdn * GCN[i] * NLGain * GFF[i] * GT[i];  // Gain, Non-linearity 
+                                                       // gain,  FlatField, 
+                                                       // TempGain
+        out[i] = hdn / GUC;                   // I/F or DN or DN/US
+      }
     }
   }
   return;
 }
 
 
-void IsisMain() {
+void IsisMain(){
 
   const std::string hical_program = "hical";
-  const std::string hical_version = "3.6";
-  const std::string hical_revision = "$Revision: 1.9 $";
+  const std::string hical_version = "5.0";
+  const std::string hical_revision = "$Revision: 1.15 $";
   const std::string hical_runtime = Application::DateTime();
 
   UserInterface &ui = Application::GetUserInterface();
@@ -109,19 +130,19 @@ void IsisMain() {
 
 // Check for label propagation and set the output cube
     Cube *ocube = p.SetOutputCube("TO");
-    if(!IsTrueValue(hiprof, "PropagateTables", "TRUE")) {
+    if ( !IsTrueValue(hiprof,"PropagateTables", "TRUE") ) {
       RemoveHiBlobs(*(ocube->getLabel()));
     }
 
 //  Set specified profile if entered by user
-    if(ui.WasEntered("PROFILE")) {
+    if (ui.WasEntered("PROFILE")) {
       hiconf.selectProfile(ui.GetAsString("PROFILE"));
     }
 
 
 //  Add OPATH parameter to profiles
-    if(ui.WasEntered("OPATH")) {
-      hiconf.add("OPATH", ui.GetAsString("OPATH"));
+    if (ui.WasEntered("OPATH")) {
+      hiconf.add("OPATH",ui.GetAsString("OPATH"));
     }
     else {
       //  Set default to output directory
@@ -139,243 +160,225 @@ void IsisMain() {
     HiCalData caldata(*hifrom);
 
 ////////////////////////////////////////////////////////////////////////////
-//  FixGaps (Z_f) Get buffer pixels and compute coefficients for equation
-//     y = a[0] + a[1]*x + a[2] * exp(a[3] * x)
-//        where y is the average of the buffer pixel region,
-//          and x is the time at each line in electrons/sec/pixel
-    procStep = "Zf module";
-    hiconf.selectProfile("Zf");
+//  Drift Correction (Zf) using buffer pixels
+//    Extracts specified regions of the calibration buffer pixels and runs
+//    series of lowpass filters.  Apply spline fit if any missing data
+//    remains.  Config file contains parameters for this operation.
+    procStep = "ZeroBufferSmooth module";
+    hiconf.selectProfile("ZeroBufferSmooth");
     hiprof = hiconf.getMatrixProfile();
-    HiHistory ZfHist;
-    ZfHist.add("Profile[" + hiprof.Name() + "]");
-    if(!SkipModule(hiprof)) {
-      DriftBuffer driftB(caldata, hiconf);
-      calVars->add("Zf", driftB.ref());
-      ZfHist = driftB.History();
-      if(hiprof.exists("DumpModuleFile")) {
-        driftB.Dump(hiconf.getMatrixSource("DumpModuleFile", hiprof));
+    HiHistory ZbsHist;
+    ZbsHist.add("Profile["+ hiprof.Name()+"]");
+    if ( !SkipModule(hiprof) ) {
+      ZeroBufferSmooth zbs(caldata, hiconf);
+      calVars->add("ZeroBufferSmooth", zbs.ref());
+      ZbsHist = zbs.History();
+      if ( hiprof.exists("DumpModuleFile") ) {
+        zbs.Dump(hiconf.getMatrixSource("DumpModuleFile",hiprof));
       }
     }
     else {
       //  NOT RECOMMENDED!  This is required for the next step!
-      //  SURELY must be skipped with Z_d step as well!
-      calVars->add("Zf", HiVector(nlines, 0.0));
-      ZfHist.add("Debug::SkipModule invoked!");
+      //  SURELY must be skipped with ZeroBufferSmooth step as well!
+      calVars->add("ZeroBufferSmooth", HiVector(nlines, 0.0));
+      ZbsHist.add("Debug::SkipModule invoked!");
     }
 
 /////////////////////////////////////////////////////////////////////
-// DriftCorrect (Z_d)
-//  Now compute the equation of fit
-//
-    procStep = "Zd module";
-    HiHistory ZdHist;
-    hiconf.selectProfile("Zd");
+// ZeroBufferFit 
+//  Compute second level of drift correction.  The high level noise
+//  is removed from a modeled non-linear fit.
+// 
+    procStep = "ZeroBufferFit module";
+    HiHistory ZbfHist;
+    hiconf.selectProfile("ZeroBufferFit");
     hiprof = hiconf.getMatrixProfile();
-    ZdHist.add("Profile[" + hiprof.Name() + "]");
-    if(!SkipModule(hiconf.getMatrixProfile("Zd"))) {
-      DriftCorrect driftC(hiconf);
-      calVars->add("Zd", driftC.Normalize(driftC.Solve(calVars->get("Zf"))));
-      ZdHist = driftC.History();
-      if(hiprof.exists("DumpModuleFile")) {
-        driftC.Dump(hiconf.getMatrixSource("DumpModuleFile", hiprof));
+    ZbfHist.add("Profile["+ hiprof.Name()+"]");
+    if (!SkipModule(hiprof) ) { 
+      ZeroBufferFit zbf(hiconf);
+
+      calVars->add(hiconf.getProfileName(), 
+                   zbf.Normalize(zbf.Solve(calVars->get("ZeroBufferSmooth"))));
+      ZbfHist = zbf.History();
+      if ( hiprof.exists("DumpModuleFile") ) {
+        zbf.Dump(hiconf.getMatrixSource("DumpModuleFile",hiprof));
       }
     }
     else {
-      calVars->add("Zd", HiVector(nlines, 0.0));
-      ZdHist.add("Debug::SkipModule invoked!");
+      calVars->add(hiconf.getProfileName(), HiVector(nlines, 0.0));
+      ZbfHist.add("Debug::SkipModule invoked!");
     }
 
 
-////////////////////////////////////////////////////////////////////
-//  ZeroCorrect (Z_z)  Get reverse clock
-    procStep = "Zz module";
-    hiconf.selectProfile("Zz");
+ ////////////////////////////////////////////////////////////////////
+ //  ZeroReverse 
+    procStep = "ZeroReverse module";
+    hiconf.selectProfile("ZeroReverse"); 
     hiprof = hiconf.getMatrixProfile();
-    HiHistory ZzHist;
-    ZzHist.add("Profile[" + hiprof.Name() + "]");
-    if(!SkipModule(hiprof)) {
-      OffsetCorrect zoff(caldata, hiconf);
-      calVars->add("Zz", zoff.ref());
-      ZzHist = zoff.History();
-      if(hiprof.exists("DumpModuleFile")) {
-        zoff.Dump(hiconf.getMatrixSource("DumpModuleFile", hiprof));
+    HiHistory ZrHist;
+    ZrHist.add("Profile["+ hiprof.Name()+"]");
+    if ( !SkipModule(hiprof) ) {
+      ZeroReverse zr(caldata, hiconf);
+      calVars->add(hiconf.getProfileName(), zr.ref());
+      ZrHist = zr.History();
+      if ( hiprof.exists("DumpModuleFile") ) {
+        zr.Dump(hiconf.getMatrixSource("DumpModuleFile",hiprof));
       }
     }
     else {
-      calVars->add("Zz", HiVector(nsamps, 0.0));
-      ZzHist.add("Debug::SkipModule invoked!");
+      calVars->add(hiconf.getProfileName(), HiVector(nsamps, 0.0));
+      ZrHist.add("Debug::SkipModule invoked!");
     }
 
 /////////////////////////////////////////////////////////////////
-// DarkSubtract (Z_b) Remove dark current
-//
-    procStep = "Zb module";
-    hiconf.selectProfile("Zb");
+// ZeroDark removes dark current
+// 
+    procStep = "ZeroDark module";
+    hiconf.selectProfile("ZeroDark");
     hiprof =  hiconf.getMatrixProfile();
-    HiHistory ZbHist;
-    ZbHist.add("Profile[" + hiprof.Name() + "]");
-    if(!SkipModule(hiprof)) {
-      DarkSubtractComp dark(hiconf);
-      calVars->add("Zb", dark.ref());
-      ZbHist = dark.History();
-      if(hiprof.exists("DumpModuleFile")) {
-        dark.Dump(hiconf.getMatrixSource("DumpModuleFile", hiprof));
+    HiHistory ZdHist;
+    ZdHist.add("Profile["+ hiprof.Name()+"]");
+    if ( !SkipModule(hiprof) ) {
+      ZeroDark zd(hiconf);
+      calVars->add(hiconf.getProfileName(), zd.ref());
+      ZdHist = zd.History();
+      if ( hiprof.exists("DumpModuleFile") ) {
+        zd.Dump(hiconf.getMatrixSource("DumpModuleFile",hiprof));
       }
     }
     else {
-      calVars->add("Zb", HiVector(nsamps, 0.0));
-      ZbHist.add("Debug::SkipModule invoked!");
+      calVars->add(hiconf.getProfileName(), HiVector(nsamps, 0.0));
+      ZdHist.add("Debug::SkipModule invoked!");
     }
 
 ////////////////////////////////////////////////////////////////////
-// GainVLineCorrect (Z_g) Correct for gain-based drift
-//
-    procStep = "Zg module";
-    hiconf.selectProfile("Zg");
+// GainLineDrift correct for gain-based drift
+// 
+    procStep = "GainLineDrift module";
+    hiconf.selectProfile("GainLineDrift");
     hiprof = hiconf.getMatrixProfile();
-    HiHistory ZgHist;
-    ZgHist.add("Profile[" + hiprof.Name() + "]");
-    if(!SkipModule(hiprof)) {
-      GainVLineComp gainV(hiconf);
-      calVars->add("Zg", gainV.ref());
-      ZgHist = gainV.History();
-      if(hiprof.exists("DumpModuleFile")) {
-        gainV.Dump(hiconf.getMatrixSource("DumpModuleFile", hiprof));
+    HiHistory GldHist;
+    GldHist.add("Profile["+ hiprof.Name()+"]");
+    if ( !SkipModule(hiprof) ) {
+      GainLineDrift gld(hiconf);
+      calVars->add(hiconf.getProfileName(), gld.ref());
+      GldHist = gld.History();
+      if ( hiprof.exists("DumpModuleFile") ) {
+        gld.Dump(hiconf.getMatrixSource("DumpModuleFile",hiprof));
       }
     }
     else {
-      calVars->add("Zg", HiVector(nlines, 1.0));
-      ZgHist.add("Debug::SkipModule invoked!");
+      calVars->add(hiconf.getProfileName(), HiVector(nlines, 1.0));
+      GldHist.add("Debug::SkipModule invoked!");
     }
 
-
 ////////////////////////////////////////////////////////////////////
-//  GainCorrect (Z_gg)  Correct for gain with the G matrix
-    procStep = "Zgg module";
-    hiconf.selectProfile("Zgg");
+//  GainNonLinearity  Correct for non-linear gain
+    procStep = "GainNonLinearity module";
+    hiconf.selectProfile("GainNonLinearity"); 
     hiprof =  hiconf.getMatrixProfile();
-    HiHistory ZggHist;
-    ZggHist.add("Profile[" + hiprof.Name() + "]");
-    if(!SkipModule(hiprof)) {
-      double bin = ToDouble(hiprof("Summing"));
-      double tdi = ToDouble(hiprof("Tdi"));
-      double factor = 128.0 / tdi / (bin * bin);
-      HiVector zgg =  hiconf.getMatrix("G", hiprof);
-      for(int i = 0 ; i < zgg.dim() ; i++) {
-        zgg[i] *= factor;
-      }
-      calVars->add("Zgg", zgg);;
-      ZggHist.add("LoadMatrix(G[" + hiconf.getMatrixSource("G", hiprof) +
-                  "],Band[" + ToString(hiconf.getMatrixBand(hiprof)) +
-                  "],Factor[" + ToString(factor) + "])");
-      if(hiprof.exists("DumpModuleFile")) {
-        Component zg("GMatrix", ZggHist);
-        zg.Process(zgg);
-        zg.Dump(hiconf.getMatrixSource("DumpModuleFile", hiprof));
+    HiHistory GnlHist;
+    GnlHist.add("Profile["+ hiprof.Name()+"]");
+    if ( !SkipModule(hiprof) ) {
+      GainNonLinearity gnl(hiconf);
+      calVars->add(hiconf.getProfileName(), gnl.ref());
+      GnlHist = gnl.History();
+      if ( hiprof.exists("DumpModuleFile") ) { 
+        gnl.Dump(hiconf.getMatrixSource("DumpModuleFile",hiprof));
       }
     }
     else {
-      calVars->add("Zgg", HiVector(nsamps, 1.0));
-      ZggHist.add("Debug::SkipModule invoked!");
+      calVars->add(hiconf.getProfileName(), HiVector(1, 0.0));
+      GnlHist.add("Debug::SkipModule invoked!");
     }
 
 ////////////////////////////////////////////////////////////////////
-//  FlatField (Z_a)  Flat field correction with A matrix
-    procStep = "Za module";
-    hiconf.selectProfile("Za");
+//  GainChannelNormalize  Correct for sample gain with the G matrix 
+    procStep = "GainChannelNormalize module";
+    hiconf.selectProfile("GainChannelNormalize"); 
     hiprof =  hiconf.getMatrixProfile();
-    HiHistory ZaHist;
-    ZaHist.add("Profile[" + hiprof.Name() + "]");
-    if(!SkipModule(hiprof)) {
-      FlatFieldComp flat(hiconf);
-      calVars->add("Za", flat.ref());
-      ZaHist = flat.History();
-      if(hiprof.exists("DumpModuleFile")) {
-        flat.Dump(hiconf.getMatrixSource("DumpModuleFile", hiprof));
+    HiHistory GcnHist;
+    GcnHist.add("Profile["+ hiprof.Name()+"]");
+    if ( !SkipModule(hiprof) ) {
+      GainChannelNormalize gcn(hiconf);
+      calVars->add(hiconf.getProfileName(), gcn.ref());
+      GcnHist = gcn.History();
+      if ( hiprof.exists("DumpModuleFile") ) { 
+        gcn.Dump(hiconf.getMatrixSource("DumpModuleFile",hiprof));
       }
     }
     else {
-      calVars->add("Za", HiVector(nsamps, 1.0));
-      ZaHist.add("Debug::SkipModule invoked!");
+      calVars->add(hiconf.getProfileName(), HiVector(nsamps, 1.0));
+      GcnHist.add("Debug::SkipModule invoked!");
     }
 
 ////////////////////////////////////////////////////////////////////
-//  FlatField (Z_t)  Temperature-dependant gain correction
-    procStep = "Zt module";
-    hiconf.selectProfile("Zt");
+//  GainFlatField  Flat field correction with A matrix
+    procStep = "GainFlatField module";
+    hiconf.selectProfile("GainFlatField"); 
     hiprof =  hiconf.getMatrixProfile();
-    HiHistory ZtHist;
-    ZtHist.add("Profile[" + hiprof.Name() + "]");
-    if(!SkipModule(hiprof)) {
-      TempGainCorrect tcorr(hiconf);
-      calVars->add("Zt", tcorr.ref());
-      ZtHist = tcorr.History();
-      if(hiprof.exists("DumpModuleFile")) {
-        tcorr.Dump(hiconf.getMatrixSource("DumpModuleFile", hiprof));
+    HiHistory GffHist;
+    GffHist.add("Profile["+ hiprof.Name()+"]");
+    if ( !SkipModule(hiprof) ) {
+      GainFlatField gff(hiconf);
+      calVars->add(hiconf.getProfileName(), gff.ref());
+      GffHist = gff.History();
+      if ( hiprof.exists("DumpModuleFile") ) {
+        gff.Dump(hiconf.getMatrixSource("DumpModuleFile",hiprof));
       }
     }
     else {
-      calVars->add("Zt", HiVector(nsamps, 1.0));
-      ZtHist.add("Debug::SkipModule invoked!");
+      calVars->add(hiconf.getProfileName(), HiVector(nsamps, 1.0));
+      GffHist.add("Debug::SkipModule invoked!");
     }
 
+////////////////////////////////////////////////////////////////////
+// GainTemperature -  Temperature-dependant gain correction
+    procStep = "GainTemperature module";
+    hiconf.selectProfile("GainTemperature"); 
+    hiprof =  hiconf.getMatrixProfile();
+    HiHistory GtHist;
+    GtHist.add("Profile["+ hiprof.Name()+"]");
+    if ( !SkipModule(hiprof) ) {
+      GainTemperature gt(hiconf);
+      calVars->add(hiconf.getProfileName(), gt.ref());
+      GtHist = gt.History();
+      if ( hiprof.exists("DumpModuleFile") ) {
+        gt.Dump(hiconf.getMatrixSource("DumpModuleFile",hiprof));
+      }
+    }
+    else {
+      calVars->add(hiconf.getProfileName(), HiVector(nsamps, 1.0));
+      GtHist.add("Debug::SkipModule invoked!");
+    }
 
 ////////////////////////////////////////////////////////////////////
-//  I/FCorrect (Z_iof) Conversion to I/F
-//
-    procStep = "Ziof module";
-    hiconf.selectProfile("Ziof");
+//  GainUnitConversion converts to requested units
+// 
+    procStep = "GainUnitConversion module";
+    hiconf.selectProfile("GainUnitConversion");
     hiprof = hiconf.getMatrixProfile();
-    HiHistory ZiofHist;
-    ZiofHist.add("Profile[" + hiprof.Name() + "]");
-    if(!SkipModule(hiprof)) {
-      double sed = ToDouble(hiprof("ScanExposureDuration"));  // units = us
-      if(IsEqual(units, "IOF")) {
-        //  Add solar I/F correction parameters
-        double au = hiconf.sunDistanceAU();
-        ZiofHist.add("SunDist[" + ToString(au) + " (AU)]");
-        double suncorr =  1.5 / au;
-        suncorr *= suncorr;
-
-        double zbin  = ToDouble(hiprof("ZiofBinFactor"));
-        ZiofHist.add("ZiofBinFactor[" + ToString(zbin) + "]");
-
-        double zgain = ToDouble(hiprof("FilterGainCorrection"));
-        ZiofHist.add("FilterGainCorrection[" + ToString(zgain) + "]");
-        ZiofHist.add("ScanExposureDuration[" + ToString(sed) + "]");
-        double ziof = (zbin * zgain) * (sed * 1.0e-6)  * suncorr;
-
-        calVars->add("Ziof", HiVector(1, ziof));
-        ZiofHist.add("I/F_Factor[" + ToString(ziof) + "]");
-        ZiofHist.add("Units[I/F Reflectance]");
-      }
-      else if(IsEqual(units, "DN/US")) {
-        // Ziof is a divisor in calibration equation
-        double ziof = sed;
-        calVars->add("Ziof", HiVector(1, ziof));
-        ZiofHist.add("ScanExposureDuration[" + ToString(sed) + "]");
-        ZiofHist.add("DN/US_Factor[" + ToString(ziof) + "]");
-        ZiofHist.add("Units[DNs/microsecond]");
-      }
-      else {
-        // Units are already in DN
-        double ziof = 1.0;
-        calVars->add("Ziof", HiVector(1, ziof));
-        ZiofHist.add("DN_Factor[" + ToString(ziof) + "]");
-        ZiofHist.add("Units[DN]");
+    HiHistory GucHist;
+    GucHist.add("Profile["+ hiprof.Name()+"]");
+    if ( !SkipModule(hiprof) ) {
+      GainUnitConversion guc(hiconf, units);
+      calVars->add(hiconf.getProfileName(), guc.ref());
+      GucHist = guc.History();
+      if ( hiprof.exists("DumpModuleFile") ) {
+        guc.Dump(hiconf.getMatrixSource("DumpModuleFile",hiprof));
       }
     }
     else {
-      calVars->add("Ziof", HiVector(1, 1.0));
-      ZiofHist.add("Debug::SkipModule invoked!");
-      ZiofHist.add("Units[Unknown]");
+      calVars->add(hiconf.getProfileName(), HiVector(1,1.0));
+      GucHist.add("Debug::SkipModule invoked!");
+      GucHist.add("Units[Unknown]");
     }
 
     //  Reset the profile selection to default
     hiconf.selectProfile();
 
 //----------------------------------------------------------------------
-//
+// 
 /////////////////////////////////////////////////////////////////////////
 //  Call the processing function
     procStep = "calibration phase";
@@ -387,13 +390,13 @@ void IsisMain() {
 
     // Quitely dumps parameter history to alternative format file.  This
     // is completely controlled by the configuration file
-    if(hiprof.exists("DumpHistoryFile")) {
+    if ( hiprof.exists("DumpHistoryFile") ) {
       procStep = "logging/reporting phase";
-      Filename hdump(hiconf.getMatrixSource("DumpHistoryFile", hiprof));
+      Filename hdump(hiconf.getMatrixSource("DumpHistoryFile",hiprof));
       string hdumpFile = hdump.Expanded();
       ofstream ofile(hdumpFile.c_str(), ios::out);
-      if(!ofile) {
-        string mess = "Unable to open/create history dump file " +
+      if (!ofile) {
+        string mess = "Unable to open/create history dump file " + 
                       hdump.Expanded();
         iException::Message(iException::User, mess, _FILEINFO_).Report();
       }
@@ -407,21 +410,22 @@ void IsisMain() {
         ofile << "TO:       " << ocube->getFilename()  << endl;
         ofile << "CONF:     " << conf_file  << endl << endl;
 
-        ofile << "/* " << hical_program << " application equation */" << endl
-              << "/* hdn = (idn - Zd(Zf) - Zz - Zb) */"
-              << endl << "/* odn = hdn / Zg * Zgg * Za * Zt / Ziof */"
-              << endl << endl;
+        ofile << "/* " << hical_program << " application equation */\n" 
+              << "/* hdn = (idn - ZeroBufferFit(ZeroBufferSmooth) - ZeroReverse - ZeroDark) */\n"
+              << "/* odn = hdn / GainLineDrift * GainNonLinearity * GainChannelNormalize */\n"
+              << "/*           * GainFlatField  * GainTemperature / GainUnitConversion */\n\n";
 
         ofile << "****** PARAMETER GENERATION HISTORY *******" << endl;
-        ofile << "\nZf   = " << ZfHist << endl;
-        ofile << "\nZd   = " << ZdHist << endl;
-        ofile << "\nZz   = " << ZzHist << endl;
-        ofile << "\nZb   = " << ZbHist << endl;
-        ofile << "\nZg   = " << ZgHist << endl;
-        ofile << "\nZgg  = " << ZggHist << endl;
-        ofile << "\nZa   = " << ZaHist << endl;
-        ofile << "\nZt   = " << ZtHist << endl;
-        ofile << "\nZiof = " << ZiofHist << endl;
+        ofile << "\nZeroBufferSmooth   = " << ZbsHist << endl;
+        ofile << "\nZeroBufferFit   = " << ZbfHist << endl;
+        ofile << "\nZeroReverse   = " << ZrHist << endl;
+        ofile << "\nZeroDark   = " << ZdHist << endl;
+        ofile << "\nGainLineDrift   = " << GldHist << endl;
+        ofile << "\nGainNonLinearity   = " << GnlHist << endl;
+        ofile << "\nGainChannelNormalize = " << GcnHist << endl;
+        ofile << "\nGainFlatField   = " << GffHist << endl;
+        ofile << "\nGainTemperature   = " << GtHist << endl;
+        ofile << "\nGainUnitConversion = " << GucHist << endl;
 
         ofile.close();
       }
@@ -429,7 +433,7 @@ void IsisMain() {
 
 //  Ensure the RadiometricCalibration group is out there
     const std::string rcalGroup("RadiometricCalibration");
-    if(!ocube->hasGroup(rcalGroup)) {
+    if (!ocube->hasGroup(rcalGroup)) {
       PvlGroup temp(rcalGroup);
       ocube->putGroup(temp);
     }
@@ -437,39 +441,44 @@ void IsisMain() {
     PvlGroup &rcal = ocube->getGroup(rcalGroup);
     rcal += PvlKeyword("Program", hical_program);
     rcal += PvlKeyword("RunTime", hical_runtime);
-    rcal += PvlKeyword("Version", hical_version);
-    rcal += PvlKeyword("Revision", hical_revision);
+    rcal += PvlKeyword("Version",hical_version);
+    rcal += PvlKeyword("Revision",hical_revision);
 
     PvlKeyword key("Conf", conf_file);
     key.AddCommentWrapped("/* " + hical_program + " application equation */");
-    key.AddComment("/* hdn = (idn - Zd(Zf) - Zz - Zb) */");
-    key.AddComment("/* odn = hdn / Zg * Zgg * Za * Zt / Ziof */");
+    key.AddComment("/* hdn = idn - ZeroBufferFit(ZeroBufferSmooth) */");
+    key.AddComment("/*           - ZeroReverse - ZeroDark */");
+    key.AddComment("/* odn = hdn / GainLineDrift * GainNonLinearity */");
+    key.AddComment("/*           * GainChannelNormalize * GainFlatField */");
+    key.AddComment("/*           * GainTemperature / GainUnitConversion */");
     rcal += key;
 
     //  Record parameter generation history.  Controllable in configuration
     //  file.  Note this is optional because of a BUG!! in the ISIS label
     //  writer as this application was initially developed
-    if(IsEqual(ConfKey(hiprof, "LogParameterHistory", string("TRUE")), "TRUE")) {
-      rcal += ZfHist.makekey("Zf");
-      rcal += ZdHist.makekey("Zd");
-      rcal += ZzHist.makekey("Zz");
-      rcal += ZbHist.makekey("Zb");
-      rcal += ZgHist.makekey("Zg");
-      rcal += ZggHist.makekey("Zgg");
-      rcal += ZaHist.makekey("Za");
-      rcal += ZiofHist.makekey("Ziof");
+    if ( IsEqual(ConfKey(hiprof,"LogParameterHistory",string("TRUE")),"TRUE")) { 
+      rcal += ZbsHist.makekey("ZeroBufferSmooth");
+      rcal += ZbfHist.makekey("ZeroBufferFit");
+      rcal += ZrHist.makekey("ZeroReverse");
+      rcal += ZdHist.makekey("ZeroDark");
+      rcal += GldHist.makekey("GainLineDrift");
+      rcal += GnlHist.makekey("GainNonLinearity");
+      rcal += GcnHist.makekey("GainChannelNormalize");
+      rcal += GffHist.makekey("GainFlatField");
+      rcal += GtHist.makekey("GainTemperature");
+      rcal += GucHist.makekey("GainUnitConversion");
     }
 
     p.EndProcess();
-  }
-  catch(iException &ie) {
+  } 
+  catch (iException &ie) {
     delete calVars;
     calVars = 0;
     string mess = "Failed in " + procStep;
     ie.Message(iException::User, mess.c_str(), _FILEINFO_);
     throw;
   }
-
+  
 // Clean up parameters
   delete calVars;
   calVars = 0;

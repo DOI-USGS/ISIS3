@@ -3,7 +3,7 @@ include $(ISISROOT)/make/isismake.macros
 RM = rm -rf
 
 STAGE := hical_stage
-CVS3 :=  cvs -d :ext:$(USER)@blackflag:/usgs/cpkgs/isis3/cvs
+SVN  :=  svn 
 REPLACE := $(PWD)/tools/replacetxt
 TARGETS := $(shell find . -name '*.h' -exec fgrep -l  hicalbeta {} \;) \
 	   $(shell find . -name '*.cpp' -exec fgrep -l  -i hicalbeta {} \;) \
@@ -21,7 +21,7 @@ snapshot: export clone rename
 export:
 	@echo "Exporting hicalbeta to $(STAGE)..."
 	$(RM)  $(STAGE)
-	$(CVS3) export -D now -d $(STAGE) isis/src/mro/apps/hicalbeta
+	$(SVN) export -D now $svnprog/isis3/trunk/isis/src/mro/apps/hicalbeta $(STAGE)
 	$(RSYNC) -av  $(STAGE)/ .
 	$(RM)  $(STAGE)
 

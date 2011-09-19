@@ -2,9 +2,9 @@
 #define HiCalData_h
 /**
  * @file
- * $Revision: 1.1 $
- * $Date: 2009/09/16 03:37:23 $
- * $Id: HiCalData.h,v 1.1 2009/09/16 03:37:23 kbecker Exp $
+ * $Revision: 1.3 $
+ * $Date: 2008/05/14 21:07:22 $
+ * $Id: HiCalData.h,v 1.3 2008/05/14 21:07:22 slambright Exp $
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are
  *   public domain. See individual third-party library and package descriptions
