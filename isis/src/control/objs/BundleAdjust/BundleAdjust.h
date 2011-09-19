@@ -237,6 +237,7 @@ namespace Isis {
 
       void GetSparseParameterCorrections();
 
+      bool IsConverged() { return m_bConverged; }
       QString IterationSummaryGroup () const {
         return m_iterationSummary;
       }
