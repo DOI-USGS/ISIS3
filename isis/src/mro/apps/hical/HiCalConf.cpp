@@ -1,8 +1,8 @@
 /**                                                                       
  * @file                                                                  
- * $Revision: 1.5 $
- * $Date: 2009/12/29 23:03:52 $
- * $Id: HiCalConf.cpp,v 1.5 2009/12/29 23:03:52 ehyer Exp $
+ * $Revision$
+ * $Date$
+ * $Id$
  * 
  *   Unless noted otherwise, the portions of Isis written by the USGS are 
  *   public domain. See individual third-party library and package descriptions 

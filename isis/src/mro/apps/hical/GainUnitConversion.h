@@ -2,8 +2,8 @@
 #define GainUnitConversion_h
 /**                                                                       
  * @file                                                                  
- * $Revision: 1.2 $
- * $Date: 2008/05/14 21:07:22 $
+ * $Revision$
+ * $Date$
  * $Id$
  * 
  *   Unless noted otherwise, the portions of Isis written by the USGS are 

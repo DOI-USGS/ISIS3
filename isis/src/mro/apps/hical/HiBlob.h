@@ -2,8 +2,8 @@
 #define HiBlob_h
 /**
  * @file
- * $Revision: 1.2 $
- * $Date: 2008/05/12 18:17:33 $
+ * $Revision$
+ * $Date$
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are
  *   public domain. See individual third-party library and package descriptions

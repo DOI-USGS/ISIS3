@@ -2,9 +2,9 @@
 #define SplineFill_h
 /**                                                                       
  * @file                                                                  
- * $Revision: 1.2 $
- * $Date: 2008/11/06 00:08:15 $
- * $Id: SplineFill.h,v 1.2 2008/11/06 00:08:15 jwalldren Exp $
+ * $Revision$
+ * $Date$
+ * $Id$
  * 
  *   Unless noted otherwise, the portions of Isis written by the USGS are 
  *   public domain. See individual third-party library and package descriptions 

@@ -2,9 +2,9 @@
 #define GainNonLinearity_h
 /**                                                                       
  * @file                                                                  
- * $Revision: 1.1 $
- * $Date: 2009/09/15 21:56:44 $
- * $Id: GainNonLinearity.h,v 1.1 2009/09/15 21:56:44 kbecker Exp $
+ * $Revision$
+ * $Date$
+ * $Id$
  * 
  *   Unless noted otherwise, the portions of Isis written by the USGS are 
  *   public domain. See individual third-party library and package descriptions 

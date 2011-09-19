@@ -1,8 +1,8 @@
 /**                                                                       
  * @file                                                                  
- * $Revision: 1.4 $
- * $Date: 2008/06/11 00:56:51 $
- * $Id: ZeroBufferFit.cpp,v 1.4 2008/06/11 00:56:51 kbecker Exp $
+ * $Revision$
+ * $Date$
+ * $Id$
  * 
  *   Unless noted otherwise, the portions of Isis written by the USGS are 
  *   public domain. See individual third-party library and package descriptions 

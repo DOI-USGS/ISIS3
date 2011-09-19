@@ -1,8 +1,8 @@
 /**                                                                       
  * @file                                                                  
- * $Revision: 1.2 $
- * $Date: 2008/02/08 21:31:01 $
- * $Id: NonLinearLSQ.cpp,v 1.2 2008/02/08 21:31:01 kbecker Exp $ 
+ * $Revision$
+ * $Date$
+ * $Id$ 
  * 
  *   Unless noted otherwise, the portions of Isis written by the USGS are 
  *   public domain. See individual third-party library and package descriptions 

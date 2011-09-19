@@ -2,9 +2,9 @@
 #define LowPassFilter_h
 /**                                                                       
  * @file                                                                  
- * $Revision: 1.1 $
- * $Date: 2008/01/13 08:12:59 $
- * $Id: LowPassFilter.h,v 1.1 2008/01/13 08:12:59 kbecker Exp $
+ * $Revision$
+ * $Date$
+ * $Id$
  * 
  *   Unless noted otherwise, the portions of Isis written by the USGS are 
  *   public domain. See individual third-party library and package descriptions 

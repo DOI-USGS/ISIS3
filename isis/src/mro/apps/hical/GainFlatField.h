@@ -2,9 +2,9 @@
 #define GainFlatField_h
 /**                                                                       
  * @file                                                                  
- * $Revision: 1.4 $
- * $Date: 2009/09/15 21:56:44 $
- * $Id: GainFlatField.h,v 1.4 2009/09/15 21:56:44 kbecker Exp $
+ * $Revision$
+ * $Date$
+ * $Id$
  * 
  *   Unless noted otherwise, the portions of Isis written by the USGS are 
  *   public domain. See individual third-party library and package descriptions 

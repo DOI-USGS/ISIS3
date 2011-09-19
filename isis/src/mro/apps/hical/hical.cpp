@@ -1,4 +1,4 @@
-//  $Id: hical.cpp,v 1.14 2009/09/15 21:56:44 kbecker Exp $
+//  $Id$
 #include "Isis.h"
 
 #include <cstdio>
@@ -109,7 +109,7 @@ void IsisMain(){
 
   const std::string hical_program = "hical";
   const std::string hical_version = "5.0";
-  const std::string hical_revision = "$Revision: 1.15 $";
+  const std::string hical_revision = "$Revision$";
   const std::string hical_runtime = Application::DateTime();
 
   UserInterface &ui = Application::GetUserInterface();

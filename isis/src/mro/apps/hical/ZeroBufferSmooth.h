@@ -2,9 +2,9 @@
 #define ZeroBufferSmooth_h
 /**                                                                       
  * @file                                                                  
- * $Revision: 1.2 $
- * $Date: 2008/06/13 22:28:55 $
- * $Id: ZeroBufferSmooth.h,v 1.2 2008/06/13 22:28:55 kbecker Exp $
+ * $Revision$
+ * $Date$
+ * $Id$
  * 
  *   Unless noted otherwise, the portions of Isis written by the USGS are 
  *   public domain. See individual third-party library and package descriptions 

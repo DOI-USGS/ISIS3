@@ -2,9 +2,9 @@
 #define ZeroBufferFit_h
 /**                                                                       
  * @file                                                                  
- * $Revision: 1.4 $
- * $Date: 2008/05/23 19:15:17 $
- * $Id: ZeroBufferFit.h,v 1.4 2008/05/23 19:15:17 kbecker Exp $
+ * $Revision$
+ * $Date$
+ * $Id$
  * 
  *   Unless noted otherwise, the portions of Isis written by the USGS are 
  *   public domain. See individual third-party library and package descriptions 

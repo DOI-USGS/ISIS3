@@ -2,9 +2,9 @@
 #define GainChannelNormalize_h
 /**                                                                       
  * @file                                                                  
- * $Revision: 1.2 $
- * $Date: 2008/05/14 21:07:22 $
- * $Id: GainChannelNormalize.h,v 1.2 2008/05/14 21:07:22 slambright Exp $
+ * $Revision$
+ * $Date$
+ * $Id$
  * 
  *   Unless noted otherwise, the portions of Isis written by the USGS are 
  *   public domain. See individual third-party library and package descriptions 

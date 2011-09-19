@@ -2,9 +2,9 @@
 #define Module_h
 /**                                                                       
  * @file                                                                  
- * $Revision: 1.4 $
- * $Date: 2008/07/16 16:38:00 $
- * $Id: Module.h,v 1.4 2008/07/16 16:38:00 skoechle Exp $
+ * $Revision$
+ * $Date$
+ * $Id$
  * 
  *   Unless noted otherwise, the portions of Isis written by the USGS are 
  *   public domain. See individual third-party library and package descriptions 

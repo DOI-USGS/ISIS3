@@ -2,8 +2,8 @@
 #define HiCalTypes_h
 /**                                                                       
  * @file                                                                  
- * $Revision: 1.1 $
- * $Date: 2008/01/13 08:12:58 $
+ * $Revision$
+ * $Date$
  *                                                                        
  *   Unless noted otherwise, the portions of Isis written by the USGS are 
  *   public domain. See individual third-party library and package descriptions 

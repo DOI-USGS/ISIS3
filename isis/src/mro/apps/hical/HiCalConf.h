@@ -2,9 +2,9 @@
 #define HiCalConf_h
 /**                                                                       
  * @file                                                                  
- * $Revision: 1.3 $
- * $Date: 2008/11/18 06:59:48 $
- * $Id: HiCalConf.h,v 1.3 2008/11/18 06:59:48 kbecker Exp $
+ * $Revision$
+ * $Date$
+ * $Id$
  * 
  *   Unless noted otherwise, the portions of Isis written by the USGS are 
  *   public domain. See individual third-party library and package descriptions 

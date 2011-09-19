@@ -2,9 +2,9 @@
 #define ZeroReverse_h
 /**                                                                       
  * @file                                                                  
- * $Revision: 1.3 $
- * $Date: 2008/11/18 07:29:12 $
- * $Id: ZeroReverse.h,v 1.3 2008/11/18 07:29:12 kbecker Exp $
+ * $Revision$
+ * $Date$
+ * $Id$
  * 
  *   Unless noted otherwise, the portions of Isis written by the USGS are 
  *   public domain. See individual third-party library and package descriptions 
