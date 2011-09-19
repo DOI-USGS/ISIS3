@@ -61,6 +61,8 @@ namespace Isis {
   *          CubeViewport.  Also fixed include issues.
   * @history 2010-11-18 Eric Hyer - addBrowseView now deletes the last viewport
   *              in the subWindowList instead of the first one
+  * @history 2011-09-19 Steven Lambright - Fixed addBrowseView to actually close
+  *                         the old viewports instead of hiding them. Fixes #418
   */
   class Workspace : public QMdiArea {
       Q_OBJECT

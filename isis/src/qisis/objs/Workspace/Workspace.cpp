@@ -4,6 +4,7 @@
 #include <QProgressBar>
 #include <QVBoxLayout>
 #include <QVector>
+#include <QWeakPointer>
 
 #include "Cube.h"
 #include "CubeAttribute.h"
@@ -188,7 +189,12 @@ namespace Isis {
   void Workspace::addBrowseView(QString cubename) {
     /* Close the last browse window if necessary.  */
     if (subWindowList().size()) {
-      removeSubWindow(subWindowList()[subWindowList().size() - 1]);
+      QWeakPointer<QMdiSubWindow> windowToRemove =
+          subWindowList()[subWindowList().size() - 1];
+
+      removeSubWindow(windowToRemove.data());
+
+      delete windowToRemove.data();
     }
 
     addCubeViewport(cubename);
