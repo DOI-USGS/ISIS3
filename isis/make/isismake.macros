@@ -148,14 +148,14 @@ endif
 #---------------------------------------------------------------------------
 #  Set up ISIS versioning
 #---------------------------------------------------------------------------
-ISISVERSIONFULL      := $(shell head -n 1 $(ISISROOT)/version)
+ISISVERSIONFULL      := $(shell head -n 1 $(ISISROOT)/version | $(SED) 's/\#.*//' | $(SED) 's/ *$$//')
 ISISMAJOR            := $(shell $(ECHO) $(ISISVERSIONFULL) | $(CUT) -d"." -f1)
 ISISMINOR            := $(shell $(ECHO) $(ISISVERSIONFULL) | $(CUT) -d"." -f2)
 ISISMINORMINOR       := $(shell $(ECHO) $(ISISVERSIONFULL) | $(CUT) -d"." -f3)
 ISISMINORMINORMINOR  := $(shell $(ECHO) $(ISISVERSIONFULL) | $(CUT) -d"." -f4)
 ISISVERSION          := $(ISISMAJOR).$(ISISMINOR).$(ISISMINORMINOR).$(ISISMINORMINORMINOR)
 ISISLIBVERSION       := $(shell echo $(ISISMAJOR).$(ISISMINOR).$(ISISMINORMINOR) | sed 's/[a-z].*$$//')
-ISISLOCALVERSION     := $(shell head -n 3 $(ISISROOT)/version | tail -n 1)
+ISISLOCALVERSION     := $(shell head -n 3 $(ISISROOT)/version | tail -n 1 | sed 's/\#.*//' | sed 's/ *$$//')
 ISISRELEASE          := REL_0_0
 
 #---------------------------------------------------------------------------

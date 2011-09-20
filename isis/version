@@ -1,3 +1,5 @@
-3.2.2.0
-2010-11-05
-v001
+3.3.1.0      # Public version number
+2011-09-20   # Version date
+v001         # 3rd party libraries version
+alpha        # release stage (alpha, unstable, stable)
+

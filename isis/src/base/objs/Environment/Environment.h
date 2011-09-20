@@ -32,6 +32,8 @@ namespace Isis {
    * @author 2011-04-01 Eric Hyer & Steven Lambright
    *
    * @internal
+   *   @history 2011-09-20 Steven Lambright - Added support for 4 line version
+   *                           file.
    */
   class Environment {
     public:
