@@ -66,6 +66,14 @@ class PvlObject;
  *                                  in system; added loading of IAK kernel
  *                                  specifically for Cassini support; removed
  *                                  conditionalized obsolete code.
+ * @history 2011-09-19 Debbie A. Cook Added section of code to ignore
+ *                                  Instrument group and use OriginalInstrument
+ *                                  group in the case of the IdealCamera.  The
+ *                                  output kernel will be based on the original
+ *                                  instrument code since the IdealCamera has
+ *                                  no code.  This is safe to do since the
+ *                                  camera is not being used to manipulate
+ *                                  pixels. 
  * 
  */
 class SpiceSegment {

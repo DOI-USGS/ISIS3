@@ -194,6 +194,14 @@ namespace Isis {
    *                                         version 63.
    *   @history 2011-07-11 Jeff Anderson  -  Added private copy constructors and
    *                                         operator= methods
+   *   @history 2011-09-19 Debbie Cook    -  Added cubes with Ideal Cameras to the
+   *                                         exclusion list for reading instrument
+   *                                         keywords from the label.  The Ideal
+   *                                         Camera has variable values for the
+   *                                         affine coefficients that are set in
+   *                                         the camera itself and not read from
+   *                                         a kernel.  The camera puts these
+   *                                         values into the Naif kernel pool.
    */
   class Spice {
     public:

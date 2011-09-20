@@ -36,6 +36,7 @@
 #include "Filename.h"
 #include "Cube.h"
 #include "Camera.h"
+#include "CameraFactory.h"
 #include "Table.h"
 #include "NaifStatus.h"
 #include "iException.h"
@@ -172,7 +173,24 @@ void SpiceSegment::import(Cube &cube, const std::string &tblname) {
     // status as loaded which may cause trouble from here on...
     Pvl *label = cube.getLabel();
     _kernels.Init(*label);
-    Camera *camera = cube.getCamera();
+
+    Camera *camera;
+    // Remove the ideal camera instrument group and rename the
+    // OriginalInstrument group to Instrument for the scope of this
+    // application.  Only label manipulation occurs and no change to the 
+    // pixels.
+    if (label->FindObject("IsisCube").HasGroup("OriginalInstrument")) {
+      label->FindObject("IsisCube").DeleteGroup("Instrument");
+      Isis::PvlGroup inst = 
+          label->FindObject("IsisCube").FindGroup("OriginalInstrument",
+          Isis::Pvl::Traverse);
+      inst.SetName("Instrument");
+      label->FindObject("IsisCube").AddGroup(inst);
+      camera = CameraFactory::Create(*label);
+    }
+    else {
+      camera = cube.getCamera();
+    }
 
     //  Determine segment ID from product ID if it exists, otherwise basename
     if ( _name.empty() ) {
