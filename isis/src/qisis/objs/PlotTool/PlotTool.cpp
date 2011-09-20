@@ -492,6 +492,7 @@ namespace Isis {
 
     /* We'll need X-Axis labels and a xMax to scale to.*/
     std::vector<double> labels;
+    std::vector<double> stddevLabels;
     double xMax = 10.0;
     Statistics wavelengthStats;
 
@@ -512,18 +513,31 @@ namespace Isis {
 
       Statistics scalingStats;
       for(unsigned int index = 0; index < labels.size(); index++) {
-        scalingStats.AddData(plotStats[index].Minimum());
-        scalingStats.AddData(plotStats[index].Maximum());
+        if (!IsSpecial(plotStats[index].Average()) &&
+            !IsSpecial(plotStats[index].Minimum()) &&
+            !IsSpecial(plotStats[index].Maximum())) {
+          avgarray.push_back(plotStats[index].Average());
+          minarray.push_back(plotStats[index].Minimum());
+          maxarray.push_back(plotStats[index].Maximum());
+          scalingStats.AddData(plotStats[index].Minimum());
+          scalingStats.AddData(plotStats[index].Maximum());
 
-        avgarray.push_back(plotStats[index].Average());
-        minarray.push_back(plotStats[index].Minimum());
-        maxarray.push_back(plotStats[index].Maximum());
-        std1array.push_back(plotStats[index].Average() +
-                            plotStats[index].StandardDeviation());
-        std2array.push_back(plotStats[index].Average() -
-                            plotStats[index].StandardDeviation());
-        stddevarray.push_back(plotStats[index].StandardDeviation());
+          if (!IsSpecial(plotStats[index].StandardDeviation())) {
+            stddevLabels.push_back(labels[index]);
+            std1array.push_back(plotStats[index].Average() +
+                                plotStats[index].StandardDeviation());
+            std2array.push_back(plotStats[index].Average() -
+                                plotStats[index].StandardDeviation());
+            stddevarray.push_back(plotStats[index].StandardDeviation());
+          }
+        }
+        else {
+          labels.erase(labels.begin() + index);
+          plotStats.erase(plotStats.begin() + index);
 
+          if (index >= 0)
+            index--;
+        }
 
         if(pvl.FindObject("IsisCube").HasGroup("BandBin")) {
           PvlGroup &bandBin = pvl.FindObject("IsisCube").FindGroup("BandBin");
@@ -546,8 +560,10 @@ namespace Isis {
         p_avgCurve->setData(&labels[0], &avgarray[0], labels.size());
         p_minCurve->setData(&labels[0], &minarray[0], labels.size());
         p_maxCurve->setData(&labels[0], &maxarray[0], labels.size());
-        p_stdDev1Curve->setData(&labels[0], &std1array[0], labels.size());
-        p_stdDev2Curve->setData(&labels[0], &std2array[0], labels.size());
+        p_stdDev1Curve->setData(&stddevLabels[0], &std1array[0],
+                                stddevLabels.size());
+        p_stdDev2Curve->setData(&stddevLabels[0], &std2array[0],
+                                stddevLabels.size());
       }
 
       p_plotToolWindow->setStdDev(stddevarray);
