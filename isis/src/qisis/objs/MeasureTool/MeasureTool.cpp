@@ -30,50 +30,43 @@ namespace Isis {
    * @param parent
    */
   MeasureTool::MeasureTool(QWidget *parent) : Tool(parent) {
-    p_rubberBand = NULL;
-    p_tableWin = new TableMainWindow("Measurements", parent);
-    p_tableWin->setTrackListItems(true);
+    m_rubberBand = NULL;
+    m_tableWin = new TableMainWindow("Measurements", parent);
+    m_tableWin->setTrackListItems(true);
 
     // Create the action for showing the table
-    p_action = new QAction(parent);
-    p_action->setText("Measuring ...");
+    m_action = new QAction(parent);
+    m_action->setText("Measuring ...");
 
-    connect(p_action, SIGNAL(triggered()), p_tableWin, SLOT(showTable()));
-    connect(p_action, SIGNAL(triggered()), p_tableWin, SLOT(raise()));
-    connect(p_action, SIGNAL(triggered()), p_tableWin, SLOT(syncColumns()));
-    p_tableWin->installEventFilter(this);
+    connect(m_action, SIGNAL(triggered()), m_tableWin, SLOT(showTable()));
+    connect(m_action, SIGNAL(triggered()), m_tableWin, SLOT(raise()));
+    connect(m_action, SIGNAL(triggered()), m_tableWin, SLOT(syncColumns()));
+    m_tableWin->installEventFilter(this);
 
-    p_tableWin->addToTable(false, "Feature\nName", "Feature Name");
-    p_tableWin->addToTable(false, "Feature\nType", "Feature Type");
-    p_tableWin->addToTable(true,
+    m_tableWin->addToTable(false, "Feature\nName", "Feature Name");
+    m_tableWin->addToTable(false, "Feature\nType", "Feature Type");
+    m_tableWin->addToTable(true,
                            "Start\nLatitude:Start\nLongitude:End\nLatitude:End\nLongitude",
                            "Ground Range", -1, Qt::Horizontal, "Start Latitude/Longitude to End Latitude/Longitude");
-    p_tableWin->addToTable(false, "Start\nSample:Start\nLine:End\nSample:End\nLine",
+    m_tableWin->addToTable(false, "Start\nSample:Start\nLine:End\nSample:End\nLine",
                            "Pixel Range", -1, Qt::Horizontal, "Start Sample/Line to End Sample/Line");
-    p_tableWin->addToTable(true, "Kilometer\nDistance", "Kilometer Distance");
-    p_tableWin->addToTable(false, "Meter\nDistance", "Meter Distance");
-    p_tableWin->addToTable(false, "Pixel\nDistance", "Pixel Distance");
-    p_tableWin->addToTable(false, "Degree\nAngle", "Degree Angle");
-    p_tableWin->addToTable(false, "Radian\nAngle", "Radian Angle");
-    p_tableWin->addToTable(false, "Kilometer\nArea", "Kilometer Area");
-    p_tableWin->addToTable(false, "Meter\nArea", "Meter Area");
-    p_tableWin->addToTable(false, "Pixel\nArea", "Pixel Area");
-    p_tableWin->addToTable(false, "Segments Sum\nkm", "Segments Sum", -1, Qt::Horizontal, "Sum of Segment lengths in kilometers");
-    p_tableWin->addToTable(false, "Segment Number", "Segment Number", -1, Qt::Horizontal, "Segment number of a segmented line");
-    p_tableWin->addToTable(false, "Path", "Path");
-    p_tableWin->addToTable(false, "Filename", "Filename");
-    p_tableWin->addToTable(false, "Notes", "Notes");
+    m_tableWin->addToTable(true, "Kilometer\nDistance", "Kilometer Distance");
+    m_tableWin->addToTable(false, "Meter\nDistance", "Meter Distance");
+    m_tableWin->addToTable(false, "Pixel\nDistance", "Pixel Distance");
+    m_tableWin->addToTable(false, "Degree\nAngle", "Degree Angle");
+    m_tableWin->addToTable(false, "Radian\nAngle", "Radian Angle");
+    m_tableWin->addToTable(false, "Kilometer\nArea", "Kilometer Area");
+    m_tableWin->addToTable(false, "Meter\nArea", "Meter Area");
+    m_tableWin->addToTable(false, "Pixel\nArea", "Pixel Area");
+    m_tableWin->addToTable(false, "Segments Sum\nkm", "Segments Sum", -1, Qt::Horizontal, "Sum of Segment lengths in kilometers");
+    m_tableWin->addToTable(false, "Segment Number", "Segment Number", -1, Qt::Horizontal, "Segment number of a segmented line");
+    m_tableWin->addToTable(false, "Path", "Path");
+    m_tableWin->addToTable(false, "Filename", "Filename");
+    m_tableWin->addToTable(false, "Notes", "Notes");
 
-    // Setup 10 blank rows in the table
-    for(int r = 0; r < 4; r++) {
-      p_tableWin->table()->insertRow(r);
-      for(int c = 0; c < p_tableWin->table()->columnCount(); c++) {
-        QTableWidgetItem *item = new QTableWidgetItem("");
-        p_tableWin->table()->setItem(r, c, item);
-      }
-    }
+    m_tableWin->setStatusMessage("Click, Drag, and Release to Measure a Line");
 
-    p_tableWin->setStatusMessage("Click, Drag, and Release to Measure a Line");
+    addRow();
   }
 
 
@@ -121,12 +114,12 @@ namespace Isis {
       <p><b>Shortcut:</b>  CTRL+M</p>";
     measureButton->setWhatsThis(text);
     measureButton->setShortcut(Qt::CTRL + Qt::Key_M);
-    connect(measureButton, SIGNAL(clicked()), p_tableWin, SLOT(showTable()));
-    connect(measureButton, SIGNAL(clicked()), p_tableWin, SLOT(syncColumns()));
-    connect(measureButton, SIGNAL(clicked()), p_tableWin, SLOT(raise()));
+    connect(measureButton, SIGNAL(clicked()), m_tableWin, SLOT(showTable()));
+    connect(measureButton, SIGNAL(clicked()), m_tableWin, SLOT(syncColumns()));
+    connect(measureButton, SIGNAL(clicked()), m_tableWin, SLOT(raise()));
     measureButton->setEnabled(true);
 
-    p_rubberBand = new RubberBandComboBox(
+    m_rubberBand = new RubberBandComboBox(
       RubberBandComboBox::Angle |
       RubberBandComboBox::Circle |
       RubberBandComboBox::Ellipse |
@@ -138,34 +131,34 @@ namespace Isis {
       RubberBandComboBox::Line // default
     );
 
-    p_distLineEdit = new QLineEdit(hbox);
-    p_distLineEdit->setText("");
-    p_distLineEdit->setMaxLength(12);
-    p_distLineEdit->setToolTip("Line Length");
+    m_distLineEdit = new QLineEdit(hbox);
+    m_distLineEdit->setText("");
+    m_distLineEdit->setMaxLength(12);
+    m_distLineEdit->setToolTip("Line Length");
     QString text2 = "<b>Function: </b> Shows the length of the line drawn on \
                      the image.";
-    p_distLineEdit->setWhatsThis(text2);
-    p_distLineEdit->setReadOnly(true);
+    m_distLineEdit->setWhatsThis(text2);
+    m_distLineEdit->setReadOnly(true);
 
-    p_showAllSegments = new QCheckBox(hbox);
-    p_showAllSegments->setText("Show All Segments");
+    m_showAllSegments = new QCheckBox(hbox);
+    m_showAllSegments->setText("Show All Segments");
 
-    p_unitsComboBox = new QComboBox(hbox);
-    p_unitsComboBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+    m_unitsComboBox = new QComboBox(hbox);
+    m_unitsComboBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 
     miComboUnit = -1;
 
     updateUnitsCombo();
-    connect(p_unitsComboBox, SIGNAL(activated(int)), this, SLOT(updateDistEdit()));
+    connect(m_unitsComboBox, SIGNAL(activated(int)), this, SLOT(updateDistEdit()));
     connect(RubberBandTool::getInstance(), SIGNAL(modeChanged()), this, SLOT(updateUnitsCombo()));
 
     QHBoxLayout *layout = new QHBoxLayout(hbox);
     layout->setMargin(0);
-    layout->addWidget(p_rubberBand);
-    layout->addWidget(p_distLineEdit);
-    layout->addWidget(p_unitsComboBox);
+    layout->addWidget(m_rubberBand);
+    layout->addWidget(m_distLineEdit);
+    layout->addWidget(m_unitsComboBox);
     layout->addWidget(measureButton);
-    layout->addWidget(p_showAllSegments);
+    layout->addWidget(m_showAllSegments);
     layout->addStretch(1);
     hbox->setLayout(layout);
     return hbox;
@@ -178,44 +171,44 @@ namespace Isis {
    */
   void MeasureTool::updateUnitsCombo(void) {
     // get the previous index if not initializing
-    if(miComboUnit >= 0) {
-      miComboUnit = p_unitsComboBox->currentIndex();
+    if (miComboUnit >= 0) {
+      miComboUnit = m_unitsComboBox->currentIndex();
     }
 
-    p_unitsComboBox->clear();
-    p_showAllSegments->setEnabled(false);
+    m_unitsComboBox->clear();
+    m_showAllSegments->setEnabled(false);
 
-    if(RubberBandTool::getMode() == RubberBandTool::Line ||
+    if (RubberBandTool::getMode() == RubberBandTool::Line ||
         RubberBandTool::getMode() == RubberBandTool::SegmentedLine) {
 
-      if(RubberBandTool::getMode() == RubberBandTool::SegmentedLine) {
-        p_showAllSegments->setEnabled(true);
+      if (RubberBandTool::getMode() == RubberBandTool::SegmentedLine) {
+        m_showAllSegments->setEnabled(true);
       }
 
-      p_unitsComboBox->addItem("km");
-      p_unitsComboBox->addItem("m");
-      p_unitsComboBox->addItem("pixels");
-      if(miComboUnit < 0 || miComboUnit > 2) {   // default && error checking
+      m_unitsComboBox->addItem("km");
+      m_unitsComboBox->addItem("m");
+      m_unitsComboBox->addItem("pixels");
+      if (miComboUnit < 0 || miComboUnit > 2) {   // default && error checking
         miComboUnit = 2;
       }
     }
-    else if(RubberBandTool::getMode() == RubberBandTool::Angle) {
-      p_unitsComboBox->addItem("degrees");
-      p_unitsComboBox->addItem("radians");
-      if(miComboUnit > 1 || miComboUnit < 0) {   // default && error checking
+    else if (RubberBandTool::getMode() == RubberBandTool::Angle) {
+      m_unitsComboBox->addItem("degrees");
+      m_unitsComboBox->addItem("radians");
+      if (miComboUnit > 1 || miComboUnit < 0) {   // default && error checking
         miComboUnit = 0;
       }
     }
     else {
-      p_unitsComboBox->addItem("km^2");
-      p_unitsComboBox->addItem("m^2");
-      p_unitsComboBox->addItem("pix^2");
-      if(miComboUnit < 0 || miComboUnit > 2) {   // default && error checking
+      m_unitsComboBox->addItem("km^2");
+      m_unitsComboBox->addItem("m^2");
+      m_unitsComboBox->addItem("pix^2");
+      if (miComboUnit < 0 || miComboUnit > 2) {   // default && error checking
         miComboUnit = 2;
       }
     }
 
-    p_unitsComboBox->setCurrentIndex(miComboUnit);
+    m_unitsComboBox->setCurrentIndex(miComboUnit);
   }
 
 
@@ -226,7 +219,7 @@ namespace Isis {
    * @param menu
    */
   void MeasureTool::addTo(QMenu *menu) {
-    menu->addAction(p_action);
+    menu->addAction(m_action);
   }
 
 
@@ -237,24 +230,29 @@ namespace Isis {
   void MeasureTool::updateMeasure() {
     MdiCubeViewport *cvp = cubeViewport();
     MdiCubeViewport *d;
-    p_numLinked = 0;
+    m_numLinked = 0;
 
-    if(cvp == NULL) {
-      p_tableWin->clearRow(p_tableWin->currentRow());
-      return;
+    int currentRow = m_tableWin->currentRow();
+
+    while (currentRow >= m_tableWin->table()->rowCount()) {
+      addRow();
     }
 
-    updateDist(cvp, p_tableWin->currentRow());
+    if (cvp == NULL) {
+      m_tableWin->clearRow(m_tableWin->currentRow());
+    }
+    else {
+      updateDist(cvp, currentRow);
+      m_tableWin->table()->selectRow(currentRow);
 
-    p_tableWin->table()->selectRow(p_tableWin->currentRow());
+      if (cvp->isLinked()) {
+        for (int i = 0; i < (int)cubeViewportList()->size(); i++) {
+          d = (*(cubeViewportList()))[i];
 
-    if(cvp->isLinked()) {
-      for(int i = 0; i < (int)cubeViewportList()->size(); i++) {
-        d = (*(cubeViewportList()))[i];
-
-        if(d->isLinked() && d != cvp) {
-          p_numLinked++;
-          updateDist(d, p_tableWin->currentRow() + p_numLinked);
+          if (d->isLinked() && d != cvp) {
+            m_numLinked++;
+            updateDist(d, currentRow + m_numLinked);
+          }
         }
       }
     }
@@ -268,35 +266,23 @@ namespace Isis {
   void MeasureTool::rubberBandComplete() {
     updateMeasure();
 
-    if(RubberBandTool::getMode() != RubberBandTool::Angle && p_unitsComboBox->currentIndex() != 2) {
-      if(p_cvp->camera() == NULL && p_cvp->projection() == NULL) {
+    if (RubberBandTool::getMode() != RubberBandTool::Angle && m_unitsComboBox->currentIndex() != 2) {
+      if (p_cvp->camera() == NULL && p_cvp->projection() == NULL) {
         QMessageBox::information((QWidget *)parent(), "Error",
                                  "File must have a Camera Model or Projection to measure in km or m");
         return;
       }
     }
 
-    if(!p_tableWin->table()->isVisible()) return;
-    if(p_tableWin->table()->item(p_tableWin->currentRow(), StartLineIndex)->text() == "N/A" &&
-        p_tableWin->table()->item(p_tableWin->currentRow(), AngleDegIndex)->text() == "N/A" &&
-        p_tableWin->table()->item(p_tableWin->currentRow(), AreaPixIndex)->text() == "N/A") return;
+    if (!m_tableWin->table()->isVisible()) return;
+    if (m_tableWin->table()->item(m_tableWin->currentRow(), StartLineIndex)->text() == "N/A" &&
+        m_tableWin->table()->item(m_tableWin->currentRow(), AngleDegIndex)->text() == "N/A" &&
+        m_tableWin->table()->item(m_tableWin->currentRow(), AreaPixIndex)->text() == "N/A") return;
 
-    if(!p_cvp->isLinked())p_tableWin->setCurrentRow(p_tableWin->currentRow() + 1);
-    if(p_cvp->isLinked()) {
-      p_tableWin->setCurrentRow(p_tableWin->currentRow() + p_numLinked + 1);
-    }
-    p_tableWin->setCurrentIndex(p_tableWin->currentIndex() + 1);
-    while(p_tableWin->currentRow() >= p_tableWin->table()->rowCount()) {
-      int row = p_tableWin->table()->rowCount();
-      p_tableWin->table()->insertRow(row);
-      for(int c = 0; c < p_tableWin->table()->columnCount(); c++) {
-        QTableWidgetItem *item = new QTableWidgetItem("");
-        p_tableWin->table()->setItem(row, c, item);
-      }
-    }
+    addRow();
+    m_tableWin->setCurrentRow(m_tableWin->table()->rowCount() - 1);
 
-    QApplication::sendPostedEvents(p_tableWin->table(), 0);
-    p_tableWin->table()->scrollToItem(p_tableWin->table()->item(p_tableWin->currentRow(), 0), QAbstractItemView::PositionAtBottom);
+    QApplication::sendPostedEvents(m_tableWin->table(), 0);
   }
 
 
@@ -305,7 +291,7 @@ namespace Isis {
    *
    */
   void MeasureTool::mouseLeave() {
-    //p_tableWin->clearRow(p_tableWin->currentRow());
+    //m_tableWin->clearRow(m_tableWin->currentRow());
   }
 
 
@@ -314,8 +300,8 @@ namespace Isis {
    *
    */
   void MeasureTool::enableRubberBandTool() {
-    if(p_rubberBand) {
-      p_rubberBand->reset();
+    if (m_rubberBand) {
+      m_rubberBand->reset();
     }
   }
 
@@ -328,91 +314,86 @@ namespace Isis {
    * @param row
    */
   void MeasureTool::updateRow(int row) {
-    if(row + 1 > p_tableWin->table()->rowCount()) {
-      p_tableWin->table()->insertRow(row);
-      for(int c = 0; c < p_tableWin->table()->columnCount(); c++) {
-        QTableWidgetItem *item = new QTableWidgetItem("");
-        p_tableWin->table()->setItem(row, c, item);
-        if(c == 0) p_tableWin->table()->scrollToItem(item);
-      }
-    }
-
     // Blank out the row to remove stuff left over from previous cvps
-    for(int c = 0; c < p_tableWin->table()->columnCount(); c++) {
-      p_tableWin->table()->item(row, c)->setText("");
+    for (int c = 0; c < m_tableWin->table()->columnCount(); c++) {
+      m_tableWin->table()->item(row, c)->setText("");
     }
 
     // Write all the new info to the current row
-    if(p_startLat != Null && p_startLon != Null) {
-      p_tableWin->table()->item(row, StartLatIndex)->setText(QString::number(p_startLat));
-      p_tableWin->table()->item(row, StartLonIndex)->setText(QString::number(p_startLon));
+    if (m_startLat != Null && m_startLon != Null) {
+      m_tableWin->table()->item(row, StartLatIndex)->setText(QString::number(m_startLat));
+      m_tableWin->table()->item(row, StartLonIndex)->setText(QString::number(m_startLon));
     }
     else {
-      p_tableWin->table()->item(row, StartLatIndex)->setText("N/A");
-      p_tableWin->table()->item(row, StartLonIndex)->setText("N/A");
+      m_tableWin->table()->item(row, StartLatIndex)->setText("N/A");
+      m_tableWin->table()->item(row, StartLonIndex)->setText("N/A");
     }
 
-    if(p_endLat != Null && p_endLon != Null) {
-      p_tableWin->table()->item(row, EndLatIndex)->setText(QString::number(p_endLat));
-      p_tableWin->table()->item(row, EndLonIndex)->setText(QString::number(p_endLon));
-      p_tableWin->table()->item(row, DistanceKmIndex)->setText(QString::number(p_kmDist));
-      p_tableWin->table()->item(row, DistanceMIndex)->setText(QString::number(p_mDist));
+    if (m_endLat != Null && m_endLon != Null) {
+      m_tableWin->table()->item(row, EndLatIndex)->setText(QString::number(m_endLat));
+      m_tableWin->table()->item(row, EndLonIndex)->setText(QString::number(m_endLon));
     }
     else {
-      p_tableWin->table()->item(row, EndLatIndex)->setText("N/A");
-      p_tableWin->table()->item(row, EndLonIndex)->setText("N/A");
-      p_tableWin->table()->item(row, DistanceKmIndex)->setText("N/A");
-      p_tableWin->table()->item(row, DistanceMIndex)->setText("N/A");
+      m_tableWin->table()->item(row, EndLatIndex)->setText("N/A");
+      m_tableWin->table()->item(row, EndLonIndex)->setText("N/A");
     }
 
-    if(p_degAngle != Null && p_radAngle != Null) {
-      p_tableWin->table()->item(row, AngleDegIndex)->setText(QString::number(p_degAngle));
-      p_tableWin->table()->item(row, AngleRadIndex)->setText(QString::number(p_radAngle));
+    if (m_mDist != Null && m_kmDist != Null) {
+      m_tableWin->table()->item(row, DistanceMIndex)->setText(QString::number(m_mDist));
+      m_tableWin->table()->item(row, DistanceKmIndex)->setText(QString::number(m_kmDist));
     }
     else {
-      p_tableWin->table()->item(row, AngleDegIndex)->setText("N/A");
-      p_tableWin->table()->item(row, AngleRadIndex)->setText("N/A");
+      m_tableWin->table()->item(row, DistanceKmIndex)->setText("N/A");
+      m_tableWin->table()->item(row, DistanceMIndex)->setText("N/A");
     }
 
-    if(p_startSamp != Null && p_startLine != Null) {
-      p_tableWin->table()->item(row, StartSampIndex)->setText(QString::number(p_startSamp));
-      p_tableWin->table()->item(row, StartLineIndex)->setText(QString::number(p_startLine));
+    if (m_degAngle != Null && m_radAngle != Null) {
+      m_tableWin->table()->item(row, AngleDegIndex)->setText(QString::number(m_degAngle));
+      m_tableWin->table()->item(row, AngleRadIndex)->setText(QString::number(m_radAngle));
     }
     else {
-      p_tableWin->table()->item(row, StartSampIndex)->setText("N/A");
-      p_tableWin->table()->item(row, StartLineIndex)->setText("N/A");
+      m_tableWin->table()->item(row, AngleDegIndex)->setText("N/A");
+      m_tableWin->table()->item(row, AngleRadIndex)->setText("N/A");
     }
 
-    if(p_endSamp != Null && p_endLine != Null) {
-      p_tableWin->table()->item(row, EndSampIndex)->setText(QString::number(p_endSamp));
-      p_tableWin->table()->item(row, EndLineIndex)->setText(QString::number(p_endLine));
-      p_tableWin->table()->item(row, DistancePixIndex)->setText(QString::number(p_pixDist));
+    if (m_startSamp != Null && m_startLine != Null) {
+      m_tableWin->table()->item(row, StartSampIndex)->setText(QString::number(m_startSamp));
+      m_tableWin->table()->item(row, StartLineIndex)->setText(QString::number(m_startLine));
     }
     else {
-      p_tableWin->table()->item(row, EndSampIndex)->setText("N/A");
-      p_tableWin->table()->item(row, EndLineIndex)->setText("N/A");
-      p_tableWin->table()->item(row, DistancePixIndex)->setText("N/A");
+      m_tableWin->table()->item(row, StartSampIndex)->setText("N/A");
+      m_tableWin->table()->item(row, StartLineIndex)->setText("N/A");
     }
 
-    if(p_pixArea != Null) {
-      p_tableWin->table()->item(row, AreaPixIndex)->setText(QString::number(p_pixArea));
+    if (m_endSamp != Null && m_endLine != Null) {
+      m_tableWin->table()->item(row, EndSampIndex)->setText(QString::number(m_endSamp));
+      m_tableWin->table()->item(row, EndLineIndex)->setText(QString::number(m_endLine));
+      m_tableWin->table()->item(row, DistancePixIndex)->setText(QString::number(m_pixDist));
     }
     else {
-      p_tableWin->table()->item(row, AreaPixIndex)->setText("N/A");
+      m_tableWin->table()->item(row, EndSampIndex)->setText("N/A");
+      m_tableWin->table()->item(row, EndLineIndex)->setText("N/A");
+      m_tableWin->table()->item(row, DistancePixIndex)->setText("N/A");
     }
 
-    if(p_mArea != Null) {
-      p_tableWin->table()->item(row, AreaKmIndex)->setText(QString::number(p_kmArea));
-      p_tableWin->table()->item(row, AreaMIndex)->setText(QString::number(p_mArea));
+    if (m_pixArea != Null) {
+      m_tableWin->table()->item(row, AreaPixIndex)->setText(QString::number(m_pixArea));
     }
     else {
-      p_tableWin->table()->item(row, AreaKmIndex)->setText("N/A");
-      p_tableWin->table()->item(row, AreaMIndex)->setText("N/A");
+      m_tableWin->table()->item(row, AreaPixIndex)->setText("N/A");
     }
 
-    p_tableWin->table()->item(row, PathIndex)->setText(p_path.c_str());
-    p_tableWin->table()->item(row, FilenameIndex)->setText(p_fname.c_str());
+    if (m_mArea != Null) {
+      m_tableWin->table()->item(row, AreaKmIndex)->setText(QString::number(m_kmArea));
+      m_tableWin->table()->item(row, AreaMIndex)->setText(QString::number(m_mArea));
+    }
+    else {
+      m_tableWin->table()->item(row, AreaKmIndex)->setText("N/A");
+      m_tableWin->table()->item(row, AreaMIndex)->setText("N/A");
+    }
 
+    m_tableWin->table()->item(row, PathIndex)->setText(m_path.c_str());
+    m_tableWin->table()->item(row, FilenameIndex)->setText(m_fname.c_str());
   }
 
 
@@ -425,69 +406,87 @@ namespace Isis {
    * @param row
    */
   void MeasureTool::updateRows(int row) {
-    if(p_distanceSegments.size() < 2) {
-      updateRow(row);
-      return;
-    }
-
-    int requiredRows = p_distanceSegments.size() + row + 2;
-    int rowDiff = (int)(requiredRows - p_tableWin->table()->rowCount());
+    int requiredRows = m_distanceSegments.size() + row;
+    int rowDiff = (int)(requiredRows - m_tableWin->table()->rowCount());
 
     //Make sure we have all the necessary rows and items in each table cell.
-    if(requiredRows > p_tableWin->table()->rowCount()) {
-      for(int r = 0; r < rowDiff; r++) {
-        p_tableWin->table()->insertRow(row + r);
-        for(int c = 0; c < p_tableWin->table()->columnCount(); c++) {
-          QTableWidgetItem *item = new QTableWidgetItem("");
-          p_tableWin->table()->setItem(row + r, c, item);
-          if(c == 0) p_tableWin->table()->scrollToItem(item);
-        }
+    if (requiredRows > m_tableWin->table()->rowCount()) {
+      for (int r = 0; r < rowDiff; r++) {
+        addRow();
       }
     }
 
-    if(RubberBandTool::getMode() == RubberBandTool::SegmentedLine && p_distanceSegments.size() > 0) {
+    if (RubberBandTool::getMode() == RubberBandTool::SegmentedLine && m_distanceSegments.size() > 0) {
       double distanceSum = 0;
-      for(int i = 0; i < p_distanceSegments.size(); i++) {
+      for (int i = 0; i < m_distanceSegments.size(); i++) {
         //write a new row for each segment...
-        p_tableWin->table()->item(row + i, StartLatIndex)->setText(QString::number(p_startLatSegments[i]));
-        p_tableWin->table()->item(row + i, StartLonIndex)->setText(QString::number(p_startLonSegments[i]));
+        if (m_startLatSegments[i] != Null && m_startLonSegments[i] != Null) {
+          m_tableWin->table()->item(row + i, StartLatIndex)->setText(QString::number(m_startLatSegments[i]));
+          m_tableWin->table()->item(row + i, StartLonIndex)->setText(QString::number(m_startLonSegments[i]));
+        }
+        else {
+          m_tableWin->table()->item(row + i, StartLatIndex)->setText("N/A");
+          m_tableWin->table()->item(row + i, StartLonIndex)->setText("N/A");
+        }
 
-        p_tableWin->table()->item(row + i, EndLatIndex)->setText(QString::number(p_endLatSegments[i]));
-        p_tableWin->table()->item(row + i, EndLonIndex)->setText(QString::number(p_endLonSegments[i]));
+        if (m_endLatSegments[i] != Null && m_endLonSegments[i] != Null) {
+          m_tableWin->table()->item(row + i, EndLatIndex)->setText(QString::number(m_endLatSegments[i]));
+          m_tableWin->table()->item(row + i, EndLonIndex)->setText(QString::number(m_endLonSegments[i]));
+        }
+        else {
+          m_tableWin->table()->item(row + i, EndLatIndex)->setText("N/A");
+          m_tableWin->table()->item(row + i, EndLonIndex)->setText("N/A");
+        }
 
-        p_tableWin->table()->item(row + i, StartSampIndex)->setText(QString::number(p_startSampSegments[i]));
-        p_tableWin->table()->item(row + i, StartLineIndex)->setText(QString::number(p_startLineSegments[i]));
+        if (m_startSampSegments[i] != Null && m_startLineSegments[i] != Null) {
+          m_tableWin->table()->item(row + i, StartSampIndex)->setText(QString::number(m_startSampSegments[i]));
+          m_tableWin->table()->item(row + i, StartLineIndex)->setText(QString::number(m_startLineSegments[i]));
+        }
+        else {
+          m_tableWin->table()->item(row + i, StartSampIndex)->setText("N/A");
+          m_tableWin->table()->item(row + i, StartLineIndex)->setText("N/A");
+        }
 
-        p_tableWin->table()->item(row + i, EndSampIndex)->setText(QString::number(p_endSampSegments[i]));
-        p_tableWin->table()->item(row + i, EndLineIndex)->setText(QString::number(p_endLineSegments[i]));
+        if (m_endSampSegments[i] != Null && m_endLineSegments[i] != Null) {
+          m_tableWin->table()->item(row + i, EndSampIndex)->setText(QString::number(m_endSampSegments[i]));
+          m_tableWin->table()->item(row + i, EndLineIndex)->setText(QString::number(m_endLineSegments[i]));
+        }
+        else {
+          m_tableWin->table()->item(row + i, EndSampIndex)->setText("N/A");
+          m_tableWin->table()->item(row + i, EndLineIndex)->setText("N/A");
+        }
 
-        p_tableWin->table()->item(row + i, DistancePixIndex)->setText(QString::number(p_pixDistSegments[i]));
+        if (m_pixDistSegments[i] != Null) {
+          m_tableWin->table()->item(row + i, DistancePixIndex)->setText(QString::number(m_pixDistSegments[i]));
+        }
+        else {
+          m_tableWin->table()->item(row + i, DistancePixIndex)->setText("N/A");
+        }
 
-        p_tableWin->table()->item(row + i, DistanceKmIndex)->setText(QString::number(p_distanceSegments[i]));
-        p_tableWin->table()->item(row + i, DistanceMIndex)->setText(QString::number(p_distanceSegments[i] * 1000));
+        if (m_distanceSegments[i] != Null) {
+          m_tableWin->table()->item(row + i, DistanceKmIndex)->setText(QString::number(m_distanceSegments[i]));
+          m_tableWin->table()->item(row + i, DistanceMIndex)->setText(QString::number(m_distanceSegments[i] * 1000.0));
+        }
+        else {
+          m_tableWin->table()->item(row + i, DistanceKmIndex)->setText("N/A");
+          m_tableWin->table()->item(row + i, DistanceMIndex)->setText("N/A");
+        }
 
-        p_tableWin->table()->item(row + i, PathIndex)->setText(p_path.c_str());
-        p_tableWin->table()->item(row + i, FilenameIndex)->setText(p_fname.c_str());
+        m_tableWin->table()->item(row + i, PathIndex)->setText(m_path.c_str());
+        m_tableWin->table()->item(row + i, FilenameIndex)->setText(m_fname.c_str());
 
-        distanceSum += p_distanceSegments[i];
+        distanceSum = (Distance(distanceSum, Distance::Kilometers) +
+            Distance(m_distanceSegments[i], Distance::Kilometers)).GetKilometers();
 
-        p_tableWin->table()->item(row + i, SegmentsSumIndex)->setText(QString::number(distanceSum));
-        p_tableWin->table()->item(row + i, SegmentNumberIndex)->setText(QString::number(i + 1));
+        if (distanceSum != Null) {
+          m_tableWin->table()->item(row + i, SegmentsSumIndex)->setText(QString::number(distanceSum));
+        }
+        else {
+          m_tableWin->table()->item(row + i, SegmentsSumIndex)->setText("N/A");
+        }
+
+        m_tableWin->table()->item(row + i, SegmentNumberIndex)->setText(QString::number(i + 1));
       }
-
-      //update the current row
-      p_tableWin->setCurrentRow(row + p_distanceSegments.size() - 1);
-      p_distanceSegments.clear();
-      p_pixDistSegments.clear();
-      p_startSampSegments.clear();
-      p_endSampSegments.clear();
-      p_startLineSegments.clear();
-      p_endLineSegments.clear();
-      p_startLatSegments.clear();
-      p_endLatSegments.clear();
-      p_startLonSegments.clear();
-      p_endLonSegments.clear();
-
     }
   }
 
@@ -498,23 +497,36 @@ namespace Isis {
    */
   void MeasureTool::initData(void) {
     // Initialize the class data
-    p_startSamp = Null;
-    p_endSamp   = Null;
-    p_startLine = Null;
-    p_endLine   = Null;
-    p_kmDist    = Null;
-    p_mDist     = Null;
-    p_pixDist   = Null;
-    p_startLon  = Null;
-    p_startLat  = Null;
-    p_endLon    = Null;
-    p_endLat    = Null;
-    p_radAngle  = Null;
-    p_degAngle  = Null;
-    p_pixArea   = Null;
-    p_kmArea    = Null;
-    p_mArea     = Null;
+    m_startSamp = Null;
+    m_endSamp   = Null;
+    m_startLine = Null;
+    m_endLine   = Null;
+    m_kmDist    = Null;
+    m_mDist     = Null;
+    m_pixDist   = Null;
+    m_startLon  = Null;
+    m_startLat  = Null;
+    m_endLon    = Null;
+    m_endLat    = Null;
+    m_radAngle  = Null;
+    m_degAngle  = Null;
+    m_pixArea   = Null;
+    m_kmArea    = Null;
+    m_mArea     = Null;
   }
+
+
+  void MeasureTool::addRow() {
+    int newRowPos = m_tableWin->table()->rowCount();
+    m_tableWin->table()->insertRow(newRowPos);
+    for (int c = 0; c < m_tableWin->table()->columnCount(); c++) {
+      QTableWidgetItem *item = new QTableWidgetItem("");
+      m_tableWin->table()->setItem(newRowPos, c, item);
+    }
+    m_tableWin->table()->scrollToItem(m_tableWin->table()->item(newRowPos, 0),
+                                      QAbstractItemView::PositionAtBottom);
+  }
+
 
   /**
    * This method updates the distance variables
@@ -532,176 +544,109 @@ namespace Isis {
     // Write out col 8 (the file name)
     Isis::Filename fname = Isis::Filename(
         cvp->cube()->getFilename()).Expanded();
-    p_path  = fname.Path();
-    p_fname = fname.Name();
+    m_path  = fname.Path();
+    m_fname = fname.Name();
+
+    m_pixDist = Null;
+    m_mDist   = Null;
+    m_kmDist  = Null;
 
     // reset the distnace gui
-    p_distLineEdit->setText("");
+    m_distLineEdit->setText("");
 
-    if(RubberBandTool::getMode() == RubberBandTool::Line ||
+    if (RubberBandTool::getMode() == RubberBandTool::Line ||
         RubberBandTool::getMode() == RubberBandTool::SegmentedLine) {
+      m_distanceSegments.clear();
+      m_pixDistSegments.clear();
+      m_startSampSegments.clear();
+      m_endSampSegments.clear();
+      m_startLineSegments.clear();
+      m_endLineSegments.clear();
+      m_startLatSegments.clear();
+      m_endLatSegments.clear();
+      m_startLonSegments.clear();
+      m_endLonSegments.clear();
 
-      p_pixDist = 0;
-      p_mDist   = 0;
-      p_kmDist  = 0;
-
-      // Flag to indicate whether distance was calculated
-      bool bDistance = false;
-      double radius = 0;
-      double mDist  = 0;
-
-      for(int startIndex = 0; startIndex < RubberBandTool::getVertices().size() - 1; startIndex++) {
+      for (int startIndex = 0; startIndex < RubberBandTool::getVertices().size() - 1; startIndex++) {
         QPoint start = RubberBandTool::getVertices()[startIndex];
         QPoint end   = RubberBandTool::getVertices()[startIndex+1];
 
-        //  Convert rubber band line to cube coordinates
-        cvp->viewportToCube(start.x(), start.y(), p_startSamp, p_startLine);
-        cvp->viewportToCube(end.x(), end.y(), p_endSamp, p_endLine);
+        setDistances(cvp, start, end);
 
-        // Don't write anything if we are outside the cube
-        if((p_startSamp < 0.5) || (p_endSamp < 0.5) ||
-            (p_startLine < 0.5) || (p_endLine < 0.5) ||
-            (p_startSamp > cvp->cubeSamples() + 0.5) ||
-            (p_endSamp > cvp->cubeSamples() + 0.5) ||
-            (p_startLine > cvp->cubeLines() + 0.5) ||
-            (p_endLine > cvp->cubeLines() + 0.5)) {
-          p_mDist   = Null;
-          p_kmDist  = Null;
-          p_pixDist = 0;
-          return;
-        }
-
-        // Check if the image is projected (Projected Images also have camera except for mosaics)
-        if(cvp->projection() != NULL) {
-          if(cvp->projection()->SetWorld(p_startSamp, p_startLine)) {
-            // If our projection is sky, the lat & lons are switched
-            if(cvp->projection()->IsSky()) {
-              p_startLat = cvp->projection()->UniversalLongitude();
-              p_startLon = cvp->projection()->UniversalLatitude();
-            }
-            else {
-              p_startLat = cvp->projection()->UniversalLatitude();
-              p_startLon = cvp->projection()->UniversalLongitude();
-            }
-
-            if(cvp->projection()->SetWorld(p_endSamp, p_endLine)) {
-              // If our projection is sky, the lat & lons are switched
-              if(cvp->projection()->IsSky()) {
-                p_endLat = cvp->projection()->UniversalLongitude();
-                p_endLon = cvp->projection()->UniversalLatitude();
-              }
-              else {
-                p_endLat = cvp->projection()->UniversalLatitude();
-                p_endLon = cvp->projection()->UniversalLongitude();
-              }
-            }
-            // Calculate and write out the distance between the two points
-            radius = cvp->projection()->LocalRadius();
-
-            // distance is calculated
-            bDistance = true;
+        if (RubberBandTool::getMode() == RubberBandTool::SegmentedLine) {
+          if (m_distanceSegments.size() < 75) {
+            m_distanceSegments.append(m_kmDist);
+            m_pixDistSegments.append(m_pixDist);
+            m_startSampSegments.append(m_startSamp);
+            m_endSampSegments.append(m_endSamp);
+            m_startLineSegments.append(m_startLine);
+            m_endLineSegments.append(m_endLine);
+            m_startLatSegments.append(m_startLat);
+            m_endLatSegments.append(m_endLat);
+            m_startLonSegments.append(m_startLon);
+            m_endLonSegments.append(m_endLon);
           }
         }
-        // Do we have a camera model?
-        else if(cvp->camera() != NULL) {
-          if(cvp->camera()->SetImage(p_startSamp, p_startLine)) {
-
-            // Write columns 2-3 (Start lat/lon)
-            p_startLat = cvp->camera()->UniversalLatitude();
-            p_startLon = cvp->camera()->UniversalLongitude();
-
-            if(cvp->camera()->SetImage(p_endSamp, p_endLine)) {
-              // Write columns 4-5 (End lat/lon)
-              p_endLat = cvp->camera()->UniversalLatitude();
-              p_endLon = cvp->camera()->UniversalLongitude();
-
-              radius = cvp->camera()->LocalRadius().GetMeters();
-
-              // distance is calculated
-              bDistance = true;
-            }
-          }
-        }
-
-        // Calculate the pixel difference
-        double lineDif = p_startLine - p_endLine;
-        double sampDif = p_startSamp - p_endSamp;
-        double pixDist = sqrt(lineDif * lineDif + sampDif * sampDif);
-        p_pixDist =  pixDist;
-
-        if(bDistance) {
-          Latitude startLat(p_startLat, Angle::Degrees);
-          Longitude startLon(p_startLon, Angle::Degrees);
-          Latitude endLat(p_endLat, Angle::Degrees);
-          Longitude endLon(p_endLon, Angle::Degrees);
-          Distance radiusDist(radius, Distance::Meters);
-
-          SurfacePoint startPoint(startLat, startLon, radiusDist);
-          SurfacePoint endPoint(endLat, endLon, radiusDist);
-
-          Distance distance =
-              startPoint.GetDistanceToPoint(endPoint, radiusDist);
-          mDist = distance.GetMeters();
-          p_mDist  += mDist;
-          p_kmDist  = p_mDist / 1000.0;
-
-          if(RubberBandTool::getMode() == RubberBandTool::SegmentedLine) {
-            if(pixDist > 16 / cvp->scale() && p_distanceSegments.size() < 75) {
-              p_distanceSegments.append(mDist / 1000.0);
-              p_pixDistSegments.append(pixDist);
-              p_startSampSegments.append(p_startSamp);
-              p_endSampSegments.append(p_endSamp);
-              p_startLineSegments.append(p_startLine);
-              p_endLineSegments.append(p_endLine);
-              p_startLatSegments.append(p_startLat);
-              p_endLatSegments.append(p_endLat);
-              p_startLonSegments.append(p_startLon);
-              p_endLonSegments.append(p_endLon);
-            }
-          }
-        }
-        bDistance = false;
       }
-      // Distance was not calculated
-      if(!p_mDist) {
-        p_mDist   = Null;
-        p_kmDist  = Null;
+
+      if (RubberBandTool::getMode() == RubberBandTool::SegmentedLine &&
+          m_pixDistSegments.size()) {
+        m_pixDist = m_pixDistSegments[0];
+        m_kmDist = m_distanceSegments[0];
+        m_mDist = Distance(m_kmDist, Distance::Kilometers).GetMeters();
+
+        for (int i = 1; i < m_pixDistSegments.size(); i++) {
+          m_pixDist = (Distance(m_pixDist, Distance::Pixels) +
+              Distance(m_pixDistSegments[i], Distance::Pixels)).GetPixels();
+
+          Distance thisDistance(m_distanceSegments[i], Distance::Kilometers);
+          m_kmDist = (Distance(m_kmDist, Distance::Kilometers) +
+                      thisDistance).GetKilometers();
+          m_mDist = (Distance(m_mDist, Distance::Meters) +
+                      thisDistance).GetMeters();
+        }
       }
     }
-    else if(RubberBandTool::getMode() == RubberBandTool::Angle) {
-      p_radAngle = RubberBandTool::getAngle();
-      p_degAngle = p_radAngle * 180.0 / PI;
+    else if (RubberBandTool::getMode() == RubberBandTool::Angle) {
+      m_radAngle = RubberBandTool::getAngle();
+      m_degAngle = m_radAngle * 180.0 / PI;
     }
     else {
       geos::geom::Geometry *polygon = RubberBandTool::geometry();
-      if(polygon != NULL) {
+      if (polygon != NULL) {
         // pix area = screenpix^2 / scale^2
-        p_pixArea = polygon->getArea() / pow(cvp->scale(), 2);
+        m_pixArea = polygon->getArea() / pow(cvp->scale(), 2);
         geos::geom::Point *center = polygon->getCentroid();
         double line, sample;
         cvp->viewportToCube((int)center->getX(), (int)center->getY(), sample, line);
 
-        if(cvp->camera() != NULL) {
+        if (cvp->camera() != NULL) {
           cvp->camera()->SetImage(sample, line);
           // pix^2 * (m/pix)^2 = m^2
-          p_mArea = p_pixArea * pow(cvp->camera()->PixelResolution(), 2);
+          m_mArea = m_pixArea * pow(cvp->camera()->PixelResolution(), 2);
           // m^2 * (km/m)^2 = km^2
-          p_kmArea = p_mArea * pow(1 / 1000.0, 2);
+          m_kmArea = m_mArea * pow(1 / 1000.0, 2);
         }
 
-        if(cvp->projection() != NULL) {
+        if (cvp->projection() != NULL) {
           cvp->projection()->SetWorld(sample, line);
           // pix^2 * (m/pix)^2 = m^2
-          p_mArea = p_pixArea * pow(cvp->projection()->Resolution(), 2);
+          m_mArea = m_pixArea * pow(cvp->projection()->Resolution(), 2);
           // m^2 * (km/m)^2 = km^2
-          p_kmArea = p_mArea * pow(1 / 1000.0, 2);
+          m_kmArea = m_mArea * pow(1 / 1000.0, 2);
         }
+      }
+
+      if (RubberBandTool::getMode() == RubberBandTool::Rectangle) {
+        setDistances(cvp, RubberBandTool::getVertices()[0],
+                     RubberBandTool::getVertices()[2]);
       }
     }
 
     updateDistEdit();
 
-    if(p_showAllSegments->isChecked()) {
+    if (m_showAllSegments->isChecked() &&
+        RubberBandTool::getMode() == RubberBandTool::SegmentedLine) {
       updateRows(row);
     }
     else {
@@ -710,61 +655,152 @@ namespace Isis {
   }
 
 
-  //! Change the value in the distance edit to match the units
-  void MeasureTool::updateDistEdit() {
-    if(RubberBandTool::getMode() == RubberBandTool::Line ||
-        RubberBandTool::getMode() == RubberBandTool::SegmentedLine) {
-      if(p_unitsComboBox->currentIndex() == 0) {
-        if(p_kmDist == Null) {
-          p_distLineEdit->setText("N/A");
-        }
-        else {
-          p_distLineEdit->setText(QString::number(p_kmDist));
+  void MeasureTool::setDistances(MdiCubeViewport *cvp, QPoint lineStart,
+                                 QPoint lineEnd) {
+    // Convert rubber band line to cube coordinates
+    cvp->viewportToCube(lineStart.x(), lineStart.y(), m_startSamp, m_startLine);
+    cvp->viewportToCube(lineEnd.x(), lineEnd.y(), m_endSamp, m_endLine);
+
+    m_mDist   = Null;
+    m_kmDist  = Null;
+    double radius = Null;
+
+    // Don't write anything if we are outside the cube
+    if ((m_startSamp >= 0.5) && (m_endSamp >= 0.5) &&
+        (m_startLine >= 0.5) && (m_endLine >= 0.5) &&
+        (m_startSamp <= cvp->cubeSamples() + 0.5) &&
+        (m_endSamp <= cvp->cubeSamples() + 0.5) &&
+        (m_startLine <= cvp->cubeLines() + 0.5) &&
+        (m_endLine <= cvp->cubeLines() + 0.5)) {
+      // Check if the image is projected (Projected Images also have camera
+      //   except for mosaics)
+      if (cvp->projection() != NULL) {
+        if (cvp->projection()->SetWorld(m_startSamp, m_startLine)) {
+          // If our projection is sky, the lat & lons are switched
+          if (cvp->projection()->IsSky()) {
+            m_startLat = cvp->projection()->UniversalLongitude();
+            m_startLon = cvp->projection()->UniversalLatitude();
+          }
+          else {
+            m_startLat = cvp->projection()->UniversalLatitude();
+            m_startLon = cvp->projection()->UniversalLongitude();
+          }
+
+          if (cvp->projection()->SetWorld(m_endSamp, m_endLine)) {
+            // If our projection is sky, the lat & lons are switched
+            if (cvp->projection()->IsSky()) {
+              m_endLat = cvp->projection()->UniversalLongitude();
+              m_endLon = cvp->projection()->UniversalLatitude();
+            }
+            else {
+              m_endLat = cvp->projection()->UniversalLatitude();
+              m_endLon = cvp->projection()->UniversalLongitude();
+            }
+          }
+
+          // Calculate and write out the distance between the two points
+          radius = cvp->projection()->LocalRadius();
         }
       }
-      else if(p_unitsComboBox->currentIndex() == 1) {
-        if(p_mDist == Null) {
-          p_distLineEdit->setText("N/A");
+      // Do we have a camera model?
+      else if (cvp->camera() != NULL &&
+              cvp->camera()->SetImage(m_startSamp, m_startLine)) {
+        // Write columns 2-3 (Start lat/lon)
+        m_startLat = cvp->camera()->UniversalLatitude();
+        m_startLon = cvp->camera()->UniversalLongitude();
+
+        if (cvp->camera()->SetImage(m_endSamp, m_endLine)) {
+          // Write columns 4-5 (End lat/lon)
+          m_endLat = cvp->camera()->UniversalLatitude();
+          m_endLon = cvp->camera()->UniversalLongitude();
+
+          radius = cvp->camera()->LocalRadius().GetMeters();
         }
-        else {
-          p_distLineEdit->setText(QString::number(p_mDist));
-        }
-      }
-      else {
-        p_distLineEdit->setText(QString::number(p_pixDist));
       }
     }
-    else if(RubberBandTool::getMode() == RubberBandTool::Angle) {
-      if(p_unitsComboBox->currentIndex() == 0) {
-        p_distLineEdit->setText(QString::number(p_degAngle));
+
+    // Calculate the pixel difference
+    double lineDif = m_startLine - m_endLine;
+    double sampDif = m_startSamp - m_endSamp;
+    double pixDist = sqrt(lineDif * lineDif + sampDif * sampDif);
+    m_pixDist = pixDist;
+
+    Latitude startLat(m_startLat, Angle::Degrees);
+    Longitude startLon(m_startLon, Angle::Degrees);
+    Latitude endLat(m_endLat, Angle::Degrees);
+    Longitude endLon(m_endLon, Angle::Degrees);
+    Distance radiusDist(radius, Distance::Meters);
+
+    SurfacePoint startPoint;
+    SurfacePoint endPoint;
+
+    if (startLat.Valid() && startLon.Valid() &&
+        endLat.Valid() && endLon.Valid() && radiusDist.Valid()) {
+      startPoint = SurfacePoint(startLat, startLon, radiusDist);
+      endPoint = SurfacePoint(endLat, endLon, radiusDist);
+    }
+
+    Distance distance = startPoint.GetDistanceToPoint(endPoint, radiusDist);
+    m_mDist = distance.GetMeters();
+    m_kmDist = distance.GetKilometers();
+  }
+
+
+  //! Change the value in the distance edit to match the units
+  void MeasureTool::updateDistEdit() {
+    if (RubberBandTool::getMode() == RubberBandTool::Line ||
+        RubberBandTool::getMode() == RubberBandTool::SegmentedLine) {
+      if (m_unitsComboBox->currentIndex() == 0) {
+        if (m_kmDist == Null) {
+          m_distLineEdit->setText("N/A");
+        }
+        else {
+          m_distLineEdit->setText(QString::number(m_kmDist));
+        }
+      }
+      else if (m_unitsComboBox->currentIndex() == 1) {
+        if (m_mDist == Null) {
+          m_distLineEdit->setText("N/A");
+        }
+        else {
+          m_distLineEdit->setText(QString::number(m_mDist));
+        }
       }
       else {
-        p_distLineEdit->setText(QString::number(p_radAngle));
+        m_distLineEdit->setText(QString::number(m_pixDist));
+      }
+    }
+    else if (RubberBandTool::getMode() == RubberBandTool::Angle) {
+      if (m_unitsComboBox->currentIndex() == 0) {
+        m_distLineEdit->setText(QString::number(m_degAngle));
+      }
+      else {
+        m_distLineEdit->setText(QString::number(m_radAngle));
       }
     }
     else {
-      if(p_unitsComboBox->currentIndex() == 0) {
-        if(p_kmArea == Null) {
-          p_distLineEdit->setText("N/A");
+      if (m_unitsComboBox->currentIndex() == 0) {
+        if (m_kmArea == Null) {
+          m_distLineEdit->setText("N/A");
         }
         else {
-          p_distLineEdit->setText(QString::number(p_kmArea));
+          m_distLineEdit->setText(QString::number(m_kmArea));
         }
       }
-      else if(p_unitsComboBox->currentIndex() == 1) {
-        if(p_mArea == Null) {
-          p_distLineEdit->setText("N/A");
+      else if (m_unitsComboBox->currentIndex() == 1) {
+        if (m_mArea == Null) {
+          m_distLineEdit->setText("N/A");
         }
         else {
-          p_distLineEdit->setText(QString::number(p_mArea));
+          m_distLineEdit->setText(QString::number(m_mArea));
         }
       }
       else {
-        if(p_pixArea != Null) {
-          p_distLineEdit->setText(QString::number(p_pixArea));
+        if (m_pixArea != Null) {
+          m_distLineEdit->setText(QString::number(m_pixArea));
         }
         else {
-          p_distLineEdit->setText("N/A");
+          m_distLineEdit->setText("N/A");
         }
       }
     }
@@ -788,7 +824,7 @@ namespace Isis {
    *
    */
   void MeasureTool::updateTool() {
-    p_distLineEdit->clear();
+    m_distLineEdit->clear();
   }
 
 }

@@ -35,6 +35,9 @@ namespace Isis {
   *   @history 2010-06-03 Eric Hyer - Fixed bug in getInstance method
   *   @history 2010-06-26 Eric Hyer - Now uses MdiCubeViewport
   *   @history 2010-11-08 Eric Hyer - Added mouse snapping
+  *   @history 2011-09-20 Steven Lambright - Segmented lines now have updates
+  *                           while the user is still drawing them instead of
+  *                           just a complete state.
   */
   class RubberBandTool : public Tool {
       Q_OBJECT

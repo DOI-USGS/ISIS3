@@ -30,25 +30,26 @@ namespace Isis {
   * @author Unknown
   *
   * @internal
-  *   @history 2007-11-19 Stacy Alley
-  *                       added the capability of the qisis
-  *                       windows to remember size and location
-  *   @history 2007-11-29 Stacy Alley
-  *                      replaced all the table stuff with the new
-  *                      TableMainWindow class.
-  *   @history 2008-08-18 Christopher Austin
-  *                      Upgraded to geos3.0.0
+  *   @history 2007-11-19 Stacy Alley added the capability of the qisis windows
+  *                           to remember size and location
+  *   @history 2007-11-29 Stacy Alley replaced all the table stuff with the new
+  *                           TableMainWindow class.
+  *   @history 2008-08-18 Christopher Austin Upgraded to geos3.0.0
   *   @history 2008-09-26 Steven Lambright Added Segmented line
   *   @history 2009-02-12 Steven Lambright Fixed bug where measure tool would
-  *                      not measure pixels for non-camera, non-projection
-  *                      cubes.
-  *   @history 2010-02-17 Sharmila Prasad Fixed bug where the
-  *            distance was calculated twice for a cube with both
-  *            camera and projection
-  *            Also made changes to save the most recent selection
-  *           (km,m,pixels) when different tool is selected
-  *   @history 2010-06-26 - Eric Hyer - Now uses MdiCubeViewport instead of
-  *            CubeViewport.  Fixed some include issues (some still remain!)
+  *                           not measure pixels for non-camera, non-projection
+  *                           cubes.
+  *   @history 2010-02-17 Sharmila Prasad Fixed bug where the distance was
+  *                           calculated twice for a cube with both camera and
+  *                           projection. Also made changes to save the most
+  *                           recent selection (km,m,pixels) when different tool
+  *                           is selected
+  *   @history 2010-06-26 Eric Hyer - Now uses MdiCubeViewport instead of
+  *                           CubeViewport.  Fixed some include issues (some
+  *                           still remain!)
+  *   @history 2011-09-20 Steven Lambright - Added some abstraction, fixed
+  *                           problems with segmented line and rectangle.
+  *                           Fixes #218.
   */
   class MeasureTool : public Tool {
       Q_OBJECT
@@ -79,12 +80,14 @@ namespace Isis {
       void updateDistEdit();
 
     private:
-      QAction *p_action;          //!< Measure tool's action
-      QLineEdit *p_distLineEdit;  //!< Distance line edit
-      QComboBox *p_unitsComboBox; //!< Units selection
+      QAction *m_action;          //!< Measure tool's action
+      QLineEdit *m_distLineEdit;  //!< Distance line edit
+      QComboBox *m_unitsComboBox; //!< Units selection
       int miComboUnit;            // Store the previous unit chosen
 
+      void addRow();
       void updateDist(MdiCubeViewport *cvp, int row);
+      void setDistances(MdiCubeViewport *cvp, QPoint lineStart, QPoint lineEnd);
       void updateRow(int row);
       void updateRows(int row);
       void initData(void);
@@ -137,42 +140,42 @@ namespace Isis {
         FilenameIndex//!< Filename index
       };
 
-      double p_startSamp;//!< starting sample
-      double p_endSamp;//!< ending sample
-      double p_startLine;//!< starting line
-      double p_endLine;//!< ending line
-      double p_startLat;//!< starting latitude
-      double p_endLat;//!< ending latitude
-      double p_startLon;//!< starting longitude
-      double p_endLon;//!< ending longitude
-      double p_kmDist;//!< distance in kilometers
-      double p_mDist;//!< distance in meters
-      double p_pixDist;//!< distance in pixels
-      double p_radAngle;//!< angle in radians
-      double p_degAngle;//!< angle in degrees
-      double p_kmArea;//!< area in kilometers
-      double p_mArea;//!< area in meters
-      double p_pixArea;//!< area in pixels
+      double m_startSamp;//!< starting sample
+      double m_endSamp;//!< ending sample
+      double m_startLine;//!< starting line
+      double m_endLine;//!< ending line
+      double m_startLat;//!< starting latitude
+      double m_endLat;//!< ending latitude
+      double m_startLon;//!< starting longitude
+      double m_endLon;//!< ending longitude
+      double m_kmDist;//!< distance in kilometers
+      double m_mDist;//!< distance in meters
+      double m_pixDist;//!< distance in pixels
+      double m_radAngle;//!< angle in radians
+      double m_degAngle;//!< angle in degrees
+      double m_kmArea;//!< area in kilometers
+      double m_mArea;//!< area in meters
+      double m_pixArea;//!< area in pixels
 
-      QList<double> p_distanceSegments;
-      QList<double>p_pixDistSegments;
-      QList<double>p_startSampSegments;
-      QList<double>p_endSampSegments;
-      QList<double>p_startLineSegments;
-      QList<double>p_endLineSegments;
-      QList<double>p_startLatSegments;
-      QList<double>p_endLatSegments;
-      QList<double>p_startLonSegments;
-      QList<double>p_endLonSegments;
+      QList<double> m_distanceSegments;
+      QList<double> m_pixDistSegments;
+      QList<double> m_startSampSegments;
+      QList<double> m_endSampSegments;
+      QList<double> m_startLineSegments;
+      QList<double> m_endLineSegments;
+      QList<double> m_startLatSegments;
+      QList<double> m_endLatSegments;
+      QList<double> m_startLonSegments;
+      QList<double> m_endLonSegments;
 
 
-      int p_numLinked;//!< number of linked viewports
-      iString p_path;//!< filename path
-      iString p_fname;//!< filename
+      int m_numLinked;//!< number of linked viewports
+      iString m_path;//!< filename path
+      iString m_fname;//!< filename
 
-      TableMainWindow *p_tableWin;//!< table window
-      RubberBandComboBox *p_rubberBand;//!< rubberband combo box
-      QCheckBox *p_showAllSegments;
+      TableMainWindow *m_tableWin;//!< table window
+      RubberBandComboBox *m_rubberBand;//!< rubberband combo box
+      QCheckBox *m_showAllSegments;
   };
 
 };

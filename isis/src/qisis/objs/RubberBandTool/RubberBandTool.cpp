@@ -643,6 +643,9 @@ namespace Isis {
           if(p_mouseDown && p != (*p_vertices)[ p_vertices->size() - 1 ]) {
             p_vertices->push_back(p);
           }
+
+          if (p_bandingMode == SegmentedLine)
+            emit measureChange();
         }
         break;
     }
@@ -696,6 +699,7 @@ namespace Isis {
       switch(p_bandingMode) {
         case Angle:
         case Line:
+        case SegmentedLine:
           vertices.push_back(*p_mouseLoc);
           break;
 
@@ -752,7 +756,6 @@ namespace Isis {
           }
           break;
 
-        case SegmentedLine:
         case Polygon:
           break;
       }
@@ -1053,7 +1056,7 @@ namespace Isis {
         break;
 
       case SegmentedLine:
-        complete = (p_vertices->size() > 1 && !p_tracking);
+        complete = (p_vertices->size() > 1 && !p_tracking) || (p_vertices->size() > 0);
         break;
 
       case Polygon:
