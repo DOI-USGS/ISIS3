@@ -11,7 +11,9 @@ namespace Isis {
   /**
    * @internal
    *   @history 2010-06-26 Eric Hyer - Now uses MdiCubeViewport instead of
-   *            CubeViewPort.  Fixed include issues
+   *                           CubeViewPort.  Fixed include issues
+   *   @history 2011-09-20 Steven Lambright - Cursors should remain consistent
+   *                           between all viewports now. Fixes #195.
    */
   class WindowTool : public Tool {
       Q_OBJECT
@@ -32,10 +34,13 @@ namespace Isis {
       void removeConnections(MdiCubeViewport *cvp);
 
     private slots:
+      void changeCursor();
       void linkWindows();
       void unlinkWindows();
       void resizeWindows();
-      void changeCursor();
+      void updateViewportCursor(MdiCubeViewport *);
+
+    private:
 
     private:
       QAction *p_cascadeWindows;   //!< cascade windows action

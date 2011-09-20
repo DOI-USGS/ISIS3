@@ -1,5 +1,7 @@
 #include "WindowTool.h"
 
+#include <iostream>
+
 #include <QMenu>
 
 #include "MdiCubeViewport.h"
@@ -99,7 +101,6 @@ namespace Isis {
     p_changeCursor->setEnabled(false);
     connect(p_changeCursor, SIGNAL(activated()), this, SLOT(changeCursor()));
 
-
     activate(true);
   }
 
@@ -118,6 +119,8 @@ namespace Isis {
     connect(p_nextWindow, SIGNAL(activated()), ws, SLOT(activateNextSubWindow()));
     connect(p_closeWindow, SIGNAL(activated()), ws, SLOT(closeActiveSubWindow()));
     connect(p_closeAllWindows, SIGNAL(activated()), ws, SLOT(closeAllSubWindows()));
+    connect(ws, SIGNAL(cubeViewportAdded(MdiCubeViewport *)),
+            this, SLOT(updateViewportCursor(MdiCubeViewport *)));
   }
 
 
@@ -187,6 +190,11 @@ namespace Isis {
   }
 
 
+  void newViewportOpened(CubeViewport *cvp) {
+    
+  }
+
+
   /**
    * Links all viewport windows in the workspace.
    *
@@ -217,17 +225,27 @@ namespace Isis {
    *
    */
   void WindowTool::changeCursor() {
-    MdiCubeViewport *d;
+    if(p_changeCursor->text() == "Change cursor to arrow.") {
+      p_changeCursor->setText("Change cursor to crosshair.");
+    }
+    else {
+      p_changeCursor->setText("Change cursor to arrow.");
+    }
+
     for(int i = 0; i < (int)cubeViewportList()->size(); i++) {
-      d = (*(cubeViewportList()))[i];
-      if(d->viewport()->cursor().shape() == Qt::CrossCursor) {
-        d->changeCursor(QCursor(Qt::ArrowCursor));
-        p_changeCursor->setText("Change cursor to crosshair.");
-      }
-      else {
-        d->changeCursor(QCursor(Qt::CrossCursor));
-        p_changeCursor->setText("Change cursor to arrow.");
-      }
+      updateViewportCursor(cubeViewportList()->at(i));
+    }
+  }
+
+
+  void WindowTool::updateViewportCursor(MdiCubeViewport *cvp) {
+    if (p_changeCursor->text() == "Change cursor to crosshair." &&
+        cvp->viewport()->cursor().shape() != Qt::ArrowCursor) {
+      cvp->viewport()->setCursor(Qt::ArrowCursor);
+    }
+    else if (p_changeCursor->text() == "Change cursor to arrow." &&
+        cvp->viewport()->cursor().shape() != Qt::CrossCursor) {
+      cvp->viewport()->setCursor(Qt::CrossCursor);
     }
   }
 
