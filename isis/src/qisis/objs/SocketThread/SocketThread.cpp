@@ -40,6 +40,7 @@ namespace Isis {
     if((p_socket = socket(PF_UNIX, SOCK_STREAM, 0)) < 0) {
       std::string msg = "Unable to create socket";
       std::cerr << msg << std::endl;
+      remove(p_socketFile.c_str());
       return;
     }
 
@@ -50,6 +51,7 @@ namespace Isis {
     if(setsockopt(p_socket, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(struct timeval)) != 0) {
       std::string msg = "Unable set socket timeout";
       std::cerr << msg << std::endl;
+      remove(p_socketFile.c_str());
       return;
     }
 
@@ -58,6 +60,7 @@ namespace Isis {
     if(status < 0) {
       std::string msg = "Unable to bind to socket [" + p_socketFile + "]";
       std::cerr << msg << std::endl;
+      remove(p_socketFile.c_str());
       return;
     }
 
@@ -65,6 +68,7 @@ namespace Isis {
     if(listen(p_socket, 5) < 0) {
       std::string msg = "Unable to listen to socket [" + p_socketFile + "]";
       std::cerr << msg << std::endl;
+      remove(p_socketFile.c_str());
       return;
     }
 
@@ -84,6 +88,7 @@ namespace Isis {
       if((bytes = recv(childSocket, &buf, 1024 * 1024, 0)) < 0) {
         std::string msg = "Unable to read from socket [" + p_socketFile + "]";
         std::cerr << msg << std::endl;
+        remove(p_socketFile.c_str());
         return;
       }
 
@@ -97,7 +102,6 @@ namespace Isis {
         }
         else emit newImage(token.c_str());
       }
-
     };
   }
 }

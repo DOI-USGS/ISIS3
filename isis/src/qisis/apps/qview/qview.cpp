@@ -57,8 +57,8 @@ int main(int argc, char *argv[]) {
     }
   }
 
+  std::string p_socketFile = "/tmp/isis_qview_" + Application::UserName();
   if(newWindow < 0) {
-    std::string p_socketFile = "/tmp/isis_qview_" + Application::UserName();
     struct sockaddr_un p_socketName;
     p_socketName.sun_family = AF_UNIX;
     strcpy(p_socketName.sun_path, p_socketFile.c_str());
@@ -66,34 +66,38 @@ int main(int argc, char *argv[]) {
 
     if(((Filename)p_socketFile).Exists()) {
       // Create a socket
-      if((p_socket = socket(PF_UNIX, SOCK_STREAM, 0)) < 0) {
+      if((p_socket = socket(PF_UNIX, SOCK_STREAM, 0)) >= 0) {
+        // Try to connect to the socket
+        if((connect(p_socket, (struct sockaddr *)&p_socketName,
+                    sizeof(p_socketName))) >= 0) {
+          std::string temp;
+          for(int i = 1; i < argc; i++) {
+            temp +=  Filename(argv[i]).Expanded() + " ";
+          }
+          temp += "raise ";
+
+          // Try to send data to the socket
+          if(send(p_socket, temp.c_str(), temp.size(), 0) >= 0) {
+            // Success, the other qview will open this file.
+            exit(0);
+          }
+          else {
+            std::string msg = "Unable to write to socket";
+            std::cout << msg << std::endl;
+            remove(p_socketFile.c_str());
+          }
+        }
+
+        // If the file already exists but we can't connect to it, assume the
+        //   socket is no longer running & remove the tmp file...it falls out &
+        //   create a new one. This happens if qview is not already running.
+        else {
+          remove(p_socketFile.c_str());
+        }
+      }
+      else {
         std::string msg = "Unable to create socket";
         std::cout << msg << std::endl;
-        exit(0);
-      }
-
-      // Try to connect to the socket
-      if((connect(p_socket, (struct sockaddr *)&p_socketName,
-                  sizeof(p_socketName))) >= 0) {
-        std::string temp;
-        for(int i = 1; i < argc; i++) {
-          temp +=  Filename(argv[i]).Expanded() + " ";
-        }
-        temp += "raise ";
-
-        // Try to send data to the socket
-        if(send(p_socket, temp.c_str(), temp.size(), 0) < 0) {
-          std::string msg = "Unable to write to socket";
-          std::cout << msg << std::endl;
-          exit(0);
-        }
-
-        exit(0);
-      }
-
-      //If the file already exists but we can't connect to it, assume the socket
-      //is no longer running & remove the tmp file...it falls out & create a new one
-      else {
         remove(p_socketFile.c_str());
       }
     }
@@ -229,6 +233,10 @@ int main(int argc, char *argv[]) {
     temp->stop();
     temp->wait(); // wait for the stop to finish
     delete temp;
+
+    if(newWindow < 0) {
+      remove(p_socketFile.c_str());
+    }
   }
 
   delete htool;
