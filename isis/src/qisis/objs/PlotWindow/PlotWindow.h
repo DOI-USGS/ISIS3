@@ -56,6 +56,8 @@ namespace Isis {
    *  @history 2011-03-18 Sharmila Prasad - Connect the viewport's close signal
    *  @history 2011-03-23 Sharmila Prasad - PlotWindow to be ontop even when it
    *           loses focus. This works for both histogram and plot tools.
+   *  @history 2011-09-21 Steven Lambright - Removed the fixed size from the
+   *                          configure curve dialog. Fixes #203.
    */
   class PlotWindow : public MainWindow {
       Q_OBJECT

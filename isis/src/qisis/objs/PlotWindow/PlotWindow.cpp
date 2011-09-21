@@ -939,7 +939,6 @@ namespace Isis {
     hlayout->addWidget(cancelButton);
     buttons->setLayout(hlayout);
 
-    dialog->setFixedSize(400, 250);
     dialog->show();
   }
 
