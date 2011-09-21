@@ -119,6 +119,12 @@ namespace Isis {
    *                           defaults. This fixes an issue with the new
    *                           spiceinit GUI with "WEB" added... -last would
    *                           always throw an error.
+   *   @history 2011-09-21 Steven Lambright - When the -batchlist does not
+   *                           understand a variable it would crash. This
+   *                           prevented users from entering variables like
+   *                           $base, $mro, etc. Now when -batchlist does not
+   *                           understand a variable it preserves it in the
+   *                           parameter list. Fixes #365.
    */
 
   class UserInterface : public IsisAml {

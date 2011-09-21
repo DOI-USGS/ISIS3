@@ -978,11 +978,19 @@ namespace Isis {
 
           while(thisValue != "") {
             newValue += token;
-            int j = iString(thisValue.substr(0, 1)).ToInteger()
-                    - 1;
-            newValue += p_batchList[i][j];
-            thisValue.replace(0, 1, "");
-            token = thisValue.Token("$");
+            try {
+              int j = iString(thisValue.substr(0, 1)).ToInteger() - 1;
+              newValue += p_batchList[i][j];
+              thisValue.replace(0, 1, "");
+              token = thisValue.Token("$");
+            }
+            catch (iException &e) {
+              e.Clear();
+
+              // Let the variable be parsed by the application 
+              newValue += "$";
+              token = thisValue.Token("$");
+            }
           }
 
           if(token != "")
