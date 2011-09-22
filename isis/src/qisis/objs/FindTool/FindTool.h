@@ -69,6 +69,9 @@ namespace Isis {
    *                                  dot from the dialog to the toolbar
    *  @history 2010-06-26 Eric Hyer - Now uses MdiCubeViewport instead of
    *           CubeViewport.  Also fixed include issues.
+   *  @history 2011-09-22 Steven Lambright - Sync scale with projections now
+   *                          uses a better guess for the equivalent scale.
+   *                          Fixes #205.
    */
   class GroundTab : public QWidget {
       Q_OBJECT

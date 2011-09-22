@@ -14,10 +14,14 @@
 #include <float.h>
 
 #include "Camera.h"
+#include "Distance.h"
+#include "Latitude.h"
+#include "Longitude.h"
 #include "MainWindow.h"
 #include "MdiCubeViewport.h"
 #include "Workspace.h"
 #include "Projection.h"
+#include "SurfacePoint.h"
 #include "ToolPad.h"
 #include "UniversalGroundMap.h"
 
@@ -531,16 +535,58 @@ namespace Isis {
           (activeViewport->isLinked() && viewport->isLinked())) {
         double newScale = viewport->scale();
 
-        if(syncScale && groundMap)
-          newScale = scale / groundMap->Resolution();
+        if(groundMap->SetUniversalGround(p_lat, p_lon)) {
+          double samp = groundMap->Sample();
+          double line = groundMap->Line();
 
-        if(p_line != DBL_MAX && p_samp != DBL_MAX) {
-          viewport->setScale(newScale, p_samp, p_line);
-        }
-        else if(p_lat != DBL_MAX && p_lon != DBL_MAX && groundMap) {
-          if(groundMap->SetUniversalGround(p_lat, p_lon)) {
-            double samp = groundMap->Sample();
-            double line = groundMap->Line();
+          // Smart resolution is getting a better resolution for projected
+          //   images. It works by calculating the lat/lon centered on the
+          //   pixel we're looking at.
+          bool smartResSucceeded = false;
+          if (syncScale && groundMap && groundMap->HasProjection()) {
+            double resolution = Null;
+
+            if (groundMap->SetImage(samp - 0.5, line - 0.5)) {
+              double lat1 = groundMap->UniversalLatitude();
+              double lon1 = groundMap->UniversalLongitude();
+
+              if (groundMap->SetImage(samp + 0.5, line + 0.5)) {
+                double lat2 = groundMap->UniversalLatitude();
+                double lon2 = groundMap->UniversalLongitude();
+
+                double radius = groundMap->Projection()->LocalRadius();
+
+                SurfacePoint point1(
+                    Latitude(lat1, Angle::Degrees),
+                    Longitude(lon1, Angle::Degrees),
+                    Distance(radius, Distance::Meters));
+
+                SurfacePoint point2(
+                    Latitude(lat2, Angle::Degrees),
+                    Longitude(lon2, Angle::Degrees),
+                    Distance(radius, Distance::Meters));
+
+                Distance distancePerPixel = point1.GetDistanceToPoint(point2);
+
+                // Resolution = meters/pixels
+                resolution = distancePerPixel.GetMeters();
+              }
+            }
+
+            if (!IsSpecial(resolution)) {
+              newScale = scale / resolution;
+              smartResSucceeded = true;
+            }
+          }
+
+          if(syncScale && groundMap && !smartResSucceeded) {
+            newScale = scale / groundMap->Resolution();
+          }
+
+          if(p_line != DBL_MAX && p_samp != DBL_MAX) {
+            viewport->setScale(newScale, p_samp, p_line);
+          }
+          else if(p_lat != DBL_MAX && p_lon != DBL_MAX && groundMap) {
             viewport->setScale(newScale, samp, line);
           }
         }
