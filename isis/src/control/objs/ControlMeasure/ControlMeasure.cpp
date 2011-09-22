@@ -1032,6 +1032,8 @@ namespace Isis {
    * @internal
    *   @history 2011-09-01 Tracie Sucharski - Do not set parentPoint to NULL or
    *                           copy, retain the current parentPoint.
+   *   @history 2011-09-22 Tracie Sucharski - Bug introduced from 2011-09-01
+   *                           change when setting ignored status.
    */
   const ControlMeasure &ControlMeasure::operator=(const ControlMeasure &other) {
     if (this == &other)
@@ -1068,7 +1070,7 @@ namespace Isis {
     //  Call SetIgnored to update the ControlGraphNode.  However, SetIgnored
     //  will return if EditLock is true, so set to false temporarily.
     p_editLock = false;
-    p_ignore = SetIgnored(other.p_ignore);
+    SetIgnored(other.p_ignore);
     p_editLock = other.p_editLock;
     p_sample = other.p_sample;
     p_line = other.p_line;
