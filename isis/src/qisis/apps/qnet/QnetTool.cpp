@@ -579,9 +579,11 @@ namespace Isis {
    *   @history 2011-07-25 Tracie Sucharski - Removed editPointChanged signal
    *                          since the editPoint is not changed.  This helped
    *                          with qnet windows blinking due to refresh.
+   *   @history 2011-09-22 Tracie Sucharski - When checking ignore status
+   *                          on right measure, check both original and edit
+   *                          measure.
    */
   void QnetTool::measureSaved() {
-    cout<<"QnetTool::measureSaved()"<<endl;
     // Read original measures from the network for comparison with measures
     // that have been edited
     ControlMeasure *origLeftMeasure =
@@ -634,7 +636,7 @@ namespace Isis {
 
       }
     }
-    if (origRightMeasure->IsIgnored()) {
+    if (origRightMeasure->IsIgnored() && p_rightMeasure->IsIgnored()) {
       QString message = "You are saving changes to an ignored measure.  ";
       message += "Do you want to set Ignore = False on the right measure?";
       switch(QMessageBox::question(p_qnetTool, "Qnet Tool Save Measure",

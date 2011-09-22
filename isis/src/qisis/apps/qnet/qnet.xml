@@ -335,8 +335,8 @@
       so they are always visible on top of the other points. Added some 
       documentation.
     </change>
-    <change name="Tracie Sucharski" date="2011-">
-      
+    <change name="Tracie Sucharski" date="2011-09-16">
+      Updated for binary control networks and selecting ground control points.
     </change>
   </history>
 </application>
