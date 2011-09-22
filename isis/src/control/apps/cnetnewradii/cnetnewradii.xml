@@ -7,24 +7,28 @@
 
   <description>
     <p>
-      This application will go through an existing ControlNet and copy it to a new 
-      one. When it encounters a point type of Fixed or Constrained it will use the 
-      control point latitude and longitude to get the radius from the DEM.  The 
-      radius will be calculated based on a bilinear interpolation of the closest
-      pixels in the DEM.  The AprioriRadius source and AprioriRadiusSourceFile
-      will be updated for control points which successfully update the radius.
+      This application will go through an existing control network and copy it
+      to a new control network updating either apriori or adjusted radii values
+      using the given shape file. When it encounters a point type of Fixed or 
+      Constrained it will use the control point latitude and longitude to update 
+      the radius from the shape model file. The radius will be calculated based 
+      on a bilinear interpolation of the closest pixels in the shape file.  The 
+      AprioriRadius, AprioriRadiusSource and AprioriRadiusSourceFile will be 
+      updated if GETLATLON=APRIORI.  The AdjustedRadius will be updated if 
+      GETLATLON=ADJUSTED.  There are not keywords for AdjustedRadiusSource or
+      AdjustedRadiusSourceFile.  
     </p>
     <p>
-      If, for a particular point, the application fails to calculated a radius using
-      the DEM, then the input Radius value is kept and the 
-      point is set to Ignore=true.  The number of these failures 
-      are recorded in the application's log.  The Point IDs for the 
-      corresponding control points will be listed in the ERRORS log output file.  
-      If the user did not enter a filename for this log and there are any 
-      points that failed, one will be created with the name "failures.log".  
-      <strong>Note: </strong> If a significant number of fixed points in the 
-      ControlNet fail to find a new Radius value, the user should make sure 
-      that they have input the correct DEM for the network.  
+      If, for a particular point, the application fails to calculate a radius
+      using the shape file, then the input radius value is kept and the point is
+      set to Ignore=true.  The number of these failures are recorded in the
+      application's log.  The Point IDs for the corresponding control points
+      will be listed in the ERRORS log output file.  If the user did not enter
+      a filename for this log and there are any points that failed, one will be
+      created with the name "failures.log".
+      <strong>Note:</strong>If a significant number of points in the control 
+      network fail to find a new radius value, the user should make sure that 
+      they have input the correct shape model for the input control network.
     </p>
   </description>
 
@@ -37,13 +41,13 @@
       Original Version
     </change>
     <change name="Jeannie Walldren" date="2010-05-25">
-      Modified to handle control points that fail to calculate a new radius as 
-      explained in the description. Added ERRORS parameter to list PointIDs of 
-      the control points that failed to calculate a new radius. Added filters 
-      for input and output parameters. 
+      Modified to handle control points that fail to calculate a new radius as
+      explained in the description. Added ERRORS parameter to list PointIDs of
+      the control points that failed to calculate a new radius. Added filters
+      for input and output parameters.
     </change>
     <change name="Jeannie Walldren" date="2010-05-27">
-      Created examples. 
+      Created examples.
     </change>
     <change name="Christopher Austin" date="2011-01-19">
       Altered to compile with the new Control redesign.
@@ -63,13 +67,13 @@
     </change>
     <change name="Tracie Sucharski" date="2011-07-28">
       Change radii values for both Fixed and Constrained points.   Use bilinear
-      interpolation to get the correct radius from the DEM.  This uses the same
-      interpolation as the camera.  Print error  if there are no Fixed or Constrained
-      points in the network.  Change input parameter names to be consistent with
-      those suggested on the Astrogeology wiki page.  Removed NETWORKID
+      interpolation to get the correct radius from the shape file.  This uses 
+      the same interpolation as the camera.  Print error  if there are no Fixed
+      or Constrained points in the network.  Change input parameter names to be
+      consistent with those suggested on the Astrogeology wiki page.  Removed NETWORKID
       as user parameter since it should carry the ID from the input control net.
       Set Apriori as the default for the GETLATLON parameter.  Update examples
-      documentation  .
+      documentation.
     </change>
   </history>
 
@@ -82,8 +86,7 @@
           Input ControlNet
         </brief>
         <description>
-          Use this parameter to select the input ControlNet to generate the 
-          output from.
+          Use this parameter to select the input control network.
         </description>
         <filter>
           *.net
@@ -91,28 +94,29 @@
       </parameter>
 
       <parameter name="MODEL">
-        <type>filename</type>
+        <type>cube</type>
         <fileMode>input</fileMode>
         <brief>
-          Input DEM cube
+          User defined ISIS cube shape model.
         </brief>
         <description>
-          Use this parameter to select the DEM to use with the original 
-          ControlNet.
+          A map projected ISIS cube which contains the radii of the target.
+          The file can cover a larger area than the control points in the 
+          network, but must minimally include all of the control point
+          locations.
         </description>
-        <filter>
-          *.cub
-        </filter>
+        <defaultPath>$base/dems/</defaultPath>
+        <filter>*.cub</filter>
       </parameter>
 
       <parameter name="ONET">
         <type>filename</type>
         <fileMode>output</fileMode>
         <brief>
-          Output ControlNet file 
+          Output ControlNet file
         </brief>
         <description>
-          Use this parameter to specify the name of the output ControlNet.
+          Use this parameter to specify the name of the output control network.
         </description>
         <filter>
           *.net
@@ -127,13 +131,13 @@
           Optional log file containing failures.
         </brief>
         <description>
-          This file will contain the Point IDs of all control points whose 
-          radius could not be calculated from the DEM.  This happens when the 
-          radius value is a special pixel or when the program fails to set 
-          universal ground given the lat/lon values of the control point.
+          This file will contain the Point IDs of all control points whose
+          radius could not be calculated from the shape model.  This happens 
+          when the radius value is a special pixel or when the program fails to 
+          set universal ground given the lat/lon values of the control point.
         </description>
         <filter>
-          *.log *.pvl *.txt 
+          *.log *.pvl *.txt
         </filter>
       </parameter>
     </group>
@@ -141,11 +145,13 @@
     <group name="Parameters">
       <parameter name="GETLATLON">
         <type>string</type>
-        <default><item>APRIORI</item></default>
-        <brief>The lat/lon used to set the new radii</brief>
-        <description>
-        Specify the Surface Point to use when setting the new radii.
-        </description>
+        <default>
+          <item>APRIORI</item>
+        </default>
+        <brief>Source of the latitude, longitude used to set new radii</brief> 
+        <description> 
+          Specify which Surface Point to use when setting the new radii.
+        </description> 
         <list>
           <option value="APRIORI">
             <brief>Use the Apriori Surface Point</brief>
@@ -162,28 +168,30 @@
                Surface Point is generated by bundle adjust.
             </description>
           </option>
-         </list>
+        </list>
       </parameter>
     </group>
   </groups>
 
   <examples>
     <example>
-      <brief>All fixed points successfully updated </brief>
+      <brief>All fixed points successfully updated</brief>
       <description>
-        Example of the use of cnetnewradii on a ControlNet whose fixed point 
-        lat/lon values are all contained within the given DEM.
+        Example of the use of cnetnewradii on a control network whose
+        constrained and fixed points lat/lon values are all contained within the 
+        given shape model.
       </description>
       <terminalInterface>
         <commandLine>
-          cnet=../IN/inputcnet.net model=../IN/inputDEM1.cub 
+          cnet=../IN/inputcnet.net model=../IN/inputDEM1.cub
           onet=../OUT/ouputcnet1.net getlatlon=APRIORI
         </commandLine>
         <description>
-          In this example, cnetnewradii will take the input control network and 
-          copy it to the output network with new Radius values calculated for 
-          all fixed points using an interpolated  DN value from the DEM cube. 
-          The apriori values will be updated.  No error log will be generated.
+          In this example, cnetnewradii will take the input control network and
+          copy it to the output network with new radii values calculated for
+          all constrained and fixed points using an interpolated  DN value from 
+          the shape cube. The apriori values will be updated.  No error log will 
+          be generated.
         </description>
       </terminalInterface>
       <guiInterfaces>
@@ -193,60 +201,61 @@
               Example GUI
             </brief>
             <description>
-              Screen shot of GUI with parameters filled in to create ControlNet 
-              with new Radius values. 
+              Screen shot of GUI with parameters filled in to create control 
+              network with new radii values.
             </description>
             <thumbnail caption="" src="assets/thumbs/cnetnewradiiGui1Thumb.jpg" width="200" height="153"/>
           </image>
         </guiInterface>
       </guiInterfaces>
       <dataFiles>
-        <dataFile path="assets/inputcnet.net.pvl">
-          <brief>Input ControlNet for cnetnewradii </brief>
+        <dataFile path="assets/inputcnet.pvl">
+          <brief>Input ControlNet for cnetnewradii</brief>
           <description>
-            Example of an input ControlNet whose Radius values will be updated
+            Example of an input control network whose radii values will be 
+            updated.
           </description>
           <parameterName>CNET</parameterName>
         </dataFile>
-        <dataFile path="assets/outputcnet1.net.pvl">
-          <brief>Output ControlNet for cnetnewradii </brief>
+        <dataFile path="assets/outputcnet1.pvl">
+          <brief>Output control network for cnetnewradii</brief>
           <description>
-            Example of an output ControlNet corresponding to the input example 
-            with updated Radius values.  Notice that Radius values have been 
-            updated for all fixed points.
+            Example of an output control network corresponding to the input 
+            example with updated radii values.  Notice that radii values have 
+            been updated for all contrained and fixed points.
           </description>
-          <parameterName>TO</parameterName>
+          <parameterName>ONET</parameterName>
         </dataFile>
       </dataFiles>
       <inputImages>
         <image src="assets/images/inputDEM1.jpg" width="716" height="550">
-          <brief>Input DEM for cnetnewradii</brief>
+          <brief>Input shape file for cnetnewradii</brief>
           <description>
-            Example of an input DEM cube used by cnetnewradii to update the 
-            Radius values of fixed points in the ControlNet.
+            Example of an input shape cube used by cnetnewradii to update the
+            radii values of contrained and fixed points in the control network.
           </description>
-          <thumbnail caption="DEM " src="assets/thumbs/inputDEM1Thumb.jpg" width="200" height="154"/>
-          <parameterName>DEM</parameterName>
+          <thumbnail caption="SHAPE " src="assets/thumbs/inputDEM1Thumb.jpg" width="200" height="154"/>
+          <parameterName>SHAPE</parameterName>
         </image>
       </inputImages>
     </example>
     <example>
-      <brief>Some fixed points fail to be updated </brief>
+      <brief>Some fixed points fail to be updated</brief>
       <description>
-        Example of the use of cnetnewradii on a ControlNet that contains some 
-        fixed points whose Radius can not be calculated.
+        Example of the use of cnetnewradii on a control network` that contains 
+        some fixed points whose radius can not be calculated.
       </description>
       <terminalInterface>
         <commandLine>
-          cnet=../IN/inputcnet.pvl model=../IN/inputDEM2.cub 
+          cnet=../IN/inputcnet.pvl model=../IN/inputDEM2.cub
           onet=../OUT/ouputcnet2.pvl errors=../OUT/failures.pvl
         </commandLine>
         <description>
-          In this example, cnetnewradii will take the input control network and 
-          copy it to the output network with new Radius values calculated for 
-          fixed points using the DN value recieved from the DEM cube. The 
-          PointIDs of fixed points that fail to calculate a new Radius value 
-          will be listed in the error log. 
+          In this example, cnetnewradii will take the input control network and
+          copy it to the output network with new radii values calculated for
+          fixed points using the DN value recieved from the shape cube. The
+          PointIDs of fixed points that fail to calculate a new radius value
+          will be listed in the error log.
         </description>
       </terminalInterface>
       <guiInterfaces>
@@ -256,49 +265,49 @@
               Example GUI
             </brief>
             <description>
-              Screen shot of GUI with parameters filled in to create ControlNet 
-              with new Radius values. 
+              Screen shot of GUI with parameters filled in to create control 
+              network with new radii values.
             </description>
             <thumbnail caption="" src="assets/thumbs/cnetnewradiiGui2Thumb.jpg" width="200" height="153"/>
           </image>
         </guiInterface>
       </guiInterfaces>
       <dataFiles>
-        <dataFile path="assets/inputcnet.net.pvl">
-          <brief>Input ControlNet for cnetnewradii </brief>
+        <dataFile path="assets/inputcnet.pvl">
+          <brief>Input control network for cnetnewradii</brief>
           <description>
-            Example of an input ControlNet whose Radius values will be updated
+            Example of an input control network whose radii values will be
+            updated.
           </description>
           <parameterName>CNET</parameterName>
         </dataFile>
         <dataFile path="assets/failures.pvl">
-          <brief>Output error log for cnetnewradii </brief>
+          <brief>Output error log for cnetnewradii</brief>
           <description>
-            Example of an output error log containing the PointIDs of all points 
-            that failed to calculate a new Radius value. 
+            Example of an output error log containing the PointIDs of all points
+            that failed to calculate a new radius value.
           </description>
           <parameterName>ERRORS</parameterName>
         </dataFile>
-        <dataFile path="assets/outputcnet2.net.pvl">
-          <brief>Output ControlNet for cnetnewradii </brief>
+        <dataFile path="assets/outputcnet2.pvl">
+          <brief>Output control network for cnetnewradii</brief>
           <description>
-            Example of an output ControlNet corresponding to the input example 
-            with updated Radius values.  Notice that the fixed points 
-            that failed are set to Ignore=True and their original radius values 
+            Example of an output control network corresponding to the input 
+            example with updated radii values.  Notice that the fixed points
+            that failed are set to Ignore=True and their original radii values
             are retained.
           </description>
-          <parameterName>TO</parameterName>
+          <parameterName>ONET</parameterName>
         </dataFile>
-        </dataFiles>
+      </dataFiles>
       <inputImages>
         <image src="assets/images/inputDEM2.jpg" width="716" height="550">
-          <brief>Input DEM for cnetnewradii</brief>
+          <brief>Input shape cube for cnetnewradii</brief>
           <description>
-            Example of an input DEM cube used by cnetnewradii to update the 
-            Radius values of fixed points in the ControlNet.
+            Example of an input shape cube used by cnetnewradii to update the
+            radii values of fixed points in the control network.
           </description>
-          <thumbnail caption="DEM " src="assets/thumbs/inputDEM2Thumb.jpg" width="200" height="154"/>
-          <parameterName>DEM</parameterName>
+          <thumbnail caption="SHAPE" src="assets/thumbs/inputDEM2Thumb.jpg" width="200" height="154"/> <parameterName>DEM</parameterName>
         </image>
       </inputImages>
     </example>
