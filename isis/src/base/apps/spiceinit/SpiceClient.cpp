@@ -80,7 +80,7 @@ namespace Isis {
     raw += "  </label>\n";
     raw += "</input_label>";
 
-    *p_xml = "name=" + iString(QByteArray(raw.c_str()).toHex().constData());
+    *p_xml = iString(QByteArray(raw.c_str()).toHex().constData());
 
     int contentLength = p_xml->length();
     iString contentLengthStr = iString((BigInt)contentLength);
@@ -104,35 +104,23 @@ namespace Isis {
    *
    */
   SpiceClient::~SpiceClient() {
-    if(p_xml) {
-      delete p_xml;
-      p_xml = NULL;
-    }
+    delete p_xml;
+    p_xml = NULL;
 
-    if(p_error) {
-      delete p_error;
-      p_error = NULL;
-    }
+    delete p_error;
+    p_error = NULL;
 
-    if(p_networkMgr) {
-      delete p_networkMgr;
-      p_networkMgr = NULL;
-    }
+    delete p_networkMgr;
+    p_networkMgr = NULL;
 
-    if(p_request) {
-      delete p_request;
-      p_request = NULL;
-    }
+    delete p_request;
+    p_request = NULL;
 
-    if(p_response) {
-      delete p_response;
-      p_response = NULL;
-    }
+    delete p_response;
+    p_response = NULL;
 
-    if(p_rawResponse) {
-      delete p_rawResponse;
-      p_rawResponse = NULL;
-    }
+    delete p_rawResponse;
+    p_rawResponse = NULL;
   }
 
 
@@ -151,7 +139,12 @@ namespace Isis {
     connect(p_networkMgr, SIGNAL(sslErrors(QNetworkReply *, const QList<QSslError> &)),
             this, SLOT(sslErrors(QNetworkReply *, const QList<QSslError> &)));
 
-    p_networkMgr->post(*p_request, p_xml->c_str());
+    QByteArray data;
+    QUrl params;
+    params.addQueryItem("name", p_xml->c_str());
+    data.append(params.encodedQuery());
+
+    p_networkMgr->post(*p_request, data);
     exec();
   }
 
@@ -198,13 +191,114 @@ namespace Isis {
       catch(iException &e) {
         e.Clear();
 
-        // Well, we really don't know what this is.
-        *p_error = "The server sent an unrecognized response";
+        if (reply->error() != QNetworkReply::NoError) {
+          *p_error = "An error occurred when talking to the server";
 
-        if (*p_rawResponse != "") {
-          *p_error += " [";
-          *p_error += *p_rawResponse;
-          *p_error += "]";
+          switch (reply->error()) {
+            case QNetworkReply::NoError:
+              break;
+
+            case QNetworkReply::ConnectionRefusedError:
+              *p_error += ". The server refused the connection";
+              break;
+
+            case QNetworkReply::RemoteHostClosedError:
+              *p_error += ". The server closed the connection";
+              break;
+
+            case QNetworkReply::HostNotFoundError:
+              *p_error += ". The server was not found";
+              break;
+
+            case QNetworkReply::TimeoutError:
+              *p_error += ". The connection timed out";
+              break;
+
+            case QNetworkReply::OperationCanceledError:
+              *p_error += ". We aborted the network operation";
+              break;
+
+            case QNetworkReply::SslHandshakeFailedError:
+              *p_error += ". Could not establish an encrypted connection";
+              break;
+
+            case QNetworkReply::ProxyConnectionRefusedError:
+              *p_error += ". The proxy server refused the connection";
+              break;
+
+            case QNetworkReply::ProxyConnectionClosedError:
+              *p_error += ". The proxy server closed the connection";
+              break;
+
+            case QNetworkReply::ProxyNotFoundError:
+              *p_error += ". The proxy server could not be found";
+              break;
+
+            case QNetworkReply::ProxyTimeoutError:
+              *p_error += ". The connection to the proxy server timed out";
+              break;
+
+            case QNetworkReply::ProxyAuthenticationRequiredError:
+              *p_error += ". The proxy server requires authentication";
+              break;
+
+            case QNetworkReply::ContentAccessDenied:
+              *p_error += ". Access to the remove content was denied (401)";
+              break;
+
+            case QNetworkReply::ContentOperationNotPermittedError:
+              *p_error += ". The operation requested on the server is not "
+                          "permitted";
+              break;
+
+            case QNetworkReply::ContentNotFoundError:
+              *p_error += ". The spice server script was not found (404)";
+              break;
+
+            case QNetworkReply::AuthenticationRequiredError:
+              *p_error += ". The server requires authentication";
+              break;
+
+            case QNetworkReply::ContentReSendError:
+              *p_error += ". The server requests for you to try again";
+              break;
+
+            case QNetworkReply::ProtocolUnknownError:
+              *p_error += ". The attempted network protocol is unknown";
+              break;
+
+            case QNetworkReply::ProtocolInvalidOperationError:
+              *p_error += ". The network protocol did not support this "
+                          "operation";
+              break;
+
+            case QNetworkReply::UnknownNetworkError:
+              *p_error += ". An unknown network-related error occurred";
+              break;
+
+            case QNetworkReply::UnknownProxyError:
+              *p_error += ". An unknown proxy-related error occurred";
+              break;
+
+            case QNetworkReply::UnknownContentError:
+              *p_error += ". An unknown content-related error occurred";
+              break;
+
+            case QNetworkReply::ProtocolFailure:
+              *p_error += ". A breakdown in the protocol was detected";
+              break;
+          }
+
+        }
+        else {
+          // Well, we really don't know what this is.
+          *p_error = "The server sent an unrecognized response";
+
+          if (*p_rawResponse != "") {
+            *p_error += " [";
+            *p_error += *p_rawResponse;
+            *p_error += "]";
+          }
         }
       }
     }
