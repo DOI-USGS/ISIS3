@@ -200,8 +200,6 @@ int main(int argc, char *argv[]) {
   }
 
   SocketThread *temp = NULL;
-//  Doesn't yet work on Mac OS X 10.4 (Tiger) systems for some reason.
-#if !defined(__APPLE__)
   // We don't want to start a thread if the user is forcing a new window
   if(newWindow < 0) {
     temp = new SocketThread();
@@ -210,7 +208,6 @@ int main(int argc, char *argv[]) {
     temp->connect(temp, SIGNAL(focusApp()), vw, SLOT(raise()));
     temp->start();
   }
-#endif
 
   //Connect the edittool to the file tool in order to save and discard changes
   QObject::connect(edittool, SIGNAL(cubeChanged(bool)), ftool, SLOT(enableSave(bool)));
@@ -234,9 +231,7 @@ int main(int argc, char *argv[]) {
     temp->wait(); // wait for the stop to finish
     delete temp;
 
-    if(newWindow < 0) {
-      remove(p_socketFile.c_str());
-    }
+    remove(p_socketFile.c_str());
   }
 
   delete htool;
