@@ -1130,14 +1130,13 @@ namespace Isis {
                 if(iString(cFieldKey[0]).ToInteger() < iFieldLength) {
                   TableRecord cFileRecordUpdate;
                   TableField cFileFieldUpdate("FileName", TableField::Text, iFieldLength);
-                  cFileFieldUpdate = cFileTable_Copy[i][0];
+                  cFileFieldUpdate = (std::string)cFileTable_Copy[i][0];
                   cFileRecordUpdate += cFileFieldUpdate;
 
                   // Populate with Serial Number
                   TableField cSNFieldUpdate("SerialNumber", TableField::Text, iFieldLength);
-                  cSNFieldUpdate = cFileTable_Copy[i][1];
+                  cSNFieldUpdate = (std::string)cFileTable_Copy[i][1];
                   cFileRecordUpdate += cSNFieldUpdate;
-
                   cFileTable = Table(sTableName, cFileRecordUpdate);  // add new record and set the size for all the other records
                 }
                 else {

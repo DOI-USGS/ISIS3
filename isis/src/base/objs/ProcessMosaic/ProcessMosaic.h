@@ -165,6 +165,10 @@ namespace Isis {
    *           the number of mosaic bands to get Count info
    *  @history 2011-01-24 Sharmila Prasad - API to match DEM and also to add new group "mosaic"
    *           to hold ShapeModel attributes for the mosaic if Flag is Enabled
+   *  @history 2011-09-23 Steven Lambright - Fixed table resizing code to not
+   *                          do nothing and eventually cause very, very bad
+   *                          things to happen (writing out of array bounds).
+   *                          Fixes #410.
    *  
    *  @todo 2005-02-11 Stuart Sides - add coded example and implementation example
    *                                  to class documentation
