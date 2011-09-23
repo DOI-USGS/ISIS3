@@ -50,7 +50,12 @@ void LoadPvl() {
       if (phtObj.HasGroup("Algorithm")) {
         PvlObject::PvlGroupIterator phtGrp = phtObj.BeginGroup();
         bool wasFound = false;
-        if (ui.WasEntered("PHTNAME")) {
+        phtVal = (string)phtGrp->FindKeyword("PHTNAME");
+        phtVal = phtVal.UpCase();
+        if (phtName == phtVal) {
+          wasFound = true;
+        }
+        if (ui.WasEntered("PHTNAME") && !wasFound) {
           phtName = ui.GetAsString("PHTNAME");
           phtName = phtName.UpCase();
           while (phtGrp != phtObj.EndGroup()) {
@@ -173,7 +178,12 @@ void LoadPvl() {
     if (atmObj.HasGroup("Algorithm")) {
       PvlObject::PvlGroupIterator atmGrp = atmObj.BeginGroup();
       bool wasFound = false;
-      if (ui.WasEntered("ATMNAME")) {
+      atmVal = (string)atmGrp->FindKeyword("PHTNAME");
+      atmVal = atmVal.UpCase();
+      if (atmName == atmVal) {
+        wasFound = true;
+      }
+      if (ui.WasEntered("ATMNAME") && !wasFound) {
         while (atmGrp != atmObj.EndGroup()) {
           if (atmGrp->HasKeyword("ATMNAME")) {
             atmVal = (string)atmGrp->FindKeyword("ATMNAME");
