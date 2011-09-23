@@ -53,6 +53,25 @@ EndGroup
 # Customize how session logging is handled
 #
 # TerminalOutput = On | Off
+#    On - in command-line mode - user input parameters,
+#                           results, and accounting are
+#                           reported to the terminal.
+#                           Errors are reported in Pvl
+#                           also to the terminal.
+#       -  in interactive mode - same as command-line
+#                           mode, but output is directed
+#                           to the gui.  In the case of
+#                           an error, nothing is reported
+#                           to the gui except a pop-up
+#                           window displaying the error.
+#    Off - in command-line mode - only the results are
+#                           reported to the terminal, or
+#                           in the case of an error, 
+#                           the error is reported in Pvl
+#                           to the terminal.
+#        - in interactive mode - same as command-line mode,
+#                           but the error is reported in
+#                           a pop-up window in the gui.
 # FileOutput = On | Off
 # FileName = print.prt | /mydirectory/myfile.prt
 # FileAccess = Append | Overwrite
