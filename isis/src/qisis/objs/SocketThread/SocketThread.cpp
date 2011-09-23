@@ -2,6 +2,7 @@
 #include "iException.h"
 #include "Application.h"
 
+#include <errno.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <sys/socket.h>
@@ -44,16 +45,9 @@ namespace Isis {
       return;
     }
 
-    //const long unsigned int timeout = 1;
-    timeval tv;
-    tv.tv_sec = 0;
-    tv.tv_usec = 100000;
-    if(setsockopt(p_socket, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(struct timeval)) != 0) {
-      std::string msg = "Unable set socket timeout";
-      std::cerr << msg << std::endl;
-      remove(p_socketFile.c_str());
-      return;
-    }
+    // Setting a timeout didn't work for Mac, so we're using a non-blocking mode
+    //   instead.
+    fcntl(p_socket, F_SETFL, O_NONBLOCK);
 
     // Bind the file to the socket
     int status =  bind(p_socket, (struct sockaddr *)&p_socketName, sizeof(p_socketName));
@@ -78,7 +72,9 @@ namespace Isis {
       // Accept Socket
       socklen_t len;
       int childSocket = accept(p_socket, (struct sockaddr *)&p_socketName, &len);
-      if(childSocket < 0) {
+      if (childSocket < 0)
+        if (errno == EWOULDBLOCK) {
+          msleep(100);
         continue; // probably timed out, we cant do anything about this anyways
       }
 
