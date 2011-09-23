@@ -43,17 +43,17 @@ documentation:
 # build tables of contents to doc directory
 
 tocalph: $(TOCDIR)/alpha.html
-$(TOCDIR)/alpha.html: build/toc.xml build/TOCindex_alpha.xsl
+$(TOCDIR)/alpha.html: documentation
 	echo "      Creating Alphabetical Applications List"
 	$(XALAN) $(XALAN_PARAM_OPTION) menuPath "'../'" $(XALAN_OUTFILE_OPTION) $(TOCDIR)/alpha.html $(XALAN_INFILE_OPTION) build/toc.xml $(XALAN_XSL_OPTION) build/TOCindex_alpha.xsl
 
 toccat: $(TOCDIR)/index.html
-$(TOCDIR)/index.html: build/toc.xml build/TOCindex_category.xsl
+$(TOCDIR)/index.html: documentation
 	echo "      Creating Categorical Applications List"
 	$(XALAN) $(XALAN_PARAM_OPTION) menuPath "'../'" $(XALAN_OUTFILE_OPTION) $(TOCDIR)/index.html $(XALAN_INFILE_OPTION) build/toc.xml $(XALAN_XSL_OPTION) build/TOCindex_category.xsl
 
 tocoldvnew: $(TOCDIR)/oldvnew.html
-$(TOCDIR)/oldvnew.html: build/toc.xml build/TOCindex_oldvnew.xsl
+$(TOCDIR)/oldvnew.html: documentation
 	echo "      Creating Old vs. New Applications List"
 	$(XALAN) $(XALAN_PARAM_OPTION) menuPath "'../'" $(XALAN_OUTFILE_OPTION) $(TOCDIR)/oldvnew.html $(XALAN_INFILE_OPTION) build/toc.xml $(XALAN_XSL_OPTION) build/TOCindex_oldvnew.xsl
 
