@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation=
+  "http://isis.astrogeology.usgs.gov/Schemas/Documentation/documentation.xsd">
+
+  <files>
+    <file>
+      <body>
+
+        <h3>Table of Contents</h3>
+        <ul>
+          <li><a href="#DigitalNumber">Digital Number</a></li>
+          <li><a href="#Elevation">Elevation</a></li>
+          <li><a href="#Emissivity">Emissivity</a></li>
+          <li><a href="#Radiance">Radiance</a></li>
+          <li><a href="#Reflectence">Reflectence</a></li>
+        </ul>
+
+        <hr />
+
+        <h2><a name="DigitalNumber">Digital Number</a></h2>
+        <p>
+          Digital Numbers are a subset of Integers, more specifically positive
+          integers.
+        </p>
+
+        <h2><a name="Elevation">Elevation</a></h2>
+        <p>
+          The height above or below a fixed point on the surface of a body.
+        </p>
+
+        <h2><a name="Emissivity">Emissivity</a></h2>
+        <p>
+          A measure describing a substances ability to absorb and radiate
+          electromagnetic energy.
+        </p>
+
+        <h2><a name="Radiance">Radiance</a></h2>
+        <p>
+          A measurement describing the amount of electromagnetic energy emitted
+          from an area of a planet.
+        </p>
+
+        <h2><a name="Reflectence">Reflectence</a></h2>
+        <p>
+          The ratio of reflected energy to incoming energy.
+        </p>
+      </body>
+
+      <type>HTML</type>
+      <source>
+        <filename>Glossary.html</filename>
+      </source>
+    </file>
+  </files>
+
+  <category>
+    <categoryItem>reference</categoryItem>
+  </category>
+
+  <audience>
+    <target>intermediate</target>
+  </audience>
+
+  <bibliography>
+    <title>Gloassary</title>
+    <brief>
+      A collection of definitions for common ideas used in ISIS and image
+      processing in general.
+    </brief>
+    <description>
+      This article acts as a collection of common definitions used frequenlty in
+      ISIS and general image processing.
+    </description>
+    <author>Travis Addair</author>
+    <date>2011-09-23</date>
+  </bibliography>
+
+  <history>
+    <change name="Travis Addair" date="2011-02-23">
+      Original version
+    </change>
+  </history>
+</documentation>
