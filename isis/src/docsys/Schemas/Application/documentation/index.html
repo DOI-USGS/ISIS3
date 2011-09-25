@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <html>
 	<head>
+     	<!-- History  2011-09-25 Sharmila Prasad Added element type combo -->
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 		<style type="text/css"> .textElement { font-family: Arial; font-size: 10pt; color: #800000; }</style>
 		<style type="text/css"> .textAttr { font-family: Arial; font-size: 10pt; color: #FF0000; }</style>
@@ -59,6 +60,11 @@
 				<td align="left" bgcolor="#FFFFFF"><a href="#element_category_Link027E9068"><span class="schemaName">category</span></a><span class="schemaName">&nbsp;</span></td>
 				<td align="left" bgcolor="#FFFFFF" />
 				<td align="left" bgcolor="#FFFFFF"><a href="#simpleType_inclusion_type_Link02826330"><span class="schemaName">inclusion_type</span></a><span class="schemaName">&nbsp;</span></td>
+			</tr>
+		    	<tr valign="top">
+				<td align="left" bgcolor="#FFFFFF"><a href="#element_combo_Link0282E999"><span class="schemaName">combo</span></a><span class="schemaName">&nbsp;</span></td>
+				<td align="left" bgcolor="#FFFFFF" />
+				<td align="left" bgcolor="#FFFFFF" />
 			</tr>
 			<tr valign="top">
 				<td align="left" bgcolor="#FFFFFF"><a href="#element_count_Link02819558"><span class="schemaName">count</span></a><span class="schemaName">&nbsp;</span></td>
@@ -1757,6 +1763,34 @@
 			</tr>
 		</table>
 		<br />
+		<a name="element_combo_Link0282E999" />
+		<span class="elementHeader">element </span>
+		<span class="elementHeader2">combo</span>
+
+		<table width="100%" cellspacing="0" cellpadding="5" border="1">
+			<tr valign="top">
+				<td width="10%" align="right" bgcolor="#F0F0F0"><span class="schemaSubTitle">diagram</span></td>
+				<td width="90%" align="left" bgcolor="#FFFFFF"><map name="Map0281B599"><area coords="162,0,285,87" href="#element_list_Link0281B548" /></map><img ALT="object" src="index_p66.png" width="305" height="97" border="0" usemap="#Map0281B599" /></td>
+			</tr>
+			<tr valign="top">
+				<td width="10%" align="right" bgcolor="#F0F0F0"><span class="schemaSubTitle">used by</span></td>
+				<td width="90%" align="left" bgcolor="#F0F0F0"><table cellspacing="0" cellpadding="0"><tr valign="top"><td align="right" bgcolor="#F0F0F0"><span class="schemaSubTitle">element&nbsp;</span></td><td align="left" bgcolor="#F0F0F0"><a href="#element_type_Link02820350"><span class="schemaName">type</span></a></td></tr></table></td>
+			</tr>
+			<tr valign="top">
+				<td width="10%" align="right" bgcolor="#F0F0F0"><span class="schemaSubTitle">annotation</span></td>
+				<td width="90%" align="left" bgcolor="#F0F0F0"><table cellspacing="0" cellpadding="0"><tr valign="top"><td align="left" bgcolor="#F0F0F0"><span class="schemaSubTitle">documentation</span></td></tr><tr valign="top"><td align="left" bgcolor="#F0F0F0"><span class="schemaSubData">List of options displayed as combo/choice box</span></td></tr></table></td>
+			</tr>
+			<tr valign="top">
+				<td width="10%" align="right" bgcolor="#F0F0F0"><span class="schemaSubTitle">source</span></td>
+				<td width="90%" align="left" bgcolor="#F0F0F0"><span class="textOperator">&lt;</span><span class="textElement">xs:element</span><span class="textAttr"> name</span><span class="textOperator">=</span><span class="textContents">&quot;combo</span><span class="textOperator">&quot;&gt;</span><span class="textContents"><BR>
+&nbsp; </span><span class="textOperator">&lt;</span><span class="textElement">xs:annotation</span><span class="textOperator">&gt;</span><span class="textContents"><BR>
+&nbsp;&nbsp;&nbsp; </span><span class="textOperator">&lt;</span><span class="textElement">xs:documentation</span><span class="textOperator">&gt;</span><span class="textContents">List of options displayed as combo/choice box</span><span class="textOperator">&lt;/</span><span class="textElement">xs:documentation</span><span class="textOperator">&gt;</span><span class="textContents"><BR>
+&nbsp; </span><span class="textOperator">&lt;/</span><span class="textElement">xs:annotation</span><span class="textOperator">&gt;</span><span class="textContents"><BR>
+</span><span class="textOperator">&lt;/</span><span class="textElement">xs:element</span><span class="textOperator">&gt;</span></td>
+			</tr>
+		</table>
+		<br />
+
 		<a name="element_list_Link0281B548" />
 		<span class="elementHeader">element </span>
 		<span class="elementHeader2">list</span>
@@ -2898,7 +2932,7 @@
 			</tr>
 			<tr valign="top">
 				<td width="10%" align="right" bgcolor="#F0F0F0"><span class="schemaSubTitle">facets</span></td>
-				<td width="90%" align="left" bgcolor="#F0F0F0"><table cellspacing="0" cellpadding="0"><tr valign="top"><td align="right" bgcolor="#F0F0F0"><span class="schemaSubTitle">enumeration&nbsp;</span></td><td align="left" bgcolor="#F0F0F0"><span class="schemaSubData">filename</span></td></tr><tr valign="top"><td align="right" bgcolor="#F0F0F0"><span class="schemaSubTitle">enumeration&nbsp;</span></td><td align="left" bgcolor="#F0F0F0"><span class="schemaSubData">integer</span></td></tr><tr valign="top"><td align="right" bgcolor="#F0F0F0"><span class="schemaSubTitle">enumeration&nbsp;</span></td><td align="left" bgcolor="#F0F0F0"><span class="schemaSubData">double</span></td></tr><tr valign="top"><td align="right" bgcolor="#F0F0F0"><span class="schemaSubTitle">enumeration&nbsp;</span></td><td align="left" bgcolor="#F0F0F0"><span class="schemaSubData">string</span></td></tr><tr valign="top"><td align="right" bgcolor="#F0F0F0"><span class="schemaSubTitle">enumeration&nbsp;</span></td><td align="left" bgcolor="#F0F0F0"><span class="schemaSubData">boolean</span></td></tr><tr valign="top"><td align="right" bgcolor="#F0F0F0"><span class="schemaSubTitle">enumeration&nbsp;</span></td><td align="left" bgcolor="#F0F0F0"><span class="schemaSubData">cube</span></td></tr></table></td>
+				<td width="90%" align="left" bgcolor="#F0F0F0"><table cellspacing="0" cellpadding="0"><tr valign="top"><td align="right" bgcolor="#F0F0F0"><span class="schemaSubTitle">enumeration&nbsp;</span></td><td align="left" bgcolor="#F0F0F0"><span class="schemaSubData">combo</span></td></tr><tr valign="top"><td align="right" bgcolor="#F0F0F0"><span class="schemaSubTitle">enumeration&nbsp;</span></td><td align="left" bgcolor="#F0F0F0"><span class="schemaSubData">filename</span></td></tr><tr valign="top"><td align="right" bgcolor="#F0F0F0"><span class="schemaSubTitle">enumeration&nbsp;</span></td><td align="left" bgcolor="#F0F0F0"><span class="schemaSubData">integer</span></td></tr><tr valign="top"><td align="right" bgcolor="#F0F0F0"><span class="schemaSubTitle">enumeration&nbsp;</span></td><td align="left" bgcolor="#F0F0F0"><span class="schemaSubData">double</span></td></tr><tr valign="top"><td align="right" bgcolor="#F0F0F0"><span class="schemaSubTitle">enumeration&nbsp;</span></td><td align="left" bgcolor="#F0F0F0"><span class="schemaSubData">string</span></td></tr><tr valign="top"><td align="right" bgcolor="#F0F0F0"><span class="schemaSubTitle">enumeration&nbsp;</span></td><td align="left" bgcolor="#F0F0F0"><span class="schemaSubData">boolean</span></td></tr><tr valign="top"><td align="right" bgcolor="#F0F0F0"><span class="schemaSubTitle">enumeration&nbsp;</span></td><td align="left" bgcolor="#F0F0F0"><span class="schemaSubData">cube</span></td></tr></table></td>
 			</tr>
 			<tr valign="top">
 				<td width="10%" align="right" bgcolor="#F0F0F0"><span class="schemaSubTitle">annotation</span></td>
@@ -3353,7 +3387,7 @@
 			</tr>
 			<tr valign="top">
 				<td width="10%" align="right" bgcolor="#F0F0F0"><span class="schemaSubTitle">facets</span></td>
-				<td width="90%" align="left" bgcolor="#F0F0F0"><table cellspacing="0" cellpadding="0"><tr valign="top"><td align="right" bgcolor="#F0F0F0"><span class="schemaSubTitle">enumeration&nbsp;</span></td><td align="left" bgcolor="#F0F0F0"><span class="schemaSubData">filename</span></td></tr><tr valign="top"><td align="right" bgcolor="#F0F0F0"><span class="schemaSubTitle">enumeration&nbsp;</span></td><td align="left" bgcolor="#F0F0F0"><span class="schemaSubData">integer</span></td></tr><tr valign="top"><td align="right" bgcolor="#F0F0F0"><span class="schemaSubTitle">enumeration&nbsp;</span></td><td align="left" bgcolor="#F0F0F0"><span class="schemaSubData">double</span></td></tr><tr valign="top"><td align="right" bgcolor="#F0F0F0"><span class="schemaSubTitle">enumeration&nbsp;</span></td><td align="left" bgcolor="#F0F0F0"><span class="schemaSubData">string</span></td></tr><tr valign="top"><td align="right" bgcolor="#F0F0F0"><span class="schemaSubTitle">enumeration&nbsp;</span></td><td align="left" bgcolor="#F0F0F0"><span class="schemaSubData">boolean</span></td></tr><tr valign="top"><td align="right" bgcolor="#F0F0F0"><span class="schemaSubTitle">enumeration&nbsp;</span></td><td align="left" bgcolor="#F0F0F0"><span class="schemaSubData">cube</span></td></tr></table></td>
+				<td width="90%" align="left" bgcolor="#F0F0F0"><table cellspacing="0" cellpadding="0"><tr valign="top"><td align="right" bgcolor="#F0F0F0"><span class="schemaSubTitle">enumeration&nbsp;</span></td><td align="left" bgcolor="#F0F0F0"><span class="schemaSubData">combo</span></td></tr><tr valign="top"><td align="right" bgcolor="#F0F0F0"><span class="schemaSubTitle">enumeration&nbsp;</span></td><td align="left" bgcolor="#F0F0F0"><span class="schemaSubData">filename</span></td></tr><tr valign="top"><td align="right" bgcolor="#F0F0F0"><span class="schemaSubTitle">enumeration&nbsp;</span></td><td align="left" bgcolor="#F0F0F0"><span class="schemaSubData">integer</span></td></tr><tr valign="top"><td align="right" bgcolor="#F0F0F0"><span class="schemaSubTitle">enumeration&nbsp;</span></td><td align="left" bgcolor="#F0F0F0"><span class="schemaSubData">double</span></td></tr><tr valign="top"><td align="right" bgcolor="#F0F0F0"><span class="schemaSubTitle">enumeration&nbsp;</span></td><td align="left" bgcolor="#F0F0F0"><span class="schemaSubData">string</span></td></tr><tr valign="top"><td align="right" bgcolor="#F0F0F0"><span class="schemaSubTitle">enumeration&nbsp;</span></td><td align="left" bgcolor="#F0F0F0"><span class="schemaSubData">boolean</span></td></tr><tr valign="top"><td align="right" bgcolor="#F0F0F0"><span class="schemaSubTitle">enumeration&nbsp;</span></td><td align="left" bgcolor="#F0F0F0"><span class="schemaSubData">cube</span></td></tr></table></td>
 			</tr>
 			<tr valign="top">
 				<td width="10%" align="right" bgcolor="#F0F0F0"><span class="schemaSubTitle">annotation</span></td>
@@ -3366,6 +3400,7 @@
 &nbsp;&nbsp;&nbsp; </span><span class="textOperator">&lt;</span><span class="textElement">xs:documentation</span><span class="textOperator">&gt;</span><span class="textContents">enumerations for types of parameters</span><span class="textOperator">&lt;/</span><span class="textElement">xs:documentation</span><span class="textOperator">&gt;</span><span class="textContents"><BR>
 &nbsp; </span><span class="textOperator">&lt;/</span><span class="textElement">xs:annotation</span><span class="textOperator">&gt;</span><span class="textContents"><BR>
 &nbsp; </span><span class="textOperator">&lt;</span><span class="textElement">xs:restriction</span><span class="textAttr"> base</span><span class="textOperator">=</span><span class="textContents">&quot;xs:string</span><span class="textOperator">&quot;&gt;</span><span class="textContents"><BR>
+&nbsp;&nbsp;&nbsp; </span><span class="textOperator">&lt;</span><span class="textElement">xs:enumeration</span><span class="textAttr"> value</span><span class="textOperator">=</span><span class="textContents">&quot;combo</span><span class="textOperator">&quot;/&gt;</span><span class="textContents"><BR>
 &nbsp;&nbsp;&nbsp; </span><span class="textOperator">&lt;</span><span class="textElement">xs:enumeration</span><span class="textAttr"> value</span><span class="textOperator">=</span><span class="textContents">&quot;filename</span><span class="textOperator">&quot;/&gt;</span><span class="textContents"><BR>
 &nbsp;&nbsp;&nbsp; </span><span class="textOperator">&lt;</span><span class="textElement">xs:enumeration</span><span class="textAttr"> value</span><span class="textOperator">=</span><span class="textContents">&quot;integer</span><span class="textOperator">&quot;/&gt;</span><span class="textContents"><BR>
 &nbsp;&nbsp;&nbsp; </span><span class="textOperator">&lt;</span><span class="textElement">xs:enumeration</span><span class="textAttr"> value</span><span class="textOperator">=</span><span class="textContents">&quot;double</span><span class="textOperator">&quot;/&gt;</span><span class="textContents"><BR>
