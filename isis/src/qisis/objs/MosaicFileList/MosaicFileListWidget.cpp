@@ -3,8 +3,10 @@
 #include <iostream>
 
 #include <QAction>
-#include <QHBoxLayout>
 #include <QFileDialog>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QLabel>
 #include <QSettings>
 
 #include "CubeDisplayProperties.h"
@@ -23,6 +25,12 @@ namespace Isis {
     p_tree = new MosaicTreeWidget();
     layout->addWidget(p_tree);
     layout->setContentsMargins(0, 0, 0, 0);
+
+    setWhatsThis("This is the mosaic file list. Opened "
+        "cubes show up here. You can arrange your cubes into groups (that you "
+        "name) to help keep track of them. Also, you can configure multiple "
+        "files at once. Finally, you can sort your files by any of the visible "
+        "columns (use the view menu to show/hide columns of data).");
 
     setLayout(layout);
   }
@@ -163,6 +171,70 @@ namespace Isis {
     exportActs.append(saveList);
 
     return exportActs;
+  }
+
+
+  QWidget * MosaicFileListWidget::getLongHelp(QWidget * fileListContainer) {
+
+    QWidget *longHelpWidget = new QWidget;
+    QVBoxLayout *longHelpLayout = new QVBoxLayout;
+    longHelpWidget->setLayout(longHelpLayout);
+
+    QLabel *title = new QLabel("<h2>Mosaic File List</h2>");
+    longHelpLayout->addWidget(title);
+
+
+    QPixmap preview;
+    if (!fileListContainer) {
+      QSettings blankSettings;
+      QWeakPointer<MosaicFileListWidget> tmp =
+          new MosaicFileListWidget(blankSettings);
+      tmp.data()->resize(QSize(500, 200));
+      preview = QPixmap::grabWidget(tmp.data());
+      delete tmp.data();
+    }
+    else {
+      QPixmap previewPixmap = QPixmap::grabWidget(fileListContainer).scaled(
+          QSize(500, 200), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
+      QLabel *previewWrapper = new QLabel;
+      previewWrapper->setPixmap(previewPixmap);
+      longHelpLayout->addWidget(previewWrapper);
+    }
+
+    QLabel *previewWrapper = new QLabel;
+    previewWrapper->setPixmap(preview);
+    longHelpLayout->addWidget(previewWrapper);
+
+    QLabel *overview = new QLabel("The mosaic file list is designed to help you "
+        "organize your files.<br>"
+        "<h3>Groups</h3>"
+            "<p>Every cube must be inside of a group. These groups can be "
+            "renamed by double clicking on them. To move a cube between groups "
+            "just click and drag it to the group you want it in. This works "
+            "for multiple cubes also. You can change all of the cubes in a "
+            "group by right clicking on the group name.</p>"
+        "<h3>Columns</h3>"
+            "You can show and hide columns by using the view menu. These "
+            "columns show relevant data about the cube, including statistical "
+            "information. Some of this information will be blank if you did "
+            "not run the application <i>camstats</i> before opening the cube."
+        "<h3>Sorting</h3>"
+            "You can sort cubes within each group by clicking on the column "
+            "title of the column that you want to sort on. Clicking on the "
+            "title again will reverse the sorting order. You can also drag and "
+            "drop a cube between two other cubes to change where it is in the "
+            "list.");
+    overview->setWordWrap(true);
+
+    // Qt doesn't calculate this well on its own
+    overview->setMinimumHeight(
+      (390 * QFontMetrics(overview->font()).averageCharWidth()) / 6);
+
+    longHelpLayout->addWidget(overview);
+    longHelpLayout->addStretch();
+
+    return longHelpWidget;
   }
 
 

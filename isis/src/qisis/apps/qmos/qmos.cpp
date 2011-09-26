@@ -33,14 +33,6 @@ int main(int argc, char *argv[]) {
 
     mainWindow->show();
 
-    if(argc == 2) {
-      mainWindow->loadProject(argv[1]);
-    }
-    else if(argc > 2) {
-      std::cerr << "Usage: qmos [project file]" << std::endl;
-      return 1;
-    }
-
     int status = app->exec();
 
     delete mainWindow;

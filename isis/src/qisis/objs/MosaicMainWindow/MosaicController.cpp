@@ -65,6 +65,9 @@ namespace Isis {
     connect(p_scene, SIGNAL(visibleRectChanged(QRectF)),
             p_worldScene, SLOT(setOutlineRect(QRectF)));
 
+    connect(this, SIGNAL(cubeListWasBlocked(QStringList)),
+            this, SLOT(openCubes(QStringList)), Qt::QueuedConnection);
+
     settings.beginGroup("MosaicController");
     m_openFilled = settings.value("openFilled", true).toBool();
     m_defaultAlpha = settings.value("defaultAlpha", 60).toInt();
@@ -260,37 +263,40 @@ namespace Isis {
    */
   void MosaicController::openCubes(QStringList cubeNames) {
     if(cubeNames.size()) {
-      if(m_watcher) {
+      if(m_watcher && !m_watcher->isFinished()) {
         m_watcher->waitForFinished();
+        emit cubeListWasBlocked(cubeNames);
+      }
+      else {
+        p_progress->setText("Opening cubes");
+
+        QFuture< CubeDisplayProperties * > displays = QtConcurrent::mapped(
+            cubeNames,
+            FilenameToDisplayFunctor(m_mutex, QThread::currentThread(),
+              m_openFilled, m_defaultAlpha));
+
+        if(m_maxThreads > 1)
+          QThreadPool::globalInstance()->setMaxThreadCount(m_maxThreads - 1);
+        else
+          QThreadPool::globalInstance()->setMaxThreadCount(
+              QThread::idealThreadCount());
+
         delete m_watcher;
         m_watcher = NULL;
+
+        m_watcher = new QFutureWatcher< CubeDisplayProperties * >;
+        connect(m_watcher, SIGNAL(resultReadyAt(int)),
+                this, SLOT(cubeDisplayReady(int)));
+        connect(m_watcher, SIGNAL(finished()),
+                this, SLOT(loadFinished()));
+        connect(m_watcher, SIGNAL(progressValueChanged(int)),
+                this, SLOT(updateProgress(int)));
+        m_watcher->setFuture(displays);
+        p_progress->setRange(m_watcher->progressMinimum(),
+            m_watcher->progressMaximum());
+        p_progress->setValue(0);
+        p_progress->setVisible(true);
       }
-
-      p_progress->setText("Opening cubes");
-
-      QFuture< CubeDisplayProperties * > displays = QtConcurrent::mapped(
-          cubeNames,
-          FilenameToDisplayFunctor(m_mutex, QThread::currentThread(),
-            m_openFilled, m_defaultAlpha));
-
-      if(m_maxThreads > 1)
-        QThreadPool::globalInstance()->setMaxThreadCount(m_maxThreads - 1);
-      else
-        QThreadPool::globalInstance()->setMaxThreadCount(
-            QThread::idealThreadCount());
-      
-      m_watcher = new QFutureWatcher< CubeDisplayProperties * >;
-      connect(m_watcher, SIGNAL(resultReadyAt(int)),
-              this, SLOT(cubeDisplayReady(int)));
-      connect(m_watcher, SIGNAL(finished()),
-              this, SLOT(loadFinished()));
-      connect(m_watcher, SIGNAL(progressValueChanged(int)),
-              this, SLOT(updateProgress(int)));
-      m_watcher->setFuture(displays);
-      p_progress->setRange(m_watcher->progressMinimum(),
-          m_watcher->progressMaximum());
-      p_progress->setValue(0);
-      p_progress->setVisible(true);
     }
   }
 
@@ -346,12 +352,12 @@ namespace Isis {
 
   void MosaicController::changeMaxThreads() {
     bool ok = false;
-    
+
     QStringList options;
-    
+
     int current = 0;
     options << "Use all available";
-    
+
     for(int i = 1; i < 24; i++) {
       QString option = QString("Use ") + QString::number(i + 1) + " threads";
 

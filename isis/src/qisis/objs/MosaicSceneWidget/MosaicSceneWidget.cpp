@@ -8,6 +8,7 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QHBoxLayout>
 #include <QKeyEvent>
+#include <QLabel>
 #include <QMessageBox>
 #include <QProgressBar>
 #include <QRubberBand>
@@ -104,6 +105,11 @@ namespace Isis {
             this, SLOT(sendVisibleRectChanged()));
     connect(getView()->verticalScrollBar() , SIGNAL(rangeChanged(int, int)),
             this, SLOT(sendVisibleRectChanged()));
+
+    setWhatsThis("This is the mosaic world view. The opened cubes will be "
+        "shown here, but you cannot zoom in. You can select cubes by dragging "
+        "a box over them, zoom to a particular cube by right clicking on it "
+        "and selecting 'Zoom Fit', and many other actions are available.");
   }
 
   MosaicSceneWidget::~MosaicSceneWidget() {
@@ -130,7 +136,7 @@ namespace Isis {
   void MosaicSceneWidget::setProjection(const PvlGroup &mapping) {
     Pvl tmp;
     tmp += mapping;
-   
+
     if(!mapping.HasKeyword("EquatorialRadius")) { 
       PvlGroup radii = Projection::TargetRadii(mapping["TargetName"]);
       tmp.FindGroup("Mapping") += radii["EquatorialRadius"];
@@ -257,6 +263,11 @@ namespace Isis {
       m_mapAction = new QAction(this);
       m_mapAction->setToolTip("Select Map File");
       m_mapAction->setText("Select Map File");
+      m_mapAction->setWhatsThis("This is the projection used by the mosaic "
+          "scene. Cubes can not be shown in the scene without a projection, so "
+          "if one is not selected, a default of Equirectangular will be used. "
+          "The selected file should be a map file, examples are available in "
+          "$base/templates/maps.");
 
       if(m_projection) {
         PvlKeyword projectionKeyword =
@@ -279,6 +290,9 @@ namespace Isis {
     }
 
     m_userToolControl = true;
+
+    setWhatsThis("This is the mosaic scene. The opened cubes will be "
+        "shown here. You can fully interact with the files shown here.");
 
     getView()->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     getView()->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
@@ -488,6 +502,82 @@ namespace Isis {
 
     return exportActs;
   }
+
+
+  QWidget * MosaicSceneWidget::getLongHelp(QWidget *sceneContainer) {
+    QWidget *longHelpWidget = new QWidget;
+    QVBoxLayout *longHelpLayout = new QVBoxLayout;
+    longHelpWidget->setLayout(longHelpLayout);
+
+    QLabel *title = new QLabel("<h2>Mosaic Scene</h2>");
+    longHelpLayout->addWidget(title);
+
+    if (sceneContainer) {
+      QPixmap previewPixmap = QPixmap::grabWidget(sceneContainer).scaled(
+          QSize(500, 200), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
+      QLabel *previewWrapper = new QLabel;
+      previewWrapper->setPixmap(previewPixmap);
+      longHelpLayout->addWidget(previewWrapper);
+    }
+
+    QLabel *overview = new QLabel("The mosaic scene displays cube footprints "
+        "to show you where your files are on a target and how they overlap. "
+        "The scene always represents projected image space and cannot show raw "
+        "or unprojected images; images will be projected on the fly."
+        "<h3>Tools</h3>"
+            "<p>You can interact with the mosaic scene in different ways using "
+            "the tools. The tools are usually in a toolbar next to the scene. "
+            "The tools define what is displayed and what happens when you "
+            "click in the mosaic scene. The tools include:</p>"
+              "<ul><li>Select Tool</li>"
+              "<li>Zoom Tool</li>"
+              "<li>Pan Tool</li>"
+              "<li>Control Network Tool</li>"
+              "<li>Show Area Tool</li>"
+              "<li>Find Tool</li></ul>"
+        "<h3>Context Menus</h3>"
+            "You can right click on anything in the mosaic scene and be given "
+            "options relevant to what you clicked on. Some typical actions are "
+            "changing which cubes are displayed on top of other cubes and the "
+            "color of a cube. The right click menus only affect the item you "
+            "clicked on, not what was selected.");
+    overview->setWordWrap(true);
+    longHelpLayout->addWidget(overview);
+    longHelpLayout->addStretch();
+
+    return longHelpWidget;
+  }
+
+
+  QWidget * MosaicSceneWidget::getPreviewHelp(QWidget *worldViewContainer) {
+    QWidget *longHelpWidget = new QWidget;
+    QVBoxLayout *longHelpLayout = new QVBoxLayout;
+    longHelpWidget->setLayout(longHelpLayout);
+
+    QLabel *title = new QLabel("<h2>Mosaic World View</h2>");
+    longHelpLayout->addWidget(title);
+
+    if (worldViewContainer) {
+      QPixmap previewPixmap = QPixmap::grabWidget(worldViewContainer).scaled(
+          QSize(500, 200), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
+      QLabel *previewWrapper = new QLabel;
+      previewWrapper->setPixmap(previewPixmap);
+      longHelpLayout->addWidget(previewWrapper);
+    }
+
+    QLabel *overview = new QLabel("The mosaic world view displays cube "
+        "footprints to show you where your files are on a target and their "
+        "general arrangement. The world view does not have tools like "
+        "mosaic scenes do, but otherwise are very similar.");
+    overview->setWordWrap(true);
+    longHelpLayout->addWidget(overview);
+    longHelpLayout->addStretch();
+
+    return longHelpWidget;
+  }
+
 
   MosaicSceneItem *MosaicSceneWidget::addCube(CubeDisplayProperties *cube) {
     if(m_projection == NULL) {

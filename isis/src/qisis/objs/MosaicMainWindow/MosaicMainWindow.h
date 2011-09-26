@@ -26,6 +26,8 @@ namespace Isis {
   *                          functionality
   *  @history 2011-08-08 Steven Lambright - Refectored for new qmos. Mosaic
   *                          controller is now always visible.
+  *  @history 2011-09-26 Steven Lambright - Command line arguments are now
+  *                          parsed here.
   */
   class MosaicMainWindow : public MainWindow {
       Q_OBJECT
@@ -71,7 +73,8 @@ namespace Isis {
       void closeMosaic();
 
     private slots:
-      void showOverview();
+      void enterWhatsThisMode();
+      void showHelp();
       void updateMenuVisibility();
 
     protected:

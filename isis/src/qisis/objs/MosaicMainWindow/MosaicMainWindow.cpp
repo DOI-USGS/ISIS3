@@ -3,6 +3,7 @@
 #include <QDockWidget>
 #include <QMenu>
 #include <QSettings>
+#include <QWhatsThis>
 
 #include "Camera.h"
 #include "FileDialog.h"
@@ -31,10 +32,15 @@ namespace Isis {
 
     m_permToolbar = new QToolBar("Standard Tools", this);
     m_permToolbar->setObjectName("Standard Tools");
+    m_permToolbar->setWhatsThis("This area contains options that are always "
+        "present in qmos, regardless of whether or not a project is open. "
+        "These options are also found in the File menu.");
     addToolBar(m_permToolbar);
 
     m_activeToolbar = new QToolBar("Active Tool", this);
     m_activeToolbar->setObjectName("Active Tool");
+    m_activeToolbar->setWhatsThis("The currently selected tool's options will "
+        "show up here. Not all tools have options.");
     addToolBar(m_activeToolbar);
 
     QStatusBar *sbar = statusBar();
@@ -56,6 +62,7 @@ namespace Isis {
     m_fileListDock->setFeatures(QDockWidget::DockWidgetFloatable |
                                 QDockWidget::DockWidgetMovable |
                                 QDockWidget::DockWidgetClosable);
+    m_fileListDock->setWhatsThis("This contains the mosaic file list.");
 
     m_mosaicPreviewDock = new QDockWidget("Mosaic World View",
                                           this, Qt::SubWindow);
@@ -63,6 +70,8 @@ namespace Isis {
     m_mosaicPreviewDock->setFeatures(QDockWidget::DockWidgetFloatable |
                                      QDockWidget::DockWidgetMovable |
                                      QDockWidget::DockWidgetClosable);
+    m_mosaicPreviewDock->setWhatsThis("This contains a zoomed out view of the "
+        "mosaic.");
 
     addDockWidget(Qt::LeftDockWidgetArea, m_fileListDock);
     addDockWidget(Qt::LeftDockWidgetArea, m_mosaicPreviewDock);
@@ -76,6 +85,50 @@ namespace Isis {
     createController();
     displayController();
     installEventFilter(this);
+
+    QStringList args = QApplication::arguments();
+    args.removeFirst();
+
+    QStringList filesToOpen;
+    bool projectLoaded = false;
+
+    foreach (QString argument, args) {
+      QRegExp cubeName(".*\\.cub$", Qt::CaseInsensitive);
+      QRegExp cubeListName(".*\\.(lis|txt)$", Qt::CaseInsensitive);
+      QRegExp projectName(".*\\.mos$", Qt::CaseInsensitive);
+
+      try {
+        if (cubeName.exactMatch(argument)) {
+          filesToOpen.append(argument);
+        }
+        else if (cubeListName.exactMatch(argument)) {
+          TextFile fileList(argument.toStdString());
+          iString line;
+
+          while(fileList.GetLine(line)) {
+            filesToOpen.append(line);
+          }
+        }
+        else if (projectName.exactMatch(argument)) {
+          if (!projectLoaded) {
+            loadProject(argument);
+            projectLoaded = true;
+          }
+          else {
+            QMessageBox::warning(this, "Multiple Projects Specified",
+                "qmos can only open one project at a time. The first project "
+                "specified is the one that will be used.");
+          }
+        }
+      }
+      catch (iException &e) {
+        QMessageBox::warning(this, "Problem Loading File", e.what());
+        e.Clear();
+      }
+    }
+
+    if (!filesToOpen.isEmpty())
+      openFiles(filesToOpen);
   }
 
 
@@ -182,11 +235,23 @@ namespace Isis {
     m_settingsMenu = menuBar()->addMenu("&Settings");
 
     QMenu *helpMenu = menuBar()->addMenu("&Help");
-    QAction *showOverviewAct = new QAction("qmos &Overview", this);
-    showOverviewAct->setIcon(QIcon::fromTheme("help-contents"));
-    connect(showOverviewAct, SIGNAL(triggered()),
-            this, SLOT(showOverview()));
-    helpMenu->addAction(showOverviewAct);
+
+    QAction *activateWhatsThisAct = new QAction("&What's This", this);
+    activateWhatsThisAct->setShortcut(Qt::SHIFT | Qt::Key_F1);
+    activateWhatsThisAct->setIcon(
+        QPixmap(Filename("$base/icons/contexthelp.png").Expanded()));
+    activateWhatsThisAct->setToolTip("Activate What's This and click on parts "
+        "this program to see more information about them");
+    connect(activateWhatsThisAct, SIGNAL(activated()),
+            this, SLOT(enterWhatsThisMode()));
+
+    QAction *showHelpAct = new QAction("qmos &Help", this);
+    showHelpAct->setIcon(QIcon::fromTheme("help-contents"));
+    connect(showHelpAct, SIGNAL(triggered()),
+            this, SLOT(showHelp()));
+
+    helpMenu->addAction(activateWhatsThisAct);
+    helpMenu->addAction(showHelpAct);
 
     updateMenuVisibility();
   }
@@ -213,39 +278,48 @@ namespace Isis {
   }
 
 
-  void MosaicMainWindow::showOverview() {
+  void MosaicMainWindow::enterWhatsThisMode() {
+    QWhatsThis::enterWhatsThisMode();
+  }
+
+
+  void MosaicMainWindow::showHelp() {
     QDialog *helpDialog = new QDialog(this);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     helpDialog->setLayout(mainLayout);
 
-    // There's a text area at the top
-    QWidget *textArea = new QWidget;
-    mainLayout->addWidget(textArea);
-
-    // The text area's items are placed vertically
-    QVBoxLayout *textLayout = new QVBoxLayout;
-    textArea->setLayout(textLayout);
-
     // Let's add some text
     QLabel *qmosTitle = new QLabel("<h1>qmos</h1>");
-    qmosTitle->setMinimumSize(QSize(800, qmosTitle->minimumSize().height()));
-    textLayout->addWidget(qmosTitle);
+//     qmosTitle->setMinimumSize(QSize(800, qmosTitle->minimumSize().height()));
+    mainLayout->addWidget(qmosTitle);
 
     QLabel *qmosSubtitle = new QLabel("A mosaic visualization tool");
-    textLayout->addWidget(qmosSubtitle);
+    mainLayout->addWidget(qmosSubtitle);
 
-    QLabel *overviewTitle = new QLabel("<h2>Overview</h2>");
-    textLayout->addWidget(overviewTitle);
+    QTabWidget *tabArea = new QTabWidget;
+    mainLayout->addWidget(tabArea);
 
-    QLabel *overviewText = new QLabel("<p>qmos is designed "
+    QWidget *overviewTab = new QWidget;
+    tabArea->addTab(overviewTab, "&Overview");
+
+    QVBoxLayout *overviewLayout = new QVBoxLayout;
+    overviewTab->setLayout(overviewLayout);
+
+    QLabel *purposeTitle = new QLabel("<h2>Purpose</h2>");
+    overviewLayout->addWidget(purposeTitle);
+
+    QLabel *purposeText = new QLabel("<p>qmos is designed "
         "specifically for visualizing large amounts of images, how images "
         "overlap, where control points lie on the images, and how jigsaw has "
         "moved control points.");
-    overviewText->setWordWrap(true);
-    textLayout->addWidget(overviewText);
+    purposeText->setWordWrap(true);
+    overviewLayout->addWidget(purposeText);
 
-    QLabel *overviewWarnings = new QLabel("<p>The known shortcomings of qmos "
+    QLabel *shortcomingsTitle = new QLabel("<h2>Known Issues</h2>");
+    overviewLayout->addWidget(shortcomingsTitle);
+
+    QLabel *shortcomingsText = new QLabel("<p>The known shortcomings of qmos "
         "include:<ul>"
         "<li>All input files are read-only, you cannot edit your input "
             "data</li>"
@@ -253,11 +327,18 @@ namespace Isis {
         "<li>Show cube DN data is extremely slow</li>"
         "<li>Warnings are not displayed graphically</li>"
         "<li>Zooming in too far causes you to pan off of your data</li></ul>");
-    overviewWarnings->setWordWrap(true);
-    textLayout->addWidget(overviewWarnings);
+    shortcomingsText->setWordWrap(true);
+    overviewLayout->addWidget(shortcomingsText);
+    overviewLayout->addStretch();
+
+    QWidget *preparationsTab = new QWidget;
+    tabArea->addTab(preparationsTab, "Preparing &Input Cubes");
+
+    QVBoxLayout *preparationsLayout = new QVBoxLayout;
+    preparationsTab->setLayout(preparationsLayout);
 
     QLabel *preparationTitle = new QLabel("<h2>Before Using qmos</h2>");
-    textLayout->addWidget(preparationTitle);
+    preparationsLayout->addWidget(preparationTitle);
 
     QLabel *preparationText = new QLabel("<p>qmos only supports files which "
         "have latitude and longitude information associated with them. Global "
@@ -279,10 +360,18 @@ namespace Isis {
                "loading images into qmos."
         "</ul>");
     preparationText->setWordWrap(true);
-    textLayout->addWidget(preparationText);
+    preparationsLayout->addWidget(preparationText);
+    preparationsLayout->addStretch();
+
+
+    QWidget *projectsTab = new QWidget;
+    tabArea->addTab(projectsTab, "&Project Files");
+
+    QVBoxLayout *projectsLayout = new QVBoxLayout;
+    projectsTab->setLayout(projectsLayout);
 
     QLabel *projectsTitle = new QLabel("<h2>Projects</h2>");
-    textLayout->addWidget(projectsTitle);
+    projectsLayout->addWidget(projectsTitle);
 
     QLabel *projectsText = new QLabel("<p>qmos can save and restore its state "
         "back to where it was at any given time. The stored files are qmos "
@@ -296,7 +385,26 @@ namespace Isis {
         "save your current project any time by going to File -> Save Project. "
         "When you initially open qmos you start with a blank project.");
     projectsText->setWordWrap(true);
-    textLayout->addWidget(projectsText);
+    projectsLayout->addWidget(projectsText);
+
+    projectsLayout->addStretch();
+
+    if (m_controllerVisible) {
+      tabArea->addTab(MosaicFileListWidget::getLongHelp(m_fileListDock),
+                      "File &List");
+      tabArea->addTab(MosaicSceneWidget::getPreviewHelp(m_mosaicPreviewDock),
+                      "Mosaic &World View");
+      tabArea->addTab(MosaicSceneWidget::getLongHelp(centralWidget()),
+                      "Mosaic &Scene");
+    }
+    else {
+      tabArea->addTab(MosaicFileListWidget::getLongHelp(),
+                      "File &List");
+      tabArea->addTab(MosaicSceneWidget::getPreviewHelp(),
+                      "Mosaic &World View");
+      tabArea->addTab(MosaicSceneWidget::getLongHelp(),
+                      "Mosaic &Scene");
+    }
 
     // Allow blank space directly below textual area
     mainLayout->addStretch();

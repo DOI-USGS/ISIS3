@@ -43,6 +43,8 @@ namespace Isis {
    *   @history 2011-08-12 Steven Lambright - Export options now come from the
    *                           scene and the file list, not directly from this
    *                           controller. Fixes #342
+   *   @history 2011-09-26 Steven Lambright - Calling openCubes many times in
+  *                          a row now works.
    */
 
   class MosaicController : public QObject {
@@ -80,6 +82,8 @@ namespace Isis {
 
       void allCubesClosed();
 
+      void cubeListWasBlocked(QStringList cubeList);
+
     public slots:
       void saveProject(QString filename);
       void readProject(QString filename);
@@ -107,11 +111,10 @@ namespace Isis {
       MosaicSceneWidget *p_worldScene;
       ProgressBar *p_progress;
       PvlObject *m_projectPvl;
-      
+
       bool m_openFilled;
       int m_defaultAlpha;
       int m_maxThreads;
-      
 
       // Cameras are not re-entrant and so this mutex will make sure they
       //   aren't overly abused

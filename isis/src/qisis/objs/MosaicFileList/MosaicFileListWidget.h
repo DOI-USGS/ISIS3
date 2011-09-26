@@ -41,6 +41,8 @@ namespace Isis {
       QList<QAction *> getViewActions();
       QList<QAction *> getExportActions();
 
+      static QWidget * getLongHelp(QWidget * fileListContainer = NULL);
+
     public slots:
       void addCubes(QList<CubeDisplayProperties *>);
 
