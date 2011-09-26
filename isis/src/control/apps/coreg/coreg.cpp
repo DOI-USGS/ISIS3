@@ -256,15 +256,19 @@ void IsisMain() {
   // second input image
   if(ui.WasEntered("TO")) {
     if(ui.GetString("TRANSFORM") == "TRANSLATE") {
-      string params = "from=" + ui.GetFilename("FROM") + " to=" +
-                      ui.GetFilename("TO") + " strans=" + iString(sTrans) + " ltrans="
-                      + iString(lTrans) + " interp=" + ui.GetString("INTERP");
+      string params = " from="   + ui.GetFilename("FROM") + 
+                      " to="     + ui.GetFilename("TO") + 
+                      " strans=" + iString(sTrans) + 
+                      " ltrans=" + iString(lTrans) + 
+                      " interp=" + ui.GetString("INTERP");
       ProgramLauncher::RunIsisProgram("translate", params);
     }
     else {
-      string params = "from=" + ui.GetFilename("FROM") + " to=" +
-                      ui.GetFilename("TO") + " cube=" + ui.GetFilename("MATCH") + " control=" +
-                      ui.GetFilename("ONET") + " interp=" + ui.GetString("INTERP") +
+      string params = " from="    + ui.GetFilename("FROM") + 
+                      " to="     + ui.GetFilename("TO") + 
+                      " cube="   + ui.GetFilename("MATCH") + 
+                      " cnet="   + ui.GetFilename("ONET") + 
+                      " interp=" + ui.GetString("INTERP") +
                       " degree=" + iString(ui.GetInteger("DEGREE"));
       ProgramLauncher::RunIsisProgram("warp", params);
     }

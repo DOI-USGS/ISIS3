@@ -191,6 +191,10 @@
     <change name="Debbie A. Cook and Tracie Sucharski" date="2011-06-07">
         Changed point types "Ground" to "Fixed" and "Tie" to "Free".
     </change>
+    <change name="Kris Becker" date="2011-09-26">
+        Corrected parameter change to warp application (CONTROL is now CNET); 
+        added application test for parameter changes.
+    </change>
   </history>
 
   <groups>
