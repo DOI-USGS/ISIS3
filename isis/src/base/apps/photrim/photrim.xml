@@ -7,20 +7,39 @@
   </brief>
 
   <description>
-    This program trims pixels outside of user specified phase, incidence and
-    emission angles.  It is meant to work specifically on camera based cubes.
-    The phase angle is the angle between the sun vector to a pixel and the
-    instrument vector to the same pixel. The incidence angle is the angle
-    between the sun vector to a point and the normal at that point. The
-    emission angle is the angle between the instrument vector to a point and the
-    normal at that point.
-
-    If the instrument is directly between the point and the sun the phase,
-    incidence and emission angles are all zero. If the instrument is looking
-    down the normal and the sun is not then the phase, incidence and emission
-    angles are greater than 0 but less than or equal to 90. If any of the angles
-    is greater than 90 then the sun is not hitting the point or the instrument
-    can not see the point.
+    Given a camera based cube and minimum and maximum ranges for the phase,
+    incidence, and emission angles, this program sets any pixels outside these
+    ranges to NULL.  Photrim uses angles calculated from the spheroid; it does
+    not use local slopes.<br/>
+    <br/>
+    Angle Definitions:<br/>
+    <br/>
+    Phase Angle - The angle between the sun vector to a point on the spheroid 
+    and the instrument vector to the same point.<br/>
+    Incidence Angle - The angle between the sun vector to a point on the 
+    spheroid and the normal at that point.<br/>
+    Emission Angle - The angle between the instrument vector to a point on the 
+    spheroid and the normal at that point.<br/>
+    <br/>
+    Examples of special cases:<br/>
+    <br/>
+    1) If the instrument is directly between the point and the sun, then the 
+    phase angle is 0; if both the sun and the instrument are both along the 
+    normal to the point, then the phase, incidence and emission angles are all 
+    zero.<br/>
+    <br/>
+    2) If the instrument is looking along the normal and the sun is 
+    illuminating the point, then the emission angle is 0 and the incidence and 
+    phase angles will be in the range of 0 to 90 and equal to each other.<br/>
+    <br/>
+    3) A point on the surface of a spherical body cannot be illuminated if the 
+    incidence angle is greater than 90 degrees.<br/>
+    <br/>
+    4) A point on the surface of spherical body cannot be visible if the 
+    emission angle is greater than 90 degrees.<br/>
+    <br/>
+    5) If a point is both illuminated and visible, then the phase angle ranges 
+    from 0 to less than 180.
   </description>
 
   <oldName>
