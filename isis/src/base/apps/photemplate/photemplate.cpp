@@ -43,6 +43,16 @@ void LoadPvl() {
   inPvl.Read(inFile);
   iString phtName = ui.GetAsString("PHTNAME");
   phtName = phtName.UpCase();
+  if (phtName == "NONE") {
+    if (inPvl.HasObject("PhotometricModel")) {
+      PvlObject phtObj = inPvl.FindObject("PhotometricModel");
+      if (phtObj.HasGroup("Algorithm")) {
+        PvlObject::PvlGroupIterator phtGrp = phtObj.BeginGroup();
+        phtName = (string)phtGrp->FindKeyword("PHTNAME");
+        phtName = phtName.UpCase();
+      }
+    }
+  }
   if (phtName != "NONE") {
     if (inPvl.HasObject("PhotometricModel")) {
       PvlObject phtObj = inPvl.FindObject("PhotometricModel");
@@ -170,6 +180,16 @@ void LoadPvl() {
   iString atmName = ui.GetAsString("ATMNAME");
   atmName = atmName.UpCase();
   if (atmName == "NONE") {
+    if (inPvl.HasObject("AtmosphericModel")) {
+      PvlObject atmObj = inPvl.FindObject("AtmosphericModel");
+      if (atmObj.HasGroup("Algorithm")) {
+        PvlObject::PvlGroupIterator atmGrp = atmObj.BeginGroup();
+        atmName = (string)atmGrp->FindKeyword("ATMNAME");
+        atmName = atmName.UpCase();
+      }
+    }
+  }
+  if (atmName == "NONE") {
     return;
   }
   if (inPvl.HasObject("AtmosphericModel")) {
@@ -178,7 +198,7 @@ void LoadPvl() {
     if (atmObj.HasGroup("Algorithm")) {
       PvlObject::PvlGroupIterator atmGrp = atmObj.BeginGroup();
       bool wasFound = false;
-      atmVal = (string)atmGrp->FindKeyword("PHTNAME");
+      atmVal = (string)atmGrp->FindKeyword("ATMNAME");
       atmVal = atmVal.UpCase();
       if (atmName == atmVal) {
         wasFound = true;
