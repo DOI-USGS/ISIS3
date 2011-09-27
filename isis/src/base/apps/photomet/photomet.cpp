@@ -61,6 +61,16 @@ void LoadPvl() {
   inPvl.Read(inFile);
   iString phtName = ui.GetAsString("PHTNAME");
   phtName = phtName.UpCase();
+  if (phtName == "NONE") {
+    if (inPvl.HasObject("PhotometricModel")) {
+      PvlObject phtObj = inPvl.FindObject("PhotometricModel");
+      if (phtObj.HasGroup("Algorithm")) {
+        PvlObject::PvlGroupIterator phtGrp = phtObj.BeginGroup();
+        phtName = (string)phtGrp->FindKeyword("PHTNAME");
+        phtName = phtName.UpCase();
+      }
+    }
+  }
   if (phtName != "NONE") {
     if (inPvl.HasObject("PhotometricModel")) {
       PvlObject phtObj = inPvl.FindObject("PhotometricModel");
@@ -68,7 +78,12 @@ void LoadPvl() {
       if (phtObj.HasGroup("Algorithm")) {
         PvlObject::PvlGroupIterator phtGrp = phtObj.BeginGroup();
         bool wasFound = false;
-        if (ui.WasEntered("PHTNAME")) {
+        phtVal = (string)phtGrp->FindKeyword("PHTNAME");
+        phtVal = phtVal.UpCase();
+        if (phtName == phtVal) {
+          wasFound = true;
+        }
+        if (ui.WasEntered("PHTNAME") && !wasFound) {
           phtName = ui.GetAsString("PHTNAME");
           phtName = phtName.UpCase();
           while (phtGrp != phtObj.EndGroup()) {
@@ -185,13 +200,28 @@ void LoadPvl() {
   iString nrmName = ui.GetAsString("NORMNAME");
   nrmName = nrmName.UpCase();
   iString nrmVal;
+  if (nrmName == "NONE") {
+    if (inPvl.HasObject("NormalizationModel")) {
+      PvlObject nrmObj = inPvl.FindObject("NormalizationModel");
+      if (nrmObj.HasGroup("Algorithm")) {
+        PvlObject::PvlGroupIterator nrmGrp = nrmObj.BeginGroup();
+        nrmName = (string)nrmGrp->FindKeyword("NORMNAME");
+        nrmName = nrmName.UpCase();
+      }
+    }
+  }
   if (nrmName != "NONE") {
     if (inPvl.HasObject("NormalizationModel")) {
       PvlObject nrmObj = inPvl.FindObject("NormalizationModel");
       if (nrmObj.HasGroup("Algorithm")) {
         PvlObject::PvlGroupIterator nrmGrp = nrmObj.BeginGroup();
         bool wasFound = false;
-        if (ui.WasEntered("NORMNAME")) {
+        nrmVal = (string)nrmGrp->FindKeyword("NORMNAME");
+        nrmVal = nrmVal.UpCase();
+        if (nrmName == nrmVal) {
+          wasFound = true;
+        }
+        if (ui.WasEntered("NORMNAME") && !wasFound) {
           while (nrmGrp != nrmObj.EndGroup()) {
             if (nrmGrp->HasKeyword("NORMNAME") || nrmGrp->HasKeyword("NAME")) {
               if (nrmGrp->HasKeyword("NORMNAME")) nrmVal = (string)nrmGrp->FindKeyword("NORMNAME");
@@ -347,6 +377,16 @@ void LoadPvl() {
   }
   iString atmName = ui.GetAsString("ATMNAME");
   atmName = atmName.UpCase();
+  if (atmName == "NONE") {
+    if (inPvl.HasObject("AtmosphericModel")) {
+      PvlObject atmObj = inPvl.FindObject("AtmosphericModel");
+      if (atmObj.HasGroup("Algorithm")) {
+        PvlObject::PvlGroupIterator atmGrp = atmObj.BeginGroup();
+        atmName = (string)atmGrp->FindKeyword("ATMNAME");
+        atmName = atmName.UpCase();
+      }
+    }
+  }
   if (atmName != "NONE") {
     if (inPvl.HasObject("AtmosphericModel")) {
       PvlObject atmObj = inPvl.FindObject("AtmosphericModel");
@@ -354,7 +394,12 @@ void LoadPvl() {
       if (atmObj.HasGroup("Algorithm")) {
         PvlObject::PvlGroupIterator atmGrp = atmObj.BeginGroup();
         bool wasFound = false;
-        if (ui.WasEntered("ATMNAME")) {
+        atmVal = (string)atmGrp->FindKeyword("ATMNAME");
+        atmVal = atmVal.UpCase();
+        if (atmName == atmVal) {
+          wasFound = true;
+        }
+        if (ui.WasEntered("ATMNAME") && !wasFound) {
           while (atmGrp != atmObj.EndGroup()) {
             if (atmGrp->HasKeyword("ATMNAME") || atmGrp->HasKeyword("NAME")) {
               if (atmGrp->HasKeyword("ATMNAME")) atmVal = (string)atmGrp->FindKeyword("ATMNAME");

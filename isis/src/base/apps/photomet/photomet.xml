@@ -496,6 +496,7 @@
         <brief>
           Pvl file
         </brief>
+        <defaultPath>$base/templates/photometry</defaultPath>
         <internalDefault>None</internalDefault>
         <description>
           This file will contain the photometric parameters to use
