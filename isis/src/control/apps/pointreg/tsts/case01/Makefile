@@ -10,6 +10,6 @@ commands:
 	cnet=$(INPUT)/red.net \
 	deffile=$(INPUT)/autoRegTemplate.def \
 	onet=$(OUTPUT)/redOutputCnet.net \
-	flatfile=$(OUTPUT)/redFlatFile.txt \
+	flatfile=$(OUTPUT)/redFlatFile.csv \
 	points=nonignored > $(OUTPUT)/redPointregLog.txt;
 	$(RM) $(OUTPUT)/cub.lis;

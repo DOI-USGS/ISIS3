@@ -204,6 +204,13 @@ void IsisMain() {
                 measure->SetAprioriLine(measure->GetLine());
                 measure->SetCoordinate(ar->CubeSample(), ar->CubeLine());
                 measure->SetIgnored(false);
+
+                // We successfully registered the current measure to the
+                // reference, and since we set the current measure to be
+                // unignored, it follows that its reference should also be made
+                // unignored.
+                patternCM->SetIgnored(false);
+
                 goodMeasureCount++;
               }
               else {
