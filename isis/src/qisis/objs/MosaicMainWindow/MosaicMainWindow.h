@@ -15,20 +15,21 @@ namespace Isis {
   class MosaicController;
 
   /**
-  * @brief
-  *
-  * @ingroup Visualization Tools
-  *
-  * @author Stacy Alley
-  *
-  * @internal
-  *  @history 2010-05-10 Christopher Austin - added cnet connectivity
-  *                          functionality
-  *  @history 2011-08-08 Steven Lambright - Refectored for new qmos. Mosaic
-  *                          controller is now always visible.
-  *  @history 2011-09-26 Steven Lambright - Command line arguments are now
-  *                          parsed here.
-  */
+   * @brief
+   *
+   * @ingroup Visualization Tools
+   *
+   * @author Stacy Alley
+   *
+   * @internal
+   *   @history 2010-05-10 Christopher Austin - added cnet connectivity
+   *                           functionality
+   *   @history 2011-08-08 Steven Lambright - Refectored for new qmos. Mosaic
+   *                           controller is now always visible.
+   *   @history 2011-09-26 Steven Lambright - Command line arguments are now
+   *                           parsed here.
+   *   @history 2011-09-27 Steven Lambright - Improved user documentation
+   */
   class MosaicMainWindow : public MainWindow {
       Q_OBJECT
     public:

@@ -17,6 +17,7 @@ namespace Isis {
    *   @history 2011-05-07 Steven Lambright - Refactored along with all of
    *                       'qmos.' A lot of work still needs to be done for
    *                       these tools.
+   *   @history 2011-09-27 Steven Lambright - Improved user documentation
    */
   class MosaicPanTool : public MosaicTool {
       Q_OBJECT

@@ -101,8 +101,14 @@ namespace Isis {
     p_action->setToolTip("Find (F)");
     p_action->setShortcut(Qt::Key_F);
     QString text  =
-      "<b>Function:</b>  Find the specified lat/lon. \
-      <p><b>Shortcut:</b>  F</p> ";
+      "<b>Function:</b>  Find a specific latitude/longitude on the mosaic "
+      "scene.<br><br>"
+      "This tool allows you to type in a latitude and longitude, in the "
+      "projection's native units, and that point will be centered and given "
+      "a red dot on the mosaic scene. Alternatively, you can <b>click</b> on "
+      "the mosaic scene and it will give you the latitude and longitude values "
+      "along with drawing the red dot."
+      "<p><b>Shortcut:</b>  F</p> ";
     p_action->setWhatsThis(text);
     return p_action;
   }

@@ -19,20 +19,23 @@ namespace Isis {
     p_widget = scene;
 
     connect(this, SIGNAL(activated(bool)), this, SLOT(updateTool()));
-    connect(scene, SIGNAL(mouseEnter()), this, SLOT(mouseEnter()));
-    connect(scene, SIGNAL(mouseLeave()), this, SLOT(mouseLeave()));
-    connect(scene, SIGNAL(mouseMove(QPointF)), this, SLOT(mouseMove(QPointF)));
 
-    connect(scene, SIGNAL(mouseDoubleClick(QPointF)),
-            this, SLOT(mouseDoubleClick(QPointF)));
-    connect(scene, SIGNAL(mouseButtonPress(QPointF, Qt::MouseButton)),
-            this, SLOT(mouseButtonPress(QPointF, Qt::MouseButton)));
-    connect(scene, SIGNAL(mouseButtonRelease(QPointF, Qt::MouseButton)),
-            this, SLOT(mouseButtonRelease(QPointF, Qt::MouseButton)));
-    connect(scene, SIGNAL(mouseWheel(QPointF, int)),
-            this, SLOT(mouseWheel(QPointF, int)));
-    connect(scene, SIGNAL(rubberBandComplete(QRectF, Qt::MouseButton)),
-            this, SLOT(rubberBandComplete(QRectF, Qt::MouseButton)));
+    if (scene) {
+      connect(scene, SIGNAL(mouseEnter()), this, SLOT(mouseEnter()));
+      connect(scene, SIGNAL(mouseLeave()), this, SLOT(mouseLeave()));
+      connect(scene, SIGNAL(mouseMove(QPointF)), this, SLOT(mouseMove(QPointF)));
+  
+      connect(scene, SIGNAL(mouseDoubleClick(QPointF)),
+              this, SLOT(mouseDoubleClick(QPointF)));
+      connect(scene, SIGNAL(mouseButtonPress(QPointF, Qt::MouseButton)),
+              this, SLOT(mouseButtonPress(QPointF, Qt::MouseButton)));
+      connect(scene, SIGNAL(mouseButtonRelease(QPointF, Qt::MouseButton)),
+              this, SLOT(mouseButtonRelease(QPointF, Qt::MouseButton)));
+      connect(scene, SIGNAL(mouseWheel(QPointF, int)),
+              this, SLOT(mouseWheel(QPointF, int)));
+      connect(scene, SIGNAL(rubberBandComplete(QRectF, Qt::MouseButton)),
+              this, SLOT(rubberBandComplete(QRectF, Qt::MouseButton)));
+    }
   }
 
 

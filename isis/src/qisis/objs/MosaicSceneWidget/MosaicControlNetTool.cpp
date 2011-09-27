@@ -32,26 +32,26 @@ namespace Isis {
     m_randomizeColors = NULL;
 
     // Create the action buttons
-    m_loadControlNetButton = new QPushButton();
-    m_loadControlNetButton->setIcon(getIcon("HILLBLU_molecola.png"));
-    connect(m_loadControlNetButton, SIGNAL(clicked()), this, SLOT(openControlNet()));
-    connect(m_loadControlNetButton, SIGNAL(destroyed(QObject *)),
-            this, SLOT(objectDestroyed(QObject *)));
 
     m_displayControlNetButton = new QPushButton("Display");
     m_displayControlNetButton->setCheckable(true);
     m_displayControlNetButton->setEnabled(false);
+    m_displayControlNetButton->setToolTip("Toggle the visibility of the "
+        "control points and movement arrows in the network.");
     connect(m_displayControlNetButton, SIGNAL(clicked()), this, SLOT(displayControlNet()));
     connect(m_displayControlNetButton, SIGNAL(destroyed(QObject *)),
             this, SLOT(objectDestroyed(QObject *)));
 
     m_displayConnectivity = new QPushButton("Color Islands");
+    m_displayConnectivity->setToolTip("Color cubes the same if the control "
+        "network has a connection between them");
     connect(m_displayConnectivity, SIGNAL(clicked()), this, SLOT(displayConnectivity()));
     connect(m_displayConnectivity, SIGNAL(destroyed(QObject *)),
             this, SLOT(objectDestroyed(QObject *)));
     m_displayConnectivity->setEnabled(false);
 
     m_randomizeColors = new QPushButton("Color Images");
+    m_randomizeColors->setToolTip("Color all cubes differently");
     connect(m_randomizeColors, SIGNAL(clicked()), this, SLOT(randomizeColors()));
     connect(m_randomizeColors, SIGNAL(destroyed(QObject *)),
             this, SLOT(objectDestroyed(QObject *)));
@@ -59,6 +59,9 @@ namespace Isis {
     m_displayArrows = new QPushButton("Show Movement");
     m_displayArrows->setCheckable(true);
     m_displayArrows->setChecked(false);
+    m_displayArrows->setToolTip("Show arrow from the apriori surface point to "
+        "the adjusted surface point for each control point with this "
+        "information");
     connect(m_displayArrows, SIGNAL(clicked()), this, SLOT(displayArrows()));
     connect(m_displayArrows, SIGNAL(destroyed(QObject *)),
             this, SLOT(objectDestroyed(QObject *)));
@@ -66,11 +69,22 @@ namespace Isis {
 
     m_closeNetwork = new QPushButton("Close Network");
     m_closeNetwork->setEnabled(false);
+    m_closeNetwork->setVisible(false);
+    m_closeNetwork->setToolTip("Close the currently open control network");
     connect(m_closeNetwork, SIGNAL(clicked()), this, SLOT(closeNetwork()));
     connect(m_closeNetwork, SIGNAL(destroyed(QObject *)),
             this, SLOT(objectDestroyed(QObject *)));
-    
+
+    m_loadControlNetButton = new QPushButton("Open Network");
+    m_loadControlNetButton->setToolTip("Open and load a control network");
+    connect(m_loadControlNetButton, SIGNAL(clicked()),
+            this, SLOT(openControlNet()));
+    connect(m_loadControlNetButton, SIGNAL(destroyed(QObject *)),
+            this, SLOT(objectDestroyed(QObject *)));
+
     m_controlNetFileLabel = new QLabel;
+    m_controlNetFileLabel->setToolTip("The filename of the currently open "
+        "control network");
     connect(m_controlNetFileLabel, SIGNAL(destroyed(QObject *)),
             this, SLOT(objectDestroyed(QObject *)));
   }
@@ -152,8 +166,12 @@ namespace Isis {
     action->setToolTip("Control Net (C)");
     action->setShortcut(Qt::Key_C);
     QString text  =
-      "<b>Function:</b>  Utilize a Control Network \
-      <p><b>Shortcut:</b>  C</p> ";
+      "<b>Function:</b>  Display and analyze a control network<br><br>"
+      "This tool shows you all of the control points in your network for "
+      "which a latitude/longitude can be calculated. The control points are "
+      "shown as color-coded '+' marks. The control points have a right-click "
+      "menu and information about them can be seen just by hovering over them." 
+      "<p><b>Shortcut:</b>  C</p> ";
     action->setWhatsThis(text);
     return action;
   }
@@ -162,8 +180,6 @@ namespace Isis {
   QWidget *MosaicControlNetTool::getToolBarWidget() {
     // Put the buttons in a horizontal orientation
     QHBoxLayout *actionLayout = new QHBoxLayout();
-    if (m_loadControlNetButton)
-      actionLayout->addWidget(m_loadControlNetButton);
 
     if (m_displayControlNetButton)
       actionLayout->addWidget(m_displayControlNetButton);
@@ -179,6 +195,9 @@ namespace Isis {
 
     if (m_closeNetwork)
       actionLayout->addWidget(m_closeNetwork);
+
+    if (m_loadControlNetButton)
+      actionLayout->addWidget(m_loadControlNetButton);
 
     if (m_controlNetFileLabel)
       actionLayout->addWidget(m_controlNetFileLabel);
@@ -291,8 +310,15 @@ namespace Isis {
     if (m_displayArrows)
       m_displayArrows->setEnabled(false);
 
-    if (m_closeNetwork)
+    if (m_closeNetwork) {
       m_closeNetwork->setEnabled(false);
+      m_closeNetwork->setVisible(false);
+    }
+
+    if (m_loadControlNetButton) {
+      m_loadControlNetButton->setEnabled(true);
+      m_loadControlNetButton->setVisible(true);
+    }
 
     if (m_controlNetFileLabel)
       m_controlNetFileLabel->setText("");
@@ -333,7 +359,7 @@ namespace Isis {
     // Bring up a file dialog for user to select their cnet file.
     QString netFile = FileDialog::getOpenFileName(getWidget(),
                       "Select Control Net. File",
-                      QDir::current().dirName(),
+                      QDir::current().dirName() + "/",
                       "Control Networks (*.net);;All Files (*.*)");
 
     //--------------------------------------------------------------
@@ -388,8 +414,15 @@ namespace Isis {
       if (m_displayArrows)
         m_displayArrows->setEnabled(true);
 
-      if (m_closeNetwork)
+      if (m_closeNetwork) {
         m_closeNetwork->setEnabled(true);
+        m_closeNetwork->setVisible(true);
+      }
+
+      if (m_loadControlNetButton) {
+        m_loadControlNetButton->setEnabled(false);
+        m_loadControlNetButton->setVisible(false);
+      }
     }
   }
 

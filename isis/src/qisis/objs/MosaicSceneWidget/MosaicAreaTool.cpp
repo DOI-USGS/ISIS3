@@ -212,8 +212,13 @@ namespace Isis {
     m_action->setToolTip("Show Area (A)");
     m_action->setShortcut(Qt::Key_A);
     QString text  =
-      "<b>Function:</b>  Draw a box given a distance centered on a lat/lon. \
-      <p><b>Shortcut:</b>  A</p> ";
+      "<b>Function:</b>  Draw a box given a distance centered on a "
+      "latitude/longitude.<br><br>"
+      "This tool draws a black square, given an edge length in meters, "
+      "centered on a latitude/longitude point. This box would be a square on "
+      "the surface of the target, and is designed to be modified and warped by "
+      "the current projection."
+      "<p><b>Shortcut:</b>  A</p> ";
     m_action->setWhatsThis(text);
     return m_action;
   }

@@ -55,6 +55,7 @@ namespace Isis {
    *                           references #342
    *   @history 2011-08-29 Steven Lambright - Re-worded export file list option,
    *                           references #342
+   *   @history 2011-09-27 Steven Lambright - Improved user documentation
    */
   class MosaicSceneWidget : public QWidget {
       Q_OBJECT
@@ -106,6 +107,7 @@ namespace Isis {
 
       QList<QAction *> getExportActions();
 
+      static QWidget * getControlNetHelp(QWidget *cnetToolContainer = NULL);
       static QWidget * getLongHelp(QWidget *mosaicSceneContainer = NULL);
       static QWidget * getPreviewHelp(QWidget *worldViewContainer = NULL);
 

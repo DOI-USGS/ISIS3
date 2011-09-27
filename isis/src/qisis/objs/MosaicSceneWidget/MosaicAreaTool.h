@@ -18,6 +18,7 @@ namespace Isis {
    * @author  Steven Lambright
    *
    * @internal
+   *   @history 2011-09-27 Steven Lambright - Improved user documentation
    */
   class MosaicAreaTool : public MosaicTool {
       Q_OBJECT

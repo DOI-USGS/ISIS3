@@ -18,7 +18,7 @@ namespace Isis {
    * @author  Stacy Alley
    *
    * @internal
-   *   @history
+   *   @history 2011-09-27 Steven Lambright - Improved user documentation
    */
   class MosaicZoomTool : public MosaicTool {
       Q_OBJECT

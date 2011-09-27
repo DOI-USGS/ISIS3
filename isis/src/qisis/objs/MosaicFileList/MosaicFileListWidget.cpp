@@ -7,6 +7,7 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QLabel>
+#include <QScrollArea>
 #include <QSettings>
 
 #include "CubeDisplayProperties.h"
@@ -175,14 +176,17 @@ namespace Isis {
 
 
   QWidget * MosaicFileListWidget::getLongHelp(QWidget * fileListContainer) {
+    QScrollArea *longHelpWidgetScrollArea = new QScrollArea;
 
     QWidget *longHelpWidget = new QWidget;
+    longHelpWidgetScrollArea->setWidget(longHelpWidget);
+
     QVBoxLayout *longHelpLayout = new QVBoxLayout;
+    longHelpLayout->setSizeConstraint(QLayout::SetFixedSize);
     longHelpWidget->setLayout(longHelpLayout);
 
     QLabel *title = new QLabel("<h2>Mosaic File List</h2>");
     longHelpLayout->addWidget(title);
-
 
     QPixmap preview;
     if (!fileListContainer) {
@@ -206,14 +210,18 @@ namespace Isis {
     previewWrapper->setPixmap(preview);
     longHelpLayout->addWidget(previewWrapper);
 
-    QLabel *overview = new QLabel("The mosaic file list is designed to help you "
-        "organize your files.<br>"
+    QLabel *overview = new QLabel("The mosaic file list is designed to help "
+        "to organize your files. The file list supports changing multiple "
+        "files simultaneously using the right-click menus after selecting "
+        "several images or groups.<br>"
         "<h3>Groups</h3>"
             "<p>Every cube must be inside of a group. These groups can be "
             "renamed by double clicking on them. To move a cube between groups "
             "just click and drag it to the group you want it in. This works "
             "for multiple cubes also. You can change all of the cubes in a "
-            "group by right clicking on the group name.</p>"
+            "group by right clicking on the group name. You can add a group "
+            "by right clicking in the white space below the last cube or on "
+            "an existing group.</p>"
         "<h3>Columns</h3>"
             "You can show and hide columns by using the view menu. These "
             "columns show relevant data about the cube, including statistical "
@@ -227,14 +235,10 @@ namespace Isis {
             "list.");
     overview->setWordWrap(true);
 
-    // Qt doesn't calculate this well on its own
-    overview->setMinimumHeight(
-      (390 * QFontMetrics(overview->font()).averageCharWidth()) / 6);
-
     longHelpLayout->addWidget(overview);
     longHelpLayout->addStretch();
 
-    return longHelpWidget;
+    return longHelpWidgetScrollArea;
   }
 
 

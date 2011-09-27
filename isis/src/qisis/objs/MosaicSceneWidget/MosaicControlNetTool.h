@@ -20,13 +20,15 @@ namespace Isis {
    * @author  Christopher Austin
    *
    * @internal
-   *   @history 2010-06-24 Christopher Austin - Added |x| functionality and fixed
-   *            control net loading
+   *   @history 2010-06-24 Christopher Austin - Added |x| functionality and
+   *                           fixed control net loading
    *   @history 2011-05-07 Steven Lambright - Refactored.
    *   @history 2011-05-10 Steven Lambright - Reduced useless code, open cnet
-   *            button is now always enabled.
+   *                           button is now always enabled.
    *   @history 2011-05-10 Steven Lambright - Added label for currently open
-   *            network. 
+   *                           network.
+   *   @history 2011-09-27 Steven Lambright - Improved user documentation. Made
+   *                           the open control network button more obvious.
    */
   class MosaicControlNetTool : public MosaicTool {
       Q_OBJECT

@@ -57,8 +57,14 @@ namespace Isis {
     action->setToolTip("Zoom (Z)");
     action->setShortcut(Qt::Key_Z);
     QString text  =
-      "<b>Function:</b>  Zoom in or out of the current cube. \
-      <p><b>Shortcut:</b>  Z</p> ";
+      "<b>Function:</b>  Zoom in or out of the current cube.<br><br>"
+      "This tool gives you a <b>click</b> to zoom by 2X and center on the "
+      "point you clicked on, a <b>right-click</b> to zoom out by 2X and center "
+      "on the point you clicked on, a <b>click and drag</b> box to best fit "
+      "the given area into the visible screen, a <b>right-click and drag</b> "
+      "box to zoom out and center on the center (smaller box means zoom out "
+      "more), and disables context menus on the mosaic scene."
+      "<p><b>Shortcut:</b>  Z</p> ";
     action->setWhatsThis(text);
     return action;
   }

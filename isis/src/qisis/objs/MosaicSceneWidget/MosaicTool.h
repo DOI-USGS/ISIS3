@@ -33,6 +33,8 @@ namespace Isis {
    * @internal
    *   @history 2011-04-14 Steven Lambright Refactored to use the new
    *                           MosaicSceneWidget
+   *   @history 2011-09-27 Steven Lambright - No longer produces errors when
+   *                           given a NULL MosaicSceneWidget.
    */
   class MosaicTool : public QObject {
       Q_OBJECT

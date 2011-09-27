@@ -39,6 +39,7 @@
 #include "PvlObject.h"
 #include "Pvl.h"
 #include "TextFile.h"
+#include "ToolPad.h"
 
 namespace Isis {
   MosaicSceneWidget::MosaicSceneWidget(QStatusBar *status,
@@ -504,8 +505,83 @@ namespace Isis {
   }
 
 
+  QWidget * MosaicSceneWidget::getControlNetHelp(QWidget *cnetToolContainer) {
+    QScrollArea *cnetHelpWidgetScrollArea = new QScrollArea;
+
+    QWidget *cnetHelpWidget = new QWidget;
+
+    QVBoxLayout *cnetHelpLayout = new QVBoxLayout;
+    cnetHelpWidget->setLayout(cnetHelpLayout);
+
+    QLabel *title = new QLabel("<h2>Control Networks</h2>");
+    cnetHelpLayout->addWidget(title);
+
+    QPixmap previewPixmap;
+
+    if (cnetToolContainer) {
+      previewPixmap = QPixmap::grabWidget(cnetToolContainer).scaled(
+          QSize(500, 200), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    }
+    else {
+      ToolPad tmpToolPad("Example Tool Pad", NULL);
+      MosaicControlNetTool tmpTool(NULL);
+      tmpTool.addTo(&tmpToolPad);
+
+      tmpToolPad.resize(QSize(32, 32));
+
+      previewPixmap = QPixmap::grabWidget(&tmpToolPad);
+    }
+
+    QLabel *previewWrapper = new QLabel;
+    previewWrapper->setPixmap(previewPixmap);
+    cnetHelpLayout->addWidget(previewWrapper);
+
+    QLabel *overview = new QLabel("The mosaic scene can display control points "
+        "in addition to the usual cube footprints. This feature is currently "
+        "offered as one of the Mosaic Scene's tools. To open a network, click "
+        "on the control network tool. It will immediately prompt you for a "
+        "control network file if one is not open. Only control points for "
+        "which the latitude and longitude can be established will be "
+        "displayed. Other control points will be ignored by qmos.<br><br>"
+        "<b>Warning: Opening large control networks is slow.</b>"
+        "<h3>Control Network Tool Options</h3>"
+        "<ul>"
+          "<li>The control network tool opens control networks in two ways. "
+          "First, if you select the control network tool and no network is "
+          "open, then it will prompt you for one. Second, there is an open "
+          "network button in the active tool area.</li>"
+          "<li>The control network tool can toggle whether or not control "
+          "points are displayed on the screen using the 'Display' button. "
+          "Control points are always on top and colored based on their "
+          "ignored, locked and type values.</li>"
+          "<li>This tool can also change the color of your files based on "
+          "connectivity through control points. This is available through the "
+          "'Color Islands' button. When you press color islands, all of the "
+          "current cube coloring information is lost and re-done based on "
+          "how the control network connects the files. Each set of connected "
+          "cubes are colored differently; generally speaking, islands are not "
+          "a good thing to have in your control network.</li>"
+          "<li>This tool will color your files on a per-image basis if you "
+          "click color images, effectively reversing color islands.</li>"
+          "<li>The show movement option only displays data when the control "
+          "network has adjusted values. This means that show movement only "
+          "works after you have done a jigsaw solution on the control network. "
+          "This displays arrows emanating from the apriori latitude/longitude "
+          "and pointing at the adjusted latitude/longitude.</li>");
+    overview->setWordWrap(true);
+    cnetHelpLayout->addWidget(overview);
+
+    cnetHelpWidgetScrollArea->setWidget(cnetHelpWidget);
+
+    return cnetHelpWidgetScrollArea;
+  }
+
+
   QWidget * MosaicSceneWidget::getLongHelp(QWidget *sceneContainer) {
+    QScrollArea *longHelpWidgetScrollArea = new QScrollArea;
+
     QWidget *longHelpWidget = new QWidget;
+
     QVBoxLayout *longHelpLayout = new QVBoxLayout;
     longHelpWidget->setLayout(longHelpLayout);
 
@@ -544,19 +620,23 @@ namespace Isis {
             "clicked on, not what was selected.");
     overview->setWordWrap(true);
     longHelpLayout->addWidget(overview);
-    longHelpLayout->addStretch();
 
-    return longHelpWidget;
+    longHelpWidgetScrollArea->setWidget(longHelpWidget);
+
+    return longHelpWidgetScrollArea;
   }
 
 
   QWidget * MosaicSceneWidget::getPreviewHelp(QWidget *worldViewContainer) {
-    QWidget *longHelpWidget = new QWidget;
-    QVBoxLayout *longHelpLayout = new QVBoxLayout;
-    longHelpWidget->setLayout(longHelpLayout);
+    QScrollArea *previewHelpWidgetScrollArea = new QScrollArea;
+
+    QWidget *previewHelpWidget = new QWidget;
+
+    QVBoxLayout *previewHelpLayout = new QVBoxLayout;
+    previewHelpWidget->setLayout(previewHelpLayout);
 
     QLabel *title = new QLabel("<h2>Mosaic World View</h2>");
-    longHelpLayout->addWidget(title);
+    previewHelpLayout->addWidget(title);
 
     if (worldViewContainer) {
       QPixmap previewPixmap = QPixmap::grabWidget(worldViewContainer).scaled(
@@ -564,7 +644,7 @@ namespace Isis {
 
       QLabel *previewWrapper = new QLabel;
       previewWrapper->setPixmap(previewPixmap);
-      longHelpLayout->addWidget(previewWrapper);
+      previewHelpLayout->addWidget(previewWrapper);
     }
 
     QLabel *overview = new QLabel("The mosaic world view displays cube "
@@ -572,10 +652,11 @@ namespace Isis {
         "general arrangement. The world view does not have tools like "
         "mosaic scenes do, but otherwise are very similar.");
     overview->setWordWrap(true);
-    longHelpLayout->addWidget(overview);
-    longHelpLayout->addStretch();
+    previewHelpLayout->addWidget(overview);
 
-    return longHelpWidget;
+    previewHelpWidgetScrollArea->setWidget(previewHelpWidget);
+
+    return previewHelpWidgetScrollArea;
   }
 
 

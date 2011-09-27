@@ -35,8 +35,10 @@ namespace Isis {
     action->setToolTip("Pan (P)");
     action->setShortcut(Qt::Key_P);
     QString text  =
-      "<b>Function:</b>  View different areas of the mosaic. \
-      <p><b>Shortcut:</b>  P</p> ";
+      "<b>Function:</b>  Pan around the current mosaic.<br><br>"
+      "This tool gives you a <b>click and drag</b> to pan around the mosaic "
+      "scene."
+      "<p><b>Shortcut:</b>  P</p> ";
     action->setWhatsThis(text);
     return action;
   }

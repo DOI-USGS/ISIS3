@@ -26,7 +26,8 @@ namespace Isis {
    *    @history 2011-08-12 Steven Lambright - Added export options,
    *                            references #342
    *    @history 2011-08-29 Steven Lambright - Reworded save file list export
-   *                            action, references #342 
+   *                            action, references #342
+   *   @history 2011-09-27 Steven Lambright - Improved user documentation
    */
   class MosaicFileListWidget : public QWidget {
       Q_OBJECT

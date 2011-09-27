@@ -294,17 +294,20 @@ namespace Isis {
 //     qmosTitle->setMinimumSize(QSize(800, qmosTitle->minimumSize().height()));
     mainLayout->addWidget(qmosTitle);
 
-    QLabel *qmosSubtitle = new QLabel("A mosaic visualization tool");
+    QLabel *qmosSubtitle = new QLabel("A tool for visualizing image "
+                                      "footprints for a mosaic.");
     mainLayout->addWidget(qmosSubtitle);
 
     QTabWidget *tabArea = new QTabWidget;
     mainLayout->addWidget(tabArea);
 
-    QWidget *overviewTab = new QWidget;
+    QScrollArea *overviewTab = new QScrollArea;
     tabArea->addTab(overviewTab, "&Overview");
 
+    QWidget *overviewContainer = new QWidget;
+
     QVBoxLayout *overviewLayout = new QVBoxLayout;
-    overviewTab->setLayout(overviewLayout);
+    overviewContainer->setLayout(overviewLayout);
 
     QLabel *purposeTitle = new QLabel("<h2>Purpose</h2>");
     overviewLayout->addWidget(purposeTitle);
@@ -329,13 +332,15 @@ namespace Isis {
         "<li>Zooming in too far causes you to pan off of your data</li></ul>");
     shortcomingsText->setWordWrap(true);
     overviewLayout->addWidget(shortcomingsText);
-    overviewLayout->addStretch();
 
-    QWidget *preparationsTab = new QWidget;
+    overviewTab->setWidget(overviewContainer);
+
+    QScrollArea *preparationsTab = new QScrollArea;
     tabArea->addTab(preparationsTab, "Preparing &Input Cubes");
 
+    QWidget *preparationsContainer = new QWidget;
     QVBoxLayout *preparationsLayout = new QVBoxLayout;
-    preparationsTab->setLayout(preparationsLayout);
+    preparationsContainer->setLayout(preparationsLayout);
 
     QLabel *preparationTitle = new QLabel("<h2>Before Using qmos</h2>");
     preparationsLayout->addWidget(preparationTitle);
@@ -361,14 +366,15 @@ namespace Isis {
         "</ul>");
     preparationText->setWordWrap(true);
     preparationsLayout->addWidget(preparationText);
-    preparationsLayout->addStretch();
 
+    preparationsTab->setWidget(preparationsContainer);
 
-    QWidget *projectsTab = new QWidget;
+    QScrollArea *projectsTab = new QScrollArea;
     tabArea->addTab(projectsTab, "&Project Files");
 
+    QWidget *projectsContainer = new QWidget;
     QVBoxLayout *projectsLayout = new QVBoxLayout;
-    projectsTab->setLayout(projectsLayout);
+    projectsContainer->setLayout(projectsLayout);
 
     QLabel *projectsTitle = new QLabel("<h2>Projects</h2>");
     projectsLayout->addWidget(projectsTitle);
@@ -387,11 +393,13 @@ namespace Isis {
     projectsText->setWordWrap(true);
     projectsLayout->addWidget(projectsText);
 
-    projectsLayout->addStretch();
+    projectsTab->setWidget(projectsContainer);
 
     if (m_controllerVisible) {
       tabArea->addTab(MosaicFileListWidget::getLongHelp(m_fileListDock),
                       "File &List");
+      tabArea->addTab(MosaicSceneWidget::getControlNetHelp(),
+                      "&Control Networks");
       tabArea->addTab(MosaicSceneWidget::getPreviewHelp(m_mosaicPreviewDock),
                       "Mosaic &World View");
       tabArea->addTab(MosaicSceneWidget::getLongHelp(centralWidget()),
@@ -400,14 +408,13 @@ namespace Isis {
     else {
       tabArea->addTab(MosaicFileListWidget::getLongHelp(),
                       "File &List");
+      tabArea->addTab(MosaicSceneWidget::getControlNetHelp(),
+                      "&Control Networks");
       tabArea->addTab(MosaicSceneWidget::getPreviewHelp(),
                       "Mosaic &World View");
       tabArea->addTab(MosaicSceneWidget::getLongHelp(),
                       "Mosaic &Scene");
     }
-
-    // Allow blank space directly below textual area
-    mainLayout->addStretch();
 
     // Now add close option
     QWidget *buttonsArea = new QWidget;
