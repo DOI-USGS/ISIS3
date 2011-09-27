@@ -115,6 +115,22 @@
     <change name="Noah Hilt" date="2008-11-18">
       Original version
     </change>
+    <change name="Janet Barrett" date="2011-09-23">
+      The entire user interface has been redesigned. The previous version of this 
+      program made use of radio button lists to allow the user to choose a photometric
+      model or an atmospheric model. In order to make the program more compact, the
+      radio button lists were replaced with drop down menus. When an option is chosen
+      from the drop down menu, the parameters that apply to that option are made visible.
+      Parameters that don't apply to that option remain hidden. This helps to make the
+      interface look less cluttered than it did when every parameter and every option
+      were visible all the time. 
+      The "NORMALIZATION" option is no longer available in this program. This program's
+      main use is to create files with preset photometric and atmospheric values for use
+      with various planets. The normalization models are not specific to individual 
+      planets like the atmospheric and photometric models are. The normalization mode
+      is only used in the photomet program, so this information now needs to be 
+      provided through photomet.
+    </change>
   </history>
 
   <seeAlso>
