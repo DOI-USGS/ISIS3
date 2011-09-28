@@ -164,7 +164,7 @@ void IsisMain() {
   double emamax = ui.GetDouble("EMAMAX");
   double phmin = ui.GetDouble("PHMIN");
   double phmax = ui.GetDouble("PHMAX");
-  double emamax_phase_coeff= ui.GetDouble("EMAMAX_PHASE_COEFF");
+  double emamax_phase_coeff= ui.GetDouble("EMAMAX_PCOEFF");
   double nph   = ui.GetInteger("NPH");
   
   bool iord = ui.GetBoolean("IORD");
