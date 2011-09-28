@@ -43,8 +43,6 @@ namespace Isis {
    * @param parent Parent widget
    */
   ZoomTool::ZoomTool(QWidget *parent) : Tool(parent) {
-    p_userCursor = QCursor();
-
     p_zoomIn2X = new QAction(parent);
     p_zoomIn2X->setShortcut(Qt::Key_Plus);
     p_zoomIn2X->setText("Zoom In");
@@ -595,20 +593,6 @@ namespace Isis {
     RubberBandTool::enable(RubberBandTool::Rectangle);
     RubberBandTool::allowPoints();
     RubberBandTool::allowAllClicks();
-  }
-
-
-  /**
-   * Sets the cursor to the original arrow cursor shape when the mouse button is
-   * released. 
-   *
-   *
-   * @param p QPoint
-   * @param s Mouse button.
-   */
-  void ZoomTool::mouseButtonRelease(QPoint p, Qt::MouseButton s) {
-    //set the cursor back to the original cursor shape.
-    cubeViewport()->viewport()->setCursor(p_userCursor);
   }
 
   /**

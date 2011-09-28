@@ -57,6 +57,10 @@ namespace Isis {
    *                          Added iExceptions if value is manually entered in
    *                          text box is invalid. Updated documentation.
    *   @history 2010-12-22 Eric Hyer - Removed mouseButtonPress method.
+   *   @history 2011-09-28 Steven Lambright - Removed p_userCursor. It was only
+   *                           causing bugs. As a result, the mouseButtonRelease
+   *                           method did nothing so I removed that too. Zooming
+   *                           happens on the rubberBandComplete slot.
    */
   class ZoomTool : public Tool {
       Q_OBJECT
@@ -93,8 +97,6 @@ namespace Isis {
       void zoomFitHeight();
       void zoomManual();
 
-      void mouseButtonRelease(QPoint p, Qt::MouseButton s);
-
 
       double setScale(MdiCubeViewport *d, double newScale);
       double setScale(MdiCubeViewport *d, double newScale, int x, int y);
@@ -116,7 +118,6 @@ namespace Isis {
 
       QLineEdit *p_zoomLineEdit; //!< Line edit for manual zoom factor.
       double p_lastScale;
-      QCursor p_userCursor;
   };
 };
 
