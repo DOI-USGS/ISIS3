@@ -145,6 +145,10 @@ ifneq "$(or $(findstring Ubuntu10_04, $(HOST_OS)), $(findstring Debian, $(HOST_O
   XALAN_XSL_OPTION := -xsl
 endif
 
+ifneq "$(or $(findstring Fedora, $(HOST_OS)), $(findstring ScientificLinux, $(HOST_OS)))" ""
+  XALAN = $(ISIS3LOCAL)/bin/Xalan
+endif
+
 #---------------------------------------------------------------------------
 #  Set up ISIS versioning
 #---------------------------------------------------------------------------
