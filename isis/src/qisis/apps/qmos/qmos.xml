@@ -7,9 +7,45 @@
   </brief>
 
   <description>
-    This program will display cube footprints and allow for interactive 
-    analysis. It is a prototype version and is still in progress.  More 
-    documentation will be forthcoming.
+    This is a tool for visualizing image footprints for a mosaic.
+
+    <p/>qmos is designed specifically for visualizing large amounts of images,
+    how images overlap, where control points lie on the images, and how
+    jigsaw has moved control points.
+
+    <p/>qmos is designed specifically for visualizing large amounts of images,
+    how images overlap, where control points lie on the images, and how
+    jigsaw has moved control points.
+
+    <p/>qmos only supports files which have latitude and longitude information
+    associated with them. Global projections are also not supported. If your 
+    files meet these requirements, it is beneficial to run a couple of Isis 
+    programs on your files before loading them into qmos. The programs you
+    should run are:
+    <ul>
+      <li>
+        <i>
+          camstats from=future_input_to_qmos.cub attach=true
+          sinc=... linc=...
+        </i>
+      </li>
+      <br/>
+      This enables qmos to give you the emission angle, incidence angle, and
+      resolution in the <b>File List</b>
+      <li>
+        <i>
+          footprintinit from=future_input_to_qmos.cub sinc=... linc=...
+        </i>
+      </li>
+      <br/>
+      This enables qmos to use the given footprints instead of trying to
+      calculate its own. The 'linc' and 'sinc' parameters can have a significant
+      effect on your image's footprint. Also, images without footprints cannot
+      be opened more than one at a time. Running footprintinit will
+      significantly speed up loading images into qmos.
+    </ul>
+
+    To see more documentation, launch qmos and go to "Help -> qmos Help."
   </description>
 
   <category>
@@ -22,6 +58,11 @@
     </change>
     <change name="Eric Hyer" date="2010-03-22">
       Discontinued forcing of gui style to windows
+    </change>
+    <change name="Steven Lambright" date="2011-09-28">
+      Rewrote the underlying functionality and re-factored the majority of the
+      code base to make a quicker, more-intuitive and more maintainable
+      program. Updated user documentation to be much more complete.
     </change>
   </history>
 </application>
