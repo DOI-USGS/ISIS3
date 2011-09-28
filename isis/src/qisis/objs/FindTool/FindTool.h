@@ -72,6 +72,9 @@ namespace Isis {
    *  @history 2011-09-22 Steven Lambright - Sync scale with projections now
    *                          uses a better guess for the equivalent scale.
    *                          Fixes #205.
+   *  @history 2011-09-28 Steven Lambright - The last change would zoom the
+   *                          active viewport. This no longer happens.
+   *                          References #205
    */
   class GroundTab : public QWidget {
       Q_OBJECT

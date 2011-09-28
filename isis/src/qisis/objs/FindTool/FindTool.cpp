@@ -206,6 +206,7 @@ namespace Isis {
     p_showDialogButton->setIconSize(QSize(22, 22));
 
     p_syncScale = new QCheckBox("Sync Scale");
+    p_syncScale->setChecked(true);
     p_syncScale->setToolTip("Synchronize Scale");
     text = "<b>Function:</b> Syncronizes the scale of all linked viewports.";
     p_syncScale->setWhatsThis(text);
@@ -263,13 +264,13 @@ namespace Isis {
   void FindTool::updateTool() {
     MdiCubeViewport *activeViewport = cubeViewport();
 
-    if(activeViewport == NULL) {
+    if (activeViewport == NULL) {
       p_linkViewportsButton->setEnabled(false);
       p_findPoint->setEnabled(false);
       p_showDialogButton->setEnabled(false);
       p_syncScale->setEnabled(false);
       p_statusEdit->setText("None");
-      if(p_dialog->isVisible()) {
+      if (p_dialog->isVisible()) {
         p_dialog->close();
       }
     }
@@ -278,7 +279,7 @@ namespace Isis {
       p_showDialogButton->setEnabled(true);
       p_statusEdit->setText("None");
 
-      if(cubeViewportList()->size() > 1) {
+      if (cubeViewportList()->size() > 1) {
         p_linkViewportsButton->setEnabled(true);
         p_syncScale->setEnabled(true);
       }
@@ -287,13 +288,13 @@ namespace Isis {
         p_syncScale->setEnabled(false);
       }
 
-      if(activeViewport->camera() != NULL) {
+      if (activeViewport->camera() != NULL) {
         p_statusEdit->setText("Camera");
-        if(cubeViewport()->camera()->HasProjection()) {
+        if (cubeViewport()->camera()->HasProjection()) {
           p_statusEdit->setText("Both");
         }
       }
-      else if(activeViewport->projection() != NULL) {
+      else if (activeViewport->projection() != NULL) {
         p_statusEdit->setText("Projection");
       }
 
@@ -302,8 +303,8 @@ namespace Isis {
 
       UniversalGroundMap *groundMap = activeViewport->universalGroundMap();
 
-      if(p_samp != DBL_MAX && p_line != DBL_MAX) {
-        if(groundMap && groundMap->SetImage(p_samp, p_line)) {
+      if (p_samp != DBL_MAX && p_line != DBL_MAX) {
+        if (groundMap && groundMap->SetImage(p_samp, p_line)) {
           QString latStr = QString::number(groundMap->UniversalLatitude());
           QString lonStr = QString::number(groundMap->UniversalLongitude());
           p_groundTab->p_latLineEdit->setText(latStr);
@@ -317,8 +318,8 @@ namespace Isis {
         p_imageTab->p_sampLineEdit->setText(QString::number(p_samp));
         p_imageTab->p_lineLineEdit->setText(QString::number(p_line));
       }
-      else if(p_lat != DBL_MAX && p_lon != DBL_MAX) {
-        if(groundMap && groundMap->SetUniversalGround(p_lat, p_lon)) {
+      else if (p_lat != DBL_MAX && p_lon != DBL_MAX) {
+        if (groundMap && groundMap->SetUniversalGround(p_lat, p_lon)) {
           QString lineStr = QString::number(groundMap->Line());
           QString sampStr = QString::number(groundMap->Sample());
           p_imageTab->p_lineLineEdit->setText(lineStr);
@@ -350,11 +351,11 @@ namespace Isis {
     p_lon = DBL_MAX;
 
 
-    if(p_tabWidget->tabText(p_tabWidget->currentIndex()) == "Ground") {
+    if (p_tabWidget->tabText(p_tabWidget->currentIndex()) == "Ground") {
       p_lat = p_groundTab->p_latLineEdit->text().toDouble();
       p_lon = p_groundTab->p_lonLineEdit->text().toDouble();
     }
-    else if(p_tabWidget->tabText(p_tabWidget->currentIndex()) == "Image") {
+    else if (p_tabWidget->tabText(p_tabWidget->currentIndex()) == "Image") {
       p_line = p_imageTab->p_lineLineEdit->text().toDouble();
       p_samp = p_imageTab->p_sampLineEdit->text().toDouble();
     }
@@ -383,19 +384,19 @@ namespace Isis {
     double line = p_line;
     double samp = p_samp;
 
-    if(p_lat != DBL_MAX && p_lon != DBL_MAX) {
+    if (p_lat != DBL_MAX && p_lon != DBL_MAX) {
       MdiCubeViewport *cvp = cubeViewport();
       UniversalGroundMap *groundMap = cvp->universalGroundMap();
 
-      if(groundMap) {
-        if(groundMap->SetUniversalGround(p_lat, p_lon)) {
+      if (groundMap) {
+        if (groundMap->SetUniversalGround(p_lat, p_lon)) {
           line = groundMap->Line();
           samp = groundMap->Sample();
         }
       }
     }
 
-    if(line != DBL_MAX && samp != DBL_MAX) {
+    if (line != DBL_MAX && samp != DBL_MAX) {
       int x, y;
       MdiCubeViewport *cvp = cubeViewport();
       cvp->cubeToViewport(samp, line, x, y);
@@ -424,8 +425,8 @@ namespace Isis {
     p_lat = DBL_MAX;
     p_lon = DBL_MAX;
 
-    if(groundMap) {
-      if(groundMap->SetImage(samp, line)) {
+    if (groundMap) {
+      if (groundMap->SetImage(samp, line)) {
         p_lat = groundMap->UniversalLatitude();
         p_lon = groundMap->UniversalLongitude();
       }
@@ -454,21 +455,21 @@ namespace Isis {
    *                                 images, whether they have a cam or not
    */
   void FindTool::paintViewport(MdiCubeViewport *vp, QPainter *painter) {
-    if((vp == cubeViewport() || (cubeViewport()->isLinked() && vp->isLinked()))
+    if ((vp == cubeViewport() || (cubeViewport()->isLinked() && vp->isLinked()))
         && p_pointVisible) {
       double samp = p_samp;
       double line = p_line;
 
       UniversalGroundMap *groundMap = vp->universalGroundMap();
 
-      if(p_lat != DBL_MAX && p_lon != DBL_MAX && groundMap) {
-        if(groundMap->SetUniversalGround(p_lat, p_lon)) {
+      if (p_lat != DBL_MAX && p_lon != DBL_MAX && groundMap) {
+        if (groundMap->SetUniversalGround(p_lat, p_lon)) {
           samp = groundMap->Sample();
           line = groundMap->Line();
         }
       }
 
-      if(samp != DBL_MAX && line != DBL_MAX) {
+      if (samp != DBL_MAX && line != DBL_MAX) {
         // first find the point
         int x, y;
         vp->cubeToViewport(samp, line, x, y);
@@ -489,7 +490,7 @@ namespace Isis {
     p_pointVisible = !p_pointVisible;
 
     // update the buttons text
-    if(p_pointVisible) {
+    if (p_pointVisible) {
       p_togglePointVisibleButton->setChecked(true);
       p_togglePointVisibleButton->setToolTip("Hide red dot");
     }
@@ -505,9 +506,9 @@ namespace Isis {
   //! Links all cubes that have camera models or are map projections
   void FindTool::handleLinkClicked() {
     MdiCubeViewport *d;
-    for(int i = 0; i < (int)cubeViewportList()->size(); i++) {
+    for (int i = 0; i < (int)cubeViewportList()->size(); i++) {
       d = (*(cubeViewportList()))[i];
-      if(d->universalGroundMap() != NULL) {
+      if (d->universalGroundMap() != NULL) {
         d->setLinked(true);
       }
       else {
@@ -524,26 +525,61 @@ namespace Isis {
     double scale = DBL_MAX;
     UniversalGroundMap *groundMap = activeViewport->universalGroundMap();
 
-    if(syncScale && groundMap) {
+    if (syncScale && groundMap) {
       scale = activeViewport->scale() * groundMap->Resolution();
+
+      if (groundMap->HasProjection() &&
+          groundMap->SetUniversalGround(p_lat, p_lon)) {
+        double samp = groundMap->Sample();
+        double line = groundMap->Line();
+        if (groundMap->SetImage(samp - 0.5,line - 0.5)) {
+          double lat1 = groundMap->UniversalLatitude();
+          double lon1 = groundMap->UniversalLongitude();
+
+          if (groundMap->SetImage(samp + 0.5, line + 0.5)) {
+            double lat2 = groundMap->UniversalLatitude();
+            double lon2 = groundMap->UniversalLongitude();
+
+            double radius = groundMap->Projection()->LocalRadius();
+
+            SurfacePoint point1(
+                Latitude(lat1, Angle::Degrees),
+                Longitude(lon1, Angle::Degrees),
+                Distance(radius, Distance::Meters));
+
+            SurfacePoint point2(
+                Latitude(lat2, Angle::Degrees),
+                Longitude(lon2, Angle::Degrees),
+                Distance(radius, Distance::Meters));
+
+            Distance distancePerPixel = point1.GetDistanceToPoint(point2);
+
+            // Resolution = meters/pixels
+            scale = activeViewport->scale() * distancePerPixel.GetMeters();
+          }
+        }
+      }
     }
 
-    for(int i = 0; i < cubeViewportList()->size(); i++) {
+    for (int i = 0; i < cubeViewportList()->size(); i++) {
       MdiCubeViewport *viewport = (*(cubeViewportList()))[i];
       groundMap = viewport->universalGroundMap();
-      if(viewport == activeViewport ||
+      if (viewport == activeViewport ||
           (activeViewport->isLinked() && viewport->isLinked())) {
         double newScale = viewport->scale();
 
-        if(groundMap->SetUniversalGround(p_lat, p_lon)) {
+        if (groundMap->SetUniversalGround(p_lat, p_lon)) {
           double samp = groundMap->Sample();
           double line = groundMap->Line();
 
           // Smart resolution is getting a better resolution for projected
           //   images. It works by calculating the lat/lon centered on the
-          //   pixel we're looking at.
+          //   pixel we're looking at. Do not do this for the current viewport
+          //   because we're not changing its resolution (but if we do it,
+          //   the scale should not move; I verified this is true -SL).
           bool smartResSucceeded = false;
-          if (syncScale && groundMap && groundMap->HasProjection()) {
+          if (syncScale && groundMap && viewport != activeViewport &&
+              groundMap->HasProjection()) {
             double resolution = Null;
 
             if (groundMap->SetImage(samp - 0.5, line - 0.5)) {
@@ -579,14 +615,14 @@ namespace Isis {
             }
           }
 
-          if(syncScale && groundMap && !smartResSucceeded) {
+          if (syncScale && groundMap && !smartResSucceeded) {
             newScale = scale / groundMap->Resolution();
           }
 
-          if(p_line != DBL_MAX && p_samp != DBL_MAX) {
+          if (p_line != DBL_MAX && p_samp != DBL_MAX) {
             viewport->setScale(newScale, p_samp, p_line);
           }
-          else if(p_lat != DBL_MAX && p_lon != DBL_MAX && groundMap) {
+          else if (p_lat != DBL_MAX && p_lon != DBL_MAX && groundMap) {
             viewport->setScale(newScale, samp, line);
           }
         }
@@ -597,10 +633,10 @@ namespace Isis {
   //! does a repaint for active viewport and also for any linked viewports
   void FindTool::refresh() {
     MdiCubeViewport *activeVp = cubeViewport();
-    for(int i = 0; i < cubeViewportList()->size(); i++) {
+    for (int i = 0; i < cubeViewportList()->size(); i++) {
       MdiCubeViewport *vp = (*(cubeViewportList()))[i];
 
-      if(vp == activeVp || (activeVp->isLinked() && vp->isLinked()))
+      if (vp == activeVp || (activeVp->isLinked() && vp->isLinked()))
         vp->viewport()->repaint();
     }
   }
