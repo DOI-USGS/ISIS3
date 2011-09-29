@@ -441,7 +441,13 @@ namespace Isis {
 
 
 
-  //!<  Process mouse events
+  /**
+   * Process mouse events
+   *
+   * @internal
+   *   @history 2011-09-29  Tracie Sucharski - Added the setFocus call
+   *                           so that arrow keys would work.
+   */
   void ChipViewport::mousePressEvent(QMouseEvent *event) {
 
     QPoint p = event->pos();
@@ -450,6 +456,11 @@ namespace Isis {
       p_chip->SetChipPosition((double)p.x(), (double)p.y());
       reloadChip(p_chip->CubeSample(), p_chip->CubeLine());
       emit userMovedTackPoint();
+      //  This was added when the scrolled area was added to the QnetTool.
+      //  For some reason when clicking in the ChipViewport, focus would be
+      //  lost and the arrow keys would no longer work.
+      //  TODO:  Is this the correct way to fix this, why is it happening?
+      setFocus();
     }
   }
 
