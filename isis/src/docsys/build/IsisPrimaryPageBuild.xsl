@@ -254,6 +254,26 @@ Deborah Lee Soltesz
 
   </xsl:template>
 
+  <xsl:template match="definitions" mode="copyContents">
+    <h3>Table of Contents</h3>
+    <ul>
+      <xsl:for-each select="definition">
+        <xsl:sort order="ascending" select="@name" />
+        <li><a href="#{translate(@name, ' ', '')}"><xsl:value-of select="@name"/></a></li>
+      </xsl:for-each>
+    </ul>
+
+    <hr />
+
+    <xsl:for-each select="definition">
+      <xsl:sort order="ascending" select="@name" />
+      <h2><a name="{translate(@name, ' ', '')}"><xsl:value-of select="@name"/></a></h2>
+      <p>
+        <xsl:value-of select="."/>
+      </p>
+    </xsl:for-each>
+  </xsl:template>
+
   <xsl:template match="*" mode="copyContents">
     <xsl:element name="{name()}" namespace="{namespace-uri()}">
       <xsl:copy-of select="@*"/>

@@ -7,45 +7,43 @@
   <files>
     <file>
       <body>
+        <definitions>
+          <definition name="Digital Number">
+            Digital Numbers are a subset of Integers, more specifically positive
+            integers.
+          </definition>
 
-        <h3>Table of Contents</h3>
-        <ul>
-          <li><a href="#DigitalNumber">Digital Number</a></li>
-          <li><a href="#Elevation">Elevation</a></li>
-          <li><a href="#Emissivity">Emissivity</a></li>
-          <li><a href="#Radiance">Radiance</a></li>
-          <li><a href="#Reflectence">Reflectence</a></li>
-        </ul>
+          <definition name="Elevation">
+            The height above or below a fixed point on the surface of a body.
+          </definition>
 
-        <hr />
+          <definition name="Emissivity">
+            A measure describing a substances ability to absorb and radiate
+            electromagnetic energy.
+          </definition>
 
-        <h2><a name="DigitalNumber">Digital Number</a></h2>
-        <p>
-          Digital Numbers are a subset of Integers, more specifically positive
-          integers.
-        </p>
+          <definition name="Radiance">
+            A measurement describing the amount of electromagnetic energy
+            emitted from an area of a planet.
+          </definition>
 
-        <h2><a name="Elevation">Elevation</a></h2>
-        <p>
-          The height above or below a fixed point on the surface of a body.
-        </p>
+          <definition name="Reflectence">
+            The ratio of reflected energy to incoming energy.
+          </definition>
 
-        <h2><a name="Emissivity">Emissivity</a></h2>
-        <p>
-          A measure describing a substances ability to absorb and radiate
-          electromagnetic energy.
-        </p>
+          <definition name="Control Measure">
+            A coordinate (measurement) on a Cube for a Control Point.
+          </definition>
 
-        <h2><a name="Radiance">Radiance</a></h2>
-        <p>
-          A measurement describing the amount of electromagnetic energy emitted
-          from an area of a planet.
-        </p>
+          <definition name="Control Point">
+            One or more measurements that identify the same feature or location
+            in different images.
+          </definition>
 
-        <h2><a name="Reflectence">Reflectence</a></h2>
-        <p>
-          The ratio of reflected energy to incoming energy.
-        </p>
+          <definition name="Control Network">
+            A network of Control Points.
+          </definition>
+        </definitions>
       </body>
 
       <type>HTML</type>
@@ -64,7 +62,7 @@
   </audience>
 
   <bibliography>
-    <title>Gloassary</title>
+    <title>Glossary</title>
     <brief>
       A collection of definitions for common ideas used in ISIS and image
       processing in general.
