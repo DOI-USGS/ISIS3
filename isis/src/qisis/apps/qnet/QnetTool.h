@@ -226,6 +226,7 @@ namespace Isis {
       QWidget *createToolBarWidget (QStackedWidget *parent);
 
     private slots:
+      void enterWhatsThisMode();
       void paintAllViewports (QString pointId );
       void saveNet();
       void addMeasure();
@@ -305,6 +306,8 @@ namespace Isis {
       QAction *p_openTemplateFile;
       QAction *p_saveTemplateFile;
       QAction *p_saveTemplateFileAs;
+
+      QAction *p_whatsThis;
       
       QMainWindow *p_mw;
       ControlPointEdit *p_pointEditor;

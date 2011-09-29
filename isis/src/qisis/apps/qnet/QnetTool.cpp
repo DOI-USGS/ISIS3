@@ -71,6 +71,7 @@ namespace Isis {
     p_createPoint = NULL;
     p_modifyPoint = NULL;
     p_deletePoint = NULL;
+    p_whatsThis = NULL;
     p_mw = NULL;
     p_pointEditor = NULL;
     p_ptIdValue = NULL;
@@ -206,10 +207,7 @@ namespace Isis {
 
     QScrollArea *scrollArea = new QScrollArea();
     scrollArea->setWidget(centralWidget);
-    scrollArea->setWidgetResizable(true);
-    centralWidget->adjustSize();
     p_qnetTool->setCentralWidget(scrollArea);
-//    p_qnetTool->setCentralWidget(centralWidget);
     
     connect(this, SIGNAL(editPointChanged(QString)),
             this, SLOT(paintAllViewports(QString)));
@@ -496,6 +494,14 @@ namespace Isis {
     p_saveTemplateFileAs->setWhatsThis("Save the registration template file");
     connect(p_saveTemplateFileAs, SIGNAL(triggered()), this,
         SLOT(saveTemplateFileAs()));
+
+    p_whatsThis = new QAction(QIcon(Filename(
+      "$base/icons/contexthelp.png").Expanded()),"&Whats's This", p_qnetTool);
+    p_whatsThis->setShortcut(Qt::SHIFT | Qt::Key_F1);
+    p_whatsThis->setToolTip("Activate What's This and click on parts "
+        "this program to see more information about them");
+    connect(p_whatsThis, SIGNAL(activated()), this, SLOT(enterWhatsThisMode()));
+
   }
 
 
@@ -521,6 +527,9 @@ namespace Isis {
     regMenu->addAction(p_openTemplateFile);
     regMenu->addAction(p_showHideTemplateEditor);
     regMenu->addAction(p_saveChips);
+
+    QMenu *helpMenu = p_qnetTool->menuBar()->addMenu("&Help");
+    helpMenu->addAction(p_whatsThis);
   }
 
 
@@ -532,6 +541,7 @@ namespace Isis {
     toolBar->addSeparator();
     toolBar->addAction(p_showHideTemplateEditor);
     toolBar->addAction(p_saveChips);
+    toolBar->addAction(p_whatsThis);
 
     p_qnetTool->addToolBar(Qt::TopToolBarArea, toolBar);
   }
@@ -3559,6 +3569,12 @@ namespace Isis {
                        QSettings::NativeFormat);
     settings.setValue("pos", p_qnetTool->pos());
     settings.setValue("size", p_qnetTool->size());
+  }
+
+
+
+  void QnetTool::enterWhatsThisMode() {
+    QWhatsThis::enterWhatsThisMode();
   }
 
 
