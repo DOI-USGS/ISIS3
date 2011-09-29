@@ -43,6 +43,34 @@
           <definition name="Control Network">
             A network of Control Points.
           </definition>
+
+          <definition name="Cube">
+            A cube is a 3-dimensional image with axis: samples, lines, and
+            bands. The physical dimensions of a cube are called the number of
+            samples (NS), number of lines (NL), and number of bands (NB).
+
+            Typically, the sample and line dimensions are used to represent
+            spatial information while the band dimension represents spectral
+            information. See the table below for examples of the line, sample,
+            and band dimensions of a few data sets from planetary missions.
+          </definition>
+
+          <definition name="Bit">
+            Short for binary digit, which in a computer is the smallest unit of
+            storage. Bits are either "0" or "1".
+          </definition>
+
+          <definition name="Byte">
+            Short for binary term. A byte is a collection of computer bits. On
+            many modern computers, a byte is a group of eight bits. Typically,
+            computers handle and store information in binary (base-2), and a
+            group of eight bits represents an eight digit binary number.
+          </definition>
+
+          <definition name="Byte">
+            Refers to how many bits there are per single meaningful value in an
+            image cube file.
+          </definition>
         </definitions>
       </body>
 
@@ -68,7 +96,7 @@
       processing in general.
     </brief>
     <description>
-      This article acts as a collection of common definitions used frequenlty in
+      This article acts as a collection of common definitions used frequently in
       ISIS and general image processing.
     </description>
     <author>Travis Addair</author>
@@ -76,8 +104,12 @@
   </bibliography>
 
   <history>
-    <change name="Travis Addair" date="2011-02-23">
+    <change name="Travis Addair" date="2011-09-23">
       Original version
+    </change>
+    <change name="Travis Addair" date="2011-09-29">
+      Reformatted to make adding new entries as simple as possible by
+      abstracting the HTML formatting away with XSLT
     </change>
   </history>
 </documentation>
