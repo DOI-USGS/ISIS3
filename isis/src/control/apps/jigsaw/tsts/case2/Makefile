@@ -12,7 +12,7 @@ commands:
 	cnet=$(INPUT)/mocVik.net \
 	onet=$(OUTPUT)/case2OutNet.net \
 	maxits=10 \
-	method=sparse \
+	method=oldsparse \
 	sigma0=1.e-5  \
 	update=yes \
 	spsolve=position | grep -v "100% Processed" | \

@@ -34,7 +34,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
     std::string errlog;
 
-    errlog = "CHOLMOD: ";
+    errlog = "SPARSE: ";
     errlog += message;
 
     PvlGroup gp(errlog);
@@ -130,7 +130,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     if ( m_pLsq )
       delete m_pLsq;
 
-    if ( m_strSolutionMethod == "CHOLMOD" )
+    if ( m_strSolutionMethod == "SPARSE" )
       freeCholMod();
   }
 
@@ -398,8 +398,8 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         m_nFixedPoints++;
 
         if ( m_strSolutionMethod == "SPECIALK"  ||
-             m_strSolutionMethod == "CHOLMOD" ||
-             m_strSolutionMethod == "SPARSE" ) {
+             m_strSolutionMethod == "SPARSE" ||
+             m_strSolutionMethod == "OLDSPARSE" ) {
           m_nPointIndexMap.push_back(count);
           count++;
         }
@@ -475,8 +475,8 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
     // Test code to match old test runs which don't solve for radius
     if ( m_strSolutionMethod != "SPECIALK"  &&
-        m_strSolutionMethod != "CHOLMOD" &&
-        m_strSolutionMethod != "SPARSE" ) {
+        m_strSolutionMethod != "SPARSE" &&
+        m_strSolutionMethod != "OLDSPARSE" ) {
       m_nNumPointPartials = 2;
 
       if (m_bSolveRadii) 
@@ -595,7 +595,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
   /**
    * Set decomposition method. Choices are...
    * SpecialK (dense normal equations matrix)
-   * Cholmod (sparse normal equations matrix)
+   * Sparse (Cholmod sparse normal equations matrix)
    */
   void BundleAdjust::SetDecompositionMethod(DecompositionMethod method) {
     m_decompositionMethod = method;
@@ -650,8 +650,8 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     int nPointParameterColumns = m_pCnet->GetNumValidPoints() * m_nNumPointPartials;
 
     if (m_strSolutionMethod != "SPECIALK" &&
-        m_strSolutionMethod != "CHOLMOD" &&
-        m_strSolutionMethod != "SPARSE")
+        m_strSolutionMethod != "SPARSE" &&
+        m_strSolutionMethod != "OLDSPARSE")
       nPointParameterColumns -= m_nFixedPoints * m_nNumPointPartials;
 
     return m_nImageParameters + nPointParameterColumns;
@@ -710,7 +710,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // initializations for cholmod
-    if ( m_strSolutionMethod == "CHOLMOD" )
+    if ( m_strSolutionMethod == "SPARSE" )
       initializeCholMod();
   }
 
@@ -3227,7 +3227,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     // Create the basis function and prep for a least squares solution
     m_nBasisColumns = BasisColumns();
     BasisFunction basis("Bundle", m_nBasisColumns, m_nBasisColumns);
-    if (m_strSolutionMethod == "SPARSE") {
+    if (m_strSolutionMethod == "OLDSPARSE") {
       m_pLsq = new Isis::LeastSquares(basis, true,
                                       m_pCnet->GetNumValidMeasures() * 2, m_nBasisColumns, true);
         SetParameterWeights();
@@ -3319,7 +3319,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         else if (m_strSolutionMethod == "QRD") {
           m_pLsq->Solve(Isis::LeastSquares::QRD);
         }
-        // next is the SPARSE solution
+        // next is the old SPARSE solution
         else {
 
           int zeroColumn = m_pLsq->Solve(Isis::LeastSquares::SPARSE);
@@ -3397,9 +3397,9 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
   }
 
   /**
-   * Retrieve parameter correction vector for sparse least-squares object and parse
-   * into m_Image_Corrections and m_Point_Corrections vectors so we can use the
-   * same output as SpecialK solution
+   * Retrieve parameter correction vector for old sparse least-squares object
+   * and parse into m_Image_Corrections and m_Point_Corrections vectors so we
+   * can use the same output as SpecialK and Cholmod Sparse solutions
    */
   void BundleAdjust::GetSparseParameterCorrections() {
 
@@ -3479,7 +3479,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
                         CameraGroundMap::WRT_Longitude);
 
     // Test to match old test run that didn't solve for radius
-    if (m_bSolveRadii || m_strSolutionMethod == "SPARSE")
+    if (m_bSolveRadii || m_strSolutionMethod == "OLDSPARSE")
     d_lookB_WRT_RAD = point->GetMeasure(0)->Camera()->GroundMap()->PointPartial(
                         point->GetAdjustedSurfacePoint(),
                         CameraGroundMap::WRT_Radius);
@@ -3571,8 +3571,8 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       // partials for 3D point
       if (point->GetType() != ControlPoint::Fixed  ||
           m_strSolutionMethod == "SPECIALK"  ||
-          m_strSolutionMethod == "CHOLMOD"  ||
-          m_strSolutionMethod == "SPARSE") {
+          m_strSolutionMethod == "SPARSE"  ||
+          m_strSolutionMethod == "OLDSPARSE") {
         nIndex = PointIndex(nPointIndex);
         pCamera->GroundMap()->GetdXYdPoint(d_lookB_WRT_LAT, &px[nIndex],
                                          &py[nIndex]);
@@ -3582,7 +3582,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         nIndex++;
 
         // test added to check old test case that didn't solve for radii
-        if (m_bSolveRadii || m_strSolutionMethod == "SPARSE")
+        if (m_bSolveRadii || m_strSolutionMethod == "OLDSPARSE")
           pCamera->GroundMap()->GetdXYdPoint(d_lookB_WRT_RAD, &px[nIndex],
                                          &py[nIndex]);
 
@@ -5481,8 +5481,8 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       if (point->IsIgnored())
         continue;
       if (m_strSolutionMethod != "SPECIALK" &&
-          m_strSolutionMethod != "CHOLMOD"  &&
           m_strSolutionMethod != "SPARSE"  &&
+          m_strSolutionMethod != "OLDSPARSE"  &&
           point->GetType() == ControlPoint::Fixed)
         continue;
 
@@ -5509,7 +5509,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       while (dLon < 0.0) dLon = dLon + 360.0;
 
       // test to match results of old test case that didn't solve for radius
-      if ( m_bSolveRadii || m_strSolutionMethod == "SPARSE") {
+      if ( m_bSolveRadii || m_strSolutionMethod == "OLDSPARSE") {
       dRad += 1000.*basis.Coefficient(index);
       index++;
       }
@@ -5705,10 +5705,10 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
   }
 
   /**
-   * set parameter weighting for SPARSE solution
+   * set parameter weighting for old SPARSE solution
    *
    * @history 2011-04-19 Debbie A. Cook - Added initialization to m_Point_AprioriSigmas
-   *                      for sparse method case
+   *                      for old sparse method case
    */
   bool BundleAdjust::SetParameterWeights() {
 
@@ -6164,7 +6164,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
 //      std::cout << m_Image_Corrections << std::endl;
 
-      if( m_strSolutionMethod == "SPARSE" )
+      if( m_strSolutionMethod == "OLDSPARSE" )
       {
           lsqCovMatrix = m_pLsq->GetCovarianceMatrix();  // get reference to the covariance matrix from the least-squares object
           bSolveSparse = true;
@@ -7443,7 +7443,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       output_columns.clear();
 
       gmm::row_matrix<gmm::rsvector<double> > lsqCovMatrix;
-      if (m_strSolutionMethod == "SPARSE" && m_bErrorPropagation) {
+      if (m_strSolutionMethod == "OLDSPARSE" && m_bErrorPropagation) {
 //      Get reference to the covariance matrix from the least-squares object
         lsqCovMatrix = m_pLsq->GetCovarianceMatrix();
         bSolveSparse = true;

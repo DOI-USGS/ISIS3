@@ -14,7 +14,7 @@ commands:
 	update=no \
 	maxits=50 \
 	method=specialk \
-	errorpropagation=no \
+	errorpropagation=yes \
 	outlier_rejection=no \
 	sigma0=1.e-10  \
 	ckdegree=yes \

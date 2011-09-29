@@ -7,7 +7,7 @@ commands:
 	$(APPNAME) fromlist=$(OUTPUT)/cube.lis \
 	cnet=$(INPUT)/apollo_basin_qnet.net \
 	onet=$(OUTPUT)/out.net \
-	method=sparse \
+	method=oldsparse \
 	maxits=5 \
 	sigma0=1.0e-5 \
 	update=no \

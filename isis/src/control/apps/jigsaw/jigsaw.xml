@@ -5,8 +5,33 @@
   </brief>
 
   <description>
-    This program takes as input a control network and list of level 1 cubes.  It uses the control network to solve for new
-    camera pointing for each of the cubes.  This helps eliminate mismatches in mosaics of multiple images.
+    <p>
+      This program performs a bundle adjustment on a group of overlapping Isis 3, level 
+      1 cubes from framing and/or line-scan cameras.  The adjustment simultaneously 
+      refines the selected image geometry information (camera pointing, spacecraft 
+      position) and control point coordinates (x,y,z or lat,lon,radius) to reduce 
+      boundary mismatches in mosaics of the images.  The application assumes spiceinit 
+      has been run on the input cubes so that SPICE is included in the Isis 3 cube 
+      labels in the Kernels group.
+    </p>  
+<!--
+    <img src='assets/higlob_diagram.png' alt='Diagram of output pixel groups' width='444' height='520' />
+-->
+    <p>
+      In order to run the program the user must provide a list of input cubes, an 
+      input control net, the name of an output control net, and the adjustment 
+      parameters. The program outputs a new control net that includes the initial 
+      state of the points in the network and their final state after the adjustment.  
+      The SPICE in the cube files is updated at the end of the adjustment only if it 
+      converges and the adjusted flag is turned on.  Optional output files can be 
+      selected to provide more information for analyzing the results.
+    </p>
+    <p>
+      The bundle adjustment solution minimizes the sum of the squares of the weighted 
+      residuals of the image Spice and control point 3-d positions included in the 
+      solution.  The measured sample/line positions associated with the control points 
+      are not changed.
+    </p>
   </description>
 
   <category>
@@ -52,6 +77,12 @@
     <change name="Debbie A. Cook" date="2011-06-14">
       Modified code to prevent updates to cube files in held list.
     </change>
+    <change name="Debbie A. Cook" date="2011-09-28">
+      Removed SC_SIGMAS from user parameter list because it is not
+      fully implemented; changed method name SPARSE to OLDSPARSE
+      and CHOLMOD to SPARSE; and improved the documentation for
+      the Isis3.3.0 release.
+    </change>
   </history>
 
   <groups>
@@ -79,7 +110,11 @@
           Held list
         </brief>
         <description>
-          This file contains a list of all cubes whose pointing angles will be held in the adjustment.
+          This file contains a list of all cubes whose orientation and position
+          will be held in the adjustment.  These images will still be included
+          in the solution, but their camera orientation and spacecraft position
+          will be constrained to keep the values from changing.  This is an
+          optional parameter and the default is to not hold any of the images.
         </description>
         <filter>
           *.txt *.lis
@@ -93,13 +128,16 @@
           Input control network
         </brief>
         <description>
-          This file is a control network generated from programs such as autoseed or qnet
+          This file is a control network generated from programs such as 
+          autoseed or qnet.  It contains the control points and associated
+          measures.
         </description>
         <filter>
           *.net
         </filter>
       </parameter>
 
+<!--  Removed until fully functional 2011-09-26
       <parameter name="SC_SIGMAS">
         <type>filename</type>
         <internalDefault>none</internalDefault>
@@ -119,6 +157,7 @@
           *.csv *.txt
         </filter>
       </parameter>
+-->
 
       <parameter name="ONET">
         <type>filename</type>
@@ -127,7 +166,8 @@
           Output control network
         </brief>
         <description>
-          This file will contain the update control network with residuals for each measurement.
+          This output file contains the updated control network with the final
+          coordinates of the control points and residuals for each measurement.
         </description>
         <filter>
           *.net
@@ -137,13 +177,17 @@
 
     <group name="Solve Options">
       <parameter name="OBSERVATIONS">
-        <brief> Keep instances of the same observation in different cube files dependent</brief>
+        <brief> Keep instances of the same observation in different cube files the same</brief>
         <description>
-            This option will solve for spice on all cubes with a matching observation number as though they were a single image.
-            For most missions the default observation number is the serial number of the cube file so that a single cube is an observation.
-            However all Lunar Orbiter missions have defined observation numbers that are different from their serial numbers, so that the 3
-            subframes of a Lunar Orbiter High Resolution frame will be treated as a single observation if this option is on.  Otherwise each
-            subframe will be adjusted independently.
+            This option will solve for SPICE on all cubes with a matching
+            observation number as though they were a single observation.  For 
+            most missions, the default observation number is equivalent to the 
+            serial number of the cube, and a single cube is an observation.
+            However, for the Lunar Orbiter mission an image has a defined 
+            observation number that is a substring of its serial number.  This
+            feature allows the three subframes of a Lunar Orbiter High
+            Resolution frame to be treated as a single observation when this 
+            option is used.  Otherwise each subframe is adjusted independently.
         </description>
         <type>boolean</type>
         <default>
@@ -167,10 +211,12 @@
       <parameter name="UPDATE">
         <brief> Update cube label</brief>
         <description>
-            This option will write the results of the solution to each cube in the FROMLIST.  The pointing is written in the form of a SPICE
-            blob which is attached to the cube.  This only occurs if the solution converged to the requested tolerance within the
-            the requested number of iterations.  If this option is turned off, then only the output control network with the latitude/longitude/radius
-            for each point in  the solution and and the point residuals is created.
+            When this option is selected, the application will update the labels  
+            of the individual cubes in the FROMLIST with the final values from 
+            the solution if the adjustment converges.  The results are written 
+            to the SPICE blobs attached to the cube, overwriting the previous
+            values.  If this option is not selected, the cube files are not
+            changed.  All other output files are still created.
         </description>
         <type>boolean</type>
         <default>
@@ -182,49 +228,15 @@
         <type>string</type>
         <brief> Matrix solution method</brief>
         <default>
-          <item>CHOLMOD</item>
+          <item>SPARSE</item>
         </default>
         <description>
-          <p>
             Enter the desired method to use to solve the matrix.  Methods will
-            vary in speed and accuracy.   The default, QRD,  is the preferred
-            method, unless the matrix is close to singular or the system being
-            solved has more than 2000 unknowns.  A matrix might be close to 
-            singular if some of the points are very close to each other, or if 
-            some of the images have camera angles that are nearly identical.  In 
-            the case of a nearly singular matrix, the SVD method wil work the 
-            best.  For larger bundle adjustments involving more than 2000 
-            unknowns, the SPARSE option will work the best.  To determine the 
-            number of unknowns use the following formula:
-          </p>
-          <p>
-              Total # Unknowns = observCount * (camUnknowns + spUnknowns) + controlPt*ptUnknowns,
-          </p>
-          <pre>
-            where, observCount = the number of images or observations
-
-                   camUnknowns = 2, if CAMSOLVE=ANGLES and TWIST is not checked
-                               = 3, if CAMSOLVE=ANGLES and TWIST is checked
-                               = 4, if CAMSOLVE=VELOCITIES and TWIST is not checked                                     
-                               = 5, if CAMSOLVE=VELOCITIES and TWIST is checked
-                               = 6, if CAMSOLVE=ACCELERATIONS and TWIST is not checked
-                               = 7, if CAMSOLVE=ACCELERATIONS and TWIST is checked
-                               = SOLVEDEGREE * 2 if TWIST is not checked
-                               = SOLVEDEGREE * 3 if TWIST is checked
-
-                    spUnknowns = 0, if SPSOLVE=NONE
-                               = 3, if SPSOLVE=POSITION
-                               = 6, if SPSOLVE=VELOCITIES
-                               = 9, if SPSOLVE=ACCELERATIONS
-
-                     controlPt = The number of control points in the network
-
-                    ptUnknowns = 2, if RADIUS is not checked in the Solve Options box
-                               = 3, if RADIUS is checked in the Solve Options box
-        </pre>
+            vary in speed and accuracy.   The default, SPARSE, is the preferred
+            method because of speed and memory usage.  
         </description>
         <list>
-        <option value="CHOLMOD">
+        <option value="SPARSE">
           <brief>CholMod (sparse)</brief>
           <description>
             Solve with CholMod sparse decomposition.
@@ -252,7 +264,7 @@
             </description>
           </option>
 -->
-          <option value="SPARSE">
+          <option value="OLDSPARSE">
             <brief> Sparse matrix solver</brief>
             <description> 
               Solve the matrix using a sparse matrix solver.
@@ -267,7 +279,8 @@
         <brief> Compute variance-covariance matrix</brief>
         <description>
             Select this option to compute the variance-covariance matrix of the 
-            parameters.
+            parameters.  The parameter uncertainties can be computed from this
+            matrix.
         </description>
         <type>boolean</type>
         <default>
@@ -291,7 +304,10 @@
       <parameter name="SIGMA0">
         <brief> standard deviation of unit weight
         </brief>
-        <description> Converges on stabilization of Sigma0</description>
+        <description>
+          Converges on stabilization of Sigma0.  Convergence occurs when the change
+          in sigma0 between iterations is less than or equal to Sigma0.
+        </description>
         <type>double</type>
         <default>
           <item>1.0e-10</item>
@@ -301,7 +317,10 @@
       <parameter name="MAXITS">
         <brief> iterations
         </brief>
-        <description> Number of iterations</description>
+        <description>
+          Maximum number of times to iterate.  The application stops iterating at
+          MAXIT, or when convergence is reached.
+        </description>
         <type>integer</type>
         <default>
           <item>50</item>
@@ -333,67 +352,76 @@
           The degree of the polynomial being fit to in the bundle adjustment
         </brief>
         <description>
-                The degree of the polynomial being fit to in the bundle adjust 
-                solution.  This polynomial can be different from the one used to 
-                generate the apriori camera angles used in the first iteration.  
-                In the case of an instrument with a jitter problem, a higher 
-                degree polynomial fit to each of the camera angles might provide 
-                a better solution (smaller errors).
+               The degree of the polynomial being fit to in the bundle adjust 
+               solution.  This polynomial can be different from the one used to 
+               generate the apriori camera angles used in the first iteration.  
+               In the case of an instrument with a jitter problem, a higher 
+               degree polynomial fit to each of the camera angles might provide 
+               a better solution (smaller errors).
         </description>
       </parameter>
       <parameter name="CAMSOLVE">
         <type>string</type>
-        <brief> Sets which, if any,  camera pointing factors to include in the bundle adjustment"</brief>
+        <brief> Camera pointing parameters to include in the bundle adjustment</brief>
         <default>
           <item>ANGLES</item>
         </default>
         <description>
-                This parameter is used to specify which camera pointing factors to fit in the adjustment.  At least one item must be selected in this group or the spacecraft group, or the application will have nothing to adjust.
+               This parameter is used to specify which, if any,  camera 
+               pointing parameters to include in the adjustment.
         </description>
         <list>
           <option value="NONE">
             <brief> Don't solve for any camera pointing factors</brief>
             <description>
-                         If this option is selected, no camera pointing factors will be adjusted.
+                   If this option is selected, no camera pointing parameters  
+                   will be adjusted.
             </description>
           </option>
 
           <option value="ANGLES">
-            <brief>Solve for camera angles: right ascension, declination, and optionally twist</brief>
+            <brief>Solve for camera angles: angle1 and angle2, and optionally twist</brief>
             <description>
-                        Camera angles in each cube will be adjusted in the solution, but not angular velocities or accelerations. Adjustments are not be applied unless UPDATE is selected.
+                   Camera angles in each cube will be adjusted in the solution, 
+                   but not angular velocities or accelerations. Adjustments are 
+                   not applied unless the solution converges and UPDATE is 
+                   selected.
             </description>
           </option>
 
           <option value="VELOCITIES">
             <brief>Solve for camera angles AND their angular velocities</brief>
             <description>
-                        Camera angles (right ascension, declination, and optionally twist) and their angular velocities will be adjusted in the solution.
+                   Camera angles (angle1, angle2, and optionally twist) and 
+                   their angular velocities will be adjusted in the solution.
             </description>
           </option>
 
           <option value="ACCELERATIONS">
             <brief>Solve for camera angles, their angular velocities and accelerations</brief>
             <description>
-                        Camera angles (right ascension, declination, and optionally twist), their angular velocities and accelerations will be adjusted in the solution.
+                   Camera angles (angle1, angle2, and optionally twist), 
+                   the angular velocities and accelerations will be 
+                   adjusted in the solution.
             </description>
           </option>
 
           <option value="ALL">
             <brief>Solve for all coefficients in the polynomials fit to the camera angles.</brief>
             <description>
-                  If this option is selected, all coefficients of the
-                        solve equation will be fit in the solution
-                        (SOLVEDEGREE+1 coefficients)
+                   If this option is selected, all coefficients of the solve
+                   equation will be adjusted in the solution (SOLVEDEGREE+1 
+                   coefficients)
             </description>
           </option>
         </list>
       </parameter>
 
       <parameter name="TWIST">
-        <brief> Solve for twist?</brief>
+        <brief> Solve for twist</brief>
         <description>
-                If this option is on, the twist angle will be adjusted in the bundle adjustment solution.
+               If this option is selected, the twist angle will be adjusted in the 
+               bundle adjustment solution.
         </description>
         <type>boolean</type>
         <default>
@@ -405,39 +433,46 @@
     <group name="Spacecraft Options">
       <parameter name="SPSOLVE">
         <type>string</type>
-        <brief> Sets which, if any, spacecraft position factors to include in the adjustment</brief>
+        <brief> Spacecraft position parameters to include in the adjustment</brief>
         <default>
           <item>NONE</item>
         </default>
         <description>
-              This parameter is used to specify which spacecraft position factors to fit in the adjustment.
+               This parameter is used to specify which, if any,  spacecraft 
+               position parameters to include in the adjustment.
         </description>
         <list>
           <option value="NONE">
             <brief>Don't solve for any spacecraft position factors</brief>
             <description>
-                         No spacecraft position factors will be adjusted.  A camera angle factor must be included in the adjustment in order for the application to run.
+                   No spacecraft position factors will be adjusted.  A camera 
+                   angle factor must be included in the adjustment in order for 
+                   the application to run.
             </description>
           </option>
 
           <option value="POSITION">
             <brief>Solve for the spacecraft positions</brief>
             <description>
-                         Spacecraft positions will be adjusted in the solution, but not the velocity or the acceleration.
+                   Spacecraft positions will be adjusted in the solution, but 
+                   not the velocity or the acceleration.
             </description>
           </option>
 
           <option value="VELOCITIES">
             <brief>Solve for the spacecraft positions and velocities</brief>
             <description>
-                         Spacecraft positions will be adjusted in the solution, as well as the velocities of the spacecraft at each instance.
+                   Spacecraft positions will be adjusted in the solution, as 
+                   well as the velocities of the spacecraft at each instance.
             </description>
           </option>
 
           <option value="ACCELERATIONS">
             <brief>Solve for the spacecraft positions, velocities, and accelerations</brief>
             <description>
-                         Spacecraft positions will be adjusted in the solution, as well as the velocities and accelerations of the spacecraft at each instance.
+                   Spacecraft positions will be adjusted in the solution, as well 
+                   as the velocities and accelerations of the spacecraft at each 
+                   instance.
             </description>
           </option>
         </list>
@@ -446,10 +481,12 @@
 
       <group name="Parameter Uncertainties">
         <parameter name="POINT_LATITUDE_SIGMA">
-          <brief> global latitude uncertainty for all points (meters)
+          <brief> Global latitude uncertainty for all points (meters)
           </brief>
-          <description> global latitude uncertainty for all points 
-            (meters)</description>
+          <description> 
+                 This optional value will be used as the global latitude 
+                 uncertainty for all points.  Units are meters.
+          </description>
           <type>double</type>
           <default>
             <item>-1.0</item>
@@ -457,10 +494,12 @@
         </parameter>
 
         <parameter name="POINT_LONGITUDE_SIGMA">
-          <brief> global longitude uncertainty for all points (meters)
+          <brief> Global longitude uncertainty for all points (meters)
           </brief>
-          <description> global longitude uncertainty for all points 
-            (meters)</description>
+          <description> 
+                 This optional value will be used as the global longitude 
+                 uncertainty for all points. Units are meters. 
+          </description>
           <type>double</type>
           <default>
             <item>-1.0</item>
@@ -468,10 +507,12 @@
         </parameter>
 
         <parameter name="POINT_RADIUS_SIGMA">
-          <brief> global radius uncertainty for all points (meters)
+          <brief> Global radius uncertainty for all points (meters)
           </brief>
-          <description> Global radius uncertainty for all points 
-            (meters)</description>
+          <description> 
+                 This value will be used as the global radius uncertainty for 
+                 all points.  Units are meters.
+          </description>
           <type>double</type>
           <default>
             <item>-1.0</item>
@@ -479,10 +520,12 @@
         </parameter>
 
         <parameter name="SPACECRAFT_POSITION_SIGMA">
-          <brief> global uncertainty for spacecraft coordinates (meters)
+          <brief> Global uncertainty for spacecraft coordinates (meters)
           </brief>
-          <description> global uncertainty for spacecraft coordinates
-            (meters)</description> 
+          <description> 
+                 This value will be used as the global uncertainty for spacecraft 
+                 coordinates.  Units are meters.
+          </description> 
           <type>double</type>
           <default>
             <item>-1.0</item>
@@ -490,9 +533,11 @@
         </parameter>
 
         <parameter name="SPACECRAFT_VELOCITY_SIGMA">
-          <brief> global uncertainty for spacecraft velocity (meters/second)
+          <brief> Global uncertainty for spacecraft velocity (meters/second)
           </brief>
-          <description> global uncertainty for spacecraft coordinates
+          <description> 
+                 This value will be used as the global uncertainty for spacecraft 
+                 velocity.  Units are meters/second.
             (meters)</description> 
           <type>double</type>
           <default>
@@ -501,10 +546,12 @@
         </parameter>
 
         <parameter name="SPACECRAFT_ACCELERATION_SIGMA">
-          <brief> global uncertainty for spacecraft acceleration 
+          <brief> Global uncertainty for spacecraft acceleration 
             (meters/second/second)</brief>
-          <description> global uncertainty for spacecraft acceleration
-            (meters/second/second)</description> 
+          <description> 
+                 This value will be used as the global uncertainty for 
+                 spacecraft acceleration.  Units are meters/second/second.
+          </description> 
           <type>double</type>
           <default>
             <item>-1.0</item>
@@ -514,8 +561,10 @@
         <parameter name="CAMERA_ANGLES_SIGMA">
           <brief> global uncertainty for camera angles 
             (decimal degrees)</brief>
-          <description> global uncertainty for camera angles
-            (decimal degrees)</description> 
+          <description> 
+                 This value will be used as the global uncertainty for camera 
+                 angles.  Units are decimal degrees.
+          </description> 
           <type>double</type>
           <default>
             <item>-1.0</item>
@@ -523,10 +572,12 @@
         </parameter>
 
         <parameter name="CAMERA_ANGULAR_VELOCITY_SIGMA">
-          <brief> global uncertainty for camera angular velocity 
+          <brief> Global uncertainty for camera angular velocity 
             (decimal degrees/second)</brief>
-          <description> global uncertainty for camera angular velocity
-            (decimal degrees/second)</description> 
+          <description> 
+                 This value will be used as the global uncertainty for camera 
+                 angular velocity.  Units are decimal degrees/second.
+          </description> 
           <type>double</type>
           <default>
             <item>-1.0</item>
@@ -536,8 +587,10 @@
         <parameter name="CAMERA_ANGULAR_ACCELERATION_SIGMA">
           <brief> global uncertainty for camera angular acceleration 
             (decimal degrees/second/second)</brief>
-          <description> global uncertainty for camera angular acceleration
-            (decimal degrees/second/second)</description> 
+          <description> 
+                 This value will be used as the global uncertainty for camera 
+                 angular acceleration.  Units are decimal degrees/second/second.
+          </description> 
           <type>double</type>
           <default>
             <item>-1.0</item>
@@ -556,35 +609,44 @@
             </description>
         </parameter>
 
-          <parameter name="BUNDLEOUT_TXT">
-            <brief> standard bundle output file - bundleout.txt
-            </brief>
-            <description> flags generation of standard bundle output file</description>
-            <type>boolean</type>
-            <default>
-              <item>yes</item>
-            </default>
-          </parameter>
+        <parameter name="BUNDLEOUT_TXT">
+          <brief> Standard bundle output file - bundleout.txt
+          </brief>
+          <description> 
+                 Selection of this parameter flags generation of the standard
+                 bundle output file
+          </description>
+          <type>boolean</type>
+          <default>
+            <item>yes</item>
+          </default>
+        </parameter>
 
-          <parameter name="OUTPUT_CSV">
-            <brief> outputs point and image data (body-fixed) to csv file - bundleout_points.csv
-            </brief>
-            <description> flags output of point and image data (body-fixed) to csv file</description>
-            <type>boolean</type>
-            <default>
-              <item>yes</item>
-            </default>
-          </parameter>
+        <parameter name="OUTPUT_CSV">
+          <brief> Outputs point and image data (body-fixed) to csv file - bundleout_points.csv
+          </brief>
+          <description> 
+                 Selection of this parameter flags output of point and image data
+                 (in body-fixed coordinates) to csv file.
+          </description>
+          <type>boolean</type>
+          <default>
+            <item>yes</item>
+          </default>
+        </parameter>
 
-          <parameter name="RESIDUALS_CSV">
-            <brief> outputs image coordinate residuals to csv file - residuals.csv</brief>
-            <description> flags output of image coordinate residuals to csv file</description>
-            <type>boolean</type>
-            <default>
-              <item>yes</item>
-            </default>
-          </parameter>
-        </group>
+        <parameter name="RESIDUALS_CSV">
+          <brief> Outputs image coordinate residuals to csv file - residuals.csv</brief>
+          <description> 
+                 Selection of this parameter flags output of image coordinate 
+                 residuals to a csv file
+          </description>
+          <type>boolean</type>
+          <default>
+            <item>yes</item>
+          </default>
+        </parameter>
+      </group>
 
     </groups>
 </application>

@@ -9,7 +9,7 @@ commands:
 	cnet=$(INPUT)/redPntreg.net \
 	onet=$(OUTPUT)/case01OutNet.net \
 	observations=yes \
-	method=sparse \
+	method=oldsparse \
 	solvedegree=3 \
 	camsolve=all \
 	update=yes \

@@ -93,6 +93,8 @@
  *                          cameraList.  Added this back in (was originally
  *                          added on 2011-01-19), was deleted somewhere along
  *                          the line.
+ *   @history 2011-09-28 Debbie A. Cook Renamed SPARSE solve method to OLDSPARSE
+ *                          and CHOLMOD to SPARSE. 
  */
 
 #include <QObject> // parent class

@@ -27,8 +27,9 @@ void IsisMain() {
     b = new BundleAdjust(cnetFile, cubeList);
    }
 
-  if (ui.WasEntered("SC_SIGMAS"))
-    b->ReadSCSigmas(ui.GetFilename("SC_SIGMAS"));
+  // For now don't use SC_SIGMAS.  This is not fully implemented yet.
+  // if (ui.WasEntered("SC_SIGMAS"))
+  //   b->ReadSCSigmas(ui.GetFilename("SC_SIGMAS"));
 
   b->SetObservationMode(ui.GetBoolean("OBSERVATIONS"));
   b->SetSolutionMethod(ui.GetString("METHOD"));
@@ -114,7 +115,7 @@ void IsisMain() {
       b->SetDecompositionMethod(BundleAdjust::SPECIALK);
       b->SolveCholesky();
     }
-    else if(ui.GetString("METHOD") == "CHOLMOD") {
+    else if(ui.GetString("METHOD") == "SPARSE") {
       b->SetDecompositionMethod(BundleAdjust::CHOLMOD);
       b->SolveCholesky();
     }
