@@ -1,5 +1,7 @@
 include $(ISISROOT)/make/isismake.macros
 
+.NOTPARALLEL:
+
 # ISIS DOCS MAKEFILE
 #   Create XML table of contents for the documents
 #   and generate upper level navigation pages
@@ -7,13 +9,20 @@ include $(ISISROOT)/make/isismake.macros
 
 
 DOCUMENTS    = $(filter-out CVS $(wildcard Makefile*) $(wildcard *.*) , $(wildcard *))
+
+RELEASENOTESPREREQ=$(wildcard ReleaseNotes/ReleaseNotesList.xml)
+
+ifneq ($(RELEASENOTESPREREQ), ReleaseNotes/ReleaseNotesList.xml)
+  DOCUMENTS    = $(filter-out CVS $(wildcard Makefile*) ReleaseNotes $(wildcard *.*) , $(wildcard *))
+endif
+
+DOCUMENTXMLS   = $(foreach DOC,$(DOCUMENTS),$(DOC)/$(DOC).xml)
+
 DOCDIR       = $(ISISROOT)/doc/documents
 
 
-
-
-docs: documents tocXML aboutisis general guides installation technicalinfo userdocs
-
+docs: tocXML
+	$(MAKE) documents aboutisis general guides installation technicalinfo userdocs
 
 
 # DOCUMENT LIST
@@ -33,16 +42,18 @@ documents:
 # TABLE OF CONTENTS XML
 # build tables of contents XML file for doc directories
 
-tocXML: ../build/doctoc.xml ../build/IsisDocumentTOCbuild.xsl
-../build/doctoc.xml: $(DOCDIR)
+tocXML: ../build/doctoc.xml ../build/IsisDocumentTOCbuild.xsl $(DOCUMENTXMLS)
+../build/doctoc.xml: $(DOCDIR) $(DOCUMENTXMLS)
 
-	echo "        Building Table of Contents XML"
-	cat ../build/doctoc_header.xml >  ../build/doctoc.xml
-	for dirname in $(DOCUMENTS); do \
-	  echo "          Adding [$$dirname]" ; \
-	  $(XALAN) $(XALAN_PARAM_OPTION) dirParam "'$$dirname'" $(XALAN_INFILE_OPTION) $$dirname/$$dirname.xml $(XALAN_XSL_OPTION) ../build/IsisDocumentTOCbuild.xsl >> ../build/doctoc.xml ; \
-	done
-	cat ../build/doctoc_footer.xml >> ../build/doctoc.xml
+	echo "        Building Table of Contents XML";                           \
+	cat ../build/doctoc_header.xml >  ../build/doctoc.xml;                   \
+	for dirname in $(DOCUMENTS); do                                          \
+	  echo "          Adding [$$dirname]" ;                                  \
+	  $(XALAN) $(XALAN_PARAM_OPTION) dirParam "'$$dirname'"                  \
+				$(XALAN_INFILE_OPTION) $$dirname/$$dirname.xml $(XALAN_XSL_OPTION) \
+				../build/IsisDocumentTOCbuild.xsl >> ../build/doctoc.xml ;         \
+	done;                                                                    \
+	cat ../build/doctoc_footer.xml >> ../build/doctoc.xml;                   \
 	echo "        Finished Building Table of Contents XML"
 
 
@@ -94,8 +105,18 @@ $(ISISROOT)/doc/UserDocs/index.html: ../build/doctoc.xml ../build/UserDocs.xsl
 	$(XALAN) $(XALAN_PARAM_OPTION) menuPath "'../'" $(XALAN_OUTFILE_OPTION) $(ISISROOT)/doc/UserDocs/index.html    $(XALAN_INFILE_OPTION) ../build/doctoc.xml $(XALAN_XSL_OPTION) ../build/UserDocs.xsl
 
 
+ReleaseNotes/ReleaseNotes.xml: ../build/ReleaseNotes.xsl ReleaseNotes/ReleaseNotesList.xml
+	if [ -f ReleaseNotes/ReleaseNotesList.xml ]; then \
+		$(XALAN) $(XALAN_PARAM_OPTION) dirParam "'ReleaseNotes'"         \
+					$(XALAN_INFILE_OPTION) ReleaseNotes/ReleaseNotesList.xml   \
+					$(XALAN_XSL_OPTION) ../build/ReleaseNotes.xsl >            \
+					ReleaseNotes/ReleaseNotes.xml ;                            \
+	fi;
+
+ReleaseNotes/ReleaseNotesList.xml: FORCE
 
 
+$(DOCUMENTXMLS):
 
 
 # CLEAN
@@ -105,8 +126,8 @@ clean:
 	    rm -f *.html ; \
 	    rm -f Makefile-temp ; \
 	    cd .. ; \
-	done
+	done ; \
+	rm ReleaseNotes/ReleaseNotes.xml
 
-
-
+FORCE:
 
