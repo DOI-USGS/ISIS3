@@ -223,30 +223,26 @@ namespace Isis {
 
     std::vector<double>::iterator pos = lower_bound(p_time.begin(), p_time.end(), currentEt);
 
-    int index;
-    if(pos == p_time.begin()) {
+    int index = p_time.size() - 1;
+    if (currentEt <= p_time[0]) {
       p_a[0] = p_a0[0];
       p_a[1] = p_a1[0];
       p_a[2] = p_a2[0];
       p_a[3] = p_a3[0];
     }
-    else {
+    else if (currentEt >= p_time.at(index)) {
+      p_a[0] = p_a0[index];
+      p_a[1] = p_a1[index];
+      p_a[2] = p_a2[index];
+      p_a[3] = p_a3[index];
+    } else { 
       index = pos - p_time.begin();
-      if((pos == p_time.end()) && (currentEt >= p_time[index])) {
-        index = p_time.size() - 1;
-        p_a[0] = p_a0[index];
-        p_a[1] = p_a1[index];
-        p_a[2] = p_a2[index];
-        p_a[3] = p_a3[index];
-      } 
-      else {
-        double weight = (currentEt - p_time[index-1]) / 
-                        (p_time[index] - p_time[index-1]);
-        p_a[0] = p_a0[index-1] * (1.0 - weight) + p_a0[index] * weight;
-        p_a[1] = p_a1[index-1] * (1.0 - weight) + p_a1[index] * weight;
-        p_a[2] = p_a2[index-1] * (1.0 - weight) + p_a2[index] * weight;
-        p_a[3] = p_a3[index-1] * (1.0 - weight) + p_a3[index] * weight;
-      }
+      double weight = (currentEt - p_time.at(index-1)) / 
+                      (p_time.at(index) - p_time.at(index-1));
+      p_a[0] = p_a0[index-1] * (1.0 - weight) + p_a0[index] * weight;
+      p_a[1] = p_a1[index-1] * (1.0 - weight) + p_a1[index] * weight;
+      p_a[2] = p_a2[index-1] * (1.0 - weight) + p_a2[index] * weight;
+      p_a[3] = p_a3[index-1] * (1.0 - weight) + p_a3[index] * weight;
     }
   }
 
