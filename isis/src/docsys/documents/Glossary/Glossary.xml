@@ -18,7 +18,7 @@
           </definition>
 
           <definition name="Emissivity">
-            A measure describing a substances ability to absorb and radiate
+            A measure describing a substance's ability to absorb and radiate
             electromagnetic energy.
           </definition>
 
@@ -71,6 +71,18 @@
             Refers to how many bits there are per single meaningful value in an
             image cube file.
           </definition>
+
+          <definition name="Cube Serial Number">
+            A unique identifier assigned to a specific observation.
+          </definition>
+
+          <definition name="Polygon Thickness">
+            The thickness of a polygon is defined as follows:
+            <pre>
+              Thickness = Area / max(Xextent,Yextent)**2
+            </pre>
+            A polygon's thickness will be between 0 and 1.
+          </definition>
         </definitions>
       </body>
 
@@ -110,6 +122,10 @@
     <change name="Travis Addair" date="2011-09-29">
       Reformatted to make adding new entries as simple as possible by
       abstracting the HTML formatting away with XSLT
+    </change>
+    <change name="Jai Rideout" date="2011-09-30">
+      Added Cube Serial Number and Polygon Thickness definitions. Fixed a
+      couple of typos elsewhere.
     </change>
   </history>
 </documentation>
