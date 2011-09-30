@@ -33,6 +33,7 @@ Cube *icube;
 Photometry *pho;
 double maxema;
 double maxinc;
+bool usedem;
 string angleSource;
 double centerPhase;
 double centerIncidence;
@@ -717,6 +718,7 @@ cout << par << endl;
   // Set value for maximum emission/incidence angles chosen by user
   maxema = ui.GetDouble("MAXEMISSION");
   maxinc = ui.GetDouble("MAXINCIDENCE");
+  usedem = ui.GetBoolean("USEDEM");
   
   // determine how photometric angles should be calculated
   angleSource = ui.GetString("ANGLESOURCE");
@@ -852,7 +854,10 @@ void photomet(Buffer &in, Buffer &out) {
         out[i] = NULL8;
       }
       // if angles greater than max allowed by user, set to null
-      else if(deminc > maxinc || demema > maxema) {
+      else if(usedem && (deminc > maxinc || demema > maxema)) {
+        out[i] = NULL8;
+      }
+      else if(!usedem && (ellipsoidinc > maxinc || ellipsoidema > maxema)) {
         out[i] = NULL8;
       }
       // otherwise, do photometric correction

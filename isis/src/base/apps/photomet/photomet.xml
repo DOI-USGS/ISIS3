@@ -550,6 +550,21 @@
         <maximum inclusive="yes">90.0</maximum>
         <default><item> 90.0</item></default>
       </parameter>
+      <parameter name="USEDEM">
+        <type>boolean</type>
+        <brief>
+          Use DEM photometric angles when trimming
+        </brief>
+        <default>
+          <item>FALSE</item>
+        </default>
+        <description>
+          This determines if the trimming will be performed based on the 
+          photometric angles obtained from the DEM surface. If this parameter is
+          set to False, then the photometric angles will be obtained from the
+          ellipsoidal surface.
+        </description>
+      </parameter>
     </group>
     
     <group name="Angle Source Options">
