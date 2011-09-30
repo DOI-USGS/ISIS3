@@ -574,12 +574,9 @@ namespace Isis {
 
           // Smart resolution is getting a better resolution for projected
           //   images. It works by calculating the lat/lon centered on the
-          //   pixel we're looking at. Do not do this for the current viewport
-          //   because we're not changing its resolution (but if we do it,
-          //   the scale should not move; I verified this is true -SL).
+          //   pixel we're looking at.
           bool smartResSucceeded = false;
-          if (syncScale && groundMap && viewport != activeViewport &&
-              groundMap->HasProjection()) {
+          if (syncScale && groundMap && groundMap->HasProjection()) {
             double resolution = Null;
 
             if (groundMap->SetImage(samp - 0.5, line - 0.5)) {
