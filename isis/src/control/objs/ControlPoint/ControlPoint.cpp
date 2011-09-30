@@ -435,6 +435,7 @@ namespace Isis {
     }
 
     if (!measures->size()) {
+      if (referenceMeasure) abort();
       ASSERT(referenceMeasure == NULL);
       referenceMeasure = measure;
     }
@@ -1958,30 +1959,29 @@ namespace Isis {
    *                          to const &.  Re-wrote using Delete and AddMeasure
    *                          methods, so that the ControlGraphNode is updated
    *                          correctly.
+   *   @history 2011-09-30 Tracie Sucharski - Fixed some memory leaks and
+   *                          deleted some calls that were already handled in
+   *                          AddMeasure.
    */
   const ControlPoint &ControlPoint::operator=(const ControlPoint &other) {
 
     if (this != &other) {
+      editLock = false;
       for (int i = cubeSerials->size() - 1; i >= 0; i--) {
         Delete(cubeSerials->at(i));
       }
 
-      measures = new QHash< QString, ControlMeasure * >;
+      //measures->clear(); = new QHash< QString, ControlMeasure * >;
 
       QHashIterator< QString, ControlMeasure * > i(*other.measures);
       while (i.hasNext()) {
         i.next();
         ControlMeasure *newMeasure = new ControlMeasure;
         *newMeasure = *i.value();
-        if (other.referenceMeasure == i.value())
-          referenceMeasure = newMeasure;
-        QString newSerial = newMeasure->GetCubeSerialNumber();
-        newMeasure->parentPoint = this;
         AddMeasure(newMeasure);
+        if (other.referenceMeasure == i.value())
+          SetRefMeasure(newMeasure);
       }
-
-      if (referenceMeasure == NULL && cubeSerials->size() != 0)
-        referenceMeasure = measures->value(cubeSerials->at(0));
 
       id             = other.id;
       chooserName    = other.chooserName;
