@@ -160,7 +160,7 @@
         <brief>
           User note to be added to the output file
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           The user can specify a note to be added to the output file using this parameter.
         </description>
@@ -216,7 +216,7 @@
         <brief>
           Single Scattering Albedo
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           Single-scattering albedo of surface particles. See Hapke 
           (1981).  Not to be confused with albedo WHA of the atmospheric 
@@ -229,7 +229,7 @@
         <brief>
           Opposition Surge Width
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           Opposition Surge Width. ZEROs are strongly advised as the simple models 
           do not fit the opposition effect well. See Hapke (1984).
@@ -241,7 +241,7 @@
         <brief>
           Opposition Surge Strength
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           Opposition Surge Strength. Magnitude of the opposition effect for
           the surface. ZEROs are strongly advised as the simple models do
@@ -254,7 +254,7 @@
         <brief>
           Surface roughness in degrees
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           Small scale surface roughness in degrees. "Macroscopic roughness"
           of the surface as it affects the photometric behavior. This is the
@@ -269,7 +269,7 @@
         <brief>
           Henyey-Greenstein coefficient 1
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           Asymmetry parameter used in the Henyey-Greenstein model for the
           scattering phase function of single particles in the surface, 
@@ -285,7 +285,7 @@
         <brief>
           Henyey-Greenstein coefficient 2
         </brief> 
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           Second parameter of the two-parameter Henyey-Greenstein model
           for the scattering phase function of single particles in the 
@@ -301,7 +301,7 @@
         <brief>
           Legendre coefficient 1
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           Coefficient of the first order Legendre polynomial in the
           single particle phase function. When PHTNAME=HAPKELEG, a
@@ -318,7 +318,7 @@
         <brief>
           Legendre coefficient 2
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           Coefficient of the second order Legendre polynomial in the
           single particle phase function. When PHTNAME=HAPKELEG, a
@@ -567,7 +567,7 @@
         <brief>
           Normal atmospheric optical depth
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           Normal atmospheric optical depth
         </description>
@@ -578,7 +578,7 @@
         <brief>
           Single-scattering albedo
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           Single-scattering albedo of atmospheric particles, not to be
           confused with the albedo WH of surface particles.
@@ -590,7 +590,7 @@
         <brief>
           Henyey-Greenstein coefficient for atmospheric particles
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           Parameter used in the Henyey-Greenstein single particle phase 
           function for atmospheric particles when ATMNAME=HAPKEATM1 or
@@ -607,7 +607,7 @@
         <brief>
           Atmospheric particle Legendre coefficient
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           Coefficient of the first order Legendre polynomial in the
           single particle phase function for atmospheric scattering.
@@ -625,7 +625,7 @@
         <brief>
           Atmospheric shell thickness
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           Atmospheric shell thickness normalized to planet radius, used
           to correct the path lengths of atmospheric transmission for the
@@ -655,7 +655,7 @@
         <brief>
           Minimum Emission Angle
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           Minimum emission angle included in the fit. The empirical
           photometric function will be fitted to the Hapke model over a
@@ -673,7 +673,7 @@
         <brief>
           Maximum Emission Angle
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           Maximum emission angle included in the fit. The empirical
           photometric function will be fitted to the Hapke model over a
@@ -691,7 +691,7 @@
         <brief>
           Fraction of phase angle to add to maximum emission angle
         </brief> 
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           EMAMAX_PCOEFF allows the range of emission angles included in
           the fit to increase slightly at high phase angles, because 
@@ -708,7 +708,7 @@
           Minimum Incidence Angle
         </brief>
         <type>double</type>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           Minimum incidence angle included in the fit. The empirical
           photometric function will be fitted to the Hapke model over 
@@ -726,7 +726,7 @@
           Maximum Incidence Angle
         </brief>
         <type>double</type>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           Maximum incidence angle included in the fit. The empirical
           photometric function will be fitted to the Hapke model over 
@@ -744,7 +744,7 @@
           Minimum Phase Angle
         </brief>
         <type>double</type>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           Minimum phase angle at which a fit will be performed, 
           corresponding to the first value in the output table.
@@ -756,7 +756,7 @@
           Maximum Phase Angle
         </brief>
         <type>double</type>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           Maximum phase angle at which a fit will be performed, 
           corresponding to the last value in the output table.
@@ -768,7 +768,7 @@
           Number of phase angles
         </brief>
         <type>integer</type>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           Number of phase angles at which a fit will be performed,
           equal to the number of values in the output table.

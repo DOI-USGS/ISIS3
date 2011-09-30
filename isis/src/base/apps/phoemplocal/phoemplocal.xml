@@ -10,36 +10,97 @@
     <pre>
     This program finds lunar-Lambert or Minnaert photometric functions
     to approximate a more realistic but more complex Hapke model.
-    The program is based on PHO_FIT_GLOBAL with the following differences:
+    The program is based on phoempglobal with the following differences:
     The fit is performed at a single geometry rather than for a range of phase 
     angles.  The user specifies the phase angle and the incidence and emission 
-    angles of the mean ground plane (datum), as well as the RMS slope relative to 
-    the dataum.  Artificial data are then created, with slopes drawn from an 
-    isotropic Gaussian distribution relative to the datum.  The simpler model is 
-    fit at these orientations to the Hapke model by adjusting its one parameter 
-    and its overall brightness so that the sum-squared-residual between the two is 
-    minimized.  Both the parameter (which, for both types of simple model, mainly 
-    controls limb darkening) and the brightness (normalized as an empirical phase 
-    curve) are reported.
+    angles of the mean ground plane (datum), as well as the root mean squared
+    (RMS) slope relative to the datum. Artificial data are then created, with 
+    slopes drawn from an isotropic Gaussian distribution relative to the datum.
+    The simpler model is fit at these orientations to the Hapke model by 
+    adjusting its one parameter and its overall brightness so that the 
+    sum-squared-residual between the two is minimized. Both the parameter 
+    (which, for both types of simple model, mainly controls limb darkening) 
+    and the brightness (normalized as an empirical phase curve) are reported.
 
-    This program should serve as a clear example for developing a new program 
-    PHO_FIT_IMAGE to fit the parameter of an empirical photometric function to 
-    part of an actual image. The differences can be summarized as follows:
-         1) Fit is done only once (not in a table vs. phase angle)
-            since the input image has a fixed geometry.
-         2) The data to be fit *to* are obtained from an ISIS cube plane
-           rather than calculated in GET_HAPKE_IMG.
-         3) Similarly, the incidence, emission, and phase angles are
-            obtained from backplanes of the same cube and maintained
-            in buffers corresponding point-for-point with the image.
-            The routine to pull values out of these buffers at the
-            current pixel can look identical to GET_ANGLES.
-         4) Both image data and angles should be stored in R*4 buffers
-            and converted to double precision before being used.
-         5) Optionally, a region-of-interest mask could be obtained
-            from a backplane and only those pixels in the ROI used
-            in the fit.  This would be in addition on the incidence
-            and emission angle tests already in the code.
+    This program is mainly intended to determine the best fitting simple
+    photometric model for a single image to support analysis by photoclinometry
+    (shape from shading). A full photometric scattering model is not generally
+    incorporated in photoclinometry software; instead, images are usually
+    precorrected by estimating and subtracting a uniform "haze" contribution
+    to the image. To facilitate this kind of use, phoemplocal can model the
+    combined effects of realistic surface and atmospheric scattering by
+    selecting an atmospheric model ATMNAME other than NONE, and by including
+    an additive offset in the fit (IORD=YES).
+
+    For the original description of the fitting process and a useful
+    compilation of Hapke parameters from the scientific literature, see McEwen
+    (1991). The atmospheric model used in the fits is discussed by Kirk et al.
+    (2000, 2001).
+
+    Example:  Mars
+
+    The following Hapke parameters for Mars are from Johnson
+    et al. (1999) for IMP data of Photometry Flats (soil) and may be
+    reasonably representative of Mars as a whole. Note that
+    (HG1, HG2=1.0) is equivalent to (-HG1, HG2=0.0)
+
+    Band    WH     B0     HH    HG1    HG2
+    Red    0.52  0.025  0.170  0.213 1.000
+    Green  0.29  0.290  0.170  0.190 1.000
+    Blue   0.16  0.995  0.170  0.145 1.000
+
+    Kirk et al. (2000) found that Mars whole-disk limb-darkening data of
+    Thorpe (1973) are consistent with THETA=30, but results of Tanaka and
+    Davis (1988) based on matching photoclinometry of local areas to shadow
+    data are more consistent with THETA=20 when the domain of the fit is
+    restricted to small emission angles (=&lt; 20 degrees).
+
+    Values of the photometric parameters for the martian atmosphere, adopted
+    from Tomasko et al. (1999) are:
+
+    Band  WHA     HGA
+    Red    0.95     0.68
+    Blue   0.76     0.78
+
+    Hapke, B. W., 1981. Bidirectional reflectance spectroscopy
+    1: Theory. J. Geophys. Res., pp. 86,3039-3054.
+
+    Hapke, B., 1984. Bidirectional reflectance spectroscopy
+    3: Corrections for macroscopic roughness. Icarus, 59, pp. 41-59.
+
+    Hapke, B., 1986. Bidirectional reflectance spectroscopy
+    4: The extinction coefficient and the opposition effect.
+    Icarus, 67, pp. 264-280.
+
+    Johnson, J. R., et al., 1999, Preliminary Results on Photometric
+    Properties of Materials at the Sagan Memorial Station, Mars,
+    J. Geophys. Res., 104, 8809.
+
+    Kirk, R. L., Thompson, K. T., Becker, T. L., and Lee, E. M.,
+    2000. Photometric modelling for planetary cartography.
+    Lunar Planet. Sci., XXXI, Abstract #2025, Lunar
+    and Planetary Institute, Houston (CD-ROM).
+
+    Kirk, R. L., Thompson, K. T., and Lee, E. M., 2001.
+    Photometry of the martian atmosphere:  An improved
+    practical model for cartography and photoclinometry.
+    Lunar Planet. Sci., XXXII, Abstract #1874, Lunar
+    and Planetary Institute, Houston (CD-ROM).
+
+    McEwen, A. S., 1991. Photometric functions for photo-
+    clinometry and other applications.  Icarus, 92, pp. 298-311.
+
+    Tanaka, K. L., and and Davis, P. A., 1988, Tectonic History of
+    the Syria Planum Provice of Mars, J. Geophys. Res., 93, 14,893.
+
+    Thorpe, T. E., 1973, Mariner 9 Photometric Observations of Mars
+    from November 1971 through March 1972, Icarus, 20, 482.
+
+    Tomasko, M. G., et al., 1999, Properties of Dust in the Martian
+    Atmosphere from the Imager on Mars Pathfinder, J. Geophys. Res.,
+    104, 8987
+
+    Programmer: Randolph Kirk, U.S.G.S., Flagstaff, AZ
     </pre>
   </description>
 
@@ -49,7 +110,7 @@
 
   <history>
     <change name="Randy Kirk" date= "1999-11-16">
-        USGS Flagstaff Original Version
+      USGS Flagstaff Original Version
     </change>
     <change name="Janet Barrett"  date="2003-01-13">
       Ported pho_fit_local from the VAX and renamed it 
@@ -70,7 +131,7 @@
             Output text file to contain fit parameters
         </brief>
         <internalDefault>
-          None
+          None Specified
         </internalDefault>
         <description>
           The output file has a table whose columns give the phase angle,
@@ -94,125 +155,200 @@
       </parameter>
     </group>
 
-     <group name="User Note">
-       <parameter name="NOTE">
+    <group name="User Note">
+      <parameter name="NOTE">
         <type>string</type>
         <brief>
-            User note to be added to output file
+          User note to be added to output file
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           The user can specify a note to be added to the output file using this parameter.
         </description>
-       </parameter>
+      </parameter>
     </group>
 
-     <group name="Hapke">
+    <group name="Hapke">
       <parameter name="PHTNAME">
         <type>combo</type>
         <internalDefault>HAPKEHEN</internalDefault>
         <default>
           <item>HAPKEHEN</item>
         </default>
-        <brief>Phase Function Type</brief>
+        <brief>
+          Surface Photometric Model
+        </brief>
         <description>
+         A Hapke (1981; 1984; 1966) photometric model is always used as the model
+          to which empirical functions are fitted. The options correspond to variants
+          of the Hapke model with different types of model for the single particle
+          phase (scattering) function.
         </description>
 
         <list>
           <option value="HAPKEHEN">
-            <brief> Hapke-Henyey-Greenstein photometric model</brief>
+            <brief> 
+              Use Henyey-Greenstein scattering function in Hapke photometric model
+            </brief>
             <description>
+              This is the two-parameter version of the Henyey-Greenstein single
+              particle phase function, with parameters HG1 and HG2.
             </description>
             <exclusions>
               <item>BH</item>
               <item>CH</item>
             </exclusions>
-         </option>
-         <option value="HAPKELEG">
-           <brief> Hapke-Legendre-Polynomial photometric model</brief>
-           <description>
-           </description>
-           <exclusions>
-             <item>HG1</item>
-             <item>HG2</item>
-           </exclusions>
-         </option>
+          </option>
+          <option value="HAPKELEG">
+            <brief>
+              Use Legendre-Polynomial in Hapke photometric model
+            </brief>
+            <description>
+              This is a two-term Legendre Polynomial expansion of the single
+              particle phase function, with parameters BH and CH.
+            </description>
+            <exclusions>
+              <item>HG1</item>
+              <item>HG2</item>
+            </exclusions>
+          </option>
         </list>
       </parameter>
 
-       <parameter name="WH">
+      <parameter name="WH">
         <type>double</type>
-        <brief>Single Scattering Albedo</brief>
-        <internalDefault>None</internalDefault>
-        <description>Single Scattering Albedo</description> 
-      </parameter>
-
-       <parameter name="HH">
-        <type>double</type>
-        <brief>Opposition Surge Width</brief>
-        <internalDefault>None</internalDefault>
-        <description>Opposition Surge Width. ZEROs are strongly advised as the simple models 
-        #do not fit the opposition effect well</description> 
-      </parameter>
-
-       <parameter name="B0">
-        <type>double</type>
-        <brief>Opposition Surge Strength</brief>
-        <internalDefault>None</internalDefault>
-        <description>Opposition Surge Strength. ZEROs are strongly advised as 
-        the simple models #do not fit the opposition effect well
+        <brief>
+          Single Scattering Albedo
+        </brief>
+        <internalDefault>None Specified</internalDefault>
+        <description>
+          Single-scattering albedo of surface particles. See Hapke
+          (1981).  Not to be confused with albedo WHA of the atmospheric
+          particles.
         </description>
       </parameter>
 
-       <parameter name="THETA">
+      <parameter name="HH">
         <type>double</type>
-        <brief>Surface roughness in degrees</brief>
-        <internalDefault>None</internalDefault>
-        <description>Small scale surface roughness in degrees</description> 
+        <brief>
+          Opposition Surge Width
+        </brief>
+        <internalDefault>None Specified</internalDefault>
+        <description>
+          Opposition Surge Width. ZEROs are strongly advised as the simple models
+          do not fit the opposition effect well. See Hapke (1984).
+        </description>
+      </parameter>
+
+      <parameter name="B0">
+        <type>double</type>
+        <brief>
+          Opposition Surge Strength
+        </brief>
+        <internalDefault>None Specified</internalDefault>
+        <description>
+          Opposition Surge Strength. Magnitude of the opposition effect for
+          the surface. ZEROs are strongly advised as the simple models do
+          not fit the opposition effect well. See Hapke (1984).
+        </description>
+      </parameter>
+
+      <parameter name="THETA">
+        <type>double</type>
+        <brief>
+          Surface roughness in degrees
+        </brief>
+        <internalDefault>None Specified</internalDefault>
+        <description>
+          Small scale surface roughness in degrees. "Macroscopic roughness"
+          of the surface as it affects the photometric behavior. This is the
+          root mean squared (RMS) slope at scales larger than the distance
+          photons penetrate the surface but smaller than a pixel.  See
+          Hapke (1986).
+        </description>
       </parameter> 
 
-       <parameter name="HG1">
+      <parameter name="HG1">
         <type>double</type>
-        <brief>Henyey-Greenstein coefficient 1</brief>
-        <internalDefault>None</internalDefault>
-        <description>Henyey-Greenstein coefficients for alternate phase 
-          function</description>
+        <brief>
+          Henyey-Greenstein coefficient 1
+        </brief>
+        <internalDefault>None Specified</internalDefault>
+        <description>
+          Asymmetry parameter used in the Henyey-Greenstein model for the
+          scattering phase function of single particles in the surface,
+          used if PHTNAME=HAPKEHEN. See Hapke (1981). The two-parameter
+          Henyey-Greenstein function is P(phase) = (1-HG2) *
+          (1-HG1**2)/(1+HG1**2+2*HG1*COS(PHASE))**1.5 + HG2 *
+          (1-HG1**2)/(1+HG1**2-2*HG1*COS(PHASE))**1.5
+        </description>
       </parameter>
 
-       <parameter name="HG2">
+      <parameter name="HG2">
         <type>double</type>
-        <brief>Henyey-Greenstein coefficient 2</brief> 
-        <internalDefault>None</internalDefault>
-        <description>Henyey-Greenstein coefficients for alternate phase 
-          function</description>
+        <brief>
+          Henyey-Greenstein coefficient 2
+        </brief> 
+        <internalDefault>None Specified</internalDefault>
+        <description>
+          Second parameter of the two-parameter Henyey-Greenstein model
+          for the scattering phase function of single particles in the
+          surface, used if PHTNAME=HAPKEHEN. This parameter controls the
+          proportions in a linear mixture of ordinary Heneyey-Greenstein
+          phase functions with asymmetry parameters equal to +HG1 and -HG1.
+          See HG1 for the full formula.
+        </description>
       </parameter>
 
-       <parameter name="BH">
+      <parameter name="BH">
         <type>double</type>
-        <brief>Legendre coefficient 1</brief>
-        <internalDefault>None</internalDefault>
-        <description>Coefficient of P1(cos(phase)) in single particle phase
-        for Legendre Function </description> 
+        <brief>
+          Legendre coefficient 1
+        </brief>
+        <internalDefault>None Specified</internalDefault>
+        <description>
+          Coefficient of the first order Legendre polynomial in the
+          single particle phase function. When PHTNAME=HAPKELEG, a
+          two-term Legendre polynomial expansion is used to represent
+          the scattering phase function of single particles in the
+          surface:  P(PHASE) = 1 + BH * P1(COS(PHASE)) + CH * P2(COS(PHASE))
+          where P1 and P2 are the first and second order Legendre
+          polynomials.
+        </description>
       </parameter>
 
-       <parameter name="CH">
+      <parameter name="CH">
         <type>double</type>
-        <brief>Legendre coefficient 2</brief>
-        <internalDefault>None</internalDefault>
-        <description>Coefficient of P1(cos(phase)) in single particle phase
-        for Legendre Function</description>
+        <brief>
+          Legendre coefficient 2
+        </brief>
+        <internalDefault>None Specified</internalDefault>
+        <description>
+          Coefficient of the second order Legendre polynomial in the
+          single particle phase function. When PHTNAME=HAPKELEG, a
+          two-term Legendre polynomial expansion is used to represent
+          the scattering phase function of single particles in the
+          surface:  P(PHASE) = 1 + BH * P1(COS(PHASE)) + CH * P2(COS(PHASE))
+          where P1 and P2 are the first and second order Legendre
+          polynomials.
+        </description>
       </parameter>
     </group>
 
     <group name="Empirical">
-         <parameter name="MODEL">
-          <type>combo</type>
-          <internalDefault>LunarLambert</internalDefault>
-          <brief>
-          </brief>
-          <description>
-          </description>
-          <list>
+      <parameter name="MODEL">
+        <type>combo</type>
+        <internalDefault>LunarLambert</internalDefault>
+        <brief>
+          Type of empirical photometric function fitted to the Hapke model.
+        </brief>
+        <description>
+          Determines which empirical photometric function will be fitted
+          to the Hapke model. The tables of B and L or B and K can be used with
+          the lunar-Lambert empirical or Minnaert empirical photometric
+          functions in the photometric normalization program photomet.
+        </description>
+        <list>
             <option value="LUNARLAMBERT">
               <brief>Lunar-Lambert Empirical Photometric Function</brief>
               <description>Include Lunar-Lambert Empirical Photometric Function to 
@@ -349,14 +485,14 @@
       <parameter name="TAU">
         <type>double</type>
         <brief>Normal atmospheric optical depth</brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>Normal atmospheric optical depth</description>
       </parameter>
 
       <parameter name="WHA">
         <type>double</type>
         <brief>Single-scattering albedo</brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>Single-scattering albedo of atmospheric 
           particles</description>
       </parameter>
@@ -364,7 +500,7 @@
       <parameter name="HGA">
         <type>double</type>
         <brief>Coeff of atmospheric particle Henyey-Greenstein</brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>Coeff of atmospheric particle Henyey-Greenstein phase 
           function</description>
       </parameter>
@@ -373,7 +509,7 @@
         <type>double</type>
         <brief>Coeff of atmospheric particle Legendre phase function
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>Coeff of atmospheric particle Legendre phase function. This 
         parameter is limited to values that are  GreaterThan Equal to -1 and 
         LessThanEqual to 1.</description>
@@ -382,7 +518,7 @@
       <parameter name="HNORM">
         <type>double</type>
         <brief>Atmospheric shell thickness</brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>Atmospheric shell thickness normalized to planet radius.
         Default 0.003 is for Mars.</description>
       </parameter>
@@ -403,7 +539,7 @@
     <group name="Mean Ground Plane(Datum) Geometry">
       <parameter name="EMISSION">
         <type>double</type>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <brief>
         </brief>
         <description>
@@ -412,7 +548,7 @@
 
       <parameter name="PHASE">
         <type>double</type>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <brief>
         </brief>
         <description>
@@ -421,7 +557,7 @@
 
       <parameter name="INCIDENCE">
         <type>double</type>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <brief>
         </brief>
         <description>
@@ -430,7 +566,7 @@
 
       <parameter name="RMS_SLOPE">
         <type>double</type>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <brief>
         </brief>
         <description>
@@ -455,7 +591,7 @@
         <description>
           Starting seed number for randomn number generator
         </description> 
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
       </parameter>
     </group>
   </groups>

@@ -497,7 +497,7 @@
           Pvl file
         </brief>
         <defaultPath>$base/templates/photometry</defaultPath>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           This file will contain the photometric parameters to use
           when doing the photometric correction.
@@ -984,7 +984,7 @@
         <brief>
           Macroscopic Roughness Angle
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           The Hapke macroscopic roughness component.
         </description>
@@ -997,7 +997,7 @@
         <brief>
           Single Scattering Albedo
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           The Hapke single scattering albedo component.
         </description>
@@ -1010,7 +1010,7 @@
         <brief>
           Hapke Henyey Greenstein Coefficient
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           The Hapke Henyey Greenstein coefficient for single particle phase
           function.
@@ -1024,7 +1024,7 @@
         <brief>
           Hapke Henyey Greenstein Coefficient
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           The Hapke Henyey Greenstein coefficient for single particle phase
           function.
@@ -1038,7 +1038,7 @@
         <brief>
           Hapke Legendre Coefficient
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           The Hapke Legendre coefficient for single particle phase
           function.
@@ -1052,7 +1052,7 @@
         <brief>
           Hapke Legendre Coefficient
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           The Hapke Legendre coefficient for single particle phase
           function.
@@ -1066,7 +1066,7 @@
         <brief>
           Hapke Opposition Surge
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           The Hapke opposition surge component.
         </description>
@@ -1078,7 +1078,7 @@
         <brief>
           Hapke Opposition Surge
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           The Hapke opposition surge component.
         </description>
@@ -1090,7 +1090,7 @@
         <brief>
           Lunar-Lambert Function Weight
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           The Lunar-Lambert function weight.
         </description>
@@ -1101,7 +1101,7 @@
         <brief>
           Minnaert Function Exponent
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           The Minnaert function exponent.
         </description>
@@ -1343,7 +1343,7 @@
         <brief>
           Optical Depth of Atmosphere
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           The normal optical depth of the atmosphere.
         </description>
@@ -1355,7 +1355,7 @@
         <brief>
           Reference Value of Tau
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           The reference value of Tau to which the image will be normalized.
         </description>
@@ -1367,7 +1367,7 @@
         <brief>
           Henyey Greenstein Coefficient
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           The coefficient of single particle Henyey Greenstein phase
           function.
@@ -1381,7 +1381,7 @@
         <brief>
           Single Scattering Albedo
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           The single scattering albedo of atmospheric particles.
         </description>
@@ -1394,7 +1394,7 @@
         <brief>
           Legendre Coefficient
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           The coefficient of the single particle Legendre phase function.
         </description>
@@ -1407,7 +1407,7 @@
         <brief>
           Atmospheric Shell Thickness
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           The atmospheric shell thickness normalized to the planet
           radius.
@@ -1773,7 +1773,7 @@
         <brief>
           Reference Incidence Angle
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           The reference incidence angle to which the image will be normalized.
         </description>
@@ -1786,7 +1786,7 @@
         <brief>
           Incidence Angle
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           This specifies the incidence angle where albedo normalization
           transition to incidence normalization.
@@ -1800,7 +1800,7 @@
         <brief>
           Amplification Threshold
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           This sets upper limit on amount of amplification in regions of small
           incidence angle.
@@ -1812,7 +1812,7 @@
         <brief>
           Albedo
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           The albedo to which the image will be normalized.
         </description>
@@ -1823,7 +1823,7 @@
         <brief>
           Albedo Normalization Parameter
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           The albedo dependent phase function normalization parameter.
         </description>
@@ -1834,7 +1834,7 @@
         <brief>
           Albedo Normalization Parameter
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           The albedo dependent phase function normalization parameter.
         </description>
@@ -1845,7 +1845,7 @@
         <brief>
           Albedo Normalization Parameter
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           The albedo dependent phase function normalization parameter.
         </description>
@@ -1856,7 +1856,7 @@
         <brief>
           Albedo Normalization Parameter
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           The albedo dependent phase function normalization parameter.
         </description>
@@ -1867,7 +1867,7 @@
         <brief>
           Albedo Normalization Parameter
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           The albedo dependent phase function normalization parameter.
         </description>
@@ -1878,7 +1878,7 @@
         <brief>
           Radiance to Reflectance/Calibration Factor
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           This is used to convert radiance to reflectance or apply a calibration
           factor.
@@ -1890,7 +1890,7 @@
         <brief>
           Wavelength
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           The wavelength in micrometers of the image being normalized.
         </description>
@@ -1901,7 +1901,7 @@
         <brief>
           Albedo Normalization Parameter
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           The albedo dependent phase function normalization parameter.
         </description>
@@ -1912,7 +1912,7 @@
         <brief>
           Albedo Normalization Parameter
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           The albedo dependent phase function normalization parameter.
         </description>
@@ -1923,7 +1923,7 @@
         <brief>
           Albedo Normalization Parameter
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           The albedo dependent phase function normalization parameter.
         </description>

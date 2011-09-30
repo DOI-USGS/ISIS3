@@ -152,7 +152,7 @@
            Input PVL containing the photometric algorithms to use
          </brief>
          <defaultPath>$base/templates/photometry</defaultPath>
-         <internalDefault>None</internalDefault>
+         <internalDefault>None Specified</internalDefault>
          <description>
            Use this parameter to select an input filename. The information in
            this file will be merged with the information that is input through
@@ -507,7 +507,7 @@
         <brief>
           Macroscopic Roughness Angle
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           The Hapke macroscopic roughness component.
         </description>
@@ -520,7 +520,7 @@
         <brief>
           Single Scattering Albedo
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           The Hapke single scattering albedo component.
         </description>
@@ -533,7 +533,7 @@
         <brief>
           Hapke Henyey Greenstein Coefficient
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           The Hapke Henyey Greenstein coefficient for single particle phase 
           function.
@@ -547,7 +547,7 @@
         <brief>
           Hapke Henyey Greenstein Coefficient
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           The Hapke Henyey Greenstein coefficient for single particle phase 
           function.
@@ -561,7 +561,7 @@
         <brief>
           Hapke Legendre Coefficient
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           The Hapke Legendre coefficient for single particle phase 
           function.
@@ -575,7 +575,7 @@
         <brief>
           Hapke Legendre Coefficient
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           The Hapke Legendre coefficient for single particle phase 
           function.
@@ -589,7 +589,7 @@
         <brief>
           Hapke Opposition Surge 
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           The Hapke opposition surge component.
         </description>
@@ -601,7 +601,7 @@
         <brief>
           Hapke Opposition Surge
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           The Hapke opposition surge component.
         </description>
@@ -613,7 +613,7 @@
         <brief>
           Lunar-Lambert Function Weight
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           The Lunar-Lambert function weight.
         </description>
@@ -624,7 +624,7 @@
         <brief>
           Minnaert Function Exponent
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           The Minnaert function exponent.
         </description>
@@ -851,7 +851,7 @@
         <brief>
           Optical Depth of Atmosphere
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           The normal optical depth of the atmosphere.
         </description>
@@ -863,7 +863,7 @@
         <brief>
           Reference Value of Tau
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           The reference value of Tau to which the image will be normalized.
         </description>
@@ -875,7 +875,7 @@
         <brief>
           Henyey Greenstein Coefficient
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           The coefficient of single particle Henyey Greenstein phase 
           function.
@@ -889,7 +889,7 @@
         <brief>
           Single Scattering Albedo
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           The single scattering albedo of atmospheric particles.
         </description>
@@ -902,7 +902,7 @@
         <brief>
           Legendre Coefficient
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           The coefficient of the single particle Legendre phase function.
         </description>
@@ -915,7 +915,7 @@
         <brief>
           Atmospheric Shell Thickness
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>None Specified</internalDefault>
         <description>
           The atmospheric shell thickness normalized to the planet 
           radius.
