@@ -67,7 +67,7 @@
             group of eight bits represents an eight digit binary number.
           </definition>
 
-          <definition name="Byte">
+          <definition name="Bit Type">
             Refers to how many bits there are per single meaningful value in an
             image cube file.
           </definition>

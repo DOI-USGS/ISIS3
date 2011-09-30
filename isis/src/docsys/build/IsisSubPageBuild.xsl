@@ -281,7 +281,7 @@ Deborah Lee Soltesz
       <xsl:sort order="ascending" select="@name" />
       <h2><a name="{translate(@name, ' ', '')}"><xsl:value-of select="@name"/></a></h2>
       <p>
-        <xsl:value-of select="."/>
+        <xsl:apply-templates mode="copyContents"/>
       </p>
     </xsl:for-each>
   </xsl:template>
