@@ -72,6 +72,8 @@ namespace Isis {
     referenceMeasure = NULL;
     parentNetwork = NULL;
 
+    editLock = false;
+
     measures = new QHash< QString, ControlMeasure * >;
     cubeSerials = new QStringList;
 
@@ -79,14 +81,11 @@ namespace Isis {
     while (i.hasNext()) {
       i.next();
       ControlMeasure *newMeasure = new ControlMeasure(*i.value());
-      if (other.referenceMeasure == i.value())
-        referenceMeasure = newMeasure;
-      newMeasure->parentPoint = this;
       AddMeasure(newMeasure);
-    }
 
-    if (referenceMeasure == NULL && cubeSerials->size() != 0)
-      referenceMeasure = measures->value(cubeSerials->at(0));
+      if (other.referenceMeasure == i.value())
+        SetRefMeasure(newMeasure); 
+    }
 
     id = other.id;
     chooserName = other.chooserName;
@@ -435,7 +434,6 @@ namespace Isis {
     }
 
     if (!measures->size()) {
-      if (referenceMeasure) abort();
       ASSERT(referenceMeasure == NULL);
       referenceMeasure = measure;
     }

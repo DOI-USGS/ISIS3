@@ -272,6 +272,12 @@ namespace Isis {
    *                          Change input parameter to const &.
    *                          Re-wrote to use Delete and AddMeasure methods, so
    *                          that the ControlGraphNode is updated correctly.
+   *   @history 2011-09-30 Steven Lambright and Tracie Sucharski - Fixed
+   *                          bugs that caused unpredictable behavior in the
+   *                          assignment operator.
+   *   @history 2011-10-01 Steven Lambright - Simplified the copy constructor
+   *                          and fixed problems (which caused ASSERT fails) in
+   *                          the copy constructor.
    */
   class ControlPoint : public QObject {
 
