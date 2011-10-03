@@ -25,7 +25,13 @@
       using the seeding method defined in the DEFFILE. The contents of the 
       DEFFILE control the location and density of the control points.
     </p>
-
+    <p>
+      <i>autoseed</i> also has the ability to use an existing control network,
+      CNET, to ignore overlaps that contain at least one contol point. This
+      allows the user to run <i>autoseed</i> multiple times with different
+      seeding parameters and algorithms. This can be useful when one run
+      fails to seed all the overlaps. 
+    </p>
     <p>
       ISIS programs that must be run prior to running <i>autoseed</i>:
     </p>
@@ -215,11 +221,11 @@
         <brief>Control network containing existing control points and measures</brief>
         <description>
           <p>
-            Use this parameter to provide a control network with existing
-            control points and measures. If any control point in this network
-            falls inside of an overlap area that overlap will not be seeded with
-            additional control points. If no control points are inside of that
-            overlap area the seeding algorithm will be applied to that area.
+            Use this parameter to provide the file name of an existing control
+            network. The control measures in this network should correspond
+            to the cubes in the FROMLIST. If any control point from this
+            network falls inside one of the overlaps listed in 
+            <i>OVERLAPLIST</i> that overlap will be ignored (i.e., not seeded)
           </p>
           <p>
             To combine the existing network (CNET) with the one created by 

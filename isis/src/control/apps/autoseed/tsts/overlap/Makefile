@@ -3,7 +3,7 @@ APPNAME = autoseed
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
-	$(LS) $(INPUT)/*.cub > $(OUTPUT)/list.lis;
+	# Test seeding two MOC WA images using a Grid seeder
 	$(LS) $(INPUT)/*sub.cub > $(OUTPUT)/sub.lis;
 	$(APPNAME) fromlist=$(OUTPUT)/sub.lis \
 	deffile=$(INPUT)/grid.pvl \
@@ -13,6 +13,8 @@ commands:
 	pointid="sub????" \
 	description=SubNetwork \
 	> /dev/null;
+	# Test a denser grid and add it to the existing one created above
+	$(LS) $(INPUT)/*.cub > $(OUTPUT)/list.lis;
 	$(APPNAME) fromlist=$(OUTPUT)/list.lis \
 	deffile=$(INPUT)/smallgrid.pvl \
 	overlaplist=$(INPUT)/listoverlaps.def \
@@ -22,5 +24,5 @@ commands:
 	pointid="new????" \
 	description=NewNetwork \
 	> /dev/null;
-	$(RM) $(OUTPUT)/list.lis;
-	$(RM) $(OUTPUT)/sub.lis;
+	#$(RM) $(OUTPUT)/list.lis;
+	#$(RM) $(OUTPUT)/sub.lis;
