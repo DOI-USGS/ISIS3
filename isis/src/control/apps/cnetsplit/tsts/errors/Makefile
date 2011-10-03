@@ -12,8 +12,8 @@ commands:
 	cnet=$(INPUT)/controlNet.net \
 	onet_prefix="outputSplit??" \
 	num_output_files=11 2> $(OUTPUT)/error1.txt > /dev/null;
-    # replace the filename path, /.../input/, with the directory name, input/,
+    # replace the filename path, [.../input/, with the directory name, [input/,
     # so test is succesful whether run in testData area
-    # or in your own work directory
-	$(SED) s+/.*input/+input/+g $(OUTPUT)/error1.txt > $(OUTPUT)/error.txt;
+    # or in your own work directory -- NOTE  [ requires 2 backslash
+	$(SED) s+\\[.*input/+\\[input/+g $(OUTPUT)/error1.txt > $(OUTPUT)/error.txt;
 	rm -f $(OUTPUT)/error1.txt;
