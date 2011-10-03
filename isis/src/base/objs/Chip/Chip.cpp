@@ -768,7 +768,7 @@ namespace Isis {
    */
   Chip Chip::Extract(int samples, int lines, int samp, int line) throw(iException &) {
     if(samples > Samples() || lines > Lines()) {
-      string msg = "Cannot exatract sub-chip of size [" + iString(samples);
+      string msg = "Cannot extract sub-chip of size [" + iString(samples);
       msg += ", " + iString(lines) + "] from chip of size [" + iString(Samples());
       msg += ", " + iString(Lines()) + "]";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
@@ -895,12 +895,12 @@ namespace Isis {
     int lines = chipped.Lines();
 
     for(int oline = 1; oline <= lines; oline++) {
-      int thisLine = TackLine() + (oline - chipped.TackLine());
+      int relativeLine = oline - chipped.TackLine();
       for(int osamp = 1; osamp <= samples; osamp++) {
-        int thisSamp = TackSample() + (osamp - chipped.TackSample());
-        affine.Compute(thisSamp, thisLine);
-        double xp = affine.xp();
-        double yp = affine.yp();
+        int relativeSamp = osamp - chipped.TackSample();
+        affine.Compute(relativeSamp, relativeLine);
+        double xp = affine.xp() + TackSample();
+        double yp = affine.yp() + TackLine();
         port.SetPosition(xp, yp, 1);
         for(int i = 0 ; i < port.size() ; i++) {
           int csamp = port.Sample(i);
@@ -921,12 +921,20 @@ namespace Isis {
     chipped.p_validMaximum = p_validMaximum;
     chipped.p_filename = p_filename;
 
-    // Update the affine
-    Affine::AMatrix taffine = p_affine.Forward() +
-                              (affine.Forward() - Affine::getIdentity());
+    // Make necessary adjustments to remaining chip elements.  Note that this
+    // matrix multiply acheives a completed transform of two Affine matrices.
+    // No translations are required - only update tack points.
+    chipped.p_affine = Affine(TNT::matmult(affine.Forward(), p_affine.Forward()));
 
-    chipped.p_affine = Affine(taffine);
-    chipped.SetChipPosition(chipped.TackSample(), chipped.TackLine());
+    affine.Compute(0.0, 0.0);
+    chipped.p_cubeTackSample = p_cubeTackSample + affine.xp();
+    chipped.p_cubeTackLine = p_cubeTackLine + affine.yp();
+
+    chipped.p_chipSample = chipped.TackSample();
+    chipped.p_chipLine   = chipped.TackLine();
+    chipped.p_cubeSample = chipped.p_cubeTackSample;
+    chipped.p_cubeLine   = chipped.p_cubeTackLine;
+
     return;
   }
 

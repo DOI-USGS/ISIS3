@@ -106,6 +106,9 @@ namespace Isis {
    *                          to Sensor class.
    *   @history 2011-03-29  Jai Rideout - Added copy constructor and equals
    *                          operator.
+   *   @history 2011-10-02  Kris Becker - Corrected a bug in the
+   *                          Extract(Chip, Affine) method when
+   *                          computing output pixels coordinates.
    *
    */
   class Chip {

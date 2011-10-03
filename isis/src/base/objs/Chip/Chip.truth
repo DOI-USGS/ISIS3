@@ -196,5 +196,5 @@ Try to set valid range with larger number passed in as first parameter:
 **PROGRAMMER ERROR** Unable to set valid chip range to [4.0, 3.0].  First parameter must be smaller than the second.
 
 Try to extract a sub-chip with samples or lines greater than original chip:
-**PROGRAMMER ERROR** Cannot exatract sub-chip of size [2, 5] from chip of size [4, 4]
+**PROGRAMMER ERROR** Cannot extract sub-chip of size [2, 5] from chip of size [4, 4]
 

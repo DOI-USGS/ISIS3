@@ -160,7 +160,7 @@ int main() {
        << mychip.CubeLine() << endl;
   Chip shift(25, 25);
   mychip.Extract(shift, affine);
-  shift.SetChipPosition(shift.TackSample(), shift.TackLine());
+  // shift.SetChipPosition(shift.TackSample(), shift.TackLine());
   cout << "Shift Cube Sample, Line = " << shift.CubeSample() << ", "
        << shift.CubeLine() << endl;
 
