@@ -1960,12 +1960,14 @@ namespace Isis {
    *   @history 2011-09-30 Tracie Sucharski - Fixed some memory leaks and
    *                          deleted some calls that were already handled in
    *                          AddMeasure.
+   *   @history 2011-10-03 Tracie Sucharski - Unlock measures before Deleting                         
    */
   const ControlPoint &ControlPoint::operator=(const ControlPoint &other) {
 
     if (this != &other) {
       editLock = false;
       for (int i = cubeSerials->size() - 1; i >= 0; i--) {
+        (*measures)[cubeSerials->at(i)]->SetEditLock(false);
         Delete(cubeSerials->at(i));
       }
 
