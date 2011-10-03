@@ -1,14 +1,14 @@
 #include "Isis.h"
 #include "IsisDebug.h"
-#include "iException.h"
+
+#include <string.h>
 
 #include "ID.h"
+#include "iException.h"
 #include "ControlNet.h"
 #include "ControlNetStatistics.h"
 #include "ControlPoint.h"
 #include "Progress.h"
-
-#include <string.h>
 
 using namespace std;
 using namespace Isis;
@@ -33,10 +33,14 @@ void IsisMain() {
     int numPoints = cNet.GetNumPoints();
     
     if (numOutputFiles > numPoints) {
-      string msg = "The number of output files is greater than total number of Control Points";
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      Filename inputNet(ui.GetFilename("CNET"));
+      string msg = "The number of output files is greater than total number of "
+                   "Control Points in the given Control Network ["
+                   + ui.GetFilename("CNET") + "].";
+      throw iException::Message(iException::User, msg, _FILEINFO_);
     }
     
+
     // Display input ControlNet Stats
     ControlNetStatistics cnetStats(&cNet);
     PvlGroup statsGrp;
@@ -82,7 +86,7 @@ void IsisMain() {
       }
     }
   } // REFORMAT THESE ERRORS INTO ISIS TYPES AND RETHROW
-  catch(Isis::iException &e) {
+  catch(iException &e) {
     throw;
   }
 }
