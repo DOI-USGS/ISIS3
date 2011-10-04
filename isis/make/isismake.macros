@@ -1,4 +1,4 @@
-SHELL=bash
+\SHELL=bash
 
 #---------------------------------------------------------------------------
 # Check to see if the programmer wants make to be noisy
@@ -225,6 +225,7 @@ ALLLIBS += $(TNTLIB)
 ALLLIBS += $(JAMALIB)
 ALLLIBS += $(GEOSLIB)
 ALLLIBS += $(GSLLIB)
+ALLLIBS += $(X11LIB)
 ALLLIBS += $(GMMLIB)
 ALLLIBS += $(SUPERLULIB)
 ALLLIBS += $(PROTOBUFLIB)
