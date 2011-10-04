@@ -271,7 +271,7 @@ Deborah Lee Soltesz
     <ul>
       <xsl:for-each select="definition">
         <xsl:sort order="ascending" select="@name" />
-        <li><a href="#{translate(@name, ' ', '')}"><xsl:value-of select="@name"/></a></li>
+        <li><a href="#{translate(normalize-space(@name), ' ', '')}"><xsl:value-of select="@name"/></a></li>
       </xsl:for-each>
     </ul>
 
@@ -279,7 +279,7 @@ Deborah Lee Soltesz
 
     <xsl:for-each select="definition">
       <xsl:sort order="ascending" select="@name" />
-      <h2><a name="{translate(@name, ' ', '')}"><xsl:value-of select="@name"/></a></h2>
+      <h2><a name="{translate(normalize-space(@name), ' ', '')}"><xsl:value-of select="@name"/></a></h2>
       <p>
         <xsl:apply-templates mode="copyContents"/>
       </p>

@@ -8,6 +8,16 @@
     <file>
       <body>
         <definitions>
+          <definition name="Adjusted">
+            Refers to the output pixel coordinate or geographic location 
+            within the control network
+          </definition>
+
+          <definition name="APriori">
+            Refers to the initial or original value of a pixel coordinate or
+            geographic location within the control network
+          </definition>
+
           <definition name="Digital Number">
             Digital Numbers are a subset of Integers, more specifically positive
             integers.
@@ -31,8 +41,15 @@
             The ratio of reflected energy to incoming energy.
           </definition>
 
+          <definition name="Control Network">
+            A network of Control Points.  By default this is a binary file
+            containing fields of information for control points and measures
+            between a collection of any number of images.
+          </definition>
+
           <definition name="Control Measure">
-            A coordinate (measurement) on a Cube for a Control Point.
+            The sample and line pixel coordinate (measurement) within an image that
+            has been measured and associated with a Control Point.
           </definition>
 
           <definition name="Control Point">
@@ -40,19 +57,17 @@
             in different images.
           </definition>
 
-          <definition name="Control Network">
-            A network of Control Points.
-          </definition>
-
           <definition name="Cube">
             A cube is a 3-dimensional image with axis: samples, lines, and
             bands. The physical dimensions of a cube are called the number of
             samples (NS), number of lines (NL), and number of bands (NB).
 
-            Typically, the sample and line dimensions are used to represent
-            spatial information while the band dimension represents spectral
-            information. See the table below for examples of the line, sample,
-            and band dimensions of a few data sets from planetary missions.
+            <p>
+              Typically, the sample and line dimensions are used to represent
+              spatial information while the band dimension represents spectral
+              information. See the table below for examples of the line, sample,
+              and band dimensions of a few data sets from planetary missions.
+            </p>
           </definition>
 
           <definition name="Bit">
@@ -82,6 +97,67 @@
               Thickness = Area / max(Xextent,Yextent)**2
             </pre>
             A polygon's thickness will be between 0 and 1.
+          </definition>
+
+          <definition name="Emission Angle">
+            The emission angle (EMA) is the angle between the spacecraft and a
+            vector drawn perpendicular to the planet's surface (surface normal).
+            Using SPICE, Isis applications compute this angle from the ellipsoid 
+            or the elevation model (e.g., local slopes) at every pixel.  
+          </definition>
+
+         <definition name="Incidence Angle">
+            The incidence angle (INC) is the angle between the sun and the 
+            surface normal.  Isis applications use SPICE to compute this angle
+            from the ellipsoid or the elevation model (e.g., local slopes) at
+            every pixel.
+          </definition>
+
+         <definition name="I/F">
+            Irradiance/SolarFlux.  Unit of DN values for a reference distance of
+            target body from the Sun (5.2 AU).  The values usually range between
+            0.0 and 1.0.
+
+            <p>
+              I/F is often a default or choice of output DN unit of the mission
+              specific radiometric calibration applications. 
+            </p>
+          </definition>
+
+         <definition name="NAIF">
+            Navigation and Ancillary Information Facility
+          </definition>
+
+         <definition name="Phase Angle">
+            The phase angle is the angle between the sun, the point on the
+            planet surface and the spacecraft.  Isis applications will use SPICE
+            to compute this angle from the ellipsoid or the elevation model
+            (e.g., local slopes) at every pixel.
+          </definition>
+
+          <definition name="Serial Number">
+            A unique identifier constructed and assigned to each individual
+            image within a control network.  The serial number (SN) is
+            constructed by most of the control network applications "in real
+            time" from specific instrument keywords on the image labels
+            (Instrument keywords are populated by mission specific ingestion
+            applications).  
+
+            <p>
+              The serial number associated with each control measure is included
+              as a field in the binary control network.  'getsn' is an Isis
+              application that will return the SN value for a given image
+              filename.
+            </p>
+          </definition>
+
+         <definition name="SPICE">
+           Spacecraft &amp; Planetary ephemerides, Instrument C-matrix and Event
+           kernels.  SPICE refers to all the information required and computed
+           within Isis to map each image onto a surface with reference to
+           spacecraft position, sun position, instrument and mission activities.
+           Isis uses software supplied by the Navigation and Ancillary
+           Information Facility (NAIF) for SPICE access and kernel management.
           </definition>
         </definitions>
       </body>
