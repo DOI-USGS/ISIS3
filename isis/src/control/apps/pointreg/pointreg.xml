@@ -1,12 +1,85 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <application name="pointreg" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
   <brief>
-    Point Registration
+    Automatically register control measures to their point's reference
   </brief>
 
   <description>
-    This program takes a control network and a registration algorithm and 
-    returns a refined control network based on the algorithm.
+    <p>
+      The main purpose of "pointreg" is to apply a chosen pattern matching
+      algorithm (DEFFILE) to subpixel (or, less commonly, whole pixel) register
+      individual <def>control point</def> coordinates (<def link="Control
+        Measure">measures</def>) that have been collected between images and
+      stored within an input <def>control network</def>. 
+    </p>
+
+    <p>
+      "Pointreg" requires that for every <def>serial number</def> (SN) that
+      exists in the input control network, there is an existing cube file and
+      its associated filename is included within the input list (FROMLIST).
+    </p>
+
+    <p>
+      Most often the input control point network (CNET) contains
+      <def>a priori</def> sample and line positions based on the original
+      <def>SPICE</def> of the images.  For creating an initial control network,
+      refer to applications such as "autoseed", "seedgrid" and/or "qnet".   
+    </p>
+
+    <p>
+      Due to many factors, often including inaccuracies with the camera
+      pointing, the control point's initial measure coordinates between images
+      are not registered to one another with subpixel -- or even whole pixel --
+      accuracy.  
+    </p>
+
+    <p>
+      The input control network contains certain fields that are evaluated by
+      "pointreg" (POINTS, MEASURES) in order to know whether or not to work on a
+      control point and the associated measures.  "Pointreg" in turn adds or
+      updates fields in the output control network that reflect the successes
+      and failures of the pattern matching for each measure.  
+    </p>
+
+    <p>
+      For every <def>control point</def> within the input network, there are
+      <def link="Control Measure">control measures</def>.  For every point in
+      the network, there is always one and only one associated "reference"
+      measure, either set explicitly or chosen at runtime implicitly.  Explicit
+      references are chosen and defined as such either manually by users
+      ("qnet") or automatically with an interest operator ("cnetref").  Implicit
+      references are determined when no explicit reference is set for a point.
+      In such a case, the control point will provide its first valid
+      (Ignore=False) measure to act as the reference.
+    </p>
+
+    <p>
+      Once "pointreg" has a reference measure for a point, it attempts to
+      register every other measure in the point to that reference location.  An
+      implicit reference will then be made explicit, and if any of the
+      registrations succeed, the reference will also be made valid.
+    </p>
+
+    <p>
+      With every successful subpixel registration for each control measure, the
+      Sample and Line fields within the output control network are updated with
+      the resulting subpixel coordinates.  Note that the reference measure
+      coordinates are "fixed" while the coordinates of the remaining measures
+      are adjusted based on the pattern matching output.  The a priori
+      <def>sample</def> and <def>line</def> fields are assigned the original
+      starting input pixel coordinates.  Applications such as "qnet", will
+      report the sample and line shift as a result of "pointreg".  "Pointreg"
+      will also update the control network with the pattern match coefficient
+      results such as minimum and maximum "pixel z-score" and "goodness of fit".
+    </p>
+
+    <p>
+      With every failed subpixel registration for each control measure, the
+      non-reference measure is set to ignored (Ignore=True).   If all the
+      measures within a control point are ignored (Ignore=True), then the entire
+      control point is set to ignored (Ignore=True) at the control point level.
+    </p>
   </description>
 
   <category>
@@ -15,8 +88,10 @@
 
   <seeAlso>
       <applications>
-          <item>autoregtemplate</item>
-          <item>coreg</item>
+        <item>autoregtemplate</item>
+        <item>coreg</item>
+        <item>qnet</item>
+        <item>cnetref</item>
       </applications>
       <documents>
         <document>
@@ -145,10 +220,14 @@
         <type>filename</type>
         <fileMode>input</fileMode>
         <brief>
-          Input File List
+          Input cube file list
         </brief>
         <description>
-          This file contains the names of all files used in the control network.
+          This file contains a list of cube filenames (one per line), each
+          mapping to the serial number of one of the control measures that is to
+          be used in registration.  For every control measure that will be
+          registered or used as a reference during registration, its serial
+          number must have an associated cube in this list.
         </description>
         <filter>
           *.txt *.lis *.lst *.list
@@ -159,10 +238,11 @@
         <type>filename</type>
         <fileMode>input</fileMode>
         <brief>
-          Input ControlNet
+          Input control network
         </brief>
         <description>
-          This file contains the initial control network.
+          This file contains the initial control network whose points are to be
+          registered.
         </description>
         <filter>
           *.net 
@@ -173,26 +253,28 @@
         <type>filename</type>
         <fileMode>input</fileMode>
         <brief>
-          Auto Registration Definition File
+          Automatic registration definition file
         </brief>
         <description>
-          This is the auto regestration definition file which contains all the
-          information on the registration algorithm to be used.  The default
+          This PVL file contains all the user-specified options for performing
+          automatic registration on the points in the network.  The default
           "template" definition file contains all the keywords AutoReg will
           accept set to their default values, or common example values where
-          defaults do not exist.
+          defaults do not exist.  For an in-depth discussion of all the options
+          available to the user in this definition file, please see the Pattern
+          Matching guide referenced above.
         </description>
-          <helpers >
-              <helper name="H1">
-                <function>PrintTemp</function>
-                <brief>View Template</brief>
-                <description>
-                  This helper button will print the template to the session log
-                   of the application
-                 </description>
-                <icon>$ISIS3DATA/base/icons/labels.png</icon>
-              </helper>
-          </helpers>
+        <helpers >
+          <helper name="H1">
+            <function>PrintTemp</function>
+            <brief>View Template</brief>
+            <description>
+              This helper button will print the template to the session log
+              of the application
+            </description>
+            <icon>$ISIS3DATA/base/icons/labels.png</icon>
+          </helper>
+        </helpers>
         <filter>
           *.def
         </filter>
@@ -204,10 +286,12 @@
           <type>filename</type>
           <fileMode>output</fileMode>
           <brief>
-            Output ControlNet
+            Output control network
           </brief>
           <description>
-            This is the output ControlNet file containing the registered information.
+            This is the output control network containing all the
+            newly-registered points in addition to anything left unchanged from
+            the input network.
           </description>
           <filter>
             *.net
@@ -218,11 +302,11 @@
           <type>filename</type>
           <fileMode>output</fileMode>
           <brief>
-               Text file of pointreg data
+            Comma-separated text file of pointreg output information
           </brief>
           <description>
             This file will contain data collected from the pointreg application.
-            The data will be comma separated and contain a line for each 
+            The data will be comma-separated and contain a line for each 
             measurement of all non-ignored points in the output control net.     
             This will include the point id, orignal sample position, original
             line position, new sample position, new line position, sample
@@ -238,10 +322,16 @@
         <parameter name="OUTPUTIGNORED">
         <type>boolean</type>
         <brief>
-          Keep Ignored ControlPoints
+          Keep "ignored" control points
         </brief>
         <description>
-          Specifies if Ignored ControlPoints will remain in the ControlNet.
+          By enabling this option, any point that is "ignored" in the input
+          network will be removed in the output network.  If the user specifies
+          with the POINTS option that they only want to register NONIGNORED
+          points, then any ignored point will be immediately removed with this
+          option enabled.  After registration is complete, if a point has less
+          than 2 valid measures, and is not a "fixed" point, then it will be set
+          to ignored, and with this option enabled, removed from the output.
         </description>
         <default><item>True</item></default>
       </parameter>
@@ -249,10 +339,11 @@
       <parameter name="OUTPUTFAILED">
         <type>boolean</type>
         <brief>
-          Keep Failed ControlMeasures
+          Keep control measures after failing registration
         </brief>
         <description>
-          Specifies if ControlMeasures that failed to register will remain in the ControlNet.
+          When enabled, control measures that failed to register in the current
+          run of "pointreg" will remain in the output control network.
         </description>
         <default><item>True</item></default>
       </parameter> 
@@ -262,7 +353,7 @@
       <parameter name="POINTS">
         <type>string</type>
         <brief>
-            How to handle "Ignored" points
+          How to handle "ignored" points
         </brief>
         <description>
           If this parameter is set to IGNORED, ignored points will be 
@@ -276,72 +367,73 @@
         </description>
         <default><item>NONIGNORED</item></default>
         <list>
-            <option value="ALL">
-                <brief>
-                   Process all Control Points 
-                </brief>
-                <description>
-                    This option will result in all Control Points being 
-                    processed regardless of "Ignored" status.
-                </description>      
-            </option>
-            <option value="NONIGNORED">
-                <brief>
-                    Process only Non-Ignored Points
-                </brief>
-                <description>
-                    This option will result in only Control Points not marked 
-                    as "Ignored" being processed.  This is the 
-                    default.
-                </description>
-            </option>
-            <option value="IGNORED">
-                <brief>
-                    Process only Ignored Points
-                </brief>
-                <description>
-                    This option will result in only Control Points that are 
-                    marked as "Ignored" being processed.
-                </description>
-            </option>
+          <option value="ALL">
+            <brief>
+              Process all control points
+            </brief>
+            <description>
+              This option will result in all Control Points being processed
+              regardless of "Ignored" status.
+            </description>      
+          </option>
+          <option value="NONIGNORED">
+            <brief>
+              Process only valid points
+            </brief>
+            <description>
+              This option will result in only control points not marked as
+              "ignored" being processed.  This is the default.
+            </description>
+          </option>
+          <option value="IGNORED">
+            <brief>
+              Process only ignored points
+            </brief>
+            <description>
+              This option will result in only control points that are marked as
+              "ignored" being processed.  This is typically used as a means of
+              running a "second pass" over points that failed to register with a
+              different definition file.
+            </description>
+          </option>
         </list>
       </parameter>
 
       <parameter name="MEASURES">
         <type>string</type>
         <brief>
-            Which types of measures should be processed
+          Which types of measures should be processed
         </brief>
         <description>
-          If this parameter is set to CANDIDATES, only measures that have not 
-          been successfully registered by a prior run of the "pointreg" 
-          application will be processed.  However, if this parameter is set to 
-          its default of ALL, every measure, including those that have been run 
-          through pointreg successfully and manually chosen measures, will be
-          processed.  A measure is considered a "Candidate" if it has never
-          been run through "pointreg" before, or if it was unsuccessfully
-          registed in a previous run.
+          If this parameter is set to CANDIDATES, only measures that have not
+          been successfully registered by a prior run of the "pointreg"
+          application will be processed.  However, if this parameter is set to
+          its default of ALL, every measure -- including those that have been
+          run through "pointreg" successfully, and those that were manually
+          selected -- will be processed.  A measure is considered a "candidate"
+          if it has never been run through "pointreg" before, or if it was
+          unsuccessfully registed in a previous run.
         </description>     
         <default><item>ALL</item></default>
         <list>
-            <option value="ALL">
-                <brief>
-                    Process all Control Measures
-                </brief>
-                <description>
-                    This option will result in all Control Measures being 
-                    processed regardless of MeasureType.  This is the default.
-                </description>
-            </option>
-            <option value="CANDIDATES">
-                <brief>
-                    Process only Candidate Measures
-                </brief>
-                <description>
-                    This option will result in only Control Measures whose 
-                    MeasureType equals "Candidate" being processed.
-                </description>
-            </option>
+          <option value="ALL">
+            <brief>
+              Process all control measures
+            </brief>
+            <description>
+              This option will result in all control measures being processed
+              regardless of measure type.  This is the default.
+            </description>
+          </option>
+          <option value="CANDIDATES">
+            <brief>
+              Process only "candidate" control measures
+            </brief>
+            <description>
+              This option will result in only measures that have never been
+              successfully registered before ("candidates") being processed.
+            </description>
+          </option>
         </list>  
       </parameter>
     </group> 
