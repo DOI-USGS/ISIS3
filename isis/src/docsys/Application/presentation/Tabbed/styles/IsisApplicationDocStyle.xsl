@@ -1117,10 +1117,21 @@ document.write("<img src=\"]]><xsl:value-of select="normalize-space(thumbnail/@s
   </xsl:template>
 
   <xsl:template match="def" mode="copyContents">
+    <xsl:variable name="text">
+      <xsl:choose>
+        <xsl:when test ="@link">
+          <xsl:value-of select="normalize-space(@link)"/> 
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="normalize-space(.)"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
     <xsl:variable name="anchor">
       <xsl:variable name="formatted">
         <xsl:call-template name="Pascalize">
-          <xsl:with-param name="text" select="concat(., ' ')"/>
+          <xsl:with-param name="text" select="concat($text, ' ')"/>
         </xsl:call-template>
       </xsl:variable>
 

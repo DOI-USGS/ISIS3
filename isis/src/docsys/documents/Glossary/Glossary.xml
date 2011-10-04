@@ -13,7 +13,7 @@
             within the control network
           </definition>
 
-          <definition name="APriori">
+          <definition name="A Priori">
             Refers to the initial or original value of a pixel coordinate or
             geographic location within the control network
           </definition>
@@ -65,8 +65,7 @@
             <p>
               Typically, the sample and line dimensions are used to represent
               spatial information while the band dimension represents spectral
-              information. See the table below for examples of the line, sample,
-              and band dimensions of a few data sets from planetary missions.
+              information.
             </p>
           </definition>
 
@@ -75,7 +74,7 @@
           </definition>
 
           <definition name="Digital Number">
-            Digital Numbers are a subset of Integers, more specifically positive
+            Digital Numbers are a subset of integers, more specifically positive
             integers.
           </definition>
 
