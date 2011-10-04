@@ -66,6 +66,7 @@ void IsisMain() {
   int numSuccesses = 0;
   int numFailures = 0;
   int numConstrainedFixed = 0;
+  int numLocked = 0;
   string failedIDs = "";
 
   for (int i = 0; i < cnet.GetNumPoints() ; i++) {
@@ -73,6 +74,11 @@ void IsisMain() {
 
     if (cp->GetType() != ControlPoint::Free) {
       numConstrainedFixed++;
+
+      if (cp->IsEditLocked()) {
+        numLocked++;
+        continue;
+      }
       // Create Brick on samp, line to get the dn value of the pixel
       SurfacePoint surfacePt;
       if (newRadiiSource == Adjusted)
@@ -151,6 +157,7 @@ void IsisMain() {
   summaryGroup.AddKeyword(PvlKeyword("Failures", numFailures));
   summaryGroup.AddKeyword(PvlKeyword("NumberFixedConstrainedPoints",
                                       numConstrainedFixed));
+  summaryGroup.AddKeyword(PvlKeyword("NumberEditLockedPoints", numLocked));
 
   bool errorlog;
   Filename errorlogFile;

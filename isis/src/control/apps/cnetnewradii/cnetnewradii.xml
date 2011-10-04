@@ -75,6 +75,10 @@
       Set Apriori as the default for the GETLATLON parameter.  Update examples
       documentation.
     </change>
+    <change name="Tracie Sucharski" date="2011-10-04">
+      Skip edit locked points, keep count for summary.  Added appTest for edit 
+      locked points.
+    </change>
   </history>
 
   <groups>
