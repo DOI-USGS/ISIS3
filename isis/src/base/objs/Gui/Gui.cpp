@@ -30,10 +30,44 @@
 #include "SessionLog.h"
 #include "UserInterface.h"
 
+#ifdef Q_OS_LINUX
+#include <X11/Xlib.h>
+#endif
+
 namespace Isis {
 
   //! Singleton
   Gui *Gui::p_gui = NULL;
+  
+  /**
+   * check to see if X is available
+   */
+  void Gui::checkX11() {
+    // Many users who run xorg compatible servers on windows like to forget to
+    // start their Xhack software before launching X clients.
+    // The standard "cannot connect to X server" message that Qt gives is not
+    // enough to explain what the problem is, because we keep getting bug
+    // reports for this.  Hopefully detecting this ourselves and printing the
+    // following message will help.  If not then yes, this is the message that
+    // needs changing...
+    
+    #ifdef Q_OS_LINUX
+    if (!XOpenDisplay(NULL)) {
+      std::cerr << "cannot connect to X server...\n\n"
+          "Do you have an X server running?\n\n"
+          "If yes then...\n\n"
+          "  If you are trying to run this program remotely using ssh, then "
+          "did you enable X11 forwarding?\n\n"
+          "If the possible causes cited above have been ruled out and this "
+          "problem persists, then check your X settings or contact your "
+          "system administrator.\n\n";
+      
+      abort();
+    }
+    #endif
+  }
+  
+  
   Gui *Gui::Create(Isis::UserInterface &ui, int &argc, char *argv[]) {
     // Don't recreate
     if(p_gui != NULL) return p_gui;

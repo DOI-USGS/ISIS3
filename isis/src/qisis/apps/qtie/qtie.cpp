@@ -1,5 +1,7 @@
 #include <QApplication>
 #include <QToolBar>
+
+#include "Gui.h"
 #include "iException.h"
 #include "ViewportMainWindow.h"
 #include "QtieFileTool.h"
@@ -19,6 +21,8 @@
 using namespace Isis;
 
 int main(int argc, char *argv[]) {
+  
+  Isis::Gui::checkX11();
 
   try {
     QApplication *app = new QApplication(argc, argv);

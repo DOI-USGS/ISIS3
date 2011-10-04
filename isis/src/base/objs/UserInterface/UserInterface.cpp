@@ -79,7 +79,8 @@ namespace Isis {
     LoadCommandLine(argc, argv);
 
     // See if we need to create the gui
-    if(p_interactive) {
+    if (p_interactive) {
+      Gui::checkX11();
       p_gui = Gui::Create(*this, argc, argv);
     }
   }

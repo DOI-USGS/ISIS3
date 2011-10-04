@@ -7,6 +7,7 @@
 #include "BandTool.h"
 #include "Filename.h"
 #include "FindTool.h"
+#include "Gui.h"
 #include "HelpTool.h"
 #include "HistogramTool.h"
 #include "iException.h"
@@ -43,6 +44,9 @@ int main(int argc, char *argv[]) {
   signal(SIGABRT, Abort);
   signal(SIGINT, InterruptSignal);
 #endif
+  
+  Isis::Gui::checkX11();
+  
   Qnet::g_controlNetwork = NULL;
   Qnet::g_serialNumberList = NULL;
 

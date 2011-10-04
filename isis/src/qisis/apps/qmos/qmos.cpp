@@ -1,5 +1,6 @@
 #include "IsisDebug.h"
 
+#include "Gui.h"
 #include "iException.h"
 #include "MosaicMainWindow.h"
 #include "Preference.h"
@@ -16,6 +17,8 @@ int main(int argc, char *argv[]) {
 #ifdef CWDEBUG
   startMonitoringMemory();
 #endif
+  
+  Isis::Gui::checkX11();
 
   try {
     QApplication *app = new QIsisApplication(argc, argv);

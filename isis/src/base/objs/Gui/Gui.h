@@ -77,6 +77,8 @@ namespace Isis {
       Q_OBJECT
 
     public:
+      static void checkX11();
+      
       static Gui *Create(Isis::UserInterface &ui, int &argc, char *argv[]);
 
       void ProgressText(const std::string &text);

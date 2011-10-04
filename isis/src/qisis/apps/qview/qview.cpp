@@ -11,33 +11,33 @@
 #include <sys/un.h>
 #include <fcntl.h>
 
-#include "QIsisApplication.h"
-#include "Filename.h"
-#include "ViewportMainWindow.h"
-#include "Workspace.h"
-#include "FileTool.h"
-#include "ZoomTool.h"
-#include "StretchTool.h"
-#include "WindowTool.h"
-#include "HelpTool.h"
-#include "PanTool.h"
-#include "RubberBandTool.h"
-#include "BandTool.h"
-#include "EditTool.h"
-#include "FindTool.h"
-#include "BlinkTool.h"
-#include "AdvancedTrackTool.h"
-#include "Filename.h"
 #include "Application.h"
-#include "SocketThread.h"
+#include "AdvancedTrackTool.h"
+#include "BandTool.h"
+#include "BlinkTool.h"
+#include "EditTool.h"
+#include "Filename.h"
+#include "FileTool.h"
+#include "FindTool.h"
+#include "Gui.h"
+#include "HelpTool.h"
+#include "HistogramTool.h"
 #include "iString.h"
 #include "MeasureTool.h"
-#include "SpecialPixelTool.h"
+#include "PanTool.h"
 #include "PlotTool.h"
-#include "HistogramTool.h"
-#include "StatisticsTool.h"
 #include "Preference.h"
 #include "PvlGroup.h"
+#include "QIsisApplication.h"
+#include "RubberBandTool.h"
+#include "SpecialPixelTool.h"
+#include "SocketThread.h"
+#include "StatisticsTool.h"
+#include "StretchTool.h"
+#include "ViewportMainWindow.h"
+#include "WindowTool.h"
+#include "Workspace.h"
+#include "ZoomTool.h"
 
 void startMonitoringMemory();
 void stopMonitoringMemory();
@@ -48,6 +48,8 @@ int main(int argc, char *argv[]) {
 #ifdef CWDEBUG
   startMonitoringMemory();
 #endif
+  
+  Isis::Gui::checkX11();
 
   // Check to see if the user wants to force a new window
   int newWindow = -1;
