@@ -7,8 +7,8 @@
 
   <description>
     <p>
-      Cubes which have supported camera models in the ISIS system require spacecraft position, pointing, body shape and orientation, sun position, and much
-      more information in order to compute ground positions (latitude/longitude) and photometric viewing angles.   This information is stored in SPICE kernels.
+      Cubes which have supported camera models in the ISIS system require spacecraft position, pointing, body shape and orientation, sun position, and other
+      information in order to compute ground positions (latitude/longitude) and photometric viewing angles.   This information is stored in SPICE kernels.
       This program attempts to search the ISIS data areas in order to discern the SPICE kernels required for the camera cube.
     </p>
 
@@ -30,22 +30,57 @@
       <li>Shape Model (DEM)</li>
     </ul>
 
-   If you are unfamilar with SPICE terminology it is recommended you read the NAIF required reading at http://naif.jpl.nasa.gov/naif/doc_C.html
+    If you are unfamilar with SPICE terminology it is recommended you read the NAIF required reading at http://naif.jpl.nasa.gov/naif/doc_C.html
 
-   <p>
-     The program modifies the kernels group and writes the name of the SPICE files that need to be loaded by the camera models.  It has the option of pre-reading the
-     data from the SPICE kernels and loading it as a binary table attached to the cube.  This can faciliate faster load times and allows the instrument pointing to be easily updated.
-   </p>
-   <p>
+    <p>
+      The program modifies the kernels group and writes the name of the SPICE files that need to be loaded by the camera models.  It has the option of pre-reading the
+      data from the SPICE kernels and loading it as a binary table attached to the cube.  This can faciliate faster load times and allows the instrument pointing to be easily updated.
+    </p>
+    <p>
+      As kernels are loaded they override the data in previously loaded kernels.
+      The order in which kernels are loaded is:
+      <ol>
+        <li>Target Position</li>
+        <li>Instrument Position</li>
+        <li>Instrument Pointing</li>
+        <li>Frame</li>
+        <li>Target Attitude Shape</li>
+        <li>Instrument</li>
+        <li>Instrument Addendum</li>
+        <li>Leap Second</li>
+        <li>Spacecraft Clock</li>
+        <li>Extra</li>
+      </ol>
+
+      spiceinit will always try to use the best quality kernels possible. This
+      only applies to kernels that are not specified manually. The
+      kernel qualities are, in order:
+      <ol>
+        <li>Smithed</li>
+        This is the best quality of kernel and will used first because these
+        kernels are created after the fact based on the image data. There are
+        not usually standard products with this quality.
+        <li>Reconstructed</li>
+        These kernels are typically produced by a mission a few weeks after the
+        fact.
+        <li>Predicted</li>
+        These kernels are produced by a mission before the fact and are
+        best-estimates of where the spacecraft will be.
+        <li>Nadir</li>
+        This is the worst quality and will be used as a last resort. This
+        assumes the spacecraft is always nadir-looking.
+      </ol>
+    </p>
+    <p>
        Please note: Kernel Files specified that reside in the current working directory will not have their paths expanded.  This is to allow variables like $msg/ to work correctly.
-   </p>
-   <p><b>Troubleshooting:</b> If spiceinit is failing with the error
-     "No Camera Kernel found for the image ..." then try enabling the
-     "CKPREDICTED" or "CKNADIR" option. A similar error exists for SPK kernels,
-     and you can enable "SPKPREDICED" to get past that error. "PREDICTED" and
-     "NADIR" options typically have less accuracy than reconstructed/smithed
-     kernels which is why they are disabled by default.
-   </p>
+    </p>
+    <p><b>Troubleshooting:</b> If spiceinit is failing with the error
+      "No Camera Kernel found for the image ..." then try enabling the
+      "CKPREDICTED" or "CKNADIR" option. A similar error exists for SPK kernels,
+      and you can enable "SPKPREDICED" to get past that error. "PREDICTED" and
+      "NADIR" options typically have less accuracy than reconstructed/smithed
+      kernels which is why they are disabled by default.
+    </p>
   </description>
 
   <category>
@@ -198,7 +233,7 @@
         <type>cube</type>
         <fileMode>input</fileMode>
         <brief>
-          The input file cube to have "kernel" labels added to it
+          The filename of the input cube to have "kernel" labels added to it
         </brief>
         <description>
           The input file which will have a new "kernel" group added to its labels.
@@ -253,8 +288,11 @@
           Attach SPICE data to cube
         </brief>
         <description>
-          This option attaches tables to the cube which contain the instrument position (SPK) and orientation (CK), as well as the sun position and body/target orientation.
-          This is the prefered initialization option as it allows the pointing to be updated by further programs.
+          This option attaches binary tables to the cube which contain the
+          instrument position (SPK) and orientation (CK), as well as the sun
+          position and body/target orientation. This is the prefered
+          initialization option as it allows the pointing to be updated by
+          further programs.
         </description>
       </parameter>
     </group>
@@ -312,10 +350,10 @@
           Compute nadir pointing if no other kernels exist
         </brief>
         <description>
-          This option will create nadir pointing data if the other kernel types do not exist or do not cover the
-          time range of the input cube. At least one of the
-          parameters "CKPREDICTED", "CKNADIR", "CKRECON", "CKSMITHED"
-          must be entered.
+          This option will create nadir pointing data if the other ck kernel
+          types do not exist or do not cover the time range of the input cube.
+          At least one of the parameters "CKPREDICTED", "CKNADIR", "CKRECON",
+          "CKSMITHED" must be entered.
         </description>
       </parameter>
     </group>
@@ -633,7 +671,9 @@
         <description>
           When the kernels for an image are loaded, by default only what the image requires is loaded. 
           By setting this option, the loaded kernels start at the specified amount of time before the 
-          image start time. This option should always be zero for framing cameras.
+          image start time. Using this option for framing cameras could significantly decrease the
+          accuracy of the Naif information because this will cause the information to be interpolated
+          between the STARTPAD and ENDPAD.
         </description>
         <default><item>0.0</item></default>
       </parameter>
@@ -646,7 +686,9 @@
         <description>
           When the kernels for an image are loaded, by default only what the image requires is loaded. 
           By setting this option, the loaded kernels end at the specified amount of time after the 
-          image end time. This option should always be zero for framing cameras.
+          image end time. Using this option for framing cameras could significantly decrease the
+          accuracy of the Naif information because this will cause the information to be interpolated
+          between the STARTPAD and ENDPAD.
         </description>
         <default><item>0.0</item></default>
       </parameter>
