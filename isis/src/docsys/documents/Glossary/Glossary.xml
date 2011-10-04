@@ -18,38 +18,38 @@
             geographic location within the control network
           </definition>
 
-          <definition name="Digital Number">
-            Digital Numbers are a subset of Integers, more specifically positive
-            integers.
+          <definition name="Band">
+            A layer of pixels in an image, typically representing spectral
+            information.  The number of bands indicates the depth of an image in
+            terms of these layers.
           </definition>
 
-          <definition name="Elevation">
-            The height above or below a fixed point on the surface of a body.
+          <definition name="Bit">
+            Short for binary digit, which in a computer is the smallest unit of
+            storage. Bits are either "0" or "1".
           </definition>
 
-          <definition name="Emissivity">
-            A measure describing a substance's ability to absorb and radiate
-            electromagnetic energy.
+          <definition name="Byte">
+            Short for binary term. A byte is a collection of computer bits. On
+            many modern computers, a byte is a group of eight bits. Typically,
+            computers handle and store information in binary (base-2), and a
+            group of eight bits represents an eight digit binary number.
           </definition>
 
-          <definition name="Radiance">
-            A measurement describing the amount of electromagnetic energy
-            emitted from an area of a planet.
+          <definition name="Bit Type">
+            Refers to how many bits there are per single meaningful value in an
+            image cube file.
           </definition>
 
-          <definition name="Reflectence">
-            The ratio of reflected energy to incoming energy.
+          <definition name="Control Measure">
+            The sample and line pixel coordinate (measurement) within an image that
+            has been measured and associated with a Control Point.
           </definition>
 
           <definition name="Control Network">
             A network of Control Points.  By default this is a binary file
             containing fields of information for control points and measures
             between a collection of any number of images.
-          </definition>
-
-          <definition name="Control Measure">
-            The sample and line pixel coordinate (measurement) within an image that
-            has been measured and associated with a Control Point.
           </definition>
 
           <definition name="Control Point">
@@ -70,33 +70,22 @@
             </p>
           </definition>
 
-          <definition name="Bit">
-            Short for binary digit, which in a computer is the smallest unit of
-            storage. Bits are either "0" or "1".
-          </definition>
-
-          <definition name="Byte">
-            Short for binary term. A byte is a collection of computer bits. On
-            many modern computers, a byte is a group of eight bits. Typically,
-            computers handle and store information in binary (base-2), and a
-            group of eight bits represents an eight digit binary number.
-          </definition>
-
-          <definition name="Bit Type">
-            Refers to how many bits there are per single meaningful value in an
-            image cube file.
-          </definition>
-
           <definition name="Cube Serial Number">
             A unique identifier assigned to a specific observation.
           </definition>
 
-          <definition name="Polygon Thickness">
-            The thickness of a polygon is defined as follows:
-            <pre>
-              Thickness = Area / max(Xextent,Yextent)**2
-            </pre>
-            A polygon's thickness will be between 0 and 1.
+          <definition name="Digital Number">
+            Digital Numbers are a subset of Integers, more specifically positive
+            integers.
+          </definition>
+
+          <definition name="Elevation">
+            The height above or below a fixed point on the surface of a body.
+          </definition>
+
+          <definition name="Emissivity">
+            A measure describing a substance's ability to absorb and radiate
+            electromagnetic energy.
           </definition>
 
           <definition name="Emission Angle">
@@ -124,15 +113,44 @@
             </p>
           </definition>
 
+          <definition name="Line">
+            A row of pixels in an image, typically representing spatial
+            information.  The number of lines indicates the height of an image
+            in pixels.
+          </definition>
+
          <definition name="NAIF">
             Navigation and Ancillary Information Facility
           </definition>
 
-         <definition name="Phase Angle">
+          <definition name="Phase Angle">
             The phase angle is the angle between the sun, the point on the
             planet surface and the spacecraft.  Isis applications will use SPICE
             to compute this angle from the ellipsoid or the elevation model
             (e.g., local slopes) at every pixel.
+          </definition>
+
+          <definition name="Polygon Thickness">
+            The thickness of a polygon is defined as follows:
+            <pre>
+              Thickness = Area / max(Xextent,Yextent)**2
+            </pre>
+            A polygon's thickness will be between 0 and 1.
+          </definition>
+
+          <definition name="Radiance">
+            A measurement describing the amount of electromagnetic energy
+            emitted from an area of a planet.
+          </definition>
+
+          <definition name="Reflectence">
+            The ratio of reflected energy to incoming energy.
+          </definition>
+
+          <definition name="Sample">
+            A column of pixels in an image, typically representing spatial
+            information.  The number of samples indicates the width of an image
+            in pixels.
           </definition>
 
           <definition name="Serial Number">
