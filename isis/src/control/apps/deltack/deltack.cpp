@@ -113,7 +113,7 @@ void IsisMain() {
     b.SetOutlierRejection(false);
     b.SetSolutionMethod("SPECIALK");
     b.SetStandardOutput(true);
-    b.SetCSVOutput(true);
+    b.SetCSVOutput(false);
     b.SetResidualOutput(true);
     b.SetConvergenceThreshold(ui.GetDouble("SIGMA0"));
     b.SetMaxIterations(ui.GetInteger("MAXITS"));

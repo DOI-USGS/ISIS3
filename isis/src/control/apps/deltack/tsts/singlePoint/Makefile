@@ -26,10 +26,6 @@ commands:
 	# 3. remove date and time
 	cat residuals.csv | sed 's/\/[^,]*\/\([^,\/]*\.cub\)/\1/g'\
 	  > $(OUTPUT)/residuals.csv
-	cat bundleout_images.csv | sed 's/\/[^,]*\/\([^,\/]*\.cub\)/\1/g' \
-	  > $(OUTPUT)/bundleout_images.csv
-	$(RM) bundleout_images.csv > /dev/null;
-	$(MV) bundleout_points.csv $(OUTPUT)/bundleout_points.csv > /dev/null;
 	$(RM) bundleout.txt > /dev/null;
 	$(RM) residuals.csv  > /dev/null;
 	$(RM) print.prt < /dev/null;

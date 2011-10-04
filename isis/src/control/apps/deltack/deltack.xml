@@ -6,27 +6,38 @@
 
   <description>
     <p>
-    This program can be used to update camera pointing in the labels of a single
-    cube (resection).  Like "jigsaw", it works on both framing cameras and line
-    scanners.  The user must supply a latitude/longitude for at least one single
-    sample/line coordinate in the image.  Angles 1 and 2 of the camera pointing
+    <b>deltack</b> can be used to correct isolated instances of problems with camera
+    attitude.  It adjusts camera orientation in the labels of a single
+    Isis 3 cube (resection).  Like <b>jigsaw</b>, it works on both framing cameras and
+    line scanners.  The user must supply a latitude/longitude for at least one 
+    sample/line coordinate in the image.  Angles 1 and 2 of the camera orientation
     stored in the cube labels will be adjusted to align the coordinate with the
-    entered latitude/longitude.  To solve for all three camera angles select the
+    entered latitude/longitude.  To solve for all three camera angles, select the
     TWIST option.  A second coordinate point and desired latitude/longitude must 
-    be entered for the TWIST option.  The application will adjust the camera
-    angles to align both points with the entered latitude/longitudes with minimal 
-    errors.  In order for this program to work properly, the cube must have been 
-    initialized with the "spiceinit" program using ATTACH="YES".
+    be entered if the <b>TWIST</b> option is used.  <b>deltack</b> will adjust the
+    camera orientation to align both points with their corresponding 
+    latitudes/longitudes with minimal residuals in sample and line.  In order for 
+    <b>deltack</b> to work properly, the input cube must have been initialized with
+    <b>spiceinit</b> using ATTACH="YES".
     </p>
 
     <p>
     The camera pointing is updated using an iterative least-squares bundle
-    adjustment.  The number of iterations and tolerance (sigma0) for 
-    convergence are input parameters to this program.  Solving for two angles
-    only is similar to a translation of the image.  Solving for the twist as well
-    will result in both a translation and a rotation.
+    adjustment.  The number of iterations (<b>MAXIT</b>)and tolerance (<b>SIGMA0</b>)
+    for  convergence are input parameters to <b>deltack</b>.  Solving for two angles
+    only is similar to a translation of the image in sample and line.  Solving for
+    the twist as well will result in both a translation and a rotation.
     </p>
-  </description>
+
+    <p>
+    <b>deltack</b> creates a set of two output files for analyzing the results. 
+    <b>BUNDLEOUT.TXT</b> provides an overall summary of the resection.  It lists the  
+    user input parameters selected and tables of statistics for both the image and
+    the point(s).  <b>RESIDUALS.CSV</b> provides a table of the measured image
+    coordinates and the final sample, line, and overall residuals in both millimeters
+    and pixels.
+    </p>
+   </description>
 
   <category>
     <categoryItem>Control Networks</categoryItem>
@@ -62,6 +73,15 @@
     <change name="Debbie A. Cook" date="2011-09-28">
         Updated documentation in response to Mantis issue #187.
     </change>
+    <change name="Brent A. Archinal" date="2011-09-30">
+        Updated documentation, mostly to indicate units.
+    </change>
+    <change name="Debbie A. Cook" date="2011-10-04">
+        Added documentation for output files and removed creation of 
+        output csv tables because the tables are not useful for
+        only one or two points.  The information is already listed
+        in bundleout.txt.
+    </change>
   </history>
 
   <groups>
@@ -87,7 +107,7 @@
         <brief>Standard deviation of unit weight</brief>
         <description>
            Convergence is reached when the solution parameters change by 
-           less than Sigma0.
+           less than Sigma0.  Units:  unitless.
         </description>
         <type>double</type>
         <default><item>1.0e-10</item></default>
@@ -121,25 +141,26 @@
    <group name="Fixed Points">
      <parameter name="SAMP1">
        <type>double</type>
-       <brief>Sample coordinate</brief>
+       <brief>Sample coordinate, point #1</brief>
        <description>
-          The sample coordinate for fixed point #1 (LAT1,LON1).
+          The sample coordinate for fixed point #1 (LAT1,LON1).  Units:: pixels
        </description>
      </parameter>
 
      <parameter name="LINE1">
        <type>double</type>
-       <brief>Line coordinate</brief>
+       <brief>Line coordinate, point #1</brief>
        <description>
-          The line coordinate for fixed point #1 (LAT1,LON1)
+          The line coordinate for fixed point #1 (LAT1,LON1).    Units:: pixels
        </description>
      </parameter>
 
      <parameter name="LAT1">
        <type>double</type>
-       <brief>Latitude</brief>
+       <brief>Latitude, point #1</brief>
        <description>
-          Planetocentric latitude at the image coordinate (SAMP1,LINE1)
+          Desired planetocentric latitude at the image coordinate (SAMP1,LINE1).
+          Units:  degrees.
        </description>
        <minimum inclusive="yes">-90.0</minimum>
        <maximum inclusive="yes">90.0</maximum>
@@ -147,9 +168,10 @@
 
      <parameter name="LON1">
        <type>double</type>
-       <brief>Longitude</brief>
+       <brief>Longitude, point #1</brief>
        <description>
-          Planetocentric longitude at the image coordinate (SAMP1,LINE1)
+          Desired east longitude at the image coordinate (SAMP1,LINE1).
+          Units:  degrees
        </description>
        <minimum inclusive="yes">0.0</minimum>
        <maximum inclusive="yes">360.0</maximum>
@@ -157,21 +179,21 @@
 
      <parameter name="RAD1">
        <type>double</type>
-       <brief>Radius</brief>
+       <brief>Radius, point #1</brief>
        <internalDefault>Computed</internalDefault>
        <description>
-          Radius in meters at the image coordinate (SAMP1,LINE1).  It 
+          Desired radius at the image coordinate (SAMP1,LINE1).  It 
           will be automatically computed using the shape model that was
-          entered in the "spiceinit" application.
+          entered in the "spiceinit" application.  Units:  meters.
        </description>
        <minimum inclusive="no">0.0</minimum>
      </parameter>
 
      <parameter name="SAMP2">
        <type>double</type>
-       <brief>Sample coordinate</brief>
+       <brief>Sample coordinate, point #2</brief>
        <description>
-          The sample coordinate for fixed point #2 (LAT2,LON2)
+          The sample coordinate for fixed point #2 (LAT2,LON2).  Units:  pixels.
        </description>
        <inclusions>
            <item>TWIST</item>
@@ -180,9 +202,9 @@
 
      <parameter name="LINE2">
        <type>double</type>
-       <brief>Line coordinate</brief>
+       <brief>Line coordinate, point #2</brief>
        <description>
-          The line coordinate for fixed point #2 (LAT2,LON2)
+          The line coordinate for fixed point #2 (LAT2,LON2).  Units:  pixels.
        </description>
        <inclusions>
            <item>TWIST</item>
@@ -191,9 +213,10 @@
 
      <parameter name="LAT2">
        <type>double</type>
-       <brief>Latitude</brief>
+       <brief>Latitude, point #2</brief>
        <description>
-          Planetocentric latitude at the image coordinate (SAMP2,LINE2)
+          Planetocentric latitude at the image coordinate (SAMP2,LINE2).
+          Units:  degrees.
        </description>
        <minimum inclusive="yes">-90.0</minimum>
        <maximum inclusive="yes">90.0</maximum>
@@ -204,8 +227,10 @@
 
      <parameter name="LON2">
        <type>double</type>
-       <brief>Longitude</brief>
-       <description>Planetocentric longitude at the image coordinate (SAMP2,LINE2)</description>
+       <brief>Longitude, point #2</brief>
+       <description>Desired east longitude at the image coordinate (SAMP2,LINE2).
+                    Units:  degrees.
+       </description>
        <minimum inclusive="yes">0.0</minimum>
        <maximum inclusive="yes">360.0</maximum>
        <inclusions>
@@ -215,12 +240,12 @@
 
      <parameter name="RAD2">
        <type>double</type>
-       <brief>Radius</brief>
+       <brief>Radius, point #2</brief>
        <internalDefault>Computed</internalDefault>
        <description>
-         Radius in meters at the image coordinate (SAMP2,LINE2).  It will 
+         Radius at the image coordinate (SAMP2,LINE2).  It will 
          be automatically computed using the shape model that was 
-         initialized in the "spiceinit" application.
+         initialized in the "spiceinit" application.  Units:  meters.
        </description>
        <minimum inclusive="no">0.0</minimum>
        <inclusions>
