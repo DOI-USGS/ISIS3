@@ -82,9 +82,9 @@
       Removed the *Sum keywords from the BRIEF output, and added PolygonCount.
     </change>
     <change name="Jai Rideout" date="2011-09-26">
-      Updated and rewrote much of the existing documentation to match the
-      current behavior of the application, as well as clarify the purpose of the
-      application.
+      Updated and rewrote much of the existing documentation with Raad Saleh and
+      Laszlo Kestay to match the current behavior of the application, as well as
+      clarify the purpose of the application.
     </change>
   </history>
 
