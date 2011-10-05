@@ -219,6 +219,11 @@
     <change name="Steven Lambright and Jai Rideout" date="2011-08-30">
       Added support for using a spiceinit web service
     </change>
+    <change name="Steven Lambright" date="2011-10-05">
+      As a result of our test and review team, I have updated the documentation
+      to match the recommendations of Laz Kestay and Ken Edmundson. Fixes
+      #423.
+    </change>
   </history>
 
   <oldName>
