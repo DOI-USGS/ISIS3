@@ -40,4 +40,4 @@ commands:
 	onet=$(OUTPUT)/new.dn.net \
 	networkid=NewNetwork pointid="new????" description=NewNetwork \
 	> /dev/null;
-	#$(RM) $(OUTPUT)/list.lis;
+	$(RM) $(OUTPUT)/list.lis;

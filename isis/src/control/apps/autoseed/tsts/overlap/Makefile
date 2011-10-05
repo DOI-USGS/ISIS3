@@ -24,5 +24,5 @@ commands:
 	pointid="new????" \
 	description=NewNetwork \
 	> /dev/null;
-	#$(RM) $(OUTPUT)/list.lis;
-	#$(RM) $(OUTPUT)/sub.lis;
+	$(RM) $(OUTPUT)/list.lis;
+	$(RM) $(OUTPUT)/sub.lis;
