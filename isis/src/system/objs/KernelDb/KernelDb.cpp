@@ -138,6 +138,7 @@ std::priority_queue< Kernel > KernelDb::FindAll(const std::string &entry,
     Isis::Pvl &lab) {
   std::priority_queue< Kernel > filesFound;
   Isis::PvlObject &cube = lab.FindObject("IsisCube");
+  int cameraVersion = CameraFactory::CameraVersion(lab);
 
   // Make sure the entry has been loaded into memory
   if(!p_kernelData.HasObject(entry)) return filesFound;
@@ -172,8 +173,8 @@ std::priority_queue< Kernel > KernelDb::FindAll(const std::string &entry,
       }
     }
 
-    bool startMatches = Matches(lab, grp, start);
-    bool endMatches = Matches(lab, grp, end);
+    bool startMatches = Matches(lab, grp, start, cameraVersion);
+    bool endMatches = Matches(lab, grp, end, cameraVersion);
 
     if(startMatches && endMatches) {
       // Simple case - the selection simply matches
@@ -200,7 +201,7 @@ std::priority_queue< Kernel > KernelDb::FindAll(const std::string &entry,
         if(grp.HasKeyword("Type") != endTimeGrp.HasKeyword("Type")) continue;
         if(grp.HasKeyword("Type") &&
             grp["Type"] != endTimeGrp["Type"]) continue;
-        if(!Matches(lab, endTimeGrp, end)) continue;
+        if(!Matches(lab, endTimeGrp, end, cameraVersion)) continue;
 
         // Better match is true if we find a full overlap
         bool betterMatch = false;
@@ -219,10 +220,10 @@ std::priority_queue< Kernel > KernelDb::FindAll(const std::string &entry,
           iTime timeRangeStart((string)key[0]);
           iTime timeRangeEnd((string)key[1]);
 
-          bool thisEndMatches = Matches(lab, endTimeGrp, timeRangeEnd);
+          bool thisEndMatches = Matches(lab, endTimeGrp, timeRangeEnd, cameraVersion);
           endTimesMatch = endTimesMatch && thisEndMatches;
 
-          if(Matches(lab, endTimeGrp, start) && Matches(lab, endTimeGrp, end)) {
+          if(Matches(lab, endTimeGrp, start, cameraVersion) && Matches(lab, endTimeGrp, end, cameraVersion)) {
             // If we run into a continuous kernel, we want to take that in all
             //   cases.
             betterMatch = true;
@@ -259,7 +260,7 @@ std::priority_queue< Kernel > KernelDb::FindAll(const std::string &entry,
 }
 
 const bool KernelDb::Matches(Pvl &lab, PvlGroup &kernelDbGrp,
-                             iTime timeToMatch) {
+                             iTime timeToMatch, int cameraVersion) {
   // These are the conditions that make this test pass:
   //   1) No time OR At least one matching time
   //   2) All keyword matches are true OR No keyword matches present
@@ -269,7 +270,6 @@ const bool KernelDb::Matches(Pvl &lab, PvlGroup &kernelDbGrp,
   // exist, one of them has to set matchTime to true. The matchKeywords is
   // true until a mismatch is found.
   Isis::PvlObject &cube = lab.FindObject("IsisCube");
-  int cameraVersion = CameraFactory::CameraVersion(lab);
   bool matchTime = !kernelDbGrp.HasKeyword("Time");
   bool matchKeywords = true;
 
@@ -492,4 +492,5 @@ const bool KernelDb::Better(const spiceInit::kernelTypes nType,
 
   return false;
 }
+
 
