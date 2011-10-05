@@ -17,7 +17,7 @@
   
   <seeAlso>
     <applications>
-      <item>remapollorx</item>
+      <item>apolloremrx</item>
       <item>findrx</item>
       <item>remrx</item>
     </applications>
@@ -55,8 +55,8 @@
         <description>
         </description>
         <default><item>0.125</item></default>
-        <minimum inclusive="yes"> 0.0 </minimum>
-        <maximum inclusive="no"> 0.5 </maximum>
+        <minimum inclusive="yes">0.0</minimum>
+        <maximum inclusive="no">0.5</maximum>
       </parameter>
       <parameter name="PATTERNSIZE">
         <type>integer</type>
