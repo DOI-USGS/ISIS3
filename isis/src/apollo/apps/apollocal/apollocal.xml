@@ -5,6 +5,8 @@
   </brief>
 
   <description>
+    This program will perform radiometric corrections on apollo plenetary
+    images.
   </description>
 
   <category>
