@@ -35,7 +35,7 @@ namespace Isis {
    * @code
    * Object = NormalizationModel
    *   Group = Algorithm
-   *     Name = ShadeAtm
+   *     NormName/Name = ShadeAtm
    *     PhotoModel = Minnaert
    *     AtmosModel = Isotropic1
    *   EndGroup
@@ -53,7 +53,18 @@ namespace Isis {
     // Get the algorithm name to create
     PvlGroup &algo = pvl.FindObject("NormalizationModel")
                      .FindGroup("Algorithm", Pvl::Traverse);
-    std::string algorithm = algo["Name"];
+    std::string algorithm = "";
+    if (algo.HasKeyword("NormName")) {
+      algorithm = std::string(algo["NormName"]);
+    }
+    else if (algo.HasKeyword("Name")) {
+      algorithm = std::string(algo["Name"]);
+    }
+    else {
+      iString msg = "Keyword [Name] or keyword [NormName] must ";
+      msg += "exist in [Group = Algorithm]";
+      throw iException::Message(iException::User, msg, _FILEINFO_);
+    }
 
     // Open the factory plugin file
     Plugin *p = new Plugin;
@@ -79,7 +90,7 @@ namespace Isis {
    * @code
    * Object = NormalizationModel
    *   Group = Algorithm
-   *     Name = ShadeAtm
+   *     NormName/Name = ShadeAtm
    *     PhotoModel = Minnaert
    *     AtmosModel = Isotropic1
    *   EndGroup
@@ -98,7 +109,18 @@ namespace Isis {
     // Get the algorithm name to create
     PvlGroup &algo = pvl.FindObject("NormalizationModel")
                      .FindGroup("Algorithm", Pvl::Traverse);
-    std::string algorithm = algo["Name"];
+    std::string algorithm = "";
+    if (algo.HasKeyword("NormName")) {
+      algorithm = std::string(algo["NormName"]);
+    }
+    else if (algo.HasKeyword("Name")) {
+      algorithm = std::string(algo["Name"]);
+    }
+    else {
+      iString msg = "Keyword [Name] or keyword [NormName] must ";
+      msg += "exist in [Group = Algorithm]";
+      throw iException::Message(iException::User, msg, _FILEINFO_);
+    }
 
     // Open the factory plugin file
     Plugin *p = new Plugin;
