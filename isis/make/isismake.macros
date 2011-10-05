@@ -1,4 +1,4 @@
-\SHELL=bash
+SHELL=bash
 
 #---------------------------------------------------------------------------
 # Check to see if the programmer wants make to be noisy
