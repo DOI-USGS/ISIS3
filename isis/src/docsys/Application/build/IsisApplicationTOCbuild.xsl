@@ -13,7 +13,9 @@ Deborah Lee Soltesz
 
 <xsl:output indent="yes" omit-xml-declaration="yes">
   <xsl:template match="/">
-     <xsl:apply-templates select="application" />
+    <xsl:apply-templates select="application">
+      <xsl:sort select="name"/>
+    </xsl:apply-templates>
   </xsl:template>
 </xsl:output>
 

@@ -137,6 +137,7 @@ Deborah Lee Soltesz
 
             <table>
             <xsl:for-each select="/tableofcontents/application/category/categoryItem">
+              <xsl:sort select="normalize-space(../../name)"/>
               <xsl:if test="normalize-space(.) = $categoryName">
                 <tr>
                   <th class="tableCellLevel1_th">
@@ -168,6 +169,7 @@ Deborah Lee Soltesz
 
             <table>
             <xsl:for-each select="/tableofcontents/application/category/missionItem">
+              <xsl:sort select="normalize-space(../../name)"/>
               <xsl:if test="normalize-space(.) = $missionName">
                 <tr>
                   <th class="tableCellLevel1_th">
