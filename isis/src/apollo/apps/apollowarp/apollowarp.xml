@@ -6,7 +6,8 @@
   </brief>
 
   <description>
-      This program warps Apollo images using the reseau information. (note: findapollorx must be run first).
+      This program warps Apollo images using the reseau information. (note:
+      apollofindrx must be run first).
   </description>
 
   <history>
