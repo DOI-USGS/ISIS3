@@ -6,7 +6,7 @@
   <description>
     This program will read an ascii file and create a cube.  The ascii values
     can be delimited by spaces, tabs, commas or any other character that is
-    not a number, a period, or a plus or minus sign.
+    not a number, a period, a plus sign or a minus sign.
   </description>
 
   <category>
@@ -36,7 +36,7 @@
         <fileMode>input</fileMode>
         <brief>Input ascii file</brief>
         <description>
-	      The file name of the input ascii file to be converted to cube.
+	  The file name of the input ascii file to be converted to cube.
         </description>
         <filter>*.txt</filter>
       </parameter>
@@ -46,7 +46,7 @@
         <pixelType>real</pixelType>
         <brief>Output cube</brief>
         <description>
-	      The file name of the output cube.
+	  The file name of the output cube.
         </description>
         <filter>*.cub</filter>
       </parameter>
@@ -153,9 +153,9 @@
 	    If this option is used input raw pixels below minimum and
         above maximum will be converted to LRS and HRS respectively.  Otherwise
         pixels in the input raw file will be left unchanged in most cases.  For
-        example, importing a raw 8-bit file and outputing to a 16-bit or 32-bit         real will
-        cause 0 and 255 to be actual values.  If left as 8-bit then 0 will
-        be NULL and 255 will be HRS.
+        example, importing a raw 8-bit file and outputing to a 16-bit or 32-bit
+        real will cause 0 and 255 to be actual values.  If left as 8-bit then 0
+        will be NULL and 255 will be HRS.
         </description>
         <inclusions>
           <item>NULLMIN</item>
@@ -196,9 +196,9 @@
 	    If this option is used input raw pixels below minimum and
         above maximum will be converted to LRS and HRS respectively.  Otherwise
         pixels in the input raw file will be left unchanged in most cases.  For
-        example, importing a raw 8-bit file and outputing to a 16-bit or 32-bit         real will
-        cause 0 and 255 to be actual values.  If left as 8-bit then 0 will
-        be NULL and 255 will be HRS.
+        example, importing a raw 8-bit file and outputing to a 16-bit or 32-bit
+        real will cause 0 and 255 to be actual values.  If left as 8-bit then 0
+        will be NULL and 255 will be HRS.
         </description>
         <inclusions>
           <item>HRSMIN</item>
@@ -208,7 +208,7 @@
 
       <parameter name="HRSMIN">
         <type>double</type>
-        <brief> Minimum valid value </brief>
+        <brief>Minimum valid value</brief>
         <description>
           Minimum valid value.  Anything below this value will be
           set to LRS.
@@ -219,7 +219,7 @@
       </parameter>
       <parameter name="HRSMAX">
         <type>double</type>
-        <brief> Maximum valid value </brief>
+        <brief>Maximum valid value</brief>
         <description>
           Maximum valid value.  Anything above this value will be
           set to HRS.
@@ -251,7 +251,7 @@
 
       <parameter name="LRSMIN">
         <type>double</type>
-        <brief> Minimum valid value </brief>
+        <brief>Minimum valid value</brief>
         <description>
           Minimum valid value.  Anything below this value will be
           set to LRS.
@@ -262,7 +262,7 @@
       </parameter>
       <parameter name="LRSMAX">
         <type>double</type>
-        <brief> Maximum valid value </brief>
+        <brief>Maximum valid value</brief>
         <description>
           Maximum valid value.  Anything above this value will be
           set to HRS.
