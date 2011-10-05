@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iomanip>
 #include <cstdlib>
 
 #include "AutoReg.h"
@@ -17,9 +18,9 @@ int main() {
   try {
     PvlGroup alg("Algorithm");
     alg += PvlKeyword("Name", "AdaptiveGruen");
-    alg += PvlKeyword("Tolerance", 100.0);
-    alg += PvlKeyword("AffineTranslationTolerance", 0.2);
-    alg += PvlKeyword("AffineScaleTolerance", 0.7);
+    alg += PvlKeyword("Tolerance", 0.01);
+    alg += PvlKeyword("AffineTranslationTolerance", 0.15);
+    alg += PvlKeyword("AffineScaleTolerance", 0.15);
     alg += PvlKeyword("MaximumIterations", 30);
 
     PvlGroup pchip("PatternChip");
@@ -53,8 +54,10 @@ int main() {
     ar->PatternChip()->Load(p);
 
     std::cout << "Register = " << ar->Register() << std::endl;
-    std::cout << "Position = " << ar->CubeSample() << " " <<
-              ar->CubeLine() << std::endl;
+    std::cout << "Goodness = " << std::setprecision(3) 
+              << ar->GoodnessOfFit() << std::endl;
+    std::cout << "Position = " << std::setprecision(6) 
+              << ar->CubeSample() << " " << ar->CubeLine() << std::endl;
 
 
 #if defined(FULL_DISCLOSURE)
