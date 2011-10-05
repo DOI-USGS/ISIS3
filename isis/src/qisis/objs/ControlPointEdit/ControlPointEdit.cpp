@@ -128,17 +128,20 @@ namespace Isis {
     QToolButton *leftZoomIn = new QToolButton();
     leftZoomIn->setIcon(QPixmap(toolIconDir + "/viewmag+.png"));
     leftZoomIn->setIconSize(isize);
-    leftZoomIn->setToolTip("Zoom In");
+    leftZoomIn->setToolTip("Zoom In 2x");
+    leftZoomIn->setWhatsThis("Zoom In 2x on left measure.");
 
     QToolButton *leftZoomOut = new QToolButton();
     leftZoomOut->setIcon(QPixmap(toolIconDir + "/viewmag-.png"));
     leftZoomOut->setIconSize(isize);
-    leftZoomOut->setToolTip("Zoom Out");
+    leftZoomOut->setToolTip("Zoom Out 2x");
+    leftZoomOut->setWhatsThis("Zoom Out 2x on left measure.");
 
     QToolButton *leftZoom1 = new QToolButton();
     leftZoom1->setIcon(QPixmap(toolIconDir + "/viewmag1.png"));
     leftZoom1->setIconSize(isize);
     leftZoom1->setToolTip("Zoom 1:1");
+    leftZoom1->setWhatsThis("Show left measure at full resolution.");
 
     QHBoxLayout *leftZoomPan = new QHBoxLayout;
     leftZoomPan->addWidget(leftZoomIn);
@@ -157,24 +160,32 @@ namespace Isis {
                                Expanded().c_str()));
       leftPanUp->setIconSize(isize);
       leftPanUp->setToolTip("Move up 1 screen pixel");
+      leftPanUp->setStatusTip("Move up 1 screen pixel");
+      leftPanUp->setWhatsThis("Move the left measure up 1 screen pixel.");
 
       leftPanDown = new QToolButton(parent);
       leftPanDown->setIcon(QIcon(Filename("$base/icons/down.png").
                                  Expanded().c_str()));
       leftPanDown->setIconSize(isize);
       leftPanDown->setToolTip("Move down 1 screen pixel");
+      leftPanDown->setStatusTip("Move down 1 screen pixel");
+      leftPanDown->setWhatsThis("Move the left measure down 1 screen pixel.");
 
       leftPanLeft = new QToolButton(parent);
       leftPanLeft->setIcon(QIcon(Filename("$base/icons/back.png").
                                  Expanded().c_str()));
       leftPanLeft->setIconSize(isize);
       leftPanLeft->setToolTip("Move left 1 screen pixel");
+      leftPanLeft->setWhatsThis("Move the left measure to the left by 1 screen"
+                                "pixel.");
 
       leftPanRight = new QToolButton(parent);
       leftPanRight->setIcon(QIcon(Filename("$base/icons/forward.png").
                                   Expanded().c_str()));
       leftPanRight->setIconSize(isize);
       leftPanRight->setToolTip("Move right 1 screen pixel");
+      leftPanRight->setWhatsThis("Move the left measure to the right by 1"
+                                 "screen pixel.");
 
       leftZoomPan->addWidget(leftPanUp);
       leftZoomPan->addWidget(leftPanDown);
@@ -188,24 +199,21 @@ namespace Isis {
     p_rightZoomIn = new QToolButton();
     p_rightZoomIn->setIcon(QPixmap(toolIconDir + "/viewmag+.png"));
     p_rightZoomIn->setIconSize(isize);
-    p_rightZoomIn->setToolTip("Zoom In");
-    QString text = "Zoom in 2X";
-    p_rightZoomIn->setWhatsThis(text);
+    p_rightZoomIn->setToolTip("Zoom In 2x");
+    p_rightZoomIn->setWhatsThis("Zoom In 2x on right measure.");
 
     p_rightZoomOut = new QToolButton();
     p_rightZoomOut->setIcon(QIcon(Filename("$base/icons/viewmag-.png").
                                   Expanded().c_str()));
     p_rightZoomOut->setIconSize(isize);
-    p_rightZoomOut->setToolTip("Zoom Out");
-    text = "Zoom out 2X";
-    p_rightZoomOut->setWhatsThis(text);
+    p_rightZoomOut->setToolTip("Zoom Out 2x");
+    p_rightZoomOut->setWhatsThis("Zoom Out 2x on right measure.");
 
     p_rightZoom1 = new QToolButton();
     p_rightZoom1->setIcon(QPixmap(toolIconDir + "/viewmag1.png"));
     p_rightZoom1->setIconSize(isize);
     p_rightZoom1->setToolTip("Zoom 1:1");
-    text = "Zoom 1:1";
-    p_rightZoom1->setWhatsThis(text);
+    p_rightZoom1->setWhatsThis("Show right measure at full resolution.");
 
     QHBoxLayout *rightZoomPan = new QHBoxLayout;
     rightZoomPan->addWidget(p_rightZoomIn);
@@ -218,24 +226,30 @@ namespace Isis {
                               Expanded().c_str()));
     rightPanUp->setIconSize(isize);
     rightPanUp->setToolTip("Move up 1 screen pixel");
+    rightPanUp->setWhatsThis("Move the right measure up 1 screen pixel.");
 
     QToolButton *rightPanDown = new QToolButton(parent);
     rightPanDown->setIcon(QIcon(Filename("$base/icons/down.png").
                                 Expanded().c_str()));
     rightPanDown->setIconSize(isize);
     rightPanDown->setToolTip("Move down 1 screen pixel");
+    rightPanUp->setWhatsThis("Move the right measure down 1 screen pixel.");
 
     QToolButton *rightPanLeft = new QToolButton(parent);
     rightPanLeft->setIcon(QIcon(Filename("$base/icons/back.png").
                                 Expanded().c_str()));
     rightPanLeft->setIconSize(isize);
     rightPanLeft->setToolTip("Move left 1 screen pixel");
+    rightPanLeft->setWhatsThis("Move the right measure to the left by 1 screen"
+                              "pixel.");
 
     QToolButton *rightPanRight = new QToolButton(parent);
     rightPanRight->setIcon(QIcon(Filename("$base/icons/forward.png").
                                  Expanded().c_str()));
     rightPanRight->setIconSize(isize);
     rightPanRight->setToolTip("Move right 1 screen pixel");
+    rightPanRight->setWhatsThis("Move the right measure to the right by 1"
+                                "screen pixel.");
 
     rightZoomPan->addWidget(rightPanUp);
     rightZoomPan->addWidget(rightPanDown);
@@ -251,9 +265,9 @@ namespace Isis {
     // there are two "lock stretch" checkboxes (left and right)
     // use same whats this text for both
     QString whatsThisTextForStretchLocking = "If checked then a new stretch "
-                                             "will NOT be calculated for each pan or zoom change.  Note that stretch"
-                                             " changes made using the stretch tool will ALWAYS take effect, "
-                                             "regardless of the state of this checkbox.";
+        "will NOT be calculated for each pan or zoom change.  Note that stretch"
+        " changes made using the stretch tool will ALWAYS take effect, "
+        "regardless of the state of this checkbox.";
     leftLockStretch->setWhatsThis(whatsThisTextForStretchLocking);
     QHBoxLayout *leftzflsLayout = new QHBoxLayout;
     leftzflsLayout->addWidget(p_leftZoomFactor);
@@ -392,13 +406,23 @@ namespace Isis {
     p_dial->setNotchesVisible(true);
     p_dial->setNotchTarget(5.);
     p_dial->setEnabled(false);
+    p_dial->setToolTip("Rotate right measure");
+    p_dial->setWhatsThis("Rotate the right measure by degrees.");
 
     p_dialNumber = new QLCDNumber();
     p_dialNumber->setEnabled(false);
+    p_dialNumber->setToolTip("Rotate right measure");
+    p_dialNumber->setWhatsThis("Rotate the right measure by given number"
+                               " of degrees.");
     connect(p_dial, SIGNAL(valueChanged(int)), p_dialNumber, SLOT(display(int)));
     connect(p_dial, SIGNAL(valueChanged(int)), p_rightView, SLOT(rotateChip(int)));
 
     QCheckBox *showPoints = new QCheckBox("Show control points");
+    showPoints->setToolTip("Draw control point crosshairs");
+    showPoints->setWhatsThis("This will toggle whether crosshairs are drawn"
+                     " for the control points located within the measure''s"
+                     " view.  For areas of dense measurements, turning this"
+                     " off will allow easier viewing of features.");
     connect(showPoints, SIGNAL(toggled(bool)), p_leftView, SLOT(setPoints(bool)));
     connect(showPoints, SIGNAL(toggled(bool)), p_rightView, SLOT(setPoints(bool)));
     showPoints->setChecked(true);
@@ -407,9 +431,15 @@ namespace Isis {
     connect(cross, SIGNAL(toggled(bool)), p_leftView, SLOT(setCross(bool)));
     connect(cross, SIGNAL(toggled(bool)), p_rightView, SLOT(setCross(bool)));
     cross->setChecked(true);
+    cross->setToolTip("Show the red crosshair across measure view");
+    cross->setWhatsThis("This will toggle whether the crosshair across the"
+                        " measure view will be shown");
 
     QCheckBox *circle = new QCheckBox("Circle");
     circle->setChecked(false);
+    circle->setToolTip("Draw circle");
+    circle->setWhatsThis("Draw circle on measure view.  This can aid in"
+                         " centering a crater under the crosshair.");
     connect(circle, SIGNAL(toggled(bool)), this, SLOT(setCircle(bool)));
 
     p_slider = new QScrollBar(Qt::Horizontal);
@@ -420,6 +450,8 @@ namespace Isis {
     p_slider->setValue(20);
     p_slider->setDisabled(true);
     p_slider->hide();
+    p_slider->setToolTip("Adjust circle size");
+    p_slider->setWhatsThis("This allows the cirle size to be adjusted.");
 
     QVBoxLayout *vlayout = new QVBoxLayout();
     vlayout->addWidget(p_nogeom);
@@ -435,21 +467,33 @@ namespace Isis {
 
     //  Show sample / line for measure of chips shown
     p_leftSampLinePosition = new QLabel();
+    p_leftSampLinePosition->setToolTip("Sample/Line under the crosshair");
     gridLayout->addWidget(p_leftSampLinePosition, row, 0);
     p_rightSampLinePosition = new QLabel();
+    p_rightSampLinePosition->setToolTip("Sample/Line under the crosshair");
     gridLayout->addWidget(p_rightSampLinePosition, row++, 1);
 
     //  Show lat / lon for measure of chips shown
     p_leftLatLonPosition = new QLabel();
+    p_leftLatLonPosition->setToolTip("Latitude/Longitude under the crosshair");
     gridLayout->addWidget(p_leftLatLonPosition, row, 0);
     p_rightLatLonPosition = new QLabel();
+    p_rightLatLonPosition->setToolTip("Latitude/Longitude under the crosshair");
     gridLayout->addWidget(p_rightLatLonPosition, row++, 1);
 
 
     //  Add auto registration extension
     p_autoRegExtension = new QWidget;
     p_oldPosition = new QLabel;
+    p_oldPosition->setToolTip("Measure Sample/Line before sub-pixel "
+                              "registration");
+    p_oldPosition->setWhatsThis("Original Sample/Line of the right measure "
+            "before the sub-pixel registration.  If you select the \"Undo\" "
+            "button, the measure will revert back to this Sample/Line.");
     p_goodFit = new QLabel;
+    p_goodFit->setToolTip("Goodness of Fit result from sub-pixel registration.");
+    p_goodFit->setWhatsThis("Resulting Goodness of Fit from sub-pixel "
+                              "registration.");
     QVBoxLayout *autoRegLayout = new QVBoxLayout;
     autoRegLayout->setMargin(0);
     autoRegLayout->addWidget(p_oldPosition);
@@ -465,7 +509,7 @@ namespace Isis {
     stop->setIcon(QPixmap(toolIconDir + "/blinkStop.png"));
     stop->setIconSize(QSize(22, 22));
     stop->setToolTip("Blink Stop");
-    text = "<b>Function:</b> Stop automatic timed blinking";
+    QString text = "<b>Function:</b> Stop automatic timed blinking";
     stop->setWhatsThis(text);
     connect(stop, SIGNAL(released()), this, SLOT(blinkStop()));
 
@@ -493,6 +537,10 @@ namespace Isis {
             this, SLOT(changeBlinkTime(double)));
 
     QPushButton *find = new QPushButton("Find");
+    find->setToolTip("Move right measure to same Latitude/Longitude as left.");
+    find->setWhatsThis("Find the Latitude/Longitude under the crosshair in the "
+                       "left measure and move the right measure to the same "
+                       "latitude/longitude.");
 
     leftLayout->addWidget(stop);
     leftLayout->addWidget(start);
@@ -508,10 +556,20 @@ namespace Isis {
 //    leftLayout->addWidget(blink);
     gridLayout->addLayout(leftLayout, row, 0);
 
-
     QHBoxLayout *rightLayout = new QHBoxLayout();
     p_autoReg = new QPushButton("Register");
+    p_autoReg->setToolTip("Sub-pixel register the right measure to the left");
+    p_autoReg->setWhatsThis("Sub-pixel register the right measure to the left "
+                       "and move the result under the crosshair.  After "
+                       "viewing the results, the option exists to move the "
+                       "measure back to the original position by selecting "
+                       "<strong>\"Undo Registration\"</strong>.");
     p_saveMeasure = new QPushButton("Save Measure");
+    p_saveMeasure->setToolTip("Save the right measure to the edit control "
+                              "point (control point currently being edited). "
+                              " <strong>Note: The edit control point "
+                              "will not be save until you select "
+                              "<strong>\"Save Point\"</strong>");
     p_saveDefaultPalette = p_saveMeasure->palette();
 
     rightLayout->addWidget(p_autoReg);
