@@ -64,5 +64,10 @@
       code base to make a quicker, more-intuitive and more maintainable
       program. Updated user documentation to be much more complete.
     </change>
+    <change name="Steven Lambright" date="2011-10-05">
+      Improved documentation in preparation for the October release. Working
+      with me to help figure out the best ways to document qmos were Orrin
+      Thomas and Trent Hare. Fixes #427
+    </change>
   </history>
 </application>
