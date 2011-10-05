@@ -7,9 +7,10 @@
 
   <description>
     This program will output the full or brief history of a .cub file.  The brief mode
-     is especially useful for creating a script for a batch job, because the output is in the
-     command line format.
+    is especially useful for creating a script for a batch job, because the output is in the
+    command line format.
   </description>
+
   <category>
     <categoryItem>Utility</categoryItem>
   </category>
