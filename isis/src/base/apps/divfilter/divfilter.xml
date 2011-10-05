@@ -51,7 +51,7 @@
       <item>lowpass</item>
       <item>trimfilter</item>
       <item>svfilter</item>
-      <item>noisfilter</item>
+      <item>noisefilter</item>
     </applications>
   </seeAlso>
 

@@ -35,7 +35,7 @@
       specifying which column to use durring normilization.
     </change>
     <change name="Steven Lambright" date="2008-05-12">
-          Removed references to CubeInfo 
+      Removed references to CubeInfo 
     </change>
   </history>
 
@@ -85,15 +85,15 @@
          <default><item>BAND</item></default>
          <brief>Direction in which statistics and operations operate</brief>
          <description>
-        	This is the the average to be used during normalization. If the user chooses
-        	to use band averages, they intend to take in an entire band of data 
-            and normalize based on the average of that band for each pixel in
-            that band. If they choose to use the average from the entire cube, 
-        	they intend to take in an entire cube of data and normalize each 
-            pixel in each band based on the average of the entire cube.  If they 
-            choose pencil, they intend to use a file containing the averages of 
-            each band to normalize each pixel in correlating band.  This file is 
-            best obtained using Qview's plot tool.
+           This is the the average to be used during normalization. If the user chooses
+           to use band averages, they intend to take in an entire band of data 
+           and normalize based on the average of that band for each pixel in
+           that band. If they choose to use the average from the entire cube, 
+           they intend to take in an entire cube of data and normalize each 
+           pixel in each band based on the average of the entire cube.  If they 
+           choose pencil, they intend to use a file containing the averages of 
+           each band to normalize each pixel in correlating band.  This file is 
+           best obtained using Qview's plot tool.
          </description>
          <list>
            <option value="BAND">
@@ -111,7 +111,7 @@
            <option value="CUBE">
             <brief>Divide by Cube Average</brief>
             <description>
-	           Get the average of the entire cube to use in the normailization
+              Get the average of the entire cube to use in the normailization
             </description>
              <exclusions>
                <item>SPECTRUM</item>
