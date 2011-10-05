@@ -2,7 +2,7 @@
 
 <application name="crop" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
-    Crops a cube
+    This program extracts a sub-area from a cube 
   </brief>
 
   <description>
@@ -14,8 +14,7 @@
 
     The contiguous area can however be sub-sampled by specifing pixel
     increments (or skips).  For example every third line (1, 4, 7, 10, ...)
-    can be written to
-    the output cube using a line increment (LINC) of three.
+    can be written to the output cube using a line increment (LINC) of three.
   </description>
 
   <category>
