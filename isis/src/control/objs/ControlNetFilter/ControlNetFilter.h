@@ -61,8 +61,9 @@ namespace Isis {
    *   @history 2011-06-07 Debbie A. Cook and Tracie Sucharski - Modified point types
    *                          Ground ------> Fixed
    *                          Tie----------> Free
-   *  @history 2011-07-22 Sharmila Prasad - modified for new keywords in binary control net and added new
+   *  @history 2011-07-22 Sharmila Prasad - Modified for new keywords in binary control net and added new
    *                               filters for ResidualTolerance, PixelShift and EditLock(Point & Measure)
+   *  @history 2011-10-05 Sharmila Prasad - Report double values with 10 digit precision
    */
   class ControlNetFilter : public ControlNetStatistics {
     public:

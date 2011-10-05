@@ -14,6 +14,10 @@
 #include "SerialNumberList.h"
 #include "Statistics.h"
 
+// for double precision
+#include <limits>
+typedef std::numeric_limits< double > dbl;
+
 using namespace std;
 
 #define UNDEFINED_STATUS 2
@@ -52,6 +56,7 @@ namespace Isis {
     Isis::Filename outFile(psPrintFile);
     string outName(outFile.Expanded());
     mOstm.open(outName.c_str(), std::ios::out);
+    mOstm.precision(dbl::digits10);
   }
 
   /**
@@ -557,8 +562,8 @@ namespace Isis {
    * @param pbLastFilter - Flag to indicate whether this is the last filter to print the stats
    */
   void ControlNetFilter::PointLatLonFilter(const PvlGroup &pvlGrp, bool pbLastFilter) {
-    double dMinLat = 0, dMaxLat = 0;
-    double dMinLon = 0, dMaxLon = 0;
+    double dMinLat = Isis::ValidMinimum, dMaxLat = Isis::ValidMaximum;
+    double dMinLon = Isis::ValidMinimum, dMaxLon = Isis::ValidMaximum;
 
     if (pvlGrp.HasKeyword("MinLat")) {
       dMinLat = pvlGrp["MinLat"][0];
@@ -592,7 +597,7 @@ namespace Isis {
     for (int i = (iNumPoints - 1); i >= 0; i--) {
       const ControlPoint *cPoint = mCNet->GetPoint(i);
       SurfacePoint cPointSurfPt = cPoint->GetAdjustedSurfacePoint();
-
+      
       if (!cPointSurfPt.Valid()) {
         const ControlMeasure *cm = cPoint->GetRefMeasure();
 
@@ -608,20 +613,19 @@ namespace Isis {
             Distance(camera->LocalRadius()));
         }
       }
-
-      if (!(cPointSurfPt.GetLatitude().GetDegrees() >= dMinLat &&
-          cPointSurfPt.GetLatitude().GetDegrees() <= dMaxLat) ||
-          !(cPointSurfPt.GetLongitude().GetDegrees() >= dMinLon &&
-              cPointSurfPt.GetLongitude().GetDegrees() <= dMaxLon)) {
+      double latitude  = cPointSurfPt.GetLatitude().GetDegrees();
+      double longitude = cPointSurfPt.GetLongitude().GetDegrees();
+      
+      if ((latitude < dMinLat || latitude > dMaxLat) ||
+          (longitude < dMinLon ||longitude > dMaxLon)) {
         FilterOutPoint(i);
         continue;
       }
 
       if (pbLastFilter) {
         PointStats(*cPoint);
-        mOstm << cPointSurfPt.GetLatitude().GetDegrees() << ", " <<
-            cPointSurfPt.GetLongitude().GetDegrees() << ", " <<
-            cPointSurfPt.GetLocalRadius().GetMeters() << endl;
+        mOstm << latitude << ", " << longitude << ", " <<
+          cPointSurfPt.GetLocalRadius().GetMeters() << endl;
       }
     }
   }
