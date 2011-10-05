@@ -2,42 +2,113 @@
 
 <application name="cnetstats" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
-    The application cnetstats has the ability to apply filters on a Control 
-    Network and generate statistics into a specified output file in a specified 
-    format. 
+   The application cnetstats has the ability to generate statistics and apply 
+   filters on a Control Network and outputs results in a specified output file 
+   in CSV format. 
   </brief>
    
   <description> 
     <p>
-    The application cnetstats has the ability to apply filters on a Control 
-    Network and generate statistics into a specified output file in a specified 
-    format. Application requires as input the  Control Network and its 
-    corresponding Serial Number List. 
+     The application cnetstats has the ability to generate Statistics and apply 
+    filters on a Control Network and the results are saved to specified output 
+    file in CSV (Comma Separated Value) format. 
+    </p> 
+
+    <p>Application takes in as input the <def>Control Net</def> CNET and its 
+    corresponding images list FROMLIST. FROMLIST contains the filenames of all 
+    the images that are part of the input Control Net. When application is run 
+    it will generate a Control Net Statistics in PVL format. This is displayed 
+    in the Application Gui and also logged in the print.prt file. The Control 
+    Net Statistics are generated for all the Points in the Control Net 
+    irrespective of all the different options chosen.                        
+    <br/><br/> 
+      Following is the Control Net Statistics format: <br/> 
+    <div style="font-family: Arial, Helvetica, Geneva, sans-serif; font-size:95%">
+         <table border="0"><tr><td width="40"></td><td>
+           <table border="0" cellspacing="0" cellpadding="0">
+            <tr><th colspan="3" align="left">Group = ControlNetSummary</th></tr>
+            <tr><td width="25"></td><td align="left">TotalImages </td>
+              <td>= Positive Integer</td></tr>
+            <tr><td></td><td align="left">TotalPoints </td>
+              <td>= Positive Integer</td></tr> 
+            <tr><td></td><td align="left">ValidPoints </td>
+              <td>= Positive Integer</td></tr>
+            <tr><td></td><td align="left">IgnoredPoints </td>
+              <td>= Positive Integer</td></tr> 
+            <tr><td></td><td align="left">FixedPoints </td>
+              <td>= Positive Integer </td></tr>
+            <tr><td></td><td align="left">ConstrainedPoints </td>
+              <td>= Positive Integer </td></tr> 
+            <tr><td></td><td align="left">FreePoints </td>
+              <td>= Positive Integer </td></tr>
+            <tr><td></td><td align="left">EditLockPoints </td>
+              <td>= Positive Integer</td></tr> 
+            <tr><td></td><td align="left">TotalMeasures</td>
+              <td>= Positive Integer</td></tr> 
+            <tr><td></td><td align="left">ValidMeasures</td>
+              <td>= Positive Integer </td></tr> 
+            <tr><td></td><td align="left">IgnoredMeasures</td>
+              <td>= Positive Integer </td></tr> 
+            <tr><td></td><td align="left">EditLockMeasures</td>
+              <td>= Positive Integer </td></tr> 
+            <tr><td></td><td align="left">AvgResidual</td>
+              <td>= Double </td></tr> 
+            <tr><td></td><td align="left">MinResidual</td>
+              <td>= Double </td></tr> 
+            <tr><td></td><td align="left">MaxResidual</td>
+              <td>= Double </td></tr> 
+            <tr><td></td><td align="left">MinLineResidual</td>
+              <td>= Double </td></tr> 
+            <tr><td></td><td align="left">MaxLineResidual</td>
+              <td>= Double </td></tr> 
+            <tr><td></td><td align="left">MinSampleResidual</td>
+              <td>= Double </td></tr> 
+            <tr><td></td><td align="left">MaxSampleResidual</td>
+              <td>= Double </td></tr> 
+            <tr><td></td><td align="left">AvgPixelShift</td>
+              <td>= Double </td></tr> 
+            <tr><td></td><td align="left">MinPixelShift</td>
+              <td>= Double </td></tr> 
+            <tr><td></td><td align="left">MaxPixelShift</td>
+              <td>= Double </td></tr> 
+            <tr><td></td><td align="left">MinLineShift</td>
+              <td>= Double </td></tr> 
+            <tr><td></td><td align="left">MaxLineShift</td>
+              <td>= Double </td></tr> 
+            <tr><td></td><td align="left">MinSampleShift</td>
+              <td>= Double </td></tr> 
+            <tr><td></td><td align="left">MaxSampleShift</td>
+              <td>= Double </td></tr> 
+          <tr><th colspan="3" align="left">EndGroup</th><td></td></tr> 
+          </table></td></tr>
+    </table>
+    </div>
+     
+    <br/>
+      
     </p>
-    <p>
-     Application generates Control Net Statistics like TotalImages, TotalPoints, 
-     ValidPoints, IgnoredPoints, FixedPoints, ConstrainedPoints, FreePoints, 
-     EditLockPoints,  AverageResidual, MinimumResidual, MaximumResidual, 
-     TotalMeasures, ValidMeasures, IgnoredMeasures, EditLockMeasures, 
-     MinLineResidual, MinSampleResidual, MaxLineResidual, MaxSampleResidual, 
-     MinPixelShift, MaxPixleShift, AvgPixelShift, MinLineShift, MaxLineShift, 
-     MinSampleShift, MaxSampleShift on the input ControlNet. This is displayed 
-     in PVL format in the Application Gui and also logged in the print.prt file. 
-     This Statistics is generated irrespective of the options chosen. 
-    </p>
+    
     <p>
     Additional Statistics can be generated if required based on Images and/or 
-    Control Points into the user specified output file. <br/>Image stats 
-    provides statistics based on Images. Following are the information generated 
-    by this option: 
+    Control Points into the user specified output file. <br/>1. Image 
+    Stats provides Statistics based on Images in the Control Net. To generate 
+    Image Stats report, click on the option CREATE_IMAGE_STATS 
+    which will enable IMAGE_STATS_FILE option. Image Stats are generated in CSV 
+    format in the output file specified in the option IMAGE_STATS_FILE. 
+    Following are the information generated by this option: 
     <table border="1" cellpadding="10" cellspacing="0" bgcolor="#f0f0f0">
         <tr>
           <td>Filename</td><td>SerialNumber</td><td>TotalPoints</td>
           <td>PointsIgnored</td><td>PointsEditLocked</td><td>Fixed</td><td>Constrained</td><td>Free</td>
         </tr>
       </table>
-   <br/>Point stats provides statistics based on Control Points. Following are 
-   the information generated by this option:
+   
+      <br/>2. Point Stats provides statistics based on Control Points in the 
+   Control Net. To generate the Point Stats report, click on the 
+   CREATE_POINT_STATS option which will enable POINT_STATS_FILE option. Point 
+   Stats are generated in CSV format in the output file specified in the option 
+   POINT_STATS_FILE. Following are the information generated by this 
+   option:
     <table border="1" cellpadding="10" cellspacing="0" bgcolor="#f0f0f0">
         <tr>
           <td>PointId</td><td>PointType</td><td>PointIgnore</td><td>PointEditLock</td><td>TotalMeasures</td>
@@ -45,31 +116,53 @@
         </tr>
       </table>
   </p>
+
   <p>
-   cnetstats also allows the option to Filter the input ControlNet based on 
-   different Filters. To apply Filters, the Filter option must be enabled and 
-   the Filters in PVL format must be provided in the DEFFILE. The output file 
-   must be provided to get the statistics report. Each Filter has its own 
-   custom report format.<br/><b>Note:</b>The Points and Measure with EditLocks 
-   will always be filtered in irrespective of the filter settings. 
-                                                              <br/> The DEFFILE 
-   contains the PVL filters in the following format:
+   cnetstats also has the option to Filter the input ControlNet based on 
+   different Filters. To apply Filters, the FILTER option must be enabled and 
+   the Filters in PVL format must be provided in the DEFFILE. The results of 
+   the Filters will be placed in the specified output file FLATFILE in CSV 
+   format. Each Filter has its own custom report format and hence the output 
+   format is different depending on the last Filter used.                     
+   <br/><b>Note:</b>The Points and Measure with EditLocks will always be 
+   filtered in irrespective of the filter settings. 
+   <br/> The DEFFILE contains the PVL filters in the following format:
    <table border="1" cellpadding="2" cellspacing="0" bgcolor="#f0f0f0">
      <tr><td><table border="0" cellpadding="5" cellspacing="0"> 
-              <tr><td colspan="2"> Group = FilterName</td></tr>
-              <tr><td width="10"></td><td> option = value</td></tr>
-              <tr><td colspan="2"> EndGroup</td></tr> </table> 
+               <tr><th colspan="3" align="left"> Object = Filters</th></tr>
+              
+               <tr><td></td><td colspan="2"> Group = FilterName1</td></tr>
+              <tr><td width="10"></td><td width="10"></td>
+                <td> option = value</td></tr> 
+              <tr><td></td><td colspan="2"> EndGroup</td></tr>  
+
+               <tr><td></td><td colspan="2"> Group = FilterName2</td></tr>
+              <tr><td width="10"></td><td width="10"></td>
+                <td> option = value</td></tr> 
+              <tr><td></td><td colspan="2"> EndGroup</td></tr>
+
+              <tr><th colspan="3" align="left"> EndObject</th></tr> </table>
     </td></tr> </table><br/> 
-   The DEFFILE can contain as many filters as available and the 
-   application will apply the filters sequentially in the First In First Out 
-   fashion. The output of the previous Filter will be the input for the next 
-   Filter. The report generated will be based on the last Filter run on the 
-   Control Network. It should also be noted that a particular Filter can be 
-   defined only once in a DEFFILE that means it can be run only once during an 
-   execution of cnetstats. If the Filter needs to be run again, the application 
-   must be run again with this Filter in the DEFFILE. <br/> <br/>
-   There are 2 kinds of Filters, Point Filters and Cube Filters.<br/> <br/>
-   Following are the <b>Point Filters</b>: <br/>
+
+   The DEFFILE is validated upfront before any processing to save time involved 
+   in reading a Control Net. It is important that the DEFFILE adheres to the 
+   specified format. The DEFFILE can contain as many filters as available and 
+   the application will apply the filters sequentially in the First In First 
+   Out fashion. The output of the previous Filter will be the input for the 
+   current Filter. The report generated will be based on the last Filter run on 
+   the Control Net. It should also be noted that a Filter can be defined only 
+   once in a DEFFILE that means it can be run only once during an execution of 
+   cnetstats. If the Filter needs to be run again, the application must be run 
+   again with this Filter in the DEFFILE. <br/><br/>
+   In any given Filter if it requires options LessThan/GreaterThan 
+   the values will always be inclusive. For example, in measures Filter, if 
+   LessThan = 3 and GreaterThan =1, cnetstats will find all the Control Points 
+   with Control Measures &gt;= 1 and &lt;=3. <br/> <br/>
+
+   There are 2 kinds of Filters, Point Filters and Cube Filters. 
+   <br/> 
+   <br/> Following are the 
+                     <b>Point Filters</b>: <br/>
    1. <a href="#error">ResidualMagnitude</a><br/>
    2. <a href="#id">Id</a> <br/>
    3. <a href="#measures">Measures</a><br/> 
@@ -93,14 +186,22 @@
       Value(CVS). </p> <br/>
     
     1. <a name="error"><b>ResidualMagnitude</b></a> - Filter the ControlNet by 
-    Control Point ResidualMagnitude. Options can be combined. To omit an option, 
-    it can be deleted from the group.<br/> 
+    Control Point ResidualMagnitude. This Filter, filters all the Control 
+    Points which have atleast one Control Measure in the specified range.  
+    Options LessThan and GreaterThan can be combined which will be applied as a 
+    Range or used alone. These values will always be inclusive. To omit an 
+    option, it can be deleted from the group. <br/> 
     <table border="1" cellpadding="2" cellspacing="0" bgcolor="#f0f0f0">
      <tr><td><table border="0" cellpadding="3" cellspacing="0"> 
-              <tr><td colspan="2"> Group = Point_ResidualMagnitude</td></tr>
-              <tr><td width="10"></td><td> LessThan = double value</td></tr>
-              <tr><td width="10"></td><td> GreaterThan = double value</td></tr>
-              <tr><td colspan="2"> EndGroup</td></tr> </table> 
+              <tr><th colspan="3"  align="left"> Object = Filters</th></tr>
+              <tr><td width="10"></td>
+                <td colspan="2"> Group = Point_ResidualMagnitude</td></tr> 
+              <tr><td></td><td width="10"></td>
+                <td> LessThan = Double</td></tr> 
+              <tr><td></td><td width="10"></td>
+                <td> GreaterThan = Double</td></tr> 
+              <tr><td></td><td colspan="2"> EndGroup</td></tr> 
+              <tr><th colspan="3"  align="left"> EndObject</th></tr> </table>
     </td></tr> </table><br/>
     Report Format:<br/>
     <table border="1" cellpadding="10" cellspacing="0" bgcolor="#f0f0f0"> 
@@ -108,31 +209,42 @@
     <td>SerialNum</td><td>ResidualMagnitude</td><td>MeasureType</td><td>MeasureIgnore</td><td>MeasureEditLock</td>
     <td> Reference</td></tr></table><br/><hr/><br/>
     
-    2. <a name="id"><b>Id</b></a> - Filter by the provided Point Id Expression. 
-    Wildcard '*' is allowed any number of times in the Expression.<br/>
+    2. <a name="id"><b>Id</b></a> - Filter the Control Net by the specified 
+    Control Point Id Expression. Wildcard '*' is allowed any number of times in 
+    the Expression. This filters all the Control Points matching the 
+    expression.<br/>
     <table border="1" cellpadding="2" cellspacing="0" bgcolor="#f0f0f0">
      <tr><td><table border="0" cellpadding="3" cellspacing="0"> 
-              <tr><td colspan="2"> Group = Point_IdExpression</td></tr>
-              <tr><td width="10"></td><td> Expression = string value</td></tr>
-              <tr><td colspan="2"> EndGroup</td></tr> </table> 
+              <tr><th colspan="3"  align="left"> Object = Filters</th></tr>
+              <tr><td width="10"></td>
+                <td colspan="2"> Group = Point_IdExpression</td></tr>
+              <tr><td width="10"></td><td></td>
+                <td> Expression = String</td></tr> 
+              <tr><td></td><td colspan="2"> EndGroup</td></tr>
+               <tr><th colspan="3"  align="left"> EndObject</th></tr> </table> 
     </td></tr> </table><br/>
 
     Report Format:<br/>
     <table border="1" cellpadding="10" cellspacing="0" bgcolor="#f0f0f0"> 
     <tr><td>PointID</td><td>PointType</td><td>PointIgnore</td><td>PointEditLock</td><td>TotalMeasures</td>
     <td>MeasuresIgnored</td><td>MeasuresEditLocked</td></tr> 
-                              </table><br/><hr/><br/>
+    </table><br/><hr/><br/>
 
-    3. <a name="measures"><b>Measures</b></a> - Filter by the number of 
-    Measures in a Point. Options can be combined. To omit an option, it can be deleted from 
-    the group. Options can be combined. To omit an option, it can be deleted 
-    from the group. <br/> 
+    3. <a name="measures"><b>Measures</b></a> - Filter the Control Net by the 
+    specified number of Control Measures in a Control Point. Options LessThan and GreaterThan can be combined which will be applied as a 
+    Range or used alone. These values will always be inclusive. To omit an 
+    option, it can be deleted from the group. <br/> 
     <table border="1" cellpadding="2" cellspacing="0" bgcolor="#f0f0f0">
      <tr><td><table border="0" cellpadding="3" cellspacing="0"> 
-              <tr><td colspan="2"> Group = Point_NumMeasures</td></tr>
-              <tr><td width="10"></td><td> LessThan = integer value</td></tr>
-              <tr><td width="10"></td><td> GreaterThan = integer value</td></tr>
-              <tr><td colspan="2"> EndGroup</td></tr> </table> 
+              <tr><th colspan="3"  align="left"> Object = Filters</th></tr>
+              <tr><td width="10"></td>
+                <td colspan="2"> Group = Point_NumMeasures</td></tr>
+              <tr><td width="10"></td><td></td>
+                <td> LessThan = Positive Integer</td></tr> 
+              <tr><td width="10"></td><td></td>
+                <td> GreaterThan = Positive Integer</td></tr> 
+              <tr><td></td><td colspan="2"> EndGroup</td></tr>
+               <tr><th colspan="3"  align="left"> EndObject</th></tr> </table> 
     </td></tr> </table><br/> 
 
     Report Format:<br/>
@@ -142,16 +254,24 @@
     <td>MeasureIgnore</td><td>MeasureEditLock</td><td>Reference</td>
     </tr> </table><br/><hr/><br/>
 
-    4. <a name="properties"><b>Properties</b></a> - Filter by Point properties 
-    "Ignore", "Fixed", "Constrained", "Free". Options can be combined. To omit 
-    an option, it can be set to "false" or just deleted from the group.                                                   
-    <br/> 
+    4. <a name="properties"><b>Properties</b></a> - Filter the Control Net by 
+    Control Point Properties "Ignore" and/or Type "Fixed", "Constrained", 
+    "Free". If both Control Point Type and Ignore is used, then the Filter will 
+    filter Control Points of the specified type and ignore flag. Options can be 
+    combined. To omit an option, it can be set to "false" or just deleted from 
+    the group.
+          <br/> 
     <table border="1" cellpadding="2" cellspacing="0" bgcolor="#f0f0f0">
      <tr><td><table border="0" cellpadding="3" cellspacing="0"> 
-              <tr><td colspan="2"> Group = Point_Properties</td></tr>
-              <tr><td width="10"></td><td> PointType =All / Fixed /  Constrained  / Free </td></tr>
-              <tr><td width="10"></td><td> Ignore = true/false</td></tr>
-              <tr><td colspan="2"> EndGroup</td></tr> </table> 
+              <tr><th colspan="3"  align="left"> Object = Filters</th></tr>
+              <tr><td width="10"></td>
+                <td colspan="2"> Group = Point_Properties</td></tr>
+              <tr><td width="10"></td><td></td>
+                <td> PointType =All / Fixed / Constrained  / Free </td></tr> 
+              <tr><td width="10"></td><td></td>
+                <td> Ignore = true/false</td></tr> 
+              <tr><td></td><td colspan="2"> EndGroup</td></tr>
+               <tr><th colspan="3"  align="left"> EndObject</th></tr> </table> 
     </td></tr> </table><br/> <br/>
 
     Report Format:<br/>
@@ -159,18 +279,27 @@
     <tr><td>PointID</td><td>PointType</td><td>PointIgnore</td><td>PointEditLock</td><td>TotalMeasures</td>
     <td>MeasuresIgnored</td><td>MeasuresEditLocked</td></tr> </table><br/><hr/><br/>
 
-    5. <a name="latlon"><b>Latitude Longitude Range</b></a> - Filter by Min, Max 
-    Latitude and Longitude Range. Options can be combined. To omit an option, it 
-    can be deleted from the group. Note that any unset value will default to 
-    zero and Min Value must always be LessThanEqualTo Max Value. <br/> 
+    5. <a name="latlon"><b>Latitude Longitude Range</b></a> - Filter the Control 
+    Net by Control Points location (Latitude/Longitude).  Control Points in the 
+    specified Minimum and Maximum Latitude/Longitude Range are filtered. The 
+    Filter Options can be combined. To omit an option, it can be deleted from 
+    the group. Note that any unset value will default to Minimum and Maximum 
+    double value.<br/> 
     <table border="1" cellpadding="2" cellspacing="0" bgcolor="#f0f0f0">
      <tr><td><table border="0" cellpadding="3" cellspacing="0"> 
-              <tr><td colspan="2"> Group = Point_LatLon</td></tr>
-              <tr><td width="10"></td><td> MinLat = double value</td></tr>
-              <tr><td width="10"></td><td> MaxLat = double value</td></tr>
-              <tr><td width="10"></td><td> MinLon = double value</td></tr>
-              <tr><td width="10"></td><td> MaxLon = double value</td></tr>
-              <tr><td colspan="2"> EndGroup</td></tr> </table> 
+              <tr><th colspan="3"  align="left"> Object = Filters</th></tr>
+              <tr><td width="10" ></td>
+                <td colspan="2">Group = Point_LatLon</td></tr>
+              <tr><td></td><td width="10"></td>
+                <td> MinLat = Double</td></tr> 
+              <tr><td></td><td width="10"></td>
+                <td> MaxLat = Double</td></tr> 
+              <tr><td></td><td width="10"></td>
+                <td> MinLon = Double</td></tr> 
+              <tr><td></td><td width="10"></td>
+                <td> MaxLon = Double</td></tr> 
+              <tr><td></td><td colspan="2"> EndGroup</td></tr> 
+      <tr><th colspan="3"  align="left"> EndObject</th></tr></table> 
     </td></tr> </table><br/> <br/>
 
     Report Format:<br/>
@@ -179,32 +308,49 @@
     <td>MeasuresIgnored</td><td>MeasuresEditLocked</td><td>Latitude</td><td> Longitude</td><td>Radius</td></tr> 
     </table><br/><hr/><br/>
 
-    6. <a name="distance"><b>Distance</b></a> - Filter by the specified distance 
-    between the Points. All the Points which is less than the specified distance 
-    will be filtered in. The units can be in pixels/meters. Default is pixels.<br/> 
+    6. <a name="distance"><b>Distance</b></a> - Filter the Control Net by the 
+    specified distance between the Control Points. All the Control Points which 
+    are less than or equal to the specified distance will be filtered. The units 
+    can be in pixels/meters and the output distance will be in the specified 
+    units. Default is pixels.<br/> 
     <table border="1" cellpadding="2" cellspacing="0" bgcolor="#f0f0f0">
      <tr><td><table border="0" cellpadding="3" cellspacing="0"> 
-              <tr><td colspan="2"> Group = Point_Distance</td></tr>
-              <tr><td width="10"></td><td> MaxDistance = double value</td></tr>
-              <tr><td width="10"></td><td> Units = meters/pixels</td></tr>
-              <tr><td colspan="2"> EndGroup</td></tr> </table> 
+              <tr><th colspan="3"  align="left"> Object = Filters</th></tr>
+              <tr><td width="10" ></td>
+                <td colspan="2"> Group = Point_Distance</td></tr>
+              <tr><td></td><td width="10"></td>
+                <td> MaxDistance = Double</td></tr> 
+              <tr><td></td><td width="10"></td>
+                <td> Units = meters/pixels</td></tr> 
+              <tr><td></td><td colspan="2"> EndGroup</td></tr> 
+               <tr><th colspan="3"  align="left"> EndObject</th></tr></table> 
     </td></tr> </table><br/><br/>
 
-    Report Format:<br/>
+    Report Format: Displays the Control Point info and a field Point#Distance. 
+    This field has the Control Point ID and the distance info. This indicates 
+    the distance the current Control Point is from the other Control Point.                                  
+    <br/>
     <table border="1" cellpadding="10" cellspacing="0" bgcolor="#f0f0f0"> 
     <tr><td>PointID</td><td>PointType</td><td>PointIgnore</td><td>PointEditLock</td><td>TotalMeasures</td>
     <td>MeasuresIgnored</td><td>MeasuresEditLocked</td><td>Point#Distance >></td></tr> </table><br/><hr/><br/>
 
-    7. <a name="mproperties"><b>Measure Properties</b></a> - Filter by Measure 
-    properties like Measure Type and/or Ignore. To omit an option, it can be set 
-    to "false" or just deleted from the group.  <br/> 
+    7. <a name="mproperties"><b>Measure Properties</b></a> - Filter the Control 
+    Net by Control Measure properties like Ignore and/or Measure Type (Manual, 
+    Estimated, Auto-Registered, Manual_Validated, AutoReg_Validated). There is 
+    an option "All" to include all Control Measure Types. To omit an option, it 
+    can be set to "false" or just deleted from the group. <br/> 
     <table border="1" cellpadding="2" cellspacing="0" bgcolor="#f0f0f0">
      <tr><td><table border="0" cellpadding="3" cellspacing="0"> 
-              <tr><td colspan="2"> Group = Point_MeasureProperties</td></tr>
-              <tr><td width="10"></td><td> MeasureType = All / Manual/Estimated 
-                  / Auto-Registered / Manual_Validated / AutoReg_Validated</td></tr>
-              <tr><td width="10"></td><td> Ignored = true/false</td></tr>
-              <tr><td colspan="2"> EndGroup</td></tr> </table> 
+              <tr><th colspan="3"  align="left"> Object = Filters</th></tr>
+              <tr><td width="10" ></td>
+                <td colspan="2">Group = Point_MeasureProperties</td></tr> 
+              <tr><td width="10"></td><td></td>
+                <td> MeasureType = All / Manual/Estimated / Auto-Registered / 
+                  Manual_Validated / AutoReg_Validated</td></tr>
+              <tr><td width="10"></td><td></td>
+                <td>Ignored = true/false</td></tr> 
+              <tr><td></td><td colspan="2"> EndGroup</td></tr> 
+               <tr><th colspan="3"  align="left"> EndObject</th></tr></table> 
     </td></tr> </table><br/> <br/>
 
     Report Format:<br/>
@@ -213,16 +359,23 @@
     <td>MeasuresIgnored</td><td>MeasuresEditLocked</td><td>FileName</td><td>SerialNum</td><td>MeasureIgnore</td><td> MeasureType</td><td> MeasureEditLock</td><td> 
     Reference</td></tr> </table><br/><hr/><br/>
 
-    8. <a name="cubename"><b>Cube Names(Serial Number)</b></a> - Filter the 
-    ControlNet by Cube Serial Number. Only Points with the specified Image as 
-    one of their Measures will be Filtered in. Any number of Cube names can be 
-    entered with "Cube="  <br/> 
+    8. <a name="cubename"><b>Cube Names (Serial Number)</b></a> - Filter the 
+    Control Net by Cube Serial Number. Only the Control Points with the 
+    specified Image as one of their Measures will be Filtered in. Any number of 
+    Cubes can be entered with "Cube=". The report will also display the Image 
+    information for all the other Control Measures in the filtered Control 
+    Points. <br/> 
     <table border="1" cellpadding="2" cellspacing="0" bgcolor="#f0f0f0">
      <tr><td><table border="0" cellpadding="3" cellspacing="0"> 
-              <tr><td colspan="2"> Group = Point_CubeNames</td></tr>
-              <tr><td width="10"></td><td> Cube = Cube Name</td></tr>
-              <tr><td width="10"></td><td> Cube = Cube Name</td></tr>
-              <tr><td colspan="2"> EndGroup</td></tr> </table> 
+              <tr><th colspan="3"  align="left"> Object = Filters</th></tr>
+              <tr><td width="10" ></td>
+                <td colspan="2"> Group = Point_CubeNames</td></tr> 
+              <tr><td></td><td width="10"></td>
+                <td> Cube = Serial Number1</td></tr> 
+              <tr><td></td><td width="10"></td>
+                <td> Cube = Serial Number2</td></tr> 
+              <tr><td></td><td colspan="2"> EndGroup</td></tr> 
+               <tr><th colspan="3"  align="left"> EndObject</th></tr></table> 
     </td></tr> </table><br/><br/> 
     
     Report Format:<br/> 
@@ -234,14 +387,18 @@
     </tr></table><br/><hr/><br/>
 
     9. <a name="editlock"><b>Point EditLock</b></a> - Filter the 
-    ControlNet by Point Edit Lock. Only Points with  Edit Lock set to 
-    true/false are filtered in.                     
+    Control Net for all Control Points that have EditLock set to user specified 
+    true/false.                    
     <br/> 
     <table border="1" cellpadding="2" cellspacing="0" bgcolor="#f0f0f0">
      <tr><td><table border="0" cellpadding="3" cellspacing="0"> 
-             <tr><td colspan="2"> Group = Point_EditLock</td></tr>
-             <tr><td width="10"></td><td>  EditLock = true/false</td></tr> 
-             <tr><td colspan="2"> EndGroup</td></tr> </table> 
+             <tr><th colspan="3"  align="left"> Object = Filters</th></tr>
+              <tr><td width="10" ></td>
+                <td colspan="2">Group = Point_EditLock</td></tr>
+             <tr><td></td><td width="10"></td>
+               <td>EditLock = true/false</td></tr> 
+             <tr><td></td><td colspan="2"> EndGroup</td></tr> 
+               <tr><th colspan="3"  align="left"> EndObject</th></tr></table> 
     </td></tr> </table><br/><br/> 
     
     Report Format:<br/> 
@@ -250,15 +407,21 @@
     <td>MeasuresIgnored</td><td>MeasuresEditLocked</td></tr></table><br/><hr/><br/>
     
     10. <a name="mseditlock"><b>Measure EditLock</b></a> - Filter the ControlNet 
-     if the number of Control Measures with the EditLock in a Control Point are 
-     in the user defined range.  Options can be combined. To omit an option, 
-    it can be deleted from the group.<br/> 
+     for all Control Points that have the number of Control Measures with the 
+     EditLock in the user specified range. Options LessThan and GreaterThan can be combined which will be applied as a 
+    Range or used alone. These values will always be inclusive. To omit an 
+    option, it can be deleted from the group.<br/> 
     <table border="1" cellpadding="2" cellspacing="0" bgcolor="#f0f0f0">
      <tr><td><table border="0" cellpadding="3" cellspacing="0"> 
-             <tr><td colspan="2"> Group = Point_NumMeasuresEditLock</td></tr>
-             <tr><td width="10"></td><td>  LessThan = integer</td></tr> 
-              <tr><td width="10"></td><td> GreaterThan = integer</td></tr>
-             <tr><td colspan="2"> EndGroup</td></tr> </table> 
+             <tr><th colspan="3"  align="left"> Object = Filters</th></tr>
+              <tr><td width="10" ></td>
+                <td colspan="2">Group = Point_NumMeasuresEditLock</td></tr>
+             <tr><td></td><td width="10"></td>
+               <td>LessThan = Positive Integer</td></tr> 
+              <tr><td></td><td width="10"></td>
+                <td>GreaterThan = Positive Integer</td></tr> 
+             <tr><td></td><td colspan="2"> EndGroup</td></tr> 
+              <tr><th colspan="3"  align="left"> EndObject</th></tr></table> 
     </td></tr> </table><br/><br/> 
     
     Report Format:<br/> 
@@ -268,16 +431,22 @@
     <td>MeasureIgnore</td><td>MeasureEditLock</td><td>Reference</td>
     </tr></table><br/><hr/><br/>
 
-    11. <a name="pixelshift"><b>Pixel Shift</b></a> - Filter the ControlNet 
-     if the max pixel shift in a Control Point are in the user defined range. 
-    Options can be combined. To omit an option, it can be deleted from the 
-    group. <br/> 
+    11. <a name="pixelshift"><b>Pixel Shift</b></a> - Filter the ControlNet for 
+     all Control Points whose maximum pixel shift are in the user specified
+    range. These values will always be inclusive. Options LessThan and 
+    GreaterThan can be combined which will be applied as a Range or used alone. 
+    To omit an option, it can be deleted from the group.<br/> 
     <table border="1" cellpadding="2" cellspacing="0" bgcolor="#f0f0f0">
     <tr><td><table border="0" cellpadding="3" cellspacing="0"> 
-            <tr><td colspan="2"> Group =Point_PixelShift</td></tr>
-            <tr><td width="10"></td><td>  LessThan = double</td></tr> 
-             <tr><td width="10"></td><td> GreaterThan = double</td></tr>
-             <tr><td colspan="2"> EndGroup</td></tr> </table> 
+            <tr><th colspan="3"  align="left"> Object = Filters</th></tr>
+            <tr><td width="10" ></td>
+                <td colspan="2"> Group =Point_PixelShift</td></tr>
+            <tr><td></td><td width="10"></td>
+              <td>LessThan = Double</td></tr> 
+             <tr><td></td><td width="10"></td>
+               <td> GreaterThan = Double</td></tr> 
+             <tr><td></td><td colspan="2"> EndGroup</td></tr> 
+             <tr><th colspan="3"  align="left"> EndObject</th></tr></table> 
     </td></tr> </table><br/><br/> 
     
     Report Format:<br/> 
@@ -304,14 +473,19 @@
     <td>GoodnessOfFit</td><td>MeasureIgnore</td><td>Reference</td></tr> </table><br/>  <hr/><br/> -->
 
     Following are the <b>Cube Filters</b>: <br/>
-    1. <a name="name"><b>Name</b></a> - Filter by the provided Cube Serial 
-    Number Expression. Wildcard '*' is allowed any number of times in the 
-    Expression. <br/>
+    1. <a name="name"><b>Name</b></a> - Filter the Control Net by the Cube 
+    Serial Number Expression. Wildcard '*' is allowed any number of times in the 
+    Expression. All the Control Points which have the cubes with Serial Numbers 
+    matching the expression will be filtered. <br/>
     <table border="1" cellpadding="2" cellspacing="0" bgcolor="#f0f0f0">
      <tr><td><table border="0" cellpadding="3" cellspacing="0"> 
-              <tr><td colspan="2"> Group = Cube_NameExpression</td></tr>
-              <tr><td width="10"></td><td> Expression = string value</td></tr>
-              <tr><td colspan="2"> EndGroup</td></tr> </table> 
+             <tr><th colspan="3"  align="left"> Object = Filters</th></tr>
+            <tr><td width="10" ></td>
+                <td colspan="2">Group = Cube_NameExpression</td></tr>
+              <tr><td></td><td width="10"></td>
+                <td> Expression = String</td></tr> 
+              <tr><td></td><td colspan="2">EndGroup</td></tr> 
+               <tr><th colspan="3"  align="left">EndObject</th></tr></table> 
     </td></tr> </table><br/><br/>
 
     Report Format:<br/>
@@ -321,15 +495,23 @@
     <td>ImagePointsConstrained</td><td>ImagePointsFree</td></tr></table><br/>  
     <hr/><br/>
     
-    2. <a name="numpoints"><b>Number of Points</b></a> - Filter the ControlNet by 
-    the number of Control Points in each image. Options can be combined. To omit 
-    an option, it can be deleted from the group.<br/> 
+    2. <a name="numpoints"><b>Number of Points</b></a> - Filter the Control Net 
+    for all the Cubes/Images by the user specified number of Control Points in 
+    each Cube.  All the Cubes which have the user specified number of Control 
+    Points will be filtered. These values will always be inclusive. Options 
+    LessThan and GreaterThan can be combined which will be applied as a Range or 
+    used alone. To omit an option, it can be deleted from the group.<br/> 
     <table border="1" cellpadding="2" cellspacing="0" bgcolor="#f0f0f0">
      <tr><td><table border="0" cellpadding="3" cellspacing="0"> 
-              <tr><td colspan="2"> Group = Cube_NumPoints</td></tr>
-              <tr><td width="10"></td><td> LessThan = integer value</td></tr>
-              <tr><td width="10"></td><td> GreaterThan = integer value</td></tr>
-              <tr><td colspan="2"> EndGroup</td></tr> </table> 
+              <tr><th colspan="3"  align="left"> Object = Filters</th></tr>
+             <tr><td width="10" ></td>
+               <td colspan="2"> Group = Cube_NumPoints</td></tr>
+              <tr><td></td><td width="10"></td>
+                <td> LessThan = Positive Integer</td></tr>
+              <tr><td></td><td width="10"></td>
+                <td> GreaterThan =Positive Integer</td></tr> 
+              <tr><td></td><td colspan="2"> EndGroup</td></tr>
+               <tr><th colspan="3"  align="left">EndObject</th></tr> </table> 
     </td></tr> </table><br/><br/>
 
     Report Format:<br/> 
@@ -339,16 +521,21 @@
     <td>ImagePointsConstrained</td><td>ImagePointsFree</td></tr></table><br/>  
     <hr/><br/>
 
-    3. <a name="cdistance"><b>Distance</b></a> - Filter by the specified 
-    distance between the Points. All the Images which have Points which are less than the 
-    specified distance between them will be filtered in. The units can be in 
-    pixels/meters.  Default is pixels. <br/> 
+    3. <a name="cdistance"><b>Distance</b></a> - Filter the Control Net by the 
+    specified distance between the Control Points in an Image. All the Images 
+    which have Points which are &lt;= to the specified distance between them 
+    will be filtered in. The units can be in pixels/meters.  Default is pixels. <br/> 
     <table border="1" cellpadding="2" cellspacing="0" bgcolor="#f0f0f0">
      <tr><td><table border="0" cellpadding="3" cellspacing="0"> 
-              <tr><td colspan="2"> Group = Cube_Distance</td></tr>
-              <tr><td width="10"></td><td> MaxDistance = double value</td></tr>
-              <tr><td width="10"></td><td> Units = meters/pixels</td></tr>
-              <tr><td colspan="2"> EndGroup</td></tr> </table> 
+              <tr><th colspan="3"  align="left"> Object = Filters</th></tr>
+             <tr><td width="10" ></td>
+               <td colspan="2">Group = Cube_Distance</td></tr>
+              <tr><td></td><td width="10"></td>
+                <td> MaxDistance = Double</td></tr> 
+              <tr><td></td><td width="10"></td>
+                <td> Units = meters/pixels</td></tr> 
+              <tr><td></td><td colspan="2"> EndGroup</td></tr> 
+              <tr><th colspan="3"  align="left">EndObject</th></tr></table> 
     </td></tr> </table><br/> <br/>
 
     Report Format:<br/> 
@@ -378,17 +565,19 @@
      <change name="Sharmila Prasad" date="2011-07-28"> Report the stats for the 
     input controlnet for now
      </change>
-  </history>
+     <change name="Sharmila Prasad, Mark Rosiek, Ken Edmundson" date="2011-10-05">Updated 
+       Documentation</change>
+    </history>
       
   <groups>
     <group name="Input">
       <parameter name="FROMLIST">
         <type>filename</type>
         <fileMode>input</fileMode>
-        <brief>List of Input cubes in the control network</brief>
+        <brief>List of Input cubes in the Control Net</brief>
         <description>
           Use this parameter to specify the cube filenames which are associated with
-          the control network.
+          the Control Net.
         </description>
         <filter>*.lis</filter>
       </parameter>
@@ -396,9 +585,9 @@
       <parameter name="CNET">
         <type>filename</type>
         <fileMode>input</fileMode>
-        <brief>Input control network</brief>
+        <brief>Input Control Net</brief>
         <description>
-          This file must contain control network with valid points and 
+          This file must contain Control Net with valid points and 
           measurements
         </description>
         <filter>*.net</filter>
@@ -409,9 +598,9 @@
       <parameter name="FILTER">
         <type>boolean</type>
         <internalDefault>false</internalDefault>
-        <brief>Apply filters on the Control Network</brief> 
-        <description>Apply filters on the Control Network defined in the 
-          DEFFILE. The resulting stats are logged in the Output FLATFILE.
+        <brief>Apply filters on the Control Net</brief> 
+        <description>Apply filters on the Control Net defined in the DEFFILE. 
+          The resulting stats are logged in the Output FLATFILE.
         </description>
         <inclusions>
           <item>DEFFILE</item>
@@ -425,7 +614,24 @@
         <brief>Input Filter Definition file</brief>
         <description>
          This file contains the filters to be run on the Control Network for 
-         which the statistics is generated and printed onto the Output file
+         which the statistics is generated and printed onto the Output file. 
+         <br/> The DEFFILE contains the PVL filters in the following format:
+         <table border="1" cellpadding="2" cellspacing="0" bgcolor="#f0f0f0">
+           <tr><td><table border="0" cellpadding="5" cellspacing="0"> 
+               <tr><th colspan="3" align="left"> Object = Filters</th></tr>
+              
+               <tr><td></td><td colspan="2"> Group = FilterName1</td></tr>
+              <tr><td width="10"></td><td width="10"></td>
+                <td> option = value</td></tr> 
+              <tr><td></td><td colspan="2"> EndGroup</td></tr>  
+
+               <tr><td></td><td colspan="2"> Group = FilterName2</td></tr>
+              <tr><td width="10"></td><td width="10"></td>
+                <td> option = value</td></tr> 
+              <tr><td></td><td colspan="2"> EndGroup</td></tr>
+
+              <tr><th colspan="3" align="left"> EndObject</th></tr> </table>
+          </td></tr> </table><br/>
         </description>
         <filter>*.def</filter> 
       </parameter> 
@@ -435,8 +641,8 @@
         <internalDefault>None</internalDefault>
         <brief>Output Flat File</brief>
         <description>
-          This file will contain statistics in the csv format for the 
-          selected options
+          This file will contain statistics in the csv format for the specified 
+          Filters.
         </description>
       </parameter>
     </group>
@@ -445,10 +651,9 @@
       <parameter name="CREATE_IMAGE_STATS">
         <type>boolean</type>
         <internalDefault>false</internalDefault>
-        <brief>Generates stats of all the Images in the Control Network</brief>
+        <brief>Generates stats of all the Images in the Control Net</brief>
         <description>When Enabled, generates the statistics of all the Images
-          wrt the Control Network into the Image Stats File. Stores info such as 
-          the total points in each Image, total ignored and point types. 
+          wrt the Control Net into the IMAGE_STATS_FILE. 
         </description>
         <inclusions><item>IMAGE_STATS_FILE</item></inclusions>
       </parameter>
@@ -457,22 +662,22 @@
         <type>filename</type>
         <fileMode>output</fileMode>
         <internalDefault>None</internalDefault>
-        <brief>Generates stats of all the Images in the Control Network</brief>
+        <brief>Generates stats of all the Images in the Control Net</brief>
         <description>This file will contain statistics of all the Images
-          wrt the Control Network. Stores info such as the filename, serial 
-          number, total points in each Image, total ignored and point types. 
+          wrt the Control Net. It has the following  information in CSV format. 
+          <table border="1" cellpadding="10" cellspacing="0" bgcolor="#f0f0f0">
+         <tr><td>Filename</td><td>SerialNumber</td><td>TotalPoints</td>
+          <td>PointsIgnored</td><td>PointsEditLocked</td><td>Fixed</td><td>Constrained</td><td>Free</td>
+         </tr> </table> 
         </description>
       </parameter>
     
       <parameter name="CREATE_POINT_STATS">
         <type>boolean</type>
         <internalDefault>false</internalDefault>
-        <brief>Generates stats of all the Points in the Control Network</brief> 
-        <description>When Enabled, generates the statistics of all the Points in 
-        the Control Network into the Point Stats File. Stores info such as the 
-        point Id, type, ignore flag, number of measures, number of ignored 
-        measures, measure held flag.
-        </description>
+        <brief>Generates stats of all the Points in the Control Net</brief> 
+        <description>When Enabled, generates the statistics of all the Control 
+        Points in the Control Net into the POINT_STATS_FILE.</description> 
         <inclusions><item>POINT_STATS_FILE</item></inclusions>
       </parameter>
 
@@ -480,13 +685,16 @@
         <type>filename</type>
         <fileMode>output</fileMode>
         <internalDefault>None</internalDefault>
-        <brief>Contains statistics of all the Points in the Control 
-          Network</brief>
-        <description>When Enabled, generates the statistics of all the Points in 
-        the Control Network into the Point Stats File. Stores info such as the 
-        point Id, type, ignore flag, number of measures, number of ignored 
-        measures, measure held flag.
-        </description>
+        <brief>Contains statistics of all the Points in the Control Net</brief> 
+        <description>This file contains the statistics of all the 
+        Control Points in the Control Net. It has the following  information in 
+        CSV format.
+        <table border="1" cellpadding="10" cellspacing="0" bgcolor="#f0f0f0">
+        <tr>
+          <td>PointId</td><td>PointType</td><td>PointIgnore</td><td>PointEditLock</td><td>TotalMeasures</td>
+          <td>MeasuresValid</td><td>MeasuresIgnored</td><td>MeasuresEditLocked</td>
+        </tr> </table> 
+        </description> 
       </parameter>
     </group>
   </groups>
