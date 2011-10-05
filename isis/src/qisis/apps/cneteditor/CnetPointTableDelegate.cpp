@@ -34,10 +34,11 @@ namespace Isis
   QWidget * CnetPointTableDelegate::getWidget(CnetTableColumn const * col) const
   {
     AbstractPointItem::Column column =
-      AbstractPointItem::getColumn(col->getTitle());
+        AbstractPointItem::getColumn(col->getTitle());
 
     switch (column)
     {
+      // handle combo box cases
       case AbstractPointItem::PointType:
       case AbstractPointItem::EditLock:
       case AbstractPointItem::Ignored:
@@ -87,13 +88,13 @@ namespace Isis
             default:
               break;
           }
+          
           return combo;
         }
+        
+      // handle line edit cases
       default:
-        {
-          QLineEdit * lineEdit = new QLineEdit;
-          return lineEdit;
-        }
+        return new QLineEdit();
     }
 
     iString msg = "Could not create delegate widget for column ["

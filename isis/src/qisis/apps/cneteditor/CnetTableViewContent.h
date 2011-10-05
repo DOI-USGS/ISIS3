@@ -75,15 +75,16 @@ namespace Isis
       void clearColumnSelection();
       void copyCellSelection(bool);
       void createActions();
+      void selectAllRows();
       int getColumnFromScreenX(int screenX) const;
       int getRowFromScreenY(int screenY) const;
       bool hasActiveCell() const;
       bool hasRowSelection() const;
       bool mouseInCellSelection(QPoint) const;
-      bool isMouseInRowSelection(QPoint) const;
-      bool isRowValid(int rowNum) const;
-      bool isColumnValid(int colNum) const;
-      bool isCellEditable(int, int) const;
+      bool mouseInRowSelection(QPoint) const;
+      bool rowIsValid(int rowNum) const;
+      bool columnIsValid(int colNum) const;
+      bool cellIsEditable(int, int) const;
       bool isDataColumn(int) const;
       void paintRow(QPainter *, int, QPoint, QPoint);
       void updateActiveCell(QPoint);
@@ -106,13 +107,16 @@ namespace Isis
       QList< AbstractTreeItem * > * items;
       CnetTableColumnList * columns;
 
-      QPair<AbstractTreeItem *, int> * activeCell;
+      QPair< AbstractTreeItem *, int > * activeCell;
+      
+      QPair< AbstractTreeItem *, int > * lastShiftArrowSelectedCell;
+      bool lastShiftArrowDirectionUp;
 
       /**
        * Stores a list of the rows that have their active column cells
        *   selected.
        */
-      QList<AbstractTreeItem *> * rowsWithActiveColumnSelected;
+      QList< AbstractTreeItem * > * rowsWithActiveColumnSelected;
 
       QWidget * editWidget;
 
@@ -121,7 +125,7 @@ namespace Isis
        * normal click.
        */
       AbstractTreeItem * lastDirectlySelectedRow;
-      QList<AbstractTreeItem *> * lastShiftSelection;
+      QList< AbstractTreeItem * > * lastShiftSelection;
       QPoint * mousePressPos;
       int rowHeight;
 

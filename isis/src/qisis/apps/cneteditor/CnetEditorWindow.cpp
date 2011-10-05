@@ -18,6 +18,7 @@
 #include <QMessageBox>
 #include <QMenu>
 #include <QMenuBar>
+#include <QQueue>
 #include <QRadioButton>
 #include <QSettings>
 #include <QStatusBar>
@@ -214,9 +215,9 @@ namespace Isis
     closeAct->setStatusTip(tr("Close control net file"));
     connect(closeAct, SIGNAL(triggered()), this, SLOT(closeNetwork()));
 
-//    aboutAct = new QAction(tr("&About"), this);
-//    aboutAct->setStatusTip(tr("Show cneteditor's about box"));
-//    connect(aboutAct, SIGNAL(triggered()), this, SLOT(about()));
+    aboutAct = new QAction(tr("&About"), this);
+    aboutAct->setStatusTip(tr("Show cneteditor's about box"));
+    connect(aboutAct, SIGNAL(triggered()), this, SLOT(about()));
 
     quitAct = new QAction(QIcon(":quit"), tr("&Quit"), this);
     quitAct->setShortcut(tr("Ctrl+Q"));
@@ -292,8 +293,10 @@ namespace Isis
     fileMenu->addSeparator();
     fileMenu->addAction(quitAct);
 
-//    helpMenu = menuBar()->addMenu("&Help");
-//    helpMenu->addAction(aboutAct);
+    menuBar()->addMenu("&Tables");
+
+    helpMenu = menuBar()->addMenu("&Help");
+//     helpMenu->addAction(aboutAct);
   }
 
 
@@ -419,7 +422,7 @@ namespace Isis
         closeAct->setEnabled(true);
         setDirty(false);
         *curFile = filename;
-        setWindowTitle(filename + "[*] - cneteditor");
+        setWindowTitle(filename + "[*] - cneteditor *BETA VERSION*");
         loadingProgressBar->setVisible(false);
         break;
 
@@ -432,7 +435,7 @@ namespace Isis
         setDirty(false);
         saveAsPvl = false;
         *curFile = "";
-        setWindowTitle("cneteditor");
+        setWindowTitle("cneteditor *BETA VERSION*");
         loadingProgressBar->setVisible(false);
         break;
 
@@ -443,7 +446,8 @@ namespace Isis
         saveAsAct->setEnabled(false);
         closeAct->setEnabled(false);
         *curFile = filename;
-        setWindowTitle("cneteditor (loading " + filename + "...)");
+        setWindowTitle("cneteditor *BETA VERSION* (loading "
+                       + filename + "...)");
         loadingProgressBar->setValue(loadingProgressBar->minimum());
         loadingProgressBar->setVisible(true);
         break;
@@ -551,6 +555,18 @@ namespace Isis
       cnet = NULL;
       delete cnetReader;
       cnetReader = NULL;
+      
+      foreach (QToolBar * tb, *toolBars)
+      {
+        foreach (QAction * tbAct, tb->actions())
+        {
+          delete tbAct;
+        }
+        delete tb;
+        toolBars->removeOne(tb);
+      }
+      
+//       removeEmptyMenus();
 
       setFileState(NoFile, "");
     }
@@ -603,9 +619,11 @@ namespace Isis
       {
         QString menuName = location.takeFirst();
         
+        int actListIndex = indexOfActionList(widget->actions(), menuName);
+        
         // if menuName not found in current widget's actions,
         // then add needed submenu
-        if (indexOfActionList(widget->actions(), menuName) == -1)
+        if (actListIndex == -1)
         {
           QMenuBar * mb = qobject_cast< QMenuBar * >(widget);
           QMenu * m = qobject_cast< QMenu * >(widget);
@@ -621,9 +639,12 @@ namespace Isis
           {
             m->addMenu(menuName);
             int index = indexOfActionList(m->actions(), menuName);
-            widget = mb->actions()[index]->menu();
+            widget = m->actions()[index]->menu();
           }
-          
+        }
+        else // menu exists so just update widget
+        {
+          widget = widget->actions()[actListIndex]->menu();
         }
       }
       
@@ -642,8 +663,8 @@ namespace Isis
       
     return index;
   }
-
-
+  
+  
   void CnetEditorWindow::populateToolBars()
   {
     QMap< QString, QList< QAction * > > actionMap;
@@ -656,30 +677,46 @@ namespace Isis
       QString objName = i.key();
       QList< QAction * > actionList = i.value();
       
-      foreach (QAction * action, actionList)
-      {
-        mainToolBar->addAction(action);
-      }
+//       foreach (QAction * action, actionList)
+//       {
+//         mainToolBar->addAction(action);
+//       }
       
-//       int index = indexOfToolBar(objName);
-//       if (index != -1)
-//       {
-//         foreach (QAction * action, actionList)
-//           (*toolBars)[index]->addAction(action);
-//       }
-//       else
-//       {
-//         if (objName != mainToolBar->objectName())
+      // if toolbar already exists, just add the actions to it
+      int index = indexOfToolBar(objName);
+//       cerr << "index: " << index << "\n";
+      if (index != -1)
+      {
+//         QToolBar * tb = (*toolBars)[index];
+//         QList< QAction * > tbActions = tb->actions();
+//         for (int i = tbActions.size() - 1; i >= 0; i--)
 //         {
-//           QToolBar * newToolBar = new QToolBar(objName);
-//           newToolBar->setObjectName(objName);
-//           newToolBar->setFloatable(false);
-//           foreach (QAction * action, actionList)
-//             newToolBar->addAction(action);
-//           
-//           addToolBar(Qt::TopToolBarArea, newToolBar);
+//           if (actionList.contains(tbActions[i]))
+//           {
+//             delete tbActions[i];
+//             actionList.removeAt(i);
+//           }
 //         }
-//       }
+        
+        foreach (QAction * action, actionList)
+          (*toolBars)[index]->addAction(action);
+      }
+      // otherwise, it needs to be created
+      else
+      {
+        // don't allow use of mainToolBar outside this class!
+        if (objName != mainToolBar->objectName())
+        {
+          QToolBar * newToolBar = new QToolBar(objName);
+          toolBars->append(newToolBar);
+          newToolBar->setObjectName(objName);
+          newToolBar->setFloatable(false);
+          foreach (QAction * action, actionList)
+            newToolBar->addAction(action);
+          
+          addToolBar(Qt::TopToolBarArea, newToolBar);
+        }
+      }
     }
   }
   
@@ -695,6 +732,36 @@ namespace Isis
         index = i;
 
     return index;
+  }
+
+
+  void CnetEditorWindow::removeEmptyMenus()
+  {
+    QQueue< QWidget * > q;
+    q.enqueue(menuBar());
+    
+    while (q.size())
+    {
+      QWidget * widget = q.dequeue();
+      QList< QAction * > actionList = widget->actions();
+      foreach (QAction * action, actionList)
+      {
+        QMenu * menu = action->menu();
+        if (menu)
+        {
+          if (menu->actions().size())
+            q.enqueue(menu);
+          else
+            widget->removeAction(action);
+        }
+      }
+    }
+  }
+  
+  
+  void CnetEditorWindow::about()
+  {
+    cerr << "CneteditorWindow::about() implement me!\n";
   }
 
 

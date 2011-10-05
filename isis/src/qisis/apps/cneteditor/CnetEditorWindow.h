@@ -44,8 +44,8 @@ namespace Isis
     private:
       CnetEditorWindow(const CnetEditorWindow &);
       const CnetEditorWindow & operator=(CnetEditorWindow);
-
-
+      
+      
     private:
       void nullify();
       void createActions();
@@ -61,12 +61,14 @@ namespace Isis
       int indexOfActionList(QList< QAction * > actionList, QString actionText);
       void populateToolBars();
       int indexOfToolBar(QString objName);
+      void removeEmptyMenus();
       void setFileState(FileState state, QString filename);
       void setDirty(bool);
       void setDockWidgetsVisible(bool visibilityState);
 
 
     private slots:
+      void about();
       void setDirty();
       void setSaveAsPvl(int);
       void open();

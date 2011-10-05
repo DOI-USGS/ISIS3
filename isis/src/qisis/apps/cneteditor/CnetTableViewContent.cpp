@@ -29,6 +29,7 @@
 #include "CnetTableColumn.h"
 #include "CnetTableColumnList.h"
 #include <ControlPoint.h>
+#include <QtCore/qtextstream.h>
 
 
 using std::cerr;
@@ -68,6 +69,8 @@ namespace Isis
     activeCell = new QPair<AbstractTreeItem *, int>(NULL, -1);
     rowsWithActiveColumnSelected = new QList<AbstractTreeItem *>;
     lastShiftSelection = new QList<AbstractTreeItem *>;
+    lastShiftArrowSelectedCell = new QPair< AbstractTreeItem *, int >;
+    lastShiftArrowSelectedCell->first = NULL;
 
     verticalScrollBar()->setSingleStep(1);
 
@@ -113,6 +116,9 @@ namespace Isis
 
     delete deleteSelectedRowsAct;
     deleteSelectedRowsAct = NULL;
+    
+    delete lastShiftArrowSelectedCell;
+    lastShiftArrowSelectedCell = NULL;
 
     columns = NULL;
   }
@@ -187,9 +193,8 @@ namespace Isis
       }
       
       updateItemList();
-      activeCell->first = NULL;
-      activeCell->second = -1;
-      clearColumnSelection();
+//      clearActiveCell();
+//       clearColumnSelection();
       lastDirectlySelectedRow = NULL;
       lastShiftSelection->clear();
 
@@ -271,7 +276,7 @@ namespace Isis
     {
       int rowNum = event->pos().y() / rowHeight;
 
-      if (activeCell->first && isCellEditable(rowNum, activeCell->second))
+      if (activeCell->first && cellIsEditable(rowNum, activeCell->second))
       {
         const AbstractCnetTableDelegate * delegate = model->getDelegate();
         CnetTableColumn * col =
@@ -305,10 +310,8 @@ namespace Isis
       // BUG
       // TODO
       // FIXME
-      if (colNum == 0) {
-        activeCell->first = NULL;
-        activeCell->second = -1;
-      }
+      if (colNum == 0)
+        clearActiveCell();
       
       if (rowNum >= 0 && rowNum < items->size() && activeCell->first)
       {
@@ -318,7 +321,7 @@ namespace Isis
         // Deselect all rows, as this will now be a cell selection.
         model->setGlobalSelection(false);
 
-        if (isCellEditable(rowNum, activeCell->second))
+        if (cellIsEditable(rowNum, activeCell->second))
         {
           if (event->modifiers() & Qt::ControlModifier)
           {
@@ -339,7 +342,7 @@ namespace Isis
             else
             {
               // Normal click, no modifiers.
-              rowsWithActiveColumnSelected->clear();
+              clearColumnSelection();
               rowsWithActiveColumnSelected->append(activeCell->first);
               lastDirectlySelectedRow = activeCell->first;
               lastShiftSelection->clear();
@@ -450,7 +453,7 @@ namespace Isis
         {
           // The user clicked on a valid item, handle selection of individual cells
           // (not rows).
-          if (isCellEditable(rowNum, activeCell->second))
+          if (cellIsEditable(rowNum, activeCell->second))
           {
             updateColumnGroupSelection((*items)[rowNum]);
           }
@@ -517,7 +520,7 @@ namespace Isis
   {
     Qt::Key key = (Qt::Key) event->key();
     
-    // Ctrl-A selects all rows.
+    // Handle Ctrl-A (selects all rows)
     if (key == Qt::Key_A && event->modifiers() == Qt::ControlModifier)
     {
       clearActiveCell();
@@ -527,11 +530,15 @@ namespace Isis
 
       emit tableSelectionChanged();
     }
+    
+    // Handle delete key (delete row(s) if any are selected)
     else if (key == Qt::Key_Delete)
     {
       if (hasRowSelection())
         deleteSelectedRows();
     }
+    
+    // Handle return or enter (stop editing)
     else if (key == Qt::Key_Return || key == Qt::Key_Enter)
     {
       if (editWidget)
@@ -544,9 +551,215 @@ namespace Isis
         editWidget = NULL;
 
         cellDataChanged(col);
+        setFocus(Qt::ActiveWindowFocusReason);
         viewport()->update();
       }
     }
+    
+    // Handle arrow key navigation
+    else if (key == Qt::Key_Up || key == Qt::Key_Down || key == Qt::Key_Left ||
+        key == Qt::Key_Right)
+    {
+      if (!hasActiveCell())
+      {
+        ASSERT(items);
+        if (items && items->size())
+        {
+          activeCell->first = (*items)[0];
+          activeCell->second = 1;
+        }
+      }
+      
+      if (hasActiveCell() && !editWidget)
+      {
+        // should have items if we have an active cell
+        ASSERT(items->size());
+        
+        // Handle up arrow with shift pressed
+        if (key == Qt::Key_Up && event->modifiers() == Qt::ShiftModifier)
+        {
+          ASSERT(lastShiftArrowSelectedCell);
+          
+          AbstractTreeItem * prevCell = lastShiftArrowSelectedCell->first ?
+              lastShiftArrowSelectedCell->first : activeCell->first;
+          
+          int prevCellIndex = getModel()->indexOfVisibleItem(prevCell);
+          
+          if (prevCellIndex > 0)
+          {
+            QList< AbstractTreeItem * > itemList =
+                getModel()->getItems(prevCellIndex - 1, prevCellIndex);
+            
+            if (itemList.size())
+            {
+              AbstractTreeItem * curItem = itemList[0];
+//               cerr << "curItem: " << qPrintable(curItem->getData(columns->getVisibleColumns()[activeCell->second]->getTitle())) << "\n";;
+              
+              if (rowsWithActiveColumnSelected->contains(curItem) ||
+                  curItem == activeCell->first)
+                rowsWithActiveColumnSelected->removeAll(prevCell);
+              else
+                rowsWithActiveColumnSelected->append(curItem);
+              
+              if (curItem == activeCell->first)
+                lastShiftArrowSelectedCell->first = NULL;
+              else
+                lastShiftArrowSelectedCell->first = curItem;
+              lastShiftArrowSelectedCell->second = activeCell->second;
+              
+              // scroll if needed
+              int itemsPrevIndex = items->indexOf(prevCell);
+              int itemsCurIndex = items->indexOf(curItem);
+              if (itemsCurIndex == -1)
+              {
+                if (itemsPrevIndex == 0) // then need to scroll up!
+                {
+                  verticalScrollBar()->setValue(qMax(0, prevCellIndex - 1));
+                }
+                else
+                {
+                  //int itemsLastIndex = items->size() - 1;
+                  //ASSERT(itemsPrevIndex == items->at(items->size() - 1));
+                  //verticalScrollBar()->setValue(qMin(prevCell + 1, ));
+                }
+              }
+              
+              
+              viewport()->update();
+            }
+          }
+        }
+        
+        // Handle down arrow with shift pressed
+        else if (key == Qt::Key_Down && event->modifiers() == Qt::ShiftModifier)
+        {
+          AbstractTreeItem * prevCell = lastShiftArrowSelectedCell->first ?
+              lastShiftArrowSelectedCell->first : activeCell->first;
+              
+          int prevCellIndex = getModel()->indexOfVisibleItem(prevCell);
+          
+          if (prevCellIndex >= 0 &&
+              prevCellIndex < getModel()->getVisibleRowCount() - 1)
+          {
+            QList< AbstractTreeItem * > itemList =
+                getModel()->getItems(prevCellIndex + 1, prevCellIndex + 2);
+            
+            if (itemList.size())
+            {
+              AbstractTreeItem * curItem = itemList[0];
+//               cerr << "curItem: " << qPrintable(curItem->getData(columns->getVisibleColumns()[activeCell->second]->getTitle())) << "\n";;
+              
+              
+              if (rowsWithActiveColumnSelected->contains(curItem) ||
+                  curItem == activeCell->first)
+                rowsWithActiveColumnSelected->removeAll(prevCell);
+              else
+                rowsWithActiveColumnSelected->append(curItem);
+              
+              if (curItem == activeCell->first)
+                lastShiftArrowSelectedCell->first = NULL;
+              else
+                lastShiftArrowSelectedCell->first = curItem;
+              lastShiftArrowSelectedCell->second = activeCell->second;
+              viewport()->update();
+
+              // scroll if needed
+              int itemsPrevIndex = items->indexOf(prevCell);
+              int itemsCurIndex = items->indexOf(curItem);
+              if (itemsCurIndex == -1)
+              {
+                if (itemsPrevIndex == items->size() - 1)
+                {
+                  int visibleItemCount = getModel()->getVisibleRowCount();
+                  verticalScrollBar()->setValue(qMin(visibleItemCount,
+                      getModel()->indexOfVisibleItem(items->at(1))));
+                }
+                else
+                {
+                  //int itemsLastIndex = items->size() - 1;
+                  //ASSERT(itemsPrevIndex == items->at(items->size() - 1));
+                  //verticalScrollBar()->setValue(qMin(prevCell + 1, ));
+                }
+              }
+            }
+          }
+        }
+        
+        // Handle up arrow
+        else if (key == Qt::Key_Up)
+        {
+          int activeIndex = items->indexOf(activeCell->first);
+          if (activeIndex != -1)
+          {
+            if (activeIndex == 0)
+            {
+              int row = qMax(0, getModel()->indexOfVisibleItem(
+                  activeCell->first) - 1);
+              
+              verticalScrollBar()->setValue(row);
+            }
+            
+            activeCell->first = (*items)[qMax(0, activeIndex - 1)];
+            clearColumnSelection();
+            viewport()->update();
+          }
+        }
+        
+        // Handle down arrow
+        else if (key == Qt::Key_Down)
+        {
+          int activeIndex = items->indexOf(activeCell->first);
+          if (activeIndex != -1)
+          {
+            if (activeIndex == items->size() - 1)
+            {
+              int row = qMin(getModel()->getVisibleRowCount() - 1,
+                            getModel()->indexOfVisibleItem(items->at(0)));
+              
+              verticalScrollBar()->setValue(row + 1);
+              activeIndex = items->indexOf(activeCell->first);
+            }
+            
+            activeCell->first = (*items)[qMin(activeIndex + 1, items->size() - 1)];
+            clearColumnSelection();
+            viewport()->update();
+          }
+        }
+        
+        // Handle left arrow
+        else if (key == Qt::Key_Left)
+        {
+          activeCell->second = qMax(1, activeCell->second - 1);
+          int leftMostVisibleCol = getColumnFromScreenX(0);
+          if (leftMostVisibleCol == activeCell->second)
+          {
+            horizontalScrollBar()->setValue(horizontalScrollBar()->value() -
+                columns->getVisibleColumns()[activeCell->second]->getWidth());
+          }
+          
+          clearColumnSelection();
+          viewport()->update();
+        }
+          
+        // Handle right arrow
+        else if (key == Qt::Key_Right)
+        {
+          activeCell->second = qMin(columns->getVisibleColumns().size() - 1,
+                                    activeCell->second + 1);
+          int rightMostVisibleCol = getColumnFromScreenX(viewport()->width());
+          if (rightMostVisibleCol == activeCell->second)
+          {
+            horizontalScrollBar()->setValue(horizontalScrollBar()->value() +
+              columns->getVisibleColumns()[activeCell->second]->getWidth());
+          }
+          
+          clearColumnSelection();
+          viewport()->update();
+        }
+      }
+    }
+    
+    // start editing the active cell
     else
     {
       // event->text() will be empty if a modifier was pressed.
@@ -558,7 +771,7 @@ namespace Isis
         ASSERT(items->contains(activeCell->first));
         
         if (items->contains(activeCell->first) &&
-            isCellEditable(items->indexOf(activeCell->first),
+            cellIsEditable(items->indexOf(activeCell->first),
             activeCell->second))
         {
           AbstractCnetTableDelegate const * delegate = model->getDelegate();
@@ -729,6 +942,7 @@ namespace Isis
     model = NULL;
     items = NULL;
     activeCell = NULL;
+    lastShiftArrowSelectedCell = NULL;
     editWidget = NULL;
     lastDirectlySelectedRow = NULL;
     lastShiftSelection = NULL;
@@ -752,6 +966,7 @@ namespace Isis
 
   void CnetTableViewContent::clearActiveCell()
   {
+    //cerr << "CnetTableViewContent::clearActiveCell called\n";
     activeCell->first = NULL;
     activeCell->second = -1;
   }
@@ -759,10 +974,13 @@ namespace Isis
 
   void CnetTableViewContent::clearColumnSelection()
   {
+    //cerr << "CnetTableViewContent::clearColumnSelection called\n";
+    ASSERT(lastShiftArrowSelectedCell);
+    lastShiftArrowSelectedCell->first = NULL;
     rowsWithActiveColumnSelected->clear();
   }
 
-
+  
   void CnetTableViewContent::copyCellSelection(bool allCells)
   {
     if (hasActiveCell())
@@ -897,7 +1115,7 @@ namespace Isis
   }
 
 
-  bool CnetTableViewContent::isMouseInRowSelection(QPoint mousePos) const
+  bool CnetTableViewContent::mouseInRowSelection(QPoint mousePos) const
   {
     AbstractTreeItem * row = items->at(getRowFromScreenY(mousePos.y()));
 
@@ -905,7 +1123,7 @@ namespace Isis
   }
   
   
-  bool CnetTableViewContent::isRowValid(int rowNum) const
+  bool CnetTableViewContent::rowIsValid(int rowNum) const
   {
     bool valid = false;
     
@@ -916,7 +1134,7 @@ namespace Isis
   }
   
   
-  bool CnetTableViewContent::isColumnValid(int colNum) const
+  bool CnetTableViewContent::columnIsValid(int colNum) const
   {
     bool valid = false;
     
@@ -927,7 +1145,7 @@ namespace Isis
   }
 
 
-  bool CnetTableViewContent::isCellEditable(int rowNum, int colNum) const
+  bool CnetTableViewContent::cellIsEditable(int rowNum, int colNum) const
   {
     ASSERT(rowNum >= 0 && rowNum < items->size());
     ASSERT(colNum >= 0 && colNum < columns->getVisibleColumns().size());
@@ -1016,7 +1234,7 @@ namespace Isis
             }
             else
             {
-              if (!isCellEditable(rowNum, i))
+              if (!cellIsEditable(rowNum, i))
               {
                 // The cell is not editable, so make the text grayed out.
                 painter->setPen(palette().color(QPalette::Disabled,
@@ -1121,8 +1339,7 @@ namespace Isis
     int rowNum = getRowFromScreenY(screenPos.y());
     int oldActiveColumn = activeCell->second;
 
-    activeCell->first = NULL;
-    activeCell->second = -1;
+    clearActiveCell();
 
     if (rowNum >= 0)
     {
@@ -1148,9 +1365,11 @@ namespace Isis
 
     if (oldActiveColumn != activeCell->second)
     {
-      rowsWithActiveColumnSelected->clear();
+      clearColumnSelection();
       lastDirectlySelectedRow = NULL;
     }
+    
+    clearColumnSelection();
   }
   
 
@@ -1275,7 +1494,7 @@ namespace Isis
 
     // If there is a row selection, show a context menu if the user clicked
     // anywhere on any of the selected row(s).
-    if (hasRowSelection() && isMouseInRowSelection(mouseLocation))
+    if (hasRowSelection() && mouseInRowSelection(mouseLocation))
     {
       contextMenu.addAction(deleteSelectedRowsAct);
       contextMenu.exec(mapToGlobal(mouseLocation));

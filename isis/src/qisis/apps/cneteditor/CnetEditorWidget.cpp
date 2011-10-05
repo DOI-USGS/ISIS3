@@ -25,6 +25,7 @@
 #include <QTimer>
 #include <QToolBar>
 #include <QVBoxLayout>
+#include <QWhatsThis>
 
 #include "ControlNet.h"
 #include "ControlPoint.h"
@@ -279,34 +280,51 @@ namespace Isis
 
   void CnetEditorWidget::createActions()
   {
+    ASSERT(menuActions);
+
+    QAction * freezeTablesAct = new QAction(QIcon(":ice"),
+                                            tr("&Freeze Tables"), this);
+    freezeTablesAct->setCheckable(true);
+    freezeTablesAct->setToolTip(tr("Freeze tables (filters will not take "
+                                   "effect until unfrozen)"));
+    freezeTablesAct->setWhatsThis(tr("<html>When editing cells in the tables, it "
+        "is often desirable to not have your currently defined filters applied "
+        "immediately when you make a change.<br/><br/>"
+        "When frozen, the contents of the tables will be locked.  Current "
+        "filters will not be applied to the tables until they are unfrozen."
+        "</html>"));
+    connect(freezeTablesAct, SIGNAL(toggled(bool)),
+            this, SLOT(setTablesFrozen(bool)));
+    QList< QString > freezeTablesLocation;
+    freezeTablesLocation.append(tr("&Tables"));
+    menuActions->insert(freezeTablesAct, freezeTablesLocation);
+    
     QAction * enableSortAct = new QAction(QIcon(":sort"),
                                           tr("&Enable Sorting"), this);
     enableSortAct->setCheckable(true);
     enableSortAct->setStatusTip(tr("Enable Sorting on Table Columns"));
+    enableSortAct->setWhatsThis(tr("<html>When sorting is enabled, the data "
+        "in the tables can be sorted by clicking on column headings.  Sorting "
+        "is disabled by default because of how long it can take for very large "
+        "control networks.</html>"));
     connect(enableSortAct, SIGNAL(toggled(bool)),
             this, SLOT(setSortingEnabled(bool)));
-    
-    ASSERT(menuActions);
-    
     QList< QString > enableSortLocation;
-    enableSortLocation.append(tr("Settings"));
+    enableSortLocation.append(tr("&Tables"));
     menuActions->insert(enableSortAct, enableSortLocation);
     
-    QList< QAction * > actionList;
-//     actionList.append(enableSortAct);
+    QAction * whatsThisAct = QWhatsThis::createAction(this);
+    QList< QString > whatsThisLocation;
+    whatsThisLocation.append(tr("&Help"));
+    menuActions->insert(whatsThisAct, whatsThisLocation);
     
-    QAction * freezeTablesAct = new QAction(tr("&Freeze Tables"), this);
-    freezeTablesAct->setCheckable(true);
-    freezeTablesAct->setToolTip(tr("Freeze tables (filters will not take "
-                                   "effect until unfrozen)"));
-    freezeTablesAct->setWhatsThis("When editing cells in the tables, it is ");
-    connect(freezeTablesAct, SIGNAL(toggled(bool)),
-            this, SLOT(setTablesFrozen(bool)));
-    
-    actionList.append(freezeTablesAct);
-    toolBarActions->insert("settingsToolBar", actionList);
+    QList< QAction * > tbActionList;
+    tbActionList.append(freezeTablesAct);
+    tbActionList.append(enableSortAct);
+//     actionList.append(whatsThisAct);
+    toolBarActions->insert("settingsToolBar", tbActionList);
   }
-  
+
   
   void CnetEditorWidget::createPointTreeView()
   {
