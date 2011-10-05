@@ -7,15 +7,24 @@
   </brief>
 
   <description>
-    This program creates an autoregistration group template for autoregs.  Given
-    a specific algorithm name, it will create that specific algorithm group template.
-    If you are unsure of what algorithm name you want to use, running the application
-    with an 'unknown' algorithm name will give you an error box containing a list of the
-    possible algorithm names.  If a tolerance is specified, the application will automatically
-    insert the tolerance keyword and value into the autoreg template.  The user must enter
-    values for the chip sizes of both the pattern and search chips.  The output templates
-    can be used in applications that use autoregistrations, such as coreg,
-    pointreg, findrx, etc.
+    This program creates an autoregistration group template for applications
+    such as "coreg", "pointreg", "qnet", "findrx", and other ISIS software
+   with a pattern matching component.  Given a specific algorithm name, it will
+    create that specific algorithm group template. If you are unsure of
+    what algorithm name you want to use, running the application with an
+    'unknown' algorithm name will give you an error box containing a list of
+    the possible algorithm names.  If a tolerance is specified, the application
+    will automatically insert the tolerance keyword and value into the autoreg
+    template.  The user must enter values for the
+    chip sizes of both the pattern and search chips.
+    <p>
+    It is highly recommended that users review the Pattern Matching document (in
+    the "Related Objects and Documents" section).
+    </p>
+     NOTE:  This program lacks updates for the Gruen pattern matching algorithm.
+    In the future this program will be depricated and replaced with a wizard
+    (expert system) which  will help guide the user in the selection of the
+    appropriate algorithm and parameter values.
   </description>
 
   <history>
@@ -46,6 +55,9 @@
         Changed VALIDPERCENT to SSUBCHIPVALIDPERCENT parameters in SearchChip
         group.  Added PVALIDPERCENT to PatternChip group.  Updated examples
         and unit tests.
+    </change>
+    <change name="Jeff Anderson" date="2011-10-05">
+        Updated documentation
     </change>
   </history>
 
@@ -94,7 +106,7 @@
         </brief>
         <description>
           This is the name of the algorithm for the autoregistration group being
-          created.  If left as unknown, an error will be reported listing all 
+          created.  If left as unknown, an error will be reported listing all
           possible options for the algorithm name.
         </description>
         <default><item>Undefined</item></default>
@@ -110,7 +122,7 @@
           represented in the template as the Tolerance keyword.
         </description>
       </parameter>
-        
+
       <parameter name="REDUCTIONFACTOR">
         <type>integer</type>
         <brief>
@@ -465,13 +477,13 @@
 
   <examples>
     <example>
-      <brief> 
+      <brief>
         Create an Autoreg Template with all Defaults
       </brief>
       <description>
         This example shows how the autoregtemplate application works, and how
         to create a simple AutoReg template.  Here, only the required parameters
-        have been entered.  Because SubpixelAccuracy is "true" by default, there 
+        have been entered.  Because SubpixelAccuracy is "true" by default, there
         is a SurfaceModel group in the output PVL containing the default
         DistanceTolerance and WindowSize.
         <pre>
@@ -481,29 +493,29 @@
                 Tolerance        = 0.7
                 SubpixelAccuracy = True
               End_Group
-            
+
               Group = PatternChip
                 Samples = 15
                 Lines   = 15
               End_Group
-            
+
               Group = SearchChip
                 Samples = 31
                 Lines   = 31
               End_Group
-            
+
               Group = SurfaceModel
                 DistanceTolerance = 1.5
                 WindowSize        = 5
               End_Group
             End_Object
             End
-        </pre> 
+        </pre>
         The above output is the text file resulting when the following
         command line is run:
       </description>
       <terminalInterface>
-        <commandLine> 
+        <commandLine>
           algorithm=MaximumCorrelation tolerance=0.7  psamp=15 pline=15
           ssamp=31 sline=31 to=out.txt
         </commandLine>
@@ -515,7 +527,7 @@
     </example>
 
     <example>
-      <brief> 
+      <brief>
         Create an Autoreg Template without Subpixel Accuracy and with Chip
         Interpolator specified
       </brief>
@@ -536,12 +548,12 @@
                 SubpixelAccuracy = False
                 ChipInterpolator = CubicConvolutionType
               End_Group
-            
+
               Group = PatternChip
                 Samples = 15
                 Lines   = 15
               End_Group
-            
+
               Group = SearchChip
                 Samples = 31
                 Lines   = 31
@@ -591,7 +603,7 @@
                 SubpixelAccuracy = True
                 ChipInterpolator = NearestNeighborType
               End_Group
-            
+
               Group = PatternChip
                 Samples       = 15
                 Lines         = 15
@@ -600,7 +612,7 @@
                 MinimumZScore = 0.5
                 ValidPercent  = 75.0
               End_Group
-            
+
               Group = SearchChip
                 Samples             = 31
                 Lines               = 31
@@ -608,7 +620,7 @@
                 ValidMaximum        = 2800
                 SubchipValidPercent = 80.0
               End_Group
-            
+
               Group = SurfaceModel
                 DistanceTolerance = 2.5
                 WindowSize        = 11
