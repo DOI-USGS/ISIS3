@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<application name="remapollorx" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+<application name="apolloremrx" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
     Removes Reseaus from an Apollo image
   </brief>
@@ -19,11 +19,9 @@
     findrx program.  If the flag is 0, the program will not remove that
     reseau.  If the flag is 1, the reseau will be removed.  If the flag is
     -1, indicating an invalid nominal position, the reseau will not be
-    removed in any case.   The output cube file can be written over the
-    input file or a new output cube can be created.  To overwrite the input
-    file, the TO parameter should be set to blank, " ".  The "findrx"
-    program, which writes the Reseau locations, Reseau type, and a valid
-    flag to the cube file label, must be run before "remapollorx".
+    removed in any case.   The "apollofindrx" program, which writes the Reseau
+    locations, Reseau type, and a valid flag to the cube file label, must be
+    run before "apolloremrx".
   </description>
 
   <category>
@@ -32,7 +30,7 @@
 
   <seeAlso>
     <applications>
-      <item>findapollorx</item>
+      <item>apollofindrx</item>
       <item>findrx</item>
       <item>remrx</item>
     </applications>
