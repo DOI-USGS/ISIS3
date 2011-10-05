@@ -116,7 +116,8 @@
       Moved the above error handling to ImageOverlapSet.
     </change>
     <change name="Steven Lambright" date="2011-09-26">
-      Improved documentation.
+      Improved documentation in preparation for the October release. Working
+      with me to document findimageoverlaps was Ra'ad Saleh and Bob Sucharski.
     </change>
   </history>
 
