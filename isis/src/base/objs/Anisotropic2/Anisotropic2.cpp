@@ -85,10 +85,15 @@ namespace Isis {
       return;
     }
 
-    if(p_atmosWha == 1.0) {
-      std::string msg = "Anisotropic conservative case not implemented yet";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
-    }
+    // The following code was commented out because this was only meant to be
+    // an informative statement and not an error - the conservative case for
+    // this model was not implemented in ISIS2 and there are currently no plans
+    // for implementing it in ISIS3
+    //
+    // if(p_atmosWha == 1.0) {
+    //   std::string msg = "Anisotropic conservative case not implemented yet";
+    //   throw iException::Message(iException::User, msg, _FILEINFO_);
+    // }
 
     if(TauOrWhaChanged()) {
       // preparation includes exponential integrals e sub 2 through 5
