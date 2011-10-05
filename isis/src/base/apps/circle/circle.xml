@@ -152,7 +152,7 @@
       </outputImages>
       <guiInterfaces>
         <guiInterface>
-          <image width="328" height="249" src="assets/screen1.jpg">
+          <image width="634" height="481" src="assets/screen1.jpg">
             <brief>Example GUI</brief>
             <description>Screenshot of GUI with parameters filled in to perform the default circle operation</description>
             <thumbnail width="200" height="152" caption="Circle GUI" src="assets/screen1_s.jpg"/>
@@ -185,7 +185,7 @@
       </outputImages>
       <guiInterfaces>
         <guiInterface>
-          <image width="328" height="249" src="assets/screen2.jpg">
+          <image width="634" height="481" src="assets/screen2.jpg">
             <brief>Example GUI</brief>
             <description>Screenshot of GUI with parameters filled in to perform a circle operation with a radius of 150</description>
             <thumbnail width="200" height="152" caption="Circle GUI" src="assets/screen2_s.jpg"/>
@@ -228,10 +228,10 @@
       </outputImages>
       <guiInterfaces>
         <guiInterface>
-          <image width="328" height="249" src="assets/screen3.jpg">
+          <image width="726" height="450" src="assets/screen3.jpg">
             <brief>Example GUI</brief>
             <description>Screenshot of GUI with parameters filled in to perform a circle operation with a radius of 200 and centered on line/sample 125/375</description>
-            <thumbnail width="200" height="152" caption="Circle GUI" src="assets/screen3_s.jpg"/>
+            <thumbnail width="200" height="124" caption="Circle GUI" src="assets/screen3_s.jpg"/>
           </image>
         </guiInterface>
       </guiInterfaces>
