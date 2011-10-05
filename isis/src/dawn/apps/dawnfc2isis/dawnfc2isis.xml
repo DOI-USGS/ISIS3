@@ -2,16 +2,34 @@
 
 <application name="dawnfc2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
-  <brief>Import PDS formatted DAWN FC EDR or RDR image cube into Isis format cube</brief>
+  <brief>Import PDS formatted Dawn FC EDR or RDR image cube into Isis format cube</brief>
 
   <description>
-    This program will import a PDS formatted DAWN Framing Camera (FC) level 1 (EDR) or 
-    level 2 (RDR) image into an Isis cube. A DAWN RDR file contains a single image
-    object and will be written to the file specified by the TO parameter. The DAWN
-    EDR file can contain multiple image objects. Until we have further information
-    about the frame image objects in the EDR, this program is going to ignore them and
-    only process the main image object. The main EDR image object will be written to 
-    the file specified by the TO parameter.
+    <p>
+    This application will import a PDS formatted Dawn Framing Camera (FC) level
+    1 (EDR) or level 2 (RDR) radiometrically calibrated image into an Isis cube.
+    The resulting cube ("TO" parameter) will function properly in other ISIS
+    cartographic software such as "spiceinit" and "cam2map".   The Dawn FC EDRs
+    and RDRs will be available for download from the PDS Small Bodies Node at
+    http://pdssbn.astro.umd.edu/. </p>
+
+    <p>
+    Although allowed in PDS standards, Dawn EDR and RDR files are arranged in a
+    rarely used spatial storage order.  That is,  the bottom line of the image
+    is stored first within the image array object contained in the PDS file. 
+    This
+    application modifies the arrangement by reversing the line storage order in
+    the output cube; however,  be aware that other
+    non-ISIS software may not apply the reversal.
+    Therefore a Dawn image may appear to be flipped from top-to-bottom when
+    comparing to ISIS cubes.
+    </p>
+
+    <p>
+    Please note that ancillary Dawn PDS products such as mosaics or other map
+    projected RDRs should not be used as input to this program.  Instead use the
+    general "pds2isis" program.
+    </p>
   </description>
 
   <history>
@@ -25,15 +43,18 @@
       Changed the category
     </change>
     <change name="Kris Becker" date="2011-03-14">
-        Removed tests on HorizontalPixelScale and VerticalPixelScale; Added 
+        Removed tests on HorizontalPixelScale and VerticalPixelScale; Added
         optional TARGET parameter to allow TargetName specification.
     </change>
     <change name="Jeff Anderson" date="2011-07-26">
     	Changed the program to write the NaifFrameCode in the labels to include
     	the filter number.  This was done because the Dawn FC team provided a new
     	instrument kernel (IK) with band dependent focal lengths and optical
-    	distortion parameters. The camera model then uses this update label 
+    	distortion parameters. The camera model then uses this update label
     	keyword to read the correct camera parameters.
+    </change>
+    <change name="Jeff Andersoni and Chris Isbell" date="2011-10-05">
+      Improved the user documentation
     </change>
   </history>
 
@@ -47,11 +68,13 @@
         <type>filename</type>
         <fileMode>input</fileMode>
         <brief>
-          Input PDS formatted DAWN EDR or RDR file
+          Select a PDS Dawn EDR or RDR file
         </brief>
         <description>
-          Use this parameter to select the DAWN EDR or RDR
-	  filename. This file must contain the PDS labels.
+          Use this parameter to select an existing Dawn EDR or RDR filename.
+      	  This file must contain the PDS labels.  The program will apply a
+          sanity check to make sure the labels match the expected Dawn PDS
+          format and report a user error if they are unacceptable.
         </description>
         <filter>
           *.img *.IMG
@@ -65,7 +88,7 @@
            Output Isis cube
          </brief>
          <description>
-           Use this parameter to select the output filename
+           Use this parameter to define the output ISIS cube filename
          </description>
          <filter>
            *.cub
@@ -78,25 +101,24 @@
             <type>string</type>
             <brief>Provide target name if it needs to be changed</brief>
             <description>
-                This parameter may be necessary as some EDR labels do not adequately defined
-                the TARGET_NAME keyword in the labels.  DAWN has a long cruise 
-                period before ariving at Vesta in August 2011.  During cruise, 
-                a Mars flyby and stellar observatoins will occur.  The proper 
-                specification of the TARGET_NAME is critical to valid 
-                instantiation of ISIS camera models. 
-
-                 There are many star observations being made and in order to 
-                 properly instantiate the ISIS camera model, the target must be 
-                 a recognized NAIF body or "Sky".  NAIF bodies provide the means 
-                 to map image coordinates to latitude/longitude values.  "Sky" 
-                 is a special instantiation within ISIS that provides the 
-                 ability to map image coordinates to RA/DEC coordinates.
-                
-                The default is to honor the value in the  EDR label.  For some 
-                observed targets, "Sky" would be required in order to properly 
-                instantiate the camera model.
+              In order for ISIS cartographic applications  to properly function
+              a TARGET_NAME keyword and value must be present in the source PDS
+              labels. During the cruise phase of the Dawn mission, preliminary
+              versions of the Dawn PDS EDRs and RDRs at times did not contain
+              the TARGET_NAME or it was left blank.   This parameter allows the
+              user to correct that oversight by providing "MARS" or "VESTA" as
+              the parameter value.  Also, star observations were made and
+              recorded in the TARGET_NAME.  The various star names are not
+              recognized by ISIS and this application will produce an unknown
+              target error message. If you plan to use some of the ISIS sky
+              projection programs such as "skymap" or "skypt" you can set the
+              this parameter to "SKY".
+              <p>
+                If this parameter is not provided it will use the value in the
+                PDS labels given by TARGET_NAME.
+              </p>
             </description>
-            <internalDefault>Label Value</internalDefault> 
+            <internalDefault>Label Value</internalDefault>
         </parameter>
     </group>
 
