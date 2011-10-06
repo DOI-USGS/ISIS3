@@ -230,12 +230,8 @@
     -----------------------
     Bha    : Coefficient of the single particle Legendre phase function:
              -1 &lt;= value &lt;= 1 : default is 0.85
-    Bharef : Reference value of Bha to which the image will be
-             normalized: -1 &lt;= value &lt;= 1 : default is Bha
     Hga    : Coefficient of single particle Henyey Greenstein phase
              function: -1 &lt; value &lt; 1 : default is 0.68
-    Hgaref : Reference value of Hga to which the image will be
-             normalized: -1 &lt; value &lt; 1 : default is Hga
     Hnorm  : Atmospheric shell thickness normalized to the planet radius:
              0 &lt;= value : default is .003
     Nulneg : Determines if negative values after removal of atmospheric
@@ -245,9 +241,7 @@
     Tauref : Reference value of Tau to which the image will be
              normalized: 0 &lt;= value : default is 0.0
     Wha    : Single scattering albedo of atmospheric particles: 
-             0 &lt; value &lt;= 1 : default is 0.95
-    Wharef : Reference value of Wha to which the image will be
-             normalized: 0 &lt; value &lt;= 1 : default is Wha
+             0 &lt; value &lt; 1 : default is 0.95
   
     Normalization parameters:
     -------------------------
@@ -455,6 +449,42 @@
       CENTER_FROM_IMAGE, CENTER_FROM_LABEL and CENTER_FROM_USER options have been 
       added. This allows the user to determine where the center photometric angles
       will come from.
+    </change>
+    <change name="Janet Barrett" date="2011-09-23">
+      The following changes were made to the program for the ISIS3.3.0 release:
+      1) The PHOPAR parameter name was changed to FROMPVL - this was done to have
+         consistent parameter names throughout the photometry software.
+      2) All radio button options are now accessed through drop down menus. The
+         only radio button options that existed prior to this release were those for
+         choosing the ANGLESOURCE. In order to use any of the drop down menus, click
+         on the drop down menu and hold the mouse button down while navigating to
+         the choice that you want.
+      3) Added a USEDEM option which will let you determine how the trim is performed.
+         If you don't check the USEDEM box, then trimming is performed based on the
+         photometric angles of the ellipsoid. If you check the USEDEM box, then the
+         trimming is performed based on the photometric angles of the DEM (if one is
+         specified in the image labels). If there is no DEM associated with your FROM
+         file, then the default is to use the ellipsoid.
+      4) The program now lets you specify the photometric model, atmospheric model,
+         and normalization model through the PHTNAME, ATMNAME, and NORMNAME drop down
+         menus. Prior to this release, you were forced to provide an input PVL file with
+         all of the model information in it. You can now provide the model information
+         through the PVL, the GUI, or a combination of both. If you provide a FROMPVL
+         file, then you need to use the GUI to specify which model(s) to use from that
+         file. If you change any of the model-specific parameters in the GUI, then they
+         will override the values in the FROMPVL file. 
+      5) The BHAREF, HGAREF, and WHAREF parameters have been removed because they were
+         obsolete.
+      6) The NONORMALIZATION model was removed because it duplicated the functionality
+         of the SHADE model.
+      7) More photometric models have been added. The Hapke Legendre, Minnaert Empirical,
+         and Lunar Lambert Empirical models have been added. 
+      8) A USEDEM parameter has been added which allows the user to determine which
+         photometric angles to use for trimming. If the USEDEM parameter is set to false,
+         then the photometric angles of the ellipsoid are used. If USEDEM is set to true,
+         then the photometric angles of the DEM shape model are used for trimming.
+      9) Helper buttons were added to the FROMPVL to allow you to View a PVL or to Load
+         a PVL.
     </change>
   </history>
 
@@ -995,10 +1025,11 @@
       </parameter>
 
       <parameter name="THETA">
-        <type>double</type>
+        <type>string</type>
         <brief>
           Macroscopic Roughness Angle
         </brief>
+        <default><item>None Specified</item></default>
         <internalDefault>None Specified</internalDefault>
         <description>
           The Hapke macroscopic roughness component.
@@ -1008,10 +1039,11 @@
       </parameter>
 
       <parameter name="WH">
-        <type>double</type>
+        <type>string</type>
         <brief>
           Single Scattering Albedo
         </brief>
+        <default><item>None Specified</item></default>
         <internalDefault>None Specified</internalDefault>
         <description>
           The Hapke single scattering albedo component.
@@ -1021,10 +1053,11 @@
       </parameter>
 
       <parameter name="HG1">
-        <type>double</type>
+        <type>string</type>
         <brief>
           Hapke Henyey Greenstein Coefficient
         </brief>
+        <default><item>None Specified</item></default>
         <internalDefault>None Specified</internalDefault>
         <description>
           The Hapke Henyey Greenstein coefficient for single particle phase
@@ -1035,10 +1068,11 @@
       </parameter>
 
       <parameter name="HG2">
-        <type>double</type>
+        <type>string</type>
         <brief>
           Hapke Henyey Greenstein Coefficient
         </brief>
+        <default><item>None Specified</item></default>
         <internalDefault>None Specified</internalDefault>
         <description>
           The Hapke Henyey Greenstein coefficient for single particle phase
@@ -1049,10 +1083,11 @@
       </parameter>
 
       <parameter name="BH">
-        <type>double</type>
+        <type>string</type>
         <brief>
           Hapke Legendre Coefficient
         </brief>
+        <default><item>None Specified</item></default>
         <internalDefault>None Specified</internalDefault>
         <description>
           The Hapke Legendre coefficient for single particle phase
@@ -1063,10 +1098,11 @@
       </parameter>
 
       <parameter name="CH">
-        <type>double</type>
+        <type>string</type>
         <brief>
           Hapke Legendre Coefficient
         </brief>
+        <default><item>None Specified</item></default>
         <internalDefault>None Specified</internalDefault>
         <description>
           The Hapke Legendre coefficient for single particle phase
@@ -1077,10 +1113,11 @@
       </parameter>
 
       <parameter name="HH">
-        <type>double</type>
+        <type>string</type>
         <brief>
           Hapke Opposition Surge
         </brief>
+        <default><item>None Specified</item></default>
         <internalDefault>None Specified</internalDefault>
         <description>
           The Hapke opposition surge component.
@@ -1089,10 +1126,11 @@
       </parameter>
 
       <parameter name="B0">
-        <type>double</type>
+        <type>string</type>
         <brief>
           Hapke Opposition Surge
         </brief>
+        <default><item>None Specified</item></default>
         <internalDefault>None Specified</internalDefault>
         <description>
           The Hapke opposition surge component.
@@ -1101,10 +1139,11 @@
       </parameter>
 
       <parameter name="L">
-        <type>double</type>
+        <type>string</type>
         <brief>
           Lunar-Lambert Function Weight
         </brief>
+        <default><item>None Specified</item></default>
         <internalDefault>None Specified</internalDefault>
         <description>
           The Lunar-Lambert function weight.
@@ -1112,10 +1151,11 @@
       </parameter>
 
       <parameter name="K">
-        <type>double</type>
+        <type>string</type>
         <brief>
           Minnaert Function Exponent
         </brief>
+        <default><item>None Specified</item></default>
         <internalDefault>None Specified</internalDefault>
         <description>
           The Minnaert function exponent.
@@ -1131,6 +1171,7 @@
         <description>
           The Minnaert empirical function phase angle list.
         </description>
+        <default><item>No List</item></default>
         <internalDefault>
           No List
         </internalDefault>
@@ -1144,6 +1185,7 @@
         <description>
           The Minnaert empirical function exponent list.
         </description>
+        <default><item>No List</item></default>
         <internalDefault>
           No List
         </internalDefault>
@@ -1157,6 +1199,7 @@
         <description>
           The Lunar Lambert empirical function exponent list.
         </description>
+        <default><item>No List</item></default>
         <internalDefault>
           No List
         </internalDefault>
@@ -1170,6 +1213,7 @@
         <description>
           The Minnaert empirical function phase curve value list.
         </description>
+        <default><item>No List</item></default>
         <internalDefault>
           No List
         </internalDefault>
@@ -1340,24 +1384,53 @@
       </parameter>
 
       <parameter name="NULNEG">
-        <type>boolean</type>
+        <type>string</type>
         <brief>
-          Set negative values to NULL
+          Determines if negative values will be set to NULL
         </brief>
-        <default>
-          <item>FALSE</item>
-        </default>
+        <default><item>READFROMPVL</item></default>
         <description>
           This determines if negative values after removal of atmospheric
           effects will be set to NULL.
         </description>
+        <list>
+          <option value="READFROMPVL">
+            <brief>
+              NULNEG will be set using the value in the FROMPVL file
+            </brief>
+            <description>
+              This option specifies that the NULNEG value be retrieved
+              from the FROMPVL file. If a FROMPVL file was not provided,
+              then an error will occur.
+            </description>
+          </option>
+          <option value="NO">
+            <brief>
+              Negative values will not be set to NULL
+            </brief>
+            <description>
+              This option specifies that the negative values will not be set to
+              NULL after the removal of atmospheric effects.
+            </description>
+          </option>
+          <option value="YES">
+            <brief>
+              Negative values will be set to NULL
+            </brief>
+            <description>
+              This option specifies that the negative values will be set to
+              NULL after the removal of atmospheric effects.
+            </description>
+          </option>
+        </list>
       </parameter>
 
       <parameter name="TAU">
-        <type>double</type>
+        <type>string</type>
         <brief>
           Optical Depth of Atmosphere
         </brief>
+        <default><item>None Specified</item></default>
         <internalDefault>None Specified</internalDefault>
         <description>
           The normal optical depth of the atmosphere.
@@ -1366,10 +1439,11 @@
       </parameter>
 
       <parameter name="TAUREF">
-        <type>double</type>
+        <type>string</type>
         <brief>
           Reference Value of Tau
         </brief>
+        <default><item>None Specified</item></default>
         <internalDefault>None Specified</internalDefault>
         <description>
           The reference value of Tau to which the image will be normalized.
@@ -1378,10 +1452,11 @@
       </parameter>
 
       <parameter name="HGA">
-        <type>double</type>
+        <type>string</type>
         <brief>
           Henyey Greenstein Coefficient
         </brief>
+        <default><item>None Specified</item></default>
         <internalDefault>None Specified</internalDefault>
         <description>
           The coefficient of single particle Henyey Greenstein phase
@@ -1392,10 +1467,11 @@
       </parameter>
 
       <parameter name="WHA">
-        <type>double</type>
+        <type>string</type>
         <brief>
           Single Scattering Albedo
         </brief>
+        <default><item>None Specified</item></default>
         <internalDefault>None Specified</internalDefault>
         <description>
           The single scattering albedo of atmospheric particles.
@@ -1405,10 +1481,11 @@
       </parameter>
 
       <parameter name="BHA">
-        <type>double</type>
+        <type>string</type>
         <brief>
           Legendre Coefficient
         </brief>
+        <default><item>None Specified</item></default>
         <internalDefault>None Specified</internalDefault>
         <description>
           The coefficient of the single particle Legendre phase function.
@@ -1418,10 +1495,11 @@
       </parameter>
 
       <parameter name="HNORM">
-        <type>double</type>
+        <type>string</type>
         <brief>
           Atmospheric Shell Thickness
         </brief>
+        <default><item>None Specified</item></default>
         <internalDefault>None Specified</internalDefault>
         <description>
           The atmospheric shell thickness normalized to the planet
@@ -1784,10 +1862,11 @@
       </parameter>
 
       <parameter name="INCREF">
-        <type>double</type>
+        <type>string</type>
         <brief>
           Reference Incidence Angle
         </brief>
+        <default><item>None Specified</item></default>
         <internalDefault>None Specified</internalDefault>
         <description>
           The reference incidence angle to which the image will be normalized.
@@ -1797,10 +1876,11 @@
       </parameter>
 
       <parameter name="INCMAT">
-        <type>double</type>
+        <type>string</type>
         <brief>
           Incidence Angle
         </brief>
+        <default><item>None Specified</item></default>
         <internalDefault>None Specified</internalDefault>
         <description>
           This specifies the incidence angle where albedo normalization
@@ -1811,10 +1891,11 @@
       </parameter>
 
       <parameter name="THRESH">
-        <type>double</type>
+        <type>string</type>
         <brief>
           Amplification Threshold
         </brief>
+        <default><item>None Specified</item></default>
         <internalDefault>None Specified</internalDefault>
         <description>
           This sets upper limit on amount of amplification in regions of small
@@ -1823,10 +1904,11 @@
       </parameter>
 
       <parameter name="ALBEDO">
-        <type>double</type>
+        <type>string</type>
         <brief>
           Albedo
         </brief>
+        <default><item>None Specified</item></default>
         <internalDefault>None Specified</internalDefault>
         <description>
           The albedo to which the image will be normalized.
@@ -1834,10 +1916,11 @@
       </parameter>
 
       <parameter name="D">
-        <type>double</type>
+        <type>string</type>
         <brief>
           Albedo Normalization Parameter
         </brief>
+        <default><item>None Specified</item></default>
         <internalDefault>None Specified</internalDefault>
         <description>
           The albedo dependent phase function normalization parameter.
@@ -1845,10 +1928,11 @@
       </parameter>
 
       <parameter name="E">
-        <type>double</type>
+        <type>string</type>
         <brief>
           Albedo Normalization Parameter
         </brief>
+        <default><item>None Specified</item></default>
         <internalDefault>None Specified</internalDefault>
         <description>
           The albedo dependent phase function normalization parameter.
@@ -1856,10 +1940,11 @@
       </parameter>
 
       <parameter name="F">
-        <type>double</type>
+        <type>string</type>
         <brief>
           Albedo Normalization Parameter
         </brief>
+        <default><item>None Specified</item></default>
         <internalDefault>None Specified</internalDefault>
         <description>
           The albedo dependent phase function normalization parameter.
@@ -1867,10 +1952,11 @@
       </parameter>
 
       <parameter name="G2">
-        <type>double</type>
+        <type>string</type>
         <brief>
           Albedo Normalization Parameter
         </brief>
+        <default><item>None Specified</item></default>
         <internalDefault>None Specified</internalDefault>
         <description>
           The albedo dependent phase function normalization parameter.
@@ -1878,10 +1964,11 @@
       </parameter>
 
       <parameter name="H">
-        <type>double</type>
+        <type>string</type>
         <brief>
           Albedo Normalization Parameter
         </brief>
+        <default><item>None Specified</item></default>
         <internalDefault>None Specified</internalDefault>
         <description>
           The albedo dependent phase function normalization parameter.
@@ -1889,10 +1976,11 @@
       </parameter>
 
       <parameter name="XMUL">
-        <type>double</type>
+        <type>string</type>
         <brief>
           Radiance to Reflectance/Calibration Factor
         </brief>
+        <default><item>None Specified</item></default>
         <internalDefault>None Specified</internalDefault>
         <description>
           This is used to convert radiance to reflectance or apply a calibration
@@ -1901,10 +1989,11 @@
       </parameter>
 
       <parameter name="WL">
-        <type>double</type>
+        <type>string</type>
         <brief>
           Wavelength
         </brief>
+        <default><item>None Specified</item></default>
         <internalDefault>None Specified</internalDefault>
         <description>
           The wavelength in micrometers of the image being normalized.
@@ -1912,10 +2001,11 @@
       </parameter>
 
       <parameter name="BSH1">
-        <type>double</type>
+        <type>string</type>
         <brief>
           Albedo Normalization Parameter
         </brief>
+        <default><item>None Specified</item></default>
         <internalDefault>None Specified</internalDefault>
         <description>
           The albedo dependent phase function normalization parameter.
@@ -1923,10 +2013,11 @@
       </parameter>
 
       <parameter name="XB1">
-        <type>double</type>
+        <type>string</type>
         <brief>
           Albedo Normalization Parameter
         </brief>
+        <default><item>None Specified</item></default>
         <internalDefault>None Specified</internalDefault>
         <description>
           The albedo dependent phase function normalization parameter.
@@ -1934,10 +2025,11 @@
       </parameter>
 
       <parameter name="XB2">
-        <type>double</type>
+        <type>string</type>
         <brief>
           Albedo Normalization Parameter
         </brief>
+        <default><item>None Specified</item></default>
         <internalDefault>None Specified</internalDefault>
         <description>
           The albedo dependent phase function normalization parameter.
