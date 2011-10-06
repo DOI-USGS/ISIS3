@@ -85,7 +85,7 @@
           match the reseau.  Similarly, if we extract from a cube a ground
           feature (e.g. crater, fault line, etc) as a pattern, we would like to
           find the same feature in another overlapping cube to define match
-          points.  
+          points.
         </p>
 
         <h3><a name="PluginsAndPvl">Plugins and PVL</a></h3>
@@ -159,7 +159,7 @@
           search chip defines how far the pattern chip is allowed to deviate
           from a desired center search spot.  Consequently, the search chip
           must be larger than the pattern chip in order for the pattern chip to
-          move through the search chip:  
+          move through the search chip:
 
           <pre style="padding-left:4em;">
             Object = AutoRegistration
@@ -226,7 +226,7 @@
           Odyssey Themis IR cameras.  For this objective to be met we will
           utilize applications which allow automatic registration plugins.
           This concept is identical to that of applications which utilize
-          camera and/or map projection plugins such as cam2map, map2map, etc. 
+          camera and/or map projection plugins such as cam2map, map2map, etc.
         </p>
         <p>
           The plugin match algorithm will receive the pattern chip and a
@@ -269,7 +269,7 @@
                 Lines   = 21
               End_Group
 
-              Group = Algorithm 
+              Group = Algorithm
                 Name    = MaximumCorrelation
               End_Group
             End_Object
@@ -309,7 +309,7 @@
                 Lines   = 21
               End_Group
 
-              Group = Algorithm 
+              Group = Algorithm
                 Name    = MinimumDifference
               End_Group
             End_Object
@@ -318,89 +318,156 @@
 
         <h3><a name="Gruen">Gruen</a></h3>
         <p>
-          This algorithm provides adaptive image (chip) registration using an
-          Affine transform to iteratively adjust the search chip at each
-          iteration.  Each iteration solves for new adjustments to the Affine
-          transform until the 6 affine parameters fall below the tolerances as
-          specified in AffineThreshold1 and AffineThreshold2.
+					A modification to the Adaptive Least Squares Correlation algorithm
+					was introduced by A.W. Gruen as a flexible technique for image data
+					matching.  It allows for simultaneous radiometric corrections and local
+					geometrical image shaping in which the system parameters are
+					automatically assessed, corrected, and thus optimized during the least
+					squares iterations.  The tools of least squares estimation are utilized
+					for the assessment of the correlation quality.  The algorithm allows for
+					stabilization and improvement of the correlation procedure through the
+					simultaneous consideration of geometrical constraints.
+
+					Within ISIS, this algorithm provides adaptive image (chip) registration
+					using an Affine transform to iteratively adjust the search chip at each
+					iteration.  Each iteration solves for new adjustments to the Affine
+					transform until the 6 affine parameters fall below the tolerances as
+					specified by the following parameters:
         </p>
         <p>
-          This algorithm minimizes the 6 specifiable Affine transform
-          components of a 3x3 matrix.  The three Affine components for X
-          (sample) and Y (line) are scale, shear, and translation.  Gruen
-          provides control over the maximum values these three components
-          should attain in order for the registration to converge to a
-          successful match.  These limits are specified by
-          <b>AffineScaleTolerance</b>, <b>AffineShearTolerance</b> and
-          <b>AffineTranslationTolerance</b>.  <b>AffineShearTolerance</b> is
-          optional and if not specified, it defaults to the value of
-          <b>AffineScaleTolerance</b>.  These tolerances specify the maximum
-          amount of translation pixels can be shifted between one Gruen
-          iteration and another.  For example:
-
-          <pre style="padding-left:4em;">
-            AffineTranslationTolerance = 0.2
-          </pre>
-
-          ...means that a subsearch chip cannot move in sample or line
-          direction more than 0.2 pixels in order to satisfy convergence.
-          <b>AffineScaleTolerance</b> constrains the sample and line scale
-          elements of the Affine transformation.  And
-          <b>AffineShearTolerance</b> constrains the sample and line shear
-          elements of the Affine transformation.  The scale and shear
-          parameters are scaled by size of the Chip.  The sample scale and
-          shear Affine components maximum limit is computed as:
-
-          <pre style="padding-left:4em;">
-            SampleMaximum = AffineScaleTolerance / ((#Samples - 1) / 2)
-            SampleMaximum = AffineShearTolerance / ((#Samples - 1) / 2)
-          </pre>
-
-          Likewise, the line scale and shear maximums are computed using
-          <b>#Lines</b> in the preceding equation.
-        </p>
-        <p>
-          Example PVL for this algorithm would as follows:
-
-          <pre style="padding-left:4em;">
-            Object = AutoRegistration
-              Group = PatternChip
-                Samples = 5
-                Lines   = 5
-              End_Group
-
-              Group = SearchChip
-                Samples = 21
-                Lines   = 21
-              End_Group
-
-              Group = Algorithm 
-                Name                       = Gruen
-                MaximumIterations          = 30
-                AffineTranslationTolerance = 0.2
-                AffineScaleTolerance       = 0.7
-                AffineShearTolerance       = 0.7
-                AffineTolerance            = 5.0
-                SpiceTolerance             = 7.0
-                RadioShiftTolerance        = 256.0
-                RadioGainMinTolerance      = -0.75
-                RadioGainMaxTolerance      = 3.0
-                FitChipScale               = 0.1
-                DefaultRadioGain           = 0.0
-                DefaultRadioShift          = 0.0
-              End_Group
-            End_Object
-          </pre>
+					 <br><h1 align="center">Gruen AutoReg Parameters</h1></br>
+    		<TABLE BORDER="1">
+          <CAPTION>
+          </CAPTION>
+        <TR>
+          <TH>Parameter</TH>
+          <TH>Description</TH>
+        </TR>
+        <TR>
+            <TD>Name</TD>
+            <TD>
+              Name of the algorithm that the set of parameters description apply
+              to.  This should be <em>AdaptiveGruen</em>.
+            </TD>
+        </TR>
+        <TR>
+            <TD>Tolerance</TD>
+            <TD>
+              This constrains the eigenvalues of the registration result.
+              Registrations with <b>GoodnessOfFit</b> larger than this value are
+              rejected.  It is highly recommended this value be utilized as it
+              will result in better fits.  (Default: Unbounded)
+            </TD>
+        </TR>
+      <TR>
+        <TD>MaximumIterations</TD>
+        <TD>
+          Maximum number of iterations allowed for the registration processing
+          to converge.  (Default: 30)
+        </TD>
+      </TR>
+      <TR>
+        <TD>AffineTolerance</TD>
+        <TD>
+          The amount of offset in pixels an Affine derived points is allowed to
+          deviate from the orginal match point. (Default: Unbounded)
+        </TD>
+      </TR>
+      <TR>
+        <TD>SpiceTolerance</TD>
+        <TD>
+          The amount of offset in pixels a registration is allowed to deviate
+          from a registered point. (Default: Unbounded)
+        </TD>
+      </TR>
+      <TR>
+        <TD>AffineTranslationTolerance</TD>
+        <TD>
+          Specifies the threshold convergence value of the Affine translation
+          shift in line/sample between each Gruen match iteration.  If the
+          amout of this value computed in the Gruen algorithm is less than this
+          value, it is deemed a match point concerning the translation portion
+          of the registered point.  (Default: 0.1)
+        </TD>
+      </TR>
+      <TR>
+        <TD>AffineScaleTolerance</TD>
+        <TD>
+          Specifies the threshold convergence value of the Affine scale in
+          line/sample between each Gruen match iteration.  If the amout of this
+          value computed in the Gruen algorithm is less than this value, it is
+          deemed a match point concerning the scaling portion of the registered
+          point. (Default: 0.3)
+        </TD>
+      </TR>
+      <TR>
+        <TD>AffineShearTolerance</TD>
+        <TD>
+          Specifies the threshold convergence value of the Affine shear in
+          line/sample between each Gruen match iteration.  If the amout of this
+          value computed in the Gruen algorithm is less than this value, it is
+          deemed a match point concerning the shearing portion of the registered
+          point. (Default: AffineScaleTolerance)
+        </TD>
+      </TR>
+      <TR>
+        <TD>RadioShiftTolerance</TD>
+        <TD>
+          Specifies the threshold convergence value for the radiometric shift of
+          the pixel value between each Gruen match iteration.  If the amout of this
+          value computed in the Gruen algorithm is less than this value, it is
+          deemed a match point concerning the radiometric shift portion of the
+          registered point. (Default: Unbounded)
+        </TD>
+      </TR>
+      <TR>
+        <TD>RadioGainMinTolerance</TD>
+        <TD>
+          Specifes the threshold convergence minimum value for the radiometric
+          gain of the pixel value between each Gruen match iteration.  If the amout of this
+          value computed in the Gruen algorithm is greater than this value and
+          less than RadioGainMaxTolerance, it is deemed a match point concerning
+           the radiometric gain portion of the registered point. (Default:
+           Unbounded)
+        </TD>
+      </TR>
+      <TR>
+        <TD>RadioGainMaxTolerance</TD>
+        <TD>
+          Specifes the threshold convergence maximum value for the radiometric
+          gain of the pixel value between each Gruen match iteration.  If the amout of this
+          value computed in the Gruen algorithm is less than this value and
+          greater than RadioGainMinTolerance, it is deemed a match point
+          concerning the radiometric gain portion of the registered point.
+          (Default: Unbounded)
+        </TD>
+      </TR>
+      <TR>
+        <TD>DefaultRadioShift</TD>
+        <TD>
+          Sets the default value for the radiometric shift value used as a
+          starting point in the Gruen algorithm.  (Default: 0)
+        </TD>
+      </TR>
+      <TR>
+        <TD>DefaultRadioGain</TD>
+        <TD>
+          Sets the default value for the radiometric gain value used as a
+          starting point in the Gruen algorithm.  (Default: 0)
+        </TD>
+      </TR>
+    </TABLE>
         </p>
 
         <h3><a name="Tolerance">Tolerance</a></h3>
         <p>
-          In both algorithms we will want to define a tolerance for goodness of
+          In all algorithms we will want to define a tolerance for goodness of
           fit.   The tolerance test must be made by the plugin as the direction
-          of the test is dependent on the algorithm.  In our two examples
-          MinimumDifference would use a test for "less than" Tolerance while the
-          MaximumCorrelation would use "greater than" Tolerance.  This is
-          represented in PVL in the following fashion:
+          of the test is dependent on the algorithm.  In our examples,
+          MinimumDifference would use a test for "less than" Tolerance,
+          MaximumCorrelation would use "greater than" Tolerance, and GruenAdaptive
+					would use "less than" Tolerance.  This is represented in PVL in the
+					following fashion:
 
           <pre style="padding-left:4em;">
             Object = AutoRegistration
@@ -414,11 +481,11 @@
                 Lines   = 21
               End_Group
 
-              Group = Algorithm 
+              Group = Algorithm
                 Name      = MaximumCorrelation
                 Tolerance = 0.7
               End_Group
-            End_Object 
+            End_Object
           </pre>
 
           In fact, the plugin will have significant control such that one, two,
@@ -426,7 +493,7 @@
           match.  For example:
 
           <pre style="padding-left:4em;">
-            Group = Algorithm 
+            Group = Algorithm
               Name      = SuperSpecialRegistration
               Tolerance = 0.7
               ChiSquare = 2.5
@@ -451,7 +518,7 @@
         <img src="assets/exampleWalk.jpg" alt="Example Walk" />
         <p>
           How the pattern chip walks the search chip can vary; currently we
-          define one method: a dense walk. 
+          define one method: a dense walk.
         </p>
 
         <h3><a name="DenseWalk">Dense Walk</a></h3>
@@ -519,7 +586,7 @@
           optional eccentricity and average residual tests.  By default, neither
           test is performed during surface model construction.  However, if the
           SurfaceModel PVL group contains one of both of those keywords, it will
-          enable the respective test(s) with the given tolerance(s).  
+          enable the respective test(s) with the given tolerance(s).
         </p>
 
         <h3><a name="FindingLocalMinMax">Finding a Local Minimum/Maximum</a></h3>
@@ -536,7 +603,7 @@
           keyword. Example:
 
           <pre style="padding-left:4em;">
-            Group = Algorithm 
+            Group = Algorithm
               Name             = MaximumCorrelation
               Tolerance        = 0.7
               SubpixelAccuracy = False
@@ -560,7 +627,7 @@
           of the match.  This tolerance value thus specifies the max number of
           pixels (with sub-pixel granularity) the sub-pixel accuracy
           computation can move the best fit before the registration is rejected
-          entirely.  
+          entirely.
         </p>
         <p>
           For example:
@@ -603,26 +670,21 @@
           ideal result is a circular formation of goodness-of-fit values
           improving towards the center of the surface.  The less circular, or
           more "eccentric", the formation of goodness-of-fit values, the less
-          likely the modelling result is accurate.
+          likely the modelling result is accurate.  The conditions under which
+          a high ratio occurs is when there are primiarily linear features in
+          the search and pattern chips.
         </p>
         <p>
           In an attempt to let the user define what constitutes a tolerable
           amount of eccentricity in their surface models, we introduce the
-          notion of an "Eccentricity Ratio".  The name itself might be a bit
-          misleading, as the value specified is not an actual ratio, nor is it
-          compared directly to the eccentricity of the surface model.  Whereas
-          the 
-          <a href="http://mathworld.wolfram.com/Ellipse.html">
-            mathematical definition of eccentricity
-          </a>
-          is a number between 0 and 1 -- those bounds representing a perfect
-          circle and a parabola, respectively -- here we think of eccentricity
-          itself as a ratio between the semi-major and semi-minor axes of an
-          ellipse.  The value specified by the EccentricityRatio keyword then
-          represents the user's tolerance for this ratio.  In other words, the
-          EccentricityRatio keyword tells us how much bigger than the
-          semi-minor axis the semi-major axis can be before we reject the
-          result.
+          notion of an "Eccentricity Ratio".  Here we think of eccentricity
+          as a ratio between the semi-major and semi-minor axes of an
+          ellipse (we recognize that this does not conform to the usual
+					definition of eccentricity).  The value specified by the
+					EccentricityRatio keyword then represents the user's tolerance for
+					this ratio.  In other words, the EccentricityRatio keyword tells
+					us how much bigger than the semi-minor axis the semi-major axis
+					can be before we reject the result.
         </p>
         <p>
           For example, consider the following PVL:
@@ -632,7 +694,6 @@
               EccentricityRatio = 5.0
             End_Group
           </pre>
-
           In this instance, if the length of the semi-major axis of the
           computed surface model is greater than 5 times the length of the
           semi-minor axis, then the surface model will be thrown out and the
@@ -744,7 +805,7 @@
           </pre>
 
           We only need to specify the percent for the pattern chip as the
-          sub-region chip of the search area will use the same value. 
+          sub-region chip of the search area will use the same value.
         </p>
 
         <h3><a name="ReductionFactor">Reduction Factor</a></h3>
@@ -758,22 +819,23 @@
           If a reduction factor greater than 1 is specified by the user, then
           before attempting to walk the pattern chip through the search chip
           looking for a match, the algorithm will first perform a "reduced
-          match".  In other words, new pattern and search chips will be created
-          with dimensions equal to the original chip dimensions divided by the
-          reduction factor, and a match will be performed on them first to help
-          refine the general match to a smaller search area.  For example, a
-          common reduction factor is 1.5, and can be specified in the
-          definition file as follows:
+          match".  In other words, new pattern and search chips will be
+					derived from the original chips with dimensions equal to the original
+					chip dimensions divided by the ReductionFactor, in a manner similar to
+					the reduce program, and a match will be performed on them first to help
+					refine the general match to a smaller search area.  For example, a
+					common reduction factor is 2, and can be specified in the definition file
+					as follows:
 
           <pre style="padding-left:4em;">
             Object = AutoRegistration
               Group = Algorithm
-                ReductionFactor = 1.5
+                ReductionFactor = 2
               End_Group
 
               Group = PatternChip
-                Samples      = 5
-                Lines        = 5
+                Samples      = 7
+                Lines        = 7
               End_Group
 
               Group = SearchChip
@@ -784,9 +846,9 @@
           </pre>
 
           In the above example, a new pattern chip would be constructed with
-          dimensions of 3 samples by 3 lines (i.e., 5 / 1.5 rounded down).  The
-          new search chip, likewise, would be 14 samples by 14 lines (i.e., 21
-          / 1.5).
+          dimensions of 3 samples by 3 lines (i.e., 7 / 2 rounded down).  The
+          new search chip, likewise, would be 10 samples by 10 lines (i.e., 21
+          / 2).
         </p>
         <p>
           Of course, by reducing the chips we lose an amount of detail directly
@@ -871,7 +933,7 @@
         <p>
           However, when interpolating during the warp process, the user can
           choose, via the definition file, which interpolation algorithm to
-          use.  Available interpolation algorithms include 
+          use.  Available interpolation algorithms include
           <a href="http://en.wikipedia.org/wiki/Nearest-neighbor_interpolation">
             Nearest Neighbor
           </a>,
@@ -892,7 +954,7 @@
 
           The above example would warp the geometry of the pattern cube using
           the Nearest Neighbor algorithm.  For a complete list of all
-          possible values for this keyword, see the 
+          possible values for this keyword, see the
           <a href="#DeffileKeywords">Definition File Keywords</a>
           appendix below.
         </p>
@@ -908,7 +970,7 @@
           chip. For example:
 
           <pre style="padding-left:4em;">
-            Group = PatternChip 
+            Group = PatternChip
               MinimumZScore = 1.5
             End_Group
           </pre>
@@ -922,12 +984,12 @@
         <p>
           To increase the chances of successful registration, a gradient filter
           can be applied to both the search and pattern chips before attempting
-          to perform a match. A gradient filter basically calculates the
-          magnitude and direction of the largest possible increase from light to
-          dark. In simple terms, a gradient filter highlights the edges in an
-          image. Thus, the use of a gradient filter on the search and pattern
-          chips may increase the chances of finding a match when the pattern
+          to perform a match.  In simple terms, a gradient filter highlights the
+          edges in an image. Thus, the use of a gradient filter on the search and
+          pattern chips may increase the chances of finding a match when the pattern
           chip contains distinctive features whose edges need to be emphasized.
+          This is especially the case for search and pattern chips where the images
+          have differing illumination conditions.
         </p>
         <p>
           Currently,
@@ -937,7 +999,7 @@
           and
           <a href="http://en.wikipedia.org/wiki/Roberts_Cross">
             Roberts
-          </a> 
+          </a>
           gradient filters are supported. The Sobel gradient filter looks at
           the eight surrounding pixels for a given point, while the Roberts
           gradient filter computes the sum of the squares of the differences
@@ -949,6 +1011,12 @@
               Gradient = Sobel
             End_Group
           </pre>
+
+          <span style="color:red;">
+           Note:  Don't use the Roberts filter.  We will be removing this option
+        from the pattern matching code in a future release.  Use of the Roberts
+        filter can cause errors in pattern matching in excess of one pixel.
+          </span>
         </p>
 
         <!-- Appendices -->
@@ -1270,11 +1338,15 @@
   </bibliography>
 
   <history>
-    <change name="Travis Addair" date="2011-02-23">
+    <change name="Jeff Anderson and Travis Addair" date="2011-02-23">
       Original version
     </change>
     <change name="Jai Rideout" date="2011-03-10">
       Added gradient filter section
+    </change>
+    <change name="Moses Millazo and Jeff Anderson" date="2011-10-05">
+      Updates to Gruen documentation, the eccentricity ratio, and the gradient 
+      filters.
     </change>
   </history>
 </documentation>
