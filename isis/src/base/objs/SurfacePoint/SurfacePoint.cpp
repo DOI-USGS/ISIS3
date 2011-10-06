@@ -918,18 +918,21 @@ namespace Isis {
    *  
    */
     Distance SurfacePoint::GetLatSigmaDistance() const {
-      if (!p_majorAxis || !p_majorAxis->Valid()) {
-        iString msg = "In order to calculate sigmas in meter units, the "
-          "equitorial radius must be set with a call to SetRadii.";
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
-      }
-
       Distance latSigmaDistance;
 
       if(Valid()) {
         Angle latSigma = GetLatSigma();
-        // Convert from radians to meters
-        latSigmaDistance = latSigma.GetRadians() * *p_majorAxis;
+
+        if (latSigma.Valid()) {
+          if (!p_majorAxis || !p_majorAxis->Valid()) {
+            iString msg = "In order to calculate sigmas in meter units, the "
+              "equitorial radius must be set with a call to SetRadii.";
+            throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+          }
+
+          // Convert from radians to meters
+          latSigmaDistance = latSigma.GetRadians() * *p_majorAxis;
+        }
       }
 
       return latSigmaDistance;
@@ -941,24 +944,25 @@ namespace Isis {
    *  
    */
   Distance SurfacePoint::GetLonSigmaDistance() const {
-      if (!p_majorAxis || !p_minorAxis || !p_polarAxis ||
-          !p_majorAxis->Valid() || !p_minorAxis->Valid() ||
-          !p_polarAxis->Valid()) {
-      iString msg = "In order to calculate sigmas in meter units, the "
-          "equitorial radius must be set with a call to SetRadii.";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
-    }
-
     Distance lonSigmaDistance;
 
     if(Valid()) {
       Angle lonSigma = GetLonSigma();
-      Latitude lat = GetLatitude();
-      double scaler = cos(lat.GetRadians());
 
-      // Convert from radians to meters and return
-      if (scaler != 0.)  
-        lonSigmaDistance = lonSigma.GetRadians() * *p_majorAxis / scaler;
+      if (lonSigma.Valid()) {
+        if (!p_majorAxis || !p_majorAxis->Valid()) {
+          iString msg = "In order to calculate sigmas in meter units, the "
+            "equitorial radius must be set with a call to SetRadii.";
+          throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+        }
+
+        Latitude lat = GetLatitude();
+        double scaler = cos(lat.GetRadians());
+
+        // Convert from radians to meters and return
+        if (scaler != 0.)
+          lonSigmaDistance = lonSigma.GetRadians() * *p_majorAxis / scaler;
+      }
     }
 
     return lonSigmaDistance;

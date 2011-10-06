@@ -62,94 +62,104 @@ namespace Isis {
    *   @history 2005-07-29 Jeff Anderson Original version
    *   @history 2006-01-11 Jacob Danton Updated unitTest
    *   @history 2006-06-22 Brendan George Updated to conform to changes in
-   *                SerialNumberList class
+   *                           SerialNumberList class
    *   @history 2008-04-04 Christopher Austin Added Exists function
    *   @history 2008-04-18 Debbie A. Cook Added Progress reports to loading and
-   *                SetImages and calculates the total number of measurements in
-   *                the control net
+   *                           SetImages and calculates the total number of
+   *                           measurements in the control net
    *   @history 2008-06-18 Christopher Austin Fixed documentation errors
    *   @history 2009-01-06 Jeannie Walldren Fixed typo in SetImages() exception
-   *                output. Added documentation.
+   *                           output. Added documentation.
    *   @history 2009-02-05 Christopher Austin when the created date or the
-   *                modified date are not set, they default to the time in which
-   *                Write() is called.
+   *                           modified date are not set, they default to the
+   *                           time in which Write() is called.
    *   @history 2009-04-07 Tracie Sucharski Added NumValidMeasures and
-   *                NumIgnoredMeasures methods.
+   *                           NumIgnoredMeasures methods.
    *   @history 2009-06-03 Christopher Austin Added p_invalid functionality
-   *                along with forceBuild, as well as other small fixes
-   *                including documentation.
+   *                           along with forceBuild, as well as other small
+   *                           fixes including documentation.
    *   @history 2009-07-13 Stacy Alley The std::vector of ControlPoints called
-   *                'p_points' was replaced with a QVector of QString
-   *                'p_pointIds' in conjunction with a QHash of
-   *                <QString, ControlPoint> called 'p_pointsHash'. This was
-   *                done to speed up the Add method which was essentially
-   *                slowing down the reading or creation of Control Networks.
+   *                           'p_points' was replaced with a QVector of QString
+   *                           'p_pointIds' in conjunction with a QHash of
+   *                           <QString, ControlPoint> called 'p_pointsHash'.
+   *                           This was done to speed up the Add method which
+   *                           was essentially slowing down the reading or
+   *                           creation of Control Networks.
    *   @history 2010-05-06 Tracie Sucharski Use defaults of 0. instead of
-   *                Isis::Null, because 0. is the default in the protocol
-   *                buffers.
+   *                           Isis::Null, because 0. is the default in the
+   *                           protocol buffers.
    *   @history 2010-08-06 Tracie Sucharski Updated for changes made after
-   *                additional working sessions for Control network design.
+   *                           additional working sessions for Control network
+   *                           design.
    *   @history 2009-09-01 Eric Hyer Added two includes: QVector and QString
    *   @history 2010-09-09 Sharmila Prasad Added API to sort Control Net by
-   *                Point ID Changed PointID's vector to StringList
+   *                           Point ID Changed PointID's vector to StringList
    *   @history 2009-09-25 Travis Addair Changed methods which return the number
-   *                of control measures in the network to compute those values
-   *                at the time the method is called, not when the control
-   *                network is first initialized.
+   *                           of control measures in the network to compute
+   *                           those values at the time the method is called,
+   *                           not when the control network is first
+   *                           initialized.
    *   @history 2010-10-05 Tracie Sucharski Renamed the Write method to
-   *                WritePvl.  Create new method, Write which takes another
-   *                parameter indicating whether to write pvl format or binary
-   *                format, The default will write binary.
+   *                           WritePvl.  Create new method, Write which takes
+   *                           another parameter indicating whether to write pvl
+   *                           format or binary format, The default will write
+   *                           binary.
    *   @history 2010-10-05 Eric Hyer ControlMeasure and ControlPoint now
-   *                return QStrings for some methods.  Fixed breakages caused by
-   *                this.
+   *                           return QStrings for some methods.  Fixed
+   *                           breakages caused by this.
    *   @history 2010-10-06 Sharmila Prasad Added method to get CreatedDate
    *   @history 2010-11-21 Tracie Sucharski - Added new keyword, jigsawRejected
-   *                to the read and write methods.
+   *                           to the read and write methods.
    *   @history 2011-01-13 Mackenzie Boyd Added copy constructor and assignment
-   *                operator.
+   *                           operator.
    *   @history 2011-01-17 Eric Hyer - Points are now owned and deleted by the
-   *                network.  Network now stored in such a way that access to
-   *                all points in a cube is just as cheap as accessing measures
-   *                in a point.  Removed redundant methods and made other api
-   *                changes.
+   *                           network.  Network now stored in such a way that
+   *                           access to all points in a cube is just as cheap
+   *                           as accessing measures in a point.  Removed
+   *                           redundant methods and made other api changes.
    *   @history 2011-02-18 Eric Hyer - Made improvements and bug fixes related
-   *                to interaction to other control network classes including
-   *                ControlPoint and ControlMesure, but most significantly to
-   *                ControlCubeGraphNode.  Most important fix was network
-   *                notification of measures added to or removed from points
-   *                after the point is added to the network.
+   *                           to interaction to other control network classes
+   *                           including ControlPoint and ControlMesure, but
+   *                           most significantly to ControlCubeGraphNode.  Most
+   *                           important fix was network notification of
+   *                           measures added to or removed from points after
+   *                           the point is added to the network.
    *   @history 2011-02-23 Eric Hyer - Added some methods to support graphing
-   *                calculations (RandomBFS, Shuffle, CalcBWAndCE, and
-   *                GetNodeConnections).
-   *   @history 2011-03-08 Ken Edmundson - Added methods GetNumberOfMeasuresInImage,
-   *                GetNumberOfJigsawRejectedMeasuresInImage,
-   *                IncrementNumberOfRejectedMeasuresInImage,
-   *                DecrementNumberOfRejectedMeasuresInImage, and members
-   *                p_cameraMeasuresMap and p_cameraRejectedMeasuresMap.
+   *                           calculations (RandomBFS, Shuffle, CalcBWAndCE,
+   *                           and GetNodeConnections).
+   *   @history 2011-03-08 Ken Edmundson - Added methods
+   *                           GetNumberOfMeasuresInImage,
+   *                           GetNumberOfJigsawRejectedMeasuresInImage,
+   *                           IncrementNumberOfRejectedMeasuresInImage,
+   *                           DecrementNumberOfRejectedMeasuresInImage, and
+   *                           members p_cameraMeasuresMap and
+   *                           p_cameraRejectedMeasuresMap.
    *   @history 2011-03-12 Debbie A. Cook - Added member p_targetRadii and
-   *                method GetTargetRadii to support SurfacePoint sigma
-   *                conversions in ControlPoint.
+   *                           method GetTargetRadii to support SurfacePoint
+   *                           sigma conversions in ControlPoint.
    *   @history 2011-03-14 Eric Hyer - Cube connection graph now updated when
-   *                points or measures are ignored.
+   *                           points or measures are ignored.
    *   @history 2011-03-15 Eric Hyer - Some cube graph bugs were fixed.
    *   @history 2011-03-25 Christopher Austin - Added UpdatePointReference() to
-   *                work with ControlPoint's SetId()
+   *                           work with ControlPoint's SetId()
    *   @history 2011-03-29 Steven Lambright - Made versioning viable for first
-   *                release.
+   *                           release.
    *   @history 2011-04-27 Steven Lambright - UpdatePointReference had a bug
-   *                where the pointIds list was not being correctly updated.
+   *                           where the pointIds list was not being correctly
+   *                           updated.
    *   @history 2011-05-04 Eric Hyer - References in graph data structure now
-   *                kept for ignored points and measures
+   *                           kept for ignored points and measures
    *   @history 2011-05-25 Eric Hyer - Added getPoints method
    *   @history 2011-06-22 James Alexander Crough and Eric Hyer - Added
-   *                getGraphNode method.
+   *                           getGraphNode method.
    *   @history 2011-06-28 Eric Hyer - Added getEdgeCount() method
    *   @history 2011-07-08 Travis Addair - Locked points can no longer be
-   *                deleted
+   *                           deleted
    *   @history 2011-07-27 Sharmila Prasad - Fixed bug in GetNumEditLockMeasures()
    *   @history 2011-08-01 Eric Hyer - Addressed some graphing issues
    *   @history 2011-08-24 Steven Lambright - Fixed bug in graph code
+   *   @history 2011-10-06 Steven Lambright - Having a target is no longer
+   *                           required.
    */
   class ControlNet : public QObject {
       Q_OBJECT

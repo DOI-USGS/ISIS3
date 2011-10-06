@@ -289,8 +289,10 @@ namespace Isis {
       adjustedSurfacePoint = adjusted;
     }
 
-    aprioriSurfacePoint.SetRadii(majorRad, minorRad, polarRad);
-    adjustedSurfacePoint.SetRadii(majorRad, minorRad, polarRad);
+    if (majorRad.Valid() && minorRad.Valid() && polarRad.Valid()) {
+      aprioriSurfacePoint.SetRadii(majorRad, minorRad, polarRad);
+      adjustedSurfacePoint.SetRadii(majorRad, minorRad, polarRad);
+    }
 
     for (int m = 0 ; m < fileEntry.measures_size() ; m++) {
       ControlMeasure *measure = new ControlMeasure(fileEntry.measures(m));

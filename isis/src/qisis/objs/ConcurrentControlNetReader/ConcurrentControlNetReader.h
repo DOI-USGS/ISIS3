@@ -53,6 +53,7 @@ namespace Isis {
    *                           restored after reading has finished.
    *   @history 2011-08-01 Steven Lambright - Fixed signals/slots not being
    *                           in correct thread.
+   *   @history 2011-10-06 Steven Lambright - Target name is now optional
    *     
    */
   class ConcurrentControlNetReader : public QObject {

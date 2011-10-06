@@ -127,8 +127,11 @@ namespace Isis {
    */
   void ConcurrentControlNetReader::startBuildingNetwork() {
     m_versionerFile = m_readWatcher->result();
-    QString targetName = QString::fromStdString(
-        m_versionerFile->GetNetworkHeader().targetname());
+    QString targetName;
+   
+    if (m_versionerFile->GetNetworkHeader().has_targetname())
+      targetName = QString::fromStdString(
+          m_versionerFile->GetNetworkHeader().targetname());
 
     QFuture< QAtomicPointer< ControlNet > > result;
 
@@ -136,8 +139,7 @@ namespace Isis {
         NetworkBuilder(targetName, QThread::currentThread()),
         &NetworkBuilder::addToNetwork,
         QtConcurrent::SequentialReduce |
-        QtConcurrent::OrderedReduce
-                                        );
+        QtConcurrent::OrderedReduce);
 
     m_builderWatcher->setFuture(result);
   }
@@ -154,7 +156,11 @@ namespace Isis {
 
     ControlNetFileHeaderV0002 &header = m_versionerFile->GetNetworkHeader();
 
-    net->SetTarget(header.targetname());
+    if (header.has_targetname())
+      net->SetTarget(header.targetname());
+    else
+      net->SetTarget("");
+
     net->SetDescription(header.description());
     net->SetUserName(header.username());
     net->SetCreatedDate(header.created());
@@ -196,10 +202,17 @@ namespace Isis {
 
     m_targetThread = targetThread;
 
-    PvlGroup pvlRadii = Projection::TargetRadii(target.toStdString());
-    m_majorRad = new Distance(pvlRadii["EquatorialRadius"], Distance::Meters);
-    m_minorRad = new Distance(pvlRadii["EquatorialRadius"], Distance::Meters);
-    m_polarRad = new Distance(pvlRadii["PolarRadius"], Distance::Meters);
+    if (!target.isEmpty()) {
+      PvlGroup pvlRadii = Projection::TargetRadii(target.toStdString());
+      m_majorRad = new Distance(pvlRadii["EquatorialRadius"], Distance::Meters);
+      m_minorRad = new Distance(pvlRadii["EquatorialRadius"], Distance::Meters);
+      m_polarRad = new Distance(pvlRadii["PolarRadius"], Distance::Meters);
+    }
+    else {
+      m_majorRad = new Distance();
+      m_minorRad = new Distance();
+      m_polarRad = new Distance();
+    }
   }
 
 

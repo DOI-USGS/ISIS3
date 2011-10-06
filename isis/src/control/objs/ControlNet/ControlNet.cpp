@@ -183,7 +183,13 @@ namespace Isis {
 
     ControlNetFileHeaderV0002 &header = fileData->GetNetworkHeader();
     p_networkId     = header.networkid();
-    SetTarget(header.targetname());
+    if (header.has_targetname()) {
+      SetTarget(header.targetname());
+    }
+    else {
+      SetTarget("");
+    }
+
     p_userName      = header.username();
     p_created       = header.created();
     p_modified      = header.lastmodified();
@@ -1340,13 +1346,23 @@ namespace Isis {
    */
   void ControlNet::SetTarget(const iString &target) {
     p_targetName = target;
-    PvlGroup pvlRadii = Projection::TargetRadii(target);
-    p_targetRadii.push_back(Distance(pvlRadii["EquatorialRadius"],
-        Distance::Meters));
-    // The method Projection::Radii does not provide the B radius
-    p_targetRadii.push_back(Distance(pvlRadii["EquatorialRadius"],
-        Distance::Meters));
-    p_targetRadii.push_back(Distance(pvlRadii["PolarRadius"], Distance::Meters));
+
+    p_targetRadii.clear();
+    if (p_targetName != "") {
+      PvlGroup pvlRadii = Projection::TargetRadii(target);
+      p_targetRadii.push_back(Distance(pvlRadii["EquatorialRadius"],
+                                       Distance::Meters));
+      // The method Projection::Radii does not provide the B radius
+      p_targetRadii.push_back(Distance(pvlRadii["EquatorialRadius"],
+                                       Distance::Meters));
+      p_targetRadii.push_back(Distance(pvlRadii["PolarRadius"],
+                                       Distance::Meters));
+    }
+    else {
+      p_targetRadii.push_back(Distance());
+      p_targetRadii.push_back(Distance());
+      p_targetRadii.push_back(Distance());
+    }
   }
 
 
