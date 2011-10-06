@@ -158,6 +158,10 @@ namespace Isis
 
     newSelectorButton = new QPushButton;
     newSelectorButton->setIcon(QIcon(":add"));
+    QString newSelectorTooltip = "Add new filter";
+    newSelectorButton->setToolTip(newSelectorTooltip);
+    newSelectorButton->setStatusTip(newSelectorTooltip);
+
     connect(newSelectorButton, SIGNAL(clicked()), this, SLOT(addSelector()));
     QHBoxLayout * newSelectorLayout = new QHBoxLayout;
     newSelectorLayout->addWidget(newSelectorButton);

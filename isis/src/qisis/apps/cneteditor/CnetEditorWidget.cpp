@@ -287,12 +287,11 @@ namespace Isis
     freezeTablesAct->setCheckable(true);
     freezeTablesAct->setToolTip(tr("Freeze tables (filters will not take "
                                    "effect until unfrozen)"));
-    freezeTablesAct->setWhatsThis(tr("<html>When editing cells in the tables, it "
-        "is often desirable to not have your currently defined filters applied "
-        "immediately when you make a change.<br/><br/>"
-        "When frozen, the contents of the tables will be locked.  Current "
-        "filters will not be applied to the tables until they are unfrozen."
-        "</html>"));
+    freezeTablesAct->setStatusTip(tr("Freeze tables (filters will not take "
+                                   "effect until unfrozen)"));
+    freezeTablesAct->setWhatsThis(tr("<html>When frozen, the contents of the "
+        "tables will be locked.  Current filters will not be applied to the "
+        "tables until they are unfrozen.</html>"));
     connect(freezeTablesAct, SIGNAL(toggled(bool)),
             this, SLOT(setTablesFrozen(bool)));
     QList< QString > freezeTablesLocation;
@@ -302,6 +301,7 @@ namespace Isis
     QAction * enableSortAct = new QAction(QIcon(":sort"),
                                           tr("&Enable Sorting"), this);
     enableSortAct->setCheckable(true);
+    enableSortAct->setToolTip(tr("Enable Sorting on Table Columns"));
     enableSortAct->setStatusTip(tr("Enable Sorting on Table Columns"));
     enableSortAct->setWhatsThis(tr("<html>When sorting is enabled, the data "
         "in the tables can be sorted by clicking on column headings.  Sorting "
@@ -411,6 +411,9 @@ namespace Isis
     pointTableModel = new CnetPointTableModel(pointModel);
     pointTableView = new CnetTableView(pointTableModel, *settingsPath,
         "pointTableView");
+    pointTableView->setWhatsThis("<html>Each row in the table is a control "
+        "point.  Each column in the table is an attribute of a control "
+        "point.<br/><br/>Cells that are gray are not editable.</html>");
     connect(pointTableView, SIGNAL(modelDataChanged()),
             this, SIGNAL(cnetModified()));
     
@@ -441,6 +444,10 @@ namespace Isis
     measureTableModel = new CnetMeasureTableModel(pointModel);
     measureTableView = new CnetTableView(measureTableModel, *settingsPath,
         "measureTableView");
+    measureTableView->setWhatsThis("<html>Each row in the table is a control "
+        "measure.  Each column in the table is an attribute of a control "
+        "measure.<br/><br/>Rows with bold text are reference measures.  "
+        "Cells that are gray are not editable.</html>");
     ASSERT(pointTableView);
     connect(pointTableView,
             SIGNAL(tableSelectionChanged(QList< AbstractTreeItem * >)),

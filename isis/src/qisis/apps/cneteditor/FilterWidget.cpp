@@ -177,13 +177,16 @@ namespace Isis
   {
     filterGroups = new QList< FilterGroup * >;
 
-    QString whatsThis = "Filters are organized into groups.  Filters within a "
-        "group will be combined using either AND or OR logic.  Furthermore, "
-        "multiple groups are supported, and the logic used to combine the "
-        "various groups is also configurable.  To illustrate what this allows "
-        "consider an example.  Let A, B, and C be (filters).  By creating two "
+    QString whatsThis = "<html>Filters are organized into groups (bounded by a box)."
+        "  Filters within a group will be combined using either AND or OR "
+        "logic.  Furthermore, multiple groups are supported, and the logic "
+        "used to combine the various groups is also configurable.<br/><br/>"
+        "For example, let A, B, and C be filters.  By creating two "
         "groups, one with A and B and the other with C, it is possible to "
-        "build the expression \"(A and B) or C\".";
+        "build the expression \"(A and B) or C\".<br/><br/>"
+        "Each group has a green plus (+) button, which adds a new filter to "
+        "the group.  There is also a green plus (+) button outside any group "
+        "for adding a new group.</html>";
 
     ASSERT(filterType);
 
@@ -225,7 +228,9 @@ namespace Isis
 
     addGroupButton = new QPushButton;
     addGroupButton->setIcon(QIcon(":add"));
-    addGroupButton->setToolTip("Add Filter Group");
+    QString addGroupTooltip = "Add new filter group";
+    addGroupButton->setToolTip(addGroupTooltip);
+    addGroupButton->setStatusTip(addGroupTooltip);
     addGroupButton->setWhatsThis(whatsThis);
     connect(addGroupButton, SIGNAL(clicked()), this, SLOT(addGroup()));
     QHBoxLayout * addGroupLayout = new QHBoxLayout;
