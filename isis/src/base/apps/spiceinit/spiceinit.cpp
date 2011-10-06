@@ -518,7 +518,7 @@ void RequestSpice(Cube *icube, Pvl &labels, iString missionName) {
       continue;
     }
 
-    for (int valueIndex = 0; valueIndex < curKeyword.Size(); valueIndex ++) {
+    /*for (int valueIndex = 0; valueIndex < curKeyword.Size(); valueIndex ++) {
       iString value = curKeyword[valueIndex];
       if (value == "Table" || value == "Null")
         continue;
@@ -532,7 +532,7 @@ void RequestSpice(Cube *icube, Pvl &labels, iString missionName) {
           "Please update your spice kernels";
         throw iException::Message(iException::Spice, msg, _FILEINFO_);
       }
-    }
+    }*/
   }
 
   Application::Log(logGrp);
