@@ -16,6 +16,9 @@
   <layout class="QGridLayout" name="gridLayout_6">
    <item row="0" column="0" rowspan="2">
     <widget class="QGroupBox" name="pointSourceGroupBox">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
      <property name="title">
       <string>Set Apriori Point (lat,lon,radius)</string>
      </property>
@@ -32,6 +35,13 @@
       <item row="0" column="0">
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
+         <widget class="QRadioButton" name="userEnteredRadioButton">
+          <property name="text">
+           <string>User Entered</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QRadioButton" name="referenceMeasureRadioButton">
           <property name="text">
            <string>Reference Measure</string>
@@ -45,13 +55,6 @@
          <widget class="QRadioButton" name="averageMeasuresRadioButton">
           <property name="text">
            <string>Average Measures</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QRadioButton" name="userEnteredRadioButton">
-          <property name="text">
-           <string>User Entered</string>
           </property>
          </widget>
         </item>
@@ -476,6 +479,54 @@
     <hint type="destinationlabel">
      <x>206</x>
      <y>343</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pointSourceGroupBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>averageMeasuresRadioButton</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>159</x>
+     <y>64</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>159</x>
+     <y>73</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pointSourceGroupBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>referenceMeasureRadioButton</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>159</x>
+     <y>64</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>159</x>
+     <y>49</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pointSourceGroupBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>userEnteredRadioButton</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>159</x>
+     <y>64</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>159</x>
+     <y>97</y>
     </hint>
    </hints>
   </connection>

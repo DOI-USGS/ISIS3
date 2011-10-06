@@ -32,6 +32,15 @@ QnetSetAprioriDialog::QnetSetAprioriDialog(QWidget *parent) : QDialog(parent) {
 
 
 
+/**
+ * Set control points in the dialog
+ * 
+ * @param selectedPoints QList<QListWidgetItem *> ControlPoints listed 
+ *  
+ * @internal 
+ * @history 2011-10-03 Tracie Sucharski - Do not enable user Entered Button, 
+ *                        this will only be enabled if the group box is enabled. 
+ */
 void QnetSetAprioriDialog::setPoints(QList<QListWidgetItem *> selectedPoints) {
 
   editLockPointsListBox->clear();
@@ -39,7 +48,6 @@ void QnetSetAprioriDialog::setPoints(QList<QListWidgetItem *> selectedPoints) {
 
   p_points = selectedPoints;
   if (p_points.size() == 1) {
-    userEnteredRadioButton->setEnabled(true);
     fillLineEdits();
   }
   else {
@@ -183,6 +191,8 @@ void QnetSetAprioriDialog::setApriori() {
   for (int i = 0; i < p_points.size(); i++) {
     QString id = p_points.at(i)->text();
     ControlPoint *pt = g_controlNetwork->GetPoint(id);
+    if (pt->IsEditLocked()) continue;
+
     if (!pt->HasAprioriCoordinates()) {
       QString msg = "Point [" + id + "] does not have an Apriori coordinate.  "
         "Make sure to save the ground source measurement then the Point before "
@@ -190,7 +200,6 @@ void QnetSetAprioriDialog::setApriori() {
       QMessageBox::warning((QWidget *)parent(), "Warning", msg);
       continue;
     }
-    if (pt->IsEditLocked()) continue;
 
     if (pointSourceGroupBox->isChecked()) {
       if (referenceMeasureRadioButton->isChecked()) {

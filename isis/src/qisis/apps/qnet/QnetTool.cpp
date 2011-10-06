@@ -176,9 +176,22 @@ namespace Isis {
             p_pointEditor, SLOT(colorizeSaveButton()));
         
     QPushButton * addMeasure = new QPushButton("Add Measure(s) to Point");
+    addMeasure->setToolTip("Add a new measure to the edit control point.");
+    addMeasure->setWhatsThis("This allows a new control measure to be added "
+                         "to the currently edited control point.  A selection "
+                         "box with all cubes from the input list will be "
+                         "displayed with those that intersect with the "
+                         "control point highlighted.");
     connect(addMeasure, SIGNAL(clicked()), this, SLOT(addMeasure()));
 
     p_savePoint = new QPushButton ("Save Point");
+    p_savePoint->setToolTip("Save the edit control point to the control "
+                            "network.");
+    p_savePoint->setWhatsThis("Save the edit control point to the control "
+                    "network which is loaded into memory in its entirety. "
+                    "When a control point is selected for editing, "
+                    "a copy of the point is made so that the original control "
+                    "point remains in the network.");
     p_saveDefaultPalette = p_savePoint->palette();
     connect (p_savePoint,SIGNAL(clicked()),this,SLOT(savePoint()));
 
@@ -189,9 +202,29 @@ namespace Isis {
     
     p_templateFilenameLabel = new QLabel("Template File: " +
         QString::fromStdString(p_pointEditor->templateFilename()));
+    p_templateFilenameLabel->setToolTip("Sub-pixel registration template File.");
+//  QString patternMatchDoc =
+//          Filename("$ISISROOT/doc/documents/PatternMatch/PatternMatch.html").fileName();
+//    p_templateFilenameLabel->setOpenExternalLinks(true);
+    p_templateFilenameLabel->setWhatsThis("Filename of the sub-pixel "
+                  "registration template.  Refer to $ISISROOT/doc/documents/"
+                  "PatternMatch/PatternMatch.html for a description of the "
+                  "contents of this file.");
     
     p_groundFilenameLabel = new QLabel("Ground Source File: ");
+    p_groundFilenameLabel->setToolTip("Cube used to create ground control "
+                               "points, either Fixed or Constrained.");
+    p_groundFilenameLabel->setWhatsThis("This cube is used to create ground "
+                             "control points, Fixed or Constrained.  This may "
+                             "be a Dem, a shaded relief version of a Dem, "
+                             "a projected basemap or an unprojected cube with "
+                             "corrected camera pointing.  This will be used "
+                             "to set the apriori latitude, longitude.");
     p_radiusFilenameLabel = new QLabel("Radius Source File: ");
+    p_radiusFilenameLabel->setToolTip("Dem used to set the radius of ground "
+                             "control points, Fixed or Constrained.  This must "
+                             "be a Dem and is strictly used to set the apriori "
+                             "radius for ground control points.");
 
     QVBoxLayout * centralLayout = new QVBoxLayout;
     
@@ -207,7 +240,11 @@ namespace Isis {
 
     QScrollArea *scrollArea = new QScrollArea();
     scrollArea->setWidget(centralWidget);
+    scrollArea->setWidgetResizable(true);
+    centralWidget->adjustSize();
     p_qnetTool->setCentralWidget(scrollArea);
+//    p_qnetTool->setCentralWidget(centralWidget);
+
     
     connect(this, SIGNAL(editPointChanged(QString)),
             this, SLOT(paintAllViewports(QString)));
@@ -316,6 +353,9 @@ namespace Isis {
   
     p_leftCombo = new QComboBox;
     p_leftCombo->view()->installEventFilter(this);
+    p_leftCombo->setToolTip("Choose left control measure");
+    p_leftCombo->setWhatsThis("Choose left control measure identified by "
+                              "cube filename.");
     connect(p_leftCombo, SIGNAL(activated(int)),
             this, SLOT(selectLeftMeasure(int)));
     p_lockLeftMeasure = new QCheckBox("Edit Lock Measure");
@@ -329,10 +369,30 @@ namespace Isis {
     p_leftReference = new QLabel();
     p_leftMeasureType = new QLabel();
     p_leftSampError = new QLabel();
+    p_leftSampError->setToolTip("<strong>Jigsaw</strong> sample residual.");
+    p_leftSampError->setWhatsThis("This is the sample residual for the left "
+                          "measure calculated by the application, "
+                          "<strong>jigsaw</strong>.");
     p_leftLineError = new QLabel();
+    p_leftLineError->setToolTip("<strong>Jigsaw</strong> line residual.");
+    p_leftLineError->setWhatsThis("This is the line residual for the left "
+                          "measure calculated by the application, "
+                          "<strong>jigsaw</strong>.");
     p_leftSampShift = new QLabel();
+    p_leftSampShift->setToolTip("Sample shift between apriori and current");
+    p_leftSampShift->setWhatsThis("The shift between the apriori sample and "
+                           "the current sample.  The apriori sample is set "
+                           "when creating a new measure.");
     p_leftLineShift = new QLabel();
+    p_leftLineShift->setToolTip("Line shift between apriori and current");
+    p_leftLineShift->setWhatsThis("The shift between the apriori line and "
+                           "the current line.  The apriori line is set "
+                           "when creating a new measure.");
     p_leftGoodness = new QLabel();
+    p_leftGoodness->setToolTip("Goodness of Fit result from sub-pixel "
+                               "registration.");
+    p_leftGoodness->setWhatsThis("Resulting Goodness of Fit from sub-pixel "
+                                 "registration.");
     QVBoxLayout * leftLayout = new QVBoxLayout;
     leftLayout->addWidget(p_leftCombo);
     leftLayout->addWidget(p_lockLeftMeasure);
@@ -358,6 +418,9 @@ namespace Isis {
     // create widgets for the right groupbox
     p_rightCombo = new QComboBox;
     p_rightCombo->view()->installEventFilter(this);
+    p_rightCombo->setToolTip("Choose right control measure");
+    p_rightCombo->setWhatsThis("Choose right control measure identified by "
+                               "cube filename.");
     connect(p_rightCombo, SIGNAL(activated(int)),
             this, SLOT(selectRightMeasure(int)));
     p_lockRightMeasure = new QCheckBox("Edit Lock Measure");
@@ -371,10 +434,24 @@ namespace Isis {
     p_rightReference = new QLabel();
     p_rightMeasureType = new QLabel();
     p_rightSampError = new QLabel();
+    p_rightSampError->setToolTip("<strong>Jigsaw</strong> sample residual.");
+    p_rightSampError->setWhatsThis("This is the sample residual for the right "
+                          "measure which was calculated by the application, "
+                          "<strong>jigsaw</strong>.");
     p_rightLineError = new QLabel();
+    p_rightLineError->setToolTip("<strong>Jigsaw</strong> line residual.");
+    p_rightLineError->setWhatsThis("This is the line residual for the right "
+                          "measure which was calculated by the application, "
+                          "<strong>jigsaw</strong>.");
     p_rightSampShift = new QLabel();
+    p_rightSampShift->setToolTip(p_leftSampShift->toolTip());
+    p_rightSampShift->setWhatsThis(p_leftSampShift->whatsThis());
     p_rightLineShift = new QLabel();
+    p_rightLineShift->setToolTip(p_leftLineShift->toolTip());
+    p_rightLineShift->setWhatsThis(p_leftLineShift->whatsThis());
     p_rightGoodness = new QLabel();
+    p_rightGoodness->setToolTip(p_leftGoodness->toolTip());
+    p_rightGoodness->setWhatsThis(p_leftGoodness->whatsThis());
     
     // create right groupbox
     QVBoxLayout * rightLayout = new QVBoxLayout;
@@ -422,25 +499,32 @@ namespace Isis {
   void QnetTool::createActions() {
     p_openGround = new QAction(p_qnetTool);
     p_openGround->setText("Open &Ground Source");
-    p_openGround->setStatusTip("Open a ground source for choosing fixed points");
+    p_openGround->setToolTip("Open a ground source for choosing ground control "
+                             "points");
+    p_openGround->setStatusTip("Open a ground source for choosing ground "
+                               "control points");
     QString whatsThis =
-      "<b>Function:</b> Open and display a ground source for choosing fixed points."
-      "This can be level1, level2 or dem cube.";
+      "<b>Function:</b> Open and display a ground source for choosing "
+      "ground control points, both Fixed and Constrained."
+      "This cube can be a level1, level2 or dem cube.";
     p_openGround->setWhatsThis(whatsThis);
     connect (p_openGround,SIGNAL(activated()),this,SLOT(openGround()));
 
     p_openDem = new QAction(p_qnetTool);
     p_openDem->setText("Open &Radius Source");
+    p_openDem->setToolTip("Open radius source file for ground control points");
+    p_openDem->setStatusTip("Open radius source file for ground control points");
     whatsThis =
       "<b>Function:</b> Open a DEM for determining the radius when "
-      "choosing fixed points.  This is not the file that will be displayed "
-      "to be used for visually picking points.  This is strictly used to "
-      "determine the radius value.";
+      "choosing ground control points.  This is not the file that will be "
+      "displayed for visually picking points.  This is strictly used to "
+      "determine the radius value for ground control points.";
     p_openDem->setWhatsThis(whatsThis);
     connect (p_openDem,SIGNAL(activated()),this,SLOT(openDem()));
 
     p_saveNet = new QAction(QIcon(":saveAs"), "Save Control Network &As...",
         p_qnetTool);
+    p_saveNet->setToolTip("Save current control network to chosen file");
     p_saveNet->setStatusTip("Save current control network to chosen file");
     whatsThis = "<b>Function:</b> Saves the current <i>"
         "control network</i> under chosen filename";
@@ -448,6 +532,7 @@ namespace Isis {
     connect(p_saveNet, SIGNAL(activated()), this, SLOT(saveNet()));
 
     p_closeQnetTool = new QAction(QIcon(":close"), "&Close", p_qnetTool);
+    p_closeQnetTool->setToolTip("Close this window");
     p_closeQnetTool->setStatusTip("Close this window");
     p_closeQnetTool->setShortcut(Qt::ALT + Qt::Key_F4);
     whatsThis = "<b>Function:</b> Closes the Qnet Tool window for this point "
@@ -458,7 +543,10 @@ namespace Isis {
     p_showHideTemplateEditor = new QAction(QIcon(":view_edit"),
         "&View/edit registration template", p_qnetTool);
     p_showHideTemplateEditor->setCheckable(true);
-    p_showHideTemplateEditor->setStatusTip("View and/or edit the registration template");
+    p_showHideTemplateEditor->setToolTip("View and/or edit the registration "
+                                         "template");
+    p_showHideTemplateEditor->setStatusTip("View and/or edit the registration "
+                                           "template");
     whatsThis = "<b>Function:</b> Displays the curent registration template.  "
        "The user may edit and save changes under a chosen filename.";
     p_showHideTemplateEditor->setWhatsThis(whatsThis);
@@ -467,6 +555,7 @@ namespace Isis {
 
     p_saveChips = new QAction(QIcon(":window_new"), "Save registration chips",
         p_qnetTool);
+    p_saveChips->setToolTip("Save registration chips");
     p_saveChips->setStatusTip("Save registration chips");
     whatsThis = "<b>Function:</b> Save registration chips to file.  "
        "Each chip: pattern, search, fit will be saved to a separate file.";
@@ -475,6 +564,7 @@ namespace Isis {
 
     p_openTemplateFile = new QAction(QIcon(":open"), "&Open registration "
         "template", p_qnetTool);
+    p_openTemplateFile->setToolTip("Set registration template");
     p_openTemplateFile->setStatusTip("Set registration template");
     whatsThis = "<b>Function:</b> Allows user to select a new file to set as "
         "the registration template";
@@ -483,6 +573,7 @@ namespace Isis {
 
     p_saveTemplateFile = new QAction(QIcon(":save"), "&Save template file",
         p_qnetTool);
+    p_saveTemplateFile->setToolTip("Save the template file");
     p_saveTemplateFile->setStatusTip("Save the template file");
     p_saveTemplateFile->setWhatsThis("Save the registration template file");
     connect(p_saveTemplateFile, SIGNAL(triggered()), this,
@@ -490,6 +581,7 @@ namespace Isis {
 
     p_saveTemplateFileAs = new QAction(QIcon(":saveAs"), "&Save template as...",
         p_qnetTool);
+    p_saveTemplateFileAs->setToolTip("Save the template file");
     p_saveTemplateFileAs->setStatusTip("Save the template file");
     p_saveTemplateFileAs->setWhatsThis("Save the registration template file");
     connect(p_saveTemplateFileAs, SIGNAL(triggered()), this,
@@ -498,8 +590,8 @@ namespace Isis {
     p_whatsThis = new QAction(QIcon(Filename(
       "$base/icons/contexthelp.png").Expanded()),"&Whats's This", p_qnetTool);
     p_whatsThis->setShortcut(Qt::SHIFT | Qt::Key_F1);
-    p_whatsThis->setToolTip("Activate What's This and click on parts "
-        "this program to see more information about them");
+    p_whatsThis->setToolTip("Activate What's This and click on items on "
+        "user interface to see more information.");
     connect(p_whatsThis, SIGNAL(activated()), this, SLOT(enterWhatsThisMode()));
 
   }
@@ -605,8 +697,11 @@ namespace Isis {
     //  Only print error if both original measure in network and the current
     //  edit measure are both editLocked.  If only the edit measure is 
     //  locked, then user just locked and it needs to be saved.
-    if (IsMeasureLocked(origRightMeasure->GetCubeSerialNumber()) &&
-        IsMeasureLocked(p_rightMeasure->GetCubeSerialNumber())) {
+    //  Do not use this classes IsMeasureLocked since we actually want to
+    //  check the original againsted the edit measure and we don't care
+    //  if this is a reference measure.  The check for moving a reference is
+    //  done below.
+    if (origRightMeasure->IsEditLocked() && p_rightMeasure->IsEditLocked()) {
       QString message = "You are saving changes to a measure that is locked ";
       message += "for editing.  Do you want to set EditLock = False for this ";
       message += "measure?";
