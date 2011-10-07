@@ -6,32 +6,63 @@
 
   <description>
     <p>
-      This program performs a bundle adjustment on a group of overlapping Isis 3, level 
-      1 cubes from framing and/or line-scan cameras.  The adjustment simultaneously 
+      <b>jigsaw</b> performs a bundle adjustment on a group of overlapping Isis 3, level 
+      1, <def>cube</def>s from framing and/or line-scan cameras.  The adjustment simultaneously 
       refines the selected image geometry information (camera pointing, spacecraft 
-      position) and control point coordinates (x,y,z or lat,lon,radius) to reduce 
-      boundary mismatches in mosaics of the images.  The application assumes spiceinit 
-      has been run on the input cubes so that SPICE is included in the Isis 3 cube 
-      labels in the Kernels group.
+      position) and <def>control point</def> coordinates (x,y,z or lat,lon,radius) to reduce 
+      boundary mismatches in mosaics of the images.
+    </p>
+    <p>
+      This functionality is demonstrated below in a zoomed-in area of a mosaic of a 
+      pair of overlapping Messenger images.  In the before jigsaw mosaic on the left 
+      (uncontrolled), the features on the edges of the images do not match.  In the after 
+      jigsaw mosaic on the right (controlled), the crater edges meet correctly and the 
+      seam between the two images is no longer visible.
     </p>  
-<!--
-    <img src='assets/higlob_diagram.png' alt='Diagram of output pixel groups' width='444' height='520' />
--->
+
+    <img src='assets/mdis2_Uncontrolled.png' alt='Before jigsaw (uncontrolled)' width='306' height='259' />
+    <img src='assets/mdis2_Controlled.png' alt='After jigsaw (controlled)' width='306' height='259' />
+
     <p>
-      In order to run the program the user must provide a list of input cubes, an 
-      input control net, the name of an output control net, and the adjustment 
-      parameters. The program outputs a new control net that includes the initial 
-      state of the points in the network and their final state after the adjustment.  
-      The SPICE in the cube files is updated at the end of the adjustment only if it 
-      converges and the adjusted flag is turned on.  Optional output files can be 
-      selected to provide more information for analyzing the results.
+      <b>jigsaw</b> assumes <b>spiceinit</b> has been run on the input <def>cube</def>s so that 
+      <def>SPICE</def> is included in the Isis 3 <def>cube</def> labels in the Kernels group.  In order to 
+      run the program, the user must provide a list of input <def>cube</def>s, an input <def>control
+      net</def>, the name of an output <def>control net</def>, and the adjustment parameters.  
+      <b>jigsaw</b> outputs a new <def>control net</def> that includes the initial state of the
+      points in the network and their final state after the adjustment.  The initial state of
+      the points are tagged as <def>a priori</def> in the <def>control net</def>, and their final
+      state as <def>adjusted</def>.  The measured <def>sample</def>/<def>line</def> positions
+      associated with the <def>control point</def>s in the net are not changed.  <def>SPICE</def> 
+      in the <def>cube</def> labels is updated at the end of the adjustment only 
+      if the bundle converges and the <b>UPDATE</b> parameter is selected.
+    </p>
+
+    <p>
+    Optional output files can be selected to provide more information for analyzing the 
+    results.  <b>BUNDLEOUT.TXT</b> provides an overall summary of the bundle adjustment.  
+    It lists the user input parameters selected and tables of statistics for both the
+    images and the points.   The image statistics can also be written to a separate
+    <b>CSV</b> file and likewise for the point statistics with the <b>OUTPUT_CSV</b>
+    option selected.  <b>RESIDUALS_CSV</b> provides a table of the measured image
+    coordinates and the final <def>sample</def>, <def>line</def>, and overall residuals 
+    in both millimeters and pixels.
     </p>
     <p>
-      The bundle adjustment solution minimizes the sum of the squares of the weighted 
-      residuals of the image Spice and control point 3-d positions included in the 
-      solution.  The measured sample/line positions associated with the control points 
-      are not changed.
+      The functional model for the bundle adjustment is the <i>collinearity 
+      condition</i>.  It stipulates that the camera perspective center, a ground 
+      point, and its associated image point measurement be collinear.  The diagram 
+      below demonstrates the collinear condition in a <i>bundle adjustment</i>.
+      The vectors formed by connecting each object space point (target surface x,y,z) 
+      and its corresponding image space points (<def>sample</def>,<def>line</def>) form 
+      a <i>bundle</i> of light rays.
     </p>
+    <img src='assets/BundleAdjustment_KarlKraus.png' alt='Before jigsaw (uncontrolled)' width='498' height='355' />
+    <p>
+     Kraus, Karl., 1993. Photogrammetry Vol. I., Fundamentals and Standard 
+     Processes, Der. Dümmler Verlag, Bonn, Germany, ISBN 3-427-78684-6, 397 
+     pages.
+    </p>
+
   </description>
 
   <category>
@@ -83,6 +114,16 @@
       and CHOLMOD to SPARSE; and improved the documentation for
       the Isis3.3.0 release.
     </change>
+    <change name="Debbie A. Cook, Ken Edmundson, and Orrin Thomas" date="2011-10-03">
+      Added images showing before and after to demonstrate the
+      program.  Added Krause's collinearity diagram and 
+      a brief explanation on the output options.  Also added
+      a lien for example(s) to be added later. 
+    </change>
+    <change name="Debbie A. Cook" date="2011-10-06">
+      Corrected previous history entry and added references to glossary.  Also
+      changed application names to bold type.
+    </change>
   </history>
 
   <groups>
@@ -92,10 +133,10 @@
         <type>filename</type>
         <fileMode>input</fileMode>
         <brief>
-          Cube list
+          <def>cube</def>list
         </brief>
         <description>
-          This file contains a list of all cubes in the network
+          This file contains a list of all <def>cube</def>s in the <def>control network</def>
         </description>
         <filter>
           *.txt *.lis
@@ -110,7 +151,7 @@
           Held list
         </brief>
         <description>
-          This file contains a list of all cubes whose orientation and position
+          This file contains a list of all <def>cube</def>s whose orientation and position
           will be held in the adjustment.  These images will still be included
           in the solution, but their camera orientation and spacecraft position
           will be constrained to keep the values from changing.  This is an
@@ -128,9 +169,9 @@
           Input control network
         </brief>
         <description>
-          This file is a control network generated from programs such as 
-          autoseed or qnet.  It contains the control points and associated
-          measures.
+          This file is a <def>control network</def> generated from programs such as 
+          <b>autoseed</b> or <b>qnet</b>.  It contains the <def>control point</def>s 
+          and associated measures.
         </description>
         <filter>
           *.net
@@ -166,8 +207,9 @@
           Output control network
         </brief>
         <description>
-          This output file contains the updated control network with the final
-          coordinates of the control points and residuals for each measurement.
+          This output file contains the updated <def>control network</def> with
+          the final coordinates of the <def>control point</def>s and residuals for each
+          measurement.
         </description>
         <filter>
           *.net
@@ -177,14 +219,15 @@
 
     <group name="Solve Options">
       <parameter name="OBSERVATIONS">
-        <brief> Keep instances of the same observation in different cube files the same</brief>
+        <brief> Keep instances of the same observation in different <def>cube</def> files 
+                the same</brief>
         <description>
-            This option will solve for SPICE on all cubes with a matching
+            This option will solve for <def>SPICE</def> on all cubes with a matching
             observation number as though they were a single observation.  For 
             most missions, the default observation number is equivalent to the 
-            serial number of the cube, and a single cube is an observation.
-            However, for the Lunar Orbiter mission an image has a defined 
-            observation number that is a substring of its serial number.  This
+            <def>serial number</def> of the <def>cube</def>, and a single <def>cube</def> 
+            is an observation.  However, for the Lunar Orbiter mission an image has a defined 
+            observation number that is a substring of its <def>serial number</def>.  This
             feature allows the three subframes of a Lunar Orbiter High
             Resolution frame to be treated as a single observation when this 
             option is used.  Otherwise each subframe is adjusted independently.
@@ -198,9 +241,9 @@
       <parameter name="RADIUS">
         <brief> Solve for local radii of points</brief>
         <description>
-            Select this option to solve for the local radius of each control
-            point.  If this button is not turned on, the radii of the points
-            will not change from the cube's shape model.
+            Select this option to solve for the local radius of each <def>control
+            point</def>.  If this button is not turned on, the radii of the points
+            will not change from the <def>cube</def>'s shape model.
         </description>
         <type>boolean</type>
         <default>
@@ -209,13 +252,13 @@
       </parameter>
       
       <parameter name="UPDATE">
-        <brief> Update cube label</brief>
+        <brief> Update <def>cube</def> label</brief>
         <description>
             When this option is selected, the application will update the labels  
-            of the individual cubes in the FROMLIST with the final values from 
-            the solution if the adjustment converges.  The results are written 
-            to the SPICE blobs attached to the cube, overwriting the previous
-            values.  If this option is not selected, the cube files are not
+            of the individual <def>cube</def>s in the FROMLIST with the final values 
+            from the solution if the adjustment converges.  The results are written 
+            to the <def>SPICE</def> blobs attached to the cube, overwriting the previous
+            values.  If this option is not selected, the <def>cube</def> files are not
             changed.  All other output files are still created.
         </description>
         <type>boolean</type>
@@ -339,7 +382,7 @@
         </brief>
         <description>
                 The degree of the polynomial fit to the original camera angles 
-                and used to generate apriori camera angles for the first 
+                and used to generate <def>a priori</def> camera angles for the first 
                 iteration.
         </description>
       </parameter>
@@ -354,7 +397,7 @@
         <description>
                The degree of the polynomial being fit to in the bundle adjust 
                solution.  This polynomial can be different from the one used to 
-               generate the apriori camera angles used in the first iteration.  
+               generate the <def>a priori</def> camera angles used in the first iteration.  
                In the case of an instrument with a jitter problem, a higher 
                degree polynomial fit to each of the camera angles might provide 
                a better solution (smaller errors).
@@ -367,7 +410,7 @@
           <item>ANGLES</item>
         </default>
         <description>
-               This parameter is used to specify which, if any,  camera 
+               This parameter is used to specify which, if any, camera 
                pointing parameters to include in the adjustment.
         </description>
         <list>
@@ -382,7 +425,7 @@
           <option value="ANGLES">
             <brief>Solve for camera angles: angle1 and angle2, and optionally twist</brief>
             <description>
-                   Camera angles in each cube will be adjusted in the solution, 
+                   Camera angles in each <def>cube</def> will be adjusted in the solution, 
                    but not angular velocities or accelerations. Adjustments are 
                    not applied unless the solution converges and UPDATE is 
                    selected.
@@ -443,11 +486,9 @@
         </description>
         <list>
           <option value="NONE">
-            <brief>Don't solve for any spacecraft position factors</brief>
+            <brief>Don't solve for any spacecraft position parameters</brief>
             <description>
-                   No spacecraft position factors will be adjusted.  A camera 
-                   angle factor must be included in the adjustment in order for 
-                   the application to run.
+                   No spacecraft position parameters will be adjusted.
             </description>
           </option>
 
@@ -649,4 +690,11 @@
       </group>
 
     </groups>
+
+    <liens>
+      <item>Add items to glossary, example(s) and tips on how to analyze the 
+            results.
+      </item>
+    </liens>
+
 </application>
