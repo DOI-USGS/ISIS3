@@ -79,8 +79,8 @@
       <ul>
         <li>Move the cursor location under the crosshair by clicking the left mouse
             button</li>
-        <li>Move 1 pixel at a time by using arrow keys on the keyboard</li>
-        <li>move 1 pixel at a time by using arrow buttons above the measure views</li>
+        <li>Move 1 pixel at a time by using arrow keys on the keyboard, or using  arrow
+             buttons located above the measure views</li>
       </ul>
       </p>
       <h4>Other point editor functions</h4>
@@ -88,7 +88,7 @@
       <ul>
         <li><strong>Save Control Network As</strong> Save the ground points
           in a control network.</li>
-        <strong>Close</strong> Close the Tie Point Tool.
+        <li><strong>Close</strong> Close the Tie Point Tool.</li>
       </ul>
       <p>In the Options menu:</p>
       <ul>
@@ -130,7 +130,7 @@
       </ul>
       <p>Below the right view:</p>
       <ul>
-        <li><strong>Register:</strong>  Sub-pixel register the the right view to
+        <li><strong>Register:</strong>  Sub-pixel register the right view to
             the left view.</li>
         <li><strong>Save Measure:</strong>  Save the control measure under the
             right view to the edit control point.</li>
@@ -181,7 +181,6 @@
     </change>
     <change name="Tracie Sucharski" date="2011-09-15">
       Updated for binary control networks.
-    </change>
     </change>
     <change name="Tracie Sucharski" date="2011-10-05">
         Updated documentation with input from Tammy Becker.
