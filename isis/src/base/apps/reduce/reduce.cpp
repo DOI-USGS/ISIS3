@@ -10,91 +10,97 @@ using namespace std;
 using namespace Isis;
 
 void IsisMain() {
-  // We will be processing by line
-  ProcessByLine p;
-  Cube *cube = new Cube;
-  double sscale, lscale;
-  int ins, inl, inb;
-  int ons, onl;
-  vector<string> bands;
-  
-  // To propogate labels, set input cube,
-  // this cube will be cleared after output cube is set.
-  p.SetInputCube("FROM");
-
-  // Setup the input and output cubes
-  UserInterface &ui = Application::GetUserInterface();
-  string replaceMode = ui.GetAsString("VPER_REPLACE");
-  CubeAttributeInput cai(ui.GetAsString("FROM"));
-  bands = cai.Bands();
-
-  string from = ui.GetFilename("FROM");
-  cube->open(from);
-
-  ins = cube->getSampleCount();
-  inl = cube->getLineCount();
-  inb = bands.size();
-
-  if(inb == 0) {
-    inb = cube->getBandCount();
-    for(int i = 1; i <= inb; i++) {
-      bands.push_back((iString)i);
-    }
-  }
-
-  string alg  = ui.GetString("ALGORITHM");
-  double vper = ui.GetDouble("VALIDPER") / 100.;
-
-  if(ui.GetString("MODE") == "TOTAL") {
-    ons = ui.GetInteger("ONS");
-    onl = ui.GetInteger("ONL");
-    sscale = (double)ins / (double)ons;
-    lscale = (double)inl / (double)onl;
-  }
-  else {
-    sscale = ui.GetDouble("SSCALE");
-    lscale = ui.GetDouble("LSCALE");
-    ons = (int)ceil((double)ins / sscale);
-    onl = (int)ceil((double)inl / lscale);
-  }
-
-  if(ons > ins || onl > inl) {
-    string msg = "Number of output samples/lines must be less than or equal";
-    msg = msg + " to the input samples/lines.";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
-  }
-
-  //  Allocate output file
-  Cube *ocube = NULL;
   try {
-    ocube = p.SetOutputCube("TO", ons, onl, inb);
+    // We will be processing by line
+    ProcessByLine p;
+    Cube *cube = new Cube;
+    double sscale, lscale;
+    int ins, inl, inb;
+    int ons, onl;
+    vector<string> bands;
+  
+    // To propogate labels, set input cube,
+    // this cube will be cleared after output cube is set.
+    p.SetInputCube("FROM");
+
+    // Setup the input and output cubes
+    UserInterface &ui = Application::GetUserInterface();
+    string replaceMode = ui.GetAsString("VPER_REPLACE");
+    CubeAttributeInput cai(ui.GetAsString("FROM"));
+    bands = cai.Bands();
+
+    string from = ui.GetFilename("FROM");
+    cube->open(from);
+
+    ins = cube->getSampleCount();
+    inl = cube->getLineCount();
+    inb = bands.size();
+
+    if(inb == 0) {
+      inb = cube->getBandCount();
+      for(int i = 1; i <= inb; i++) {
+        bands.push_back((iString)i);
+      }
+    }
+
+    string alg  = ui.GetString("ALGORITHM");
+    double vper = ui.GetDouble("VALIDPER") / 100.;
+
+    if(ui.GetString("MODE") == "TOTAL") {
+      ons = ui.GetInteger("ONS");
+      onl = ui.GetInteger("ONL");
+      sscale = (double)ins / (double)ons;
+      lscale = (double)inl / (double)onl;
+    }
+    else {
+      sscale = ui.GetDouble("SSCALE");
+      lscale = ui.GetDouble("LSCALE");
+      ons = (int)ceil((double)ins / sscale);
+      onl = (int)ceil((double)inl / lscale);
+    }
+
+    if(ons > ins || onl > inl) {
+      string msg = "Number of output samples/lines must be less than or equal";
+      msg = msg + " to the input samples/lines.";
+      throw iException::Message(iException::User, msg, _FILEINFO_);
+    }
+
+    //  Allocate output file
+    Cube *ocube = p.SetOutputCube("TO", ons, onl, inb);
     // Our processing routine only needs 1
     // the original set was for info about the cube only
     p.ClearInputCubes();
-  }
-  catch(iException &e) {
-    // If there is a problem, catch it and close the cube so it isn't open next time around
+    
+    // Start the processing
+    PvlGroup results;
+    if(alg == "AVERAGE"){
+      Average average(cube, bands, sscale, lscale, vper, replaceMode);
+      p.StartProcessInPlace(average);
+      results = average.UpdateOutputLabel(ocube);
+    }
+    else if(alg == "NEAREST") {
+      Nearest near(cube, bands, sscale, lscale);
+      p.StartProcessInPlace(near);
+      results = near.UpdateOutputLabel(ocube);
+    }
+  
+    // Cleanup
     cube->close();
-    throw e;
-  }
+    delete (cube);
+    p.EndProcess();
   
-  // Start the processing
-  PvlGroup results;
-  if(alg == "AVERAGE"){
-    Average average(cube, bands, sscale, lscale, vper, replaceMode);
-    p.StartProcessInPlace(average);
-    results = average.UpdateOutputLabel(ocube);
+    // Write the results to the log
+    Application::Log(results);
+  } // REFORMAT THESE ERRORS INTO ISIS TYPES AND RETHROW
+  catch (Isis::iException &e) {
+    throw;
+  }  
+  catch (std::exception const &se) {
+    string message = "std::exception: " + (iString)se.what();
+    throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
   }
-  else if(alg == "NEAREST") {
-    Nearest near(cube, bands, sscale, lscale);
-    p.StartProcessInPlace(near);
-    results = near.UpdateOutputLabel(ocube);
+  catch (...) {
+    string message = "Other Error";
+    throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
   }
-  
-  // Cleanup
-  cube->close();
-  p.EndProcess();
-  
-  // Write the results to the log
-  Application::Log(results);
 }

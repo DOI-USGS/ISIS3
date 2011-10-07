@@ -83,6 +83,9 @@
       Ported the reduce by near and average functionality from the app to 
       base/objs/Reduce class
      </change> 
+    <change name="Sharmila Prasad" date="2011-10-07">
+      Fixed bug #0000463 regarding memory leak
+    </change>
     </history> 
 
   <category>
