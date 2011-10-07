@@ -77,6 +77,7 @@ namespace Isis {
       void mouseButtonRelease(QPoint p, Qt::MouseButton s);
 
     private slots:
+      void enterWhatsThisMode();
       void drawMeasuresOnViewports();
       void solve();
       void writeNewCmatrix(Table *cmatrix);
@@ -99,12 +100,15 @@ namespace Isis {
       void createQtieTool(QWidget *parent);
       QMainWindow *p_tieTool;
       void createMenus();
+      void createToolBars();
 
       void loadPoint();
 
+      QAction *p_whatsThis;
       QAction *p_createPoint;
       QAction *p_modifyPoint;
       QAction *p_deletePoint;
+      QAction *p_saveNet;
 
       QMainWindow *p_mw;
       ControlPointEdit *p_pointEditor;

@@ -100,6 +100,7 @@ namespace Isis {
     p_tieTool->layout()->setSizeConstraint(QLayout::SetFixedSize);
 
     createMenus();
+    createToolBars();
 
     // Place everything in a grid
     QGridLayout *gridLayout = new QGridLayout();
@@ -112,12 +113,21 @@ namespace Isis {
     int row = 0;
 
     QCheckBox *twist = new QCheckBox("Twist");
+    twist->setToolTip("Solve for twist");
+    twist->setStatusTip("Solving for twist includes a rotation in addition "
+                        "to a translation.");
+    twist->setWhatsThis("Turning off twist will solve for right ascension and "
+               "declinatiuon only which is a translation of the image.  "
+               "Solving for twist inclues both translation and rotation.");
     twist->setChecked(p_twist);
     connect(twist, SIGNAL(toggled(bool)), this, SLOT(setTwist(bool)));
     QLabel *iterationLabel = new QLabel("Maximum Iterations");
     QSpinBox *iteration = new QSpinBox();
     iteration->setRange(1, 100);
     iteration->setValue(p_maxIterations);
+    iteration->setToolTip("Maximum number of iterations.");
+    iteration->setWhatsThis("Maximum number of iterations to try for "
+                    "convergence to tolerance before stopping.");
     iterationLabel->setBuddy(iteration);
     connect(iteration, SIGNAL(valueChanged(int)), this, SLOT(setIterations(int)));
     QHBoxLayout *itLayout = new QHBoxLayout();
@@ -127,6 +137,9 @@ namespace Isis {
 
     QLabel *tolLabel = new QLabel("Sigma0");
     p_tolValue = new QLineEdit();
+    p_tolValue->setToolTip("Sigma0 used for convergence tolerance.");
+    p_tolValue->setWhatsThis("Sigma0 is the standard deviation of unit weight."
+                          "  Solution converges on stabilization.");
     tolLabel->setBuddy(p_tolValue);
     QHBoxLayout *tolLayout = new QHBoxLayout();
     tolLayout->addWidget(tolLabel);
@@ -158,6 +171,15 @@ namespace Isis {
 
 
     QPushButton *solve = new QPushButton("Solve");
+    solve->setToolTip("Start the iterative least-squares bundle adjustment.");
+    solve->setWhatsThis("Start the iterative least-squares bundle adjustment.  "
+                "Right ascension (angle 1) and declination (angle 2) which "
+                "are stored in the cube labels are adjusted to align the "
+                "coordinate of each sample/line of the control points from "
+                "the \"Match\" level 1 cube with the latitude/longitude from "
+                "the \"Base\" map projected cube.  To solve for all three "
+                "camera angles, select the <strong>Twist</strong> radio "
+                "button.");
     connect(solve, SIGNAL(clicked()), this, SLOT(solve()));
     gridLayout->addWidget(solve, row++, 0);
 
@@ -175,16 +197,21 @@ namespace Isis {
   /**
    * Create the menus for QtieTool
    *
-   *
+   * @internal 
+   * @history 2011-10-06 Tracie Sucharski - Added Help and What's This 
+   *  
    */
   void QtieTool::createMenus() {
 
-    QAction *saveNet = new QAction(p_tieTool);
-    saveNet->setText("Save Control Network &As...");
-    QString whatsThis =
-      "<b>Function:</b> Saves the current <i>control network</i> under chosen filename";
-    saveNet->setWhatsThis(whatsThis);
-    connect(saveNet, SIGNAL(activated()), this, SLOT(saveNet()));
+    p_saveNet = new QAction(QIcon(Filename(
+      "$base/icons/mActionFileSaveAs.png").Expanded()), "Save Control Network &As...",
+                            p_tieTool);
+    p_saveNet->setToolTip("Save current control network to chosen file");
+    p_saveNet->setStatusTip("Save current control network to chosen file");
+    QString whatsThis = "<b>Function:</b> Saves the current <i>"
+                        "control network</i> under chosen filename";
+    p_saveNet->setWhatsThis(whatsThis);
+    connect(p_saveNet, SIGNAL(activated()), this, SLOT(saveNet()));
 
     QAction *closeQtieTool = new QAction(p_tieTool);
     closeQtieTool->setText("&Close");
@@ -196,7 +223,7 @@ namespace Isis {
     connect(closeQtieTool, SIGNAL(activated()), p_tieTool, SLOT(close()));
 
     QMenu *fileMenu = p_tieTool->menuBar()->addMenu("&File");
-    fileMenu->addAction(saveNet);
+    fileMenu->addAction(p_saveNet);
     fileMenu->addAction(closeQtieTool);
 
     QAction *templateFile = new QAction(p_tieTool);
@@ -222,7 +249,30 @@ namespace Isis {
     regMenu->addAction(viewTemplate);
     //    registrationMenu->addAction(interestOp);
 
+
+    p_whatsThis = new QAction(QIcon(Filename(
+      "$base/icons/contexthelp.png").Expanded()),"&Whats's This", p_tieTool);
+    p_whatsThis->setShortcut(Qt::SHIFT | Qt::Key_F1);
+    p_whatsThis->setToolTip("Activate What's This and click on items on "
+                          "user interface to see more information.");
+    connect(p_whatsThis, SIGNAL(activated()), this, SLOT(enterWhatsThisMode()));
+
+    QMenu *helpMenu = p_tieTool->menuBar()->addMenu("&Help");
+    helpMenu->addAction(p_whatsThis);
   }
+
+
+  void QtieTool::createToolBars() {
+
+    QToolBar * toolBar = new QToolBar;
+    toolBar->setFloatable(false);
+    toolBar->addAction(p_saveNet);
+    toolBar->addSeparator();
+    toolBar->addAction(p_whatsThis);
+
+    p_tieTool->addToolBar(Qt::TopToolBarArea, toolBar);
+  }
+
 
 
   /**
@@ -309,6 +359,7 @@ namespace Isis {
           QString message = "Error parsing input control net.  Point Id: " +
                             QString::fromStdString(p.GetId()) + " does not exist on basemap.";
           QMessageBox::critical((QWidget *)parent(), "Control Net Error", message);
+          clearFiles();
           return;
         }
 
@@ -434,14 +485,23 @@ namespace Isis {
     cvp->viewportToCube(p.x(), p.y(), samp, line);
 
     if (s == Qt::LeftButton) {
-      //  Find closest control point in network
-      ControlPoint *point =
-        p_controlNet->FindClosest(sn, samp, line);
-      //  TODO:  test for errors and reality
-      if (point == NULL) {
+      if (p_controlNet->GetNumMeasures() == 0) {
         QString message = "No points exist for editing.  Create points ";
         message += "using the right mouse button.";
         QMessageBox::information((QWidget *)parent(), "Warning", message);
+        return;
+      }
+      //  Find closest control point in network
+      ControlPoint *point;
+      try {
+        point = p_controlNet->FindClosest(sn, samp, line);
+      }
+      catch (iException &e) {
+        QString message = "No points found for editing.  Create points ";
+        message += "using the right mouse button.";
+        message += e.Errors().c_str();
+        QMessageBox::critical((QWidget *)parent(), "Error", message);
+        e.Clear();
         return;
       }
       modifyPoint(point);
@@ -768,7 +828,17 @@ namespace Isis {
       QMessageBox msgBox(QMessageBox::Question, msgTitle, message, 0, p_tieTool,
                          Qt::Dialog);
       QPushButton *update = msgBox.addButton("Update", QMessageBox::AcceptRole);
+      update->setToolTip("Update camera pointing on \"Match\" cube labels.");
+      update->setWhatsThis("Update the camera angles on the \"Match\" cube "
+                           "labels.  The right ascension, declination  and "
+                           "twist (if the <strong>Twist option</strong was "
+                           "chosen).");
       QPushButton *close = msgBox.addButton("Close", QMessageBox::RejectRole);
+      close->setToolTip("Do not update camera pointing.");
+      close->setWhatsThis("If you are not happy with the solution, select "
+                          "this.  The camera pointing will not be updated.  "
+                          "You can attempt to refine the control points and "
+                          "attempt a new solution.");
       msgBox.setDetailedText(b.IterationSummaryGroup());
       msgBox.setDefaultButton(close);
       msgBox.setMinimumWidth(5000);
@@ -947,5 +1017,11 @@ namespace Isis {
       QMessageBox::information((QWidget *)parent(),
                                "Error", "Saving Aborted");
     }
+  }
+
+
+
+  void QtieTool::enterWhatsThisMode() {
+    QWhatsThis::enterWhatsThisMode();
   }
 }

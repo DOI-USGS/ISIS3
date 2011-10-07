@@ -196,17 +196,4 @@ namespace Isis {
 
     return;
   }
-
-
-
-
-
-#if 0
-  // Exit the program
-  ............................................
-
-  void QtieFileTool::exit() {
-    qApp->quit();
-  }
-#endif
 }

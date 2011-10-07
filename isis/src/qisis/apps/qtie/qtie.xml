@@ -2,104 +2,164 @@
 
 <application name="qtie" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
-    Create and edit control networks
+    Update camera pointing (SPICE) on a single cube
   </brief>
 
   <description>
     <p>
-   This program will update the camera pointing of a level 1 image matching to a 
-   base map.   The camera pointing is updated using an iterative least-squares bundle
-   adjustment.  This is the interactive version of the program, deltack.
+      This program will update the camera pointing (CK) in the labels of a 
+      level 1 cube using a map projected "Base" cube to determine the
+      latitude/longitude of control points.  Angles 1 and 2 of the camera
+      pointing stored in the cube labels will be adjusted to align the
+      coordinate of each sample/line from the "Match" level 1 cube with
+      the latitude/longitude from the "Base" map projected cube.  To
+      solve for all three camera angles select the TWIST radio button in
+      the Qtie Tool window.  At least two control points will need to be
+      selected for the TWIST option.
     </p>
     <p>
-    To run qtie, you will enter a base map (projected) and a match cube 
-    (unprojected).  There are 2 core windows used in this application.
+      The application will adjust the camera
+      angles to align all control points with the latitude/longitude
+      values from the "Base" cube with minimal errors using an iterative
+      least-squares bundle adjustment.  The number of iterations and
+      tolerance (sigma0) for convergence can be selected from the 
+      Qtie Tool window.  Solving for two angles only is similar to a 
+      translation of the image.  Solving for twist will result in both a
+      translation and a rotation of the image.
     </p>
-    <h3>qtie window</h3> 
-    The main qtie window is similar to the qview application. You will see many
-    of the same tools, such as "Band Selection", "Zoom", "Pan", "Stretch" and 
-    "Find" along the right border. The "Tie" tool is the last button along the
-    right toolbar. It will be the default tool selected when qtie is launched.
     <p>
-    In this window, select the "Open images" button or the Open action (from 
-    File menu).  You will be prompted to enter the base map cube first followed 
-    by the level 1 (unprojected) cube to be tied to the base map.
+      This is the interactive version of the program "deltack".
+      Like "jigsaw" and "deltack", it works on both framing cameras and line
+      scanners.  Note that only the camera pointing is solved for with 
+      qtie and deltack (solving for radius and spacecraft position are not
+      options with these applications, refer to jigsaw for more options).
+    </p>
+    <p>
+      To run qtie, you will enter a base map cube (map projected) and a match
+      cube (unprojected) which will be the cube which will have the camera
+      pointing updated.  The unprojected match cube must have been initialized
+      with the "spiceinit" program using ATTACH="YES".  Optionally, an
+      existing control network containing control points between the "Match"
+      cube and a basemap, may be entered.
+    </p>
+    <p>
+    There are 2 core windows used in this application.
+    </p>
+    <h3>Qtie window</h3> 
+    <p>
+      The main qtie window is similar to the qview application. You will see many
+      of the same tools, such as "Band Selection", "Zoom", "Pan", "Stretch" and 
+      "Find" along the right border. The "Tie" tool is the last button along the
+      right toolbar. It will be the default tool selected when qtie is launched.
+    </p>
+    <p>
+      In this window, select the "Open images" button or the Open action (from 
+      File menu).  You will be prompted to enter the base map cube first followed 
+      by the level 1 (unprojected) cube to be tied to the base map.  You then
+      have the option of opening an existing control network which has control
+      points between the "Match" cube and a basemap.  Click the "Cancel"
+      button to create a new control points.
     </p>
       When the "Tie" tool is activated, the mouse buttons have the following 
-      function in the cube viewports of the main qtie window:
-    <pre>
-      <strong>Left Button:</strong>  Modify the closest control point
-
-      <strong>Middle Button:</strong>  Delete the closest control point 
-
-      <strong>Right Button:</strong>  Create new control point
-    </pre>
+      function in the cube viewports of the main qtie window:<br>
+      (<strong>Note:</strong>  Mouse events will only work on the "Match" cube)</br>
+    <font size="-1"><ul>
+      <li><strong>Left Button:</strong>  Modify the closest control point</li>
+      <li><strong>Middle Button:</strong>  Delete the closest control point</li>
+      <li><strong>Right Button:</strong>  Create new control point</li>
+    </ul></font>
     <h3>Qtie Tool window</h3>
       This is the point editor window of qtie for modifying or creating a point.
       The window will display the cube that is the base map on the left and 
-      the level 1 cube on the right.  Both measures (base map and level 1) may be 
-      moved.  The measure can be adjusted by:
-    <pre>
-      move to the cursor position under the crosshair by clicking the left mouse button
-
-      move 1 pixel at a time by using arrow keys on the keyboard 
-
-      move 1 pixel at a time by using arrow buttons above the right view
-    </pre>
-    Other point editor functions / options include the following:
-    <pre>
-      <i>In the File menu:</i>    
-        <strong>Save Control Network As</strong> Save the ground points
-        in a control network.
-
+      the level 1 cube on the right.  Both measures ("Base" and "Match") may be 
+      moved.
+      <h4>Changing Measure Locations</h4>
+      <p>
+        The measure location can be adjusted by:
+      <ul>
+        <li>Move the cursor location under the crosshair by clicking the left mouse
+            button</li>
+        <li>Move 1 pixel at a time by using arrow keys on the keyboard</li>
+        <li>move 1 pixel at a time by using arrow buttons above the measure views</li>
+      </ul>
+      </p>
+      <h4>Other point editor functions</h4>
+      <p>In the File menu:</p>
+      <ul>
+        <li><strong>Save Control Network As</strong> Save the ground points
+          in a control network.</li>
         <strong>Close</strong> Close the Tie Point Tool.
-
-      <i>In the Options menu:</i>
-        <strong>Registration</strong> Set or view and save registration 
-        templates.
-
-      <i>Along the top of the window:</i>
-        <strong>Twist</strong> Turning off twist will solve for right ascension and
+      </ul>
+      <p>In the Options menu:</p>
+      <ul>
+        <li><strong>Registration</strong> Set or view and save registration 
+          templates.</li>
+      </ul>
+      <p>Along the top of the window:</p>
+      <ul>
+        <li><strong>Twist</strong> Turning off twist will solve for right ascension and
         declination only which is a translation of the image.  Solving for twist 
-        includes both translation and rotation.
-
-        <strong>Maximum Iterations</strong> Maximum number of iterations to try
-        for convergence to tolerance before stopping.
-
-        <strong>Tolerance</strong> Tolerance in pixels.  When the bundle adjustment
-        drops below this value, the solution has converged.
-
-      <i>Along the right border of the window:</i>
-        <strong>Geom</strong>  Geom the right view to match the left view 
-
-        <strong>Rotate</strong>  Rotate the right view
-
-      <i>Below the left view:</i>
-        <strong>Blink controls</strong>  Blink the left and right view in the
+        includes both translation and rotation.</li>
+        <li><strong>Maximum Iterations</strong> Maximum number of iterations to try
+          for convergence to tolerance before stopping.</li>
+        <li><strong>Sigma0</strong> Standard deviation of unit weight.  Solution
+          converges on stabilization</li>
+      </ul>
+      <p>Along the right border of the window:</p>
+      <ul>
+        <li><strong>Geom:</strong>  Geometrically match the right view to the left
+            view</li>
+        <li><strong>Rotate:</strong>  Rotate the right view using either the dial
+            or entering degrees </li>
+        <li><strong>Show control points:</strong> Draw crosshairs at all control
+             point locations visible within the view</li>
+        <li><strong>Show crosshair:</strong> Show a red crosshair across the entire
+            view</li>
+        <li><strong>Circle</strong> Draw circle which may help center measure
+            on a crater</li>
+      </ul>
+      <p>Below the left view:</p>
+      <ul>
+        <li><strong>Blink controls:</strong>  Blink the left and right view in the
         left view window using the "Blink Start" button (with play icon) and 
-        "Blink Stop" button (with stop icon).  The arrow keys above the right view 
-        may be used to move the right view in order to update the blinking in real 
-        time.
+        "Blink Stop" button (with stop icon).  Both arrow keys above the right view 
+        and the keyboard arrow keys may be used to move the right view while
+        blinking.</li>
+        <li><strong>Find:</strong> Center the right view so that the same latitude / 
+        longitude is under the crosshair as the left view.</li>
+      </ul>
+      <p>Below the right view:</p>
+      <ul>
+        <li><strong>Register:</strong>  Sub-pixel register the the right view to
+            the left view.</li>
+        <li><strong>Save Measure:</strong>  Save the control measure under the
+            right view to the edit control point.</li>
+      </ul>
+      <p>Along the bottom:</p>
+      <ul>
+        <li><strong>Solve</strong> Attempt the bundle solution using the control
+        points picked with the given input parameters such as Twist, Maximum
+        Iterations and Sigma0.  If the solution converges, a window will be
+        displayed showing the bundle adjustment results.  The option is given
+        to update the camera pointing on the labels of the "Match" cube.</li>
 
-        <strong>Find</strong>   Center the right view so that the same latitude / 
-        longitude is under the crosshair as the left view. 
+        Once the camera pointing labels have been updated (Match cube labels), 
+        there are various ways to evaluate the results.   The 'Find' tool with
+        the "Match" cube and "Base" cube can give a visual indication how 
+        correlated the features are between the two images.  The updated 
+        "Match" cube can be projected to a map projection (cam2map), the 
+        projected result can then be displayed with other reference images 
+        (for example, the "Base" image) in qview.
 
-      <i>Below the right view:</i>
-        <strong>Register</strong>  Sub-pixel register the the right view to
-        the left view.
-
-        <strong>Save Point</strong>  Save both left and right measures in a
-        control point.
-
-        <strong>Solve</strong> Attempt the bundle solution using the points picked with
-        the given input parameters such as Twist, Maximum Iterations and Tolerance.
-        If the solution converges, you will be asked whether you want to update
-        the camera pointing.
-    </pre>
+        If the results of the updated "Match" cube are unsatisfactory, the
+        original 'CK/camera pointing' can recovered by re-running spiceinit
+        on the "Match" cube. 
+      </ul>
 
   </description>
 
   <category>
+    <categoryItem>Control Networks</categoryItem>
     <categoryItem>Display</categoryItem>
   </category>
 
@@ -121,6 +181,10 @@
     </change>
     <change name="Tracie Sucharski" date="2011-09-15">
       Updated for binary control networks.
+    </change>
+    </change>
+    <change name="Tracie Sucharski" date="2011-10-05">
+        Updated documentation with input from Tammy Becker.
     </change>
   </history>
 </application>
