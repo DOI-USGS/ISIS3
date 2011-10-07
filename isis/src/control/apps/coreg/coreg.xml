@@ -8,38 +8,39 @@
 
   <description>
     <p>
-      This program co-regsisters two images using a constant sample/line
-      translation.  This implies of course that the internal geometry of the
-      both images be nearly the same so that the translation can be computed.
-      That is, this program will not work if the translation varies
-      significantly throughout the image.  However, there are still useful
-      capabilities in this program if this condition is not meet.  If the
-      condition of near constant translation is met then the translation can
-      be computed  to sub-pixel accuracy.   The basic principle behind this
-      program is to compute an average translation by computing local
+      This program co-regsisters two images using an image-wide averaged
+			sample/line translation with the TRANSLATE option or a set of
+			variable sample/line translations with the WARP option.   The program computes local
       translations spaced evenly throughout the image.  The number and spacing
       of local translations is user defined.  This allows for many output
       options including 1) directly creating the  translated image,  2)
       creating a control network which can be used in other programs (e.g.,
       qnet, warp), especially if the translation is not constant across the
       image, or 3) creating a flat-field file usable in spreadsheets or
-      plotting packages to visualize magnitude and direction of varying
-      translations.
-    </p>
+      plotting packages to visualize magnitude and direction of varying translations.
 
+      For the TRANSLATE option, this implies that the internal geometry of both 
+      images be nearly the same so that the translation can be computed. That 
+      is, this program will not work if the translation varies significantly 
+      throughout the image. If condition of near constant translation is met 
+      then the translation can be computed  to sub-pixel accuracy.  
+
+      If the internal geometry of both images do not match well, or a simple 
+      line/sample shift is not sufficient to register the images, the WARP 
+      option is a better choice than TRANSLATE because this uses the local 
+      translations to perform a rubber-sheet transformation.  This option must 
+      be used with caution.
+    </p>
     <p>
       NOTE:  This program can utilize many different techniques for computing
-      the translation.  It is recommended that you review the
-      <a href="../../../../documents/PatternMatch/PatternMatch.html">
-        Pattern Matching
-      </a> 
-      page from the "Related Objects and Documents" section below.  It is
-      essential for using this application to understand how to create a
-      "registration definition" file and how to size your search and pattern
-      chips.  We will continue with the discussion of functionality of this
-      program assuming the reader has a fundamental knowledge of Automatic
-      Registration.  For the brave we give an example of a defintion file
-      (DEFFILE):
+      the translation.  It is recommended that you review the 
+      <a href="../../../../documents/PatternMatch/PatternMatch.html">Pattern   
+      Matching</a> page from the "Related Objects and Documents" section below.  
+      It is essential for using this application to understand how to create a 
+      "registration definition" file and how to size your search and pattern 
+      chips.  We will continue with the discussion of functionality of this 
+      program assuming the reader has a fundamental knowledge of Automatic 
+      Registration.  Below we give an example of a defintion file (DEFFILE):
     </p>
 
     <pre>
@@ -65,44 +66,55 @@
       EndObject
     </pre>
 
+    <p> 
+      For further discussion of the parameters used in this DEFFILE, see the 
+      <a href="../../../../documents/PatternMatch/PatternMatch.html">Pattern 
+      Matching</a> document.  Briefly, the example DEFFILE will allow a 
+      successful registration only where the MaximumCorrelation 
+      algorithm's goodness-of-fit result is >=0.7, pixel value is >1400, and at 
+      least 75% of the pixels in both the PatternChip or the SearchChip are 
+      valid pixels.
+    </p>
+		
     <p>
-      You will provide two input cubes, one which will be translated (FROM)
+      This program requires two input cubes, one which will be translated (FROM)
       and the other is held fixed (MATCH).   The images must have the same
       number of samples and lines and can have only one band (use cube
-      attributes if necessary).  A sparse grid will be defined across the held
-      image using the parameters ROWS and COLUMNS.   If the user does not
-      provide values for the sparse grid size it will be automatically
-      computed as follows:  COLUMNS = (image samples - 1) / search chip
-      samples + 1.   Similarly for ROWS.  Conceptually, the sparse grid
-      defined by ROWS and COLUMNS will be laid on top of both images with even
-      spacing between the rows (or columns) and but no row will touch the top
-      or bottom of the image.  That is, the grid is internal to the image.
+      attributes if necessary).  A grid will be defined across the held
+      image using either the user parameters, ROWS and COLUMNS, or calculated
+      based on the image size and the search chip size as follows: 
+      COLUMNS = (image samples - 1) / search chip samples + 1, and similarly for 
+      ROWS.  Conceptually, the sparse grid defined by ROWS and COLUMNS will be 
+      laid on top of both images with even spacing between the rows (or columns) 
+      and but no row will touch the top or bottom of the image.  That is, the 
+      grid is internal to the image.
     </p>
 
     <p>
-      At each grid intersection we will compute a translation.  This is done
+      At each grid intersection, the local translation will be computed.  This is done
       by centering the search chip at the grid intersection for the image to
       be translated (FROM) and centering the pattern chip at the grid
       intersection for the held image (MATCH).  The pattern chip is walked
-      through the search chip to find the best registration (if any).  Again
-      the details of how this is done is described in the document "Automatic
-      Registation in Isis 3.0".  The local translation is recorded at all grid
-      intersections that had a successful registration.  It will be written to
-      the control network and/or flat-file if requested.  The average of the
+      through the search chip to find the best registration (if any).  Again,
+			see the <a href="../../../../documents/PatternMatch/PatternMatch.html">
+      Pattern Matching </a> document for further details.  The local translation is recorded at all grid
+      intersections that had a successful registration.  
+      The results are written to a control network and/or flat-file if requested.  The average of the
       local translations is then used to compute an overall sub-pixel
-      translation which can be applied to the output image (TO).
+      translation which can be applied to the FROM image and written 
+			as the output image (TO).
     </p>
 
     <p>
-      Some tips to improve odds of a successful registration.  In general
-      don't go too small with the pattern chip size, 20x20 is probably a good
-      starting point.  Also, the larger the translation, the larger the search
-      chip size will need to be.  So if your translation is only a couple of
-      pixels keep the search chip slightly bigger than the pattern (e.g.,
-      25x25 vs 20x20).  However if the translation is large you will need to
-      expand the seach area.  For example, if the translation is roughly 45
-      pixels and your pattern is 20x20 the search area should be 20+2*45 or
-      110x110.
+      Some tips to improve odds of a successful registration are provided.  In 
+			general a small pattern chip size makes registration more difficult.  
+      Depending on your dataset, 20x20 is probably a good starting point.  The    
+      larger the translation, the larger the search chip size will need to be;    
+      if your translation is only a couple of pixels, you should make the search 
+      chip only slightly larger than the pattern (e.g., 25x25 vs 20x20).  
+      However if the translation is large you will need to expand the search 
+      area.  For example, if the translation is roughly 45 pixels and your 
+      pattern is 20x20 the search area should be, roughly, 20+2*45 or 110x110.
     </p>
    </description>
 
@@ -195,6 +207,10 @@
         Corrected parameter change to warp application (CONTROL is now CNET); 
         added application test for parameter changes.
     </change>
+    <change name="Kris Becker" date="2011-10-07">
+        The documentation has been updated with review and contributions 
+        from  Ella Lee, Chris Isbell and Moses Millazzo.
+    </change>
   </history>
 
   <groups>
@@ -217,10 +233,10 @@
         <type>cube</type>
         <fileMode>input</fileMode>
         <brief>
-          The Held Input Image
+          The input image which will be held as a reference.
         </brief>
         <description>
-          This cube will be held. The FROM cube will be translated to match this cube. 
+          This cube will be held as the reference and the FROM cube will be translated to match this cube. 
         </description>
         <filter>
           *.cub
@@ -318,10 +334,10 @@
         <parameter name="INTERP">
             <type>string</type>
             <brief>
-                Interpolation used for Transformation
+                Interpolation used for transformation
             </brief>
             <description>
-                This will be the interpolation type used to get the output file in either the 
+                This will be the interpolation type used to generate the output file in either the 
                 translate or warp application.  Defaults to NEARESTNEIGHBOR.
             </description>
             <default><item>CUBICCONVOLUTION</item></default>
@@ -372,7 +388,7 @@
           </description>
           <internalDefault>None</internalDefault>
           <filter>
-            *.txt *.lis *.lst
+            *.net *.txt
           </filter>
         </parameter>
 
