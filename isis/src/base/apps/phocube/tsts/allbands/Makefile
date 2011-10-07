@@ -12,6 +12,8 @@ commands:
 	  phase=true \
 	  emission=true \
 	  incidence=true \
+	  localemission=true \
+	  localincidence=true \
 	  latitude=true \
 	  longitude=true \
 	  pixelresolution=true \

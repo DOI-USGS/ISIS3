@@ -264,7 +264,7 @@ void phocube(Buffer &out) {
           index += 64 * 64;
         }
         if(detectorResolution) {
-          out[index] = cam->SampleResolution();
+          out[index] = cam->DetectorResolution();
           index += 64 * 64;
         }
         if(northAzimuth) {

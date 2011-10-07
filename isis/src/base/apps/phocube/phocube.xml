@@ -7,8 +7,11 @@
   </brief>
 
   <description>
-    This program creates a cube where the bands represent the photometry phase,
-    emission and/or incidence angles. Only the desired bands will be created.
+    This program creates a cube where the bands represent different
+    photogrametric values such as <def>phase angle</def>,
+    <def>emission angle</def>, <def>incidience
+    angle</def>, albedo, and other values specific to the
+    instrument that acquired the image.
   </description>
 
   <oldName>
@@ -87,7 +90,15 @@
       the output label (should support camera models). Added MORPHOLOGY and 
       ALBEDO backplane options for special mosaic options.
     </change>
-</history>
+    <change name="Stuart Sides" date="2011-10-07">
+      Reviewed and added documentation with Tammy Becker and Paul Giessler.
+    </change>
+    <change name="Stuart Sides" date="2011-10-07">
+      Fixed a bug where the Detector Resolution was not being 
+      reported correctly in the output cube. The reported value
+      was completly incorrect.
+    </change>
+  </history>
 
   <category>
     <categoryItem>Radiometric and Photometric Correction</categoryItem>
@@ -142,7 +153,9 @@
         <default><item>TRUE</item></default>
         <brief>Create a phase angle band.</brief>
         <description>
-          If this parameter is true then a phase angle band will be created
+          If this parameter is true then a <def>phase angle</def> band will be
+          created in the output cube. The pixel values in units of
+          degrees.
         </description>
       </parameter>
       <parameter name="EMISSION">
@@ -150,7 +163,12 @@
         <default><item>TRUE</item></default>
         <brief>Create an emission angle band.</brief>
         <description>
-          If this parameter is true then an emission angle band will be created
+          If this parameter is true then an <def>emission angle</def> band will
+          be created
+          in the output cube. The pixel values will be in units of degrees.
+          The emission anlgle is calculated using the surface normal for
+          the elipsoid.
+          (See the LOCALEMISSION parameter also)
         </description>
       </parameter>
       <parameter name="INCIDENCE">
@@ -158,7 +176,12 @@
         <default><item>TRUE</item></default>
         <brief>Create an incidience angle band.</brief>
         <description>
-          If this parameter is true then an incidence angle band will be created
+          If this parameter is true then an <def>incidence angle</def> band 
+          will be created
+          in the output cube.  The pixel values will be in units of degrees.
+          The incidence anlgle is calculated using the surface normal for
+          the elipsoid.
+          (See the LOCALINCIDENCE parameter also)
         </description>
       </parameter>
       <parameter name="LOCALEMISSION">
@@ -166,7 +189,12 @@
         <default><item>FALSE</item></default>
         <brief>Create a local emission angle band.</brief>
         <description>
-          If this parameter is true then a local emission angle band will be created
+          If this parameter is true then a local <def>emission angle</def> band 
+          will be created in the output cube.  The pixel values will 
+          be in units of degrees. The local emission angle will be calculated
+          using the normal to the local slope as defined by the shape model
+          used in the camera. If the shape model is using the ellipsoid the
+          LOCALEMISSION angle will be the same as the EMISSION angle.
         </description>
       </parameter>
       <parameter name="LOCALINCIDENCE">
@@ -174,7 +202,12 @@
         <default><item>FALSE</item></default>
         <brief>Create a local incidience angle band.</brief>
         <description>
-          If this parameter is true then a local incidence angle band will be created
+          If this parameter is true then a local <def>incidence angle</def>
+          band will be created in the output cube. The pixel values will be
+          in units of degrees.  The local incidence angle will be calculated
+          using the normal to the local slope as defined by the shape model
+          used in the camera. If the shape model is using the ellipsoid the
+          LOCALINCIDENCE angle will be the same as the INCIDENCE angle.
         </description>
       </parameter>
       <parameter name="LATITUDE">
@@ -182,7 +215,8 @@
         <default><item>TRUE</item></default>
         <brief>Create a latitude band.</brief>
         <description>
-          If this parameter is true then a latitude band will be created
+          If this parameter is true then a latitude band will be created in
+          the output cube. The pixel values will be in units of degrees.
         </description>
       </parameter>
       <parameter name="LONGITUDE">
@@ -190,7 +224,8 @@
         <default><item>TRUE</item></default>
         <brief>Create a longitude band.</brief>
         <description>
-          If this parameter is true then a longitude band will be created
+          If this parameter is true then a longitude band will be created in
+          the output cube. The pixel values will be in units of degrees.
         </description>
       </parameter>
       <parameter name="PIXELRESOLUTION">
@@ -199,6 +234,7 @@
         <brief>Create a pixel resolution band.</brief>
         <description>
           If this parameter is true then a pixel resolution band will be created
+          in the output cube. The pixel values will be in units of meters.
         </description>
       </parameter>
       <parameter name="LINERESOLUTION">
@@ -207,7 +243,8 @@
         <brief>Create a line resolution band.</brief>
         <description>
           If this parameter is true then a line resolution band will be created
-        </description>
+          in the output cube. The pixel values will be in units of meters.
+         </description>
       </parameter>
       <parameter name="SAMPLERESOLUTION">
         <type>boolean</type>
@@ -215,8 +252,9 @@
         <brief>Create a sample resolution band.</brief>
         <description>
           If this parameter is true then a sample resolution band will be 
-          created
-        </description>
+          created in the output cube. The pixel values will be in units of
+          meters.
+         </description>
       </parameter>
       <parameter name="DETECTORRESOLUTION">
         <type>boolean</type>
@@ -224,7 +262,8 @@
         <brief>Create a detector resolution band.</brief>
         <description>
           If this parameter is true then a detector resolution band will be 
-          created
+          created in the output cube. The pixel values will be in units of
+          millimeter.
         </description>
       </parameter>
       <parameter name="NORTHAZIMUTH">
@@ -233,6 +272,7 @@
         <brief>Create a north azimuth band.</brief>
         <description>
           If this parameter is true then a north azimuth band will be created
+          in the output cube. The pixel values will be in units of degrees.
         </description>
       </parameter>
       <parameter name="SUNAZIMUTH">
@@ -241,7 +281,8 @@
         <brief>Create a sun azimuth band.</brief>
         <description>
           If this parameter is true then a sun azimuth band will be 
-          created
+          created in the ouput cube. The pixel values will be in units 
+          of degrees.
         </description>
       </parameter>
       <parameter name="SPACECRAFTAZIMUTH">
@@ -250,7 +291,8 @@
         <brief>Create a spacecraft azimuth band.</brief>
         <description>
           If this parameter is true then a spacecraft azimuth band will be 
-          created
+          created in the output cube. The pixel values will be in units
+          of degrees.
         </description>
       </parameter>
       <parameter name="OFFNADIRANGLE">
@@ -259,6 +301,7 @@
         <brief>Create a offNadir angle band.</brief>
         <description>
           If this parameter is true then a offNadir angle band will be created
+          in the output cube. The pixel values will be in units of degrees.
         </description>
       </parameter>
       <parameter name="SUBSPACECRAFTGROUNDAZIMUTH">
@@ -266,6 +309,9 @@
         <default><item>FALSE</item></default>
         <brief>Creata a sub spacecraft ground azimuth band.</brief>
         <description>
+          If this parameter is true then a subspacecraaft ground azimuth band
+          will be created in the output cube. The pixel values will be in units
+          of degrees.
           This is the clockwise angle on the ground between a line drawn from
           the ground point to the North pole of the body and a line drawn from
           the ground point to the sub spacecraft point.
@@ -276,6 +322,9 @@
         <default><item>FALSE</item></default>
         <brief>Create a sub solar ground azimuth band.</brief>
         <description>
+          If this parameter is true then a subsolar ground azimuth band
+          will be created in the output cube. The pixel values will be in units
+          of degrees.
           This is the clockwise angle on the ground between a line drawn from
           the ground point to the North pole of the body and a line drawn from
           the ground point to the sub solar point.
