@@ -124,6 +124,11 @@
       Corrected previous history entry and added references to glossary.  Also
       changed application names to bold type.
     </change>
+    <change name="Debbie A. Cook and Ken Edmundson" date="2011-10-07">
+      Removed glossary references from briefs.  Also changed the definition
+      of angles to state right ascension and declination to be consistent
+      with the output.
+    </change>
   </history>
 
   <groups>
@@ -133,7 +138,7 @@
         <type>filename</type>
         <fileMode>input</fileMode>
         <brief>
-          <def>cube</def>list
+          cube list
         </brief>
         <description>
           This file contains a list of all <def>cube</def>s in the <def>control network</def>
@@ -219,8 +224,7 @@
 
     <group name="Solve Options">
       <parameter name="OBSERVATIONS">
-        <brief> Keep instances of the same observation in different <def>cube</def> files 
-                the same</brief>
+        <brief> Keep instances of the same observation in different cube files the same</brief>
         <description>
             This option will solve for <def>SPICE</def> on all cubes with a matching
             observation number as though they were a single observation.  For 
@@ -252,7 +256,7 @@
       </parameter>
       
       <parameter name="UPDATE">
-        <brief> Update <def>cube</def> label</brief>
+        <brief> Update cube label</brief>
         <description>
             When this option is selected, the application will update the labels  
             of the individual <def>cube</def>s in the FROMLIST with the final values 
@@ -280,7 +284,7 @@
         </description>
         <list>
         <option value="SPARSE">
-          <brief>CholMod (sparse)</brief>
+          <brief>CholMod </brief>
           <description>
             Solve with CholMod sparse decomposition.
           </description>
@@ -400,7 +404,8 @@
                generate the <def>a priori</def> camera angles used in the first iteration.  
                In the case of an instrument with a jitter problem, a higher 
                degree polynomial fit to each of the camera angles might provide 
-               a better solution (smaller errors).
+               a better solution (smaller errors).  For framing cameras, the application
+               automatically sets degree to 1. 
         </description>
       </parameter>
       <parameter name="CAMSOLVE">
@@ -423,11 +428,15 @@
           </option>
 
           <option value="ANGLES">
-            <brief>Solve for camera angles: angle1 and angle2, and optionally twist</brief>
+            <brief>Solve for camera angles: right ascension, declination and optionally 
+                   twist
+            </brief>
             <description>
                    Camera angles in each <def>cube</def> will be adjusted in the solution, 
-                   but not angular velocities or accelerations. Adjustments are 
-                   not applied unless the solution converges and UPDATE is 
+                   but not angular velocities or accelerations. Solving for the first two
+                   camera angles translates images in sample and line.  Adding the third
+                   angle to the solution (TWIST option) allows for rotation corrections.
+                   Adjustments are not applied unless the solution converges and UPDATE is 
                    selected.
             </description>
           </option>
@@ -435,16 +444,15 @@
           <option value="VELOCITIES">
             <brief>Solve for camera angles AND their angular velocities</brief>
             <description>
-                   Camera angles (angle1, angle2, and optionally twist) and 
-                   their angular velocities will be adjusted in the solution.
+                   Camera angles and their angular velocities will be adjusted in the
+                   solution.
             </description>
           </option>
 
           <option value="ACCELERATIONS">
             <brief>Solve for camera angles, their angular velocities and accelerations</brief>
             <description>
-                   Camera angles (angle1, angle2, and optionally twist), 
-                   the angular velocities and accelerations will be 
+                   Camera angles, their angular velocities, and accelerations will be 
                    adjusted in the solution.
             </description>
           </option>
