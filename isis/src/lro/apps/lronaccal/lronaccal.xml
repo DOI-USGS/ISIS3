@@ -146,8 +146,10 @@
         </brief>
         <description>
         </description>
-        <inclusions><item>OffsetFile</item></inclusions>
-        <inclusions><item>NonlinearityFile</item></inclusions>
+        <inclusions>
+          <item>OffsetFile</item>
+          <item>NonlinearityFile</item>
+        </inclusions>
       </parameter>
       
       <parameter name="OffsetFile">
@@ -203,8 +205,10 @@
         </brief>
         <description>
         </description>
-        <inclusions><item>RadiometricType</item></inclusions>
-        <inclusions><item>RadiometricFile</item></inclusions>
+        <inclusions>
+          <item>RadiometricType</item>
+          <item>RadiometricFile</item>
+        </inclusions>
       </parameter>
       
       <parameter name="RadiometricType">
