@@ -49,11 +49,9 @@
   </category>
 
   <seeAlso>
-    <application>
-      <item>
-        voycal
-      </item>
-    </application>
+    <applications>
+      <item>voycal</item>
+    </applications>
   </seeAlso>
 
   <groups>
