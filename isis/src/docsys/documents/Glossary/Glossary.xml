@@ -71,7 +71,7 @@
 
           <definition name="Cube Serial Number">
             A unique identifier associated with a specific image and its
-            derivitive images.
+            derivative images.
           </definition>
 
           <definition name="Digital Number">

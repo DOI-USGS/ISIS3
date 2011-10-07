@@ -21,15 +21,12 @@
     <a href="../findimageoverlaps/findimageoverlaps.html" target="_blank">
     findimageoverlaps</a> run to produce the input for this application.
     </p>
-
     <p>
-    Statistics for the area, 
-    <a href="../../../../documents/Glossary/Glossary.html#PolygonThickness"
-      target="_blank">thickness</a>, and image stack size of the polygons
-    are calculated. These statistics include minimum, maximum, average, standard
-    deviation, and variance. Area refers to the area of the polygon in square
-    meters. Image stack is the number of images that overlap for a given overlap
-    region.
+     Statistics for the area, <def>polygon thickness</def>, and image stack
+     size of the polygons are calculated. These statistics include minimum,
+     maximum, average, standard deviation, and variance. Area refers to the area
+     of the polygon in square meters. Image stack is the number of images that
+     overlap for a given overlap region.
     </p>
     <p>
     If there are any cubes within the list that do not overlap with
@@ -225,12 +222,11 @@
           Place all cube serial numbers on the same CVS line
         </brief>
         <description>
-          Places all <a
-           href="../../../../documents/Glossary/Glossary.html#CubeSerialNumber"
-           target="_blank">cube serial numbers</a> and filenames on the same
-          line in the output file. When False, Serial Numbers and Filenames are
-          placed in columns for better human readability. This option is only
-          available when the output is in CSV format.
+          Places all <def link="Cube Serial Number">cube serial numbers</def>
+          and filenames on the same line in the output file. When False, Serial
+          Numbers and Filenames are placed in columns for better human
+          readability. This option is only available when the output is in CSV
+          format.
         </description>
       </parameter>
 
