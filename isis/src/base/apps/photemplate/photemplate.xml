@@ -83,7 +83,7 @@
       Original version
     </change>
     <change name="Janet Barrett" date="2011-09-23">
-      The entire user interface has been redesigned. The previous version of this 
+      1) The entire user interface has been redesigned. The previous version of this 
       program made use of radio button lists to allow the user to choose a photometric
       model or an atmospheric model. In order to make the program more compact, the
       radio button lists were replaced with drop down menus. When an option is chosen
@@ -91,12 +91,23 @@
       Parameters that don't apply to that option remain hidden. This helps to make the
       interface look less cluttered than it did when every parameter and every option
       were visible all the time. 
-      The "NORMALIZATION" option is no longer available in this program. This program's
+      2) The "NORMALIZATION" option is no longer available in this program. This program's
       main use is to create files with preset photometric and atmospheric values for use
       with various planets. The normalization models are not specific to individual 
       planets like the atmospheric and photometric models are. The normalization mode
       is only used in the photomet program, so this information now needs to be 
       provided through photomet.
+      3) The PVL parameter was replaced with the TOPVL parameter. The PHOTOMETRIC
+      parameter was replaced with PHTNAME. The ATMOSPHERIC parameter was replaced with
+      ATMNAME.
+      4) The BHAREF, HGAREF, and WHAREF parameters were removed because they have
+      become obsolete.
+      5) The Hapke Legendre (HAPKELEG), empirical Minnaert (MINNAERTEMPIRICAL), and
+      empirical Lunar Lambert (LUNARLAMBERTEMPIRICAL) photometric functions have
+      been added.
+      6) Documentation describing the parameters is still central to the photomet
+      program. The documentation will be moved into this program in the next ISIS
+      release.
     </change>
   </history>
 
