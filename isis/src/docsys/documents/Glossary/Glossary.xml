@@ -31,7 +31,7 @@
 
           <definition name="Byte">
             Short for binary term. A byte is a collection of computer bits. On
-            many modern computers, a byte is a group of eight bits. Typically,
+            most modern computers, a byte is a group of eight bits. Typically,
             computers handle and store information in binary (base-2), and a
             group of eight bits represents an eight digit binary number.
           </definition>
@@ -47,7 +47,7 @@
           </definition>
 
           <definition name="Control Network">
-            A network of Control Points.  By default this is a binary file
+            A network of Control Points.  A file
             containing fields of information for control points and measures
             between a collection of any number of images.
           </definition>
@@ -70,12 +70,15 @@
           </definition>
 
           <definition name="Cube Serial Number">
-            A unique identifier assigned to a specific observation.
+            A unique identifier associated with a specific image and its
+            derivitive images.
           </definition>
 
           <definition name="Digital Number">
-            Digital Numbers are a subset of integers, more specifically positive
-            integers.
+            The numeric value of a single pixel in an image. The value may
+            represent almost any unit. For example: reflectance, radiance,
+            elevation, or radius. DNs can be discrete integers or floating
+            point values. 
           </definition>
 
           <definition name="Elevation">
