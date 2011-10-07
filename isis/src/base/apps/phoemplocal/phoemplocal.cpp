@@ -184,7 +184,7 @@ void IsisMain() {
     inclusion.push_back("TAU");
     inclusion.push_back("WHA");
     inclusion.push_back("HNORM");
-    inclusion.push_back("IORD");
+    inclusion.push_back("ADDOFFSET");
 
     if (sAsmType=="ANISOTROPIC1" || sAsmType=="ANISOTROPIC2" ){
       inclusion.push_back("BHA");

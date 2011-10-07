@@ -9,37 +9,34 @@
   <description>
     <pre>
     This program finds lunar-Lambert or Minnaert photometric functions
-    to approximate a more realistic but more complex Hapke model.
-    The program is based on PHO_FIT_GLOBAL with the following differences:
-    The fit is performed at a single geometry rather than for a range of phase 
+    to approximate a more realistic but more complex Hapke model. The fit
+    is performed at a single geometry rather than for a range of phase 
     angles.  The user specifies the phase angle and the incidence and emission 
-    angles of the mean ground plane (datum), as well as the RMS slope relative to 
-    the dataum.  Artificial data are then created, with slopes drawn from an 
-    isotropic Gaussian distribution relative to the datum.  The simpler model is 
-    fit at these orientations to the Hapke model by adjusting its one parameter 
-    and its overall brightness so that the sum-squared-residual between the two is 
-    minimized.  Both the parameter (which, for both types of simple model, mainly 
-    controls limb darkening) and the brightness (normalized as an empirical phase 
-    curve) are reported.
+    angles of the mean ground plane (datum), as well as the RMS (root mean
+    squared) slope relative to the dataum.  Artificial data are then created, 
+    with slopes drawn from an isotropic Gaussian distribution relative to the 
+    datum.  The simpler model is fit at these orientations to the Hapke model 
+    by adjusting its one parameter and its overall brightness so that the 
+    sum-squared-residual between the two is minimized.  Both the parameter 
+    (which, for both types of simple model, mainly controls limb darkening) 
+    and the brightness (normalized as an empirical phase curve) are reported.
 
     This program should serve as a clear example for developing a new program 
-    PHO_FIT_IMAGE to fit the parameter of an empirical photometric function to 
-    part of an actual image. The differences can be summarized as follows:
+    to fit the parameter of an empirical photometric function to part of an
+    actual image. The differences can be summarized as follows:
          1) Fit is done only once (not in a table vs. phase angle)
             since the input image has a fixed geometry.
          2) The data to be fit *to* are obtained from an ISIS cube plane
-           rather than calculated in GET_HAPKE_IMG.
+            rather than modeled in in the code.
          3) Similarly, the incidence, emission, and phase angles are
             obtained from backplanes of the same cube and maintained
             in buffers corresponding point-for-point with the image.
-            The routine to pull values out of these buffers at the
-            current pixel can look identical to GET_ANGLES.
-         4) Both image data and angles should be stored in R*4 buffers
-            and converted to double precision before being used.
+         4) Both image data and angles should be converted to double
+            precision before being used.
          5) Optionally, a region-of-interest mask could be obtained
             from a backplane and only those pixels in the ROI used
-            in the fit.  This would be in addition on the incidence
-            and emission angle tests already in the code.
+            in the fit.  This would be in addition to the incidence
+            and emission angle tests already done in the code.
     </pre>
   </description>
 
@@ -59,6 +56,9 @@
       Isis3 Original version, pho_emp_local ported from isis2 to isis3 
       phoemplocal 
     </change>
+    <change name="Randy Kirk" date="2011-09-25">
+      Updated documentation for the phoemplocal program
+    </change>
   </history>
 
   <groups>
@@ -73,8 +73,8 @@
           None Specified
         </internalDefault>
         <description>
-          The output file has a table whose columns give the phase angle,
-          best-fit limb darkening parameter, best-fit brightness both in absolute units
+          The output file will contain the phase angle, best-fit limb
+          darkening parameter, best-fit brightness both in absolute units
           and relative to the zero phase model and RMS residual to the fit.
         </description>
         <filter>
@@ -283,9 +283,10 @@
         </brief>
         <description>
           Determines which empirical photometric function will be fitted
-          to the Hapke model. The tables of B and L or B and K can be used with
-          the lunar-Lambert empirical or Minnaert empirical photometric
-          functions in the photometric normalization program photomet.
+          to the Hapke model. The values of brightness and limb darkening
+          can be used with the lunar-Lambert empirical or Minnaert empirical 
+          photometric functions in the photometric normalization program 
+          photomet.
         </description>
         <list>
           <option value="LUNARLAMBERT">
@@ -336,12 +337,12 @@
           (more accurate) approximation. Atmospheric scattering in all these
           models both attenuates the surface signal and adds its own (uniform)
           contribution to the image radiance. Therefore, unless NONE is
-          selected, it makes sense to also set IORD=YES so that the additive
+          selected, it makes sense to also set ADDOFFSET=YES so that the additive
           contribution of the atmosphere will be modeled by an additive
           constant in the fit. This approach is useful in preparing for 
           photoclinometry (shape from shading), for which images are normally
           preprocessed by subtracting a uniform haze component that corresponds
-          to the additive term in the fit with IORD=YES.
+          to the additive term in the fit with ADDOFFSET=YES.
         </description>
         <list>  
           <option value="NONE">
@@ -357,7 +358,7 @@
               <item>WHA</item>
               <item>HGA</item>
               <item>HNORM</item>
-              <item>IORD</item>
+              <item>ADDOFFSET</item>
               <item>BHA</item>
             </exclusions>
           </option>
@@ -374,7 +375,7 @@
               <item>TAU</item>
               <item>WHA</item>
               <item>HNORM</item>
-              <item>IORD</item>
+              <item>ADDOFFSET</item>
             </inclusions>
             <exclusions>
               <item>HGA</item>
@@ -394,7 +395,7 @@
               <item>TAU</item>
               <item>WHA</item>
               <item>HNORM</item>
-              <item>IORD</item>
+              <item>ADDOFFSET</item>
             </inclusions>
             <exclusions>
               <item>HGA</item>
@@ -415,7 +416,7 @@
               <item>WHA</item>
               <item>BHA</item>
               <item>HNORM</item>
-              <item>IORD</item>
+              <item>ADDOFFSET</item>
             </inclusions>
             <exclusions>
               <item>HGA</item>
@@ -435,7 +436,7 @@
               <item>WHA</item>
               <item>BHA</item>
               <item>HNORM</item>
-              <item>IORD</item>
+              <item>ADDOFFSET</item>
             </inclusions>
             <exclusions>
               <item>HGA</item>
@@ -462,7 +463,7 @@
               <item>WHA</item>
               <item>HGA</item>
               <item>HNORM</item>
-              <item>IORD</item>
+              <item>ADDOFFSET</item>
             </inclusions>
             <exclusions>
               <item>BHA</item>
@@ -489,7 +490,7 @@
               <item>WHA</item>
               <item>HGA</item>
               <item>HNORM</item>
-              <item>IORD</item>
+              <item>ADDOFFSET</item>
             </inclusions>
             <exclusions>
               <item>BHA</item>
@@ -569,7 +570,7 @@
         </description>
       </parameter>
 
-      <parameter name="IORD">
+      <parameter name="ADDOFFSET">
         <type>boolean</type>
         <brief>
           Allow additive offset in fit
