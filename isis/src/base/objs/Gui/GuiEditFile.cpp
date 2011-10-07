@@ -258,7 +258,7 @@ namespace Isis {
       }
     }
     else {
-      m_txtEdit->append("\nThis file cannot be edited. Please check the file's Read/Write permissions");
+      m_txtEdit->append("\nThis file cannot be edited. Please check the file's Write permissions");
     }
     m_textChanged = false;
   }
