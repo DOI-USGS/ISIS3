@@ -998,9 +998,9 @@
             <description>
               This model combines a weighted sum of the LommelSeeliger and
               Lambert models. Given a suitable value for the LunarLambert
-                          function weight, L, this model fits the true reflectance behavior
-                          of many planetary surfaces equally well as the Hapke model. This
-                          model also depends on the incidence and emission angles.
+              function weight, L, this model fits the true reflectance behavior
+              of many planetary surfaces equally well as the Hapke model. This
+              model also depends on the incidence and emission angles.
             </description>
             <inclusions>
               <item>K</item>
@@ -1589,69 +1589,6 @@
               <item>XB2</item>
             </exclusions>
           </option>
-          <option value="SHADEATM">
-            <brief>
-              Shade Normalization Model With Atmosphere
-            </brief>
-            <description>
-              Normalization with atmosphere. The surface photometric function is
-              used to simulate an image by relief shading, just like the Shade
-              model, but the effects of atmospheric scattering are also included
-              in the calculation.
-            </description>
-            <inclusions>
-              <item>ATMNAME</item>
-              <item>INCREF</item>
-              <item>ALBEDO</item>
-            </inclusions>
-            <exclusions>
-              <item>INCMAT</item>
-              <item>THRESH</item>
-              <item>D</item>
-              <item>E</item>
-              <item>F</item>
-              <item>G2</item>
-              <item>XMUL</item>
-              <item>WL</item>
-              <item>H</item>
-              <item>BSH1</item>
-              <item>XB1</item>
-              <item>XB2</item>
-            </exclusions>
-          </option>
-          <option value="TOPOATM">
-            <brief>
-              Topographic Normalization Model With Atmosphere
-            </brief>
-            <description>
-              Normalization with atmosphere. As with the Topo model, this option
-              is used in the final step of a three step  process: (1) normalize
-              with the AlbedoAtm model, Incref=0, and Tauref=0 to temporarily
-              remove atmosphere and normalize albedo variations; (2) use
-              highpass divide filter to remove albedo variations; and (3)
-              normalize with the TopoAtm model to undo the temporary
-              normalization and equalize topographic shading.
-            </description>
-            <inclusions>
-              <item>ATMNAME</item>
-              <item>INCREF</item>
-              <item>ALBEDO</item>
-            </inclusions>
-            <exclusions>
-              <item>INCMAT</item>
-              <item>THRESH</item>
-              <item>D</item>
-              <item>E</item>
-              <item>F</item>
-              <item>G2</item>
-              <item>XMUL</item>
-              <item>WL</item>
-              <item>H</item>
-              <item>BSH1</item>
-              <item>XB1</item>
-              <item>XB2</item>
-            </exclusions>
-          </option>
           <option value="ALBEDO">
             <brief>
               Albedo Normalization Model
@@ -1775,6 +1712,36 @@
               <item>BHA</item>
             </exclusions>
           </option>
+          <option value="SHADEATM">
+            <brief>
+              Shade Normalization Model With Atmosphere
+            </brief>
+            <description>
+              Normalization with atmosphere. The surface photometric function is
+              used to simulate an image by relief shading, just like the Shade
+              model, but the effects of atmospheric scattering are also included
+              in the calculation.
+            </description>
+            <inclusions>
+              <item>ATMNAME</item>
+              <item>INCREF</item>
+              <item>ALBEDO</item>
+            </inclusions>
+            <exclusions>
+              <item>INCMAT</item>
+              <item>THRESH</item>
+              <item>D</item>
+              <item>E</item>
+              <item>F</item>
+              <item>G2</item>
+              <item>XMUL</item>
+              <item>WL</item>
+              <item>H</item>
+              <item>BSH1</item>
+              <item>XB1</item>
+              <item>XB2</item>
+            </exclusions>
+          </option>
           <option value="SHADE">
             <brief>
                 Shade Normalization Model
@@ -1811,6 +1778,39 @@
               <item>TAUREF</item>
               <item>HGA</item>
               <item>BHA</item>
+            </exclusions>
+          </option>
+          <option value="TOPOATM">
+            <brief>
+              Topographic Normalization Model With Atmosphere
+            </brief>
+            <description>
+              Normalization with atmosphere. As with the Topo model, this option
+              is used in the final step of a three step  process: (1) normalize
+              with the AlbedoAtm model, Incref=0, and Tauref=0 to temporarily
+              remove atmosphere and normalize albedo variations; (2) use
+              highpass divide filter to remove albedo variations; and (3)
+              normalize with the TopoAtm model to undo the temporary
+              normalization and equalize topographic shading.
+            </description>
+            <inclusions>
+              <item>ATMNAME</item>
+              <item>INCREF</item>
+              <item>ALBEDO</item>
+            </inclusions>
+            <exclusions>
+              <item>INCMAT</item>
+              <item>THRESH</item>
+              <item>D</item>
+              <item>E</item>
+              <item>F</item>
+              <item>G2</item>
+              <item>XMUL</item>
+              <item>WL</item>
+              <item>H</item>
+              <item>BSH1</item>
+              <item>XB1</item>
+              <item>XB2</item>
             </exclusions>
           </option>
           <option value="TOPO">
