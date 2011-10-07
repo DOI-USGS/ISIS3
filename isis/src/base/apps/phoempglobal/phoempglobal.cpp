@@ -117,7 +117,7 @@ void IsisMain() {
   empPvl.AddObject(PvlObject("PhotometricModel"));
   empPvl.FindObject("PhotometricModel").AddGroup(PvlGroup("Algorithm"));
   empPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
-        AddKeyword(PvlKeyword("PhtName", sEmpirical), Pvl::Replace);;
+        AddKeyword(PvlKeyword("PhtName", sEmpirical), Pvl::Replace);
   PhotoModel *empModel = PhotoModelFactory::Create(empPvl);
   
   // Order of approximation in atmospheric scatter model
