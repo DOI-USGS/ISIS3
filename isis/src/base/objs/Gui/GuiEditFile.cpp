@@ -244,7 +244,7 @@ namespace Isis {
     m_editFile = new QFile(psOutFile);
     //m_editWin->setWindowTitle(Filename(psOutFile.toStdString()).Name().c_str());
     windowTitle(psOutFile);
-    
+
     if (m_editFile->open(QIODevice::ReadWrite)){
       char buf[1024];
       QString bufStr;
@@ -256,6 +256,9 @@ namespace Isis {
         m_txtEdit->append(bufStr);
         lineLength = m_editFile->readLine(buf, sizeof(buf));
       }
+    }
+    else {
+      m_txtEdit->append("\nThis file cannot be edited. Please check the file's Read/Write permissions");
     }
     m_textChanged = false;
   }

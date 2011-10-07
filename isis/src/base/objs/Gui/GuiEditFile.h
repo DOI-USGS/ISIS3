@@ -41,7 +41,9 @@ namespace Isis {
   * @author Sharmila Prasad
   *
   * @internal
-  * @history 2011-05-21  Sharmila Prasad - Initial Version
+  * @history 2011-05-21  Sharmila Prasad - Initial Version 
+  * @history 2011-10-07  Sharmila Prasad - Added message if the file does not have  
+  *                      write permissions and is unable to load it. 
   */
   
   class GuiEditFile : public QObject {
