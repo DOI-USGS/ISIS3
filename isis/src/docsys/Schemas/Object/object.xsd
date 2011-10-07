@@ -502,20 +502,21 @@
       <xs:enumeration value="Chandrayaan"/>
       <xs:enumeration value="Clementine"/>
       <xs:enumeration value="Dawn"/>
-      <xs:enumeration value="Mariner"/>
       <xs:enumeration value="Galileo"/>
+      <xs:enumeration value="Kaguya"/>
       <xs:enumeration value="Lunar Orbiter"/>
       <xs:enumeration value="Lunar Reconnaissance Orbiter"/>
+      <xs:enumeration value="Mariner"/>
+      <xs:enumeration value="Mars Exploration Rover"/>
       <xs:enumeration value="Mars Express"/>
-      <xs:enumeration value="Mars Reconnaissance Orbiter"/>
       <xs:enumeration value="Mars Global Surveyor"/>
       <xs:enumeration value="Mars Odyssey"/>
-      <xs:enumeration value="Mars Exploration Rover"/>
+      <xs:enumeration value="Mars Reconnaissance Orbiter"/>
       <xs:enumeration value="Messenger"/>
       <xs:enumeration value="Robotic Lunar Observatory"/>
       <xs:enumeration value="Small Missions for Advanced Research and Technology 1"/>
-      <xs:enumeration value="Voyager"/>
       <xs:enumeration value="Viking"/>
+      <xs:enumeration value="Voyager"/>
     </xs:restriction>
   </xs:simpleType>
   <xs:element name="target" type="audienceType">
