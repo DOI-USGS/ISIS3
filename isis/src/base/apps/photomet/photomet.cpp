@@ -1436,7 +1436,6 @@ void IsisMain() {
   if (normName == "ALBEDOATM" || normName == "SHADEATM" || normName == "TOPOATM") {
     par.AddObject(atmObj);
   }
-cout << par << endl;
 
   // Set value for maximum emission/incidence angles chosen by user
   maxema = ui.GetDouble("MAXEMISSION");
