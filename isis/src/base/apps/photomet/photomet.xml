@@ -478,7 +478,13 @@
       6) The NONORMALIZATION model was removed because it duplicated the functionality
          of the SHADE model.
       7) More photometric models have been added. The Hapke Legendre, Minnaert Empirical,
-         and Lunar Lambert Empirical models have been added. 
+         and Lunar Lambert Empirical models have been added. The Minnaert Empirical
+         model has parameters PHASELIST, PHASECURVELIST, and KLIST associated with it.
+         The information for the new parameters is a list of comma delimited values
+         (phase angle goes in PHASELIST, brightness values go in PHASECURVELIST, and
+         limb darkening values go in KLIST). The Lunar Lambert Empirical model has
+         parameters PHASELIST, PHASECURVELIST, and LLIST where LLIST is similar to the
+         KLIST parameter for Minnaert Empirical.
       8) A USEDEM parameter has been added which allows the user to determine which
          photometric angles to use for trimming. If the USEDEM parameter is set to false,
          then the photometric angles of the ellipsoid are used. If USEDEM is set to true,

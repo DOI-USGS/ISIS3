@@ -84,8 +84,7 @@ void LoadPvl() {
         } else if (phtGrp->HasKeyword("NAME")) {
           phtVal = (string)phtGrp->FindKeyword("NAME");
         } else {
-          string message = "The FROMPVL file must have a PHTNAME or NAME keyword specifying the photometric model type";
-          throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+          phtVal = "NONE";
         }
         phtVal = phtVal.UpCase();
         if (phtName == phtVal) {
@@ -101,8 +100,7 @@ void LoadPvl() {
               } else if (phtGrp->HasKeyword("NAME")) {
                 phtVal = (string)phtGrp->FindKeyword("NAME");
               } else {
-                string message = "The FROMPVL file must have a PHTNAME or NAME keyword specifying the photometric model type";
-                throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+                phtVal = "NONE";
               }
               phtVal = phtVal.UpCase();
               if (phtName == phtVal) {
@@ -134,8 +132,7 @@ void LoadPvl() {
           } else if (phtGrp->HasKeyword("NAME")) {
             phtVal = (string)phtGrp->FindKeyword("NAME");
           } else {
-            string message = "The FROMPVL file must have a PHTNAME or NAME keyword specifying the photometric model type";
-            throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+            phtVal = "NONE";
           }
           phtVal = phtVal.UpCase();
           if (phtVal == "HAPKEHEN" || phtVal == "HAPKELEG") {
@@ -253,8 +250,7 @@ void LoadPvl() {
         } else if (nrmGrp->HasKeyword("NAME")) {
           nrmVal = (string)nrmGrp->FindKeyword("NAME");
         } else {
-          string message = "The FROMPVL file must have a NORMNAME or NAME keyword specifying the normalization model type";
-          throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+          nrmVal = "NONE";
         }
         nrmVal = nrmVal.UpCase();
         if (nrmName == nrmVal) {
@@ -268,8 +264,7 @@ void LoadPvl() {
               } else if (nrmGrp->HasKeyword("NAME")) {
                 nrmVal = (string)nrmGrp->FindKeyword("NAME");
               } else {
-                string message = "The FROMPVL file must have a NORMNAME or NAME keyword specifying the normalization model type";
-                throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+                nrmVal = "NONE";
               }
               nrmVal = nrmVal.UpCase();
               if (nrmName == nrmVal) {
@@ -304,8 +299,7 @@ void LoadPvl() {
           } else if (nrmGrp->HasKeyword("NAME")) {
             nrmVal = (string)nrmGrp->FindKeyword("NAME");
           } else {
-            string message = "The FROMPVL file must have a NORMNAME or NAME keyword specifying the normalization model type";
-            throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+            nrmVal = "NONE";
           }
           nrmVal = nrmVal.UpCase();
           if (nrmVal != "MOONALBEDO") {
@@ -490,8 +484,7 @@ void LoadPvl() {
         } else if (atmGrp->HasKeyword("NAME")) {
           atmVal = (string)atmGrp->FindKeyword("NAME");
         } else {
-          string message = "The FROMPVL file must have a ATMNAME or NAME keyword specifying the atmospheric model type";
-          throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+          atmVal = "NONE";
         }
         atmVal = atmVal.UpCase();
         if (atmName == atmVal) {
@@ -505,8 +498,7 @@ void LoadPvl() {
               } else if (atmGrp->HasKeyword("NAME")) {
                 atmVal = (string)atmGrp->FindKeyword("NAME");
               } else {
-                string message = "The FROMPVL file must have a ATMNAME or NAME keyword specifying the atmospheric model type";
-                throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+                atmVal = "NONE";
               }
               atmVal = atmVal.UpCase();
               if (atmName == atmVal) {
@@ -532,8 +524,7 @@ void LoadPvl() {
         } else if (atmGrp->HasKeyword("NAME")) {
           atmVal = (string)atmGrp->FindKeyword("NAME");
         } else {
-          string message = "The FROMPVL file must have a ATMNAME or NAME keyword specifying the atmospheric model type";
-          throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+          atmVal = "NONE";
         }
         atmVal = atmVal.UpCase();
         if (atmVal == "ANISOTROPIC1" || atmVal == "ANISOTROPIC2" ||
@@ -637,8 +628,7 @@ void IsisMain() {
         } else if (fromNormGrp->HasKeyword("NAME")) {
           normVal = (string)fromNormGrp->FindKeyword("NAME");
         } else {
-          string message = "The FROMPVL file must have a NORMNAME or NAME keyword specifying the normalization model type";
-          throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+          normVal = "NONE";
         }
         normVal = normVal.UpCase();
         if (normName == normVal) {
@@ -652,8 +642,7 @@ void IsisMain() {
               } else if (fromNormGrp->HasKeyword("NAME")) {
                 normVal = (string)fromNormGrp->FindKeyword("NAME");
               } else {
-                string message = "The FROMPVL file must have a NORMNAME or NAME keyword specifying the normalization model type";
-                throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+                normVal = "NONE";
               }
               normVal = normVal.UpCase();
               if (normName == normVal) {
@@ -1019,8 +1008,7 @@ void IsisMain() {
           } else if (fromAtmGrp->HasKeyword("NAME")) {
             atmVal = (string)fromAtmGrp->FindKeyword("NAME");
           } else {
-            string message = "The FROMPVL file must have a ATMNAME or NAME keyword specifying the atmospheric model type";
-            throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+            atmVal = "NONE";
           }
           atmVal = atmVal.UpCase();
           if (atmName == atmVal) {
@@ -1034,8 +1022,7 @@ void IsisMain() {
                 } else if (fromAtmGrp->HasKeyword("NAME")) {
                   atmVal = (string)fromAtmGrp->FindKeyword("NAME");
                 } else {
-                  string message = "The FROMPVL file must have a ATMNAME or NAME keyword specifying the atmospheric model type";
-                  throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+                  atmVal = "NONE";
                 }
                 atmVal = atmVal.UpCase();
                 if (atmName == atmVal) {
@@ -1193,8 +1180,7 @@ void IsisMain() {
         } else if (fromPhtGrp->HasKeyword("NAME")) {
           phtVal = (string)fromPhtGrp->FindKeyword("NAME");
         } else {
-          string message = "The FROMPVL file must have a PHTNAME or NAME keyword specifying the photometric model type";
-          throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+          phtVal = "NONE";
         }
         phtVal = phtVal.UpCase();
         if (phtName == phtVal) {
@@ -1208,8 +1194,7 @@ void IsisMain() {
               } else if (fromPhtGrp->HasKeyword("NAME")) {
                 phtVal = (string)fromPhtGrp->FindKeyword("NAME");
               } else {
-                string message = "The FROMPVL file must have a PHTNAME or NAME keyword specifying the photometric model type";
-                throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+                phtVal = "NONE";
               }
               phtVal = phtVal.UpCase();
               if (phtName == phtVal) {
