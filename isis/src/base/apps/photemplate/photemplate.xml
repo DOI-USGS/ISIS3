@@ -108,6 +108,13 @@
       6) Documentation describing the parameters is still central to the photomet
       program. The documentation will be moved into this program in the next ISIS
       release.
+      7) Helper buttons were added to the FROMPVL to allow you to View a PVL or to Load
+      a PVL. PLEASE NOTE: When loading a Minnaert Empirical or Lunar Lambert Empirical
+      model from a PVL, only the first value will be loaded into the GUI. This is
+      a known problem and will be fixed in the next patch or release to ISIS.
+      8) ***NOTE*** The Minnaert Empirical and Lunar Lambert Empirical models do not
+      load properly from a PVL file when using the Load Pvl helper button. This is
+      a known problem and will be fixed in the next patch or release of ISIS.
     </change>
   </history>
 
