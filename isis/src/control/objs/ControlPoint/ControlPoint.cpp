@@ -294,18 +294,15 @@ namespace Isis {
       adjustedSurfacePoint.SetRadii(majorRad, minorRad, polarRad);
     }
 
+    referenceExplicitlySet = false;
+
     for (int m = 0 ; m < fileEntry.measures_size() ; m++) {
       ControlMeasure *measure = new ControlMeasure(fileEntry.measures(m));
       AddMeasure(measure);
     }
 
     if (fileEntry.has_referenceindex()) {
-      referenceExplicitlySet = true;
-      referenceMeasure =
-        (*measures)[cubeSerials->at(fileEntry.referenceindex())];
-    }
-    else {
-      referenceExplicitlySet = false;
+      SetRefMeasure((*measures)[cubeSerials->at(fileEntry.referenceindex())]);
     }
   }
 

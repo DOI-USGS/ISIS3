@@ -313,6 +313,10 @@ namespace Isis {
    *                           the copy constructor.
    *   @history 2011-10-06 Steven Lambright - Radii provided in the protocol
    *                           buffer constructor can now be invalid. 
+   *   @history 2011-10-07 Steven Lambright and Stuart Sides - Fixed bug in the
+   *                           constructor given a protocol buffer. This caused
+   *                           unpredictable reference measure behaviour
+   *                           sometimes (rarely).
    */
   class ControlPoint : public QObject {
 
