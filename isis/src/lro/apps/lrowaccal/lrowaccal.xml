@@ -109,8 +109,10 @@
         </brief>
         <description>
         </description>
-        <inclusions><item>RadiometricType</item></inclusions>
-        <inclusions><item>RadiometricFile</item></inclusions>
+        <inclusions>
+          <item>RadiometricType</item>
+          <item>RadiometricFile</item>
+        </inclusions>
       </parameter>
       
       <parameter name="RadiometricType">
