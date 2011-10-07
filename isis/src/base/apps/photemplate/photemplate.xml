@@ -9,35 +9,29 @@
 
   <description>
     <pre>
-     This program creates a PVL template to be used in photomet for photometric 
-     correction. There are three types of correction that can be applied in
-     photomet:
+     This program creates a PVL template to be used in photometry-based
+     applications (such as photomet). There are two types of correction that 
+     can be specified by this program:
   
       1) Photometric
       2) Atmospheric
-      3) Normalization
       
      Photometric correction applies to the surface of an image. Atmospheric 
      correction applies to the atmosphere through which an image was acquired. 
-     Normalization is the method in which the photometric and atmospheric 
-     corrections are applied. 
-      
-     The photomet program requires at least that the user specify a photometric 
-     option and a normalization option. The atmospheric correction is only valid 
-     if one of the following normalization models is being used: AlbedoAtm,
-     ShadeAtm, TopoAtm. 
+
+     This program will allow the user to provide a FROMPVL file that has some
+     preset parameters for different photometric and atmospheric models. Each
+     planet has different surface and atmospheric properties that require model
+     specifications that won't be applicable to other planets. It is important
+     to set up the models and their parameters that apply to the planetary data
+     you are working with.
 
      Example output files: 
       Example 1:
 
       Object = PhotometricModel 
        Group = Algorithm
-          Name = Lambert
-        EndGroup
-      EndObject
-      Object = NormalizationModel
-        Group = Algorithm
-          Name = Shade
+          PhtName = Lambert
         EndGroup
       EndObject
       
@@ -45,17 +39,8 @@
       
       Object = PhotometricModel
         Group = Algorithm
-          Name = Minnaert
+          PhtName = Minnaert
           K = .5
-        EndGroup
-      EndObject
-      Object = NormalizationModel
-        Group = Algorithm
-          Name = Albedo
-          Incref = 0.0
-          Incmat = 0.0
-          Albedo = 1.0
-          Thresh = 30.0
         EndGroup
       EndObject
       
@@ -64,17 +49,6 @@
       Object = PhotometricModel
         Group  = Algorithm
           Name = Moonpr
-        EndGroup
-      EndObject
-      Object = NormalizationModel
-        Group = Algorithm
-          Name = MoonAlbedo
-          D = 0.0
-          E = -0.222
-          F = 0.5
-          G2 = 0.39
-          H = 0.062
-          Bsh1 = 2.31
         EndGroup
       EndObject
       
@@ -101,13 +75,6 @@
           Hga = 0.68
         EndGroup
       EndObject
-      Object = NormalizationModel
-        Group = Algorithm
-          Name = AlbedoAtm
-          Incref = 0.0
-        EndGroup
-      EndObject
-
     </pre>
   </description>
 
@@ -503,10 +470,11 @@
       </parameter>
     
       <parameter name="THETA">
-        <type>double</type>
+        <type>string</type>
         <brief>
           Macroscopic Roughness Angle
         </brief>
+        <default><item>None Specified</item></default>
         <internalDefault>None Specified</internalDefault>
         <description>
           The Hapke macroscopic roughness component.
@@ -516,10 +484,11 @@
       </parameter>
 
       <parameter name="WH">
-        <type>double</type>
+        <type>string</type>
         <brief>
           Single Scattering Albedo
         </brief>
+        <default><item>None Specified</item></default>
         <internalDefault>None Specified</internalDefault>
         <description>
           The Hapke single scattering albedo component.
@@ -529,10 +498,11 @@
       </parameter>
 
       <parameter name="HG1">
-        <type>double</type>
+        <type>string</type>
         <brief>
           Hapke Henyey Greenstein Coefficient
         </brief>
+        <default><item>None Specified</item></default>
         <internalDefault>None Specified</internalDefault>
         <description>
           The Hapke Henyey Greenstein coefficient for single particle phase 
@@ -543,10 +513,11 @@
       </parameter>
 
       <parameter name="HG2">
-        <type>double</type>
+        <type>string</type>
         <brief>
           Hapke Henyey Greenstein Coefficient
         </brief>
+        <default><item>None Specified</item></default>
         <internalDefault>None Specified</internalDefault>
         <description>
           The Hapke Henyey Greenstein coefficient for single particle phase 
@@ -557,10 +528,11 @@
       </parameter>
 
       <parameter name="BH">
-        <type>double</type>
+        <type>string</type>
         <brief>
           Hapke Legendre Coefficient
         </brief>
+        <default><item>None Specified</item></default>
         <internalDefault>None Specified</internalDefault>
         <description>
           The Hapke Legendre coefficient for single particle phase 
@@ -571,10 +543,11 @@
       </parameter>
 
       <parameter name="CH">
-        <type>double</type>
+        <type>string</type>
         <brief>
           Hapke Legendre Coefficient
         </brief>
+        <default><item>None Specified</item></default>
         <internalDefault>None Specified</internalDefault>
         <description>
           The Hapke Legendre coefficient for single particle phase 
@@ -585,10 +558,11 @@
       </parameter>
 
       <parameter name="HH">
-        <type>double</type>
+        <type>string</type>
         <brief>
           Hapke Opposition Surge 
         </brief>
+        <default><item>None Specified</item></default>
         <internalDefault>None Specified</internalDefault>
         <description>
           The Hapke opposition surge component.
@@ -597,10 +571,11 @@
       </parameter>
 
       <parameter name="B0">
-        <type>double</type>
+        <type>string</type>
         <brief>
           Hapke Opposition Surge
         </brief>
+        <default><item>None Specified</item></default>
         <internalDefault>None Specified</internalDefault>
         <description>
           The Hapke opposition surge component.
@@ -609,10 +584,11 @@
       </parameter>
 
       <parameter name="L">
-        <type>double</type>
+        <type>string</type>
         <brief>
           Lunar-Lambert Function Weight
         </brief>
+        <default><item>None Specified</item></default>
         <internalDefault>None Specified</internalDefault>
         <description>
           The Lunar-Lambert function weight.
@@ -620,10 +596,11 @@
       </parameter>
 
       <parameter name="K">
-        <type>double</type>
+        <type>string</type>
         <brief>
           Minnaert Function Exponent
         </brief>
+        <default><item>None Specified</item></default>
         <internalDefault>None Specified</internalDefault>
         <description>
           The Minnaert function exponent.
@@ -639,6 +616,7 @@
         <description>
           The Minnaert empirical function phase angle list.
         </description>
+        <default><item>No List</item></default>
         <internalDefault>
           No List
         </internalDefault>
@@ -652,6 +630,7 @@
         <description>
           The Minnaert empirical function exponent list.
         </description>
+        <default><item>No List</item></default>
         <internalDefault>
           No List
         </internalDefault>
@@ -665,6 +644,7 @@
         <description>
           The Lunar Lambert empirical function exponent list.
         </description>
+        <default><item>No List</item></default>
         <internalDefault>
           No List
         </internalDefault>
@@ -678,6 +658,7 @@
         <description>
           The Minnaert empirical function phase curve value list.
         </description>
+        <default><item>No List</item></default>
         <internalDefault>
           No List
         </internalDefault>
@@ -711,6 +692,7 @@
               <item>TAUREF</item>
               <item>WHA</item>
               <item>HGA</item>
+              <item>NULNEG</item>
             </exclusions>
           </option>
 
@@ -845,12 +827,55 @@
           </option>
         </list>
       </parameter>
-    
+   
+      <parameter name="NULNEG">
+        <type>string</type>
+        <brief>
+          Determines if negative values will be set to NULL
+        </brief>
+        <default><item>READFROMPVL</item></default>
+        <description>
+          This determines if negative values after removal of atmospheric
+          effects will be set to NULL.
+        </description>
+        <list>
+          <option value="READFROMPVL">
+            <brief>
+              NULNEG will be set using the value in the FROMPVL file
+            </brief>
+            <description>
+              This option specifies that the NULNEG value be retrieved
+              from the FROMPVL file. If a FROMPVL file was not provided,
+              then an error will occur.
+            </description>
+          </option>
+          <option value="NO">
+            <brief>
+              Negative values will not be set to NULL
+            </brief>
+            <description>
+              This option specifies that the negative values will not be set to
+              NULL after the removal of atmospheric effects.
+            </description>
+          </option>
+          <option value="YES">
+            <brief>
+              Negative values will be set to NULL
+            </brief>
+            <description>
+              This option specifies that the negative values will be set to
+              NULL after the removal of atmospheric effects.
+            </description>
+          </option>
+        </list>
+      </parameter>
+ 
       <parameter name="TAU">
-        <type>double</type>
+        <type>string</type>
         <brief>
           Optical Depth of Atmosphere
         </brief>
+        <default><item>None Specified</item></default>
         <internalDefault>None Specified</internalDefault>
         <description>
           The normal optical depth of the atmosphere.
@@ -859,10 +884,11 @@
       </parameter>
 
       <parameter name="TAUREF">
-        <type>double</type>
+        <type>string</type>
         <brief>
           Reference Value of Tau
         </brief>
+        <default><item>None Specified</item></default>
         <internalDefault>None Specified</internalDefault>
         <description>
           The reference value of Tau to which the image will be normalized.
@@ -871,10 +897,11 @@
       </parameter>
 
       <parameter name="HGA">
-        <type>double</type>
+        <type>string</type>
         <brief>
           Henyey Greenstein Coefficient
         </brief>
+        <default><item>None Specified</item></default>
         <internalDefault>None Specified</internalDefault>
         <description>
           The coefficient of single particle Henyey Greenstein phase 
@@ -885,10 +912,11 @@
       </parameter>
 
       <parameter name="WHA">
-        <type>double</type>
+        <type>string</type>
         <brief>
           Single Scattering Albedo
         </brief>
+        <default><item>None Specified</item></default>
         <internalDefault>None Specified</internalDefault>
         <description>
           The single scattering albedo of atmospheric particles.
@@ -898,10 +926,11 @@
       </parameter>
       
       <parameter name="BHA">
-        <type>double</type>
+        <type>string</type>
         <brief>
           Legendre Coefficient
         </brief>
+        <default><item>None Specified</item></default>
         <internalDefault>None Specified</internalDefault>
         <description>
           The coefficient of the single particle Legendre phase function.
@@ -911,10 +940,11 @@
       </parameter>
 
       <parameter name="HNORM">
-        <type>double</type>
+        <type>string</type>
         <brief>
           Atmospheric Shell Thickness
         </brief>
+        <default><item>None Specified</item></default>
         <internalDefault>None Specified</internalDefault>
         <description>
           The atmospheric shell thickness normalized to the planet 
