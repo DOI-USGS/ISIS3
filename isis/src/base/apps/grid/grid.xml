@@ -337,7 +337,6 @@
         <minimum inclusive="yes">1</minimum>
         <odd />
       </parameter>
-      <odd />
 
       <parameter name="LINEVALUE">
         <type>string</type>
