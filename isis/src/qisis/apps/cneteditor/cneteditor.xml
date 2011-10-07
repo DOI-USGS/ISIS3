@@ -2,16 +2,145 @@
 
 <application name="cneteditor" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
-    Edit control networks
+    Interactive control network editor
   </brief>
 
   <description>
+    <p>
+      Cneteditor allows a user to edit attributes of control points and measures
+      interactively. Select keywords from a control network file are imported
+      into a table of editable rows and columns. <strong>Always make a
+      backup copy of the input file before using this program. There is no
+      "undo" capability yet.</strong>
+    </p>
+    <p>
+      The basic utility of this program is to set control points or control
+      measures to "ignore" or "EditLock," and to modify values assigned to
+      "A Priori SP Lat Sigma," "A Priori SP Lon Sigma," and "A Priori SP Radius
+      Sigma." The control point type can be changed to "Constrained," "Fixed,"
+      or "Free." There are columns such as PointID or Reference which should not
+      be changed. If control points or measures are set to "yes" for EditLock,
+      the user is prompted to verify updated values.
+    </p>
+    <p>
+      The control network file is loaded either by entering the filename after
+      the program name on the command line or by using the file selection menu
+      after invoking the program.
+    </p>
+    <p>
+      Command line example:
+      <pre>cneteditor control_network_file.net</pre>
+    </p>
+    <p>
+      On the menu bar are drop down menus "File," "Tables," and "Help."  The
+      options under "File" are "Open," "Save," "Save As," "Close," and "Quit."
+      The options under "Tables" are "Freeze Tables" and "Enable Sorting."
+      The icons are activated only after a control network file has been loaded.
+      When the sorting icon is enabled, the <strong>"^" (ascending)</strong> or
+      <strong>"v" (descending)</strong> symbol appears in the activated column
+      heading. The sort is performed by clicking on the symbol or by clicking on
+      a different column of interest while sorting is enabled.
+    </p>
+    <p>
+      The "Freeze Tables" icon (ice cube) is used to temporarily turn off the
+      filtering function. It freezes the table so that edits to a cell can be
+      performed without screen refresh. When the edits are completed, turn off
+      the freeze pane by clicking on the icon again. Once the freeze icon is
+      off, the edited information is updated in memory but not saved to disk.
+      Use the "save" or "save as" options under "File" to save the file to disk.
+    </p>
+    <p>
+      When the tables are not frozen the cells are updated based on the filters
+      that have been applied as soon as a cell is edited. If more than one cell
+      in a row needs to be edited then freeze the pane before changing any of
+      the cells.
+    </p>
+    <p>
+      The filters tabs presently available are "Control Points and Measures" and
+      "Images and Points." The tab for "Connections" is displayed but not
+      implemented yet so there are no keyword options available when the tab is
+      selected.
+    </p>
+    <p>
+      The results of the filters are displayed in the "Control Point Table,
+      "Control Measure Table," and the "Point View" tree.
+    </p>
+    <p>
+      The green "+" icon can be used to add a new filter or a new filter group.
+      Click the "+" icon inside the bounding box to add a new filter. Select a
+      keyword to filter with such as "PointType." The "And" or "Or" logic type
+      radio button must also be selected.
+    </p>
+    <p>
+      Click the "+" icon outside the bounding box to add a new filter group.
+      Select a keyword to filter with such as "GoodnessOfFit."  The "And" or
+      "Or" logic type radio button must also be selected.
+    </p>
+    <p>
+      The drop-down menu under the filter tabs lists keywords that can be
+      selected for the filters. Additional filtering options can be chosen to
+      include or exclude specific values by clicking on the radio icons. A text
+      box will be displayed for keywords that require text or numbers. <strong>
+      Be careful with extra spaces when entering text, verify entry by reading
+      the filter statement if the expected result is empty.</strong>
+    </p>
+    <p>
+      The ">=" or "&lt;=" symbols are used to enter the cutoff numbers for
+      specific keywords that are stored as numbers, and when selected there may
+      be an option to select the "inclusive" or "exclusive" filter.
+    </p>
+    <p>
+      The "Effect" option is used to select "Point" and/or "Measure." The
+      default is both "Point" and "Measure" so there is an "X" within the radio
+      icons. To turn off one or the other option, click on the desired radio
+      icon; "X" means selected and no "X" means not selected.
+    </p>
+    <p>
+      For the "Control Points and Measures" tab, the "Min count for points" is
+      used to define how many measures a control point must have for a
+      particular filter. The default value is "1" so the filtering is applied to
+      control points that have at least one measure. If the "Control point"
+      option under "Effect" is turned off, then the min count is not used.
+    </p>
+    <p>
+      <strong>Warning:</strong> Not all filters have the same effect. For
+      example, some keywords require minimum and/or maximum values while others
+      require text entries. <strong>It is best to read the statement above the
+      filter options to see exactly what the options that has been selected is
+      performing</strong>.
+    </p>
+    <p>
+      <strong>Editing cells:</strong>
+      <br/><br/>
+      Click on the cell to type the value, or double-click on the cell to see
+      the valid values in the drop-down menu to select from. If no valid values
+      exist, then type the text in the cell.
+    </p>
+    <p>
+      <strong>Copying to all cells:</strong>
+      <br/><br/>
+      Select a cell that has the content that will be copied to all cells under
+      a column. Click on the selected cell to activate, and then hold down the
+      right icon to select "copy to all cells."
+    </p>
+    <p>
+      For more help click on "What"s This?" under Help, or use Shift+F1. Once
+      you see the "?" on the screen, click on the screen to see the information.
+    </p>
   </description>
+
   <category>
     <categoryItem>Control Networks</categoryItem>
     <categoryItem>Display</categoryItem>
   </category>
 
   <history>
+    <change name="Eric Hyer" date="2011-03-07">
+      Original version
+    </change>
+    <change name="Jai Rideout" date="2011-10-07">
+      Added documentation in preparation for the October release. Credit goes to
+      Janet Richie and Ella Lee for their help in preparing the documentation.
+    </change>
   </history>
 </application>
