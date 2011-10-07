@@ -33,13 +33,13 @@
 
     Because the program photomet (used to make photometric corrections to
     images) incorporates all the same atmospheric scattering models as
-    phoempglobal, one would normally set ATMNAME=NONE and IORD=NO to obtain
-    an empirical model for the surface alone, then apply the atmospheric
-    scattering parameters in photomet. Fitting with an atmospheric model
-    and IORD=YES in phoempglobal is more useful for application to 
-    photoclinometry where images are normally corrected by subtracting a
-    uniform haze estimate rather than by applying a full atmospheric scattering
-    model.
+    phoempglobal, one would normally set ATMNAME=NONE and ADDOFFSET=NO to 
+    obtain an empirical model for the surface alone, then apply the 
+    atmospheric scattering parameters in photomet. Fitting with an 
+    atmospheric model and ADDOFFSET=YES in phoempglobal is more useful for 
+    application to photoclinometry where images are normally corrected by 
+    subtracting a uniform haze estimate rather than by applying a full 
+    atmospheric scattering model.
 
     For the original description of the fitting process and a useful 
     compilation of Hapke parameters from the scientific literature, see McEwen 
@@ -129,6 +129,9 @@
       Isis3 Original version, pho_emp_global  ported from isis2 to isis3 
       phoempglobal 
     </change>
+    <change name="Randy Kirk" date="2011-09-25">
+      Updated documentation for the phoempglobal program.
+    </change>
   </history>
 
   <groups>
@@ -140,13 +143,12 @@
           Output text file contain fitted parameters
         </brief>
         <description>
-          This output is a PVL file containing tables of the phase angle,
+          This output is a PVL file containing lists of the phase angle,
           best fit limb darkening parameter, and brightness, formatted so
           that it can be used as a photometric template by the programs
           photemplate (used to edit the parameters) and photomet (used to
           apply photometric normalization to an image). The file also contains
-          a record of the input parameters on which the fit was based, and an
-          optional user supplied note.
+          an optional user supplied note.
         </description>
         <filter>
           *.txt
@@ -340,9 +342,10 @@
         </brief>
         <description>
           Determines which empirical photometric function will be fitted
-          to the Hapke model. The tables of B and L or B and K can be used with 
-          the lunar-Lambert empirical or Minnaert empirical photometric
-          functions in the photometric normalization program photomet.
+          to the Hapke model. The lists of brightness and limb darkening
+          values can be used with the lunar-Lambert empirical or Minnaert 
+          empirical photometric functions in the photometric normalization 
+          program photomet.
         </description>
         <list>
           <option value="LUNARLAMBERT">
@@ -393,16 +396,16 @@
           (more accurate) approximation. Atmospheric scattering in all these
           models both attenuates the surface signal and adds its own (uniform)
           contribution to the image radiance. Therefore, unless NONE is 
-          selected, it makes sense to also set IORD=YES so that the additive
-          contribution of the atmosphere will be modeled by an additive
-          constant in the fit.
+          selected, it makes sense to also set ADDOFFSET=YES so that the 
+          additive contribution of the atmosphere will be modeled by an 
+          additive constant in the fit.
 
           Because the program photomet (used to make photometric corrections to
           images) incorporates all the same atmospheric scattering models as
-          phoempglobal, one would normally set ATMNAME=NONE and IORD=NO to 
+          phoempglobal, one would normally set ATMNAME=NONE and ADDOFFSET=NO to 
           obtain an empirical model for the surface alone, then apply the 
           atmospheric scattering parameters in photomet. Fitting with an
-          atmospheric model and IORD=YES in phoempglobal is more useful for
+          atmospheric model and ADDOFFSET=YES in phoempglobal is more useful for
           application to photoclinometry where images are normally corrected
           by subtracting a uniform haze estimate rather than by applying a
           full atmospheric scattering model.
@@ -421,7 +424,7 @@
               <item>WHA</item>
               <item>HGA</item>
               <item>HNORM</item>
-              <item>IORD</item>
+              <item>ADDOFFSET</item>
               <item>BHA</item>
             </exclusions>
           </option>
@@ -438,7 +441,7 @@
               <item>TAU</item>
               <item>WHA</item>
               <item>HNORM</item>
-              <item>IORD</item>
+              <item>ADDOFFSET</item>
             </inclusions>
             <exclusions>
               <item>HGA</item>
@@ -458,7 +461,7 @@
               <item>TAU</item>
               <item>WHA</item>
               <item>HNORM</item>
-              <item>IORD</item>
+              <item>ADDOFFSET</item>
             </inclusions>
             <exclusions>
               <item>HGA</item>
@@ -479,7 +482,7 @@
               <item>WHA</item>
               <item>BHA</item>
               <item>HNORM</item>
-              <item>IORD</item>
+              <item>ADDOFFSET</item>
             </inclusions>
             <exclusions>
               <item>HGA</item>
@@ -499,7 +502,7 @@
               <item>WHA</item>
               <item>BHA</item>
               <item>HNORM</item>
-              <item>IORD</item>
+              <item>ADDOFFSET</item>
             </inclusions>
             <exclusions>
               <item>HGA</item>
@@ -526,7 +529,7 @@
               <item>WHA</item>
               <item>HGA</item>
               <item>HNORM</item>
-              <item>IORD</item>
+              <item>ADDOFFSET</item>
             </inclusions>
             <exclusions>
               <item>BHA</item>
@@ -553,7 +556,7 @@
               <item>WHA</item>
               <item>HGA</item>
               <item>HNORM</item>
-              <item>IORD</item>
+              <item>ADDOFFSET</item>
             </inclusions>
             <exclusions>
               <item>BHA</item>
@@ -633,7 +636,7 @@
         </description>
       </parameter>
 
-      <parameter name="IORD">
+      <parameter name="ADDOFFSET">
         <type>boolean</type>
         <brief>
           Allow additive offset in fit

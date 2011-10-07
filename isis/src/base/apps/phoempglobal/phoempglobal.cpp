@@ -136,7 +136,7 @@ void IsisMain() {
     inclusion.push_back("TAU");
     inclusion.push_back("WHA");
     inclusion.push_back("HNORM");
-    //inclusion.push_back("IORD");
+    //inclusion.push_back("ADDOFFSET");
 
     if (sAsmType=="ANISOTROPIC1" || sAsmType=="ANISOTROPIC2" ){
       inclusion.push_back("BHA");
@@ -167,7 +167,7 @@ void IsisMain() {
   double emamax_phase_coeff= ui.GetDouble("EMAMAX_PCOEFF");
   double nph   = ui.GetInteger("NPH");
   
-  bool iord = ui.GetBoolean("IORD");
+  bool iord = ui.GetBoolean("ADDOFFSET");
   
   struct linearFitParams lFitParams;
   lFitParams.empirical = sEmpirical;
