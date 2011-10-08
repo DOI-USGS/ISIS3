@@ -38,15 +38,18 @@ you must <em>not</em> upgrade the Isis Data Files!!!
 
         <h2>1) Find Disk Space</h2>
         <p>
-            The current distribution of Isis 3 contains over 200 applications. 
+            The current distribution of Isis 3 contains over 300 applications. 
             It includes the complete source, binaries, documentation, and
             libraries necessary to run the applications. 
             Note: This does not include 3rd party binaries and header files 
             necessary for developing Isis applications. The data area is 
             available as a seperate download. Be aware, the full data area is 
             very large (many 10s of GBs). This includes SPICE kernels for 
-            CASSINI, Clementine1, Mars Global Surveyor, Mars Odyssey, Mars 
-            Reconnaissance Orbiter, Viking, and others. Other missions are 
+            Apollo, 
+            CASSINI, Clementine1, Dawn, Galileo, Lunar Reconnaissance Orbiter,
+            Lunar Orbiter, Mariner10, Messenger, 
+            Mars Global Surveyor, Mars Odyssey, Mars 
+            Reconnaissance Orbiter, Viking, Voyager, and others. Other missions are 
             included as they become available in Isis. 
         </p>
         <p>
@@ -73,66 +76,87 @@ you must <em>not</em> upgrade the Isis Data Files!!!
 
         <h2>2) Download Isis3</h2>
         <p>
-          We are distributing Isis3 using an rsync server. If the "rsync" 
+          We are distributing Isis3 using two rsync servers. If the "rsync" 
           command is is not available on your system please see your system
           administrator. To download Isis3 follow the example for your hardware
-          and operating system combintion.
-          <strong><i>Make sure to include the "." at the end of the "rsync"
+          and operating system combination.
+          <strong><i>Make sure to include the period "." at the end of the "rsync"
           commands - if you don't, you will only get a list of available
           downloads from the rsync server.</i></strong>
         </p>
-
+        <p>
+          <strong>Announcing our new rsync server mirror.</strong>
+          We have a new rsync server with a much faster connection. The 
+          old system is still up, but we encourage the use of the new one.
+        </p>
+        <ul>
+          <li>New - isisdist.astrogeology.usgs.gov</li>
+          <li>Old - isisdist.wr.usgs.gov</li>
+        </ul>
+        <p>
+          All of the example commands below use the "New" server name. You
+          can use the "Old" server name if you need to.
+        </p>
         <p>
           <span style="font-size:120%; color:red; font-weight:bold">Warning:</span><i>
-                 You must be in the correct directory as shown above, and you 
-              must type the follwing commands correctly. If you do not you could
-              remove files not associated with ISIS.
+           You must be in the correct directory as shown above, and you 
+           must type the follwing commands correctly. If you do not you could
+           remove files not associated with ISIS.
             </i>
         </p>
 
-        <p>
-          Example for Suse 10.1 Linux x86 64-bit Intel compatible systems:
-        </p>
-<pre>
-        rsync -azv --delete --partial isisdist.wr.usgs.gov::x86-64_linux_SUSE/isis .
-</pre>
-        <p>
-          Example for Suse 10.1 Linux x86 32-bit Intel compatible systems:
-        </p>
-<pre>
-        rsync -azv --delete --partial isisdist.wr.usgs.gov::x86_linux_SUSE/isis .
-</pre>
 
-        <p>
-          Example for Red Hat 5.4 Linux x86 64-bit Intel compatible systems:    
-        </p> 
-<pre>
-        rsync -azv --delete --partial isisdist.wr.usgs.gov::x86-64_linux_RHEL/isis .
-</pre>
-        <p>
-          Example for Red Hat 5.4 Linux x86 32-bit Intel compatible systems:
-        </p>
-<pre>
-        rsync -azv --delete --partial isisdist.wr.usgs.gov::x86_linux_RHEL/isis .
-</pre>
+
+
 
         <p>
           Example for MacOSX 10.5 32-bit Intel compatible systems:
         </p>
 <pre>
-        rsync -azv --delete --partial isisdist.wr.usgs.gov::x86_darwin_OSX/isis .
+        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::x86_darwin_OSX/isis .
 </pre>
 
         <p>
+          Example for Fedora 14 Linux x86 64-bit Intel compatible systems:
+        </p>
+<pre>
+        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::x86-64_linux_FEDORA/isis .
+</pre>
+
+        <p>
+          Example for RHEL 5.5 Linux x86 64-bit Intel compatible systems:
+        </p>
+<pre>
+        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::x86-64_linux_RHEL/isis .
+</pre>
+
+        <p>
+          Example for RHEL 5.5 Linux x86 32-bit Intel compatible systems:
+        </p>
+<pre>
+        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::x86_linux_RHEL/isis .
+</pre>
+
+        <p>
+          Example for Open SUSE 11.3 Linux x86 64-bit Intel compatible systems:
+        </p>
+<pre>
+        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::x86-64_linux_SUSE11/isis .
+</pre>
+
+
+
+
+        <p>
           <i><b>Note:</b> Isis3 can also be downloaded over port 80. To use port 80 change
-           isisdist.wr.usgs.gov:: in the previous commands to rsync://isisdist.wr.usgs.gov:80::.
-           Example: <pre>rsync -azv --delete --partial rsync://isisdist.wr.usgs.gov:80::x86-64_linux_RHEL/isis .</pre>
+           isisdist.astrogeology.usgs.gov:: in the previous commands to rsync://isisdist.astrogeology.usgs.gov:80::.
+           Example: <pre>rsync -azv --delete --partial rsync://isisdist.astrogeology.usgs.gov:80::x86-64_linux_RHEL/isis .</pre>
           </i>
         </p>
 
         <p>
           <i>Note: We are no longer building Isis 3 for Linux SuSE 
-            9.X, RedHat Enterprise 3, 4 or equivalent systems or Mac OSX
+            9.X, 10.X, RedHat Enterprise 3, 4 or equivalent systems or Mac OSX
             with the Power PC processor.
           </i>
         </p>
@@ -141,20 +165,35 @@ you must <em>not</em> upgrade the Isis Data Files!!!
         <h2>3) Get the Isis3 data files </h2>
         <p>
             The data area is separate from the source code. This data area is
-            crucial to Isis3 and must be downloaded too.
+            crucial to Isis3 and some of it must be downloaded.
+        </p>
+        <p>
+          <strong>Announcing a new service useable by ISIS to retrieve 
+          SPICE data for cubes.</strong> Isis can now use a service to 
+          retreive the SPICE data for most instruments Isis supports via
+          the internet. This
+          can significantly reduce the size of the download from our data 
+          area. If you want to use this new service and not have to download all the 
+          SPICE data add the following argument to all rsync command below:
+        </p>
+<pre>
+  --exclude='kernels'
+</pre>
+        <p>
+          For example: rsync -azv --exclude='kernels' --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data .
         </p>
         <p>
             Perform this step from the same directory you ran the previous rsync
-            command from. In the example it was "/work1/isis3".
+            command. In the example it was "/work1/isis3".
         </p>
         <p>
             To download all Isis3 data files use the following command.
         </p>
 <pre>
-        rsync -azv --delete --partial isisdist.wr.usgs.gov::isis3data/data .
+        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data .
 </pre>
         <p>
-          <b>Note:</b> The isis3 data area is very large (over 70GB). You may want to 
+          <b>Note:</b> The isis3 data area is very large (over 130GB). You may want to 
           consider downloading only the missions you require. To download 
             specific Isis3 mission data files use the following commands. 
           <u>Please note: Regardless of the mission the base data is required.</u>
@@ -165,138 +204,140 @@ you must <em>not</em> upgrade the Isis Data Files!!!
           </b>
         </p>
 <pre>
-        rsync -azv --delete --partial isisdist.wr.usgs.gov::isis3data/data/base data/
+        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/base data/
 </pre>
+
+
 <p>
   Apollo Mission:
 </p>
         <pre>
-        rsync -azv --delete --partial isisdist.wr.usgs.gov::isis3data/data/apollo15 data/
-        rsync -azv --delete --partial isisdist.wr.usgs.gov::isis3data/data/apollo16 data/
-        rsync -azv --delete --partial isisdist.wr.usgs.gov::isis3data/data/apollo17 data/
+        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/apollo15 data/
+        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/apollo16 data/
+        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/apollo17 data/
         </pre>
 <p>
   Cassini Mission:
 </p>
         <pre>
-        rsync -azv --delete --partial isisdist.wr.usgs.gov::isis3data/data/cassini data/
+        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/cassini data/
         </pre>
 <p>
   Chan1 Mission:
 </p>
         <pre>
-        rsync -azv --delete --partial isisdist.wr.usgs.gov::isis3data/data/chan1 data/
+        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/chan1 data/
         </pre>
 <p>
   Clementine Mission:
 </p>
         <pre>
-        rsync -azv --delete --partial isisdist.wr.usgs.gov::isis3data/data/clementine1 data/
+        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/clementine1 data/
         </pre>
 <p>
   Dawn Mission:
 </p>
         <pre>
-        rsync -azv --delete --partial isisdist.wr.usgs.gov::isis3data/data/dawn data/
+        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/dawn data/
         </pre>
  <p>
   Galileo Mission:
 </p>
         <pre>
-        rsync -azv --delete --partial isisdist.wr.usgs.gov::isis3data/data/galileo data/
+        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/galileo data/
         </pre>
 <p>
   Ideal Mission:
 </p>
         <pre>
-        rsync -azv --delete --partial isisdist.wr.usgs.gov::isis3data/data/ideal data/
+        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/ideal data/
         </pre>
 <p>
   Lunar Orbiter Mission:
 </p>
         <pre>
-        rsync -azv --delete --partial isisdist.wr.usgs.gov::isis3data/data/lo data/
+        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/lo data/
         </pre>
 <p>
   Lunar Reconnaissance Orbiter Mission:
 </p>
         <pre>
-        rsync -azv --delete --partial isisdist.wr.usgs.gov::isis3data/data/lro data/
+        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/lro data/
         </pre>
 <p>
   Mars Exploration Rover Mission:
 </p>
         <pre>
-        rsync -azv --delete --partial isisdist.wr.usgs.gov::isis3data/data/mer data/
+        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/mer data/
         </pre>
 <p>
   Mariner10 Mission:
 </p>
         <pre>
-        rsync -azv --delete --partial isisdist.wr.usgs.gov::isis3data/data/mariner10 data/
+        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/mariner10 data/
         </pre>
 <p>
   Messenger Mission:
 </p>
         <pre>
-        rsync -azv --delete --partial isisdist.wr.usgs.gov::isis3data/data/messenger data/
+        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/messenger data/
         </pre>
 <p>
   Mars Express Mission:
 </p>
         <pre>
-        rsync -azv --delete --partial isisdist.wr.usgs.gov::isis3data/data/mex data/
+        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/mex data/
         </pre>
 <p>
   Mars Global Surveyor Mission:
 </p>
         <pre>
-        rsync -azv --delete --partial isisdist.wr.usgs.gov::isis3data/data/mgs data/
+        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/mgs data/
         </pre>
 <p>
   Mars Reconnaissance Orbiter Mission:
 </p>
         <pre>
-        rsync -azv --delete --partial isisdist.wr.usgs.gov::isis3data/data/mro data/
+        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/mro data/
         </pre>
 <p>
   Odyssey Mission:
 </p>
         <pre>
-        rsync -azv --delete --partial isisdist.wr.usgs.gov::isis3data/data/odyssey data/
+        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/odyssey data/
         </pre>
 <p>
   Rolo Mission:
 </p>
         <pre>
-        rsync -azv --delete --partial isisdist.wr.usgs.gov::isis3data/data/rolo data/
+        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/rolo data/
         </pre>
 <p>
   Smart1 Mission:
 </p>
         <pre>
-        rsync -azv --delete --partial isisdist.wr.usgs.gov::isis3data/data/smart1 data/
+        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/smart1 data/
         </pre>
 <p>
   Viking Mission:
 </p>
         <pre>
-        rsync -azv --delete --partial isisdist.wr.usgs.gov::isis3data/data/viking1 data/
-        rsync -azv --delete --partial isisdist.wr.usgs.gov::isis3data/data/viking2 data/
+        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/viking1 data/
+        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/viking2 data/
         </pre>
 <p>
   Voyager Mission:
 </p>
         <pre>
-        rsync -azv --delete --partial isisdist.wr.usgs.gov::isis3data/data/voyager1 data/
-        rsync -azv --delete --partial isisdist.wr.usgs.gov::isis3data/data/voyager2 data/
+        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/voyager1 data/
+        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/voyager2 data/
         </pre>
 
         <h2>4) Set up your environment</h2>
         <p>
             Isis3 needs to know where all its pieces are located. We use an
             environment variable called "ISISROOT" to do this. For the above 
-            example set ISISROOT to as follows:
+            example set ISISROOT as follows:
         </p>
 
         <p>
