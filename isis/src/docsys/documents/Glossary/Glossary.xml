@@ -8,25 +8,36 @@
     <file>
       <body>
         <definitions>
-          <definition name="Adjusted">
-            Refers to the output pixel coordinate or geographic location 
-            within the control network
+
+          <definition name="SPICE">
+            Spacecraft &amp; Planetary ephemerides, Instrument C-matrix and Event kernels.
+            SPICE refers to all the information required by Isis in order to compute
+            and map each image pixel onto a surface with reference to spacecraft position, 
+            sun position, instrument and mission activities.  Isis uses software supplied
+            by the Navigation and Ancillary Information Facility (NAIF) for SPICE
+            access and kernel management (Refer to spiceinit).
+
+            SPICE is available only for mission instruments supported by Isis (camera models).
           </definition>
 
-          <definition name="A Priori">
-            Refers to the initial or original value of a pixel coordinate or
-            geographic location within the control network
+          <definition name="Reference Measure">
+            Reference Measure is a fundamental component of the control network.
+            For every point within the network, there is always one and only one
+            associated Reference Measure (Reference=True).  The Reference Measure
+            refers to a single image and it's pixel coordinate (measure) that best 
+            represents a control point location or feature.  This specific
+            element of the control network is exclusively used for co-registering all
+            other overlapping and potential measures (images) to the Reference 
+            Measure.  There are control network applications that can set the
+            Reference=True explicitly (cnetref, qnet) or  'runtime' implicitly 
+            (If reference is not set, the implicit default is the first 'valid' 
+            measure listed within a control point, refer to the 'pointreg' application
+            for more information). 
           </definition>
 
-          <definition name="Band">
-            A layer of pixels in an image, typically representing spectral
-            information.  The number of bands indicates the depth of an image in
-            terms of these layers.
-          </definition>
-
-          <definition name="Bit">
-            Short for binary digit, which in a computer is the smallest unit of
-            storage. Bits are either "0" or "1".
+          <definition name="Special Pixels">
+            Special Pixels are defined to distinguish valid pixels from non-valid
+            pixels.
           </definition>
 
           <definition name="Byte">
@@ -36,14 +47,26 @@
             group of eight bits represents an eight digit binary number.
           </definition>
 
-          <definition name="Bit Type">
-            Refers to how many bits there are per single meaningful value in an
-            image cube file.
+          <definition name="NULL">
+            NULL is a Special Pixel value that is tracked and reported to the user.
+            NULL represents "No Data".   NULL is set in all 8, 16, 32-bit type image
+            data.
           </definition>
 
-          <definition name="Control Measure">
-            The sample and line pixel coordinate (measurement) within an image that
-            has been measured and associated with a Control Point.
+          <definition name="LRS">
+            LRS [Low Representation Saturation] is a representation special pixel value
+            that is tracked and reported to the user.  LRS is set when an Isis application
+            causes the output DN pixel to fall 'below' the possible range of valid values
+            LRS  represents "Undersaturated".  LRS is set in 16-and 32-bit type image data.  
+            For output 8-bit, LRS = NULL.
+          </definition>
+
+          <definition name="HRS">
+            HRS [High Representation Saturation] is a representation special pixel value
+            that is tracked and reported to the user.  HRS is set when an Isis application
+            causes the output DN pixel to fall 'above' the possible range of valid values
+            HRS represents "Oversaturated".   HRS is set in all 8, 16, 32-bit type image
+            data.
           </definition>
 
           <definition name="Control Network">
@@ -52,26 +75,51 @@
             between a collection of any number of images.
           </definition>
 
-          <definition name="Control Point">
-            One or more measurements that identify the same feature or location
-            in different images.
+          <definition name="LIS">
+            LIS [Low Instrument Saturation] is an instrument special pixel value
+            that is tracked and reported to the user.  LIS is set during the ingestion
+            of the image data into Isis.  The input image sensor acquired a value too low
+            to be measured accurately.  LIS represents "Undersaturated".  LIS is
+            set in 16-and 32-bit type image data.  For 8-bit, LIS = NULL.
           </definition>
 
-          <definition name="Cube">
-            A cube is a 3-dimensional image with axis: samples, lines, and
-            bands. The physical dimensions of a cube are called the number of
-            samples (NS), number of lines (NL), and number of bands (NB).
+          <definition name="HIS">
+            HIS [High Instrument Saturation] is an instrument special pixel value
+            that is tracked and reported to the user.  HIS is set during the ingestion
+            of the image data into Isis.  The input image sensor acquired a value too high
+            to be measured accurately.  HIS represents "Oversaturated".  HIS is set in 
+            16-and 32-bit type image data.  For 8-bit image data, HIS = NULL.
+          </definition>
 
-            <p>
-              Typically, the sample and line dimensions are used to represent
-              spatial information while the band dimension represents spectral
-              information.
-            </p>
+          <definition name="Level0">
+            Level0 is a standard cartographic processing phase that describes an image
+            has been ingested into Isis (PDS EDR) and will often have SPICE information 
+            loaded on the Isis cube labels (spiceinit).  Level0 image cubes are often
+            the input to mission specific radiomatric calibration applications if supported
+            in Isis.  Level1 implies a 'non-projected', raw image cube.
+          </definition>
+
+          <definition name="Level1">
+            Level1 is a standard cartographic processing phase that describes an image
+            has been radiometrically calibrated (PDS CDR) with SPICE information loaded
+            on the Isis cube labels.  This level will often represent an image that also
+            has had  noise removed.  Level1 implies a 'non-projected' cube.  Isis 
+            reports the camera geometry (viewing geometry of an image cube) for a 
+            Level1. Most Isis application names that start with a prefix of 'cam' expects
+            a Level1 cube as input (refer to applications such as camstats, campt, cam2map) 
           </definition>
 
           <definition name="Cube Serial Number">
             A unique identifier associated with a specific image and its
             derivative images.
+          </definition>
+
+          <definition name="Level2">
+            Level2 is a standard cartographic processing phase that describes an image
+            has been map projected.  The Level2 image cube labels contain Mapping keywords
+            that describe the projection and all associated map characteristics.  Most Isis 
+            applications that start with a prefix of 'map' expects a Level2 cube as input 
+            (refer to applications such as mappt, map2map, map2cam) 
           </definition>
 
           <definition name="Digital Number">
@@ -81,104 +129,118 @@
             point values. 
           </definition>
 
-          <definition name="Elevation">
-            The height above or below a fixed point on the surface of a body.
+          <definition name="Albedo">
+            Reflectivity of a surface or particle.  Commonly in I/F units for radiometrically
+            calibrated data.
           </definition>
 
-          <definition name="Emissivity">
-            A measure describing a substance's ability to absorb and radiate
-            electromagnetic energy.
+          <definition name="Radius">
+            The distance (vector) value between the center of and a point on a circle, sphere,
+            ellipse or ellipsoid.  Refer to qview, camstats, campt as example reporting 
+            applications of the radius value at every image pixel location.  Isis expects and
+            reports the radius value to be in Meters.
+
+            Isis requires a radius DEM model in order to orthorectify an image (refer to spicienit-
+            shapemodel and cam2map).  This is not to be confused with a topography file where the
+            radius is subtracted from the (best fit trixial or aeroid) shape of the target body.
           </definition>
 
-          <definition name="Emission Angle">
-            The emission angle (EMA) is the angle between the spacecraft and a
-            vector drawn perpendicular to the planet's surface (surface normal).
-            Using SPICE, Isis applications compute this angle from the ellipsoid 
-            or the elevation model (e.g., local slopes) at every pixel.  
+          <definition name="Pixel Resolution">
+            The ground distance in meters from the left edge to the right edge of a pixel.
           </definition>
 
-         <definition name="Incidence Angle">
-            The incidence angle (INC) is the angle between the sun and the 
-            surface normal.  Isis applications use SPICE to compute this angle
-            from the ellipsoid or the elevation model (e.g., local slopes) at
-            every pixel.
+          <definition name="Line Resolution">
+            The ground distance in meters from the top edge to the bottom edge of a pixel.
           </definition>
 
-         <definition name="I/F">
-            Irradiance/SolarFlux.  Unit of DN values for a reference distance of
-            target body from the Sun (5.2 AU).  The values usually range between
-            0.0 and 1.0.
-
-            <p>
-              I/F is often a default or choice of output DN unit of the mission
-              specific radiometric calibration applications. 
-            </p>
+          <definition name="Sample Resolution">
+            The ground distance in meters from the left edge to the right edge of a pixel.
           </definition>
 
-          <definition name="Line">
-            A row of pixels in an image, typically representing spatial
-            information.  The number of lines indicates the height of an image
-            in pixels.
+          <definition name="Detector Resolution">
+            The size of the detector on the focal plane for each pixel. 
           </definition>
 
-         <definition name="NAIF">
-            Navigation and Ancillary Information Facility
+          <definition name="Ground Azimuth">
+            A clockwise angle between one reference point and another reference point. 
+            Each pixellocation has a latitude, longitude associated with it (ground point).  
+            The only information required to calculate a ground azimuth is to form a 
+            spherical triangle from three points on the planet (ground point, north pole, 
+            and point of interest) The point of interest is often the sub-spacecraft or
+            sub-solar point). Spherical trignometry is then used to calculate the angle.
+
+            Ground Azimuth has nothing to do with the image, meaning it does not rely
+            on camera geometry for it's calculation
           </definition>
 
-          <definition name="Phase Angle">
-            The phase angle is the angle between the sun, the point on the
-            planet surface and the spacecraft.  Isis applications will use SPICE
-            to compute this angle from the ellipsoid or the elevation model
-            (e.g., local slopes) at every pixel.
+          <definition name="Azimuth">
+            A clockwise angle from a point of origin to a point of interest.  The azimuth is 
+            measured in a positive clockwise direction from a reference line.  The reference
+            line is formed by a line drawn horizontally from the origin point to the right
+            side of the image (3 o'clock reference if the image is viewed as a clock face)
+            Azimuth can also be referred to as Image Azimuth.  
           </definition>
 
-          <definition name="Polygon Thickness">
-            The thickness of a polygon is defined as follows:
-            <pre>
-              Thickness = Area / max(Xextent,Yextent)**2
-            </pre>
-            A polygon's thickness will be between 0 and 1.
+          <definition name="North Azimuth">
+            A clockwise angle from a point of origin to true North.  The North Azimuth 
+            is measured in a positive clockwise direction from a reference line.  The reference
+            line is formed by a line drawn horizontally from the origin point (pixel location)
+            to the right side of the image.  Refer to Azimuth.
           </definition>
 
-          <definition name="Radiance">
-            A measurement describing the amount of electromagnetic energy
-            emitted from an area of a planet.
+          <definition name="Sun Azimuth">
+            A clockwise angle from a point of origin to the direction of the Sun.  The Sun Azimuth 
+            is measured in a positive clockwise direction from a reference line.  The reference
+            line is formed by a line drawn horizontally from the origin point (pixel location)
+            to the right side of the image.  Refer to Azimuth.
           </definition>
 
-          <definition name="Reflectence">
-            The ratio of reflected energy to incoming energy.
+          <definition name="Spacecraft Azimuth">
+            A clockwise angle from a point of origin to the direction of the Spacecraft.  
+            The Spacecraft Azimuth is measured in a positive clockwise direction from a reference line.  
+            The reference line is formed by a line drawn horizontally from the origin point 
+            (pixel location) to the right side of the image.  Refer to Azimuth.
           </definition>
 
-          <definition name="Sample">
-            A column of pixels in an image, typically representing spatial
-            information.  The number of samples indicates the width of an image
-            in pixels.
+          <definition name="Off Nadir Angle">
+            From the spacecraft, the Off Nadir is the angle between the nadir vector 
+            (subspacecraft vector) and the look vector.  Every pixel in the image will
+            result in a different Off Nadir Angle.  OffNadirAngle is in degrees.
           </definition>
 
-          <definition name="Serial Number">
-            A unique identifier constructed and assigned to each individual
-            image within a control network.  The serial number (SN) is
-            constructed by most of the control network applications "in real
-            time" from specific instrument keywords on the image labels
-            (Instrument keywords are populated by mission specific ingestion
-            applications).  
-
-            <p>
-              The serial number associated with each control measure is included
-              as a field in the binary control network.  'getsn' is an Isis
-              application that will return the SN value for a given image
-              filename.
-            </p>
+          <definition name="Slew Angle">
+            From the spacecraft, the Slew is the angle between the boresight
+            (i.e., center of framing camera) and the nadir vector (subspacecraft vector).
+            The Slew angle will be a constant value across the image.
+            SlewAngle is in degrees.
           </definition>
 
-         <definition name="SPICE">
-           Spacecraft &amp; Planetary ephemerides, Instrument C-matrix and Event
-           kernels.  SPICE refers to all the information required and computed
-           within Isis to map each image onto a surface with reference to
-           spacecraft position, sun position, instrument and mission activities.
-           Isis uses software supplied by the Navigation and Ancillary
-           Information Facility (NAIF) for SPICE access and kernel management.
+          <definition name="SubSpacecraft Ground Azimuth">
+            The Ground azimuth to the SubSpacecraft point (where the look vector from the
+            spacecraft intercepts the target body) is obtained by taking true North
+            (90 deg Latitude) and finding the clockwise angle to the subspacecraft 
+            latitude and longitude point.  
+
+            The subspacecraft ground azimuth is complementary to the emission angle and can 
+            help to determine if two images would make a good stereo pair.  If the camera 
+            position (subspacecraft ground azimuth) is the same in both images they would 
+            not offer stereo.  If the camera position is slightly off between the two images, 
+            then they would make a good stereo pair
+
+            SubSpacecraft Ground Azimuth is in degrees.
           </definition>
+
+          <definition name="Subsolar Ground Azimuth">
+            The Ground azimuth to the SubSolar point is obtained by taking true North
+            (90 deg Latitude) and finding the clockwise angle to the subsolar 
+            latitude and longitude point.  
+
+            The Subsolar Ground Azimuth is complementary to the incidence angle and gives
+            more information about which direction the sun is coming from.  
+
+            SubSolar Ground Azimuth is in degrees.
+          </definition>
+
         </definitions>
       </body>
 
@@ -218,10 +280,6 @@
     <change name="Travis Addair" date="2011-09-29">
       Reformatted to make adding new entries as simple as possible by
       abstracting the HTML formatting away with XSLT
-    </change>
-    <change name="Jai Rideout" date="2011-09-30">
-      Added Cube Serial Number and Polygon Thickness definitions. Fixed a
-      couple of typos elsewhere.
     </change>
   </history>
 </documentation>
