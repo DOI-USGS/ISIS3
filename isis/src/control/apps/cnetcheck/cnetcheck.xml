@@ -3,20 +3,19 @@
 <application name="cnetcheck" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>
-    Checks for validity of a Control Net file.
+    Checks the validity of a control network
   </brief>
 
   <description>
-    Checks for the validity of a Control Net file given a cube list.  Its primary
-    function is to check and find islands of the Control Net.  These islands
-    are then written to seperate files, which lists the cubes and their
-    corresponding serial number.  If a serial number's cube is not listed in
-    the input list, than that cube will NOT be listed within the appropriate
-    island file.  If an island file is missing altogether, it is due to the fact
-    that all of that islands cubes were not listed in the input list.
-
-    cnetcheck should be ran from the directory you wish for the output files to 
-    be written to.
+    This program checks for the validity of a <def>control network</def> in a
+    user-defined input cube list. Its primary function is to check and find
+    "islands" in the control network.  These islands are then written to
+    separate files, which list the cubes and their corresponding serial numbers.
+    If a serial number's cube is not listed in the input list, then that cube
+    will NOT be listed within the appropriate island file. If an island file is
+    missing altogether, it is due to the fact that all of that island's cubes
+    were not listed in the input list.  All program output files are created in
+    the working directory where cnetcheck is initiated.
   </description>
 
   <history>
