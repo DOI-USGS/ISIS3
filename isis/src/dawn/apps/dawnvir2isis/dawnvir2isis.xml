@@ -54,8 +54,8 @@
           filename. This file must contain a PDS label, with the actual image 
           data either attached (within FROM file) or detached (separate file). 
           For the detached case, the image data filename will automatically be 
-          obtained from the PDS image pointer keyword (“^IMAGE = …”). To 
-          override the existing pointer value, use this application’s IMAGE 
+          obtained from the PDS image pointer keyword (^IMAGE =...). To 
+          override the existing pointer value, use this application's IMAGE 
           parameter to specify the file containing the binary image data. 
         </description>
         <filter>
@@ -71,7 +71,7 @@
         </brief>
         <description>
           Use this parameter, if desired, to override the image pointer 
-          (“^IMAGE = …”) value in the detached PDS label (FROM). Or, if the 
+          (^IMAGE =...) value in the detached PDS label (FROM). Or, if the 
           existing pointer value is not resolved as an existing file, this 
           application will search for an image file with the same FROM path and 
           base name, only now with extension .QUB.  
