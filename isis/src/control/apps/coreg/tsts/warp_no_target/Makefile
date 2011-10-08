@@ -1,6 +1,7 @@
 APPNAME = coreg
 
 # Test warp option
+mal_3095LE_coreg_warp.cub.TOLERANCE = .00001
 
 include $(ISISROOT)/make/isismake.tsts
 
