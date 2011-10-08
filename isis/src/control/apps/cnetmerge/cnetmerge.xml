@@ -8,12 +8,31 @@
 
   <description>
     <p>
-      This program attempts to merge a set of (two or more) Control Networks
-      into a single network.  The merging process starts with a "base" network
-      into which each successive, "new" network is added.  When conflicts arise
-      between the base network and the new network being added, a set of
-      user-defined rules are used to determine how the conflicts are resolved.
-      Each network must share the same target.
+      This program attempts to merge a set of (two or more)
+      <def link="Control Network">Control Networks</def> into a single network.
+      The merging process starts with a "base" network into which each
+      successive "add" network is added.  When conflicts arise between the base
+      network and the network being added, a set of user-selected options are
+      used to determine how the conflicts are resolved.
+    </p>
+
+    <p>
+      When more than two Control Networks are merged, note that the "base"
+      network is updated iteratively when each successive network is added.
+      So the definition of the "base" network is dynamic in this case.
+    </p>
+
+    <p>
+      For any point or measure that is edit locked in the base network, that
+      point or measure will never be modified regardless of the OVERWRITE
+      options set.  When a point is edit locked, the reference measure is locked
+      implicitly.  So, for example, if OVERWRITEREFERENCE is selected, and a
+      control point is edit locked, that point's reference will not be
+      overwritten.
+    </p>
+
+    <p>
+      Note: Each network must share the same target.
     </p>
   </description>
 
@@ -96,6 +115,10 @@
       '[]' operator that was used inside of the call to Filename's constructor
       confused the compiler on Ubuntu10.04 systems.
     </change>
+    <change name="Travis Addair, Janet Richie, Elpitha Howington-Kraus" date="2011-10-07">
+      Rewrote large sections of the documentation to make more clear,
+      accessible, and user-friendly.
+    </change>
   </history> 
 
   <category>
@@ -123,7 +146,7 @@
               into which each successive network is "added".  The last network
               in the file is the last network to be added to the network, and
               thus will have either highest or lowest priority in certain
-              conflict resolutions depending on the options specified in the
+              conflict resolutions depending on the option(s) specified in the
               "Conflict Resolution" parameter group.
             </description>
             <exclusions>
@@ -153,8 +176,8 @@
         <brief>Reverse the order of CLIST, making last network the base</brief>
         <description>
           By default, the first network in CLIST will be the base network, and
-          each network below it will be added to it in descending order.  By
-          enabling this option, the input CLIST will be reversed, making the
+          each network below it will be added to it in descending order.  When
+          this option is SELECTED, the input CLIST will be reversed, making the
           last item in the list the base network, and the second-to-last item
           the first to be added, etc.
         </description>
@@ -186,9 +209,9 @@
         </brief>
         <description>
           The "base" Control Network into which the second control network
-          will be "added".  When an overwrite option in "Conflict Resolution"
-          is set to FALSE, the conflicting value from this network will be
-          retained.
+          will be "added".  When no overwrite option(s) from the "Conflict
+          Resolution" group are selected, any conflicts will be resolved
+          by retaining the values from this network.
         </description>
         <filter>
           *.ctl *.pvl *.net
@@ -203,9 +226,9 @@
         </brief>
         <description>
           The Control Network to be "added" into the base network.  When an
-          overwrite option in "Conflict Resolution" is set to TRUE, the
-          conflicting value from this network will replace the existing value
-          in the base network.
+          overwrite option(s) in the "Conflict Resolution" group is selected, 
+          the conflicting value from this network will replace the existing
+          value in the base network.
         </description>
         <filter>
           *.ctl *.pvl *.net
@@ -231,19 +254,21 @@
 
       <parameter name="NETWORKID">
         <type>string</type>
-        <brief>The NetworkId for the merged ControlNet</brief>
+        <brief>The NetworkId keyword value for the merged ControlNet</brief>
         <description>
           The NetworkId keyword for the newly merged ControlNet will be set to
-          the given value.
+          this given value. The Networkid is a single word identifier or name
+          assigned to a Control Network.
         </description>
       </parameter>
 
       <parameter name="DESCRIPTION">
         <type>string</type>
-        <brief>The Description for the merged ControlNet</brief>
+        <brief>The Description keyword value for the merged ControlNet</brief>
         <description>
-          The Descrition keyword for the newly merged ControlNet will be set
-          to the given value.
+          The Description keyword for the newly merged ControlNet will be set
+          to this given value.  This should be a brief description of the
+          purpose of the merged control network.
         </description>
       </parameter>
 
@@ -271,23 +296,23 @@
         <default><item>ERROR</item></default>
         <description>
           This parameter specifies how conflicting Control Points between two
-          networks are handled when merging.  The current options are to throw
-          an error when a Control Point appears in both the base and add
-          networks (ERROR), or to attempt to merge the conflicts in the
-          duplicated point (MERGE).
+          networks are handled when merging.  The current options are to report
+          an error and abort the program when a Control Point appears in both
+          the base and add networks (ERROR), or to attempt to merge the
+          conflicts in the duplicated point (MERGE).
         </description>
         <list>
           <option value="ERROR">
             <brief>Disallow merging networks with duplicate points</brief>
             <description>
               This option will check for conflicting Control Points in the
-              Control Networks and throw an error when a conflict occurs.
-              If no conflict occurs, all Control Points will be added
-              without changing any existing points in the base network.  For
-              the purposes of this parameter, a conflict can be as simple as
-              two Control Points sharing the same ID.  In such a case, an
-              error will be thrown, even if nothing else is different
-              between them.
+              Control Networks and report an error and abort the program when
+              a conflict occurs.  If no conflict occurs, all Control Points
+              will be added without changing any existing points in the base
+              network.  For the purposes of this option, a conflict can be as
+              simple as two Control Points sharing the same ID.  In such a
+              case, an error will be reported and the program aborted, even
+              if nothing else is different between them.
             </description>
             <exclusions>
               <item>LOG</item>
@@ -303,14 +328,14 @@
               This option will attempt to merge duplicate points between the
               base network and the successive networks being added to it.
               When conflicts arise, they will be resolved in accordance with
-              the various overwrite parameters.  By default, values in the
-              base network will take priority over those in the networks
-              added to it, but this can be changed using these parameters.
-              For example, if OVERWRITEMEASURES is set to TRUE, then
-              Line/Sample values in the last network added will take
-              precedence over all the Line/Sample values for conflicting
-              measures in the base network and the networks that were added
-              prior.
+              the various overwrite options.  By default (i.e., when no
+              overwrite option is selected), values in the base network will
+              take priority over those in the networks added to it, but this
+              can be changed when selecting an overwrite option(s).  For
+              example, if OVERWRITEMEASURES is selected, then Line/Sample
+              measurements in the last network added will take precedence over
+              all the Line/Sample measurements for conflicting measures in the
+              base network and the networks that were added prior.
             </description>
           </option>
         </list>
@@ -319,28 +344,48 @@
       <parameter name="OVERWRITEPOINTS">
         <type>boolean</type>
         <default><item>False</item></default>
-        <brief>Replace conflicting points as networks are added</brief>
+        <brief>Replace conflicting Control Points as networks are added</brief>
         <description>
-          Whenever a latitude or longitude value conflicts between the base
-          network and the network being added on a fixed Control Point,
-          then the value in the base network will be replaced with that
-          from the add network when this option is TRUE.  When this options is
-          FALSE, the conflict will be noted in the LOG file (if provided), but
-          the value from base will be retained in the output network.
+        <p>
+          When this option is SELECTED, whenever a Control Point conflicts
+          between the base network and the network being added, the
+          Control Point values in the base network will be replaced with the
+          values from the added network.  When this option is NOT SELECTED,
+          the conflict will be noted in the LOG file (if provided), but the
+          values from the base network will be retained in the output network.
+        </p>
+
+        <p>
+          Note that Control Point values being retained or overwritten
+          include the point type (fixed, constrained or free), ignore status,
+          editlock status, apriori and/or adjusted ground coordinates,
+          apriori and/or adjusted ground coordinate sigma values, 
+          constrained coordinate flags.
+        </p>
+
+        <p>
+          It should also be noted that even when this options is NOT SELECTED,
+          measures can still be added and, depending on the OVERWRITE options
+          selected, modified and deleted from points.  This options therefore
+          applies only to control point data values, not items contained within
+          control points.
+        </p>
         </description>
       </parameter>
 
       <parameter name="OVERWRITEMEASURES">
         <type>boolean</type>
         <default><item>False</item></default>
-        <brief>Replace conflicting measures as networks are added</brief>
+        <brief>
+          Replace conflicting Control Measures as networks are added
+        </brief>
         <description>
-          Whenever a Control Measure conflicts between the base network and
-          the network being added on a fixed Control Point, then the measure
-          in the base network will be replaced with that from the add
-          network when this option is TRUE.  When this options is FALSE, the
-          conflict will be noted in the LOG file (if provided), but the
-          measure from base will be retained in the output network.
+          When this option is SELECTED, whenever a Control Measure conflicts
+          between the base network and the network being added, the Control
+          Measure in the base network will be replaced with that from the
+          added network.  When this options is NOT SELECTED, the conflict will
+          be noted in the LOG file (if provided), but the Control Measure
+          from the base network will be retained in the output network.
         </description>
       </parameter>
 
@@ -348,19 +393,31 @@
         <type>boolean</type>
         <default><item>False</item></default>
         <brief>
-          Replace reference measures in conflicting points as networks are added
+          Replace Reference Measures in conflicting Control Points
         </brief>
         <description>
-          When this parameter is true, if a Control Point in the current
-          "base" network and the current network being added to it have
-          different reference measures, there is ambiguity about which measure
-          should be defined as the one and only "reference measure" in the
-          output Control Network.  When this parameter is set to TRUE, the
-          reference measure in the network being added will overwrite the
-          existing reference status of the reference measure in the base
-          network.  If FALSE, the base reference will be retained.  In both
-          cases, both measures make it into the final network, but only one
-          will be listed as the reference for that point.
+          <p>
+            If a Control Point in the current "base" network and the current
+            network being added to it have different Reference Measures, there
+            is ambiguity about which Control Measure should be defined as the
+            one and only Reference Measure in the output Control Network.  When
+            this option is SELECTED, the Reference Measure in the network being
+            added will overwrite the existing reference status of the Reference
+            Measure in the base network.  If this option is NOT SELECTED, the
+            base Reference Measure will be retained.  In both cases, both
+            Control Measures make it into the merged network, but only one will
+            be listed as the Reference Measure for that Control Point.
+          </p>
+
+          <p>
+            Regardless of the other OVERWRITE options selected, a reference
+            measure will NEVER be modified unless this option is SELECTED.  So,
+            for example, if OVERWRITEMEASURES is selected, and the reference
+            measure exists in the new network with a different line/sample, the
+            base's line/sample will be retained if OVERWRITEREFERENCE is not
+            selected.  If this options is selected, however, the reference is
+            subject to modification or removal like any other measure.
+          </p>
         </description>
       </parameter>
 
@@ -368,15 +425,16 @@
         <type>boolean</type>
         <default><item>False</item></default>
         <brief>
-          Measures missing in newer networks will not appear in the output
+          Omit Control Measures missing in network(s) added to the base network
         </brief>
         <description>
-          When this parameter is true, if a measure exists in a conflicting
-          point in the base network, but not the new network being added to it,
-          then the missing measure will not appear in that point in the output
-          Control Network.  By default, this option is set to false, and if a
-          measure exists in either the base or the new network, it will appear
-          in the output as well.
+          When this option is SELECTED, if a Control Measure exists in a
+          conflicting Control Point in the base network, but not the network
+          being added to it, then the missing Control Measure will not be
+          included in the output merged Control Network for that Control Point.
+          If this option is NOT SELECTED (the default), and a Control Measure
+          exists in either the base or the "add" network, it will be included
+          in the ouput network.
         </description>
       </parameter>
     </group>
