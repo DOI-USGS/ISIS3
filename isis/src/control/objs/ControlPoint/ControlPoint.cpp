@@ -132,7 +132,7 @@ namespace Isis {
 
     chooserName = fileEntry.choosername();
     dateTime = fileEntry.datetime();
-    editLock = fileEntry.editlock();
+    editLock = false;
 
     parentNetwork = NULL;
 
@@ -304,6 +304,9 @@ namespace Isis {
     if (fileEntry.has_referenceindex()) {
       SetRefMeasure((*measures)[cubeSerials->at(fileEntry.referenceindex())]);
     }
+
+    // Set edit lock last
+    editLock = fileEntry.editlock();
   }
 
 
