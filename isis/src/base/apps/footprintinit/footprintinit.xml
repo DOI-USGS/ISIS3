@@ -1,58 +1,85 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <application name="footprintinit" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
   <brief>
-    This program stores a polygon representing the Lat/Lon footprint of the 
-    image.
+    Creates a lat/lon polygon and writes it to the image
   </brief>
-
+  
   <description>
-    This program creates a latitude/longitude geometric polygon that determines the footprint of the image. 
-    This footprint is used in other programs such as autoseed.
-  </description>
+    <p>
+      This applications creates a geometric polygon ("footprint") of the input
+      image, where each vertex is a latitude/longitude coordinate in the image.
+      Depending on the granularity of the search (SINC/LINC, NUMVERTICES), this
+      polygon can represent anything from a rough approximation to a
+      fine-grained model of the latitude/longitude extents of the image.
+    </p>
 
+    <p>
+      These polygons are used in a variety of ISIS applications, primarily for
+      performing fast intersection tests to determine if a given coordinate or
+      line falls within the bounds of an image in latitude/longitude space.
+    </p>
+
+    <p>
+      Because many applications can see performance gains on the order of
+      magnitudes from using polygons over repeatedly creating cameras, it is
+      highly recommended that this application be run on all images in a control
+      network prior to performing network population.  The application
+      "autoseed" requires the presence to these polygons, while "cnetadd" has a
+      significant optimization in place using polygons.
+    </p>
+  </description>
+  
   <category>
     <categoryItem>Control Networks</categoryItem>
   </category>
 
+  <seeAlso>
+      <applications>
+        <item>autoseed</item>
+        <item>cnetadd</item>
+      </applications>
+  </seeAlso>
+  
   <history>
     <change name="Tracie Sucharski" date="2005-07-19">
-       Original version 
+      Original version 
     </change>
     <change name="Jacob Danton" date="2006-02-10">
-       Changed input from a list of cube files to a single cube and added appTest.
+      Changed input from a list of cube files to a single cube and added appTest.
     </change>
     <change name="Brendan George" date="2006-06-30">
-        Fixed application test
+      Fixed application test
     </change>
     <change name="Brendan George" date="2006-09-19">
-        Added call to propagate and modify the history blob
+      Added call to propagate and modify the history blob
     </change>
     <change name="Tracie Sucharski" date="2007-05-09">
-        Added error check to insure spiceinit has been run.
+      Added error check to insure spiceinit has been run.
     </change>
     <change name="Brendan George" date="2007-05-21">
-        Moved from Geometry category to Control Network category
+      Moved from Geometry category to Control Network category
     </change>
     <change name="Steven Lambright" date="2007-07-26">
-        Moved Control Network category to Control Networks Category (Control Network category is invalid) and updated program description.
+      Moved Control Network category to Control Networks Category (Control Network category is invalid) and updated program description.
     </change>
     <change name="Steven Koechle" date="2007-10-19">
-        Changed name from polyinit to footprint init
+      Changed name from polyinit to footprint init
     </change>
     <change name="Steven Koechle" date="2008-08-19">
-        Updated to work with Geos3.0.0
+      Updated to work with Geos3.0.0
     </change>
     <change name="Steven Koechle" date="2008-12-15">
-        Deletes old footprint (generated off cubes serial number) if its found. 
-        New name for blob is just Footprint.
+      Deletes old footprint (generated off cubes serial number) if its found. 
+      New name for blob is just Footprint.
     </change>
     <change name="Steven Koechle" date="2009-04-17">
-        PIXINC parameter was removed, ImagePolygon now uses a new method of 
-        finding footprints
+      PIXINC parameter was removed, ImagePolygon now uses a new method of 
+      finding footprints
     </change>
     <change name="Steven Lambright" date="2009-05-29">
-        PIXINC re-implemented. This functionality is crucial. Existing polygons will no
-        longer be deleted if this program fails.
+      PIXINC re-implemented. This functionality is crucial. Existing polygons will no
+      longer be deleted if this program fails.
     </change>
     <change name="Christopher Austin" date="2009-06-16">
       Changed default PIXINC to 100, added test cases.
@@ -100,12 +127,15 @@
     <change name="Christopher Austin" date="2011-05-12">
       Added smarts to the VERTICES option.
     </change>
+    <change name="Travis Addair, Bob Sucharski, Trent Hare" date="2011-10-07">
+      Overhauled documentation.
+    </change>
   </history>
-
+  
   <groups>
-
+    
     <group name="Files">
-
+      
       <parameter name="FROM">
         <type>cube</type>
         <fileMode>input</fileMode>
@@ -119,11 +149,11 @@
           *.cub
         </filter>
       </parameter>
-
+      
     </group>
-
+    
     <group name="Options">
-
+      
       <parameter name="INCREASEPRECISION">
         <type>boolean</type>
         <default><item>FALSE</item></default>
@@ -134,12 +164,12 @@
           invalid polygon. In addition, a results group will be created with
           the keywords SINC/LINC which reveal what SINC/LINC values were
           actually used for the creation of the footprint.
-
+          
           NOTE: This parameter can result in a drastic increase in running time
           as well as a change to user input values.
         </description>
       </parameter>
-
+      
       <parameter name="INCTYPE">
         <type>string</type>
         <default><item>LINCSINC</item></default>
@@ -180,7 +210,7 @@
           </option>
         </list>
       </parameter>
-      
+
       <parameter name="LINC">
         <type>integer</type>
         <minimum inclusive="yes">1</minimum>
@@ -208,7 +238,7 @@
           to skip for every point stored in the footprint.
         </description>
       </parameter>
-
+      
       <parameter name="NUMVERTICES">
         <type>integer</type>
         <default><item>40</item></default>
@@ -224,7 +254,7 @@
         </description>
         <minimum inclusive="true">4</minimum>
       </parameter>
-      
+
       <parameter name="MAXEMISSION">
         <type>double</type>
         <minimum inclusive="yes">0.0</minimum>
@@ -236,12 +266,12 @@
         <description>
           When this value is provided, footprintinit will only consider points
           with an emission angle less than or equal to the provided value.
-
+          
           There should never be an emission angle above 90.  However,
           planet features can cause abnormalities.
         </description>
       </parameter>
-
+      
       <parameter name="MAXINCIDENCE">
         <type>double</type>
         <minimum inclusive="yes">0.0</minimum>
@@ -253,16 +283,16 @@
         <description>
           When this value is provided, footprintinit will only consider points
           with an incidence angle less than or equal to the provided value.
-
+          
           There should never be an incidence angle above 90. However,
           planet features can cause abnormalities.
         </description>
       </parameter>
-
+      
     </group>
-
+    
     <group name="Limb Test">
-
+      
       <parameter name="LIMBTEST">
         <type>string</type>
         <default><item>ELLIPSOID</item></default>
@@ -271,27 +301,27 @@
           This parameter is used to specify how limb images are to be handled.
         </description>
         <list>
-           <option value="ELLIPSOID">
-              <brief>Use an Ellipsoid Shape Model</brief>
-              <description>
-                If a limb image is detected, an ellipsoid shape model will be
-                used reguardless of the shape model defined by spiceinit.
-              </description>
-            </option>
-           <option value="SPICEINIT">
-              <brief>Use Spiceinit Shape Model</brief>
-              <description>
-                If a limb image is detected then use the shape model defined 
-                by spiceinit. This is 
-              </description>
-            </option>
+          <option value="ELLIPSOID">
+            <brief>Use an Ellipsoid Shape Model</brief>
+            <description>
+              If a limb image is detected, an ellipsoid shape model will be
+              used reguardless of the shape model defined by spiceinit.
+            </description>
+          </option>
+          <option value="SPICEINIT">
+            <brief>Use Spiceinit Shape Model</brief>
+            <description>
+              If a limb image is detected then use the shape model defined 
+              by spiceinit. This is 
+            </description>
+          </option>
         </list>
       </parameter>
-
+      
     </group>
-
+    
     <group name="XY Test">
-
+      
       <parameter name="TESTXY">
         <type>boolean</type>
         <default><item>FALSE</item></default>
@@ -326,8 +356,8 @@
             <brief>View MapFile</brief>
             <description>
               This helper button will cat out the mapping group of the given mapfile to the session log
-               of the application
-             </description>
+              of the application
+            </description>
             <icon>$ISIS3DATA/base/icons/labels.png</icon>
           </helper>
         </helpers>
@@ -335,9 +365,9 @@
           *.map *.cub
         </filter>
       </parameter>
-
+      
     </group>
-
+    
   </groups>
-
+  
 </application>
