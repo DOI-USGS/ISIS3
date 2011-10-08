@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <application name="dawnvir2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
-  <brief>Import PDS formatted DAWN VIR EDR or RDR image cube into Isis format cube</brief>
+  <brief>
+       Import PDS formatted Dawn VIR EDR or RDR image cube into ISIS format cube 
+  </brief>
 
   <description>
-    This program will import a PDS formatted DAWN Visual and InfraRed Mapping
-    Spectrometer (VIR) level 1a (EDR) or level 1b (RDR) image into an ISIS cube.  
-    It supports ingestion of detached PDS labels.  The file containing the label 
-    needs to be provided in the FROM parameter.  If it is not the actual image 
-    data, it will search for a file with the same base name and suffix with 
-    .QUB. 
+      This program will import a PDS formatted Dawn Visual and InfraRed Mapping
+      Spectrometer (VIR) level 1A (EDR) or level 1B (RDR) image into an ISIS 
+      cube.  It supports ingestion of detached PDS labels.  The file containing 
+      the label needs to be provided in the FROM parameter.   This is typically 
+      a file ending with a .LBL suffix.   If it is not the actual image data, it 
+      will search for a file with the same base name and suffix with .QUB. 
   </description>
 
   <history>
@@ -29,6 +31,9 @@
      <change name="Kris Becker" date="2011-06-29">
           Added ingestion of PDS table data file for camera model support
      </change>
+     <change name="Kris Becker" date="2011-10-02">
+          Updated documentation.
+     </change>
   </history>
 
   <category>
@@ -41,14 +46,17 @@
         <type>filename</type>
         <fileMode>input</fileMode>
         <brief>
-          Input PDS formatted DAWN VIR EDR or RDR file
+          Input PDS formatted Dawn VIR EDR (1A) or RDR (1B) file (or detached 
+          label file) 
         </brief>
         <description>
-          Use this parameter to select the DAWN VIR EDR or RDR filename. This 
-          file must contain the PDS labels. However, the image data can be 
-          detached and will automatically be obtained from the PDS image pointer 
-          keyword. If the pointer is incorrect, then use the IMAGE parameter to 
-          specify the file containing the binary image data.
+          Use this parameter to select the existing Dawn VIR EDR or RDR 
+          filename. This file must contain a PDS label, with the actual image 
+          data either attached (within FROM file) or detached (separate file). 
+          For the detached case, the image data filename will automatically be 
+          obtained from the PDS image pointer keyword (“^IMAGE = …”). To 
+          override the existing pointer value, use this application’s IMAGE 
+          parameter to specify the file containing the binary image data. 
         </description>
         <filter>
           *.qub *.QUB *.lbl *.LBL *.img
@@ -59,11 +67,14 @@
         <type>filename</type>
         <fileMode>input</fileMode>
         <brief>
-          Detached data file
+          Detached data file (if not attached in FROM file)
         </brief>
         <description>
-          Use this parameter if the pointer to the image data in the
-          detached label (FROM) is incorrect.
+          Use this parameter, if desired, to override the image pointer 
+          (“^IMAGE = …”) value in the detached PDS label (FROM). Or, if the 
+          existing pointer value is not resolved as an existing file, this 
+          application will search for an image file with the same FROM path and 
+          base name, only now with extension .QUB.  
         </description>
         <internalDefault>
           Cube data embedded with label or file pointer in label file.
@@ -81,39 +92,35 @@
         </brief>
         <description>
             <p>
-                This parameters is optional but the file is not.  It must be 
-                provided.  The application will derive the expected name of the 
-                input file which will always be the .LBL file describing the 
-                contents of the housekeeping (HK) table file.
+                Housekeeping label file describing the HKTABLE. This parameter
+                is optional but the relevant label file must exist and be accessible 
+                by this application. Without a user entry here, the application will 
+                derive an expected label filename (two options) as follows. 
             </p>
             <p>
-                The file is derived from the input file by first, stripping the 
-                extention off the FROM file , replacing it with _HK.LBL.  It 
-                will then detemine if it exists.  If it doesn't exist, then the 
-                filename is scanned for '_1B_' and it is replaced with '_1A'. 
-                This is because the table data for 1A (uncalibrated) images can 
-                be used with 1B (calibrated) images.  
+                To start, the HKFROM filename is derived by using the FROM base 
+                filename, and replacing the .extension with _HK.LBL. If this 
+                file does not exist, the application then replaces, within the 
+                derived filename, the string '_1B_' with '_1A_', and attempts a 
+                second search for the file.  This second attempt is relevant 
+                since table data for 1A (uncalibrated) images can be used with 
+                1B (calibrated) images.
             </p>
             <p>
-                If the above file determination effort fails, then the user must 
-                provide the name of the housekeeping label file as this data is 
-                required.
+                 For example (again, without a user HKFROM entry), if the input 
+                 image label file (FROM) is VIR_IR_1B_1_358284474_1.LBL, then 
+                 the housekeeping file name first derived is    
+                 VIR_IR_1B_1_358284474_1_HK.LBL. If deemed nonexistent, the 
+                 second derived file name is VIR_IR_1A_1_358284474_1_HK.LBL. 
+                 Otherwise, user input is required for the HKFROM parameter.
             </p>
             <p>
-                For example, if the input image label file is 
-                VIR_IR_1B_1_358284474_1.LBL, then the housekeeping file name 
-                derived from this is VIR_IR_1B_1_358284474_1_HK.LBL.  This file 
-                is unlikely to not exist so the second file name generated is 
-                VIR_IR_1A_1_358284474_1_HK.LBL.  If this one does not exist, the 
-                user is required to provide this in the HKFROM parameter.
-            </p>
-            <p>
-                Note that this file is assumed to exist in the same directory as 
-                the image data.  If this is not the case, then the user must 
-                provide the filename.
+                  Note this file is assumed to exist in the same directory as 
+                   the image data (FROM). Otherwise, the user must provide the 
+                   full path and filename. 
             </p>
         </description>
-        <internalDefault>Derived from input image</internalDefault>
+        <internalDefault>Derived from input image (FROM)</internalDefault>
         <filter>
           *.LBL *.TAB
         </filter>
@@ -140,7 +147,7 @@
             </p>
         </description>
         <internalDefault>
-          Deterministic from input files
+          Deterministic from input label file (HKFROM)
         </internalDefault>
         <filter>
           *.img *.qub *.QUB
@@ -166,25 +173,36 @@
     <group name="Parameters">
         <parameter name="TARGET">
             <type>string</type>
-            <brief>Provide target name if it needs to be changed</brief>
+            <brief>Provide target name if absent or incorrect in input (FROM) 
+              label 
+            </brief>
             <description>
-                This parameter may be necessary as some EDR labels do not adequately defined
-                the TARGET_NAME keyword in the labels.  DAWN has a long cruise 
-                period before ariving at Vesta in August 2011.  During cruise, 
-                a Mars flyby and stellar observatoins will occur.  The proper 
-                specification of the TARGET_NAME is critical to valid 
-                instantiation of ISIS camera models. 
-
-                 There are many star observations being made and in order to 
-                 properly instantiate the ISIS camera model, the target must be 
-                 a recognized NAIF body or "Sky".  NAIF bodies provide the means 
-                 to map image coordinates to latitude/longitude values.  "Sky" 
-                 is a special instantiation within ISIS that provides the 
-                 ability to map image coordinates to RA/DEC coordinates.
-                
-                The default is to honor the value in the  EDR label.  For some 
-                observed targets, "Sky" would be required in order to properly 
-                instantiate the camera model.
+              <p>
+               This parameter may be necessary as some Dawn EDR labels may 
+                not contain incorrect values for the TARGET_NAME keyword. 
+              </p>
+              <p>
+                Dawn had a long cruise period before arriving at Vesta in 
+                August 2011. During cruise, a Mars flyby and various stellar 
+                observations occurred. Proper specification of the 
+                TARGET_NAME is critical. 
+              </p>
+              <p>
+                With many star observations being made by Dawn, and in order to 
+                properly instantiate the ISIS camera model, the target must be 
+                either a recognized NAIF body or defined as <i>Sky</i>. NAIF 
+                bodies provide the means to map image coordinates to 
+                latitude/longitude values. 
+              </p>
+              <p>
+                <i>Sky</i> is a special instantiation within ISIS providing the 
+                ability to map image coordinates to RA/DEC coordinates. If not 
+                defined here (TARGET), the default is to honor the TARGET_NAME 
+                value in the existing EDR label. For some observed targets, 
+                <i>Sky</i> is required in order to properly instantiate the camera 
+                model orignally validated by the <b>spiceinit</b> ISIS 
+                application.
+              </p>
             </description>
             <internalDefault>Label Value</internalDefault> 
         </parameter>
