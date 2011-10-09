@@ -3,7 +3,7 @@
 <application name="cnetextract" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>
-    Extracts portions of an existing Control Network
+    Extracts portions of an existing Control Network 
   </brief>
 
   <description>
