@@ -316,7 +316,7 @@ void phocube(Buffer &out) {
       }
       // Trim outerspace
       else {
-        for(int b = 0; b < nbands; b++) {
+        for(int b = (skipDN) ? 1 : 0; b < nbands; b++) {
           out[index] = Isis::NULL8;
           index += 64 * 64;
         }

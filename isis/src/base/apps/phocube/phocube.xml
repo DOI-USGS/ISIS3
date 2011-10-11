@@ -98,6 +98,9 @@
       reported correctly in the output cube. The reported value
       was completly incorrect.
     </change>
+    <change name="Steven Lambright and Stuard Sides" date="2011-10-11">
+      Fixed an out of array bounds problem that caused unpredictable behavior.
+    </change>
   </history>
 
   <category>
