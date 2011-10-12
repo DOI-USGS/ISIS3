@@ -8,9 +8,10 @@
   <description>
     <p>
       This program will update the camera pointing (CK) in the labels of a 
-      level 1 cube using a map projected "Base" cube to determine the
-      latitude/longitude of control points.  Angles 1 and 2 of the camera
-      pointing stored in the cube labels will be adjusted to align the
+      <def>Level1</def> cube using a map projected, <def>Level2</def> 
+      "Base" cube to determine the latitude/longitude of
+      <def>control point</def>s.  Angles 1 and 2 of the camera pointing
+      stored in the cube labels will be adjusted to align the
       coordinate of each sample/line from the "Match" level 1 cube with
       the latitude/longitude from the "Base" map projected cube.  To
       solve for all three camera angles select the TWIST radio button in
@@ -39,7 +40,7 @@
       cube (unprojected) which will be the cube which will have the camera
       pointing updated.  The unprojected match cube must have been initialized
       with the "spiceinit" program using ATTACH="YES".  Optionally, an
-      existing control network containing control points between the "Match"
+      existing <def>control network</def> containing control points between the "Match"
       cube and a basemap, may be entered.
     </p>
     <p>
@@ -184,6 +185,10 @@
     </change>
     <change name="Tracie Sucharski" date="2011-10-05">
         Updated documentation with input from Tammy Becker.
+    </change>
+    <change name="Tracie Sucharski" date="2011-10-12">
+        Added links to definitions and made corrections to  documentation
+        based on suggestions from Trent Hare.
     </change>
   </history>
 </application>
