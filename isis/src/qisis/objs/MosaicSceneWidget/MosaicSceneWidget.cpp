@@ -734,7 +734,7 @@ namespace Isis {
       double minX, minY, maxX, maxY;
       m_projection->XYRange(minX, maxX, minY, maxY);
 
-      QRectF projRect(minX, minY, maxX - minX, maxY - minY);
+      QRectF projRect(minX, -maxY, maxX - minX, maxY - minY);
       QRectF cubesBounding = cubesBoundingRect();
 
       QRectF bounding = projRect.united(cubesBounding);
