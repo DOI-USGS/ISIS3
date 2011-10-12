@@ -124,24 +124,45 @@ you must <em>not</em> upgrade the Isis Data Files!!!
 </pre>
 
         <p>
-          Example for RHEL 5.5 Linux x86 64-bit Intel compatible systems:
+          Example for Open SUSE 11.3 Linux x86 64-bit Intel compatible systems:
+        </p>
+<pre>
+        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::x86-64_linux_SUSE11/isis .
+</pre>
+
+        <p>
+          Example for RHEL 5.6 Linux x86 64-bit Intel compatible systems:
         </p>
 <pre>
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::x86-64_linux_RHEL/isis .
 </pre>
 
         <p>
-          Example for RHEL 5.5 Linux x86 32-bit Intel compatible systems:
+          Example for RHEL 5.6 Linux x86 32-bit Intel compatible systems:
         </p>
 <pre>
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::x86_linux_RHEL/isis .
 </pre>
 
         <p>
-          Example for Open SUSE 11.3 Linux x86 64-bit Intel compatible systems:
+          Example for Ubuntu 10.04 Linux x86 64-bit Intel compatible systems:
         </p>
 <pre>
-        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::x86-64_linux_SUSE11/isis .
+        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::x86-64_linux_UBUNTU/isis .
+</pre>
+
+        <p>
+          Example for Debian 6.0 Linux x86 64-bit Intel compatible systems:
+        </p>
+<pre>
+        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::x86-64_linux_DEBIAN/isis .
+</pre>
+
+        <p>
+          Example for RHEL 6.1 Linux x86 64-bit Intel compatible systems:
+        </p>
+<pre>
+        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::x86-64_linux_RHEL6/isis .
 </pre>
 
 
@@ -174,13 +195,13 @@ you must <em>not</em> upgrade the Isis Data Files!!!
           the internet. This
           can significantly reduce the size of the download from our data 
           area. If you want to use this new service and not have to download all the 
-          SPICE data add the following argument to all rsync command below:
+          SPICE data add the following argument to the mission-specific rsync commands below:
         </p>
 <pre>
   --exclude='kernels'
 </pre>
         <p>
-          For example: rsync -azv --exclude='kernels' --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data .
+          For example: rsync -azv --exclude='kernels' --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/cassini data/
         </p>
         <p>
             Perform this step from the same directory you ran the previous rsync
