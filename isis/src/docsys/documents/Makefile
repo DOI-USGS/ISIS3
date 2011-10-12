@@ -136,8 +136,12 @@ clean:
 	    rm -f Makefile-temp ; \
 	    cd .. ; \
 	done ; \
-	rm ReleaseNotes/ReleaseNotes.xml
-	rm ParameterChanges/ParameterChanges.xml
+	if [ -f ReleaseNotes/ReleaseNotes.xml ]; then \
+	  rm ReleaseNotes/ReleaseNotes.xml; \
+	fi; \
+	if [ -f ParameterChanges/ParameterChanges.xml ]; then \
+	  rm ParameterChanges/ParameterChanges.xml; \
+	fi;
 
 FORCE:
 
