@@ -50,7 +50,8 @@ void MakeCompletion(const string &appName) {
 
   if(appName.compare("qmos") == 0 ||
      appName.compare("./qmos") == 0) {
-    cout << "complete " << appName << " 'n@*@f:*.[mM][oO][sS]@'; ";
+    cout << "complete " << appName
+         << " 'n@*@f:*.{[mM][oO][sS],[cC][uU][bB],[lL][iI][sS]}@'; ";
     return;
   }
 
