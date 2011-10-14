@@ -74,17 +74,50 @@ void IsisMain() {
   }
 
   // global parameter uncertainties
-  b->SetGlobalLatitudeAprioriSigma(ui.GetDouble("POINT_LATITUDE_SIGMA"));
-  b->SetGlobalLongitudeAprioriSigma(ui.GetDouble("POINT_LONGITUDE_SIGMA"));
-  b->SetGlobalRadiiAprioriSigma(ui.GetDouble("POINT_RADIUS_SIGMA"));
+  if( ui.WasEntered("POINT_LATITUDE_SIGMA") )
+    b->SetGlobalLatitudeAprioriSigma(ui.GetDouble("POINT_LATITUDE_SIGMA"));
+  else
+    b->SetGlobalLatitudeAprioriSigma(-1.0);
 
-  b->SetGlobalSpacecraftPositionAprioriSigma(ui.GetDouble("SPACECRAFT_POSITION_SIGMA"));
-  b->SetGlobalSpacecraftVelocityAprioriSigma(ui.GetDouble("SPACECRAFT_VELOCITY_SIGMA"));
-  b->SetGlobalSpacecraftAccelerationAprioriSigma(ui.GetDouble("SPACECRAFT_ACCELERATION_SIGMA"));
+  if( ui.WasEntered("POINT_LONGITUDE_SIGMA") )
+    b->SetGlobalLongitudeAprioriSigma(ui.GetDouble("POINT_LONGITUDE_SIGMA"));
+  else
+    b->SetGlobalLongitudeAprioriSigma(-1.0);
 
-  b->SetGlobalCameraAnglesAprioriSigma(ui.GetDouble("CAMERA_ANGLES_SIGMA"));
-  b->SetGlobalCameraAngularVelocityAprioriSigma(ui.GetDouble("CAMERA_ANGULAR_VELOCITY_SIGMA"));
-  b->SetGlobalCameraAngularAccelerationAprioriSigma(ui.GetDouble("CAMERA_ANGULAR_ACCELERATION_SIGMA"));
+  if( ui.WasEntered("POINT_RADIUS_SIGMA") )
+    b->SetGlobalRadiiAprioriSigma(ui.GetDouble("POINT_RADIUS_SIGMA"));
+  else
+    b->SetGlobalRadiiAprioriSigma(-1.0);
+
+  if( ui.WasEntered("SPACECRAFT_POSITION_SIGMA") )
+    b->SetGlobalSpacecraftPositionAprioriSigma(ui.GetDouble("SPACECRAFT_POSITION_SIGMA"));
+  else
+    b->SetGlobalSpacecraftPositionAprioriSigma(-1.0);
+
+  if( ui.WasEntered("SPACECRAFT_VELOCITY_SIGMA") )
+    b->SetGlobalSpacecraftVelocityAprioriSigma(ui.GetDouble("SPACECRAFT_VELOCITY_SIGMA"));
+  else
+    b->SetGlobalSpacecraftVelocityAprioriSigma(-1.0);
+
+  if( ui.WasEntered("SPACECRAFT_ACCELERATION_SIGMA") )
+    b->SetGlobalSpacecraftAccelerationAprioriSigma(ui.GetDouble("SPACECRAFT_ACCELERATION_SIGMA"));
+  else
+    b->SetGlobalSpacecraftAccelerationAprioriSigma(-1.0);
+
+  if( ui.WasEntered("CAMERA_ANGLES_SIGMA") )
+    b->SetGlobalCameraAnglesAprioriSigma(ui.GetDouble("CAMERA_ANGLES_SIGMA"));
+  else
+    b->SetGlobalCameraAnglesAprioriSigma(-1.0);
+
+  if( ui.WasEntered("CAMERA_ANGULAR_VELOCITY_SIGMA") )
+    b->SetGlobalCameraAngularVelocityAprioriSigma(ui.GetDouble("CAMERA_ANGULAR_VELOCITY_SIGMA"));
+  else
+    b->SetGlobalCameraAngularVelocityAprioriSigma(-1.0);
+
+  if( ui.WasEntered("CAMERA_ANGULAR_ACCELERATION_SIGMA") )
+    b->SetGlobalCameraAngularAccelerationAprioriSigma(ui.GetDouble("CAMERA_ANGULAR_ACCELERATION_SIGMA"));
+  else
+    b->SetGlobalCameraAngularAccelerationAprioriSigma(-1.0);
 
   // output options
   if (ui.WasEntered("FILE_PREFIX"))  {
@@ -97,10 +130,10 @@ void IsisMain() {
   b->SetResidualOutput(ui.GetBoolean("RESIDUALS_CSV"));
 
   // Check to make sure user entered something to adjust... Or can just points be in solution?
-//   if (camsolve == "NONE"  &&  spsolve == "NONE") {
-//     string msg = "Must either solve for camera pointing or spacecraft position";
-//     throw iException::Message(Isis::iException::User, msg, _FILEINFO_);
-//   }
+   if (camsolve == "NONE"  &&  spsolve == "NONE") {
+     string msg = "Must either solve for camera pointing or spacecraft position";
+     throw iException::Message(Isis::iException::User, msg, _FILEINFO_);
+   }
 
   // set convergence threshold
   b->SetConvergenceThreshold(ui.GetDouble("SIGMA0"));

@@ -129,6 +129,10 @@
       of angles to state right ascension and declination to be consistent
       with the output.
     </change>
+    <change name="Ken Edmundson" date="2011-10-14">
+      Added internal default and minimum inclusive tags to global apriori
+      uncertainties.
+    </change>
   </history>
 
   <groups>
@@ -537,9 +541,8 @@
                  uncertainty for all points.  Units are meters.
           </description>
           <type>double</type>
-          <default>
-            <item>-1.0</item>
-          </default>
+          <internalDefault>none</internalDefault>
+          <minimum inclusive="yes">0</minimum>
         </parameter>
 
         <parameter name="POINT_LONGITUDE_SIGMA">
@@ -550,9 +553,8 @@
                  uncertainty for all points. Units are meters. 
           </description>
           <type>double</type>
-          <default>
-            <item>-1.0</item>
-          </default>
+          <internalDefault>none</internalDefault>
+          <minimum inclusive="yes">0</minimum>
         </parameter>
 
         <parameter name="POINT_RADIUS_SIGMA">
@@ -563,9 +565,8 @@
                  all points.  Units are meters.
           </description>
           <type>double</type>
-          <default>
-            <item>-1.0</item>
-          </default>
+          <internalDefault>none</internalDefault>
+          <minimum inclusive="yes">0</minimum>
         </parameter>
 
         <parameter name="SPACECRAFT_POSITION_SIGMA">
@@ -576,9 +577,8 @@
                  coordinates.  Units are meters.
           </description> 
           <type>double</type>
-          <default>
-            <item>-1.0</item>
-          </default>
+          <internalDefault>none</internalDefault>
+          <minimum inclusive="yes">0</minimum>
         </parameter>
 
         <parameter name="SPACECRAFT_VELOCITY_SIGMA">
@@ -589,9 +589,8 @@
                  velocity.  Units are meters/second.
             (meters)</description> 
           <type>double</type>
-          <default>
-            <item>-1.0</item>
-          </default>
+          <internalDefault>none</internalDefault>
+          <minimum inclusive="yes">0</minimum>
         </parameter>
 
         <parameter name="SPACECRAFT_ACCELERATION_SIGMA">
@@ -602,9 +601,8 @@
                  spacecraft acceleration.  Units are meters/second/second.
           </description> 
           <type>double</type>
-          <default>
-            <item>-1.0</item>
-          </default>
+          <internalDefault>none</internalDefault>
+          <minimum inclusive="yes">0</minimum>
         </parameter>
 
         <parameter name="CAMERA_ANGLES_SIGMA">
@@ -615,9 +613,8 @@
                  angles.  Units are decimal degrees.
           </description> 
           <type>double</type>
-          <default>
-            <item>-1.0</item>
-          </default>
+          <internalDefault>none</internalDefault>
+          <minimum inclusive="yes">0</minimum>
         </parameter>
 
         <parameter name="CAMERA_ANGULAR_VELOCITY_SIGMA">
@@ -628,9 +625,8 @@
                  angular velocity.  Units are decimal degrees/second.
           </description> 
           <type>double</type>
-          <default>
-            <item>-1.0</item>
-          </default>
+          <internalDefault>none</internalDefault>
+          <minimum inclusive="yes">0</minimum>
         </parameter>
 
         <parameter name="CAMERA_ANGULAR_ACCELERATION_SIGMA">
@@ -641,9 +637,8 @@
                  angular acceleration.  Units are decimal degrees/second/second.
           </description> 
           <type>double</type>
-          <default>
-            <item>-1.0</item>
-          </default>
+          <internalDefault>none</internalDefault>
+          <minimum inclusive="yes">0</minimum>
         </parameter>
         </group>
 
