@@ -992,31 +992,19 @@
           have differing illumination conditions.
         </p>
         <p>
-          Currently,
+          Currently, the
           <a href="http://en.wikipedia.org/wiki/Sobel_operator">
             Sobel
           </a>
-          and
-          <a href="http://en.wikipedia.org/wiki/Roberts_Cross">
-            Roberts
-          </a>
-          gradient filters are supported. The Sobel gradient filter looks at
-          the eight surrounding pixels for a given point, while the Roberts
-          gradient filter computes the sum of the squares of the differences
-          between diagonally adjacent pixels. A Sobel gradient filter can be
-          specified like so:
+          gradient filter is supported. The Sobel gradient filter looks at
+          the eight surrounding pixels for a given point. A Sobel gradient
+          filter can be specified like so:
 
           <pre style="padding-left:4em;">
             Group = Algorithm
               Gradient = Sobel
             End_Group
           </pre>
-
-          <span style="color:red;">
-           Note:  Don't use the Roberts filter.  We will be removing this option
-        from the pattern matching code in a future release.  Use of the Roberts
-        filter can cause errors in pattern matching in excess of one pixel.
-          </span>
         </p>
 
         <!-- Appendices -->
@@ -1106,7 +1094,7 @@
             <td>Algorithm</td>
             <td>All</td>
             <td>String</td>
-            <td>{None, Roberts, Sobel}</td>
+            <td>{None, Sobel}</td>
             <td>None</td>
           </tr>
 
@@ -1347,6 +1335,10 @@
     <change name="Moses Millazo and Jeff Anderson" date="2011-10-05">
       Updates to Gruen documentation, the eccentricity ratio, and the gradient 
       filters.
+    </change>
+    <change name="Jai Rideout" date="2011-10-14">
+      Removed references to Roberts gradient because it has been removed from
+      AutoReg.
     </change>
   </history>
 </documentation>
