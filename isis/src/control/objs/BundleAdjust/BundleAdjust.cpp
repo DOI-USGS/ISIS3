@@ -203,6 +203,9 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     // Get the cameras set up for all images
     m_pCnet->SetImages(*m_pSnList, progress);
 
+    // clear JigsawRejected flags
+    m_pCnet->ClearJigsawRejected();
+
     m_nHeldImages = 0;
     int nImages = m_pSnList->Size();
 
@@ -949,11 +952,9 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         m_dSigma0 = dvtpv;
       else {
         std::string msg = "Degrees of Freedom " + iString(m_nDegreesOfFreedom) 
-            + " is invalid ( <= 0)!";
+            + " is invalid (&lt;= 0)!";
       throw Isis::iException::Message(iException::Io, msg, _FILEINFO_);
     }
-
-      std::cout << "degrees of freedom = " << m_nDegreesOfFreedom << std::endl;
 
       m_dSigma0 = sqrt(m_dSigma0);
 

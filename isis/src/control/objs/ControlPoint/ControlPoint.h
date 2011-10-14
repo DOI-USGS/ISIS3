@@ -317,6 +317,9 @@ namespace Isis {
    *                           constructor given a protocol buffer. This caused
    *                           unpredictable reference measure behaviour
    *                           sometimes (rarely).
+   *   @history 2011-10-14 Ken Edmundson Added method ClearJigsawRejected(); to
+   *                           set all measure and point JigsawRejected flags to
+   *                           false prior to bundle adjustment.
    */
   class ControlPoint : public QObject {
 
@@ -534,13 +537,14 @@ namespace Isis {
       bool operator==(const ControlPoint &pPoint) const;
       const ControlPoint &operator=(const ControlPoint &pPoint);
 
-      // The next 6 methods are specifically to support BundleAdjust
+      // The next 7 methods are specifically to support BundleAdjust
       void ZeroNumberOfRejectedMeasures();
       void SetNumberOfRejectedMeasures(int numRejected);
       int GetNumberOfRejectedMeasures() const;
       double GetSampleResidualRms() const;
       double GetLineResidualRms() const;
       double GetResidualRms() const;
+      void ClearJigsawRejected();
 
       ControlPointFileEntryV0002 ToFileEntry() const;
 

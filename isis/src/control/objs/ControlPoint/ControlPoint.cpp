@@ -2126,6 +2126,26 @@ namespace Isis {
       return stats.Rms();
   }
 
+  /**
+   * Set jigsaw rejected flag for all measures to false
+   * and set the jigsaw rejected flag for the point itself to false
+   */
+  void ControlPoint::ClearJigsawRejected() {
+    int nmeasures = measures->size();
+    if( nmeasures <= 0 )
+        return;
+
+    for( int i = 0; i < nmeasures; i++) {
+      ControlMeasure* m = GetMeasure(i);
+      if( !m )
+        continue;
+
+      m->SetRejected(false);
+    }
+
+    SetRejected(false);
+  }
+
 
   ControlPointFileEntryV0002 ControlPoint::ToFileEntry() const {
     ControlPointFileEntryV0002 fileEntry;

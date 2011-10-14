@@ -160,6 +160,9 @@ namespace Isis {
    *   @history 2011-08-24 Steven Lambright - Fixed bug in graph code
    *   @history 2011-10-06 Steven Lambright - Having a target is no longer
    *                           required.
+   *   @history 2011-10-14 Ken Edmundson Added method ClearJigsawRejected(); to
+   *                           set all measure/point JigsawRejected flags to
+   *                           false prior to bundle adjustment.
    */
   class ControlNet : public QObject {
       Q_OBJECT
@@ -216,6 +219,7 @@ namespace Isis {
       int GetNumIgnoredMeasures();
       int GetNumberOfMeasuresInImage(const std::string &serialNumber);
       int GetNumberOfJigsawRejectedMeasuresInImage(const std::string &serialNumber);
+      void ClearJigsawRejected();
       void IncrementNumberOfRejectedMeasuresInImage(const std::string &serialNumber);
       void DecrementNumberOfRejectedMeasuresInImage(const std::string &serialNumber);
       int GetNumMeasures() const;

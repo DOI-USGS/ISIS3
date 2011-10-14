@@ -1115,6 +1115,18 @@ namespace Isis {
 
 
   /**
+   * Sets jigsaw rejected flag to false for all points and measures.
+   * Called by BundleAdjust::Init method
+   *
+   */
+  void ControlNet::ClearJigsawRejected() {
+    foreach(ControlPoint * p, *points) {
+      p->ClearJigsawRejected();
+    }
+  }
+
+
+  /**
    * Increment number of jigsaw rejected measures in image specified by serialNumber
    *
    */

@@ -95,6 +95,9 @@
  *                          the line.
  *   @history 2011-09-28 Debbie A. Cook Renamed SPARSE solve method to OLDSPARSE
  *                          and CHOLMOD to SPARSE. 
+ *   @history 2011-10-14 Ken Edmundson Added call to m_pCnet->ClearJigsawRejected();
+ *                          to Init() method to set all measure/point
+ *                          JigsawRejected flags to false prior to bundle.
  */
 
 #include <QObject> // parent class
