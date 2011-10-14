@@ -310,9 +310,6 @@ namespace Isis {
     if (gradientFilterType == "None") {
       p_gradientFilterType = None;
     }
-    else if (gradientFilterType == "Roberts") {
-      p_gradientFilterType = Roberts;
-    }
     else if (gradientFilterType == "Sobel") {
       p_gradientFilterType = Sobel;
     }
@@ -1003,10 +1000,7 @@ namespace Isis {
     // Use a different subchip size depending on which gradient filter is
     // being applied.
     int subChipWidth;
-    if (p_gradientFilterType == Roberts) {
-      subChipWidth = 2;
-    }
-    else if (p_gradientFilterType == Sobel) {
+    if (p_gradientFilterType == Sobel) {
       subChipWidth = 3;
     }
     else {
@@ -1046,9 +1040,6 @@ namespace Isis {
         // Calculate gradient based on contents in buffer and insert it into
         // output chip.
         double newPixelValue = 0;
-        if (p_gradientFilterType == Roberts) {
-          RobertsGradient(buffer, newPixelValue);
-        }
         if (p_gradientFilterType == Sobel) {
           SobelGradient(buffer, newPixelValue);
         }
@@ -1064,28 +1055,6 @@ namespace Isis {
     }
   }
 
-  /**
-   * Compute a Roberts gradient based on an input buffer.
-   *
-   * TODO: Remove this method as it already exists in the
-   * gradient application.
-   *
-   * @param in the input buffer
-   * @param v the value of the gradient computed from the buffer
-   */
-  void AutoReg::RobertsGradient(Buffer &in, double &v) {
-    bool specials = false;
-    for(int i = 0; i < in.size(); ++i) {
-      if(IsSpecial(in[i])) {
-        specials = true;
-      }
-    }
-    if(specials) {
-      v = Isis::Null;
-      return;
-    }
-    v = abs(in[0] - in[3]) + abs(in[1] - in[2]);
-  }
 
   /**
    * Compute a Sobel gradient based on an input buffer.

@@ -160,6 +160,8 @@ namespace Isis {
    *             filtered chips after registration instead of just saving the
    *             original chips.
    *    @history 2011-05-18 Steven Lambright - Fixed a bug with ReductionFactor 
+   *    @history 2011-10-12 Jai Rideout - Removed Roberts gradient. It did not
+   *             give useful results due to the 2x2 matrix it uses.
    */
   class AutoRegItem;
   class Buffer;
@@ -199,8 +201,7 @@ namespace Isis {
        */
       enum GradientFilterType {
         None,   //!< default, no gradient filter
-        Sobel,  //!< Sobel gradient filter
-        Roberts //!< Roberts gradient filter
+        Sobel   //!< Sobel gradient filter
       };
 
       //! Return pointer to pattern chip
@@ -533,7 +534,6 @@ namespace Isis {
       bool ComputeChipZScore(Chip &chip);
       void Init();
       void ApplyGradientFilter(Chip &chip);
-      void RobertsGradient(Buffer &in, double &v);
       void SobelGradient(Buffer &in, double &v);
 
       Chip p_patternChip;                                  //!< Chip to be matched
