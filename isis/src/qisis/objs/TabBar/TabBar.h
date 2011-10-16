@@ -23,7 +23,6 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-
 // QToolBar is the parent of this class, and should be the ONLY include
 // in this file.  Do not add any other includes to this header file!
 #include <QToolBar>
@@ -31,8 +30,8 @@
 class QWidget;
 template< class A > class QVector;
 
-
-namespace Isis {
+namespace Isis
+{
   class Tab;
 
   /**
@@ -47,38 +46,44 @@ namespace Isis {
    * @internal
    * @history 2010-05-07 Eric Hyer - Original Version
    * @history 2010-06-03 Eric Hyer - Added noneSelected method
+   * @history 2010-09-23 Eric Hyer - Tab's parent is now QAction
+   *                               - Removed useDefaults var and functionality
+   *                               - Fixed namespace issue
    */
-  class TabBar : public QToolBar {
+  class TabBar : public QToolBar
+  {
       Q_OBJECT
 
     public:
-      TabBar(const bool &useDefaultViewSettings = false, QWidget *parent = 0);
+      TabBar();
       virtual ~TabBar();
 
-      virtual void addTab(Tab *newTab);
+      virtual void addTab(Tab * newTab);
       const int curSelectedTab() const;
-      void setRadioStyle(const bool &radioStyle);
+      void setRadioStyle(const bool & radioStyle);
       bool radioStyle();
       const int size() const;
 
-      void setSelected(const int &index, const bool &status);
-      bool isSelected(const int &index);
+      void setSelected(const int & index, const bool & status);
+      bool isSelected(const int & index);
       bool noneSelected();
+      void setEnabled(bool);
 
-
+    
     private slots:
-      void tabClicked(const int &index);
+      void tabClicked(const int & index);
 
 
-    private: // functions
-      bool noOthersInGrpSelected(const int &index) const;
-      void deselectOthersInGrp(const int &index);
+    private:
+      // functions
+      bool noOthersInGrpSelected(const int & index) const;
+      void deselectOthersInGrp(const int & index);
 
 
-    private: // data
+    private:
+      // data
       QVector< Tab * > * tabs;
       bool radioStyleTabs;
-      bool useDefaults;
   };
 }
 
