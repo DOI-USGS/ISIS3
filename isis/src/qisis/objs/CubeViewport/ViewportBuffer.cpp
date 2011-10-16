@@ -53,6 +53,7 @@ namespace Isis {
     p_oldVertScrollBarPos = p_viewport->verticalScrollBar()->value();
 
     p_requestedFillArea = 0.0;
+    p_bricksOrdered = true;
 
     connect(this, SIGNAL(ReadCube(int, int, int, int, int, int, void *)),
             p_dataThread, SLOT(ReadCube(int, int, int, int, int, int, void *)));
@@ -127,42 +128,63 @@ namespace Isis {
       throw iException::Message(iException::Programmer, "invalid band",
                                 _FILEINFO_);
     }
-
-    ViewportBufferFill *fill = createViewportBufferFill(rect, false);
-
-    while(fill->shouldRequestMore()) {
-      fill->incRequestPosition();
-      fill->incReadPosition();
-
-      for(int x = rect.left(); x <= rect.right(); x ++) {
-        // Index into internal buffer is minus leftmost/topmost pixel
-        int xIndex = x - fill->getLeftmostPixelPosition();
-        int yIndex = fill->getRequestPosition() - fill->getTopmostPixelPosition();
-
-        double samp = fill->viewportToSample(x);
-        double line = fill->viewportToLine(fill->getRequestPosition());
-
-        // Index into buffer is current sample - start sample
-        //   *Brick indices are in units of cube pixels, not screen pixels
-        int brickIndex = data->Index((int)(samp + 0.5), (int)(line + 0.5), p_band);
-
-        if(brickIndex < 0) {
-          p_buffer.at(yIndex).at(xIndex) = data->at(0);
-        }
-        else if(brickIndex >= data->size()) {
-          p_buffer.at(yIndex).at(xIndex) = data->at(data->size() - 1);
-        }
-        else {
-          if(yIndex < 0 || xIndex < 0 || yIndex >= (int) p_buffer.size() ||
-              xIndex >= (int) p_buffer.at(yIndex).size()) {
-            throw iException::Message(iException::Programmer,
-                                      "index out of range", _FILEINFO_);
-          }
-          else {
-            p_buffer.at(yIndex).at(xIndex) = data->at(brickIndex);
-          }
+    
+    rect = rect.intersected(bufferXYRect());
+    
+    if (!rect.isValid())
+      return;
+    
+    try {
+      ViewportBufferFill *fill = createViewportBufferFill(rect, false);
+      
+      while(fill->shouldRequestMore()) {
+        fill->incRequestPosition();
+        fill->incReadPosition();
+        
+        for(int x = rect.left(); x <= rect.right(); x ++) {
+          // Index into internal buffer is minus leftmost/topmost pixel
+          int xIndex = x - fill->getLeftmostPixelPosition();
+          int yIndex = fill->getRequestPosition() -
+          fill->getTopmostPixelPosition();
+          
+          double samp = fill->viewportToSample(x);
+          double line = fill->viewportToLine(fill->getRequestPosition());
+          if (samp < data->Sample())
+            samp = data->Sample();
+          if (samp > data->Sample() + data->SampleDimension())
+            samp = data->Sample() + data->SampleDimension();
+          if (line < data->Line())
+            line = data->Line();
+          if (line > data->Line() + data->LineDimension())
+            line = data->Line() + data->LineDimension();
+          
+          // Index into buffer is current sample - start sample
+            //   *Brick indices are in units of cube pixels, not screen pixels
+            int brickIndex = data->Index((int)(samp + 0.5), (int)(line + 0.5),
+                                         p_band);
+            
+            if(brickIndex < 0) {
+              p_buffer.at(yIndex).at(xIndex) = data->at(0);
+            }
+            else if(brickIndex >= data->size()) {
+              p_buffer.at(yIndex).at(xIndex) = data->at(data->size() - 1);
+            }
+            else {
+              if(yIndex < 0 || xIndex < 0 || yIndex >= (int) p_buffer.size() ||
+                xIndex >= (int) p_buffer.at(yIndex).size()) {
+                throw iException::Message(iException::Programmer,
+                                          "index out of range", _FILEINFO_);
+                }
+                else {
+                  p_buffer.at(yIndex).at(xIndex) = data->at(brickIndex);
+                }
+            }
         }
       }
+    }
+    catch (iException &e) {
+      throw iException::Message(iException::Programmer, "Failed to load brick "
+      "into buffer", _FILEINFO_);
     }
   }
 
@@ -198,8 +220,22 @@ namespace Isis {
 
     const QRect *rect = fill->getRect();
 
-    int y = fill->getReadPosition();
-
+    int y = fill->getReadPosition(); // screen line
+    
+    // check to see if the next screen line's brick differs from this screen
+    // line's brick.  If it does, which brick do we use?
+    int curBrickLine = (int) (fill->viewportToLine(y) + 0.5);
+    int nextBrickLine = (int) (fill->viewportToLine(y + 1) + 0.5);
+    bool brickOrderCorrection = p_bricksOrdered;
+    if (curBrickLine != nextBrickLine &&
+        nextBrickLine == (int) (brick->Line() + 0.5)) {
+      y++;
+      p_bricksOrdered = false;
+    }
+    else {
+      p_bricksOrdered = true;
+    }
+    
     double samp, line;
 
     // Loop through x values of rect on screen that we want to fill
@@ -246,8 +282,17 @@ namespace Isis {
     }
     fill->incReadPosition();
 
+    
     if(fill->shouldRequestMore()) {
-      requestCubeLine(fill);
+      if (p_bricksOrdered) {
+        requestCubeLine(fill);
+      }
+      else {
+        if (brickOrderCorrection) {
+          requestCubeLine(fill);
+          requestCubeLine(fill);
+        }
+      }
     }
     else if(fill->doneReading()) {
       delete fill;
@@ -1330,12 +1375,15 @@ namespace Isis {
       reset->setResize(0, 0);
       enqueueAction(reset);
 
-      ViewportBufferTransform *transform = new ViewportBufferTransform();
-      transform->setResize(p_XYBoundingRect.width(), p_XYBoundingRect.height());
-      enqueueAction(transform);
-      ViewportBufferFill *fill = createViewportBufferFill(p_XYBoundingRect,
-                                 false);
-      enqueueAction(fill);
+      if (p_XYBoundingRect.isValid()) {
+        ViewportBufferTransform *transform = new ViewportBufferTransform();
+        transform->setResize(p_XYBoundingRect.width(), p_XYBoundingRect.height());
+        enqueueAction(transform);
+        ViewportBufferFill *fill = createViewportBufferFill(p_XYBoundingRect,
+                                   false);
+        enqueueAction(fill);
+      }
+      
       doQueuedActions();
     }
     catch (iException &e) {

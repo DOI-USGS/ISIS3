@@ -24,9 +24,8 @@
  */
 
 
-// The only includes allowed in this file are the direct parents of this class!
+// parent of this class
 #include <QAbstractScrollArea>
-// There are absolutely no exceptions to this.
 
 
 class QPaintEvent;
@@ -41,9 +40,7 @@ namespace Isis {
   class PvlKeyword;
   class Stretch;
   class UniversalGroundMap;
-}
 
-namespace Isis {
   class ViewportBuffer;
 
   /**
@@ -109,11 +106,11 @@ namespace Isis {
   class Tool;
 
   class CubeViewport : public QAbstractScrollArea {
+    
       Q_OBJECT
 
-
     public:
-      CubeViewport(Cube *cube, QWidget *parent = 0);
+      CubeViewport(Cube *cube, CubeDataThread * cdt = 0, QWidget *parent = 0);
       virtual ~CubeViewport();
 
 
@@ -308,6 +305,22 @@ namespace Isis {
        * @param stretch
        */
       void setAllBandStretches(Stretch stretch);
+      
+      
+      /**
+       * @returns this CubeViewport's CubeDataThread
+       */
+      CubeDataThread *cubeDataThread() {
+        return p_cubeData;
+      }
+      
+      /**
+       * @returns the CubeViewport's cube id
+       */
+      int cubeID() {
+        return p_cubeId;
+      }
+      
 
       /**
        * Get All WhatsThis info - viewport, cube, area in PVL format
@@ -407,8 +420,8 @@ namespace Isis {
 
 
 
-    private slots:
-      void cubeDataChanged(int cubeId, const Isis::Brick *);
+    protected slots:
+      virtual void cubeDataChanged(int cubeId, const Isis::Brick *);
 
 
     private:
@@ -428,8 +441,14 @@ namespace Isis {
 
     protected: // data
       QPixmap p_pixmap;//!< The qpixmap.
+      
+      //! Stretches for each previously stretched band
+      QVector< Stretch * > * p_knownStretches;
 
+      //! Global stretches for each stretched band
+      QVector< Stretch * > * p_globalStretches;
 
+      
     private: // data
       ViewportBuffer *p_grayBuffer;  //!< Viewport Buffer to manage gray band
       ViewportBuffer *p_redBuffer;  //!< Viewport Buffer to manage red band
@@ -454,12 +473,6 @@ namespace Isis {
       BandInfo p_green;//!< Green band info
       BandInfo p_blue;//!< Blue band info
 
-      //! Stretches for each previously stretched band
-      QVector< Stretch * > * p_knownStretches;
-
-      //! Global stretches for each stretched band
-      QVector< Stretch * > * p_globalStretches;
-
       Brick *p_redBrick;  //!< Bricks for every color.
       Brick *p_grnBrick;  //!< Bricks for every color.
       Brick *p_bluBrick;  //!< Bricks for every color.
@@ -478,10 +491,15 @@ namespace Isis {
 
       //! A list of rects that the viewport buffers have requested painted
       QList< QRect * > *p_pixmapPaintRects;
-
+      
       CubeDataThread *p_cubeData;  //!< Does all the cube I/O
       int p_cubeId; //!< Cube ID given from cube data thread for I/O
 
+      /**
+       *  if true then this owns the CubeDataThread,
+       *  and should thus delete it
+       */
+      bool p_thisOwnsCubeData;
   };
 }
 

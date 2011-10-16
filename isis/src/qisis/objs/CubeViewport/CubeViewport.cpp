@@ -65,8 +65,8 @@ namespace Isis {
    * @param cube
    * @param parent
    */
-  CubeViewport::CubeViewport(Cube *cube, QWidget *parent) :
-    QAbstractScrollArea(parent) {
+  CubeViewport::CubeViewport(Cube *cube, CubeDataThread * cubeData,
+      QWidget *parent) : QAbstractScrollArea(parent) {
     // Is the cube usable?
     if(cube == NULL) {
       throw iException::Message(iException::Programmer,
@@ -81,8 +81,20 @@ namespace Isis {
 
     p_cube = cube;
     p_cubeData = NULL;
-    p_cubeData = new CubeDataThread();
-    p_cubeId = p_cubeData->AddCube(p_cube);
+    
+    if (cubeData)
+    {
+      p_cubeData = cubeData;
+      p_thisOwnsCubeData = false;
+      p_cubeId = p_cubeData->FindCubeId(cube);
+    }
+    else
+    {
+      p_cubeData = new CubeDataThread();
+      p_thisOwnsCubeData = true;
+      p_cubeId = p_cubeData->AddCube(p_cube);
+    }
+
 
     connect(p_cubeData, SIGNAL(BrickChanged(int, const Isis::Brick *)),
             this, SLOT(cubeDataChanged(int, const Isis::Brick *)));
@@ -339,15 +351,14 @@ namespace Isis {
     // p_cubeData MUST be deleted AFTER all viewport buffers!!!
     if(p_cubeData) {
       p_cubeData->RemoveChangeListener();
-      delete p_cubeData;
+      
+      if(p_thisOwnsCubeData)
+        delete p_cubeData;
+      
       p_cubeData = NULL;
     }
 
-    // p_cube MUST be deleted AFTER all viewport buffers!!!
-    if(p_cube) {
-      delete p_cube;
-      p_cube = NULL;
-    }
+    p_cube = NULL;
 
     if(p_progressTimer) {
       delete p_progressTimer;
@@ -567,15 +578,17 @@ namespace Isis {
       return;
     }
 
-    // don't let zoom scale be larger than the viewport size
-    double maxScale = max(viewport()->width(),viewport()->height());
-    if (scale > maxScale) {
-      scale = maxScale;
-    }
-    // don't let zoom scale be smaller than one pixel high/wide showing
-    double minScale = 1.0 / (min(cubeSamples(),cubeLines()));
-    if (scale < minScale) {
-      scale = minScale;
+    if (viewport()->width() && viewport()->height()) {
+      // don't let zoom scale be larger than the viewport size
+      double maxScale = max(viewport()->width(),viewport()->height());
+      if (scale > maxScale) {
+        scale = maxScale;
+      }
+      // don't let zoom scale be smaller than one pixel high/wide showing 
+      double minScale = 1.0 / (min(cubeSamples(),cubeLines()));
+      if (scale < minScale) {
+        scale = minScale;
+      }
     }
 
     // Resize the scrollbars to reflect the new scale

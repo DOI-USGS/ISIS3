@@ -34,9 +34,6 @@ template < class T > class QList;
 
 namespace Isis {
   class Cube;
-}
-
-namespace Isis {
   class Tool;
   class ViewportBuffer;
 
@@ -55,7 +52,8 @@ namespace Isis {
       Q_OBJECT
 
     public:
-      MdiCubeViewport(Cube *cube, QWidget *parent = 0);
+      MdiCubeViewport(Cube *cube, Isis::CubeDataThread * cdt = 0,
+                      QWidget *parent = 0);
       ~MdiCubeViewport();
 
       void forceAbstract() {}

@@ -36,8 +36,8 @@ using namespace std;
 
 
 namespace Isis {
-  MdiCubeViewport::MdiCubeViewport(Cube *cube, QWidget *parent) :
-    CubeViewport(cube, parent) {
+  MdiCubeViewport::MdiCubeViewport(Cube *cube, CubeDataThread * cdt,
+      QWidget *parent) : CubeViewport(cube, cdt, parent) {
     p_linked = false;
 
     string unlinkedIcon = Filename("$base/icons/unlinked.png").Expanded();
@@ -47,7 +47,6 @@ namespace Isis {
   }
 
   MdiCubeViewport::~MdiCubeViewport() {
-
   }
 
 

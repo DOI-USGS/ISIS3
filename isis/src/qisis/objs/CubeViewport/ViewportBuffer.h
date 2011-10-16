@@ -40,9 +40,6 @@ class QRect;
 namespace Isis {
   class CubeDataThread;
   class Brick;
-}
-
-namespace Isis {
   class CubeViewport;
   class ViewportBufferAction;
   class ViewportBufferFill;
@@ -216,6 +213,8 @@ namespace Isis {
        * give us cube data before we progress through the queue.
        */
       QQueue< ViewportBufferAction * > * p_actions;
+      
+      bool p_bricksOrdered;
   };
 }
 

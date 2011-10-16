@@ -154,7 +154,7 @@ namespace Isis {
       QWidget *centralWidget = new QWidget(this);
       QVBoxLayout *layout = new QVBoxLayout();
 
-      cvp = new MdiCubeViewport(cube, centralWidget);
+      cvp = new MdiCubeViewport(cube, NULL, centralWidget);
       QProgressBar *progress = new QProgressBar();
       connect(cvp, SIGNAL(progressChanged(int)), progress, SLOT(setValue(int)));
       progress->setRange(0, 100);
