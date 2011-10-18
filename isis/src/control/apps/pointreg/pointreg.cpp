@@ -24,6 +24,7 @@ using namespace Isis;
 
 void verifyCube(Cube & cube);
 bool outputValue(ofstream &os, double value);
+int calcGoodMeasureCount(const ControlPoint *point);
 void printTemp();
 
 map<string, void *> GuiHelpers() {
@@ -128,96 +129,102 @@ void IsisMain() {
         outPoint->SetRefMeasure(patternCM);
       }
 
-      // reset goodMeasureCount for this point before looping measures
-      int goodMeasureCount = 0;
-
       // Register all the unlocked measurements
       int j = 0;
       while (j < outPoint->GetNumMeasures()) {
-        ControlMeasure * measure = outPoint->GetMeasure(j);
+        if (j != outPoint->IndexOfRefMeasure()) {
 
-        if (j == outPoint->IndexOfRefMeasure()) {
-          // don't register the reference, go to next measure
-          if (!measure->IsIgnored()) goodMeasureCount++;
-        }
-        else if (measure->IsEditLocked()) {
-          // if the measurement is locked, keep it as is and go to next measure
-          locked++;
-          if (!measure->IsIgnored()) goodMeasureCount++;
-        }
-        else if (registerMeasures == "CANDIDATES" && measure->IsMeasured()) {
-          // if user chose not to reprocess successful measures, keep registered
-          // measure as is and go to next measure
-          if (!measure->IsIgnored()) goodMeasureCount++;
-        }
-        else {
+          ControlMeasure * measure = outPoint->GetMeasure(j);
+          if (measure->IsEditLocked()) {
+            // If the measurement is locked, keep it as is and go to next measure
+            locked++;
+          }
+          else if (!measure->IsMeasured() || registerMeasures != "CANDIDATES") {
 
-          // refresh pattern cube pointer to ensure it stays valid
-          Cube &patternCube = *cubeMgr.OpenCube(files.Filename(
-                patternCM->GetCubeSerialNumber()));
-          Cube &searchCube = *cubeMgr.OpenCube(files.Filename(
-                measure->GetCubeSerialNumber()));
+            // refresh pattern cube pointer to ensure it stays valid
+            Cube &patternCube = *cubeMgr.OpenCube(files.Filename(
+                  patternCM->GetCubeSerialNumber()));
+            Cube &searchCube = *cubeMgr.OpenCube(files.Filename(
+                  measure->GetCubeSerialNumber()));
 
-          ar->SearchChip()->TackCube(measure->GetSample(), measure->GetLine());
-          
-          verifyCube(patternCube);
-          verifyCube(searchCube);
+            ar->SearchChip()->TackCube(measure->GetSample(), measure->GetLine());
 
-          try {
+            verifyCube(patternCube);
+            verifyCube(searchCube);
 
-            ar->SearchChip()->Load(searchCube, *(ar->PatternChip()), patternCube);
+            try {
 
-            // If the measurements were correctly registered
-            // Write them to the new ControlNet
-            AutoReg::RegisterStatus res = ar->Register();
-            searchCube.clearIoCache();
-            patternCube.clearIoCache();
+              ar->SearchChip()->Load(searchCube, *(ar->PatternChip()), patternCube);
 
-            double score1, score2;
-            ar->ZScores(score1, score2);
+              // If the measurements were correctly registered
+              // Write them to the new ControlNet
+              AutoReg::RegisterStatus res = ar->Register();
+              searchCube.clearIoCache();
+              patternCube.clearIoCache();
 
-            // Set the minimum and maximum z-score values for the measure
-            measure->SetLogData(ControlMeasureLogData(
-                  ControlMeasureLogData::MinimumPixelZScore, score1));
-            measure->SetLogData(ControlMeasureLogData(
-                  ControlMeasureLogData::MaximumPixelZScore, score2));
+              double score1, score2;
+              ar->ZScores(score1, score2);
 
-            if (ar->Success()) {
-              // Check to make sure the newly calculated measure position is on
-              // the surface of the planet
-              Camera *cam = searchCube.getCamera();
-              bool foundLatLon = cam->SetImage(ar->CubeSample(), ar->CubeLine());
+              // Set the minimum and maximum z-score values for the measure
+              measure->SetLogData(ControlMeasureLogData(
+                    ControlMeasureLogData::MinimumPixelZScore, score1));
+              measure->SetLogData(ControlMeasureLogData(
+                    ControlMeasureLogData::MaximumPixelZScore, score2));
 
-              if (foundLatLon) {
-                registered++;
+              if (ar->Success()) {
+                // Check to make sure the newly calculated measure position is on
+                // the surface of the planet
+                Camera *cam = searchCube.getCamera();
+                bool foundLatLon = cam->SetImage(ar->CubeSample(), ar->CubeLine());
 
-                if (res == AutoReg::SuccessSubPixel)
-                  measure->SetType(ControlMeasure::RegisteredSubPixel);
-                else
-                  measure->SetType(ControlMeasure::RegisteredPixel);
+                if (foundLatLon) {
+                  registered++;
 
-                measure->SetLogData(ControlMeasureLogData(
-                      ControlMeasureLogData::GoodnessOfFit,
-                      ar->GoodnessOfFit()));
+                  if (res == AutoReg::SuccessSubPixel)
+                    measure->SetType(ControlMeasure::RegisteredSubPixel);
+                  else
+                    measure->SetType(ControlMeasure::RegisteredPixel);
 
-                measure->SetAprioriSample(measure->GetSample());
-                measure->SetAprioriLine(measure->GetLine());
-                measure->SetCoordinate(ar->CubeSample(), ar->CubeLine());
-                measure->SetIgnored(false);
+                  measure->SetLogData(ControlMeasureLogData(
+                        ControlMeasureLogData::GoodnessOfFit,
+                        ar->GoodnessOfFit()));
 
-                // We successfully registered the current measure to the
-                // reference, and since we set the current measure to be
-                // unignored, it follows that its reference should also be made
-                // unignored.
-                patternCM->SetIgnored(false);
+                  measure->SetAprioriSample(measure->GetSample());
+                  measure->SetAprioriLine(measure->GetLine());
+                  measure->SetCoordinate(ar->CubeSample(), ar->CubeLine());
+                  measure->SetIgnored(false);
 
-                goodMeasureCount++;
+                  // We successfully registered the current measure to the
+                  // reference, and since we set the current measure to be
+                  // unignored, it follows that its reference should also be made
+                  // unignored.
+                  patternCM->SetIgnored(false);
+                }
+                else {
+                  notintersected++;
+
+                  if (ui.GetBoolean("OUTPUTFAILED")) {
+                    measure->SetType(ControlMeasure::Candidate);
+                    measure->SetIgnored(true);
+                  }
+                  else {
+                    outPoint->Delete(j);
+                    continue;
+                  }
+                }
               }
+              // Else use the original marked as "Candidate"
               else {
-                notintersected++;
+                unregistered++;
 
                 if (ui.GetBoolean("OUTPUTFAILED")) {
                   measure->SetType(ControlMeasure::Candidate);
+
+                  if (res == AutoReg::FitChipToleranceNotMet) {
+                    measure->SetLogData(ControlMeasureLogData(
+                          ControlMeasureLogData::GoodnessOfFit,
+                          ar->GoodnessOfFit()));
+                  }
                   measure->SetIgnored(true);
                 }
                 else {
@@ -226,37 +233,18 @@ void IsisMain() {
                 }
               }
             }
-            // Else use the original marked as "Candidate"
-            else {
+            catch (iException &e) {
+              e.Clear();
               unregistered++;
 
               if (ui.GetBoolean("OUTPUTFAILED")) {
                 measure->SetType(ControlMeasure::Candidate);
-
-                if (res == AutoReg::FitChipToleranceNotMet) {
-                  measure->SetLogData(ControlMeasureLogData(
-                        ControlMeasureLogData::GoodnessOfFit,
-                        ar->GoodnessOfFit()));
-                }
                 measure->SetIgnored(true);
               }
               else {
                 outPoint->Delete(j);
                 continue;
               }
-            }
-          }
-          catch (iException &e) {
-            e.Clear();
-            unregistered++;
-
-            if (ui.GetBoolean("OUTPUTFAILED")) {
-              measure->SetType(ControlMeasure::Candidate);
-              measure->SetIgnored(true);
-            }
-            else {
-              outPoint->Delete(j);
-              continue;
             }
           }
         }
@@ -272,7 +260,8 @@ void IsisMain() {
       // registered. When a measure can't be registered to the reference then
       // that measure is set to be ignored where in the past the whole point
       // was ignored
-      if (goodMeasureCount < 2 && outPoint->GetType() != ControlPoint::Fixed) {
+      if (calcGoodMeasureCount(outPoint) < 2 &&
+          outPoint->GetType() != ControlPoint::Fixed) {
         outPoint->SetIgnored(true);
       }
 
@@ -305,10 +294,10 @@ void IsisMain() {
     ofstream os;
     os.open(fFile.c_str(), ios::out);
     os <<
-       "PointId,MeasureType,Reference,EditLock,Ignore,Registered," <<
-       "OriginalMeasurementSample,OriginalMeasurementLine," <<
-       "RegisteredMeasurementSample,RegisteredMeasurementLine,SampleShift," <<
-       "LineShift,PixelShift,ZScoreMin,ZScoreMax,GoodnessOfFit" << endl;
+      "PointId,MeasureType,Reference,EditLock,Ignore,Registered," <<
+      "OriginalMeasurementSample,OriginalMeasurementLine," <<
+      "RegisteredMeasurementSample,RegisteredMeasurementLine,SampleShift," <<
+      "LineShift,PixelShift,ZScoreMin,ZScoreMax,GoodnessOfFit" << endl;
     os << Null << endl;
 
     // Create a ControlNet from the original input file
@@ -328,19 +317,19 @@ void IsisMain() {
           // Get measure and find its corresponding measure from input net
           const ControlMeasure * cmTrans = outPoint->GetMeasure(i);
           const ControlMeasure * cmOrig =
-              inPoint->GetMeasure((QString) cmTrans->GetCubeSerialNumber());
+            inPoint->GetMeasure((QString) cmTrans->GetCubeSerialNumber());
 
           string pointId = outPoint->GetId();
 
           string measureType = cmTrans->MeasureTypeToString(
               cmTrans->GetType());
           string reference = outPoint->GetRefMeasure() == cmTrans ?
-              "true" : "false";
+            "true" : "false";
           string editLock = cmTrans->IsEditLocked() ? "true" : "false";
           string ignore = cmTrans->IsIgnored() ? "true" : "false";
           string registered =
-              !cmOrig->IsRegistered() && cmTrans->IsRegistered() ?
-              "true" : "false";
+            !cmOrig->IsRegistered() && cmTrans->IsRegistered() ?
+            "true" : "false";
 
           double inSamp = cmOrig->GetSample();
           double inLine = cmOrig->GetLine();
@@ -349,16 +338,16 @@ void IsisMain() {
           double outLine = cmTrans->GetLine();
 
           os <<
-              pointId << "," <<
-              measureType << "," <<
-              reference << "," <<
-              editLock << "," <<
-              ignore << "," <<
-              registered << "," <<
-              inSamp << "," <<
-              inLine << "," <<
-              outSamp << "," <<
-              outLine;
+            pointId << "," <<
+            measureType << "," <<
+            reference << "," <<
+            editLock << "," <<
+            ignore << "," <<
+            registered << "," <<
+            inSamp << "," <<
+            inLine << "," <<
+            outSamp << "," <<
+            outLine;
 
           double sampleShift = cmTrans->GetSampleShift();
           double lineShift = cmTrans->GetLineShift();
@@ -435,6 +424,17 @@ bool outputValue(ofstream &os, double value) {
   }
 
   return false;
+}
+
+
+int calcGoodMeasureCount(const ControlPoint *point) {
+  int goodMeasureCount = 0;
+  for (int i = 0; i < point->GetNumMeasures(); i++) {
+    const ControlMeasure *measure = point->GetMeasure(i);
+    if (!measure->IsIgnored()) goodMeasureCount++;
+  }
+
+  return goodMeasureCount;
 }
 
 
