@@ -20,8 +20,8 @@
       seam between the two images is no longer visible.
     </p>  
 
-    <img src='assets/mdis2_Uncontrolled.png' alt='Before jigsaw (uncontrolled)' width='306' height='259' />
-    <img src='assets/mdis2_Controlled.png' alt='After jigsaw (controlled)' width='306' height='259' />
+    <img src='assets/images/mdis2_Uncontrolled.png' alt='Before jigsaw (uncontrolled)' width='306' height='259' />
+    <img src='assets/images/mdis2_Controlled.png' alt='After jigsaw (controlled)' width='306' height='259' />
 
     <p>
       <b>jigsaw</b> assumes <b>spiceinit</b> has been run on the input <def>cube</def>s so that 
@@ -47,21 +47,45 @@
     coordinates and the final <def>sample</def>, <def>line</def>, and overall residuals 
     in both millimeters and pixels.
     </p>
+
     <p>
       The functional model for the bundle adjustment is the <i>collinearity 
-      condition</i>.  It stipulates that the camera perspective center, a ground 
+      condition</i>.  It stipulates that the camera perspective center, a ground
       point, and its associated image point measurement be collinear.  The diagram 
       below demonstrates the collinear condition in a <i>bundle adjustment</i>.
       The vectors formed by connecting each object space point (target surface x,y,z) 
       and its corresponding image space points (<def>sample</def>,<def>line</def>) form 
       a <i>bundle</i> of light rays.
     </p>
-    <img src='assets/BundleAdjustment_KarlKraus.png' alt='Before jigsaw (uncontrolled)' width='498' height='355' />
+    <img src='assets/images/BundleAdjustment_KarlKraus.png' alt='Before jigsaw (uncontrolled)' width='498' height='355' />
     <p>
      Kraus, Karl., 1993. Photogrammetry Vol. I., Fundamentals and Standard 
      Processes, Der. Dümmler Verlag, Bonn, Germany, ISBN 3-427-78684-6, 397 
      pages.
     </p>
+
+    <h4>Known Issues</h4>
+      <blockquote>
+      <b>Running jigsaw with a control net containing <i>JigsawRejected</i>
+      flags may result in bundle failure</b>
+      <p>When running <b>jigsaw</b> with <i>Outlier Retection</i> turned on,
+      control points and/or control measures may be flagged as
+      <i>JigsawRejected</i> in the output control net file. If this output net
+      file is then used in a subsequent <b>jigsaw</b> run, these points and
+      measures will be erroneously ignored, potentially causing the bundle
+      adjustment to fail.
+        <blockquote>
+        <b>--Workarounds</b>
+        <ol>
+        <li>Run jigsaw with <i>Outlier Rejection</i> <b>off</b>.</li>
+        <li>Do not use the output control net file in subsequent jigsaw runs.</li>
+        <li>Convert the output control net file from binary to pvl and back using
+        <i><b>cnetbin2pvl</b></i> and <i><b>cnetpvl2bin</b></i>. This will
+        clear the <i>JigsawRejected</i> flags.</li>
+        </ol>
+        </blockquote>
+      </p>
+      </blockquote>
 
   </description>
 
@@ -132,6 +156,9 @@
     <change name="Ken Edmundson" date="2011-10-14">
       Added internal default and minimum inclusive tags to global apriori
       uncertainties.
+    </change>
+    <change name="Ken Edmundson" date="2011-10-18">
+      Added Known Issues section and JigsawRejected flag issue.
     </change>
   </history>
 
