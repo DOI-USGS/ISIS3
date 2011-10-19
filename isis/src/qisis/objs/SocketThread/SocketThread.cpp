@@ -70,7 +70,7 @@ namespace Isis {
 
     while(!p_done) {
       // Accept Socket
-      socklen_t len;
+      socklen_t len = sizeof(&p_socketName);
       int childSocket = accept(p_socket, (struct sockaddr *)&p_socketName, &len);
       if (childSocket < 0)
         if (errno == EWOULDBLOCK) {
