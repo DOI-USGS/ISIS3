@@ -80,8 +80,12 @@ namespace Isis {
 
       // Receive Data
       int bytes;
-      char buf[1024*1024];
-      if((bytes = recv(childSocket, &buf, 1024 * 1024, 0)) < 0) {
+      // This used to be char buf[1024*1024]; but when that line existed the
+      //   mac OS's would crash unpredictably, even when the code on that
+      //   line wasn't executed.
+      QScopedPointer< char, QScopedPointerArrayDeleter<char> > buf(
+          new char[1024*1024]);
+      if((bytes = recv(childSocket, buf.data(), 1024 * 1024, 0)) < 0) {
         std::string msg = "Unable to read from socket [" + p_socketFile + "]";
         std::cerr << msg << std::endl;
         remove(p_socketFile.c_str());
@@ -90,7 +94,7 @@ namespace Isis {
 
       // Push everything onto our string buffer
       iString buffer;
-      for(int i = 0; i < bytes; i++) buffer += buf[i];
+      for(int i = 0; i < bytes; i++) buffer += buf.data()[i];
       while(buffer.size() > 0) {
         iString token = buffer.Token(" ");
         if(token == "raise") {
