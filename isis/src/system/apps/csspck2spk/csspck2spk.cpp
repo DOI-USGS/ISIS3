@@ -20,14 +20,16 @@ using std::string;
 void IsisMain() {
   // Open the input file from the GUI or find the latest version of the DB file
   UserInterface &ui = Application::GetUserInterface();
+
   string inDBfile;
   if (ui.WasEntered("FROM")) {
     inDBfile = ui.GetFilename("FROM");
   }
   else {
+    // Stores highest version
     string exDBfile("$cassini/kernels/spk/kernels.????.db");
     Filename exDBfilenm(exDBfile);
-    exDBfilenm.HighestVersion();      // Stores highest version
+    exDBfilenm.HighestVersion();
     inDBfile = exDBfilenm.Expanded();
   }
 
@@ -73,7 +75,7 @@ void IsisMain() {
       Filename fnm(value);
       string basename = fnm.Basename();
 
-      // Add en entry in our hash for the current SPK filename for quick lookup
+      // Add an entry in our hash for the current SPK filename for quick lookup
       // of the group later
       spkGroups.insert(QString::fromStdString(basename), grpIndex);
     }
@@ -114,10 +116,12 @@ void IsisMain() {
   for (int i = rawLines.size() - 1; i >= 0; i--) {
     iString line = rawLines[i];
 
+    // Split the line around the command and strip the extraneous characters
+    string unwantedChars = "\n\r\t\v\f ";
     iString pck = line.Token(",");
-    pck.Trim("\n\r\t\v\f ");        // Stripping the extraneous characters
+    pck.Trim(unwantedChars);
     iString spk = line;
-    spk.Trim("\n\r\t\v\f ");
+    spk.Trim(unwantedChars);
 
     if (!spkGroups.contains(spk)) {
       // Every pair in the pairing file must have a corresponding SPK in the DB
