@@ -404,6 +404,7 @@
           *.lis
         </filter>
       </parameter>
+
       <parameter name="CUBEMEASURES">
         <type>boolean</type>
         <default><item>False</item></default>
@@ -420,6 +421,9 @@
           created. Each Control Measure it lists was not
           extracted due to this filter.</p>
         </description>
+        <inclusions>
+          <item>RETAIN_REFERENCE</item>
+        </inclusions>
       </parameter>
 
       <parameter name="RETAIN_REFERENCE">
