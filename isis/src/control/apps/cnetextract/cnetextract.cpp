@@ -255,7 +255,7 @@ void IsisMain() {
     }
 
     // Do not add outPoint if it does not have a cube in CUBELIST as asked
-    if(cubePoints && !cubeMeasures) {
+    if(cubePoints) {
       bool hasSerialNumber = false;
 
       for(int cm = 0; cm < newPoint->GetNumMeasures() && !hasSerialNumber; cm ++) {
