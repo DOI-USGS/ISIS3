@@ -169,7 +169,8 @@ namespace Isis {
    *                          do nothing and eventually cause very, very bad
    *                          things to happen (writing out of array bounds).
    *                          Fixes #410.
-   *  
+   *  @history 2011-10-20 Sharmila Prasad - Fixes #0000462, allow Band Priority even if Tracking
+   *                                        is not enabled
    *  @todo 2005-02-11 Stuart Sides - add coded example and implementation example
    *                                  to class documentation
    */
@@ -199,7 +200,7 @@ namespace Isis {
         BandCriteria eCriteria; //!< Lesser or Greater Criteria
         int  iInBand;  //!< input  band index for the corresponding band in KeyValue
         int  iOutBand; //!< output band index for the corresponding band in KeyValue
-      }TrackInfo;
+      }MosaicOptions;
 
       /**
        * Enumeration for different Mosaic priorities 
@@ -408,12 +409,12 @@ namespace Isis {
        * @param pbFlag - set the tracking flag 
        */
       void SetTrackFlag(bool pbFlag) {
-        mtTrackInfo.bTrack = pbFlag;
+        mMosaicOptions.bTrack = pbFlag;
       };
       
       //! Get Track Flag status
       bool GetTrackFlag(void) {
-        return mtTrackInfo.bTrack;
+        return mMosaicOptions.bTrack;
       };
 
       /**
@@ -425,7 +426,7 @@ namespace Isis {
        * @param pbFlag - Set Create Flag True/False
        */
       void SetCreateFlag(bool pbFlag) {
-        mtTrackInfo.bCreate  = pbFlag;
+        mMosaicOptions.bCreate  = pbFlag;
       };
 
       /**
@@ -436,7 +437,7 @@ namespace Isis {
        * @param piBandNum - Band Number 
        */
       void SetBandNumber(int piBandNum) {
-        mtTrackInfo.iBandNum = piBandNum;
+        mMosaicOptions.iBandNum = piBandNum;
       };
 
       /**
@@ -448,8 +449,8 @@ namespace Isis {
        * @param psKeyValue - Band Value
        */
       void SetBandKeyWord(std::string psKeyName, std::string psKeyValue) {
-        mtTrackInfo.sKeyName = psKeyName;
-        mtTrackInfo.sKeyValue = psKeyValue;
+        mMosaicOptions.sKeyName = psKeyName;
+        mMosaicOptions.sKeyValue = psKeyValue;
       };
 
       /**
@@ -460,7 +461,7 @@ namespace Isis {
        * @param peCriteria - Band Criteria
        */
       void SetBandCriteria(BandCriteria peCriteria) {
-        mtTrackInfo.eCriteria = peCriteria;
+        mMosaicOptions.eCriteria = peCriteria;
       };
 
       //! Debugging
@@ -513,7 +514,7 @@ namespace Isis {
       bool mbLowSat;  //!< LS Flag
       bool mbNull;    //!< NULL Flag
 
-      TrackInfo mtTrackInfo; //!< Structure holding the tracking info
+      MosaicOptions mMosaicOptions; //!< Structure holding the tracking info
   };
 };
 
