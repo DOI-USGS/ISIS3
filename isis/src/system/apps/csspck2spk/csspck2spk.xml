@@ -52,6 +52,13 @@
     <change name="Christopher Austin" date="2009-12-04">
       Added an error when an spk file does not exist inside the latest mapping file.
     </change>
+    <change name="Travis Addair" date="2011-10-20">
+      Changed to iterate over the pairing file instead of the SPK DB file.  In
+      order to properly maintain tests when the pairing file can have entries
+      removed and replaced, a new parameter PAIRING was added so a specific
+      pairing file, not merely the latest, can be used to generate the new PCK
+      DB file.
+    </change>
   </history>
 
   <category>
