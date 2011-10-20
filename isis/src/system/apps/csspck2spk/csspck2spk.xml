@@ -95,6 +95,25 @@
           *.db
         </filter>
       </parameter>
+
+      <parameter name="PAIRING">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          The PCK2SPK pairing file
+        </brief>
+        <description>
+          The PCK2SPK file used to map the SPK entries in the FROM SPK DB file
+          to entries in the output PCK DB file.  Defaulted to use
+          $ISIS3DATA/cassini/kernels/pck/pck2spk_????.map
+        </description>
+        <internalDefault>
+          Automatic
+        </internalDefault>
+        <filter>
+          *.map
+        </filter>
+      </parameter>
     </group>
   </groups>
 </application>

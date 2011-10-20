@@ -1,34 +1,23 @@
-//_VER $Id: csspck2spk.cpp,v 1.8 2009/12/04 21:58:45 caustin Exp $
 #include "Isis.h"
-#include "Pvl.h"
-#include "PvlGroup.h"
-#include "Filename.h"
-#include "TextFile.h"
+
 #include <iostream>
 #include <sstream>
 #include <string>
 
+#include <QHash>
+#include <QList>
+#include <QString>
+
+#include "Pvl.h"
+#include "PvlGroup.h"
+#include "Filename.h"
+#include "TextFile.h"
+
 using namespace Isis;
 using namespace std;
 
-void IsisMain() {
-  /* Ingesting the pck2spk into mapped key/values; first grap latest file name,
-     and then the individual lines for parsing into the map */
-  string pckfile("$cassini/kernels/pck/pck2spk_????.map");
-  Filename pckFilenm(pckfile);
-  pckFilenm.HighestVersion();
-  TextFile txt(pckFilenm.Expanded());
-  iString line;
-  map< string, string> lookuparray;
-  while(txt.GetLine(line)) {
-    iString pck = line.Token(",");
-    pck.Trim("\n\r\t\v\f ");        // stripping the extraneous characters
-    iString spk = line;
-    spk.Trim("\n\r\t\v\f ");
-    pair<string, string> pckspk(spk, pck);
-    lookuparray.insert(pckspk);
-  }
 
+void IsisMain() {
   /* Open the input file from the guior find
      the latest version of the db file */
   UserInterface &ui = Application::GetUserInterface();
@@ -53,11 +42,11 @@ void IsisMain() {
 
   //Search PVL for main object
   PvlObject &mainob = spkdb.FindObject("SpacecraftPosition");
-  mainob.SetName("TargetAttitudeShape");
 
   /* Search for the Selection Groups, and the based on the File Keyword, add
      the appropriate pck file keyword.  First check to see if the input file has
      already been updated from an old version of the program. */
+  QHash<QString, int> spkGroups;
   for(int grpIndex = 0; grpIndex < mainob.Groups(); grpIndex ++) {
     PvlGroup &grp = mainob.Group(grpIndex);
     if(grp.IsNamed("Selection")) {
@@ -80,19 +69,68 @@ void IsisMain() {
 
       string value = (string)grp["File"];
       Filename fnm(value);
-      string filename = fnm.Basename();
-      if(lookuparray[filename] == "") {
-        std::string msg = "Spk [" + filename + "] does not exist in [" + pckFilenm.Name() + "]";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
-      }
-      else {
-        PvlKeyword newfile("File", "$cassini/kernels/pck/" + lookuparray[filename]);
-        grp.AddKeyword(basefile, Pvl::Replace);
-        grp.AddKeyword(newfile);
-        grp.DeleteKeyword("Type");
-      }
+      string basename = fnm.Basename();
+
+      spkGroups.insert(QString::fromStdString(basename), grpIndex);
     }
   }
+
+  /* Ingesting the pck2spk into mapped key/values; first grap latest file name,
+     and then the individual lines for parsing into the map */
+  Filename pckFilename;
+  if(ui.WasEntered("PAIRING")) {
+    pckFilename = ui.GetFilename("PAIRING");
+  }
+  else {
+    string pckfile("$cassini/kernels/pck/pck2spk_????.map");
+    pckFilename = pckfile;
+    pckFilename.HighestVersion();
+  }
+
+  TextFile txt(pckFilename.Expanded());
+
+  QList<QString> rawLines;
+  iString rawLine;
+  while(txt.GetLine(rawLine)) {
+    rawLines.append(QString::fromStdString(rawLine));
+  }
+
+  PvlObject targetAttitudeShape("TargetAttitudeShape");
+
+  PvlKeyword &runTime = mainob.FindKeyword("RunTime");
+  targetAttitudeShape.AddKeyword(runTime);
+
+  PvlGroup &dependencies = mainob.FindGroup("Dependencies");
+  targetAttitudeShape.AddGroup(dependencies);
+
+  for (int i = rawLines.size() - 1; i >= 0; i--) {
+    iString line = rawLines[i];
+
+    iString pck = line.Token(",");
+    pck.Trim("\n\r\t\v\f ");        // stripping the extraneous characters
+    iString spk = line;
+    spk.Trim("\n\r\t\v\f ");
+
+    if(!spkGroups.contains(spk)) {
+      std::string msg = "Spk [" + spk + "] does not exist in [" + inDBfile + "]";
+      throw iException::Message(iException::User, msg, _FILEINFO_);
+    }
+    else {
+      PvlGroup selection("Selection");
+
+      PvlGroup &grp = mainob.Group(spkGroups[spk]);
+      selection.AddKeyword(grp.FindKeyword("Time"));
+      selection.AddKeyword(basefile);
+
+      PvlKeyword newfile("File", "$cassini/kernels/pck/" + pck);
+      selection.AddKeyword(newfile);
+
+      targetAttitudeShape.AddGroup(selection);
+    }
+  }
+
+  Pvl outPvl;
+  outPvl.AddObject(targetAttitudeShape);
 
   // Create new db file with the updated contents of the Pvl
   Filename outDBfile;
@@ -104,5 +142,6 @@ void IsisMain() {
     outDBfile.NewVersion();
   }
 
-  spkdb.Write(outDBfile.Expanded());
+  outPvl.Write(outDBfile.Expanded());
 }
+
