@@ -86,7 +86,13 @@ void IsisMain() {
     bl.Progress()->SetText("Initializing base mosaic");
     CubeAttributeInput iAtt(inputFile);
     bl.SetInputCube(inputFile, iAtt);
-    
+
+    bl.PropagateHistory(false);
+    bl.PropagateLabels(false);
+    bl.PropagateTables(false);
+    bl.PropagatePolygons(false);
+    bl.PropagateOriginalLabel(false);
+
     CubeAttributeOutput oAtt = ui.GetOutputAttribute("MOSAIC");
     bl.SetOutputCube(mosaicFile, oAtt, ns, nl, nb);
     bl.ClearInputCubes();

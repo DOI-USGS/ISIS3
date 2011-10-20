@@ -228,6 +228,10 @@
       Option to match DEM and also added new group "mosaic" to hold ShapeModel 
       attributes for the mosaic
     </change>
+    <change name="Steven Lambright" date="2011-10-19">
+      Output cube when CREATE=yes no longer propagates labels other than the
+      band bin information.
+    </change>
   </history>
 
   <oldName>
