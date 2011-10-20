@@ -64,6 +64,12 @@ namespace Isis {
 
     p_latMap = new QVector< QVector<Latitude> >(64, QVector<Latitude>(64));
     p_lonMap = new QVector< QVector<Longitude> >(64, QVector<Longitude>(64));
+
+    if (parent->ParentSamples() > 64 || parent->ParentLines() > 64) {
+      iString msg = "The Vims ground map does not understand cubes that "
+                    "initially have more than 64 lines or 64 samples.";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    }
   }
 
   /**

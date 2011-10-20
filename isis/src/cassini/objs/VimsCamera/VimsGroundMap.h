@@ -59,6 +59,13 @@ namespace Isis {
    *                           Latitude and Longitude classes.
    *   @history 2011-05-03 Jeannie Walldren - Updated documentation. Removed
    *                          Cassini namespace wrap inside Isis namespace.
+   *   @history 2011-10-19 Steven Lambright - Added common sense check to
+   *                           constructor to at least provide a string
+   *                           explanation for why their program is going to
+   *                           crash when the original cube makes no sense.
+   *                           Since the exception is in the constructor the
+   *                           error will probably lead to an alternate seg
+   *                           fault.
    */
   class VimsGroundMap : public CameraGroundMap {
     public:
