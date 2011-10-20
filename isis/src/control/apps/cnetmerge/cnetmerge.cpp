@@ -190,9 +190,10 @@ void mergeNetwork(ControlNet &baseNet, ControlNet &newNet, PvlObject &cnetLog) {
       }
       else {
         // User has disallowed merging points, so throw an error
-        string msg = "Inputs contain the same ControlPoint with ID [";
-        msg += newPoint->GetId() + "].  Set DUPLICATEPOINTS=MERGE to ";
-        msg += "merge conflicting Control Points";
+        string msg = "New network [" + newNet.GetNetworkId() + "] contains ";
+        msg += "Control Point with ID [" + newPoint->GetId() + "] already ";
+        msg += "contained within the base network.  ";
+        msg += "Set DUPLICATEPOINTS=MERGE to merge conflicting Control Points";
         throw iException::Message(iException::User, msg, _FILEINFO_);
       }
     }
