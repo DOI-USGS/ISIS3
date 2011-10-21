@@ -170,7 +170,7 @@
     <p>
       This is the point editor window of qnet for modifying or creating a control
       point.  This window will display information about the control point and
-      two control measures are displayed.  Initially the measures displayed will
+      two <def>control measure</def>s are displayed.  Initially the measures displayed will
       be the "Reference" cube on the left and the next cube in the control point
       on the right. The measures displayed in the left and right side can be 
       chosen from the combo-boxes under the labels "Left Measure" and
