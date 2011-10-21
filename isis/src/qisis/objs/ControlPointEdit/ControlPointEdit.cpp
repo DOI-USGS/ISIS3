@@ -845,6 +845,8 @@ namespace Isis {
    *   @history 2011-06-27  Tracie Sucharski - If un-doing registration, change
    *                             save button back to black.  If registration
    *                             successful, change save button to red.
+   *   @history 2011-10-21  Tracie Sucharski - Add try/catch around registration
+   *                             to catch errors thrown from autoreg class.
    *
    */
 
@@ -884,63 +886,72 @@ namespace Isis {
       return;
     }
 
-    AutoReg::RegisterStatus status = p_autoRegFact->Register();
-    if ( !p_autoRegFact->Success() ) {
-      QString msg = "Cannot sub-pixel register this point.\n";
-      if ( status == AutoReg::PatternChipNotEnoughValidData ) {
-        msg += "\n\nNot enough valid data in Pattern Chip.\n";
-        msg += "  PatternValidPercent = ";
-        msg += QString::number(p_autoRegFact->PatternValidPercent()) + "%";
-      }
-      else if ( status == AutoReg::FitChipNoData ) {
-        msg += "\n\nNo valid data in Fit Chip.";
-      }
-      else if ( status == AutoReg::FitChipToleranceNotMet ) {
-        msg += "\n\nGoodness of Fit Tolerance not met.\n";
-        msg += "\nGoodnessOfFit = " + QString::number(p_autoRegFact->GoodnessOfFit());
-        msg += "\nGoodnessOfFitTolerance = ";
-        msg += QString::number(p_autoRegFact->Tolerance());
-      }
-      else if ( status == AutoReg::SurfaceModelNotEnoughValidData ) {
-        msg += "\n\nNot enough points to fit a surface model for sub-pixel ";
-        msg += "accuracy.  Probably too close to edge.\n";
-      }
-      else if ( status == AutoReg::SurfaceModelSolutionInvalid ) {
-        msg += "\n\nCould not model surface for sub-pixel accuracy.\n";
-      }
-      else if ( status == AutoReg::SurfaceModelDistanceInvalid ) {
-        double sampDist, lineDist;
-        p_autoRegFact->Distance(sampDist, lineDist);
-        msg += "\n\nSurface model moves registartion more than tolerance.\n";
-        msg += "\nSampleMovement = " + QString::number(sampDist) +
-               "    LineMovement = " + QString::number(lineDist);
-        msg += "\nDistanceTolerance = " +
-               QString::number(p_autoRegFact->DistanceTolerance());
-      }
-      else if ( status == AutoReg::PatternZScoreNotMet ) {
-        double score1, score2;
-        p_autoRegFact->ZScores(score1, score2);
-        msg += "\n\nPattern data max or min does not pass z-score test.\n";
-        msg += "\nMinimumZScore = " + QString::number(p_autoRegFact->MinimumZScore());
-        msg += "\nCalculatedZscores = " + QString::number(score1) + ", " + QString::number(score2);
-      }
-      else if ( status == AutoReg::SurfaceModelEccentricityRatioNotMet ) {
-        msg += "\n\nEccentricity of surface model exceeds tolerance.";
-        QString calcEccentricity = QString::number(p_autoRegFact->EccentricityRatio(), 'f', 5);
-        msg += "\nCalculated Eccentricity Ratio = " +
-               calcEccentricity + " (" + calcEccentricity + ":1)";
-        QString tolEccentricity = QString::number(p_autoRegFact->EccentricityRatioTolerance(), 'f', 5);
-        msg += "\nEccentricity Ratio Tolerance (i.e., EccentricityRatio) = " +
-               tolEccentricity + " (" + tolEccentricity + ":1)";
-      }
-      else if ( status == AutoReg::AdaptiveAlgorithmFailed ) {
-        msg += "\n\nError occured in Adaptive algorithm.";
-      }
-      else {
-        msg += "\n\nUnknown registration error.";
-      }
+    try {
+      AutoReg::RegisterStatus status = p_autoRegFact->Register();
+      if ( !p_autoRegFact->Success() ) {
+        QString msg = "Cannot sub-pixel register this point.\n";
+        if ( status == AutoReg::PatternChipNotEnoughValidData ) {
+          msg += "\n\nNot enough valid data in Pattern Chip.\n";
+          msg += "  PatternValidPercent = ";
+          msg += QString::number(p_autoRegFact->PatternValidPercent()) + "%";
+        }
+        else if ( status == AutoReg::FitChipNoData ) {
+          msg += "\n\nNo valid data in Fit Chip.";
+        }
+        else if ( status == AutoReg::FitChipToleranceNotMet ) {
+          msg += "\n\nGoodness of Fit Tolerance not met.\n";
+          msg += "\nGoodnessOfFit = " + QString::number(p_autoRegFact->GoodnessOfFit());
+          msg += "\nGoodnessOfFitTolerance = ";
+          msg += QString::number(p_autoRegFact->Tolerance());
+        }
+        else if ( status == AutoReg::SurfaceModelNotEnoughValidData ) {
+          msg += "\n\nNot enough points to fit a surface model for sub-pixel ";
+          msg += "accuracy.  Probably too close to edge.\n";
+        }
+        else if ( status == AutoReg::SurfaceModelSolutionInvalid ) {
+          msg += "\n\nCould not model surface for sub-pixel accuracy.\n";
+        }
+        else if ( status == AutoReg::SurfaceModelDistanceInvalid ) {
+          double sampDist, lineDist;
+          p_autoRegFact->Distance(sampDist, lineDist);
+          msg += "\n\nSurface model moves registartion more than tolerance.\n";
+          msg += "\nSampleMovement = " + QString::number(sampDist) +
+                 "    LineMovement = " + QString::number(lineDist);
+          msg += "\nDistanceTolerance = " +
+                 QString::number(p_autoRegFact->DistanceTolerance());
+        }
+        else if ( status == AutoReg::PatternZScoreNotMet ) {
+          double score1, score2;
+          p_autoRegFact->ZScores(score1, score2);
+          msg += "\n\nPattern data max or min does not pass z-score test.\n";
+          msg += "\nMinimumZScore = " + QString::number(p_autoRegFact->MinimumZScore());
+          msg += "\nCalculatedZscores = " + QString::number(score1) + ", " + QString::number(score2);
+        }
+        else if ( status == AutoReg::SurfaceModelEccentricityRatioNotMet ) {
+          msg += "\n\nEccentricity of surface model exceeds tolerance.";
+          QString calcEccentricity = QString::number(p_autoRegFact->EccentricityRatio(), 'f', 5);
+          msg += "\nCalculated Eccentricity Ratio = " +
+                 calcEccentricity + " (" + calcEccentricity + ":1)";
+          QString tolEccentricity = QString::number(p_autoRegFact->EccentricityRatioTolerance(), 'f', 5);
+          msg += "\nEccentricity Ratio Tolerance (i.e., EccentricityRatio) = " +
+                 tolEccentricity + " (" + tolEccentricity + ":1)";
+        }
+        else if ( status == AutoReg::AdaptiveAlgorithmFailed ) {
+          msg += "\n\nError occured in Adaptive algorithm.";
+        }
+        else {
+          msg += "\n\nUnknown registration error.";
+        }
 
+        QMessageBox::information((QWidget *)parent(), "Error", msg);
+        return;
+      }
+    }
+    catch ( iException &e ) {
+      QString msg = "Cannot register this point.";
+      msg += e.Errors().c_str();
       QMessageBox::information((QWidget *)parent(), "Error", msg);
+      e.Clear();
       return;
     }
 
