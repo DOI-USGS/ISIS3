@@ -46,6 +46,7 @@ namespace Isis {
    *   @history 2009-01-08 Jeannie Walldren - Modified to remove
    *                          new filter points from the existing
    *                          filtered list.
+   *   @history 2011-10-20 Tracie Sucharski - trim whitespace from input 
    */
   void QnetPointIdFilter::filter() {
 
@@ -57,7 +58,7 @@ namespace Isis {
     }
 
     // Make sure the user has entered a regular expression for filtering
-    QRegExp rx(p_pointIdEdit->text());
+    QRegExp rx(p_pointIdEdit->text().trimmed());
     rx.setPatternSyntax(QRegExp::Wildcard);
     if (rx.isEmpty()) {
       QMessageBox::information((QWidget *)parent(),

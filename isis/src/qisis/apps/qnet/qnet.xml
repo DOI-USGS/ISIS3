@@ -7,12 +7,26 @@
 
   <description>
     <p>
-      This program will create and edit control networks.  To run qnet, you will
-      need to create a text file containing a list of all cubes in the control
-      network. These cubes must be un-projected, level 1 cubes. Optionally, you 
-      can also input an existing control network or when prompted for the 
-      control network, select the "Cancel" button, and a new control network 
+      This program will create and edit <def>control network</def>s.  Before running  qnet,
+      you will need to create a text file containing a list of all cubes in the control
+      network, 1 cube per line. These cubes must be un-projected, <def>level1</def> cubes.
+      Optionally, you can also input an existing control network or when prompted
+      for the control network, select the "Cancel" button, and a new control network 
       will be created.  
+    </p>
+
+    <p>
+      In addition to selecting <def>control point</def>s between level 1 un-projected images,
+      qnet may also be used to select ground control points, both Fixed  and
+      Constrained points.   To select ground control points, you must select
+      a ground source image.  This could be a Dem or shaded relief version
+      of a Dem, a projected basemap or a level 1 image with updated camera
+      pointing.  Optionally, a radius source file, Dem may also be entered 
+      which would provide radii for the ground control point.  These files
+      are entered from the <strong>File Menu</strong> on the main Qnet window.
+      The ground source image is immediately displayed in the main Qnet
+      window and new ground control points may be created by right-clicking
+      on the ground source cube display.
     </p>
 
     <p>
@@ -110,8 +124,6 @@
           </ul>
         <li><strong>Range:</strong> points that lie within the user specified 
         latitudinal and longitudinal ranges</li>
-        <li><strong>Measure Properties:</strong> points that contain any combination
-        of the following measure properties.</li>
         <li><strong>Distance:</strong> points that are within the user specified 
         distance of some other point in the control network</li>
         <li><strong>Measure Properties:</strong> points that contain at least one 
@@ -173,21 +185,21 @@
       <li>Move the cursor location under the crosshair by clicking the left mouse
           button</li>
       <li>Move 1 pixel at a time by using arrow keys on the keyboard</li>
-      <li>move 1 pixel at a time by using arrow buttons above the right view</li>
+      <li>Move 1 pixel at a time by using arrow buttons above the right view</li>
     </ul>
     </p>
     <h4>Other Point Editor Functions</h4>
       <p>Along the right border of the window:</p>
       <ul>
-        <li><strong>Geom:</strong>  Geometrically match the right view to the left
+        <li><strong>Geom:</strong>   Geometrically match the right view to the left
             view</li>
-        <li><strong>Rotate:</strong>  Rotate the right view using either the dial
+        <li><strong>Rotate:</strong>   Rotate the right view using either the dial
             or entering degrees </li>
-        <li><strong>Show control points:</strong> Draw crosshairs at all control
+        <li><strong>Show control points:</strong>  Draw crosshairs at all control
              point locations visible within the view</li>
-        <li><strong>Show crosshair:</strong> Show a red crosshair across the entire
+        <li><strong>Show crosshair:</strong>  Show a red crosshair across the entire
             view</li>
-        <li><strong>Circle</strong> Draw circle which may help center measure
+        <li><strong>Circle:</strong>  Draw circle which may help center measure
             on a crater</li>
       </ul>
       <p>Below the left view:</p>

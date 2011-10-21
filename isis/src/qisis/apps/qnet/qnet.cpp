@@ -143,7 +143,7 @@ int main(int argc, char *argv[]) {
     /**** LOADING IMAGES ****/
     // The fileTool needs to know when the navTool wants to load images
     QObject::connect(ntool, SIGNAL(loadImage(const QString &)),
-        ftool, SLOT(loadImage(const QString &)));
+                     ftool, SLOT(loadImage(const QString &)));
     // The fileTool needs to know when to load the images associated with a point
     QObject::connect(ntool,SIGNAL(loadPointImages(ControlPoint *)),
                      ftool,SLOT(loadPointImages(ControlPoint *)));

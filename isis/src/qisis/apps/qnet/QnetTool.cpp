@@ -1733,7 +1733,8 @@ namespace Isis {
    */
   void QnetTool::deletePoint(ControlPoint *point) {
 
-    // Make a copy
+    // Make a copy and make sure editPoint is a copy (which means it does not
+    // have a parent network.
     if (p_editPoint != NULL && p_editPoint->Parent() == NULL) {
       delete p_editPoint;
       p_editPoint = NULL;
@@ -2798,11 +2799,12 @@ namespace Isis {
    *                          measures to be drawn on all cubes.  Also removed
    *                          loop through measures, instead just get measure
    *                          for given serial number.
+   *   @history 2011-10-20 Tracie Sucharski - Add check for a control network
+   *                          that does not yet have any control points.
    */
   void QnetTool::drawAllMeasurments(MdiCubeViewport *vp, QPainter *painter) {
-    
-    // Without a controlnetwork there are no points
-    if (g_controlNetwork == 0) return;
+    // Without a controlnetwork there are no points, or if new net, no points
+    if (g_controlNetwork == 0 || g_controlNetwork->GetNumPoints() == 0) return;
 
     // Don't show the measurments on cubes not in the serial number list
     // TODO: Should we show them anyway
@@ -3182,6 +3184,9 @@ namespace Isis {
    * @history 2010-12-15 Tracie Sucharski - Before setting p_editPoint to NULL, 
    *                        release memory.  TODO: Why is the first if statement
    *                        being done???
+   * @history 2011-10-20 Tracie Sucharski - If no control points exist in the 
+   *                        network, emit proper signal and make sure editor
+   *                        and measure table are hidden.
    *  
    */
   void QnetTool::refresh() {
@@ -3198,7 +3203,9 @@ namespace Isis {
       catch (iException &e) {
         delete p_editPoint;
         p_editPoint = NULL;
+        emit editPointChanged("");
         p_qnetTool->setShown(false);
+        p_measureWindow->setShown(false);
       }
     }
 

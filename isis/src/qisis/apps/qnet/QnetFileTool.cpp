@@ -317,6 +317,8 @@ namespace Isis {
         break;
       }
     }
+    //  If viewport doesn't already exist for this serial number, emit
+    //  signal so that FileTool will add a viewport.
     if (!found)
       emit fileSelected(filename);
   }

@@ -72,8 +72,7 @@ namespace Isis {
     p_filterCountLabel = NULL;
     p_aprioriDialog = NULL;
     createNavigationDialog(parent);
-    connect(this, SIGNAL(deletedPoints()),
-        this, SLOT(refreshList()));
+    connect(this, SIGNAL(deletedPoints()), this, SLOT(refreshList()));
     p_filtered = false;
   }
 
@@ -771,6 +770,14 @@ namespace Isis {
    *   @history 2011-07-25 Tracie Sucharski - Fixed bug in refreshing list 
    *                          changed to delete starting at end of list so
    *                          indices stay accurate.
+   *   @history 2011-10-20 Tracie Sucharski - Fixed bug with filter list not
+   *                          being updated correctly after deleting points.
+   *                          The simple fix was to reset the list, then
+   *                          re-filter.  For most filters this is probably
+   *                          adequate.  However, for computationally
+   *                          intensive filters, we might need a smarter
+   *                          algorithm which would involve actually adjusting
+   *                          the indices of the filtered list.
    */
   void QnetNavTool::deletePoints() {
     // do nothing if no cubes are loaded
@@ -785,7 +792,6 @@ namespace Isis {
           "Error", "No point selected to delete");
       return;
     }
-
     switch (QMessageBox::question((QWidget *)parent(),
         "Control Network Navigator - Delete Points",
         "You have chosen to delete "
@@ -793,29 +799,34 @@ namespace Isis {
         + " point(s). Do you want to continue?",
         "&Yes", "&No", 0, 0)) {
       case 0: // Yes was clicked or Enter was pressed, delete points
-        QApplication::setOverrideCursor(Qt::WaitCursor);
 
-        int editPointIndex = 0;
-        int lockedPoints = 0;
+
+#if 0 //  If resetting filtered list, then re-filtering too slow, try code below
+
+        // Keep track of rows to be deleted.  They cannot be deleted until
+        // the end, or indices in list widget will be incorrect.
         vector<int> deletedRows;
-        //  Delete starting from end of list so that entries can be deleted
-        //  from filtered list as points are deleted from network
-        for (int i = selected.size() - 1; i >= 0; i--) {
-//          for (int i = 0; i < selected.size(); i++) {
-          QString id = selected.at(i)->text();
-          //  Keep track of rows #'s that are being deleted.
-          deletedRows.push_back(p_listBox->row(selected.at(i)));
-          if (id == p_editPointId) {
-            editPointIndex = deletedRows[i];
+        // Keep track of points deleted so far, to keep indices into network
+        // (stored in g_filteredPoints) accurate, they will need to be adjusted
+        // on the fly.
+        int deletedSoFar = 0;
+
+        for (int i = 0; i < g_filteredPoints.size(); i++) {
+          if (p_listBox->item(i)->isSelected() {
+            QString id = p_listBox->item(i)->text();
+            if (g_controlNetwork->DeletePoint(id) == ControlPoint::PointLocked) {
+              lockedPoints++;
+            }
           }
+        }
+#endif
+        int lockedPoints = 0;
+        for (int i = 0; i < selected.size(); i++) {
+          QString id = selected.at(i)->text();
           if (g_controlNetwork->DeletePoint(id) == ControlPoint::PointLocked) {
             lockedPoints++;
           }
-          else {
-            g_filteredPoints.removeAt(i);
-          }
         }
-        QApplication::restoreOverrideCursor();
 
         //  Print info about locked points if there are any
         if (lockedPoints > 0) {
@@ -825,12 +836,15 @@ namespace Isis {
                 + " points are EditLocked and were not deleted.");
         }
 
-        if (g_filteredPoints.size() == 0) {
-          filterList();
+        //  Reset filter list, if this becomes too slow, we might need to
+        //  implement smarter algorithm, which would require adjusting indices
+        //  as points get deleted.  See commented out code above.
+        g_filteredPoints.clear();
+        // copy the control net indices into the filtered points list
+        for (int i = 0; i < g_controlNetwork->GetNumPoints(); i++) {
+          g_filteredPoints.push_back(i);
         }
-        else {
-          emit deletedPoints();
-        }
+        emit deletedPoints();
         emit netChanged();
         break;
         //  case 1: // No was clicked, close window and do nothing to points
