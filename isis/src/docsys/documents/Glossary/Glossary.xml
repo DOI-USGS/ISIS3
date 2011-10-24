@@ -194,7 +194,7 @@
             Mapping keywords that describe the projection and all associated map
             characteristics.  Most Isis applications that start with a prefix of
             'map' expects a Level2 cube as input (refer to applications such as
-            mappt, map2map, map2cam) 
+            mappt, map2map, map2cam).
           </definition>
 
           <definition name="Serial Number">
