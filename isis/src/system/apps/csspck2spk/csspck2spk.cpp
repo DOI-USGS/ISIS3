@@ -113,6 +113,8 @@ void IsisMain() {
 
   // Loop over the pairing file in reverse so the output PCK DB file will be
   // ordered from oldest date to most recent (the pairing file is the opposite)
+  PvlObject predicted;
+  PvlObject reconstructed;
   for (int i = rawLines.size() - 1; i >= 0; i--) {
     iString line = rawLines[i];
 
@@ -133,16 +135,33 @@ void IsisMain() {
       // Create the PCK Selection group from data in the mapped SPK
       PvlGroup selection("Selection");
 
-      PvlGroup &grp = mainob.Group(spkGroups[spk]);
-      selection.AddKeyword(grp.FindKeyword("Time"));
+      PvlGroup &spkSelection = mainob.Group(spkGroups[spk]);
+      selection.AddKeyword(spkSelection.FindKeyword("Time"));
       selection.AddKeyword(basefile);
 
       PvlKeyword newfile("File", "$cassini/kernels/pck/" + pck);
       selection.AddKeyword(newfile);
 
-      targetAttitudeShape.AddGroup(selection);
+      PvlKeyword &type = spkSelection.FindKeyword("Type");
+      if (type[0] == "Predicted") {
+        predicted.AddGroup(selection);
+      }
+      else if (type[0] == "Reconstructed") {
+        reconstructed.AddGroup(selection);
+      }
+      else {
+        string msg = "Unrecognized SPK Type [" + type[0] + "] in [" +
+            inDBfile + "]";
+        throw iException::Message(iException::User, msg, _FILEINFO_);
+      }
     }
   }
+
+  for (int i = 0; i < predicted.Groups(); i++)
+    targetAttitudeShape.AddGroup(predicted.Group(i));
+
+  for (int i = 0; i < reconstructed.Groups(); i++)
+    targetAttitudeShape.AddGroup(reconstructed.Group(i));
 
   // Make a new PVL file so we can write out all the PCK DB data
   Pvl outPvl;
