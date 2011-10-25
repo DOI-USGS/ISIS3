@@ -6,11 +6,12 @@
 
 #include <QHash>
 #include <QList>
+#include <QSet>
 #include <QString>
 
+#include "Filename.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
-#include "Filename.h"
 #include "TextFile.h"
 
 using namespace Isis;
@@ -18,68 +19,7 @@ using std::string;
 
 
 void IsisMain() {
-  // Open the input file from the GUI or find the latest version of the DB file
   UserInterface &ui = Application::GetUserInterface();
-
-  string inDBfile;
-  if (ui.WasEntered("FROM")) {
-    inDBfile = ui.GetFilename("FROM");
-  }
-  else {
-    // Stores highest version
-    string exDBfile("$cassini/kernels/spk/kernels.????.db");
-    Filename exDBfilenm(exDBfile);
-    exDBfilenm.HighestVersion();
-    inDBfile = exDBfilenm.Expanded();
-  }
-
-  Filename basepckPath("$base/kernels/pck/kernels.????.db");
-  basepckPath.HighestVersion();
-
-  // Read SPK DB file into a PVL
-  Pvl spkdb(inDBfile);
-  Pvl basepck(basepckPath.Expanded());
-  PvlKeyword basefile = basepck.FindObject("TargetAttitudeShape").Group(0)["File"];
-
-  //Search PVL for main object
-  PvlObject &mainob = spkdb.FindObject("SpacecraftPosition");
-
-  // Search for the Selection Groups, and the based on the File Keyword, add the
-  // appropriate pck file keyword.  First check to see if the input file has
-  // already been updated from an old version of the program.
-  QHash<QString, int> spkGroups;
-  for (int grpIndex = 0; grpIndex < mainob.Groups(); grpIndex++) {
-    PvlGroup &grp = mainob.Group(grpIndex);
-
-    if (grp.IsNamed("Selection")) {
-      int count = 0;
-      for(int keyIndex = 0; keyIndex < grp.Keywords(); keyIndex++) {
-        if (grp[keyIndex].IsNamed("File")) {
-          count++;
-
-          // Older versions of this program added the file to the SPK kernels DB
-          // file instead of creating a new one in the PCK directory. Check for
-          // this.
-          if (count > 1) {
-            string msg = "This file has already been updated [";
-            msg += iString(inDBfile) + "] by an old version of this program.";
-            msg += " This is not a valid input.";
-            throw iException::Message(iException::User, msg, _FILEINFO_);
-          }
-        }
-      }
-
-      // Get the basename of the SPK file so it references 1:1 with an entry in
-      // the pairing file
-      string value = (string)grp["File"];
-      Filename fnm(value);
-      string basename = fnm.Basename();
-
-      // Add an entry in our hash for the current SPK filename for quick lookup
-      // of the group later
-      spkGroups.insert(QString::fromStdString(basename), grpIndex);
-    }
-  }
 
   // Fetch the pairing file
   Filename pckFilename;
@@ -95,79 +35,122 @@ void IsisMain() {
 
   TextFile txt(pckFilename.Expanded());
 
-  // Store the file into a list so we can iterate over it in reverse order
-  QList<QString> rawLines;
+  QList<QString> spkList;
+  QHash<QString, QString> pairings;
+
   iString rawLine;
   while (txt.GetLine(rawLine)) {
-    rawLines.append(QString::fromStdString(rawLine));
-  }
-
-  // Begin building up our output PVL
-  PvlObject targetAttitudeShape("TargetAttitudeShape");
-
-  PvlKeyword &runTime = mainob.FindKeyword("RunTime");
-  targetAttitudeShape.AddKeyword(runTime);
-
-  PvlGroup &dependencies = mainob.FindGroup("Dependencies");
-  targetAttitudeShape.AddGroup(dependencies);
-
-  // Loop over the pairing file in reverse so the output PCK DB file will be
-  // ordered from oldest date to most recent (the pairing file is the opposite)
-  PvlObject predicted;
-  PvlObject reconstructed;
-  for (int i = rawLines.size() - 1; i >= 0; i--) {
-    iString line = rawLines[i];
-
-    // Split the line around the command and strip the extraneous characters
+    // Split the line around the comma and remove any unwanted characters
     string unwantedChars = "\n\r\t\v\f ";
-    iString pck = line.Token(",");
+    iString pck = rawLine.Token(",");
     pck.Trim(unwantedChars);
-    iString spk = line;
+    iString spk = rawLine;
     spk.Trim(unwantedChars);
 
-    if (!spkGroups.contains(spk)) {
-      // Every pair in the pairing file must have a corresponding SPK in the DB
-      // file
-      string msg = "Spk [" + spk + "] does not exist in [" + inDBfile + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
-    }
-    else {
-      // Create the PCK Selection group from data in the mapped SPK
-      PvlGroup selection("Selection");
+    // Store the SPK into a list so we can iterate over it to ensure all SPKs
+    // are properly mapped from the pairing file to the SPK DB file
+    spkList.append(QString::fromStdString(spk));
 
-      PvlGroup &spkSelection = mainob.Group(spkGroups[spk]);
-      selection.AddKeyword(spkSelection.FindKeyword("Time"));
-      selection.AddKeyword(basefile);
+    // Add an entry to the pairings hash for nearly constant-time lookup
+    pairings.insert(QString::fromStdString(spk), QString::fromStdString(pck));
+  }
 
-      PvlKeyword newfile("File", "$cassini/kernels/pck/" + pck);
-      selection.AddKeyword(newfile);
+  // Get the "base file" used for reference for all PCK entries from the most
+  // recent PCK DB file
+  Filename basepckPath("$base/kernels/pck/kernels.????.db");
+  basepckPath.HighestVersion();
+  Pvl basepck(basepckPath.Expanded());
+  PvlKeyword basefile =
+      basepck.FindObject("TargetAttitudeShape").Group(0)["File"];
 
-      PvlKeyword &type = spkSelection.FindKeyword("Type");
-      if (type[0] == "Predicted") {
-        predicted.AddGroup(selection);
+  // Open the input file from the GUI or find the latest version of the DB file
+  string inDBfile;
+  if (ui.WasEntered("FROM")) {
+    inDBfile = ui.GetFilename("FROM");
+  }
+  else {
+    // Stores highest version
+    string exDBfile("$cassini/kernels/spk/kernels.????.db");
+    Filename exDBfilenm(exDBfile);
+    exDBfilenm.HighestVersion();
+    inDBfile = exDBfilenm.Expanded();
+  }
+
+  // Read SPK DB file into a PVL and search the PVL for the main object
+  Pvl spkdb(inDBfile);
+  PvlObject &mainob = spkdb.FindObject("SpacecraftPosition");
+  mainob.SetName("TargetAttitudeShape");
+
+  // Search for the Selection Groups, and then based on the File Keyword, add
+  // the appropriate PCK file keyword.  First check to see if the input file has
+  // already been updated from an old version of the program.
+  QSet<QString> mappedSpks;
+  for (int spkIndex = mainob.Groups() - 1; spkIndex >= 0; spkIndex--) {
+    PvlGroup &spkGroup = mainob.Group(spkIndex);
+
+    // Only modify the Selection groups, all others can remain the same
+    if (spkGroup.IsNamed("Selection")) {
+      int count = 0;
+      for (int keyIndex = 0; keyIndex < spkGroup.Keywords(); keyIndex++) {
+        if (spkGroup[keyIndex].IsNamed("File")) {
+          count++;
+
+          // Older versions of this program added the file to the SPK kernels DB
+          // file instead of creating a new one in the PCK directory. Check for
+          // this.
+          if (count > 1) {
+            string msg = "This file has already been updated [";
+            msg += iString(inDBfile) + "] by an old version of this program.";
+            msg += "  This is not a valid input.";
+            throw iException::Message(iException::User, msg, _FILEINFO_);
+          }
+        }
       }
-      else if (type[0] == "Reconstructed") {
-        reconstructed.AddGroup(selection);
+
+      // Get the basename of the SPK file, which references 1:1 with an entry in
+      // the pairing file
+      string value = (string) spkGroup["File"];
+      Filename filename(value);
+      QString basename = filename.Basename();
+
+      // Remove entries in-place if there is not a match in the PCK2SPK pairing
+      // file.  If the entries in the PCK DB file generated by this program are
+      // not in the same relative order as the SPK DB file entries, then it is
+      // possible for an SPK to be paired with the wrong PCK during "spiceinit".
+      if (!pairings.contains(basename)) {
+        mainob.DeleteGroup(spkIndex);
       }
       else {
-        string msg = "Unrecognized SPK Type [" + type[0] + "] in [" +
-            inDBfile + "]";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        // Record that the current SPK has been properly mapped to an entry in
+        // the existing SPK DB file.  Every SPK from the pairing file must have
+        // a selection group in the SPK DB file.
+        mappedSpks.insert(basename);
+
+        // Modify the SPK group in-place to preserve relative ordering, then
+        // change the keywords to contain on PCK-relevant information
+        PvlKeyword newfile("File", "$cassini/kernels/pck/" + pairings[basename]);
+        spkGroup.AddKeyword(basefile, Pvl::Replace);
+        spkGroup.AddKeyword(newfile);
+        spkGroup.DeleteKeyword("Type");
       }
     }
   }
 
-  for (int i = 0; i < predicted.Groups(); i++)
-    targetAttitudeShape.AddGroup(predicted.Group(i));
+  // Error check to ensure every SPK in the pairing file has an entry in the SPK
+  // DB file
+  for (int i = 0; i < spkList.size(); i++) {
+    QString spk = spkList[i];
+    if (!mappedSpks.contains(spk)) {
+      // Every SPK in the pairing file must have its corresponding entry in the
+      // DB file
+      string msg = "SPK [" + spk.toStdString() +
+          "] does not map to an entry in [" + inDBfile + "]";
+      throw iException::Message(iException::User, msg, _FILEINFO_);
+    }
+  }
 
-  for (int i = 0; i < reconstructed.Groups(); i++)
-    targetAttitudeShape.AddGroup(reconstructed.Group(i));
-
-  // Make a new PVL file so we can write out all the PCK DB data
-  Pvl outPvl;
-  outPvl.AddObject(targetAttitudeShape);
-
-  // Create new DB file with the updated contents of the PVL
+  // Determine whether we want to update the data area directly or write to a
+  // user-specified location
   Filename outDBfile;
   if (ui.WasEntered("TO")) {
     outDBfile = ui.GetFilename("TO");
@@ -177,6 +160,7 @@ void IsisMain() {
     outDBfile.NewVersion();
   }
 
-  outPvl.Write(outDBfile.Expanded());
+  // Write the updated PVL as the new PCK DB file
+  spkdb.Write(outDBfile.Expanded());
 }
 
