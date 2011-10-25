@@ -30,6 +30,14 @@ void IsisMain() {
     string msg = "The list file [" + ui.GetFilename("FROMLIST") +"does not contain any data";
     throw iException::Message(iException::User, msg, _FILEINFO_);
   }
+  
+  fstream os;
+  bool olistFlag = false;
+  if (ui.WasEntered("TOLIST")){
+    string olist = ui.GetFilename("TOLIST");
+    olistFlag = true;
+    os.open(olist.c_str(), std::ios::out);
+  }
 
   ProcessMapMosaic m;
 
@@ -114,13 +122,20 @@ void IsisMain() {
       imgPosition += PvlKeyword("StartLine", iStartLine);
       Application::Log(imgPosition);
       mosaicCreated = true;
+      if(olistFlag) {
+        os << list[i] << endl;
+      }
     }
     if(mosaicCreated) {
       // Mosaic is already created, use the existing mosaic
       m.SetCreateFlag(false);
     }
   }
-
+  
+  if(olistFlag) {
+    os.close();
+  }
+  
   m.EndProcess();
 }
 

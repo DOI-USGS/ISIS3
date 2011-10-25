@@ -238,8 +238,12 @@
       attributes for the mosaic
     </change>
     <change name="Sharmila Prasad" date="2011-09-07">
-      Fixed bug 0000390 - tracking should continue even if the first image does 
+    Fixed bug #0000390 - tracking should continue even if the first image does 
     not map onto the mosaic  
+    </change>
+    <change name="Sharmila Prasad" date="2011-10-25">
+    Fixed bug #0000464 - add optional list TOLIST containing all the files names 
+    that were added onto the mosaic. 
     </change>
   </history>
 
@@ -272,6 +276,22 @@
         </description>
         <filter>
           *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TOLIST">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <internalDefault>None</internalDefault>
+        <brief>
+          List of images were added to the mosaic
+        </brief>
+        <description>
+        This optional output list  contains the names of all images that were 
+        added onto the mosaic. 
+        </description>
+        <filter>
+          *.lis
         </filter>
       </parameter>
     
