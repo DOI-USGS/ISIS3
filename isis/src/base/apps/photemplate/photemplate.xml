@@ -116,6 +116,10 @@
       load properly from a PVL file when using the Load Pvl helper button. This is
       a known problem and will be fixed in the next patch or release of ISIS.
     </change>
+    <change name="Sharmila Prasad" date="2011-10-27">
+      Added API's to display and output PVL info, specifically for arrays and 
+    alphabetically organised the Photometric Model names
+    </change>
   </history>
 
   <seeAlso>
@@ -221,34 +225,6 @@
             </exclusions>
           </option>
 
-          <option value="LAMBERT">
-            <brief>
-              Lambert Photometric Model
-            </brief>
-            <description>
-              Simple photometric model which predicts that light 
-              incident on a surface is scattered uniformly in all directions;
-		          the total amount of reflected light depends on the incidence angle
-		          of the illumination. This function does not depend upon the
-		          outgoing light direction.
-            </description>
-            <exclusions>
-              <item>THETA</item>
-              <item>WH</item>
-              <item>HG1</item>
-              <item>HG2</item>
-              <item>HH</item>
-              <item>B0</item>
-              <item>BH</item>
-              <item>CH</item>
-              <item>L</item>
-              <item>K</item>
-              <item>PHASELIST</item>
-              <item>KLIST</item>
-              <item>LLIST</item>
-              <item>PHASECURVELIST</item>
-            </exclusions>
-          </option>
           <option value="HAPKEHEN">
             <brief>
               Hapke-Henyey-Greenstein Photometric Model
@@ -309,6 +285,35 @@
               <item>PHASECURVELIST</item>
             </exclusions>
           </option>
+
+          <option value="LAMBERT">
+            <brief>
+              Lambert Photometric Model
+            </brief>
+            <description>
+              Simple photometric model which predicts that light 
+              incident on a surface is scattered uniformly in all directions;
+		          the total amount of reflected light depends on the incidence angle
+		          of the illumination. This function does not depend upon the
+		          outgoing light direction.
+            </description>
+            <exclusions>
+              <item>THETA</item>
+              <item>WH</item>
+              <item>HG1</item>
+              <item>HG2</item>
+              <item>HH</item>
+              <item>B0</item>
+              <item>BH</item>
+              <item>CH</item>
+              <item>L</item>
+              <item>K</item>
+              <item>PHASELIST</item>
+              <item>KLIST</item>
+              <item>LLIST</item>
+              <item>PHASECURVELIST</item>
+            </exclusions>
+          </option>
           <option value="LOMMELSEELIGER">
             <brief>
               Lommel-Seeliger Photometric Model
@@ -331,6 +336,36 @@
               <item>HH</item>
               <item>B0</item>
               <item>L</item>
+              <item>K</item>
+              <item>PHASELIST</item>
+              <item>KLIST</item>
+              <item>LLIST</item>
+              <item>PHASECURVELIST</item>
+            </exclusions>
+          </option>
+          <option value="LUNARLAMBERT">
+            <brief>
+              Lunar Lambert Photometric Model
+            </brief>
+            <description>
+              This model combines a weighted sum of the LommelSeeliger and
+              Lambert models. Given a suitable value for the LunarLambert
+		          function weight, L, this model fits the true reflectance behavior
+		          of many planetary surfaces equally well as the Hapke model. This
+		          model also depends on the incidence and emission angles.
+            </description>
+            <inclusions>
+              <item>L</item>
+            </inclusions>
+            <exclusions>
+              <item>THETA</item>
+              <item>WH</item>
+              <item>HG1</item>
+              <item>HG2</item>
+              <item>BH</item>
+              <item>CH</item>
+              <item>HH</item>
+              <item>B0</item>
               <item>K</item>
               <item>PHASELIST</item>
               <item>KLIST</item>
@@ -394,9 +429,9 @@
               <item>PHASECURVELIST</item>
             </exclusions>
           </option>
-          <option value="LUNARLAMBERT">
+          <option value="MINNAERT">
             <brief>
-              Lunar Lambert Photometric Model
+              Minnaert Photometric Model
             </brief>
             <description>
               This model combines a weighted sum of the LommelSeeliger and
@@ -406,7 +441,7 @@
 		          model also depends on the incidence and emission angles.
             </description>
             <inclusions>
-              <item>L</item>
+              <item>K</item>
             </inclusions>
             <exclusions>
               <item>THETA</item>
@@ -417,7 +452,7 @@
               <item>CH</item>
               <item>HH</item>
               <item>B0</item>
-              <item>K</item>
+              <item>L</item>
               <item>PHASELIST</item>
               <item>KLIST</item>
               <item>LLIST</item>
@@ -452,36 +487,6 @@
               <item>K</item>
               <item>L</item>
               <item>LLIST</item>
-            </exclusions>
-          </option>
-          <option value="MINNAERT">
-            <brief>
-              Minnaert Photometric Model
-            </brief>
-            <description>
-              This model combines a weighted sum of the LommelSeeliger and
-              Lambert models. Given a suitable value for the LunarLambert
-		          function weight, L, this model fits the true reflectance behavior
-		          of many planetary surfaces equally well as the Hapke model. This
-		          model also depends on the incidence and emission angles.
-            </description>
-            <inclusions>
-              <item>K</item>
-            </inclusions>
-            <exclusions>
-              <item>THETA</item>
-              <item>WH</item>
-              <item>HG1</item>
-              <item>HG2</item>
-              <item>BH</item>
-              <item>CH</item>
-              <item>HH</item>
-              <item>B0</item>
-              <item>L</item>
-              <item>PHASELIST</item>
-              <item>KLIST</item>
-              <item>LLIST</item>
-              <item>PHASECURVELIST</item>
             </exclusions>
           </option>
         </list>

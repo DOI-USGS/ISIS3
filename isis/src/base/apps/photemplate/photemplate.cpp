@@ -36,9 +36,36 @@ void PrintPvl() {
   Application::GuiLog(inPvl);
 }
 
+// Load the values from the input PVL to a string to be displayed
+// onto the UI.
+void LoadKeyValue(const PvlKeyword & key, string & val){
+  int size = key.Size();
+  val = "";
+  for (int i=0; i<size; i++) {
+    if (i > 0) {
+      val += ", ";
+    }
+    val += key[i];
+  }
+}
+
+// Data from the UI is output to a PVL
+// Converts the string into double value
+void OutputKeyValue(PvlKeyword & key, string val){
+  key.Clear();
+  size_t found = val.find(",");
+  while(found != string::npos) {
+    key += iString(val.substr(0, found)).ToDouble();
+    val = val.substr(found+1);
+    found = val.find(",");
+  }
+  key += iString(val.substr(0, found)).ToDouble();
+}
+
 // Helper function to load the input pvl file into the GUI
 void LoadPvl() {
   std::stringstream os;
+  string keyVal;
   UserInterface &ui = Application::GetUserInterface();
   string inFile(ui.GetFilename("FROMPVL"));
   Pvl inPvl;
@@ -116,91 +143,85 @@ void LoadPvl() {
           phtVal = phtVal.UpCase();
           if (phtVal == "HAPKEHEN" || phtVal == "HAPKELEG") {
             if (phtGrp->HasKeyword("THETA")) {
-              double theta = phtGrp->FindKeyword("THETA");
-              os.str("");
-              os << theta;
-              ui.PutAsString("THETA", os.str());
+              PvlKeyword thetaKey = phtGrp->FindKeyword("THETA");
+              LoadKeyValue(thetaKey, keyVal);
+              ui.PutAsString("THETA", keyVal);
             }
             if (phtGrp->HasKeyword("WH")) {
-              double wh = phtGrp->FindKeyword("WH");
-              os.str("");
-              os << wh;
-              ui.PutAsString("WH", os.str());
+              PvlKeyword whKey = phtGrp->FindKeyword("WH");
+              LoadKeyValue(whKey, keyVal);
+              ui.PutAsString("WH", keyVal);
             }
             if (phtGrp->HasKeyword("HH")) {
-              double hh = phtGrp->FindKeyword("HH");
-              os.str("");
-              os << hh;
-              ui.PutAsString("HH", os.str());
+              PvlKeyword hhKey = phtGrp->FindKeyword("HH");
+              LoadKeyValue(hhKey, keyVal);
+              ui.PutAsString("HH", keyVal);
             } 
             if (phtGrp->HasKeyword("B0")) {
-              double b0 = phtGrp->FindKeyword("B0");
-              os.str("");
-              os << b0;
-              ui.PutAsString("B0", os.str());
+              PvlKeyword b0Key = phtGrp->FindKeyword("B0");
+              LoadKeyValue(b0Key, keyVal);
+              ui.PutAsString("B0", keyVal);
             }
             if (phtVal == "HAPKEHEN") {
               if (phtGrp->HasKeyword("HG1")) {
-                double hg1 = phtGrp->FindKeyword("HG1");
-                os.str("");
-                os << hg1;
-                ui.PutAsString("HG1", os.str());
+                PvlKeyword hg1Key = phtGrp->FindKeyword("HG1");
+                LoadKeyValue(hg1Key, keyVal);
+                ui.PutAsString("HG1", keyVal);
               }
               if (phtGrp->HasKeyword("HG2")) {
-                double hg2 = phtGrp->FindKeyword("HG2");
-                os.str("");
-                os << hg2;
-                ui.PutAsString("HG2", os.str());
+                PvlKeyword hg2Key = phtGrp->FindKeyword("HG2");
+                LoadKeyValue(hg2Key, keyVal);
+                ui.PutAsString("HG2", keyVal);
               }
             }
             if (phtVal == "HAPKELEG") {
               if (phtGrp->HasKeyword("BH")) {
-                double bh = phtGrp->FindKeyword("BH");
-                os.str("");
-                os << bh;
-                ui.PutAsString("BH", os.str());
+                PvlKeyword bhKey = phtGrp->FindKeyword("BH");
+                LoadKeyValue(bhKey, keyVal);
+                ui.PutAsString("BH", keyVal);
               }
               if (phtGrp->HasKeyword("CH")) {
-                double ch = phtGrp->FindKeyword("CH");
-                os.str("");
-                os << ch;
-                ui.PutAsString("CH", os.str());
+                PvlKeyword chKey = phtGrp->FindKeyword("CH");
+                LoadKeyValue(chKey, keyVal);
+                ui.PutAsString("CH", keyVal);
               }
             }
           } else if (phtVal == "MINNAERT") {
             if (phtGrp->HasKeyword("K")) {
-              double k = phtGrp->FindKeyword("K");
-              os.str("");
-              os << k;
-              ui.PutAsString("K", os.str());
+              PvlKeyword k = phtGrp->FindKeyword("K");
+              LoadKeyValue(k, keyVal);
+              ui.PutAsString("K", keyVal);
             }
           } else if (phtVal == "LUNARLAMBERTEMPIRICAL" || phtVal == "MINNAERTEMPIRICAL") {
             if (phtGrp->HasKeyword("PHASELIST")) {
-              string phaselist = (string)phtGrp->FindKeyword("PHASELIST");
-              ui.PutAsString("PHASELIST", phaselist);
+              PvlKeyword phaselist = phtGrp->FindKeyword("PHASELIST");
+              LoadKeyValue(phaselist, keyVal);
+              ui.PutAsString("PHASELIST", keyVal);
             } 
             if (phtGrp->HasKeyword("PHASECURVELIST")) {
-              string phasecurvelist = (string)phtGrp->FindKeyword("PHASECURVELIST");
-              ui.PutAsString("PHASECURVELIST", phasecurvelist);
+              PvlKeyword phasecurvelist = phtGrp->FindKeyword("PHASECURVELIST");
+              LoadKeyValue(phasecurvelist, keyVal);
+              ui.PutAsString("PHASECURVELIST", keyVal);
             }
             if (phtVal == "LUNARLAMBERTEMPIRICAL") {
               if (phtGrp->HasKeyword("LLIST")) {
-                string llist = (string)phtGrp->FindKeyword("LLIST");
-                ui.PutAsString("LLIST", llist);
+                PvlKeyword llist = phtGrp->FindKeyword("LLIST");
+                LoadKeyValue(llist, keyVal);
+                ui.PutAsString("LLIST", keyVal);
               }
             }
             if (phtVal == "MINNAERTEMPIRICAL") {
               if (phtGrp->HasKeyword("KLIST")) {
-                string klist = (string)phtGrp->FindKeyword("KLIST");
-                ui.PutAsString("KLIST", klist);
+                PvlKeyword kList = phtGrp->FindKeyword("KLIST");
+                LoadKeyValue(kList, keyVal);
+                ui.PutAsString("KLIST", keyVal);
               }
             }
           } else if (phtVal == "LUNARLAMBERT") {
             if (phtGrp->HasKeyword("L")) {
-              double l = phtGrp->FindKeyword("L");
-              os.str("");
-              os << l;
-              ui.PutAsString("L", os.str());
+              PvlKeyword l = phtGrp->FindKeyword("L");
+              LoadKeyValue(l, keyVal);
+              ui.PutAsString("L", keyVal);
             } 
           } else if (phtVal != "LAMBERT" && phtVal != "LOMMELSEELIGER" &&
                      phtVal != "LUNARLAMBERTMCEWEN") {
@@ -439,10 +460,10 @@ void addPhoModel(Pvl &pvl, Pvl &outPvl) {
   //Hapke Photometric Models
   if(phtName == "HAPKEHEN" || phtName == "HAPKELEG") {
     if (ui.WasEntered("THETA")) {
-      iString keyval = ui.GetString("THETA");
-      double theta = keyval.ToDouble();
+      PvlKeyword thetaKey("THETA");
+      OutputKeyValue(thetaKey, ui.GetString("THETA"));
       outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
-             AddKeyword(PvlKeyword("THETA",theta),Pvl::Replace);
+             AddKeyword(thetaKey,Pvl::Replace);
     } else {
       if (!outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                   HasKeyword("THETA")) {
@@ -452,10 +473,10 @@ void addPhoModel(Pvl &pvl, Pvl &outPvl) {
       }
     }
     if (ui.WasEntered("WH")) {
-      iString keyval = ui.GetString("WH");
-      double wh = keyval.ToDouble();
+      PvlKeyword whKey("WH");
+      OutputKeyValue(whKey, ui.GetString("WH"));
       outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
-             AddKeyword(PvlKeyword("WH",wh),Pvl::Replace);
+             AddKeyword(whKey, Pvl::Replace);
     } else {
       if (!outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                   HasKeyword("WH")) {
@@ -465,10 +486,10 @@ void addPhoModel(Pvl &pvl, Pvl &outPvl) {
       }
     }
     if (ui.WasEntered("HH")) {
-      iString keyval = ui.GetString("HH");
-      double hh = keyval.ToDouble();
+      PvlKeyword hhKey("HH");
+      OutputKeyValue(hhKey, ui.GetString("HH"));
       outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
-             AddKeyword(PvlKeyword("HH",hh),Pvl::Replace);
+             AddKeyword(hhKey, Pvl::Replace);
     } else {
       if (!outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                   HasKeyword("HH")) {
@@ -478,10 +499,10 @@ void addPhoModel(Pvl &pvl, Pvl &outPvl) {
       }
     }
     if (ui.WasEntered("B0")) {
-      iString keyval = ui.GetString("B0");
-      double b0 = keyval.ToDouble();
+      PvlKeyword b0Key("B0");
+      OutputKeyValue(b0Key, ui.GetString("B0"));
       outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
-             AddKeyword(PvlKeyword("B0",b0),Pvl::Replace);
+             AddKeyword(b0Key, Pvl::Replace);
     } else {
       if (!outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                   HasKeyword("B0")) {
@@ -492,10 +513,10 @@ void addPhoModel(Pvl &pvl, Pvl &outPvl) {
     }
     if (phtName == "HAPKEHEN") {
       if (ui.WasEntered("HG1")) {
-        iString keyval = ui.GetString("HG1");
-        double hg1 = keyval.ToDouble();
+        PvlKeyword hg1Key("HG1");
+        OutputKeyValue(hg1Key, ui.GetString("HG1"));
         outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
-               AddKeyword(PvlKeyword("HG1",hg1),Pvl::Replace);
+               AddKeyword(hg1Key, Pvl::Replace);
       } else {
         if (!outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                     HasKeyword("HG1")) {
@@ -505,10 +526,10 @@ void addPhoModel(Pvl &pvl, Pvl &outPvl) {
         }
       }
       if (ui.WasEntered("HG2")) {
-        iString keyval = ui.GetString("HG2");
-        double hg2 = keyval.ToDouble();
+        PvlKeyword hg2Key("HG2");
+        OutputKeyValue(hg2Key, ui.GetString("HG2"));
         outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
-               AddKeyword(PvlKeyword("HG2",hg2),Pvl::Replace);
+               AddKeyword(hg2Key, Pvl::Replace);
       } else {
         if (!outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                     HasKeyword("HG2")) {
@@ -519,10 +540,10 @@ void addPhoModel(Pvl &pvl, Pvl &outPvl) {
       }
     } else {
       if (ui.WasEntered("BH")) {
-        iString keyval = ui.GetString("BH");
-        double bh = keyval.ToDouble();
+        PvlKeyword bhKey("BH");
+        OutputKeyValue(bhKey, ui.GetString("BH"));
         outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
-               AddKeyword(PvlKeyword("BH",bh),Pvl::Replace);
+               AddKeyword(bhKey, Pvl::Replace);
       } else {
         if (!outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                     HasKeyword("BH")) {
@@ -532,10 +553,10 @@ void addPhoModel(Pvl &pvl, Pvl &outPvl) {
         }
       }
       if (ui.WasEntered("CH")) {
-        iString keyval = ui.GetString("CH");
-        double ch = keyval.ToDouble();
+        PvlKeyword chKey("CH");
+        OutputKeyValue(chKey, ui.GetString("CH"));
         outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
-               AddKeyword(PvlKeyword("CH",ch),Pvl::Replace);
+               AddKeyword(chKey, Pvl::Replace);
       } else {
         if (!outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                     HasKeyword("CH")) {
@@ -550,9 +571,10 @@ void addPhoModel(Pvl &pvl, Pvl &outPvl) {
   //Lunar Lambert Empirical and Minnaert Empirical Photometric Models
   else if (phtName == "LUNARLAMBERTEMPIRICAL" || phtName == "MINNAERTEMPIRICAL") {
     if (ui.WasEntered("PHASELIST")) {
-      iString keyval = ui.GetString("PHASELIST");
+      PvlKeyword phaseListKey("PHASELIST");
+      OutputKeyValue(phaseListKey, ui.GetString("PHASELIST"));
       outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
-             AddKeyword(PvlKeyword("PHASELIST",keyval),Pvl::Replace);
+             AddKeyword(phaseListKey, Pvl::Replace);
     } else {
       if (!outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                     HasKeyword("PHASELIST")) {
@@ -561,9 +583,10 @@ void addPhoModel(Pvl &pvl, Pvl &outPvl) {
       }
     }
     if (ui.WasEntered("PHASECURVELIST")) {
-      iString keyval = ui.GetString("PHASECURVELIST");
+      PvlKeyword phCurveListKey("PHASECURVELIST");
+      OutputKeyValue(phCurveListKey, ui.GetString("PHASECURVELIST"));
       outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
-             AddKeyword(PvlKeyword("PHASECURVELIST",keyval),Pvl::Replace);
+             AddKeyword(phCurveListKey, Pvl::Replace);
     } else {
       if (!outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                   HasKeyword("PHASECURVELIST")) {
@@ -573,9 +596,10 @@ void addPhoModel(Pvl &pvl, Pvl &outPvl) {
     }
     if (phtName == "LUNARLAMBERTEMPIRICAL") {
       if (ui.WasEntered("LLIST")) {
-        iString keyval = ui.GetString("LLIST");
+        PvlKeyword lListKey("LLIST");
+        OutputKeyValue(lListKey, ui.GetString("LLIST"));
         outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
-               AddKeyword(PvlKeyword("LLIST",keyval),Pvl::Replace);
+               AddKeyword(lListKey, Pvl::Replace);
       } else {
         if (!outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                     HasKeyword("LLIST")) {
@@ -585,9 +609,10 @@ void addPhoModel(Pvl &pvl, Pvl &outPvl) {
       }
     } else {
       if (ui.WasEntered("KLIST")) {
-        iString keyval = ui.GetString("KLIST");
+        PvlKeyword kListKey("KLIST");
+        OutputKeyValue(kListKey, ui.GetString("KLIST"));
         outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
-               AddKeyword(PvlKeyword("KLIST",keyval),Pvl::Replace);
+               AddKeyword(kListKey, Pvl::Replace);
       } else {
         if (!outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                     HasKeyword("KLIST")) {
@@ -600,10 +625,10 @@ void addPhoModel(Pvl &pvl, Pvl &outPvl) {
   //Lunar Lambert Photometric Model
   else if (phtName == "LUNARLAMBERT") {
     if (ui.WasEntered("L")) {
-      iString keyval = ui.GetString("L");
-      double l = keyval.ToDouble();
+      PvlKeyword lKey("L");
+      OutputKeyValue(lKey, ui.GetString("L"));
       outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
-             AddKeyword(PvlKeyword("L",l),Pvl::Replace);
+             AddKeyword(lKey,Pvl::Replace);
     } else {
       if (!outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                   HasKeyword("L")) {
@@ -616,10 +641,10 @@ void addPhoModel(Pvl &pvl, Pvl &outPvl) {
   //Minnaert Photometric Model
   else if (phtName == "MINNAERT") {
     if (ui.WasEntered("K")) {
-      iString keyval = ui.GetString("K");
-      double k = keyval.ToDouble();
+      PvlKeyword kKey("K");
+      OutputKeyValue(kKey, ui.GetString("K"));
       outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
-             AddKeyword(PvlKeyword("K",k),Pvl::Replace);
+             AddKeyword(kKey, Pvl::Replace);
     } else {
       if (!outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                   HasKeyword("K")) {
@@ -698,10 +723,10 @@ void addAtmosModel(Pvl &pvl, Pvl &outPvl) {
       atmName == "HAPKEATM1" || atmName == "HAPKEATM2" ||
       atmName == "ISOTROPIC1" || atmName == "ISOTROPIC2") {
     if (ui.WasEntered("HNORM")) {
-      iString keyval = ui.GetString("HNORM");
-      double hnorm = keyval.ToDouble();
-      outPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
-             AddKeyword(PvlKeyword("HNORM",hnorm),Pvl::Replace);
+       PvlKeyword hnormKey("HNORM");
+       OutputKeyValue(hnormKey, ui.GetString("HNORM"));
+       outPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
+             AddKeyword(hnormKey, Pvl::Replace);
     } else {
       if (!outPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
                   HasKeyword("HNORM")) {
@@ -711,10 +736,10 @@ void addAtmosModel(Pvl &pvl, Pvl &outPvl) {
       }
     }
     if (ui.WasEntered("TAU")) {
-      iString keyval = ui.GetString("TAU");
-      double tau = keyval.ToDouble();
+      PvlKeyword tauKey("TAU");
+      OutputKeyValue(tauKey, ui.GetString("TAU"));
       outPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
-             AddKeyword(PvlKeyword("TAU",tau),Pvl::Replace);
+             AddKeyword(tauKey, Pvl::Replace);
     } else {
       if (!outPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
                   HasKeyword("TAU")) {
@@ -724,10 +749,10 @@ void addAtmosModel(Pvl &pvl, Pvl &outPvl) {
       }
     }
     if (ui.WasEntered("TAUREF")) {
-      iString keyval = ui.GetString("TAUREF");
-      double tauref = keyval.ToDouble();
+      PvlKeyword taurefKey("TAUREF");
+      OutputKeyValue(taurefKey, ui.GetString("TAUREF"));
       outPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
-             AddKeyword(PvlKeyword("TAUREF",tauref),Pvl::Replace);
+             AddKeyword(taurefKey,Pvl::Replace);
     } else {
       if (!outPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
                   HasKeyword("TAUREF")) {
@@ -737,10 +762,10 @@ void addAtmosModel(Pvl &pvl, Pvl &outPvl) {
       }
     }
     if (ui.WasEntered("WHA")) {
-      iString keyval = ui.GetString("WHA");
-      double wha = keyval.ToDouble();
+      PvlKeyword whaKey("WHA");
+      OutputKeyValue(whaKey, ui.GetString("WHA"));
       outPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
-             AddKeyword(PvlKeyword("WHA",wha),Pvl::Replace);
+             AddKeyword(whaKey, Pvl::Replace);
     } else {
       if (!outPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
                   HasKeyword("WHA")) {
@@ -766,10 +791,10 @@ void addAtmosModel(Pvl &pvl, Pvl &outPvl) {
   }
   if (atmName == "ANISOTROPIC1" || atmName == "ANISOTROPIC2") {
     if (ui.WasEntered("BHA")) {
-      iString keyval = ui.GetString("BHA");
-      double bha = keyval.ToDouble();
+      PvlKeyword bhaKey("BHA");
+      OutputKeyValue(bhaKey, ui.GetString("BHA"));
       outPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
-             AddKeyword(PvlKeyword("BHA",bha),Pvl::Replace);
+             AddKeyword(bhaKey, Pvl::Replace);
     } else {
       if (!outPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
                   HasKeyword("BHA")) {
@@ -781,10 +806,10 @@ void addAtmosModel(Pvl &pvl, Pvl &outPvl) {
   }
   if (atmName == "HAPKEATM1" || atmName == "HAPKEATM2") {
     if (ui.WasEntered("HGA")) {
-      iString keyval = ui.GetString("HGA");
-      double hga = keyval.ToDouble();
+      PvlKeyword hgaKey("HGA");
+      OutputKeyValue(hgaKey, ui.GetString("HGA"));
       outPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
-             AddKeyword(PvlKeyword("HGA",hga),Pvl::Replace);
+             AddKeyword(hgaKey, Pvl::Replace);
     } else {
       if (!outPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
                   HasKeyword("HGA")) {
