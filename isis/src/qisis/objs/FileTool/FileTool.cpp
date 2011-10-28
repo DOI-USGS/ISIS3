@@ -426,7 +426,6 @@ namespace Isis {
       delete imgEnlarge;
       delete interp;
       
-      ocube->close();
     } catch(iException &e) {
       QMessageBox::critical((QWidget *)parent(),
                             "Error", "Cannot open file, please check permissions");
