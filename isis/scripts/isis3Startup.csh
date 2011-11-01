@@ -75,3 +75,8 @@ if ($QTPLUGINPATH == "true") then
 endif
 
 unset Platform
+
+if ( -f $ISISROOT/scripts/tabcomplete.csh ) then
+  source $ISISROOT/scripts/tabcomplete.csh;
+endif
+

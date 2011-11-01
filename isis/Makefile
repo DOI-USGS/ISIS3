@@ -142,11 +142,23 @@ clean:
 	rm -rf doc
 	rm -rf bin
 	rm -rf lib
+	rm -rf scripts/tabcomplete.csh
 	$(MAKE) --directory=3rdParty clean
 	echo "Finished cleaning Isis"
 
 cleansrc:
 	$(MAKE) --directory=src clean
+
+tabcomplete:
+	if [ ! -d bin ]; then                                               \
+	  echo "You must build the applications first";                     \
+	elif [ ! -f bin/isiscomplete ]; then                                \
+	  echo "Isis application 'isiscomplete' is missing";                \
+	else                                                                \
+	  echo "#!/bin/csh" > $$ISISROOT/scripts/tabcomplete.csh;           \
+	  isiscomplete `ls $$ISISROOT/bin | grep -v xml` | sed 's/; /;\n/g' \
+	      >> $$ISISROOT/scripts/tabcomplete.csh;                        \
+	fi;
 
 #----------------------------------------------------------------------------
 # Target = unitTest appTest appTest2 catTest
