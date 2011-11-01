@@ -182,8 +182,11 @@ namespace Isis {
   }
 
   /**
-   * Set the InputCube vector to an opened Cube. This is used if there already exists 
-   * a valid opened cube 
+   * Set the InputCube vector to an opened Cube which was dynamically allocated. 
+   * This is used if there already exists a valid opened cube 
+   *  
+   * Note: This requires that the cube was dynamically allocated because ClearInputCubes 
+   * deletes the cube. 
    * 
    * @author Sharmila Prasad (5/7/2011)
    * 
