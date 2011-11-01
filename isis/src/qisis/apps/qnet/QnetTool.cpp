@@ -522,14 +522,23 @@ namespace Isis {
     p_openDem->setWhatsThis(whatsThis);
     connect (p_openDem,SIGNAL(activated()),this,SLOT(openDem()));
 
-    p_saveNet = new QAction(QIcon(":saveAs"), "Save Control Network &As...",
-        p_qnetTool);
-    p_saveNet->setToolTip("Save current control network to chosen file");
-    p_saveNet->setStatusTip("Save current control network to chosen file");
+    p_saveNet = new QAction(QIcon(":save"), "Save Control Network ...",
+                            p_qnetTool);
+    p_saveNet->setToolTip("Save current control network");
+    p_saveNet->setStatusTip("Save current control network");
     whatsThis = "<b>Function:</b> Saves the current <i>"
-        "control network</i> under chosen filename";
+        "control network</i>";
     p_saveNet->setWhatsThis(whatsThis);
     connect(p_saveNet, SIGNAL(activated()), this, SLOT(saveNet()));
+
+    p_saveAsNet = new QAction(QIcon(":saveAs"), "Save Control Network &As...",
+                              p_qnetTool);
+    p_saveAsNet->setToolTip("Save current control network to chosen file");
+    p_saveAsNet->setStatusTip("Save current control network to chosen file");
+    whatsThis = "<b>Function:</b> Saves the current <i>"
+        "control network</i> under chosen filename";
+    p_saveAsNet->setWhatsThis(whatsThis);
+    connect(p_saveAsNet, SIGNAL(activated()), this, SLOT(saveAsNet()));
 
     p_closeQnetTool = new QAction(QIcon(":close"), "&Close", p_qnetTool);
     p_closeQnetTool->setToolTip("Close this window");
@@ -613,6 +622,7 @@ namespace Isis {
     fileMenu->addAction(p_openGround);
     fileMenu->addAction(p_openDem);
     fileMenu->addAction(p_saveNet);
+    fileMenu->addAction(p_saveAsNet);
     fileMenu->addAction(p_closeQnetTool);
 
     QMenu * regMenu = p_qnetTool->menuBar()->addMenu("&Registration");
@@ -1254,11 +1264,30 @@ namespace Isis {
   }
 
 
+
+  /**
+   * Signal to save control net 
+   *  
+   * @author 2011-10-31 Tracie Sucharski 
+   */
+  void QnetTool::saveNet() {
+    if (p_cnetFilename.isEmpty()) {
+      QString message = "This is a new network, you must select "
+                        "\"Save As\" under the File Menu.";
+      QMessageBox::critical((QWidget *)parent(), "Error", message);
+      return;
+    }
+    emit qnetToolSave();
+    //g_controlNetwork->Write(p_cnetFilename.toStdString());
+  }
+
+
+
   /**
    * Signal to save the control net.
    */
-  void QnetTool::saveNet () {
-    emit qnetToolSave();
+  void QnetTool::saveAsNet () {
+    emit qnetToolSaveAs();
   }
 
 
@@ -1287,9 +1316,13 @@ namespace Isis {
    *   @history 2008-11-26 Jeannie Walldren - Added cNetFilename input parameter
    *                          in order to show the file path in the window's title
    *                          bar.
+   *   @history 2011-10-31 Tracie Sucharski - Save filename for implementation
+   *                          of Save option.
    */
   void QnetTool::updateNet(QString cNetFilename) {
-    p_qnetTool->setWindowTitle("Qnet Tool - Control Network File: " + cNetFilename);
+    p_cnetFilename = cNetFilename;
+    p_qnetTool->setWindowTitle("Qnet Tool - Control Network File: " +
+                               cNetFilename);
     //p_pointEditor->setControlNet(*g_controlNetwork);
 
   }

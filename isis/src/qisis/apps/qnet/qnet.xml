@@ -112,7 +112,8 @@
         <li><strong>Point ID:</strong> points whose Point Id contains the user 
         specified string</li>
         <li><strong>Number of Measures:</strong> points that are contained in (at 
-        least or no more than) the user specified number of images</li>
+        least or no more than) the user specified number of images.  The control point
+        will contain at least the given number of <def>control measure</def>s.</li>
         <li><strong>Point Properties:</strong> points that have the user specified 
           property.  There are 3 options and any combination may be chosen.</li>
           <ul>
@@ -127,7 +128,7 @@
         <li><strong>Distance:</strong> points that are within the user specified 
         distance of some other point in the control network</li>
         <li><strong>Measure Properties:</strong> points that contain at least one 
-          measure that matches the selected criteria</li>
+          control measure that matches the selected criteria</li>
           <ul>
             <li>Filter by Measure Type(s)</li>
             <li>Filter by Ignore Status</li>
@@ -170,7 +171,7 @@
     <p>
       This is the point editor window of qnet for modifying or creating a control
       point.  This window will display information about the control point and
-      two <def>control measure</def>s are displayed.  Initially the measures displayed will
+      two control measures are displayed.  Initially the measures displayed will
       be the "Reference" cube on the left and the next cube in the control point
       on the right. The measures displayed in the left and right side can be 
       chosen from the combo-boxes under the labels "Left Measure" and
@@ -477,6 +478,13 @@
     <change name="Tracie Sucharski" date="2011-09-29">
       Updated documentation.  Implemented the "What's This" functionality
       to the control point editor.
+    </change>
+    <change name="Tracie Sucharski" date="2011-10-21">
+      Fixed bug that caused qnet to crash when creating a new control network.
+    </change>
+    <change name="Tracie Sucharski" date="2011-10-31">
+      Changed the Save button on the qnet tool to save to current network,
+      rather than a "Save As".
     </change>
   </history>
 </application>

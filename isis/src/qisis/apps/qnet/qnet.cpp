@@ -206,7 +206,8 @@ int main(int argc, char *argv[]) {
     //  edit/create/ignore point) so that user can be prompted to save net
     QObject::connect(qnetTool, SIGNAL(netChanged()), ftool, SLOT(setSaveNet()));
     QObject::connect(ntool, SIGNAL(netChanged()), ftool, SLOT(setSaveNet()));
-    QObject::connect(qnetTool, SIGNAL(qnetToolSave()), ftool, SLOT(saveAs()));
+    QObject::connect(qnetTool, SIGNAL(qnetToolSave()), ftool, SLOT(save()));
+    QObject::connect(qnetTool, SIGNAL(qnetToolSaveAs()), ftool, SLOT(saveAs()));
 
     // First hop for signal from StretchTool to ChipViewport
     QObject::connect(stool,

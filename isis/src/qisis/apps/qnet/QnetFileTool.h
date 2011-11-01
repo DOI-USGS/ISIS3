@@ -69,10 +69,11 @@ namespace Isis {
    *  @history 2010-11-17 Eric Hyer - Added newControlNetwork SIGNAL
    *  @history 2010-12-10 Tracie Sucharski - Renamed slot loadPoint to
    *                          loadPointImages.
-   *   @history 2011-06-03 Tracie Sucharski - Add Open Ground & Open Dem
+   *  @history 2011-06-03 Tracie Sucharski - Add Open Ground & Open Dem
    *                          signals.
-   *   @history 2011-07-07 Tracie Sucharski - Disable Open Ground and Open Dem
+   *  @history 2011-07-07 Tracie Sucharski - Disable Open Ground and Open Dem
    *                          until list & net open.
+   *  @history 2011-11-01 Tracie Sucharski - Added save slot. 
    *
    */
 
@@ -94,12 +95,14 @@ namespace Isis {
     public slots:
       virtual void open();
       virtual void exit();
+      virtual void save();
       virtual void saveAs();
       void loadPointImages(ControlPoint *point);
       void loadImage(const QString &serialNumber);
       void setSaveNet();
 
     private:
+      QString p_cnetFilename;
       bool p_saveNet;
       QAction *p_openGround;
       QAction *p_openDem;

@@ -104,6 +104,7 @@ namespace Isis {
    *  @history 2010-11-09 Tracie Sucharski - "emit" was missing from the signal
    *                         serialNumberListUpdated.
    *  @history 2011-08-08 Tracie Sucharski - If new network, set the Target
+   *  @history 2011-11-01 Tracie Sucharski - save filename for the "Save" slot.
    *
    */
   void QnetFileTool::open() {
@@ -219,6 +220,7 @@ namespace Isis {
 
     QApplication::restoreOverrideCursor();
 
+    p_cnetFilename = cNetFilename;
     emit serialNumberListUpdated();
     emit controlNetworkUpdated(cNetFilename);
     emit newControlNetwork(g_controlNetwork);
@@ -247,11 +249,31 @@ namespace Isis {
     qApp->quit();
   }
 
+
+
+    /**
+   *  Save control network with given file
+   *  @internal
+   *  @history 2010-07-01 Jeannie Walldren - Added file extension filters for
+   *                         input control network
+   *  @history 2011-11-01 Tracie Sucharski - emit signal to update network
+   *                         information.
+   *
+   */
+  void QnetFileTool::save() {
+    g_controlNetwork->Write(p_cnetFilename.toStdString());
+    p_saveNet = false;
+  }
+
+
+
   /**
    *  Save control network with given file
    *  @internal
    *  @history 2010-07-01 Jeannie Walldren - Added file extension filters for
    *                         input control network
+   *  @history 2011-11-01 Tracie Sucharski - emit signal to update network
+   *                         information and save filename for the "Save" slot.
    *
    */
   void QnetFileTool::saveAs() {
@@ -279,6 +301,8 @@ namespace Isis {
       QMessageBox::information((QWidget *)parent(),
           "Error", "Saving Aborted");
     }
+    p_cnetFilename = fn;
+    emit controlNetworkUpdated(fn);
     p_saveNet = false;
   }
 

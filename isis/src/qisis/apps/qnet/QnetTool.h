@@ -196,6 +196,7 @@ namespace Isis {
 
     signals:
       void qnetToolSave();
+      void qnetToolSaveAs();
       void refreshNavList();
       void editPointChanged(QString pointId);
       void netChanged();
@@ -229,6 +230,7 @@ namespace Isis {
       void enterWhatsThisMode();
       void paintAllViewports (QString pointId );
       void saveNet();
+      void saveAsNet();
       void addMeasure();
       void setPointType (int pointType);
       void setLockPoint (bool ignore);
@@ -290,6 +292,8 @@ namespace Isis {
 
       MainWindow *p_qnetTool;
 
+      QString p_cnetFilename;
+
       QStringList findPointFiles(double lat, double lon);
 
       QAction *p_createPoint;
@@ -299,6 +303,7 @@ namespace Isis {
       QAction *p_openGround;
       QAction *p_openDem;
       QAction *p_saveNet;
+      QAction *p_saveAsNet;
       QAction *p_closeQnetTool;
 
       QAction *p_saveChips;
