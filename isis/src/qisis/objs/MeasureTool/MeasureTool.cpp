@@ -1,3 +1,4 @@
+#include "IsisDebug.h"
 #include "MeasureTool.h"
 
 #include <QApplication>
