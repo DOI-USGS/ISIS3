@@ -50,6 +50,8 @@ namespace Isis {
   *   @history 2011-09-20 Steven Lambright - Added some abstraction, fixed
   *                           problems with segmented line and rectangle.
   *                           Fixes #218.
+   *  @history 2011-11-01 Steven Lambright - Fixed possible seg fault.
+   *                          References #205.
   */
   class MeasureTool : public Tool {
       Q_OBJECT

@@ -251,6 +251,11 @@ namespace Isis {
 
           if (d->isLinked() && d != cvp) {
             m_numLinked++;
+
+            if (currentRow + m_numLinked >= m_tableWin->table()->rowCount()) {
+              addRow();
+            }
+
             updateDist(d, currentRow + m_numLinked);
           }
         }
@@ -314,6 +319,12 @@ namespace Isis {
    * @param row
    */
   void MeasureTool::updateRow(int row) {
+    ASSERT(row < m_tableWin->table()->rowCount());
+
+    if (row >= m_tableWin->table()->rowCount()) {
+      return;
+    }
+
     // Blank out the row to remove stuff left over from previous cvps
     for (int c = 0; c < m_tableWin->table()->columnCount(); c++) {
       m_tableWin->table()->item(row, c)->setText("");

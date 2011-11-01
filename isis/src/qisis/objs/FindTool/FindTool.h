@@ -33,6 +33,7 @@ class QTabWidget;
 class QToolButton;
 
 namespace Isis {
+  class Distance;
   class MdiCubeViewport;
 
   /**
@@ -75,6 +76,8 @@ namespace Isis {
    *  @history 2011-09-28 Steven Lambright - The last change would zoom the
    *                          active viewport. This no longer happens.
    *                          References #205
+   *  @history 2011-11-01 Steven Lambright - Explicitly wrote out and fixed
+   *                          equations for sync scale. Fixes #205
    */
   class GroundTab : public QWidget {
       Q_OBJECT
@@ -133,6 +136,8 @@ namespace Isis {
 
     private: // methods
       void centerLinkedViewports();
+      Distance distancePerPixel(MdiCubeViewport *viewport,
+                                double lat, double lon) const;
       void refresh();
 
     private:

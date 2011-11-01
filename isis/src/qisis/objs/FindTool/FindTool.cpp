@@ -522,17 +522,82 @@ namespace Isis {
   void FindTool::centerLinkedViewports() {
     MdiCubeViewport *activeViewport = cubeViewport();
     bool syncScale = p_syncScale->isChecked();
-    double scale = DBL_MAX;
+    // This will be the ground map resolution of the active viewport in meters
+    //   per pixel.
+    Distance viewportResolutionToMatch;
     UniversalGroundMap *groundMap = activeViewport->universalGroundMap();
 
-    if (syncScale && groundMap) {
-      scale = activeViewport->scale() * groundMap->Resolution();
+    // Equation to match viewports:
+    //   otherViewportZoomFactor = activeViewportZoomFactor *
+    //       (otherViewportResolution / activeViewportResolution)
 
-      if (groundMap->HasProjection() &&
-          groundMap->SetUniversalGround(p_lat, p_lon)) {
-        double samp = groundMap->Sample();
-        double line = groundMap->Line();
-        if (groundMap->SetImage(samp - 0.5,line - 0.5)) {
+    if (syncScale) {
+      viewportResolutionToMatch = distancePerPixel(activeViewport, p_lat, p_lon);
+    }
+
+    for (int i = 0; i < cubeViewportList()->size(); i++) {
+      MdiCubeViewport *viewport = (*(cubeViewportList()))[i];
+
+      if (viewport == activeViewport ||
+          (activeViewport->isLinked() && viewport->isLinked())) {
+
+        groundMap = viewport->universalGroundMap();
+
+        if (groundMap && groundMap->SetUniversalGround(p_lat, p_lon)) {
+          double samp = groundMap->Sample();
+          double line = groundMap->Line();
+
+          double otherViewportZoomFactor = viewport->scale();
+          if (viewportResolutionToMatch.Valid()) {
+            Distance otherViewportResolution = distancePerPixel(viewport,
+                                                                p_lat, p_lon);
+            otherViewportZoomFactor = activeViewport->scale() *
+                (otherViewportResolution / viewportResolutionToMatch);
+            std::cerr << "Zoom Factor: " << otherViewportZoomFactor << " & Active Zoom Factor: " << activeViewport->scale() << "\n";
+          }
+
+          if (p_line != DBL_MAX && p_samp != DBL_MAX) {
+            viewport->setScale(otherViewportZoomFactor, p_samp, p_line);
+          }
+          else if (p_lat != DBL_MAX && p_lon != DBL_MAX && groundMap) {
+            viewport->setScale(otherViewportZoomFactor, samp, line);
+          }
+        }
+      }
+    }
+  }
+
+
+  /**
+   * This computes the distance covered by a pixel at the given lat/lon in the
+   *   given viewport. This computation is used for synchronizing the scales of
+   *   the viewports so that features appear approximately the right size. The
+   *   resolution is the universal ground map's resolution unless we're dealing
+   *   with a projection. If the cube in the viewport is projected then we try
+   *   to calculate a resolution centered at the clicked on pixel... if that
+   *   fails then we give the projection's resolution.
+   *
+   * @param viewport The viewport for which we want the resolution
+   * @param lat The latitude to calculate the resolution at
+   * @param lon The longitude to calculate the resolution at
+   *
+   * @return The resolution, in distance/pixel, of the data in the viewport. The
+   *         distance will be in a unit other than pixels.
+   */
+  Distance FindTool::distancePerPixel(MdiCubeViewport *viewport,
+                                      double lat, double lon) const {
+    UniversalGroundMap *groundMap = viewport->universalGroundMap();
+    Distance viewportResolution;
+
+    if (groundMap && groundMap->SetUniversalGround(lat, lon)) {
+      // Distance/pixel
+      viewportResolution = Distance(groundMap->Resolution(),
+                                    Distance::Meters);
+      double samp = groundMap->Sample();
+      double line = groundMap->Line();
+
+      if (groundMap->HasProjection()) {
+        if (groundMap->SetImage(samp - 0.5, line - 0.5)) {
           double lat1 = groundMap->UniversalLatitude();
           double lon1 = groundMap->UniversalLongitude();
 
@@ -552,80 +617,15 @@ namespace Isis {
                 Longitude(lon2, Angle::Degrees),
                 Distance(radius, Distance::Meters));
 
-            Distance distancePerPixel = point1.GetDistanceToPoint(point2);
-
-            // Resolution = meters/pixels
-            scale = activeViewport->scale() * distancePerPixel.GetMeters();
+            viewportResolution = point1.GetDistanceToPoint(point2);
           }
         }
       }
     }
 
-    for (int i = 0; i < cubeViewportList()->size(); i++) {
-      MdiCubeViewport *viewport = (*(cubeViewportList()))[i];
-      groundMap = viewport->universalGroundMap();
-      if (viewport == activeViewport ||
-          (activeViewport->isLinked() && viewport->isLinked())) {
-        double newScale = viewport->scale();
-
-        if (groundMap->SetUniversalGround(p_lat, p_lon)) {
-          double samp = groundMap->Sample();
-          double line = groundMap->Line();
-
-          // Smart resolution is getting a better resolution for projected
-          //   images. It works by calculating the lat/lon centered on the
-          //   pixel we're looking at.
-          bool smartResSucceeded = false;
-          if (syncScale && groundMap && groundMap->HasProjection()) {
-            double resolution = Null;
-
-            if (groundMap->SetImage(samp - 0.5, line - 0.5)) {
-              double lat1 = groundMap->UniversalLatitude();
-              double lon1 = groundMap->UniversalLongitude();
-
-              if (groundMap->SetImage(samp + 0.5, line + 0.5)) {
-                double lat2 = groundMap->UniversalLatitude();
-                double lon2 = groundMap->UniversalLongitude();
-
-                double radius = groundMap->Projection()->LocalRadius();
-
-                SurfacePoint point1(
-                    Latitude(lat1, Angle::Degrees),
-                    Longitude(lon1, Angle::Degrees),
-                    Distance(radius, Distance::Meters));
-
-                SurfacePoint point2(
-                    Latitude(lat2, Angle::Degrees),
-                    Longitude(lon2, Angle::Degrees),
-                    Distance(radius, Distance::Meters));
-
-                Distance distancePerPixel = point1.GetDistanceToPoint(point2);
-
-                // Resolution = meters/pixels
-                resolution = distancePerPixel.GetMeters();
-              }
-            }
-
-            if (!IsSpecial(resolution)) {
-              newScale = scale / resolution;
-              smartResSucceeded = true;
-            }
-          }
-
-          if (syncScale && groundMap && !smartResSucceeded) {
-            newScale = scale / groundMap->Resolution();
-          }
-
-          if (p_line != DBL_MAX && p_samp != DBL_MAX) {
-            viewport->setScale(newScale, p_samp, p_line);
-          }
-          else if (p_lat != DBL_MAX && p_lon != DBL_MAX && groundMap) {
-            viewport->setScale(newScale, samp, line);
-          }
-        }
-      }
-    }
+    return viewportResolution;
   }
+
 
   //! does a repaint for active viewport and also for any linked viewports
   void FindTool::refresh() {
