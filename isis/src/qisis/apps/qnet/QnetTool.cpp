@@ -1247,7 +1247,7 @@ namespace Isis {
    *                        not changed in the net unless "Save Point" is
    *                        selected.
    * @history 2011-06-27 Tracie Sucharski - emit signal indicating a measure 
-   *                        parameter has changed. 
+   *                        parameter has changed.
    */
   void QnetTool::setIgnoreRightMeasure (bool ignore) {
     if (p_rightMeasure != NULL) p_rightMeasure->SetIgnored(ignore);
@@ -1274,7 +1274,7 @@ namespace Isis {
     if (p_cnetFilename.isEmpty()) {
       QString message = "This is a new network, you must select "
                         "\"Save As\" under the File Menu.";
-      QMessageBox::critical((QWidget *)parent(), "Error", message);
+      QMessageBox::critical(p_qnetTool, "Error", message);
       return;
     }
     emit qnetToolSave();
