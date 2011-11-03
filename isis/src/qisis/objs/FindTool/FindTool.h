@@ -78,6 +78,12 @@ namespace Isis {
    *                          References #205
    *  @history 2011-11-01 Steven Lambright - Explicitly wrote out and fixed
    *                          equations for sync scale. Fixes #205
+   *  @history 2011-11-03 Steven Lambright - Fixed find given a line/sample.
+   *                          We were calling SetUniversalGround given
+   *                          DBL_MAX which causes an infinite loop.
+   *                          So when you looked for a line/sample it would
+   *                          infinite loop. Sync scale does not work for
+   *                          image coordinates - is it supposed to?
    */
   class GroundTab : public QWidget {
       Q_OBJECT

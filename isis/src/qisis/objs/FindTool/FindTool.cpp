@@ -530,9 +530,9 @@ namespace Isis {
     // Equation to match viewports:
     //   otherViewportZoomFactor = activeViewportZoomFactor *
     //       (otherViewportResolution / activeViewportResolution)
-
     if (syncScale) {
-      viewportResolutionToMatch = distancePerPixel(activeViewport, p_lat, p_lon);
+      viewportResolutionToMatch = distancePerPixel(activeViewport, p_lat,
+                                                   p_lon);
     }
 
     for (int i = 0; i < cubeViewportList()->size(); i++) {
@@ -540,28 +540,29 @@ namespace Isis {
 
       if (viewport == activeViewport ||
           (activeViewport->isLinked() && viewport->isLinked())) {
-
         groundMap = viewport->universalGroundMap();
+        double otherViewportZoomFactor = viewport->scale();
 
-        if (groundMap && groundMap->SetUniversalGround(p_lat, p_lon)) {
+        if (groundMap && !IsSpecial(p_lat) && p_lat != DBL_MAX &&
+            !IsSpecial(p_lon) && p_lon != DBL_MAX &&
+            groundMap->SetUniversalGround(p_lat, p_lon)) {
           double samp = groundMap->Sample();
           double line = groundMap->Line();
 
-          double otherViewportZoomFactor = viewport->scale();
           if (viewportResolutionToMatch.Valid()) {
             Distance otherViewportResolution = distancePerPixel(viewport,
                                                                 p_lat, p_lon);
             otherViewportZoomFactor = activeViewport->scale() *
                 (otherViewportResolution / viewportResolutionToMatch);
-            std::cerr << "Zoom Factor: " << otherViewportZoomFactor << " & Active Zoom Factor: " << activeViewport->scale() << "\n";
           }
 
-          if (p_line != DBL_MAX && p_samp != DBL_MAX) {
-            viewport->setScale(otherViewportZoomFactor, p_samp, p_line);
-          }
-          else if (p_lat != DBL_MAX && p_lon != DBL_MAX && groundMap) {
+          if (p_lat != DBL_MAX && p_lon != DBL_MAX && groundMap) {
             viewport->setScale(otherViewportZoomFactor, samp, line);
           }
+        }
+
+        if (p_line != DBL_MAX && p_samp != DBL_MAX) {
+          viewport->setScale(otherViewportZoomFactor, p_samp, p_line);
         }
       }
     }
@@ -589,7 +590,9 @@ namespace Isis {
     UniversalGroundMap *groundMap = viewport->universalGroundMap();
     Distance viewportResolution;
 
-    if (groundMap && groundMap->SetUniversalGround(lat, lon)) {
+    if (groundMap && !IsSpecial(lat) && !IsSpecial(lon) &&
+        lat != DBL_MAX && lon != DBL_MAX &&
+        groundMap->SetUniversalGround(lat, lon)) {
       // Distance/pixel
       viewportResolution = Distance(groundMap->Resolution(),
                                     Distance::Meters);
