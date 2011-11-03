@@ -24,10 +24,8 @@ namespace Isis {
 
 
   FindSpotGraphicsItem::~FindSpotGraphicsItem() {
-    if(m_centerPoint) {
-      delete m_centerPoint;
-      m_centerPoint = NULL;
-    }
+    delete m_centerPoint;
+    m_centerPoint = NULL;
   }
 
 
