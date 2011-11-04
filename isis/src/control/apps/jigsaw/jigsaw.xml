@@ -160,6 +160,11 @@
     <change name="Ken Edmundson" date="2011-10-18">
       Added Known Issues section and JigsawRejected flag issue.
     </change>
+    <change name="Debbie A. Cook" date="2011-11-04">
+      Added minimums to parameters, corrected SOLVEDEGREE description, and
+      added to the camsolve option descriptions in response to Mantis 
+      issue #514.
+    </change>
   </history>
 
   <groups>
@@ -387,6 +392,7 @@
           in sigma0 between iterations is less than or equal to Sigma0.
         </description>
         <type>double</type>
+        <minimum inclusive="no">0</minimum>
         <default>
           <item>1.0e-10</item>
         </default>
@@ -400,6 +406,7 @@
           MAXIT, or when convergence is reached.
         </description>
         <type>integer</type>
+        <minimum inclusive="yes">1</minimum>
         <default>
           <item>50</item>
         </default>
@@ -409,6 +416,7 @@
     <group name="Camera Pointing Options">
       <parameter name="CKDEGREE">
         <type>integer</type>
+        <minimum inclusive="yes">0</minimum>
         <default>
           <item>2</item>
         </default>
@@ -423,6 +431,7 @@
       </parameter>
       <parameter name="SOLVEDEGREE">
         <type>integer</type>
+        <minimum inclusive="yes">0</minimum>
         <default>
           <item>2</item>
         </default>
@@ -436,7 +445,7 @@
                In the case of an instrument with a jitter problem, a higher 
                degree polynomial fit to each of the camera angles might provide 
                a better solution (smaller errors).  For framing cameras, the application
-               automatically sets degree to 1. 
+               automatically sets degree to 0. 
         </description>
       </parameter>
       <parameter name="CAMSOLVE">
@@ -468,7 +477,7 @@
                    camera angles translates images in sample and line.  Adding the third
                    angle to the solution (TWIST option) allows for rotation corrections.
                    Adjustments are not applied unless the solution converges and UPDATE is 
-                   selected.
+                   selected. Solving for angles only is equivalent to using SOLVEDEGREE=0.
             </description>
           </option>
 
@@ -476,7 +485,8 @@
             <brief>Solve for camera angles AND their angular velocities</brief>
             <description>
                    Camera angles and their angular velocities will be adjusted in the
-                   solution.
+                   solution.  Solving for angles and velocities is equivalent to using 
+                   SOLVEDEGREE=1.
             </description>
           </option>
 
@@ -484,7 +494,8 @@
             <brief>Solve for camera angles, their angular velocities and accelerations</brief>
             <description>
                    Camera angles, their angular velocities, and accelerations will be 
-                   adjusted in the solution.
+                   adjusted in the solution.  Solving for angles, angular velocities, and 
+                   accelerations is equivalent to using SOLVEDEGREE=2.
             </description>
           </option>
 
