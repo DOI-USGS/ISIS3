@@ -497,6 +497,13 @@
          load properly from a PVL file when using the Load Pvl helper button. This is
          a known problem and will be fixed in the next patch or release of ISIS.
     </change>
+    <change name="Janet Barrett" date="2011-11-04">
+      The ZEROB0STANDARD parameter for the Hapke models was not added to the new
+      update of photomet during the last release. This parameter is responsible for
+      determining if the Hapke opposition surge component B0 is set to zero when
+      calculations are based on standard conditions. This parameter has been added
+      to the new interface to photomet. 
+    </change>
   </history>
 
   <category>
@@ -758,6 +765,7 @@
               <item>HG2</item>
               <item>HH</item>
               <item>B0</item>
+              <item>ZEROB0STANDARD</item>
               <item>BH</item>
               <item>CH</item>
               <item>L</item>
@@ -787,6 +795,7 @@
               <item>HG2</item>
               <item>HH</item>
               <item>B0</item>
+              <item>ZEROB0STANDARD</item>
               <item>BH</item>
               <item>CH</item>
               <item>L</item>
@@ -815,6 +824,7 @@
               <item>HG2</item>
               <item>HH</item>
               <item>B0</item>
+              <item>ZEROB0STANDARD</item>
             </inclusions>
             <exclusions>
               <item>BH</item>
@@ -845,6 +855,7 @@
               <item>CH</item>
               <item>HH</item>
               <item>B0</item>
+              <item>ZEROB0STANDARD</item>
             </inclusions>
             <exclusions>
               <item>HG1</item>
@@ -878,6 +889,7 @@
               <item>CH</item>
               <item>HH</item>
               <item>B0</item>
+              <item>ZEROB0STANDARD</item>
               <item>L</item>
               <item>K</item>
               <item>PHASELIST</item>
@@ -911,6 +923,7 @@
               <item>CH</item>
               <item>HH</item>
               <item>B0</item>
+              <item>ZEROB0STANDARD</item>
               <item>K</item>
               <item>L</item>
               <item>KLIST</item>
@@ -934,6 +947,7 @@
               <item>CH</item>
               <item>HH</item>
               <item>B0</item>
+              <item>ZEROB0STANDARD</item>
               <item>L</item>
               <item>K</item>
               <item>PHASELIST</item>
@@ -965,6 +979,7 @@
               <item>CH</item>
               <item>HH</item>
               <item>B0</item>
+              <item>ZEROB0STANDARD</item>
               <item>K</item>
               <item>PHASELIST</item>
               <item>KLIST</item>
@@ -997,6 +1012,7 @@
               <item>CH</item>
               <item>HH</item>
               <item>B0</item>
+              <item>ZEROB0STANDARD</item>
               <item>K</item>
               <item>L</item>
               <item>LLIST</item>
@@ -1025,6 +1041,7 @@
               <item>CH</item>
               <item>HH</item>
               <item>B0</item>
+              <item>ZEROB0STANDARD</item>
               <item>L</item>
               <item>PHASELIST</item>
               <item>KLIST</item>
@@ -1147,6 +1164,38 @@
           The Hapke opposition surge component.
         </description>
         <minimum inclusive="yes">0.0</minimum>
+      </parameter>
+
+      <parameter name="ZEROB0STANDARD">
+        <type>string</type>
+        <brief>
+          Determines if opposition surge (B0) is set to zero when standard conditions are used
+        </brief>
+        <default><item>TRUE</item></default>
+        <description>
+          This determines if the opposition surge component B0 is set to zero
+          during the standard conditions phase.
+        </description>
+        <list>
+          <option value="FALSE">
+            <brief>
+              The opposition surge B0 will not be set to zero for the standard conditions phase
+            </brief>
+            <description>
+              This option specifies that the opposition surge B0 will not be set to zero 
+              during the standard conditions phase.
+            </description>
+          </option>
+          <option value="TRUE">
+            <brief>
+              The opposition surge B0 will be set to zero for the standard conditions phase 
+            </brief>
+            <description>
+              This option specifies that the opposition surge B0 will be set to zero
+              during the standard conditions phase.
+            </description>
+          </option>
+        </list>
       </parameter>
 
       <parameter name="L">

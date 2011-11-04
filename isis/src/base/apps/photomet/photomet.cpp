@@ -119,6 +119,7 @@ void LoadPvl() {
           ui.Clear("HG2");
           ui.Clear("HH");
           ui.Clear("B0");
+          ui.Clear("ZEROB0STANDARD");
           ui.Clear("BH");
           ui.Clear("CH");
           ui.Clear("L");
@@ -159,6 +160,17 @@ void LoadPvl() {
               os.str("");
               os << b0;
               ui.PutAsString("B0", os.str());
+            }
+            if (phtGrp->HasKeyword("ZEROB0STANDARD")) {
+              string zerob0 = (string)phtGrp->FindKeyword("ZEROB0STANDARD");
+              if (zerob0.compare("TRUE")) {
+                ui.PutString("ZEROB0STANDARD", "TRUE");
+              } else if (zerob0.compare("FALSE")) {
+                ui.PutString("ZEROB0STANDARD", "FALSE");
+              } else {
+                string message = "The ZEROB0STANDARD value is invalid - must be set to TRUE or FALSE";
+                throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+              }
             }
             if (phtVal == "HAPKEHEN") {
               if (phtGrp->HasKeyword("HG1")) {
@@ -1272,6 +1284,20 @@ void IsisMain() {
                     HasKeyword("B0")) {
         string message = "The " + phtName + " Photometric model requires a value for the B0 parameter.";
         message += "The normal range for B0 is: 0 <= B0";
+        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+      }
+    }
+    if (ui.GetString("ZEROB0STANDARD") == "TRUE") {
+      toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
+               AddKeyword(PvlKeyword("ZEROB0STANDARD","TRUE"),Pvl::Replace);
+    } else if (ui.GetString("ZEROB0STANDARD") == "FALSE") {
+      toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
+               AddKeyword(PvlKeyword("ZEROB0STANDARD","FALSE"),Pvl::Replace);
+    } else {
+      if (!toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
+                    HasKeyword("ZEROB0STANDARD")) {
+        string message = "The " + phtName + " Photometric model requires a value for the ZEROB0STANDARD parameter.";
+        message += "The valid values for ZEROB0STANDARD are: TRUE, FALSE";
         throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
       }
     }
