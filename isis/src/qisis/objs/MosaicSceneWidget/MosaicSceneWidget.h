@@ -59,6 +59,14 @@ namespace Isis {
    *   @history 2011-11-04 Steven Lambright - Added the zoom factor and
    *                           scroll bar position to the project file.
    *                           References #542.
+   *   @history 2011-11-04 Steven Lambright - The mouse wheel events no longer
+   *                           cause panning. The qt code for
+   *                           QAbstractGraphicsView was looking at the event's
+   *                           accepted state. This being fixed means the mouse
+   *                           wheel can be used for zooming! Also added
+   *                           getViewActions in order to allow the zooming key
+   *                           shortcuts from the zoom tool to take effect when
+   *                           the zoom tool wasn't active.
    */
   class MosaicSceneWidget : public QWidget {
       Q_OBJECT
@@ -109,6 +117,7 @@ namespace Isis {
       QList<CubeDisplayProperties *> cubeDisplays();
 
       QList<QAction *> getExportActions();
+      QList<QAction *> getViewActions();
 
       static QWidget * getControlNetHelp(QWidget *cnetToolContainer = NULL);
       static QWidget * getLongHelp(QWidget *mosaicSceneContainer = NULL);

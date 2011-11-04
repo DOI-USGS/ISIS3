@@ -119,8 +119,7 @@ namespace Isis {
     m_outlineRect = NULL; // The scene will clean this up
 
     if(m_tools) {
-      MosaicTool *tool;
-      foreach(tool, *m_tools) {
+      foreach(MosaicTool *tool, *m_tools) {
         delete tool;
         tool = NULL;
       }
@@ -537,6 +536,18 @@ namespace Isis {
     exportActs.append(saveList);
 
     return exportActs;
+  }
+
+
+  QList<QAction *> MosaicSceneWidget::getViewActions() {
+    QList<QAction *> viewActs;
+
+    foreach(MosaicTool *tool, *m_tools) {
+      QList<QAction *> toolViewActs = tool->getViewActions();
+      viewActs.append(toolViewActs);
+    }
+
+    return viewActs;
   }
 
 
@@ -1138,6 +1149,7 @@ namespace Isis {
         emit mouseWheel(
               ((QGraphicsSceneWheelEvent *)event)->scenePos(),
               ((QGraphicsSceneWheelEvent *)event)->delta());
+        event->accept();
         stopProcessingEvent = true;
         break;
 

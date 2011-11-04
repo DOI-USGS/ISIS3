@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include <QResizeEvent>
+#include <QScrollBar>
 
 namespace Isis {
   MosaicGraphicsView::MosaicGraphicsView(QGraphicsScene *scene,

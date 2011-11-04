@@ -80,6 +80,11 @@ namespace Isis {
   }
 
 
+  QList<QAction *> MosaicTool::getViewActions() {
+    return QList<QAction *>();
+  }
+
+
   PvlObject MosaicTool::toPvl() const {
     if(projectPvlObjectName() == "") {
       PvlObject obj("Invalid");

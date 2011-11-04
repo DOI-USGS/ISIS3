@@ -1,6 +1,8 @@
 #include "MosaicZoomTool.h"
 
 #include <float.h>
+#include <iomanip>
+#include <iostream>
 
 #include <QDoubleSpinBox>
 #include <QGraphicsSceneMouseEvent>
@@ -25,29 +27,89 @@ namespace Isis {
   MosaicZoomTool::MosaicZoomTool(MosaicSceneWidget *scene) : MosaicTool(scene) {
     p_scaleBox = NULL;
 
-    p_zoomIn2X = new QAction(this);
-    p_zoomIn2X->setShortcut(Qt::Key_Plus);
-    p_zoomIn2X->setText("Zoom In");
-    p_zoomIn2X->setIcon(getIcon("viewmag+.png"));
-    connect(p_zoomIn2X, SIGNAL(activated()), this, SLOT(zoomIn2X()));
+    m_zoomInAction = new QAction(this);
+    m_zoomInAction->setIcon(getIcon("viewmag+.png"));
+    m_zoomInAction->setText("Zoom In");
+    m_zoomInAction->setToolTip("Zoom in on the mosaic scene");
+    m_zoomInAction->setShortcut(Qt::Key_Plus);
+    QString text =
+      "<b>Function:</b> Zoom in 2X at the center of the active viewport \
+      <p><b>Shortcut:</b>  +</p> \
+      <p><b>Mouse:</b>  LeftButton zooms in 2X under pointer</p> \
+      <p><b>Modifiers:</b>  Shortcuts and mouse clicks can be augmented \
+      using the Ctrl or Alt key for 4X and 8X zooms, respectively</p> \
+      <p><b>Hint:</b>  Left click and drag for a local zoom which scales data \
+      in the marquee to the view</p>";
+    m_zoomInAction->setWhatsThis(text);
+    connect(m_zoomInAction, SIGNAL(triggered()), this, SLOT(zoomIn2X()));
 
-    p_zoomOut2X = new QAction(this);
-    p_zoomOut2X->setShortcut(Qt::Key_Minus);
-    p_zoomOut2X->setText("Zoom Out");
-    p_zoomOut2X->setIcon(getIcon("viewmag-.png"));
-    connect(p_zoomOut2X, SIGNAL(activated()), this, SLOT(zoomOut2X()));
+    m_zoomOutAction = new QAction(this);
+    m_zoomOutAction->setIcon(getIcon("viewmag-.png"));
+    m_zoomOutAction->setText("Zoom Out");
+    m_zoomOutAction->setToolTip("Zoom out on the mosaic scene");
+    m_zoomOutAction->setShortcut(Qt::Key_Minus);
+    text =
+      "<b>Function:</b> Zoom out 2X at the center of the view \
+      <p><b>Shortcut:</b>  +</p> \
+      <p><b>Mouse:</b>  RightButton zooms out 2X under pointer</p> \
+      <p><b>Modifiers:</b>  Shortcuts and mouse clicks can be augmented \
+      using the Ctrl or Alt key for 4X and 8X zooms, respectively</p> \
+      <p><b>Hint:</b>  Left click and drag for a local zoom which scales data \
+      in the marquee to the view</p>";
+    m_zoomOutAction->setWhatsThis(text);
+    connect(m_zoomOutAction, SIGNAL(triggered()), this, SLOT(zoomOut2X()));
 
-    p_zoomActual = new QAction(this);
-    p_zoomActual->setShortcut(Qt::Key_Plus);
-    p_zoomActual->setText("&Actual Pixels");
-    p_zoomActual->setIcon(getIcon("viewmag1.png"));
-    connect(p_zoomActual, SIGNAL(activated()), this, SLOT(zoomActual()));
+    m_zoomFitAction = new QAction(this);
+    m_zoomFitAction->setIcon(getIcon("viewmagfit.png"));
+    m_zoomFitAction->setText("Fit in View");
+    m_zoomFitAction->setToolTip("Zoom to where all of the cubes are visible in "
+                                "the mosaic scene");
+    m_zoomFitAction->setShortcut(Qt::Key_Asterisk);
+    text =
+      "<b>Function:</b> Fit the entire mosaic inside the view. \
+      <p><b>Shortcut:</b> *</p> \
+      <p><b>Hint:</b>  Many shortcuts for the zoom tool and other tools \
+      are easily available on the numeric keypad </p>";
+    m_zoomFitAction->setWhatsThis(text);
+    connect(m_zoomFitAction, SIGNAL(triggered()), this, SLOT(zoomFit()));
+  }
 
-    p_zoomFit = new QAction(this);
-    p_zoomFit->setShortcut(Qt::Key_Asterisk);
-    p_zoomFit->setText("&Fit in Window");
-    p_zoomFit->setIcon(getIcon("viewmagfit.png"));
-    connect(p_zoomFit, SIGNAL(activated()), this, SLOT(zoomFit()));
+
+  /**
+   * Updates the text in the screen resolution display box to the
+   * current screen resolution, in meters per pixel.
+   *
+   */
+  void MosaicZoomTool::updateResolutionBox() {
+    if(p_scaleBox) {
+      // Using these two points we can calculated the scene's width.
+      QPointF point1 = getWidget()->getView()->mapToScene(0, 0);
+      QPointF point2 = getWidget()->getView()->mapToScene(
+          (int)getWidget()->getView()->width(), 0);
+      double newWidth = point2.x() - point1.x();
+
+      // The scene width divided by the viewport's width gives us the screen res.
+      p_screenResolution = newWidth / getWidget()->getView()->viewport()->width();
+
+      // Update the text box display
+      p_scaleBox->setValue(p_screenResolution);
+      //------------------------------------------------------------------------
+      // This sets the up and down arrows (on the text box) so that each time a
+      // user clicks them, a resonable amount of zoom happens.
+      //------------------------------------------------------------------------
+      p_scaleBox->setSingleStep(p_screenResolution * .05);
+    }
+  }
+
+
+  QList<QAction *> MosaicZoomTool::getViewActions() {
+    QList<QAction *> viewActs;
+
+    viewActs.append(m_zoomInAction);
+    viewActs.append(m_zoomOutAction);
+    viewActs.append(m_zoomFitAction);
+
+    return viewActs;
   }
 
 
@@ -71,20 +133,6 @@ namespace Isis {
 
 
   /**
-   * Adds the zoom action to the given menu.
-   *
-   *
-   * @param menu
-   */
-  void MosaicZoomTool::addToMenu(QMenu *menu) {
-    menu->addAction(p_zoomFit);
-    menu->addAction(p_zoomActual);
-    menu->addAction(p_zoomIn2X);
-    menu->addAction(p_zoomOut2X);
-  }
-
-
-  /**
    * Creates the widget to add to the tool bar.
    *
    *
@@ -96,50 +144,18 @@ namespace Isis {
     QWidget *hbox = new QWidget;
 
     QToolButton *zoomInButton = new QToolButton(hbox);
-    zoomInButton->setIcon(getIcon("viewmag+.png"));
-    zoomInButton->setToolTip("Zoom In");
-    QString text =
-      "<b>Function:</b> Zoom in 2X at the center of the active viewport \
-      <p><b>Shortcut:</b>  +</p> \
-      <p><b>Mouse:</b>  LeftButton zooms in 2X under pointer</p> \
-      <p><b>Modifiers:</b>  Shortcuts and mouse clicks can be augmented \
-      using the Ctrl or Alt key for 4X and 8X zooms, respectively</p> \
-      <p><b>Hint:</b>  Left click and drag for a local zoom which scales data \
-      in the marquee to the view</p>";
-    zoomInButton->setWhatsThis(text);
-    connect(zoomInButton, SIGNAL(clicked()), this, SLOT(zoomIn2X()));
     zoomInButton->setAutoRaise(true);
+    zoomInButton->setDefaultAction(m_zoomInAction);
     zoomInButton->setIconSize(QSize(22, 22));
 
     QToolButton *zoomOutButton = new QToolButton(hbox);
-    zoomOutButton->setIcon(getIcon("viewmag-.png"));
-    zoomOutButton->setToolTip("Zoom Out");
-    text =
-      "<b>Function:</b> Zoom out 2X at the center of the view \
-      <p><b>Shortcut:</b>  +</p> \
-      <p><b>Mouse:</b>  RightButton zooms out 2X under pointer</p> \
-      <p><b>Modifiers:</b>  Shortcuts and mouse clicks can be augmented \
-      using the Ctrl or Alt key for 4X and 8X zooms, respectively</p> \
-      <p><b>Hint:</b>  Left click and drag for a local zoom which scales data \
-      in the marquee to the view</p>";
-    zoomOutButton->setWhatsThis(text);
-    connect(zoomOutButton, SIGNAL(clicked()), this, SLOT(zoomOut2X()));
     zoomOutButton->setAutoRaise(true);
+    zoomOutButton->setDefaultAction(m_zoomOutAction);
     zoomOutButton->setIconSize(QSize(22, 22));
 
     QToolButton *zoomFitButton = new QToolButton(hbox);
-    zoomFitButton->setIcon(getIcon("viewmagfit.png"));
-    //zoomFitButton->setMenu(zoomFitMenu);
-    //zoomFitButton->setPopupMode(QToolButton::MenuButtonPopup);
-    zoomFitButton->setToolTip("Fit in view");
-    text =
-      "<b>Function:</b> Fit the entire mosaic inside the view. \
-      <p><b>Shortcut:</b> *</p> \
-      <p><b>Hint:</b>  Many shortcuts for the zoom tool and other tools \
-      are easily available on the numeric keypad </p>";
-    zoomFitButton->setWhatsThis(text);
-    connect(zoomFitButton, SIGNAL(clicked()), this, SLOT(zoomFit()));
     zoomFitButton->setAutoRaise(true);
+    zoomFitButton->setDefaultAction(m_zoomFitAction);
     zoomFitButton->setIconSize(QSize(22, 22));
 
     p_scaleBox = new QDoubleSpinBox();
@@ -187,7 +203,22 @@ namespace Isis {
 
     scale = limitZoomBy(scale);
 
-    zoomBy( scale );
+    QPoint screenMouseLoc(getWidget()->getView()->mapFromScene(mouseLoc));
+    QPoint screenCenter(
+        getWidget()->getView()->viewport()->size().width() / 2,
+        getWidget()->getView()->viewport()->size().height() / 2);
+
+    // We're going to do this by zooming on the mouse and then
+    //   undo-ing the center in screen pixels.
+    zoomBy(scale, mouseLoc);
+
+    // The new center screen pixel is:
+    //   center - mouseLoc
+    QPoint desiredScreenCenter =
+        screenCenter + (screenCenter - screenMouseLoc);
+    QPointF newCenterPoint =
+        getWidget()->getView()->mapToScene(desiredScreenCenter);
+    getWidget()->getView()->centerOn(newCenterPoint);
   }
 
 
@@ -379,33 +410,6 @@ namespace Isis {
     }
 
     updateResolutionBox();
-  }
-
-
-  /**
-   * Updates the text in the screen resolution display box to the
-   * current screen resolution, in meters per pixel.
-   *
-   */
-  void MosaicZoomTool::updateResolutionBox() {
-    if(p_scaleBox) {
-      // Using these two points we can calculated the scene's width.
-      QPointF point1 = getWidget()->getView()->mapToScene(0, 0);
-      QPointF point2 = getWidget()->getView()->mapToScene(
-          (int)getWidget()->getView()->width(), 0);
-      double newWidth = point2.x() - point1.x();
-
-      // The scene width divided by the viewport's width gives us the screen res.
-      p_screenResolution = newWidth / getWidget()->getView()->viewport()->width();
-
-      // Update the text box display
-      p_scaleBox->setValue(p_screenResolution);
-      //------------------------------------------------------------------------
-      // This sets the up and down arrows (on the text box) so that each time a
-      // user clicks them, a resonable amount of zoom happens.
-      //------------------------------------------------------------------------
-      p_scaleBox->setSingleStep(p_screenResolution * .05);
-    }
   }
 
 }

@@ -35,6 +35,7 @@ namespace Isis {
    *                           MosaicSceneWidget
    *   @history 2011-09-27 Steven Lambright - No longer produces errors when
    *                           given a NULL MosaicSceneWidget.
+   *   @history 2011-11-04 Steven Lambright - Added getViewActions().
    */
   class MosaicTool : public QObject {
       Q_OBJECT
@@ -65,6 +66,8 @@ namespace Isis {
       virtual void addTo(QMenu *menu) {}
       virtual void addTo(ToolPad *toolPad);
       virtual void addTo(QToolBar *toolBar);
+
+      virtual QList<QAction *> getViewActions();
 
       virtual PvlObject toPvl() const;
       virtual void fromPvl(const PvlObject &obj);
