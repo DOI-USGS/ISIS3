@@ -3,9 +3,11 @@
 
 #include <map>
 #include <iostream>
+#include <vector>
 #include "Progress.h"
 #include "PvlGroup.h"
 #include "SerialNumberList.h"
+#include "Statistics.h"
 
 using namespace std;
 
@@ -34,6 +36,7 @@ using namespace std;
 
 namespace Isis {
   class ControlNet;
+  class ControlCubeGraphNode;
   class Progress;
   class PvlGroup;
   
@@ -60,6 +63,8 @@ namespace Isis {
    *                          Ground ------> Fixed
    *                          Tie----------> Free
    *   @history 2011-07-19 Sharmila Prasad - Modified for new keywords in binary control net
+   *   @history 2011-11-03 Sharmila Prasad - Used ControlNet's CubeGraphNodes to get Image stats
+   *                                         including Convex Hull Ratio
    */
   class ControlNetStatistics {
     public:
@@ -86,6 +91,10 @@ namespace Isis {
                                avgPixelShift, maxPixelShift, minPixelShift, minLineShift, maxLineShift, minSampleShift, maxSampleShift};
       static const int numPointDblStats = 14;
 
+      //! Enumeration for image stats
+      enum ImageStats { imgSamples, imgLines, imgTotalPoints, imgIgnoredPoints, imgFixedPoints, imgLockedPoints, imgLocked, imgConstrainedPoints, imgFreePoints, imgConvexHullArea, imgConvexHullRatio };
+      static const int numImageStats = 11;
+      
       //! Generate stats like Total, Ignored, Fixed Points in an Image
       void GenerateImageStats(void);
 
@@ -93,7 +102,7 @@ namespace Isis {
       void PrintImageStats(const string &psImageFile);
 
       //! Returns the Image Stats by Serial Number
-      void GetImageStatsBySerialNum(string psSerialNum, int *piPointDetail, int piSize);
+      const vector<double> GetImageStatsBySerialNum(string psSerialNum);
 
       //! Generate stats like Ignored, Fixed, Total Measures, Ignored by Control Point
       void GeneratePointStats(const string &psPointFile);
@@ -225,23 +234,20 @@ namespace Isis {
       SerialNumberList mSerialNumList;    //!< Serial Number List
       ControlNet *mCNet;                  //!< Control Network
       Progress *mProgress;                //!< Progress state
-
+      QList< ControlCubeGraphNode * > mCubeGraphNodes;
+      
     private:
-      map <string, int> mImageTotalPointMap;   //!< Contains map of serial num and Total points
-      map <string, int> mImageIgnorePointMap;  //!< Contains map of serial num and Ignored points
-      map <string, int> mImageFixedPointMap;   //!< Contains map of serial num and Fixed points
-      map <string, int> mImageConstPointMap;   //!< Contains map of serial num and Constrained points
-      map <string, int> mImageFreePointMap;    //!< Contains map of serial num and Free points
-      map <string, int> mImageLockedPointMap;  //!< Contains map of serial num and Locked points
-      map <string, int> mImageLockedMap;       //!< Contains map of serial num and Locked Measures
       map <int, int> mPointIntStats;           //!< Contains map of different count stats
       map <int, double> mPointDoubleStats;     //!< Contains map of different computed stats
+      map <string, vector<double> > mImageMap;
       
       //! Get point count stats
       void GetPointIntStats(void);
       
       //! Get Point stats for Residuals and Shifts 
       void GetPointDoubleStats(void);
+      
+      Statistics mConvexHullStats, mConvexHullRatioStats; //!< min, max, average convex hull stats
   };
 }
 #endif

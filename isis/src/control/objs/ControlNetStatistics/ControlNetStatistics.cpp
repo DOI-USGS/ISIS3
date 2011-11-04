@@ -4,12 +4,25 @@
 #include "ControlPoint.h"
 #include "ControlMeasure.h"
 #include "ControlMeasureLogData.h"
+#include "ControlCubeGraphNode.h"
+#include "Cube.h"
+#include "CubeManager.h"
 #include "Filename.h"
 #include "iString.h"
 #include "Progress.h"
 #include "Pvl.h"
 #include "SpecialPixel.h"
 #include "Statistics.h" 
+
+
+#include <geos_c.h>
+#include <geos/algorithm/ConvexHull.h>
+#include <geos/geom/CoordinateSequence.h>
+#include <geos/geom/CoordinateArraySequence.h>
+#include <geos/geom/Envelope.h>
+#include <geos/geom/Geometry.h>
+#include <geos/geom/GeometryFactory.h>
+#include <geos/geom/Polygon.h>
 
 using namespace std;
 
@@ -32,10 +45,12 @@ namespace Isis {
    */
   ControlNetStatistics::ControlNetStatistics(ControlNet *pCNet, const string &psSerialNumFile, Progress *pProgress) {
     mCNet = pCNet;
-    mSerialNumList = SerialNumberList(psSerialNumFile);
-    mProgress = pProgress;
+    mSerialNumList  = SerialNumberList(psSerialNumFile); 
+    mProgress       = pProgress;
+    
     GetPointIntStats();
     GetPointDoubleStats();
+    GenerateImageStats();
   }
 
   /**
@@ -47,8 +62,9 @@ namespace Isis {
    * @param pProgress
    */
   ControlNetStatistics::ControlNetStatistics(ControlNet *pCNet, Progress *pProgress) {
-    mCNet = pCNet;
-    mProgress = pProgress;
+    mCNet      = pCNet;
+    mProgress  = pProgress;
+    
     GetPointIntStats();
     GetPointDoubleStats();
   }
@@ -132,70 +148,103 @@ namespace Isis {
 
     dValue = GetMaxSampleShift(); 
     pStatsGrp += PvlKeyword("MaxSampleShift",    (dValue == Isis::NULL8 ? "Null" : iString(dValue)));
+    
+    // Convex Hull
+    if (mSerialNumList.Size()) {
+      dValue = mConvexHullRatioStats.Minimum();
+      pStatsGrp += PvlKeyword("MinConvexHullRatio",(dValue == Isis::NULL8 ? "Null" : iString(dValue)));
+      
+      dValue = mConvexHullRatioStats.Maximum();
+      pStatsGrp += PvlKeyword("MaxConvexHullRatio",(dValue == Isis::NULL8 ? "Null" : iString(dValue)));
+      
+      dValue = mConvexHullRatioStats.Average();
+      pStatsGrp += PvlKeyword("AvgConvexHullRatio",(dValue == Isis::NULL8 ? "Null" : iString(dValue)));
+    }
   }
-
+  
   /**
-   * Generate the statistics of a Control Network by Image
-   * Stats include Filename, Serial Num, and
-   * Total, Valid, Ignored, Fixed Points in each Image
-   *
-   * @author Sharmila Prasad (8/24/2010)
-   *
+   * Generate the Image stats
+   * 
+   * @author Sharmila Prasad (11/1/2011)
    */
-  void ControlNetStatistics::GenerateImageStats(void) {
-    map<string, int>::iterator it;
-    int iNumPoints = mCNet->GetNumPoints();
-
-    // Sort the ControlNet by PointID
-    //mCNet->SortControlNet();
-
-    // Initialise the Progress object
-    if (mProgress != NULL && iNumPoints > 0) {
-      mProgress->SetText("Image Stats: Loading Control Points...");
-      mProgress->SetMaximumSteps(iNumPoints);
+  void ControlNetStatistics::GenerateImageStats(void){
+    geos::geom::GeometryFactory geosFactory;
+    
+    CubeManager cubeMgr;
+    cubeMgr.SetNumOpenCubes(50);
+  
+    mCubeGraphNodes = mCNet->GetCubeGraphNodes();
+    
+    if (mProgress != NULL) {
+      mProgress->SetText("Generating Image Stats.....");
+      mProgress->SetMaximumSteps(mCubeGraphNodes.size());
       mProgress->CheckStatus();
     }
+    
+    foreach (ControlCubeGraphNode * node, mCubeGraphNodes) {
+      geos::geom::CoordinateSequence * ptCoordinates = new geos::geom::CoordinateArraySequence();
+      
+      // setup vector for number of image properties and init to 0
+      vector<double> imgStats(numImageStats, 0);
+      
+      // Open the cube to get the dimensions
+      iString sn = node->getSerialNumber();
+      Cube *cube = cubeMgr.OpenCube(mSerialNumList.Filename(sn));
 
-    for (int i = 0; i < iNumPoints; i++) {
-      const ControlPoint *cPoint = mCNet->GetPoint(i);
-      int iNumMeasures = cPoint->GetNumMeasures();
-      bool bIgnore = cPoint->IsIgnored();
-      bool bFixed = (cPoint->GetType() == ControlPoint::Fixed ? true : false);
-      bool bConstrained = (cPoint->GetType() == ControlPoint::Constrained ? true : false);
-      bool bFree = (cPoint->GetType() == ControlPoint::Free ? true : false);
-      bool bLocked = cPoint->IsEditLocked();
+      imgStats[imgSamples] = cube->getSampleCount();
+      imgStats[imgLines]   = cube->getLineCount();
+      double cubeArea      = imgStats[imgSamples] * imgStats[imgLines];
 
-      for (int j = 0; j < iNumMeasures; j++) {
-        const ControlMeasure *cMeasure = cPoint->GetMeasure(j);
-        string sMeasureSN = cMeasure->GetCubeSerialNumber();
-        it = mImageTotalPointMap.find(sMeasureSN);
-        // initialize the maps
-        if (mImageTotalPointMap.find(sMeasureSN) == mImageTotalPointMap.end()) {
-          mImageTotalPointMap [sMeasureSN] = 0;
-          mImageIgnorePointMap[sMeasureSN] = 0;
-          mImageFixedPointMap [sMeasureSN] = 0;
-          mImageConstPointMap [sMeasureSN] = 0;
-          mImageFreePointMap  [sMeasureSN] = 0;
-          mImageLockedPointMap[sMeasureSN] = 0;
-          mImageLockedMap     [sMeasureSN] = 0;
+      QList< ControlMeasure * > measures = node->getMeasures();
+
+      // Populate pts with a list of control points
+      // imgSamples, imgLines, imgTotalPoints, imgIgnoredPoints, imgFixedPoints, imgLockedPoints, imgLocked, imgConstrainedPoints, imgFreePoints, imgConvexHullArea, imgConvexHullRatio
+      foreach (ControlMeasure * measure, measures) {
+        ControlPoint *parentPoint = measure->Parent();
+        imgStats[imgTotalPoints]++;
+        if (parentPoint->IsIgnored()) {
+          imgStats[imgIgnoredPoints]++;
         }
-        mImageTotalPointMap[sMeasureSN]++;
-        if (bIgnore)
-          mImageIgnorePointMap[sMeasureSN]++;
-        if (bFixed)
-          mImageFixedPointMap[sMeasureSN]++;
-        if (bConstrained)
-          mImageConstPointMap[sMeasureSN]++;
-        if (bFree) 
-          mImageFreePointMap[sMeasureSN]++;
+        if (parentPoint->GetType() == ControlPoint::Fixed) {
+          imgStats[imgFixedPoints]++;
+        }
+        if (parentPoint->GetType() == ControlPoint::Constrained) {
+          imgStats[imgConstrainedPoints]++;
+        }
+        if (parentPoint->GetType() == ControlPoint::Free) {
+          imgStats[imgFreePoints]++;
+        }
+        if (parentPoint->IsEditLocked()) {
+          imgStats[imgLockedPoints]++;
+        }
+        if (measure->IsEditLocked()) {
+          imgStats[imgLocked]++;
+        } 
+        ptCoordinates->add(geos::geom::Coordinate(measure->GetSample(), measure->GetLine()));
+      }
+      ptCoordinates->add(geos::geom::Coordinate(measures[0]->GetSample(), measures[0]->GetLine()));
         
-        // Point Locked
-        if (bLocked)
-          mImageLockedPointMap[sMeasureSN]++;
+      if (ptCoordinates->size() >= 4) {
         
-        // Measure Locked
-        if (cMeasure->IsEditLocked())
-          mImageLockedMap[sMeasureSN]++;
+        // Calculate the convex hull
+        geos::geom::Geometry * convexHull = geosFactory.createPolygon(
+          geosFactory.createLinearRing(ptCoordinates), 0)->convexHull();
+    
+        // Calculate the area of the convex hull
+        imgStats[imgConvexHullArea] = convexHull->getArea();
+        
+        imgStats[imgConvexHullRatio]= imgStats[imgConvexHullArea] / cubeArea;
+      }
+      
+      // Add info to statistics to get min, max and avg convex hull
+      mConvexHullStats.AddData(imgStats[imgConvexHullArea]);
+      mConvexHullRatioStats.AddData(imgStats[imgConvexHullRatio]);
+      
+      mImageMap[sn] = imgStats;
+      
+      if (ptCoordinates) {
+        delete ptCoordinates;
+        ptCoordinates = NULL;
       }
       // Update Progress
       if (mProgress != NULL)
@@ -224,40 +273,36 @@ namespace Isis {
     string outName(outFile.Expanded());
     ostm.open(outName.c_str(), std::ios::out);
     
-    map<string, int>::iterator it;
+    map< string, vector<double> >::iterator it;
 
+    // / imgSamples, imgLines, imgTotalPoints, imgIgnoredPoints, imgFixedPoints, imgLockedPoints, imgLocked, imgConstrainedPoints, imgFreePoints, imgConvexHullArea, imgConvexHullRatio
+ 
     // Log into the output file
-    ostm << "Filename, SerialNumber, TotalPoints, PointsIgnored, PointsEditLocked, Fixed, Constrained, Free" <<  endl;
-    for (it = mImageTotalPointMap.begin(); it != mImageTotalPointMap.end(); it++) {
+    ostm << "Filename, SerialNumber, TotalPoints, PointsIgnored, PointsEditLocked, Fixed, Constrained, Free, ConvexHullRatio" <<  endl;
+    for (it = mImageMap.begin(); it != mImageMap.end(); it++) {
       ostm << mSerialNumList.Filename((*it).first) << ", " << (*it).first << ", ";
-      ostm << (*it).second << ", " << mImageIgnorePointMap[(*it).first] << ", " ;
-      ostm << mImageLockedPointMap[(*it).first] << ", " << mImageFixedPointMap[(*it).first] << ", " ;
-      ostm << mImageConstPointMap[(*it).first] << ", " << mImageFreePointMap[(*it).first] << endl;
+      vector<double>imgStats = (*it).second ;
+      ostm << imgStats[imgTotalPoints]<< ", " << imgStats[imgIgnoredPoints] << ", " ;
+      ostm << imgStats[imgLockedPoints] << ", " << imgStats[imgFixedPoints] << ", " ;
+      ostm << imgStats[imgConstrainedPoints] << ", " << imgStats[imgFreePoints] << ", ";
+      ostm << imgStats[ imgConvexHullRatio] << endl;
     }
     ostm.close();
   }
 
   /**
    * Returns the Image Stats by Serial Number
-   *
-   * @author Sharmila Prasad (9/17/2010)
-   *
-   * @param psSerialNum   - Image Serial Number File
-   * @param piPointDetail - Calculated Points stats (total, ignore, fixed)
-   * @param piSize        - array size
+   * 
+   * @author Sharmila Prasad (11/3/2011)
+   * 
+   * @param psSerialNum - Image serialNum
+   * 
+   * @return const vector<double> 
    */
-  void ControlNetStatistics::GetImageStatsBySerialNum(string psSerialNum, int *piPointDetail, int piSize) {
-    if (piSize < numPointDetails) {
-      return;
-    }
-    piPointDetail[total]       = mImageTotalPointMap [psSerialNum];
-    piPointDetail[ignore]      = mImageIgnorePointMap[psSerialNum];
-    piPointDetail[locked]      = mImageLockedPointMap[psSerialNum];
-    piPointDetail[fixed]       = mImageFixedPointMap [psSerialNum];
-    piPointDetail[constrained] = mImageConstPointMap [psSerialNum];
-    piPointDetail[freed]       = mImageFreePointMap  [psSerialNum]; 
+  const vector<double>  ControlNetStatistics::GetImageStatsBySerialNum(string psSerialNum) {
+    return mImageMap[psSerialNum]; 
   }
-
+  
   /**
    * Generate the statistics of a Control Network by Point
    * Stats include ID, Type of each Control Point and
