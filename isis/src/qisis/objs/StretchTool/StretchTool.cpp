@@ -253,16 +253,22 @@ namespace Isis {
     p_globalButton->setDefaultAction(currentView);
     p_globalButton->setToolTip("Reset");
     text  =
-      "<b>Function:</b> Reset the stretch to be automatically computed \
-      using the statisics from the entire image. Use the drop down menu \
-      to reset the stretch for all the bands in the active viewport or \
-      to reset the stretch for all the viewports. </p>";
+      "<b>Function:</b> Reset the stretch to be automatically computed "
+      "using the statisics from the entire image. Use the drop down menu "
+      "to reset the stretch for all the bands in the active viewport or "
+      "to reset the stretch for all the viewports.";
     p_globalButton->setWhatsThis(text);
 
     QPushButton *advancedButton = new QPushButton("Advanced");
     connect(advancedButton, SIGNAL(clicked()), this, SLOT(showAdvancedDialog()));
 
     p_flashButton = new QPushButton("Show Global");
+    text  =
+      "<b>Function:</b> While this button is pressed down, the visible stretch "
+      "will be the automatically computed stretch using the statisics from the "
+      "entire image. The original stretch is restored once you let up on this "
+      "button.";
+    p_flashButton->setWhatsThis(text);
     connect(p_flashButton, SIGNAL(pressed()), this, SLOT(stretchChanged()));
     connect(p_flashButton, SIGNAL(released()), this, SLOT(stretchChanged()));
 
