@@ -64,6 +64,7 @@ namespace Isis {
    *  @history 2011-07-22 Sharmila Prasad - Modified for new keywords in binary control net and added new
    *                               filters for ResidualTolerance, PixelShift and EditLock(Point & Measure)
    *  @history 2011-10-05 Sharmila Prasad - Report double values with 10 digit precision
+   *  @history 2011-11-03 Sharmila Prasad - Added functionality to filter by Convex Hull Ratio
    */
   class ControlNetFilter : public ControlNetStatistics {
     public:
@@ -125,6 +126,9 @@ namespace Isis {
 
       //! Filter Cubes by Distance between points in a Cube
       void CubeDistanceFilter(const PvlGroup &pvlGrp, bool pbLastFilter);
+      
+      //! Filter Cubes by its ConvexHull Ratio
+      void CubeConvexHullFilter(const PvlGroup &pvlGrp, bool pbLastFilter);
 
       //! Print the standard cube stats Header
       void CubeStatsHeader(void);
@@ -139,6 +143,7 @@ namespace Isis {
       SerialNumberList mSerialNumFilter;  //!< Serial Number List file
       
       void FilterOutPoint(int pindex);
+      void FilterOutMeasuresBySerialNum(string serialNum);
   };
 }
 #endif

@@ -1,6 +1,9 @@
 UnitTest for ControlNetFilter ....
 
 ****************** Point_ResidualMagnitude Filter ******************
+Group = Point_ResidualMagnitude
+  LessThan = 1
+End_Group
 Control Point ID  P003
    Measure SerialNum Clementine1/UVVIS/1994-03-08T20:03:40.056
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
@@ -20,6 +23,9 @@ Control Point ID  P009
 ************************************************************************
 
 ****************** Point_EditLock Filter ******************
+Group = Point_EditLock
+  EditLock = 1
+End_Group
 Control Point ID  P001
    Measure SerialNum Clementine1/UVVIS/1994-03-08T20:03:40.056
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
@@ -50,6 +56,9 @@ Control Point ID  P026
 ************************************************************************
 
 ****************** Point_NumMeasuresEditLock Filter ******************
+Group = Point_NumMeasuresEditLock
+  LessThan = 1
+End_Group
 Control Point ID  P001
    Measure SerialNum Clementine1/UVVIS/1994-03-08T20:03:40.056
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
@@ -167,9 +176,16 @@ Control Point ID  P026
 ************************************************************************
 
 ****************** Point_PixelShift Filter ******************
+Group = Point_PixelShift
+  LessThan    = 10
+  GreaterThan = 1
+End_Group
 ************************************************************************
 
 ******************  Point_ID Filter ******************
+Group = Point_IdExpression
+  Expression = P01*
+End_Group
 Control Point ID  P010
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:18:07.957
@@ -215,6 +231,10 @@ Control Point ID  P019
 ************************************************************************
 
 ****************** Point_NumMeasures Filter ******************
+Group = Point_NumMeasures
+  GreaterThan = 2
+  LessThan    = 2
+End_Group
 Control Point ID  P001
    Measure SerialNum Clementine1/UVVIS/1994-03-08T20:03:40.056
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
@@ -274,6 +294,10 @@ Control Point ID  P017
 ************************************************************************
 
 ****************** Points_Properties Filter ******************
+Group = Point_Properties
+  Ignore    = 0
+  PointType = constraineD
+End_Group
 Control Point ID  P003
    Measure SerialNum Clementine1/UVVIS/1994-03-08T20:03:40.056
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
@@ -291,6 +315,12 @@ Control Point ID  P021
 ************************************************************************
 
 ****************** Point_LatLon Filter ******************
+Group = Point_LatLon
+  MinLat = -100
+  MaxLat = 100
+  MinLon = 0
+  MaxLon = 238
+End_Group
 Control Point ID  P001
    Measure SerialNum Clementine1/UVVIS/1994-03-08T20:03:40.056
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
@@ -333,6 +363,10 @@ Control Point ID  P024
 ************************************************************************
 
 ****************** Point_Distance Filter ******************
+Group = Point_Distance
+  MaxDistance = 50000
+  Units       = meters
+End_Group
 Control Point ID  P001
    Measure SerialNum Clementine1/UVVIS/1994-03-08T20:03:40.056
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
@@ -455,6 +489,9 @@ Control Point ID  P026
 ************************************************************************
 
 ****************** Points_MeasureProperties Filter ******************
+Group = Point_MeasureProperties
+  MeasureType = Candidate
+End_Group
 Control Point ID  P001
    Measure SerialNum Clementine1/UVVIS/1994-03-08T20:03:40.056
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
@@ -568,6 +605,10 @@ Control Point ID  P025
 ************************************************************************
 
 ****************** Point_CubeNames Filter ******************
+Group = Point_CubeNames
+  Cube3 = Clementine1/UVVIS/1994-03-08T20:04:59.856
+  Cube4 = Clementine1/UVVIS/1994-04-05T12:18:07.957
+End_Group
 Control Point ID  P004
    Measure SerialNum Clementine1/UVVIS/1994-03-08T20:04:59.856
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
@@ -678,30 +719,27 @@ Control Point ID  P026
 ************************************************************************
 
 ****************** Cube_NameExpression Filter ******************
+Group = Cube_NameExpression
+  Expression = Clementine1/UVVIS/1994-04*
+End_Group
 Control Point ID  P001
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:03:40.056
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
 
 Control Point ID  P002
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:03:40.056
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
 
 Control Point ID  P003
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:03:40.056
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
 
 Control Point ID  P004
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:04:59.856
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:18:07.957
 
 Control Point ID  P005
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:04:59.856
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:18:07.957
 
 Control Point ID  P006
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:04:59.856
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:18:07.957
 
@@ -722,84 +760,174 @@ Control Point ID  P010
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:18:07.957
 
 Control Point ID  P011
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:04:59.856
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
 
 Control Point ID  P012
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:04:59.856
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
 
 Control Point ID  P013
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:04:59.856
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
 
 Control Point ID  P014
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:04:59.856
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
 
 Control Point ID  P015
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:05:19.806
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:18:07.957
 
 Control Point ID  P016
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:05:19.806
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:18:07.957
 
 Control Point ID  P017
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:05:19.806
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:18:07.957
 
 Control Point ID  P018
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:03:40.056
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:04:59.856
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
 
 Control Point ID  P019
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:03:40.056
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:04:59.856
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
 
 Control Point ID  P020
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:03:40.056
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:04:59.856
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
 
 Control Point ID  P021
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:04:59.856
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:05:19.806
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:18:07.957
 
 Control Point ID  P022
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:04:59.856
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:05:19.806
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:18:07.957
 
 Control Point ID  P023
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:04:59.856
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:05:19.806
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:18:07.957
 
 Control Point ID  P024
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:04:59.856
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:05:19.806
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:18:07.957
 
 Control Point ID  P025
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:04:59.856
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:05:19.806
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:18:07.957
 
 Control Point ID  P026
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:04:59.856
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:05:19.806
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:18:07.957
 
 ************************************************************************
 
 ****************** Cube_NumPoints Filter ******************
+Group = Cube_NumPoints
+  GreaterThan = 10
+  LessThan    = 20
+End_Group
+Control Point ID  P001
+   Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
+
+Control Point ID  P002
+   Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
+
+Control Point ID  P003
+   Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
+
+Control Point ID  P004
+   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:04:59.856
+   Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
+   Measure SerialNum Clementine1/UVVIS/1994-04-05T12:18:07.957
+
+Control Point ID  P005
+   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:04:59.856
+   Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
+   Measure SerialNum Clementine1/UVVIS/1994-04-05T12:18:07.957
+
+Control Point ID  P006
+   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:04:59.856
+   Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
+   Measure SerialNum Clementine1/UVVIS/1994-04-05T12:18:07.957
+
+Control Point ID  P007
+   Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
+   Measure SerialNum Clementine1/UVVIS/1994-04-05T12:18:07.957
+
+Control Point ID  P008
+   Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
+   Measure SerialNum Clementine1/UVVIS/1994-04-05T12:18:07.957
+
+Control Point ID  P009
+   Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
+   Measure SerialNum Clementine1/UVVIS/1994-04-05T12:18:07.957
+
+Control Point ID  P010
+   Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
+   Measure SerialNum Clementine1/UVVIS/1994-04-05T12:18:07.957
+
+Control Point ID  P011
+   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:04:59.856
+   Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
+
+Control Point ID  P012
+   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:04:59.856
+   Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
+
+Control Point ID  P013
+   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:04:59.856
+   Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
+
+Control Point ID  P014
+   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:04:59.856
+   Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
+
+Control Point ID  P015
+   Measure SerialNum Clementine1/UVVIS/1994-04-05T12:18:07.957
+
+Control Point ID  P016
+   Measure SerialNum Clementine1/UVVIS/1994-04-05T12:18:07.957
+
+Control Point ID  P017
+   Measure SerialNum Clementine1/UVVIS/1994-04-05T12:18:07.957
+
+Control Point ID  P018
+   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:04:59.856
+   Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
+
+Control Point ID  P019
+   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:04:59.856
+   Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
+
+Control Point ID  P020
+   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:04:59.856
+   Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
+
+Control Point ID  P021
+   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:04:59.856
+   Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
+   Measure SerialNum Clementine1/UVVIS/1994-04-05T12:18:07.957
+
+Control Point ID  P022
+   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:04:59.856
+   Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
+   Measure SerialNum Clementine1/UVVIS/1994-04-05T12:18:07.957
+
+Control Point ID  P023
+   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:04:59.856
+   Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
+   Measure SerialNum Clementine1/UVVIS/1994-04-05T12:18:07.957
+
+Control Point ID  P024
+   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:04:59.856
+   Measure SerialNum Clementine1/UVVIS/1994-04-05T12:18:07.957
+
+Control Point ID  P025
+   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:04:59.856
+   Measure SerialNum Clementine1/UVVIS/1994-04-05T12:18:07.957
+
+Control Point ID  P026
+   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:04:59.856
+   Measure SerialNum Clementine1/UVVIS/1994-04-05T12:18:07.957
+
+************************************************************************
+
+****************** Cube_Distance Filter ******************
+Group = Cube_Distance
+  MaxDistance = 100000
+  Units=      = meters
+End_Group
 Control Point ID  P001
    Measure SerialNum Clementine1/UVVIS/1994-03-08T20:03:40.056
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
@@ -921,7 +1049,11 @@ Control Point ID  P026
 
 ************************************************************************
 
-****************** Cube_Distance Filter ******************
+****************** Cube_ConvexHullRatio Filter ******************
+Group = Cube_ConvexHullRatio
+  GreaterThan = 0.2
+  LessThan    = 0.3
+End_Group
 Control Point ID  P001
    Measure SerialNum Clementine1/UVVIS/1994-03-08T20:03:40.056
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
@@ -935,111 +1067,70 @@ Control Point ID  P003
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
 
 Control Point ID  P004
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:04:59.856
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
-   Measure SerialNum Clementine1/UVVIS/1994-04-05T12:18:07.957
 
 Control Point ID  P005
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:04:59.856
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
-   Measure SerialNum Clementine1/UVVIS/1994-04-05T12:18:07.957
 
 Control Point ID  P006
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:04:59.856
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
-   Measure SerialNum Clementine1/UVVIS/1994-04-05T12:18:07.957
 
 Control Point ID  P007
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
-   Measure SerialNum Clementine1/UVVIS/1994-04-05T12:18:07.957
 
 Control Point ID  P008
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
-   Measure SerialNum Clementine1/UVVIS/1994-04-05T12:18:07.957
 
 Control Point ID  P009
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
-   Measure SerialNum Clementine1/UVVIS/1994-04-05T12:18:07.957
 
 Control Point ID  P010
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
-   Measure SerialNum Clementine1/UVVIS/1994-04-05T12:18:07.957
 
 Control Point ID  P011
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:04:59.856
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
 
 Control Point ID  P012
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:04:59.856
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
 
 Control Point ID  P013
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:04:59.856
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
 
 Control Point ID  P014
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:04:59.856
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
 
 Control Point ID  P015
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:05:19.806
-   Measure SerialNum Clementine1/UVVIS/1994-04-05T12:18:07.957
 
 Control Point ID  P016
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:05:19.806
-   Measure SerialNum Clementine1/UVVIS/1994-04-05T12:18:07.957
 
 Control Point ID  P017
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:05:19.806
-   Measure SerialNum Clementine1/UVVIS/1994-04-05T12:18:07.957
 
 Control Point ID  P018
    Measure SerialNum Clementine1/UVVIS/1994-03-08T20:03:40.056
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:04:59.856
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
 
 Control Point ID  P019
    Measure SerialNum Clementine1/UVVIS/1994-03-08T20:03:40.056
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:04:59.856
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
 
 Control Point ID  P020
    Measure SerialNum Clementine1/UVVIS/1994-03-08T20:03:40.056
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:04:59.856
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
 
 Control Point ID  P021
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:04:59.856
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:05:19.806
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
-   Measure SerialNum Clementine1/UVVIS/1994-04-05T12:18:07.957
 
 Control Point ID  P022
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:04:59.856
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:05:19.806
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
-   Measure SerialNum Clementine1/UVVIS/1994-04-05T12:18:07.957
 
 Control Point ID  P023
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:04:59.856
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:05:19.806
    Measure SerialNum Clementine1/UVVIS/1994-04-05T12:17:21.337
-   Measure SerialNum Clementine1/UVVIS/1994-04-05T12:18:07.957
 
 Control Point ID  P024
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:04:59.856
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:05:19.806
-   Measure SerialNum Clementine1/UVVIS/1994-04-05T12:18:07.957
 
 Control Point ID  P025
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:04:59.856
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:05:19.806
-   Measure SerialNum Clementine1/UVVIS/1994-04-05T12:18:07.957
 
 Control Point ID  P026
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:04:59.856
-   Measure SerialNum Clementine1/UVVIS/1994-03-08T20:05:19.806
-   Measure SerialNum Clementine1/UVVIS/1994-04-05T12:18:07.957
 
 ************************************************************************
 

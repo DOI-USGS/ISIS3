@@ -5,6 +5,7 @@
 #include "CameraFactory.h"
 #include "ControlMeasure.h"
 #include "ControlNet.h"
+#include "ControlCubeGraphNode.h"
 #include "ControlPoint.h"
 #include "Filename.h"
 #include "iString.h"
@@ -81,8 +82,39 @@ namespace Isis {
     if ( mCNet->GetPoint(pindex)->IsEditLocked() ) {
       mCNet->GetPoint(pindex)->SetEditLock(false);
     }
-    //cerr  << "Deleting " << mCNet->GetPoint(pindex)->GetId () << endl;
     mCNet->DeletePoint(pindex);
+  }
+  
+  /**
+   * Delete the network for an Image given Serial Number for all the 
+   * Points in the network.If the Measure is locked, then it is unlocked 
+   * in preparation for deleting. If the Point is locked, it is unlocked 
+   * and set back to lock when the Measure is deleted. 
+   * 
+   * @author Sharmila Prasad (11/3/2011)
+   * 
+   * @param serialNum - Serial Number
+   */
+  void ControlNetFilter::FilterOutMeasuresBySerialNum(string serialNum){
+    QString sn(serialNum.c_str());
+    const ControlCubeGraphNode *csn = mCNet->getGraphNode(sn);
+    QList< ControlMeasure * > measures = csn->getMeasures();
+    
+    foreach(ControlMeasure * measure, measures) {
+      bool pointEditFlag = false;
+      QString ptId(measure->Parent()->GetId().c_str());
+      ControlPoint * point = mCNet->GetPoint(ptId);
+      if (point->IsEditLocked()) {
+        point->SetEditLock(false);
+        pointEditFlag = true;
+      }
+      ControlMeasure *msr = point->GetMeasure(sn);
+      msr->SetEditLock(false);
+      point->Delete(serialNum);
+      if (pointEditFlag) {
+        point->SetEditLock(true);
+      }
+    } 
   }
   
   /**
@@ -128,7 +160,7 @@ namespace Isis {
    * @author Sharmila Prasad (8/31/2010)
    */
   void ControlNetFilter::CubeStatsHeader(void) {
-    mOstm << "FileName, SerialNum, ImageTotalPoints, ImagePointsIgnore, ImagePointsEditLock, ImagePointsFixed, ImagePointsConstrained, ImagePointsFree, ";
+    mOstm << "FileName, SerialNum, ImageTotalPoints, ImagePointsIgnore, ImagePointsEditLock, ImagePointsFixed, ImagePointsConstrained, ImagePointsFree, ConvexHullRatio,";
   }
   
   /**
@@ -191,6 +223,9 @@ namespace Isis {
         }
       }
     }
+    
+    // update the image stats with the changes
+    GenerateImageStats();
   }
 
   /**
@@ -250,6 +285,9 @@ namespace Isis {
         }
       }
     }
+    
+    // update the image stats with the changes
+    GenerateImageStats();
   }
   
   /**
@@ -297,6 +335,9 @@ namespace Isis {
               <<  cPoint->GetNumLockedMeasures() << endl;
       }
     }
+    
+    // update the image stats with the changes
+    GenerateImageStats();
   }
   
   /**
@@ -362,6 +403,9 @@ namespace Isis {
         }
       }
     }
+    
+    // update the image stats with the changes
+    GenerateImageStats();
   }
 
   /**
@@ -422,6 +466,9 @@ namespace Isis {
         }
       }
     }
+    
+    // update the image stats with the changes
+    GenerateImageStats();
   }
 
   /**
@@ -477,6 +524,9 @@ namespace Isis {
         }
       }
     }
+    
+    // update the image stats with the changes
+    GenerateImageStats();
   }
 
   /**
@@ -550,6 +600,9 @@ namespace Isis {
         mOstm << endl;
       }
     }
+
+    // update the image stats with the changes
+    GenerateImageStats();
   }
 
   /**
@@ -628,6 +681,9 @@ namespace Isis {
           cPointSurfPt.GetLocalRadius().GetMeters() << endl;
       }
     }
+    
+    // update the image stats with the changes
+    GenerateImageStats();
   }
 
   /**
@@ -758,6 +814,9 @@ namespace Isis {
       }
       bMinDistance = false;
     }
+    
+    // update the image stats with the changes
+    GenerateImageStats();
   }
 
   /**
@@ -862,8 +921,6 @@ namespace Isis {
       mOstm << "FileName, SerialNum, MeasureIgnore, MeasureType, MeasureEditLock, Reference," << endl;
     }
     
-    //cerr << "iIgnoredFlag="  << iIgnoredFlag <<  "  type=" << sType << endl;
-
     int iNumPoints = mCNet->GetNumPoints();
     for (int i = (iNumPoints - 1); i >= 0; i--) {
       const ControlPoint *cPoint = mCNet->GetPoint(i);
@@ -913,6 +970,9 @@ namespace Isis {
         continue;
       }
     }
+    
+    // update the image stats with the changes
+    GenerateImageStats();
   }
 
   /**
@@ -948,7 +1008,6 @@ namespace Isis {
       bool bMatch = false;
       for (int j = 0; j < iNumMeasures; j++) {
         const ControlMeasure *cMeasure = cPoint->GetMeasure(j);
-        //odb << "Point" << i << ". Measure"  << j << ". Cube =" << cMeasure.CubeSerialNumber() << endl;
         for (int k = 0; k < size; k++) {
           if (cMeasure->GetCubeSerialNumber() == sCubeNames[k]) {
             bMatch = true;
@@ -964,9 +1023,11 @@ namespace Isis {
       }
     } //end point loop
 
+    // update the image stats with the changes
+    GenerateImageStats();
+    
     // If Last filter print to the output file in the required format
     if (pbLastFilter) {
-      GenerateImageStats();
       iNumPoints = mCNet->GetNumPoints();
       for (int i = 0; i < iNumPoints; i++) {
         const ControlPoint *cPoint = mCNet->GetPoint(i);
@@ -984,12 +1045,12 @@ namespace Isis {
           
           // Image Details
           string sn = cMeasure->GetCubeSerialNumber();
-          int iPointDetails[ControlNetStatistics::numPointDetails], *iPntDetailsPtr = iPointDetails;
-          GetImageStatsBySerialNum(sn, iPntDetailsPtr, ControlNetStatistics::numPointDetails);
+          vector <double> imgStats = GetImageStatsBySerialNum(sn);
           mOstm << mSerialNumList.Filename(sn)   << ", " << sn << ", "
-                << iPntDetailsPtr[total] << ", " << iPntDetailsPtr[ignore] << ", "
-                << iPntDetailsPtr[locked] << ", " << iPntDetailsPtr[fixed] << ", "
-                << iPntDetailsPtr[constrained] << ", " << iPntDetailsPtr[freed] << ", " 
+                << imgStats[imgTotalPoints] << ", " << imgStats[imgIgnoredPoints] << ", "
+                << imgStats[imgLockedPoints] << ", " << imgStats[imgFixedPoints] << ", "
+                << imgStats[imgConstrainedPoints] << ", " << imgStats[imgFreePoints] << ", " 
+                << imgStats[imgConvexHullRatio] << ", "
                 << sBoolean[cMeasure->IsIgnored()] << ", " << sBoolean[cMeasure->IsEditLocked()] << endl;
         }
       }
@@ -997,12 +1058,71 @@ namespace Isis {
   }
 
   /**
+   * Filter Cubes by its ConvexHull Ratio (Ratio = Convex Hull / Image Area). 
+   * ConvexHull is calculated only for valid Control Points
+   * 
+   * @author Sharmila Prasad (11/2/2011)
+   * 
+   * @param pvlGrp       - Pvl Group containing the filter info
+   * @param pbLastFilter - Flag to indicate whether this is the last filter to print the stats 
+   *  
+   *  Group = Cube_ConvexHullRatio
+   *     LessThan = double
+   *     GreaterThan = double
+   *  EndGroup 
+   */
+  void ControlNetFilter::CubeConvexHullFilter(const PvlGroup &pvlGrp, bool pbLastFilter){
+    double dLesser = Isis::ValidMaximum;
+    double dGreater = 0;
+
+    if (pvlGrp.HasKeyword("LessThan")) {
+      dLesser = fabs((pvlGrp["LessThan"][0]).ToDouble());
+    }
+
+    if (pvlGrp.HasKeyword("GreaterThan")) {
+      dGreater = fabs((pvlGrp["GreaterThan"][0]).ToDouble());
+    }
+
+    if (dLesser < 0 || dGreater < 0 || dLesser <= dGreater) {
+      string sErrMsg = "Invalid Deffile - Check Cube_ConvexHullRatio Group\n";
+      throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_);
+      return;
+    }
+
+    if (pbLastFilter) {
+      CubeStatsHeader();
+      mOstm << endl;
+    }
+
+    int iNumCubes  = mSerialNumFilter.Size();
+
+    for (int sn = (iNumCubes - 1); sn >= 0; sn--) {
+      string sSerialNum = mSerialNumFilter.SerialNumber(sn);
+      vector<double> imgStats = GetImageStatsBySerialNum(sSerialNum);
+      double convexHullRatio = imgStats[imgConvexHullRatio];
+      if (convexHullRatio < dGreater || convexHullRatio > dLesser){
+        FilterOutMeasuresBySerialNum(sSerialNum);
+        mSerialNumFilter.Delete(sSerialNum);
+      }
+      else if (pbLastFilter) {
+        mOstm << mSerialNumFilter.Filename(sSerialNum) << ", " << sSerialNum << ", "
+              << imgStats[imgTotalPoints]  << ", " << imgStats[imgIgnoredPoints] << ", " << imgStats[imgLockedPoints] << ", " 
+              << imgStats[imgFixedPoints] << ", " << imgStats[imgConstrainedPoints] << ", " << imgStats[imgFreePoints] << ", " 
+              <<  imgStats[imgConvexHullRatio]<< endl;
+      }
+    }
+    
+    // update the image stats with the changes
+    GenerateImageStats();
+  }
+  
+  /**
    * Filter Cube names in Control Network by cube name expression
    * Group by Image
    *
    * @author Sharmila Prasad (8/16/2010)
    *
-   * @param pvlGrp - Pvl Group containing the filter info
+   * @param pvlGrp       - Pvl Group containing the filter info
    * @param pbLastFilter - Flag to indicate whether this is the last filter to print the stats
    */
   void ControlNetFilter::CubeNameExpressionFilter(const PvlGroup &pvlGrp, bool pbLastFilter) {
@@ -1016,7 +1136,6 @@ namespace Isis {
     string strToken = sCubeExpr.Token(sSeparator);
     while (strToken != "") {
       strTokens.push_back(strToken);
-      //odb << "Expr=" << sCubeExpr << "   Token=" << strToken << endl;
       if (!sCubeExpr.size()) {
         break;
       }
@@ -1031,7 +1150,6 @@ namespace Isis {
       mOstm << endl;
     }
 
-    //odb << "Token Size=" << iTokenSize << endl;
     for (int i = (iNumCubes - 1); i >= 0;  i--) {
       string sCubeName = mSerialNumFilter.Filename(i);
       string sSerialNum = mSerialNumFilter.SerialNumber(i);
@@ -1048,25 +1166,28 @@ namespace Isis {
             }
           }
           else {
+            FilterOutMeasuresBySerialNum(sSerialNum);
             mSerialNumFilter.Delete(sSerialNum);
             break;
           }
         }
       }
     }
+    
+    // update the image stats with the changes
+    GenerateImageStats();
+    
     if (pbLastFilter) {
-      GenerateImageStats();
       iNumCubes = mSerialNumFilter.Size();
       for (int i = 0; i < iNumCubes; i++) {
-        string sn = mSerialNumFilter.SerialNumber(i);
-        mOstm << mSerialNumFilter.Filename(i) << ", " << sn << ", ";
-        int iPointDetails[ControlNetStatistics::numPointDetails], *iPntDetailsPtr = iPointDetails;
-        GetImageStatsBySerialNum(sn, iPntDetailsPtr, ControlNetStatistics::numPointDetails);
-
-        mOstm << mSerialNumList.Filename(sn)   << ", " << sn << ", "
-              << iPntDetailsPtr[total] << ", " << iPntDetailsPtr[ignore] << ", "
-              << iPntDetailsPtr[locked] << ", " << iPntDetailsPtr[fixed] << ", "
-              << iPntDetailsPtr[constrained] << ", " << iPntDetailsPtr[freed] << endl;
+        string sSerialNum = mSerialNumFilter.SerialNumber(i);
+        
+        mOstm << mSerialNumFilter.Filename(i) << ", " << sSerialNum << ", ";
+        vector<double> imgStats = GetImageStatsBySerialNum(sSerialNum);
+        mOstm << mSerialNumFilter.Filename(sSerialNum) << ", " << sSerialNum << ", "
+              << imgStats[imgTotalPoints]  << ", " << imgStats[imgIgnoredPoints] << ", " << imgStats[imgLockedPoints] << ", " 
+              << imgStats[imgFixedPoints] << ", " << imgStats[imgConstrainedPoints] << ", " << imgStats[imgFreePoints] << ", " 
+              <<  imgStats[imgConvexHullRatio]<< endl;
       }
     }
   }
@@ -1099,54 +1220,27 @@ namespace Isis {
       CubeStatsHeader();
       mOstm << endl;
     }
-    int iNumCubes = mSerialNumFilter.Size();
-    int iNumPoints = mCNet->GetNumPoints();
+    
+    int iNumCubes  = mSerialNumFilter.Size();
 
     for (int sn = (iNumCubes - 1); sn >= 0; sn--) {
-      int iPointsTotal = 0;
-      int iPointsIgnored = 0;
-      int iPointsFixed = 0;
-      int iPointsLocked = 0;
-      int iPointsConstrained = 0;
-      int iPointsFree = 0;
       string sSerialNum = mSerialNumFilter.SerialNumber(sn);
-
-      for (int i = 0; i < iNumPoints; i++) {
-        const ControlPoint *cPoint = mCNet->GetPoint(i);
-        int iNumMeasures = cPoint->GetNumMeasures();
-        for (int j = 0; j < iNumMeasures; j++) {
-          const ControlMeasure *cMeasure = cPoint->GetMeasure(j);
-          if (cMeasure->GetCubeSerialNumber() == sSerialNum) {
-            iPointsTotal++;
-            if (cPoint->IsIgnored()) {
-              iPointsIgnored++;
-            }
-            if (cPoint->GetType() == ControlPoint::Fixed) {
-              iPointsFixed++;
-            }
-            if (cPoint->GetType() == ControlPoint::Constrained) {
-              iPointsConstrained++;
-            }
-            if (cPoint->GetType() == ControlPoint::Free) {
-              iPointsFree++;
-            }
-            if (cPoint->IsEditLocked()) {
-              iPointsLocked++;
-            }
-            break;
-          }
-        }
-      }
-
-      if (iPointsTotal < iGreaterPoints || iPointsTotal > iLessPoints){
+      vector<double> imgStats = GetImageStatsBySerialNum(sSerialNum);
+      double numPoints = imgStats[imgTotalPoints];
+      if (numPoints < iGreaterPoints || numPoints > iLessPoints){
+        FilterOutMeasuresBySerialNum(sSerialNum);
         mSerialNumFilter.Delete(sSerialNum);
       }
       else if (pbLastFilter) {
         mOstm << mSerialNumFilter.Filename(sSerialNum) << ", " << sSerialNum << ", "
-              << iPointsTotal << ", " << iPointsIgnored << ", " << iPointsLocked << ", " 
-              << iPointsFixed << ", " << iPointsConstrained << ", " << iPointsFree << endl;
+              << imgStats[imgTotalPoints]  << ", " << imgStats[imgIgnoredPoints] << ", " << imgStats[imgLockedPoints] << ", " 
+              << imgStats[imgFixedPoints] << ", " << imgStats[imgConstrainedPoints] << ", " << imgStats[imgFreePoints] << ", " 
+              <<  imgStats[imgConvexHullRatio] << endl;
       }
     }
+    
+    // update the image stats with the changes
+    GenerateImageStats();
   }
 
   /**
@@ -1316,12 +1410,15 @@ namespace Isis {
         //}
       } //end Loop Point1
       if (!bMatchDistance) {
+        FilterOutMeasuresBySerialNum(sSerialNum);
         mSerialNumFilter.Delete(sSerialNum);
       }
       else if (pbLastFilter) {
+        vector <double> imgStats = GetImageStatsBySerialNum((sSerialNum));
         mOstm << mSerialNumList.Filename(sSerialNum) << ", " << sSerialNum << ", "
               << iPointsTotal << ", " << iPointsIgnored << ", " << iPointsLocked << ", " 
-              << iPointsFixed << ", " << iPointsConstrained << ", " << iPointsFree << ", " ;
+              << iPointsFixed << ", " << iPointsConstrained << ", " << iPointsFree << ", " 
+              << imgStats[ imgConvexHullRatio] << ", ";
         for (int j = 0; j < (int)sPointIndex1.size(); j++) {
           iString sPointIDDist(dPointDistance[j]);
           sPointIDDist += "#";
@@ -1335,7 +1432,9 @@ namespace Isis {
       }
       delete(cam);
     } // end cube loop
+    
+    // update the image stats with the changes
+    GenerateImageStats();
   }
-
 }
 
