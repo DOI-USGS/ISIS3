@@ -161,8 +161,9 @@ namespace Isis {
 //      The All option implies the same min/max will be applied
 //      to all three colors (RGB) if either text field is edited";
     p_stretchBandComboBox->setWhatsThis(text);
-    p_stretchBandComboBox->setCurrentIndex(p_stretchBandComboBox->findData(Red));
-    p_stretchBand = Red;
+    p_stretchBand = All;
+    p_stretchBandComboBox->setCurrentIndex(
+        p_stretchBandComboBox->findData(p_stretchBand));
     connect(p_stretchBandComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(stretchBandChanged(int)));
 
     QDoubleValidator *dval = new QDoubleValidator(hbox);
@@ -564,7 +565,7 @@ namespace Isis {
       Stretch rstretch = cvp->redStretch();
       Stretch gstretch = cvp->greenStretch();
       Stretch bstretch = cvp->blueStretch();
-      
+
       //Get the min/max from the current stretch
       if(p_stretchBand == Red) {
         min = rstretch.Input(0);
@@ -579,7 +580,7 @@ namespace Isis {
         max = bstretch.Input(bstretch.Pairs() - 1);
       }
     }
-    
+
     //Set the min/max text fields
     if(p_stretchBand != All) {
       QString strMin;
@@ -590,7 +591,7 @@ namespace Isis {
       strMax.setNum(max);
       p_stretchMaxEdit->setText(strMax);
     }
-    
+
     if(p_advancedStretch->isVisible()) {
       if(p_stretchBand == All){
         updateAdvStretchDialogforAll();
@@ -598,7 +599,8 @@ namespace Isis {
       p_advancedStretch->updateStretch(cvp);
     }
   }
-  
+
+
   /**
    * This is called when one of the advanced stretches changed.
    * Give the stretch to the viewport.
@@ -606,38 +608,32 @@ namespace Isis {
   void StretchTool::advancedStretchChanged() {
     CubeViewport *cvp = cubeViewport();
     if(cvp == NULL) return;
-    
+
     if(!p_advancedStretch->isRgbMode()) {
       Stretch grayStretch = cvp->grayStretch();
       grayStretch.ClearPairs();
       grayStretch.CopyPairs(p_advancedStretch->getGrayStretch());
       cvp->stretchGray(grayStretch);
-      
+
       // send the stretch to any ChipViewports that want to listen
       *p_chipViewportStretch = grayStretch;
       emit stretchChipViewport(p_chipViewportStretch, cvp);
     }
     else {
-      if(p_stretchBand==Red) {
-        Stretch redStretch = cvp->redStretch();
-        redStretch.ClearPairs();
-        redStretch.CopyPairs(p_advancedStretch->getRedStretch());
-        cvp->stretchRed(redStretch);
-      }
+      Stretch redStretch = cvp->redStretch();
+      redStretch.ClearPairs();
+      redStretch.CopyPairs(p_advancedStretch->getRedStretch());
+      cvp->stretchRed(redStretch);
 
-      if(p_stretchBand==Green) {
-        Stretch grnStretch = cvp->greenStretch();
-        grnStretch.ClearPairs();
-        grnStretch.CopyPairs(p_advancedStretch->getGrnStretch());
-        cvp->stretchGreen(grnStretch);
-      }
-     
-      if(p_stretchBand==Blue) {
-        Stretch bluStretch = cvp->blueStretch();
-        bluStretch.ClearPairs();
-        bluStretch.CopyPairs(p_advancedStretch->getBluStretch());
-        cvp->stretchBlue(bluStretch);
-      }
+      Stretch grnStretch = cvp->greenStretch();
+      grnStretch.ClearPairs();
+      grnStretch.CopyPairs(p_advancedStretch->getGrnStretch());
+      cvp->stretchGreen(grnStretch);
+
+      Stretch bluStretch = cvp->blueStretch();
+      bluStretch.ClearPairs();
+      bluStretch.CopyPairs(p_advancedStretch->getBluStretch());
+      cvp->stretchBlue(bluStretch);
     }
     stretchChanged();
   }
