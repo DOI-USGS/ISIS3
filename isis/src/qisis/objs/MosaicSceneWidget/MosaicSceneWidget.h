@@ -56,6 +56,9 @@ namespace Isis {
    *   @history 2011-08-29 Steven Lambright - Re-worded export file list option,
    *                           references #342
    *   @history 2011-09-27 Steven Lambright - Improved user documentation
+   *   @history 2011-11-04 Steven Lambright - Added the zoom factor and
+   *                           scroll bar position to the project file.
+   *                           References #542.
    */
   class MosaicSceneWidget : public QWidget {
       Q_OBJECT

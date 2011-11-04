@@ -1,6 +1,8 @@
 #include "MosaicSceneWidget.h"
 
 #include <QAction>
+#include <QBuffer>
+#include <QDataStream>
 #include <QEvent>
 #include <QFileDialog>
 //#include <QGLWidget> This is necessary for OpenGL acceleration
@@ -346,6 +348,22 @@ namespace Isis {
     if(m_projection) {
       output += m_projection->Mapping();
 
+      QBuffer dataBuffer;
+      dataBuffer.open(QIODevice::ReadWrite);
+      QDataStream transformStream(&dataBuffer);
+      transformStream << getView()->transform();
+      dataBuffer.seek(0);
+
+      PvlObject mosaicScenePosition("SceneVisiblePosition");
+      mosaicScenePosition += PvlKeyword("ViewTransform",
+                                        QString(dataBuffer.data().toHex()));
+      PvlKeyword scrollPos("ScrollPosition");
+      scrollPos += getView()->horizontalScrollBar()->value();
+      scrollPos += getView()->verticalScrollBar()->value();
+      mosaicScenePosition += scrollPos;
+
+      output += mosaicScenePosition;
+
       MosaicTool *tool;
       foreach(tool, *m_tools) {
         if(tool->projectPvlObjectName() != "") {
@@ -414,6 +432,23 @@ namespace Isis {
             }
           }
         }
+      }
+
+      if (project.HasObject("SceneVisiblePosition")) {
+        const PvlObject &positionInfo =
+            project.FindObject("SceneVisiblePosition");
+
+        QByteArray hexValues(positionInfo["ViewTransform"][0].c_str());
+        QDataStream transformStream(QByteArray::fromHex(hexValues));
+
+        QTransform viewTransform;
+        transformStream >> viewTransform;
+        getView()->setTransform(viewTransform);
+
+        getView()->horizontalScrollBar()->setValue(
+            positionInfo["ScrollPosition"][0]);
+        getView()->verticalScrollBar()->setValue(
+            positionInfo["ScrollPosition"][1]);
       }
     }
   }
