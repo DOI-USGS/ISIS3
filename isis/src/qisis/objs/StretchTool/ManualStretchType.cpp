@@ -24,43 +24,36 @@ namespace Isis {
   ManualStretchType::ManualStretchType(const Histogram &hist,
                                        const Stretch &stretch,
                                        const QString &name, const QColor &color)
-    : StretchType(hist, stretch, name, color) {
-    p_inputEdit = NULL;
-    p_outputEdit = NULL;
-
-    QWidget *sliderWidget = new QWidget();
-    QGridLayout *sliderLayout = new QGridLayout();
-
-    QLabel *inputLabel = new QLabel("Input");
-    p_inputEdit = new QLineEdit();
-
-    sliderLayout->addWidget(inputLabel,  0, 0);
-    sliderLayout->addWidget(p_inputEdit, 0, 1);
-
-    QLabel *outputLabel = new QLabel("Output");
-    p_outputEdit = new QLineEdit();
-
-    sliderLayout->addWidget(outputLabel,  1, 0);
-    sliderLayout->addWidget(p_outputEdit, 1, 1);
+      : StretchType(hist, stretch, name, color) {
+    p_errorMessage = NULL;
 
     QWidget *buttonContainer = new QWidget();
     QHBoxLayout *buttonLayout = new QHBoxLayout();
+    p_errorMessage = new QLabel;
 
-    QPushButton *addButton = new QPushButton("Add / Edit");
+    QPushButton *addButton = new QPushButton("Add Row");
     connect(addButton, SIGNAL(clicked(bool)),
             this, SLOT(addButtonPressed(bool)));
     buttonLayout->addWidget(addButton);
 
-    QPushButton *deleteButton = new QPushButton("Delete");
+    QPushButton *deleteButton = new QPushButton("Delete Row");
     connect(deleteButton, SIGNAL(clicked(bool)),
             this, SLOT(deleteButtonPressed(bool)));
     buttonLayout->addWidget(deleteButton);
 
     buttonContainer->setLayout(buttonLayout);
-    sliderLayout->addWidget(buttonContainer, 2, 0, 1, 2);
 
-    sliderWidget->setLayout(sliderLayout);
-    p_mainLayout->addWidget(sliderWidget, 1, 0);
+    p_mainLayout->addWidget(buttonContainer, 1, 0);
+    p_mainLayout->addWidget(p_errorMessage, 4, 0);
+
+    p_table->setSelectionMode(QAbstractItemView::SingleSelection);
+    p_table->setSelectionBehavior(QAbstractItemView::SelectRows);
+    p_table->setEditTriggers(QAbstractItemView::DoubleClicked |
+                             QAbstractItemView::SelectedClicked |
+                             QAbstractItemView::AnyKeyPressed);
+    connect(p_table, SIGNAL(cellChanged(int, int)),
+            this, SLOT(readTable()));
+    disconnect(this, SIGNAL(stretchChanged()), this, SLOT(updateTable()));
 
     setLayout(p_mainLayout);
     setStretch(stretch);
@@ -91,6 +84,7 @@ namespace Isis {
   void ManualStretchType::setStretch(Stretch newStretch) {
     if(newStretch.Text() != p_stretch->Text()) {
       p_stretch->CopyPairs(newStretch);
+      updateTable();
       emit stretchChanged();
     }
   }
@@ -102,41 +96,7 @@ namespace Isis {
    * editing the pair at that location (input value).
    */
   void ManualStretchType::addButtonPressed(bool) {
-    double input = p_inputEdit->text().toDouble();
-    double output = p_outputEdit->text().toDouble();
-
-    Stretch newStretch;
-    bool added = false;
-
-    for(int stretchPair = 0;
-        stretchPair < p_stretch->Pairs();
-        stretchPair ++) {
-      if(input < p_stretch->Input(stretchPair)) {
-        if(!added) {
-          newStretch.AddPair(input, output);
-          added = true;
-        }
-
-        newStretch.AddPair(p_stretch->Input(stretchPair),
-                           p_stretch->Output(stretchPair));
-      }
-      else if(!added && input == p_stretch->Input(stretchPair)) {
-        newStretch.AddPair(input, output);
-        added = true;
-      }
-      else {
-        newStretch.AddPair(p_stretch->Input(stretchPair),
-                           p_stretch->Output(stretchPair));
-      }
-    }
-
-    if(!added) {
-      newStretch.AddPair(input, output);
-      added = true;
-    }
-
-    p_stretch->CopyPairs(newStretch);
-    emit stretchChanged();
+    p_table->insertRow(p_table->rowCount());
   }
 
 
@@ -145,23 +105,49 @@ namespace Isis {
    * responsible for removing the pair with the given input value.
    */
   void ManualStretchType::deleteButtonPressed(bool) {
-    double input = p_inputEdit->text().toDouble();
+    QList<QTableWidgetSelectionRange> selectedRanges =
+        p_table->selectedRanges();
 
-    Stretch newStretch;
-
-    for(int stretchPair = 0;
-        stretchPair < p_stretch->Pairs();
-        stretchPair ++) {
-      if(input == p_stretch->Input(stretchPair)) {
-        continue;
-      }
-      else {
-        newStretch.AddPair(p_stretch->Input(stretchPair),
-                           p_stretch->Output(stretchPair));
-      }
+    if (selectedRanges.empty()) {
+      iString msg = "You must select a row to delete";
+      throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
-    p_stretch->CopyPairs(newStretch);
+    int row = selectedRanges.first().topRow();
+    p_table->removeRow(row);
+  }
+
+  void ManualStretchType::readTable() {
+    *p_stretch = convertTableToStretch();
     emit stretchChanged();
+  }
+
+
+  Stretch ManualStretchType::convertTableToStretch() {
+    Stretch stretch(*p_stretch);
+    stretch.ClearPairs();
+
+    p_errorMessage->setText("");
+    try {
+      if (p_table->columnCount() == 2) {
+        for (int i = 0; i < p_table->rowCount(); i++) {
+          if (p_table->item(i, 0) &&
+              p_table->item(i, 1) &&
+              !p_table->item(i, 0)->data(Qt::DisplayRole).isNull() &&
+              !p_table->item(i, 1)->data(Qt::DisplayRole).isNull()) {
+            stretch.AddPair(
+                p_table->item(i, 0)->data(Qt::DisplayRole).toString().toDouble(),
+                p_table->item(i, 1)->data(Qt::DisplayRole).toString().toDouble());
+          }
+        }
+      }
+    }
+    catch (iException &e) {
+      p_errorMessage->setText(QString::fromStdString(
+          "<font color='red'>" + e.Errors() + "</font>"));
+      e.Clear();
+    }
+
+    return stretch;
   }
 }

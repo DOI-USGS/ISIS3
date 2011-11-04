@@ -51,6 +51,7 @@ namespace Isis {
     p_mainLayout->addWidget(p_graph, 0, 0);
 
     p_table = createStretchTable();
+    connect(this, SIGNAL(stretchChanged()), this, SLOT(updateGraph()));
     connect(this, SIGNAL(stretchChanged()), this, SLOT(updateTable()));
     p_mainLayout->addWidget(p_table, 2, 0);
 
@@ -115,11 +116,17 @@ namespace Isis {
 
 
   /**
+   * This updates the graph with the current stretch object.
+   */
+  void StretchType::updateGraph() {
+    p_graph->setStretch(*p_stretch);
+  }
+
+
+  /**
    * This updates the table with the current stretch pairs.
    */
   void StretchType::updateTable() {
-    p_graph->setStretch(*p_stretch);
-
     Stretch stretch = getStretch();
     p_table->setRowCount(stretch.Pairs());
 

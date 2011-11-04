@@ -3,17 +3,16 @@
 
 #include "StretchType.h"
 
+class QColor;
+class QLabel;
+class QLineEdit;
+class QPushButton;
+class QSlider;
+class QString;
+
 namespace Isis {
   class Stretch;
   class Histogram;
-}
-
-class QSlider;
-class QLineEdit;
-class QString;
-class QColor;
-
-namespace Isis {
 
   /**
    * @brief This handles arbitrary user-input stretches
@@ -26,6 +25,8 @@ namespace Isis {
    * @author 2010-05-20 Steven Lambright
    *
    * @internal
+   *   @history 2011-11-04 Steven Lambright - This should be much, much easier
+   *                           to use now. Fixes #567.
    */
   class ManualStretchType : public StretchType {
       Q_OBJECT
@@ -40,10 +41,12 @@ namespace Isis {
     private slots:
       void addButtonPressed(bool);
       void deleteButtonPressed(bool);
+      void readTable();
 
     private:
-      QLineEdit *p_inputEdit; //!< Input Stretch Value
-      QLineEdit *p_outputEdit; //!< Output Stretch Value
+      Stretch convertTableToStretch();
+
+      QLabel *p_errorMessage;
   };
 }
 

@@ -29,6 +29,11 @@ namespace Isis {
    * @author 2010-05-20 Steven Lambright
    *
    * @internal
+   *   @history 2011-11-04 Steven Lambright - Split up updateGraph and
+   *                           updateTable and moved them to protected. The
+   *                           manual stretch type needs to choose explicitly
+   *                           when to update the table, but always wants to
+   *                           update the graph.
    */
   class StretchType : public QWidget {
       Q_OBJECT
@@ -53,6 +58,9 @@ namespace Isis {
     protected: // methods
       QTableWidget *createStretchTable();
 
+    protected slots:
+      void updateGraph();
+      void updateTable();
 
     protected: // data
       QGridLayout *p_mainLayout; //!< Main layout
@@ -68,7 +76,6 @@ namespace Isis {
 
 
     private slots:
-      void updateTable();
       void savePairs();
   };
 };
