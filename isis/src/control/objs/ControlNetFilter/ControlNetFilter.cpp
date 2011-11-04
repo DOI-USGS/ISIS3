@@ -123,7 +123,7 @@ namespace Isis {
    * @author Sharmila Prasad (8/31/2010)
    */
   void ControlNetFilter::PointStatsHeader(void) {
-    mOstm << "PointID, PointType, PointIgnore, PointEditLock, TotalMeasures, MeasuresIgnored, MeasuresEditLocked, ";
+    mOstm << "PointID, PointType, PointIgnored, PointEditLocked, TotalMeasures, MeasuresIgnored, MeasuresEditLocked, ";
   }
 
   /**
@@ -160,7 +160,7 @@ namespace Isis {
    * @author Sharmila Prasad (8/31/2010)
    */
   void ControlNetFilter::CubeStatsHeader(void) {
-    mOstm << "FileName, SerialNum, ImageTotalPoints, ImagePointsIgnore, ImagePointsEditLock, ImagePointsFixed, ImagePointsConstrained, ImagePointsFree, ConvexHullRatio,";
+    mOstm << "FileName, SerialNumber, ImageTotalPoints, ImagePointsIgnored, ImagePointsEditLocked, ImagePointsFixed, ImagePointsConstrained, ImagePointsFree, ImageConvexHullRatio,";
   }
   
   /**
@@ -190,7 +190,7 @@ namespace Isis {
     }
 
     if (pbLastFilter) {
-      mOstm << "PointID, PointType, PointIgnore, PointEditLock, Filename, SerialNum, PixelShift, MeasureType, MeasureIgnore, MeasureEditLock, Reference, ";
+      mOstm << "PointID, PointType, PointIgnored, PointEditLocked, Filename, SerialNumber, PixelShift, MeasureType, MeasureIgnored, MeasureEditLocked, Reference, ";
       mOstm << endl;
     }
 
@@ -258,7 +258,7 @@ namespace Isis {
     
     if (pbLastFilter) {
       PointStatsHeader();
-      mOstm << "Filename, SerialNum, MeasureType, MeasureIgnore, MeasureEditLock, Reference" << endl;
+      mOstm << "Filename, SerialNumber, MeasureType, MeasureIgnored, MeasureEditLocked, Reference" << endl;
     }
     
     int iNumPoints = mCNet->GetNumPoints();
@@ -306,7 +306,6 @@ namespace Isis {
     if (pvlGrp.HasKeyword("EditLock")) {
       if(pvlGrp["EditLock"][0] == "1" || iString(pvlGrp["EditLock"][0]).DownCase() == "true")
         editLock = true;
-      //cerr << "Pvl Flag=" << pvlGrp["EditLock"][0] <<  endl;
     }
     
     if (pbLastFilter) {
@@ -314,13 +313,10 @@ namespace Isis {
       mOstm << endl;
     }
     
-    //cerr << "Point Lock Flag=" << editLock << endl;
-    
     int iNumPoints = mCNet->GetNumPoints();
     for (int i = (iNumPoints - 1); i >= 0; i--) {
       ControlPoint *cPoint = mCNet->GetPoint(i);
       if (cPoint->IsEditLocked() != editLock) {
-        //cerr << i << ". Point Locked=" << cPoint->IsEditLocked() << "\n";
         FilterOutPoint(i);
         continue;
       }
@@ -370,7 +366,7 @@ namespace Isis {
     }
 
     if (pbLastFilter) {
-      mOstm << "PointID, PointType, PointIgnore,PointEditLock, Filename, SerialNum, ResidualMagnitude, MeasureType, MeasureIgnore, MeasureEditLock, Reference, ";
+      mOstm << "PointID, PointType, PointIgnored, PointEditLocked, Filename, SerialNumber, ResidualMagnitude, MeasureType, MeasureIgnored, MeasureEditLocked, Reference, ";
       mOstm << endl;
     }
     
@@ -563,8 +559,6 @@ namespace Isis {
     }
 
     int iNumPoints = mCNet->GetNumPoints();
-    
-    //cerr << "Ignore=" << bIgnoredFlag << " Set Ignore=" << iSetIgnoreFlag << endl;
 
     for (int i = (iNumPoints - 1); i >= 0; i--) {
       const ControlPoint *cPoint = mCNet->GetPoint(i);
@@ -918,7 +912,7 @@ namespace Isis {
 
     if (pbLastFilter) {
       PointStatsHeader();
-      mOstm << "FileName, SerialNum, MeasureIgnore, MeasureType, MeasureEditLock, Reference," << endl;
+      mOstm << "FileName, SerialNumber, MeasureIgnored, MeasureType, MeasureEditLocked, Reference," << endl;
     }
     
     int iNumPoints = mCNet->GetNumPoints();
@@ -996,7 +990,7 @@ namespace Isis {
     if (pbLastFilter) {
       PointStatsHeader();
       CubeStatsHeader();
-      mOstm << "ImageMeasureIgnore, ImageMeasureEditLock, ";
+      mOstm << "ImageMeasureIgnored, ImageMeasureEditLocked, ";
       mOstm << endl;
     }
 
@@ -1187,7 +1181,7 @@ namespace Isis {
         mOstm << mSerialNumFilter.Filename(sSerialNum) << ", " << sSerialNum << ", "
               << imgStats[imgTotalPoints]  << ", " << imgStats[imgIgnoredPoints] << ", " << imgStats[imgLockedPoints] << ", " 
               << imgStats[imgFixedPoints] << ", " << imgStats[imgConstrainedPoints] << ", " << imgStats[imgFreePoints] << ", " 
-              <<  imgStats[imgConvexHullRatio]<< endl;
+              << imgStats[imgConvexHullRatio]<< endl;
       }
     }
   }
