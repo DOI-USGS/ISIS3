@@ -198,6 +198,10 @@ void (ControlNetFilter::*GetPtr2Filter(const string psFilter)) (const PvlGroup &
     return &ControlNetFilter::CubeDistanceFilter;
   }
   
+  if (psFilter == "Cube_ConvexHullRatio") {
+    return &ControlNetFilter::CubeConvexHullFilter;
+  }
+  
   return NULL;
 }
 

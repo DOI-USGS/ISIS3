@@ -567,6 +567,9 @@
      </change>
      <change name="Sharmila Prasad, Mark Rosiek, Ken Edmundson" date="2011-10-05">Updated 
        Documentation</change>
+     <change name="Sharmila Prasad" date="2011-11-03">Added functionality to 
+     filter by Image's Convex Hull Ratio 
+     </change>
     </history>
       
   <groups>
