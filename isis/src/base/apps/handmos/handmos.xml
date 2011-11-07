@@ -25,16 +25,21 @@
       also has the ability to track the pixel origin. 
    </p> 
    <p>There are four different ways/priorities (input, mosaic, band, average) 
-    for how the input image has to be placed on the mosaic. Priority "input" 
-   will place the input image on top of the mosaic. Priority "mosaic" will 
-   place the input image beneath the mosaic. Priority "band" will place the 
-   input image on the mosaic based on the "Lessser" or "Greater" criteria 
-   between user defined band in the input and the mosaic images. Priority 
-   Average will average of valid pixels in the input and mosaic images. 
-   Choosing this priority will cause the mosaic to have twice the number of 
-   bands of the input image, with a count band for each band. The count band 
-   keeps track of number of images involved in the dn value of the mosaic. In 
-   case of special pixels and the special pixel flags being enabled, the details 
+    for how the input image has to be placed on the mosaic.</p>
+    
+   <p>Priority <b>Input</b> will place the input image on top of the mosaic.</p>
+   
+   <p>Priority <b>Mosaic</b> will place the input image beneath the mosaic.</p>
+   
+   <p>Priority <b>Band</b> will place the input image on the mosaic based on the "Lessser" or "Greater" criteria 
+   between user defined band in the input and the mosaic images.</p>
+   
+   <p>Priority <b>Average</b> will average the valid pixels in the input and mosaic images. For each mosaic band, a count band is maintained. The count band 
+   keeps track of the number of images involved in the averaging of the dn value for each pixel in the mosaic. Choosing this priority will cause the mosaic to have twice the number of 
+   bands of the input image, with a count band for each band. <b>Hence the file size of the mosaic is doubled due to the count band.</b>
+   </p>
+   
+   <p>In case of special pixels and the special pixel flags being enabled, the details 
    for each priority is described below.
    </p>
       <p> Tracking can be set at the time of Mosaic creation
@@ -232,6 +237,8 @@
       Output cube when CREATE=yes no longer propagates labels other than the
       band bin information.
     </change>
+    <change name="Sharmila Prasad" date="2011-11-07">Updated documentation for 
+    Average priority. Fixes #553</change>
   </history>
 
   <oldName>
