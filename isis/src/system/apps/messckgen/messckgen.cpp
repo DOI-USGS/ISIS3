@@ -4,6 +4,7 @@
 #include <sstream>
 #include <string>
 
+#include <QFile>
 #include <QHash>
 #include <QList>
 #include <QSet>
@@ -27,6 +28,8 @@ PvlGroup* insertGroup(PvlObject &object, PvlGroup &group, int index);
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
+  // Convert between integer representations of months to abbreviated strings,
+  // as used in the TDB time format of the kernel date ranges
   QHash<int, QString> MONTH_TO_STRING;
   MONTH_TO_STRING[1] = "JAN";
   MONTH_TO_STRING[2] = "FEB";
@@ -102,9 +105,13 @@ void IsisMain() {
 
     if (ckGroup.IsNamed("Selection")) {
 
+      // We've already found the mapping section, so just update the pivot and
+      // atthist files for all remaining selection groups
       if (foundMapping)
         updatePointing(ckGroup, pivotPointing, atthistPointing);
 
+      // We're looking for the group with a comment that says MAPPING,
+      // signifying the beginning of the section we wish to update
       for (int j = 0; j < ckGroup.Comments(); j++) {
         QString comment = QString::fromStdString(ckGroup.Comment(j));
         if (comment.contains("MAPPING")) {
@@ -125,6 +132,7 @@ void IsisMain() {
             }
           }
 
+          // Remove the trailiung " TDB" as it confuses the time conversion
           string newEnd = pivotEndRaw.toStdString();
           pivotEndRaw.remove(QRegExp(" TDB$"));
           string pivotEnd = pivotEndRaw.toStdString();
@@ -149,10 +157,15 @@ void IsisMain() {
           iTime coveredTime(currentStart);
           coveredTime += 1;
           while (coveredTime <= pivotEndTime) {
+            // Keep adding a new file for every day that doesn't have coverage
+            // in the DB file, but is covered by the pivot and atthist files
             PvlObject::PvlKeywordIterator itr = currentGroup->Begin();
             itr++;
 
+            // Until our covered time has exceeded a week past the current
+            // group's start time, add new files to the current group
             while (coveredTime <= weekFromStart && coveredTime <= pivotEndTime) {
+              // Construct the string used to identify the day's BC file
               string year = coveredTime.YearString();
               string month = coveredTime.MonthString();
               if (month.size() < 2) month = "0" + month;
@@ -162,16 +175,29 @@ void IsisMain() {
               string bcFilename = "$messenger/kernels/ck/";
               bcFilename += "msgr" + year + month + day + ".bc";
 
+              // Check that the current day's BC file exists
+              string bcExpanded = Filename(bcFilename).Expanded();
+              if (!QFile(QString::fromStdString(bcExpanded)).exists()) {
+                string msg = "The BC file [" + bcExpanded + "] does not exist";
+                throw iException::Message(iException::User, msg, _FILEINFO_);
+              }
+
+              // If the current day's file isn't already present in the group,
+              // then go ahead and add it
               if ((*itr)[0] != bcFilename) {
                 PvlKeyword bcKeyword("File", bcFilename);
                 itr = currentGroup->AddKeyword(bcKeyword, itr);
               }
               itr++;
 
+              // Move forward a day's time (in seconds) so we can do the same
+              // for the next day
               coveredTime += 24 * 3600;
             }
 
             if (coveredTime <= pivotEndTime) {
+              // Set the end of the previous range and the beginning of the new
+              // range to a week past the previous beginning
               iString newEndTime = weekFromStart.YearString() + " ";
               newEndTime += MONTH_TO_STRING[weekFromStart.Month()].toStdString() + " ";
               newEndTime += weekFromStart.DayString() + " ";
