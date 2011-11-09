@@ -2834,6 +2834,8 @@ namespace Isis {
    *                          for given serial number.
    *   @history 2011-10-20 Tracie Sucharski - Add check for a control network
    *                          that does not yet have any control points.
+   *   @history 2011-11-09 Tracie Sucharski - If there are no measures for
+   *                          this cube, return.
    */
   void QnetTool::drawAllMeasurments(MdiCubeViewport *vp, QPainter *painter) {
     // Without a controlnetwork there are no points, or if new net, no points
@@ -2848,7 +2850,8 @@ namespace Isis {
       drawGroundMeasures(vp, painter);
       return;
     }
-
+    if (!g_controlNetwork->GetCubeSerials().contains(
+                      QString::fromStdString(serialNumber))) return;
     if (!g_serialNumberList->HasSerialNumber(serialNumber)) return;
     QList<ControlMeasure *> measures = 
         g_controlNetwork->GetMeasuresInCube(serialNumber);

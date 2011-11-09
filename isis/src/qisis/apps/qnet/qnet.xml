@@ -486,5 +486,9 @@
       Changed the Save button on the qnet tool to save to current network,
       rather than a "Save As".
     </change>
+    <change name="Tracie Sucharski" date="2011-11-09">
+      Fixed problem caused by an image in the list which did not have any
+      measure associated with it.
+    </change>
   </history>
 </application>
