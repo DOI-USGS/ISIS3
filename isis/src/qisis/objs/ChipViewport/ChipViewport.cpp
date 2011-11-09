@@ -219,6 +219,8 @@ namespace Isis {
    *   @history 2011-08-23  Tracie Sucharski - Use the GetMeasuresInCube method
    *                           from ControlNet to get list of measures rather
    *                           than searching through entire net.
+   *   @history 2011-11-09 Tracie Sucharski - If there are no measures for
+   *                          this cube, return.
    */
   void ChipViewport::paintEvent(QPaintEvent *e) {
     QPainter painter(this);
@@ -244,6 +246,8 @@ namespace Isis {
     }
 
     string serialNumber = SerialNumber::Compose(*p_chipCube);
+    if (!p_controlNet->GetCubeSerials().contains(
+                         QString::fromStdString(serialNumber))) return;
     // draw measure locations if we have a control network
     //  If the serial number is Unknown, we probably have a ground source
     //  file or level 2 which means it does not exist in the network
