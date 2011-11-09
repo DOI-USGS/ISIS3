@@ -141,114 +141,77 @@ void IsisMain() {
 
           // See if a week has passed from the start time to the pivot end time
           iTime pivotEndTime(pivotEnd);
-          if (pivotEndTime > weekFromStart) {
-            time[1] = newEnd;
+          time[1] = newEnd;
 
-            PvlGroup *currentGroup = &ckGroup;
+          PvlGroup *currentGroup = &ckGroup;
 
-            // Add a second to adjust for midnight conversion
-            iTime coveredTime(currentStart);
-            coveredTime += 1;
-            //std::cerr << coveredTime.UTC() << std::endl;
-            //std::cerr << pivotEndTime.UTC() << std::endl;
-            while (coveredTime <= pivotEndTime) {
-              PvlObject::PvlKeywordIterator itr = currentGroup->Begin();
-              itr++;
+          // Add a second to adjust for midnight conversion
+          iTime coveredTime(currentStart);
+          coveredTime += 1;
+          while (coveredTime <= pivotEndTime) {
+            PvlObject::PvlKeywordIterator itr = currentGroup->Begin();
+            itr++;
 
-              while (coveredTime <= weekFromStart && coveredTime <= pivotEndTime) {
-                string year = coveredTime.YearString();
-                string month = coveredTime.MonthString();
-                if (month.size() < 2) month = "0" + month;
-                string day = coveredTime.DayString();
-                if (day.size() < 2) day = "0" + day;
+            while (coveredTime <= weekFromStart && coveredTime <= pivotEndTime) {
+              string year = coveredTime.YearString();
+              string month = coveredTime.MonthString();
+              if (month.size() < 2) month = "0" + month;
+              string day = coveredTime.DayString();
+              if (day.size() < 2) day = "0" + day;
 
-                string bcFilename = "$messenger/kernels/ck/";
-                bcFilename += "msgr" + year + month + day + ".bc";
-                //std::cerr << bcFilename << std::endl;
-
-                if ((*itr)[0] != bcFilename) {
-                  PvlKeyword bcKeyword("File", bcFilename);
-                  itr = currentGroup->AddKeyword(bcKeyword, itr);
-                }
-                itr++;
-
-                coveredTime += 24 * 3600;
-              }
-
-              if (coveredTime <= pivotEndTime) {
-                iString newEndTime = weekFromStart.YearString() + " ";
-                newEndTime += MONTH_TO_STRING[weekFromStart.Month()].toStdString() + " ";
-                newEndTime += weekFromStart.DayString() + " ";
-                newEndTime += "00:00:00.000 TDB";
-                //std::cerr << newEndTime << std::endl;
-
-                // Add another week's time
-                //std::cerr << weekFromStart.UTC() << std::endl;
-                coveredTime = weekFromStart;
-                weekFromStart += 7 * 24 * 3600;
-
-                PvlKeyword &currentTime = currentGroup->FindKeyword("Time");
-                currentTime[1] = newEndTime;
-                PvlKeyword latestTime(currentTime);
-                latestTime[0] = newEndTime;
-                latestTime[1] = newEnd;
-
-                PvlGroup *latestGroup = new PvlGroup("Selection");
-                latestGroup->AddKeyword(latestTime);
-
-                PvlKeyword atthistPlaceholder("File");
-                atthistPlaceholder += "";
-                PvlKeyword pivotPlaceholder("File");
-                pivotPlaceholder.AddComment("Regular pivot angle CK");
-                pivotPlaceholder += "";
-
-                latestGroup->AddKeyword(atthistPlaceholder);
-                latestGroup->AddKeyword(pivotPlaceholder);
-
-                latestGroup->AddKeyword(currentGroup->FindKeyword("Type"));
-
-                updatePointing(*latestGroup, pivotPointing, atthistPointing);
-                currentGroup = insertGroup(pointing, *latestGroup, i);
-                //std::cerr << *currentGroup << std::endl;
-                //currentGroup = latestGroup;
-              }
-            }
-            //std::cerr << *currentGroup << std::endl;
-          }
-          else {
-            time[1] = newEnd;
-
-            PvlObject::PvlKeywordIterator itr = ckGroup.Begin();
-            while (itr->Name() != "File") itr++;
-
-            // Add a second to adjust for midnight conversion
-            iTime coveredTime(currentStart);
-            coveredTime += 1;
-            //std::cerr << coveredTime.UTC() << std::endl;
-            while (coveredTime <= pivotEndTime) {
               string bcFilename = "$messenger/kernels/ck/";
-              bcFilename += "msgr" + iString(coveredTime.Year());
-              bcFilename += iString(coveredTime.Month());
-              bcFilename += iString(coveredTime.Day()) + ".bc";
+              bcFilename += "msgr" + year + month + day + ".bc";
 
               if ((*itr)[0] != bcFilename) {
                 PvlKeyword bcKeyword("File", bcFilename);
-                ckGroup.AddKeyword(bcKeyword, itr);
+                itr = currentGroup->AddKeyword(bcKeyword, itr);
               }
               itr++;
 
-              //std::cerr << bcFilename << std::endl;
               coveredTime += 24 * 3600;
             }
 
-            //std::cerr << pivotEndTime.UTC() << std::endl;
-            //std::cerr << ckGroup << std::endl;
+            if (coveredTime <= pivotEndTime) {
+              iString newEndTime = weekFromStart.YearString() + " ";
+              newEndTime += MONTH_TO_STRING[weekFromStart.Month()].toStdString() + " ";
+              newEndTime += weekFromStart.DayString() + " ";
+              newEndTime += "00:00:00.000 TDB";
+
+              // Add another week's time
+              coveredTime = weekFromStart;
+              weekFromStart += 7 * 24 * 3600;
+
+              PvlKeyword &currentTime = currentGroup->FindKeyword("Time");
+              currentTime[1] = newEndTime;
+              PvlKeyword latestTime(currentTime);
+              latestTime[0] = newEndTime;
+              latestTime[1] = newEnd;
+
+              PvlGroup *latestGroup = new PvlGroup("Selection");
+              latestGroup->AddKeyword(latestTime);
+
+              PvlKeyword atthistPlaceholder("File");
+              atthistPlaceholder += "";
+              PvlKeyword pivotPlaceholder("File");
+              pivotPlaceholder.AddComment("Regular pivot angle CK");
+              pivotPlaceholder += "";
+
+              latestGroup->AddKeyword(atthistPlaceholder);
+              latestGroup->AddKeyword(pivotPlaceholder);
+
+              latestGroup->AddKeyword(currentGroup->FindKeyword("Type"));
+
+              updatePointing(*latestGroup, pivotPointing, atthistPointing);
+              currentGroup = insertGroup(pointing, *latestGroup, i);
+            }
           }
         }
       }
     }
   }
 
+  // Get the output filename, either user-specified or the latest version for
+  // the kernels area (as run by makedb)
   Filename outDBfile;
   if (ui.WasEntered("TO")) {
     outDBfile = ui.GetFilename("TO");
@@ -289,34 +252,53 @@ void updatePointing(PvlGroup &ckGroup,
 
 
 PvlGroup* insertGroup(PvlObject &object, PvlGroup &group, int index) {
+  // Keep track of the comments signifying the beginning of the mapping section,
+  // as it will need to be moved to the most recent date range
   QList<QString> mappingComments;
 
+  // Add a copy of the last group to the end so we can begin shifting all our
+  // mapping selection groups down
   object.AddGroup(object.Group(object.Groups() - 1));
   for (int i = object.Groups() - 2; i > index; i--) {
+    // Shift groups down until we reach the new beginning of the mapping section
     object.Group(i) = object.Group(i - 1);
 
+    // See if we've found the mapping comments yet
     if (mappingComments.size() == 0) {
+      // If not, let's get the comments from the current group and check them
+      // against our criteria for the mapping comments
       PvlGroup &currentGroup = object.Group(i);
       bool foundMapping = false;
       for (int j = 0; j < currentGroup.Comments(); j++) {
         QString comment = QString::fromStdString(currentGroup.Comment(j));
         mappingComments.append(comment);
+
         if (comment.contains("MAPPING"))
           foundMapping = true;
       }
 
-      if (mappingComments.size() > 0 && !foundMapping)
+      if (mappingComments.size() > 0 && !foundMapping) {
+        // Still haven't found the mapping comments, so clear away whatever
+        // comments we did find
         mappingComments.clear();
-      else
+      }
+      else {
+        // We found the mapping comments, so now that we've extracted them we
+        // can remove them from the former latest selection group
         currentGroup.GetNameKeyword().ClearComments();
+      }
     }
   }
+
+  // Add the new group
   object.Group(index) = group;
 
+  // Add all the mapping comments
   PvlGroup &currentGroup = object.Group(index);
   for (int i = 0; i < mappingComments.size(); i++)
     currentGroup.AddComment(mappingComments[i].toStdString());
 
+  // Return the location of the new group
   return &currentGroup;
 }
 
