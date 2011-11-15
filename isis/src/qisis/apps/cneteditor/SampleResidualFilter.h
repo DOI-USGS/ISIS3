@@ -9,31 +9,35 @@ class QString;
 
 namespace Isis
 {
-  class AbstractFilterSelector;
   class ControlCubeGraphNode;
   class ControlMeasure;
   class ControlPoint;
 
-  class SampleResidualFilter : public AbstractNumberFilter
+  namespace CnetViz
   {
-      Q_OBJECT
+    class AbstractFilterSelector;
+    
+    class SampleResidualFilter : public AbstractNumberFilter
+    {
+        Q_OBJECT
 
-    public:
-      SampleResidualFilter(AbstractFilter::FilterEffectivenessFlag flag,
-          int minimumForSuccess = -1);
-      SampleResidualFilter(const SampleResidualFilter & other);
-      virtual ~SampleResidualFilter();
+      public:
+        SampleResidualFilter(AbstractFilter::FilterEffectivenessFlag flag,
+            int minimumForSuccess = -1);
+        SampleResidualFilter(const SampleResidualFilter & other);
+        virtual ~SampleResidualFilter();
 
-      bool evaluate(const ControlCubeGraphNode *) const;
-      bool evaluate(const ControlPoint *) const;
-      bool evaluate(const ControlMeasure *) const;
+        bool evaluate(const ControlCubeGraphNode *) const;
+        bool evaluate(const ControlPoint *) const;
+        bool evaluate(const ControlMeasure *) const;
 
-      AbstractFilter * clone() const;
+        AbstractFilter * clone() const;
 
-      QString getImageDescription() const;
-      QString getPointDescription() const;
-      QString getMeasureDescription() const;
-  };
+        QString getImageDescription() const;
+        QString getPointDescription() const;
+        QString getMeasureDescription() const;
+    };
+  }
 }
 
 #endif

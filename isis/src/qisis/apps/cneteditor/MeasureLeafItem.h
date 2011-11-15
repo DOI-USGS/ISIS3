@@ -10,18 +10,21 @@ namespace Isis
 {
   class ControlMeasure;
 
-  class MeasureLeafItem : public AbstractMeasureItem, public AbstractLeafItem
+  namespace CnetViz
   {
-    public:
-      MeasureLeafItem(ControlMeasure * cm, int avgCharWidth,
-          AbstractTreeItem * parent = 0);
-      virtual ~MeasureLeafItem();
+    class MeasureLeafItem : public AbstractMeasureItem, public AbstractLeafItem
+    {
+      public:
+        MeasureLeafItem(ControlMeasure * cm, int avgCharWidth,
+            AbstractTreeItem * parent = 0);
+        virtual ~MeasureLeafItem();
 
 
-    private: // Disallow copying of this class
-      MeasureLeafItem(const MeasureLeafItem & other);
-      const MeasureLeafItem & operator=(const MeasureLeafItem & other);
-  };
+      private: // Disallow copying of this class
+        MeasureLeafItem(const MeasureLeafItem & other);
+        const MeasureLeafItem & operator=(const MeasureLeafItem & other);
+    };
+  }
 }
 
 #endif

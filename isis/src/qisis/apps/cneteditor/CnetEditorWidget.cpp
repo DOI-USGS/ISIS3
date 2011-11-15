@@ -34,15 +34,15 @@
 #include "AbstractMeasureItem.h"
 #include "AbstractPointItem.h"
 #include "AbstractTreeItem.h"
-#include "CnetMeasureTableModel.h"
-#include "CnetPointTableModel.h"
-#include "CnetTableView.h"
-#include "CnetTableViewHeader.h"
-#include "CnetTreeView.h"
-#include "ConnectionModel.h"
+#include "MeasureTableModel.h"
+#include "PointTableModel.h"
+#include "TableView.h"
+#include "TableViewHeader.h"
+#include "TreeView.h"
+#include "ImageImageTreeModel.h"
 #include "FilterWidget.h"
-#include "PointModel.h"
-#include "SerialModel.h"
+#include "PointMeasureTreeModel.h"
+#include "ImagePointTreeModel.h"
 
 
 using std::cerr;
@@ -50,6 +50,7 @@ using std::cerr;
 
 namespace Isis
 {
+  using namespace CnetViz;
 
 //**************************************************************
 //**************************************************************
@@ -108,8 +109,8 @@ namespace Isis
     delete pointTreeView;
     pointTreeView = NULL;
 
-    delete serialTreeView;
-    serialTreeView = NULL;
+    delete imageTreeView;
+    imageTreeView = NULL;
 
     delete connectionTreeView;
     connectionTreeView = NULL;
@@ -140,11 +141,11 @@ namespace Isis
   void CnetEditorWidget::nullify()
   {
     pointTreeView = NULL;
-    serialTreeView = NULL;
+    imageTreeView = NULL;
     connectionTreeView = NULL;
 
     pointModel = NULL;
-    serialModel = NULL;
+    imageModel = NULL;
     connectionModel = NULL;
 
     pointTableModel = NULL;
@@ -175,7 +176,7 @@ namespace Isis
   void CnetEditorWidget::rebuildModels(QList<AbstractTreeItem *> itemsToDelete)
   {
     pointModel->stopWorking();
-    serialModel->stopWorking();
+    imageModel->stopWorking();
     connectionModel->stopWorking();
 
     bool ignoreAll = false;
@@ -219,7 +220,7 @@ namespace Isis
     }
 
     pointModel->rebuildItems();
-    serialModel->rebuildItems();
+    imageModel->rebuildItems();
     connectionModel->rebuildItems();
   }
 
@@ -231,19 +232,19 @@ namespace Isis
     createConnectionTreeView();
 
     connect(pointTreeView, SIGNAL(activated()),
-        serialTreeView, SLOT(deactivate()));
+        imageTreeView, SLOT(deactivate()));
     connect(pointTreeView, SIGNAL(activated()),
         connectionTreeView, SLOT(deactivate()));
 
-    connect(serialTreeView, SIGNAL(activated()),
+    connect(imageTreeView, SIGNAL(activated()),
         pointTreeView, SLOT(deactivate()));
-    connect(serialTreeView, SIGNAL(activated()),
+    connect(imageTreeView, SIGNAL(activated()),
         connectionTreeView, SLOT(deactivate()));
 
     connect(connectionTreeView, SIGNAL(activated()),
         pointTreeView, SLOT(deactivate()));
     connect(connectionTreeView, SIGNAL(activated()),
-        serialTreeView, SLOT(deactivate()));
+        imageTreeView, SLOT(deactivate()));
 
     createFilterArea();
 
@@ -328,27 +329,27 @@ namespace Isis
   
   void CnetEditorWidget::createPointTreeView()
   {
-    pointTreeView = new CnetTreeView();
+    pointTreeView = new TreeView();
     pointTreeView->setTitle("Point View");
-    pointModel = new PointModel(controlNet, pointTreeView, qApp);
+    pointModel = new PointMeasureTreeModel(controlNet, pointTreeView, qApp);
     pointTreeView->setModel(pointModel);
   }
 
 
   void CnetEditorWidget::createSerialTreeView()
   {
-    serialTreeView = new CnetTreeView();
-    serialTreeView->setTitle("Cube View");
-    serialModel = new SerialModel(controlNet, serialTreeView, qApp);
-    serialTreeView->setModel(serialModel);
+    imageTreeView = new TreeView();
+    imageTreeView->setTitle("Cube View");
+    imageModel = new ImagePointTreeModel(controlNet, imageTreeView, qApp);
+    imageTreeView->setModel(imageModel);
   }
 
 
   void CnetEditorWidget::createConnectionTreeView()
   {
-    connectionTreeView = new CnetTreeView();
+    connectionTreeView = new TreeView();
     connectionTreeView->setTitle("Cube Connection View");
-    connectionModel = new ConnectionModel(controlNet, connectionTreeView, qApp);
+    connectionModel = new ImageImageTreeModel(controlNet, connectionTreeView, qApp);
     connectionTreeView->setModel(connectionModel);
   }
 
@@ -356,7 +357,7 @@ namespace Isis
   void CnetEditorWidget::createFilterArea()
   {
     ASSERT(pointModel);
-    ASSERT(serialModel);
+    ASSERT(imageModel);
     ASSERT(connectionModel);
 
     FilterWidget * pointFilter = new FilterWidget("Points and Measures");
@@ -375,9 +376,9 @@ namespace Isis
     pointFilterWidget = pointFilterScrollArea;
 
     FilterWidget * serialFilter = new FilterWidget("Images and Points");
-    if (serialModel)
+    if (imageModel)
     {
-      serialModel->setFilter(serialFilter);
+      imageModel->setFilter(serialFilter);
     }
 
     QHBoxLayout * serialFilterLayout = new QHBoxLayout;
@@ -408,8 +409,8 @@ namespace Isis
 
   void CnetEditorWidget::createPointTableView()
   {
-    pointTableModel = new CnetPointTableModel(pointModel);
-    pointTableView = new CnetTableView(pointTableModel, *settingsPath,
+    pointTableModel = new PointTableModel(pointModel);
+    pointTableView = new TableView(pointTableModel, *settingsPath,
         "pointTableView");
     pointTableView->setWhatsThis("<html>Each row in the table is a control "
         "point.  Each column in the table is an attribute of a control "
@@ -422,8 +423,10 @@ namespace Isis
     connect(pointTableView, SIGNAL(selectionChanged()),
             pointTreeView, SLOT(handleModelSelectionChanged()));
     
-    connect(pointTableView, SIGNAL(rebuildModels(QList<AbstractTreeItem *>)),
-            this, SLOT(rebuildModels(QList<AbstractTreeItem *>)));
+    connect(pointTableView,
+            SIGNAL(rebuildModels(QList< CnetViz::AbstractTreeItem * >)),
+            this,
+            SLOT(rebuildModels(QList< CnetViz::AbstractTreeItem * >)));
     
     for (int i = 0; i < AbstractPointItem::COLS; i++)
     {
@@ -441,8 +444,8 @@ namespace Isis
 
   void CnetEditorWidget::createMeasureTableView()
   {
-    measureTableModel = new CnetMeasureTableModel(pointModel);
-    measureTableView = new CnetTableView(measureTableModel, *settingsPath,
+    measureTableModel = new MeasureTableModel(pointModel);
+    measureTableView = new TableView(measureTableModel, *settingsPath,
         "measureTableView");
     measureTableView->setWhatsThis("<html>Each row in the table is a control "
         "measure.  Each column in the table is an attribute of a control "
@@ -457,7 +460,7 @@ namespace Isis
     connect(measureTableView,
             SIGNAL(tableSelectionChanged(QList< AbstractTreeItem * >)),
             pointTableModel,
-            SLOT(handleTreeSelectionChanged(QList<AbstractTreeItem*>)));
+            SLOT(handleTreeSelectionChanged(QList< AbstractTreeItem * >)));
 
 
     connect(measureTableView, SIGNAL(modelDataChanged()),
@@ -466,8 +469,10 @@ namespace Isis
             measureTableView, SLOT(handleModelSelectionChanged()));
     connect(measureTableView, SIGNAL(selectionChanged()),
             pointTreeView, SLOT(handleModelSelectionChanged()));
-    connect(measureTableView, SIGNAL(rebuildModels(QList<AbstractTreeItem *>)),
-            this, SLOT(rebuildModels(QList<AbstractTreeItem *>)));
+    connect(measureTableView,
+            SIGNAL(rebuildModels(QList< CnetViz::AbstractTreeItem * >)),
+            this,
+            SLOT(rebuildModels(QList< CnetViz::AbstractTreeItem * >)));
 
     for (int i = 0; i < AbstractMeasureItem::COLS; i++)
     {
@@ -603,7 +608,7 @@ namespace Isis
 
   QWidget * CnetEditorWidget::getSerialTreeView()
   {
-    return serialTreeView;
+    return imageTreeView;
   }
 
 
@@ -664,13 +669,13 @@ namespace Isis
     if (freezeTables)
     {
       connectionModel->setFrozen(true);
-      serialModel->setFrozen(true);
+      imageModel->setFrozen(true);
       pointModel->setFrozen(true);
     }
     else
     {
       pointModel->setFrozen(false);
-      serialModel->setFrozen(false);
+      imageModel->setFrozen(false);
       connectionModel->setFrozen(false);
     }
   }

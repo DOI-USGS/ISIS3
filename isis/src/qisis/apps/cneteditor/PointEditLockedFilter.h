@@ -10,25 +10,28 @@ namespace Isis
   class ControlPoint;
   class ControlMeasure;
 
-  class PointEditLockedFilter : public AbstractFilter
+  namespace CnetViz
   {
-      Q_OBJECT
+    class PointEditLockedFilter : public AbstractFilter
+    {
+        Q_OBJECT
 
-    public:
-      PointEditLockedFilter(AbstractFilter::FilterEffectivenessFlag flag,
-          int minimumForSuccess = -1);
-      PointEditLockedFilter(const AbstractFilter & other);
-      virtual ~PointEditLockedFilter();
+      public:
+        PointEditLockedFilter(AbstractFilter::FilterEffectivenessFlag flag,
+            int minimumForSuccess = -1);
+        PointEditLockedFilter(const AbstractFilter & other);
+        virtual ~PointEditLockedFilter();
 
-      bool evaluate(const ControlCubeGraphNode *) const;
-      bool evaluate(const ControlPoint *) const;
-      bool evaluate(const ControlMeasure *) const;
+        bool evaluate(const ControlCubeGraphNode *) const;
+        bool evaluate(const ControlPoint *) const;
+        bool evaluate(const ControlMeasure *) const;
 
-      AbstractFilter * clone() const;
+        AbstractFilter * clone() const;
 
-      QString getImageDescription() const;
-      QString getPointDescription() const;
-  };
+        QString getImageDescription() const;
+        QString getPointDescription() const;
+    };
+  }
 }
 
 #endif

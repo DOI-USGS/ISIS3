@@ -1,0 +1,149 @@
+#include "IsisDebug.h"
+
+#include "MeasureTableModel.h"
+
+#include <iostream>
+
+#include <QList>
+#include <QMessageBox>
+#include <QStringList>
+#include <QVariant>
+
+#include "ControlMeasure.h"
+#include "ControlMeasure.h"
+#include "Distance.h"
+#include "iException.h"
+#include "iString.h"
+#include "Latitude.h"
+#include "Longitude.h"
+#include "SpecialPixel.h"
+
+#include "AbstractTableDelegate.h"
+#include "AbstractMeasureItem.h"
+#include "TableColumn.h"
+#include "TableColumnList.h"
+#include "MeasureTableDelegate.h"
+#include "AbstractTreeModel.h"
+
+
+using std::cerr;
+
+
+namespace Isis
+{
+  namespace CnetViz
+  {
+    MeasureTableModel::MeasureTableModel(AbstractTreeModel * model) :
+        AbstractTableModel(model, new MeasureTableDelegate)
+    {
+      connect(model, SIGNAL(filterCountsChanged(int, int)),
+              this, SLOT(calculateFilterCounts()));
+      connect(model,
+              SIGNAL(treeSelectionChanged(QList< AbstractTreeItem * >)),
+              this,
+              SLOT(handleTreeSelectionChanged(QList< AbstractTreeItem * >)));
+    }
+
+
+    MeasureTableModel::~MeasureTableModel()
+    {
+    }
+
+
+    QList< AbstractTreeItem * > MeasureTableModel::getItems(
+        int start, int end)
+    {
+      return getSortedItems(start, end, AbstractTreeModel::MeasureItems);
+    }
+
+
+    QList< AbstractTreeItem * > MeasureTableModel::getItems(
+        AbstractTreeItem * item1, AbstractTreeItem * item2)
+    {
+      return getSortedItems(item1, item2, AbstractTreeModel::MeasureItems);
+    }
+
+
+    int MeasureTableModel::getVisibleRowCount() const
+    {
+      return getDataModel()->getVisibleItemCount(AbstractTreeModel::MeasureItems, true);
+    }
+
+
+    QList< AbstractTreeItem * > MeasureTableModel::getSelectedItems()
+    {
+      return getDataModel()->getSelectedItems(AbstractTreeModel::MeasureItems, true);
+    }
+
+
+    QString MeasureTableModel::getWarningMessage(AbstractTreeItem const * row,
+        TableColumn const * column, QString valueToSave) const
+    {
+      return getMeasureWarningMessage(row, column, valueToSave);
+    }
+
+
+    void MeasureTableModel::setGlobalSelection(bool selected)
+    {
+      return getDataModel()->setGlobalSelection(selected,
+          AbstractTreeModel::MeasureItems);
+    }
+
+
+    void MeasureTableModel::calculateFilterCounts()
+    {
+      int visible =
+        getDataModel()->getVisibleItemCount(AbstractTreeModel::MeasureItems, true);
+      int total = getDataModel()->getItemCount(AbstractTreeModel::MeasureItems);
+
+      emit filterCountsChanged(visible, total);
+    }
+    
+    
+    int MeasureTableModel::indexOfVisibleItem(
+        AbstractTreeItem const * item) const
+    {
+      return getDataModel()->indexOfVisibleItem(item, AbstractTreeModel::MeasureItems,
+                                                true);
+    }
+
+    
+    QString MeasureTableModel::getMeasureWarningMessage(
+        AbstractTreeItem const * row, TableColumn const * column,
+        QString valueToSave)
+    {
+      QString colTitle = column->getTitle();
+      AbstractMeasureItem::Column colType =
+          AbstractMeasureItem::getColumn(colTitle);
+
+      QString warningText;
+
+      if (colType == AbstractMeasureItem::EditLock &&
+          valueToSave.toLower() == "no" &&
+          row->getFormattedData(colTitle).toLower() == "yes")
+      {
+        QString pointColTitle =
+            AbstractMeasureItem::getColumnName(AbstractMeasureItem::PointId);
+        warningText = "Are you sure you want to unlock control measure [" +
+            row->getFormattedData() + "] in point [" +
+            row->getFormattedData(pointColTitle) + "] for editing?";
+      }
+
+      return warningText;
+    }
+    
+    
+    void MeasureTableModel::handleTreeSelectionChanged(
+        QList< AbstractTreeItem * > newlySelectedItems)
+    {
+      AbstractTableModel::handleTreeSelectionChanged(
+          newlySelectedItems, AbstractTreeItem::Measure);
+    }
+
+
+    TableColumnList * MeasureTableModel::createColumns()
+    {
+      return AbstractMeasureItem::createColumns();
+    }
+  }
+}

@@ -1,6 +1,6 @@
 #include "BusyLeafItem.h"
 
-#include <QString>
+#include <QVariant>
 
 #include "iException.h"
 #include "iString.h"
@@ -10,26 +10,29 @@
 
 namespace Isis
 {
-  BusyLeafItem::BusyLeafItem(AbstractTreeItem * parent)
-      : AbstractTreeItem(parent), AbstractNullDataItem()
+  namespace CnetViz
   {
-    calcDataWidth(1);
-  }
+    BusyLeafItem::BusyLeafItem(AbstractTreeItem * parent)
+        : AbstractTreeItem(parent), AbstractNullDataItem()
+    {
+      calcDataWidth(1);
+    }
 
 
-  BusyLeafItem::~BusyLeafItem()
-  {
-  }
+    BusyLeafItem::~BusyLeafItem()
+    {
+    }
 
 
-  QString BusyLeafItem::getData() const
-  {
-    return QString("Working...");
-  }
+    QVariant BusyLeafItem::getData() const
+    {
+      return QVariant("Working...");
+    }
 
 
-  bool BusyLeafItem::isSelectable() const
-  {
-    return false;
+    bool BusyLeafItem::isSelectable() const
+    {
+      return false;
+    }
   }
 }

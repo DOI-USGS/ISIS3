@@ -12,36 +12,39 @@ class QString;
 
 namespace Isis
 {
-  class AbstractFilterSelector;
-
-  class AbstractMultipleChoiceFilter : public AbstractFilter
+  namespace CnetViz
   {
-      Q_OBJECT
+    class AbstractFilterSelector;
 
-    public:
-      AbstractMultipleChoiceFilter(AbstractFilter::FilterEffectivenessFlag,
-          int minimumForSuccess = -1);
-      AbstractMultipleChoiceFilter(const AbstractMultipleChoiceFilter & other);
-      virtual ~AbstractMultipleChoiceFilter();
+    class AbstractMultipleChoiceFilter : public AbstractFilter
+    {
+        Q_OBJECT
 
-      
-    protected:
-      void createWidget(QStringList options);
-      QString const & getCurrentChoice() const;
-      
-      
-    private:
-      void nullify();
-      
-      
-    private slots:
-      void updateCurChoice(QString);
+      public:
+        AbstractMultipleChoiceFilter(AbstractFilter::FilterEffectivenessFlag,
+            int minimumForSuccess = -1);
+        AbstractMultipleChoiceFilter(const AbstractMultipleChoiceFilter & other);
+        virtual ~AbstractMultipleChoiceFilter();
+
+        
+      protected:
+        void createWidget(QStringList options);
+        QString const & getCurrentChoice() const;
+        
+        
+      private:
+        void nullify();
+        
+        
+      private slots:
+        void updateCurChoice(QString);
 
 
-    private:
-      QComboBox * combo;
-      QString * curChoice;
-  };
+      private:
+        QComboBox * combo;
+        QString * curChoice;
+    };
+  }
 }
 
 #endif

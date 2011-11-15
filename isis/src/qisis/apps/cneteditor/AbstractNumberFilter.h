@@ -13,41 +13,43 @@ class QString;
 
 namespace Isis
 {
-  class AbstractFilterSelector;
   class ControlPoint;
   class ControlMeasure;
 
-  class AbstractNumberFilter : public AbstractFilter
+  namespace CnetViz
   {
-      Q_OBJECT
+    class AbstractNumberFilter : public AbstractFilter
+    {
+        Q_OBJECT
 
-    public:
-      AbstractNumberFilter(AbstractFilter::FilterEffectivenessFlag,
-          int minimumForSuccess = -1);
-      AbstractNumberFilter(const AbstractNumberFilter & other);
-      virtual ~AbstractNumberFilter();
-
-
-    protected:
-      bool evaluate(double) const;
-      QString descriptionSuffix() const;
-      bool lessThan() const;
+      public:
+        AbstractNumberFilter(AbstractFilter::FilterEffectivenessFlag,
+            int minimumForSuccess = -1);
+        AbstractNumberFilter(const AbstractNumberFilter & other);
+        virtual ~AbstractNumberFilter();
 
 
-    private:
-      void createWidget();
-      void nullify();
+      protected:
+        bool evaluate(double) const;
+        QString descriptionSuffix() const;
+        bool lessThan() const;
 
 
-    private slots:
-      void updateLineEditText(QString);
+      private:
+        void createWidget();
+        void nullify();
 
 
-    private:
-      QButtonGroup * greaterThanLessThan;
-      QLineEdit * lineEdit;
-      QString * lineEditText;
-  };
+      private slots:
+        void updateLineEditText(QString);
+
+
+      private:
+        QButtonGroup * greaterThanLessThan;
+        QLineEdit * lineEdit;
+        QString * lineEditText;
+    };
+  }
 }
 
 #endif

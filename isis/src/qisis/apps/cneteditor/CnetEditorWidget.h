@@ -15,17 +15,20 @@ class QToolBar;
 
 namespace Isis
 {
-  class AbstractTreeItem;
-  class CnetMeasureTableModel;
-  class CnetPointTableModel;
-  class CnetTableView;
-  class CnetTreeView;
-  class ConnectionModel;
   class ControlNet;
-  class FilterWidget;
-  class PointModel;
-  class PointTableModel;
-  class SerialModel;
+  
+  namespace CnetViz
+  {
+    class AbstractTreeItem;
+    class FilterWidget;
+    class ImageImageTreeModel;
+    class ImagePointTreeModel;
+    class MeasureTableModel;
+    class PointMeasureTreeModel;
+    class PointTableModel;
+    class TableView;
+    class TreeView;
+  }
 
   class CnetEditorWidget : public QWidget
   {
@@ -35,7 +38,7 @@ namespace Isis
       enum View
       {
         PointView,
-        SerialView,
+        ImageView,
         ConnectionView
       };
 
@@ -81,7 +84,8 @@ namespace Isis
 
     private slots:
       void rebuildModels();
-      void rebuildModels(QList< AbstractTreeItem * > itemsToDelete);
+      void rebuildModels(QList< CnetViz::AbstractTreeItem * > itemsToDelete);
+      
       void pointColToggled();
       void measureColToggled();
 
@@ -95,12 +99,12 @@ namespace Isis
 
 
     private: // widgets
-      CnetTreeView * pointTreeView;
-      CnetTreeView * serialTreeView;
-      CnetTreeView * connectionTreeView;
+      CnetViz::TreeView * pointTreeView;
+      CnetViz::TreeView * imageTreeView;
+      CnetViz::TreeView * connectionTreeView;
 
-      CnetTableView * pointTableView;
-      CnetTableView * measureTableView;
+      CnetViz::TableView * pointTableView;
+      CnetViz::TableView * measureTableView;
 
       QScrollArea * filterArea;
 
@@ -108,12 +112,12 @@ namespace Isis
       QWidget * serialFilterWidget;
       QWidget * connectionFilterWidget;
 
-      PointModel * pointModel;
-      SerialModel * serialModel;
-      ConnectionModel * connectionModel;
+      CnetViz::PointMeasureTreeModel * pointModel;
+      CnetViz::ImagePointTreeModel * imageModel;
+      CnetViz::ImageImageTreeModel * connectionModel;
 
-      CnetPointTableModel * pointTableModel;
-      CnetMeasureTableModel * measureTableModel;
+      CnetViz::PointTableModel * pointTableModel;
+      CnetViz::MeasureTableModel * measureTableModel;
 
       QSplitter * topSplitter;
       QSplitter * mainSplitter;

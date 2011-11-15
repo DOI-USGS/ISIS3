@@ -2,29 +2,32 @@
 #define ConnectionParentItem_H
 
 
-#include "AbstractSerialItem.h"
+#include "AbstractImageItem.h"
 #include "AbstractParentItem.h"
 
 
 namespace Isis
 {
   class ControlCubeGraphNode;
-
-  class ConnectionParentItem : public AbstractSerialItem,
-    public AbstractParentItem
+  
+  namespace CnetViz
   {
-    public:
-      ConnectionParentItem(ControlCubeGraphNode * node,
-          int avgCharWidth, AbstractTreeItem * parent = 0);
-      virtual ~ConnectionParentItem();
+    class ConnectionParentItem : public AbstractImageItem,
+                                 public AbstractParentItem
+    {
+      public:
+        ConnectionParentItem(ControlCubeGraphNode * node,
+            int avgCharWidth, AbstractTreeItem * parent = 0);
+        virtual ~ConnectionParentItem();
 
-      void addChild(AbstractTreeItem * child);
+        void addChild(AbstractTreeItem * child);
 
 
-    private: // Disallow copying of this class
-      ConnectionParentItem(const ConnectionParentItem &);
-      const ConnectionParentItem & operator=(const ConnectionParentItem &);
-  };
+      private: // Disallow copying of this class
+        ConnectionParentItem(const ConnectionParentItem &);
+        const ConnectionParentItem & operator=(const ConnectionParentItem &);
+    };
+  }
 }
 
 #endif

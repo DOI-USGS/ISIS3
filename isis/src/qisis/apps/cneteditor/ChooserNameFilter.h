@@ -9,29 +9,32 @@ class QString;
 
 namespace Isis
 {
-  class AbstractFilterSelector;
   class ControlPoint;
   class ControlMeasure;
 
-  class ChooserNameFilter : public AbstractStringFilter
+  namespace CnetViz
   {
-      Q_OBJECT
+    class AbstractFilterSelector;
+    class ChooserNameFilter : public AbstractStringFilter
+    {
+        Q_OBJECT
 
-    public:
-      ChooserNameFilter(AbstractFilter::FilterEffectivenessFlag,
-          int minimumForSuccess = -1);
-      ChooserNameFilter(const ChooserNameFilter & other);
-      virtual ~ChooserNameFilter();
+      public:
+        ChooserNameFilter(AbstractFilter::FilterEffectivenessFlag,
+            int minimumForSuccess = -1);
+        ChooserNameFilter(const ChooserNameFilter & other);
+        virtual ~ChooserNameFilter();
 
-      bool evaluate(const ControlCubeGraphNode *) const;
-      bool evaluate(const ControlPoint *) const;
-      bool evaluate(const ControlMeasure *) const;
+        bool evaluate(const ControlCubeGraphNode *) const;
+        bool evaluate(const ControlPoint *) const;
+        bool evaluate(const ControlMeasure *) const;
 
-      AbstractFilter * clone() const;
+        AbstractFilter * clone() const;
 
-      QString getImageDescription() const;
-      QString getPointDescription() const;
-  };
+        QString getImageDescription() const;
+        QString getPointDescription() const;
+    };
+  }
 }
 
 #endif

@@ -5,27 +5,30 @@
 
 namespace Isis
 {
-  RootItem::RootItem() : AbstractTreeItem(NULL), AbstractNullDataItem()
+  namespace CnetViz
   {
-    lastVisibleFilteredItem = NULL;
-    setExpanded(true);
-  }
+    RootItem::RootItem() : AbstractTreeItem(NULL), AbstractNullDataItem()
+    {
+      lastVisibleFilteredItem = NULL;
+      setExpanded(true);
+    }
 
 
-  RootItem::~RootItem()
-  {
-    lastVisibleFilteredItem = NULL;
-  }
+    RootItem::~RootItem()
+    {
+      lastVisibleFilteredItem = NULL;
+    }
 
 
-  void RootItem::setLastVisibleFilteredItem(AbstractTreeItem * item)
-  {
-    lastVisibleFilteredItem = item;
-  }
+    void RootItem::setLastVisibleFilteredItem(AbstractTreeItem * item)
+    {
+      lastVisibleFilteredItem = item;
+    }
 
 
-  const AbstractTreeItem * RootItem::getLastVisibleFilteredItem() const
-  {
-    return lastVisibleFilteredItem;
+    const AbstractTreeItem * RootItem::getLastVisibleFilteredItem() const
+    {
+      return lastVisibleFilteredItem;
+    }
   }
 }

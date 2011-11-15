@@ -2,27 +2,31 @@
 
 #include "ConnectionParentItem.h"
 
-#include "SerialParentItem.h"
+#include "ImageParentItem.h"
 
 
 namespace Isis
 {
-  ConnectionParentItem::ConnectionParentItem(ControlCubeGraphNode * node,
-      int avgCharWidth, AbstractTreeItem * parent)
-    : AbstractTreeItem(parent), AbstractSerialItem(node, avgCharWidth)
+  namespace CnetViz
   {
-  }
+    ConnectionParentItem::ConnectionParentItem(ControlCubeGraphNode * node,
+        int avgCharWidth, AbstractTreeItem * parent)
+        : AbstractTreeItem(parent), AbstractImageItem(node, avgCharWidth)
+    {
+    }
 
 
-  ConnectionParentItem::~ConnectionParentItem()
-  {
-  }
+    ConnectionParentItem::~ConnectionParentItem()
+    {
+    }
 
 
-  void ConnectionParentItem::addChild(AbstractTreeItem * child)
-  {
-    // Only SerialParentItems should be children of ConnectionParentItems
-    ASSERT(dynamic_cast< SerialParentItem * >(child));
-    AbstractParentItem::addChild(child);
+    void ConnectionParentItem::addChild(AbstractTreeItem * child)
+    {
+      // Only ImageParentItems should be children of ConnectionParentItems
+      ASSERT(dynamic_cast< ImageParentItem * >(child));
+      
+      AbstractParentItem::addChild(child);
+    }
   }
 }

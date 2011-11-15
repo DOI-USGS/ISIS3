@@ -7,27 +7,30 @@
 
 namespace Isis
 {
-  class AbstractFilter;
-
-  class PointMeasureFilterSelector : public AbstractFilterSelector
+  namespace CnetViz
   {
-      Q_OBJECT
+    class AbstractFilter;
 
-    public:
-      PointMeasureFilterSelector();
-      PointMeasureFilterSelector(const PointMeasureFilterSelector & other);
-      virtual ~PointMeasureFilterSelector();
-      PointMeasureFilterSelector & operator=(
-        const PointMeasureFilterSelector & other);
+    class PointMeasureFilterSelector : public AbstractFilterSelector
+    {
+        Q_OBJECT
+
+      public:
+        PointMeasureFilterSelector();
+        PointMeasureFilterSelector(const PointMeasureFilterSelector & other);
+        virtual ~PointMeasureFilterSelector();
+        PointMeasureFilterSelector & operator=(
+            const PointMeasureFilterSelector & other);
 
 
-    protected:
-      void createSelector();
+      protected:
+        void createSelector();
 
 
-    protected: // slots (already marked as slots inside parent)
-      void changeFilter(int);
-  };
+      protected: // slots (already marked as slots inside parent)
+        void changeFilter(int);
+    };
+  }
 }
 
 #endif

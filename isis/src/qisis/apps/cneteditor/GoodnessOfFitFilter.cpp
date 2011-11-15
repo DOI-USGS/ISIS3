@@ -10,76 +10,79 @@
 
 namespace Isis
 {
-  GoodnessOfFitFilter::GoodnessOfFitFilter(
-    AbstractFilter::FilterEffectivenessFlag flag,
-    int minimumForSuccess) : AbstractNumberFilter(flag, minimumForSuccess)
+  namespace CnetViz
   {
-  }
-
-
-  GoodnessOfFitFilter::GoodnessOfFitFilter(
-    const GoodnessOfFitFilter & other) : AbstractNumberFilter(other)
-  {
-  }
-
-
-  GoodnessOfFitFilter::~GoodnessOfFitFilter()
-  {
-  }
-
-
-  bool GoodnessOfFitFilter::evaluate(const ControlCubeGraphNode * node) const
-  {
-    return evaluateImageFromMeasureFilter(node);
-  }
-
-
-  bool GoodnessOfFitFilter::evaluate(const ControlPoint * point) const
-  {
-    return evaluatePointFromMeasureFilter(point);
-  }
-
-
-  bool GoodnessOfFitFilter::evaluate(const ControlMeasure * measure) const
-  {
-    double goodness = Null;
-    if (measure->HasLogData(ControlMeasureLogData::GoodnessOfFit))
+    GoodnessOfFitFilter::GoodnessOfFitFilter(
+      AbstractFilter::FilterEffectivenessFlag flag,
+      int minimumForSuccess) : AbstractNumberFilter(flag, minimumForSuccess)
     {
-      goodness = measure->GetLogData(
-          ControlMeasureLogData::GoodnessOfFit).GetNumericalValue();
     }
 
-    return AbstractNumberFilter::evaluate(goodness);
-  }
+
+    GoodnessOfFitFilter::GoodnessOfFitFilter(
+      const GoodnessOfFitFilter & other) : AbstractNumberFilter(other)
+    {
+    }
 
 
-  AbstractFilter * GoodnessOfFitFilter::clone() const
-  {
-    return new GoodnessOfFitFilter(*this);
-  }
+    GoodnessOfFitFilter::~GoodnessOfFitFilter()
+    {
+    }
 
 
-  QString GoodnessOfFitFilter::getImageDescription() const
-  {
-    QString description = AbstractFilter::getImageDescription();
-    if (getMinForSuccess() == 1)
-      description += "measure that has a goodness of fit which is ";
-    else
-      description += "measures that have goodness of fits which are ";
-
-    description += descriptionSuffix();
-    return description;
-  }
+    bool GoodnessOfFitFilter::evaluate(const ControlCubeGraphNode * node) const
+    {
+      return evaluateImageFromMeasureFilter(node);
+    }
 
 
-  QString GoodnessOfFitFilter::getPointDescription() const
-  {
-    return getImageDescription();
-  }
+    bool GoodnessOfFitFilter::evaluate(const ControlPoint * point) const
+    {
+      return evaluatePointFromMeasureFilter(point);
+    }
 
 
-  QString GoodnessOfFitFilter::getMeasureDescription() const
-  {
-    return "that have goodness of fits which are " + descriptionSuffix();
+    bool GoodnessOfFitFilter::evaluate(const ControlMeasure * measure) const
+    {
+      double goodness = Null;
+      if (measure->HasLogData(ControlMeasureLogData::GoodnessOfFit))
+      {
+        goodness = measure->GetLogData(
+            ControlMeasureLogData::GoodnessOfFit).GetNumericalValue();
+      }
+
+      return AbstractNumberFilter::evaluate(goodness);
+    }
+
+
+    AbstractFilter * GoodnessOfFitFilter::clone() const
+    {
+      return new GoodnessOfFitFilter(*this);
+    }
+
+
+    QString GoodnessOfFitFilter::getImageDescription() const
+    {
+      QString description = AbstractFilter::getImageDescription();
+      if (getMinForSuccess() == 1)
+        description += "measure that has a goodness of fit which is ";
+      else
+        description += "measures that have goodness of fits which are ";
+
+      description += descriptionSuffix();
+      return description;
+    }
+
+
+    QString GoodnessOfFitFilter::getPointDescription() const
+    {
+      return getImageDescription();
+    }
+
+
+    QString GoodnessOfFitFilter::getMeasureDescription() const
+    {
+      return "that have goodness of fits which are " + descriptionSuffix();
+    }
   }
 }

@@ -6,26 +6,29 @@
 
 
 class QString;
+class QVariant;
 
 
 namespace Isis
 {
-  class BusyLeafItem : public AbstractNullDataItem, public AbstractLeafItem
+  namespace CnetViz
   {
-      Q_OBJECT
-    
-    public:
-      BusyLeafItem(AbstractTreeItem * parent = 0);
-      virtual ~BusyLeafItem();
-      virtual QString getData() const;
-      virtual bool isSelectable() const;
+    class BusyLeafItem : public AbstractNullDataItem, public AbstractLeafItem
+    {
+        Q_OBJECT
       
+      public:
+        BusyLeafItem(AbstractTreeItem * parent = 0);
+        virtual ~BusyLeafItem();
+        virtual QVariant getData() const;
+        virtual bool isSelectable() const;
+        
 
-    private: // Disallow copying of this class
-      BusyLeafItem(const BusyLeafItem & other);
-      const BusyLeafItem & operator=(const BusyLeafItem & other);
-  };
+      private: // Disallow copying of this class
+        BusyLeafItem(const BusyLeafItem & other);
+        const BusyLeafItem & operator=(const BusyLeafItem & other);
+    };
+  }
 }
 
 #endif
-

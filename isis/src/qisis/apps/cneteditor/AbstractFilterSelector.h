@@ -16,69 +16,72 @@ class QReadWriteLock;
 
 namespace Isis
 {
-  class AbstractFilter;
   class ControlCubeGraphNode;
   class ControlMeasure;
   class ControlPoint;
 
-  class AbstractFilterSelector : public QWidget
+  namespace CnetViz
   {
-      Q_OBJECT
+    class AbstractFilter;
 
-    signals:
-      void close(AbstractFilterSelector *);
-      void filterChanged();
-      void sizeChanged();
+    class AbstractFilterSelector : public QWidget
+    {
+        Q_OBJECT
 
-
-    public:
-      AbstractFilterSelector();
-      virtual ~AbstractFilterSelector();
-
-      template< typename Evaluatable >
-      bool evaluate(const Evaluatable * evaluatable) const
-      {
-        return filter && filter->evaluate(evaluatable);
-      }
-
-      bool hasFilter() const;
-      bool hasFilter(bool (AbstractFilter::*)() const) const;
-
-      QString getDescription(QString(AbstractFilter::*)() const) const;
-
-      AbstractFilterSelector & operator=(const AbstractFilterSelector & other);
+      signals:
+        void close(AbstractFilterSelector *);
+        void filterChanged();
+        void sizeChanged();
 
 
-    public slots:
-      void sendClose();
+      public:
+        AbstractFilterSelector();
+        virtual ~AbstractFilterSelector();
+
+        template< typename Evaluatable >
+        bool evaluate(const Evaluatable * evaluatable) const
+        {
+          return filter && filter->evaluate(evaluatable);
+        }
+
+        bool hasFilter() const;
+        bool hasFilter(bool (AbstractFilter::*)() const) const;
+
+        QString getDescription(QString(AbstractFilter::*)() const) const;
+
+        AbstractFilterSelector & operator=(const AbstractFilterSelector & other);
 
 
-    protected:
-      void nullify();
-      virtual void createSelector();
-      QComboBox * getSelector() const;
-      QHBoxLayout * getMainLayout() const;
-      AbstractFilter * getFilter() const;
-      void setFilter(AbstractFilter *);
+      public slots:
+        void sendClose();
 
 
-    protected slots:
-      virtual void changeFilter(int index) = 0;
-      virtual void deleteFilter();
+      protected:
+        void nullify();
+        virtual void createSelector();
+        QComboBox * getSelector() const;
+        QHBoxLayout * getMainLayout() const;
+        AbstractFilter * getFilter() const;
+        void setFilter(AbstractFilter *);
 
 
-      // disable copying of this class which can't exist anyway ....uhhuh...yeah
-    private:
-      AbstractFilterSelector(const AbstractFilterSelector & other);
+      protected slots:
+        virtual void changeFilter(int index) = 0;
+        virtual void deleteFilter();
 
 
-    private:
-      QComboBox * selector;
-      QHBoxLayout * mainLayout;
-      QPushButton * closeButton;
-      AbstractFilter * filter;
-  };
+        // disable copying of this class which can't exist anyway ....uhhuh...yeah
+      private:
+        AbstractFilterSelector(const AbstractFilterSelector & other);
+
+
+      private:
+        QComboBox * selector;
+        QHBoxLayout * mainLayout;
+        QPushButton * closeButton;
+        AbstractFilter * filter;
+    };
+  }
 }
 
 #endif
-

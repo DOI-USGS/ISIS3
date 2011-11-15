@@ -11,21 +11,24 @@ class QVariant;
 namespace Isis
 {
   class ControlPoint;
-
-  class PointParentItem : public AbstractPointItem, public AbstractParentItem
+  
+  namespace CnetViz
   {
-    public:
-      PointParentItem(ControlPoint * cp, int avgCharWidth,
-          AbstractTreeItem * parent = 0);
-      virtual ~PointParentItem();
+    class PointParentItem : public AbstractPointItem, public AbstractParentItem
+    {
+      public:
+        PointParentItem(ControlPoint * cp, int avgCharWidth,
+            AbstractTreeItem * parent = 0);
+        virtual ~PointParentItem();
 
-      void addChild(AbstractTreeItem * child);
+        void addChild(AbstractTreeItem * child);
 
 
-    private: // Disallow copying of this class
-      PointParentItem(const PointParentItem & other);
-      const PointParentItem & operator=(const PointParentItem & other);
-  };
+      private: // Disallow copying of this class
+        PointParentItem(const PointParentItem & other);
+        const PointParentItem & operator=(const PointParentItem & other);
+    };
+  }
 }
 
 #endif
