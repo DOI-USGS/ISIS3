@@ -22,9 +22,10 @@
 
     <p>
       Most often the input control point network (CNET) contains
-      <def>a priori</def> sample and line positions based on the original
-      <def>SPICE</def> of the images.  For creating an initial control network,
-      refer to applications such as "autoseed", "seedgrid" and/or "qnet".   
+      <def>A priori</def>  <def>sample</def> and <def>line</def> positions based 
+      on the original <def>SPICE</def> of the images.  For creating an initial 
+      control network, refer to applications such as "autoseed", "seedgrid" 
+      and/or "qnet".   
     </p>
 
     <p>
@@ -43,15 +44,14 @@
     </p>
 
     <p>
-      For every <def>control point</def> within the input network, there are
-      <def link="Control Measure">control measures</def>.  For every point in
-      the network, there is always one and only one associated "reference"
-      measure, either set explicitly or chosen at runtime implicitly.  Explicit
-      references are chosen and defined as such either manually by users
-      ("qnet") or automatically with an interest operator ("cnetref").  Implicit
-      references are determined when no explicit reference is set for a point.
-      In such a case, the control point will provide its first valid
-      (Ignore=False) measure to act as the reference.
+      For every control point within the input network, there are control measures.  
+      For each control point there is always one and only one associated 
+      <def link="Reference Measure">reference measure</def>, either set explicitly 
+      or chosen at runtime implicitly.  Explicit references are chosen and defined 
+      as such either manually by users ("qnet") or automatically with an interest 
+      operator ("cnetref").  Implicit references are determined when no explicit 
+      reference is set for a point. In such a case, the control point will provide 
+      its first valid (Ignore=False) measure to act as the reference.
     </p>
 
     <p>
@@ -63,15 +63,15 @@
 
     <p>
       With every successful subpixel registration for each control measure, the
-      Sample and Line fields within the output control network are updated with
-      the resulting subpixel coordinates.  Note that the reference measure
-      coordinates are "fixed" while the coordinates of the remaining measures
-      are adjusted based on the pattern matching output.  The a priori
-      <def>sample</def> and <def>line</def> fields are assigned the original
-      starting input pixel coordinates.  Applications such as "qnet", will
-      report the sample and line shift as a result of "pointreg".  "Pointreg"
-      will also update the control network with the pattern match coefficient
-      results such as minimum and maximum "pixel z-score" and "goodness of fit".
+      sample and line values within the output control network 
+      are updated with the resulting subpixel coordinates.  Note that the reference 
+      measure coordinates are "fixed" while the coordinates of the remaining measures
+      are adjusted based on the pattern matching output.  The a priori sample and 
+      line fields are assigned the original starting input pixel coordinates.  
+      Applications such as "qnet", will report the sample and line shift as a result 
+      of "pointreg".  "Pointreg" will also update the control network with the 
+      pattern match coefficient results such as minimum and maximum "pixel z-score" 
+      and "goodness of fit".
     </p>
 
     <p>
