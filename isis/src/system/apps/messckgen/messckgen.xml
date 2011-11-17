@@ -29,7 +29,7 @@
           Input CK kernel.xxxx.db file
         </brief>
         <description>
-          The CK PVL group db file used to generate the new DB file. Defaulted
+          The CK PVL group DB file used to generate the new DB file. Defaulted
           to use $ISIS3DATA/messenger/kernels/ck/kernels.????.db.  This file is
           primarily used to extract formatting and old groups that need to be
           updated and transferred to the new CK DB file.

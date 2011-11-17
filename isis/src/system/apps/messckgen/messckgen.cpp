@@ -14,7 +14,9 @@
 #include "iTime.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
-#include "TextFile.h"
+#include "PvlKeyword.h"
+#include "PvlObject.h"
+
 
 using namespace Isis;
 using std::string;
@@ -132,7 +134,7 @@ void IsisMain() {
             }
           }
 
-          // Remove the trailiung " TDB" as it confuses the time conversion
+          // Remove the trailing " TDB" as it confuses the time conversion
           string newEnd = pivotEndRaw.toStdString();
           pivotEndRaw.remove(QRegExp(" TDB$"));
           string pivotEnd = pivotEndRaw.toStdString();
@@ -247,7 +249,7 @@ void IsisMain() {
     outDBfile.NewVersion();
   }
 
-  // Write the updated PVL as the new PCK DB file
+  // Write the updated PVL as the new CK DB file
   kernelDb.Write(outDBfile.Expanded());
 }
 
