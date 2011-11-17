@@ -257,6 +257,10 @@ THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/postgresql*/libpq.*dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/mysql5/mysql/libmysqlclient_r*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libkdu_a63R.dylib"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libsuperlu_3.0.dylib"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libamd.dylib"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libcholmod.dylib"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libcolamd.dylib"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libufconfig.dylib"
 THIRDPARTYLIBS    += "/System/Library/Frameworks/Accelerate.framework"
 
 # libxerces-c depends on these libraries
