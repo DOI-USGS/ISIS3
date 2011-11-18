@@ -129,7 +129,11 @@ void gatherAverages(Buffer &in) {
 
 void apply(Buffer &in, Buffer &out) {
   for(int sample = 0; sample < in.size(); sample ++) {
-    out[sample] = in[sample] * cubeAverage[in.Band() - 1] / lineAverages[in.Band() - 1][in.Line() - 1];
+
+    if (!Isis::IsSpecial(in[sample]))    
+      out[sample] = in[sample] * cubeAverage[in.Band() - 1] / lineAverages[in.Band() - 1][in.Line() - 1];
+    else
+      out[sample] = in[sample];
   }
 }
 
