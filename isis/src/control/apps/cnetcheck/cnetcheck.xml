@@ -7,15 +7,37 @@
   </brief>
 
   <description>
-    This program checks for the validity of a <def>control network</def> in a
-    user-defined input cube list. Its primary function is to check and find
-    "islands" in the control network.  These islands are then written to
-    separate files, which list the cubes and their corresponding serial numbers.
-    If a serial number's cube is not listed in the input list, then that cube
-    will NOT be listed within the appropriate island file. If an island file is
-    missing altogether, it is due to the fact that all of that island's cubes
-    were not listed in the input list.  All program output files are created in
-    the working directory where cnetcheck is initiated.
+    <p>
+      This program checks for the validity of a <def>Control Network</def>.  It
+      is recommended to run cnetcheck before running jigsaw (can use the same
+      input image cube list and control network) in order to catch a choice of
+      potential issues with the control network and the corresponding input
+      image cube list.  
+    </p>
+    <p>
+      The default primary function of cnetcheck is to idenify any
+      <def link="Control Islands">Islands</def> within the control network
+      (CNET).  Each identified 'Island' will have an output file associated with
+      it ("PREFIX"_Island.#, where #=sequential number id).  The output Island
+      files contain the list of images connected together as a group, the file
+      includes the cube filenames and corresponding
+      <def link="Serial Number">serial numbers</def>.
+    </p>
+    <p>
+      NOTE1: If a serial number is identified as a single image island and the
+      corresponding image cube file name is not listed within the FROMLIST, then
+      the image cube filename will not be included in the appropriate island
+      file.
+    </p>
+    <p>
+      NOTE2: If it is discovered that a known island is missing an output island
+      file (i.e., output list not created as expected), it is possible that the
+      image cube file name(s) were not listed in the input list (FROMLIST).  
+    </p>
+    <p>
+      All output files are created in the working directory where cnetcheck is
+      initiated.
+    </p>
   </description>
 
   <history>
@@ -82,126 +104,135 @@
     <change name="Travis Addair" date="2011-08-10">
       Added LOWCOVERAGE option to make convex hull check optional.
     </change>
+    <change name="Tammy Becker" date="2011-11-17">
+      Modified documentation and changed Tolerance default from 0.0 to 1.0.
+    </change>
   </history>
 
   <category>
     <categoryItem>Control Networks</categoryItem>
   </category>
-  
+
   <groups>
     <group name="Input Files">
       <parameter name="FROMLIST">
-          <type>filename</type>
-          <fileMode>input</fileMode>
-          <brief>
-            List of ISIS3 input cubes in the Control Network
-          </brief>
-          <description>
-          A text file containing one column of ISIS3 cube file names. Every file
-          used in the match point file should be represented in this list.
-          </description>
-          <filter>
-            *.txt *.lis *.list
-          </filter>
-        </parameter>
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          List of input cube file names in the Control Network
+        </brief>
+        <description>
+          A text file containing one column of ISIS3 image cube file names.
+          Every image cube file used in the control network should be included
+          in this list.  The input images are required to be a <def>Level0</def>
+          or <def>Level1</def> cube with a successful 'spiceinit' applied
+          previously. 
+        </description>
+        <filter>
+          *.txt *.lis *.list
+        </filter>
+      </parameter>
 
-        <parameter name="CNET">
-          <type>filename</type>
-          <fileMode>input</fileMode>
-          <brief>
-             Isis3 input Control Network file
-          </brief>
-          <description>
-            Use this parameter to specify the control network file containing
-            the information to be validated
-            </description>
-          <filter>
-            *.net
-          </filter>
-        </parameter>
+      <parameter name="CNET">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input Control Network file
+        </brief>
+        <description>
+          Use this parameter to specify the input Control Network file for
+          validation.
+        </description>
+        <filter>
+          *.net
+        </filter>
+      </parameter>
 
     </group>
 
     <group name="Output Options">
 
       <parameter name="DELIMIT">
-          <type>string</type>
-          <brief>
-              The character to be inserted between file entries
-          </brief>
-          <description>
-              This option will determine which character will be used to
-              separate file entries, with the default option as a tab.
-              The other options are comma, to separate with a single
-              space, or "OTHER," which allows the user to input whatever
-              they wish as the delimiter character.
-          </description>
-          <default><item>TAB</item></default>
-          <list>
-            <option value="TAB">
-                <brief>Separate with tabs</brief>
-                <description>
-                    This option will cause the file entries to be
-                    separated by tabs.
-                </description>
-                <exclusions>
-                    <item>CUSTOM</item>
-                </exclusions>
-            </option>
-              <option value="COMMA">
-                  <brief>Separate with commas</brief>
-                  <description>
-                      This option will cause the file entries to be
-                      separated by commas.
-                  </description>
-                  <exclusions>
-                      <item>CUSTOM</item>
-                  </exclusions>
-              </option>
-              <option value="SPACE">
-                  <brief>Separate with spaces</brief>
-                  <description>
-                      This option will cause the file entries to be
-                      separated by single space when output.
-                  </description>
-                  <exclusions>
-                      <item>CUSTOM</item>
-                  </exclusions>
-              </option>
-              <option value="OTHER">
-                  <brief>Separate with user-defined characters</brief>
-                  <description>
-                      This option allows the user to determine what
-                      character is used to separate entries. When this
-                      option is selected, the CUSTOM parameter is used
-                      to determine what will be used. Whatever string the
-                      user enters will be used in between the entries.
-                  </description>
-                  <inclusions>
-                      <item>CUSTOM</item>
-                  </inclusions>
-              </option>
-          </list>
+        <type>string</type>
+        <brief>
+          The character to be inserted between output file field entries
+        </brief>
+        <description>
+          This option determines which character will be used to separate 
+          the output file field entries, with the default option as a tab.
+          Other options are comma, single space, or "OTHER," which allows 
+          the user to input whatever they wish as the delimiter character.
+        </description>
+        <default><item>TAB</item></default>
+        <list>
+          <option value="TAB">
+            <brief>Separate with tabs</brief>
+            <description>
+              This option will cause the output file field entries to be
+              separated by tabs.
+            </description>
+            <exclusions>
+              <item>CUSTOM</item>
+            </exclusions>
+          </option>
+          <option value="COMMA">
+            <brief>Separate with commas</brief>
+            <description>
+              This option will cause the output file field entries to be
+              separated by commas.
+            </description>
+            <exclusions>
+              <item>CUSTOM</item>
+            </exclusions>
+          </option>
+          <option value="SPACE">
+            <brief>Separate with spaces</brief>
+            <description>
+              This option will cause the output file field entries to be
+              separated by single 'white' space.
+            </description>
+            <exclusions>
+              <item>CUSTOM</item>
+            </exclusions>
+          </option>
+          <option value="OTHER">
+            <brief>Separate with user-defined characters</brief>
+            <description>
+              This option allows the user to determine what
+              character is used to separate field entries. When this
+              option is selected, the CUSTOM parameter contains the
+              user-defined string that will be used between the output
+              file field entries.
+            </description>
+            <inclusions>
+              <item>CUSTOM</item>
+            </inclusions>
+          </option>
+        </list>
       </parameter>
       <parameter name="CUSTOM">
-          <type>string</type>
-          <brief>User-defined delimiter</brief>
-          <description>
-              This parameter is only used if the user has selected "OTHER"
-              as a delimiter. The user then enters something into this
-              parameter to use as a delimiter.
-          </description>
+        <type>string</type>
+        <brief>User-defined delimiter</brief>
+        <description>
+          This parameter is only used if the user has selected "OTHER"
+          as a delimiter. The user enters a string into this
+          parameter to use as the output delimiter.
+        </description>
       </parameter>
 
       <parameter name="PREFIX">
         <type>string</type>
         <fileMode>output</fileMode>
         <brief>
-          Outputs results
+          Output result filename prefix
         </brief>
         <description>
-	        The result of the validity check is placed in output files with the 
-          given prefix.
+          The results of the validity check are placed in output file names with
+          the given prefix.            
+          <p>
+            For example, PREFIX=CHK_, will result in an output filename
+            CHK_Island.1 or CHK_NoControl.txt
+          </p>
         </description>
       </parameter>
 
@@ -209,12 +240,21 @@
         <type>boolean</type>
         <default><item>True</item></default>
         <brief>
-          Ignores ignored Control Points when checking the Control Net
+          Disregard 'Ignored' Control Points when checking the Control Network
         </brief>
         <description>
-  	       When true, all ignored Control Points and all ignored Control
-           Measures provided by the Control Net will be discarded during
-           calculations.
+          When Ignore=TRUE, any <def link="Control Point">control points</def>
+          and <def link="Control Measures">control measures</def> that are
+          flagged as invalid within the network (IGNORE=TRUE), are NOT
+          considered links across images/groups when identifying islands.  
+          <p>
+            Ignore=TRUE is the default for consistency with other apps, such as
+            jigsaw, that do NOT consider invalid points or measures.
+          </p>
+          <p>
+            When Ignore=FALSE, all valid and invalid control points and control
+            measures are considered for links between images and groups.
+          </p>
         </description>
       </parameter>
     </group>
@@ -227,10 +267,19 @@
           Check for images in the FROMLIST that are not in the Control Net
         </brief>
         <description>
-  	       When true, a file named [PREFIX]NoMatch.txt will be created, which 
-           will list all of the cubes, and their corresponding Serial Number 
-           which do not exist within the provided Control Net.  If there are no 
-           such cubes, then no file is created.
+          NOCONTROL=True, given the input image cube file name list (FROMLIST),
+          any files (and their corresponding <def>serial number</def>) that are
+          not found in the input control network (CNET) are considered images
+          without control.  These filenames and serial numbers will be listed in
+          the output file named [PREFIX]NoControl.txt (with a field delimiter
+          [DELIMIT]).  
+          <p>
+            No output file will be created if all images are controlled.  
+          </p>
+          <p>
+            NOCONTROL=False will turn off this testing of images without
+            control.
+          </p>
         </description>
       </parameter>
 
@@ -238,13 +287,21 @@
         <type>boolean</type>
         <default><item>True</item></default>
         <brief>
-          Checks for images in the Control Net that are not in the FROMLIST
+          Checks for images in the Control Network that are not in the FROMLIST
         </brief>
         <description>
-            When true, a file named [PREFIX]NoCube.txt will be created, which 
-            will list all of the Serial Numbers in the given Control Net which 
-            do not have a corresponding Cube in the proveded List.  If there are 
-            no such Serial Numbers, then no file is created.
+          NOCUBE=True, an output file named [PREFIX]NoCube.txt will be created,
+          which will list all <def link="Serial Number">serial numbers</def>
+          encountered in the input Control Network (CNET) that do not have a
+          corresponding image cube file name in the provided list (FROMLIST).             
+          <p>
+            No output file will be created if all serial numbers match to an 
+            image cube file name.  
+          </p>
+          <p>
+            NOCUBE=False will turn off the testing for matching serial number 
+            and input image file names.
+          </p>
         </description>
       </parameter>
 
@@ -255,10 +312,18 @@
           Check for Control Points that contain only a single Control Measure
         </brief>
         <description>
-          When true, a file named [PREFIX]SinglePointCubes.txt will be created, 
-          which will list all of the Cubes which exist as a single Control 
-          Measure in any Control Point within the provided Control Net.  If there 
-          are no such single Control Measures, then no file is created.
+          SINGLEMEASURE=True, a file named [PREFIX]SinglePointCubes.txt will be
+          created, which will list all image cube file names that exist as the
+          single Control Measure in any Control Point within the provided
+          Control Network.  
+          <p>
+            Note: In general and when possible, a control point should have more 
+            than one control measures (more than three).
+          </p>
+          <p>
+            If there are no such single Control Measures, then no file is
+            created.
+          </p>
         </description>
       </parameter>
 
@@ -269,10 +334,18 @@
           Check for Control Points containing same image in multiple Measures
         </brief>
         <description>
-          When true, a file named [PREFIX]DuplicateMeasures.txt will be created, 
-          which will list all of the cubes which exist in more than one Control 
-          Measure in a single Control Point within the provided Control Net.  If 
-          there are no such duplicate Control Measures, then no file is created.
+          When true, a file named [PREFIX]DuplicateMeasures.txt will be created,
+          which will list all image cube filenames that exist in more than one
+          Control Measure in a single Control Point.
+          <p>
+            Images under this scenario must be resolved before running jigsaw.
+            A single image must not have more than one measure to the same
+            control point.
+          </p>  
+          <p>
+            If there are no such duplicate Control Measures, then no file is
+            created.
+          </p>
         </description>
       </parameter>
 
@@ -280,13 +353,22 @@
         <type>boolean</type>
         <default><item>True</item></default>
         <brief>
-          Check for images referenced by only a single Control Measure
+          Check for images that are measured to only one Control Point
         </brief>
         <description>
           When true, a file named [PREFIX]SingleCubes.txt will be created, 
-          which will list all of the Cubes which exist in only a single Control 
-          Measure within the entire Control Net.  If there 
-          are no such single Cubes, then no file is created.
+          that will list all image cube filenames that are measured to only 
+          one control point.
+          <p>
+            These images would have a convex hull value near zero, meaning there
+            are not enough control points.  Where possible, any image should
+            have measures to multiple control points along the image plane
+            boundaries (convex hull value near 1.0 for a full distribution).
+            Refer to the Tolerance parameter for a distrubution test.
+          </p>
+          <p>
+            If there are no such single Cubes, then no file is created.
+          </p> 
         </description>
       </parameter>
 
@@ -298,13 +380,22 @@
         </brief>
         <description>
           When true, a file named [PREFIX]NoLatLon.txt will be created, which
-          will list all of the serial numbers which are within the given Control
-          Net and listed in the input list which cannot compute a latitude and
-          longitude.  These serial numbers will be followed by the Control Point
-          IDs in which they could not compute their latitudes and longitudes.
-          If there are no such serial numbers, then no file is created.
+          will list all Serial Numbers within the given Control Network and
+          FROMLIST which a latitude and longitude value cannot be computed at
+          their respective image measure coordinate.  
+          <p>
+            These identified Serial Numbers and image cube filenames will be
+            followed by the Control Point IDs where the latitude and longitude
+            could not be computed at the associated measures.
+          </p>
 
-          Only cubes in both the FROMLIST and CNET are checked.
+          <p>
+            If there are no such serial numbers, then no file is created.
+          </p>
+
+          <p>
+            Only image cubes included in both the FROMLIST and CNET are checked.
+          </p>
         </description>
       </parameter>
 
@@ -312,28 +403,30 @@
         <type>boolean</type>
         <default><item>True</item></default>
         <brief>
-          Check for images whose convex hull coverages are below given TOLERANCE
+          Check for the distribution of Control Points across each image
         </brief>
         <description>
           <p>
-            A convex hull is constructed from all Control Measures falling on
-            the image in "image space".  The purpose of the convex hull is to
-            give a rough estimation of how much a given image is "covered" by
-            the Control Points in a Control Network.  By enabling this option, a
-            file named [PREFIX]LowCoverage.txt will be created containing all
-            images (with corresponding serial numbers) whose convex hull
-            coverage is less than the given user-specified TOLERANCE.  A third
-            column will also be output, showing the actual coverage value that
-            failed this test for the given image.
+            The main purpose of this test is to isolate the images that have an
+            insufficient distribution of control point measures.  This is
+            performed by constructing a convex hull from all Control Measures
+            located on the image in "image pixel space".  The convex hull gives
+            a rough estimation of the distributed coverage of Control Points in
+            the input control network across each image.  By enabling this
+            option, a file named [PREFIX]LowCoverage.txt will be created
+            containing all images (with corresponding serial numbers) whose
+            convex hull coverage is less than the given user-specified
+            TOLERANCE.  A third column will also be output, showing the actual
+            coverage value for each reported image.
           </p>
           <p>
-            The default, minimal tolerance of 0.0 effectively makes the test
-            meaningless, allowing images to "pass" this test without having any
-            coverage.  A maximal tolerance of 1.0 will effectively cause every
-            image to fail, as it is highly unlikely that a convex hull will
-            cover all of its corresponding image.  With a tolerance of 0.25,
-            any image whose convex hull covers less than a quarter of the image
-            area will "fail" the test.
+            The default of 1.0 for a max tolerance will effectively cause
+            nearly every image to be reported, as it is highly unlikely that 
+            a convex hull will cover 100% of it's corresponding image.   
+            With a tolerance of 0.25, any image whose convex hull covers less 
+            than a quarter of the image area will be reported.  A minimal 
+            tolerance of 0.0 effectively makes the test meaningless, allowing 
+            images to "pass" this test without having ay control point coverage.
           </p>
           <p>
             Only cubes in both the FROMLIST and CNET are checked.
@@ -346,7 +439,7 @@
 
       <parameter name="TOLERANCE">
         <type>double</type>
-        <default><item>0.0</item></default>
+        <default><item>1.0</item></default>
         <minimum inclusive="yes">0.0</minimum>
         <maximum inclusive="yes">1.0</maximum>
         <brief>
@@ -359,7 +452,7 @@
           by its measures.  If this coverage value is less than the tolerance
           specified by this parameter, then the image will fail the LOWCOVERAGE
           check and be reported as such.  This value must be between 0.0 and
-          1.0, inclusive, and defaults to 0.0.
+          1.0, inclusive.
         </description>
       </parameter>
     </group>
