@@ -540,6 +540,11 @@ void RequestSpice(Cube *icube, Pvl &labels, iString missionName) {
   icube->putGroup(kernelsGroup);
   icube->getLabel()->AddObject(naifKeywords);
 
+  icube->write(*pointingTable);
+  icube->write(*positionTable);
+  icube->write(*bodyTable);
+  icube->write(*sunPosTable);
+
   try {
     icube->getCamera();
   }
@@ -548,11 +553,6 @@ void RequestSpice(Cube *icube, Pvl &labels, iString missionName) {
        "The SPICE server returned incompatible SPICE data",
         _FILEINFO_);
   }
-
-  icube->write(*pointingTable);
-  icube->write(*positionTable);
-  icube->write(*bodyTable);
-  icube->write(*sunPosTable);
 
   delete pointingTable;
   pointingTable = NULL;

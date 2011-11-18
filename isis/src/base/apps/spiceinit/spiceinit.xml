@@ -224,6 +224,10 @@
       to match the recommendations of Laz Kestay and Ken Edmundson. Fixes
       #423.
     </change>
+    <change name="Jai Rideout" date="2011-11-18">
+      Fixed bug in writing tables to the cube that were retrieved from the web
+      service.
+    </change>
   </history>
 
   <oldName>
