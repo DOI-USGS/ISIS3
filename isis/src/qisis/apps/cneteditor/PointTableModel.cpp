@@ -144,6 +144,32 @@ namespace Isis
             }
             break;
           }
+        case AbstractPointItem::APrioriSPLat:
+        case AbstractPointItem::APrioriSPLon:
+        case AbstractPointItem::APrioriSPRadius:
+          {
+            ASSERT(row->getPointerType() == AbstractTreeItem::Point);
+            ControlPoint * point = (ControlPoint *) row->getPointer();
+
+            // Check to see if any of the surface point values are null.
+            bool latValid = (point->GetAprioriSurfacePoint().
+                GetLatitude().Valid());
+            bool lonValid = (point->GetAprioriSurfacePoint().
+                GetLongitude().Valid());
+            bool radiusValid = (point->GetAprioriSurfacePoint().
+                GetLocalRadius().Valid());
+
+            if (!latValid && !lonValid && !radiusValid &&
+                valueToSave.toLower() != "null")
+            {
+              warningText = "Some of the a priori surface point values are "
+                  "currently null. The surface point lat and lon will be set "
+                  "to 0 if they are null, and the radius will be set to "
+                  "10,000 if it is null. Is this okay?";
+            }
+            break;
+          }
+
         default:
           break;
       }

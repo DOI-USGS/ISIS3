@@ -12,6 +12,8 @@ namespace Isis
 {
   class ControlPoint;
   class Distance;
+  class Latitude;
+  class Longitude;
   class SurfacePoint;
 
   namespace CnetViz
@@ -81,7 +83,11 @@ namespace Isis
         AbstractPointItem(const AbstractPointItem & other);
         const AbstractPointItem & operator=(const AbstractPointItem & other);
 
-        SurfacePoint prepareSigmas(Distance newSigma, SurfacePoint surfacePoint);
+        SurfacePoint prepareSigmas(Distance, SurfacePoint);
+        SurfacePoint prepareSurfacePoint(Latitude, SurfacePoint);
+        SurfacePoint prepareSurfacePoint(Longitude, SurfacePoint);
+        SurfacePoint prepareSurfacePoint(Distance, SurfacePoint);
+        SurfacePoint prepareSurfacePoint(SurfacePoint);
 
 
       private:

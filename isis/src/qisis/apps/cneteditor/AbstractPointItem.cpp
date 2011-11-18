@@ -124,11 +124,11 @@ namespace Isis
       columnList->append(
           new TableColumn(getColumnName(AdjustedSPRadiusSigma), true, false));
       columnList->append(
-          new TableColumn(getColumnName(APrioriSPLat), true, false));
+          new TableColumn(getColumnName(APrioriSPLat), false, false));
       columnList->append(
-          new TableColumn(getColumnName(APrioriSPLon), true, false));
+          new TableColumn(getColumnName(APrioriSPLon), false, false));
       columnList->append(
-          new TableColumn(getColumnName(APrioriSPRadius), true, false));
+          new TableColumn(getColumnName(APrioriSPRadius), false, false));
       columnList->append(
           new TableColumn(getColumnName(APrioriSPLatSigma), false, false));
       columnList->append(
@@ -338,24 +338,41 @@ namespace Isis
             throw iException::Message(iException::Programmer, msg, _FILEINFO_);
             break;
           }
-          case APrioriSPLat:
-            point->SetAprioriSurfacePoint(SurfacePoint(
-                Latitude(catchNull(newData), Angle::Degrees),
-                point->GetAprioriSurfacePoint().GetLongitude(),
-                point->GetAprioriSurfacePoint().GetLocalRadius()));
+          case APrioriSPLat: {
+            Latitude newLat(catchNull(newData), Angle::Degrees);
+            SurfacePoint newSurfacePoint(prepareSurfacePoint(newLat,
+                  point->GetAprioriSurfacePoint()));
+
+            newSurfacePoint.SetSphericalCoordinates(newLat,
+                newSurfacePoint.GetLongitude(),
+                newSurfacePoint.GetLocalRadius());
+            point->SetAprioriSurfacePoint(newSurfacePoint);
             break;
-          case APrioriSPLon:
-            point->SetAprioriSurfacePoint(SurfacePoint(
-                point->GetAprioriSurfacePoint().GetLatitude(),
-                Longitude(catchNull(newData), Angle::Degrees),
-                point->GetAprioriSurfacePoint().GetLocalRadius()));
+          }
+          case APrioriSPLon: {
+            Longitude newLon(catchNull(newData), Angle::Degrees);
+            SurfacePoint newSurfacePoint(prepareSurfacePoint(newLon,
+                          point->GetAprioriSurfacePoint()));
+
+            newSurfacePoint.SetSphericalCoordinates(
+                newSurfacePoint.GetLatitude(),
+                newLon,
+                newSurfacePoint.GetLocalRadius());
+            point->SetAprioriSurfacePoint(newSurfacePoint);
             break;
-          case APrioriSPRadius:
-            point->SetAprioriSurfacePoint(SurfacePoint(
-                point->GetAprioriSurfacePoint().GetLatitude(),
-                point->GetAprioriSurfacePoint().GetLongitude(),
-                Distance(catchNull(newData), Distance::Meters)));
+          }
+          case APrioriSPRadius: {
+            Distance newRadius(catchNull(newData), Distance::Meters);
+            SurfacePoint newSurfacePoint(prepareSurfacePoint(newRadius,
+                point->GetAprioriSurfacePoint()));
+                      
+            newSurfacePoint.SetSphericalCoordinates(
+                      newSurfacePoint.GetLatitude(),
+                      newSurfacePoint.GetLongitude(),
+                      newRadius);
+            point->SetAprioriSurfacePoint(newSurfacePoint);
             break;
+          }
           case APrioriSPLatSigma: {
             Distance newSigma(catchNull(newData), Distance::Meters);
             SurfacePoint newSurfacePoint(prepareSigmas(newSigma,
@@ -484,5 +501,70 @@ namespace Isis
           latSigDist, lonSigDist, radiusSigDist);
       return surfacePoint;
     }
+
+
+    SurfacePoint AbstractPointItem::prepareSurfacePoint(Latitude newLat,
+        SurfacePoint surfacePoint)
+    {
+      if (newLat.Valid()) {
+        surfacePoint = prepareSurfacePoint(surfacePoint);
+      }
+      else {
+        surfacePoint.SetSphericalCoordinates(Latitude(), Longitude(),
+            Distance());
+      }
+
+      return surfacePoint;
+    }
+
+
+    SurfacePoint AbstractPointItem::prepareSurfacePoint(Longitude newLon,
+        SurfacePoint surfacePoint)
+    {
+      if (newLon.Valid()) {
+        surfacePoint = prepareSurfacePoint(surfacePoint);
+      }
+      else {
+        surfacePoint.SetSphericalCoordinates(Latitude(), Longitude(),
+            Distance());
+      }
+
+      return surfacePoint;
+    }
+
+
+    SurfacePoint AbstractPointItem::prepareSurfacePoint(
+        Distance newRadius, SurfacePoint surfacePoint)
+    {
+      if (newRadius.Valid()) {
+        surfacePoint = prepareSurfacePoint(surfacePoint);
+      }
+      else {
+        surfacePoint.SetSphericalCoordinates(Latitude(), Longitude(),
+            Distance());
+      }
+
+      return surfacePoint;
+    }
+
+
+    SurfacePoint AbstractPointItem::prepareSurfacePoint(
+        SurfacePoint surfacePoint)
+    {
+      Latitude lat = surfacePoint.GetLatitude();
+      Longitude lon = surfacePoint.GetLongitude();
+      Distance radius = surfacePoint.GetLocalRadius();
+
+      if (!lat.Valid())
+        lat = Latitude(0, Angle::Degrees);
+      if (!lon.Valid())
+        lon = Longitude(0, Angle::Degrees);
+      if (!radius.Valid())
+        radius= Distance(10000, Distance::Meters);
+
+      surfacePoint.SetSphericalCoordinates(lat, lon, radius);
+      return surfacePoint;
+    }
   }
 }
+
