@@ -23,7 +23,7 @@ namespace Isis {
   ControlNetValidMeasure::ControlNetValidMeasure(Pvl *pPvl) {
     InitStdOptions();
 
-    if(pPvl != 0) {
+    if(pPvl->HasGroup("ValidMeasure")) {
       Parse(*pPvl);
     }
     else {
@@ -42,7 +42,13 @@ namespace Isis {
    */
   ControlNetValidMeasure::ControlNetValidMeasure(Pvl &pPvl) {
     InitStdOptions();
-    Parse(pPvl);
+    
+    if(pPvl.HasGroup("ValidMeasure")) {
+      Parse(pPvl);
+    }
+    else {
+      InitStdOptionsGroup();
+    }
     mStatisticsGrp = PvlGroup("Statistics");
   }
 

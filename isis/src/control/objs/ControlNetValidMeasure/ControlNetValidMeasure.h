@@ -65,6 +65,8 @@ namespace Isis {
     *                                        the processing speed
     *  @history 2011-06-06 Sharmila Prasad - Process the options only is specified in the DefFile to
     *                                        improve run time
+    *  @history 2011-11-21 Sharmila Prasad - Validate/Parse Pvl only if ValidMeasure Group is found.
+    *                                        Fixes Mantis #584
     */
 
   class ControlNetValidMeasure {
