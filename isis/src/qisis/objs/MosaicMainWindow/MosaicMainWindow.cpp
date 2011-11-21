@@ -503,11 +503,22 @@ namespace Isis {
       statusBar()->addWidget(
           m_mosaicController->getMosaicFileList()->getProgress());
 
-      QList<QAction *> viewActs =
+      QList<QAction *> sceneViewActs =
+          m_mosaicController->getMosaicScene()->getViewActions();
+
+      foreach(QAction *viewAct, sceneViewActs) {
+        connect(viewAct, SIGNAL(destroyed(QObject *)),
+                this, SLOT(updateMenuVisibility()));
+
+        m_viewMenu->addAction(viewAct);
+      }
+
+      m_viewMenu->addSeparator();
+
+      QList<QAction *> fileListViewActs =
           m_mosaicController->getMosaicFileList()->getViewActions();
 
-      QAction *viewAct;
-      foreach(viewAct, viewActs) {
+      foreach(QAction *viewAct, fileListViewActs) {
         connect(viewAct, SIGNAL(destroyed(QObject *)),
                 this, SLOT(updateMenuVisibility()));
 

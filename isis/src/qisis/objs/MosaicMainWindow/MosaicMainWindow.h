@@ -29,6 +29,8 @@ namespace Isis {
    *   @history 2011-09-26 Steven Lambright - Command line arguments are now
    *                           parsed here.
    *   @history 2011-09-27 Steven Lambright - Improved user documentation
+   *   @history 2011-11-21 Steven Lambright - View menu actions come from more
+   *                           places now. Fixes #568
    */
   class MosaicMainWindow : public MainWindow {
       Q_OBJECT
