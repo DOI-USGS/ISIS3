@@ -26,6 +26,17 @@ namespace Isis {
    *
    */
   InterestOperator::InterestOperator(Pvl &pPvl): ControlNetValidMeasure(pPvl) {
+    InitInterestOptions();
+    mOperatorGrp = PvlGroup("InterestOptions");
+    Parse(pPvl);
+  }
+  
+  /**
+   * Initialise Interest Options to defaults
+   * 
+   * @author Sharmila Prasad (11/21/2011)
+   */
+  void InterestOperator::InitInterestOptions() {
     p_interestAmount = 0.0;
     p_worstInterest = 0.0;
     p_lines = 1;
@@ -34,20 +45,17 @@ namespace Isis {
     p_deltaLine = 0;
     p_clipPolygon = NULL;
     mbOverlaps = false;
-
-    mOperatorGrp = PvlGroup("InterestOptions");
-    Parse(pPvl);
   }
-
-
-  //! Destroy InterestOperator object
+  
+  /**
+   * Destroy InterestOperator object
+   */
   InterestOperator::~InterestOperator() {
     if (p_clipPolygon != NULL) {
       delete p_clipPolygon;
       p_clipPolygon = NULL;
     }
   }
-
 
   /**
    * Create an InterestOperator object using a PVL specification.
@@ -487,6 +495,11 @@ namespace Isis {
                 double dSample = measureCamera->Sample();
                 double dLine   = measureCamera->Line();
 
+                double origSample = newMeasure->GetSample();
+                double origLine   = newMeasure->GetLine();
+                
+                newMeasure->SetCoordinate(dSample, dLine);
+                
                 MeasureValidationResults results =
                   ValidStandardOptions(newMeasure, measureCube);
                 if (!results.isValid()) {
@@ -495,10 +508,9 @@ namespace Isis {
                   newMeasure->SetIgnored(true);
                 }
                 pvlMeasureGrp += Isis::PvlKeyword("NewLocation", LocationString(dSample, dLine));
-                pvlMeasureGrp += Isis::PvlKeyword("DeltaSample", (int)abs((int)dSample - (int)newMeasure->GetSample()));
-                pvlMeasureGrp += Isis::PvlKeyword("DeltaLine", (int)abs((int)dLine - (int)newMeasure->GetLine()));
+                pvlMeasureGrp += Isis::PvlKeyword("DeltaSample", (int)abs((int)dSample - (int)origSample));
+                pvlMeasureGrp += Isis::PvlKeyword("DeltaLine", (int)abs((int)dLine - (int)origLine));
                 pvlMeasureGrp += Isis::PvlKeyword("Reference",   "false");
-                newMeasure->SetCoordinate(dSample, dLine);
               }
             }
             else {

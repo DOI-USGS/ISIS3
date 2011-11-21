@@ -108,11 +108,17 @@ namespace Isis {
    *   @history 2011-06-07 Debbie A. Cook and Tracie Sucharski - Modified point types
    *                          Ground ------> Fixed
    *                          Tie----------> Free
+   *   @history 2011-11-21 Sharmila Prasad - 1. InterestOperator should run without ValidMeasure Group.
+   *   2. The Validity test must be performed on Measure after moving to new location Fixes Mantis #584
+   *  
    */
   class InterestOperator : public ControlNetValidMeasure {
     public:
       InterestOperator(Pvl &pPvl);
+      
       virtual ~InterestOperator();
+      
+      void InitInterestOptions();
 
       void SetPatternValidPercent(const double percent);
       void SetPatternSampling(const double percent);
