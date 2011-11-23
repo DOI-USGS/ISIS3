@@ -84,4 +84,95 @@
       </parameter>
     </group>
   </groups>
+
+  <examples>
+    <example>
+      <brief>
+        Two THEMIS Images
+      </brief>
+      <description>
+        This example shows a typical usage of sigmastretch as part of THEMIS
+        mosaic creation.  As input, the two images have very high contrast, and
+        as such, blending the overlapping area will result in an awkward
+        transition between the image bounds.  By running sigmastretch first, the
+        resulting images have less contrast, and can be mosaicked with good
+        results.  The default value for the VARIANCE of 40.0 here is used, as is
+        typical in THEMIS processing.
+      </description>
+      <terminalInterface>
+        <commandLine>
+          from=I01086005.cub to=I01086005.fx.cub;
+          sigmastretch from=I23851018.cub to=I23851018.fx.cub
+        </commandLine>
+        <description>
+          We're running the program once for each image.  Without using multiple
+          images, it's hard to see the differences due to "qview" automatically
+          stretching the image for viewing.  When mosaicked, however, the
+          contrast is especially noticeable.
+        </description>
+      </terminalInterface>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="614" height="750" src="assets/images/gui1.jpg">
+            <brief>
+              Example GUI for I01086005.cub  
+            </brief>
+            <description>
+              Screenshot of the GUI with parameters set to stretch the first
+              image.
+            </description>
+            <thumbnail caption="The first sigmastretch GUI"
+              src="assets/thumbs/gui1.jpg" width="164" height="200" />
+          </image>
+        </guiInterface>
+        <guiInterface>
+          <image width="614" height="750" src="assets/images/gui2.jpg">
+            <brief>
+              Example GUI for I23851018.cub  
+            </brief>
+            <description>
+              Screenshot of the GUI with parameters set to stretch the second
+              image.
+            </description>
+            <thumbnail caption="The second sigmastretch GUI"
+              src="assets/thumbs/gui2.jpg" width="164" height="200" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+
+      <inputImages>
+        <image src="assets/images/before.jpg" width="512" height="512">
+          <brief>
+            Mosaic of the input images for sigmastretch
+          </brief>
+          <description>
+            This is a cropped subsection of the mosaic of the input images
+            before being stretched.  Note the sharp contrast between the two
+            images when mosaicked.
+          </description>
+          <thumbnail caption="Mosaic of unstretched input images"
+            src="assets/thumbs/before.jpg" width="200" height="200" />
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image src="assets/images/after.jpg" width="512" height="512">
+          <brief>
+            Mosaic of the output images for sigmastretch
+          </brief>
+          <description> 
+            This is the same subarea of a mosaic of the output images after
+            being stretched.  The contrast is now much more subtle, making the
+            images ready to be blended together along their overlapping areas.
+          </description>
+          <thumbnail
+            caption="Mosaic showing results of the sigmastretch application"
+            src="assets/thumbs/after.jpg" width="200" height="200" />
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+    </example>
+  </examples>
 </application>
