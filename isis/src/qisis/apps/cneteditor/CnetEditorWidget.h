@@ -6,6 +6,7 @@
 
 class QAction;
 class QBoxLayout;
+class QGroupBox;
 template< typename T > class QList;
 class QMenu;
 class QScrollArea;
@@ -80,6 +81,8 @@ namespace Isis
       void createPointTableView();
       void createMeasureTableView();
       void upgradeVersion();
+      void handleTableFilterCountsChanged(int visibleRows, int totalRows,
+          QGroupBox * box, QString initialText);
 
 
     private slots:
@@ -88,6 +91,10 @@ namespace Isis
       
       void pointColToggled();
       void measureColToggled();
+      
+      void handlePointTableFilterCountsChanged(int visibleRows, int totalRows);
+      void handleMeasureTableFilterCountsChanged(int visibleRows,
+                                                 int totalRows);
 
 
     private: // data
@@ -105,7 +112,10 @@ namespace Isis
 
       CnetViz::TableView * pointTableView;
       CnetViz::TableView * measureTableView;
-
+      
+      QGroupBox * pointTableBox;
+      QGroupBox * measureTableBox;
+      
       QScrollArea * filterArea;
 
       QWidget * pointFilterWidget;

@@ -53,6 +53,7 @@ namespace Isis
         void selectionChanged();
         void modelDataChanged();
         void tableSelectionChanged(QList< AbstractTreeItem * >);
+        void filterCountsChanged(int visibleRows, int totalRows);
         
 
       private: // disable copying and assigning of this class

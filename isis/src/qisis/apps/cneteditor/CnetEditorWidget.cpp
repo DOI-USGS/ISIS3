@@ -135,6 +135,13 @@ namespace Isis
 
     delete toolBarActions;
     toolBarActions = NULL;
+    
+    pointTableBox = NULL;
+    measureTableBox = NULL;
+    topSplitter = NULL;
+    mainSplitter = NULL;
+    
+    // TODO: null all member widgets!
   }
 
 
@@ -150,6 +157,9 @@ namespace Isis
 
     pointTableModel = NULL;
     measureTableModel = NULL;
+    
+    pointTableBox = NULL;
+    measureTableBox = NULL;
 
     pointTableView = NULL;
     measureTableView = NULL;
@@ -249,13 +259,13 @@ namespace Isis
     createFilterArea();
 
     createPointTableView();
-    QGroupBox * pointTableBox = new QGroupBox(tr("Control Point Table"));
+    pointTableBox = new QGroupBox(tr("Control Point Table"));
     QHBoxLayout * pointTableLayout = new QHBoxLayout;
     pointTableLayout->addWidget(pointTableView);
     pointTableBox->setLayout(pointTableLayout);
 
     createMeasureTableView();
-    QGroupBox * measureTableBox = new QGroupBox(tr("Control Measure Table"));
+    measureTableBox = new QGroupBox(tr("Control Measure Table"));
     QHBoxLayout * measureTableLayout = new QHBoxLayout;
     measureTableLayout->addWidget(measureTableView);
     measureTableBox->setLayout(measureTableLayout);
@@ -428,6 +438,9 @@ namespace Isis
             this,
             SLOT(rebuildModels(QList< CnetViz::AbstractTreeItem * >)));
     
+    connect(pointTableView, SIGNAL(filterCountsChanged(int,int)),
+            this, SLOT(handlePointTableFilterCountsChanged(int,int)));
+    
     for (int i = 0; i < AbstractPointItem::COLS; i++)
     {
       QAction * act = new QAction(
@@ -473,6 +486,9 @@ namespace Isis
             SIGNAL(rebuildModels(QList< CnetViz::AbstractTreeItem * >)),
             this,
             SLOT(rebuildModels(QList< CnetViz::AbstractTreeItem * >)));
+    
+    connect(measureTableView, SIGNAL(filterCountsChanged(int,int)),
+            this, SLOT(handleMeasureTableFilterCountsChanged(int,int)));
 
     for (int i = 0; i < AbstractMeasureItem::COLS; i++)
     {
@@ -516,7 +532,40 @@ namespace Isis
           actions[i]->isChecked());
   }
 
-
+  void CnetEditorWidget::handlePointTableFilterCountsChanged(
+      int visibleRows, int totalRows)
+  {
+    handleTableFilterCountsChanged(visibleRows, totalRows, pointTableBox,
+                                   "Control Point Table");
+  }
+  
+  
+  void CnetEditorWidget::handleMeasureTableFilterCountsChanged(
+      int visibleRows, int totalRows)
+  {
+    handleTableFilterCountsChanged(visibleRows, totalRows, measureTableBox,
+                                   "Control Measure Table");
+  }
+  
+  
+  void CnetEditorWidget::handleTableFilterCountsChanged(
+      int visibleRows, int totalRows, QGroupBox * box, QString initialText)
+  {
+    if (box)
+    {
+      QString newTitle = initialText + " (";
+      if (visibleRows > -1)
+        newTitle += QString::number(visibleRows);
+      else
+        newTitle += "???";
+      
+      newTitle += " / " + QString::number(totalRows) + ")";
+        
+      box->setTitle(newTitle);
+    }
+  }
+  
+  
   void CnetEditorWidget::upgradeVersion()
   {
     if (*workingVersion == "")

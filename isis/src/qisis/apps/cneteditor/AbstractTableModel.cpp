@@ -69,6 +69,8 @@ namespace Isis
       
       connect(this, SIGNAL(tableSelectionChanged(QList<AbstractTreeItem *>)),
               model, SIGNAL(tableSelectionChanged(QList<AbstractTreeItem *>)));
+      connect(model, SIGNAL(filterCountsChanged(int,int)),
+              this, SIGNAL(filterCountsChanged(int,int)));
     }
 
 

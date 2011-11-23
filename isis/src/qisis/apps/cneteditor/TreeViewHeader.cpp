@@ -111,7 +111,7 @@ namespace Isis
 
 
     void TreeViewHeader::handleFilterCountsChanged(
-      int visibleTopLevelItemCount, int topLevelItemCount)
+        int visibleTopLevelItemCount, int topLevelItemCount)
     {
       visibleCount = visibleTopLevelItemCount;
       totalCount = topLevelItemCount;

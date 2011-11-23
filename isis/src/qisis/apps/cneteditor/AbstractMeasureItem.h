@@ -33,24 +33,25 @@ namespace Isis
           Line = 3,
           EditLock = 4,
           Ignored = 5,
-          Type = 6,
-          Eccentricity = 7,
-          GoodnessOfFit = 8,
-          MinPixelZScore = 9,
-          MaxPixelZScore = 10,
-          SampleShift = 11,
-          LineShift = 12,
-          SampleSigma = 13,
-          LineSigma = 14,
-          APrioriSample = 15,
-          APrioriLine = 16,
-          Diameter = 17,
-          JigsawRejected = 18,
-          ResidualSample = 19,
-          ResidualLine = 20,
-          ResidualMagnitude = 21
+          Reference = 6,
+          Type = 7,
+          Eccentricity = 8,
+          GoodnessOfFit = 9,
+          MinPixelZScore = 10,
+          MaxPixelZScore = 11,
+          SampleShift = 12,
+          LineShift = 13,
+          SampleSigma = 14,
+          LineSigma = 15,
+          APrioriSample = 16,
+          APrioriLine = 17,
+          Diameter = 18,
+          JigsawRejected = 19,
+          ResidualSample = 20,
+          ResidualLine = 21,
+          ResidualMagnitude = 22
         };
-        static const int COLS = 22;
+        static const int COLS = 23;
 
         static QString getColumnName(Column);
         static Column getColumn(QString);

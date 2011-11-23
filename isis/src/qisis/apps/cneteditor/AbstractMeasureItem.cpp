@@ -36,6 +36,8 @@ namespace Isis
           return "Edit Locked";
         case Ignored:
           return "Ignored";
+        case Reference:
+          return "Reference";
         case Type:
           return "Measure Type";
         case Eccentricity:
@@ -102,6 +104,7 @@ namespace Isis
       columnList->append(new TableColumn(getColumnName(EditLock), false,
                                             false));
       columnList->append(new TableColumn(getColumnName(Ignored), false, true));
+      columnList->append(new TableColumn(getColumnName(Reference), true, true));
       columnList->append(new TableColumn(getColumnName(Type), false, false));
       columnList->append(new TableColumn(getColumnName(Eccentricity), true,
                                             false));
@@ -184,6 +187,11 @@ namespace Isis
               return QVariant("No");
           case Ignored:
             if (measure->IsIgnored())
+              return QVariant("Yes");
+            else
+              return QVariant("No");
+          case Reference:
+            if (measure->Parent()->GetRefMeasure() == measure)
               return QVariant("Yes");
             else
               return QVariant("No");
@@ -274,6 +282,10 @@ namespace Isis
             else
               if (newData == "No")
                 measure->SetIgnored(false);
+            break;
+          case Reference:
+            // A measure's reference status should never be editable. It should
+            // only be changed through the point.
             break;
           case Type:
             measure->SetType(measure->StringToMeasureType(newData));
@@ -408,3 +420,4 @@ namespace Isis
     }
   }
 }
+

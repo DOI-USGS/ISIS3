@@ -23,8 +23,8 @@ namespace Isis
   namespace CnetViz
   {
     TableView::TableView(AbstractTableModel * someModel,
-                                QString pathForSettings,
-                                QString objName)
+                         QString pathForSettings,
+                         QString objName)
     {
       nullify();
       
@@ -32,6 +32,8 @@ namespace Isis
       setObjectName(objName);
       
       model = someModel;
+      connect(model, SIGNAL(filterCountsChanged(int,int)),
+              this, SIGNAL(filterCountsChanged(int,int)));
       
       columns = model->getColumns();
       

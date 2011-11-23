@@ -71,8 +71,7 @@ namespace Isis
         void filterProgressRangeChanged(int, int);
         void rebuildProgressRangeChanged(int, int);
         void sortProgressRangeChanged(int, int);
-        void filterCountsChanged(int visibleTopLevelItemCount,
-            int topLevelItemCount);
+        void filterCountsChanged(int visibleRows, int totalRows);
         void treeSelectionChanged(QList<AbstractTreeItem *>);
         void tableSelectionChanged(QList<AbstractTreeItem *>);
 
