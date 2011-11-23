@@ -70,12 +70,12 @@ void IsisMain() {
     }
   }
 
-  for (unsigned int i = 0; i < outputs.size() - 1; i++) {
+  for (unsigned int i = 1; i < outputs.size(); i++) {
     Cube from1;
     from1.open(outputs[i]);
 
     bool hasOverlap = false;
-    for (unsigned int j = i + 1; j < outputs.size(); j++) {
+    for (unsigned int j = 0; j < i; j++) {
       Cube from2;
       from2.open(outputs[j]);
 
@@ -191,6 +191,25 @@ bool validValue(int oSample, int oLine) {
 }
 
 
+/*
+class Node {
+  public:
+    Node(int sample, int line, int score) {
+      m_sample = sample;
+      m_line = line;
+      m_score = score;
+    }
+
+    ~Node() {}
+
+  private:
+    int m_sample;
+    int m_line;
+    int m_score;
+};
+*/
+
+
 Chip * createRamp(Chip *pic1, Chip *pic2, int stop) {
   // x and y dimensions of the original pictures
   int x = pic1->Samples();
@@ -212,7 +231,7 @@ Chip * createRamp(Chip *pic1, Chip *pic2, int stop) {
   int c2 = 0;
 
   // Extract profiles of images
-//   QQueue<int> nodes;
+  //QQueue<Node> nodes;
   int sum = 0;
   for (int i = 0; i < x; i++) {
     for (int j = 0; j < y; j++) {
@@ -236,6 +255,9 @@ Chip * createRamp(Chip *pic1, Chip *pic2, int stop) {
         if (i < c1) c1 = i;
         if (i > c2) c2 = i;
       }
+
+      // TODO speed increase here
+      //if (ol1[t1] == -1)
     }
   }
 
@@ -347,8 +369,8 @@ void readOutputs(string outName, const FileList &inputs, FileList &outputs) {
     throw iException::Message(Isis::iException::User, msg, _FILEINFO_);
   }
 
-  // Make sure that all output files do not have the same names as their
-  // corresponding input files
+  // Make sure that every output file has a different filename from its
+  // corresponding input file
   for (unsigned i = 0; i < outputs.size(); i++) {
     if (outputs[i].compare(inputs[i]) == 0) {
       string msg = "The to list file [" + outputs[i] +

@@ -9,27 +9,56 @@
   <description>
     <p>
       This application is a translation of the Davinci script "blend" into Isis
-      3.  The blending process itself takes a list of map-projected cubes and
-      blends them together along their overlapping areas by creating a "ramp"
-      from one image to the other.
+      3.  The blending process itself takes a list of <def>Level2</def>
+      <def link="Cube">cubes</def> and blends them together along their
+      overlapping areas by creating a "ramp" from one image to the other.
     </p>
     <p>
       The ramp-creation process creates a smooth, qualitative transition from
-      one image to the other, but sacrifices all scientific value of the pixel
+      one image to the other, but sacrifices the scientific value of the pixel
       values in the process.  Only the pixel values of the overlapping area will
       be changed, however.  Consequently, this application is best suited to
-      blend images that have relatively low contrast between them.
+      blend images that have relatively low contrast between them.  As part of
+      the THEMIS mosaicking pipeline, it is customary to use the Isis 3
+      application "sigmastretch" (itself a translation of another Davinci
+      script, "sstretch") to reduce contrast.
     </p>
     <p>
       Each output pixel value is simply a weighted average of the pixel values
-      taken from the two input images being examined.  The closer a pixel is to
-      one image over the other, the more heavily its value will be weighted in
-      favor of that image.
+      taken from the two input images being examined at a time.  The closer a
+      pixel is to one image over the other, the more heavily its value will be
+      weighted in favor of that image.
+    </p>
+    <p>
+      The "closeness" of a pixel from one image versus another is determined by
+      the aforementioned ramp.  The ramp is map of the overlapping area between
+      two images, where every pixel position in the overlap maps to a value from
+      0.0 to 1.0.  Here, a value of 1.0 means the pixel falls entirely within
+      the first image, and a value of 0.0 means it falls entirely within the
+      second image.  Thus, a value of 0.5 would indicate the pixel is
+      equidistant from the borders of the two images.
+    </p>
+    <p>
+      Once the ramp has been generated, each pixel in the overlap is given a new
+      value by the formula:
+      <pre>
+        overlap[i] = ramp[i] * image_1[i] + (1.0 - ramp[i]) * image_2[i]
+      </pre>
+      Here, "overlap" could refer to the overlapping area in either image, as
+      both will be adjusted by the same calculation.  The "ramp" is the 0.0 to
+      1.0 map, "image_1" is the first image, "image_2" is the second image, and
+      "i" is the unique index of the current pixel being adjusted.
     </p>
     <p>
       The output of this application is a list of images, setup nicely to move
-      on to mosaicking as a logical next step.  All the overlaps on between
-      these images will share the same pixel values.
+      on to mosaicking (see "automos" and "mapmos") as a logical next step.  All
+      the overlaps between these images will share the same pixel values.
+    </p>
+    <p>
+      This program is conceptually very similar to "noseam", in that it takes a
+      list of images and attempts to smooth out the boundaries between them.
+      Unlike that program, however, "blend" does not perform the mosaicking as
+      part of the blending routine.
     </p>
   </description>
 
@@ -39,7 +68,10 @@
 
   <seeAlso>
     <applications>
+      <item>sigmastretch</item>
       <item>noseam</item>
+      <item>automos</item>
+      <item>mapmos</item>
     </applications>
   </seeAlso>
 
@@ -59,7 +91,21 @@
         </brief>
         <description>
           A list of map projected cubes to blend.  The Mapping groups must match
-          in order to do the blending. 
+          in order to do the blending.
+          <p>
+            Note that the order of the images in this list can have a
+            significant impact on the output results.  The order of blending
+            will proceed in the order of the list, regardless of the actual
+            spatial ordering (in planetary coordinates) of the images.
+          </p>
+          <p>
+            Each time an image is processed (from the top of the list to the
+            bottom), it is blended with every image that cam prior in the list,
+            ensuring that every image gets blended once and only once with every
+            other image.  Since every blend of one image to another is a
+            separate operation, pixels that overlap with more than two images
+            can change depending on the order of the individual image blends.
+          </p>
         </description>
       </parameter>
 
@@ -72,15 +118,18 @@
         <description>
           This list of output files must contain a file name to correspond to
           each input file in the FROMLIST.  Input files will be associated with
-          output files by index, so that the equalized product of the first file
+          output files by index, so that the blended product of the first file
           in the FROMLIST will be written to the name and location of the first
           file in the TOLIST, and so on.  Each output file will be written to
           the exact location with the exact name specified, unless the location
           and name happen to be identical to those of its corresponding input
-          file, in which case an error will be thrown.  If this list is not
-          specified, the output files will be placed in the directories of their
-          input files, and named the same with the exception of an added
-          ".blend" extension (e.g. "foobar.cub" becomes "foobar.blend.cub").
+          file, in which case an error will be thrown.
+          <p>
+            If this list is not specified, the output files will be placed in
+            the directories of their input files, and named the same with the
+            exception of an added ".blend" extension (e.g. "foobar.cub" becomes
+            "foobar.blend.cub").
+          </p>
         </description>
         <internalDefault>Automatic</internalDefault>
       </parameter>
@@ -93,13 +142,112 @@
           Maximum number of pixels away from edge to search
         </brief>
         <description>
-          Defines how large the "blend ramp" will be between two images.  Tells
-          the algorithm to stop searching this number of pixels from the edge.
-          By choosing a lower value, the algorithm will work much faster, but
-          the ramp will also be much sharper and shorter.
+          Defines how far from image boundaries the "blend ramp" will be
+          calculated between two images.  After moving "stop" steps from the
+          image border, all remaining values in the ramp will be considered the
+          same distance from the edge.  By choosing a lower value, the algorithm
+          will work much faster, but the ramp will also be much sharper and
+          shorter.
+          <p>
+            The default value is an excessively large number to indicate that
+            the ramp-creation process should calculate distance values for the
+            entire overlapping area.  A typical value for this parameter would
+            be 100 for most THEMIS images.  This will typically result in a
+            smooth ramp indistinguishable from letting the distance calculation
+            run to completion.
+          </p>
         </description>
         <default><item>100000</item></default>
       </parameter>
     </group>
   </groups>
+
+  <examples>
+    <example>
+      <brief>
+        Two Images, Side-By-Side
+      </brief>
+      <description>
+        This example shows the most typical use of the blend application.  The
+        input is simply two images laid side by side in map-projected space.
+        The stop value is set to a typical value, 200, so that the ramp will
+        only be calculated out to 200 pixels from the image boundary.
+      </description>
+      <terminalInterface>
+        <commandLine>
+          fromlist=fromlist.lis stop=200
+        </commandLine>
+        <description>
+          Specify a list of images to blend along with a stop value, specifying
+          how many "distance steps" to calculate from the image border before
+          stopping.  After "stop" number of steps, all remaining values in the
+          ramp will be filled in with the stop value.
+        </description>
+      </terminalInterface>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="614" height="750" src="assets/images/gui.jpg">
+            <brief>
+              Example GUI
+            </brief>
+            <description>
+              Screenshot of the GUI with parameters set to blend the images in
+              the FROMLIST.  Because the TOLIST parameter is set to its default
+              value of "Automatic", each output image will be placed into the
+              directory of its corresponding input image.
+            </description>
+            <thumbnail caption="The blend GUI"
+              src="assets/thumbs/gui.jpg" width="164" height="200" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+
+      <inputImages>
+        <image src="assets/images/before.jpg" width="512" height="512">
+          <brief>
+            Mosaic of the input images for equalizer
+          </brief>
+          <description>
+            This is a cropped subsection of the mosaic of the input images
+            before being blended.  Note the clear delineation of the two images
+            by the sharp contrast along their overlapping area.
+          </description>
+          <thumbnail caption="Mosaic of unblended input images"
+            src="assets/thumbs/before.jpg" width="200" height="200" />
+          <parameterName>FROMLIST</parameterName>
+        </image>
+      </inputImages>
+
+      <dataFiles>
+        <dataFile path="assets/fromlist.lis">
+          <brief>
+            FROMLIST
+          </brief>
+          <description>
+            This list contains the names of two files to be blended together.
+            The file names are separated by new lines.
+          </description>
+        </dataFile>
+      </dataFiles>
+
+      <outputImages>
+        <image src="assets/images/after.jpg" width="512" height="512">
+          <brief>
+            Mosaic of the output images for blend
+          </brief>
+          <description> 
+            This is the same subarea of a mosaic of the output images after
+            being blended together.  The seam from the "before" mosaic is now
+            gone, and there is a smooth transition from one image to the other,
+            such that they appear to be one continuous image.
+          </description>
+          <thumbnail
+            caption="Mosaic showing results of the blend application"
+            src="assets/thumbs/after.jpg" width="200" height="200" />
+          <parameterName>TOLIST</parameterName>
+        </image>
+      </outputImages>
+    </example>
+  </examples>
 </application>
