@@ -86,7 +86,8 @@ namespace Isis {
 
       int iNumMeasuresLocked = newPnt->GetNumLockedMeasures();
       bool bRefLocked = newPnt->GetRefMeasure()->IsEditLocked();
-
+      int numMeasures = newPnt->GetNumMeasures();
+      
       int iRefIndex = -1;
       if (newPnt->IsReferenceExplicit())
         iRefIndex = newPnt->IndexOfRefMeasure();
@@ -99,7 +100,7 @@ namespace Isis {
       // Points having atleast 1 measure and Point is not Ignored
       // Check for EditLock in the Measures and also verfify that
       // only a Reference Measure can be Locked else error
-      if (!newPnt->IsIgnored() && newPnt->GetType() == ControlPoint::Free && iRefIndex >= 0 &&
+      if (!newPnt->IsIgnored() && newPnt->GetType() == ControlPoint::Free && numMeasures > 0 &&
           (iNumMeasuresLocked == 0 || (iNumMeasuresLocked > 0 && bRefLocked))) {
         int iNumIgnore = 0;
         iString istrTemp;
@@ -200,7 +201,7 @@ namespace Isis {
       } // end Free
       else {
         int iComment = 0;
-        if (iRefIndex < 0) {
+        if (numMeasures == 0) {
           iString sComment = "Comment";
           sComment += iString(++iComment);
           pvlPointObj += Isis::PvlKeyword(sComment, "No Measures in the Point");
@@ -241,20 +242,25 @@ namespace Isis {
       if (*newPnt != origPnt) {
         iPointsModified++;
       }
-
+      
       if (!bError && !newPnt->IsIgnored() && newPnt->IsReferenceExplicit() && iBestIndex != iRefIndex 
           && !bPntEditLock && !bRefLocked) {
         iRefChanged++;
         PvlGroup pvlRefChangeGrp("ReferenceChangeDetails");
-        pvlRefChangeGrp += Isis::PvlKeyword("PrevSerialNumber",
-            origPnt.GetMeasure(iRefIndex)->GetCubeSerialNumber());
-        pvlRefChangeGrp += Isis::PvlKeyword("PrevResolution",   mdResVector[iRefIndex]);
-
-        istrTemp = iString((int)origPnt.GetMeasure(iRefIndex)->GetSample());
-        istrTemp += ",";
-        istrTemp += iString((int)origPnt.GetMeasure(iRefIndex)->GetLine());
-        pvlRefChangeGrp += Isis::PvlKeyword("PrevLocation",     istrTemp);
-
+        if (iRefIndex >= 0) {
+          pvlRefChangeGrp += Isis::PvlKeyword("PrevSerialNumber",
+              origPnt.GetMeasure(iRefIndex)->GetCubeSerialNumber());
+          pvlRefChangeGrp += Isis::PvlKeyword("PrevResolution",   mdResVector[iRefIndex]);
+  
+          istrTemp = iString((int)origPnt.GetMeasure(iRefIndex)->GetSample());
+          istrTemp += ",";
+          istrTemp += iString((int)origPnt.GetMeasure(iRefIndex)->GetLine());
+          pvlRefChangeGrp += Isis::PvlKeyword("PrevLocation",     istrTemp);
+        }
+        else {
+          pvlRefChangeGrp += Isis::PvlKeyword("PrevReference", "Not Set");
+        }
+        
         pvlRefChangeGrp += Isis::PvlKeyword("NewSerialNumber",
             newPnt->GetMeasure(iBestIndex)->GetCubeSerialNumber());
         std::string sKeyName = "NewHighestResolution";

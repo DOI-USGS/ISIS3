@@ -70,7 +70,7 @@
     area defined by DeltaLine and DeltaSample. 
     </p>
     <p>
-    The interest operator reads in a chip of size Delta Samples and Lines from 
+    The Interest operator reads in a chip of size Delta Samples and Lines from 
     each Control Measure(<def>Cube</def>) in a point.  If the Overlap list is 
     included then the overlap polygon is taken into consideration when the chip 
     reads the cube. For each pixel in the chip, it extracts a sub chip of box 
@@ -79,19 +79,17 @@
     then the Interest is calculated for the box around the pixel using the 
     chosen algorithm. This way it calculates the interest for all the pixels in 
     the chosen area (chip) around the Control Measure and the best Interest 
-    (highest value) is chosen among them. This way the best Interest is 
-    calculated for all the Control Measure in a Control Point.<br/> 
-    The application then selects the best Interest of all the valid Control 
-    Measure in the Control Point and chooses it as the Reference. It then moves 
-    all the other valid Control Measures to the chosen Reference by mapping the 
-    Reference Lat/Lon to a sample, line in the Control Measure.  If Interest is 
-    not calculated for a Control Measure because it is invalid or if the 
-    Interest calculated itself is invalid, then the Control Measure is ignored. 
-    This causes the Control Measure to have the sample and line to be set to 
-    "Null". If the number of valid Control Measures in the Control Point is less 
-    than 2 then the Control Point is also ignored. It then creates a new Control 
-    Net using these new "more interesting" Control Points. 
-    <br/> 
+    (highest value) is chosen among them. The best Interest is calculated for 
+    all the Control Measures in a Control Point.                                                        
+    <br/> The application then selects the best Interest of all the valid 
+    Control Measures in the Control Point and chooses it as the Reference. It 
+    then moves all the other valid Control Measures to the chosen Reference by 
+    mapping the Reference Lat/Lon to a sample, line in the Control Measure. It 
+    then creates a new Control Net using these new "more interesting" Control 
+    Points. If the BestReferenceIndex is not calculated because no Interest was 
+    calculated for all the Control Measures or if the BestReferenceIndex's 
+    Interest is invalid(less than the threshold Interest) then the Control Point 
+    is set to be ignored. <br/> 
     <br/>Interest Algorithm could be:  <br/>
     <b>1. Standard Deviation</b><br/> 
     <b>2. Gradient</b> <br/> <br/>
@@ -132,11 +130,24 @@
     Recommended preprocessing would be to run "gradient" filter or "svfilter" 
     and run "hist" to get the image stats and set the values for the Operator 
     accordingly. <br/><br/>
-    For all the criterias, the application first validates each measure for the 
-    following properties if specified in the DEFFILE. The DEFFILE is 
-    optional for Emission, Incidence and Resolution Criteria. Following is the 
-    format for the Pvl DEFFILE file with the defaults for Control Measure 
-    validation:  <br/></p>
+    For all the criterias except Interest, the application first validates each 
+    measure for the properties specified in the "ValidMeasure" PvlGroup in 
+    DEFFILE. The Validity test is optional for all the Criterias.<br/></p> 
+
+    <p>Validation is little different if using the Interest Critera. The 
+    Interest Operator while finding Interest for a Valid Control Measure, first 
+    Validates each Sample, Line location in the DeltaSample, DeltaLine area 
+    of the Control Measure and then calculates the Interest for that location. 
+    This way the expensive Interest calculation is bypassed for an invalid 
+    Sample, Line location. Validity test is also performed after moving the 
+    Control Measure to the new location of the BestReference chosen after the 
+    Interest operation for all the Control Measures in the Control Point.  If 
+    the moved Control Measure fails the Validity test, then it is set to be 
+    Ignored. </p> 
+
+    <p>Following is the format for the Pvl DEFFILE file with the 
+    defaults for Control Measure validation:   
+   <br/></p> 
 
     <p><div style="font-family: Arial, Helvetica, Geneva, sans-serif; font-size:95%">
          <table border="0"><tr><td width="40"></td><td>
@@ -400,6 +411,10 @@
     </change>
     <change name="Sharmila Prasad, Bonnie Redding, Mark Rosiek" date="2011-10-06">
      Updated the documentation and added missing tests for criteria resolution 
+    </change>
+    <change name="Sharmila Prasad" date="2011-11-23">
+    Updated the documentation. Edited to work for control nets with Reference 
+    not set. Fixes #589 and #584 
     </change>
 </history>
 
