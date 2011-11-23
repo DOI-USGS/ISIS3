@@ -22,8 +22,8 @@ namespace Isis {
    */
   ControlNetValidMeasure::ControlNetValidMeasure(Pvl *pPvl) {
     InitStdOptions();
-
-    if(pPvl->HasGroup("ValidMeasure")) {
+    
+    if(pPvl != NULL && pPvl->HasGroup("ValidMeasure")) {
       Parse(*pPvl);
     }
     else {
