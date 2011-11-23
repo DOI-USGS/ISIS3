@@ -206,7 +206,7 @@
       <inputImages>
         <image src="assets/images/before.jpg" width="512" height="512">
           <brief>
-            Mosaic of the input images for equalizer
+            Mosaic of the input images for blend
           </brief>
           <description>
             This is a cropped subsection of the mosaic of the input images
