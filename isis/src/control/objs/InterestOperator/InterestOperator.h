@@ -110,6 +110,8 @@ namespace Isis {
    *                          Tie----------> Free
    *   @history 2011-11-21 Sharmila Prasad - 1. InterestOperator should run without ValidMeasure Group.
    *   2. The Validity test must be performed on Measure after moving to new location Fixes Mantis #584
+   *   @history 2011-11-23 Sharmila Prasad - Process for control nets with Reference not explicitly set.
+   *                                         Fixes #589
    *  
    */
   class InterestOperator : public ControlNetValidMeasure {

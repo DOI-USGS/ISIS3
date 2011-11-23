@@ -381,7 +381,8 @@ namespace Isis {
       // Get number of measures locked and check if Reference
       // Measure is locked
       int iNumMeasuresLocked = newPnt->GetNumLockedMeasures();
-
+      int numMeasures = newPnt->GetNumMeasures();
+      
       bool bRefLocked = false;
       int iOrigRefIndex = -1;
       try {
@@ -394,8 +395,7 @@ namespace Isis {
 
       // Only perform the interest operation on points of type "Free" and
       // Points having atleast 1 measure and Point is not Ignored
-      if (!newPnt->IsIgnored() && newPnt->GetType() == ControlPoint::Free &&
-          iOrigRefIndex >= 0 &&
+      if (!newPnt->IsIgnored() && newPnt->GetType() == ControlPoint::Free && numMeasures > 0 &&
           (iNumMeasuresLocked == 0 || (iNumMeasuresLocked > 0 && bRefLocked))) {
 
         // Check only the validity of the Point / Measures only if Point and/or
@@ -444,7 +444,7 @@ namespace Isis {
         // Create a measurment for each image in this point using
         // the reference lat/lon.
         int iNumIgnore = 0;
-        for (int measure = 0; measure < newPnt->GetNumMeasures(); ++measure) {
+        for (int measure = 0; measure < numMeasures; ++measure) {
           ControlMeasure *newMeasure = newPnt->GetMeasure(measure);
           newMeasure->SetDateTime();
           newMeasure->SetChooserName("Application cnetref(interest)");
@@ -542,7 +542,7 @@ namespace Isis {
         } // Measures Loop
 
         // Check the ignored measures number
-        if ((newPnt->GetNumMeasures() - iNumIgnore) < 2) {
+        if ((numMeasures - iNumIgnore) < 2) {
           newPnt->SetIgnored(true);
           pvlPointObj += Isis::PvlKeyword("Ignored", "Good Measures less than 2");
         }
@@ -556,10 +556,15 @@ namespace Isis {
         if (!newPnt->IsIgnored() && iBestMeasureIndex != iOrigRefIndex) {
           iRefChanged ++;
           PvlGroup pvlRefChangeGrp("ReferenceChangeDetails");
-          pvlRefChangeGrp += Isis::PvlKeyword("PrevSerialNumber", mtInterestResults[iOrigRefIndex].msSerialNum);
-          pvlRefChangeGrp += Isis::PvlKeyword("PrevBestInterest", mtInterestResults[iOrigRefIndex].mdInterest);
-          pvlRefChangeGrp += Isis::PvlKeyword("PrevLocation",     LocationString(mtInterestResults[iOrigRefIndex].mdOrigSample,
-                                              mtInterestResults[iOrigRefIndex].mdOrigLine));
+          if (iOrigRefIndex >= 0) {
+            pvlRefChangeGrp += Isis::PvlKeyword("PrevSerialNumber", mtInterestResults[iOrigRefIndex].msSerialNum);
+            pvlRefChangeGrp += Isis::PvlKeyword("PrevBestInterest", mtInterestResults[iOrigRefIndex].mdInterest);
+            pvlRefChangeGrp += Isis::PvlKeyword("PrevLocation",     LocationString(mtInterestResults[iOrigRefIndex].mdOrigSample,
+                                                mtInterestResults[iOrigRefIndex].mdOrigLine));
+          }
+          else {
+            pvlRefChangeGrp += Isis::PvlKeyword("PrevReference", "Not Set");
+          }
           pvlRefChangeGrp += Isis::PvlKeyword("NewSerialNumber",  mtInterestResults[iBestMeasureIndex].msSerialNum);
           pvlRefChangeGrp += Isis::PvlKeyword("NewBestInterest",  mtInterestResults[iBestMeasureIndex].mdInterest);
           pvlRefChangeGrp += Isis::PvlKeyword("NewLocation",      LocationString(mtInterestResults[iBestMeasureIndex].mdBestSample,
@@ -582,7 +587,7 @@ namespace Isis {
         // Process Ignored, non Free points or Measures=0
         int iComment = 0;
 
-        if (iOrigRefIndex < 0) {
+        if (numMeasures == 0) {
           iString sComment = "Comment";
           sComment += iString(++iComment);
           pvlPointObj += Isis::PvlKeyword(sComment, "No Measures in the Point");
