@@ -59,9 +59,14 @@ namespace Isis {
    *   @history 2011-07-18 Jai Rideout and Steven Lambright - Added
    *                           unimplemented copy constructor and assignment
    *                           operator.
-   *   @history 2011-07-18 Jai Rideout and Steven Lambright -getDataFile() is
+   *   @history 2011-07-18 Jai Rideout and Steven Lambright - getDataFile() is
    *                           no longer const, along with readRaw() and
    *                           writeRaw().
+   *   @history 2011-11-23 Jai Rideout - Added fix to findCubeChunks() and
+   *                           findIntersection() so that requested areas that
+   *                           are outside of the virtual bands of the cube will
+   *                           no longer fail, but instead will fill the buffer
+   *                           with nulls.
    */
   class CubeIoHandler {
     public:

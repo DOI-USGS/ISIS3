@@ -58,6 +58,19 @@ namespace Isis {
    *   @history 2011-08-19 Jeannie Backer - Modified unitTest to use
    *                           $temporary variable instead of /tmp directory.
    *                           Added some documentation to methods.
+   *   @history 2011-11-23 Jai Rideout - Modified the two StartProcess() methods
+   *                           that either accept one input and one output
+   *                           cube, or multiple input and output cubes so that
+   *                           the area that the brick traverses is the largest
+   *                           of all of the cubes (including both input and
+   *                           output cubes). This resolves the issue of
+   *                           premature wrapping that would occur when the
+   *                           sizes of the cubes differed. Now, the bricks are
+   *                           filled with nulls if they read past the end of a
+   *                           smaller cube before they have reached the end of
+   *                           the larger one. These changes only take effect
+   *                           when the wrap option is off, otherwise the
+   *                           previous behavior is used.
    */
   class ProcessByBrick : public Isis::Process {
     
@@ -79,6 +92,9 @@ namespace Isis {
                                                   bricks*/
       std::vector<int> p_outputBrickBands;   /**< Number of bands in the output 
                                                   bricks*/
+
+    private:
+      std::vector<int> CalculateMaxDimensions(std::vector<Cube *> cubes) const;
 
     public:
       //! Constructs a ProcessByBrick object

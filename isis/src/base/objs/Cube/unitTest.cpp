@@ -1,12 +1,14 @@
 #include <iostream>
 
 #include "iException.h"
+#include "Brick.h"
 #include "Cube.h"
 #include "Filename.h"
 #include "LineManager.h"
 #include "Pvl.h"
 #include "Preference.h"
 #include "Histogram.h"
+#include "SpecialPixel.h"
 #include "Statistics.h"
 
 using namespace std;
@@ -257,6 +259,172 @@ int main(int argc, char *argv[]) {
     in.reopen("r");
     Report(in);
 
+
+    // Test reading past cube boundaries.
+    // First create a new cube for us to test and fill it with ones.
+    cerr << "Testing reading past cube boundaries ... " << endl;
+    cerr << "Constructing cube ... " << endl;
+    Cube boundaryTestCube;
+    boundaryTestCube.setDimensions(10, 10, 2);
+    boundaryTestCube.create("IsisCube_boundary");
+    Report(boundaryTestCube);
+    LineManager boundaryLine(boundaryTestCube);
+    j = 0;
+    for(boundaryLine.begin(); !boundaryLine.end(); boundaryLine++) {
+      for(int i = 0; i < boundaryLine.size(); i++) {
+        boundaryLine[i] = 1.0;
+        j++;
+      }
+      j--;
+      boundaryTestCube.write(boundaryLine);
+    }
+
+    // Now read past the cube boundaries and compare the results to what we
+    // expect. All valid positions in the brick should be filled with ones since
+    // our cube is entirely filled with ones, and any parts that fall outside of
+    // the cube should be nulls.
+    cerr << "Reading completely within cube boundaries ... " << endl;
+    Brick readBrick(1, 1, 2, boundaryTestCube.getPixelType());
+    readBrick.SetBasePosition(1, 1, 1);
+    boundaryTestCube.read(readBrick);
+
+    cerr << "Comparing results ... " << endl;
+    for(int i = 0; i < readBrick.size(); i++) {
+      if (readBrick[i] != 1.0) {
+        cerr << "Not all values in brick were 1.0.\n";
+        return 1;
+      }
+    }
+    cerr << endl;
+
+    cerr << "Reading completely outside band boundaries ... " << endl;
+    readBrick.SetBasePosition(1, 1, -1);
+    boundaryTestCube.read(readBrick);
+
+    cerr << "Comparing results ... " << endl;
+    for(int i = 0; i < readBrick.size(); i++) {
+      if (readBrick[i] != Null) {
+        cerr << "Not all values in brick were Null.\n";
+        return 1;
+      }
+    }
+    cerr << endl;
+
+    // Read before the bands start in the cube.
+    cerr << "Reading partially within band boundaries ... " << endl;
+    readBrick.SetBasePosition(1, 1, 0);
+    boundaryTestCube.read(readBrick);
+
+    cerr << "Comparing results ... " << endl;
+    if (readBrick[0] != Null) {
+      cerr << "Value outside cube boundary was not Null.\n";
+      return 1;
+    }
+    if (readBrick[1] != 1.0) {
+      cerr << "Value inside cube boundary was not 1.0.\n";
+      return 1;
+    }
+
+    // Read after the bands start in the cube.
+    readBrick.SetBasePosition(1, 1, 2);
+    boundaryTestCube.read(readBrick);
+    if (readBrick[0] != 1.0) {
+      cerr << "Value inside cube boundary was not 1.0.\n";
+      return 1;
+    }
+    if (readBrick[1] != Null) {
+      cerr << "Value outside cube boundary was not Null.\n";
+      return 1;
+    }
+    cerr << endl;
+
+    boundaryTestCube.close();
+
+    // Test reading outside a cube with virtual bands.
+    cerr << "Testing reading past cube boundaries with virtual bands ... \n";
+    QList<iString> virtualBands;
+    virtualBands.push_back("2");
+    boundaryTestCube.setVirtualBands(virtualBands);
+    boundaryTestCube.open("IsisCube_boundary");
+
+    cerr << "Reading completely outside virtual band boundaries ... " << endl;
+    readBrick.SetBasePosition(1, 1, 2);
+    boundaryTestCube.read(readBrick);
+
+    cerr << "Comparing results ... " << endl;
+    for(int i = 0; i < readBrick.size(); i++) {
+      if (readBrick[i] != Null) {
+        cerr << "Not all values in brick were Null.\n";
+        return 1;
+      }
+    }
+
+    readBrick.SetBasePosition(1, 1, 1000);
+    boundaryTestCube.read(readBrick);
+    for(int i = 0; i < readBrick.size(); i++) {
+      if (readBrick[i] != Null) {
+        cerr << "Not all values in brick were Null.\n";
+        return 1;
+      }
+    }
+
+    readBrick.SetBasePosition(1, 1, -1);
+    boundaryTestCube.read(readBrick);
+    for(int i = 0; i < readBrick.size(); i++) {
+      if (readBrick[i] != Null) {
+        cerr << "Not all values in brick were Null.\n";
+        return 1;
+      }
+    }
+    cerr << endl;
+
+    // Read before the bands start in the cube.
+    cerr << "Reading partially within virtual band boundaries ... " << endl;
+    readBrick.SetBasePosition(1, 1, 0);
+    boundaryTestCube.read(readBrick);
+
+    cerr << "Comparing results ... " << endl;
+    if (readBrick[0] != Null) {
+      cerr << "Value outside cube boundary was not Null.\n";
+      return 1;
+    }
+    if (readBrick[1] != 1.0) {
+      cerr << "Value inside cube boundary was not 1.0.\n";
+      return 1;
+    }
+
+    // Read after the bands start in the cube.
+    readBrick.SetBasePosition(1, 1, 1);
+    boundaryTestCube.read(readBrick);
+    if (readBrick[0] != 1.0) {
+      cerr << "Value inside cube boundary was not 1.0.\n";
+      return 1;
+    }
+    if (readBrick[1] != Null) {
+      cerr << "Value outside cube boundary was not Null.\n";
+      return 1;
+    }
+
+    // Resize the brick to be have many more bands than the cube, and position
+    // it before the start of the bands. We should get nulls, then some values,
+    // then more nulls.
+    readBrick.Resize(1, 1, 20);
+    readBrick.SetBasePosition(1, 1, -10);
+    boundaryTestCube.read(readBrick);
+    for (int i = 0; i < readBrick.size(); i++) {
+      if (i == 11) {
+        if (readBrick[i] != 1.0)
+          cerr << "Value inside cube boundary was not 1.0.\n";
+      }
+      else {
+        if (readBrick[i] != Null)
+          cerr << "Value outside cube boundary was not Null.\n";
+      }
+    }
+    cerr << endl;
+    boundaryTestCube.close();
+
+
     // Check errors
     cerr << "Testing errors ... " << endl;
     try {
@@ -401,6 +569,7 @@ int main(int argc, char *argv[]) {
   remove("IsisCube_03.cub");
   remove("IsisCube_04.cub");
   remove("IsisCube_05.cub");
+  remove("IsisCube_boundary.cub");
   return 0;
 }
 

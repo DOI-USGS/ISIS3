@@ -616,7 +616,6 @@ namespace Isis {
       int numBands) {
     QList<RawCubeChunk *> results;
 
-    int initialBand = max(startBand, 1);
     int lastBand = min(startBand + numBands - 1,
                        getBandCount());
 
@@ -631,14 +630,17 @@ namespace Isis {
     // We are considering only 1 band at a time.. we can't use m_bandsInChunk
     //   because of virtual bands, but every extra loop should not need extra
     //   IO.
-    for(int band = initialBand; band <= lastBand; band ++) {
+    for(int band = startBand; band <= lastBand; band ++) {
       // This is the user-requested area in this band
       QRect areaLeftInBand(areaInBand);
 
       int actualBand = band;
 
       if(m_virtualBands) {
-        actualBand = (m_virtualBands->at(band - 1) - 1) / m_bandsInChunk + 1;
+        if (band < 1 || band > m_virtualBands->size())
+          actualBand = 0;
+        else
+          actualBand = (m_virtualBands->at(band - 1) - 1) / m_bandsInChunk + 1;
       }
 
       // We will be consuming areaLeftInBand until we've got all of the area
@@ -703,7 +705,11 @@ namespace Isis {
                       initialChunkYPos * m_linesInChunk + 1,
                       m_samplesInChunk, m_linesInChunk);
 
-        while(chunkRect.intersects(areaLeftInBand)) {
+        // The chunk rectangle must intersect the remaining area that is in the
+        // current band, and the chunk's initial band must be between 1 and the
+        // number of physical bands in the cube (inclusive).
+        while(chunkRect.intersects(areaLeftInBand) &&
+              (initialChunkBand >= 1 && initialChunkBand <= getBandCount())) {
           int chunkXPos = (chunkRect.left() - 1) / m_samplesInChunk;
           int chunkYPos = (chunkRect.top() - 1) / m_linesInChunk;
           int chunkZPos = initialChunkZPos;
@@ -782,23 +788,32 @@ namespace Isis {
     int startPhysicalBand = 0;
     int endPhysicalBand = 0;
 
+    bool startVBandFound = false;
     for(int virtualBand = startVBand; virtualBand <= endVBand; virtualBand ++) {
       int physicalBand = virtualBand;
 
+      bool bandExists = true;
       if(m_virtualBands) {
-        physicalBand = m_virtualBands->at(virtualBand - 1);
+        if (virtualBand < 1 || virtualBand > m_virtualBands->size())
+          bandExists = false;
+        else {
+          physicalBand = m_virtualBands->at(virtualBand - 1);
+        }
       }
 
-      if(virtualBand == startVBand) {
-        startPhysicalBand = physicalBand;
-        endPhysicalBand = physicalBand;
-      }
-      else {
-        if(physicalBand < startPhysicalBand)
+      if (bandExists) {
+        if(!startVBandFound) {
           startPhysicalBand = physicalBand;
-
-        if(physicalBand > endPhysicalBand)
           endPhysicalBand = physicalBand;
+          startVBandFound = true;
+        }
+        else {
+          if(physicalBand < startPhysicalBand)
+            startPhysicalBand = physicalBand;
+
+          if(physicalBand > endPhysicalBand)
+            endPhysicalBand = physicalBand;
+        }
       }
     }
 
@@ -1045,7 +1060,7 @@ namespace Isis {
         virtualBand = m_virtualBands->indexOf(virtualBand) + 1;
       }
 
-      if(virtualBand >= bufferBand &&
+      if(virtualBand != 0 && virtualBand >= bufferBand &&
          virtualBand <= bufferBand + bufferBands - 1) {
 
         for(int y = startY; y <= endY; y++) {
@@ -1178,7 +1193,7 @@ namespace Isis {
         virtualBand = m_virtualBands->indexOf(virtualBand) + 1;
       }
 
-      if(virtualBand >= bufferBand &&
+      if(virtualBand != 0 && virtualBand >= bufferBand &&
          virtualBand <= bufferBand + bufferBands - 1) {
 
         for(int y = startY; y <= endY; y++) {

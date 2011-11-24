@@ -46,22 +46,25 @@ namespace Isis {
    *  @history 2006-04-21 Jacob Danton - Modified Brick to extend BufferManager,
    *                                      added new constructor, and two methods,
    *                                      SetBrick and Bricks
+   *  @history 2011-11-23 Jai Rideout - Added a new constructor that allows one
+   *                                    to specify the shape buffer size as well
+   *                                    as the size of the area to be mapped.
+   *                                    This is useful for classes such as
+   *                                    ProcessByBrick that need to specify an
+   *                                    area to be traversed that is bigger than
+   *                                    the cube itself.
    *
    *  @todo 2005-02-28 Jeff Anderson - add coded and implementation examples to
    *                                   class documentation
    */
   class Brick : public Isis::BufferManager {
     public:
-
       /**
        * Constructs a Brick object
        *
        * @param nsamps Number of samples in shape buffer
-       *
        * @param nlines Number of lines in shape buffer
-       *
        * @param nbands Number of bands in shape buffer
-       *
        * @param type Type of pixel in raw buffer
        */
       Brick(const int nsamps, const int nlines, const int nbands,
@@ -75,6 +78,24 @@ namespace Isis {
         Isis::BufferManager(cube.getSampleCount(), cube.getLineCount(),
                             cube.getBandCount(), bufNumSamples, bufNumLines,
                             bufNumBands, cube.getPixelType()) {
+      };
+
+      /**
+       * Constructs a Brick object of the specified buffer size and area size to
+       * map.
+       *
+       * @param maxSamples Maximum number of samples to map
+       * @param maxLines Maximum number of lines to map
+       * @param maxBands Maximum number of bands to map
+       * @param bufNumSamples Number of samples in shape buffer
+       * @param bufNumLines Number of lines in shape buffer
+       * @param bufNumBands Number of bands in shape buffer
+       * @param type Type of pixel in raw buffer
+       */
+      Brick(int maxSamples, int maxLines, int maxBands, int bufNumSamples,
+            int bufNumLines, int bufNumBands, Isis::PixelType type) :
+        Isis::BufferManager(maxSamples, maxLines, maxBands, bufNumSamples,
+                            bufNumLines, bufNumBands, type) {
       };
 
     public:

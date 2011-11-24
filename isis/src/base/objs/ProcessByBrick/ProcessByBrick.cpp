@@ -290,10 +290,38 @@ namespace Isis {
     }
 
     // Construct brick buffers
-    *ibrick = new Isis::Brick(*InputCubes[0], p_inputBrickSamples[1], 
-                              p_inputBrickLines[1], p_inputBrickBands[1]);
-    *obrick = new Isis::Brick(*OutputCubes[0], p_outputBrickSamples[1], 
-                              p_outputBrickLines[1], p_outputBrickBands[1]);
+    if (Wraps()) {
+      // Use the size of each cube as the area for the bricks to traverse since
+      // we will be wrapping if we hit the end of one, but not the other.
+      *ibrick = new Isis::Brick(*InputCubes[0], p_inputBrickSamples[1], 
+                                p_inputBrickLines[1], p_inputBrickBands[1]);
+      *obrick = new Isis::Brick(*OutputCubes[0], p_outputBrickSamples[1], 
+                                p_outputBrickLines[1], p_outputBrickBands[1]);
+    }
+    else {
+      // Since we are not wrapping, we need to find the maximum size of the
+      // input cube and the output cube. We will use this size when
+      // constructing each of the bricks' area to traverse so that we don't
+      // read into nonexistent bands of the smaller of the two cubes.
+      std::vector<Cube *> allCubes;
+      allCubes.push_back(InputCubes[0]);
+      allCubes.push_back(OutputCubes[0]);
+      std::vector<int> maxDimensions = CalculateMaxDimensions(allCubes);
+      int maxSamples = maxDimensions[0];
+      int maxLines = maxDimensions[1];
+      int maxBands = maxDimensions[2];
+
+      *ibrick = new Isis::Brick(maxSamples, maxLines, maxBands,
+                                p_inputBrickSamples[1],
+                                p_inputBrickLines[1],
+                                p_inputBrickBands[1],
+                                InputCubes[0]->getPixelType());
+      *obrick = new Isis::Brick(maxSamples, maxLines, maxBands,
+                                p_outputBrickSamples[1],
+                                p_outputBrickLines[1],
+                                p_outputBrickBands[1],
+                                OutputCubes[0]->getPixelType());
+    }
 
     int numBricks;
     if((*ibrick)->Bricks() > (*obrick)->Bricks()) {
@@ -491,11 +519,41 @@ namespace Isis {
     // which is the maximum number of bricks of all the cubes.
     int numBricks = 0;
 
-    
+    // If we are not wrapping, we need to find the maximum size of the input and
+    // output cubes. We will use this size when constructing each of the bricks'
+    // area to traverse so that we don't read into nonexistent bands of the
+    // smaller cubes.
+    int maxSamples = 0;
+    int maxLines = 0;
+    int maxBands = 0;
+    if (!Wraps()) {
+      std::vector<Cube *> allCubes(InputCubes);
+      for (unsigned int i = 0; i < OutputCubes.size(); i++)
+        allCubes.push_back(OutputCubes[i]);
+      std::vector<int> maxDimensions = CalculateMaxDimensions(allCubes);
+      maxSamples = maxDimensions[0];
+      maxLines = maxDimensions[1];
+      maxBands = maxDimensions[2];
+    }
+
     for(unsigned int i = 1; i <= InputCubes.size(); i++) {
-      Isis::Brick *ibrick = new Brick(*InputCubes[i-1], p_inputBrickSamples[i], 
-                                      p_inputBrickLines[i], 
-                                      p_inputBrickBands[i]);
+      Isis::Brick *ibrick = NULL;
+      if (Wraps()) {
+        // Use the size of each cube as the area for the bricks to traverse
+        // since we will be wrapping if we hit the end of a cube before we are
+        // done processing.
+        ibrick = new Brick(*InputCubes[i-1],
+                            p_inputBrickSamples[i],
+                            p_inputBrickLines[i],
+                            p_inputBrickBands[i]);
+      }
+      else {
+        ibrick = new Brick(maxSamples, maxLines, maxBands,
+                            p_inputBrickSamples[i],
+                            p_inputBrickLines[i],
+                            p_inputBrickBands[i],
+                            InputCubes[i - 1]->getPixelType());
+      }
       ibrick->begin();
       ibufs.push_back(ibrick);
       imgrs.push_back(ibrick);
@@ -505,10 +563,20 @@ namespace Isis {
     }
     
     for(unsigned int i = 1; i <= OutputCubes.size(); i++) {
-      Isis::Brick *obrick = new Brick(*OutputCubes[i-1], 
-                                      p_outputBrickSamples[i], 
-                                      p_outputBrickLines[i], 
-                                      p_outputBrickBands[i]);
+      Isis::Brick *obrick = NULL;
+      if (Wraps()) {
+        obrick = new Brick(*OutputCubes[i-1],
+                            p_outputBrickSamples[i],
+                            p_outputBrickLines[i],
+                            p_outputBrickBands[i]);
+      }
+      else {
+        obrick = new Brick(maxSamples, maxLines, maxBands,
+                            p_outputBrickSamples[i],
+                            p_outputBrickLines[i],
+                            p_outputBrickBands[i],
+                            OutputCubes[i - 1]->getPixelType());
+      }
       obrick->begin();
       obufs.push_back(obrick);
       omgrs.push_back(obrick);
@@ -519,6 +587,7 @@ namespace Isis {
     
     return numBricks;
   }
+
   /**
    * Starts the systematic processing of the input cube by moving an arbitrary
    * shaped brick through the cube. This method allows multiple input and output
@@ -565,13 +634,15 @@ namespace Isis {
 
       for(unsigned int i = 0; i < InputCubes.size(); i++) {
         imgrs[i]->next();
+
         // if the manager has reached the end and the
         // wrap option is on, wrap around to the beginning
-        if(Wraps() && imgrs[i]->end()) imgrs[i]->begin();
+        if(Wraps() && imgrs[i]->end())
+          imgrs[i]->begin();
 
         // Enforce same band
-        if(imgrs[i]->Band() != imgrs[0]->Band() 
-           && InputCubes[i]->getBandCount() != 1) {
+        if(imgrs[i]->Band() != imgrs[0]->Band() &&
+           InputCubes[i]->getBandCount() != 1) {
           imgrs[i]->SetBaseBand(imgrs[0]->Band());
         }
       }
@@ -601,6 +672,45 @@ namespace Isis {
     p_outputBrickSizeSet = false;
     Isis::Process::EndProcess();
 
+  }
+
+  /**
+   * Calculates the maximum dimensions of all the cubes and returns them in a
+   * vector where position 0 is the max sample, position 1 is the max line, and
+   * position 2 is the max band. For example, if two cubes were passed in and
+   * the first cube had 1 sample, 1 line, and 1 band, and the second cube had 2
+   * samples, 2 lines, and 2 bands, the max dimensions would be 2 samples, 2
+   * lines, and 2 bands.
+   *
+   * @param cubes The vector of cubes to calculate the maximum dimensions for.
+   * @return A vector of size 3 containing the max sample dimension at position
+   *   0, the max line dimension at position 1, and the max band dimension at
+   *   position 2.
+   */
+  std::vector<int> ProcessByBrick::CalculateMaxDimensions(
+      std::vector<Cube *> cubes) const {
+    int maxSamples = 0;
+    int maxLines = 0;
+    int maxBands = 0;
+
+    for (unsigned int i = 0; i < cubes.size(); i++) {
+      int sampleCount = cubes[i]->getSampleCount();
+      int lineCount = cubes[i]->getLineCount();
+      int bandCount = cubes[i]->getBandCount();
+
+      if (sampleCount > maxSamples)
+        maxSamples = sampleCount;
+      if (lineCount > maxLines)
+        maxLines = lineCount;
+      if (bandCount > maxBands)
+        maxBands = bandCount;
+    }
+
+    std::vector<int> maxDimensions;
+    maxDimensions.push_back(maxSamples);
+    maxDimensions.push_back(maxLines);
+    maxDimensions.push_back(maxBands);
+    return maxDimensions;
   }
 } // end namespace isis
 
