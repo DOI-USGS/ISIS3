@@ -6,7 +6,9 @@
 #include "AbstractFilter.h"
 
 #include <QAction>
+#include <QAbstractButton>
 #include <QButtonGroup>
+#include <QCheckBox>
 #include <QFlags>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -43,6 +45,8 @@ namespace Isis
 
       effectivenessFlags = new FilterEffectivenessFlag(effectiveness);
 
+      smallFont = new QFont("SansSerif", 9);
+
       createWidget();
     }
 
@@ -55,6 +59,8 @@ namespace Isis
 
       effectivenessFlags = new FilterEffectivenessFlag(*other.effectivenessFlags);
 
+      smallFont = new QFont(*other.smallFont);
+
       createWidget();
 
       inclusiveExclusiveGroup->button(
@@ -64,17 +70,14 @@ namespace Isis
 
     AbstractFilter::~AbstractFilter()
     {
-      if (effectivenessFlags)
-      {
-        delete effectivenessFlags;
-        effectivenessFlags = NULL;
-      }
+      delete effectivenessFlags;
+      effectivenessFlags = NULL;
 
-      if (inclusiveExclusiveGroup)
-      {
-        delete inclusiveExclusiveGroup;
-        inclusiveExclusiveGroup = NULL;
-      }
+      delete inclusiveExclusiveGroup;
+      inclusiveExclusiveGroup = NULL;
+
+      delete smallFont;
+      smallFont = NULL;
     }
 
 
@@ -116,22 +119,22 @@ namespace Isis
 
     void AbstractFilter::nullify()
     {
-      effectivenessMenu = NULL;
+      effectivenessGroup = NULL;
       inclusiveExclusiveGroup = NULL;
       inclusiveExclusiveLayout = NULL;
       mainLayout = NULL;
       minWidget = NULL;
       effectivenessFlags = NULL;
+      smallFont = NULL;
     }
 
 
     void AbstractFilter::createWidget()
     {
-      QFont inclusiveExclusiveFont("SansSerif", 9);
       QRadioButton * inclusiveButton = new QRadioButton("Inclusive");
-      inclusiveButton->setFont(inclusiveExclusiveFont);
+      inclusiveButton->setFont(*smallFont);
       QRadioButton * exclusiveButton = new QRadioButton("Exclusive");
-      exclusiveButton->setFont(inclusiveExclusiveFont);
+      exclusiveButton->setFont(*smallFont);
 
       inclusiveExclusiveGroup = new QButtonGroup;
       connect(inclusiveExclusiveGroup, SIGNAL(buttonClicked(int)),
@@ -155,45 +158,56 @@ namespace Isis
 
       controlsLayout->addLayout(inclusiveExclusiveLayout);
 
-
-      effectivenessMenu = new QMenu("Effect");
-      connect(effectivenessMenu, SIGNAL(aboutToHide()),
-          this, SLOT(showHideEffectivenessMenu()));
+      effectivenessGroup = new QButtonGroup();
+      effectivenessGroup->setExclusive(false);
 
       if (effectivenessFlags->testFlag(Images))
-        effectivenessMenu->addAction(createEffectivenessAction("&Images"));
+        effectivenessGroup->addButton(
+            createEffectivenessCheckBox("&Images"), 0);
 
       if (effectivenessFlags->testFlag(Points))
-        effectivenessMenu->addAction(createEffectivenessAction("&Points"));
+        effectivenessGroup->addButton(
+            createEffectivenessCheckBox("&Points"), 1);
 
       if (effectivenessFlags->testFlag(Measures))
-        effectivenessMenu->addAction(createEffectivenessAction("&Measures"));
+        effectivenessGroup->addButton(
+            createEffectivenessCheckBox("&Measures"), 2);
 
-      QString firstMenuEntry;
-      ASSERT(effectivenessMenu->actions().size());
-      if (effectivenessMenu->actions().size())
+      QString firstGroupEntry;
+      ASSERT(effectivenessGroup->buttons().size());
+      if (effectivenessGroup->buttons().size())
       {
-        firstMenuEntry = effectivenessMenu->actions()[0]->text();
-        firstMenuEntry.remove(0, 1);
+        firstGroupEntry = effectivenessGroup->buttons()[0]->text();
+        firstGroupEntry.remove(0, 1);
       }
 
-      if (effectivenessMenu->actions().size() >= 2)
+      QList<QAbstractButton *> buttons = effectivenessGroup->buttons();
+      if (effectivenessGroup->buttons().size() >= 2)
       {
-        QMenuBar * bar = new QMenuBar;
-        bar->addMenu(effectivenessMenu);
-        controlsLayout->addWidget(bar);
-        controlsLayout->setAlignment(bar, Qt::AlignTop);
+        QHBoxLayout * effectivenessLayout = new QHBoxLayout;
+        QMargins effectivenessMargins = effectivenessLayout->contentsMargins();
+        effectivenessMargins.setTop(0);
+        effectivenessMargins.setBottom(0);
+        effectivenessLayout->setContentsMargins(effectivenessMargins);
+
+        for (int i = 0; i < buttons.size(); i++)
+          effectivenessLayout->addWidget(buttons[i]);
+
+        controlsLayout->addLayout(effectivenessLayout);
       }
       else
       {
-        delete effectivenessMenu;
-        effectivenessMenu = NULL;
+        for (int i = 0; i < buttons.size(); i++)
+          delete buttons[i];
+        delete effectivenessGroup;
+        effectivenessGroup = NULL;
       }
 
       if (minForSuccess != -1)
       {
         QLabel * label = new QLabel;
-        label->setText("<span>Min Count<br/>for " + firstMenuEntry + "</span>");
+        label->setText(
+            "<span>Min Count<br/>for " + firstGroupEntry + "</span>");
         label->setFont(QFont("SansSerif", 7));
         QSpinBox * spinBox = new QSpinBox;
         spinBox->setRange(1, std::numeric_limits< int >::max());
@@ -232,13 +246,15 @@ namespace Isis
     }
 
 
-    QAction * AbstractFilter::createEffectivenessAction(QString text)
+    QCheckBox * AbstractFilter::createEffectivenessCheckBox(QString text)
     {
-      QAction * act = new QAction(text, this);
-      act->setCheckable(true);
-      act->setChecked(true);
-      connect(act, SIGNAL(toggled(bool)), this, SLOT(updateEffectiveness()));
-      return act;
+      QCheckBox * checkBox = new QCheckBox(text, this);
+      checkBox->setChecked(true);
+      checkBox->setFont(*smallFont);
+      connect(checkBox, SIGNAL(toggled(bool)),
+              this, SLOT(updateEffectiveness()));
+      connect(checkBox, SIGNAL(toggled(bool)), this, SIGNAL(filterChanged()));
+      return checkBox;
     }
 
 
@@ -358,52 +374,30 @@ namespace Isis
     }
 
 
-    void AbstractFilter::showHideEffectivenessMenu()
-    {
-      ASSERT(effectivenessMenu);
-
-      if (effectivenessMenu)
-      {
-        QRect menuRect(effectivenessMenu->pos(), effectivenessMenu->size());
-        QPoint cursorPos = effectivenessMenu->cursor().pos();
-
-        if (menuRect.contains(cursorPos))
-        {
-          effectivenessMenu->show();
-        }
-        else
-        {
-          effectivenessMenu->hide();
-          emit filterChanged();
-        }
-      }
-    }
-
-
     void AbstractFilter::updateEffectiveness()
     {
-      ASSERT(effectivenessMenu);
+      ASSERT(effectivenessGroup);
 
-      if (effectivenessMenu)
+      if (effectivenessGroup)
       {
         FilterEffectivenessFlag newFlags;
 
-        QList< QAction * > actions = effectivenessMenu->actions();
+        QList< QAbstractButton * > buttons = effectivenessGroup->buttons();
 
         if (minWidget)
           minWidget->setVisible(false);
 
-        for (int i = 0; i < actions.size(); i++)
+        for (int i = 0; i < buttons.size(); i++)
         {
-          if (actions[i]->isChecked())
+          if (buttons[i]->isChecked())
           {
-            if (actions[i]->text() == "&Images")
+            if (buttons[i]->text() == "&Images")
               newFlags |= Images;
             else
-              if (actions[i]->text() == "&Points")
+              if (buttons[i]->text() == "&Points")
                 newFlags |= Points;
               else
-                if (actions[i]->text() == "&Measures")
+                if (buttons[i]->text() == "&Measures")
                   newFlags |= Measures;
 
             if (i == 0 && minWidget)

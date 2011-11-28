@@ -6,8 +6,8 @@
 
 class QBoxLayout;
 class QButtonGroup;
+class QCheckBox;
 template< typename T > class QFlags;
-class QMenu;
 
 
 namespace Isis
@@ -85,26 +85,26 @@ namespace Isis
 
 
       private slots:
-        void showHideEffectivenessMenu();
         void updateEffectiveness();
         void updateMinForSuccess(int);
 
 
       private:
-        QAction * createEffectivenessAction(QString);
+        QCheckBox * createEffectivenessCheckBox(QString);
 
 
       private:
         QBoxLayout * mainLayout;
         QBoxLayout * inclusiveExclusiveLayout;
         QButtonGroup * inclusiveExclusiveGroup;
-        QMenu * effectivenessMenu;
+        QButtonGroup * effectivenessGroup;
         QWidget * minWidget;
 
 
       private:
         int minForSuccess;
         FilterEffectivenessFlag * effectivenessFlags;
+        QFont * smallFont;
     };
 
     Q_DECLARE_OPERATORS_FOR_FLAGS(AbstractFilter::FilterEffectivenessFlag)
