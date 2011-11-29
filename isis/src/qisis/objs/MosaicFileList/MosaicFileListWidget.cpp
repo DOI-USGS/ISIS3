@@ -105,12 +105,12 @@ namespace Isis {
         p_tree->topLevelItem(0)->addChildren(allCubes);
 
         iString msg = "Mosaic file list did not have a location for "
-            "all of the cubes";
+            "all of the cubes. Putting them in the first group";
         throw iException::Message(iException::Programmer, msg, _FILEINFO_);
       }
     }
     else {
-      throw iException::Message(iException::Io, "Unable to read mosaic file "
+      throw iException::Message(iException::Io, "Unable to read mosaic file's "
           "list widget settings from Pvl", _FILEINFO_);
     }
   }
