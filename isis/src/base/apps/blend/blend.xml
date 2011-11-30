@@ -79,6 +79,10 @@
     <change name="Travis Addair" date="2011-09-08">
       Original translation of the Davinci "blend" script into Isis 3.
     </change>
+    <change name="Travis Addair" date="2011-11-30">
+      Added new queue technique to create the ramp, resulting in significant
+      performance gains overall.
+    </change>
   </history>
 
   <groups>

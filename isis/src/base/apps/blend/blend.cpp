@@ -1,6 +1,7 @@
 #include "Isis.h"
 
 #include <QFile>
+#include <QQueue>
 #include <QVector>
 
 #include "Buffer.h"
@@ -19,10 +20,92 @@ using namespace Isis;
 using std::string;
 
 
+int r1;
+int r2;
+int c1;
+int c2;
+
+
+class Node {
+  public:
+    Node(int sample, int line, int samples, int lines, int score) {
+      m_sample = sample;
+      m_line = line;
+      m_samples = samples;
+      m_lines = lines;
+      m_score = score;
+    }
+
+    int createIndex(int sample, int line) {
+      return line * m_samples + sample; 
+    }
+
+    int getIndex() {
+      return createIndex(m_sample, m_line);
+    }
+
+    bool hasUp() { return inBounds(m_sample, m_line - 1); }
+    bool hasDown() { return inBounds(m_sample, m_line + 1); }
+    bool hasLeft() { return inBounds(m_sample - 1, m_line); }
+    bool hasRight() { return inBounds(m_sample + 1, m_line); }
+
+    bool inBounds(int sample, int line) {
+      return sample >= c1 && sample <= c2 && line >= r1 && line <= r2;
+    }
+
+    int getUp() {
+      return createIndex(m_sample, m_line - 1);
+    }
+
+    int getDown() {
+      return createIndex(m_sample, m_line + 1);
+    }
+
+    int getLeft() {
+      return createIndex(m_sample - 1, m_line);
+    }
+
+    int getRight() {
+      return createIndex(m_sample + 1, m_line);
+    }
+
+    Node createUp() {
+      return Node(m_sample, m_line - 1, m_samples, m_lines, m_score + 1);
+    }
+
+    Node createDown() {
+      return Node(m_sample, m_line + 1, m_samples, m_lines, m_score + 1);
+    }
+
+    Node createLeft() {
+      return Node(m_sample - 1, m_line, m_samples, m_lines, m_score + 1);
+    }
+
+    Node createRight() {
+      return Node(m_sample + 1, m_line, m_samples, m_lines, m_score + 1);
+    }
+
+    int getScore() {
+      return m_score;
+    }
+
+    ~Node() {}
+
+  private:
+    int m_sample;
+    int m_line;
+    int m_samples;
+    int m_lines;
+    int m_score;
+};
+
+
 void blend(Buffer &in);
 bool inIntersection(int sample, int line);
 bool validValue(int oSample, int oLine);
 Chip * createRamp(Chip *pic1, Chip *pic2, int stop);
+void processNodes(QQueue<Node> &nodes, QVector<int> &ol,
+    int &maxScore, int stop);
 
 void readOutputs(string outName, const FileList &inputs, FileList &outputs);
 void generateOutputs(const FileList &inputs, FileList &outputs);
@@ -70,14 +153,14 @@ void IsisMain() {
     }
   }
 
-  for (unsigned int i = 1; i < outputs.size(); i++) {
-    Cube from1;
-    from1.open(outputs[i]);
+  for (unsigned int j = 1; j < outputs.size(); j++) {
+    Cube from2;
+    from2.open(outputs[j]);
 
     bool hasOverlap = false;
-    for (unsigned int j = 0; j < i; j++) {
-      Cube from2;
-      from2.open(outputs[j]);
+    for (unsigned int i = 0; i < j; i++) {
+      Cube from1;
+      from1.open(outputs[i]);
 
       OverlapStatistics oStats(from1, from2);
 
@@ -150,7 +233,7 @@ void IsisMain() {
 
     // Make sure cube projection overlaps at least one other cube
     if (!hasOverlap) {
-      string msg = "Input Cube [" + from1.getFilename() +
+      string msg = "Input Cube [" + from2.getFilename() +
           "] does not overlap another cube";
       throw iException::Message(Isis::iException::User, msg, _FILEINFO_);
     }
@@ -191,25 +274,6 @@ bool validValue(int oSample, int oLine) {
 }
 
 
-/*
-class Node {
-  public:
-    Node(int sample, int line, int score) {
-      m_sample = sample;
-      m_line = line;
-      m_score = score;
-    }
-
-    ~Node() {}
-
-  private:
-    int m_sample;
-    int m_line;
-    int m_score;
-};
-*/
-
-
 Chip * createRamp(Chip *pic1, Chip *pic2, int stop) {
   // x and y dimensions of the original pictures
   int x = pic1->Samples();
@@ -225,13 +289,15 @@ Chip * createRamp(Chip *pic1, Chip *pic2, int stop) {
   QVector<int> ol2(x * y, -1);
 
   // Lines and columns bounding data
-  int r1 = y - 1;
-  int r2 = 0;
-  int c1 = x - 1;
-  int c2 = 0;
+  r1 = y - 1;
+  r2 = 0;
+  c1 = x - 1;
+  c2 = 0;
+
+  QQueue<Node> nodes1;
+  QQueue<Node> nodes2;
 
   // Extract profiles of images
-  //QQueue<Node> nodes;
   int sum = 0;
   for (int i = 0; i < x; i++) {
     for (int j = 0; j < y; j++) {
@@ -239,11 +305,9 @@ Chip * createRamp(Chip *pic1, Chip *pic2, int stop) {
 
       double tempval = pic1->GetValue(i + 1, j + 1);
       if (IsValidPixel(tempval)) ol1[t1] = 0;
-      //if (tempval != 0.0) ol1[t1] = 0;
 
       tempval = pic2->GetValue(i + 1, j + 1);
       if (IsValidPixel(tempval)) ol2[t1] = 0;
-      //if (tempval != 0.0) ol2[t1] = 0;
 
       // What does this do?
       if (ol1[t1] == 0) sum += ol2[t1];
@@ -256,8 +320,8 @@ Chip * createRamp(Chip *pic1, Chip *pic2, int stop) {
         if (i > c2) c2 = i;
       }
 
-      // TODO speed increase here
-      //if (ol1[t1] == -1)
+      if (ol1[t1] == -1) nodes1.enqueue(Node(i, j, x, y, 0));
+      if (ol2[t1] == -1) nodes2.enqueue(Node(i, j, x, y, 0));
     }
   }
 
@@ -279,67 +343,13 @@ Chip * createRamp(Chip *pic1, Chip *pic2, int stop) {
   // that pixel to 1.  On all other iterations we look for neighbors with values
   // num-1. If "stop" number is specified, we stop searching for distances and
   // set all values to value of "stop".
-  int k = 1;
-  int ct = 1; // Counter
+  int maxScore = 0;
+  processNodes(nodes1, ol1, maxScore, stop);
+  if (sum != 0) processNodes(nodes2, ol2, maxScore, stop);
 
-  // Fill-in numbers
-  int n = -1;
-  int num = 1;
-  while (ct > 0) {
-    ct = 0;
-
-    for (int i = c1; i <= c2; i++) {
-      for (int j = r1; j <= r2; j++) {
-        int t1 = j * x + i;
-
-        // Neighbor pixel positions
-        int up = (j - 1) * x + i;
-        int down = (j + 1) * x + i;
-        int left = t1 - 1;
-        int right = t1 + 1;
-
-        // Safety against falling off the edge
-        if (j == 0) up = t1;
-        if (j == y - 1) down = t1;
-        if (i == 0) left = t1;
-        if (i == x - 1) right = t1;
-
-        if (ol1[t1] == 0 && ((ol1[left] == n) || (ol1[right] == n) ||
-              (ol1[up] == n) || (ol1[down] == n))) {
-          ol1[t1] = num;
-          ct += 1;
-        }
-
-        // If the sum of the overlap == 0 then we don't need to do this part
-        if (sum != 0) {
-          if (ol2[t1] == 0 && ((ol2[left] == n) || (ol2[right] == n) ||
-                (ol2[up] == n) || (ol2[down] == n))) {
-            ol2[t1] = num;
-            ct += 1;
-          }
-        }
-      }
-    }
-
-    num += 1;
-    n = num - 1;
-    k += 1;
-
-    // We've searched enough. Set all remaining values to 'stop'
-    if (k == stop) {
-      for (int i = c1; i <= c2; i++) {
-        for (int j = r1; j <= r2; j++) {
-          int t1 = j * x + i;
-          if (ol1[t1] == 0) ol1[t1] = stop;
-          if (sum != 0) {
-            if (ol2[t1] == 0) ol2[t1] = stop;
-          }
-        }
-      }
-
-      ct = 0;
-    }
-  }
+  // This is just to be consistent with the old, iterative way of creating the
+  // ramp (without the queue).  Not sure if it's correct.
+  if (maxScore < stop) maxScore++;
 
   // Loop through last time and create ramp using the special cases
   Chip *ramp = new Chip(x, y);
@@ -349,13 +359,51 @@ Chip * createRamp(Chip *pic1, Chip *pic2, int stop) {
       int t1 = j * x + i;
       if (ol1[t1] != -1 && ol2[t1] != -1) {
         double value = (sum != 0) ? ((double) ol2[t1]) / (ol2[t1] + ol1[t1]) :
-            1.0 - ol1[t1] / (2.0 * k);
+            1.0 - ol1[t1] / (2.0 * maxScore);
         ramp->SetValue(i + 1, j + 1, value);
       }
     }
   }
 
   return ramp;
+}
+
+
+void processNodes(QQueue<Node> &nodes, QVector<int> &ol,
+    int &maxScore, int stop) {
+
+  while (!nodes.empty()) {
+    Node node = nodes.dequeue();
+
+    int newScore = node.getScore() + 1;
+    if (newScore > stop) newScore = stop;
+    if (newScore > maxScore) maxScore = newScore;
+
+    if (node.hasUp()) {
+      if (ol[node.getUp()] == 0) {
+        ol[node.getUp()] = newScore;
+        nodes.enqueue(node.createUp());
+      }
+    }
+    if (node.hasDown()) {
+      if (ol[node.getDown()] == 0) {
+        ol[node.getDown()] = newScore;
+        nodes.enqueue(node.createDown());
+      }
+    }
+    if (node.hasLeft()) {
+      if (ol[node.getLeft()] == 0) {
+        ol[node.getLeft()] = newScore;
+        nodes.enqueue(node.createLeft());
+      }
+    }
+    if (node.hasRight()) {
+      if (ol[node.getRight()] == 0) {
+        ol[node.getRight()] = newScore;
+        nodes.enqueue(node.createRight());
+      }
+    }
+  }
 }
 
 
