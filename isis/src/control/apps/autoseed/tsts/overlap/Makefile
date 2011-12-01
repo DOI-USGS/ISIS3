@@ -23,6 +23,7 @@ commands:
 	networkid=NewNetwork \
 	pointid="new????" \
 	description=NewNetwork \
+	errors=errors.txt \
 	> /dev/null;
 	$(RM) $(OUTPUT)/list.lis;
 	$(RM) $(OUTPUT)/sub.lis;

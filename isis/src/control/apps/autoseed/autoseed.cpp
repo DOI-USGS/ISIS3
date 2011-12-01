@@ -455,7 +455,7 @@ void IsisMain() {
   }
 
   //Log the ERRORS file
-  if(ui.WasEntered("ERRORS")) {
+  if(ui.WasEntered("ERRORS") && errorNum > 0) {
     string errorname = ui.GetFilename("ERRORS");
     std::ofstream errorsfile;
     errorsfile.open(errorname.c_str());
