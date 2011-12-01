@@ -40,53 +40,48 @@ class Node {
       return line * m_samples + sample; 
     }
 
-    int getIndex() {
-      return createIndex(m_sample, m_line);
+    bool hasNeighbor(int sample, int line) {
+      return inBounds(sample, line);
     }
-
-    bool hasUp() { return inBounds(m_sample, m_line - 1); }
-    bool hasDown() { return inBounds(m_sample, m_line + 1); }
-    bool hasLeft() { return inBounds(m_sample - 1, m_line); }
-    bool hasRight() { return inBounds(m_sample + 1, m_line); }
 
     bool inBounds(int sample, int line) {
       return sample >= c1 && sample <= c2 && line >= r1 && line <= r2;
     }
 
-    int getUp() {
-      return createIndex(m_sample, m_line - 1);
+    Node create(int sample, int line, int stop) {
+      return Node(sample, line, m_samples, m_lines, getNextScore(stop));
     }
 
-    int getDown() {
-      return createIndex(m_sample, m_line + 1);
+    void evaluate(int sample, int line, 
+        QQueue<Node> &nodes, QVector<int> &ol, int stop) {
+
+      if (hasNeighbor(sample, line)) {
+        int index = createIndex(sample, line);
+        if (ol[index] == 0) {
+          ol[index] = getNextScore(stop);
+          nodes.enqueue(create(sample, line, stop));
+        }
+      }
     }
 
-    int getLeft() {
-      return createIndex(m_sample - 1, m_line);
+    void evaluateUp(QQueue<Node> &nodes, QVector<int> &ol, int stop) {
+      evaluate(m_sample, m_line - 1, nodes, ol, stop);
     }
 
-    int getRight() {
-      return createIndex(m_sample + 1, m_line);
+    void evaluateDown(QQueue<Node> &nodes, QVector<int> &ol, int stop) {
+      evaluate(m_sample, m_line + 1, nodes, ol, stop);
     }
 
-    Node createUp() {
-      return Node(m_sample, m_line - 1, m_samples, m_lines, m_score + 1);
+    void evaluateLeft(QQueue<Node> &nodes, QVector<int> &ol, int stop) {
+      evaluate(m_sample - 1, m_line, nodes, ol, stop);
     }
 
-    Node createDown() {
-      return Node(m_sample, m_line + 1, m_samples, m_lines, m_score + 1);
+    void evaluateRight(QQueue<Node> &nodes, QVector<int> &ol, int stop) {
+      evaluate(m_sample + 1, m_line, nodes, ol, stop);
     }
 
-    Node createLeft() {
-      return Node(m_sample - 1, m_line, m_samples, m_lines, m_score + 1);
-    }
-
-    Node createRight() {
-      return Node(m_sample + 1, m_line, m_samples, m_lines, m_score + 1);
-    }
-
-    int getScore() {
-      return m_score;
+    int getNextScore(int stop) {
+      return (m_score < stop) ? m_score + 1 : stop;
     }
 
     ~Node() {}
@@ -375,34 +370,13 @@ void processNodes(QQueue<Node> &nodes, QVector<int> &ol,
   while (!nodes.empty()) {
     Node node = nodes.dequeue();
 
-    int newScore = node.getScore() + 1;
-    if (newScore > stop) newScore = stop;
+    int newScore = node.getNextScore(stop);
     if (newScore > maxScore) maxScore = newScore;
 
-    if (node.hasUp()) {
-      if (ol[node.getUp()] == 0) {
-        ol[node.getUp()] = newScore;
-        nodes.enqueue(node.createUp());
-      }
-    }
-    if (node.hasDown()) {
-      if (ol[node.getDown()] == 0) {
-        ol[node.getDown()] = newScore;
-        nodes.enqueue(node.createDown());
-      }
-    }
-    if (node.hasLeft()) {
-      if (ol[node.getLeft()] == 0) {
-        ol[node.getLeft()] = newScore;
-        nodes.enqueue(node.createLeft());
-      }
-    }
-    if (node.hasRight()) {
-      if (ol[node.getRight()] == 0) {
-        ol[node.getRight()] = newScore;
-        nodes.enqueue(node.createRight());
-      }
-    }
+    node.evaluateUp(nodes, ol, stop);
+    node.evaluateDown(nodes, ol, stop);
+    node.evaluateLeft(nodes, ol, stop);
+    node.evaluateRight(nodes, ol, stop);
   }
 }
 
