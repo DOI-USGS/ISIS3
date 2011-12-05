@@ -32,13 +32,13 @@ namespace Isis {
     QAction *action = new QAction(this);
     action->setIcon(getIcon("move.png"));
     //action->setIcon(QPixmap("/work1/salley/icons/mActionMoveVertex.png"));
-    action->setToolTip("Pan (P)");
+    action->setToolTip("Pan (p)");
     action->setShortcut(Qt::Key_P);
     QString text  =
       "<b>Function:</b>  Pan around the current mosaic.<br><br>"
       "This tool gives you a <b>click and drag</b> to pan around the mosaic "
       "scene."
-      "<p><b>Shortcut:</b>  P</p> ";
+      "<p><b>Shortcut:</b>  p</p> ";
     action->setWhatsThis(text);
     return action;
   }

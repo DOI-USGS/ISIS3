@@ -116,7 +116,7 @@ namespace Isis {
   QAction *MosaicZoomTool::getPrimaryAction() {
     QAction *action = new QAction(this);
     action->setIcon(getIcon("viewmag.png"));
-    action->setToolTip("Zoom (Z)");
+    action->setToolTip("Zoom (z)");
     action->setShortcut(Qt::Key_Z);
     QString text  =
       "<b>Function:</b>  Zoom in or out of the current cube.<br><br>"
@@ -126,7 +126,7 @@ namespace Isis {
       "the given area into the visible screen, a <b>right-click and drag</b> "
       "box to zoom out and center on the center (smaller box means zoom out "
       "more), and disables context menus on the mosaic scene."
-      "<p><b>Shortcut:</b>  Z</p> ";
+      "<p><b>Shortcut:</b>  z</p> ";
     action->setWhatsThis(text);
     return action;
   }

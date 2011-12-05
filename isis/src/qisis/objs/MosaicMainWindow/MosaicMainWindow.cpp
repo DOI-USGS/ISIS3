@@ -302,7 +302,6 @@ namespace Isis {
     mainLayout->addWidget(tabArea);
 
     QScrollArea *overviewTab = new QScrollArea;
-    tabArea->addTab(overviewTab, "&Overview");
 
     QWidget *overviewContainer = new QWidget;
 
@@ -336,7 +335,6 @@ namespace Isis {
     overviewTab->setWidget(overviewContainer);
 
     QScrollArea *preparationsTab = new QScrollArea;
-    tabArea->addTab(preparationsTab, "Preparing &Input Cubes");
 
     QWidget *preparationsContainer = new QWidget;
     QVBoxLayout *preparationsLayout = new QVBoxLayout;
@@ -357,12 +355,25 @@ namespace Isis {
                "angle, and resolution in the <b>File List</b>"
         "<li><i>footprintinit from=future_input_to_qmos.cub "
             "sinc=... linc=...</i></li>"
-        "  <br>This enables qmos to use the given footprints instead of trying "
-               "to calculate its own. The 'linc' and 'sinc' parameters can "
-               "have a significant effect on your image's footprint. Also, "
-               "images without footprints cannot be opened more than one at a "
-               "time. Running footprintinit will significantly speed up "
-               "loading images into qmos."
+        "  <br>For Level1 (raw camera space) images, when calculating the "
+               "footprint polygons, footprintinit refers to the image labels "
+               "and uses the SPICE kernels and the shape model (DEM if one "
+               "exists and is specified, otherwise, the IAU sphere or "
+               "ellipsoid is used).  Refer to spiceinit for more information "
+               "on loading SPICE onto Level0 and Level1 images. This enables "
+               "qmos to use the given footprints instead of trying to "
+               "calculate its own. The 'linc' and 'sinc' parameters can have a "
+               "significant effect on your image's footprint. Also, images "
+               "without footprints cannot be opened more than one at a time. "
+               "Running footprintinit will significantly speed up loading "
+               "images into qmos.<br>"
+               "For Level2 images, do not run footprintinit. The footprint "
+               "polygon is created by 'walking' around the valid image data. "
+               "qmos 'reprojects' the footprint polygons according to the "
+               "loaded Map File.<br>"
+               "Qmos displays the footprints, and optional image data and map "
+               "grid to the default IAU radius, unless otherwise specified "
+               "within the loaded Map File."
         "</ul>");
     preparationText->setWordWrap(true);
     preparationsLayout->addWidget(preparationText);
@@ -370,7 +381,6 @@ namespace Isis {
     preparationsTab->setWidget(preparationsContainer);
 
     QScrollArea *projectsTab = new QScrollArea;
-    tabArea->addTab(projectsTab, "&Project Files");
 
     QWidget *projectsContainer = new QWidget;
     QVBoxLayout *projectsLayout = new QVBoxLayout;
@@ -396,24 +406,44 @@ namespace Isis {
     projectsTab->setWidget(projectsContainer);
 
     if (m_controllerVisible) {
+      tabArea->addTab(overviewTab, "&Overview");
+      tabArea->addTab(preparationsTab, "Preparing &Input Cubes");
+
       tabArea->addTab(MosaicFileListWidget::getLongHelp(m_fileListDock),
                       "File &List");
-      tabArea->addTab(MosaicSceneWidget::getControlNetHelp(),
-                      "&Control Networks");
-      tabArea->addTab(MosaicSceneWidget::getPreviewHelp(m_mosaicPreviewDock),
-                      "Mosaic &World View");
       tabArea->addTab(MosaicSceneWidget::getLongHelp(centralWidget()),
                       "Mosaic &Scene");
-    }
-    else {
-      tabArea->addTab(MosaicFileListWidget::getLongHelp(),
-                      "File &List");
+      tabArea->addTab(MosaicSceneWidget::getPreviewHelp(m_mosaicPreviewDock),
+                      "Mosaic &World View");
+
+      tabArea->addTab(MosaicSceneWidget::getMapHelp(),
+                      "&Map File");
+      tabArea->addTab(projectsTab, "&Project Files");
+
       tabArea->addTab(MosaicSceneWidget::getControlNetHelp(),
                       "&Control Networks");
-      tabArea->addTab(MosaicSceneWidget::getPreviewHelp(),
-                      "Mosaic &World View");
+      tabArea->addTab(MosaicSceneWidget::getGridHelp(),
+                      "Mosaic &Grid");
+    }
+    else {
+      tabArea->addTab(overviewTab, "&Overview");
+      tabArea->addTab(preparationsTab, "Preparing &Input Cubes");
+
+      tabArea->addTab(MosaicFileListWidget::getLongHelp(),
+                      "File &List");
       tabArea->addTab(MosaicSceneWidget::getLongHelp(),
                       "Mosaic &Scene");
+      tabArea->addTab(MosaicSceneWidget::getPreviewHelp(),
+                      "Mosaic &World View");
+
+      tabArea->addTab(MosaicSceneWidget::getMapHelp(),
+                      "&Map File");
+      tabArea->addTab(projectsTab, "&Project Files");
+
+      tabArea->addTab(MosaicSceneWidget::getControlNetHelp(),
+                      "&Control Networks");
+      tabArea->addTab(MosaicSceneWidget::getGridHelp(),
+                      "Mosaic &Grid");
     }
 
     // Now add close option

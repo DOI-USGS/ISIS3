@@ -119,9 +119,11 @@ namespace Isis {
       QList<QAction *> getExportActions();
       QList<QAction *> getViewActions();
 
-      static QWidget * getControlNetHelp(QWidget *cnetToolContainer = NULL);
-      static QWidget * getLongHelp(QWidget *mosaicSceneContainer = NULL);
-      static QWidget * getPreviewHelp(QWidget *worldViewContainer = NULL);
+      static QWidget *getControlNetHelp(QWidget *cnetToolContainer = NULL);
+      static QWidget *getGridHelp(QWidget *gridToolContainer = NULL);
+      static QWidget *getLongHelp(QWidget *mosaicSceneContainer = NULL);
+      static QWidget *getMapHelp(QWidget *mapContainer = NULL);
+      static QWidget *getPreviewHelp(QWidget *worldViewContainer = NULL);
 
     signals:
       void mouseEnter();

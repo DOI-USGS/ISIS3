@@ -30,6 +30,7 @@
 #include "MosaicControlNetTool.h"
 #include "MosaicFindTool.h"
 #include "MosaicGraphicsView.h"
+#include "MosaicGridTool.h"
 #include "MosaicPanTool.h"
 #include "MosaicSceneItem.h"
 #include "MosaicSelectTool.h"
@@ -84,6 +85,7 @@ namespace Isis {
     m_tools->append(new MosaicControlNetTool(this));
     m_tools->append(new MosaicAreaTool(this));
     m_tools->append(new MosaicFindTool(this));
+    m_tools->append(new MosaicGridTool(this));
     if(status)
       m_tools->append(new MosaicTrackTool(this, status));
 
@@ -623,6 +625,78 @@ namespace Isis {
   }
 
 
+  QWidget * MosaicSceneWidget::getGridHelp(QWidget *gridToolContainer) {
+    QScrollArea *gridHelpWidgetScrollArea = new QScrollArea;
+
+    QWidget *gridHelpWidget = new QWidget;
+
+    QVBoxLayout *gridHelpLayout = new QVBoxLayout;
+    gridHelpWidget->setLayout(gridHelpLayout);
+
+    QLabel *title = new QLabel("<h2>Map Grid Tool</h2>");
+    gridHelpLayout->addWidget(title);
+
+    QPixmap previewPixmap;
+
+    if (gridToolContainer) {
+      previewPixmap = QPixmap::grabWidget(gridToolContainer).scaled(
+          QSize(500, 200), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    }
+    else {
+      ToolPad tmpToolPad("Example Tool Pad", NULL);
+      MosaicGridTool tmpTool(NULL);
+      tmpTool.addTo(&tmpToolPad);
+
+      tmpToolPad.resize(QSize(32, 32));
+
+      previewPixmap = QPixmap::grabWidget(&tmpToolPad);
+    }
+
+    QLabel *previewWrapper = new QLabel;
+    previewWrapper->setPixmap(previewPixmap);
+    gridHelpLayout->addWidget(previewWrapper);
+
+    QLabel *overview = new QLabel("Superimpose a map grid over the area of "
+        "displayed footprints in the 'mosaic scene.'"
+        "<h2>Overview</h2>"
+        "<ul>"
+          "<li>The Map Grid Tool is activated by selecting the 'cross-hatch' "
+              "icon or typing 'g' at the keyboard."
+          "</li>"
+          "<li>The parameter options are displayed at the top of the screen. "
+              "Hitting the 'Draw Grid' button will draw the map grid."
+          "</li>"
+          "<li>The map grid is defined by the loaded Map File (just as the "
+              "footprints and image data are) and the grid tool parameters."
+          "</li>"
+          "<li>If a Map File has not been selected, the default "
+              "Equirectangular projection will be used. The resulting grid "
+              "lines in the default 'Equi' map file will be drawn for the "
+              "full global range (latitude range = -90,90; longitude range = "
+              "0,360) at the default latitude and longitude increment values."
+          "</li>"
+          "<li>"
+              "If the grid lines are not immediately visible, try to "
+              "'zoom out' in the 'mosaic scene' window and modify the "
+              "Latitude and Longitude Increment parameters."
+          "</li>"
+        "</ul>"
+        "<strong>Note:</strong>: The Map Grid Tool currently does not have an "
+            "option for an automatic grid definition based on the boundary "
+            "extents that can be calculated based on the displayed footprints. "
+            "This feature has been requested and will be an added parameter "
+            "option in the future. A current work-around from the default "
+            "'global' view is to include the boundary latitude, longitude "
+            "ranges of the loaded image cubes within the Map Template File.");
+    overview->setWordWrap(true);
+    gridHelpLayout->addWidget(overview);
+
+    gridHelpWidgetScrollArea->setWidget(gridHelpWidget);
+
+    return gridHelpWidgetScrollArea;
+  }
+
+
   QWidget * MosaicSceneWidget::getLongHelp(QWidget *sceneContainer) {
     QScrollArea *longHelpWidgetScrollArea = new QScrollArea;
 
@@ -670,6 +744,57 @@ namespace Isis {
     longHelpWidgetScrollArea->setWidget(longHelpWidget);
 
     return longHelpWidgetScrollArea;
+  }
+
+
+  QWidget * MosaicSceneWidget::getMapHelp(QWidget *mapContainer) {
+    QScrollArea *mapHelpWidgetScrollArea = new QScrollArea;
+
+    QWidget *mapHelpWidget = new QWidget;
+
+    QVBoxLayout *mapHelpLayout = new QVBoxLayout;
+    mapHelpWidget->setLayout(mapHelpLayout);
+
+    QLabel *title = new QLabel("<h2>Map File</h2>");
+    mapHelpLayout->addWidget(title);
+
+    if (mapContainer) {
+      QPixmap previewPixmap = QPixmap::grabWidget(mapContainer).scaled(
+          QSize(500, 200), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
+      QLabel *previewWrapper = new QLabel;
+      previewWrapper->setPixmap(previewPixmap);
+      mapHelpLayout->addWidget(previewWrapper);
+    }
+
+    QLabel *overview = new QLabel("The mosaic scene's projection is defined by "
+        "the map file/template. The default map file defines the "
+        "equirectangular projection, planetocentric latitude, positive "
+        "longitude east, latitude range=90S-90N, longitude range=0-360E. The "
+        "radius will default to the IAU standards (ellipsoid or sphere) for "
+        "the specific target body.<br><br>Please refer to Isis applications "
+        "such as 'maptemplate' or 'mosrange' for more details on creating a "
+        "custom map template file that can define the desired projection, "
+        "latitude system, longitude direction and domain. qmos will use the "
+        "latitude range and longitude range if they exist in the loaded map "
+        "file. A choice of map templates that can be used as a starting point "
+        "for supported map projections can be found in $base/templates/maps "
+        "(refer to maptemplate or mosrange for more details and information on "
+        "the required parameters for a projection).<br><br>"
+        "The footprints and image data that are displayed in the mosaic scene "
+        "are defined by the loaded \"Map template\" File.  Regardless of "
+        "whether the opened cubes are Level1 (raw camera space) or Level2 "
+        "(map projected), their associated footprint polygons will be "
+        "displayed in qmos as defined by the loaded Map File (i.e. Level2 cube "
+        "footprints are re-mapped). Refer to the Map File documenation for "
+        "more information on how to redefine the map projection that will be "
+        "used to display in the 'mosaic scene.'");
+    overview->setWordWrap(true);
+    mapHelpLayout->addWidget(overview);
+
+    mapHelpWidgetScrollArea->setWidget(mapHelpWidget);
+
+    return mapHelpWidgetScrollArea;
   }
 
 

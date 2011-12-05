@@ -209,7 +209,7 @@ namespace Isis {
   QAction *MosaicAreaTool::getPrimaryAction() {
     m_action = new QAction(this);
     m_action->setIcon(getIcon("qmos_area.png"));
-    m_action->setToolTip("Show Area (A)");
+    m_action->setToolTip("Show Area (a)");
     m_action->setShortcut(Qt::Key_A);
     QString text  =
       "<b>Function:</b>  Draw a box given a distance centered on a "
@@ -218,7 +218,7 @@ namespace Isis {
       "centered on a latitude/longitude point. This box would be a square on "
       "the surface of the target, and is designed to be modified and warped by "
       "the current projection."
-      "<p><b>Shortcut:</b>  A</p> ";
+      "<p><b>Shortcut:</b>  a</p> ";
     m_action->setWhatsThis(text);
     return m_action;
   }

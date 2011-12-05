@@ -163,7 +163,7 @@ namespace Isis {
   QAction *MosaicControlNetTool::getPrimaryAction() {
     QAction *action = new QAction(this);
     action->setIcon(getIcon("HILLBLU_molecola.png"));
-    action->setToolTip("Control Net (C)");
+    action->setToolTip("Control Net (c)");
     action->setShortcut(Qt::Key_C);
     QString text  =
       "<b>Function:</b>  Display and analyze a control network<br><br>"
@@ -171,7 +171,7 @@ namespace Isis {
       "which a latitude/longitude can be calculated. The control points are "
       "shown as color-coded '+' marks. The control points have a right-click "
       "menu and information about them can be seen just by hovering over them." 
-      "<p><b>Shortcut:</b>  C</p> ";
+      "<p><b>Shortcut:</b>  c</p> ";
     action->setWhatsThis(text);
     return action;
   }

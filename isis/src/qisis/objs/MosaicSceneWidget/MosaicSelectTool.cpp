@@ -31,7 +31,7 @@ namespace Isis {
   QAction *MosaicSelectTool::getPrimaryAction() {
     QAction *action = new QAction(this);
     action->setIcon(getIcon("mActionSelect.png"));
-    action->setToolTip("Select (S)");
+    action->setToolTip("Select (s)");
     action->setShortcut(Qt::Key_S);
     QString text  =
       "<b>Function:</b>  Select cubes in a mosaic.<br><br>"
@@ -39,7 +39,7 @@ namespace Isis {
       "selects files underneath the top one), a <b>control-click</b> select to "
       "add files to the current selection, and a <b>click</b> selection to "
       "replace the current selection with the file you clicked on."
-      "<br><p><b>Shortcut:</b>  S</p>";
+      "<br><p><b>Shortcut:</b>  s</p>";
     action->setWhatsThis(text);
     return action;
   }

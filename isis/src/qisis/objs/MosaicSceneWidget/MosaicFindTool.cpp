@@ -98,7 +98,7 @@ namespace Isis {
   QAction *MosaicFindTool::getPrimaryAction() {
     p_action = new QAction(this);
     p_action->setIcon(getIcon("find.png"));
-    p_action->setToolTip("Find (F)");
+    p_action->setToolTip("Find (f)");
     p_action->setShortcut(Qt::Key_F);
     QString text  =
       "<b>Function:</b>  Find a specific latitude/longitude on the mosaic "
@@ -108,7 +108,7 @@ namespace Isis {
       "a red dot on the mosaic scene. Alternatively, you can <b>click</b> on "
       "the mosaic scene and it will give you the latitude and longitude values "
       "along with drawing the red dot."
-      "<p><b>Shortcut:</b>  F</p> ";
+      "<p><b>Shortcut:</b>  f</p> ";
     p_action->setWhatsThis(text);
     return p_action;
   }
