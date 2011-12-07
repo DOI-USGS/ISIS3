@@ -163,6 +163,18 @@
         </description>
         <default><item>100000</item></default>
       </parameter>
+
+      <parameter name="ERROR">
+        <type>boolean</type>
+        <brief>
+          Every image must overlap at least one other
+        </brief>
+        <description>
+          Enabling this requires that every image overlap at least one other
+          image.  Otherwise, an error will be reported and the program will end.
+        </description>
+        <default><item>false</item></default>
+      </parameter>
     </group>
   </groups>
 

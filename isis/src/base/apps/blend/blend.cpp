@@ -2,6 +2,7 @@
 
 #include <QFile>
 #include <QQueue>
+#include <QSet>
 #include <QVector>
 
 #include "Buffer.h"
@@ -148,11 +149,11 @@ void IsisMain() {
     }
   }
 
+  QSet<QString> overlapped;
   for (unsigned int j = 1; j < outputs.size(); j++) {
     Cube from2;
     from2.open(outputs[j]);
 
-    bool hasOverlap = false;
     for (unsigned int i = 0; i < j; i++) {
       Cube from1;
       from1.open(outputs[i]);
@@ -160,7 +161,8 @@ void IsisMain() {
       OverlapStatistics oStats(from1, from2);
 
       if (oStats.HasOverlap()) {
-        hasOverlap = true;
+        overlapped.insert(QString::fromStdString(inputs[j]));
+        overlapped.insert(QString::fromStdString(inputs[i]));
 
         i1 = new Chip(oStats.Samples() + 2, oStats.Lines() + 2);
         int from1CenterSample =
@@ -225,12 +227,16 @@ void IsisMain() {
         i2 = NULL;
       }
     }
+  }
 
-    // Make sure cube projection overlaps at least one other cube
-    if (!hasOverlap) {
-      string msg = "Input Cube [" + from2.getFilename() +
+  // Make sure cube projection overlaps at least one other cube
+  if (ui.GetBoolean("ERROR")) {
+    for (unsigned int i = 1; i < inputs.size(); i++) {
+      if (!overlapped.contains(QString::fromStdString(inputs[i]))) {
+        string msg = "Input Cube [" + inputs[i] +
           "] does not overlap another cube";
-      throw iException::Message(Isis::iException::User, msg, _FILEINFO_);
+        throw iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      }
     }
   }
 }
