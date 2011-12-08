@@ -13,7 +13,7 @@ PVLFILES =  pvl
 # Determine isis path from the current directory and use that path to set the TESTDATA_PATH variable
 DIR := `pwd`
 STR :=$(AWK) -v str=$(DIR) 'BEGIN { pos=index( str, \"/isis/\" ); print substr( str, pos, length( str ) - pos + 1 ) }'
-ISIS_PATH := $(shell $(AWK) -v str=$(DIR) 'BEGIN { pos=index( str, "/isis/" ); print substr( str, pos, length( str ) - pos + 1 ) }' )
+ISIS_PATH := $(shell $(AWK) -v str=$(DIR) 'BEGIN { pos=index( str, "/isis/src" ); print substr( str, pos, length( str ) - pos + 1 ) }' )
 TESTDATA_PATH := $(ISIS3TESTDATA)$(ISIS_PATH)
 
 ifneq ("$(shell echo $(ISIS_PATH) | cut -d '/' -f2,3,5,7)", "isis/src/apps/tsts")
