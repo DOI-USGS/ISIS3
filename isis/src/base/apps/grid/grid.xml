@@ -63,6 +63,12 @@
     <change name="Steven Lambright" date="2011-01-26">
       Added BOUNDARY, MINLAT, MAXLAT, MINLON and MAXLON options.
     </change>
+    <change name="Steven Lambright" date="2011-12-08">
+      Fixed a bug with the outline option. If the image had a larger number of
+      samples than number of lines, all of the data at sample > number of lines
+      would be considered a grid line. This could result in a large portion of
+      the image losing legitimate DN values for the grid value. Fixes #607.
+    </change>
   </history>
 
   <groups>

@@ -250,7 +250,7 @@ void imageGrid(Buffer &in, Buffer &out) {
       for(int i = 0; i <= lineWidth * 2; i++)
         out[i] = Isis::Hrs;
 
-      for(int i = inputLines - lineWidth * 2 - 1; i < in.size(); i++)
+      for(int i = inputSamples - lineWidth * 2 - 1; i < in.size(); i++)
         out[i] = Isis::Hrs;
     }
   }
@@ -361,7 +361,7 @@ void groundGrid(Buffer &in, Buffer &out) {
       for(int i = 0; i <= lineWidth * 2; i++)
         out[i] = Isis::Hrs;
 
-      for(int i = inputLines - lineWidth * 2 - 1; i < in.size(); i++)
+      for(int i = inputSamples - lineWidth * 2 - 1; i < in.size(); i++)
         out[i] = Isis::Hrs;
     }
   }

@@ -40,17 +40,21 @@ namespace Isis {
    * @author 2010-01-06 Steven Lambright
    *
    * @internal
-   *   @history 2010-05-06 Steven Lambright Added Split Lat/Lon
-   *            Functionality
-   *   @history 2010-06-22 Steven Lambright Improved handling of resolutions
-   *   @history 2011-01-25 Steven Lambright Now uses native units to the
-   *            projection, Lat/Lon classes, and several bug fixes when it comes
-   *            to out of range values or non-standard projection types.
-   *   @history 2011-01-26 Steven Lambright Fixed a bug where the grid was not
-   *            consistent on the edges and added SetGroundLimits and
-   *            WalkBoundary for the new grid options Bound lat/lon range.
-   *   @history 2011-02-25 Steven Lambright Min/Max Lat/Lons do not have
-   *            to be known in the constructor any more
+   *   @history 2010-05-06 Steven Lambright - Added Split Lat/Lon
+   *                           Functionality
+   *   @history 2010-06-22 Steven Lambright - Improved handling of resolutions
+   *   @history 2011-01-25 Steven Lambright - Now uses native units to the
+   *                           projection, Lat/Lon classes, and several bug
+   *                           fixes when it comes to out of range values or
+   *                           non-standard projection types.
+   *   @history 2011-01-26 Steven Lambright - Fixed a bug where the grid was not
+   *                           consistent on the edges and added SetGroundLimits
+   *                           and WalkBoundary for the new grid options Bound
+   *                           lat/lon range.
+   *   @history 2011-02-25 Steven Lambright - Min/Max Lat/Lons do not have
+   *                           to be known in the constructor any more
+   *   @history 2011-12-08 Steven Lambright - Fixed a bug causing the longitude
+   *                           range to be incorrect. Fixes #607.
    */
   class GroundGrid {
     public:

@@ -284,7 +284,7 @@ namespace Isis {
         *GetMappingGroup());
 
     Longitude startLon = Longitude(
-        baseLon - Angle(floor((baseLat - *p_minLon) / lonInc) * lonInc));
+        baseLon - Angle(floor((baseLon - *p_minLon) / lonInc) * lonInc));
 
     if(!latRes.Valid() || latRes <= Angle(0, Angle::Degrees)) {
       latRes = Angle(p_defaultResolution, Angle::Degrees);
