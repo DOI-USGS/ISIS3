@@ -2568,21 +2568,24 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     b = cholmod_zeros ( m_nRank, 1, CHOLMOD_REAL, &m_cm ) ;
     double* pb = (double*)b->x;
 
+    double* px = NULL;
+
     for ( i = 0; i < m_nRank; i++ ) {
       if ( i > 0 )
         pb[i-1] = 0.0;
       pb[i] = 1.0;
 
       x = cholmod_solve ( CHOLMOD_A, m_L, b, &m_cm ) ;
-      double* px = (double*)x->x;
+      px = (double*)x->x;
 
       // store solution in corresponding column of inverse (replacing column in
       // m_Normals)
       for (j = 0; j <= i; j++)
         m_Normals(j, i) = px[j];
+
+      cholmod_free_dense(&x,&m_cm);
     }
 
-    cholmod_free_dense(&x,&m_cm);
     cholmod_free_dense(&b,&m_cm);
 
     return true;
