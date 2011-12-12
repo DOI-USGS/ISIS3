@@ -38,13 +38,15 @@ namespace Isis {
    *
    * @param parent
    */
-  MosaicController::MosaicController(QStatusBar *status, QSettings &settings) {
+  MosaicController::MosaicController(QStatusBar *status, QSettings &settings) :
+      m_cubesLeftToOpen(new QStringList) {
     m_mutex = new QMutex;
     m_watcher = NULL;
     m_projectPvl = NULL;
 
     p_progress = new ProgressBar;
     p_progress->setVisible(false);
+    p_progress->setValue(0);
 
     p_fileList = new MosaicFileListWidget(settings);
     p_scene = new MosaicSceneWidget(status);
@@ -65,13 +67,11 @@ namespace Isis {
     connect(p_scene, SIGNAL(visibleRectChanged(QRectF)),
             p_worldScene, SLOT(setOutlineRect(QRectF)));
 
-    connect(this, SIGNAL(cubeListWasBlocked(QStringList)),
-            this, SLOT(openCubes(QStringList)), Qt::QueuedConnection);
-
     settings.beginGroup("MosaicController");
     m_openFilled = settings.value("openFilled", true).toBool();
     m_defaultAlpha = settings.value("defaultAlpha", 60).toInt();
     m_maxThreads = settings.value("maxThreads", 0).toInt();
+    m_maxOpenCubes = settings.value("maxOpenCubes", 750).toInt();
     settings.endGroup();
   }
 
@@ -108,13 +108,6 @@ namespace Isis {
     foreach (QAction * exportAct, exportActions) {
       fileMenu.addAction(exportAct);
     }
-
-//     QAction *exportView = new QAction(this);
-//     exportView->setText("Export View...");
-//     connect(exportView, SIGNAL(activated()), this, SLOT(exportView()));
-
-//     fileMenu.addAction(saveList);
-//     fileMenu.addAction(exportView);
   }
 
 
@@ -151,6 +144,17 @@ namespace Isis {
             this, SLOT(defaultFillChanged(bool)));
     settingsActs.append(defaultFill);
 
+    QAction *setSmallOpenCubeCount = new QAction("&Safe File Open", this);
+    setSmallOpenCubeCount->setCheckable(true);
+    setSmallOpenCubeCount->setChecked(m_maxOpenCubes < 750);
+    setSmallOpenCubeCount->setWhatsThis("This lowers the number of "
+        "simulataneously open files drastically in order to stay under the "
+        "operating system limit. Only use this if you are having trouble "
+        "loading large numbers of images.");
+    connect(setSmallOpenCubeCount, SIGNAL(toggled(bool)),
+            this, SLOT(setSmallNumberOfOpenCubes(bool)));
+    settingsActs.append(setSmallOpenCubeCount);
+
     QAction *setAlpha = new QAction("Set Default &Transparency", this);
     connect(setAlpha, SIGNAL(triggered(bool)),
             this, SLOT(changeDefaultAlpha()));
@@ -170,6 +174,7 @@ namespace Isis {
     settings.setValue("openFilled", m_openFilled);
     settings.setValue("defaultAlpha", m_defaultAlpha);
     settings.setValue("maxThreads", m_maxThreads);
+    settings.setValue("maxOpenCubes", m_maxOpenCubes);
     settings.endGroup();
   }
 
@@ -203,11 +208,11 @@ namespace Isis {
           QString(Filename(filename.toStdString()).Expanded().c_str()),
           m_mutex);
       prop->setShowFill(m_openFilled);
-      
+
       QColor newColor = prop->getValue(
           CubeDisplayProperties::Color).value<QColor>();
       newColor.setAlpha(m_defaultAlpha);
- 
+
       prop->setColor(newColor);
       prop->moveToThread(m_targetThread);
       return prop;
@@ -262,13 +267,23 @@ namespace Isis {
    *   actual Cube objects.
    */
   void MosaicController::openCubes(QStringList cubeNames) {
+    if (!cubeNames.size() && m_cubesLeftToOpen->size()) {
+      cubeNames = m_cubesLeftToOpen->mid(0, m_maxOpenCubes);
+      *m_cubesLeftToOpen = m_cubesLeftToOpen->mid(m_maxOpenCubes);
+    }
+
     if(cubeNames.size()) {
       if(m_watcher && !m_watcher->isFinished()) {
-        m_watcher->waitForFinished();
-        emit cubeListWasBlocked(cubeNames);
+        m_cubesLeftToOpen->append(cubeNames);
+        p_progress->setRange(0, p_progress->maximum() + cubeNames.size());
       }
       else {
         p_progress->setText("Opening cubes");
+
+        if (cubeNames.size() > m_maxOpenCubes) {
+          m_cubesLeftToOpen->append(cubeNames.mid(m_maxOpenCubes));
+          cubeNames = cubeNames.mid(0, m_maxOpenCubes);
+        }
 
         QFuture< CubeDisplayProperties * > displays = QtConcurrent::mapped(
             cubeNames,
@@ -289,12 +304,8 @@ namespace Isis {
                 this, SLOT(cubeDisplayReady(int)));
         connect(m_watcher, SIGNAL(finished()),
                 this, SLOT(loadFinished()));
-        connect(m_watcher, SIGNAL(progressValueChanged(int)),
-                this, SLOT(updateProgress(int)));
         m_watcher->setFuture(displays);
-        p_progress->setRange(m_watcher->progressMinimum(),
-            m_watcher->progressMaximum());
-        p_progress->setValue(0);
+        p_progress->setRange(0, cubeNames.size() + m_cubesLeftToOpen->size());
         p_progress->setVisible(true);
       }
     }
@@ -304,38 +315,41 @@ namespace Isis {
   void MosaicController::cubeDisplayReady(int index) {
     if(m_watcher) {
       CubeDisplayProperties *cubeDisplay = m_watcher->resultAt(index);
+      p_progress->setValue(p_progress->value() + 1);
 
       if(cubeDisplay) {
         p_unannouncedCubes.append(cubeDisplay);
         p_cubes.append(cubeDisplay);
         connect(cubeDisplay, SIGNAL(destroyed(QObject *)),
                 this, SLOT(cubeClosed(QObject *)));
-
-        flushCubes();
       }
     }
   }
 
   void MosaicController::loadFinished() {
-    flushCubes(true);
+    flushCubes();
 
-    if(m_projectPvl && m_projectPvl->HasObject("MosaicFileList"))
-      p_fileList->fromPvl(m_projectPvl->FindObject("MosaicFileList"));
-
-    if(m_projectPvl && m_projectPvl->HasObject("MosaicScene"))
-      p_scene->fromPvl(m_projectPvl->FindObject("MosaicScene"));
-
-    if(m_projectPvl) {
-      delete m_projectPvl;
-      m_projectPvl = NULL;
+    if (m_cubesLeftToOpen->size()) {
+      QStringList empty;
+      openCubes(QStringList());
     }
+    else {
+      if(m_projectPvl && m_projectPvl->HasObject("MosaicFileList"))
+        p_fileList->fromPvl(m_projectPvl->FindObject("MosaicFileList"));
 
-    p_progress->setVisible(false);
+      if(m_projectPvl && m_projectPvl->HasObject("MosaicScene"))
+        p_scene->fromPvl(m_projectPvl->FindObject("MosaicScene"));
+
+      if(m_projectPvl) {
+        delete m_projectPvl;
+        m_projectPvl = NULL;
+      }
+
+      p_progress->setVisible(false);
+      p_progress->setValue(0);
+    }
   }
 
-  void MosaicController::updateProgress(int newVal) {
-    p_progress->setValue(newVal);
-  }
 
   void MosaicController::changeDefaultAlpha() {
     bool ok = false;
@@ -428,8 +442,6 @@ namespace Isis {
               this, SLOT(cubeDisplayReady(int)));
       connect(m_watcher, SIGNAL(finished()),
               this, SLOT(loadFinished()));
-      connect(m_watcher, SIGNAL(progressValueChanged(int)),
-              this, SLOT(updateProgress(int)));
       m_watcher->setFuture(displays);
       p_progress->setRange(m_watcher->progressMinimum(),
           m_watcher->progressMaximum());
@@ -438,7 +450,7 @@ namespace Isis {
     }
     catch(iException &e) {
       p_progress->setVisible(false);
-      flushCubes(true);
+      flushCubes();
       throw iException::Message(iException::Io, "Input project file does is not"
           " an up to date qmos project", _FILEINFO_);
     }
@@ -462,33 +474,33 @@ namespace Isis {
   }
 
 
-  void MosaicController::flushCubes(bool force) {
+  void MosaicController::setSmallNumberOfOpenCubes(bool useSmallNumber) {
+    if (useSmallNumber)
+      m_maxOpenCubes = 20;
+    else
+      m_maxOpenCubes = 750;
+  }
+
+
+  /**
+   * This method takes the opened cube files, announces them to the GUI widgets,
+   *   and then closes the Cube files so that more can be opened later.
+   */
+  void MosaicController::flushCubes() {
     // We really can't have all of the cubes in memory before
-    //   the OS stops letting us open more files. Throttle at 1k.
-    if(force || p_unannouncedCubes.size() >= 500) {
-      if(p_unannouncedCubes.size() > 0) {
-        // The concurrent threads will open too many files if we let them keep
-        //   going. Pause them while the GUI starts working.
-        if(m_watcher) {
-          m_watcher->pause();
-        }
+    //   the OS stops letting us open more files.
+    if(p_unannouncedCubes.size() > 0) {
+      // Assume cameras are being used in other parts of code since it's
+      //   unknown
+      QMutexLocker lock(m_mutex);
+      emit cubesAdded(p_unannouncedCubes);
 
-        // Assume cameras are being used in other parts of code since it's
-        //   unknown
-        QMutexLocker lock(m_mutex);
-        emit cubesAdded(p_unannouncedCubes);
-
-        CubeDisplayProperties *openCube;
-        foreach(openCube, p_unannouncedCubes) {
-          openCube->closeCube();
-        }
-
-        p_unannouncedCubes.clear();
-
-        if(m_watcher) {
-          m_watcher->resume();
-        }
+      CubeDisplayProperties *openCube;
+      foreach(openCube, p_unannouncedCubes) {
+        openCube->closeCube();
       }
+
+      p_unannouncedCubes.clear();
     }
   }
 }

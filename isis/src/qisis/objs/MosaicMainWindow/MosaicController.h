@@ -44,7 +44,10 @@ namespace Isis {
    *                           scene and the file list, not directly from this
    *                           controller. Fixes #342
    *   @history 2011-09-26 Steven Lambright - Calling openCubes many times in
-  *                          a row now works.
+   *                          a row now works.
+   *   @history 2011-12-05 Steven Lambright - Added fixes for maximum number of
+   *                          simultaneously open files. It now stays lower and
+   *                          has an option to become drastically lower.
    */
 
   class MosaicController : public QObject {
@@ -82,8 +85,6 @@ namespace Isis {
 
       void allCubesClosed();
 
-      void cubeListWasBlocked(QStringList cubeList);
-
     public slots:
       void saveProject(QString filename);
       void readProject(QString filename);
@@ -97,10 +98,10 @@ namespace Isis {
       void defaultFillChanged(bool);
       void loadFinished();
       void saveList();
-      void updateProgress(int);
+      void setSmallNumberOfOpenCubes(bool useSmallNumber);
 
     private:
-      void flushCubes(bool force = false);
+      void flushCubes();
 
     private:
       QList<CubeDisplayProperties *> p_cubes;
@@ -114,7 +115,10 @@ namespace Isis {
 
       bool m_openFilled;
       int m_defaultAlpha;
+      int m_maxOpenCubes;
       int m_maxThreads;
+
+      QScopedPointer< QStringList > m_cubesLeftToOpen;
 
       // Cameras are not re-entrant and so this mutex will make sure they
       //   aren't overly abused
