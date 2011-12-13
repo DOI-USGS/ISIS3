@@ -2099,17 +2099,25 @@ namespace Isis {
 
 
 
+
+  /**
+   * @brief Load measure information into the measure table
+   * @internal 
+   *   @history 2011-12-05 Tracie Sucharski - Turn off sorting until table
+   *                          is loaded.
+   *
+   */
   void QnetTool::loadMeasureTable () {
     if (p_measureWindow == NULL) { 
       p_measureWindow = new QMainWindow();
       p_measureTable = new QTableWidget();
       p_measureTable->setMinimumWidth(1600);
       p_measureTable->setAlternatingRowColors(true);
-      p_measureTable->setSortingEnabled(true);
       p_measureWindow->setCentralWidget(p_measureTable);
     }
     else {
       p_measureTable->clear();
+      p_measureTable->setSortingEnabled(false);
     }
     p_measureTable->setRowCount(p_editPoint->GetNumMeasures());
     p_measureTable->setColumnCount(NUMCOLUMNS);
@@ -2255,6 +2263,7 @@ namespace Isis {
 
     p_measureTable->resizeColumnsToContents();
     p_measureTable->resizeRowsToContents();
+    p_measureTable->setSortingEnabled(true);
     p_measureWindow->show();
   }
 

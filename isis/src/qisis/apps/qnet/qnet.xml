@@ -490,5 +490,9 @@
       Fixed problem caused by an image in the list which did not have any
       measure associated with it.
     </change>
+    <change name="Tracie Sucharski" date="2011-12-05">
+      Fixed bug with measure table not displaying all information when 
+      table has been sorted.
+    </change>
   </history>
 </application>
