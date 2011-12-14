@@ -212,6 +212,10 @@
     <change name="Debbie A. Cook" date="2011-06-07">
       Changed point types "Ground" to "Fixed" and "Tie" to "Free".
     </change>
+    <change name="Travis Addair" date="2011-12-14">
+      Added Validation options and Back-Registration test to detect and remove
+      false positive registrations from the network.
+    </change>
   </history>
 
   <groups>
@@ -315,7 +319,7 @@
           </description>
           <internalDefault>None</internalDefault>
           <filter>
-            *.txt *.lis *.lst *.list
+            *.txt *.csv
           </filter>
         </parameter>
 
@@ -437,6 +441,149 @@
         </list>  
       </parameter>
     </group> 
+
+    <group name="Validation">                           
+      <parameter name="VALIDATE">
+        <type>string</type>
+        <brief>
+          Whether to perform validation, and if so, when
+        </brief>
+        <description>
+          Validating the control network attempts to weed out false positive
+          registrations based on a series of tests.  When a measure fails a
+          given test, its type will be set to CANDIDATE, its line and sample
+          will be reset to their apriori values, and its log data will be
+          removed.  Depending on the tests selected, validation can more than
+          double the runtime of the registration process.  As such, it is
+          disabled (VALIDATE=SKIP) by default.  By selecting the AFTER option,
+          validation will occur immediately after registration using the same
+          definition file and control network.  However, the user can also
+          choose to skip registration and only validate the input network by
+          selecting the ONLY option.
+        </description>
+        <default><item>SKIP</item></default>
+        <list>
+          <option value="SKIP">
+            <brief>
+              Skip the validation process
+            </brief>
+            <description>
+              Selecting this option (default) will skip the validation process.
+              This is useful if the user trusts the results from the program, or
+              is concerned about the additional runtime cost of doing this test.
+            </description>
+            <exclusions>
+              <item>REVERT</item>
+              <item>SEARCH</item>
+              <item>SHIFT</item>
+              <item>FALSEPOSITIVES</item>
+            </exclusions>
+          </option>
+          <option value="AFTER">
+            <brief>
+              Validate the control network after the registration process
+            </brief>
+            <description>
+              This option will result in both the registration and validation
+              processes occuring in the same run.  By doing both steps in one
+              run, it saves the user from needing to keep track of the paired
+              output network, cube list, and definition file from a previous run
+              of pointreg.  However, this option will also result in the longest
+              runtime of the program.
+            </description>
+          </option>
+          <option value="ONLY">
+            <brief>
+              Only validate the input network, do not register it
+            </brief>
+            <description>
+              This option allows the user to validate a previously registered
+              network without needing to rerun the registration process.  It is
+              important that the user provide, as input, the same definition
+              file and cube list that were used to register the network
+              originally in order to have consistent results.
+            </description>
+            <exclusions>
+              <item>MEASURES</item>
+            </exclusions>
+          </option>
+        </list>
+      </parameter>
+
+      <parameter name="REVERT">
+        <type>boolean</type>
+        <brief>
+          Revert false positives back to original values
+        </brief>
+        <description>
+          Enabling this option causes the program to revert every measure it
+          considers to be falsely registered back to its values prior to
+          registration.  This includes the line/sample, type, and log data of
+          the measure.  If this option is disabled, the user must enter a file
+          to log the results for the FALSEPOSITIVES parameter.
+        </description>
+        <default><item>True</item></default>
+      </parameter>
+
+      <parameter name="SEARCH">
+        <type>integer</type>
+        <brief>
+          How many pixels to expand the pattern chip for validation
+        </brief>
+        <description>
+          During the validation process, a much smaller search window can be
+          used than the SearchChip from registration, as ideally, the measure
+          position should move very little (if at all) if it is to be considered
+          a valid registration.  By default, the search window will be the
+          PatternChip expanded by the number of pixels specified by the
+          WindowSize parameter on each side (from the definition file, defaults
+          to 5).
+        </description>
+        <internalDefault>WindowSize</internalDefault>
+      </parameter>
+
+      <parameter name="SHIFT">
+        <type>double</type>
+        <brief>
+          The maximum number of pixels a valid registration can shift
+        </brief>
+        <description>
+          All validation tests involve registering different combinations of
+          measures besides candidate-to-reference.  Consequently, the measure
+          positions are likely to shift slightly from their previous
+          registrations.  Ideally, there should be no shift if the two measures
+          being examined are perfectly registered.  The more the measures shift
+          from their previous registrations, the more likely the registrations
+          are false positives.  This paraneter allows the user to specify a
+          tolerance for how much a measure position can shift (in pixels) before
+          the registration is considered invalid.
+          <p>
+            It should be noted that any shifting of measures that occurs during
+            validation is for testing purposes only.  The previous registration
+            will never be overridden by the results of these tests.
+          </p>
+        </description>
+        <default><item>1.0</item></default>
+      </parameter>
+
+      <parameter name="FALSEPOSITIVES">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Comma-separated text file of false positive information
+        </brief>
+        <description>
+          This file will contain a line for every registration that is
+          determined to be a false positive.  This line will include the measure
+          serial number, reasons why it originally succeeded, reasons why it was
+          considered a false positive, and the test that declared it as such.
+        </description>
+        <internalDefault>None</internalDefault>
+        <filter>
+          *.txt *.csv
+        </filter>
+      </parameter>
+    </group>
   </groups>
 
   <examples>
