@@ -18,6 +18,8 @@ class QStatusBar;
 // This is the parent of the inner class
 #include <functional>
 
+#include "PvlObject.h"
+
 namespace Isis {
   class ControlNet;
   class CubeDisplayProperties;
@@ -44,10 +46,13 @@ namespace Isis {
    *                           scene and the file list, not directly from this
    *                           controller. Fixes #342
    *   @history 2011-09-26 Steven Lambright - Calling openCubes many times in
-   *                          a row now works.
+   *                           a row now works.
    *   @history 2011-12-05 Steven Lambright - Added fixes for maximum number of
-   *                          simultaneously open files. It now stays lower and
-   *                          has an option to become drastically lower.
+   *                           simultaneously open files. It now stays lower and
+   *                           has an option to become drastically lower.
+   *   @history 2011-12-16 Steven Lambright - Applies fixes for maximum number
+   *                           of open files to opening project files and fixed
+   *                           progress to be more accurate. Fixes #635.
    */
 
   class MosaicController : public QObject {
@@ -89,6 +94,7 @@ namespace Isis {
       void saveProject(QString filename);
       void readProject(QString filename);
       void openCubes(QStringList filenames);
+      void openProjectCubes(QList<PvlObject> projectCubes);
       void cubeDisplayReady(int);
 
     private slots:
@@ -119,6 +125,7 @@ namespace Isis {
       int m_maxThreads;
 
       QScopedPointer< QStringList > m_cubesLeftToOpen;
+      QScopedPointer< QList<PvlObject> > m_projectCubesLeftToOpen;
 
       // Cameras are not re-entrant and so this mutex will make sure they
       //   aren't overly abused

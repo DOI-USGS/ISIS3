@@ -39,7 +39,8 @@ namespace Isis {
    * @param parent
    */
   MosaicController::MosaicController(QStatusBar *status, QSettings &settings) :
-      m_cubesLeftToOpen(new QStringList) {
+      m_cubesLeftToOpen(new QStringList),
+      m_projectCubesLeftToOpen(new QList<PvlObject>) {
     m_mutex = new QMutex;
     m_watcher = NULL;
     m_projectPvl = NULL;
@@ -305,7 +306,55 @@ namespace Isis {
         connect(m_watcher, SIGNAL(finished()),
                 this, SLOT(loadFinished()));
         m_watcher->setFuture(displays);
-        p_progress->setRange(0, cubeNames.size() + m_cubesLeftToOpen->size());
+        if (!p_progress->isVisible())
+          p_progress->setRange(0, cubeNames.size() + m_cubesLeftToOpen->size());
+        p_progress->setVisible(true);
+      }
+    }
+  }
+
+
+  void MosaicController::openProjectCubes(QList<PvlObject> projectCubes) {
+    if (!projectCubes.size() && m_projectCubesLeftToOpen->size()) {
+      projectCubes = m_projectCubesLeftToOpen->mid(0, m_maxOpenCubes);
+      *m_projectCubesLeftToOpen = m_projectCubesLeftToOpen->mid(m_maxOpenCubes);
+    }
+
+    if(projectCubes.size()) {
+      if(m_watcher && !m_watcher->isFinished()) {
+        m_projectCubesLeftToOpen->append(projectCubes);
+        p_progress->setRange(0, p_progress->maximum() + projectCubes.size());
+      }
+      else {
+        p_progress->setText("Opening cubes");
+
+        if (projectCubes.size() > m_maxOpenCubes) {
+          m_projectCubesLeftToOpen->append(projectCubes.mid(m_maxOpenCubes));
+          projectCubes = projectCubes.mid(0, m_maxOpenCubes);
+        }
+
+        QFuture< CubeDisplayProperties * > displays = QtConcurrent::mapped(
+            projectCubes,
+            ProjectToDisplayFunctor(m_mutex, QThread::currentThread()));
+
+        if(m_maxThreads > 1)
+          QThreadPool::globalInstance()->setMaxThreadCount(m_maxThreads - 1);
+        else
+          QThreadPool::globalInstance()->setMaxThreadCount(
+              QThread::idealThreadCount());
+
+        delete m_watcher;
+        m_watcher = NULL;
+
+        m_watcher = new QFutureWatcher< CubeDisplayProperties * >;
+        connect(m_watcher, SIGNAL(resultReadyAt(int)),
+                this, SLOT(cubeDisplayReady(int)));
+        connect(m_watcher, SIGNAL(finished()),
+                this, SLOT(loadFinished()));
+        m_watcher->setFuture(displays);
+        if (!p_progress->isVisible())
+          p_progress->setRange(0,
+              projectCubes.size() + m_projectCubesLeftToOpen->size());
         p_progress->setVisible(true);
       }
     }
@@ -329,8 +378,11 @@ namespace Isis {
   void MosaicController::loadFinished() {
     flushCubes();
 
-    if (m_cubesLeftToOpen->size()) {
-      QStringList empty;
+    if (m_projectCubesLeftToOpen->size()) {
+      QList<PvlObject> empty;
+      openProjectCubes(empty);
+    }
+    else if (m_cubesLeftToOpen->size()) {
       openCubes(QStringList());
     }
     else {
@@ -413,40 +465,19 @@ namespace Isis {
 
   void MosaicController::readProject(QString filename) {
     try {
-      if(m_watcher) {
-        m_watcher->waitForFinished();
-        delete m_watcher;
-        m_watcher = NULL;
-      }
-
       m_projectPvl = new Pvl(filename.toStdString());
       PvlObject &cubes(m_projectPvl->FindObject("Cubes"));
 
-      p_progress->setText("Opening cubes");
+      QList<PvlObject> cubesList;
 
-      if(m_maxThreads > 1)
-        QThreadPool::globalInstance()->setMaxThreadCount(m_maxThreads - 1);
-      else
-        QThreadPool::globalInstance()->setMaxThreadCount(
-            QThread::idealThreadCount());
+      for (int i = 0; i < cubes.Objects(); i++) {
+        cubesList.append(cubes.Object(i));
+      }
 
       if(m_projectPvl && m_projectPvl->HasObject("MosaicScene"))
         p_scene->preloadFromPvl(m_projectPvl->FindObject("MosaicScene"));
 
-      QFuture< CubeDisplayProperties * > displays = QtConcurrent::mapped(
-          cubes.BeginObject(), cubes.EndObject(),
-          ProjectToDisplayFunctor(m_mutex, QThread::currentThread()));
-
-      m_watcher = new QFutureWatcher< CubeDisplayProperties * >;
-      connect(m_watcher, SIGNAL(resultReadyAt(int)),
-              this, SLOT(cubeDisplayReady(int)));
-      connect(m_watcher, SIGNAL(finished()),
-              this, SLOT(loadFinished()));
-      m_watcher->setFuture(displays);
-      p_progress->setRange(m_watcher->progressMinimum(),
-          m_watcher->progressMaximum());
-      p_progress->setValue(0);
-      p_progress->setVisible(true);
+      openProjectCubes(cubesList);
     }
     catch(iException &e) {
       p_progress->setVisible(false);
