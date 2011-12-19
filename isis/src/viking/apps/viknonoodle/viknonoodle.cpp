@@ -58,6 +58,15 @@ void removeNoise(Buffer &in, Buffer &out) {
   int index2 = in.size() - 1;
   while(IsSpecial(in[index2])) index2--;
 
+  // If no valid pixels are on the line, just copy the
+  // input line over to the output cube as is.
+  if(index2 < index1) {
+    for(int i = 0; i < out.size(); i++) {
+      out[i] = in[i];
+    }
+    return;
+  }
+
   // create a line that will cover at least half the data
   //  this guarentees a more accurate result
   int length = fft.NextPowerOfTwo((index2 - index1) / 2); // the length of the interval

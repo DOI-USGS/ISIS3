@@ -36,6 +36,10 @@
     <change name="Steven Lambright" date="2007-12-14">
         Fixed boundary condition where vectors went out of bounds
     </change>
+    <change name="Debbie A. Cook" date="2011-12-12">
+        Added a check for a line with no valid pixels and
+        just copy the input line to the output in that case
+    </change>
   </history>
 
   <groups>
