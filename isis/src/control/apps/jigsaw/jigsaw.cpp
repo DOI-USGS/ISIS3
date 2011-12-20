@@ -36,6 +36,7 @@ void IsisMain() {
   b->SetSolveRadii(ui.GetBoolean("RADIUS"));
   b->SetErrorPropagation(ui.GetBoolean("ERRORPROPAGATION"));
   b->SetOutlierRejection(ui.GetBoolean("OUTLIER_REJECTION"));
+  b->SetRejectionMultiplier(ui.GetDouble("REJECTION_MULTIPLIER"));
 
   b->SetCkDegree(ui.GetInteger("CKDEGREE"));
   b->SetSolveCamDegree(ui.GetInteger("SOLVEDEGREE"));

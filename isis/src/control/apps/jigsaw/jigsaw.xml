@@ -165,6 +165,9 @@
       added to the camsolve option descriptions in response to Mantis 
       issue #514.
     </change>
+    <change name="Ken Edmundson" date="2011-12-20">
+      Added REJECTION_MULTIPLIER to interface, part of Mantis issue #637.
+    </change>
   </history>
 
   <groups>
@@ -381,6 +384,15 @@
         <item>No</item>
       </default>
     </parameter>
+
+     <parameter name="REJECTION_MULTIPLIER">
+        <brief>Rejection multiplier</brief>
+        <description> Rejection multiplier</description>
+        <type>double</type>
+        <default>
+          <item>3.0</item>
+        </default>
+      </parameter>
     </group>
 
     <group name="Convergence Criteria">

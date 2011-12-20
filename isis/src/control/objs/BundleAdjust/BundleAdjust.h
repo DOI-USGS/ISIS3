@@ -98,6 +98,12 @@
  *   @history 2011-10-14 Ken Edmundson Added call to m_pCnet->ClearJigsawRejected();
  *                          to Init() method to set all measure/point
  *                          JigsawRejected flags to false prior to bundle.
+ *   @history 2011-12-09 Ken Edmundson, memory leak fix in method cholmod_Inverse
+ *                          need call to "cholmod_free_dense(&x,&m_cm)" inside
+ *                          loop.
+ *   @history 2011-12-20 Ken Edmundson, Fixes to outlier rejection. Added
+ *                          rejection multiplier member variable, can be set in
+ *                          jigsaw interface.
  */
 
 #include <QObject> // parent class
@@ -162,6 +168,7 @@ namespace Isis {
       void SetSolveRadii(bool solve) { m_bSolveRadii = solve; }
       void SetErrorPropagation(bool b) { m_bErrorPropagation = b; }
       void SetOutlierRejection(bool b) { m_bOutlierRejection = b; }
+      void SetRejectionMultiplier(double d) { m_dRejectionMultiplier = d; }
 
       void SetGlobalLatitudeAprioriSigma(double d) { m_dGlobalLatitudeAprioriSigma = d; }
       void SetGlobalLongitudeAprioriSigma(double d) { m_dGlobalLongitudeAprioriSigma = d; }
@@ -295,6 +302,7 @@ namespace Isis {
       bool m_bObservationMode;                               //!< for observation mode (explain this somewhere)
       bool m_bErrorPropagation;                              //!< to perform error propagation
       bool m_bOutlierRejection;                              //!< to perform automatic outlier detection/rejection
+      double m_dRejectionMultiplier;                         //!< outlier rejection multiplier
       bool m_bPrintSummary;                                  //!< to print summary
       bool m_bOutputStandard;                                //!< to print standard bundle output file (bundleout.txt)
       bool m_bOutputCSV;                                     //!< to output points and image station data in csv format

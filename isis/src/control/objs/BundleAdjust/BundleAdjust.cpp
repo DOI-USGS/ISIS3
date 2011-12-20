@@ -5007,19 +5007,21 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       return true;
   }
 
-  bool BundleAdjust::ComputeRejectionLimit() {
 
+  bool BundleAdjust::ComputeRejectionLimit() {
       double vx, vy;
 
       int nResiduals = m_nObservations / 2;
 
-      std::vector<double> x_residuals;
-      std::vector<double> y_residuals;
+//      std::cout << "total observations: " << m_nObservations << std::endl;
+//      std::cout << "rejected observations: " << m_nRejectedObservations << std::endl;
+//      std::cout << "good observations: " << m_nObservations-m_nRejectedObservations << std::endl;
 
-      x_residuals.resize(nResiduals);
-      y_residuals.resize(nResiduals);
+      std::vector<double> resvectors;
 
-      // load absolute value of residuals into vectors
+      resvectors.resize(nResiduals);
+
+      // load magnitude (squared) of residual vector
       int nObservation = 0;
       int nObjectPoints = m_pCnet->GetNumPoints();
       for (int i = 0; i < nObjectPoints; i++) {
@@ -5044,8 +5046,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
               vx = measure->GetSampleResidual();
               vy = measure->GetLineResidual();
 
-              x_residuals[nObservation] = fabs(vx);
-              y_residuals[nObservation] = fabs(vy);
+              resvectors[nObservation] = sqrt(vx*vx + vy*vy);
 
               nObservation++;
           }
@@ -5055,45 +5056,54 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 //      std::cout << "y_residuals\n" << y_residuals << std::endl;
 
       // sort vectors
-      std::sort(x_residuals.begin(), x_residuals.end());
-      std::sort(y_residuals.begin(), y_residuals.end());
+      std::sort(resvectors.begin(), resvectors.end());
+
+//      std::cout << "residuals range: \n" << resvectors[0] << resvectors[nResiduals-1] << std::endl;
 
 //      std::cout << "x residuals sorted\n" << x_residuals << std::endl;
 //      std::cout << "y_residuals sorted\n" << y_residuals << std::endl;
 
-      double xmedian, ymedian;
-      double xmad, ymad;
+      double median;
+      double mediandev;
+      double mad;
 
       int nmidpoint = nResiduals / 2;
 
-      if ( nResiduals % 2 ) {
-          xmedian = x_residuals[nmidpoint];
-          ymedian = y_residuals[nmidpoint];
-      }
-      else {
-          xmedian = (x_residuals[nmidpoint-1] + x_residuals[nmidpoint]) / 2;
-          ymedian = (y_residuals[nmidpoint-1] + y_residuals[nmidpoint]) / 2;
-      }
+      if ( nResiduals % 2 == 0 )
+        median = (resvectors[nmidpoint-1] + resvectors[nmidpoint]) / 2;
+      else
+        median = resvectors[nmidpoint];
+
+//      std::cout << "median: " << median << std::endl;
 
       // compute M.A.D.
-      for (int i = 0; i < nResiduals; i++) {
-          x_residuals[i] = fabs(x_residuals[i] - xmedian);
-          y_residuals[i] = fabs(y_residuals[i] - ymedian);
-      }
+      for (int i = 0; i < nResiduals; i++)
+          resvectors[i] = fabs(resvectors[i] - median);
 
-      std::sort(x_residuals.begin(), x_residuals.end());
-      std::sort(y_residuals.begin(), y_residuals.end());
+      std::sort(resvectors.begin(), resvectors.end());
 
-      if ( nResiduals % 2 ) {
-          xmad = 1.4826 * x_residuals[nmidpoint];
-          ymad = 1.4826 * y_residuals[nmidpoint];
-      }
-      else {
-          xmad = 1.4826 * (x_residuals[nmidpoint-1] + x_residuals[nmidpoint]) / 2;
-          ymad = 1.4826 * (y_residuals[nmidpoint-1] + y_residuals[nmidpoint]) / 2;
-      }
+//      std::cout << "residuals range: \n" << resvectors[0] << resvectors[nResiduals-1] << std::endl;
 
-      m_dRejectionLimit = 10.0 * std::max(xmad, ymad);
+      if ( nResiduals % 2 == 0 )
+        mediandev = (resvectors[nmidpoint-1] + resvectors[nmidpoint]) / 2;
+      else
+        mediandev = resvectors[nmidpoint];
+
+      std::cout << "median deviation: " << mediandev << std::endl;
+
+      mad = 1.4826 * mediandev;
+
+      std::cout << "mad: " << mad << std::endl;
+
+//      double dLow = median - m_dRejectionMultiplier * mad;
+//      double dHigh = median + m_dRejectionMultiplier * mad;
+
+//      std::cout << "reject range: \n" << dLow << " " << dHigh << std::endl;
+//      std::cout << "Rejection multipler: \n" << m_dRejectionMultiplier << std::endl;
+
+      m_dRejectionLimit = median + m_dRejectionMultiplier * mad;
+
+      std::cout << "Rejection Limit: " << m_dRejectionLimit << std::endl;
 
       return true;
   }
@@ -5103,13 +5113,16 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     int nRejected;
     int ntotalrejected = 0;
 
-    int nIndexMaxResidual = -1;
+    int nIndexMaxResidual;
     double dMaxResidual;
     double dSumSquares;
     double dUsedRejectionLimit = m_dRejectionLimit;
 
-    if ( m_dRejectionLimit < 0.05 )
-        dUsedRejectionLimit = 0.05;
+//    if ( m_dRejectionLimit < 0.05 )
+//        dUsedRejectionLimit = 0.14;
+    //        dUsedRejectionLimit = 0.05;
+
+    int nComingBack = 0;
 
     int nObjectPoints = m_pCnet->GetNumPoints();
     for (int i = 0; i < nObjectPoints; i++) {
@@ -5120,6 +5133,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       point->ZeroNumberOfRejectedMeasures();
 
       nRejected = 0;
+      nIndexMaxResidual = -1;
       dMaxResidual = -1.0;
 
       int nMeasures = point->GetNumMeasures();
@@ -5132,9 +5146,15 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
           vx = measure->GetSampleResidual();
           vy = measure->GetLineResidual();
 
-          if ( fabs(vx) < dUsedRejectionLimit && fabs(vy) < dUsedRejectionLimit ) {
-              if( measure->IsRejected() ) {
+          dSumSquares = sqrt(vx*vx + vy*vy);
+
+          // measure is good
+          if ( dSumSquares <= dUsedRejectionLimit ) {
+
+            // was it previously rejected?
+            if( measure->IsRejected() ) {
                   printf("Coming back in: %s\r",point->GetId().c_str());
+                  nComingBack++;
                   m_pCnet->DecrementNumberOfRejectedMeasuresInImage(measure->GetCubeSerialNumber());
               }
 
@@ -5149,8 +5169,6 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
               continue;
           }
 
-          dSumSquares = vx * vx + vy * vy;
-
           if ( dSumSquares > dMaxResidual ) {
               dMaxResidual = dSumSquares;
               nIndexMaxResidual = j;
@@ -5158,17 +5176,17 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       }
 
       // no observations above the current rejection limit for this 3D point
-      if ( dMaxResidual == -1.0 ) {
+      if ( dMaxResidual == -1.0 || dMaxResidual <= dUsedRejectionLimit ) {
           point->SetNumberOfRejectedMeasures(nRejected);
           continue;
       }
 
       // this is another kluge - if we only have two observations
       // we won't reject (for now)
-//      if ((nMeasures - (nRejected + 1)) < 2) {
-//          point->SetNumberOfRejectedMeasures(nRejected);
-//          continue;
-//      }
+      if ((nMeasures - (nRejected + 1)) < 2) {
+          point->SetNumberOfRejectedMeasures(nRejected);
+          continue;
+      }
 
       // otherwise, we have at least one observation
       // for this point whose residual is above the
@@ -5199,8 +5217,11 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     printf("\n\t       Rejected Observations:%10d (Rejection Limit:%12.5lf\n",
            m_nRejectedObservations, dUsedRejectionLimit);
 
+    std::cout << "Measures that came back: " << nComingBack << std::endl;
+
     return true;
 }
+
 
   /**
    * error propagation.
