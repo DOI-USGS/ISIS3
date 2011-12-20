@@ -246,43 +246,44 @@ namespace Isis {
     }
 
     string serialNumber = SerialNumber::Compose(*p_chipCube);
-    if (!p_controlNet->GetCubeSerials().contains(
-                         QString::fromStdString(serialNumber))) return;
-    // draw measure locations if we have a control network
-    //  If the serial number is Unknown, we probably have a ground source
-    //  file or level 2 which means it does not exist in the network
-    //  TODO:  Is there a better way to handle this?
-    if (p_controlNet && p_showPoints && serialNumber.compare("Unknown") &&
-        p_controlNet->GetNumPoints() != 0) {
-      QList<ControlMeasure *> measures =
-                                 p_controlNet->GetMeasuresInCube(serialNumber);
-      // loop through all points in the control net
-      for (int i = 0; i < measures.count(); i++) {
-        ControlMeasure *m = measures[i];
-        // Find the measurments on the viewport
-        double samp = m->GetSample();
-        double line = m->GetLine();
-        int x, y;
-
-        cubeToViewport(samp, line, x, y);
-        // Determine pen color
-        // if the point or measure is ignored set to yellow
-        if (m->Parent()->IsIgnored() ||
-           (!m->Parent()->IsIgnored() && m->IsIgnored())) {
-          painter.setPen(QColor(255, 255, 0)); // set point marker yellow
-        }
-        // check for ground measure
-        else if (m->Parent()->GetType() == ControlPoint::Fixed) {
-          painter.setPen(Qt::magenta);// set point marker magenta
-        }
-        else {
-          painter.setPen(Qt::green); // set all other point markers green
-        }
-
-        // draw points which are not under cross
-        if (x != (p_width - 1) / 2 || y != (p_height - 1) / 2) {
-          painter.drawLine(x - 5, y, x + 5, y);
-          painter.drawLine(x, y - 5, x, y + 5);
+    if (p_controlNet && p_controlNet->GetCubeSerials().contains(
+                             QString::fromStdString(serialNumber))) {
+      // draw measure locations if we have a control network
+      //  If the serial number is Unknown, we probably have a ground source
+      //  file or level 2 which means it does not exist in the network
+      //  TODO:  Is there a better way to handle this?
+      if (p_showPoints && serialNumber.compare("Unknown") &&
+          p_controlNet->GetNumPoints() != 0) {
+        QList<ControlMeasure *> measures =
+                                   p_controlNet->GetMeasuresInCube(serialNumber);
+        // loop through all points in the control net
+        for (int i = 0; i < measures.count(); i++) {
+          ControlMeasure *m = measures[i];
+          // Find the measurments on the viewport
+          double samp = m->GetSample();
+          double line = m->GetLine();
+          int x, y;
+      
+          cubeToViewport(samp, line, x, y);
+          // Determine pen color
+          // if the point or measure is ignored set to yellow
+          if (m->Parent()->IsIgnored() ||
+             (!m->Parent()->IsIgnored() && m->IsIgnored())) {
+            painter.setPen(QColor(255, 255, 0)); // set point marker yellow
+          }
+          // check for ground measure
+          else if (m->Parent()->GetType() == ControlPoint::Fixed) {
+            painter.setPen(Qt::magenta);// set point marker magenta
+          }
+          else {
+            painter.setPen(Qt::green); // set all other point markers green
+          }
+      
+          // draw points which are not under cross
+          if (x != (p_width - 1) / 2 || y != (p_height - 1) / 2) {
+            painter.drawLine(x - 5, y, x + 5, y);
+            painter.drawLine(x, y - 5, x, y + 5);
+          }
         }
       }
     }
