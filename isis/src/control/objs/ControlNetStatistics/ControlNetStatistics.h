@@ -65,6 +65,7 @@ namespace Isis {
    *   @history 2011-07-19 Sharmila Prasad - Modified for new keywords in binary control net
    *   @history 2011-11-03 Sharmila Prasad - Used ControlNet's CubeGraphNodes to get Image stats
    *                                         including Convex Hull Ratio
+   *   @history 2011-12-21 Sharmila Prasad Fixed #634 to include stats of images not in the  ControlNet
    */
   class ControlNetStatistics {
     public:
@@ -232,20 +233,26 @@ namespace Isis {
       
     protected:
       SerialNumberList mSerialNumList;    //!< Serial Number List
-      ControlNet *mCNet;                  //!< Control Network
-      Progress *mProgress;                //!< Progress state
+      ControlNet *mCNet;                         //!< Control Network
+      Progress *mProgress;                       //!< Progress state
       QList< ControlCubeGraphNode * > mCubeGraphNodes;
       
     private:
-      map <int, int> mPointIntStats;           //!< Contains map of different count stats
-      map <int, double> mPointDoubleStats;     //!< Contains map of different computed stats
-      map <string, vector<double> > mImageMap;
+      map <int, int> mPointIntStats;                           //!< Contains map of different count stats
+      map <int, double> mPointDoubleStats;             //!< Contains map of different computed stats
+      map <string, vector<double> > mImageMap; //!< Contains stats by Image/Serial Num
+      map <string, bool> mSerialNumMap;                //!< Whether serial# is part of ControlNet
       
       //! Get point count stats
       void GetPointIntStats(void);
       
       //! Get Point stats for Residuals and Shifts 
       void GetPointDoubleStats(void);
+      
+      //! Init SerialNum map
+      void InitSerialNumMap(void);
+      
+      int numCNetImages;
       
       Statistics mConvexHullStats, mConvexHullRatioStats; //!< min, max, average convex hull stats
   };

@@ -4,6 +4,7 @@ CNET=/usgs/cpkgs/isis3/data/base/testData/cnet/cnetbin.net
 Serial File=/usgs/cpkgs/isis3/data/base/testData/cnet/serialNum.lis
 Group = ControlNetSummary
   TotalImages        = 5
+  ImagesInControlNet = 5
   TotalPoints        = 26
   ValidPoints        = 23
   IgnoredPoints      = 3

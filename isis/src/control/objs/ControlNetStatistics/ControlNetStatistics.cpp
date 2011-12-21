@@ -45,7 +45,10 @@ namespace Isis {
    */
   ControlNetStatistics::ControlNetStatistics(ControlNet *pCNet, const string &psSerialNumFile, Progress *pProgress) {
     mCNet = pCNet;
+
     mSerialNumList  = SerialNumberList(psSerialNumFile); 
+    InitSerialNumMap();
+    
     mProgress       = pProgress;
     
     GetPointIntStats();
@@ -77,6 +80,20 @@ namespace Isis {
   ControlNetStatistics::~ControlNetStatistics() {
 
   }
+  
+  /**
+   * Init SerialNum map
+   * 
+   * @author Sharmila Prasad (12/20/2011)
+   */
+  void ControlNetStatistics::InitSerialNumMap(void){
+    int numSn = mSerialNumList.Size();
+    numCNetImages = 0;
+    for (int i=0; i<numSn; i++) {
+      string sn = mSerialNumList.SerialNumber(i);
+      mSerialNumMap[sn] = false;
+    }
+  }
 
   /**
    * Generates the summary stats for the entire control network.
@@ -90,8 +107,10 @@ namespace Isis {
    */
   void ControlNetStatistics::GenerateControlNetStats(PvlGroup &pStatsGrp) {
     pStatsGrp = PvlGroup("ControlNetSummary");
-    if (mSerialNumList.Size()) {
-      pStatsGrp += PvlKeyword("TotalImages",     mSerialNumList.Size());
+    int numSN = mSerialNumList.Size();
+    if (numSN) {
+      pStatsGrp += PvlKeyword("TotalImages",             numSN);
+      pStatsGrp += PvlKeyword("ImagesInControlNet", numCNetImages);
     }
     pStatsGrp += PvlKeyword("TotalPoints",       mCNet->GetNumPoints());
     pStatsGrp += PvlKeyword("ValidPoints",       NumValidPoints());
@@ -163,8 +182,10 @@ namespace Isis {
   }
   
   /**
-   * Generate the Image stats
-   * 
+   * Generate the Image stats - 
+   *  imgSamples, imgLines, imgTotalPoints, imgIgnoredPoints, imgFixedPoints, imgLockedPoints, 
+   *  imgLocked, imgConstrainedPoints, imgFreePoints, imgConvexHullArea, imgConvexHullRatio
+   *  
    * @author Sharmila Prasad (11/1/2011)
    */
   void ControlNetStatistics::GenerateImageStats(void){
@@ -190,6 +211,8 @@ namespace Isis {
       // Open the cube to get the dimensions
       iString sn = node->getSerialNumber();
       Cube *cube = cubeMgr.OpenCube(mSerialNumList.Filename(sn));
+      mSerialNumMap[sn] = true;
+      numCNetImages++;
 
       imgStats[imgSamples] = cube->getSampleCount();
       imgStats[imgLines]   = cube->getLineCount();
@@ -198,7 +221,6 @@ namespace Isis {
       QList< ControlMeasure * > measures = node->getMeasures();
 
       // Populate pts with a list of control points
-      // imgSamples, imgLines, imgTotalPoints, imgIgnoredPoints, imgFixedPoints, imgLockedPoints, imgLocked, imgConstrainedPoints, imgFreePoints, imgConvexHullArea, imgConvexHullRatio
       foreach (ControlMeasure * measure, measures) {
         ControlPoint *parentPoint = measure->Parent();
         imgStats[imgTotalPoints]++;
@@ -273,19 +295,26 @@ namespace Isis {
     string outName(outFile.Expanded());
     ostm.open(outName.c_str(), std::ios::out);
     
-    map< string, vector<double> >::iterator it;
-
-    // / imgSamples, imgLines, imgTotalPoints, imgIgnoredPoints, imgFixedPoints, imgLockedPoints, imgLocked, imgConstrainedPoints, imgFreePoints, imgConvexHullArea, imgConvexHullRatio
+    //map< string, vector<double> >::iterator it;
+    map< string, bool >::iterator it;
+    // imgSamples, imgLines, imgTotalPoints, imgIgnoredPoints, imgFixedPoints, imgLockedPoints, imgLocked, imgConstrainedPoints, imgFreePoints, imgConvexHullArea, imgConvexHullRatio
  
     // Log into the output file
     ostm << "Filename, SerialNumber, TotalPoints, PointsIgnored, PointsEditLocked, Fixed, Constrained, Free, ConvexHullRatio" <<  endl;
-    for (it = mImageMap.begin(); it != mImageMap.end(); it++) {
-      ostm << mSerialNumList.Filename((*it).first) << ", " << (*it).first << ", ";
-      vector<double>imgStats = (*it).second ;
-      ostm << imgStats[imgTotalPoints]<< ", " << imgStats[imgIgnoredPoints] << ", " ;
-      ostm << imgStats[imgLockedPoints] << ", " << imgStats[imgFixedPoints] << ", " ;
-      ostm << imgStats[imgConstrainedPoints] << ", " << imgStats[imgFreePoints] << ", ";
-      ostm << imgStats[ imgConvexHullRatio] << endl;
+    //for (it = mImageMap.begin(); it != mImageMap.end(); it++) {
+    for (it = mSerialNumMap.begin(); it != mSerialNumMap.end(); it++) {
+        ostm << mSerialNumList.Filename((*it).first) << ", " << (*it).first << ", ";
+        bool serialNumExists = (*it).second ;
+        if (serialNumExists) {
+          vector<double>imgStats = mImageMap[(*it).first] ;
+          ostm << imgStats[imgTotalPoints]<< ", " << imgStats[imgIgnoredPoints] << ", " ;
+          ostm << imgStats[imgLockedPoints] << ", " << imgStats[imgFixedPoints] << ", " ;
+          ostm << imgStats[imgConstrainedPoints] << ", " << imgStats[imgFreePoints] << ", ";
+          ostm << imgStats[ imgConvexHullRatio] << endl;
+        }
+        else {
+          ostm << "0, 0, 0, 0, 0, 0, 0" << endl;
+        }
     }
     ostm.close();
   }
