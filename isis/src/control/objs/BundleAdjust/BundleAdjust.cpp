@@ -5968,6 +5968,8 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       m_bOutlierRejection ? sprintf(buf, "\n              OUTLIER REJECTION: ON"):
               sprintf(buf, "\n              OUTLIER REJECTION: OFF");
       fp_out << buf;
+      sprintf(buf,"\n           REJECTION MULTIPLIER: %lf",m_dRejectionMultiplier);
+      fp_out << buf;
       sprintf(buf, "\n\nINPUT: CONVERGENCE CRITERIA\n===========================\n");
       fp_out << buf;
       sprintf(buf,"\n                         SIGMA0: %e",m_dConvergenceThreshold);
