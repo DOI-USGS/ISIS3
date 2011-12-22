@@ -54,6 +54,10 @@
       Added an option to run ckwriter to create a ck with jitter for correcting
       image geometry.
     </change>
+    <change name="Debbie A. Cook" date="2011-12-21">
+      Fixed the loop that calculated pitch to only loop the number of overlaps
+      (count).
+    </change>
   </history>
 
   <groups>

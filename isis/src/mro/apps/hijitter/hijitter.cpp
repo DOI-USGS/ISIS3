@@ -361,7 +361,7 @@ void ProcessNoprojFiles(Pipeline &p) {
   // averageSampleOffset[i] is the sampleOffset from first0-1.flat,
   double yaw = 0.0;
 
-  for(int i = 0; i < numFiles; i++) {
+  for(int i = 0; i < count; i++) {
     if(IsSpecial(avgOffsets[i][0]) || IsSpecial(avgOffsets[i][1])) continue;
 
     pitchRate += 0.000001 * (avgOffsets[i][1] / (lineOff[i] * lineRate)) / (double)count;
