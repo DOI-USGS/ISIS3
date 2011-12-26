@@ -83,6 +83,11 @@
       Laszlo Kestay to match the current behavior of the application, as well as
       clarify the purpose of the application.
     </change>
+    <change name="Jai Rideout" date="2011-12-26">
+      Added check to ensure the provided cube list is the same one used in
+      findimageoverlaps (i.e. the serial numbers in the overlap list match
+      the serial numbers in the provided cube list). Fixes #515.
+    </change>
   </history>
 
   <groups>

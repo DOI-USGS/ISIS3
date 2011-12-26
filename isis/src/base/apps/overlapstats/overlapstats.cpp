@@ -37,6 +37,24 @@ void IsisMain() {
   progress.SetMaximumSteps(overlaps.Size());
   progress.CheckStatus();
 
+  // Perform some sanity checking on our inputs to make sure that the serial
+  // numbers in the overlap list are in the provided cube list. We don't want
+  // users to provide a different cube list from the one that was used in
+  // findimageoverlaps.
+  for (int i = 0; i < overlaps.Size(); i++) {
+    ImageOverlap const * currOverlap = overlaps[i];
+    for (int j = 0; j < currOverlap->Size(); j++) {
+      string currSerialNum = (*currOverlap)[j];
+      if (!serialNumbers.HasSerialNumber(currSerialNum)) {
+        iString msg = "Found serial number [" + currSerialNum + "] in overlap "
+            "list that was not in the provided cube list. Please ensure that "
+            "the cube list is the same one used to generate your overlap list "
+            "file.";
+        throw iException::Message(iException::User, msg, _FILEINFO_);
+      }
+    }
+  }
+
   // Sets up the no overlap list
   set<string> nooverlap;
   for(int i = 0; i < serialNumbers.Size(); i ++) {
@@ -44,7 +62,6 @@ void IsisMain() {
   }
 
   // Create the output
-
   stringstream output(stringstream::in | stringstream::out);
   output.precision(16);
   output.setf(ios::showpoint);
@@ -56,14 +73,13 @@ void IsisMain() {
     if(ui.GetString("TABLETYPE") == "CSV") {
       delim = ",";
       singleLine = ui.GetBoolean("SINGLELINE");
-      // This line was removed because reability (ios::showpoint) was more
+      // This line was removed because readability (ios::showpoint) was more
       // important than an extra decimal place of precision.
       //output.setf(ios::scientific,ios::floatfield);
     }
     else if(ui.GetString("TABLETYPE") == "TAB") {
       delim = "\t";
       pretty = "\t";
-
       tab = true;
     }
 
