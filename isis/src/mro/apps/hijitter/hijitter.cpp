@@ -1,14 +1,17 @@
 #include "Isis.h"
 
-#include "UserInterface.h"
-#include "FileList.h"
-#include "Pipeline.h"
-#include "SpecialPixel.h"
-#include "TextFile.h"
 #include "Camera.h"
 #include "CameraDetectorMap.h"
 #include "CameraFactory.h"
+#include "CSVReader.h"
+#include "FileList.h"
+#include "iTime.h"
+#include "LineScanCameraDetectorMap.h"
+#include "Pipeline.h"
 #include "ProgramLauncher.h"
+#include "SpecialPixel.h"
+#include "TextFile.h"
+#include "UserInterface.h"
 
 using namespace std;
 using namespace Isis;
@@ -20,9 +23,12 @@ int numFiles;
 Filename FindRed(FileList &inList, int n);
 void ProcessNoprojFiles(Pipeline &p);
 
+void GetCropLines(const string inFile, double eTime1, double eTime2, int & line1, int & line2, int & numLines);
+void GetEphemerisTimeFromJitterFile(const string jitterFile, double & eTime1, double & eTime2);
+
 // avgOffsets[i][Sample = 0, Line = 1]
-//   where i is in the table just above
-//   lineOff's declaration
+// where i is in the table just above
+// lineOff's declaration
 double avgOffsets[9][2];
 
 /*
@@ -70,6 +76,8 @@ void IsisMain() {
 
   int masterFileNum = ui.GetInteger("MASTER");
 
+  numFiles = inputList.size();
+  
   // This will initialize our global variables
   FindRed(inputList, masterFileNum);
 
@@ -171,7 +179,41 @@ void IsisMain() {
 
     p.Run();
   }
+  
+  // Crop the lines using the jitter file if crop is ebabled
+  if(ui.GetBoolean("CROP")) {
+    double eTime1, eTime2;
+    string jitterFile = ui.GetAsString("JITTER");
 
+    GetEphemerisTimeFromJitterFile(jitterFile, eTime1, eTime2);
+
+    for(int i=0; i<numFiles; i++) {
+      int line1=0, line2=0;
+      int numLines=0;
+      
+      GetCropLines(p.FinalOutput(i).c_str(), eTime1, eTime2, line1, line2, numLines);
+      Pipeline pcrop;
+      pcrop.KeepTemporaryFiles(false);
+      
+      iString tag = "crop" + iString(i);
+      string inFile(p.FinalOutput(i).c_str());
+      string outFile = "temp_"+tag+".cub";
+
+      pcrop.SetInputFile(Filename(inFile));
+      pcrop.SetOutputFile(Filename(outFile));
+      
+      pcrop.AddToPipeline("crop", tag);
+      pcrop.Application(tag).SetInputParameter ("FROM",   false);
+      pcrop.Application(tag).SetOutputParameter("TO",     "crop");
+      pcrop.Application(tag).AddConstParameter ("LINE",   line1);
+      pcrop.Application(tag).AddConstParameter ("NLINES", numLines);
+      pcrop.Run();
+      
+      remove(inFile.c_str());
+      rename(outFile.c_str(), inFile.c_str());
+    }
+  }
+  
   for(unsigned int tempFile = 0; tempFile < tempFiles.size(); tempFile++) 
     remove(tempFiles[tempFile].c_str());
 
@@ -370,5 +412,81 @@ void ProcessNoprojFiles(Pipeline &p) {
 
   p.Application("appjit").AddConstParameter("PITCHRATE", iString(pitchRate));
   p.Application("appjit").AddConstParameter("YAW", iString(yaw));
+}
+
+/**
+ * Get the start and end ephemeris time from the jitter file
+ * 
+ * @author Sharmila Prasad (12/20/2011)
+ *  
+ * @param jitterFile - jitter file
+ * @param eTime1 - Start time
+ * @param eTime2 - End time
+ */
+void GetEphemerisTimeFromJitterFile(const string jitterFile, double & eTime1, double & eTime2) {
+  CSVReader jitter(jitterFile, true, 0, ' ', false, true);
+  int iRows = jitter.rows();
+  CSVReader::CSVAxis csvArr;
+
+  eTime1=0, eTime2=0;
+
+  double temp=0;
+  for (int j=0; j<iRows; j++) {
+    csvArr = jitter.getRow(j);
+    int iArrSize = csvArr.dim();
+    for (int i=0; i<iArrSize; i++) {
+      csvArr[i].TrimHead(" \n,");
+      csvArr[i].TrimTail(" \n,\t\r");
+      temp = iString(csvArr[i]).ToDouble(); 
+      if(!i && temp == 0) {
+        break;
+      }
+      // Ephemeris Time
+      if(i==2) {
+        if (eTime1 == 0) {
+          eTime1 = temp;
+        }
+        else {
+          eTime2 = temp;
+        }
+      }
+    }
+  }
+}
+
+/**
+ * GetCropLines for an image given the start and end ephemeris times
+ * 
+ * @author Sharmila Prasad (12/21/2011)
+ * 
+ * @param inFile   - Input image file
+ * @param eTime1   - Ephemeris start time
+ * @param eTime2   - Ephemeris end time
+ * @param line1    - Calculated start line for cropping
+ * @param line2    - Calculated end line for cropping 
+ * @param numLines - Number of lines in the image to be cropped 
+ */
+void GetCropLines(const string inFile, double eTime1, double eTime2, int & line1, int & line2, int & numLines){
+
+  Cube *inCube = new Cube;
+  inCube->open(inFile);
+
+  Camera *cam = inCube->getCamera();
+
+  iTime etTime = cam->Spice::CacheStartTime();
+  double etStart = etTime.Et();
+  double lineRate = ((LineScanCameraDetectorMap*) cam->DetectorMap())->LineRate();
+
+  int imgLines = inCube->getLineCount();
+  line1 = (eTime1 - etStart) / lineRate + 0.5;
+  line2 = (eTime2 - etStart) / lineRate + 0.5;
+
+  if (line2 > imgLines)
+    numLines = imgLines - line1 + 1;
+  else
+    numLines = line2 - line1 + 1;
+  
+  inCube->close();
+  delete(inCube);
 }
 

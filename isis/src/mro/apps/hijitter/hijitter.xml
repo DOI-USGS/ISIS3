@@ -6,6 +6,7 @@
   </brief>
 
   <description>
+  <pre>
      This application computes angular corrections from pixel offsets in the
      input jitter file and applies the corrections to the undistorted output 
      cube.  This application is procedural in that it runs other applications.
@@ -28,9 +29,16 @@
      ccd's by the application hijitreg and used to compute the additional pitch 
      rate and yaw required to center the errors around zero.  
 
-    Now the procedure is repeated with the calculated pitch and yaw passed into 
-    appjit as input parameters.  The jitter-reduced and distortion-free output 
-    cubes are created by the final set of noproj runs on adjacent ccd's. 
+     Now the procedure is repeated with the calculated pitch and yaw passed into 
+     appjit as input parameters.  The jitter-reduced and distortion-free output 
+     cubes are created by the final set of noproj runs on adjacent ccd's. 
+
+     If crop=true then the application crops the extended portion of the   
+     image. The starting line and number of lines parameter for <i><b>crop</b></i> 
+     application is calculated from the ephemeris time in the  jitter  
+     correction file. LineRate is used to get the starting and ending line 
+     information.
+    </pre>
   </description>
 
   <category>
@@ -57,6 +65,10 @@
     <change name="Debbie A. Cook" date="2011-12-21">
       Fixed the loop that calculated pitch to only loop the number of overlaps
       (count).
+    </change>
+    <change name="Sharmila Prasad" date="2011-12-27">
+     Added an option to crop the extended portion of the image using the jitter 
+     correction file 
     </change>
   </history>
 
@@ -165,6 +177,19 @@
           the jittery ck.
         </description>
         <internalDefault>None</internalDefault>
+      </parameter>
+      <parameter name="CROP">
+        <type>boolean</type>     
+        <default><item>true</item></default>
+        <brief>
+          Crop the top and bottom extending portion of the image
+        </brief>      
+        <description>
+          Crop the top and bottom extending portion of CCDs in the image using 
+          the jitter file's first and last non zero corrections. This option 
+          when enabled removes the lines at the beginning and end of the image 
+          as determined by the jitter file
+        </description>  
       </parameter>     
     </group>
   </groups>
