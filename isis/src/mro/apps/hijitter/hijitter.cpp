@@ -476,11 +476,10 @@ void GetCropLines(const string inFile, double eTime1, double eTime2, int & line1
   iTime etTime = cam->Spice::CacheStartTime();
   double etStart = etTime.Et();
   double lineRate = ((LineScanCameraDetectorMap*) cam->DetectorMap())->LineRate();
-  lineRate += 0.5;
 
   int imgLines = inCube->getLineCount();
-  line1 = int ((eTime1 - etStart) / lineRate);
-  line2 = int ((eTime2 - etStart) / lineRate);
+  line1 = int ((eTime1 - etStart) / lineRate + 0.5 );
+  line2 = int ((eTime2 - etStart) / lineRate + 0.5 );
 
   if (line2 > imgLines)
     numLines = imgLines - line1 + 1;
