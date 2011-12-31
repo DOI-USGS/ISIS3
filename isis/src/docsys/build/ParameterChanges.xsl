@@ -40,7 +40,7 @@
       <body>
         <h2>Core Programs</h2>
           <ul>
-            <xsl:for-each select="applications/application[normalize-space(category/missionItem) = '' and count(parameters/parameter[@status != 'nochange']) > 0]">
+            <xsl:for-each select="isisReleaseNotes/application[normalize-space(category/missionItem) = '' and count(parameters/parameter[@status != 'nochange']) > 0]">
             <xsl:sort select="@name" />
               <li>
                 <a>
@@ -58,12 +58,12 @@
           <xsl:variable name="mission"><xsl:value-of select="@value" /></xsl:variable>
             <li>
               <xsl:choose>
-                <xsl:when test="count($root/applications/application[count(parameters/parameter[@status != 'nochange']) > 0 and normalize-space(category/missionItem) = $mission]) > 0">
+                <xsl:when test="count($root/isisReleaseNotes/application[count(parameters/parameter[@status != 'nochange']) > 0 and normalize-space(category/missionItem) = $mission]) > 0">
                   <a>
                     <xsl:attribute name="href">#<xsl:value-of select="$mission" /></xsl:attribute>
                     <xsl:value-of select="$mission" />
                     <ul>
-                      <xsl:for-each select="$root/applications/application[count(parameters/parameter[@status != 'nochange']) > 0 and normalize-space(category/missionItem) = $mission]">
+                      <xsl:for-each select="$root/isisReleaseNotes/application[count(parameters/parameter[@status != 'nochange']) > 0 and normalize-space(category/missionItem) = $mission]">
                         <xsl:sort select="@name" />
                         <li>
                           <a>
@@ -84,7 +84,7 @@
         </ul>
 
         <h2>Core Programs (detailed)</h2>
-          <xsl:for-each select="applications/application[normalize-space(category/missionItem) = '' and count(parameters/parameter[@status != 'nochange']) > 0]">
+          <xsl:for-each select="isisReleaseNotes/application[normalize-space(category/missionItem) = '' and count(parameters/parameter[@status != 'nochange']) > 0]">
           <xsl:sort select="@name" />
           <a>
             <xsl:attribute name="name"><xsl:value-of select="@name" /></xsl:attribute>
@@ -111,12 +111,12 @@
         <xsl:for-each select="document('../Schemas/Application/application.xsd')/*[local-name() = 'schema']/*[local-name() = 'simpleType' and @name = 'missionItem_type']/*[local-name() = 'restriction']/*[local-name() = 'enumeration']">
           <xsl:sort select="@value" />
           <xsl:variable name="mission"><xsl:value-of select="@value" /></xsl:variable>
-          <xsl:if test="count($root/applications/application[count(parameters/parameter[@status != 'nochange']) > 0 and normalize-space(category/missionItem) = $mission]) > 0">
+          <xsl:if test="count($root/isisReleaseNotes/application[count(parameters/parameter[@status != 'nochange']) > 0 and normalize-space(category/missionItem) = $mission]) > 0">
             <a>
               <xsl:attribute name="name"><xsl:value-of select="$mission" /></xsl:attribute>
             </a>
             <h2><xsl:value-of select="$mission" /> (detailed)</h2>
-              <xsl:for-each select="$root/applications/application[count(parameters/parameter[@status != 'nochange']) > 0 and normalize-space(category/missionItem) = $mission]">
+              <xsl:for-each select="$root/isisReleaseNotes/application[count(parameters/parameter[@status != 'nochange']) > 0 and normalize-space(category/missionItem) = $mission]">
                 <xsl:sort select="@name" />
                 <a>
                   <xsl:attribute name="name"><xsl:value-of select="@name" /></xsl:attribute>

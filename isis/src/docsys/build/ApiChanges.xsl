@@ -36,11 +36,11 @@
   </audience>
 
   <files>
-    <file><!--/simpleType[@name = 'missionItem_type']/restriction-->
+    <file>
       <body>
-        <h2>Core Programs</h2>
+        <h2>Changed Isis Classes</h2>
           <ul>
-            <xsl:for-each select="isisReleaseNotes/application[normalize-space(category/missionItem) = '' and count(history/change) > 0]">
+            <xsl:for-each select="isisReleaseNotes/object[count(historyEntry) > 0]">
             <xsl:sort select="@name" />
               <li>
                 <a>
@@ -51,55 +51,18 @@
             </xsl:for-each>
           </ul>
 
-        <h2>Mission-Specific Programs</h2>
-        <ul>
-          <xsl:for-each select="document('../Schemas/Application/application.xsd')/*[local-name() = 'schema']/*[local-name() = 'simpleType' and @name = 'missionItem_type']/*[local-name() = 'restriction']/*[local-name() = 'enumeration']">
-          <xsl:sort select="@value" />
-          <xsl:variable name="mission"><xsl:value-of select="@value" /></xsl:variable>
-            <li>
-              <xsl:choose>
-                <xsl:when test="count($root/isisReleaseNotes/application[count(history/change) > 0 and normalize-space(category/missionItem) = $mission]) > 0">
-                  <a>
-                    <xsl:attribute name="href">#<xsl:value-of select="$mission" /></xsl:attribute>
-                    <xsl:value-of select="$mission" />
-                    <ul>
-                      <xsl:for-each select="$root/isisReleaseNotes/application[count(history/change) > 0 and normalize-space(category/missionItem) = $mission]">
-                        <xsl:sort select="@name" />
-                        <li>
-                          <a>
-                            <xsl:attribute name="href">#<xsl:value-of select="@name" /></xsl:attribute>
-                            <xsl:value-of select="@name" />
-                          </a>
-                        </li>
-                      </xsl:for-each>
-                    </ul>
-                  </a>
-                </xsl:when>
-                <xsl:otherwise>
-                  <b><xsl:value-of select="$mission" /></b>
-                </xsl:otherwise>
-              </xsl:choose>
-            </li>
-          </xsl:for-each>
-        </ul>
-
-        <h2>Core Programs (detailed)</h2>
-          <xsl:for-each select="isisReleaseNotes/application[normalize-space(category/missionItem) = '' and count(history/change) > 0]">
+        <h2>Changed Isis Classes (detailed)</h2>
+          <xsl:for-each select="isisReleaseNotes/object[count(historyEntry) > 0]">
           <xsl:sort select="@name" />
           <a>
             <xsl:attribute name="name"><xsl:value-of select="@name" /></xsl:attribute>
           </a>
           <h3><xsl:value-of select="@name" /></h3>
-            <font size="2">
-              <a>
-                <xsl:attribute name="href">../../Application/presentation/Tabbed/<xsl:value-of select="@name" />/<xsl:value-of select="@name" />.html</xsl:attribute>
-                View full documentation
-              </a>
-            </font>
           <ul>
-            <xsl:for-each select="history/change">
+            <xsl:for-each select="historyEntry">
+              <xsl:sort select="@date" />
               <li>
-                <p><b><xsl:value-of select="@date" /></b>: <xsl:value-of select="normalize-space(.)" /></p>
+                <p><b><xsl:value-of select="normalize-space(@date)"/>: </b> <xsl:value-of select="." /></p>
               </li>
             </xsl:for-each>
           </ul>
@@ -109,12 +72,12 @@
         <xsl:for-each select="document('../Schemas/Application/application.xsd')/*[local-name() = 'schema']/*[local-name() = 'simpleType' and @name = 'missionItem_type']/*[local-name() = 'restriction']/*[local-name() = 'enumeration']">
           <xsl:sort select="@value" />
           <xsl:variable name="mission"><xsl:value-of select="@value" /></xsl:variable>
-          <xsl:if test="count($root/isisReleaseNotes/application[count(history/change) > 0 and normalize-space(category/missionItem) = $mission]) > 0">
+          <xsl:if test="count($root/isisReleaseNotes/application[count(parameters/parameter[@status != 'nochange']) > 0 and normalize-space(category/missionItem) = $mission]) > 0">
             <a>
               <xsl:attribute name="name"><xsl:value-of select="$mission" /></xsl:attribute>
             </a>
             <h2><xsl:value-of select="$mission" /> (detailed)</h2>
-              <xsl:for-each select="$root/isisReleaseNotes/application[count(history/change) > 0]">
+              <xsl:for-each select="$root/isisReleaseNotes/application[count(parameters/parameter[@status != 'nochange']) > 0 and normalize-space(category/missionItem) = $mission]">
                 <xsl:sort select="@name" />
                 <a>
                   <xsl:attribute name="name"><xsl:value-of select="@name" /></xsl:attribute>
@@ -127,9 +90,11 @@
                   </a>
                 </font>
                 <ul>
-                  <xsl:for-each select="history/change">
+                  <xsl:for-each select="parameters/parameter[@status != 'nochange']">
+                    <xsl:sort select="@status" />
+                    <xsl:sort select="@name" />
                     <li>
-                      <p><b><xsl:value-of select="@date" /></b>: <xsl:value-of select="normalize-space(.)" /></p>
+                      <p>Parameter <xsl:value-of select="normalize-space(@status)"/>: <b><xsl:value-of select="@name" /></b></p>
                     </li>
                   </xsl:for-each>
                 </ul>
@@ -141,17 +106,17 @@
       <type>HTML</type>
 
       <source>
-        <filename>ReleaseNotes.html</filename>
+        <filename>ParameterChanges.html</filename>
       </source>
     </file>
   </files>
 
   <bibliography>
-    <title>Release Notes</title>
+    <title>API Changes</title>
     <brief>Changes since the last Isis 3 release</brief>
-    <description>Complete listing of the changes to Isis 3 since the last major release.</description>
+    <description>Listing of the classes that have changed in Isis 3 since the last major release.</description>
     <author>Steven Lambright</author>
-    <date>2011-09-27</date>
+    <date>2011-12-27</date>
   </bibliography>
 </documentation>
   </xsl:template>

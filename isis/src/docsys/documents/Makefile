@@ -13,7 +13,7 @@ DOCUMENTS    = $(filter-out CVS $(wildcard Makefile*) $(wildcard *.*) , $(wildca
 RELEASENOTESPREREQ=$(wildcard ReleaseNotes/ReleaseNotesList.xml)
 
 ifneq ($(RELEASENOTESPREREQ), ReleaseNotes/ReleaseNotesList.xml)
-  DOCUMENTS    = $(filter-out CVS $(wildcard Makefile*) ReleaseNotes ParameterChanges $(wildcard *.*) , $(wildcard *))
+  DOCUMENTS    = $(filter-out CVS $(wildcard Makefile*) ReleaseNotes ParameterChanges ApiChanges $(wildcard *.*) , $(wildcard *))
 endif
 
 DOCUMENTXMLS   = $(foreach DOC,$(DOCUMENTS),$(DOC)/$(DOC).xml)
@@ -120,6 +120,15 @@ ParameterChanges/ParameterChanges.xml: ../build/ParameterChanges.xsl ReleaseNote
 					$(XALAN_INFILE_OPTION) ReleaseNotes/ReleaseNotesList.xml  \
 					$(XALAN_XSL_OPTION) ../build/ParameterChanges.xsl >       \
 					ParameterChanges/ParameterChanges.xml ;                   \
+	fi;
+
+
+ApiChanges/ApiChanges.xml: ../build/ApiChanges.xsl ReleaseNotes/ReleaseNotesList.xml
+	if [ -f ReleaseNotes/ReleaseNotesList.xml ]; then                                         \
+		$(XALAN) $(XALAN_PARAM_OPTION) dirParam "'ApiChanges'"                      \
+					$(XALAN_INFILE_OPTION) ReleaseNotes/ReleaseNotesList.xml  \
+					$(XALAN_XSL_OPTION) ../build/ApiChanges.xsl >       \
+					ApiChanges/ApiChanges.xml ;                   \
 	fi;
 
 
