@@ -126,47 +126,65 @@ namespace Isis {
     pStatsGrp += PvlKeyword("EditLockMeasures",  mCNet->GetNumEditLockMeasures());
 
     double dValue = GetAverageResidual();
-    pStatsGrp += PvlKeyword("AvgResidual",       (dValue == Isis::NULL8 ? "Null" : iString(dValue)));
+    pStatsGrp += PvlKeyword("AvgResidual",       (dValue == 0 ? "Null" : iString(dValue)));
 
     dValue = GetMinimumResidual();
-    pStatsGrp += PvlKeyword("MinResidual",       (dValue == Isis::NULL8 ? "Null" : iString(dValue)));
+    pStatsGrp += PvlKeyword("MinResidual",       (dValue == DBL_MAX ? "Null" : iString(dValue)));
 
     dValue = GetMaximumResidual();
     pStatsGrp += PvlKeyword("MaxResidual",       (dValue == Isis::NULL8 ? "Null" : iString(dValue)));
     
     dValue = GetMinLineResidual();
-    pStatsGrp += PvlKeyword("MinLineResidual",   (dValue == Isis::NULL8 ? "Null" : iString(dValue)));
+    pStatsGrp += PvlKeyword("MinLineResidual",   (dValue == DBL_MAX ? "Null" : iString(dValue)));
 
     dValue = GetMaxLineResidual();
     pStatsGrp += PvlKeyword("MaxLineResidual",   (dValue == Isis::NULL8 ? "Null" : iString(dValue)));
 
     dValue = GetMinSampleResidual();
-    pStatsGrp += PvlKeyword("MinSampleResidual", (dValue == Isis::NULL8 ? "Null" : iString(dValue)));
+    pStatsGrp += PvlKeyword("MinSampleResidual", (dValue == DBL_MAX ? "Null" : iString(dValue)));
     
     dValue = GetMaxSampleResidual();
     pStatsGrp += PvlKeyword("MaxSampleResidual", (dValue == Isis::NULL8 ? "Null" : iString(dValue)));
     
     // Shifts - Line, Sample, Pixel
-    dValue = GetAvgPixelShift();
-    pStatsGrp += PvlKeyword("AvgPixelShift",     (dValue == Isis::NULL8 ? "Null" : iString(dValue)));
-    
-    dValue = GetMinPixelShift();
-    pStatsGrp += PvlKeyword("MinPixelShift",     (dValue == Isis::NULL8 ? "Null" : iString(dValue)));
-    
-    dValue = GetMaxPixelShift();
-    pStatsGrp += PvlKeyword("MaxPixelShift",     (dValue == Isis::NULL8 ? "Null" : iString(dValue)));
-    
     dValue = GetMinLineShift();
-    pStatsGrp += PvlKeyword("MinLineShift",      (dValue == Isis::NULL8 ? "Null" : iString(dValue)));
+    pStatsGrp += PvlKeyword("MinLineShift",      (dValue == DBL_MAX ? "Null" : iString(dValue)));
     
     dValue = GetMaxLineShift();
     pStatsGrp += PvlKeyword("MaxLineShift",      (dValue == Isis::NULL8 ? "Null" : iString(dValue)));
 
     dValue = GetMinSampleShift();
-    pStatsGrp += PvlKeyword("MinSampleShift",    (dValue == Isis::NULL8 ? "Null" : iString(dValue)));
+    pStatsGrp += PvlKeyword("MinSampleShift",    (dValue == DBL_MAX ? "Null" : iString(dValue)));
 
     dValue = GetMaxSampleShift(); 
     pStatsGrp += PvlKeyword("MaxSampleShift",    (dValue == Isis::NULL8 ? "Null" : iString(dValue)));
+    
+    dValue = GetAvgPixelShift();
+    pStatsGrp += PvlKeyword("AvgPixelShift",     (dValue == 0 ? "NA" : iString(dValue)));
+    
+    dValue = GetMinPixelShift();
+    pStatsGrp += PvlKeyword("MinPixelShift",     (dValue == DBL_MAX ? "NA" : iString(dValue)));
+    
+    dValue = GetMaxPixelShift();
+    pStatsGrp += PvlKeyword("MaxPixelShift",     (dValue == Isis::NULL8 ? "NA" : iString(dValue)));
+    
+    dValue = mPointDoubleStats[minGFit];
+    pStatsGrp += PvlKeyword("MinGoodnessOfFit",  (dValue == DBL_MAX ? "NA" : iString(dValue)));
+    
+    dValue = mPointDoubleStats[maxGFit];
+    pStatsGrp += PvlKeyword("MaxGoodnessOfFit",  (dValue == Isis::NULL8 ? "NA" : iString(dValue)));
+    
+    dValue = mPointDoubleStats[minEccentricity];
+    pStatsGrp += PvlKeyword("MinEccentricity",   (dValue == DBL_MAX ? "NA" : iString(dValue)));
+    
+    dValue = mPointDoubleStats[maxEccentricity];
+    pStatsGrp += PvlKeyword("MaxEccentricity",   (dValue == Isis::NULL8 ? "NA" : iString(dValue)));
+    
+    dValue = mPointDoubleStats[minPixelZScore];
+    pStatsGrp += PvlKeyword("MinPixelZScore",    (dValue == DBL_MAX ? "NA" : iString(dValue)));
+    
+    dValue = mPointDoubleStats[maxPixelZScore];
+    pStatsGrp += PvlKeyword("MaxPixelZScore",    (dValue == Isis::NULL8 ? "NA" : iString(dValue)));
     
     // Convex Hull
     if (mSerialNumList.Size()) {
@@ -435,18 +453,47 @@ namespace Isis {
   }
   
   /**
+   * Initialize Point double stats vector
+   * 
+   * @author Sharmila Prasad (1/3/2012)
+   */
+  void ControlNetStatistics::InitPointDoubleStats(void) {
+    for (int i=0; i<numPointDblStats; i++) {
+      switch (i) {
+        case avgResidual:
+        case avgPixelShift:
+          mPointDoubleStats[i] = 0;
+          break;
+        
+        case minResidual:
+        case minLineResidual: 
+        case minSampleResidual: 
+        case minPixelShift: 
+        case minLineShift: 
+        case minSampleShift: 
+        case minGFit: 
+        case minEccentricity: 
+        case minPixelZScore:
+          mPointDoubleStats[i] = DBL_MAX;
+          break;
+          
+        default:
+          mPointDoubleStats[i] = Isis::NULL8;
+          break;
+      }
+    }
+  }
+  
+  /**
    * Get the Network Statistics for Residuals (line, sample, magnitude) and 
    * Shifts (line, sample, pixel)
    * 
    * @author Sharmila Prasad (7/19/2011)
    */
   void ControlNetStatistics::GetPointDoubleStats(void) {
-    // avgResidual, maxResidual, minResidual, minLineResidual, maxLineResidual, minSampleResidual, maxSampleResidual,
-    // avgShift, maxShift, minShift, minLineShift, maxLineShift, minSampleShift, maxSampleShift
-    for (int i=0; i<numPointDblStats; i++) {
-      mPointDoubleStats[i] = 0;
-    }
-
+    
+    InitPointDoubleStats();
+    
     int iNumPoints = mCNet->GetNumPoints();
     double dValue = 0;
     
@@ -455,96 +502,132 @@ namespace Isis {
 
       // avgResidual
       if (resMagStats.Average() != Isis::NULL8 ) {
-        mPointDoubleStats[avgResidual] += abs(resMagStats.Average());
+        mPointDoubleStats[avgResidual] += fabs(resMagStats.Average());
       }
       
       // maxResidual
-      dValue = abs(resMagStats.Maximum());
-      if (resMagStats.Maximum() != Isis::NULL8 && mPointDoubleStats[maxResidual] < dValue)
-        mPointDoubleStats[maxResidual] = dValue;
+      dValue = resMagStats.Maximum();
+      if (dValue != Isis::NULL8 && mPointDoubleStats[maxResidual] < dValue)
+        mPointDoubleStats[maxResidual] = fabs(dValue);
     
       // minResidual
-      dValue = abs(resMagStats.Minimum());
-      if (resMagStats.Minimum() != Isis::NULL8 && mPointDoubleStats[minResidual] > dValue)
-        mPointDoubleStats[minResidual] = dValue;
+      dValue = resMagStats.Minimum();
+      if (dValue != Isis::NULL8 && mPointDoubleStats[minResidual] > dValue)
+        mPointDoubleStats[minResidual] = fabs(dValue);
     
       // Line Residual
       Statistics resLineStats = mCNet->GetPoint(i)->GetStatistic(&ControlMeasure::GetLineResidual);
     
       // minLineResidual
-      dValue = abs(resLineStats.Minimum());
-      if (resLineStats.Minimum() != Isis::NULL8 && mPointDoubleStats[minLineResidual] > dValue)
-        mPointDoubleStats[minLineResidual] = dValue;
+      dValue = resLineStats.Minimum();
+      if (dValue != Isis::NULL8 && mPointDoubleStats[minLineResidual] > dValue)
+        mPointDoubleStats[minLineResidual] = fabs(dValue);
     
       // maxLineResidual
-      dValue = abs(resLineStats.Maximum());
-      if (resLineStats.Maximum() != Isis::NULL8 && mPointDoubleStats[maxLineResidual] < dValue)
-        mPointDoubleStats[maxLineResidual] = dValue;
+      dValue = resLineStats.Maximum();
+      if (dValue != Isis::NULL8 && mPointDoubleStats[maxLineResidual] < dValue)
+        mPointDoubleStats[maxLineResidual] = fabs(dValue);
     
       // Sample Residual
       Statistics resSampStats = mCNet->GetPoint(i)->GetStatistic(&ControlMeasure::GetSampleResidual);
     
       // minSampleResidual
-      dValue = abs(resSampStats.Minimum());
-      if (resSampStats.Minimum() != Isis::NULL8 && mPointDoubleStats[minSampleResidual] > dValue)
-        mPointDoubleStats[minSampleResidual] = dValue;
+      dValue = resSampStats.Minimum();
+      if (dValue != Isis::NULL8 && mPointDoubleStats[minSampleResidual] > dValue)
+        mPointDoubleStats[minSampleResidual] = fabs(dValue);
     
       // maxSampleResidual
-      dValue = abs(resSampStats.Maximum());
+      dValue = resSampStats.Maximum();
       if (resSampStats.Maximum() != Isis::NULL8 && mPointDoubleStats[maxSampleResidual] < dValue)
-        mPointDoubleStats[maxSampleResidual] = dValue;
+        mPointDoubleStats[maxSampleResidual] = fabs(dValue);
     
       // Pixel Shift
       Statistics pixShiftStats = mCNet->GetPoint(i)->GetStatistic(&ControlMeasure::GetPixelShift);
     
       // avgShift
       if (pixShiftStats.Average() !=  Isis::NULL8) {
-        mPointDoubleStats[avgPixelShift] += abs(pixShiftStats.Average());
+        mPointDoubleStats[avgPixelShift] += fabs(pixShiftStats.Average());
       }
     
       // maxShift
-      dValue = abs(pixShiftStats.Maximum());
-      if (pixShiftStats.Maximum() != Isis::NULL8 && mPointDoubleStats[maxPixelShift] < dValue)
-        mPointDoubleStats[maxPixelShift] = dValue;
+      dValue = pixShiftStats.Maximum();
+      if (dValue != Isis::NULL8 && mPointDoubleStats[maxPixelShift] < dValue)
+        mPointDoubleStats[maxPixelShift] = fabs(dValue);
     
       // minShift
-      dValue = abs(pixShiftStats.Minimum());
-      if (pixShiftStats.Minimum() != Isis::NULL8 && mPointDoubleStats[minPixelShift] > dValue)  
-        mPointDoubleStats[minPixelShift] = dValue;
+      dValue = pixShiftStats.Minimum();
+      if (dValue != Isis::NULL8 && mPointDoubleStats[minPixelShift] > dValue)  
+        mPointDoubleStats[minPixelShift] = fabs(dValue);
     
       // Line Shift
       Statistics lineShiftStats = mCNet->GetPoint(i)->GetStatistic(&ControlMeasure::GetLineShift);
     
       // minLineShift
-      dValue = abs(lineShiftStats.Minimum());
-      if (lineShiftStats.Minimum() != Isis::NULL8 && mPointDoubleStats[minLineShift] > dValue)
-          mPointDoubleStats[minLineShift] = dValue;
+      dValue = lineShiftStats.Minimum();
+      if (dValue != Isis::NULL8 && mPointDoubleStats[minLineShift] > dValue)
+          mPointDoubleStats[minLineShift] = fabs(dValue);
     
       // maxLineShift
-      dValue = abs(lineShiftStats.Maximum());
-      if (lineShiftStats.Maximum() != Isis::NULL8 && mPointDoubleStats[maxLineShift] < dValue)
-        mPointDoubleStats[maxLineShift] = dValue;
+      dValue = lineShiftStats.Maximum();
+      if (dValue != Isis::NULL8 && mPointDoubleStats[maxLineShift] < dValue)
+        mPointDoubleStats[maxLineShift] = fabs(dValue);
     
       // Sample Shift
       Statistics sampShiftStats = mCNet->GetPoint(i)->GetStatistic(&ControlMeasure::GetSampleShift);
     
       // minSampleShift
-      dValue = abs(sampShiftStats.Minimum());
-      if (sampShiftStats.Minimum() != Isis::NULL8 && mPointDoubleStats[minSampleShift] > dValue)
-        mPointDoubleStats[minSampleShift] = dValue;
+      dValue = sampShiftStats.Minimum();
+      if (dValue != Isis::NULL8 && mPointDoubleStats[minSampleShift] > dValue)
+        mPointDoubleStats[minSampleShift] = fabs(dValue);
     
       // maxSampleShift
-      dValue = abs(sampShiftStats.Maximum());
-      if (sampShiftStats.Maximum() != Isis::NULL8 && mPointDoubleStats[maxSampleShift] < dValue)
-        mPointDoubleStats[maxSampleShift] = dValue;
+      dValue = sampShiftStats.Maximum();
+      if (dValue != Isis::NULL8 && mPointDoubleStats[maxSampleShift] < dValue)
+        mPointDoubleStats[maxSampleShift] = fabs(dValue);
+      
+      // goodnessOfFit
+      Statistics gFitStats = mCNet->GetPoint(i)->GetStatistic(ControlMeasureLogData::GoodnessOfFit);
+      dValue = gFitStats.Minimum();
+      if (dValue != Isis::NULL8 && mPointDoubleStats[minGFit] > dValue)
+        mPointDoubleStats[minGFit] = fabs(dValue);
+      
+      dValue = gFitStats.Maximum();
+      if (dValue != Isis::NULL8 && mPointDoubleStats[maxGFit] < dValue)
+        mPointDoubleStats[maxGFit] = fabs(dValue);
+      
+      // eccentricity
+      Statistics eccentStats = mCNet->GetPoint(i)->GetStatistic(ControlMeasureLogData::Eccentricity);
+      dValue = eccentStats.Minimum();
+      if (dValue != Isis::NULL8 && mPointDoubleStats[minEccentricity] > dValue)
+        mPointDoubleStats[minEccentricity] = fabs(dValue);
+      
+      dValue = eccentStats.Maximum();
+      if (dValue != Isis::NULL8 && mPointDoubleStats[maxEccentricity] < dValue)
+        mPointDoubleStats[maxEccentricity] = fabs(dValue);
+      
+      // MinimumPixelZScore
+      Statistics minPixelZScoreStats = mCNet->GetPoint(i)->GetStatistic(ControlMeasureLogData::MinimumPixelZScore);
+      dValue = minPixelZScoreStats.Minimum();
+      if (dValue != Isis::NULL8 && mPointDoubleStats[minPixelZScore] > dValue)
+        mPointDoubleStats[minPixelZScore] = fabs(dValue);
+      
+      // MaximumPixelZScore
+      Statistics maxPixelZScoreStats = mCNet->GetPoint(i)->GetStatistic(ControlMeasureLogData::MaximumPixelZScore);
+      dValue = maxPixelZScoreStats.Maximum();
+      if (dValue != Isis::NULL8 && mPointDoubleStats[maxPixelZScore] < dValue)
+        mPointDoubleStats[maxPixelZScore] = fabs(dValue);
     } 
     
     int iValidPoints = mPointIntStats[validPoints];
      
-    // Residuals
-    mPointDoubleStats[avgResidual] /= iValidPoints;
+    // Average Residuals
+    if (mPointDoubleStats[avgResidual] != Isis::NULL8) {
+      mPointDoubleStats[avgResidual] /= iValidPoints;
+    }
   
-    // Shift
-    mPointDoubleStats[avgPixelShift] /= iValidPoints;
+    // Average Shift
+    if (mPointDoubleStats[avgPixelShift] != Isis::NULL8) {
+      mPointDoubleStats[avgPixelShift] /= iValidPoints;
+    }
   }
 }

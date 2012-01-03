@@ -66,6 +66,7 @@ namespace Isis {
    *   @history 2011-11-03 Sharmila Prasad - Used ControlNet's CubeGraphNodes to get Image stats
    *                                         including Convex Hull Ratio
    *   @history 2011-12-21 Sharmila Prasad Fixed #634 to include stats of images not in the  ControlNet
+   *   @history 2011-12-29 Sharmila Prasad Fixed #652 to include stats of ControlMeasure Log data
    */
   class ControlNetStatistics {
     public:
@@ -88,12 +89,14 @@ namespace Isis {
       static const int numPointIntStats = 11;
   
       //! Enumeration for Point stats like Tolerances, PixelShifts which have double data
-      enum ePointDoubleStats { avgResidual, maxResidual, minResidual, minLineResidual, maxLineResidual, minSampleResidual, maxSampleResidual,
-                               avgPixelShift, maxPixelShift, minPixelShift, minLineShift, maxLineShift, minSampleShift, maxSampleShift};
-      static const int numPointDblStats = 14;
+      enum ePointDoubleStats { avgResidual, minResidual, maxResidual, minLineResidual, maxLineResidual, minSampleResidual, maxSampleResidual,
+                               avgPixelShift, minPixelShift, maxPixelShift, minLineShift, maxLineShift, minSampleShift, maxSampleShift,
+                               minGFit, maxGFit, minEccentricity, maxEccentricity, minPixelZScore, maxPixelZScore};
+      static const int numPointDblStats = 20;
 
       //! Enumeration for image stats
-      enum ImageStats { imgSamples, imgLines, imgTotalPoints, imgIgnoredPoints, imgFixedPoints, imgLockedPoints, imgLocked, imgConstrainedPoints, imgFreePoints, imgConvexHullArea, imgConvexHullRatio };
+      enum ImageStats { imgSamples, imgLines, imgTotalPoints, imgIgnoredPoints, imgFixedPoints, imgLockedPoints, imgLocked, 
+                        imgConstrainedPoints, imgFreePoints, imgConvexHullArea, imgConvexHullRatio };
       static const int numImageStats = 11;
       
       //! Generate stats like Total, Ignored, Fixed Points in an Image
@@ -232,22 +235,25 @@ namespace Isis {
       };
       
     protected:
-      SerialNumberList mSerialNumList;    //!< Serial Number List
+      SerialNumberList mSerialNumList;           //!< Serial Number List
       ControlNet *mCNet;                         //!< Control Network
       Progress *mProgress;                       //!< Progress state
       QList< ControlCubeGraphNode * > mCubeGraphNodes;
       
     private:
-      map <int, int> mPointIntStats;                           //!< Contains map of different count stats
-      map <int, double> mPointDoubleStats;             //!< Contains map of different computed stats
+      map <int, int> mPointIntStats;           //!< Contains map of different count stats
+      map <int, double> mPointDoubleStats;     //!< Contains map of different computed stats
       map <string, vector<double> > mImageMap; //!< Contains stats by Image/Serial Num
-      map <string, bool> mSerialNumMap;                //!< Whether serial# is part of ControlNet
+      map <string, bool> mSerialNumMap;        //!< Whether serial# is part of ControlNet
       
       //! Get point count stats
       void GetPointIntStats(void);
       
       //! Get Point stats for Residuals and Shifts 
       void GetPointDoubleStats(void);
+      
+      //! Init Pointstats vector
+      void InitPointDoubleStats(void);
       
       //! Init SerialNum map
       void InitSerialNumMap(void);
