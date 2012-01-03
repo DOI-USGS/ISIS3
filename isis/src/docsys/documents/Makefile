@@ -148,6 +148,9 @@ clean:
 	if [ -f ReleaseNotes/ReleaseNotes.xml ]; then \
 	  rm ReleaseNotes/ReleaseNotes.xml; \
 	fi; \
+	if [ -f ApiChanges/ApiChanges.xml ]; then \
+	  rm ApiChanges/ApiChanges.xml; \
+	fi; \
 	if [ -f ParameterChanges/ParameterChanges.xml ]; then \
 	  rm ParameterChanges/ParameterChanges.xml; \
 	fi;
