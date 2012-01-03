@@ -8,5 +8,6 @@ commands:
 	  cnet=$(INPUT)/cnet.net \
 	  filter=yes \
 	  deffile=$(INPUT)/deffile.def \
-	  flatfile=$(OUTPUT)/truth.txt > /dev/null;
-	  $(RM) $(OUTPUT)/cube.lis;
+	  flatfile=$(OUTPUT)/out.txt > /dev/null;
+	$(SED) 's/, \/.*\/input\//, /' $(OUTPUT)/out.txt > $(OUTPUT)/truth.txt;
+	$(RM) $(OUTPUT)/cube.lis $(OUTPUT)/out.txt;
