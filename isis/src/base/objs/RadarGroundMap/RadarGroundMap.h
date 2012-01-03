@@ -78,6 +78,9 @@ namespace Isis {
    *                       PointPartial to get the body-fixed look vector
    *                       derivative prior to calling this method.
    *  @history 2010-12-17 Debbie A. Cook - Corrected units to kilometers in GetXY
+   *  @history 2012-01-03 Janet Barrett - Got rid of call to SetLookDirection in the
+   *                      SetFocalPlane method. The call to SetLookDirection was
+   *                      duplicating the functionality of the SetFocalPlane method.
    *
    */
   class RadarGroundMap : public CameraGroundMap {

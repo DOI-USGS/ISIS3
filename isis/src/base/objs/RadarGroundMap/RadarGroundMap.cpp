@@ -156,7 +156,6 @@ namespace Isis {
 
     SpiceDouble unitLookC[3];
     vhat_c(&lookC[0], unitLookC);
-    p_camera->SetLookDirection(unitLookC);
 
     return p_camera->Sensor::SetUniversalGround(lat, lon);
   }
