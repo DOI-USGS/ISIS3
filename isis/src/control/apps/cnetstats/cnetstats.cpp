@@ -153,9 +153,9 @@ void (ControlNetFilter::*GetPtr2Filter(const string psFilter)) (const PvlGroup &
     return &ControlNetFilter::PointResMagnitudeFilter;
   }
   
-  //if (psFilter == "Point_GoodnessOfFit"){
-  //  return &ControlNetFilter::PointGoodnessOfFitFilter;
-  //}
+  if (psFilter == "Point_GoodnessOfFit") {
+    return &ControlNetFilter::PointGoodnessOfFitFilter;
+  }
 
   if (psFilter == "Point_IdExpression") {
     return &ControlNetFilter::PointIDFilter;

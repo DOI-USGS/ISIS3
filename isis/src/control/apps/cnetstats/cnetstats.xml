@@ -67,12 +67,6 @@
               <td>= Double </td></tr> 
             <tr><td></td><td align="left">MaxSampleResidual</td>
               <td>= Double </td></tr> 
-            <tr><td></td><td align="left">AvgPixelShift</td>
-              <td>= Double </td></tr> 
-            <tr><td></td><td align="left">MinPixelShift</td>
-              <td>= Double </td></tr> 
-            <tr><td></td><td align="left">MaxPixelShift</td>
-              <td>= Double </td></tr> 
             <tr><td></td><td align="left">MinLineShift</td>
               <td>= Double </td></tr> 
             <tr><td></td><td align="left">MaxLineShift</td>
@@ -80,6 +74,24 @@
             <tr><td></td><td align="left">MinSampleShift</td>
               <td>= Double </td></tr> 
             <tr><td></td><td align="left">MaxSampleShift</td>
+              <td>= Double </td></tr> 
+             <tr><td></td><td align="left">AvgPixelShift</td>
+              <td>= Double </td></tr> 
+            <tr><td></td><td align="left">MinPixelShift</td>
+              <td>= Double </td></tr> 
+            <tr><td></td><td align="left">MaxPixelShift</td>
+              <td>= Double </td></tr> 
+             <tr><td></td><td align="left">MinGoodnessOfFit</td>
+              <td>= Double </td></tr> 
+            <tr><td></td><td align="left">MaxGoodnessOfFit</td>
+              <td>= Double </td></tr> 
+            <tr><td></td><td align="left">MinEccentricity</td>
+              <td>= Double </td></tr> 
+             <tr><td></td><td align="left">MaxEccentricity</td>
+              <td>= Double </td></tr> 
+            <tr><td></td><td align="left">MinPixelZScore</td>
+              <td>= Double </td></tr> 
+            <tr><td></td><td align="left">MaxPixelZScore</td>
               <td>= Double </td></tr> 
              <tr><td></td><td align="left">MinConvexHullRatio</td>
               <td>= Double </td></tr>
@@ -185,7 +197,7 @@
    9. <a href="#editlock">EditLock</a><br/>
    10. <a href="#mseditlock">Measures EditLock</a><br/>
    11.<a href="#pixelshift">Pixel Shift</a><br/>
-    <!--12. <a href="#gooodfit">Goodness Of Fit</a><br/> -->
+   12.<a href="#goodnessOfFit">Goodness of Fit</a><br/>
     <br/> 
     
    Following are the <b>Cube Filters</b>: <br/>
@@ -465,23 +477,27 @@
     <tr><td>PointID</td><td>PointType</td><td>PointIgnored</td><td>Filename</td><td>SerialNumber</td>
     <td>PixelShift</td><td>MeasureType</td><td>MeasureIgnored</td><td>MeasureEditLocked</td><td>Reference</td>
     </tr></table><br/><hr/><br/>
-    
-    <!-- 12. <a name="goodfit"><b>Goodness Of Fit</b></a> - Filter the ControlNet 
-   by 
-    Control Point GoodnessOfFit. Options can be combined. To omit an option, it 
-    can be deleted from the group.<br/> 
+
+    12. <a name="goodnessOfFit"><b>Goodness Of Fit</b></a> - Filter the      
+    ControlNet by Control Measure's GoodnessOfFit. These values will 
+    always be inclusive. Options LessThan and GreaterThan can be combined which 
+    will be applied as a Range or used alone. To omit an option, it can be 
+    deleted from the group. <br/> 
     <table border="1" cellpadding="2" cellspacing="0" bgcolor="#f0f0f0">
      <tr><td><table border="0" cellpadding="3" cellspacing="0"> 
               <tr><td colspan="2"> Group = Point_GoodnessOfFit</td></tr>
-              <tr><td width="10"></td><td> LessThan = double value</td></tr>
-              <tr><td width="10"></td><td> GreaterThan = double value</td></tr>
+              <tr><td width="10"></td><td> LessThan = Double</td></tr>
+              <tr><td width="10"></td><td> GreaterThan = Double</td></tr>
               <tr><td colspan="2"> EndGroup</td></tr> </table> 
     </td></tr> </table><br/> <br/>
     
     Report Format:<br/> 
     <table border="1" cellpadding="10" cellspacing="0" bgcolor="#f0f0f0"> 
-    <tr><td>PointID</td><td>Type</td><td>Ignore</td><td>Filename</td><td>SerialNum</td>
-    <td>GoodnessOfFit</td><td>MeasureIgnore</td><td>Reference</td></tr> </table><br/>  <hr/><br/> -->
+    <tr><td>PointID</td><td>PointType</td><td>PointIgnored</td><td>PointEditLocked</td>
+    <td>TotalMeasures</td><td>MeasuresIgnored</td><td>MeasuresEditLocked</td>
+    <td>FileName</td><td>SerialNumber</td><td>GoodnessOfFit</td><td>MeasureType</td>
+     <td>MeasureIgnored</td><td>MeasureEditLocked</td><td>Reference</td></tr>
+    </table><br/>  <hr/><br/> 
 
     Following are the <b>Cube Filters</b>: <br/>
     1. <a name="name"><b>Name</b></a> - Filter the Control Net by the Cube 
@@ -612,6 +628,9 @@
      <change name="Sharmila Prasad" date="2011-11-03">Added functionality to 
      filter by Image's Convex Hull Ratio. Fixes Mantis #305
      </change>
+    <change name="Sharmila Prasad" date="2011-12-29">Updated GoodnessOfFit 
+     Filter and added ControlNet stats for ControlMeasureLogData. Fixes Mantis #652 
+    </change>
     </history>
       
   <groups>
