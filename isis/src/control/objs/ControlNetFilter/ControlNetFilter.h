@@ -65,6 +65,7 @@ namespace Isis {
    *                               filters for ResidualTolerance, PixelShift and EditLock(Point & Measure)
    *  @history 2011-10-05 Sharmila Prasad - Report double values with 10 digit precision
    *  @history 2011-11-03 Sharmila Prasad - Added functionality to filter by Convex Hull Ratio
+   *  @history 2011-12-29 Sharmila Prasad - Updated GoodnessOfFit Filter. Fixes Mantis #652
    */
   class ControlNetFilter : public ControlNetStatistics {
     public:
@@ -88,7 +89,7 @@ namespace Isis {
       void PointResMagnitudeFilter(const PvlGroup &pvlGrp, bool pbLastFilter);
 
       //! Filter Points by GoodnessOfFit
-      //void PointGoodnessOfFitFilter(const PvlGroup & pvlGrp, bool pbLastFilter);
+      void PointGoodnessOfFitFilter(const PvlGroup & pvlGrp, bool pbLastFilter);
       
       //! Filter Points by Point ID Expression
       void PointIDFilter(const PvlGroup &pvlGrp, bool pbLastFilter);

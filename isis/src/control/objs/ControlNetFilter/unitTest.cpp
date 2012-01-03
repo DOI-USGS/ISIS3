@@ -225,19 +225,21 @@ void IsisMain() {
   cout << "************************************************************************\n\n";
 
   // Filter Points by Goodness of Fit
-   
-  //cnet = new ControlNet(ui.GetFilename("CNET"));
-  //cnetFilter = new ControlNetFilter(cnet, sSerialFile);
-  //filterGrp = PvlGroup("Point_GoodnessOfFit");
-  //keyword = PvlKeyword("LessThan", 5);
- // filterGrp += keyword;
- // cnetFilter->PointGoodnessOfFitFilter(filterGrp,  false);
- // filterGrp.Clear()                                      ;
- // delete (cnet);
- // delete (cnetFilter);
- // cnetFilter = NULL;
- // cnet = NULL;
-  
+  cout << "****************** Points_GoodnessOfFit Filter ******************" << endl;
+  cnet = new ControlNet(ui.GetFilename("CNET"));
+  cnetFilter = new ControlNetFilter(cnet, sSerialFile);
+  filterGrp = PvlGroup("Point_GoodnessOfFit");
+  keyword = PvlKeyword("LessThan", 0.5);
+  filterGrp += keyword;
+  cnetFilter->PointGoodnessOfFitFilter(filterGrp,  false);
+  cout << filterGrp << endl;
+  PrintControlNetInfo(*cnet);
+  filterGrp.Clear();
+  delete (cnet);
+  delete (cnetFilter);
+  cnetFilter = NULL;
+  cnet = NULL;
+  cout << "************************************************************************\n\n";
 
   // Point_CubeNames Filter
   cout << "****************** Point_CubeNames Filter ******************" << endl;

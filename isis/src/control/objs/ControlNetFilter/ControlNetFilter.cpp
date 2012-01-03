@@ -4,6 +4,7 @@
 #include "Camera.h"
 #include "CameraFactory.h"
 #include "ControlMeasure.h"
+#include "ControlMeasureLogData.h"
 #include "ControlNet.h"
 #include "ControlCubeGraphNode.h"
 #include "ControlPoint.h"
@@ -197,15 +198,23 @@ namespace Isis {
     int iNumPoints = mCNet->GetNumPoints();
     for (int i = (iNumPoints - 1); i >= 0; i--) {
       ControlPoint *cPoint = mCNet->GetPoint(i);
-      double dMaxPixShift = fabs(cPoint->GetStatistic(&ControlMeasure::GetPixelShift).Maximum());
-      if (dMaxPixShift > dLesser || dMaxPixShift < dGreater) {
+      int iNumMeasures = cPoint->GetNumMeasures();
+      bool bFilter = true;
+      for (int j = 0; j < iNumMeasures; j++){
+        const ControlMeasure *measure = cPoint->GetMeasure(j);
+        double dPixelShift = measure->GetPixelShift();
+        if (dPixelShift <= dLesser  && dPixelShift >= dGreater) {
+          bFilter = false;
+          break;
+        }
+      }
+      if (bFilter) {
         FilterOutPoint(i);
         continue;
       }
       
       // Print into output, if it is the last Filter
       if (pbLastFilter) {
-        int iNumMeasures = cPoint->GetNumMeasures();
         for (int j = 0; j < iNumMeasures; j++) {
           mOstm << cPoint->GetId() << ", " << sPointType[cPoint->GetType()] << ", "
                 << sBoolean[cPoint->IsIgnored()] << ", " 
@@ -372,16 +381,25 @@ namespace Isis {
     
     int iNumPoints = mCNet->GetNumPoints();
     for (int i = (iNumPoints - 1); i >= 0; i--) {
+      bool bFilter = true;
       ControlPoint *cPoint = mCNet->GetPoint(i);
-      double dMaxErr = fabs(cPoint->GetStatistic(&ControlMeasure::GetResidualMagnitude).Maximum());
-      if (dMaxErr > dLesser || dMaxErr < dGreater) {
+      int iNumMeasures = cPoint->GetNumMeasures();
+      for (int j = 0; j < iNumMeasures; j++) {
+        const ControlMeasure *measure = cPoint->GetMeasure(j);
+        double dResMag = measure->GetResidualMagnitude();
+        if (dResMag <= dLesser &&  dResMag >= dGreater) {
+          bFilter = false;
+          break;
+        }
+      } 
+      
+      if (bFilter) {
         FilterOutPoint(i);
         continue;
       }
-      
       // Print into output, if it is the last Filter
-      if (pbLastFilter) {
-        int iNumMeasures = cPoint->GetNumMeasures();
+      else if (pbLastFilter) {
+        
         for (int j = 0; j < iNumMeasures; j++) {
           mOstm << cPoint->GetId() << ", " << sPointType[cPoint->GetType()] << ", "
                 << sBoolean[cPoint->IsIgnored()] << ", " 
@@ -816,52 +834,44 @@ namespace Isis {
   /**
    * Filter the Points based on the Measures Goodness ofFit value
    * Group by Points
-   *
+   *  
+   * Header: 
+   * PointID, PointType, PointIgnored, PointEditLocked, TotalMeasures, MeasuresIgnored, MeasuresEditLocked, 
+   * FileName, SerialNumber, GoodnessOfFit, MeasureIgnored, MeasureType, MeasureEditLocked, Reference
+   *  
    * @author Sharmila Prasad (8/16/2010)
    *
    * @param pvlGrp - Pvl Group containing the filter info
    * @param pbLastFilter - Flag to indicate whether this is the last filter to print the stats
    */
-  /*void ControlNetFilter::PointGoodnessOfFitFilter(const PvlGroup & pvlGrp, bool pbLastFilter){
+  void ControlNetFilter::PointGoodnessOfFitFilter(const PvlGroup & pvlGrp, bool pbLastFilter){
     double dLesser=Isis::ValidMaximum, dGreater=0;
 
     if (pvlGrp.HasKeyword("LessThan")){
-      dLesserValue = (int) pvlGrp["LessThan"][0];
+      dLesser = fabs((pvlGrp["LessThan"][0]).ToDouble());
     }
 
     if (pvlGrp.HasKeyword("GreaterThan")){
-      dGreaterValue = (int) pvlGrp["GreaterThan"][0];
+      dGreater = fabs((pvlGrp["GreaterThan"][0]).ToDouble());
     }
 
     if (pbLastFilter) {
-      mOstm << "PointID, PointType, PointIgnore, Filename, SerialNum, GoodnessOfFit, MeasureIgnore, Reference";
-      mOstm << endl << endl;
+      PointStatsHeader();
+      mOstm << "FileName, SerialNumber, GoodnessOfFit, MeasureType, MeasureIgnored, MeasureEditLocked, Reference" << endl;
     }
 
     int iNumPoints = mCNet->GetNumPoints();
     for (int i=(iNumPoints-1); i>=0; i--) {
       ControlPoint *cPoint = mCNet->GetPoint(i);
-
       int iNumMeasures = cPoint->GetNumMeasures();
       bool bMatchFlag=false;
 
       for (int j=0; j<iNumMeasures; j++) {
-        double dGFit = cPoint->GetStatistic(ControlMeasureLogData::GoodnessOfFit);
-        #ifdef _DEBUG_
-        odb << " Point." << i << "  Measure." << j << "   GoodnessFit=" << dGFit << endl;
-        #endif
-        if (dGFit != Isis::Null) {
-          if (bLesserFlag && bGreaterFlag) {
-            if (dGFit < dLesserValue && dGFit > dGreaterValue) {
-              bMatchFlag = true;
-            }
-          }
-          else if (bLesserFlag && dGFit < dLesserValue) {
-            bMatchFlag = true;
-          }
-          else if (bGreaterFlag && dGFit > dGreaterValue) {
-            bMatchFlag = true;
-          }
+        const ControlMeasure *measure = cPoint->GetMeasure(j);
+        double dMsrGFit= measure->GetLogData(ControlMeasureLogData::GoodnessOfFit).GetNumericalValue();
+        if (dMsrGFit >= dGreater &&  dMsrGFit <= dLesser) {
+          bMatchFlag = true;
+          break;
         }
       }
 
@@ -869,23 +879,32 @@ namespace Isis {
         FilterOutPoint(i);
       }
       else {
-        if (pbLastFilter){
-          for (int j=0; j<iNumMeasures; j++) {
-            ControlMeasure cMeasure=cPoint[j];
-            double dGFit = cMeasure.GoodnessOfFit();
-
-            mOstm << cPoint.Id() << ", " << sPointType[cPoint.Type()] << ", ";
-            mOstm << sBoolean[cPoint.Ignore()] << ", " ;
-            PrintCubeFileSerialNum(cMeasure);
-            mOstm << ", " << (dGFit==Isis::Null ? "Null" : iString(dGFit)) << ", ";
-            mOstm << sBoolean[cMeasure.Ignore()] << ", ";
-            mOstm << sBoolean[(int)cMeasure.Type() == ControlMeasure::Reference] << endl;
+        // Print into output, if it is the last Filter
+        if (pbLastFilter) {
+          int iNumMeasures = cPoint->GetNumMeasures();
+          int iNumMsIgnored = iNumMeasures - cPoint->GetNumValidMeasures();
+          for (int j = 0; j < iNumMeasures; j++) {
+            const ControlMeasure *measure = cPoint->GetMeasure(j);
+            double dMsrGFit= measure->GetLogData(ControlMeasureLogData::GoodnessOfFit).GetNumericalValue();
+            
+            mOstm << cPoint->GetId() << ", " << sPointType[cPoint->GetType()] << ", "
+              << sBoolean[cPoint->IsIgnored()] << ", " << sBoolean[cPoint->IsEditLocked()] << ", "
+              << iNumMeasures << ", " << iNumMsIgnored << ", " << cPoint->GetNumLockedMeasures() << ", ";
+            PrintCubeFileSerialNum(*measure);
+            mOstm << ", " <<  (dMsrGFit == Null ? "NA" : iString(dMsrGFit)) << ", "
+              << measure->GetMeasureTypeString() << ", "
+              << sBoolean[measure->IsIgnored()] << ", "
+              << sBoolean[measure->IsEditLocked()] << ", "
+              << sBoolean[cPoint->GetRefMeasure() == measure]
+              << endl;
           }
         }
       }
     }
-  }*/
-
+    
+    // update the image stats with the changes
+    GenerateImageStats();
+  }
   /**
    * Filter the Points which have measures of specified Measure type and Ignored Flag.
    * Group by Points
