@@ -82,6 +82,7 @@ int main(int argc, char *argv[]) {
 
     double v[3] = { 0.0, 0.0, 1.0 };
     double p[3];
+    double scSurf[3];
 
     cerr << setprecision(8);
 
@@ -108,6 +109,9 @@ int main(int argc, char *argv[]) {
       spi.LookDirection(p);
       cerr << "Look Direction      = " << p[0] << " " << p[1] << " " << p[2]
            << endl;
+      spi.SpacecraftSurfaceVector(scSurf);
+      cerr << "Spacecraft Surface Vector = " << scSurf[0] << " " << scSurf[1]
+           << " " << scSurf[2] <<endl;
       cerr << "Slant Distance      = " << spi.SlantDistance() << endl;
       cerr << "Local Solar Time    = " << spi.LocalSolarTime() << endl;
       cerr << "Spacecraft Altitude = " << spi.SpacecraftAltitude() << endl;
@@ -141,6 +145,9 @@ int main(int argc, char *argv[]) {
     spi.LookDirection(p);
     cerr << "Look Direction      = " << p[0] << " " << p[1] << " " << p[2]
          << endl;
+    spi.SpacecraftSurfaceVector(scSurf);
+    cerr << "Spacecraft Surface Vector = " << scSurf[0] << " " << scSurf[1]
+         << " " << scSurf[2] <<endl;
     cerr << "Slant Distance      = " << spi.SlantDistance() << endl;
     cerr << "Local Solar Time    = " << spi.LocalSolarTime() << endl;
     cerr << "Spacecraft Altitude = " << spi.SpacecraftAltitude() << endl;
@@ -170,6 +177,9 @@ int main(int argc, char *argv[]) {
     spi.LookDirection(p);
     cerr << "Look Direction      = " << p[0] << " " << p[1] << " " << p[2]
          << endl;
+    spi.SpacecraftSurfaceVector(scSurf);
+    cerr << "Spacecraft Surface Vector = " << scSurf[0] << " " << scSurf[1]
+         << " " << scSurf[2] <<endl;
     cerr << "Slant Distance      = " << spi.SlantDistance() << endl;
     cerr << "Local Solar Time    = " << spi.LocalSolarTime() << endl;
     cerr << "Spacecraft Altitude = " << spi.SpacecraftAltitude() << endl;
@@ -229,6 +239,9 @@ int main(int argc, char *argv[]) {
       spi2.LookDirection(p);
       cerr << "Look Direction      = " << p[0] << " " << p[1] << " " << p[2]
            << endl;
+      spi2.SpacecraftSurfaceVector(scSurf);
+      cerr << "Spacecraft Surface Vector = " << scSurf[0] << " " << scSurf[1]
+           << " " << scSurf[2] <<endl;
       cerr << "Slant Distance      = " << spi2.SlantDistance() << endl;
       cerr << "Local Solar Time    = " << spi2.LocalSolarTime() << endl;
       cerr << "Spacecraft Altitude = " << spi2.SpacecraftAltitude() << endl;
@@ -265,6 +278,9 @@ int main(int argc, char *argv[]) {
     spi2.LookDirection(p);
     cerr << "Look Direction      = " << p[0] << " " << p[1] << " " << p[2]
          << endl;
+    spi2.SpacecraftSurfaceVector(scSurf);
+    cerr << "Spacecraft Surface Vector = " << scSurf[0] << " " << scSurf[1]
+         << " " << scSurf[2] <<endl;
     cerr << "Slant Distance      = " << spi2.SlantDistance() << endl;
     cerr << "Local Solar Time    = " << spi2.LocalSolarTime() << endl;
     cerr << "Spacecraft Altitude = " << spi2.SpacecraftAltitude() << endl;
@@ -290,6 +306,9 @@ int main(int argc, char *argv[]) {
     spi2.LookDirection(p);
     cerr << "Look Direction      = " << p[0] << " " << p[1] << " " << p[2]
          << endl;
+    spi2.SpacecraftSurfaceVector(scSurf);
+    cerr << "Spacecraft Surface Vector = " << scSurf[0] << " " << scSurf[1]
+         << " " << scSurf[2] <<endl;
     cerr << "Slant Distance      = " << spi2.SlantDistance() << endl;
     cerr << "Local Solar Time    = " << spi2.LocalSolarTime() << endl;
     cerr << "Spacecraft Altitude = " << spi2.SpacecraftAltitude() << endl;

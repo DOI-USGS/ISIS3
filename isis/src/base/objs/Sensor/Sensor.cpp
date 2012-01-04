@@ -954,6 +954,19 @@ namespace Isis {
 
 
   /**
+   * Return the vector between the spacecraft and surface point in body-fixed
+   *  
+   * @author 2011-12-20 Tracie Sucharski 
+   */
+  void Sensor::SpacecraftSurfaceVector(double scSurfaceVector[3]) const {
+    scSurfaceVector[0] = p_lookB[0];
+    scSurfaceVector[1] = p_lookB[1];
+    scSurfaceVector[2] = p_lookB[2];
+  }
+
+
+
+  /**
    * Return the distance between the spacecraft and surface point in kmv
    * @return @b double Slant distance
    */

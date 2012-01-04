@@ -165,6 +165,9 @@ namespace Isis {
    *                           loop in the ray tracing algorithm.  The problem
    *                           was first exposed when trying to intersect the
    *                           Vesta DEM on the limb.
+   *   @history 2011-12-20 Tracie Sucharski - Added  SpacecraftSurfaceVector
+   *                           method which returns the vector between the
+   *                           spacecraft and the surface point in body-fixed.
    */
   class Sensor : public Spice {
     public:
@@ -245,6 +248,8 @@ namespace Isis {
       double RightAscension();
       double Declination();
 
+      //! Return vector between spacecraft and surface point in body-fixed
+      void SpacecraftSurfaceVector(double scSurfaceVector[3]) const;
       double SlantDistance() const;
       double LocalSolarTime();
       double SolarDistance() const;
