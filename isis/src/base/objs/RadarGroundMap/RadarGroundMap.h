@@ -81,7 +81,8 @@ namespace Isis {
    *  @history 2012-01-03 Janet Barrett - Got rid of call to SetLookDirection in the
    *                      SetFocalPlane method. The call to SetLookDirection was
    *                      duplicating the functionality of the SetFocalPlane method.
-   *
+   *  @history 2012-01-04 Janet Barrett - Added check for valid radius in the 
+   *                      SetGround method.
    */
   class RadarGroundMap : public CameraGroundMap {
     public:

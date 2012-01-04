@@ -168,6 +168,12 @@ namespace Isis {
    * @return conversion was successful
    */
   bool RadarGroundMap::SetGround(const Latitude &lat, const Longitude &lon) {
+    Distance localRadius(p_camera->LocalRadius(lat, lon));
+
+    if(!localRadius.Valid()) {
+      return false;
+    }
+
     return SetGround(SurfacePoint(lat, lon, p_camera->LocalRadius(lat, lon)));
   }
 
@@ -289,12 +295,12 @@ namespace Isis {
 
         SpiceDouble unitLookC[3];
         vhat_c(&lookC[0], unitLookC);
-        p_camera->SetLookDirection(unitLookC);
+        bool result = p_camera->SetLookDirection(unitLookC);
 
         p_camera->SetFocalLength(p_slantRange * 1000.0); // p_slantRange is km so focal length is in m
         p_focalPlaneX = p_slantRange * 1000.0 / p_rangeSigma; // km to meters and scaled to focal plane
         p_focalPlaneY = 0.0;
-        return true;
+        return result;
       }
     }
 
