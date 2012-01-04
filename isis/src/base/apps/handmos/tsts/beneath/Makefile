@@ -15,5 +15,5 @@ commands:
     nlines=10 \
 	nsamples=10 \
 	nbands=5 \
-	track=yes \
+	track=no \
 	create=yes > /dev/null;

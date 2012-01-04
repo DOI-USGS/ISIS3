@@ -13,4 +13,4 @@ commands:
 	  track=yes \
 	  nsamples=10 \
 	  nlines=20 \
-	  nbands=2 > /dev/null;
+	  nbands=1 > /dev/null;
