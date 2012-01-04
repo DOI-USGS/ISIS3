@@ -1425,7 +1425,11 @@ namespace Isis {
     else if (s == Qt::RightButton) {
       p_leftFile = file;
       UniversalGroundMap *gmap = cvp->universalGroundMap();
-      gmap->SetImage(samp,line);
+      if (!gmap->SetImage(samp,line)) {
+        QString message = "Invalid latitude or longitude at this point. ";
+        QMessageBox::critical(p_qnetTool,"Error", message);
+        return;
+      }
       double lat = gmap->UniversalLatitude();
       double lon = gmap->UniversalLongitude();
       if (p_groundOpen && file == p_groundCube->getFilename()) {
