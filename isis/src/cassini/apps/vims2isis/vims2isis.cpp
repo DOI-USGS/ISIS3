@@ -1,15 +1,16 @@
 #include "Isis.h"
+
+#include "Brick.h"
 #include "EndianSwapper.h"
-#include "ProcessImportPds.h"
-#include "ProcessByLine.h"
 #include "Filename.h"
-#include "UserInterface.h"
-#include "Filename.h"
-#include "Pvl.h"
 #include "iException.h"
 #include "iString.h"
-#include "Brick.h"
+#include "OriginalLabel.h"
+#include "ProcessByLine.h"
+#include "ProcessImportPds.h"
+#include "Pvl.h"
 #include "Table.h"
+#include "UserInterface.h"
 
 #include <algorithm>
 #include <stdio.h>
@@ -90,6 +91,9 @@ void IsisMain() {
     ReadVimsBIL(in.Expanded(), lab.FindObject("QUBE")["SUFFIX_ITEMS"], tempname.Name());
   }
 
+  // Create holder for original labels
+  OriginalLabel origLabel(pdsLab);
+
   //Now separate the cubes
   ProcessByLine l;
 
@@ -101,6 +105,7 @@ void IsisMain() {
     CubeAttributeInput inattvis = CubeAttributeInput("+1-96");
     l.SetInputCube(tempname.Name(), inattvis);
     Cube *oviscube = l.SetOutputCube("VIS");
+    oviscube->write(origLabel);
     l.StartProcess(ProcessCube);
     TranslateVimsLabels(pdsLab, oviscube, VIS);
     l.EndProcess();
@@ -116,9 +121,11 @@ void IsisMain() {
     CubeAttributeInput inattir = CubeAttributeInput("+97-352");
     l.SetInputCube(tempname.Name(), inattir);
     Cube *oircube = l.SetOutputCube("IR");
+    oircube->write(origLabel);
     l.StartProcess(ProcessCube);
     TranslateVimsLabels(pdsLab, oircube, IR);
     l.EndProcess();
+
     status += PvlKeyword("IrCreated", "true");
   }
   else {

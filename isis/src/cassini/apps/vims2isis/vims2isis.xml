@@ -64,6 +64,9 @@
             DATA_SET_ID was too specific and wasn't allowing imports of 
             appropriate data.
         </change>
+        <change name="Tracie Sucharski" date="2011-12-16">
+            Added the OriginalLabel blob to both output cubes , vis and  ir.
+        </change>
       </history>
     <category>
         <missionItem>Cassini</missionItem>
