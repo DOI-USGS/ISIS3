@@ -171,6 +171,8 @@ namespace Isis {
    *                          Fixes #410.
    *  @history 2011-10-20 Sharmila Prasad - Fixes #0000462, allow Band Priority even if Tracking
    *                                        is not enabled
+   *  @history 2011-12-30 Sharmila Prasad - Fixed #00587, Disable Tracking for multiband mosaic for
+   *                      ontop or beneath priority
    *  @todo 2005-02-11 Stuart Sides - add coded example and implementation example
    *                                  to class documentation
    */

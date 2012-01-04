@@ -11,7 +11,7 @@ using namespace std;
 int giDefault = 0;
 
 void TestIn(int iss, int isl, int isb, int ins = 0, int inl = 0, int inb = 0);
-void TestOut(int piSamples, int piLines, int piBands, int piOffset, int piPriority);
+void TestOut(int piSamples, int piLines, int piBands, int piOffset, int piPriority, int originBand);
 
 /**
  * Display the contents of Input image with starting and number of
@@ -69,9 +69,11 @@ void TestIn(int iss, int isl, int isb, int ins, int inl, int inb) {
  * @param isl  - input starting line
  * @param isb  - input starting band
  */
-void TestOut(int piSamples, int piLines, int piBands, int piOffset, int piPriority) {
+void TestOut(int piSamples, int piLines, int piBands, int piOffset, int piPriority, int originBand) {
   int iFileIndex;
 
+  //originBand--;
+  
   Isis::Cube cOutCube;
   Isis::UserInterface &ui = Isis::Application::GetUserInterface();
   string sTo;
@@ -93,12 +95,11 @@ void TestOut(int piSamples, int piLines, int piBands, int piOffset, int piPriori
       cOutCube.read(coPortal);
       for(int iPixel = 0; iPixel < coPortal.size(); iPixel++) {
         iFileIndex = 0;
-        if(piPriority != Isis::ProcessMosaic::average && band == 3 && coPortal[iPixel] != giDefault) {
+        if(piPriority != Isis::ProcessMosaic::average && band == originBand && coPortal[iPixel] != giDefault) {
           iFileIndex = (int)coPortal[iPixel] - piOffset + 1;
         }
-        if(band == 3 && piPriority != Isis::ProcessMosaic::average) { //origin band
+        if(band == originBand && piPriority != Isis::ProcessMosaic::average) //origin band
           printf("(%d,%d,%d)=%-9d,%-1d  ", line, (iPixel + 1), band, (int)coPortal[iPixel], iFileIndex);
-        }
         else
           printf("(%d,%d,%d)=%-11d  ", line, (iPixel + 1), band, (int)coPortal[iPixel]);
       }
@@ -109,7 +110,7 @@ void TestOut(int piSamples, int piLines, int piBands, int piOffset, int piPriori
     if(band > iBands) {
       break;
     }
-    band = (piPriority == Isis::ProcessMosaic::average ? 2 : 3);
+    //band = (piPriority == Isis::ProcessMosaic::average ? 2 : 3);
   }
   cOutCube.close();
 }
@@ -134,7 +135,7 @@ void IsisMain() {
 
   // Create the default output cube
   Isis::Process p;
-  p.SetOutputCube("TO", 5, 5, 3);
+  p.SetOutputCube("TO", 5, 5, 2);
   p.EndProcess();
 
   // ***********************************************************
@@ -157,16 +158,16 @@ void IsisMain() {
 
   // Test for Tracking Table "Input Images"
   if(m1.GetTrackStatus()) {
-    cout << "a. SUCCESS - Track Table Exists\n";
+    cout << "\na. SUCCESS - Track Table Exists\n";
   }
   else {
-    cout << "a. FAILURE - Track Table does not Exist\n";
+    cout << "\na. FAILURE - Track Table does not Exist\n";
   }
 
   // Test for Tracking Band
   FileType eBandFile   = outFile; //output
   m1.SetBandKeyWord("OriginalBand", "TRACKING");
-  if(m1.GetBandIndex(eBandFile) == 3) {
+  if(m1.GetBandIndex(eBandFile) == 2) {
     cout << "b. SUCCESS - Tracking Band Exists\n\n";
   }
   else {
@@ -175,7 +176,7 @@ void IsisMain() {
   m1.EndProcess();
 
   TestIn(1, 1, 1, 5, 5, 1);
-  TestOut(2, 2, 1, iDefault, Isis::ProcessMosaic::input);
+  TestOut(2, 2, 1, iDefault, Isis::ProcessMosaic::input, 2);
 
   remove("isisMosaic_01.cub");
 
@@ -192,7 +193,7 @@ void IsisMain() {
 
   m2.SetInputCube("FROM", 2, 2, 1);
 
-  p.SetOutputCube("TO", 5, 5, 3);
+  p.SetOutputCube("TO", 5, 5, 2);
   p.EndProcess();
   m2.SetOutputCube("TO");
 
@@ -200,7 +201,7 @@ void IsisMain() {
   m2.EndProcess();
 
   TestIn(2, 2, 1, 5, 5, 1);
-  TestOut(4, 4, 2, iDefault, Isis::ProcessMosaic::input);
+  TestOut(4, 4, 1, iDefault, Isis::ProcessMosaic::input, 0);
   remove("isisMosaic_01.cub");
   cout << "************************************************************************************************\n";
 
@@ -214,7 +215,7 @@ void IsisMain() {
 
   m3.SetInputCube("FROM", 3, 3, 1, 10, 1, 1);
 
-  p.SetOutputCube("TO", 5, 5, 3);
+  p.SetOutputCube("TO", 5, 5, 2);
   p.EndProcess();
   m3.SetOutputCube("TO");
 
@@ -222,7 +223,7 @@ void IsisMain() {
   m3.EndProcess();
 
   TestIn(3, 3, 1, 5, 5, 1);
-  TestOut(5, 1, 1, iDefault, Isis::ProcessMosaic::mosaic);
+  TestOut(5, 1, 1, iDefault, Isis::ProcessMosaic::mosaic, 2);
 
   remove("isisMosaic_01.cub");
   cout << "************************************************************************************************\n";
@@ -237,7 +238,7 @@ void IsisMain() {
 
   m4.SetInputCube("FROM", 1, 1, 1, 3, 3, 1);
 
-  p.SetOutputCube("TO", 5, 5, 3);
+  p.SetOutputCube("TO", 5, 5, 2);
   p.EndProcess();
   m4.SetOutputCube("TO");
 
@@ -245,7 +246,7 @@ void IsisMain() {
   m4.EndProcess();
 
   TestIn(1, 1, 1, 3, 3, 1);
-  TestOut(1, 1, 1, iDefault, Isis::ProcessMosaic::mosaic);
+  TestOut(1, 1, 1, iDefault, Isis::ProcessMosaic::mosaic, 2);
 
   //remove("isisMosaic_01.cub");
   cout << "************************************************************************************************\n";
@@ -265,7 +266,7 @@ void IsisMain() {
   m5.EndProcess();
 
   TestIn(1, 1, 1, 5, 5, 1);
-  TestOut(1, 2, 1, iDefault, Isis::ProcessMosaic::mosaic);
+  TestOut(1, 2, 1, iDefault, Isis::ProcessMosaic::mosaic, 2);
 
   cout << "************************************************************************************************\n";
 
@@ -290,7 +291,7 @@ void IsisMain() {
   m6.EndProcess();
 
   TestIn(3, 3, 1, 10, 1, 1);
-  TestOut(1, 1, 1, iDefault, Isis::ProcessMosaic::band);
+  TestOut(1, 1, 1, iDefault, Isis::ProcessMosaic::band, 2);
 
   cout << "************************************************************************************************\n";
 
@@ -315,7 +316,7 @@ void IsisMain() {
   m7.EndProcess();
 
   TestIn(1, 1, 1, 10, 1, 1);
-  TestOut(1, 1, 1, iDefault, Isis::ProcessMosaic::band);
+  TestOut(1, 1, 1, iDefault, Isis::ProcessMosaic::band, 2);
 
   //remove("isisMosaic_01.cub");
   cout << "************************************************************************************************\n";
@@ -343,7 +344,7 @@ void IsisMain() {
   m8.EndProcess();
 
   TestIn(1, 1, 1, 5, 5, 1);
-  TestOut(1, 3, 1, iDefault, Isis::ProcessMosaic::band);
+  TestOut(1, 3, 1, iDefault, Isis::ProcessMosaic::band, 2);
 
   cout << "************************************************************************************************\n";
   
@@ -365,7 +366,7 @@ void IsisMain() {
   m9.EndProcess();
 
   TestIn(1, 1, 1, 5, 5, 1);
-  TestOut(1, 2, 1, iDefault, Isis::ProcessMosaic::band);
+  TestOut(1, 2, 1, iDefault, Isis::ProcessMosaic::band, 2);
   
   //remove("isisMosaic_01.cub");
   
@@ -386,7 +387,7 @@ void IsisMain() {
   m10.StartProcess(1, 1, 1);
   m10.EndProcess();
   TestIn(1, 1, 1, 5, 5, 1);
-  TestOut(1, 1, 1, iDefault, Isis::ProcessMosaic::average);
+  TestOut(1, 1, 1, iDefault, Isis::ProcessMosaic::average, 0);
 
   m10.SetInputCube("FROM", 1, 1, 1, 5, 5, 1);
   m10.SetOutputCube("TO_AVG");
@@ -397,7 +398,7 @@ void IsisMain() {
   m10.StartProcess(-1, -1, 1);
   m10.EndProcess();
 
-  TestOut(1, 1, 1, iDefault, Isis::ProcessMosaic::average);
+  TestOut(1, 1, 1, iDefault, Isis::ProcessMosaic::average, 0);
   remove("isisMosaic_02.cub");
 
   cout << "****** End Average **********************\n";

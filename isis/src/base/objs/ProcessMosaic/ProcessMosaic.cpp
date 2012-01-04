@@ -117,7 +117,7 @@ namespace Isis {
     if(!mMosaicOptions.bCreate) {
       bTrackExists = GetTrackStatus();
     }
-
+    
     // **
     // Set up the input sub cube (This must be a legal sub-area of the input cube)
     // *
@@ -178,7 +178,20 @@ namespace Isis {
     p_progress->SetMaximumSteps((int)InputCubes[0]->getLineCount() * (int)InputCubes[0]->getBandCount());
     p_progress->CheckStatus();
 
-
+    // Tracking is done for:
+    // (1) Band priority,
+    // (2) Ontop and Beneath priority with number of bands equal to 1,
+    // (3) Ontop priority with all the special pixel flags set to true
+    if(mMosaicOptions.bTrack) {
+      if(!(mePriority == band  ||
+          ((mePriority == input || mePriority == mosaic) && 
+           (OutputCubes[0]->getBandCount()-1) == 1) ||   // tracking band was already created for Tracking=true
+          (mePriority == input && mbHighSat && mbLowSat && mbNull)) ){
+        string m = "Tracking cannot be True for multi-band Mosaic with ontop or beneath priority";
+        throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      }
+    }
+    
     // *******************************************************************************
 
     Pvl *inLab  = InputCubes[0]->getLabel();
@@ -240,22 +253,12 @@ namespace Isis {
     }
 
     // Image name into the table & Get the index for this input file
-    int iInNumBands = inb - isb + 1; // actual number of inpur bands being transfered to mosaic
+    //int iInNumBands = inb - isb + 1; // actual number of inpur bands being transfered to mosaic
     int iIndex = GetIndexOffsetByPixelType();
 
-    // Tracking is done for:
-    // (1) Band priority,
-    // (2) Ontop and Beneath priority with number of bands equal to 1,
-    // (3) Ontop priority with all the special pixel flags set to true
+    // Set the Mosaic Origin is Tracking is enabled
     if(mMosaicOptions.bTrack) {
-      if(mePriority == band  ||
-          ((mePriority == input || mePriority == mosaic) && iInNumBands == 1) ||
-          (mePriority == input && mbHighSat && mbLowSat && mbNull)) {
-        SetMosaicOrigin(iIndex);
-      }
-      else {
-        mMosaicOptions.bTrack = false;
-      }
+      SetMosaicOrigin(iIndex);
     }
     else if(mePriority == average && mMosaicOptions.bCreate) {
       ResetCountBands();
