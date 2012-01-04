@@ -142,5 +142,9 @@
       Added documentation in preparation for the October release. Credit goes to
       Janet Richie and Ella Lee for their help in preparing the documentation.
     </change>
+    <change name="Jai Rideout" date="2012-01-04">
+      No longer crashes if unknown column titles are found in cneteditor
+      QSettings. Fixes #616.
+    </change>
   </history>
 </application>

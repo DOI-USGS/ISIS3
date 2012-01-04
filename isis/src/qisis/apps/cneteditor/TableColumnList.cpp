@@ -88,7 +88,7 @@ namespace Isis
     }
     
     
-    int TableColumnList::indexOf(TableColumn const * someCol)
+    int TableColumnList::indexOf(TableColumn const * someCol) const
     {
       int index = -1;
       for (int i = 0; index < 0 && i < cols->size(); i++)
@@ -99,9 +99,18 @@ namespace Isis
     }
     
     
-    bool TableColumnList::contains(TableColumn const * someCol)
+    bool TableColumnList::contains(TableColumn const * someCol) const
     {
       return indexOf(someCol) != -1;
+    }
+    
+
+    bool TableColumnList::contains(QString columnTitle) const
+    {
+      bool foundTitle = false;
+      for (int i = 0; i < cols->size() && !foundTitle; i++)
+        foundTitle = (cols->at(i)->getTitle() == columnTitle);
+      return foundTitle;
     }
     
     
@@ -274,7 +283,8 @@ namespace Isis
     void TableColumnList::setSortingOrder(QStringList newOrder)
     {
       for (int i = newOrder.size() - 1; i >= 0; i--)
-        raiseToTop(operator[](newOrder[i]));
+        if (contains(newOrder[i]))
+          raiseToTop(operator[](newOrder[i]));
     }
 
     

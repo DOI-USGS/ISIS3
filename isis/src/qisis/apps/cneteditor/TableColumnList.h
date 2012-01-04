@@ -27,8 +27,9 @@ namespace Isis
         void append(TableColumn * newCol);
         void prepend(TableColumn * newCol);
         
-        int indexOf(TableColumn const * someCol);
-        bool contains(TableColumn const * someCol);
+        int indexOf(TableColumn const * someCol) const;
+        bool contains(TableColumn const * someCol) const;
+        bool contains(QString columnTitle) const;
 
         QPair< int, int > getVisibleXRange(int visibleColumn);
         TableColumnList getVisibleColumns();
