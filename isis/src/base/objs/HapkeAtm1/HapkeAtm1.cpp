@@ -48,6 +48,11 @@ namespace Isis {
    * @history 2008-11-05 Jeannie Walldren - Modified references to
    *          NumericalMethods class and replaced Isis::PI with PI
    *          since this is in Isis namespace.
+   * @history 2011-12-19 Janet Barrett - Added code to estimate the
+   *          shadow brightness value (transs). Also got rid of
+   *          unnecessary check for identical photometric angle values
+   *          between successive calls. This check should only be
+   *          made in the photometric models.
    */
   void HapkeAtm1::AtmosModelAlgorithm(double phase, double incidence, double emission) {
     double munot, mu;
@@ -62,19 +67,6 @@ namespace Isis {
     double hahgt, hahgt0;
     double phasefn;
     double maxval;
-
-    static double old_phase = -9999;
-    static double old_incidence = -9999;
-    static double old_emission = -9999;
-
-    if (phase == old_phase && incidence == old_incidence &&
-        emission == old_emission) {
-      return;
-    }
-
-    old_phase = phase;
-    old_incidence = incidence;
-    old_emission = emission;
 
     if(p_atmosTau == 0.0) {
       p_pstd = 0.0;
@@ -122,7 +114,11 @@ namespace Isis {
 
       // sbar is total diffuse illumination
       // isotropic part comes from moments, correction is numerical integral
-      GenerateHahgTables();
+      if (p_atmosEstTau) {
+        GenerateHahgTablesShadow();
+      } else {
+        GenerateHahgTables();
+      }
       p_sbar = 1.0 - ((2.0 - p_atmosWha * p_alpha0) * p_alpha1 + p_atmosWha * p_beta0 * p_beta1) + p_atmosHahgsb;
 
       SetOldTau(p_atmosTau);
@@ -195,14 +191,30 @@ namespace Isis {
       ymu = ymu + fix;
     }
 
-
     // gamma1 functions come from x and y, with a correction for
     // highly forward-scattered light as tabulated in hahgtTable
-    hahgt = p_atmosHahgtSpline.Evaluate(incidence, NumericalApproximation::Extrapolate);
-    gmunot = p_gammax * xmunot + p_gammay * ymunot + hahgt;
-
-    hahgt = p_atmosHahgtSpline.Evaluate(emission, NumericalApproximation::Extrapolate);
-    gmu = p_gammax * xmu + p_gammay * ymu + hahgt;
+    if (p_atmosEstTau) {
+      NumericalAtmosApprox::IntegFunc sub;
+      sub = NumericalAtmosApprox::OuterFunction;
+      NumericalAtmosApprox qromb;
+      p_atmosAtmSwitch = 1;
+      qromb.Reset();
+      p_atmosInc = incidence;
+      p_atmosMunot = cos((PI / 180.0) * incidence);
+      p_atmosSini = sin((PI / 180.0) * incidence);
+      hahgt = qromb.RombergsMethod(this, sub, 0, 180);
+      gmunot = p_gammax * xmunot + p_gammay * ymunot + hahgt * AtmosWha() / 360.0;
+      p_atmosInc = emission;
+      p_atmosMunot = cos((PI / 180.0) * emission);
+      p_atmosSini = sin((PI / 180.0) * emission);
+      hahgt = qromb.RombergsMethod(this, sub, 0, 180);
+      gmu = p_gammax * xmu + p_gammay * ymu + hahgt * AtmosWha() / 360.0;
+    } else {
+      hahgt = p_atmosHahgtSpline.Evaluate(incidence, NumericalApproximation::Extrapolate);
+      gmunot = p_gammax * xmunot + p_gammay * ymunot + hahgt;
+      hahgt = p_atmosHahgtSpline.Evaluate(emission, NumericalApproximation::Extrapolate);
+      gmu = p_gammax * xmu + p_gammay * ymu + hahgt;
+    }
 
     // purely atmos term uses x and y (plus single-particle phase
     // function correction)
@@ -223,13 +235,37 @@ namespace Isis {
     // finally, never-scattered term is given by pure attenuation, with
     // a correction for highly forward-scattered light (on the way down
     // but not on the way up) as tabulated in hahgt0Table
-    hahgt0 = p_atmosHahgt0Spline.Evaluate(incidence, NumericalApproximation::Extrapolate);
+    if (p_atmosEstTau) {
+      NumericalAtmosApprox::IntegFunc sub;
+      sub = NumericalAtmosApprox::OuterFunction;
+      NumericalAtmosApprox qromb;
+      p_atmosAtmSwitch = 3;
+      qromb.Reset();
+      p_atmosInc = incidence;
+      p_atmosMunot = cos((PI / 180.0) * incidence);
+      p_atmosSini = sin((PI / 180.0) * incidence);
+      hahgt0 = qromb.RombergsMethod(this, sub, 0, 180);
+      hahgt0 = hahgt0 * AtmosWha() * p_atmosMunot / (360.0 * p_atmosSini);
+    } else {
+      hahgt0 = p_atmosHahgt0Spline.Evaluate(incidence, NumericalApproximation::Extrapolate);
+    }
     p_trans0 = (emunot + hahgt0) * emu;
 
     // Calculate the transmission of light that must be subtracted from a shadow. This
     // includes direct flux and the scattered flux in the upsun half of the sky
     // downwelling onto the surface, and the usual transmission upward.
-    hahgt = p_atmosHahgtSpline.Evaluate(incidence, NumericalApproximation::Extrapolate);
+    if (p_atmosEstTau) {
+      NumericalAtmosApprox::IntegFunc sub;
+      sub = NumericalAtmosApprox::OuterFunction;
+      NumericalAtmosApprox qromb;
+      p_atmosAtmSwitch = 1;
+      qromb.Reset();
+      hahgt = qromb.RombergsMethod(this, sub, 90, 180);
+      hahgt = .5 * (p_gammax * xmunot + p_gammay * ymunot - emunot) + hahgt *
+        AtmosWha() / 360.0;
+    } else {
+      hahgt = p_atmosHahgtSpline.Evaluate(incidence, NumericalApproximation::Extrapolate);
+    }
     p_transs = (emunot + hahgt) * emu;
   }
 }

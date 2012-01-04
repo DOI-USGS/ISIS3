@@ -111,10 +111,17 @@ namespace Isis {
     }
     
     if(algorithm.HasKeyword("Iord")) {
-      SetAtmosIord(((string)algorithm["Iord"]).compare("1") == 0);
+      SetAtmosIord(((string)algorithm["Iord"]).compare("YES") == 0);
     }
     else {
       p_atmosAddOffset = false;
+    }
+
+    if(algorithm.HasKeyword("EstTau")) {
+      SetAtmosEstTau(((string)algorithm["EstTau"]).compare("YES") == 0);
+    }
+    else {
+      p_atmosEstTau = false;
     }
   }
 
@@ -689,6 +696,71 @@ namespace Isis {
   }
 
   /**
+   * This method is a modified version of the GenerateHahgTables
+   * method and is used solely for shadow modeling. Unlike the
+   * GenerateHahgTables method, this method does not tabulate the
+   * first or third integrals. It only evaluates the middle 
+   * integral that corrects the sbar variable (illumination of
+   * the ground by the sky).
+   *
+   * @internal
+   *   @history 1998-12-21 Randy Kirk - USGS, Flagstaff - Original
+   *            specs
+   *   @history 1999-01-15 K Teal Thompson - Original code
+   *   @history 2006-07-07 Randy Kirk - Modify get_ah_table to get
+   *            other integrals
+   *   @history 2000-09-15 Randy Kirk - Delete first, last integrals
+   *            and table of second integral
+   *   @history 2000-12-29 Randy Kirk - Modified /hide_inc/ so phi
+   *            gets passed, etc. moved factors to outside
+   *            integration
+   *   @history 2011-12-16 Janet Barrett - Imported to Isis3 from
+   *            Isis2 get_hahgsb_shad routine in the not_shadow_tau
+   *            set of routines
+   */
+  void AtmosModel::GenerateHahgTablesShadow() {
+    int inccnt;         // for loop incidence angle count,1:ninc
+    double fun_temp;    // temporary variable for integral
+    double factor;      // factor for integration: 1 except at ends of interval where it's 1/2
+    int nincl = 19;     // used instead of p_atmosNinc
+    double deltaInc;    // limits table size and increment used
+
+    NumericalAtmosApprox::IntegFunc sub;
+    sub = NumericalAtmosApprox::OuterFunction;
+
+    p_atmosHahgsb = 0.0;
+    NumericalAtmosApprox qromb;
+    deltaInc = 90.0/(double)(nincl-1.0);
+
+    for(inccnt = 0; inccnt < nincl; inccnt++) {
+      p_atmosInc = deltaInc * (double) inccnt;
+      p_atmosMunot = cos((PI / 180.0) * p_atmosInc);
+      p_atmosSini = sin((PI / 180.0) * p_atmosInc);
+
+      p_atmosAtmSwitch = 2;
+
+      qromb.Reset();
+      if (p_atmosInc >= 90.0) {
+        fun_temp = 0.0;
+      } else {
+        fun_temp = qromb.RombergsMethod(this, sub, 0, 180);
+      }
+
+      if((inccnt == 0) || (inccnt == nincl - 1)) {
+        factor = 0.5;
+      }
+      else {
+        factor = 1.0;
+      }
+      p_atmosHahgsb = p_atmosHahgsb + p_atmosSini * factor * fun_temp *
+        AtmosWha() / 360.0;
+    }
+
+    factor = 2.0 * deltaInc * PI / 180.0;
+    p_atmosHahgsb = p_atmosHahgsb * factor;
+  }
+
+  /**
   * Set the switch that controls the function that will be
   * integrated. This method is only used for testing the
   * methods in this class. This parameter is limited to the
@@ -913,5 +985,24 @@ namespace Isis {
     }
 
     SetAtmosIord(temp.compare("YES") == 0);
+  }
+  
+  /**
+   * Estimate the optical depth tau using shadows
+   * 
+   * @author Janet Barrett (12/16/2011)
+   * 
+   * @param esttau true/false
+   */
+  void AtmosModel::SetAtmosEstTau(const string esttau) {
+    iString temp(esttau);
+    temp = temp.UpCase();
+
+    if(temp != "NO" && temp != "YES") {
+      string msg = "Invalid value of Atmospheric optical depth estimation[" + temp + "]";
+      throw iException::Message(iException::User, msg, _FILEINFO_);
+    }
+
+    SetAtmosEstTau(temp.compare("YES") == 0);
   }
 }

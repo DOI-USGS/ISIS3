@@ -64,6 +64,14 @@ namespace Isis {
    *  @history 2011-08-17 Sharmila Prasad -Added API's for HNORM, Additive Offset
    *  @history 2011-09-14 Janet Barrett - Got rid of bharef, hgaref,
    *           and wharef variables and supporting methods.
+   *  @history 2011-12-19 Janet Barrett - Added the p_atmosEstTau variable
+   *           that determines if the optical depth "tau" will be estimated
+   *           using shadow modeling. Added the GenerateHahgTablesShadow
+   *           method for doing the shadow modeling. Added a getter method
+   *           for accessing the Munot (normally the cosine of the incidence
+   *           angle) value in the atmospheric classes. Added a setter method
+   *           for setting the p_atmosEstTau variable which is used by the
+   *           atmospheric classes.
    */
   class AtmosModel {
     public:
@@ -84,6 +92,12 @@ namespace Isis {
       void GenerateAhTable();
       // Perform integration for Hapke Henyey-Greenstein atmosphere correction
       void GenerateHahgTables();
+      // Perform integration for Hapke Henyey-Greenstein atmosphere correction. This
+      // version is used for shadow modeling and does not tabulate the first and third
+      // integrals like GenerateHahgTables. It only evaluates the middle integral
+      // that corrects the sbar variable (which is the illumination of the ground
+      // by the sky).
+      void GenerateHahgTablesShadow();
       // Set parameters needed for atmospheric correction
       void SetAtmosAtmSwitch(const int atmswitch);
       void SetAtmosBha(const double bha);
@@ -96,6 +110,7 @@ namespace Isis {
       void SetAtmosWha(const double wha);
       void SetAtmosHnorm(const double hnorm);
       void SetAtmosIord(const string offset);
+      void SetAtmosEstTau(const string esttau);
       
       //! Return atmospheric algorithm name
       string AlgorithmName() const {
@@ -147,6 +162,10 @@ namespace Isis {
       //! Return atmospheric Ninc value
       int AtmosNinc() const {
         return p_atmosNinc;
+      };
+      //! Return atmospheric Munot value
+      double AtmosMunot() const {
+        return p_atmosMunot;
       };
       
       //! Return atmospheric IncTable value
@@ -221,6 +240,9 @@ namespace Isis {
       void SetAtmosIord(bool offset) {
         p_atmosAddOffset = offset;
       }
+      void SetAtmosEstTau(bool esttau) {
+        p_atmosEstTau = esttau;
+      }
       void SetOldTau(double tau) {
         p_atmosTauold = tau;
       }
@@ -260,6 +282,7 @@ namespace Isis {
       double p_atmosAb;
       double p_atmosHnorm;     //!< Atmospheric shell thickness normalized to planet radius.
       bool   p_atmosAddOffset; //!< Allow additive offset in fit
+      bool   p_atmosEstTau;    //!< Estimate optical depth tau using shadows
       vector <double> p_atmosIncTable;
       vector <double> p_atmosAhTable;
       double p_atmosHahgsb;

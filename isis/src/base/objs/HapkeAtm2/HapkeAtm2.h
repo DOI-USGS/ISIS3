@@ -36,7 +36,7 @@ namespace Isis {
    *
    * @internal
    *  @history 2000-07-07 Randy Kirk - USGS, Flagstaff - Original
-   *          code
+   *                      code
    *  @history 2007-02-20 Janet Barrett - Imported from Isis2.
    *  @history 2007-08-15 Steven Lambright - Refactored code
    *  @history 2008-03-07 Janet Barrett - Moved code to set
@@ -44,9 +44,14 @@ namespace Isis {
    *                      class
    *  @history 2008-06-18 Stuart Sides - Fixed doc error
    *  @history 2008-11-05 Jeannie Walldren - Modified references
-   *            to NumericalMethods class. Added documentation
-   *            from Isis2.
+   *                      to NumericalMethods class. Added documentation
+   *                      from Isis2.
    *  @history 2011-08-18 Sharmila Prasad Moved common HNORM to base AtmosModel
+   *  @history 2011-12-19 Janet Barrett - Added code to estimate the
+   *                      shadow brightness value (transs). Also got rid of
+   *                      unnecessary check for identical photometric angle values
+   *                      between successive calls. This check should only be
+   *                      made in the photometric models.
    */
   class HapkeAtm2 : public AtmosModel {
     public:

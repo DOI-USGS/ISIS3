@@ -50,6 +50,11 @@ namespace Isis {
    *            NumericalMethods::r8ei() with AtmosModel::Ei().
    *            Added documentation from Isis2.
    *  @history 2011-08-17 Sharmila Prasad - Moved common HNORM to base AtmosModel
+   *  @history 2011-12-19 Janet Barrett - Added code to estimate the
+   *           shadow brightness value (transs). Also got rid of
+   *           unnecessary check for identical photometric angle values
+   *           between successive calls. This check should only be
+   *           made in the photometric models.
    */
   class Anisotropic2 : public AtmosModel {
     public:

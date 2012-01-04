@@ -44,6 +44,11 @@ namespace Isis {
    *          NumericalMethods::r8expint() with AtmosModel::En().
    *          Replaced Isis::PI with PI since this is in Isis
    *          namespace.
+   * @history 2011-12-19 Janet Barrett - Added code to estimate the
+   *          shadow brightness value (transs). Also got rid of
+   *          unnecessary check for identical photometric angle values
+   *          between successive calls. This check should only be
+   *          made in the photometric models.
    */
   void Isotropic1::AtmosModelAlgorithm(double phase, double incidence, double emission) {
     double hpsq1;
@@ -56,19 +61,6 @@ namespace Isis {
     double ymu, ymunot;
     double fix;
     double gmunot, gmu;
-
-    static double old_phase = -9999;
-    static double old_incidence = -9999;
-    static double old_emission = -9999;
-
-    if (phase == old_phase && incidence == old_incidence &&
-        emission == old_emission) {
-      return;
-    }
-
-    old_phase = phase;
-    old_incidence = incidence;
-    old_emission = emission;
 
     if(p_atmosTau == 0.0) {
       p_pstd = 0.0;
