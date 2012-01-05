@@ -402,6 +402,50 @@ void IsisMain() {
   remove("isisMosaic_02.cub");
 
   cout << "****** End Average **********************\n";
+  
+ // Test for band priority using Band Number
+  cout << "11. Test for band priority with Tracking Off and BandNumber set\n";
+  Isis::ProcessMosaic m11;
+  m11.SetTrackFlag(false);
+  m11.SetCreateFlag(true);
+  m11.SetPriority(Isis::ProcessMosaic::band);
+  m11.SetBandNumber(1);
+  m11.SetBandCriteria(Lesser);
+  //m11.SetHighSaturationFlag(true) ;
+  //m11.SetLowSaturationFlag(false) ;
+  //m11.SetNullFlag(false) ;
+
+  m11.SetInputCube("FROM", 1, 1, 1, 5, 5, 1);
+
+  p.SetOutputCube("TO", 5, 5, 2);
+  p.EndProcess();
+  m11.SetOutputCube("TO");
+
+  m11.StartProcess(1, 3, 1);
+  m11.EndProcess();
+
+  TestIn(1, 1, 1, 5, 5, 1);
+  TestOut(1, 3, 1, iDefault, Isis::ProcessMosaic::band, 0);
+  
+  Isis::ProcessMosaic m12;
+  m12.SetTrackFlag(false);
+  m12.SetCreateFlag(true);
+  m12.SetPriority(Isis::ProcessMosaic::band);
+  m12.SetBandNumber(1);
+  m12.SetBandCriteria(Lesser);
+  //m11.SetHighSaturationFlag(true) ;
+  //m11.SetLowSaturationFlag(false) ;
+  //m11.SetNullFlag(false) ;
+
+  m12.SetInputCube("FROM", 1, 1, 1, 5, 5, 1);
+  m12.SetOutputCube("TO");
+  m12.StartProcess(1, 1, 1);
+  m12.EndProcess();
+  
+  TestOut(1, 1, 1, iDefault, Isis::ProcessMosaic::band, 0);
+
+  cout << "************************************************************************************************\n";
+  
   // ***********************************************************
   // Testing Errors
 

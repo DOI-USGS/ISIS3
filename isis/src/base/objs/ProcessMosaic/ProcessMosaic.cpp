@@ -45,29 +45,29 @@ namespace Isis {
     SetBandBinMatch(true);
 
     // Initialize the structure Track Info
-    mMosaicOptions.bTrack    = false;
-    mMosaicOptions.bCreate   = false;
-    mMosaicOptions.iBandNum  = 0;
-    mMosaicOptions.sKeyName  = "";
-    mMosaicOptions.sKeyValue = "";
-    mMosaicOptions.eCriteria = Lesser;
-    mMosaicOptions.iInBand   = 0;
-    mMosaicOptions.iOutBand  = 0;
+    m_mosaicOptions.bTrack    = false;
+    m_mosaicOptions.bCreate   = false;
+    m_mosaicOptions.iBandNum  = 0;
+    m_mosaicOptions.sKeyName  = "";
+    m_mosaicOptions.sKeyValue = "";
+    m_mosaicOptions.eCriteria = Lesser;
+    m_mosaicOptions.iInBand   = 0;
+    m_mosaicOptions.iOutBand  = 0;
 
     // Initialize the Special Pixel Flags
-    mbHighSat = false;
-    mbLowSat = false;
-    mbNull = false;
+    m_highSat = false;
+    m_lowSat = false;
+    m_null = false;
 
     // Default Priority OnTop
-    mePriority = input;
+    m_priority = input;
 
-    mbMatchDEM = false;
+    m_matchDEM = false;
     
     // Initialize the data members
-    miOss = -1;
-    miOsl = -1;
-    miOsb = -1;
+    m_oss = -1;
+    m_osl = -1;
+    m_osb = -1;
   };
 
   /**
@@ -103,10 +103,7 @@ namespace Isis {
   * @author Sharmila Prasad (8/25/2009)
   */
   void ProcessMosaic::StartProcess(const int &os, const int &ol, const int &ob) {
-    int outSample = os;
-    int outLine   = ol;
-    int outFile   = ob;
-
+ 
     // Error checks ... there must be one input and one output
     if((OutputCubes.size() != 1) || (InputCubes.size() != 1)) {
       string m = "You must specify exactly one input and one output cube";
@@ -114,65 +111,55 @@ namespace Isis {
     }
 
     bool bTrackExists = false;
-    if(!mMosaicOptions.bCreate) {
+    if(!m_mosaicOptions.bCreate) {
       bTrackExists = GetTrackStatus();
     }
     
     // **
     // Set up the input sub cube (This must be a legal sub-area of the input cube)
     // *
-    int ins = p_ins;
-    int inl = p_inl;
-    int inb = p_inb;
 
-    if(ins == 0) ins = (int)InputCubes[0]->getSampleCount();
-    if(inl == 0) inl = (int)InputCubes[0]->getLineCount();
-    if(inb == 0) inb = (int)InputCubes[0]->getBandCount();
+    if(m_ins == 0) m_ins = (int)InputCubes[0]->getSampleCount();
+    if(m_inl == 0) m_inl = (int)InputCubes[0]->getLineCount();
+    if(m_inb == 0) m_inb = (int)InputCubes[0]->getBandCount();
 
     // Adjust the input sub-area if it overlaps any edge of the output cube
-    int iss = p_iss;
-    int isl = p_isl;
-    int isb = p_isb;
-
-    miOss = outSample;
-    miOsl = outLine;
-    miOsb = outFile;
+    m_oss = os;
+    m_osl = ol;
+    m_osb = ob;
 
     // Left edge
-    if(outSample < 1) {
-      miOss = outSample - 1;
-      iss = iss - outSample + 1;
-      ins = ins + outSample - 1;
-      outSample = 1;
+    if(m_oss < 1) {
+      m_iss = m_iss - m_oss + 1;
+      m_ins = m_ins + m_oss - 1;
+      m_oss = 1;
     }
     // Top edge
-    if(outLine < 1) {
-      miOsl = outLine - 1;
-      isl = isl - outLine + 1;
-      inl = inl + outLine - 1;
-      outLine = 1;
+    if(m_osl < 1) {
+      m_isl = m_isl - m_osl + 1;
+      m_inl = m_inl + m_osl - 1;
+      m_osl = 1;
     }
     // Right edge
-    if((outSample + ins - 1) > OutputCubes[0]->getSampleCount()) {
-      ins = OutputCubes[0]->getSampleCount() - outSample + 1;
+    if((m_oss + m_ins - 1) > OutputCubes[0]->getSampleCount()) {
+      m_ins = OutputCubes[0]->getSampleCount() - m_oss + 1;
     }
     // Bottom edge
-    if((outLine + inl - 1) > OutputCubes[0]->getLineCount()) {
-      inl = OutputCubes[0]->getLineCount() - outLine + 1;
+    if((m_osl + m_inl - 1) > OutputCubes[0]->getLineCount()) {
+      m_inl = OutputCubes[0]->getLineCount() - m_osl + 1;
     }
     
     // Tests for completly off the mosaic
-    if((ins < 1) || (inl < 1)) {
+    if((m_ins < 1) || (m_inl < 1)) {
       string m = "The input cube does not overlap the mosaic";
       throw Isis::iException::Message(Isis::iException::User, m, _FILEINFO_);
     }
 
     // Band Adjustments
-    if(outFile < 1) {
-      miOsb = outFile - 1;
-      isb = isb - outFile + 1;
-      inb = inb + outFile - 1;
-      outFile = 1;
+    if(m_osb < 1) {
+      m_isb = m_isb - m_osb + 1;
+      m_inb = m_inb + m_osb - 1;
+      m_osb = 1;
     }
     
     p_progress->SetMaximumSteps((int)InputCubes[0]->getLineCount() * (int)InputCubes[0]->getBandCount());
@@ -182,11 +169,11 @@ namespace Isis {
     // (1) Band priority,
     // (2) Ontop and Beneath priority with number of bands equal to 1,
     // (3) Ontop priority with all the special pixel flags set to true
-    if(mMosaicOptions.bTrack) {
-      if(!(mePriority == band  ||
-          ((mePriority == input || mePriority == mosaic) && 
+    if(m_mosaicOptions.bTrack) {
+      if(!(m_priority == band  ||
+          ((m_priority == input || m_priority == mosaic) && 
            (OutputCubes[0]->getBandCount()-1) == 1) ||   // tracking band was already created for Tracking=true
-          (mePriority == input && mbHighSat && mbLowSat && mbNull)) ){
+          (m_priority == input && m_highSat && m_lowSat && m_null)) ){
         string m = "Tracking cannot be True for multi-band Mosaic with ontop or beneath priority";
         throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
       }
@@ -196,25 +183,25 @@ namespace Isis {
 
     Pvl *inLab  = InputCubes[0]->getLabel();
     // Create / Match DEM Shape Model if bMatchDEM Flag is enabled 
-    if (mbMatchDEM){
+    if (m_matchDEM){
       MatchDEMShapeModel();
     }
 
     // Check to make sure the bandbins match if necessary
-    if(mbBandbinMatch) {
+    if(m_bandBinMatch) {
       Pvl *outLab = OutputCubes[0]->getLabel();
 
       if(inLab->FindObject("IsisCube").HasGroup("BandBin")) {
         // Check to make sure the output cube has a bandbin group & make sure it
         // matches the input cube bandbin group
-        if(!mMosaicOptions.bCreate && outLab->FindObject("IsisCube").HasGroup("BandBin")) {
-          inb = 0;
+        if(!m_mosaicOptions.bCreate && outLab->FindObject("IsisCube").HasGroup("BandBin")) {
+          m_inb = 0;
 
-          MatchBandBinGroup(isb, outFile, inb);
+          MatchBandBinGroup();
         }
         // Otherwise copy the input cube bandbin to the output file
         else {
-          AddBandBinGroup(isb, outFile);
+          AddBandBinGroup();
         }
       }
       // BandBin group is not found
@@ -225,9 +212,9 @@ namespace Isis {
     }
     // Match BandBin set to false and CREATE and TRACKING is true
     else {
-      if(mMosaicOptions.bCreate) {
+      if(m_mosaicOptions.bCreate) {
         if (inLab->FindObject("IsisCube").HasGroup("BandBin")) {
-          AddBandBinGroup(isb, outFile);
+          AddBandBinGroup();
         }
         else {
           AddDefaultBandBinGroup();
@@ -237,14 +224,14 @@ namespace Isis {
 
     // Even if the track flag is off, if the track table exists continue tracking
     if(bTrackExists) {
-      mMosaicOptions.bTrack = true;
+      m_mosaicOptions.bTrack = true;
     }
 
     int iOriginBand = 0, iChanged = 0;
 
     // Do this before SetMosaicOrigin as we don't want to set the filename
     // in the table unless the band info is valid
-    if(mePriority == band) {
+    if(m_priority == band) {
       // Find the band to be compared
       FileType eFileType = FileType(0);
       GetBandIndex(eFileType);
@@ -253,126 +240,132 @@ namespace Isis {
     }
 
     // Image name into the table & Get the index for this input file
-    //int iInNumBands = inb - isb + 1; // actual number of inpur bands being transfered to mosaic
+    //int iInNumBands = m_inb - m_isb + 1; // actual number of inpur bands being transfered to mosaic
     int iIndex = GetIndexOffsetByPixelType();
 
     // Set the Mosaic Origin is Tracking is enabled
-    if(mMosaicOptions.bTrack) {
+    if(m_mosaicOptions.bTrack) {
       SetMosaicOrigin(iIndex);
     }
-    else if(mePriority == average && mMosaicOptions.bCreate) {
+    else if(m_priority == average && m_mosaicOptions.bCreate) {
       ResetCountBands();
     }
 
-    int iOutNumBands = OutputCubes[0]->getBandCount();
+    m_onb = OutputCubes[0]->getBandCount();
 
-    if(mMosaicOptions.bTrack) {
+    if(m_mosaicOptions.bTrack) {
       iOriginBand = OutputCubes[0]->getBandCount(); //Get the last band set aside for "Origin" 1 based
-      iOutNumBands--;
+      m_onb--;
       iChanged = 0;
 
       // For mosaic creation, the input is copied onto mosaic by default
-      if(mePriority == band && !mMosaicOptions.bCreate) {
-        BandComparison(iIndex, ins, inl, iss, isl, outSample, outLine);
+      if(m_priority == band && !m_mosaicOptions.bCreate) {
+        BandComparison(iIndex);
       }
     }
-    else if(mePriority == average) {
-      iOutNumBands /= 2;
+    else if(m_priority == average) {
+      m_onb /= 2;
     }
 
-    // Create portal buffers for the input and output files
-    Isis::Portal iPortal   (ins, 1, InputCubes[0]->getPixelType());
-    Isis::Portal oPortal   (ins, 1, OutputCubes[0]->getPixelType());
-    Isis::Portal origPortal(ins, 1, OutputCubes[0]->getPixelType());
+    // Process Band Priority with no tracking
+    if (m_priority == band && !m_mosaicOptions.bTrack ) {
+      BandPriorityWithNoTracking();
+    }
+    else {
+      // Create portal buffers for the input and output files
+      Isis::Portal iPortal   (m_ins, 1, InputCubes[0]->getPixelType());
+      Isis::Portal oPortal   (m_ins, 1, OutputCubes[0]->getPixelType());
+      Isis::Portal origPortal(m_ins, 1, OutputCubes[0]->getPixelType());
 
-    for(int ib = isb, ob = outFile; ib < (isb + inb) && ob <= iOutNumBands; ib++, ob++) {
-      for(int il = isl, ol = outLine; il < isl + inl; il++, ol++) {
-        // Set the position of the portals in the input and output cubes
-        iPortal.SetPosition(iss, il, ib);
-        InputCubes[0]->read(iPortal);
+      for(int ib = m_isb, ob = m_osb; ib < (m_isb + m_inb) && ob <= m_onb; ib++, ob++) {
+        for(int il = m_isl, ol = m_osl; il < m_isl + m_inl; il++, ol++) {
+          // Set the position of the portals in the input and output cubes
+          iPortal.SetPosition(m_iss, il, ib);
+          InputCubes[0]->read(iPortal);
 
-        oPortal.SetPosition(outSample, ol, ob);
-        OutputCubes[0]->read(oPortal);
+          oPortal.SetPosition(m_oss, ol, ob);
+          OutputCubes[0]->read(oPortal);
 
-        if(mMosaicOptions.bTrack) {
-          origPortal.SetPosition(outSample, ol, iOriginBand);
-          OutputCubes[0]->read(origPortal);
-        }
-        else if(mePriority == average) {
-          origPortal.SetPosition(outSample, ol, (ob+iOutNumBands));
-          OutputCubes[0]->read(origPortal);
-        }
-
-        bool bChanged = false;
-        // Move the input data to the output
-        for(int pixel = 0; pixel < oPortal.size(); pixel++) {
-          // Creating Mosaic, copy the input onto mosaic
-          // regardless of the priority
-          if(mMosaicOptions.bCreate) {
-            oPortal[pixel] = iPortal[pixel];
-            if(mMosaicOptions.bTrack) {
-              origPortal[pixel] = iIndex;
-              bChanged = true;
-            }
-            else if(mePriority == average) {
-              if(Isis::IsValidPixel(iPortal[pixel])) {
-                origPortal[pixel]=1;
-                bChanged = true;
-              }
-            }
-            iChanged++;
+          if(m_mosaicOptions.bTrack) {
+            origPortal.SetPosition(m_oss, ol, iOriginBand);
+            OutputCubes[0]->read(origPortal);
           }
-          // Band Priority
-          else if(mMosaicOptions.bTrack && mePriority == band) {
-            int iPixelOrigin = (int) origPortal[pixel];
-            if(iPixelOrigin == iIndex) {
-              oPortal[pixel] = iPortal[pixel];
-              iChanged++;
-              bChanged = true;
-            }
+          else if(m_priority == average) {
+            origPortal.SetPosition(m_oss, ol, (ob+m_onb));
+            OutputCubes[0]->read(origPortal);
           }
-          // OnTop/Input Priority
-          else if(mePriority == input) {
-            if(Isis::IsNullPixel(oPortal[pixel])  ||
-                Isis::IsValidPixel(iPortal[pixel]) ||
-                (mbHighSat && Isis::IsHighPixel(iPortal[pixel])) ||
-                (mbLowSat  && Isis::IsLowPixel(iPortal[pixel]))  ||
-                (mbNull    && Isis::IsNullPixel(iPortal[pixel]))) {
+
+          bool bChanged = false;
+          // Move the input data to the output
+          for(int pixel = 0; pixel < oPortal.size(); pixel++) {
+            // Creating Mosaic, copy the input onto mosaic
+            // regardless of the priority
+            if(m_mosaicOptions.bCreate) {
               oPortal[pixel] = iPortal[pixel];
-              if(mMosaicOptions.bTrack) {
+              if(m_mosaicOptions.bTrack) {
                 origPortal[pixel] = iIndex;
                 bChanged = true;
               }
-              iChanged++;
-            }
-          }
-          // Average priority
-          else if(mePriority == average) {
-            bChanged |= ProcessAveragePriority(pixel, iPortal, oPortal, origPortal);
-          }
-          // Beneath/Mosaic Priority
-          else if(mePriority == mosaic) {
-            if(Isis::IsNullPixel(oPortal[pixel])) {
-              oPortal[pixel] = iPortal[pixel];
-              // Set the origin if number of input bands equal to 1
-              // and if the track flag was set
-              if(mMosaicOptions.bTrack) {
-                origPortal[pixel] = iIndex;
-                bChanged = true;
+              else if(m_priority == average) {
+                if(Isis::IsValidPixel(iPortal[pixel])) {
+                  origPortal[pixel]=1;
+                  bChanged = true;
+                }
               }
               iChanged++;
             }
-          }
-        } // End sample loop
-        if(bChanged) {
-          if(mMosaicOptions.bTrack || mePriority == average) {
+            // Band Priority
+            else if(m_mosaicOptions.bTrack && m_priority == band) {
+              int iPixelOrigin = (int) origPortal[pixel];
+              if(iPixelOrigin == iIndex) {
+                oPortal[pixel] = iPortal[pixel];
+                iChanged++;
+                bChanged = true;
+              }
+            }
+            // OnTop/Input Priority
+            else if(m_priority == input) {
+              if(Isis::IsNullPixel(oPortal[pixel])  ||
+                 Isis::IsValidPixel(iPortal[pixel]) ||
+                 (m_highSat && Isis::IsHighPixel(iPortal[pixel])) ||
+                 (m_lowSat  && Isis::IsLowPixel(iPortal[pixel]))  ||
+                 (m_null    && Isis::IsNullPixel(iPortal[pixel]))) {
+                oPortal[pixel] = iPortal[pixel];
+                if(m_mosaicOptions.bTrack) {
+                  origPortal[pixel] = iIndex;
+                  bChanged = true;
+                }
+                iChanged++;
+              }
+            }
+            // Average priority
+            else if(m_priority == average) {
+              bChanged |= ProcessAveragePriority(pixel, iPortal, oPortal, origPortal);
+            }
+            // Beneath/Mosaic Priority
+            else if(m_priority == mosaic) {
+              if(Isis::IsNullPixel(oPortal[pixel])) {
+                oPortal[pixel] = iPortal[pixel];
+                // Set the origin if number of input bands equal to 1
+                // and if the track flag was set
+                if(m_mosaicOptions.bTrack) {
+                  origPortal[pixel] = iIndex;
+                  bChanged = true;
+                }
+                iChanged++;
+              }
+            }
+          } // End sample loop
+          if(bChanged) {
+            if(m_mosaicOptions.bTrack || m_priority == average) {
             OutputCubes[0]->write(origPortal);
+            }
           }
-        }
-        OutputCubes[0]->write(oPortal);
-        p_progress->CheckStatus();
-      } // End line loop
-    }   // End band loop
+          OutputCubes[0]->write(oPortal);
+          p_progress->CheckStatus();
+        } // End line loop
+      }   // End band loop
+    }
   } // End StartProcess
 
   /**
@@ -410,7 +403,7 @@ namespace Isis {
       }
     }
     else {
-      if(mMosaicOptions.bCreate) {
+      if(m_mosaicOptions.bCreate) {
         if(inLabel->FindObject("IsisCube").HasGroup("Kernels")) {
           string sShapeModel = inLabel->FindObject("IsisCube").FindGroup("Kernels").FindKeyword("ShapeModel")[0];
           size_t found = sShapeModel.rfind ("/");
@@ -485,9 +478,9 @@ namespace Isis {
     }
     // Input-Special, Flags-True
     else if(Isis::IsSpecial(piPortal[piPixel])) {
-      if((mbHighSat && Isis::IsHighPixel(piPortal[piPixel])) ||
-         (mbLowSat  && Isis::IsLowPixel (piPortal[piPixel]))  ||
-         (mbNull    && Isis::IsNullPixel(piPortal[piPixel]))) {
+      if((m_highSat && Isis::IsHighPixel(piPortal[piPixel])) ||
+         (m_lowSat  && Isis::IsLowPixel (piPortal[piPixel]))  ||
+         (m_null    && Isis::IsNullPixel(piPortal[piPixel]))) {
         poPortal[piPixel]    = piPortal[piPixel];
         porigPortal[piPixel] = 0;
         bChanged = true;
@@ -501,17 +494,13 @@ namespace Isis {
   *  and allows band to be replaced in mosaic if it is NA (not assigned).
   *  It expects the bands to be contiguous
   *
-  *  @piIsb - Input starting Band#
-  *  @piOsb - Output starting Band#
-  *  @piInb - Actual number of bands matching the mosaic
-  *
   *  returns None
   *
   *  @throws Isis::iException::Message
   *
   *  @author Sharmila Prasad (9/25/2009)
   */
-  void ProcessMosaic::MatchBandBinGroup(const int piIsb, const int piOsb, int &piInb) {
+  void ProcessMosaic::MatchBandBinGroup(void) {
     Pvl *inLab  = InputCubes[0]->getLabel();
     Pvl *outLab = OutputCubes[0]->getLabel();
 
@@ -523,19 +512,19 @@ namespace Isis {
     }
 
     //pvl - zero based
-    int iIsb = (piIsb - 1), iOsb = (piOsb - 1);
-    int iOutBandsHalf = OutputCubes[0]->getBandCount()/2;    
+    int isb = (m_isb - 1), osb = (m_osb - 1);
+    int iOutBandsHalf = OutputCubes[0]->getBandCount()/2;
 
     for(int i = 0; i < outBin.Keywords(); i++) {
       PvlKeyword &outKey = outBin[i];
       string sOutName = outKey.Name();
       if(inBin.HasKeyword(sOutName)) {
         PvlKeyword &inKey = inBin[sOutName];
-        for(int j = iOsb, k = iIsb; j < outKey.Size() && k < inKey.Size(); j++, k++) {
-//           piInb++;
+        for(int j = osb, k = isb; j < outKey.Size() && k < inKey.Size(); j++, k++) {
+//           m_inb++;
           if(outKey[j] == "NA") {
             outKey[j] = inKey[k];
-            if(mePriority == average) {
+            if(m_priority == average) {
               if(sOutName.find("Filter") != string::npos || 
                  sOutName.find("Name") != string::npos) {
                 outKey[j+iOutBandsHalf] = inKey[k] + "_Count";
@@ -558,19 +547,17 @@ namespace Isis {
         throw Isis::iException::Message(iException::User, msg, _FILEINFO_);
       }
     }
-//     piInb /= outBin.Keywords();
+//     m_inb /= outBin.Keywords();
 
-    int inputRange = InputCubes[0]->getBandCount() - iIsb;
-    int outputRange = OutputCubes[0]->getBandCount() - iOsb;
-    piInb = min(inputRange, outputRange);
+    int inputRange = InputCubes[0]->getBandCount() - isb;
+    int outputRange = OutputCubes[0]->getBandCount() - osb;
+    m_inb = min(inputRange, outputRange);
   }
 
   /**
    *  This method adds the BandBin group to the mosaic corresponding
    *  to the actual bands in the mosaic
-   *
-   *  @piIsb   - Input starting Band#
-   *  @piOsb   - Output starting Band#
+   *  
    *  returns None
    *
    *  @author Sharmila Prasad (9/24/2009)
@@ -578,21 +565,21 @@ namespace Isis {
    *  @history 2011-01-12 Sharmila Prasad Added logic for Count Bands for
    *  Average Priority
    */
-  void ProcessMosaic::AddBandBinGroup(int piIsb, int piOsb) {
+  void ProcessMosaic::AddBandBinGroup(void) {
     Pvl *inLab  = InputCubes[0]->getLabel();
     Pvl *outLab = OutputCubes[0]->getLabel();
 
     int iOutBands = OutputCubes[0]->getBandCount();
 
-    if(mMosaicOptions.bTrack) {
+    if(m_mosaicOptions.bTrack) {
       iOutBands -= 1;     // leave tracking band
     }
-    else if(mePriority == average) {
+    else if(m_priority == average) {
       iOutBands /= 2;
     }
 
-    int iIsb = piIsb - 1; // array zero based
-    int iOsb = piOsb - 1;
+    int isb = m_isb - 1; // array zero based
+    int osb = m_osb - 1;
 
     PvlGroup &cInBin  = inLab->FindGroup("BandBin", Pvl::Traverse);
     PvlGroup cOutBin("BandBin");
@@ -604,12 +591,12 @@ namespace Isis {
       int iInKeySize = cInKey.Size();
       PvlKeyword cOutKey(cInKey.Name());
       
-      for(int b = 0; b < iOsb; b++) {
+      for(int b = 0; b < osb; b++) {
         cOutKey += "NA";
       }
-      for(int b = iOsb; b < iOutBands; b++) {
-        if(iIsb < iInKeySize) {
-          cOutKey += cInKey[iIsb++];
+      for(int b = osb; b < iOutBands; b++) {
+        if(isb < iInKeySize) {
+          cOutKey += cInKey[isb++];
         }
         else {
           cOutKey += "NA";
@@ -618,15 +605,15 @@ namespace Isis {
 
       // Add the "TRACKING" band to the Keyword if the flag is set and also if the number of
       // input cube bands is same as the the keysize of the keyword in the BandBin group.
-      if(mMosaicOptions.bTrack && iInBands == iInKeySize) {
+      if(m_mosaicOptions.bTrack && iInBands == iInKeySize) {
         cOutKey += "TRACKING"; // for the origin band
       }
       
       // Tag the Count Bands if priority is Average. 
-      else if(mePriority == average) {
+      else if(m_priority == average) {
         int iTotalOutBands = OutputCubes[0]->getBandCount();
-        iIsb = piIsb - 1; // reset the input starting band
-        int iOutStartBand = iOutBands + iOsb; 
+        isb = m_isb - 1; // reset the input starting band
+        int iOutStartBand = iOutBands + osb; 
         string sKeyName = cInKey.Name();
         bool bFilterKey = false;
         if(sKeyName.find("Filter") != string::npos ||
@@ -635,13 +622,13 @@ namespace Isis {
           bFilterKey = true;
         }
         for(int ob=iOutBands; ob<iTotalOutBands; ob++) {
-          if(iIsb < iInKeySize && ob >= iOutStartBand) {
+          if(isb < iInKeySize && ob >= iOutStartBand) {
             if(bFilterKey) {
-              cOutKey += cInKey[iIsb++] + "_Count";
+              cOutKey += cInKey[isb++] + "_Count";
             }
             else {
               cOutKey += 0;
-              iIsb++;
+              isb++;
             }
           }
           else {
@@ -657,7 +644,7 @@ namespace Isis {
       }
 
       cOutBin += cOutKey;
-      iIsb = piIsb - 1;        // reinitialize the input starting band
+      isb = m_isb - 1;        // reinitialize the input starting band
     }
     outLab->FindObject("IsisCube").AddGroup(cOutBin);
   }
@@ -679,10 +666,10 @@ namespace Isis {
     int iOutBands = OutputCubes[0]->getBandCount();
     int iOutBandsTotal = iOutBands;
 
-    if(mMosaicOptions.bTrack) {
+    if(m_mosaicOptions.bTrack) {
       iOutBands--; // Leave tracking band
     }
-    else if(mePriority == average) {
+    else if(m_priority == average) {
       iOutBands /= 2;
     }
 
@@ -692,13 +679,13 @@ namespace Isis {
       cOutKey += "NA";
     }
     
-    if(mePriority == average) {
+    if(m_priority == average) {
       for(int i=iOutBands; i<iOutBandsTotal; i++) {
         cOutKey += "NA_Count";
       }
     }
 
-    if(mMosaicOptions.bTrack) {
+    if(m_mosaicOptions.bTrack) {
       cOutKey += "TRACKING";
     }
     
@@ -732,14 +719,14 @@ namespace Isis {
       cPvlLabel = *(OutputCubes[0]->getLabel());
 
     //if non-zero integer, must be original band #, 1 based
-    if(mMosaicOptions.iBandNum) {
+    if(m_mosaicOptions.iBandNum) {
       PvlKeyword cKeyOrigBand;
       if(cPvlLabel.FindGroup("BandBin", Pvl::Traverse).HasKeyword("OriginalBand")) {
         cKeyOrigBand = cPvlLabel.FindGroup("BandBin", Pvl::Traverse).FindKeyword("OriginalBand");
       }
       int iSize = cKeyOrigBand.Size();
       char buff[64];
-      sprintf(buff, "%d", mMosaicOptions.iBandNum);
+      sprintf(buff, "%d", m_mosaicOptions.iBandNum);
       for(int i = 0; i < iSize; i++) {
         if(std::string(buff) == cKeyOrigBand[i]) {
           iBandIndex = i + 1; //1 based get band index
@@ -751,12 +738,12 @@ namespace Isis {
     //key name
     else {
       PvlKeyword cKeyName;
-      if(cPvlLabel.FindGroup("BandBin", Pvl::Traverse).HasKeyword(mMosaicOptions.sKeyName)) {
-        cKeyName = cPvlLabel.FindGroup("BandBin", Pvl::Traverse).FindKeyword(mMosaicOptions.sKeyName);
+      if(cPvlLabel.FindGroup("BandBin", Pvl::Traverse).HasKeyword(m_mosaicOptions.sKeyName)) {
+        cKeyName = cPvlLabel.FindGroup("BandBin", Pvl::Traverse).FindKeyword(m_mosaicOptions.sKeyName);
       }
       int iSize = cKeyName.Size();
       for(int i = 0; i < iSize; i++) {
-        if(Isis::iString::Equal(mMosaicOptions.sKeyValue.c_str(), cKeyName[i].c_str())) {
+        if(Isis::iString::Equal(m_mosaicOptions.sKeyValue.c_str(), cKeyName[i].c_str())) {
           iBandIndex = i + 1; //1 based get key value index
           bFound = true;
           break;
@@ -769,9 +756,9 @@ namespace Isis {
     }
 
     if(peFileType == inFile)
-      mMosaicOptions.iInBand = iBandIndex;
+      m_mosaicOptions.iInBand = iBandIndex;
     else
-      mMosaicOptions.iOutBand = iBandIndex;
+      m_mosaicOptions.iOutBand = iBandIndex;
 
     return  iBandIndex;
   }
@@ -783,59 +770,128 @@ namespace Isis {
    * input pixel is assigned to the output if the origin pixel equals the current
    * input file index
    *
-   * @piIndex     - Filename Index for the origin band (default +
+   * @index     - Filename Index for the origin band (default +
    *                zero based index)
-   * @piIns       - Number of input samples
-   * @piInl       - Number of input lines
-   * @piIss       - Starting input sample
-   * @piIsl       - Starting input line
-   * @piOss       - Starting output sample
-   * @piOsl       - Starting output line
-   *
+   *  
    * @throws Isis::iException::Message
    *
    * @author Sharmila Prasad (9/04/2009)
    */
-  void ProcessMosaic::BandComparison(int piIndex, int piIns, int piInl, int piIss, int piIsl, int piOss, int piOsl) {
+  void ProcessMosaic::BandComparison(int index) {
     //
     // Create portal buffers for the input and output files
-    Isis::Portal cIportal(piIns, 1, InputCubes[0]->getPixelType());
-    Isis::Portal cOportal(piIns, 1, OutputCubes[0]->getPixelType());
-    Isis::Portal origPortal(piIns, 1, OutputCubes[0]->getPixelType());
+    Isis::Portal cIportal(m_ins, 1, InputCubes[0]->getPixelType());
+    Isis::Portal cOportal(m_ins, 1, OutputCubes[0]->getPixelType());
+    Isis::Portal origPortal(m_ins, 1, OutputCubes[0]->getPixelType());
 
     //Get the last band set aside for "Origin"
     int iOriginBand = OutputCubes[0]->getBandCount();
 
-    for(int iIL = piIsl, iOL = piOsl; iIL < piIsl + piInl; iIL++, iOL++) {
+    for(int iIL = m_isl, iOL = m_osl; iIL < m_isl + m_inl; iIL++, iOL++) {
       // Set the position of the portals in the input and output cubes
-      cIportal.SetPosition(piIss, iIL, mMosaicOptions.iInBand);
+      cIportal.SetPosition(m_iss, iIL, m_mosaicOptions.iInBand);
       InputCubes[0]->read(cIportal);
 
-      cOportal.SetPosition(piOss, iOL, mMosaicOptions.iOutBand);
+      cOportal.SetPosition(m_oss, iOL, m_mosaicOptions.iOutBand);
       OutputCubes[0]->read(cOportal);
 
-      origPortal.SetPosition(piOss, iOL, iOriginBand);
+      origPortal.SetPosition(m_oss, iOL, iOriginBand);
       OutputCubes[0]->read(origPortal);
 
       // Move the input data to the output
       for(int iPixel = 0; iPixel < cOportal.size(); iPixel++) {
         if(Isis::IsNullPixel(origPortal[iPixel]) ||
-            (mbHighSat && Isis::IsHighPixel(cIportal[iPixel])) ||
-            (mbLowSat  && Isis::IsLowPixel(cIportal[iPixel])) ||
-            (mbNull    && Isis::IsNullPixel(cIportal[iPixel]))) {
-          origPortal[iPixel] = piIndex;
+            (m_highSat && Isis::IsHighPixel(cIportal[iPixel])) ||
+            (m_lowSat  && Isis::IsLowPixel(cIportal[iPixel])) ||
+            (m_null    && Isis::IsNullPixel(cIportal[iPixel]))) {
+          origPortal[iPixel] = index;
         }
         else {
           if(Isis::IsValidPixel(cIportal[iPixel])) {
             if(Isis::IsSpecial(cOportal[iPixel]) ||
-                (mMosaicOptions.eCriteria == Lesser  && cIportal[iPixel] < cOportal[iPixel]) ||
-                (mMosaicOptions.eCriteria == Greater && cIportal[iPixel] > cOportal[iPixel])) {
-              origPortal[iPixel] = piIndex;
+                (m_mosaicOptions.eCriteria == Lesser  && cIportal[iPixel] < cOportal[iPixel]) ||
+                (m_mosaicOptions.eCriteria == Greater && cIportal[iPixel] > cOportal[iPixel])) {
+              origPortal[iPixel] = index;
             }
           }
         }
       }
       OutputCubes[0]->write(origPortal);
+    }
+  }
+  
+  /**
+   * Mosaicking for Band Priority with no Tracking
+   * 
+   * @author Sharmila Prasad (1/4/2012)
+   */
+  void ProcessMosaic::BandPriorityWithNoTracking(void) {
+    // Create portal buffers for the input and output files pointing to the
+    // specified band for comparison
+    Isis::Portal iComparePortal(m_ins, 1, InputCubes[0]->getPixelType());
+    Isis::Portal oComparePortal(m_ins, 1, OutputCubes[0]->getPixelType());
+
+    Isis::Portal resultsPortal (m_ins, 1, OutputCubes[0]->getPixelType());
+
+    // Create portal buffers for the input and output files
+    Isis::Portal iPortal(m_ins, 1, InputCubes[0]->getPixelType());
+    Isis::Portal oPortal(m_ins, 1, OutputCubes[0]->getPixelType());
+
+    for(int inLine = m_isl, outLine = m_osl; inLine < m_isl + m_inl; inLine++, outLine++) {
+      // Set the position of the portals in the input and output cubes
+      iComparePortal.SetPosition(m_iss, inLine, m_mosaicOptions.iInBand);
+      InputCubes[0]->read(iComparePortal);
+
+      oComparePortal.SetPosition(m_oss, outLine, m_mosaicOptions.iOutBand);
+      OutputCubes[0]->read(oComparePortal);
+      
+      Isis::Portal iPortal(m_ins, 1, InputCubes[0]->getPixelType());
+      Isis::Portal oPortal(m_ins, 1, OutputCubes[0]->getPixelType());
+      
+      bool inCopy = false;
+      
+      // Move the input data to the output
+      for(int iPixel = 0; iPixel < m_ins; iPixel++) {
+        resultsPortal[iPixel] = false;
+        if(m_mosaicOptions.bCreate) {
+          resultsPortal[iPixel] = true;
+          inCopy = true;
+        }
+        else if((m_highSat && Isis::IsHighPixel(iComparePortal[iPixel])) ||
+            (m_lowSat  && Isis::IsLowPixel (iComparePortal[iPixel]))  ||
+            (m_null    && Isis::IsNullPixel(iComparePortal[iPixel]))) {
+          resultsPortal[iPixel] = true;
+          inCopy = true;
+        }
+        else {
+          if(Isis::IsValidPixel(iComparePortal[iPixel])) {
+            if(Isis::IsSpecial(oComparePortal[iPixel]) ||
+                (m_mosaicOptions.eCriteria == Lesser  && iComparePortal[iPixel] < oComparePortal[iPixel]) ||
+                (m_mosaicOptions.eCriteria == Greater && iComparePortal[iPixel] > oComparePortal[iPixel])) {
+              resultsPortal[iPixel] = true;
+              inCopy = true;
+            }
+          }
+        }
+      }
+      
+      if(inCopy) {
+        for(int ib = m_isb, ob = m_osb; ib < (m_isb + m_inb) && ob <= m_onb; ib++, ob++) {
+          // Set the position of the portals in the input and output cubes
+          iPortal.SetPosition(m_iss, inLine, ib);
+          InputCubes[0]->read(iPortal);
+  
+          oPortal.SetPosition(m_oss, outLine, ob);
+          OutputCubes[0]->read(oPortal);
+            
+          for(int iPixel = 0; iPixel < m_ins; iPixel++) {
+            if(resultsPortal[iPixel]) {
+              oPortal[iPixel] = iPortal[iPixel];
+            }
+          }
+          OutputCubes[0]->write(oPortal);
+        }
+      }
     }
   }
 
@@ -851,7 +907,7 @@ namespace Isis {
     int iFileIndex, iFileCount;
 
     Isis::Portal origPortal(iSamples, 1, OutputCubes[0]->getPixelType());
-    if(mePriority == average) {
+    if(m_priority == average) {
       for(int line=1; line<=iLines; line++) {
         origPortal.SetPosition(1, line, iBand/2+1);  //sample, line, band position
         OutputCubes[0]->read(origPortal);
@@ -878,7 +934,6 @@ namespace Isis {
       }
     }
   }
-
 
   /**
    * This method returns the start value depending on the pixel
@@ -1015,7 +1070,7 @@ namespace Isis {
    * records to new file size. When the table is newly created,it
    * resets the origin band to default based on pixel type.
    *
-   * @param piIndex - the input file index
+   * @param index - the input file index
    *
    * @returns none
    *
@@ -1026,7 +1081,7 @@ namespace Isis {
    *
    * @author Sharmila Prasad (8/28/2009)
    */
-  void ProcessMosaic::SetMosaicOrigin(int &piIndex) {
+  void ProcessMosaic::SetMosaicOrigin(int &index) {
     // Get only the file name
     std::string sInputFile = Filename(InputCubes[0]->getFilename()).Name();
     std::string sTableName = SRC_IMAGE_TBL;
@@ -1071,7 +1126,7 @@ namespace Isis {
             PvlKeyword cFieldKey = cPvlObj.FindGroup("Field").FindKeyword("Size");
 
             //set the tracker flag to true as the tracking table exists
-            mMosaicOptions.bTrack = true;
+            m_mosaicOptions.bTrack = true;
 
             // Create a new blank table
             Table cFileTable(sTableName);
@@ -1116,7 +1171,7 @@ namespace Isis {
 
               // ostm << "File=" << string(cFileTable_Copy[i][0]).c_str() << "   Length=" << string(cFileTable_Copy[i][0]).length() << "  Compare=" << str.compare(sInputFile) << "\n";
               if(sTableFile.compare(sInputFile) == 0) {
-                piIndex += i;
+                index += i;
                 return;
               }
 
@@ -1144,7 +1199,7 @@ namespace Isis {
               cFileTable += cFileTable_Copy[i];
             }
             // Get the current image file index
-            piIndex += iRecs;
+            index += iRecs;
 
             // Add the current input image record to the new table
             cFileTable +=  cFileRecord;
@@ -1158,7 +1213,7 @@ namespace Isis {
     }
 
     //creating new table if track flag is true
-    if(mMosaicOptions.bCreate && mMosaicOptions.bTrack) {
+    if(m_mosaicOptions.bCreate && m_mosaicOptions.bTrack) {
       Table cFileTable(sTableName, cFileRecord);
       cFileTable += cFileRecord;
       OutputCubes[0]->write(cFileTable);
@@ -1214,12 +1269,12 @@ namespace Isis {
       throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
     }
 
-    p_iss = ss;
-    p_isl = sl;
-    p_isb = sb;
-    p_ins = ns;
-    p_inl = nl;
-    p_inb = nb;
+    m_iss = ss;
+    m_isl = sl;
+    m_isb = sb;
+    m_ins = ns;
+    m_inl = nl;
+    m_inb = nb;
 
     Isis::Cube *cInCube = Isis::Process::SetInputCube(parameter);
 
@@ -1283,12 +1338,12 @@ namespace Isis {
       throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
     }
 
-    p_iss = ss;
-    p_isl = sl;
-    p_isb = sb;
-    p_ins = ns;
-    p_inl = nl;
-    p_inb = nb;
+    m_iss = ss;
+    m_isl = sl;
+    m_isb = sb;
+    m_ins = ns;
+    m_inl = nl;
+    m_inb = nb;
 
     Isis::Cube *cInCube = Isis::Process::SetInputCube(fname, att);
 
@@ -1339,7 +1394,7 @@ namespace Isis {
       throw;
     }
 
-    if(mMosaicOptions.bCreate) {
+    if(m_mosaicOptions.bCreate) {
       Pvl *outLab = cube->getLabel();
       if(outLab->FindObject("IsisCube").HasGroup("BandBin")) {
         outLab->FindObject("IsisCube").DeleteGroup("BandBin");

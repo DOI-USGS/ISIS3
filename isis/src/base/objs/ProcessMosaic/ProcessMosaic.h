@@ -173,6 +173,8 @@ namespace Isis {
    *                                        is not enabled
    *  @history 2011-12-30 Sharmila Prasad - Fixed #00587, Disable Tracking for multiband mosaic for
    *                      ontop or beneath priority
+   *  @history 2012-01-05 Sharmila Prasad - Fixed #00586 Allow Band Priority with no Tracking
+   *  
    *  @todo 2005-02-11 Stuart Sides - add coded example and implementation example
    *                                  to class documentation
    */
@@ -252,7 +254,7 @@ namespace Isis {
        * @param pbFlag - The boolean value to set the bandbin match parameter
        */
       void SetBandBinMatch(bool pbFlag) {
-        mbBandbinMatch = pbFlag;
+        m_bandBinMatch = pbFlag;
       };
 
       /** 
@@ -269,8 +271,10 @@ namespace Isis {
 
       //! Compare the input and mosaic for the specified band based on the 
       //! criteria and update the mosaic origin band
-      void BandComparison(int piIndex, int piIns, int piInl, int piIss, 
-                          int piIsl, int piOss, int piOsl);
+      void BandComparison(int index);
+      
+      //! Mosaicking for Band Priority with no Tracking
+      void BandPriorityWithNoTracking(void);
 
       //! Get the default origin value based on pixel type for the origin band
       int GetOriginDefaultByPixelType(void);
@@ -289,17 +293,17 @@ namespace Isis {
        * @return MosaicPriority 
        */
       MosaicPriority GetPriority(void){
-        return mePriority;
+        return m_priority;
       };
       
       //! New mosaic, add the Band Bin group specific to the mosaic
-      void AddBandBinGroup(int piIsb, int piOsb);
+      void AddBandBinGroup(void);
 
       //! Default BandBin group if Match BandBin is set to False
       void AddDefaultBandBinGroup(void);
 
       //! Mosaic exists, match the band with the input image
-      void MatchBandBinGroup(const int piIsb, const int piOsb, int &piInb);
+      void MatchBandBinGroup(void);
       
       //! Process average priority
       bool ProcessAveragePriority(int piPixel, Portal& pInPortal, Portal& pOutPortal, Portal& pOrigPortal);
@@ -320,7 +324,7 @@ namespace Isis {
         * @param pbFlag 
         */
        void SetHighSaturationFlag(bool pbFlag) {
-         mbHighSat = pbFlag;
+         m_highSat = pbFlag;
        } ;
        
        /**
@@ -331,7 +335,7 @@ namespace Isis {
         * @param pbFlag 
         */
        void SetLowSaturationFlag(bool pbFlag) {
-         mbLowSat  = pbFlag;
+         m_lowSat  = pbFlag;
        } ;
        
        /**
@@ -342,7 +346,7 @@ namespace Isis {
         * @param pbFlag 
         */
        void SetNullFlag(bool pbFlag) {
-         mbNull    = pbFlag;
+         m_null    = pbFlag;
        } ;
        
        /**
@@ -353,7 +357,7 @@ namespace Isis {
         * @return bool 
         */
        bool GetHighSaturationFlag(void) {
-         return mbHighSat;
+         return m_highSat;
        } ;
 
        /**
@@ -364,7 +368,7 @@ namespace Isis {
         * @return bool 
         */
        bool GetLowSaturationFlag(void) {
-         return mbLowSat;
+         return m_lowSat;
        };
        
        /**
@@ -375,7 +379,7 @@ namespace Isis {
         * @return bool
         */
        bool GetNullFlag(void) {
-         return mbNull;
+         return m_null;
        };
 
       /**
@@ -386,7 +390,7 @@ namespace Isis {
        * @param pePriority - one of the four priorities
        */
       void SetPriority(MosaicPriority pePriority) {
-        mePriority = pePriority;
+        m_priority = pePriority;
       };
 
       /**
@@ -397,7 +401,7 @@ namespace Isis {
        * @param pbMatchDEM 
        */
       void SetMatchDEM(bool pbMatchDEM) {
-        mbMatchDEM = pbMatchDEM;
+        m_matchDEM = pbMatchDEM;
       }
       
       //! Match DEM between Input & Mosaic if MatchDEM Flag is enabled
@@ -411,12 +415,12 @@ namespace Isis {
        * @param pbFlag - set the tracking flag 
        */
       void SetTrackFlag(bool pbFlag) {
-        mMosaicOptions.bTrack = pbFlag;
+        m_mosaicOptions.bTrack = pbFlag;
       };
       
       //! Get Track Flag status
       bool GetTrackFlag(void) {
-        return mMosaicOptions.bTrack;
+        return m_mosaicOptions.bTrack;
       };
 
       /**
@@ -428,7 +432,7 @@ namespace Isis {
        * @param pbFlag - Set Create Flag True/False
        */
       void SetCreateFlag(bool pbFlag) {
-        mMosaicOptions.bCreate  = pbFlag;
+        m_mosaicOptions.bCreate  = pbFlag;
       };
 
       /**
@@ -439,7 +443,7 @@ namespace Isis {
        * @param piBandNum - Band Number 
        */
       void SetBandNumber(int piBandNum) {
-        mMosaicOptions.iBandNum = piBandNum;
+        m_mosaicOptions.iBandNum = piBandNum;
       };
 
       /**
@@ -451,8 +455,8 @@ namespace Isis {
        * @param psKeyValue - Band Value
        */
       void SetBandKeyWord(std::string psKeyName, std::string psKeyValue) {
-        mMosaicOptions.sKeyName = psKeyName;
-        mMosaicOptions.sKeyValue = psKeyValue;
+        m_mosaicOptions.sKeyName = psKeyName;
+        m_mosaicOptions.sKeyValue = psKeyValue;
       };
 
       /**
@@ -463,7 +467,7 @@ namespace Isis {
        * @param peCriteria - Band Criteria
        */
       void SetBandCriteria(BandCriteria peCriteria) {
-        mMosaicOptions.eCriteria = peCriteria;
+        m_mosaicOptions.eCriteria = peCriteria;
       };
 
       //! Debugging
@@ -471,52 +475,53 @@ namespace Isis {
 
       //! Get the input file Line location in the mosaic
       int GetInputStartLineInMosaic(void) {
-        return miOsl;
+        return m_osl;
       };
       
       //! Get the input file Sample location in the mosaic
       int GetInputStartSampleInMosaic(void) {
-        return miOss;
+        return m_oss;
       };
       
       //! Get the input file Band location in the mosaic
       int GetInputStartBandInMosaic(void) {
-        return miOsb;
+        return m_osb;
       };
 
     private:
-      int p_iss; //!< The starting sample within the input cube
-      int p_isl; //!< The starting line within the input cube
-      int p_isb; //!< The starting band within the input cube
-      int p_ins; //!< The number of samples from the input cube
-      int p_inl; //!< The number of lines from the input cube
-      int p_inb; //!< The number of bands from the input cube
+      int m_iss; //!< The starting sample within the input cube
+      int m_isl; //!< The starting line within the input cube
+      int m_isb; //!< The starting band within the input cube
+      int m_ins; //!< The number of samples from the input cube
+      int m_inl; //!< The number of lines from the input cube
+      int m_inb; //!< The number of bands from the input cube
 
-      int miOss; //!< The starting sample within the output cube
-      int miOsl; //!< The starting line within the output cube
-      int miOsb; //!< The starting band within the output cube
+      int m_oss; //!< The starting sample within the output cube
+      int m_osl; //!< The starting line within the output cube
+      int m_osb; //!< The starting band within the output cube
+      int m_onb; //!< The number of bands in the output cube
       /**
        * True/False value to determine whether to enforce the input cube
        * bandbin matches the mosaic bandbin group
        */
-      bool mbBandbinMatch;
+      bool m_bandBinMatch;
 
       //! Flag to indicate whether DEM of the input and mosaic should match
-      bool mbMatchDEM;
+      bool m_matchDEM;
       
       //! Set the priority to input(ontop), mosaic(beneath) or band
-      MosaicPriority mePriority;
+      MosaicPriority m_priority;
 
       /**
        * Set the Special Pixels Flags to True/False.
        * True- allow the special pixel to be passed onto the mosaic. 
        * Holds good for input and band priority
        */
-      bool mbHighSat; //!< HS Flag
-      bool mbLowSat;  //!< LS Flag
-      bool mbNull;    //!< NULL Flag
+      bool m_highSat; //!< HS Flag
+      bool m_lowSat;  //!< LS Flag
+      bool m_null;    //!< NULL Flag
 
-      MosaicOptions mMosaicOptions; //!< Structure holding the tracking info
+      MosaicOptions m_mosaicOptions; //!< Structure holding the tracking info
   };
 };
 
