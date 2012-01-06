@@ -9,16 +9,16 @@
       <body>
         <definitions>
           <definition name="Adjusted">
-            The term, Adjusted, refers to the output pixel coordinate or output geographic location 
+            The term, Adjusted, refers to the output pixel coordinate or output geographic location
             within a control network.  Applications such as pointreg or jigsaw report and update
-            the "Adjusted" output pixel coordinate (pointreg) or geographic location (jigsaw) in 
+            the "Adjusted" output pixel coordinate (pointreg) or geographic location (jigsaw) in
             the output control network.
           </definition>
 
           <definition name="A Priori">
             The term, "A Priori", refers to the initial or original value of a pixel coordinate or
             geographic location within a control network.  Applications such as pointreg or jigsaw
-            refer to the a priori values for an input pixel coordinate (pointreg) or geographic 
+            refer to the a priori values for an input pixel coordinate (pointreg) or geographic
             location (jigsaw) in an input control network.
           </definition>
 
@@ -56,9 +56,9 @@
             Event kernels.  SPICE refers to all the information required by Isis
             in order to compute and map each image pixel onto a surface with
             reference to spacecraft position, sun position, instrument and
-            mission activities.  Isis uses software supplied by the Navigation
-            and Ancillary Information Facility (NAIF) for SPICE access and
-            kernel management (Refer to spiceinit).
+            mission activities.  Isis uses software (ToolKit) supplied by the
+            Navigation and Ancillary Information Facility (NAIF) for SPICE access
+            and kernel management (Refer to spiceinit).
             <p>
               SPICE is available only for mission instruments supported by Isis
               (camera models).
@@ -84,9 +84,9 @@
             LRS [Low Representation Saturation] is a representation special
             pixel value that is tracked and reported to the user.  LRS is set
             when an Isis application causes the output DN pixel to fall 'below'
-            the possible range of valid values.   
+            the possible range of valid values.
             <p>
-            LRS represents "Undersaturated".  LRS is set in 16-and 32-bit type image data.  
+            LRS represents "Undersaturated".  LRS is set in 16-and 32-bit type image data.
             For output 8-bit, LRS = NULL.
             </p>
           </definition>
@@ -105,9 +105,9 @@
             LIS [Low Instrument Saturation] is an instrument special pixel value
             that is tracked and reported to the user.  LIS is set during the
             ingestion of the image data into Isis.  The input image sensor
-            acquired a value too low to be measured accurately.  
+            acquired a value too low to be measured accurately.
             <p>
-              LIS represents "Undersaturated".  LIS is set in 16-and 32-bit type image data.  
+              LIS represents "Undersaturated".  LIS is set in 16-and 32-bit type image data.
               For 8-bit, LIS = NULL.
             </p>
           </definition>
@@ -116,16 +116,16 @@
             HIS [High Instrument Saturation] is an instrument special pixel
             value that is tracked and reported to the user.  HIS is set during
             the ingestion of the image data into Isis.  The input image sensor
-            acquired a value too high to be measured accurately.  
+            acquired a value too high to be measured accurately.
             <p>
-               HIS represents "Oversaturated".  HIS is set in 16-and 32-bit type image data.  
+               HIS represents "Oversaturated".  HIS is set in 16-and 32-bit type image data.
                For 8-bit image data, HIS = NULL.
             </p>
           </definition>
 
          <definition name="Control Network">
             A network of Control Points.  Within the ISIS environment, the control network
-            file is binary.  The network contains multiple fields of information for 
+            file is binary.  The network contains multiple fields of information for
             control points identified and measures collected between any number of image cubes.
             <p>
               Refer to qnet, cneteditor, cnetbin2pvl for more information about the control network
@@ -141,7 +141,7 @@
 
           <definition name="Control Point">
             One or more measurements (image coordinates) that identify the same feature or location
-            in different overlapping images. 
+            in different overlapping images.
           </definition>
 
          <definition name="Serial Number">
@@ -164,17 +164,17 @@
             For every point within the network, there is always one and only one
             associated Reference Measure (Reference=True).  The Reference
             Measure refers to a single image and it's pixel coordinate (measure)
-            that best represents a control point location or feature. 
-            <p> 
+            that best represents a control point location or feature.
+            <p>
               This specific element of the control network is exclusively used for
               co-registering all other overlapping and potential measures (images)
-              to the Reference Measure.  
+              to the Reference Measure.
             </p>
             <p>
-              There are control network applications that can set the Reference=True 
-              explicitly (cnetref, qnet) or 'runtime' implicitly (If reference is not set, 
-              the implicit default is the first 'valid' measure listed within a control point, 
-              refer to the 'pointreg' application for more information). 
+              There are control network applications that can set the Reference=True
+              explicitly (cnetref, qnet) or 'runtime' implicitly (If reference is not set,
+              the implicit default is the first 'valid' measure listed within a control point,
+              refer to the 'pointreg' application for more information).
             </p>
           </definition>
 
@@ -204,8 +204,8 @@
           <definition name="Digital Number">
             The numeric value of a single pixel in an image. The value may
             represent almost any unit. For example: reflectance (I/F), radiance,
-            elevation, or radius. DNs can be discrete integers or floating
-            point values. 
+            elevation, or radius. Digital Numbers (DNs) can be discrete integers 
+            or floating point values.
           </definition>
 
           <definition name="Level0">
@@ -213,22 +213,21 @@
             image has been ingested into Isis (PDS EDR) and will often have
             SPICE information loaded on the Isis cube labels (spiceinit).
             Level0 image cubes are often the input to mission specific
-            radiomatric calibration applications if supported in Isis.  
+            radiomatric calibration applications if supported in Isis.
             <p>
               Level0 implies a 'non-projected', raw image cube ('camera space').
             </p>
           </definition>
 
-
           <definition name="Level1">
             Level1 is a standard cartographic processing phase that describes an
             image has been radiometrically calibrated (PDS CDR or the Isis output
-            of a mission specific calibration application) with SPICE information 
-            loaded on the Isis cube labels.  
-            <p> 
-              This level will often represent an image that also has had  noise removed.  
-              Isis reports the camera geometry (viewing geometry of an image cube) for 
-              a Level1. Most Isis application names that start with a prefix of 'cam' 
+            of a mission specific calibration application) with SPICE information
+            loaded on the Isis cube labels.
+            <p>
+              This level will often represent an image that also has had  noise removed.
+              Isis reports the camera geometry (viewing geometry of an image cube) for
+              a Level1. Most Isis application names that start with a prefix of 'cam'
               expect a Level1  cube as input (refer to applications such as camstats, campt, cam2map).
             </p>
             <p>
@@ -236,12 +235,11 @@
             </p>
           </definition>
 
-
           <definition name="Level2">
             Level2 is a standard cartographic processing phase that describes an
             image has been map projected (PDS RDR).  The Level2 image cube labels contain
             Mapping keywords that describe the projection and all associated map
-            characteristics.  
+            characteristics.
             <p>
                Most Isis applications that start with a prefix of
               'map' expects a Level2 cube as input (refer to applications such as
@@ -251,7 +249,7 @@
               Level2 implies a 'map-projected' cube.
             </p>
           </definition>
- 
+
           <definition name="Elevation">
             The height above or below a fixed point on the surface of a body.
           </definition>
@@ -279,9 +277,9 @@
             The distance (vector) value between the center of and a point on a
             circle, sphere, ellipse or ellipsoid.  Refer to qview, camstats,
             campt as example reporting applications of the radius value at every
-            image pixel location.  
+            image pixel location.
             <p>
-               Isis expects and reports the radius value to be in Meters.
+               Isis expects and reports the radius value in Meters.
             </p>
             <p>
               Isis requires a radius DEM model in order to orthorectify an image
@@ -318,7 +316,7 @@
 
           <definition name="Phase Angle">
             The phase angle is the angle between the sun and the spacecraft at a point
-            on the surface.  Isis applications will use SPICE to compute this angle 
+            on the surface.  Isis applications will use SPICE to compute this angle
             from the ellipsoid or the elevation model (e.g., local slopes) at every pixel.
           <p>
              Phase Angle is in degrees.
@@ -341,7 +339,7 @@
           </definition>
 
           <definition name="Detector Resolution">
-            The size of the detector on the focal plane for each pixel. 
+            The size of the detector on the focal plane for each pixel.
           </definition>
 
           <definition name="I/F">
@@ -370,7 +368,7 @@
             it (ground point).  The only information required to calculate a
             ground azimuth is to form a spherical triangle from three points on
             the planet (ground point, north pole, and point of interest) The
-            point of interest is often the sub-spacecraft or sub-solar point).
+            point of interest is often the sub-spacecraft or sub-solar point.
             Spherical trignometry is then used to calculate the angle.
             <p>
               Ground Azimuth has nothing to do with the image, meaning it does
@@ -385,17 +383,17 @@
               reference line.  The reference line is formed by a line drawn
               horizontally from the origin point to the right side of the image (3
               o'clock reference if the image is viewed as a clock face) Azimuth
-              can also be referred to as Image Azimuth.  
+              can also be referred to as Image Azimuth.
            </p>
           </definition>
 
           <definition name="North Azimuth">
-            A clockwise angle from a point of origin to true North.  
+            A clockwise angle from a point of origin to true North.
             <p>
               The North Azimuth is measured in a positive clockwise direction from a
               reference line.  The reference line is formed by a line drawn
               horizontally from the origin point (pixel location) to the right
-              side of the image.  Refer to Azimuth.
+              side of the image (3 o'clock axis).  Refer to Azimuth.
             </p>
           </definition>
 
@@ -424,7 +422,7 @@
           <definition name="Off Nadir Angle">
             From the spacecraft, the Off Nadir is the angle between the nadir
             vector (subspacecraft vector) and the look vector.  Every pixel in
-            the image will result in a different Off Nadir Angle.  
+            the image will result in a different Off Nadir Angle.
             <p>
               OffNadirAngle is in degrees.
             </p>
@@ -438,14 +436,13 @@
             <p>
                SlewAngle is in degrees.
             </p>
-
           </definition>
 
           <definition name="SubSpacecraft Ground Azimuth">
             The Ground azimuth to the SubSpacecraft point (where the look vector
             from the spacecraft intercepts the target body) is obtained by
             taking true North (90 deg Latitude) and finding the clockwise angle
-            to the subspacecraft latitude and longitude point.  
+            to the subspacecraft latitude and longitude point.
             <p>
               The subspacecraft ground azimuth is complementary to the emission
               angle and can help to determine if two images would make a good
@@ -462,11 +459,11 @@
           <definition name="Subsolar Ground Azimuth">
             The Ground azimuth to the SubSolar point is obtained by taking true
             North (90 deg Latitude) and finding the clockwise angle to the
-            subsolar latitude and longitude point.  
+            subsolar latitude and longitude point.
             <p>
               The Subsolar Ground Azimuth is complementary to the incidence
               angle and gives more information about which direction the sun is
-              coming from.  
+              coming from.
             </p>
             <p>
               SubSolar Ground Azimuth is in degrees.
@@ -477,10 +474,10 @@
             The local emission angle is the angle between the spacecraft and a
             vector drawn perpendicular to the planet's surface (surface normal).
             <p>
-              Using SPICE, Isis applications compute this angle using an elevation model 
+              Using SPICE, Isis applications compute this angle using an elevation model
               (e.g., local slopes) at every pixel; ONLY if the elevation model exists on the
               image cube labels (Instrument Group, ShapeModel keyword, Refer to the Spiceinit
-              application).  If the elevation model does not exist, the computation will 
+              application).  If the elevation model does not exist, the computation will
               then be based on the the ellipsoid (the result will match "Emission Angle").
             </p>
             <p>
@@ -492,28 +489,390 @@
             The local incidence angle is the angle between the sun and a vector
             drawn perpendicular to the planet's surface (surface normal).
             <p>
-              Isis applications use SPICE to compute this angle using the elevation model 
+              Isis applications use SPICE to compute this angle using the elevation model
               (e.g., local slopes) at every pixel; ONLY IF the elevation model exists on
-              the image cube labels (Instrument Group, ShapeModel keyword, refer 
-              to the application, spiceinit).   If the elevation model does not exist, 
-              the computation will then be based on the ellipsoid 
+              the image cube labels (Instrument Group, ShapeModel keyword, refer
+              to the application, spiceinit).   If the elevation model does not exist,
+              the computation will then be based on the ellipsoid
               (the result will match "Incidence Angle").
             </p>
             <p>
               Local Incidence Angle is in degrees.
-            </p> 
+            </p>
           </definition>
 
           <definition name="Control Island">
              Ideally a control network will represent a single island of
              a list of overlapping images all tied together through
-             a network of control points and image measures (Refer to 
-             Control Measures).   
+             a network of control points and image measures (Refer to
+             Control Measures).
              <p>
-             Multiple islands can be identified within a single network 
-             if groups of images are isolated from one another due to no 
+             Multiple islands can be identified within a single network
+             if groups of images are isolated from one another due to no
              overlap or the absence of possible image measures.
              </p>
+          </definition>
+
+
+          <definition name="Body Fixed Coordinate">
+              A planetary coordinate system where the coordinates are
+              not time varying. 
+             <p>
+              For a body-fixed reference frame, Isis refers to the NAIF 
+              planet kernel (PCK) for high-accuracy orientation (rotation) 
+              data for any solar system target body.
+              This kernel includes location of the pole, prime meridian,
+              axis directions of a body-fixed, body-centered reference frame
+              and spin rate.
+             </p>
+          </definition>
+
+          <definition name="Right Ascension">
+              Right Ascension (RA) is one of two angles of the north pole
+              of a target body as a function of time.  
+             <p>
+              For more information, refer to Euler Angles, Declination and Prime Meridian
+             </p>
+          </definition>
+
+          <definition name="Declination">
+              Declination (Dec) is one of two angles of the north pole of
+              a target body as a function of time.
+             <p>
+              For more information, refer to Euler Angles, Right Ascension and Prime Meridian
+             </p>
+          </definition>
+
+          <definition name="Prime Meridian">
+              Prime Meridian (W) location is the third Euler angle which is expressed
+              as a rotation about the north pole as a function of time.  The reference
+              frame is J2000.
+             <p>
+              For more information, refer to Euler Angles
+             </p>
+          </definition>
+
+          <definition name="Euler Angles">
+              All the NAIF orientation models use three Euler angles to describe
+              body orientation.  The Euler angles describe the orientation of the
+              coordinate axes of the 'body equator and prime meridian' system with
+              respect to the J2000 system.
+             <p>
+              For more information, refer to Right Ascension (RA), Declination (Dec) 
+              and Prime Meridian (W)
+             </p>
+          </definition>
+
+          <definition name="Planetocentric Latitude">
+             Planetocentric Latitude is the angle between the equatorial plane
+             and a line from the center of the body.
+             <p>
+               For more details refer to the definition for Latitude Type and
+               the interactive demonstration in the "Learning About Map Projections"
+               on the IsisWorkshop website.
+             </p>
+          </definition>
+
+          <definition name="Planetographic Latitude">
+             Planetographic Latitude is the angle between the equatorial plane
+             and a line that is normal (perpendicular) to the surface body.
+             <p>
+               For more details refer to the definition for Latitude Type and
+               the interactive demonstration in the "Learning About Map Projections"
+               on the IsisWorkshop website.
+             </p>
+           </definition>
+
+         <definition name="Latitude">
+             Latitude represents a geographic position and is measured
+             from the equator, with positive longitudes going North and
+             negative values going South.
+             <p>
+               Latitude is in degrees.
+             </p>
+             <p>
+               Refer to the definition for Latitude Type for more information
+               within the Isis environment.
+             </p>
+           </definition>
+
+          <definition name="Latitude Type">
+             Latitudes can be represented either in Planetographic or
+             Planetocentric form.  Both latitudes are equivalent on a
+             sphere (i.e., the equatorial radius is equal to the polar
+             radius); however they differ on an ellipsoid body
+             (e.g., Mars, Earth).
+             <p>
+               The default for Latitude Type in Isis is Planetocentric.
+               Latitude Type will affect the computed values for latitude
+               range (Minimum and Maximum Latitude) and Center latitude.
+               Refer to the definitions for Planetocentric Latitude and
+               Planetographic Latitude.
+             </p>
+             <p>
+               Level2 map projections such as Sinusoidal, Simple Cylindrical,
+               and Equirectangular will differ depending on Latitude Type
+               for non-spherical bodies.  Other map projections are not
+               affected.
+             </p>
+           </definition>
+
+          <definition name="Longitude">
+             Longitude represents a geographic position and is measured
+             from a specified Prime Meridian (default is IAU)
+             for the target body.
+             <p>
+               Longitude is in degrees.
+             </p>
+             <p>
+              Refer to the definitions for Longitude Direction and
+              Longitude Domain for more information on computed and
+              reported values within the Isis environment.
+             </p>
+          </definition>
+
+          <definition name="Longitude Direction">
+             Longitude direction of a target body indicates whether
+             longitude increases (positive) to the east or the west.
+             <p>
+              The default for Longitude Direction in Isis is East.
+              Longitude Direction will affect the reported values
+              for longitude range (Minimum and Maximum Longitude)
+              and Center longitude.
+             </p>
+          </definition>
+
+          <definition name="Positive East Longitude">
+             The reported longitude values for a target body
+             increase positive to the East.
+             <p>
+              For more details refer to the definition for Longitude
+              Direction and the interactive demonstration in the
+              "Learning About Map Projections" on the IsisWorkshop
+              website.
+             </p>
+          </definition>
+
+          <definition name="Positive West Longitude">
+             The reported longitude values for a target body
+             increase positive to the West.
+             <p>
+              For more details refer to the definition for Longitude
+              Direction and the interactive demonstration in the
+              "Learning About Map Projections" on the IsisWorkshop
+              website.
+             </p>
+          </definition>
+
+          <definition name="Longitude Domain">
+             Longitude Domain specifies how longitudes should be
+             interpreted and reported for a target body.
+             <p>
+              Longitude Domain = 360 will report longitude values
+             (including Minimimum, Maximum and Center longitudue) in
+             a degree range between 0 to 360.
+             </p>
+             <p>
+              Longitude Domain = 180 will report longitude values
+             (including Minimimum, Maximum and Center longitudue) in
+             a degree range between -180 to 180.
+             </p>
+             <p>
+              For more details, refer to the interactive demonstration
+              in "Learning About Map Projections" on the IsisWorkshop
+              website.  For potential challenges refer to the workshop
+              discussion regarding image data that crosses the
+              Longitude Seams.
+             </p>
+             <p>
+              The default Longitude Domain in Isis is 360.
+             </p>
+          </definition>
+
+
+<!--
+          <definition name="Local Radius">
+
+             <p>
+
+             </p>
+          </definition>
+-->
+
+          <definition name="Spacecraft Position">
+              The Spacecraft Position is the position of the spacecraft (x,y,z)
+              in body-fixed rotating coordinate system.
+             <p>
+              Spacecraft position in body-fixed frame kilometer units.
+             </p>
+          </definition>
+
+          <definition name="Slant Distance">
+              The distance from the spacecraft to the point of interest
+              on the surface of the planet.
+              <p>
+                Slant Distance is reported in kilometers.
+              </p>
+          </definition>
+
+          <definition name="Target Center Distance">
+              The distance from the spacecraft to the target body center.
+             <p>
+               Target Center Distance is in kilometers
+             </p>
+          </definition>
+
+<!--
+          <definition name="Solar Distance">
+
+             <p>
+
+             </p>
+          </definition>
+
+          <definition name="Sun Position">
+
+             <p>
+
+             </p>
+          </definition>
+-->
+
+          <definition name="Ephemeris Time">
+             Ephemeris Time (ET) as defined by NAIF (Toolkit used by Isis),
+             is the uniform scale represented by the independent variable in
+             the differential equations that describe the motions of the planets,
+             sun and moon.  Ephemeris time is described as a count of ephemeris
+             seconds past the ephemeris reference epoch (J2000).
+             <p>
+               The basic spacial reference system for SPICE is the J2000 system.
+               This is an inertial reference frame in which the equations of
+               motion for the solar system may be integrated.  This reference
+               frame is specified by the orientation of the earth's mean equator
+               and equinox at a particular ephoch...the J2000 epoch.  This epoch
+               is Greenwich noon on January 1 2000 Barycentric Dynamical Time.
+             </p>
+             <p>
+               Ephemeris Time is in seconds.
+             </p>
+          </definition>
+
+          <definition name="UTC">
+            Coordinated Universal Time (UTC) is a system of time keeping
+            that gives an understandable name to each instant of time.  The
+            names are formed from the calendar date and time of day.  UTC format
+            consists of year, month, day, hour, minutes and seconds.
+             <p>
+              UTC is in string format.
+             </p>
+          </definition>
+
+          <definition name="Local Solar Time">
+             How high the sun is in the sky as seen from a particular site
+             on the surface of a planet.  The local solar time at a site on a
+             body is the angular difference between the planetocentric longitude
+             of the site and the planetocentric longitude of the Sun as seen
+             from the center of the body.
+          </definition>
+
+          <definition name="Solar Longitude">
+              The Solar Longitude is the planetocentric longitude of the sun
+              as seen from a point on a body.  It is considered a seasonal angle.
+             <p>
+              Also referred to as L_sub_S.
+             </p>
+          </definition>
+
+<!--
+          <definition name="BLOB">
+
+             <p>
+
+             </p>
+          </definition>
+-->
+
+          <definition name="PVL">
+             Parameter Value Language (PVL) is used extensively by
+             Isis as a standard keyword value type language for naming and
+             expressing data values. PVL format in Isis is compatible with
+             syntax used by the Planetary Data System.
+             <p>
+              For example, the keyword labels of a typical Isis image cube
+              is in PVL format (refer to catlab in order to view image cube labels).
+              A parameter name (or keyword name) is used to reference the value.
+              The value portion of an assignment statement may contain a simple value
+              (i.e., numeric, string, date/time value), a set or a sequence of values.
+             </p>
+             <p>
+              Refer to the Isis application, getkey, for one method of
+              extracting data values from a PVL formatted file.
+             </p>
+          </definition>
+
+            <definition name="MAP">
+               A representation of a three dimensional target such as a sphere,
+               ellipsoid or an irregular shaped body onto a plane
+             <p>
+                A two dimensional object such a paper or an image
+             </p>
+          </definition>
+
+           <definition name="Map Projection">
+               A map projection is an algorithm or equation for mapping a
+               three dimensional coordinate (latitude, longitude, radius)
+               into a two dimensional coordinate plane (x,y).
+           </definition>
+
+           <definition name="SubSpacecraft Latitude">
+               The latitude value of the Subspacecraft Point
+           </definition>
+
+           <definition name="SubSpacecraft Longitude">
+               The longitude value Subspacecraft Point
+           </definition>
+
+           <definition name="SubSpacecraft Point">
+               The point on the surface of the target body which lies 
+               directly beneath the spacecraft.
+           </definition>
+
+           <definition name="SubSolar Latitude">
+               The latitude of the subsolar point.
+           </definition>
+
+           <definition name="SubSolar Longitude">
+               The longitude of the subsolar point.
+           </definition>
+
+           <definition name="SubSolar Point">
+               The subsolar point is the target surface intercept of
+               the line from the Sun and the target body's center.
+               A triaxial ellipsoid is used to model the surface of
+               the target body.
+           </definition>
+
+          <definition name="IAU">
+            The International Astronomical Union
+          </definition>
+
+          <definition name="Projection X">
+            Projection X is the x-coordinate (Easting) for a point on a
+            geographic Cartesian coordinate system
+          </definition>
+
+          <definition name="Projection Y">
+            Projection Y is the y-coordinate (Northing) for a point on
+            a geographic Cartesian coordinate system 
+          </definition>
+
+          <definition name="Universal Coordinate">
+            The Isis default coordinate system
+            <pre>
+              LatitudeType = Planetocentric
+              Longitude Direction = East
+              Longitude Domain = 360
+            </pre>
           </definition>
 
         </definitions>
@@ -563,6 +922,9 @@
     <change name="Tammy Becker" date="2011-11-16">
       Added local emission, local incidence angles, control islands.
       Modified a few existing definitions (more info and added paragraph syntax)
+    </change>
+    <change name="Tammy Becker" date="2012-01-05">
+      Added more definitions related to terms reported by the campt application
     </change>
   </history>
 </documentation>
