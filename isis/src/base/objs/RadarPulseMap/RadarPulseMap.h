@@ -27,8 +27,9 @@
 #include "CameraDetectorMap.h"
 
 namespace Isis {
-  /** Convert between alpha image coordinates and radar sample,
-   *  time coordinates
+  /**
+   * Convert between alpha image coordinates and radar sample,
+   * time coordinates
    *
    * This class is used to convert between alpha coordinates
    * (sample/line) and radar pulse coordinates (sample,time) for a
@@ -38,13 +39,11 @@ namespace Isis {
    *
    * @see Camera
    *
+   * @author 2008-06-16 Jeff Anderson
+   *
    * @internal
-   *
-   * @history 2008-06-16 Jeff Anderson
-   * Original version
-   *
-   *  @history 2009-07-01 Janet Barrett - Corrected the calculations
-   *                      used to convert from line to time and back
+   *   @history 2009-07-01 Janet Barrett - Corrected the calculations used to
+   *                           convert from line to time and back
    *
    */
   class RadarPulseMap : public CameraDetectorMap {

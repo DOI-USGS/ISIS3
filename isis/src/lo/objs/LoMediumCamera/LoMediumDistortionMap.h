@@ -29,11 +29,13 @@ namespace Isis {
    *
    * Creates a map for adding/removing optical distortions
    * from the focal plane of the Lunar Orbiter medium resolution camera.
-   *  
+   *
    * @ingroup SpiceInstrumentsAndCameras
    * @ingroup LunarOrbiter
    *
    * @see LoMediumCamera
+   *
+   * @author 2007-07-31 Debbie A. Cook
    *
    * @internal
    *

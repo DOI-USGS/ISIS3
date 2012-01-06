@@ -43,6 +43,8 @@ namespace Isis {
    *
    * @see MinimumDifference AutoReg
    *
+   * @author ????-??-?? Unknown
+   *
    * @internal
    *   @history 2006-01-11 Jacob Danton Added idealFit value, unitTest
    *   @history 2006-03-08 Jacob Danton Added sampling options

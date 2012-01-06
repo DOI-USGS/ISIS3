@@ -23,7 +23,7 @@ namespace Isis {
    *
    * @ingroup Visualization Tools
    *
-   * @author  Jeff Anderson -  ???
+   * @author ????-??-?? Jeff Anderson
    *
    * @internal
    *   @history 2008-06-09 Noah Hilt - Added settings to read and

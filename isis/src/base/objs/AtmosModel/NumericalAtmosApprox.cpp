@@ -126,7 +126,7 @@ namespace Isis {
    * method returns the crudest estimate of the integral.
    * Subsequent calls with @a n = 2, 3, ... (in sequential order)
    * will improve the accuracy by adding
-   * 2<sup>@a n-2</sup> additional interior points. This method
+   * 2<sup>@a n-2 </sup> additional interior points. This method
    * can be used to integrate by the extended trapeziodal rule if
    * you know the number of steps you want to take.
    *
@@ -272,8 +272,8 @@ namespace Isis {
     double emu;    //exp(-tau/mu)
     double tfac;   //factor that occurs in the integrals for transmission
 
-    //	calculate the phase angle
-    //	also calculate any of the other redundant parameters
+    //  calculate the phase angle
+    //  also calculate any of the other redundant parameters
     ema = acos(mu) * (180.0 / PI);
     sine = sin(ema * (PI / 180.0));
     if((am->p_atmosAtmSwitch == 0) || (am->p_atmosAtmSwitch == 2)) {  // Reflection phase <= 90
@@ -285,8 +285,8 @@ namespace Isis {
               am->p_atmosMunot * mu;
     }
     phase = acos(alpha) * (180.0 / PI);
-    //	now evaluate the integrand; all needed parameters
-    //	have been hidden separately and passed to it in COMMON.
+    //  now evaluate the integrand; all needed parameters
+    //  have been hidden separately and passed to it in COMMON.
     if(am->p_atmosAtmSwitch == 0) {
       // integrand for hemispheric albedo
       result = mu * am->p_atmosPM->CalcSurfAlbedo(phase, am->p_atmosInc, ema);

@@ -18,6 +18,8 @@ namespace Isis {
    * designed to remove points from the current filtered list
    * whose PointId keyword values do not contain the string.
    *
+   * @author ????-??-?? Unknown
+   *
    * @internal
    *   @history 2009-01-08 Jeannie Walldren - Modified filter()
    *                          method to remove new filter points

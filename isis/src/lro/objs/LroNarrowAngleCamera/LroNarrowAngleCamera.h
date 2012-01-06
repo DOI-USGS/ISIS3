@@ -31,6 +31,9 @@ namespace Isis {
    *
    * @ingroup SpiceInstrumentsAndCameras
    * @ingroup LunarReconnaissanceOrbiter
+   *
+   * @author 2009-02-20 Jacob Danton
+   *
    * @internal
    *   @history 2009-02-20  Jacob Danton, Original Object
    *   @history 2009-08-28 Steven Lambright - Changed inheritance to no longer

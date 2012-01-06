@@ -65,7 +65,7 @@ namespace Isis {
   Application *iApp = NULL;
 
   /**
-   * Constuctor for the Application object   
+   * Constuctor for the Application object   
    *
    * @param argc Number of arguments in argv[].  This must be passed by
    *             reference!!

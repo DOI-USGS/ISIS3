@@ -95,7 +95,7 @@ namespace Isis {
    *  @history 2009-10-01  Debbie A. Cook Modified methods to be compatible with changes made
    *                        to parent class, SpiceRotation, to separate rotation into a constant
    *                        rotation and a time-dependent rotation
-   *  @history 2010=12-23  Debbie A. Cook Added new method to return InstrumentPointing keyword
+   *  @history 2010-12-23  Debbie A. Cook Added new method to return InstrumentPointing keyword
    *                        value from kernels group in label and added this value as a class
    *                        member.
    */

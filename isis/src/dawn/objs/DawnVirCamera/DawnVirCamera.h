@@ -41,9 +41,10 @@ namespace Isis {
      *  
      * @ingroup SpiceInstrumentsAndCameras 
      * @ingroup Dawn 
-     *  
-     * @internal
      *
+     * @author 2011-03-10 Kris Becker
+     *
+     * @internal
      *   @history 2011-03-10 Kris Becker Original Version
      *   @history 2011-08-23 Kris Becker - Correct length of scan
      *            line to be the EXTERNAL_REPETITION_TIME of the

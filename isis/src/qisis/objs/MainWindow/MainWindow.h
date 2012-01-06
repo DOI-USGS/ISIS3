@@ -11,11 +11,10 @@ namespace Isis {
   *
   * @ingroup Visualization Tools
   *
-  * @author Stacy Alley
+  * @author ????-??-?? Stacy Alley
   *
+  * @internal
   */
-
-
   class MainWindow : public QMainWindow {
       Q_OBJECT
     public:

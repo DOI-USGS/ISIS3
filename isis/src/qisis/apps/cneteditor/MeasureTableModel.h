@@ -18,6 +18,22 @@ namespace Isis
     class TableColumnList;
     class AbstractTreeModel;
     
+    /**
+     * @brief Table model for control measures
+     *
+     * This class represents a model that provides access to control measures in
+     * a table-like fashion. It acts as a proxy model to the underlying tree
+     * model by providing an interface to get items by index ranges, get
+     * selected items, etc.. Thus, users of the class can access all control
+     * measures in the underlying tree model without having to worry about the
+     * details of traversing the tree structure to find the items of interest.
+     * The class also has knowledge of what columns should be in the control
+     * measure table.
+     *
+     * @author ????-??-?? Eric Hyer
+     *
+     * @internal
+     */
     class MeasureTableModel : public AbstractTableModel
     {
         Q_OBJECT

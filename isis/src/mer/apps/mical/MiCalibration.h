@@ -7,6 +7,11 @@
 
 namespace Isis {
   namespace Mer {
+    /**
+     * @author ????-??-?? Unknown
+     *
+     * @internal
+     */
     class MiCalibration {
       public:
         MiCalibration(Cube &image, Pvl &kernel);

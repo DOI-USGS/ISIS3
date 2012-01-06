@@ -43,6 +43,8 @@ namespace Isis {
    * @see Camera
    * @see VimsCamera
    *
+   * @author 2006-03-16 Tracie Sucharski
+   *
    * @internal
    *
    *   @history 2006-03-16 Tracie Sucharski Original version

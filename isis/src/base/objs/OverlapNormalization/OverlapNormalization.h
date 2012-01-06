@@ -160,6 +160,10 @@ namespace Isis {
        * Store statistics pertaining to the overlapping areas and
        * indices (corresponding to the statistics list) for two data
        * sets
+       *
+       * @author ????-??-?? Unknown
+       *
+       * @internal
        */
       class Overlap {
         public:

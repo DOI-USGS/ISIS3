@@ -40,7 +40,7 @@ namespace Isis {
   class SurfacePoint;
 
   /**
-   * @author ??? Jeff Anderson
+   * @author ????-??-?? Jeff Anderson
    *
    * @ingroup SpiceInstrumentsAndCameras
    * @internal

@@ -52,7 +52,7 @@ namespace Isis {
   *
   * @ingroup Visualization Tools
   *
-  * @author ??? Jeff Anderson
+  * @author ????-??-?? Jeff Anderson
   *
   * @internal
   *  @history 2007-04-30  Tracie Sucharski,  Added Qpainter to parameters

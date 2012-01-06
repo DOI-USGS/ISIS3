@@ -22,9 +22,10 @@ namespace Isis {
    * current filtered list that do not contain any measures of the
    * selected type.
    *  
-   * @todo 
-   *   Add ability to filter points without a Reference.
-   *  
+   * @todo Add ability to filter points without a Reference.
+   *
+   * @author ????-??-?? Unknown
+   *
    * @internal
    *   @history 2009-01-08 Jeannie Walldren - Modified filter()
    *                          method to remove new filter points

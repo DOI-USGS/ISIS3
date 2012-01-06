@@ -74,28 +74,31 @@ class Kernel;
  *
  * @ingroup System
  *
+ * @author ????-??-?? Unknown
+ *
  * @internal
- * @history 2005-12-27 Jacob Danton - Added support for multiple
- *                         files and fixed a bug in SearchMatch.
- * @history 2007-07-09 Steven Lambright - Removed inheritance from PVL
- * @history 2007-10-25 Steven Koechle - Corrected Smithed Enum
- *                         fixed search methods.
- * @history 2007-07-09 Steven Lambright - Added Kernel class and multiple-ck
- *                         return
- * @history 2009-05-12 Steven Lambright - Added Camera Version Checking
- * @history 2010-07-19 Steven Lambright - Added kernel selection merging
- * @history 2011-10-05 Jacob Danton - The placement of int cameraVersion =
- *                         CameraFactory::CameraVersion(lab); was the reason
- *                         that spiceinit ran so slowly. Its placement in the
- *                         "Matches" function resulted in CameraFactory reading
- *                         in the "Camera.plugin" file for every single kernel
- *                         in both the CK and SPK kernels.????.db files. That
- *                         means, for LRO, it was read in around 2100 times.
- *                         By moving this line of code out of the "Matches"
- *                         function and into the "FindAll" function (the only
- *                         one that calls "Matches") and then passing it as a
- *                         parameter, I was able to reduce the time to about 5%
- *                         (from almost 4 minutes to under 15 seconds).
+ *   @history 2005-12-27 Jacob Danton - Added support for multiple
+ *                           files and fixed a bug in SearchMatch.
+ *   @history 2007-07-09 Steven Lambright - Removed inheritance from PVL
+ *   @history 2007-10-25 Steven Koechle - Corrected Smithed Enum
+ *                           fixed search methods.
+ *   @history 2007-07-09 Steven Lambright - Added Kernel class and multiple-ck
+ *                           return
+ *   @history 2009-05-12 Steven Lambright - Added Camera Version Checking
+ *   @history 2010-07-19 Steven Lambright - Added kernel selection merging
+ *   @history 2011-10-05 Jacob Danton - The placement of int cameraVersion =
+ *                           CameraFactory::CameraVersion(lab); was the reason
+ *                           that spiceinit ran so slowly. Its placement in the
+ *                           "Matches" function resulted in CameraFactory
+ *                           reading in the "Camera.plugin" file for every
+ *                           single kernel in both the CK and SPK
+ *                           kernels.????.db files. That means, for LRO, it was
+ *                           read in around 2100 times. By moving this line of
+ *                           code out of the "Matches" function and into the
+ *                           "FindAll" function (the only one that calls
+ *                           "Matches") and then passing it as a parameter, I
+ *                           was able to reduce the time to about 5% (from
+ *                           almost 4 minutes to under 15 seconds).
  */
 class KernelDb {
 
@@ -143,6 +146,11 @@ class KernelDb {
     Isis::Pvl p_kernelData;
 };
 
+/**
+ * @author ????-??-?? Unknown
+ *
+ * @internal
+ */
 class Kernel {
   public:
     Kernel() {

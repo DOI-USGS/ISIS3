@@ -5,6 +5,11 @@
 #include "Camera.h"
 
 namespace Isis {
+  /**
+   * @author ????-??-?? Unknown
+   *
+   * @internal
+   */
   class DawnFcDistortionMap : public CameraDistortionMap {
     public:
       DawnFcDistortionMap(Camera *parent, double k1, double zDirection = 1.0);

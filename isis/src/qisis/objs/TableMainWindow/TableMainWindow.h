@@ -12,7 +12,7 @@ namespace Isis {
   *
   * @ingroup Visualization Tools
   *
-  * @author Stacy Alley
+  * @author ????-??-?? Stacy Alley
   *
   * @internal
   *  @history 2008-06-12 Noah Hilt - Changed the save/load

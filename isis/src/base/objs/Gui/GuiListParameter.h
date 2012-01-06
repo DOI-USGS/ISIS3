@@ -7,7 +7,11 @@
 
 
 namespace Isis {
-
+  /**
+   * @author ????-??-?? Unknown
+   *
+   * @internal
+   */
   class GuiListParameter : public GuiParameter {
 
       Q_OBJECT

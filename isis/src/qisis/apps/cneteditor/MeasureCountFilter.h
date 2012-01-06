@@ -21,6 +21,17 @@ namespace Isis
   {
     class AbstractFilterSelector;
     
+    /**
+     * @brief Allows filtering by the number of measures in a control point
+     *
+     * This class allows the user to filter control points by the number of
+     * measures they contain. This allows the user to make a list of control
+     * points which are shallow or deep.
+     *
+     * @author ????-??-?? Eric Hyer
+     *
+     * @internal
+     */
     class MeasureCountFilter : public AbstractFilter
     {
         Q_OBJECT

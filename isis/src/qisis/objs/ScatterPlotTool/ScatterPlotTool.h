@@ -16,7 +16,7 @@ namespace Isis {
   /**
    * @brief Scatter Plot Tool
    *
-   * @author Stacy Alley
+   * @author ????-??-?? Stacy Alley
    * @internal
    *   @history 2010-06-26 Eric Hyer - Now uses MdiCubeViewport instead of
    *            CubeViewport.  Also fixed some include issues.

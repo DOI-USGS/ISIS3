@@ -2,6 +2,11 @@
 #include "iString.h"
 
 namespace Isis {
+  /**
+   * @author ????-??-?? Unknown
+   *
+   * @internal
+   */
   class GuiHelperAction : public QAction {
 
       Q_OBJECT

@@ -32,24 +32,26 @@
 #include "Table.h"
 
 namespace Isis {         
-  /**
-   * @brief Import a PDS table file with a label description
-   *
-   * This class ingests a PDS table and converts it to an ISIS Table
-   * object.
-   *
-   * The PDS label file (*.LBL) should completely define the contents of a
-   * text file (*.TAB).  The name of the text file is determined from a label
-   * keyword ^TABLE keyword.  Programmers can provide a different name for the
-   * text table file.
-   *
-   * @ingroup Utility
-   *
-   * @author 2011-07-20 Kris Becker
-   * @history 2011-08-02 Kris Becker Modified to ensure the proper size of strings are
-   *                       exported to the TableRecord
-   *
-   */
+/**
+ * @brief Import a PDS table file with a label description
+ *
+ * This class ingests a PDS table and converts it to an ISIS Table
+ * object.
+ *
+ * The PDS label file (*.LBL) should completely define the contents of a
+ * text file (*.TAB).  The name of the text file is determined from a label
+ * keyword ^TABLE keyword.  Programmers can provide a different name for the
+ * text table file.
+ *
+ * @ingroup Utility
+ *
+ * @author 2011-07-20 Kris Becker
+ *
+ * @internal
+ *   @history 2011-08-02 Kris Becker Modified to ensure the proper size of strings are
+ *                         exported to the TableRecord
+ *
+ */
 class ImportPdsTable {
   public:
     ImportPdsTable();

@@ -39,7 +39,7 @@ namespace Isis
    * Tabs, which are specialized QToolButtons that can hide and show other
    * QWidgets (see Tab).
    *
-   * @author Eric Hyer
+   * @author 2010-05-07 Eric Hyer
    *
    * @see Tab
    *

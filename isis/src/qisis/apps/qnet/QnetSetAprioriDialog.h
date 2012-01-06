@@ -7,7 +7,11 @@
 
 #include "SurfacePoint.h"
 
-
+/**
+ * @author ????-??-?? Unknown
+ *
+ * @internal
+ */
 class QnetSetAprioriDialog : public QDialog, public Ui::QnetSetAprioriDialog {
     Q_OBJECT
 

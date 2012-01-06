@@ -17,6 +17,17 @@ namespace Isis
   {
     class AbstractFilterSelector;
     
+    /**
+     * @brief Allows filtering by the sample residual
+     *
+     * This class allows the user to filter control measures by how much the
+     * sample coordinate moved. This allows the user to make a list of control
+     * measures which have been significantly adjusted by pointreg.
+     *
+     * @author ????-??-?? Eric Hyer
+     *
+     * @internal
+     */
     class SampleResidualFilter : public AbstractNumberFilter
     {
         Q_OBJECT

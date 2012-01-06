@@ -4,20 +4,11 @@
 // This is the only include allowed in this file!
 #include "Tool.h"
 
-
 class QComboBox;
 class QPushButton;
 class QLineEdit;
 class QRect;
 class QToolButton;
-
-namespace Isis {
-  class Cube;
-  class CubeViewport;
-  class Histogram;
-  class Statistics;
-  class Stretch;
-}
 
 /**
  * @file
@@ -42,8 +33,12 @@ namespace Isis {
  */
 
 namespace Isis {
-  class CubeViewport;
   class AdvancedStretchDialog;
+  class Cube;
+  class CubeViewport;
+  class Histogram;
+  class Statistics;
+  class Stretch;
   class ViewportBuffer;
 
   /**
@@ -54,7 +49,7 @@ namespace Isis {
    *
    * @ingroup Visualization Tools
    *
-   * @author
+   * @author ????-??-?? Unknown
    *
    * @internal
    *  @history 2008-05-23 Noah Hilt - Added RubberBandTool

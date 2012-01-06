@@ -35,7 +35,7 @@ namespace Isis {
    *   order to stay below this limit, as long as the chunks weren't in the
    *   last IO.
    *
-   * @author Jai Rideout and Steven Lambright
+   * @author ????-??-?? Jai Rideout and Steven Lambright
    *
    * @internal
    */

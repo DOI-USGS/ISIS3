@@ -20,6 +20,17 @@ namespace Isis
   {
     class TableColumnList;
     
+    /**
+     * @brief Base class for a point item in the tree
+     *
+     * This class represents a point item in the tree. This is generally
+     * visualized as a point id. This has columns for compatibility with the
+     * table models.
+     *
+     * @author ????-??-?? Eric Hyer
+     *
+     * @internal
+     */
     class AbstractPointItem : public virtual AbstractTreeItem
     {
         Q_OBJECT

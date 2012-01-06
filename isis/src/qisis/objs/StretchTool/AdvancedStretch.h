@@ -28,8 +28,8 @@ namespace Isis {
    *
    * @author 2010-05-20 Steven Lambright
    *
+   * @internal
    */
-
   class AdvancedStretch : public QWidget {
       Q_OBJECT
 

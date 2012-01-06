@@ -54,8 +54,11 @@ namespace Isis {
    *
    * @ingroup Utility
    * @author 2007-08-14 Kris Becker
-   * @history 2008-09-22 Kris Becker - corrected formatting of units that were
-   *          missing in some cases where the first value units is not defined.
+   *
+   * @internal
+   *   @history 2008-09-22 Kris Becker - corrected formatting of units that were
+   *                           missing in some cases where the first value units
+   *                           is not defined.
    */
   class MdisEdrKeys {
     public:

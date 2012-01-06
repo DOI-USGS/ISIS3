@@ -42,7 +42,7 @@ namespace Isis {
    *
    * @ingroup ControlGraph
    *
-   * @author Eric Hyer
+   * @author 2009-09-23 Eric Hyer
    *
    * @see ControlNet ControlPoint ControlMeasure GroupedStatistics
    *

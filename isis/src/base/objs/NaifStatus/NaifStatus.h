@@ -32,6 +32,7 @@ namespace Isis {
    *
    * @author 2008-06-13 Steven Lambright
    *
+   * @internal
    */
   class NaifStatus {
     public:

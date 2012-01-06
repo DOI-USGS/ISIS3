@@ -144,30 +144,25 @@ namespace Isis {
    *
    * @ingroup Parsing
    *
+   * @author 2003-07-09 Stuart Sides
+   *
    * @internal
-   * @history 2003-07-09 Stuart Sides
-   * Original version
-   *
-   * @history 2003-07-17 Stuart Sides
-   * Added input file band attribute capabilities.
-   *
-   * @history 2003-07-29 Stuart Sides
-   * Separated the input and output attributes into two separated class
-   * deriving off a base class, instead of one class for all cases.
-   *
-   * @history 2003-10-03 Stuart Sides
-   * Added members HasPixelType. It was needed by the IsisCube so it could do
-   * an easy check. Added IsMsb, IsLsb, HasOrder, ByteOrderStr, ByteOrderType,
-   * Order and Order. These were needed to allow users to specify a
-   * byte order for output cubes.
-   *
-   * @history 2004-02-03 Stuart Sides
-   * Refactor for IsisProcess and cube changes
-   *
-   * @history 2004-03-03 Stuart Sides
-   * Modified IsisCubeAttributeOutput::Write so min and max don't get written
-   *      when the pixel type is real.
-   *
+   *   @history 2003-07-17 Stuart Sides - Added input file band attribute
+   *                           capabilities.
+   *   @history 2003-07-29 Stuart Sides - Separated the input and output
+   *                           attributes into two separated class deriving off
+   *                           a base class, instead of one class for all cases.
+   *   @history 2003-10-03 Stuart Sides - Added members HasPixelType. It was
+   *                           needed by the IsisCube so it could do an easy
+   *                           check. Added IsMsb, IsLsb, HasOrder,
+   *                           ByteOrderStr, ByteOrderType, Order and Order.
+   *                           These were needed to allow users to specify a
+   *                           byte order for output cubes.
+   *   @history 2004-02-03 Stuart Sides - Refactor for IsisProcess and cube
+   *                           changes
+   *   @history 2004-03-03 Stuart Sides - Modified
+   *                           IsisCubeAttributeOutput::Write so min and max
+   *                           don't get written when the pixel type is real.
    */
   class CubeAttribute {
     public:
@@ -222,8 +217,6 @@ namespace Isis {
   };
 
 
-#ifndef DOXY_INTERNAL
-
   /**
    * @brief Manipulate and parse attributes of input cube filenames.
    *
@@ -235,18 +228,17 @@ namespace Isis {
    *
    * @ingroup Parsing
    *
+   * @author 2003-07-29 Stuart Sides
+   *
    * @internal
-   * @history 2003-07-29 Stuart Sides
-   * Separated the input and output attributes into two seprated class
-   * deriving off a base class, instead of one class for all cases.
-   *
-   * @history 2004-02-03 Stuart Sides
-   * Refactor for IsisProcess and cube changes
-   *
-   * @history 2006-01-05 Stuart Sides
-   * Fixed bug when the input attribute was "+7-10". In this case the Write
-   * members were not putting the "+" at the beginning.
-   *
+   *   @history 2003-07-29 Stuart Sides - Separated the input and output
+   *                           attributes into two seprated class deriving off a
+   *                           base class, instead of one class for all cases.
+   *   @history 2004-02-03 Stuart Sides - Refactor for IsisProcess and cube
+   *                           changes
+   *   @history 2006-01-05 Stuart Sides - Fixed bug when the input attribute was
+   *                           "+7-10". In this case the Write members were not
+   *                           putting the "+" at the beginning.
    */
   class CubeAttributeInput : public CubeAttribute {
 
@@ -347,24 +339,23 @@ namespace Isis {
    *
    * @ingroup Parsing
    *
+   * @author 2003-07-29 Stuart Sides
+   *
    * @internal
-   * @history 2003-07-29 Stuart Sides
-   * Separated the input and output attributes into two separated class
-   * deriving off a base class, instead of one class for all cases.
-   *
-   * @history 2003-10-03 Stuart Sides
-   * Added members HasPixelType. It was needed by the IsisCube so it could do
-   * an easy check. Added IsMsb, IsLsb, HasOrder, ByteOrderStr, ByteOrderType,
-   * Order and Order. These were needed to allow users to specify a
-   * byte order for output cubes.
-   *
-   * @history 2004-02-03 Stuart Sides
-   * Refactor for IsisProcess and cube changes
-   *
-   * @history 2004-03-03 Stuart Sides
-   * Modified IsisCubeAttributeOutput::Write so min and max don't get written
-   * when the pixel type is real.
-   *
+   *   @history 2003-07-29 Stuart Sides - Separated the input and output
+   *                           attributes into two separated class deriving off
+   *                           a base class, instead of one class for all cases.
+   *   @history 2003-10-03 Stuart Sides - Added members HasPixelType. It was
+   *                           needed by the IsisCube so it could do an easy
+   *                           check. Added IsMsb, IsLsb, HasOrder,
+   *                           ByteOrderStr, ByteOrderType, Order and Order.
+   *                           These were needed to allow users to specify a
+   *                           byte order for output cubes.
+   *   @history 2004-02-03 Stuart Sides - Refactor for IsisProcess and cube
+   *                           changes
+   *   @history 2004-03-03 Stuart Sides - Modified
+   *                           IsisCubeAttributeOutput::Write so min and max
+   *                           don't get written when the pixel type is real.
    */
   class CubeAttributeOutput : public CubeAttribute {
     public:
@@ -519,7 +510,6 @@ namespace Isis {
       void Initialize();
 
   };
-#endif //DOXY_INTERNAL
 };
 
 #endif

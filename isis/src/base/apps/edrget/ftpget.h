@@ -7,7 +7,11 @@
 
 class QUrl;
 namespace Isis {
-
+  /**
+   * @author ????-??-?? Unknown
+   *
+   * @internal
+   */
   class FtpGet : public QObject {
       Q_OBJECT
 

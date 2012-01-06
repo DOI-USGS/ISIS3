@@ -40,7 +40,7 @@ namespace Isis {
    *
    * @ingroup Visualization Tools
    *
-   * @author  ?? Unknown
+   * @author ????-??-?? Unknown
    *
    * @internal
    *  @history 2008-06-25 Noah Hilt - Added enumeration for different column

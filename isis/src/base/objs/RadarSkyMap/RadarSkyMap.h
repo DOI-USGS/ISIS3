@@ -38,10 +38,11 @@ namespace Isis {
    *
    * @see Camera
    *
+   * @author 2008-06-17 Jeff Anderson
+   *
    * @internal
    *
-   * @history 2008-06-17 Jeff Anderson
-   * Original version
+   *   @history 2008-06-17 Jeff Anderson - Original version
    *
    */
   class RadarSkyMap : public CameraSkyMap {

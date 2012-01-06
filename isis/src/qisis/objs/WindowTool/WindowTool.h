@@ -9,6 +9,8 @@ namespace Isis {
   class MdiCubeViewport;
 
   /**
+   * @author ????-??-?? Unknown
+   *
    * @internal
    *   @history 2010-06-26 Eric Hyer - Now uses MdiCubeViewport instead of
    *                           CubeViewPort.  Fixed include issues

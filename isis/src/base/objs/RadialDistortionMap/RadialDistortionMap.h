@@ -5,6 +5,11 @@
 #include "Camera.h"
 
 namespace Isis {
+  /**
+   * @author ????-??-?? Unknown
+   *
+   * @internal
+   */
   class RadialDistortionMap : public CameraDistortionMap {
     public:
       RadialDistortionMap(Camera *parent, double k1, double zDirection = 1.0);

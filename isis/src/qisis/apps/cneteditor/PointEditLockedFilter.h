@@ -12,6 +12,18 @@ namespace Isis
 
   namespace CnetViz
   {
+
+    /**
+     * @brief Allows filtering by a control point's edit lock status
+     *
+     * This class allows the user to filter control points based on whether or
+     * not they are edit locked. This allows the user to make a list of
+     * edit locked or not-edit locked control points.
+     *
+     * @author ????-??-?? Eric Hyer
+     *
+     * @internal
+     */
     class PointEditLockedFilter : public AbstractFilter
     {
         Q_OBJECT

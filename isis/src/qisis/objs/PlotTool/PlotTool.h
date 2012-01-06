@@ -18,39 +18,36 @@
 class QComboBox;
 class QMainWindow;
 
-// FIXME: uncomment this
-//template< class A, class B > class QMap;
-
-
-namespace Isis {
-  class Statistics;
-}
 
 namespace Isis {
   class PlotToolCurve;
   class PlotToolWindow;
   class PlotWindow;
   class RubberBandComboBox;
+  class Statistics;
 
   /**
    * @brief plot tool
    *
    * This class is a plot tool.
    *
-   * @author Stacy Alley
+   * @author ????-??-?? Stacy Alley
    *
-   * @history 2008-08-18 Christopher Austin - Upgraded to geos3.0.0
-   * @history 2008-09-05 Stacy Alley allowed spectral plotting of
-   *                         a single point.
-   * @history 2009-01-29 Steven Lambright - Added RotatedRectangle to the
-   *                         spatial plot
-   * @history 2010-06-26 Eric Hyer - Now uses MdiCubeViewport instead of
-   *                         CubeViewport.  Fixed some include issues (many
-   *                         still remain!).
-   * @history 2010-11-08 Eric Hyer - Spacial plot now handles linked images.
-   * @history 2011-03-18 Sharmila Prasad - Connect the viewport's close signal
-   * @history 2011-09-20 Steven Lambright - Now handles NULL statistical values
-   *                         when graphing by not displaying them. Fixes #234.
+   * @internal
+   *   @history 2008-08-18 Christopher Austin - Upgraded to geos3.0.0
+   *   @history 2008-09-05 Stacy Alley allowed spectral plotting of
+   *                           a single point.
+   *   @history 2009-01-29 Steven Lambright - Added RotatedRectangle to the
+   *                           spatial plot
+   *   @history 2010-06-26 Eric Hyer - Now uses MdiCubeViewport instead of
+   *                           CubeViewport.  Fixed some include issues (many
+   *                           still remain!).
+   *   @history 2010-11-08 Eric Hyer - Spacial plot now handles linked images.
+   *   @history 2011-03-18 Sharmila Prasad - Connect the viewport's close
+   *                           signal
+   *   @history 2011-09-20 Steven Lambright - Now handles NULL statistical
+   *                           values when graphing by not displaying them.
+   *                           Fixes #234.
    */
   class PlotTool : public Tool {
       Q_OBJECT

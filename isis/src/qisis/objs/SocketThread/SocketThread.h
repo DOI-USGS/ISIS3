@@ -4,6 +4,11 @@
 #include <QThread>
 
 namespace Isis {
+  /**
+   * @author ????-??-?? Unknown
+   *
+   * @internal
+   */
   class SocketThread : public QThread {
       Q_OBJECT
 

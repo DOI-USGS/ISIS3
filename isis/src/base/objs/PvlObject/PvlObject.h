@@ -43,7 +43,7 @@ namespace Isis {
    * @internal
    *  @history 2005-04-04 Leah Dahmer wrote class documentation.
    *  @history 2006-04-21 Jacob Danton Added format templates abilities.
-   *  @history 2006-05-18 Jacob Danton Added DeleteGroup by index @history
+   *  @history 2006-05-18 Jacob Danton Added DeleteGroup by index
    *  @history 2006-09-11 Stuart Sides Added formatting ability
    *  @history 2007-08-11 Stuart Sides Added recursive FindKeyword and
    *                      HasKeyword

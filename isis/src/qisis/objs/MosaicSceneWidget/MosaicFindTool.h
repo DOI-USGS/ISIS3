@@ -15,7 +15,7 @@ namespace Isis {
    *
    * @ingroup Visualization Tools
    *
-   * @author  Stacy Alley
+   * @author ????-??-?? Stacy Alley
    *
    * @internal
    *   @history 2011-05-07 Steven Lambright - Refactored along with all of

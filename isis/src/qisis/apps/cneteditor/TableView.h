@@ -18,7 +18,12 @@ namespace Isis
     class TableViewContent;
     class TableViewHeader;
     class TableColumnList;
-    
+
+    /**
+     * @author ????-??-?? Unknown
+     *
+     * @internal
+     */
     class TableView : public QWidget
     {
         Q_OBJECT

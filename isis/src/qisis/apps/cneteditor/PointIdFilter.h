@@ -15,6 +15,18 @@ namespace Isis
   namespace CnetViz
   {
     class AbstractFilterSelector;
+
+    /**
+     * @brief Filter by control point id string
+     *
+     * This class allows the user to filter control points based on what the
+     * control point id is. This allows the user to find a particular control
+     * point or make a list of control points with similar ids.
+     *
+     * @author ????-??-?? Eric Hyer
+     *
+     * @internal
+     */
     class PointIdFilter : public AbstractStringFilter
     {
         Q_OBJECT

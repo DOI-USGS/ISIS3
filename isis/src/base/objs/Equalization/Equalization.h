@@ -42,8 +42,18 @@ namespace Isis {
   class Statistics;
 
 
+  /**
+   * @author ????-??-?? Unknown
+   *
+   * @internal
+   */
   class Equalization {
     protected:
+      /**
+       * @author ????-??-?? Unknown
+       *
+       * @internal
+       */
       class ImageAdjustment {
         public:
           ImageAdjustment() {}
@@ -86,6 +96,11 @@ namespace Isis {
           std::vector<double> avgs;
       };
 
+      /**
+       * @author ????-??-?? Unknown
+       *
+       * @internal
+       */
       class CalculateFunctor {
         public:
           CalculateFunctor(Statistics *stats, double percent) {
@@ -107,6 +122,11 @@ namespace Isis {
           int m_line;
       };
 
+      /**
+       * @author ????-??-?? Unknown
+       *
+       * @internal
+       */
       class ApplyFunctor {
         public:
           ApplyFunctor(const ImageAdjustment *adjustment) {

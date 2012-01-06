@@ -18,6 +18,11 @@ namespace Isis
     class AbstractTableModel;
     class TableColumnList;
 
+    /**
+     * @author ????-??-?? Unknown
+     *
+     * @internal
+     */
     class TableViewHeader : public QWidget
     {
 

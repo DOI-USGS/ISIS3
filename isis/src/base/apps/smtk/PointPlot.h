@@ -42,7 +42,8 @@ namespace Isis {
    * matching is used to compute the output pixel coordinate of the tile. 
    *  
    * @author  2009-09-11 Kris Becker
-   * 
+   *
+   * @internal
    */                                                                       
   class PointPlot  {
     public:

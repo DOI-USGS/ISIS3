@@ -25,6 +25,18 @@ namespace Isis
     class FilterWidget;
     class RootItem;
 
+    /**
+     * @brief Base class for tree models
+     *
+     * This class is a base class for models that store data in a tree-like
+     * structure. There is also a linked-list for iterating over the filtered
+     * items in an efficient manner. This handles the filtering of items and
+     * provides an interface for rebuilding.
+     *
+     * @author ????-??-?? Eric Hyer
+     *
+     * @internal
+     */
     class AbstractTreeModel : public QObject
     {
         Q_OBJECT
@@ -156,6 +168,11 @@ namespace Isis
 
 
       private:
+        /**
+         * @author ????-??-?? Eric Hyer
+         *
+         * @internal
+         */
         class FilterFunctor
             : public std::unary_function< AbstractTreeItem * const &, bool >
         {

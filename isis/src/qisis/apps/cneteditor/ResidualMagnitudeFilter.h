@@ -17,6 +17,15 @@ namespace Isis
   {
     class AbstractFilterSelector;
     
+    /**
+     * @brief Filters by residual magnitude
+     *
+     * This class handles filtering by residual magnitudes.
+     *
+     * @author ????-??-?? Eric Hyer
+     *
+     * @internal
+     */
     class ResidualMagnitudeFilter : public AbstractNumberFilter
     {
         Q_OBJECT

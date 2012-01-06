@@ -5,6 +5,11 @@
 #include "GuiParameter.h"
 
 namespace Isis {
+  /**
+   * @author ????-??-?? Unknown
+   *
+   * @internal
+   */
   class GuiParameterFactory {
     public:
       static GuiParameter *Create(QGridLayout *grid,

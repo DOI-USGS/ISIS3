@@ -72,9 +72,10 @@ namespace Isis {
    *
    * @author 2006-08-14 Kris Becker, USGS
    *
-   * @history 2007-06-05 Brendan George - Modified to work with
-   *          iString/StringTools merge
-   * @history 2008-06-18 Christopher Austin - Fixed documentation
+   * @internal
+   *   @history 2007-06-05 Brendan George - Modified to work with
+   *                           iString/StringTools merge
+   *   @history 2008-06-18 Christopher Austin - Fixed documentation
    */
   template <typename TokenStore = iString>
   class CSVParser {
@@ -240,8 +241,9 @@ namespace Isis {
    * @ingroup Parsing
    * @author 2006-08-14 Kris Becker
    *
-   * @history 2008-06-18 Christopher Austin - Fixed documentation
-   * @history 2010-04-08 Kris Becker - Added discarding of comment and blank lines
+   * @internal
+   *   @history 2008-06-18 Christopher Austin - Fixed documentation
+   *   @history 2010-04-08 Kris Becker - Added discarding of comment and blank lines
    */
   class CSVReader {
 

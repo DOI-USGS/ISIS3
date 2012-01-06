@@ -78,6 +78,10 @@ namespace Isis {
 
   /**
    * InfixOperator and InfixFunction are helper classes for InfixToPostfix
+   *
+   * @author ????-??-?? Unknown
+   *
+   * @internal
    */
   class InfixOperator {
     public:
@@ -120,6 +124,14 @@ namespace Isis {
       bool m_isFunction;
   };
 
+
+  /**
+   * InfixOperator and InfixFunction are helper classes for InfixToPostfix
+   *
+   * @author ????-??-?? Unknown
+   *
+   * @internal
+   */
   class InfixFunction : public InfixOperator {
     public:
       InfixFunction(iString inString, int argCount) :

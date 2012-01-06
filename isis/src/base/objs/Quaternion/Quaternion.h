@@ -43,7 +43,7 @@ namespace Isis {
    * @author 2005-12-07 Debbie A. Cook
    *
    * @internal
-   *   @history Steven Lambright Fixed documentation
+   *   @history ????-??-?? Steven Lambright Fixed documentation
    *
    */
 

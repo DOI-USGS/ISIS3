@@ -42,7 +42,8 @@ namespace Isis {
    *
    * @ingroup Visualization Tools
    *
-   * @author Eric Hyer - Moved MDI specific code here from CubeViewport
+   * @author ????-??-?? Eric Hyer - Moved MDI specific code here from
+   *                        CubeViewport
    *
    * @internal
    *

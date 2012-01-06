@@ -28,14 +28,14 @@
 
 namespace Isis {
   /**
+   * @author ????-??-?? Unknown
    *
    * @internal
-   *  @history 2005-12-28 Elizabeth Miller - Added try/catch block in Write() to
-   *                                         catch an error that causes an abort
-   *  @history 2008-01-09 Steven Lambright - Made Application a friend for
-   *                                         destruction purposes
+   *   @history 2005-12-28 Elizabeth Miller - Added try/catch block in Write()
+   *                           to catch an error that causes an abort
+   *   @history 2008-01-09 Steven Lambright - Made Application a friend for
+   *                           destruction purposes
    *   @history 2008-07-08 Steven Lambright - Now uses atexit for destruction
-   *  @todo 2005-02-15 Write class documentation
    */
   class SessionLog : private Isis::Pvl {
     public:

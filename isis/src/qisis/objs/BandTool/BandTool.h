@@ -22,6 +22,7 @@ namespace Isis {
 namespace Isis {
   class ToolPad;
   /**
+   * @author ????-??-?? Unknown
    * @internal
    *   @history 2010-06-26 Eric Hyer - Now uses MdiCubeViewport instead of
    *            CubeViewport

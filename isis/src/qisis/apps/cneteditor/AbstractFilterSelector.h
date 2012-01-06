@@ -24,6 +24,17 @@ namespace Isis
   {
     class AbstractFilter;
 
+    /**
+     * @brief Base class for filter selectors
+     *
+     * Filter selectors are combo boxes with filters as elements. A filter
+     * selector has only one active filter at a time. These allow the user to
+     * choose which filter to apply to the control net.
+     * 
+     * @author ????-??-?? Eric Hyer
+     *
+     * @internal
+     */
     class AbstractFilterSelector : public QWidget
     {
         Q_OBJECT

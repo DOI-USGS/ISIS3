@@ -13,6 +13,16 @@ namespace Isis
 {
   namespace CnetViz
   {
+
+    /**
+     * @brief Base class for leaf items in the tree
+     *
+     * This class represents a leaf item in the tree.
+     *
+     * @author ????-??-?? Eric Hyer
+     *
+     * @internal
+     */
     class AbstractLeafItem : public virtual AbstractTreeItem
     {
       public:

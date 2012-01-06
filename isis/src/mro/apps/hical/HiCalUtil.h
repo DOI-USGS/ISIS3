@@ -371,6 +371,10 @@ inline HiMatrix appendSamples(const HiMatrix &left, const HiMatrix &right) {
  * This class will compute the time (in seconds) for a HiRISE observation line
  * based upon the binning mode and line number.  It is assumed that the first
  * line will be time 0, but that is up to the caller to keep that straight.
+ *
+ * @author ????-??-?? Unknown
+ *
+ * @internal
  */
 class HiLineTimeEqn {
   public:

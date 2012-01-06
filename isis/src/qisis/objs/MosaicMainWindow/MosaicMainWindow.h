@@ -19,7 +19,7 @@ namespace Isis {
    *
    * @ingroup Visualization Tools
    *
-   * @author Stacy Alley
+   * @author ????-??-?? Stacy Alley
    *
    * @internal
    *   @history 2010-05-10 Christopher Austin - added cnet connectivity

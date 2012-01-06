@@ -22,6 +22,11 @@ namespace Isis
     class TreeView;
     class AbstractTreeModel;
 
+    /**
+     * @author ????-??-?? Unknown
+     *
+     * @internal
+     */
     class TreeViewContent : public QAbstractScrollArea
     {
         Q_OBJECT

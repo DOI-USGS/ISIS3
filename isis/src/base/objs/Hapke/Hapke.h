@@ -39,18 +39,18 @@ namespace Isis {
    *
    * @ingroup RadiometricAndPhotometricCorrection
    * @author 1989-08-02 Unknown
-   * @history 2008-01-14 Janet Barret - Imported into Isis3 from
-   *          Isis2.
-   * @history 2008-03-07 Janet Barrett - Moved variables and related
-   *                     methods that pertain to Hapke specific parameters
-   *                     to the PhotoModel class.
-   * @history 2008-06-18 Stuart Sides - Fixed doc error
-   * @history 2008-10-17 Steven Lambright - Changed inheritance, moved
-   *              HapkeHen specific methods into this class from
-   *              the base class.
-   * @history 2008-11-05 Jeannie Walldren - Added documentation
-   *          from Isis2 files
    *
+   * @internal
+   *   @history 2008-01-14 Janet Barret - Imported into Isis3 from Isis2.
+   *   @history 2008-03-07 Janet Barrett - Moved variables and related
+   *                           methods that pertain to Hapke specific parameters
+   *                           to the PhotoModel class.
+   *   @history 2008-06-18 Stuart Sides - Fixed doc error
+   *   @history 2008-10-17 Steven Lambright - Changed inheritance, moved
+   *                           HapkeHen specific methods into this class from
+   *                           the base class.
+   *   @history 2008-11-05 Jeannie Walldren - Added documentation
+   *                           from Isis2 files
    */
   class Hapke : public PhotoModel {
     public:

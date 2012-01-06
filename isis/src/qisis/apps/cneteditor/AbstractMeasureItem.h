@@ -17,6 +17,17 @@ namespace Isis
   {
     class TableColumnList;
 
+    /**
+     * @brief Base class for a measure item in the tree
+     *
+     * This class represents a measure item in the tree. This is generally
+     * visualized as a serial number. This has columns for compatibility with
+     * the table models.
+     *
+     * @author ????-??-?? Eric Hyer
+     *
+     * @internal
+     */
     class AbstractMeasureItem : public virtual AbstractTreeItem
     {
 

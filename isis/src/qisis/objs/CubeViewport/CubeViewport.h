@@ -39,74 +39,71 @@ namespace Isis {
   class Pvl;
   class PvlKeyword;
   class Stretch;
+  class Tool;
   class UniversalGroundMap;
 
   class ViewportBuffer;
 
   /**
-  * @brief Widget to display Isis cubes for qt apps
-  *
-  * @ingroup Visualization Tools
-  *
-  * @author ??? Jeff Anderson
-  *
-  * @internal
-  *  @history 2007-01-30  Tracie Sucharski,  Add information
-  *                           message if spice not found.
-  *  @history 2007-02-07  Tracie Sucharski,  Remove error message, decided it
-  *                           was more of a hassle to click ok when displaying
-  *                           many images without spice.
-  *  @history 2007-03-20  Tracie Sucharski,  Add fitScaleMinDimension,
-  *                           fitScaleWidth and fitScaleHeight methods.  Change
-  *                           cursor to wait cursor in paintPixmap.
-  *  @history 2007-04-13  Tracie Sucharski, Remove fitScaleMinDimension, turns
-  *                           out it was not needed.
-  *  @history 2007-09-11  Steven Lambright, Added double click signal
-  *  @history 2007-12-11  Steven Lambright, Added 1x1xn cube auto stretch support
-  *  @history 2008-06-19  Noah Hilt, Added a close event for saving and discarding
-  *                           changes and a method to set the cube.
-  *  @history 2008-12-04  Jeannie Walldren, Fixed a bug in computeStretch() method
-  *                          for comparing precision difference on 32 bit Linux
-  *                          system. Added try/catch in showCube() to set
-  *                          p_cubeShown = false if this fails.
-  *  @history 2009-03-09  Steven Lambright - Changed the way we do floating point
-  *                          math in autoStretch to work better in order to allow
-  *                          more cubes to open.
-  *  @history 2009-03-27 Noah Hilt/Steven Lambright - Removed old rubber band
-  *                         methods and variables. Added new ViewportBuffer to
-  *                         read and store visible dn values in the viewport.
-  *  @history 2009-10-23 Steven Lambright - Camera::SetBand is now called when
-  *                         switching the band being shown.
-  *  @history 2010-04-08 Steven Lambright and Eric Hyer -
-  *                         Now supports ViewportBuffer using threaded cube I/O
-  *  @history 2010-04-30 Steven Lambright - Bug fixes and better
-  *                         support for threaded cube I/O
-  *  @history 2010-05-20 Steven Lambright - Added memory of global
-  *                         stretches
-  *  @history 2010-05-24 Eric Hyer - Fixed bug where QPainter construction was
-  *                         being attempted with a potentially null pixmap
-  *  @history 2010-06-26 Eric Hyer - Moved MDI specific code to new child class
-  *                         called MdiCubeViewport.  Fixed many include mistakes.
-  *  @history 2010-07-12 Jeannie Walldren - Changed setScale() method's maximum
-  *                         value from hard-coded 16 to the max of the viewport
-  *                         width and height.  Added setScale() minimum value of
-  *                         1/min(samps,lines).  Added exceptions to
-  *                         ViewportBuffer to help track errors.
-  *  @history 2010-11-08 Eric Hyer -  Added better mouseMove signal
-  *  @history 2010-12-01 Steven Lambright - The initial scale now uses fitScale
-  *                         so that it is consistent with the zoom tool.
-  *  @history 2011-03-30 Sharmila Prasad - Set the frame shadow and style to remove
-  *                      border around the image
-  *  @history 2011-03-31 Sharmila Prasad - Added band info to "whatsthis"
-  *                      API to store the whatsthis info in a PVL format
-  *  @history 2011-04-25 Steven Lambright - Fixed "center" and added more safety
-  *                      checks.
-  */
-
-  class Tool;
-
+   * @brief Widget to display Isis cubes for qt apps
+   *
+   * @ingroup Visualization Tools
+   *
+   * @author ????-??-?? Jeff Anderson
+   *
+   * @internal
+   *  @history 2007-01-30  Tracie Sucharski,  Add information
+   *                           message if spice not found.
+   *  @history 2007-02-07  Tracie Sucharski,  Remove error message, decided it
+   *                           was more of a hassle to click ok when displaying
+   *                           many images without spice.
+   *  @history 2007-03-20  Tracie Sucharski,  Add fitScaleMinDimension,
+   *                           fitScaleWidth and fitScaleHeight methods.  Change
+   *                           cursor to wait cursor in paintPixmap.
+   *  @history 2007-04-13  Tracie Sucharski, Remove fitScaleMinDimension, turns
+   *                           out it was not needed.
+   *  @history 2007-09-11  Steven Lambright, Added double click signal
+   *  @history 2007-12-11  Steven Lambright, Added 1x1xn cube auto stretch support
+   *  @history 2008-06-19  Noah Hilt, Added a close event for saving and discarding
+   *                           changes and a method to set the cube.
+   *  @history 2008-12-04  Jeannie Walldren, Fixed a bug in computeStretch() method
+   *                          for comparing precision difference on 32 bit Linux
+   *                          system. Added try/catch in showCube() to set
+   *                          p_cubeShown = false if this fails.
+   *  @history 2009-03-09  Steven Lambright - Changed the way we do floating point
+   *                          math in autoStretch to work better in order to allow
+   *                          more cubes to open.
+   *  @history 2009-03-27 Noah Hilt/Steven Lambright - Removed old rubber band
+   *                         methods and variables. Added new ViewportBuffer to
+   *                         read and store visible dn values in the viewport.
+   *  @history 2009-10-23 Steven Lambright - Camera::SetBand is now called when
+   *                         switching the band being shown.
+   *  @history 2010-04-08 Steven Lambright and Eric Hyer -
+   *                         Now supports ViewportBuffer using threaded cube I/O
+   *  @history 2010-04-30 Steven Lambright - Bug fixes and better
+   *                         support for threaded cube I/O
+   *  @history 2010-05-20 Steven Lambright - Added memory of global
+   *                         stretches
+   *  @history 2010-05-24 Eric Hyer - Fixed bug where QPainter construction was
+   *                         being attempted with a potentially null pixmap
+   *  @history 2010-06-26 Eric Hyer - Moved MDI specific code to new child class
+   *                         called MdiCubeViewport.  Fixed many include mistakes.
+   *  @history 2010-07-12 Jeannie Walldren - Changed setScale() method's maximum
+   *                         value from hard-coded 16 to the max of the viewport
+   *                         width and height.  Added setScale() minimum value of
+   *                         1/min(samps,lines).  Added exceptions to
+   *                         ViewportBuffer to help track errors.
+   *  @history 2010-11-08 Eric Hyer -  Added better mouseMove signal
+   *  @history 2010-12-01 Steven Lambright - The initial scale now uses fitScale
+   *                         so that it is consistent with the zoom tool.
+   *  @history 2011-03-30 Sharmila Prasad - Set the frame shadow and style to remove
+   *                      border around the image
+   *  @history 2011-03-31 Sharmila Prasad - Added band info to "whatsthis"
+   *                      API to store the whatsthis info in a PVL format
+   *  @history 2011-04-25 Steven Lambright - Fixed "center" and added more safety
+   *                      checks.
+   */
   class CubeViewport : public QAbstractScrollArea {
-    
       Q_OBJECT
 
     public:
@@ -114,6 +111,11 @@ namespace Isis {
       virtual ~CubeViewport();
 
 
+      /**
+       * @author ????-??-?? Unknown
+       *
+       * @internal
+       */
       class BandInfo {
         public:
           BandInfo();

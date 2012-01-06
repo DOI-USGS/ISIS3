@@ -15,6 +15,11 @@ namespace Isis
   {
     class TreeViewContent;
 
+    /**
+     * @author ????-??-?? Unknown
+     *
+     * @internal
+     */
     class TreeViewHeader : public QWidget
     {
 

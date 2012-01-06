@@ -25,7 +25,9 @@ namespace Isis {
    *
    * @ingroup SpiceInstrumentsAndCameras
    * @ingroup MarsGlobalSurveyor
-   *  
+   *
+   * @author ????-??-?? Unknown
+   *
    * @internal
    *   @history 2011-05-03 Jeannie Walldren - Updated documentation. Removed Mgs
    *            namespace wrap inside Isis namespace. Added Isis Disclaimer to

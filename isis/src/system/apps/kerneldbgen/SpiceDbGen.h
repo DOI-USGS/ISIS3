@@ -36,19 +36,17 @@
 using namespace std;
 using namespace Isis;
 
+/**
+ * @brief Utility for SPICE kernel interrogation and kerneldb generation
+ *
+ * @author ????-??-?? Unknown
+ *
+ * @internal
+ *   @history 2010-04-27 Stuart Sides - Modified Direct member to use a vector
+ *                           of filters instead of a single string
+ *
+ */
 class SpiceDbGen {
-
-    /**
-    * @brief Utility for SPICE kernel interrogation and kerneldb generation
-    *
-    * @author  Unknown
-    *
-    * @internal
-    *   @history 2010-04-27 Stuart Sides - Modified Direct member to use a
-    *   vector of filters instead of a single string
-    *
-    */
-
 
   public:
     SpiceDbGen(iString type);

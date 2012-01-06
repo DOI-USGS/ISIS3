@@ -40,6 +40,8 @@ namespace Isis {
    * the current filtered list that lie outside of the given
    * range.
    *
+   * @author ????-??-?? Unknown
+   *
    * @internal
    *   @history 2009-01-08 Jeannie Walldren - Modified filter()
    *                          method to remove new filter points

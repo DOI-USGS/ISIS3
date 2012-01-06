@@ -34,6 +34,8 @@ namespace Isis {
    *
    * @see cnetref cnetedit etc.
    *
+   * @author ????-??-?? Unknown
+   *
    * @internal
    *  @history 2011-05-11 Sharmila Prasad - Added Residuals for Validation and added
    *                                        comparison string for API addFailure(..)

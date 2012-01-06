@@ -21,90 +21,8 @@
  *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
- *
- * @author 2006-05-30 Jeff Anderson, Debbie A. Cook, and Tracie Sucharski
- *
- * @internal
- *   @history 2005-05-30 Jeff Anderson, Debbie A. Cook & Tracie Sucharski Original version
- *   @history 2007-05-29 Debbie A. Cook  Added new method IterationSummary and
- *                       changed points on held images to held instead of ground
- *   @history 2007-07-12 Debbie A. Cook  Fixed bug in iteration statistics calculations in the
- *                       case of a single control point that was causing a divide by zero error
- *   @history 2007-08-25 Debbie A. Cook Added methods and members to support instrument position solution
- *   @history 2007-09-17 Debbie A. Cook Added ability to process in observation mode for Lunar Orbiter
- *   @history 2007-11-17 Debbie A. Cook Added method SetSolution Method.
- *   @history 2007-12-21 Debbie A. Cook Added member p_Degree and methods m_nsolveCamDegree and ckDegree
- *   @history 2008-01-11 Debbie A. Cook Added observation mode functionality for spacecraft position
- *                       and upgraded ObservationNumber methods for compatability
- *   @history 2008-01-14 Debbie A. Cook Added code to solve for local radii
- *   @history 2008-04-18 Debbie A. Cook Added progress for ControlNet
- *   @history 2008-06-18 Christopher Austin Fixed ifndef
- *   @history 2008-11-07 Tracie Sucharski, Added bool to constructors to
- *                          indicate whether to print iteration summary info
- *                          to the session log. This was needed for qtie which
- *                          has no session log.
- *   @history 2008-11-22 Debbie A. Cook Added code to wrap longitude to keep it in [0.,360.]
- *   @history 2008-11-22 Debbie A. Cook Added new call to get timeScale and set for the observation along with basetime
- *   @history 2008-11-26 Debbie A. Cook Added check to ApplyHeldList for Ignored points and measures
- *   @history 2009-01-08 Debbie A. Cook Revised AddPartials and PointPartial to avoid using the camera methods
- *                          to map a body-fixed vector to the camera because they compute a new time for line
- *                          scan cameras based on the lat/lon/radius and the new time is used to retrieve Spice.
- *                          The updated software uses the Spice at the time of the measurement.
- *   @history 2009-02-15 Debbie A. Cook Corrected focal length to include its sign and removed obsolete calls to X/Y
- *                          direction methods.  Also modified PointPartial to use lat/lon/radius from the point
- *                          instead of the camera.
- *   @history 2009-08-13 Debbie A. Cook Corrected calculations of cudx and cudy so that they use the signed focal length
- *                          also
- *   @history 2009-10-14 Debbie A. Cook Modified AddPartials method to use new CameraGroundMap method, GetXY
- *   @history 2009-10-30 Debbie A. Cook Improved error message in AddPartials
- *   @history 2009-12-14 Debbie A. Cook Updated SpicePosition enumerated partial type constants
- *   @history 2010-03-19 Debbie A. Cook Moved partials to GroundMap classes to support Radar sensors and modified
- *                          argument list for GroundMap method ComputeXY since it now returns cudx and cudy
- *   @history 2010-06-18 Debbie A. Cook Added p_cnetFile as member since it was taken out of ControlNet
- *   @history 2010-07-09 Ken Edmundson Added Folding in solution method (SPECIALK), error propogation, statistical report, etc.
- *   @history 2010-08-13 Debbie A. Cook Changed surface point from lat/lon/radius to body-fixed XYZ.
- *   @history 2010-12-17 Debbie A. Cook Merged Ken Edmundson version with system and updated to new binary control net
- *   @history 2011-02-01 Debbie A. Cook Moved code to create point index map into its own method to be called after the solution
- *                          method has been set.
- *   @history 2011-02-17 Debbie A. Cook Updated to use new parameter added to SpicePosition, p_timeScale
- *   @history 2011-03-05 Debbie A. Cook Put point index creation back in init.  This will prevent QRD and SVD from working if ground
- *                          points are in the control net.
- *   @history 2011-03-29 Ken Edmundson Fixed bug in observation mode when solving for spacecraft position and improved output
- *   @history 2011-04-02 Debbie A. Cook Updated to ControlPoint class changes regarding target radii.  Also separated out 2 sets of
- *                          calculations to test later for efficiency
- *   @history 2011-06-05 Debbie A. Cook Changed checks for solution type to match change from SPARSE to SPARSE-LU
- *   @history 2011-06-07 Debbie A. Cook and Tracie Sucharski - Modified point types
- *                          Ground ------> Fixed
- *                          Tie----------> Free
- *   @history 2011-06-14 Debbie A. Cook added method IsHeld(int index) for preventing any updates to held images
- *   @history 2011-06-27 Debbie A. Cook and Ken Edmundson Added names to top
- *                          header fields of .csv output and fixed bugs in
- *                          sparse output.
- *   @history 2011-07-12 Ken Edmundson Segmentation fault bugfix in OutputHeader
- *                          method. Previously was attempting to output camera
- *                          angle sigmas when none had been allocated.
- *   @history 2011-07-14 Ken Edmundson and Debbie Cook Added new member,
- *                          m_bDeltack to indicate calling application
- *                          was deltack (or qtie) and has potential to have
- *                          a single ControlPoint and ControlMeasure.
- *   @history 2011-08-08 Tracie Sucharski, Added method to return the iteration
- *                          summary to be used in qtie which does not have a log
- *                          file. In SetImages, clear the cameraMap and
- *                          cameraList.  Added this back in (was originally
- *                          added on 2011-01-19), was deleted somewhere along
- *                          the line.
- *   @history 2011-09-28 Debbie A. Cook Renamed SPARSE solve method to OLDSPARSE
- *                          and CHOLMOD to SPARSE. 
- *   @history 2011-10-14 Ken Edmundson Added call to m_pCnet->ClearJigsawRejected();
- *                          to Init() method to set all measure/point
- *                          JigsawRejected flags to false prior to bundle.
- *   @history 2011-12-09 Ken Edmundson, memory leak fix in method cholmod_Inverse
- *                          need call to "cholmod_free_dense(&x,&m_cm)" inside
- *                          loop.
- *   @history 2011-12-20 Ken Edmundson, Fixes to outlier rejection. Added
- *                          rejection multiplier member variable, can be set in
- *                          jigsaw interface.
  */
+
 
 #include <QObject> // parent class
 
@@ -133,10 +51,93 @@ template< typename A, typename B > class QMap;
 #endif
 
 namespace Isis {
-
   class LeastSquares;
   class BasisFunction;
 
+  /**
+   * @author 2006-05-30 Jeff Anderson, Debbie A. Cook, and Tracie Sucharski
+   *
+   * @internal
+   *   @history 2005-05-30 Jeff Anderson, Debbie A. Cook & Tracie Sucharski Original version
+   *   @history 2007-05-29 Debbie A. Cook  Added new method IterationSummary and
+   *                       changed points on held images to held instead of ground
+   *   @history 2007-07-12 Debbie A. Cook  Fixed bug in iteration statistics calculations in the
+   *                       case of a single control point that was causing a divide by zero error
+   *   @history 2007-08-25 Debbie A. Cook Added methods and members to support instrument position solution
+   *   @history 2007-09-17 Debbie A. Cook Added ability to process in observation mode for Lunar Orbiter
+   *   @history 2007-11-17 Debbie A. Cook Added method SetSolution Method.
+   *   @history 2007-12-21 Debbie A. Cook Added member p_Degree and methods m_nsolveCamDegree and ckDegree
+   *   @history 2008-01-11 Debbie A. Cook Added observation mode functionality for spacecraft position
+   *                       and upgraded ObservationNumber methods for compatability
+   *   @history 2008-01-14 Debbie A. Cook Added code to solve for local radii
+   *   @history 2008-04-18 Debbie A. Cook Added progress for ControlNet
+   *   @history 2008-06-18 Christopher Austin Fixed ifndef
+   *   @history 2008-11-07 Tracie Sucharski, Added bool to constructors to
+   *                          indicate whether to print iteration summary info
+   *                          to the session log. This was needed for qtie which
+   *                          has no session log.
+   *   @history 2008-11-22 Debbie A. Cook Added code to wrap longitude to keep it in [0.,360.]
+   *   @history 2008-11-22 Debbie A. Cook Added new call to get timeScale and set for the observation along with basetime
+   *   @history 2008-11-26 Debbie A. Cook Added check to ApplyHeldList for Ignored points and measures
+   *   @history 2009-01-08 Debbie A. Cook Revised AddPartials and PointPartial to avoid using the camera methods
+   *                          to map a body-fixed vector to the camera because they compute a new time for line
+   *                          scan cameras based on the lat/lon/radius and the new time is used to retrieve Spice.
+   *                          The updated software uses the Spice at the time of the measurement.
+   *   @history 2009-02-15 Debbie A. Cook Corrected focal length to include its sign and removed obsolete calls to X/Y
+   *                          direction methods.  Also modified PointPartial to use lat/lon/radius from the point
+   *                          instead of the camera.
+   *   @history 2009-08-13 Debbie A. Cook Corrected calculations of cudx and cudy so that they use the signed focal length
+   *                          also
+   *   @history 2009-10-14 Debbie A. Cook Modified AddPartials method to use new CameraGroundMap method, GetXY
+   *   @history 2009-10-30 Debbie A. Cook Improved error message in AddPartials
+   *   @history 2009-12-14 Debbie A. Cook Updated SpicePosition enumerated partial type constants
+   *   @history 2010-03-19 Debbie A. Cook Moved partials to GroundMap classes to support Radar sensors and modified
+   *                          argument list for GroundMap method ComputeXY since it now returns cudx and cudy
+   *   @history 2010-06-18 Debbie A. Cook Added p_cnetFile as member since it was taken out of ControlNet
+   *   @history 2010-07-09 Ken Edmundson Added Folding in solution method (SPECIALK), error propogation, statistical report, etc.
+   *   @history 2010-08-13 Debbie A. Cook Changed surface point from lat/lon/radius to body-fixed XYZ.
+   *   @history 2010-12-17 Debbie A. Cook Merged Ken Edmundson version with system and updated to new binary control net
+   *   @history 2011-02-01 Debbie A. Cook Moved code to create point index map into its own method to be called after the solution
+   *                          method has been set.
+   *   @history 2011-02-17 Debbie A. Cook Updated to use new parameter added to SpicePosition, p_timeScale
+   *   @history 2011-03-05 Debbie A. Cook Put point index creation back in init.  This will prevent QRD and SVD from working if ground
+   *                          points are in the control net.
+   *   @history 2011-03-29 Ken Edmundson Fixed bug in observation mode when solving for spacecraft position and improved output
+   *   @history 2011-04-02 Debbie A. Cook Updated to ControlPoint class changes regarding target radii.  Also separated out 2 sets of
+   *                          calculations to test later for efficiency
+   *   @history 2011-06-05 Debbie A. Cook Changed checks for solution type to match change from SPARSE to SPARSE-LU
+   *   @history 2011-06-07 Debbie A. Cook and Tracie Sucharski - Modified point types
+   *                          Ground ------> Fixed
+   *                          Tie----------> Free
+   *   @history 2011-06-14 Debbie A. Cook added method IsHeld(int index) for preventing any updates to held images
+   *   @history 2011-06-27 Debbie A. Cook and Ken Edmundson Added names to top
+   *                          header fields of .csv output and fixed bugs in
+   *                          sparse output.
+   *   @history 2011-07-12 Ken Edmundson Segmentation fault bugfix in OutputHeader
+   *                          method. Previously was attempting to output camera
+   *                          angle sigmas when none had been allocated.
+   *   @history 2011-07-14 Ken Edmundson and Debbie Cook Added new member,
+   *                          m_bDeltack to indicate calling application
+   *                          was deltack (or qtie) and has potential to have
+   *                          a single ControlPoint and ControlMeasure.
+   *   @history 2011-08-08 Tracie Sucharski, Added method to return the iteration
+   *                          summary to be used in qtie which does not have a log
+   *                          file. In SetImages, clear the cameraMap and
+   *                          cameraList.  Added this back in (was originally
+   *                          added on 2011-01-19), was deleted somewhere along
+   *                          the line.
+   *   @history 2011-09-28 Debbie A. Cook Renamed SPARSE solve method to OLDSPARSE
+   *                          and CHOLMOD to SPARSE. 
+   *   @history 2011-10-14 Ken Edmundson Added call to m_pCnet->ClearJigsawRejected();
+   *                          to Init() method to set all measure/point
+   *                          JigsawRejected flags to false prior to bundle.
+   *   @history 2011-12-09 Ken Edmundson, memory leak fix in method cholmod_Inverse
+   *                          need call to "cholmod_free_dense(&x,&m_cm)" inside
+   *                          loop.
+   *   @history 2011-12-20 Ken Edmundson, Fixes to outlier rejection. Added
+   *                          rejection multiplier member variable, can be set in
+   *                          jigsaw interface.
+   */
   class BundleAdjust {
     public:
       BundleAdjust(const std::string &cnetFile, const std::string &cubeList,

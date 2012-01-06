@@ -3,6 +3,11 @@
 
 
 namespace Isis {
+  /**
+   * @author ????-??-?? Unknown
+   *
+   * @internal
+   */
   class ViewportBufferAction {
     public:
       ViewportBufferAction();

@@ -5,6 +5,11 @@
 
 #include "ui_QnetDeletePointDialog.h"
 
+/**
+ * @author ????-??-?? Unknown
+ *
+ * @internal
+ */
 class QnetDeletePointDialog : public QDialog, public Ui::QnetDeletePointDialog {
     Q_OBJECT
 

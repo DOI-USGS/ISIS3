@@ -12,7 +12,11 @@ class QwtIntervalData;
 class QString;
 
 namespace Isis {
-
+  /**
+   * @author ????-??-?? Unknown
+   *
+   * @internal
+   */
   class HistogramItem: public QwtPlotItem {
     public:
       explicit HistogramItem(const QString &title = QString::null);

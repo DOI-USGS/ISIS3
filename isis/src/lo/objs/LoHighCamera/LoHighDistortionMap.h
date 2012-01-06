@@ -35,6 +35,8 @@ namespace Isis {
    *
    * @see LoHighCamera
    *
+   * @author 2007-06-29 Debbie A. Cook
+   *
    * @internal
    *
    *   @history 2007-06-29 Debbie A. Cook - Original version

@@ -32,6 +32,11 @@ namespace XERCES = XERCES_CPP_NAMESPACE;
 
 //  This class converts from the internal XMLCh character format to simple c strings
 
+/**
+ * @author ????-??-?? Unknown
+ *
+ * @internal
+ */
 class XMLChTrans {
   public :
     //  Constructors and Destructor

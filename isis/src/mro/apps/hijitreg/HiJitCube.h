@@ -48,6 +48,7 @@ namespace Isis {
    *
    * @author 2006-05-04 Kris Becker
    *
+   * @internal
    */
   class HiJitCube : public Cube {
     public:

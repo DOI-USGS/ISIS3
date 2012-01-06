@@ -43,15 +43,16 @@ namespace Isis {
    *
    * @author 2006-01-20 Stuart Sides
    *
-   * @history 2008-08-18 Christopher Austin - Upgraded to
-   *          geos3.0.0, removed Chip.h include, fixed ifndef
-   * @history 2009-08-05 Travis Addair - Encapsulated group
-   *          creation for seed definition group
-   * @history 2009-04-15 Eric Hyer - Now stores invalid input
-   *                               - Added Copy constructor, destructor, and
-   *                                 assignment operator
-   * @history 2010-04-20 Christopher Austin - adapted for generic/unitless
-   * 	                                      seeding
+   * @internal
+   *   @history 2008-08-18 Christopher Austin - Upgraded to
+   *                           geos3.0.0, removed Chip.h include, fixed ifndef
+   *   @history 2009-08-05 Travis Addair - Encapsulated group
+   *                           creation for seed definition group
+   *   @history 2009-04-15 Eric Hyer - Now stores invalid input
+   *                                 - Added Copy constructor, destructor, and
+   *                                   assignment operator
+   *   @history 2010-04-20 Christopher Austin - adapted for generic/unitless
+   *                           seeding
    */
   class PolygonSeeder {
     public:

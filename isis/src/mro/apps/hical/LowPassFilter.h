@@ -41,6 +41,8 @@ namespace Isis {
    * @ingroup Utility
    * 
    * @author 2007-10-09 Kris Becker
+   *
+   * @internal
    */
   class LowPassFilter : public Module {
 

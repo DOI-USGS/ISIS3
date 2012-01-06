@@ -28,7 +28,8 @@
 
 namespace Isis {
   /**
-   *  
+   * @author ????-??-?? Unknown
+   *
    * @internal 
    *   @history 2006-12-11 Kris Becker Fixed bug in WriteInit method using a
    *                           temporary string to reference a char pointer to

@@ -48,6 +48,7 @@ namespace Isis {
    *
    * @ingroup Visualization Tools
    *
+   * @author ????-??-?? Unknown
    *
    * @internal
    *   @history 2008-11-24 Jeannie Walldren - Changed name from TieTool.

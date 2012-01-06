@@ -40,11 +40,9 @@ namespace Isis {
    *
    * @see Camera
    *
+   * @author 2005-02-08 Jeff Anderson
+   *
    * @internal
-   *
-   * @history 2005-02-08 Jeff Anderson
-   * Original version
-   *
    *  @history 2005-11-16 Jeff Anderson  Fixed bug in SetGround not setting the
    *          proper boolean return value
    *  @history 2007-06-11 Debbie A. Cook - Added overloaded method SetGround that

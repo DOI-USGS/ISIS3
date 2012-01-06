@@ -3,6 +3,11 @@
 
 #include "Transform.h"
 
+/**
+ * @author ????-??-?? Unknown
+ *
+ * @internal
+ */
 class vims2map : public Isis::Transform {
   private:
     Isis::Camera *p_incam;

@@ -36,7 +36,7 @@ void InterruptSignal(int);
 /**
  * This asserts the pointer is delete-able
  */
-#define ASSERT_PTR(x)                                                     \
+#define ASSERT_PTR(x)                                                       \
           if (libcwd::test_delete(x))                                       \
           {                                                                 \
             std::cerr << ">> " << __FILE__ << ":" << __LINE__ <<            \
@@ -50,7 +50,11 @@ class MyMutex : public QMutex {
     }
 };
 
-
+/**
+ * @author ????-??-?? Steven Lambright
+ *
+ * @internal
+ */
 class StackTrace {
   public:
     /**
@@ -100,6 +104,12 @@ class StackTrace {
 #else
 #define ASSERT_PTR(x)
 
+
+/**
+ * @author ????-??-?? Steven Lambright
+ *
+ * @internal
+ */
 class StackTrace {
   public:
     static void GetStackTrace(const void *) {}

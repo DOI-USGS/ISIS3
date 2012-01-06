@@ -52,7 +52,7 @@ namespace Isis {
    *   guarantees that unwritten cube data ends up read and written as NULLs.
    *   The default caching algorithm is a RegionalCachingAlgorithm.
    *
-   * @author Jai Rideout and Steven Lambright
+   * @author 2011-??-?? Jai Rideout and Steven Lambright
    *
    * @internal
    *   @history 2011-06-27 Steven Lambright - Added addCachingAlgorithm()

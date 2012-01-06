@@ -12,6 +12,18 @@ namespace Isis
 
   namespace CnetViz
   {
+
+    /**
+     * @brief A leaf node in the tree structure that represents a control point
+     *
+     * This class represents a leaf node in the tree model and has a control
+     * point as data. When created, it was used in the serial model to show
+     * which control points connect which images.
+     *
+     * @author ????-??-?? Eric Hyer
+     *
+     * @internal
+     */
     class PointLeafItem : public AbstractPointItem, public AbstractLeafItem
     {
       public:

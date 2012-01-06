@@ -40,14 +40,6 @@ using std::cerr;
 
 namespace Isis
 {
-
-  class CnetEditorFileDialog : public QFileDialog
-  {
-
-    public:
-      CnetEditorFileDialog(QLayout * l, QWidget * parent = NULL);
-  };
-
   CnetEditorFileDialog::CnetEditorFileDialog(QLayout * l,
       QWidget * parent) : QFileDialog(parent)
   {

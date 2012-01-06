@@ -113,8 +113,9 @@ namespace Isis {
    * @ingroup Utility
    * @author 2006-07-01 Kris Becker
    *
-   * @history 2007-06-05 Brendan George - Modified to work with
-   *          iString/StringTool merge
+   * @internal
+   *   @history 2007-06-05 Brendan George - Modified to work with
+   *                           iString/StringTool merge
    */
   class DbAccess : public DbProfile {
     private:

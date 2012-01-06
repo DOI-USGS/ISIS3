@@ -36,9 +36,10 @@ namespace Isis {
   *
   * @ingroup Statistics
   *
-  * @author Janet Barrett - 2009-03-13
-  *  
-  * @history 2011-02-08 Sharmila Prasad - Extended Highpass API for hicubenorm 
+  * @author 2009-03-13 Janet Barrett
+  *
+  * @internal
+  *   @history 2011-02-08 Sharmila Prasad - Extended Highpass API for hicubenorm
   */
   class VecFilter {
     public:

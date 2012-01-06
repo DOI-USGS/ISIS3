@@ -7,6 +7,7 @@ namespace Isis {
   class CubeDisplayProperties;
 
   /**
+   * @author ????-??-?? Unknown
    *
    * @internal
    *   @history 2011-05-18 Steven Lambright - Resolution now sorts correctly

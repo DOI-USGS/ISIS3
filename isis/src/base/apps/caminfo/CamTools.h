@@ -118,19 +118,24 @@ namespace Isis {
    *
    * @ingroup Utility
    * @author 2008-09-10 Kris Becker
-   * @history 2009-02-26 Kris Becker - Removed unconditional computation of
-   *          polygon even when the user did not request it.  Reorganized some
-   *          keywords to their relevant group locations.
-   * @history 2009-05-29 Kris Becker - Added _pixinx parameter
-   * @history 2009-06-22 Kris Becker - Added hasLimb() method to check for the
-   *          presence of a planet limb; Added getProjGeometry() method.
-   * @history 2009-08-04 Christopher Austin - fixed ImagePolygon::Create call for
-   *          the updated sampinc/lineinc implementation
-   * @history 2009-08-12 Kris Becker - Modified so that images that include
-   *          poles are not converted to 180 domain when projected
-   * @history 2009-08-24 Kris Becker - Added ability to disable use of shape
-   *          model when creating polygons that contains a limb
-   * @history 2011-02-17 Jai Rideout - Replaced pixinc with sinc and linc.
+   *
+   * @internal
+   *   @history 2009-02-26 Kris Becker - Removed unconditional computation of
+   *                           polygon even when the user did not request it.
+   *                           Reorganized some keywords to their relevant group
+   *                           locations.
+   *   @history 2009-05-29 Kris Becker - Added _pixinx parameter
+   *   @history 2009-06-22 Kris Becker - Added hasLimb() method to check for the
+   *                           presence of a planet limb; Added
+   *                           getProjGeometry() method.
+   *   @history 2009-08-04 Christopher Austin - fixed ImagePolygon::Create call
+   *                           for the updated sampinc/lineinc implementation
+   *   @history 2009-08-12 Kris Becker - Modified so that images that include
+   *                           poles are not converted to 180 domain when
+   *                           projected
+   *   @history 2009-08-24 Kris Becker - Added ability to disable use of shape
+   *                           model when creating polygons that contains a limb
+   *   @history 2011-02-17 Jai Rideout - Replaced pixinc with sinc and linc.
    */
   class BandGeometry {
 

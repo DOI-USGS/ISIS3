@@ -6,6 +6,11 @@
 
 
 namespace Isis {
+  /**
+   * @author ????-??-?? Unknown
+   *
+   * @internal
+   */
   class ViewportBufferTransform : public ViewportBufferAction {
     public:
       ViewportBufferTransform();

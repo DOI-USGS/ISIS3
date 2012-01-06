@@ -12,19 +12,19 @@
 
 namespace Isis {
 
+  /**
+    * @author 2006-06-22 Kris Becker
+    *
+    * @internal
+    *  @history 2008-11-05 Jeannie Walldren - Updated references to
+    *           DataInterp with NumericalApproximation.  Removed
+    *           const from LineStats() and SampleStats(),
+    *           getOffset(), getLineXform(), and getSampXform()
+    *           since calling NumericalApproximation::Evaluate()
+    *           changes class variables.
+    *
+    */
   class SlitherTransform : public Transform {
-      /**
-       * @author 2006-06-22 Kris Becker
-       *
-       * @internal
-       *  @history 2008-11-05 Jeannie Walldren - Updated references to
-       *           DataInterp with NumericalApproximation.  Removed
-       *           const from LineStats() and SampleStats(),
-       *           getOffset(), getLineXform(), and getSampXform()
-       *           since calling NumericalApproximation::Evaluate()
-       *           changes class variables.
-       *
-       */
 
     public:
       typedef NumericalApproximation::InterpType InterpType;

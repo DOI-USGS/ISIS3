@@ -5,6 +5,11 @@
 #include <cmath>
 #include <iostream>
 
+/**
+ * @author ????-??-?? Unknown
+ *
+ * @internal
+ */
 class Rotate : public Isis::Transform {
   private:
     double p_degrees;    // The degree of rotation

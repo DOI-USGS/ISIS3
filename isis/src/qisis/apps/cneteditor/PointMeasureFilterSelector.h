@@ -11,6 +11,16 @@ namespace Isis
   {
     class AbstractFilter;
 
+    /**
+     * @brief Allows users to choose filters for filtering points and measures
+     *
+     * This class is responsible for creating a list of filters that can be
+     * selected for filtering points and measures.
+     *
+     * @author ????-??-?? Eric Hyer
+     *
+     * @internal
+     */
     class PointMeasureFilterSelector : public AbstractFilterSelector
     {
         Q_OBJECT

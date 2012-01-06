@@ -42,8 +42,11 @@ namespace Isis {
    *      Distinct Points, Corners and Centres of Circular
    *      Features" by W. Forstner and E. Gulch    (Forstner.pdf)
    *
-   * @author 2006-05-01 Jacob Danton 
-   * @history 2010-11-10 Sharmila Prasad - Updated unittest for changes in the deffile 
+   * @author 2006-05-01 Jacob Danton
+   *
+   * @internal
+   *   @history 2010-11-10 Sharmila Prasad - Updated unittest for changes in the
+   *                           deffile 
    */
   class ForstnerOperator : public InterestOperator {
     public:

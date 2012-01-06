@@ -118,6 +118,11 @@ namespace Isis {
       int p_outputSamples;
   };
 
+  /**
+   * @author ????-??-?? Unknown
+   *
+   * @internal
+   */
   class DataValue {
     public:
       /**

@@ -12,6 +12,18 @@ namespace Isis
 {
   namespace CnetViz
   {
+
+    /**
+     * @brief Base class for an item without data
+     *
+     * This class represents an item in the tree that has no data. For example,
+     * RootItem and BusyLeafItem are two types of items that do not have any
+     * data.
+     *
+     * @author ????-??-?? Eric Hyer
+     *
+     * @internal
+     */
     class AbstractNullDataItem : public virtual AbstractTreeItem
     {
         Q_OBJECT

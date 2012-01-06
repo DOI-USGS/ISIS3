@@ -30,8 +30,15 @@ int overlapSize; //!< This stores the result of FrameletOverlapSize()
 // sample,line -> DN
 QList< QPair< QPair<int, int>, double> > nextFrameletFixes;
 
-//! This class is used to remember a translation between the bottom of one
-//! framelet and the top of the next. These stay fairly constant for one band.
+/**
+ *
+ * This class is used to remember a translation between the bottom of one
+ *   framelet and the top of the next. These stay fairly constant for one band.
+ *
+ * @author ????-??-?? Unknown
+ *
+ * @internal
+ */
 class Offset {
   public:
     Offset()

@@ -26,7 +26,24 @@ namespace Isis
   namespace CnetViz
   {
     class FilterGroup;
-    
+   
+    /**
+     * This widget contains filtering capabilities for a single filter type.
+     *
+     * The filter types are (strings containing exactly):
+     *   Connections
+     *   Images and Points
+     *   Points and Measures
+     *
+     * @todo Add type safety to filter types.
+     *
+     * This class does the visualization and editing of the filter groups. An
+     * interface is provided for evaluating all of the contained filters.
+     *
+     * @author ????-??-?? Eric Hyer
+     *
+     * @internal
+     */ 
     class FilterWidget : public QWidget
     {
         Q_OBJECT

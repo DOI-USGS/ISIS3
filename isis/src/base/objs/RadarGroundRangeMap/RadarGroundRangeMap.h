@@ -35,16 +35,17 @@ namespace Isis {
 #define RADAR_LOOK_DIR
 #endif
 
-  /** Construct a mapping between image sample and Radar ground range
+  /**
+   * Construct a mapping between image sample and Radar ground range
    *
    * @ingroup Camera
    *
    * @see Camera
    *
-   * @internal
-   *
    * @author 2008-06-17 Jeff Anderson
    * Original version
+   *
+   * @internal
    *
    * @history 2009-07-01 Janet Barrett - Corrected the transformation
    *                     calculations

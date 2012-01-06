@@ -38,10 +38,10 @@ namespace Isis {
   *
   * @ingroup Visualization Tools
   *
-  * @author Sharmila Prasad
+  * @author 2011-05-11 Sharmila Prasad
   *
   * @internal
-  * @history 2011-05-11  Sharmila Prasad - Initial Version
+  *   @history 2011-05-11  Sharmila Prasad - Initial Version
   */
   class SaveAsDialog : public FileDialog {
       Q_OBJECT

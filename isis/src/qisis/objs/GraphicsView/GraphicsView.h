@@ -1,6 +1,11 @@
 #include <QGraphicsView>
 
 namespace Isis {
+  /**
+   * @author ????-??-?? Unknown
+   *
+   * @internal
+   */
   class GraphicsView : public QGraphicsView {
      Q_OBJECT
     public:

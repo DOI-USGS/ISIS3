@@ -15,6 +15,8 @@ namespace Isis {
    * from the current filtered list that are not of the selected
    * type.
    *
+   * @author ????-??-?? Unknown
+   *
    * @internal
    *   @history 2008-11-26 Jeannie Walldren - Fixed comment in
    *                          filter() method.

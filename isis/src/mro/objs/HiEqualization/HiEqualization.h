@@ -42,8 +42,18 @@ namespace Isis {
   class Statistics;
 
 
+  /**
+   * @author ????-??-?? Unknown
+   *
+   * @internal
+   */
   class HiEqualization : public Equalization {
     protected:
+      /**
+       * @author ????-??-?? Unknown
+       *
+       * @internal
+       */
       class HiCalculateFunctor : public CalculateFunctor {
         public:
           HiCalculateFunctor(Statistics *stats, Statistics *statsLeft,

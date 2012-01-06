@@ -22,9 +22,11 @@
 #include "Camera.h"
 
 namespace Isis {
-  /** 
+  /**
    * Apollo Metric Distortion Map
-   * 
+   *
+   * @author ????-??-?? Unknown
+   *
    * @internal
    *   @history 2011-05-03 Jeannie Walldren - Updated documentation. Removed
    *                          Apollo namespace wrap inside Isis namespace. Added

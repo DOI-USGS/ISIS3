@@ -27,7 +27,11 @@
 #include <xercesc/sax2/DefaultHandler.hpp>
 
 namespace XERCES = XERCES_CPP_NAMESPACE;
-
+/**
+ * @author ????-??-?? Unknown
+ *
+ * @internal
+ */
 class IsisXMLHandler : public XERCES::DefaultHandler {
 
   public:

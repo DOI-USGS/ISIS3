@@ -80,6 +80,9 @@ namespace Isis {
    * for analysis of coregistration results with one or more columns specified
    * in the search/pattern chip strategy.
    *
+   * @author ????-??-?? Unknown
+   *
+   * @internal
    */
   class ControlByRow {
     public:

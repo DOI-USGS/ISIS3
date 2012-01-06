@@ -27,6 +27,8 @@
  */
 
 namespace Isis {
+  class ControlNet;
+  class Pvl;
 
   /**
    * @brief Find a Reference in Control Point with the least Incidence Angle
@@ -60,9 +62,6 @@ namespace Isis {
    *                                            Ground ------> Fixed
    *                                            Tie----------> Free
    */
-  class Pvl;
-  class ControlNet;
-
   class CnetRefByIncidence : public ControlNetValidMeasure {
     public:
       //! Constructor

@@ -871,7 +871,7 @@ namespace Isis {
    * return f evaluated at the nearest domain boundary.
    * @a CubicClamped and @a PolynomialNeville interpolation types
    * can extrapolate a value with accuracy only if
-   * @a a<sub>@a i</sub> is near enough to the domain boundary.
+   * @a a<sub>@a i </sub> is near enough to the domain boundary.
    *
    *
    * @param a     Vector of domain values from which to
@@ -2027,10 +2027,10 @@ namespace Isis {
    * @a n = 1, the method returns the non-composite
    * trapezoidal estimate of the integral.  Subsequent calls with
    * @a n = 2, 3, ... (in sequential order) will improve the
-   * accuracy by adding 2<sup>@a n-2</sup> additional interior
+   * accuracy by adding 2<sup>@a n-2 </sup> additional interior
    * points. This method can be used to integrate by the extended
    * trapeziodal rule if you know the number of steps you want to
-   * take.  For example, if you want 2<sup>@e M</sup> + 1, use
+   * take.  For example, if you want 2<sup>@e M </sup> + 1, use
    * the following code:
    * @code
    * double result;

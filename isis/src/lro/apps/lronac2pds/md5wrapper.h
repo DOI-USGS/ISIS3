@@ -1,13 +1,13 @@
 /*
- *	This is my wrapper-class to create
- *	a MD5 Hash from a string and a file.
+ *  This is my wrapper-class to create
+ *  a MD5 Hash from a string and a file.
  *
- *	This code is completly free, you
- *	can copy it, modify it, or do
- *	what ever you want with it.
+ *  This code is completly free, you
+ *  can copy it, modify it, or do
+ *  what ever you want with it.
  *
- *	Feb. 2005
- *	Benjamin Grüdelbach
+ *  Feb. 2005
+ *  Benjamin Grüdelbach
  */
 
 //include protection
@@ -20,6 +20,11 @@
 //forwards
 class MD5;
 
+/**
+ * @author 2005-02-?? Benjamin Grudelbach
+ *
+ * @internal
+ */
 class md5wrapper {
   private:
     MD5 *md5;

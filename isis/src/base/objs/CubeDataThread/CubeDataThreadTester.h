@@ -10,6 +10,11 @@ namespace Isis {
   class Brick;
   class CubeDataThread;
 
+  /**
+   * @author ????-??-?? Steven Lambright
+   *
+   * @internal
+   */
   class CubeDataThreadTester : public QThread {
       Q_OBJECT
 

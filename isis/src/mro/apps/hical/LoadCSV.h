@@ -62,6 +62,8 @@ namespace Isis {
    * @ingroup Utility
    * 
    * @author 2010-04-06 Kris Becker
+   *
+   * @internal
    */
   class LoadCSV {
 

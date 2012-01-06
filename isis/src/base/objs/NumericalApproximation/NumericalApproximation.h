@@ -559,7 +559,7 @@ namespace Isis {
    *       integral.  The first stage of refinement returns the
    *       ordinary trapezoidal estimate of the integral.
    *       Subsequent stages will improve the accuracy, where, for
-   *       the @a n<sup>th</sup> stage 2<sup>@a n-2</sup> interior
+   *       the @a n<sup>th</sup> stage 2<sup>@a n-2 </sup> interior
    *       points are added.
    *     </td>
    *   </tr>

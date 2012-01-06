@@ -29,7 +29,11 @@
 #include "IsisAmlData.h"
 #include "IsisXMLGroup.h"
 #include "IsisXMLIgnore.h"
-
+/**
+ * @author ????-??-?? Unknown
+ *
+ * @internal
+ */
 class IsisXMLGroups : public IsisXMLHandler {
 
   public:

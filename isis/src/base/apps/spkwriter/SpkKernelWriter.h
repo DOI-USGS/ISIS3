@@ -32,6 +32,7 @@
 #include "Filename.h"
 namespace Isis {
 
+typedef SpiceKernel<SpkSegment> SpkKernel;
 
 /**
  * @brief Support writing of SPK kernels to NAIF SPICE files
@@ -57,9 +58,11 @@ namespace Isis {
  * handle need to write the segment and the addComment() method to add details 
  * in the kernel file regarding the segment being written. 
  * 
+ * @author ????-??-?? Unknown
+ *
+ * @internal
  */
 
-typedef SpiceKernel<SpkSegment> SpkKernel;
 class SpkKernelWriter : public KernelWriter<SpkKernel> {
   public:
     SpkKernelWriter() { setType(DefaultSpkType); }

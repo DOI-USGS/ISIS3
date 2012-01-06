@@ -19,6 +19,15 @@ namespace Isis
   {
     class AbstractFilterSelector;
     
+    /**
+     * @brief Base class for filters that are string-based
+     *
+     * This class is the base class that all filters that are string-based.
+     *
+     * @author ????-??-?? Eric Hyer
+     *
+     * @internal
+     */
     class AbstractStringFilter : public AbstractFilter
     {
         Q_OBJECT

@@ -54,6 +54,8 @@ namespace Isis {
    *
    * @see StandardDeviationOperator GradientOperator
    *
+   * @author 2006-02-11 Jacob Danton
+   *
    * @internal
    *   @history 2006-02-11 Jacob Danton - Original Version
    *   @history 2007-08-02 Steven Koechle - Added better

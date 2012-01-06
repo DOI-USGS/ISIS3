@@ -18,6 +18,8 @@ namespace Isis {
    * class is designed to remove cubes from the current filtered
    * list that contain no points within the given distance.
    *
+   * @author ????-??-?? Unknown
+   *
    * @internal
    *   @history 2008-12-03 Jeannie Walldren - Changed variable
    *                          names and labels for clarity. Added

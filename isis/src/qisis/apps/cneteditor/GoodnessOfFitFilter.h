@@ -17,6 +17,17 @@ namespace Isis
   {
     class AbstractFilterSelector;
     
+    /**
+     * @brief Allows filtering by goodness of fit
+     *
+     * This class allows the user to filter control points and control measures
+     * by goodness of fit. This allows the user to make a list of control
+     * points that are potentially mis-registered.
+     *
+     * @author ????-??-?? Eric Hyer
+     *
+     * @internal
+     */
     class GoodnessOfFitFilter : public AbstractNumberFilter
     {
         Q_OBJECT

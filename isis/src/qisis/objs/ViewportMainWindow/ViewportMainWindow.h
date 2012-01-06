@@ -9,32 +9,29 @@
 
 namespace Isis {
   class Preference;
-}
-
-namespace Isis {
-  /**
-  * @brief This was called the Qisis MainWindow.  Now this is
-  *        being subclassed from the mainwindow class which keeps
-  *        track of the size and location of the qisis windows.
-  *        qview and qnet are two applications that use
-  *        WiewportMainWindow.
-  *
-  * @ingroup Visualization Tools
-  *
-  * @author Stacy Alley
-  *
-  * @internal
-  *
-  *  @history 2008-06-19 Noah Hilt - Added a method for sending a signal to qview
-  *           when this window recieves a close event. This signal calls the file
-  *           tool's exit method and ignores this class's close method.
-  *  @history 2010-18-03 Sharmila Prasad - Added ability to handle exception and display warning status
-  *           when exception occured
-  */
-  class Workspace;
   class ToolPad;
   class TrackTool;
+  class Workspace;
 
+  /**
+   * @brief This was called the Qisis MainWindow.  Now this is
+   *        being subclassed from the mainwindow class which keeps
+   *        track of the size and location of the qisis windows.
+   *        qview and qnet are two applications that use
+   *        WiewportMainWindow.
+   *
+   * @ingroup Visualization Tools
+   *
+   * @author ????-??-?? Stacy Alley
+   *
+   * @internal
+   *
+   *  @history 2008-06-19 Noah Hilt - Added a method for sending a signal to qview
+   *           when this window recieves a close event. This signal calls the file
+   *           tool's exit method and ignores this class's close method.
+   *  @history 2010-18-03 Sharmila Prasad - Added ability to handle exception and display warning status
+   *           when exception occured
+   */
   class ViewportMainWindow : public MainWindow {
       Q_OBJECT
 

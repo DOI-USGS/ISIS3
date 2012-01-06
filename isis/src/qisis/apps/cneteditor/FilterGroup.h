@@ -21,7 +21,16 @@ namespace Isis
   namespace CnetViz
   {
     class AbstractFilterSelector;
-    
+
+    /**
+     * This class provides an interface for a group of filters. Filters within
+     * a group are logically connected (AND/OR operations). An interface is
+     * provided for evaluating all of the filters in the group.
+     *
+     * @author ????-??-?? Eric Hyer
+     *
+     * @internal
+     */
     class FilterGroup : public QWidget
     {
         Q_OBJECT

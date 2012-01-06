@@ -12,7 +12,13 @@
 
 
 namespace Isis {
+  class ScatterPlotTool;
 
+  /**
+   * @author ????-??-?? Unknown
+   *
+   * @internal
+   */
   class MyZoomer: public QwtPlotZoomer {
     public:
       MyZoomer(QwtPlotCanvas *canvas): QwtPlotZoomer(canvas) {
@@ -27,17 +33,14 @@ namespace Isis {
         text.setBackgroundBrush(QBrush(bg));
         return text;
       }
-
   };
 
 
   /**
-   * @brief Scatter Plot Tool
+   * @author ????-??-?? Stacy Alley
    *
-   * @author Stacy Alley
+   * @internal
    */
-  class ScatterPlotTool;
-
   class ScatterPlotWindow : public MainWindow {
       Q_OBJECT
 

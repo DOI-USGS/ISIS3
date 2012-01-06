@@ -46,7 +46,7 @@ namespace Isis {
    * in separate threads using QtConcurrent.  When reading large Pvl networks
    * the progress will hang at zero percent for a while.
    * 
-   * @author Eric Hyer, Steven Lambright, Jai Rideout
+   * @author ????-??-?? Eric Hyer, Steven Lambright, Jai Rideout
    *
    * @internal
    *   @history 2011-07-27 Jai Rideout - The original thread count is now
@@ -104,7 +104,9 @@ namespace Isis {
        *
        * This class is designed to be called with QtConcurrent::run()
        * 
-       * @author Eric Hyer, Steven Lambright, Jai Rideout
+       * @author ????-??-?? Eric Hyer, Steven Lambright, Jai Rideout
+       *
+       * @internal
        */
       class ReadNetworkFunctor : public std::unary_function<
           void, LatestControlNetFile *> {
@@ -119,14 +121,16 @@ namespace Isis {
           //! needed by operator() to do call ControlNetVersioner::Read()
           QString m_networkFilename;
       };
-      
+
 
       /**
        * @brief This functor builds the points in a network
        *
        * This class is designed to be called with QtConcurrent::mappedReduced()
        * 
-       * @author Eric Hyer, Steven Lambright, Jai Rideout
+       * @author ????-??-?? Eric Hyer, Steven Lambright, Jai Rideout
+       *
+       * @internal
        */
       class NetworkBuilder : public std::unary_function<
           const ControlPointFileEntryV0002 &, ControlPoint *> {

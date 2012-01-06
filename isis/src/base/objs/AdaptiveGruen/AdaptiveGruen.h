@@ -41,7 +41,7 @@ namespace Isis {
    *
    * @see Gruen AutoReg MinimumGruen
    *
-   * @author  2009-09-09 Kris Becker
+   * @author 2009-09-09 Kris Becker
    *
    * @internal
    */

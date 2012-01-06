@@ -1,11 +1,11 @@
 /*
- *	This is the C++ implementation of the MD5 Message-Digest
- *	Algorithm desrcipted in RFC 1321.
- *	I translated the C code from this RFC to C++.
- *	There is no warranty.
+ *  This is the C++ implementation of the MD5 Message-Digest
+ *  Algorithm desrcipted in RFC 1321.
+ *  I translated the C code from this RFC to C++.
+ *  There is no warranty.
  *
- *	Feb. 12. 2005
- *	Benjamin Gr�delbach
+ *  Feb. 12. 2005
+ *  Benjamin Gr�delbach
  */
 
 /*
@@ -49,13 +49,19 @@ typedef uint8_t *POINTER;
  * MD5 context.
  */
 typedef struct {
-  uint32_t state[4];   	      /* state (ABCD) */
-  uint32_t count[2]; 	      /* number of bits, modulo 2^64 (lsb first) */
-  uint8_t buffer[64];	      /* input buffer */
+  uint32_t state[4];           /* state (ABCD) */
+  uint32_t count[2];         /* number of bits, modulo 2^64 (lsb first) */
+  uint8_t buffer[64];        /* input buffer */
 } MD5_CTX;
 
-/*
+/**
  * MD5 class
+ *
+ * This is the RSA Data Security, Inc. MD5 Message-Digest Algorithm
+ *
+ * @author ????-??-?? Unknown
+ *
+ * @internal
  */
 class MD5 {
 

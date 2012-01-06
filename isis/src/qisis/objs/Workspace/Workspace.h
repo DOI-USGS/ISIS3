@@ -39,7 +39,7 @@ namespace Isis {
   *
   * @ingroup Visualization Tools
   *
-  * @author ??? Jeff Anderson
+  * @author ????-??-?? Jeff Anderson
   *
   * @internal
   * @history  2007-03-21  Tracie Sucharski - Changed call from fitScale to

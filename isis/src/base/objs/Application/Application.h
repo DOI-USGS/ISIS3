@@ -47,7 +47,8 @@ namespace Isis {
   class Progress;
 
   /** 
-   *  
+   *  @author ????-??-?? Unknown
+   *
    * @internal
    *   @history 2005-12-16 Elizabeth Miller - Added documentation and
    *                           -BATCHLIST capabilities

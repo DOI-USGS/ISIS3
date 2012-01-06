@@ -32,7 +32,7 @@ namespace Isis {
    *   or very similar I/O patterns to cache cube data appropriately. The last
    *   numParallelIOs worth of I/Os will be left in the cache.
    *
-   * @author Jai Rideout and Steven Lambright
+   * @author ????-??-?? Jai Rideout and Steven Lambright
    *
    * @internal
    */

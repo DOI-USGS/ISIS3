@@ -25,25 +25,25 @@
 #include <string>
 #include <vector>
 
-/**
- * @brief Sets up calibration parameters for Viking images
- *
- * This class sets up necessary calibration parameters for a given Viking input
- * image.  It is a helper class for the vikcal application.
- *
- * If you would like to see CalParameters
- * being used in implementation, see vikcal.cpp
- *
- * @ingroup Viking
- *
- * @author 2005-05-18 Elizabeth Ribelin
- *
- * @internal
- *   @history 2005-11-15 Elizabeth Miller - Fixed problems caused by the split
- *                                          of the viking data area
- *
- */
 namespace Isis {
+  /**
+   * @brief Sets up calibration parameters for Viking images
+   *
+   * This class sets up necessary calibration parameters for a given Viking input
+   * image.  It is a helper class for the vikcal application.
+   *
+   * If you would like to see CalParameters
+   * being used in implementation, see vikcal.cpp
+   *
+   * @ingroup Viking
+   *
+   * @author 2005-05-18 Elizabeth Ribelin
+   *
+   * @internal
+   *   @history 2005-11-15 Elizabeth Miller - Fixed problems caused by the split
+   *                                          of the viking data area
+   *
+   */
   class CalParameters {
     public:
       // Constructor

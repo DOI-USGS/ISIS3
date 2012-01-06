@@ -13,6 +13,18 @@ namespace Isis
 {
   namespace CnetViz
   {
+
+    /**
+     * @brief Base class for an item that is a parent in the tree
+     *
+     * This class represents an item in the tree that is a parent (i.e. has
+     * children items). Item types that have children should derive from this
+     * class.
+     *
+     * @author ????-??-?? Eric Hyer
+     *
+     * @internal
+     */
     class AbstractParentItem : public virtual AbstractTreeItem
     {
       public:

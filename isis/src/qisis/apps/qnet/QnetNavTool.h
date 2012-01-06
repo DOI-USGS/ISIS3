@@ -44,7 +44,7 @@ namespace Isis {
    *
    * @ingroup Visualization Tools
    *
-   * @author Elizabeth Ribelin - 2006-11-07
+   * @author 2006-11-07 Elizabeth Ribelin
    *
    * @internal
    *   @history 2007-06-05 Tracie Sucharski - Added enumerators for filter indices

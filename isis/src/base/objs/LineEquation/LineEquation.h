@@ -39,6 +39,7 @@ namespace Isis {
    * @todo Add constructor with arguments (double slope, double intercept)
    *       Add method to double y = EvaluateLine( double x )
    *
+   * @internal
    */
   class LineEquation {
     public:

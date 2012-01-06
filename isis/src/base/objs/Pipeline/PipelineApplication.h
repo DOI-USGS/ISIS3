@@ -333,6 +333,8 @@ namespace Isis {
    * class.
    *
    * @author 2008-08-01 Steven Lambright
+   *
+   * @internal
    */
   class PipelineParameter {
     public:

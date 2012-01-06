@@ -17,6 +17,18 @@ namespace Isis
   {
     class AbstractFilterSelector;
     
+    /**
+     * @brief Allows filtering by cube serial number
+     *
+     * This class allows the user to filter control points and control measures
+     * by a cube serial number. This allows the user to make a list of control
+     * points and measures for a particular image or set of images with similar
+     * serial numbers.
+     *
+     * @author ????-??-?? Eric Hyer
+     *
+     * @internal
+     */
     class CubeSerialNumberFilter : public AbstractStringFilter
     {
         Q_OBJECT

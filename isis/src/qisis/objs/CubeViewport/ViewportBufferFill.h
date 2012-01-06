@@ -8,6 +8,8 @@ class QPoint;
 
 namespace Isis {
   /**
+   * @author ????-??-?? Unknown
+   *
    * @internal
    *   @history 2011-04-25 Steven Lambright Fixed a problem where 1 too few
    *                       lines were being read

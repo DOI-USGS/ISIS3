@@ -18,6 +18,8 @@ namespace Isis {
    * designed to remove cubes from the current filtered list
    * whose filename does not contain the string.
    *
+   * @author ????-??-?? Unknown
+   *
    * @internal
    *   @history 2009-01-08 Jeannie Walldren - Modified filter()
    *                          method to create new filtered list

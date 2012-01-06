@@ -47,7 +47,9 @@ namespace Isis {
  * The Gruen algorithm is initialized here and maintained for use in the 
  * stereo matching process. 
  * 
- * @author Kris Becker - 5/28/2011
+ * @author 2011-05-28 Kris Becker
+ *
+ * @internal
  */
 class SmtkMatcher {
   public:

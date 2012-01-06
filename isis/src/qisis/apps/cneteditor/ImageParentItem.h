@@ -12,6 +12,17 @@ namespace Isis
   
   namespace CnetViz
   {
+
+    /**
+     * @brief Tree item that is a parent and represents an image
+     *
+     * This class represents a parent item in a tree structure that holds
+     * serial number data.
+     *
+     * @author ????-??-?? Eric Hyer
+     *
+     * @internal
+     */
     class ImageParentItem : public AbstractImageItem, public AbstractParentItem
     {
       public:

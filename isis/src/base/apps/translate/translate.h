@@ -5,6 +5,11 @@
 #include <cmath>
 #include <iostream>
 
+/**
+ * @author ????-??-?? Unknown
+ *
+ * @internal
+ */
 class Translate : public Isis::Transform {
   private:
     int p_outputSamples;

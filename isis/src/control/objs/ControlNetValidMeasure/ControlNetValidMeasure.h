@@ -33,13 +33,12 @@
  */
 
 namespace Isis {
-  
   class Camera;
   class Cube;
   class ControlNet;
   class MeasureValidationResults;
   class ControlMeasure;
-  
+
    /**
     * @brief ControlNetValidMeasure class
     *
@@ -48,25 +47,29 @@ namespace Isis {
     *
     * @see cnetref autoseed etc.
     *
+    * @author 2010-05-11 Sharmila Prasad
+    *
     * @internal
     *  @history 2010-05-11 Sharmila Prasad - Original Version
-    *  @history 2010-06-21 Sharmila Prasad - Remove references to UniversalGroundMap & 
-    *                                        Cubes use CubeManager instead
-    *  @history 2010-06-23 Sharmila Prasad - Added Pixels/Meters from the edge options
-    *                                        and Validate Standard Options
-    *  @history 2010-09-16 Sharmila Prasad - Renamed to ControlNetValidMeasure for  
-    *                                        uniformity with other ControlNet Classes
-    *  @history 2010-10-14 Sharmila Prasad - Use only a single copy of Control Net
-    *  @history 2010-11-10 Sharmila Prasad - Change group name of DefFile from "Operator" to
-    *                                        "ValidMeasure"
-    *  @history 2011-05-17 Sharmila Prasad - Added Sample, Line Residuals and Residual Magnitude
-    *                                        for validation
-    *  @history 2011-05-19 Sharmila Prasad - Flag to indicate whether Camera is required, to increase
-    *                                        the processing speed
-    *  @history 2011-06-06 Sharmila Prasad - Process the options only is specified in the DefFile to
-    *                                        improve run time
-    *  @history 2011-11-21 Sharmila Prasad - Validate/Parse Pvl only if ValidMeasure Group is found.
-    *                                        Fixes Mantis #584
+    *  @history 2010-06-21 Sharmila Prasad - Remove references to
+    *                          UniversalGroundMap & Cubes use CubeManager
+    *                          instead
+    *  @history 2010-06-23 Sharmila Prasad - Added Pixels/Meters from the edge
+    *                          options and Validate Standard Options
+    *  @history 2010-09-16 Sharmila Prasad - Renamed to ControlNetValidMeasure
+    *                          for uniformity with other ControlNet Classes
+    *  @history 2010-10-14 Sharmila Prasad - Use only a single copy of Control
+    *                          Net
+    *  @history 2010-11-10 Sharmila Prasad - Change group name of DefFile from
+    *                          "Operator" to "ValidMeasure"
+    *  @history 2011-05-17 Sharmila Prasad - Added Sample, Line Residuals and
+    *                          Residual Magnitude for validation
+    *  @history 2011-05-19 Sharmila Prasad - Flag to indicate whether Camera is
+    *                          required, to increase the processing speed
+    *  @history 2011-06-06 Sharmila Prasad - Process the options only is
+    *                          specified in the DefFile to improve run time
+    *  @history 2011-11-21 Sharmila Prasad - Validate/Parse Pvl only if
+    *                          ValidMeasure Group is found. Fixes Mantis #584
     */
 
   class ControlNetValidMeasure {

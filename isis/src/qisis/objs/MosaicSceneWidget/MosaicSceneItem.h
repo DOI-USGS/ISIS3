@@ -25,7 +25,7 @@ namespace Isis {
    *
    * @ingroup Visualization Tools
    *
-   * @author Stacy Alley
+   * @author ????-??-?? Stacy Alley
    *
    * @internal
    *

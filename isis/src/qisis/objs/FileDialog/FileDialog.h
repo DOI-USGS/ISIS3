@@ -12,7 +12,7 @@ namespace Isis {
    *
    * @ingroup Visualization Tools
    *
-   * @author Stacy Alley
+   * @author ????-??-?? Stacy Alley
    *
    * @internal
    *   @history 2008-01-18 Stacy Alley - Changed the constructor to

@@ -12,6 +12,7 @@ class QStringList;
 
 namespace Isis {
   /**
+   * @author ????-??-?? Unknown
    * @internal
    *   @history 2008-11-26 Jeannie Walldren - Added functionality
    *                          to show the last Point ID entered

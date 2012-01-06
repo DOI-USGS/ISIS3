@@ -16,6 +16,11 @@ namespace Isis
     class TreeViewHeader;
     class AbstractTreeModel;
 
+    /**
+     * @author ????-??-?? Unknown
+     *
+     * @internal
+     */
     class TreeView : public QWidget
     {
         Q_OBJECT

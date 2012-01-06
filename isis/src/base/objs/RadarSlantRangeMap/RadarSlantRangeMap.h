@@ -37,11 +37,9 @@ namespace Isis {
    *
    * @see Camera
    *
-   * @internal
-   *
    * @author 2008-06-16 Jeff Anderson
-   * Original version
    *
+   * @internal
    *  @history 2009-07-01 Janet Barrett - Changed the bracketing method
    *                      used to solve for the root of the function that
    *                      determines ground range given slant range;

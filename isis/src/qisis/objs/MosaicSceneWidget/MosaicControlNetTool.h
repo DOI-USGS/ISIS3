@@ -17,7 +17,7 @@ namespace Isis {
    *
    * @ingroup Visualization Tools
    *
-   * @author  Christopher Austin
+   * @author ????-??-?? Christopher Austin
    *
    * @internal
    *   @history 2010-06-24 Christopher Austin - Added |x| functionality and

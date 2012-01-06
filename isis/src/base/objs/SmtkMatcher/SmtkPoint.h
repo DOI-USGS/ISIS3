@@ -34,7 +34,9 @@ namespace Isis {
   /**
    * @brief Container for a point and its geometry
    * 
-   * @author Kris Becker - 6/4/2011
+   * @author 2011-06-04 Kris Becker
+   *
+   * @internal
    */
   class PointGeometry {
     public:
@@ -62,7 +64,7 @@ namespace Isis {
    * hold all the neccessary information to complete stereo processing and 
    * generation of other SMTK points. 
    *  
-   * @author  2011-05-24 Kris Becker
+   * @author 2011-05-24 Kris Becker
    * 
    * @internal
    */

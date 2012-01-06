@@ -23,6 +23,14 @@
  */
 
 namespace Isis {
+  class Camera;
+  class Cube;
+  class Projection;
+  class Pvl;
+  class SurfacePoint;
+  class Latitude;
+  class Longitude;
+
   /**
    * @brief Universal Ground Map
    *
@@ -59,14 +67,6 @@ namespace Isis {
    *                                       classes.
    *  @history 2011-01-25 Eric Hyer - Added SetGround method for Surface Points
    */
-  class Camera;
-  class Cube;
-  class Projection;
-  class Pvl;
-  class SurfacePoint;
-  class Latitude;
-  class Longitude;
-
   class UniversalGroundMap {
     public:
       /**

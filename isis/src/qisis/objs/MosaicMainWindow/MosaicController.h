@@ -33,7 +33,7 @@ namespace Isis {
    *
    * @ingroup Visualization Tools
    *
-   * @author Stacy Alley
+   * @author ????-??-?? Stacy Alley
    *
    * @internal
    *   @history 2010-05-10 Christopher Austin - added cnet connectivity
@@ -133,6 +133,12 @@ namespace Isis {
 
       QFutureWatcher< CubeDisplayProperties * > * m_watcher;
 
+
+      /**
+       * @author ????-??-?? Steven Lambright
+       *
+       * @internal
+       */
       class FilenameToDisplayFunctor : public std::unary_function<
           const QString &, CubeDisplayProperties *> {
 
@@ -148,6 +154,12 @@ namespace Isis {
           int m_defaultAlpha;
       };
 
+
+      /**
+       * @author ????-??-?? Steven Lambright
+       *
+       * @internal
+       */
       class ProjectToDisplayFunctor : public std::unary_function<
           const PvlObject &, CubeDisplayProperties *> {
 

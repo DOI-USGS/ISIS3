@@ -15,6 +15,18 @@ namespace Isis
   namespace CnetViz
   {
     class AbstractFilterSelector;
+
+    /**
+     * @brief Allows filtering by the chooser name
+     *
+     * This class allows the user to filter control points by chooser name. This
+     * allows the user to make a list of control points which have been chosen
+     * by a particular user or application.
+     *
+     * @author ????-??-?? Eric Hyer
+     *
+     * @internal
+     */
     class ChooserNameFilter : public AbstractStringFilter
     {
         Q_OBJECT

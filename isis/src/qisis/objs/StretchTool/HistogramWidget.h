@@ -31,6 +31,7 @@ namespace Isis {
    *
    * @author 2009-05-01 Noah Hilt
    *
+   * @internal
    */
   class HistogramWidget : public QwtPlot {
       Q_OBJECT

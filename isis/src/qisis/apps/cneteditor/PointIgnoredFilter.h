@@ -14,6 +14,17 @@ namespace Isis
   {
     class AbstractFilterSelector;
     
+    /**
+     * @brief Allows filtering by a control point's ignored status
+     *
+     * This class allows the user to filter control points based on whether or
+     * not they are ignored. This allows the user to make a list of ignored or
+     * not-ignored control points.
+     *
+     * @author ????-??-?? Eric Hyer
+     *
+     * @internal
+     */
     class PointIgnoredFilter : public AbstractFilter
     {
         Q_OBJECT

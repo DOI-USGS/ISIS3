@@ -26,7 +26,7 @@ namespace Isis {
   *
   * @ingroup Visualization Tools
   *
-  * @author Noah Hilt
+  * @author ????-??-?? Noah Hilt
   *
   * @internal
   *  @history 2008-08-18 Christopher Austin - Upgraded to geos3.0.0

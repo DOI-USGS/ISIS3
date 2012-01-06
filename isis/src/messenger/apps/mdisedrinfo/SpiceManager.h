@@ -51,6 +51,8 @@ namespace Isis {
    *
    * @ingroup Utility
    * @author 2007-08-19 Kris Becker
+   *
+   * @internal
    */
   class SpiceManager {
     public:

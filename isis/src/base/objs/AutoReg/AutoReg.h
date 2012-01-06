@@ -29,6 +29,11 @@
 #include "Statistics.h"
 
 namespace Isis {
+  class AutoRegItem;
+  class Buffer;
+  class iString;
+  class Pvl;
+
   /**
    * @brief Auto Registration class
    *
@@ -39,6 +44,8 @@ namespace Isis {
    * @ingroup PatternMatching
    *
    * @see AutoRegFactory MaximumCorrelation MinimumDifference
+   *
+   * @author ????-??-?? Unknown
    *
    * @internal
    *   @history 2006-01-11 Jacob Danton Added idealFit variable, option for sub-pixel
@@ -163,11 +170,6 @@ namespace Isis {
    *    @history 2011-10-12 Jai Rideout - Removed Roberts gradient. It did not
    *             give useful results due to the 2x2 matrix it uses.
    */
-  class AutoRegItem;
-  class Buffer;
-  class iString;
-  class Pvl;
-
   class AutoReg {
     public:
       AutoReg(Pvl &pvl);

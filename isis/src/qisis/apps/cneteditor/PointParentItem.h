@@ -14,6 +14,18 @@ namespace Isis
   
   namespace CnetViz
   {
+
+    /**
+     * @brief Tree item that is a parent and represents a control point
+     *
+     * This class represents a parent item in a tree structure that holds
+     * control point data. It can have children items added to it, but they must
+     * be of type MeasureLeafItem.
+     *
+     * @author ????-??-?? Eric Hyer
+     *
+     * @internal
+     */
     class PointParentItem : public AbstractPointItem, public AbstractParentItem
     {
       public:

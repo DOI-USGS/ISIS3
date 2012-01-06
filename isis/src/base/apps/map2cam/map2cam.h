@@ -3,6 +3,11 @@
 
 #include "Transform.h"
 
+/**
+ * @author ????-??-?? Unknown
+ *
+ * @internal
+ */
 class map2cam : public Isis::Transform {
   private:
     Isis::Camera *p_outcam;

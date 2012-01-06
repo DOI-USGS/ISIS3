@@ -1,4 +1,4 @@
-/*	StaticStats
+/* StaticStats
 
 PIRL CVS ID: $Id: staticStats.h,v 1.1 2007/01/11 20:59:17 kbecker Exp $
 
@@ -42,47 +42,46 @@ namespace PIRL {
     values to create a StaticStats instance so that statistics from the cube would
     not have to be gathered over and over again.
 
-    @author		Drew Davidson, UA/PIRL
-
-    $Revision: 1.1 $
+    @author ????-??-?? Drew Davidson, UA/PIRL
+    @internal
   */
   class StaticStats {
     public:
 
       /*==============================================================================
-      	Constants
+        Constants
       ==============================================================================*/
-//!	Class identification name with source code version and date.
+//!     Class identification name with source code version and date.
       static const char *const
       ID;
 
       /*==============================================================================
-      	Constructors
+        Constructors
       ==============================================================================*/
-      /**	Constructs a default StaticStats.
+      /**  Constructs a default StaticStats.
 
       The staticStats has no statistics, they should be set via the mutator
       methods below
        */
       StaticStats() {};
 
-      /**	Constructs a StaticStats with given statistics.
+      /**  Constructs a StaticStats with given statistics.
 
       The staticStats is given an initial set of statistics.
 
-      @param	initialMean
+      @param  initialMean
         The initial mean DN for pixels in the cub
 
-      @param	initialStandardDeviation
+      @param  initialStandardDeviation
         The initial DN standard deviation for pixels in the cub
 
-      @param	initialValidPixels
+      @param  initialValidPixels
         The initial number of valid pixels in the cub
 
-      @param	initialMinimum
+      @param  initialMinimum
         The initial minimum DN value in the cub
 
-      @param	initialMaximum
+      @param  initialMaximum
         The initial maximum DN value in the cub
       */
       StaticStats(double initialMean,
@@ -92,85 +91,85 @@ namespace PIRL {
                   double initialMaximum);
 
       /*==============================================================================
-      	Accessors
+        Accessors
       ==============================================================================*/
-      /**	Gets the perceived mean pixel DN value.
+      /**  Gets the perceived mean pixel DN value.
 
-      @return	DN mean for the cub
+      @return  DN mean for the cub
       */
       double Average();
 
-      /**	Gets the perceived standard deviation for all pixel DN values.
+      /**  Gets the perceived standard deviation for all pixel DN values.
 
-      @return	DN standard deviaton for the cub
+      @return  DN standard deviaton for the cub
       */
       double StandardDeviation();
 
-      /**	Gets the perceived number of valid pixels.
+      /**  Gets the perceived number of valid pixels.
 
-      @return	Number of valid pixels in the cub
+      @return  Number of valid pixels in the cub
       */
       int ValidPixels();
 
-      /**	Gets the perceived minimum DN value.
+      /**  Gets the perceived minimum DN value.
 
-      @return	Lowest pixel DN in the cub
+      @return  Lowest pixel DN in the cub
       */
       double Minimum();
 
-      /**	Gets the perceived maximum DN value.
+      /**  Gets the perceived maximum DN value.
 
-      @return	Highest pixel DN in the cub
+      @return  Highest pixel DN in the cub
       */
       double Maximum();
 
       /*==============================================================================
-      	Mutators
+        Mutators
       ==============================================================================*/
-      /**	Sets the perceived mean DN value.
+      /**  Sets the perceived mean DN value.
 
-      @param	newMean New mean DN value
+      @param  newMean New mean DN value
       */
       void setMean(double newMean);
 
-      /**	Sets the perceived standard deviation of DN values in the cub.
+      /**  Sets the perceived standard deviation of DN values in the cub.
 
-      @param	newStandardDeviation New standard deviation for the cub
+      @param  newStandardDeviation New standard deviation for the cub
       */
       void setStandardDeviation(double newStandardDeviation);
 
-      /**	Sets the perceived count of valid pixels.
+      /**  Sets the perceived count of valid pixels.
 
-      @param	newValidPixels New count of valid pixels in the cub
+      @param  newValidPixels New count of valid pixels in the cub
       */
       void setValidPixels(int newValidPixelCount);
 
-      /**	Sets the perceived maximum DN in the cub
+      /**  Sets the perceived maximum DN in the cub
 
-      @param	newMaximum New maximum DN value
+      @param  newMaximum New maximum DN value
       */
       void setMaximum(double newMaximum);
 
-      /**	Sets the perceived minimum DN in the cub
+      /**  Sets the perceived minimum DN in the cub
 
-      @param	newMinimum New minimum DN value
+      @param  newMinimum New minimum DN value
       */
       void setMinimum(double newMinimum);
 
     private:
-      //!	Perceived mean DN
+      //!  Perceived mean DN
       double myMean;
 
-      //!	Perceived DN standard deviation
+      //!  Perceived DN standard deviation
       double myStandardDeviation;
 
-      //!	Perceived minimum DN
+      //!  Perceived minimum DN
       double myMinimum;
 
-      //!	Perceived maximum DN
+      //!  Perceived maximum DN
       double myMaximum;
 
-      //!	Perceived valid pixel count
+      //!  Perceived valid pixel count
       int myValidPixels;
   };
 }/* End namespace PIRL */

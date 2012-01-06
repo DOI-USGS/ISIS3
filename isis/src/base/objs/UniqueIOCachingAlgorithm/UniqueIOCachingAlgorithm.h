@@ -40,7 +40,7 @@ namespace Isis {
    *    band N):
    *   A,A or A,B,A or A,B,B,A
    *
-   * @author Jai Rideout and Steven Lambright
+   * @author ????-??-?? Jai Rideout and Steven Lambright
    *
    * @internal
    */

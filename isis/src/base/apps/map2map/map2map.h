@@ -3,6 +3,11 @@
 
 #include "Transform.h"
 
+/**
+ * @author ????-??-?? Unknown
+ *
+ * @internal
+ */
 class map2map : public Isis::Transform {
   private:
     Isis::Projection *p_inmap;

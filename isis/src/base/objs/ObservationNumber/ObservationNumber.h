@@ -30,6 +30,9 @@
 #include "SerialNumberList.h"
 
 namespace Isis {
+  class Pvl;
+  class PvlGroup;
+  class Cube;
 
   /**
    * @brief Serial Number composer
@@ -54,12 +57,6 @@ namespace Isis {
    *  @history 2008-05-09 Steven Lambright - Optimized the
    *           FindObservationTranslation method
    */
-
-  // Forward declarations
-  class Pvl;
-  class PvlGroup;
-  class Cube;
-
   class ObservationNumber : public Isis::SerialNumber {
     public:
       ObservationNumber();

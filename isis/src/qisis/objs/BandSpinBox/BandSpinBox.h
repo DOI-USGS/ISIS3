@@ -7,6 +7,11 @@
 #include "Pvl.h"
 
 namespace Isis {
+  /**
+   * @author ????-??-?? Unknown
+   *
+   * @internal
+   */
   class BandSpinBox : public QSpinBox {
       Q_OBJECT
 

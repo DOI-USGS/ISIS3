@@ -33,7 +33,7 @@ namespace Isis {
    * @see http://pds-imaging.jpl.nasa.gov/portal/galileo_mission.html 
    *
    *
-   * @author  Jeff Anderson
+   * @author ????-??-?? Jeff Anderson
    *
    * @internal
    *   @history 2007-10-25 Steven Koechle - Fixed so that it works in Isis3

@@ -136,8 +136,9 @@ namespace Isis {
     private:
 
       /** 
-       *  
-       *  
+       * @author ????-??-?? Unknown
+       *
+       * @internal
        */
       class Quad {
         public:

@@ -28,11 +28,12 @@ namespace Isis {
    *
    * @ingroup SpiceInstrumentsAndCameras
    * @ingroup Dawn
-   *  
-   * @see http://dawn.jpl.nasa.gov/mission/index.asp 
    *
-   * @author  Janet Barrett 
-   * @internal 
+   * @see http://dawn.jpl.nasa.gov/mission/index.asp
+   *
+   * @author ????-??-?? Janet Barrett
+   *
+   * @internal
    *   @history 2011-01-14 Travis Addair - Added new CK/SPK accessor methods,
    *                          pure virtual in Camera, implemented in mission
    *                          specific cameras.

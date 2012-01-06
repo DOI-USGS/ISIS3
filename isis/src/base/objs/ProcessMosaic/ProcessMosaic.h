@@ -40,6 +40,14 @@ enum FileType {
 };
 
 namespace Isis {
+
+/** 
+ * Constants
+ */
+#define SRC_IMAGE_TBL  "InputImages"
+#define FLOAT_MAX      16777216       //!< Max number a Floating point will hold
+#define FLOAT_MIN      -16777215      //!< Min number a Floating point will hold
+
   /**
    * @brief Mosaic two cubes together
    *
@@ -178,13 +186,6 @@ namespace Isis {
    *  @todo 2005-02-11 Stuart Sides - add coded example and implementation example
    *                                  to class documentation
    */
-
-/** 
- * Constants
- */
-#define SRC_IMAGE_TBL  "InputImages"
-#define FLOAT_MAX      16777216       //!< Max number a Floating point will hold
-#define FLOAT_MIN      -16777215      //!< Min number a Floating point will hold
 
   class ProcessMosaic : public Isis::Process {
 

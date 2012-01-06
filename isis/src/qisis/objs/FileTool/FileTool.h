@@ -19,6 +19,7 @@ namespace Isis {
   class MdiCubeViewport;
   class SaveAsDialog;
   /**
+   * @author ????-??-?? Unknown
    *
    * @internal
    *   @history 2008-12-10 Jeannie Walldren - Added "What's this?"

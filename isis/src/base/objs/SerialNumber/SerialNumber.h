@@ -28,6 +28,9 @@
 #include "SerialNumberList.h"
 
 namespace Isis {
+  class Pvl;
+  class PvlGroup;
+  class Cube;
 
   /**
    * @brief Serial Number composer
@@ -79,12 +82,6 @@ namespace Isis {
    *           method
    *  @history 2008-05-18 Steven Lambright Fixed documentation
    */
-
-  // Forward declarations
-  class Pvl;
-  class PvlGroup;
-  class Cube;
-
   class SerialNumber {
     public:
       SerialNumber();

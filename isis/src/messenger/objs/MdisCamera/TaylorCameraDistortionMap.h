@@ -39,7 +39,7 @@ namespace Isis {
    * @see MdisCamera
    * @see CameraDistortionMap
    *
-   * @author Kris Becker
+   * @author ????-??-?? Kris Becker
    *
    * @internal
    *   @history 2011-05-03 Jeannie Walldren - Added Isis disclaimer.

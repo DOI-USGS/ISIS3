@@ -41,7 +41,7 @@ namespace Isis {
    *
    * @ingroup Math and Statistics
    *
-   * @author Jacob Danton - 2005-11-28
+   * @author 2005-11-28 Jacob Danton
    *
    * @internal
    */

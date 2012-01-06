@@ -15,6 +15,20 @@ namespace Isis
 
   namespace CnetViz
   {
+
+    /**
+     * @brief The root of a tree
+     *
+     * This class represents the root of a tree in the tree model. It is
+     * different from other parent nodes because it knows of the last visible
+     * item in the tree that was filtered, which is needed during a
+     * partially-complete filter operation so that unfiltered items can be
+     * determined. The root item never contains any data.
+     *
+     * @author ????-??-?? Eric Hyer
+     *
+     * @internal
+     */
     class RootItem : public AbstractNullDataItem, public AbstractParentItem
     {
         Q_OBJECT

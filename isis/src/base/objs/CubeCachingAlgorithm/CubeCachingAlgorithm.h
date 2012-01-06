@@ -40,7 +40,7 @@ namespace Isis {
    *   freed from memory. These will not be called until there is at least
    *   a few allocated chunks in memory.
    *
-   * @author Jai Rideout and Steven Lambright
+   * @author ????-??-?? Jai Rideout and Steven Lambright
    *
    * @internal
    */
@@ -52,7 +52,7 @@ namespace Isis {
       /**
        * @brief This stores the results of the caching algorithm.
        *
-       * @author Jai Rideout and Steven Lambright
+       * @author ????-??-?? Jai Rideout and Steven Lambright
        *
        * @internal
        *   @history 2011-08-26 Steven Lambright and Jai Rideout - Fixed memory

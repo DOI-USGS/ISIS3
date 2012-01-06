@@ -38,13 +38,14 @@ template <typename A, typename B> class QMap;
 
 namespace Isis {
   class Pvl;
+
   /**
    * @brief Isis exception class
    *
    * The general Isis exception class. Contains an enumeration for what type of
    * exception to throw.
    *
-   * @author Jeff Anderson
+   * @author ????-??-?? Jeff Anderson
    *
    * @internal
    *   @history 2005-05-10 Leah Dahmer - Added class documentation
@@ -112,7 +113,7 @@ namespace Isis {
        * Contains information about an iException object. A helper class to
        * iException.
        *
-       * @author Unknown author, unknown date
+       * @author ????-??-?? Unknown
        *
        * @internal
        *   @history 2005-05-10 Leah Dahmer - wrote class documentation

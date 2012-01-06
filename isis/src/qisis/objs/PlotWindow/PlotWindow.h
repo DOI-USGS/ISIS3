@@ -49,7 +49,7 @@ namespace Isis {
   /**
    * @ingroup Visualization Tools
    *
-   * @author Stacy Alley
+   * @author ????-??-?? Stacy Alley
    *
    * @internal
    *  @history 2010-11-08 Eric Hyer - Added replot method

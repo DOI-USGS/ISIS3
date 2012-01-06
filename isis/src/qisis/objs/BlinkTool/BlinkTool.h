@@ -18,6 +18,7 @@ class QListWidgetItem;
 
 namespace Isis {
   /**
+   * @author ????-??-?? Unknown
    * @internal
    *   @history 2010-06-26 Eric Hyer - Now uses MdiCubeViewport instead of
    *            CubeViewport.  Fixed misuse of includes.

@@ -33,7 +33,9 @@ namespace Isis {
    * Defines the Registration Error filter for the QnetNavTool's Points section.
    * The user may enter values for Less Than and/or Greater Than. This class is 
    * designed to remove points from the current filtered list that lie outside 
-   * of the given range. 
+   * of the given range.
+   *
+   * @author ????-??-?? Unknown
    *
    * @internal
    *   @history 2009-01-08 Jeannie Walldren - Modified filter()

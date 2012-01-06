@@ -23,7 +23,12 @@ namespace Isis
     class TableColumn;
     class TableColumnList;
     class TableView;
-    
+
+    /**
+     * @author ????-??-?? Unknown
+     *
+     * @internal
+     */
     class TableViewContent : public QAbstractScrollArea
     {
         Q_OBJECT

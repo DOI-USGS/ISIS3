@@ -16,6 +16,7 @@ namespace Isis {
 
 namespace Isis {
   /**
+   * @author ????-??-?? Unknown
    *
    * @internal
    *   @history 2010-06-03 Jeannie Walldren - Initialized pointers

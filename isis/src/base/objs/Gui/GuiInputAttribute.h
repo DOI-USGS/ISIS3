@@ -29,6 +29,11 @@
 #include <QButtonGroup>
 
 namespace Isis {
+  /**
+   * @author ????-??-?? Unknown
+   *
+   * @internal
+   */
   class GuiInputAttribute : public QDialog {
       Q_OBJECT
 

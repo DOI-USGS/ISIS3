@@ -10,6 +10,11 @@ namespace Isis {
   class MosaicTreeWidgetItem;
   class ProgressBar;
 
+  /**
+   * @author ????-??-?? Unknown
+   *
+   * @internal
+   */
   class MosaicTreeWidget : public QTreeWidget {
       Q_OBJECT
 

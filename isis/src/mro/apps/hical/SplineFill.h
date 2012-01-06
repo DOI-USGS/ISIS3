@@ -40,9 +40,11 @@ namespace Isis {
    * 
    * @ingroup Utility
    * 
-   * @author 2007-10-09 Kris Becker 
-   * @history 2008-11-05 Jeannie Walldren Replaced references to 
-   *  DataInterp class with NumericalApproximation.
+   * @author 2007-10-09 Kris Becker
+   *
+   * @internal
+   *   @history 2008-11-05 Jeannie Walldren Replaced references to 
+   *                           DataInterp class with NumericalApproximation.
    */
   class SplineFill : public Module {
 

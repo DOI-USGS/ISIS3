@@ -56,10 +56,13 @@ namespace Isis {
    * The default initialization sets the points the ISIS Null pixel value
    * indicating it has not been initialized or can signal an invalid point if
    * either one of the values is not initialized to something other than an 
-   * ISIS special pixel. 
-   *  
+   * ISIS special pixel.
+   *
    * Operators are defined to ease performing simple add/subtract operations. 
-   * 
+   *
+   * @author ????-??-?? Unknown
+   *
+   * @internal
    */
   class Coordinate {
     public:
@@ -174,6 +177,10 @@ namespace Isis {
    * geomertry.  Valid geometry requires using camera models and that is costly.
    * 
    * Default initialize sets all points to an invalid state.
+   *
+   * @author ????-??-?? Unknown
+   *
+   * @internal
    */
   class PointPair {
     public:
@@ -205,7 +212,10 @@ namespace Isis {
 
   /**
    * @brief Store for radiometric gain and shift parameters
-   * 
+   *
+   * @author ????-??-?? Unknown
+   *
+   * @internal
    */
   class Radiometric {
     public:
@@ -239,7 +249,9 @@ namespace Isis {
    *  
    * These parameters are provided for input and output results. 
    * 
-   * @author Kris Becker - 4/18/2011
+   * @author 2011-04-18 Kris Becker
+   *
+   * @internal
    */
   class AffineRadio { 
     public:
@@ -314,7 +326,9 @@ namespace Isis {
    *  
    * @see Threshold 
    *  
-   * @author Kris Becker - 5/18/2011
+   * @author 2011-05-18 Kris Becker
+   * 
+   * @internal
    */
   struct AffineTolerance {
     public:
@@ -341,6 +355,9 @@ namespace Isis {
    * (x/y scaling) registration parameters. These parameters typically come from 
    * the PVL setup and the Gruen object. 
    *
+   * @author ????-??-?? Unknown
+   *
+   * @internal
    */
   class Threshold {
     public:
@@ -372,8 +389,10 @@ namespace Isis {
 
   /**
    * @brief Error analysis of Gruen match point solution
-   * 
-   * @author Kris Becker - 4/18/2011
+   *
+   * @author 2011-04-18 Kris Becker
+   *
+   * @internal
    */
   struct Analysis {
     Analysis() : m_npts(0), m_variance(0.0), m_sevals(), 
@@ -420,8 +439,10 @@ namespace Isis {
    * analysis, error analysis and affine/radiometric paramters.  The offset 
    * of the registration can be obtained through a call to getAffinePoint() 
    * using the default point coordinate of (0,0). 
-   * 
-   * @author kbecker (5/18/2011)
+   *
+   * @author 2011-05-18 Kris Becker
+   *
+   * @internal
    */
   class MatchPoint {
     public:

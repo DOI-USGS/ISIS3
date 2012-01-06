@@ -15,6 +15,11 @@
 
 namespace Isis {
 
+  /**
+   * @author ????-??-?? Unknown
+   *
+   * @internal
+   */
   class ScatterPlotData: public QwtRasterData {
 
     public:

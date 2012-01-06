@@ -67,8 +67,15 @@ namespace Isis {
       vector<string>msBands;      //!< Bands list
       Isis::Portal *m_iPortal;    //!< Input portal
   };
-  
-  // Functor for reduce using near functionality
+
+
+  /**
+   * Functor for reduce using near functionality
+   *
+   * @author ????-??-?? Unknown
+   *
+   * @internal
+   */
   class Nearest : public Isis::Reduce {
     public:
       //! Constructor
@@ -76,12 +83,19 @@ namespace Isis {
               double pdSampleScale, double pdLineScale) 
       :Reduce(pInCube, psBands, pdSampleScale, pdLineScale){
       }
-      
+
       //! Operator () overload 
       void operator() (Isis::Buffer & out);
   };
-  
-  // Functor for reduce using average functionality
+
+
+  /**
+   * Functor for reduce using average functionality
+   *
+   * @author ????-??-?? Unknown
+   *
+   * @internal
+   */
   class Average : public Isis::Reduce {
     public:
       //! Constructor

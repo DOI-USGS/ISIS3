@@ -18,6 +18,7 @@ namespace Isis {
    * list whose distance from all other points in the control net
    * is greater than or equal to the given value.
    *
+   * @author ????-??-?? Unknown
    * @internal
    *   @history 2008-11-26 Jeannie Walldren - Changed variable
    *                          names and labels for clarity.

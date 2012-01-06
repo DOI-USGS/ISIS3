@@ -1,6 +1,7 @@
 #ifndef CnetEditorWindow_H
 #define CnetEditorWindow_H
 
+#include <QFileDialog>
 #include <QMainWindow>
 
 class QAction;
@@ -19,6 +20,13 @@ namespace Isis
   class CnetEditorWidget;
   class ProgressBar;
 
+  /**
+   * This is the cneteditor program.
+   *
+   * @author 2011-??-?? Eric Hyer
+   *
+   * @internal
+   */
   class CnetEditorWindow : public QMainWindow
   {
       Q_OBJECT
@@ -117,6 +125,20 @@ namespace Isis
       static const int defaultWindowWidth = 1100;
       static const int defaultWindowHeight = 700;
   };
+
+
+  /**
+   * @author ????-??-?? Eric Hyer
+   *
+   * @internal
+   */
+  class CnetEditorFileDialog : public QFileDialog
+  {
+    public:
+      CnetEditorFileDialog(QLayout * l, QWidget * parent = NULL);
+  };
+
 }
 
 #endif
+

@@ -35,7 +35,6 @@
 #include "SpecialPixel.h"
 
 namespace Isis {
-
     class PvlObject;
     class Camera;
 
@@ -49,6 +48,7 @@ namespace Isis {
      *
      * @author  2010-02-15 Kris Becker
      *
+     * @internal
      */
     class HapkeExponential : public PhotometricFunction {
         public:

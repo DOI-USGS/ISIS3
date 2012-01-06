@@ -8,6 +8,12 @@
 #include "PvlGroup.h"
 
 namespace Isis {
+
+/**
+ * @author ????-??-?? Unknown
+ *
+ * @internal
+ */
 class WarpTransform : public Transform {
     public:
       WarpTransform(Isis::BasisFunction &basisLine, 

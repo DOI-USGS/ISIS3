@@ -13,6 +13,17 @@ namespace Isis
   {
     class AbstractFilterSelector;
     
+    /**
+     * @brief Allows filtering by a control measure's ignored status
+     *
+     * This class allows the user to filter control measures based on whether or
+     * not they are ignored. This allows the user to make a list of ignored or
+     * not-ignored control measures.
+     *
+     * @author ????-??-?? Eric Hyer
+     *
+     * @internal
+     */
     class MeasureIgnoredFilter : public AbstractFilter
     {
         Q_OBJECT

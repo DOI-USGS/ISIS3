@@ -17,6 +17,17 @@ namespace Isis
   {
     class AbstractFilterSelector;
     
+    /**
+     * @brief Allows filtering by the line residual
+     *
+     * This class allows the user to filter control measures by how much the
+     * line coordinate moved. This allows the user to make a list of control
+     * measures which have been significantly adjusted by pointreg.
+     *
+     * @author ????-??-?? Eric Hyer
+     *
+     * @internal
+     */
     class LineResidualFilter : public AbstractNumberFilter
     {
         Q_OBJECT

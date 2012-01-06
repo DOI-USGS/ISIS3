@@ -67,8 +67,10 @@ namespace Isis {
    * Camera", published in Icaris v141, pg. 205-255 (1999).
    *
    * @author  2010-02-15 Kris Becker
-   * @history 2010-02-24 Kris Becker - Changed include paths by adding "naif" to NAIF
-   *                     includes
+   *
+   * @internal
+   *   @history 2010-02-24 Kris Becker - Changed include paths by adding "naif" to NAIF
+   *                       includes
    *
    */
   class Hillier {

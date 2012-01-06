@@ -43,39 +43,43 @@ namespace Isis {
   class CubeViewport;
 
   /**
-    * @brief Viewport for Isis Chips
-    *
-    * @ingroup Visualization Tools
-    *
-    * @author 2007-05-01 Tracie Sucharski
-    *
-    * @internal
-    * @history 2008-09-09 Tracie Sucharski - Added setCircle and setCircleSize
-    *     methods.
-    * @history 2010-06-16 Jeannie Walldren - Modified geomChip(), nogeomChip(),
-    *     rotateChip() and reloadChip() to catch possible iExceptions from
-    *     Chip's Load() method and display Error in QMessageBox
-    * @history 2010-11-17 Eric Hyer - Added cubeToViewport method and
-    *     setControlNet slot.  paintEvent can now use the control net to paint
-    *     measures in the viewport.
-    * @history 2010-11-22 Eric Hyer - ChipViewports can now be stretched by
-    *     stretching CubeViewports opened to the same cube
-    * @history 2010-11-24 Eric Hyer - Fixed bug where crosses were painted one
-    *     screen pixel off on each direction.  Also no longer paint cross under
-    *     the large main red crosses.
-    * @history 2010-12-01 Eric Hyer - Added stretch locking
-    * @history 2011-06-07 Debbie A. Cook and Tracie Sucharski - Changed point
-    *     type "Ground" to "Fixed".
-    * @history 2011-06-14 Tracie Sucharski - Added mouseClick signal.  Qnet 
-    *     needed to know if user moved the tackpoint vs. simply loading a new
-    *     chip, or geoming the chip.
-    * @history 2011-06-15 Tracie Sucharski - Changed signal mouseClick to 
-    *     userMovedTackPoint.  TODO:  Could not use tackPointChanged signal
-    *     because that signal is emitted whenever the measure is loaded not
-    *     just when the user initiates the move.  This should be cleaned up.
-    * @history 2011-09-14 Tracie Sucharski - Added user option to determine 
-    *     whether control points are drawn. 
-    */
+   * @brief Viewport for Isis Chips
+   *
+   * @ingroup Visualization Tools
+   *
+   * @author 2007-05-01 Tracie Sucharski
+   *
+   * @internal
+   *   @history 2008-09-09 Tracie Sucharski - Added setCircle and setCircleSize
+   *                           methods.
+   *   @history 2010-06-16 Jeannie Walldren - Modified geomChip(), nogeomChip(),
+   *                           rotateChip() and reloadChip() to catch possible
+   *                           iExceptions from Chip's Load() method and display
+   *                           Error in QMessageBox
+   *   @history 2010-11-17 Eric Hyer - Added cubeToViewport method and
+   *                           setControlNet slot.  paintEvent can now use the
+   *                           control net to paint measures in the viewport.
+   *   @history 2010-11-22 Eric Hyer - ChipViewports can now be stretched by
+   *                           stretching CubeViewports opened to the same cube
+   *   @history 2010-11-24 Eric Hyer - Fixed bug where crosses were painted one
+   *                           screen pixel off on each direction.  Also no
+   *                           longer paint cross under the large main red
+   *                           crosses.
+   *   @history 2010-12-01 Eric Hyer - Added stretch locking
+   *   @history 2011-06-07 Debbie A. Cook and Tracie Sucharski - Changed point
+   *                           type "Ground" to "Fixed".
+   *   @history 2011-06-14 Tracie Sucharski - Added mouseClick signal.  Qnet 
+   *                           needed to know if user moved the tackpoint vs.
+   *                           simply loading a new chip, or geoming the chip.
+   *   @history 2011-06-15 Tracie Sucharski - Changed signal mouseClick to 
+   *                           userMovedTackPoint.
+   *                           TODO:  Could not use tackPointChanged signal
+   *                           because that signal is emitted whenever the
+   *                           measure is loaded not just when the user
+   *                           initiates the move.  This should be cleaned up.
+   *   @history 2011-09-14 Tracie Sucharski - Added user option to determine 
+   *                           whether control points are drawn.
+   */
   class ChipViewport : public QWidget {
       Q_OBJECT
 
@@ -184,6 +188,11 @@ namespace Isis {
       void computeStretch(Stretch &stretch, bool force = false);
       void paintImage();
 
+      /**
+       * @author ????-??-?? Unknown
+       *
+       * @internal
+       */
       class BandInfo {
         public:
           int band;

@@ -37,6 +37,37 @@ namespace Isis {
   class MdiCubeViewport;
 
   /**
+   * @author ????-??-?? Unknown
+   *
+   * @internal
+   */
+  class GroundTab : public QWidget {
+      Q_OBJECT
+
+    public:
+      GroundTab(QWidget *parent = 0);
+
+      QLineEdit *p_lonLineEdit;  //!< Input for longitude
+      QLineEdit *p_latLineEdit;  //!< Input for latitude
+  };
+
+  /**
+   * @author ????-??-?? Unknown
+   *
+   * @internal
+   */
+  class ImageTab : public QWidget {
+      Q_OBJECT
+
+    public:
+      ImageTab(QWidget *parent = 0);
+
+      QLineEdit *p_sampLineEdit;  //!< Input for sample
+      QLineEdit *p_lineLineEdit;  //!< Input for line
+  };
+
+
+  /**
    * @brief Tool to locate a point on a cube that is projected and/or has a camera
    *        model
    *
@@ -46,7 +77,7 @@ namespace Isis {
    *
    * @ingroup Visualization Tools
    *
-   * @author  ?? Unknown
+   * @author ????-??-?? Unknown
    *
    * @internal
 
@@ -85,26 +116,6 @@ namespace Isis {
    *                          infinite loop. Sync scale does not work for
    *                          image coordinates - is it supposed to?
    */
-  class GroundTab : public QWidget {
-      Q_OBJECT
-
-    public:
-      GroundTab(QWidget *parent = 0);
-
-      QLineEdit *p_lonLineEdit;  //!< Input for longitude
-      QLineEdit *p_latLineEdit;  //!< Input for latitude
-  };
-
-  class ImageTab : public QWidget {
-      Q_OBJECT
-
-    public:
-      ImageTab(QWidget *parent = 0);
-
-      QLineEdit *p_sampLineEdit;  //!< Input for sample
-      QLineEdit *p_lineLineEdit;  //!< Input for line
-  };
-
   class FindTool : public Tool {
       Q_OBJECT
 

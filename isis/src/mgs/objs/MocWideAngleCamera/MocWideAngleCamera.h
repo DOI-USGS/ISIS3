@@ -28,10 +28,12 @@ namespace Isis {
    * @brief MOC Wide Angle Camera Model
    *
    * This is the camera model for the Mars Global Surveyor MOC wide angle 
-   * camera. 
+   * camera.
    *
    * @ingroup SpiceInstrumentsAndCameras
    * @ingroup MarsGlobalSurveyor
+   *
+   * @author ????-??-?? Unknown
    *
    * @internal
    *   @history 2008-08-08 Steven Lambright Now using the new LoadCache(...)

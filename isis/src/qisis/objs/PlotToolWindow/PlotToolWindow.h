@@ -41,7 +41,7 @@ namespace Isis {
    *
    * @ingroup Visualization Tools
    *
-   * @author ???
+   * @author ????-??-?? Unknown
    *
    * @internal
    *  @history 2010-06-26 - Eric Hyer - Now uses MdiCubeViewport instead of

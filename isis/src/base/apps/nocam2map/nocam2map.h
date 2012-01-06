@@ -3,6 +3,11 @@
 
 #include "Transform.h"
 
+/**
+ * @author ????-??-?? Unknown
+ *
+ * @internal
+ */
 class nocam2map : public Isis::Transform {
   private:
     Isis::LeastSquares *p_sampleSol;

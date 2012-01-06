@@ -16,6 +16,21 @@ namespace Isis
     class AbstractTreeItem;
     class AbstractTreeModel;
 
+    /**
+     * @brief Table model for control points
+     *
+     * This class represents a model that provides access to control points in a
+     * table-like fashion. It acts as a proxy model to the underlying tree model
+     * by providing an interface to get items by index ranges, get selected
+     * items, etc.. Thus, users of the class can access all control points in
+     * the underlying tree model without having to worry about the details of
+     * traversing the tree structure to find the items of interest. The class
+     * also has knowledge of what columns should be in the control point table.
+     *
+     * @author ????-??-?? Eric Hyer
+     *
+     * @internal
+     */
     class PointTableModel : public AbstractTableModel
     {
         Q_OBJECT

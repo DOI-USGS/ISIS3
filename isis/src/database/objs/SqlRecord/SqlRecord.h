@@ -54,8 +54,9 @@ namespace Isis {
    *
    * @author 2006-08-18 Kris Becker
    *
-   * @history 2007-06-05 Brendan George - Modified to work with
-   *          iString/StringTools merge
+   * @internal
+   *   @history 2007-06-05 Brendan George - Modified to work with
+   *                           iString/StringTools merge
    */
   class SqlRecord : public QSqlRecord {
     public:

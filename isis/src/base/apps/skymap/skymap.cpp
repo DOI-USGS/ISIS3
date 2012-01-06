@@ -28,6 +28,12 @@ map <string, void *> GuiHelpers() {
   return helper;
 }
 
+
+/**
+ * @author ????-??-?? Unknown
+ *
+ * @internal
+ */
 class sky2map : public Transform {
   private:
     Camera *p_incam;

@@ -13,6 +13,17 @@ namespace Isis
 {
   namespace CnetViz
   {
+
+    /**
+     * @brief A leaf item that is not ready for user interaction
+     *
+     * This class represents a leaf item in the tree that is still being
+     * calculated (i.e. during filtering).
+     *
+     * @author ????-??-?? Eric Hyer
+     *
+     * @internal
+     */
     class BusyLeafItem : public AbstractNullDataItem, public AbstractLeafItem
     {
         Q_OBJECT

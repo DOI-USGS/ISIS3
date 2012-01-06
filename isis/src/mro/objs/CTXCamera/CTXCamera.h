@@ -29,10 +29,12 @@ namespace Isis {
    *
    * This is the camera model for the Mars Reconnaissance Orbiter Context Camera
    * (CTX). 
-   *  
+   *
    * @ingroup SpiceInstrumentsAndCameras
    * @ingroup MarsReconnaissanceOrbiter
-   *  
+   *
+   * @author ????-??-?? Unknown
+   *
    * @internal
    *   @todo Allow the programmer to apply scale and shear.
    *   @todo Write multiplaction method (operator*) for Affine * Affine.

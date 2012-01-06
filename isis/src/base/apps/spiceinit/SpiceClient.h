@@ -20,6 +20,11 @@ namespace Isis {
   class PvlObject;
   class Table;
 
+  /**
+   * @author ????-??-?? Steven Lambright
+   *
+   * @internal
+   */
   class SpiceClient : public QThread {
       Q_OBJECT
 

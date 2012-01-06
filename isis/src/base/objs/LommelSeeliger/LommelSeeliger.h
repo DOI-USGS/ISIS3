@@ -28,6 +28,11 @@
 namespace Isis {
   class Pvl;
 
+  /**
+   * @author ????-??-?? Unknown
+   *
+   * @internal
+   */
   class LommelSeeliger : public PhotoModel {
     public:
       LommelSeeliger(Pvl &pvl) : PhotoModel(pvl) {};

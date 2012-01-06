@@ -33,6 +33,11 @@
 #include "IsisXMLList.h"
 #include "IsisXMLHelpers.h"
 
+/**
+ * @author ????-??-?? Unknown
+ *
+ * @internal
+ */
 class IsisXMLParameter : public IsisXMLHandler {
 
   public:

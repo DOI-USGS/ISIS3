@@ -37,16 +37,14 @@ namespace Isis {
    *
    * @see Camera
    *
+   * @author 2005-02-08 Jeff Anderson
+   *
    * @internal
-   *
-   * @history 2005-02-08 Jeff Anderson
-   * Original version
-   *
-   * @history 2005-10-13 Jeff Anderson
-   * Fixed a bug.  Removed failure comparsion test on
-   * Sensor::SetRightAscensionDeclination calls.  A failure indicated we
-   * didn't hit the target but we don't care here since the target is the
-   * sky.
+   *   @history 2005-10-13 Jeff Anderson - Fixed a bug.  Removed failure
+   *                           comparsion test on
+   *                           Sensor::SetRightAscensionDeclination calls. A
+   *                           failure indicated we didn't hit the target but we
+   *                           don't care here since the target is the sky.
    *
    */
   class LineScanCameraSkyMap : public CameraSkyMap {

@@ -48,11 +48,9 @@ namespace Isis {
    *
    * @see Camera
    *
+   * @author 2008-06-16 Jeff Anderson
+   *
    * @internal
-   *
-   * @history 2008-06-16 Jeff Anderson
-   * Original version
-   *
    *  @history 2009-07-01 Janet Barrett - Fixed intrack, crosstrack, and radial
    *                      coordinate calculations; changed boundary check to use
    *                      radius instead of lat,lon; updated calculation of Doppler

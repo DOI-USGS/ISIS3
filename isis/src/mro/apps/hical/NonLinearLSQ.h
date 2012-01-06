@@ -53,6 +53,8 @@ namespace Isis {
    *  
    * @ingroup Utility
    * @author 2007-11-15 Kris Becker
+   *
+   * @internal
    */
   class NonLinearLSQ {
     public:

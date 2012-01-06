@@ -7,6 +7,9 @@ namespace Isis {
   /**
    * @brief A graphics view that resizes in a more friendly way
    *
+   * @author ????-??-?? Unknown
+   *
+   * @internal
    */
   class MosaicGraphicsView : public QGraphicsView {
       Q_OBJECT

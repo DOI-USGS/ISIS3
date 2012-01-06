@@ -32,7 +32,7 @@ namespace Isis {
    *
    * This class is designed to handle running any other programs or commands.
    *
-   * @author Steven Lambright
+   * @author 2010-12-03 Steven Lambright
    *
    * @internal
    *   @history 2010-12-03 Steven Lambright - Original version

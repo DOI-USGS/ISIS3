@@ -6,6 +6,11 @@
 namespace Isis {
   class SpiceClient;
 
+  /**
+   * @author ????-??-?? Steven Lambright
+   *
+   * @internal
+   */
   class SpiceClientStarter : public QObject {
       Q_OBJECT
 

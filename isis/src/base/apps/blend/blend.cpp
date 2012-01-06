@@ -26,7 +26,11 @@ int r2;
 int c1;
 int c2;
 
-
+/**
+ * @author ????-??-?? Unknown
+ *
+ * @internal
+ */
 class Node {
   public:
     Node(int sample, int line, int samples, int lines, int score) {

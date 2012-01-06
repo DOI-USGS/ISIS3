@@ -24,6 +24,22 @@ namespace Isis
     class PointParentItem;
     class RootItem;
 
+    /**
+     * @brief Tree model for control points and control measures
+     *
+     * This class represents a model that provides access to control points and
+     * control measures in a tree-like fashion. The tree structure is designed
+     * such that control points are parent nodes with control measures as
+     * children (leaf) nodes.
+     *
+     * This class also provides functionality for the multi-threaded rebuilding
+     * of the point-measure tree model structure, which is necessary when
+     * certain types of changes are made to the underlying control network.
+     *
+     * @author ????-??-?? Eric Hyer
+     *
+     * @internal
+     */
     class PointMeasureTreeModel : public AbstractTreeModel
     {
         Q_OBJECT
@@ -41,6 +57,11 @@ namespace Isis
 
 
       private:
+        /**
+         * @author ????-??-?? Eric Hyer
+         *
+         * @internal
+         */
         class CreateRootItemFunctor : public std::unary_function <
           ControlPoint * const &, PointParentItem * >
         {

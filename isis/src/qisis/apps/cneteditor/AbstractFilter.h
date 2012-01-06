@@ -20,6 +20,18 @@ namespace Isis
   {
     class AbstractFilterSelector;
 
+    /**
+     * @brief Base class for control net filters
+     *
+     * This class is the base class that all other filters derive from. It
+     * encompasses both the widget and the filter functionality itself. See the
+     * cneteditor architecture document for further information about the
+     * filtering system.
+     *
+     * @author ????-??-?? Eric Hyer
+     *
+     * @internal
+     */
     class AbstractFilter : public QWidget
     {
         Q_OBJECT

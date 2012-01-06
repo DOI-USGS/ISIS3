@@ -24,8 +24,8 @@
 #include "Camera.h"
 
 namespace Isis {
-  /** 
-   *  @brief Cassini Vims camera model
+  /**
+   * @brief Cassini Vims camera model
    *
    *   This is the camera model for the Cassini Vims instrument
    *
@@ -33,6 +33,8 @@ namespace Isis {
    * @ingroup Cassini-Huygens
    *
    * @see Camera
+   *
+   * @author 2006-03-16 Tracie Sucharski
    *
    * @internal
    *

@@ -11,6 +11,16 @@ namespace Isis
   {
     class AbstractFilter;
 
+    /**
+     * @brief Allows users to choose filters for filtering images and points
+     *
+     * This class is responsible for creating a list of filters that can be
+     * selected for filtering images and points.
+     *
+     * @author ????-??-?? Eric Hyer
+     *
+     * @internal
+     */
     class ImagePointFilterSelector : public AbstractFilterSelector
     {
         Q_OBJECT

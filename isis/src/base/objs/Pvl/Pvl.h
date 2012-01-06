@@ -118,7 +118,7 @@ namespace Isis {
    *           output operator
    *  @history 2008-07-10 Steven Lambright - Changed StringEqual to use
    *           PvlKeyword::StringEqual
-   *  @history 2008-10-2 Christopher Austin - Replaced all std::endl in the <<
+   *  @history 2008-10-02 Christopher Austin - Replaced all std::endl in the <<
    *           operator, Write() and Append() with PvlFormat.FormatEOL()
    *  @history 2009-12-17 Steven Lambright - Rewrote read (istream operator)
    *  @history 2010-04-13 Eric Hyer - Added copy constructor
@@ -128,7 +128,7 @@ namespace Isis {
    *  @history 2010-07-12 Steven Lambright - It's a bad idea to copy 
    *            p_internalTemplate in the copy constructor since it describes
    *            whether or not to delete an internal pointer.
-   *  @history 2010-079-27 Sharmila Prasad - Validate a Pvl with the Template Pvl
+   *  @history 2010-09-27 Sharmila Prasad - Validate a Pvl with the Template Pvl
    *  @todo 2005-02-14 add coded example to class documentation.
    */
   class Pvl : public Isis::PvlObject {

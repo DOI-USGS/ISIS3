@@ -99,7 +99,12 @@ namespace Isis {
       static Plugin m_projPlugin;
   };
 
-  /// @cond INTERNAL
+
+  /**
+   * @author ????-??-?? Unknown
+   *
+   * @internal
+   */
   class PFPixelMapper : public Isis::WorldMapper {
     public:
       /**

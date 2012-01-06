@@ -9,6 +9,11 @@
 #include <QDockWidget>
 
 namespace Isis {
+  /**
+   * @author ????-??-?? Unknown
+   *
+   * @internal
+   */
   class HistogramToolWindow : public PlotWindow {
       Q_OBJECT
 

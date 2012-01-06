@@ -7,7 +7,11 @@
 
 namespace Isis {
 
-
+  /**
+   * @author ????-??-?? Unknown
+   *
+   * @internal
+   */
   class PaletteWindow : public QMainWindow {
       Q_OBJECT
     public:

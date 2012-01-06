@@ -6,6 +6,11 @@
 class QRect;
 
 namespace Isis {
+  /**
+   * @author ????-??-?? Unknown
+   *
+   * @internal
+   */
   class ViewportBufferStretch : public ViewportBufferAction {
     public:
       ViewportBufferStretch();

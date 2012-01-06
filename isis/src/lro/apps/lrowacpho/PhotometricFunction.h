@@ -67,6 +67,7 @@ namespace Isis {
      *
      * @author  2010-02-15 Kris Becker
      *
+     * @internal
      */
     class PhotometricFunction {
         public:

@@ -36,6 +36,8 @@ namespace Isis {
    * @ingroup Utility
    *
    * @author 2007-05-01 Brendan George
+   *
+   * @internal
    */
   class WriteTabular {
     public:

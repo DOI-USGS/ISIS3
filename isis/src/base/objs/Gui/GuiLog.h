@@ -5,7 +5,11 @@
 #include <QTextEdit>
 
 namespace Isis {
-
+  /**
+   * @author ????-??-?? Unknown
+   *
+   * @internal
+   */
   class GuiLog : public QWidget {
 
       Q_OBJECT

@@ -31,6 +31,11 @@
 
 
 namespace Isis {
+  /**
+   * @author ????-??-?? Unknown
+   *
+   * @internal
+   */
   class PlotToolCurve : public PlotCurve {
 
     public:

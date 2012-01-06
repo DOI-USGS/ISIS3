@@ -27,7 +27,7 @@ namespace Isis {
   *
   * @ingroup Visualization Tools
   *
-  * @author Unknown
+  * @author ????-??-?? Unknown
   *
   * @internal
   *   @history 2007-11-19 Stacy Alley added the capability of the qisis windows

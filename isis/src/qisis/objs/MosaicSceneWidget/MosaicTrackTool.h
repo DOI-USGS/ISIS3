@@ -10,6 +10,11 @@ class QLabel;
 class QStatusBar;
 
 namespace Isis {
+  /**
+   * @author ????-??-?? Unknown
+   *
+   * @internal
+   */
   class MosaicTrackTool : public MosaicTool {
       Q_OBJECT
 

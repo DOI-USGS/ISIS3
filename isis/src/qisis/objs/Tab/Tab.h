@@ -45,7 +45,7 @@ namespace Isis
    * TabBar for which the Tab resides has a radioStyle() of true, which is
    * false by default.  See TabBar for more details about radioStyle.
    *
-   * @author Eric Hyer
+   * @author 2010-05-06 Eric Hyer
    *
    * @internal
    * @history 2010-05-06 Eric Hyer - Original Version

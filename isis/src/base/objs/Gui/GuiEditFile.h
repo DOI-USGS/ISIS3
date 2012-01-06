@@ -38,7 +38,7 @@ namespace Isis {
   * Example can be used to edit DefFiles in control net applications. 
   * Refer to cnetedit Application
   *
-  * @author Sharmila Prasad
+  * @author 2011-05-21 Sharmila Prasad
   *
   * @internal
   * @history 2011-05-21  Sharmila Prasad - Initial Version 

@@ -33,6 +33,11 @@
 #include <qwt_plot_marker.h>
 
 namespace Isis {
+  /**
+   * @author ????-??-?? Unknown
+   *
+   * @internal
+   */
   class PlotCurve : public QwtPlotCurve {
 
     public:

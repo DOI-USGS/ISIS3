@@ -51,7 +51,10 @@ class SpiceSegment;
  * looks like SpiceSegment::write(CkKernelWriter &writer).  This class exposes
  * the handle need to write the segment and the addComment() method to add
  * details in the kernel file regarding the segment being written.
- * 
+ *
+ * @author ????-??-?? Unknown
+ *
+ * @internal
  */
 class CkKernelWriter {
   public:

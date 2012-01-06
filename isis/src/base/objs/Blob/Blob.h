@@ -29,19 +29,22 @@
 namespace Isis {
   bool IsBlob(Isis::PvlObject &obj);
   /**
+   * @author ????-??-?? Unknown
+   *
    * @internal
-   *   @history Jeff Anderson 04-04-2006 Class was not overwriting
-   *          existing blobs correctly.
-   *   @history Elizabeth Miller 02-20-2007 Fixed bug with
-   *          OriginalLabel naming and modified to be backwards
-   *          compatible
-   *   @history Steven Lambright Added copy constructor,
-   *            assignment operator
+   *   @history 2006-04-04 Jeff Anderson Class was not overwriting existing
+   *                           blobs correctly.
+   *   @history 2007-02-20 Elizabeth Miller Fixed bug with
+   *                           OriginalLabel naming and modified to be backwards
+   *                           compatible
+   *   @history ????-??-?? Steven Lambright Added copy constructor,
+   *                           assignment operator
    *   @history 2010-05-15 Steven Lambright Changed Read to use an
-   *            istream instead of an fstream
+   *                           istream instead of an fstream
    *   @history 2011-05-25 Janet Barrett and Steven Lambright Added a Read
-   *            method that takes the pvl labels so they do not have to be
-   *            re-read, which is a very expensive operation.
+   *                           method that takes the pvl labels so they do not
+   *                           have to be re-read, which is a very expensive
+   *                           operation.
    *
    * @todo Write class description, history, etc.
    */

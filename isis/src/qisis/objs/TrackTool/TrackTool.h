@@ -19,7 +19,7 @@ namespace Isis {
    *
    * @ingroup Visualization Tools
    *
-   * @author
+   * @author ????-??-?? Unknown
    *
    * @internal
    *

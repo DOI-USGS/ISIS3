@@ -46,11 +46,13 @@ namespace Isis {
    * 
    * @ingroup Utility
    * 
-   * @author 2008-03-04 Kris Becker 
-   * @history 2009-09-14 Kris Becker Removed temperature components and placed 
-   *          them in the GainTemperature module.
-   * @history 2010-04-16 Kris Becker Modified to used the standardized CSV 
-   *          reader for the A matrix.
+   * @author 2008-03-04 Kris Becker
+   *
+   * @internal
+   *   @history 2009-09-14 Kris Becker Removed temperature components and placed 
+   *                           them in the GainTemperature module.
+   *   @history 2010-04-16 Kris Becker Modified to used the standardized CSV 
+   *                           reader for the A matrix.
    */
   class GainFlatField : public Module {
 

@@ -30,19 +30,26 @@ namespace Isis {
    * This class extends the ProcessExport class to allow the user
    * to export cubes to PDS format.
    *
-   * @history 2006-09-05 Stuart Sides - Original version
-   * @history 2006-12-14 Stuart Sides - Modified keword units to be PDS complient
-   * @history 2008-05-20 Steven Lambright - Fixed documentation
-   * @history 2008-08-07 Christopher Austin - Added fixed label export capability
-   * @history 2008-10-02 Christopher Austin - Fixed LabelSize() and OutputLabel()
-   *          in accordace to the pds end of line sequence requirement
-   * @history 2008-12-17 Steven Lambright - Added calculations for OFFSET and
-   *          SCALEFACTOR keywords
-   * @history 2009-05-31 Kris Becker - Included the number of bands in the
-   *          computation of the number of FILE_RECORDS for fixed PDS type
-   *          products.  It assumed only 1 band.
-   * @history 2010-02-24 Janet Barrett - Added code to support JPEG2000. 
-   * @history 2010-07-21 Sharmila Prasad - Fixed error while converting resolution from Meters to Kilometers 
+   * @author 2006-09-05 Stuart Sides
+   *
+   * @internal
+   *   @history 2006-09-05 Stuart Sides - Original version
+   *   @history 2006-12-14 Stuart Sides - Modified keword units to be PDS
+   *                           compliant
+   *   @history 2008-05-20 Steven Lambright - Fixed documentation
+   *   @history 2008-08-07 Christopher Austin - Added fixed label export
+   *                           capability
+   *   @history 2008-10-02 Christopher Austin - Fixed LabelSize() and
+   *                           OutputLabel() in accordace to the pds end of line
+   *                           sequence requirement
+   *   @history 2008-12-17 Steven Lambright - Added calculations for OFFSET and
+   *                           SCALEFACTOR keywords
+   *   @history 2009-05-31 Kris Becker - Included the number of bands in the
+   *                           computation of the number of FILE_RECORDS for
+   *                           fixed PDS type products.  It assumed only 1 band.
+   *   @history 2010-02-24 Janet Barrett - Added code to support JPEG2000. 
+   *   @history 2010-07-21 Sharmila Prasad - Fixed error while converting
+   *                           resolution from Meters to Kilometers 
    */
   class ProcessExportPds : public Isis::ProcessExport {
     public:

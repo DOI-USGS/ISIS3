@@ -7,7 +7,11 @@
 
 
 namespace Isis {
-
+  /**
+   * @author ????-??-?? Unknown
+   *
+   * @internal
+   */
   class GuiComboBoxParameter : public GuiParameter {
 
       Q_OBJECT

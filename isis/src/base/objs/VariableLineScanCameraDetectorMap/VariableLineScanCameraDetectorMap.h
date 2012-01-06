@@ -69,6 +69,13 @@ namespace Isis {
       std::vector< LineRateChange > &p_lineRates;
   };
 
+
+  /**
+   *
+   * @author ????-??-?? Unknown
+   *
+   * @internal
+   */
   class LineRateChange {
     public:
       LineRateChange(int line, double stime, double rate) {

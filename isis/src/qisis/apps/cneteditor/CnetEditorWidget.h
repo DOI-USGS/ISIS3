@@ -31,6 +31,17 @@ namespace Isis
     class TreeView;
   }
 
+  /**
+   * This widget provides full editing, filtering and viewing capabilities for
+   * the raw data in a control network. The raw data is, for example, chooser
+   * name or cube serial number. The display is all textual. Please use
+   * the widget accessors to appropriately place the various ancillary sections
+   * of the editor.
+   *
+   * @author ????-??-?? Eric Hyer
+   *
+   * @internal
+   */
   class CnetEditorWidget : public QWidget
   {
       Q_OBJECT

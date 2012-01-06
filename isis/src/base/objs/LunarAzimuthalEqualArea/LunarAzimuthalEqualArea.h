@@ -44,8 +44,9 @@ namespace Isis {
   *
   * @ingroup MapProjection
   *
-  * @author 15 MAY 2009 Eric Hyer
+  * @author 2009-05-15 Eric Hyer
   *
+  * @internal
   */
   class LunarAzimuthalEqualArea : public Isis::Projection {
     public:

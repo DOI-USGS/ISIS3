@@ -9,6 +9,11 @@
 
 
 namespace Isis {
+  /**
+   * @author ????-??-?? Unknown
+   *
+   * @internal
+   */
   class QnetFilter : public QWidget {
       Q_OBJECT
 

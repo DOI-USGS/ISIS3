@@ -13,6 +13,17 @@ namespace Isis
     class AbstractTreeItem;
     class TableColumn;
 
+    /**
+     * Delegate for creating, reading, and saving data in the measure table.
+     *
+     * This class is responsible for creating widgets that can be used to edit
+     * cells in the measure table. It is also responsible for populating the
+     * widgets with values and for saving the values.
+     *
+     * @author ????-??-?? Eric Hyer
+     *
+     * @internal
+     */
     class MeasureTableDelegate : public AbstractTableDelegate
     {
       public:

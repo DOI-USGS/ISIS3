@@ -28,7 +28,7 @@ namespace Isis {
    *
    * @ingroup Visualization Tools
    *
-   * @author Stacy Alley
+   * @author ????-??-?? Stacy Alley
    *
    * @internal
    *   @history 2011-04-14 Steven Lambright Refactored to use the new

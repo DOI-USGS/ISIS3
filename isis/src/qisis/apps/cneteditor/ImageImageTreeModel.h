@@ -23,6 +23,22 @@ namespace Isis
     class TreeView;
     class ImageParentItem;
 
+    /**
+     * @brief Tree model for images and images
+     *
+     * This class represents a model that provides access to images that are
+     * connected together through a control point. The tree structure is
+     * designed such that images are parent nodes with images as children (leaf)
+     * nodes.
+     *
+     * This class also provides functionality for the multi-threaded rebuilding
+     * of the image-image tree model structure, which is necessary when certain
+     * types of changes are made to the underlying control network.
+     *
+     * @author ????-??-?? Eric Hyer
+     *
+     * @internal
+     */
     class ImageImageTreeModel : public AbstractTreeModel
     {
         Q_OBJECT
@@ -40,6 +56,11 @@ namespace Isis
 
 
       private:
+        /**
+         * @author ????-??-?? Eric Hyer
+         *
+         * @internal
+         */
         class CreateRootItemFunctor : public std::unary_function <
           ControlCubeGraphNode * const &, ImageParentItem * >
         {

@@ -33,20 +33,22 @@ namespace Isis {
     *
     * @author 2008-09-09 Tracie Sucharski
     *
-    * @history 2008-11-19  Tracie Sucharski - Addition option to constructor
-    *                          to allow mouse events on leftChipViewport.
-    * @history 2009-06-10  Tracie Sucharski - Added new slot, clearFiles which
-    *                          allow new files to be opened.
-    * @history  2010-05-18 Jeannie Walldren - Modified createPoint() method Point ID
-    *                           Dialog to return if "Cancel" is clicked.
-    * @history 2010-05-18  Tracie Sucharski - Added pointId to the Tie tool
-    *                          Dialog.
-    * @history 2010-11-23 Eric Hyer - Added stretchChipViewport SIGNAL for
-    *                          forwarding of SIGNAL from StretchTool to
-    *                          ChipViewport
-    * @history 2010-12-17 Eric Hyer - Code for open dialog for setting the
-    *                          registration template now in this class, not in
-    *                          ControlPointEdit
+    * @internal
+    *   @history 2008-11-19 Tracie Sucharski - Addition option to constructor
+    *                           to allow mouse events on leftChipViewport.
+    *   @history 2009-06-10 Tracie Sucharski - Added new slot, clearFiles which
+    *                           allow new files to be opened.
+    *   @history 2010-05-18 Jeannie Walldren - Modified createPoint() method
+    *                           Point ID Dialog to return if "Cancel" is
+    *                           clicked.
+    *   @history 2010-05-18 Tracie Sucharski - Added pointId to the Tie tool
+    *                           Dialog.
+    *   @history 2010-11-23 Eric Hyer - Added stretchChipViewport SIGNAL for
+    *                           forwarding of SIGNAL from StretchTool to
+    *                           ChipViewport
+    *   @history 2010-12-17 Eric Hyer - Code for open dialog for setting the
+    *                           registration template now in this class, not in
+    *                           ControlPointEdit
     */
   class QtieTool : public Tool {
       Q_OBJECT

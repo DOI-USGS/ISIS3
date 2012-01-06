@@ -37,6 +37,8 @@ namespace Isis {
    *
    * @see Camera
    *
+   * @author 2005-02-08 Jeff Anderson
+   *
    * @internal
    *  @history 2005-02-08 Jeff Anderson Original version
    *  @history 2008-07-14 Steven Lambright Added NaifStatus calls

@@ -38,13 +38,14 @@ namespace Isis {
    *
    * @author 2006-02-23 Robert Wallace and Brian Lipkowitz
    *
-   * @history 2006-06-13 Brendan George - Modified to throw error when called
-   *                                      file does not contain an Original Label
-   * @history 2006-12-11 Kris Becker - Fixed bug in WriteInit method using a
-   *                                 temporary string to reference a char pointer
-   *                                 to its contents.  The string remain after the
-   *                                 reference or its toast.
-   * @history 2008-06-18 Steven Koechle - Fixed Documentation Errors
+   * @internal
+   *   @history 2006-06-13 Brendan George - Modified to throw error when called
+   *                           file does not contain an Original Label
+   *   @history 2006-12-11 Kris Becker - Fixed bug in WriteInit method using a
+   *                           temporary string to reference a char pointer
+   *                           to its contents.  The string remain after the
+   *                           reference or its toast.
+   *   @history 2008-06-18 Steven Koechle - Fixed Documentation Errors
    *
    */
   class OriginalLabel : public Isis::Blob {

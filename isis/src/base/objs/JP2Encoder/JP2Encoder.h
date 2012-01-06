@@ -35,6 +35,8 @@
 #define INCREMENTAL_FLUSH_BYTES                         (256 * 1024 * 1024)
 
 namespace Isis {
+  class JP2Error;
+
   /**
    * @brief  JPEG2000 encoder class
    *
@@ -67,14 +69,12 @@ namespace Isis {
    *
    * @ingroup HighLevelCubeIO
    *
-   * @author 2009-1-11 Janet Barrett
+   * @author 2009-01-11 Janet Barrett
    *
    * @internal
-   *  @history 2009-1-11 Janet Barrett - Original version.
+   *  @history 2009-01-11 Janet Barrett - Original version.
    *
    */
-
-  class JP2Error;
   class JP2Encoder {
     public:
       JP2Encoder(const std::string &jp2file, const unsigned int nsamps,

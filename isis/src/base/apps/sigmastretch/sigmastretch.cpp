@@ -8,7 +8,11 @@
 
 using namespace Isis;
 
-
+/**
+ * @author ????-??-?? Unknown
+ *
+ * @internal
+ */
 class BandStretch {
   public:
     BandStretch(Cube *cube, int band, double variance) {
@@ -34,6 +38,11 @@ class BandStretch {
 };
 
 
+/**
+ * @author ????-??-?? Unknown
+ *
+ * @internal
+ */
 class SigmaStretcher {
   public:
     SigmaStretcher() {}

@@ -7,6 +7,8 @@
 #include "Stretch.h"
 
 namespace Isis {
+  class StretchTool;
+
   /**
    * @brief Abstract class for complex stretch objects
    *
@@ -19,10 +21,8 @@ namespace Isis {
    *
    * @author 2009-05-01 Noah hilt
    *
-   *
+   * @internal
    */
-  class StretchTool;
-
   class QStretch : public QObject {
       Q_OBJECT
 

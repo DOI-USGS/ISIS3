@@ -49,7 +49,7 @@ namespace Isis
    *
    * @ingroup Visualization Tools
    *
-   * @author Eric Hyer
+   * @author ????-??-?? Eric Hyer
    *
    * @internal
    *

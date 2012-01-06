@@ -28,6 +28,8 @@
 #include "Pvl.h"
 
 namespace Isis {
+  class Application;
+
   /**
    * @brief Reads user preferences from a data file.
    *
@@ -64,8 +66,6 @@ namespace Isis {
    *   @history 2010-07-19 Jeannie Walldren - Added FileCustomization group to
    *                          TestPreferences file
    */
-  class Application;
-
   class Preference : public Pvl {
 
     public:

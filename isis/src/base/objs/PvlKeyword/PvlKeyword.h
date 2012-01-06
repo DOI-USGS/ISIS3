@@ -33,6 +33,9 @@
 #include "Constants.h"
 
 namespace Isis {
+  class PvlSequence;
+  class PvlFormat;
+
   /**
    * @brief A single keyword-value pair.
    *
@@ -88,9 +91,6 @@ namespace Isis {
    *  @history 2011-07-07 Sharmila Prasad - While validating keyword, display appropriate 
    *                 error msg when converting string to integer which has a double value.
    */
-  class PvlSequence;
-  class PvlFormat;
-
   class PvlKeyword {
     public:
       PvlKeyword();

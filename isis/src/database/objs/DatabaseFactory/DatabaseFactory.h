@@ -248,10 +248,12 @@ namespace Isis {
    * @ingroup Database
    * @author 2006-08-18 Kris Becker
    *
-   * @history 2007-06-05 Brendan George - Modified to work with
-   *          iString/StringTools merge
-   * @history 2009-11-27 Kris Becker - Made argc parameter for QCoreApplication so
-   *          persistence of the parameter is preserve as required for Qt.
+   * @internal
+   *   @history 2007-06-05 Brendan George - Modified to work with
+   *                           iString/StringTools merge
+   *   @history 2009-11-27 Kris Becker - Made argc parameter for
+   *                           QCoreApplication so persistence of the parameter
+   *                           is preserve as required for Qt.
    */
   class DatabaseFactory  {
     public:

@@ -32,7 +32,9 @@ namespace Isis {
    *
    * @ingroup SpiceInstrumentsAndCameras
    * @ingroup MarsGlobalSurveyor
-   *  
+   *
+   * @author ????-??-?? Unknown
+   *
    * @internal
    *   @history 2008-08-08 Steven Lambright Now using the new LoadCache(...)
    *            method instead of CreateCache(...).

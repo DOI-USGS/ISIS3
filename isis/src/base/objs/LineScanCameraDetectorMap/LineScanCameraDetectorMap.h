@@ -36,11 +36,10 @@ namespace Isis {
    *
    * @see Camera
    *
-   * @internal
+   * @author 2005-02-09 Jeff Anderson
    *
-   * @history 2005-02-09 Jeff Anderson
-   * Original version
-   * @history 2009-03-07 Debbie A. Cook Removed reference to obsolute CameraDetectorMap methods
+   * @internal
+   *   @history 2009-03-07 Debbie A. Cook Removed reference to obsolute CameraDetectorMap methods
    *
    */
   class LineScanCameraDetectorMap : public CameraDetectorMap {

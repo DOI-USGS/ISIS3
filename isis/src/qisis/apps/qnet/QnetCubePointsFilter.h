@@ -15,16 +15,18 @@ namespace Isis {
    * the current filtered list that contain more than the maximum
    * or less than the minimum number of points.
    *
+   * @author ????-??-?? Unknown
+   *
    * @internal
    *   @history 2009-01-08 Jeannie Walldren - Modified filter()
-   *                          method to create a new filtered list
-   *                          from images in the existing filtered
-   *                          list.
+   *                           method to create a new filtered list
+   *                           from images in the existing filtered
+   *                           list.
    *   @history 2010-06-03 Jeannie Walldren - Initialized pointers
-   *                          to null in constructor
-   *  @history 2010-10-28 Tracie Sucharski - Fixed some include problems caused
-   *                          by changes made to the ControlNet,ControlPoint,
-   *                          ControlMeasure header files.
+   *                           to null in constructor
+   *   @history 2010-10-28 Tracie Sucharski - Fixed some include problems caused
+   *                           by changes made to the ControlNet,ControlPoint,
+   *                           ControlMeasure header files.
    *
    *
    */

@@ -33,7 +33,11 @@
 
 namespace Isis {
 
-
+  /**
+   * @author ????-??-?? Unknown
+   *
+   * @internal
+   */
   class DarkModelPixel {
     public:
       DarkModelPixel() : _scale(1), _ccdTemp(0.0), _expTime(0.0), _coefs(8, 0.0),

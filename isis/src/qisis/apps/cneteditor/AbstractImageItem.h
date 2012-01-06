@@ -15,6 +15,17 @@ namespace Isis
 
   namespace CnetViz
   {
+
+    /**
+     * @brief Base class for an image item in the tree
+     *
+     * This class represents an image item in the tree. This is generally
+     * visualized as a serial number.
+     *
+     * @author ????-??-?? Eric Hyer
+     *
+     * @internal
+     */
     class AbstractImageItem : public virtual AbstractTreeItem
     {
 

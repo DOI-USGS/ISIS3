@@ -16,6 +16,15 @@ namespace Isis
   {
     class AbstractFilterSelector;
 
+    /**
+     * @brief Base class for combo box type filters
+     *
+     * This class is the base class that all filters that use combo boxes.
+     *
+     * @author ????-??-?? Eric Hyer
+     *
+     * @internal
+     */
     class AbstractMultipleChoiceFilter : public AbstractFilter
     {
         Q_OBJECT

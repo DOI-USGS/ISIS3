@@ -29,6 +29,11 @@
 #include <QRadioButton>
 
 namespace Isis {
+  /**
+   * @author ????-??-?? Unknown
+   *
+   * @internal
+   */
   class GuiOutputAttribute : public QDialog {
       Q_OBJECT
 

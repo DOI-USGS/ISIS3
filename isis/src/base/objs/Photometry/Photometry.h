@@ -36,6 +36,8 @@ namespace Isis {
   class AtmosModel;
   class NormModel;
   /**
+   * @author ????-??-?? Unknown
+   *
    * @internal
    *  @history 2007-08-02 Steven Lambright - Fixed memory leak
    *  @history 2008-03-07 Janet Barrett - Added SetPhotomWl method to allow

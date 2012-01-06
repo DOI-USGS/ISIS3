@@ -16,6 +16,16 @@ namespace Isis
   {
     class AbstractFilterSelector;
     
+    /**
+     * @brief Filters by point type
+     *
+     * This class handles filtering by control point type (i.e. fixed,
+     * constrained, free, etc.).
+     *
+     * @author ????-??-?? Eric Hyer
+     *
+     * @internal
+     */
     class PointTypeFilter : public AbstractMultipleChoiceFilter
     {
         Q_OBJECT

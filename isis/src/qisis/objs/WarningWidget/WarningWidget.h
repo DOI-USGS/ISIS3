@@ -42,11 +42,11 @@ namespace Isis {
    *
    * @ingroup Part of active tool bar of all the Tools
    *
-   * @author  Sharmila Prasad
+   * @author 2009-12-11 Sharmila Prasad
    *
    * @internal
-   * @history 2009/12/11 Sharmila Prasad - Initial Version
-   * @history 2010/03/22 Sharmila Prasad - Point the warning icons to right path
+   * @history 2009-12-11 Sharmila Prasad - Initial Version
+   * @history 2010-03-22 Sharmila Prasad - Point the warning icons to right path
    */
   class WarningWidget : public QObject {
       Q_OBJECT

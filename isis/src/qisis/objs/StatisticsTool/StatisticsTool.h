@@ -48,10 +48,10 @@ namespace Isis {
    *
    * @ingroup Visualization Tools
    *
-   * @author  Noah Hilt
+   * @author 2009-10-07 Noah Hilt
    *
    * @internal
-
+   *
    *  @history 2009-10-07 Noah Hilt - Original version.
    *
    *  @history 2010-06-26 Eric Hyer - Now uses MdiCubeViewport
@@ -123,6 +123,12 @@ namespace Isis {
       QVector<QVector<double> > p_pixelData; //!< Stored pixel values
   };
 
+  /**
+   * @author ????-??-?? Unknown
+   *
+   * @internal
+   *
+   */
   class StatisticsTool : public Tool {
       Q_OBJECT
 

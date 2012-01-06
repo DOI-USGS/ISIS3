@@ -12,6 +12,11 @@
 
 namespace Isis {
 
+  /**
+   * @author ????-??-?? Unknown
+   *
+   * @internal
+   */
   class HistogramItem::PrivateData {
     public:
       int attributes;

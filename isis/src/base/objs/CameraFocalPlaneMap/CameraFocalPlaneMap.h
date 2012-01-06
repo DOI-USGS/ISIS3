@@ -65,7 +65,7 @@ namespace Isis {
    *
    * @ingroup Camera
    *
-   * @author Jeff Anderson 2005-02-05
+   * @author 2005-02-05 Jeff Anderson
    *
    * @see Camera
    *

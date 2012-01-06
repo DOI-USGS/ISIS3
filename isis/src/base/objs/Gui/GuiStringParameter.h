@@ -9,7 +9,11 @@
 namespace Isis {
 
 //  class QTextEdit;
-
+  /**
+   * @author ????-??-?? Unknown
+   *
+   * @internal
+   */
   class GuiStringParameter : public GuiParameter {
 
       Q_OBJECT

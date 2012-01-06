@@ -17,6 +17,18 @@ namespace Isis
 
   namespace CnetViz
   {
+
+    /**
+     * @brief Base class for an item in the tree
+     *
+     * This class represents an arbitrary item in the tree. Some of the data
+     * access methods are provided for compatibility with the table models (i.e.
+     * by column).
+     *
+     * @author ????-??-?? Eric Hyer
+     *
+     * @internal
+     */
     class AbstractTreeItem : public QObject
     {
 

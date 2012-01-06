@@ -15,7 +15,7 @@ namespace Isis {
    *
    * @ingroup Visualization Tools
    *
-   * @author  Steven Lambright
+   * @author ????-??-?? Steven Lambright
    *
    * @internal
    *   @history 2011-09-27 Steven Lambright - Improved user documentation

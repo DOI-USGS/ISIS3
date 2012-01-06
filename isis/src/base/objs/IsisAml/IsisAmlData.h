@@ -29,6 +29,11 @@
 
 #include "CubeAttribute.h"
 
+/**
+ * @author ????-??-?? Unknown
+ *
+ * @internal
+ */
 class IsisListOptionData {
   public:
     std::string value;
@@ -41,6 +46,11 @@ class IsisListOptionData {
     ~IsisListOptionData();
 };
 
+/**
+ * @author ????-??-?? Unknown
+ *
+ * @internal
+ */
 class IsisHelperData {
   public:
     std::string name;
@@ -53,6 +63,11 @@ class IsisHelperData {
     ~IsisHelperData();
 };
 
+/**
+ * @author ????-??-?? Unknown
+ *
+ * @internal
+ */
 class IsisParameterData {
   public:
     std::vector <std::string> values;
@@ -89,6 +104,11 @@ class IsisParameterData {
 };
 
 
+/**
+ * @author ????-??-?? Unknown
+ *
+ * @internal
+ */
 class IsisGroupData {
   public:
     std::string name;
@@ -98,6 +118,11 @@ class IsisGroupData {
     ~IsisGroupData();
 };
 
+/**
+ * @author ????-??-?? Unknown
+ *
+ * @internal
+ */
 class IsisChangeData {
   public:
     std::string name;
@@ -109,6 +134,11 @@ class IsisChangeData {
 };
 
 
+/**
+ * @author ????-??-?? Unknown
+ *
+ * @internal
+ */
 class IsisAmlData {
   public:
     std::string name;

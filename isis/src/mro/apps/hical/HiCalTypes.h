@@ -38,6 +38,11 @@ namespace Isis {
 typedef TNT::Array1D<double> HiVector;       //!<  1-D Buffer
 typedef TNT::Array2D<double> HiMatrix;       //!<  2-D buffer
 
+/**
+ * @author ????-??-?? Unknown
+ *
+ * @internal
+ */
 class HiHistory {
   public:
     /**

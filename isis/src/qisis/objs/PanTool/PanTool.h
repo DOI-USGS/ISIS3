@@ -9,6 +9,8 @@ class QLineEdit;
 
 namespace Isis {
   /**
+   * @author ????-??-?? Unknown
+   *
    * @internal
    *   @history 2010-06-26 Eric Hyer - Now uses MdiCubeViewport
    *                                 - Fixed multiple include problems

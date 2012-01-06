@@ -10,6 +10,12 @@ namespace Isis
 {
   namespace CnetViz
   {
+
+    /**
+     * @author ????-??-?? Unknown
+     *
+     * @internal
+     */
     class TableColumn : public QObject
     {
         Q_OBJECT

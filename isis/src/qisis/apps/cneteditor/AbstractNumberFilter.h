@@ -18,6 +18,16 @@ namespace Isis
 
   namespace CnetViz
   {
+
+    /**
+     * @brief Base class for filters that are number-based
+     *
+     * This class is the base class that all filters that are number-based.
+     *
+     * @author ????-??-?? Eric Hyer
+     *
+     * @internal
+     */
     class AbstractNumberFilter : public AbstractFilter
     {
         Q_OBJECT

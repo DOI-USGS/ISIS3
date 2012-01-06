@@ -29,7 +29,7 @@ namespace Isis {
   *
   * @ingroup Visualization Tools
   *
-  * @author Jeff Anderson
+  * @author ????-??-?? Jeff Anderson
   *
   * @internal @history 2007-06-12 Tracie Sucharski - Added aboutProgram method
   *

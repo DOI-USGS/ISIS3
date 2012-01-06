@@ -5,6 +5,12 @@
 #include <QActionGroup>
 
 namespace Isis {
+  /**
+   *
+   * @author ????-??-?? Unknown
+   *
+   * @internal
+   */
   class ToolPad : public QToolBar {
       Q_OBJECT
 

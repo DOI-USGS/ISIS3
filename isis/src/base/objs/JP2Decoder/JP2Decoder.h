@@ -33,6 +33,8 @@
 #define MAX_STRIPE_HEIGHT 8192
 
 namespace Isis {
+  class JP2Error;
+
   /**
    * @brief  JPEG2000 decoder class
    *
@@ -83,8 +85,6 @@ namespace Isis {
    *  @history 2009-12-18 Janet Barrett - Original version.
    *
    */
-
-  class JP2Error;
   class JP2Decoder {
     public:
       JP2Decoder(const std::string &jp2file);

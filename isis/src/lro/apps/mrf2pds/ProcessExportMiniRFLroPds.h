@@ -28,10 +28,13 @@ namespace Isis {
    * This class extends the ProcessExportPds class to add Mini RF
    * LRO specific PVL.
    *
-   * @history 2009-11-04 Sharmila Prasad - Original version
-   * @history 2010-03-09 Sharmila Prasad - Changed class name to
-   *  		  ProcessExportMiniRFLroPds to avoid conflicts with
-   *  		  functionality of LRO objects
+   * @author 2009-11-04 Sharmila Prasad
+   *
+   * @internal
+   *   @history 2009-11-04 Sharmila Prasad - Original version
+   *   @history 2010-03-09 Sharmila Prasad - Changed class name to
+   *                           ProcessExportMiniRFLroPds to avoid conflicts with
+   *                           functionality of LRO objects
    */
 
   class ProcessExportMiniRFLroPds : public Isis::ProcessExportPds {

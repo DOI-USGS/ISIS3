@@ -8,7 +8,11 @@
 
 
 namespace Isis {
-
+  /**
+   * @author ????-??-?? Unknown
+   *
+   * @internal
+   */
   class GuiBooleanParameter : public GuiParameter {
 
       Q_OBJECT
