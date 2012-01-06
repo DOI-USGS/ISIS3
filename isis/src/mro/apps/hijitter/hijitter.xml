@@ -70,6 +70,9 @@
      Added an option to crop the extended portion of the image using the jitter 
      correction file 
     </change>
+    <change name="Sharmila Prasad" date="2012-02-05">
+     Crop option false by default 
+    </change>
   </history>
 
   <groups>
@@ -180,7 +183,7 @@
       </parameter>
       <parameter name="CROP">
         <type>boolean</type>     
-        <default><item>true</item></default>
+        <default><item>false</item></default>
         <brief>
           Crop the top and bottom extending portion of the image
         </brief>      
