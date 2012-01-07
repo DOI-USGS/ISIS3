@@ -138,6 +138,8 @@ namespace Isis {
     p_zScoreMin = Isis::Null;
     p_zScoreMax = Isis::Null;
     p_goodnessOfFit = Isis::Null;
+    p_wholePixelCorr = Isis::Null;
+    p_subPixelCorr = Isis::Null;
     p_surfaceModelEccentricity = Isis::Null;
     p_surfaceModelEccentricityRatio = Isis::Null;
     p_surfaceModelAvgResidual = Isis::Null;
@@ -839,6 +841,7 @@ namespace Isis {
         }
 
         p_goodnessOfFit = p_bestFit;
+        p_wholePixelCorr = p_bestFit;
         p_subpixelSuccesses++;
       }
       return p_registrationStatus;
@@ -861,6 +864,7 @@ namespace Isis {
     // event the user does not want a surface model fit
     // ----------------------------------------------------------------
     p_goodnessOfFit = p_bestFit;
+    p_wholePixelCorr = p_bestFit;
     p_searchChip.SetChipPosition(p_bestSamp, p_bestLine);
     gradientSearchChip.SetChipPosition(p_bestSamp, p_bestLine);
     p_cubeSample = p_searchChip.CubeSample();
@@ -1315,6 +1319,7 @@ namespace Isis {
     temp.push_back(p_chipSample);
     temp.push_back(p_chipLine);
     p_goodnessOfFit = lsq.Evaluate(temp);
+    p_subPixelCorr = lsq.Evaluate(temp);
     return true;
   }
 

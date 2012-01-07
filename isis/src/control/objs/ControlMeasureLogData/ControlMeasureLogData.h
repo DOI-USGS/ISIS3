@@ -119,13 +119,31 @@ namespace Isis {
          * Deprecated keyword kept for backwards compatability with older
          * Control Networks.  DO NOT USE!!
          */
-        PixelShift                = 5
+        PixelShift                = 5,
+
+        /**
+         * Goodness of Fit of the whole pixel least-squares solution (surface
+         * model) from automatic registration.
+         */
+        WholePixelCorrelation       = 6,
+
+        /**
+         * Goodness of Fit of the sub-pixel least-squares solution (surface
+         * model) from automatic registration.
+         */
+        SubPixelCorrelation       = 7,
+
+        /**
+         * Average Residual of the sub-pixel least squares solution (surface
+         * model) from automatic registration. 
+         */
+        AverageResidual           = 8
       };
       /**
        * This value must be > the largest enumerated value in this type or
        * convertions to and from Pvl will not work.
        */
-      static const int MaximumNumericLogDataType = 6;
+      static const int MaximumNumericLogDataType = 9;
 
 
       ControlMeasureLogData();

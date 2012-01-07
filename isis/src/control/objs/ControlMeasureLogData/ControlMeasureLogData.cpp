@@ -270,6 +270,15 @@ namespace Isis {
 
       case PixelShift:
         return "PixelShift";
+
+      case WholePixelCorrelation:
+        return "WholePixelCorrelation";
+
+      case SubPixelCorrelation:
+        return "SubPixelCorrelation";
+
+      case AverageResidual:
+        return "AverageResidual";
     }
 
     iString msg = "Unknown data type [" + iString(type) + "]";

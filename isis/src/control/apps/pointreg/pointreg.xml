@@ -212,6 +212,11 @@
     <change name="Debbie A. Cook" date="2011-06-07">
       Changed point types "Ground" to "Fixed" and "Tie" to "Free".
     </change>
+    <change name="Travis Addair" date="2012-01-05">
+      Added new columns to flatfile including Filename, SubPixelCorrelation,
+      Eccentricity, AverageResidual, and renamed GoodnessOfFit to
+      WholePixelCorrelation.
+    </change>
   </history>
 
   <groups>

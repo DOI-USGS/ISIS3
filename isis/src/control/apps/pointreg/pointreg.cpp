@@ -34,7 +34,6 @@ map<string, void *> GuiHelpers() {
 }
 
 void IsisMain() {
-
   // Get user interface
   UserInterface &ui = Application::GetUserInterface();
 
@@ -180,14 +179,31 @@ void IsisMain() {
                 if (foundLatLon) {
                   registered++;
 
-                  if (res == AutoReg::SuccessSubPixel)
+                  if (res == AutoReg::SuccessSubPixel) {
                     measure->SetType(ControlMeasure::RegisteredSubPixel);
-                  else
-                    measure->SetType(ControlMeasure::RegisteredPixel);
 
-                  measure->SetLogData(ControlMeasureLogData(
-                        ControlMeasureLogData::GoodnessOfFit,
-                        ar->GoodnessOfFit()));
+                    measure->SetLogData(ControlMeasureLogData(
+                          ControlMeasureLogData::SubPixelCorrelation,
+                          ar->SubPixelCorrelation()));
+                    if (ar->Eccentricity() != Null)
+                      measure->SetLogData(ControlMeasureLogData(
+                            ControlMeasureLogData::Eccentricity,
+                            ar->Eccentricity()));
+                    if (ar->AverageResidual() != Null)
+                      measure->SetLogData(ControlMeasureLogData(
+                            ControlMeasureLogData::AverageResidual,
+                            ar->AverageResidual()));
+                  }
+                  else {
+                    measure->SetType(ControlMeasure::RegisteredPixel);
+                  }
+
+                   measure->SetLogData(ControlMeasureLogData(
+                         ControlMeasureLogData::GoodnessOfFit,
+                         ar->GoodnessOfFit()));
+                   measure->SetLogData(ControlMeasureLogData(
+                         ControlMeasureLogData::WholePixelCorrelation,
+                         ar->WholePixelCorrelation()));
 
                   measure->SetAprioriSample(measure->GetSample());
                   measure->SetAprioriLine(measure->GetLine());
@@ -221,9 +237,12 @@ void IsisMain() {
                   measure->SetType(ControlMeasure::Candidate);
 
                   if (res == AutoReg::FitChipToleranceNotMet) {
-                    measure->SetLogData(ControlMeasureLogData(
-                          ControlMeasureLogData::GoodnessOfFit,
-                          ar->GoodnessOfFit()));
+                     measure->SetLogData(ControlMeasureLogData(
+                           ControlMeasureLogData::GoodnessOfFit,
+                           ar->GoodnessOfFit()));
+                     measure->SetLogData(ControlMeasureLogData(
+                           ControlMeasureLogData::WholePixelCorrelation,
+                           ar->WholePixelCorrelation()));
                   }
                   measure->SetIgnored(true);
                 }
@@ -294,10 +313,11 @@ void IsisMain() {
     ofstream os;
     os.open(fFile.c_str(), ios::out);
     os <<
-      "PointId,MeasureType,Reference,EditLock,Ignore,Registered," <<
+      "PointId,Filename,MeasureType,Reference,EditLock,Ignore,Registered," <<
       "OriginalMeasurementSample,OriginalMeasurementLine," <<
       "RegisteredMeasurementSample,RegisteredMeasurementLine,SampleShift," <<
-      "LineShift,PixelShift,ZScoreMin,ZScoreMax,GoodnessOfFit" << endl;
+      "LineShift,PixelShift,ZScoreMin,ZScoreMax,WholePixelCorrelation," <<
+      "SubPixelCorrelation,EccentricityRatio,AverageResidual" << endl;
     os << Null << endl;
 
     // Create a ControlNet from the original input file
@@ -321,6 +341,9 @@ void IsisMain() {
 
           string pointId = outPoint->GetId();
 
+          string fullName = files.Filename(cmTrans->GetCubeSerialNumber());
+          string filename = Filename(fullName).Basename();
+
           string measureType = cmTrans->MeasureTypeToString(
               cmTrans->GetType());
           string reference = outPoint->GetRefMeasure() == cmTrans ?
@@ -339,6 +362,7 @@ void IsisMain() {
 
           os <<
             pointId << "," <<
+            filename << "," <<
             measureType << "," <<
             reference << "," <<
             editLock << "," <<
@@ -361,12 +385,24 @@ void IsisMain() {
               ControlMeasureLogData::MinimumPixelZScore).GetNumericalValue();
           double zScoreMax = cmTrans->GetLogData(
               ControlMeasureLogData::MaximumPixelZScore).GetNumericalValue();
-          double goodnessOfFit = cmTrans->GetLogData(
-              ControlMeasureLogData::GoodnessOfFit).GetNumericalValue();
+          double wholePixelCorrelation = cmTrans->GetLogData(
+              ControlMeasureLogData::WholePixelCorrelation).GetNumericalValue();
+          double subPixelCorrelation = cmTrans->GetLogData(
+              ControlMeasureLogData::SubPixelCorrelation).GetNumericalValue();
+          double eccentricity = cmTrans->GetLogData(
+              ControlMeasureLogData::Eccentricity).GetNumericalValue();
+          double averageResidual = cmTrans->GetLogData(
+              ControlMeasureLogData::AverageResidual).GetNumericalValue();
+
+          double eccentricityRatio = sqrt(
+              1.0 / (1.0 - eccentricity * eccentricity));
 
           outputValue(os, zScoreMin);
           outputValue(os, zScoreMax);
-          outputValue(os, goodnessOfFit);
+          outputValue(os, wholePixelCorrelation);
+          outputValue(os, subPixelCorrelation);
+          outputValue(os, eccentricityRatio);
+          outputValue(os, averageResidual);
 
           os << endl;
         }
@@ -422,8 +458,10 @@ bool outputValue(ofstream &os, double value) {
     os << value;
     return true;
   }
-
-  return false;
+  else {
+    os << "NA";
+    return false;
+  }
 }
 
 

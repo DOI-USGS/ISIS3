@@ -169,6 +169,8 @@ namespace Isis {
    *    @history 2011-05-18 Steven Lambright - Fixed a bug with ReductionFactor 
    *    @history 2011-10-12 Jai Rideout - Removed Roberts gradient. It did not
    *             give useful results due to the 2x2 matrix it uses.
+   *    @history 2012-01-05 Travis Addair - Added separate variables for Whole
+   *             Pixel Correlation and Subpixel Correlation.
    */
   class AutoReg {
     public:
@@ -355,6 +357,16 @@ namespace Isis {
       //! Return the goodness of fit of the match algorithm
       inline double GoodnessOfFit() const {
         return p_goodnessOfFit;
+      };
+
+      //! Return the whole-pixel correlation of the match algorithm
+      inline double WholePixelCorrelation() const {
+        return p_wholePixelCorr;
+      };
+
+      //! Return the sub-pixel correlation of the match algorithm
+      inline double SubPixelCorrelation() const {
+        return p_subPixelCorr;
       };
 
       //! Return the eccentricity of the surface model, null if not calculated
@@ -577,6 +589,8 @@ namespace Isis {
       double p_cubeSample;                                 //!< Cube sample
       double p_cubeLine;                                   //!< Cube line
       double p_goodnessOfFit;                              //!< Goodness of fit of the match algorithm
+      double p_wholePixelCorr;                             //!< Whole-pixel correlation of the match algorithm
+      double p_subPixelCorr;                               //!< Sub-pixel correlation of the match algorithm
       double p_tolerance;                                  //!< Tolerance for acceptable goodness of fit in match algorithm
 
       int p_windowSize;                                    //!< Surface model window size
