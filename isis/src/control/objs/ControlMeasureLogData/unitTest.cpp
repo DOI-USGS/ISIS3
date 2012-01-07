@@ -34,7 +34,7 @@ int main() {
 
   cout << "Testing PvlKeyword constructor..." << endl;
   {
-    ControlMeasureLogData logData(PvlKeyword("WholePixelCorrelation", 3.14159));
+    ControlMeasureLogData logData(PvlKeyword("GoodnessOfFit", 3.14159));
 
     cout << "Valid? " << logData.IsValid() << "\n"
          << "Type?  " << logData.GetDataType() << "\n"

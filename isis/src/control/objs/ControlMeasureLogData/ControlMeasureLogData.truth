@@ -14,19 +14,19 @@ Testing PvlKeyword constructor...
 Valid? 1
 Type?  2
 Value? 3.14159
-Keyword: 'WholePixelCorrelation = 3.14159'
+Keyword: 'GoodnessOfFit = 3.14159'
 
 Testing type/value constructor...
 Valid? 1
 Type?  2
 Value? 3.14159
-Keyword: 'WholePixelCorrelation = 3.14159'
+Keyword: 'GoodnessOfFit = 3.14159'
 
 Testing copy constructor 1...
 Valid? 1
 Type?  2
 Value? 3.14159
-Keyword: 'WholePixelCorrelation = 3.14159'
+Keyword: 'GoodnessOfFit = 3.14159'
 
 Testing copy constructor 2...
 Valid? 0
