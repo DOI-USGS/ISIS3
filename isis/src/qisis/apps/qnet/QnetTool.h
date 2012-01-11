@@ -162,6 +162,8 @@ namespace Isis {
    *                          from a Dem if one is open.
    *   @history 2011-09-16 Tracie Sucharski - Added method to draw Fixed and
    *                          Constrained points on the ground source viewport.
+   *   @history 2012-01-11 Tracie Sucharski - Add error check for invalid lat, 
+   *                          lon when creating new control point.
    */
   class QnetTool : public Tool {
     Q_OBJECT

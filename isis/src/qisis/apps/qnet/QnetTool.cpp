@@ -1368,6 +1368,8 @@ namespace Isis {
    *                          edited or added.  Do not add to control
    *                          network until user selects
    *                          "Save Point To Control Network".
+   * @history 2012-01-11 Tracie Sucharski - Add error check for invalid lat, lon 
+   *                          when creating new control point. 
    *  
    */
   void QnetTool::mouseButtonRelease(QPoint p, Qt::MouseButton s) {
