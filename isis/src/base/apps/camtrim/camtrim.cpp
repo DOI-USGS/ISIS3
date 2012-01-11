@@ -28,11 +28,21 @@ void IsisMain() {
   icube = p.SetInputCube("FROM");
   cam = icube->getCamera();
 
+  UserInterface &ui = Application::GetUserInterface();
+
+  // Make sure the cube isn't projected (i.e. level 2). If it is, the user
+  // should be using maptrim instead of this program.
+  if (icube->hasGroup("Mapping")) {
+    iString msg = "Input cube [" + ui.GetFilename("FROM") + "] is level 2 "
+        "(projected). This application is only designed to operate on level 1 "
+        "(non-projected) cubes. Please use maptrim instead";
+    throw iException::Message(iException::User, msg, _FILEINFO_);
+  }
+
   // Create the output cube
   p.SetOutputCube("TO");
 
   // Get the lat/lon range to trim
-  UserInterface &ui = Application::GetUserInterface();
   minlat = ui.GetDouble("MINLAT");
   maxlat = ui.GetDouble("MAXLAT");
   minlon = ui.GetDouble("MINLON");

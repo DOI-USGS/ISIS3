@@ -7,11 +7,17 @@
   </brief>
 
   <description>
-    This program trims pixels outside of a user specified
-    latitude/longitude range.  It is meant to work specifically on
-    camera based cubes.  By default, the range is in Planetocentric
-    latitudes and 0 to 360 positive east longitudes.  This can be
-    overridden using a map projection file.
+    This application trims pixels outside of a user-specified
+    <def>latitude</def>/<def>longitude</def> range. Pixels that are outside of
+    the lat/lon range are set to <def>NULL</def> in the resulting
+    <def>cube</def>. By default, the lat/lon range is in the
+    <def>universal coordinate</def> system. This can be overridden using a map
+    projection template file.
+    <br/><br/>
+    Note: This application will not handle projected images (i.e.
+    <def>Level2</def>). This program is meant to work specifically on
+    <def>Level1</def> images. To trim Level2 images, please refer to
+    <em>maptrim</em>.
   </description>
 
   <history>
@@ -49,6 +55,14 @@
     <change name="Travis Addair" date="2009-08-10">
       Mapping group parameters are now placed into the print file.
     </change>
+    <change name="Jai Rideout" date="2012-01-11">
+      Updated documentation and testing with Ella Lee in preparation for the
+      3.4.0 release. Fixed various inconsistencies in the documentation and
+      rewrote some parts to make it clearer. Added two examples. Added a check
+      to ensure that projected cubes cannot be used with this application. Added
+      two new tests to test the processing of level 2 cubes and the use of a map
+      template file.
+    </change>
 </history>
 
   <category>
@@ -65,8 +79,8 @@
           Input cube to trim
         </brief>
         <description>
-          Use this parameter to select the filename. All bands within the file
-          will be trimmed.
+          Use this parameter to select the input cube filename. All bands within
+          the cube will be trimmed.
         </description>
         <filter>
           *.cub
@@ -80,7 +94,7 @@
           Output cube
         </brief>
         <description>
-          This file will contain the results of the circle trim.
+          This file will contain the trimmed cube.
         </description>
       </parameter>
 
@@ -89,14 +103,14 @@
         <default><item>None</item></default>
         <fileMode>input</fileMode>
         <brief>
-          Map projection label file
+          Map projection template file
         </brief>
         <description>
-          If a file is not given then this program will assume the
-          user is entering planetocentric latitude and positive east,
-          0 to 360 longitudes.  Otherwise the labels (LatitudeType,
-          LongitudeDomain, LongitudeDirection) in the map file
-          determine the user preferences.
+          If a file is not provided, this program will use the planetocentric
+          latitude type, positive east longitude direction, and 360 longitude
+          domain. Otherwise, the labels (LatitudeType, LongitudeDomain, and
+          LongitudeDirection) in the map projection template file will determine
+          the lat/lon type, direction, and domain.
         </description>
       </parameter>
     </group>
@@ -106,19 +120,20 @@
         <type>double</type>
         <brief>Minimum Latitude</brief>
         <description>
-          Pixels which have a latitude less than this value will be
-          trimmed.
+          Pixels that have a latitude less than this value will be trimmed.
         </description>
         <minimum inclusive="yes">-90</minimum>
         <maximum inclusive="yes">90</maximum>
+        <lessThan>
+          <item>MAXLAT</item>
+        </lessThan>
       </parameter>
 
       <parameter name="MAXLAT">
         <type>double</type>
         <brief>Maximum Latitude</brief>
         <description>
-          Pixels which have a latitude greater than this value will be
-          trimmed.
+          Pixels that have a latitude greater than this value will be trimmed.
         </description>
         <minimum inclusive="yes">-90</minimum>
         <maximum inclusive="yes">90</maximum>
@@ -131,19 +146,20 @@
         <type>double</type>
         <brief>Minimum Longitude</brief>
         <description>
-          Pixels which have a longitude less than this value will be
-          trimmed.
+          Pixels that have a longitude less than this value will be trimmed.
         </description>
         <minimum inclusive="yes">-360</minimum>
         <maximum inclusive="yes">360</maximum>
+        <lessThan>
+          <item>MAXLON</item>
+        </lessThan>
       </parameter>
 
       <parameter name="MAXLON">
         <type>double</type>
         <brief>Maximum Longitude</brief>
         <description>
-          Pixels which have a longitude less than this value will be
-          trimmed.
+          Pixels that have a longitude greater than this value will be trimmed.
         </description>
         <minimum inclusive="yes">-360</minimum>
         <maximum inclusive="yes">360</maximum>
@@ -153,4 +169,93 @@
       </parameter>
     </group>
   </groups>
+
+  <examples>
+    <example>
+      <brief>Trimming Pixels</brief>
+      <description>
+        This example illustrates how to trim a cube such that all pixels with
+        latitudes greater than 25 are set to NULL.
+      </description>
+      <terminalInterface>
+        <commandLine>
+          FROM=input.cub TO=trimmed.cub MINLAT=-90 MAXLAT=25
+          MINLON=0 MAXLON=360
+        </commandLine>
+        <description>
+          The command to use for this example.
+        </description>
+      </terminalInterface>
+      <inputImages>
+        <image src="assets/image/input.png" width="458" height="550">
+          <brief>Input cube</brief>
+          <description>This is the input cube to trim.</description>
+          <parameterName>FROM</parameterName>
+          <thumbnail caption="input.cub" src="assets/thumb/input_thumb.png"
+            width="150" height="180"/>
+        </image>
+      </inputImages>
+      <outputImages>
+        <image src="assets/image/trimmed.png" width="458" height="550">
+          <brief>Trimmed cube</brief>
+          <description>This is the trimmed cube. Notice the NULL pixels with
+            latitudes greater than 25 degrees.</description>
+          <parameterName>TO</parameterName>
+          <thumbnail caption="trimmed.cub" src="assets/thumb/trimmed_thumb.png"
+            width="150" height="180"/>
+        </image>
+      </outputImages>
+    </example>
+    <example>
+      <brief>Trimming Pixels Using a Map Projection Template File</brief>
+      <description>
+        This example illustrates how to trim a cube such that only pixels
+        between longitudes 134 and 136 are kept. All other pixels are set to
+        NULL. The map projection template file specifies planetographic
+        latitudes and -180 to 180 positive west longitudes, instead of using
+        planetocentric latitudes and 0 to 360 positive east longitudes (the
+        default).
+      </description>
+      <terminalInterface>
+        <commandLine>
+          FROM=input.cub TO=trimmed_lon.cub MAP=sinusoidal.map MINLAT=-90
+          MAXLAT=90 MINLON=134 MAXLON=136
+        </commandLine>
+        <description>
+          The command to use for this example.
+        </description>
+      </terminalInterface>
+      <dataFiles>
+        <dataFile path="assets/sinusoidal.map">
+          <brief>Map projection template file</brief>
+          <description>
+            This is the map projection template file that is used to specify the
+            latitude type, longitude direction, and longitude domain. The three
+            keywords of interest in this file are LatitudeType,
+            LongitudeDirection, and LongitudeDomain.
+          </description>
+          <parameterName>MAP</parameterName>
+        </dataFile>
+      </dataFiles>
+      <inputImages>
+        <image src="assets/image/input.png" width="458" height="550">
+          <brief>Input cube</brief>
+          <description>This is the input cube to trim.</description>
+          <parameterName>FROM</parameterName>
+          <thumbnail caption="input.cub" src="assets/thumb/input_thumb.png"
+            width="150" height="180"/>
+        </image>
+      </inputImages>
+      <outputImages>
+        <image src="assets/image/trimmed_lon.png" width="458" height="550">
+          <brief>Trimmed cube</brief>
+          <description>This is the trimmed cube.</description>
+          <parameterName>TO</parameterName>
+          <thumbnail caption="trimmed_lon.cub"
+            src="assets/thumb/trimmed_lon_thumb.png"
+            width="150" height="180"/>
+        </image>
+      </outputImages>
+    </example>
+  </examples>
 </application>

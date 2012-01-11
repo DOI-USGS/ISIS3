@@ -1,0 +1,10 @@
+Group = Mapping
+  ProjectionName = Sinusoidal
+  CenterLongitude = 0.0
+  TargetName = Mars
+  LatitudeType = Planetographic
+  LongitudeDirection = PositiveWest
+  LongitudeDomain = 180
+  EquatorialRadius = 5000.0
+  PolarRadius = 4000.0
+End_Group
