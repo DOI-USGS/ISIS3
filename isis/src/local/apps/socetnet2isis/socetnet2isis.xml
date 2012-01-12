@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="socetnet2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Creates an Isis3 Control Network file from the SOCET Net files.
+  </brief>
+  <description>
+    <p> 
+      <b>socetnet2isis</b> will create an ISIS control network from an existing 
+        SOCET control network. Required Socet net files are<br/>
+      <pre>
+          1. Aero Triangulation File (.atf)
+          2. Ground Point File (.gpf)
+          3. Report File (.rep)
+          4. Image Point File(s) (.ipf)
+          5. Image Translation File(s) (.pvl)
+          6. Project File (.prj)
+      </pre>
+
+      <p><b>1. Aero Triangulation File</b>: Information such as the Project 
+      file, number of images, image Ipf are got from this file. The Report file share the same file name.  </p>
+      <p><b>2. Ground Point File</b>: Information such as the total number of 
+      Points in the socet net, Point Id, Status(Valid/Invalid), Point Type are 
+      parsed from this file.
+     <pre>
+      Different Point Types are:
+       1. Tie (0)    
+       2. Z Cntrl(1) : Z Constrained
+       3. XY Cntrl(2) : XY Constrained
+       4. XYZ Cntrl(3) : XYZ Constrained
+       5. Check(4) 
+
+       Check Points are deleted in Isis.
+     </pre>
+        </p> 
+      <p><b>3. Report </b> file: The Ground Point Parameters section of this 
+      report is parsed to get information such as Point Id, Point Type, Number 
+      of Images in the Point. Also Original, OriginalSigma, Adjusted, 
+      AdjustedSigma, Residual values for X, Y, Z are parsed from this 
+      file.</p>
+    <p><b>4. Image Point File</b>: There is an Ipf file for each image. This file 
+     contains info regarding the image, to which Points they belong to. 
+     Information such as Point Id, Valid/Invalid(1/0) status, line and sample 
+     values are parsed from this file.</p>
+    <p> <b>5. Image Translation File </b>: There is a Pvl translation for each 
+     image. This PvlGroup contains info about the dimensions of the image, 
+     Serial Number, Flip and Padding parameters. This info is used to create 
+     Control Measure.</p>
+     <p><b>6. Project File </b>: Project file contains info about the 
+     Control net. Information such as Coordinate System (Ographic or 
+     Projected), XY units, Z units are parsed from this file. 
+     <pre>
+      XY Units: Meters(1), DecimalDegrees(2), DegMinSec(3) 
+
+      Z is always in Meters.
+     </pre>
+     </p>
+    </p> 
+
+    <p>The application takes ATF file as input. All the other socetnet files 
+    are expected to be in the same location as the ATF file. The app 
+    first gets the Target from one of the Image Translation Pvl files and then 
+    creates a Projection depending on the Coordinate System. If the Coordinate 
+    System as specified in the Project file is 1 then it is OGraphic coordinayes 
+    with no projection. 
+    </p> 
+
+    <p>It starts building the Control Net by reading the Report and GPF files. These 
+    files contain information to create a Control Point minus the Control 
+    Measures info. The Tie points are set to Free and all the other Constrained 
+    types(X, Y, Z) are set to Constrained. </p>
+    
+    <p>The SIGMAS are used as specified by the user, to use the socet or user 
+    defined(override) sigmas. Override option provides parameters SLAT, SLON, 
+    SRAD for user defined Sigmas. The user defined Sigmas can be applied to ALL 
+    Control Point or for Control Point of type Free(Tie) only. This sets the 
+    Control Point's Surface Point. </p> 
+
+    <p>The Measurement type (MEASUREMENTS) can be APRIORI or ADJUSTED. It is used 
+    along with SIGMAS option. </p>
+    
+    <p>If Apriori, the Sigmas(socet / user defined) are applied to Control Point 
+    based on the Control Point type .i.e. For Example, for Z constrained, Sigma 
+    is applied for Radius, for XY Constrained, the Sigma could be applied for 
+    Lat, Lon so on. 
+    </p>
+
+    <p>If Adjusted, the Sigmas(socet / user defined) are applied to Lat, 
+    Lon, Radius irrespective of Control Point Type. </p> 
+
+    <p>If projected, the projected Lat, Lon and Radius values are used. </p>
+
+    <p>The application then builds the Control Measure info by parsing the Ipf and the 
+    Translation files. It applies the Flip and Padding information from the Translation 
+    file to get the actual line and sample position for the Control Measure.</p>
+
+    <p>Control Measures that are invalid or have their line and sample residuals with value 
+    zero are set to Ignore. All the Measures are set to have a default type of "RegisteredSubPixel".</p>
+
+    <p>The created Control Net is now processed to add Prefix to Control Point ID if specified, 
+    Ignore Control Points with Valid Measures less than 2. Edit Locks are applied to the 
+    Control Point or Control Measure depending on the EditLock Options.</p>
+
+    <p>The Control Point stats can be logged if specified in an optional Log file 
+    in Pvl.</p> 
+    
+  </description>
+  
+  <category>
+    <categoryItem>Control Networks</categoryItem>
+  </category>
+
+  <history>
+    <change name="Philip Martinez" date="2010-06-10">
+      Original version
+    </change>
+    <change name="EHK" date="2011-06-23"> 
+      1. Corrected bug in setting adjusted control point sigmas in binary cnet  file 
+      2. Updated to set point types as Free/Constrained to follow latest naming 
+      convention in ISIS.  I.e.:   Free==Tie, Constrained==Z-only, XY, or XYZ 
+      ctrl  Fixed==a point not allowed to adjust in ISIS at all (typically for 
+      band co-registration tasks)                           
+      3. Added this History/Documentation section 
+    </change>
+    <change name="EHK" date="2011-06-23">
+      1. Set ControlMeasure Type to RegisteredSubPixel  
+      2. When the output of SS is being used as input to jigsaw (for LMMP), editlocked ControlPoints and 
+         ControlMeasures
+      3. Set ControlMeasure Type to RegisteredSubPixel
+    </change>
+    <change name="EHK" date="2011-07-02">
+     Set the first image 'in the list' as the reference image 
+    </change>            
+    <change name="Sharmila Prasad" date="2011-11-16">
+      1. Edited the GUI for more features
+      2. Updated, Formatted and Edited the code
+      3. Added the Documentation
+      4. Checked into isis3/src/local/apps Mantis issue => #0000663
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input .atf file
+        </brief>
+        <description>
+          The input .atf file
+        </description>
+        <filter>
+          *.atf
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output ISIS .net file
+        </brief>
+        <description>
+          The output .net file
+        </description>
+      </parameter>
+      
+      <parameter name="MEASUREMENTS">
+        <type>string</type>
+        <default><item>APRIORI</item></default>
+        <brief>
+	       Choose to include either apriori or adjusted measurements in the output 
+        cnet 
+        </brief>
+        <description>
+	       The USE parameter is for deciding whether to use the SOCET apriori measurements, or the adjusted measurements  (if a .rep file exists) as apriori measurements in the output control network.
+        </description>
+        <list>
+          <option value="APRIORI">
+            <brief>Use SOCET apriori measurements</brief>
+            <description>
+	           SOCET SET apriori measurements will be used as apriori measurements in the output control network 
+            </description>
+          </option>
+          <option value="ADJUSTED">
+            <brief>Use SOCET adjusted measurements</brief>
+            <description>
+	           SOCET SET adjusted measurements will be used as apriori measurements in the output control network 
+            </description>
+          </option>
+        </list>
+      </parameter>
+
+      <parameter name="LOG">
+        <type>filename</type>
+        <internalDefault>None</internalDefault>
+        <fileMode>output</fileMode>
+        <brief>
+          Specify optional Log file
+        </brief>
+        <description>
+          Specify optional Log file
+        </description>
+      </parameter>
+
+    </group>
+
+    <group name="Descriptors">
+      <parameter name="NETWORKID">
+        <type>string</type>
+        <default><item>socetnet2isis</item></default>
+        <brief>Control Network ID
+          </brief>
+        <description>An identification label to describe the Control 
+      Network.</description> 
+      </parameter>
+
+      <parameter name="USERNAME">
+        <type>string</type>
+        <default><item>whoami</item></default>
+        <brief>The user's name</brief>
+        <description>
+          The username who executed the control net conversion.
+        </description>
+      </parameter>
+      
+      <parameter name="DESCRIPTION">
+        <type>string</type>
+        <default><item>socetnet2isis</item></default>
+        <brief>Describes the control network</brief>
+        <description>Describes the control network</description>
+      </parameter> 
+
+      <parameter name="POINT_ID_PREFIX">
+        <brief>Prefix string for Control Point IDs</brief>
+        <type>string</type>
+        <default>
+          <item>None</item>
+        </default>
+        <description>
+          Prefix string for Control Point IDs. Inserts the specified string in 
+        front of all Control Point IDs.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Sigmas">
+      <parameter name="SIGMAS">
+        <type>string</type>
+        <default><item>USE_SOCET_SIGMAS</item></default>
+        <brief>Override or Use Socet Control Net Sigmas</brief>
+        <description>Override or Use Socet Control Net Sigmas</description>
+        <list>
+          <option value="USE">
+            <brief>Use Socet Control Net Sigmas</brief>
+            <description>Use Socet Control Net Sigmas</description>
+            <exclusions>
+              <item>SLAT</item>
+              <item>SLON</item>
+              <item>SRAD</item>
+              <item>POINT_TYPE</item>
+            </exclusions>
+          </option>
+          <option value="OVERRIDE">
+            <brief>Override Socet Control Net Sigmas</brief>
+            <description>Override Socet Control Net Sigmas</description>
+            <inclusions>
+              <item>SLAT</item>
+              <item>SLON</item>
+              <item>SRAD</item>
+              <item>POINT_TYPE</item>
+            </inclusions>
+          </option>
+        </list>
+      </parameter>
+
+      <parameter name="SLAT">
+        <type>double</type>
+        <brief>Sigma Latitude</brief>
+        <description>Sigma Latitude</description>
+        <default><item>0.0</item></default>
+      </parameter>
+
+      <parameter name="SLON">
+        <type>double</type>
+        <brief>Sigma Longitude</brief>
+        <description>Sigma Longitude</description>
+        <default><item>0.0</item></default>
+      </parameter>
+
+      <parameter name="SRAD">
+        <type>double</type>
+        <brief>Sigma Radius</brief>
+        <description>Sigma Radius</description>
+        <default><item>0.0</item></default>
+      </parameter>
+
+      <parameter name="POINT_TYPE">
+        <type>string</type>
+        <default><item>FREE</item></default>
+        <brief>
+	         Apply the Sigmas to Points based on Type
+        </brief>
+        <description>
+	        Apply the Sigmas to the Control Points based on Control Point Type.
+        </description>
+        <list>
+          <option value="FREE">
+            <brief>Specify Sigmas for Free Points</brief>
+            <description>
+	           Specify Sigmas for Free Control Points only
+            </description>
+          </option>
+          <option value="ALL">
+            <brief>Specify Sigmas for All Points</brief>
+            <description>
+	           Specify Sigmas for All Control Points
+            </description>
+          </option>
+        </list>
+      </parameter>
+    </group>
+
+    <group name="EditLock Options">
+     <parameter name="EDITLOCK">
+        <type>string</type>
+        <default><item>NONE</item></default>
+       <brief>Edit Lock options for the Control Net</brief>
+       <description>Edit Lock options for the Control Net</description>
+        <list>
+
+          <option value="NONE">
+            <brief>No EditLock</brief>
+          <description>No EditLock for any Control Points or Measures in the 
+          Control Net 
+          </description> 
+        </option>
+
+          <option value="POINTS">
+            <brief>EditLock All the Control Points</brief>
+          <description>EditLock all the Control Points in the Control Net
+          </description> 
+        </option>
+  
+        <option value="CONSTRAINED_FIXED">
+          <brief>EditLock All the Constrained or Fixed Control Points 
+            Type</brief>
+          <description>EditLock all the Constrained or Fixed Control Points Type in the 
+            Control Net</description> 
+        </option>
+
+        <option value="MEASURES">
+          <brief>EditLock All the Control Measures</brief>
+          <description>EditLock all the Control Measures in the Control Net
+          </description> 
+        </option>
+
+        </list>
+      </parameter>
+    </group>
+  </groups>
+</application>
