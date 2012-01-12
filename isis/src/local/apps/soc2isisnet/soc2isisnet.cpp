@@ -402,7 +402,7 @@ void ReadIpf(const string & inputIpf, ControlNet& cnet, Pvl & logPvl){
     ControlMeasure* cMeasure = new ControlMeasure;
 
     cMeasure->SetCubeSerialNumber(serialNum);
-    cMeasure->SetChooserName("socetnet2isis conversion");
+    cMeasure->SetChooserName("soc2isisnet conversion");
     
     // Set current time
     iTime time;

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<application name="socetnet2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+<application name="soc2isisnet" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
     Creates an Isis3 Control Network file from the SOCET Net files.
   </brief>
   <description>
     <p> 
-      <b>socetnet2isis</b> will create an ISIS control network from an existing 
+      <b>soc2isisnet</b> will create an ISIS control network from an existing 
         SOCET control network. Required Socet net files are<br/>
       <pre>
           1. Aero Triangulation File (.atf)
@@ -137,6 +137,9 @@
       3. Added the Documentation
       4. Checked into isis3/src/local/apps Mantis issue => #0000663
     </change>
+    <change name="Sharmila Prasad" date="2012-01-12">Change name from 
+    socetnet2isis to soc2isisnet  Mantis issue => #0000663
+    </change> 
   </history>
 
   <groups>
@@ -209,7 +212,7 @@
     <group name="Descriptors">
       <parameter name="NETWORKID">
         <type>string</type>
-        <default><item>socetnet2isis</item></default>
+        <default><item>soc2isisnet</item></default>
         <brief>Control Network ID
           </brief>
         <description>An identification label to describe the Control 
@@ -227,7 +230,7 @@
       
       <parameter name="DESCRIPTION">
         <type>string</type>
-        <default><item>socetnet2isis</item></default>
+        <default><item>soc2isisnet</item></default>
         <brief>Describes the control network</brief>
         <description>Describes the control network</description>
       </parameter> 
