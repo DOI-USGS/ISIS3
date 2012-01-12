@@ -618,11 +618,6 @@ void IsisMain() {
   Pvl toNormPvl;
   iString normName = ui.GetAsString("NORMNAME");
   normName = normName.UpCase();
-  // Check to make sure that a normalization model was specified
-  if (normName == "NONE") {
-    string message = "A Normalization model must be specified before running this program.";
-    throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
-  }
   bool wasFound = false;
   if (ui.WasEntered("FROMPVL")) {
     iString normVal;
@@ -643,7 +638,11 @@ void IsisMain() {
           normVal = "NONE";
         }
         normVal = normVal.UpCase();
-        if (normName == normVal) {
+        if (normName == normVal && normVal != "NONE") {
+          wasFound = true;
+        }
+        if (normName == "NONE" && normVal != "NONE" && !wasFound) {
+          normName = normVal;
           wasFound = true;
         }
         if (!wasFound) {
@@ -657,7 +656,12 @@ void IsisMain() {
                 normVal = "NONE";
               }
               normVal = normVal.UpCase();
-              if (normName == normVal) {
+              if (normName == normVal && normVal != "NONE") {
+                wasFound = true;
+                break;
+              }
+              if (normName == "NONE" && normVal != "NONE" && !wasFound) {
+                normName = normVal;
                 wasFound = true;
                 break;
               }
@@ -666,6 +670,13 @@ void IsisMain() {
           }
         }
       }
+    }
+    // Check to make sure that a normalization model was specified
+    if (normName == "NONE") {
+      string message = "A Normalization model must be specified before running this program. ";
+      message += "You need to provide a Normalization model through an input PVL (FROMPVL) or ";
+      message += "you need to specify a Normalization model through the program interface.";
+      throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
     }
     if (wasFound) {
       toNormPvl.AddObject(fromNormObj);
@@ -999,10 +1010,6 @@ void IsisMain() {
   // Check to make sure that an atmospheric model was specified (if the
   // normalization model requires it)
   if (normName == "ALBEDOATM" || normName == "SHADEATM" || normName == "TOPOATM") {
-    if (atmName == "NONE") {
-      string message = "An Atmospheric model must be specified when doing normalization with atmosphere.";
-      throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
-    }
     wasFound = false;
     if (ui.WasEntered("FROMPVL")) {
       iString atmVal;
@@ -1023,7 +1030,11 @@ void IsisMain() {
             atmVal = "NONE";
           }
           atmVal = atmVal.UpCase();
-          if (atmName == atmVal) {
+          if (atmName == atmVal && atmVal != "NONE") {
+            wasFound = true;
+          }
+          if (atmName == "NONE" && atmVal != "NONE" && !wasFound) {
+            atmName = atmVal;
             wasFound = true;
           }
           if (!wasFound) {
@@ -1037,7 +1048,12 @@ void IsisMain() {
                   atmVal = "NONE";
                 }
                 atmVal = atmVal.UpCase();
-                if (atmName == atmVal) {
+                if (atmName == atmVal && atmVal != "NONE") {
+                  wasFound = true;
+                  break;
+                }
+                if (atmName == "NONE" && atmVal != "NONE" && !wasFound) {
+                  atmName = atmVal;
                   wasFound = true;
                   break;
                 }
@@ -1046,6 +1062,12 @@ void IsisMain() {
             }
           }
         }
+      }
+      if (atmName == "NONE") {
+        string message = "An Atmospheric model must be specified when doing normalization with atmosphere.";
+        message += "You need to provide an Atmospheric model through an input PVL (FROMPVL) or ";
+        message += "you need to specify an Atmospheric model through the program interface.";
+        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
       }
       if (wasFound) {
         toAtmPvl.AddObject(fromAtmObj);
@@ -1170,11 +1192,6 @@ void IsisMain() {
   Pvl toPhtPvl;
   iString phtName = ui.GetAsString("PHTNAME");
   phtName = phtName.UpCase();
-  // Check to make sure that a photometric model was specified 
-  if (phtName == "NONE") {
-    string message = "A Photometric model must be specified before running this program.";
-    throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
-  }
   wasFound = false;
   if (ui.WasEntered("FROMPVL")) {
     iString phtVal;
@@ -1195,7 +1212,11 @@ void IsisMain() {
           phtVal = "NONE";
         }
         phtVal = phtVal.UpCase();
-        if (phtName == phtVal) {
+        if (phtName == phtVal && phtVal != "NONE") {
+          wasFound = true;
+        }
+        if (phtName == "NONE" && phtVal != "NONE" && !wasFound) {
+          phtName = phtVal;
           wasFound = true;
         }
         if (!wasFound) {
@@ -1209,7 +1230,12 @@ void IsisMain() {
                 phtVal = "NONE";
               }
               phtVal = phtVal.UpCase();
-              if (phtName == phtVal) {
+              if (phtName == phtVal && phtVal != "NONE") {
+                wasFound = true;
+                break;
+              }
+              if (phtName == "NONE" && phtVal != "NONE" && !wasFound) {
+                phtName = phtVal;
                 wasFound = true;
                 break;
               }
@@ -1218,6 +1244,13 @@ void IsisMain() {
           }
         }
       }
+    }
+    // Check to make sure that a photometric model was specified 
+    if (phtName == "NONE") {
+      string message = "A Photometric model must be specified before running this program.";
+      message += "You need to provide a Photometric model through an input PVL (FROMPVL) or ";
+      message += "you need to specify a Photometric model through the program interface.";
+      throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
     }
     if (wasFound) {
       toPhtPvl.AddObject(fromPhtObj);

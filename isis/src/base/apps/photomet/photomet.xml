@@ -504,6 +504,15 @@
       calculations are based on standard conditions. This parameter has been added
       to the new interface to photomet. 
     </change>
+    <change name="Janet Barrett" date="2012-01-10">
+      The program was fixed to make it backwards compatible with older PVL files. If
+      you tried running this program with an older PVL, then you most likely got the
+      following error message "A Normalization model must be specified before running
+      this program.". This message would have occurred even if you had a Normalization
+      model specified in your FROMPVL file. This problem has been fixed. If your FROMPVL
+      file specifies a Normalization model, then you aren't required to specify one through 
+      the program interface as well.
+    </change>
   </history>
 
   <category>
