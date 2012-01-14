@@ -4,7 +4,7 @@ include $(ISISROOT)/make/isismake.tsts
 
 commands:
 	$(APPNAME) from=$(INPUT)/MRF_NAC_xyz_noZadj_Yvel20_4ISIS.atf \
-	to=$(OUTPUT)/jcrater.net \
+	to=$(OUTPUT)/truth.net \
 	measurement=adjusted \
 	sigmas=override \
 	point_type=all \
