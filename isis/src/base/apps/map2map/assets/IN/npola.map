@@ -1,0 +1,11 @@
+Group = Mapping
+ ProjectionName = PolarStereographic
+ CenterLatitude     = 90.0
+ CenterLongitude    = 0.0
+ TargetName         = Mercury
+ MinimumLatitude    = 65.0
+ MaximumLatitude    = 90.0
+ MinimumLongitude   = -180
+ MaximumLongitude   = 180
+ PixelResolution    = 1000
+End_Group
