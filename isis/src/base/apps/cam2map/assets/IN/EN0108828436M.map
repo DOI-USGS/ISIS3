@@ -1,0 +1,19 @@
+  Group = Mapping
+    ProjectionName     = Equirectangular
+    CenterLongitude    = 180.0
+    TargetName         = Mercury
+    EquatorialRadius   = 2440000.0 <meters>
+    PolarRadius        = 2440000.0 <meters>
+    LatitudeType       = Planetocentric
+    LongitudeDirection = PositiveEast
+    LongitudeDomain    = 360
+    MinimumLatitude    = 0.28266251334852
+    MaximumLatitude    = 13.593031136638
+    MinimumLongitude   = 156.0625759355
+    MaximumLongitude   = 172.73516112289
+    UpperLeftCornerX   = -1019500.0 <meters>
+    UpperLeftCornerY   = 579000.0 <meters>
+    PixelResolution    = 500.0 <meters/pixel>
+    Scale              = 85.172067497323 <pixels/degree>
+    CenterLatitude     = 0.0
+  End_Group
