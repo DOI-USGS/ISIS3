@@ -1,22 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <application name="grid" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
-    Add a grid to the input image.     
+    Add a graticule or rectangular grid to the input image
   </brief>
 
   <description>
-    Superimpose a grid on an input image using input from the user.  The grid can
-    defined in terms of latitude and longitude, or simply lines and samples.  For 
-    example, if you wanted to draw a grid that has an intersection at line 23, 
-    sample 17, with vertical lines every 30 pixels and horizontal lines every
-    40 pixels, your parameters would be: BASELINE = 23, BASESAMPLE = 17, 
-    SINC = 30, and LINC = 40. <br></br><br></br>
-    If you wanted to draw a grid on a map projection that was based on latitude 
-    and longitude, GROUND would be selected instead.  And suppose you wanted the 
-    grid to have an intersection at LAT 50, LON 60, with lines drawn every two
-    and a half degrees latitude and every three degrees longitude.  Your parameters 
-    would be: BASELAT = 50, BASELON = 60, LATINC = 2.5, and LONINC = 3. 
+    Superimpose a user defined grid on an input image. A graticule is defined in
+    terms of latitude and longitude coordinates (MODE=GROUND), while a simple
+    rectangular grid is based on line and sample coordinates (MODE=IMAGE).<br/><br/>
+
+    Example 1: For a basic latitude/longitude graticule with grid lines drawn
+    every 10 degrees, your parameters would be: Select GROUND mode, BASELAT=0,
+    BASELON=0, LATINC=10, LONINC=10. Latitude and longitude lines will be drawn
+    at even 10 degree increments, based on zero. Superimpose a grid on an input
+    image using input from the user. The grid can be defined in terms of
+    latitude and longitude or simply lines and samples. For example, if you
+    wanted to draw a grid that has an intersection at line 23, sample 17, with
+    vertical lines every 30 pixels and horizontal lines every 40 pixels, your
+    parameters would be:
+      <pre>BASELINE=23 BASESAMPLE=17 SINC=30 LINC=40</pre>
+    Example 2: For a rectangular grid that has an intersection at line 23,
+    sample 17, with vertical lines every 30 pixels and horizontal lines every 40
+    pixels, your parameters would be:
+      <pre>MODE=IMAGE BASELINE=23 BASESAMPLE=17 SINC=30 LINC=40</pre>
+    Example 3: For a latitude/longitude graticule with a grid intersection at
+    LAT 50 degrees, LON 60 degrees, with latitude lines drawn every two and a half degrees and
+    longitude lines drawn every three degrees, your parameters would be:
+      <pre>MODE=GROUND BASELAT=50 BASELON=60 LATINC=2.5 LONINC=3</pre>
+
+    Example 4: If desired, you may draw a latitude/longitude graticule within a
+    subarea of an image. For example, suppose you have a global image (full
+    latitude and longitude extent), but would like a 10 degree graticule drawn
+    only between latitudes -20 degrees and +50 degrees and only between
+    longitudes 90 degrees and 180 degrees. In this case, your parameters would
+    be:
+      <pre>MODE=GROUND BASELAT=0 BASELON=0 LATINC=10 LONINC=10 MINLAT=-20 MAXLAT=50 MINLON=90 MAXLON=180</pre>
+    This approach can also be used to produce grid variations as desired through
+    multiple executions of the grid application.
   </description>
 
   <category>
@@ -69,6 +89,10 @@
       would be considered a grid line. This could result in a large portion of
       the image losing legitimate DN values for the grid value. Fixes #607.
     </change>
+    <change name="Steven Lambright" date="2012-01-04">
+      Tested and documented for the January 2012 release. The documentation
+      updates included were recommended by Chris Isbell.
+    </change>
   </history>
 
   <groups>
@@ -107,14 +131,14 @@
         <default><item>GROUND</item></default> 
         <brief>Grid options</brief>
         <description>
-          This allows the user to decide which grid option to use.
+          This allows for selection of either IMAGE or GROUND coordinates when drawing the grid.
         </description>
         <list>
           <option value = "IMAGE">
-            <brief>Add a grid in terms of lines and samples</brief>
+            <brief>Add a rectangular grid in terms of lines and samples</brief>
             <description>
               A grid will be inserted into the image with spacing and position
-              defined in terms of lines and samples.
+              defined in line and sample coordinates.
             </description>
             <exclusions>
               <item>BASELAT</item>
@@ -125,14 +149,15 @@
               <item>MAXLAT</item>
               <item>MINLON</item>
               <item>MAXLON</item>
+              <item>BOUNDARY</item>
             </exclusions>
           </option>
 
           <option value = "GROUND">
-            <brief>Add a grid in terms of lat/lon coordinates</brief>
+            <brief>Add a grid (graticule) in terms of lat/lon coordinates</brief>
             <description>
               A grid will be inserted into the image with spacing and position
-              defined in terms of latitude and longitude.
+              defined in latitude and longitude coordinates.
             </description>
             <exclusions>
               <item>LINC</item>
@@ -149,7 +174,7 @@
         <default><item>false</item></default>
         <brief>Draw ticks instead of lines</brief>
         <description>
-          Draw ticks at lat, lon line intersections instead of lines
+          Draw ticks at grid intersections (instead of drawing full lines)
         </description>
         <inclusions>
           <item>DIAGONALTICKS</item>
@@ -169,12 +194,11 @@
       <parameter name="BOUNDARY">
         <type>boolean</type>
         <default><item>false</item></default>
-        <brief>Outline the lat/lon range</brief>
+        <brief>Include grid lines at the lat/lon extent of the image or as defined by the ground options</brief>
         <description>
-          This will draw grid lines at the extents of the latitude and longitude
-          range provided by minlat, maxlat, minlon and maxlon. The boundary will
-          add ticks to intersections with it in the case of TICKS being
-          true.
+          This will draw grid lines (or ticks) at the lat/lon extents of the
+          image or those extents as provided by user input MINLAT, MAXLAT,
+          MINLON, and MAXLON.
         </description>
       </parameter>
     </group>
@@ -185,8 +209,8 @@
         <default><item>1</item></default>
         <brief>Starting line</brief>
         <description>
-          Starting line of grid.  This, along with BASESAMPLE will give the 
-          program a starting point to draw the grid with.
+          Starting line of grid.  This, along with BASESAMPLE, defines the
+          starting point (line) for drawing the grid.
         </description>
         <minimum inclusive="yes">1</minimum>
       </parameter>
@@ -196,8 +220,8 @@
         <default><item>1</item></default>
         <brief>Starting sample</brief>
         <description>
-          Starting sample of grid.  This, along with BASELINE will give the 
-          program a starting point to draw the grid with.
+          Starting sample of grid.  This, along with BASELINE, defines the
+          starting point (sample) for drawing the grid.
         </description>
         <minimum inclusive="yes">1</minimum>
       </parameter>
@@ -207,7 +231,8 @@
         <default><item>100</item></default>
         <brief>Line increment</brief>
         <description>
-          This defines the number of lines between gridlines 
+          This defines the line increment when drawing the grid, starting at
+          BASELINE. The line increment is the spacing between lines.
         </description>
         <minimum inclusive="yes">1</minimum>
       </parameter>
@@ -217,7 +242,8 @@
         <default><item>100</item></default>
         <brief>Sample increment</brief>
         <description>
-          This defines the number of samples between gridlines 
+          This defines the sample increment when drawing the grid, starting at
+          BASESAMPLE. The sample increment is the spacing between samples.
         </description>
         <minimum inclusive="yes">1</minimum>
       </parameter>
@@ -229,12 +255,11 @@
         <default><item>0.0</item></default>
         <brief>Starting latitude</brief>
         <description>
-          This is a latitude line the grid will lie on. If it is not in the
-          image, then it is a latitude line the grid would lie on if the image
-          were larger. This is not a minimum latitude for the grid. If the image
-          is projected, then this should be in the same units of the projection
-          (for example, if your cube has a planetographic projection then this
-          parameter will be interpretted as planetographic).
+          This is the latitude on which LATINC is mathematically based. That is,
+          this establishes a starting point for a global 'virtual' grid where
+          latitude lines are drawn where the input image intersects the virtual
+          grid. The application assumes user input reflects proper units (e.g.
+          planetographic, planetocentric latitude) as defined within the image.
         </description>
         <minimum inclusive="yes">-90.0</minimum>
       </parameter>
@@ -244,13 +269,10 @@
         <default><item>0.0</item></default>
         <brief>Starting longitude</brief>
         <description>
-          This is a longitude line the grid will lie on. If it is not in the 
-          image,  then it is a longitude line the grid would lie on if the image 
-          were larger. This is not a minimum longitude for the grid. If this
-          image is projected, then this should be in the same units of the
-          projection (for example, if your cube is projected in postive west
-          then this longitude will be interpretted as a positive west
-          longitude).
+          This is the longitude on which LONINC is mathematically based. That
+          is, this establishes a starting point for a global 'virtual' grid
+          where longitude lines are drawn where the input image intersects the
+          virtual grid.
         </description>
         <minimum inclusive="yes">-360.0</minimum>
       </parameter>
@@ -260,7 +282,10 @@
         <default><item>10.0</item></default>
         <brief>Latitude increment</brief>
         <description>
-          This defines the latitudinal spacing between gridlines 
+          This defines the latitude increment, based on BASELAT, on which grid
+          lines are drawn. This establishes a global 'virtual' grid where
+          latitude lines are drawn only where the input image intersects the
+          virtual grid.
         </description>
         <minimum inclusive="yes">0.0</minimum>
       </parameter>
@@ -270,7 +295,10 @@
         <default><item>10.0</item></default>
         <brief>Longitude increment</brief>
         <description>
-          This defines the longitudinal spacing between gridlines 
+          This defines the longitude increment, based on BASELON, on which grid
+          lines are drawn. This establishes a global 'virtual' grid where
+          longitude lines are drawn only where the input image intersects the
+          virtual grid.
         </description>
         <minimum inclusive="yes">0.0</minimum>
       </parameter>
@@ -280,11 +308,11 @@
       <parameter name="MINLAT">
         <type>double</type>
         <internalDefault>Automatic</internalDefault>
-        <brief>Lowest latitude inside the grid</brief>
+        <brief>Lowest latitude value to extend grid lines</brief>
         <description>
-          This defines the lowest latitude to draw grid lines for. If BOUNDARY
-          then this latitude will have a line at it too, regardless of the
-          BASELAT and LATINC values.
+          This defines the minimum latitude to which longitude grid lines will
+          extend. If BOUNDARY is selected, a latitude line will be drawn at this
+          latitude.
         </description>
         <minimum inclusive="yes">-90</minimum>
         <maximum inclusive="yes">90</maximum>
@@ -293,11 +321,11 @@
       <parameter name="MAXLAT">
         <type>double</type>
         <internalDefault>Automatic</internalDefault>
-        <brief>Highest latitude inside the grid</brief>
+        <brief>Highest latitude value to extend grid lines</brief>
         <description>
-          This defines the highest latitude to draw grid lines for. If BOUNDARY
-          then this latitude will have a line at it too, regardless of the
-          BASELAT and LATINC values.
+          This defines the maximum latitude to which longitude grid lines will
+          extend. If BOUNDARY is selected, a latitude line will be drawn at this
+          latitude.
         </description>
         <minimum inclusive="yes">-90</minimum>
         <maximum inclusive="yes">90</maximum>
@@ -307,11 +335,11 @@
       <parameter name="MINLON">
         <type>double</type>
         <internalDefault>Automatic</internalDefault>
-        <brief>Lowest longitude value inside grid</brief>
+        <brief>Lowest longitude value to extend grid lines</brief>
         <description>
-          This defines the lowest longitude to draw grid lines for. If BOUNDARY
-          then this latitude will have a line at it too, regardless of the
-          BASELAT and LATINC values.
+          This defines the minimum longitude to which latitude grid lines will
+          extend. If BOUNDARY is selected, a longitude line will be drawn at
+          this longitude.
         </description>
         <minimum inclusive="yes">-360</minimum>
         <maximum inclusive="yes">360</maximum>
@@ -320,11 +348,11 @@
       <parameter name="MAXLON">
         <type>double</type>
         <internalDefault>Automatic</internalDefault>
-        <brief>Highest longitude value in the image</brief>
+        <brief>Highest longitude value to extend grid lines</brief>
         <description>
-          This defines the highest longitude to draw grid lines for. If BOUNDARY
-          then this latitude will have a line at it too, regardless of the
-          BASELAT and LATINC values.
+          This defines the maximum longitude to which latitude grid lines will
+          extend. If BOUNDARY is selected, a longitude line will be drawn at
+          this longitude.
         </description>
         <minimum inclusive="yes">-360</minimum>
         <maximum inclusive="yes">360</maximum>
@@ -336,7 +364,7 @@
       <parameter name="LINEWIDTH">
         <type>integer</type>
         <default><item>1</item></default>
-        <brief>Thickness of lines</brief>
+        <brief>Thickness of lines (pixels)</brief>
         <description>
           This defines the thickness of grid lines in pixels.
         </description>
@@ -349,15 +377,15 @@
         <default><item>HRS</item></default>
         <brief>Select line DN value</brief>
         <description>
-          This options allows for any DN value, or any of three special pixel
-          values to be choosen as the line value.
+          This option allows for any DN value, or any of three special pixel
+          values to be chosen as the grid line value.
         </description>
         <list>
           <option value="HRS">
             <brief>Use HRS DN value</brief>
             <description>
               Use the special pixel value HRS (High Representation Saturation)
-              as the line value. This may vary with bittype used.
+              as the grid line value. This may vary with bittype used.
             </description>
             <exclusions><item>DNVALUE</item></exclusions>
           </option>
@@ -365,15 +393,15 @@
             <brief>Use LRS DN value</brief>
             <description>
               Use the special pixel value LRS (Low Representation Saturation)
-              as the line value. This may vary with bittype used.
+              as the grid line value. This may vary with bittype used.
             </description>
             <exclusions><item>DNVALUE</item></exclusions>
           </option>
           <option value="NULL">
             <brief>Use NULL DN value</brief>
             <description>
-              Use the special pixel value NULL as the line value. This may vary
-              with bittype used.
+              Use the special pixel value NULL as the grid line value. This may
+              vary with bittype used.
             </description>
             <exclusions><item>DNVALUE</item></exclusions>
           </option>
@@ -383,7 +411,7 @@
             <description>
               Use the DN value specified in the DNVALUE parameter. It is a good
               idea to run the application stats on a cube before selecting a DN
-              value. 
+              value.
             </description>
           </option>
         </list>
@@ -392,8 +420,9 @@
         <type>double</type>
         <brief>DN value to be used</brief>
         <description>
-          This is the DN value to be used as the value of the line. To pick an
-          appropriate value, run the application stats first and use max or min.
+          This is the DN value to be used as the value of the grid lines when
+          LINEVALUE=DN. It may be beneficial to first run the stats application
+          in determining image minimum and maximum values.
         </description>
       </parameter>
     </group>
@@ -402,17 +431,17 @@
       <parameter name="DIAGONALTICKS">
         <type>boolean</type>
         <default><item>false</item></default>
-        <brief>Draw tick marks diagonally</brief>
+        <brief>Draw tick marks diagonally ('x' instead of '+')</brief>
         <description>
-          Instead of drawing the tick marks vertically and horizonally, 
-          creating a '+', draw the tick marks diagonally creating an 'x'
+          Draw tick marks diagonally (creating an 'x'), instead of default
+          vertical/horizontal ('+')
         </description>
       </parameter>
 
       <parameter name="TICKSIZE">
         <type>integer</type>
         <default><item>5</item></default>
-        <brief>Size of tickmarks</brief>
+        <brief>Size (length) of tickmarks (pixels)</brief>
         <description>
           This defines the width and height (which are always equal) of the tick
           marks in pixels.
