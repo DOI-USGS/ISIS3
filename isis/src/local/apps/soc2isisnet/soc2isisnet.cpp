@@ -58,15 +58,16 @@ string GetPrjFilename(const Filename & inFile);
 string GetTarget(const Filename & inputAtf);
 void   GetTargetRadius(const string & targetName, double & equatorialRad, double & polarRad);
 
-bool ParseProjectAndSetMapping(Pvl & mapPvl, PvlGroup & logGrp, int & unitsXY, const string & targetName, const string & prjFilename);
+bool ParseProjectAndSetMapping(Pvl & mapPvl, PvlGroup & logGrp, int & unitsXY, const string & targetName, 
+                               const string & prjFilename);
 void ProcessX(vector<double> & pointParams, fstream & repstream, int unitsXY);
 void ProcessY(vector<double> & pointParams, fstream & repstream, int unitsXY);
 void ProcessZ(vector<double> & pointParams, fstream & repstream);
 
 void ParseReport(const string & atfFilename, const int numPoints, map< string, vector<double> > & pointParamMap, 
                  vector<int> & pointStats, vector<string> & pointID, int unitsXY);
-void ParseGpf   (const string & gpfFilename, const string & atfFilename, const string & targetName, ControlNet&, pointInfoStruct & pointInfo, 
-                 Pvl & logPvl, Projection*, int unitsXY); 
+void ParseGpf   (const string & gpfFilename, const string & atfFilename, const string & targetName, ControlNet&, 
+                 pointInfoStruct & pointInfo, Pvl & logPvl, Projection*, int unitsXY); 
 void ParseIpfs  (const string & atfFilename, ControlNet& cnet, Pvl & logPvl); 
 void ReadIpf    (const string & inputIpf, ControlNet & cnet, Pvl & logPvl);    
 
@@ -471,7 +472,9 @@ void ReadIpf(const string & inputIpf, ControlNet& cnet, Pvl & logPvl){
  * @param unitsXY      - Coordinate system for this socetset 
  *  
  */
-void ParseGpf(const string & gpfFilename, const string & atfFileName, const string & targetName, ControlNet & cnet, pointInfoStruct & pointInfo, Pvl & logPvl, Projection* proj, int unitsXY) { 
+void ParseGpf(const string & gpfFilename, const string & atfFileName, const string & targetName, 
+              ControlNet & cnet, pointInfoStruct & pointInfo, Pvl & logPvl, Projection* proj, 
+              int unitsXY) { 
   UserInterface &ui = Application::GetUserInterface();
   
   string sigma           = ui.GetString("SIGMAS");
@@ -487,6 +490,18 @@ void ParseGpf(const string & gpfFilename, const string & atfFileName, const stri
   if (proj != NULL) {
     isProjected = true;
   }
+  
+  // Handle Ellipsoid target such as Mars the radius differently
+  // by using the Aroid file to calculate the radius
+  bool isEllipsoid = ui.GetBoolean("ELLIPSOID");
+  Cube *aroid = NULL;
+  Projection *aroidProj = NULL;
+  if (isEllipsoid) {
+    aroid = new Cube;
+    aroid->open(ui.GetAsString("AROID_FILE"));
+    aroidProj = aroid->getProjection();
+  }
+  
   double userSigmaLat = DEFAULT_SIGMA;
   double userSigmaLon = DEFAULT_SIGMA;
   double userSigmaRad = DEFAULT_SIGMA;
@@ -544,26 +559,37 @@ void ParseGpf(const string & gpfFilename, const string & atfFileName, const stri
       //cerr << "Deleting Checkpoint " << pname ;
       continue;
     }
-    //cerr << " Adding Point " << pname << "\n";
+
     // Get all original values from Report File
     // Ignore the lat, lon, height from the gpf file
     latitude  = pointParamsMap[pname][origVal_Y];
     longitude = pointParamsMap[pname][origVal_X];
     radius    = pointParamsMap[pname][origVal_Z];
     
-    //cerr << "\ntype=" << knownPointType << " isProjected=" << isProjected << " latitude=" << latitude << " longitude=" << longitude << " radius=" << radius << "\n";
+    //cerr << "\npoint name=" << pname << " type=" << knownPointType << " isProjected=" << isProjected << " latitude=" << latitude << " longitude=" << longitude << " radius=" << radius << "EquatorialRadius=" << EquatorialRadius <<"\n";
 
-    // If no projection
-    if (!isProjected){
-      latitude  = latitude  * 360.0 / (2.0*PI);
-      longitude = longitude * 360.0 / (2.0*PI);
+    // For Ellipsoid Targets
+    if (isEllipsoid) {
+      aroidProj->SetCoordinate(longitude, latitude);
+      radius += aroidProj->LocalRadius();
     }
-    else{
-      proj->SetCoordinate(longitude, latitude);
-      latitude  = proj->UniversalLatitude();
-      longitude = proj->UniversalLongitude();
-      radius   += proj->LocalRadius();
+    // Spherical Targets
+    else {
+      // If no projection - change radians into degrees
+      if (!isProjected){
+        latitude  = latitude  * 360.0 / (2.0*PI);
+        longitude = longitude * 360.0 / (2.0*PI);
+        radius   += EquatorialRadius;
+      }
+      else{
+        proj->SetCoordinate(longitude, latitude);
+        latitude  = proj->UniversalLatitude();
+        longitude = proj->UniversalLongitude();
+        radius   += proj->LocalRadius();
+      }
     }
+    
+    //cerr << " latitude=" << latitude << " longitude=" << longitude << " radius=" << radius << "\n";
     
     Distance  radDist(radius,    Isis::Distance::Meters);
     Latitude  latObj (latitude,  Isis::Angle::Degrees);
@@ -578,7 +604,7 @@ void ParseGpf(const string & gpfFilename, const string & atfFileName, const stri
     // default Point Type
     cPoint->SetType(Isis::ControlPoint::Constrained);
     
-    if (knownPointType == Tie) {
+    if (knownPointType == Tie && measurementType == "APRIORI") {
       cPoint->SetType(Isis::ControlPoint::Free);
     }
     
@@ -637,8 +663,11 @@ void ParseGpf(const string & gpfFilename, const string & atfFileName, const stri
       double adjRad = pointParamsMap[pname][adjVal_Z];
 
       //cerr << "\nPointName=" << pname << " overRide=" << overRide << " adjRad=" << adjRad;
-
-      if(isProjected){
+      
+      if(!isProjected){
+        adjRad += EquatorialRadius;
+      }
+      else {
         proj->SetCoordinate(adjLon, adjLat);
         adjLat = proj->UniversalLatitude();
         adjLon = proj->UniversalLongitude();
@@ -668,8 +697,8 @@ void ParseGpf(const string & gpfFilename, const string & atfFileName, const stri
       sp.SetRadii(equatorial_rad, equatorial_rad, polar_rad);
       sp.SetSphericalSigmasDistance(sigmaLatDist, sigmaLonDist, sigmaRadDist);
       //cerr << "\nadjLat=" << adjLat << " adjLat=" << adjLat << " adjRad=" << adjRad;
-      // cerr << "\nadjRad=" << adjRad << " adjSigmaRad=" << pointParamsMap[pname][adjSigma_Z] << " sigmaRadDist=" << sigmaRadDist.GetMeters() << "\n";
-      cPoint->SetAdjustedSurfacePoint(sp);
+      //cerr << "\nadjRad=" << adjRad << " adjSigmaRad=" << pointParamsMap[pname][adjSigma_Z] << " sigmaRadDist=" << sigmaRadDist.GetMeters() << "\n";
+      cPoint->SetAprioriSurfacePoint(sp);
     } // end Adjusted
     
     cnet.AddPoint(cPoint);
@@ -1052,7 +1081,8 @@ bool ParseProjectAndSetMapping(Pvl & mapPvl, PvlGroup & logGrp, int & unitsXY, c
  * @param inputatf - Atf File
  */
 string GetTarget(const Filename & inputAtf) {
-  fstream atfFile(inputAtf.absoluteFilePath().toStdString().c_str());
+  fstream atfFile;
+  atfFile.open(inputAtf.absoluteFilePath().toStdString().c_str());
 
   string imgFile, temp;
   while (atfFile.good()){
@@ -1062,27 +1092,23 @@ string GetTarget(const Filename & inputAtf) {
     }
   }
   atfFile >> temp;
-  imgFile = inputAtf.Path() + "/" + temp;
   atfFile.close();
-  
-  imgFile.erase(imgFile.size()-4, imgFile.size());
-  imgFile.append("_translation.pvl");
-  
-  string target="";
-  ifstream imgPvl(imgFile.c_str());
 
-  while (imgPvl.good()){
-    imgPvl >> target;
-    if (target.find("Target") != string::npos) {
-      break;
-    }
-  }
-  imgPvl >> target; // get "="
-  imgPvl >> target; // get targetName
-  imgPvl.close();
+  temp.erase(temp.size()-4, temp.size());
+  temp.append("_translation.pvl");
   
-  if (target == "End_Group"){
-    string msg = "Target Not Found";
+  imgFile = inputAtf.Path() + "/" + temp;
+
+  string target="";
+  try {
+    Pvl imgPvl(imgFile);
+    PvlGroup imgGrp = imgPvl.FindGroup("ISIS_SS_TRANSLATION");
+    target = imgGrp.FindKeyword("Target")[0];
+  } 
+  catch (Isis::iException e) {
+    string msg = "Target Not Found. Check if the Image Translation File \"";
+    msg += temp;
+    msg += "\" Exist";
     throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
   }
   

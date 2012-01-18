@@ -86,9 +86,17 @@
     </p>
 
     <p>If Adjusted, the Sigmas(socet / user defined) are applied to Lat, 
-    Lon, Radius irrespective of Control Point Type. </p> 
+    Lon, Radius irrespective of Control Point Type. All the Control Points are 
+    set to type Constrained. </p> 
 
-    <p>If projected, the projected Lat, Lon and Radius values are used. </p>
+    <p>The Adjusted/Apriori of the socetset will always form the Apriori for the 
+      isis3 Control Net
+    </p>
+
+    <p>If projected, the projected Lat, Lon and Radius values are used else Lat 
+      and Lon are converted to degrees and Radius is calculated using the 
+      Equatorial Radius of the Target. 
+    </p>
 
     <p>The application then builds the Control Measure info by parsing the Ipf and the 
     Translation files. It applies the Flip and Padding information from the Translation 
@@ -140,6 +148,11 @@
     <change name="Sharmila Prasad" date="2012-01-12">Change name from 
     socetnet2isis to soc2isisnet  Mantis issue => #0000663
     </change> 
+    <change name="Sharmila Prasad" date="2012-01-18">Fixes #0000663
+      1. Fixed errors while importing unprojected socetnet 
+      2. Adjusted Measurements always have Control Point Type Constrained 
+      3. Updated Gui and added parameters for Ellipsoid Targets 
+     </change> 
   </history>
 
   <groups>
@@ -168,32 +181,6 @@
           The output .net file
         </description>
       </parameter>
-      
-      <parameter name="MEASUREMENTS">
-        <type>string</type>
-        <default><item>APRIORI</item></default>
-        <brief>
-	       Choose to include either apriori or adjusted measurements in the output 
-        cnet 
-        </brief>
-        <description>
-	       The USE parameter is for deciding whether to use the SOCET apriori measurements, or the adjusted measurements  (if a .rep file exists) as apriori measurements in the output control network.
-        </description>
-        <list>
-          <option value="APRIORI">
-            <brief>Use SOCET apriori measurements</brief>
-            <description>
-	           SOCET SET apriori measurements will be used as apriori measurements in the output control network 
-            </description>
-          </option>
-          <option value="ADJUSTED">
-            <brief>Use SOCET adjusted measurements</brief>
-            <description>
-	           SOCET SET adjusted measurements will be used as apriori measurements in the output control network 
-            </description>
-          </option>
-        </list>
-      </parameter>
 
       <parameter name="LOG">
         <type>filename</type>
@@ -207,6 +194,24 @@
         </description>
       </parameter>
 
+      <parameter name="ELLIPSOID">
+        <type>boolean</type>
+        <default><item>false</item></default>
+        <brief>Check if Target is an Ellipsoid</brief>
+        <description>Check if Target is an Ellipsoid</description>
+        <inclusions>
+          <item>AROID_FILE</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="AROID_FILE">
+        <type>filename</type>
+        <internalDefault>None</internalDefault>
+        <fileMode>input</fileMode>
+        <brief>Specify Aroid file for Ellipsoid Target</brief>
+        <description>Specify Aroid file for Ellipsoid Target
+        </description>
+      </parameter>
     </group>
 
     <group name="Descriptors">
@@ -221,7 +226,7 @@
 
       <parameter name="USERNAME">
         <type>string</type>
-        <default><item>whoami</item></default>
+        <default><item>isisuser</item></default>
         <brief>The user's name</brief>
         <description>
           The username who executed the control net conversion.
@@ -248,16 +253,42 @@
       </parameter>
     </group>
 
-    <group name="Sigmas">
+    <group name="Measurements and Sigmas">
+      <parameter name="MEASUREMENTS">
+        <type>string</type>
+        <default><item>APRIORI</item></default>
+        <brief>
+	       Choose to include either apriori or adjusted measurements in the output 
+        cnet 
+        </brief>
+        <description>
+	       The USE parameter is for deciding whether to use the SOCET apriori measurements, or the adjusted measurements  (if a .rep file exists) as apriori measurements in the output control network.
+        </description>
+        <list>
+          <option value="APRIORI">
+            <brief>Use SOCET apriori measurements</brief>
+            <description>
+	           SOCET SET apriori measurements will be used as apriori measurements in the output control network 
+            </description>
+          </option>
+          <option value="ADJUSTED">
+            <brief>Use SOCET adjusted measurements</brief>
+            <description>
+	           SOCET SET adjusted measurements will be used as apriori measurements in the output control network 
+            </description>
+          </option>
+        </list>
+      </parameter>
+
       <parameter name="SIGMAS">
         <type>string</type>
-        <default><item>USE_SOCET_SIGMAS</item></default>
-        <brief>Override or Use Socet Control Net Sigmas</brief>
-        <description>Override or Use Socet Control Net Sigmas</description>
+        <default><item>DEFAULT</item></default>
+        <brief>Override or Use SOCET Net Sigmas</brief>
+        <description>Override or Use SOCET Control Net Sigmas</description>
         <list>
-          <option value="USE">
-            <brief>Use Socet Control Net Sigmas</brief>
-            <description>Use Socet Control Net Sigmas</description>
+          <option value="DEFAULT">
+            <brief>Use SOCET Net Sigmas</brief>
+            <description>Use SOCET Control Net Sigmas</description>
             <exclusions>
               <item>SLAT</item>
               <item>SLON</item>
@@ -266,8 +297,8 @@
             </exclusions>
           </option>
           <option value="OVERRIDE">
-            <brief>Override Socet Control Net Sigmas</brief>
-            <description>Override Socet Control Net Sigmas</description>
+            <brief>Override SOCET Net Sigmas</brief>
+            <description>Override SOCET Net Sigmas</description>
             <inclusions>
               <item>SLAT</item>
               <item>SLON</item>
@@ -334,27 +365,26 @@
         <list>
 
           <option value="NONE">
-            <brief>No EditLock</brief>
+            <brief>None</brief>
           <description>No EditLock for any Control Points or Measures in the 
           Control Net 
           </description> 
         </option>
 
           <option value="POINTS">
-            <brief>EditLock All the Control Points</brief>
+            <brief>All the Control Points</brief>
           <description>EditLock all the Control Points in the Control Net
           </description> 
         </option>
   
         <option value="CONSTRAINED_FIXED">
-          <brief>EditLock All the Constrained or Fixed Control Points 
-            Type</brief>
+          <brief>All the Constrained or Fixed Control Points</brief>
           <description>EditLock all the Constrained or Fixed Control Points Type in the 
             Control Net</description> 
         </option>
 
         <option value="MEASURES">
-          <brief>EditLock All the Control Measures</brief>
+          <brief>All the Control Measures</brief>
           <description>EditLock all the Control Measures in the Control Net
           </description> 
         </option>
