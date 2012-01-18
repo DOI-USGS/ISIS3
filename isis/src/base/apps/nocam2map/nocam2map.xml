@@ -8,11 +8,11 @@
 
   <description>
     <p>
-      This program will map project a raw instrument cube without a camera
-      model. However, the lack of a camera model requires latitude/longitude
-      information at each pixel in the raw cube. This must be facilitated 
-      through a latitude image and longitude image with the same size as the raw
-      instrument cube.
+      This program will map project a raw instrument <def>cube</def> without a
+      camera model. However, the lack of a camera model requires
+      <def>latitude</def>/<def>longitude</def> information at each pixel in the
+      raw cube. This must be facilitated through a latitude cube and longitude cube
+      with the same size as the raw instrument cube.
     </p>
 
     <p>
@@ -23,20 +23,20 @@
       the two input cubes (latitude/longitude). If found, we will have a
       sub-pixel location that has a 1-1 correspondence with the raw instrument
       pixel. An interpolator (nearest neighbor, bilinear, or cubic convolution)
-      is then used to compute a value for the output pixel.
+      is then used to compute a value for the output <def>pixel</def>.
     </p>
 
     <p>
       Therefore the root of the problem is finding the latitude/longitude in the 
       two input cubes as it is a 2-dimensional search. We do this by first
       creating two polynomial functions of a user-specified order (DEGREE), one
-      for sample and one for line. These functions, f(lat,long) = sample and
-      g(lat,long) = line, are dervied using a least-squares computation by
-      collecting a sparse set of control points (line,samp)-to-(lat,long). The
+      for sample and one for line. These functions, f(lat,lon) = sample and
+      g(lat,lon) = line, are derived using a least-squares computation by
+      collecting a sparse set of control points (line,samp)-to-(lat,lon). The
       sparseness is controlled by the SINC and LINC. Unfortunately the
       polynomial is not accurate enough to supply the mapping to sub-pixel
-      accuracy. The level of errors (between control points and the equations
-      derived) can be written to the RESIDUAL file for examination.
+      accuracy. The level of errors between the control points and the derived
+      equations can be written to the RESIDUAL file for examination.
     </p>
 
     <p>
@@ -45,13 +45,13 @@
       transforms are computed by collecting a small 3x3 window of control
       points. These equations are used to further refine the estimated location.
       We iterate this process until our estimated sample/line is within an
-      acceptable tolerance (TOLERANCE) of latitude/longitude values contained in
-      the two cubes (LATCUB/LONCUB) or until the number of iterations is 
+      acceptable tolerance (TOLERANCE) of latitude/longitude values contained
+      in the two cubes (LATCUBE/LONCUBE) or until the number of iterations is 
       exceeded (ITERATIONS).
     </p>
 
     <p>
-      Defining the output map is controlled as follows:
+      Defining the output <def>map projection</def> is controlled as follows:
       <ul>
         <li>ProjectionName - Should be specified by the map file</li>
         <li>TargetName -  Will be searched for in the FROM cube or can be
@@ -60,27 +60,31 @@
         <li>EquatorialRadius and PolarRadius- Will be automatically computed
           from NAIF kernels or can be specified by the user.
         </li>
-        <li>LatitudeType - Will be read from the map if available,
-          otherwise will be set to the latitude type of the LATCUB</li>
-        <li>LongitudeDirection - Will be read from the map if available,
-          otherwise will be set to the longitude direction of the LONCUB</li>
-        <li>LongitudeDomain - 0-360 by default.</li>
-        <li>MinimumLatitude - Can be computed from the LATCUB, read from the map
-          file or user specified.</li>
-        <li>MaximumLatitude - Can be computed from the LATCUB, read from
-          the map or user specified.</li>
-        <li>MinimumLongitude - Can be computed from the LONCUB, read from
-          the map or user specified.</li>
-        <li>MaximumLongitude - Can be computed from the LONCUB, read from
-          the map or user specified.</li>
-        <li>Scale or PixelResolution - Can be computed<sup>1</sup> from the
-           input, read from the map, or user specified in either meters/pixel
+        <li>LatitudeType - Will be read from the map file if available,
+          otherwise will be set to the <def>latitude type</def> of the
+          LATCUBE</li>
+        <li>LongitudeDirection - Will be read from the map file if available,
+          otherwise will be set to the <def>longitude direction</def> of the
+          LONCUBE</li>
+        <li>LongitudeDomain - The <def>longitude domain</def> will be 0-360 by
+          default.</li>
+        <li>MinimumLatitude - Can be computed from the LATCUBE, read from the
+          map file or user specified.</li>
+        <li>MaximumLatitude - Can be computed from the LATCUBE, read from
+          the map file or user specified.</li>
+        <li>MinimumLongitude - Can be computed from the LONCUBE, read from
+          the map file or user specified.</li>
+        <li>MaximumLongitude - Can be computed from the LONCUBE, read from
+          the map file or user specified.</li>
+        <li>Scale or <def>PixelResolution</def> - Can be computed<sup>1</sup>
+           from the input, read from the map file, or user specified in either meters/pixel
           (PixelResolution) or pixels/degree (Scale)</li>
       </ul>
     </p>
 
       <pre>
-<sup>1</sup>To compute the scale we find the number of pixels from point (1, 1) to point (nsamples, nlines) in the input cube:
+<sup>1</sup>To compute the scale we find the number of pixels from pixel (1, 1)
+  to pixel (nsamples, nlines) in the input cube:
   sqrt[(nsamples-1)<sup>2</sup> + (nlines-1)<sup>2</sup>]
  And the angle across this line:
   acos(cos(latitude_point1) * cos(latitude_point2) * cos(longitude_point1 - longitude_point2) + sin(latitude_point1) * sin(latitude_point2))
@@ -107,6 +111,9 @@
     <change name="Travis Addair" date="2009-08-10">
       Mapping group parameters are now placed into the print file.
     </change>
+    <change name="Annie Howington and Tracie Sucharski" date="2012-01-13">
+      Updated documentation.
+    </change>
   </history>
 
   <groups>
@@ -125,7 +132,7 @@
         </filter>
       </parameter>
 
-      <parameter name="LATCUB">
+      <parameter name="LATCUBE">
         <type>cube</type>
         <fileMode>input</fileMode>
         <brief>
@@ -133,7 +140,8 @@
         </brief>
         <description>
           The DN values from this cube will be used as the latitude values for
-          the input cube, samples and lines must match the FROM cube.
+          the input cube.  The number of  samples and lines must match the FROM
+          cube.
         </description>
         <filter>
           *.cub
@@ -147,8 +155,8 @@
         </default>
         <brief>The latitude type</brief>
         <description>
-          Specify the latitude type, either in planetographic or planetocentric 
-          coordinates.
+          Specify the latitude type, as either <def>planetographic latitude</def>
+          or <def>planetocentric latitude</def>.
         </description>
         <list>
           <option value="PLANETOCENTRIC">
@@ -166,7 +174,7 @@
         </list>
       </parameter>
 
-      <parameter name="LONCUB">
+      <parameter name="LONCUBE">
         <type>cube</type>
         <fileMode>input</fileMode>
         <brief>
@@ -174,7 +182,8 @@
         </brief>
         <description>
           The DN values from this cube will be used as the longitude values for
-          the input cube, samples and lines must match the FROM cube.
+          the input cube.  The number of samples and lines must match the FROM
+          cube.
         </description>
         <filter>
           *.cub
@@ -201,7 +210,7 @@
           <option value="POSITIVEWEST">
             <brief>Positive West Longitude</brief>
             <description>
-              Sets the longitudedirection to be positive west.
+              Sets the longitude direction to be positive west.
             </description>
           </option>
         </list>
@@ -214,7 +223,7 @@
             Newly mapped cube
           </brief>
           <description>
-            This file will contain the results of the remapping.
+            This file will contain the map projected cube.
           </description>
           <filter>
             *.cub
@@ -277,8 +286,8 @@
         <default><item>false</item></default>
         <brief>Specify whether or not to warp the image</brief>
         <description>
-          If set to true, the image will not be processed and warped, and will
-          only calculate the polynomial fit with errors.
+          If set to true, the output cube will not be processed and warped.
+          The program will simply calculate the polynomial fit with errors.
         </description>
         <exclusions>
           <item>TO</item>
@@ -310,17 +319,19 @@
         <defaultPath>$base/templates/maps</defaultPath>
         <default><item>$base/templates/maps/sinusoidal.map</item></default>
         <description>
-          A file containing the desired output mapping parameters in PVL form.  This
-          file can be a simple hand produced label file.  It can also be an existing cube label
-          which contains a Mapping group.  You can produce map file using the "maptemplate" program.
+          A file containing the desired output mapping parameters in
+          <def>PVL</def> form.  This file can be a simple hand produced label
+          file.  It can also be an existing cube label which contains a Mapping
+          group.  You can produce map file using the <i>maptemplate</i>
+          program.
         </description>
         <helpers>
           <helper name="H1">
             <function>PrintMap</function>
             <brief>View MapFile</brief>
             <description>
-              This helper button will cat out the mapping group of the given mapfile to the session log
-               of the application
+              This helper button will cat out the mapping group of the given
+              map file to the session log of the application
              </description>
             <icon>$ISIS3DATA/base/icons/labels.png</icon>
           </helper>
@@ -332,11 +343,15 @@
 
       <parameter name="PIXRES">
         <type>string</type>
-        <brief>Defines how the pixel resolution in the output map file is obtained</brief>
+        <brief>
+            Defines how the pixel resolution in the output map file
+            is obtained
+         </brief>
         <default><item>COMPUTE</item></default>
         <description>
-          This parameter is used to specify how the pixel resolution is obtained for the output map
-          projected cube.
+          This parameter is used to specify how the
+          <def>pixel resolution</def> is obtained for the output map projected
+          cube.
         </description>
 
         <helpers>
@@ -350,19 +365,23 @@
           <helper name="H2">
             <function>LoadMapRes</function>
             <brief>Load Map File Resolution </brief>
-            <description>This helper button will load the default resolution from the map file</description>
+            <description>
+                This helper button will load the default resolution from the
+                map file
+             </description>
           </helper>
         </helpers>
 
         <list>
            <option value="COMPUTE">
-              <brief>Compute resolution from input cube</brief>
+              <brief>Compute pixel resolution from input cube</brief>
               <description>
-                This option will automatically determine the resolution from the
-                input. The scale in pixels per degree is computed by calculating 
-                the angle from point (1,1) to point (nsamples, nlines) across 
-                the input cube and dividing the number of pixels across the line 
-                from point (1,1) to point (nsamples, nlines) by the angle.
+                This option will automatically determine the pixel resolution
+                from the input cube. The scale in pixels per degree is computed
+                by calculating the angle from pixel (1,1) to
+                pixel (nsamples, nlines) across the input cube and dividing the
+                number of pixels across the line from pixel (1,1) to
+                pixel (nsamples, nlines) by the angle.
               </description>
               <exclusions>
                 <item>RESOLUTION</item>
@@ -372,7 +391,8 @@
            <option value="MAP">
               <brief>Read resolution from input map file</brief>
               <description>
-                This option will use either the PixelResolution (meters/pixel) or Scale (pixels/degree) in the map file.
+                This option will use either the PixelResolution (meters/pixel)
+                or Scale (pixels/degree) in the map file.
               </description>
               <exclusions>
                 <item>RESOLUTION</item>
@@ -380,9 +400,10 @@
             </option>
 
            <option value="MPP">
-              <brief> Get resolution from user in meters per pixel</brief>
+              <brief> Get pixel resolution from user in meters per pixel</brief>
               <description>
-                This option allows the user to specify the resolution in meters per pixel using the RESOLUTION parameter
+                This option allows the user to specify the pixel resolution in
+                meters per pixel using the RESOLUTION parameter.
               </description>
               <inclusions>
                 <item>RESOLUTION</item>
@@ -390,9 +411,10 @@
             </option>
 
            <option value="PPD">
-              <brief> Get resolution from user in pixels per degree</brief>
+              <brief> Get pixel resolution from user in pixels per degree</brief>
               <description>
-                This option allows the user to specify the resolution in pixels per degree using the RESOLUTION parameter
+                This option allows the user to specify the pixel resolution in
+                pixels per degree using the RESOLUTION parameter.
               </description>
               <inclusions>
                 <item>RESOLUTION</item>
@@ -405,7 +427,8 @@
         <type>double</type>
         <brief>Pixel resolution</brief>
         <description>
-          Specifies the resolution in either meters per pixel or pixels per degree
+          Specifies the pixel resolution in either meters per pixel or pixels
+          per degree.
         </description>
         <minimum inclusive="no">0.0</minimum>
       </parameter>
@@ -422,8 +445,8 @@
 
        <parameter name ="EQURADIUS">
          <type>double</type>
-         <internalDefault>Read from PCK file</internalDefault>
-         <brief>Equatorial radius of target</brief>
+         <internalDefault>Read from Naif PCK kernel file</internalDefault>
+         <brief>Equatorial <def>radius</def> of target</brief>
          <description>
              The equatorial radius can be read using the NAIF routines to get
              the radius from the specified target planet, or read from the user.
@@ -436,7 +459,7 @@
 
         <parameter name ="POLRADIUS">
           <type>double</type>
-          <internalDefault>Read from PCK file</internalDefault>
+          <internalDefault>Read from Naif PCK kernel file</internalDefault>
           <brief>Polar radius of target</brief>
           <description>
              The polar radius can be read using the NAIF routines to get
@@ -455,10 +478,14 @@
         <brief>Defines how the default ground range is determined</brief>
         <default><item>COMPUTE</item></default>
         <description>
-          This parameter is used to specify how the default latitude/longitude ground range for the output map projected image
-          is obtained.  The ground range can be obtained from the camera or map file.  Note the user can overide the default using the MINLAT, MAXLAT, MINLON, MAXLON parameters.
-          The purpose of the ground range is to define the coverage of the map projected image.  Essentially, the ground range and
-          pixel resolution are used to compute the size (samples and line) of the output image.
+          This parameter is used to specify how the default latitude/longitude
+          ground range for the output map projected cube is obtained.  The
+          ground range can be obtained from the camera or map file.  Note the
+          user can overide the default using the MINLAT, MAXLAT, MINLON,
+          MAXLON parameters.  The purpose of the ground range is to define the
+          coverage of the map projected cube.  Essentially, the ground range and
+          pixel resolution are used to compute the size (samples and line) of the
+          output cube.
         </description>
 
         <helpers>
@@ -472,7 +499,10 @@
           <helper name="H2">
             <function>LoadMapRange</function>
             <brief>Load Map File Ground Range </brief>
-            <description>This helper button will load the default ground range from the map file</description>
+            <description>
+               This helper button will load the default ground range from the
+               map file
+             </description>
           </helper>
         </helpers>
 
@@ -480,7 +510,8 @@
            <option value="COMPUTE">
               <brief> Compute default range from input cube</brief>
               <description>
-                This option will automatically determine the mininum/maximum latitude/longitude from the input camera model cube specified
+                This option will automatically determine the mininum/maximum
+                latitude/longitude from the input camera model cube specified
                 using the FROM parameter.
               </description>
             </option>
@@ -488,7 +519,9 @@
            <option value="MAP">
               <brief> Read default range from map file</brief>
               <description>
-                This option will read the mininum/maximum latitude/longitude from the input map file.  All four values are expected to be defined.
+                This option will read the mininum/maximum latitude/longitude
+                from the input map file.  All four values are expected to be
+                defined.
               </description>
             </option>
         </list>
@@ -499,8 +532,10 @@
         <brief>Starting latitude</brief>
         <internalDefault>Use default range</internalDefault>
         <description>
-          The minimum latitude of the ground range.   If this is entered by the user it will override the default camera or map value.  By default,
-          planetocentric latitudes are assumed unless the MAP file specifies otherwise.
+          The minimum latitude of the ground range.   If this is entered by the
+          user it will override the default camera or map file value.  By default,
+          planetocentric latitudes are assumed unless the map file specifies
+          otherwise.
         </description>
 
         <minimum inclusive="yes">-90.0</minimum>
@@ -512,8 +547,10 @@
         <brief>Ending latitude</brief>
         <internalDefault>Use default range</internalDefault>
         <description>
-          The maximum latitude of the ground range.   If this is entered by the user it will override the default camera or map value.
-          By default, planetocentric latitudes are assumed unless the MAP file specifies otherwise.
+          The maximum latitude of the ground range.   If this is entered by the
+          user it will override the default camera or map file value.  By default,
+          planetocentric latitudes are assumed unless the map file specifies
+          otherwise.
         </description>
         <minimum inclusive="yes">-90.0</minimum>
         <maximum inclusive="yes">90.0</maximum>
@@ -525,8 +562,10 @@
         <brief>Starting longitude</brief>
         <internalDefault>Use default range</internalDefault>
         <description>
-          The minimum longitude of the ground range.   If this is entered by the user it will override the default camera or map value.
-           By default, positive east longitudes in the range of 0 to 360 are assumed unless the MAP file specifies otherwise.
+          The minimum longitude of the ground range.   If this is entered by
+          the user it will override the default camera or map value.  By
+          default, positive east longitudes in the range of 0 to 360 are
+          assumed unless the map file specifies otherwise.
         </description>
       </parameter>
 
@@ -535,8 +574,10 @@
         <brief>Ending longitude</brief>
         <internalDefault>Use default range</internalDefault>
         <description>
-          The maximum longitude of the ground range.   If this is entered by the user it will override the default camera or map value.
-           By default, positive east longitudes in the range of 0 to 360 are assumed unless the MAP file specifies otherwise.
+          The maximum longitude of the ground range.   If this is entered by
+          the user it will override the default camera or map value.  By
+          default, positive east longitudes in the range of 0 to 360 are
+          assumed unless the map file specifies otherwise.
         </description>
         <greaterThan><item>MINLON</item></greaterThan>
       </parameter>
@@ -550,11 +591,11 @@
           <item>1.0</item>
         </default>
         <description>
-          When computing the sample/line to be mapped from input->output, the
+          When computing the sample/line to be mapped from input to output, the
           sample and line are determined from the polynomial fit function. The
           transform then calculates the pixel differences in stereographically
-          projected latitude/longitude from the input at sample/line to
-          the output's stereographically projected latitude/longitude. If this
+          projected latitude/longitude from the input at sample/line to the
+          output's stereographically projected latitude/longitude. If this
           difference is greater than the tolerance, then an affine
           transformation is iteratively used until the difference is less than
           the tolerance or is set to null after a set number of iterations.
