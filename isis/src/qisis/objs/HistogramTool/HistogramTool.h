@@ -23,6 +23,9 @@ namespace Isis {
   *
   * @internal
   *  @history 2008-08-18 Christopher Austin - Upgraded to geos3.0.0
+  *  @history 2012-01-18 Steven Lambright and Jai Rideout - Fixed issue where
+  *                          histograms were not created correctly for any bands
+  *                          but band 1. Added check for RGB mode. Fixes #668.
   */
   class HistogramTool : public AbstractPlotTool {
       Q_OBJECT

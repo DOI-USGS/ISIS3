@@ -136,7 +136,14 @@ namespace Isis {
     }
 
     if(RubberBandTool::isValid()) {
-      refreshPlot();
+      if (cubeViewport()->isGray()) {
+        refreshPlot();
+      }
+      else {
+        QMessageBox::information(NULL, "Error",
+                                 "Cannot create histogram on colored viewport",
+                                 QMessageBox::Ok);
+      }
     }
     else {
       QMessageBox::information(NULL, "Error",
@@ -175,7 +182,7 @@ namespace Isis {
 
       Cube *cube = activeViewport->cube();
       int band = activeViewport->grayBand();
-      Histogram hist(*cube, 1);
+      Histogram hist(*cube, band);
 
       //If the rubber band is a line
       if(RubberBandTool::getMode() == RubberBandTool::Line) {
