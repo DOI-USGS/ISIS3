@@ -108,12 +108,15 @@ namespace Isis {
 
     m_contour = new QAction(this);
     m_contour->setText("Hide Contour Lines");
-    m_contour->setIcon(QPixmap(Filename("$base/icons/scatterplotcontour.png").Expanded()));
+    m_contour->setIcon(
+        QPixmap(Filename("$base/icons/scatterplotcontour.png").Expanded()));
     connect(m_contour, SIGNAL(activated()),
             this, SLOT(showHideContour()));
 
     QAction *configureAlarmingAct = new QAction(this);
     configureAlarmingAct->setText("Change Alarming");
+    configureAlarmingAct->setIcon(
+        QPixmap(Filename("$base/icons/scatterplotalarming.png").Expanded()));
     connect(configureAlarmingAct, SIGNAL(activated()),
             this, SLOT(configureAlarming()));
 
