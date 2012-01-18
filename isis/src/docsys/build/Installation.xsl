@@ -88,13 +88,12 @@ Deborah Lee Soltesz
 
 
       <p>
-      <strong>Isis 3 beta</strong> was released March 2004 for Linux.
-      See the <a href="../documents/InstallGuide/index.html">Isis 3.0 Installation Guide</a>
+      See the <a href="../documents/InstallGuide/index.html">Isis 3 Installation Guide</a>
       for instructions on downloading and installing Isis 3.
       </p>
 
       <p>
-      Refer to the <a href="/Isis2/isis-bin/installation.cgi">Isis 2 Installation Guide</a>
+        Refer to the <a href="http://isis.astrogeology.usgs.gov/Isis2/isis-bin/installation.cgi">Isis 2 Installation Guide</a>
       for instructions on downloading and installing Isis 2.
       </p>
 

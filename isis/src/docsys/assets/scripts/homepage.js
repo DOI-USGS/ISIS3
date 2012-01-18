@@ -8,6 +8,10 @@
  ***********************************/
 
 function writeAnnouncements() {
+  /* This code, which pulls posts from the support board, is not currently
+   * working. I have left it here as a reference, or in case we decide to fix it
+   * to work with our current version of the support board.
+   *
     isWeb = (document.URL.lastIndexOf("isis.astrogeology.usgs.gov") > 0) ||
             (document.URL.lastIndexOf("isis-dev.wr.usgs.gov") > 0) ||
             (document.URL.lastIndexOf("blackflag") > 0) ;
@@ -15,7 +19,7 @@ function writeAnnouncements() {
       document.write (
                      "<div><script language=\"JavaScript\" type=\"text/javascript\" src=\"http://isis.astrogeology.usgs.gov/IsisSupport/topics_anywhere.php?mode=show&f=1&n=3&a=y&t=_top&rt=n&so=d&b=dis&lpd=3&af=p3R0pyCnbHB0pw%3D%3D&l=y\"></script></div>"   );
     } else {
-      document.write ( "Visit the <a href=\"http://isis.astrogeology.usgs.gov/IsisSupport/viewforum.php?f=1\" target=\"_top\">Isis Support Center</a> for the latest news and announcements") ;
+      document.write ( "Visit the <a href=\"http://isis.astrogeology.usgs.gov/IsisSupport/\" target=\"_top\">Isis Support Center</a> for the latest news and announcements.") ;
     }
     if (isWeb) {
       document.write (
@@ -24,9 +28,14 @@ function writeAnnouncements() {
                      "    More...</a>"  +
                      "</p>" ) ;
     }
+    */
+  document.write("Visit the <a href=\"http://isis.astrogeology.usgs.gov/IsisSupport/\" target=\"_top\">Isis Support Center</a> for the latest news and announcements.");
 }
 
 function writeWhatsUpAtTheSupportCenter () {
+  /*
+   * Again, this code is not working with our support board.
+   *
     isWeb = (document.URL.lastIndexOf("isis.astrogeology.usgs.gov") > 0) ||
             (document.URL.lastIndexOf("isis-dev.wr.usgs.gov") > 0) ||
             (document.URL.lastIndexOf("blackflag") > 0) ;
@@ -52,4 +61,5 @@ function writeWhatsUpAtTheSupportCenter () {
                      "</div>                                                                                                                                                                                                                                                                                "
                      );
     }
+    */
 }

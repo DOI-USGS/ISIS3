@@ -109,7 +109,8 @@ Deborah Lee Soltesz
                 <div align="center">
                 <input type="text" alt="Search term" name="qt" size="12" maxlength="2033"/><input alt="Search" type="submit" value="Go"/><br/>
                 <a href="{$menuPath}search.html" target="_top">Advanced</a> |
-                <a href="http://search.usgs.gov/help/" target="_top">Help</a>
+                <a href="http://search.usgs.gov/searchhelp.html"
+                   target="_top">Help</a>
                 </div>
                 </td>
               </tr>

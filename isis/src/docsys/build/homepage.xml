@@ -5,17 +5,12 @@
     <tr>
       <td><img src="assets/banners/banner.jpg" width="600" height="106" alt="[USGS Banner]" border="0" usemap="#bannermap"/>
         <map name="bannermap" id="bannermap">
-          <area shape="rect" target="_top" alt="Visit the USGS Home Page"                          coords="2,1,186,73"   href="http://www.usgs.gov" title="Visit the USGS Home Page"/>
-          <area shape="rect" target="_top" alt="Go to the Astrogeology Research Program Home Page" coords="2,75,249,102" href="/"                   title="Go to the Astrogeology Research Program Home Page"/>
+          <area shape="rect" target="_top" alt="Visit the USGS Home Page" coords="2,1,186,73" href="http://www.usgs.gov"
+            title="Visit the USGS Home Page"/>
+          <area shape="rect" target="_top" alt="Go to the Astrogeology Research Program Home Page" coords="2,75,249,102"
+            href="http://astrogeology.usgs.gov"   title="Go to the Astrogeology Research Program Home Page"/>
           <area shape="default" alt="USGS" nohref="nohref"/>
         </map>
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <script type="text/javascript">
-          writeNavigationBar();
-        </script>
       </td>
     </tr>
   </table>
@@ -45,19 +40,23 @@
         <h2>Popular Destinations</h2>
         <ul>
           <li>
-            <a href="http://isis.astrogeology.usgs.gov/Isis2/isis-bin/isis.cgi">Isis 2.1
-            Home Page</a>
+            <a href="http://isis.astrogeology.usgs.gov/Isis2/isis-bin/isis.cgi">
+              Isis 2 Home Page
+            </a>
           </li>
           <li>
-            <a href="Application">Isis 3.0 Application Table of Contents</a>
+            <a href="Application/index.html">Isis 3 Application Table of Contents</a>
           </li>
         </ul>
 
+<!-- Commented out because the feed2js PHP script doesn't seem to be working due
+     to deprecated calls.
 <script language="JavaScript" src="http://isis.astrogeology.usgs.gov/assets/scripts/feed2js/feed2js.php?src=http%3A%2F%2Fisis.astrogeology.usgs.gov%2FIsisSupport%2Findex.php%3Ftype%3Drss%3Baction%3D.xml&amp;chan=y&amp;num=10" type="text/javascript"></script>
 
 <noscript>
 <a href="http://isis.astrogeology.usgs.gov/assets/scripts/feed2js/feed2js.php?src=http%3A%2F%2Fisis.astrogeology.usgs.gov%2FIsisSupport%2Findex.php%3Ftype%3Drss%3Baction%3D.xml&amp;chan=y&amp;num=10&amp;html=y">View RSS feed</a>
 </noscript>
+-->
 
         <script language="JavaScript" type="text/javascript">
           writeWhatsUpAtTheSupportCenter() ;

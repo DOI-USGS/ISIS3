@@ -50,10 +50,13 @@ Deborah Lee Soltesz
         <link rel="stylesheet" media="print" href="assets/styles/print.css"/>
 
       <!-- ** start PAGE HEADER needs these scripts  ** -->
+      <!-- Commented out because we don't want to show the navigation menu
+           due to the rest of the Astrogeology site changing in structure.
         <script type="text/javascript" src="assets/scripts/navigationBar.js">
           <xsl:comment><![CDATA[
           ]]></xsl:comment>
         </script>
+      -->
         <script type="text/javascript" src="assets/scripts/homepage.js">
           <xsl:comment><![CDATA[
           ]]></xsl:comment>
@@ -62,8 +65,11 @@ Deborah Lee Soltesz
 
       </head>
 
-
+      <!-- Commented out because we are not displaying the navigation menu
+           anymore.
       <body onclick="coolAllNavButtons();" onload="setDefaultBarTo(techBar); coolAllNavButtons();">
+      -->
+      <body>
 
         <div class="isisMenu">
           <xsl:call-template  name="writeMenu"/>
