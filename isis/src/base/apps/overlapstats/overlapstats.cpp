@@ -178,15 +178,11 @@ void IsisMain() {
 
       }
       catch(iException &e) {
+        errorNum++;
 
         if(ui.WasEntered("ERRORS")) {
-
-          if(errorNum > 0) {
-            errors << endl;
-          }
-          errorNum ++;
-
           errors << e.PvlErrors().Group(0).FindKeyword("Message")[0];
+
           for(int serNum = 0; serNum < overlaps[index]->Size(); serNum++) {
             if(serNum == 0) {
               errors << ": ";
@@ -196,6 +192,8 @@ void IsisMain() {
             }
             errors << (*overlaps[index])[serNum];
           }
+
+          errors << endl;
         }
 
         e.Clear();
@@ -203,11 +201,9 @@ void IsisMain() {
         progress.CheckStatus();
         continue;
       }
-
     }
 
     progress.CheckStatus();
-
   }
 
   // Checks if there were overlaps to output results from

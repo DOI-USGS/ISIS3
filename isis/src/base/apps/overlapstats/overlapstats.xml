@@ -88,6 +88,11 @@
       findimageoverlaps (i.e. the serial numbers in the overlap list match
       the serial numbers in the provided cube list). Fixes #515.
     </change>
+    <change name="Jai Rideout" date="2012-01-18">
+      The errors file now contains a newline at the end. The error count is now
+      calculated regardless of whether or not the ERRORS parameter was
+      specified.
+    </change>
   </history>
 
   <groups>
