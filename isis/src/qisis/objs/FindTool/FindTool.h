@@ -84,7 +84,7 @@ namespace Isis {
    *  @history 2008-06-25 Noah Hilt - Switched positions of the sample/line line
    *           edits and labels.
    *
-   *  @history 2008-08 Stacy Alley - Added red dot which is draw
+   *  @history 2008-08-?? Stacy Alley - Added red dot which is draw
    *           at the specified lat/lon or line/sample.  Also, the
    *           red dot is draw in the corresponding spot of a
    *           linked image, if there is overlap in the two

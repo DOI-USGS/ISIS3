@@ -52,7 +52,7 @@ namespace Isis {
   *
   * @ingroup Statistics
   *
-  * @author Jeff Anderson - 2002-05-06
+  * @author 2002-05-06 Jeff Anderson
   *
   * @internal
   * @history 2002-05-08 Jeff Anderson - Added Chebyshev and Best
