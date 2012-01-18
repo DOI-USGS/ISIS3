@@ -93,7 +93,7 @@ namespace Isis {
       p_sumxy += x * y * count;
       p_validPixels += count;
 
-      for (int i = 0; i < count; i++) {
+      for (unsigned int i = 0; i < count; i++) {
         p_x.AddData(x);
         p_y.AddData(y);
       }
