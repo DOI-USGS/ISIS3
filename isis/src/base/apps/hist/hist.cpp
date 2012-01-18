@@ -10,9 +10,9 @@
 #include "Progress.h"
 #include "LineManager.h"
 #include "QHistogram.h"
-#include "HistogramToolWindow.h"
+#include "HistogramPlotWindow.h"
 #include "HistogramItem.h"
-#include "PlotToolCurve.h"
+#include "CubePlotCurve.h"
 
 using namespace std;
 using namespace Isis;
@@ -109,7 +109,8 @@ void IsisMain() {
 
     // Create the QHistogram, set the title & load the Isis::Histogram into it
 
-    HistogramToolWindow *plot = new HistogramToolWindow(title.c_str(), ui.TheGui());
+    HistogramPlotWindow *plot = new HistogramPlotWindow(title.c_str(),
+                                                        ui.TheGui());
 
     // Set the xaxis title if they entered one
     if(ui.WasEntered("XAXIS")) {
@@ -118,15 +119,15 @@ void IsisMain() {
     }
 
     // Set the yLeft axis title if they entered one
-    if(ui.WasEntered("Y1AXIS")) {
-      string yaxis(ui.GetString("Y1AXIS"));
-      plot->setAxisLabel(QwtPlot::yLeft, yaxis.c_str());
+    if(ui.WasEntered("FREQAXIS")) {
+      string yaxis(ui.GetString("FREQAXIS"));
+      plot->setAxisLabel(QwtPlot::yRight, yaxis.c_str());
     }
 
     // Set the yRight axis title if they entered one
-    if(ui.WasEntered("Y2AXIS")) {
-      string y2axis(ui.GetString("Y2AXIS"));
-      plot->setAxisLabel(QwtPlot::yRight, y2axis.c_str());
+    if(ui.WasEntered("PERCENTAXIS")) {
+      string y2axis(ui.GetString("PERCENTAXIS"));
+      plot->setAxisLabel(QwtPlot::yLeft, y2axis.c_str());
     }
 
     //Transfer data from histogram to the plotcurve
@@ -147,42 +148,50 @@ void IsisMain() {
     histCurve->setColor(Qt::darkCyan);
     histCurve->setTitle("Frequency");
 
-    PlotToolCurve *cdfCurve = new PlotToolCurve();
+    CubePlotCurve *cdfCurve = new CubePlotCurve(CubePlotCurve::CubeDN,
+                                                CubePlotCurve::Percentage);
     cdfCurve->setStyle(QwtPlotCurve::Lines);
     cdfCurve->setTitle("Percentage");
 
     QPen *pen = new QPen(Qt::red);
     pen->setWidth(2);
-    histCurve->setYAxis(QwtPlot::yLeft);
-    cdfCurve->setYAxis(QwtPlot::yRight);
+    histCurve->setYAxis(QwtPlot::yRight);
+    cdfCurve->setYAxis(QwtPlot::yLeft);
     cdfCurve->setPen(*pen);
 
     //These are all variables needed in the following for loop.
     //----------------------------------------------
     QwtArray<QwtDoubleInterval> intervals(xarray.size());
     QwtArray<double> values(yarray.size());
-    double maxYValue = DBL_MIN;
-    double minYValue = DBL_MAX;
-    // ---------------------------------------------
-
+//     double maxYValue = DBL_MIN;
+//     double minYValue = DBL_MAX;
+//     // ---------------------------------------------
+// 
     for(unsigned int y = 0; y < yarray.size(); y++) {
 
       intervals[y] = QwtDoubleInterval(xarray[y], xarray[y] + hist.BinSize());
 
       values[y] = yarray[y];
-      if(values[y] > maxYValue) maxYValue = values[y];
-      if(values[y] < minYValue) minYValue = values[y];
+//       if(values[y] > maxYValue) maxYValue = values[y];
+//       if(values[y] < minYValue) minYValue = values[y];
     }
+
+    QPen percentagePen(Qt::red);
+    percentagePen.setWidth(2);
+    cdfCurve->setColor(Qt::red);
+    QwtSymbol symbol(cdfCurve->markerSymbol());
+    symbol.setStyle(QwtSymbol::NoSymbol);
+    cdfCurve->setMarkerSymbol(symbol);
 
     histCurve->setData(QwtIntervalData(intervals, values));
     cdfCurve->setData(&xarray[0], &y2array[0], xarray.size());
 
     plot->add(histCurve);
     plot->add(cdfCurve);
-    plot->fillTable();
+//     plot->fillTable();
 
-    plot->setScale(QwtPlot::yLeft, 0, maxYValue);
-    plot->setScale(QwtPlot::xBottom, hist.Minimum(), hist.Maximum());
+//     plot->setScale(QwtPlot::yLeft, 0, maxYValue);
+//     plot->setScale(QwtPlot::xBottom, hist.Minimum(), hist.Maximum());
 
     QLabel *label = new QLabel("  Average = " + QString::number(hist.Average()) + '\n' +
                                "\n  Minimum = " + QString::number(hist.Minimum()) + '\n' +

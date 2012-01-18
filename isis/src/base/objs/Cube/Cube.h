@@ -23,6 +23,9 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+// This is needed for the QVariant macro
+#include <QMetaType>
+
 #include "Endian.h"
 #include "PixelType.h"
 
@@ -364,7 +367,9 @@ namespace Isis {
       //! If allocated, converts from physical on-disk band # to virtual band #
       QList<int> *m_virtualBandList;
   };
-};
+}
+
+Q_DECLARE_METATYPE(Isis::Cube *);
 
 #endif
 

@@ -1,4 +1,12 @@
+#include "IsisDebug.h"
 #include "ScatterPlotData.h"
+
+#include <algorithm>
+
+#include <qwt_double_range.h>
+
+#include "Brick.h"
+#include "SpecialPixel.h"
 
 namespace Isis {
 
@@ -12,119 +20,98 @@ namespace Isis {
    * @param band2
    * @param numBins
    */
-  ScatterPlotData::ScatterPlotData(CubeViewport *cube1, int band1, int numBins1, CubeViewport *cube2, int band2, int numBins2) : QwtRasterData() {
-    p_cube1 = cube1->cube();
-    p_cube2 = cube2->cube();
+  ScatterPlotData::ScatterPlotData(
+      Cube *xCube, int xCubeBand, int xBinCount,
+      Cube *yCube, int yCubeBand, int yBinCount,
+      QwtDoubleRange sampleRange, QwtDoubleRange lineRange) : QwtRasterData(),
+      m_xDnToBinStretch(new Stretch), m_yDnToBinStretch(new Stretch),
+      m_counts(
+        new QVector< QVector<int> >(yBinCount, QVector<int>(xBinCount))),
+      m_alarmedBins(new QMap<int, bool>) {
+    int startLine = lineRange.minValue();
+    int endLine = lineRange.maxValue();
+    ASSERT(xCube->getLineCount() == yCube->getLineCount());
 
-    p_cube1Viewport = cube1;
-    p_cube2Viewport = cube2;
-
-    p_band1 = band1;
-    p_band2 = band2;
-    p_numBins1 = numBins1;
-    p_numBins2 = numBins2;
-
-    //initializing the 2D vector
-    for(unsigned int i = 0; i < 257; i++) {
-      p_counts.push_back(std::vector<int>());
-      for(unsigned int j = 0; j < 257; j++) {
-        p_counts[i].push_back(0);
-      }
-    }
-
-    //-------------------------------
-    // stretch cube one / band one
-    //-------------------------------
-    double ssamp, esamp, sline, eline;
-    p_cube1Viewport->viewportToCube(0, 0, ssamp, sline);
-    p_cube1Viewport->viewportToCube(p_cube1Viewport->viewport()->width() - 1,
-                                    p_cube1Viewport->viewport()->height() - 1,
-                                    esamp, eline);
+    Histogram *xCubeHist = new Histogram(*xCube, xCubeBand, NULL,
+        sampleRange.minValue(), lineRange.minValue(),
+        sampleRange.maxValue(), lineRange.maxValue(),
+        xBinCount, true);
+    m_xCubeMin = xCubeHist->Minimum();
+    m_xCubeMax = xCubeHist->Maximum();
 
 
-    Statistics stats;
-    Brick brick(1, 1, 1, p_cube1->getPixelType());
+    Histogram *yCubeHist = new Histogram(*yCube, yCubeBand, NULL,
+        sampleRange.minValue(), lineRange.minValue(),
+        sampleRange.maxValue(), lineRange.maxValue(),
+        yBinCount, true);
+    m_yCubeMin = yCubeHist->Minimum();
+    m_yCubeMax = yCubeHist->Maximum();
 
-    int bufns1 = (int)esamp - (int)ssamp + 1;
-    brick.Resize(bufns1, 1, 1);
 
-    //for (int line=(int)sline; line <= (int)eline; line+=lineRate) {
-    for(int line = (int)sline; line <= (int)eline; line++) {
-      brick.SetBasePosition((int)ssamp, line, band1);
-      p_cube1->read(brick);
-      stats.AddData(brick.DoubleBuffer(), bufns1);
-    }
+    m_xDnToBinStretch->AddPair(m_xCubeMin, 0);
+    m_xDnToBinStretch->AddPair(m_xCubeMax, xBinCount - 1);
 
-    p_min1 = stats.Minimum();
-    p_max1 = stats.Maximum();
-    p_str1.AddPair(p_min1, 0);
-    p_str1.AddPair(p_max1, numBins1 - 1);
+    m_yDnToBinStretch->AddPair(m_yCubeMin, 0);
+    m_yDnToBinStretch->AddPair(m_yCubeMax, yBinCount - 1);
 
-    //----------------------------
-    // stretch cube two / band two
-    //-----------------------------
-    p_cube2Viewport->viewportToCube(0, 0, ssamp, sline);
-    p_cube2Viewport->viewportToCube(p_cube2Viewport->viewport()->width() - 1,
-                                    p_cube2Viewport->viewport()->height() - 1,
-                                    esamp, eline);
+    setBoundingRect(QwtDoubleRect(m_xCubeMin,
+                                  m_yCubeMin,
+                                  m_xCubeMax - m_xCubeMin,
+                                  m_yCubeMax - m_yCubeMin));
 
-    stats.Reset();
-    int bufns2 = (int)esamp - (int)ssamp + 1;
-    brick.Resize(bufns2, 1, 1);
+    m_maxCount = 0;
 
-    //for (int line=(int)sline; line <=(int) eline; line+=lineRate) {
-    for(int line = (int)sline; line <= (int)eline; line++) {
-      brick.SetBasePosition((int)ssamp, line, band2);
-      p_cube2->read(brick);
-      stats.AddData(brick.DoubleBuffer(), bufns2);
-    }
+    Brick brick1(sampleRange.maxValue() - sampleRange.minValue() + 1,
+                 1, 1, xCube->getPixelType());
+    Brick brick2(sampleRange.maxValue() - sampleRange.minValue() + 1,
+                 1, 1, yCube->getPixelType());
+    ASSERT(xCube->getSampleCount() == yCube->getSampleCount());
+    ASSERT(brick1.size() == brick2.size());
 
-    p_min2 = stats.Minimum();
+    for (int line = startLine; line <= endLine; line++) {
+      brick1.SetBasePosition(sampleRange.minValue(), line, xCubeBand);
+      xCube->read(brick1);
 
-    p_max2 = stats.Maximum();
-    p_str2.AddPair(p_min2, 0);
-    p_str2.AddPair(p_max2, numBins2 - 1);
+      brick2.SetBasePosition(sampleRange.minValue(), line, yCubeBand);
+      yCube->read(brick2);
 
-    // -------------------------------------
-    // Done getting min max for both cubes!
-    // -------------------------------------
+      for (int i = 0; i < brick1.size(); i++) {
+        double xDn = brick1[i];
+        double yDn = brick2[i];
 
-    setBoundingRect(QwtDoubleRect(p_min1, p_min2, p_max1, p_max2));
+        if (!IsSpecial(xDn) && !IsSpecial(yDn)) {
+          double x = m_xDnToBinStretch->Map(xDn);
+          double y = m_yDnToBinStretch->Map(yDn);
 
-    Brick brick1(1, 1, 1, p_cube1->getPixelType());
-    Brick brick2(1, 1, 1, p_cube2->getPixelType());
+          if (!IsSpecial(x) && !IsSpecial(y)) {
+            int roundedX = qRound(x);
+            int roundedY = qRound(y);
 
-    // -----------------------------------------------
-    // If the actual cube size is smaller than the
-    // visible cube viewport area, we don't need
-    // to loop through all the access lines/samples.
-    // -----------------------------------------------
-    if((esamp - ssamp) > p_cube1->getSampleCount()) {
-      ssamp = 0;
-      esamp = p_cube1->getSampleCount();
-    }
-    if((eline - sline) > p_cube1->getLineCount()) {
-      sline = 0;
-      eline = p_cube1->getLineCount();
-    }
+            if (roundedX >= 0 && roundedX < xBinCount &&
+                roundedY >= 0 && roundedY < yBinCount) {
+              int value = (*m_counts)[roundedY][roundedX] + 1;
+              (*m_counts)[roundedY][roundedX] = value;
 
-    for(int s = (int)ssamp; s < (int)esamp; s++) {
-      for(int l = (int)sline; l <= (int)eline; l++) {
-        brick1.SetBasePosition(s, l, band1);
-        p_cube1->read(brick1);
-
-        unsigned int x = (int)(p_str1.Map(brick1[0]));
-
-        brick2.SetBasePosition(s, l, band2);
-        p_cube2->read(brick2);
-
-        unsigned int y = (int)(p_str2.Map(brick2[0]));
-        if(x < p_counts.size() && y < p_counts.size()) {
-          p_counts[x][y] = p_counts[x][y] + 1;
+              m_maxCount = qMax(m_maxCount, value);
+            }
+          }
         }
       }
     }
-  } //end SpectrogramData contstructor
+  }
+
+
+  ScatterPlotData::ScatterPlotData(const ScatterPlotData &other) {
+    m_xDnToBinStretch.reset(new Stretch(*other.m_xDnToBinStretch));
+    m_yDnToBinStretch.reset(new Stretch(*other.m_yDnToBinStretch));
+    m_counts.reset(new QVector< QVector<int> >(*other.m_counts));
+    m_alarmedBins.reset(new QMap< int, bool>(*other.m_alarmedBins));
+    m_maxCount = other.m_maxCount;
+    m_xCubeMin = other.m_xCubeMin;
+    m_xCubeMax = other.m_xCubeMax;
+    m_yCubeMin = other.m_yCubeMin;
+    m_yCubeMax = other.m_yCubeMax;
+  }
 
 
   /**
@@ -132,8 +119,6 @@ namespace Isis {
    *
    */
   ScatterPlotData::~ScatterPlotData() {
-    p_cube1->close();
-    p_cube2->close();
   }
 
 
@@ -142,8 +127,7 @@ namespace Isis {
    *
    */
   QwtRasterData *ScatterPlotData::copy() const {
-    return new ScatterPlotData(p_cube1Viewport, p_band1, p_numBins1, p_cube1Viewport,
-                               p_band2, p_numBins2);
+    return new ScatterPlotData(*this);
   }
 
 
@@ -152,13 +136,7 @@ namespace Isis {
    *
    */
   QwtDoubleInterval ScatterPlotData::range() const {
-    int max = 0;
-    for(unsigned int i = 0; i < p_counts.size(); i++) {
-      for(unsigned int j = 0; j < p_counts.size(); j++) {
-        if(p_counts[i][j] > max) max = p_counts[i][j];
-      }
-    }
-    return QwtDoubleInterval(0.0, max);
+    return QwtDoubleInterval(0.0, m_maxCount);
   }
 
 
@@ -167,13 +145,219 @@ namespace Isis {
    * It returns the counts for each DN (x), DN (y).
    */
   double ScatterPlotData::value(double x, double y) const {
-    unsigned int iX = (int)(p_str1.Map(x));
-    unsigned int iY = (int)(p_str2.Map(y));
+    double value = 0;
 
-    if(iX >= p_counts.size() || iY >= p_counts.size()) {
-      return 0;
-    }
-    return p_counts[iX][iY];
+    QPair<int, int> indices = binXYIndices(x, y);
+    int index = binIndex(indices.first, indices.second);
+
+    if (index != -1 && (*m_alarmedBins)[index])
+      value = m_maxCount;
+    else
+      value = binCount(indices.first, indices.second);
+
+    return value;
   }
 
+
+  double ScatterPlotData::xCubeMin() const {
+    return m_xCubeMin;
+  }
+
+
+  double ScatterPlotData::xCubeMax() const {
+    return m_xCubeMax;
+  }
+
+
+  double ScatterPlotData::yCubeMin() const {
+    return m_yCubeMin;
+  }
+
+
+  double ScatterPlotData::yCubeMax() const {
+    return m_yCubeMax;
+  }
+
+
+  void ScatterPlotData::swap(ScatterPlotData &other) {
+    m_xDnToBinStretch.swap(other.m_xDnToBinStretch);
+    m_yDnToBinStretch.swap(other.m_yDnToBinStretch);
+    m_counts.swap(other.m_counts);
+    m_alarmedBins.swap(other.m_alarmedBins);
+    std::swap(m_maxCount, other.m_maxCount);
+    std::swap(m_xCubeMin, other.m_xCubeMin);
+    std::swap(m_xCubeMax, other.m_xCubeMax);
+    std::swap(m_yCubeMin, other.m_yCubeMin);
+    std::swap(m_yCubeMax, other.m_yCubeMax);
+  }
+
+
+  QPair<double, double> ScatterPlotData::binXY(int index) const {
+    QPair<int, int> indices = binXYIndices(index);
+    int xIndex = indices.first;
+    int yIndex = indices.second;
+
+    if (xIndex != -1 && yIndex != -1) {
+      int xSize = 0;
+      int ySize = m_counts->size();
+
+      // Assume square 2D structurs
+      if (ySize > 0)
+        xSize = (*m_counts)[0].size();
+
+      double percentAcrossXRange = ((double)xIndex / (double)xSize);
+      double xDnValue = m_xCubeMin +
+          percentAcrossXRange * (m_xCubeMax - m_xCubeMin);
+
+      double percentAcrossYRange = ((double)yIndex / (double)ySize);
+      double yDnValue = m_yCubeMin +
+          percentAcrossYRange * (m_yCubeMax - m_yCubeMin);
+
+      return QPair<double, double>(xDnValue, yDnValue);
+    }
+
+
+    iString msg = "Bin at index [" + iString(index) + "] not found. "
+                  "There are [" + iString(numberOfBins()) + "] bins";
+    throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+  }
+
+
+  int ScatterPlotData::binCount(int binIndex) const {
+    QPair<int, int> indices = binXYIndices(binIndex);
+    return binCount(indices.first, indices.second);
+  }
+
+
+  int ScatterPlotData::numberOfBins() const {
+    int xSize = 0;
+    int ySize = m_counts->size();
+
+    // Assume square 2D structurs
+    if (ySize > 0)
+      xSize = (*m_counts)[0].size();
+
+    return xSize * ySize;
+  }
+
+
+  QVector<double> ScatterPlotData::discreteXValues() const {
+    QVector<double> xValues;
+
+    int ySize = m_counts->size();
+    if (ySize) {
+      int xSize = (*m_counts)[0].size();
+      xValues.resize(xSize);
+
+      for (int xIndex = 0; xIndex < xSize; xIndex++) {
+        double percentAcrossXRange = ((double)xIndex / (double)xSize);
+        xValues[xIndex] = m_xCubeMin +
+            percentAcrossXRange * (m_xCubeMax - m_xCubeMin);
+      }
+    }
+
+    return xValues;
+  }
+
+
+  void ScatterPlotData::alarm(double x, double y) const {
+    int binToAlarm = binIndex(x, y);
+    if (binToAlarm != -1)
+      (*m_alarmedBins)[binToAlarm] = true;
+  }
+
+
+  void ScatterPlotData::clearAlarms() const {
+    m_alarmedBins->clear();
+  }
+
+
+  ScatterPlotData &ScatterPlotData::operator=(const ScatterPlotData &other) {
+    ScatterPlotData tmp(other);
+
+    swap(tmp);
+
+    return *this;
+  }
+
+
+  int ScatterPlotData::binCount(int xIndex, int yIndex) const {
+    int count = 0;
+
+    if (yIndex >= 0 && yIndex < m_counts->size()) {
+      if (xIndex >= 0 && xIndex < (*m_counts)[yIndex].size()) {
+        count = (*m_counts)[yIndex][xIndex];
+      }
+    }
+
+    return count;
+  }
+
+
+  int ScatterPlotData::binIndex(int xIndex, int yIndex) const {
+    int xSize = 0;
+    int ySize = m_counts->size();
+
+    // Assume square 2D structurs
+    if (ySize > 0)
+      xSize = (*m_counts)[0].size();
+
+    int index = -1;
+    if ((xIndex >= 0 && xIndex < xSize) && (yIndex >= 0 && yIndex < ySize))
+      index = xSize * yIndex + xIndex;
+
+    return index;
+  }
+
+
+  int ScatterPlotData::binIndex(double x, double y) const {
+    QPair<int, int> indices = binXYIndices(x, y);
+    return binIndex(indices.first, indices.second);
+  }
+
+
+  QPair<int, int> ScatterPlotData::binXYIndices(int binIndex) const {
+    int xSize = 0;
+    int ySize = m_counts->size();
+
+    // Assume square 2D structurs
+    if (ySize > 0)
+      xSize = (*m_counts)[0].size();
+
+    int yIndex = (binIndex / xSize);
+    binIndex -= yIndex * xSize;
+
+    int xIndex = binIndex;
+
+    if (xIndex < 0 || yIndex < 0 || xIndex >= xSize || yIndex >= ySize) {
+      iString msg = "Bin at index [" + iString(binIndex) + "] not found. "
+                    "There are [" + iString(numberOfBins()) + "] bins";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    }
+
+    return QPair<int, int>(xIndex, yIndex);
+  }
+
+
+  QPair<int, int> ScatterPlotData::binXYIndices(double x, double y) const {
+    QPair<int, int> indices(-1, -1);
+
+    if (m_counts->size() && m_counts->at(0).size()) {
+      double xBinPosition = m_xDnToBinStretch->Map(x);
+      double yBinPosition = m_yDnToBinStretch->Map(y);
+
+      if (!IsSpecial(xBinPosition) && !IsSpecial(yBinPosition)) {
+        int discreteXBin = qRound(xBinPosition);
+        int discreteYBin = qRound(yBinPosition);
+
+        if (discreteXBin >= 0 && discreteXBin < m_counts->at(0).size() &&
+            discreteYBin >= 0 && discreteYBin < m_counts->size()) {
+          indices = QPair<int, int>(discreteXBin, discreteYBin);
+        }
+      }
+    }
+
+    return indices;
+  }
 }
+

@@ -1,12 +1,17 @@
+#include "IsisDebug.h"
+
 #include "PlotCurve.h"
+
+#include <iostream>
 
 #include <qwt_plot.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_marker.h>
 #include <qwt_symbol.h>
-#include <iostream>
 
-#include "PlotTool.h"
+#include <QBuffer>
+#include <QByteArray>
+
 #include "SpecialPixel.h"
 
 namespace Isis {
@@ -14,14 +19,61 @@ namespace Isis {
    * Constructs and instance of a PlotCurve with some default
    * properties.
    */
-  PlotCurve::PlotCurve()  : QwtPlotCurve() {
-    //The default is to show the symbols but not the curves.
-    setVisible(false);
-    setSymbolVisible(true);
+  PlotCurve::PlotCurve(Units xUnits, Units yUnits)  : QwtPlotCurve() {
+    m_markerSymbol.setStyle(QwtSymbol::XCross);
+    m_markerSymbol.setSize(6, 6);
+    m_color = QColor(Qt::white);
+    m_xUnits = xUnits;
+    m_yUnits = yUnits;
+  }
 
-    p_symbolStyle.setStyle(QwtSymbol::XCross);
-    p_symbolStyle.setSize(6, 6);
-    p_markerPen.setColor(this->pen().color());
+
+  PlotCurve::~PlotCurve() {
+    if (plot()) {
+      clearMarkers();
+    }
+  }
+
+
+  void PlotCurve::attachMarkers() {
+    recreateMarkers();
+  }
+
+
+  /**
+   * This method returns the color of the curve
+   *
+   * @return QColor
+   */
+  QColor PlotCurve::color() const {
+    return m_color;
+  }
+
+
+  /**
+   * This method returns the shape of the markers.
+   *
+   * @return QwtSymbol
+   */
+  QwtSymbol PlotCurve::markerSymbol() const {
+    return m_markerSymbol;
+  }
+
+
+  PlotCurve::Units PlotCurve::xUnits() const {
+    return m_xUnits;
+  }
+
+
+  PlotCurve::Units PlotCurve::yUnits() const {
+    return m_yUnits;
+  }
+
+
+  void PlotCurve::setColor(const QColor &color) {
+    //set the data for the curve
+    m_color = color;
+    setPen(pen());
   }
 
 
@@ -32,22 +84,8 @@ namespace Isis {
    */
   void PlotCurve::setData(const QwtData &data) {
     //set the data for the curve
-    this->QwtPlotCurve::setData(data);
-    //now we can set up the marker list and set the data for them.
-    for(int i = 0; i < p_plotMarkers.size(); i++) {
-      delete p_plotMarkers[i];
-    }
-    p_plotMarkers.clear();
-    for(unsigned int i = 0; i < data.size(); i++) {
-      if(data.y(i) != Null) {
-        QwtPlotMarker *marker = new QwtPlotMarker();
-        marker->setValue(data.x(i), data.y(i));
-        marker->setAxis(this->xAxis(), this->yAxis());
-        p_plotMarkers.push_back(marker);
-
-      }
-
-    }
+    QwtPlotCurve::setData(data);
+    recreateMarkers();
   }
 
 
@@ -60,70 +98,8 @@ namespace Isis {
    */
   void PlotCurve::setData(const double *xData, const double *yData, int size) {
     /*set the data for the curve*/
-    this->QwtPlotCurve::setData(xData, yData, size);
-    /*now we can set up the marker list and set the data for them.*/
-    for(int i = 0; i < p_plotMarkers.size(); i++) {
-      delete p_plotMarkers[i];
-    }
-    p_plotMarkers.clear();
-    for(int i = 0; i < size; i++) {
-      if(yData[i] != 0) {
-        QwtPlotMarker *marker = new QwtPlotMarker();
-        marker->setValue(xData[i], yData[i]);
-        marker->setAxis(this->xAxis(), this->yAxis());
-        //marker->setVisible(true);
-        //setSymbolVisible(true);
-        p_plotMarkers.push_back(marker);
-      }
-    }
-
-  }
-
-
-  /**
-   * This method allows the user to set the color of the curve and
-   * it's markers.
-   * @param c
-   */
-  void PlotCurve::setColor(QColor c) {
-    this->setPen(QPen(c));
-  }
-
-
-  /**
-   * This method removes all the curves and markers from the plot.
-   */
-  void PlotCurve::detach() {
-    QwtPlotCurve::detach();
-    for(int i = 0; i < p_plotMarkers.size(); i++) {
-      p_plotMarkers[i]->detach();
-    }
-  }
-
-
-  /**
-   * This method allows the users to copy all of the given curves
-   * properties into the current curve.
-   * @param pc
-   */
-  void PlotCurve::copyCurveProperties(const PlotCurve *pc) {
-    this->setVisible(pc->isVisible());
-    this->setPen(pc->pen());
-    this->setTitle(pc->title().text());
-    this->setData(pc->data());
-    this->setSymbolColor(pc->symbolColor());
-    this->setSymbolStyle(pc->symbolStyle().style());
-    this->setSymbolVisible(pc->isSymbolVisible());
-  }
-
-
-  /**
-   * This method returns the shape of the markers.
-   *
-   * @return QwtSymbol
-   */
-  QwtSymbol PlotCurve::symbolStyle() const {
-    return p_symbolStyle;
+    QwtPlotCurve::setData(xData, yData, size);
+    recreateMarkers();
   }
 
 
@@ -131,44 +107,217 @@ namespace Isis {
    *  This method sets the shape of the markers.
    * @param style
    */
-  void PlotCurve::setSymbolStyle(QwtSymbol::Style style) {
-    p_symbolStyle.setStyle(style);
-    for(int i = 0; i < p_plotMarkers.size(); i++) {
-      p_plotMarkers[i]->setSymbol(p_symbolStyle);
-      p_plotMarkers[i]->setVisible(p_markerIsVisible);
+  void PlotCurve::setMarkerSymbol(QwtSymbol symbol) {
+    m_markerSymbol = symbol;
+    recreateMarkers();
+  }
+
+
+
+  void PlotCurve::setMarkerVisible(bool visible) {
+    foreach (QwtPlotMarker *marker, m_valuePointMarkers) {
+      marker->setVisible(visible);
     }
   }
 
 
-  /**
-   * This method returns the color of the curve's markers.
-   *
-   * @return QColor
-   */
-  QColor PlotCurve::symbolColor() const {
-    return p_markerPen.color();
-  }
-
 
   /**
-   * This method sets the color of the curve's markers.
-   * @param c
+   * Construct the plot curve given the past results of toByteArray(...).
+   * This is used for copy/paste and drag/drop.
+   * 
+   * Returns the unconsumed part of the byte array.
    */
-  void PlotCurve::setSymbolColor(const QColor &c) {
-    p_markerPen.setColor(c);
-  }
+  QByteArray PlotCurve::fromByteArray(const QByteArray &classData) {
+    QString expectedHeader("PLOT_CURVE_V1");
+    int headerKeySize = expectedHeader.toUtf8().size();
+
+    if (classData.size() > headerKeySize) {
+      int dataPos = 0;
+      const char *rawClassData = classData.data();
+
+      QString givenKey = QString::fromUtf8(classData.data() + dataPos,
+                                           headerKeySize);
+      dataPos += headerKeySize;
+      if (givenKey != expectedHeader) {
+        iString msg = "The given byte array does not contain the required "
+            "header";
+        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      }
+
+      int titleSize = *(((int *)(rawClassData + dataPos)));
+      dataPos += sizeof(int);
+
+      setTitle(QString::fromUtf8(classData.data() + dataPos, titleSize));
+      dataPos += titleSize;
+
+      m_xUnits = (Units)(*((int *)(rawClassData + dataPos)));
+      dataPos += sizeof(int);
+
+      m_yUnits = (Units)(*((int *)(rawClassData + dataPos)));
+      dataPos += sizeof(int);
+
+      // Read the pen...
+      int penBufferSize = *(((int *)(rawClassData + dataPos)));
+      dataPos += sizeof(int);
+
+      QByteArray penBufferBytes(rawClassData + dataPos, penBufferSize);
+      dataPos += penBufferSize;
+
+      QBuffer penDataBuffer(&penBufferBytes);
+      penDataBuffer.open(QIODevice::ReadWrite);
+
+      QDataStream penDataStream(&penDataBuffer);
+      QPen pen;
+      penDataStream >> pen;
+      setPen(pen);
 
 
-  /**
-   * This methods hides/shows the curve's markers.
-   * @param visible
-   */
-  void PlotCurve::setSymbolVisible(bool visible) {
-    p_markerIsVisible = visible;
-    for(int i = 0; i < p_plotMarkers.size(); i++) {
-      p_plotMarkers[i]->setSymbol(p_symbolStyle);
-      p_plotMarkers[i]->setVisible(p_markerIsVisible);
+      // Read the color...
+      int colorBufferSize = *(((int *)(rawClassData + dataPos)));
+      dataPos += sizeof(int);
+
+      QByteArray colorBufferBytes(rawClassData + dataPos, colorBufferSize);
+      dataPos += colorBufferSize;
+
+      QBuffer colorDataBuffer(&colorBufferBytes);
+      colorDataBuffer.open(QIODevice::ReadWrite);
+
+      QDataStream colorDataStream(&colorDataBuffer);
+      QColor newColor;
+      colorDataStream >> newColor;
+      setColor(newColor);
+
+      // Read the marker symbol...
+      int markerSymbolBufferSize = *(((int *)(rawClassData + dataPos)));
+      dataPos += sizeof(int);
+
+      QByteArray markerSymbolBufferBytes(rawClassData + dataPos,
+                                         markerSymbolBufferSize);
+      dataPos += markerSymbolBufferSize;
+
+      QBuffer markerSymbolDataBuffer(&markerSymbolBufferBytes);
+      markerSymbolDataBuffer.open(QIODevice::ReadWrite);
+
+      QDataStream markerSymbolDataStream(&markerSymbolDataBuffer);
+
+      QBrush markerBrush;
+      markerSymbolDataStream >> markerBrush;
+      m_markerSymbol.setBrush(markerBrush);
+
+      QPen markerPen;
+      markerSymbolDataStream >> markerPen;
+      m_markerSymbol.setPen(markerPen);
+
+      QSize markerSize;
+      markerSymbolDataStream >> markerSize;
+      m_markerSymbol.setSize(markerSize);
+
+      int markerStyle;
+      markerSymbolDataStream >> markerStyle;
+      m_markerSymbol.setStyle((QwtSymbol::Style)markerStyle);
+
+      // Done reading the more advanced items, finish up with the data
+      int plotDataSize = *((int *)(rawClassData + dataPos));
+      dataPos += sizeof(int);
+      QwtArray<double> plotDataXValues;
+      QwtArray<double> plotDataYValues;
+
+      for (int i = 0; i < plotDataSize; i ++) {
+        double x = *((double *)(rawClassData + dataPos));
+        dataPos += sizeof(double);
+
+        double y = *((double *)(rawClassData + dataPos));
+        dataPos += sizeof(double);
+
+        plotDataXValues.push_back(x);
+        plotDataYValues.push_back(y);
+      }
+
+      QwtArrayData plotData(plotDataXValues, plotDataYValues);
+
+      setData(plotData);
+      ASSERT(dataPos <= classData.size());
+
+      return classData.right(classData.size() - dataPos);
     }
+    else {
+      iString msg = "The given byte array is not large enough to contain the "
+          "required header";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    }
+  }
+
+
+  QByteArray PlotCurve::toByteArray() const {
+    QByteArray classData;
+
+    QString header("PLOT_CURVE_V1");
+    classData.append(header.toUtf8());
+
+    QByteArray titleArray = title().text().toUtf8();
+    int size = titleArray.size();
+    classData.append((char *)&size, sizeof(int));
+    classData.append(titleArray);
+
+    int xUnitsInt = (int)m_xUnits;
+    int yUnitsInt = (int)m_yUnits;
+    classData.append((char *)&xUnitsInt, sizeof(int));
+    classData.append((char *)&yUnitsInt, sizeof(int));
+
+    // Store the pen... to do this we need to serialize using QPen's operators
+    QBuffer penDataBuffer;
+    penDataBuffer.open(QIODevice::ReadWrite);
+
+    QDataStream penDataStream(&penDataBuffer);
+    penDataStream << pen();
+    penDataBuffer.seek(0);
+
+    size = penDataBuffer.buffer().size();
+    classData.append((char *)&size, sizeof(int));
+    classData.append(penDataBuffer.buffer());
+
+    // Store the color...
+    QBuffer colorDataBuffer;
+    colorDataBuffer.open(QIODevice::ReadWrite);
+
+    QDataStream colorDataStream(&colorDataBuffer);
+    colorDataStream << m_color;
+    colorDataBuffer.seek(0);
+
+    size = colorDataBuffer.buffer().size();
+    classData.append((char *)&size, sizeof(int));
+    classData.append(colorDataBuffer.buffer());
+
+    // Store the marker symbol...
+    QBuffer markerSymbolDataBuffer;
+    markerSymbolDataBuffer.open(QIODevice::ReadWrite);
+
+    QDataStream markerSymbolDataStream(&markerSymbolDataBuffer);
+    markerSymbolDataStream << m_markerSymbol.brush();
+    markerSymbolDataStream << m_markerSymbol.pen();
+    markerSymbolDataStream << m_markerSymbol.size();
+    markerSymbolDataStream << (int)m_markerSymbol.style();
+    markerSymbolDataBuffer.seek(0);
+
+    size = markerSymbolDataBuffer.buffer().size();
+    classData.append((char *)&size, sizeof(int));
+    classData.append(markerSymbolDataBuffer.buffer());
+
+    // Store the X/Y plot values
+    const QwtData &plotData = data();
+    size = plotData.size();
+    classData.append((char *)&size, sizeof(int));
+
+    for (int i = 0; i < size; i ++) {
+      double x = plotData.x(i);
+      double y = plotData.y(i);
+
+      classData.append((char *)&x, sizeof(double));
+      classData.append((char *)&y, sizeof(double));
+    }
+
+    return classData;
   }
 
 
@@ -179,40 +328,45 @@ namespace Isis {
    * @param pen
    */
   void PlotCurve::setPen(const QPen &pen) {
-    this->QwtPlotCurve::setPen(pen);
+    QPen newPen(pen);
+    newPen.setColor(m_color);
 
-    setSymbolColor(pen.color());
-    p_symbolStyle.setPen(p_markerPen);
-    for(int i = 0; i < p_plotMarkers.size(); i++) {
-      p_plotMarkers[i]->setSymbol(p_symbolStyle);
-      p_plotMarkers[i]->setVisible(p_markerIsVisible);
+    QwtPlotCurve::setPen(newPen);
+
+    recreateMarkers();
+  }
+
+
+  void PlotCurve::clearMarkers() {
+    foreach (QwtPlotMarker *marker, m_valuePointMarkers) {
+      marker->detach();
+      delete marker;
     }
 
+    m_valuePointMarkers.clear();
   }
 
 
-  /**
-   * This method returns a bool indicating if the  curve's markers
-   * are visible.
-   *
-   * @return bool
-   */
-  bool PlotCurve::isSymbolVisible() const {
-    return p_markerIsVisible;
-  }
+  void PlotCurve::recreateMarkers() {
+    bool markersVisible = true;
+    if (m_valuePointMarkers.size()) {
+      markersVisible = m_valuePointMarkers.first()->isVisible();
+    }
+    clearMarkers();
 
+    QPen markerPen = m_markerSymbol.pen();
+    markerPen.setColor(m_color);
+    m_markerSymbol.setPen(markerPen);
 
-  /**
-   * This method attachs the curves's markers to the plot.
-   * @param plot
-   */
-  void PlotCurve::attachSymbols(QwtPlot *plot) {
-    p_symbolStyle.setPen(p_markerPen);
-    for(int i = 0; i < p_plotMarkers.size(); i++) {
-      p_plotMarkers[i]->setSymbol(p_symbolStyle);
-      p_plotMarkers[i]->setVisible(p_markerIsVisible);
-      p_plotMarkers[i]->attach(plot);
+    const QwtData &plotData = data();
+    for(unsigned int i = 0; i < plotData.size(); i++) {
+      QwtPlotMarker *newMarker = new QwtPlotMarker();
+      newMarker->setValue(plotData.x(i), plotData.y(i));
+      newMarker->setAxis(xAxis(), yAxis());
+      newMarker->setSymbol(m_markerSymbol);
+      newMarker->setVisible(markersVisible);
+      newMarker->attach(plot());
+      m_valuePointMarkers.append(newMarker);
     }
   }
-
 }

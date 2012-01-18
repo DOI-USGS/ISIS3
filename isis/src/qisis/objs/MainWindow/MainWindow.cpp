@@ -109,15 +109,15 @@ namespace Isis {
   * @return bool
   */
   bool MainWindow::eventFilter(QObject *o, QEvent *e) {
-    switch(e->type()) {
-      case QEvent::Close: {
-          writeSettings();
-        }
+    switch (e->type()) {
+      case QEvent::Close:
+        writeSettings();
+        break;
 
-      default: {
-          return false;
-        }
+      default:
+        break;
     }
+    return QMainWindow::eventFilter(o, e);
   }
 }
 

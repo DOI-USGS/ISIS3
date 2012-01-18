@@ -170,25 +170,27 @@
         </description>
         <internalDefault>Default</internalDefault>
       </parameter>
-      <parameter name="Y1AXIS">
+      <parameter name="FREQAXIS">
         <type>string</type>
         <brief>
-          Left Y-Axis Title
+          Frequency Y-Axis Title
         </brief>
         <description>
-          This will be the title for the y axis to the left of the histogram plot, which represents the frequency of the pixel value.  
-          The plot will only be shown in ui mode.
+          This will be the title for the y axis to the right of the histogram
+          plot, which represents the frequency of the pixel value. The plot will
+          only be shown in GUI mode.
         </description>
         <internalDefault>Default</internalDefault>
       </parameter>
-      <parameter name="Y2AXIS">
+      <parameter name="PERCENTAXIS">
         <type>string</type>
         <brief>
-          Right Y-Axis Title
+          Percent Y-Axis Title
         </brief>
         <description>
-          This will be the title for the y axis to the right of the histogram plot, which represents the percentage of pixel seen so far.  
-          The plot will only be shown in ui  mode.
+          This will be the title for the y axis to the left of the histogram
+          plot, which represents the percentage of pixel seen so far. The plot
+          will only be shown in GUI mode.
         </description>
         <internalDefault>Default</internalDefault>
       </parameter>

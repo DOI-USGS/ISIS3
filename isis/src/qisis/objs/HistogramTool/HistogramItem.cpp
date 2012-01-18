@@ -393,11 +393,8 @@ namespace Isis {
   void HistogramItem::setVertices(const QList <QPoint> &points) {
     double sample, line;
     p_pointList.clear();
-    if(this->getViewPort() == NULL) {
-      std::cout << "Please be sure to set the view port first!" << std::endl;
-    }
-    for(int i = 0; i < points.size(); i++) {
-      this->getViewPort()->viewportToCube(points[i].x(), points[i].y(), sample, line);
+    for(int i = 0; getViewPort() && i < points.size(); i++) {
+      getViewPort()->viewportToCube(points[i].x(), points[i].y(), sample, line);
       p_pointList.push_back(QPointF((sample), (line)));
     }
   }
@@ -421,25 +418,4 @@ namespace Isis {
   void HistogramItem::setViewPort(CubeViewport *cvp) {
     p_cvp = cvp;
   }
-
-
-  /**
-   * This method allows the users to copy all of the given curves
-   * properties into the current curve.  This is an overriden
-   * function from the PlotCurve class.
-   *
-   * @param pc
-   */
-  void HistogramItem::copyCurveProperties(HistogramItem *hi) {
-    this->setAxis(hi->xAxis(), hi->yAxis());
-    this->setVisible(hi->isVisible());
-    //this->setPen(hi->pen());
-    this->setTitle(hi->title().text());
-    this->setData(hi->data());
-    this->setColor(hi->color());
-
-    p_cvp = hi->getViewPort();
-    p_pointList = hi->getVertices();
-  }
-
 }

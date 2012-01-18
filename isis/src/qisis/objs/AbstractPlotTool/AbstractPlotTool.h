@@ -1,0 +1,89 @@
+#ifndef AbstractPlotTool_h
+#define AbstractPlotTool_h
+
+// this should be the only include in this file!
+#include "Tool.h"
+
+// We need PlotCurve::Units
+#include "PlotCurve.h"
+
+#include <QPointer>
+
+class QComboBox;
+class QPen;
+
+namespace Isis {
+  class CubePlotCurve;
+  class PlotWindow;
+  class RubberBandComboBox;
+
+  /**
+   * @brief Parent class for plotting tools which provides common functionality
+   *
+   * This qview tool is designed to be inherited from by tools which create 
+   * plots.  This class provides common functionality such as opening new 
+   * plot windows.
+   *
+   * @author Steven Lambright and Tracie Sucharski
+   *
+   * @internal 
+   *   @history 2011-11-02 Steven Lambright and Tracie Sucharski - Original 
+   *                           Version 
+   */
+  class AbstractPlotTool : public Tool {
+      Q_OBJECT
+
+    public:
+      AbstractPlotTool(QWidget *parent);
+      virtual ~AbstractPlotTool();
+
+      virtual void paintViewport(MdiCubeViewport *vp, QPainter *painter);
+
+    public slots:
+      void removeWindow(QObject *);
+      void repaintViewports(CubePlotCurve *);
+      void showPlotWindow();
+
+    protected slots:
+      void repaintViewports();
+
+    protected:
+      PlotWindow *addWindow();
+      static CubePlotCurve *createCurve(QString name, QPen pen,
+          PlotCurve::Units xUnits, PlotCurve::Units yUnits);
+      QWidget *createToolBarWidget(QStackedWidget *parent);
+      virtual PlotWindow *createWindow() = 0;
+      virtual void updateTool();
+      QList<MdiCubeViewport *> viewportsToPlot();
+      QList<PlotWindow *> plotWindows();
+
+      /**
+       * This will be called when the selected plot window changes.  The 
+       * existing curves need to be detached (forgotten, but not deleted). 
+       * The curves are being detached between the previously selected window 
+       * and the tool. 
+       */
+      virtual void detachCurves() = 0;
+      PlotWindow *selectedWindow(bool createIfNeeded = true);
+
+    private slots:
+      void selectedWindowChanged();
+
+    private:
+      void paintCurves(MdiCubeViewport *vp, QPainter *painter,
+                       PlotWindow *container);
+
+      /**
+       * This allows the user to select the active plot window.  New curves 
+       * will be drawn into this window. The items in the combo box store 
+       * pointers to the windows themselves so we do not need an explicit list 
+       * of plot windows. 
+       */
+      QPointer<QComboBox> m_selectWindowCombo;
+
+
+  };
+};
+
+#endif
+

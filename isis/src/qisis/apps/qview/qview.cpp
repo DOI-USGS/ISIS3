@@ -25,12 +25,14 @@
 #include "iString.h"
 #include "MeasureTool.h"
 #include "PanTool.h"
-#include "PlotTool.h"
 #include "Preference.h"
 #include "PvlGroup.h"
 #include "QIsisApplication.h"
 #include "RubberBandTool.h"
+#include "ScatterPlotTool.h"
 #include "SpecialPixelTool.h"
+#include "SpatialPlotTool.h"
+#include "SpectralPlotTool.h"
 #include "SocketThread.h"
 #include "StatisticsTool.h"
 #include "StretchTool.h"
@@ -126,57 +128,63 @@ int main(int argc, char *argv[]) {
   Tool *rubberBandTool = RubberBandTool::getInstance(vw);
   rubberBandTool->addTo(vw);
 
-  Tool *ftool = new FileTool(vw);
-  ftool->addTo(vw);
+  Tool *fileTool = new FileTool(vw);
+  fileTool->addTo(vw);
   vw->permanentToolBar()->addSeparator();
 
-  Tool *btool = new BandTool(vw);
-  btool->addTo(vw);
+  Tool *bandTool = new BandTool(vw);
+  bandTool->addTo(vw);
 
-  Tool *ztool = new ZoomTool(vw);
-  ztool->addTo(vw);
-  ztool->activate(true);
+  Tool *zoomTool = new ZoomTool(vw);
+  zoomTool->addTo(vw);
+  zoomTool->activate(true);
   vw->getMenu("&View")->addSeparator();
 
-  Tool *ptool = new PanTool(vw);
-  ptool->addTo(vw);
+  Tool *panTool = new PanTool(vw);
+  panTool->addTo(vw);
   vw->getMenu("&View")->addSeparator();
 
-  Tool *stool = new StretchTool(vw);
-  stool->addTo(vw);
+  Tool *stretchTool = new StretchTool(vw);
+  stretchTool->addTo(vw);
 
-  Tool *findtool = new FindTool(vw);
-  findtool->addTo(vw);
+  Tool *findTool = new FindTool(vw);
+  findTool->addTo(vw);
 
-  Tool *blinktool = new BlinkTool(vw);
-  blinktool->addTo(vw);
+  Tool *blinkTool = new BlinkTool(vw);
+  blinkTool->addTo(vw);
 
-  Tool *attool = new AdvancedTrackTool(vw);
-  attool->addTo(vw);
+  Tool *advancedTrackTool = new AdvancedTrackTool(vw);
+  advancedTrackTool->addTo(vw);
 
-  Tool *edittool = new EditTool(vw);
-  edittool->addTo(vw);
+  Tool *editTool = new EditTool(vw);
+  editTool->addTo(vw);
 
-  Tool *wtool = new WindowTool(vw);
-  wtool->addTo(vw);
+  Tool *windowTool = new WindowTool(vw);
+  windowTool->addTo(vw);
 
-  Tool *mtool = new MeasureTool(vw);
-  mtool->addTo(vw);
+  Tool *measureTool = new MeasureTool(vw);
+  measureTool->addTo(vw);
 
-  Tool *sptool = new SpecialPixelTool(vw);
-  sptool->addTo(vw);
+  Tool *specialPixelTool = new SpecialPixelTool(vw);
+  specialPixelTool->addTo(vw);
 
-  Tool *pltool = new PlotTool(vw);
-  pltool->addTo(vw);
+  Tool *spatialPlotTool = new SpatialPlotTool(vw);
+  spatialPlotTool->addTo(vw);
 
-  Tool *histtool = new HistogramTool(vw);
-  histtool->addTo(vw);
+  Tool *spectralPlotTool = new SpectralPlotTool(vw);
+  spectralPlotTool->addTo(vw);
 
-  Tool *statstool = new StatisticsTool(vw);
-  statstool->addTo(vw);
+  Tool *scatterPlotTool = new ScatterPlotTool(vw);
+  scatterPlotTool->addTo(vw);
 
-  Tool *htool = new HelpTool(vw);
-  htool->addTo(vw);
+  Tool *histTool = new HistogramTool(vw);
+  histTool->addTo(vw);
+
+  Tool *statsTool = new StatisticsTool(vw);
+  statsTool->addTo(vw);
+
+  Tool *helpTool = new HelpTool(vw);
+  helpTool->addTo(vw);
 
   // Show the application window & open the cubes
   vw->show();
@@ -211,19 +219,26 @@ int main(int argc, char *argv[]) {
     temp->start();
   }
 
-  //Connect the edittool to the file tool in order to save and discard changes
-  QObject::connect(edittool, SIGNAL(cubeChanged(bool)), ftool, SLOT(enableSave(bool)));
-  QObject::connect(ftool, SIGNAL(saveChanges(MdiCubeViewport *)), edittool, SLOT(save(MdiCubeViewport *)));
-  QObject::connect(ftool, SIGNAL(discardChanges(MdiCubeViewport *)), edittool, SLOT(undoAll(MdiCubeViewport *)));
-  QObject::connect(edittool, SIGNAL(save()), ftool, SLOT(confirmSave()));
-  QObject::connect(edittool, SIGNAL(saveAs()), ftool, SLOT(saveAs()));
-  //Connect the FindTool to the AdvancedTrackTool to record the point if the "record" button is clicked
-  QObject::connect(findtool, SIGNAL(recordPoint(QPoint)), attool, SLOT(record(QPoint)));
+  //Connect the editTool to the file tool in order to save and discard changes
+  QObject::connect(editTool, SIGNAL(cubeChanged(bool)),
+                   fileTool, SLOT(enableSave(bool)));
+  QObject::connect(fileTool, SIGNAL(saveChanges(MdiCubeViewport *)),
+                   editTool, SLOT(save(MdiCubeViewport *)));
+  QObject::connect(fileTool, SIGNAL(discardChanges(MdiCubeViewport *)),
+                   editTool, SLOT(undoAll(MdiCubeViewport *)));
+  QObject::connect(editTool, SIGNAL(save()), fileTool, SLOT(confirmSave()));
+  QObject::connect(editTool, SIGNAL(saveAs()), fileTool, SLOT(saveAs()));
+  // Connect the FindTool to the AdvancedTrackTool to record the point if the
+  // "record" button is clicked
+  QObject::connect(findTool, SIGNAL(recordPoint(QPoint)),
+                   advancedTrackTool, SLOT(record(QPoint)));
 
   //Connect the viewport's close signal to the all windows/subwindows
-  QObject::connect(vw , SIGNAL(closeWindow()), histtool, SLOT(removeWindow()));
-  QObject::connect(vw , SIGNAL(closeWindow()), pltool,   SLOT(removeWindow()));
-  QObject::connect(vw , SIGNAL(closeWindow()), ftool,    SLOT(exit()));
+//   QObject::connect(vw , SIGNAL(closeWindow()), histTool, SLOT(removeWindow()));
+//   QObject::connect(vw , SIGNAL(closeWindow()), spltool,  SLOT(removeWindow()));
+//   QObject::connect(vw, SIGNAL(closeWindow()),
+//                    scatterPlotTool, SLOT(removeWindow()));
+  QObject::connect(vw, SIGNAL(closeWindow()), fileTool, SLOT(exit()));
 
   int status = app->exec();
 
@@ -236,18 +251,19 @@ int main(int argc, char *argv[]) {
     remove(p_socketFile.c_str());
   }
 
-  delete htool;
-  delete histtool;
-  delete pltool;
-  delete sptool;
-  delete mtool;
-  delete wtool;
-  delete attool;
-  delete blinktool;
-  delete findtool;
-  delete stool;
-  delete ptool;
-  delete btool;
+  delete helpTool;
+  delete histTool;
+  delete spatialPlotTool;
+  delete spectralPlotTool;
+  delete scatterPlotTool;
+  delete specialPixelTool;
+  delete measureTool;
+  delete windowTool;
+  delete advancedTrackTool;
+  delete blinkTool;
+  delete findTool;
+  delete stretchTool;
+  delete bandTool;
   delete rubberBandTool;
   delete vw;
   delete app;

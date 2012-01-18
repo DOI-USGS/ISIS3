@@ -48,8 +48,12 @@ namespace Isis {
    *
    * @internal
    *   @history 2005-03-28 Leah Dahmer modified file to support Doxygen
-   *    documentation.
+   *                           documentation.
    *   @history 2005-05-23 Jeff Anderson - Added 2GB+ file support
+   *   @history 2012-01-03 Steven Lambright - Added AddData(double, double,
+   *                           unsigned int) for a significant performance
+   *                           improvement and to increase the consistency in
+   *                           the API relative to the Statistics class.
    *
    *   @todo This class needs an example.
    *   @todo For the below methods we will need to compute log x, loy y, sumx3,
@@ -66,6 +70,7 @@ namespace Isis {
       void Reset();
       void AddData(const double *x, const double *y,
                    const unsigned int count);
+      void AddData(double x, double y, unsigned int count = 1);
       void RemoveData(const double *x, const double *y,
                       const unsigned int count);
 

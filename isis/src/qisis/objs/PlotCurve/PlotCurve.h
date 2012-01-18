@@ -1,4 +1,3 @@
-
 #ifndef PlotCurve_h
 #define PlotCurve_h
 
@@ -41,29 +40,50 @@ namespace Isis {
   class PlotCurve : public QwtPlotCurve {
 
     public:
-      PlotCurve();
-      void attachSymbols(QwtPlot *plot);
-      void copyCurveProperties(const PlotCurve *pc);
-      void detach();
-      bool isSymbolVisible() const;
-      QColor symbolColor() const;
-      QwtSymbol symbolStyle() const;
+      enum Units {
+        Unknown,
+        Band,
+        CubeDN,
+        Elevation,
+        Percentage,
+        PixelNumber,
+        Wavelength
+      };
 
-      void setColor(QColor c);
+      PlotCurve(Units xUnits, Units yUnits);
+      ~PlotCurve();
+
+      void attachMarkers();
+
+      QColor color() const;
+      QwtSymbol markerSymbol() const;
+      Units xUnits() const;
+      Units yUnits() const;
+
+      void setColor(const QColor &color);
       void setData(const QwtData &data);
       void setData(const double *xData, const double *yData, int size);
       void setPen(const QPen &pen);
-      void setSymbolColor(const QColor &c);
-      void setSymbolStyle(QwtSymbol::Style style);
-      void setSymbolVisible(bool visible);
-
-      bool p_markerIsVisible;//!< Are the markers visible?
+      void setMarkerSymbol(QwtSymbol symbol);
+      void setMarkerVisible(bool visible);
 
     protected:
-      QwtSymbol p_symbolStyle; //!< Plot symbols
-      QList<QwtPlotMarker *> p_plotMarkers;//!< List of the plot markers
-      QPen p_markerPen;//!< Pen used to draw plot line and markers
+      QByteArray fromByteArray(const QByteArray &classData);
+      QByteArray toByteArray() const;
 
+    private:
+      PlotCurve(const PlotCurve &other);
+      PlotCurve &operator=(const PlotCurve &other);
+
+      void clearMarkers();
+      void recreateMarkers();
+
+    private:
+      QColor m_color;
+      QwtSymbol m_markerSymbol; //!< Marker's styles
+      QList<QwtPlotMarker *> m_valuePointMarkers;
+      Units m_xUnits;
+      Units m_yUnits;
   };
 };
 #endif

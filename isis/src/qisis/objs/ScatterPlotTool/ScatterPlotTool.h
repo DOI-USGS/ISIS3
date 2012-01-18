@@ -1,9 +1,10 @@
 #ifndef ScatterPlotTool_h
 #define ScatterPlotTool_h
 
-// this is the only include allowed in this file!
 #include "Tool.h"
 
+#include <QPointer>
+#include <QScopedPointer>
 
 class QAction;
 template< class T > class QVector;
@@ -11,6 +12,7 @@ class QWidget;
 
 namespace Isis {
   class MdiCubeViewport;
+  class ScatterPlotConfigDialog;
   class ScatterPlotWindow;
 
   /**
@@ -28,30 +30,28 @@ namespace Isis {
       ScatterPlotTool(QWidget *parent);
       void setActionChecked(bool checked);
 
-      typedef QVector< MdiCubeViewport * > CubeViewportList;
-      CubeViewportList *getCubeViewportList() const;
+      virtual void paintViewport(MdiCubeViewport *vp, QPainter *painter);
+
+    public slots:
+      void onScatterPlotConfigAccepted();
+      void onScatterPlotConfigRejected();
+      void showNewScatterPlotConfig();
+
+    protected slots:
+      void mouseMove(QPoint p, Qt::MouseButton);
+      void mouseLeave();
+      void repaintViewports();
 
     protected:
-      void createWindow();
+      QWidget *createToolBarWidget(QStackedWidget *parent);
       QAction *toolPadAction(ToolPad *pad);
 
-
-      /**
-       * Returns this tool's action
-       *
-       *
-       * @return QAction*
-       */
-      QAction *toolAction() {
-        return p_action;
-      };
+      QAction *toolAction();
 
     private:
-      ScatterPlotWindow *p_mainWindow;  //!<The window the scatter plot is displayed in.
-      QAction *p_action;  //!< The tool's action
-      QWidget *p_parent; //!< The tool's parent.
-
-
+      QPointer<QAction> m_action;
+      QPointer<ScatterPlotConfigDialog> m_configDialog;
+      QScopedPointer< QList< QPointer<ScatterPlotWindow> > > m_plotWindows;
   };
 };
 

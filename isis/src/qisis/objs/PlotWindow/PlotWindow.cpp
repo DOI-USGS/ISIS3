@@ -1,18 +1,40 @@
+#include "IsisDebug.h"
+
 #include "PlotWindow.h"
-#include "MainWindow.h"
-#include "Stretch.h"
-#include "Filename.h"
-#include "QHistogram.h"
-#include "Interpolator.h"
+
+#include <algorithm>
+#include <iostream>
+
+#include <qwt_legend.h>
+#include <qwt_plot_grid.h>
+#include <qwt_plot_spectrogram.h>
 #include <qwt_symbol.h>
 #include <qwt_scale_engine.h>
-#include <algorithm>
+
+#include <QAction>
+#include <QIcon>
+#include <QMap>
+#include <QSet>
+
+#include "Cube.h"
+#include "CubePlotCurve.h"
+#include "CubeViewport.h"
+#include "Filename.h"
+#include "Interpolator.h"
+#include "MainWindow.h"
+#include "MdiCubeViewport.h"
+#include "PlotWindowBestFitDialog.h"
+#include "Pvl.h"
+#include "PvlGroup.h"
+#include "PvlKeyword.h"
+#include "QHistogram.h"
+#include "Stretch.h"
+#include "TableMainWindow.h"
+
+
+using namespace std;
 
 namespace Isis {
-  /*Static variables*/
-  PlotCurve *PlotWindow::p_dragCurve = NULL;
-  bool PlotWindow::p_curveCopied = false;
-
   /**
    * This constructs a plot window. The plot window graphs any
    * curve sent to it via the addPlotCurve() method.
@@ -21,25 +43,65 @@ namespace Isis {
    * @param title
    * @param parent
    */
-  PlotWindow::PlotWindow(QString title, QWidget *parent) : MainWindow(title, parent) {
-    p_selected = -1;
-    p_toolBar = NULL;
-    p_menubar = NULL;
-    p_tableWindow = NULL;
-    p_mainWindow = NULL;
-    p_parent = parent;
-    p_scaled = false;
-    p_curvePropsSaved = false;
-    p_xLogScale = false;
-    p_yLogScale = false;
-    p_deletable = false;
+  PlotWindow::PlotWindow(QString title, PlotCurve::Units xAxisUnits,
+                         PlotCurve::Units yAxisUnits, QWidget *parent,
+                         MenuOptions optionsToProvide) :
+        MainWindow(title, parent) {
+    m_toolBar = NULL;
+    m_menubar = NULL;
+    m_tableWindow = NULL;
+    m_pasteAct = NULL;
+    m_allowUserToAddCurves = true;
+    m_autoscaleAxes = true;
 
-    createWindow();
-    createConfigDialog();
-    createLegendMenu();
+    m_parent = parent;
+    m_xAxisUnits = xAxisUnits;
+    m_yAxisUnits = yAxisUnits;
+
+    if (!m_parent) {
+      iString msg = "PlotWindow cannot be instantiated with a NULL parent";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    }
+
+    installEventFilter(this);
+    setAcceptDrops(true);
+
+    createWidgets(optionsToProvide);
     setWindowTitle(title);
 
+    setPlotBackground(Qt::black);
+
+    connect(QApplication::clipboard(), SIGNAL(changed(QClipboard::Mode)),
+            this, SLOT(onClipboardChanged()));
+    connect(this, SIGNAL(plotChanged()),
+            this, SLOT(fillTable()));
+
+    QMap<PlotCurve::Units, QString> unitLabels;
+    unitLabels.insert(PlotCurve::Band, "Band");
+    unitLabels.insert(PlotCurve::Percentage, "Percentage");
+    unitLabels.insert(PlotCurve::PixelNumber, "Pixel Number");
+    unitLabels.insert(PlotCurve::CubeDN, "Pixel Value");
+    unitLabels.insert(PlotCurve::Elevation, "Elevation");
+    unitLabels.insert(PlotCurve::Wavelength, "Wavelength");
+
+    plot()->setAxisTitle(QwtPlot::xBottom, unitLabels[xAxisUnits]);
+    plot()->setAxisTitle(QwtPlot::yLeft,   unitLabels[yAxisUnits]);
+    setPlotTitle(title);
+
+    onClipboardChanged();
+
     readSettings();
+
+#ifdef __APPLE__
+    setWindowFlags(Qt::Tool);
+#else
+    setWindowFlags(Qt::Dialog);
+#endif
+  }
+
+
+
+  PlotWindow::~PlotWindow() {
   }
 
 
@@ -47,85 +109,53 @@ namespace Isis {
    * This method is called by the constructor to create the
    * plot, legend. zoomer, and main window
    */
-  void PlotWindow::createWindow() {
+  void PlotWindow::createWidgets(MenuOptions optionsToProvide) {
     /*Create plot*/
-    p_plot = new QwtPlot();
-    p_plot->installEventFilter(this);
-    p_plot->setAxisMaxMinor(QwtPlot::yLeft, 5);
-    p_plot->setAxisMaxMajor(QwtPlot::xBottom, 30);
-    p_plot->setAxisMaxMinor(QwtPlot::xBottom, 5);
-    p_plot->setAxisLabelRotation(QwtPlot::xBottom, 45);
-    p_plot->setAxisLabelAlignment(QwtPlot::xBottom, Qt::AlignRight);
+    m_plot = new QwtPlot();
+    m_plot->installEventFilter(this);
+    m_plot->setAxisMaxMinor(QwtPlot::yLeft, 5);
+    m_plot->setAxisMaxMajor(QwtPlot::xBottom, 30);
+    m_plot->setAxisMaxMinor(QwtPlot::xBottom, 5);
+    m_plot->setAxisLabelRotation(QwtPlot::xBottom, 45);
+    m_plot->setAxisLabelAlignment(QwtPlot::xBottom, Qt::AlignRight);
 
     /*Plot Legend*/
-    p_legend = new QwtLegend();
-    p_legend->setItemMode(QwtLegend::ClickableItem);
-    p_legend->setWhatsThis("Right Click on a legend item to display the context menu.");
-    p_plot->insertLegend(p_legend, QwtPlot::RightLegend, 1.0);
+    QwtLegend *legend = new QwtLegend();
+    legend->setItemMode(QwtLegend::ClickableItem);
+    legend->setWhatsThis("Right Click on a legend item to display the context "
+                         "menu.");
+    m_plot->insertLegend(legend, QwtPlot::RightLegend, 1.0);
+    legend->installEventFilter(this);
 
     /*Plot Grid*/
-    p_grid = new QwtPlotGrid;
-    p_grid->enableXMin(true);
-    p_grid->setMajPen(QPen(Qt::white, 1, Qt::DotLine));
-    p_grid->setMinPen(QPen(Qt::gray, 1, Qt::DotLine));
-    p_grid->attach(p_plot);
-    p_grid->setVisible(false);
+    m_grid = new QwtPlotGrid;
+    m_grid->enableXMin(true);
+    m_grid->setMajPen(QPen(Qt::white, 1, Qt::DotLine));
+    m_grid->setMinPen(QPen(Qt::gray, 1, Qt::DotLine));
+    m_grid->attach(m_plot);
+    m_grid->setVisible(false);
 
     /*Plot Zoomer*/
-    p_zoomer = new QwtPlotZoomer(p_plot->canvas());
-    p_zoomer->setRubberBandPen(QPen(Qt::lightGray));
-    p_zoomer->setTrackerPen(QPen(Qt::lightGray));
+    m_zoomer = new QwtPlotZoomer(m_plot->canvas());
+    m_zoomer->setRubberBandPen(QPen(Qt::lightGray));
+    m_zoomer->setTrackerPen(QPen(Qt::lightGray));
 
-    /* Create the Plot window*/
-    p_mainWindow = new MainWindow(this->windowTitle(), p_parent);
-    p_mainWindow->installEventFilter(this);
-    p_mainWindow->setCentralWidget(p_plot);
-    setupDefaultMenu();
-
-  #if defined(__APPLE__)
-    p_mainWindow->setWindowFlags(Qt::Tool);
-  #endif
-
-  #if !defined(__APPLE__)
-    p_mainWindow->setWindowFlags(Qt::Dialog);
-  #endif
-
-
-    /*set max and min*/
-    p_xMin = 0;
-    p_yMin = 0;
-    p_xMax = 1000;
-    p_yMax = 1000;
+    setCentralWidget(m_plot);
+    setupDefaultMenu(optionsToProvide);
   }
 
-  /**
-   * Remove current plot window when main app is closed
-   * 
-   * @author Sharmila Prasad (3/18/2011)
-   */
-  void PlotWindow::closeAll(void)
-  {
-    clearPlot();
-    p_mainWindow->close();
-  }
 
   /**
    * Shows the plot window, and raises it to the front of any
    * overlapping sibling widgets.
   */
   void PlotWindow::showWindow() {
-    p_mainWindow->raise();
-    p_mainWindow->show();
+    raise();
+    show();
   }
 
-  /**
-   * Sets the plot to auto scale the given axis.
-   *
-   *
-   * @param axisId
-   */
-  void PlotWindow::setAutoScaleAxis(int axisId) {
-    p_plot->setAxisAutoScale(axisId);
+
+  void PlotWindow::update(MdiCubeViewport *activeViewport) {
   }
 
 
@@ -137,7 +167,7 @@ namespace Isis {
    * @param title
    */
   void PlotWindow::setAxisLabel(int axisId, QString title) {
-    p_plot->setAxisTitle(axisId, title);
+    m_plot->setAxisTitle(axisId, title);
   }
 
 
@@ -149,9 +179,9 @@ namespace Isis {
    *
    * @return QwtText
    */
-  QwtText PlotWindow::getAxisLabel(int axisId) {
-    return p_plot->axisTitle(axisId);
-  }
+//   QwtText PlotWindow::getAxisLabel(int axisId) {
+//     return m_plot->axisTitle(axisId);
+//   }
 
 
   /**
@@ -161,9 +191,13 @@ namespace Isis {
    * @param pt
    */
   void PlotWindow::setPlotTitle(QString pt) {
-    p_plot->setTitle(pt);
+    m_plot->setTitle(pt);
   }
 
+
+  void PlotWindow::setUserCanAddCurves(bool userHasControl) {
+    m_allowUserToAddCurves = userHasControl;
+  }
 
   /**
    * Returns the plot title.
@@ -171,8 +205,23 @@ namespace Isis {
    *
    * @return QwtText
    */
-  QwtText PlotWindow::getPlotTitle() {
-    return p_plot->title();
+  QString PlotWindow::plotTitle() const {
+    return m_plot->title().text();
+  }
+
+
+  bool PlotWindow::userCanAddCurves() const {
+    return m_allowUserToAddCurves;
+  }
+
+
+  PlotCurve::Units PlotWindow::xAxisUnits() const {
+    return m_xAxisUnits;
+  }
+
+
+  PlotCurve::Units PlotWindow::yAxisUnits() const {
+    return m_yAxisUnits;
   }
 
 
@@ -183,7 +232,12 @@ namespace Isis {
    * @param c
    */
   void PlotWindow::setPlotBackground(QColor c) {
-    p_plot->setCanvasBackground(c);
+    m_plot->setCanvasBackground(c);
+  }
+
+  bool PlotWindow::canAdd(CubePlotCurve *curveToTest) const {
+    return (curveToTest->xUnits() == m_xAxisUnits &&
+            curveToTest->yUnits() == m_yAxisUnits);
   }
 
 
@@ -193,8 +247,90 @@ namespace Isis {
    *
    * @return QColor
    */
-  QColor PlotWindow::getPlotBackground() {
-    return p_plot->canvasBackground();
+  QColor PlotWindow::plotBackgroundColor() const {
+    return m_plot->canvasBackground();
+  }
+
+
+  QList<CubePlotCurve *> PlotWindow::plotCurves() {
+    QList<CubePlotCurve *> foundCurves;
+
+    const QwtPlotItemList &plotItems = m_plot->itemList();
+
+    for (int itemIndex = plotItems.size()- 1; itemIndex >= 0; itemIndex --) {
+      QwtPlotItem *item = plotItems[itemIndex];
+
+      if (item->rtti() == QwtPlotItem::Rtti_PlotCurve) {
+        CubePlotCurve *curve = dynamic_cast<CubePlotCurve *>(item);
+
+        if (curve && curve->color().alpha() != 0)
+          foundCurves.append(curve);
+      }
+    }
+
+    return foundCurves;
+  }
+
+
+  QList<const CubePlotCurve *> PlotWindow::plotCurves() const {
+    QList<const CubePlotCurve *> foundCurves;
+
+    const QwtPlotItemList &plotItems = m_plot->itemList();
+
+    for (int itemIndex = plotItems.size()- 1; itemIndex >= 0; itemIndex --) {
+      const QwtPlotItem *item = plotItems[itemIndex];
+
+      if (item->rtti() == QwtPlotItem::Rtti_PlotCurve) {
+        const CubePlotCurve *curve = dynamic_cast<const CubePlotCurve *>(item);
+
+        if (curve)
+          foundCurves.append(curve);
+      }
+    }
+
+    return foundCurves;
+  }
+
+
+  QList<QwtPlotSpectrogram *> PlotWindow::plotSpectrograms() {
+    QList<QwtPlotSpectrogram *> foundSpectrograms;
+
+    const QwtPlotItemList &plotItems = m_plot->itemList();
+
+    for (int itemIndex = plotItems.size()- 1; itemIndex >= 0; itemIndex --) {
+      QwtPlotItem *item = plotItems[itemIndex];
+
+      if (item->rtti() == QwtPlotItem::Rtti_PlotSpectrogram) {
+        QwtPlotSpectrogram *spectrogram =
+            dynamic_cast<QwtPlotSpectrogram *>(item);
+
+        if (spectrogram)
+          foundSpectrograms.append(spectrogram);
+      }
+    }
+
+    return foundSpectrograms;
+  }
+
+
+  QList<const QwtPlotSpectrogram *> PlotWindow::plotSpectrograms() const {
+    QList<const QwtPlotSpectrogram *> foundSpectrograms;
+
+    const QwtPlotItemList &plotItems = m_plot->itemList();
+
+    for (int itemIndex = plotItems.size()- 1; itemIndex >= 0; itemIndex --) {
+      const QwtPlotItem *item = plotItems[itemIndex];
+
+      if (item->rtti() == QwtPlotItem::Rtti_PlotSpectrogram) {
+        const QwtPlotSpectrogram *spectrogram =
+            dynamic_cast<const QwtPlotSpectrogram *>(item);
+
+        if (spectrogram)
+          foundSpectrograms.append(spectrogram);
+      }
+    }
+
+    return foundSpectrograms;
   }
 
 
@@ -204,32 +340,50 @@ namespace Isis {
    *
    * @param pc
    */
-  void PlotWindow::add(PlotCurve *pc) {
-    p_plotCurves.push_back(pc);
-    pc->attach(p_plot);
-    fillTable();
-    pc->attachSymbols(p_plot);
-    //check to see if the curve is visible.
-    if(pc->isVisible()) {
-      pc->setVisible(true);
+  void PlotWindow::add(CubePlotCurve *pc) {
+    if (!canAdd(pc)) {
+      QMessageBox::warning(NULL, "Failed to add plot curve",
+          "Can not add plot curves with x/y units that do not match the plot's "
+          "x/y units");
     }
     else {
-      pc->setVisible(false);
+      QString curveTitle = pc->title().text();
+
+      bool titleAccepted = false;
+      int titleTryCount = 0;
+      while (!titleAccepted) {
+        if (titleTryCount > 0) {
+          curveTitle = pc->title().text() + " (" +
+              QString::number(titleTryCount + 1) + ")";
+        }
+
+        titleTryCount++;
+        titleAccepted = true;
+
+        const QwtPlotItemList &plotItems = m_plot->itemList();
+
+        for (int itemIndex = 0; itemIndex < plotItems.size(); itemIndex ++) {
+          QwtPlotItem *item = plotItems[itemIndex];
+
+          if (item->title().text() == curveTitle)
+            titleAccepted = false;
+        }
+      }
+
+      pc->setTitle(curveTitle);
+      pc->attach(m_plot);
+      pc->attachMarkers();
+      fillTable();
+
+      updateVisibility(pc);
+
+      connect(pc, SIGNAL(needsRepaint()),
+              this, SIGNAL(plotChanged()));
+      connect(pc, SIGNAL(destroyed(QObject *)),
+              this, SLOT(resetScale()));
+
+      replot();
     }
-    //check to see if the symbols are visible.
-    if(pc->isSymbolVisible()) {
-      pc->setSymbolVisible(true);
-    }
-    else {
-      pc->setSymbolVisible(false);
-    }
-    p_plot->replot();
-    /*The zoomer base needs to reset after the replot in order for the y-axis
-    scale to adjust after a zoom action*/
-    p_zoomer->setZoomBase();
-    /*Installing the event filter is what enables the user to cut and paste
-    curves from one plot window to another*/
-    p_legend->find(pc)->installEventFilter(this);
   }
 
 
@@ -239,22 +393,20 @@ namespace Isis {
   * calls the necessary method to delete the table stuff
   */
   void PlotWindow::clearPlot() {
-
-    for(int i = 0; i < p_plotCurves.size(); i++) {
-      p_plotCurves[i]->detach();
-    }
-    /*Need to clear all the qlists associated with the plot items.*/
-    p_plotCurves.clear();
-    p_plot->replot();
+    clearPlotCurves();
 
     /*Table Stuff if table is open*/
-    if(p_tableWindow != NULL && p_tableWindow->isVisible()) {
-      p_tableWindow->table()->setColumnCount(1);
-      p_tableWindow->table()->setRowCount(0);
-      deleteFromTable();
+    if (m_tableWindow != NULL && m_tableWindow->isVisible()) {
+      m_tableWindow->table()->setColumnCount(1);
+      m_tableWindow->table()->setRowCount(0);
+//       deleteFromTable();
     }
+  }
 
-    emit plotChanged();
+
+  void PlotWindow::createBestFitLine() {
+    PlotWindowBestFitDialog *dialog = new PlotWindowBestFitDialog(this, plot());
+    dialog->show();
   }
 
 
@@ -266,21 +418,19 @@ namespace Isis {
   *
   * @param keepScale
   */
-  void PlotWindow::clearPlotCurves(bool keepScale) {
+  void PlotWindow::clearPlotCurves() {
+    const QwtPlotItemList &plotItems = m_plot->itemList();
 
-    //clearPlot();
-    for(int i = 0; i < p_plotCurves.size(); i++) {
-      p_plotCurves[i]->detach();
+    for (int itemIndex = plotItems.size()- 1; itemIndex >= 0; itemIndex --) {
+      QwtPlotItem *item = plotItems[itemIndex];
+
+      if (item->rtti() == QwtPlotItem::Rtti_PlotCurve ||
+          item->rtti() == QwtPlotItem::Rtti_PlotHistogram) {
+        delete item;
+      }
     }
 
-    /*Need to clear all the qlists associated with the plot items.*/
-    p_plotCurves.clear();
-    p_plot->replot();
-
-    if(!keepScale) {
-      setScale(QwtPlot::xBottom, 0, 10);
-      setScale(QwtPlot::yLeft, 0, 10);
-    }
+    replot();
   }
 
 
@@ -289,11 +439,11 @@ namespace Isis {
    *
    */
   void PlotWindow::trackerEnabled() {
-    if(p_zoomer->trackerMode() == QwtPicker::ActiveOnly) {
-      p_zoomer->setTrackerMode(QwtPicker::AlwaysOn);
+    if (m_zoomer->trackerMode() == QwtPicker::ActiveOnly) {
+      m_zoomer->setTrackerMode(QwtPicker::AlwaysOn);
     }
     else {
-      p_zoomer->setTrackerMode(QwtPicker::ActiveOnly);
+      m_zoomer->setTrackerMode(QwtPicker::ActiveOnly);
     }
   }
 
@@ -306,15 +456,15 @@ namespace Isis {
     QPixmap pixmap;
     /* Initialize a printer*/
     static QPrinter *printer = NULL;
-    if(printer == NULL) printer = new QPrinter;
+    if (printer == NULL) printer = new QPrinter;
     printer->setPageSize(QPrinter::Letter);
     printer->setColorMode(QPrinter::Color);
 
     QPrintDialog printDialog(printer, (QWidget *)parent());
 
-    if(printDialog.exec() == QDialog::Accepted) {
+    if (printDialog.exec() == QDialog::Accepted) {
       /* Get display widget as a pixmap and convert to an image*/
-      pixmap = QPixmap::grabWidget(p_plot);
+      pixmap = QPixmap::grabWidget(m_plot);
       QImage img = pixmap.toImage();
       /* C++ Gui Programming with Qt, page 201*/
       QPainter painter(printer);
@@ -337,23 +487,23 @@ namespace Isis {
   void PlotWindow::savePlot() {
     QPixmap pixmap;
     QString output =
-      QFileDialog::getSaveFileName((QWidget *)parent(),
-                                   "Choose output file",
-                                   "./",
-                                   QString("Images (*.png *.jpg *.tif)"));
-    if(output.isEmpty()) return;
+    QFileDialog::getSaveFileName((QWidget *)parent(),
+                                 "Choose output file",
+                                 "./",
+                                 QString("Images (*.png *.jpg *.tif)"));
+    if (output.isEmpty()) return;
     //Make sure the filename is valid
-    if(!output.isEmpty()) {
-      if(!output.endsWith(".png") && !output.endsWith(".jpg") && !output.endsWith(".tif")) {
+    if (!output.isEmpty()) {
+      if (!output.endsWith(".png") && !output.endsWith(".jpg") && !output.endsWith(".tif")) {
         output = output + ".png";
       }
     }
 
     QString format = QFileInfo(output).suffix();
-    pixmap = QPixmap::grabWidget(p_plot);
+    pixmap = QPixmap::grabWidget(m_plot);
 
     std::string formatString = format.toStdString();
-    if(!pixmap.save(output, formatString.c_str())) {
+    if (!pixmap.save(output, formatString.c_str())) {
       QMessageBox::information((QWidget *)parent(), "Error", "Unable to save " + output);
       return;
     }
@@ -367,21 +517,21 @@ namespace Isis {
   void PlotWindow::switchBackground() {
     QPen *pen = new QPen(Qt::white);
 
-    if(p_plot->canvasBackground() == Qt::white) {
-      p_plot->setCanvasBackground(Qt::black);
-      p_grid->setMajPen(QPen(Qt::white, 1, Qt::DotLine));
+    if (m_plot->canvasBackground() == Qt::white) {
+      m_plot->setCanvasBackground(Qt::black);
+      m_grid->setMajPen(QPen(Qt::white, 1, Qt::DotLine));
     }
     else {
-      p_plot->setCanvasBackground(Qt::white);
+      m_plot->setCanvasBackground(Qt::white);
       pen->setColor(Qt::black);
-      p_grid->setMajPen(QPen(Qt::black, 1, Qt::DotLine));
+      m_grid->setMajPen(QPen(Qt::black, 1, Qt::DotLine));
     }
 
-    p_zoomer->setRubberBandPen(*pen);
-    p_zoomer->setTrackerPen(*pen);
+    m_zoomer->setRubberBandPen(*pen);
+    m_zoomer->setTrackerPen(*pen);
     pen->setWidth(2);
     /*Replot with the new background and pen colors*/
-    p_plot->replot();
+    m_plot->replot();
   }
 
 
@@ -390,47 +540,32 @@ namespace Isis {
    *
    */
   void PlotWindow::resetScale() {
-    setScale(QwtPlot::xBottom, p_xMin, p_xMax);
-    setScale(QwtPlot::yLeft, p_yMin, p_yMax);
-  }
+    m_zoomer->zoom(0);
 
+    if (m_autoscaleAxes) {
+      if (m_xAxisUnits != PlotCurve::Band) {
+        m_plot->setAxisAutoScale(QwtPlot::xBottom);
+      }
+      else {
+        QPair<double, double> calculatedXRange = findDataRange(
+            QwtPlot::xBottom);
+        m_plot->setAxisScale(QwtPlot::xBottom, calculatedXRange.first,
+                             calculatedXRange.second);
+      }
 
-  /**
-   * This method sets the scale of the axis on the plot
-   *
-   *
-   * @param axisId
-   * @param minimum
-   * @param maximum
-   */
-  void PlotWindow::setScale(int axisId, double minimum, double maximum, double stepSize) {
-    if(axisId == QwtPlot::xBottom) {
-      p_xMax = maximum;
-      p_xMin = minimum;
+      if (m_yAxisUnits != PlotCurve::Band) {
+        m_plot->setAxisAutoScale(QwtPlot::yLeft);
+      }
+      else {
+        QPair<double, double> calculatedYRange = findDataRange(
+            QwtPlot::yLeft);
+        m_plot->setAxisScale(QwtPlot::yLeft, calculatedYRange.first,
+                             calculatedYRange.second);
+      }
     }
 
-    if(axisId == QwtPlot::yLeft) {
-      p_yMax = maximum;
-      p_yMin = minimum;
-    }
-
-    p_plot->setAxisScale(axisId, minimum, maximum, stepSize);
-
-    p_plot->replot();
-    p_zoomer->setZoomBase();
-    p_scaled = true;
-  }
-
-  /**
-   *
-   *
-   *
-   * @param axisId
-   * @param scaleDiv
-   */
-  void PlotWindow::setScaleDiv(int axisId, QwtScaleDiv scaleDiv) {
-    p_plot->setAxisScaleDiv(axisId, scaleDiv);
-    p_plot->replot();
+    m_zoomer->setZoomBase();
+    m_plot->replot();
   }
 
 
@@ -439,425 +574,43 @@ namespace Isis {
    * user specified numbers.
    */
   void PlotWindow::setUserValues() {
-    p_xMin = p_xMinEdit->text().toDouble();
-    p_xMax = p_xMaxEdit->text().toDouble();
-    p_yMin = p_yMinEdit->text().toDouble();
-    p_yMax = p_yMaxEdit->text().toDouble();
-    setScale(QwtPlot::xBottom, p_xMin, p_xMax);
-    setScale(QwtPlot::yLeft, p_yMin, p_yMax);
-
-    if(p_xLogCheckBox->isChecked()) {
-      p_plot->setAxisScaleEngine(QwtPlot::xBottom, new QwtLog10ScaleEngine);
-      p_xLogScale = true;
+    if (m_xLogCheckBox->isChecked()) {
+      m_plot->setAxisScaleEngine(QwtPlot::xBottom, new QwtLog10ScaleEngine);
     }
     else {
-      p_plot->setAxisScaleEngine(QwtPlot::xBottom, new QwtLinearScaleEngine);
-      p_xLogScale = false;
+      m_plot->setAxisScaleEngine(QwtPlot::xBottom, new QwtLinearScaleEngine);
     }
 
-    if(p_yLogCheckBox->isChecked()) {
-      p_plot->setAxisScaleEngine(QwtPlot::yLeft, new QwtLog10ScaleEngine);
-      p_yLogScale = true;
+    if (m_yLogCheckBox->isChecked()) {
+      m_plot->setAxisScaleEngine(QwtPlot::yLeft, new QwtLog10ScaleEngine);
     }
     else {
-      p_plot->setAxisScaleEngine(QwtPlot::yLeft, new QwtLinearScaleEngine);
-      p_yLogScale = false;
+      m_plot->setAxisScaleEngine(QwtPlot::yLeft, new QwtLinearScaleEngine);
     }
 
-  }
+    m_autoscaleAxes = m_autoScaleCheckBox->isChecked();
 
+    if (!m_autoscaleAxes) {
+      double xMin = m_xMinEdit->text().toDouble();
+      double xMax = m_xMaxEdit->text().toDouble();
+  //  QwtScaleDiv xAxisScale =
+  //      m_plot->axisScaleEngine(QwtPlot::xBottom)->divideScale(xMin, xMax,
+  //                                                             25, 100);
+  //  m_plot->setAxisScaleDiv(QwtPlot::xBottom, xAxisScale);
+      m_plot->setAxisScale(QwtPlot::xBottom, xMin, xMax);
 
-  /**
-   * This method is called when the user activates the curve title
-   * drop down menu.  When a curve is selected, then the rest of
-   * the dialog box needs to be filled in with the information
-   * specific to that curve
-   *
-   *
-   * @param title
-   */
-  void PlotWindow::fillInValues(int title) {
-    p_selected = title;
+      double yMin = m_yMinEdit->text().toDouble();
+      double yMax = m_yMaxEdit->text().toDouble();
+  //  QwtScaleDiv yAxisScale =
+  //      m_plot->axisScaleEngine(QwtPlot::yLeft)->divideScale(yMin, yMax,
+  //                                                             25, 100);
+  //  m_plot->setAxisScaleDiv(QwtPlot::yLeft, yAxisScale);
+      m_plot->setAxisScale(QwtPlot::yLeft, yMin, yMax);
 
-    if(p_selected > p_plotCurves.size() || p_selected < 0) {
-      return;
+      m_zoomer->setZoomBase();
     }
 
-    /*save dragCurve with all the properties before the change.*/
-    p_dragCurve = new PlotCurve();
-    p_dragCurve->copyCurveProperties(p_plotCurves[p_selected]);
-
-    p_titleBox->setCurrentIndex(p_selected);
-    p_titleLineEdit->setText(p_plotCurves[p_selected]->title().text());
-    p_styleBox->setCurrentIndex(p_plotCurves[p_selected]->pen().style() - 1);
-    p_sizeBox->setCurrentIndex(p_plotCurves[p_selected]->pen().width());
-    QPalette *palette = new QPalette();
-    palette->setColor(QPalette::Button, p_plotCurves[p_selected]->pen().color());
-    p_colorButton->setPalette(*palette);
-    p_symbolBox->setCurrentIndex(p_plotCurves[p_selected]->symbolStyle().style());
-
-    if(p_plotCurves[p_selected]->isVisible()) p_hideButton->setText("Hide Curve");
-    if(!p_plotCurves[p_selected]->isVisible()) p_hideButton->setText("Show Curve");
-
-    if(p_plotCurves[p_selected]->p_markerIsVisible) p_symbolsButton->setText("Hide Symbols");
-    if(!p_plotCurves[p_selected]->p_markerIsVisible) p_symbolsButton->setText("Show Symbols");
-
-  }
-
-
-
-  /**
-   * Method called from the configDialog box when the user
-   * changes the line edit box for the curve title
-   *
-   *
-   * @param s
-   */
-  void PlotWindow::changeTitle(QString s) {
-    p_plotCurves[p_selected]->setTitle(p_titleLineEdit->text());
-    p_legend->find(p_plotCurves[p_selected])->updateGeometry();
-    p_plot->updateLayout();
-
-    /*We need to change the title on the table.*/
-    if(p_tableWindow != NULL && p_tableWindow->isVisible())
-      p_tableWindow->table()->horizontalHeaderItem(p_selected)->setText(p_titleLineEdit->text());
-
-    if(p_tableWindow != NULL && p_tableWindow->isVisible())
-      p_tableWindow->listWidget()->item(p_selected)->setText(p_titleLineEdit->text());
-  }
-
-
-  /**
-  *  Each time the user makes a change to the curve (and/or it's
-  *  respective markers) we need to emit a signal for programmers
-  *  who are using this class know when something has been changed
-  *  in the plot window.
-  */
-  void PlotWindow::saveProperties() {
-    emit plotChanged();
-
-  }
-
-
-  /**
-   *  This is called from the constructor.  It creates the dialog
-   * box and all the widgets in it but the dialog box is not show
-   * until the user selects the config Plot action
-   */
-  void PlotWindow::createConfigDialog() {
-    configDialog = new QDialog(p_mainWindow);
-    configDialog->setWindowTitle("Configure Plot Curves");
-    configDialog->setModal(true);
-
-    QWidget *labels = new QWidget(configDialog);
-    QWidget *textBoxes = new QWidget(configDialog);
-    QWidget *buttons = new QWidget(configDialog);
-    QWidget *mainButtons = new QWidget(configDialog);
-    QWidget *main = new QWidget(configDialog);
-
-    QVBoxLayout *layout = new QVBoxLayout();
-    layout->addWidget(main);
-    layout->addWidget(buttons);
-
-    configDialog->setLayout(layout);
-
-    p_titleBox = new QComboBox(configDialog);
-    p_titleBox->setDuplicatesEnabled(true);
-    connect(p_titleBox, SIGNAL(activated(int)), this, SLOT(fillInValues(int)));
-
-    QVBoxLayout *labelLayout = new QVBoxLayout();
-    QLabel *selectLabel = new QLabel("Select Curve: ");
-    QLabel *titleLabel = new QLabel("Title: ");
-    QLabel *colorLabel = new QLabel("Color: ");
-    QLabel *styleLabel = new QLabel("Style:");
-    QLabel *sizeLabel = new QLabel("Size:");
-    QLabel *symbolLabel = new QLabel("Symbol:");
-    labelLayout->addWidget(selectLabel);
-    labelLayout->addWidget(titleLabel);
-    labelLayout->addWidget(colorLabel);
-    labelLayout->addWidget(styleLabel);
-    labelLayout->addWidget(sizeLabel);
-    labelLayout->addWidget(symbolLabel);
-
-    labels->setLayout(labelLayout);
-
-    QVBoxLayout *textBoxLayout = new QVBoxLayout();
-    p_titleLineEdit = new QLineEdit(configDialog);
-    connect(p_titleLineEdit, SIGNAL(textChanged(QString)), this, SLOT(changeTitle(QString)));
-    p_colorButton = new QPushButton(configDialog);
-    connect(p_colorButton, SIGNAL(clicked()), this, SLOT(colorSelect()));
-    p_colorButton->setFixedWidth(25);
-    p_styleBox = new QComboBox(configDialog);
-    connect(p_styleBox, SIGNAL(activated(int)), this, SLOT(changeCurveStyle(int)));
-    p_styleBox->addItem("SolidLine");
-    p_styleBox->addItem("DashLine");
-    p_styleBox->addItem("DotLine");
-    p_styleBox->addItem("DashDotLine");
-    p_styleBox->addItem("DashDotDot Line");
-    p_symbolBox = new QComboBox(configDialog);
-    connect(p_symbolBox, SIGNAL(activated(int)), this, SLOT(changeMarkerStyle(int)));
-    p_symbolBox->addItem("Ellipse");
-    p_symbolBox->addItem("Rect");
-    p_symbolBox->addItem("Diamond");
-    p_symbolBox->addItem("Triangle");
-    p_symbolBox->addItem("DTriangle");
-    p_symbolBox->addItem("UTriangle");
-    p_symbolBox->addItem("LTriangle");
-    p_symbolBox->addItem("RTriangle");
-    p_symbolBox->addItem("Cross");
-    p_symbolBox->addItem("XCross");
-    p_symbolBox->addItem("HLine");
-    p_symbolBox->addItem("VLine");
-    p_symbolBox->addItem("Star1");
-    p_symbolBox->addItem("Star2");
-    p_symbolBox->addItem("Hexagon");
-    p_sizeBox = new QComboBox(configDialog);
-    connect(p_sizeBox, SIGNAL(activated(int)), this, SLOT(changeCurveSize(int)));
-    p_sizeBox->addItem("1");
-    p_sizeBox->addItem("2");
-    p_sizeBox->addItem("3");
-    p_sizeBox->addItem("4");
-
-    textBoxLayout->addWidget(p_titleBox);
-    textBoxLayout->addWidget(p_titleLineEdit);
-    textBoxLayout->addWidget(p_colorButton);
-    textBoxLayout->addWidget(p_styleBox);
-    textBoxLayout->addWidget(p_sizeBox);
-    textBoxLayout->addWidget(p_symbolBox);
-
-    textBoxes->setLayout(textBoxLayout);
-
-    QVBoxLayout *mainButtonsLayout = new QVBoxLayout();
-    p_deleteButton = new QPushButton(configDialog);
-    p_deleteButton->setText("Delete Curve");
-    connect(p_deleteButton, SIGNAL(clicked()), this, SLOT(deleteCurve()));
-    mainButtonsLayout->addWidget(p_deleteButton);
-    if(!p_deletable) p_deleteButton->setVisible(false);
-
-    p_hideButton = new QPushButton(configDialog);
-    p_hideButton->setText("Show Curve");
-    connect(p_hideButton, SIGNAL(clicked()), this, SLOT(showCurve()));
-    mainButtonsLayout->addWidget(p_hideButton);
-
-    p_symbolsButton = new QPushButton(configDialog);
-    p_symbolsButton->setText("Hide Symbols");
-    connect(p_symbolsButton, SIGNAL(clicked()), this, SLOT(showSymbols()));
-    mainButtonsLayout->addWidget(p_symbolsButton);
-
-    mainButtons->setLayout(mainButtonsLayout);
-
-    QHBoxLayout *mainLayout = new QHBoxLayout();
-    mainLayout->addWidget(labels);
-    mainLayout->addWidget(textBoxes);
-    mainLayout->addWidget(mainButtons);
-
-    main->setLayout(mainLayout);
-
-    QHBoxLayout *buttonsLayout = new QHBoxLayout();
-    QPushButton *okButton = new QPushButton(configDialog);
-    connect(okButton, SIGNAL(clicked()), this, SLOT(saveProperties()));
-    connect(okButton, SIGNAL(clicked()), configDialog, SLOT(hide()));
-    okButton->setText("OK");
-    QPushButton *cancelButton = new QPushButton(configDialog);
-    connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancelConfig()));
-    cancelButton->setText("Cancel");
-
-    buttonsLayout->addWidget(okButton);
-    buttonsLayout->addWidget(cancelButton);
-
-    buttons->setLayout(buttonsLayout);
-
-  }
-
-
-  /**
-  *  This method is called when the user selects the config plot
-  *  action on the tool bar or the option menu
-  */
-  void PlotWindow::configPlot() {
-
-    if(p_plotCurves.size() < 1) return;
-
-    p_curveTitleList.clear();
-    p_titleBox->clear();
-
-    /*add all the current curves to the drop down menu*/
-    for(int i = 0; i < p_plotCurves.size(); i++) {
-      p_curveTitleList.push_back(p_plotCurves[i]->title().text());
-    }
-
-    p_titleBox->addItems(p_curveTitleList);
-
-    /*fill in the dialog box's values according to which curve is selected.*/
-    if(p_selected >=  0) {
-      fillInValues(p_selected);
-    }
-    else {
-      fillInValues(0);
-    }
-
-    /*check to see if this plotWindow allows the user to delete curves.*/
-    if(!p_deletable) {
-      p_deleteButton->setVisible(false);
-    }
-    else {
-      p_deleteButton->setVisible(true);
-    }
-
-    /*now show the dialog box.*/
-    configDialog->show();
-  }
-
-
-
-  /**
-   * This method allows the programmer to set a property of the
-   * plot window which determines if a window will allow the
-   * pasting of curves.  If paste is false, the paste option on
-   * the context menu is disabled.
-   *
-   *
-   * @param paste
-   */
-  void PlotWindow::setPasteable(bool paste) {
-    p_pasteable = paste;
-  }
-
-
-  /**
-   * This method allows a programmer to set a property of the plot
-   *  window which determines whether the user is allowed to delete
-   *  a curve from the plotWindow or not. If set to false, the
-   *  delete button is not visible on the configDialog box
-   *  and the delete option on the context menu is disabled.
-   *
-   *
-   * @param d
-   */
-  void PlotWindow::setDeletable(bool d) {
-    p_deletable = d;
-  }
-
-
-  /**
-   * This method allows the programmer to set the property which
-   * allows the user to copy a curve from the window.  If c is
-   * false, the copy option on the context menu is disabled.
-   *
-   * @param c
-   */
-  void PlotWindow::setCopyEnable(bool c) {
-    p_copyable = c;
-  }
-
-
-  /**
-   * This method allows the programmer set the property to destroy
-   * the window upon a close event.  When this is set to true, the
-   * class will emit a destroyed(this) signal.  See the
-   * eventFilter method. p_destroyOnClose is set to false by
-   *
-   * default.
-   * @param destroy
-   */
-  void PlotWindow::setDestroyOnClose(bool destroy) {
-    p_destroyOnClose = destroy;
-  }
-
-
-  /**
-  *  When the user deletes a curve, there is a table column and a
-  *  QList of markers associated with the that curve that also need
-  * to be deleted.
-  */
-  void PlotWindow::deleteCurve() {
-    p_plotCurves[p_selected]->detach();
-    delete p_plotCurves[p_selected];
-    p_curveTitleList.removeAt(p_selected);
-    p_plotCurves.removeAt(p_selected);
-
-
-    /*Replot with the p_selected curve deleted.*/
-    p_plot->replot();
-
-    /*deletes the column from the table if the table has been created.*/
-    if(p_tableWindow != NULL) deleteFromTable();
-    configDialog->hide();
-  }
-
-
-  /**
-  * This method is called when user presses the p_colorButton on
-  * the config plot dialog the color of the button itself is then
-  * set to the selected color for visual feedback
-  */
-  void PlotWindow::colorSelect() {
-    QColor c = QColorDialog::getColor(Qt::white, configDialog);
-
-    if(c.isValid()) {
-      QPalette *palette = new QPalette();
-      palette->setColor(QPalette::Button, c);
-      p_colorButton->setPalette(*palette);
-      QPen *pen = new QPen(c);
-      pen->setWidth(p_plotCurves[p_selected]->pen().width());
-      pen->setStyle(p_plotCurves[p_selected]->pen().style());
-      p_plotCurves[p_selected]->setPen(*pen);
-
-      /*Replot with new color.*/
-      p_plot->replot();
-    }
-
-  }
-
-
-  /**
-   * Called from the "Size:" drop down menu on the configDialog
-   * box. Changes the width of the line
-   *
-   *
-   * @param size
-   */
-  void PlotWindow::changeCurveSize(int size) {
-    QPen *pen = new QPen(p_colorButton->palette().color(QPalette::Button));
-    pen->setWidth(size);
-    pen->setStyle(p_plotCurves[p_selected]->pen().style());
-    p_plotCurves[p_selected]->setPen(*pen);
-    /*Replot with the new size.*/
-    p_plot->replot();
-
-  }
-
-
-  /**
-   * Called from the "Style:" drop down menu on the
-   * configDialog box.
-   *
-   *
-   * @param style
-   */
-  void PlotWindow::changeCurveStyle(int style) {
-    QPen *pen = new QPen(p_colorButton->palette().color(QPalette::Button));
-    pen->setWidth(p_plotCurves[p_selected]->pen().width());
-    pen->setStyle(Qt::PenStyle(style + 1));
-    p_plotCurves[p_selected]->setPen(*pen);
-    /*Replot with the new style*/
-    p_plot->replot();
-  }
-
-
-  /**
-   * Called from the "Symbol:" drop down menu on the
-   * configDialog box
-   *
-   *
-   * @param style
-   */
-  void PlotWindow::changeMarkerStyle(int style) {
-    p_plotCurves[p_selected]->setSymbolStyle(QwtSymbol::Style(style));
-
-    /*Replot with the new marker style.*/
-    p_plot->replot();
-
+    replot();
   }
 
 
@@ -866,79 +619,106 @@ namespace Isis {
    *
    */
   void PlotWindow::setDefaultRange() {
-    QDialog *dialog = new QDialog(p_mainWindow);
+    QDialog *dialog = new QDialog(this);
     dialog->setWindowTitle("Set Display Range");
 
-    QWidget *buttons = new QWidget(dialog);
-    QWidget *textAreas = new QWidget(dialog);
-    QWidget *labels = new QWidget(dialog);
-    QWidget *main = new QWidget(dialog);
+    QGridLayout *dialogLayout = new QGridLayout;
 
-    QVBoxLayout *layout = new QVBoxLayout();
-    layout->addWidget(main, 0);
-    layout->addWidget(buttons, 0);
-    dialog->setLayout(layout);
+    int row = 0;
 
-    QToolButton *okButton = new QToolButton(dialog);
-    connect(okButton, SIGNAL(released()), this, SLOT(setUserValues()));
-    connect(okButton, SIGNAL(released()), dialog, SLOT(hide()));
-    okButton->setShortcut(Qt::Key_Enter);
-    okButton->setText("Ok");
+    QLabel *autoLabel = new QLabel("Auto-Scale: ");
+    dialogLayout->addWidget(autoLabel, row, 0);
 
-    QToolButton *cancelButton = new QToolButton(dialog);
-    connect(cancelButton, SIGNAL(released()), dialog, SLOT(hide()));
-    cancelButton->setText("Cancel");
+    m_autoScaleCheckBox = new QCheckBox("Scale X/Y Axes Automatically");
+    m_autoScaleCheckBox->setChecked(m_autoscaleAxes);
+    connect(m_autoScaleCheckBox, SIGNAL(stateChanged(int)),
+            this, SLOT(autoScaleCheckboxToggled()));
+    dialogLayout->addWidget(m_autoScaleCheckBox, row, 1);
+    row++;
 
-    QLabel *xLabel = new QLabel("X-Axis: ");
+    QLabel *xLabel = new QLabel("<h3>X-Axis</h3>");
+    dialogLayout->addWidget(xLabel, row, 0, 1, 2);
+    row++;
+
     QLabel *xMinLabel = new QLabel("Minimum: ");
+    dialogLayout->addWidget(xMinLabel, row, 0);
+
+    double xMin = plot()->axisScaleDiv(QwtPlot::xBottom)->lowerBound();
+    m_xMinEdit = new QLineEdit(QString::number(xMin));
+    dialogLayout->addWidget(m_xMinEdit, row, 1);
+    row++;
+
     QLabel *xMaxLabel = new QLabel("Maximum: ");
-    QLabel *yLabel = new QLabel("Y-Axis: ");
+    dialogLayout->addWidget(xMaxLabel, row, 0);
+
+    double xMax = plot()->axisScaleDiv(QwtPlot::xBottom)->upperBound();
+    m_xMaxEdit = new QLineEdit(QString::number(xMax));
+    dialogLayout->addWidget(m_xMaxEdit, row, 1);
+    row++;
+
+    QLabel *xLogLabel = new QLabel("Logarithmic Scale");
+    dialogLayout->addWidget(xLogLabel, row, 0);
+
+    m_xLogCheckBox = new QCheckBox;
+    m_xLogCheckBox->setChecked(
+        m_plot->axisScaleEngine(QwtPlot::xBottom)->transformation()->type() ==
+        QwtScaleTransformation::Log10);
+    dialogLayout->addWidget(m_xLogCheckBox, row, 1);
+    row++;
+
+    QLabel *yLabel = new QLabel("<h3>Y-Axis</h3>");
+    dialogLayout->addWidget(yLabel, row, 0, 1, 2);
+    row++;
+
     QLabel *yMinLabel = new QLabel("Minimum: ");
+    dialogLayout->addWidget(yMinLabel, row, 0);
+
+    double yMin = plot()->axisScaleDiv(QwtPlot::yLeft)->lowerBound();
+    m_yMinEdit = new QLineEdit(QString::number(yMin));
+    dialogLayout->addWidget(m_yMinEdit, row, 1);
+    row++;
+
     QLabel *yMaxLabel = new QLabel("Maximum: ");
+    dialogLayout->addWidget(yMaxLabel, row, 0);
 
-    p_xLogCheckBox = new QCheckBox("x - Log Scale");
-    p_xLogCheckBox->setChecked(p_xLogScale);
-    p_yLogCheckBox = new QCheckBox("y - Log Scale");
-    p_yLogCheckBox->setChecked(p_yLogScale);
+    double yMax = plot()->axisScaleDiv(QwtPlot::yLeft)->upperBound();
+    m_yMaxEdit = new QLineEdit(QString::number(yMax));
+    dialogLayout->addWidget(m_yMaxEdit, row, 1);
+    row++;
 
-    QVBoxLayout *vlayout = new QVBoxLayout();
-    vlayout->addWidget(xLabel);
-    vlayout->addWidget(xMinLabel);
-    vlayout->addWidget(xMaxLabel);
-    vlayout->addWidget(p_xLogCheckBox);
-    vlayout->addWidget(yLabel);
-    vlayout->addWidget(yMinLabel);
-    vlayout->addWidget(yMaxLabel);
-    vlayout->addWidget(p_yLogCheckBox);
-    labels->setLayout(vlayout);
+    QLabel *yLogLabel = new QLabel("Logarithmic Scale");
+    dialogLayout->addWidget(yLogLabel, row, 0);
 
-    p_xMinEdit = new QLineEdit(QString::number(p_xMin), dialog);
-    p_xMaxEdit = new QLineEdit(QString::number(p_xMax), dialog);
-    p_yMinEdit = new QLineEdit(QString::number(p_yMin), dialog);
-    p_yMaxEdit = new QLineEdit(QString::number(p_yMax), dialog);
+    m_yLogCheckBox = new QCheckBox;
+    m_yLogCheckBox->setChecked(
+        m_plot->axisScaleEngine(QwtPlot::yLeft)->transformation()->type() ==
+        QwtScaleTransformation::Log10);
+    dialogLayout->addWidget(m_yLogCheckBox, row, 1);
+    row++;
 
-    QVBoxLayout *v2layout = new QVBoxLayout();
-    v2layout->addWidget(new QLabel(""));
-    v2layout->addWidget(p_xMinEdit);
-    v2layout->addWidget(p_xMaxEdit);
-    v2layout->addWidget(new QLabel(""));
-    v2layout->addWidget(new QLabel(""));
-    v2layout->addWidget(p_yMinEdit);
-    v2layout->addWidget(p_yMaxEdit);
-    v2layout->addWidget(new QLabel(""));
-    textAreas->setLayout(v2layout);
+    QHBoxLayout *buttonsLayout = new QHBoxLayout;
+    buttonsLayout->addStretch();
 
+    QPushButton *okButton = new QPushButton("&Ok");
+    okButton->setIcon(QIcon::fromTheme("dialog-ok"));
+    connect(okButton, SIGNAL(clicked()), dialog, SLOT(accept()));
+    connect(dialog, SIGNAL(accepted()), this, SLOT(setUserValues()));
+    okButton->setShortcut(Qt::Key_Enter);
+    buttonsLayout->addWidget(okButton);
 
-    QHBoxLayout *mainLayout = new QHBoxLayout();
-    mainLayout->addWidget(labels);
-    mainLayout->addWidget(textAreas);
-    main->setLayout(mainLayout);
+    QPushButton *cancelButton = new QPushButton("&Cancel");
+    cancelButton->setIcon(QIcon::fromTheme("dialog-cancel"));
+    connect(cancelButton, SIGNAL(clicked()), dialog, SLOT(reject()));
+    buttonsLayout->addWidget(cancelButton);
 
-    QHBoxLayout *hlayout = new QHBoxLayout();
-    hlayout->addWidget(okButton);
-    hlayout->addWidget(cancelButton);
-    buttons->setLayout(hlayout);
+    QWidget *buttonsWrapper = new QWidget;
+    buttonsWrapper->setLayout(buttonsLayout);
+    dialogLayout->addWidget(buttonsWrapper, row, 0, 1, 2);
+    row++;
 
+    autoScaleCheckboxToggled();
+
+    dialog->setLayout(dialogLayout);
     dialog->show();
   }
 
@@ -947,61 +727,55 @@ namespace Isis {
    * This method creates the dialog box which allows the user
    * to relabel the plot window
    */
-  void PlotWindow::reLabel() {
-    QDialog *dialog = new QDialog(p_mainWindow);
+  void PlotWindow::changePlotLabels() {
+    QDialog *dialog = new QDialog(this);
     dialog->setWindowTitle("Name Plot Labels");
 
-    QWidget *buttons = new QWidget(dialog);
-    QWidget *textAreas = new QWidget(dialog);
-    QWidget *labels = new QWidget(dialog);
-    QWidget *main = new QWidget(dialog);
+    QGridLayout *dialogLayout = new QGridLayout;
 
-    QVBoxLayout *layout = new QVBoxLayout();
-    layout->addWidget(main, 0);
-    layout->addWidget(buttons, 0);
-    dialog->setLayout(layout);
-
-    QToolButton *okButton = new QToolButton(dialog);
-    connect(okButton, SIGNAL(released()), this, SLOT(setLabels()));
-    connect(okButton, SIGNAL(released()), dialog, SLOT(hide()));
-    okButton->setShortcut(Qt::Key_Enter);
-    okButton->setText("Ok");
-
-    QToolButton *cancelButton = new QToolButton(dialog);
-    connect(cancelButton, SIGNAL(released()), dialog, SLOT(hide()));
-    cancelButton->setText("Cancel");
-
+    int row = 0;
     QLabel *plotLabel = new QLabel("Plot Title: ");
+    dialogLayout->addWidget(plotLabel, row, 0);
+
+    m_plotTitleText = new QLineEdit(plot()->title().text());
+    dialogLayout->addWidget(m_plotTitleText, row, 1);
+    row++;
+
     QLabel *xAxisLabel = new QLabel("X-Axis Label: ");
+    dialogLayout->addWidget(xAxisLabel, row, 0);
+
+    m_xAxisText = new QLineEdit(m_plot->axisTitle(QwtPlot::xBottom).text());
+    dialogLayout->addWidget(m_xAxisText, row, 1);
+    row++;
+
     QLabel *yAxisLabel = new QLabel("Y-Axis Label: ");
+    dialogLayout->addWidget(yAxisLabel, row, 0);
 
-    QVBoxLayout *vlayout = new QVBoxLayout();
-    vlayout->addWidget(plotLabel);
-    vlayout->addWidget(xAxisLabel);
-    vlayout->addWidget(yAxisLabel);
-    labels->setLayout(vlayout);
+    m_yAxisText = new QLineEdit(m_plot->axisTitle(QwtPlot::yLeft).text());
+    dialogLayout->addWidget(m_yAxisText, row, 1);
+    row++;
 
-    p_plotTitleText = new QLineEdit(p_plot->title().text(), dialog);
-    p_xAxisText = new QLineEdit(p_plot->axisTitle(QwtPlot::xBottom).text(), dialog);
-    p_yAxisText = new QLineEdit(p_plot->axisTitle(QwtPlot::yLeft).text(), dialog);
+    QHBoxLayout *buttonsLayout = new QHBoxLayout;
+    buttonsLayout->addStretch();
 
-    QVBoxLayout *v2layout = new QVBoxLayout();
-    v2layout->addWidget(p_plotTitleText);
-    v2layout->addWidget(p_xAxisText);
-    v2layout->addWidget(p_yAxisText);
-    textAreas->setLayout(v2layout);
+    QPushButton *okButton = new QPushButton("&Ok");
+    okButton->setIcon(QIcon::fromTheme("dialog-ok"));
+    connect(okButton, SIGNAL(clicked()), dialog, SLOT(accept()));
+    connect(dialog, SIGNAL(accepted()), this, SLOT(setLabels()));
+    okButton->setShortcut(Qt::Key_Enter);
+    buttonsLayout->addWidget(okButton);
 
-    QHBoxLayout *mainLayout = new QHBoxLayout();
-    mainLayout->addWidget(labels);
-    mainLayout->addWidget(textAreas);
-    main->setLayout(mainLayout);
+    QPushButton *cancelButton = new QPushButton("&Cancel");
+    cancelButton->setIcon(QIcon::fromTheme("dialog-cancel"));
+    connect(cancelButton, SIGNAL(clicked()), dialog, SLOT(reject()));
+    buttonsLayout->addWidget(cancelButton);
 
-    QHBoxLayout *hlayout = new QHBoxLayout();
-    hlayout->addWidget(okButton);
-    hlayout->addWidget(cancelButton);
-    buttons->setLayout(hlayout);
+    QWidget *buttonsWrapper = new QWidget;
+    buttonsWrapper->setLayout(buttonsLayout);
+    dialogLayout->addWidget(buttonsWrapper, row, 0, 1, 2);
+    row++;
 
-    dialog->setFixedSize(400, 190);
+    dialog->setLayout(dialogLayout);
     dialog->show();
   }
 
@@ -1010,11 +784,11 @@ namespace Isis {
    * Makes the user specified changes to the plot labels.
    */
   void PlotWindow::setLabels() {
-    p_plot->setTitle(p_plotTitleText->text());
-    p_plot->setAxisTitle(QwtPlot::xBottom, p_xAxisText->text());
-    p_plot->setAxisTitle(QwtPlot::yLeft, p_yAxisText->text());
+    m_plot->setTitle(m_plotTitleText->text());
+    m_plot->setAxisTitle(QwtPlot::xBottom, m_xAxisText->text());
+    m_plot->setAxisTitle(QwtPlot::yLeft, m_yAxisText->text());
     /*Replot with new labels.*/
-    p_plot->replot();
+    m_plot->replot();
   }
 
 
@@ -1022,82 +796,43 @@ namespace Isis {
    * This method hides/shows the grid on the plotWindow and
    * changes the text for the action
    */
-  void PlotWindow::showGrid() {
-    p_grid->setVisible(!p_grid->isVisible());
+  void PlotWindow::showHideGrid() {
+    m_grid->setVisible(!m_grid->isVisible());
 
-    if(p_grid->isVisible()) {
-      p_gridShow->setText("Hide Grid");
+    if (m_grid->isVisible()) {
+      m_showHideGrid->setText("Hide Grid");
     }
     else {
-      p_gridShow->setText("Show Grid");
+      m_showHideGrid->setText("Show Grid");
     }
-    p_plot->replot();
-  }
-
-
-  /**
-   * Called from the configDialog box to Hide/Show selected
-   * curve.
-   */
-  void PlotWindow::showCurve() {
-    if(p_selected < 0) return;
-    /*shows/hides item on the plot*/
-    p_plotCurves[p_selected]->setVisible(!p_plotCurves[p_selected]->isVisible());
-    /*Replot with selected curve showing or hidden*/
-    p_plot->replot();
-    /*Change the text on the button according to what this method will do next time it is pressed.*/
-    if(p_plotCurves[p_selected]->isVisible()) p_hideButton->setText("Hide Curve");
-    if(!p_plotCurves[p_selected]->isVisible()) p_hideButton->setText("Show Curve");
-
-  }
-
-
-  /**
-   * This method hides/shows the symbols for the selected
-   * curve.
-   */
-  void PlotWindow::showSymbols() {
-
-    if(p_plotCurves[p_selected]->p_markerIsVisible) {
-      p_symbolsButton->setText("Show Symbols");
-
-      p_plotCurves[p_selected]->setSymbolVisible(false);
-    }
-    else {
-      p_symbolsButton->setText("Hide Symbols");
-      p_plotCurves[p_selected]->setSymbolVisible(true);
-    }
-
-    /*Replot with selected curve's symbols visible*/
-    p_plot->replot();
-
+    m_plot->replot();
   }
 
 
   /**
    *Shows/Hides all the markers(symbols)
    */
-  void PlotWindow::hideAllSymbols() {
-    if(p_hideAllMarkers->text() == "Hide All Symbols") {
+  void PlotWindow::showHideAllMarkers() {
+    void (QwtPlotItem::*method)();
+    if (m_showHideAllMarkers->text() == "Hide All Symbols") {
+      method = &QwtPlotItem::hide;
 
-      for(int i = 0; i < p_plotCurves.size(); i++) {
-        p_plotCurves[i]->setSymbolVisible(false);
-      }
-
-      p_hideAllMarkers->setText("Show All Symbols");
+      m_showHideAllMarkers->setText("Show All Symbols");
 
     }
     else {
+      method = &QwtPlotItem::show;
 
-      for(int i = 0; i < p_plotCurves.size(); i++) {
-        p_plotCurves[i]->setSymbolVisible(true);
-      }
-
-      p_hideAllMarkers->setText("Hide All Symbols");
+      m_showHideAllMarkers->setText("Hide All Symbols");
     }
 
+    for (int i = 0; i < m_plot->itemList().size(); i ++) {
+      QwtPlotItem *plotItem = m_plot->itemList()[i];
+      if (plotItem->rtti() == QwtPlotItem::Rtti_PlotMarker) 
+        (plotItem->*method)();
+    }
     /*Replot with all symbols hidden*/
-    p_plot->replot();
+    m_plot->replot();
   }
 
 
@@ -1105,51 +840,31 @@ namespace Isis {
    * This method shows or hides all of the curves in the
    * plotWindow
    */
-  void PlotWindow::hideAllCurves() {
-    if(p_hideAllCurves->text() == "Hide All Curves") {
+  void PlotWindow::showHideAllCurves() {
+    void (QwtPlotItem::*method)();
+    if (m_showHideAllCurves->text() == "Hide All Curves") {
+      method = &QwtPlotItem::hide;
 
-      for(int i = 0; i < p_plotCurves.size(); i++) {
-        p_plotCurves[i]->hide();
-      }
-
-      p_hideButton->setText("Show Curve");
-      p_hideAllCurves->setText("Show All Curves");
-      p_hideAllCurves->setIcon(QPixmap("/usgs/cpkgs/isis3/data/base/icons/plot_showCurves.png"));
+      m_showHideAllCurves->setText("Show All Curves");
+      m_showHideAllCurves->setIcon(
+          QPixmap("/usgs/cpkgs/isis3/data/base/icons/plot_showCurves.png"));
 
     }
     else {
+      method = &QwtPlotItem::show;
 
-      for(int i = 0; i < p_plotCurves.size(); i++) {
-        p_plotCurves[i]->show();
-      }
-
-      p_hideButton->setText("Hide Curve");
-      p_hideAllCurves->setText("Hide All Curves");
-      p_hideAllCurves->setIcon(QPixmap("/usgs/cpkgs/isis3/data/base/icons/plot_hideCurves.png"));
-
+      m_showHideAllCurves->setText("Hide All Curves");
+      m_showHideAllCurves->setIcon(
+          QPixmap("/usgs/cpkgs/isis3/data/base/icons/plot_hideCurves.png"));
     }
 
+    for (int i = 0; i < m_plot->itemList().size(); i ++) {
+      QwtPlotItem *plotItem = m_plot->itemList()[i];
+      if (plotItem->rtti() == QwtPlotItem::Rtti_PlotCurve) 
+        (plotItem->*method)();
+    }
     /*Replot with all curves hidden*/
-    p_plot->replot();
-  }
-
-
-  /**
-   * This method cancels out any of the changes made on the config
-   * dialog box, and copies in the old curve properties.
-   *
-   */
-  void PlotWindow::cancelConfig() {
-    if(p_dragCurve != NULL) p_plotCurves[p_selected]->copyCurveProperties(p_dragCurve);
-
-    configDialog->hide();
-    p_plot->replot();
-    /*We need to change the title on the table.*/
-    if(p_tableWindow != NULL && p_tableWindow->isVisible())
-      p_tableWindow->table()->horizontalHeaderItem(p_selected)->setText(p_plotCurves[p_selected]->title().text());
-
-    if(p_tableWindow != NULL && p_tableWindow->isVisible())
-      p_tableWindow->listWidget()->item(p_selected)->setText(p_plotCurves[p_selected]->title().text());
+    m_plot->replot();
   }
 
 
@@ -1158,27 +873,27 @@ namespace Isis {
    * plot window.  this is called from the Help-->Basic Help menu.
    */
   void PlotWindow::showHelp() {
-    QDialog *d = new QDialog(p_plot);
+    QDialog *d = new QDialog(m_plot);
     d->setWindowTitle("Basic Help");
 
     QLabel *zoomLabel = new QLabel("<U>Zoom Options:</U>");
     QLabel *zoomIn = new
-    QLabel("  <b>Left click</b> on the mouse, drag, and release to select an area to zoom in on");
+                     QLabel("  <b>Left click</b> on the mouse, drag, and release to select an area to zoom in on");
     QLabel *zoomOut = new
-    QLabel("  <b>Middle click</b> on the mouse to zoom out one level");
+                      QLabel("  <b>Middle click</b> on the mouse to zoom out one level");
     QLabel *zoomReset = new
-    QLabel("  <b>Right click</b> on the mouse and select <I>Reset  Scale</I> to clear the zoom and return to the original plot");
+                        QLabel("  <b>Right click</b> on the mouse and select <I>Reset  Scale</I> to clear the zoom and return to the original plot");
 
     QLabel *curveConfigLabel = new QLabel("<br><U>Curve Configuration:</U>");
     QLabel *configDirections = new
-    QLabel("  <b>To configure the curve properties</b>  Right click on the legend and select <I>Configure</I> from <br>  the menu"
-           " or click on the configure icon in the tool bar.");
+                               QLabel("  <b>To configure the curve properties</b>  Right click on the legend and select <I>Configure</I> from <br>  the menu"
+                                      " or click on the configure icon in the tool bar.");
     QLabel *config = new QLabel();
     config->setPixmap(QPixmap("/usgs/cpkgs/isis3/data/base/icons/plot_configure.png"));
 
     QLabel *tableLabel = new QLabel("<br><U>Table Options:</U>");
     QLabel *tableDirections = new
-    QLabel("  <b>To view the table</b> Click on the File menu and select <I>Show Table</I> or click on the table icon in the <br>   tool bar.");
+                              QLabel("  <b>To view the table</b> Click on the File menu and select <I>Show Table</I> or click on the table icon in the <br>   tool bar.");
     QLabel *table = new QLabel();
     table->setPixmap(QPixmap("/usgs/cpkgs/isis3/data/base/icons/plot_table.png"));
 
@@ -1203,11 +918,273 @@ namespace Isis {
   * The user can add menu items from parent classes, but there are
   * some menu items required (default) for the plotWindow
   */
-  void PlotWindow::setupDefaultMenu() {
+  void PlotWindow::setupDefaultMenu(MenuOptions optionsToProvide) {
     QList<QMenu *> menu;
-    QList<QAction *> actionButtons;
-    getDefaultMenus(menu, actionButtons);
-    setCustomMenu(menu, actionButtons);
+    QList<QAction *> actions;
+
+    QMenu *fileMenu = new QMenu("&File");
+    QMenu *editMenu = new QMenu("&Edit");
+    QMenu *optionsMenu = new QMenu("&Options");
+    QMenu *helpMenu = new QMenu("&Help");
+
+    if ((optionsToProvide & SaveMenuOption) == SaveMenuOption) {
+      QAction *save = new QAction(m_plot);
+      save->setText("&Save Plot As");
+      save->setIcon(QIcon::fromTheme("document-save-as"));
+      QString text =
+          "<b>Function:</b>  Save the plot as a png, jpg, or tif file.";
+      save->setWhatsThis(text);
+      connect(save, SIGNAL(activated()), this, SLOT(savePlot()));
+      fileMenu->addAction(save);
+      actions.push_back(save);
+    }
+
+
+    if ((optionsToProvide & PrintMenuOption) == PrintMenuOption) {
+      QAction *prt = new QAction(m_plot);
+      prt->setText("&Print Plot");
+      prt->setIcon(QIcon::fromTheme("document-print"));
+      QString text =
+          "<b>Function:</b>  Sends the plot image to the printer";
+      prt->setWhatsThis(text);
+      connect(prt, SIGNAL(activated()), this, SLOT(printPlot()));
+      fileMenu->addAction(prt);
+      actions.push_back(prt);
+    }
+
+    if ((optionsToProvide & ShowTableMenuOption) == ShowTableMenuOption) {
+      QAction *table = new QAction(m_plot);
+      table->setText("Show Table");
+      table->setIcon(
+          QPixmap(Filename("$base/icons/plot_table.png").Expanded()));
+      QString text =
+          "<b>Function:</b>  Activates the table which displays the data of the "
+                            "current plot";
+      table->setWhatsThis(text);
+      connect(table, SIGNAL(activated()), this, SLOT(showTable()));
+      fileMenu->addAction(table);
+      actions.push_back(table);
+    }
+
+    QAction *close = new QAction(QIcon::fromTheme("document-close"), "&Close",
+                                 m_plot);
+    connect(close, SIGNAL(activated()), this, SLOT(close()));
+    fileMenu->addAction(close);
+
+    if ((optionsToProvide & TrackMenuOption) == TrackMenuOption) {
+      QAction *track = new QAction(m_plot);
+      track->setText("Show Mouse &Tracking");
+      track->setIcon(
+          QPixmap(Filename("$base/icons/goto.png").Expanded()));
+      track->setCheckable(true);
+      QString text =
+          "<b>Function:</b>  Displays the x,y coordinates as the cursor moves "
+          "around on the plot.";
+      track->setWhatsThis(text);
+      connect(track, SIGNAL(activated()), this, SLOT(trackerEnabled()));
+      optionsMenu->addAction(track);
+    }
+
+    if ((optionsToProvide & BackgroundSwitchMenuOption) ==
+        BackgroundSwitchMenuOption) {
+      QAction *backgrdSwitch = new QAction(m_plot);
+      backgrdSwitch->setText("White/Black &Background");
+      backgrdSwitch->setIcon(
+          QPixmap(Filename("$base/icons/plot_switchBackgrd.png").Expanded()));
+      QString text =
+          "<b>Function:</b>  Switch the background color between black and "
+                            "white.";
+      backgrdSwitch->setWhatsThis(text);
+      connect(backgrdSwitch, SIGNAL(activated()),
+              this, SLOT(switchBackground()));
+      optionsMenu->addAction(backgrdSwitch);
+      actions.push_back(backgrdSwitch);
+    }
+
+    if ((optionsToProvide & ShowHideGridMenuOption) == ShowHideGridMenuOption) {
+      m_showHideGrid = new QAction(m_plot);
+      m_showHideGrid->setText("Show Grid");
+      m_showHideGrid->setIcon(
+          QPixmap(Filename("$base/icons/plot_grid.png").Expanded()));
+      QString text =
+          "<b>Function:</b>  Display grid lines on the plot.";
+      m_showHideGrid->setWhatsThis(text);
+      connect(m_showHideGrid, SIGNAL(activated()), this, SLOT(showHideGrid()));
+      optionsMenu->addAction(m_showHideGrid);
+      actions.push_back(m_showHideGrid);
+    }
+
+    if ((optionsToProvide & RenameLabelsMenuOption) == RenameLabelsMenuOption) {
+      QAction *changeLabels = new QAction(m_plot);
+      changeLabels->setText("Rename Plot &Labels");
+      changeLabels->setIcon(
+          QPixmap(Filename("$base/icons/plot_renameLabels.png").Expanded()));
+      QString text =
+          "<b>Function:</b>  Edit the plot title, x and y axis labels.";
+      changeLabels->setWhatsThis(text);
+      connect(changeLabels, SIGNAL(activated()),
+              this, SLOT(changePlotLabels()));
+      optionsMenu->addAction(changeLabels);
+      actions.push_back(changeLabels);
+    }
+
+    if ((optionsToProvide & SetDisplayRangeMenuOption) ==
+        SetDisplayRangeMenuOption) {
+      QAction *changeScale = new QAction(m_plot);
+      changeScale->setText("Set &Display Range");
+      changeScale->setIcon(
+          QPixmap(Filename("$base/icons/plot_setScale.png").Expanded()));
+      QString text =
+          "<b>Function:</b>  Adjust the scale for the x and y axis on the "
+          "plot.";
+      changeScale->setWhatsThis(text);
+      connect(changeScale, SIGNAL(activated()), this, SLOT(setDefaultRange()));
+      optionsMenu->addAction(changeScale);
+      actions.push_back(changeScale);
+    }
+
+    if ((optionsToProvide & ShowHideCurvesMenuOption) ==
+        ShowHideCurvesMenuOption) {
+      m_showHideAllCurves = new QAction(m_plot);
+      m_showHideAllCurves->setText("Hide All Curves");
+      m_showHideAllCurves->setIcon(
+          QPixmap(Filename("$base/icons/plot_showCurves.png").Expanded()));
+      QString text =
+          "<b>Function:</b>  Displays or hides all the curves currently "
+                            "displayed on the plot.";
+      m_showHideAllCurves->setWhatsThis(text);
+      connect(m_showHideAllCurves, SIGNAL(activated()),
+              this, SLOT(showHideAllCurves()));
+      optionsMenu->addAction(m_showHideAllCurves);
+      actions.push_back(m_showHideAllCurves);
+    }
+
+    if ((optionsToProvide & ShowHideMarkersMenuOption) ==
+        ShowHideMarkersMenuOption) {
+      m_showHideAllMarkers = new QAction(m_plot);
+      m_showHideAllMarkers->setText("Hide All Symbols");
+      m_showHideAllMarkers->setIcon(
+          QPixmap(Filename("$base/icons/plot_markers.png").Expanded()));
+      QString text = "<b>Function:</b>  Displays or hides a symbol for each "
+                     "data point plotted on a plot.";
+      m_showHideAllMarkers->setWhatsThis(text);
+      connect(m_showHideAllMarkers, SIGNAL(activated()),
+              this, SLOT(showHideAllMarkers()));
+      optionsMenu->addAction(m_showHideAllMarkers);
+      actions.push_back(m_showHideAllMarkers);
+    }
+
+    if ((optionsToProvide & ResetScaleMenuOption) == ResetScaleMenuOption) {
+      QAction *resetScaleButton = new QAction(m_plot);
+      resetScaleButton->setText("Reset Scale");
+      resetScaleButton->setIcon(
+          QPixmap(Filename("$base/icons/plot_resetscale.png").Expanded()));
+      QString text =
+          "<b>Function:</b>  Reset the plot's scale.";
+      resetScaleButton->setWhatsThis(text);
+      connect(resetScaleButton, SIGNAL(activated()), this, SLOT(resetScale()));
+      actions.push_back(resetScaleButton);
+    }
+
+    if ((optionsToProvide & ClearPlotMenuOption) == ClearPlotMenuOption) {
+      QAction *clear = new QAction(m_plot);
+      clear->setText("Clear Plot");
+      clear->setIcon(
+          QPixmap(Filename("$base/icons/plot_clear.png").Expanded()));
+      QString text =
+          "<b>Function:</b>  Removes all the curves from the plot.";
+      clear->setWhatsThis(text);
+      connect(clear, SIGNAL(activated()), this, SLOT(clearPlot()));
+      actions.push_back(clear);
+    }
+
+    if ((optionsToProvide & LineFitMenuOption) == LineFitMenuOption) {
+      QAction *lineFit = new QAction(m_plot);
+      lineFit->setText("Create Best Fit Line");
+      lineFit->setIcon(
+          QPixmap(Filename("$base/icons/linefit.png").Expanded()));
+      QString text = "<b>Function:</b>  Calculates a best fit line from an "
+                     "existing curve.";
+      lineFit->setWhatsThis(text);
+      connect(lineFit, SIGNAL(activated()), this, SLOT(createBestFitLine()));
+      optionsMenu->addAction(lineFit);
+      actions.push_back(lineFit);
+    }
+
+    /*setup menus*/
+    m_pasteAct = new QAction(QIcon::fromTheme("edit-paste"),
+                             "&Paste Curve", m_plot);
+    m_pasteAct->setEnabled(false);
+    m_pasteAct->setShortcut(Qt::CTRL | Qt::Key_V);
+    connect(m_pasteAct, SIGNAL(triggered()),
+            this, SLOT(pasteCurve()));
+    editMenu->addAction(m_pasteAct);
+
+    menu.push_back(fileMenu);
+    menu.push_back(editMenu);
+
+    if (optionsMenu->actions().size()) {
+      menu.push_back(optionsMenu);
+    }
+    else {
+      delete optionsMenu;
+      optionsMenu = NULL;
+    }
+
+    if (helpMenu->actions().size()) {
+      menu.push_back(helpMenu);
+    }
+    else {
+      delete helpMenu;
+      helpMenu = NULL;
+    }
+
+    setMenus(menu, actions);
+  }
+
+
+  bool PlotWindow::userCanAddCurve(const QMimeData *curve) {
+    bool userCanAdd = false;
+
+    if (m_allowUserToAddCurves &&
+        curve->hasFormat("application/isis3-plot-curve")) {
+
+      CubePlotCurve * testCurve = new CubePlotCurve(
+          curve->data("application/isis3-plot-curve"));
+
+      userCanAdd = canAdd(testCurve);
+    }
+
+    return userCanAdd;
+  }
+
+
+  /**
+   * This method sets the visibility states in the curve (and it's symbols) to 
+   *   match with this window's current visibility settings. Every means of
+   *   adding a curve to the window needs to call this with the curve that is
+   *   being added, otherwise visibility states will not be consistent.
+   * 
+   * @param curve Curve (with symbols) to set the visibility states on
+   */
+  void PlotWindow::updateVisibility(PlotCurve *curve) {
+    if (m_showHideAllCurves) {
+      if (m_showHideAllCurves->text() == "Hide All Curves") {
+        curve->show();
+      }
+      else {
+        curve->hide();
+      }
+
+      if (m_showHideAllMarkers->text() == "Hide All Symbols") {
+        curve->setMarkerVisible(true);
+      }
+      else {
+        curve->setMarkerVisible(false);
+      }
+    }
+
+    emit plotChanged();
   }
 
 
@@ -1218,201 +1195,33 @@ namespace Isis {
    * @param menu
    * @param actions
    */
-  void PlotWindow::setCustomMenu(QList<QMenu *> &menu, QList<QAction *> &actions) {
-    if(p_toolBar == NULL) {
-      p_toolBar = new QToolBar(p_mainWindow);
-      p_toolBar->setObjectName("PlotWindow");
-      p_toolBar->setAllowedAreas(Qt::LeftToolBarArea | Qt::RightToolBarArea | Qt::TopToolBarArea);
-      p_mainWindow->addToolBar(Qt::TopToolBarArea, p_toolBar);
+  void PlotWindow::setMenus(QList<QMenu *> menu, QList<QAction *> actions) {
+    if (m_toolBar == NULL) {
+      m_toolBar = new QToolBar(this);
+      m_toolBar->setObjectName("PlotWindow");
+      m_toolBar->setAllowedAreas(Qt::LeftToolBarArea | Qt::RightToolBarArea | Qt::TopToolBarArea);
+      addToolBar(Qt::TopToolBarArea, m_toolBar);
     }
     else {
-      p_toolBar->clear();
+      m_toolBar->clear();
     }
 
-    p_menubar = p_mainWindow->menuBar();
-    p_menubar->clear();
+    m_menubar = menuBar();
+    m_menubar->clear();
 
-    for(int i = 0; i < menu.size(); i++) {
-      p_menubar->addMenu(menu[i]);
+    for (int i = 0; i < menu.size(); i++) {
+      m_menubar->addMenu(menu[i]);
     }
 
-    for(int i = 0; i < actions.size(); i++) {
-      p_toolBar->addAction(actions[i]);
+    for (int i = 0; i < actions.size(); i++) {
+      m_toolBar->addAction(actions[i]);
     }
 
   }
 
 
-  /**
-   * Sets up the default menus
-   *
-   *
-   * @param menu
-   * @param actions
-   */
-  void PlotWindow::getDefaultMenus(QList<QMenu *> &menu, QList<QAction *> &actions) {
-    /*setup actions*/
-    p_hideAllMarkers = new QAction(p_plot);
-    p_hideAllMarkers->setText("Hide All Symbols");
-    p_hideAllMarkers->setIcon(QPixmap("/usgs/cpkgs/isis3/data/base/icons/plot_markers.png"));
-    QString text  =
-      "<b>Function:</b>  Displays or hides a symbol for each data point plotted on a plot.";
-    p_hideAllMarkers->setWhatsThis(text);
-    QObject::connect(p_hideAllMarkers, SIGNAL(activated()), this, SLOT(hideAllSymbols()));
-
-    p_hideAllCurves = new QAction(p_plot);
-    p_hideAllCurves->setText("Show All Curves");
-    p_hideAllCurves->setIcon(QPixmap("/usgs/cpkgs/isis3/data/base/icons/plot_showCurves.png"));
-    text  =
-      "<b>Function:</b>  Displays or hides all the curves currently displayed on the plot.";
-    p_hideAllCurves->setWhatsThis(text);
-    QObject::connect(p_hideAllCurves, SIGNAL(activated()), this, SLOT(hideAllCurves()));
-
-    QAction *table = new QAction(p_plot);
-    table->setText("Show Table");
-    table->setIcon(QPixmap("/usgs/cpkgs/isis3/data/base/icons/plot_table.png"));
-    text  =
-      "<b>Function:</b>  Activates the table which displays the data of the \
-      current plot";
-    table->setWhatsThis(text);
-    QObject::connect(table, SIGNAL(activated()), this, SLOT(showTable()));
-
-    QAction *configPlot = new QAction(p_plot);
-    configPlot->setText("Configure Plot Curves");
-    configPlot->setIcon(QPixmap("/usgs/cpkgs/isis3/data/base/icons/plot_configure.png"));
-    text  =
-      "<b>Function:</b>  Brings up a dialog box in which the plot curves can be \
-      uniquely configured.";
-    configPlot->setWhatsThis(text);
-    QObject::connect(configPlot, SIGNAL(activated()), this, SLOT(configPlot()));
-
-    QAction *save = new QAction(p_plot);
-    save->setText("&Save Plot As");
-    save->setIcon(QPixmap("/usgs/cpkgs/isis3/data/base/icons/filesaveas.png"));
-    text  =
-      "<b>Function:</b>  Save the plot as a png, jpg, or tif file.";
-    save->setWhatsThis(text);
-    QObject::connect(save, SIGNAL(activated()), this, SLOT(savePlot()));
-
-    QAction *prt = new QAction(p_plot);
-    prt->setText("&Print Plot");
-    prt->setIcon(QPixmap("/usgs/cpkgs/isis3/data/base/icons/fileprint.png"));
-    text  =
-      "<b>Function:</b>  Sends the plot image to the printer";
-    prt->setWhatsThis(text);
-    QObject::connect(prt, SIGNAL(activated()), this, SLOT(printPlot()));
-
-    QAction *track = new QAction(p_plot);
-    track->setText("Show Mouse &Tracking");
-    track->setIcon(QPixmap("/usgs/cpkgs/isis3/data/base/icons/goto.png"));
-    track->setCheckable(true);
-    text  =
-      "<b>Function:</b>  Displays the x,y coordinates as the cursor moves \
-      around on the plot.";
-    track->setWhatsThis(text);
-    QObject::connect(track, SIGNAL(activated()), this, SLOT(trackerEnabled()));
-
-    QAction *backgrdSwitch = new QAction(p_plot);
-    backgrdSwitch->setText("White/Black &Background");
-    backgrdSwitch->setIcon(QPixmap("/usgs/cpkgs/isis3/data/base/icons/plot_switchBackgrd.png"));
-    text  =
-      "<b>Function:</b>  Switch the background color between black and white.";
-    backgrdSwitch->setWhatsThis(text);
-    QObject::connect(backgrdSwitch, SIGNAL(activated()), this, SLOT(switchBackground()));
-
-    p_gridShow = new QAction(p_plot);
-    p_gridShow->setText("Show Grid");
-    p_gridShow->setIcon(QPixmap("/usgs/cpkgs/isis3/data/base/icons/plot_grid.png"));
-    text  =
-      "<b>Function:</b>  Display grid lines on the plot.";
-    p_gridShow->setWhatsThis(text);
-    QObject::connect(p_gridShow, SIGNAL(activated()), this, SLOT(showGrid()));
-
-    QAction *changeLabels = new QAction(p_plot);
-    changeLabels->setText("Rename Plot &Labels");
-    changeLabels->setIcon(QPixmap("/usgs/cpkgs/isis3/data/base/icons/plot_renameLabels.png"));
-    text  =
-      "<b>Function:</b>  Edit the plot title, x and y axis labels.";
-    changeLabels->setWhatsThis(text);
-    QObject::connect(changeLabels, SIGNAL(activated()), this, SLOT(reLabel()));
-
-    QAction *changeScale = new QAction(p_plot);
-    changeScale->setText("Set &Display Range");
-    changeScale->setIcon(QPixmap("/usgs/cpkgs/isis3/data/base/icons/plot_setScale.png"));
-    text  =
-      "<b>Function:</b>  Adjust the scale for the x and y axis on the plot.";
-    changeScale->setWhatsThis(text);
-    QObject::connect(changeScale, SIGNAL(activated()), this, SLOT(setDefaultRange()));
-
-    QAction *resetScaleButton = new QAction(p_plot);
-    resetScaleButton->setText("Reset Scale");
-    resetScaleButton->setIcon(QPixmap("/usgs/cpkgs/isis3/data/base/icons/plot_resetscale.png"));
-    text  =
-      "<b>Function:</b>  Reset the plot's scale.";
-    resetScaleButton->setWhatsThis(text);
-    QObject::connect(resetScaleButton, SIGNAL(activated()), this, SLOT(resetScale()));
-
-    QAction *clear = new QAction(p_plot);
-    clear->setText("Clear Plot");
-    clear->setIcon(QPixmap("/usgs/cpkgs/isis3/data/base/icons/plot_clear.png"));
-    text  =
-      "<b>Function:</b>  Removes all the curves from the plot.";
-    clear->setWhatsThis(text);
-    connect(clear, SIGNAL(activated()), this, SLOT(clearPlot()));
-
-    QAction *getHelp = new QAction(p_plot);
-    getHelp->setText("Basic Help");
-    QObject::connect(getHelp, SIGNAL(activated()), this, SLOT(showHelp()));
-
-    QAction *close = new QAction(p_plot);
-    close->setText("Close");
-    QObject::connect(close, SIGNAL(activated()), p_mainWindow, SLOT(close()));
-
-    /*setup menus*/
-    QMenu *options = new QMenu("&Options");
-    options->addAction(configPlot);
-    options->addAction(track);
-    options->addAction(backgrdSwitch);
-    options->addAction(p_gridShow);
-    options->addAction(changeLabels);
-    options->addAction(changeScale);
-    options->addAction(p_hideAllCurves);
-    options->addAction(p_hideAllMarkers);
-
-    QMenu *help = new QMenu("&Help");
-    help->addAction(getHelp);
-
-    QMenu *file = new QMenu("&File");
-    file->addAction(save);
-    file->addAction(prt);
-    file->addAction(table);
-    file->addAction(close);
-
-    actions.push_back(save);
-    actions.push_back(prt);
-    actions.push_back(table);
-    actions.push_back(clear);
-    actions.push_back(configPlot);
-    actions.push_back(p_hideAllMarkers);
-    actions.push_back(p_hideAllCurves);
-    actions.push_back(backgrdSwitch);
-    actions.push_back(changeLabels);
-    actions.push_back(changeScale);
-    actions.push_back(p_gridShow);
-    actions.push_back(resetScaleButton);
-
-    menu.push_back(file);
-    menu.push_back(options);
-    menu.push_back(help);
-
-  }
-
-
-  /**
-   * Returns the number of curves in the plotWindow
-   */
-  int PlotWindow::getNumCurves() {
-    return p_plotCurves.size();
+  QwtPlotZoomer *PlotWindow::zoomer() {
+    return m_zoomer;
   }
 
 
@@ -1421,80 +1230,106 @@ namespace Isis {
    * in the plotWindow
    */
   void PlotWindow::fillTable() {
-    if(p_tableWindow == NULL) return;
-    p_tableWindow->listWidget()->clear();
-    p_tableWindow->table()->clear();
-    p_tableWindow->table()->setRowCount(0);
-    p_tableWindow->table()->setColumnCount(0);
+    if (m_tableWindow == NULL) return;
+    m_tableWindow->listWidget()->clear();
+    m_tableWindow->table()->clear();
+    m_tableWindow->table()->setRowCount(0);
+    m_tableWindow->table()->setColumnCount(0);
 
-    /*resize rows if needed*/
-    unsigned int rows = p_tableWindow->table()->rowCount();
+    m_tableWindow->addToTable(true,
+                              m_plot->axisTitle(QwtPlot::xBottom).text(),
+                              m_plot->axisTitle(QwtPlot::xBottom).text());
 
-    if(rows != p_plotCurves[p_plotCurves.size()-1]->data().size()) {
-      int diff = p_plotCurves[p_plotCurves.size()-1]->data().size() - rows;
-      for(int i = 0; i <= abs(diff); i++) {
+    QList<CubePlotCurve *> curves = plotCurves();
+    foreach (CubePlotCurve *curve, curves) {
+      m_tableWindow->addToTable(true,
+                                curve->title().text(),
+                                curve->title().text());
+    }
 
-        if(diff > 0) {
-          p_tableWindow->table()->insertRow(rows + i);
+    // We really need all of the x-values associated with the curves,
+    //   but qwt doesn't seem to want to give this to us. It'll give us the
+    //   axis scale, but that isn't quite what we want (especially when zooming)
+    //   So let's find the list of x-points ourselves.
+    //
+    // This is what I tried and it did NOT work:
+    // QwtScaleDiv *xAxisScaleDiv = m_plot->axisScaleDiv(QwtPlot::xBottom);
+    // QList<double> xAxisPoints = xAxisScaleDiv->ticks(QwtScaleDiv::MajorTick);
+    //
+    // Also, QSet<double> does not work (Qt can't do it as of version 4.6).
+    QList<double> xAxisPoints;
+
+    foreach (CubePlotCurve *curve, curves) {
+      // Loop backwards because our insertion sort will have a much better
+      //   chance of success on it's first try this way.
+      for (int dataIndex = (int)curve->data().size() - 1;
+            dataIndex >= 0;
+            dataIndex--) {
+        double xValue = curve->data().x(dataIndex);
+
+        // It turns out that qBinaryFind(container, value) is NOT the same as
+        //   qBinaryFind(container.begin(), container.end(), value). Use the one
+        //   that works right.
+        QList<double>::const_iterator foundPos =
+            qBinaryFind(xAxisPoints.begin(), xAxisPoints.end(), xValue);
+
+        if (foundPos == xAxisPoints.end()) {
+          bool inserted = false;
+          for (int searchIndex = 0;
+             searchIndex < xAxisPoints.size() && !inserted;
+             searchIndex++) {
+            if (xAxisPoints[searchIndex] > xValue) {
+              inserted = true;
+              xAxisPoints.insert(searchIndex, xValue);
+            }
+          }
+          if (!inserted)
+            xAxisPoints.prepend(xValue);
         }
-        else {
-          p_tableWindow->table()->removeRow(rows - i);
-        }
-
       }
     }
 
-    p_axisTitle = p_plot->axisTitle(QwtPlot::xBottom).text().toStdString();
+    m_tableWindow->table()->setRowCount(xAxisPoints.size());
 
-    //write X axis
-    if(p_tableWindow->table()->columnCount() == 0) {
-      p_tableWindow->addToTable(true, p_plot->axisTitle(QwtPlot::xBottom).text()
-                                , p_plot->axisTitle(QwtPlot::xBottom).text(), 0);
-      p_header = p_tableWindow->table()->horizontalHeaderItem(0)->text().toStdString();
+    for (int row = 0; row < m_tableWindow->table()->rowCount(); row++) {
+      double xAxisValue = xAxisPoints[row];
 
-    }
-    else if(p_header.compare(p_axisTitle)) {
+      QTableWidgetItem *xAxisItem = new QTableWidgetItem(
+          iString(xAxisValue).ToQt());
+      m_tableWindow->table()->setItem(row, 0, xAxisItem);
 
-      p_tableWindow->table()->removeColumn(0);
-      p_tableWindow->listWidget()->takeItem(0);
-      p_tableWindow->addToTable(true, p_plot->axisTitle(QwtPlot::xBottom).text()
-                                , p_plot->axisTitle(QwtPlot::xBottom).text(), 0);
-      p_header = p_tableWindow->table()->horizontalHeaderItem(0)->text().toStdString();
-
-    }
-
-    for(int c = 0; c < p_plotCurves.size(); c++) {
-      //adding columns to the table if more curves had been added to the plotWindow
-      //columns
-      if(c > p_tableWindow->table()->columnCount() - 2) {
-        p_tableWindow->addToTable(true, p_plotCurves[c]->title().text(),
-                                  p_plotCurves[c]->title().text());
+      if (row == m_tableWindow->table()->rowCount() - 1) {
+        m_tableWindow->table()->resizeColumnToContents(0);
       }
-      //rows
-      for(unsigned int r = 0; r < p_plotCurves[c]->data().size(); r++) {
-        //creates a widget item with the data from the curves.
-        QTableWidgetItem *item = new QTableWidgetItem
-        (iString(p_plotCurves[c]->data().y(r)).ToQt());
-        p_tableWindow->table()->setItem(r, c + 1, item);
-        //p_tableWindow->table()->resizeColumnToContents(c-1);
 
-        QTableWidgetItem *xAxisItem = new QTableWidgetItem
-        (iString(p_plotCurves[c]->data().x(r)).ToQt());
-        p_tableWindow->table()->setItem(r, 0, xAxisItem);
-        //p_tableWindow->table()->resizeColumnToContents(0);
-      }//end rows
-    }//end columns
-  }
+      // Now search for the x-axis points in the curves to fill in data
+      for (int col = 1; col < m_tableWindow->table()->columnCount(); col++) {
+        CubePlotCurve *curve = curves[col - 1];
 
+        double y = Null;
 
-  /**
-   * This method is called when the user deletes a curve(s)
-   * from the plot window.
-   */
-  void PlotWindow::deleteFromTable() {
-    if(p_tableWindow == NULL) return;
-    p_tableWindow->TableMainWindow::deleteColumn(p_selected);
-    fillTable();
+        for (int dataIndex = 0;
+             dataIndex < (int)curve->data().size() && y == Null;
+             dataIndex++) {
+          if (curve->data().x(dataIndex) == xAxisValue) {
+            y = curve->data().y(dataIndex);
+          }
+        }
+
+        QTableWidgetItem *item = NULL;
+
+        if (IsSpecial(y))
+          item = new QTableWidgetItem(QString("N/A"));
+        else
+          item = new QTableWidgetItem(iString(y).ToQt());
+
+        m_tableWindow->table()->setItem(row, col, item);
+
+        if (row == m_tableWindow->table()->rowCount() - 1) {
+          m_tableWindow->table()->resizeColumnToContents(col);
+        }
+      }
+    }
   }
 
 
@@ -1504,171 +1339,88 @@ namespace Isis {
   * fill the table
   */
   void PlotWindow::showTable() {
-    if(p_plotCurves.size() < 1) return;
+    if (plotCurves().size()) {
+      if (m_tableWindow == NULL) {
+        //m_tableWindow = new TableMainWindow("Plot Table", this);
+        m_tableWindow = new TableMainWindow("Plot Table", m_parent);
+        m_tableWindow->setTrackListItems(false);
+      }
 
-    if(p_tableWindow == NULL) {
-      //p_tableWindow = new TableMainWindow("Plot Table", this);
-      p_tableWindow = new TableMainWindow("Plot Table", p_parent);
-      p_tableWindow->setTrackListItems(false);
+      fillTable();
+      m_tableWindow->show();
+      m_tableWindow->syncColumns();
     }
-    fillTable();
-    p_tableWindow->show();
-    p_tableWindow->syncColumns();
-  }
-
-
-  /**
-   * This method is called from the context menu which is shown on
-   * the plot legend with a right mouse click.  It creates a new
-   * curve, which is a static curve, then loads all of the
-   * properties of the curve that was clicked into the new curve.
-   * Now the new curve can be pasted into another plot window.
-   */
-  void PlotWindow::copyCurve() {
-    if(p_selected < 0) return;
-    emit curveCopied(p_plotCurves[p_selected]);
-    p_curveCopied = true;
-  }
-
-
-  /**
-   * This method is called from the context menu which is shown on
-   * the plot legend with a right mouse click.  (Only shown when
-   * p_curveCopied is true.) Sets the p_curveCopied flag to false, so we know to
-   * disable the paste option in the context menu.
-   */
-  void PlotWindow::pasteCurve() {
-    emit curvePaste(this);
-    p_curveCopied = false;
-  }
-
-
-  /**
-   * Emits the curvePasteSpecial signal
-   *
-   */
-  void PlotWindow::pasteCurveSpecial() {
-    emit curvePasteSpecial(this);
-    p_curveCopied = false;
-  }
-
-
-  /**
-   * This method creates the context menu which pops up when the
-   * user right clicks on a legend item.
-   */
-  void PlotWindow::createLegendMenu() {
-    p_legendMenu = new QMenu(p_mainWindow);
-    QAction *configure = new QAction(p_plot);
-    configure->setText("Configure");
-    QObject::connect(configure, SIGNAL(activated()), this, SLOT(configPlot()));
-    p_legendMenu->addAction(configure);
-
-    p_copyCurveAction = new QAction(p_plot);
-    p_copyCurveAction->setText("Copy Curve");
-    QObject::connect(p_copyCurveAction, SIGNAL(activated()), this, SLOT(copyCurve()));
-    p_legendMenu->addAction(p_copyCurveAction);
-
-    p_pasteCurve = new QAction(p_plot);
-    p_pasteCurve->setText("Paste Curve");
-    QObject::connect(p_pasteCurve, SIGNAL(activated()), this, SLOT(pasteCurve()));
-    p_legendMenu->addAction(p_pasteCurve);
-
-    p_pasteSpecial = new QAction(p_plot);
-    p_pasteSpecial->setText("Paste Special");
-    QObject::connect(p_pasteSpecial, SIGNAL(activated()), this, SLOT(pasteCurveSpecial()));
-    p_legendMenu->addAction(p_pasteSpecial);
-
-    p_deleteCurve = new QAction(p_plot);
-    p_deleteCurve->setText("Delete Curve");
-    QObject::connect(p_deleteCurve, SIGNAL(activated()), this, SLOT(deleteCurve()));
-    p_legendMenu->addAction(p_deleteCurve);
-
-    QAction *resetScaleAction = new QAction(p_plot);
-    resetScaleAction->setText("Reset Scale");
-    QObject::connect(resetScaleAction, SIGNAL(activated()), this, SLOT(resetScale()));
-    p_legendMenu->addAction(resetScaleAction);
-
-    p_hideShowCurve = new QAction(p_plot);
-    p_hideShowCurve->setText("Hide Curve");
-    QObject::connect(p_hideShowCurve, SIGNAL(activated()), this, SLOT(showCurve()));
-    p_legendMenu->addAction(p_hideShowCurve);
   }
 
 
   /**
    * This method filters the events of the objects it is connected
-   * to.  In this case, the eventFilter has been installed on the
-   * p_mainWindow, p_plot, and p_legend.
+   * to.  In this case, the eventFilter has been installed on the m_plot and 
+   * m_legend. 
    * @param o
    * @param e
    *
    * @return bool
    */
   bool PlotWindow::eventFilter(QObject *o, QEvent *e) {
-    switch(e->type()) {
-      case QEvent::ContextMenu: {
-          p_eventObject = o;
+    bool blockWidgetFromEvent = false;
 
-          for(int i = 0; i < p_plotCurves.size(); i++) {
-
-            if((QwtPlotCurve *) p_legend->find((QWidget *)p_eventObject) == p_plotCurves[i]) {
-              p_selected = i;
-            }
-          }
-
-          QPoint *contextMenuPos = new QPoint(((QContextMenuEvent *)e)->globalPos());
-          p_legendMenu->setGeometry(contextMenuPos->x(), contextMenuPos->y(), 110, 80);
-          p_legendMenu->adjustSize();
-
-          /*disable/enable menu items depending on the state of the window.*/
-          if(!p_curveCopied) {
-            p_pasteCurve->setEnabled(false);
-            p_pasteSpecial->setEnabled(false);
-          }
-          else {
-            p_pasteCurve->setEnabled(true);
-            p_pasteSpecial->setEnabled(true);
-          }
-
-          if(!p_pasteable)p_pasteCurve->setEnabled(false);
-          if(!p_pasteable)p_pasteSpecial->setEnabled(false);
-
-          if(o->inherits("QwtPlot")) {
-            p_copyCurveAction->setEnabled(false);
-            p_hideShowCurve->setEnabled(false);
-          }
-          if(o->inherits("QwtLegendItem")) {
-            p_copyCurveAction->setEnabled(true);
-            p_hideShowCurve->setEnabled(true);
-          }
-
-          if(p_selected > 0 && p_selected < p_plotCurves.size()) {
-            if(p_plotCurves[p_selected]->isVisible()) p_hideShowCurve->setText("Hide Curve");
-            if(!p_plotCurves[p_selected]->isVisible())p_hideShowCurve->setText("Show Curve");
-          }
-
-          if(!p_deletable || o->inherits("QwtPlot") || p_plotCurves.size() < 1) {
-            p_deleteCurve->setEnabled(false);
-          }
-          else {
-            p_deleteCurve->setEnabled(true);
-          }
-          p_legendMenu->show();
-
-          return true;
-        }
-
-      case QEvent::Close: {
+    switch (e->type()) {
+      case QEvent::Close:
+        if (o == this || o == plot())
           writeSettings();
-          if(p_destroyOnClose) {
-            emit destroyed(this);
-          }
+        break;
+
+      case QEvent::MouseButtonPress:
+        if (o == this &&
+            childAt(((QMouseEvent *)e)->pos()) != plot()->canvas()) {
+          mousePressEvent(o, (QMouseEvent *)e);
+          blockWidgetFromEvent = true;
         }
-      default: {
-          return FALSE;
-        }
+        break;
+
+      default:
+        break;
     }
+
+    bool stopHandlingEvent = false;
+    if (!blockWidgetFromEvent && o == this) {
+      stopHandlingEvent = MainWindow::eventFilter(o, e);
+
+      if (e->type() == QEvent::Close && !stopHandlingEvent) {
+        emit closed();
+      }
+      else if (e->type() == QEvent::Hide) {
+        ASSERT(0);
+      }
+    }
+
+    return stopHandlingEvent || blockWidgetFromEvent;
+  }
+
+
+  void PlotWindow::mousePressEvent(QObject *object, QMouseEvent *event) {
+    if (qobject_cast<QWidget *>(object) &&
+        event->button() == Qt::RightButton &&
+        userCanAddCurve(QApplication::clipboard()->mimeData())) {
+      QMenu contextMenu;
+
+      QAction *pasteAct = new QAction(QIcon::fromTheme("edit-paste"), "Paste",
+                                      this);
+      contextMenu.addAction(pasteAct);
+
+      QAction *chosenAct = contextMenu.exec(
+          qobject_cast<QWidget *>(object)->mapToGlobal(event->pos()));
+
+      if (chosenAct == pasteAct) {
+        pasteCurve();
+      }
+    }
+  }
+
+
+  QwtPlot *PlotWindow::plot() {
+    return m_plot;
   }
 
 
@@ -1680,15 +1432,100 @@ namespace Isis {
    */
   void PlotWindow::readSettings() {
     /*Call the base class function to read the size and location*/
-    this->MainWindow::readSettings();
-    std::string appName = p_parent->windowTitle().toStdString();
+    MainWindow::readSettings();
+    QString appName = QCoreApplication::applicationName();
     /*Now read the settings that are specific to this window.*/
-    std::string instanceName = this->windowTitle().toStdString();
-    Filename config("$HOME/.Isis/" + appName + "/" + instanceName + ".config");
+    QString instanceName = windowTitle();
+    Isis::Filename config(
+        iString("$HOME/.Isis/" + appName + "/" + instanceName + ".config"));
 
     QSettings settings(QString::fromStdString(config.Expanded()), QSettings::NativeFormat);
     QByteArray state = settings.value("state", QByteArray("0")).toByteArray();
-    p_mainWindow->restoreState(state);
+    restoreState(state);
+  }
+
+
+  void PlotWindow::disableAxisAutoScale() {
+    m_autoscaleAxes = false;
+  }
+
+
+  void PlotWindow::autoScaleCheckboxToggled() {
+    m_xMinEdit->setEnabled(!m_autoScaleCheckBox->isChecked());
+    m_xMaxEdit->setEnabled(!m_autoScaleCheckBox->isChecked());
+    m_yMinEdit->setEnabled(!m_autoScaleCheckBox->isChecked());
+    m_yMaxEdit->setEnabled(!m_autoScaleCheckBox->isChecked());
+  }
+
+
+  /**
+   * This slot will be called when the system clipboard is changed.
+   */
+  void PlotWindow::onClipboardChanged() {
+    m_pasteAct->setEnabled(
+        userCanAddCurve(QApplication::clipboard()->mimeData()));
+  }
+
+
+  void PlotWindow::pasteCurve() {
+    if (m_allowUserToAddCurves) {
+      QClipboard *globalClipboard = QApplication::clipboard();
+      const QMimeData *globalData = globalClipboard->mimeData();
+
+      if (globalData->hasFormat("application/isis3-plot-curve")) {
+        CubePlotCurve * newCurve = new CubePlotCurve(
+                globalData->data("application/isis3-plot-curve"));
+        // add curve to plot
+        add(newCurve);
+        emit plotChanged();
+      }
+    }
+  }
+
+
+  QPair<double, double> PlotWindow::findDataRange(int axisId) const {
+    QList<const CubePlotCurve *> curves = plotCurves();
+
+    bool foundDataValue = false;
+    QPair<double, double> rangeMinMax;
+
+    foreach(const CubePlotCurve *curve, curves) {
+      for (int dataIndex = 0; dataIndex < curve->dataSize(); dataIndex++) {
+        if (axisId == QwtPlot::xBottom) {
+          if (!foundDataValue) {
+            rangeMinMax.first = curve->x(dataIndex);
+            rangeMinMax.second = curve->x(dataIndex);
+            foundDataValue = true;
+          }
+          else {
+            rangeMinMax.first = qMin(rangeMinMax.first, curve->x(dataIndex));
+            rangeMinMax.second = qMax(rangeMinMax.second, curve->x(dataIndex));
+          }
+        }
+        else if (axisId == QwtPlot::yLeft) {
+          if (!foundDataValue) {
+            rangeMinMax.first = curve->y(dataIndex);
+            rangeMinMax.second = curve->y(dataIndex);
+            foundDataValue = true;
+          }
+          else {
+            rangeMinMax.first = qMin(rangeMinMax.first, curve->y(dataIndex));
+            rangeMinMax.second = qMax(rangeMinMax.second, curve->y(dataIndex));
+          }
+        }
+      }
+    }
+
+    if (!foundDataValue) {
+      rangeMinMax.first = 1;
+      rangeMinMax.second = 10;
+    }
+    else if(rangeMinMax.first == rangeMinMax.second) {
+      rangeMinMax.first -= 0.5;
+      rangeMinMax.second += 0.5;
+    }
+
+    return rangeMinMax;
   }
 
 
@@ -1701,23 +1538,106 @@ namespace Isis {
    */
   void PlotWindow::writeSettings() {
     /*Call the base class function to write the size and location*/
-    this->MainWindow::writeSettings();
-    std::string appName = p_parent->windowTitle().toStdString();
+    MainWindow::writeSettings();
+    std::string appName = QCoreApplication::applicationName().toStdString();
     /*Now write the settings that are specific to this window.*/
-    std::string instanceName = this->windowTitle().toStdString();
-    Filename config("$HOME/.Isis/" + appName + "/" + instanceName + ".config");
+    std::string instanceName = windowTitle().toStdString();
+    Isis::Filename config("$HOME/.Isis/" + appName + "/" + instanceName + ".config");
 
     QSettings settings(QString::fromStdString(config.Expanded()), QSettings::NativeFormat);
-    settings.setValue("state", p_mainWindow->saveState());
+    settings.setValue("state", saveState());
   }
-  
-  
+
+
+  void PlotWindow::paint(MdiCubeViewport *vp, QPainter *painter) {
+    foreach (CubePlotCurve *curve, plotCurves()) {
+      curve->paint(vp, painter);
+    }
+  }
+
+
   /**
    * replot the plot
    */
-   void PlotWindow::replot() {
-     p_plot->replot();
-   }
+  void PlotWindow::replot() {
+    resetScale();
+    emit plotChanged();
+  }
+
+
+
+  QString PlotWindow::defaultWindowTitle() {
+    return "Plot";
+  }
+
+
+  void PlotWindow::dragEnterEvent(QDragEnterEvent *event) {
+    QWidget *source = event->source();
+
+    if (source != m_plot->legend()->contentsWidget() &&
+        userCanAddCurve(event->mimeData())) {
+      event->acceptProposedAction();
+    }
+  }
+
+
+  void PlotWindow::dropEvent(QDropEvent *event) {
+    if (m_allowUserToAddCurves &&
+        event->mimeData()->hasFormat("application/isis3-plot-curve")) {
+      Qt::DropActions possibleActions = event->possibleActions();
+      Qt::DropAction actionToTake = event->proposedAction();
+
+      QFont boldFont;
+      boldFont.setBold(true);
+      QMenu dropActionsMenu;
+
+      QAction *copyAct = new QAction("&Copy Here", this);
+      if (possibleActions.testFlag(Qt::CopyAction)) {
+        dropActionsMenu.addAction(copyAct);
+
+        if (actionToTake == Qt::CopyAction)
+          copyAct->setFont(boldFont);
+      }
+
+      QAction *moveAct = new QAction("&Move Here", this);
+      if (possibleActions.testFlag(Qt::MoveAction)) {
+        dropActionsMenu.addAction(moveAct);
+
+        if (actionToTake == Qt::MoveAction)
+          moveAct->setFont(boldFont);
+      }
+
+      if (dropActionsMenu.actions().size() > 1) {
+        dropActionsMenu.addSeparator();
+
+        QAction *cancelAct = new QAction("&Cancel", this);
+        dropActionsMenu.addAction(cancelAct);
+
+        QAction *chosenAct = dropActionsMenu.exec(mapToGlobal(event->pos()));
+
+        if (chosenAct == copyAct) {
+          actionToTake = Qt::CopyAction;
+        }
+        else if (chosenAct == moveAct) {
+          actionToTake = Qt::MoveAction;
+        }
+        else {
+          actionToTake = Qt::IgnoreAction;
+        }
+      }
+
+      if (actionToTake != Qt::IgnoreAction) {
+        CubePlotCurve * newCurve = new CubePlotCurve(
+                event->mimeData()->data("application/isis3-plot-curve"));
+        // add curve to plot
+        add(newCurve);
+        emit plotChanged();
+
+        event->setDropAction(actionToTake);
+        event->accept();
+      }
+    }
+  }
 
 }
 

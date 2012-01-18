@@ -79,6 +79,31 @@ namespace Isis {
   }
 
   /**
+   * Add an x,y value to the accumulators and counters count times. This method
+   * can be invoked multiple times before obtaining statistics.
+   *
+   * @param x x value to add
+   * @param y y value to add
+   * @param count Number of times to add this x,y value
+   */
+  void MultivariateStatistics::AddData(double x, double y, unsigned int count) {
+    p_totalPixels += count;
+
+    if(IsValidPixel(x) && IsValidPixel(y)) {
+      p_sumxy += x * y * count;
+      p_validPixels += count;
+
+      for (int i = 0; i < count; i++) {
+        p_x.AddData(x);
+        p_y.AddData(y);
+      }
+    }
+    else {
+      p_invalidPixels += count;
+    }
+  }
+
+  /**
    * Remove an array of doubles from the accumulators and counters.
    *
    * @param x Pointer to an array of doubles to remove.

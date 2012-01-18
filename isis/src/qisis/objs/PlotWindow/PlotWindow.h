@@ -24,233 +24,216 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include <QtGui>
-#include <Qt>
-#include "Workspace.h"
-#include "Tool.h"
-#include "PlotCurve.h"
-#include "PlotToolCurve.h"
+// This is needed for the QVariant macro
+#include <QMetaType>
+
+// This is the parent
 #include "MainWindow.h"
-#include "TableMainWindow.h"
-#include <qwt_plot.h>
-#include <qwt_plot_spectrogram.h>
-#include <qwt_plot_zoomer.h>
-#include <qwt_legend.h>
-#include <qwt_legend_item.h>
-#include <qwt_plot_curve.h>
-#include <qwt_plot_grid.h>
-#include <qwt_plot_marker.h>
-#include <qmainwindow.h>
+
+// This is for an enum inside of plot curve
+#include "PlotCurve.h"
+
+class QwtPlot;
+class QwtPlotGrid;
+class QwtPlotSpectrogram;
+class QwtPlotZoomer;
 
 class QDockWidget;
 class QListWidgetItem;
+class QLineEdit;
+class QComboBox;
+
+template <typename A, typename B> class QPair;
 
 namespace Isis {
+  class MdiCubeViewport;
+  class CubePlotCurve;
+  class PvlKeyword;
+  class TableMainWindow;
+
   /**
    * @ingroup Visualization Tools
    *
    * @author ????-??-?? Stacy Alley
    *
    * @internal
-   *  @history 2010-11-08 Eric Hyer - Added replot method
-   *  @history 2011-03-18 Sharmila Prasad - Connect the viewport's close signal
-   *  @history 2011-03-23 Sharmila Prasad - PlotWindow to be ontop even when it
-   *           loses focus. This works for both histogram and plot tools.
-   *  @history 2011-09-21 Steven Lambright - Removed the fixed size from the
+   *   @history 2010-11-08 Eric Hyer - Added replot method
+   *   @history 2011-03-18 Sharmila Prasad - Connect the viewport's close signal
+   *   @history 2011-03-23 Sharmila Prasad - PlotWindow to be ontop even when it
+   *                           loses focus. This works for both histogram and
+   *                           plot tools.
+   *   @history 2011-09-21 Steven Lambright - Removed the fixed size from the
    *                          configure curve dialog. Fixes #203.
    */
   class PlotWindow : public MainWindow {
       Q_OBJECT
 
     public:
-      PlotWindow(QString title, QWidget *parent);
-      void add(PlotCurve *pc);
-      void clearPlotCurves(bool keepScale = true);
-      QwtText getAxisLabel(int axisId);
-      int getNumCurves();
-      QColor getPlotBackground();
-      QwtText getPlotTitle();
+      enum MenuOptions {
+        ShowHideMarkersMenuOption  = 1,
+        ShowHideCurvesMenuOption   = 2,
+        ShowTableMenuOption        = 4,
+        SaveMenuOption             = 8,
+        PrintMenuOption            = 16,
+        TrackMenuOption            = 32,
+        BackgroundSwitchMenuOption = 64,
+        ShowHideGridMenuOption     = 128,
+        RenameLabelsMenuOption     = 256,
+        SetDisplayRangeMenuOption  = 512,
+        ResetScaleMenuOption       = 1024,
+        ClearPlotMenuOption        = 2048,
+        DefaultHelpMenuOption      = 4096,
+        LineFitMenuOption          = 8192,
+        AllMenuOptions = ShowHideMarkersMenuOption | ShowHideCurvesMenuOption |
+                         ShowTableMenuOption | SaveMenuOption |
+                         PrintMenuOption | TrackMenuOption |
+                         BackgroundSwitchMenuOption | ShowHideGridMenuOption |
+                         RenameLabelsMenuOption | SetDisplayRangeMenuOption |
+                         ResetScaleMenuOption | ClearPlotMenuOption |
+                         DefaultHelpMenuOption | LineFitMenuOption
+      };
+
+      PlotWindow(QString title, PlotCurve::Units xAxisUnits,
+                 PlotCurve::Units yAxisUnits, QWidget *parent,
+                 MenuOptions optionsToProvide = AllMenuOptions);
+      ~PlotWindow();
+      virtual void add(CubePlotCurve *pc);
+      virtual void clearPlotCurves();
+
+      bool canAdd(CubePlotCurve *curveToTest) const;
+      QColor plotBackgroundColor() const;
+      QList<CubePlotCurve *> plotCurves();
+      QList<const CubePlotCurve *> plotCurves() const;
+      QList<QwtPlotSpectrogram *> plotSpectrograms();
+      QList<const QwtPlotSpectrogram *> plotSpectrograms() const;
+      QString plotTitle() const;
+      bool userCanAddCurves() const;
+      PlotCurve::Units xAxisUnits() const;
+      PlotCurve::Units yAxisUnits() const;
+
+      virtual void paint(MdiCubeViewport *vp, QPainter *painter);
+      void replot();
       void setAxisLabel(int axisId, QString title);
-      void setAutoScaleAxis(int axisId);
       void setPlotBackground(QColor c);
       void setPlotTitle(QString pt);
-      void setScale(int axisId, double minimum, double maximum, double stepSize = 0);
-      void setScaleDiv(int axisId, QwtScaleDiv scaleDiv);
+      void setUserCanAddCurves(bool);
       void showWindow();
-      void setupDefaultMenu();
-      void setCustomMenu(QList<QMenu *> &menu, QList<QAction *> &actions);
-      void getDefaultMenus(QList<QMenu *> &menu, QList<QAction *> &actions);
-      void replot();
-      void closeAll(void);
-      
-      /**
-       *
-       *
-       *
-       * @return int
-       */
-      int getPlotCurveCount() {
-        return p_plotCurves.size();
-      }
-      /**
-       *  Reuturns the plot curve at the given index.
-       *
-       * @param index
-       *
-       * @return QwtPlotCurve*
-       */
-      QwtPlotCurve *getPlotCurve(int index) {
-        return p_plotCurves[index];
-      }
+      virtual void update(MdiCubeViewport *activeViewport);
 
-      double p_xMin;//!< X minimum
-      double p_xMax;//!< X maximum
-      double p_yMin;//!< Y minimum
-      double p_yMax;//!< Y maximum
-      static bool p_curveCopied;//!< Has a curve been copied?
+      static QString defaultWindowTitle();
 
-    protected:
-      QwtPlot *p_plot;//!< The plot in this window
-      //! Returns the name of the menu.
-      QString menuName() const {
-        return "&Options";
-      };
-      bool eventFilter(QObject *o, QEvent *e);
-      TableMainWindow *p_tableWindow;//!< Table window
-      QList <PlotCurve *> p_plotCurves; //!< List of the plot curves in this window
-      QToolBar *p_toolBar;//!< Tool bar on the plot window
-      std::string p_header;//!< Header name
-      std::string p_axisTitle;//!< Header name and axis title
-      MainWindow  *p_mainWindow;
-
-    protected slots:
-      void cancelConfig();
-      void copyCurve();
-      void pasteCurve();
-      void pasteCurveSpecial();
-      void createWindow();
-      void createConfigDialog();
-      void createLegendMenu();
-      void deleteFromTable();
-      void fillInValues(int title);
-      void saveProperties();
-      void colorSelect();
-      void deleteCurve();
-      void writeSettings();
-      void readSettings();
 
     signals:
-      /**
-       *  Emitted when a curve has been copied.
-       *
-       * @param pc
-       */
-      void curveCopied(PlotCurve *pc);
-      /**
-       *  Emitted when a curve has been requested to be pasted.
-       *
-       * @param pw
-       */
-      void curvePaste(PlotWindow *pw);
-      /**
-       * Emitted when a curve needs to be pasted with a new random
-       * color.
-       *
-       * @param pw
-       */
-      void curvePasteSpecial(PlotWindow *pw);
+      void closed();
       //! Emitted every time there is a change to the plot window.
       void plotChanged();
 
     public slots:
       void clearPlot();
-      void configPlot();
-      void setDeletable(bool d = true);
-      void setPasteable(bool paste = true);
-      void setCopyEnable(bool c = true);
-      void setDestroyOnClose(bool destroy = false);
-      virtual void fillTable();
+      void createBestFitLine();
       void printPlot();
-      void reLabel();
+      void changePlotLabels();
       void savePlot();
       void setDefaultRange();
       void setLabels();
       void setUserValues();
-      void changeTitle(QString s);
-      void changeCurveSize(int size);
-      void changeCurveStyle(int style);
-      void changeMarkerStyle(int style);
-      void hideAllSymbols();
-      void showCurve();
-      void hideAllCurves();
+      void showHideAllMarkers();
+      void showHideAllCurves();
       void resetScale();
-      void showGrid();
+      void showHideGrid();
       void showHelp();
-      void showSymbols();
       void showTable();
       void switchBackground();
       void trackerEnabled();
 
+      void fillTable();
+
+    protected slots:
+      void writeSettings();
+      void readSettings();
+
+    protected:
+      void createWidgets(MenuOptions optionsToProvide);
+      void disableAxisAutoScale();
+      virtual void dragEnterEvent(QDragEnterEvent *event);
+      virtual void dropEvent(QDropEvent *event);
+      void enableZoomer(bool enable);
+      virtual bool eventFilter(QObject *o, QEvent *e);
+      void mousePressEvent(QObject *object, QMouseEvent *e);
+
+      //! Returns the name of the menu.
+      QString menuName() const {
+        return "&Options";
+      };
+      QwtPlot *plot();
+      void setMenus(QList<QMenu *> menus, QList<QAction *> actions);
+      QwtPlotZoomer *zoomer();
+
+    private slots:
+      void autoScaleCheckboxToggled();
+      void onClipboardChanged();
+      void pasteCurve();
+
     private:
-      QWidget       *p_parent;//!< Parent widget
-      QDialog       *configDialog;//!<Dialog box to configure the entire plot window and curves.
-      QPen          *p_pen;//!<Plot window's pen.
-      QwtPlotZoomer *p_zoomer;//!< Plot Zoomer
-      QwtLegend     *p_legend;//!< Plot legend
-      QwtPlotGrid   *p_grid;//!< Plot grid lines
-      QLineEdit     *p_plotTitleText;//!< Plot title line edit for the config dialog.
-      QLineEdit     *p_xAxisText;//!< X-axis line edit for the config dialog.
-      QLineEdit     *p_yAxisText;//!< Y-axis line edit for the config dialog.
-      QLineEdit     *p_xMinEdit;//!< X min. line edit for the config dialog.
-      QLineEdit     *p_xMaxEdit;//!< X max. line edit for the config dialog.
-      QLineEdit     *p_yMinEdit;//!< Y min. line edit for the config dialog.
-      QLineEdit     *p_yMaxEdit;//!< Y max. line edit for the config dialog.
-      QLineEdit     *p_titleLineEdit;//!< Table title edit for the config dialog.
-      QPushButton   *p_colorButton;//!< Color button for the config dialog.
-      QPushButton   *p_hideButton;//!< Hide/show button for the config dialog.
-      QPushButton   *p_symbolsButton;//!< Hide/show symbols button for the config dialog.
-      QPushButton   *p_deleteButton;//!< Delete curve button for the config dialog.
-      QComboBox     *p_styleBox;//!< Line style combo box for the config dialog.
-      QComboBox     *p_sizeBox;//!< Line size combo box for the config dialog.
-      QComboBox     *p_symbolBox;//!< Symbol style combo box for the config dialog.
-      QComboBox     *p_titleBox;//!< Curve selection combo box for the config dialog.
-      QCheckBox     *p_xLogCheckBox;
-      QCheckBox     *p_yLogCheckBox;
+      QPair<double, double> findDataRange(int axisId) const;
+      bool userCanAddCurve(const QMimeData *curve);
+      void updateVisibility(PlotCurve *curve);
+      void setupDefaultMenu(MenuOptions optionsToProvide);
 
-      QMenuBar      *p_menubar;//!< Plot window's menu bar.
+      //! Parent widget
+      QWidget       *m_parent;
+      //! Plot Zoomer
+      QwtPlotZoomer *m_zoomer;
+      //! Plot grid lines
+      QwtPlotGrid   *m_grid;
+      QCheckBox     *m_autoScaleCheckBox;
+      QCheckBox     *m_xLogCheckBox;
+      QCheckBox     *m_yLogCheckBox;
+      QLineEdit     *m_xMinEdit;
+      QLineEdit     *m_xMaxEdit;
+      QLineEdit     *m_yMinEdit;
+      QLineEdit     *m_yMaxEdit;
+      QLineEdit     *m_xAxisText;
+      QLineEdit     *m_yAxisText;
+      QLineEdit     *m_plotTitleText;
 
+      //! Plot window's menu bar.
+      QMenuBar      *m_menubar;
 
-      QAction *p_action;//!< Plot window's action.
-      QAction *p_hideAllCurves;//!< Hide all curves action.
-      QAction *p_hideAllMarkers;//!< Hide all markers action.
-      QAction *p_gridShow;//!< Show plot grid lines action.
-      QAction *p_pasteCurve;//!< Paste curve action.
-      QAction *p_pasteSpecial;//!< Paste spectial action.
-      QAction *p_deleteCurve;//!< Delete curve action.
-      QAction *p_copyCurveAction;//!< Copy curve action.
-      QAction *p_hideShowCurve;//!< Hide/show curve action.
+      /**
+       * This is the paste action in the edit menu to paste a curve into the
+       * plot window.  This is enabled or disabled based on what is in the
+       * clipboard.
+       */
+      QAction       *m_pasteAct;
 
-      QStringList p_curveTitleList;//!< String list of all curves in the window.
+      //! Plot window's action.
+      QPointer<QAction> m_action;
+      //! Hide all curves action.
+      QPointer<QAction> m_showHideAllCurves;
+      //! Hide all markers action.
+      QPointer<QAction> m_showHideAllMarkers;
+      //! Show plot grid lines action.
+      QPointer<QAction> m_showHideGrid;
 
-      int p_selected;//!< The index of the selected curve.
+      PlotCurve::Units m_xAxisUnits;
+      PlotCurve::Units m_yAxisUnits;
 
-      bool p_deletable;//!< Is the curve delete-able?
-      bool p_pasteable;//!< Is the window paste-able?
-      bool p_symbols;//!< Is the window showing the curve markers?
-      bool p_curvePropsSaved;//!< Have the curve properties been saved?
-      bool p_copyable;//!< Is this curve copy-able?
-      bool p_destroyOnClose;//!< Should the curve be destroyed on close?
-      bool p_scaled;//!< Has this window been rescaled?
-      bool p_xLogScale;
-      bool p_yLogScale;
+      //! Is the window showing the curve markers?
+      bool m_allowUserToAddCurves;
+      bool m_autoscaleAxes;
 
-      static PlotCurve *p_dragCurve;//!< The curve to drag to a new window.
-
-      QObject *p_eventObject;//!< The object that just had an event happen.
-      QMenu *p_legendMenu;//!< Context menu for the plot legend.
-
-  };
+      QwtPlot *m_plot;//!< The plot in this window
+      TableMainWindow *m_tableWindow;//!< Table window
+      QToolBar *m_toolBar;//!< Tool bar on the plot window
+   };
 };
+
+Q_DECLARE_METATYPE(Isis::PlotWindow *);
+
+// There isn't a great place to put this currently since it's not a class we
+//   can manage the header for.
+Q_DECLARE_METATYPE(QwtPlotSpectrogram *);
 
 #endif
 

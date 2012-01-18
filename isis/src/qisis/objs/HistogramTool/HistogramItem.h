@@ -17,7 +17,9 @@ namespace Isis {
    *
    * @internal
    */
-  class HistogramItem: public QwtPlotItem {
+  class HistogramItem: public QObject, public QwtPlotItem {
+    Q_OBJECT
+
     public:
       explicit HistogramItem(const QString &title = QString::null);
       explicit HistogramItem(const QwtText &title);
@@ -25,7 +27,6 @@ namespace Isis {
 
       void setData(const QwtIntervalData &data);
       const QwtIntervalData &data() const;
-      void copyCurveProperties(HistogramItem *hi);
       QList <QPointF > getVertices() const;
       void setVertices(const QList <QPoint> &points);
       CubeViewport *getViewPort() const;

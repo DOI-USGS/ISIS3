@@ -1,87 +1,78 @@
 #ifndef ScatterPlotData_h
 #define ScatterPlotData_h
 
-#include <QtGui>
-#include <qwt_plot.h>
-#include <qwt_plot_spectrogram.h>
+#include <qwt_raster_data.h>
 
-#include "Cube.h"
+#include <QScopedPointer>
+#include <QVector>
+
 #include "Stretch.h"
-#include "Histogram.h"
-#include "Brick.h"
-#include "CubeViewport.h"
 
-#include <vector>
+template <typename A, typename B> class QPair;
+template <typename T> class QVector;
+
+class QwtDoubleRange;
 
 namespace Isis {
+  class Cube;
+
 
   /**
    * @author ????-??-?? Unknown
    *
    * @internal
    */
-  class ScatterPlotData: public QwtRasterData {
-
+  class ScatterPlotData : public QwtRasterData {
     public:
-      ScatterPlotData(CubeViewport *cube1, int band1, int numbBins1, CubeViewport *cube2, int band2, int numBins2);
+      ScatterPlotData(Cube *xCube, int xCubeBand, int xBinCount,
+                      Cube *yCube, int yCubeBand, int yBinCount,
+                      QwtDoubleRange sampleRange, QwtDoubleRange lineRange);
+      ScatterPlotData(const ScatterPlotData &other);
+
       ~ScatterPlotData();
       virtual QwtRasterData *copy() const;
       virtual QwtDoubleInterval range() const;
       virtual double value(double x, double y) const;
 
-      int bandOne() const {
-        return p_band1;
-      };
-      int bandTwo() const {
-        return p_band2;
-      };
+      double xCubeMin() const;
+      double xCubeMax() const;
+      double yCubeMin() const;
+      double yCubeMax() const;
 
-      int numberOfBins() const {
-        return p_numBins1;
-      };
+      void swap(ScatterPlotData &other);
 
-      double minOne() const {
-        return p_min1;
-      };
-      double minTwo() const {
-        return p_min2;
-      };
+      QPair<double, double> binXY(int binIndex) const;
+      int binCount(int binIndex) const;
+      int numberOfBins() const;
 
-      double maxOne() const {
-        return p_max1;
-      };
-      double maxTwo() const {
-        return p_max2;
-      };
+      QVector<double> discreteXValues() const;
 
-      Cube *cubeOne() const {
-        return p_cube1;
-      };
-      Cube *cubeTwo() const {
-        return p_cube2;
-      };
+      void alarm(double x, double y) const;
+      void clearAlarms() const;
 
+      ScatterPlotData &operator=(const ScatterPlotData &other);
 
     private:
-      Cube *p_cube1; //!< Cube 1
-      Cube *p_cube2; //!< Cube 2
-      CubeViewport *p_cube1Viewport; //!< CubeViewport 1
-      CubeViewport *p_cube2Viewport; //!< CubeViewport 2
-      Stretch p_str1; //!< Stretch 1
-      Stretch p_str2; //!< Stretch 2
-      std::vector< std::vector<int> > p_counts; //!< 2D Vector of ints.
-      double p_min1; //!< Minimum for cube 1
-      double p_min2; //!< Minimum for cube 2
-      double p_max1; //!< Maximum for cube 1
-      double p_max2; //!< Maximum for cube 2
+      int binCount(int xIndex, int yIndex) const;
+      int binIndex(int xIndex, int yIndex) const;
+      int binIndex(double x, double y) const;
+      QPair<int, int> binXYIndices(int binIndex) const;
+      QPair<int, int> binXYIndices(double x, double y) const;
 
-      int p_band1; //!< Band for cube 1
-      int p_band2; //!< Band for cube 2
-      int p_numBins1; //!< Number of Bins
-      int p_numBins2;
+      QScopedPointer<Stretch> m_xDnToBinStretch; //!< Stretch 1
+      QScopedPointer<Stretch> m_yDnToBinStretch; //!< Stretch 2
 
+      QScopedPointer< QVector< QVector<int> > > m_counts;
+      int m_maxCount;
+
+      // map from bin index to alarm state (true for alarmed)
+      mutable QScopedPointer< QMap<int, bool> > m_alarmedBins;
+
+      double m_xCubeMin;
+      double m_xCubeMax;
+      double m_yCubeMin;
+      double m_yCubeMax;
   };
 };
 
 #endif
-

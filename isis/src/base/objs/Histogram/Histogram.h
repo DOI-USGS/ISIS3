@@ -23,11 +23,12 @@
 #ifndef Histogram_h
 #define Histogram_h
 
-#include "Statistics.h"
-#include "iException.h"
-#include "Constants.h"
-#include "Progress.h"
 #include "Cube.h"
+#include "Constants.h"
+#include "iException.h"
+#include "Progress.h"
+#include "SpecialPixel.h"
+#include "Statistics.h"
 
 namespace Isis {
   /**
@@ -61,11 +62,14 @@ namespace Isis {
    *            binning will start and end. Increased the default number of bins
    *            for floating point cubes.
    */
-  class Histogram : public Isis::Statistics {
+  class Histogram : public Statistics {
     public:
-      Histogram(const double minimum, const double maximum,
-                const int bins = 1024);
-      Histogram(Cube &cube, const int band, Progress *progress = NULL);
+      Histogram(double minimum, double maximum,
+                int bins = 1024);
+      Histogram(Cube &cube, int statsBand, Progress *progress = NULL,
+                double startSample = 1.0, double startLine = 1.0,
+                double endSample = Null, double endLine = Null, int bins = 0,
+                bool addCubeData = false);
 
       ~Histogram();
 
@@ -96,7 +100,10 @@ namespace Isis {
       void SetBinRange(double binStart, double binEnd);
 
     private:
-      void InitializeFromCube(Cube &cube, const int band, Progress *progress);
+      void InitializeFromCube(Cube &cube, int statsBand, Progress *progress,
+          int nbins = 0, double startSample = Null, double startLine = Null,
+          double endSample = Null, double endLine = Null);
+
       //! The array of counts.
       std::vector<BigInt> p_bins;
       double p_binRangeStart, p_binRangeEnd;
