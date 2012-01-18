@@ -3,16 +3,21 @@
 <application name="mapgrid" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>
-    Draws a grid of Latitude/Longitude lines for a projection
+    Produces a user defined cartographic graticule (latitude/longitude grid) in
+    GML form.
   </brief>
 
   <description>
-    This program will draw a grid of latitude and longitude lines for a 
-    projected mapping.   The mapfile should contain all necessary 
-    keywords and values to create the specific projection.  If you are unsure
-    of what keywords are necessary, a template file can be created
-    for the projection using the maptemplate application.  The output
-    is a GML file that can be plotted using qgis.
+    This application will create a GML (Geography Mapping Language) file
+    containing drawing instruction for a user defined latitude/longitude
+    graticule (grid). The MAPFILE provides definition of map projection
+    parameters while user input 'Options' define how specific latitude and lines
+    are drawn. The resulting GML file can be viewed by various applications such
+    as QGIS, Snowflake GML Viewer, GAIA, etc. In addition, GML files produced
+    via this program can be manipulated by GDAL utilities for conversion to
+    other usable formats. For example, the "ogr2ogr" utility can produce DXF and
+    ESRI Shape files readable by Adobe Illustrator and Arc applications
+    respectively.
   </description>
 
   <category>
@@ -49,18 +54,19 @@
   <groups>
     <group name="Files">
       <parameter name="MAPFILE">
-          <type>filename</type>
-          <fileMode>input</fileMode>
-          <brief>
-              Map File
-          </brief>
-          <description>
-              This file contains the mapping projection information necessary to 
-              make the grid. This can be a text file or a cube.
-          </description>
-          <filter>
-              *.txt *.cub
-          </filter>
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Map File
+        </brief>
+        <description>
+          This file contains map projection information necessary to produce the
+          grid. This can be a conventional or user defined ISIS3 mapping
+          template or an existing projected ISIS3 cube.
+        </description>
+        <filter>
+          *.map *.cub *.txt
+        </filter>
       </parameter>
 
       <parameter name="TO">
@@ -70,7 +76,13 @@
           Grid Output
         </brief>
         <description>
-          The resultant grid.  The output is a GML file that can be plotted using qgis.
+          The resultant GML file. This output file contains drawing instruction
+          in GML form and can be viewed or plotted by various applications such
+          as QGIS, Snowflake GML Viewer, GAIA, etc. In addition, GML files
+          produced via this program can be manipulated by GDAL utilities for
+          conversion to other usable formats. For example, the "ogr2ogr" utility
+          can produce DXF and ESRI Shape files readable by Adobe Illustrator and
+          Arc applications respectively.
         </description>
         <filter>
           *.gml
@@ -79,113 +91,116 @@
     </group>
 
     <group name="Options">
-        <parameter name="STARTLAT">
-            <type>double</type>
-            <brief>
-                Starting Latitude
-            </brief>
-            <description>
-                This is the starting value for the latitude lines in the grid.
-            </description>
-        </parameter>
+      <parameter name="STARTLAT">
+        <type>double</type>
+        <brief>
+          Starting Latitude
+        </brief>
+        <description>
+          This defines the minimum or starting latitude to which longitude grid
+          lines will extend.
+        </description>
+      </parameter>
 
-        <parameter name="STARTLON">
-            <type>double</type>
-            <brief>
-                Starting Longitude
-            </brief>
-            <description>
-                This is the starting value for the longitude lines in the grid.
-            </description>
-        </parameter>
+      <parameter name="STARTLON">
+        <type>double</type>
+        <brief>
+          Starting Longitude
+        </brief>
+        <description>
+          This defines the minimum or starting longitude to which latitude grid
+          lines will extend.
+        </description>
+      </parameter>
 
-        <parameter name="ENDLAT">
-            <type>double</type>
-            <brief>
-                Ending Latitude
-            </brief>
-            <description>
-                This is the ending value for the latitude lines in the grid.
-            </description>
-        </parameter>
+      <parameter name="ENDLAT">
+        <type>double</type>
+        <brief>
+          Ending Latitude
+        </brief>
+        <description>
+          This defines the maximum or ending latitude to which longitude grid
+          lines will extend.
+        </description>
+      </parameter>
 
-        <parameter name="ENDLON">
-            <type>double</type>
-            <brief>
-                Ending Longitude
-            </brief>
-            <description>
-                This is the ending value for the longitude lines in the grid.
-            </description>
-        </parameter>
+      <parameter name="ENDLON">
+        <type>double</type>
+        <brief>
+          Ending Longitude
+        </brief>
+        <description>
+          This defines the maximum or ending longitude to which latitude grid
+          lines will extend.
+        </description>
+      </parameter>
 
-        <parameter name="LATSPACING">
-            <type>double</type>
-            <brief>
-                Value for Spacing the Latitude Lines
-            </brief>
-            <description>
-                This value will determine how far apart the latitude
-                lines are spaced.
-            </description>
-            <default><item>10.0</item></default>
-        </parameter>
+      <parameter name="LATSPACING">
+        <type>double</type>
+        <brief>
+          Value for Spacing the Latitude Lines
+        </brief>
+        <description>
+          This value defines the spacing of latitude lines, starting with STARTLAT
+        </description>
+        <default><item>10.0</item></default>
+      </parameter>
 
-        <parameter name="LONSPACING">
-            <type>double</type>
-            <brief>
-                Value for Spacing the Longitude Lines
-            </brief>
-            <description>
-                This value will determine how far apart the longitude
-                lines are spaced.
-            </description>
-            <default><item>10.0</item></default>
-        </parameter>
+      <parameter name="LONSPACING">
+        <type>double</type>
+        <brief>
+          Value for Spacing the Longitude Lines
+        </brief>
+        <description>
+          This value defines the spacing of longitude lines, starting with STARTLON
+        </description>
+        <default><item>10.0</item></default>
+      </parameter>
 
-        <parameter name="LATINCREMENT">
-            <type>double</type>
-            <brief>
-                Incrementing value for the Latitude Lines
-            </brief>
-            <description>
-                This value will determine how smooth the latitude lines are drawn.
-                A large value here will create a more rough, jagged line, while a very
-                small value will create a more smooth, curved line.
-            </description>
-            <default><item>0.01</item></default>
-        </parameter>
+      <parameter name="LATINCREMENT">
+        <type>double</type>
+        <brief>
+          Incrementing value for the Latitude Lines
+        </brief>
+        <description>
+          This value sets the incremental definition of latitude lines. That
+          is, it defines the frequency of how often a coordinate is calculated
+          while drawing each latitude line. In general, a larger value will
+          result in a more rough or jagged line, while a smaller value will
+          result in a more smooth or curved line.
+        </description>
+        <default><item>0.01</item></default>
+      </parameter>
 
-        <parameter name="LONINCREMENT">
-            <type>double</type>
-            <brief>
-                Incrementing value for the Longitude lines
-            </brief>
-            <description>
-                This value will determine how smooth the longitude lines are drawn.
-                 A large value here will create a more rough, jagged line, while a very 
-                 small value will create a more smooth, curved line.
-            </description>
-            <default><item>0.01</item></default>
-        </parameter>
+      <parameter name="LONINCREMENT">
+        <type>double</type>
+        <brief>
+          Incrementing value for the Longitude lines
+        </brief>
+        <description>
+          This value sets the incremental definition of longitude lines. That
+          is, it defines the frequency of how often a coordinate is calculated
+          while drawing each longitude line. In general, a larger value will
+          result in a more rough or jagged line, while a smaller value will
+          result in a more smooth or curved line.
+        </description>
+        <default><item>0.01</item></default>
+      </parameter>
 
-        <parameter name="BOUNDED">
-            <type>boolean</type>
-            <brief>
-               Draw Boundary Lines on Grid
-            </brief>
-            <description>
-                If this option is selected, boundry lines will be drawn
-                around the projection grid.  If the option is not selected, 
-                no boundry lines will be drawn.
-            </description>
-            <default><item>TRUE</item></default>
-        </parameter>
-
+      <parameter name="BOUNDED">
+        <type>boolean</type>
+        <brief>
+          Include rectangular box at the x-y extents of entire grid
+        </brief>
+        <description>
+          This option will draw a rectangular box outlining the x-y extents of the entire grid.
+        </description>
+        <default><item>TRUE</item></default>
+      </parameter>
     </group>
   </groups>
 
-    <examples>
+  <examples>
     <example>
       <brief> Sinusoidal Map Grid </brief>
       <description>
