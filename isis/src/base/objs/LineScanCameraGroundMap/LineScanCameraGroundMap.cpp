@@ -68,7 +68,6 @@ namespace Isis {
    */
   bool LineScanCameraGroundMap::SetGround(const SurfacePoint &surfacePoint) {
     FindFocalPlaneStatus status = FindFocalPlane(-1, surfacePoint);
-
     if(status == Success) return true;
     if(status == Failure) return false;
 
@@ -149,11 +148,11 @@ namespace Isis {
 
     bool bounded = false;
     while(!bounded) {
-      if(approxTime != 0.0) {
+      if(approxTime != 0.0) {  //if an approximate time was given attempt to bound it by the lineTolerance
         startTime = approxTime - lineTolerance * lineRate;
         endTime   = approxTime + lineTolerance * lineRate;
       }
-      else {
+      else {  //if no approximate time was given the cacheStart and cacheStop times are chosen as bounds
         startTime = cacheStart;
         endTime = cacheEnd;
       }
@@ -177,10 +176,12 @@ namespace Isis {
         return Failure;
       }
 
+      //covert the look direction to sensor plane coordinates (at startTime)
       p_camera->Sensor::LookDirection(lookC);
       double ux = p_camera->FocalLength() * lookC[0] / lookC[2];
       double uy = p_camera->FocalLength() * lookC[1] / lookC[2];
 
+      //caculate the range from the camera to target
       double s[3], p[3];
       p_camera->InstrumentPosition(s);
       p_camera->Coordinate(p);
@@ -197,6 +198,7 @@ namespace Isis {
         backCheck++;
       }
 
+      //covert from sensor plane to detector (that is distorted) pixel coordinates
       double dx, dy;
       CameraDistortionMap *distortionMap = p_camera->DistortionMap();
       if(!distortionMap->SetUndistortedFocalPlane(ux, uy)) {
@@ -212,6 +214,10 @@ namespace Isis {
       if(!focalMap->SetFocalPlane(dx, dy)) {
         return Failure;
       }
+
+      
+      
+      //distance from the caculated line to expected line
       startOffset = focalMap->DetectorLineOffset() -
                     focalMap->DetectorLine();
 
@@ -322,11 +328,8 @@ namespace Isis {
     }
 
     // Iterate to find the time at which the instrument imaged the ground point
-    LineScanCameraDetectorMap *detectorMap =
-      (LineScanCameraDetectorMap *) p_camera->DetectorMap();
-    double timeTol = detectorMap->LineRate() / 10.0;
     bool checkHidden = false;
-    for(int j = 0; j < 30; j++) {
+    for(int j = 0; j < 300; j++) {
       double etGuess = xl + (xh - xl) * fl / (fl - fh);
       p_camera->Sensor::SetTime(etGuess);
       if(!p_camera->Sensor::SetGround(surfacePoint, checkHidden))
@@ -348,7 +351,7 @@ namespace Isis {
                  focalMap->DetectorLine();
 
       double delTime;
-      if(f < 0.0) {
+      if( fabs( xl- etGuess) > fabs( xh - etGuess) ) {  //elliminate the node farthest away from the current best guess
         delTime = xl - etGuess;
         xl = etGuess;
         fl = f;
@@ -361,7 +364,8 @@ namespace Isis {
 
       // See if we converged on the point so set up the undistorted
       // focal plane values and return
-      if(fabs(delTime) < timeTol || f == 0.0) {
+      //if(fabs(delTime) < timeTol || f == 0.0) {
+      if(fabs(f) < 1e-2 || f == 0.0) {
         if(checkHidden) {
           p_focalPlaneX = ux;
           p_focalPlaneY = uy;
@@ -372,7 +376,6 @@ namespace Isis {
         }
       }
     }
-
     return Failure;
   }
 }

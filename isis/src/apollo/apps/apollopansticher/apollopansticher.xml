@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="ApolloPanSticher" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Stiches together the typically eight individual scans of an Apollo Panoramic Image
+  </brief>
+
+  <description>
+    This program uses the Selection and CentroidApolloPan classes to find the centers of the fiducial marks along the image segments.  Conjugate fiducial marks between segments are used
+	to calculate transformations to united the segments.  The transformation math model is limited to three parameters (2 transformations and 1 rotation) because it is unlikely the
+	film is undergoing any measureable demensional changes during the scanning.  Thus, the intent of this program is to stich together the image that would have been produced had there
+	been a large enough scaner, and not to correct for any film degradation or other systematic error sources.  Those corrections are left to the camera model.
+  </description>
+
+  <history>
+    <change name="Orrin Thomas" date="2011-10-03">
+      Created
+    </change>
+  </history>
+
+  <category>
+    <categoryItem>Image Processing</categoryItem>
+  </category>
+
+   <groups>
+     <group name="Files">
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output image 
+        </brief>
+        <description>
+          Use this parameter to specify the name of the output cube.
+        </description>
+        <pixelType>real</pixelType>
+      </parameter>
+    </group>
+    <group name="File Base Name">
+      <parameter name="FILE_BASE">
+        <type>string</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Apollo Panoramic Image Base Name
+        </brief>
+        <description>
+          Base Name of the eight subscans of an Apollo Panoramic image. For example, given the base name: "AS15_P_0330-", the first image would be expected to be "AS15_p_0330-0001.cub", the second
+		"AS15_P_0330-0002.cub", etc.
+        </description>
+      </parameter>
+    </group>    
+    <group name="Resolution">
+     <parameter name="MICRONS">
+       <type>double</type>
+       <brief>
+	 Pixels size in microns
+       </brief>
+       <description>
+	 The scanner resolution (dot size) in microns.
+       </description>  
+     </parameter>  
+    </group>
+  </groups>
+</application>

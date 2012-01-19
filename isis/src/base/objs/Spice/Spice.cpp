@@ -169,11 +169,14 @@ namespace Isis {
       }
 
       Load(kernels["TargetAttitudeShape"], noTables);
-      Load(kernels["Instrument"], noTables);
+    if(kernels.HasKeyword("Instrument"))
+    Load(kernels["Instrument"], noTables);
       // Always load after instrument
-      Load(kernels["InstrumentAddendum"], noTables);
+    if(kernels.HasKeyword("InstrumentAddendum"))
+    Load(kernels["InstrumentAddendum"], noTables);
       Load(kernels["LeapSecond"], noTables);
-      Load(kernels["SpacecraftClock"], noTables);
+    if( kernels.HasKeyword("SpacecraftClock"))
+    Load(kernels["SpacecraftClock"], noTables);
 
 // Modified to load extra kernels last to allow overriding default values
 // (2010-04-07) (DAC)
@@ -680,9 +683,9 @@ namespace Isis {
 
     *p_et = et;
 
-    p_bodyRotation->SetEphemerisTime(et.Et());
-    p_instrumentRotation->SetEphemerisTime(et.Et());
-    p_instrumentPosition->SetEphemerisTime(et.Et());
+    p_bodyRotation->SetEphemerisTime(et.Et());  
+    p_instrumentRotation->SetEphemerisTime(et.Et()); 
+    p_instrumentPosition->SetEphemerisTime(et.Et());    
     p_sunPosition->SetEphemerisTime(et.Et());
 
     std::vector<double> uB = p_bodyRotation->ReferenceVector(p_sunPosition->Coordinate());

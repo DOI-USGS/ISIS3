@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="apollopaninit" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Imports a complete (stitched) apollo panaramic image JP2 image
+  </brief>
+
+  <description>
+    This program will import a merged JPEG2000 Apollo Panaramic Image.
+    JPEG2000 files (JP2) is supported in the ISIS3 library.  The JP2 file
+    can have any number of bands up to 16384. The output from a JP2 file 
+    will be a multi-spectral ISIS3 image file.
+  </description>
+
+  <history>
+    <change name="Orrin Thomas" date="2010-09-08">
+      Ripped of std2isis JPEG2000 import code to create ApolloPan2Isis
+    </change>
+  </history>
+
+  <category>
+    <categoryItem>Import and Export</categoryItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>isis2std</item>
+    </applications>
+  </seeAlso>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input Cube
+        </brief>
+        <description>
+          Use this parameter to select the filename to import.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+    <group name ="Scaning Resolution">
+      <parameter name="Microns">
+        <type>double</type>
+        <brief>Scanner dot size</brief>
+        <description>
+          The size of the scanned image pixel in microns.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Apopllo Mission">
+      <parameter name="MISSION">
+        <type>string</type>
+        <default><item>APOLLO15</item></default>
+        <brief>Apollo Mission</brief>
+        <description>The Apollo Mission that captured the input JPEG2000 image</description>
+        <list>
+          <option value="APOLLO11">
+            <brief>Apollo 11</brief>
+            <description>Apollo 11</description>
+          </option>
+          <option value="APOLLO12">
+            <brief>Apollo 12</brief>
+            <description>Apollo 12</description>
+          </option>
+          <option value="APOLLO14">
+            <brief>Apollo 14</brief>
+            <description>Apollo 14</description>
+          </option>
+          <option value="APOLLO15">
+            <brief>Apollo 15</brief>
+            <description>Apollo 15</description>
+          </option>
+          <option value="APOLLO16">
+            <brief>Apollo 16</brief>
+            <description>Apollo 16</description>
+          </option>
+          <option value="APOLLO17">
+            <brief>Apollo 17</brief>
+            <description>Apollo 17</description>
+          </option>
+        </list>
+      </parameter>
+    </group>
+
+    <group name="Time">
+      <parameter name="GMT">
+        <type>string</type>
+        <brief>GMT format: YYYY-MM-DD HH:MM:SS.SSS</brief>
+        <description>GMT is space deliniated Year Month Day Hour Minute Seconds</description>
+      </parameter>
+    </group>
+    
+    <group name="Spacecraft Position">
+      <parameter name="LON_NADIR">
+        <type>double</type>
+        <brief>Longitude of Nadir point</brief>
+        <description>Longitude of the the sub spacecraft nadir point in degrees.</description>
+      </parameter>
+
+      <parameter name="LAT_NADIR">
+        <type>double</type>
+        <brief>
+          Latitude of Nadir point
+        </brief>
+        <description>Latitude of the sub-spacecraft nadir point in degrees.</description>
+      </parameter>
+
+      <parameter name="CRAFT_ALTITUDE">
+        <type>double</type>
+        <brief>Spacecraft Radius</brief>
+        <description>The distance from the center of the moon to the spacecraft in KM</description>
+      </parameter>
+    </group>
+
+    <group name="Primary Image Axis Intersect Position">
+      <parameter name="LON_INT">
+        <type>double</type>
+        <brief>Longitude of camera axis intersect.</brief>
+        <description>The Longitude of the intersection of the primary camera axis with the surface of the moon.</description>
+      </parameter>
+
+      <parameter name="LAT_INT">
+        <type>double</type>
+        <brief>Latitude of camera axis intersection</brief>
+        <description>The Latitude of the intersection of the primary camera azis with the surface of the moon.</description>
+      </parameter>
+    </group>
+
+    <group name="SpaceCraft Velocity">
+      <parameter name="VEL_AZM">
+        <type>double</type>
+        <brief>Azimuth of velocity vector</brief>
+        <description>Azimuth of the velocity vector.  Measured in degrees clockwise from north in the local horizontal plane</description>
+      </parameter>
+
+      <parameter name="VEL_HORIZ">
+        <type>double</type>
+        <brief>Horizontal Velocity</brief>
+        <description>The magnitude of the horizontal velocity (parral to local horizontal plane) in km/s.</description>
+      </parameter>
+
+      <parameter name="VEL_RADIAL">
+        <type>double</type>
+        <brief>Mean Altitude Rate</brief>
+        <description>The average velcity in the spacecraft radial direction in KM/sec.</description>
+      </parameter>
+    </group>
+
+    <group name="Optional V/H override.">
+      <parameter name="V/H_OVERRIDE">
+        <type>double</type>
+        <brief>User can optionally override the V/H with this parameter (Milli-Radians/seccond)</brief>
+        <description>Nominally the V/H can be calucalated from the other input parameters.  However, during some periods of the mission the V/H sensor was stuck and did not adjust image to image.  In those cases this manual override can be used.</description>
+        <internalDefault>None</internalDefault>
+      </parameter>
+    </group>  
+    
+  </groups>
+</application>
