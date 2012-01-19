@@ -31,10 +31,11 @@ namespace Isis {
   class PvlGroup;
   
   /**
-   * @author Tracie Sucharski and Steven Lambright
+   * @author ????-??-?? Tracie Sucharski and Steven Lambright
    *
    * @ingroup Visualization Tools
    *
+   * @internal
    */
   class SpectralPlotWindow : public PlotWindow {
       Q_OBJECT

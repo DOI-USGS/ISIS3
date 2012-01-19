@@ -76,7 +76,7 @@ namespace Isis {
                        endSample, endLine);
 
     if (addCubeData) {
-      Brick cubeDataBrick(endSample - startSample + 1,
+      Brick cubeDataBrick((int)(endSample - startSample + 1),
                           1, 1, cube.getPixelType());
 
       // if band == 0, then we're gathering data for all bands.
@@ -91,13 +91,13 @@ namespace Isis {
       if (progress != NULL) {
         progress->SetText("Gathering histogram");
         progress->SetMaximumSteps(
-          (endLine - startLine + 1) * (endBand - startBand + 1));
+          (int)(endLine - startLine + 1) * (int)(endBand - startBand + 1));
         progress->CheckStatus();
       }
 
       for (int band = startBand; band <= endBand; band++) {
-        for (int line = startLine; line <= endLine; line++) {
-          cubeDataBrick.SetBasePosition(startSample, line, band);
+        for (int line = (int)startLine; line <= endLine; line++) {
+          cubeDataBrick.SetBasePosition(qRound(startSample), line, band);
           cube.read(cubeDataBrick);
           AddData(cubeDataBrick.DoubleBuffer(), cubeDataBrick.size());
           if (progress != NULL) {
@@ -167,7 +167,7 @@ namespace Isis {
     // If we still need our min/max DN values, find them.
     if (minDnValue == Null || maxDnValue == Null) {
 
-      Brick cubeDataBrick(endSample - startSample + 1,
+      Brick cubeDataBrick((int)(endSample - startSample + 1),
                           1, 1, cube.getPixelType());
       Statistics stats;
 
@@ -185,13 +185,13 @@ namespace Isis {
       if (progress != NULL) {
         progress->SetText("Computing min/max for histogram");
         progress->SetMaximumSteps(
-          (endLine - startLine + 1) * (endBand - startBand + 1));
+          (int)(endLine - startLine + 1) * (int)(endBand - startBand + 1));
         progress->CheckStatus();
       }
 
       for (int band = startBand; band <= endBand; band++) {
-        for (int line = startLine; line <= endLine; line++) {
-          cubeDataBrick.SetBasePosition(startSample, line, band);
+        for (int line = (int)startLine; line <= endLine; line++) {
+          cubeDataBrick.SetBasePosition(qRound(startSample), line, band);
           cube.read(cubeDataBrick);
           stats.AddData(cubeDataBrick.DoubleBuffer(), cubeDataBrick.size());
           if (progress != NULL) {

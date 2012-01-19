@@ -8,6 +8,11 @@ class QDockWidget;
 namespace Isis {
   class HistogramItem;
 
+  /**
+   * @author ????-??-?? Unknown
+   *
+   * @internal
+   */
   class HistogramPlotWindow : public PlotWindow {
       Q_OBJECT
 

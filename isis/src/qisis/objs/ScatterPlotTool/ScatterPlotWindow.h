@@ -19,7 +19,9 @@ namespace Isis {
   /**
    * @brief Scatter Plot Window
    *
-   * @author Stacy Alley
+   * @author ????-??-?? Stacy Alley
+   *
+   * @internal
    */
   class ScatterPlotWindow : public PlotWindow {
       Q_OBJECT

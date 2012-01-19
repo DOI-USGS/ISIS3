@@ -61,6 +61,8 @@ namespace Isis {
    *            collect statistics over all of the data and also set where the
    *            binning will start and end. Increased the default number of bins
    *            for floating point cubes.
+   *   @history 2012-01-19 Steven Lambright and Jai Rideout - Added constructor
+   *                           parameters to read from the Cube automatically.
    */
   class Histogram : public Statistics {
     public:

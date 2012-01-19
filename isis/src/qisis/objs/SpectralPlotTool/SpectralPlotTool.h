@@ -29,7 +29,7 @@ namespace Isis {
    * The statistical values plotted are the minimum, maximum, mean, 
    * mean + standard deviation and mean - standard deviation.
    *
-   * @author Stacy Alley
+   * @author ????-??-?? Stacy Alley
    *  
    * @internal 
    *   @history 2008-08-18 Christopher Austin - Upgraded to geos3.0.0

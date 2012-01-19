@@ -18,7 +18,9 @@ class QWidget;
 
 namespace Isis {
   /**
+   * @author 2012-01-18 Steven Lambright
    *
+   * @internal
    */
   class PlotWindowBestFitDialog : public QDialog {
       Q_OBJECT

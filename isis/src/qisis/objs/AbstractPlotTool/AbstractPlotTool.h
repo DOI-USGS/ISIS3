@@ -24,7 +24,7 @@ namespace Isis {
    * plots.  This class provides common functionality such as opening new 
    * plot windows.
    *
-   * @author Steven Lambright and Tracie Sucharski
+   * @author 2012-01-18 Steven Lambright and Tracie Sucharski
    *
    * @internal 
    *   @history 2011-11-02 Steven Lambright and Tracie Sucharski - Original 

@@ -17,6 +17,10 @@ namespace Isis {
   /**
    * This should be an inner class for CubePlotCurve, but Qt doesn't support
    *   having a QObject as an inner class.
+   *
+   * @author 2012-01-18 Steven Lambright
+   *
+   * @internal
    */
   class CubePlotCurveConfigureDialog : public QDialog {
       Q_OBJECT

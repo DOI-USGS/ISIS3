@@ -17,6 +17,14 @@ namespace Isis {
   class ScatterPlotTool;
   class Workspace;
 
+  /**
+   * This configuration dialog is for users to determine the scatter plot
+   *   parameters required to create a scatter plot.
+   *
+   * @author 2012-01-18 Steven Lambright
+   *
+   * @internal
+   */
   class ScatterPlotConfigDialog : public QDialog {
       Q_OBJECT
 

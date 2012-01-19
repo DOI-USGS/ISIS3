@@ -65,5 +65,9 @@
       Added options for SaveAs to save cube as fullImage, Export AsIs or Export 
       FullResolution options
     </change>
+    <change name="Steven Lambright, Jai Rideout and Tracie Sucharski" date="2012-01-18">
+      Re-implemented all of the plotting functionality in order to improve the
+      user interface and capabilities. Added best fit lines and a scatter plot.
+    </change>
   </history>
 </application>

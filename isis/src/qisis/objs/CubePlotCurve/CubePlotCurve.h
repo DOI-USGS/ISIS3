@@ -38,6 +38,17 @@ class QMouseEvent;
 namespace Isis {
   class CubeViewport;
 
+  /**
+   * This was formerly known as PlotToolCurve.
+   *
+   * @author ????-??-?? Stacy Alley
+   *
+   * @internal
+   *   @history 2012-01-18 Steven Lambright and Tracie Sucharski - Renamed
+   *                           class to CubePlotCurve. Changed
+   *                           functionality dramatically to support a new
+   *                           plotting infrastructure.
+   */
   class CubePlotCurve : public QObject, public PlotCurve {
       Q_OBJECT
 

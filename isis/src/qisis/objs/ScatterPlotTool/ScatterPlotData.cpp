@@ -28,8 +28,8 @@ namespace Isis {
       m_counts(
         new QVector< QVector<int> >(yBinCount, QVector<int>(xBinCount))),
       m_alarmedBins(new QMap<int, bool>) {
-    int startLine = lineRange.minValue();
-    int endLine = lineRange.maxValue();
+    int startLine = qRound(lineRange.minValue());
+    int endLine = qRound(lineRange.maxValue());
     ASSERT(xCube->getLineCount() == yCube->getLineCount());
 
     Histogram *xCubeHist = new Histogram(*xCube, xCubeBand, NULL,
@@ -61,18 +61,18 @@ namespace Isis {
 
     m_maxCount = 0;
 
-    Brick brick1(sampleRange.maxValue() - sampleRange.minValue() + 1,
+    Brick brick1((int)(sampleRange.maxValue() - sampleRange.minValue() + 1),
                  1, 1, xCube->getPixelType());
-    Brick brick2(sampleRange.maxValue() - sampleRange.minValue() + 1,
+    Brick brick2((int)(sampleRange.maxValue() - sampleRange.minValue() + 1),
                  1, 1, yCube->getPixelType());
     ASSERT(xCube->getSampleCount() == yCube->getSampleCount());
     ASSERT(brick1.size() == brick2.size());
 
     for (int line = startLine; line <= endLine; line++) {
-      brick1.SetBasePosition(sampleRange.minValue(), line, xCubeBand);
+      brick1.SetBasePosition(qRound(sampleRange.minValue()), line, xCubeBand);
       xCube->read(brick1);
 
-      brick2.SetBasePosition(sampleRange.minValue(), line, yCubeBand);
+      brick2.SetBasePosition(qRound(sampleRange.minValue()), line, yCubeBand);
       yCube->read(brick2);
 
       for (int i = 0; i < brick1.size(); i++) {

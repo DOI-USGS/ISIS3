@@ -205,7 +205,7 @@ namespace Isis {
 
 
   QSize ScatterPlotConfigDialog::sizeHint() const {
-    return QSize(QDialog::sizeHint().width() * 1.3,
+    return QSize(qRound(QDialog::sizeHint().width() * 1.3),
                  QDialog::sizeHint().height());
   }
 

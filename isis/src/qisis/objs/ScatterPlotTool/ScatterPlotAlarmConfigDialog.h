@@ -16,8 +16,13 @@ namespace Isis {
   class ScatterPlotWindow;
 
   /**
-   * This should be an inner class for CubePlotCurve, but Qt doesn't support
-   *   having a QObject as an inner class.
+   * This is the configuration dialog for alarming scatter plots between the
+   *   plot window and cube viewports.
+   *
+   *
+   * @author 2012-01-18 Steven Lambright and Jai Rideout
+   *
+   * @internal
    */
   class ScatterPlotAlarmConfigDialog : public QDialog {
       Q_OBJECT
