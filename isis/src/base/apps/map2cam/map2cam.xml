@@ -1,15 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
  
 <application name="map2cam" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd"> 
+
   <brief>
     Convert map projected image to a raw camera image
   </brief>
   
   <description>
-    This program will take as input an image in a map project and 
-    geometrically transform it into a raw instrument image.  This allows
-    for example a Viking base map to be converted to a MOC raw geometry
-    image.
+    This program will geometrically transform a <def link="Map Projected">map projected</def> image 
+    (ISIS <def link="Level2">level2</def> <def link="Cube">cube</def> or mosaic) into an ISIS 
+    <def link="Level1">level1</def> cube using a level1 cube as input to match.  This allows for example 
+    a Viking base map to be converted to a MOC raw geometry image.
+
+    <p>
+     The main purpose of this program is to facilitate control point selection between a level1 cube and a 
+     base map.  The MATCH image and the resulting TO file can be opened in the program <i>qnet</i> along with other
+     level1 cubes for building a control network with ties to ground. 
+    </p>
   </description>
   
   <category>
@@ -35,6 +42,9 @@
     <change name="Steven Lambright" date="2008-05-13">
       Removed references to CubeInfo 
     </change>
+     <change name="Lynn Weller and Debbie A. Cook" date="2012-01-17">
+       Updated documentation text, added glossary links, and improved compatability with Isis documentation.
+     </change>
   </history>
 
   <oldName>
@@ -68,11 +78,11 @@
         </brief>
         <description>
           This cube defines the raw instrument geometry to be matched.  The
-          output file will have the same labels (Kernel and Instrument
+          output file will have the same labels (Kernels and Instrument
           group).  Note the Band group will represent data from the
           raw camera and the content of the cube may not match.  For example,
           using the MOLA base as the FROM file and a MOC Wide Angle Red cube
-          as the match, will have labels which indicate geometry for the MOC
+          as the MATCH, will have labels which indicate geometry for the MOC
           WA red camera but the pixels will contain MOLA elevations.
         </description>
         <filter>
@@ -131,5 +141,73 @@
         </list>
       </parameter>
     </group>
-  </groups>  
+  </groups>
+
+  <examples>
+    <example>
+      <brief>Typical usage</brief> 
+      <description>
+        In this example, the map2cam application is used to map a base map into 
+        the same geometry as the matching Messenger level 1 image.  The output
+        file can then be used to select control points.  Sometimes matching
+        features can be found easier when features when a comparing level 1 
+        image to another level 1 image.
+      </description>
+      <terminalInterface>
+        <description>
+          This is what to type to run this example in command line mode.
+        </description>
+        <commandLine>
+          from=M10_Equi_1000meters_Clon180.cub 
+          match=EN0108821402M.cal.cub 
+          to=M10_match_EN0108821402M.cub interp=CUBICCONVOLUTION
+        </commandLine>
+      </terminalInterface>
+      <guiInterfaces>
+        <guiInterface>
+          <image src="assets/images/map2cam_gui.jpg" width="728" height="451">
+            <brief>Example GUI</brief>
+            <description>
+              Screen shot of GUI with parameters filled in to create
+              a level 1 version of a base map for selecting control
+              in a Messenger image.
+            </description>
+            <thumbnail caption="" src="assets/thumbs/map2cam_gui_thumb.jpg" width="200" height="200"/>
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+
+      <inputImages>
+        <image src="assets/images/FromFile_Mariner10_Level2.jpg" width="496" height="496">
+          <brief>Input level 2 image (map)</brief>
+          <description>
+            This is the image that will be mapped into a level 1 image using the
+            geometry of the MATCH image.
+          </description>
+          <parameterName>FROM</parameterName>
+          <thumbnail caption="Basemap image from Mariner 10" src="assets/thumbs/FromFile_Mariner10_Level2_thumb.jpg" width="200" height="200"/>
+        </image>
+        <image src="assets/images/MatchFile_Messenger_Lev1.jpg" width="496" height="496">
+          <brief>Image to match</brief>
+          <description>
+            The geometry of this image will be used to create the level 1 version 
+            of the FROM image, which will be output as the TO image.
+          </description>
+          <parameterName>MATCH</parameterName>
+          <thumbnail caption="Messenger image to match" src="assets/thumbs/MatchFile_Messenger_Lev1_thumb.jpg" width="200" height="200"/>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image src="assets/images/ToFile_M10_Match_Messenger.jpg" width="496" height="496">
+          <brief>Output image</brief>
+          <description>
+            The level 1 version of the FROM image
+          </description>
+          <parameterName>TO</parameterName>
+          <thumbnail caption="Mariner 10 basemap mapped into Messenger level 1 space" src="assets/thumbs/ToFile_M10_Match_Messenger_thumb.jpg" width="200" height="200"/>
+        </image>
+      </outputImages>
+    </example>
+  </examples>
 </application> 
