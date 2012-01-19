@@ -81,6 +81,11 @@ namespace Isis {
    *  @history 2011-11-04 Steven Lambright - Improved advanced stretch to allow
    *                          all stretches to be changed despite combo box.
    *                          References #567.
+   *  @history 2012-01-18 Steven Lambright - Fixed a bug that caused the stretch
+   *                          pair line edits to not update properly in grey
+   *                          mode when the color mode band selection was set to
+   *                          all. Also, fixed layout of stretch options to
+   *                          correctly squeeze widgets left. Fixes #640.
    */
   class StretchTool : public Tool {
       Q_OBJECT

@@ -33,13 +33,12 @@ namespace Isis {
    * @param parent
    */
   StretchTool::StretchTool(QWidget *parent) : Tool::Tool(parent) {
-    
     p_chipViewportStretch = NULL;
     p_preGlobalStretches = NULL;
     p_advancedStretch = NULL;
-    
+
     p_chipViewportStretch = new Stretch;
-    
+
     p_advancedStretch = new AdvancedStretchDialog(parent);
     connect(p_advancedStretch, SIGNAL(stretchChanged()),
             this, SLOT(advancedStretchChanged()));
@@ -72,15 +71,11 @@ namespace Isis {
    * Destructor
    */
   StretchTool::~StretchTool() {
-    if(p_preGlobalStretches) {
-      delete [] p_preGlobalStretches;
-      p_preGlobalStretches = NULL;
-    }
-    
-    if (p_chipViewportStretch) {
-      delete p_chipViewportStretch;
-      p_chipViewportStretch = NULL;
-    }
+    delete [] p_preGlobalStretches;
+    p_preGlobalStretches = NULL;
+
+    delete p_chipViewportStretch;
+    p_chipViewportStretch = NULL;
   }
 
 
@@ -164,7 +159,8 @@ namespace Isis {
     p_stretchBand = All;
     p_stretchBandComboBox->setCurrentIndex(
         p_stretchBandComboBox->findData(p_stretchBand));
-    connect(p_stretchBandComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(stretchBandChanged(int)));
+    connect(p_stretchBandComboBox, SIGNAL(currentIndexChanged(int)),
+            this, SLOT(stretchBandChanged(int)));
 
     QDoubleValidator *dval = new QDoubleValidator(hbox);
     p_stretchMinEdit = new QLineEdit(hbox);
@@ -180,7 +176,8 @@ namespace Isis {
       less than the maximum.";
     p_stretchMinEdit->setWhatsThis(text);
     p_stretchMinEdit->setMaximumWidth(100);
-    connect(p_stretchMinEdit, SIGNAL(returnPressed()), this, SLOT(changeStretch()));
+    connect(p_stretchMinEdit, SIGNAL(returnPressed()),
+            this, SLOT(changeStretch()));
 
     p_stretchMaxEdit = new QLineEdit(hbox);
     p_stretchMaxEdit->setValidator(dval);
@@ -274,15 +271,15 @@ namespace Isis {
 
     QHBoxLayout *layout = new QHBoxLayout(hbox);
     layout->setMargin(0);
-    layout->addWidget(p_copyButton, Qt::AlignLeft);
-    layout->addWidget(p_globalButton, Qt::AlignLeft);
-    layout->addWidget(p_stretchRegionalButton, Qt::AlignLeft);
-    layout->addWidget(p_stretchBandComboBox, Qt::AlignLeft);
-    layout->addWidget(p_stretchMinEdit, Qt::AlignLeft);
-    layout->addWidget(p_stretchMaxEdit, Qt::AlignLeft);
-    layout->addWidget(advancedButton, Qt::AlignLeft);
-    layout->addWidget(p_flashButton, Qt::AlignLeft);
-    layout->addStretch(1); // Pushes everything else left in the menu bar
+    layout->addWidget(p_copyButton);
+    layout->addWidget(p_globalButton);
+    layout->addWidget(p_stretchRegionalButton);
+    layout->addWidget(p_stretchBandComboBox);
+    layout->addWidget(p_stretchMinEdit);
+    layout->addWidget(p_stretchMaxEdit);
+    layout->addWidget(advancedButton);
+    layout->addWidget(p_flashButton);
+    layout->addStretch(); // Pushes everything else left in the menu bar
     hbox->setLayout(layout);
 
     return hbox;
@@ -434,10 +431,13 @@ namespace Isis {
     if(cvp && cvp->isGray()) {
       p_copyBands->setEnabled(true);
       p_stretchBandComboBox->setShown(false);
+      p_stretchMinEdit->show();
+      p_stretchMaxEdit->show();
     }
     else if(cvp) {
       p_copyBands->setEnabled(true);
       p_stretchBandComboBox->setShown(true);
+      stretchBandChanged(0);
     }
     else {
       p_copyBands->setEnabled(false);
@@ -454,7 +454,6 @@ namespace Isis {
     }
 
     updateHistograms();
-    stretchChanged();
   }
 
 
@@ -588,7 +587,7 @@ namespace Isis {
     }
 
     //Set the min/max text fields
-    if(p_stretchBand != All) {
+    if(p_stretchBand != All || cvp->isGray()) {
       QString strMin;
       strMin.setNum(min);
       p_stretchMinEdit->setText(strMin);
@@ -654,7 +653,7 @@ namespace Isis {
   void StretchTool::changeStretch() {
     MdiCubeViewport *cvp = cubeViewport();
     if(cvp == NULL) return;
-    
+
     // Make sure the user didn't enter bad min/max and if so fix it
     double min = p_stretchMinEdit->text().toDouble();
     double max = p_stretchMaxEdit->text().toDouble();
@@ -671,7 +670,7 @@ namespace Isis {
       stretch.ClearPairs();
       stretch.AddPair(min, 0.0);
       stretch.AddPair(max, 255.0);
-      
+
       // send the stretch to any ChipViewports that want to listen
       *p_chipViewportStretch = stretch;
       emit stretchChipViewport(p_chipViewportStretch, cvp);
