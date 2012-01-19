@@ -18,7 +18,8 @@
       </pre>
 
       <p><b>1. Aero Triangulation File</b>: Information such as the Project 
-      file, number of images, image Ipf are got from this file. The Report file share the same file name.  </p>
+      file, number of images, image Ipf are got from this file. The Report file 
+      share the same file name with the atf file.  </p>
       <p><b>2. Ground Point File</b>: Information such as the total number of 
       Points in the socet net, Point Id, Status(Valid/Invalid), Point Type are 
       parsed from this file.
@@ -47,8 +48,9 @@
      Serial Number, Flip and Padding parameters. This info is used to create 
      Control Measure.</p>
      <p><b>6. Project File </b>: Project file contains info about the 
-     Control net. Information such as Coordinate System (Ographic or 
-     Projected), XY units, Z units are parsed from this file. 
+     socet net. Information such as Coordinate System (Ographic or 
+     Projected), Projection parametes if projected, XY units, Z units are parsed 
+     from this file. 
      <pre>
       XY Units: Meters(1), DecimalDegrees(2), DegMinSec(3) 
 
@@ -61,7 +63,7 @@
     are expected to be in the same location as the ATF file. The app 
     first gets the Target from one of the Image Translation Pvl files and then 
     creates a Projection depending on the Coordinate System. If the Coordinate 
-    System as specified in the Project file is 1 then it is OGraphic coordinayes 
+    System as specified in the Project file is 1 then it is OGraphic coordinates 
     with no projection. 
     </p> 
 
@@ -89,14 +91,19 @@
     Lon, Radius irrespective of Control Point Type. All the Control Points are 
     set to type Constrained. </p> 
 
-    <p>The Adjusted/Apriori of the socetset will always form the Apriori for the 
-      isis3 Control Net
+    <p>The Apriori in the socet is the Original value in the report file. 
+    Also the Apriori values could be got from the gpf file which is in 
+    radians. The Adjusted/Apriori of the socetset will always form the Apriori 
+    for the isis3 Control Net 
     </p>
 
     <p>If projected, the projected Lat, Lon and Radius values are used else Lat 
       and Lon are converted to degrees and Radius is calculated using the 
       Equatorial Radius of the Target. 
     </p>
+  
+    <p>If the target is an ellipsoid then the radius is got from the user 
+      specified Reference Ellipsoid. The Reference Ellipsoid </p>
 
     <p>The application then builds the Control Measure info by parsing the Ipf and the 
     Translation files. It applies the Flip and Padding information from the Translation 
@@ -200,16 +207,17 @@
         <brief>Check if Target is an Ellipsoid</brief>
         <description>Check if Target is an Ellipsoid</description>
         <inclusions>
-          <item>AROID_FILE</item>
+          <item>REFERENCE_FILE</item>
         </inclusions>
       </parameter>
 
-      <parameter name="AROID_FILE">
+      <parameter name="REFERENCE_FILE">
         <type>filename</type>
         <internalDefault>None</internalDefault>
         <fileMode>input</fileMode>
-        <brief>Specify Aroid file for Ellipsoid Target</brief>
-        <description>Specify Aroid file for Ellipsoid Target
+        <brief>Specify Reference Ellipsoid file</brief>
+        <description>Specify Reference Ellipsoid file Aeroid for Mars and Geoid 
+        for Earth
         </description>
       </parameter>
     </group>

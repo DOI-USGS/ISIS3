@@ -1,6 +1,11 @@
 #include "Isis.h"
 #include "iException.h"
 
+#include "Camera.h"
+#include "ControlNet.h"
+#include "ControlPoint.h"
+#include "ControlMeasure.h"
+#include "Portal.h"
 #include "Pvl.h"
 #include "Projection.h"
 #include "ProjectionFactory.h"
@@ -17,9 +22,7 @@
 #include "iTime.h"
 #include "iString.h"
 #include "SurfacePoint.h"
-#include "ControlNet.h"
-#include "ControlPoint.h"
-#include "ControlMeasure.h"
+
 
 using namespace std;
 using namespace Isis;
@@ -494,12 +497,12 @@ void ParseGpf(const string & gpfFilename, const string & atfFileName, const stri
   // Handle Ellipsoid target such as Mars the radius differently
   // by using the Aroid file to calculate the radius
   bool isEllipsoid = ui.GetBoolean("ELLIPSOID");
-  Cube *aroid = NULL;
-  Projection *aroidProj = NULL;
+  Cube *refEllip = NULL;
+  Camera *refEllipCam = NULL;
   if (isEllipsoid) {
-    aroid = new Cube;
-    aroid->open(ui.GetAsString("AROID_FILE"));
-    aroidProj = aroid->getProjection();
+    refEllip = new Cube;
+    refEllip->open(ui.GetAsString("REFERENCE_FILE"));
+    refEllipCam = refEllip->getCamera();
   }
   
   double userSigmaLat = DEFAULT_SIGMA;
@@ -548,6 +551,7 @@ void ParseGpf(const string & gpfFilename, const string & atfFileName, const stri
     double latitude=0, longitude=0, radius=0;
     
     // Read pointId, stat, knownPointType, lat, lon, height, sigm information from Gpf
+    // Lat Lon are the Apriori values in radians
     gpfFile >> pname >> stat >> knownPointType >> latitude >> longitude >> radius >> sigmalat >> sigmalon >> sigmarad;
     
     // Skip Residuals info line and blank line
@@ -560,29 +564,33 @@ void ParseGpf(const string & gpfFilename, const string & atfFileName, const stri
       continue;
     }
 
-    // Get all original values from Report File
-    // Ignore the lat, lon, height from the gpf file
+    // Get all original(apriori) values from Report File
+    // Ignore the lat(y), lon(x), height from the gpf file
     latitude  = pointParamsMap[pname][origVal_Y];
     longitude = pointParamsMap[pname][origVal_X];
     radius    = pointParamsMap[pname][origVal_Z];
     
     //cerr << "\npoint name=" << pname << " type=" << knownPointType << " isProjected=" << isProjected << " latitude=" << latitude << " longitude=" << longitude << " radius=" << radius << "EquatorialRadius=" << EquatorialRadius <<"\n";
 
-    // For Ellipsoid Targets
+    // Ellipsoid Targets - Always projected (Simple Cylinderical)
+    // Reference Ellipsoids hold the radius as the dn value
     if (isEllipsoid) {
-      aroidProj->SetCoordinate(longitude, latitude);
-      radius += aroidProj->LocalRadius();
+      refEllipCam->SetUniversalGround(latitude, longitude);
+      double sample = refEllipCam->Sample();
+      double line   = refEllipCam->Line();
+      Portal iPortal (1, 1, refEllip->getPixelType());
+      iPortal.SetPosition(sample, line, 1);
+      refEllip->read(iPortal);
+      radius += iPortal[0];
     }
     // Spherical Targets
     else {
-      // If no projection - change radians into degrees
+      // No projection 
       if (!isProjected){
-        latitude  = latitude  * 360.0 / (2.0*PI);
-        longitude = longitude * 360.0 / (2.0*PI);
-        radius   += EquatorialRadius;
+        radius += EquatorialRadius;
       }
       else{
-        proj->SetCoordinate(longitude, latitude);
+        proj->SetCoordinate(longitude, latitude); 
         latitude  = proj->UniversalLatitude();
         longitude = proj->UniversalLongitude();
         radius   += proj->LocalRadius();
@@ -663,16 +671,27 @@ void ParseGpf(const string & gpfFilename, const string & atfFileName, const stri
       double adjRad = pointParamsMap[pname][adjVal_Z];
 
       //cerr << "\nPointName=" << pname << " overRide=" << overRide << " adjRad=" << adjRad;
-      
-      if(!isProjected){
-        adjRad += EquatorialRadius;
+      if (isEllipsoid) {
+        refEllipCam->SetUniversalGround(adjLat, adjLon);
+        double sample = refEllipCam->Sample();
+        double line   = refEllipCam->Line();
+        Portal iPortal (1, 1, refEllip->getPixelType());
+        iPortal.SetPosition(sample, line, 1);
+        refEllip->read(iPortal);
+        adjRad += iPortal[0];
       }
+      // Spherical Targets
       else {
-        proj->SetCoordinate(adjLon, adjLat);
-        adjLat = proj->UniversalLatitude();
-        adjLon = proj->UniversalLongitude();
-        adjRad = proj->LocalRadius() + adjRad;
-        //cerr << " localRadius=" <<  proj->LocalRadius();
+        if(!isProjected){
+          adjRad += EquatorialRadius;
+        }
+        else {
+          proj->SetCoordinate(adjLon, adjLat);
+          adjLat = proj->UniversalLatitude();
+          adjLon = proj->UniversalLongitude();
+          adjRad = proj->LocalRadius() + adjRad;
+          //cerr << " localRadius=" <<  proj->LocalRadius();
+        }
       }
       
       double adjSigmaLat = pointParamsMap[pname][adjSigma_Y];
@@ -987,40 +1006,12 @@ bool ParseProjectAndSetMapping(Pvl & mapPvl, PvlGroup & logGrp, int & unitsXY, c
     return false;
   }
   
-  string fileStr;
-  string coord_system;
-  string projection_type;
-  string polar_aspect;
-  string grid_name;
-  
-  while(prjstream.good()){
-    prjstream >> fileStr;
-    if (fileStr == "XY_UNITS") {
-      prjstream >> unitsXY;
-    }
-    else if(fileStr == "COORD_SYS"){
-      prjstream >> coord_system;
-    }
-    else if(fileStr == "PROJECTION_TYPE"){
-      prjstream >> projection_type;
-    }
-    else if(fileStr == "POLAR_ASPECT"){
-      prjstream >> polar_aspect;
-    }
-    else if(fileStr == "GRID_NAME"){
-      prjstream >> grid_name;
-    }
-  }
-  prjstream.close();
-  
-  // OGraphic Coordiante System, no Projection
-  if(coord_system == "1"){
-    string msg = "OGraphic Coordinates, No Projection";
-    PvlKeyword msgKey("Mapping", msg);
-    logGrp += msgKey;
-    return false;
-  }
-  
+  string fileStr="";
+  string coord_system="";
+  string polar_aspect="";
+  string grid_name="";
+  string projType="";
+
   //Default values
   iString ProjectionName     = "PolarStereographic";
   iString CenterLongitude    = "0.0";
@@ -1034,7 +1025,41 @@ bool ParseProjectAndSetMapping(Pvl & mapPvl, PvlGroup & logGrp, int & unitsXY, c
   iString MaximumLongitude   = "180.0";
   iString PixelResolution    = "100.0";
   
-  if(projection_type == "POLAR_STEREOGRAPHIC_PROJECTION"){
+  while(prjstream.good()){
+    prjstream >> fileStr;
+    if (fileStr == "XY_UNITS") {
+      prjstream >> unitsXY;
+    }
+    else if(fileStr == "COORD_SYS"){
+      prjstream >> coord_system;
+    }
+    else if(fileStr == "PROJECTION_TYPE"){
+      prjstream >> projType;
+    }
+    else if(fileStr == "POLAR_ASPECT"){
+      prjstream >> polar_aspect;
+    }
+    else if(fileStr == "GRID_NAME"){
+      prjstream >> grid_name;
+    }
+    else if (fileStr =="CENTER_LONGITUDE") { // for PolarStereographic Projection
+      prjstream >> CenterLongitude;
+    }
+    else if (fileStr == "CENTRAL_MERIDIAN") { // for Sinusoidal Projection
+      prjstream >> CenterLongitude; 
+    }
+  }
+  prjstream.close();
+  
+  // OGraphic Coordiante System, no Projection
+  if(coord_system == "1"){
+    string msg = "OGraphic Coordinates, No Projection";
+    PvlKeyword msgKey("Mapping", msg);
+    logGrp += msgKey;
+    return false;
+  }
+  
+  if(projType == "POLAR_STEREOGRAPHIC_PROJECTION"){
     if(polar_aspect == "S"){
       CenterLatitude = "-90.0";
     }
@@ -1042,7 +1067,7 @@ bool ParseProjectAndSetMapping(Pvl & mapPvl, PvlGroup & logGrp, int & unitsXY, c
       CenterLatitude = "90.0";
     }
   }
-  else if (projection_type == "SINUSOIDAL_PROJECTION") {
+  else if (projType == "SINUSOIDAL_PROJECTION") {
     ProjectionName = "Sinusoidal";
   }
   
