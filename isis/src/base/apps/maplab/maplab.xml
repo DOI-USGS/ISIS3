@@ -8,33 +8,26 @@
 
   <description>
     <p>
-      The maplab application will take in a cube and a map file.  The user will 
-      then need to choose to enter either latitude/longitude or x/y coordinates 
-      that correspond to a given sample/line.  This application will then modify 
-      the input cube's labels to include a Mapping Group with projection 
-      information.
+      The maplab application is used to geo-reference a map-projected cube by
+      adding or updating the Mapping Group with projection and geo-referencing
+      information.  Maplab takes as input a map-projected cube and a map file.
+      The user has the option to geo-reference by (LATITUDE,LONGITUDE)-coordinates
+      or by (X,Y)-map-projected-coordinates that correspond to a given
+      (SAMPLE,LINE)-coordinate in the input cube.
     </p>
 
     <p>
-      The map file provided as input must contain information pertaining to a 
-      target, body radius, and a longitude direction.  In terms of keywords, this 
-      means that all of the following must appear in the map file in order to
-      run this program:
+      The map file must contain information pertaining to the specifics of the
+      cube's map-projection parameters, along with the  target, body radius,
+      longitude direction, latitude type and scale.  We suggest running the
+      maptemplate program to generate the map file provided as input.
     </p>
 
-    <ul>
-      <li>TargetName</li>
-      <li>EquatorialRadius</li>
-      <li>PolarRadius</li>
-      <li>LongitudeDomain</li>
-    </ul>
-
     <p>
-      It should also be noted that when selecting a sample and line for 
-      relating coordinates to a pixel, that position (0.5, 0.5) is the 
-      top-left corner of the top-left pixel in the image.  By extension, (1.0, 
-      1.0) is the center of the top-left pixel, and (1.5, 1.5) is the 
-      top-left corner of the pixel one sample to the right and one line down.
+      NOTE that when selecting a SAMPLE and LINE for referencing known coordinates
+      to a pixel, pixel coordinate (0.5, 0.5) is the top-left corner of the top-left
+      pixel in the cube.  By extension, (1.0, 1.0) is the center of the top-left
+      pixel, and (1.5, 1.5) is the lower-right corner of the top-left pixel.
     </p>
   </description>
 
@@ -68,11 +61,10 @@
         <type>cube</type>
         <fileMode>input</fileMode>
         <brief>
-          Input file to be modified
+          Input file to be geo-referenced
         </brief>
         <description>
-          The cube whose label will be appended to include Mapping Group 
-          information.
+          The cube whose label will be updated with Mapping Group information.
         </description>
         <filter>
           *.cub
@@ -83,51 +75,52 @@
         <type>filename</type>
         <fileMode>input</fileMode>
         <brief>
-          Input map
+          Input map file
         </brief>
         <description>
-          File containing mapping parameters.
+          File containing map projection parameters.
         </description>
         <filter>
           *.map
         </filter>
       </parameter>
     </group>
-    
+
     <group name="Input Values">
       <parameter name= "SAMPLE">
         <type>double</type>
         <brief>Sample position in the cube</brief>
         <description>
-         Some sample position in the cube that will correspond to a known 
-         x-coordinate or latitude.   In ISIS, the furthest left part of the
-         first sample is defined as 0.5.
+          The SAMPLE coordinate in the cube that corresponds to a known 
+          (X,Y) or (LATITUDE,LONGITUDE) coordinate. In ISIS, the upper-left
+          corner of the upper-left pixel has coordinate 0.5.
         </description> 
       </parameter>
       <parameter name="LINE">
         <type>double</type> 
         <brief>Line position in the cube</brief>
         <description> 
-          Some line position in the cube that will correspond to a known 
-          y-coordinate or longitude.  In ISIS, the top of the first line is 
-          defined as 0.5.
+          The LINE coordinate in the cube that corresponds to a known 
+          (X,Y) or (LATITUDE,LONGITUDE) coordinate. In ISIS, the upper-left 
+          corner of the upper-left pixel has coordinate 0.5.
         </description>
       </parameter> 
       <parameter name="COORDINATES">
         <type>string</type>
         <brief>Options for coordinate systems</brief>
         <description>
-               A list of the different types of coordinates allowed by the
-               application.
+          A list of the different types of coordinates allowed by the
+          application.
         </description>
         <default><item>XY</item></default>
         <list>
           <option value="XY">
             <brief>Allows X, Y as Input Values</brief>
             <description> 
-              This option requires the user to enter x/y coordinates that 
-              correspond to the given sample and line positions.  LAT and LON 
-              Input Values are not allowed.
+              This option allows the user to enter the (X,Y) map projected
+              coordinate (in meters) that corresponds to the given
+              (SAMPLE,LINE) coordinate.
+              This option excludes LATITUDE and LONGITUDE input values.
             </description>
             <exclusions> 
               <item>LAT</item>
@@ -141,9 +134,11 @@
           <option value="LATLON">
             <brief>Allows LAT, LON as Input Values</brief>
             <description> 
-              This option requires the user to enter latitude/longitude that 
-              correspond to the entered sample and line positions. X and Y  
-              Input Values are not allowed.
+              This option allows the user to enter the (LATITUDE,LONGITUDE)
+              coordinate that corresponds to the given (SAMPLE,LINE) coordinate.
+              The (LATITUDE,LONGITUDE) coordinate is in decimal degrees, and must
+              be in the same LatitudeType and LongitudeDomain listed in the map file.
+              This option excludes X and Y input values.
             </description>
             <exclusions> 
               <item>X</item>
@@ -152,38 +147,42 @@
             <inclusions> 
               <item>LAT</item>
               <item>LON</item>
-              </inclusions>
+            </inclusions>
           </option>
         </list>
       </parameter>      
       <parameter name="X">
         <type>double</type>
-        <brief>Distance from projection to sample</brief>
+        <brief>X map-projected coordinate corresponding to (SAMPLE,LINE), meters</brief>
         <description> 
-              Distance from in meters from the projection origin to the given 
-              sample value of the cube.
+          The map-projection X-coordinate, in meters, corresponding to the
+          the given (SAMPLE,LINE) coordinate of the cube.
         </description>
       </parameter>
       <parameter name="Y">
         <type>double</type>
-        <brief>Distance from projection to line</brief>
+        <brief>Y map-projected coordinate corresponding to (SAMPLE,LINE), meters</brief>
         <description> 
-              Distance from in meters from the projection origin to the given 
-              line value of the cube.
+          The map-projection Y-coordinate, in meters, corresponding to the 
+          given (SAMPLE,LINE) coordinate of the cube.
         </description>
       </parameter>
       <parameter name="LAT">
         <type>double</type>
-        <brief>Latitude</brief>
+        <brief>Latitude coordinate corresponding to (SAMPLE,LINE), degrees</brief>
         <description> 
-              Latitude for the given sample value of the cube.
+          Latitude coordinate, in decimal degrees, for the given
+          (SAMPLE,LINE) coordinate of the cube.  It must be in the same
+          LatitudeType listed in the map file.
         </description>
       </parameter>
       <parameter name="LON">
         <type>double</type>
-        <brief>Longitude</brief>
+        <brief>Longitude coordinate corresponding to (SAMPLE,LINE), degrees</brief>
         <description> 
-              Longitude for the given line value of the cube.
+          Longitude coordinate, in decimal degrees, for the given
+          (SAMPLE,LINE) coordinate of the cube. It must be in the same
+          LongitudeDomain listed in the map file.
         </description>
       </parameter>  
     </group>
@@ -191,172 +190,26 @@
 
   <examples>
     <example>
-      <brief> Mapping Group added with corresponding x/y coordinates</brief>
+      <brief>GeoTiff Header</brief>
       <description>
-        This example shows the Mapping Group added to the labels using x and y 
-        positions of the corresponding sample and line positions.  XY is the 
-        default for COORDINATES.
+        Most outside applications use the top left pixel (either upper-left edge
+        or center) to define their location in X, Y. For example, a GeoTiff with
+        an internal header, uses the upper left edge and for an example may
+        report: Upper Left (2883258.0, 979924.0) -- meaning (X, Y).  Thus for
+        maplab, one would need to use the same top left corner of the pixel for
+        ISIS, as illustrated in the command line below.
       </description>
       <terminalInterface>
-        <commandLine> maplab from=../IN/inputCube.cub map=../IN/inputMap.map 
-          sample=85.0 line=23.0 x=-395500.0 y=2019500.0
+        <commandLine> from=input.cub map=projection.map sample=0.5 line=0.5 x=2883258.0 y=979924.0
         </commandLine>
         <description> 
-          Run the maplab application to add a new Mapping Group to the labels 
-          using x/y coordinates.
+          Mapping the upper-left of an ISIS cube (0.5, 0.5) to the upper left of
+          the example image (2883258.0, 979924.0).
         </description>
       </terminalInterface>
       <dataFiles>
-        <dataFile path="assets/dataFiles/origLabel1.txt">
-          <brief> Click here to see the original label</brief>
-          <description>
-            For this example, the original label did not contain a Mapping 
-            Group.
-          </description>
-        </dataFile>
-        <dataFile path="assets/dataFiles/maplabTruth11.txt">
-          <brief>Click here to see the new label in its entirety</brief>
-          <description>
-            <strong>
-              After the command line is run, the label includes a Mapping Group.
-            </strong>
-            <pre> 
-Object = IsisCube ...
-
-  Group = Mapping
-    ProjectionName     = Sinusoidal
-    CenterLongitude    = 227.95679821639
-    TargetName         = Mars
-    EquatorialRadius   = 3396190.0 &lt;meters&gt;
-    PolarRadius        = 3376200.0 &lt;meters&gt;
-    LatitudeType       = Planetocentric
-    LongitudeDirection = PositiveEast
-    LongitudeDomain    = 360
-    MinimumLatitude    = 10.76690271209
-    MaximumLatitude    = 34.444196777763
-    MinimumLongitude   = 219.72404560653
-    MaximumLongitude   = 236.18955082624
-    UpperLeftCornerX   = -480000.0 &lt;meters&gt;
-    UpperLeftCornerY   = 2042000.0 &lt;meters&gt;
-    PixelResolution    = 1000.0 &lt;meters/pixel&gt;
-    Scale              = 59.274697523306 &lt;pixels/degree&gt;
-    TrueScaleLatitude  = 0.0
-  End_Group
-  ...
-End_Object
-            </pre>
-          </description>
-        </dataFile>
-      </dataFiles>
-      <guiInterfaces>
-        <guiInterface>
-          <image width="484" height="550" src="assets/images/maplabEx11Gui.jpg">
-            <brief>Example Gui</brief>
-            <description>
-              Screenshot of GUI with parameters filled in to perform the maplab
-              application.  Input files, SAMPLE, and LINE are always required.  
-              The radio button XY is chosen to input x and y input values that 
-              correspond to the given sample and line values, respectively.
-            </description>
-            <thumbnail width="176" height="200" caption="Maplab Gui using x/y coordinates" src="assets/thumbs/maplabEx11Thumb.jpg" />
-          </image>
-        </guiInterface>
-      </guiInterfaces>
-    </example>
-    <example>
-      <brief> Mapping Group added with corresponding latitude/longitude</brief>
-      <description>
-        This example shows the Mapping Group added to the labels using the 
-        latitude and longitude  corresponding to the sample and line.  XY is the
-        default for COORDINATES.
-      </description>
-      <terminalInterface>
-        <commandLine> maplab from=../IN/inputCube.cub map=../IN/inputMap.map 
-          sample=85.0 line=23.0 coordinates=latlong lat=34.070186510964 
-          long=219.90185944016
-        </commandLine>
-        <description> 
-          Run the maplab application to add a new Mapping Group to the labels 
-          using latitude/longitude coordinates.
-        </description>
-      </terminalInterface>
-      <dataFiles>
-        <dataFile path="assets/dataFiles/origLabel1.txt">
-          <brief> Click here to see the original label</brief>
-          <description>
-            For this example, the original label did not contain a Mapping 
-            Group.
-          </description>
-        </dataFile>
-        <dataFile path="assets/dataFiles/maplabTruth12.txt">
-          <brief> Click here to see new label in its entirety</brief>
-          <description>
-            <strong> 
-              After the command line is run, the label includes a Mapping Group.
-            </strong>            
-            <pre> 
-Object = IsisCube 
-  ...
-  Group = Mapping
-    ProjectionName     = Sinusoidal
-    CenterLongitude    = 227.95679821639
-    TargetName         = Mars
-    EquatorialRadius   = 3396190.0 &lt;meters&gt;
-    PolarRadius        = 3376200.0 &lt;meters&gt;
-    LatitudeType       = Planetocentric
-    LongitudeDirection = PositiveEast
-    LongitudeDomain    = 360
-    MinimumLatitude    = 10.76690271209
-    MaximumLatitude    = 34.444196777763
-    MinimumLongitude   = 219.72404560653
-    MaximumLongitude   = 236.18955082624
-    UpperLeftCornerX   = -480000.00000057 &lt;meters&gt;
-    UpperLeftCornerY   = 2042000.0 &lt;meters&gt;
-    PixelResolution    = 1000.0 &lt;meters/pixel&gt;
-    Scale              = 59.274697523306 &lt;pixels/degree&gt;
-    TrueScaleLatitude  = 0.0
-  End_Group
-  ...
-End_Object
-            </pre>
-          </description>
-        </dataFile>
-      </dataFiles>
-      <guiInterfaces>
-        <guiInterface>
-          <image width="490" height="550" src="assets/images/maplabEx12Gui.jpg">
-            <brief>Example Gui</brief>
-            <description>
-              Screenshot of GUI with parameters filled in to perform the maplab
-              application.  Input files, SAMPLE, and LINE are always required.  
-              The radio button LATLON is chosen to input latitude and longitude 
-              input values that correspond to the given sample and line values, 
-              respectively.
-            </description>
-            <thumbnail width="178" height="200" caption="Maplab Gui using latitude/longitude coordinates" src="assets/thumbs/maplabEx12Thumb.jpg" />
-          </image>
-        </guiInterface>
-      </guiInterfaces>
-    </example>
-    <example>
-      <brief> Mapping Group revised with x/y coordinates</brief>
-      <description>
-        This example shows the original Mapping Group replaced with new values 
-        for UpperLeftCornerX and UpperLeftCornerY after maplab application is 
-        run using the x/y coordinates  of the sample and line. XY is the default for COORDINATES.
-      </description>
-      <terminalInterface>
-        <commandLine> maplab from=../IN/inputCube.cub map=../IN/inputMap.map 
-          sample=85.0 line=23.0 x=-3000.0 y=201.0
-        </commandLine>
-        <description> 
-          Run the maplab application to revise the existing Mapping Group in the 
-          labels using x/y coordinates.
-        </description>
-      </terminalInterface>
-      <dataFiles>
-        <dataFile path="assets/dataFiles/origLabel2.txt">
-          <brief> Click here to see the original label</brief>
+        <dataFile path="">
+          <brief></brief>
           <description>
             <strong>
               For this example, the original label already contained a Mapping 
@@ -389,16 +242,16 @@ End_Object
             </pre>
           </description>
         </dataFile>
-        <dataFile path="assets/dataFiles/maplabTruth21.txt">
-          <brief>Click here to see new label in its entirety</brief>
+        <dataFile path="">
+          <brief></brief>
           <description>
             <strong>
               After the command line is run, the original Mapping Group is
               revised.
             </strong>
             <pre> 
-Object = IsisCube ...
-
+Object = IsisCube
+  ...
   Group = Mapping
     ProjectionName     = Sinusoidal
     CenterLongitude    = 227.95679821639
@@ -412,8 +265,8 @@ Object = IsisCube ...
     MaximumLatitude    = 34.444196777763
     MinimumLongitude   = 219.72404560653
     MaximumLongitude   = 236.18955082624 
-    <span style="background-color:#ffc;">UpperLeftCornerX   = -87500.0 &lt;meters&gt;</span>
-    <span style="background-color:#ffc;">UpperLeftCornerY   = 22701.0 &lt;meters&gt;</span>
+    <span style="background-color:#ffc;">UpperLeftCornerX   = 2883258.0 &lt;meters&gt;</span>
+    <span style="background-color:#ffc;">UpperLeftCornerY   = 979924.0 &lt;meters&gt;</span>
     PixelResolution    = 1000.0 &lt;meters/pixel&gt;
     Scale              = 59.274697523306 &lt;pixels/degree&gt;
     TrueScaleLatitude  = 0.0
@@ -424,121 +277,73 @@ End_Object
           </description>
         </dataFile>
       </dataFiles>
-      <guiInterfaces>
-        <guiInterface>
-          <image width="484" height="550" src="assets/images/maplabEx21Gui.jpg">
-            <brief>Example Gui</brief>
-            <description>
-              Screenshot of GUI with parameters filled in to perform the maplab
-              application.  Input files, SAMPLE, and LINE are always required.  
-              The radio button XY is chosen to input x and y input values that 
-              correspond to the given sample and line values, respectively.
-            </description>
-            <thumbnail width="176" height="200" caption="Maplab Gui using x/y coordinates" src="assets/thumbs/maplabEx21Thumb.jpg" />
-          </image>
-        </guiInterface>
-      </guiInterfaces>
     </example>
+
     <example>
-      <brief> Mapping Group revised with known latitude/longitude</brief>
+      <brief>GIS Worldfile</brief>
       <description>
-        This example shows the original Mapping Group replaced with new values 
-        for UpperLeftCornerX and UpperLeftCornerY after maplab application is 
-        run using the latitude and longitude  of the sample and line. XY is the default for COORDINATES.
+        A typical image that has a "GIS Worldfile", in contrast to an internal
+        GeoTiff header, uses the center of the top left pixel to define its
+        location in X, Y. Thus a Worldfile might look like myImage.wld or *.tfw,
+        *.jgw, *.pgw (depending on image type):
+        <pre>
+          2.0           Cellsize in X (meters)
+          0.0           rotation/skew (normally 0)
+          0.0           rotation/skew (normally 0)
+          -2.0          Cellsize in Y (meters)
+          -24243.731055 Upper-left pixel center X (meters)
+          815863.281183 Upper-left pixel center Y (meters)
+        </pre>
+        Thus for this example the user would need to run the program with the
+        command line that follows.
       </description>
       <terminalInterface>
-        <commandLine> maplab from=../IN/inputCube.cub map=../IN/inputMap.map 
-          sample=85.0 line=23.0 coordinates=latlong lat=5.75 long=42.0
+        <commandLine> from=input.cub map=projection.map sample=1 line=1 x=-24243.731055 y=815863.281183
         </commandLine>
         <description> 
-          Run the maplab application to replace the existing Mapping Group in the labels using latitude/longitude coordinates.
+          Mapping the center of the upper-left pixel of an ISIS cube (1.0, 1.0)
+          to the center of the upper left of the example image (2883258.0,
+          979924.0).
         </description>
       </terminalInterface>
-      <dataFiles>
-        <dataFile path="assets/dataFiles/origLabel2.txt">
-          <brief> Click here to see original label in its entirety</brief>
-          <description>
-            <strong>
-              For this example, the original label already contained a mapping 
-              group.
-            </strong>
-            <pre>
-Object = IsisCube 
-  ...
-  Group = Mapping
-    ProjectionName     = Sinusoidal
-    CenterLongitude    = 227.95679821639
-    TargetName         = Mars
-    EquatorialRadius   = 3396190.0 &lt;meters&gt;
-    PolarRadius        = 3376200.0 &lt;meters&gt;
-    LatitudeType       = Planetocentric
-    LongitudeDirection = PositiveEast
-    LongitudeDomain    = 360
-    MinimumLatitude    = 10.76690271209
-    MaximumLatitude    = 34.444196777763
-    MinimumLongitude   = 219.72404560653
-    MaximumLongitude   = 236.18955082624
-    <span style="background-color:#ffc;">UpperLeftCornerX   = -480000.00000057 &lt;meters&gt;</span>
-    <span style="background-color:#ffc;">UpperLeftCornerY   = 2042000.0 &lt;meters&gt;</span>
-    PixelResolution    = 1000.0 &lt;meters/pixel&gt;
-    Scale              = 59.274697523306 &lt;pixels/degree&gt;
-    TrueScaleLatitude  = 0.0
-  End_Group
-  ...
-End_Object
-            </pre>
-          </description>
-        </dataFile>
-        <dataFile path="assets/dataFiles/maplabTruth22.txt">
-          <brief> Click here to see new label in its entirety</brief>
-          <description>
-            <strong> 
-              After the command line is run, the original Mapping Group is
-              replaced with the new one that contains updated keyword values.
-            </strong>            
-            <pre> 
-Object = IsisCube 
-  ...
-  Group = Mapping
-    ProjectionName     = Sinusoidal
-    CenterLongitude    = 227.95679821639
-    TargetName         = Mars
-    EquatorialRadius   = 3396190.0 &lt;meters&gt;
-    PolarRadius        = 3376200.0 &lt;meters&gt;
-    LatitudeType       = Planetocentric
-    LongitudeDirection = PositiveEast
-    LongitudeDomain    = 360
-    MinimumLatitude    = 10.76690271209
-    MaximumLatitude    = 34.444196777763
-    MinimumLongitude   = 219.72404560653
-    MaximumLongitude   = 236.18955082624 
-    <span style="background-color:#ffc;">UpperLeftCornerX   = -11051573.293228 &lt;meters&gt;</span>
-    <span style="background-color:#ffc;">UpperLeftCornerY   = 363329.51075901 &lt;meters&gt; </span>
-    PixelResolution    = 1000.0 &lt;meters/pixel&gt;
-    Scale              = 59.274697523306 &lt;pixels/degree&gt;
-    TrueScaleLatitude  = 0.0
-  End_Group
-  ...
-End_Object
-            </pre>
-          </description>
-        </dataFile>
-      </dataFiles>
-      <guiInterfaces>
-        <guiInterface>
-          <image width="483" height="550" src="assets/images/maplabEx22Gui.jpg">
-            <brief>Example Gui</brief>
-            <description>
-              Screenshot of GUI with parameters filled in to perform the maplab
-              application.  Input files, SAMPLE, and LINE are always required.  
-              The radio button LATLON is chosen to input latitude and longitude 
-              input values that correspond to the given sample and line values, 
-              respectively.
-            </description>
-            <thumbnail width="176" height="200" caption="Maplab Gui using latitude/longitude coordinates" src="assets/thumbs/maplabEx22Thumb.jpg" />
-          </image>
-        </guiInterface>
-      </guiInterfaces>
     </example>
+
+    <example>
+      <brief>Simple Cylindrical Global Case</brief>
+      <description>
+        Say the global file is 1440x720 or 4ppd (and perfectly 0 to 360 lon and
+        -90 to 90 lat). This global case would be run as follows.
+      </description>
+      <terminalInterface>
+        <commandLine> from=input.cub map=projection.map sample=0.5 line=0.5 coordinates=latlong lon=0 lat=90
+        </commandLine>
+        <description> 
+          Or assuming clon is set to 180, > maplab ... sample=720.5 line=360.5
+          x=0 y=0
+        </description>
+      </terminalInterface>
+    </example>
+
+    <example>
+      <brief>Polar File</brief>
+      <description>
+        Generally one will try to bring in a polar file which is 0 to 360 lon,
+        extends to a common lat range, and centered at the pole (clat = 90 or
+        -90). Nothing about the extent in meters is needed if the center of the
+        image is again 90 or -90 lat.  Again GIS/RS application will still
+        register to the upper left pixel but manually this can be harder to use
+        than just using the center which will be defined as X,Y = 0,0 when in a
+        Polar or Lambert Azimuthal projection.  Using an example where the polar
+        image is 2000 lines by 2000 samples then the run would look like:
+      </description>
+      <terminalInterface>
+        <commandLine> from=input.cub map=projection.map sample=1000.5 line=1000.5 x=0 y=0
+        </commandLine>
+        <description> 
+          Assuming clat is 90 or -90.
+        </description>
+      </terminalInterface>
+    </example>
+
   </examples>
 </application>
