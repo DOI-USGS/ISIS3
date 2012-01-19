@@ -186,4 +186,374 @@
       </parameter>
     </group>
   </groups>
+
+  <examples>
+    <example>
+      <brief>Define scale, compute paper size</brief>
+      <description>
+        In this example, the user selects the SCALE option, defining a 1:1000
+        map scale, and the application computes the corresponding paper size.
+      </description>
+      <terminalInterface>
+        <commandLine> from=I00824006RDR.lev2.cub option=scale scale=1000
+        </commandLine>
+        <description>
+          Specify the scale option for emphasis even though it is the default
+        </description>
+      </terminalInterface>
+      <dataFiles>
+        <dataFile path="">
+          <brief></brief>
+          <description>
+            <pre></pre>
+            <u>Input Cube Label</u>
+            <pre>
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 128
+    TileLines   = 128
+
+    Group = Dimensions
+      Samples = 82
+      Lines   = 362
+      Bands   = 10
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Instrument
+    SpacecraftName        = MARS_ODYSSEY
+    InstrumentId          = THEMIS_IR
+    TargetName            = MARS
+    MissionPhaseName      = MAPPING
+    StartTime             = 2002-02-20T11:00:50.525
+    StopTime              = 2002-02-20T11:02:50.525
+    SpacecraftClockCount  = 698670100.051
+    GainNumber            = 16
+    OffsetNumber          = 0
+    MissingScanLines      = 0
+    TimeDelayIntegration  = ENABLED
+    SpacecraftClockOffset = 0.0 &lt;seconds&gt;
+  End_Group
+
+  Group = BandBin
+    OriginalBand = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+    Center       = (6.78, 6.78, 7.93, 8.56, 9.35, 10.21, 11.04, 11.79, 12.57,
+                    14.88)
+    Width        = (1.01, 1.01, 1.09, 1.16, 1.20, 1.10, 1.19, 1.07, 0.81,
+                    0.87)
+    FilterNumber = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+  End_Group
+
+  Group = Archive
+    DataSetId               = ODY-M-THM-3-IRRDR-V1.0
+    ProducerId              = ODY_THM_TEAM
+    ProductId               = I00824006RDR
+    ProductCreationTime     = 2003-03-12T12:56:59
+    ProductVersionId        = 1.4
+    ReleaseId               = 0002
+    OrbitNumber             = 00824
+    FlightSoftwareVersionId = 1.00
+    CommandSequenceNumber   = 824
+    Description             = "Sinus Meridiani (west side)"
+  End_Group
+
+  Group = Kernels
+    NaifFrameCode       = -53031
+    LeapSecond          = $base/kernels/lsk/naif0008.tls
+    TargetAttitudeShape = $base/kernels/pck/pck00008.tpc
+    TargetPosition      = $base/kernels/spk/de405.bsp
+    SpacecraftPointing  = $Odyssey/kernels/ck/m01_sc_map1_v2.bc
+    Instrument          = Null
+    SpacecraftClock     = $odyssey/kernels/sclk/ORB1_SCLKSCET.00113.tsc
+    SpacecraftPosition  = $odyssey/kernels/spk/m01_map1_v2.bsp
+    Frame               = $odyssey/kernels/fk/m01_v26.tf
+    InstrumentAddendum  = $odyssey/kernels/iak/themisAddendum001.ti
+    ElevationModel      = $base/dems/molaMarsPlanetaryRadius0001.cub
+  End_Group
+
+  Group = Mapping
+    ProjectionName         = Sinusoidal
+    LatitudeType           = Planetocentric
+    LongitudeDirection     = PositiveEast
+    LongitudeDomain        = 360
+    CenterLongitude        = 353.0
+    TargetName             = MARS
+    EquatorialRadius       = 3396190.0 &lt;meters&gt;
+    PolarRadius            = 3376200.0 &lt;meters&gt;
+    MinimumLatitude        = -4.8337546206235
+    MaximumLatitude        = 1.254149686355
+    MinimumLongitude       = 351.45064252629
+    MaximumLongitude       = 352.82816449976
+    PixelResolution        = 1000.0 &lt;meters/pixel&gt;
+    Scale                  = 59.274697523306 &lt;pixels/degree&gt;
+    TrueScaleLatitude      = 0.0
+    UpperLeftCornerX       = -92000.0 &lt;meters&gt;
+    UpperLeftCornerY       = 75000.0 &lt;meters&gt;
+    LineProjectionOffset   = -74.5
+    SampleProjectionOffset = -91.5
+  End_Group
+
+  Group = AlphaCube
+    AlphaSamples        = 320
+    AlphaLines          = 3600
+    AlphaStartingSample = 0.5
+    AlphaStartingLine   = 0.5
+    AlphaEndingSample   = 320.5
+    AlphaEndingLine     = 3600.5
+    BetaSamples         = 320
+    BetaLines           = 3600
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = 2031617
+  Bytes     = 1105
+End_Object
+End
+            </pre>
+          </description>
+        </dataFile>
+        <dataFile path="">
+          <brief></brief>
+          <description>
+            <u>Output Label</u>
+            <pre>
+Group = Results
+  Map              = I00824006RDR.lev2.cub
+  Scale            = 1000.0
+  Width            = 3216.0732591105 &lt;inches&gt;
+  Height           = 14207.006481481 &lt;inches&gt;
+  Samples          = 82
+  Lines            = 362
+  RealSize         = 115.953125 &lt;KB&gt;
+  SignedWordSize   = 57.9765625 &lt;KB&gt;
+  UnsignedByteSize = 28.98828125 &lt;KB&gt;
+End_Group
+
+Group = Mapping
+  ProjectionName         = Sinusoidal
+  LatitudeType           = Planetocentric
+  LongitudeDirection     = PositiveEast
+  LongitudeDomain        = 360
+  CenterLongitude        = 353.0
+  TargetName             = MARS
+  EquatorialRadius       = 3396190.0 &lt;meters&gt;
+  PolarRadius            = 3376200.0 &lt;meters&gt;
+  MinimumLatitude        = -4.8337546206235
+  MaximumLatitude        = 1.254149686355
+  MinimumLongitude       = 351.45064252629
+  MaximumLongitude       = 352.82816449976
+  PixelResolution        = 1000.0 &lt;meters/pixel&gt;
+  Scale                  = 59.274697523306 &lt;pixels/degree&gt;
+  TrueScaleLatitude      = 0.0
+  UpperLeftCornerX       = -92000.0 &lt;meters&gt;
+  UpperLeftCornerY       = 75000.0 &lt;meters&gt;
+  LineProjectionOffset   = -74.5
+  SampleProjectionOffset = -91.5
+End_Group
+            </pre>
+          </description>
+        </dataFile>
+      </dataFiles>
+    </example>
+
+    <example>
+      <brief>Define paper size, compute scale</brief>
+      <description>
+        In this example, the user selects the PAPER option, defining a 38x100
+        paper size, and the application computes the corresponding scale.
+        Notice that the resulting PVL is identical to that of the previous
+        example with the exception of the Scale, Height, and Width keywords.
+      </description>
+      <terminalInterface>
+        <commandLine> from=I00824006RDR.lev2.cub option=paper width=38 height=100
+        </commandLine>
+        <description>
+          Specify the paper option and provide the width and height
+        </description>
+      </terminalInterface>
+      <dataFiles>
+        <dataFile path="">
+          <brief></brief>
+          <description>
+            <pre></pre>
+            <u>Input Cube Label</u>
+            <pre>
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 128
+    TileLines   = 128
+
+    Group = Dimensions
+      Samples = 82
+      Lines   = 362
+      Bands   = 10
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Instrument
+    SpacecraftName        = MARS_ODYSSEY
+    InstrumentId          = THEMIS_IR
+    TargetName            = MARS
+    MissionPhaseName      = MAPPING
+    StartTime             = 2002-02-20T11:00:50.525
+    StopTime              = 2002-02-20T11:02:50.525
+    SpacecraftClockCount  = 698670100.051
+    GainNumber            = 16
+    OffsetNumber          = 0
+    MissingScanLines      = 0
+    TimeDelayIntegration  = ENABLED
+    SpacecraftClockOffset = 0.0 &lt;seconds&gt;
+  End_Group
+
+  Group = BandBin
+    OriginalBand = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+    Center       = (6.78, 6.78, 7.93, 8.56, 9.35, 10.21, 11.04, 11.79, 12.57,
+                    14.88)
+    Width        = (1.01, 1.01, 1.09, 1.16, 1.20, 1.10, 1.19, 1.07, 0.81,
+                    0.87)
+    FilterNumber = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+  End_Group
+
+  Group = Archive
+    DataSetId               = ODY-M-THM-3-IRRDR-V1.0
+    ProducerId              = ODY_THM_TEAM
+    ProductId               = I00824006RDR
+    ProductCreationTime     = 2003-03-12T12:56:59
+    ProductVersionId        = 1.4
+    ReleaseId               = 0002
+    OrbitNumber             = 00824
+    FlightSoftwareVersionId = 1.00
+    CommandSequenceNumber   = 824
+    Description             = "Sinus Meridiani (west side)"
+  End_Group
+
+  Group = Kernels
+    NaifFrameCode       = -53031
+    LeapSecond          = $base/kernels/lsk/naif0008.tls
+    TargetAttitudeShape = $base/kernels/pck/pck00008.tpc
+    TargetPosition      = $base/kernels/spk/de405.bsp
+    SpacecraftPointing  = $Odyssey/kernels/ck/m01_sc_map1_v2.bc
+    Instrument          = Null
+    SpacecraftClock     = $odyssey/kernels/sclk/ORB1_SCLKSCET.00113.tsc
+    SpacecraftPosition  = $odyssey/kernels/spk/m01_map1_v2.bsp
+    Frame               = $odyssey/kernels/fk/m01_v26.tf
+    InstrumentAddendum  = $odyssey/kernels/iak/themisAddendum001.ti
+    ElevationModel      = $base/dems/molaMarsPlanetaryRadius0001.cub
+  End_Group
+
+  Group = Mapping
+    ProjectionName         = Sinusoidal
+    LatitudeType           = Planetocentric
+    LongitudeDirection     = PositiveEast
+    LongitudeDomain        = 360
+    CenterLongitude        = 353.0
+    TargetName             = MARS
+    EquatorialRadius       = 3396190.0 &lt;meters&gt;
+    PolarRadius            = 3376200.0 &lt;meters&gt;
+    MinimumLatitude        = -4.8337546206235
+    MaximumLatitude        = 1.254149686355
+    MinimumLongitude       = 351.45064252629
+    MaximumLongitude       = 352.82816449976
+    PixelResolution        = 1000.0 &lt;meters/pixel&gt;
+    Scale                  = 59.274697523306 &lt;pixels/degree&gt;
+    TrueScaleLatitude      = 0.0
+    UpperLeftCornerX       = -92000.0 &lt;meters&gt;
+    UpperLeftCornerY       = 75000.0 &lt;meters&gt;
+    LineProjectionOffset   = -74.5
+    SampleProjectionOffset = -91.5
+  End_Group
+
+  Group = AlphaCube
+    AlphaSamples        = 320
+    AlphaLines          = 3600
+    AlphaStartingSample = 0.5
+    AlphaStartingLine   = 0.5
+    AlphaEndingSample   = 320.5
+    AlphaEndingLine     = 3600.5
+    BetaSamples         = 320
+    BetaLines           = 3600
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = 2031617
+  Bytes     = 1105
+End_Object
+End
+            </pre>
+          </description>
+        </dataFile>
+        <dataFile path="">
+          <brief></brief>
+          <description>
+            <u>Output Label</u>
+            <pre>
+Group = Results
+  Map              = I00824006RDR.lev2.cub
+  Scale            = 142070.06481481
+  Width            = 22.63723370087 &lt;inches&gt;
+  Height           = 100.0 &lt;inches&gt;
+  Samples          = 82
+  Lines            = 362
+  RealSize         = 115.953125 &lt;KB&gt;
+  SignedWordSize   = 57.9765625 &lt;KB&gt;
+  UnsignedByteSize = 28.98828125 &lt;KB&gt;
+End_Group
+
+Group = Mapping
+  ProjectionName         = Sinusoidal
+  LatitudeType           = Planetocentric
+  LongitudeDirection     = PositiveEast
+  LongitudeDomain        = 360
+  CenterLongitude        = 353.0
+  TargetName             = MARS
+  EquatorialRadius       = 3396190.0 &lt;meters&gt;
+  PolarRadius            = 3376200.0 &lt;meters&gt;
+  MinimumLatitude        = -4.8337546206235
+  MaximumLatitude        = 1.254149686355
+  MinimumLongitude       = 351.45064252629
+  MaximumLongitude       = 352.82816449976
+  PixelResolution        = 1000.0 &lt;meters/pixel&gt;
+  Scale                  = 59.274697523306 &lt;pixels/degree&gt;
+  TrueScaleLatitude      = 0.0
+  UpperLeftCornerX       = -92000.0 &lt;meters&gt;
+  UpperLeftCornerY       = 75000.0 &lt;meters&gt;
+  LineProjectionOffset   = -74.5
+  SampleProjectionOffset = -91.5
+End_Group
+            </pre>
+          </description>
+        </dataFile>
+      </dataFiles>
+    </example>
+  </examples>
 </application>
