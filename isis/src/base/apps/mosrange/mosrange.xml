@@ -6,31 +6,48 @@
   </brief>
 
   <description>
-    This program computes and outputs the latitude/longitude range of a set of 
-    images in camera space, as well as the pixel resolution.  It creates a 
-    cam2map ready map file with the extents of the latitude/longitude ranges of 
-    the image set.  
+    <p>
+      This program computes and outputs the 
+      <def link="Latitude">latitude</def>/<def link="Longitude">longitude</def>
+      range of a set of images in camera space, as well as the <def link="Pixel Resolution">
+      pixel resolution</def>.  It creates a <i>cam2map</i> ready map file with 
+      the extents of the latitude/longitude ranges of the image set.  
+    </p>
 
-    mosrange provides better control over the values of the latitude/longitude 
-    ranges by providing a PRECISION parameter.  This parameter specifies the 
-    maximum nuber of digits precision for many of the Mapping group parameters 
-    used to project images.
+    <p>
+      The user can select the type of <def link="Map Projection">map projection</def>
+      preferred by two different means. The PROJECTION parameter allows direct 
+      specification of an ISIS supported projection.  Or, the user can select a 
+      map file from the ISIS map template system that contains the projection name.  
+      If none of these options are used, then <b>Equirectangular</b> is the default.
+    </p>
 
-    Its primary use is to provide a quick, simple and batchable means of 
-    creating map files for projections.
+    <p>
+      mosrange provides better control over the values of the latitude/longitude 
+      ranges by providing a PRECISION parameter.  This parameter specifies the 
+      maximum nuber of digits precision for many of the Mapping group parameters 
+      used to project images.
+    </p>
+
+    <p>
+      Its primary use is to provide a quick, simple and batchable means of 
+      creating map files for projections.
+    </p>
     
-    An example of the output generated is:
+    <p>
+      An example of the output generated is:
+    </p>
 <pre>
 Group = Mapping
   ProjectionName          = Equirectangular
-  TargetName              = Moon
-  EquatorialRadius        = 2440000.0  &lt;meters&gt;   
+  TargetName              = Mercury
+  Equatorial<def>Radius</def>        = 2440000.0  &lt;meters&gt;   
   PolarRadius             = 2440000.0 &lt;meters&gt;
-  LatitudeType            = Planetocentric
-  LongitudeDirection      = PositiveEast
-  LongitudeDomain         = 360
-  PixelResolution         = 505.3668 &lt;meters/pixel&gt;
-  Scale                   = 84.2676 &lt;pixels/degree&gt;
+  <def link="Latitude Type">LatitudeType</def>            = Planetocentric
+  <def link="Longitude Direction">LongitudeDirection</def>      = PositiveEast
+  <def link="Longitude Domain">LongitudeDomain</def>         = 360
+  <def link="Pixel Resolution">PixelResolution</def>         = 505.3668 &lt;meters/pixel&gt; 
+  <def>Scale</def>                   = 84.2676 &lt;pixels/degree&gt;
   MinPixelResolution      = 483.45317995544 &lt;meters&gt;
   MaxPixelResolution      = 527.28051834369 &lt;meters&gt;
   CenterLongitude         = 165.9728
@@ -80,6 +97,9 @@ End
         Added more detail to error reporting so the offending file can be 
         more readily identified.
     </change>
+    <change name="Kris Becker, Lynn Weller" date="2012-01-05">
+        Updated the documentation
+    </change>
 </history>
 
   <groups>
@@ -110,7 +130,7 @@ End
           projection
         </brief>
         <description>
-            If this file is given, the ProjectionName keyword is used to 
+            If this file is given, only the ProjectionName keyword is used to 
             determine the type of projection desired.  If you know the type 
             already as well as the proper spelling required by ISIS, then you 
             may use PROJECTION as an alternative to this file.
@@ -141,7 +161,7 @@ End
         </brief>
         <description>
             Each input file will have its geometry computed and the results can 
-            be written to this file for a looksee.
+            be written to this file.
         </description>
       </parameter>
     </group>
@@ -282,6 +302,53 @@ End
                 MaximumLatitude.  The pixel resolution is rounded using same 
                 technique (with the rint fuction).
             </p>
+                <TABLE  border="1" cellpadding="3" cellspacing="2" 
+                       summary="This table shows the different effect of the PRECISION 
+                        parameter on select data values.">
+                <TR>
+                  <TH colspan="3">PRECISION Examples</TH>
+                </TR>
+                    <TR>
+                      <TH>Value</TH>
+                      <TH align="center">PRECISION</TH>
+                      <TH>Result</TH>
+                    </TR>
+                    <TR>
+                       <TD>118.08747089457</TD>
+                       <TD align="center">12 (Default)</TD>
+                       <TD>118.08747089457</TD>
+                    </TR>
+                    <TR>
+                       <TD>118.08747089457</TD>
+                       <TD align="center">5</TD>
+                       <TD>118.0875</TD>
+                    </TR>
+                   <TR>
+                       <TD>118.08747089457</TD>
+                       <TD align="center">1</TD>
+                       <TD>118.1</TD>
+                    </TR>
+                    <TR>
+                       <TD>118.08747089457</TD>
+                       <TD align="center">0</TD>
+                       <TD>118.0</TD>
+                    </TR>
+                    <TR>
+                       <TD>118.08747089457</TD>
+                       <TD align="center">-1</TD>
+                       <TD>120.0</TD>
+                    </TR>
+                   <TR>
+                       <TD>118.08747089457</TD>
+                       <TD align="center">-2</TD>
+                       <TD>100.0</TD>
+                    </TR>
+                  <TR>
+                       <TD>118.08747089457</TD>
+                       <TD align="center">-3</TD>
+                       <TD>0.0 (Bad!)</TD>
+                    </TR>
+                </TABLE>
         </description>
       </parameter>
     </group>
