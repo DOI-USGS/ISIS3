@@ -275,7 +275,9 @@ void IsisMain() {
 
   /////////////Finding the principal scan line position and orientation
   //get the radii of the MOON
-  bodvcd_c(301,"RADII",3,&nRadii,R_MOON);  //units are km
+  SpiceInt tempRadii = 0;
+  bodvcd_c(301,"RADII",3,&tempRadii,R_MOON);  //units are km
+  nRadii = (int) tempRadii;
   double  omega,phi,kappa;
 
   std::vector<double>  posSel;  //Seleno centric position
