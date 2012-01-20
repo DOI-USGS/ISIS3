@@ -74,7 +74,7 @@ namespace Isis
 
     QString SampleResidualFilter::getMeasureDescription() const
     {
-      return "that have sample residuals which are " + descriptionSuffix();
+      return "have sample residuals which are " + descriptionSuffix();
     }
   }
 }

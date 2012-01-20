@@ -146,5 +146,10 @@
       No longer crashes if unknown column titles are found in cneteditor
       QSettings. Fixes #616.
     </change>
+    <change name="Jai Rideout" date="2012-01-20">
+      Added measure type, line, and sample filters. Added a couple of existing
+      filters to the image-point filter selector and fixed typos in a few of the
+      filter description strings. Fixes #645.
+    </change>
   </history>
 </application>

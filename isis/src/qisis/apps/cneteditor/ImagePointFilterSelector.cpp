@@ -11,12 +11,16 @@
 #include "ChooserNameFilter.h"
 #include "CubeSerialNumberFilter.h"
 #include "GoodnessOfFitFilter.h"
+#include "LineFilter.h"
 #include "LineResidualFilter.h"
 #include "MeasureIgnoredFilter.h"
+#include "MeasureTypeFilter.h"
 #include "PointEditLockedFilter.h"
 #include "PointIgnoredFilter.h"
 #include "PointIdFilter.h"
+#include "PointTypeFilter.h"
 #include "ResidualMagnitudeFilter.h"
+#include "SampleFilter.h"
 #include "SampleResidualFilter.h"
 
 
@@ -66,11 +70,15 @@ namespace Isis
       getSelector()->addItem("Edit Locked Points");
       getSelector()->addItem("Ignored Points");
       getSelector()->addItem("Point Id");
+      getSelector()->addItem("Point Type");
       getSelector()->insertSeparator(getSelector()->count());
       getSelector()->addItem("Goodness Of Fit");
       getSelector()->addItem("Ignored Measures");
+      getSelector()->addItem("Line");
       getSelector()->addItem("Line Residual");
+      getSelector()->addItem("Measure Type");
       getSelector()->addItem("Residual Magnitude");
+      getSelector()->addItem("Sample");
       getSelector()->addItem("Sample Residual");
     }
 
@@ -102,19 +110,32 @@ namespace Isis
             setFilter(new PointIdFilter(AbstractFilter::Images |
                 AbstractFilter::Points, 1));
             break;
-          case 9:
-            setFilter(new GoodnessOfFitFilter(AbstractFilter::Images, 1));
+          case 8:
+            setFilter(new PointTypeFilter(AbstractFilter::Images |
+                AbstractFilter::Points, 1));
             break;
           case 10:
-            setFilter(new MeasureIgnoredFilter(AbstractFilter::Images, 1));
+            setFilter(new GoodnessOfFitFilter(AbstractFilter::Images, 1));
             break;
           case 11:
-            setFilter(new LineResidualFilter(AbstractFilter::Images, 1));
+            setFilter(new MeasureIgnoredFilter(AbstractFilter::Images, 1));
             break;
           case 12:
-            setFilter(new ResidualMagnitudeFilter(AbstractFilter::Images, 1));
+            setFilter(new LineFilter(AbstractFilter::Images, 1));
             break;
           case 13:
+            setFilter(new LineResidualFilter(AbstractFilter::Images, 1));
+            break;
+          case 14:
+            setFilter(new MeasureTypeFilter(AbstractFilter::Images, 1));
+            break;
+          case 15:
+            setFilter(new ResidualMagnitudeFilter(AbstractFilter::Images, 1));
+            break;
+          case 16:
+            setFilter(new SampleFilter(AbstractFilter::Images, 1));
+            break;
+          case 17:
             setFilter(new SampleResidualFilter(AbstractFilter::Images, 1));
             break;
         }
@@ -125,3 +146,4 @@ namespace Isis
     }
   }
 }
+

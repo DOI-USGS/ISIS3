@@ -12,14 +12,17 @@
 #include "CubeSerialNumberFilter.h"
 #include "ChooserNameFilter.h"
 #include "GoodnessOfFitFilter.h"
+#include "LineFilter.h"
 #include "LineResidualFilter.h"
 #include "PointEditLockedFilter.h"
 #include "MeasureCountFilter.h"
 #include "MeasureIgnoredFilter.h"
+#include "MeasureTypeFilter.h"
 #include "PointIdFilter.h"
 #include "PointIgnoredFilter.h"
 #include "PointTypeFilter.h"
 #include "ResidualMagnitudeFilter.h"
+#include "SampleFilter.h"
 #include "SampleResidualFilter.h"
 
 
@@ -73,8 +76,11 @@ namespace Isis
       getSelector()->addItem("Cube Serial Number");
       getSelector()->addItem("Goodness Of Fit");
       getSelector()->addItem("Ignored Measures");
+      getSelector()->addItem("Line");
       getSelector()->addItem("Line Residual");
+      getSelector()->addItem("Measure Type");
       getSelector()->addItem("Residual Magnitude");
+      getSelector()->addItem("Sample");
       getSelector()->addItem("Sample Residual");
     }
 
@@ -118,14 +124,26 @@ namespace Isis
                 AbstractFilter::Measures, 1));
             break;
           case 12:
-            setFilter(new LineResidualFilter(AbstractFilter::Points |
+            setFilter(new LineFilter(AbstractFilter::Points |
                 AbstractFilter::Measures, 1));
             break;
           case 13:
-            setFilter(new ResidualMagnitudeFilter(AbstractFilter::Points |
+            setFilter(new LineResidualFilter(AbstractFilter::Points |
                 AbstractFilter::Measures, 1));
             break;
           case 14:
+            setFilter(new MeasureTypeFilter(AbstractFilter::Points |
+                AbstractFilter::Measures, 1));
+            break;
+          case 15:
+            setFilter(new ResidualMagnitudeFilter(AbstractFilter::Points |
+                AbstractFilter::Measures, 1));
+            break;
+          case 16:
+            setFilter(new SampleFilter(AbstractFilter::Points |
+                AbstractFilter::Measures, 1));
+            break;
+          case 17:
             setFilter(new SampleResidualFilter(AbstractFilter::Points |
                 AbstractFilter::Measures, 1));
             break;
@@ -137,3 +155,4 @@ namespace Isis
     }
   }
 }
+

@@ -66,6 +66,8 @@ namespace Isis
 
       if (getMinForSuccess() != 1)
         description += "s ";
+      else
+        description += " ";
       
       description += "that ";
       

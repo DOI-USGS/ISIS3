@@ -73,7 +73,8 @@ namespace Isis
 
     QString LineResidualFilter::getMeasureDescription() const
     {
-      return "that have line residuals which are " + descriptionSuffix();
+      return "have line residuals which are " + descriptionSuffix();
     }
   }
 }
+
