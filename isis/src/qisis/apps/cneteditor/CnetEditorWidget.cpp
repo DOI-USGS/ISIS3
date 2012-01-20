@@ -34,6 +34,7 @@
 #include "AbstractMeasureItem.h"
 #include "AbstractPointItem.h"
 #include "AbstractTreeItem.h"
+#include "CnetDisplayProperties.h"
 #include "MeasureTableModel.h"
 #include "PointTableModel.h"
 #include "TableView.h"
@@ -75,6 +76,8 @@ namespace Isis
     updatingSelection = false;
 
     controlNet = cNet;
+    connect(CnetDisplayProperties::getInstance(), SIGNAL(compositionFinished()),
+            this, SLOT(rebuildModels()));
 //     connect(controlNet, SIGNAL(networkStructureModified()),
 //         this, SLOT(rebuildModels()));
 

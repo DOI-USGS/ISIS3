@@ -80,6 +80,7 @@ namespace Isis
         QVariant getData() const;
         QVariant getData(QString columnTitle) const;
         void setData(QString const & columnTitle, QString const & newData);
+        bool isDataLocked(QString columnTitle) const;
         void deleteSource();
         InternalPointerType getPointerType() const;
         void * getPointer() const;

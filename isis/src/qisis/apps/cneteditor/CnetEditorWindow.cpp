@@ -32,6 +32,7 @@
 #include "ProgressBar.h"
 #include "Pvl.h"
 
+#include "CnetDisplayProperties.h"
 #include "CnetEditorWidget.h"
 
 
@@ -70,9 +71,11 @@ namespace Isis
 #endif
 
     nullify();
-    curFile = new QString;
-    labelFont = new QFont("Sansserif", 9);
     
+    displayProperties = CnetDisplayProperties::getInstance();
+    curFile = new QString;
+//     cubeListFile = new QString;
+    labelFont = new QFont("Sansserif", 9);
     toolBars = new QList< QToolBar * >;
 
     createActions();
@@ -85,16 +88,14 @@ namespace Isis
     setFileState(NoFile, "");
 
     if (QApplication::arguments().size() > 1)
-    {
       load(QApplication::arguments().at(1));
-    }
   }
 
 
   CnetEditorWindow::~CnetEditorWindow()
   {
-    delete openAct;
-    openAct = NULL;
+    delete openNetAct;
+    openNetAct = NULL;
 
     delete saveAct;
     saveAct = NULL;
@@ -113,6 +114,9 @@ namespace Isis
 
     delete cnet;
     cnet = NULL;
+    
+    delete displayProperties;
+    displayProperties = NULL;
 
     delete cnetReader;
     cnetReader = NULL;
@@ -122,6 +126,9 @@ namespace Isis
 
     delete curFile;
     curFile = NULL;
+    
+//     delete cubeListFile;
+//     cubeListFile = NULL;
 
     delete labelFont;
     labelFont = NULL;
@@ -139,12 +146,14 @@ namespace Isis
   void CnetEditorWindow::nullify()
   {
     cnet = NULL;
+    displayProperties = NULL;
     cnetReader = NULL;
     editorWidget = NULL;
     curFile = NULL;
+//     cubeListFile = NULL;
     labelFont = NULL;
 
-    openAct = NULL;
+    openNetAct = NULL;
     saveAct = NULL;
     saveAsAct = NULL;
     aboutAct = NULL;
@@ -189,10 +198,15 @@ namespace Isis
 
   void CnetEditorWindow::createActions()
   {
-    openAct = new QAction(QIcon(":open"), tr("&Open"), this);
-    openAct->setShortcut(tr("Ctrl+O"));
-    openAct->setStatusTip(tr("Open a control network file"));
-    connect(openAct, SIGNAL(triggered()), this, SLOT(open()));
+    openNetAct = new QAction(QIcon(":open"), tr("&Open control network"), this);
+    openNetAct->setShortcut(tr("Ctrl+O"));
+    openNetAct->setStatusTip(tr("Open a control network file"));
+    connect(openNetAct, SIGNAL(triggered()), this, SLOT(openNet()));
+
+    openCubeListAct = new QAction(QIcon(":open"), tr("Open cube &list"), this);
+    openCubeListAct->setShortcut(tr("Ctrl+L"));
+    openCubeListAct->setStatusTip(tr("Open a cube list file"));
+    connect(openCubeListAct, SIGNAL(triggered()), this, SLOT(openCubeList()));
 
     saveAct = new QAction(QIcon(":save"), tr("&Save"), this);
     saveAct->setShortcut(tr("Ctrl+S"));
@@ -276,7 +290,9 @@ namespace Isis
   void CnetEditorWindow::createMenus()
   {
     fileMenu = menuBar()->addMenu("&File");
-    fileMenu->addAction(openAct);
+    fileMenu->addAction(openNetAct);
+    fileMenu->addSeparator();
+    fileMenu->addAction(openCubeListAct);
     fileMenu->addSeparator();
     fileMenu->addAction(saveAct);
     fileMenu->addAction(saveAsAct);
@@ -297,8 +313,9 @@ namespace Isis
     mainToolBar = new QToolBar(tr("Main ToolBar"));
     mainToolBar->setObjectName("main toolbar");
     mainToolBar->setFloatable(false);
-    //mainToolBar->setAllowedAreas(Qt::TopToolBarArea);
-    mainToolBar->addAction(openAct);
+    mainToolBar->addAction(openCubeListAct);
+    mainToolBar->addSeparator();
+    mainToolBar->addAction(openNetAct);
     mainToolBar->addSeparator();
     mainToolBar->addAction(saveAct);
     mainToolBar->addAction(saveAsAct);
@@ -315,6 +332,10 @@ namespace Isis
     loadingProgressBar = new ProgressBar("Reading network");
     statusBar()->addPermanentWidget(loadingProgressBar);
     loadingProgressBar->setVisible(false);
+    
+    cubeListProgressBar = new ProgressBar("Reading cube list");
+    statusBar()->addPermanentWidget(cubeListProgressBar);
+    cubeListProgressBar->setVisible(false);
   }
 
 
@@ -376,7 +397,7 @@ namespace Isis
   {
     setDirty(true);
   }
-
+  
 
   void CnetEditorWindow::setSaveAsPvl(int state)
   {
@@ -384,7 +405,22 @@ namespace Isis
   }
 
 
-  void CnetEditorWindow::open()
+  void CnetEditorWindow::openCubeList()
+  {
+    QString filename = QFileDialog::getOpenFileName(this,
+        tr("Open a cube list file"), ".",
+        tr("Cube list files (*.lis);;All files (*)"));
+
+    if (filename.size())
+    {
+      ASSERT(displayProperties);
+      displayProperties->setCubeList(filename);
+    }
+    
+  }
+
+
+  void CnetEditorWindow::openNet()
   {
     QString filename = QFileDialog::getOpenFileName(this,
         tr("Open a control net file"), ".",
@@ -409,7 +445,8 @@ namespace Isis
         if (centralWidget() != editorWidget)
           setCentralWidget(editorWidget);
 
-        openAct->setEnabled(false);
+        openCubeListAct->setEnabled(true);
+        openNetAct->setEnabled(false);
         saveAsAct->setEnabled(true);
         closeAct->setEnabled(true);
         setDirty(false);
@@ -421,7 +458,8 @@ namespace Isis
       case NoFile:
 //         setDockWidgetsVisible(false);
         setCentralWidget(new QWidget());
-        openAct->setEnabled(true);
+        openCubeListAct->setEnabled(true);
+        openNetAct->setEnabled(true);
         saveAsAct->setEnabled(false);
         closeAct->setEnabled(false);
         setDirty(false);
@@ -434,7 +472,8 @@ namespace Isis
       case FileLoading:
 //         setDockWidgetsVisible(false);
         setCentralWidget(new QWidget());
-        openAct->setEnabled(false);
+        openCubeListAct->setEnabled(false);
+        openNetAct->setEnabled(false);
         saveAsAct->setEnabled(false);
         closeAct->setEnabled(false);
         *curFile = filename;
@@ -573,7 +612,7 @@ namespace Isis
     populateMenus();
     populateToolBars();
     connect(editorWidget, SIGNAL(cnetModified()), this, SLOT(setDirty()));
-    setFileState(CnetEditorWindow::HasFile, *curFile);
+//     setFileState(CnetEditorWindow::HasFile, *curFile);
 
     pointTreeDockWidget->setWidget(editorWidget->getPointTreeView());
     serialTreeDockWidget->setWidget(editorWidget->getSerialTreeView());
@@ -587,7 +626,7 @@ namespace Isis
         editorWidget->getConnectionFilterWidget());
 
     setFileState(HasFile, *curFile);
-    saveAsPvl = !Pvl((iString) * curFile).HasObject("ProtoBuffer");
+    saveAsPvl = !Pvl((iString) *curFile).HasObject("ProtoBuffer");
   }
   
   

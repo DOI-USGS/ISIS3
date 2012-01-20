@@ -9,15 +9,15 @@
 #include <QHBoxLayout>
 
 #include "AbstractFilter.h"
-#include "CubeSerialNumberFilter.h"
 #include "ChooserNameFilter.h"
 #include "GoodnessOfFitFilter.h"
+#include "ImageIdFilter.h"
 #include "LineFilter.h"
 #include "LineResidualFilter.h"
-#include "PointEditLockedFilter.h"
 #include "MeasureCountFilter.h"
 #include "MeasureIgnoredFilter.h"
 #include "MeasureTypeFilter.h"
+#include "PointEditLockedFilter.h"
 #include "PointIdFilter.h"
 #include "PointIgnoredFilter.h"
 #include "PointTypeFilter.h"
@@ -73,9 +73,9 @@ namespace Isis
       getSelector()->addItem("Point Type");
       getSelector()->addItem("Measure Count");
       getSelector()->insertSeparator(getSelector()->count());
-      getSelector()->addItem("Cube Serial Number");
       getSelector()->addItem("Goodness Of Fit");
       getSelector()->addItem("Ignored Measures");
+      getSelector()->addItem("Image ID");
       getSelector()->addItem("Line");
       getSelector()->addItem("Line Residual");
       getSelector()->addItem("Measure Type");
@@ -112,15 +112,15 @@ namespace Isis
             setFilter(new MeasureCountFilter(AbstractFilter::Points));
             break;
           case 9:
-            setFilter(new CubeSerialNumberFilter(AbstractFilter::Points |
-                AbstractFilter::Measures, 1));
-            break;
-          case 10:
             setFilter(new GoodnessOfFitFilter(AbstractFilter::Points |
                 AbstractFilter::Measures, 1));
             break;
-          case 11:
+          case 10:
             setFilter(new MeasureIgnoredFilter(AbstractFilter::Points |
+                AbstractFilter::Measures, 1));
+            break;
+          case 11:
+            setFilter(new ImageIdFilter(AbstractFilter::Points |
                 AbstractFilter::Measures, 1));
             break;
           case 12:

@@ -6,6 +6,7 @@
 #include <QString>
 #include <QVariant>
 
+#include "CnetDisplayProperties.h"
 #include "ControlMeasure.h"
 #include "ControlMeasureLogData.h"
 #include "ControlPoint.h"
@@ -26,8 +27,8 @@ namespace Isis
       {
         case PointId:
           return "Point ID";
-        case CubeSerialNumber:
-          return "Serial Number";
+        case ImageId:
+          return "Image ID";
         case Sample:
           return "Sample";
         case Line:
@@ -82,8 +83,8 @@ namespace Isis
     {
       for (int i = 0; i < COLS; i++)
       {
-        if (columnTitle == getColumnName((Column)i))
-          return (Column)i;
+        if (columnTitle == getColumnName((Column) i))
+          return (Column) i;
       }
 
       iString msg = "Column title [" + columnTitle + "] does not match any of "
@@ -97,7 +98,7 @@ namespace Isis
       TableColumnList * columnList = new TableColumnList;
 
       columnList->append(new TableColumn(getColumnName(PointId), true, false));
-      columnList->append(new TableColumn(getColumnName(CubeSerialNumber), true,
+      columnList->append(new TableColumn(getColumnName(ImageId), true,
                                             true));
       columnList->append(new TableColumn(getColumnName(Sample), true, false));
       columnList->append(new TableColumn(getColumnName(Line), true, false));
@@ -160,7 +161,7 @@ namespace Isis
 
     QVariant AbstractMeasureItem::getData() const
     {
-      return getData(getColumnName(CubeSerialNumber));
+      return getData(getColumnName(ImageId));
     }
 
 
@@ -173,9 +174,10 @@ namespace Isis
         switch ((Column) column)
         {
           case PointId:
-            return QVariant((QString)measure->Parent()->GetId());
-          case CubeSerialNumber:
-            return QVariant((QString)measure->GetCubeSerialNumber());
+            return QVariant((QString) measure->Parent()->GetId());
+          case ImageId:
+            return QVariant(CnetDisplayProperties::getInstance()->getImageName(
+                (QString) measure->GetCubeSerialNumber()));
           case Sample:
             return QVariant(measure->GetSample());
           case Line:
@@ -259,8 +261,9 @@ namespace Isis
           case PointId:
             // PointId is not editable in the measure table
             break;
-          case CubeSerialNumber:
-            measure->SetCubeSerialNumber(newData);
+          case ImageId:
+            measure->SetCubeSerialNumber(
+                CnetDisplayProperties::getInstance()->getSerialNumber(newData));
             break;
           case Sample:
             measure->SetCoordinate(catchNull(newData),
@@ -288,7 +291,9 @@ namespace Isis
             // only be changed through the point.
             break;
           case Type:
-            measure->SetType(measure->StringToMeasureType(newData));
+            measure->SetType(measure->StringToMeasureType(
+                CnetDisplayProperties::getInstance()->getSerialNumber(
+                newData)));
             break;
           case Eccentricity:
             setLogData(measure, ControlMeasureLogData::Eccentricity, newData);
@@ -341,6 +346,29 @@ namespace Isis
             break;
         }
       }
+    }
+
+
+    // Returns true if the data at the given column is locked (i.e. is
+    // edit-locked). If the measure is edit-locked, all columns except the edit
+    // lock column should be uneditable. If the measure's parent point is
+    // edit-locked, none of the columns should be editable as it should only be
+    // unlocked from the parent point.
+    bool AbstractMeasureItem::isDataLocked(QString columnTitle) const {
+      bool locked = true;
+      if (measure->IsEditLocked()) {
+        if (getColumn(columnTitle) == EditLock) {
+          if (measure->Parent() && measure->Parent()->IsEditLocked())
+            locked = true;
+          else
+            locked = false;
+        }
+      }
+      else {
+        locked = false;
+      }
+
+      return locked;
     }
 
 

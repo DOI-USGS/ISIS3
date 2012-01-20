@@ -1292,9 +1292,17 @@ namespace Isis
               }
               else
               {
+                // If the current column is not editable (i.e. read-only), or it
+                // is locked (think edit-locked control point or measure), then
+                // it should be grayed out.
+                //
+                // NOTE: The following two lines provide for graying out of edit
+                // locked data. This is commented out because this functionality
+                // is not fully working yet.
+                //if (!cellIsEditable(rowNum, i) ||
+                //    item->isDataLocked(columnTitle))
                 if (!cellIsEditable(rowNum, i))
                 {
-                  // The cell is not editable, so make the text grayed out.
                   painter->setPen(palette().color(QPalette::Disabled,
                       QPalette::Text));
                 }

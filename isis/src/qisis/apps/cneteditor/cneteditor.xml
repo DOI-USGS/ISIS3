@@ -151,5 +151,12 @@
       filters to the image-point filter selector and fixed typos in a few of the
       filter description strings. Fixes #645.
     </change>
+    <change name="Jai Rideout" date="2012-01-20">
+      Added Eric Hyer's final changes to this application that allow users to
+      load a cube list and have cube filenames display instead of cube serial
+      numbers. "Cube serial number" filter is now called "Image ID", as users
+      may be either filtering on cube serial numbers or cube filenames. Fixes
+      #304.
+    </change>
   </history>
 </application>

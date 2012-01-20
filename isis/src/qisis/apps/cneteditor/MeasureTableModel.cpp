@@ -66,13 +66,15 @@ namespace Isis
 
     int MeasureTableModel::getVisibleRowCount() const
     {
-      return getDataModel()->getVisibleItemCount(AbstractTreeModel::MeasureItems, true);
+      return getDataModel()->getVisibleItemCount(
+          AbstractTreeModel::MeasureItems, true);
     }
 
 
     QList< AbstractTreeItem * > MeasureTableModel::getSelectedItems()
     {
-      return getDataModel()->getSelectedItems(AbstractTreeModel::MeasureItems, true);
+      return getDataModel()->getSelectedItems(
+          AbstractTreeModel::MeasureItems, true);
     }
 
 
@@ -92,9 +94,10 @@ namespace Isis
 
     void MeasureTableModel::calculateFilterCounts()
     {
-      int visible =
-        getDataModel()->getVisibleItemCount(AbstractTreeModel::MeasureItems, true);
-      int total = getDataModel()->getItemCount(AbstractTreeModel::MeasureItems);
+      int visible = getDataModel()->getVisibleItemCount(
+          AbstractTreeModel::MeasureItems, true);
+      int total = getDataModel()->getItemCount(
+          AbstractTreeModel::MeasureItems);
 
       emit filterCountsChanged(visible, total);
     }
@@ -103,8 +106,8 @@ namespace Isis
     int MeasureTableModel::indexOfVisibleItem(
         AbstractTreeItem const * item) const
     {
-      return getDataModel()->indexOfVisibleItem(item, AbstractTreeModel::MeasureItems,
-                                                true);
+      return getDataModel()->indexOfVisibleItem(item,
+          AbstractTreeModel::MeasureItems, true);
     }
 
     

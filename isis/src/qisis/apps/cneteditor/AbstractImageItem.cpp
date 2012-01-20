@@ -54,6 +54,11 @@ namespace Isis
     }
 
 
+    bool AbstractImageItem::isDataLocked(QString columnTitle) const {
+      return false;
+    }
+
+
     void AbstractImageItem::deleteSource()
     {
       // Shouldn't be deleting ControlCubeGraphNode's!

@@ -3,6 +3,7 @@
 
 #include <QFileDialog>
 #include <QMainWindow>
+#include <qaction.h>
 
 class QAction;
 class QButtonGroup;
@@ -17,6 +18,7 @@ namespace Isis
 {
   class ConcurrentControlNetReader;
   class ControlNet;
+  class CnetDisplayProperties;
   class CnetEditorWidget;
   class ProgressBar;
 
@@ -79,7 +81,8 @@ namespace Isis
       void about();
       void setDirty();
       void setSaveAsPvl(int);
-      void open();
+      void openCubeList();
+      void openNet();
       void save();
       void saveAs();
       void closeNetwork();
@@ -87,7 +90,8 @@ namespace Isis
 
 
     private: // widgets
-      QAction * openAct;
+      QAction * openCubeListAct;
+      QAction * openNetAct;
       QAction * saveAct;
       QAction * saveAsAct;
       QAction * aboutAct;
@@ -101,6 +105,7 @@ namespace Isis
       QList< QToolBar * > * toolBars;
 
       ProgressBar * loadingProgressBar;
+      ProgressBar * cubeListProgressBar;
 
       QDockWidget * pointTreeDockWidget;
       QDockWidget * serialTreeDockWidget;
@@ -113,9 +118,11 @@ namespace Isis
 
     private: // data
       ControlNet * cnet;
+      CnetDisplayProperties * displayProperties;
       ConcurrentControlNetReader * cnetReader;
       CnetEditorWidget * editorWidget;
       QString * curFile;
+//       QString * cubeListFile;
       QFont * labelFont;
       bool dirty;
       bool saveAsPvl;

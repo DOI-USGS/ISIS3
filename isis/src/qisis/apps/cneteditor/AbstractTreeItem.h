@@ -72,6 +72,7 @@ namespace Isis
         virtual QVariant getData(QString columnTitle) const = 0;
         virtual void setData(QString const & columnTitle,
                             QString const & newData) = 0;
+        virtual bool isDataLocked(QString columnTitle) const = 0;
         virtual void deleteSource() = 0;
         virtual InternalPointerType getPointerType() const = 0;
         virtual void * getPointer() const = 0;
@@ -113,8 +114,8 @@ namespace Isis
 
       // disable copying of this class
       private:
-        AbstractTreeItem(const AbstractTreeItem &);
-        const AbstractTreeItem & operator=(const AbstractTreeItem &);
+        AbstractTreeItem(AbstractTreeItem const &);
+        AbstractTreeItem & operator=(AbstractTreeItem const &);
 
 
       private:

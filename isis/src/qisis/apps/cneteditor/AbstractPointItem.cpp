@@ -7,14 +7,15 @@
 #include <QString>
 #include <QVariant>
 
-#include "TableColumn.h"
-#include "TableColumnList.h"
+#include "CnetDisplayProperties.h"
 #include "ControlMeasure.h"
 #include "ControlNet.h"
 #include "ControlPoint.h"
 #include "iException.h"
 #include "Latitude.h"
 #include "Longitude.h"
+#include "TableColumn.h"
+#include "TableColumnList.h"
 
 
 namespace Isis
@@ -206,7 +207,8 @@ namespace Isis
           case Reference:
             if (point->GetNumMeasures())
               return QVariant(
-                  (QString)point->GetRefMeasure()->GetCubeSerialNumber());
+                  CnetDisplayProperties::getInstance()->getImageName(
+                  (QString) point->GetRefMeasure()->GetCubeSerialNumber()));
             else
               return QVariant();
           case AdjustedSPLat:
@@ -429,6 +431,23 @@ namespace Isis
             break;
         }
       }
+    }
+
+
+    // Returns true if the data at the given column is locked (i.e.
+    // edit-locked). If the point is edit-locked, all columns except the edit
+    // lock column should be uneditable.
+    bool AbstractPointItem::isDataLocked(QString columnTitle) const {
+      bool locked = true;
+      if (point->IsEditLocked()) {
+        if (getColumn(columnTitle) == EditLock)
+          locked = false;
+      }
+      else {
+        locked = false;
+      }
+
+      return locked;
     }
 
 

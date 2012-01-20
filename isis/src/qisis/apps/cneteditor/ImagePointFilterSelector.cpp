@@ -9,7 +9,7 @@
 
 #include "AbstractFilter.h"
 #include "ChooserNameFilter.h"
-#include "CubeSerialNumberFilter.h"
+#include "ImageIdFilter.h"
 #include "GoodnessOfFitFilter.h"
 #include "LineFilter.h"
 #include "LineResidualFilter.h"
@@ -64,7 +64,7 @@ namespace Isis
     {
       AbstractFilterSelector::createSelector();
 
-      getSelector()->addItem("Cube Serial Number");
+      getSelector()->addItem("Image ID");
       getSelector()->insertSeparator(getSelector()->count());
       getSelector()->addItem("Chooser Name");
       getSelector()->addItem("Edit Locked Points");
@@ -92,7 +92,7 @@ namespace Isis
         switch (index)
         {
           case 2:
-            setFilter(new CubeSerialNumberFilter(AbstractFilter::Images));
+            setFilter(new ImageIdFilter(AbstractFilter::Images));
             break;
           case 4:
             setFilter(new ChooserNameFilter(AbstractFilter::Images |

@@ -43,6 +43,11 @@ namespace Isis
     }
 
 
+    bool AbstractNullDataItem::isDataLocked(QString columnTitle) const {
+      return false;
+    }
+
+
     void AbstractNullDataItem::deleteSource()
     {
       iString msg = "deleteSource called on an AbstractNullDataItem";

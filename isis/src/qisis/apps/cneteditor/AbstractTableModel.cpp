@@ -402,7 +402,8 @@ namespace Isis
 
           try
           {
-            qStableSort(itemsToSort.begin(), itemsToSort.end(), *lessThanFunctor);
+            qStableSort(itemsToSort.begin(), itemsToSort.end(),
+                        *lessThanFunctor);
           }
           catch (SortingCanceledException & e)
           {
@@ -421,9 +422,9 @@ namespace Isis
     //         qStableSort(sortedItems->begin(), sortedItems->end(),
     //                     LessThanFunctor(columnsToSortOn.at(i)));
 
-          // The sort is done, so stop emiting status updates and make sure we let
-          // the listeners know that the sort is done (since the status will not
-          // always reach 100% as we are estimating the progress).
+          // The sort is done, so stop emiting status updates and make sure we
+          // let the listeners know that the sort is done (since the status
+          // will not always reach 100% as we are estimating the progress).
           sortStatusPoller->stop();
           emit sortProgressRangeChanged(0, 0);
           emit sortProgressChanged(0);
@@ -629,7 +630,8 @@ namespace Isis
     
     void AbstractTableModel::LessThanFunctorData::setInterrupted(bool newStatus)
     {
-      newStatus ? interruptFlag.fetchAndStoreRelaxed(1) : interruptFlag.fetchAndStoreRelaxed(0);
+      newStatus ? interruptFlag.fetchAndStoreRelaxed(1) :
+                  interruptFlag.fetchAndStoreRelaxed(0);
     }
     
     

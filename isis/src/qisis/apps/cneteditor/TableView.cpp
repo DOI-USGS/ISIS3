@@ -67,7 +67,26 @@ namespace Isis
       
       key = objectName() + " sorting order";
       key.replace(" ", "_");
-      columns->setSortingOrder(settings.value(key, QStringList()).toStringList());
+      try
+      {
+        columns->setSortingOrder(
+            settings.value(key, QStringList()).toStringList());
+      }
+      catch (iException & e)
+      {
+        cerr << "Failed to restore the sorting order!\n\n"
+                "Dear programmer,\n"
+                "  Did any of the column titles change since the last\n"
+                "  time QSettings were saved?  If so this message should\n"
+                "  go away after the next successfull save of QSettings.\n"
+                "  Note that your users will also see this message the\n"
+                "  first time they run the program with your new column\n"
+                "  titles, which should be handled with versioning.\n"
+                "  Please see Steven Lambright for the correct way to\n"
+                "  implement versioning.  So many people get this wrong,\n"
+                "  and you surely don't want to be one of \"those\"\n"
+                "  people, do you?\n\n";
+      }
       
       header = new TableViewHeader(model);
       connect(header, SIGNAL(requestedGlobalSelection(bool)),

@@ -1,5 +1,5 @@
-#ifndef CubeSerialNumberFilter_H
-#define CubeSerialNumberFilter_H
+#ifndef ImageIdFilter_H
+#define ImageIdFilter_H
 
 #include "AbstractStringFilter.h"
 
@@ -18,26 +18,27 @@ namespace Isis
     class AbstractFilterSelector;
     
     /**
-     * @brief Allows filtering by cube serial number
+     * @brief Allows filtering by image ID
      *
      * This class allows the user to filter control points and control measures
-     * by a cube serial number. This allows the user to make a list of control
-     * points and measures for a particular image or set of images with similar
-     * serial numbers.
+     * by an image ID (either a cube serial number or a cube filename). This
+     * allows the user to make a list of control points and measures for a
+     * particular image or set of images with similar serial numbers or
+     * filenames.
      *
      * @author ????-??-?? Eric Hyer
      *
      * @internal
      */
-    class CubeSerialNumberFilter : public AbstractStringFilter
+    class ImageIdFilter : public AbstractStringFilter
     {
         Q_OBJECT
 
       public:
-        CubeSerialNumberFilter(AbstractFilter::FilterEffectivenessFlag,
+        ImageIdFilter(AbstractFilter::FilterEffectivenessFlag,
             int minimumForSuccess = -1);
-        CubeSerialNumberFilter(const CubeSerialNumberFilter & other);
-        virtual ~CubeSerialNumberFilter();
+        ImageIdFilter(const ImageIdFilter & other);
+        virtual ~ImageIdFilter();
 
         bool evaluate(const ControlCubeGraphNode *) const;
         bool evaluate(const ControlPoint *) const;

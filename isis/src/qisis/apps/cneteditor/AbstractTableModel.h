@@ -11,6 +11,7 @@
 #include "AbstractTreeModel.h"
 
 
+class QAtomicInt;
 template< typename T > class QFutureWatcher;
 class QTimer;
 template< typename T > class QList;
@@ -26,16 +27,6 @@ namespace Isis
     class TableColumnList;
     class AbstractTreeModel;
 
-    /**
-     * @brief Translates the tree model into a table model
-     *
-     * This class acts as a proxy model for the abstract tree model by allowing
-     * the user to access data in a table-like fashion (by sorted row).
-     *
-     * @author ????-??-?? Eric Hyer
-     *
-     * @internal
-     */
     class AbstractTableModel : public QObject
     {
       class LessThanFunctor;
@@ -45,7 +36,6 @@ namespace Isis
       public:
         AbstractTableModel(AbstractTreeModel *, AbstractTableDelegate *);
         virtual ~AbstractTableModel();
-
 
         virtual QList< AbstractTreeItem * > getItems(int, int) = 0;
         virtual QList< AbstractTreeItem * > getItems(AbstractTreeItem *,
@@ -135,11 +125,6 @@ namespace Isis
       private:
         class LessThanFunctorData;
 
-        /**
-         * @author 2011-??-?? Jai Rideout
-         *
-         * @internal
-         */
         class LessThanFunctor : public std::binary_function<
             AbstractTreeItem * const &, AbstractTreeItem * const &, bool >
         {
@@ -163,15 +148,9 @@ namespace Isis
             QExplicitlySharedDataPointer<LessThanFunctorData> sharedData;
         };
 
-        /**
-         * For explicit sharing of the comparison counter between multiple
-         * copies of a LessThanFunctor object. This bypasses the need for a 
-         * static member in LessThanFunctor.
-         *
-         * @author 2011-??-?? Jai Rideout
-         *
-         * @internal
-         */
+        // For explicit sharing of the comparison counter between multiple
+        // copies of a LessThanFunctor object. This bypasses the need for a
+        // static member in LessThanFunctor.
         class LessThanFunctorData : public QSharedData
         {
           public:
@@ -192,17 +171,10 @@ namespace Isis
         };
         
         
-        /**
-         * @brief Thread-safe exception for cancelling sorting.
-         *
-         * This class is used to cancel sorting when it is done in another
-         * thread. It can be thrown from the thread doing the sorting in order
-         * to abort the sorting. It is thread-safe.
-         *
-         * @author 2011-??-?? Eric Hyer
-         *
-         * @internal
-         */
+        // this custom exception was supposed to be able to cross threads.
+        // it didn't work, and we are doing something different now, but are
+        // still using the exception
+        // TODO: Remove this class and use iExceptions instead.
         class SortingCanceledException : public QtConcurrent::Exception
         {
           public:
