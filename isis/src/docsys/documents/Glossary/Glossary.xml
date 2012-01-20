@@ -689,15 +689,13 @@
              </p>
           </definition>
 
-
-<!--
           <definition name="Local Radius">
-
+            The distance from a point on the surface of a body to its geometric
+            center.
              <p>
-
+               Isis expects and reports the local radius value in Meters.
              </p>
           </definition>
--->
 
           <definition name="Spacecraft Position">
               The Spacecraft Position is the position of the spacecraft (x,y,z)
@@ -875,6 +873,20 @@
             </pre>
           </definition>
 
+          <definition name="Scale">
+            The map resolution measured in pixels per degree
+          </definition>
+
+          <definition name="Polar Radius">
+            The distance from the geometric center of an ellipsoid to either
+            of its poles.
+          </definition>
+
+          <definition name="Equatorial Radius">
+            The distance from the geometric center of an ellipsoid to its
+            equator.
+          </definition>
+
         </definitions>
       </body>
 
@@ -925,6 +937,9 @@
     </change>
     <change name="Tammy Becker" date="2012-01-05">
       Added more definitions related to terms reported by the campt application
+    </change>
+    <change name="Debbie Cook" date="2012-01-19">
+      Added more definitions scale from Lynn Weller and local radius
     </change>
   </history>
 </documentation>
