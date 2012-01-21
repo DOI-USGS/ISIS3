@@ -331,9 +331,14 @@ namespace Isis {
     bool checkHidden = false;
     for(int j = 0; j < 300; j++) {
       double etGuess = xl + (xh - xl) * fl / (fl - fh);
+
+      if (etGuess < startTime) etGuess = startTime;
+      if (etGuess > endTime) etGuess = endTime;
+
       p_camera->Sensor::SetTime(etGuess);
-      if(!p_camera->Sensor::SetGround(surfacePoint, checkHidden))
+      if(!p_camera->Sensor::SetGround(surfacePoint, checkHidden)) {
         return Failure;
+      }
       p_camera->Sensor::LookDirection(lookC);
       ux = p_camera->FocalLength() * lookC[0] / lookC[2];
       uy = p_camera->FocalLength() * lookC[1] / lookC[2];
@@ -350,22 +355,18 @@ namespace Isis {
       double f = focalMap->DetectorLineOffset() -
                  focalMap->DetectorLine();
 
-      double delTime;
       if( fabs( xl- etGuess) > fabs( xh - etGuess) ) {  //elliminate the node farthest away from the current best guess
-        delTime = xl - etGuess;
         xl = etGuess;
         fl = f;
       }
       else {
-        delTime = xh - etGuess;
         xh = etGuess;
         fh = f;
       }
 
       // See if we converged on the point so set up the undistorted
       // focal plane values and return
-      //if(fabs(delTime) < timeTol || f == 0.0) {
-      if(fabs(f) < 1e-2 || f == 0.0) {
+      if(fabs(f) < 1e-2) {
         if(checkHidden) {
           p_focalPlaneX = ux;
           p_focalPlaneY = uy;
