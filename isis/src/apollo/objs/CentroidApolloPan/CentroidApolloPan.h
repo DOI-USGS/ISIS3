@@ -26,18 +26,18 @@
 #include "Centroid.h"
 
 namespace Isis {
-  /**-*
-   * @brief Slection Class derived from the Pure Virtual Parent Class for all Selection classes
-   *
+  /**                                                                       
+   * @brief Selection class derived from the Pure Virtual Parent Class for all Selection classes
+   *                                                                        
+   * Description coming soon
    *
    * @ingroup Selection
-   *
-   * @see 
-   *
-   * @internal
-   *    @history 2011-10-12 Orrin Thomas - creation
-   */
-  
+   *                                                                        
+   * @author 2011-10-22 Orrin Thomas
+   *                                                                        
+   * @internal                                                              
+   *   @history 2011-10-22 Orrin Thomas - Original version
+   */        
   class CentroidApolloPan : public Centroid {
   public:
     CentroidApolloPan(double pixel_size_microns);

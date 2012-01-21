@@ -38,20 +38,19 @@ typedef struct Ellipse
 }Ellipse;
 
 namespace Isis {
-  /**
-  * @brief Pure Virtual Parent Class for all Selection classes
-  *
-  * Create Selection object.  Because this is a pure virtual class you can
-  * not create a Selection class directly.  
-  *
-  * @ingroup Selection
-  *
-  * @see 
-  *
-  * @internal
-  *    @history 2011-10-12 Orrin Thomas - creation
-  */
-  
+  /**                                                                       
+   * @brief Pure Virtual Parent Class for all Selection classes
+   *                                                                        
+   * Create Selection object.  Because this is a pure virtual class you can
+   * not create a Selection class directly.  
+   *
+   * @ingroup Selection
+   *                                                                        
+   * @author 2011-10-12 Orrin Thomas
+   *                                                                        
+   * @internal                                                              
+   *   @history 2011-10-12 Orrin Thomas - Original version
+   */        
   class Selection {
   public:
     Selection();

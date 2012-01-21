@@ -28,18 +28,16 @@
 #include "Statistics.h"
 
 namespace Isis {
-  /**
-   * @brief Slection Class derived from the Pure Virtual Parent Class for all Selection classes
-   *
-   *
-   * @ingroup Selection
-   *
-   * @see 
-   *
-   * @internal
-   *    @history 2011-10-12 Orrin Thomas - origin version
-   */
-  
+  /**                                                                       
+   * @brief Selection class derived from the Pure Virtual Parent Class for all Selection classes
+   *                                                                        
+   * Description coming soon
+   *                                                                        
+   * @author 2011-10-12 Orrin Thomas
+   *                                                                        
+   * @internal                                                              
+   *   @history 2011-10-12 Orrin Thomas - Original version
+   */        
   class Centroid : public Selection
   {
   public:
