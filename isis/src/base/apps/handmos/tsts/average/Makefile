@@ -10,6 +10,7 @@ commands:
 	  outline=2 \
 	  outband=1 \
 	  create=yes \
+	  propagate=false \
 	  nsamples=10 \
 	  nlines=20 \
 	  nbands=1 > /dev/null;

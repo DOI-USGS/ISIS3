@@ -237,8 +237,14 @@
       Output cube when CREATE=yes no longer propagates labels other than the
       band bin information.
     </change>
-    <change name="Sharmila Prasad" date="2011-11-07">Updated documentation for 
-    Average priority. Fixes #553</change>
+    <change name="Sharmila Prasad" date="2011-11-07">
+      Updated documentation for Average priority. Fixes #553
+    </change>
+    <change name="Stuart Sides" date="2012-01-19">
+      Added option to have the BLOBs and labels transfered from the input
+      cube transfered to the output mosaic from the input cube.
+    </change>
+
   </history>
 
   <oldName>
@@ -610,6 +616,7 @@
               <item>NLINES</item>
               <item>NBANDS</item>
               <item>TRACK</item>
+              <item>PROPAGATE</item>
             </exclusions>
           </option>
 
@@ -622,22 +629,37 @@
               <item>NSAMPLES</item>
               <item>NLINES</item>
               <item>NBANDS</item>
+              <item>PROPAGATE</item>
             </inclusions>
           </option>
         </list>
       </parameter>
      
       <parameter name="TRACK">
-          <type>boolean</type>
-         <default><item>FALSE</item></default>
-          <brief>
-            Track the mosaic origin
-          </brief>
-          <description>
-            If selected the application will track the mosaic origin. Once 
-            origin is tracked, the tracker cannot be turned off.
-          </description>
-        </parameter>
+        <type>boolean</type>
+        <default><item>FALSE</item></default>
+        <brief>
+          Track the mosaic origin
+        </brief>
+        <description>
+          If selected the application will track the mosaic origin. Once 
+          origin is tracked, the tracker cannot be turned off.
+        </description>
+      </parameter>
+
+      <parameter name="PROPAGATE">
+        <type>boolean</type>
+        <default><item>TRUE</item></default>
+        <brief>
+          Propagate the labels, tables, and BLOBs from the input cube.
+        </brief>
+        <description>
+          If selected the application will transfere the lablels, tables,
+          and BLOBs from the input cube to the output mosaic. If not selected
+          only the Band Bin information will be transfered. This option can
+          only be used when the mosaic is being created (i.e., CREATE=YES).
+        </description>
+      </parameter>
 
       <parameter name="NSAMPLES">
         <type>integer</type>

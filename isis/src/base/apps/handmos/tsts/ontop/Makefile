@@ -11,6 +11,7 @@ commands:
 	  outband=1 \
 	  create=yes \
 	  track=yes \
+	  propagate=false \
 	  nsamples=10 \
 	  nlines=20 \
 	  nbands=1 > /dev/null;

@@ -16,6 +16,7 @@ commands:
 	nsamples=1000 \
 	nbands=5 \
 	create=yes \
+	propagate=false \
 	track=true \
 	type=KEYWORD \
 	keyname=FilterName \
