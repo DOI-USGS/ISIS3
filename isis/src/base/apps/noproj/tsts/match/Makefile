@@ -1,6 +1,7 @@
 APPNAME = noproj
 # This file exercises the match file option
 
+# Maintains accuracy across systems to 4 sig figs
 PSP_001414_1780_RED4.balance.cropped.noproj.cub.TOLERANCE=0.8
 
 include $(ISISROOT)/make/isismake.tsts
