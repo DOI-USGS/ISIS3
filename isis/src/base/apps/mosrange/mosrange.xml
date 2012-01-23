@@ -41,7 +41,7 @@
 Group = Mapping
   ProjectionName          = Equirectangular
   TargetName              = Mercury
-  <def link="Equitorial Radius" >EquatorialRadius</def>        = 2440000.0  &lt;meters&gt;   
+  <def link="Equatorial Radius" >EquatorialRadius</def>        = 2440000.0  &lt;meters&gt;   
   <def link="Polar Radius" >PolarRadius</def>             = 2440000.0 &lt;meters&gt;
   <def link="Latitude Type">LatitudeType</def>            = <def link="Planetocentric Latitude">Planetocentric</def>
   <def link="Longitude Direction">LongitudeDirection</def>      = <def link="Positive East Longitude">PositiveEast</def>
