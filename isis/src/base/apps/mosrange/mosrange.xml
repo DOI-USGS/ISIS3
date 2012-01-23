@@ -41,10 +41,10 @@
 Group = Mapping
   ProjectionName          = Equirectangular
   TargetName              = Mercury
-  Equatorial<def>Radius</def>        = 2440000.0  &lt;meters&gt;   
-  PolarRadius             = 2440000.0 &lt;meters&gt;
-  <def link="Latitude Type">LatitudeType</def>            = Planetocentric
-  <def link="Longitude Direction">LongitudeDirection</def>      = PositiveEast
+  <def link="Equitorial Radius" >EquatorialRadius</def>        = 2440000.0  &lt;meters&gt;   
+  <def link="Polar Radius" >PolarRadius</def>             = 2440000.0 &lt;meters&gt;
+  <def link="Latitude Type">LatitudeType</def>            = <def link="Planetocentric Latitude">Planetocentric</def>
+  <def link="Longitude Direction">LongitudeDirection</def>      = <def link="Positive East Longitude">PositiveEast</def>
   <def link="Longitude Domain">LongitudeDomain</def>         = 360
   <def link="Pixel Resolution">PixelResolution</def>         = 505.3668 &lt;meters/pixel&gt; 
   <def>Scale</def>                   = 84.2676 &lt;pixels/degree&gt;
@@ -97,7 +97,7 @@ End
         Added more detail to error reporting so the offending file can be 
         more readily identified.
     </change>
-    <change name="Kris Becker, Lynn Weller" date="2012-01-05">
+    <change name="Kris Becker, Lynn Weller" date="2012-01-22">
         Updated the documentation
     </change>
 </history>
