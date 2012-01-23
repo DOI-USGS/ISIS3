@@ -198,7 +198,16 @@ namespace Isis {
    *  @history 2011-02-18 Steven Lambright - Fixed a problem where using a
    *                          planetographic mapping group in GroundRange would
    *                          still output planetocentric latitudes.
-   *   @history 2011-05-03 Jeannie Walldren - Added Isis Disclaimer to files.
+   *  @history 2011-05-03 Jeannie Walldren - Added Isis Disclaimer to files.
+   *  @history 2012-01-19 Janet Barrett - Fixes issue #625 - Fixed a problem with the 
+   *                          ground azimuth calculation in the GroundAzimuth method.
+   *                          The algorithm being used was the Napier's analogies and
+   *                          was not providing the correct azimuth value. The Napier's
+   *                          analogies also have the weakness of producing a divide by
+   *                          zero error. The new algorithm being used is the spherical
+   *                          law of cosines for sides which comes out of the "CRC
+   *                          Standard Mathematical Tables and Formulae 30th Edition on
+   *                          page 469.
    */
 
   class Camera : public Sensor {

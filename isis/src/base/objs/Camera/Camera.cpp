@@ -1532,42 +1532,30 @@ namespace Isis {
                                double slat, double slon) {
     double a = (90.0 - slat) * PI / 180.0;
     double b = (90.0 - glat) * PI / 180.0;
-    double c = (glon - slon) * PI / 180.0;
-    double absum = 0.5 * (a + b);
-    double cosabsum = cos(absum);
-    double sinabsum = sin(absum);
-    double abdif = 0.5 * (a - b);
-    double cosabdif = cos(abdif);
-    double sinabdif = sin(abdif);
-    double cotc = 1.0 / (tan(0.5 * c));
-    double tanabsum = cotc * cosabdif / cosabsum;
-    double tanabdif = cotc * sinabdif / sinabsum;
-    double ABsum = atan(tanabsum);
-    double ABdif = atan(tanabdif);
-    double A = ABsum + ABdif;
-    double B = ABsum - ABdif;
-    double sinc = sin(c) * sin(a) / sin(A);
-    c = asin(sinc);
-    double azimuthA = A * 180.0 / PI + 90.0;
-    double azimuthB = 90.0 - B * 180.0 / PI;
-    double azimuth = 0.0;
-    if((glat > slat && glon > slon) ||
-        (glat < slat && glon > slon)) {
-      if(azimuthA < azimuthB) {
-        azimuth = 270.0 - azimuthA;
-      }
-      else {
-        azimuth = 270.0 - azimuthB;
+    double cslon = slon;
+    double cglon = glon;
+    if (cslon > cglon) {
+      if ((cslon-cglon) > 180.0) {
+        while((cslon-cglon) > 180.0) cslon = cslon - 360.0;
       }
     }
-    else if((glat < slat && glon < slon) ||
-            (glat > slat && glon < slon)) {
-      if(azimuthA < azimuthB) {
-        azimuth = 90.0 - azimuthA;
+    if (cglon > cslon) {
+      if ((cglon-cslon) > 180.0) {
+        while((cglon-cslon) > 180.0) cglon = cglon - 360.0;
       }
-      else {
-        azimuth = 90.0 - azimuthB;
-      }
+    }
+    double C = (cglon - cslon) * PI / 180.0;
+    double c = acos(cos(a)*cos(b) + sin(a)*sin(b)*cos(C));
+    double azimuth = 0.0;
+    if (sin(b) == 0.0 || sin(c) == 0.0) {
+      return azimuth;
+    } 
+    double A = acos((cos(a) - cos(b)*cos(c))/(sin(b)*sin(c))) * 180.0 / PI;
+    //double B = acos((cos(b) - cos(c)*cos(a))/(sin(c)*sin(a))) * 180.0 / PI;
+    if (cslon > cglon) {
+      azimuth = A;
+    } else {
+      azimuth = 360.0 - A;
     }
     return azimuth;
   }

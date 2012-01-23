@@ -26,7 +26,7 @@ Group = GroundPoint
   SubSpacecraftLongitude     = 14.052595361351
   SpacecraftAltitude         = 734.83693022532 <km>
   OffNadirAngle              = 0.382
-  SubSpacecraftGroundAzimuth = 116.079
+  SubSpacecraftGroundAzimuth = 117.656
 
   # Sun Information
   SunPosition                = (142092302.24738, 46513072.418956,
@@ -35,7 +35,7 @@ Group = GroundPoint
   SolarDistance              = 0.99964723782732 <AU>
   SubSolarLatitude           = 1.2167758823866
   SubSolarLongitude          = 18.125552305876
-  SubSolarGroundAzimuth      = 0.519
+  SubSolarGroundAzimuth      = 5.668
 
   # Illumination and Other
   Phase                      = 86.187914936426
@@ -86,7 +86,7 @@ Group = GroundPoint
   SolarDistance              = 0.99964718552167 <AU>
   SubSolarLatitude           = 1.2167758823866
   SubSolarLongitude          = 18.125552305876
-  SubSolarGroundAzimuth      = 0.3
+  SubSolarGroundAzimuth      = 3.134
 
   # Illumination and Other
   Phase                      = 86.799461484504
