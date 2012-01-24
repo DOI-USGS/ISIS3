@@ -33,6 +33,12 @@ commands:
 	  to= $(OUTPUT)/CM_1477461989_1.cub--finalOutput.pvl SAMPLE=32 LINE=33 ALLOWOUTSIDE=no \
 	  > /dev/null
 
+	cat $(OUTPUT)/CM_1477461989_1.cub--finalOutput.pvl | \
+	  sed 's/\([0-9]*\.[0-9]\{9\}\)\([0-9]*\)/\1/g' \
+	  > $(OUTPUT)/temp.txt
+
+	$(MV) $(OUTPUT)/temp.txt $(OUTPUT)/CM_1477461989_1.cub--finalOutput.pvl
+
 	$(ECHO) "Output of getsn..." >> $(OUTPUT)/CM_1477461989_1.cub--getsnOutput.txt
 
 	$(GETSN) from=$(OUTPUT)/CM_1477461989_1.cub--vims2isis-spiceinit-vis.cub \
