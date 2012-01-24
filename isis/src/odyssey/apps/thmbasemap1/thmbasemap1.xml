@@ -55,6 +55,10 @@
     <change name="Janet Barrett" date="2012-01-03">
       Cleaned up program and added tests.
     </change>
+    <change name="Janet Barrett" date="2012-01-23">
+      Got rid of FROM parameter. The input file(s) must now be
+      specified through the FROMLIST parameter.
+    </change>
   </history>
 
   <category>
@@ -63,23 +67,6 @@
 
   <groups>
     <group name="Files">
-      <parameter name="USELIST">
-        <type>boolean</type>
-        <brief>
-          Provide a list file
-        </brief>
-        <description>
-          Determines if the user will provide a single input file or a
-	  list of input files.
-        </description>
-        <inclusions>
-          <item>FROMLIST</item>
-        </inclusions>
-        <exclusions>
-          <item>FROM</item>
-        </exclusions>
-        <default><item>FALSE</item></default>
-      </parameter>
       <parameter name="FROMLIST">
         <type>filename</type>
         <fileMode>input</fileMode>
@@ -94,29 +81,14 @@
           *.lis *.lst
         </filter>
       </parameter>
-      <parameter name="FROM">
-        <type>filename</type>
-        <fileMode>input</fileMode>
+      <parameter name="TOPATH">
+        <type>string</type>
         <brief>
-          Input Themis PDS RDR file
+          Output file pathname
         </brief>
         <description>
-          Input filename.  The file is a calibrated PDS formatted Themis RDR.
-        </description>
-        <filter>
-          *.imq *.QUB
-        </filter>
-      </parameter>
-      <parameter name="TO">
-        <type>filename</type>
-        <fileMode>output</fileMode>
-        <brief>
-          Final output filename
-        </brief>
-        <description>
-          Output filename.  The output file will be a "level 1" file, the  to 
- 	  parameter of lineeq program.  (May change to findgaps after
-	  requested modification is added).
+          Output file pathname.  All output files will be written to this
+          directory.
         </description>
         <default><item>None</item></default>
       </parameter>

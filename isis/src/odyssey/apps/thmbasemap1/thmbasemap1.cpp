@@ -24,23 +24,19 @@ void IsisMain(){
   // processing
 
   // Input file options 
-  bool usefromlist = ui.GetBoolean("USELIST");
   FileList cubes;
   Pvl &pref = Preference::Preferences();
   string pathName = (string)pref.FindGroup("DataDirectory")["Temporary"] + "/";
+  if (ui.WasEntered("TOPATH")) {
+    pathName = (string)ui.GetString("TOPATH") + "/";
+  }
   string outFile;
-  if (ui.WasEntered("FROMLIST") && usefromlist) {
+  if (ui.WasEntered("FROMLIST")) {
     cubes.Read(ui.GetFilename("FROMLIST"));
-    if (ui.WasEntered("TO")) {
-      pathName = ui.GetFilename("TO") + "/";
-    }
   } 
   else {
-    cubes.Read(ui.GetFilename("FROM"));
-    if (!ui.WasEntered("TO")) {
-      string msg = "Error: TO file must be specified when the FROM option is used";
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
-    }
+    string msg = "Error: FROMLIST file must be specified";
+    throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
   }
 
   // Processing Options
@@ -322,9 +318,7 @@ void IsisMain(){
 
     //Run lineeq
     input=output;
-    if (usefromlist) {
-      outFile = pathName + infile.Basename() + ".lev1.cub";
-    }
+    outFile = pathName + infile.Basename() + ".lev1.cub";
     parameters ="FROM=" + input + " TO=" + outFile;
     ProgramLauncher::RunIsisProgram("lineeq", parameters);
     remove (input.c_str());
