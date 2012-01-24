@@ -15,6 +15,21 @@ class QTimer;
 
 namespace Isis
 {
+
+  /**
+   * @brief Handles how control networks should be displayed to the user
+   *
+   * This class handles how control networks should be displayed to the user.
+   * For example, this class keeps track of whether cube serial numbers or file
+   * names should be displayed to the user, and provides an interface to
+   * translate between the two.
+   *
+   * This class is a singleton.
+   *
+   * @author ????-??-?? Eric Hyer
+   *
+   * @internal
+   */
   class CnetDisplayProperties : public QObject
   {
       Q_OBJECT
