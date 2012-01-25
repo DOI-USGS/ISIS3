@@ -45,7 +45,8 @@ cleanuplockfile:
 	  if [ "$$COUNTER" -gt 300 ]; then                                        \
 	    $(RM) /tmp/.isisbuild.$$USER.$$BUILDNAME;                             \
 	    COUNTER=0;                                                            \
-	    echo "Warning: Acquiring lock to print to screen timed out";          \
+	    echo $(CURTIMESTAMP) "Warning: Acquiring lock to print to screen "    \
+	         "timed out";                                                     \
 	  fi;                                                                     \
 	                                                                          \
 	  ( set -o noclobber &&                                                   \
@@ -94,7 +95,7 @@ api:
 	if [ "$(OBJECTS)" != "" ]; \
 	then \
 	for i in $(OBJECTS); do \
-	  echo "    Adding API object [$$i]"; \
+	  echo $(CURTIMESTAMP) "    Adding API object [$$i]"; \
 	  cd $$i; $(MAKE) install; cd ..; \
 	done \
 	fi
@@ -110,7 +111,7 @@ objects: $(OBJSBUILD)
 	OBJNAME=`$(ECHO) $@ | $(SED) 's/-build//'`;                               \
 	                                                                          \
 	$(MAKE) $$OBJNAME-bld-cleanupprint;                                       \
-	echo "    Building object [$$OBJNAME] ("`date +%T`")"                     \
+	echo $(CURTIMESTAMP) "    Building object [$$OBJNAME] "                   \
 	  > .$$OBJNAME-bld.stdout.log;                                            \
 	$(MAKE) --directory=$$OBJNAME object                                      \
 	  1>>.$$OBJNAME-bld.stdout.log 2>.$$OBJNAME-bld.stderr.log;               \
@@ -124,7 +125,7 @@ includes: $(OBJSINCS)
 %-incs:
 	OBJNAME=`$(ECHO) $@ | $(SED) 's/-incs//'`;                                \
 	$(MAKE) $$OBJNAME-inc-cleanupprint;                                       \
-	echo "    Installing includes [$$OBJNAME]"                                \
+	echo $(CURTIMESTAMP) "    Installing includes [$$OBJNAME]"                \
 	  > .$$OBJNAME-inc.stdout.log;                                            \
 	$(MAKE) --directory=$$OBJNAME incs                                        \
 	  1>>.$$OBJNAME-inc.stdout.log 2>.$$OBJNAME-inc.stderr.log;               \
@@ -136,7 +137,7 @@ clean: $(OBJSCLEAN)
 %-clean:
 	OBJNAME=`$(ECHO) $@ | $(SED) 's/-clean//'`;                               \
 	$(MAKE) $$OBJNAME-cln-cleanupprint;                                       \
-	echo "    Cleaning [$$OBJNAME]"                                           \
+	echo $(CURTIMESTAMP) "    Cleaning [$$OBJNAME]"                           \
 	  > .$$OBJNAME-cln.stdout.log;                                            \
 	$(MAKE) --directory=$$OBJNAME clean                                       \
 	  1>>.$$OBJNAME-cln.stdout.log 2>.$$OBJNAME-cln.stderr.log;               \
@@ -149,8 +150,9 @@ test: $(OBJSTEST)
 %-test:
 	OBJNAME=`$(ECHO) $@ | $(SED) 's/-test//'`;                                \
 	$(MAKE) $$OBJNAME-tst-cleanupprint;                                       \
-	printf %-60s "    Testing [$$OBJNAME] ("`date +%T`")"                     \
-	  > .$$OBJNAME-tst.stdout.log;                                            \
+	echo -n $(CURTIMESTAMP) > .$$OBJNAME-tst.stdout.log;                      \
+	printf %-60s "    Testing [$$OBJNAME] "                                   \
+	  >> .$$OBJNAME-tst.stdout.log;                                           \
 	$(MAKE) --directory=$$OBJNAME test                                        \
 	  1>>.$$OBJNAME-tst.stdout.log 2>.$$OBJNAME-tst.stderr.log;               \
 	$(MAKE) $$OBJNAME-tst-print;

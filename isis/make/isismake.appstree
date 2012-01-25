@@ -44,7 +44,8 @@ cleanuplockfile:
 	  if [ "$$COUNTER" -gt 300 ]; then                                       \
 	    $(RM) /tmp/.isisbuild.$$USER.$$BUILDNAME;                            \
 	    COUNTER=0;                                                           \
-	    echo "Warning: Acquiring lock to print to screen timed out";         \
+	    echo $(CURTIMESTAMP) "Warning: Acquiring lock to print to screen "   \
+	         "timed out";                                                    \
 	  fi;                                                                    \
 	                                                                         \
 	  ( set -o noclobber &&                                                  \
@@ -94,23 +95,23 @@ applications: $(APPSBUILD)
 
 # This compiles a single application (APPSBUILD names this target for each app)
 %-build:
-	APPNAME=`$(ECHO) $@ | $(SED) 's/-build//'`;                   \
-	$(MAKE) $$APPNAME-bld-cleanupprint;                           \
-	echo "    Building and installing [$$APPNAME] ("`date +%T`")" \
-	  > .$$APPNAME-bld.stdout.log;                                \
-	$(MAKE) --directory=$$APPNAME install                         \
-	  1>>.$$APPNAME-bld.stdout.log 2>.$$APPNAME-bld.stderr.log;   \
+	APPNAME=`$(ECHO) $@ | $(SED) 's/-build//'`;                    \
+	$(MAKE) $$APPNAME-bld-cleanupprint;                            \
+	echo $(CURTIMESTAMP) "    Building and installing"             \
+	     "[$$APPNAME]" > .$$APPNAME-bld.stdout.log;                \
+	$(MAKE) --directory=$$APPNAME install                          \
+	  1>>.$$APPNAME-bld.stdout.log 2>.$$APPNAME-bld.stderr.log;    \
 	$(MAKE) $$APPNAME-bld-print;
 
 documentation: $(APPSDOCS)
 
 %-docs:
-	APPNAME=`$(ECHO) $@ | $(SED) 's/-docs//'`;                 \
-	$(MAKE) $$APPNAME-doc-cleanupprint;                         \
-	echo "    Installing application documentation [$$APPNAME]" \
-	  > .$$APPNAME-doc.stdout.log;                              \
-	$(MAKE) --directory=$$APPNAME docs                         \
-	  1>>.$$APPNAME-doc.stdout.log 2>.$$APPNAME-doc.stderr.log; \
+	APPNAME=`$(ECHO) $@ | $(SED) 's/-docs//'`;                       \
+	$(MAKE) $$APPNAME-doc-cleanupprint;                              \
+	echo $(CURTIMESTAMP) "    Installing application documentation"  \
+	     "[$$APPNAME]" > .$$APPNAME-doc.stdout.log;                  \
+	$(MAKE) --directory=$$APPNAME docs                               \
+	  1>>.$$APPNAME-doc.stdout.log 2>.$$APPNAME-doc.stderr.log;      \
 	$(MAKE) $$APPNAME-doc-print;
 
 # Do the same for this as we did docs.
@@ -119,7 +120,7 @@ clean: $(APPSCLEAN)
 %-clean:
 	APPNAME=`$(ECHO) $@ | $(SED) 's/-clean//'`;                 \
 	$(MAKE) $$APPNAME-cln-cleanupprint;                         \
-	echo "    Cleaning [$$APPNAME]"                             \
+	echo $(CURTIMESTAMP) "    Cleaning [$$APPNAME]"             \
 	  > .$$APPNAME-cln.stdout.log;                              \
 	$(MAKE) --directory=$$APPNAME clean                         \
 	  1>>.$$APPNAME-cln.stdout.log 2>.$$APPNAME-cln.stderr.log; \
@@ -133,7 +134,8 @@ test: $(APPSTEST)
 %-test:
 	APPNAME=`$(ECHO) $@ | $(SED) 's/-test//'`;                     \
 	$(MAKE) $$APPNAME-tst-cleanupprint;                            \
-	echo "    Testing [$$APPNAME]"  > .$$APPNAME-tst.stdall.log;   \
+	echo $(CURTIMESTAMP) "    Testing [$$APPNAME]"                 \
+	     > .$$APPNAME-tst.stdall.log;                              \
 	$(MAKE) --directory=$$APPNAME test                             \
 	  1>> .$$APPNAME-tst.stdall.log 2>> .$$APPNAME-tst.stdall.log; \
 	$(MAKE) $$APPNAME-tst-print;

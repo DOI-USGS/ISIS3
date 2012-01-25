@@ -40,11 +40,11 @@ all: incs thirdParty api apps docs
 # system directory $(ISISROOT)/inc.
 #----------------------------------------------------------------------------
 incs:
-	echo "Installing include files"
+	echo $(CURTIMESTAMP) "Installing include files"
 	mkdir -p inc
 	$(MAKE) --directory=src includes
-	echo "Finished installing include files"
-	echo " "
+	echo $(CURTIMESTAMP) "Finished installing include files"
+	echo $(CURTIMESTAMP) " "
 
 #----------------------------------------------------------------------------
 # Target = api
@@ -67,15 +67,15 @@ incs:
 # constructed from libisis.a
 #----------------------------------------------------------------------------
 api:
-	echo "Building Isis API"
+	echo $(CURTIMESTAMP) "Building Isis API"
 	mkdir -p lib
 	$(MAKE) --directory=src objects
-	echo "Finished building Isis API"
-	echo ""
-	echo "Adding API objects"
+	echo $(CURTIMESTAMP) "Finished building Isis API"
+	echo $(CURTIMESTAMP) ""
+	echo $(CURTIMESTAMP) "Adding API objects"
 	$(MAKE) --directory=src api
-	echo "Finished adding API objects"
-	echo " "
+	echo $(CURTIMESTAMP) "Finished adding API objects"
+	echo $(CURTIMESTAMP) " "
 
 #	echo "Building Isis API with debugging"
 #	cd src; $(MAKE) objects MODE=DEBUG
@@ -83,11 +83,11 @@ api:
 #	echo "Finished building Isis API with debugging"
 #	echo " "
 
-	echo "Creating Shared Libraries ..."
+	echo $(CURTIMESTAMP) "Creating Shared Libraries ..."
 	cp make/Makefile.libs lib/Makefile
 	$(MAKE) --directory=lib shared
-	echo "Finished creating Shared Libraries ..."
-	echo " "
+	echo $(CURTIMESTAMP) "Finished creating Shared Libraries ..."
+	echo $(CURTIMESTAMP) " "
 
 #----------------------------------------------------------------------------
 # Target = apps
@@ -100,11 +100,11 @@ api:
 # API must be built for this to work properly
 #----------------------------------------------------------------------------
 apps:
-	echo "Building Isis Applications"
+	echo $(CURTIMESTAMP) "Building Isis Applications"
 	mkdir -p bin/xml
 	$(MAKE) --directory=src applications
-	echo "Finished building Isis Applications"
-	echo " "
+	echo $(CURTIMESTAMP) "Finished building Isis Applications"
+	echo $(CURTIMESTAMP) " "
 
 #----------------------------------------------------------------------------
 # Target = docs
@@ -116,11 +116,11 @@ apps:
 # generates the Isis Documentation under $(ISISROOT)/doc
 #----------------------------------------------------------------------------
 docs:
-	echo "Building Isis Documentation"
+	echo $(CURTIMESTAMP) "Building Isis Documentation"
 	mkdir -p doc
 	$(MAKE) --directory=src documentation
 	$(MAKE) --directory=src/docsys docs
-	echo "Finished building Isis Documentation"
+	echo $(CURTIMESTAMP) "Finished building Isis Documentation"
 
 #----------------------------------------------------------------------------
 # Target = clean
@@ -136,7 +136,7 @@ docs:
 # This walks the src tree and removes ".o" files and binary files
 #----------------------------------------------------------------------------
 clean:
-	echo "Cleaning Isis"
+	echo $(CURTIMESTAMP) "Cleaning Isis"
 	$(MAKE) cleansrc
 	rm -rf inc
 	rm -rf doc
@@ -144,20 +144,20 @@ clean:
 	rm -rf lib
 	rm -rf scripts/tabcomplete.csh
 	$(MAKE) --directory=3rdParty clean
-	echo "Finished cleaning Isis"
+	echo $(CURTIMESTAMP) "Finished cleaning Isis"
 
 cleansrc:
 	$(MAKE) --directory=src clean
 
 tabcomplete:
-	if [ ! -d bin ]; then                                               \
-	  echo "You must build the applications first";                     \
-	elif [ ! -f bin/isiscomplete ]; then                                \
-	  echo "Isis application 'isiscomplete' is missing";                \
-	else                                                                \
-	  echo "#!/bin/csh" > $$ISISROOT/scripts/tabcomplete.csh;           \
-	  isiscomplete `ls $$ISISROOT/bin | grep -v xml` | sed 's/; /;\n/g' \
-	      >> $$ISISROOT/scripts/tabcomplete.csh;                        \
+	if [ ! -d bin ]; then                                                    \
+	  echo $(CURTIMESTAMP) "You must build the applications first";          \
+	elif [ ! -f bin/isiscomplete ]; then                                     \
+	  echo $(CURTIMESTAMP) "Isis application 'isiscomplete' is missing";     \
+	else                                                                     \
+	  echo $(CURTIMESTAMP) "#!/bin/csh" > $$ISISROOT/scripts/tabcomplete.csh;\
+	  isiscomplete `ls $$ISISROOT/bin | grep -v xml` | sed 's/; /;\n/g'      \
+	      >> $$ISISROOT/scripts/tabcomplete.csh;                             \
 	fi;
 
 #----------------------------------------------------------------------------
@@ -171,19 +171,19 @@ tabcomplete:
 # output data (whether it be a cube, text file, postscript file, etc)
 #----------------------------------------------------------------------------
 unitTest:
-	echo "Testing Isis API"
+	echo $(CURTIMESTAMP) "Testing Isis API"
 	$(MAKE) --directory=src unitTest
-	echo "Finished testing Isis API"
+	echo $(CURTIMESTAMP) "Finished testing Isis API"
 
 appTest:
-	echo "Testing Isis Applications version 2"
+	echo $(CURTIMESTAMP) "Testing Isis Applications version 2"
 	$(MAKE) --directory=src appTest
-	echo "Finished testing Isis Applications version 2"
+	echo $(CURTIMESTAMP) "Finished testing Isis Applications version 2"
 
 catTest:
-	echo "Testing Isis Category"
+	echo $(CURTIMESTAMP) "Testing Isis Category"
 	$(MAKE) --directory=src catTest
-	echo "Finished testing Isis Category"
+	echo $(CURTIMESTAMP) "Finished testing Isis Category"
 
 #----------------------------------------------------------------------------
 # Target = thirdParty
@@ -198,9 +198,9 @@ HOST_ARCH ?= $(shell uname -s)
 HOST_MACH  = $(shell uname -m)
 
 thirdParty:
-	echo "Installing 3rdParty libraries"
+	echo $(CURTIMESTAMP) "Installing 3rdParty libraries"
 	rm -f $(ISISROOT)/3rdParty/lib/lib*
 	$(MAKE) -C $(ISISROOT)/3rdParty install
-	echo "Finished installing 3rdParty libraries"
-	echo " "
+	echo $(CURTIMESTAMP) "Finished installing 3rdParty libraries"
+	echo $(CURTIMESTAMP) " "
 

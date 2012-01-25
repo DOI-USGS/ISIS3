@@ -71,6 +71,8 @@ ECHO           ?= /bin/echo
 CUT            ?= /usr/bin/cut
 PATCHELF       ?= patchelf
 
+CURTIMESTAMP   ?= "[`date +'%Y-%m-%d %H:%M:%S'`]"
+
 #  Third party library/plugin install tool
 INSTALL3P         =  $(RSYNC)
 INSTALL3POPTS     = -aq

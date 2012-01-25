@@ -18,47 +18,48 @@ CASESTEST := $(TESTS:%=%-test)
 # This deletes the lock file. This should not be called when anything could be
 # using the file.
 cleanuplockfile:
-	BUILDNAME=`dirname $$ISISROOT`;                                           \
-	BUILDNAME=`basename $$BUILDNAME`;                                         \
-	if [ -f ".isisbuild.$$USER.$$BUILDNAME" ]; then                           \
-	  $(RM) ".isisbuild.$$USER.$$BUILDNAME";                                  \
+	BUILDNAME=`dirname $$ISISROOT`;                                        \
+	BUILDNAME=`basename $$BUILDNAME`;                                      \
+	if [ -f ".isisbuild.$$USER.$$BUILDNAME" ]; then                        \
+	  $(RM) ".isisbuild.$$USER.$$BUILDNAME";                               \
 	fi;
 
 # When we make casename-print it should print the cases' log. This acquires the
 # appropriate lock before printing. There is a 30s timeout on the lock before 
 # breaking it.
 %-print:
-	CASENAME=`$(ECHO) $@ | $(SED) 's/-print//'`;                        \
-	                                                                    \
-	BUILDNAME=`dirname $$ISISROOT`;                                     \
-	BUILDNAME=`basename $$BUILDNAME`;                                   \
-	trap "rm -f .isisbuild.$$USER.$$BUILDNAME; exit $$?" INT TERM EXIT; \
-	                                                                    \
-	LOCKED=0;                                                           \
-	COUNTER=0;                                                          \
-	while [ "$$LOCKED" -eq "0" ]; do                                    \
-	  if [ "$$COUNTER" -gt 300 ]; then                                  \
-	    $(RM) .isisbuild.$$USER.$$BUILDNAME;                            \
-	    COUNTER=0;                                                      \
-	    echo "Warning: Acquiring lock to print to screen timed out";    \
-	  fi;                                                               \
-                                                                        \
-	  ( set -o noclobber &&                                             \
-	    echo "$$$$" > .isisbuild.$$USER.$$BUILDNAME ) &>/dev/null;      \
-	  if [ "$$?" -eq "0" ]; then                                        \
-	    LOCKED=1;                                                       \
-	  else                                                              \
-	    COUNTER=`expr $$COUNTER + 1`;                                   \
-	    sleep 0.1;                                                      \
-	  fi;                                                               \
-	done;                                                               \
-	                                                                    \
-	if [ -f .$$CASENAME.stdall.log ]; then                              \
-	  $(CAT) .$$CASENAME.stdall.log;                                    \
-	fi;                                                                 \
-	                                                                    \
-	$(RM) .isisbuild.$$USER.$$BUILDNAME;                                \
-	                                                                    \
+	CASENAME=`$(ECHO) $@ | $(SED) 's/-print//'`;                           \
+	                                                                       \
+	BUILDNAME=`dirname $$ISISROOT`;                                        \
+	BUILDNAME=`basename $$BUILDNAME`;                                      \
+	trap "rm -f .isisbuild.$$USER.$$BUILDNAME; exit $$?" INT TERM EXIT;    \
+	                                                                       \
+	LOCKED=0;                                                              \
+	COUNTER=0;                                                             \
+	while [ "$$LOCKED" -eq "0" ]; do                                       \
+	  if [ "$$COUNTER" -gt 300 ]; then                                     \
+	    $(RM) .isisbuild.$$USER.$$BUILDNAME;                               \
+	    COUNTER=0;                                                         \
+	    echo $(CURTIMESTAMP) "Warning: Acquiring lock to print to screen " \
+	         "timed out";                                                  \
+	  fi;                                                                  \
+                                                                               \
+	  ( set -o noclobber &&                                                \
+	    echo "$$$$" > .isisbuild.$$USER.$$BUILDNAME ) &>/dev/null;         \
+	  if [ "$$?" -eq "0" ]; then                                           \
+	    LOCKED=1;                                                          \
+	  else                                                                 \
+	    COUNTER=`expr $$COUNTER + 1`;                                      \
+	    sleep 0.1;                                                         \
+	  fi;                                                                  \
+	done;                                                                  \
+	                                                                       \
+	if [ -f .$$CASENAME.stdall.log ]; then                                 \
+	  $(CAT) .$$CASENAME.stdall.log;                                       \
+	fi;                                                                    \
+	                                                                       \
+	$(RM) .isisbuild.$$USER.$$BUILDNAME;                                   \
+	                                                                       \
 	$(MAKE) $$CASENAME-cleanupprint;
 
 
@@ -97,7 +98,7 @@ help:
 test: $(CASESTEST)
 	$(MAKE) cleanuplockfile; \
 	if [ "$CASESTEST" = "" ]; then \
-	  echo "no tests"; \
+	  echo $(CURTIMESTAMP) "no tests"; \
 	fi;
 
 %-test:
@@ -130,10 +131,10 @@ force: ;
 newtest:
 	if [ "$(TEST)" = "" ]; \
 	then \
-	  echo "TEST needs to be set to create a new test"; \
+	  echo $(CURTIMESTAMP) "TEST needs to be set to create a new test"; \
 	elif [ -d "$(TEST)" ]; \
 	then \
-	    echo "The test already exists"; \
+	    echo $(CURTIMESTAMP) "The test already exists"; \
 	else \
 	  $(MKDIR) $(TEST); \
 	  cd $(TEST); \

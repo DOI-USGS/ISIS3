@@ -11,8 +11,7 @@ applications:
 	then                                     \
 	  $(MAKE) --directory=apps applications; \
 	else                                     \
-	  printf %-4s "";                        \
-	  echo "$(NOAPPS)";                      \
+	  echo $(CURTIMESTAMP) "    $(NOAPPS)";  \
 	fi
 
 api: 
@@ -38,8 +37,7 @@ documentation:
 	then                                        \
 	  $(MAKE) --directory=apps documentation;   \
 	else                                        \
-	  printf %-4s "";                           \
-	  echo "$(NOAPPS)";                         \
+	  echo $(CURTIMESTAMP) "    $(NOAPPS)";     \
 	fi
 
 clean:
@@ -54,29 +52,27 @@ clean:
 	fi
 
 unitTest:
-	if [ "$(OBJECTS)" != "" ];         \
-	then                               \
-	  $(MAKE) --directory=objs test;   \
+	if [ "$(OBJECTS)" != "" ];          \
+	then                                \
+	  $(MAKE) --directory=objs test;    \
 	fi
 
 appTest:
-	if [ "$(APPS)" != "" ];            \
-	then                               \
-	  $(MAKE) --directory=apps test;   \
-	else                               \
-	  printf %-4s "";                  \
-	  echo "$(NOAPPS)";                \
+	if [ "$(APPS)" != "" ];                 \
+	then                                    \
+	  $(MAKE) --directory=apps test;        \
+	else                                    \
+	  echo $(CURTIMESTAMP) "    $(NOAPPS)"; \
 	fi
 
 catTest:
-	if [ ! -d "tsts" ];                \
-	then                               \
-	  printf %-4s "";                  \
-	  echo "no tsts folder";           \
-	elif [ -f "tsts/Makefile" ];       \
-	then                               \
-	  $(MAKE) --directory=tsts test;   \
-	else                               \
-	  echo "no makefile";              \
+	if [ ! -d "tsts" ];                          \
+	then                                         \
+	  echo $(CURTIMESTAMP) "    no tsts folder"; \
+	elif [ -f "tsts/Makefile" ];                 \
+	then                                         \
+	  $(MAKE) --directory=tsts test;             \
+	else                                         \
+	  echo $(CURTIMESTAMP) "    no makefile";    \
 	fi
 

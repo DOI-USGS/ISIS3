@@ -93,8 +93,8 @@ OUTPUT = output
 TESTNOCLEAN := NOCLEAN
 
 # Defined text statements
-TESTPASSED =$(PRINTF) $(BLANKS) \"\"; echo -n "OK ... Case [$(CASE)] "
-TESTFAILED =$(PRINTF) $(BLANKS) \"\"; echo -n "Failed ... Case [$(CASE)] "
+TESTPASSED =$(PRINTF) $(BLANKS) \"\"; echo -n " OK ... Case [$(CASE)] "
+TESTFAILED =$(PRINTF) $(BLANKS) \"\"; echo -n " Failed ... Case [$(CASE)] "
 TESTFILEFAILED =echo Failed ... File
 FILENOTFOUND =echo Failed ... File does not exist
 UNKNOWNFILE =echo Failed ... Unknown file type
@@ -169,13 +169,15 @@ test: FORCE clean
 	MIN60=`expr $$MIN % 60`;                                              \
 	HOUR=`expr $$MIN / 60`;                                               \
 	HOUR60=`expr $$HOUR % 60`;                                            \
+	echo -n $(CURTIMESTAMP);                                              \
 	if [ -f casesucceeded.txt ]; then                                     \
 	  eval $(TESTPASSED);                                                 \
-	  $(PRINTF) "(%.2i:%.2i:%.2i)\n" $$HOUR60 $$MIN60 $$SEC60;            \
+	  $(PRINTF) "Duration [%.2i:%.2i:%.2i]\n" $$HOUR60 $$MIN60 $$SEC60;   \
 	  $(RM) casesucceeded.txt;                                            \
 	else                                                                  \
 	  eval $(TESTFAILED);                                                 \
-	  $(PRINTF) "(%.2i:%.2i:%.2i)\n" $$HOUR60 $$MIN60 $$SEC60;            \
+	  $(PRINTF) "Duration [%.2i:%.2i:%.2i]\n" $$HOUR60 $$MIN60 $$SEC60;   \
+	  echo -n $(CURTIMESTAMP);                                            \
 	  $(CAT) errors.txt;                                                  \
 	  $(RM) errors.txt;                                                   \
 	fi;                                                                   \
@@ -226,7 +228,7 @@ compare: FORCE
 	    $(RM) casesucceeded.txt;                                          \
 	  else                                                                \
 	    eval $(TESTFAILED);                                               \
-	    echo;                                                             \
+	    echo $(CURTIMESTAMP);                                             \
 	    $(CAT) errors.txt;                                                \
 	    $(RM) errors.txt;                                                 \
 	  fi;                                                                 \

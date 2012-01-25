@@ -23,13 +23,13 @@ applications: $(PACKAGESAPPS)
 	
 %-apps:
 	PACKAGE=`$(ECHO) $@ | $(SED) 's/-apps//'`; \
-	echo "  Working on Package [$$PACKAGE]"; \
+	echo $(CURTIMESTAMP) "  Working on Package [$$PACKAGE]"; \
 	$(MAKE) --directory=$$PACKAGE applications
 
 # We need this to be serialized
 api:
 	for i in $(PACKAGES); do \
-	  echo "  Working on Package [$$i] ("`date +%T`")"; \
+	  echo $(CURTIMESTAMP) "  Working on Package [$$i]"; \
 	  cd $$i; $(MAKE) api; cd ..; \
 	done
 
@@ -37,21 +37,21 @@ objects: $(PACKAGESOBJS)
 
 %-objects:
 	PACKAGE=`$(ECHO) $@ | $(SED) 's/-objects//'`; \
-	echo "  Working on Package [$$PACKAGE]"; \
+	echo $(CURTIMESTAMP) "  Working on Package [$$PACKAGE]"; \
 	$(MAKE) --directory=$$PACKAGE objects
 
 includes: $(PACKAGESINCS)
 
 %-includes:
 	PACKAGE=`$(ECHO) $@ | $(SED) 's/-includes//'`; \
-	echo "  Working on Package [$$PACKAGE] ("`date +%T`")"; \
+	echo $(CURTIMESTAMP) "  Working on Package [$$PACKAGE]"; \
 	$(MAKE) --directory=$$PACKAGE includes;
 
 documentation: $(PACKAGESDOCS)
 
 %-docs:
 	PACKAGE=`$(ECHO) $@ | $(SED) 's/-docs//'`; \
-	echo "  Working on Package [$$PACKAGE]"; \
+	echo $(CURTIMESTAMP) "  Working on Package [$$PACKAGE]"; \
 	$(MAKE) --directory=$$PACKAGE documentation;
 
 clean: $(PACKAGESCLEAN)
@@ -59,7 +59,7 @@ clean: $(PACKAGESCLEAN)
 
 %-clean:
 	PACKAGE=`$(ECHO) $@ | $(SED) 's/-clean//'`; \
-	echo "  Working on Package [$$PACKAGE]"; \
+	echo $(CURTIMESTAMP) "  Working on Package [$$PACKAGE]"; \
 	$(MAKE) --directory=$$PACKAGE clean;
 
 
@@ -67,7 +67,7 @@ unitTest: $(PACKAGESUNITTEST)
 
 %-unitTest:
 	PACKAGE=`$(ECHO) $@ | $(SED) 's/-unitTest//'`; \
-	echo "  Working on Package [$$PACKAGE]"; \
+	echo $(CURTIMESTAMP) "  Working on Package [$$PACKAGE]"; \
 	$(MAKE) --directory=$$PACKAGE unitTest;
 
 
@@ -75,7 +75,7 @@ appTest: $(PACKAGESAPPTEST)
 
 %-appTest:
 	PACKAGE=`$(ECHO) $@ | $(SED) 's/-appTest//'`; \
-	echo "  Working on Package [$$PACKAGE]"; \
+	echo $(CURTIMESTAMP) "  Working on Package [$$PACKAGE]"; \
 	$(MAKE) --directory=$$PACKAGE appTest;
 
 
@@ -83,5 +83,5 @@ catTest: $(PACKAGESCATTEST)
 
 %-catTest:
 	PACKAGE=`$(ECHO) $@ | $(SED) 's/-catTest//'`; \
-	echo "  Working on Package [$$PACKAGE]"; \
+	echo $(CURTIMESTAMP) "  Working on Package [$$PACKAGE]"; \
 	$(MAKE) --directory=$$PACKAGE catTest;
