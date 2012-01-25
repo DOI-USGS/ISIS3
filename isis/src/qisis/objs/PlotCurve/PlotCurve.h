@@ -1,7 +1,6 @@
 #ifndef PlotCurve_h
 #define PlotCurve_h
 
-
 /**
  * @file
  * $Revision: 1.4 $
@@ -24,7 +23,6 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-
 #include <qwt_plot.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_marker.h>
@@ -36,17 +34,48 @@ namespace Isis {
    * @author ????-??-?? Unknown
    *
    * @internal
+   *   @history 2012-01-20 Steven Lambright - Completed documentation.
    */
   class PlotCurve : public QwtPlotCurve {
 
     public:
+      /**
+       * These are all the possible units for the x or y data in a plot curve.
+       *   We want these in order to have type checking when moving curves
+       *   around - it's theoretically possible to even utilize the right y axis
+       *   automatically when you put mismatched plot curve y data into the same
+       *   plot. All of this and more requires knowing your data's units.
+       */
       enum Units {
+        /**
+         * The data units are not yet known. Please avoid using this if at all
+         *   possible.
+         */
         Unknown,
+        /**
+         * The data is a band number.
+         */
         Band,
+        /**
+         * The data is a Cube DN value.
+         */
         CubeDN,
+        /**
+         * The data is an elevation (in meters).
+         */
         Elevation,
+        /**
+         * The data is a percentage (0-100).
+         */
         Percentage,
+        /**
+         * The data is a pixel #. For example, it's the nth pixel along a line.
+         */
         PixelNumber,
+        /**
+         * The data is a wavelength. This is usually associated with a band and
+         *   comes from the band bin group.
+         */
         Wavelength
       };
 

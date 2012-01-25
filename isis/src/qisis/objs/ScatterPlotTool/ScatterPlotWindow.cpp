@@ -26,7 +26,21 @@
 using namespace std;
 
 namespace Isis {
-
+  /**
+   * Create a scatter plot window with the given data. This will fully populate
+   *   the window with scatter plot data automatically.
+   *
+   * @param title The window title and plot title
+   * @param xAxisCube The cube to use for reading X values
+   * @param xAxisBand The band of the x axis cube to read
+   * @param xAxisBinCount The resolution of the x axis data
+   * @param yAxisCube The cube to use for reading X values
+   * @param yAxisBand The band of the y axis cube to read
+   * @param yAxisBinCount The resolution of the y axis data
+   * @param sampleRange The sample range, inclusive 1-based, to read data from
+   * @param lineRange The line range, inclusive 1-based, to read data from
+   * @param parent The Qt-parent relationship parent widget
+   */
   ScatterPlotWindow::ScatterPlotWindow(QString title,
       Cube *xAxisCube, int xAxisBand, int xAxisBinCount,
       Cube *yAxisCube, int yAxisBand, int yAxisBinCount,
@@ -183,38 +197,87 @@ namespace Isis {
   }
 
 
+  /**
+   * This indicates if we are alarming from viewport to plot.
+   *
+   * @return True if alarming viewport->plot, false otherwise
+   */
   bool ScatterPlotWindow::alarmingPlot() const {
     return m_alarmPlot;
   }
 
 
+  /**
+   * This indicates if we are alarming from plot to viewport.
+   *
+   * @return True if alarming plot->viewport, false otherwise
+   */
   bool ScatterPlotWindow::alarmingViewport() const {
     return m_alarmViewport;
   }
 
 
+  /**
+   * This is the sample/line box sizes for alarming from viewport to plot.
+   *
+   * @return Sample Box Size, Line Box Size
+   */
   QPair<int, int> ScatterPlotWindow::alarmPlotBoxSize() const {
     return QPair<int, int>(m_alarmPlotSamples, m_alarmPlotLines);
   }
 
 
-  ScatterPlotWindow::AlarmRangeUnits ScatterPlotWindow::alarmViewportUnits() const {
+  /**
+   * This is the active alarming units for plot->viewport. We either alarm a
+   *   screen pixel box size or a cube sample/line range around the mouse.
+   *
+   * @return The units used for alarming plot->viewport
+   */
+  ScatterPlotWindow::AlarmRangeUnits
+      ScatterPlotWindow::alarmViewportUnits() const {
     return m_alarmViewportUnits;
   }
 
 
+  /**
+   * This is the alarming box size for plot->viewport in screen units. If the
+   *   current units are not screen units, this is not actively alarming the
+   *   given box. These values are valid even when alarming is a Cube DN
+   *   box, just not use, and they are never translated/re-calculated based on
+   *   the conversion from screen pixels to cube pixels.
+   *
+   * @return The screen pixel alarming box size
+   */
   QPair<int, int> ScatterPlotWindow::alarmViewportScreenBoxSize() const {
     return QPair<int, int>(m_alarmViewportScreenWidth,
                            m_alarmViewportScreenHeight);
   }
 
 
+  /**
+   * This is the alarming box size for plot->viewport in cube units (number of
+   *   samples/lines). If the current units are not cube units then this is not
+   *   actively alarming the given box. These values are valid even when
+   *   alarming is a screen pixel box, just not use, and they are never
+   *   translated/re-calculated based on the conversion from screen pixels to
+   *   cube pixels.
+   *
+   * @return The sample/line alarming box size
+   */
   QPair<double, double> ScatterPlotWindow::alarmViewportDnBoxSize() const {
     return QPair<double, double>(m_alarmViewportXDnBoxSize,
                                  m_alarmViewportYDnBoxSize);
   }
 
 
+  /**
+   * We override events done on the plot canvas for alarming purposes. This
+   *   method will forward mouse moves and leaves to the appropriate methods.
+   *
+   * @param o The object on which the event happened
+   * @param e The event that triggered this method call
+   * @return True if no more processing should happen with this event
+   */
   bool ScatterPlotWindow::eventFilter(QObject *o, QEvent *e) {
     if (o == plot()->canvas()) {
       switch (e->type()) {
@@ -239,6 +302,14 @@ namespace Isis {
   }
 
 
+  /**
+   * If the viewport is showing the x axis cube data or y axis cube data,
+   *   and alarming is enabled, this paints alarmed values from the plot onto
+   *   the viewport.
+   *
+   * @param vp The viewport that might need to be alarmed/painted red
+   * @param painter The painter to paint with
+   */
   void ScatterPlotWindow::paint(MdiCubeViewport *vp, QPainter *painter) {
     PlotWindow::paint(vp, painter);
 
@@ -322,7 +393,11 @@ namespace Isis {
 
   /**
    * Saves the current mouse position in the viewport so that the plot can be
-   * alarmed around that position.
+   *   alarmed around that position.
+   *
+   * @param vp The viewport that received the mouse event
+   * @param mouseLoc The location on the viewport wheere the mouse is, in
+   *                 screen coordinates.
    */
   void ScatterPlotWindow::setMousePosition(MdiCubeViewport *vp,
                                            QPoint mouseLoc) {
@@ -373,33 +448,80 @@ namespace Isis {
   }
 
 
+  /**
+   * This enables or disables alarming viewport->plot.
+   *
+   * @param alarming True to enable alarming viewport->plot, false to disable
+   *                 alarming viewport->plot
+   */
   void ScatterPlotWindow::setAlarmingPlot(bool alarming) {
     m_alarmPlot = alarming;
   }
 
 
+  /**
+   * This enables or disables alarming plot->viewport.
+   *
+   * @param alarming True to enable alarming plot->viewport, false to disable
+   *                 alarming plot->viewport
+   */
   void ScatterPlotWindow::setAlarmingViewport(bool alarming) {
     m_alarmViewport = alarming;
   }
 
 
+  /**
+   * This sets the box size for alarming viewport->plot in cube samples/lines.
+   *
+   * @param samples How many samples (total) the alarming box size should be.
+   *                This should be odd because the mouse is in the center.
+   * @param lines How many lines (total) the alarming box size should be.
+   *                This should be odd because the mouse is in the center.
+   */
   void ScatterPlotWindow::setAlarmPlotBoxSize(int samples, int lines) {
     m_alarmPlotSamples = samples;
     m_alarmPlotLines = lines;
   }
 
 
+  /**
+   * This sets the units to be used for alarming plot->viewport.
+   *
+   * @param units The units (screen or cube DN range) to use for alarming.
+   */
   void ScatterPlotWindow::setAlarmViewportUnits(AlarmRangeUnits units) {
     m_alarmViewportUnits = units;
   }
 
 
+  /**
+   * This sets the screen pixel box size for alarming plot->viewport. If the
+   *   current alarming units for plot->viewport isn't screen pixels, these
+   *   values will still be stored off and just not be active until the units
+   *   are changed.
+   *
+   * @param width The screen pixels (total) around the mouse in the X direction
+   *              to be used for alarming.
+   * @param height The screen pixels (total) around the mouse in the Y direction
+   *              to be used for alarming.
+   */
   void ScatterPlotWindow::setAlarmViewportScreenBoxSize(int width, int height) {
     m_alarmViewportScreenWidth = width;
     m_alarmViewportScreenHeight = height;
   }
 
 
+  /**
+   * This sets the cube DN box size for alarming plot->viewport. If the
+   *   current alarming units for plot->viewport isn't cube pixels, these
+   *   values will still be stored off and just not be active until the units
+   *   are changed.
+   *
+   * @param xDnBoxSize The Cube DN box size (total) around the mouse in the X
+   *                   direction to be used for alarming.
+   * @param yDnBoxSize The Cube DN box size (total) around the mouse in the Y
+   *                   direction to be used for alarming.
+   */
   void ScatterPlotWindow::setAlarmViewportDnBoxSize(double xDnBoxSize,
                                                     double yDnBoxSize) {
     m_alarmViewportXDnBoxSize = xDnBoxSize;
@@ -407,6 +529,11 @@ namespace Isis {
   }
 
 
+  /**
+   * This causes the window to lose it's pointers to the input cubes. When a
+   *   viewport is closed, this will prevent using the cube pointers still for
+   *   alarming.
+   */
   void ScatterPlotWindow::forgetCubes() {
     m_xAxisCube = NULL;
     m_yAxisCube = NULL;
@@ -469,7 +596,10 @@ namespace Isis {
 
   /**
    * Returns true if the viewport's cube is the cube currently being used on the
-   * x-axis.
+   *   x-axis.
+   *
+   * @param vp The viewport to test for a cube match
+   * @return True if the vp is showing the x axis cube data
    */
   bool ScatterPlotWindow::isXCube(MdiCubeViewport *vp) const {
     return (vp && m_xAxisCube &&
@@ -480,7 +610,10 @@ namespace Isis {
 
   /**
    * Returns true if the viewport's cube is the cube currently being used on the
-   * y-axis.
+   *   y-axis.
+   *
+   * @param vp The viewport to test for a cube match
+   * @return True if the vp is showing the y axis cube data
    */
   bool ScatterPlotWindow::isYCube(MdiCubeViewport *vp) const {
     return (vp && m_yAxisCube &&
@@ -489,6 +622,13 @@ namespace Isis {
   }
 
 
+  /**
+   * When the mosue moves, this updates the alarming information and causes
+   *   repaints on the cube viewports in order to show the alarming
+   *   appropriately.
+   *
+   * @param e The event that caused this method to be called
+   */
   void ScatterPlotWindow::mouseMoveEvent(QMouseEvent *e) {
     if (alarmingViewport()) {
       if (m_alarmViewportUnits == ScreenUnits) {
@@ -531,6 +671,12 @@ namespace Isis {
   }
 
 
+  /**
+   * When the mouse leaves the plot canvas we disable all alarming from
+   *   plot->viewport.
+   *
+   * @param e The event that caused this method to be called
+   */
   void ScatterPlotWindow::mouseLeaveEvent(QMouseEvent *e) {
     m_xCubeDnAlarmRange.first = Null;
     m_xCubeDnAlarmRange.second = Null;
@@ -541,6 +687,11 @@ namespace Isis {
   }
 
 
+  /**
+   * This sets the contour pen to an appropriate color based on the color of the
+   *   plot (B/W v. Color). The contour pen is set to red for color, white for
+   *   B/W.
+   */
   void ScatterPlotWindow::updateContourPen() {
     if (m_colorize->text() == "Gray") {
       m_spectrogram->setDefaultContourPen(QPen(Qt::red));
@@ -551,6 +702,9 @@ namespace Isis {
   }
 
 
+  /**
+   * Give the users an alarm config dialog to change the alarming settings.
+   */
   void ScatterPlotWindow::configureAlarming() {
     ScatterPlotAlarmConfigDialog * config =
         new ScatterPlotAlarmConfigDialog(this);

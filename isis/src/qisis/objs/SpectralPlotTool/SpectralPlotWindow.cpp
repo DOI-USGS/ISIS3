@@ -16,9 +16,10 @@ using namespace std;
 namespace Isis {
   /**
    * This constructs a spectral plot window. The spectral plot window graphs a
-   * spectral curve sent to it via the addPlotCurve() method.
+   *   spectral curve sent to it via the addPlotCurve() method.
    *
-   *
+   * @param xUnits The units to use for the x-axis: usually wavelength/band #
+   * @param parent The Qt-parent relationship parent for this window
    */
   SpectralPlotWindow::SpectralPlotWindow(PlotCurve::Units xUnits,
       QWidget *parent) : PlotWindow("Spectral Plot", xUnits,
@@ -48,13 +49,14 @@ namespace Isis {
   }
 
 
-
   SpectralPlotWindow::~SpectralPlotWindow() {
     nullify();
   }
 
 
-
+  /**
+   * This initializes the class member data to NULL.
+   */
   void SpectralPlotWindow::nullify() {
     m_cvp = NULL;
     m_grayBandLine = NULL;
@@ -65,7 +67,13 @@ namespace Isis {
   }
 
 
-
+  /**
+   * This is a helper method to create new band markers with the same line
+   *   style and a custom color.
+   *
+   * @param color The color of the band marker
+   * @return The requested plot marker; ownership is passed to the caller
+   */
   QwtPlotMarker *SpectralPlotWindow::createMarker(QColor color) {
     QPen markerPen(color);
     markerPen.setWidth(1);
@@ -78,7 +86,6 @@ namespace Isis {
 
     return newMarker;
   }
-
 
 
   /**
@@ -174,6 +181,7 @@ namespace Isis {
     }
   }
 
+
   /**
    * This class needs to know which viewport the user is looking
    * at so it can appropriately draw in the band lines.
@@ -185,6 +193,7 @@ namespace Isis {
     m_cvp = cvp;
 
   }
+
 
   /**
    *
@@ -203,6 +212,12 @@ namespace Isis {
   }
 
 
+  /**
+   * This window can show markers for the currently visible bands. This will
+   *   synchronize the markers with the given viewport.
+   *
+   * @param activeViewport The viewport to synchronize this plot window with
+   */
   void SpectralPlotWindow::update(MdiCubeViewport *activeViewport) {
     setViewport(activeViewport);
     drawBandMarkers();
@@ -218,6 +233,5 @@ namespace Isis {
   bool SpectralPlotWindow::bandMarkersVisible() const {
     return m_markersVisible;
   }
-
 }
 

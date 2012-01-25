@@ -19,6 +19,16 @@
 #include "ScatterPlotData.h"
 
 namespace Isis {
+  /**
+   * Create a PlotWindowBestFitDialog. If a best fit line is accepted by the
+   *   user, then the curve will be added directly to the plot window with no
+   *   extra code in the plot window. This fully initializes the state of the
+   *   dialog and no extra initialization should be required.
+   *
+   * @param windowWithCurves This must not be NULL. This is the plot window for
+   *                         which a best fit line should be calculated.
+   * @param parent The Qt-parent of this dialog.
+   */
   PlotWindowBestFitDialog::PlotWindowBestFitDialog(
       PlotWindow *windowWithCurves, QWidget *parent) : QDialog(parent) {
     m_plotWindowWithCurves = windowWithCurves;
@@ -91,6 +101,13 @@ namespace Isis {
   }
 
 
+  /**
+   * This is called when the user finally wants the best fit line. The already
+   *   populated m_curveMultivariateStats is used to give us the current
+   *   best-fit coefficients. We create y-data points based on the best fit for
+   *   every x value inside of the curve we're fitting. The curve is then added
+   *   directly to the plot window.
+   */
   void PlotWindowBestFitDialog::createBestFitLine() {
 
     if (m_curveMultivariateStats && selectedCurve() && m_plotWindowWithCurves) {
@@ -185,6 +202,11 @@ namespace Isis {
   }
 
 
+  /**
+   * This populates the curve selection combo with all of the available
+   *   information inside of the PlotWindow for which we're adding a best fit
+   *   line to.
+   */
   void PlotWindowBestFitDialog::readCurvesFromWindow() {
     m_curvesCombo->clear();
 
@@ -209,6 +231,11 @@ namespace Isis {
   }
 
 
+  /**
+   * This updates all of the widgets in this window's visibility and text
+   *   data based on what the user has entered so far. This does not refresh the
+   *   list of best fit-able curves/spectrograms.
+   */
   void PlotWindowBestFitDialog::refreshWidgetStates() {
     bool canDeriveEquation = false;
 
@@ -281,6 +308,12 @@ namespace Isis {
   }
 
 
+  /**
+   * If a curve is selected, this returns it. If something else is selected, or
+   *   nothing is selected, this returns NULL.
+   *
+   * @return The user-selected curve to create a best fit line for
+   */
   CubePlotCurve *PlotWindowBestFitDialog::selectedCurve() {
     CubePlotCurve *selected = NULL;
 
@@ -300,6 +333,13 @@ namespace Isis {
   }
 
 
+  /**
+   * If a spectrogram (scatter plot) is selected, this returns it. If something
+   *   else is selected, or nothing is selected, this returns NULL.
+   *
+   * @return The user-selected spectrogram (scatter plot) to create a best fit
+   *         line for
+   */
   QwtPlotSpectrogram *PlotWindowBestFitDialog::selectedSpectrogram() {
     QwtPlotSpectrogram *selected = NULL;
 

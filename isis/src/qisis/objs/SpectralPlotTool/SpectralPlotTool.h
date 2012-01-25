@@ -76,7 +76,6 @@ namespace Isis {
                                  QVector<Statistics> &data,
                                  MdiCubeViewport *viewport);
       void validatePlotCurves();
-      double testSpecial(double pixel);
 
       //! wavelength vs band #
       QPointer<QComboBox> m_displayCombo;
@@ -87,10 +86,15 @@ namespace Isis {
       //! Plot tool's action
       QPointer<QAction> m_toolPadAction;
 
+      //! This QAction actives/deactivates plotting the average values
       QPointer<QAction> m_plotAvgAction;
+      //! This QAction actives/deactivates plotting the min values
       QPointer<QAction> m_plotMinAction;
+      //! This QAction actives/deactivates plotting the max values
       QPointer<QAction> m_plotMaxAction;
+      //! This QAction actives/deactivates plotting the avg+std dev values
       QPointer<QAction> m_plotStdDev1Action;
+      //! This QAction actives/deactivates plotting the avg-std dev values
       QPointer<QAction> m_plotStdDev2Action;
 
       //! Plot curves for max values

@@ -13,12 +13,16 @@ namespace Isis {
   /**
    * ScatterPlotDataConstructor
    *
-   *
-   * @param cube1
-   * @param band1
-   * @param cube2
-   * @param band2
-   * @param numBins
+   * @param xCube The x-axis cube
+   * @param xCubeBand The x-axis cube's band to get DN values from
+   * @param xBinCount The resolution of the x-axis
+   * @param yCube The y-axis cube
+   * @param yCubeBand The y-axis cube's band to get DN values from
+   * @param yBinCount The resolution of the y-axis
+   * @param sampleRange The sample range to gather the histogram from, this is
+   *                    the same for the x cube and y cube.
+   * @param lineRange The line range to gather the histogram from, this is
+   *                  the same for the x cube and y cube.
    */
   ScatterPlotData::ScatterPlotData(
       Cube *xCube, int xCubeBand, int xBinCount,
@@ -101,6 +105,12 @@ namespace Isis {
   }
 
 
+  /**
+   * This is an optimized copy constructor. Copies are not zero-time, but they
+   *   are pretty quick.
+   *
+   * @param other The ScatterPlotData to copy.
+   */
   ScatterPlotData::ScatterPlotData(const ScatterPlotData &other) {
     m_xDnToBinStretch.reset(new Stretch(*other.m_xDnToBinStretch));
     m_yDnToBinStretch.reset(new Stretch(*other.m_yDnToBinStretch));
@@ -125,6 +135,7 @@ namespace Isis {
   /**
    * Returns a copy of the ScatterPlotData object.
    *
+   * @return A new instance this this class
    */
   QwtRasterData *ScatterPlotData::copy() const {
     return new ScatterPlotData(*this);
@@ -134,6 +145,7 @@ namespace Isis {
   /**
    * Returns the range of the counts.
    *
+   * @return A range from 0 to maxCount.
    */
   QwtDoubleInterval ScatterPlotData::range() const {
     return QwtDoubleInterval(0.0, m_maxCount);
@@ -141,8 +153,13 @@ namespace Isis {
 
 
   /**
-   * This gets called every time the scatter plot is re-drawn.
-   * It returns the counts for each DN (x), DN (y).
+   * This gets called every time the scatter plot is re-drawn. This returns the
+   * counts for each DN (x), DN (y), or if the bin is alarmed this returns the
+   *   max count.
+   *
+   * @param x The X-Dn value
+   * @param y The Y-Dn value
+   * @return The bin's colorizable-value
    */
   double ScatterPlotData::value(double x, double y) const {
     double value = 0;
@@ -159,26 +176,51 @@ namespace Isis {
   }
 
 
+  /**
+   * Return the min DN value for the x-axis cube's data range.
+   *
+   * @return x axis cube data min DN value
+   */
   double ScatterPlotData::xCubeMin() const {
     return m_xCubeMin;
   }
 
 
+  /**
+   * Return the max DN value for the y-axis cube's data range.
+   *
+   * @return x axis cube data max DN value
+   */
   double ScatterPlotData::xCubeMax() const {
     return m_xCubeMax;
   }
 
 
+  /**
+   * Return the min DN value for the y-axis cube's data range.
+   *
+   * @return y axis cube data min DN value
+   */
   double ScatterPlotData::yCubeMin() const {
     return m_yCubeMin;
   }
 
 
+  /**
+   * Return the max DN value for the y-axis cube's data range.
+   *
+   * @return x axis cube data max DN value
+   */
   double ScatterPlotData::yCubeMax() const {
     return m_yCubeMax;
   }
 
 
+  /**
+   * This is part of the copy-and-swap paradigm. Swap member data with other.
+   *
+   * @param other The class to trade member data with
+   */
   void ScatterPlotData::swap(ScatterPlotData &other) {
     m_xDnToBinStretch.swap(other.m_xDnToBinStretch);
     m_yDnToBinStretch.swap(other.m_yDnToBinStretch);
@@ -192,6 +234,13 @@ namespace Isis {
   }
 
 
+  /**
+   * Get the center X/Y Dn values for the bin at index.
+   *
+   * @param index The bin to get the center X/Y DN Values for
+   *
+   * @return The center DN value of the given bin
+   */
   QPair<double, double> ScatterPlotData::binXY(int index) const {
     QPair<int, int> indices = binXYIndices(index);
     int xIndex = indices.first;
@@ -223,12 +272,23 @@ namespace Isis {
   }
 
 
+  /**
+   * Get the count (number of values) which fall into the bin at index.
+   *
+   * @param binIndex The bin we're getting the data from
+   * @return The total number of cube DNs which fall into the given bin
+   */
   int ScatterPlotData::binCount(int binIndex) const {
     QPair<int, int> indices = binXYIndices(binIndex);
     return binCount(indices.first, indices.second);
   }
 
 
+  /**
+   * Get the total number of bins (bin count in x * bin count in y).
+   *
+   * @return The total number of bins
+   */
   int ScatterPlotData::numberOfBins() const {
     int xSize = 0;
     int ySize = m_counts->size();
@@ -241,6 +301,11 @@ namespace Isis {
   }
 
 
+  /**
+   * Get a list of all of the x-bin center values for this scatter plot.
+   *
+   * @return A set of discrete x values, useful for things like fitting a line
+   */
   QVector<double> ScatterPlotData::discreteXValues() const {
     QVector<double> xValues;
 
@@ -260,6 +325,13 @@ namespace Isis {
   }
 
 
+  /**
+   * Alarm the bin (highlight it) at the given x/y DN value. This is for
+   *   viewport->plot alarming.
+   *
+   * @param x The x-dn value of the bin to alarm
+   * @param y The y-dn value of the bin to alarm
+   */
   void ScatterPlotData::alarm(double x, double y) const {
     int binToAlarm = binIndex(x, y);
     if (binToAlarm != -1)
@@ -267,11 +339,21 @@ namespace Isis {
   }
 
 
+  /**
+   * Forget all alarmed bins (viewport->plot).
+   */
   void ScatterPlotData::clearAlarms() const {
     m_alarmedBins->clear();
   }
 
 
+  /**
+   * Take the data from other and copy it into this. This uses the copy-and-swap
+   *   paradigm for exception safety.
+   *
+   * @param other The scatter plot data which needs copied to this
+   * @return This returns *this.
+   */
   ScatterPlotData &ScatterPlotData::operator=(const ScatterPlotData &other) {
     ScatterPlotData tmp(other);
 
@@ -281,6 +363,13 @@ namespace Isis {
   }
 
 
+  /**
+   * Get the count (number of values) which fall into the bin at xIndex, yIndex.
+   *
+   * @param xIndex The x index of the bin we're getting our data from
+   * @param yIndex The y index of the bin we're getting our data from
+   * @return The total number of cube DNs which fall into the given bin
+   */
   int ScatterPlotData::binCount(int xIndex, int yIndex) const {
     int count = 0;
 
@@ -294,6 +383,14 @@ namespace Isis {
   }
 
 
+  /**
+   * Get the single-index position given an x/y index position. That is, get a
+   *   1D (flat) index from a 2D (x/y based) index.
+   *
+   * @param xIndex The x index of the bin we're translating into a 1D index
+   * @param yIndex The y index of the bin we're translating into a 1D index
+   * @return The 1D (flat) index position
+   */
   int ScatterPlotData::binIndex(int xIndex, int yIndex) const {
     int xSize = 0;
     int ySize = m_counts->size();
@@ -310,12 +407,25 @@ namespace Isis {
   }
 
 
+  /**
+   * Get the single-index position given an x/y dn value.
+   *
+   * @param x The x-dn value of the bin
+   * @param y The y-dn value of the bin
+   * @return The 1D (flat) index position
+   */
   int ScatterPlotData::binIndex(double x, double y) const {
     QPair<int, int> indices = binXYIndices(x, y);
     return binIndex(indices.first, indices.second);
   }
 
 
+  /**
+   * Get the 2D index index position given a 1D (flat) index position.
+   *
+   * @param binIndex The 1D (flat) index of the bin
+   * @return The x/y 2D index position
+   */
   QPair<int, int> ScatterPlotData::binXYIndices(int binIndex) const {
     int xSize = 0;
     int ySize = m_counts->size();
@@ -339,6 +449,13 @@ namespace Isis {
   }
 
 
+  /**
+   * Get the 2D (x/y) index position given an x/y dn value.
+   *
+   * @param x The x-dn value of the bin
+   * @param y The y-dn value of the bin
+   * @return The 2D (x/y) bin index position
+   */
   QPair<int, int> ScatterPlotData::binXYIndices(double x, double y) const {
     QPair<int, int> indices(-1, -1);
 

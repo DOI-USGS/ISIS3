@@ -43,7 +43,6 @@ namespace Isis {
     m_toolPadAction = new QAction(this);
     m_toolPadAction->setText("Spectral Plot Tool");
     m_toolPadAction->setIcon(QPixmap(toolIconDir() + "/spectral_plot.png"));
-    //connect(m_toolPadAction, SIGNAL(activated()), this, SLOT(showPlotWindow()));
     connect(this, SIGNAL(viewportChanged()), this, SLOT(viewportSelected()));
 
     m_displayCombo = new QComboBox;
@@ -59,6 +58,11 @@ namespace Isis {
   }
 
 
+  /**
+   * Get the combo box which toggles between units of wavelength and band number
+   *
+   * @return A combo box for switching plot window x-axis units
+   */
   QComboBox *SpectralPlotTool::spectralDisplayCombo() const
   {
     ASSERT(m_displayCombo);
@@ -82,6 +86,10 @@ namespace Isis {
   }
 
 
+  /**
+   * This prompts the user for which curves they want to plot. This is an
+   *   alternative method to just right clicking this tool's options area.
+   */
   void SpectralPlotTool::selectCurvesToPlot() {
     QDialog *selectCurvesDialog = new QDialog;
     selectCurvesDialog->setWindowTitle("Select Curves to Plot");
@@ -258,8 +266,9 @@ namespace Isis {
 
 
   /**
-   * Creates the active plot window
+   * Creates a new plot window compatible with the curves in this tool.
    *
+   * @return a newly allocated plot window, ownership is passed to the caller.
    */
   PlotWindow *SpectralPlotTool::createWindow() {
     PlotWindow *window = new SpectralPlotWindow(
@@ -271,6 +280,12 @@ namespace Isis {
     return window;
   }
 
+
+  /**
+   * Forget about all existing plot curves. Don't delete them, just
+   *   forget them so that when the user requests new ones they get brand
+   *   new curves.
+   */
   void SpectralPlotTool::detachCurves() {
     m_minCurves->clear();
     m_maxCurves->clear();
@@ -336,13 +351,10 @@ namespace Isis {
         Cube *cube = viewport->cube();
 
         Pvl &pvl = *cube->getLabel();
-        Statistics scalingStats;
         for (int index = 0; index < labels.size(); index++) {
           if (!IsSpecial(plotStats[index].Average()) &&
               !IsSpecial(plotStats[index].Minimum()) &&
               !IsSpecial(plotStats[index].Maximum())) {
-            scalingStats.AddData(testSpecial(plotStats[index].Minimum()));
-            scalingStats.AddData(testSpecial(plotStats[index].Maximum()));
             avgarray.push_back(plotStats[index].Average());
             minarray.push_back(plotStats[index].Minimum());
             maxarray.push_back(plotStats[index].Maximum());
@@ -509,16 +521,12 @@ namespace Isis {
   }
 
 
-  double SpectralPlotTool::testSpecial(double pixel) {
-    return (IsSpecial(pixel)) ? 0.0 : pixel;
-  }
-
-
   /**
    *
    *
    * @param labels
    * @param data
+   * @param viewport
    */
   void SpectralPlotTool::getSpectralStatistics(QVector<double> &labels,
                                                QVector<Statistics> &data,

@@ -16,6 +16,14 @@
 #include "ScatterPlotWindow.h"
 
 namespace Isis {
+  /**
+   * Create an alarming configuration dialog. This fully initializes the state,
+   *   but a valid scatter plot window must be specified.
+   *
+   * @param window The scatter plot window to be configured, this must not be
+   *               NULL.
+   * @param parent The Qt-parent for this dialog.
+   */
   ScatterPlotAlarmConfigDialog::ScatterPlotAlarmConfigDialog(
       ScatterPlotWindow *window, QWidget *parent) : QDialog(parent) {
     m_window = window;
@@ -205,6 +213,10 @@ namespace Isis {
   }
 
 
+  /**
+   * Take the settings that have been configured and apply them to the scatter
+   *   plot. Any settings which fail to apply will be reverted in the GUI.
+   */
   void ScatterPlotAlarmConfigDialog::applySettingsToScatterPlot() {
     m_window->setAlarmingPlot(m_alarmOntoPlot->isChecked());
 
@@ -241,6 +253,10 @@ namespace Isis {
   }
 
 
+  /**
+   * Update the current widgets' states with the current settings in the
+   *   scatter plot window.
+   */
   void ScatterPlotAlarmConfigDialog::readSettingsFromScatterPlot() {
     setWindowTitle("Configure Alarming - " + m_window->windowTitle());
 
@@ -271,6 +287,10 @@ namespace Isis {
   }
 
 
+  /**
+   * Update the enabled/disabled states of the various widgets based on the
+   *   current user inputs' states.
+   */
   void ScatterPlotAlarmConfigDialog::refreshWidgetStates() {
     bool allValid = true;
 

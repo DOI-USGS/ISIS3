@@ -40,19 +40,42 @@ namespace Isis {
       CubePlotCurve *selectedCurve();
       QwtPlotSpectrogram *selectedSpectrogram();
 
+      /**
+       * Copy constructing this class is disabled.
+       *
+       * @param other Nothing.
+       */
       PlotWindowBestFitDialog(const PlotWindowBestFitDialog &other);
+
+      /**
+       * Assignments with this class are not allowed.
+       *
+       * @param other Nothing.
+       * @return Nothing.
+       */
       PlotWindowBestFitDialog &operator=(
           const PlotWindowBestFitDialog &other);
 
     private:
+      //! A combo box for the user to select a curve/spectrogram to best fit
       QPointer<QComboBox> m_curvesCombo;
+      //! A label populated with the resulting equation from a best fit
       QPointer<QLabel> m_equationLabel;
+      //! A label populated with the resulting correlation from a best fit
       QPointer<QLabel> m_correlationLabel;
+      //! A label populated with the resulting determination from a best fit
       QPointer<QLabel> m_determinationLabel;
+      /**
+       * The ok button which the user clicks to create the best fit curve. This
+       *   gets enabled/disabled based on whether or not a best fit was
+       *   successful.
+       */
       QPointer<QPushButton> m_okayButton;
 
+      //! The plot window we're creating a best for line for
       QPointer<PlotWindow> m_plotWindowWithCurves;
 
+      //! The MV stats which is doing our regression calculations
       QScopedPointer<MultivariateStatistics> m_curveMultivariateStats;
   };
 }

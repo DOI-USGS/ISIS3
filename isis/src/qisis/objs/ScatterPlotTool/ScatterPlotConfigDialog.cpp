@@ -14,27 +14,24 @@
 
 #include "Cube.h"
 #include "MdiCubeViewport.h"
-#include "ScatterPlotTool.h"
 #include "SpecialPixel.h"
 #include "Workspace.h"
 
 namespace Isis {
-
-
   /**
    * This method creates all the dialog boxes required for the
-   * scatter plot window.  Called from the ScatterPlotWindow
-   * constructor.
+   * scatter plot window.
    *
+   * @param activeViewport The current user-selected viewport
+   * @param workspace The workspace containing all of the viewports
+   * @param parent The Qt-parent for this dialog
    */
   ScatterPlotConfigDialog::ScatterPlotConfigDialog(
-      MdiCubeViewport *activeViewport, Workspace *workspace,
-      ScatterPlotTool *tool, QWidget *parent) :
+      MdiCubeViewport *activeViewport, Workspace *workspace, QWidget *parent) :
       QDialog(parent) {
     setWindowTitle("Configure Scatter Plot");
 
     m_oldXAxisCube = NULL;
-    m_tool = tool;
     m_workspace = workspace;
 
     QGridLayout *mainLayout = new QGridLayout;
@@ -204,54 +201,113 @@ namespace Isis {
   }
 
 
+  /**
+   * This is overridden to give a better default size than what Qt calculates
+   *   by default.
+   *
+   * @return The recommended size for this dialog
+   */
   QSize ScatterPlotConfigDialog::sizeHint() const {
     return QSize(qRound(QDialog::sizeHint().width() * 1.3),
                  QDialog::sizeHint().height());
   }
 
 
+  /**
+   * The current user selection for a cube for the x-axis data for a scatter
+   *   plot. This never returns null if the dialog was accepted().
+   *
+   * @return The x-axis cube or NULL if there isn't one selected.
+   */
   Cube *ScatterPlotConfigDialog::xAxisCube() const {
     return m_xAxisCubeCombo->itemData(
         m_xAxisCubeCombo->currentIndex()).value<Cube *>();
   }
 
 
+  /**
+   * The current user selection for a cube for the x-axis data for a scatter
+   *   plot. This never returns null if the dialog was accepted().
+   *
+   * @return The y-axis cube or NULL if there isn't one selected.
+   */
   Cube *ScatterPlotConfigDialog::yAxisCube() const {
     return m_yAxisCubeCombo->itemData(
         m_yAxisCubeCombo->currentIndex()).value<Cube *>();
   }
 
 
+  /**
+   * The current user selection for the band in the x-axis cube to get data
+   *   from. This isn't valid unless there is an xAxisCube().
+   *
+   * @return The x-axis cube's band to get data from.
+   */
   int ScatterPlotConfigDialog::xAxisCubeBand() const {
     return m_xAxisCubeBandSpinBox->value();
   }
 
 
+  /**
+   * The current user selection for the band in the y-axis cube to get data
+   *   from. This isn't valid unless there is an yAxisCube().
+   *
+   * @return The y-axis cube's band to get data from.
+   */
   int ScatterPlotConfigDialog::yAxisCubeBand() const {
     return m_yAxisCubeBandSpinBox->value();
   }
 
 
+  /**
+   * The current user selection for the resolution of the scatter plot's x data.
+   *
+   * @return The x-axis data's bin count for a histogram/spectrogram
+   */
   int ScatterPlotConfigDialog::xAxisBinCount() const {
     return m_xAxisBinCountSpinBox->value();
   }
 
 
+  /**
+   * The current user selection for the resolution of the scatter plot's y data.
+   *
+   * @return The y-axis data's bin count for a histogram/spectrogram
+   */
   int ScatterPlotConfigDialog::yAxisBinCount() const {
     return m_yAxisBinCountSpinBox->value();
   }
 
 
+  /**
+   * This is the sample range from which the scatter plot should be created.
+   *   The return value is 1-based (samples start at 1) and inclusive. The range
+   *   1 and nsamples is the entire sample range.
+   *
+   * @return The sample range for the scatter plot data
+   */
   QwtDoubleRange ScatterPlotConfigDialog::sampleRange() const {
     return sampleLineRanges().first;
   }
 
 
+  /**
+   * This is the line range from which the scatter plot should be created.
+   *   The return value is 1-based (lines start at 1) and inclusive. The range
+   *   1 and nlines is the entire line range.
+   *
+   * @return The line range for the scatter plot data
+   */
   QwtDoubleRange ScatterPlotConfigDialog::lineRange() const {
     return sampleLineRanges().second;
   }
 
 
+  /**
+   * This returns a viewport which contains the x-axis cube.
+   *
+   * @return a viewport which contains the x-axis cube
+   */
   MdiCubeViewport *ScatterPlotConfigDialog::xAxisCubeViewport() const {
     MdiCubeViewport * container = NULL;
 
@@ -264,6 +320,11 @@ namespace Isis {
   }
 
 
+  /**
+   * This returns a viewport which contains the y-axis cube.
+   *
+   * @return a viewport which contains the y-axis cube
+   */
   MdiCubeViewport *ScatterPlotConfigDialog::yAxisCubeViewport() const {
     MdiCubeViewport * container = NULL;
 
@@ -276,6 +337,11 @@ namespace Isis {
   }
 
 
+  /**
+   * Update the enabled/disabled states of the various widgets based on the
+   *   current user inputs' states. This also updates the cube lists based on
+   *   what exists and what is selected.
+   */
   void ScatterPlotConfigDialog::refreshWidgetStates() {
     QList<Cube *> listedXCubes;
     for (int i = 0; i < m_xAxisCubeCombo->count(); i++) {
@@ -304,10 +370,6 @@ namespace Isis {
     }
 
     m_xAxisCubeBandSpinBox->setMinimum(1);
-
-
-//     m_yAxisCubeBandSpinBox->setEnabled(xAxisCube != NULL);
-//     m_yAxisBinCountSpinBox->setEnabled(xAxisCube != NULL);
 
     if (xAxisCube()) {
       m_xAxisCubeBandSpinBox->setEnabled(true);
@@ -396,6 +458,15 @@ namespace Isis {
   }
 
 
+  /**
+   * This is a helper method. It takes all of the itemsToRemove out of list and
+   *   returns the result.
+   *
+   * @param list The original list of cubes
+   * @param itemsToRemove A list of cubes to take out of the original list of
+   *                      cubes
+   * @return The result of list - itemsToRemove
+   */
   QList<Cube *> ScatterPlotConfigDialog::removeFromList(QList<Cube *> list,
       QList<Cube *> itemsToRemove) {
     foreach (Cube *toRemove, itemsToRemove) {
@@ -406,6 +477,16 @@ namespace Isis {
   }
 
 
+  /**
+   * This returns the sample/line ranges indicated by the user for the scatter
+   *   plot to be created on. This is a helper method for sampleRange() and
+   *   lineRange(). NOTE: If a cube if opened twice, and we're using the
+   *   viewport visible range, it's currently ambiguous which viewport to use.
+   *
+   * @return The sample/line ranges to create a scatter plot on. The information
+   *         is 1-based and inclusive, so a result of [1, nsamples], [1, nlines]
+   *         is the entire cube.
+   */
   QPair<QwtDoubleRange, QwtDoubleRange>
       ScatterPlotConfigDialog::sampleLineRanges() const {
     QwtDoubleRange sampleRange;

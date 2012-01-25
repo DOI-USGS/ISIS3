@@ -27,9 +27,8 @@
 #include "PlotWindow.h"
 
 namespace Isis {
-  
   class PvlGroup;
-  
+
   /**
    * @author ????-??-?? Tracie Sucharski and Steven Lambright
    *
@@ -57,12 +56,19 @@ namespace Isis {
       QwtPlotMarker *createMarker(QColor color);
       void drawBandMarkers();
 
+      //! The viewport to be used as a reference for band markers
       MdiCubeViewport *m_cvp;
+      //! True if the visibile state of the active markers should be true
       bool m_markersVisible;
+      //! The band marker for the gray band
       QwtPlotMarker *m_grayBandLine;
+      //! The band marker for the red band
       QwtPlotMarker *m_redBandLine;
+      //! The band marker for the green band
       QwtPlotMarker *m_greenBandLine;
+      //! The band marker for the blue band
       QwtPlotMarker *m_blueBandLine;
+      //! This action toggles band marker visibility
       QAction *m_showHideBandMarkers;
    };
 };

@@ -13,6 +13,13 @@
 #include "CubePlotCurve.h"
 
 namespace Isis {
+  /**
+   * This instantiates a configuration dialog associated with the given cube
+   *   plot curve.
+   *
+   * @param curve The plot curve to be configured
+   * @param parent The parent widget/widget who owns this dialog.
+   */
   CubePlotCurveConfigureDialog::CubePlotCurveConfigureDialog(
       CubePlotCurve *curve, QWidget *parent) : QDialog(parent) {
     m_plotCurve = curve;
@@ -122,11 +129,21 @@ namespace Isis {
   }
 
 
+  /**
+   * This destroys the configuration dialog, which happens when the user closes
+   *   it or clicks ok or cancel.
+   */
   CubePlotCurveConfigureDialog::~CubePlotCurveConfigureDialog() {
     m_colorButton = NULL;
     m_plotCurve = NULL;
   }
 
+
+  /**
+   * This takes the configuration settings and applies them to the plot curve.
+   *   This happens when the user clicks 'apply' or 'ok.' Any settings that fail
+   *   to be applied correctly will be reverted in the GUI.
+   */
   void CubePlotCurveConfigureDialog::applySettingsToCurve() {
     if (m_plotCurve->title() != m_nameEdit->text()) {
       m_plotCurve->enableAutoRenaming(false);
@@ -163,6 +180,10 @@ namespace Isis {
   }
 
 
+  /**
+   * This takes the current data inside of the plot curve and populates this
+   *   configuration dialog's widgets with the appropriate data/settings.
+   */
   void CubePlotCurveConfigureDialog::readSettingsFromCurve() {
     setWindowTitle("Configure " + m_plotCurve->title().text());
 
@@ -200,6 +221,9 @@ namespace Isis {
   }
 
 
+  /**
+   * This prompts the user to select a new color for the curve/curve markers.
+   */
   void CubePlotCurveConfigureDialog::askUserForColor() {
     QPalette colorPalette(m_colorButton->palette());
 

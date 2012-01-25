@@ -21,14 +21,13 @@ namespace Isis {
    * @brief Parent class for plotting tools which provides common functionality
    *
    * This qview tool is designed to be inherited from by tools which create 
-   * plots.  This class provides common functionality such as opening new 
+   * plots.  This class provides common functionality such as opening new
    * plot windows.
    *
    * @author 2012-01-18 Steven Lambright and Tracie Sucharski
    *
-   * @internal 
-   *   @history 2011-11-02 Steven Lambright and Tracie Sucharski - Original 
-   *                           Version 
+   * @internal
+   *   @history 2012-01-20 Steven Lambright - Documentation improved.
    */
   class AbstractPlotTool : public Tool {
       Q_OBJECT
@@ -52,6 +51,15 @@ namespace Isis {
       static CubePlotCurve *createCurve(QString name, QPen pen,
           PlotCurve::Units xUnits, PlotCurve::Units yUnits);
       QWidget *createToolBarWidget(QStackedWidget *parent);
+
+      /**
+       * This needs to be implemented by children to instantiate a plot window
+       *   of the appropriate child class of PlotWindow. You should set the
+       *   window title, but the rest of the initialization will be handled by
+       *   addWindow().
+       *
+       * @return A newly instantiated, but not fully initialized, plot window.
+       */
       virtual PlotWindow *createWindow() = 0;
       virtual void updateTool();
       QList<MdiCubeViewport *> viewportsToPlot();
@@ -70,9 +78,6 @@ namespace Isis {
       void selectedWindowChanged();
 
     private:
-      void paintCurves(MdiCubeViewport *vp, QPainter *painter,
-                       PlotWindow *container);
-
       /**
        * This allows the user to select the active plot window.  New curves 
        * will be drawn into this window. The items in the combo box store 
@@ -80,10 +85,8 @@ namespace Isis {
        * of plot windows. 
        */
       QPointer<QComboBox> m_selectWindowCombo;
-
-
   };
-};
+}
 
 #endif
 

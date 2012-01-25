@@ -28,7 +28,11 @@
 using std::cerr;
 
 namespace Isis {
-
+  /**
+   * Create a spatial plot tool.
+   *
+   * @param parent The Qt-parent relationship parent widget
+   */
   SpatialPlotTool::SpatialPlotTool(QWidget *parent) : AbstractPlotTool(parent),
       m_spatialCurves(new QMap<MdiCubeViewport *, QPointer<CubePlotCurve> >) {
     m_toolPadAction = new QAction(this);
@@ -128,8 +132,9 @@ namespace Isis {
 
 
   /**
-   * Creates the active plot window
+   * Creates a new plot window compatible with the curves in this tool.
    *
+   * @return a newly allocated plot window, ownership is passed to the caller.
    */
   PlotWindow *SpatialPlotTool::createWindow() {
     PlotWindow *window = new PlotWindow(
@@ -139,6 +144,11 @@ namespace Isis {
   }
 
 
+  /**
+   * Forget about all existing spatial plot curves. Don't delete them, just
+   *   forget them so that when the user requests a new one they get a brand
+   *   new curve.
+   */
   void SpatialPlotTool::detachCurves() {
     m_spatialCurves->clear();
   }
@@ -227,16 +237,12 @@ namespace Isis {
   }
 
 
-  double SpatialPlotTool::testSpecial(double pixel) {
-    return (IsSpecial(pixel)) ? 0.0 : pixel;
-  }
-
-
   /**
    *
    *
    * @param labels
    * @param data
+   * @param cvp
    */
   void SpatialPlotTool::getSpatialStatistics(QVector<double> &labels,
                                              QVector<double> &data,

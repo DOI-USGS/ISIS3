@@ -63,7 +63,6 @@ namespace Isis {
       void getSpatialStatistics(QVector<double>  & labels,
                                 QVector<double> & data, MdiCubeViewport *);
       void validatePlotCurves();
-      double testSpecial(double pixel);
 
       //! Plot tool's action
       QPointer<QAction> m_toolPadAction;

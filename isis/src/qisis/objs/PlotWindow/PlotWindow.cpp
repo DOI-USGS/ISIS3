@@ -39,9 +39,14 @@ namespace Isis {
    * This constructs a plot window. The plot window graphs any
    * curve sent to it via the addPlotCurve() method.
    *
-   *
-   * @param title
-   * @param parent
+   * @param title The window title and default plot title
+   * @param xAxisUnits The x-bottom axis data's units, which must match any
+   *                   curves' units that are added to this window.
+   * @param yAxisUnits The y-left axis data's units, which must match any
+   *                   curves' units that are added to this window.
+   * @param parent The Qt parent widget
+   * @param optionsToProvide A bit-flag containing information on which options
+   *                         to provide to the users.
    */
   PlotWindow::PlotWindow(QString title, PlotCurve::Units xAxisUnits,
                          PlotCurve::Units yAxisUnits, QWidget *parent,
@@ -107,7 +112,10 @@ namespace Isis {
 
   /**
    * This method is called by the constructor to create the
-   * plot, legend. zoomer, and main window
+   *   plot, legend. zoomer, and main window.
+   *
+   * @param optionsToProvide This is a bit-flag containing information on which
+   *                         menu options to give the user/put in the GUI.
    */
   void PlotWindow::createWidgets(MenuOptions optionsToProvide) {
     /*Create plot*/
@@ -148,13 +156,19 @@ namespace Isis {
   /**
    * Shows the plot window, and raises it to the front of any
    * overlapping sibling widgets.
-  */
+   */
   void PlotWindow::showWindow() {
     raise();
     show();
   }
 
 
+  /**
+   * This is provided to allow children to react to tool updates. This is useful
+   *   for example for band markers in the spectral plots.
+   *
+   * @param activeViewport The currently selected viewport
+   */
   void PlotWindow::update(MdiCubeViewport *activeViewport) {
   }
 
@@ -172,29 +186,23 @@ namespace Isis {
 
 
   /**
-   * Returns the axis title of the given axis.
+   * Sets the plot title to the given string. This does not update the window
+   *   title.
    *
-   *
-   * @param axisId
-   *
-   * @return QwtText
-   */
-//   QwtText PlotWindow::getAxisLabel(int axisId) {
-//     return m_plot->axisTitle(axisId);
-//   }
-
-
-  /**
-   * Sets the plot title to the given string.
-   *
-   *
-   * @param pt
+   * @param pt The plot title to use
    */
   void PlotWindow::setPlotTitle(QString pt) {
     m_plot->setTitle(pt);
   }
 
 
+  /**
+   * Allow or disallow users from manually putting curves into this plot window
+   *   through either copy-and-paste or drag-and-drop.
+   *
+   * @param userHasControl True if users can add curves manually, false
+   *                       otherwise
+   */
   void PlotWindow::setUserCanAddCurves(bool userHasControl) {
     m_allowUserToAddCurves = userHasControl;
   }
@@ -210,16 +218,38 @@ namespace Isis {
   }
 
 
+  /**
+   * Ask if a user action can add this curve to this window in general. This
+   *   verifies that the user is allowed to add curves to this window but not
+   *   that a particular curve is compatible with this window.
+   *
+   * @return True if the user should be allowed to paste/drop curves in general
+   *         into this window
+   */
   bool PlotWindow::userCanAddCurves() const {
     return m_allowUserToAddCurves;
   }
 
 
+  /**
+   * This is the data-type of the curves' x data in this plot window. All of the
+   *   cube plot curves must have the same units for x axis data or the display
+   *   will not make sense.
+   *
+   * @return X-Axis Curve Data Units
+   */
   PlotCurve::Units PlotWindow::xAxisUnits() const {
     return m_xAxisUnits;
   }
 
 
+  /**
+   * This is the data-type of the curves' y data in this plot window. All of the
+   *   cube plot curves must have the same units for y-left axis data (y-right
+   *   sometimes has different units) or the display will not make sense.
+   *
+   * @return Left Y-Axis Data Units
+   */
   PlotCurve::Units PlotWindow::yAxisUnits() const {
     return m_yAxisUnits;
   }
@@ -235,6 +265,18 @@ namespace Isis {
     m_plot->setCanvasBackground(c);
   }
 
+
+  /**
+   * This method tests whethere or not a CubePlotCurve can be successfully
+   *   added to this window. Plot curves with mismatched X/Y data from the
+   *   plot's x/y axis types can not be added to the window. This does not
+   *   test whether or not a user is allowed to add the curve manually, just if
+   *   the curve can be added programatically.
+   *
+   * @param curveToTest The plot curve to test for compatibility with this
+   *                    window
+   * @return True if the curve is compatible with this window, false otherwise
+   */
   bool PlotWindow::canAdd(CubePlotCurve *curveToTest) const {
     return (curveToTest->xUnits() == m_xAxisUnits &&
             curveToTest->yUnits() == m_yAxisUnits);
@@ -252,6 +294,12 @@ namespace Isis {
   }
 
 
+  /**
+   * Get a comprehensive list of the plot curves inside of this plot window,
+   *   excluding plot curves that are in the process of being removed.
+   *
+   * @return The plot curves contained inside of this plot window
+   */
   QList<CubePlotCurve *> PlotWindow::plotCurves() {
     QList<CubePlotCurve *> foundCurves;
 
@@ -272,6 +320,12 @@ namespace Isis {
   }
 
 
+  /**
+   * Get a comprehensive const list of the plot curves inside of this plot
+   *   window, excluding plot curves that are in the process of being removed.
+   *
+   * @return The const plot curves contained inside of this plot window
+   */
   QList<const CubePlotCurve *> PlotWindow::plotCurves() const {
     QList<const CubePlotCurve *> foundCurves;
 
@@ -292,6 +346,13 @@ namespace Isis {
   }
 
 
+  /**
+   * Get a comprehensive list of the scatter plots (spectrograms) inside of this
+   *   plot window.
+   *
+   * @return The spectrograms (scatter plots) contained inside of this plot
+   *         window
+   */
   QList<QwtPlotSpectrogram *> PlotWindow::plotSpectrograms() {
     QList<QwtPlotSpectrogram *> foundSpectrograms;
 
@@ -313,6 +374,13 @@ namespace Isis {
   }
 
 
+  /**
+   * Get a comprehensive const list of the scatter plots (spectrograms) inside
+   *   of this plot window.
+   *
+   * @return The const spectrograms (scatter plots) contained inside of this
+   *         plot window
+   */
   QList<const QwtPlotSpectrogram *> PlotWindow::plotSpectrograms() const {
     QList<const QwtPlotSpectrogram *> foundSpectrograms;
 
@@ -388,10 +456,10 @@ namespace Isis {
 
 
   /**
-  * This method completely clears the plot of all plot items.
-  * i.e. curves and markers, which also deletes the legend also
-  * calls the necessary method to delete the table stuff
-  */
+   * This method completely clears the plot of all plot items.
+   * i.e. curves and markers, which also deletes the legend also
+   * calls the necessary method to delete the table stuff
+   */
   void PlotWindow::clearPlot() {
     clearPlotCurves();
 
@@ -404,6 +472,12 @@ namespace Isis {
   }
 
 
+  /**
+   * This method prompts the user to select the best fit line criterea. The
+   *   PlotWindowBestFitDialog will create the best fit line automatically
+   *   when the user asks for one, so we don't need to worry about doing
+   *   any more than showing a dialog here.
+   */
   void PlotWindow::createBestFitLine() {
     PlotWindowBestFitDialog *dialog = new PlotWindowBestFitDialog(this, plot());
     dialog->show();
@@ -411,13 +485,10 @@ namespace Isis {
 
 
   /**
-  * This method also clears the plot of all plot items, but does
-  * not call the table delete stuff This method is called from
-  * plotTool each time the changePlot() method is called.
-  *
-  *
-  * @param keepScale
-  */
+   * This method also clears the plot of all plot items, but does
+   * not call the table delete stuff This method is called from
+   * plotTool each time the changePlot() method is called.
+   */
   void PlotWindow::clearPlotCurves() {
     const QwtPlotItemList &plotItems = m_plot->itemList();
 
@@ -449,8 +520,7 @@ namespace Isis {
 
 
   /**
-   * Provids printing support of the plot image.
-   *
+   * Provides printing support of the plot image.
    */
   void PlotWindow::printPlot() {
     QPixmap pixmap;
@@ -915,9 +985,12 @@ namespace Isis {
 
 
   /**
-  * The user can add menu items from parent classes, but there are
-  * some menu items required (default) for the plotWindow
-  */
+   * The user can add menu items from parent classes, but there are
+   *   some menu items that are common between many types of plot windows.
+   *
+   * @param optionsToProvide A bit-flag containing information on which options
+   *                         to provide to the users.
+   */
   void PlotWindow::setupDefaultMenu(MenuOptions optionsToProvide) {
     QList<QMenu *> menu;
     QList<QAction *> actions;
@@ -1143,6 +1216,17 @@ namespace Isis {
   }
 
 
+  /**
+   * Ask if a user action can add this curve to this window. This verifies that
+   *   the user is allowed to add curves to this window and that
+   *   programmatically the curve can be added (i.e. things such as the X/Y
+   *   data units match).
+   *
+   * @param curve Mime-data containing a plot curve to be added
+   *
+   * @return True if the user should be allowed to paste/drop the curve into
+   *         this window
+   */
   bool PlotWindow::userCanAddCurve(const QMimeData *curve) {
     bool userCanAdd = false;
 
@@ -1220,6 +1304,11 @@ namespace Isis {
   }
 
 
+  /**
+   * Get this window's plot's zoomer.
+   *
+   * @return A QwtPlotZoomer which is associated with this PlotWindow's QwtPlot
+   */
   QwtPlotZoomer *PlotWindow::zoomer() {
     return m_zoomer;
   }
@@ -1334,10 +1423,10 @@ namespace Isis {
 
 
   /**
-  * This method is called from the showTable action on the tool
-  * bar There are some checks done to make sure there are data to
-  * fill the table
-  */
+   * This method is called from the showTable action on the tool
+   * bar There are some checks done to make sure there are data to
+   * fill the table
+   */
   void PlotWindow::showTable() {
     if (plotCurves().size()) {
       if (m_tableWindow == NULL) {
@@ -1399,6 +1488,15 @@ namespace Isis {
   }
 
 
+  /**
+   * This is a helper method for the eventFilter() method. When a mouse press
+   *   event is seen, this handles it. For example, if the user right clicks
+   *   and the clipboard contains compatible data then this will give a paste
+   *   option.
+   *
+   * @param object The object which was pressed
+   * @param event The mouse event which contains button information
+   */
   void PlotWindow::mousePressEvent(QObject *object, QMouseEvent *event) {
     if (qobject_cast<QWidget *>(object) &&
         event->button() == Qt::RightButton &&
@@ -1419,6 +1517,11 @@ namespace Isis {
   }
 
 
+  /**
+   * Get the plot encapsulated by this PlotWindow.
+   *
+   * @return The QwtPlot that this window encapsulates.
+   */
   QwtPlot *PlotWindow::plot() {
     return m_plot;
   }
@@ -1445,11 +1548,23 @@ namespace Isis {
   }
 
 
+  /**
+   * This turns off scaling the x/y axes automatically. Use this if you have
+   *   a very specific axis range you want to use, but keep in mind that
+   *   users (potentially) have an option to re-enable axis auto scaling if
+   *   they want to.
+   */
   void PlotWindow::disableAxisAutoScale() {
     m_autoscaleAxes = false;
   }
 
 
+  /**
+   * This is a helper method for the set scale configuration dialog. This
+   *   enables or disables options inside of the dialog when a checkbox is
+   *   clicked in the dialog. This does not change the state of the plot or
+   *   plot zoomer.
+   */
   void PlotWindow::autoScaleCheckboxToggled() {
     m_xMinEdit->setEnabled(!m_autoScaleCheckBox->isChecked());
     m_xMaxEdit->setEnabled(!m_autoScaleCheckBox->isChecked());
@@ -1467,6 +1582,11 @@ namespace Isis {
   }
 
 
+  /**
+   * When the user pastes a curve try to put it into this plot window. This
+   *   shouldn't be called when the curve on the system clipboard isn't
+   *   compatible.
+   */
   void PlotWindow::pasteCurve() {
     if (m_allowUserToAddCurves) {
       QClipboard *globalClipboard = QApplication::clipboard();
@@ -1483,6 +1603,15 @@ namespace Isis {
   }
 
 
+  /**
+   * This calculates the data range of the specified axis (works with xBottom
+   *   and yLeft only). This is used to provide unit context (band #'s shouldn't
+   *   ever pad) and to fix the lack of an axis when only one value exists (if
+   *   there is only one x-value, this will always pad with +/- 0.5).
+   *
+   * @param axisId This must be yLeft or xBottom
+   * @return The double range of the data contained by the given axis.
+   */
   QPair<double, double> PlotWindow::findDataRange(int axisId) const {
     QList<const CubePlotCurve *> curves = plotCurves();
 
@@ -1549,6 +1678,12 @@ namespace Isis {
   }
 
 
+  /**
+   * Paint plot curve information onto the viewport.
+   *
+   * @param vp The cube viewport to paint onto
+   * @param painter The painter to use for painting
+   */
   void PlotWindow::paint(MdiCubeViewport *vp, QPainter *painter) {
     foreach (CubePlotCurve *curve, plotCurves()) {
       curve->paint(vp, painter);
@@ -1557,7 +1692,7 @@ namespace Isis {
 
 
   /**
-   * replot the plot
+   * Reset the scale of the plot, replot it and emit plot changed.
    */
   void PlotWindow::replot() {
     resetScale();
@@ -1565,12 +1700,26 @@ namespace Isis {
   }
 
 
-
+  /**
+   * This is the typical suffix for plot windows, it's here in case we want to
+   *   update all plot windows to have a different ending than just 'Plot' on
+   *   them (for example, 'Plot Window').
+   *
+   * @return A string to be appended to your window title
+   */
   QString PlotWindow::defaultWindowTitle() {
     return "Plot";
   }
 
 
+  /**
+   * When a user drags data into our plot window, we need to indicate whether or
+   *   not this data is compatible with this window. This checks
+   *   userCanAddCurve() on the drag & drop data and allows or disallowed the
+   *   event accordingly.
+   *
+   * @param event The drag event to test
+   */
   void PlotWindow::dragEnterEvent(QDragEnterEvent *event) {
     QWidget *source = event->source();
 
@@ -1581,6 +1730,17 @@ namespace Isis {
   }
 
 
+  /**
+   * This is called when a user drops data into our window. The dragEnterEvent()
+   *   must have said that this curve is compatible with this window. This
+   *   provides all of the available options to the user (if any) set by the
+   *   creator of the drag & drop event (i.e. whether or not we can move or
+   *   just copy). If there are options, we create a context menu - otherwise
+   *   the default action is taken.
+   *
+   * @param event The drop event containing the curve to put into the current
+   *              window.
+   */
   void PlotWindow::dropEvent(QDropEvent *event) {
     if (m_allowUserToAddCurves &&
         event->mimeData()->hasFormat("application/isis3-plot-curve")) {

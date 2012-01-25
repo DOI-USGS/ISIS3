@@ -23,7 +23,6 @@ namespace Isis {
    * Gives the programmer more flexibility on when the action
    * button for this tool is checked or not.
    *
-   *
    * @param checked
    */
   void ScatterPlotTool::setActionChecked(bool checked) {
@@ -31,6 +30,13 @@ namespace Isis {
   }
 
 
+  /**
+   * When a viewport needs repainted this is called. We are going to give the
+   *   plot windows a chance to paint onto the viewport.
+   *
+   * @param vp The viewport to potentially be painted on
+   * @param painter The painter to use for painting
+   */
   void ScatterPlotTool::paintViewport(MdiCubeViewport *vp, QPainter *painter) {
     m_plotWindows->removeAll(NULL);
 
@@ -63,11 +69,22 @@ namespace Isis {
   }
 
 
+  /**
+   * Get the action which activates this tool.
+   *
+   * @return The action which activates this tool
+   */
   QAction *ScatterPlotTool::toolAction() {
     return m_action;
   }
 
 
+  /**
+   * Create the toolbar options widget for this tool's options.
+   *
+   * @param parent The stacked widget this will be put into.
+   * @return A widget containing detailed options for this tool
+   */
   QWidget *ScatterPlotTool::createToolBarWidget(QStackedWidget *parent) {
     QWidget *wrapper = new QWidget(parent);
 
@@ -87,6 +104,10 @@ namespace Isis {
   }
 
 
+  /**
+   * The user has asked to create a scatter plot. If we can, create the scatter
+   *   plot.
+   */
   void ScatterPlotTool::onScatterPlotConfigAccepted() {
     try {
       if (m_configDialog) {
@@ -118,11 +139,21 @@ namespace Isis {
   }
 
 
+  /**
+   * The user has cancelled creating a scatter plot. Delete the configuration
+   *   dialog.
+   */
   void ScatterPlotTool::onScatterPlotConfigRejected() {
     delete m_configDialog;
   }
 
 
+  /**
+   * The user has moved their mouse on the cube viewport. We're going to
+   *   notify the plot windows about this for alarming viewport->plot.
+   *
+   * @param p The mouse location
+   */
   void ScatterPlotTool::mouseMove(QPoint p, Qt::MouseButton) {
     m_plotWindows->removeAll(NULL);
 
@@ -132,6 +163,10 @@ namespace Isis {
   }
 
 
+  /**
+   * The user moused out of the viewport. Let the plot windows know this for
+   *   alarming viewport->plot.
+   */
   void ScatterPlotTool::mouseLeave() {
     m_plotWindows->removeAll(NULL);
 
@@ -141,6 +176,10 @@ namespace Isis {
   }
 
 
+  /**
+   * This is a helper method for asking every viewport to repaint. Any time
+   *   alarming changes this needs to happen.
+   */
   void ScatterPlotTool::repaintViewports() {
     QVector<MdiCubeViewport *> allViewports = *cubeViewportList();
 
@@ -150,11 +189,14 @@ namespace Isis {
   }
 
 
+  /**
+   * Ask the user to give us information for a new scatter plot.
+   */
   void ScatterPlotTool::showNewScatterPlotConfig() {
     try {
       if (!m_configDialog) {
         m_configDialog = new ScatterPlotConfigDialog(
-            cubeViewport(), p_workspace, this);
+            cubeViewport(), p_workspace);
         connect(m_configDialog, SIGNAL(accepted()),
                 this, SLOT(onScatterPlotConfigAccepted()));
         connect(m_configDialog, SIGNAL(rejected()),

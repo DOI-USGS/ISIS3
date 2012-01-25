@@ -27,8 +27,14 @@ namespace Isis {
       Q_OBJECT
 
     public:
+      /**
+       * This enumeration differentiates alarming a strict cube DN box
+       *   size from a screen region.
+       */
       enum AlarmRangeUnits {
+        //! Alarming is a DN range around the mouse
         CubeUnits,
+        //! Alarming is a visible area around the mouse
         ScreenUnits
       };
 
@@ -78,33 +84,50 @@ namespace Isis {
       void configureAlarming();
 
     private:
+      //! This is the scatter plot's Qwt plot item
       QwtPlotSpectrogram *m_spectrogram;
 
       //! The action for switching the scatter plot from B/W to color.
       QPointer<QAction> m_colorize;
+      //! The action for switching on and off contour lines
       QPointer<QAction> m_contour;
 
+      //! The cube associated with the X-Axis DN values
       Cube *m_xAxisCube;
+      //! The cube associated with the Y-Axis DN values
       Cube *m_yAxisCube;
+      //! The DN range of the X-Axis Cube to be alarmed when painting
       QPair<double, double> m_xCubeDnAlarmRange;
+      //! The DN range of the Y-Axis Cube to be alarmed when painting
       QPair<double, double> m_yCubeDnAlarmRange;
+      //! The band on the X-Axis cube used for the scatter plot
       int m_xAxisCubeBand;
+      //! The band on the Y-Axis cube used for the scatter plot
       int m_yAxisCubeBand;
+      //! The sample range (1-based inclusive) of data used for the scatter plot
       QwtDoubleRange m_sampleRange;
+      //! The line range (1-based inclusive) of data used for the scatter plot
       QwtDoubleRange m_lineRange;
 
-      //! Alarm onto plot
+      //! Alarm onto plot... aka alarm viewport->plot
       bool m_alarmPlot;
-      //! Alarm onto viewport
+      //! Alarm onto viewport... aka alarm plot->viewport
       bool m_alarmViewport;
 
+      //! Alarm viewport->plot viewport sample box size
       int m_alarmPlotSamples;
+      //! Alarm viewport->plot viewport line box size
       int m_alarmPlotLines;
 
+      //! Alarm plot->viewport current units
       AlarmRangeUnits m_alarmViewportUnits;
+      //! Alarm plot->viewport X (screen pixels) box size
       int m_alarmViewportScreenWidth;
+      //! Alarm plot->viewport Y (screen pixels) box size
       int m_alarmViewportScreenHeight;
+      //! Alarm plot->viewport X (Cube DN) box size
       double m_alarmViewportXDnBoxSize;
+      //! Alarm plot->viewport Y (Cube DN) box size
       double m_alarmViewportYDnBoxSize;
   };
 }

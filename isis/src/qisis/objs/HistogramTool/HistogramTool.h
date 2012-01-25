@@ -26,6 +26,7 @@ namespace Isis {
   *  @history 2012-01-18 Steven Lambright and Jai Rideout - Fixed issue where
   *                          histograms were not created correctly for any bands
   *                          but band 1. Added check for RGB mode. Fixes #668.
+  *  @history 2012-01-20 Steven Lambright - Completed documentation.
   */
   class HistogramTool : public AbstractPlotTool {
       Q_OBJECT
@@ -52,9 +53,13 @@ namespace Isis {
 
       HistogramToolWindow *m_histToolWindow;//!< Plot Tool Window Widget
 
+      //! This is the qwt plot item which draws the histogram frequency bars
       QPointer<HistogramItem> m_frequencyItem;
+      //! This plot curve indicates the data percentage over the histogram
       QPointer<CubePlotCurve> m_percentageCurve;
+      //! This is the action that activates this tool
       QAction *m_action;
+      //! This combo box is for various rubber band selection types
       QPointer<RubberBandComboBox> m_rubberBandCombo;
   };
 };

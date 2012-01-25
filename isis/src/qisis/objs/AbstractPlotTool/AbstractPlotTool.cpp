@@ -13,9 +13,9 @@
 namespace Isis {
 
   /**
-   * This constructs a plot tool. The plot tool graphs either DN values across a
-   * line, or statistics across a spectrum (bands).
-   *
+   * When you construct a plot tool, this initializes the common functionality
+   * between plot tools. For example, the select window combo box that appears
+   * when you call createToolBarWidget().
    *
    * @param parent
    */
@@ -33,10 +33,12 @@ namespace Isis {
     m_selectWindowCombo->setCurrentIndex(-1);
     connect(m_selectWindowCombo, SIGNAL(currentIndexChanged(int)),
             this, SLOT(selectedWindowChanged()));
-
   }
 
 
+  /**
+   * Clean up the abstract plot tool. This will destroy all of the plot windows.
+   */
   AbstractPlotTool::~AbstractPlotTool() {
     // currentIndexChanged wants to call a pure virtual method, which crashes.
     disconnect(m_selectWindowCombo, SIGNAL(currentIndexChanged(int)),
@@ -55,11 +57,12 @@ namespace Isis {
 
 
   /**
-   * This method paints the polygons of the copied curves
-   * onto the cubeviewport
+   * This method allows each plot window to paint any information it wants onto
+   * the cube viewports. For example, spatial plots can paint the originating
+   * selection in the color of the curve.
    *
-   * @param vp
-   * @param painter
+   * @param vp The viewport to paint onto
+   * @param painter The painter to use for painting
    */
   void AbstractPlotTool::paintViewport(MdiCubeViewport *vp, QPainter *painter) {
     for (int i = 0; i < m_selectWindowCombo->count(); i++) {
@@ -74,12 +77,14 @@ namespace Isis {
 
 
   /**
-   * Creates the widgets for the tool bar.
+   * This provides the standard plot tool options, such as selecting an active
+   * plot window.
    *
+   * @param parent The stacked widget which will contain ours as one of the
+   *               widgets it can show.
    *
-   * @param parent
-   *
-   * @return QWidget*
+   * @return QWidget* The widget we want the stacked widget to show when this is
+   *               the active tool.
    */
   QWidget *AbstractPlotTool::createToolBarWidget(QStackedWidget *parent) {
     QWidget *toolBarWidget = new QWidget(parent);
@@ -93,6 +98,9 @@ namespace Isis {
   }
 
 
+  /**
+   * This forwards all update calls to the plot windows.
+   */
   void AbstractPlotTool::updateTool() {
     foreach (PlotWindow *window, plotWindows()) {
       window->update(cubeViewport());
@@ -100,6 +108,14 @@ namespace Isis {
   }
 
 
+  /**
+   * Get a list of linked viewports that should be plotting when a new plot is
+   *   requested. This is a utility for child classes. For example, a spatial
+   *   plot will make a curve for each viewport.
+   *
+   * @return A list of viewports containing the active one and any that are
+   *         linked to the active viewport.
+   */
   QList<MdiCubeViewport *> AbstractPlotTool::viewportsToPlot() {
     QList<MdiCubeViewport *> viewports;
     MdiCubeViewport *activeViewport = cubeViewport();
@@ -117,6 +133,11 @@ namespace Isis {
   }
 
 
+  /**
+   * Get a list of all of the instantiated plot windows.
+   *
+   * @return All of the plot windows associated with this tool
+   */
   QList<PlotWindow *> AbstractPlotTool::plotWindows() {
     QList<PlotWindow *> windows;
 
@@ -134,7 +155,11 @@ namespace Isis {
 
 
   /**
-   * This method updates the window where new curves are placed.
+   * This method is called when the window where new curves are placed is
+   *   changed by the user. If the current selection has no window associated
+   *   with it, then one is created. Otherwise, the selected window is
+   *   explicitly shown and any curves associated with an old window should be
+   *   forgotten (but not deleted, see detachCurves()).
    */
   void AbstractPlotTool::selectedWindowChanged() {
     int currentIndex = m_selectWindowCombo->currentIndex();
@@ -156,8 +181,10 @@ namespace Isis {
 
   /**
    * When a user closes a window, we want to remove that window from our
-   * QComboBox.
-   * 
+   *   combo box for selecting the active window. We also repaint all of the
+   *   cube viewports so that the destroyed window leaves no visible artifacts.
+   *
+   * @param window The plot window that is to be removed
    */
   void AbstractPlotTool::removeWindow(QObject *window) {
     // See if we need to unselect it before removing it
@@ -177,6 +204,18 @@ namespace Isis {
   }
 
 
+  /**
+   * This is a helper method for children. Given a title, a color, and units
+   *   a new CubePlotCurve is created.
+   *
+   * @param name The title of the curve to be created
+   * @param pen The color & thickness of the curve
+   * @param xUnits The units of the x-axis associated with this curve. This must
+   *               match the plot window's x axis.
+   * @param yUnits The units of the y-axis associated with this curve. This must
+   *               match the plot window's y axis.
+   * @return createCurve The requested plot curve
+   */
   CubePlotCurve * AbstractPlotTool::createCurve(QString name, QPen pen,
       PlotCurve::Units xUnits, PlotCurve::Units yUnits) {
     CubePlotCurve * newCurve = new CubePlotCurve(xUnits, yUnits);
@@ -189,6 +228,17 @@ namespace Isis {
   }
 
 
+  /**
+   * Get the 'active' plot window (the window selected by the user to contain
+   *   new curves). This may return NULL if and only if createIfNeeded is false.
+   *   Windows are created by child classes.
+   *
+   * @param createIfNeeded If this is true, and no window is selected in the
+   *                       active window combo box, then a window will be
+   *                       created and selected before this method returns.
+   *
+   * @return The user-selected active plot window
+   */
   PlotWindow *AbstractPlotTool::selectedWindow(bool createIfNeeded) {
     PlotWindow *window = NULL;
     int curIndex = m_selectWindowCombo->currentIndex();
@@ -213,8 +263,9 @@ namespace Isis {
   /**
    * This method causes the viewports corresponding with the given
    * CubePlotCurve to be repainted with all of the area's of
-   * interest associated with the CubePlotCurve's plotwindow.
-   * 
+   * interest associated with the CubePlotCurve's PlotWindow.
+   *
+   * @param pc The plot curve which needs to repaint
    */
   void AbstractPlotTool::repaintViewports(CubePlotCurve *pc) {
     QVector<MdiCubeViewport *> allViewports = *cubeViewportList();
@@ -226,6 +277,14 @@ namespace Isis {
   }
 
 
+  /**
+   * This creates and initializes everything about a plot window. This updates
+   *   the window's title to be unique, adds it to the active plot window combo
+   *   box, listens for the window to be removed and selects it in the active
+   *   plot window combo box. Call this if you need a new plot window.
+   *
+   * @return The newly initialized plot window
+   */
   PlotWindow *AbstractPlotTool::addWindow() {
     PlotWindow *newPlotWindow = createWindow();
 
@@ -280,6 +339,9 @@ namespace Isis {
 
 
   /**
+   * This method causes all of the viewports to be repainted. This is
+   *   useful because it removes visible artifacts from deleted plot
+   *   windows/curves.
    */
   void AbstractPlotTool::repaintViewports() {
     QVector<MdiCubeViewport *> allViewports = *cubeViewportList();
@@ -288,6 +350,5 @@ namespace Isis {
       viewport->viewport()->repaint();
     }
   }
-  
 }
 

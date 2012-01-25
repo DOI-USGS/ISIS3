@@ -30,8 +30,7 @@ namespace Isis {
 
     public:
       ScatterPlotConfigDialog(MdiCubeViewport *activeViewport,
-                              Workspace *ws, ScatterPlotTool *tool,
-                              QWidget *parent = NULL);
+                              Workspace *workspace, QWidget *parent = NULL);
 
       virtual QSize sizeHint() const;
 
@@ -55,24 +54,35 @@ namespace Isis {
                                    QList<Cube *> itemsToRemove);
       QPair<QwtDoubleRange, QwtDoubleRange> sampleLineRanges() const;
 
-      ScatterPlotTool *m_tool;
+      //! This is the workspace containing all of the viewports.
       Workspace *m_workspace;
 
+      //! A user-selection for the x axis cube
       QPointer<QComboBox> m_xAxisCubeCombo;
+      //! A user-selection for the x axis cube's band to plot
       QPointer<QSpinBox> m_xAxisCubeBandSpinBox;
+      //! A user-selection for the x axis cube's resolution
       QPointer<QSpinBox> m_xAxisBinCountSpinBox;
+      //! A user-selection for using only the visible range of the viewport
       QPointer<QCheckBox> m_useViewportRangesCheckBox;
 
+      //! A user-selection for the y axis cube
       QPointer<QComboBox> m_yAxisCubeCombo;
+      //! A user-selection for the y axis cube's band to plot
       QPointer<QSpinBox> m_yAxisCubeBandSpinBox;
+      //! A user-selection for the y axis cube's resolution
       QPointer<QSpinBox> m_yAxisBinCountSpinBox;
 
+      /**
+       * This button triggers an accepted() signal. This is only enabled when
+       *   the user inputs make sense.
+       */
       QPointer<QPushButton> m_createButton;
 
+      //! This is used to detect when a user changes the x-axis cube.
       Cube *m_oldXAxisCube;
   };
 }
 
 
 #endif
-

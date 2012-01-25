@@ -35,6 +35,13 @@ namespace Isis {
   }
 
 
+  /**
+   * After attaching this curve to a plot, due to an inheritance/implementation
+   *   complication with qwt the markers will remain detached until they are
+   *   recreated. This forces the markers to be updated immediately.
+   *
+   * Please always call this method after attaching this curve to a plot.
+   */
   void PlotCurve::attachMarkers() {
     recreateMarkers();
   }
@@ -60,16 +67,32 @@ namespace Isis {
   }
 
 
+  /**
+   * Get the units of the x-axis double data.
+   *
+   * @return The units of the x-axis data
+   */
   PlotCurve::Units PlotCurve::xUnits() const {
     return m_xUnits;
   }
 
 
+  /**
+   * Get the units of the y-axis double data.
+   *
+   * @return The units of the y-axis data
+   */
   PlotCurve::Units PlotCurve::yUnits() const {
     return m_yUnits;
   }
 
 
+  /**
+   * Set the color of this curve and it's markers. This color will override the
+   *   pen's color always.
+   *
+   * @param color The color of this curve.
+   */
   void PlotCurve::setColor(const QColor &color) {
     //set the data for the curve
     m_color = color;
@@ -113,7 +136,11 @@ namespace Isis {
   }
 
 
-
+  /**
+   * This method sets the visibility states of the markers at each value point.
+   *
+   * @param visible True to show markers, false to hide
+   */
   void PlotCurve::setMarkerVisible(bool visible) {
     foreach (QwtPlotMarker *marker, m_valuePointMarkers) {
       marker->setVisible(visible);
@@ -125,8 +152,8 @@ namespace Isis {
   /**
    * Construct the plot curve given the past results of toByteArray(...).
    * This is used for copy/paste and drag/drop.
-   * 
-   * Returns the unconsumed part of the byte array.
+   *
+   * @return The unconsumed part of the byte array.
    */
   QByteArray PlotCurve::fromByteArray(const QByteArray &classData) {
     QString expectedHeader("PLOT_CURVE_V1");

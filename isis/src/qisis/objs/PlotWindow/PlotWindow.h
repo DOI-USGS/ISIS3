@@ -69,21 +69,81 @@ namespace Isis {
       Q_OBJECT
 
     public:
+      /**
+       * There is a menu option for everything in the plot window's menu. This
+       *   is provided so that you can enable/disable any given option.
+       */
       enum MenuOptions {
+        //! This option is titled 'Hide All Symbols' which hides all markers
         ShowHideMarkersMenuOption  = 1,
+        /**
+         * This option is titled 'Hide All Curves' which makes all curves
+         *   invisible
+         */
         ShowHideCurvesMenuOption   = 2,
+        /**
+         * This option brings up the table. No table will be available
+         *   without this option.
+         */
         ShowTableMenuOption        = 4,
+        /**
+         * This option exports the plot into a standard image format.
+         *   No conversion to a standard image format file will be available
+         *   without this option, but printing will still be available.
+         */
         SaveMenuOption             = 8,
+        /**
+         * This option sends the plot to a printer.
+         */
         PrintMenuOption            = 16,
+        /**
+         * This option enables mouse tracking on the plot area (displays next
+         *   to the mouse which x/y point you are hovering over). This option
+         *   is by default disabled.
+         */
         TrackMenuOption            = 32,
+        /**
+         * This option enables the ability for a user to change the background
+         *   color of the plot from black to white.
+         */
         BackgroundSwitchMenuOption = 64,
+        /**
+         * This option enables the ability for a user to enable a grid over the
+         *   plot area.
+         */
         ShowHideGridMenuOption     = 128,
+        /**
+         * This option enables the ability for a user to change the x/y axis
+         *   labels and plot title.
+         */
         RenameLabelsMenuOption     = 256,
+        /**
+         * This option allows the user to set the x/y axis display value ranges.
+         */
         SetDisplayRangeMenuOption  = 512,
+        /**
+         * This option provides the user with an alternative zoom out button.
+         */
         ResetScaleMenuOption       = 1024,
+        /**
+         * This option allows the user to delete all of the data inside the
+         *   plot. If you don't want the user deleting a custom plot item, you
+         *   should disable this option.
+         */
         ClearPlotMenuOption        = 2048,
+        /**
+         * Not implemented.
+         */
         DefaultHelpMenuOption      = 4096,
+        /**
+         * This option allows the user to create a best fit line for any of the
+         *   scatter plot data or cube plot curve data in the window. This
+         *   allows the user to create new plot curves.
+         */
         LineFitMenuOption          = 8192,
+        /**
+         * This is all of the available menu options.
+         */
         AllMenuOptions = ShowHideMarkersMenuOption | ShowHideCurvesMenuOption |
                          ShowTableMenuOption | SaveMenuOption |
                          PrintMenuOption | TrackMenuOption |
@@ -124,6 +184,10 @@ namespace Isis {
 
 
     signals:
+      /**
+       * Emitted when there is a close event on this window that will be
+       *   accepted.
+       */
       void closed();
       //! Emitted every time there is a change to the plot window.
       void plotChanged();
@@ -157,14 +221,9 @@ namespace Isis {
       void disableAxisAutoScale();
       virtual void dragEnterEvent(QDragEnterEvent *event);
       virtual void dropEvent(QDropEvent *event);
-      void enableZoomer(bool enable);
       virtual bool eventFilter(QObject *o, QEvent *e);
       void mousePressEvent(QObject *object, QMouseEvent *e);
 
-      //! Returns the name of the menu.
-      QString menuName() const {
-        return "&Options";
-      };
       QwtPlot *plot();
       void setMenus(QList<QMenu *> menus, QList<QAction *> actions);
       QwtPlotZoomer *zoomer();
@@ -186,15 +245,25 @@ namespace Isis {
       QwtPlotZoomer *m_zoomer;
       //! Plot grid lines
       QwtPlotGrid   *m_grid;
+      //! Set Scale Dialog's checkbox for enabling automatic scaling on x & y
       QCheckBox     *m_autoScaleCheckBox;
+      //! Set Scale Dialog's checkbox for using logarithmic scale for the x axis
       QCheckBox     *m_xLogCheckBox;
+      //! Set Scale Dialog's checkbox for using logarithmic scale for the y axis
       QCheckBox     *m_yLogCheckBox;
+      //! Set Scale Dialog's edit for the min X-axis value
       QLineEdit     *m_xMinEdit;
+      //! Set Scale Dialog's edit for the max X-axis value
       QLineEdit     *m_xMaxEdit;
+      //! Set Scale Dialog's edit for the min Y-axis value
       QLineEdit     *m_yMinEdit;
+      //! Set Scale Dialog's edit for the max Y-axis value
       QLineEdit     *m_yMaxEdit;
+      //! Set Labels Dialog's edit for the x-axis label
       QLineEdit     *m_xAxisText;
+      //! Set Labels Dialog's edit for the y-axis label
       QLineEdit     *m_yAxisText;
+      //! Set Labels Dialog's edit for the plot title
       QLineEdit     *m_plotTitleText;
 
       //! Plot window's menu bar.
@@ -216,11 +285,14 @@ namespace Isis {
       //! Show plot grid lines action.
       QPointer<QAction> m_showHideGrid;
 
+      //! The units of the data on the x-bottom axis
       PlotCurve::Units m_xAxisUnits;
+      //! The units of the data on the y-left axis
       PlotCurve::Units m_yAxisUnits;
 
       //! Is the window showing the curve markers?
       bool m_allowUserToAddCurves;
+      //! True if we are autoscaling the x-bottom and y-left axes
       bool m_autoscaleAxes;
 
       QwtPlot *m_plot;//!< The plot in this window
@@ -229,10 +301,12 @@ namespace Isis {
    };
 };
 
+//! We have plot windows as QVariant data types, so here it's enabled.
 Q_DECLARE_METATYPE(Isis::PlotWindow *);
 
 // There isn't a great place to put this currently since it's not a class we
 //   can manage the header for.
+//! We have scatter plot types as QVariant data types, so here it's enabled.
 Q_DECLARE_METATYPE(QwtPlotSpectrogram *);
 
 #endif

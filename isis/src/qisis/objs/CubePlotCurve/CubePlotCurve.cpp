@@ -28,10 +28,13 @@
 namespace Isis {
   /**
    * This constructs a CubePlotCurve... a subclass of PlotCurve.
-   * This class was created specifically for use withthe plot
-   * tool. With this class the programmer can set the cube view
-   * port that the curve is associated with along with the
-   * vertices on the cvp of which the curve gets it data.
+   *   This class was created specifically for use with the plot
+   *   tools. With this class the programmer can set the cube view
+   *   port that the curve is associated with along with the
+   *   vertices on the cvp of which the curve gets it data.
+   *
+   * @param xUnits The units that the x-axis data is in
+   * @param yUnits The units that the x-axis data is in
    */
   CubePlotCurve::CubePlotCurve(Units xUnits, Units yUnits) :
       PlotCurve(xUnits, yUnits) {
@@ -43,6 +46,9 @@ namespace Isis {
   /**
    * Construct the plot tool curve given the past results of toByteArray(...).
    * This is used for copy/paste and drag/drop.
+   *
+   * @param parentAndChildData A serialized, binary representation of an
+   *                           instance of this class.
    */
   CubePlotCurve::CubePlotCurve(const QByteArray &parentAndChildData) :
       PlotCurve(Unknown, Unknown) {
@@ -101,6 +107,12 @@ namespace Isis {
   /**
    * This will start the drag & drop operation for these curves.
    *
+   * @param o The object that the event relates to. This is usually the legend
+   *          item, but some children install their own event filters for other
+   *          objects.
+   * @param e The event that occurred on the given object.
+   *
+   * @return True if we don't want any more processing of the event
    */
   bool CubePlotCurve::eventFilter(QObject *o, QEvent *e) {
     bool blockWidgetFromEvent = false;
@@ -126,6 +138,14 @@ namespace Isis {
   }
 
 
+  /**
+   * Use information inside of the plot curve to paint onto a cube viewport.
+   *   This paints the originating data points, in the color of the curve, onto
+   *   the viewport. This will not paint onto unrelated cube viewports.
+   *
+   * @param vp The viewport we're going to potentially paint onto
+   * @param painter The painter to use for painting onto the viewport
+   */
   void CubePlotCurve::paint(CubeViewport *vp, QPainter *painter) {
     if (m_sourceCube == vp->cube()->getFilename()) {
       QPen customPen;
@@ -172,14 +192,6 @@ namespace Isis {
 
 
   /**
-   * TODO: does this work?
-   */
-  QWidget *CubePlotCurve::legendItem() const {
-    return m_legendItem;
-  }
-
-
-  /**
    * This method returns the cube view port associated with the
    * curve.
    *
@@ -190,11 +202,24 @@ namespace Isis {
   }
 
 
+  /**
+   * This enables/disables the plot curve from changing it's title when the
+   *   source data changes. This is enabled by default and typically disabled
+   *   when a user manually renames a curve.
+   *
+   * @param allowed True for automatic renaming, false to preserve curve title
+   */
   void CubePlotCurve::enableAutoRenaming(bool allowed) {
     m_renameAutomatically = allowed;
   }
 
 
+  /**
+   * This copies the source data from another CubePlotCurve. This curve will now
+   *   act as if it has the same exact source data as the other curve.
+   *
+   * @param other The curve with the source (origination) data to copy.
+   */
   void CubePlotCurve::copySource(const CubePlotCurve &other) {
     m_sourceCube = other.m_sourceCube;
     m_pointList = other.m_pointList;
@@ -202,6 +227,18 @@ namespace Isis {
   }
 
 
+  /**
+   * Tell this plot curve from where its data originated.
+   *
+   * If you set a source, you must keep it up to date. Any time the data in
+   *   the curve changes, you should be calling this method again.
+   *
+   * @param cvp The viewport from which this curve's data came from
+   * @param screenPoints The pertinent points on the viewport from which this
+   *                     curve's data came from.
+   * @param band The band of the cube inside of said viewport from which this
+   *             curve's data came from.
+   */
   void CubePlotCurve::setSource(CubeViewport *cvp, QList<QPoint> screenPoints,
                                 int band) {
     if (m_originalName != "" && m_sourceCube != "" && m_renameAutomatically) {
@@ -239,6 +276,9 @@ namespace Isis {
   }
 
 
+  /**
+   * This creates a legend item and overrides events from it.
+   */
   void CubePlotCurve::updateLegendItemWidget() {
     if (!m_legendItem) {
       m_legendItem = PlotCurve::legendItem();
@@ -250,7 +290,11 @@ namespace Isis {
 
 
   /**
-   * Ownership of the return value is passed to the caller.
+   * This converts the plot curve into a binary, clipboard-compatible storage
+   *   format (QMimeData). The format is 'application/isis3-plot-curve'.
+   *
+   * @return A mime-data representation of this class. Ownership of the return
+   *         value is passed to the caller.
    */
   QMimeData *CubePlotCurve::createMimeData() const {
     QMimeData *mimeData = new QMimeData;
@@ -260,6 +304,12 @@ namespace Isis {
   }
 
 
+  /**
+   * Serialize this plot curve into a binary byte array. This is useful for
+   *   storing the curve on the clipboard or in a drag & drop event.
+   *
+   * @return This curve represented as binary data
+   */
   QByteArray CubePlotCurve::toByteArray() const {
     QByteArray classData;
 
@@ -290,8 +340,11 @@ namespace Isis {
 
 
   /**
-   * This will only be called for the legend item's events. So it is the right
-   *   place to start a drag & drop.
+   * Handle various events on the legend item. This will only be called for the
+   *   legend item's events and handles drag & drop, context menus and similar
+   *   actions. Basically all user interaction with legend items happen here.
+   *
+   * @param event The event which happened on the legend item.
    */
   void CubePlotCurve::mousePressEvent(QMouseEvent *event) {
     bool deleteThisCurve = false;
@@ -373,4 +426,3 @@ namespace Isis {
     }
   }
 }
-

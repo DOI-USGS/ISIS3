@@ -16,8 +16,10 @@ class QwtDoubleRange;
 namespace Isis {
   class Cube;
 
-
   /**
+   * This is the QwtRasterData for a scatter plot. This gives Qwt values to
+   *   put in each bin for a spectrogram, effectively making the scatter plot.
+   *
    * @author ????-??-?? Unknown
    *
    * @internal
@@ -62,15 +64,31 @@ namespace Isis {
       QScopedPointer<Stretch> m_xDnToBinStretch; //!< Stretch 1
       QScopedPointer<Stretch> m_yDnToBinStretch; //!< Stretch 2
 
+      /**
+       * The bin counts stored by 2D (x/y) index position. The first dimension
+       *   is the y-index.
+       */
       QScopedPointer< QVector< QVector<int> > > m_counts;
+
+      //! The maximum value in m_counts, stored for efficiency
       int m_maxCount;
 
-      // map from bin index to alarm state (true for alarmed)
+      /**
+       * map from bin index to alarm state (true for alarmed), mutable for
+       *   efficiency (not necessity). This efficiency gain is very significant
+       *   and easy to test - the scatter plot data must be copied every time
+       *   the alarming changes if this isn't mutable. Copy-on-write might be
+       *   able to remove the need for this mutable.
+       */
       mutable QScopedPointer< QMap<int, bool> > m_alarmedBins;
 
+      //! The minimum DN value for the x cube
       double m_xCubeMin;
+      //! The maximum DN value for the x cube
       double m_xCubeMax;
+      //! The minimum DN value for the y cube
       double m_yCubeMin;
+      //! The maximum DN value for the y cube
       double m_yCubeMax;
   };
 };

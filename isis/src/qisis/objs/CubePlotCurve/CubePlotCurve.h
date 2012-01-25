@@ -39,7 +39,14 @@ namespace Isis {
   class CubeViewport;
 
   /**
-   * This was formerly known as PlotToolCurve.
+   * This is a plot curve with information relating it to a particular cube or
+   *   region of a cube. This class was created specifically for use with the
+   *   qview plot tools (AbstractPlotTool). This was formerly known as
+   *   PlotToolCurve. With this class the programmer can set the cube view
+   *   port that the curve is associated with along with the
+   *   vertices on the viewport of which the curve gets it data. With this
+   *   information, the plot curve can rename itself and paint its origin points
+   *   onto cube viewports.
    *
    * @author ????-??-?? Stacy Alley
    *
@@ -48,6 +55,8 @@ namespace Isis {
    *                           class to CubePlotCurve. Changed
    *                           functionality dramatically to support a new
    *                           plotting infrastructure.
+   *   @history 2012-01-20 Steven Lambright and Jai Rideout - Completed
+   *                           documentation.
    */
   class CubePlotCurve : public QObject, public PlotCurve {
       Q_OBJECT
@@ -59,7 +68,6 @@ namespace Isis {
       bool eventFilter(QObject *o, QEvent *e);
       void paint(CubeViewport *vp, QPainter *painter);
       QList <QPointF > sourceVertices() const;
-      virtual QWidget *legendItem() const;
       QString sourceCube() const;
 
       void enableAutoRenaming(bool);
@@ -68,7 +76,15 @@ namespace Isis {
                      int band = -1);
 
     signals:
+      /**
+       * This is emitted when the curve is modified in such a way that it would
+       *   paint a viewport differently.
+       */
       void needsRepaint();
+      /**
+       * This is emitted just before the cube plot curve is deleted. This is
+       *   used to queue the deletes to happen at a safe time.
+       */
       void removing();
 
     private slots:
@@ -80,9 +96,16 @@ namespace Isis {
       void mousePressEvent(QMouseEvent *e);
 
     private:
+      //! This is the widget legend item associated with this curve.
       QPointer<QWidget> m_legendItem;
+
+      //! This is the curve's name before any automatic renaming happened.
       QString m_originalName;
 
+      /**
+       * This indicates if we are allowed to modify the title of this curve when
+       *   the source (origin) data changes.
+       */
       bool m_renameAutomatically;
 
       //! List of vertices in sample,line coordinates from the rubber band
@@ -90,11 +113,10 @@ namespace Isis {
 
       //! The cube that the data is coming from
       QString m_sourceCube;
-
-
   };
 };
 
+//! This allows CubePlotCurves to be stored inside of QVariants.
 Q_DECLARE_METATYPE(Isis::CubePlotCurve *);
 
 #endif

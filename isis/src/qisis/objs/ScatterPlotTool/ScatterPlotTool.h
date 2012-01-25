@@ -19,9 +19,10 @@ namespace Isis {
    * @brief Scatter Plot Tool
    *
    * @author ????-??-?? Stacy Alley
+   *
    * @internal
    *   @history 2010-06-26 Eric Hyer - Now uses MdiCubeViewport instead of
-   *            CubeViewport.  Also fixed some include issues.
+   *                           CubeViewport.  Also fixed some include issues.
    */
   class ScatterPlotTool : public Tool {
       Q_OBJECT
@@ -49,8 +50,11 @@ namespace Isis {
       QAction *toolAction();
 
     private:
+      //! The action which activates this tool.
       QPointer<QAction> m_action;
+      //! This is the configuration dialog for a new scatter plot
       QPointer<ScatterPlotConfigDialog> m_configDialog;
+      //! This is a list of all of the plot windows used for painting/alarming
       QScopedPointer< QList< QPointer<ScatterPlotWindow> > > m_plotWindows;
   };
 };

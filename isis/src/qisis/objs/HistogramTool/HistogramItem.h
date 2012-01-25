@@ -9,10 +9,12 @@
 #include "CubeViewport.h"
 
 class QwtIntervalData;
-class QString;
 
 namespace Isis {
   /**
+   * This is the (qwt) plot item for a histogram. This draws bars for each of
+   *   the histogram bins.
+   *
    * @author ????-??-?? Unknown
    *
    * @internal

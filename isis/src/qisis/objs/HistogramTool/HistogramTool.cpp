@@ -97,6 +97,9 @@ namespace Isis {
   }
 
 
+  /**
+   * Forget the frequency histogram item and the percentage curve.
+   */
   void HistogramTool::detachCurves() {
     m_frequencyItem = NULL;
     m_percentageCurve = NULL;
