@@ -30,9 +30,9 @@ def setisis():
   #If PATH is not set, just set it to a default location. Else append
   #the isis path to the end of the current path
   try:
-    environ['PATH']
+    os.environ['PATH']
   except:
-    os.environ['PATH'] = "%s/bin" % (os.environ['PATH'])
+    os.environ['PATH'] = "%s/bin" % (ISISROOT)
   else:
     os.environ['PATH'] = "%s:%s/bin" % (os.environ['PATH'], ISISROOT)
 
