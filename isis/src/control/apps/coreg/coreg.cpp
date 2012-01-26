@@ -1,22 +1,24 @@
 #define GUIHELPERS
 
 #include "Isis.h"
-#include "PvlGroup.h"
-#include "UserInterface.h"
-#include "Cube.h"
-#include "Chip.h"
-#include "Progress.h"
-#include "iException.h"
+
 #include "AutoReg.h"
 #include "AutoRegFactory.h"
-#include "Statistics.h"
-#include "ControlNet.h"
-#include "SerialNumber.h"
+#include "Chip.h"
 #include "ControlMeasure.h"
-#include "iTime.h"
-#include "iString.h"
+#include "ControlMeasureLogData.h"
+#include "ControlNet.h"
 #include "ControlPoint.h"
+#include "Cube.h"
 #include "ProgramLauncher.h"
+#include "Progress.h"
+#include "PvlGroup.h"
+#include "SerialNumber.h"
+#include "Statistics.h"
+#include "UserInterface.h"
+#include "iException.h"
+#include "iString.h"
+#include "iTime.h"
 
 using namespace std;
 using namespace Isis;
@@ -170,6 +172,9 @@ void IsisMain() {
         cmTrans->SetCoordinate(ar->CubeSample(), ar->CubeLine(),
                               ControlMeasure::RegisteredPixel);
         cmTrans->SetResidual(sDiff, lDiff);
+        cmTrans->SetLogData(ControlMeasureLogData(
+              ControlMeasureLogData::GoodnessOfFit,
+              ar->GoodnessOfFit()));
       }
 
       // Add the measures to a control point
@@ -239,16 +244,20 @@ void IsisMain() {
     ofstream os;
     os.open(fFile.c_str(), ios::out);
     os << "Sample,Line,TranslatedSample,TranslatedLine," <<
-       "SampleDifference,LineDifference" << endl;
+       "SampleDifference,LineDifference,GoodnessOfFit" << endl;
     for(int i = 0; i < cn.GetNumPoints(); i++) {
       const ControlPoint * cp = cn[i];
       if(cp->IsIgnored()) continue;
       const ControlMeasure * cmTrans = cp->GetMeasure(0);
       const ControlMeasure * cmMatch = cp->GetMeasure(1);
+
+      double goodnessOfFit = cmTrans->GetLogData(
+          ControlMeasureLogData::GoodnessOfFit).GetNumericalValue();
+
       os << cmTrans->GetSample() << "," << cmTrans->GetLine() << ","
          << cmMatch->GetSample() << "," << cmMatch->GetLine() << ","
          << cmTrans->GetSampleResidual() << "," << cmTrans->GetLineResidual()
-         << endl;
+         << "," << goodnessOfFit << endl;
     }
   }
 

@@ -146,70 +146,74 @@
   </seeAlso>
 
   <history>
-     <change name="Kris Becker" date="2000-08-07">
-         Original Version
-     </change>
+    <change name="Kris Becker" date="2000-08-07">
+      Original Version.
+    </change>
     <change name="Elizabeth Ribelin" date="2005-08-25">
-      Ported to Isis3.0
+      Ported to Isis3.0.
     </change>
     <change name="Elizabeth Miller" date="2005-10-14">
-        Added warp option and fixed bug in control net creation
+      Added warp option and fixed bug in control net creation.
     </change>
     <change name="Elizabeth Miller" date="2006-03-23">
-      Fixed appTest
+      Fixed appTest.
     </change>
     <change name="Jacob Danton" date="2006-01-06">
-        Fixed appTest to comply with changes made to the ControlMeasure class.
+      Fixed appTest to comply with changes made to the ControlMeasure class.
     </change>
     <change name="Jacob Danton" date="2006-04-05">
-        Added error reporting when the registration was a failure.
+      Added error reporting when the registration was a failure.
     </change>
     <change name="Kris Becker" date="2006-06-15">
-        Set the MATCH file as the reference image so it can be used in 
-        subsequent processing.  Implemented use of unique serial numbers
-        for each image.  Issues still remain with handling band-to-band
-        registrations within files.  One alternative is to extract bands to
-        separate files as a fallback approach is to use filenames as the
-        serial number.  This solution/alterntive is unique to coreg, however.
+      Set the MATCH file as the reference image so it can be used in subsequent
+      processing.  Implemented use of unique serial numbers for each image.
+      Issues still remain with handling band-to-band registrations within files.
+      One alternative is to extract bands to separate files as a fallback
+      approach is to use filenames as the serial number.  This
+      solution/alterntive is unique to coreg, however.
     </change>
     <change name="Brendan George" date="2006-10-02">
-        Modified call for current time to point to Time class, instead of Application class
+      Modified call for current time to point to Time class, instead of
+      Application class.
     </change>
     <change name="Brendan George" date="2006-12-08">
-        Modified to reflect changes to the SerialNumber class
+      Modified to reflect changes to the SerialNumber class.
     </change>
     <change name="Steven Lambright" date="2008-06-23">
-        Updated to properly check AutoReg::Register()'s return status
+      Updated to properly check AutoReg::Register()'s return status.
     </change>
     <change name="Noah Hilt" date="2008-08-13">
-        Added two new optional arguments to AutoReg: WindowSize and 
-        DistanceTolerance. These two arguments affect how AutoReg gathers and 
-        compares data for surface modeling and accuracy. Added more statistics 
-        to the Translation group, including min/max and standard deviation of 
-        line/sample changes. Added the AutoReg statistics to be displayed as 
-        well.
+      Added two new optional arguments to AutoReg: WindowSize and
+      DistanceTolerance. These two arguments affect how AutoReg gathers and
+      compares data for surface modeling and accuracy. Added more statistics to
+      the Translation group, including min/max and standard deviation of
+      line/sample changes. Added the AutoReg statistics to be displayed as well.
     </change>
     <change name="Travis Addair" date="2009-08-10">
-        Auto registration parameters are now placed into the print file.
+      Auto registration parameters are now placed into the print file.
     </change>
     <change name="Eric Hyer" date="2010-02-09">
-        Auto registration parameters now placed into the print file before
-        potential throwing of exceptions.
+      Auto registration parameters now placed into the print file before
+      potential throwing of exceptions.
     </change>
     <change name="Janet Barrett" date="2010-07-30">
-        Changed REGDEF parameter name to DEFFILE. Changed CNETFILE parameter name
-        to ONET.
+      Changed REGDEF parameter name to DEFFILE. Changed CNETFILE parameter name
+      to ONET.
     </change>
     <change name="Debbie A. Cook and Tracie Sucharski" date="2011-06-07">
-        Changed point types "Ground" to "Fixed" and "Tie" to "Free".
+      Changed point types "Ground" to "Fixed" and "Tie" to "Free".
     </change>
     <change name="Kris Becker" date="2011-09-26">
-        Corrected parameter change to warp application (CONTROL is now CNET); 
-        added application test for parameter changes.
+      Corrected parameter change to warp application (CONTROL is now CNET);
+      added application test for parameter changes.
     </change>
     <change name="Kris Becker" date="2011-10-07">
-        The documentation has been updated with review and contributions 
-        from  Ella Lee, Chris Isbell and Moses Millazzo.
+      The documentation has been updated with review and contributions from
+      Ella Lee, Chris Isbell and Moses Millazzo.
+    </change>
+    <change name="Travis Addair" date="2012-01-26">
+      Added back GoodnessOfFit to Control Network and flatfile, mistakenly
+      removed during binary Control Network conversion.
     </change>
   </history>
 
