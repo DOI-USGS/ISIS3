@@ -155,7 +155,7 @@ tabcomplete:
 	elif [ ! -f bin/isiscomplete ]; then                                     \
 	  echo $(CURTIMESTAMP) "Isis application 'isiscomplete' is missing";     \
 	else                                                                     \
-	  echo $(CURTIMESTAMP) "#!/bin/csh" > $$ISISROOT/scripts/tabcomplete.csh;\
+	  echo "#!/bin/csh" > $$ISISROOT/scripts/tabcomplete.csh;                \
 	  isiscomplete `ls $$ISISROOT/bin | grep -v xml` | sed 's/; /;\n/g'      \
 	      >> $$ISISROOT/scripts/tabcomplete.csh;                             \
 	fi;
