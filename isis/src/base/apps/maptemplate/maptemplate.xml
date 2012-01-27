@@ -44,6 +44,10 @@
     <change name="Steven Lambright" date="2009-02-05">
       Fixed a problem that occurred when using "TARGOPT=USER", "RNGOPT=CALC" and not entering "EQRADIUS" or "POLRADIUS"
     </change>
+    <change name="Steven Lambright" date="2011-12-19">
+      Updated documentation as per Ella Lee's recommendations in preparation for
+      the January 2012 release.
+    </change>
   </history>
 
   <seeAlso>
@@ -65,7 +69,7 @@
         <type>filename</type>
         <fileMode>output</fileMode>
         <brief>
-          Output text file containing mapping template
+          Output text file containing mapping keywords and values
         </brief>
         <description>
           This file will contain the mapping group template.  If this file currently exists, the application will write over
@@ -102,8 +106,10 @@
           Input list of images used when calculation option is selected
         </brief>
         <description>
-          A list of file names that will be used by the caluclation option for the ground range and resolution
-          parameters.  It is also used when a user selects the helper button for the two parameters.
+          A list of file names that will be used by the calculation (CALC)
+          option for the ground range (RNGOPT) and resolution (RESOPT) parameters.
+          It is also used when a user selects the helper button for the two
+          parameters.
         </description>
         <filter>
           *.lis
@@ -398,11 +404,13 @@
           Target Selection Options
         </brief>
         <description>
-          This option decides how the target information will be created.  The default is IMAGE.  The
-          other options include SYSTEM and USER.  The IMAGE option will not add any target information
-          to the map file, allowing the target information from the image to be used.  The SYSTEM option
-          will retrieve the target information from the system defaults, and the USER option allows the user
-          to specify their own target information.
+          This option specifies how the target information will be created.  The
+          default is IMAGE.  The other options include SYSTEM and USER.  The
+          IMAGE option will not add any target information to the map file,
+          allowing the target information from the image to be used.  The SYSTEM
+          option will retrieve the target information from the system defaults,
+          and the USER option allows the user to specify their own target
+          information.
         </description>
         <default>
           <item>IMAGE</item>
@@ -413,8 +421,9 @@
               Image Defaults
             </brief>
             <description>
-              No target information will be put into the mapfile.  This information will be retrieved from
-              the image at the time of projection.
+              No target information will be put into the map template file.
+              This information will be retrieved from the image at the time
+              of projection.
             </description>
             <exclusions>
               <item>TARGDEF</item>
@@ -450,8 +459,8 @@
               User Input
             </brief>
             <description>
-              The user may enter the values for the target name, latitude type, and the longitude
-              direction and domain.
+              The information needed is based on the target name, latitude type,
+              and the longitude direction and domain.
             </description>
             <inclusions>
               <item>TARGETNAME</item>
@@ -556,7 +565,7 @@
               PositiveEast Longitude Direction
             </brief>
             <description>
-              Sets the longitude direction in the mapping template to PositiveEast.
+              Longitude values increase to the east.
             </description>
           </option>
           <option value="POSITIVEWEST">
@@ -564,7 +573,7 @@
               PositiveWest Longitude Direction
             </brief>
             <description>
-              Sets the longitude direction in the mapping template to PositiveWest.
+              Longitude values increase to the west.
             </description>
           </option>
         </list>
@@ -642,11 +651,14 @@
           Ground Range Selection Options
         </brief>
         <description>
-          This option decides how the ground range information will be created. IMAGE is the default value.  The
-          other options are USER and CALC.  The IMAGE option does not write any ground range information to the 
-          map file, allowing the range to be calculated from the image at the time of projection.  The USER option allows
-          the user to enter their own values for the ground range, and the CALC option will calculate the ground range
-          using the files listed in the FROMLIST.
+          This option specifies how the ground range information will be
+          created. IMAGE is the default value. The other options are USER
+          and CALC. The IMAGE option does not write any ground range
+          information to the map template file, allowing the range to be
+          calculated from the image at the time of projection. The USER
+          option allows the user to enter their own values for the ground
+          range, and the CALC option will calculate the ground range using
+          the files listed in the FROMLIST parameter.
         </description>
         <default>
           <item>IMAGE</item>
@@ -685,7 +697,7 @@
               User Entered Values
             </brief>
             <description>
-              The user enters the values used for the ground range in the mapfile.
+              The user enters the values to be used for the ground range.
             </description>
           </option>
 
@@ -714,6 +726,9 @@
         <description>
           The mimimum latitude value in the mapping template will be set to this user entered value.
         </description>
+        <lessThan><item>MAXLAT</item></lessThan>
+        <minimum inclusive="yes">-90</minimum>
+        <maximum inclusive="no">90</maximum>
       </parameter>
 
       <parameter name="MAXLAT">
@@ -724,6 +739,9 @@
         <description>
           The maximum latitude value in the mapping template will be set to this user entered value.
         </description>
+        <greaterThan><item>MINLAT</item></greaterThan>
+        <minimum inclusive="no">-90</minimum>
+        <maximum inclusive="yes">90</maximum>
       </parameter>
 
       <parameter name="MINLON">
@@ -734,6 +752,7 @@
         <description>
           The minimum longitude value in the mapping template will be set to this user entered value.
         </description>
+        <lessThan><item>MAXLON</item></lessThan>
       </parameter>
 
       <parameter name="MAXLON">
@@ -744,6 +763,7 @@
         <description>
           The maximum longitude value in the mapping template will be set to this user entered value.
         </description>
+        <greaterThan><item>MINLON</item></greaterThan>
       </parameter> 
     </group>
 
@@ -754,11 +774,14 @@
           Resolution Selection Options
         </brief>
         <description>
-          This option decides how the resolution information will be created.  The default is IMAGE.  The other 
-          options are MPP, PPD and CALC.  The IMAGE option does not write any ground range information to the 
-          map file, allowing the range to be calculated from the image at the time of projection.  The MPP and PPD option allow
-          the user to enter their own values for the ground range and select the appropriate units. The CALC option will 
-          calculate the ground range using the files listed in the FROMLIST.
+          This option decides how the resolution information will be created.
+          The default is IMAGE. The other options are MPP, PPD and CALC. The
+          IMAGE option does not write any resolution information to the map
+          file, allowing the resolution to be calculated from the image at the
+          time of projection. The MPP and PPD option allow the user to enter
+          their own values for the resolution and select the appropriate units.
+          The CALC option will calculate the resolution using the files listed
+          in the FROMLIST parameter. 
         </description>
         <default>
           <item>IMAGE</item>
@@ -793,8 +816,9 @@
               User entered Pixel Resolution (MPP)
             </brief>
             <description>
-              The values used for resolution are user entered in meters per pixel.  This value is the keyword
-              PixelResoution in the map file and mapping group.
+              The values used for resolution are user entered in meters per
+              pixel. This value is the keyword PixelResoution in the map
+              template file.
             </description>
             <exclusions>
               <item>RESCALCOPT</item>
@@ -805,8 +829,8 @@
              User entered Scale (PPD)
             </brief>
             <description>
-              The values used for resolution are user entered in pixels per degree.  This value is the keyword
-              Scale in the map file and mapping group.
+              The values used for resolution are user entered in pixels per
+              degree. This value is the keyword Scale in the map template file.
             </description>
             <exclusions>
               <item>RESCALCOPT</item>
@@ -844,11 +868,13 @@
           Select highest value, lowest value, or average value
         </brief>
         <description>
-          This option decides how resolution information will be calculated. The defualt is HIGH.  
-          The other options are LOW and AVERAGE.  The HIGH option gets the highest 
-          resolution from the list of images, the LOW option gets the lowest resolution, and the
-          AVERAGE option calculates the average resolution from all of the files in the FROMLIST.
-          All options output the resolution in meters per pixel.
+          This option specifies how the resolution information will be
+          calculated. The default is HIGH. The other options are LOW and
+          AVERAGE. The HIGH option gets the highest resolution from the list
+          of images, the LOW option gets the lowest resolution, and the AVERAGE
+          option calculates the average resolution from all of the files in the
+          FROMLIST parameter. All options output the resolution in meters per
+          pixel.
         </description>
         <default>
           <item>HIGH</item>
@@ -887,8 +913,10 @@
     <example>
       <brief> Sinusoidal Map Template</brief>
       <description>
-        This example shows how the maptemplate application works.  The settings are all default for
-        this example, other than the output filename and center longitude which are entered in.
+        This example shows the contents of a PVL text file generated by the
+        maptemplate application.  The settings are all default for this example,
+        other than the output filename and center longitude which are entered
+        by the user.
         <pre>
 Group = Mapping
   ProjectionName     = Sinusoidal
@@ -909,8 +937,10 @@ End
     <example>
       <brief> Lambert Conformal Map Template</brief>
       <description>
-        This example shows how the maptemplate application works.  For this example, the output file, projection type, 
-        center latitude, center longitude, first and second standard parallel, target option, and target name are entered.
+        This example shows the contents of a PVL text file for a lambert
+        conformal map projection based on user selected options.  The output
+        file, projection type, center latitude, center longitude, first and
+        second standard parallel, target option, and target name are entered.
         The rest of the settings are left in their default state.
         <pre>
 Group = Mapping
