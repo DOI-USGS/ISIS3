@@ -192,6 +192,17 @@ namespace Isis {
 
 
   /**
+   * This method is necessary for getting the correct (event filter altered)
+   *   legend item. Without this, drag & drop and context menus do not work.
+   *
+   * @return The legend item widget associated with this curve
+   */
+  QWidget *CubePlotCurve::legendItem() const {
+    return m_legendItem;
+  }
+
+
+  /**
    * This method returns the cube view port associated with the
    * curve.
    *

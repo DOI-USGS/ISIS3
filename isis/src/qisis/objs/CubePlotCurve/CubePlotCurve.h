@@ -57,6 +57,9 @@ namespace Isis {
    *                           plotting infrastructure.
    *   @history 2012-01-20 Steven Lambright and Jai Rideout - Completed
    *                           documentation.
+   *   @history 2012-01-30 Steven Lambright - Fixed a bug added when the
+   *                           legendItem() method was removed. This method is
+   *                           necessary. Fixes #688.
    */
   class CubePlotCurve : public QObject, public PlotCurve {
       Q_OBJECT
@@ -68,6 +71,7 @@ namespace Isis {
       bool eventFilter(QObject *o, QEvent *e);
       void paint(CubeViewport *vp, QPainter *painter);
       QList <QPointF > sourceVertices() const;
+      virtual QWidget *legendItem() const;
       QString sourceCube() const;
 
       void enableAutoRenaming(bool);
