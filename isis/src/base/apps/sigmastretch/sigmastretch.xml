@@ -2,20 +2,21 @@
 <application name="sigmastretch" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>
-    Apply a Davinci "Sigma Stretch" (sstretch) to a cube.
+    Apply a Sigma Stretch to a cube.
   </brief>
 
   <description>
-    Stretch a cube according to the following formula for each pixel in the
-    image:
+    This application is a translation of the Davinci script "sstretch" (Arizona
+    State University, http://davinci.asu.edu).  This program will stretch a cube
+    according to the following formula for each pixel in the image:
     <pre>
       new_dn = (old_dn - avg) * (variance / stddev)
     </pre>
-    Here, <i>avg</i> and <i>stddev</i> stand for the statistical average and
-    standard deviation of all valid pixels in the current pixel's band,
-    respectively.  The <i>variance</i> mentioned is not actually the statistical
-    variance of the band, but a user-specified parameter, VARIANCE, that affects
-    how much the histogram of the image is widened.
+    where <i>avg</i> and <i>stddev</i> are the statistical average and standard
+    deviation of all valid pixels in the current band.  The <i>variance</i> is a
+    user-specified parameter, VARIANCE, that affects how much the histogram of
+    the image is widened, and does not represent the statistical variance of the
+    image.
   </description>
 
   <category>
@@ -42,10 +43,10 @@
         <type>cube</type>
         <fileMode>input</fileMode>
         <brief>
-          Input file to stretch
+          Input cube to stretch
         </brief>
         <description>
-          The input cube which will have the sigma stretch applied.
+          The input cube to which the sigma stretch will be applied.
         </description>
         <filter>
           *.cub

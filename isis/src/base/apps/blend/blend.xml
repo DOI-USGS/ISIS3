@@ -3,35 +3,37 @@
 <application name="blend" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>
-    Blends a list of images together along the overlapping areas.
+    Blends a list of Level2 cubes together along the overlapping areas.
   </brief>
 
   <description>
     <p>
-      This application is a translation of the Davinci script "blend" into Isis
-      3.  The blending process itself takes a list of <def>Level2</def>
+      This application is a translation of the Davinci script "blend" (Arizona
+      State University, http://davinci.asu.edu) into Isis 3.  The blending
+      process itself takes a list of <def>Level2</def>
       <def link="Cube">cubes</def> and blends them together along their
       overlapping areas by creating a "ramp" from one image to the other.
     </p>
     <p>
       The ramp-creation process creates a smooth, qualitative transition from
-      one image to the other, but sacrifices the scientific value of the pixel
-      values in the process.  Only the pixel values of the overlapping area will
-      be changed, however.  Consequently, this application is best suited to
-      blend images that have relatively low contrast between them.  As part of
-      the THEMIS mosaicking pipeline, it is customary to use the Isis 3
-      application "sigmastretch" (itself a translation of another Davinci
-      script, "sstretch") to reduce contrast.
+      one image to the other, and thus modifies pixel values in a manner that
+      does not preserve the scientific integrity of the data.  Only the pixel
+      values of the overlapping area are changed, however.  Consequently, this
+      application is best suited to blend images that are similar in contrast
+      and/or brightness.  As part of the THEMIS mosaicking pipeline, it is
+      customary to use the Isis 3 application "sigmastretch" (itself a
+      translation of another Davinci script, "sstretch") to reduce and contrast
+      differences between images.
     </p>
     <p>
-      Each output pixel value is simply a weighted average of the pixel values
-      taken from the two input images being examined at a time.  The closer a
-      pixel is to one image over the other, the more heavily its value will be
-      weighted in favor of that image.
+      In the "blend" script, each output pixel value is a weighted average of
+      the pixel values taken from the two input images being examined at a time.
+      The closer a pixel is to one image border over the other, the more heavily
+      its value will be weighted in favor of that image.
     </p>
     <p>
-      The "closeness" of a pixel from one image versus another is determined by
-      the aforementioned ramp.  The ramp is map of the overlapping area between
+      The "closeness" of a pixel to one image versus another is determined by
+      the aforementioned ramp.  The ramp is a map of the overlapping area between
       two images, where every pixel position in the overlap maps to a value from
       0.0 to 1.0.  Here, a value of 1.0 means the pixel falls entirely within
       the first image, and a value of 0.0 means it falls entirely within the
@@ -44,21 +46,21 @@
       <pre>
         overlap[i] = ramp[i] * image_1[i] + (1.0 - ramp[i]) * image_2[i]
       </pre>
-      Here, "overlap" could refer to the overlapping area in either image, as
-      both will be adjusted by the same calculation.  The "ramp" is the 0.0 to
-      1.0 map, "image_1" is the first image, "image_2" is the second image, and
-      "i" is the unique index of the current pixel being adjusted.
+      where <i>overlap</i> refers to the overlapping area in both images, as
+      both will be adjusted by the same calculation; <i>ramp</i> is the 0.0 to
+      1.0 map; <i>image_1</i> is the first image; <i>image_2</i> is the second
+      image; <i>i</i> is the unique index of the current pixel being adjusted.
     </p>
     <p>
-      The output of this application is a list of images, setup nicely to move
-      on to mosaicking (see "automos" and "mapmos") as a logical next step.  All
-      the overlaps between these images will share the same pixel values.
+      The output of this application is a list of images, formatted for easy
+      ingestion into additional Isis tools mosaicking (see "automos" and
+      "mapmos") overlaps between images will share the same pixel values.
     </p>
     <p>
-      This program is conceptually very similar to "noseam", in that it takes a
-      list of images and attempts to smooth out the boundaries between them.
-      Unlike that program, however, "blend" does not perform the mosaicking as
-      part of the blending routine.
+      This program is conceptually similar to the Isis program "noseam", in that
+      it takes a list of images and attempts to smooth out the boundaries
+      between them.  Unlike "noseam", however, "blend" does not perform the
+      mosaicking as part of the blending routine.
     </p>
   </description>
 
@@ -94,8 +96,8 @@
           List of cubes to blend
         </brief>
         <description>
-          A list of map projected cubes to blend.  The Mapping groups must match
-          in order to do the blending.
+          A list of map projected Level2 cubes to blend.  The Mapping groups
+          must match in order to sucessfully run this program.
           <p>
             Note that the order of the images in this list can have a
             significant impact on the output results.  The order of blending
@@ -104,11 +106,11 @@
           </p>
           <p>
             Each time an image is processed (from the top of the list to the
-            bottom), it is blended with every image that cam prior in the list,
+            bottom), it is blended with every image that came prior in the list,
             ensuring that every image gets blended once and only once with every
             other image.  Since every blend of one image to another is a
             separate operation, pixels that overlap with more than two images
-            can change depending on the order of the individual image blends.
+            can change depending on the order of the blend operations.
           </p>
         </description>
       </parameter>
@@ -127,12 +129,13 @@
           file in the TOLIST, and so on.  Each output file will be written to
           the exact location with the exact name specified, unless the location
           and name happen to be identical to those of its corresponding input
-          file, in which case an error will be thrown.
+          file, in which case the program will terminate and generate an error
+          message.
           <p>
             If this list is not specified, the output files will be placed in
-            the directories of their input files, and named the same with the
-            exception of an added ".blend" extension (e.g. "foobar.cub" becomes
-            "foobar.blend.cub").
+            the directories of their input files, and the output filename will
+            be a modification of the input filename with an added ".blend"
+            extension (e.g. "foobar.cub" becomes "foobar.blend.cub").
           </p>
         </description>
         <internalDefault>Automatic</internalDefault>
@@ -153,12 +156,12 @@
           will work much faster, but the ramp will also be much sharper and
           shorter.
           <p>
-            The default value is an excessively large number to indicate that
-            the ramp-creation process should calculate distance values for the
-            entire overlapping area.  A typical value for this parameter would
-            be 100 for most THEMIS images.  This will typically result in a
-            smooth ramp indistinguishable from letting the distance calculation
-            run to completion.
+            The default value is a sufficiently large number so that the
+            ramp-creation process will calculate distance values for the entire
+            overlapping area for most images.  A typical value for this
+            parameter would be 100 for most THEMIS images, generally resulting
+            in a smooth ramp indistinguishable from letting the distance
+            calculation run to completion.
           </p>
         </description>
         <default><item>100000</item></default>
@@ -186,8 +189,8 @@
       <description>
         This example shows the most typical use of the blend application.  The
         input is simply two images laid side by side in map-projected space.
-        The stop value is set to a typical value, 200, so that the ramp will
-        only be calculated out to 200 pixels from the image boundary.
+        The stop value is set to 200 so that the ramp will only be calculated
+        out to 200 pixels from the image boundary.
       </description>
       <terminalInterface>
         <commandLine>
