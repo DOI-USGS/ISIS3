@@ -156,8 +156,8 @@ tabcomplete:
 	  echo $(CURTIMESTAMP) "Isis application 'isiscomplete' is missing";     \
 	else                                                                     \
 	  echo "#!/bin/csh" > $$ISISROOT/scripts/tabcomplete.csh;                \
-	  isiscomplete `ls $$ISISROOT/bin | grep -v xml` | sed 's/; /;\n/g'      \
-	      >> $$ISISROOT/scripts/tabcomplete.csh;                             \
+	  isiscomplete `ls $$ISISROOT/bin | grep -v xml` | sed 's/; /;~/g' |     \
+	               tr '~' '\n' > $$ISISROOT/scripts/tabcomplete.csh;         \
 	fi;
 
 #----------------------------------------------------------------------------
