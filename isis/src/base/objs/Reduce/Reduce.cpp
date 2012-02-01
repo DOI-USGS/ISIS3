@@ -16,11 +16,9 @@ namespace Isis {
    * @param sampleScale - Sample scale
    * @param lineScale   - Line scale
    */
-  Reduce::Reduce(Isis::Cube *pInCube, vector<string>psBands, 
-                 const double sampleScale, const double lineScale)
+  Reduce::Reduce(Isis::Cube *pInCube, const double sampleScale, const double lineScale)
   {
     // Input Cube
-    msBands = psBands;
     mInCube = pInCube;
     
     mdLine      = 1;

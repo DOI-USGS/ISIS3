@@ -32,12 +32,13 @@ namespace Isis {
    *                           reduce subarea of an image
    *   @history 2011-08-19 Jeannie Backer - Modified unitTest to use
    *                           $temporary variable instead of /tmp directory.
+   *   @history 2012-02-01 Sharmila Prasad - Remove unused band data member
+   *                           Fixes #00681
    */
   class Reduce {
   public:
     //! Constructor
-    Reduce(Isis::Cube *pInCube, vector<string>psBands, const double sampleScale,
-           const double lineScale);
+    Reduce(Isis::Cube *pInCube,const double sampleScale, const double lineScale);
     
     //! Destructor
     ~Reduce();
@@ -64,7 +65,6 @@ namespace Isis {
       int miInputLines;           //!< Input Lines
       int miInputBands;           //!< Input Bands
       int miBandIndex;            //!< Band Index
-      vector<string>msBands;      //!< Bands list
       Isis::Portal *m_iPortal;    //!< Input portal
   };
 
@@ -72,16 +72,15 @@ namespace Isis {
   /**
    * Functor for reduce using near functionality
    *
-   * @author ????-??-?? Unknown
+   * @author 2011-04-15 Sharmila Prasad
    *
    * @internal
    */
   class Nearest : public Isis::Reduce {
     public:
       //! Constructor
-      Nearest(Isis::Cube *pInCube, vector<string> psBands, 
-              double pdSampleScale, double pdLineScale) 
-      :Reduce(pInCube, psBands, pdSampleScale, pdLineScale){
+      Nearest(Isis::Cube *pInCube, double pdSampleScale, double pdLineScale) 
+      :Reduce(pInCube, pdSampleScale, pdLineScale){
       }
 
       //! Operator () overload 
@@ -92,16 +91,16 @@ namespace Isis {
   /**
    * Functor for reduce using average functionality
    *
-   * @author ????-??-?? Unknown
+   * @author 2011-04-15 Sharmila Prasad
    *
    * @internal
    */
   class Average : public Isis::Reduce {
     public:
       //! Constructor
-      Average(Isis::Cube *pInCube, vector<string> psBands, double pdSampleScale,
-              double pdLineScale, double pdValidPer, string psReplaceMode) 
-      : Reduce(pInCube, psBands, pdSampleScale, pdLineScale){
+      Average(Isis::Cube *pInCube, double pdSampleScale, double pdLineScale, 
+              double pdValidPer, string psReplaceMode) 
+      : Reduce(pInCube, pdSampleScale, pdLineScale){
         mdValidPer    = pdValidPer;
         msReplaceMode = psReplaceMode;
       }

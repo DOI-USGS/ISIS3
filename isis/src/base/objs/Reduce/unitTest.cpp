@@ -2,6 +2,7 @@
 #include "iString.h"
 #include "ProcessByLine.h"
 #include "Cube.h"
+#include "CubeAttribute.h"
 #include "PvlGroup.h"
 #include "Reduce.h"
 #include "UserInterface.h"
@@ -13,26 +14,26 @@ using namespace std;
 void IsisMain() {
   Isis::Preference::Preferences(true);
   Isis::ProcessByLine p;
-  vector<string> bands;
   Isis::UserInterface &ui = Isis::Application::GetUserInterface();
+  vector<string> bands;
   
   p.SetInputCube("FROM");
-  Isis::Cube *icube=new Isis::Cube;
+  Isis::Cube icube;
 
-  icube->open(ui.GetFilename("FROM"));
-  // Get input bands
-  int inb = icube->getBandCount();
-  for(int i = 1; i <= inb; i++) {
-    bands.push_back((Isis::iString)i);
-  }
+  Isis::CubeAttributeInput cai(ui.GetAsString("FROM"));
+  bands = cai.Bands();
+
+  icube.setVirtualBands(bands);
+  icube.open(ui.GetFilename("FROM"));
+  
   double sscale = 3;
   double lscale = 4;
-  int ons = (int)ceil((double)icube->getSampleCount() / sscale);
-  int onl = (int)ceil((double)icube->getLineCount() / lscale);
+  int ons = (int)ceil((double)icube.getSampleCount() / sscale);
+  int onl = (int)ceil((double)icube.getLineCount() / lscale);
     
   // Reduce by "Near"
-  Isis::Cube *ocube = p.SetOutputCube("TO", ons, onl, icube->getBandCount());
-  Isis::Nearest near(icube, bands, sscale, lscale);
+  Isis::Cube *ocube = p.SetOutputCube("TO", ons, onl, icube.getBandCount());
+  Isis::Nearest near(&icube, sscale, lscale);
   p.ClearInputCubes();
   cout << "Reduce by Near\n";
   p.StartProcessInPlace(near);
@@ -42,16 +43,16 @@ void IsisMain() {
   
   // Reduce by "Average"
   p.SetInputCube("FROM");
-  ocube=p.SetOutputCube("TO2", ons, onl, icube->getBandCount());
+  ocube=p.SetOutputCube("TO2", ons, onl, icube.getBandCount());
   p.ClearInputCubes();
-  Isis::Average avg(icube, bands, sscale, lscale, 0.5, "scale");
+  Isis::Average avg(&icube, sscale, lscale, 0.5, "scale");
   cout << "\nReduce by Average\n";
   p.StartProcessInPlace(avg);
   results = avg.UpdateOutputLabel(ocube);
   cout << results << endl;
 
   p.EndProcess();
-  icube->close();
+  icube.close();
   remove(ui.GetAsString("TO").c_str());
   remove(ui.GetAsString("TO2").c_str());
 }
