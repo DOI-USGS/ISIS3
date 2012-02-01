@@ -86,6 +86,9 @@
     <change name="Sharmila Prasad" date="2011-10-07">
       Fixed bug #0000463 regarding memory leak
     </change>
+    <change name="Sharmila Prasad" date="2012-02-01">
+      Fixed bug #0000681 - reduce in ISIS 3.3.0 is ignoring the +N band identifier 
+    </change>
     </history> 
 
   <category>

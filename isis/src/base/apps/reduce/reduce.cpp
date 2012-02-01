@@ -13,12 +13,12 @@ void IsisMain() {
   try {
     // We will be processing by line
     ProcessByLine p;
-    Cube *cube = new Cube;
     double sscale, lscale;
     int ins, inl, inb;
     int ons, onl;
     vector<string> bands;
-  
+    Cube inCube;
+
     // To propogate labels, set input cube,
     // this cube will be cleared after output cube is set.
     p.SetInputCube("FROM");
@@ -29,19 +29,14 @@ void IsisMain() {
     CubeAttributeInput cai(ui.GetAsString("FROM"));
     bands = cai.Bands();
 
+    inCube.setVirtualBands(bands);
+    
     string from = ui.GetFilename("FROM");
-    cube->open(from);
-
-    ins = cube->getSampleCount();
-    inl = cube->getLineCount();
-    inb = bands.size();
-
-    if(inb == 0) {
-      inb = cube->getBandCount();
-      for(int i = 1; i <= inb; i++) {
-        bands.push_back((iString)i);
-      }
-    }
+    inCube.open(from);
+    
+    ins = inCube.getSampleCount();
+    inl = inCube.getLineCount();
+    inb = inCube.getBandCount();
 
     string alg  = ui.GetString("ALGORITHM");
     double vper = ui.GetDouble("VALIDPER") / 100.;
@@ -74,19 +69,18 @@ void IsisMain() {
     // Start the processing
     PvlGroup results;
     if(alg == "AVERAGE"){
-      Average average(cube, bands, sscale, lscale, vper, replaceMode);
+      Average average(&inCube, sscale, lscale, vper, replaceMode);
       p.StartProcessInPlace(average);
       results = average.UpdateOutputLabel(ocube);
     }
     else if(alg == "NEAREST") {
-      Nearest near(cube, bands, sscale, lscale);
+      Nearest near(&inCube, sscale, lscale);
       p.StartProcessInPlace(near);
       results = near.UpdateOutputLabel(ocube);
     }
-  
+        
     // Cleanup
-    cube->close();
-    delete (cube);
+    inCube.close();
     p.EndProcess();
   
     // Write the results to the log
