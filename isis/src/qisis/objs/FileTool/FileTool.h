@@ -29,6 +29,9 @@ namespace Isis {
    *              the current cubeviewport's whatsthis info
    *   @history 2011-05-11 Sharmila Prasad - Added SaveAsDialog to select the output 
    *                   cube and options to save FullImage, ExportAsIs, ExportFullRes
+   *   @history  2012-02-01 Sharmila Prasad - Fixed bug #0000681 - reduce in ISIS 3.3.0
+   *                   is ignoring the +N band identifier 
+    </change>
    */
   class FileTool : public Tool {
       Q_OBJECT

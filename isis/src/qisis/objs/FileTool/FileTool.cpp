@@ -461,7 +461,7 @@ namespace Isis {
     CubeAttributeInput cai(icube->getFilename());
     vector<string> bands = cai.Bands();
     int inb = bands.size();
-
+    
     if(inb == 0) {
       inb = cubeViewport()->cube()->getBandCount();
       for(int i = 1; i <= inb; i++) {
@@ -486,7 +486,7 @@ namespace Isis {
 
     Cube *tempcube=new Cube;
     tempcube->open(cubeViewport()->cube()->getFilename(), "r");
-    Nearest *near = new Nearest(tempcube, bands, ins/ons, inl/onl);
+    Nearest *near = new Nearest(tempcube, ins/ons, inl/onl);
     near->setInputBoundary((int)dStartSample, (int)dEndSample, (int)dStartLine, (int)dEndLine);
     
     p.StartProcessInPlace(*near);
