@@ -142,6 +142,7 @@ test: FORCE clean
 	  TRUTHDIR=`$(LS) $(TRUTH)`;                                          \
 	  if [ "$$TRUTHDIR" == "" ]; then                                     \
 	    MSG='$(NOTRUTHFILE)';                                             \
+	    echo -n $(CURTIMESTAMP) >> errors.txt;                            \
 	    $(PRINTF) "$(BLANKS)  " >> errors.txt;                            \
 	    $$MSG >> errors.txt;                                              \
 	  else                                                                \
@@ -150,6 +151,7 @@ test: FORCE clean
 	    OUTPUTFILECOUNT=`$(LS) -p $(OUTPUT) | $(GREP) -v "/" | wc -l`;    \
 	    if [ $$TRUTHFILECOUNT -ne $$OUTPUTFILECOUNT ]; then               \
 	      MSG='$(FILECOUNTMISMATCH)';                                     \
+	      echo -n $(CURTIMESTAMP) >> errors.txt;                          \
 	      $(PRINTF) "$(BLANKS)  " >> errors.txt;                          \
 	      $$MSG >> errors.txt;                                            \
 	    else                                                              \
@@ -158,6 +160,7 @@ test: FORCE clean
 	  fi;                                                                 \
 	else                                                                  \
 	  MSG='$(NOTRUTH)';                                                   \
+	  echo -n $(CURTIMESTAMP) >> errors.txt;                              \
 	  $(PRINTF) "$(BLANKS)  " >> errors.txt;                              \
 	  $$MSG >> errors.txt;                                                \
 	fi;                                                                   \
@@ -177,7 +180,6 @@ test: FORCE clean
 	else                                                                  \
 	  eval $(TESTFAILED);                                                 \
 	  $(PRINTF) "Duration [%.2i:%.2i:%.2i]\n" $$HOUR60 $$MIN60 $$SEC60;   \
-	  echo -n $(CURTIMESTAMP);                                            \
 	  $(CAT) errors.txt;                                                  \
 	  $(RM) errors.txt;                                                   \
 	fi;                                                                   \
@@ -203,6 +205,7 @@ compare: FORCE
 	    TRUTHDIR=`$(LS) $(TRUTH)`;                                        \
 	    if [ "$$TRUTHDIR" == "" ]; then                                   \
 	      MSG='$(NOTRUTHFILE)';                                           \
+	      echo -n $(CURTIMESTAMP) >> errors.txt;                          \
 	      $(PRINTF) "$(BLANKS)  " >> errors.txt;                          \
 	      $$MSG >> errors.txt;                                            \
 	    else                                                              \
@@ -210,6 +213,7 @@ compare: FORCE
 	      OUTPUTFILECOUNT=`$(LS) -p $(OUTPUT) | $(GREP) -v "/" | wc -l`;  \
 	      if [ $$TRUTHFILECOUNT -ne $$OUTPUTFILECOUNT ]; then             \
 	        MSG='$(FILECOUNTMISMATCH)';                                   \
+	        echo -n $(CURTIMESTAMP) >> errors.txt;                        \
 	        $(PRINTF) "$(BLANKS)  " >> errors.txt;                        \
 	        $$MSG >> errors.txt;                                          \
 	      else                                                            \
@@ -218,6 +222,7 @@ compare: FORCE
 	    fi;                                                               \
 	  else                                                                \
 	    MSG='$(NOTRUTH)';                                                 \
+	    echo -n $(CURTIMESTAMP) >> errors.txt;                            \
 	    $(PRINTF) "$(BLANKS)  " >> errors.txt;                            \
 	    $$MSG >> errors.txt;                                              \
 	  fi;                                                                 \
@@ -294,7 +299,8 @@ comparefiles: FORCE
 	for FILE in $$FILES; do                                               \
 	  if [ ! -f $(OUTPUT)/$$FILE ]; then                                  \
 	    MSG="$(FILENOTFOUND) [$$FILE]";                                   \
-	    $(PRINTF) "$(BLANKS)  " >> errors.txt;                            \
+	    echo -n $(CURTIMESTAMP) >> errors.txt;                            \
+	    $(PRINTF) "$(BLANKS)   " >> errors.txt;                           \
 	    $$MSG >> errors.txt;                                              \
 	  else                                                                \
 	    FILETYPE=$${FILE##*.};                                            \
@@ -344,7 +350,8 @@ comparefiles: FORCE
 	      COMMAND="";                                                     \
 	      if [ "$$COMPRESULT" != "Identical" ]; then                      \
 	        MSG="$(TESTFILEFAILED) [$$FILE]";                             \
-	        $(PRINTF) "$(BLANKS)  " >> errors.txt;                        \
+	        echo -n $(CURTIMESTAMP) >> errors.txt;                        \
+	        $(PRINTF) "$(BLANKS)   " >> errors.txt;                       \
 	        $$MSG >> errors.txt;                                          \
 	        if [ "$$COMPRESULT" == "ERROR" ]; then                        \
 	          cat cubediffError.txt >> errors.txt;                        \
@@ -361,7 +368,8 @@ comparefiles: FORCE
 	      $(DIFF) $(TRUTH)/$$FILE $(OUTPUT)/$$FILE > /dev/null;           \
 	      if [ $$? -ne 0 ]; then                                          \
 	        MSG="$(TESTFILEFAILED) [$$FILE]";                             \
-	        $(PRINTF) "$(BLANKS)  " >> errors.txt;                        \
+	        echo -n $(CURTIMESTAMP) >> errors.txt;                        \
+	        $(PRINTF) "$(BLANKS)   " >> errors.txt;                       \
 	        $$MSG >> errors.txt;                                          \
 	      else                                                            \
 	        let SUCCESSFULCOMPARISONS++;                                  \
@@ -378,7 +386,8 @@ comparefiles: FORCE
 	      RETVAL=$$?;                                                     \
 	      if [ $$RETVAL != 0 ]; then                                      \
 	        MSG="$(TESTFILEFAILED) [$$FILE]";                             \
-	        $(PRINTF) "$(BLANKS)  " >> errors.txt;                        \
+	        echo -n $(CURTIMESTAMP) >> errors.txt;                        \
+	        $(PRINTF) "$(BLANKS)   " >> errors.txt;                       \
 	        $$MSG >> errors.txt;                                          \
 	      else                                                            \
 	        let SUCCESSFULCOMPARISONS++;                                  \
@@ -398,7 +407,8 @@ comparefiles: FORCE
 	                                                                      \
 	      if [ "$$COMPRESULT" == "different" ]; then                      \
 	        MSG="$(TESTFILEFAILED) [$$FILE]";                             \
-	        $(PRINTF) "$(BLANKS)  " >> errors.txt;                        \
+	        echo -n $(CURTIMESTAMP) >> errors.txt;                        \
+	        $(PRINTF) "$(BLANKS)   " >> errors.txt;                       \
 	        $$MSG >> errors.txt;                                          \
 	      else                                                            \
 	        let SUCCESSFULCOMPARISONS++;                                  \
@@ -419,7 +429,8 @@ comparefiles: FORCE
 	                                                                      \
 	      if [ "$$COMPRESULT" == "different" ]; then                      \
 	        MSG="$(TESTFILEFAILED) [$$FILE]";                             \
-	        $(PRINTF) "$(BLANKS)  " >> errors.txt;                        \
+	        echo -n $(CURTIMESTAMP) >> errors.txt;                        \
+	        $(PRINTF) "$(BLANKS)   " >> errors.txt;                       \
 	        $$MSG >> errors.txt;                                          \
 	      else                                                            \
 	        let SUCCESSFULCOMPARISONS++;                                  \
@@ -430,14 +441,16 @@ comparefiles: FORCE
 	      $(DIFF) $(TRUTH)/$$FILE $(OUTPUT)/$$FILE > /dev/null;           \
 	      if [ $$? -ne 0 ]; then                                          \
 	        MSG="$(TESTFILEFAILED) [$$FILE]";                             \
-	        $(PRINTF) "$(BLANKS)  " >> errors.txt;                        \
+	        echo -n $(CURTIMESTAMP) >> errors.txt;                        \
+	        $(PRINTF) "$(BLANKS)   " >> errors.txt;                       \
 	        $$MSG >> errors.txt;                                          \
 	      else                                                            \
 	        let SUCCESSFULCOMPARISONS++;                                  \
 	      fi;                                                             \
 	    else                                                              \
 	      MSG="$(UNKNOWNFILE) [$$FILE]";                                  \
-	      $(PRINTF) "$(BLANKS)  " >> errors.txt;                          \
+	      echo -n $(CURTIMESTAMP) >> errors.txt;                          \
+	      $(PRINTF) "$(BLANKS)   " >> errors.txt;                         \
 	      $$MSG >> errors.txt;                                            \
 	    fi;                                                               \
 	  fi;                                                                 \
@@ -447,7 +460,7 @@ comparefiles: FORCE
 	  touch casesucceeded.txt;                                            \
 	elif [ ! -s errors.txt ]; then                                        \
 	  MSG='$(NOTALLMATCH)';                                               \
-	  $(PRINTF) "$(BLANKS)  " >> errors.txt;                              \
+	  $(PRINTF) "$(BLANKS)   " >> errors.txt;                             \
 	  $$MSG >> errors.txt;                                                \
 	fi;
 
