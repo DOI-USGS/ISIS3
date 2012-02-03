@@ -186,7 +186,7 @@
     If the Control Measure does not pass the validity test, then it will be 
     be Ignored. If the number of Valid Control Measures in a Control Point is 
     less than 2, then the Control Point is Ignored.<br/> <br/> 
-    If the "Required" parameters are not entered or misspelt, then the 
+    If the "Required" parameters are not entered or misspelled, then the 
     application will throw an error. If "Optional" parameters are not entered 
     then the Control Measure will not be validated against that option.
     <br/> 
