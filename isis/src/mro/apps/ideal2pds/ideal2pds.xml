@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<application name="hijitter" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+<application name="ideal2pds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
       Export PDS product containing ideal camera and related spice data from an 
       isis3 image. 
@@ -16,21 +16,18 @@
         pixel accurately.
 
         PDS Metadata will contain the following isis information:
-      <ol>
-        <li>Core</li>
-        <li>Original HiRise Label(PDS)</li>
-        <li>Instrument Group</li>
-        <li>Kernels Group</li>
-        <li>Original Instrument Group</li>
-        <li>Tables</li>
-      </ol>
 
-      In addition the the CK and SPK Spice Kernel file will be a separate file 
-      we make available for nonIsis users. 
+          1. Core   
+          2. Original HiRise Label(PDS) 
+          3. Instrument Group Kernels Group 
+          4. Original Instrument Group Tables 
 
-      The ISIS3 cube will be in Band Sequential Foramt(BSQ) to be compatible 
-      with PDS format. The Core Object in PDS Metadata indicates the StartByte 
-      of the image in isis3 cube.
+        In addition the the CK and SPK Spice Kernel file will be a separate file 
+        we make available for nonIsis users. 
+
+        The ISIS3 cube will be in Band Sequential Foramt(BSQ) to be compatible 
+        with PDS format. The Core Object in PDS Metadata indicates the StartByte 
+        of the image in isis3 cube.
     </pre>
   </description>
 
