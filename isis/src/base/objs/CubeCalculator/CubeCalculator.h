@@ -31,6 +31,7 @@ template<class T> class QVector;
 
 namespace Isis {
   class DataValue;
+  class CameraBuffers;
 
   /**
    * @brief Calculator for arrays
@@ -48,9 +49,17 @@ namespace Isis {
    *  @history 2008-06-18 Steven Lambright - Fixed documentation
    *  @history 2009-03-03 Steven Lambright - Added missing secant method call
    *  @history 2010-02-23 Steven Lambright - Added min2,max2
-   *  @history 2010-04-08 Steven Lambright - Replaced min2,max2 with proper
-   *    implementations of cubemin, cubemax, linemin, linemax, min and max.
-   *    Added support for getting statistics of a cube for constants.
+   *  @history 2010-04-08 Steven Lambright - Replaced min2,max
+   *                          with proper implementations of
+   *                          cubemin, cubemax, linemin, linemax,
+   *                          min and max. Added support for
+   *                          getting statistics of a cube for
+   *                          constants.
+   *  @history 2012-02-02 Jeff Anderson - Added support for camera
+   *                          parameters such as phase, incidence,
+   *                          etc
+   *  @history 2012-02-09 Jeff Anderson - Modified to conform to
+   *                          ISIS coding standards
    */
   class CubeCalculator : Calculator {
     public:
@@ -62,11 +71,11 @@ namespace Isis {
        */
       void Clear();
 
-      void PrepareCalculations(iString equation,
+      void prepareCalculations(iString equation,
                                QVector<Cube *> &inCubes,
                                Cube *outCube);
 
-      QVector<double> RunCalculations(QVector<Buffer *> &cubeData,
+      QVector<double> runCalculations(QVector<Buffer *> &cubeData,
                                       int line, int band);
 
     private:
@@ -75,47 +84,57 @@ namespace Isis {
        *   the overall action to perform in
        *   RunCalculations(..).
        */
-      enum calculations {
+      enum Calculations {
         //! The calculation requires calling one of the methods
-        callNextMethod,
+        CallNextMethod,
         //! The calculation requires input data
-        pushNextData
+        PushNextData
       };
 
-      void AddMethodCall(void (Calculator::*method)(void));
+      void addMethodCall(void (Calculator::*method)(void));
 
-      int LastPushToCubeStats(QVector<Cube *> &inCubes);
+      int lastPushToCubeStats(QVector<Cube *> &inCubes);
+
+      int lastPushToCubeCameras(QVector<Cube *> &inCubes);
 
       /**
        * This is what RunCalculations(...) will loop over.
        *   The action to perform (push data or execute calculation)
        *   is defined in this vector.
        */
-      QVector< calculations > *p_calculations;
+      QVector<Calculations> *m_calculations;
 
       /**
        * This stores the addresses to the methods RunCalculations(...)
        * will call
        */
-      QVector< void (Calculator:: *)(void) > *p_methods;
+      QVector<void (Calculator:: *)(void)> *m_methods;
 
       /**
        * This stores the addressed to the methods RunCalculations(...)
        * will push (constants), along with placeholders for simplicity to
        * keep synchronized with the data definitions.
        */
-      QVector< QVector<double> > *p_data;
+      QVector< QVector<double> > *m_data;
 
       /**
        * This defines what kind of data RunCalculations(...) will push
        * onto the calculator. Constants will be taken from p_data, which
        * is synchronized (index-wise) with this vector.
        */
-      QVector< DataValue > *p_dataDefinitions;
+      QVector<DataValue> *m_dataDefinitions;
 
-      QVector<Statistics *> *p_cubeStats;
+      QVector<Statistics *> *m_cubeStats;
 
-      int p_outputSamples;
+      /**
+       * This two are used for keeping cameras and camera buffers 
+       * internalized for quick computations
+       */
+      QVector<Camera *> *m_cubeCameras;
+
+      QVector<CameraBuffers *> *m_cameraBuffers;
+
+      int m_outputSamples;
   };
 
   /**
@@ -129,61 +148,119 @@ namespace Isis {
        * This is used to tell what kind of data to
        *   push onto the RPN calculator.
        */
-      enum dataValueType {
-        constant, //!< a single constant value
-        sample, //!< current sample number
-        line, //!< current line number
-        band, //!< current band number
-        cubeData //!< a brick of cube data
+      enum DataValueType {
+        Constant, //!< a single constant value
+        Sample, //!< current sample number
+        Line, //!< current line number
+        Band, //!< current band number
+        CubeData, //!< a brick of cube data
+        InaData, //!< incidence camera data
+        EmaData, //!< emission camera data
+        PhaData, //!< phase camera data
+        LatData, //!< Latitude camera data
+        LonData, //!< Longitude camera data
+        ResData, //!< Pixel resolution camera data
+        RadiusData, //!< DEM radius
+        InalData, //!< local incidence camera data
+        EmalData, //!< local emission camera data
+        PhalData //!< local phase camera data
       };
 
       DataValue() {
-        p_type = (dataValueType) - 1;
-        p_cubeIndex = -1;
-        p_constantValue = 0.0;
+        m_type = (DataValueType) - 1;
+        m_cubeIndex = -1;
+        m_constantValue = 0.0;
       }
 
-      DataValue(dataValueType type) {
-        p_type = type;
-        p_constantValue = 0.0;
-        p_cubeIndex = -1;
+      DataValue(DataValueType type) {
+        m_type = type;
+        m_constantValue = 0.0;
+        m_cubeIndex = -1;
       }
 
-      DataValue(dataValueType type, int cubeIndex) {
-        p_type = type;
-        p_constantValue = 0.0;
+      DataValue(DataValueType type, int cubeIndex) {
+        m_type = type;
+        m_constantValue = 0.0;
+        m_cubeIndex = cubeIndex;
+      }
 
-        if(type == cubeData) {
-          p_cubeIndex = cubeIndex;
+      DataValue(DataValueType type, double value) {
+        m_type = type;
+        m_cubeIndex = -1;
+
+        if(type == Constant) {
+          m_constantValue = value;
         }
       }
 
-      DataValue(dataValueType type, double value) {
-        p_type = type;
-        p_cubeIndex = -1;
-
-        if(type == constant) {
-          p_constantValue = value;
-        }
-      }
-
-      dataValueType getType() {
-        return p_type;
+      DataValueType getType() {
+        return m_type;
       }
 
       int getCubeIndex() {
-        return p_cubeIndex;
+        return m_cubeIndex;
       }
 
-      double getContant() {
-        return p_constantValue;
+      double getConstant() {
+        return m_constantValue;
       }
 
     private:
-      int p_cubeIndex;
-      double p_constantValue;
+      int m_cubeIndex;
+      double m_constantValue;
 
-      dataValueType p_type;
+      DataValueType m_type;
+  };
+
+  /**
+   * @author 2012-02-02 Jeff Anderson
+   *
+   * @internal
+   */
+  class CameraBuffers {
+    public:
+      CameraBuffers(Camera *camera);
+      ~CameraBuffers();
+
+       void enablePhaBuffer();
+       void enableInaBuffer(); 
+       void enableEmaBuffer(); 
+       void enableLatBuffer(); 
+       void enableLonBuffer(); 
+       void enableResBuffer(); 
+       void enableRadiusBuffer(); 
+       void enablePhalBuffer();
+       void enableInalBuffer(); 
+       void enableEmalBuffer(); 
+
+       QVector<double> *getPhaBuffer (int currentLine, int ns);
+       QVector<double> *getInaBuffer (int currentLine, int ns);
+       QVector<double> *getEmaBuffer (int currentLine, int ns);
+       QVector<double> *getLatBuffer (int currentLine, int ns);
+       QVector<double> *getLonBuffer (int currentLine, int ns);
+       QVector<double> *getResBuffer (int currentLine, int ns);
+       QVector<double> *getRadiusBuffer (int currentLine, int ns);
+       QVector<double> *getPhalBuffer (int currentLine, int ns);
+       QVector<double> *getInalBuffer (int currentLine, int ns);
+       QVector<double> *getEmalBuffer (int currentLine, int ns);
+
+
+    private:
+      void loadBuffers (int currentLine, int ns);
+
+      Camera *m_camera;
+      int m_lastLine;
+
+      QVector<double> *m_phaBuffer;
+      QVector<double> *m_inaBuffer;
+      QVector<double> *m_emaBuffer;
+      QVector<double> *m_phalBuffer;
+      QVector<double> *m_inalBuffer;
+      QVector<double> *m_emalBuffer;
+      QVector<double> *m_resBuffer;
+      QVector<double> *m_latBuffer;
+      QVector<double> *m_lonBuffer;
+      QVector<double> *m_radiusBuffer;
   };
 }
 #endif

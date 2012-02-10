@@ -73,7 +73,7 @@ void IsisMain() {
   }
 
   CubeInfixToPostfix infixToPostfix;
-  c.PrepareCalculations(infixToPostfix.Convert(ui.GetString("EQUATION")), cubes, outCube);
+  c.prepareCalculations(infixToPostfix.convert(ui.GetString("EQUATION")), cubes, outCube);
   p.StartProcess(Evaluate);
   p.EndProcess();
 }
@@ -94,7 +94,7 @@ void Evaluate(vector<Buffer *> &input, vector<Buffer *> &output) {
     inputCopy.push_back(input[i]);
   }
 
-  QVector<double> results = c.RunCalculations(inputCopy,
+  QVector<double> results = c.runCalculations(inputCopy,
                             outBuffer.Line(), outBuffer.Band());
 
   // If final result is a scalar, set all pixels to that value.

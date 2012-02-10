@@ -42,38 +42,41 @@ namespace Isis {
    *
    * @internal
    *   @history 2007-08-22 Steven Lambright - Changed p_operators from
-   *                   vector to QList (static std::vector is unsafe)
+   *                           vector to QList (static std::vector
+   *                           is unsafe)
    *   @history 2008-01-23 Steven Lambright - Added the operators (constants)
-   *                   PI and e
+   *                           PI and e
    *   @history 2010-02-23 Steven Lambright - Operator/Function input strings and
-   *                   output strings now separated
+   *                           output strings now separated
    *   @history 2010-04-08 Steven Lambright - Min, max functions expanded upon
+   *   @history 2012-01-09 Jeff Anderson - Modified to conform
+   *                           ISIS programming standards
    */
   class InfixToPostfix {
     public:
       InfixToPostfix();
       virtual ~InfixToPostfix();
 
-      iString Convert(const iString &infix);
-      iString TokenizeEquation(const iString &equation);
+      iString convert(const iString &infix);
+      iString tokenizeEquation(const iString &equation);
 
     protected:
 
-      virtual bool IsKnownSymbol(iString representation);
-      virtual InfixOperator *FindOperator(iString representation);
+      virtual bool isKnownSymbol(iString representation);
+      virtual InfixOperator *findOperator(iString representation);
 
       QList<InfixOperator *> p_operators;
     private:
-      void Initialize();
-      void Uninitialize();
+      void initialize();
+      void uninitialize();
 
-      iString FormatFunctionCalls(iString equation);
-      iString CleanSpaces(iString equation);
+      iString formatFunctionCalls(iString equation);
+      iString cleanSpaces(iString equation);
 
-      void CloseParenthesis(iString &postfix, std::stack<InfixOperator> &theStack);
-      void AddOperator(iString &postfix, const InfixOperator &op, std::stack<InfixOperator> &theStack);
-      bool IsFunction(iString representation);
-      void CheckArgument(iString funcName, int argNum, iString argument);
+      void closeParenthesis(iString &postfix, std::stack<InfixOperator> &theStack);
+      void addOperator(iString &postfix, const InfixOperator &op, std::stack<InfixOperator> &theStack);
+      bool isFunction(iString representation);
+      void checkArgument(iString funcName, int argNum, iString argument);
   };
 
   /**
@@ -100,19 +103,19 @@ namespace Isis {
         m_isFunction = isFunc;
       }
 
-      const iString &InputString() const {
+      const iString &inputString() const {
         return m_inputString;
       }
 
-      const iString &OutputString() const {
+      const iString &outputString() const {
         return m_outputString;
       }
 
-      int Precedence() const {
+      int precedence() const {
         return m_precedence;
       }
 
-      bool IsFunction() const {
+      bool isFunction() const {
         return m_isFunction;
       }
 
@@ -144,7 +147,7 @@ namespace Isis {
         m_numArguments = argCount;
       }
 
-      int ArgumentCount() const {
+      int argumentCount() const {
         return m_numArguments;
       }
 

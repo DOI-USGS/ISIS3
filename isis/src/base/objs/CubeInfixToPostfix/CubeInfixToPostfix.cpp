@@ -26,6 +26,47 @@
 using namespace std;
 
 namespace Isis {
+  /**
+   * Constructs a CubeInfixToPostfix converter
+   * 
+   * @author janderson (2/2/2012)
+   */
+  CubeInfixToPostfix::CubeInfixToPostfix() {
+    initialize();
+  }
+
+  /**
+   * This method is used to create functions that are specific to 
+   * cubes.  Moved the cubemin and cubemax functions out of the 
+   * InfixToPostfix initialization method into this method 
+   * 
+   * @author janderson (2/2/2012)
+   */
+  void CubeInfixToPostfix::initialize() {
+    // List of the form funct(fN) where N is the file number
+    // For example pha(f1) returns the phase angle for f1
+    p_operators.push_back(new InfixFunction("cubemin", 1));
+    p_operators.push_back(new InfixFunction("cubemax", 1));
+    p_operators.push_back(new InfixFunction("cubeavg", 1));
+    p_operators.push_back(new InfixFunction("cubestd", 1));
+
+    p_operators.push_back(new InfixFunction("pha", 1));
+    p_operators.push_back(new InfixFunction("ema", 1));
+    p_operators.push_back(new InfixFunction("ina", 1));
+
+    p_operators.push_back(new InfixFunction("phal", 1));
+    p_operators.push_back(new InfixFunction("emal", 1));
+    p_operators.push_back(new InfixFunction("inal", 1));
+
+    p_operators.push_back(new InfixFunction("phac", 1));
+    p_operators.push_back(new InfixFunction("emac", 1));
+    p_operators.push_back(new InfixFunction("inac", 1));
+
+    p_operators.push_back(new InfixFunction("lat", 1));
+    p_operators.push_back(new InfixFunction("lon", 1));
+    p_operators.push_back(new InfixFunction("res", 1));
+    p_operators.push_back(new InfixFunction("radius", 1));
+  }
 
   /**
    * This method will return true if it believes the argument represents
@@ -35,9 +76,9 @@ namespace Isis {
    *
    * @return bool True if it looks valid, false if it's not known
    */
-  bool CubeInfixToPostfix::IsKnownSymbol(iString representation) {
+  bool CubeInfixToPostfix::isKnownSymbol(iString representation) {
     for(int i = 0; i < p_operators.size(); i++) {
-      if(representation.compare(p_operators[i]->InputString()) == 0) {
+      if(representation.compare(p_operators[i]->inputString()) == 0) {
         return true;
       }
     }
@@ -55,9 +96,9 @@ namespace Isis {
     return isFunction;
   }
 
-  InfixOperator *CubeInfixToPostfix::FindOperator(iString representation) {
+  InfixOperator *CubeInfixToPostfix::findOperator(iString representation) {
     try {
-      return InfixToPostfix::FindOperator(representation);
+      return InfixToPostfix::findOperator(representation);
     }
     catch(iException &e) {
       e.Clear();

@@ -29,18 +29,18 @@ using namespace std;
 namespace Isis {
   //! Constructor
   InfixToPostfix::InfixToPostfix() {
-    Initialize();
+    initialize();
   }
 
   InfixToPostfix::~InfixToPostfix() {
-    Uninitialize();
+    uninitialize();
   }
 
   /**
    * This populates the known operators/functions list. If the operators list
    * is not empty, this function will do nothing.
    */
-  void InfixToPostfix::Initialize() {
+  void InfixToPostfix::initialize() {
     p_operators.push_back(new InfixOperator(7, "^"));
     p_operators.push_back(new InfixOperator(5, "/"));
     p_operators.push_back(new InfixOperator(5, "*"));
@@ -60,6 +60,7 @@ namespace Isis {
     p_operators.push_back(new InfixOperator(-1, ","));
 
     p_operators.push_back(new InfixFunction("--",     1));
+    p_operators.push_back(new InfixFunction("neg",    1));
     p_operators.push_back(new InfixFunction("sqrt",   1));
     p_operators.push_back(new InfixFunction("abs",    1));
     p_operators.push_back(new InfixFunction("sin",    1));
@@ -81,8 +82,8 @@ namespace Isis {
     p_operators.push_back(new InfixFunction("log",    1));
     p_operators.push_back(new InfixFunction("log10",  1));
     p_operators.push_back(new InfixFunction("ln",     1));
-    p_operators.push_back(new InfixFunction("cubemin", 1));
-    p_operators.push_back(new InfixFunction("cubemax", 1));
+    p_operators.push_back(new InfixFunction("degs",    1));
+    p_operators.push_back(new InfixFunction("rads",    1));
     p_operators.push_back(new InfixFunction("linemin", 1));
     p_operators.push_back(new InfixFunction("linemax", 1));
     p_operators.push_back(new InfixFunction("min",     2));
@@ -97,7 +98,7 @@ namespace Isis {
   /**
    * This cleans the known operators/functions list.
    */
-  void InfixToPostfix::Uninitialize() {
+  void InfixToPostfix::uninitialize() {
     for(int i = 0; i < p_operators.size(); i ++) {
       delete p_operators[i];
     }
@@ -117,7 +118,7 @@ namespace Isis {
    *
    * @return iString A space-delimited string with data between every pair of spaces
    */
-  iString InfixToPostfix::CleanSpaces(iString equation) {
+  iString InfixToPostfix::cleanSpaces(iString equation) {
     iString clean = "";
     while(!equation.empty()) {
       iString data = equation.Token(" ");
@@ -146,9 +147,9 @@ namespace Isis {
    *
    * @return iString The postfix equation
    */
-  iString InfixToPostfix::Convert(const iString &infix) {
+  iString InfixToPostfix::convert(const iString &infix) {
     // Prep our equation for the conversion
-    iString equation = TokenizeEquation(infix);
+    iString equation = tokenizeEquation(infix);
     iString postfix = "";
 
     // The algorithm uses a stack
@@ -172,18 +173,18 @@ namespace Isis {
       iString data = equation.Token(" ");
 
       if(data.compare("(") == 0) {
-        theStack.push(*FindOperator(data));
+        theStack.push(*findOperator(data));
       }
       else if(data.compare(")") == 0) {
-        CloseParenthesis(postfix, theStack);
+        closeParenthesis(postfix, theStack);
       }
-      else if(IsKnownSymbol(data)) {
-        AddOperator(postfix, *FindOperator(data), theStack);
+      else if(isKnownSymbol(data)) {
+        addOperator(postfix, *findOperator(data), theStack);
 
-        if(IsFunction(data)) {
+        if(isFunction(data)) {
           // For a general check, zero single argument functions the
           //   same as an operand.
-          if(((InfixFunction *)FindOperator(data))->ArgumentCount() == 0) {
+          if(((InfixFunction *)findOperator(data))->argumentCount() == 0) {
             numConsecutiveOperators = 0;
             numConsecutiveOperands ++;
           }
@@ -226,7 +227,7 @@ namespace Isis {
     }
 
     while(!theStack.empty()) {
-      iString op = theStack.top().OutputString();
+      iString op = theStack.top().outputString();
 
       // Any opening parentheses here are invalid at this point
       if(op == "(") {
@@ -244,7 +245,7 @@ namespace Isis {
     postfix = postfix.Remove(",");
 
     // Clean spaces just to double check and return our postfix answer
-    return CleanSpaces(postfix);
+    return cleanSpaces(postfix);
   }
 
   /**
@@ -255,9 +256,9 @@ namespace Isis {
    *
    * @return bool True if it looks valid, false if it's not known
    */
-  bool InfixToPostfix::IsKnownSymbol(iString representation) {
+  bool InfixToPostfix::isKnownSymbol(iString representation) {
     for(int i = 0; i < p_operators.size(); i++) {
-      if(representation.compare(p_operators[i]->InputString()) == 0) {
+      if(representation.compare(p_operators[i]->inputString()) == 0) {
         return true;
       }
     }
@@ -272,9 +273,9 @@ namespace Isis {
    *
    * @return bool True if it's a known function, false otherwise
    */
-  bool InfixToPostfix::IsFunction(iString representation) {
-    if(IsKnownSymbol(representation)) {
-      return FindOperator(representation)->IsFunction();
+  bool InfixToPostfix::isFunction(iString representation) {
+    if(isKnownSymbol(representation)) {
+      return findOperator(representation)->isFunction();
     }
     else {
       return false;
@@ -289,22 +290,22 @@ namespace Isis {
    * @param op The operator
    * @param theStack The operator stack
    */
-  void InfixToPostfix::AddOperator(iString &postfix, const InfixOperator &op, std::stack<InfixOperator> &theStack) {
+  void InfixToPostfix::addOperator(iString &postfix, const InfixOperator &op, std::stack<InfixOperator> &theStack) {
     while(!theStack.empty()) {
       InfixOperator top = theStack.top();
       theStack.pop();
 
-      if(top.InputString().compare("(") == 0) {
+      if(top.inputString().compare("(") == 0) {
         theStack.push(top);
         break;
       }
 
-      if(top.Precedence() < op.Precedence()) {
+      if(top.precedence() < op.precedence()) {
         theStack.push(top);
         break;
       }
       else {
-        postfix += ' ' + top.OutputString() + ' ';
+        postfix += ' ' + top.outputString() + ' ';
       }
     }
 
@@ -318,18 +319,18 @@ namespace Isis {
    * @param postfix The postix generated thus far
    * @param theStack The operator stack
    */
-  void InfixToPostfix::CloseParenthesis(iString &postfix, std::stack<InfixOperator> &theStack) {
+  void InfixToPostfix::closeParenthesis(iString &postfix, std::stack<InfixOperator> &theStack) {
     bool openingFound = false;
     while(!theStack.empty()) {
       InfixOperator op = theStack.top();
       theStack.pop();
 
-      if(op.InputString().compare("(") == 0) {
+      if(op.inputString().compare("(") == 0) {
         openingFound = true;
         break;
       }
       else {
-        postfix += ' ' + op.OutputString() + ' ';
+        postfix += ' ' + op.outputString() + ' ';
       }
     }
 
@@ -349,9 +350,9 @@ namespace Isis {
    *
    * @return InfixOperator* A pointer to the operator object that contains known information about the operator
    */
-  InfixOperator *InfixToPostfix::FindOperator(iString representation) {
+  InfixOperator *InfixToPostfix::findOperator(iString representation) {
     for(int i = 0; i < p_operators.size(); i++) {
-      if(representation.compare(p_operators[i]->InputString()) == 0) {
+      if(representation.compare(p_operators[i]->inputString()) == 0) {
         return p_operators[i];
       }
     }
@@ -371,7 +372,7 @@ namespace Isis {
    *
    * @return iString A tokenized equation with additional parentheses
    */
-  iString InfixToPostfix::TokenizeEquation(const iString &equation) {
+  iString InfixToPostfix::tokenizeEquation(const iString &equation) {
     iString output = "";
 
     // Insert whitespace, make everything lowercase, and change all braces to
@@ -456,7 +457,7 @@ namespace Isis {
       }
     }
 
-    iString cleanedEquation = CleanSpaces(FormatFunctionCalls(output.DownCase()));
+    iString cleanedEquation = cleanSpaces(formatFunctionCalls(output.DownCase()));
 
     return cleanedEquation;
   }
@@ -472,9 +473,9 @@ namespace Isis {
    *
    * @return iString The parenthesized equation
    */
-  iString InfixToPostfix::FormatFunctionCalls(iString equation) {
+  iString InfixToPostfix::formatFunctionCalls(iString equation) {
     // Clean our space-delimited equation
-    equation = CleanSpaces(equation);
+    equation = cleanSpaces(equation);
     iString output = "";
 
     // We'll use tokens to get through the entire equation, which is space-delimited.
@@ -483,17 +484,17 @@ namespace Isis {
       iString element = equation.Token(" ");
 
       // Did we find a function? Figure out what it is!
-      if(IsFunction(element)) {
+      if(isFunction(element)) {
         // Point to the function. We know if IsFunction returned true,
         //   the result is really a InfixFunction*
-        InfixFunction *func = (InfixFunction *)FindOperator(element);
+        InfixFunction *func = (InfixFunction *)findOperator(element);
 
         // We want to wrap the entire thing in parentheses, and it's argument string.
         //   So sin(.5)^2 becomes (sin(.5))^2
-        output += " ( " + func->InputString() + " (";
+        output += " ( " + func->inputString() + " (";
 
         // Deal with 0-argument functions
-        if(func->ArgumentCount() == 0) {
+        if(func->argumentCount() == 0) {
           iString next = equation.Token(" ");
 
           // If they didn't add parentheses around the zero-argument
@@ -510,7 +511,7 @@ namespace Isis {
             //   Make sure the next thing is a close or we have a problem.
             if(equation.Token(" ") != ")") {
               throw iException::Message(iException::User,
-                                        "The function " + func->InputString() + " should not have any arguments.",
+                                        "The function " + func->inputString() + " should not have any arguments.",
                                         _FILEINFO_);
             }
 
@@ -522,30 +523,30 @@ namespace Isis {
           // Deal with 1+ argument functions by parsing out the arguments
 
           // Make sure the user put parentheses around these, otherwise we're left in the dark.
-          if(func->ArgumentCount() > 1 && equation.Token(" ") != "(") {
+          if(func->argumentCount() > 1 && equation.Token(" ") != "(") {
             throw iException::Message(iException::User,
-                                      "Missing parenthesis after " + func->InputString(),
+                                      "Missing parenthesis after " + func->inputString(),
                                       _FILEINFO_);
           }
 
           // Single argument missing parenthesis?
-          else if(func->ArgumentCount() == 1) {
+          else if(func->argumentCount() == 1) {
             iString argument = equation.Token(" ");
 
             if(argument != "(") {
               // We might have a problem. They're calling a function without adding parentheses....
               //   unless it's a negate, because we insert those, tell them their mistake. It's not
               //   my job to figure out what they mean!
-              if(func->InputString() != "--") {
+              if(func->inputString() != "--") {
                 throw iException::Message(iException::User,
-                                          "Missing parenthesis after " + func->InputString(),
+                                          "Missing parenthesis after " + func->inputString(),
                                           _FILEINFO_);
               }
 
               // It's a negate without parentheses, so they mean the next term?
-              if(!IsFunction(argument)) {
+              if(!isFunction(argument)) {
                 // If it isn't a function, it's safe to just append
-                output += " " + FormatFunctionCalls(argument) + " ) ) ";
+                output += " " + formatFunctionCalls(argument) + " ) ) ";
                 continue;
               }
               else {
@@ -556,7 +557,7 @@ namespace Isis {
 
                 // No open parens? Call ourself again with this supposed function
                 if(openParen != "(") {
-                  output += " " + FormatFunctionCalls(functionName) + " ) ) ";
+                  output += " " + formatFunctionCalls(functionName) + " ) ) ";
                   equation = openParen + " " + equation;
                   continue;
                 }
@@ -582,7 +583,7 @@ namespace Isis {
                   functionName += " " + newElem;
                 }
 
-                output += " " + FormatFunctionCalls(functionName) + " ) ) ";
+                output += " " + formatFunctionCalls(functionName) + " ) ) ";
                 continue;
               }
             }
@@ -600,13 +601,13 @@ namespace Isis {
           iString argument = "";
           int numParens = 0;
           int argNum = 0;
-          while(argNum < func->ArgumentCount()) {
+          while(argNum < func->argumentCount()) {
             iString elem = equation.Token(" ");
 
             // Ran out of data, the function call is not complete.
             if(elem == "") {
               throw iException::Message(iException::User,
-                                        "The definition of '" + func->InputString() + "' is not complete.",
+                                        "The definition of '" + func->inputString() + "' is not complete.",
                                         _FILEINFO_);
             }
 
@@ -623,16 +624,16 @@ namespace Isis {
               }
             }
             else if(elem == "," && numParens == 0) {
-              CheckArgument(func->InputString(), argNum, argument);
-              argument = FormatFunctionCalls(argument);
+              checkArgument(func->inputString(), argNum, argument);
+              argument = formatFunctionCalls(argument);
               output += " ( " + argument + " ) , ";
               argNum++;
               argument = "";
 
               // Too many arguments? We don't expect a comma delimiter on the last argument.
-              if(argNum == func->ArgumentCount()) {
+              if(argNum == func->argumentCount()) {
                 throw iException::Message(iException::User,
-                                          "There were too many arguments supplied to the function '" + func->InputString() + "'.",
+                                          "There were too many arguments supplied to the function '" + func->inputString() + "'.",
                                           _FILEINFO_);
               }
             }
@@ -640,9 +641,9 @@ namespace Isis {
               argument += " " + elem;
             }
 
-            if(argNum == func->ArgumentCount() - 1 && numParens == -1) {
-              CheckArgument(func->InputString(), argNum, argument);
-              argument = FormatFunctionCalls(argument);
+            if(argNum == func->argumentCount() - 1 && numParens == -1) {
+              checkArgument(func->inputString(), argNum, argument);
+              argument = formatFunctionCalls(argument);
               // close function call & function wrap
               output += " " + argument + " ) ) ";
               argNum++;
@@ -651,7 +652,7 @@ namespace Isis {
             // Closed the function early?
             else if(numParens == -1) {
               throw iException::Message(iException::User,
-                                        "There were not enough arguments supplied to the function '" + func->InputString() + "'.",
+                                        "There were not enough arguments supplied to the function '" + func->inputString() + "'.",
                                         _FILEINFO_);
             }
           }
@@ -666,7 +667,7 @@ namespace Isis {
     return output;
   }
 
-  void InfixToPostfix::CheckArgument(iString funcName, int argNum, iString argument) {
+  void InfixToPostfix::checkArgument(iString funcName, int argNum, iString argument) {
     argument = argument.Remove(" ");
     argument = argument.Remove("(");
     argument = argument.Remove(")");

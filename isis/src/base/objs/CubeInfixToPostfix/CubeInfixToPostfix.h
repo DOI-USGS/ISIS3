@@ -27,6 +27,7 @@
 #include "InfixToPostfix.h"
 #include <stack>
 #include <iostream>
+#include <QVector>
 
 namespace Isis {
 
@@ -41,16 +42,25 @@ namespace Isis {
    *
    * @internal
    *   @history 2010-02-23 Steven Lambright Updated to use InfixOperator class
-   *              method instead of direct access to member
+   *                           method instead of direct access to
+   *                           member
+   *   @history 2012-02-02 Jeff Anderson - Added the Initialize
+   *                           method and camera variables (phase,
+   *                           incidence, etc) for a cube
+   *   @history 2012-02-09 Jeff Anderson - Modified to conform to
+   *                           ISIS programming standards
    */
   class CubeInfixToPostfix : public InfixToPostfix {
     public:
-      CubeInfixToPostfix() {} ;
+      CubeInfixToPostfix();
       ~CubeInfixToPostfix() {};
 
     protected:
-      bool IsKnownSymbol(iString representation);
-      InfixOperator *FindOperator(iString representation);
+      bool isKnownSymbol(iString representation);
+      InfixOperator *findOperator(iString representation);
+
+    private:
+      void initialize();
   };
 };
 

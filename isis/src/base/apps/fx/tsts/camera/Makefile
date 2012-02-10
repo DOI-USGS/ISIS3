@@ -1,0 +1,43 @@
+APPNAME = fx
+
+include $(ISISROOT)/make/isismake.tsts
+commands:
+	$(APPNAME) f1=$(INPUT)/crop.cub \
+	to=$(OUTPUT)/radius.cub \
+	equation="radius(f1)" > /dev/null;
+	$(APPNAME) f1=$(INPUT)/crop.cub \
+	to=$(OUTPUT)/phac.cub \
+	equation="phac(f1)" > /dev/null;
+	$(APPNAME) f1=$(INPUT)/crop.cub \
+	to=$(OUTPUT)/inac.cub \
+	equation="inac(f1)" > /dev/null;
+	$(APPNAME) f1=$(INPUT)/crop.cub \
+	to=$(OUTPUT)/emac.cub \
+	equation="emac(f1)" > /dev/null;
+	$(APPNAME) f1=$(INPUT)/crop.cub \
+	to=$(OUTPUT)/pha.cub \
+	equation="pha(f1)" > /dev/null;
+	$(APPNAME) f1=$(INPUT)/crop.cub \
+	to=$(OUTPUT)/ina.cub \
+	equation="ina(f1)" > /dev/null;
+	$(APPNAME) f1=$(INPUT)/crop.cub \
+	to=$(OUTPUT)/ema.cub \
+	equation="ema(f1)" > /dev/null;
+	$(APPNAME) f1=$(INPUT)/crop.cub \
+	to=$(OUTPUT)/phal.cub \
+	equation="phal(f1)" > /dev/null;
+	$(APPNAME) f1=$(INPUT)/crop.cub \
+	to=$(OUTPUT)/inal.cub \
+	equation="inal(f1)" > /dev/null;
+	$(APPNAME) f1=$(INPUT)/crop.cub \
+	to=$(OUTPUT)/emal.cub \
+	equation="emal(f1)" > /dev/null;
+	$(APPNAME) f1=$(INPUT)/crop.cub \
+	to=$(OUTPUT)/lon.cub \
+	equation="lon(f1)" > /dev/null;
+	$(APPNAME) f1=$(INPUT)/crop.cub \
+	to=$(OUTPUT)/lat.cub \
+	equation="lat(f1)" > /dev/null;
+	$(APPNAME) f1=$(INPUT)/crop.cub \
+	to=$(OUTPUT)/res.cub \
+	equation="res(f1)" > /dev/null;

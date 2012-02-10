@@ -16,8 +16,11 @@
     <p>
     The equation parser is case insensitive and all braces get converted to 
     parenthesis.  Whitespace is ignored.  Currently, you must explicitly 
-    state all multiplication operations (e.g. 5x will not work, but 5*x will).  
-    The modulus (%), AND and OR operators are not implemented yet. 
+    state all multiplication operations (e.g. 2pi will not work, but 2*pi will).  
+    The modulus (%), AND and OR operators are not implemented yet.  Finally, 
+    functions such as pha, ina, ema, lat, lon, radius, and resolution require
+    the input image be an Isis aware and initialized camera.  That is, the
+    program "spiceinit" should be run once before using these functions.
     </p>
 
     <p>
@@ -73,8 +76,10 @@
     <p>
       The following table shows all currently supported operators sorted 
       by precedence (0 = highest precedence).  All examples are valid 
-      equations that assume one or two files (F1, F2) are loaded. All angles
-      are in radians, not degrees.
+      equations that assume one or two files (F1, F2) are loaded. All 
+      trigonometric functions expect angles in radians, not degrees.  However,
+      all camera functions return angles in degrees and therefore should be
+      converted to radians.
     </p>  
     
     <table border = "1">
@@ -82,7 +87,7 @@
         <td colspan="4" align="center" valign="middle"><b>OPERATORS</b></td>
       </tr>
       <tr>
-        <th>Precedence</th>
+        <th>Precedence<br />Level</th>
         <th>Operator</th>
         <th>Description</th>
         <th>Example</th>
@@ -95,227 +100,346 @@
       </tr>   
       <tr>
         <td>1</td>
-        <td>--</td>
+        <td>-- or neg</td>
         <td>Negative sign</td>
-        <td>--f1 + f2</td>
+        <td>--f1 + f2 or neg(f1) + f2</td>
       </tr>   
       <tr>
-        <td>2</td>
-        <td>></td>
-        <td>Greater than</td>
-        <td>f1 > f2</td>
-      </tr>   
-      <tr>
-        <td>3</td>
-        <td>&lt;</td>
-        <td>Less than</td>
-        <td>(f1 &lt; f2) / f2</td>
-      </tr>   
-      <tr>
-        <td>4</td>
-        <td>&lt;=</td>
-        <td>Less than or equal</td>
-        <td>.505 &lt;= f1</td>
-      </tr>   
-      <tr>
-        <td>5</td>
-        <td>>=</td>
-        <td>Greater than or equal</td>
-        <td>f1 * (f1 >= 101)</td>
-      </tr>   
-      <tr>
-        <td>6</td>
-        <td>==</td>
-        <td>Equal to</td>
-        <td>f1 == (f2/2)</td>
-      </tr>   
-      <tr>
-        <td>7</td>
-        <td>!=</td>
-        <td>Not equal to</td>
-        <td>f1 != f2</td>
-      </tr>   
-      <tr>
-        <td>8</td>
+        <td>1</td>
         <td>abs</td>
         <td>Absolute value</td>
         <td>abs(f2 - f1)</td>
       </tr>   
       <tr>
-        <td>9</td>
+        <td>1</td>
         <td>min</td>
-        <td>Minimum of Two DNs</td>
+        <td>Minimum of two DNs</td>
         <td>f1 + min(5, f2) + min(f2, f3)</td>
       </tr>   
       <tr>
-        <td>10</td>
+        <td>1</td>
+        <td>max</td>
+        <td>Maximum of two DNs</td>
+        <td>20 * max(f1,f2)</td>
+      </tr>   
+      <tr>
+        <td>1</td>
         <td>linemin</td>
         <td>Minimum of DNs on the current line</td>
         <td>f1 + linemin(f2)</td>
       </tr>   
       <tr>
-        <td>11</td>
-        <td>cubemin</td>
-        <td>Minimum of a Cube</td>
-        <td>f1 + mincube(f2)</td>
-      </tr>   
-      <tr>
-        <td>12</td>
-        <td>max</td>
-        <td>Maximum of Two DNs</td>
-        <td>20 * max(f1,f2)</td>
-      </tr>   
-      <tr>
-        <td>13</td>
+        <td>1</td>
         <td>linemax</td>
-        <td>Minimum of DNs on the current line</td>
+        <td>Maximum of DNs on the current line</td>
         <td>f1 + linemax(f2)</td>
       </tr>   
       <tr>
-        <td>14</td>
-        <td>cubemax</td>
-        <td>Minimum of a Cube</td>
-        <td>f1 + maxcube(f2)</td>
+        <td>1</td>
+        <td>cubemin</td>
+        <td>Minimum of a cube</td>
+        <td>f1 + cubemin(f2)</td>
       </tr>   
       <tr>
-        <td>15</td>
+        <td>1</td>
+        <td>cubemax</td>
+        <td>Maximum of a cube</td>
+        <td>f1 + cubemax(f2)</td>
+      </tr>   
+      <tr>
+        <td>1</td>
+        <td>cubeavg</td>
+        <td>Average of a cube</td>
+        <td>f1 / cubeavg(f1)</td>
+      </tr>   
+      <tr>
+        <td>1</td>
+        <td>cubestd</td>
+        <td>Standard deviation of a cube</td>
+        <td>f1 * (abs(f1-cubeavg(f1)) &lt; 2*cubestd(f1))</td>
+      </tr>   
+      <tr>
+        <td>1</td>
         <td>sin</td>
         <td>Sine</td>
         <td>f1 * sin(123/321)</td>
       </tr>   
       <tr>
-        <td>16</td>
+        <td>1</td>
         <td>cos</td>
         <td>Cosine</td>
         <td>cos(.02*50)</td>
       </tr>   
       <tr>
-        <td>17</td>
+        <td>1</td>
         <td>tan</td>
         <td>Tangent</td>
         <td>tan(f1/f2)</td>
       </tr>   
       <tr>
-        <td>18</td>
+        <td>1</td>
         <td>csc</td>
         <td>Cosecant</td>
         <td>12.3 + csc(f1)</td>
       </tr>   
       <tr>
-        <td>19</td>
+        <td>1</td>
         <td>sec</td>
         <td>Secant</td>
         <td>sin(pi/60) + (sec(f2))^2</td>
       </tr>   
       <tr>
-        <td>20</td>
+        <td>1</td>
         <td>cot</td>
         <td>Cotangent</td>
         <td>line + cot(f1) - 42</td>
       </tr>   
       <tr>
-        <td>21</td>
+        <td>1</td>
         <td>asin</td>
         <td>Arcsine</td>
         <td>0.006 ^ asin(f1*5)</td>
       </tr>   
       <tr>
-        <td>22</td>
+        <td>1</td>
         <td>acos</td>
         <td>Arccosine</td>
         <td>acos(1/[2*pi])</td>
       </tr>   
       <tr>
-        <td>23</td>
+        <td>1</td>
         <td>atan</td>
         <td>Arctangent</td>
         <td>atan(f1/e)</td>
       </tr>   
       <tr>
-        <td>24</td>
+        <td>1</td>
         <td>atan2</td>
         <td>Arctangent2</td>
         <td>atan2(--10  5.5)</td>
       </tr>   
       <tr>
-        <td>25</td>
+        <td>1</td>
         <td>sinh</td>
         <td>Hyperbolic sine</td>
         <td>55 + sinh(f2)</td>
       </tr>   
       <tr>
-        <td>26</td>
+        <td>1</td>
         <td>cosh</td>
         <td>Hyperbolic cosine</td>
         <td>cosh(sample^pi)</td>
       </tr>   
       <tr>
-        <td>27</td>
+        <td>1</td>
         <td>tanh</td>
         <td>Hyperbolic tangent</td>
         <td>tanh(f1)</td>
       </tr>   
       <tr>
-        <td>28</td>
+        <td>1</td>
         <td>log or ln</td>
         <td>Natural log</td>
         <td>ln(abs(1/[f2-f1]))</td>
       </tr>   
       <tr>
-        <td>29</td>
+        <td>1</td>
         <td>log10</td>
         <td>Log base 10</td>
         <td>99 + log10(f1-160)</td>
       </tr>   
       <tr>
-        <td>30</td>
+        <td>1</td>
         <td>sqrt</td>
         <td>Square root</td>
         <td>sqrt(abs[1000 - f2])</td>
       </tr>   
+
       <tr>
-        <td>31</td>
-        <td>&lt;&lt;</td>
-        <td>Left shift.  <i>Note:</i> pixel shift, not bitwise</td>
-        <td>f1 &lt;&lt; 250</td>
+        <td>1</td>
+        <td>pha</td>
+        <td>Phase angle on the ellipsoid</td>
+        <td>pha(f1)</td>
       </tr>   
       <tr>
-        <td>32</td>
-        <td>>></td>
-        <td>Right shift.  <i>Note:</i> pixel shift, not bitwise</td>
-        <td>f2 + (f1 >> 500)</td>
+        <td>1</td>
+        <td>ina</td>
+        <td>Incidence angle on the ellipsoid</td>
+        <td>ina(f1)</td>
       </tr>   
       <tr>
-        <td>33</td>
+        <td>1</td>
+        <td>ema</td>
+        <td>Emission angle on the ellipsoid</td>
+        <td>ema(f1)</td>
+      </tr>
+
+      <tr>
+        <td>1</td>
+        <td>phal</td>
+        <td>Local phase angle on DTM</td>
+        <td>phal(f1)</td>
+      </tr>   
+      <tr>
+        <td>1</td>
+        <td>inal</td>
+        <td>Local incidence angle on DTM</td>
+        <td>inal(f1)</td>
+      </tr>   
+      <tr>
+        <td>1</td>
+        <td>emal</td>
+        <td>Local emission angle on DTM</td>
+        <td>emal(f1)</td>
+      </tr>   
+
+      <tr>
+        <td>1</td>
+        <td>phac</td>
+        <td>Phase angle on the ellipsoid at image center</td>
+        <td>phac(f1)</td>
+      </tr>   
+      <tr>
+        <td>1</td>
+        <td>inac</td>
+        <td>Incidence angle on the ellipsoid at image center</td>
+        <td>inac(f1)</td>
+      </tr>   
+      <tr>
+        <td>1</td>
+        <td>emac</td>
+        <td>Emission angle on the ellipsoid at image center</td>
+        <td>emac(f1)</td>
+      </tr>
+
+      <tr>
+        <td>1</td>
+        <td>emal</td>
+        <td>Local emission angle on DTM</td>
+        <td>emal(f1)</td>
+      </tr>   
+
+      <tr>
+        <td>1</td>
+        <td>rads</td>
+        <td>Converts degrees to radians</td>
+        <td>f1 / cos(rads(pha(f1)))</td>
+      </tr>   
+
+      <tr>
+        <td>1</td>
+        <td>r2d</td>
+        <td>Converts radians to degrees</td>
+        <td>degs(acos(f1))</td>
+      </tr>   
+
+      <tr>
+        <td>1</td>
+        <td>lat</td>
+        <td>Latitude</td>
+        <td>lat(f1)</td>
+      </tr>   
+      <tr>
+        <td>1</td>
+        <td>lon</td>
+        <td>Longitude</td>
+        <td>lon(f1)</td>
+      </tr>   
+      <tr>
+        <td>1</td>
+        <td>radius</td>
+        <td>Radius of DTM in meters</td>
+        <td>radius(f1)</td>
+      </tr>   
+
+      <tr>
+        <td>1</td>
+        <td>res</td>
+        <td>Pixel resolution in meters</td>
+        <td>res(f1)</td>
+      </tr>   
+
+
+      <tr>
+        <td>2</td>
         <td>^</td>
         <td>Exponent</td>
         <td>f1 ^ 3</td>
       </tr>   
       <tr>
-        <td>34</td>
+        <td>3</td>
         <td>*</td>
         <td>Multiplication</td>
         <td>10 * f1</td>
       </tr>   
       <tr>
-        <td>35</td>
+        <td>3</td>
         <td>/</td>
         <td>Division</td>
         <td>f2 / f1</td>
       </tr>   
+
       <tr>
-        <td>36</td>
+        <td>4</td>
+        <td>&lt;&lt;</td>
+        <td>Left shift.  <i>Note:</i> pixel shift, not bitwise</td>
+        <td>f1 &lt;&lt; 250</td>
+      </tr>   
+      <tr>
+        <td>4</td>
+        <td>>></td>
+        <td>Right shift.  <i>Note:</i> pixel shift, not bitwise</td>
+        <td>f2 + (f1 >> 500)</td>
+      </tr>   
+      <tr>
+        <td>5</td>
         <td>+</td>
         <td>Addition</td>
         <td>123 + 0.004 + f1</td>
       </tr>   
       <tr>
-        <td>37</td>
+        <td>5</td>
         <td>-</td>
         <td>Subtraction</td>
         <td>10 - (--f1)</td>
       </tr>   
-    </table>  
+      <tr>
+        <td>6</td>
+        <td>></td>
+        <td>Greater than (note: result is 0 or 1)</td>
+        <td>f1 > f2</td>
+      </tr>   
+      <tr>
+        <td>6</td>
+        <td>&lt;</td>
+        <td>Less than (note: result is 0 or 1)</td>
+        <td>f1 * (f1 &lt; cubeavg(f1)) </td>
+      </tr>   
+      <tr>
+        <td>6</td>
+        <td>&lt;=</td>
+        <td>Less than or equal (note: result is 0 or 1)</td>
+        <td>f1 &lt;= 0.505</td>
+      </tr>   
+      <tr>
+        <td>6</td>
+        <td>>=</td>
+        <td>Greater than or equal (note: result is 0 or 1)</td>
+        <td>f1 * (f1 >= 101)</td>
+      </tr>   
+      <tr>
+        <td>6</td>
+        <td>==</td>
+        <td>Equal to (note: result is 0 or 1)</td>
+        <td>f1 == (f2/2)</td>
+      </tr>   
+      <tr>
+        <td>6</td>
+        <td>!=</td>
+        <td>Not equal to (note: result is 0 or 1)</td>
+        <td>f1 != f2</td>
+      </tr>   
+      </table>  
     
   </description>
 
@@ -351,6 +475,10 @@
     <change name="Steven Lambright" date="2010-04-08">
       Min, max capabilities have been expanded to include line and cube
         min/max.
+    </change>
+    <change name="Jeff Anderson" date="2012-02-09">
+      Added cubeavg, cubestd, rads, degs, neg, pha, ina, ema, phac, inac, inal, phal,
+      emal, res, lat, lon, and radius functions.
     </change>
   </history>
 
