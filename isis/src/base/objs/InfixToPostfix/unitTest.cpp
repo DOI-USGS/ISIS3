@@ -46,9 +46,9 @@ int main(int argc, char *argv[]) {
     cout << endl << endl << equation + 1 << ": Convert '" << equations[equation] << "' to postfix" << endl;
 
     try {
-      iString tokenized = converter.TokenizeEquation(equations[equation]);
+      iString tokenized = converter.tokenizeEquation(equations[equation]);
       cout << "   Tokenized equation: '" << tokenized << "'" << endl;
-      iString postfix = converter.Convert(equations[equation]);
+      iString postfix = converter.convert(equations[equation]);
       cout << "   Postfix: '" << postfix << "'" << endl;
     }
     catch(iException e) {

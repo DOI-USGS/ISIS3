@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
   std::string postfix = "sample line + -- band *";
   QVector<Isis::Cube *> iCubes;
   iCubes.push_back(icube);
-  c.PrepareCalculations(postfix, iCubes, icube);
+  c.prepareCalculations(postfix, iCubes, icube);
 
   std::cout << "EQUATION: " << postfix << std::endl;
 
@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
   cubeData.push_back(&mgr);
 
   while(!mgr.end()) {
-    QVector<double> res = c.RunCalculations(cubeData, mgr.Line(), mgr.Band());
+    QVector<double> res = c.runCalculations(cubeData, mgr.Line(), mgr.Band());
 
     std::cout << "Line " << mgr.Line() << " Band " << mgr.Band() << std::endl;
     for(int i = 0; i < (int)res.size(); i++) std::cout << res[i] << std::endl;
