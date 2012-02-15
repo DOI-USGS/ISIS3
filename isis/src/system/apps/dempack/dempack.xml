@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="dempack" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Creates an XML representation of DEM installation packs
+  </brief>
+
+  <description>
+    <p>
+      This program creates an XML document of "pack" elements for use within the
+      Isis installer.  Each pack represent an optional installation package for
+      the user, enabling them to select the targets they are working with, and
+      only download the relevant DEMs.  This XML file is generated from the
+      kernels.????.db file in the $base/dems area.
+    </p>
+  </description>
+
+  <category>
+    <categoryItem>System</categoryItem>
+  </category>
+
+  <history>
+    <change name="Travis Addair" date="2012-02-13">
+      Original version
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input kernel.????.db file
+        </brief>
+        <description>
+          The DB file used to generate the new XML file. Defaulted to use
+          $ISIS3DATA/base/dems/kernels.????.db
+        </description>
+        <internalDefault>
+          Automatic
+        </internalDefault>
+        <filter>
+          *.db
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output XML file
+        </brief>
+        <description>
+          Newly generated XML description of the DEMs available in ISIS.
+        </description>
+        <filter>
+          *.xml
+        </filter>
+      </parameter>
+    </group>
+  </groups>
+
+</application>
