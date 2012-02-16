@@ -39,7 +39,9 @@ namespace Isis {
       m_minCurves(new QMap< MdiCubeViewport *, QPointer<CubePlotCurve> >),
       m_avgCurves(new QMap< MdiCubeViewport *, QPointer<CubePlotCurve> >),
       m_stdDev1Curves(new QMap< MdiCubeViewport *, QPointer<CubePlotCurve> >),
-      m_stdDev2Curves(new QMap< MdiCubeViewport *, QPointer<CubePlotCurve> >) {
+      m_stdDev2Curves(new QMap< MdiCubeViewport *, QPointer<CubePlotCurve> >),
+      m_stdErr1Curves(new QMap< MdiCubeViewport *, QPointer<CubePlotCurve> >),
+      m_stdErr2Curves(new QMap< MdiCubeViewport *, QPointer<CubePlotCurve> >) {
     m_toolPadAction = new QAction(this);
     m_toolPadAction->setText("Spectral Plot Tool");
     m_toolPadAction->setIcon(QPixmap(toolIconDir() + "/spectral_plot.png"));
@@ -106,6 +108,8 @@ namespace Isis {
     actions.append(m_plotMaxAction);
     actions.append(m_plotStdDev1Action);
     actions.append(m_plotStdDev2Action);
+    actions.append(m_plotStdErr1Action);
+    actions.append(m_plotStdErr2Action);
 
     int row = 2;
     foreach (QAction *action, actions) {
@@ -175,11 +179,21 @@ namespace Isis {
     m_plotStdDev2Action->setCheckable(true);
     m_plotStdDev2Action->setChecked(false);
 
+    m_plotStdErr1Action = new QAction("+ Std Error", this);
+    m_plotStdErr1Action->setCheckable(true);
+    m_plotStdErr1Action->setChecked(false);
+
+    m_plotStdErr2Action = new QAction("- Std Error", this);
+    m_plotStdErr2Action->setCheckable(true);
+    m_plotStdErr2Action->setChecked(false);
+
     wrapper->addAction(m_plotAvgAction);
     wrapper->addAction(m_plotMinAction);
     wrapper->addAction(m_plotMaxAction);
     wrapper->addAction(m_plotStdDev1Action);
     wrapper->addAction(m_plotStdDev2Action);
+    wrapper->addAction(m_plotStdErr1Action);
+    wrapper->addAction(m_plotStdErr2Action);
 
     m_rubberBandCombo = new RubberBandComboBox(
       RubberBandComboBox::Polygon |
@@ -292,6 +306,8 @@ namespace Isis {
     m_avgCurves->clear();
     m_stdDev1Curves->clear();
     m_stdDev2Curves->clear();
+    m_stdErr1Curves->clear();
+    m_stdErr2Curves->clear();
   }
 
 
@@ -342,7 +358,7 @@ namespace Isis {
         Statistics wavelengthStats;
 
         QVector<double> avgarray, minarray, maxarray, std1array, std2array,
-            wavelengtharray;
+            stderr1array, stderr2array, wavelengtharray;
         QVector< double > stddevarray;
         QVector<Statistics> plotStats;
 
@@ -365,6 +381,12 @@ namespace Isis {
                                   plotStats[index].StandardDeviation());
               std2array.push_back(plotStats[index].Average() -
                                   plotStats[index].StandardDeviation());
+              double standardError = plotStats[index].StandardDeviation() /
+                                     sqrt(plotStats[index].ValidPixels());
+              stderr1array.push_back(plotStats[index].Average() +
+                                     standardError);
+              stderr2array.push_back(plotStats[index].Average() -
+                                     standardError);
               stddevarray.push_back(plotStats[index].StandardDeviation());
             }
           }
@@ -423,6 +445,20 @@ namespace Isis {
               (*m_stdDev2Curves)[viewport]->setSource(viewport,
                                                       rubberBandPoints);
             }
+
+            if (m_plotStdErr1Action->isChecked()) {
+              (*m_stdErr1Curves)[viewport]->setData(&stddevLabels[0],
+                  &stderr1array[0], stddevLabels.size());
+              (*m_stdErr1Curves)[viewport]->setSource(viewport,
+                                                      rubberBandPoints);
+            }
+
+            if (m_plotStdErr2Action->isChecked()) {
+              (*m_stdErr2Curves)[viewport]->setData(&stddevLabels[0],
+                  &stderr2array[0], stddevLabels.size());
+              (*m_stdErr2Curves)[viewport]->setSource(viewport,
+                                                      rubberBandPoints);
+            }
           }
           else {
             if (m_plotStdDev1Action->isChecked()) {
@@ -434,6 +470,18 @@ namespace Isis {
             if (m_plotStdDev2Action->isChecked()) {
               (*m_stdDev2Curves)[viewport]->setData(NULL, NULL, 0);
               (*m_stdDev2Curves)[viewport]->setSource(viewport,
+                                                      rubberBandPoints);
+            }
+
+            if (m_plotStdErr1Action->isChecked()) {
+              (*m_stdErr1Curves)[viewport]->setData(NULL, NULL, 0);
+              (*m_stdErr1Curves)[viewport]->setSource(viewport,
+                                                      rubberBandPoints);
+            }
+
+            if (m_plotStdErr2Action->isChecked()) {
+              (*m_stdErr2Curves)[viewport]->setData(NULL, NULL, 0);
+              (*m_stdErr2Curves)[viewport]->setSource(viewport,
                                                       rubberBandPoints);
             }
           }
@@ -470,6 +518,11 @@ namespace Isis {
       stdDevPen.setWidth(2);
 //       stdDevPen.setStyle(Qt::DotLine);
       stdDevPen.setStyle(Qt::NoPen);
+
+      QPen stdErrPen(Qt::green);
+      stdErrPen.setWidth(2);
+//       stdErrPen.setStyle(Qt::DotLine);
+      stdErrPen.setStyle(Qt::NoPen);
 
       foreach (MdiCubeViewport *viewport, viewportsToPlot()) {
         if (m_plotAvgAction->isChecked() &&
@@ -514,6 +567,24 @@ namespace Isis {
           CubePlotCurve *plotCurve = createCurve("- Sigma", stdDevPen,
               targetUnits, CubePlotCurve::CubeDN);
           m_stdDev2Curves->insert(viewport, plotCurve);
+          targetWindow->add(plotCurve);
+        }
+
+        if (m_plotStdErr1Action->isChecked() &&
+           (!(*m_stdErr1Curves)[viewport] ||
+            (*m_stdErr1Curves)[viewport]->xUnits() != targetUnits)) {
+          CubePlotCurve *plotCurve = createCurve("+ Std Error", stdErrPen,
+              targetUnits, CubePlotCurve::CubeDN);
+          m_stdErr1Curves->insert(viewport, plotCurve);
+          targetWindow->add(plotCurve);
+        }
+
+        if (m_plotStdErr2Action->isChecked() &&
+           (!(*m_stdErr2Curves)[viewport] ||
+            (*m_stdErr2Curves)[viewport]->xUnits() != targetUnits)) {
+          CubePlotCurve *plotCurve = createCurve("- Std Error", stdErrPen,
+              targetUnits, CubePlotCurve::CubeDN);
+          m_stdErr2Curves->insert(viewport, plotCurve);
           targetWindow->add(plotCurve);
         }
       }

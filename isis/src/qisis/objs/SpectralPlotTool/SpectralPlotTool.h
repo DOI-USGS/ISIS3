@@ -44,6 +44,8 @@ namespace Isis {
    *   @history 2011-03-18 Sharmila Prasad - Connect the viewport's close signal  
    *   @history 2011-09-20 Steven Lambright - Now handles NULL statistical values
    *                         when graphing by not displaying them. Fixes #234.
+   *   @history 2012-02-16 Steven Lambright and Jai Rideout - Added standard
+   *                         error of the mean curves. Fixes #713.
    */
   class SpectralPlotTool : public AbstractPlotTool {
       Q_OBJECT
@@ -96,6 +98,10 @@ namespace Isis {
       QPointer<QAction> m_plotStdDev1Action;
       //! This QAction actives/deactivates plotting the avg-std dev values
       QPointer<QAction> m_plotStdDev2Action;
+      //! This QAction actives/deactivates plotting the avg+std dev values
+      QPointer<QAction> m_plotStdErr1Action;
+      //! This QAction actives/deactivates plotting the avg-std dev values
+      QPointer<QAction> m_plotStdErr2Action;
 
       //! Plot curves for max values
       QScopedPointer<
@@ -116,6 +122,15 @@ namespace Isis {
       //! Plot curves for avg. - std. dev
       QScopedPointer<
         QMap< MdiCubeViewport *, QPointer<CubePlotCurve> > > m_stdDev2Curves;
+
+      //! Plot curves for avg. + std. err
+      QScopedPointer<
+        QMap< MdiCubeViewport *, QPointer<CubePlotCurve> > > m_stdErr1Curves;
+
+      //! Plot curves for avg. - std. err
+      QScopedPointer<
+        QMap< MdiCubeViewport *, QPointer<CubePlotCurve> > > m_stdErr2Curves;
+
 
       //! Hide/show lines action
       QPointer<QAction> m_showHideBandMarkers;
