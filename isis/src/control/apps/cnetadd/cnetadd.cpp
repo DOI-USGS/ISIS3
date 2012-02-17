@@ -293,7 +293,9 @@ void IsisMain() {
       ControlPoint *point = inNet.GetPoint(cp);
 
       // If the point was not modified, delete
+      // Even get rid of edit locked points in this case
       if (!modifications.contains(point->GetId())) {
+        point->SetEditLock(false);
         inNet.DeletePoint(cp);
       }
       // Else, remove the unwanted measures from the modified point
@@ -301,10 +303,13 @@ void IsisMain() {
         for (int cm = point->GetNumMeasures() - 1; cm >= 0; cm--) {
           ControlMeasure *measure = point->GetMeasure(cm);
 
+          // Even get rid of edit locked measures in this case
           if (point->GetRefMeasure() != measure &&
               !modifications[point->GetId()].contains(
-                  measure->GetCubeSerialNumber()))
+                  measure->GetCubeSerialNumber())) {
+            measure->SetEditLock(false);
             point->Delete(cm);
+          }
         }
       }
     }
