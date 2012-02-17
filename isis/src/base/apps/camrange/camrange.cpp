@@ -28,9 +28,9 @@ void IsisMain() {
   PvlGroup target("Target");
   target += PvlKeyword("From", ui.GetFilename("FROM"));
   target += PvlKeyword("TargetName", cam->Target());
-  target += PvlKeyword("RadiusA", radii[0].GetMeters(), "meters");
-  target += PvlKeyword("RadiusB", radii[1].GetMeters(), "meters");
-  target += PvlKeyword("RadiusC", radii[2].GetMeters(), "meters");
+  target += PvlKeyword("RadiusA", radii[0].meters(), "meters");
+  target += PvlKeyword("RadiusB", radii[1].meters(), "meters");
+  target += PvlKeyword("RadiusC", radii[2].meters(), "meters");
 
   // Get resolution
   PvlGroup res("PixelResolution");

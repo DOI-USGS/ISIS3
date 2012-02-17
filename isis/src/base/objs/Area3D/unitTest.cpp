@@ -363,11 +363,11 @@ int main(int argc, char *argv[]) {
 
 
 void printArea(const Area3D &area) {
-  cerr << area.getStartX().GetMeters() << ","
-        << area.getStartY().GetMeters() << ","
-        << area.getStartZ().GetMeters() << " -> "
-        << area.getEndX().GetMeters() << ","
-        << area.getEndY().GetMeters() << ","
-        << area.getEndZ().GetMeters()
+  cerr << area.getStartX().meters() << ","
+        << area.getStartY().meters() << ","
+        << area.getStartZ().meters() << " -> "
+        << area.getEndX().meters() << ","
+        << area.getEndY().meters() << ","
+        << area.getEndZ().meters()
         << " && Valid = " << area.isValid() << "\n";
 }

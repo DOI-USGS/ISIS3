@@ -36,6 +36,8 @@ namespace Isis {
    *
    * @internal
    *   @history 2011-04-18 Steven Lambright Improved special pixel math handling
+   *   @history 2012-02-16 Steven Lambright - Brought up to method and member
+   *                           naming standards.
    */
   class Distance {
     public:
@@ -59,16 +61,16 @@ namespace Isis {
       Distance(const Distance &distanceToCopy);
       virtual ~Distance();
 
-      double GetMeters() const;
-      void SetMeters(double distanceInMeters);
+      double meters() const;
+      void setMeters(double distanceInMeters);
 
-      double GetKilometers() const;
-      void SetKilometers(double distanceInKilometers);
+      double kilometers() const;
+      void setKilometers(double distanceInKilometers);
 
-      double GetPixels(double pixelsPerMeter = 1.0) const;
-      void SetPixels(double distanceInPixels, double pixelsPerMeter = 1.0);
+      double pixels(double pixelsPerMeter = 1.0) const;
+      void setPixels(double distanceInPixels, double pixelsPerMeter = 1.0);
 
-      bool Valid() const;
+      bool isValid() const;
 
       bool operator >(const Distance &otherDistance) const;
       bool operator <(const Distance &otherDistance) const;
@@ -108,7 +110,7 @@ namespace Isis {
        * @return True if this distance is equal to the given distance
        */
       bool operator ==(const Distance &otherDistance) const {
-        return GetMeters() == otherDistance.GetMeters();
+        return meters() == otherDistance.meters();
       }
 
 
@@ -121,7 +123,7 @@ namespace Isis {
        * @return True if this distance is not equal to the given distance
        */
       bool operator !=(const Distance &otherDistance) const {
-        return GetMeters() != otherDistance.GetMeters();
+        return meters() != otherDistance.meters();
       }
 
 
@@ -138,15 +140,15 @@ namespace Isis {
       void operator *=(const double &valueToMult);
 
     protected:
-      virtual double GetDistance(Units distanceUnit) const;
-      virtual void SetDistance(const double &distance, Units distanceUnit);
+      virtual double distance(Units distanceUnit) const;
+      virtual void setDistance(const double &distance, Units distanceUnit);
 
     private:
       /**
        * This is the distance value that this class is encapsulating, always
        *   stored in meters.
        */
-      double p_distanceInMeters;
+      double m_distanceInMeters;
   };
 }
 

@@ -126,8 +126,8 @@ namespace Isis {
 
         Latitude lat = cp.GetBestSurfacePoint().GetLatitude();
         Longitude lon = cp.GetBestSurfacePoint().GetLongitude();
-        if (lat.IsInRange(Latitude(minlat,Angle::Degrees),Latitude(maxlat,Angle::Degrees)) &&
-            lon.IsInRange(Longitude(minlon,Angle::Degrees),Longitude(maxlon,Angle::Degrees))) {
+        if (lat.inRange(Latitude(minlat,Angle::Degrees),Latitude(maxlat,Angle::Degrees)) &&
+            lon.inRange(Longitude(minlon,Angle::Degrees),Longitude(maxlon,Angle::Degrees))) {
           continue;
         }
         else {

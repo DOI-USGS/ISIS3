@@ -363,13 +363,13 @@ namespace Isis {
                 Displacement(binaryPoint.aprioriy(),Displacement::Meters),
                 Displacement(binaryPoint.aprioriz(),Displacement::Meters));
         pvlPoint.FindKeyword("AprioriX").AddComment("AprioriLatitude = " + 
-                                 iString(apriori.GetLatitude().GetDegrees()) +
+                                 iString(apriori.GetLatitude().degrees()) +
                                  " <degrees>");
         pvlPoint.FindKeyword("AprioriY").AddComment("AprioriLongitude = " + 
-                                 iString(apriori.GetLongitude().GetDegrees()) +
+                                 iString(apriori.GetLongitude().degrees()) +
                                  " <degrees>");
         pvlPoint.FindKeyword("AprioriZ").AddComment("AprioriRadius = " + 
-                                 iString(apriori.GetLocalRadius().GetMeters()) +
+                                 iString(apriori.GetLocalRadius().meters()) +
                                  " <meters>");
 
         if(binaryPoint.aprioricovar_size()) {
@@ -398,11 +398,11 @@ namespace Isis {
             covar(2, 2) = binaryPoint.aprioricovar(5);
             apriori.SetRectangularMatrix(covar);
             iString sigmas = "AprioriLatitudeSigma = " +
-                             iString(apriori.GetLatSigmaDistance().GetMeters()) +
+                             iString(apriori.GetLatSigmaDistance().meters()) +
                              " <meters>  AprioriLongitudeSigma = " +
-                             iString(apriori.GetLonSigmaDistance().GetMeters()) +
+                             iString(apriori.GetLonSigmaDistance().meters()) +
                              " <meters>  AprioriRadiusSigma = " +
-                             iString(apriori.GetLocalRadiusSigma().GetMeters()) +
+                             iString(apriori.GetLocalRadiusSigma().meters()) +
                              " <meters>";
             pvlPoint.FindKeyword("AprioriCovarianceMatrix").AddComment(sigmas);
           }
@@ -430,13 +430,13 @@ namespace Isis {
                 Displacement(binaryPoint.adjustedy(),Displacement::Meters),
                 Displacement(binaryPoint.adjustedz(),Displacement::Meters));
         pvlPoint.FindKeyword("AdjustedX").AddComment("AdjustedLatitude = " + 
-                                 iString(adjusted.GetLatitude().GetDegrees()) +
+                                 iString(adjusted.GetLatitude().degrees()) +
                                  " <degrees>");
         pvlPoint.FindKeyword("AdjustedY").AddComment("AdjustedLongitude = " + 
-                                 iString(adjusted.GetLongitude().GetDegrees()) +
+                                 iString(adjusted.GetLongitude().degrees()) +
                                  " <degrees>");
         pvlPoint.FindKeyword("AdjustedZ").AddComment("AdjustedRadius = " + 
-                                 iString(adjusted.GetLocalRadius().GetMeters()) +
+                                 iString(adjusted.GetLocalRadius().meters()) +
                                  " <meters>");
 
         if(binaryPoint.adjustedcovar_size()) {
@@ -465,11 +465,11 @@ namespace Isis {
             covar(2, 2) = binaryPoint.adjustedcovar(5);
             adjusted.SetRectangularMatrix(covar);
             iString sigmas = "AdjustedLatitudeSigma = " +
-                             iString(adjusted.GetLatSigmaDistance().GetMeters()) +
+                             iString(adjusted.GetLatSigmaDistance().meters()) +
                              " <meters>  AdjustedLongitudeSigma = " +
-                             iString(adjusted.GetLonSigmaDistance().GetMeters()) +
+                             iString(adjusted.GetLonSigmaDistance().meters()) +
                              " <meters>  AdjustedRadiusSigma = " +
-                             iString(adjusted.GetLocalRadiusSigma().GetMeters()) +
+                             iString(adjusted.GetLocalRadiusSigma().meters()) +
                              " <meters>";
             pvlPoint.FindKeyword("AdjustedCovarianceMatrix").AddComment(sigmas);
           }

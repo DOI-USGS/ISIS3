@@ -83,8 +83,8 @@ namespace Isis {
 
           double x = 0;
           double y = 0;
-          bool valid = proj->SetUniversalGround(lat.GetDegrees(),
-                                                lon.GetDegrees());
+          bool valid = proj->SetUniversalGround(lat.degrees(),
+                                                lon.degrees());
           if (valid) {
             x = proj->XCoord();
             y = -1 * proj->YCoord();
@@ -118,8 +118,8 @@ namespace Isis {
           double x = 0;
           double y = 0;
 
-          bool valid = proj->SetUniversalGround(lat.GetDegrees(),
-                                                lon.GetDegrees());
+          bool valid = proj->SetUniversalGround(lat.degrees(),
+                                                lon.degrees());
 
           if (valid) {
             x = proj->XCoord();

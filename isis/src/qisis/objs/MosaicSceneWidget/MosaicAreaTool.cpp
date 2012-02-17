@@ -385,14 +385,14 @@ namespace Isis {
 
     if(proj) {
       bool longitudeWraps = false;
-      Distance radius(proj->LocalRadius(centerLat.GetDegrees()),
+      Distance radius(proj->LocalRadius(centerLat.degrees()),
           Distance::Meters);
 
       // First we can get the angle between the latitudes...
       // d = arcsin ( movementDistance / radiusDistance )
       Angle deltaLat(asin( distanceFromCenter / radius ), Angle::Radians);
 
-      latLonBoundingBox.setTop( (centerLat - deltaLat).GetDegrees() );
+      latLonBoundingBox.setTop( (centerLat - deltaLat).degrees() );
 
       if(latLonBoundingBox.top() < -90 && centerLatLon.y() != -90) {
 
@@ -409,7 +409,7 @@ namespace Isis {
         longitudeWraps = true;
       }
 
-      latLonBoundingBox.setBottom( (centerLat + deltaLat).GetDegrees() );
+      latLonBoundingBox.setBottom( (centerLat + deltaLat).degrees() );
 
       if(latLonBoundingBox.bottom() > 90 && centerLatLon.y() != 90) {
 
@@ -428,12 +428,12 @@ namespace Isis {
 
       // Now let's do lons...
       Angle widestLat(
-          asin( sin(centerLat.GetRadians()) /
+          asin( sin(centerLat.radians()) /
                 cos( distanceFromCenter / radius ) ),
           Angle::Radians);
 
       double valueToASin = sin(distanceFromCenter / radius) /
-          cos(widestLat.GetRadians());
+          cos(widestLat.radians());
 
       if(valueToASin < -1 || valueToASin > 1)
         longitudeWraps = true;
@@ -452,10 +452,10 @@ namespace Isis {
       else {
         Angle deltaLon(
             asin( sin(distanceFromCenter / radius) /
-                  cos(widestLat.GetRadians())),
+                  cos(widestLat.radians())),
             Angle::Radians);
-        latLonBoundingBox.setLeft( (centerLon - deltaLon).GetDegrees() );
-        latLonBoundingBox.setRight( (centerLon + deltaLon).GetDegrees() );
+        latLonBoundingBox.setLeft( (centerLon - deltaLon).degrees() );
+        latLonBoundingBox.setRight( (centerLon + deltaLon).degrees() );
       }
     }
 

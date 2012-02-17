@@ -105,21 +105,21 @@ namespace Isis {
 
       SurfacePoint adjSurfacePoint(cp->GetAdjustedSurfacePoint());
       if(adjSurfacePoint.Valid()) {
-        if(proj->SetUniversalGround(adjSurfacePoint.GetLatitude().GetDegrees(),
-                                 adjSurfacePoint.GetLongitude().GetDegrees())) {
+        if(proj->SetUniversalGround(adjSurfacePoint.GetLatitude().degrees(),
+                                 adjSurfacePoint.GetLongitude().degrees())) {
           adjusted = QPointF(proj->XCoord(), -1 * proj->YCoord());
-          adjustedLatLon = QPointF(adjSurfacePoint.GetLongitude().GetDegrees(),
-              adjSurfacePoint.GetLatitude().GetDegrees());
+          adjustedLatLon = QPointF(adjSurfacePoint.GetLongitude().degrees(),
+              adjSurfacePoint.GetLatitude().degrees());
         }
       }
 
       SurfacePoint apriSurfacePoint(cp->GetAprioriSurfacePoint());
       if(apriSurfacePoint.Valid()) {
-        if(proj->SetUniversalGround(apriSurfacePoint.GetLatitude().GetDegrees(),
-            apriSurfacePoint.GetLongitude().GetDegrees())) {
+        if(proj->SetUniversalGround(apriSurfacePoint.GetLatitude().degrees(),
+            apriSurfacePoint.GetLongitude().degrees())) {
           initial = QPointF(proj->XCoord(), -1 * proj->YCoord());
-          initialLatLon = QPointF(apriSurfacePoint.GetLongitude().GetDegrees(),
-              apriSurfacePoint.GetLatitude().GetDegrees());
+          initialLatLon = QPointF(apriSurfacePoint.GetLongitude().degrees(),
+              apriSurfacePoint.GetLatitude().degrees());
         }
       }
 

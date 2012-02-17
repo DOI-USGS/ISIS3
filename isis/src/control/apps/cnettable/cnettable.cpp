@@ -179,48 +179,48 @@ void IsisMain() {
     measureInfo += iString(cpoint->GetAprioriRadiusSourceFile()) + ",";
 
     SurfacePoint Asp = cpoint->GetAprioriSurfacePoint();
-    measureInfo += iString(CheckValue(Asp.GetX().GetKilometers())) + ",";
-    measureInfo += iString(CheckValue(Asp.GetY().GetKilometers())) + ",";
-    measureInfo += iString(CheckValue(Asp.GetZ().GetKilometers())) + ",";
-    measureInfo += iString(CheckValue(Asp.GetXSigma().GetKilometers())) + ",";
-    measureInfo += iString(CheckValue(Asp.GetYSigma().GetKilometers())) + ",";
-    measureInfo += iString(CheckValue(Asp.GetZSigma().GetKilometers())) + ",";
-    measureInfo += iString(CheckValue(Asp.GetLatitude().GetPlanetocentric(Angle::Degrees))) + ",";
-    measureInfo += iString(CheckValue(Asp.GetLongitude().GetPositiveEast(Angle::Degrees))) + ",";
-    measureInfo += iString(CheckValue(Asp.GetLocalRadius().GetKilometers())) + ",";
-    measureInfo += iString(CheckValue(Asp.GetLatSigma().GetDegrees())) + ",";
-    measureInfo += iString(CheckValue(Asp.GetLonSigma().GetDegrees())) + ",";
-    measureInfo += iString(CheckValue(Asp.GetLocalRadiusSigma().GetKilometers())) + ",";
-    try { measureInfo += iString(CheckValue(Asp.GetLatSigmaDistance().GetKilometers())) + ","; }
+    measureInfo += iString(CheckValue(Asp.GetX().kilometers())) + ",";
+    measureInfo += iString(CheckValue(Asp.GetY().kilometers())) + ",";
+    measureInfo += iString(CheckValue(Asp.GetZ().kilometers())) + ",";
+    measureInfo += iString(CheckValue(Asp.GetXSigma().kilometers())) + ",";
+    measureInfo += iString(CheckValue(Asp.GetYSigma().kilometers())) + ",";
+    measureInfo += iString(CheckValue(Asp.GetZSigma().kilometers())) + ",";
+    measureInfo += iString(CheckValue(Asp.GetLatitude().planetocentric(Angle::Degrees))) + ",";
+    measureInfo += iString(CheckValue(Asp.GetLongitude().positiveEast(Angle::Degrees))) + ",";
+    measureInfo += iString(CheckValue(Asp.GetLocalRadius().kilometers())) + ",";
+    measureInfo += iString(CheckValue(Asp.GetLatSigma().degrees())) + ",";
+    measureInfo += iString(CheckValue(Asp.GetLonSigma().degrees())) + ",";
+    measureInfo += iString(CheckValue(Asp.GetLocalRadiusSigma().kilometers())) + ",";
+    try { measureInfo += iString(CheckValue(Asp.GetLatSigmaDistance().kilometers())) + ","; }
     catch (iException e) {
       e.Clear();
       measureInfo += ",";
     }
-    try { measureInfo += iString(CheckValue(Asp.GetLonSigmaDistance().GetKilometers())) + ","; }
+    try { measureInfo += iString(CheckValue(Asp.GetLonSigmaDistance().kilometers())) + ","; }
     catch (iException e) {
       e.Clear();
       measureInfo += ",";
     }
 
     SurfacePoint sp = cpoint->GetAdjustedSurfacePoint();
-    measureInfo += iString(CheckValue(sp.GetX().GetKilometers())) + ",";
-    measureInfo += iString(CheckValue(sp.GetY().GetKilometers())) + ",";
-    measureInfo += iString(CheckValue(sp.GetZ().GetKilometers())) + ",";
-    measureInfo += iString(CheckValue(sp.GetXSigma().GetKilometers())) + ",";
-    measureInfo += iString(CheckValue(sp.GetYSigma().GetKilometers())) + ",";
-    measureInfo += iString(CheckValue(sp.GetZSigma().GetKilometers())) + ",";
-    measureInfo += iString(CheckValue(sp.GetLatitude().GetPlanetocentric(Angle::Degrees))) + ",";
-    measureInfo += iString(CheckValue(sp.GetLongitude().GetPositiveEast(Angle::Degrees))) + ",";
-    measureInfo += iString(CheckValue(sp.GetLocalRadius().GetKilometers())) + ",";
-    measureInfo += iString(CheckValue(sp.GetLatSigma().GetDegrees())) + ",";
-    measureInfo += iString(CheckValue(sp.GetLonSigma().GetDegrees())) + ",";
-    measureInfo += iString(CheckValue(sp.GetLocalRadiusSigma().GetKilometers())) + ",";
-    try { measureInfo += iString(CheckValue(sp.GetLatSigmaDistance().GetKilometers())) + ","; }
+    measureInfo += iString(CheckValue(sp.GetX().kilometers())) + ",";
+    measureInfo += iString(CheckValue(sp.GetY().kilometers())) + ",";
+    measureInfo += iString(CheckValue(sp.GetZ().kilometers())) + ",";
+    measureInfo += iString(CheckValue(sp.GetXSigma().kilometers())) + ",";
+    measureInfo += iString(CheckValue(sp.GetYSigma().kilometers())) + ",";
+    measureInfo += iString(CheckValue(sp.GetZSigma().kilometers())) + ",";
+    measureInfo += iString(CheckValue(sp.GetLatitude().planetocentric(Angle::Degrees))) + ",";
+    measureInfo += iString(CheckValue(sp.GetLongitude().positiveEast(Angle::Degrees))) + ",";
+    measureInfo += iString(CheckValue(sp.GetLocalRadius().kilometers())) + ",";
+    measureInfo += iString(CheckValue(sp.GetLatSigma().degrees())) + ",";
+    measureInfo += iString(CheckValue(sp.GetLonSigma().degrees())) + ",";
+    measureInfo += iString(CheckValue(sp.GetLocalRadiusSigma().kilometers())) + ",";
+    try { measureInfo += iString(CheckValue(sp.GetLatSigmaDistance().kilometers())) + ","; }
     catch (iException e) {
       e.Clear();
       measureInfo += ",";
     }
-    try { measureInfo += iString(CheckValue(sp.GetLonSigmaDistance().GetKilometers())) + ","; }
+    try { measureInfo += iString(CheckValue(sp.GetLonSigmaDistance().kilometers())) + ","; }
     catch (iException e) {
       e.Clear();
       measureInfo += ",";

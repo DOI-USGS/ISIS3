@@ -136,23 +136,23 @@ int main() {
 
   cout << endl << "Test SetAdjustedSurfacePoint ... " << endl;
   SurfacePoint surfPt(cp.GetAdjustedSurfacePoint());
-  cout << "X = " << surfPt.GetX().GetMeters() << endl;
-  cout << "Y = " << surfPt.GetY().GetMeters() << endl;
-  cout << "Z = " << surfPt.GetZ().GetMeters() << endl;
-  cout << "Latitude = " << surfPt.GetLatitude().GetDegrees() << endl;
-  cout << "Longitude = " << surfPt.GetLongitude().GetDegrees() << endl;
-  cout << "Radius = " << surfPt.GetLocalRadius().GetMeters() << endl;
+  cout << "X = " << surfPt.GetX().meters() << endl;
+  cout << "Y = " << surfPt.GetY().meters() << endl;
+  cout << "Z = " << surfPt.GetZ().meters() << endl;
+  cout << "Latitude = " << surfPt.GetLatitude().degrees() << endl;
+  cout << "Longitude = " << surfPt.GetLongitude().degrees() << endl;
+  cout << "Radius = " << surfPt.GetLocalRadius().meters() << endl;
   surfPt.SetSpherical(Latitude(32, Angle::Degrees),
       Longitude(120, Angle::Degrees),
       Distance(1000, Distance::Meters));
   cp.SetAdjustedSurfacePoint(surfPt);
   surfPt = cp.GetAdjustedSurfacePoint();
-  cout << "X = " << surfPt.GetX().GetMeters() << endl;
-  cout << "Y = " << surfPt.GetY().GetMeters() << endl;
-  cout << "Z = " << surfPt.GetZ().GetMeters() << endl;
-  cout << "Latitude = " << surfPt.GetLatitude().GetDegrees() << endl;
-  cout << "Longitude = " << surfPt.GetLongitude().GetDegrees() << endl;
-  cout << "Radius = " << surfPt.GetLocalRadius().GetMeters() << endl;
+  cout << "X = " << surfPt.GetX().meters() << endl;
+  cout << "Y = " << surfPt.GetY().meters() << endl;
+  cout << "Z = " << surfPt.GetZ().meters() << endl;
+  cout << "Latitude = " << surfPt.GetLatitude().degrees() << endl;
+  cout << "Longitude = " << surfPt.GetLongitude().degrees() << endl;
+  cout << "Radius = " << surfPt.GetLocalRadius().meters() << endl;
 
   cout << endl << "Test conversions for apriori/adjusted covariance matrices ... " << endl;
 
@@ -174,14 +174,14 @@ int main() {
 
   //c.SetAprioriCovariance();
   point = cp.GetAprioriSurfacePoint();
-  cout << "Apriori Sigma X = " << point.GetXSigma().GetMeters() << endl;
-  cout << "Apriori Sigma Y = " << point.GetYSigma().GetMeters() << endl;
-  cout << "Apriori Sigma Z = " << point.GetZSigma().GetMeters() << endl;
+  cout << "Apriori Sigma X = " << point.GetXSigma().meters() << endl;
+  cout << "Apriori Sigma Y = " << point.GetYSigma().meters() << endl;
+  cout << "Apriori Sigma Z = " << point.GetZSigma().meters() << endl;
 
   point = cp.GetAdjustedSurfacePoint();
-  cout << "Adjusted Sigma X = " << point.GetXSigma().GetMeters() << endl;
-  cout << "Adjusted Sigma Y = " << point.GetYSigma().GetMeters() << endl;
-  cout << "Adjusted Sigma Z = " << point.GetZSigma().GetMeters() << endl;
+  cout << "Adjusted Sigma X = " << point.GetXSigma().meters() << endl;
+  cout << "Adjusted Sigma Y = " << point.GetYSigma().meters() << endl;
+  cout << "Adjusted Sigma Z = " << point.GetZSigma().meters() << endl;
 
   cout << endl;
 

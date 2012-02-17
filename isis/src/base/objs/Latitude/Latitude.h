@@ -120,44 +120,44 @@ namespace Isis {
 
       ~Latitude();
 
-      double GetPlanetocentric(Angle::Units units = Angle::Radians) const;
-      void SetPlanetocentric(double latitude,
+      double planetocentric(Angle::Units units = Angle::Radians) const;
+      void setPlanetocentric(double latitude,
                              Angle::Units units = Angle::Radians);
 
-      double GetPlanetographic(Angle::Units units = Angle::Radians) const;
-      void SetPlanetographic(double latitude,
+      double planetographic(Angle::Units units = Angle::Radians) const;
+      void planetographic(double latitude,
                            Angle::Units units = Angle::Radians);
 
-      bool IsInRange(Latitude min, Latitude max) const;
+      bool inRange(Latitude min, Latitude max) const;
 
       Latitude& operator=(const Latitude & latitudeToCopy);
     
       /**
-       * Same as GetPlanetocentric.
+       * Same as planetocentric.
        *
-       * @see GetPlanetocentric
+       * @see planetocentric
        
       operator double() const {
-        return GetPlanetocentric();
+        return planetocentric();
       }*/
 
     protected:
-      virtual void SetAngle(double angle, const Angle::Units &units);
+      virtual void setAngle(double angle, const Angle::Units &units);
 
     private:
       /**
        * Used for converting to Planetographic, this is the radius of the target
        *   on the equatorial plane.
        */
-      Distance *p_equatorialRadius;
+      Distance *m_equatorialRadius;
       /**
        * Used for converting to Planetographic, this is the radius of the target
        *   perpendicular to the equatorial plane.
        */
-      Distance *p_polarRadius;
+      Distance *m_polarRadius;
       
       //! This contains which exceptions should not be thrown
-      ErrorChecking p_errors;
+      ErrorChecking m_errors;
   };
 }
 

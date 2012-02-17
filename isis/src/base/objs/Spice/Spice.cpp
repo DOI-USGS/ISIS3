@@ -1112,9 +1112,9 @@ namespace Isis {
     sB[2] = vsB[2];
     unorm_c(sB, usB, &dist);
 
-    SpiceDouble a = p_radii[0].GetKilometers();
-    SpiceDouble b = p_radii[1].GetKilometers();
-    SpiceDouble c = p_radii[2].GetKilometers();
+    SpiceDouble a = p_radii[0].kilometers();
+    SpiceDouble b = p_radii[1].kilometers();
+    SpiceDouble c = p_radii[2].kilometers();
 
     SpiceDouble originB[3];
     originB[0] = originB[1] = originB[2] = 0.0;
@@ -1154,9 +1154,9 @@ namespace Isis {
     SpiceDouble uuB[3], dist;
     unorm_c(p_uB, uuB, &dist);
 
-    SpiceDouble a = p_radii[0].GetKilometers();
-    SpiceDouble b = p_radii[1].GetKilometers();
-    SpiceDouble c = p_radii[2].GetKilometers();
+    SpiceDouble a = p_radii[0].kilometers();
+    SpiceDouble b = p_radii[1].kilometers();
+    SpiceDouble c = p_radii[2].kilometers();
 
     SpiceDouble originB[3];
     originB[0] = originB[1] = originB[2] = 0.0;
@@ -1245,7 +1245,7 @@ namespace Isis {
     double radius, ls, lat;
     reclat_c(pos, &radius, &ls, &lat);
 
-    *p_solarLongitude = Longitude(ls, Angle::Radians).Force360Domain();
+    *p_solarLongitude = Longitude(ls, Angle::Radians).force360Domain();
 
     NaifStatus::CheckErrors();
   }

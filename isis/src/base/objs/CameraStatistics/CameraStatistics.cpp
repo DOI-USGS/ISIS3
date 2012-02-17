@@ -216,7 +216,7 @@ namespace Isis {
       m_emissionStat->AddData(cam->EmissionAngle());
       m_incidenceStat->AddData(cam->IncidenceAngle());
       m_localSolarTimeStat->AddData(cam->LocalSolarTime());
-      m_localRaduisStat->AddData(cam->LocalRadius().GetMeters());
+      m_localRaduisStat->AddData(cam->LocalRadius().meters());
       m_northAzimuthStat->AddData(cam->NorthAzimuth());
 
       double aspectRatio = cam->LineResolution() / cam->SampleResolution();

@@ -101,7 +101,7 @@ namespace Isis {
               if (Stereo::Elevation(lhcam, rhcam, radius, lat, lon, sepang, error)) {
                 int index;
                 if (WithinTile(lhcam, lat, lon, radius, dem, index)) {
-                  double elevation = radius - lhcam.LocalRadius().GetMeters();
+                  double elevation = radius - lhcam.LocalRadius().meters();
                   dem[index] = elevation;
                   stErr[index] = error;
                   eigen[index] = ev;

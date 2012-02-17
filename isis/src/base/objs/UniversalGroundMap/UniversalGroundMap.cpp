@@ -135,8 +135,8 @@ namespace Isis {
       }
     }
     else {
-      double universalLat = lat.GetDegrees();
-      double universalLon = lon.GetDegrees();
+      double universalLat = lat.degrees();
+      double universalLon = lon.degrees();
       return p_projection->SetUniversalGround(universalLat, universalLon);
     }
   }
@@ -161,8 +161,8 @@ namespace Isis {
       }
     }
     else {
-      return p_projection->SetUniversalGround(sp.GetLatitude().GetDegrees(),
-                                              sp.GetLongitude().GetDegrees());
+      return p_projection->SetUniversalGround(sp.GetLatitude().degrees(),
+                                              sp.GetLongitude().degrees());
     }
   }
 

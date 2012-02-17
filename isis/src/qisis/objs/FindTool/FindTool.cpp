@@ -549,7 +549,7 @@ namespace Isis {
           double samp = groundMap->Sample();
           double line = groundMap->Line();
 
-          if (viewportResolutionToMatch.Valid()) {
+          if (viewportResolutionToMatch.isValid()) {
             Distance otherViewportResolution = distancePerPixel(viewport,
                                                                 p_lat, p_lon);
             otherViewportZoomFactor = activeViewport->scale() *

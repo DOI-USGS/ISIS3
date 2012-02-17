@@ -137,7 +137,7 @@ namespace Isis {
           sp2 = cam2->GetSurfacePoint();
         }
         // Get the distance from the camera class
-        double dist = sp1.GetDistanceToPoint(sp2,sp1.GetLocalRadius()).GetMeters();
+        double dist = sp1.GetDistanceToPoint(sp2,sp1.GetLocalRadius()).meters();
 
         // If the distance found is less than the input number, add the
         // control points' indices to the new filtered points list

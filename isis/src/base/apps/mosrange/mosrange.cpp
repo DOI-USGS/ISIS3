@@ -137,9 +137,9 @@ void IsisMain() {
       Distance radii[3];
       cam->Radii(radii);
   
-      eqRad   = radii[0].GetMeters();
-      eq2Rad  = radii[1].GetMeters();
-      poleRad = radii[2].GetMeters();
+      eqRad   = radii[0].meters();
+      eq2Rad  = radii[1].meters();
+      poleRad = radii[2].meters();
   
       target = cam->Target();
       equiRadStat.AddData(&eqRad, 1);

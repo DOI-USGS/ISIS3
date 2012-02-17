@@ -168,7 +168,7 @@ namespace Isis {
     //  to compute surface area if no geoemetry has a center intersect point.
     Distance radii[3];
     camera.Radii(radii);
-    _radius = ((radii[0] + radii[1] + radii[2]) / 3.0).GetMeters();
+    _radius = ((radii[0] + radii[1] + radii[2]) / 3.0).meters();
 
     double cLine = _nLines;
     double cSamp = _nSamps;
@@ -205,7 +205,7 @@ namespace Isis {
         _hasCenterGeom = true;
         g.centerLatitude  = camera.UniversalLatitude();
         g.centerLongitude = camera.UniversalLongitude();
-        g.radius = camera.LocalRadius().GetMeters();
+        g.radius = camera.LocalRadius().meters();
 
         g.rightAscension = camera.RightAscension();
         g.declination    = camera.Declination();
@@ -213,7 +213,7 @@ namespace Isis {
         g.sampRes = camera.SampleResolution();
         g.lineRes = camera.LineResolution();
 
-        g.solarLongitude = camera.SolarLongitude().GetDegrees();
+        g.solarLongitude = camera.SolarLongitude().degrees();
         g.northAzimuth = camera.NorthAzimuth();
         g.offNader = camera.OffNadirAngle();
         g.subSolarAzimuth = camera.SunAzimuth();
@@ -593,7 +593,7 @@ namespace Isis {
     if(camera.SetUniversalGround(g.centroidLatitude, g.centroidLongitude)) {
       g.centroidLine = camera.Line();
       g.centroidSample = camera.Sample();
-      g.centroidRadius = camera.LocalRadius().GetMeters();
+      g.centroidRadius = camera.LocalRadius().meters();
     }
 
     return (sinuMap);
@@ -696,7 +696,7 @@ namespace Isis {
       Longitude(lon2, Angle::Degrees),
       Distance(radius, Distance::Meters));
     thisDist = point1.GetDistanceToPoint(point2,
-                      Distance(radius, Distance::Meters)).GetMeters();
+                      Distance(radius, Distance::Meters)).meters();
     return (thisDist < bestDist);
   }
 

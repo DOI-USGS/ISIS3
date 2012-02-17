@@ -145,7 +145,7 @@ void IsisMain() {
       Longitude lon = surfacePoint.GetLongitude();
       Latitude lat = surfacePoint.GetLatitude();
 
-      Coordinate *coord = new Coordinate(lon.GetDegrees(), lat.GetDegrees());
+      Coordinate *coord = new Coordinate(lon.degrees(), lat.degrees());
       Envelope *envelope = new Envelope(*coord);
       coordTree.insert(envelope, point);
     }

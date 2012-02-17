@@ -23,14 +23,18 @@
  */
 
 namespace Isis {
+  class iString;
+
   /**
-   *  @brief Defines an angle and provides unit conversions
+   * @brief Defines an angle and provides unit conversions
    *
-   *  @author 2010-10-09 Debbie A. Cook
+   * @author 2010-10-09 Debbie A. Cook
    *
-   *  @internal
-   *    @history 2010-11-01 Steven Lambright - Added methods SetRadians and
-   *                          SetDegrees
+   * @internal
+   *   @history 2010-11-01 Steven Lambright - Added methods setRadians and
+   *                           SetDegrees
+   *   @history 2012-02-16 Steven Lambright - Brought up to method and member
+   *                           naming standards.
    */
   class Angle {
 
@@ -61,7 +65,7 @@ namespace Isis {
 
 
     // Class member operator functions 
-    bool Valid() const;
+    bool isValid() const;
 
     /**
      * Assign angle object equal to another
@@ -70,7 +74,7 @@ namespace Isis {
      * @return The new angle value 
      */
     Angle& operator=(const Angle& angle2) { 
-      SetAngle(angle2.GetRadians(), Radians); return *this;
+      setAngle(angle2.radians(), Radians); return *this;
     }
 
 
@@ -161,7 +165,7 @@ namespace Isis {
      * @return true if the angle equals the comparision angle 
      */
     bool operator==(const Angle& angle2) const {
-      return (GetAngle(Radians) == angle2.GetAngle(Radians));
+      return (angle(Radians) == angle2.angle(Radians));
     }
 
 
@@ -206,43 +210,47 @@ namespace Isis {
      *
      * @return The angle value in radians 
 
-    operator double() const { return GetAngle(Radians); }*/
+    operator double() const { return angle(Radians); }*/
 
     /**
      * Get the angle in units of Radians.
+     * @return A double-value representing this angle. Null if not valid.
      */
-    double GetRadians() const { return GetAngle(Radians); }
+    double radians() const { return angle(Radians); }
 
     /**
      * Get the angle in units of Degrees.
+     * @return A double-value representing this angle. Null if not valid.
      */
-    double GetDegrees() const { return GetAngle(Degrees); }
+    double degrees() const { return angle(Degrees); }
 
     /**
      * Set the angle in units of Radians.
      *
      * @param radians The new angle value, Null for invalid angle
      */
-    void SetRadians(double radians) { SetAngle(radians, Radians); }
+    void setRadians(double radians) { setAngle(radians, Radians); }
 
     /**
      * Set the angle in units of Degrees.
      *
      * @param degrees The new angle value, Null for invalid angle
      */
-    void SetDegrees(double degrees) { SetAngle(degrees, Degrees); }
+    void setDegrees(double degrees) { setAngle(degrees, Degrees); }
+
+    virtual iString text(bool printUnits = true) const;
 
   protected:
-    double UnitWrapValue(const Units& unit) const;
-    virtual double GetAngle(const Units& unit) const;
-    virtual void SetAngle(const double &angle, const Units& unit);
+    double unitWrapValue(const Units& unit) const;
+    virtual double angle(const Units& unit) const;
+    virtual void setAngle(const double &angle, const Units& unit);
 
   private:
     /**
      * The angle measure, always stored in radians. If degrees are requested
      *   then a conversion is done on the fly.
      */
-    double p_radians;
+    double m_radians;
   };
 }
 

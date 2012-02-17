@@ -234,12 +234,12 @@ void phocube(Buffer &out) {
           cam->LocalPhotometricAngles(phase, incidence, emission, success);
 
           if (localEmission) {
-            out[index] = emission.GetDegrees();
+            out[index] = emission.degrees();
             index += 64 * 64;
           }
 
           if (localIncidence) {
-            out[index] = incidence.GetDegrees();
+            out[index] = incidence.degrees();
             index += 64 * 64;
           }
         }
@@ -347,23 +347,23 @@ MosData *getMosaicIndicies(Camera &camera, MosData &md) {
   bool mysuccess;
   camera.LocalPhotometricAngles(myphase, myincidence, myemission, mysuccess);
   if (!mysuccess) {
-    myemission.SetDegrees(camera.EmissionAngle());
-    myincidence.SetDegrees(camera.IncidenceAngle());
+    myemission.setDegrees(camera.EmissionAngle());
+    myincidence.setDegrees(camera.IncidenceAngle());
   }
   double res = camera.PixelResolution();
   if (fabs(res) < Epsilon) res = Epsilon;
 
   md = MosData();  // Nullifies the data
-  if (myemission.Valid()) {
+  if (myemission.isValid()) {
     // Compute MORPHOLOGY
-    double cose = cos(myemission.GetRadians());
+    double cose = cos(myemission.radians());
     if (fabs(cose) < Epsilon) cose = Epsilon;
     // Convert resolution to units of KM
     md.m_morph = (res / 1000.0) / cose;
 
-    if (myincidence.Valid()) {
+    if (myincidence.isValid()) {
       // Compute ALBEDO
-      double cosi = cos(myincidence.GetRadians());
+      double cosi = cos(myincidence.radians());
       if (fabs(cosi) < Epsilon) cosi = Epsilon;
       //  Convert resolution to KM
       md.m_albedo = (res / 1000.0 ) * ( (1.0 / cose) + (1.0 / cosi) );  

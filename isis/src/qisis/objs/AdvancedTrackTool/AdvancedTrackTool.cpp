@@ -290,7 +290,7 @@ namespace Isis {
         double lat = cvp->camera()->UniversalLatitude();
         double lon = cvp->camera()->UniversalLongitude();
 
-        double radius = cvp->camera()->LocalRadius().GetMeters();
+        double radius = cvp->camera()->LocalRadius().meters();
         p_tableWin->table()->item(row, PLANETOCENTRIC_LAT)->setText(QString::number(lat, 'f', 15));
         p_tableWin->table()->item(row, EAST_LON_360)->setText(QString::number(lon, 'f', 15));
         p_tableWin->table()->item(row, RADIUS)->setText(QString::number(radius, 'f', 15));
@@ -303,7 +303,7 @@ namespace Isis {
         while(lon < 0.0) lon += 360.0;
         Distance radii[3];
         cvp->camera()->Radii(radii);
-        lat = Projection::ToPlanetographic(lat, radii[0].GetMeters(), radii[2].GetMeters());
+        lat = Projection::ToPlanetographic(lat, radii[0].meters(), radii[2].meters());
         p_tableWin->table()->item(row, PLANETOGRAPHIC_LAT)->setText(QString::number(lat, 'f', 15));
         p_tableWin->table()->item(row, WEST_LON_360)->setText(QString::number(lon, 'f', 15));
 
@@ -336,8 +336,8 @@ namespace Isis {
         bool bSuccess=false;
         cvp->camera()->LocalPhotometricAngles(phaseAngle, incidenceAngle, emissionAngle, bSuccess);
         if(bSuccess) {
-          p_tableWin->table()->item(row, LOCAL_INCIDENCE)->setText(QString::number(incidenceAngle.GetDegrees()));
-          p_tableWin->table()->item(row, LOCAL_EMISSION)->setText(QString::number(emissionAngle.GetDegrees()));
+          p_tableWin->table()->item(row, LOCAL_INCIDENCE)->setText(QString::number(incidenceAngle.degrees()));
+          p_tableWin->table()->item(row, LOCAL_EMISSION)->setText(QString::number(emissionAngle.degrees()));
         }
         else {
           p_tableWin->table()->item(row, LOCAL_INCIDENCE)->setText("NA");
@@ -347,7 +347,7 @@ namespace Isis {
         // Write out columns north azimuth, sun azimuth, solar longitude
         double northAzi = cvp->camera()->NorthAzimuth();
         double sunAzi   = cvp->camera()->SunAzimuth();
-        double solarLon = cvp->camera()->SolarLongitude().GetDegrees();
+        double solarLon = cvp->camera()->SolarLongitude().degrees();
         p_tableWin->table()->item(row, NORTH_AZIMUTH)->setText(QString::number(northAzi));
         p_tableWin->table()->item(row, SUN_AZIMUTH)->setText(QString::number(sunAzi));
         p_tableWin->table()->item(row, SOLAR_LON)->setText(QString::number(solarLon));

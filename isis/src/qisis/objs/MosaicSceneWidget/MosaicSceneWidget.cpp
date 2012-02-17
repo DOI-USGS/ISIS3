@@ -227,9 +227,9 @@ namespace Isis {
         cam->Radii(radii);
 
         mappingGrp += PvlKeyword("TargetName", cam->Target());
-        mappingGrp += PvlKeyword("EquatorialRadius", radii[0].GetMeters(),
+        mappingGrp += PvlKeyword("EquatorialRadius", radii[0].meters(),
                                  "meters");
-        mappingGrp += PvlKeyword("PolarRadius", radii[2].GetMeters(),
+        mappingGrp += PvlKeyword("PolarRadius", radii[2].meters(),
                                  "meters");
 
       }
@@ -1034,40 +1034,40 @@ namespace Isis {
       Longitude maxLon(maxLonKeyword[0], mapping, Angle::Degrees);
 
       Angle increment(1, Angle::Degrees);
-      if(m_projection->SetUniversalGround(minLat.GetDegrees(),
-         minLon.GetDegrees())) {
+      if(m_projection->SetUniversalGround(minLat.degrees(),
+         minLon.degrees())) {
         x = m_projection->XCoord();
         y = -1 * (m_projection->YCoord());
         footprintPoints.push_back(QPointF(x, y));
       }
 
       for(Angle lat = minLat + increment; lat < maxLat; lat += increment) {
-        if(m_projection->SetUniversalGround(lat.GetDegrees(),
-           minLon.GetDegrees())) {
+        if(m_projection->SetUniversalGround(lat.degrees(),
+           minLon.degrees())) {
           x = m_projection->XCoord();
           y = -1 * (m_projection->YCoord());
           footprintPoints.push_back(QPointF(x, y));
         }
       }
       for(Angle lon = minLon + increment; lon < maxLon; lon += increment) {
-        if(m_projection->SetUniversalGround(maxLat.GetDegrees(),
-           lon.GetDegrees())) {
+        if(m_projection->SetUniversalGround(maxLat.degrees(),
+           lon.degrees())) {
           x = m_projection->XCoord();
           y = -1 * (m_projection->YCoord());
           footprintPoints.push_back(QPointF(x, y));
         }
       }
       for(Angle lat = maxLat; lat > minLat + increment; lat -= increment) {
-        if(m_projection->SetUniversalGround(lat.GetDegrees(),
-           maxLon.GetDegrees())) {
+        if(m_projection->SetUniversalGround(lat.degrees(),
+           maxLon.degrees())) {
           x = m_projection->XCoord();
           y = -1 * (m_projection->YCoord());
           footprintPoints.push_back(QPointF(x, y));
         }
       }
       for(Angle lon = maxLon; lon > minLon + increment; lon -= increment) {
-        if(m_projection->SetUniversalGround(minLat.GetDegrees(),
-           lon.GetDegrees())) {
+        if(m_projection->SetUniversalGround(minLat.degrees(),
+           lon.degrees())) {
           x = m_projection->XCoord();
           y = -1 * (m_projection->YCoord());
           footprintPoints.push_back(QPointF(x, y));
@@ -1075,8 +1075,8 @@ namespace Isis {
       }
 
       //Now close the polygon.
-      if(m_projection->SetUniversalGround(minLat.GetDegrees(),
-         minLon.GetDegrees())) {
+      if(m_projection->SetUniversalGround(minLat.degrees(),
+         minLon.degrees())) {
         x = m_projection->XCoord();
         y = -1 * (m_projection->YCoord());
         footprintPoints.push_back(QPointF(x, y));

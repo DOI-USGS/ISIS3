@@ -420,7 +420,7 @@ bool TryKernels(Pvl &label, Process &p,
       bodyTable.Label()["Kernels"].AddValue(pckKeyword[i]);
 
     bodyTable.Label() += PvlKeyword("SolarLongitude",
-                                    cam->SolarLongitude().GetDegrees());
+                                    cam->SolarLongitude().degrees());
     bodyTable.Write(ui.GetFilename("TO") + ".bodyrot");
 
     Table sunTable = cam->SunPosition()->Cache("SunPosition");

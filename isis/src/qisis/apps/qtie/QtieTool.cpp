@@ -420,7 +420,7 @@ namespace Isis {
     p_matchGM->SetGround(
               Latitude(lat, Angle::Degrees), Longitude(lon, Angle::Degrees));
     Distance radius = p_matchGM->Camera()->LocalRadius();
-    if (!radius.Valid()) {
+    if (!radius.isValid()) {
       QString message = "Could not determine radius from DEM at lat/lon ["
           + QString::number(lat) + "," + QString::number(lon) + "]";
       QMessageBox::critical((QWidget *)parent(),"Error",message);
@@ -435,7 +435,7 @@ namespace Isis {
       QString message = "Unable to set Apriori Surface Point.\n";
       message += "Latitude = " + QString::number(lat);
       message += "  Longitude = " + QString::number(lon);
-      message += "  Radius = " + QString::number(radius.GetMeters()) + "\n";
+      message += "  Radius = " + QString::number(radius.meters()) + "\n";
       message += e.Errors().c_str();
       QMessageBox::critical((QWidget *)parent(),"Error",message);
       e.Clear();

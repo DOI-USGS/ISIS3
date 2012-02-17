@@ -101,29 +101,29 @@ void QnetSetAprioriDialog::fillLineEdits() {
   sPt.SetRadii(Distance(targetRadii[0]), 
                Distance(targetRadii[1]),
                Distance(targetRadii[2]));
-  if (sPt.GetLatitude().GetDegrees() != Null) {
+  if (sPt.GetLatitude().degrees() != Null) {
     aprioriLatEdit->setText(
-      QString::number(sPt.GetLatitude().GetDegrees()));
+      QString::number(sPt.GetLatitude().degrees()));
   }
-  if (sPt.GetLatSigmaDistance().GetMeters() != Null) {
+  if (sPt.GetLatSigmaDistance().meters() != Null) {
     latSigmaEdit->setText(
-      QString::number(sPt.GetLatSigmaDistance().GetMeters()));
+      QString::number(sPt.GetLatSigmaDistance().meters()));
   }
-  if (sPt.GetLongitude().GetDegrees() != Null) {
+  if (sPt.GetLongitude().degrees() != Null) {
     aprioriLonEdit->setText(
-      QString::number(sPt.GetLongitude().GetDegrees()));
+      QString::number(sPt.GetLongitude().degrees()));
   }
-  if (sPt.GetLonSigmaDistance().GetMeters() != Null) {
+  if (sPt.GetLonSigmaDistance().meters() != Null) {
     lonSigmaEdit->setText(
-      QString::number(sPt.GetLonSigmaDistance().GetMeters()));
+      QString::number(sPt.GetLonSigmaDistance().meters()));
   }
-  if (sPt.GetLocalRadius().GetMeters() != Null) {
+  if (sPt.GetLocalRadius().meters() != Null) {
     aprioriRadiusEdit->setText(
-      QString::number(sPt.GetLocalRadius().GetMeters()));
+      QString::number(sPt.GetLocalRadius().meters()));
   }
-  if (sPt.GetLocalRadiusSigma().GetMeters() != Null) {
+  if (sPt.GetLocalRadiusSigma().meters() != Null) {
     radiusSigmaEdit->setText(
-      QString::number(sPt.GetLocalRadiusSigma().GetMeters()));
+      QString::number(sPt.GetLocalRadiusSigma().meters()));
   }
 }
 

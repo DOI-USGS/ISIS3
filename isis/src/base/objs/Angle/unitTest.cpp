@@ -14,13 +14,13 @@ public:
   MyAngle(double angle, Angle::Units unit) : Isis::Angle(angle, unit) {}
 
   void TestUnitWrapValue() {
-    cout << "  Degree wrap value = " << UnitWrapValue(Angle::Degrees) << endl;
-    cout << "  Radian wrap value = " << UnitWrapValue(Angle::Radians) << endl;
+    cout << "  Degree wrap value = " << unitWrapValue(Angle::Degrees) << endl;
+    cout << "  Radian wrap value = " << unitWrapValue(Angle::Radians) << endl;
   }
 
-  void SetAngle(const double& angle, const Units& unit) {
-    Angle::SetAngle(angle, unit);
-    cout << "angle set to " << GetAngle(unit) << endl;
+  void setAngle(const double& angleValue, const Units& unit) {
+    Angle::setAngle(angleValue, unit);
+    cout << "angle set to " << angle(unit) << endl;
   }
 
 };
@@ -35,9 +35,10 @@ int main(int argc, char *argv[]) {
 
   try {
     Angle angle;
-    cout << "  Default constructor - valid?:  " << angle.Valid() << 
-      " values: " << angle.GetRadians() << " and " << angle.GetDegrees() << 
+    cout << "  Default constructor - valid?:  " << angle.isValid() << 
+      " values: " << angle.radians() << " and " << angle.degrees() << 
       endl;
+    cout << "  " << angle.text() << endl;
   }
   catch(Isis::iException &e) {
     e.Report();
@@ -45,18 +46,20 @@ int main(int argc, char *argv[]) {
 
   try {
     Angle angle(30., Angle::Degrees );
-    cout << "  Degree input and radian output:  " << angle.GetRadians() << 
+    cout << "  Degree input and radian output:  " << angle.radians() << 
       " radians" << endl;
-    cout << "  Valid? " << angle.Valid() << endl;
+    cout << "  Valid? " << angle.isValid() << endl;
+    cout << "  " << angle.text() << endl;
   }
   catch(Isis::iException &e) {
     e.Report();
   }
 
   try {
-    Angle angle(0.523598776, Angle::Radians );
-    cout << "  Radian input and degree output:  " << angle.GetDegrees() <<
+    Angle angle(30. * PI / 180., Angle::Radians );
+    cout << "  Radian input and degree output:  " << angle.degrees() <<
       " degrees" <<endl;
+    cout << "  " << angle.text(false) << endl;
   }
   catch(Isis::iException &e) {
     e.Report();
@@ -65,7 +68,7 @@ int main(int argc, char *argv[]) {
   try {
     Angle angle(30., Angle::Degrees );
     Angle angleCopy(angle);
-    cout <<"  Copy constructor:  " << angleCopy.GetDegrees() << " degrees" << 
+    cout <<"  Copy constructor:  " << angleCopy.degrees() << " degrees" << 
         endl;
   }
   catch(Isis::iException &e) {
@@ -76,11 +79,11 @@ int main(int argc, char *argv[]) {
 
   try {
     Angle angle(30., Angle::Degrees );
-    angle.SetDegrees(180);
-    cout <<"  SetDegrees:  " << angle.GetDegrees() << " degrees" << 
+    angle.setDegrees(180);
+    cout <<"  setDegrees:  " << angle.degrees() << " degrees" << 
         endl;
-    angle.SetRadians(PI);
-    cout <<"  SetRadians:  " << angle.GetRadians() << " radians" << 
+    angle.setRadians(PI);
+    cout <<"  setRadians:  " << angle.radians() << " radians" << 
         endl;
   }
   catch(Isis::iException &e) {
@@ -92,7 +95,7 @@ int main(int argc, char *argv[]) {
   try {
     Angle angle(30., Angle::Degrees );
     angle = Angle(45., Angle::Degrees);
-    cout << "  Assignment operator:  " << angle.GetDegrees() << " degrees" <<
+    cout << "  Assignment operator:  " << angle.degrees() << " degrees" <<
         endl;
   }
   catch(Isis::iException &e) {
@@ -105,13 +108,13 @@ int main(int argc, char *argv[]) {
     angle1 = angle1 + angle2;
     // Begin with 30 degrees and end with 30 degrees
     cout << "  + and - operators..." << endl;
-    cout << "    angle + angle: " << angle1.GetDegrees() << " degrees" <<endl;
+    cout << "    angle + angle: " << angle1.degrees() << " degrees" <<endl;
     angle1 += angle2;
-    cout << "    angle += angle: " << angle1.GetDegrees() << " degrees" <<endl;
+    cout << "    angle += angle: " << angle1.degrees() << " degrees" <<endl;
     angle1 -= angle2;
-    cout << "    angle -= angle: " << angle1.GetDegrees() << " degrees" <<endl;
+    cout << "    angle -= angle: " << angle1.degrees() << " degrees" <<endl;
     angle1 = angle1 - angle2;
-    cout << "    angle - angle: " << angle1.GetDegrees() << " degrees" <<endl;
+    cout << "    angle - angle: " << angle1.degrees() << " degrees" <<endl;
   }
   catch(Isis::iException &e) {
     e.Report();
@@ -122,13 +125,13 @@ int main(int argc, char *argv[]) {
     // Begin with 30 degrees and end with 30 degrees
     cout << "  * and / operators..." << endl;
     angle = 2. * angle;
-    cout << "    double * angle: " << angle.GetDegrees() << " degrees" <<endl;
+    cout << "    double * angle: " << angle.degrees() << " degrees" <<endl;
     angle *= 2;
-    cout << "    angle *= double: " << angle.GetDegrees() << " degrees" <<endl;
+    cout << "    angle *= double: " << angle.degrees() << " degrees" <<endl;
     angle /= 2;
-    cout << "    angle /= double: " << angle.GetDegrees() << " degrees" <<endl;
+    cout << "    angle /= double: " << angle.degrees() << " degrees" <<endl;
     angle = angle / 2;
-    cout << "    angle / double: " << angle.GetDegrees() << " degrees" <<endl;
+    cout << "    angle / double: " << angle.degrees() << " degrees" <<endl;
   }
   catch(Isis::iException &e) {
     e.Report();
@@ -236,7 +239,7 @@ int main(int argc, char *argv[]) {
   try {
     MyAngle angle(0., Angle::Degrees);
     cout << "  Degree ";
-    angle.SetAngle(60., Angle::Degrees);
+    angle.setAngle(60., Angle::Degrees);
   }
   catch(Isis::iException &e) {
     e.Report();
@@ -245,7 +248,7 @@ int main(int argc, char *argv[]) {
   try {
     MyAngle angle(0., Angle::Radians);
     cout << "  Radian ";
-    angle.SetAngle(.5, Angle::Degrees);
+    angle.setAngle(.5, Angle::Degrees);
   }
   catch(Isis::iException &e) {
     e.Report();

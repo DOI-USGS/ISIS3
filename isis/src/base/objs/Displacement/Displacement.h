@@ -37,6 +37,8 @@ namespace Isis {
    * @author 2010-10-12 Steven Lambright and Debbie A. Cook
    *
    * @internal
+   *   @history 2012-02-16 Steven Lambright - Brought up to method and member
+   *                           naming standards.
    */
   class Displacement {
     public:
@@ -64,24 +66,24 @@ namespace Isis {
        */
       ~Displacement() {};
 
-      double GetMeters() const;
-      void SetMeters(double displacementInMeters);
+      double meters() const;
+      void setMeters(double displacementInMeters);
 
-      double GetKilometers() const;
-      void SetKilometers(double displacementInKilometers);
+      double kilometers() const;
+      void setKilometers(double displacementInKilometers);
 
-      double GetPixels(double pixelsPerMeter = 1.0) const;
-      void SetPixels(double distanceInPixels, double pixelsPerMeter = 1.0);
+      double pixels(double pixelsPerMeter = 1.0) const;
+      void setPixels(double distanceInPixels, double pixelsPerMeter = 1.0);
 
-      bool Valid() const;
+      bool isValid() const;
 
       /**
-       * Get the displacement in meters. This is equivalent to GetMeters()
+       * Get the displacement in meters. This is equivalent to meters()
        *
        * @return The displacement, as a number, in units of Meters
 
       operator double() const {
-        return GetMeters();
+        return meters();
       }*/
 
       bool operator >(const Displacement &otherDisplacement) const;
@@ -138,7 +140,8 @@ namespace Isis {
        * 
        */
       bool operator ==(const Displacement &otherDisplacement) const {
-        return GetLength() == otherDisplacement.GetLength();
+        return m_displacementInMeters ==
+               otherDisplacement.m_displacementInMeters;
       }
 
       Displacement operator +(const Displacement &displacementToAdd) const;
@@ -155,16 +158,15 @@ namespace Isis {
       void operator *=(const double &valueToMult);
 
     protected:
-      double GetDisplacement(Units displacementUnit) const;
-      void SetDisplacement(const double &displacement, Units displacementUnit);
+      double displacement(Units displacementUnit) const;
+      void setDisplacement(const double &displacement, Units displacementUnit);
 
     private:
-      double GetLength() const;
       /**
        * This is the displacement value that this class is encapsulating, always
        *   stored in meters.
        */
-      double p_displacementInMeters;
+      double m_displacementInMeters;
   };
 }
 

@@ -129,11 +129,11 @@ namespace Isis
 
             // Check to see if any of the sigma values are null.
             bool latSigmaValid = (point->GetAprioriSurfacePoint().
-                GetLatSigmaDistance().Valid());
+                GetLatSigmaDistance().isValid());
             bool lonSigmaValid = (point->GetAprioriSurfacePoint().
-                GetLonSigmaDistance().Valid());
+                GetLonSigmaDistance().isValid());
             bool radiusSigmaValid = (point->GetAprioriSurfacePoint().
-                GetLocalRadiusSigma().Valid());
+                GetLocalRadiusSigma().isValid());
 
             if (!latSigmaValid && !lonSigmaValid && !radiusSigmaValid &&
                 valueToSave.toLower() != "null")
@@ -153,11 +153,11 @@ namespace Isis
 
             // Check to see if any of the surface point values are null.
             bool latValid = (point->GetAprioriSurfacePoint().
-                GetLatitude().Valid());
+                GetLatitude().isValid());
             bool lonValid = (point->GetAprioriSurfacePoint().
-                GetLongitude().Valid());
+                GetLongitude().isValid());
             bool radiusValid = (point->GetAprioriSurfacePoint().
-                GetLocalRadius().Valid());
+                GetLocalRadius().isValid());
 
             if (!latValid && !lonValid && !radiusValid &&
                 valueToSave.toLower() != "null")

@@ -173,9 +173,9 @@ int main(int argc, char *argv[]) {
   cout << "Testing radius ... " << endl;
   Distance radii[3];
   spi.Radii(radii);
-  cout << "Radii[0]:  " << radii[0].GetKilometers() << endl;
-  cout << "Radii[1]:  " << radii[1].GetKilometers() << endl;
-  cout << "Radii[2]:  " << radii[2].GetKilometers() << endl;
+  cout << "Radii[0]:  " << radii[0].kilometers() << endl;
+  cout << "Radii[1]:  " << radii[1].kilometers() << endl;
+  cout << "Radii[2]:  " << radii[2].kilometers() << endl;
   cout << endl;
 
   // Normal testing (no cache)

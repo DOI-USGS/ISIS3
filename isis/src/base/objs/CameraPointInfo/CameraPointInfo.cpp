@@ -304,7 +304,7 @@ namespace Isis {
         Distance radii[3];
         camera->Radii(radii);
         oglat = Isis::Projection::ToPlanetographic(camera->UniversalLatitude(),
-                radii[0].GetKilometers(), radii[2].GetKilometers());
+                radii[0].kilometers(), radii[2].kilometers());
         gp->FindKeyword("PlanetographicLatitude").SetValue(oglat);
 
         gp->FindKeyword("PositiveEast360Longitude").SetValue(
@@ -329,7 +329,7 @@ namespace Isis {
         gp->FindKeyword("BodyFixedCoordinate").AddValue(pB[1], "km");
         gp->FindKeyword("BodyFixedCoordinate").AddValue(pB[2], "km");
 
-        gp->FindKeyword("LocalRadius").SetValue(camera->LocalRadius().GetMeters(), "meters");
+        gp->FindKeyword("LocalRadius").SetValue(camera->LocalRadius().meters(), "meters");
         gp->FindKeyword("SampleResolution").SetValue(camera->SampleResolution(), "meters/pixel");
         gp->FindKeyword("LineResolution").SetValue(camera->LineResolution(), "meters/pixel");
 
@@ -379,7 +379,7 @@ namespace Isis {
         utc = camera->Time().UTC();
         gp->FindKeyword("UTC").SetValue(utc);
         gp->FindKeyword("LocalSolarTime").SetValue(camera->LocalSolarTime(), "hour");
-        gp->FindKeyword("SolarLongitude").SetValue(camera->SolarLongitude().GetDegrees());
+        gp->FindKeyword("SolarLongitude").SetValue(camera->SolarLongitude().degrees());
         if(allowErrors) gp->FindKeyword("Error").SetValue("N/A");
       }
     }

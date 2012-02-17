@@ -53,7 +53,7 @@ After assignment: 270 degrees
 
 ----- Testing Domain Methods -----
 
-Test Force180Domain
+Test force180Domain
 -90 degrees
-Test Force360Domain
+Test force360Domain
 270 degrees

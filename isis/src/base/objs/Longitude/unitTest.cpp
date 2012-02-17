@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
   try {
     cout << "Default constructor" << endl;
     Longitude lon;
-    cout << lon.GetDegrees() << " degrees" << endl;
+    cout << lon.degrees() << " degrees" << endl;
   }
   catch(iException &e) {
     e.Report(false);
@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
   try {
     cout << "Constructor given a value in degrees" << endl;
     Longitude lon(180.0, Angle::Degrees);
-    cout << lon.GetDegrees() << " degrees" << endl;
+    cout << lon.degrees() << " degrees" << endl;
   }
   catch(iException &e) {
     e.Report(false);
@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
   try {
     cout << "Constructor given a positive west value in degrees" << endl;
     Longitude lon(180.0, Angle::Degrees, Longitude::PositiveWest);
-    cout << lon.GetDegrees() << " degrees" << endl;
+    cout << lon.degrees() << " degrees" << endl;
   }
   catch(iException &e) {
     e.Report(false);
@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
     cout << "Constructor given a positive west, -90 value in degrees" << endl;
     Longitude lon(-90.0, Angle::Degrees, Longitude::PositiveWest,
         Longitude::Domain180);
-    cout << lon.GetDegrees() << " degrees" << endl;
+    cout << lon.degrees() << " degrees" << endl;
   }
   catch(iException &e) {
     e.Report(false);
@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
     cout << "Constructor given -90 degrees PW & 360 domain" << endl;
     Longitude lon(-90.0, Angle::Degrees, Longitude::PositiveWest,
         Longitude::Domain360);
-    cout << lon.GetDegrees() << " degrees" << endl;
+    cout << lon.degrees() << " degrees" << endl;
   }
   catch(iException &e) {
     e.Report(false);
@@ -73,7 +73,7 @@ int main(int argc, char *argv[]) {
     cout << "Copy constructor" << endl;
     Longitude lon(-90.0, Angle::Degrees, Longitude::PositiveWest,
         Longitude::Domain360);
-    cout << lon.GetDegrees() << " degrees == " << Longitude(lon).GetDegrees() <<
+    cout << lon.degrees() << " degrees == " << Longitude(lon).degrees() <<
       " degrees" << endl;
   }
   catch(iException &e) {
@@ -85,8 +85,8 @@ int main(int argc, char *argv[]) {
   try {
     cout << "Set to 90 degrees" << endl;
     Longitude lon(270.0, Angle::Degrees);
-    lon.SetPositiveEast(90, Angle::Degrees);
-    cout << lon.GetDegrees() << " degrees" << endl;
+    lon.setPositiveEast(90, Angle::Degrees);
+    cout << lon.degrees() << " degrees" << endl;
   }
   catch(iException &e) {
     e.Report(false);
@@ -96,11 +96,11 @@ int main(int argc, char *argv[]) {
     cout << "Set to 90 degrees PW" << endl;
     Longitude lon(270.0, Angle::Degrees);
     Longitude lonCopy(lon);
-    lon.SetPositiveWest(90, Angle::Degrees);
-    cout << lon.GetDegrees() << " degrees" << endl;
+    lon.setPositiveWest(90, Angle::Degrees);
+    cout << lon.degrees() << " degrees" << endl;
 
     lonCopy = lon;
-    cout << "After assignment: " << lonCopy.GetDegrees() << " degrees" << endl;
+    cout << "After assignment: " << lonCopy.degrees() << " degrees" << endl;
   }
   catch(iException &e) {
     e.Report(false);
@@ -111,14 +111,14 @@ int main(int argc, char *argv[]) {
   try {
     cout << "90 degrees is" << endl;
     Longitude lon(90.0, Angle::Degrees);
-    cout << lon.GetDegrees() << " degrees universal" << endl;
-    cout << lon.GetPositiveEast(Angle::Degrees) << " degrees positive east"
+    cout << lon.degrees() << " degrees universal" << endl;
+    cout << lon.positiveEast(Angle::Degrees) << " degrees positive east"
         << endl;
-    cout << lon.GetPositiveEast(Angle::Radians) / PI << "*pi radians positive "
+    cout << lon.positiveEast(Angle::Radians) / PI << "*pi radians positive "
         "east" << endl;
-    cout << lon.GetPositiveWest(Angle::Degrees) << " degrees positive west"
+    cout << lon.positiveWest(Angle::Degrees) << " degrees positive west"
       << endl;
-    cout << lon.GetPositiveWest(Angle::Radians) / PI << "*pi radians positive "
+    cout << lon.positiveWest(Angle::Radians) / PI << "*pi radians positive "
         "west" << endl;
   }
   catch(iException &e) {
@@ -130,14 +130,14 @@ int main(int argc, char *argv[]) {
   try {
     cout << "450 degrees is" << endl;
     Longitude lon(450.0, Angle::Degrees);
-    cout << lon.GetDegrees() << " degrees universal" << endl;
-    cout << lon.GetPositiveEast(Angle::Degrees) << " degrees positive east"
+    cout << lon.degrees() << " degrees universal" << endl;
+    cout << lon.positiveEast(Angle::Degrees) << " degrees positive east"
         << endl;
-    cout << lon.GetPositiveEast(Angle::Radians) / PI << "*pi radians positive "
+    cout << lon.positiveEast(Angle::Radians) / PI << "*pi radians positive "
         "east" << endl;
-    cout << lon.GetPositiveWest(Angle::Degrees) << " degrees positive west"
+    cout << lon.positiveWest(Angle::Degrees) << " degrees positive west"
       << endl;
-    cout << lon.GetPositiveWest(Angle::Radians) / PI << "*pi radians positive "
+    cout << lon.positiveWest(Angle::Radians) / PI << "*pi radians positive "
         "west" << endl;
   }
   catch(iException &e) {
@@ -149,14 +149,14 @@ int main(int argc, char *argv[]) {
   try {
     cout << "-450 degrees is" << endl;
     Longitude lon(-450.0, Angle::Degrees);
-    cout << lon.GetDegrees() << " degrees universal" << endl;
-    cout << lon.GetPositiveEast(Angle::Degrees) << " degrees positive east"
+    cout << lon.degrees() << " degrees universal" << endl;
+    cout << lon.positiveEast(Angle::Degrees) << " degrees positive east"
         << endl;
-    cout << lon.GetPositiveEast(Angle::Radians) / PI << "*pi radians positive "
+    cout << lon.positiveEast(Angle::Radians) / PI << "*pi radians positive "
         "east" << endl;
-    cout << lon.GetPositiveWest(Angle::Degrees) << " degrees positive west"
+    cout << lon.positiveWest(Angle::Degrees) << " degrees positive west"
       << endl;
-    cout << lon.GetPositiveWest(Angle::Radians) / PI << "*pi radians positive "
+    cout << lon.positiveWest(Angle::Radians) / PI << "*pi radians positive "
         "west" << endl;
   }
   catch(iException &e) {
@@ -168,14 +168,14 @@ int main(int argc, char *argv[]) {
   try {
     cout << "-450 degrees PW is" << endl;
     Longitude lon(-450.0, Angle::Degrees, Longitude::PositiveWest);
-    cout << lon.GetDegrees() << " degrees universal" << endl;
-    cout << lon.GetPositiveEast(Angle::Degrees) << " degrees positive east"
+    cout << lon.degrees() << " degrees universal" << endl;
+    cout << lon.positiveEast(Angle::Degrees) << " degrees positive east"
         << endl;
-    cout << lon.GetPositiveEast(Angle::Radians) / PI << "*pi radians positive "
+    cout << lon.positiveEast(Angle::Radians) / PI << "*pi radians positive "
         "east" << endl;
-    cout << lon.GetPositiveWest(Angle::Degrees) << " degrees positive west"
+    cout << lon.positiveWest(Angle::Degrees) << " degrees positive west"
       << endl;
-    cout << lon.GetPositiveWest(Angle::Radians) / PI << "*pi radians positive "
+    cout << lon.positiveWest(Angle::Radians) / PI << "*pi radians positive "
         "west" << endl;
   }
   catch(iException &e) {
@@ -185,12 +185,12 @@ int main(int argc, char *argv[]) {
   cout << endl << "----- Testing Domain Methods -----" << endl << endl;
 
   try {
-    cout << "Test Force180Domain" << endl;
+    cout << "Test force180Domain" << endl;
     Longitude lon(270.0, Angle::Degrees);
-    cout << lon.Force180Domain().GetDegrees() << " degrees" << endl;
+    cout << lon.force180Domain().degrees() << " degrees" << endl;
 
-    cout << "Test Force360Domain" << endl;
-    cout << lon.Force360Domain().GetDegrees() << " degrees" << endl;
+    cout << "Test force360Domain" << endl;
+    cout << lon.force360Domain().degrees() << " degrees" << endl;
   }
   catch(iException &e) {
     e.Report(false);

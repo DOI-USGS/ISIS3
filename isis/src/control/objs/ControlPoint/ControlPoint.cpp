@@ -245,8 +245,8 @@ namespace Isis {
         covar(2, 2) = fileEntry.aprioricovar(5);
         apriori.SetRectangularMatrix(covar);
 
-        if (Displacement(covar(0, 0), Displacement::Meters).Valid() ||
-            Displacement(covar(1, 1), Displacement::Meters).Valid()) {
+        if (Displacement(covar(0, 0), Displacement::Meters).isValid() ||
+            Displacement(covar(1, 1), Displacement::Meters).isValid()) {
           if (fileEntry.latitudeconstrained())
             constraintStatus.set(LatitudeConstrained);
           if (fileEntry.longitudeconstrained())
@@ -254,7 +254,7 @@ namespace Isis {
           if (fileEntry.radiusconstrained())
             constraintStatus.set(RadiusConstrained);
         }
-        else if (Displacement(covar(2, 2), Displacement::Meters).Valid()) {
+        else if (Displacement(covar(2, 2), Displacement::Meters).isValid()) {
           if (fileEntry.latitudeconstrained())
             constraintStatus.set(LatitudeConstrained);
           if (fileEntry.radiusconstrained())
@@ -289,7 +289,7 @@ namespace Isis {
       adjustedSurfacePoint = adjusted;
     }
 
-    if (majorRad.Valid() && minorRad.Valid() && polarRad.Valid()) {
+    if (majorRad.isValid() && minorRad.isValid() && polarRad.isValid()) {
       aprioriSurfacePoint.SetRadii(majorRad, minorRad, polarRad);
       adjustedSurfacePoint.SetRadii(majorRad, minorRad, polarRad);
     }
@@ -465,7 +465,7 @@ namespace Isis {
    * number.  It is common to ensure that a measure exists before taking some
    * action.
    *
-   * @param sn The serial number of the measure to validate
+   * @param sn The serial number of the measure to Validate
    */
   void ControlPoint::ValidateMeasure(iString serialNumber) const {
     if (!measures->contains(serialNumber)) {
@@ -932,11 +932,11 @@ namespace Isis {
     }
     if (editLock)
       return PointLocked;
-    if (aprioriSP.GetLatSigma().Valid())
+    if (aprioriSP.GetLatSigma().isValid())
       constraintStatus.set(LatitudeConstrained);
-    if (aprioriSP.GetLonSigma().Valid())
+    if (aprioriSP.GetLonSigma().isValid())
       constraintStatus.set(LongitudeConstrained);
-    if (aprioriSP.GetLocalRadiusSigma().Valid())
+    if (aprioriSP.GetLocalRadiusSigma().isValid())
       constraintStatus.set(RadiusConstrained);
     PointModified();
     aprioriSurfacePoint = aprioriSP;
@@ -1204,9 +1204,9 @@ namespace Isis {
         // focal plane is doppler shift.  Line is calculated from time.  If
         // we hold time and the Spice, we'll get the same sample/line as
         // measured
-        double lat = GetAdjustedSurfacePoint().GetLatitude().GetDegrees();
-        double lon = GetAdjustedSurfacePoint().GetLongitude().GetDegrees();
-        double rad = GetAdjustedSurfacePoint().GetLocalRadius().GetMeters();
+        double lat = GetAdjustedSurfacePoint().GetLatitude().degrees();
+        double lon = GetAdjustedSurfacePoint().GetLongitude().degrees();
+        double rad = GetAdjustedSurfacePoint().GetLocalRadius().meters();
         if (!cam->SetUniversalGround(lat, lon, rad)) {
           std::string msg = "ControlPoint [" +
               GetId() + "], ControlMeasure [" +
@@ -1629,9 +1629,9 @@ namespace Isis {
   }
 
   bool ControlPoint::HasAprioriCoordinates() {
-    if (aprioriSurfacePoint.GetX().Valid() &&
-        aprioriSurfacePoint.GetY().Valid() &&
-        aprioriSurfacePoint.GetZ().Valid())
+    if (aprioriSurfacePoint.GetX().isValid() &&
+        aprioriSurfacePoint.GetY().isValid() &&
+        aprioriSurfacePoint.GetZ().isValid())
       return true;
 
     return false;
@@ -2233,9 +2233,9 @@ namespace Isis {
 
     if (GetAprioriSurfacePoint().Valid()) {
       SurfacePoint apriori = GetAprioriSurfacePoint();
-      fileEntry.set_apriorix(apriori.GetX().GetMeters());
-      fileEntry.set_aprioriy(apriori.GetY().GetMeters());
-      fileEntry.set_aprioriz(apriori.GetZ().GetMeters());
+      fileEntry.set_apriorix(apriori.GetX().meters());
+      fileEntry.set_aprioriy(apriori.GetY().meters());
+      fileEntry.set_aprioriz(apriori.GetZ().meters());
 
       symmetric_matrix< double, upper > covar = apriori.GetRectangularMatrix();
       if (covar(0, 0) != 0. || covar(0, 1) != 0. ||
@@ -2262,9 +2262,9 @@ namespace Isis {
 
     if (GetAdjustedSurfacePoint().Valid()) {
       SurfacePoint adjusted = GetAdjustedSurfacePoint();
-      fileEntry.set_adjustedx(adjusted.GetX().GetMeters());
-      fileEntry.set_adjustedy(adjusted.GetY().GetMeters());
-      fileEntry.set_adjustedz(adjusted.GetZ().GetMeters());
+      fileEntry.set_adjustedx(adjusted.GetX().meters());
+      fileEntry.set_adjustedy(adjusted.GetY().meters());
+      fileEntry.set_adjustedz(adjusted.GetZ().meters());
 
       symmetric_matrix< double, upper > covar = adjusted.GetRectangularMatrix();
       if (covar(0, 0) != 0. || covar(0, 1) != 0. ||

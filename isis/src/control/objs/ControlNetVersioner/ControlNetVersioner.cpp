@@ -510,9 +510,9 @@ namespace Isis {
             Longitude(cp["AprioriLongitude"][0], Angle::Degrees),
             Distance(cp["AprioriRadius"][0], Distance::Meters));
 
-        cp += PvlKeyword("AprioriX", apriori.GetX().GetMeters(), "meters");
-        cp += PvlKeyword("AprioriY", apriori.GetY().GetMeters(), "meters");
-        cp += PvlKeyword("AprioriZ", apriori.GetZ().GetMeters(), "meters");
+        cp += PvlKeyword("AprioriX", apriori.GetX().meters(), "meters");
+        cp += PvlKeyword("AprioriY", apriori.GetY().meters(), "meters");
+        cp += PvlKeyword("AprioriZ", apriori.GetZ().meters(), "meters");
       }
 
       if(cp.HasKeyword("Latitude")) {
@@ -521,14 +521,14 @@ namespace Isis {
             Longitude(cp["Longitude"][0], Angle::Degrees),
             Distance(cp["Radius"][0], Distance::Meters));
 
-        cp += PvlKeyword("AdjustedX", adjusted.GetX().GetMeters(), "meters");
-        cp += PvlKeyword("AdjustedY", adjusted.GetY().GetMeters(), "meters");
-        cp += PvlKeyword("AdjustedZ", adjusted.GetZ().GetMeters(), "meters");
+        cp += PvlKeyword("AdjustedX", adjusted.GetX().meters(), "meters");
+        cp += PvlKeyword("AdjustedY", adjusted.GetY().meters(), "meters");
+        cp += PvlKeyword("AdjustedZ", adjusted.GetZ().meters(), "meters");
 
         if(!cp.HasKeyword("AprioriLatitude")) {
-          cp += PvlKeyword("AprioriX", adjusted.GetX().GetMeters(), "meters");
-          cp += PvlKeyword("AprioriY", adjusted.GetY().GetMeters(), "meters");
-          cp += PvlKeyword("AprioriZ", adjusted.GetZ().GetMeters(), "meters");
+          cp += PvlKeyword("AprioriX", adjusted.GetX().meters(), "meters");
+          cp += PvlKeyword("AprioriY", adjusted.GetY().meters(), "meters");
+          cp += PvlKeyword("AprioriZ", adjusted.GetZ().meters(), "meters");
         }
       }
 

@@ -357,8 +357,8 @@ namespace Isis {
    * @param units the units the coordinates are in
    */
   void Projection::SetUpperLeftCorner(const Displacement &x, const Displacement &y) {
-    PvlKeyword xKeyword("UpperLeftCornerX", x.GetMeters(), "meters");
-    PvlKeyword yKeyword("UpperLeftCornerY", y.GetMeters(), "meters");
+    PvlKeyword xKeyword("UpperLeftCornerX", x.meters(), "meters");
+    PvlKeyword yKeyword("UpperLeftCornerY", y.meters(), "meters");
     p_mappingGrp.AddKeyword(xKeyword);
     p_mappingGrp.AddKeyword(yKeyword);
   }

@@ -620,7 +620,7 @@ void ExtractLatLonRange(ControlNet &outNet, QVector<iString> nonLatLonPoints,
         cube = NULL;
 
         bool notInRange = false;
-        bool validLatLonRadius = lat.Valid() && lon.Valid() && radius.Valid();
+        bool validLatLonRadius = lat.isValid() && lon.isValid() && radius.isValid();
         if(validLatLonRadius) {
           SurfacePoint sfpt(lat, lon, radius);
           notInRange = NotInLatLonRange(sfpt, minlat, maxlat, minlon, maxlon);
@@ -665,7 +665,7 @@ bool NotInLatLonRange(SurfacePoint surfacePtToTest, Latitude minlat,
 
   bool outRange = false;
   try {
-    outRange = !lat.IsInRange(minlat, maxlat) || !lon.IsInRange(minlon, maxlon);
+    outRange = !lat.inRange(minlat, maxlat) || !lon.inRange(minlon, maxlon);
   }
   catch (iException &e) {
     iString msg = "Cannot complete lat/lon range test with given filters";

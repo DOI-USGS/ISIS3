@@ -34,7 +34,7 @@ namespace Isis {
    *   to do any calculations.
    */
   Angle::Angle() {
-    p_radians = Null;
+    m_radians = Null;
   }
 
   /**
@@ -46,11 +46,11 @@ namespace Isis {
   Angle::Angle(double angle, Units unit) {
     switch (unit) {
       case Radians:
-        p_radians = angle;
+        m_radians = angle;
         break;
 
       case Degrees:
-        p_radians = angle * DEG2RAD;
+        m_radians = angle * DEG2RAD;
         break;
 
       default:
@@ -67,7 +67,7 @@ namespace Isis {
    * @param fromAngle The angle object to copy on initialization 
    */
   Angle::Angle(const Angle& fromAngle) {
-    p_radians = fromAngle.p_radians;
+    m_radians = fromAngle.m_radians;
   }
 
 
@@ -77,7 +77,7 @@ namespace Isis {
    */
   Angle::~Angle() {
     // Help prevent any accidental reuse of an Angle object
-    p_radians = Null;
+    m_radians = Null;
   }
 
 
@@ -87,8 +87,8 @@ namespace Isis {
    *
    * @returns True if we have a legitimate angle value, false if not initialized
    */
-  bool Angle::Valid() const {
-    return p_radians != Null;
+  bool Angle::isValid() const {
+    return m_radians != Null;
   }
 
 
@@ -100,10 +100,10 @@ namespace Isis {
    * @return sum angle 
    */
   Angle Angle::operator+(const Angle& angle2) const {
-    if(!Valid() || !angle2.Valid()) return Angle();
+    if(!isValid() || !angle2.isValid()) return Angle();
 
-    double ourAngle   = GetRadians();
-    double otherAngle = angle2.GetRadians();
+    double ourAngle   = radians();
+    double otherAngle = angle2.radians();
 
     return Angle(ourAngle + otherAngle, Radians);
   }
@@ -118,10 +118,10 @@ namespace Isis {
    * @return difference angle
    */
   Angle Angle::operator-(const Angle& angle2) const {
-    if(!Valid() || !angle2.Valid()) return Angle();
+    if(!isValid() || !angle2.isValid()) return Angle();
 
-    double ourAngle   = GetRadians();
-    double otherAngle = angle2.GetRadians();
+    double ourAngle   = radians();
+    double otherAngle = angle2.radians();
 
     return Angle(ourAngle - otherAngle, Radians);
   }
@@ -136,9 +136,9 @@ namespace Isis {
    * @return Multiplied angle
    */
   Angle Angle::operator*(double value) const {
-    if(!Valid()) return Angle();
+    if(!isValid()) return Angle();
 
-    return Angle(GetRadians() * value, Radians);
+    return Angle(radians() * value, Radians);
   }
 
 
@@ -163,9 +163,9 @@ namespace Isis {
     * @return Quotient of the angles 
     */
   Angle Angle::operator/(double value) const {
-    if(!Valid()) return Angle();
+    if(!isValid()) return Angle();
 
-    return Angle(GetRadians() / value, Radians);
+    return Angle(radians() / value, Radians);
   }
 
 
@@ -176,9 +176,9 @@ namespace Isis {
     * @return Quotient of the angles
     */
   double Angle::operator/(Angle value) const {
-    if(!Valid() || !value.Valid()) return Null;
+    if(!isValid() || !value.isValid()) return Null;
 
-    return GetRadians() / value.GetRadians();
+    return radians() / value.radians();
   }
 
 
@@ -190,12 +190,12 @@ namespace Isis {
    * @return True if the angle is less than the comparision angle 
    */
   bool Angle::operator<(const Angle& angle2) const {
-    if(!Valid() || !angle2.Valid()) {
+    if(!isValid() || !angle2.isValid()) {
       iString msg = "Cannot compare a invalid angles with the < operator";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     } 
 
-    return (GetAngle(Radians) < angle2.GetAngle(Radians));
+    return (angle(Radians) < angle2.angle(Radians));
   }
 
 
@@ -207,12 +207,32 @@ namespace Isis {
    * @return True if the angle is greater than the comparision angle 
    */
   bool Angle::operator>(const Angle& angle2) const {
-    if(!Valid() || !angle2.Valid()) {
+    if(!isValid() || !angle2.isValid()) {
       iString msg = "Cannot compare a invalid angles with the > operator";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     } 
 
-    return (GetAngle(Radians) > angle2.GetAngle(Radians));
+    return (angle(Radians) > angle2.angle(Radians));
+  }
+
+
+  /**
+   * Get the angle in human-readable form.
+   *
+   * @param printUnits Include the angle's units in the text.
+   * @return A user-displayable angle.
+   */
+  iString Angle::text(bool printUnits) const {
+    iString textResult = "(N/A)";
+      
+    if (isValid()) {
+      textResult = iString(degrees());
+
+      if (printUnits)
+        textResult += " degrees";
+    }
+
+    return textResult;
   }
 
 
@@ -225,7 +245,7 @@ namespace Isis {
    * @param unit Desired units of the Angle wrap constant (see Angle::Units)
    * @return  Wrap value in specified units
    */
-  double Angle::UnitWrapValue(const Units& unit) const {
+  double Angle::unitWrapValue(const Units& unit) const {
     switch (unit) {
       case Radians:
         return PI * 2.;
@@ -248,9 +268,9 @@ namespace Isis {
    * @param unit Desired units of the angle (see Angle::Units)
    * @return  angle value in specified units
    */
-  double Angle::GetAngle(const Units& unit) const {
+  double Angle::angle(const Units& unit) const {
     // Don't do math on special pixels
-    if(p_radians == Null) {
+    if(m_radians == Null) {
       return Null;
     }
 
@@ -258,11 +278,11 @@ namespace Isis {
 
     switch (unit) {
       case Radians:
-        angleValue = p_radians;
+        angleValue = m_radians;
         break;
 
       case Degrees:
-        angleValue = p_radians * RAD2DEG;
+        angleValue = m_radians * RAD2DEG;
         break;
     }
 
@@ -282,7 +302,7 @@ namespace Isis {
    * @param angle The angle value in units of the unit parameter 
    * @param unit  Desired units of the angle (see Angle::Units)
    */
-  void Angle::SetAngle(const double &angle,const Units& unit) {
+  void Angle::setAngle(const double &angle,const Units& unit) {
     // Don't allow non-Null special pixels, Null means no value
     if (IsSpecial(angle) && angle != Null) {
       iString msg = "Angle cannot be a non-Null special pixel";
@@ -291,17 +311,17 @@ namespace Isis {
 
     // Don't do math on special pixels
     if(angle == Null) {
-      p_radians = Null;
+      m_radians = Null;
       return;
     }
 
     switch (unit) {
       case Radians:
-        p_radians = angle;
+        m_radians = angle;
         break;
 
       case Degrees:
-        p_radians  =  angle * DEG2RAD;
+        m_radians = angle * DEG2RAD;
         break;
 
       default:

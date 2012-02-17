@@ -896,7 +896,7 @@ namespace Isis {
           if (p_editPoint->GetRefMeasure()->Camera()->SetGround(
               Latitude(lat, Angle::Degrees), Longitude(lon, Angle::Degrees))) {
             radius =
-              p_editPoint->GetRefMeasure()->Camera()->LocalRadius().GetMeters();
+              p_editPoint->GetRefMeasure()->Camera()->LocalRadius().meters();
               p_editPoint->SetAprioriRadiusSource(
                   ControlPoint::RadiusSource::None);
               //p_editPoint->SetAprioriRadiusSourceFile(p_radiusSourceFile);
@@ -917,7 +917,7 @@ namespace Isis {
         if (p_editPoint->GetRefMeasure()->Camera()->SetGround(
               Latitude(lat, Angle::Degrees), Longitude(lon, Angle::Degrees))) {
           radius =
-              p_editPoint->GetRefMeasure()->Camera()->LocalRadius().GetMeters();
+              p_editPoint->GetRefMeasure()->Camera()->LocalRadius().meters();
 //        cout.width(15);
 //        cout.precision(4);
 //        cout<<"Camera Radius = "<<fixed<<radius<<endl;
@@ -1690,7 +1690,7 @@ namespace Isis {
           QMessageBox::warning(p_qnetTool, "Warning", msg);
           if ((*fixedPoint)[0]->Camera()->SetGround(
                Latitude(lat, Angle::Degrees), Longitude(lon, Angle::Degrees))) {
-            radius = (*fixedPoint)[0]->Camera()->LocalRadius().GetMeters();
+            radius = (*fixedPoint)[0]->Camera()->LocalRadius().meters();
           }
           else {
             QString msg = "Error trying to get radius at this pt.  "
@@ -1708,7 +1708,7 @@ namespace Isis {
       else {
         if ((*fixedPoint)[0]->Camera()->SetGround(
              Latitude(lat, Angle::Degrees), Longitude(lon, Angle::Degrees))) {
-          radius = (*fixedPoint)[0]->Camera()->LocalRadius().GetMeters();
+          radius = (*fixedPoint)[0]->Camera()->LocalRadius().meters();
         }
         else {
           QString msg = "Error trying to get radius at this pt.  "
@@ -2002,8 +2002,8 @@ namespace Isis {
       double lon = 0.;
       if (p_editPoint->HasAprioriCoordinates()) {
         SurfacePoint sPt = p_editPoint->GetAprioriSurfacePoint();
-        lat = sPt.GetLatitude().GetDegrees();
-        lon = sPt.GetLongitude().GetDegrees();
+        lat = sPt.GetLatitude().degrees();
+        lon = sPt.GetLongitude().degrees();
       }
       else {
         ControlMeasure m = *(p_editPoint->GetRefMeasure());
@@ -2332,28 +2332,28 @@ namespace Isis {
     QString s;
   
     SurfacePoint aprioriPoint = p_editPoint->GetAprioriSurfacePoint();
-    if (aprioriPoint.GetLatitude().GetDegrees() == Null) {
+    if (aprioriPoint.GetLatitude().degrees() == Null) {
       s = "AprioriLatitude:  Null";
     }
     else {
       s = "Apriori Latitude:  " +
-          QString::number(aprioriPoint.GetLatitude().GetDegrees());
+          QString::number(aprioriPoint.GetLatitude().degrees());
     }
     p_pointAprioriLatitude->setText(s);
-    if (aprioriPoint.GetLongitude().GetDegrees() == Null) {
+    if (aprioriPoint.GetLongitude().degrees() == Null) {
       s = "Apriori Longitude:  Null";
     }
     else {
       s = "Apriori Longitude:  " +
-          QString::number(aprioriPoint.GetLongitude().GetDegrees());
+          QString::number(aprioriPoint.GetLongitude().degrees());
     }
     p_pointAprioriLongitude->setText(s);
-    if (aprioriPoint.GetLocalRadius().GetMeters() == Null) {
+    if (aprioriPoint.GetLocalRadius().meters() == Null) {
       s = "Apriori Radius:  Null";
     }
     else {
       s = "Apriori Radius:  " +
-          QString::number(aprioriPoint.GetLocalRadius().GetMeters(),'f',2) +
+          QString::number(aprioriPoint.GetLocalRadius().meters(),'f',2) +
           " <meters>";
     }
     p_pointAprioriRadius->setText(s);
@@ -2362,30 +2362,30 @@ namespace Isis {
       vector<Distance> targRadii = g_controlNetwork->GetTargetRadii();
       aprioriPoint.SetRadii(targRadii[0],targRadii[1],targRadii[2]);
 
-      if (aprioriPoint.GetLatSigmaDistance().GetMeters() == Null) {
+      if (aprioriPoint.GetLatSigmaDistance().meters() == Null) {
         s = "Apriori Latitude Sigma:  Null";
       }
       else {
         s = "Apriori Latitude Sigma:  " +
-            QString::number(aprioriPoint.GetLatSigmaDistance().GetMeters()) +
+            QString::number(aprioriPoint.GetLatSigmaDistance().meters()) +
             " <meters>";
       }
       p_pointAprioriLatitudeSigma->setText(s);
-      if (aprioriPoint.GetLonSigmaDistance().GetMeters() == Null) {
+      if (aprioriPoint.GetLonSigmaDistance().meters() == Null) {
         s = "Apriori Longitude Sigma:  Null";
       }
       else {
         s = "Apriori Longitude Sigma:  " +
-            QString::number(aprioriPoint.GetLonSigmaDistance().GetMeters()) +
+            QString::number(aprioriPoint.GetLonSigmaDistance().meters()) +
             " <meters>";
       }
       p_pointAprioriLongitudeSigma->setText(s);
-      if (aprioriPoint.GetLocalRadiusSigma().GetMeters() == Null) {
+      if (aprioriPoint.GetLocalRadiusSigma().meters() == Null) {
         s = "Apriori Radius Sigma:  Null";
       }
       else {
         s = "Apriori Radius Sigma:  " +
-            QString::number(aprioriPoint.GetLocalRadiusSigma().GetMeters()) +
+            QString::number(aprioriPoint.GetLocalRadiusSigma().meters()) +
             " <meters>";
       }
       p_pointAprioriRadiusSigma->setText(s);
@@ -2401,26 +2401,26 @@ namespace Isis {
       
           
     SurfacePoint point = p_editPoint->GetAdjustedSurfacePoint();
-    if (point.GetLatitude().GetDegrees() == Null) {
+    if (point.GetLatitude().degrees() == Null) {
       s = "Adjusted Latitude:  Null";
     }
     else {
-      s = "Adjusted Latitude:  " + QString::number(point.GetLatitude().GetDegrees());
+      s = "Adjusted Latitude:  " + QString::number(point.GetLatitude().degrees());
     }
     p_pointLatitude->setText(s);
-    if (point.GetLongitude().GetDegrees() == Null) {
+    if (point.GetLongitude().degrees() == Null) {
       s = "Adjusted Longitude:  Null";
     }
     else {
-      s = "Adjusted Longitude:  " + QString::number(point.GetLongitude().GetDegrees());
+      s = "Adjusted Longitude:  " + QString::number(point.GetLongitude().degrees());
     }
     p_pointLongitude->setText(s);
-    if (point.GetLocalRadius().GetMeters() == Null) {
+    if (point.GetLocalRadius().meters() == Null) {
       s = "Adjusted Radius:  Null";
     }
     else {
       s = "Adjusted Radius:  " +
-          QString::number(point.GetLocalRadius().GetMeters(),'f',2) + " <meters>";
+          QString::number(point.GetLocalRadius().meters(),'f',2) + " <meters>";
     }
     p_pointRadius->setText(s);
 
@@ -2705,8 +2705,8 @@ namespace Isis {
     Camera *cam;
 
     // If no apriori or adjusted lat/lon for this point, use lat/lon of first measure
-    double lat = p_editPoint->GetBestSurfacePoint().GetLatitude().GetDegrees();
-    double lon = p_editPoint->GetBestSurfacePoint().GetLongitude().GetDegrees();
+    double lat = p_editPoint->GetBestSurfacePoint().GetLatitude().degrees();
+    double lon = p_editPoint->GetBestSurfacePoint().GetLongitude().degrees();
     if (lat == Null || lon == Null) {
       ControlMeasure m = *(p_editPoint->GetRefMeasure());
       int camIndex = g_serialNumberList->SerialNumberIndex(m.GetCubeSerialNumber());

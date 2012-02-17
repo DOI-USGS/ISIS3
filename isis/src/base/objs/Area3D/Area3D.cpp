@@ -164,7 +164,7 @@ namespace Isis {
    */
   Distance Area3D::getWidth() const {
     return Distance(
-        (getEndX() - getStartX()).GetMeters(),
+        (getEndX() - getStartX()).meters(),
         Distance::Meters);
   }
 
@@ -174,7 +174,7 @@ namespace Isis {
    */
   Distance Area3D::getHeight() const {
     return Distance(
-        (getEndY() - getStartY()).GetMeters(),
+        (getEndY() - getStartY()).meters(),
         Distance::Meters);
   }
 
@@ -184,7 +184,7 @@ namespace Isis {
    */
   Distance Area3D::getDepth() const {
     return Distance(
-        (getEndZ() - getStartZ()).GetMeters(),
+        (getEndZ() - getStartZ()).meters(),
         Distance::Meters);
   }
 
@@ -584,12 +584,12 @@ namespace Isis {
       const Displacement &startY, const Displacement &startZ,
       const Displacement &endX, const Displacement &endY,
       const Displacement &endZ) {
-    bool startXValid = startX.Valid();
-    bool endXValid = endX.Valid();
-    bool startYValid = startY.Valid();
-    bool endYValid = endY.Valid();
-    bool startZValid = startZ.Valid();
-    bool endZValid = endZ.Valid();
+    bool startXValid = startX.isValid();
+    bool endXValid = endX.isValid();
+    bool startYValid = startY.isValid();
+    bool endYValid = endY.isValid();
+    bool startZValid = startZ.isValid();
+    bool endZValid = endZ.isValid();
 
     deleteTheData();
 
@@ -606,22 +606,22 @@ namespace Isis {
     else {
       if(startXValid && endXValid && startX > endX) {
         iString msg = "Cannot have a 3D area with inverted X coordinates of ["
-            + iString(startX.GetMeters()) + " meters] to ["
-            + iString(endX.GetMeters()) + " meters]";
+            + iString(startX.meters()) + " meters] to ["
+            + iString(endX.meters()) + " meters]";
         throw iException::Message(iException::Programmer, msg, _FILEINFO_);
       }
 
       if(startYValid && endYValid && startY > endY) {
         iString msg = "Cannot have a 3D area with inverted Y coordinates of ["
-            + iString(startY.GetMeters()) + " meters] to ["
-            + iString(endY.GetMeters()) + " meters]";
+            + iString(startY.meters()) + " meters] to ["
+            + iString(endY.meters()) + " meters]";
         throw iException::Message(iException::Programmer, msg, _FILEINFO_);
       }
 
       if(startZValid && endZValid && startZ > endZ) {
         iString msg = "Cannot have a 3D area with inverted Z coordinates of ["
-            + iString(startZ.GetMeters()) + " meters] to ["
-            + iString(endZ.GetMeters()) + " meters]";
+            + iString(startZ.meters()) + " meters] to ["
+            + iString(endZ.meters()) + " meters]";
         throw iException::Message(iException::Programmer, msg, _FILEINFO_);
       }
 

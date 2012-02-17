@@ -51,7 +51,7 @@ namespace Isis {
   bool LineScanCameraGroundMap::SetGround(const Latitude &lat,
       const Longitude &lon) {
     Distance radius(p_camera->LocalRadius(lat, lon));
-    if (radius.Valid()) {
+    if (radius.isValid()) {
       return SetGround(SurfacePoint(lat, lon, radius));
     } else {
       return false;
@@ -143,8 +143,8 @@ namespace Isis {
       lineRate = ((LineScanCameraDetectorMap *)p_camera->DetectorMap())->LineRate();
     }
 
-    const double &givenLat = surfacePoint.GetLatitude().GetDegrees();
-    const double &givenLon = surfacePoint.GetLongitude().GetDegrees();
+    const double &givenLat = surfacePoint.GetLatitude().degrees();
+    const double &givenLon = surfacePoint.GetLongitude().degrees();
 
     bool bounded = false;
     while(!bounded) {

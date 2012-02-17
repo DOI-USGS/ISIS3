@@ -1601,9 +1601,9 @@ void photomet(Buffer &in, Buffer &out) {
           Angle phase, incidence, emission;
           cam->LocalPhotometricAngles(phase, incidence, emission, success);
           if (success) {
-            dempha = phase.GetDegrees();
-            deminc = incidence.GetDegrees();
-            demema = emission.GetDegrees();
+            dempha = phase.degrees();
+            deminc = incidence.degrees();
+            demema = emission.degrees();
           }
         } else if (angleSource == "ELLIPSOID") {
           dempha = ellipsoidpha;

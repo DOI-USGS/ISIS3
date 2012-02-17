@@ -74,7 +74,7 @@ int main() {
 
   cout << endl << "Camera* from: " << inputFile << endl;
   cout << "Line: " << line << ", Sample: " << sample << endl;
-  cout << "Lat: " << lat.GetDegrees() << ", Lon: " << lon.GetDegrees() << endl;
+  cout << "Lat: " << lat.degrees() << ", Lon: " << lon.degrees() << endl;
   cout << "RightAscension: " << ra << ", Declination: " << dec << endl << endl;
 
   cout << "SetImage (sample, line): " << c->SetImage(sample, line)
@@ -167,15 +167,15 @@ int main() {
   c->IgnoreProjection(false);
 
   cout << endl << "Testing SetUniversalGround(lat,lon,radius)..." << endl;
-  lat.SetDegrees(18.221);
-  lon.SetDegrees(226.671);
+  lat.setDegrees(18.221);
+  lon.setDegrees(226.671);
   double radius = 3414033.72108798;
-  c->SetUniversalGround(lat.GetDegrees(), lon.GetDegrees(), radius);
+  c->SetUniversalGround(lat.degrees(), lon.degrees(), radius);
   c->SetGround(SurfacePoint(lat, lon, Distance(radius, Distance::Meters)));
   cout << "Has intersection " << c->HasSurfaceIntersection() << endl;
   cout << "Latitude = " << c->UniversalLatitude() << endl;
   cout << "Longitude = " << c->UniversalLongitude() << endl;
-  cout << "Radius = " << c->LocalRadius().GetMeters() << endl;
+  cout << "Radius = " << c->LocalRadius().meters() << endl;
   double p[3];
   c->Coordinate(p);
   cout << "Point = " << setprecision(4)
@@ -190,13 +190,13 @@ int main() {
   cout << "SetImage (sample, line): " << c->SetImage(sample, line) << endl;
   cout << "Latitude = " << c->UniversalLatitude() << endl;
   cout << "Longitude = " << c->UniversalLongitude() << endl;
-  cout << "Radius = " << c->LocalRadius().GetMeters() << endl;
+  cout << "Radius = " << c->LocalRadius().meters() << endl;
   c->Coordinate(p);
   cout << "Point = " << setprecision(4)
        << p[0] << " " << p[1] << " " << p[2] << endl;
   cout << "SetUniversalGround (lat, lon, radius): "
        << c->SetUniversalGround(c->UniversalLatitude(), c->UniversalLongitude(),
-                                c->LocalRadius().GetMeters())
+                                c->LocalRadius().meters())
        << endl;
   cout << "Sample = " << c->Sample() << endl;
   cout << "Line = " << c->Line() << endl << endl;
@@ -253,7 +253,7 @@ int main() {
   cout << "SetImage (sample, line): " << cam2->SetImage(sample, line) << endl;
   cout << "Latitude = " << cam2->UniversalLatitude() << endl;
   cout << "Longitude = " << cam2->UniversalLongitude() << endl;
-  cout << "Radius = " << cam2->LocalRadius().GetMeters() << endl;
+  cout << "Radius = " << cam2->LocalRadius().meters() << endl;
   cam2->Coordinate(p);
   cout << "Point = " << p[0] << " " << p[1] << " " << p[2] << endl;
   cout << "SetUniversalGround (cam2->UniversalLatitude(), "
@@ -291,9 +291,9 @@ int main() {
   bool success;
   cam3->LocalPhotometricAngles(phase,emission,incidence,success);
   if (success) {
-    cout << "Phase = " << phase.GetDegrees() << endl;
-    cout << "Emission = " << emission.GetDegrees() << endl;
-    cout << "Incidence = " << incidence.GetDegrees() << endl;
+    cout << "Phase = " << phase.degrees() << endl;
+    cout << "Emission = " << emission.degrees() << endl;
+    cout << "Incidence = " << incidence.degrees() << endl;
   } else {
     cout << "Angles could not be calculated." << endl;
   }
@@ -316,9 +316,9 @@ int main() {
   cout << "Normal = " << normal[0] << ", " << normal[1] << ", " << normal[2] << endl;
   cam4->LocalPhotometricAngles(phase,emission,incidence,success);
   if (success) {
-    cout << "Phase = " << phase.GetDegrees() << endl;
-    cout << "Emission = " << emission.GetDegrees() << endl;
-    cout << "Incidence = " << incidence.GetDegrees() << endl;
+    cout << "Phase = " << phase.degrees() << endl;
+    cout << "Emission = " << emission.degrees() << endl;
+    cout << "Incidence = " << incidence.degrees() << endl;
   } else {
     cout << "Angles could not be calculated." << endl;
   }
@@ -341,9 +341,9 @@ int main() {
   cout << "Normal = " << normal[0] << ", " << normal[1] << ", " << normal[2] << endl;
   cam5->LocalPhotometricAngles(phase,emission,incidence,success);
   if (success) {
-    cout << "Phase = " << phase.GetDegrees() << endl;
-    cout << "Emission = " << emission.GetDegrees() << endl;
-    cout << "Incidence = " << incidence.GetDegrees() << endl;
+    cout << "Phase = " << phase.degrees() << endl;
+    cout << "Emission = " << emission.degrees() << endl;
+    cout << "Incidence = " << incidence.degrees() << endl;
   } else {
     cout << "Angles could not be calculated." << endl;
   }
@@ -366,9 +366,9 @@ int main() {
   cout << "Normal = " << normal[0] << ", " << normal[1] << ", " << normal[2] << endl;
   cam6->LocalPhotometricAngles(phase,emission,incidence,success);
   if (success) {
-    cout << "Phase = " << phase.GetDegrees() << endl;
-    cout << "Emission = " << emission.GetDegrees() << endl;
-    cout << "Incidence = " << incidence.GetDegrees() << endl;
+    cout << "Phase = " << phase.degrees() << endl;
+    cout << "Emission = " << emission.degrees() << endl;
+    cout << "Incidence = " << incidence.degrees() << endl;
   } else {
     cout << "Angles could not be calculated." << endl;
   }
@@ -391,9 +391,9 @@ int main() {
   cout << "Normal = " << normal[0] << ", " << normal[1] << ", " << normal[2] << endl;
   cam7->LocalPhotometricAngles(phase,emission,incidence,success);
   if (success) {
-    cout << "Phase = " << phase.GetDegrees() << endl;
-    cout << "Emission = " << emission.GetDegrees() << endl;
-    cout << "Incidence = " << incidence.GetDegrees() << endl;
+    cout << "Phase = " << phase.degrees() << endl;
+    cout << "Emission = " << emission.degrees() << endl;
+    cout << "Incidence = " << incidence.degrees() << endl;
   } else {
     cout << "Angles could not be calculated." << endl;
   }
@@ -416,9 +416,9 @@ int main() {
   cout << "Normal = " << normal[0] << ", " << normal[1] << ", " << normal[2] << endl;
   cam8->LocalPhotometricAngles(phase,emission,incidence,success);
   if (success) {
-    cout << "Phase = " << phase.GetDegrees() << endl;
-    cout << "Emission = " << emission.GetDegrees() << endl;
-    cout << "Incidence = " << incidence.GetDegrees() << endl;
+    cout << "Phase = " << phase.degrees() << endl;
+    cout << "Emission = " << emission.degrees() << endl;
+    cout << "Incidence = " << incidence.degrees() << endl;
   } else {
     cout << "Angles could not be calculated." << endl;
   }
@@ -441,9 +441,9 @@ int main() {
   cout << "Normal = " << normal[0] << ", " << normal[1] << ", " << normal[2] << endl;
   cam9->LocalPhotometricAngles(phase,emission,incidence,success);
   if (success) {
-    cout << "Phase = " << phase.GetDegrees() << endl;
-    cout << "Emission = " << emission.GetDegrees() << endl;
-    cout << "Incidence = " << incidence.GetDegrees() << endl;
+    cout << "Phase = " << phase.degrees() << endl;
+    cout << "Emission = " << emission.degrees() << endl;
+    cout << "Incidence = " << incidence.degrees() << endl;
   } else {
     cout << "Angles could not be calculated." << endl;
   }
@@ -466,9 +466,9 @@ int main() {
   cout << "Normal = " << normal[0] << ", " << normal[1] << ", " << normal[2] << endl;
   cam10->LocalPhotometricAngles(phase,emission,incidence,success);
   if (success) {
-    cout << "Phase = " << phase.GetDegrees() << endl;
-    cout << "Emission = " << emission.GetDegrees() << endl;
-    cout << "Incidence = " << incidence.GetDegrees() << endl;
+    cout << "Phase = " << phase.degrees() << endl;
+    cout << "Emission = " << emission.degrees() << endl;
+    cout << "Incidence = " << incidence.degrees() << endl;
   } else {
     cout << "Angles could not be calculated." << endl;
   }
@@ -491,9 +491,9 @@ int main() {
   cout << "Normal = " << normal[0] << ", " << normal[1] << ", " << normal[2] << endl;
   cam11->LocalPhotometricAngles(phase,emission,incidence,success);
   if (success) {
-    cout << "Phase = " << phase.GetDegrees() << endl;
-    cout << "Emission = " << emission.GetDegrees() << endl;
-    cout << "Incidence = " << incidence.GetDegrees() << endl;
+    cout << "Phase = " << phase.degrees() << endl;
+    cout << "Emission = " << emission.degrees() << endl;
+    cout << "Incidence = " << incidence.degrees() << endl;
   } else {
     cout << "Angles could not be calculated." << endl;
   }
@@ -516,9 +516,9 @@ int main() {
   cout << "Normal = " << normal[0] << ", " << normal[1] << ", " << normal[2] << endl;
   cam12->LocalPhotometricAngles(phase,emission,incidence,success);
   if (success) {
-    cout << "Phase = " << phase.GetDegrees() << endl;
-    cout << "Emission = " << emission.GetDegrees() << endl;
-    cout << "Incidence = " << incidence.GetDegrees() << endl;
+    cout << "Phase = " << phase.degrees() << endl;
+    cout << "Emission = " << emission.degrees() << endl;
+    cout << "Incidence = " << incidence.degrees() << endl;
   } else {
     cout << "Angles could not be calculated." << endl;
   }

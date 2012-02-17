@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
   try {
     cout << "Default constructor" << endl;
     Latitude lat;
-    cout << lat.GetDegrees() << " degrees" << endl;
+    cout << lat.degrees() << " degrees" << endl;
   }
   catch(iException &e) {
     e.Report(false);
@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
   try {
     cout << "Constructor given a value in degrees" << endl;
     Latitude lat(45.0, Angle::Degrees);
-    cout << lat.GetDegrees() << " degrees" << endl;
+    cout << lat.degrees() << " degrees" << endl;
   }
   catch(iException &e) {
     e.Report(false);
@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
                  Distance(1500, Distance::Meters),
                  Latitude::Planetographic,
                  Angle::Degrees);
-    cout << lat.GetDegrees() << " degrees" << endl;
+    cout << lat.degrees() << " degrees" << endl;
   }
   catch(iException &e) {
     e.Report(false);
@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
     Latitude lat(45.0, Distance(1500, Distance::Meters),
                  Distance(2500, Distance::Meters), Latitude::Planetographic,
                  Angle::Degrees);
-    cout << lat.GetDegrees() << " degrees" << endl;
+    cout << lat.degrees() << " degrees" << endl;
   }
   catch(iException &e) {
     e.Report(false);
@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
     Latitude lat(95.0, Distance(1500, Distance::Meters),
                  Distance(2500, Distance::Meters), Latitude::Planetographic,
                  Angle::Degrees, Latitude::AllowPastPole);
-    cout << lat.GetDegrees() << " degrees" << endl;
+    cout << lat.degrees() << " degrees" << endl;
   }
   catch(iException &e) {
     e.Report(false);
@@ -82,7 +82,7 @@ int main(int argc, char *argv[]) {
     Latitude lat(95.0, Distance(1500, Distance::Meters),
                  Distance(2500, Distance::Meters), Latitude::Planetocentric,
                  Angle::Degrees, Latitude::AllowPastPole);
-    cout << lat.GetDegrees() << " degrees" << endl;
+    cout << lat.degrees() << " degrees" << endl;
   }
   catch(iException &e) {
     e.Report(false);
@@ -93,7 +93,7 @@ int main(int argc, char *argv[]) {
     Latitude lat(95.0, Distance(1500, Distance::Meters),
                  Distance(2500, Distance::Meters), Latitude::Planetographic,
                  Angle::Degrees);
-    cout << lat.GetDegrees() << " degrees" << endl;
+    cout << lat.degrees() << " degrees" << endl;
   }
   catch(iException &e) {
     e.Report(false);
@@ -104,8 +104,8 @@ int main(int argc, char *argv[]) {
     Latitude lat(95.0, Distance(1500, Distance::Meters),
         Distance(2500, Distance::Meters), Latitude::Planetocentric,
         Angle::Degrees, Latitude::AllowPastPole);
-    cout << lat.GetDegrees() << " degrees == ";
-    cout << Latitude(lat).GetDegrees() << " degrees" << endl;
+    cout << lat.degrees() << " degrees == ";
+    cout << Latitude(lat).degrees() << " degrees" << endl;
   }
   catch(iException &e) {
     e.Report(false);
@@ -116,14 +116,14 @@ int main(int argc, char *argv[]) {
   try {
     cout << "Set to 45 degrees" << endl;
     Latitude lat(0.0, Angle::Degrees);
-    lat.SetPlanetocentric(45, Angle::Degrees);
-    cout << lat.GetDegrees() << " degrees" << endl;
-    cout << lat.GetRadians() / PI << "*pi radians universal"
+    lat.setPlanetocentric(45, Angle::Degrees);
+    cout << lat.degrees() << " degrees" << endl;
+    cout << lat.radians() / PI << "*pi radians universal"
         << endl;
 
     Latitude lat2(0.0, Angle::Degrees);
     lat2 = lat;
-    cout << lat.GetDegrees() << " degrees after assignment" << endl;
+    cout << lat.degrees() << " degrees after assignment" << endl;
   }
   catch(iException &e) {
     e.Report(false);
@@ -132,8 +132,8 @@ int main(int argc, char *argv[]) {
   try {
     cout << "Set to 25 degrees Planetographic" << endl;
     Latitude lat(0.0, Angle::Degrees);
-    lat.SetPlanetographic(25, Angle::Degrees);
-    cout << lat.GetDegrees() << " degrees" << endl;
+    lat.planetographic(25, Angle::Degrees);
+    cout << lat.degrees() << " degrees" << endl;
   }
   catch(iException &e) {
     e.Report(false);
@@ -143,8 +143,8 @@ int main(int argc, char *argv[]) {
     cout << "Set to 25 degrees Planetographic with radii" << endl;
     Latitude lat(0.0, Distance(1400, Distance::Meters),
                  Distance(1500, Distance::Meters));
-    lat.SetPlanetographic(25, Angle::Degrees);
-    cout << lat.GetDegrees() << " degrees" << endl;
+    lat.planetographic(25, Angle::Degrees);
+    cout << lat.degrees() << " degrees" << endl;
   }
   catch(iException &e) {
     e.Report(false);
@@ -157,10 +157,10 @@ int main(int argc, char *argv[]) {
     Latitude lat(-15, Distance(1, Distance::Meters),
                  Distance(1.1, Distance::Meters), Latitude::Planetocentric,
                  Angle::Degrees);
-    cout << lat.GetDegrees() << " degrees universal" << endl;
-    cout << lat.GetPlanetocentric(Angle::Degrees) << " degrees Planetocentric"
+    cout << lat.degrees() << " degrees universal" << endl;
+    cout << lat.planetocentric(Angle::Degrees) << " degrees Planetocentric"
          << endl;
-    cout << lat.GetPlanetographic(Angle::Degrees) << " degrees GetPlanetographic"
+    cout << lat.planetographic(Angle::Degrees) << " degrees planetographic"
          << endl;
   }
   catch(iException &e) {

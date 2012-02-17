@@ -33,10 +33,10 @@ namespace Isis {
    * Create a blank Latitude object without Planetographic support.
    */
   Latitude::Latitude() : Angle() {
-    p_equatorialRadius = NULL;
-    p_polarRadius = NULL;
+    m_equatorialRadius = NULL;
+    m_polarRadius = NULL;
 
-    p_errors = ThrowAllErrors;
+    m_errors = ThrowAllErrors;
   }
 
 
@@ -52,12 +52,12 @@ namespace Isis {
    */
   Latitude::Latitude(double latitude, Angle::Units latitudeUnits,
                      ErrorChecking errors) : Angle() {
-    p_equatorialRadius = NULL;
-    p_polarRadius = NULL;
+    m_equatorialRadius = NULL;
+    m_polarRadius = NULL;
 
-    p_errors = errors;
+    m_errors = errors;
 
-    SetPlanetocentric(latitude, latitudeUnits);
+    setPlanetocentric(latitude, latitudeUnits);
   }
 
 
@@ -69,12 +69,12 @@ namespace Isis {
    * @param errors Error checking conditions
    */
   Latitude::Latitude(Angle latitude, ErrorChecking errors) : Angle() {
-    p_equatorialRadius = NULL;
-    p_polarRadius = NULL;
+    m_equatorialRadius = NULL;
+    m_polarRadius = NULL;
 
-    p_errors = errors;
+    m_errors = errors;
 
-    SetPlanetocentric(latitude.GetRadians(), Radians);
+    setPlanetocentric(latitude.radians(), Radians);
   }
 
 
@@ -92,21 +92,21 @@ namespace Isis {
    */
   Latitude::Latitude(Angle latitude, PvlGroup mapping,
             ErrorChecking errors) : Angle(latitude) {
-    p_equatorialRadius = NULL;
-    p_polarRadius = NULL;
+    m_equatorialRadius = NULL;
+    m_polarRadius = NULL;
 
-    p_equatorialRadius = new Distance(mapping["EquatorialRadius"][0],
+    m_equatorialRadius = new Distance(mapping["EquatorialRadius"][0],
         Distance::Meters);
-    p_polarRadius = new Distance(mapping["PolarRadius"][0],
+    m_polarRadius = new Distance(mapping["PolarRadius"][0],
         Distance::Meters);
 
-    p_errors = errors;
+    m_errors = errors;
 
     if(mapping["LatitudeType"][0] == "Planetographic") {
-      SetPlanetographic(latitude.GetRadians(), Radians);
+      planetographic(latitude.radians(), Radians);
     }
     else if(mapping["LatitudeType"][0] == "Planetocentric") {
-      SetPlanetocentric(latitude.GetRadians(), Radians);
+      setPlanetocentric(latitude.radians(), Radians);
     }
     else {
       iString msg = "Latitude type [" + iString(mapping["LatitudeType"][0]) +
@@ -132,21 +132,21 @@ namespace Isis {
             PvlGroup mapping,
             Angle::Units latitudeUnits,
             ErrorChecking errors) : Angle(latitude, latitudeUnits) {
-    p_equatorialRadius = NULL;
-    p_polarRadius = NULL;
+    m_equatorialRadius = NULL;
+    m_polarRadius = NULL;
 
-    p_equatorialRadius = new Distance(mapping["EquatorialRadius"][0],
+    m_equatorialRadius = new Distance(mapping["EquatorialRadius"][0],
         Distance::Meters);
-    p_polarRadius = new Distance(mapping["PolarRadius"][0],
+    m_polarRadius = new Distance(mapping["PolarRadius"][0],
         Distance::Meters);
 
-    p_errors = errors;
+    m_errors = errors;
 
     if(mapping["LatitudeType"][0] == "Planetographic") {
-      SetPlanetographic(latitude, latitudeUnits);
+      planetographic(latitude, latitudeUnits);
     }
     else if(mapping["LatitudeType"][0] == "Planetocentric") {
-      SetPlanetocentric(latitude, latitudeUnits);
+      setPlanetocentric(latitude, latitudeUnits);
     }
     else {
       iString msg = "Latitude type [" + iString(mapping["LatitudeType"][0]) +
@@ -174,19 +174,19 @@ namespace Isis {
                      CoordinateType latType,
                      Angle::Units latitudeUnits,
                      ErrorChecking errors) : Angle(latitude, latitudeUnits) {
-    p_equatorialRadius = NULL;
-    p_polarRadius = NULL;
+    m_equatorialRadius = NULL;
+    m_polarRadius = NULL;
 
-    p_equatorialRadius = new Distance(equatorialRadius);
-    p_polarRadius = new Distance(polarRadius);
+    m_equatorialRadius = new Distance(equatorialRadius);
+    m_polarRadius = new Distance(polarRadius);
 
-    p_errors = errors;
+    m_errors = errors;
 
     if (latType == Planetocentric) {
-      SetPlanetocentric(latitude, latitudeUnits);
+      setPlanetocentric(latitude, latitudeUnits);
     }
     else if (latType == Planetographic) {
-      SetPlanetographic(latitude, latitudeUnits);
+      planetographic(latitude, latitudeUnits);
     }
     else {
       iString msg = "Enumeration value [" + iString(latType) + "] is not a "
@@ -202,17 +202,17 @@ namespace Isis {
    * @param latitudeToCopy The latitude we're duplicating
    */
   Latitude::Latitude(const Latitude &latitudeToCopy) : Angle(latitudeToCopy) {
-    p_equatorialRadius = NULL;
-    p_polarRadius = NULL;
+    m_equatorialRadius = NULL;
+    m_polarRadius = NULL;
 
-    p_errors = latitudeToCopy.p_errors;
+    m_errors = latitudeToCopy.m_errors;
 
-    if(latitudeToCopy.p_equatorialRadius) {
-      p_equatorialRadius = new Distance(*latitudeToCopy.p_equatorialRadius);
+    if(latitudeToCopy.m_equatorialRadius) {
+      m_equatorialRadius = new Distance(*latitudeToCopy.m_equatorialRadius);
     }
 
-    if(latitudeToCopy.p_polarRadius) {
-      p_polarRadius = new Distance(*latitudeToCopy.p_polarRadius);
+    if(latitudeToCopy.m_polarRadius) {
+      m_polarRadius = new Distance(*latitudeToCopy.m_polarRadius);
     }
   }
 
@@ -221,14 +221,14 @@ namespace Isis {
    * This cleans up the Latitude class.
    */
   Latitude::~Latitude() {
-    if (p_equatorialRadius) {
-      delete p_equatorialRadius;
-      p_equatorialRadius = NULL;
+    if (m_equatorialRadius) {
+      delete m_equatorialRadius;
+      m_equatorialRadius = NULL;
     }
 
-    if (p_polarRadius) {
-      delete p_polarRadius;
-      p_polarRadius = NULL;
+    if (m_polarRadius) {
+      delete m_polarRadius;
+      m_polarRadius = NULL;
     }
   }
 
@@ -240,8 +240,8 @@ namespace Isis {
    * @param units The angular units to get the latitude in
    * @return The Planetocentric latitude value
    */
-  double Latitude::GetPlanetocentric(Angle::Units units) const {
-    return GetAngle(units);
+  double Latitude::planetocentric(Angle::Units units) const {
+    return angle(units);
   }
 
 
@@ -251,8 +251,8 @@ namespace Isis {
    * @param latitude The planetographic latitude to set ourselves to
    * @param units The angular units latitude is in
    */
-  void Latitude::SetPlanetocentric(double latitude, Angle::Units units) {
-    SetAngle(latitude, units);
+  void Latitude::setPlanetocentric(double latitude, Angle::Units units) {
+    setAngle(latitude, units);
   }
 
 
@@ -265,9 +265,9 @@ namespace Isis {
    * @param units The angular units to get the latitude in
    * @return The Planetographic latitude value
    */
-  double Latitude::GetPlanetographic(Angle::Units units) const {
-    if (p_equatorialRadius == NULL || p_polarRadius == NULL) {
-      iString msg = "Latitude [" + iString(GetDegrees()) + " degrees] cannot "
+  double Latitude::planetographic(Angle::Units units) const {
+    if (m_equatorialRadius == NULL || m_polarRadius == NULL) {
+      iString msg = "Latitude [" + iString(degrees()) + " degrees] cannot "
           "be converted to Planetographic without the planetary radii, please "
           "use the other Latitude constructor";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
@@ -280,19 +280,19 @@ namespace Isis {
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
-    if(!Valid()) {
+    if(!isValid()) {
       iString msg = "Invalid planetographic latitudes are not currently "
           "supported";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
-    double ographicLatitude = atan(tan(GetRadians()) * 
-        (*p_equatorialRadius / *p_polarRadius) *
-        (*p_equatorialRadius / *p_polarRadius));
+    double ographicLatitude = atan(tan(radians()) * 
+        (*m_equatorialRadius / *m_polarRadius) *
+        (*m_equatorialRadius / *m_polarRadius));
 
     // This theoretically should just be an angle, but make it a Latitude so
-    //   we can access GetAngle
-    return Latitude(ographicLatitude, Angle::Radians).GetAngle(units);
+    //   we can access angle
+    return Latitude(ographicLatitude, Angle::Radians).angle(units);
   }
 
 
@@ -302,8 +302,8 @@ namespace Isis {
    * @param latitude The planetographic latitude to set ourselves to
    * @param units The angular units latitude is in
    */
-  void Latitude::SetPlanetographic(double latitude, Angle::Units units) {
-    if (p_equatorialRadius == NULL || p_polarRadius == NULL) {
+  void Latitude::planetographic(double latitude, Angle::Units units) {
+    if (m_equatorialRadius == NULL || m_polarRadius == NULL) {
       iString msg = "Latitude [" + iString(latitude) + "] cannot be "
           "converted to Planetocentic without the planetary radii, please use "
           "the other Latitude constructor";
@@ -325,11 +325,11 @@ namespace Isis {
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
-    double ocentricLatitude = atan(tan(inputAngle.GetRadians()) *
-        (*p_polarRadius / *p_equatorialRadius) *
-        (*p_polarRadius / *p_equatorialRadius));
+    double ocentricLatitude = atan(tan(inputAngle.radians()) *
+        (*m_polarRadius / *m_equatorialRadius) *
+        (*m_polarRadius / *m_equatorialRadius));
 
-    SetAngle(ocentricLatitude, Angle::Radians);
+    setAngle(ocentricLatitude, Angle::Radians);
   }
 
 
@@ -344,12 +344,12 @@ namespace Isis {
    *
    * @return Whether the latitude is in the given range
    */
-  bool Latitude::IsInRange(Latitude min, Latitude max) const {
+  bool Latitude::inRange(Latitude min, Latitude max) const {
     // Validity check on the range
     if (min > max) {
-      iString msg = "Minimum latitude [" + iString(min.GetDegrees()) +
+      iString msg = "Minimum latitude [" + iString(min.degrees()) +
         "] degrees is greater than maximum latitude [" +
-        iString(max.GetDegrees()) + "] degrees";
+        iString(max.degrees()) + "] degrees";
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
@@ -373,20 +373,20 @@ namespace Isis {
   Latitude& Latitude::operator=(const Latitude & latitudeToCopy) {
     if(this == &latitudeToCopy) return *this;
 
-    p_equatorialRadius = NULL;
-    p_polarRadius = NULL;
+    m_equatorialRadius = NULL;
+    m_polarRadius = NULL;
 
-    p_errors = latitudeToCopy.p_errors;
+    m_errors = latitudeToCopy.m_errors;
 
-    if(latitudeToCopy.p_equatorialRadius) {
-      p_equatorialRadius = new Distance(*latitudeToCopy.p_equatorialRadius);
+    if(latitudeToCopy.m_equatorialRadius) {
+      m_equatorialRadius = new Distance(*latitudeToCopy.m_equatorialRadius);
     }
 
-    if(latitudeToCopy.p_polarRadius) {
-      p_polarRadius = new Distance(*latitudeToCopy.p_polarRadius);
+    if(latitudeToCopy.m_polarRadius) {
+      m_polarRadius = new Distance(*latitudeToCopy.m_polarRadius);
     }
 
-    SetPlanetocentric(latitudeToCopy.GetPlanetocentric());
+    setPlanetocentric(latitudeToCopy.planetocentric());
 
     return *this;
   }
@@ -398,18 +398,18 @@ namespace Isis {
    * @param angle The numeric value of the angle
    * @param units The units angle is in (radians or degrees typically)
    */
-  void Latitude::SetAngle(double angle, const Angle::Units &units) { 
+  void Latitude::setAngle(double angle, const Angle::Units &units) { 
     // Check for passing 90 degrees if that error checking is on
-    if (!IsSpecial(angle) && (p_errors | AllowPastPole) != AllowPastPole) {
+    if (!IsSpecial(angle) && (m_errors | AllowPastPole) != AllowPastPole) {
       Angle tmpAngle(angle, units);
       if(tmpAngle > Angle(90, Angle::Degrees) ||
          tmpAngle < Angle(-90, Angle::Degrees)) {
         iString msg = "Latitudes past 90 degrees are not valid. The latitude "
-            "[" + iString(tmpAngle.GetDegrees()) + " degrees] is not allowed";
+            "[" + iString(tmpAngle.degrees()) + " degrees] is not allowed";
         throw iException::Message(iException::Programmer, msg, _FILEINFO_);
       }
     }
 
-    Angle::SetAngle(angle, units);
+    Angle::setAngle(angle, units);
   }
 }

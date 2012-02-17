@@ -79,9 +79,9 @@ void IsisMain() {
     Table table(shp_name,record);
  
     record[0] = Distance(inCubeStats.Minimum(),
-                         Distance::Meters).GetKilometers();
+                         Distance::Meters).kilometers();
     record[1] = Distance(inCubeStats.Maximum(),
-                         Distance::Meters).GetKilometers();
+                         Distance::Meters).kilometers();
     table += record;
 
     ocube->write(table);
@@ -276,9 +276,9 @@ void IsisMain() {
   Table table(shp_name,record);
 
   record[0] = Distance(outCubeStats.Minimum(),
-                       Distance::Meters).GetKilometers();
+                       Distance::Meters).kilometers();
   record[1] = Distance(outCubeStats.Maximum(),
-                       Distance::Meters).GetKilometers();
+                       Distance::Meters).kilometers();
   table += record;
 
   ocube->write(table);

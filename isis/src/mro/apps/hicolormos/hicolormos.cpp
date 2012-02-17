@@ -114,7 +114,7 @@ void IsisMain() {
     Cphase = cam->PhaseAngle();
     Cincid = cam->IncidenceAngle();
     ClocalSolTime = cam->LocalSolarTime();
-    CsolarLong = cam->SolarLongitude().GetDegrees();
+    CsolarLong = cam->SolarLongitude().degrees();
     CnorthAzimuth = cam->NorthAzimuth();
     CsunAzimuth = cam->SunAzimuth();
     runXY = false;
@@ -126,7 +126,7 @@ void IsisMain() {
       Cphase = cam->PhaseAngle();
       Cincid = cam->IncidenceAngle();
       ClocalSolTime = cam->LocalSolarTime();
-      CsolarLong = cam->SolarLongitude().GetDegrees();
+      CsolarLong = cam->SolarLongitude().degrees();
       CnorthAzimuth = cam->NorthAzimuth();
       CsunAzimuth = cam->SunAzimuth();
       runXY = false;
@@ -170,7 +170,7 @@ void IsisMain() {
       Cphase = cam->PhaseAngle();
       Cincid = cam->IncidenceAngle();
       ClocalSolTime = cam->LocalSolarTime();
-      CsolarLong = cam->SolarLongitude().GetDegrees();
+      CsolarLong = cam->SolarLongitude().degrees();
       CnorthAzimuth = cam->NorthAzimuth();
       CsunAzimuth = cam->SunAzimuth();
       runXY = false;
@@ -182,7 +182,7 @@ void IsisMain() {
         Cphase = cam->PhaseAngle();
         Cincid = cam->IncidenceAngle();
         ClocalSolTime = cam->LocalSolarTime();
-        CsolarLong = cam->SolarLongitude().GetDegrees();
+        CsolarLong = cam->SolarLongitude().degrees();
         CnorthAzimuth = cam->NorthAzimuth();
         CsunAzimuth = cam->SunAzimuth();
         runXY = false;

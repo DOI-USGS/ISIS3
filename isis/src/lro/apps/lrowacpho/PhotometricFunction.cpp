@@ -88,9 +88,9 @@ namespace Isis {
             Angle phase, incidence, emission;
             _camera->LocalPhotometricAngles(phase, incidence, emission, success);
             if (success) {
-                g = phase.GetDegrees();
-                i = incidence.GetDegrees();
-                e = emission.GetDegrees();
+                g = phase.degrees();
+                i = incidence.degrees();
+                e = emission.degrees();
             }
         }
 

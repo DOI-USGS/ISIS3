@@ -117,7 +117,7 @@ namespace Isis {
       p_maxLon = new Longitude;
     }
 
-    if(p_minLon->Valid() && p_maxLon->Valid()) {
+    if(p_minLon->isValid() && p_maxLon->isValid()) {
       if(*p_minLon > *p_maxLon) {
         Longitude tmp(*p_minLon);
         *p_minLon = *p_maxLon;
@@ -132,15 +132,15 @@ namespace Isis {
     if(p_groundMap->HasCamera()) {
       p_defaultResolution =
         (p_groundMap->Camera()->HighestImageResolution() /
-         largerRadius.GetMeters()) * 10;
+         largerRadius.meters()) * 10;
     }
     else {
       p_defaultResolution = (p_groundMap->Resolution() /
-        largerRadius.GetMeters()) * 10;
+        largerRadius.meters()) * 10;
     }
 
     if(p_defaultResolution < 0) {
-      p_defaultResolution = 10.0 / largerRadius.GetMeters();
+      p_defaultResolution = 10.0 / largerRadius.meters();
     }
   }
 
@@ -238,22 +238,22 @@ namespace Isis {
     // Verify lat/lon range is okay
     bool badLatLonRange = false;
     QVector<iString> badLatLonValues;
-    if(!p_minLat || !p_minLat->Valid()) {
+    if(!p_minLat || !p_minLat->isValid()) {
       badLatLonValues.append("MinimumLatitude");
       badLatLonRange = true;
     }
 
-    if(!p_maxLat || !p_maxLat->Valid()) {
+    if(!p_maxLat || !p_maxLat->isValid()) {
       badLatLonValues.append("MaximumLatitude");
       badLatLonRange = true;
     }
 
-    if(!p_minLon || !p_minLon->Valid()) {
+    if(!p_minLon || !p_minLon->isValid()) {
       badLatLonValues.append("MinimumLongitude");
       badLatLonRange = true;
     }
 
-    if(!p_maxLon || !p_maxLon->Valid()) {
+    if(!p_maxLon || !p_maxLon->isValid()) {
       badLatLonValues.append("MaximumLongitude");
       badLatLonRange = true;
     }
@@ -286,11 +286,11 @@ namespace Isis {
     Longitude startLon = Longitude(
         baseLon - Angle(floor((baseLon - *p_minLon) / lonInc) * lonInc));
 
-    if(!latRes.Valid() || latRes <= Angle(0, Angle::Degrees)) {
+    if(!latRes.isValid() || latRes <= Angle(0, Angle::Degrees)) {
       latRes = Angle(p_defaultResolution, Angle::Degrees);
     }
 
-    if(!lonRes.Valid() || latRes <= Angle(0, Angle::Degrees)) {
+    if(!lonRes.isValid() || latRes <= Angle(0, Angle::Degrees)) {
       lonRes = Angle(p_defaultResolution, Angle::Degrees);
     }
 
@@ -380,18 +380,18 @@ namespace Isis {
    */
   void GroundGrid::SetGroundLimits(Latitude minLat, Longitude minLon,
                                    Latitude maxLat, Longitude maxLon) {
-    if(minLat.Valid()) *p_minLat = minLat;
-    if(maxLat.Valid()) *p_maxLat = maxLat;
-    if(minLon.Valid()) *p_minLon = minLon;
-    if(maxLon.Valid()) *p_maxLon = maxLon;
+    if(minLat.isValid()) *p_minLat = minLat;
+    if(maxLat.isValid()) *p_maxLat = maxLat;
+    if(minLon.isValid()) *p_minLon = minLon;
+    if(maxLon.isValid()) *p_maxLon = maxLon;
 
-    if(p_minLat->Valid() && p_maxLat->Valid() && *p_minLat > *p_maxLat) {
+    if(p_minLat->isValid() && p_maxLat->isValid() && *p_minLat > *p_maxLat) {
       Latitude tmp(*p_minLat);
       *p_minLat = *p_maxLat;
       *p_maxLat = tmp;
     }
 
-    if(p_minLon->Valid() && p_maxLon->Valid() && *p_minLon > *p_maxLon) {
+    if(p_minLon->isValid() && p_maxLon->isValid() && *p_minLon > *p_maxLon) {
       Longitude tmp(*p_minLon);
       *p_minLon = *p_maxLon;
       *p_maxLon = tmp;

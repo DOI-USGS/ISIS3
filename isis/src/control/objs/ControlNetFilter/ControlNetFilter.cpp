@@ -678,8 +678,8 @@ namespace Isis {
             Distance(camera->LocalRadius()));
         }
       }
-      double latitude  = cPointSurfPt.GetLatitude().GetDegrees();
-      double longitude = cPointSurfPt.GetLongitude().GetDegrees();
+      double latitude  = cPointSurfPt.GetLatitude().degrees();
+      double longitude = cPointSurfPt.GetLongitude().degrees();
       
       if ((latitude < dMinLat || latitude > dMaxLat) ||
           (longitude < dMinLon ||longitude > dMaxLon)) {
@@ -690,7 +690,7 @@ namespace Isis {
       if (pbLastFilter) {
         PointStats(*cPoint);
         mOstm << latitude << ", " << longitude << ", " <<
-          cPointSurfPt.GetLocalRadius().GetMeters() << endl;
+          cPointSurfPt.GetLocalRadius().meters() << endl;
       }
     }
     
@@ -792,7 +792,7 @@ namespace Isis {
           }
 
           dDist = surfacePt1.GetDistanceToPoint(surfacePt2,
-              surfacePt1.GetLocalRadius()).GetMeters();
+              surfacePt1.GetLocalRadius()).meters();
         }
         else
           // pixels
@@ -1353,7 +1353,7 @@ namespace Isis {
         if (sUnits == "meters") {
           // try to set image using sample/line values
           if (cam->SetImage(cMeasure1->GetSample(), cMeasure1->GetLine())) {
-            dRadius = cam->LocalRadius().GetMeters();
+            dRadius = cam->LocalRadius().meters();
             dLat1 = cam->UniversalLatitude();
             dLon1 = cam->UniversalLongitude();
           }
@@ -1405,7 +1405,7 @@ namespace Isis {
             SurfacePoint point1(lat1, lon1, radius);
             SurfacePoint point2(lat2, lon2, radius);
 
-            dDist = point1.GetDistanceToPoint(point1, radius).GetMeters();
+            dDist = point1.GetDistanceToPoint(point1, radius).meters();
           }
           if (!dDist || dDist >= dDistance) {
             continue;

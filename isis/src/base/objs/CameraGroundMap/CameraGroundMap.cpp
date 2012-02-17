@@ -76,7 +76,7 @@ namespace Isis {
    */
   bool CameraGroundMap::SetGround(const Latitude &lat, const Longitude &lon) {
     Distance radius(p_camera->LocalRadius(lat, lon));
-    if (radius.Valid()) {
+    if (radius.isValid()) {
       if(p_camera->Sensor::SetGround(SurfacePoint(lat, lon, radius))) {
         LookCtoFocalPlaneXY();
         return true;
@@ -127,9 +127,9 @@ namespace Isis {
   bool CameraGroundMap::GetXY(const SurfacePoint &point, double *cudx, double *cudy) {
 
     double pB[3];
-    pB[0] = point.GetX().GetKilometers();
-    pB[1] = point.GetY().GetKilometers();
-    pB[2] = point.GetZ().GetKilometers();
+    pB[0] = point.GetX().kilometers();
+    pB[1] = point.GetY().kilometers();
+    pB[2] = point.GetZ().kilometers();
 
     // Check for Sky images
     if(p_camera->IsSky()) {
@@ -322,13 +322,13 @@ namespace Isis {
    * @return partialDerivative
    */
   std::vector<double> CameraGroundMap::PointPartial(SurfacePoint spoint, PartialType wrt) {
-    double rlat = spoint.GetLatitude().GetRadians();
-    double rlon = spoint.GetLongitude().GetRadians();
+    double rlat = spoint.GetLatitude().radians();
+    double rlon = spoint.GetLongitude().radians();
     double sinLon = sin(rlon);
     double cosLon = cos(rlon);
     double sinLat = sin(rlat);
     double cosLat = cos(rlat);
-    double radkm = spoint.GetLocalRadius().GetKilometers();
+    double radkm = spoint.GetLocalRadius().kilometers();
 
     std::vector<double> v(3);
     if(wrt == WRT_Latitude) {

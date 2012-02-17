@@ -102,7 +102,7 @@ int main(int argc, char *argv[]) {
       cerr << "Point               = " << p[0] << " " << p[1] << " " << p[2]
            << endl;
       cerr << "Local Radius        = " //< setprecision(6)
-           << spi.LocalRadius().GetMeters() << endl;
+           << spi.LocalRadius().meters() << endl;
       cerr << "Phase               = " << spi.PhaseAngle() << endl;
       cerr << "Emission            = " << spi.EmissionAngle() << endl;
       cerr << "Incidence           = " << spi.IncidenceAngle() << endl;
@@ -138,7 +138,7 @@ int main(int argc, char *argv[]) {
     spi.Coordinate(p);
     cerr << "Point               = " << p[0] << " " << p[1] << " " << p[2]
          << endl;
-    cerr << "Local Radius        = " << spi.LocalRadius().GetMeters() << endl;
+    cerr << "Local Radius        = " << spi.LocalRadius().meters() << endl;
     cerr << "Phase               = " << spi.PhaseAngle() << endl;
     cerr << "Emission            = " << spi.EmissionAngle() << endl;
     cerr << "Incidence           = " << spi.IncidenceAngle() << endl;
@@ -166,11 +166,11 @@ int main(int argc, char *argv[]) {
     cerr << "Has Intersection    = " << spi.HasSurfaceIntersection() << endl;
     cerr << "Latitude            = " << spi.UniversalLatitude() << endl;
     cerr << "Longitude           = " << spi.UniversalLongitude() << endl;
-    cerr << "Radius              = " << spi.LocalRadius().GetMeters() << endl;
+    cerr << "Radius              = " << spi.LocalRadius().meters() << endl;
     spi.Coordinate(p);
     cerr << "Point               = " << p[0] << " " << p[1] << " " << p[2]
          << endl;
-    cerr << "Local Radius        = " << spi.LocalRadius().GetMeters() << endl;
+    cerr << "Local Radius        = " << spi.LocalRadius().meters() << endl;
     cerr << "Phase               = " << spi.PhaseAngle() << endl;
     cerr << "Emission            = " << spi.EmissionAngle() << endl;
     cerr << "Incidence           = " << spi.IncidenceAngle() << endl;
@@ -232,7 +232,7 @@ int main(int argc, char *argv[]) {
       spi2.Coordinate(p);
       cerr << "Point               = " << p[0] << " " << p[1] << " " << p[2]
            << endl;
-      cerr << "Local Radius        = " << spi2.LocalRadius().GetMeters() << endl;
+      cerr << "Local Radius        = " << spi2.LocalRadius().meters() << endl;
       cerr << "Phase               = " << spi2.PhaseAngle() << endl;
       cerr << "Emission            = " << spi2.EmissionAngle() << endl;
       cerr << "Incidence           = " << spi2.IncidenceAngle() << endl;
@@ -271,7 +271,7 @@ int main(int argc, char *argv[]) {
     spi2.Coordinate(p);
     cerr << "Point               = " << p[0] << " " << p[1] << " " << p[2]
          << endl;
-    cerr << "Local Radius        = " << spi2.LocalRadius().GetMeters() << endl;
+    cerr << "Local Radius        = " << spi2.LocalRadius().meters() << endl;
     cerr << "Phase               = " << spi2.PhaseAngle() << endl;
     cerr << "Emission            = " << spi2.EmissionAngle() << endl;
     cerr << "Incidence           = " << spi2.IncidenceAngle() << endl;
@@ -295,11 +295,11 @@ int main(int argc, char *argv[]) {
     cerr << "Has Intersection    = " << spi2.HasSurfaceIntersection() << endl;
     cerr << "Latitude            = " << spi2.UniversalLatitude() << endl;
     cerr << "Longitude           = " << spi2.UniversalLongitude() << endl;
-    cerr << "Radius              = " << spi2.LocalRadius().GetMeters() << endl;
+    cerr << "Radius              = " << spi2.LocalRadius().meters() << endl;
     spi2.Coordinate(p);
     cerr << "Point               = " << p[0] << " " << p[1] << " " << p[2]
          << endl;
-    cerr << "Local Radius        = " << spi2.LocalRadius().GetMeters() << endl;
+    cerr << "Local Radius        = " << spi2.LocalRadius().meters() << endl;
     cerr << "Phase               = " << spi2.PhaseAngle() << endl;
     cerr << "Emission            = " << spi2.EmissionAngle() << endl;
     cerr << "Incidence           = " << spi2.IncidenceAngle() << endl;

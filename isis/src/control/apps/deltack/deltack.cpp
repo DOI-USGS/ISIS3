@@ -162,9 +162,9 @@ Distance GetRadius(std::string filename, Latitude lat, Longitude lon) {
   Sensor sensor(lab);
   sensor.SetGround(SurfacePoint(lat, lon, sensor.LocalRadius(lat, lon)));
   Distance radius = sensor.LocalRadius();
-  if(!radius.Valid()) {
+  if(!radius.isValid()) {
     string msg = "Could not determine radius from DEM at lat/lon [";
-    msg += iString(lat.GetDegrees()) + "," + iString(lon.GetDegrees()) + "]";
+    msg += iString(lat.degrees()) + "," + iString(lon.degrees()) + "]";
     throw iException::Message(Isis::iException::Camera, msg, _FILEINFO_);
   }
   return radius;

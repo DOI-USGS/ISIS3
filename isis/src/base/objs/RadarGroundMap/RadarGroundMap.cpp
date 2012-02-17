@@ -95,7 +95,7 @@ namespace Isis {
     // What is the initial guess for R
     Distance radii[3];
     p_camera->Radii(radii);
-    SpiceDouble R = radii[0].GetKilometers();
+    SpiceDouble R = radii[0].kilometers();
     SpiceDouble lastR = DBL_MAX;
     SpiceDouble rlat;
     SpiceDouble rlon;
@@ -132,7 +132,7 @@ namespace Isis {
 
       rlat = lat * 180.0 / Isis::PI;
       rlon = lon * 180.0 / Isis::PI;
-      R = p_camera->LocalRadius(rlat, rlon).GetKilometers();
+      R = p_camera->LocalRadius(rlat, rlon).kilometers();
       iter++;
     }
     while(fabs(R - lastR) > p_tolerance && iter < 30);
@@ -170,7 +170,7 @@ namespace Isis {
   bool RadarGroundMap::SetGround(const Latitude &lat, const Longitude &lon) {
     Distance localRadius(p_camera->LocalRadius(lat, lon));
 
-    if(!localRadius.Valid()) {
+    if(!localRadius.isValid()) {
       return false;
     }
 
@@ -324,9 +324,9 @@ namespace Isis {
 
     // Get the ground point in rectangular body-fixed coordinates (X)
     double X[3];
-    X[0] = spoint.GetX().GetKilometers();
-    X[1] = spoint.GetY().GetKilometers();
-    X[2] = spoint.GetZ().GetKilometers();
+    X[0] = spoint.GetX().kilometers();
+    X[1] = spoint.GetY().kilometers();
+    X[2] = spoint.GetZ().kilometers();
 
     // Compute body-fixed look vector
     SpiceRotation *bodyFrame = p_camera->BodyRotation();

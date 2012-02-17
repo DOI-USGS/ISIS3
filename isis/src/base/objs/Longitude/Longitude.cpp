@@ -32,7 +32,7 @@ namespace Isis {
    * Create a blank Longitude object with 0-360 domain.
    */
   Longitude::Longitude() : Angle() {
-    p_currentDomain = Domain360;
+    m_currentDomain = Domain360;
   }
 
 
@@ -50,10 +50,10 @@ namespace Isis {
                        Angle::Units longitudeUnits) :
       Angle(longitude, longitudeUnits) {
     if(mapping["LongitudeDomain"][0] == "360") {
-      p_currentDomain = Domain360;
+      m_currentDomain = Domain360;
     }
     else if(mapping["LongitudeDomain"][0] == "180") {
-      p_currentDomain = Domain180;
+      m_currentDomain = Domain180;
     }
     else {
       iString msg = "Longitude domain [" +
@@ -62,10 +62,10 @@ namespace Isis {
     }
 
     if(mapping["LongitudeDirection"][0] == "PositiveEast") {
-      SetPositiveEast(longitude, longitudeUnits);
+      setPositiveEast(longitude, longitudeUnits);
     }
     else if(mapping["LongitudeDirection"][0] == "PositiveWest") {
-      SetPositiveWest(longitude, longitudeUnits);
+      setPositiveWest(longitude, longitudeUnits);
     }
     else {
       iString msg = "Longitude direction [" +
@@ -86,13 +86,13 @@ namespace Isis {
   Longitude::Longitude(Angle longitude,
                        Direction lonDir, Domain lonDomain) :
       Angle(longitude) {
-    p_currentDomain = lonDomain;
+    m_currentDomain = lonDomain;
 
     if(lonDir == PositiveEast) {
-      SetPositiveEast(longitude.GetRadians(), Radians);
+      setPositiveEast(longitude.radians(), Radians);
     }
     else if(lonDir == PositiveWest) {
-      SetPositiveWest(longitude.GetRadians(), Radians);
+      setPositiveWest(longitude.radians(), Radians);
     }
     else {
       iString msg = "Longitude direction [" + iString(lonDir) + "] not valid";
@@ -113,13 +113,13 @@ namespace Isis {
   Longitude::Longitude(double longitude, Angle::Units longitudeUnits,
                        Direction lonDir, Domain lonDomain) :
       Angle(longitude, longitudeUnits) {
-    p_currentDomain = lonDomain;
+    m_currentDomain = lonDomain;
 
     if(lonDir == PositiveEast) {
-      SetPositiveEast(longitude, longitudeUnits);
+      setPositiveEast(longitude, longitudeUnits);
     }
     else if(lonDir == PositiveWest) {
-      SetPositiveWest(longitude, longitudeUnits);
+      setPositiveWest(longitude, longitudeUnits);
     }
     else {
       iString msg = "Longitude direction [" + iString(lonDir) + "] not valid";
@@ -135,7 +135,7 @@ namespace Isis {
    */
   Longitude::Longitude(const Longitude &longitudeToCopy)
       : Angle(longitudeToCopy) {
-    p_currentDomain = longitudeToCopy.p_currentDomain;
+    m_currentDomain = longitudeToCopy.m_currentDomain;
   }
 
 
@@ -153,8 +153,8 @@ namespace Isis {
    * @see Direction
    * @return The PositiveEast longitude value
    */
-  double Longitude::GetPositiveEast(Angle::Units units) const {
-    return GetAngle(units);
+  double Longitude::positiveEast(Angle::Units units) const {
+    return angle(units);
   }
 
 
@@ -165,11 +165,11 @@ namespace Isis {
    * @see Direction
    * @return The PositiveWest longitude value
    */
-  double Longitude::GetPositiveWest(Angle::Units units) const {
-    double longitude = GetAngle(units);
+  double Longitude::positiveWest(Angle::Units units) const {
+    double longitude = angle(units);
 
-    if(p_currentDomain == Domain360) {
-      double wrapPoint = UnitWrapValue(units);
+    if(m_currentDomain == Domain360) {
+      double wrapPoint = unitWrapValue(units);
       double halfWrap = wrapPoint / 2.0;
 
       int numPlanetWraps = (int)(longitude / wrapPoint);
@@ -198,8 +198,8 @@ namespace Isis {
    * @param longitude The positive east longitude to set ourselves to
    * @param units The angular units longitude is in
    */
-  void Longitude::SetPositiveEast(double longitude, Angle::Units units) {
-    SetAngle(longitude, units);
+  void Longitude::setPositiveEast(double longitude, Angle::Units units) {
+    setAngle(longitude, units);
   }
 
 
@@ -209,11 +209,11 @@ namespace Isis {
    * @param longitude The positive west longitude to set ourselves to
    * @param units The angular units longitude is in
    */
-  void Longitude::SetPositiveWest(double longitude, Angle::Units units) {
+  void Longitude::setPositiveWest(double longitude, Angle::Units units) {
     if(!IsSpecial(longitude)) {
-      if(p_currentDomain == Domain360) {
-        // Same as GetPositiveWest
-        double wrapPoint = UnitWrapValue(units);
+      if(m_currentDomain == Domain360) {
+        // Same as positiveWest
+        double wrapPoint = unitWrapValue(units);
         double halfWrap = wrapPoint / 2.0;
 
         int numPlanetWraps = (int)(longitude / wrapPoint);
@@ -233,7 +233,7 @@ namespace Isis {
       }
     }
 
-    SetAngle(longitude, units);
+    setAngle(longitude, units);
   }
 
 
@@ -247,8 +247,8 @@ namespace Isis {
   Longitude& Longitude::operator=(const Longitude & longitudeToCopy) {
     if(this == &longitudeToCopy) return *this;
 
-    p_currentDomain = longitudeToCopy.p_currentDomain;
-    SetPositiveEast(longitudeToCopy.GetPositiveEast());
+    m_currentDomain = longitudeToCopy.m_currentDomain;
+    setPositiveEast(longitudeToCopy.positiveEast());
 
     return *this;
   }
@@ -259,10 +259,10 @@ namespace Isis {
    *
    * @return Longitude with an angular value between 0 and 360 inclusive
    */
-  Longitude Longitude::Force360Domain() const {
-    if(!Valid()) return Longitude();
+  Longitude Longitude::force360Domain() const {
+    if(!isValid()) return Longitude();
 
-    double resultantLongitude = GetAngle(Angle::Degrees);
+    double resultantLongitude = angle(Angle::Degrees);
 
     // Bring the number in the 0 to 360 range
     resultantLongitude -= 360 * floor(resultantLongitude / 360);
@@ -276,12 +276,12 @@ namespace Isis {
    *
    * @return Longitude with an angular value between -180 and 180 inclusive
    */
-  Longitude Longitude::Force180Domain() const {
-    if(!Valid()) return Longitude();
+  Longitude Longitude::force180Domain() const {
+    if(!isValid()) return Longitude();
 
-    Longitude forced = Force360Domain();
+    Longitude forced = force360Domain();
 
-    if(forced.GetDegrees() > 180.0)
+    if(forced.degrees() > 180.0)
       forced -= Angle(360.0, Angle::Degrees);
 
     return forced;
@@ -306,12 +306,12 @@ namespace Isis {
    *
    * @return Whether the longitude is in the given range
    */
-  bool Longitude::IsInRange(Longitude min, Longitude max) const {
+  bool Longitude::inRange(Longitude min, Longitude max) const {
     // Get around the "wrapping around the planet" problem by clamping the
     // longitudes to a strict 0-360 range.  Now we're simply dealing with angles
     // on a circle from an origin.
-    Longitude adjustedMin = min.Force360Domain();
-    Longitude adjustedMax = max.Force360Domain();
+    Longitude adjustedMin = min.force360Domain();
+    Longitude adjustedMax = max.force360Domain();
 
     bool inRange = false;
     if (adjustedMin == adjustedMax && min != max) {
@@ -344,7 +344,7 @@ namespace Isis {
       deltaMax += Angle(DBL_EPSILON, Angle::Degrees);
 
       // Clamp this longitude to the same 0-360 domain
-      Longitude adjusted = Force360Domain();
+      Longitude adjusted = force360Domain();
 
       // Apply the same adjustment for the change from the min longitude to this
       // longitude as was applied to the maximal change

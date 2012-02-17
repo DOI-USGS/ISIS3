@@ -244,9 +244,9 @@ namespace Isis {
     }
 
     // Prep for surfpt by obtaining the radii
-    SpiceDouble a = p_radii[0].GetKilometers();
-    SpiceDouble b = p_radii[1].GetKilometers();
-    SpiceDouble c = p_radii[2].GetKilometers();
+    SpiceDouble a = p_radii[0].kilometers();
+    SpiceDouble b = p_radii[1].kilometers();
+    SpiceDouble c = p_radii[2].kilometers();
 
     // See if it intersects the planet
     SpiceBoolean found;
@@ -351,7 +351,7 @@ namespace Isis {
         SpiceDouble plat, plon, pradius;
         SpiceDouble pB[3];
         double maxRadiusMetersSquared =
-            p_maxRadius->GetKilometers() * p_maxRadius->GetKilometers();
+            p_maxRadius->kilometers() * p_maxRadius->kilometers();
         double cmin = cos((90.0 - 1.0 / (2.0*p_demScale)) * PI/180.0);
 
         // Separate iteration algorithms are used for different projections -
@@ -589,14 +589,14 @@ namespace Isis {
    * @param p[] The coordinate of the surface intersection
    */
   void Sensor::Coordinate(double p[3]) const {
-    p[0] = p_surfacePoint->GetX().GetKilometers();
-    p[1] = p_surfacePoint->GetY().GetKilometers();
-    p[2] = p_surfacePoint->GetZ().GetKilometers();
+    p[0] = p_surfacePoint->GetX().kilometers();
+    p[1] = p_surfacePoint->GetY().kilometers();
+    p[2] = p_surfacePoint->GetZ().kilometers();
   }
 
 
   double Sensor::UniversalLatitude() const {
-    return p_surfacePoint->GetLatitude().GetDegrees();
+    return p_surfacePoint->GetLatitude().degrees();
   }
 
 
@@ -606,7 +606,7 @@ namespace Isis {
 
 
   double Sensor::UniversalLongitude() const {
-    return p_surfacePoint->GetLongitude().GetDegrees();
+    return p_surfacePoint->GetLongitude().degrees();
   }
 
 
@@ -634,7 +634,7 @@ namespace Isis {
    *          lat,lon in meters
    */
   Distance Sensor::LocalRadius(Latitude lat, Longitude lon) {
-    return LocalRadius(lat.GetDegrees(), lon.GetDegrees());
+    return LocalRadius(lat.degrees(), lon.degrees());
   }
 
 
@@ -652,11 +652,11 @@ namespace Isis {
                        Longitude(lon, Angle::Degrees));
     }
 
-    double a = p_radii[0].GetKilometers();
-    double b = p_radii[1].GetKilometers();
-    double c = p_radii[2].GetKilometers();
-    double rlat = Angle(lat, Angle::Degrees).GetRadians();
-    double rlon = Angle(lon, Angle::Degrees).GetRadians();
+    double a = p_radii[0].kilometers();
+    double b = p_radii[1].kilometers();
+    double c = p_radii[2].kilometers();
+    double rlat = Angle(lat, Angle::Degrees).radians();
+    double rlon = Angle(lon, Angle::Degrees).radians();
     double xyradius = a * b / sqrt(pow(b * cos(rlon), 2) +
                       pow(a * sin(rlon), 2));
     const double &radius = xyradius * c / sqrt(pow(c * cos(rlat), 2) +
@@ -675,9 +675,9 @@ namespace Isis {
     std::vector<double> sB = BodyRotation()->ReferenceVector(InstrumentPosition()->Coordinate());
 
     SpiceDouble pB[3];
-    pB[0] = p_surfacePoint->GetX().GetKilometers();
-    pB[1] = p_surfacePoint->GetY().GetKilometers();
-    pB[2] = p_surfacePoint->GetZ().GetKilometers();
+    pB[0] = p_surfacePoint->GetX().kilometers();
+    pB[1] = p_surfacePoint->GetY().kilometers();
+    pB[2] = p_surfacePoint->GetZ().kilometers();
     vsub_c((SpiceDouble *) &sB[0], pB, psB);
     unorm_c(psB, upsB, &dist);
 
@@ -710,9 +710,9 @@ namespace Isis {
     SpiceDouble psB[3], upsB[3], upB[3], dist;
 
     SpiceDouble pB[3];
-    pB[0] = p_surfacePoint->GetX().GetKilometers();
-    pB[1] = p_surfacePoint->GetY().GetKilometers();
-    pB[2] = p_surfacePoint->GetZ().GetKilometers();
+    pB[0] = p_surfacePoint->GetX().kilometers();
+    pB[1] = p_surfacePoint->GetY().kilometers();
+    pB[2] = p_surfacePoint->GetZ().kilometers();
 
     vsub_c((ConstSpiceDouble *) &sB[0], pB, psB);
     unorm_c(psB, upsB, &dist);
@@ -733,9 +733,9 @@ namespace Isis {
     SpiceDouble puB[3], upuB[3], upB[3], dist;
 
     SpiceDouble pB[3];
-    pB[0] = p_surfacePoint->GetX().GetKilometers();
-    pB[1] = p_surfacePoint->GetY().GetKilometers();
-    pB[2] = p_surfacePoint->GetZ().GetKilometers();
+    pB[0] = p_surfacePoint->GetX().kilometers();
+    pB[1] = p_surfacePoint->GetY().kilometers();
+    pB[2] = p_surfacePoint->GetZ().kilometers();
 
     vsub_c(p_uB, pB, puB);
     unorm_c(puB, upuB, &dist);
@@ -865,9 +865,9 @@ namespace Isis {
     const vector<double> &sB =
         BodyRotation()->ReferenceVector(InstrumentPosition()->Coordinate());
 
-    p_lookB[0] = p_surfacePoint->GetX().GetKilometers() - sB[0];
-    p_lookB[1] = p_surfacePoint->GetY().GetKilometers() - sB[1];
-    p_lookB[2] = p_surfacePoint->GetZ().GetKilometers() - sB[2];
+    p_lookB[0] = p_surfacePoint->GetX().kilometers() - sB[0];
+    p_lookB[1] = p_surfacePoint->GetY().kilometers() - sB[1];
+    p_lookB[2] = p_surfacePoint->GetZ().kilometers() - sB[2];
     p_newLookB = true;
 
     // See if the point is on the backside of the target
@@ -977,9 +977,9 @@ namespace Isis {
     std::vector<double> sB = BodyRotation()->ReferenceVector(InstrumentPosition()->Coordinate());
 
     SpiceDouble pB[3];
-    pB[0] = p_surfacePoint->GetX().GetKilometers();
-    pB[1] = p_surfacePoint->GetY().GetKilometers();
-    pB[2] = p_surfacePoint->GetZ().GetKilometers();
+    pB[0] = p_surfacePoint->GetX().kilometers();
+    pB[1] = p_surfacePoint->GetY().kilometers();
+    pB[2] = p_surfacePoint->GetZ().kilometers();
 
     vsub_c(pB, (SpiceDouble *) &sB[0], psB);
     unorm_c(psB, upsB, &dist);
@@ -1011,9 +1011,9 @@ namespace Isis {
     Spice::SunPosition(sB);
 
     // Calc the change
-    double xChange = sB[0] - p_surfacePoint->GetX().GetKilometers();
-    double yChange = sB[1] - p_surfacePoint->GetY().GetKilometers();
-    double zChange = sB[2] - p_surfacePoint->GetZ().GetKilometers();
+    double xChange = sB[0] - p_surfacePoint->GetX().kilometers();
+    double yChange = sB[1] - p_surfacePoint->GetY().kilometers();
+    double zChange = sB[2] - p_surfacePoint->GetZ().kilometers();
 
     // Calc the distance and convert to AU
     double dist = sqrt(pow(xChange, 2) + pow(yChange, 2) + pow(zChange, 2));
@@ -1042,7 +1042,7 @@ namespace Isis {
 
     // Now with the 3 spherical value compute the x/y/z coordinate
     double ssB[3];
-    latrec_c(rad.GetKilometers(), rlon, rlat, ssB);
+    latrec_c(rad.kilometers(), rlon, rlat, ssB);
 
     // Calc the change
     double xChange = spB[0] - ssB[0];
@@ -1074,7 +1074,7 @@ namespace Isis {
   Distance Sensor::DemRadius(const Latitude &lat, const Longitude &lon) {
     if(!p_hasElevationModel) return Distance();
     //if(!lat.Valid() || !lon.Valid()) return Distance();
-    p_demProj->SetUniversalGround(lat.GetDegrees(), lon.GetDegrees());
+    p_demProj->SetUniversalGround(lat.degrees(), lon.degrees());
     if(!p_demProj->IsGood()) {
       return Distance();
     }

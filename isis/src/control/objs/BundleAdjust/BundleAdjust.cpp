@@ -287,7 +287,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 //      printf("radii: %lf %lf %lf\n",m_BodyRadii[0],m_BodyRadii[1],m_BodyRadii[2]);
 
       if (m_BodyRadii[0] >= Distance(0, Distance::Meters)) {
-        m_dMTR = 0.001 / m_BodyRadii[0].GetKilometers(); // at equator
+        m_dMTR = 0.001 / m_BodyRadii[0].kilometers(); // at equator
         m_dRTM = 1.0 / m_dMTR;
       }
 //      printf("MTR: %lf\nRTM: %lf\n",m_dMTR,m_dRTM);
@@ -1787,7 +1787,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       }
       else {
           if( point->IsLatitudeConstrained() ) {
-            apriorisigmas[0] = point->GetAprioriSurfacePoint().GetLatSigmaDistance().GetMeters();
+            apriorisigmas[0] = point->GetAprioriSurfacePoint().GetLatSigmaDistance().meters();
               weights[0] = point->GetAprioriSurfacePoint().GetLatWeight();
           }
           else if( m_dGlobalLatitudeAprioriSigma > 0.0 ) {
@@ -1815,7 +1815,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 //       dAprioriSigmaLon = point->AprioriSigmaLongitude();
 
           if( point->IsLongitudeConstrained() ) {
-            apriorisigmas[1] = point->GetAprioriSurfacePoint().GetLonSigmaDistance().GetMeters();
+            apriorisigmas[1] = point->GetAprioriSurfacePoint().GetLonSigmaDistance().meters();
               weights[1] = point->GetAprioriSurfacePoint().GetLonWeight();
           }
           else if( m_dGlobalLongitudeAprioriSigma > 0.0 ) {
@@ -1846,7 +1846,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
               weights[2] = 1.0e+50;
           else {
               if( point->IsRadiusConstrained() ) {
-                apriorisigmas[2] = point->GetAprioriSurfacePoint().GetLocalRadiusSigma().GetMeters();
+                apriorisigmas[2] = point->GetAprioriSurfacePoint().GetLocalRadiusSigma().meters();
                   weights[2] = point->GetAprioriSurfacePoint().GetLocalRadiusWeight();
               }
               else if( m_dGlobalRadiusAprioriSigma > 0.0 ) {
@@ -2804,9 +2804,9 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     double deltax, deltay;
     double dObservationSigma;
     // Compute fixed point in body-fixed coordinates km
-//    latrec_c((double) point->GetAdjustedSurfacePoint().GetLocalRadius().GetKilometers(),
-//             (double) point->GetAdjustedSurfacePoint().GetLongitude().GetRadians(),
-//             (double) point->GetAdjustedSurfacePoint().GetLatitude().GetRadians(),
+//    latrec_c((double) point->GetAdjustedSurfacePoint().GetLocalRadius().kilometers(),
+//             (double) point->GetAdjustedSurfacePoint().GetLongitude().radians(),
+//             (double) point->GetAdjustedSurfacePoint().GetLatitude().radians(),
 //             pB);
 
     double dObservationWeight;
@@ -3690,9 +3690,9 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 //    std::cout << "d_lookB_WRT_RAD" << d_lookB_WRT_RAD << std::endl;
 
     // Compute fixed point in body-fixed coordinates km
-//     latrec_c((double) point->GetAdjustedSurfacePoint().GetLocalRadius().GetKilometers(),
-//              (double) point->GetAdjustedSurfacePoint().GetLongitude().GetRadians(),
-//              (double) point->GetAdjustedSurfacePoint().GetLatitude().GetRadians(),
+//     latrec_c((double) point->GetAdjustedSurfacePoint().GetLocalRadius().kilometers(),
+//              (double) point->GetAdjustedSurfacePoint().GetLongitude().radians(),
+//              (double) point->GetAdjustedSurfacePoint().GetLatitude().radians(),
 //              pB);
 
     int nObservations = point->GetNumMeasures();
@@ -4278,9 +4278,9 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
     // Compute fixed point in body-fixed coordinates
     double pB[3];
-    latrec_c((double) rPoint.GetAdjustedSurfacePoint().GetLocalRadius().GetKilometers(),
-             (double) rPoint.GetAdjustedSurfacePoint().GetLongitude().GetRadians(),
-             (double) rPoint.GetAdjustedSurfacePoint().GetLatitude().GetRadians(),
+    latrec_c((double) rPoint.GetAdjustedSurfacePoint().GetLocalRadius().kilometers(),
+             (double) rPoint.GetAdjustedSurfacePoint().GetLongitude().radians(),
+             (double) rPoint.GetAdjustedSurfacePoint().GetLatitude().radians(),
              pB);
 
 //    printf("%s: %lf   %lf   %lf\n",rPoint.Id().c_str(), AveragePoint[0],AveragePoint[1],AveragePoint[2]);
@@ -4475,9 +4475,9 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 //      printf("Point %s Corrections\n Latitude: %20.10lf\nLongitude: %20.10lf\n   Radius: %20.10lf\n",point->GetId().c_str(),dLatCorr, dLongCorr, dRadCorr);
 //      std::cout <<"Point " <<  point->GetId().c_str() << " Corrections\n" << "Latitude: " << dLatCorr << std::endl << "Longitude: " << dLongCorr << std::endl << "Radius: " << dRadCorr << std::endl;
 
-      double dLat = point->GetAdjustedSurfacePoint().GetLatitude().GetDegrees();
-      double dLon = point->GetAdjustedSurfacePoint().GetLongitude().GetDegrees();
-      double dRad = point->GetAdjustedSurfacePoint().GetLocalRadius().GetMeters();
+      double dLat = point->GetAdjustedSurfacePoint().GetLatitude().degrees();
+      double dLon = point->GetAdjustedSurfacePoint().GetLongitude().degrees();
+      double dRad = point->GetAdjustedSurfacePoint().GetLocalRadius().meters();
 
       dLat += RAD2DEG * dLatCorr;
       dLon += RAD2DEG * dLongCorr;
@@ -4700,9 +4700,9 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 //      printf("Point %s Corrections\n Latitude: %20.10lf\nLongitude: %20.10lf\n   Radius: %20.10lf\n",point->GetId().c_str(),dLatCorr, dLongCorr, dRadCorr);
 //      std::cout <<"Point " <<  point->GetId().c_str() << " Corrections\n" << "Latitude: " << dLatCorr << std::endl << "Longitude: " << dLongCorr << std::endl << "Radius: " << dRadCorr << std::endl;
 
-      double dLat = point->GetAdjustedSurfacePoint().GetLatitude().GetDegrees();
-      double dLon = point->GetAdjustedSurfacePoint().GetLongitude().GetDegrees();
-      double dRad = point->GetAdjustedSurfacePoint().GetLocalRadius().GetMeters();
+      double dLat = point->GetAdjustedSurfacePoint().GetLatitude().degrees();
+      double dLon = point->GetAdjustedSurfacePoint().GetLongitude().degrees();
+      double dRad = point->GetAdjustedSurfacePoint().GetLocalRadius().meters();
 
       dLat += RAD2DEG * dLatCorr;
       dLon += RAD2DEG * dLongCorr;
@@ -4955,9 +4955,9 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
               if ( point->IsIgnored() )
                   continue;
 
-              dSigmaLat = point->GetAdjustedSurfacePoint().GetLatSigmaDistance().GetMeters();
-              dSigmaLong = point->GetAdjustedSurfacePoint().GetLonSigmaDistance().GetMeters();
-              dSigmaRadius = point->GetAdjustedSurfacePoint().GetLocalRadiusSigma().GetMeters();
+              dSigmaLat = point->GetAdjustedSurfacePoint().GetLatSigmaDistance().meters();
+              dSigmaLong = point->GetAdjustedSurfacePoint().GetLonSigmaDistance().meters();
+              dSigmaRadius = point->GetAdjustedSurfacePoint().GetLocalRadiusSigma().meters();
 
               sigmaLatitude.AddData(dSigmaLat);
               sigmaLongitude.AddData(dSigmaLong);
@@ -5274,15 +5274,15 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         // Shouldn't we be updating and setting the matrix???  TODO
         SurfacePoint SurfacePoint = point->GetAdjustedSurfacePoint();
 
-        dSigmaLat = SurfacePoint.GetLatSigma().GetRadians();
-        dSigmaLong = SurfacePoint.GetLonSigma().GetRadians();
-        dSigmaRadius = SurfacePoint.GetLocalRadiusSigma().GetMeters();
+        dSigmaLat = SurfacePoint.GetLatSigma().radians();
+        dSigmaLong = SurfacePoint.GetLonSigma().radians();
+        dSigmaRadius = SurfacePoint.GetLocalRadiusSigma().meters();
 
 //      std::cout << dSigmaLat << " " << dSigmaLong << " " << dSigmaRadius << std::endl;
 
-//      dSigmaLat = point->GetAdjustedSurfacePoint().GetLatSigmaDistance().GetMeters();
-//      dSigmaLong = point->GetAdjustedSurfacePoint().GetLonSigmaDistance().GetMeters();
-//      dSigmaRadius = point->GetAdjustedSurfacePoint().GetLocalRadiusSigma().GetMeters();
+//      dSigmaLat = point->GetAdjustedSurfacePoint().GetLatSigmaDistance().meters();
+//      dSigmaLong = point->GetAdjustedSurfacePoint().GetLonSigmaDistance().meters();
+//      dSigmaRadius = point->GetAdjustedSurfacePoint().GetLocalRadiusSigma().meters();
 
         t = dSigmaLat*dSigmaLat + T(0, 0);
         Distance tLatSig(sqrt(dSigma02 * t) * m_dRTM, Distance::Meters);
@@ -5290,7 +5290,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         t = dSigmaLong*dSigmaLong + T(1, 1);
         t = sqrt(dSigma02 * t) * m_dRTM;
         Distance tLonSig(
-            t * cos(point->GetAdjustedSurfacePoint().GetLatitude().GetRadians()),
+            t * cos(point->GetAdjustedSurfacePoint().GetLatitude().radians()),
             Distance::Meters);
 
         t = dSigmaRadius*dSigmaRadius + T(2, 2);
@@ -5370,15 +5370,15 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       // Shouldn't we be updating and setting the matrix???  TODO
       SurfacePoint SurfacePoint = point->GetAdjustedSurfacePoint();
 
-      dSigmaLat = SurfacePoint.GetLatSigma().GetRadians();
-      dSigmaLong = SurfacePoint.GetLonSigma().GetRadians();
-      dSigmaRadius = SurfacePoint.GetLocalRadiusSigma().GetMeters();
+      dSigmaLat = SurfacePoint.GetLatSigma().radians();
+      dSigmaLong = SurfacePoint.GetLonSigma().radians();
+      dSigmaRadius = SurfacePoint.GetLocalRadiusSigma().meters();
 
 //    std::cout << dSigmaLat << " " << dSigmaLong << " " << dSigmaRadius << std::endl;
 
-//      dSigmaLat = point->GetAdjustedSurfacePoint().GetLatSigmaDistance().GetMeters();
-//      dSigmaLong = point->GetAdjustedSurfacePoint().GetLonSigmaDistance().GetMeters();
-//      dSigmaRadius = point->GetAdjustedSurfacePoint().GetLocalRadiusSigma().GetMeters();
+//      dSigmaLat = point->GetAdjustedSurfacePoint().GetLatSigmaDistance().meters();
+//      dSigmaLong = point->GetAdjustedSurfacePoint().GetLonSigmaDistance().meters();
+//      dSigmaRadius = point->GetAdjustedSurfacePoint().GetLocalRadiusSigma().meters();
 
       t = dSigmaLat*dSigmaLat + T(0, 0);
       Distance tLatSig(sqrt(dSigma02 * t) * m_dRTM, Distance::Meters);
@@ -5386,7 +5386,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       t = dSigmaLong*dSigmaLong + T(1, 1);
       t = sqrt(dSigma02 * t) * m_dRTM;
       Distance tLonSig(
-          t * cos(point->GetAdjustedSurfacePoint().GetLatitude().GetRadians()),
+          t * cos(point->GetAdjustedSurfacePoint().GetLatitude().radians()),
           Distance::Meters);
 
       t = dSigmaRadius*dSigmaRadius + T(2, 2);
@@ -5511,9 +5511,9 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
           point->GetType() == ControlPoint::Fixed)
         continue;
 
-      double dLat = point->GetAdjustedSurfacePoint().GetLatitude().GetDegrees();
-      double dLon = point->GetAdjustedSurfacePoint().GetLongitude().GetDegrees();
-      double dRad = point->GetAdjustedSurfacePoint().GetLocalRadius().GetMeters();
+      double dLat = point->GetAdjustedSurfacePoint().GetLatitude().degrees();
+      double dLon = point->GetAdjustedSurfacePoint().GetLongitude().degrees();
+      double dRad = point->GetAdjustedSurfacePoint().GetLocalRadius().meters();
       int index = PointIndex(i);
       dLat += RAD2DEG * (basis.Coefficient(index));
       index++;
@@ -5804,7 +5804,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       }
       else {
         if( point->IsLatitudeConstrained() ) {
-          apriorisigmas[0] = point->GetAprioriSurfacePoint().GetLatSigmaDistance().GetMeters();
+          apriorisigmas[0] = point->GetAprioriSurfacePoint().GetLatSigmaDistance().meters();
           m_dParameterWeights[nWtIndex] = point->GetAprioriSurfacePoint().GetLatWeight();
           m_nConstrainedPointParameters++;
         }
@@ -5816,7 +5816,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         }
       
         if( point->IsLongitudeConstrained() ) {
-          apriorisigmas[1] = point->GetAprioriSurfacePoint().GetLonSigmaDistance().GetMeters();
+          apriorisigmas[1] = point->GetAprioriSurfacePoint().GetLonSigmaDistance().meters();
           m_dParameterWeights[nWtIndex+1] = point->GetAprioriSurfacePoint().GetLonWeight();
           m_nConstrainedPointParameters++;
         }
@@ -5832,7 +5832,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
           m_nConstrainedPointParameters++;
         }
         else if( point->IsRadiusConstrained() ) {
-          apriorisigmas[2] = point->GetAprioriSurfacePoint().GetLocalRadiusSigma().GetMeters();
+          apriorisigmas[2] = point->GetAprioriSurfacePoint().GetLocalRadiusSigma().meters();
           m_dParameterWeights[nWtIndex+2] = point->GetAprioriSurfacePoint().GetLocalRadiusWeight();
           m_nConstrainedPointParameters++;
         }
@@ -5878,7 +5878,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       nIndex++;
 
       dSigmaLong = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-      dSigmaLong *= m_dRTM * cos(point->GetAdjustedSurfacePoint().GetLatitude().GetRadians()); // Lat in radians
+      dSigmaLong *= m_dRTM * cos(point->GetAdjustedSurfacePoint().GetLatitude().radians()); // Lat in radians
       nIndex++;
 
       dSigmaRadius = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
@@ -6599,12 +6599,12 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
           nRays = point->GetNumMeasures();
           dResidualRms = point->GetResidualRms();         
-          dLat = point->GetAdjustedSurfacePoint().GetLatitude().GetDegrees();
-          dLon = point->GetAdjustedSurfacePoint().GetLongitude().GetDegrees();
-          dRadius = point->GetAdjustedSurfacePoint().GetLocalRadius().GetMeters();
-          dSigmaLat = point->GetAdjustedSurfacePoint().GetLatSigmaDistance().GetMeters();
-          dSigmaLong = point->GetAdjustedSurfacePoint().GetLonSigmaDistance().GetMeters();
-          dSigmaRadius = point->GetAdjustedSurfacePoint().GetLocalRadiusSigma().GetMeters();
+          dLat = point->GetAdjustedSurfacePoint().GetLatitude().degrees();
+          dLon = point->GetAdjustedSurfacePoint().GetLongitude().degrees();
+          dRadius = point->GetAdjustedSurfacePoint().GetLocalRadius().meters();
+          dSigmaLat = point->GetAdjustedSurfacePoint().GetLatSigmaDistance().meters();
+          dSigmaLong = point->GetAdjustedSurfacePoint().GetLonSigmaDistance().meters();
+          dSigmaRadius = point->GetAdjustedSurfacePoint().GetLocalRadiusSigma().meters();
           nGoodRays = nRays - point->GetNumberOfRejectedMeasures();
 
           if (point->GetType() == ControlPoint::Fixed)
@@ -6635,12 +6635,12 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
               continue;
 
           nRays = point->GetNumMeasures();
-          dLat = point->GetAdjustedSurfacePoint().GetLatitude().GetDegrees();
-          dLon = point->GetAdjustedSurfacePoint().GetLongitude().GetDegrees();
-          dRadius = point->GetAdjustedSurfacePoint().GetLocalRadius().GetMeters();
-          dSigmaLat = point->GetAdjustedSurfacePoint().GetLatSigmaDistance().GetMeters();
-          dSigmaLong = point->GetAdjustedSurfacePoint().GetLonSigmaDistance().GetMeters();
-          dSigmaRadius = point->GetAdjustedSurfacePoint().GetLocalRadiusSigma().GetMeters();
+          dLat = point->GetAdjustedSurfacePoint().GetLatitude().degrees();
+          dLon = point->GetAdjustedSurfacePoint().GetLongitude().degrees();
+          dRadius = point->GetAdjustedSurfacePoint().GetLocalRadius().meters();
+          dSigmaLat = point->GetAdjustedSurfacePoint().GetLatSigmaDistance().meters();
+          dSigmaLong = point->GetAdjustedSurfacePoint().GetLonSigmaDistance().meters();
+          dSigmaRadius = point->GetAdjustedSurfacePoint().GetLocalRadiusSigma().meters();
           nGoodRays = nRays - point->GetNumberOfRejectedMeasures();
 
           // point corrections and initial sigmas
@@ -7006,9 +7006,9 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
         nRays = point->GetNumMeasures();
         dResidualRms = point->GetResidualRms();
-        dLat = point->GetAdjustedSurfacePoint().GetLatitude().GetDegrees();
-        dLon = point->GetAdjustedSurfacePoint().GetLongitude().GetDegrees();
-        dRadius = point->GetAdjustedSurfacePoint().GetLocalRadius().GetMeters();
+        dLat = point->GetAdjustedSurfacePoint().GetLatitude().degrees();
+        dLon = point->GetAdjustedSurfacePoint().GetLongitude().degrees();
+        dRadius = point->GetAdjustedSurfacePoint().GetLocalRadius().meters();
         nGoodRays = nRays - point->GetNumberOfRejectedMeasures();
 
         if( point->GetType() == ControlPoint::Fixed)
@@ -7038,9 +7038,9 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
             continue;
 
         nRays = point->GetNumMeasures();
-        dLat = point->GetAdjustedSurfacePoint().GetLatitude().GetDegrees();
-        dLon = point->GetAdjustedSurfacePoint().GetLongitude().GetDegrees();
-        dRadius = point->GetAdjustedSurfacePoint().GetLocalRadius().GetMeters();
+        dLat = point->GetAdjustedSurfacePoint().GetLatitude().degrees();
+        dLon = point->GetAdjustedSurfacePoint().GetLongitude().degrees();
+        dRadius = point->GetAdjustedSurfacePoint().GetLocalRadius().meters();
         nGoodRays = nRays - point->GetNumberOfRejectedMeasures();
 
         // point corrections and initial sigmas
@@ -7151,12 +7151,12 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       if ( point->IsIgnored() || point->IsRejected() )
         continue;
 
-      dLat = point->GetAdjustedSurfacePoint().GetLatitude().GetDegrees();
-      dLon = point->GetAdjustedSurfacePoint().GetLongitude().GetDegrees();
-      dRadius = point->GetAdjustedSurfacePoint().GetLocalRadius().GetKilometers();
-      dX = point->GetAdjustedSurfacePoint().GetX().GetKilometers();
-      dY = point->GetAdjustedSurfacePoint().GetY().GetKilometers();
-      dZ = point->GetAdjustedSurfacePoint().GetZ().GetKilometers();
+      dLat = point->GetAdjustedSurfacePoint().GetLatitude().degrees();
+      dLon = point->GetAdjustedSurfacePoint().GetLongitude().degrees();
+      dRadius = point->GetAdjustedSurfacePoint().GetLocalRadius().kilometers();
+      dX = point->GetAdjustedSurfacePoint().GetX().kilometers();
+      dY = point->GetAdjustedSurfacePoint().GetY().kilometers();
+      dZ = point->GetAdjustedSurfacePoint().GetZ().kilometers();
       nMeasures = point->GetNumMeasures();
       nRejectedMeasures = point->GetNumberOfRejectedMeasures();
       dResidualRms = point->GetResidualRms();
@@ -7177,9 +7177,9 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         strStatus = "UNKNOWN";
 
       if (m_bErrorPropagation) {
-        dSigmaLat = point->GetAdjustedSurfacePoint().GetLatSigmaDistance().GetMeters();
-        dSigmaLong = point->GetAdjustedSurfacePoint().GetLonSigmaDistance().GetMeters();
-        dSigmaRadius = point->GetAdjustedSurfacePoint().GetLocalRadiusSigma().GetMeters();
+        dSigmaLat = point->GetAdjustedSurfacePoint().GetLatSigmaDistance().meters();
+        dSigmaLong = point->GetAdjustedSurfacePoint().GetLonSigmaDistance().meters();
+        dSigmaRadius = point->GetAdjustedSurfacePoint().GetLocalRadiusSigma().meters();
 
         sprintf(buf, "%s,%s,%d,%d,%6.2lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf\n",
                 point->GetId().c_str(), strStatus.c_str(), nMeasures, nRejectedMeasures, dResidualRms, dLat, dLon, dRadius,

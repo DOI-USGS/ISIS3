@@ -368,7 +368,7 @@ bool TryKernels(Cube *icube, Process &p,
         bodyTable.Label()["Kernels"].AddValue(pckKeyword[i]);
 
       bodyTable.Label() += PvlKeyword("SolarLongitude",
-          cam->SolarLongitude().GetDegrees());
+          cam->SolarLongitude().degrees());
       icube->write(bodyTable);
 
       Table sunTable = cam->SunPosition()->Cache("SunPosition");

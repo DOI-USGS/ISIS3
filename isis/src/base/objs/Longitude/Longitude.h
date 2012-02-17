@@ -82,25 +82,25 @@ namespace Isis {
       Longitude(const Longitude &longitudeToCopy);
       ~Longitude();
 
-      double GetPositiveEast(Angle::Units units = Angle::Radians) const;
-      void SetPositiveEast(double longitude,
+      double positiveEast(Angle::Units units = Angle::Radians) const;
+      void setPositiveEast(double longitude,
                            Angle::Units units = Angle::Radians);
-      double GetPositiveWest(Angle::Units units = Angle::Radians) const;
-      void SetPositiveWest(double longitude,
+      double positiveWest(Angle::Units units = Angle::Radians) const;
+      void setPositiveWest(double longitude,
                            Angle::Units units = Angle::Radians);
 
-      Longitude Force180Domain() const;
-      Longitude Force360Domain() const;
+      Longitude force180Domain() const;
+      Longitude force360Domain() const;
 
-      bool IsInRange(Longitude min, Longitude max) const;
+      bool inRange(Longitude min, Longitude max) const;
 
       /**
-       * Same as GetPositiveEast.
+       * Same as positiveEast.
        *
-       * @see GetPositiveEast
+       * @see positiveEast
        
       operator double() const {
-        return GetPositiveEast();
+        return positiveEast();
       }*/
 
       Longitude& operator=(const Longitude & longitudeToCopy);
@@ -109,7 +109,7 @@ namespace Isis {
       /**
        * This is necessary for converting to PositiveWest and back.
        */
-      Domain p_currentDomain;
+      Domain m_currentDomain;
   };
 }
 

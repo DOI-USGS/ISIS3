@@ -31,7 +31,7 @@ namespace Isis {
    *   distance later on with operator= or one of the Set methods.
    */
   Distance::Distance() {
-    SetDistance(Null, Meters);
+    setDistance(Null, Meters);
   }
 
 
@@ -49,7 +49,7 @@ namespace Isis {
     if(distanceUnit == Pixels)
       distanceUnit = Meters;
 
-    SetDistance(distance, distanceUnit);
+    setDistance(distance, distanceUnit);
   }
 
 
@@ -62,7 +62,7 @@ namespace Isis {
    * @param pixelsPerMeter The pixels/meter conversion factor
    */
   Distance::Distance(double distanceInPixels, double pixelsPerMeter) {
-    SetDistance(distanceInPixels / pixelsPerMeter, Meters);
+    setDistance(distanceInPixels / pixelsPerMeter, Meters);
   }
 
 
@@ -75,7 +75,7 @@ namespace Isis {
    */
   Distance::Distance(const Distance &distanceToCopy) {
     // Use meters because it is the stored format, no precision loss
-    SetDistance(distanceToCopy.GetMeters(), Meters);
+    setDistance(distanceToCopy.meters(), Meters);
   }
 
 
@@ -85,7 +85,7 @@ namespace Isis {
   Distance::~Distance() {
     // This will help debug memory problems, better to reset to obviously bad
     //   values in case we're used after we're deleted.
-    p_distanceInMeters = Null;
+    m_distanceInMeters = Null;
   }
 
 
@@ -94,8 +94,8 @@ namespace Isis {
    *
    * @return Current distance, in meters, guaranteed to be >= 0.0
    */
-  double Distance::GetMeters() const {
-    return GetDistance(Meters);
+  double Distance::meters() const {
+    return distance(Meters);
   }
 
 
@@ -105,8 +105,8 @@ namespace Isis {
    * @param distanceInMeters This is the value to set this distance to, given in
    *     meters. This will throw an exception if the value is negative.
    */
-  void Distance::SetMeters(double distanceInMeters) {
-    SetDistance(distanceInMeters, Meters);
+  void Distance::setMeters(double distanceInMeters) {
+    setDistance(distanceInMeters, Meters);
   }
 
 
@@ -115,8 +115,8 @@ namespace Isis {
    *
    * @return Current distance, in kilometers, guaranteed to be >= 0.0
    */
-  double Distance::GetKilometers() const {
-    return GetDistance(Kilometers);
+  double Distance::kilometers() const {
+    return distance(Kilometers);
   }
 
 
@@ -127,8 +127,8 @@ namespace Isis {
    *     given in kilometers. This will throw an exception if the value is
    *     negative.
    */
-  void Distance::SetKilometers(double distanceInKilometers) {
-    SetDistance(distanceInKilometers, Kilometers);
+  void Distance::setKilometers(double distanceInKilometers) {
+    setDistance(distanceInKilometers, Kilometers);
   }
 
 
@@ -140,8 +140,8 @@ namespace Isis {
    * @return Current distance, in pixels, guaranteed to be >= 0.0 if
    *         pixelsPerMeter is positive
    */
-  double Distance::GetPixels(double pixelsPerMeter) const {
-    return GetDistance(Meters) * pixelsPerMeter;
+  double Distance::pixels(double pixelsPerMeter) const {
+    return distance(Meters) * pixelsPerMeter;
   }
 
 
@@ -154,8 +154,8 @@ namespace Isis {
    * @param pixelsPerMeter Pixels/Meters conversion ratio to use, stored data
    *         is always in meters
    */
-  void Distance::SetPixels(double distanceInPixels, double pixelsPerMeter) {
-    SetDistance(distanceInPixels / pixelsPerMeter, Meters);
+  void Distance::setPixels(double distanceInPixels, double pixelsPerMeter) {
+    setDistance(distanceInPixels / pixelsPerMeter, Meters);
   }
 
 
@@ -164,8 +164,8 @@ namespace Isis {
    *
    * @return True if this distance has been initialized.
    */
-  bool Distance::Valid() const {
-    return GetDistance(Meters) != Null;
+  bool Distance::isValid() const {
+    return distance(Meters) != Null;
   }
 
 
@@ -177,13 +177,13 @@ namespace Isis {
     * @return True if this distance is greater than the given distance
     */
   bool Distance::operator >(const Distance &otherDistance) const {
-    if(!Valid() || !otherDistance.Valid()) {
+    if(!isValid() || !otherDistance.isValid()) {
       iString msg = "Distance has not been initialized, you must initialize "
           "it first before comparing with another distance using [>]";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
-    return GetMeters() > otherDistance.GetMeters();
+    return meters() > otherDistance.meters();
   }
 
 
@@ -195,13 +195,13 @@ namespace Isis {
     * @return True if this distance is less than the given distance
     */
   bool Distance::operator <(const Distance &otherDistance) const {
-    if(!Valid() || !otherDistance.Valid()) {
+    if(!isValid() || !otherDistance.isValid()) {
       iString msg = "Distance has not been initialized, you must initialize "
           "it first before comparing with another distance using [<]";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
-    return GetMeters() < otherDistance.GetMeters();
+    return meters() < otherDistance.meters();
   }
 
 
@@ -214,7 +214,7 @@ namespace Isis {
   Distance &Distance::operator =(const Distance &distanceToCopy) {
     if(this == &distanceToCopy) return *this;
 
-    SetDistance(distanceToCopy.GetMeters(), Meters);
+    setDistance(distanceToCopy.meters(), Meters);
 
     return *this;
   }
@@ -227,9 +227,9 @@ namespace Isis {
    * @return Resulting distance, self not modified
    */
   Distance Distance::operator +(const Distance &distanceToAdd) const {
-    if(!Valid() || !distanceToAdd.Valid()) return Distance();
+    if(!isValid() || !distanceToAdd.isValid()) return Distance();
 
-    return Distance(GetMeters() + distanceToAdd.GetMeters(), Meters);
+    return Distance(meters() + distanceToAdd.meters(), Meters);
   }
 
 
@@ -241,9 +241,9 @@ namespace Isis {
    * @return Resulting distance, self not modified
    */
   Displacement Distance::operator -(const Distance &distanceToSub) const {
-    if(!Valid() || !distanceToSub.Valid()) return Displacement();
+    if(!isValid() || !distanceToSub.isValid()) return Displacement();
 
-    Displacement result(GetMeters() - distanceToSub.GetMeters(),
+    Displacement result(meters() - distanceToSub.meters(),
         Displacement::Meters);
 
     return result;
@@ -257,9 +257,9 @@ namespace Isis {
    * @return Resulting value
    */
   double Distance::operator /(const Distance &distanceToDiv) const {
-    if(!Valid() || !distanceToDiv.Valid()) return Null;
+    if(!isValid() || !distanceToDiv.isValid()) return Null;
 
-    double result = GetMeters() / distanceToDiv.GetMeters();
+    double result = meters() / distanceToDiv.meters();
     return result;
   }
 
@@ -271,9 +271,9 @@ namespace Isis {
    * @return Resulting value
    */
   Distance Distance::operator /(const double &valueToDiv) const {
-    if(!Valid() || IsSpecial(valueToDiv)) return Distance();
+    if(!isValid() || IsSpecial(valueToDiv)) return Distance();
 
-    Distance result = Distance(GetMeters() / valueToDiv, Meters);
+    Distance result = Distance(meters() / valueToDiv, Meters);
 
     return result;
   }
@@ -286,9 +286,9 @@ namespace Isis {
    * @return Resulting value
    */
   Distance Distance::operator *(const double &valueToMult) const {
-    if(!Valid() || IsSpecial(valueToMult)) return Distance();
+    if(!isValid() || IsSpecial(valueToMult)) return Distance();
 
-    Distance result = Distance(GetMeters() * valueToMult, Meters);
+    Distance result = Distance(meters() * valueToMult, Meters);
 
     return result;
   }
@@ -313,11 +313,11 @@ namespace Isis {
    * @param distanceToAdd This is the distance we are to duplicate exactly
    */
   void Distance::operator +=(const Distance &distanceToAdd) {
-    if(!Valid() || !distanceToAdd.Valid()) {
-      SetDistance(Null, Meters);
+    if(!isValid() || !distanceToAdd.isValid()) {
+      setDistance(Null, Meters);
     }
     else {
-      SetDistance(GetMeters() + distanceToAdd.GetMeters(), Meters);
+      setDistance(meters() + distanceToAdd.meters(), Meters);
     }
   }
 
@@ -330,11 +330,11 @@ namespace Isis {
    * @param distanceToSub This is the distance we are to subtract
    */
   void Distance::operator -=(const Distance &distanceToSub) {
-    if(!Valid() || !distanceToSub.Valid()) {
-      SetDistance(Null, Meters);
+    if(!isValid() || !distanceToSub.isValid()) {
+      setDistance(Null, Meters);
     }
     else {
-      SetDistance(GetMeters() - distanceToSub.GetMeters(), Meters);
+      setDistance(meters() - distanceToSub.meters(), Meters);
     }
   }
 
@@ -345,11 +345,11 @@ namespace Isis {
    * @param valueToDiv This is the displacement we are to divide by
    */
   void Distance::operator /=(const double &valueToDiv) {
-    if(!Valid() || IsSpecial(valueToDiv)) {
-      SetDistance(Null, Meters);
+    if(!isValid() || IsSpecial(valueToDiv)) {
+      setDistance(Null, Meters);
     }
     else {
-      SetDistance(GetMeters() / valueToDiv, Meters);
+      setDistance(meters() / valueToDiv, Meters);
     }
   }
 
@@ -360,11 +360,11 @@ namespace Isis {
    * @param valueToMult This is the value we are going to multiply by
    */
   void Distance::operator *=(const double &valueToMult) {
-    if(!Valid() || IsSpecial(valueToMult)) {
-      SetDistance(Null, Meters);
+    if(!isValid() || IsSpecial(valueToMult)) {
+      setDistance(Null, Meters);
     }
     else {
-      SetDistance(GetMeters() * valueToMult, Meters);
+      setDistance(meters() * valueToMult, Meters);
     }
   }
 
@@ -377,11 +377,11 @@ namespace Isis {
    *     exception will be thrown.
    * @return The distance in units of distanceUnit
    */
-  double Distance::GetDistance(Units distanceUnit) const {
-    double distanceInMeters = p_distanceInMeters;
+  double Distance::distance(Units distanceUnit) const {
+    double distanceInMeters = m_distanceInMeters;
     double resultingDistance = Null;
 
-    if(p_distanceInMeters == Null) return Null;
+    if(m_distanceInMeters == Null) return Null;
 
     switch(distanceUnit) {
       case Meters:
@@ -393,7 +393,7 @@ namespace Isis {
         break;
 
       case Pixels:
-        iString msg = "Cannot GetDistance with pixels, ask for another unit";
+        iString msg = "Cannot distance with pixels, ask for another unit";
         throw iException::Message(iException::Programmer, msg, _FILEINFO_);
         break;
     }
@@ -418,11 +418,11 @@ namespace Isis {
    * @param distanceUnit Unit of distance. If this is invalid, an
    *     exception will be thrown and the state left unmodified.
    */
-  void Distance::SetDistance(const double &distance, Units distanceUnit) {
+  void Distance::setDistance(const double &distance, Units distanceUnit) {
     double distanceInMeters = Null;
 
     if(IsSpecial(distance)) {
-      p_distanceInMeters = Null;
+      m_distanceInMeters = Null;
       return;
     }
 
@@ -436,7 +436,7 @@ namespace Isis {
         break;
 
       case Pixels:
-        iString msg = "Cannot SetDistance with pixels, must convert to another "
+        iString msg = "Cannot setDistance with pixels, must convert to another "
             "unit first";
         throw iException::Message(iException::Programmer, msg, _FILEINFO_);
         break;
@@ -455,6 +455,6 @@ namespace Isis {
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
-    p_distanceInMeters = distanceInMeters;
+    m_distanceInMeters = distanceInMeters;
   }
 }

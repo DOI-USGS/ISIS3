@@ -253,7 +253,7 @@ namespace Isis {
   void SurfacePoint::SetRectangularPoint(const Displacement &x,
       const Displacement &y, const Displacement &z) {
 
-    if (!x.Valid() || !y.Valid() || !z.Valid()) {
+    if (!x.isValid() || !y.isValid() || !z.isValid()) {
       iString msg = "x, y, and z must be set to valid displacements.  One or "
         "more coordinates have been set to an invalid displacement.";
       throw iException::Message(iException::User, msg, _FILEINFO_);
@@ -301,7 +301,7 @@ namespace Isis {
       const Distance &ySigma, const Distance &zSigma) {
     SetRectangularPoint(x, y, z);
 
-    if (xSigma.Valid() && ySigma.Valid() && zSigma.Valid()) 
+    if (xSigma.isValid() && ySigma.isValid() && zSigma.isValid()) 
       SetRectangularSigmas(xSigma, ySigma, zSigma); 
   }
 
@@ -336,7 +336,7 @@ namespace Isis {
                                           const Distance &ySigma,
                                           const Distance &zSigma) {
     // Is this error checking necessary or should we just use Distance?????
-    if (!xSigma.Valid() || !ySigma.Valid() || !zSigma.Valid()) {
+    if (!xSigma.isValid() || !ySigma.isValid() || !zSigma.isValid()) {
       iString msg = "x sigma, y sigma , and z sigma must be set to valid "
         "distances.  One or more sigmas have been set to an invalid distance.";
       throw iException::Message(iException::User, msg, _FILEINFO_);
@@ -344,9 +344,9 @@ namespace Isis {
 
     symmetric_matrix<double,upper> covar(3);
     covar.clear();
-    covar(0,0) = xSigma.GetMeters() * xSigma.GetMeters();
-    covar(1,1) = ySigma.GetMeters() * ySigma.GetMeters();
-    covar(2,2) = zSigma.GetMeters() * zSigma.GetMeters();
+    covar(0,0) = xSigma.meters() * xSigma.meters();
+    covar(1,1) = ySigma.meters() * ySigma.meters();
+    covar(2,2) = zSigma.meters() * zSigma.meters();
     SetRectangularMatrix(covar);
   }
 
@@ -377,9 +377,9 @@ namespace Isis {
     SpiceDouble rectMat[3][3];
 
     // Compute the local radius of the surface point
-    double x2  = p_x->GetMeters() * p_x->GetMeters();
-    double y2  = p_y->GetMeters() * p_y->GetMeters();
-    double z   = p_z->GetMeters();
+    double x2  = p_x->meters() * p_x->meters();
+    double y2  = p_y->meters() * p_y->meters();
+    double z   = p_z->meters();
     double radius = sqrt(x2 + y2 + z*z);
 
     // Should we use a matrix utility?
@@ -392,18 +392,18 @@ namespace Isis {
 
     // Compute the Jacobian
     SpiceDouble J[3][3];
-    double zOverR = p_z->GetMeters() / radius;
+    double zOverR = p_z->meters() / radius;
     double r2 = radius*radius;
     double denom = r2*radius*sqrt(1.0 - (zOverR*zOverR));
-    J[0][0] = -p_x->GetMeters() * p_z->GetMeters() / denom;
-    J[0][1] = -p_y->GetMeters() * p_z->GetMeters() / denom;
-    J[0][2] = (r2 - p_z->GetMeters() * p_z->GetMeters()) / denom;
-    J[1][0] = -p_y->GetMeters() / (x2 + y2);
-    J[1][1] = p_x->GetMeters() / (x2 + y2);
+    J[0][0] = -p_x->meters() * p_z->meters() / denom;
+    J[0][1] = -p_y->meters() * p_z->meters() / denom;
+    J[0][2] = (r2 - p_z->meters() * p_z->meters()) / denom;
+    J[1][0] = -p_y->meters() / (x2 + y2);
+    J[1][1] = p_x->meters() / (x2 + y2);
     J[1][2] = 0.0;
-    J[2][0] = p_x->GetMeters() / radius;
-    J[2][1] = p_y->GetMeters() / radius;
-    J[2][2] = p_z->GetMeters() / radius;
+    J[2][0] = p_x->meters() / radius;
+    J[2][1] = p_y->meters() / radius;
+    J[2][2] = p_z->meters() / radius;
 
     if(!p_sphereCovar)
       p_sphereCovar = new symmetric_matrix<double, upper>(3);
@@ -435,14 +435,14 @@ namespace Isis {
                                        const Longitude &lon,
                                        const Distance  &radius) {
 // Is error checking necessary or does Latitude, Longitude, and Distance handle it?????
-    if (!lat.Valid()  ||  !lon.Valid()  ||  !radius.Valid()) {
+    if (!lat.isValid()  ||  !lon.isValid()  ||  !radius.isValid()) {
       iString msg = "Latitude, longitude, or radius is an invalid value.";
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
-    SpiceDouble dlat = (double) lat.GetRadians();
-    SpiceDouble dlon = (double) lon.GetRadians();
-    SpiceDouble dradius = radius.GetKilometers();
+    SpiceDouble dlat = (double) lat.radians();
+    SpiceDouble dlon = (double) lon.radians();
+    SpiceDouble dradius = radius.kilometers();
 
     SpiceDouble rect[3];
     latrec_c ( dradius, dlon, dlat, rect);
@@ -471,7 +471,7 @@ namespace Isis {
       const Distance &radiusSigma) {
     SetSphericalPoint(lat, lon, radius);
 
-    if (latSigma.Valid() && lonSigma.Valid() && radiusSigma.Valid())
+    if (latSigma.isValid() && lonSigma.isValid() && radiusSigma.isValid())
       SetSphericalSigmas(latSigma, lonSigma, radiusSigma); 
   }
 
@@ -517,16 +517,16 @@ namespace Isis {
   void SurfacePoint::SetSphericalSigmas(const Angle &latSigma,
                                         const Angle &lonSigma,
                                         const Distance &radiusSigma) {
-    if (latSigma.Valid() && lonSigma.Valid() && radiusSigma.Valid()) {
+    if (latSigma.isValid() && lonSigma.isValid() && radiusSigma.isValid()) {
       symmetric_matrix<double,upper> covar(3);
       covar.clear();
 
       double sphericalCoordinate;
-      sphericalCoordinate = (double) latSigma.GetRadians();
+      sphericalCoordinate = (double) latSigma.radians();
       covar(0,0) =  sphericalCoordinate*sphericalCoordinate;
-      sphericalCoordinate = (double) lonSigma.GetRadians();
+      sphericalCoordinate = (double) lonSigma.radians();
       covar(1,1) = sphericalCoordinate*sphericalCoordinate;
-      sphericalCoordinate = (double) radiusSigma.GetMeters();
+      sphericalCoordinate = (double) radiusSigma.meters();
       covar(2,2) = sphericalCoordinate*sphericalCoordinate;
 
       SetSphericalMatrix(covar);
@@ -555,8 +555,8 @@ namespace Isis {
   void SurfacePoint::SetSphericalSigmasDistance(const Distance &latSigma,
     const Distance &lonSigma, const Distance &radiusSigma) {
 
-    if (!p_majorAxis || !p_minorAxis || !p_polarAxis || !p_majorAxis->Valid() ||
-        !p_minorAxis->Valid() || !p_polarAxis->Valid()) {
+    if (!p_majorAxis || !p_minorAxis || !p_polarAxis || !p_majorAxis->isValid() ||
+        !p_minorAxis->isValid() || !p_polarAxis->isValid()) {
       iString msg = "In order to use sigmas in meter units, the equitorial "
         "radius must be set with a call to SetRadii or an appropriate "
         "constructor";
@@ -569,7 +569,7 @@ namespace Isis {
     }
  
     double scaledLatSig = latSigma / *p_majorAxis;
-    double scaledLonSig = lonSigma * cos((double)GetLatitude().GetRadians())
+    double scaledLonSig = lonSigma * cos((double)GetLatitude().radians())
                                    / *p_majorAxis;
     SetSphericalSigmas( Angle(scaledLatSig, Angle::Radians),
                         Angle(scaledLonSig, Angle::Radians), radiusSigma);
@@ -614,9 +614,9 @@ namespace Isis {
 //              <<"         "<<sphereMat[2][0]<<" "<<sphereMat[2][1]<<" "<<sphereMat[2][2]<<std::endl;
 
     // Get the lat/lon/radius of the point
-    double lat = (double) GetLatitude().GetRadians();
-    double lon = (double) GetLongitude().GetRadians();
-    double radius = (double) GetLocalRadius().GetMeters();
+    double lat = (double) GetLatitude().radians();
+    double lon = (double) GetLongitude().radians();
+    double radius = (double) GetLocalRadius().meters();
 
     // Compute the Jacobian
     SpiceDouble J[3][3];
@@ -667,9 +667,9 @@ namespace Isis {
    */
   void SurfacePoint::ToNaifArray(double naifOutput[3]) const {
     if(Valid()) {
-      naifOutput[0] = p_x->GetKilometers();
-      naifOutput[1] = p_y->GetKilometers();
-      naifOutput[2] = p_z->GetKilometers();
+      naifOutput[0] = p_x->kilometers();
+      naifOutput[1] = p_y->kilometers();
+      naifOutput[2] = p_z->kilometers();
     }
     else {
       iString msg = "Cannot convert an invalid surface point to a naif array";
@@ -688,9 +688,9 @@ namespace Isis {
    */
   void SurfacePoint::FromNaifArray(const double naifValues[3]) {
     if(p_x && p_y && p_z) {
-      p_x->SetKilometers(naifValues[0]);
-      p_y->SetKilometers(naifValues[1]);
-      p_z->SetKilometers(naifValues[2]);
+      p_x->setKilometers(naifValues[0]);
+      p_y->setKilometers(naifValues[1]);
+      p_z->setKilometers(naifValues[2]);
     }
     else {
       p_x = new Displacement(naifValues[0], Displacement::Kilometers);
@@ -711,9 +711,9 @@ namespace Isis {
                               const Distance &minorRadius,
                               const Distance &polarRadius) {
 
-    if (!majorRadius.Valid()  ||
-        !minorRadius.Valid()  ||
-        !polarRadius.Valid()) {
+    if (!majorRadius.isValid()  ||
+        !minorRadius.isValid()  ||
+        !polarRadius.isValid()) {
       iString msg = "Radii must be set to valid distances.  One or more radii "
         "have been set to an invalid distance.";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
@@ -750,25 +750,25 @@ namespace Isis {
    */
   void SurfacePoint::ResetLocalRadius(const Distance &radius) {
 
-    if (!radius.Valid()) {
+    if (!radius.isValid()) {
       iString msg = "Radius value must be a valid Distance.";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
-    if (!p_x || !p_y || !p_z || !p_x->Valid() || !p_y->Valid() ||
-        !p_z->Valid()) {
+    if (!p_x || !p_y || !p_z || !p_x->isValid() || !p_y->isValid() ||
+        !p_z->isValid()) {
         iString msg = "In order to reset the local radius, a Surface Point must "
           "already be set.";
         throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
-    SpiceDouble lat = (double) GetLatitude().GetRadians();
-    SpiceDouble lon = (double) GetLongitude().GetRadians();
+    SpiceDouble lat = (double) GetLatitude().radians();
+    SpiceDouble lon = (double) GetLongitude().radians();
     SpiceDouble rect[3];
-    latrec_c ((SpiceDouble) radius.GetKilometers(), lon, lat, rect);
-    p_x->SetKilometers(rect[0]);
-    p_y->SetKilometers(rect[1]);
-    p_z->SetKilometers(rect[2]);
+    latrec_c ((SpiceDouble) radius.kilometers(), lon, lat, rect);
+    p_x->setKilometers(rect[0]);
+    p_y->setKilometers(rect[1]);
+    p_z->setKilometers(rect[2]);
 
     // TODO What should be done to the variance/covariance matrix when the
     // radius is reset??? With Bundle updates will this functionality be
@@ -778,7 +778,7 @@ namespace Isis {
 
   bool SurfacePoint::Valid() const {
     static const Displacement zero(0, Displacement::Meters);
-    return p_x && p_y && p_z && p_x->Valid() && p_y->Valid() && p_z->Valid() &&
+    return p_x && p_y && p_z && p_x->isValid() && p_y->isValid() && p_z->isValid() &&
            (*p_x != zero || *p_y != zero || *p_z != zero);
   }
 
@@ -862,9 +862,9 @@ namespace Isis {
         return Latitude();
 
       // TODO Scale for accuracy with coordinate of largest magnitude
-      double x = p_x->GetMeters();
-      double y = p_y->GetMeters();
-      double z = p_z->GetMeters();
+      double x = p_x->meters();
+      double y = p_y->meters();
+      double z = p_z->meters();
 
       if (x != 0.  ||  y != 0.  || z != 0.) 
         return Latitude(atan2(z, sqrt(x*x + y*y) ), Angle::Radians);
@@ -881,8 +881,8 @@ namespace Isis {
       if (!Valid()) 
         return Longitude();
 
-      double x = p_x->GetMeters();
-      double y = p_y->GetMeters();
+      double x = p_x->meters();
+      double y = p_y->meters();
 
       if(x == 0.0 && y == 0.0) {
         return Longitude(0, Angle::Radians);
@@ -905,9 +905,9 @@ namespace Isis {
       if (!Valid())
         return Distance();
 
-      double x = p_x->GetMeters();
-      double y = p_y->GetMeters();
-      double z = p_z->GetMeters();
+      double x = p_x->meters();
+      double y = p_y->meters();
+      double z = p_z->meters();
 
       return Distance(sqrt(x*x + y*y + z*z), Distance::Meters);
     }
@@ -923,15 +923,15 @@ namespace Isis {
       if(Valid()) {
         Angle latSigma = GetLatSigma();
 
-        if (latSigma.Valid()) {
-          if (!p_majorAxis || !p_majorAxis->Valid()) {
+        if (latSigma.isValid()) {
+          if (!p_majorAxis || !p_majorAxis->isValid()) {
             iString msg = "In order to calculate sigmas in meter units, the "
               "equitorial radius must be set with a call to SetRadii.";
             throw iException::Message(iException::Programmer, msg, _FILEINFO_);
           }
 
           // Convert from radians to meters
-          latSigmaDistance = latSigma.GetRadians() * *p_majorAxis;
+          latSigmaDistance = latSigma.radians() * *p_majorAxis;
         }
       }
 
@@ -949,19 +949,19 @@ namespace Isis {
     if(Valid()) {
       Angle lonSigma = GetLonSigma();
 
-      if (lonSigma.Valid()) {
-        if (!p_majorAxis || !p_majorAxis->Valid()) {
+      if (lonSigma.isValid()) {
+        if (!p_majorAxis || !p_majorAxis->isValid()) {
           iString msg = "In order to calculate sigmas in meter units, the "
             "equitorial radius must be set with a call to SetRadii.";
           throw iException::Message(iException::Programmer, msg, _FILEINFO_);
         }
 
         Latitude lat = GetLatitude();
-        double scaler = cos(lat.GetRadians());
+        double scaler = cos(lat.radians());
 
         // Convert from radians to meters and return
         if (scaler != 0.)
-          lonSigmaDistance = lonSigma.GetRadians() * *p_majorAxis / scaler;
+          lonSigmaDistance = lonSigma.radians() * *p_majorAxis / scaler;
       }
     }
 
@@ -994,7 +994,7 @@ namespace Isis {
    *
    */
   double SurfacePoint::GetLatWeight() const {
-    double dlatSigma = GetLatSigma().GetRadians();
+    double dlatSigma = GetLatSigma().radians();
 
       if( dlatSigma <= 0.0 ) {
           iString msg = "SurfacePoint::GetLatWeight(): Sigma <= 0.0";
@@ -1010,7 +1010,7 @@ namespace Isis {
   *
   */
   double SurfacePoint::GetLonWeight() const {
-    double dlonSigma = GetLonSigma().GetRadians();
+    double dlonSigma = GetLonSigma().radians();
 
         if( dlonSigma <= 0.0 ) {
             iString msg = "SurfacePoint::GetLonWeight(): Sigma <= 0.0";
@@ -1027,7 +1027,7 @@ namespace Isis {
   */
   double SurfacePoint::GetLocalRadiusWeight() const {
 
-    double dlocalRadiusSigma = GetLocalRadiusSigma().GetKilometers();
+    double dlocalRadiusSigma = GetLocalRadiusSigma().kilometers();
 
         if (dlocalRadiusSigma <= 0.0 ) {
             iString msg = "SurfacePoint::GetRadWeight(): Sigma <= 0.0";
@@ -1082,14 +1082,14 @@ namespace Isis {
     Angle deltaLat = latitude - otherLatitude;
     Angle deltaLon = longitude - otherLongitude;
 
-    double haversinLat = sin(deltaLat.GetRadians() / 2.0);
+    double haversinLat = sin(deltaLat.radians() / 2.0);
     haversinLat *= haversinLat;
 
-    double haversinLon = sin(deltaLon.GetRadians() / 2.0);
+    double haversinLon = sin(deltaLon.radians() / 2.0);
     haversinLon *= haversinLon;
 
-    double a = haversinLat + cos(latitude.GetRadians()) *
-               cos(otherLatitude.GetRadians()) *
+    double a = haversinLat + cos(latitude.radians()) *
+               cos(otherLatitude.radians()) *
                haversinLon;
 
     double c = 2 * atan(sqrt(a) / sqrt(1 - a));

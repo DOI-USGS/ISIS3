@@ -213,46 +213,46 @@ namespace Isis
               return QVariant();
           case AdjustedSPLat:
             return QVariant(
-                point->GetAdjustedSurfacePoint().GetLatitude().GetDegrees());
+                point->GetAdjustedSurfacePoint().GetLatitude().degrees());
           case AdjustedSPLon:
             return QVariant(
-                point->GetAdjustedSurfacePoint().GetLongitude().GetDegrees());
+                point->GetAdjustedSurfacePoint().GetLongitude().degrees());
           case AdjustedSPRadius:
             return QVariant(
-                point->GetAdjustedSurfacePoint().GetLocalRadius().GetMeters());
+                point->GetAdjustedSurfacePoint().GetLocalRadius().meters());
           case AdjustedSPLatSigma:
             return QVariant(
                 point->GetAdjustedSurfacePoint().
-                  GetLatSigmaDistance().GetMeters());
+                  GetLatSigmaDistance().meters());
           case AdjustedSPLonSigma:
             return QVariant(
                 point->GetAdjustedSurfacePoint().
-                  GetLonSigmaDistance().GetMeters());
+                  GetLonSigmaDistance().meters());
           case AdjustedSPRadiusSigma:
             return QVariant(
                 point->GetAdjustedSurfacePoint().
-                  GetLocalRadiusSigma().GetMeters());
+                  GetLocalRadiusSigma().meters());
           case APrioriSPLat:
             return QVariant(
-                point->GetAprioriSurfacePoint().GetLatitude().GetDegrees());
+                point->GetAprioriSurfacePoint().GetLatitude().degrees());
           case APrioriSPLon:
             return QVariant(
-                point->GetAprioriSurfacePoint().GetLongitude().GetDegrees());
+                point->GetAprioriSurfacePoint().GetLongitude().degrees());
           case APrioriSPRadius:
             return QVariant(
-                point->GetAprioriSurfacePoint().GetLocalRadius().GetMeters());
+                point->GetAprioriSurfacePoint().GetLocalRadius().meters());
           case APrioriSPLatSigma:
             return QVariant(
                 point->GetAprioriSurfacePoint().
-                  GetLatSigmaDistance().GetMeters());
+                  GetLatSigmaDistance().meters());
           case APrioriSPLonSigma:
             return QVariant(
                 point->GetAprioriSurfacePoint().
-                  GetLonSigmaDistance().GetMeters());
+                  GetLonSigmaDistance().meters());
           case APrioriSPRadiusSigma:
             return QVariant(
                 point->GetAprioriSurfacePoint().
-                  GetLocalRadiusSigma().GetMeters());
+                  GetLocalRadiusSigma().meters());
           case APrioriSPSource:
             return QVariant((QString)point->GetSurfacePointSourceString());
           case APrioriSPSourceFile:
@@ -500,13 +500,13 @@ namespace Isis
       Distance lonSigDist = surfacePoint.GetLonSigmaDistance();
       Distance radiusSigDist = surfacePoint.GetLocalRadiusSigma();
 
-      if (newSigma.Valid())
+      if (newSigma.isValid())
       {
-        if (!latSigDist.Valid())
+        if (!latSigDist.isValid())
           latSigDist = free;
-        if (!lonSigDist.Valid())
+        if (!lonSigDist.isValid())
           lonSigDist = free;
-        if (!radiusSigDist.Valid())
+        if (!radiusSigDist.isValid())
           radiusSigDist = free;
       }
       else
@@ -525,7 +525,7 @@ namespace Isis
     SurfacePoint AbstractPointItem::prepareSurfacePoint(Latitude newLat,
         SurfacePoint surfacePoint)
     {
-      if (newLat.Valid()) {
+      if (newLat.isValid()) {
         surfacePoint = prepareSurfacePoint(surfacePoint);
       }
       else {
@@ -540,7 +540,7 @@ namespace Isis
     SurfacePoint AbstractPointItem::prepareSurfacePoint(Longitude newLon,
         SurfacePoint surfacePoint)
     {
-      if (newLon.Valid()) {
+      if (newLon.isValid()) {
         surfacePoint = prepareSurfacePoint(surfacePoint);
       }
       else {
@@ -555,7 +555,7 @@ namespace Isis
     SurfacePoint AbstractPointItem::prepareSurfacePoint(
         Distance newRadius, SurfacePoint surfacePoint)
     {
-      if (newRadius.Valid()) {
+      if (newRadius.isValid()) {
         surfacePoint = prepareSurfacePoint(surfacePoint);
       }
       else {
@@ -574,11 +574,11 @@ namespace Isis
       Longitude lon = surfacePoint.GetLongitude();
       Distance radius = surfacePoint.GetLocalRadius();
 
-      if (!lat.Valid())
+      if (!lat.isValid())
         lat = Latitude(0, Angle::Degrees);
-      if (!lon.Valid())
+      if (!lon.isValid())
         lon = Longitude(0, Angle::Degrees);
-      if (!radius.Valid())
+      if (!radius.isValid())
         radius= Distance(10000, Distance::Meters);
 
       surfacePoint.SetSphericalCoordinates(lat, lon, radius);

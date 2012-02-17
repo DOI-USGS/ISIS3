@@ -203,7 +203,7 @@ namespace Isis {
         Latitude lat(p_projection->UniversalLatitude(), Angle::Degrees);
         Longitude lon(p_projection->UniversalLongitude(), Angle::Degrees);
         Distance rad(LocalRadius(lat, lon));
-        if(!rad.Valid()) {
+        if(!rad.isValid()) {
           p_hasIntersection = false;
           return p_hasIntersection;
         }
@@ -256,7 +256,7 @@ namespace Isis {
   bool Camera::SetGround(Latitude latitude, Longitude longitude) {
     Distance localRadius(LocalRadius(latitude, longitude));
 
-    if(!localRadius.Valid()) {
+    if(!localRadius.isValid()) {
       p_hasIntersection = false;
       return p_hasIntersection;
     }
@@ -539,7 +539,7 @@ namespace Isis {
       Distance radius(LocalRadius(latitude, longitude));
       SurfacePoint testPoint;
 
-      if (radius.Valid()) {
+      if (radius.isValid()) {
 
         testPoint = SurfacePoint(latitude, longitude, radius);
 
@@ -560,7 +560,7 @@ namespace Isis {
       longitude = Longitude(0.0, Angle::Degrees);
       radius = LocalRadius(latitude, longitude);
 
-      if (radius.Valid()) {
+      if (radius.isValid()) {
 
         testPoint = SurfacePoint(latitude, longitude, radius);
 
@@ -579,7 +579,7 @@ namespace Isis {
       latitude = Latitude(-90, Angle::Degrees);
       radius = LocalRadius(latitude, longitude);
 
-      if (radius.Valid()) {
+      if (radius.isValid()) {
 
         testPoint = SurfacePoint(latitude, longitude, radius);
         if(SetGround(testPoint)) {
@@ -763,8 +763,8 @@ namespace Isis {
   void Camera::BasicMapping(Pvl &pvl) {
     PvlGroup map("Mapping");
     map += PvlKeyword("TargetName", Target());
-    map += PvlKeyword("EquatorialRadius", p_radii[0].GetMeters(), "meters");
-    map += PvlKeyword("PolarRadius", p_radii[2].GetMeters(), "meters");
+    map += PvlKeyword("EquatorialRadius", p_radii[0].meters(), "meters");
+    map += PvlKeyword("PolarRadius", p_radii[2].meters(), "meters");
     map += PvlKeyword("LatitudeType", "Planetocentric");
     map += PvlKeyword("LongitudeDirection", "PositiveEast");
     map += PvlKeyword("LongitudeDomain", "360");
@@ -907,8 +907,8 @@ namespace Isis {
       Longitude demLon = p_surfacePoint->GetLongitude();
       Distance demRadius = DemRadius(demLat, demLon);
 
-      latrec_c(demRadius.GetKilometers(), demLon.GetRadians(),
-               demLat.GetRadians(), lookVects[i]);
+      latrec_c(demRadius.kilometers(), demLon.radians(),
+               demLat.radians(), lookVects[i]);
     }
    
     if ((surroundingPoints[0].first == surroundingPoints[1].first &&
@@ -971,9 +971,9 @@ namespace Isis {
     // then negate it.
 
     SpiceDouble pB[3];
-    pB[0] = p_surfacePoint->GetX().GetKilometers();
-    pB[1] = p_surfacePoint->GetY().GetKilometers();
-    pB[2] = p_surfacePoint->GetZ().GetKilometers();
+    pB[0] = p_surfacePoint->GetX().kilometers();
+    pB[1] = p_surfacePoint->GetY().kilometers();
+    pB[2] = p_surfacePoint->GetZ().kilometers();
 
     unorm_c(pB, centerLookVect, &mag);
     double dotprod = vdot_c(normal,centerLookVect);
@@ -1028,9 +1028,9 @@ namespace Isis {
         InstrumentPosition()->Coordinate());
 
     SpiceDouble pB[3];
-    pB[0] = p_surfacePoint->GetX().GetKilometers();
-    pB[1] = p_surfacePoint->GetY().GetKilometers();
-    pB[2] = p_surfacePoint->GetZ().GetKilometers();
+    pB[0] = p_surfacePoint->GetX().kilometers();
+    pB[1] = p_surfacePoint->GetY().kilometers();
+    pB[2] = p_surfacePoint->GetZ().kilometers();
 
     vsub_c((SpiceDouble *) &sB[0], pB, surfSpaceVect);
     unorm_c(surfSpaceVect, unitizedSurfSpaceVect, &dist);
@@ -1399,14 +1399,14 @@ namespace Isis {
     SpiceDouble oB[3];
     Coordinate(oB);
     Distance originRadius = LocalRadius();
-    if (!originRadius.Valid()) {
+    if (!originRadius.isValid()) {
       return -1.0;
     }
 
     // Convert the point of interest to x/y/z in body-fixed and use the origin radius
     // to avoid the situation where the DEM does not cover the entire planet
     SpiceDouble pB[3];
-    latrec_c(originRadius.GetKilometers(), lon * PI / 180.0,
+    latrec_c(originRadius.kilometers(), lon * PI / 180.0,
              lat * PI / 180.0, pB);
 
     // Get the difference vector poB=pB-oB with its tail at oB and its head at pB
@@ -1445,7 +1445,7 @@ namespace Isis {
 
     // Use the radius of the origin point to avoid the effects of topography on the
     // calculation
-    SetUniversalGround(nlat, nlon, originRadius.GetMeters());
+    SetUniversalGround(nlat, nlon, originRadius.meters());
     double nsample = Sample();
     double nline = Line();
 

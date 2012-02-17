@@ -235,13 +235,13 @@ namespace Isis {
           const Longitude &longitude = p_camera->GetLongitude();
           // could do
           // double lat = this->UniversalLatitude ()
-          if(!p_minLat->Valid() || latitude < *p_minLat)
+          if(!p_minLat->isValid() || latitude < *p_minLat)
             *p_minLat = latitude;
-          if(!p_maxLat->Valid() || latitude > *p_maxLat)
+          if(!p_maxLat->isValid() || latitude > *p_maxLat)
             *p_maxLat = latitude;
-          if(!p_minLon->Valid() || longitude < *p_minLon)
+          if(!p_minLon->isValid() || longitude < *p_minLon)
             *p_minLon = longitude;
-          if(!p_maxLon->Valid() || longitude > *p_maxLon)
+          if(!p_maxLon->isValid() || longitude > *p_maxLon)
             *p_maxLon = longitude;
           (*p_latMap)[line][samp] = latitude;
           (*p_lonMap)[line][samp] = longitude;
@@ -353,9 +353,9 @@ namespace Isis {
 
       for(int samp = 0; samp < p_camera->ParentSamples(); samp++) {
         const Latitude &mapLat = (*p_latMap)[line][samp];
-        if(!mapLat.Valid()) continue;
+        if(!mapLat.isValid()) continue;
         Longitude mapLon = (*p_lonMap)[line][samp];
-        if(!mapLon.Valid()) continue;
+        if(!mapLon.isValid()) continue;
 
         //  If on boundary convert lons.  If trying to find 360, convert
         //  lons on other side of meridian to values greater than 360.  If
@@ -364,8 +364,8 @@ namespace Isis {
 
         Angle deltaLat = lat - mapLat;
         Angle deltaLon = lon - mapLon;
-        double dist = (deltaLat.GetRadians() * deltaLat.GetRadians()) +
-                      (deltaLon.GetRadians() * deltaLon.GetRadians());
+        double dist = (deltaLat.radians() * deltaLat.radians()) +
+                      (deltaLon.radians() * deltaLon.radians());
         if(dist < minDist) {
           minDist = dist;
           minSamp = samp;
@@ -429,15 +429,15 @@ namespace Isis {
 
         Latitude mapLat = (*p_latMap)[line][samp];
         Longitude mapLon = (*p_lonMap)[line][samp];
-        if((!mapLat.Valid()) || (!mapLon.Valid())) continue;
+        if((!mapLat.isValid()) || (!mapLon.isValid())) continue;
 
         //  If on boundary convert lons.  If trying to find 360, convert
         //  lons on other side of meridian to values greater than 360.  If
         //  trying to find 1.0, convert lons on other side to negative numbers.
         WrapWorldToBeClose(lon, mapLon);
 
-        known[0] = mapLat.GetDegrees();
-        known[1] = mapLon.GetDegrees();
+        known[0] = mapLat.degrees();
+        known[1] = mapLon.degrees();
         sampLsq.AddKnown(known, samp + 1);
         lineLsq.AddKnown(known, line + 1);
       }
@@ -448,8 +448,8 @@ namespace Isis {
     lineLsq.Solve();
 
     //  Solve for new sample position
-    known[0] = lat.GetDegrees();
-    known[1] = lon.GetDegrees();
+    known[0] = lat.degrees();
+    known[1] = lon.degrees();
     double inSamp = sampLsq.Evaluate(known);
     double inLine = lineLsq.Evaluate(known);
 
@@ -485,7 +485,7 @@ namespace Isis {
    */
   void VimsGroundMap::WrapWorldToBeClose(const Longitude &lon1,
                                          Longitude &lon2) {
-    if(abs((lon1 - lon2).GetDegrees()) > 180) {
+    if(abs((lon1 - lon2).degrees()) > 180) {
       if(lon1 > lon2) {
         lon2 += Angle(360, Angle::Degrees);
       }

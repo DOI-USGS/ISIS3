@@ -26,13 +26,13 @@ namespace Isis {
     m_rawBuffer = new QByteArray(numBytes, '\0');
     m_rawBufferInternalPtr = m_rawBuffer->data();
 
-    m_sampleCount = (int)round(placement.getWidth().GetPixels()) + 1;
-    m_lineCount = (int)round(placement.getHeight().GetPixels()) + 1;
-    m_bandCount = (int)round(placement.getDepth().GetPixels()) + 1;
+    m_sampleCount = (int)round(placement.getWidth().pixels()) + 1;
+    m_lineCount = (int)round(placement.getHeight().pixels()) + 1;
+    m_bandCount = (int)round(placement.getDepth().pixels()) + 1;
 
-    m_startSample = (int)round(placement.getStartX().GetPixels());
-    m_startLine = (int)round(placement.getStartY().GetPixels());
-    m_startBand = (int)round(placement.getStartZ().GetPixels());
+    m_startSample = (int)round(placement.getStartX().pixels());
+    m_startLine = (int)round(placement.getStartY().pixels());
+    m_startBand = (int)round(placement.getStartZ().pixels());
   }
 
   /**

@@ -903,15 +903,15 @@ namespace Isis {
           if (m_latBuffer) (*m_latBuffer)[i] = m_camera->UniversalLatitude();
           if (m_lonBuffer) (*m_lonBuffer)[i] = m_camera->UniversalLongitude();
           if (m_resBuffer) (*m_resBuffer)[i] = m_camera->PixelResolution();
-          if (m_radiusBuffer) (*m_radiusBuffer)[i] = m_camera->LocalRadius().GetMeters();
+          if (m_radiusBuffer) (*m_radiusBuffer)[i] = m_camera->LocalRadius().meters();
           if (m_phalBuffer || m_inalBuffer || m_emalBuffer) {
             Angle phal, inal, emal;
             bool okay;
             m_camera->LocalPhotometricAngles(phal, inal, emal, okay);
             if (okay) {
-              if (m_phalBuffer) (*m_phalBuffer)[i] = phal.GetDegrees();
-              if (m_inalBuffer) (*m_inalBuffer)[i] = inal.GetDegrees();
-              if (m_emalBuffer) (*m_emalBuffer)[i] = emal.GetDegrees();
+              if (m_phalBuffer) (*m_phalBuffer)[i] = phal.degrees();
+              if (m_inalBuffer) (*m_inalBuffer)[i] = inal.degrees();
+              if (m_emalBuffer) (*m_emalBuffer)[i] = emal.degrees();
             }
             else {
               if (m_phalBuffer) (*m_phalBuffer)[i] = NAN;

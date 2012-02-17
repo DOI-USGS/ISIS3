@@ -637,25 +637,25 @@ void ParseGpf(const string & gpfFilename, const string & atfFileName, const stri
       Distance sigmaRadDist(DEFAULT_SIGMA, Isis::Distance::Meters);
       
       if(overRide && (sigmaPointType == "ALL" || (sigmaPointType == "FREE" && knownPointType == Tie) ) ) {
-        sigmaLatDist.SetMeters(userSigmaLat);
-        sigmaLonDist.SetMeters(userSigmaLon);
-        sigmaRadDist.SetMeters(userSigmaRad);
+        sigmaLatDist.setMeters(userSigmaLat);
+        sigmaLonDist.setMeters(userSigmaLon);
+        sigmaRadDist.setMeters(userSigmaRad);
       }
       else {
         // Tie Points - use default sigmas
         if (knownPointType != Tie) {
         
           if(knownPointType == Z_Control) { // default XY apriori Z
-            sigmaRadDist.SetMeters(sigmarad > DEFAULT_SIGMA ? DEFAULT_SIGMA : sigmarad);
+            sigmaRadDist.setMeters(sigmarad > DEFAULT_SIGMA ? DEFAULT_SIGMA : sigmarad);
           } 
           else if(knownPointType == XY_Control) { // apriori XY default Z
-            sigmaLatDist.SetMeters(sigmalat > DEFAULT_SIGMA ? DEFAULT_SIGMA : sigmalat);
-            sigmaLonDist.SetMeters(sigmalon > DEFAULT_SIGMA ? DEFAULT_SIGMA : sigmalon);
+            sigmaLatDist.setMeters(sigmalat > DEFAULT_SIGMA ? DEFAULT_SIGMA : sigmalat);
+            sigmaLonDist.setMeters(sigmalon > DEFAULT_SIGMA ? DEFAULT_SIGMA : sigmalon);
           }
           else if(knownPointType == XYZ_Control) { // apriori XYZ
-            sigmaLatDist.SetMeters(sigmalat > DEFAULT_SIGMA ? DEFAULT_SIGMA : sigmalat);
-            sigmaLonDist.SetMeters(sigmalon > DEFAULT_SIGMA ? DEFAULT_SIGMA : sigmalon);
-            sigmaRadDist.SetMeters(sigmarad > DEFAULT_SIGMA ? DEFAULT_SIGMA : sigmarad);
+            sigmaLatDist.setMeters(sigmalat > DEFAULT_SIGMA ? DEFAULT_SIGMA : sigmalat);
+            sigmaLonDist.setMeters(sigmalon > DEFAULT_SIGMA ? DEFAULT_SIGMA : sigmalon);
+            sigmaRadDist.setMeters(sigmarad > DEFAULT_SIGMA ? DEFAULT_SIGMA : sigmarad);
           }
         }
       }
@@ -716,7 +716,7 @@ void ParseGpf(const string & gpfFilename, const string & atfFileName, const stri
       sp.SetRadii(equatorial_rad, equatorial_rad, polar_rad);
       sp.SetSphericalSigmasDistance(sigmaLatDist, sigmaLonDist, sigmaRadDist);
       //cerr << "\nadjLat=" << adjLat << " adjLat=" << adjLat << " adjRad=" << adjRad;
-      //cerr << "\nadjRad=" << adjRad << " adjSigmaRad=" << pointParamsMap[pname][adjSigma_Z] << " sigmaRadDist=" << sigmaRadDist.GetMeters() << "\n";
+      //cerr << "\nadjRad=" << adjRad << " adjSigmaRad=" << pointParamsMap[pname][adjSigma_Z] << " sigmaRadDist=" << sigmaRadDist.meters() << "\n";
       cPoint->SetAprioriSurfacePoint(sp);
     } // end Adjusted
     

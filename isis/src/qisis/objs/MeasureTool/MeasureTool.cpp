@@ -488,7 +488,7 @@ namespace Isis {
         m_tableWin->table()->item(row + i, FilenameIndex)->setText(m_fname.c_str());
 
         distanceSum = (Distance(distanceSum, Distance::Kilometers) +
-            Distance(m_distanceSegments[i], Distance::Kilometers)).GetKilometers();
+            Distance(m_distanceSegments[i], Distance::Kilometers)).kilometers();
 
         if (distanceSum != Null) {
           m_tableWin->table()->item(row + i, SegmentsSumIndex)->setText(QString::number(distanceSum));
@@ -605,17 +605,17 @@ namespace Isis {
           m_pixDistSegments.size()) {
         m_pixDist = m_pixDistSegments[0];
         m_kmDist = m_distanceSegments[0];
-        m_mDist = Distance(m_kmDist, Distance::Kilometers).GetMeters();
+        m_mDist = Distance(m_kmDist, Distance::Kilometers).meters();
 
         for (int i = 1; i < m_pixDistSegments.size(); i++) {
           m_pixDist = (Distance(m_pixDist, Distance::Pixels) +
-              Distance(m_pixDistSegments[i], Distance::Pixels)).GetPixels();
+              Distance(m_pixDistSegments[i], Distance::Pixels)).pixels();
 
           Distance thisDistance(m_distanceSegments[i], Distance::Kilometers);
           m_kmDist = (Distance(m_kmDist, Distance::Kilometers) +
-                      thisDistance).GetKilometers();
+                      thisDistance).kilometers();
           m_mDist = (Distance(m_mDist, Distance::Meters) +
-                      thisDistance).GetMeters();
+                      thisDistance).meters();
         }
       }
     }
@@ -726,7 +726,7 @@ namespace Isis {
           m_endLat = cvp->camera()->UniversalLatitude();
           m_endLon = cvp->camera()->UniversalLongitude();
 
-          radius = cvp->camera()->LocalRadius().GetMeters();
+          radius = cvp->camera()->LocalRadius().meters();
         }
       }
     }
@@ -746,15 +746,15 @@ namespace Isis {
     SurfacePoint startPoint;
     SurfacePoint endPoint;
 
-    if (startLat.Valid() && startLon.Valid() &&
-        endLat.Valid() && endLon.Valid() && radiusDist.Valid()) {
+    if (startLat.isValid() && startLon.isValid() &&
+        endLat.isValid() && endLon.isValid() && radiusDist.isValid()) {
       startPoint = SurfacePoint(startLat, startLon, radiusDist);
       endPoint = SurfacePoint(endLat, endLon, radiusDist);
     }
 
     Distance distance = startPoint.GetDistanceToPoint(endPoint, radiusDist);
-    m_mDist = distance.GetMeters();
-    m_kmDist = distance.GetKilometers();
+    m_mDist = distance.meters();
+    m_kmDist = distance.kilometers();
   }
 
 

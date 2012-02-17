@@ -155,7 +155,7 @@ namespace Isis {
 
     Isis::Distance radii[3];
     this->Radii(radii);
-    double R = radii[0].GetKilometers();
+    double R = radii[0].kilometers();
     double height = sqrt(Xsc[0] * Xsc[0] + Xsc[1] * Xsc[1] + Xsc[2] * Xsc[2]) - R;
     double speed = vnorm_c(Vsc);
     double dopplerSigma = 2.0 * speed * azimuthResolution / (waveLength *
