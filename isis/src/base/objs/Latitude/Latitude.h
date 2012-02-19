@@ -125,7 +125,7 @@ namespace Isis {
                              Angle::Units units = Angle::Radians);
 
       double planetographic(Angle::Units units = Angle::Radians) const;
-      void planetographic(double latitude,
+      void setPlanetographic(double latitude,
                            Angle::Units units = Angle::Radians);
 
       bool inRange(Latitude min, Latitude max) const;

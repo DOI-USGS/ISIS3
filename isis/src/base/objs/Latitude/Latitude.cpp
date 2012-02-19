@@ -103,7 +103,7 @@ namespace Isis {
     m_errors = errors;
 
     if(mapping["LatitudeType"][0] == "Planetographic") {
-      planetographic(latitude.radians(), Radians);
+      setPlanetographic(latitude.radians(), Radians);
     }
     else if(mapping["LatitudeType"][0] == "Planetocentric") {
       setPlanetocentric(latitude.radians(), Radians);
@@ -143,7 +143,7 @@ namespace Isis {
     m_errors = errors;
 
     if(mapping["LatitudeType"][0] == "Planetographic") {
-      planetographic(latitude, latitudeUnits);
+      setPlanetographic(latitude, latitudeUnits);
     }
     else if(mapping["LatitudeType"][0] == "Planetocentric") {
       setPlanetocentric(latitude, latitudeUnits);
@@ -186,7 +186,7 @@ namespace Isis {
       setPlanetocentric(latitude, latitudeUnits);
     }
     else if (latType == Planetographic) {
-      planetographic(latitude, latitudeUnits);
+      setPlanetographic(latitude, latitudeUnits);
     }
     else {
       iString msg = "Enumeration value [" + iString(latType) + "] is not a "
@@ -302,7 +302,7 @@ namespace Isis {
    * @param latitude The planetographic latitude to set ourselves to
    * @param units The angular units latitude is in
    */
-  void Latitude::planetographic(double latitude, Angle::Units units) {
+  void Latitude::setPlanetographic(double latitude, Angle::Units units) {
     if (m_equatorialRadius == NULL || m_polarRadius == NULL) {
       iString msg = "Latitude [" + iString(latitude) + "] cannot be "
           "converted to Planetocentic without the planetary radii, please use "

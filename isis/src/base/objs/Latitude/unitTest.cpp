@@ -132,7 +132,7 @@ int main(int argc, char *argv[]) {
   try {
     cout << "Set to 25 degrees Planetographic" << endl;
     Latitude lat(0.0, Angle::Degrees);
-    lat.planetographic(25, Angle::Degrees);
+    lat.setPlanetographic(25, Angle::Degrees);
     cout << lat.degrees() << " degrees" << endl;
   }
   catch(iException &e) {
@@ -143,7 +143,7 @@ int main(int argc, char *argv[]) {
     cout << "Set to 25 degrees Planetographic with radii" << endl;
     Latitude lat(0.0, Distance(1400, Distance::Meters),
                  Distance(1500, Distance::Meters));
-    lat.planetographic(25, Angle::Degrees);
+    lat.setPlanetographic(25, Angle::Degrees);
     cout << lat.degrees() << " degrees" << endl;
   }
   catch(iException &e) {
