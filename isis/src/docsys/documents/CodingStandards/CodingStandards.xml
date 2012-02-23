@@ -13,7 +13,7 @@
             <li><a href="#lineLength">Line Length</a></li>
             <li><a href="#padding">Padding</a></li>
             <ol type="1">
-              <li><a href="#insideParentheses">Inside Parentheses</a></li>
+              <li><a href="#aroundParentheses">Around Parentheses, Braces, and Brackets</a></li>
               <li><a href="#methodDefinitions">Method and Definition Calls</a></li>
               <li><a href="#unaryOperators">Unary Operators</a></li>
               <li><a href="#binaryOperators">Binary Operators</a></li>
@@ -114,7 +114,9 @@
                                       _FILEINFO_);
           </strong></pre>
         </p>
-        <p align="right"><a href="#top">Return to Table of Contents</a></p>
+        <p align="right"><a href="#top"><font size="1">
+          Return to Table of Contents
+        </font></a></p>
         <h3> <a name="lineLength">Line Length</a> </h3>
         <p>
           Lines of code should not exceed 80 characters unless they can not be 
@@ -150,59 +152,82 @@
             }
           </strong></pre>
         </p>
-        <p align="right"><a href="#top">Return to Table of Contents</a></p>
+        <p align="right"><a href="#top"><font size="1">
+          Return to Table of Contents
+        </font></a></p>
+
         <h3> <a name="padding">Padding</a> </h3>
-        <h4> <a name="insideParentheses">Inside parentheses</a> </h4>
+        <h4> <a name="aroundParentheses">Around Parentheses, Braces, and Brackets</a> </h4>
         <p>
-          Padding is not used inside parentheses ( ) or angle braces &lt; &gt; if 
-          the interior is short and simple.  If there is embedding, padding may be 
-          used to make code more readable.  If the interior is not simple, 
-          programmers can use padding in such a way that they find the code more 
+          Padding is not used inside parentheses ( ) or angle brackets &lt; &gt; if 
+          the interior is short and simple.  For embedded paretheses, padding may be 
+          used to make code more readable.  For embeded angle brackets, padding
+          is required between closing brackets.  If the interior is not simple, 
+          programmers can also use padding in such a way to make the code more 
           readable.
         </p> 
+        <p>
+          Externally, we use padding before opening curly braces.  For example, 
+          a space should be added before opening curly braces for 
+          method definitions, namespace wrappers, enumeration definitions
+          and control structures.
+        </p>
         <p>
           For example:<br />
           <code><strong>
             <blockquote>
               <font color="green"> 
-              // No padding needed - single braces </font><br />
-              vector&lt;double&gt; vectName;<br />
+              // No interior padding needed - single brackets </font><br />
+              vector&lt;double&gt; vectName;<br /><br />
               <font color="green"> 
-              // No padding needed - braces are not consecutive </font><br />
-              vector&lt;vector&lt;double, double&gt;, int&gt; <br />
+              // No interior padding needed - brackets are not consecutive </font><br />
+              vector&lt;vector&lt;double, double&gt;, int&gt; <br /><br />
               <font color="green"> 
-              // Pad outside parentheses, none needed inside </font><br />
-              <font color="purple"><b>if</b></font> (condition) statement;<br />
-          
+              // Padding needed outside parentheses, none needed inside </font><br />
+              <font color="purple"><b>if</b></font> (condition) {<br />
+                statement;<br />
+              }<br /><br />
               <font color="green"> 
-              // Use padding when closing parentheses or braces <br />
+              // Use interior padding when closing parentheses or angle brackets <br />
               // are consecutive characters. </font><br />
               vector&lt; int, vector&lt;double, double&gt; &gt;<br />
               <font color="purple"><b>
-              if</b></font> ( (a &amp;&amp; b) || (c &amp;&amp; d) ) statement;<br />
+              if</b></font> ( (a &amp;&amp; b) || (c &amp;&amp; d) ) statement;<br /><br />
+              <font color="green"> 
+              // Use padding before opening curly brace  </font><br />
+              <font color="purple"><b>namespace</b></font> Isis {<br />
+                ...<br />
+              }<br />
             </blockquote>
           </strong></code>
         </p>
-        <p align="right"><a href="#top">Return to Table of Contents</a></p>
+        <p align="right"><a href="#top"><font size="1">
+          Return to Table of Contents
+        </font></a></p>
+
         <h4> <a name="methodDefinitions">Method Definition and Calls</a> </h4>
         <p>
           No space should be used between a method name and its opening parentheses.
-          Padding inside parentheses was covered previously in this document, see 
-          <a href="#insideParentheses"> Formatting Padding Inside Parentheses.</a>
+          Padding inside and after parentheses was covered previously in this 
+          document, see <a href="#aroundParentheses"> Formatting Padding Around
+          Parentheses, Braces, and Brackets.</a>
         </p> 
         <p>
           For example:
           <pre><strong>
             <font color="green"> // Correct form </font>
-            int functionName(){
+            int functionName() {
             <font color="purple"><b>if</b></font> (success())
             <font color="green"> 
             // Incorrect form has space after function name </font>
-            int functionName (){
+            int functionName () {
             <font color="purple"><b>if</b></font> ( success () )
           </strong></pre>
         </p>
-        <p align="right"><a href="#top">Return to Table of Contents</a></p>
+        <p align="right"><a href="#top"><font size="1">
+          Return to Table of Contents
+        </font></a></p>
+
         <h4> <a name="unaryOperators">Unary Operators</a> </h4>
         <p>
           There is no padding between variables and unary operators such as 
@@ -226,7 +251,10 @@
             <font color="purple"><b>if</b></font> ( ! success() ) 
           </strong></pre>
         </p>
-        <p align="right"><a href="#top">Return to Table of Contents</a></p>
+        <p align="right"><a href="#top"><font size="1">
+          Return to Table of Contents
+        </font></a></p>
+
         <h4> <a name="binaryOperators">Binary Operators</a> </h4>
         <p>
           Padding to be discussed
@@ -267,11 +295,14 @@
             </ul>
           </ul>
         </p> 
-        <p align="right"><a href="#top">Return to Table of Contents</a></p>
+        <p align="right"><a href="#top"><font size="1">
+          Return to Table of Contents
+        </font></a></p>
+
         <h4> <a name="vectorsAndLists">Vector and List Declarations</a> </h4>
         <p>
           When declaring a vector or list data type, no space between the keyword 
-          and the opening angle brace should be used.  This is merely an aesthetic 
+          and the opening angle bracket should be used.  This is merely an aesthetic 
           preference for consistency throughout <strong>Isis 3</strong>.
         </p>
         <p>
@@ -280,12 +311,16 @@
             <font color="green">// Correct form - No outside padding</font> 
             <font color="brown">vector</font>&lt;double&gt; 
             QList&lt; QList&lt;int&gt;, QList&lt;int&gt; &gt; 
+
             <font color="green">// Incorrect form with outside padding</font> 
             <font color="brown">vector</font> &lt;double&gt;
             QList &lt; QList &lt;int&gt;, QList &lt;int&gt; &gt;
           </strong></pre>
         </p>
-        <p align="right"><a href="#top">Return to Table of Contents</a></p>
+        <p align="right"><a href="#top"><font size="1">
+          Return to Table of Contents
+        </font></a></p>
+
         <h3> <a name="controlStructures">Control Structures</a> </h3>
         <h4> <a name="braces">Braces</a> </h4>
         <p>
@@ -329,24 +364,36 @@
           multiple parts should use consistent formatting in each part.  That is, if 
           braces are used on any section, then they should be used on all sections.
         </p>
-        <p align="right"><a href="#top">Return to Table of Contents</a></p>
+        <p align="right"><a href="#top"><font size="1">
+          Return to Table of Contents
+        </font></a></p>
+
         <h4> <a name="controlStructurePadding">Padding</a> </h4>
-        <p>
-          Control structures that use parentheses (if, for, while, catch, switch) 
+        <p>         
+          Control structures that use parentheses 
+          (<font color="purple"><b>if</b></font>, 
+          <font color="purple"><b>for</b></font>, 
+          <font color="purple"><b>while</b></font>, 
+          <font color="purple"><b>switch</b></font>, 
+          <font color="purple"><b>catch</b></font>).  For these 
           should have external padding around the parentheses.  That is, there 
-          should be a single space before an opening parenthesis and one space after
-          a closing parenthesis.  Padding inside parentheses was covered previously 
-          in this document, see 
-          <a href="#insideParentheses"> Formatting Padding Inside Parentheses.</a>
-        </p>
-        <p>
-          If a control structure has a keyword immediately preceding an opening 
-          brace (<font color="purple"><b>try</b></font>, 
-          <font color="purple"><b>else</b></font>) there should be one space between
-          the keyword and brace.  For an example, see 
+          should be a single space before an opening parenthesis and one space 
+          after a closing parenthesis.  If a control structure has a keyword 
+          immediately preceding an opening brace 
+          (<font color="purple"><b>try</b></font>, 
+          <font color="purple"><b>else</b></font>) there should be 
+          one space between the keyword and brace.  For an example, see 
           <a href="#braces"> Control Structure Braces.</a>
         </p>
-        <p align="right"><a href="#top">Return to Table of Contents</a></p>
+        <p>
+          General padding guidelines have been previously covered in this 
+          document, see <a href="#aroundParentheses"> Formatting Padding Around
+          Parentheses, Braces, and Brackets.</a>
+        </p>
+        <p align="right"><a href="#top"><font size="1">
+          Return to Table of Contents
+        </font></a></p>
+
         <h3> <a name="continuingLinesOfCode">Continuing Lines of Code</a> </h3>
         <p>
           Do not use a backslash to continue a line of code.  This is not necessary 
@@ -358,7 +405,10 @@
             string str = <font color="darkcyan"> "This string is very long and will need to be "
                           "continued on a second line."</font>;
           </strong></pre>
-        <p align="right"><a href="#top">Return to Table of Contents</a></p>
+          <p align="right"><a href="#top"><font size="1">
+            Return to Table of Contents
+          </font></a></p>
+
         <h3> <a name="logicalOperators">Logical Operators</a> </h3>
         <p>
           The use of aliases for logical operators is prohibited in <strong>Isis 3
@@ -394,22 +444,29 @@
             </tr>
           </table>
         </p>
-        <p align="right"><a href="#top">Return to Table of Contents</a></p>
-        <hr />
+        <p align="right"><a href="#top"><font size="1">
+          Return to Table of Contents
+        </font></a></p>
         
         <h2> <a name="namingConventions">Naming Conventions</a> </h2>
         <p>
           This section will cover the proper way to name applications, classes, 
           functions, variables, enumerations, and namespaces and files.
         </p>
-        <p align="right"><a href="#top">Return to Table of Contents</a></p>
+        <p align="right"><a href="#top"><font size="1">
+          Return to Table of Contents
+        </font></a></p>
+
         <h3> <a name="applicationNames">Application Names</a> </h3>
         <p>
           Application names are always all lower case.  Existing parameter names 
           should be checked before any new names are created.  (Plans to create a 
           standard parameter name document are currently underway.)
         </p>
-        <p align="right"><a href="#top">Return to Table of Contents</a></p>
+        <p align="right"><a href="#top"><font size="1">
+          Return to Table of Contents
+        </font></a></p>
+
         <h3> <a name="classNames">Class Names</a> </h3>
         <p>
           Classes should be upper camel case.  That is, the first letter should be 
@@ -435,7 +492,10 @@
             IVector
             </strong></pre>
         </p>
-        <p align="right"><a href="#top">Return to Table of Contents</a></p>
+        <p align="right"><a href="#top"><font size="1">
+          Return to Table of Contents
+        </font></a></p>
+
         <h3> <a name="memberFunctionNames">Member Function Names</a> </h3>
         <p>
           Member functions should be lower camel case, when possible.  That is, the 
@@ -446,7 +506,7 @@
           upper camel case to match the class name.   The other case in which this 
           convention may not be followed is when a method overrides or overloads an 
           existing method from its parent package.  In these cases, clearly, the 
-          original method name must be kept.  For example, the STL package uses 
+          original method name must be kept.  For example, some packages use 
           underscore separated naming.
         </p>
         <p>
@@ -459,39 +519,41 @@
             // Constructor function names are upper camel case.</font>
             ClassName()
             <font color="green">
-            // Overridden member function from STL package keeps the name of 
+            // Overridden member function from third party package keeps the name of 
             // the original function.</font>
-            c_str()
+            original_function_name()
           </strong></pre>
         </p>
         <p>
-          All appropriate mutator and accesor methods should begin with <i>set</i> 
-          or <i>has</i>.  The <i>get</i> and <i>is</i> prefixes for accessor methods 
-          are neither required nor disallowed.  However, to maintain consistency within 
-          <strong>Isis 3</strong>, programmers should be careful when opting to use 
-          these.  If methods in the same class or related classes do not use 
-          <i>get</i> or <i>is</i>, then new methods should not be written with these 
-          prefixes.
+          All appropriate mutator and accesor methods should begin with 
+          <i>set</i>, <i>has</i>, or <i>is</i>.  The <i>get</i> prefix should 
+          not be used for accessor methods, with the exception of overriden
+          methods inherited from third party libraries.  
         </p>
         <p>
           For example:
           <pre><strong>
             <font color="green">
             // All mutator methods begin with the 'set' prefix.</font>
-            setSize()
+            void setSize();
             <font color="green">
-            // The 'has' prefix is always used.</font>
-            hasKeyword()
+            // The 'has' and 'is' prefixes are always used.</font>
+            bool hasKeyword();
+            bool isIgnored();
             <font color="green">
-            // The 'get' prefix is sometimes used.</font>
-            size()
-            getFilename()
+            // The 'get' prefix is not used for methods that retrieve</font>
+            int size();
+            Stretch stretch();
             <font color="green">
-            // The 'is' prefix is sometimes used.</font>
-            isIgnored()
+            // The 'get' prefix sometimes is required for overriden methods from 
+            // third party packages, such as the following method from QInputDialog.</font>
+            QString getText(); 
           </strong></pre>
         </p>
-        <p align="right"><a href="#top">Return to Table of Contents</a></p>
+        <p align="right"><a href="#top"><font size="1">
+          Return to Table of Contents
+        </font></a></p>
+
         <h3> <a name="dataMemberNames">Data Member Names</a> </h3>
         <p>
           <strong>Isis 3</strong> currently uses three types of data members: <i>
@@ -515,7 +577,10 @@
             m_memberVariable
           </strong></pre>
         </p>
-        <p align="right"><a href="#top">Return to Table of Contents</a></p>
+        <p align="right"><a href="#top"><font size="1">
+          Return to Table of Contents
+        </font></a></p>
+
         <h3> <a name="localVariableNames">Local Variable Names</a> </h3>
         <p>
           Local variables should have lower camel case names.  Names for local 
@@ -554,7 +619,10 @@
          }
          </strong></pre>
         </p>
-        <p align="right"><a href="#top">Return to Table of Contents</a></p>
+        <p align="right"><a href="#top"><font size="1">
+          Return to Table of Contents
+        </font></a></p>
+
         <h3> <a name="enumerationNames">Enumeration Names</a> </h3>
         <p>
           Both the enumeration type name and enumerators inside the braces should be
@@ -581,7 +649,10 @@
             </blockquote>
           </strong></code>
         </p>
-        <p align="right"><a href="#top">Return to Table of Contents</a></p>
+        <p align="right"><a href="#top"><font size="1">
+          Return to Table of Contents
+        </font></a></p>
+
         <h3> <a name="namespaceNames">Namespace Names</a> </h3>
         <p>
           Currently, the only namespace that is used is the <i>Isis</i> namespace.  
@@ -595,7 +666,10 @@
             NamespaceName
           </strong></pre>
         </p>
-        <p align="right"><a href="#top">Return to Table of Contents</a></p>
+        <p align="right"><a href="#top"><font size="1">
+          Return to Table of Contents
+        </font></a></p>
+
         <h3> <a name="sourceCodeFileNames">Source Code File Names</a> </h3>
         <p>
           In some situations, having multiple files with the same name (regardless 
@@ -603,7 +677,10 @@
           problems the use of the same file name anywhere in Isis should be avoided, 
           when possible.
         </p>
-        <p align="right"><a href="#top">Return to Table of Contents</a></p>
+        <p align="right"><a href="#top"><font size="1">
+          Return to Table of Contents
+        </font></a></p>
+
         <h4> <a name="objectFileNames">Object File Names</a> </h4>
         <p>
           All class source files should match the name of the class and use a <i>
@@ -618,7 +695,10 @@
             ClassName.h
           </strong></pre>
         </p>
-        <p align="right"><a href="#top">Return to Table of Contents</a></p>
+        <p align="right"><a href="#top"><font size="1">
+          Return to Table of Contents
+        </font></a></p>
+
         <h4> <a name="applicationFileNames">Application File Names</a> </h4>
         <p>
           The application file that contains the main method should have the same 
@@ -634,9 +714,10 @@
             applicationname.xml
           </strong></pre>
         </p>
-        <p align="right"><a href="#top">Return to Table of Contents</a></p>
-        <hr />
-        
+        <p align="right"><a href="#top"><font size="1">
+          Return to Table of Contents
+        </font></a></p>
+
         <h2> <a name="includes">#Includes</a> </h2>
         <h3> <a name="includeGuards">#Include Guards</a> </h3>
         <p>
@@ -654,7 +735,10 @@
             <font color="olive"><b>#define</b></font> ClassName_h
           </strong></pre>
         </p>
-        <p align="right"><a href="#top">Return to Table of Contents</a></p>
+        <p align="right"><a href="#top"><font size="1">
+          Return to Table of Contents
+        </font></a></p>
+
         <h3> <a name="orderingLibraryIncludes">Ordering Library Includes</a> </h3>
         <p>
           No code should exist before <font color="olive"><b>#include</b></font> 
@@ -663,7 +747,7 @@
           libraries by a single blank line and each group should be ordered 
           alphabetically.  All <font color="olive"><b>#include</b></font> statements 
           for third party libraries (i.e. not in the Isis namespace) should use 
-          angle braces, not quotation marks.
+          angle brackets, not quotation marks.
         </p>
         <p>
           For example:
@@ -769,7 +853,10 @@
               ...
           </strong></pre>
         </p>
-        <p align="right"><a href="#top">Return to Table of Contents</a></p>
+        <p align="right"><a href="#top"><font size="1">
+          Return to Table of Contents
+        </font></a></p>
+
         <h3> <a name="forwardClassDeclarations">Forward Class Declarations</a> </h3>
         <p>
           Forward class declarations are statements in a header file that let the 
@@ -795,21 +882,28 @@
           color="olive"><b>#include</b></font> statement in the header, then the 
           copy constructor, assignment operator and destructor must be implemented.
         </p>
-        <p align="right"><a href="#top">Return to Table of Contents</a></p>
-        <hr />
-        
+        <p align="right"><a href="#top"><font size="1">
+          Return to Table of Contents
+        </font></a></p>
+
         <h2> <a name="documentation">Documentation</a> </h2>
         <p>
           Documentation for <strong>Isis 3</strong> is done using Doxygen.
         </p>
-        <p align="right"><a href="#top">Return to Table of Contents</a></p>
+        <p align="right"><a href="#top"><font size="1">
+          Return to Table of Contents
+        </font></a></p>
+
         <h3> <a name="historyEntries">History Entries</a> </h3>
         <p>
           Any time a method is added to a class, the header file class history 
           should include an entry indicating this change with the name of the method 
           indicated with empty parentheses.
         </p>
-        <p align="right"><a href="#top">Return to Table of Contents</a></p>
+        <p align="right"><a href="#top"><font size="1">
+          Return to Table of Contents
+        </font></a></p>
+
         <h4> <a name="documentationFormatting">Formatting</a> </h4>
         <p>
           All history entries should be below an internal tag and indented 2 spaces 
@@ -834,7 +928,10 @@
              */</font>
           </strong></pre>
         </p>
-        <p align="right"><a href="#top">Return to Table of Contents</a></p>
+        <p align="right"><a href="#top"><font size="1">
+          Return to Table of Contents
+        </font></a></p>
+
         <h3> <a name="authorTag">Author Tag</a> </h3>
         <p>
           The Doxygen author tag is required for class documentation and optional 
@@ -855,7 +952,10 @@
              */</font>
           </strong></pre>
         </p>
-        <p align="right"><a href="#top">Return to Table of Contents</a></p>
+        <p align="right"><a href="#top"><font size="1">
+          Return to Table of Contents
+        </font></a></p>
+
         <h3> <a name="makefileComments">Makefile Comments</a> </h3>
         <p>
           Every Makefile for an application test or category test should have 
@@ -875,9 +975,10 @@
                               to=$(OUTPUT)/bandnormTruth.cub > /dev/null;
           </pre>
         </p>
-        <p align="right"><a href="#top">Return to Table of Contents</a></p>
-        <hr />
-        
+        <p align="right"><a href="#top"><font size="1">
+          Return to Table of Contents
+        </font></a></p>
+
         <h2> <a name="sourceCode">Source Code</a> </h2>
         <h3> <a name="structures">Structures</a> </h3>
         <p>
@@ -890,13 +991,19 @@
           only data is acceptable in Isis 3.  Structures in <strong>Isis 3
           </strong> can not have methods.
         </p>
-        <p align="right"><a href="#top">Return to Table of Contents</a></p>
+        <p align="right"><a href="#top"><font size="1">
+          Return to Table of Contents
+        </font></a></p>
+
         <h3> <a name="implementationFiles">Implementation Files</a> </h3>
         <p>
           Using statements should be placed in the implementation files after 
           <font color="olive"><b>#include</b></font> statements.
         </p>
-        <p align="right"><a href="#top">Return to Table of Contents</a></p>
+        <p align="right"><a href="#top"><font size="1">
+          Return to Table of Contents
+        </font></a></p>
+
         <h3> <a name="supportClassFiles">Support Class Files</a> </h3>
         <p>
           With the exception of inner (or nested) classes, all classes should 
@@ -920,7 +1027,10 @@
             CnetRefByEmission.cpp
           </strong></pre>
         </p>
-        <p align="right"><a href="#top">Return to Table of Contents</a></p>
+        <p align="right"><a href="#top"><font size="1">
+          Return to Table of Contents
+        </font></a></p>
+
         <h3> <a name="headerFiles">Header Files</a> </h3>
         <p>
           In general, header files should only include prototypes and declarations.  
@@ -930,14 +1040,20 @@
         <p>
           Using statements should not be used in header files.
         </p>
-        <p align="right"><a href="#top">Return to Table of Contents</a></p>
+        <p align="right"><a href="#top"><font size="1">
+          Return to Table of Contents
+        </font></a></p>
+
         <h4> <a name="inlineMembers">Inline Member Functions</a> </h4>
         <p>
           The <font color="purple"><b>inline</b></font> keyword should only be used 
           if a function is implemented in the header.  Therefore, inline functions 
           are only used when necessary or proven faster.
         </p>
-        <p align="right"><a href="#top">Return to Table of Contents</a></p>
+        <p align="right"><a href="#top"><font size="1">
+          Return to Table of Contents
+        </font></a></p>
+
         <h4><a name="constKeyword"><font color="purple"><b>
           const</b></font> Keyword</a></h4>
         <p>
@@ -946,14 +1062,20 @@
           necessary, an identical overridden version of the method should be written 
           without the <font color="purple"><b>const</b></font> keyword.
         </p>
-        <p align="right"><a href="#top">Return to Table of Contents</a></p>
+        <p align="right"><a href="#top"><font size="1">
+          Return to Table of Contents
+        </font></a></p>
+
         <h3><a name="declaring">Declaring &amp; Initializing Variables</a></h3>
         <h4><a name="localVariables">Local Variable Declarations</a></h4>
         <p>
           It is recommended that <i>just in time</i> declaration is used for local 
           variables whenever possible.  
         </p>
-        <p align="right"><a href="#top">Return to Table of Contents</a></p>
+        <p align="right"><a href="#top"><font size="1">
+          Return to Table of Contents
+        </font></a></p>
+
         <h4> <a name="initializing">Initializing Variables</a> </h4>
         <p>
           Primitive variable types should be initialized using an equals sign, not 
@@ -964,6 +1086,7 @@
             <pre><strong>
               <font color="green">// Initialize primitives with = sign.</font>
               int i = 0; 
+
               <font color="green">// Incorrect form - Do not initialize 
               // primitive with parentheses.</font>
               int i(0);
@@ -978,23 +1101,26 @@
         <p>
           For example:
           <pre><strong>
-            ClassName::ClassName(){
+            ClassName::ClassName() {
               m_pointerVariable = NULL;
               <font color="purple"><b>if</b></font> (condition) {
-                m_pointerVariable = new OtherClass();
+                m_pointerVariable = <font color="purple"><b>new</b></font> OtherClass();
               }
               <font color="purple"><b>else</b></font> {
-                m_pointerVariable = new ThirdClass();
+                m_pointerVariable = <font color="purple"><b>new</b></font> ThirdClass();
               }
             }
         
             ClassName::~ClassName() {
-              delete m_pointerVariable;
-              m_pointerVariable = NULL;
+              <font color="purple"><b>delete</b></font> m_pointerVariable;
+              m_pointerVariable = <font color="brown"><b>NULL</b></font>;
             }
           </strong></pre>
         </p>
-        <p align="right"><a href="#top">Return to Table of Contents</a></p>
+        <p align="right"><a href="#top"><font size="1">
+          Return to Table of Contents
+        </font></a></p>
+
         <h3><a name="methodOrdering">Method Order in Implementation File</a></h3>
         <p>
           The methods in the <i>*.cpp</i> file should be ordered as the author finds 
@@ -1007,18 +1133,22 @@
             Ordered by usage, where private methods are often listed directly 
             after the public methods that call them.</li>
           </ol>
-        <p align="right"><a href="#top">Return to Table of Contents</a></p>
-        <hr />
-        
+          <p align="right"><a href="#top"><font size="1">
+            Return to Table of Contents
+          </font></a></p>
+
         <h2><a name="todo">TO DO</a></h2>
           <ul>
           <li> Improve examples </li>
           <li> Binary Operators - Determine padding. </li>
-          <li> Complete Documentation section
+          <li> Complete History and Documentation section
             <ol>
               <li> 
                 Determine when must we use tags @brief, @description, 
                 @param, @param[out], @return, @ingroup, @see, @throw
+              </li>
+              <li> 
+                Determine how to document the return value and submit new groups.
               </li>
               <li> 
                 Determine when we can or should use other doxygen documentation styles, 
@@ -1029,6 +1159,12 @@
                 postfix block documentation (following a member, may be multi-line)
                 <font color="green">/**&lt; comment */</font>.
               </li>
+              <li> 
+                Will we require "make html" to return no errors to check in code?
+              </li>
+              <li> 
+                Requirements/recommendations for documenting/history of xml files.
+              </li>
             </ol>
           </li>
           <li> Consider separating documentation standards from coding standards.</li>
@@ -1036,6 +1172,9 @@
           <li> 
             Create links for each section to a page that shows justification 
             for the standards chosen.
+          </li>
+          <li> 
+            Should  the Disclaimer be required for all Isis files?
           </li>
           </ul>
       </body>
@@ -1074,6 +1213,9 @@
   <history>
     <change name="Jeannie Backer" date="2012-01-30">
       Original version
+    </change>
+    <change name="Jeannie Backer" date="2012-02-23">
+      Clarified the language for Member Function Names.  Fixed typos.
     </change>
   </history>
 
