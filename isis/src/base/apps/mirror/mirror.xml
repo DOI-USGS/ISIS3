@@ -64,8 +64,7 @@
           Input file to be flipped
         </brief>
         <description>
-          The cube to be flipped.  All bands will be flipped from
-          left-to-right.
+          The cube to be flipped.  All bands will be flipped from left-to-right.
         </description>
         <filter>
           *.cub
