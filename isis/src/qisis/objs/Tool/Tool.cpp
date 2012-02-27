@@ -124,6 +124,7 @@ namespace Isis {
         p_toolPadAction->setChecked(true);
       addViewportConnections();
       enableToolBar();
+      emit toolActivated();
       p_active = true;
     }
   }

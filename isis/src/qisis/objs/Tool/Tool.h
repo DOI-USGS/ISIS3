@@ -72,6 +72,9 @@ namespace Isis {
   *  @history 2010-06-26  Eric Hyer - Now uses MdiCubeViewport
   *  @history 2010-11-08  Eric Hyer - Added connects and disconnects for
   *               cubeViewport's new mouseMove signal
+  *  @history 2012-02-27  Tracie Sucharski - Added the signal, toolActivated,
+  *               to enable a tool to connect and respond when user selects
+  *               a given tool using the toolPad button.
   */
 
   class Tool : public QObject {
@@ -137,6 +140,7 @@ namespace Isis {
 
     signals:
       void clearWarningSignal();
+      void toolActivated();
 
     protected slots:
 
