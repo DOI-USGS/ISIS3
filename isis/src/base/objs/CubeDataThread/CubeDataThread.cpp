@@ -74,6 +74,9 @@ namespace Isis {
         delete (*p_managedData)[i].second;
         p_managedData->removeAt(i);
       }
+
+      delete p_managedData;
+      p_managedData = NULL;
     }
 
     // Destroy the cubes still in memory
@@ -725,7 +728,11 @@ namespace Isis {
    * @return int Count of how many bricks reside in memory.
    */
   int CubeDataThread::BricksInMemory() {
-    return p_managedData->size();
+    p_threadSafeMutex->lock();
+    int numBricksInMemory = p_managedData->size();
+    p_threadSafeMutex->unlock();
+
+    return numBricksInMemory;
   }
 
   /**

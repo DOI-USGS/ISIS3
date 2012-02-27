@@ -36,13 +36,15 @@ namespace Isis {
    *
    * @internal
    *   @history 2010-04-12 Eric Hyer - Added check for valid cube ID's for
-   *       slots ReadCube and ReadWriteCube.
+   *                           slots ReadCube and ReadWriteCube.
    *   @history 2010-07-29 Eric Hyer - AcquireLock now flushes events for this
-   *       thread instead of the main eventloop's thread.
+   *                           thread instead of the main eventloop's thread.
    *   @history 2010-08-12 Steven Lambright - Fixed memory leak and simplified
-   *       acquiring write bricks
+   *                           acquiring write bricks
    *   @history 2010-08-23 Eric Hyer - Added the FindCubeId method
    *   @history 2010-08-24 Eric Hyer - Added the RemoveCube method
+   *   @history 2012-02-27 Jai Rideout and Steven Lambright - Made
+   *                           BricksInMemory() thread-safe. Fixes #733.
    *
    *   @todo Add state recording/reverting functionality
    *
@@ -161,7 +163,7 @@ namespace Isis {
        */
       QMap< int, QPair< bool, Cube * > > * p_managedCubes;
 
-      //! This locks the member variable p_managedCubes
+      //! This locks the member variable p_managedCubes and p_managedData itself
       QMutex *p_threadSafeMutex;
 
       /**
