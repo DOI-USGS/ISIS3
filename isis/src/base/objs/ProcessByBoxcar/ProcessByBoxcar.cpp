@@ -122,11 +122,24 @@ namespace Isis {
   /**
    * End the boxcar processing sequence and cleans up by closing cubes, freeing
    * memory, etc.
+   *
+   * @deprecated Please use Finalize()
    */
   void ProcessByBoxcar::EndProcess() {
 
     p_boxsizeSet = false;
     Isis::Process::EndProcess();
+
+  }
+
+  /**
+   * End the boxcar processing sequence and cleans up by closing cubes, freeing
+   * memory, etc.
+   */
+  void ProcessByBoxcar::Finalize() {
+
+    p_boxsizeSet = false;
+    Isis::Process::Finalize();
 
   }
 } // end namespace isis

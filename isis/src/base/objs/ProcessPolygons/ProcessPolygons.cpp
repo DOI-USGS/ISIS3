@@ -321,14 +321,24 @@ namespace Isis {
 
   /**
    *
-   *
+   * @deprecated Please use Finalize()
    */
   void ProcessPolygons::EndProcess() {
     delete p_imagePoly;
     delete p_brick1;
     delete p_brick2;
     Process::EndProcess();
+  }
 
+  /**
+   *
+   *
+   */
+  void ProcessPolygons::Finalize() {
+    delete p_imagePoly;
+    delete p_brick1;
+    delete p_brick2;
+    Process::Finalize();
   }
 
   /**

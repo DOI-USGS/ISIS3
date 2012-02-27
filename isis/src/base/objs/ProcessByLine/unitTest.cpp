@@ -12,21 +12,21 @@ void twoInAndOut(vector<Isis::Buffer *> &ib, vector<Isis::Buffer *> &ob);
 
 class Functor1 {
   public:
-    void operator()(Isis::Buffer & in){
+    void operator()(Isis::Buffer & in) const {
       oneInput(in);
     };
 };
 
 class Functor2 {
   public:
-  void operator()(Isis::Buffer & in, Isis::Buffer & out){
+  void operator()(Isis::Buffer & in, Isis::Buffer & out) const {
     oneInAndOut(in, out);
   };
 };
 
 class Functor3 {
   public:
-  void operator()(vector<Isis::Buffer *> &ib, vector<Isis::Buffer *> &ob){
+  void operator()(vector<Isis::Buffer *> &ib, vector<Isis::Buffer *> &ob) const {
     twoInAndOut(ib, ob);
   };
 };
@@ -63,13 +63,13 @@ void IsisMain() {
   Functor3 func3;
   p.SetInputCube("FROM");
   cout << "Functor1\n";
-  p.StartProcessInPlace(func1);
+  p.ProcessCubeInPlace(func1, false);
   p.EndProcess();
 
   p.SetInputCube("FROM");
   p.SetOutputCube("TO");
   cout << "Functor2\n";
-  p.StartProcessIO(func2);
+  p.ProcessCube(func2, false);
   p.EndProcess();
 
   p.SetInputCube("FROM");
@@ -77,7 +77,7 @@ void IsisMain() {
   p.SetOutputCube("TO");
   p.SetOutputCube("TO2");
   cout << "Functor3\n";
-  p.StartProcessIOList(func3);
+  p.ProcessCubes(func3, false);
   p.EndProcess();
   
   cout << "End Testing Functors\n";

@@ -61,15 +61,122 @@ namespace Isis {
    *            constructor to change the order of the progression
    *            through the cube
    *   @history 2008-06-18 Christopher Austin - Fixed documenation errors
-   *
-   *   @todo Jeff Anderson  - add coded and implementation example to class doc.
+   *   @history 2012-02-24 Steven Lambright - Optimized setpos() and made it
+   *                           public.
    */
   class BufferManager : public Isis::Buffer {
 
+    public:
+      //  Constructors and Destructors
+      BufferManager();
+      BufferManager(int maxsamps, int maxlines, int maxbands,
+                    int bufsamps, int buflines, int bufbands,
+                    Isis::PixelType type, bool reverse = false);
+      BufferManager(const BufferManager &other);
+
+      //! Destroys the BufferManager object
+      ~BufferManager() {};
+
+      // Traversal Methods
+
+      /**
+       * Moves the shape buffer to the next position. Returns true if the next
+       * position is valid.
+       *
+       * @return bool
+       */
+      bool operator++(int) {
+        return (next());
+      }
+
+
+      BufferManager &operator+=(int i) {
+        setpos(p_currentMap + i);
+        return *this;
+      }
+
+      /**
+       * Moves the shape buffer to the first position
+       *
+       * @return bool
+       */
+      bool begin() {
+        return (setpos(0));
+      }
+
+      /**
+       * Moves the shape buffer to the next position. Returns true if the next
+       * position is valid.
+       *
+       * @return bool
+       */
+      bool next() {
+        return (setpos(p_currentMap + 1));
+      }
+
+      /**
+       * Returns true if the shape buffer has accessed the end of the cube.
+       *
+       * @return bool
+       */
+      bool end() const {
+        return (p_currentMap >= p_nmaps);
+      }
+
+      bool setpos(BigInt map);
+
+      void swap(BufferManager &other);
+
+      BufferManager &operator=(const BufferManager &rhs);
+
+    protected:
+
+      //  Methods visable to deriving classes
+
+      /**
+       * Returns the number of samples in the cube
+       *
+       * @return int
+       */
+      int MaxSamples() const {
+        return (p_maxSamps);
+      }
+
+      /**
+       * Returns the number of lines in the cube
+       *
+       * @return int
+       */
+      int MaxLines() const {
+        return (p_maxLines);
+      }
+
+      /**
+       * Returns the number of bands in the cube
+       *
+       * @return int
+       */
+      int MaxBands() const {
+        return (p_maxBands);
+      }
+
+      /**
+       * Returns the maximum number of positions the shape buffer needs to cover
+       * the entire image (see setpos method for more info).
+       *
+       * @return int
+       */
+      BigInt MaxMaps() const {
+        return (p_nmaps);
+      }
+
+      void SetIncrements(const int sinc, const int linc, const int binc);
+      void SetOffsets(const int soff, const int loff, const int boff);
+
     private:
-      const int p_maxSamps;  //!<  Maximum samples to map
-      const int p_maxLines;  //!<  Maximum lines to map
-      const int p_maxBands;  //!<  Maximum bands to map
+      int p_maxSamps;  //!<  Maximum samples to map
+      int p_maxLines;  //!<  Maximum lines to map
+      int p_maxBands;  //!<  Maximum bands to map
 
       int p_sinc;            //!<  Sample increment
       int p_linc;            //!<  Line increment
@@ -92,100 +199,6 @@ namespace Isis {
       * Sample, Line, Band order (e.g., BSQ, BIP).
       */
       bool p_reverse;
-
-    public:
-      //  Constructors and Destructors
-      BufferManager(const int maxsamps, const int maxlines, const int maxbands,
-                    const int bufsamps, const int buflines, const int bufbands,
-                    const Isis::PixelType type, const bool reverse = false);
-
-      //! Destroys the BufferManager object
-      ~BufferManager() {};
-
-      // Traversal Methods
-
-      /**
-       * Moves the shape buffer to the next position. Returns true if the next
-       * position is valid.
-       *
-       * @return bool
-       */
-      inline bool operator++(int) {
-        return (next());
-      }
-
-      /**
-       * Moves the shape buffer to the first position
-       *
-       * @return bool
-       */
-      inline bool begin() {
-        return (setpos(0));
-      }
-
-      /**
-       * Moves the shape buffer to the next position. Returns true if the next
-       * position is valid.
-       *
-       * @return bool
-       */
-      inline bool next() {
-        return (setpos(p_currentMap + 1));
-      }
-
-      /**
-       * Returns true if the shape buffer has accessed the end of the cube.
-       *
-       * @return bool
-       */
-      inline bool end() const {
-        return (p_currentMap >= p_nmaps);
-      }
-
-    protected:
-      bool setpos(const BigInt map);
-
-      //  Methods visable to deriving classes
-
-      /**
-       * Returns the number of samples in the cube
-       *
-       * @return int
-       */
-      inline int MaxSamples() const {
-        return (p_maxSamps);
-      }
-
-      /**
-       * Returns the number of lines in the cube
-       *
-       * @return int
-       */
-      inline int MaxLines() const {
-        return (p_maxLines);
-      }
-
-      /**
-       * Returns the number of bands in the cube
-       *
-       * @return int
-       */
-      inline int MaxBands() const {
-        return (p_maxBands);
-      }
-
-      /**
-       * Returns the maximum number of positions the shape buffer needs to cover
-       * the entire image (see setpos method for more info).
-       *
-       * @return int
-       */
-      inline BigInt MaxMaps() const {
-        return (p_nmaps);
-      }
-
-      void SetIncrements(const int sinc, const int linc, const int binc);
-      void SetOffsets(const int soff, const int loff, const int boff);
   };
 };
 

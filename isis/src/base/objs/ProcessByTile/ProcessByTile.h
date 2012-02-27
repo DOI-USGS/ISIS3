@@ -53,7 +53,7 @@ namespace Isis {
    *  @todo 2005-02-08 Jeff Anderson - add coded example, and implementation
    *                       example to class documentation
    */
-  class ProcessByTile : public Isis::ProcessByBrick {
+  class ProcessByTile : public ProcessByBrick {
 
     private:
       bool p_tileSizeSet;  //!< Indicates whether the tile size has been set
@@ -72,12 +72,51 @@ namespace Isis {
 
       void SetTileSize(const int ns, const int nl);
 
-      void StartProcess(void funct(Isis::Buffer &in));
-      void StartProcess(void funct(Isis::Buffer &in, Isis::Buffer &out));
+      void StartProcess(void funct(Buffer &in));
+      void StartProcess(void funct(Buffer &in, Buffer &out));
 
-      void StartProcess(void funct(std::vector<Isis::Buffer *> &in,
-                                   std::vector<Isis::Buffer *> &out));
+      void StartProcess(void funct(std::vector<Buffer *> &in,
+                                   std::vector<Buffer *> &out));
       void EndProcess();
+      void Finalize();
+
+      /**
+       * @see ProcessByBrick::ProcessCubeInPlace()
+       * @param funct
+       * @param threaded
+       */
+      template <typename Functor>
+      void ProcessCubeInPlace(const Functor & funct, bool threaded = true) {
+        SetBrickSizesForProcessCubeInPlace();
+        ProcessByBrick::ProcessCubeInPlace(funct, threaded);
+      }
+
+      /**
+       * @see ProcessByBrick::ProcessCube()
+       * @param funct
+       * @param threaded
+       */
+      template <typename Functor>
+      void ProcessCube(const Functor & funct, bool threaded = true) {
+        SetBrickSizesForProcessCube();
+        ProcessByBrick::ProcessCube(funct, threaded);
+      }
+
+      /**
+       * @see ProcessByBrick::ProcessCubes()
+       * @param funct
+       * @param threaded
+       */
+      template <typename Functor>
+      void ProcessCubes(const Functor & funct, bool threaded = true) {
+        SetBrickSizesForProcessCubes();
+        ProcessByBrick::ProcessCubes(funct, threaded);
+      }
+
+    private:
+      void SetBrickSizesForProcessCubeInPlace();
+      void SetBrickSizesForProcessCube();
+      void SetBrickSizesForProcessCubes();
   };
 };
 

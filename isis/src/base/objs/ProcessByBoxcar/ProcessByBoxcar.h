@@ -44,9 +44,7 @@ namespace Isis {
    *                           documentation
    *   @history 2011-08-19 Jeannie Backer - Modified unitTest to use
    *                           $temporary variable instead of /tmp directory.
-   *
-   *  @todo 2005-02-08 Tracie Sucharski - add code example and implementation
-   *                                      example to class documentation
+   *   @history 2012-02-24 Steven Lambright - Added Finalize() and ProcessCube()
    */
 
   class ProcessByBoxcar : public Isis::Process {
@@ -70,7 +68,12 @@ namespace Isis {
       void SetBoxcarSize(const int ns, const int nl);
 
       void StartProcess(void funct(Isis::Buffer &in, double &out));
+      void ProcessCube(void funct(Isis::Buffer &in, double &out)) {
+        StartProcess(funct);
+      }
+
       void EndProcess();
+      void Finalize();
   };
 };
 

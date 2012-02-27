@@ -5,57 +5,132 @@
 #include <string>
 
 using namespace std;
-void oneInAndOut(Isis::Buffer &ob, Isis::Buffer &ib);
-void twoInAndOut(vector<Isis::Buffer *> &ib, vector<Isis::Buffer *> &ob);
+using namespace Isis;
+void oneInAndOut(Buffer &ob, Buffer &ib);
+void twoInAndOut(vector<Buffer *> &ib, vector<Buffer *> &ob);
 
 class Functor2 {
   public:
-  void operator()(Isis::Buffer & in, Isis::Buffer & out){
+  void operator()(Buffer & in, Buffer & out) const {
     oneInAndOut(in, out);
   };
 };
 
 class Functor3 {
   public:
-  void operator()(vector<Isis::Buffer *> &ib, vector<Isis::Buffer *> &ob){
+  void operator()(vector<Buffer *> &ib,
+                  vector<Buffer *> &ob) const {
     twoInAndOut(ib, ob);
   };
 };
 
+class Functor4 {
+  public:
+  void operator()(Buffer &in, Buffer &out) const {
+    for (int i = 0; i < out.size(); i++) {
+      out[i] = in.Sample(i) + in.Line(i) * 10 + in.Band(i) * 100;
+    }
+  };
+};
+
+class Functor5 {
+  public:
+  void operator()(Buffer &inout) const {
+    for (int i = 0; i < inout.size(); i++) {
+      inout[i] = inout[i] * 2;
+    }
+  };
+};
+
 void IsisMain() {
-  Isis::Preference::Preferences(true);
-  Isis::ProcessByBrick p;
+  Preference::Preferences(true);
+  ProcessByBrick p;
 
-  Isis::Cube *icube =p.SetInputCube("FROM");
-  p.SetBrickSize(10, 10, 2);
-  p.SetOutputCube("TO", icube->getSampleCount(), icube->getLineCount(), icube->getBandCount());
-  Functor2 func2;
-  cout << "\nTesting Functors\nFunctor2\n";
-  p.StartProcessIO(func2);
-  p.EndProcess();
-  
-  icube = p.SetInputCube("FROM");
-  p.SetInputCube("FROM2");
-  p.SetBrickSize(10, 10, 2);
-  p.SetOutputCube("TO", icube->getSampleCount(), icube->getLineCount(), icube->getBandCount());
-  p.SetOutputCube("TO2", icube->getSampleCount(), icube->getLineCount(), icube->getBandCount());
+  cout << "Testing Functors\n";
+  {
+    cout << "Functor2 - ProcessCube One Thread\n";
+    Cube *icube = p.SetInputCube("FROM");
+    p.SetBrickSize(10, 10, 2);
+    p.SetOutputCube("TO", icube->getSampleCount(), icube->getLineCount(),
+                    icube->getBandCount());
+    Functor2 functor;
+    p.ProcessCube(functor, false);
+    p.EndProcess();
+    cout << "\n";
+  }
 
-  Functor3 func3;
-  cout << "\nFunctor3\n";
-  p.StartProcessIOList(func3);
+  {
+    cout << "Functor3 - ProcessCubes One Thread\n";
+    Cube *icube = p.SetInputCube("FROM");
+    p.SetInputCube("FROM2");
+    p.SetBrickSize(10, 10, 2);
+    p.SetOutputCube("TO", icube->getSampleCount(), icube->getLineCount(), icube->getBandCount());
+    p.SetOutputCube("TO2", icube->getSampleCount(), icube->getLineCount(), icube->getBandCount());
+
+    Functor3 functor;
+    p.ProcessCubes(functor, false);
+    p.EndProcess();
+    cout << "\n";
+  }
+
+  {
+    cout << "Functor4 - ProcessCube Threaded\n";
+    Cube *icube = p.SetInputCube("FROM");
+    p.SetBrickSize(10, 10, 2);
+    p.SetOutputCube("TO", icube->getSampleCount(), icube->getLineCount(),
+                    icube->getBandCount());
+    Functor4 functor;
+    p.ProcessCube(functor);
+    p.EndProcess();
+    Cube cube;
+    cube.open(Application::GetUserInterface().GetFilename("TO"));
+    Statistics *statsBand1 = cube.getStatistics(1);
+    Statistics *statsBand2 = cube.getStatistics(2);
+    std::cerr << "Averages: " << statsBand1->Average() << ", " <<
+                                 statsBand2->Average() << "\n";
+    cout << "\n";
+  }
+
+  {
+    cout << "Functor5 - ProcessCubeInPlace Threaded\n";
+    Cube *cube = new Cube;
+    cube->open(Application::GetUserInterface().GetFilename("TO"), "rw");
+    p.SetBrickSize(10, 10, 2);
+    p.SetInputCube(cube);
+    Functor5 functor;
+    p.ProcessCubeInPlace(functor);
+    p.EndProcess();
+    cube = new Cube;
+    cube->open(Application::GetUserInterface().GetFilename("TO"), "rw");
+    Statistics *statsBand1 = cube->getStatistics(1);
+    Statistics *statsBand2 = cube->getStatistics(2);
+    delete cube;
+    std::cerr << "Averages: " << statsBand1->Average() << ", " <<
+                                 statsBand2->Average() << "\n";
+    cout << "\n";
+  }
+
   cout << "End Testing Functors\n\n";
-  
-  p.StartProcess(twoInAndOut);
-  p.EndProcess();
-  
-  Isis::Cube cube;
+  cout << "Testing StartProcess\n";
+
+  {
+    Cube *icube = p.SetInputCube("FROM");
+    p.SetInputCube("FROM2");
+    p.SetBrickSize(10, 10, 2);
+    p.SetOutputCube("TO", icube->getSampleCount(), icube->getLineCount(), icube->getBandCount());
+    p.SetOutputCube("TO2", icube->getSampleCount(), icube->getLineCount(), icube->getBandCount());
+    p.StartProcess(twoInAndOut);
+    p.EndProcess();
+  }
+
+  Cube cube;
   cube.open("$temporary/isisProcessByBrick_01");
   cube.close(true);
   cube.open("$temporary/isisProcessByBrick_02");
   cube.close(true);
 }
 
-void oneInAndOut(Isis::Buffer &ib, Isis::Buffer &ob) {
+void oneInAndOut(Buffer &ib, Buffer &ob) {
   if((ib.Line() == 1) && (ib.Band() == 1)) {
     cout << endl;
     cout << "Testing one input and output cube ... " << endl;
@@ -75,7 +150,7 @@ void oneInAndOut(Isis::Buffer &ib, Isis::Buffer &ob) {
   }
 }
 
-void twoInAndOut(vector<Isis::Buffer *> &ib, vector<Isis::Buffer *> &ob) {
+void twoInAndOut(vector<Buffer *> &ib, vector<Buffer *> &ob) {
   static bool firstTime = true;
   if(firstTime) {
     firstTime = false;
@@ -85,10 +160,10 @@ void twoInAndOut(vector<Isis::Buffer *> &ib, vector<Isis::Buffer *> &ob) {
     cout << endl;
   }
 
-  Isis::Buffer &inone = *ib[0];
-  Isis::Buffer &intwo = *ib[1];
-  Isis::Buffer &outone = *ob[0];
-  Isis::Buffer &outtwo = *ob[1];
+  Buffer &inone = *ib[0];
+  Buffer &intwo = *ib[1];
+  Buffer &outone = *ob[0];
+  Buffer &outtwo = *ob[1];
 
   cout << "Sample:  " << inone.Sample() << ":" << intwo.Sample()
        << "  Line:  " << inone.Line() << ":" << intwo.Line()

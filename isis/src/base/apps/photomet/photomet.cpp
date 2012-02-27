@@ -1,19 +1,23 @@
 #define GUIHELPERS
 
 #include "Isis.h"
+
+#include <map>
 #include <sstream>
 #include <string>
-#include "Camera.h"
-#include "ProcessByLine.h"
-#include "SpecialPixel.h"
-#include "Photometry.h"
-#include "Pvl.h"
-#include "Cube.h"
-
-#include "PvlGroup.h"
-#include "iException.h"
 
 #include "Angle.h"
+#include "Camera.h"
+#include "Cube.h"
+#include "iException.h"
+#include "Photometry.h"
+#include "ProcessByLine.h"
+#include "Pvl.h"
+#include "PvlGroup.h"
+#include "SpecialPixel.h"
+
+using namespace std;
+using namespace Isis;
 
 void PrintPvl();
 void LoadPvl();
@@ -24,9 +28,6 @@ map <string, void *> GuiHelpers() {
   helper ["LoadPvl"] = (void *) LoadPvl;
   return helper;
 }
-
-using namespace std;
-using namespace Isis;
 
 // Global variables
 Camera *cam;

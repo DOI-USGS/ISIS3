@@ -122,7 +122,7 @@ namespace Isis {
    * 
    * @param out - output buffer 
    */
-  void Nearest::operator()(Isis::Buffer & out)
+  void Nearest::operator()(Isis::Buffer & out) const
   {
     int readLine = (int)(mdLine + 0.5);
 
@@ -149,7 +149,7 @@ namespace Isis {
    * 
    * @param out - output buffer
    */
-  void Average::operator() (Isis::Buffer & out)
+  void Average::operator() (Isis::Buffer & out) const
   {
     double rline = (double)out.Line() * mdLineScale;
 

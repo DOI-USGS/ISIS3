@@ -19,6 +19,7 @@ namespace Isis {
    *   @history 2010-02-26 Steven Lambright - Now using a geometry snapper on
    *             points before testing if they are inside a polygon inside
    *             DoWork(...).
+   *   @history 2012-02-24 Steven Lambright - Added Finalize()
    */
   class ProcessPolygons : public Isis::Process {
 
@@ -45,6 +46,7 @@ namespace Isis {
 
 
       void EndProcess();
+      void Finalize();
 
     private:
       void DoWork(int Flag);

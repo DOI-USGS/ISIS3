@@ -53,6 +53,10 @@
     <change name="Jeff Anderson" date="2004-03-31">
       Modified XML file to default output pixel type to real
     </change>
+    <change name="Steven Lambright" date="2012-02-24">
+      Rewrote to no longer use StartProcess() since it's deprecated. This
+      program no longer uses global variables.
+    </change>
   </history>
 
   <groups>

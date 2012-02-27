@@ -468,8 +468,17 @@ namespace Isis {
   /**
    * End the processing sequence and cleans up by closing cubes, freeing memory,
    * etc.
+   *
+   * @deprecated Please use Finalize()
    */
   void Process::EndProcess() {
+    Process::Finalize();
+  }
+
+  /**
+   * Cleans up by closing cubes and freeing memory
+   */
+  void Process::Finalize() {
     ClearInputCubes();
     ClearOutputCubes();
   }

@@ -36,7 +36,7 @@ void IsisMain() {
   Isis::Nearest near(&icube, sscale, lscale);
   p.ClearInputCubes();
   cout << "Reduce by Near\n";
-  p.StartProcessInPlace(near);
+  p.ProcessCubeInPlace(near, false);
   Isis::PvlGroup results = near.UpdateOutputLabel(ocube);
   p.EndProcess();
   cout << results << endl;
@@ -47,7 +47,7 @@ void IsisMain() {
   p.ClearInputCubes();
   Isis::Average avg(&icube, sscale, lscale, 0.5, "scale");
   cout << "\nReduce by Average\n";
-  p.StartProcessInPlace(avg);
+  p.ProcessCubeInPlace(avg, false);
   results = avg.UpdateOutputLabel(ocube);
   cout << results << endl;
 

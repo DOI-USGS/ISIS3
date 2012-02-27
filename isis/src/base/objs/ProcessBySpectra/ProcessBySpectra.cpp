@@ -86,12 +86,74 @@ namespace Isis {
    * this method can be used to obtain statistics, histograms, or other 
    * information from an input cube. 
    *
+   * @deprecated Please use ProcessCubeInPlace()
    * @param funct (Isis::Buffer &b) Name of your processing function
    *
    * @throws Isis::iException::Message
    */
   void ProcessBySpectra::StartProcess(void funct(Isis::Buffer &in)) {
+    SetBrickSizesForProcessCubeInPlace();
+    ProcessByBrick::StartProcess(funct);
+  }
 
+  /**
+   * This method invokes the process by spectra operation over exactly one input 
+   * and one output cube. Typically, this method is used for simple operations 
+   * such as stretching a cube or applying various operators to a cube (add 
+   * constant, multiply by constant, etc). 
+   *
+   * @deprecated Please use ProcessCube()
+   * @param funct (Isis::Buffer &in, Isis::Buffer &out) Name of your processing
+   *                                                    function
+   *
+   * @throws Isis::iException::Message
+   */
+  void ProcessBySpectra::StartProcess(void
+                                      funct(Isis::Buffer &in, 
+                                            Isis::Buffer &out)) {
+    SetBrickSizesForProcessCube();
+    ProcessByBrick::StartProcess(funct);
+  }
+
+  /**
+   * This method invokes the process by spectra operation over multiple input 
+   * and output cubes. Typically, this method is used when two input cubes are
+   * required for operations like ratios, differences, masking, etc.
+   *
+   * @deprecated Please use ProcessCubes()
+   * @param funct (vector<Isis::Buffer *> &in, vector<Isis::Buffer *> &out) Name
+   *                of your processing function
+   *
+   * @throws Isis::iException::Message
+   */
+  void ProcessBySpectra::StartProcess(void funct(std::vector<Isis::Buffer *> &in,
+                                      std::vector<Isis::Buffer *> &out)) {
+    SetBrickSizesForProcessCubes();
+    ProcessByBrick::StartProcess(funct);
+  }
+
+  /**
+   * Sets the spectra type to one of the following: 
+   * <UL> 
+   *   <LI> 0 = PerPixel
+   *   <LI> 1 = ByLine
+   *   <LI> 2 = BySample
+   * </UL>
+   * @param type Integer value representing the spectra type.
+   */
+  void ProcessBySpectra::SetType(const int type) {
+    if(type != PerPixel && type != ByLine && type != BySample) {
+      string m = "The specified spectra type is invalid";
+      throw iException::Message(iException::Programmer, m, _FILEINFO_);
+    }
+    else p_spectraType = type;
+  }
+
+
+  /**
+   * This is a helper method for StartProcess() and ProcessCubeInPlace().
+   */
+  void ProcessBySpectra::SetBrickSizesForProcessCubeInPlace() {
     // Error checks
     if((InputCubes.size() + OutputCubes.size()) > 1) {
       string m = "You can only specify exactly one input or output cube";
@@ -116,23 +178,13 @@ namespace Isis {
     if(Type() == PerPixel) SetBrickSize(1, 1, nb);
     else if(Type() == ByLine) SetBrickSize(ns, 1, nb);
     else SetBrickSize(1, nl, nb);
-    ProcessByBrick::StartProcess(funct);
   }
 
+
   /**
-   * This method invokes the process by spectra operation over exactly one input 
-   * and one output cube. Typically, this method is used for simple operations 
-   * such as stretching a cube or applying various operators to a cube (add 
-   * constant, multiply by constant, etc). 
-   *
-   * @param funct (Isis::Buffer &in, Isis::Buffer &out) Name of your processing
-   *                                                    function
-   *
-   * @throws Isis::iException::Message
+   * This is a helper method for StartProcess() and ProcessCube().
    */
-  void ProcessBySpectra::StartProcess(void
-                                      funct(Isis::Buffer &in, 
-                                            Isis::Buffer &out)) {
+  void ProcessBySpectra::SetBrickSizesForProcessCube() {
     // Error checks ... there must be one input and output
     if(InputCubes.size() != 1) {
       string m = "You must specify exactly one input cube";
@@ -173,22 +225,13 @@ namespace Isis {
       SetOutputBrickSize(1, OutputCubes[0]->getLineCount(),
                          OutputCubes[0]->getBandCount());
     }
-
-    ProcessByBrick::StartProcess(funct);
   }
 
+
   /**
-   * This method invokes the process by spectra operation over multiple input 
-   * and output cubes. Typically, this method is used when two input cubes are
-   * required for operations like ratios, differences, masking, etc.
-   *
-   * @param funct (vector<Isis::Buffer *> &in, vector<Isis::Buffer *> &out) Name
-   *                of your processing function
-   *
-   * @throws Isis::iException::Message
+   * This is a helper method for StartProcess() and ProcessCubes().
    */
-  void ProcessBySpectra::StartProcess(void funct(std::vector<Isis::Buffer *> &in,
-                                      std::vector<Isis::Buffer *> &out)) {
+  void ProcessBySpectra::SetBrickSizesForProcessCubes() {
     if(Type() == PerPixel) {
       for(unsigned int i = 0; i < InputCubes.size(); i++) {
         SetInputBrickSize(1, 1, InputCubes[i]->getBandCount(), i + 1);
@@ -217,24 +260,5 @@ namespace Isis {
                            OutputCubes[i]->getBandCount(), i + 1);
       }
     }
-
-    ProcessByBrick::StartProcess(funct);
-  }
-
-  /**
-   * Sets the spectra type to one of the following: 
-   * <UL> 
-   *   <LI> 0 = PerPixel
-   *   <LI> 1 = ByLine
-   *   <LI> 2 = BySample
-   * </UL>
-   * @param type Integer value representing the spectra type.
-   */
-  void ProcessBySpectra::SetType(const int type) {
-    if(type != PerPixel && type != ByLine && type != BySample) {
-      string m = "The specified spectra type is invalid";
-      throw iException::Message(iException::Programmer, m, _FILEINFO_);
-    }
-    else p_spectraType = type;
   }
 }

@@ -70,12 +70,12 @@ void IsisMain() {
     PvlGroup results;
     if(alg == "AVERAGE"){
       Average average(&inCube, sscale, lscale, vper, replaceMode);
-      p.StartProcessInPlace(average);
+      p.ProcessCubeInPlace(average, false);
       results = average.UpdateOutputLabel(ocube);
     }
     else if(alg == "NEAREST") {
       Nearest near(&inCube, sscale, lscale);
-      p.StartProcessInPlace(near);
+      p.ProcessCubeInPlace(near, false);
       results = near.UpdateOutputLabel(ocube);
     }
         

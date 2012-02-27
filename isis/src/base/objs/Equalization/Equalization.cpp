@@ -97,7 +97,7 @@ namespace Isis {
         Statistics *stats = new Statistics();
 
         CalculateFunctor func(stats, percent);
-        p.StartProcessInPlace(func);
+        p.ProcessCubeInPlace(func, false);
         p.EndProcess();
 
         statsList.push_back(stats);
@@ -302,7 +302,7 @@ namespace Isis {
 
       // Apply gain/offset to the image
       ApplyFunctor func(m_adjustments[img]);
-      p.StartProcessIO(func);
+      p.ProcessCube(func, false);
       p.EndProcess();
     }
   }
@@ -529,22 +529,21 @@ namespace Isis {
   }
 
 
-  void Equalization::CalculateFunctor::operator()(Buffer &in) {
+  void Equalization::CalculateFunctor::operator()(Buffer &in) const {
     // Make sure we consider the last line
-    if (m_line % m_linc == 0 || m_line == in.LineDimension() - 1) {
+    if ((in.Line() - 1) % m_linc == 0 || in.Line() == in.LineDimension()) {
       addStats(in);
     }
-    m_line++;
   }
 
 
-  void Equalization::CalculateFunctor::addStats(Buffer &in) {
+  void Equalization::CalculateFunctor::addStats(Buffer &in) const {
     // Add data to Statistics object by line
     m_stats->AddData(&in[0], in.size());
   }
 
 
-  void Equalization::ApplyFunctor::operator()(Buffer &in, Buffer &out) {
+  void Equalization::ApplyFunctor::operator()(Buffer &in, Buffer &out) const {
     int index = in.Band() - 1;
     for (int i = 0; i < in.size(); i++) {
       out[i] = (IsSpecial(in[i])) ?

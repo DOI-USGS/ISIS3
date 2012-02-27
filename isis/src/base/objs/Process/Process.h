@@ -138,8 +138,8 @@ namespace Isis {
    *           3. Added additional testing while writing history to output files
    *  @history 2011-08-26 Steven Lambright - The NaifKeywords object is now
    *                          being propagated.
-   *
-   *  @todo 2005-02-08 Jeff Anderson - add an example to the class documentation.
+   *  @history 2012-02-24 Steven Lambright - Added Finalize() method and
+   *                          deprecated EndProcess()
    */
   class Process {
     protected:
@@ -207,6 +207,7 @@ namespace Isis {
         funct();
       };
       virtual void EndProcess();
+      virtual void Finalize();
 
       Isis::Cube *SetInputCube(const std::string &parameter,
                                const int requirements = 0);

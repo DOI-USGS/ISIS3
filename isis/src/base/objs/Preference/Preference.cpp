@@ -25,8 +25,8 @@
 #include <iostream>
 #include <iomanip>
 
-
 #include <QDir>
+#include <QThreadPool>
 
 #include "Preference.h"
 #include "Filename.h"
@@ -64,6 +64,24 @@ namespace Isis {
       }
       else {
         this->AddGroup(inGroup);
+      }
+    }
+
+    // Configure Isis to use the user performance preferences where
+    //   appropriate.
+    if (HasGroup("Performance")) {
+      PvlGroup &performance = FindGroup("Performance");
+      if (performance.HasKeyword("GlobalThreads")) {
+        iString threadsPreference = performance["GlobalThreads"][0];
+
+        if (threadsPreference.DownCase() != "optimized") {
+          // We need a no-iException conversion here
+          int threads = threadsPreference.ToQt().toInt();
+
+          if (threads > 0) {
+            QThreadPool::globalInstance()->setMaxThreadCount(threads);
+          }
+        }
       }
     }
   }

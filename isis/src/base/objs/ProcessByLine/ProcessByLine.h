@@ -127,19 +127,20 @@ namespace Isis {
        * @author 2011-04-22 Sharmila Prasad
        * 
        * @param funct - Functor with overloaded operator()(Isis::Buffer &)
+       * @param threaded @see ProcessByBrick::ProcessCubeInPlace()
        */
       template <typename Functor> 
-      void StartProcessInPlace(Functor & funct) {
+      void ProcessCubeInPlace(const Functor & funct, bool threaded = true) {
         VerifyCubeInPlace();
-        Isis::ProcessByBrick::StartProcessInPlace(funct);
+        ProcessByBrick::ProcessCubeInPlace(funct, threaded);
       }
-      
+
       /** 
        * Verify input and output cubes and set brick size for 
        * StartProcessIO(Functor funct) and StartProcess(funct(in,out))
        */ 
       void VerifyCubeIO(void);
-      
+
       /**
        * Same functionality as 
        * StartProcess(void funct(Isis::Buffer &in, Isis::Buffer &out)) using 
@@ -150,13 +151,14 @@ namespace Isis {
        * 
        * @param funct - Functor with overloaded 
        *                operator()(Isis::Buffer &, Isis::Buffer &)
+       * @param threaded @see ProcessByBrick::ProcessCube()
        */
       template <typename Functor> 
-      void StartProcessIO(Functor & funct) {
+      void ProcessCube(const Functor & funct, bool threaded = true) {
         VerifyCubeIO();
-        Isis::ProcessByBrick::StartProcessIO(funct);
+        ProcessByBrick::ProcessCube(funct, threaded);
       }
-      
+
       /** 
        * Verify input and output cubes and set brick size for 
        * StartProcessIOList(Functor funct) and 
@@ -164,7 +166,7 @@ namespace Isis {
        * &out)) 
        */ 
       void VerifyCubeIOList(void);
-      
+
       /**
        * Same functionality as StartProcess(std::vector<Isis::Buffer *> &in, 
        * std::vector<Isis::Buffer *> &out) using Functors. The Functor operator(), 
@@ -176,11 +178,12 @@ namespace Isis {
        * @param funct - Functor with overloaded operator() 
        *              (Istd::vector<Isis::Buffer *> &, 
        *                std::vector<Isis::Buffer *> &)
+       * @param threaded @see ProcessByBrick::ProcessCubes()
        */
       template <typename Functor> 
-      void StartProcessIOList(Functor & funct) {
+      void ProcessCubes(const Functor & funct, bool threaded = true) {
         VerifyCubeIOList();
-        Isis::ProcessByBrick::StartProcessIOList(funct);
+        ProcessByBrick::ProcessCubes(funct, threaded);
       }
   };
 };

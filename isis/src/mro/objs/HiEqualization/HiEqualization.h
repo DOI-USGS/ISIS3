@@ -66,7 +66,7 @@ namespace Isis {
           virtual ~HiCalculateFunctor() {}
 
         protected:
-          virtual void addStats(Buffer &in);
+          virtual void addStats(Buffer &in) const;
 
         private:
           Statistics *m_statsLeft;

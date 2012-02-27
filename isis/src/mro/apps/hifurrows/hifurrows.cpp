@@ -16,7 +16,7 @@
 using namespace std;
 using namespace Isis;
 
-int channel, bin;
+int channel;
 double correlation;
 struct furrow {
   int startSample;
@@ -56,10 +56,9 @@ void IsisMain() {
   correlation = ui.GetDouble("CORRELATION");
   HiLab hiInfo(icube);
   channel = hiInfo.getChannel();
-  bin = hiInfo.getBin();
 
   // Bin 1 images have up to four furrows; others have only one
-  if(bin == 1) {
+  if(hiInfo.getBin() == 1) {
     // Numbers derived from TRA_000827_0985
     furrows.resize(4);
     furrows[0].startSample = 5;

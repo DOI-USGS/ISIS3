@@ -35,6 +35,8 @@ namespace Isis {
    * @author 2011-06-09 Jai Rideout and Steven Lambright
    *
    * @internal
+   *   @history 2012-02-24 Steven Lambright - Changed intersection test
+   *                           to be faster on intersection failures.
    */
   class Area3D {
     public:

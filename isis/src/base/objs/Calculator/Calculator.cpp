@@ -25,7 +25,6 @@
 #include <QStack>
 #include <QVector>
 
-#include "ProcessByLine.h"
 #include "Calculator.h"
 #include "InfixToPostfix.h"
 #include "iException.h"

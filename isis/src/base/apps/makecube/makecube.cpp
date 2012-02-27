@@ -5,9 +5,40 @@
 using namespace std;
 using namespace Isis;
 
-// Glocal declarations
-void makecube(Buffer &out);
-double value;
+/**
+ *
+ * @author 2012-02-22 Steven Lambright
+ *
+ * @internal
+ */
+class ConstantValueFunctor {
+  public:
+    ConstantValueFunctor(double value) {
+      m_value = value;
+    }
+
+
+    ConstantValueFunctor(const ConstantValueFunctor &other) {
+      m_value = other.m_value;
+    }
+
+
+    void operator()(Buffer &output) const {
+      for (int i = 0; i < output.size(); i++) {
+        output[i] = m_value;
+      }
+    }
+
+
+    ConstantValueFunctor &operator=(const ConstantValueFunctor &rhs) {
+      m_value = rhs.m_value;
+      return *this;
+    }
+
+
+  private:
+    double m_value;
+};
 
 void IsisMain() {
   // Create a process by line object
@@ -16,6 +47,8 @@ void IsisMain() {
   // Get the value to put in the cube
   UserInterface &ui = Application::GetUserInterface();
   string pixels = ui.GetString("PIXELS");
+
+  double value = Null;
   if(pixels == "NULL") {
     value = NULL8;
   }
@@ -64,12 +97,6 @@ void IsisMain() {
   p.SetOutputCube(ui.GetFilename("TO"), att, samps, lines, bands);
 
   // Make the cube
-  p.StartProcess(makecube);
+  p.ProcessCubeInPlace(ConstantValueFunctor(value), false);
   p.EndProcess();
-}
-
-void makecube(Buffer &out) {
-  for(int i = 0; i < out.size(); i++) {
-    out[i] = (double) value;
-  }
 }

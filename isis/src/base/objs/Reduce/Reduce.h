@@ -58,13 +58,13 @@ namespace Isis {
       int miEndSample;            //!< Input end sample
       int miStartLine;            //!< Input start line
       int miEndLine;              //!< Input end line
-      double mdLine;              //!< Line index
+      mutable double mdLine;              //!< Line index
       int miOutputSamples;        //!< Output Samples
       int miOutputLines;          //!< Output Lines
       int miInputSamples;         //!< Input Samples
       int miInputLines;           //!< Input Lines
       int miInputBands;           //!< Input Bands
-      int miBandIndex;            //!< Band Index
+      mutable int miBandIndex;            //!< Band Index
       Isis::Portal *m_iPortal;    //!< Input portal
   };
 
@@ -84,7 +84,7 @@ namespace Isis {
       }
 
       //! Operator () overload 
-      void operator() (Isis::Buffer & out);
+      void operator() (Isis::Buffer & out) const;
   };
 
 
@@ -106,16 +106,16 @@ namespace Isis {
       }
 
       //! Operator () overload
-      void operator() (Isis::Buffer & out);
+      void operator() (Isis::Buffer & out) const;
 
     private:
-      double mdValidPer;   //!< Valid Percentage
+      mutable double mdValidPer;   //!< Valid Percentage
       string msReplaceMode;//!< Replace Mode (scale/total)
-      double *mdIncTab;
-      double *mdSum;
-      double *mdNpts;
-      double *mdSum2;
-      double *mdNpts2;
+      mutable double *mdIncTab;
+      mutable double *mdSum;
+      mutable double *mdNpts;
+      mutable double *mdSum2;
+      mutable double *mdNpts2;
   };
   
 };

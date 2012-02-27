@@ -68,6 +68,7 @@ namespace Isis {
    *                           FilterCachingAlgorithm
    *   @history 2011-08-19 Jeannie Backer - Modified unitTest to use
    *                           $temporary variable instead of /tmp directory.
+   *   @history 2012-02-24 Steven Lambright - Added ProcessCube()
    */
   class ProcessByQuickFilter : public Isis::Process {
 
@@ -76,6 +77,10 @@ namespace Isis {
 
       void StartProcess(void funct(Isis::Buffer &in, Isis::Buffer &out, 
                                    Isis::QuickFilter &filter));
+      void ProcessCube(void funct(Isis::Buffer &in, Isis::Buffer &out, 
+                                  Isis::QuickFilter &filter)) {
+        StartProcess(funct);
+      }
       void SetFilterParameters(int samples, int lines,
                                double low = -DBL_MAX, double high = DBL_MAX,
                                int minimum = 0);

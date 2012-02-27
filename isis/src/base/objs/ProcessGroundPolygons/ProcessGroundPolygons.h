@@ -10,18 +10,19 @@
 
 namespace Isis {
   /**
-  * @brief Process cube polygons to map or camera projections
-  *
-  * This class allows a programmer to develop a program which
-  * @ingroup HighLevelCubeIO
-  *
-  * @author  2008-12-14 Stacy Alley
-  *
-  * @internal
-  *  @history 2008-05-12 Steven Lambright - Removed references to CubeInfo
-  *  @history 2008-08-18 Steven Lambright - Updated to work with geos3.0.0
-  *           instead of geos2. Mostly namespace changes.
-  */
+   * @brief Process cube polygons to map or camera projections
+   *
+   * This class allows a programmer to develop a program which
+   * @ingroup HighLevelCubeIO
+   *
+   * @author  2008-12-14 Stacy Alley
+   *
+   * @internal
+   *   @history 2008-05-12 Steven Lambright - Removed references to CubeInfo
+   *   @history 2008-08-18 Steven Lambright - Updated to work with geos3.0.0
+   *                           instead of geos2. Mostly namespace changes.
+   *   @history 2012-02-24 Steven Lambright - Added Finalize()
+   */
   class ProcessGroundPolygons : public ProcessPolygons {
     public:
       ProcessGroundPolygons();
@@ -54,6 +55,7 @@ namespace Isis {
       void Rasterize(double &lat, double &lon, int &band, double &value);
 
       void EndProcess();
+      void Finalize();
       UniversalGroundMap *GetUniversalGroundMap() {
         return p_groundMap;
       };

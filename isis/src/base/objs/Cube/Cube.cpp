@@ -78,22 +78,22 @@ namespace Isis {
   Cube::~Cube() {
     close();
 
-    if(m_mutex) {
+    if (m_mutex) {
       delete m_mutex;
       m_mutex = NULL;
     }
 
-    if(m_camera) {
+    if (m_camera) {
       delete m_camera;
       m_camera = NULL;
     }
 
-    if(m_projection) {
+    if (m_projection) {
       delete m_projection;
       m_projection = NULL;
     }
 
-    if(m_formatTemplateFile) {
+    if (m_formatTemplateFile) {
       delete m_formatTemplateFile;
       m_formatTemplateFile = NULL;
     }
@@ -138,12 +138,12 @@ namespace Isis {
   bool Cube::isReadOnly() const {
     bool readOnly = false;
 
-    if(!isOpen()) {
+    if (!isOpen()) {
       iString msg = "No cube opened";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
-    if((m_labelFile->openMode() & QIODevice::ReadWrite) != QIODevice::ReadWrite)
+    if ((m_labelFile->openMode() & QIODevice::ReadWrite) != QIODevice::ReadWrite)
       readOnly = true;
 
     return readOnly;
@@ -183,7 +183,7 @@ namespace Isis {
    * removed/deleted.
    */
   void Cube::close(bool removeIt) {
-    if(isOpen() && isReadWrite())
+    if (isOpen() && isReadWrite())
       writeLabels();
 
     cleanUp(removeIt);
@@ -212,12 +212,12 @@ namespace Isis {
    */
   void Cube::create(const iString &cubeFilename) {
     // Already opened?
-    if(isOpen()) {
+    if (isOpen()) {
       string msg = "You already have a cube opened";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
-    if(m_samples < 1 || m_lines < 1 || m_bands < 1) {
+    if (m_samples < 1 || m_lines < 1 || m_bands < 1) {
       iString msg = "Number of samples [" + iString(m_samples) +
           "], lines [" + iString(m_lines) + "], or bands [" + iString(m_bands) +
           "] cannot be less than 1";
@@ -237,7 +237,7 @@ namespace Isis {
     maxSizePreference =
         Preference::Preferences().FindGroup("CubeCustomization")["MaximumSize"];
 
-    if(size > maxSizePreference) {
+    if (size > maxSizePreference) {
       string msg;
       msg += "The cube you are attempting to create [" + cubeFilename + "] is ["
              + iString(size) + "GB]. This is larger than the current allowed "
@@ -257,7 +257,7 @@ namespace Isis {
 
     // See if we have attached or detached labels
     PvlObject core("Core");
-    if(m_attached) {
+    if (m_attached) {
       // StartByte is 1-based (why!!) so we need to do + 1
       core += PvlKeyword("StartByte", m_labelBytes + 1);
       m_labelFilename = new iString(cubFile.Expanded());
@@ -315,21 +315,21 @@ namespace Isis {
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
 
-    if(!m_labelFile->open(QIODevice::Truncate | QIODevice::ReadWrite)) {
+    if (!m_labelFile->open(QIODevice::Truncate | QIODevice::ReadWrite)) {
       iString msg = "Failed to create [" + m_labelFile->fileName() + "]";
       cleanUp(false);
       throw iException::Message(iException::Io, msg, _FILEINFO_);
     }
 
     if (m_dataFile) {
-      if(!m_dataFile->open(QIODevice::Truncate | QIODevice::ReadWrite)) {
+      if (!m_dataFile->open(QIODevice::Truncate | QIODevice::ReadWrite)) {
         iString msg = "Failed to create [" + m_dataFile->fileName() + "]";
         cleanUp(false);
         throw iException::Message(iException::Io, msg, _FILEINFO_);
       }
     }
 
-    if(m_format == Bsq) {
+    if (m_format == Bsq) {
       m_ioHandler = new CubeBsqHandler(getDataFile(), m_virtualBandList,
           *m_label, false);
     }
@@ -355,7 +355,7 @@ namespace Isis {
    */
   void Cube::open(const iString &cubeFilename, iString access) {
     // Already opened?
-    if(isOpen()) {
+    if (isOpen()) {
       string msg = "You already have a cube opened";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
@@ -364,7 +364,7 @@ namespace Isis {
     Filename realName(cubeFilename);
 
     try {
-      if(realName.exists()) {
+      if (realName.exists()) {
         m_label = new Pvl(realName.Expanded());
         if (!m_label->Objects()) {
           throw iException::Message(iException::Programmer, "", _FILEINFO_);
@@ -374,17 +374,17 @@ namespace Isis {
     catch(iException &e) {
       e.Clear();
 
-      if(m_label) {
+      if (m_label) {
         delete m_label;
         m_label = NULL;
       }
     }
 
     try {
-      if(!m_label) {
+      if (!m_label) {
         Filename tmp(realName);
         tmp.AddExtension("cub");
-        if(tmp.exists()) {
+        if (tmp.exists()) {
           m_label = new Pvl(tmp.Expanded());
           if (!m_label->Objects()) {
             throw iException::Message(iException::Programmer, "", _FILEINFO_);
@@ -396,18 +396,18 @@ namespace Isis {
     catch(iException &e) {
       e.Clear();
 
-      if(m_label) {
+      if (m_label) {
         delete m_label;
         m_label = NULL;
       }
     }
 
     try {
-      if(!m_label) {
+      if (!m_label) {
         Filename tmp(realName);
         tmp.RemoveExtension();
         tmp.AddExtension("lbl");
-        if(tmp.exists()) {
+        if (tmp.exists()) {
           m_label = new Pvl(tmp.Expanded());
           if (!m_label->Objects()) {
             throw iException::Message(iException::Programmer, "", _FILEINFO_);
@@ -419,13 +419,13 @@ namespace Isis {
     catch(iException &e) {
       e.Clear();
 
-      if(m_label) {
+      if (m_label) {
         delete m_label;
         m_label = NULL;
       }
     }
 
-    if(!m_label) {
+    if (!m_label) {
       string msg = Message::FileOpen(cubeFilename);
       throw iException::Message(iException::Io, msg, _FILEINFO_);
     }
@@ -434,8 +434,8 @@ namespace Isis {
 
     // See if this is an old Isis cube format.  If so then we will
     // need to internalize a new label
-    if(m_label->HasKeyword("CCSD3ZF0000100000001NJPL3IF0PDS200000001")) {
-      if(access == "r") {
+    if (m_label->HasKeyword("CCSD3ZF0000100000001NJPL3IF0PDS200000001")) {
+      if (access == "r") {
         reformatOldIsisLabel(*m_labelFilename);
       }
       else {
@@ -452,10 +452,10 @@ namespace Isis {
     // Figure out the name of the data file
     try {
       PvlObject &core = m_label->FindObject("IsisCube").FindObject("Core");
-      if(core.HasKeyword("^Core")) {
+      if (core.HasKeyword("^Core")) {
         Filename temp(core["^Core"][0]);
 
-        if(temp.OriginalPath() == ".") {
+        if (temp.OriginalPath() == ".") {
           m_dataFilename = new iString(realName.Path() + "/" + temp.Name());
         }
         else {
@@ -477,7 +477,7 @@ namespace Isis {
     }
 
     if (access == "r") {
-      if(!m_labelFile->open(QIODevice::ReadOnly)) {
+      if (!m_labelFile->open(QIODevice::ReadOnly)) {
         iString msg = "Failed to open [" + m_labelFile->fileName() + "] with "
             "read only access";
         cleanUp(false);
@@ -485,7 +485,7 @@ namespace Isis {
       }
 
       if (m_dataFile) {
-        if(!m_dataFile->open(QIODevice::ReadOnly)) {
+        if (!m_dataFile->open(QIODevice::ReadOnly)) {
           iString msg = "Failed to open [" + m_dataFile->fileName() + "] with "
               "read only access";
           cleanUp(false);
@@ -494,7 +494,7 @@ namespace Isis {
       }
     }
     else if (access == "rw") {
-      if(!m_labelFile->open(QIODevice::ReadWrite)) {
+      if (!m_labelFile->open(QIODevice::ReadWrite)) {
         iString msg = "Failed to open [" + m_labelFile->fileName() + "] with "
             "read/write access";
         cleanUp(false);
@@ -502,7 +502,7 @@ namespace Isis {
       }
 
       if (m_dataFile) {
-        if(!m_dataFile->open(QIODevice::ReadWrite)) {
+        if (!m_dataFile->open(QIODevice::ReadWrite)) {
           iString msg = "Failed to open [" + m_dataFile->fileName() + "] with "
               "read/write access";
           cleanUp(false);
@@ -533,7 +533,7 @@ namespace Isis {
     m_pixelType = PixelTypeEnumeration(pixelsGroup["Type"]);
 
     // Determine the number of bytes in the label
-    if(m_attached) {
+    if (m_attached) {
       m_labelBytes = m_label->FindObject("Label")["Bytes"];
     }
     else {
@@ -541,7 +541,7 @@ namespace Isis {
     }
 
     // Now examine the format to see which type of handler to create
-    if((string) core["Format"] == "BandSequential") {
+    if ((string) core["Format"] == "BandSequential") {
       m_ioHandler = new CubeBsqHandler(getDataFile(), m_virtualBandList,
           *m_label, true);
       m_format = Bsq;
@@ -553,10 +553,10 @@ namespace Isis {
     }
 
     // Prune the band bin group if it exists
-    if(m_label->FindObject("IsisCube").HasGroup("BandBin")) {
+    if (m_label->FindObject("IsisCube").HasGroup("BandBin")) {
       PvlGroup &bandBin = m_label->FindObject("IsisCube").FindGroup("BandBin");
       for(int k = 0; k < bandBin.Keywords(); k++) {
-        if(bandBin[k].Size() == m_bands && m_virtualBandList) {
+        if (bandBin[k].Size() == m_bands && m_virtualBandList) {
           PvlKeyword temp = bandBin[k];
           bandBin[k].Clear();
           for(int i = 0; i < m_virtualBandList->size(); i++) {
@@ -568,7 +568,7 @@ namespace Isis {
     }
 
     // Change the number of bands in the labels of the cube
-    if(m_virtualBandList)
+    if (m_virtualBandList)
       dims["Bands"] = m_virtualBandList->size();
   }
 
@@ -582,7 +582,7 @@ namespace Isis {
    *
    */
   void Cube::reopen(iString access) {
-    if(!m_labelFile) {
+    if (!m_labelFile) {
       iString msg = "Cube has not been opened yet. The filename to re-open is "
           "unknown";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
@@ -592,14 +592,14 @@ namespace Isis {
     iString filename = *m_labelFilename;
     QList<int> virtualBandList;
 
-    if(m_virtualBandList)
+    if (m_virtualBandList)
       virtualBandList = *m_virtualBandList;
 
     close();
     open(filename, access);
 
-    if(virtualBandList.size()) {
-      if(m_virtualBandList)
+    if (virtualBandList.size()) {
+      if (m_virtualBandList)
         *m_virtualBandList = virtualBandList;
       else
         m_virtualBandList = new QList<int>(virtualBandList);
@@ -615,7 +615,7 @@ namespace Isis {
    * @return (type)return description
    */
   void Cube::read(Blob &blob) const {
-    if(!isOpen()) {
+    if (!isOpen()) {
       string msg = "The cube is not opened so you can't read a blob from it";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
@@ -624,6 +624,8 @@ namespace Isis {
     if (m_tempCube)
       cubeFile = *m_tempCube;
 
+    QMutexLocker locker(m_mutex);
+    QMutexLocker locker2(m_ioHandler->dataFileMutex());
     blob.Read(cubeFile, *getLabel());
   }
 
@@ -634,8 +636,8 @@ namespace Isis {
    *
    * @param bufferToFill Buffer to be loaded
    */
-  void Cube::read(Buffer &bufferToFill) {
-    if(!isOpen()) {
+  void Cube::read(Buffer &bufferToFill) const {
+    if (!isOpen()) {
       string msg = "Try opening a file before you read it";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
@@ -652,18 +654,21 @@ namespace Isis {
    * @param blob data to be written
    */
   void Cube::write(Blob &blob) {
-    if(!isOpen()) {
+    if (!isOpen()) {
       string msg = "The cube is not opened so you can't write a blob to it";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
-    if (!m_labelFile->isWritable()) { 
+    if (!m_labelFile->isWritable()) {
       string msg = "The cube must be opened in read/write mode, not readOnly";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
     // Write an attached blob
-    if(m_attached) {
+    if (m_attached) {
+      QMutexLocker locker(m_mutex);
+      QMutexLocker locker2(m_ioHandler->dataFileMutex());
+
       // Compute the number of bytes in the cube + label bytes and if the
       // endpos of the file // is not greater than this then seek to that position.
       fstream stream(m_labelFilename->c_str(),
@@ -672,7 +677,7 @@ namespace Isis {
       streampos endByte = stream.tellp();
       streampos maxbyte = (streampos) m_labelBytes +
           m_ioHandler->getDataSize();
-      if(endByte < maxbyte) stream.seekp(maxbyte, ios::beg);
+      if (endByte < maxbyte) stream.seekp(maxbyte, ios::beg);
       blob.Write(*m_label, stream);
     }
 
@@ -686,7 +691,7 @@ namespace Isis {
       ios::openmode flags = ios::in | ios::binary | ios::out | ios::trunc;
       fstream detachedStream;
       detachedStream.open(blobFile.c_str(), flags);
-      if(!detachedStream) {
+      if (!detachedStream) {
         string message = "Unable to open data file [" +
                          blobFilename.Expanded() + "]";
         throw iException::Message(iException::Io, message, _FILEINFO_);
@@ -708,12 +713,12 @@ namespace Isis {
    * @param bufferToWrite Buffer to be written.
    */
   void Cube::write(Buffer &bufferToWrite) {
-    if(!isOpen()) {
+    if (!isOpen()) {
       string msg = "Try opening/creating a file before you write it";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
-    if(isReadOnly()) {
+    if (isReadOnly()) {
       string msg = "The cube [" + (iString)QFileInfo(getFilename()).fileName() +
           "] is opened read-only ... you can't write to it";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
@@ -758,13 +763,13 @@ namespace Isis {
     m_multiplier = 1.0;
 
     double x1, x2;
-    if(m_pixelType == UnsignedByte) {
+    if (m_pixelType == UnsignedByte) {
       x1 = VALID_MIN1;
       x2 = VALID_MAX1;
       m_multiplier = (max - min) / (x2 - x1);
       m_base = min - m_multiplier * x1;
     }
-    else if(m_pixelType == SignedWord) {
+    else if (m_pixelType == SignedWord) {
       x1 = VALID_MIN2;
       x2 = VALID_MAX2;
       m_multiplier = (max - min) / (x2 - x1);
@@ -796,7 +801,7 @@ namespace Isis {
    */
   void Cube::setDimensions(int ns, int nl, int nb) {
     openCheck();
-    if((ns < 1) || (nl < 1) || (nb < 1)) {
+    if ((ns < 1) || (nl < 1) || (nb < 1)) {
       string msg = "SetDimensions:  Invalid number of sample, lines or bands";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
@@ -875,7 +880,7 @@ namespace Isis {
     else
       m_virtualBandList = new QList<int>;
 
-    if(vbands.size() > 0) {
+    if (vbands.size() > 0) {
       QListIterator<iString> it(vbands);
       while (it.hasNext()) {
         m_virtualBandList->append(it.next());
@@ -886,7 +891,7 @@ namespace Isis {
       m_virtualBandList = NULL;
     }
 
-    if(m_ioHandler) {
+    if (m_ioHandler) {
       m_ioHandler->setVirtualBands(m_virtualBandList);
     }
   }
@@ -955,7 +960,7 @@ namespace Isis {
    * @returns A camera based on the open cube
    */
   Camera *Cube::getCamera() {
-    if(m_camera == NULL && isOpen()) {
+    if (m_camera == NULL && isOpen()) {
       m_camera = CameraFactory::Create(*getLabel());
     }
     return m_camera;
@@ -969,7 +974,7 @@ namespace Isis {
    * @returns The opened cube's filename
    */
   iString Cube::getFilename() const {
-    if(isOpen())
+    if (isOpen())
       return *m_labelFilename;
     else
       return "";
@@ -1037,7 +1042,7 @@ namespace Isis {
   Histogram *Cube::getHistogram(const int &band, const double &validMin,
                              const double &validMax, iString msg) {
     // Make sure band is valid
-    if((band < 0) || (band > getBandCount())) {
+    if ((band < 0) || (band > getBandCount())) {
       string msg = "Invalid band in [CubeInfo::Histogram]";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
@@ -1045,7 +1050,7 @@ namespace Isis {
     int bandStart = band;
     int bandStop = band;
     int maxSteps = getLineCount();
-    if(band == 0) {
+    if (band == 0) {
       bandStart = 1;
       bandStop = getBandCount();
       maxSteps = getLineCount() * getBandCount();
@@ -1062,11 +1067,11 @@ namespace Isis {
     //   acceptable, default to the bin range start/end.
     double binMin = validMin;
     double binMax = validMax;
-    if(binMin == ValidMinimum) {
+    if (binMin == ValidMinimum) {
       binMin = hist->BinRangeStart();
     }
 
-    if(binMax == ValidMaximum) {
+    if (binMax == ValidMaximum) {
       binMax = hist->BinRangeEnd();
     }
 
@@ -1114,12 +1119,12 @@ namespace Isis {
   int Cube::getLabelSize(bool actual) const {
     int labelSize = m_labelBytes;
 
-    if(actual && m_label) {
+    if (actual && m_label) {
       ostringstream s;
       s << *m_label << endl;
       labelSize = s.tellp();
     }
-    else if(actual) {
+    else if (actual) {
       labelSize = 0;
     }
 
@@ -1175,7 +1180,7 @@ namespace Isis {
     int physicalBand = virtualBand;
 
     if (m_virtualBandList) {
-      if((virtualBand < 1) ||
+      if ((virtualBand < 1) ||
           (virtualBand > m_virtualBandList->size())) {
         string msg = "Out of array bounds [" + iString(virtualBand) + "]";
         throw iException::Message(iException::Programmer, msg, _FILEINFO_);
@@ -1193,7 +1198,7 @@ namespace Isis {
    * if that interests you.
    */
   Projection *Cube::getProjection() {
-    if(m_projection == NULL && isOpen()) {
+    if (m_projection == NULL && isOpen()) {
       m_projection =  ProjectionFactory::CreateFromCube(*getLabel());
     }
     return m_projection;
@@ -1252,7 +1257,7 @@ namespace Isis {
   Statistics *Cube::getStatistics(const int &band, const double &validMin,
                                      const double &validMax, iString msg) {
     // Make sure band is valid
-    if((band < 0) || (band > getBandCount())) {
+    if ((band < 0) || (band > getBandCount())) {
       string msg = "Invalid band in [CubeInfo::Statistics]";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
@@ -1266,7 +1271,7 @@ namespace Isis {
     int bandStart = band;
     int bandStop = band;
     int maxSteps = getLineCount();
-    if(band == 0) {
+    if (band == 0) {
       bandStart = 1;
       bandStop = getBandCount();
       maxSteps = getLineCount() * getBandCount();
@@ -1306,10 +1311,10 @@ namespace Isis {
    */
   void Cube::addCachingAlgorithm(CubeCachingAlgorithm *algorithm) {
 
-    if(isOpen() && m_ioHandler) {
+    if (isOpen() && m_ioHandler) {
       m_ioHandler->addCachingAlgorithm(algorithm);
     }
-    else if(!isOpen()) {
+    else if (!isOpen()) {
       iString msg = "Cannot add a caching algorithm until the cube is open";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
@@ -1321,7 +1326,7 @@ namespace Isis {
    *   IO cache will start growing again on future IO's.
    */
   void Cube::clearIoCache() {
-    if(m_ioHandler) {
+    if (m_ioHandler) {
       QMutexLocker locker(m_mutex);
       m_ioHandler->clearCache();
     }
@@ -1340,8 +1345,8 @@ namespace Isis {
   bool Cube::deleteBlob(iString BlobType, iString BlobName) {
     for(int i = 0; i < m_label->Objects(); i++) {
       PvlObject obj = m_label->Object(i);
-      if(obj.Name().compare(BlobType) == 0) {
-        if(obj.FindKeyword("Name")[0] == BlobName) {
+      if (obj.Name().compare(BlobType) == 0) {
+        if (obj.FindKeyword("Name")[0] == BlobName) {
           m_label->DeleteObject(i);
           return true;
         }
@@ -1361,7 +1366,7 @@ namespace Isis {
    */
   void Cube::deleteGroup(const iString &group) {
     PvlObject &isiscube = getLabel()->FindObject("IsisCube");
-    if(!isiscube.HasGroup(group)) return;
+    if (!isiscube.HasGroup(group)) return;
     isiscube.DeleteGroup(group);
   }
 
@@ -1388,7 +1393,7 @@ namespace Isis {
    */
   bool Cube::hasGroup(const iString &group) const {
     const PvlObject &isiscube = getLabel()->FindObject("IsisCube");
-    if(isiscube.HasGroup(group)) return true;
+    if (isiscube.HasGroup(group)) return true;
     return false;
   }
 
@@ -1403,13 +1408,13 @@ namespace Isis {
   bool Cube::hasTable(const iString &name) {
     for(int o = 0; o < getLabel()->Objects(); o++) {
       PvlObject &obj = getLabel()->Object(o);
-      if(obj.IsNamed("Table")) {
-        if(obj.HasKeyword("Name")) {
+      if (obj.IsNamed("Table")) {
+        if (obj.HasKeyword("Name")) {
           iString temp = (string) obj["Name"];
           temp.UpCase();
           iString temp2 = name;
           temp2.UpCase();
-          if(temp == temp2) return true;
+          if (temp == temp2) return true;
         }
       }
     }
@@ -1427,7 +1432,7 @@ namespace Isis {
    */
   void Cube::putGroup(PvlGroup &group) {
     PvlObject &isiscube = getLabel()->FindObject("IsisCube");
-    if(isiscube.HasGroup(group.Name())) {
+    if (isiscube.HasGroup(group.Name())) {
       isiscube.FindGroup(group.Name()) = group;
     }
     else {
@@ -1441,13 +1446,13 @@ namespace Isis {
    * @param removeIt If true, the input cube will be removed from disk
    */
   void Cube::cleanUp(bool removeIt) {
-    if(m_ioHandler) {
+    if (m_ioHandler) {
       delete m_ioHandler;
       m_ioHandler = NULL;
     }
 
     // Always remove a temporary file
-    if(m_tempCube) {
+    if (m_tempCube) {
       remove(m_tempCube->c_str());
       removeIt = false; // dont remove originals
 
@@ -1455,10 +1460,10 @@ namespace Isis {
       m_tempCube = NULL;
     }
 
-    if(removeIt) {
+    if (removeIt) {
       remove(m_labelFilename->c_str());
 
-      if(*m_labelFilename != *m_dataFilename)
+      if (*m_labelFilename != *m_dataFilename)
         remove(m_dataFilename->c_str());
     }
 
@@ -1544,7 +1549,7 @@ namespace Isis {
    * Throw an exception if the cube is not open.
    */
   void Cube::openCheck() {
-    if(isOpen()) {
+    if (isOpen()) {
       string msg = "Sorry you can't do a SetMethod after the cube is opened";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
@@ -1563,7 +1568,7 @@ namespace Isis {
     Filename tempCube("Temporary_" + oldName.Name(), "cub");
     parameters += " to=" + tempCube.Expanded();
 
-    if(iApp == NULL) {
+    if (iApp == NULL) {
       iString command = "$ISISROOT/bin/pds2isis " + parameters;
       ProgramLauncher::RunSystemCommand(command);
     }
@@ -1592,11 +1597,14 @@ namespace Isis {
     m_label->SetFormatTemplate(*m_formatTemplateFile);
 
     // Write them with attached data
-    if(m_attached) {
+    if (m_attached) {
+      QMutexLocker locker(m_mutex);
+      QMutexLocker locker2(m_ioHandler->dataFileMutex());
+
       ostringstream temp;
       temp << *m_label << endl;
       string tempstr = temp.str();
-      if((int) tempstr.length() < m_labelBytes) {
+      if ((int) tempstr.length() < m_labelBytes) {
         // Clear out the label area
         m_labelFile->seek(0);
         m_labelFile->write(QByteArray(m_labelBytes, '\0'));
@@ -1605,6 +1613,7 @@ namespace Isis {
         m_labelFile->write(tempstr.c_str(), tempstr.length());
       }
       else {
+        locker2.unlock();
         string msg = "Label space is full in [" +
             (iString)Filename(*m_labelFilename).fileName() +
                      "] unable to write labels";

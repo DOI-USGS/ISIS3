@@ -24,12 +24,18 @@
 #ifndef CubeIoHandler_h
 #define CubeIoHandler_h
 
+#include <QRunnable>
+#include <QThreadPool>
+
 #include "Constants.h"
 #include "Endian.h"
 #include "PixelType.h"
 
 class QFile;
+class QMutex;
+class QTime;
 template <typename A> class QList;
+template <typename A, typename B> class QPair;
 
 namespace Isis {
   class Buffer;
@@ -67,6 +73,28 @@ namespace Isis {
    *                           are outside of the virtual bands of the cube will
    *                           no longer fail, but instead will fill the buffer
    *                           with nulls.
+   *   @history 2012-02-17 Steven Lambright - The read() method is now const -
+   *                           the caching should be transparent to the API. It
+   *                           is still important to note that you cannot call
+   *                           read() and write() simultaneously - Cube is
+   *                           guaranteeing this. Backgrounded writes are now
+   *                           implemented and fully supported. Timing tests
+   *                           show results like this:
+   *                           Before:
+   *                           User: 358.71 Kernel: 38.29 Total Elapsed: 6:49.83
+   *                           After:
+   *                           User: 380.01 Kernel: 44.97 Total Elapsed: 6:19.96
+   *                             User- user-space CPU time consumed.
+   *                             Kernel- kernel-space CPU time consumed.
+   *                           The CPU consumption and kernel time consumption
+   *                           goes up, but the overall run time is lower. This
+   *                           makes the option perfectly viable for typical
+   *                           multi-core desktop solutions. Turning off the
+   *                           cube write optimization results in equivalent run
+   *                           times as before implementation. These time tests
+   *                           were run before the adaptive cache flush size was
+   *                           added, which improved performance further.
+   *                           References #727.
    */
   class CubeIoHandler {
     public:
@@ -74,14 +102,16 @@ namespace Isis {
           const Pvl &label, bool alreadyOnDisk);
       virtual ~CubeIoHandler();
 
-      void read(Buffer &bufferToFill);
+      void read(Buffer &bufferToFill) const;
       void write(const Buffer &bufferToWrite);
 
       void addCachingAlgorithm(CubeCachingAlgorithm *algorithm);
-      void clearCache();
+      void clearCache(bool blockForWriteCache = true) const;
       BigInt getDataSize() const;
       void setVirtualBands(const QList<int> *virtualBandList);
       virtual void updateLabels(Pvl &labels);
+
+      QMutex *dataFileMutex();
 
     protected:
       int getBandCount() const;
@@ -122,6 +152,53 @@ namespace Isis {
 
     private:
       /**
+       * This class is designed to handle write() asynchronously.
+       *
+       * Only one of these should be running at a time, otherwise
+       *   race conditions may exist, so this class locks the
+       *   ioHandler->m_writeThreadMutex appropriately.
+       *
+       * This works by doing what write() used to do, but inside
+       *   of run(), so that it can happen simultaneously. If any
+       *   read operations occur, they must block until all writes
+       *   are done.
+       *
+       * @author 2012-02-22 Steven Lambright
+       *
+       * @internal
+       */
+      class BufferToChunkWriter : public QRunnable {
+        public:
+          BufferToChunkWriter(CubeIoHandler * ioHandler,
+                              QList<Buffer *> buffersToWrite);
+          ~BufferToChunkWriter();
+
+          void run();
+
+        private:
+          /**
+           * This is disabled.
+           * @param other Nothing.
+           */
+          BufferToChunkWriter(const BufferToChunkWriter & other);
+          /**
+           * This is disabled.
+           * @param rhs Nothing.
+           * @return Nothing.
+           */
+          BufferToChunkWriter & operator=(const BufferToChunkWriter & rhs);
+
+        private:
+          //! The IO Handler instance to put the buffers into
+          CubeIoHandler * m_ioHandler;
+          //! The buffers that need pushed into the IO handler; we own these
+          QList<Buffer * > * m_buffersToWrite;
+          //! Used to calculate the lifetime of an instance of this class
+          QTime *m_timer;
+      };
+
+
+      /**
        * Disallow copying of this object.
        *
        * @param other The object to copy.
@@ -137,17 +214,23 @@ namespace Isis {
        */
       CubeIoHandler &operator=(const CubeIoHandler &other);
 
+      void blockUntilThreadPoolEmpty() const;
+
+      static bool bufferLessThan(Buffer * const &lhs, Buffer * const &rhs);
+
       QList<RawCubeChunk *> findCubeChunks(int startSample,
           int numSamples, int startLine, int numLines, int startBand,
-          int numBands);
+          int numBands) const;
 
       void findIntersection(const RawCubeChunk &cube1,
           const Buffer &cube2, int &startX, int &startY, int &startZ,
           int &endX, int &endY, int &endZ) const;
 
-      void freeChunk(RawCubeChunk *chunkToFree);
+      void flushWriteCache(bool force = false) const;
 
-      RawCubeChunk *getChunk(int chunkIndex) const;
+      void freeChunk(RawCubeChunk *chunkToFree) const;
+
+      RawCubeChunk *getChunk(int chunkIndex, bool allocateIfNecessary) const;
 
       int getChunkCount() const;
 
@@ -155,16 +238,18 @@ namespace Isis {
         int &startSample, int &startLine, int &startBand,
         int &endSample, int &endLine, int &endBand) const;
 
-      RawCubeChunk *getNullChunk(int chunkIndex);
+      RawCubeChunk *getNullChunk(int chunkIndex) const;
 
       void minimizeCache(const QList<RawCubeChunk *> &justUsed,
-                         const Buffer &justRequested);
+                         const Buffer &justRequested) const;
+
+      void synchronousWrite(const Buffer &bufferToWrite);
 
       void writeIntoDouble(const RawCubeChunk &chunk, Buffer &output) const;
 
       void writeIntoRaw(const Buffer &buffer, RawCubeChunk &output) const;
 
-      void writeNullDataToDisk();
+      void writeNullDataToDisk() const;
 
     private:
       //! The file containing cube data.
@@ -205,10 +290,10 @@ namespace Isis {
       QList<CubeCachingAlgorithm *> * m_cachingAlgorithms;
 
       //! The map from chunk index to chunk for cached data.
-      QMap<int, RawCubeChunk *> * m_rawData;
+      mutable QMap<int, RawCubeChunk *> * m_rawData;
 
       //! The map from chunk index to on-disk status, all true if not allocated.
-      QMap<int, bool> * m_dataIsOnDiskMap;
+      mutable QMap<int, bool> * m_dataIsOnDiskMap;
 
       //! Converts from virtual band to physical band.
       QList<int> * m_virtualBands;
@@ -226,10 +311,40 @@ namespace Isis {
        * This is an optimization for process by line. It relies on chunks found
        *   often being the exact same between multiple reads or multiple writes.
        */
-      QList<RawCubeChunk *> *m_lastProcessByLineChunks;
+      mutable QList<RawCubeChunk *> *m_lastProcessByLineChunks;
 
       //! A raw cube chunk's data when it was all NULL's. Used for speed.
-      QByteArray *m_nullChunkData;
+      mutable QByteArray *m_nullChunkData;
+
+      //! These are the buffers we need to write to raw cube chunks
+      QPair< QMutex *, QList<Buffer *> > *m_writeCache;
+
+      /**
+       * This contains threads for doing cube writes (and later maybe cube
+       *   reads). We're using a thread pool so that the same QThread is reused
+       *   for performance reasons.
+       */
+      mutable QThreadPool *m_ioThreadPool;
+
+      /**
+       * If the last operation was a write then we need to flush the cache when
+       *   reading. Keep track of this.
+       */
+      mutable bool m_lastOperationWasWrite;
+      /**
+       * This is true if the Isis preference for the cube write thread is
+       *   optimized.
+       */
+      bool m_useOptimizedCubeWrite;
+
+      //! This enables us to block while the write thread is working
+      QMutex *m_writeThreadMutex;
+
+      //! Ideal write cache flush size
+      mutable volatile int m_idealFlushSize;
+
+      //! How many times the write cache has overflown in a row
+      mutable int m_consecutiveOverflowCount;
   };
 }
 

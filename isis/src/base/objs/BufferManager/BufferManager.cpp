@@ -20,11 +20,19 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-#include <string>
+#include "IsisDebug.h"
 #include "BufferManager.h"
 
+#include <iostream>
+#include <string>
+
 using namespace std;
+
 namespace Isis {
+  BufferManager::BufferManager() {
+  }
+
+
   /**
    * Constructs a BufferManager object.
    *
@@ -48,16 +56,55 @@ namespace Isis {
    *             If reverse = true, then the buffer progresses
    *             bands first, then lines, then samples.
    */
-  BufferManager::BufferManager(const int maxsamps, const int maxlines,
-                               const int maxbands, const int bufsamps,
-                               const int buflines, const int bufbands,
-                               const Isis::PixelType type, const bool reverse) :
+  BufferManager::BufferManager(int maxsamps, int maxlines,
+                               int maxbands, int bufsamps,
+                               int buflines, int bufbands,
+                               Isis::PixelType type, bool reverse) :
     Isis::Buffer(bufsamps, buflines, bufbands, type),
     p_maxSamps(maxsamps), p_maxLines(maxlines),
     p_maxBands(maxbands) {
     SetIncrements(bufsamps, buflines, bufbands);
     p_reverse = reverse;
   }
+
+
+  BufferManager::BufferManager(const BufferManager &other) :
+      Buffer(other),
+      p_maxSamps(other.p_maxSamps), p_maxLines(other.p_maxLines),
+      p_maxBands(other.p_maxBands), p_sinc(other.p_sinc), p_linc(other.p_linc),
+      p_binc(other.p_binc), p_soff(other.p_soff), p_loff(other.p_loff),
+      p_boff(other.p_boff), p_currentSample(other.p_currentSample),
+      p_currentLine(other.p_currentLine), p_currentBand(other.p_currentBand),
+      p_nmaps(other.p_nmaps), p_currentMap(other.p_currentMap),
+      p_reverse(other.p_reverse) {
+  }
+
+
+  void BufferManager::swap(BufferManager &other) {
+    std::swap(p_maxSamps, other.p_maxSamps);
+    std::swap(p_maxLines, other.p_maxLines);
+    std::swap(p_maxBands, other.p_maxBands);
+    std::swap(p_sinc, other.p_sinc);
+    std::swap(p_linc, other.p_linc);
+    std::swap(p_binc, other.p_binc);
+    std::swap(p_soff, other.p_soff);
+    std::swap(p_loff, other.p_loff);
+    std::swap(p_boff, other.p_boff);
+    std::swap(p_currentSample, other.p_currentSample);
+    std::swap(p_currentLine, other.p_currentLine);
+    std::swap(p_currentBand, other.p_currentBand);
+    std::swap(p_nmaps, other.p_nmaps);
+    std::swap(p_currentMap, other.p_currentMap);
+    std::swap(p_reverse, other.p_reverse);
+  }
+
+
+  BufferManager &BufferManager::operator=(const BufferManager &rhs) {
+    BufferManager copy(rhs);
+    swap(copy);
+    return *this;
+  }
+
 
   /**
    * Sets how the shape is incremented through the cube. By default (if this
@@ -148,7 +195,7 @@ namespace Isis {
    *
    * When p_reverse is set to true:
    * Following the above cube with 100 samples, 200 lines, and 2 bands, performing the
-   * setpos(0) would still position othe shape at sample 1, line
+   * setpos(0) would still position the shape at sample 1, line
    * 1, and band 1.  However, setpos(1) would position the shape
    * at sample 1, line 1, band 2, while setpos(200) would position
    * the spame at sample 1, line 100, band 1.  Setpos returns true
@@ -162,97 +209,53 @@ namespace Isis {
    *
    * @throws Isis::iException::Programmer - Invalid value for map argument
    */
-  bool BufferManager::setpos(const BigInt map) {
-    if(map < 0) {
+  bool BufferManager::setpos(BigInt map) {
+    if(map >= 0) {
+      p_currentMap = map;
+
+      if(!p_reverse) {
+        int sampDimension = (p_maxSamps / p_sinc);
+        if (p_maxSamps % p_sinc)
+          sampDimension++;
+
+        p_currentSample = (map % sampDimension) * p_sinc + 1;
+        map /= sampDimension;
+
+        int lineDimension = (p_maxLines / p_linc);
+        if (p_maxLines % p_linc)
+          lineDimension++;
+
+        p_currentLine = (map % lineDimension) * p_linc + 1;
+        map /= lineDimension;
+
+        p_currentBand = map * p_binc + 1;
+      }
+      else {
+        int bandDimension = (p_maxBands / p_binc);
+        if (p_maxBands % p_binc)
+          bandDimension++;
+
+        p_currentBand = (map % bandDimension) * p_binc + 1;
+        map /= bandDimension;
+
+        int lineDimension = (p_maxLines / p_linc);
+        if (p_maxLines % p_linc)
+          lineDimension++;
+
+        p_currentLine = (map % lineDimension) * p_linc + 1;
+        map /= lineDimension;
+
+        p_currentSample = map * p_sinc + 1;
+      }
+
+      SetBasePosition(p_currentSample + p_soff,
+                      p_currentLine + p_loff,
+                      p_currentBand + p_boff);
+    }
+    else {
       string message = "Invalid value for argument [map]";
       throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
     }
-    if(p_reverse) {
-      if(p_currentMap + 1 == map) {
-        p_currentBand += p_binc;
-        if(p_currentBand > p_maxBands) {
-          p_currentBand = 1;
-          p_currentLine += p_linc;
-          if(p_currentLine > p_maxLines) {
-            p_currentLine = 1;
-            p_currentSample += p_sinc;
-          }
-        }
-      }
-      else if(p_currentMap - 1 == map) {
-        p_currentBand -= p_binc;
-        if(p_currentBand < 1) {
-          p_currentBand = ((p_maxBands - 1) / p_binc) * p_binc + 1;
-          p_currentBand -= p_binc;
-          if(p_currentLine < 1) {
-            p_currentLine = ((p_maxLines - 1) / p_linc) * p_linc + 1;
-            p_currentSample -= p_sinc;
-          }
-        }
-      }
-      else {
-        p_currentSample = p_currentLine = p_currentBand = 1;
-        if(map < p_nmaps) {
-          for(int i = 0; i < map; i++) {
-            p_currentBand += p_binc;
-            if(p_currentBand > p_maxBands) {
-              p_currentBand = 1;
-              p_currentLine += p_linc;
-              if(p_currentLine > p_maxLines) {
-                p_currentLine = 1;
-                p_currentSample += p_sinc;
-              }
-            }
-          }
-        }
-      }
-    }
-    else {   //p_reverse is false
-      if(p_currentMap + 1 == map) {
-        p_currentSample += p_sinc;
-        if(p_currentSample > p_maxSamps) {
-          p_currentSample = 1;
-          p_currentLine += p_linc;
-          if(p_currentLine > p_maxLines) {
-            p_currentLine = 1;
-            p_currentBand += p_binc;
-          }
-        }
-      }
-      else if(p_currentMap - 1 == map) {
-        p_currentSample -= p_sinc;
-        if(p_currentSample < 1) {
-          p_currentSample = ((p_maxSamps - 1) / p_sinc) * p_sinc + 1;
-          p_currentLine -= p_linc;
-          if(p_currentLine < 1) {
-            p_currentLine = ((p_maxLines - 1) / p_linc) * p_linc + 1;
-            p_currentBand -= p_binc;
-          }
-        }
-      }
-      else {
-        p_currentSample = p_currentLine = p_currentBand = 1;
-        if(map < p_nmaps) {
-          for(int i = 0; i < map; i++) {
-            p_currentSample += p_sinc;
-            if(p_currentSample > p_maxSamps) {
-              p_currentSample = 1;
-              p_currentLine += p_linc;
-              if(p_currentLine > p_maxLines) {
-                p_currentLine = 1;
-                p_currentBand += p_binc;
-              }
-            }
-          }
-        }
-      }
-    }
-
-    SetBasePosition(p_currentSample + p_soff,
-                    p_currentLine + p_loff,
-                    p_currentBand + p_boff);
-
-    p_currentMap = map;
 
     return !end();
   }

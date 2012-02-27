@@ -489,7 +489,7 @@ namespace Isis {
     Nearest *near = new Nearest(tempcube, ins/ons, inl/onl);
     near->setInputBoundary((int)dStartSample, (int)dEndSample, (int)dStartLine, (int)dEndLine);
     
-    p.StartProcessInPlace(*near);
+    p.ProcessCubeInPlace(*near, false);
     near->UpdateOutputLabel(ocube);
     p.EndProcess();
     

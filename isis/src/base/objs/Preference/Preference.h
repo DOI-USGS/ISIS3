@@ -53,18 +53,20 @@ namespace Isis {
    *   The documentation shows methods that don't exist in the code. It also
    *   needs an example.
    *   @history 2003-04-23 Jeff Anderson - reworked the class to use the Label
-   *                                       object.
+   *                           object.
    *   @history 2003-05-16 Stuart Sides - Modified schema from astrogeoloy...
-   *                                      isis.astrogeology
+   *                           isis.astrogeology
    *   @history 2003-12-03 Stuart Sides - added HasGroup member.
    *   @history 2005-10-03 Elizabeth Miller - changed @ingroup tag
    *   @history 2008-01-09 Steven Lambright - Made Application a friend
-   *                          for destruction purposes
+   *                           for destruction purposes
    *   @history 2008-07-08 Steven Lambright - Now uses atexit for destruction
    *   @history 2010-05-28 Steven Lambright - More resilient to $HOME/.Isis
-   *                          problems
+   *                           problems
    *   @history 2010-07-19 Jeannie Walldren - Added FileCustomization group to
-   *                          TestPreferences file
+   *                           TestPreferences file
+   *   @history 2012-02-24 Steven Lambright - This class now sets the thread
+   *                           limit in the Qt global thread pool.
    */
   class Preference : public Pvl {
 

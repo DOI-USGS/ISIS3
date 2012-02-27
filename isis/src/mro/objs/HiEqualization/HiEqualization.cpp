@@ -52,8 +52,7 @@ namespace Isis {
       const string inp = imageList[img];
       p.SetInputCube(inp, att);
       HiCalculateFunctor func(stats, statsLeft, statsRight, 100.0);
-      p.StartProcessInPlace(func);
-      p.EndProcess();
+      p.ProcessCubeInPlace(func, false);
 
       statsList.push_back(stats);
       leftStatsList.push_back(statsLeft);
@@ -202,7 +201,7 @@ namespace Isis {
   }
 
 
-  void HiEqualization::HiCalculateFunctor::addStats(Buffer &in) {
+  void HiEqualization::HiCalculateFunctor::addStats(Buffer &in) const {
     Equalization::CalculateFunctor::addStats(in);
 
     // Number of samples per line that intersect with the next and the

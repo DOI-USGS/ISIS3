@@ -54,8 +54,8 @@ void IsisMain() {
   lProc.SetOutputCube(tmpPhaseFilename, cao, numSamples, numLines, numBands);
 
   // Start the line processing
-  lProc.StartProcess(IFFT2);
-  lProc.EndProcess();
+  lProc.ProcessCubes(IFFT2);
+  lProc.Finalize();
 
   // Then process by sample
   ProcessByTile sProc;
@@ -72,8 +72,8 @@ void IsisMain() {
   sProc.SetOutputCube("TO", initSamples, initLines, numBands);
 
   //Start the sample proccessing
-  sProc.StartProcess(IFFT1);
-  sProc.EndProcess();
+  sProc.ProcessCubes(IFFT1);
+  sProc.Finalize();
 
   remove(tmpMagFilename.c_str());
   remove(tmpPhaseFilename.c_str());

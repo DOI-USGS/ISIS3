@@ -46,7 +46,7 @@ void IsisMain() {
   }
   else if(replacement == "MINMAX") {
     sProc.Progress()->SetText("Getting Statistics");
-    sProc.StartProcess(getMinMax);
+    sProc.ProcessCubeInPlace(getMinMax, false);
     LPixel = stats.Minimum();
     HPixel = stats.Maximum();
     NPixel = 0.0;
@@ -61,8 +61,8 @@ void IsisMain() {
   sProc.SetOutputCube(tmpPhaseFilename, cao, numSamples, numLines, numBands);
 
   // Start the sample processing
-  sProc.StartProcess(FFT1);
-  sProc.EndProcess();
+  sProc.ProcessCubes(FFT1);
+  sProc.Finalize();
 
   // Then process by line
   ProcessByTile lProc;
@@ -80,13 +80,13 @@ void IsisMain() {
   lProc.SetOutputCube("PHASE");
 
   //Start the line proccessing
-  lProc.StartProcess(FFT2);
+  lProc.ProcessCubes(FFT2);
 
   // Add or update the AlphaCube group
   aCube.UpdateGroup(*ocube->getLabel());
 
   // Stop the process and remove the temporary files
-  lProc.EndProcess();
+  lProc.Finalize();
 
   remove(tmpMagFilename.c_str());
   remove(tmpPhaseFilename.c_str());

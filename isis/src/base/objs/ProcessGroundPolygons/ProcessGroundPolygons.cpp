@@ -134,6 +134,7 @@ namespace Isis {
    * the pointer to the universal ground map if there was one
    * created.
    *
+   * @deprecated Please use Finalize()
    */
   void ProcessGroundPolygons::EndProcess() {
 
@@ -142,6 +143,21 @@ namespace Isis {
     }
 
     ProcessPolygons::EndProcess();
+  }
+
+  /**
+   * This method cleans up any open outputcube files and deletes
+   * the pointer to the universal ground map if there was one
+   * created.
+   *
+   */
+  void ProcessGroundPolygons::Finalize() {
+
+    if(p_groundMap != NULL) {
+      delete p_groundMap;
+    }
+
+    ProcessPolygons::Finalize();
   }
 
   /**

@@ -41,6 +41,13 @@ namespace Isis {
    */
   class RegionalCachingAlgorithm : public CubeCachingAlgorithm {
     public:
+      /**
+       * @see CubeCachingAlgorithm::recommendChunksToFree()
+       * @param allocated
+       * @param justUsed
+       * @param justRequested
+       * @return
+       */
       virtual CacheResult recommendChunksToFree(
           QList<RawCubeChunk *> allocated, QList<RawCubeChunk *> justUsed,
           const Buffer &justRequested);

@@ -106,20 +106,18 @@ namespace Isis {
           CalculateFunctor(Statistics *stats, double percent) {
             m_stats = stats;
             m_linc = (int) (100.0 / percent + 0.5);
-            m_line = 0;
           }
 
           virtual ~CalculateFunctor() {}
 
-          void operator()(Buffer &in);
+          void operator()(Buffer &in) const;
 
         protected:
-          virtual void addStats(Buffer &in);
+          virtual void addStats(Buffer &in) const;
 
         private:
           Statistics *m_stats;
           int m_linc;
-          int m_line;
       };
 
       /**
@@ -133,7 +131,7 @@ namespace Isis {
             m_adjustment = adjustment;
           }
 
-          void operator()(Buffer &in, Buffer &out);
+          void operator()(Buffer &in, Buffer &out) const;
 
         private:
           const ImageAdjustment *m_adjustment;

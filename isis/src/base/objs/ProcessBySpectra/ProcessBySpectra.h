@@ -100,9 +100,48 @@ namespace Isis {
       void StartProcess(void funct(std::vector<Isis::Buffer *> &in,
                                    std::vector<Isis::Buffer *> &out));
 
+
+      /**
+       * @see ProcessByBrick::ProcessCubeInPlace()
+       * @param funct
+       * @param threaded
+       */
+      template <typename Functor> 
+      void ProcessCubeInPlace(const Functor & funct, bool threaded = true) {
+        SetBrickSizesForProcessCubeInPlace();
+        ProcessByBrick::ProcessCubeInPlace(funct, threaded);
+      }
+
+      /**
+       * @see ProcessByBrick::ProcessCube()
+       * @param funct
+       * @param threaded
+       */
+      template <typename Functor> 
+      void ProcessCube(const Functor & funct, bool threaded = true) {
+        SetBrickSizesForProcessCube();
+        ProcessByBrick::ProcessCube(funct, threaded);
+      }
+
+      /**
+       * @see ProcessByBrick::ProcessCubes()
+       * @param funct
+       * @param threaded
+       */
+      template <typename Functor>
+      void ProcessCubes(const Functor & funct, bool threaded = true) {
+        SetBrickSizesForProcessCubes();
+        ProcessByBrick::ProcessCubes(funct, threaded);
+      }
+
       static const int PerPixel = 0; //!< PerPixel spectra type (equal to 0)
       static const int ByLine = 1;   //!< ByLine spectra type (equal to 1)
       static const int BySample = 2; //!< BySample spectra type (equal to 2)
+
+    private:
+      void SetBrickSizesForProcessCubeInPlace();
+      void SetBrickSizesForProcessCube();
+      void SetBrickSizesForProcessCubes();
   };
 };
 

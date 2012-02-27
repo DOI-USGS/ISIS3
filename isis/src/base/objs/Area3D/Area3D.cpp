@@ -455,20 +455,23 @@ namespace Isis {
    * @return the 3D area that is the intersection
    */
   Area3D Area3D::intersect(const Area3D &otherArea) const {
-    // Optimized for success.
-    try {
-      return Area3D(
-          std::max( getStartX(), otherArea.getStartX() ),
-          std::max( getStartY(), otherArea.getStartY() ),
-          std::max( getStartZ(), otherArea.getStartZ() ),
-          std::min( getEndX(), otherArea.getEndX() ),
-          std::min( getEndY(), otherArea.getEndY() ),
-          std::min( getEndZ(), otherArea.getEndZ() ));
+    Area3D result;
+
+    // Check validity because of comparison operators.
+    if (isValid() && otherArea.isValid()) {
+      Displacement startX(std::max(getStartX(), otherArea.getStartX()));
+      Displacement startY(std::max(getStartY(), otherArea.getStartY()));
+      Displacement startZ(std::max(getStartZ(), otherArea.getStartZ()));
+      Displacement endX(std::min(getEndX(), otherArea.getEndX()));
+      Displacement endY(std::min(getEndY(), otherArea.getEndY()));
+      Displacement endZ(std::min(getEndZ(), otherArea.getEndZ()));
+
+
+      if (startX <= endX && startY <= endY && startZ <= endZ)
+        result = Area3D(startX, startY, startZ, endX, endY, endZ);
     }
-    catch(iException &e) {
-      e.Clear();
-      return Area3D();
-    }
+
+    return result;
   }
 
 

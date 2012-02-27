@@ -12,7 +12,7 @@ void sub(vector<Buffer *> &in,
          vector<Buffer *> &out);
 void mult(vector<Buffer *> &in,
           vector<Buffer *> &out);
-void div(vector<Buffer *> &in,
+void divide(vector<Buffer *> &in,
          vector<Buffer *> &out);
 void unary(Buffer &in, Buffer &out);
 
@@ -38,14 +38,11 @@ void IsisMain() {
 
   // Start the processing based on the operator
   string op = ui.GetString("OPERATOR");
-  if(op == "ADD") p.StartProcess(add);
-  if(op == "SUBTRACT") p.StartProcess(sub);
-  if(op == "MULTIPLY") p.StartProcess(mult);
-  if(op == "DIVIDE") p.StartProcess(div);
-  if(op == "UNARY") p.StartProcess(unary);
-
-  // Cleanup
-  p.EndProcess();
+  if(op == "ADD") p.ProcessCubes(add);
+  if(op == "SUBTRACT") p.ProcessCubes(sub);
+  if(op == "MULTIPLY") p.ProcessCubes(mult);
+  if(op == "DIVIDE") p.ProcessCubes(divide);
+  if(op == "UNARY") p.ProcessCube(unary);
 }
 
 // Add routine
@@ -53,7 +50,6 @@ void add(vector<Buffer *> &in, vector<Buffer *> &out) {
   Buffer &inp1 = *in[0];
   Buffer &inp2 = *in[1];
   Buffer &outp = *out[0];
-
   // Loop for each pixel in the line.
   for(int i = 0; i < inp1.size(); i++) {
     if(IsSpecial(inp1[i])) {
@@ -109,7 +105,7 @@ void mult(vector<Buffer *> &in, vector<Buffer *> &out) {
 }
 
 // Div routine
-void div(vector<Buffer *> &in, vector<Buffer *> &out) {
+void divide(vector<Buffer *> &in, vector<Buffer *> &out) {
   Buffer &inp1 = *in[0];
   Buffer &inp2 = *in[1];
   Buffer &outp = *out[0];

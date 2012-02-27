@@ -46,6 +46,8 @@ namespace Isis {
    *   @history 2011-08-19 Jeannie Backer - Modified unitTest to use
    *                           $temporary variable instead of /tmp directory.
    *                           Added some documentation to methods.
+   *   @history 2012-02-22 Steven Lambright - Updated to have functorized and
+   *                           threaded StartProcess equivalents.
    */
   class ProcessBySample : public Isis::ProcessByBrick {
 
@@ -55,10 +57,10 @@ namespace Isis {
       };
 
       Isis::Cube *SetInputCube(const std::string &parameter,
-                               const int requirements = 0);
+                               int requirements = 0);
       Isis::Cube *SetInputCube(const std::string &file,
                                Isis::CubeAttributeInput &att,
-                               const int requirements = 0);
+                               int requirements = 0);
 
       void StartProcess(void funct(Isis::Buffer &inout));
 
@@ -66,6 +68,45 @@ namespace Isis {
 
       void StartProcess(void funct(std::vector<Isis::Buffer *> &in,
                                    std::vector<Isis::Buffer *> &out));
+
+      /**
+       * @see ProcessByBrick::ProcessCubeInPlace()
+       * @param funct
+       * @param threaded
+       */
+      template <typename Functor>
+      void ProcessCubeInPlace(const Functor & funct, bool threaded = true) {
+        SetBrickSizesForProcessCubeInPlace();
+        ProcessByBrick::ProcessCubeInPlace(funct, threaded);
+      }
+
+      /**
+       * @see ProcessByBrick::ProcessCube()
+       * @param funct
+       * @param threaded
+       */
+      template <typename Functor>
+      void ProcessCube(const Functor & funct, bool threaded = true) {
+        SetBrickSizesForProcessCube();
+        ProcessByBrick::ProcessCube(funct, threaded);
+      }
+
+      /**
+       * @see ProcessByBrick::ProcessCubes()
+       * @param funct
+       * @param threaded
+       */
+      template <typename Functor>
+      void ProcessCubes(const Functor & funct, bool threaded = true) {
+        SetBrickSizesForProcessCubes();
+        ProcessByBrick::ProcessCubes(funct, threaded);
+      }
+
+
+    private:
+      void SetBrickSizesForProcessCubeInPlace();
+      void SetBrickSizesForProcessCube();
+      void SetBrickSizesForProcessCubes();
   };
 };
 

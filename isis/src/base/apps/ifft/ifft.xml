@@ -35,6 +35,10 @@
       they should now exist. The name of the GUI screenshot was incorrect,
       "fft" was changed to "ifft."
     </change>
+    <change name="Steven Lambright" date="2012-02-24">
+      This program now takes advantage of multiple global
+      processing threads.
+    </change>
   </history>
 
   <groups>

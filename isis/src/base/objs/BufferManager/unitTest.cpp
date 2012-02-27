@@ -28,5 +28,16 @@ int main(int argc, char *argv[]) {
   while(bm2.next());
   cout << endl;
 
+  Isis::BufferManager bm3(5, 1, 1, 2, 1, 1, Isis::Real);
+
+  bm3.begin();
+  do {
+    cout << "Position:  " << bm3.Sample() << " "
+         << bm3.Line() << " "
+         << bm3.Band() << endl;
+  }
+  while(bm3.next());
+  cout << endl;
+
   return 0;
 }

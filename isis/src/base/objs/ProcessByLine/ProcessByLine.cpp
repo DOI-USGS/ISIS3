@@ -132,6 +132,7 @@ namespace Isis {
    * this method can be used to obtain statistics, histograms, or other 
    * information from an input cube. 
    *
+   * @deprecated Please use ProcessCubeInPlace()
    * @param funct (Isis::Buffer &b) Name of your processing function
    *
    * @throws Isis::iException::Message
@@ -190,6 +191,7 @@ namespace Isis {
    * such as stretching a cube or applying various operators to a cube (add 
    * constant, multiply by constant, etc). 
    *
+   * @deprecated Please use ProcessCube()
    * @param funct (Isis::Buffer &in, Isis::Buffer &out) Name of your processing
    *                                                    function
    *
@@ -246,6 +248,7 @@ namespace Isis {
    * output cubes. Typically, this method is used when two input cubes are
    * required for operations like ratios, differences, masking, etc.
    *
+   * @deprecated Please use ProcessCubes()
    * @param funct (vector<Isis::Buffer *> &in, vector<Isis::Buffer *> &out) Name
    *                of your processing function
    *

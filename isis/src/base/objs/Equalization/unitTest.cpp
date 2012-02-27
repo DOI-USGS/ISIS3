@@ -15,34 +15,32 @@ using namespace Isis;
 
 class TestFunctor {
   public:
-    TestFunctor(const Equalization *equalizer, int imageIndex) {
-      m_sample = 0;
-      m_line = 0;
+    TestFunctor(const Equalization *equalizer, int lineCount, int imageIndex) {
       m_equalizer = equalizer;
       m_imageIndex = imageIndex;
+      m_lineCount = lineCount;
     }
 
-    void operator()(Buffer &in) {
-      if (IsValidPixel(in[m_sample])) {
+    void operator()(Buffer &in) const {
+      int lineIndex = ((in.Band() - 1) * m_lineCount + (in.Line() - 1));
+      int sampleIndex = lineIndex % in.size();
+
+      if (IsValidPixel(in[sampleIndex])) {
         int bandIndex = in.Band() - 1;
 
-        cout << "sample " << m_sample + 1 << ", ";
-        cout << "line " << m_line + 1 << ": ";
-        cout << in[m_sample] << " => ";
+        cout << "sample " << sampleIndex + 1 << ", ";
+        cout << "line " << (lineIndex + 1) << ": ";
+        cout << in[sampleIndex] << " => ";
 
         cout << m_equalizer->evaluate(
-            in[m_sample], m_imageIndex, bandIndex) << endl;
+            in[sampleIndex], m_imageIndex, bandIndex) << endl;
       }
-
-      m_sample = (m_sample + 1) % in.size();
-      m_line++;
     }
 
   private:
     const Equalization *m_equalizer;
     int m_imageIndex;
-    int m_sample;
-    int m_line;
+    int m_lineCount;
 };
 
 
@@ -71,10 +69,9 @@ int main(int argc, char *argv[]) {
       ProcessByLine p;
       CubeAttributeInput att;
       const string inp = imageList[i];
-      p.SetInputCube(inp, att);
-      TestFunctor func(&equalizer, i);
-      p.StartProcessInPlace(func);
-      p.EndProcess();
+      Cube *inputCube = p.SetInputCube(inp, att);
+      TestFunctor func(&equalizer, inputCube->getLineCount(), i);
+      p.ProcessCubeInPlace(func, false);
     }
   }
   catch (iException &e) {

@@ -36,6 +36,10 @@
       Documentation fixes: Created images for the GUI screenshots,
       which were missing.
     </change>
+    <change name="Steven Lambright" date="2012-02-24">
+      This program now takes advantage of multiple global
+      processing threads.
+    </change>
   </history>
 
   <groups>

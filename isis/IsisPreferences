@@ -114,6 +114,39 @@ Group = FileCustomization
 EndGroup
 
 ########################################################
+# Customize how Isis uses your computer's resources.
+#
+# CubeWriteThread = Always | Optimized | Never
+#   Always - Override Isis program defaults and always
+#     use a separate thread for writing out cubes. This
+#     will probably improve performance for some
+#     programs, will probably negatively impact programs
+#     that read/write the same file. This option should
+#     be used with caution.
+#   Optimized - Let the Isis program decide based on
+#     it's own internal knowledge.
+#   Never - Revert to the original method of writing
+#     cubes always.
+#
+# GlobalThreads = Optimized | N
+#   Optimized - The number of global (active processing)
+#     threads used will match the current system's number
+#     of CPU cores.
+#   N -
+#     Global (processing threads) encapsulate most of Isis'
+#     CPU-intensive operations. This should be a
+#     positive whole number greater than 0. This number
+#     does not cull the number of other thread-types in
+#     Isis, for example the cube write thread, but it
+#     should fairly accurately reflect overall potential
+#     CPU usage in Isis.
+########################################################
+Group = Performance
+  CubeWriteThread = Optimized
+  GlobalThreads = Optimized
+EndGroup
+
+########################################################
 # Customize the location of mission specific data
 # files (calibration and spice kernels).  Usually this
 # should be left to the Isis administrator

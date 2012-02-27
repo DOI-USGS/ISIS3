@@ -128,6 +128,8 @@ namespace Isis {
    *   @history 2011-07-08 Steven Lambright - getProjection() and getCamera()
    *                will now return NULL if the cube is not open, instead of
    *                crashing, references #161
+   *   @history 2012-02-17 Steven Lambright - Made the read() method const.
+   *                Added mutex lock calls around data file accesses.
    *
    */
   class Cube {
@@ -208,7 +210,7 @@ namespace Isis {
       void reopen(iString access = "r");
 
       void read(Blob &blob) const;
-      void read(Buffer &rbuf);
+      void read(Buffer &rbuf) const;
       void write(Blob &blob);
       void write(Buffer &wbuf);
 
@@ -369,6 +371,7 @@ namespace Isis {
   };
 }
 
+//! This allows Cube *'s to be stored in a QVariant.
 Q_DECLARE_METATYPE(Isis::Cube *);
 
 #endif

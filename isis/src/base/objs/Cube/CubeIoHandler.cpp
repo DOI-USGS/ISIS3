@@ -26,12 +26,18 @@
 
 #include <algorithm>
 #include <cmath>
+#include <iomanip>
 
 #include <QFile>
+#include <QList>
 #include <QListIterator>
 #include <QMapIterator>
+#include <QMutex>
+#include <QPair>
 #include <QRect>
+#include <QTime>
 
+#include "Area3D.h"
 #include "Brick.h"
 #include "CubeCachingAlgorithm.h"
 #include "Displacement.h"
@@ -41,12 +47,14 @@
 #include "iException.h"
 #include "iString.h"
 #include "PixelType.h"
+#include "Preference.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "PvlObject.h"
 #include "RawCubeChunk.h"
 #include "RegionalCachingAlgorithm.h"
 #include "SpecialPixel.h"
+#include "Statistics.h"
 
 using namespace std;
 
@@ -76,6 +84,9 @@ namespace Isis {
     m_virtualBands = NULL;
     m_nullChunkData = NULL;
     m_lastProcessByLineChunks = NULL;
+    m_writeCache = NULL;
+    m_ioThreadPool = NULL;
+    m_writeThreadMutex = NULL;
 
     try {
       if (!dataFile) {
@@ -84,7 +95,25 @@ namespace Isis {
       }
 
       m_cachingAlgorithms = new QList<CubeCachingAlgorithm *>;
+
+      PvlGroup &performancePrefs =
+          Preference::Preferences().FindGroup("Performance");
+      iString cubeWritePerfOpt = performancePrefs["CubeWriteThread"][0];
+      m_useOptimizedCubeWrite = (cubeWritePerfOpt.DownCase() == "optimized");
+      if ((m_useOptimizedCubeWrite && !alreadyOnDisk) ||
+           cubeWritePerfOpt.DownCase() == "always") {
+        m_ioThreadPool = new QThreadPool;
+        m_ioThreadPool->setMaxThreadCount(1);
+      }
+
+      m_consecutiveOverflowCount = 0;
+      m_lastOperationWasWrite = false;
       m_rawData = new QMap<int, RawCubeChunk *>;
+      m_writeCache = new QPair< QMutex *, QList<Buffer *> >;
+      m_writeCache->first = new QMutex;
+      m_writeThreadMutex = new QMutex;
+
+      m_idealFlushSize = 32;
 
       m_cachingAlgorithms->append(new RegionalCachingAlgorithm);
 
@@ -139,10 +168,14 @@ namespace Isis {
   CubeIoHandler::~CubeIoHandler() {
     ASSERT( m_rawData ? m_rawData->size() == 0 : 1 );
 
-    if(m_dataIsOnDiskMap) {
-      delete m_dataIsOnDiskMap;
-      m_dataIsOnDiskMap = NULL;
-    }
+    if (m_ioThreadPool)
+      m_ioThreadPool->waitForDone();
+
+    delete m_ioThreadPool;
+    m_ioThreadPool = NULL;
+
+    delete m_dataIsOnDiskMap;
+    m_dataIsOnDiskMap = NULL;
 
     if (m_cachingAlgorithms) {
       QListIterator<CubeCachingAlgorithm *> it(*m_cachingAlgorithms);
@@ -167,26 +200,30 @@ namespace Isis {
       m_rawData = NULL;
     }
 
+    if (m_writeCache) {
+      delete m_writeCache->first;
+      m_writeCache->first = NULL;
 
-    if (m_byteSwapper) {
-      delete m_byteSwapper;
-      m_byteSwapper = NULL;
+      for (int i = 0; i < m_writeCache->second.size(); i++) {
+        delete m_writeCache->second[i];
+      }
+      m_writeCache->second.clear();
+
+      delete m_writeCache;
+      m_writeCache = NULL;
     }
 
-    if(m_virtualBands) {
-      delete m_virtualBands;
-      m_virtualBands = NULL;
-    }
+    delete m_byteSwapper;
+    m_byteSwapper = NULL;
 
-    if(m_nullChunkData) {
-      delete m_nullChunkData;
-      m_nullChunkData = NULL;
-    }
+    delete m_virtualBands;
+    m_virtualBands = NULL;
 
-    if(m_lastProcessByLineChunks) {
-      delete m_lastProcessByLineChunks;
-      m_lastProcessByLineChunks = NULL;
-    }
+    delete m_nullChunkData;
+    m_nullChunkData = NULL;
+
+    delete m_lastProcessByLineChunks;
+    m_lastProcessByLineChunks = NULL;
 
     m_dataFile = NULL;
   }
@@ -200,19 +237,78 @@ namespace Isis {
    *
    * @param bufferToFill The buffer to populate with cube data.
    */
-  void CubeIoHandler::read(Buffer &bufferToFill) {
-    // This works by finding the cube chunks intersecting the buffer,
-    //   initializing the buffer to NULL, and then going through the
-    //   intersecting cube chunks and putting their respective data
-    //   into the buffer. Finally, extra cube chunks in memory are
-    //   freed.
-    QList<RawCubeChunk *> cubeChunks = findCubeChunks(
-        bufferToFill.Sample(), bufferToFill.SampleDimension(),
-        bufferToFill.Line(), bufferToFill.LineDimension(),
-        bufferToFill.Band(), bufferToFill.BandDimension());
+  void CubeIoHandler::read(Buffer &bufferToFill) const {
+    if (m_lastOperationWasWrite) {
+      // Do the remaining writes
+      flushWriteCache(true);
 
-    for(int i = 0; i < bufferToFill.size(); i++)
-      bufferToFill[i] = Null;
+      m_lastOperationWasWrite = false;
+
+      // Stop backgrounding writes now, we don't want to keep incurring this
+      //   penalty.
+      if (m_useOptimizedCubeWrite) {
+        delete m_ioThreadPool;
+        m_ioThreadPool = NULL;
+      }
+    }
+
+    QMutexLocker lock(m_writeThreadMutex);
+
+    // NON-THREADED CUBE READ
+    QList<RawCubeChunk *> cubeChunks;
+
+    int bufferSampleCount = bufferToFill.SampleDimension();
+    int bufferLineCount = bufferToFill.LineDimension();
+    int bufferBandCount = bufferToFill.BandDimension();
+
+    if (bufferSampleCount == m_samplesInChunk &&
+        bufferLineCount == m_linesInChunk &&
+        bufferBandCount == m_bandsInChunk) {
+      int bufferStartSample = bufferToFill.Sample();
+      int bufferStartLine = bufferToFill.Line();
+      int bufferStartBand = bufferToFill.Band();
+
+      int bufferEndSample = bufferStartSample + bufferSampleCount - 1;
+      int bufferEndLine = bufferStartLine + bufferLineCount - 1;
+      int bufferEndBand = bufferStartBand + bufferBandCount - 1;
+
+      int expectedChunkIndex =
+          ((bufferStartSample - 1) / getSampleCountInChunk()) +
+          ((bufferStartLine - 1) / getLineCountInChunk()) *
+            getChunkCountInSampleDimension() +
+          ((bufferStartBand - 1) / getBandCountInChunk()) *
+            getChunkCountInSampleDimension() *
+            getChunkCountInLineDimension();
+
+      int chunkStartSample, chunkStartLine, chunkStartBand,
+          chunkEndSample, chunkEndLine, chunkEndBand;
+
+      getChunkPlacement(expectedChunkIndex,
+          chunkStartSample, chunkStartLine, chunkStartBand,
+          chunkEndSample, chunkEndLine, chunkEndBand);
+
+      if (chunkStartSample == bufferStartSample &&
+          chunkStartLine == bufferStartLine &&
+          chunkStartBand == bufferStartBand &&
+          chunkEndSample == bufferEndSample &&
+          chunkEndLine == bufferEndLine &&
+          chunkEndBand == bufferEndBand) {
+        cubeChunks.append(getChunk(expectedChunkIndex, true));
+      }
+    }
+
+    if (cubeChunks.empty()) {
+      // We can't guarantee our cube chunks will encompass the buffer
+      //   if the buffer goes beyond the cube bounds.
+      for(int i = 0; i < bufferToFill.size(); i++) {
+        bufferToFill[i] = Null;
+      }
+
+      cubeChunks = findCubeChunks(
+          bufferToFill.Sample(), bufferToFill.SampleDimension(),
+          bufferToFill.Line(), bufferToFill.LineDimension(),
+          bufferToFill.Band(), bufferToFill.BandDimension());
+    }
 
     RawCubeChunk * fileData;
     foreach (fileData, cubeChunks) {
@@ -233,64 +329,23 @@ namespace Isis {
    * @param bufferToWrite The buffer to get cube data from.
    */
   void CubeIoHandler::write(const Buffer &bufferToWrite) {
-    // This works by finding the cube chunks intersecting the buffer,
-    //   going through the intersecting cube chunks and putting the buffer
-    //   data into the respective chunks. Finally, extra cube chunks in memory
-    //   are freed.
-    QList<RawCubeChunk *> cubeChunks;
+    m_lastOperationWasWrite = true;
 
-    int bufferSampleCount = bufferToWrite.SampleDimension();
-    int bufferLineCount = bufferToWrite.LineDimension();
-    int bufferBandCount = bufferToWrite.BandDimension();
-
-    // process by line optimization
-    if(m_lastProcessByLineChunks && m_lastProcessByLineChunks->size()) {
-      // Not optimized yet, let's see if we can optimize
-      if(bufferToWrite.Sample() == 1 &&
-         bufferSampleCount == getSampleCount() &&
-         bufferLineCount == 1 &&
-         bufferBandCount == 1) {
-        // We look like a process by line, are we using the same chunks as
-        //   before?
-        int bufferLine = bufferToWrite.Line();
-        int chunkStartLine = (*m_lastProcessByLineChunks)[0]->getStartLine();
-        int chunkLines = (*m_lastProcessByLineChunks)[0]->getLineCount();
-        int bufferBand = bufferToWrite.Band();
-        int chunkStartBand = (*m_lastProcessByLineChunks)[0]->getStartBand();
-        int chunkBands = (*m_lastProcessByLineChunks)[0]->getBandCount();
-
-        if(bufferLine >= chunkStartLine &&
-           bufferLine <= chunkStartLine + chunkLines - 1 &&
-           bufferBand >= chunkStartBand &&
-           bufferBand <= chunkStartBand + chunkBands - 1) {
-          cubeChunks = *m_lastProcessByLineChunks;
-        }
+    if (m_ioThreadPool) {
+      // THREADED CUBE WRITE
+      Buffer * copy = new Buffer(bufferToWrite);
+      {
+        QMutexLocker locker(m_writeCache->first);
+        m_writeCache->second.append(copy);
       }
-    }
 
-    if(cubeChunks.empty()) {
-      cubeChunks = findCubeChunks(
-         bufferToWrite.Sample(), bufferSampleCount,
-         bufferToWrite.Line(), bufferLineCount,
-         bufferToWrite.Band(), bufferBandCount);
+      flushWriteCache();
     }
-
-    // process by line optimization
-    if(bufferToWrite.Sample() == 1 &&
-        bufferSampleCount == getSampleCount() &&
-        bufferLineCount == 1 &&
-        bufferBandCount == 1) {
-      if(!m_lastProcessByLineChunks)
-        m_lastProcessByLineChunks = new QList<RawCubeChunk *>(cubeChunks);
-      else
-        *m_lastProcessByLineChunks = cubeChunks;
+    else {
+      QMutexLocker lock(m_writeThreadMutex);
+      // NON-THREADED CUBE WRITE
+      synchronousWrite(bufferToWrite);
     }
-
-    for(int i = 0; i < cubeChunks.size(); i++) {
-      writeIntoRaw(bufferToWrite, *cubeChunks[i]);
-    }
-
-    minimizeCache(cubeChunks, bufferToWrite);
   }
 
 
@@ -314,8 +369,16 @@ namespace Isis {
    *
    * This method should only be called otherwise when lots of cubes are in
    *   memory and the many caches cause problems with system RAM limitations.
+   *
+   * @param blockForWriteCache This should be true unless this method is called
+   *                           from the write thread.
    */
-  void CubeIoHandler::clearCache() {
+  void CubeIoHandler::clearCache(bool blockForWriteCache) const {
+    if (blockForWriteCache) {
+      // Start the rest of the writes
+      flushWriteCache(true);
+    }
+
     // If this map is allocated, then this is a brand new cube and we need to
     //   make sure it's filled with data or NULLs.
     if(m_dataIsOnDiskMap) {
@@ -331,7 +394,7 @@ namespace Isis {
 
         if(it.value()) {
           if(it.value()->isDirty()) {
-            writeRaw(*it.value());
+            (const_cast<CubeIoHandler *>(this))->writeRaw(*it.value());
           }
 
           delete it.value();
@@ -392,6 +455,17 @@ namespace Isis {
   void CubeIoHandler::updateLabels(Pvl &labels) {
   }
 
+
+  /**
+   * Get the mutex that this IO handler is using around I/Os on the given
+   *   data file. A lock should be acquired before doing any reads/writes on
+   *   the data file externally.
+   *
+   * @return A mutex that can guarantee exclusive access to the data file
+   */
+  QMutex *CubeIoHandler::dataFileMutex() {
+    return m_writeThreadMutex;
+  }
 
   /**
    * @return the number of physical bands in the cube.
@@ -599,6 +673,62 @@ namespace Isis {
 
 
   /**
+   * This blocks (doesn't return) until the number of active runnables in the
+   *   thread pool goes to 0. This uses the m_writeThreadMutex, because the
+   *   thread pool doesn't delete threads immediately, so runnables might
+   *   actually still exist but are inconsequential/being deleted already.
+   */
+  void CubeIoHandler::blockUntilThreadPoolEmpty() const {
+    if (m_ioThreadPool) {
+      QMutexLocker lock(m_writeThreadMutex);
+    }
+  }
+
+
+  /**
+   * This is used for sorting buffers into the most efficient write order.
+   *
+   * @param lhs The left hand side of the '<' operator
+   * @param rhs The right hand side of the '<' operator
+   * @return True if lhs is obviously earlier in a cube than rhs.
+   */
+  bool CubeIoHandler::bufferLessThan(Buffer * const &lhs, Buffer * const &rhs) {
+    bool lessThan = false;
+
+    // If there is any overlap then we need to return false due to it being
+    //   ambiguous.
+    Area3D lhsArea(
+        Displacement(lhs->Sample(), Displacement::Pixels),
+        Displacement(lhs->Line(), Displacement::Pixels),
+        Displacement(lhs->Band(), Displacement::Pixels),
+        Distance(lhs->SampleDimension() - 1, Distance::Pixels),
+        Distance(lhs->LineDimension() - 1, Distance::Pixels),
+        Distance(lhs->BandDimension() - 1, Distance::Pixels));
+    Area3D rhsArea(
+        Displacement(rhs->Sample(), Displacement::Pixels),
+        Displacement(rhs->Line(), Displacement::Pixels),
+        Displacement(rhs->Band(), Displacement::Pixels),
+        Distance(rhs->SampleDimension() - 1, Distance::Pixels),
+        Distance(rhs->LineDimension() - 1, Distance::Pixels),
+        Distance(rhs->BandDimension() - 1, Distance::Pixels));
+
+    if (!lhsArea.intersect(rhsArea).isValid()) {
+      if (lhs->Band() != rhs->Band()) {
+        lessThan = lhs->Band() < rhs->Band();
+      }
+      else if (lhs->Line() != rhs->Line()) {
+        lessThan = lhs->Line() < rhs->Line();
+      }
+      else if (lhs->Sample() != rhs->Sample()) {
+        lessThan = lhs->Sample() < rhs->Sample();
+      }
+    }
+
+    return lessThan;
+  }
+
+
+  /**
    * Get the cube chunks that correspond to the given cube area.
    *   This will create and initialize the chunks if they are not already in
    *   memory.
@@ -613,7 +743,7 @@ namespace Isis {
    */
   QList<RawCubeChunk *> CubeIoHandler::findCubeChunks(int startSample,
       int numSamples, int startLine, int numLines, int startBand,
-      int numBands) {
+      int numBands) const {
     QList<RawCubeChunk *> results;
 
     int lastBand = min(startBand + numBands - 1,
@@ -720,29 +850,9 @@ namespace Isis {
               (chunkZPos * getChunkCountInSampleDimension() *
                           getChunkCountInLineDimension());
 
-          RawCubeChunk * newChunk = getChunk(chunkIndex);
+          RawCubeChunk * newChunk = getChunk(chunkIndex, true);
 
-          if(!newChunk) {
-            if(m_dataIsOnDiskMap && !(*m_dataIsOnDiskMap)[chunkIndex]) {
-              newChunk = getNullChunk(chunkIndex);
-              (*m_dataIsOnDiskMap)[chunkIndex] = true;
-            }
-            else {
-              newChunk = new RawCubeChunk(
-                chunkRect.left(), chunkRect.top(), initialChunkBand,
-                chunkRect.right(), chunkRect.bottom(),
-                initialChunkBand + m_bandsInChunk - 1,
-                getBytesPerChunk());
-
-              readRaw(*newChunk);
-              newChunk->setDirty(false);
-            }
-
-            (*m_rawData)[chunkIndex] = newChunk;
-          }
-
-          if(newChunk)
-            results.append(newChunk);
+          results.append(newChunk);
 
           chunkRect.moveLeft(chunkRect.right() + 1);
         }
@@ -830,19 +940,100 @@ namespace Isis {
 
 
   /**
+   * This attempts to write the so-far-unwritten buffers from m_writeCache
+   *   into the cube's RawCubeChunk cache. This will not do anything if
+   *   there is a runnable and will block if the write cache grows to
+   *   be too large.
+   *
+   * @param optimize Set to true for best performance, false for just get it
+   *                 done. When optimize is true, the cache may not be flushed
+   *                 even though it is flushable.
+   */
+  void CubeIoHandler::flushWriteCache(bool force) const {
+    if (m_ioThreadPool) {
+      bool shouldFlush = m_writeCache->second.size() >= m_idealFlushSize ||
+                         force;
+      bool cacheOverflowing =
+          (m_writeCache->second.size() > m_idealFlushSize * 10);
+      bool shouldAndCanFlush = false;
+      bool forceStart = force;
+
+      if (shouldFlush) {
+        shouldAndCanFlush = m_writeThreadMutex->tryLock();
+        if (shouldAndCanFlush) {
+          m_writeThreadMutex->unlock();
+        }
+      }
+
+      if (cacheOverflowing && !shouldAndCanFlush) {
+        forceStart = true;
+        m_consecutiveOverflowCount++;
+      }
+
+      if (forceStart) {
+        blockUntilThreadPoolEmpty();
+
+        if (m_writeCache->second.size() != 0) {
+          m_idealFlushSize = m_writeCache->second.size();
+          shouldFlush = true;
+          shouldAndCanFlush = true;
+        }
+      }
+      else if (!cacheOverflowing && shouldAndCanFlush) {
+        m_consecutiveOverflowCount = 0;
+      }
+
+      if (cacheOverflowing && m_useOptimizedCubeWrite) {
+        blockUntilThreadPoolEmpty();
+
+        // If the process is very I/O bound, then write caching isn't helping
+        //   anything. In fact, it hurts, so turn it off.
+        if (m_consecutiveOverflowCount > 10) {
+          delete m_ioThreadPool;
+          m_ioThreadPool = NULL;
+        }
+
+        // Write it all synchronously.
+        foreach (Buffer *bufferToWrite, m_writeCache->second) {
+          const_cast<CubeIoHandler *>(this)->synchronousWrite(*bufferToWrite);
+          delete bufferToWrite;
+        }
+
+        m_writeCache->second.clear();
+      }
+
+      if (shouldAndCanFlush && m_ioThreadPool) {
+        QMutexLocker locker(m_writeCache->first);
+        QRunnable *writer = new BufferToChunkWriter(
+            const_cast<CubeIoHandler *>(this), m_writeCache->second);
+
+        m_ioThreadPool->start(writer);
+
+        m_writeCache->second.clear();
+        m_lastOperationWasWrite = true;
+      }
+
+      if (force) {
+        blockUntilThreadPoolEmpty();
+      }
+    }
+  }
+
+
+  /**
    * If the chunk is dirty, then we write it to disk. Regardless, we then
    *   free it from memory.
    *
    * @param chunkToFree The chunk we're removing from memory
    */
-  void CubeIoHandler::freeChunk(RawCubeChunk *chunkToFree) {
+  void CubeIoHandler::freeChunk(RawCubeChunk *chunkToFree) const {
     if(chunkToFree && m_rawData) {
       int chunkIndex = getChunkIndex(*chunkToFree);
 
       m_rawData->erase(m_rawData->find(chunkIndex));
 
       if(chunkToFree->isDirty())
-        writeRaw(*chunkToFree);
+        (const_cast<CubeIoHandler *>(this))->writeRaw(*chunkToFree);
 
       delete chunkToFree;
 
@@ -858,13 +1049,42 @@ namespace Isis {
    * Retrieve the cached chunk at the given chunk index, if there is one.
    *
    * @param chunkIndex The position of the chunk in the cube
+   * @param allocateIfNecessary If true, the chunk will be read into cache
+   *                            when necessary and this method will not return
+   *                            NULL.
    * @return NULL if data is not cached, otherwise the cube file data
    */
-  RawCubeChunk *CubeIoHandler::getChunk(int chunkIndex) const {
+  RawCubeChunk *CubeIoHandler::getChunk(int chunkIndex,
+                                        bool allocateIfNecessary) const {
     RawCubeChunk *chunk = NULL;
 
     if(m_rawData) {
       chunk = m_rawData->value(chunkIndex);
+    }
+
+    if(allocateIfNecessary && !chunk) {
+      if(m_dataIsOnDiskMap && !(*m_dataIsOnDiskMap)[chunkIndex]) {
+        chunk = getNullChunk(chunkIndex);
+        (*m_dataIsOnDiskMap)[chunkIndex] = true;
+      }
+      else {
+        int startSample;
+        int startLine;
+        int startBand;
+        int endSample;
+        int endLine;
+        int endBand;
+        getChunkPlacement(chunkIndex, startSample, startLine, startBand,
+                          endSample, endLine, endBand);
+        chunk = new RawCubeChunk(startSample, startLine, startBand,
+                                    endSample, endLine, endBand,
+                                    getBytesPerChunk());
+
+        (const_cast<CubeIoHandler *>(this))->readRaw(*chunk);
+        chunk->setDirty(false);
+      }
+
+      (*m_rawData)[chunkIndex] = chunk;
     }
 
     return chunk;
@@ -925,7 +1145,7 @@ namespace Isis {
    * @param chunkIndex The chunk's index which provides it's positioning.
    * @return A chunk filled with nulls at the chunkIndex position
    */
-  RawCubeChunk *CubeIoHandler::getNullChunk(int chunkIndex) {
+  RawCubeChunk *CubeIoHandler::getNullChunk(int chunkIndex) const {
     // Shouldn't ask for null chunks when the area has already been allocated
 //     ASSERT(getChunk(chunkIndex) == NULL);
 
@@ -979,10 +1199,10 @@ namespace Isis {
    *     is calling this method.
    */
   void CubeIoHandler::minimizeCache(const QList<RawCubeChunk *> &justUsed,
-                                    const Buffer &justRequested) {
-    // Don't try to minimize the cache every time. Only try if we have 1MB+
-    //   in memory.
-    if(m_rawData->size() * getBytesPerChunk() > 1 * 1024 * 1024 ||
+                                    const Buffer &justRequested) const {
+    // Since we have a lock on the cache, no newly created threads can utilize
+    //   or access any cache data until we're done.
+    if (m_rawData->size() * getBytesPerChunk() > 1 * 1024 * 1024 ||
        m_cachingAlgorithms->size() > 1) {
       bool algorithmAccepted = false;
 
@@ -1011,9 +1231,119 @@ namespace Isis {
 
       // Fall back - no algorithms liked us :(
       if(!algorithmAccepted && m_rawData->size() > 100) {
-        clearCache();
+        // This (minimizeCache()) is typically executed in the Runnable thread.
+        // We don't want to wait for ourselves.
+        clearCache(false);
       }
     }
+  }
+
+
+  /**
+   * This method takes the given buffer and synchronously puts it into the
+   *   Cube's cache. This includes reading missing cache areas and freeing
+   *   extra cache areas. This is what the non-threaded CubeIoHandler::write
+   *   used to do.
+   *
+   * @param bufferToWrite The buffer we're writing into this cube, synchronously
+   */
+  void CubeIoHandler::synchronousWrite(const Buffer &bufferToWrite) {
+    QList<RawCubeChunk *> cubeChunks;
+
+    int bufferSampleCount = bufferToWrite.SampleDimension();
+    int bufferLineCount = bufferToWrite.LineDimension();
+    int bufferBandCount = bufferToWrite.BandDimension();
+
+    // process by line optimization
+    if(m_lastProcessByLineChunks &&
+       m_lastProcessByLineChunks->size()) {
+      // Not optimized yet, let's see if we can optimize
+      if(bufferToWrite.Sample() == 1 &&
+         bufferSampleCount == getSampleCount() &&
+         bufferLineCount == 1 &&
+         bufferBandCount == 1) {
+        // We look like a process by line, are we using the same chunks as
+        //   before?
+        int bufferLine = bufferToWrite.Line();
+        int chunkStartLine =
+            (*m_lastProcessByLineChunks)[0]->getStartLine();
+        int chunkLines =
+            (*m_lastProcessByLineChunks)[0]->getLineCount();
+        int bufferBand = bufferToWrite.Band();
+        int chunkStartBand =
+            (*m_lastProcessByLineChunks)[0]->getStartBand();
+        int chunkBands =
+            (*m_lastProcessByLineChunks)[0]->getBandCount();
+
+        if(bufferLine >= chunkStartLine &&
+           bufferLine <= chunkStartLine + chunkLines - 1 &&
+           bufferBand >= chunkStartBand &&
+           bufferBand <= chunkStartBand + chunkBands - 1) {
+          cubeChunks = *m_lastProcessByLineChunks;
+        }
+      }
+    }
+    // Processing by chunk size
+    else if (bufferSampleCount == m_samplesInChunk &&
+             bufferLineCount == m_linesInChunk &&
+             bufferBandCount == m_bandsInChunk) {
+      int bufferStartSample = bufferToWrite.Sample();
+      int bufferStartLine = bufferToWrite.Line();
+      int bufferStartBand = bufferToWrite.Band();
+
+      int bufferEndSample = bufferStartSample + bufferSampleCount - 1;
+      int bufferEndLine = bufferStartLine + bufferLineCount - 1;
+      int bufferEndBand = bufferStartBand + bufferBandCount - 1;
+
+      int expectedChunkIndex =
+          ((bufferStartSample - 1) / getSampleCountInChunk()) +
+          ((bufferStartLine - 1) / getLineCountInChunk()) *
+            getChunkCountInSampleDimension() +
+          ((bufferStartBand - 1) / getBandCountInChunk()) *
+            getChunkCountInSampleDimension() *
+            getChunkCountInLineDimension();
+
+      int chunkStartSample, chunkStartLine, chunkStartBand,
+          chunkEndSample, chunkEndLine, chunkEndBand;
+
+      getChunkPlacement(expectedChunkIndex,
+          chunkStartSample, chunkStartLine, chunkStartBand,
+          chunkEndSample, chunkEndLine, chunkEndBand);
+
+      if (chunkStartSample == bufferStartSample &&
+          chunkStartLine == bufferStartLine &&
+          chunkStartBand == bufferStartBand &&
+          chunkEndSample == bufferEndSample &&
+          chunkEndLine == bufferEndLine &&
+          chunkEndBand == bufferEndBand) {
+        cubeChunks.append(getChunk(expectedChunkIndex, true));
+      }
+    }
+
+    if(cubeChunks.empty()) {
+      cubeChunks = findCubeChunks(
+         bufferToWrite.Sample(), bufferSampleCount,
+         bufferToWrite.Line(), bufferLineCount,
+         bufferToWrite.Band(), bufferBandCount);
+    }
+
+    // process by line optimization
+    if(bufferToWrite.Sample() == 1 &&
+        bufferSampleCount == getSampleCount() &&
+        bufferLineCount == 1 &&
+        bufferBandCount == 1) {
+      if(!m_lastProcessByLineChunks)
+        m_lastProcessByLineChunks =
+            new QList<RawCubeChunk *>(cubeChunks);
+      else
+        *m_lastProcessByLineChunks = cubeChunks;
+    }
+
+    for(int i = 0; i < cubeChunks.size(); i++) {
+      writeIntoRaw(bufferToWrite, *cubeChunks[i]);
+    }
+
+    minimizeCache(cubeChunks, bufferToWrite);
   }
 
 
@@ -1048,6 +1378,7 @@ namespace Isis {
     int chunkStartBand = chunk.getStartBand();
     int chunkLineSize = chunk.getSampleCount();
     int chunkBandSize = chunkLineSize * chunk.getLineCount();
+    //double *buffersDoubleBuf = output.p_buf;
     double *buffersDoubleBuf = output.DoubleBuffer();
     const char *chunkBuf = chunk.getRawData().data();
     char *buffersRawBuf = (char *)output.RawBuffer();
@@ -1340,7 +1671,7 @@ namespace Isis {
   /**
    * Write all NULL cube chunks that have not yet been accessed to disk.
    */
-  void CubeIoHandler::writeNullDataToDisk() {
+  void CubeIoHandler::writeNullDataToDisk() const {
     if(!m_dataIsOnDiskMap) {
       iString msg = "Cannot call CubeIoHandler::writeNullDataToDisk unless "
           "data is not already on disk (Cube::Create was called)";
@@ -1351,13 +1682,112 @@ namespace Isis {
     for(int i = 0; i < numChunks; i++) {
       if(!(*m_dataIsOnDiskMap)[i]) {
         RawCubeChunk *nullChunk = getNullChunk(i);
-        writeRaw(*nullChunk);
+        (const_cast<CubeIoHandler *>(this))->writeRaw(*nullChunk);
         (*m_dataIsOnDiskMap)[i] = true;
 
         delete nullChunk;
         nullChunk = NULL;
       }
     }
+  }
+
+
+  /**
+   * Create a BufferToChunkWriter which is designed to asynchronously move
+   *   the given buffers into the cube cache. This will lock the
+   *   ioHandler's m_writeThreadMutex.
+   *
+   * @param ioHandler This is the cube IO handler. It's not const because you
+   *                  should have non-constness on a cube in order to write to
+   *                  it. This does, sometimes, need overridden externally if
+   *                  you are simply flushing the cache and not doing a new
+   *                  write.
+   * @param buffersToWrite The buffers to put into the cube. This takes
+   *                  ownership of the given buffers.
+   */
+  CubeIoHandler::BufferToChunkWriter::BufferToChunkWriter(
+      CubeIoHandler * ioHandler, QList<Buffer *> buffersToWrite) {
+    m_ioHandler = ioHandler;
+    m_buffersToWrite = new QList<Buffer *>(buffersToWrite);
+    m_timer = new QTime;
+    m_timer->start();
+
+    m_ioHandler->m_writeThreadMutex->lock();
+  }
+
+
+  /**
+   * We're done writing our buffers into the cube, clean up. It turns out you
+   *   can't start the next cache flush from here, so this does not initiate
+   *   another write cache flush.
+   *
+   * Before releasing the lock on the QDataFile, this destructor attempts to
+   *   correct the ideal cache size to reflect the current run. This tries to
+   *   bring the cache size to a point where this class lives for a total of
+   *   100ms.
+   */
+  CubeIoHandler::BufferToChunkWriter::~BufferToChunkWriter() {
+    int elapsedMs = m_timer->elapsed();
+    int idealFlushElapsedTime = 100; // ms
+
+    // We want to aim our flush size at 100ms, so adjust accordingly to aim at
+    //   our target. This method seems to be extremely effective because
+    //   we maximize our I/O calls when caching is interfering and normalize
+    //   them otherwise.
+    int msOffIdeal = elapsedMs - idealFlushElapsedTime;
+    double percentOffIdeal = msOffIdeal / (double)idealFlushElapsedTime;
+
+    // flush size is bounded to [32, 5000]
+    int currentCacheSize = m_ioHandler->m_idealFlushSize;
+    int desiredAdjustment = -1 * currentCacheSize * percentOffIdeal;
+    int desiredCacheSize = (int)(currentCacheSize + desiredAdjustment);
+    m_ioHandler->m_idealFlushSize = (int)(qMin(5000,
+                                               qMax(32, desiredCacheSize)));
+
+    delete m_timer;
+    m_timer = NULL;
+
+    m_ioHandler->m_writeThreadMutex->unlock();
+    m_ioHandler = NULL;
+
+    ASSERT(m_buffersToWrite->isEmpty());
+    delete m_buffersToWrite;
+    m_buffersToWrite = NULL;
+  }
+
+
+  /**
+   * This is the asynchronous computation. Write the given buffers into the
+   *   cube synchronously in this thread and delete the buffers when we're
+   *   done.
+   */
+  void CubeIoHandler::BufferToChunkWriter::run() {
+    // Sorting the buffers didn't seem to have a large positive impact on speed,
+    //   but does increase complexity so it's disabled.
+//     QList<Buffer * > buffersToWrite(*m_buffersToWrite);
+//     qSort(buffersToWrite.begin(), buffersToWrite.end(), bufferLessThan);
+
+    // If the buffers have any overlap at all then we can't sort them and still
+    //   guarantee the last write() call makes it into the correct place. The
+    //   bufferLessThan is guaranteed to return false if there is overlap.
+//     bool sortable = true;
+//     for (int i = 1; sortable && i < buffersToWrite.size(); i++) {
+//       if (!bufferLessThan(buffersToWrite[i - 1], buffersToWrite[i])) {
+//         sortable = false;
+//       }
+//     }
+
+//     if (!sortable) {
+//       buffersToWrite = *m_buffersToWrite;
+//     }
+
+    foreach (Buffer * bufferToWrite, *m_buffersToWrite) {
+      m_ioHandler->synchronousWrite(*bufferToWrite);
+      delete bufferToWrite;
+    }
+
+    m_buffersToWrite->clear();
+    m_ioHandler->m_dataFile->flush();
   }
 }
 

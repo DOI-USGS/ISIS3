@@ -1,6 +1,5 @@
-
 Testing Functors
-Functor2
+Functor2 - ProcessCube One Thread
 unittest: Working
 0% Processed
 Testing one input and output cube ... 
@@ -251,7 +250,7 @@ Sample:  111  Line:  121  Band:  1
 Sample:  121  Line:  121  Band:  1
 100% Processed
 
-Functor3
+Functor3 - ProcessCubes One Thread
 unittest: Working
 0% ProcessedTesting two input and output cubes ... 
 Number of input cubes:   2
@@ -427,8 +426,28 @@ Sample:  101:101  Line:  121:121  Band:  1:1
 Sample:  111:111  Line:  121:121  Band:  1:1
 Sample:  121:121  Line:  121:121  Band:  1:1
 100% Processed
+
+Functor4 - ProcessCube Threaded
+unittest: Working
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+unittest: Gathering statistics
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+unittest: Gathering statistics
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+Averages: 798.5, 898.5
+
+Functor5 - ProcessCubeInPlace Threaded
+unittest: Working
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+unittest: Gathering statistics
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+unittest: Gathering statistics
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+Averages: 1597, 1797
+
 End Testing Functors
 
+Testing StartProcess
 unittest: Working
 0% ProcessedSample:  1:1  Line:  1:1  Band:  1:1
 Sample:  11:11  Line:  1:1  Band:  1:1

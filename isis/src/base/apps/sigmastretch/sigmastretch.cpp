@@ -26,7 +26,7 @@ class BandStretch {
 
     ~BandStretch() {}
 
-    double calculateStretch(double dn) {
+    double calculateStretch(double dn) const {
       return !IsSpecial(dn) ?
           (dn - m_average) * (m_variance / m_standardDeviation) : dn;
     }
@@ -56,7 +56,7 @@ class SigmaStretcher {
       m_bandStretches.append(stretch);
     }
 
-    void operator()(Buffer &in, Buffer &out) {
+    void operator()(Buffer &in, Buffer &out) const {
       for (int i = 0; i < in.size(); i++)
         out[i] = m_bandStretches[in.Band(i) - 1]->calculateStretch(in[i]);
     }
@@ -76,7 +76,7 @@ void IsisMain() {
   for (int i = 1; i <= cube->getBandCount(); i++)
     stretcher.addStretch(new BandStretch(cube, i, variance));
 
-  p.StartProcessIO(stretcher);
+  p.ProcessCube(stretcher);
   p.EndProcess();
 }
 
