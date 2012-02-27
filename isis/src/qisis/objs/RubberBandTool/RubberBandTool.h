@@ -38,6 +38,8 @@ namespace Isis {
   *   @history 2011-09-20 Steven Lambright - Segmented lines now have updates
   *                           while the user is still drawing them instead of
   *                           just a complete state.
+  *   @history 2012-02-08 Tracie Sucharski - Added method to set drawing on the
+  *                           active viewport only.
   */
   class RubberBandTool : public Tool {
       Q_OBJECT
@@ -62,6 +64,9 @@ namespace Isis {
 
       static void disable();
       void disableBanding();
+
+      static void drawActiveViewportOnly(bool activeOnly = false);
+      void setDrawActiveViewportOnly(bool activeOnly = false);
 
       static QList<QPoint> getVertices();
       QList<QPoint> getFoundVertices();
@@ -135,6 +140,7 @@ namespace Isis {
       bool p_doubleClicking;         //<! True if on second click of a double click
       bool p_tracking;               //<! True if painting on mouse move
       bool p_allClicks;              //<! Enables all mouse buttons for banding
+      bool p_drawActiveOnly;         //<! True if draw on active viewport only
       RubberBandMode p_bandingMode;  //<! Current type of rubber band
       QList<QPoint> * p_vertices;      //<! Known vertices pertaining to the current rubber band
       QPoint *p_mouseLoc;              //<! Current mouse location, only valid of p_tracking

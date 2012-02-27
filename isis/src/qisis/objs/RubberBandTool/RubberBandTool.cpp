@@ -101,7 +101,9 @@ namespace Isis {
     greenPen.setStyle(Qt::SolidLine);
     painter->setPen(pen);
 
-     if (!(vp == cubeViewport() || (cubeViewport()->isLinked() && vp->isLinked()))) {
+    if ( (vp != cubeViewport() && p_drawActiveOnly) ||
+        !(vp == cubeViewport() || (cubeViewport()->isLinked() &&
+          vp->isLinked()))) {
        return;
      }
 
@@ -333,6 +335,7 @@ namespace Isis {
     //Took this out because it was reseting and not letting us plot single points.
     //p_pointTolerance = 0;
     p_allClicks = false;
+    p_drawActiveOnly = false;
     reset();
     activate(true);
 
@@ -349,6 +352,15 @@ namespace Isis {
 
     activate(false);
     reset();
+    repaint();
+  }
+
+  /**
+   * This called to set whether rubber band is drawn on active viewport only 
+   * rather than all linked viewports.  
+   */
+  void RubberBandTool::setDrawActiveViewportOnly(bool activeOnly) {
+    p_drawActiveOnly = activeOnly;
     repaint();
   }
 
@@ -1177,6 +1189,11 @@ namespace Isis {
 
   void RubberBandTool::disable() {
     getInstance()->disableBanding();
+  }
+
+
+  void RubberBandTool::drawActiveViewportOnly(bool activeOnly) {
+    getInstance()->setDrawActiveViewportOnly(activeOnly);
   }
 
 
