@@ -1,0 +1,15 @@
+Group = Apollo15/Apollo_Pan
+  Library = ApolloPanoramicCamera
+  Routine = ApolloPanoramicCameraPlugin
+  Version = 1
+EndGroup
+Group = Apollo16/Apollo_Pan
+  Library = ApolloPanoramicCamera
+  Routine = ApolloPanoramicCameraPlugin
+  Version = 1
+EndGroup
+Group = Apollo17/Apollo_Pan
+  Library = ApolloPanoramicCamera
+  Routine = ApolloPanoramicCameraPlugin
+  Version = 1
+EndGroup
