@@ -61,7 +61,7 @@ void IsisMain() {
   sProc.SetOutputCube(tmpPhaseFilename, cao, numSamples, numLines, numBands);
 
   // Start the sample processing
-  sProc.ProcessCubes(FFT1);
+  sProc.ProcessCubes(&FFT1);
   sProc.Finalize();
 
   // Then process by line
@@ -80,7 +80,7 @@ void IsisMain() {
   lProc.SetOutputCube("PHASE");
 
   //Start the line proccessing
-  lProc.ProcessCubes(FFT2);
+  lProc.ProcessCubes(&FFT2);
 
   // Add or update the AlphaCube group
   aCube.UpdateGroup(*ocube->getLabel());

@@ -1,4 +1,5 @@
 #include "Isis.h"
+#include "ProcessByBrick.h"
 #include "ProcessByLine.h"
 #include "SpecialPixel.h"
 #include "iException.h"
@@ -14,7 +15,7 @@ void mult(vector<Buffer *> &in,
           vector<Buffer *> &out);
 void divide(vector<Buffer *> &in,
          vector<Buffer *> &out);
-void unary(Buffer &in, Buffer &out);
+void unaryFunction(Buffer &in, Buffer &out);
 
 double Isisa, Isisb, Isisc, Isisd, Isise;
 
@@ -38,11 +39,11 @@ void IsisMain() {
 
   // Start the processing based on the operator
   string op = ui.GetString("OPERATOR");
-  if(op == "ADD") p.ProcessCubes(add);
-  if(op == "SUBTRACT") p.ProcessCubes(sub);
-  if(op == "MULTIPLY") p.ProcessCubes(mult);
-  if(op == "DIVIDE") p.ProcessCubes(divide);
-  if(op == "UNARY") p.ProcessCube(unary);
+  if(op == "ADD") p.ProcessCubes(&add);
+  if(op == "SUBTRACT") p.ProcessCubes(&sub);
+  if(op == "MULTIPLY") p.ProcessCubes(&mult);
+  if(op == "DIVIDE") p.ProcessCubes(&divide);
+  if(op == "UNARY") p.ProcessCube(&unaryFunction);
 }
 
 // Add routine
@@ -130,7 +131,7 @@ void divide(vector<Buffer *> &in, vector<Buffer *> &out) {
 }
 
 // Unary routine
-void unary(Buffer &in, Buffer &out) {
+void unaryFunction(Buffer &in, Buffer &out) {
   // Loop for each pixel in the line.
   for(int i = 0; i < in.size(); i++) {
     if(IsSpecial(in[i])) {
