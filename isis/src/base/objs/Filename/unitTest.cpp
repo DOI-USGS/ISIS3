@@ -1,6 +1,8 @@
 #include <iostream>
 #include <fstream>
 
+#include <QDate>
+
 #include "Filename.h"
 #include "iException.h"
 #include "Preference.h"
@@ -8,6 +10,9 @@
 
 using namespace std;
 using namespace Isis;
+
+void ReportError(iString err);
+void TestHighestVersion(string name);
 
 int main(int argc, char *argv[]) {
   void ReportError(iString err);
@@ -277,6 +282,7 @@ int main(int argc, char *argv[]) {
     ProgramLauncher::RunSystemCommand("touch tttt000008.tmp");
     ProgramLauncher::RunSystemCommand("touch 1tttt000008.tmp");
     ProgramLauncher::RunSystemCommand("touch 2tttt000008.tmp");
+    ProgramLauncher::RunSystemCommand("touch tttt_0.tmp");
 
     Filename p("tttt??????.tmp");
     cout << "Testing HighestVersion for file " << p.Name() << endl;
@@ -311,6 +317,7 @@ int main(int argc, char *argv[]) {
     cout << "  " << q2.Name() << endl;
     cout << endl;
 
+    TestHighestVersion("tttt_?.tmp");
 
     remove("tttt000001");
     remove("tttt000001.tmp");
@@ -319,6 +326,7 @@ int main(int argc, char *argv[]) {
     remove("tttt000008.tmp");
     remove("1tttt000008.tmp");
     remove("2tttt000008.tmp");
+    remove("tttt_0.tmp");
 
     Filename r("tttt");
     cout << "Testing HighestVersion for file " << r.Name() << endl;
@@ -352,9 +360,41 @@ int main(int argc, char *argv[]) {
     ProgramLauncher::RunSystemCommand("rm junk06.tmp");
     ProgramLauncher::RunSystemCommand("rm junk09.tmp");
 
-// Use the files previously created to
-// test the NewVersion member
 
+    // Test Highest Version for date versioned files
+    ProgramLauncher::RunSystemCommand("touch tttt05Sep2002.tmp");
+    ProgramLauncher::RunSystemCommand("touch tttt20Jan2010.tmp");
+    ProgramLauncher::RunSystemCommand("touch tttt14Apr2010.tmp");
+    ProgramLauncher::RunSystemCommand("touch ttAPRtt22yy99.tmp");
+    ProgramLauncher::RunSystemCommand("touch ttMARtt11yy00.tmp");
+    ProgramLauncher::RunSystemCommand("touch ttFEBtt04yy01.tmp");
+    ProgramLauncher::RunSystemCommand("touch ttMARtt072003.tmp");
+    ProgramLauncher::RunSystemCommand("touch tt14ttNovember.tmp");
+    ProgramLauncher::RunSystemCommand("touch tt2ttDecember.tmp");
+    ProgramLauncher::RunSystemCommand("touch tttt.tmp");
+
+    TestHighestVersion("tttt{ddMMMyyyy}.tmp");
+    TestHighestVersion("tt{MMM}tt{dd}yy{yy}.tmp");
+    TestHighestVersion("tt{d}tt{MMM}.tmp");
+    TestHighestVersion("tt{d}tt{MMMM}.tmp");
+    TestHighestVersion("tt{dd}.tmp");
+    TestHighestVersion("tttt{}.tmp");
+    TestHighestVersion("tttt{dd}.tmp");
+
+    remove("tttt05Sep2002.tmp");
+    remove("tttt20Jan2010.tmp");
+    remove("tttt14Apr2010.tmp");
+    remove("ttAPRtt22yy99.tmp");
+    remove("ttMARtt11yy00.tmp");
+    remove("ttFEBtt04yy01.tmp");
+    remove("ttMARtt072003.tmp");
+    remove("tt14ttNovember.tmp");
+    remove("tt2ttDecember.tmp");
+    remove("tttt.tmp");
+
+
+    // Use the files previously created to
+    // test the NewVersion member
     ProgramLauncher::RunSystemCommand("touch tttt000001");
     ProgramLauncher::RunSystemCommand("touch tttt000001.tmp");
     ProgramLauncher::RunSystemCommand("touch tttt000005.tmp");
@@ -396,7 +436,6 @@ int main(int argc, char *argv[]) {
     cout << " " << q2New.Name() << endl;
     cout << endl;
 
-
     remove("tttt000001");
     remove("tttt000001.tmp");
     remove("tttt000005.tmp");
@@ -404,6 +443,23 @@ int main(int argc, char *argv[]) {
     remove("tttt000008.tmp");
     remove("1tttt000008.tmp");
     remove("2tttt000008.tmp");
+
+    // Test new version for date file.  Makes a file for today, which cannot be
+    // printed as truth, so compare it with what we expect and print the result.
+    Filename todayFilename("tttt{dd}tt{yyyy}tt{MMM}.tmp");
+    cout << "Testing NewVersion for file " << todayFilename.Name() << endl;
+    bool success = false;
+    try {
+      todayFilename.NewVersion();
+      QDate today = QDate::currentDate();
+      QString expected = today.toString("'tttt'dd'tt'yyyy'tt'MMM'.tmp'");
+      success = todayFilename.Name() == expected.toStdString();
+    }
+    catch(iException &error) {
+      error.Report(false);
+    }
+    cout << "Made today's filename: " << success << endl;
+    cout << endl;
 
     Filename rNew("tttt");
     cout << "Testing NewVersion for file " << rNew.Name() << endl;
@@ -540,5 +596,20 @@ void ReportError(iString err) {
     report += "\n";
   }
   cout << report << endl;
+}
+
+
+void TestHighestVersion(string name) {
+  Filename filename(name);
+  cout << "Testing HighestVersion for file " << filename.Name() << endl;
+  try {
+    filename.HighestVersion();
+    cout << "  " << filename.Name() << endl;
+  }
+  catch(iException &error) {
+    cout << "No version available for " << name << endl;
+    error.Clear();
+  }
+  cout << endl;
 }
 

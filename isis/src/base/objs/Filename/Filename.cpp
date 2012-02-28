@@ -20,15 +20,18 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
+
 #include "Filename.h"
 
+#include <QDate>
 #include <QDir>
 
+#include "Preference.h"
 #include "iException.h"
 #include "iString.h"
-#include "Preference.h"
 
 using namespace std;
+
 namespace Isis {
 
   //! Constructs an empty Filename object.
@@ -213,6 +216,20 @@ namespace Isis {
 
 
   /**
+   * Get the directory contents of the path to this filename.
+   */
+  QDir Filename::GetDirectory() const {
+    // Get the path of the current file and make sure it exists
+    QDir dir((QString)(iString)Path());
+    if (!dir.exists()) {
+      string msg = "The path [" + Path() + "] does not exist";
+      throw iException::Message(iException::Io, msg, _FILEINFO_);
+    }
+    return dir;
+  }
+
+
+  /**
    * Searches for a filename with the highest integer version number. Version
    * numbers are defined as a sequence of question marks "?" in the filename.
    * Only one sequence is allowed per filename. The already internalized filename
@@ -226,56 +243,199 @@ namespace Isis {
    */
   void Filename::HighestVersion() {
     CheckVersion();
+    if (IsNumericallyVersioned())
+      SetHighestNumericalVersion();
+    else if (IsDateVersioned())
+      SetHighestDateVersion();
+  }
 
-    int highestVersion = -1;
-    iString highestVersionStr;
 
-    // Get the path of the current file and make sure it exists
-    QDir dir((QString)(iString)Path());
-    if(!dir.exists()) {
-      string msg = "The path [" + Path() + "] does not exist";
-      throw iException::Message(iException::Io, msg, _FILEINFO_);
+  /**
+   * Checks that the filename is a valid versioning pattern, and throws an
+   * exception if it is not.
+   *
+   * @throws iException::Programmer - File does not contain a version
+   * @throws iException::Programmer - File has too many version sequences,
+   *                                        only one is allowed
+   */
+  void Filename::CheckVersion() const {
+    if (!IsVersioned()) {
+      string msg = "Filename [" + Expanded() +
+                   "] does not contain a version sequence";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
-
-    // Find the beginning and end of the "?"s in the versioned filename
-    unsigned int start = Name().find_first_of("?");
-    unsigned int end = Name().find_last_of("?");
-    unsigned int charsAfterVersion = Name().length() - end - 1;
+  }
 
 
-    // Loop through all files in the dir and see if they match our name
-    for(unsigned int indx = 0; indx < dir.count(); indx++) {
+  /**
+   * Returns true if the filename is a versioning pattern.  Such patterns are
+   * denoted by a sequence of '?' symbols for numerical versions or a pair of
+   * curly braces '{}' for date versions.
+   */
+  bool Filename::IsVersioned() const {
+    return IsNumericallyVersioned() || IsDateVersioned();
+  }
 
-      string file = dir[indx].toStdString();
-      bool leftSide = file.substr(0, start) == Name().substr(0, start);
-      bool rightSide = ((int)file.length() - (int)charsAfterVersion) >= 0;
-      if(rightSide) {
-        rightSide = rightSide &&
-                    (file.substr(file.length() - charsAfterVersion) == Name().substr(end + 1));
-      }
 
-      if(leftSide && rightSide) {
+  /**
+   * Returns true if the filename is a numerical versioning pattern.  These
+   * patterns are denoted by a series of '?'.  Only one such continuous pattern
+   * is allowed in a filename.
+   */
+  bool Filename::IsNumericallyVersioned() const {
+    // Make sure there was at least one "?" for a version number
+    return Name().ToQt().contains("?");
+  }
 
-        iString version = file.substr(start, file.length() - charsAfterVersion - start);
 
-        if((version.length() > 0) &&
-            (version.find_first_not_of("0123456789") == string::npos) &&
-            (version.ToInteger() > highestVersion)) {
-          highestVersion = version.ToInteger();
-          highestVersionStr = version;
-        }
-      }
-    }
+  /**
+   * Returns true if the filename is a Qt date versioning pattern.  These
+   * patterns are denoted by a series of 'd', 'M', and 'y' surrounded by curly
+   * braces '{}', and follow Qt's formatting guidelines for constructing dates
+   * from strings, except that instead of enclosing non-date patterns in
+   * single-quotes, Isis encloses the date patterns themselves in curly braces.
+   */
+  bool Filename::IsDateVersioned() const {
+    QString filePattern = Name().ToQt();
+    return filePattern.contains("{") && filePattern.contains("}");
+  }
+
+
+  /**
+   * Sets this filename to be that of the highest numerically versioned file in
+   * the pattern filename's directory.
+   */
+  void Filename::SetHighestNumericalVersion() {
+    QString highestVersion = GetHighestVersionNumber();
 
     // Make sure we got a version number
-    if(highestVersion == -1) {
+    if (highestVersion.isEmpty()) {
       string msg = "No versions available for file [" + Expanded() + "]";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
 
-    string temp = Path() + "/" + Name().substr(0, start) +
-                  highestVersionStr + Name().substr(end + 1);
+    QString name = ReplacePattern(Name().ToQt(), highestVersion);
+    string temp = Path() + "/" + name.toStdString();
     QFileInfo::setFile(temp.c_str());
+  }
+
+
+  /**
+   * Replace the numeric '?' pattern with the given version number.
+   */
+  QString Filename::ReplacePattern(QString name, QString version) {
+    // Pad each extra '?' with a '0'. This maintains the length of the filename
+    // so that "file.???.ext" will be "file.001.ext" instead of "file.1.ext".
+    int minLength = name.lastIndexOf("?") - name.indexOf("?") + 1;
+    version = PadFront(version, "0", minLength);
+
+    return name.replace(QRegExp("\\?+"), version);
+  }
+
+
+  /**
+   * Pad the front of the string with the given padding symbols until the
+   * minimum length is reached.
+   */
+  QString Filename::PadFront(QString string, QString padding, int minLength) {
+    while (string.size() < minLength) string = padding + string;
+    return string;
+  }
+
+
+  /**
+   * Retrieves the version number of the highest numerically versioned filename
+   * in the pattern filename's directory.
+   */
+  QString Filename::GetHighestVersionNumber() const {
+    iString highestVersion = "-1";
+
+    // Find the beginning and end of the "?"s in the versioned filename
+    string name = Name();
+    unsigned int start = name.find_first_of("?");
+    unsigned int end = name.find_last_of("?");
+    unsigned int charsAfterVersion = name.length() - end - 1;
+
+    // Make sure all chars between start and end are "?"
+    for (unsigned int pos = start; pos <= end; pos++) {
+      if (name[pos] != '?') {
+        string msg = "Only one version sequence is allowed per filename [" +
+                     Expanded() + "]";
+        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      }
+    }
+
+    // Loop through all files in the dir and see if they match our name
+    QDir dir = GetDirectory();
+    for (unsigned int indx = 0; indx < dir.count(); indx++) {
+      string file = dir[indx].toStdString();
+      bool leftSide = file.substr(0, start) == name.substr(0, start);
+      bool rightSide = ((int)file.length() - (int)charsAfterVersion) >= 0;
+      if (rightSide) {
+        rightSide = rightSide &&
+                    (file.substr(file.length() - charsAfterVersion) == name.substr(end + 1));
+      }
+
+      if (leftSide && rightSide) {
+        iString version = file.substr(start, file.length() - charsAfterVersion - start);
+        if ((version.length() > 0) &&
+            (version.find_first_not_of("0123456789") == string::npos) &&
+            (version.ToInteger() > highestVersion.ToInteger())) {
+          highestVersion = version;
+        }
+      }
+    }
+
+    return highestVersion.ToInteger() != -1 ? highestVersion.ToQt() : QString();
+  }
+
+
+  /**
+   * Sets this filename to be that of the highest date versioned file in the
+   * pattern filename's directory.
+   */
+  void Filename::SetHighestDateVersion() {
+    QDir dir = GetDirectory();
+    QString filePattern = GetDatePattern();
+
+    QString latestFilename = "";
+    QDate latestDate(1900, 1, 1);
+    QDate sputnikLaunch(1957, 10, 4);
+    for (unsigned int i = 0; i < dir.count(); i++) {
+      QString filename = dir[i];
+      QDate fileDate = QDate::fromString(filename, filePattern);
+
+      if (fileDate.isValid()) {
+        // No missions before Sputnik 1, so we must be in the new millenium
+        if (fileDate < sputnikLaunch) fileDate = fileDate.addYears(100);
+
+        if (fileDate > latestDate) {
+          latestFilename = filename;
+          latestDate = fileDate;
+        }
+      }
+    }
+
+    if (latestFilename == "") {
+      string msg = "No versions available for file [" + Expanded() + "]";
+      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    }
+
+    string fullFilename = Path() + "/" + latestFilename.toStdString();
+    QFileInfo::setFile(fullFilename.c_str());
+  }
+
+
+  /**
+   * Converts the Isis date pattern to a standard Qt pattern and returns the
+   * result, excluding the path.
+   */
+  QString Filename::GetDatePattern() const {
+    QString filePattern = Name().ToQt();
+    filePattern = filePattern.replace("{", "'");
+    filePattern = filePattern.replace("}", "'");
+    filePattern = "'" + filePattern + "'";
+    return filePattern;
   }
 
 
@@ -295,59 +455,54 @@ namespace Isis {
    * @throws iException::Programmer - No versions available for the file
    */
   void Filename::NewVersion() {
-
     CheckVersion();
+    if (IsNumericallyVersioned())
+      SetNewNumericalVersion();
+    else if (IsDateVersioned())
+      SetNewDateVersion();
+  }
 
-    // Get the path of the current file and make sure it exists
-    QDir dir((QString)(iString)Path());
-    if(!dir.exists()) {
-      string msg = "The path [" + Path() + "] does not exist";
-      throw iException::Message(iException::Io, msg, _FILEINFO_);
+
+  /**
+   * Sets this filename to be a new, latest version of the numerical filename
+   * pattern.  This new version is constructed by incrementing the version
+   * number of the current highest version filename.
+   */
+  void Filename::SetNewNumericalVersion() {
+    // Create a string with the new version number
+    QString highestVersion = GetHighestVersionNumber();
+    if (!highestVersion.isEmpty()) {
+      // Increment the version number, but preserve the length of the string
+      // (for expanding '?' symbols when the true filename has more digits than
+      // the pattern
+      int length = highestVersion.size();
+      highestVersion = QString::number(highestVersion.toInt() + 1);
+      PadFront(highestVersion, "0", length);
+    }
+    else {
+      // It has been decided that versioning starts at 1, but we must still
+      // account for existing files versioned starting at 0
+      highestVersion = QString::number(1);
     }
 
-    // Find the beginning and end of the "?"s in the versioned filename
-    unsigned int start = Name().find_first_of("?");
-    unsigned int end = Name().find_last_of("?");
-    unsigned int charsAfterVersion = Name().length() - end - 1;
-
-    int highestVersion = 0;
-    // Loop through all files in the dir and see if they match our name
-    for(unsigned int indx = 0; indx < dir.count(); indx++) {
-
-      string file = dir[indx].toStdString();
-      bool leftSide = file.substr(0, start) == Name().substr(0, start);
-      bool rightSide = ((int)file.length() - (int)charsAfterVersion) >= 0;
-      if(rightSide) {
-        rightSide = rightSide &&
-                    (file.substr(file.length() - charsAfterVersion) == Name().substr(end + 1));
-      }
-
-      if(leftSide && rightSide) {
-
-        iString version = file.substr(start, file.length() - charsAfterVersion - start);
-
-        if((version.length() > 0) &&
-            (version.find_first_not_of("0123456789") == string::npos) &&
-            (version.ToInteger() > highestVersion)) {
-          highestVersion = version.ToInteger();
-        }
-      }
-    }
-    //create a string with the new version number
-    iString newVersion = ++highestVersion;
-
-
-
-    //pad each extra "?" with a 0. This maintains the length of the Filename
-    //so that "file.???.ext" will be "file.001.ext" instead of "file.1.ext"
-    int zeroesNeeded = end - start - newVersion.length();
-    for(int i = 0 ; i <= zeroesNeeded; i++) {
-      newVersion = "0" + newVersion;
-    }
-
-    string temp = Path() + "/" + Name().substr(0, start) +
-                  newVersion + Name().substr(end + 1);
+    QString name = ReplacePattern(Name().ToQt(), highestVersion);
+    string temp = Path() + "/" + name.toStdString();
     QFileInfo::setFile(temp.c_str());
+  }
+
+
+  /**
+   * Sets this filename to be a new, latest version of the date filename
+   * pattern.  This new version is constructed by formatting the current date to
+   * the filename pattern.
+   */
+  void Filename::SetNewDateVersion() {
+    QDate today = QDate::currentDate();
+    QString filePattern = GetDatePattern();
+
+    QString filename = today.toString(filePattern);
+    string fullFilename = Path() + "/" + filename.toStdString();
+    QFileInfo::setFile(fullFilename.c_str());
   }
 
 
@@ -357,7 +512,6 @@ namespace Isis {
    * @throws iException::Programmer - Unable to create the directory
    */
   void Filename::MakeDirectory() {
-
     QDir dir;
     if(!dir.mkdir(iString(Expanded()))) {
       string msg = "Unable to create directory [" + Expanded() + "]";
@@ -492,37 +646,5 @@ namespace Isis {
     }
     return temp;
   }
+}
 
-
-  /**
-   *  Check the current filename for a valid version sequence of "?"s
-   *
-   * @throws iException::Programmer - File does not contain a version
-   * @throws iException::Programmer - File has too many version sequences,
-   *                                        only one is allowed
-   */
-  void Filename::CheckVersion() const {
-
-    // Find the series of "?"
-    string name = Expanded();
-
-    string::size_type start = name.find_first_of("?");
-    string::size_type end = name.find_last_of("?");
-
-    // Make sure there was at least one "?" for a version number
-    if(start == string::npos || end == string::npos) {
-      string msg = "Filename [" + Expanded() +
-                   "] does not contain a version sequence";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
-    }
-
-    // Make sure all chars between start and end are "?"
-    for(unsigned int pos = start; pos <= end; ++pos) {
-      if(name[pos] != '?') {
-        string msg = "Only one version sequence is allowed per filename [" +
-                     Expanded() + "]";
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
-      }
-    }
-  }
-} // end namespace Isis

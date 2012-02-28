@@ -153,6 +153,9 @@ Testing HighestVersion for file tttt??????
 Testing HighestVersion for file ?tttt000008.tmp
   2tttt000008.tmp
 
+Testing HighestVersion for file tttt_?.tmp
+  tttt_0.tmp
+
 Testing HighestVersion for file tttt
 No version string in tttt
 
@@ -162,6 +165,27 @@ No version available for ??tttt
 Testing HighestVersion to expand 1 "?" into 2 digits
 junk09.tmp
 
+Testing HighestVersion for file tttt{ddMMMyyyy}.tmp
+  tttt14Apr2010.tmp
+
+Testing HighestVersion for file tt{MMM}tt{dd}yy{yy}.tmp
+  ttFEBtt04yy01.tmp
+
+Testing HighestVersion for file tt{d}tt{MMM}.tmp
+No version available for tt{d}tt{MMM}.tmp
+
+Testing HighestVersion for file tt{d}tt{MMMM}.tmp
+  tt2ttDecember.tmp
+
+Testing HighestVersion for file tt{dd}.tmp
+No version available for tt{dd}.tmp
+
+Testing HighestVersion for file tttt{}.tmp
+  tttt.tmp
+
+Testing HighestVersion for file tttt{dd}.tmp
+No version available for tttt{dd}.tmp
+
 Testing NewVersion for file tttt??????.tmp
   tttt000009.tmp
 
@@ -170,6 +194,9 @@ Testing NewVersion for file tttt??????
 
 Testing NewVersion for file ?tttt000008.tmp
  3tttt000008.tmp
+
+Testing NewVersion for file tttt{dd}tt{yyyy}tt{MMM}.tmp
+Made today's filename: 1
 
 Testing NewVersion for file tttt
 No version string in tttt

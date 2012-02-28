@@ -143,8 +143,22 @@ namespace Isis {
       // Find the highest version of a filename
       void HighestVersion();
 
+      bool IsVersioned() const;
+
+      bool IsNumericallyVersioned() const;
+
+      bool IsDateVersioned() const;
+
+      void SetHighestNumericalVersion();
+
+      void SetHighestDateVersion();
+
       // Find the highest version + 1 of a filename
       void NewVersion();
+
+      void SetNewNumericalVersion();
+
+      void SetNewDateVersion();
 
       // Return true if the file exists
       bool Exists();
@@ -158,12 +172,21 @@ namespace Isis {
       void Temporary(const iString &name, const iString &extension);
 
     private:
+      QDir GetDirectory() const;
+
+      void CheckVersion() const;
+
+      QString ReplacePattern(QString name, QString version);
+
+      QString PadFront(QString string, QString padding, int minLength);
+
+      QString GetHighestVersionNumber() const;
+
+      QString GetDatePattern() const;
 
       // Expand any "$xxxx" into Isis preferences and environment variables
       // THe "DataDirectory" is the only group searched in IsisPreferences
       iString Expand(const iString &file);
-
-      void CheckVersion() const;
 
       iString p_original; //!< The original filename saved at construction
 
