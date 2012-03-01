@@ -4,6 +4,9 @@
 
 #include <QList>
 #include <QMap>
+#include <QSet>
+#include <QString>
+#include <QTextStream>
 
 #include "ControlCubeGraphNode.h"
 #include "ControlMeasure.h"
@@ -13,19 +16,19 @@
 #include "ControlPointList.h"
 #include "Cube.h"
 #include "Filename.h"
-#include "iException.h"
 #include "MeasureValidationResults.h"
 #include "Progress.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
 #include "PvlObject.h"
+#include "SerialNumber.h"
 #include "SerialNumberList.h"
+#include "iException.h"
 
 #include "GuiEditFile.h"
 
 using namespace std;
-
 using namespace Isis;
 
 // Deletion test
@@ -39,9 +42,23 @@ void deletePoint(ControlNet &cnet, int cp);
 void deleteMeasure(ControlPoint *point, int cm);
 
 // Edit passes
-void populateLog(ControlNet &cnet);
-void processControlPoints(string fileName, ControlNet &cnet);
-void processControlMeasures(string fileName, ControlNet &cnet);
+void populateLog(ControlNet &cnet, bool ignore);
+
+void unlockPoints(ControlNet &cnet, ControlPointList &cpList);
+void ignorePoints(ControlNet &cnet, ControlPointList &cpList);
+void lockPoints(ControlNet &cnet, ControlPointList &cpList);
+
+void unlockCubes(ControlNet &cnet, SerialNumberList &snl);
+void ignoreCubes(ControlNet &cnet, SerialNumberList &snl);
+void lockCubes(ControlNet &cnet, SerialNumberList &snl);
+
+void unlockMeasures(ControlNet &cnet,
+    QMap< QString, QSet<QString> * > &editMeasures);
+void ignoreMeasures(ControlNet &cnet,
+    QMap< QString, QSet<QString> * > &editMeasures);
+void lockMeasures(ControlNet &cnet,
+    QMap< QString, QSet<QString> * > &editMeasures);
+
 void checkAllMeasureValidity(ControlNet &cnet, string cubeList);
 
 // Validity test
@@ -75,11 +92,11 @@ bool preservePoints;
 bool retainRef;
 bool keepLog;
 
-QMap<string, string> * ignoredPoints;
-QMap<string, PvlGroup> * ignoredMeasures;
-QMap<string, string> * retainedReferences;
-QMap<string, string> * editLockedPoints;
-QMap<string, PvlGroup> * editLockedMeasures;
+QMap<string, string> *ignoredPoints;
+QMap<string, PvlGroup> *ignoredMeasures;
+QMap<string, string> *retainedReferences;
+QMap<string, string> *editLockedPoints;
+QMap<string, PvlGroup> *editLockedMeasures;
 
 ControlNetValidMeasure *validator;
 
@@ -94,9 +111,10 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
   // Get global user parameters
-  deleteIgnored  = ui.GetBoolean("DELETE");
+  bool ignore = ui.GetBoolean("IGNORE");
+  deleteIgnored = ui.GetBoolean("DELETE");
   preservePoints = ui.GetBoolean("PRESERVE");
-  retainRef      = ui.GetBoolean("RETAIN_REFERENCE");
+  retainRef = ui.GetBoolean("RETAIN_REFERENCE");
 
   // Data needed to keep track of ignored/deleted points and measures
   keepLog = ui.WasEntered("LOG");
@@ -110,7 +128,67 @@ void IsisMain() {
   // existing ignored points and measures
   ControlNet cnet(ui.GetFilename("CNET"));
   if (keepLog && cnet.GetNumPoints() > 0)
-    populateLog(cnet);
+    populateLog(cnet, ignore);
+
+  // List has Points Ids
+  bool processPoints = false;
+  ControlPointList *cpList = NULL;
+  if (ui.WasEntered("POINTLIST") && cnet.GetNumPoints() > 0) {
+    processPoints = true;
+    string pointlistFilename = ui.GetFilename("POINTLIST");
+    cpList = new ControlPointList((Filename) pointlistFilename);
+  }
+
+  // List has Cube file names
+  bool processCubes = false;
+  SerialNumberList *cubeSnl = NULL;
+  if (ui.WasEntered("CUBELIST") && cnet.GetNumPoints() > 0) {
+    processCubes = true;
+    string ignorelistFilename = ui.GetFilename("CUBELIST");
+    cubeSnl = new SerialNumberList(ignorelistFilename);
+  }
+
+  // List has Cube file names
+  bool processMeasures = false;
+  QMap< QString, QSet<QString> * > *editMeasures = NULL;
+  if (ui.WasEntered("MEASURELIST") && cnet.GetNumPoints() > 0) {
+    processMeasures = true;
+    editMeasures = new QMap< QString, QSet<QString> * >;
+
+    QFile file(ui.GetFilename("MEASURELIST"));
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+      string msg = "Unable to open MEASURELIST [" +
+        file.fileName().toStdString() + "]";
+      throw iException::Message(iException::User, msg, _FILEINFO_);
+    }
+
+    QTextStream in(&file);
+    int lineNumber = 1;
+    while (!in.atEnd()) {
+      QString line = in.readLine();
+      QStringList results = line.split(",");
+      if (results.size() < 2) {
+        string msg = "Line " + iString(lineNumber) + " in the MEASURELIST does "
+          "not contain a Point ID and a cube filename separated by a comma";
+        throw iException::Message(iException::User, msg, _FILEINFO_);
+      }
+
+      if (!editMeasures->contains(results[0]))
+        editMeasures->insert(results[0], new QSet<QString>);
+
+      Filename cubeName(results[1].toStdString());
+      string sn = SerialNumber::Compose(cubeName.Expanded());
+      (*editMeasures)[results[0]]->insert(QString::fromStdString(sn));
+
+      lineNumber++;
+    }
+  }
+
+  if (ui.GetBoolean("UNLOCK")) {
+    if (processPoints) unlockPoints(cnet, *cpList);
+    if (processCubes) unlockCubes(cnet, *cubeSnl);
+    if (processMeasures) unlockMeasures(cnet, *editMeasures);
+  }
 
   /*
    * As a first pass, just try and delete anything that's already ignored
@@ -124,7 +202,6 @@ void IsisMain() {
    * regardless.
    */
   if (deleteIgnored && cnet.GetNumPoints() > 0) {
-
     Progress progress;
     progress.SetText("Deleting Ignored in Input");
     progress.SetMaximumSteps(cnet.GetNumPoints());
@@ -160,49 +237,49 @@ void IsisMain() {
     }
   }
 
-  //List has Points Ids
-  if (ui.WasEntered("POINTLIST") && cnet.GetNumPoints() > 0) {
-    string pointlistFilename = ui.GetFilename("POINTLIST");
-    processControlPoints(pointlistFilename, cnet);
-  }
+  if (ignore) {
+    if (processPoints) ignorePoints(cnet, *cpList);
+    if (processCubes) ignoreCubes(cnet, *cubeSnl);
+    if (processMeasures) ignoreMeasures(cnet, *editMeasures);
 
-  //List has Cube file names
-  if (ui.WasEntered("CUBELIST") && cnet.GetNumPoints() > 0) {
-    string ignorelistFilename = ui.GetFilename("CUBELIST");
-    processControlMeasures(ignorelistFilename, cnet);
-  }
-
-  // Perform validity check
-  if (ui.GetBoolean("CHECKVALID") && cnet.GetNumPoints() > 0) {
-    validator = NULL;
-
-    // First validate DefFile's keywords and value type
-    Pvl defFile(ui.GetFilename("DEFFILE"));
-    Pvl pvlTemplate("$ISIS3DATA/base/templates/cnet_validmeasure/validmeasure.def");
-    Pvl pvlResults;
-    pvlTemplate.ValidatePvl(defFile, pvlResults);
-    if (pvlResults.Groups() > 0 || pvlResults.Keywords() > 0) {
-      Application::Log(pvlResults.Group(0));
-      string sErrMsg = "Invalid Deffile\n";
-      throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_);
-    }
-
-    // Construct the validator from the user-specified definition file
-    validator = new ControlNetValidMeasure(&defFile);
-
-    // User also provided a list of all serial numbers corresponding to every
-    // cube in the control network
-    string cubeList = ui.GetFilename("FROMLIST");
-    checkAllMeasureValidity(cnet, cubeList);
-
-    // Delete the validator
-    if (validator != NULL) {
-      delete validator;
+    // Perform validity check
+    if (ui.GetBoolean("CHECKVALID") && cnet.GetNumPoints() > 0) {
       validator = NULL;
-    }
 
-    // Log the DEFFILE to the print file
-    Application::Log(defFile.FindGroup("ValidMeasure", Pvl::Traverse));
+      // First validate DefFile's keywords and value type
+      Pvl defFile(ui.GetFilename("DEFFILE"));
+      Pvl pvlTemplate("$ISIS3DATA/base/templates/cnet_validmeasure/validmeasure.def");
+      Pvl pvlResults;
+      pvlTemplate.ValidatePvl(defFile, pvlResults);
+      if (pvlResults.Groups() > 0 || pvlResults.Keywords() > 0) {
+        Application::Log(pvlResults.Group(0));
+        string sErrMsg = "Invalid Deffile\n";
+        throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_);
+      }
+
+      // Construct the validator from the user-specified definition file
+      validator = new ControlNetValidMeasure(&defFile);
+
+      // User also provided a list of all serial numbers corresponding to every
+      // cube in the control network
+      string cubeList = ui.GetFilename("FROMLIST");
+      checkAllMeasureValidity(cnet, cubeList);
+
+      // Delete the validator
+      if (validator != NULL) {
+        delete validator;
+        validator = NULL;
+      }
+
+      // Log the DEFFILE to the print file
+      Application::Log(defFile.FindGroup("ValidMeasure", Pvl::Traverse));
+    }
+  }
+
+  if (ui.GetBoolean("LOCK")) {
+    if (processPoints) lockPoints(cnet, *cpList);
+    if (processCubes) lockCubes(cnet, *cubeSnl);
+    if (processMeasures) lockMeasures(cnet, *editMeasures);
   }
 
   // Log statistics
@@ -244,6 +321,19 @@ void IsisMain() {
 
     delete editLockedMeasures;
     editLockedMeasures = NULL;
+  }
+
+  delete cpList;
+  cpList = NULL;
+
+  delete cubeSnl;
+  cubeSnl = NULL;
+
+  if (editMeasures != NULL) {
+    QList<QString> points = editMeasures->keys();
+    for (int i = 0; i < points.size(); i++) delete (*editMeasures)[points[i]];
+    delete editMeasures;
+    editMeasures = NULL;
   }
 
   // Write the network
@@ -380,7 +470,7 @@ void deleteMeasure(ControlPoint *point, int cm) {
  *
  * @param cnet The Control Network being modified
  */
-void populateLog(ControlNet &cnet) {
+void populateLog(ControlNet &cnet, bool ignore) {
   ignoredPoints = new QMap<string, string>;
   ignoredMeasures = new QMap<string, PvlGroup>;
 
@@ -406,8 +496,8 @@ void populateLog(ControlNet &cnet) {
 
       if (measure->IsIgnored()) {
         if (cm == point->IndexOfRefMeasure()) {
-          // If the reference is ignored, the point must ignored too
-          if (!point->IsIgnored()) {
+          // If the reference is ignored, the point must be ignored too
+          if (ignore && !point->IsIgnored()) {
             ignorePoint(cnet, point, "Reference measure ignored");
           }
         }
@@ -416,6 +506,22 @@ void populateLog(ControlNet &cnet) {
       }
     }
 
+    progress.CheckStatus();
+  }
+}
+
+
+void unlockPoints(ControlNet &cnet, ControlPointList &cpList) {
+  Progress progress;
+  progress.SetText("Unlocking Points");
+  progress.SetMaximumSteps(cnet.GetNumPoints());
+  progress.CheckStatus();
+
+  for (int cp = cnet.GetNumPoints() - 1; cp >= 0; cp--) {
+    ControlPoint *point = cnet.GetPoint(cp);
+    if (point->IsEditLocked() && cpList.HasControlPoint(point->GetId())) {
+      point->SetEditLock(false);
+    }
     progress.CheckStatus();
   }
 }
@@ -430,9 +536,7 @@ void populateLog(ControlNet &cnet) {
  * @param fileName Name of the file containing the list of Control Points
  * @param cnet     The Control Network being modified
  */
-void processControlPoints(string fileName, ControlNet &cnet) {
-  ControlPointList cpList((Filename)fileName);
-
+void ignorePoints(ControlNet &cnet, ControlPointList &cpList) {
   Progress progress;
   progress.SetText("Comparing Points to POINTLIST");
   progress.SetMaximumSteps(cnet.GetNumPoints());
@@ -471,6 +575,45 @@ void processControlPoints(string fileName, ControlNet &cnet) {
   }
 }
 
+
+void lockPoints(ControlNet &cnet, ControlPointList &cpList) {
+  Progress progress;
+  progress.SetText("Locking Points");
+  progress.SetMaximumSteps(cnet.GetNumPoints());
+  progress.CheckStatus();
+
+  for (int cp = cnet.GetNumPoints() - 1; cp >= 0; cp--) {
+    ControlPoint *point = cnet.GetPoint(cp);
+    if (!point->IsEditLocked() && cpList.HasControlPoint(point->GetId())) {
+      point->SetEditLock(true);
+    }
+    progress.CheckStatus();
+  }
+}
+
+
+void unlockCubes(ControlNet &cnet, SerialNumberList &snl) {
+  Progress progress;
+  progress.SetText("Unlocking Cubes");
+  progress.SetMaximumSteps(cnet.GetNumPoints());
+  progress.CheckStatus();
+
+  for (int cp = cnet.GetNumPoints() - 1; cp >= 0; cp--) {
+    ControlPoint *point = cnet.GetPoint(cp);
+
+    for (int cm = point->GetNumMeasures() - 1; cm >= 0; cm--) {
+      ControlMeasure *measure = point->GetMeasure(cm);
+
+      string serialNumber = measure->GetCubeSerialNumber();
+      if (measure->IsEditLocked() && snl.HasSerialNumber(serialNumber)) {
+        measure->SetEditLock(false);
+      }
+    }
+    progress.CheckStatus();
+  }
+}
+
+
 /**
  * Iterates over the list of Control Measures in the Control Network and
  * compares measure serial numbers with those in the input list of serial
@@ -482,15 +625,13 @@ void processControlPoints(string fileName, ControlNet &cnet) {
  *                 ignored
  * @param cnet     The Control Network being modified
  */
-void processControlMeasures(string fileName, ControlNet &cnet) {
-  SerialNumberList snl = fileName;
-
+void ignoreCubes(ControlNet &cnet, SerialNumberList &snl) {
   Progress progress;
   progress.SetText("Comparing Measures to CUBELIST");
   progress.SetMaximumSteps(cnet.GetNumPoints());
   progress.CheckStatus();
 
-  for (int cp = cnet.GetNumPoints() - 1; cp >= 0; cp --) {
+  for (int cp = cnet.GetNumPoints() - 1; cp >= 0; cp--) {
     ControlPoint *point = cnet.GetPoint(cp);
 
     // Compare each Serial Number listed with the serial number in the
@@ -530,6 +671,146 @@ void processControlMeasures(string fileName, ControlNet &cnet) {
       deletePoint(cnet, cp);
     }
 
+    progress.CheckStatus();
+  }
+}
+
+
+void lockCubes(ControlNet &cnet, SerialNumberList &snl) {
+  Progress progress;
+  progress.SetText("Locking Cubes");
+  progress.SetMaximumSteps(cnet.GetNumPoints());
+  progress.CheckStatus();
+
+  for (int cp = cnet.GetNumPoints() - 1; cp >= 0; cp--) {
+    ControlPoint *point = cnet.GetPoint(cp);
+
+    for (int cm = point->GetNumMeasures() - 1; cm >= 0; cm--) {
+      ControlMeasure *measure = point->GetMeasure(cm);
+
+      string serialNumber = measure->GetCubeSerialNumber();
+      if (!measure->IsEditLocked() && snl.HasSerialNumber(serialNumber)) {
+        measure->SetEditLock(true);
+      }
+    }
+    progress.CheckStatus();
+  }
+}
+
+
+void unlockMeasures(ControlNet &cnet,
+    QMap< QString, QSet<QString> * > &editMeasures) {
+
+  Progress progress;
+  progress.SetText("Unlocking Measures");
+  progress.SetMaximumSteps(cnet.GetNumPoints());
+  progress.CheckStatus();
+
+  for (int cp = cnet.GetNumPoints() - 1; cp >= 0; cp--) {
+    ControlPoint *point = cnet.GetPoint(cp);
+
+    QString id = QString::fromStdString(point->GetId());
+    if (editMeasures.contains(id)) {
+      QSet<QString> *measureSet = editMeasures[id];
+
+      for (int cm = point->GetNumMeasures() - 1; cm >= 0; cm--) {
+        ControlMeasure *measure = point->GetMeasure(cm);
+
+        QString serialNumber = QString::fromStdString(
+            measure->GetCubeSerialNumber());
+        if (measure->IsEditLocked() && measureSet->contains(serialNumber)) {
+          measure->SetEditLock(false);
+        }
+      }
+    }
+    progress.CheckStatus();
+  }
+}
+
+
+void ignoreMeasures(ControlNet &cnet,
+    QMap< QString, QSet<QString> * > &editMeasures) {
+
+  Progress progress;
+  progress.SetText("Ignoring Measures");
+  progress.SetMaximumSteps(cnet.GetNumPoints());
+  progress.CheckStatus();
+
+  for (int cp = cnet.GetNumPoints() - 1; cp >= 0; cp--) {
+    ControlPoint *point = cnet.GetPoint(cp);
+
+    QString id = QString::fromStdString(point->GetId());
+    if (editMeasures.contains(id)) {
+      QSet<QString> *measureSet = editMeasures[id];
+
+      // Compare each Serial Number listed with the serial number in the
+      // Control Measure for according exclusion
+      for (int cm = point->GetNumMeasures() - 1; cm >= 0; cm--) {
+        ControlMeasure *measure = point->GetMeasure(cm);
+
+        if (!point->IsIgnored() && point->GetMeasure(cm)->IsEditLocked()) {
+          ignoreMeasure(cnet, point, measure, "EditLocked measure skipped");
+        }
+
+        QString serialNumber = QString::fromStdString(
+            measure->GetCubeSerialNumber());
+        if (measureSet->contains(serialNumber)) {
+          string cause = "Measure in MEASURELIST";
+          if (cm == point->IndexOfRefMeasure() && retainRef) {
+            logResult(retainedReferences, point->GetId(), cause);
+          } 
+          else if (!measure->IsIgnored() || cm == point->IndexOfRefMeasure()) {
+            ignoreMeasure(cnet, point, measure, cause);
+
+            if (cm == point->IndexOfRefMeasure() && !point->IsIgnored()) {
+              ignorePoint(cnet, point, "Reference measure ignored");
+            } 
+          }
+        }
+
+        //also look for previously ignored control measures
+        if (deleteIgnored && measure->IsIgnored() &&
+            cm != point->IndexOfRefMeasure()) {
+          deleteMeasure(point, cm);
+        }
+      }
+      // Check if there are too few measures in the point or the point was
+      // previously ignored
+      if (shouldDelete(point)) {
+        deletePoint(cnet, cp);
+      }
+    }
+
+    progress.CheckStatus();
+  }
+}
+
+
+void lockMeasures(ControlNet &cnet,
+    QMap< QString, QSet<QString> * > &editMeasures) {
+
+  Progress progress;
+  progress.SetText("Locking Measures");
+  progress.SetMaximumSteps(cnet.GetNumPoints());
+  progress.CheckStatus();
+
+  for (int cp = cnet.GetNumPoints() - 1; cp >= 0; cp--) {
+    ControlPoint *point = cnet.GetPoint(cp);
+
+    QString id = QString::fromStdString(point->GetId());
+    if (editMeasures.contains(id)) {
+      QSet<QString> *measureSet = editMeasures[id];
+
+      for (int cm = point->GetNumMeasures() - 1; cm >= 0; cm--) {
+        ControlMeasure *measure = point->GetMeasure(cm);
+
+        QString serialNumber = QString::fromStdString(
+            measure->GetCubeSerialNumber());
+        if (!measure->IsEditLocked() && measureSet->contains(serialNumber)) {
+          measure->SetEditLock(true);
+        }
+      }
+    }
     progress.CheckStatus();
   }
 }
@@ -746,3 +1027,4 @@ void EditDefFile(void) {
   
   GuiEditFile::EditFile(ui, sDefFile);
 }
+

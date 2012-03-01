@@ -3,20 +3,46 @@
 <application name="cnetedit" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>
-    Edits Control Networks
+    Edit control networks
   </brief>
 
   <description>
     <p>
-      This application edits Control Networks by setting the "ignored" status
-      of Control Points and Measures based on user-specified criteria, then
-      optionally deleting them.  The user-specified criteria includes ignoring
-      points in a given list, ignoring measures in a given list, and ignoring
-      measures with attributes failing to meet the requirements defined by a
-      definition file.  Additional options include the ability to preserve
-      points with less than a single valid measure, ability to retain the 
-      Reference even if not validated or exists in the Ignore Cube List and the 
-      ability to print detailed logging results to a text file.
+      This application applies a series of edits to a <def>control network</def>
+      based on the <def>control point</def> IDs and <def>control measure</def>
+      cube filenames specified in various edit lists.  All edit operations are
+      optional, and performed in a sequential order that cannot be changed.  If
+      the user wises to perform any edit operations in a different order, it is
+      suggested that they run the application multiple times in a pipeline
+      fashion.
+    </p>
+    <p>
+      The primary, and most typical, function of this application is to
+      selectively delete unwanted points and measures from a network by flagging
+      them as "ignored".  Other operations are generally in place to facilitate
+      this purpose, but can also be used on their own.
+    </p>
+    <p>
+      The available operations are as follows:
+      <ol>
+        <li>Unlock</li>
+        <li>Ignore</li>
+        <li>Delete</li>
+        <li>Lock</li>
+      </ol>
+      Before any points or measures are ignored and deleted, the listed points
+      and measures can be unlocked if edit locked in the input.  Listed points
+      and measures can then be ignored, and subsequently any ignored points and
+      measures can be deleted from the network.  The deletion operation deletes
+      all ignored points and measures, not just those specified in the lists.
+      Finally, any listed points or measures can be locked to prevent further
+      modification.
+    </p>
+    <p>
+      Additional options include the ability to preserve points with less than a
+      single valid measure, ability to retain the <def link="Reference
+        Measure">reference</def> (even if not validated or exists in an ignore
+      list), and the ability to print detailed logging results to a text file.
     </p>
   </description>
 
@@ -98,6 +124,11 @@
       Changed output again this time in order to seperate skipping EditLocked
       points into their own PVL objects.
     </change>
+    <change name="Travis Addair" date="2012-02-24">
+      Changed from ignoring/deletion program to a series of sequential
+      and optional operations (unlock, ignore, delete, lock).  Added MEASURELIST
+      to allow editing specific measures.  Updated documentation.
+    </change>
   </history> 
   
   <category>
@@ -114,8 +145,7 @@
           Input control network
         </brief>
         <description>
-          This file is a control network generated from programs such as 
-          autoseed or qnet.
+          A control network generated from programs such as autoseed or qnet.
         </description>
         <filter>
           *.net
@@ -129,7 +159,7 @@
           Output control network
         </brief>
         <description>
-          The file will contain the updated control network with edits.
+          Updated control network with the applied edits.
         </description>
         <filter>
           *.net
@@ -143,31 +173,35 @@
           None
         </internalDefault>
         <brief>
-          Log the control network
+          Log of all ignored or deleted points and measures
         </brief>
         <description>
-          If this file is entered then the log will be outputted to this file
+          This file provides a PVL record of all points and measures ignored or
+          deleted from the input network.  It also makes note of points and
+          measures that could not be ignored or deleted, and provides rationales
+          for each.
         </description>
         <filter>
-          *.*
+          *.pvl *.txt
         </filter>
       </parameter>
     </group>
 
-    <group name="Ignore Lists" >
+    <group name="Edit Lists" >
        <parameter name="POINTLIST">
         <type>filename</type>
         <fileMode>input</fileMode>
         <internalDefault>None</internalDefault>
         <brief>
-          File contains Point Ids which will be ignored if matched in the 
-          Control Network
+          List of IDs mapping to points to be edited
         </brief>
         <description>
-          Use this parameter to select the filename which contains a list of
-         point ids. All the Control Points with matching Ids will be ignored. If
-         DELETE is also set to true, all the ignored control measures and points
-         will be deleted.
+          The given edit operations will be applied to all the points in the
+          control network mapped by the IDs in this list.  Each entry in this
+          list should be a control point ID on its own line.  Operations such as
+          unlocking, ignoring, and locking will only be applied at the point
+          level (e.g. locking lat/lon but not measurements).  Deleting a point,
+          however, will remove it and all its measures from the network.
         </description>
         <filter>
           *.lis
@@ -179,18 +213,101 @@
         <fileMode>input</fileMode>
         <internalDefault>None</internalDefault>
         <brief>
-          File contains Cube file names from which Serial #'s are generated and
-          matching Control Measures will be ignored in the Control Network. 
+          List of cube filenames to be edited
         </brief>
         <description>
-          Use this parameter to select the filename which contains a list of
-          cubes. All of the Control Measures matching the serial # of the cube
-          will be ignored.  If DELETE is also set to true, the ignored control
-          measures and points  will be deleted.
+          The given edit operations will be applied to all the measurements
+          taken on a cube in this list.  This information is derived from the
+          measurement's cube serial number, mapping to a filename in this list.
         </description>
         <filter>
           *.lis
         </filter>
+      </parameter>
+
+      <parameter name="MEASURELIST">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <internalDefault>None</internalDefault>
+        <brief>
+          List of paired Point IDs and cube filenames 
+        </brief>
+        <description>
+          A file containing a list of paired Point IDs and cube filenames,
+          uniquely identifying specific measures to be edited.  Each pairing
+          must be on its own line and have the Point ID and filename separated
+          by a comma (',').
+        </description>
+        <filter>
+          *.lis *.csv
+        </filter>
+      </parameter>
+    </group>
+      
+    <group name="Edit Operations">
+      <parameter name="UNLOCK">
+        <type>boolean</type>
+        <default><item>False</item></default>
+        <brief>
+          Unlock listed points and measures
+        </brief>
+        <description>
+          Any listed point or measure will have its edit lock removed if it has
+          one in the input network.  If not, nothing will happen to the point or
+          measure and processing will continue.  Unlocking a point does not
+          automatically unlock its measurements, except for the reference.
+        </description>
+      </parameter>
+      <parameter name="IGNORE">
+        <type>boolean</type>
+        <default><item>True</item></default>
+        <brief>
+          Ignore listed points and measures
+        </brief>
+        <description>
+          Any listed point or measure will be ignored.  Ignoring a point does
+          not automatically ignore its measurements, except for the reference.
+          Ignoring can sometimes fail, for example, if the point or measure is
+          edit locked, and the UNLOCK operation is not enabled.
+        </description>
+        <inclusions>
+          <item>CHECKVALID</item>
+        </inclusions>
+      </parameter>
+      <parameter name="DELETE">
+        <type>boolean</type>
+        <default><item>TRUE</item></default>
+        <brief>
+          Delete ignored points and measures
+        </brief>
+        <description>
+          Any ignored point or measure will be deleted, regardless of whether
+          or not it is present in an edit list.  Deleting a point will delete
+          all its measurements in the process.  If any control point has less
+          than two remaining measures after all measurement deletions have been
+          performed, then that point will be deleted as well.  This can be
+          prevented by enabling the PRESERVE option.  Furthermore, the
+          RETAIN_REFERENCE option can be enabled to prevent reference measures
+          from being deleted under any circumstance.
+        </description>
+        <inclusions>
+          <item>PRESERVE</item>
+          <item>RETAIN_REFERENCE</item>
+        </inclusions>
+      </parameter>
+      <parameter name="LOCK">
+        <type>boolean</type>
+        <default><item>False</item></default>
+        <brief>
+          Lock listed points and measures
+        </brief>
+        <description>
+          Any listed point or measure will have its edit lock set if it does not
+          already have one in the input network.  Otherwise, nothing will happen
+          to the point or measure and processing will continue.  Locking a point
+          does not automatically lock its measurements, except for the
+          reference.
+        </description>
       </parameter>
     </group>
 
@@ -202,13 +319,13 @@
           Ignore all control measures outside user-specified tolerances
         </brief>
         <description>
-          If set to true, the application will check the validity of each
-          control measure against the tolerances set in the relevant
-          definition file (DEFFILE).  Because validity checking requires camera
-          information not contained within the control measure itself, a list of
-          all cubes in the network is necessary (FROMLIST), and could result in
-          a noticeably more time-intensive run of the program.  For the
-          aforementioned reasons, this option is disabled by default.
+          If enabled, the application will check the validity of each control
+          measure against the tolerances set in the relevant definition file
+          (DEFFILE).  Because validity checking requires camera information not
+          contained within the control measure itself, a list of all cubes in
+          the network is necessary (FROMLIST), and could result in a noticeably
+          more time-intensive run of the program.  For the aforementioned
+          reasons, this option is disabled by default.
         </description>
         <inclusions>
           <item>FROMLIST</item>
@@ -269,37 +386,30 @@
       </parameter>
     </group>
       
-    <group name="Output Options">
-      <parameter name="DELETE">
-        <type>boolean</type>
-        <default><item>TRUE</item></default>
-        <brief>
-          Delete Ignored Points and Measures
-        </brief>
-        <description>
-          This option deletes all ignored Control Measures and Control Points.
-          If any Control Point results in less than 2 Control Measures, that
-          Control Point will be deleted as well.
-        </description>
-      </parameter>
+    <group name="Deletion Options">
       <parameter name="PRESERVE">
         <type>boolean</type>
         <default><item>FALSE</item></default>
         <brief>
-          Preserve Points with Measures equal to One
+          Preserve points with only one remaining measure
         </brief>
         <description>
-          This option preserves Control Points with Control Measures equal to 
-          one.
+          This option will prevent the DELETE operation from removing control
+          points that only have one control measure remaining at the end of the
+          deletion process.
         </description>
       </parameter>
       <parameter name="RETAIN_REFERENCE">
         <type>boolean</type>
         <default><item>False</item></default>
-        <brief>Retain Reference even if not Validated or not in CUBELIST</brief> 
+        <brief>
+          Never delete a reference measure unless the entire point is removed
+        </brief> 
         <description>
-          <p>When true, retain the Reference even if not validated by the 
-            DefFile and/or if it is in the Ignore List CUBELIST. </p> 
+          When enabled, the DELETE operation will retain reference measures
+          under all circumstances.  Consequently, if a reference measure is
+          ignored, in an edit list, or invalidated, it will still show up in the
+          output network.
         </description>
       </parameter>
     </group>
