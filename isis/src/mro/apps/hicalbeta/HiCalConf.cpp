@@ -98,10 +98,8 @@ bool HiCalConf::_naifLoaded = false;
    * @return string Expanded filename but not the filepath
    */
   string HiCalConf::filepath(const std::string &fname) const {
-    string::size_type start = fname.find_first_of("?");
-    if (start != string::npos) {
-      Filename efile(fname);
-
+    Filename efile(fname);
+    if (efile.IsVersioned()) {
       string path(efile.OriginalPath());
       if (!path.empty()) path += "/";
 

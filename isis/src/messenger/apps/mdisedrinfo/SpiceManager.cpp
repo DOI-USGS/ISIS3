@@ -140,10 +140,9 @@ namespace Isis {
 
     string kfile(kernfile);
 
-    //  Check for versionized file naming
-    string::size_type start = kfile.find_first_of("?");
-    if(start != string::npos) {
-      Filename efile(kfile);
+    //  Check for versioned file naming
+    Filename efile(kfile);
+    if (efile.IsVersioned()) {
       efile.HighestVersion();
       kfile = efile.Expanded();
     }

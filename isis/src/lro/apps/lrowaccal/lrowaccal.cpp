@@ -162,7 +162,7 @@ void IsisMain () {
       radFile = "$lro/calibration/WAC_RadiometricResponsivity.????.pvl";
 
     Filename radFilename(radFile);
-    if ((radFilename.Expanded()).find("?") != string::npos)
+    if (radFilename.IsVersioned())
       radFilename.HighestVersion();
     if (!radFilename.Exists()) {
       string msg = radFile + " does not exist.";
@@ -378,7 +378,7 @@ void Calibrate ( Buffer &inCube, Buffer &outCube ) {
 void CopyCubeIntoBuffer ( string &fileString, Buffer* &data) {
   Cube cube;
   Filename filename(fileString);
-  if ((filename.Expanded()).find("?") != string::npos)
+  if (filename.IsVersioned())
     filename.HighestVersion();
   if (!filename.Exists()) {
     string msg = fileString + " does not exist.";

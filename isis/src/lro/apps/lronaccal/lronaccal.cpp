@@ -110,7 +110,7 @@ void IsisMain() {
       maskedFile = "$lro/calibration/" + instId + "_MaskedPixels.????.pvl";
 
     Filename maskedFilename(maskedFile);
-    if((maskedFilename.Expanded()).find("?") != string::npos)
+    if(maskedFilename.IsVersioned())
       maskedFilename.HighestVersion();
     if(!maskedFilename.Exists()) {
       string msg = maskedFile + " does not exist.";
@@ -186,7 +186,7 @@ void IsisMain() {
       radFile = "$lro/calibration/NAC_RadiometricResponsivity.????.pvl";
 
     Filename radFilename(radFile);
-    if((radFilename.Expanded()).find("?") != string::npos)
+    if(radFilename.IsVersioned())
       radFilename.HighestVersion();
     if(!radFilename.Exists()) {
       string msg = radFile + " does not exist.";
@@ -328,7 +328,7 @@ void Calibrate(Buffer &in, Buffer &out) {
 void CopyCubeIntoArray(string &fileString, vector<double> &data) {
   Cube cube;
   Filename filename(fileString);
-  if((filename.Expanded()).find("?") != string::npos)
+  if(filename.IsVersioned())
     filename.HighestVersion();
   if(!filename.Exists()) {
     string msg = fileString + " does not exist.";
@@ -348,7 +348,7 @@ void CopyCubeIntoArray(string &fileString, vector<double> &data) {
 
 void ReadTextDataFile(string &fileString, vector<double> &data) {
   Filename filename(fileString);
-  if((filename.Expanded()).find("?") != string::npos)
+  if(filename.IsVersioned())
     filename.HighestVersion();
   if(!filename.Exists()) {
     string msg = fileString + " does not exist.";
@@ -366,7 +366,7 @@ void ReadTextDataFile(string &fileString, vector<double> &data) {
 
 void ReadTextDataFile(string &fileString, vector<vector<double> > &data) {
   Filename filename(fileString);
-  if((filename.Expanded()).find("?") != string::npos)
+  if(filename.IsVersioned())
     filename.HighestVersion();
   if(!filename.Exists()) {
     string msg = fileString + " does not exist.";

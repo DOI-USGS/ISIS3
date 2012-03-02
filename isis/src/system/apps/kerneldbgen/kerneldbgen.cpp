@@ -20,7 +20,7 @@ void IsisMain() {
     if(sclkString.length() != 0) {
       sclkString.Trim("\\");
       sclkFile = Filename(sclkString);
-      if(sclkFile.Expanded().find_first_of("?") != string::npos) {
+      if (sclkFile.IsVersioned()) {
         sclkFile.HighestVersion();
         sclkString = sclkFile.OriginalPath() + "/" + sclkFile.Name();
       }
@@ -32,7 +32,7 @@ void IsisMain() {
   iString lskString = ui.GetAsString("LSK");
   lskString.Trim("\\");
   Filename lskFile(lskString);
-  if(lskFile.Expanded().find_first_of("?") != string::npos) {
+  if (lskFile.IsVersioned()) {
     lskFile.HighestVersion();
     lskString = lskFile.OriginalPath() + "/" + lskFile.Name();
   }
@@ -131,7 +131,7 @@ void IsisMain() {
     to = ui.GetFilename("TO");
   }
   //create a new output version if the user specified any version sequence
-  if(to.Expanded().find_first_of("?") != string::npos) {
+  if (to.IsVersioned()) {
     to.NewVersion();
   }
 
