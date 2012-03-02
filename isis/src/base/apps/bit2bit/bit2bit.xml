@@ -6,24 +6,24 @@
   </brief>
   <description>
     <p>
-      bit2bit allows the user to change the bit-type of a cube to 8, 16,
-      or 32-bit.
+      bit2bit allows the user to change the bit-type of a cube to 8, 16, or
+      32-bit.
     </p>
     <p>
-      Since the pixel type will typically be modified with this procedure,
-      if a non-32 bit output is selected some binning will be done to accomodate 
-      the output data's new bit type. To minimize over or underbinning, the user 
-      can choose values MINPER and MAXPER or MIN and MAX to clip the original 
-      data set. MINPER and MAXPER denote minimum and maximum percentages on the 
-      cumulative histogram of the incoming cube data that you wish to be 
-      represented in the output cube. MIN and MAX represent the minimum and maximum 
-      pixel values you wish to have represented in the output cube. All pixels under 
-      MIN or MINPER get set to LRS in the output cube while all pixels over MAX or 
-      MAXPER get mapped to HRS.
+      Since the pixel type will typically be modified with this procedure, if a
+      non-32 bit output is selected some binning will be done to accomodate the
+      output data's new bit type. To minimize over or underbinning, the user can
+      choose values MINPER and MAXPER or MIN and MAX to clip the original data
+      set. MINPER and MAXPER denote minimum and maximum percentages on the
+      cumulative histogram of the incoming cube data that you wish to be
+      represented in the output cube. MIN and MAX represent the minimum and
+      maximum pixel values you wish to have represented in the output cube. All
+      pixels under MIN or MINPER get set to LRS in the output cube while all
+      pixels over MAX or MAXPER get mapped to HRS.
     </p>
     <p>
-      Why would one wish to clip data off a perfectly good cube? The example below
-      illustrates why:
+      Why would one wish to clip data off a perfectly good cube? The example
+      below illustrates why:
     </p>
     <br/>
     <p>Below is an incoming image shown in a histogram:</p>
@@ -31,23 +31,28 @@
     <image src="assets/image/b2bhist1.png"></image>
     <br/>
     <p>
-      If we were to convert this image to 8-bit directly, 50 % of the bins would be occupied by only 2.5% of the data
-      (DN's in the range 12500-15000) as shown below:
+      If we were to convert this image to 8-bit directly, 50 % of the bins would
+      be occupied by only 2.5% of the data (DN's in the range 12500-15000) as
+      shown below:
     </p>
     <br/><br/>
     <image src="assets/image/b2bhist2.png"></image>
     <br/>
     <p>
-      To minimize over or under binning in the output image, the user can chose to only accept data within 
-      the range bounded by MINPER and MAXPER on the cumulative histogram. In the example above, if the user 
-      set MINPER=0 and MAXPER=97.5, the 8-bit range (including base and multiplier) would include DN's in the range
-      10,000 to 12,500. A DN above 12500 would be set as the special pixel HRS.
+      To minimize over or under binning in the output image, the user can chose
+      to only accept data within the range bounded by MINPER and MAXPER on the
+      cumulative histogram. In the example above, if the user set MINPER=0 and
+      MAXPER=97.5, the 8-bit range (including base and multiplier) would include
+      DN's in the range 10,000 to 12,500. A DN above 12500 would be set as the
+      special pixel HRS.
     </p>
     <p>
-      Any data that gets scaled out of range gets converted to the special pixels LRS (if the DN is <i>below</i> the
-      value corresponding to the <i>minimum</i> percentile specified by MINPER) or HRS (if the DN is <i>above</i> the
-      value corresponding to the <i>maximum</i> percentile specified by MAXPER).
-     </p>
+      Any data that gets scaled out of range gets converted to the special
+      pixels LRS (if the DN is <i>below</i> the value corresponding to the
+      <i>minimum</i> percentile specified by MINPER) or HRS (if the DN is
+      <i>above</i> the value corresponding to the <i>maximum</i> percentile
+      specified by MAXPER).
+    </p>
   </description>
 
   <category>
@@ -93,7 +98,7 @@
         </description>
       </parameter>
     </group>
-      
+
     <group name="Output Bit Type">
       <parameter name="BITTYPE">
         <type>string</type>
@@ -102,38 +107,39 @@
           Determines the bit type of the ouput pixel
         </brief>
         <description>
-          Determines the bit type of the ouput pixel: Options are 8BIT, 16BIT, and 32BIT (default).
+          Determines the bit type of the ouput pixel: Options are 8BIT, 16BIT,
+          and 32BIT (default).
         </description>
-      <list>
-        <option value="8BIT">
-	  <brief>8 bit output pixels</brief>
-	  <description>
-	    The input pixels will be converted to unsigned 
-	    8-bit values in the output cube.
-	  </description>
-	</option>  
-	<option value="16BIT">
-	  <brief>16 bit output pixels</brief>
-	  <description>
-	    The input pixels will be converted to signed 
-	    16-bit values in the output cube.
-	  </description>
-	</option>  
-	<option value="32BIT">
-	  <brief>32 bit output pixels</brief>
-	  <description>
-	    The input pixels will be converted to 32 bit
-	    floats in the output cube.
-	  </description>
-	  <exclusions>
-      <item>MINPER</item>
-	    <item>MAXPER</item>
-	  </exclusions>
-	</option>  
-	</list>
+        <list>
+          <option value="8BIT">
+            <brief>8 bit output pixels</brief>
+            <description>
+              The input pixels will be converted to unsigned 8-bit values in the
+              output cube.
+            </description>
+          </option>  
+          <option value="16BIT">
+            <brief>16 bit output pixels</brief>
+            <description>
+              The input pixels will be converted to signed 16-bit values in the
+              output cube.
+            </description>
+          </option>  
+          <option value="32BIT">
+            <brief>32 bit output pixels</brief>
+            <description>
+              The input pixels will be converted to 32 bit floats in the output
+              cube.
+            </description>
+            <exclusions>
+              <item>MINPER</item>
+              <item>MAXPER</item>
+            </exclusions>
+          </option>  
+        </list>
       </parameter>
     </group>
-    
+
     <group name="Clipping Method">
       <parameter name="CLIP">
         <type>string</type>
@@ -142,61 +148,66 @@
           Clip by Percentage or Min/Max
         </brief>
         <description>
-          Optionally clip the ends of cube data by percentage on cumulative histogram
-	  or by Min/Max pixel values
+          Optionally clip the ends of cube data by percentage on cumulative
+          histogram or by Min/Max pixel values
         </description>
-      <list>
-        <option value="PERCENT">
-	  <brief>Clip by percentage</brief>
-	  <description>
-	    Clip by percentage on cumulative histogram of pixel values (default)
-	  </description>
-	  <exclusions>
-	    <item>MINVAL</item>
-	    <item>MAXVAL</item>
-	  </exclusions>
-	</option>  
-	<option value="MINMAX">
-	  <brief>Clip by Min/Max</brief>
-	  <description>
-	    Clip by Min/Max pixel values
-	  </description>
-	  <exclusions>
-	    <item>MINPER</item>
-	    <item>MAXPER</item>
-	  </exclusions>
-	</option>
-	</list>
+        <list>
+          <option value="PERCENT">
+            <brief>Clip by percentage</brief>
+            <description>
+              Clip by percentage on cumulative histogram of pixel values
+              (default)
+            </description>
+            <exclusions>
+              <item>MINVAL</item>
+              <item>MAXVAL</item>
+            </exclusions>
+          </option>  
+          <option value="MINMAX">
+            <brief>Clip by Min/Max</brief>
+            <description>
+              Clip by Min/Max pixel values
+            </description>
+            <exclusions>
+              <item>MINPER</item>
+              <item>MAXPER</item>
+            </exclusions>
+          </option>
+        </list>
       </parameter>
     </group>
-      
+
     <group name="Extrema">
       <parameter name="MINPER">
         <type>double</type>
-	<minimum inclusive="yes">0.0</minimum>
+        <minimum inclusive="yes">0.0</minimum>
         <default><item>0.5</item></default>
         <brief>
           User-defined minimum percent
         </brief>
         <description>
-          Choose the minimum percentile to represent from the cumulative data histogram of the pixel values from the incoming cube.
-	  For example: The default MINPER value of .5 will discard the lowest .5% of the data values from the incoming cube.
+          Choose the minimum percentile to represent from the cumulative data
+          histogram of the pixel values from the incoming cube.  For example:
+          The default MINPER value of .5 will discard the lowest .5% of the data
+          values from the incoming cube.
         </description>
       </parameter>
-      
+
       <parameter name="MAXPER">
         <type>double</type>
-	<maximum inclusive="yes">100.0</maximum>
+        <maximum inclusive="yes">100.0</maximum>
         <default><item>99.5</item></default>
         <brief>
           User-defined maximum percent
         </brief>
         <description>
-          Choose the maximum percentile to represent from the cumulative data histogram of the pixel values from the incoming cube.
-	  For example: The default MAXPER value of 99.5 will discard the upper .5% of the data values from the incoming cube.
+          Choose the maximum percentile to represent from the cumulative data
+          histogram of the pixel values from the incoming cube.  For example:
+          The default MAXPER value of 99.5 will discard the upper .5% of the
+          data values from the incoming cube.
         </description>
       </parameter> 
-      
+
       <parameter name="MINVAL">
         <type>double</type>
         <default><item>0.0</item></default>
@@ -204,10 +215,11 @@
           User-defined minimum value
         </brief>
         <description>
-          Choose the minimum pixel value to be represented by a valid pixel in the output cube
+          Choose the minimum pixel value to be represented by a valid pixel in
+          the output cube
         </description>
       </parameter>
-      
+
       <parameter name="MAXVAL">
         <type>double</type>
         <default><item>255.0</item></default>
@@ -215,23 +227,24 @@
           User-defined maximum value
         </brief>
         <description>
-          Choose the maximum pixel value to be represented by a valid pixel in the output cube
+          Choose the maximum pixel value to be represented by a valid pixel in
+          the output cube
         </description>
       </parameter>
     </group>
-    
+
     <group name="Stats">
       <parameter name="STATS">
-        <type>integer</type>
-	<default><item>1</item></default>
-	<brief>Include output cube statistics in summary reporting</brief>
-	<description>Include output cube statistics in summary reporting:
-	 0 to include, and 1 to exclude. If excluded, bit2bit runs 
-	 significantly faster.
-	 </description>
+        <type>boolean</type>
+        <default><item>True</item></default>
+        <brief>Include output cube statistics in summary reporting</brief>
+        <description>
+          If enabled, will include output cube statistics in summary reporting.
+          If disabled, bit2bit runs significantly faster.
+        </description>
       </parameter>
     </group>
-    
+
   </groups>
-  
+
 </application>
