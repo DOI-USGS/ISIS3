@@ -52,15 +52,16 @@
       image; <i>i</i> is the unique index of the current pixel being adjusted.
     </p>
     <p>
-      The output of this application is a list of images, formatted for easy
-      ingestion into additional Isis tools mosaicking (see "automos" and
-      "mapmos") overlaps between images will share the same pixel values.
-    </p>
-    <p>
       This program is conceptually similar to the Isis program "noseam", in that
       it takes a list of images and attempts to smooth out the boundaries
       between them.  Unlike "noseam", however, "blend" does not perform the
       mosaicking as part of the blending routine.
+    </p>
+    <p>
+      The output of this application is a list of images, formatted for easy
+      ingestion into additional Isis mosaicking tools (see "automos" and
+      "mapmos"), where any overlaps between images will share the same pixel
+      values.
     </p>
   </description>
 
