@@ -458,14 +458,14 @@ std::vector<std::string> KernelDb::GetFile(PvlGroup &grp) {
       string pref = kfile[0];
       string version = kfile[1];
       Isis::Filename filename("$" + pref + "/" + version);
-      if(filename.Expanded().find('?') != string::npos)
+      if (filename.IsVersioned())
         filename.HighestVersion();
       files.push_back(filename.OriginalPath() + "/" + filename.Name());
     }
     // One value in "File" indicates a full file spec
     else if(kfile.Size() == 1) {
       Isis::Filename filename(kfile[0]);
-      if(filename.Expanded().find('?') != string::npos)
+      if (filename.IsVersioned())
         filename.HighestVersion();
       files.push_back(filename.OriginalPath() + "/" + filename.Name());
     }
