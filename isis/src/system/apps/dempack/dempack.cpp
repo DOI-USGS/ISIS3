@@ -59,12 +59,9 @@ void IsisMain() {
       string area = "$" + file[0];
       string pattern = file[1];
 
-      // Some DEMs are hardcoded, but others are versioned.  If we see any "?"
-      // symbols in the filename, treat them as version placeholders to get the
-      // latest DEM.
+      // Some DEMs are hardcoded, but others are versioned.
       Filename demFilename(area + "/" + pattern);
-      if (demFilename.Expanded().find('?') != string::npos)
-        demFilename.HighestVersion();
+      if (demFilename.IsVersioned()) demFilename.HighestVersion();
 
       // Find the corresponding Isis Preference if one exists
       if (Preference::Preferences().HasGroup("DataDirectory")) {
