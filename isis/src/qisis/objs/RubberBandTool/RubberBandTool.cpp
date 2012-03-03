@@ -1,5 +1,6 @@
 #include "RubberBandTool.h"
 
+#include <cmath>
 #include <float.h>
 
 #include <QList>

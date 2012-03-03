@@ -45,7 +45,7 @@ namespace Isis {
     p_graph->setHistogram(*p_cubeHist);
     p_graph->setSizePolicy(QSizePolicy(QSizePolicy::Minimum,
                                        QSizePolicy::Minimum));
-    p_graph->setMinimumSize(QSize(250, 200));
+    p_graph->setMinimumSize(QSize(100, 50));
 
     p_mainLayout = new QGridLayout();
     p_mainLayout->addWidget(p_graph, 0, 0);
@@ -110,6 +110,7 @@ namespace Isis {
     table->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
     table->setEditTriggers(QAbstractItemView::NoEditTriggers);
     table->setSelectionMode(QAbstractItemView::NoSelection);
+    table->setMinimumSize(QSize(50, 20));
 
     return table;
   }
@@ -140,7 +141,6 @@ namespace Isis {
 
       p_table->setItem(i, 0, inputItem);
       p_table->setItem(i, 1, outputItem);
-      p_table->setMinimumSize(QSize(200, 100));
     }
   }
 

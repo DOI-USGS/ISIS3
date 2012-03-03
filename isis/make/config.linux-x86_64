@@ -61,36 +61,37 @@ ISIS3LOCAL  ?= /usgs/pkgs/local/$(ISISLOCALVERSION)
 #---------------------------------------------------------------------------
 # Set up for cwd
 #---------------------------------------------------------------------------
-CWDINCDIR =
-CWDLIBDIR =
-CWDLIB    =
+#CWDINCDIR =
+#CWDLIBDIR =
+#CWDLIB    =
 
-ifeq ($(findstring DEBUG, $(MODE)),DEBUG)
-  ifeq ($(findstring CWD, $(MODE)),CWD)
-    CWDINCDIR = -I$(ISIS3LOCAL)/include/libcwd/libcwd-1.0.4
-    CWDLIBDIR = -L$(ISIS3LOCAL)/lib
-    CWDLIB    = -lcwd_r
-  endif
-endif
+#ifeq ($(findstring DEBUG, $(MODE)),DEBUG)
+#  ifeq ($(findstring CWD, $(MODE)),CWD)
+#    CWDINCDIR = -I$(ISIS3LOCAL)/include/libcwd/libcwd-1.0.4
+#    CWDLIBDIR = -L$(ISIS3LOCAL)/lib
+#    CWDLIB    = -lcwd_r
+#  endif
+#endif
 
 #---------------------------------------------------------------------------
 # Set up for Qt
 #---------------------------------------------------------------------------
-QTINCDIR = -I$(ISIS3LOCAL)/include/qt/qt4.6.2
-QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.6.2/Qt
-QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.6.2/QtCore
-QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.6.2/QtAssistant
-QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.6.2/QtGui
-QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.6.2/QtNetwork
-QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.6.2/QtScript
-QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.6.2/QtScriptTools
-QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.6.2/QtSql
-QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.6.2/QtSvg
-QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.6.2/QtWebKit
-QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.6.2/QtXml
-QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.6.2/QtXmlPatterns
+QTINCDIR = -I$(ISIS3LOCAL)/include/qt/qt4.8.0
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.8.0/Qt
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.8.0/QtCore
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.8.0/QtAssistant
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.8.0/QtGui
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.8.0/QtNetwork
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.8.0/QtScript
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.8.0/QtScriptTools
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.8.0/QtSql
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.8.0/QtSvg
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.8.0/QtTest
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.8.0/QtWebKit
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.8.0/QtXml
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.8.0/QtXmlPatterns
 QTLIBDIR = -L$(ISIS3LOCAL)/lib
-QTLIB    = -lQtXmlPatterns -lQtXml -lQtNetwork -lQtSql -lQtGui -lQtCore -lQtSvg
+QTLIB    = -lQtXmlPatterns -lQtXml -lQtNetwork -lQtSql -lQtGui -lQtCore -lQtSvg -lQtTest
 
 UIC      = $(ISIS3LOCAL)/bin/uic
 MOC      = $(ISIS3LOCAL)/bin/moc
@@ -100,7 +101,7 @@ PATCHELF = $(ISIS3LOCAL)/bin/patchelf
 #---------------------------------------------------------------------------
 # Set up for Qwt
 #---------------------------------------------------------------------------
-QWTINCDIR = -I$(ISIS3LOCAL)/include/qwt/qwt5.2.0
+QWTINCDIR = -I$(ISIS3LOCAL)/include/qwt/qwt6.0.1
 QWTLIBDIR = -L$(ISIS3LOCAL)/lib
 QWTLIB    = -lqwt 
 
@@ -114,7 +115,7 @@ XERCESLIB    = -lxerces-c
 #---------------------------------------------------------------------------
 # Set up for naif
 #---------------------------------------------------------------------------
-NAIFINCDIR = -I$(ISIS3LOCAL)/include/naif/cspice63
+NAIFINCDIR = -I$(ISIS3LOCAL)/include/naif/cspice64
 NAIFLIBDIR = -L$(ISIS3LOCAL)/lib
 NAIFLIB    = -lcspice
 
@@ -135,9 +136,9 @@ JAMALIB    =
 #---------------------------------------------------------------------------
 # Set up for GEOS
 #---------------------------------------------------------------------------
-GEOSINCDIR = -I$(ISIS3LOCAL)/include/geos/geos3.2.0
+GEOSINCDIR = -I$(ISIS3LOCAL)/include/geos/geos3.3.2
 GEOSLIBDIR = -L$(ISIS3LOCAL)/lib
-GEOSLIB    = -lgeos-3.2.0
+GEOSLIB    = -lgeos-3.3.2
 
 #---------------------------------------------------------------------------
 # Set up for the GNU Scientific Library (GSL).  Note that this setup
@@ -162,21 +163,21 @@ X11LIB    = -lX11
 #---------------------------------------------------------------------------
 # Set up for GMM
 #---------------------------------------------------------------------------
-GMMINCDIR = -I$(ISIS3LOCAL)/include/gmm/gmm3.0.0
+GMMINCDIR = -I$(ISIS3LOCAL)/include/gmm/gmm-4.1 -I$(ISIS3LOCAL)/include/gmm/gmm-4.1/gmm
 GMMLIBDIR =
 GMMLIB    = 
 
 #---------------------------------------------------------------------------
 # Set up for SuperLU
 #---------------------------------------------------------------------------
-SUPERLUINCDIR = -I$(ISIS3LOCAL)/include/superlu/superlu3.0
+SUPERLUINCDIR = -I$(ISIS3LOCAL)/include/superlu/superlu4.3
 SUPERLULIBDIR = -L$(ISIS3LOCAL)/lib
-SUPERLULIB    = -lsuperlu_3.0 -lblas -lgfortran
+SUPERLULIB    = -lsuperlu_4.3 -lblas -lgfortran
 
 #---------------------------------------------------------------------------
 # Set up for Google Protocol Buffers (ProtoBuf)
 #---------------------------------------------------------------------------
-PROTOBUFINCDIR = -I$(ISIS3LOCAL)/include/google-protobuf/protobuf2.3.0
+PROTOBUFINCDIR = -I$(ISIS3LOCAL)/include/google-protobuf/protobuf2.4.1
 PROTOBUFLIBDIR = -L$(ISIS3LOCAL)/lib
 PROTOBUFLIB    = -lprotobuf
 PROTOC         = $(ISIS3LOCAL)/bin/protoc
@@ -199,7 +200,7 @@ ISISCPPFLAGS += -DENABLEJP2K=1
 #---------------------------------------------------------------------------
 # Set up for BOOST
 #---------------------------------------------------------------------------
-BOOSTINCDIR = -I$(ISIS3LOCAL)/include/boost/boost1.41.0
+BOOSTINCDIR = -I$(ISIS3LOCAL)/include/boost/boost1.48.0
 BOOSTLIBDIR = 
 BOOSTLIB    = 
 #BOOSTLIBDIR = -L$(ISIS3LOCAL)/lib
@@ -228,13 +229,19 @@ THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtSql.so*[^g]"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtGui.so*[^g]"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtCore.so*[^g]"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtSvg.so*[^g]"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtTest.so*[^g]"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtDBus.so*[^g]"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libqwt.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libprotobuf.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libgeos-*.so"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libgeos_c.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libcspice.so*"
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libsuperlu_3.0.a"
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libcwd_r.so*"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libsuperlu_4.3.a"
+#THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libcwd_r.so*"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libcolamd.so"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libamd.so"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libcholmod.so"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/liblapack.so"
 THIRDPARTYLIBS    += "$(ISIS3SYSLIB)/libblas.so.*"
 THIRDPARTYLIBS    += "$(ISIS3SYSLIB)/libgfortran.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libxerces-c*.so*"

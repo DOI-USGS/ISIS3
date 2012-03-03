@@ -1,0 +1,273 @@
+# $Id: config.darwin,v 1.47 2010/04/07 00:07:52 kbecker Exp $
+#--------------------------------------------------------------------------
+# Compiler options
+#---------------------------------------------------------------------------
+#  Set all builds to 32-bit architecture until support for others is added
+include $(ISISROOT)/make/isis.conf
+
+#MAC_ARCH_FLAGS  = $(MAC_ARCH) $(MAC_XARCH) $(MAC_OS_MIN)
+
+#  Basically is GNU g++/gcc
+CXX           = c++
+CC            = cc
+
+ISISCPPFLAGS  = -Wall
+ISISCPPFLAGS += -ansi
+ISISCPPFLAGS += $(MAC_ARCH_FLAGS)
+ifeq ($(HOST_PROC), powerpc)
+  # Powerpc support
+  ISISCPPFLAGS += -DISIS_LITTLE_ENDIAN=0
+else
+  # Assumes Intel Mac
+  ISISCPPFLAGS += -DISIS_LITTLE_ENDIAN=1
+endif
+ISISCPPFLAGS += -D_LARGEFILE64_SOURCE -D_LARGEFILE_SOURCE
+ISISCPPFLAGS += -fPIC
+ISISCPPFLAGS += -DGMM_USES_SUPERLU
+
+ifeq ($(findstring DEBUG, $(MODE)),DEBUG)
+  ISISCPPFLAGS  += -g 
+  ISISCPPFLAGS  += -O0
+else
+  ISISCPPFLAGS  += -O1
+  QTDARWINFLAGS += $(QTDEFINES)
+endif
+
+ISISCFLAGS = 
+
+#---------------------------------------------------------------------------
+# Linker options.  Runtime paths for Mac is rooted to $ISISROOT
+#---------------------------------------------------------------------------
+ISISLDFLAGS = -headerpad_max_install_names $(MAC_ARCH_FLAGS) -bind_at_load -Wl,-w
+ISISLDRPATH = -Wl,-rpath,@loader_path/..  -Wl,-rpath,$(ISISROOT)
+ISISSYSLIBS = -lz -lm -framework ApplicationServices
+ISISSTATIC  = 
+ISISDYNAMIC = 
+
+#---------------------------------------------------------------------------
+# Shared library options
+#---------------------------------------------------------------------------
+RANLIB          = /usr/bin/ranlib
+SHAREDLIBEXT    = dylib
+DYLIBVERSION    = -compatibility_version $(ISISMAJOR).$(ISISMINOR) \
+                  -current_version $(ISISLIBVERSION)
+DYLIBFLAGS      = $(MAC_ARCH_FLAGS)  -dynamiclib -flat_namespace \
+	   	   -single_module -undefined suppress
+ISISSHAREDFLAGS = $(MAC_ARCH_FLAGS) -bundle -flat_namespace -dynamic \
+		  -undefined suppress 
+ISISSHAREDON    = 
+ISISSHAREDOFF   =
+ISISARFLAGS     =
+
+#---------------------------------------------------------------------------
+#  3rd party directory root
+#---------------------------------------------------------------------------
+ISIS3OPT       ?= /opt/local
+ISIS3LOCAL     ?= /usgs/pkgs/local/$(ISISLOCALVERSION)
+
+#---------------------------------------------------------------------------
+# Set up for cwd
+#---------------------------------------------------------------------------
+CWDINCDIR =
+CWDLIBDIR =
+CWDLIB    =
+
+#---------------------------------------------------------------------------
+# Set up for Qwt
+#---------------------------------------------------------------------------
+QWTDIR    = $(ISIS3OPT)
+QWTINCDIR = -I$(QWTDIR)/include/qwt
+QWTLIBDIR = -L$(QWTDIR)/lib
+QWTLIB    = -lqwt 
+
+#---------------------------------------------------------------------------
+# Set up for Qt
+#---------------------------------------------------------------------------
+QTDARWINFLAGS += -DQT_GUI_LIB -DQT_CORE_LIB -DQT_SHARED
+QTDIR        = $(ISIS3OPT)
+QTINCDIR  = -I$(QTDIR)/libexec/qt4-mac/mkspecs/macx-g++
+QTINCDIR += -I$(QTDIR)/libexec/qt4-mac/include
+QTINCDIR += -I$(QTDIR)/libexec/qt4-mac/include/QtCore
+QTINCDIR += -I$(QTDIR)/libexec/qt4-mac/include/QtAssistant
+QTINCDIR += -I$(QTDIR)/libexec/qt4-mac/include/QtGui
+QTINCDIR += -I$(QTDIR)/libexec/qt4-mac/include/QtNetwork
+QTINCDIR += -I$(QTDIR)/libexec/qt4-mac/include/QtScript
+QTINCDIR += -I$(QTDIR)/libexec/qt4-mac/include/QtSql
+QTINCDIR += -I$(QTDIR)/libexec/qt4-mac/include/QtSvg
+QTINCDIR += -I$(QTDIR)/libexec/qt4-mac/include/QtWebKit
+QTINCDIR += -I$(QTDIR)/libexec/qt4-mac/include/QtXml
+QTINCDIR += -I$(QTDIR)/libexec/qt4-mac/include/QtXmlPatterns
+QTLIBDIR  = -L$(QTDIR)/libexec/qt4-mac/lib -F$(QTDIR)/libexec/qt4-mac/lib
+
+ISISCPPFLAGS       += $(QTDARWINFLAGS)
+QTCOMMONFRAMEWORKS  =
+QTFRAMEWORKS        = -framework QtXmlPatterns -framework QtXml -framework QtNetwork \
+                      -framework QtSql -framework QtGui -framework QtCore -framework QtSvg
+QTLIB               = $(QTFRAMEWORKS) $(QTCOMMONFRAMEWORKS)
+
+QTOPENGL     = -framework OpenGL -framework AGL
+
+UIC          = $(QTDIR)/libexec/qt4-mac/bin/uic
+RCC          = $(QTDIR)/libexec/qt4-mac/bin/rcc
+RCCDEFINES   =
+MOC          = $(QTDIR)/libexec/qt4-mac/bin/moc
+MOCDEFINES   += $(QTDARWINFLAGS)
+MOCDEFINES   += $(QTINCDIR)
+MOCDEFINES   += -D__APPLE__ -D__GNUC__
+
+#---------------------------------------------------------------------------
+# Set up for Xerces 
+#---------------------------------------------------------------------------
+XERCESINCDIR = -I$(ISIS3OPT)/include/xercesc
+XERCESLIBDIR = -L$(ISIS3OPT)/lib
+XERCESLIB    = -lxerces-c
+
+XALAN        = $(ISIS3OPT)/bin/Xalan
+
+#---------------------------------------------------------------------------
+# Set up for naif
+#---------------------------------------------------------------------------
+NAIFINCDIR = -I$(ISIS3LOCAL)/include
+NAIFLIBDIR = -L$(ISIS3LOCAL)/lib
+NAIFLIB    = -lcspice
+
+#---------------------------------------------------------------------------
+# Set up for TNT
+#---------------------------------------------------------------------------
+TNTINCDIR = -I$(ISIS3LOCAL)/include/tnt 
+TNTLIBDIR =
+TNTLIB    = 
+
+#---------------------------------------------------------------------------
+# Set up for JAMA
+#---------------------------------------------------------------------------
+JAMAINCDIR = -I$(ISIS3LOCAL)/include/jama
+JAMALIBDIR =
+JAMALIB    = 
+
+#---------------------------------------------------------------------------
+# Set up for GEOS
+#---------------------------------------------------------------------------
+GEOSINCDIR = -I$(ISIS3OPT)/include/geos
+GEOSLIBDIR = -L$(ISIS3OPT)/lib
+GEOSLIB    = -lgeos
+
+#---------------------------------------------------------------------------
+# Set up for the GNU Scientific Library (GSL).  Note that this setup
+# suppports include patterns such as <gsl/gsl_errno.h>.  With this
+# format, any other include spec that points to the general include
+# directory, such as GEOS, will suffice.  Therefore, an explicit
+# include directive is ommitted but provided as an empty reference
+# in cases where it may be located elsewhere.  This also goes for the
+# library reference.
+#---------------------------------------------------------------------------
+GSLINCDIR =  -I$(ISIS3OPT)/include/gsl
+GSLLIBDIR =  -L$(ISIS3OPT)/lib
+GSLLIB    = -lgsl -lgslcblas
+
+#---------------------------------------------------------------------------
+# Set up for GMM
+#---------------------------------------------------------------------------
+GMMINCDIR = -I$(ISIS3LOCAL)/include
+GMMLIBDIR =
+GMMLIB    = 
+
+#---------------------------------------------------------------------------
+# Set up for SuperLU
+#---------------------------------------------------------------------------
+SUPERLUINCDIR = -I$(ISIS3LOCAL)/include/superlu
+SUPERLULIBDIR = -L$(ISIS3LOCAL)/lib
+ifeq ($(HOST_PROC), powerpc)
+#  Powerpc support
+  SUPERLULIB    = -lsuperlu_3.0 -framework vecLib
+else
+#  Assumes Intel Mac
+  SUPERLULIB    = -lsuperlu_3.0 -lblas
+endif
+
+#---------------------------------------------------------------------------
+# Set up for Google Protocol Buffers (ProtoBuf)
+#---------------------------------------------------------------------------
+PROTOBUFINCDIR = -I$(ISIS3OPT)/include/google
+PROTOBUFLIBDIR = -L$(ISIS3OPT)/lib
+PROTOBUFLIB    = -lprotobuf
+PROTOC         = $(ISIS3OPT)/bin/protoc
+
+#---------------------------------------------------------------------------
+# Set up for kakadu
+# The Kakadu library is proprietary. The source files cannot be distributed
+# with ISIS3. If you need to rebuild ISIS3 on your system, then you will
+# need to modify the lines below that pertain to the location of the
+# header files and library on your system. The compilation flag, ENABLEJP2K,
+# should be set to true if you are building with the Kakadu library and
+# you want to use the JPEG2000 specific code in the ISIS3 system. Otherwise,
+# set the ENABLEJP2K flag to false.
+#---------------------------------------------------------------------------
+KAKADUINCDIR = -I$(ISIS3LOCAL)/include/kakadu/v6_3-00967N
+KAKADULIBDIR = -L$(ISIS3LOCAL)/lib
+KAKADULIB    = -lkdu_a63R
+ISISCPPFLAGS += -DENABLEJP2K=1
+
+
+#---------------------------------------------------------------------------
+# Set up for Boost Library
+#---------------------------------------------------------------------------
+BOOSTINCDIR = -I$(ISIS3OPT)/include
+BOOSTLIBDIR = -L$(ISIS3OPT)/lib
+BOOSTLIB   =
+
+#---------------------------------------------------------------------------
+# Set up for Cholmod Libraries
+#---------------------------------------------------------------------------
+CHOLMODINCDIR = -I$(ISIS3LOCAL)/include/CHOLMOD/CHOLMOD1.7.3
+CHOLMODLIBDIR = -L$(ISIS3LOCAL)/lib
+CHOLMODLIB   = -lcholmod -lamd -lcolamd -framework Accelerate
+
+#---------------------------------------------------------------------------
+#  Define the third party distribution libraries (patterns)
+#---------------------------------------------------------------------------
+
+#  Libraries
+THIRDPARTYLIBS    += "$(QTDIR)/libexec/qt4-mac/lib/QtXmlPatterns.framework"
+THIRDPARTYLIBS    += "$(QTDIR)/libexec/qt4-mac/lib/QtXml.framework"
+THIRDPARTYLIBS    += "$(QTDIR)/libexec/qt4-mac/lib/QtNetwork.framework"
+THIRDPARTYLIBS    += "$(QTDIR)/libexec/qt4-mac/lib/QtSql.framework"
+THIRDPARTYLIBS    += "$(QTDIR)/libexec/qt4-mac/lib/QtGui.framework"
+THIRDPARTYLIBS    += "$(QTDIR)/libexec/qt4-mac/lib/QtCore.framework"
+THIRDPARTYLIBS    += "$(QTDIR)/libexec/qt4-mac/lib/QtSvg.framework"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libqwt.*dylib"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libcspice*.dylib"
+#THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libsuperlu_3.0.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libprotobuf*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libiconv*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libxerces-c*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libgsl*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libz*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libssl*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libcrypto*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libpng12.*dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libpng.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libtiff.*dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libjpeg.*dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libmng.*dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/liblcms.*dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libgeos*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libsqlite3.*dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/postgresql*/libpq.*dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/mysql5/mysql/libmysqlclient_r*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libkdu_a63R.dylib"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libsuperlu_3.0.dylib"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libamd.dylib"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libcholmod.dylib"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libcolamd.dylib"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libufconfig.dylib"
+THIRDPARTYLIBS    += "/System/Library/Frameworks/Accelerate.framework"
+
+# libxerces-c depends on these libraries
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libicui18n*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libicuuc*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libicudata*.dylib"
+
+#  Plugins
+THIRDPARTYPLUGINS +=  "$(ISIS3OPT)/libexec/qt4-mac/plugins/"
+

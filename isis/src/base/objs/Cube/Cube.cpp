@@ -676,7 +676,7 @@ namespace Isis {
       stream.seekp(0, ios::end);
       streampos endByte = stream.tellp();
       streampos maxbyte = (streampos) m_labelBytes +
-          m_ioHandler->getDataSize();
+                          (streampos) m_ioHandler->getDataSize();
       if (endByte < maxbyte) stream.seekp(maxbyte, ios::beg);
       blob.Write(*m_label, stream);
     }

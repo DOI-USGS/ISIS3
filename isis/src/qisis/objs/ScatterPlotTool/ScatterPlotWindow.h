@@ -41,7 +41,7 @@ namespace Isis {
       ScatterPlotWindow(QString title,
                         Cube *xAxisCube, int xAxisBand, int xAxisBinCount,
                         Cube *yAxisCube, int yAxisBand, int yAxisBinCount,
-                        QwtDoubleRange sampleRange, QwtDoubleRange lineRange,
+                        QwtInterval sampleRange, QwtInterval lineRange,
                         QWidget *parent);
       virtual ~ScatterPlotWindow();
 
@@ -105,9 +105,9 @@ namespace Isis {
       //! The band on the Y-Axis cube used for the scatter plot
       int m_yAxisCubeBand;
       //! The sample range (1-based inclusive) of data used for the scatter plot
-      QwtDoubleRange m_sampleRange;
+      QwtInterval m_sampleRange;
       //! The line range (1-based inclusive) of data used for the scatter plot
-      QwtDoubleRange m_lineRange;
+      QwtInterval m_lineRange;
 
       //! Alarm onto plot... aka alarm viewport->plot
       bool m_alarmPlot;

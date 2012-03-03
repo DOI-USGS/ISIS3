@@ -79,11 +79,11 @@ void IsisMain() {
   //  any polys that were split on the boundary.
   if(conv360) {
     for(unsigned int i = 0; i < allPolys.size(); i++) {
-      geos::geom::MultiPolygon *m = (geos::geom::MultiPolygon *)allPolys[i];
+      geos::geom::MultiPolygon *m = PolygonTools::MakeMultiPolygon(allPolys[i]);
       if(m->getNumGeometries() > 1 ||
           m->getCoordinates()->minCoordinate()->x > 180.) {
         geos::geom::MultiPolygon *poly =
-          PolygonTools::To180((geos::geom::MultiPolygon *)allPolys[i]);
+          PolygonTools::To180(PolygonTools::MakeMultiPolygon(allPolys[i]));
         allPolys[i] = poly;
       }
     }
@@ -104,7 +104,7 @@ void IsisMain() {
     return;
   }
   else if(unionPoly->getGeometryTypeId() == geos::geom::GEOS_MULTIPOLYGON) {
-    geos::geom::MultiPolygon *multi = (geos::geom::MultiPolygon *) unionPoly;
+    geos::geom::MultiPolygon *multi = PolygonTools::MakeMultiPolygon(unionPoly);
     for(unsigned int i = 0; i < multi->getNumGeometries(); ++i) {
       islandPolys.push_back(multi->getGeometryN(i)->clone());
     }

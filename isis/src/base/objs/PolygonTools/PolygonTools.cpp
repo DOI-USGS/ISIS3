@@ -74,7 +74,9 @@ namespace Isis {
       vector<geos::geom::Geometry *> *xyPolys = new vector<geos::geom::Geometry *>;
       // Convert each polygon in this multi-polygon
       for(unsigned int g = 0; g < lonLatPolygon.getNumGeometries(); ++g) {
-        geos::geom::Polygon *poly = (geos::geom::Polygon *)(lonLatPolygon.getGeometryN(g));
+        const geos::geom::Polygon *poly =
+            dynamic_cast<const geos::geom::Polygon *>(
+              lonLatPolygon.getGeometryN(g));
 
         // Convert each hole inside this polygon
         vector<geos::geom::Geometry *> *holes = new vector<geos::geom::Geometry *>;
@@ -179,7 +181,9 @@ namespace Isis {
       vector<geos::geom::Geometry *> *llPolys = new vector<geos::geom::Geometry *>;
       // Convert each polygon in this multi-polygon
       for(unsigned int g = 0; g < xYPolygon.getNumGeometries(); ++g) {
-        geos::geom::Polygon *poly = (geos::geom::Polygon *)(xYPolygon.getGeometryN(g));
+        const geos::geom::Polygon *poly =
+            dynamic_cast<const geos::geom::Polygon *>(
+              xYPolygon.getGeometryN(g));
 
         // Convert each hole inside this polygon
         vector<geos::geom::Geometry *> *holes = new vector<geos::geom::Geometry *>;
@@ -269,7 +273,9 @@ namespace Isis {
       vector<geos::geom::Geometry *> *slPolys = new vector<geos::geom::Geometry *>;
       // Convert each polygon in this multi-polygon
       for(unsigned int g = 0; g < lonLatPolygon.getNumGeometries(); g++) {
-        geos::geom::Polygon *poly = (geos::geom::Polygon *)(lonLatPolygon.getGeometryN(g));
+        const geos::geom::Polygon *poly =
+            dynamic_cast<const geos::geom::Polygon *>(
+              lonLatPolygon.getGeometryN(g));
 
         // Convert each hole inside this polygon
         vector<geos::geom::Geometry *> *holes = new vector<geos::geom::Geometry *>;
@@ -580,7 +586,8 @@ namespace Isis {
     // Despike each polygon in the multipolygon
     vector<geos::geom::Geometry *> *newPolys = new vector<geos::geom::Geometry *>;
     for(unsigned int g = 0; g < multiPoly->getNumGeometries(); ++g) {
-      geos::geom::Polygon *poly = (geos::geom::Polygon *)(multiPoly->getGeometryN(g));
+      const geos::geom::Polygon *poly =
+          dynamic_cast<const geos::geom::Polygon *>(multiPoly->getGeometryN(g));
 
       // Despike each hole inside this polygon
       vector<geos::geom::Geometry *> *holes = new vector<geos::geom::Geometry *>;
@@ -624,7 +631,7 @@ namespace Isis {
         // Sometimes despike and fix fail, but the input is really valid. We can just go
         // with the non-despiked polygon.
         if(ls->isValid() && ls->getGeometryTypeId() == geos::geom::GEOS_LINEARRING) {
-          lr = (geos::geom::LinearRing *)ls->clone();
+          lr = dynamic_cast<geos::geom::LinearRing *>(ls->clone());
           e.Clear();
         }
         else {
@@ -995,13 +1002,13 @@ namespace Isis {
    */
   geos::geom::Geometry *PolygonTools::FixGeometry(const geos::geom::Geometry *geom) {
     if(geom->getGeometryTypeId() == geos::geom::GEOS_MULTIPOLYGON) {
-      return FixGeometry((geos::geom::MultiPolygon *)geom);
+      return FixGeometry(dynamic_cast<const geos::geom::MultiPolygon *>(geom));
     }
     if(geom->getGeometryTypeId() == geos::geom::GEOS_LINEARRING) {
-      return FixGeometry((geos::geom::LinearRing *)geom);
+      return FixGeometry(dynamic_cast<const geos::geom::LinearRing *>(geom));
     }
     if(geom->getGeometryTypeId() == geos::geom::GEOS_POLYGON) {
-      return FixGeometry((geos::geom::Polygon *)geom);
+      return FixGeometry(dynamic_cast<const geos::geom::Polygon *>(geom));
     }
     if(geom->getGeometryTypeId() == geos::geom::GEOS_GEOMETRYCOLLECTION) {
       return FixGeometry(MakeMultiPolygon(geom));
@@ -1027,7 +1034,9 @@ namespace Isis {
 
     // Convert each polygon in this multi-polygon
     for(unsigned int geomIndex = 0; geomIndex < poly->getNumGeometries(); geomIndex ++) {
-      geos::geom::Polygon *fixedpoly = FixGeometry((geos::geom::Polygon *)(poly->getGeometryN(geomIndex)));
+      geos::geom::Polygon *fixedpoly = FixGeometry(
+          dynamic_cast<const geos::geom::Polygon *>(
+            poly->getGeometryN(geomIndex)));
       if(fixedpoly->isValid()) {
         newPolys->push_back(fixedpoly);
       }
@@ -1185,7 +1194,7 @@ namespace Isis {
         delete newRing;
       }
 
-      newRing = (geos::geom::LinearRing *)ring->clone();
+      newRing = dynamic_cast<geos::geom::LinearRing *>(ring->clone());
     }
 
     return newRing;
@@ -1275,7 +1284,7 @@ namespace Isis {
     }
 
     else if(geom->getGeometryTypeId() == geos::geom::GEOS_MULTIPOLYGON) {
-      return (geos::geom::MultiPolygon *)geom->clone();
+      return dynamic_cast<geos::geom::MultiPolygon *>(geom->clone());
     }
 
     else if(geom->getGeometryTypeId() == geos::geom::GEOS_POLYGON) {
@@ -1288,17 +1297,19 @@ namespace Isis {
     else if(geom->getGeometryTypeId() == geos::geom::GEOS_GEOMETRYCOLLECTION) {
       vector<geos::geom::Geometry *> * polys =
           new vector<geos::geom::Geometry *>;
-      geos::geom::GeometryCollection *gc = (geos::geom::GeometryCollection *)geom;
+      const geos::geom::GeometryCollection *gc =
+          dynamic_cast<const geos::geom::GeometryCollection *>(geom);
       for(unsigned int i = 0; i < gc->getNumGeometries(); ++i) {
         geos::geom::MultiPolygon *subMultiPoly =
             MakeMultiPolygon(gc->getGeometryN(i));
-        
+
         for(unsigned int subPoly = 0;
             subPoly < subMultiPoly->getNumGeometries();
             subPoly ++) {
-          geos::geom::Polygon *poly =
-              (geos::geom::Polygon *)subMultiPoly->getGeometryN(subPoly);
-          polys->push_back((geos::geom::Polygon *)poly->clone());
+          const geos::geom::Polygon *poly =
+              dynamic_cast<const geos::geom::Polygon *>(
+                subMultiPoly->getGeometryN(subPoly));
+          polys->push_back(dynamic_cast<geos::geom::Polygon *>(poly->clone()));
         }
       }
 
@@ -1416,8 +1427,8 @@ namespace Isis {
 
       while(innerPolyIndex < polys->size()) {
         geos::geom::MultiPolygon *fixedPair = FixSeam(
-            (geos::geom::Polygon *)polys->at(outerPolyIndex),
-            (geos::geom::Polygon *)polys->at(innerPolyIndex));
+            dynamic_cast<geos::geom::Polygon *>(polys->at(outerPolyIndex)),
+            dynamic_cast<geos::geom::Polygon *>(polys->at(innerPolyIndex)));
 
         if(fixedPair != NULL) {
           geos::geom::Geometry *oldInnerPoly = polys->at(innerPolyIndex);
@@ -1459,13 +1470,16 @@ namespace Isis {
    */
   geos::geom::Geometry *PolygonTools::ReducePrecision(const geos::geom::Geometry *geom, unsigned int precision) {
     if(geom->getGeometryTypeId() == geos::geom::GEOS_MULTIPOLYGON) {
-      return ReducePrecision((geos::geom::MultiPolygon *)geom, precision);
+      return ReducePrecision(
+          dynamic_cast<const geos::geom::MultiPolygon *>(geom), precision);
     }
     if(geom->getGeometryTypeId() == geos::geom::GEOS_LINEARRING) {
-      return ReducePrecision((geos::geom::LinearRing *)geom, precision);
+      return ReducePrecision(
+          dynamic_cast<const geos::geom::LinearRing *>(geom), precision);
     }
     if(geom->getGeometryTypeId() == geos::geom::GEOS_POLYGON) {
-      return ReducePrecision((geos::geom::Polygon *)geom, precision);
+      return ReducePrecision(
+          dynamic_cast<const geos::geom::Polygon *>(geom), precision);
     }
     if(geom->getGeometryTypeId() == geos::geom::GEOS_GEOMETRYCOLLECTION) {
       return ReducePrecision(MakeMultiPolygon(geom), precision);
@@ -1492,7 +1506,10 @@ namespace Isis {
 
     // Convert each polygon in this multi-polygon
     for(unsigned int geomIndex = 0; geomIndex < poly->getNumGeometries(); geomIndex ++) {
-      geos::geom::Geometry *lowerPrecision = ReducePrecision((geos::geom::Polygon *)(poly->getGeometryN(geomIndex)), precision);
+      geos::geom::Geometry *lowerPrecision = ReducePrecision(
+          dynamic_cast<const geos::geom::Polygon *>(
+            poly->getGeometryN(geomIndex)),
+          precision);
 
       if(!lowerPrecision->isEmpty()) {
         newPolys->push_back(lowerPrecision);
@@ -1581,7 +1598,8 @@ namespace Isis {
     geos::geom::CoordinateSequence *coords = ring->getCoordinates();
 
     // Check this, just in case
-    if(coords->getSize() <= 0) return (geos::geom::LinearRing *)ring->clone();
+    if(coords->getSize() <= 0) return dynamic_cast<geos::geom::LinearRing *>(
+        ring->clone());
 
     geos::geom::CoordinateSequence *newCoords = new geos::geom::DefaultCoordinateSequence();
     geos::geom::Coordinate *coord = ReducePrecision(&coords->getAt(0), precision);
@@ -1660,19 +1678,25 @@ namespace Isis {
    * @return double The reduced precision number
    */
   double PolygonTools::ReducePrecision(double num, unsigned int precision) {
-    int decimalPlace = DecimalPlace(num);
-    double factor = pow(10.0, (int)decimalPlace);
+    double result = num;
 
-    // reduced num is in the form 0.nnnnnnnnnn...
-    double reducedNum = num / factor;
+    // If num == nan then this test will fail
+    if (num == num) {
+      int decimalPlace = DecimalPlace(num);
+      double factor = pow(10.0, (int)decimalPlace);
 
-    double cutoff = pow(10.0, (int)precision);
-    double round_offset = (num < 0) ? -0.5 : 0.5;
+      // reduced num is in the form 0.nnnnnnnnnn...
+      double reducedNum = num / factor;
 
-    // cast off the digits past the precision's place
-    reducedNum = ((long long)(reducedNum * cutoff + round_offset)) / cutoff;
+      double cutoff = pow(10.0, (int)precision);
+      double round_offset = (num < 0) ? -0.5 : 0.5;
 
-    return reducedNum * factor;
+      // cast off the digits past the precision's place
+      reducedNum = ((long long)(reducedNum * cutoff + round_offset)) / cutoff;
+      result = reducedNum * factor;
+    }
+
+    return result;
   }
 
 
@@ -1717,8 +1741,10 @@ namespace Isis {
 
     // Convert each polygon in this multi-polygon
     for(unsigned int geomIndex = 0; geomIndex < poly1->getNumGeometries(); geomIndex ++) {
-      polys1.push_back((geos::geom::Polygon *)poly1->getGeometryN(geomIndex));
-      polys2.push_back((geos::geom::Polygon *)poly2->getGeometryN(geomIndex));
+      polys1.push_back(dynamic_cast<const geos::geom::Polygon *>(
+          poly1->getGeometryN(geomIndex)));
+      polys2.push_back(dynamic_cast<const geos::geom::Polygon *>(
+          poly2->getGeometryN(geomIndex)));
     }
 
     for(int p1 = polys1.size() - 1; (p1 >= 0) && polys1.size(); p1 --) {

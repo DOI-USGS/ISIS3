@@ -7,8 +7,6 @@
 #include <QColor>
 
 #include <qwt_symbol.h>
-#include <qwt_interval_data.h>
-#include <qwt_double_interval.h>
 #include <qwt_scale_div.h>
 #include <qwt_plot_zoomer.h>
 #include <qwt_scale_engine.h>
@@ -47,7 +45,7 @@ namespace Isis {
     p_stretchCurve = new QwtPlotCurve();
     p_stretchCurve->setYAxis(QwtPlot::yRight);
     p_stretchCurve->setPen(QPen(QBrush(stretchColor), 2, Qt::DashLine));
-    p_stretchCurve->setSymbol(QwtSymbol(QwtSymbol::Ellipse, QBrush(stretchColor), QPen(stretchColor), QSize(5, 5)));
+    p_stretchCurve->setSymbol(new QwtSymbol(QwtSymbol::Ellipse, QBrush(stretchColor), QPen(stretchColor), QSize(5, 5)));
 
     p_histCurve->attach(this);
     p_stretchCurve->attach(this);
@@ -75,30 +73,24 @@ namespace Isis {
 
     //These are all variables needed in the following for loop.
     //----------------------------------------------
-    QwtArray<QwtDoubleInterval> intervals(xarray.size());
-    QwtValueList majorTicks;
-    QwtArray<double> values(yarray.size());
+    QVector<QwtIntervalSample> intervals(xarray.size());
     double maxYValue = DBL_MIN;
     double minYValue = DBL_MAX;
     // ---------------------------------------------
 
     for(unsigned int y = 0; y < yarray.size(); y++) {
-      intervals[y] = QwtDoubleInterval(xarray[y], xarray[y] + hist.BinSize());
+      intervals[y].interval = QwtInterval(xarray[y], xarray[y] + hist.BinSize());
 
-      majorTicks.push_back(xarray[y]);
-      majorTicks.push_back(xarray[y] + hist.BinSize());
-
-      values[y] = yarray[y];
-      if(values[y] > maxYValue)
-        maxYValue = values[y];
-      if(values[y] < minYValue)
-        minYValue = values[y];
+      intervals[y].value = yarray[y];
+      if(yarray[y] > maxYValue)
+        maxYValue = yarray[y];
+      if(yarray[y] < minYValue)
+        minYValue = yarray[y];
     }
 
     QwtScaleDiv scaleDiv;
-    scaleDiv.setTicks(QwtScaleDiv::MajorTick, majorTicks);
 
-    p_histCurve->setData(QwtIntervalData(intervals, values));
+    p_histCurve->setData(QwtIntervalSeriesData(intervals));
 
     double min = hist.Minimum();
     double max = hist.Maximum();
@@ -108,7 +100,7 @@ namespace Isis {
     // Find a good, fixed, axis scale
     QwtScaleEngine *engine = axisScaleEngine(QwtPlot::xBottom);
     QwtScaleDiv scale = engine->divideScale(min, max, maxMajor, maxMinor);
-    QwtDoubleInterval interval = scale.interval();
+    QwtInterval interval = scale.interval();
     setAxisScale(QwtPlot::xBottom,
                  interval.minValue() - hist.BinSize(),
                  interval.maxValue() + hist.BinSize());
@@ -121,13 +113,12 @@ namespace Isis {
    * @param stretch
    */
   void HistogramWidget::setStretch(Stretch stretch) {
-    std::vector<double> xarray, yarray;
+    QVector<QPointF> curvePoints(stretch.Pairs());
     for(int i = 0; i < stretch.Pairs(); i++) {
-      xarray.push_back(stretch.Input(i));
-      yarray.push_back(stretch.Output(i));
+      curvePoints[i] = QPointF(stretch.Input(i), stretch.Output(i));
     }
 
-    p_stretchCurve->setData(&xarray[0], &yarray[0], xarray.size());
+    p_stretchCurve->setData(new QwtPointSeriesData(curvePoints));
     replot();
   }
 
@@ -136,7 +127,7 @@ namespace Isis {
    *
    */
   void HistogramWidget::clearStretch() {
-    p_stretchCurve->setData(NULL, NULL, 0);
+    p_stretchCurve->setData(new QwtPointSeriesData());
     replot();
   }
 }

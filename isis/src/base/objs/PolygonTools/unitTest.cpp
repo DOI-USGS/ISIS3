@@ -110,15 +110,25 @@ int main() {
     // Create coordinate sequence for the first of two polygons
     geos::geom::CoordinateSequence *llpts = new geos::geom::CoordinateArraySequence();
     ugm.SetImage(1.0, 1.0);
-    llpts->add(geos::geom::Coordinate(ugm.UniversalLongitude(), ugm.UniversalLatitude()));
+    llpts->add(geos::geom::Coordinate(
+          qRound(ugm.UniversalLongitude()),
+          qRound(ugm.UniversalLatitude())));
     ugm.SetImage(1204.0, 1.0);
-    llpts->add(geos::geom::Coordinate(ugm.UniversalLongitude(), ugm.UniversalLatitude()));
+    llpts->add(geos::geom::Coordinate(
+          qRound(ugm.UniversalLongitude()),
+          qRound(ugm.UniversalLatitude())));
     ugm.SetImage(1204.0, 1056.0);
-    llpts->add(geos::geom::Coordinate(ugm.UniversalLongitude(), ugm.UniversalLatitude()));
+    llpts->add(geos::geom::Coordinate(
+          qRound(ugm.UniversalLongitude()),
+          qRound(ugm.UniversalLatitude())));
     ugm.SetImage(1.0, 1056.0);
-    llpts->add(geos::geom::Coordinate(ugm.UniversalLongitude(), ugm.UniversalLatitude()));
+    llpts->add(geos::geom::Coordinate(
+          qRound(ugm.UniversalLongitude()),
+          qRound(ugm.UniversalLatitude())));
     ugm.SetImage(1.0, 1.0);
-    llpts->add(geos::geom::Coordinate(ugm.UniversalLongitude(), ugm.UniversalLatitude()));
+    llpts->add(geos::geom::Coordinate(
+          qRound(ugm.UniversalLongitude()),
+          qRound(ugm.UniversalLatitude())));
     cout << "Coordinates of Lon/Lat polygon:" << llpts->toString() << endl << endl;
 
     // Create the L/L polygon
@@ -129,7 +139,8 @@ int main() {
     geos::geom::MultiPolygon *llmPolygon = Isis::globalFactory.createMultiPolygon(llpolys);
 
     geos::geom::MultiPolygon *slmPolygon = PolygonTools::LatLonToSampleLine(*llmPolygon, &ugm);
-    cout << "Coordinates of Sample/Line polygon:" << slmPolygon->toString() << endl;
+    cout << "Coordinates of Sample/Line polygon:" <<
+        PolygonTools::ReducePrecision(slmPolygon, 2)->toString() << endl;
 
     cout << endl;
 

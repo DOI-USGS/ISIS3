@@ -5,11 +5,12 @@
 
 #include <qwt_double_range.h>
 
+#include <QtCore>
+
 #include "Brick.h"
 #include "SpecialPixel.h"
 
 namespace Isis {
-
   /**
    * ScatterPlotDataConstructor
    *
@@ -27,7 +28,7 @@ namespace Isis {
   ScatterPlotData::ScatterPlotData(
       Cube *xCube, int xCubeBand, int xBinCount,
       Cube *yCube, int yCubeBand, int yBinCount,
-      QwtDoubleRange sampleRange, QwtDoubleRange lineRange) : QwtRasterData(),
+      QwtInterval sampleRange, QwtInterval lineRange) : QwtRasterData(),
       m_xDnToBinStretch(new Stretch), m_yDnToBinStretch(new Stretch),
       m_counts(
         new QVector< QVector<int> >(yBinCount, QVector<int>(xBinCount))),
@@ -57,11 +58,6 @@ namespace Isis {
 
     m_yDnToBinStretch->AddPair(m_yCubeMin, 0);
     m_yDnToBinStretch->AddPair(m_yCubeMax, yBinCount - 1);
-
-    setBoundingRect(QwtDoubleRect(m_xCubeMin,
-                                  m_yCubeMin,
-                                  m_xCubeMax - m_xCubeMin,
-                                  m_yCubeMax - m_yCubeMin));
 
     m_maxCount = 0;
 
@@ -102,6 +98,10 @@ namespace Isis {
         }
       }
     }
+
+    setInterval(Qt::XAxis, QwtInterval(m_xCubeMin, m_xCubeMax));
+    setInterval(Qt::YAxis, QwtInterval(m_yCubeMin, m_yCubeMax));
+    setInterval(Qt::ZAxis, QwtInterval(0, m_maxCount));
   }
 
 
@@ -139,16 +139,6 @@ namespace Isis {
    */
   QwtRasterData *ScatterPlotData::copy() const {
     return new ScatterPlotData(*this);
-  }
-
-
-  /**
-   * Returns the range of the counts.
-   *
-   * @return A range from 0 to maxCount.
-   */
-  QwtDoubleInterval ScatterPlotData::range() const {
-    return QwtDoubleInterval(0.0, m_maxCount);
   }
 
 
@@ -332,7 +322,7 @@ namespace Isis {
    * @param x The x-dn value of the bin to alarm
    * @param y The y-dn value of the bin to alarm
    */
-  void ScatterPlotData::alarm(double x, double y) const {
+  void ScatterPlotData::alarm(double x, double y) {
     int binToAlarm = binIndex(x, y);
     if (binToAlarm != -1)
       (*m_alarmedBins)[binToAlarm] = true;
@@ -342,8 +332,28 @@ namespace Isis {
   /**
    * Forget all alarmed bins (viewport->plot).
    */
-  void ScatterPlotData::clearAlarms() const {
+  void ScatterPlotData::clearAlarms() {
     m_alarmedBins->clear();
+  }
+
+
+  /**
+   * This is a hint given to qwt for how to render a pixel in the spectrogram.
+   *
+   * @param area This is ignored
+   * @return The size of a pixel in the scatter plot
+   */
+  QRectF ScatterPlotData::pixelHint(const QRectF &area) const {
+    QRectF hint;
+
+    if (m_xDnToBinStretch->Pairs() > 1 && m_yDnToBinStretch->Pairs() > 1) {
+      hint = QRectF(
+          QPointF(m_xCubeMin, m_yCubeMin),
+          QSizeF(m_xDnToBinStretch->Input(1) - m_xDnToBinStretch->Input(0),
+                 m_yDnToBinStretch->Input(1) - m_yDnToBinStretch->Input(1)));
+    }
+
+    return hint;
   }
 
 

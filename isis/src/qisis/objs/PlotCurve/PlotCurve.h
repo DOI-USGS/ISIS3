@@ -90,8 +90,7 @@ namespace Isis {
       Units yUnits() const;
 
       void setColor(const QColor &color);
-      void setData(const QwtData &data);
-      void setData(const double *xData, const double *yData, int size);
+      void setData(QwtSeriesData<QPointF> *data);
       void setPen(const QPen &pen);
       void setMarkerSymbol(QwtSymbol symbol);
       void setMarkerVisible(bool visible);

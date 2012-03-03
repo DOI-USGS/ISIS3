@@ -126,15 +126,14 @@ namespace Isis {
                                                     selected->yUnits());
 
         int dataSize = selected->dataSize();
-        QVector<double> xData(dataSize);
-        QVector<double> yData(dataSize);
+        QVector<QPointF> data(dataSize);
 
         for (int i = 0; i < dataSize; i++) {
-          xData[i] = selected->x(i);
-          yData[i] = a + b * xData[i];
+          data[i].setX(selected->sample(i).x());
+          data[i].setY(a + b * data[i].x());
         }
 
-        newCurve->setData(&xData[0], &yData[0], dataSize);
+        newCurve->setData(new QwtPointSeriesData(data));
         newCurve->setColor(selected->color());
 
         QwtSymbol newSymbol(newCurve->markerSymbol());
@@ -164,8 +163,8 @@ namespace Isis {
         e.Clear();
       }
 
-      const ScatterPlotData *scatterData =
-          dynamic_cast<const ScatterPlotData *>(&selected->data());
+      ScatterPlotData *scatterData =
+          dynamic_cast<ScatterPlotData *>(selected->data());
 
       if (scatterData && !IsSpecial(a) && !IsSpecial(b)) {
         CubePlotCurve *newCurve = new CubePlotCurve(
@@ -175,15 +174,14 @@ namespace Isis {
         QVector<double> rawXValues = scatterData->discreteXValues();
 
         int dataSize = rawXValues.size();
-        QVector<double> xData(dataSize);
-        QVector<double> yData(dataSize);
+        QVector<QPointF> data(dataSize);
 
         for (int i = 0; i < dataSize; i++) {
-          xData[i] = rawXValues[i];
-          yData[i] = a + b * xData[i];
+          data[i].setX(rawXValues[i]);
+          data[i].setY(a + b * data[i].x());
         }
 
-        newCurve->setData(&xData[0], &yData[0], dataSize);
+        newCurve->setData(new QwtPointSeriesData(data));
         newCurve->setColor(Qt::red);
 
         QwtSymbol newSymbol(newCurve->markerSymbol());
@@ -215,7 +213,7 @@ namespace Isis {
           m_plotWindowWithCurves->plotSpectrograms();
 
       foreach (QwtPlotSpectrogram *spectrogram, spectrograms) {
-        if (dynamic_cast<const ScatterPlotData *>(&spectrogram->data())) {
+        if (dynamic_cast<ScatterPlotData *>(spectrogram->data())) {
           m_curvesCombo->insertItem(
               0, spectrogram->title().text(), qVariantFromValue(spectrogram));
         }
@@ -245,8 +243,8 @@ namespace Isis {
 
       int dataSize = selected->dataSize();
       for (int dataPoint = 0; dataPoint < dataSize; dataPoint++) {
-        double x = selected->x(dataPoint);
-        double y = selected->y(dataPoint);
+        double x = selected->sample(dataPoint).x();
+        double y = selected->sample(dataPoint).y();
         m_curveMultivariateStats->AddData(&x, &y, 1);
       }
     }
@@ -254,8 +252,8 @@ namespace Isis {
       QwtPlotSpectrogram *selected = selectedSpectrogram();
       m_curveMultivariateStats.reset(new MultivariateStatistics);
 
-      const ScatterPlotData *scatterData =
-          dynamic_cast<const ScatterPlotData *>(&selected->data());
+      ScatterPlotData *scatterData =
+          dynamic_cast<ScatterPlotData *>(selected->data());
 
       if (scatterData) {
         for (int i = 0; i < scatterData->numberOfBins(); i++) {
@@ -268,7 +266,8 @@ namespace Isis {
       }
     }
 
-    if (m_curveMultivariateStats->ValidPixels() > 1) {
+    if (m_curveMultivariateStats &&
+        m_curveMultivariateStats->ValidPixels() > 1) {
       double a = Null;
       double b = Null;
 

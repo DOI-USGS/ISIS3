@@ -44,7 +44,7 @@ namespace Isis {
   ScatterPlotWindow::ScatterPlotWindow(QString title,
       Cube *xAxisCube, int xAxisBand, int xAxisBinCount,
       Cube *yAxisCube, int yAxisBand, int yAxisBinCount,
-      QwtDoubleRange sampleRange, QwtDoubleRange lineRange,
+      QwtInterval sampleRange, QwtInterval lineRange,
       QWidget *parent) :
       PlotWindow("Scatter Plot", PlotCurve::CubeDN, PlotCurve::CubeDN, parent,
                  (MenuOptions)(
@@ -58,8 +58,10 @@ namespace Isis {
     m_yAxisCube = yAxisCube;
     m_xAxisCubeBand = xAxisBand;
     m_yAxisCubeBand = yAxisBand;
+
     m_sampleRange = sampleRange;
     m_lineRange = lineRange;
+
     m_xCubeDnAlarmRange.first = Null;
     m_xCubeDnAlarmRange.second = Null;
     m_yCubeDnAlarmRange.first = Null;
@@ -72,7 +74,7 @@ namespace Isis {
 
     m_spectrogram = new QwtPlotSpectrogram;
 
-    m_spectrogram->setData(*data);
+    m_spectrogram->setData(data);
     m_spectrogram->setTitle("Scatter Plot Counts");
     m_spectrogram->attach(plot());
 
@@ -86,12 +88,12 @@ namespace Isis {
     QwtScaleWidget *rightAxis = plot()->axisWidget(QwtPlot::yRight);
     rightAxis->setTitle("Counts");
     rightAxis->setColorBarEnabled(true);
-    rightAxis->setColorMap(m_spectrogram->data().range(),
-                             m_spectrogram->colorMap());
+//    rightAxis->setColorMap(m_spectrogram->data()->interval(Qt::ZAxis),
+//                           m_spectrogram->colorMap());
 
     plot()->setAxisScale(QwtPlot::yRight,
-                         m_spectrogram->data().range().minValue(),
-                         m_spectrogram->data().range().maxValue());
+                         m_spectrogram->data()->interval(Qt::ZAxis).minValue(),
+                         m_spectrogram->data()->interval(Qt::ZAxis).maxValue());
     plot()->enableAxis(QwtPlot::yRight);
 
     plot()->setAxisTitle(QwtPlot::xBottom,
@@ -103,8 +105,8 @@ namespace Isis {
         QString::number(yAxisBand) + " " +
         plot()->axisTitle(QwtPlot::yLeft).text());
 
-    QwtValueList contourLevels;
-    QwtDoubleInterval range = data->range();
+    QList<double> contourLevels;
+    QwtInterval range = m_spectrogram->data()->interval(Qt::ZAxis);
 
     for (double level = range.minValue();
          level < range.maxValue();
@@ -401,8 +403,8 @@ namespace Isis {
    */
   void ScatterPlotWindow::setMousePosition(MdiCubeViewport *vp,
                                            QPoint mouseLoc) {
-    const ScatterPlotData *scatterData =
-        dynamic_cast<const ScatterPlotData *>(&m_spectrogram->data());
+    ScatterPlotData *scatterData =
+        dynamic_cast<ScatterPlotData *>(m_spectrogram->data());
 
     if (scatterData) {
       scatterData->clearAlarms();
@@ -549,25 +551,25 @@ namespace Isis {
     if (m_colorize->text().compare("Colorize") == 0) {
       m_colorize->setIcon(QPixmap("/usgs/cpkgs/isis3/data/base/icons/gray.png"));
       m_colorize->setText("Gray");
-      QwtLinearColorMap colorMap(Qt::darkCyan, Qt::red);
-      colorMap.addColorStop(DBL_EPSILON, Qt::cyan);
-      colorMap.addColorStop(0.3, Qt::green);
-      colorMap.addColorStop(0.50, Qt::yellow);
+      QwtLinearColorMap *colorMap = new QwtLinearColorMap(Qt::darkCyan, Qt::red);
+      colorMap->addColorStop(DBL_EPSILON, Qt::cyan);
+      colorMap->addColorStop(0.3, Qt::green);
+      colorMap->addColorStop(0.50, Qt::yellow);
       m_spectrogram->setColorMap(colorMap);
       plot()->setCanvasBackground(Qt::darkCyan);
     }
     else {
       m_colorize->setIcon(QPixmap("/usgs/cpkgs/isis3/data/base/icons/rgb.png"));
       m_colorize->setText("Colorize");
-      QwtLinearColorMap colorMap(Qt::black, Qt::white);
-      colorMap.addColorStop(DBL_EPSILON, Qt::darkGray);
+      QwtLinearColorMap *colorMap = new QwtLinearColorMap(Qt::black, Qt::white);
+      colorMap->addColorStop(DBL_EPSILON, Qt::darkGray);
       m_spectrogram->setColorMap(colorMap);
       plot()->setCanvasBackground(Qt::black);
     }
 
-    plot()->axisWidget(QwtPlot::yRight)->setColorMap(
-        m_spectrogram->data().range(),
-        m_spectrogram->colorMap());
+//    plot()->axisWidget(QwtPlot::yRight)->setColorMap(
+//        m_spectrogram->interval(Qt::ZAxis),
+//        m_spectrogram->colorMap());
     updateContourPen();
 
     replot();

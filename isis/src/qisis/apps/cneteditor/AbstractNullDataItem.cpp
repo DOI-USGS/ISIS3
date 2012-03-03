@@ -72,5 +72,9 @@ namespace Isis
       iString msg = "operator<() called on an AbstractNullDataItem";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
+
+
+    void AbstractNullDataItem::sourceDeleted() {
+    }
   }
 }

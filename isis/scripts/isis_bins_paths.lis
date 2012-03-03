@@ -5,3 +5,5 @@
 /(.+)/isis/lib                 @rpath/lib
 /opt/local/libexec/qt4-mac/lib @rpath/3rdParty/lib
 /opt/local/lib                 @rpath/3rdParty/lib
+#  Add new MacPorts structure
+/opt/usgs/(.*?)lib             @rpath/3rdParty/lib

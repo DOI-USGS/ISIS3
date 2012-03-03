@@ -104,7 +104,9 @@ namespace Isis
 
         virtual void setLastVisibleFilteredItem(AbstractTreeItem * item);
         virtual const AbstractTreeItem * getLastVisibleFilteredItem() const;
-        
+
+      protected slots:
+        virtual void sourceDeleted() = 0;
 
       protected:
         virtual void calcDataWidth(int avgCharWidth);

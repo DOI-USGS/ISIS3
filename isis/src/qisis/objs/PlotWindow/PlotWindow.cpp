@@ -107,6 +107,9 @@ namespace Isis {
 
 
   PlotWindow::~PlotWindow() {
+    foreach (QwtPlotCurve *curve, plotCurves()) {
+      delete curve;
+    }
   }
 
 
@@ -290,7 +293,7 @@ namespace Isis {
    * @return QColor
    */
   QColor PlotWindow::plotBackgroundColor() const {
-    return m_plot->canvasBackground();
+    return m_plot->canvasBackground().color();
   }
 
 
@@ -1351,10 +1354,10 @@ namespace Isis {
     foreach (CubePlotCurve *curve, curves) {
       // Loop backwards because our insertion sort will have a much better
       //   chance of success on it's first try this way.
-      for (int dataIndex = (int)curve->data().size() - 1;
+      for (int dataIndex = (int)curve->data()->size() - 1;
             dataIndex >= 0;
             dataIndex--) {
-        double xValue = curve->data().x(dataIndex);
+        double xValue = curve->data()->sample(dataIndex).x();
 
         // It turns out that qBinaryFind(container, value) is NOT the same as
         //   qBinaryFind(container.begin(), container.end(), value). Use the one
@@ -1398,10 +1401,10 @@ namespace Isis {
         double y = Null;
 
         for (int dataIndex = 0;
-             dataIndex < (int)curve->data().size() && y == Null;
+             dataIndex < (int)curve->data()->size() && y == Null;
              dataIndex++) {
-          if (curve->data().x(dataIndex) == xAxisValue) {
-            y = curve->data().y(dataIndex);
+          if (curve->data()->sample(dataIndex).x() == xAxisValue) {
+            y = curve->data()->sample(dataIndex).y();
           }
         }
 
@@ -1619,27 +1622,27 @@ namespace Isis {
     QPair<double, double> rangeMinMax;
 
     foreach(const CubePlotCurve *curve, curves) {
-      for (int dataIndex = 0; dataIndex < curve->dataSize(); dataIndex++) {
+      for (int dataIndex = 0; dataIndex < (int)curve->dataSize(); dataIndex++) {
         if (axisId == QwtPlot::xBottom) {
           if (!foundDataValue) {
-            rangeMinMax.first = curve->x(dataIndex);
-            rangeMinMax.second = curve->x(dataIndex);
+            rangeMinMax.first = curve->sample(dataIndex).x();
+            rangeMinMax.second = curve->sample(dataIndex).x();
             foundDataValue = true;
           }
           else {
-            rangeMinMax.first = qMin(rangeMinMax.first, curve->x(dataIndex));
-            rangeMinMax.second = qMax(rangeMinMax.second, curve->x(dataIndex));
+            rangeMinMax.first = qMin(rangeMinMax.first, curve->sample(dataIndex).x());
+            rangeMinMax.second = qMax(rangeMinMax.second, curve->sample(dataIndex).x());
           }
         }
         else if (axisId == QwtPlot::yLeft) {
           if (!foundDataValue) {
-            rangeMinMax.first = curve->y(dataIndex);
-            rangeMinMax.second = curve->y(dataIndex);
+            rangeMinMax.first = curve->sample(dataIndex).y();
+            rangeMinMax.second = curve->sample(dataIndex).y();
             foundDataValue = true;
           }
           else {
-            rangeMinMax.first = qMin(rangeMinMax.first, curve->y(dataIndex));
-            rangeMinMax.second = qMax(rangeMinMax.second, curve->y(dataIndex));
+            rangeMinMax.first = qMin(rangeMinMax.first, curve->sample(dataIndex).y());
+            rangeMinMax.second = qMax(rangeMinMax.second, curve->sample(dataIndex).y());
           }
         }
       }

@@ -28,9 +28,6 @@ namespace Isis
      */
     class AbstractImageItem : public virtual AbstractTreeItem
     {
-
-        Q_OBJECT
-
       public:
         AbstractImageItem(ControlCubeGraphNode * cubeGraphNode,
             int avgCharWidth, AbstractTreeItem * parent = 0);
@@ -46,9 +43,8 @@ namespace Isis
         bool hasNode(ControlCubeGraphNode *) const;
 
 
-      private slots:
-        void sourceDeleted();
-
+      protected:
+        virtual void sourceDeleted();
 
       private: // disable copying of this class
         AbstractImageItem(const AbstractImageItem & other);

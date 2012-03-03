@@ -1,12 +1,13 @@
 #include "HistogramItem.h"
 
 #include <QPainter>
+#include <QScopedPointer>
 #include <QString>
 
 #include <qwt_plot.h>
-#include <qwt_interval_data.h>
 #include <qwt_painter.h>
 #include <qwt_scale_map.h>
+#include <qwt_series_data.h>
 
 #include <iostream>
 
@@ -20,7 +21,7 @@ namespace Isis {
   class HistogramItem::PrivateData {
     public:
       int attributes;
-      QwtIntervalData data;
+      QScopedPointer<QwtIntervalSeriesData> data;
       QColor color;
       double reference;
   };
@@ -62,6 +63,7 @@ namespace Isis {
    */
   void HistogramItem::init() {
     d_data = new PrivateData();
+    d_data->data.reset(new QwtIntervalSeriesData());
     d_data->reference = 0.0;
     d_data->attributes = HistogramItem::Auto;
 
@@ -103,8 +105,8 @@ namespace Isis {
    *
    * @param data
    */
-  void HistogramItem::setData(const QwtIntervalData &data) {
-    d_data->data = data;
+  void HistogramItem::setData(const QwtIntervalSeriesData &data) {
+    d_data->data.reset(new QwtIntervalSeriesData(data));
     itemChanged();
   }
 
@@ -113,10 +115,10 @@ namespace Isis {
    * Returns this item's data
    *
    *
-   * @return const QwtIntervalData&
+   * @return
    */
-  const QwtIntervalData &HistogramItem::data() const {
-    return d_data->data;
+  const QwtIntervalSeriesData &HistogramItem::data() const {
+    return *d_data->data;
   }
 
 
@@ -151,14 +153,14 @@ namespace Isis {
    *
    * @return QwtDoubleRect
    */
-  QwtDoubleRect HistogramItem::boundingRect() const {
-    QwtDoubleRect rect = d_data->data.boundingRect();
+  QRectF HistogramItem::boundingRect() const {
+    QRectF rect = d_data->data->boundingRect();
     if(!rect.isValid())
       return rect;
 
     if(d_data->attributes & Xfy) {
-      rect = QwtDoubleRect(rect.y(), rect.x(),
-                           rect.height(), rect.width());
+      rect = QRectF(rect.y(), rect.x(),
+                    rect.height(), rect.width());
 
       if(rect.left() > d_data->reference)
         rect.setLeft(d_data->reference);
@@ -229,32 +231,32 @@ namespace Isis {
    * @param yMap
    */
   void HistogramItem::draw(QPainter *painter, const QwtScaleMap &xMap,
-                           const QwtScaleMap &yMap, const QRect &) const {
-    const QwtIntervalData &iData = d_data->data;
+                           const QwtScaleMap &yMap, const QRectF &) const {
+    const QwtIntervalSeriesData &data = *d_data->data;
 
     painter->setPen(QPen(d_data->color));
 
     const int x0 = xMap.transform(baseline());
     const int y0 = yMap.transform(baseline());
 
-    for(int i = 0; i < (int)iData.size(); i++) {
+    for(int i = 0; i < (int)data.size(); i++) {
       if(d_data->attributes & HistogramItem::Xfy) {
-        const int x2 = xMap.transform(iData.value(i));
+        const int x2 = xMap.transform(data.sample(i).value);
         if(x2 == x0)
           continue;
 
-        int y1 = yMap.transform(iData.interval(i).minValue());
-        int y2 = yMap.transform(iData.interval(i).maxValue());
+        int y1 = yMap.transform(data.sample(i).interval.minValue());
+        int y2 = yMap.transform(data.sample(i).interval.maxValue());
         if(y1 > y2)
           qSwap(y1, y2);
 
-        if(i < (int)iData.size() - 2) {
-          const int yy1 = yMap.transform(iData.interval(i + 1).minValue());
-          const int yy2 = yMap.transform(iData.interval(i + 1).maxValue());
+        if(i < (int)data.size() - 2) {
+          const int yy1 = yMap.transform(data.sample(i + 1).interval.minValue());
+          const int yy2 = yMap.transform(data.sample(i + 1).interval.maxValue());
 
-          if(y2 == qwtMin(yy1, yy2)) {
+          if(y2 == qMin(yy1, yy2)) {
             const int xx2 = xMap.transform(
-                              iData.interval(i + 1).minValue());
+                              data.sample(i + 1).interval.minValue());
             if(xx2 != x0 && ((xx2 < x0 && x2 < x0) ||
                              (xx2 > x0 && x2 > x0))) {
               // One pixel distance between neighboured bars
@@ -267,21 +269,21 @@ namespace Isis {
                 QRect(x0, y1, x2 - x0, y2 - y1));
       }
       else {
-        const int y2 = yMap.transform(iData.value(i));
+        const int y2 = yMap.transform(data.sample(i).value);
         if(y2 == y0)
           continue;
 
-        int x1 = xMap.transform(iData.interval(i).minValue());
-        int x2 = xMap.transform(iData.interval(i).maxValue());
+        int x1 = xMap.transform(data.sample(i).interval.minValue());
+        int x2 = xMap.transform(data.sample(i).interval.maxValue());
         if(x1 > x2)
           qSwap(x1, x2);
 
-        if(i < (int)iData.size() - 2) {
-          const int xx1 = xMap.transform(iData.interval(i + 1).minValue());
-          const int xx2 = xMap.transform(iData.interval(i + 1).maxValue());
+        if(i < (int)data.size() - 2) {
+          const int xx1 = xMap.transform(data.sample(i + 1).interval.minValue());
+          const int xx2 = xMap.transform(data.sample(i + 1).interval.maxValue());
 
-          if(x2 == qwtMin(xx1, xx2)) {
-            const int yy2 = yMap.transform(iData.value(i + 1));
+          if(x2 == qMin(xx1, xx2)) {
+            const int yy2 = yMap.transform(data.sample(i + 1).value);
             if(yy2 != y0 && ((yy2 < y0 && y2 < y0) ||
                              (yy2 > y0 && y2 > y0))) {
               // One pixel distance between neighboured bars
@@ -308,11 +310,7 @@ namespace Isis {
     painter->save();
 
     const QColor color(painter->pen().color());
-#if QT_VERSION >= 0x040000
     const QRect r = rect.normalized();
-#else
-    const QRect r = rect.normalize();
-#endif
 
     const int factor = 125;
     const QColor light(color.light(factor));
@@ -325,50 +323,26 @@ namespace Isis {
     painter->setBrush(Qt::NoBrush);
 
     painter->setPen(QPen(light, 2));
-#if QT_VERSION >= 0x040000
     QwtPainter::drawLine(painter,
                          r.left() + 1, r.top() + 2, r.right() + 1, r.top() + 2);
-#else
-    QwtPainter::drawLine(painter,
-                         r.left(), r.top() + 2, r.right() + 1, r.top() + 2);
-#endif
 
     painter->setPen(QPen(dark, 2));
-#if QT_VERSION >= 0x040000
     QwtPainter::drawLine(painter,
                          r.left() + 1, r.bottom(), r.right() + 1, r.bottom());
-#else
-    QwtPainter::drawLine(painter,
-                         r.left(), r.bottom(), r.right() + 1, r.bottom());
-#endif
 
     painter->setPen(QPen(light, 1));
 
-#if QT_VERSION >= 0x040000
     QwtPainter::drawLine(painter,
                          r.left(), r.top() + 1, r.left(), r.bottom());
     QwtPainter::drawLine(painter,
                          r.left() + 1, r.top() + 2, r.left() + 1, r.bottom() - 1);
-#else
-    QwtPainter::drawLine(painter,
-                         r.left(), r.top() + 1, r.left(), r.bottom() + 1);
-    QwtPainter::drawLine(painter,
-                         r.left() + 1, r.top() + 2, r.left() + 1, r.bottom());
-#endif
 
     painter->setPen(QPen(dark, 1));
 
-#if QT_VERSION >= 0x040000
     QwtPainter::drawLine(painter,
                          r.right() + 1, r.top() + 1, r.right() + 1, r.bottom());
     QwtPainter::drawLine(painter,
                          r.right(), r.top() + 2, r.right(), r.bottom() - 1);
-#else
-    QwtPainter::drawLine(painter,
-                         r.right() + 1, r.top() + 1, r.right() + 1, r.bottom() + 1);
-    QwtPainter::drawLine(painter,
-                         r.right(), r.top() + 2, r.right(), r.bottom());
-#endif
 
     painter->restore();
   }

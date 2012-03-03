@@ -30,9 +30,6 @@ namespace Isis
      */
     class AbstractMeasureItem : public virtual AbstractTreeItem
     {
-
-        Q_OBJECT
-
       public:
         // If a column is added or removed then make sure you also update
         // the COLS constant that immediately follows this enum.
@@ -83,18 +80,18 @@ namespace Isis
         virtual InternalPointerType getPointerType() const;
         virtual void * getPointer() const;
         virtual bool hasMeasure(ControlMeasure *) const;
-        
 
-      private slots:
-        void sourceDeleted();
 
-        
+      protected:
+        virtual void sourceDeleted();
+
+
       private: // disable copying of this class
         AbstractMeasureItem(const AbstractMeasureItem & other);
         const AbstractMeasureItem & operator=(
             const AbstractMeasureItem & other);
 
-        
+
       private:
         static void setLogData(ControlMeasure *, int, const QString &);
 

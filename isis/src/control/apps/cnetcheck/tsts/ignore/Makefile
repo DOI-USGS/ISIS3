@@ -15,6 +15,6 @@ commands:
 	# upon where the test is run from
 	for i in $(OUTPUT)/*.txt; do \
 	  base=`basename $$i`; \
-	  cat $$i | sed 's/.*\/\(.*\.cub\)/\1/g' > $$base; \
+	  cat $$i | sed 's/.*\/\(.*\.cub\)/\1/g' | sed 's/\([0-9]\.[0-9]\{12\}\)\([0-9]*\)/\1/g' > $$base; \
 	  $(MV) $$base $$i; \
 	done

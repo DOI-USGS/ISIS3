@@ -9,3 +9,4 @@
 /opt/local/lib/postgresql83    @loader_path/../../lib
 /opt/local/lib/mysql5/mysql    @loader_path/../../lib
 /opt/local/lib                 @loader_path/../../lib
+/opt/usgs(.*?)/lib             @loader_path/../../lib

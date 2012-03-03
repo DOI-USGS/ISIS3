@@ -82,27 +82,27 @@ namespace Isis {
     p_cdfCurve->setStyle(QwtPlotCurve::Lines);
 
     //Transfer data from histogram to the plotcurve
-    vector<double> xarray, yarray, y2array;
+    QVector<QPointF> histData;
+    QVector<QPointF> cdfData;
     double cumpct = 0.0;
     for(int i = 0; i < hist.Bins(); i++) {
       if(hist.BinCount(i) > 0) {
-        xarray.push_back(hist.BinMiddle(i));
-        yarray.push_back(hist.BinCount(i));
+        histData.append(QPointF(hist.BinMiddle(i), hist.BinCount(i)));
 
         double pct = (double)hist.BinCount(i) / hist.ValidPixels() * 100.;
         cumpct += pct;
-        y2array.push_back(cumpct);
+        cdfData.append(QPointF(hist.BinMiddle(i), cumpct));
       }
     }
     QPen *pen = new QPen(Qt::red);
     pen->setWidth(2);
-    p_histCurve->setData(&xarray[0], &yarray[0], xarray.size());
+    p_histCurve->setData(new QwtPointSeriesData(histData));
     p_histCurve->setYAxis(QwtPlot::yLeft);
     p_histCurve->setPen(*pen);
     p_histCurve->attach(this);
 
     pen->setColor(Qt::blue);
-    p_cdfCurve->setData(&xarray[0], &y2array[0], xarray.size());
+    p_cdfCurve->setData(new QwtPointSeriesData(cdfData));
     p_cdfCurve->setYAxis(QwtPlot::yRight);
     p_cdfCurve->setPen(*pen);
     p_cdfCurve->attach(this);

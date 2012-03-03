@@ -189,20 +189,16 @@ namespace Isis {
 
       // get curves for active viewport and also for any linked viewports
       foreach (MdiCubeViewport *viewport, viewportsToPlot()) {
-        QVector<double> labels;
-        QVector<double> dnValues;
-        getSpatialStatistics(labels, dnValues, viewport);
+        QVector<QPointF> data = getSpatialStatistics(viewport);
 
         // load data into curve
-        ASSERT(labels.size() == dnValues.size());
-        if (labels.size() > 0) {
+        if (data.size() > 0) {
           QList<QPoint> rubberBandPoints = RubberBandTool::getVertices();
 
           validatePlotCurves();
           int band = ((viewport->isGray()) ? viewport->grayBand() :
                                              viewport->redBand());
-          (*m_spatialCurves)[viewport]->setData(
-              &labels[0], &dnValues[0], labels.size());
+          (*m_spatialCurves)[viewport]->setData(new QwtPointSeriesData(data));
           (*m_spatialCurves)[viewport]->setSource(
               viewport, rubberBandPoints, band);
         }
@@ -244,10 +240,11 @@ namespace Isis {
    * @param data
    * @param cvp
    */
-  void SpatialPlotTool::getSpatialStatistics(QVector<double> &labels,
-                                             QVector<double> &data,
-                                             MdiCubeViewport * cvp) {
+  QVector<QPointF> SpatialPlotTool::getSpatialStatistics(
+      MdiCubeViewport * cvp) {
     QList<QPoint> vertices = RubberBandTool::getVertices();
+
+    QVector<QPointF> data;
 
     if(cvp && vertices.size()) {
       Interpolator interp;
@@ -290,8 +287,7 @@ namespace Isis {
           double result = interp.Interpolate(x, y, dataReader.DoubleBuffer());
 
           if(!IsSpecial(result)) {
-            labels.push_back(index + 1);
-            data.push_back(result);
+            data.append(QPointF(index + 1, result));
           }
         }
       }
@@ -383,12 +379,13 @@ namespace Isis {
           }
 
           if(!IsSpecial(acrossStats.Average())) {
-            labels.push_back(index + 1);
-            data.push_back(acrossStats.Average());
+            data.append(QPointF(index + 1, acrossStats.Average()));
           }
         }
       }
     }
+
+    return data;
   }
 }
 

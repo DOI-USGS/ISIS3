@@ -72,7 +72,8 @@ namespace Isis {
     p_cubeLine = other.p_cubeLine;
 
     if (other.p_clipPolygon) {
-      p_clipPolygon = (geos::geom::MultiPolygon*)other.p_clipPolygon->clone();
+      p_clipPolygon = PolygonTools::MakeMultiPolygon(
+          other.p_clipPolygon->clone());
     }
     else {
       p_clipPolygon = NULL;
@@ -1083,7 +1084,8 @@ namespace Isis {
     }
 
     if (other.p_clipPolygon) {
-      p_clipPolygon = (geos::geom::MultiPolygon*)other.p_clipPolygon->clone();
+      p_clipPolygon = PolygonTools::MakeMultiPolygon(
+          other.p_clipPolygon->clone());
     }
 
     p_affine = other.p_affine;

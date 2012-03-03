@@ -34,7 +34,6 @@
 
 using namespace std;
 namespace Isis {
-
   //! Constructs an empty Pvl object.
   Pvl::Pvl() : Isis::PvlObject("Root") {
     Init();

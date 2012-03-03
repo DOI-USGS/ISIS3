@@ -41,6 +41,10 @@ namespace Isis
         virtual void * getPointer() const;
         virtual bool operator<(AbstractTreeItem const & other) const;
 
+
+      protected:
+        virtual void sourceDeleted();
+
         
       private: // disable copying of this class
         AbstractNullDataItem(const AbstractNullDataItem & other);

@@ -10,6 +10,7 @@
 #include "Cube.h"
 #include "Filename.h"
 #include "ImagePolygon.h"
+#include "PolygonTools.h"
 #include "PvlObject.h"
 #include "SpecialPixel.h"
 #include "Table.h"
@@ -263,7 +264,7 @@ namespace Isis {
       try {
         ImagePolygon poly;
         cube()->read(poly);
-        m_footprint = (MultiPolygon *)poly.Polys()->clone();
+        m_footprint = PolygonTools::MakeMultiPolygon(poly.Polys()->clone());
       }
       catch (iException &e) {
         e.Clear();
@@ -707,7 +708,7 @@ namespace Isis {
 
     imgPoly.Create(*cube(), sampleStepSize, lineStepSize);
 
-    m_footprint = (geos::geom::MultiPolygon *)imgPoly.Polys()->clone();
+    m_footprint = PolygonTools::MakeMultiPolygon(imgPoly.Polys()->clone());
 
     iException &e = iException::Message(iException::User,
         "Warning: Polygon re-calculated "

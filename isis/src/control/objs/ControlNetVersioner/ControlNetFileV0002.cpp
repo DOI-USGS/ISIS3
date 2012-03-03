@@ -196,12 +196,12 @@ namespace Isis {
 
     PvlObject protoCore("Core");
     protoCore.AddKeyword(PvlKeyword("HeaderStartByte",
-        iString(startCoreHeaderPos)));
-    protoCore.AddKeyword(PvlKeyword("HeaderBytes", iString(coreHeaderSize)));
+                         iString((BigInt) startCoreHeaderPos)));
+    protoCore.AddKeyword(PvlKeyword("HeaderBytes", iString((BigInt) coreHeaderSize)));
     protoCore.AddKeyword(PvlKeyword("PointsStartByte",
-        iString(startCoreHeaderPos + coreHeaderSize)));
+        iString((BigInt) ( startCoreHeaderPos + coreHeaderSize))));
     protoCore.AddKeyword(PvlKeyword("PointsBytes",
-        iString(pointsSize)));
+        (BigInt) iString(pointsSize)));
     protoObj.AddObject(protoCore);
 
     PvlGroup netInfo("ControlNetworkInfo");

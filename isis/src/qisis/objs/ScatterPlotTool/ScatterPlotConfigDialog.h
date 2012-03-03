@@ -4,7 +4,7 @@
 #include <QDialog>
 #include <QPointer>
 
-class QwtDoubleRange;
+class QwtInterval;
 
 template <typename A, typename B> class QPair;
 class QCheckBox;
@@ -40,8 +40,8 @@ namespace Isis {
       int yAxisCubeBand() const;
       int xAxisBinCount() const;
       int yAxisBinCount() const;
-      QwtDoubleRange sampleRange() const;
-      QwtDoubleRange lineRange() const;
+      QwtInterval sampleRange() const;
+      QwtInterval lineRange() const;
 
       MdiCubeViewport *xAxisCubeViewport() const;
       MdiCubeViewport *yAxisCubeViewport() const;
@@ -50,9 +50,17 @@ namespace Isis {
       void refreshWidgetStates();
 
     private:
+      //! This is used internally to differentiate range accessors
+      enum RangeType {
+        //! This is used to get the sample range in a generic way
+        SampleRange,
+        //! This is used to get the line range in a generic way
+        LineRange
+      };
+
       QList<Cube *> removeFromList(QList<Cube *> list,
                                    QList<Cube *> itemsToRemove);
-      QPair<QwtDoubleRange, QwtDoubleRange> sampleLineRanges() const;
+      QwtInterval range(RangeType) const;
 
       //! This is the workspace containing all of the viewports.
       Workspace *m_workspace;

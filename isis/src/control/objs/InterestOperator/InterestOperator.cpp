@@ -905,7 +905,7 @@ namespace Isis {
                        (const geos::geom::Geometry *)measPolygon3.Polys());
       geomIntersect1 = geomIntersect2;
     }
-    return (geos::geom::MultiPolygon *)geomIntersect1;
+    return PolygonTools::MakeMultiPolygon(geomIntersect1);
   }
 
   /**

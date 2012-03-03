@@ -353,58 +353,41 @@ namespace Isis {
       foreach (MdiCubeViewport *viewport, viewportsToPlot()) {
         /* We'll need X-Axis labels and a xMax to scale to.*/
         QVector<double> labels;
-        QVector<double> stddevLabels;
         double xMax = 10.0;
         Statistics wavelengthStats;
 
-        QVector<double> avgarray, minarray, maxarray, std1array, std2array,
-            stderr1array, stderr2array, wavelengtharray;
-        QVector< double > stddevarray;
+        QVector<QPointF> avgData, minData, maxData, std1Data, std2Data,
+            stdErr1Data, stdErr2Data, wavelengthData;
         QVector<Statistics> plotStats;
 
         getSpectralStatistics(labels, plotStats, viewport);
         xMax = labels.size();
-        Cube *cube = viewport->cube();
 
-        Pvl &pvl = *cube->getLabel();
         for (int index = 0; index < labels.size(); index++) {
           if (!IsSpecial(plotStats[index].Average()) &&
               !IsSpecial(plotStats[index].Minimum()) &&
               !IsSpecial(plotStats[index].Maximum())) {
-            avgarray.push_back(plotStats[index].Average());
-            minarray.push_back(plotStats[index].Minimum());
-            maxarray.push_back(plotStats[index].Maximum());
+            avgData.append(QPointF(labels[index], plotStats[index].Average()));
+            minData.append(QPointF(labels[index], plotStats[index].Minimum()));
+            maxData.append(QPointF(labels[index], plotStats[index].Maximum()));
 
             if (!IsSpecial(plotStats[index].StandardDeviation())) {
-              stddevLabels.push_back(labels[index]);
-              std1array.push_back(plotStats[index].Average() +
-                                  plotStats[index].StandardDeviation());
-              std2array.push_back(plotStats[index].Average() -
-                                  plotStats[index].StandardDeviation());
+              std1Data.append(QPointF(labels[index],
+                  plotStats[index].Average() +
+                  plotStats[index].StandardDeviation()));
+              std2Data.append(QPointF(labels[index],
+                  plotStats[index].Average() -
+                  plotStats[index].StandardDeviation()));
+
               double standardError = plotStats[index].StandardDeviation() /
                                      sqrt(plotStats[index].ValidPixels());
-              stderr1array.push_back(plotStats[index].Average() +
-                                     standardError);
-              stderr2array.push_back(plotStats[index].Average() -
-                                     standardError);
-              stddevarray.push_back(plotStats[index].StandardDeviation());
-            }
-          }
-          else {
-            labels.erase(labels.begin() + index);
-            plotStats.erase(plotStats.begin() + index);
-            if (index >= 0)
-              index--;
-          }
 
-          if (pvl.FindObject("IsisCube").HasGroup("BandBin")) {
-            PvlGroup &bandBin = pvl.FindObject("IsisCube").FindGroup("BandBin");
-            if (bandBin.HasKeyword("Center")) {
-              PvlKeyword &wavelength = bandBin.FindKeyword("Center");
-              if (wavelength.Size() > index) {
-                wavelengtharray.push_back(wavelength[index]);
-                wavelengthStats.AddData(wavelength[index]);
-              }
+              stdErr1Data.append(QPointF(labels[index],
+                                         plotStats[index].Average() +
+                                         standardError));
+              stdErr2Data.append(QPointF(labels[index],
+                                         plotStats[index].Average() -
+                                         standardError));
             }
           }
         } /*end for loop*/
@@ -414,76 +397,46 @@ namespace Isis {
 
           validatePlotCurves();
           if (m_plotAvgAction->isChecked()) {
-            (*m_avgCurves)[viewport]->setData(&labels[0], &avgarray[0],
-                                              labels.size());
+            (*m_avgCurves)[viewport]->setData(new QwtPointSeriesData(avgData));
             (*m_avgCurves)[viewport]->setSource(viewport, rubberBandPoints);
           }
 
           if (m_plotMinAction->isChecked()) {
-            (*m_minCurves)[viewport]->setData(&labels[0], &minarray[0],
-                                              labels.size());
+            (*m_minCurves)[viewport]->setData(new QwtPointSeriesData(minData));
             (*m_minCurves)[viewport]->setSource(viewport, rubberBandPoints);
           }
 
           if (m_plotMaxAction->isChecked()) {
-            (*m_maxCurves)[viewport]->setData(&labels[0], &maxarray[0],
-                                              labels.size());
+            (*m_maxCurves)[viewport]->setData(new QwtPointSeriesData(maxData));
             (*m_maxCurves)[viewport]->setSource(viewport, rubberBandPoints);
           }
 
-          if (stddevLabels.size()) {
-            if (m_plotStdDev1Action->isChecked()) {
-              (*m_stdDev1Curves)[viewport]->setData(&stddevLabels[0],
-                  &std1array[0], stddevLabels.size());
-              (*m_stdDev1Curves)[viewport]->setSource(viewport,
-                                                      rubberBandPoints);
-            }
-
-            if (m_plotStdDev2Action->isChecked()) {
-              (*m_stdDev2Curves)[viewport]->setData(&stddevLabels[0],
-                  &std2array[0], stddevLabels.size());
-              (*m_stdDev2Curves)[viewport]->setSource(viewport,
-                                                      rubberBandPoints);
-            }
-
-            if (m_plotStdErr1Action->isChecked()) {
-              (*m_stdErr1Curves)[viewport]->setData(&stddevLabels[0],
-                  &stderr1array[0], stddevLabels.size());
-              (*m_stdErr1Curves)[viewport]->setSource(viewport,
-                                                      rubberBandPoints);
-            }
-
-            if (m_plotStdErr2Action->isChecked()) {
-              (*m_stdErr2Curves)[viewport]->setData(&stddevLabels[0],
-                  &stderr2array[0], stddevLabels.size());
-              (*m_stdErr2Curves)[viewport]->setSource(viewport,
-                                                      rubberBandPoints);
-            }
+          if (m_plotStdDev1Action->isChecked()) {
+            (*m_stdDev1Curves)[viewport]->setData(
+                new QwtPointSeriesData(std1Data));
+            (*m_stdDev1Curves)[viewport]->setSource(viewport,
+                                                    rubberBandPoints);
           }
-          else {
-            if (m_plotStdDev1Action->isChecked()) {
-              (*m_stdDev1Curves)[viewport]->setData(NULL, NULL, 0);
-              (*m_stdDev1Curves)[viewport]->setSource(viewport,
-                                                      rubberBandPoints);
-            }
 
-            if (m_plotStdDev2Action->isChecked()) {
-              (*m_stdDev2Curves)[viewport]->setData(NULL, NULL, 0);
-              (*m_stdDev2Curves)[viewport]->setSource(viewport,
-                                                      rubberBandPoints);
-            }
+          if (m_plotStdDev2Action->isChecked()) {
+            (*m_stdDev2Curves)[viewport]->setData(
+                new QwtPointSeriesData(std2Data));
+            (*m_stdDev2Curves)[viewport]->setSource(viewport,
+                                                    rubberBandPoints);
+          }
 
-            if (m_plotStdErr1Action->isChecked()) {
-              (*m_stdErr1Curves)[viewport]->setData(NULL, NULL, 0);
-              (*m_stdErr1Curves)[viewport]->setSource(viewport,
-                                                      rubberBandPoints);
-            }
+          if (m_plotStdErr1Action->isChecked()) {
+            (*m_stdErr1Curves)[viewport]->setData(
+                new QwtPointSeriesData(stdErr1Data));
+            (*m_stdErr1Curves)[viewport]->setSource(viewport,
+                                                    rubberBandPoints);
+          }
 
-            if (m_plotStdErr2Action->isChecked()) {
-              (*m_stdErr2Curves)[viewport]->setData(NULL, NULL, 0);
-              (*m_stdErr2Curves)[viewport]->setSource(viewport,
-                                                      rubberBandPoints);
-            }
+          if (m_plotStdErr2Action->isChecked()) {
+            (*m_stdErr2Curves)[viewport]->setData(
+                new QwtPointSeriesData(stdErr2Data));
+            (*m_stdErr2Curves)[viewport]->setSource(viewport,
+                                                    rubberBandPoints);
           }
         }
       }

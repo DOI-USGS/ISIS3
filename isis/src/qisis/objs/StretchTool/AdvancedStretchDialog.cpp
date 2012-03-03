@@ -60,6 +60,7 @@ namespace Isis {
     p_bluStretch = new AdvancedStretch(bluHist, bluStretch,
                                        "Blue", QColor(Qt::blue));
     layout()->addWidget(p_bluStretch);
+    updateGeometry();
 
     connect(p_redStretch, SIGNAL(stretchChanged()),
             this, SIGNAL(stretchChanged()));
@@ -118,6 +119,7 @@ namespace Isis {
     p_grayStretch = new AdvancedStretch(grayHist, grayStretch,
                                         "Gray", QColor(Qt::gray));
     layout()->addWidget(p_grayStretch);
+    updateGeometry();
 
     connect(p_grayStretch, SIGNAL(stretchChanged()),
             this, SIGNAL(stretchChanged()));

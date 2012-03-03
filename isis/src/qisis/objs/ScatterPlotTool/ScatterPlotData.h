@@ -11,7 +11,7 @@
 template <typename A, typename B> class QPair;
 template <typename T> class QVector;
 
-class QwtDoubleRange;
+class QwtInterval;
 
 namespace Isis {
   class Cube;
@@ -28,12 +28,11 @@ namespace Isis {
     public:
       ScatterPlotData(Cube *xCube, int xCubeBand, int xBinCount,
                       Cube *yCube, int yCubeBand, int yBinCount,
-                      QwtDoubleRange sampleRange, QwtDoubleRange lineRange);
+                      QwtInterval sampleRange, QwtInterval lineRange);
       ScatterPlotData(const ScatterPlotData &other);
 
       ~ScatterPlotData();
       virtual QwtRasterData *copy() const;
-      virtual QwtDoubleInterval range() const;
       virtual double value(double x, double y) const;
 
       double xCubeMin() const;
@@ -49,8 +48,10 @@ namespace Isis {
 
       QVector<double> discreteXValues() const;
 
-      void alarm(double x, double y) const;
-      void clearAlarms() const;
+      void alarm(double x, double y);
+      void clearAlarms();
+
+      QRectF pixelHint(const QRectF &area) const;
 
       ScatterPlotData &operator=(const ScatterPlotData &other);
 
@@ -74,13 +75,9 @@ namespace Isis {
       int m_maxCount;
 
       /**
-       * map from bin index to alarm state (true for alarmed), mutable for
-       *   efficiency (not necessity). This efficiency gain is very significant
-       *   and easy to test - the scatter plot data must be copied every time
-       *   the alarming changes if this isn't mutable. Copy-on-write might be
-       *   able to remove the need for this mutable.
+       * map from bin index to alarm state (true for alarmed)
        */
-      mutable QScopedPointer< QMap<int, bool> > m_alarmedBins;
+      QScopedPointer< QMap<int, bool> > m_alarmedBins;
 
       //! The minimum DN value for the x cube
       double m_xCubeMin;

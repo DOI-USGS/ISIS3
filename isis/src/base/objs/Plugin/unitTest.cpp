@@ -8,22 +8,6 @@ using namespace std;
 int main(int argc, char *argv[]) {
   Isis::Preference::Preferences(true);
 
-  try {
-    stringstream temp;
-    temp << "Group = Plugin" << endl;
-    temp << "  Library = isis3" << endl;
-    temp << "  Routine = PluginPlugin" << endl;
-    temp << "EndGroup" << endl;
-
-    Isis::Plugin p;
-    temp >> p;
-    void *ptr = p.GetPlugin("Plugin");
-
-    int * (*module)();
-    module = (int * ( *)()) ptr;
-    cout << *(*module)() << endl;
-  }
-  catch(Isis::iException &e) {
-    e.Report(false);
-  }
+  std::cout << "This unit test is not currently capable of testing Plugin"
+            << std::endl;
 }

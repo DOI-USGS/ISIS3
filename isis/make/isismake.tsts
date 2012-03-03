@@ -147,8 +147,8 @@ test: FORCE clean
 	    $$MSG >> errors.txt;                                              \
 	  else                                                                \
 	    $(MAKE) output;                                                   \
-	    TRUTHFILECOUNT=`$(LS) -p $(TRUTH) | $(GREP) -v "/" | wc -l`;      \
-	    OUTPUTFILECOUNT=`$(LS) -p $(OUTPUT) | $(GREP) -v "/" | wc -l`;    \
+	    TRUTHFILECOUNT=`$(LS) -p $(TRUTH)/ | $(GREP) -v "/" | wc -l`;     \
+	    OUTPUTFILECOUNT=`$(LS) -p $(OUTPUT)/ | $(GREP) -v "/" | wc -l`;   \
 	    if [ $$TRUTHFILECOUNT -ne $$OUTPUTFILECOUNT ]; then               \
 	      MSG='$(FILECOUNTMISMATCH)';                                     \
 	      echo -n $(CURTIMESTAMP) >> errors.txt;                          \
@@ -209,8 +209,8 @@ compare: FORCE
 	      $(PRINTF) "$(BLANKS)  " >> errors.txt;                          \
 	      $$MSG >> errors.txt;                                            \
 	    else                                                              \
-	      TRUTHFILECOUNT=`$(LS) -p $(TRUTH) | $(GREP) -v "/" | wc -l`;    \
-	      OUTPUTFILECOUNT=`$(LS) -p $(OUTPUT) | $(GREP) -v "/" | wc -l`;  \
+	      TRUTHFILECOUNT=`$(LS) -p $(TRUTH)/ | $(GREP) -v "/" | wc -l`;   \
+	      OUTPUTFILECOUNT=`$(LS) -p $(OUTPUT)/ | $(GREP) -v "/" | wc -l`; \
 	      if [ $$TRUTHFILECOUNT -ne $$OUTPUTFILECOUNT ]; then             \
 	        MSG='$(FILECOUNTMISMATCH)';                                   \
 	        echo -n $(CURTIMESTAMP) >> errors.txt;                        \
@@ -292,7 +292,7 @@ compare: FORCE
 # variables to do this, so it would be a considerable undertaking. 
 #----------------------------------------------------------------------------
 comparefiles: FORCE
-	TRUTHFILECOUNT=`$(LS) -p $(TRUTH) | $(GREP) -v "/" | wc -l`;          \
+	TRUTHFILECOUNT=`$(LS) -p $(TRUTH)/ | $(GREP) -v "/" | wc -l`;         \
 	SUCCESSFULCOMPARISONS=0;                                              \
 	                                                                      \
 	FILES="$(notdir $(wildcard $(TRUTH)/*))";                             \

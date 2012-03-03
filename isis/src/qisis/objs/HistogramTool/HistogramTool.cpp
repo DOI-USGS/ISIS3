@@ -1,8 +1,6 @@
 #include "HistogramTool.h"
 
-#include <qwt_interval_data.h>
 #include <qwt_legend_item.h>
-#include <qwt_valuelist.h>
 
 #include <geos/geom/Point.h>
 
@@ -359,16 +357,16 @@ namespace Isis {
 
 
       //Transfer data from histogram to the plotcurve
-      std::vector<double> xarray, yarray, y2array;
+      QVector<QPointF> binCountData;
+      QVector<QPointF> cumPctData;
       double cumpct = 0.0;
       for(int i = 0; i < hist.Bins(); i++) {
         if(hist.BinCount(i) > 0) {
-          xarray.push_back(hist.BinMiddle(i));
-          yarray.push_back(hist.BinCount(i));
+          binCountData.append(QPointF(hist.BinMiddle(i), hist.BinCount(i)));
 
           double pct = (double)hist.BinCount(i) / hist.ValidPixels() * 100.;
           cumpct += pct;
-          y2array.push_back(cumpct);
+          cumPctData.append(QPointF(hist.BinMiddle(i), cumpct));
         }
       }
 
@@ -377,32 +375,24 @@ namespace Isis {
 
       //These are all variables needed in the following for loop.
       //----------------------------------------------
-      QwtArray<QwtDoubleInterval> intervals(xarray.size());
-      QwtValueList majorTicks;
-      QwtArray<double> values(yarray.size());
+      QVector<QwtIntervalSample> intervals(binCountData.size());
       double maxYValue = DBL_MIN;
       double minYValue = DBL_MAX;
       // ---------------------------------------------
 
-      for(unsigned int y = 0; y < yarray.size(); y++) {
+      for(int y = 0; y < binCountData.size(); y++) {
+        intervals[y].interval = QwtInterval(binCountData[y].x(), binCountData[y].x() + hist.BinSize());
 
-        intervals[y] = QwtDoubleInterval(xarray[y], xarray[y] + hist.BinSize());
-
-        majorTicks.push_back(xarray[y]);
-        //std::cout << "\nmajor tick " << xarray[y] << std::endl;
-        majorTicks.push_back(xarray[y] + hist.BinSize());
-        //std::cout << "& " << xarray[y] + hist.BinSize() << std::endl;
-
-        values[y] = yarray[y];
-        if(values[y] > maxYValue) maxYValue = values[y];
-        if(values[y] < minYValue) minYValue = values[y];
+        intervals[y].value = binCountData[y].y();
+        if(binCountData[y].y() > maxYValue) maxYValue = binCountData[y].y();
+        if(binCountData[y].y() < minYValue) minYValue = binCountData[y].y();
       }
 
-      if (xarray.size()) {
+      if (binCountData.size()) {
         validatePlotCurves();
-        m_frequencyItem->setData(QwtIntervalData(intervals, values));
+        m_frequencyItem->setData(QwtIntervalSeriesData(intervals));
 //         m_frequencyItem->setSource(activeViewport, vertices);
-        m_percentageCurve->setData(&xarray[0], &y2array[0], xarray.size());
+        m_percentageCurve->setData(new QwtPointSeriesData(cumPctData));
         m_percentageCurve->setSource(activeViewport, vertices);
       }
 

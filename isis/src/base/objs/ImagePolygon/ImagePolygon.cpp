@@ -1319,7 +1319,7 @@ namespace Isis {
     }
 
     geos::io::WKTReader *wkt = new geos::io::WKTReader(&(globalFactory));
-    p_polygons = (geos::geom::MultiPolygon *) wkt->read(p_polyStr);
+    p_polygons = PolygonTools::MakeMultiPolygon(wkt->read(p_polyStr));
     delete wkt;
   }
 

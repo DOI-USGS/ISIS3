@@ -1,4 +1,12 @@
-include $(ISISROOT)/make/isismake.macros
+#include $(ISISROOT)/make/isismake.macros
+CURTIMESTAMP   ?= "[`date +'%Y-%m-%d %H:%M:%S'`]"
+#---------------------------------------------------------------------------
+# Check to see if the programmer wants make to be noisy
+#---------------------------------------------------------------------------
+ifeq ($(findstring LOUD, $(MODE)),LOUD)
+else
+.SILENT:
+endif
 
 .NOTPARALLEL:
 
@@ -9,6 +17,7 @@ help:
 	echo "Isis Make System Commands"
 	echo "------------------------ "
 	echo "make all       : Build and install the entire system (incs,api,apps,docs)"
+	echo "make config    : Generate preliminary config parameters"
 	echo "make incs      : Install API include files"
 	echo "make api       : Build and install the Isis API"
 	echo "make apps      : Build and install Isis Applications"
@@ -28,7 +37,19 @@ help:
 # After the API is created then the applications can be individually built
 # and installed. Finally create the web documentation for the entire system.
 #----------------------------------------------------------------------------
-all: incs thirdParty api apps docs
+all: config incs thirdParty api apps docs
+
+#----------------------------------------------------------------------------
+# Target = config
+# Dependencies = none
+#
+# Set up any compile/link configuration dependancy files
+#----------------------------------------------------------------------------
+config: FORCE
+	echo $(CURTIMESTAMP) "Creating config files"
+	$(MAKE) --directory=config -f config.mak config
+	echo $(CURTIMESTAMP) "Finished creating config files"
+	echo $(CURTIMESTAMP) " "
 
 #----------------------------------------------------------------------------
 # Target = incs
@@ -39,7 +60,7 @@ all: incs thirdParty api apps docs
 # copy the include file from the individual object directory into the
 # system directory $(ISISROOT)/inc.
 #----------------------------------------------------------------------------
-incs:
+incs: config
 	echo $(CURTIMESTAMP) "Installing include files"
 	mkdir -p inc
 	$(MAKE) --directory=src includes
@@ -144,6 +165,7 @@ clean:
 	rm -rf lib
 	rm -rf scripts/tabcomplete.csh
 	$(MAKE) --directory=3rdParty clean
+	$(MAKE) --directory=config -f config.mak clean
 	echo $(CURTIMESTAMP) "Finished cleaning Isis"
 
 cleansrc:
@@ -197,10 +219,11 @@ catTest:
 HOST_ARCH ?= $(shell uname -s)
 HOST_MACH  = $(shell uname -m)
 
-thirdParty:
+thirdParty: config
 	echo $(CURTIMESTAMP) "Installing 3rdParty libraries"
 	rm -f $(ISISROOT)/3rdParty/lib/lib*
 	$(MAKE) -C $(ISISROOT)/3rdParty install
 	echo $(CURTIMESTAMP) "Finished installing 3rdParty libraries"
 	echo $(CURTIMESTAMP) " "
 
+FORCE:

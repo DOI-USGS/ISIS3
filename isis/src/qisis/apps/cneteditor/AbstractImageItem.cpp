@@ -85,7 +85,6 @@ namespace Isis
 
 
     void AbstractImageItem::sourceDeleted() {
-  //     std::cerr << "Serial item - " << ccgn << " lost\n";
       ccgn = NULL;
     }
   }

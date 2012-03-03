@@ -105,23 +105,9 @@ namespace Isis {
    * for the markers associated with the curve.
    * @param data
    */
-  void PlotCurve::setData(const QwtData &data) {
+  void PlotCurve::setData(QwtSeriesData<QPointF> *data) {
     //set the data for the curve
     QwtPlotCurve::setData(data);
-    recreateMarkers();
-  }
-
-
-  /**
-   * This method sets the data for the curve, then sets the value
-   * for the markers associated with the curve.
-   * @param xData
-   * @param yData
-   * @param size
-   */
-  void PlotCurve::setData(const double *xData, const double *yData, int size) {
-    /*set the data for the curve*/
-    QwtPlotCurve::setData(xData, yData, size);
     recreateMarkers();
   }
 
@@ -247,8 +233,7 @@ namespace Isis {
       // Done reading the more advanced items, finish up with the data
       int plotDataSize = *((int *)(rawClassData + dataPos));
       dataPos += sizeof(int);
-      QwtArray<double> plotDataXValues;
-      QwtArray<double> plotDataYValues;
+      QVector<QPointF> plotDataValues;
 
       for (int i = 0; i < plotDataSize; i ++) {
         double x = *((double *)(rawClassData + dataPos));
@@ -257,13 +242,10 @@ namespace Isis {
         double y = *((double *)(rawClassData + dataPos));
         dataPos += sizeof(double);
 
-        plotDataXValues.push_back(x);
-        plotDataYValues.push_back(y);
+        plotDataValues.append(QPointF(x, y));
       }
 
-      QwtArrayData plotData(plotDataXValues, plotDataYValues);
-
-      setData(plotData);
+      setData(new QwtPointSeriesData(plotDataValues));
       ASSERT(dataPos <= classData.size());
 
       return classData.right(classData.size() - dataPos);
@@ -332,13 +314,13 @@ namespace Isis {
     classData.append(markerSymbolDataBuffer.buffer());
 
     // Store the X/Y plot values
-    const QwtData &plotData = data();
+    const QwtSeriesData<QPointF> &plotData = *data();
     size = plotData.size();
     classData.append((char *)&size, sizeof(int));
 
     for (int i = 0; i < size; i ++) {
-      double x = plotData.x(i);
-      double y = plotData.y(i);
+      double x = plotData.sample(i).x();
+      double y = plotData.sample(i).y();
 
       classData.append((char *)&x, sizeof(double));
       classData.append((char *)&y, sizeof(double));
@@ -367,7 +349,7 @@ namespace Isis {
   void PlotCurve::clearMarkers() {
     foreach (QwtPlotMarker *marker, m_valuePointMarkers) {
       marker->detach();
-      delete marker;
+      //delete marker;
     }
 
     m_valuePointMarkers.clear();
@@ -385,12 +367,12 @@ namespace Isis {
     markerPen.setColor(m_color);
     m_markerSymbol.setPen(markerPen);
 
-    const QwtData &plotData = data();
+    const QwtSeriesData<QPointF> &plotData = *data();
     for(unsigned int i = 0; i < plotData.size(); i++) {
       QwtPlotMarker *newMarker = new QwtPlotMarker();
-      newMarker->setValue(plotData.x(i), plotData.y(i));
-      newMarker->setAxis(xAxis(), yAxis());
-      newMarker->setSymbol(m_markerSymbol);
+      newMarker->setValue(plotData.sample(i).x(), plotData.sample(i).y());
+      newMarker->setAxes(xAxis(), yAxis());
+      newMarker->setSymbol(&m_markerSymbol);
       newMarker->setVisible(markersVisible);
       newMarker->attach(plot());
       m_valuePointMarkers.append(newMarker);

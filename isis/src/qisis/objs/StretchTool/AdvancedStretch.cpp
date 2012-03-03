@@ -29,6 +29,8 @@ namespace Isis {
                                    const QString &name, const QColor &color) {
     setLayout(new QVBoxLayout());
 
+    setSizePolicy(QSizePolicy::MinimumExpanding,
+                  QSizePolicy::MinimumExpanding);
     QWidget *typeSelectionArea = new QWidget();
     typeSelectionArea->setLayout(new QHBoxLayout());
     typeSelectionArea->layout()->addWidget(new QLabel("Stretch Type"));

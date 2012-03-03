@@ -83,7 +83,8 @@ namespace Isis {
       /*If there is not an intersecting polygon, there is no reason to go on.*/
       if(!poly->intersects(p_imagePoly))return;
 
-      geos::geom::Polygon *intersectPoly = ((geos::geom::Polygon *)p_imagePoly->intersection(poly));
+      geos::geom::MultiPolygon *intersectPoly = PolygonTools::MakeMultiPolygon(
+          p_imagePoly->intersection(poly));
       const geos::geom::Envelope *envelope = intersectPoly->getEnvelopeInternal();
 
       for(double y = floor(envelope->getMinY()); y <= ceil(envelope->getMaxY()); y++) {
@@ -215,7 +216,8 @@ namespace Isis {
       /*If there is not an intersecting polygon, there is no reason to go on.*/
       if(!poly->intersects(p_imagePoly))return;
 
-      geos::geom::Polygon *intersectPoly = ((geos::geom::Polygon *)p_imagePoly->intersection(poly));
+      geos::geom::MultiPolygon *intersectPoly = PolygonTools::MakeMultiPolygon(
+          p_imagePoly->intersection(poly));
       const geos::geom::Envelope *envelope = intersectPoly->getEnvelopeInternal();
 
       geos::operation::overlay::snap::GeometrySnapper snap(*intersectPoly);

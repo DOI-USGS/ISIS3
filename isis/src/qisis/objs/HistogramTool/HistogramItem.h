@@ -8,7 +8,9 @@
 #include "qwt_plot_item.h"
 #include "CubeViewport.h"
 
-class QwtIntervalData;
+class QRectF;
+
+class QwtIntervalSeriesData; 
 
 namespace Isis {
   /**
@@ -27,8 +29,8 @@ namespace Isis {
       explicit HistogramItem(const QwtText &title);
       virtual ~HistogramItem();
 
-      void setData(const QwtIntervalData &data);
-      const QwtIntervalData &data() const;
+      void setData(const QwtIntervalSeriesData &data);
+      const QwtIntervalSeriesData &data() const;
       QList <QPointF > getVertices() const;
       void setVertices(const QList <QPoint> &points);
       CubeViewport *getViewPort() const;
@@ -37,12 +39,12 @@ namespace Isis {
       void setColor(const QColor &);
       QColor color() const;
 
-      virtual QwtDoubleRect boundingRect() const;
+      virtual QRectF boundingRect() const;
 
       virtual int rtti() const;
 
       virtual void draw(QPainter *, const QwtScaleMap &xMap,
-                        const QwtScaleMap &yMap, const QRect &) const;
+                        const QwtScaleMap &yMap, const QRectF &) const;
 
       void setBaseline(double reference);
       double baseline() const;

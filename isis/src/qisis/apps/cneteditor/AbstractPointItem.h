@@ -19,7 +19,7 @@ namespace Isis
   namespace CnetViz
   {
     class TableColumnList;
-    
+
     /**
      * @brief Base class for a point item in the tree
      *
@@ -33,8 +33,6 @@ namespace Isis
      */
     class AbstractPointItem : public virtual AbstractTreeItem
     {
-        Q_OBJECT
-
       public:
         // If a column is added or removed then make sure you also update
         // the COLS constant that immediately follows this enum.
@@ -87,8 +85,8 @@ namespace Isis
         bool hasPoint(ControlPoint *) const;
 
 
-      private slots:
-        void sourceDeleted();
+      protected:
+        virtual void sourceDeleted();
 
 
       private:

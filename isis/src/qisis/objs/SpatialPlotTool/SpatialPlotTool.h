@@ -60,8 +60,7 @@ namespace Isis {
       void viewportSelected();
 
     private:
-      void getSpatialStatistics(QVector<double>  & labels,
-                                QVector<double> & data, MdiCubeViewport *);
+      QVector<QPointF> getSpatialStatistics(MdiCubeViewport *);
       void validatePlotCurves();
 
       //! Plot tool's action

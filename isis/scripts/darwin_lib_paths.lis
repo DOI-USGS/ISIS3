@@ -6,3 +6,5 @@
 /usgs/pkgs/local(.*?)lib       @loader_path
 /opt/local/libexec/qt4-mac/lib @loader_path
 /opt/local/lib                 @loader_path
+#  Add paths for new MacPorts structure
+/opt/usgs/(.*?)/lib       @loader_path

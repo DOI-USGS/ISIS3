@@ -39,7 +39,7 @@ libs:
              --liblog=DarwinLibs.lis                                         \
 	     --relocdir=$(ISISROOT)/3rdParty/lib:$ISISROOT/3rdParty          \
              --update                                                        \
-	    `find $(ISISROOT)/3rdParty/lib -name 'Qt*' -print                \
+	    `find $(ISISROOT)/3rdParty/lib -name '[Qq]*' -print                \
 	    -mindepth 3 -maxdepth 4 -type f` > /dev/null;                    \
 	  chmod u-w $(ISISROOT)/3rdParty/lib/libcrypto.*.dylib;              \
 	  chmod u-w $(ISISROOT)/3rdParty/lib/libssl.*.dylib;                 \
@@ -60,16 +60,19 @@ plugins:
 	    --liblog=DarwinLibs.lis --update                                 \
 	    --relocdir=$(ISISROOT)/3rdParty/lib:$(ISISROOT)/3rdParty         \
 	    --errlog=DarwinErrors.lis                                        \
-	    `find $(ISISROOT)/3rdParty/plugins -name '*.bundle' -type f`     \
-	    > /dev/null;                                                     \
+            `find $(ISISROOT)/3rdParty/plugins -name '*.bundle' -type f`     \
+            `find $(ISISROOT)/3rdParty/plugins -name '*.dylib' -type f`      \
+            > /dev/null;                                                     \
 	  if [ -f "DarwinErrors.lis" ]; then                                 \
 	    cat DarwinErrors.lis;                                            \
 	  fi;                                                                \
 	  $(RM) DarwinErrors.lis DarwinLibs.lis;                             \
 	fi
 
+
 clean:
-	rm -f lib/lib*.so*
+	rm -f lib/lib*.so* lib/lib*.dylib
+	cd lib && rm -rf *.framework
 	@for plugs in plugins/*; do \
 	  if [ -d $$plugs -a $$plugs != "plugins/CVS" ]; \
 	  then \

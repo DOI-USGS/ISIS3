@@ -198,6 +198,10 @@ namespace Isis {
             case QNetworkReply::NoError:
               break;
 
+            case QNetworkReply::TemporaryNetworkFailureError:
+              *p_error += ". There was a temporary network failure";
+              break;
+
             case QNetworkReply::ConnectionRefusedError:
               *p_error += ". The server refused the connection";
               break;

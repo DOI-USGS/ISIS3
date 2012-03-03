@@ -85,8 +85,3 @@ namespace Isis {
   }
 } // end namespace isis
 
-extern "C" int *PluginPlugin() {
-  cout << "Hello world" << endl;
-  static int k = 5;
-  return &k;
-}

@@ -2,7 +2,6 @@
 
 #include <string>
 #include <QMenuBar>
-#include <qwt_interval_data.h>
 
 #include "Process.h"
 #include "Histogram.h"
@@ -131,16 +130,16 @@ void IsisMain() {
     }
 
     //Transfer data from histogram to the plotcurve
-    std::vector<double> xarray, yarray, y2array;
+    QVector<QPointF> binCountData;
+    QVector<QPointF> cumPctData;
     double cumpct = 0.0;
     for(int i = 0; i < hist.Bins(); i++) {
       if(hist.BinCount(i) > 0) {
-        xarray.push_back(hist.BinMiddle(i));
-        yarray.push_back(hist.BinCount(i));
+        binCountData.append(QPointF(hist.BinMiddle(i), hist.BinCount(i)));
 
         double pct = (double)hist.BinCount(i) / hist.ValidPixels() * 100.;
         cumpct += pct;
-        y2array.push_back(cumpct);
+        cumPctData.append(QPointF(hist.BinMiddle(i), cumpct));
       }
     }
 
@@ -161,17 +160,17 @@ void IsisMain() {
 
     //These are all variables needed in the following for loop.
     //----------------------------------------------
-    QwtArray<QwtDoubleInterval> intervals(xarray.size());
-    QwtArray<double> values(yarray.size());
+    QVector<QwtIntervalSample> intervals(binCountData.size());
 //     double maxYValue = DBL_MIN;
 //     double minYValue = DBL_MAX;
 //     // ---------------------------------------------
 // 
-    for(unsigned int y = 0; y < yarray.size(); y++) {
+    for(int y = 0; y < binCountData.size(); y++) {
 
-      intervals[y] = QwtDoubleInterval(xarray[y], xarray[y] + hist.BinSize());
+      intervals[y].interval = QwtInterval(binCountData[y].x(),
+                                          binCountData[y].x() + hist.BinSize());
 
-      values[y] = yarray[y];
+      intervals[y].value = binCountData[y].y();
 //       if(values[y] > maxYValue) maxYValue = values[y];
 //       if(values[y] < minYValue) minYValue = values[y];
     }
@@ -183,8 +182,8 @@ void IsisMain() {
     symbol.setStyle(QwtSymbol::NoSymbol);
     cdfCurve->setMarkerSymbol(symbol);
 
-    histCurve->setData(QwtIntervalData(intervals, values));
-    cdfCurve->setData(&xarray[0], &y2array[0], xarray.size());
+    histCurve->setData(QwtIntervalSeriesData(intervals));
+    cdfCurve->setData(new QwtPointSeriesData(cumPctData));
 
     plot->add(histCurve);
     plot->add(cdfCurve);

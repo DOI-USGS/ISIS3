@@ -1,7 +1,7 @@
 #include "IsisDebug.h"
 #include "ScatterPlotConfigDialog.h"
 
-#include <qwt_double_range.h>
+#include <qwt_interval.h>
 
 #include <QCheckBox>
 #include <QComboBox>
@@ -286,8 +286,8 @@ namespace Isis {
    *
    * @return The sample range for the scatter plot data
    */
-  QwtDoubleRange ScatterPlotConfigDialog::sampleRange() const {
-    return sampleLineRanges().first;
+  QwtInterval ScatterPlotConfigDialog::sampleRange() const {
+    return range(SampleRange);
   }
 
 
@@ -298,8 +298,8 @@ namespace Isis {
    *
    * @return The line range for the scatter plot data
    */
-  QwtDoubleRange ScatterPlotConfigDialog::lineRange() const {
-    return sampleLineRanges().second;
+  QwtInterval ScatterPlotConfigDialog::lineRange() const {
+    return range(LineRange);
   }
 
 
@@ -483,21 +483,21 @@ namespace Isis {
    *   lineRange(). NOTE: If a cube if opened twice, and we're using the
    *   viewport visible range, it's currently ambiguous which viewport to use.
    *
-   * @return The sample/line ranges to create a scatter plot on. The information
-   *         is 1-based and inclusive, so a result of [1, nsamples], [1, nlines]
-   *         is the entire cube.
+   * @param rangeType The range type we're getting: sample range or line range
+   * @return The sample or line range to create a scatter plot on. The
+   *         information is 1-based and inclusive, so a result of [1, nsamples]
+   *         is the entire sample range.
    */
-  QPair<QwtDoubleRange, QwtDoubleRange>
-      ScatterPlotConfigDialog::sampleLineRanges() const {
-    QwtDoubleRange sampleRange;
-    QwtDoubleRange lineRange;
+  QwtInterval ScatterPlotConfigDialog::range(RangeType rangeType) const {
+    QwtInterval sampleRange;
+    QwtInterval lineRange;
 
     if (m_useViewportRangesCheckBox->isChecked()) {
       MdiCubeViewport * container = xAxisCubeViewport();
       if (!container && xAxisCube()) {
         ASSERT(0);
-        sampleRange.setRange(1.0, xAxisCube()->getSampleCount());
-        lineRange.setRange(1.0, xAxisCube()->getLineCount());
+        sampleRange.setInterval(1.0, xAxisCube()->getSampleCount());
+        lineRange.setInterval(1.0, xAxisCube()->getLineCount());
       }
       else if (container && xAxisCube()) {
         double startSample = Null;
@@ -509,20 +509,19 @@ namespace Isis {
         container->viewportToCube(container->viewport()->width() - 1,
                                   container->viewport()->height() - 1,
                                   endSample, endLine);
-        sampleRange.setRange(qRound(startSample), qRound(endSample));
-        lineRange.setRange(qRound(startLine), qRound(endLine));
-      }
-      else {
-        sampleRange.setValid(false);
-        lineRange.setValid(false);
+        sampleRange.setInterval(qRound(startSample), qRound(endSample));
+        lineRange.setInterval(qRound(startLine), qRound(endLine));
       }
     }
     else {
-      sampleRange.setRange(1.0, xAxisCube()->getSampleCount());
-      lineRange.setRange(1.0, xAxisCube()->getLineCount());
+      sampleRange.setInterval(1.0, xAxisCube()->getSampleCount());
+      lineRange.setInterval(1.0, xAxisCube()->getLineCount());
     }
 
-    return QPair<QwtDoubleRange, QwtDoubleRange>(sampleRange, lineRange);
+    if (rangeType == SampleRange)
+      return sampleRange;
+    else
+      return lineRange;
   }
 }
 
