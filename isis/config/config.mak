@@ -2,10 +2,13 @@
 # Makefile for building: config Makefile
 # Command: $(QMAKE) -o Makefile config.pro
 #############################################################################
-QMAKE ?= $(shell which qmake)
+SHELL=bash
+.SILENT:
+
+QMAKE ?= $(shell which qmake 2 >& /dev/null)
 
 ifeq ($(QMAKE),)
-  QMAKE := $(shell which qmake-mac)
+  QMAKE := $(shell which qmake-mac 2 >& /dev/null)
 endif
 
 ifeq ($(QMAKE),)
