@@ -18,18 +18,26 @@ ifeq ($(QMAKE),)
 endif
 
 ifeq ($(QMAKE),)
-  QMAKE := /opt/local/bin/qmake-mac
+  QMAKE := $(wildcard /usgs/pkgs/local/$(ISISLOCALVERSION)/bin/qmake)
+endif
+
+ifeq ($(QMAKE),)
+  QMAKE := $(wildcard /opt/local/bin/qmake-mac)
 endif
 
 config: Makefile
 
 Makefile: FORCE config.pro
-	@$(QMAKE) -o Makefile config.pro
-	@$(MAKE) isis_conf
+	if [ -f "$(QMAKE)" ]; then       \
+	  $(QMAKE) -o Makefile config.pro; \
+	  $(MAKE) isis_conf;               \
+	fi;
 
 
 clean:
-	@$(MAKE) distclean
+	if [ -f Makefile ]; then \
+	  $(MAKE) distclean;    \
+	fi;
 
 FORCE:
 
