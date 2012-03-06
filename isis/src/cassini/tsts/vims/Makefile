@@ -11,6 +11,7 @@ commands:
 	  IR= $(OUTPUT)/CM_1477461989_1.cub--vims2isis-spiceinit-ir.cub > /dev/null
 
 	$(SPICEINIT) from=$(OUTPUT)/CM_1477461989_1.cub--vims2isis-spiceinit-vis.cub \
+	  PCK=$(ISIS3DATA)/cassini/kernels/pck/cpck24Jul2006.tpc \
 	  > /dev/null
 
 	$(CAMPT) from=$(OUTPUT)/CM_1477461989_1.cub--vims2isis-spiceinit-vis.cub \
