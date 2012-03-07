@@ -118,7 +118,9 @@ namespace Isis {
    *                                    properly display a clean mapping group.
    *  @history 2011-08-11 Steven Lambright - phi2Compute was running out of
    *                          iterations for vesta (an asteroid). Fixes #279
-   *
+   *  @history 2012-03-01 Jeff Anderson - Fixed bug in SetUpperLeftCorner by
+   *                          adding Pvl::Replace when updating the mapping
+   *                          labels 
    */
   class Projection {
     public:
