@@ -34,6 +34,15 @@ namespace Isis {
    * @internal
    *   @history 2011-09-20 Steven Lambright - Added support for 4 line version
    *                           file.
+   *   @history 2012-03-06 Steven Lambright - Added automatic environment
+   *                           setup that works with every Isis 3 application.
+   *                           This includes the 'qisis' applications. The
+   *                           automatic setup is setting the Qt plugin path
+   *                           because picking up a plugin from the OS means
+   *                           crashing with an error like:
+   *                             Cannot mix incompatible Qt library (version
+   *                             0x40704) with this library (version 0x40800)
+   *                           Fixes #742.
    */
   class Environment {
     public:
@@ -45,11 +54,17 @@ namespace Isis {
       
       
     protected:
-      Environment() {}
+      Environment();
       
       
     private:
       static iString getEnvironmentValue(iString, iString);
+      /**
+       *  Construct an environment in static space to initialize some
+       *    global Isis 3 environment options. This initialization
+       *    applies to anything that links against the Isis 3 library.
+       */
+      static Environment automaticEnvironmentSetup;
   };
 }
 

@@ -134,12 +134,8 @@ namespace Isis {
         // Get the starting wall clock time
         p_datetime = DateTime(&p_startTime);
         p_startClock = clock();
-        //cerr << "Application NonGUI start clock=" << (long)p_startClock << " time=" << p_startTime << endl;
-        new QCoreApplication(argc, argv);
 
-        // Add the Qt plugin directory to the library path
-        Filename qtpluginpath("$ISISROOT/3rdParty/plugins");
-        QCoreApplication::addLibraryPath(qtpluginpath.Expanded().c_str());
+        new QCoreApplication(argc, argv);
       }
     }
     catch (iException &e) {

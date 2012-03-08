@@ -79,9 +79,6 @@ namespace Isis {
     new QApplication(argc, argv);
     QApplication::setQuitOnLastWindowClosed(true);
 
-    Isis::Filename qtpluginpath("$ISISROOT/3rdParty/plugins");
-    QCoreApplication::addLibraryPath(qtpluginpath.Expanded().c_str());
-
 
     // Qt is smart enough to use the style of the system running the program.
     // However, Isis supports overriding this with a setting in IsisPreferences.

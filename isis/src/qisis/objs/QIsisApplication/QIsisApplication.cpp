@@ -4,6 +4,8 @@
 
 #include <QObject>
 
+#include "Filename.h"
+
 namespace Isis {
   /**
    * Constructor
@@ -13,6 +15,7 @@ namespace Isis {
    */
   QIsisApplication::QIsisApplication(int &argc, char *argv[]) :
     QApplication(argc, argv) {
+
     // try to use US locale for numbers so we don't end up printing "," instead
     //   of "." where it might count.
     setlocale(LC_NUMERIC, "en_US");

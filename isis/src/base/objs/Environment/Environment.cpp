@@ -2,12 +2,29 @@
 
 #include <stdlib.h>
 
+#include <QCoreApplication>
+
 #include "iException.h"
 #include "iString.h"
 #include "TextFile.h"
 
 
 namespace Isis {
+  Environment Environment::automaticEnvironmentSetup;
+
+  Environment::Environment() {
+    // Set the Qt plugin directory
+    QStringList pluginPaths;
+
+    iString root = getEnvironmentValue("ISISROOT", "");
+
+    if (root != "") {
+      iString thirdPartyPluginPath = root + "/3rdParty/plugins";
+      pluginPaths << thirdPartyPluginPath.ToQt();
+      QCoreApplication::setLibraryPaths(pluginPaths);
+    }
+  }
+
 
   /**
    * @Returns the user name. Returns 'Unknown' if it cannot find the user name.
