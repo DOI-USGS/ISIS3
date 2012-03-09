@@ -4,9 +4,11 @@
 #  the current library exists in the plugin bundle which is assumed to be
 #  $ISISROOT/3rdParty/plugins/*/*/bundle.  The path to all libraries
 #  are therefore fixed and the same path for all.
-/usgs/pkgs/local(.*?)lib       @loader_path/../../lib
-/opt/local/libexec/qt4-mac/lib @loader_path/../../lib
-/opt/local/lib/postgresql83    @loader_path/../../lib
-/opt/local/lib/mysql5/mysql    @loader_path/../../lib
-/opt/local/lib                 @loader_path/../../lib
-/opt/usgs(.*?)/lib             @loader_path/../../lib
+/usgs/pkgs/local(.*?)lib             @loader_path/../../lib
+/opt/local/libexec/qt4-mac/lib       @loader_path/../../lib
+/opt/local/lib/postgresql83          @loader_path/../../lib
+/opt/local/lib/mysql5/mysql          @loader_path/../../lib
+/opt/local/lib                       @loader_path/../../lib
+/opt/usgs(.*?)/lib/postgresql(.*?)/  @loader_path/../../lib/
+/opt/usgs(.*?)/lib/mysql(.*?)/mysql  @loader_path/../../lib
+/opt/usgs(.*?)/lib                   @loader_path/../../lib
