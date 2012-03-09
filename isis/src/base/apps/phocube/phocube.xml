@@ -9,14 +9,18 @@
   <description>
     <p>
     Phocube creates an output cube where each <def>band</def> represents a choice of information
-    computed from <def>SPICE</def> for every pixel.   The choices of information ranges 
-    from photometric angles (phase, emission, incidence) to various azimuth angles and 
-    resolution values.  
+    computed from either the <def>SPICE</def> for every pixel or the projection information for
+    every pixel. The choices of information depends on the processing level of the image and
+    ranges from photometric angles (phase, emission, incidence) to various azimuth angles and 
+    resolution values. Images that have a camera model associated with them will have the ability
+    to generate any of the possible bands of information provided by this program. Those images
+    that do not have a camera model associated with them are more limited in the types of bands
+    that can be produced by this program.
     </p>
 
     <p>
     The input cube is required to have had a successful 'spiceinit' applied previous to 
-    running phocube.  
+    running phocube or the input cube must have mapping labels associated with it.
     </p>
 
     <p>
@@ -26,7 +30,12 @@
     </p>
     
     <p>
-     Phocube can be applied to a <def>Level1</def> or <def>Level2</def> image cube.
+     Phocube can be applied to a <def>Level1</def> or <def>Level2</def> image cube. Phocube can
+     also be applied to any file as long as it has mapping labels contained in it, such as a 
+     mosaic. The number of bands that can be created for an image without a camera model 
+     associated with it are very limited. Image files that have only mapping labels (no camera
+     model or SPICE information) will be limited to the ability to create Dn, PixelResolution, 
+     Latitude, and Longitude.
     </p>
   </description>
 
@@ -98,13 +107,24 @@
     <change name="Travis Addair" date="2011-02-10">
       Added parameters LOCALINCIDENCE and LOCALEMISSION.
     </change>
-   <change name="Kris Becker" date="2011-08-08">
+    <change name="Kris Becker" date="2011-08-08">
       Added the option to propagate the input pixel value (DN)
       as the first band (however, this, by default, will not be invoked as default so as to 
       preserve pre-existing behavior). Ensure the Center, OriginalBand, Name, and 
       Width BandBin  keyword values are populated properly and propagated to 
       the output label (should support camera models). Added MORPHOLOGY and 
       ALBEDO backplane options for special mosaic options.
+    </change>
+    <change name="Janet Barrett" date="2012-02-22">
+      Added the capability to run this program on image files where the camera
+      information is missing. The ability to generate lat/lon bands for 
+      image files is highly useful when performing fx operations on the files.
+      Other bands that can be created for a mosaic file include: Dn and PixelResolution.
+      A new parameter, NoCamera, was added so that the user can specify
+      if their image does not contain a camera model. This will result in the
+      appropriate parameter choices being greyed out. If the user does not specify 
+      that their file does not contain a camera model, then they will receive an error 
+      if they choose to create a band that cannot be created for the file.
     </change>
 </history>
 
@@ -144,6 +164,56 @@
           with the Name keyword containing the output band names in the order
           that they are stacked within the cube.
         </description>
+      </parameter>
+
+      <parameter name="SOURCE">
+        <type>string</type>
+        <brief>Determines where geometric information will come from - camera or projection</brief>
+        <default><item>CAMERA</item></default>
+        <description>
+          If this parameter is set to CAMERA, then all the band choices are available
+          for the user to choose from. If this parameter is set to PROJECTION, then 
+          only the DN, LATITUDE, LONGITUDE, and PIXELRESOLUTION band choices will
+          be available and all other band choices will be greyed out. If the
+          user sets this parameter to CAMERA and their input file does not contain
+          a camera model or SPICE information, then they will receive an error
+          when they choose a band option that is not valid for their file.
+        </description>
+        <list>
+          <option value="CAMERA">
+            <brief>Get geometric information from camera model</brief>
+            <description>
+              Geometric information will be obtained from a camera model and all the
+              photometry options will be available.
+            </description>
+          </option>
+          <option value="PROJECTION">
+            <brief>Get geometric information from the projection</brief>
+            <description>
+              Geometric information will be obtained from the projection and only the
+              DN, LATITUDE, LONGITUDE, and PIXELRESOLUTION photometry options will be
+              available.
+            </description>
+            <exclusions>
+              <item>PHASE</item>
+              <item>EMISSION</item>
+              <item>INCIDENCE</item>
+              <item>LOCALEMISSION</item>
+              <item>LOCALINCIDENCE</item>
+              <item>LINERESOLUTION</item>
+              <item>SAMPLERESOLUTION</item>
+              <item>DETECTORRESOLUTION</item>
+              <item>SUNAZIMUTH</item>
+              <item>SPACECRAFTAZIMUTH</item>
+              <item>OFFNADIRANGLE</item>
+              <item>SUBSPACECRAFTGROUNDAZIMUTH</item>
+              <item>SUBSOLARGROUNDAZIMUTH</item>
+              <item>MORPHOLOGY</item>
+              <item>ALBEDO</item>
+              <item>NORTHAZIMUTH</item>
+            </exclusions>
+          </option>
+        </list>
       </parameter>
     </group>
 

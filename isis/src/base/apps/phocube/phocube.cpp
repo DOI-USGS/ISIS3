@@ -2,6 +2,8 @@
 
 #include "Angle.h"
 #include "Camera.h"
+#include "Projection.h"
+#include "ProjectionFactory.h"
 #include "ProcessByBrick.h"
 #include "ProcessByLine.h"
 #include "SpecialPixel.h"
@@ -14,7 +16,9 @@ using namespace Isis;
 
 // Global variables
 Camera *cam;
+Projection *proj;
 int nbands;
+bool noCamera;
 
 bool dn;
 bool phase; 
@@ -62,38 +66,82 @@ void UpdateBandKey(const std::string &keyname, PvlGroup &bb, const int &nvals,
 
 
 void IsisMain() {
-  // Get the camera information
+  UserInterface &ui = Application::GetUserInterface();
+
+  // Get the camera information if this is not a mosaic. Otherwise, get the
+  // projection information
   Process p1;
   Cube *icube = p1.SetInputCube("FROM", OneBand);
-  cam = icube->getCamera();
+  if (ui.GetString("SOURCE") == "CAMERA") {
+    noCamera = false;
+  }
+  else {
+    noCamera = true;
+  }
+
+  if(noCamera) {
+    try {
+      proj = icube->getProjection();
+    }
+    catch(iException &e) {
+      string msg = "Mosaic files must contain mapping labels";
+      throw iException::Message(iException::User, msg, _FILEINFO_);
+    }
+  } 
+  else {
+    try {
+      cam = icube->getCamera();
+    }
+    catch(iException &e) {
+      string msg = "Input file needs to have spiceinit run on it - if this file ";
+      msg += "is a mosaic, then check the MOSAICONLY box";
+      throw iException::Message(iException::User, msg, _FILEINFO_);
+    }
+  }
 
   // We will be processing by brick.
   ProcessByBrick p;
 
   // Find out which bands are to be created
-  UserInterface &ui = Application::GetUserInterface();
-
   nbands = 0;
+  phase = false;
+  emission = false;
+  incidence = false;
+  localEmission = false;
+  localIncidence = false;
+  lineResolution = false;
+  sampleResolution = false;
+  detectorResolution = false;
+  sunAzimuth = false;
+  spacecraftAzimuth = false;
+  offnadirAngle = false;
+  subSpacecraftGroundAzimuth = false;
+  subSolarGroundAzimuth = false;
+  morphology = false;
+  albedo = false;
+  northAzimuth = false;
+  if (!noCamera) {
+    if((phase = ui.GetBoolean("PHASE"))) nbands++;
+    if((emission = ui.GetBoolean("EMISSION"))) nbands++;
+    if((incidence = ui.GetBoolean("INCIDENCE"))) nbands++;
+    if((localEmission = ui.GetBoolean("LOCALEMISSION"))) nbands++;
+    if((localIncidence = ui.GetBoolean("LOCALINCIDENCE"))) nbands++;
+    if((lineResolution = ui.GetBoolean("LINERESOLUTION"))) nbands++;
+    if((sampleResolution = ui.GetBoolean("SAMPLERESOLUTION"))) nbands++;
+    if((detectorResolution = ui.GetBoolean("DETECTORRESOLUTION"))) nbands++;
+    if((sunAzimuth = ui.GetBoolean("SUNAZIMUTH"))) nbands++;
+    if((spacecraftAzimuth = ui.GetBoolean("SPACECRAFTAZIMUTH"))) nbands++;
+    if((offnadirAngle = ui.GetBoolean("OFFNADIRANGLE"))) nbands++;
+    if((subSpacecraftGroundAzimuth = ui.GetBoolean("SUBSPACECRAFTGROUNDAZIMUTH"))) nbands++;
+    if((subSolarGroundAzimuth = ui.GetBoolean("SUBSOLARGROUNDAZIMUTH"))) nbands++;
+    if ((morphology = ui.GetBoolean("MORPHOLOGY"))) nbands++; 
+    if ((albedo = ui.GetBoolean("ALBEDO"))) nbands++; 
+    if ((northAzimuth = ui.GetBoolean("NORTHAZIMUTH"))) nbands++; 
+  }
   if((dn = ui.GetBoolean("DN"))) nbands++;
-  if((phase = ui.GetBoolean("PHASE"))) nbands++;
-  if((emission = ui.GetBoolean("EMISSION"))) nbands++;
-  if((incidence = ui.GetBoolean("INCIDENCE"))) nbands++;
-  if((localEmission = ui.GetBoolean("LOCALEMISSION"))) nbands++;
-  if((localIncidence = ui.GetBoolean("LOCALINCIDENCE"))) nbands++;
   if((latitude = ui.GetBoolean("LATITUDE"))) nbands++;
   if((longitude = ui.GetBoolean("LONGITUDE"))) nbands++;
   if((pixelResolution = ui.GetBoolean("PIXELRESOLUTION"))) nbands++;
-  if((lineResolution = ui.GetBoolean("LINERESOLUTION"))) nbands++;
-  if((sampleResolution = ui.GetBoolean("SAMPLERESOLUTION"))) nbands++;
-  if((detectorResolution = ui.GetBoolean("DETECTORRESOLUTION"))) nbands++;
-  if((northAzimuth = ui.GetBoolean("NORTHAZIMUTH"))) nbands++;
-  if((sunAzimuth = ui.GetBoolean("SUNAZIMUTH"))) nbands++;
-  if((spacecraftAzimuth = ui.GetBoolean("SPACECRAFTAZIMUTH"))) nbands++;
-  if((offnadirAngle = ui.GetBoolean("OFFNADIRANGLE"))) nbands++;
-  if((subSpacecraftGroundAzimuth = ui.GetBoolean("SUBSPACECRAFTGROUNDAZIMUTH"))) nbands++;
-  if((subSolarGroundAzimuth = ui.GetBoolean("SUBSOLARGROUNDAZIMUTH"))) nbands++;
-  if ((morphology = ui.GetBoolean("MORPHOLOGY"))) nbands++; 
-  if ((albedo = ui.GetBoolean("ALBEDO"))) nbands++; 
 
   if(nbands < 1) {
     string message = "At least one photometry parameter must be entered"
@@ -211,9 +259,25 @@ void phocube(Buffer &out) {
       int index = i * 64 + j + skipDN;
       double samp = out.Sample(index);
       double line = out.Line(index);
-      cam->SetImage(samp, line);
+      if (noCamera) {
+        proj->SetWorld(samp, line);
+      }
+      else {
+        cam->SetImage(samp, line);
+      }
 
-      if(cam->HasSurfaceIntersection()) {
+      bool isGood=false;
+      if (noCamera) {
+        if (proj->IsGood()) {
+          isGood = true;
+        }
+      }
+      else {
+        if (cam->HasSurfaceIntersection()) {
+          isGood = true;
+        }
+      }
+      if (isGood) {
         if(phase) {
           out[index] = cam->PhaseAngle();
           index += 64 * 64;
@@ -244,15 +308,30 @@ void phocube(Buffer &out) {
           }
         }
         if(latitude) {
-          out[index] = cam->UniversalLatitude();
+          if(noCamera) {
+            out[index] = proj->UniversalLatitude();
+          }
+          else {
+            out[index] = cam->UniversalLatitude();
+          }
           index += 64 * 64;
         }
         if(longitude) {
-          out[index] = cam->UniversalLongitude();
+          if(noCamera) {
+            out[index] = proj->UniversalLongitude();
+          }
+          else {
+            out[index] = cam->UniversalLongitude();
+          }
           index += 64 * 64;
         }
         if(pixelResolution) {
-          out[index] = cam->PixelResolution();
+          if(noCamera) {
+            out[index] = proj->Resolution();
+          }
+          else {
+            out[index] = cam->PixelResolution();
+          }
           index += 64 * 64;
         }
         if(lineResolution) {
