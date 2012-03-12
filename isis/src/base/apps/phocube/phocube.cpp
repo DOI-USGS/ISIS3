@@ -83,7 +83,7 @@ void IsisMain() {
     try {
       proj = icube->getProjection();
     }
-    catch(iException &e) {
+    catch(IException &e) {
       string msg = "Mosaic files must contain mapping labels";
       throw IException(e, IException::User, msg, _FILEINFO_);
     }
@@ -92,7 +92,7 @@ void IsisMain() {
     try {
       cam = icube->getCamera();
     }
-    catch(iException &e) {
+    catch(IException &e) {
       string msg = "Input file needs to have spiceinit run on it - if this file ";
       msg += "is a mosaic, then check the MOSAICONLY box";
       throw IException(e, IException::User, msg, _FILEINFO_);
