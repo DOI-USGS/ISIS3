@@ -1,26 +1,26 @@
-/**                                                                       
- * @file                                                                  
+/**
+ * @file
  * $Revision$
  * $Date$
  * $Id$
- * 
- *   Unless noted otherwise, the portions of Isis written by the USGS are 
- *   public domain. See individual third-party library and package descriptions 
- *   for intellectual property information, user agreements, and related  
- *   information.                                                         
- *                                                                        
- *   Although Isis has been used by the USGS, no warranty, expressed or   
- *   implied, is made by the USGS as to the accuracy and functioning of such 
- *   software and related material nor shall the fact of distribution     
+ *
+ *   Unless noted otherwise, the portions of Isis written by the USGS are
+ *   public domain. See individual third-party library and package descriptions
+ *   for intellectual property information, user agreements, and related
+ *   information.
+ *
+ *   Although Isis has been used by the USGS, no warranty, expressed or
+ *   implied, is made by the USGS as to the accuracy and functioning of such
+ *   software and related material nor shall the fact of distribution
  *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.                                        
- *                                                                        
- *   For additional information, launch                                   
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html                
+ *   USGS in connection therewith.
+ *
+ *   For additional information, launch
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
  *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.                                    
- */ 
+ *   http://www.usgs.gov/privacy.html.
+ */
 #include <string>
 #include <vector>
 #include <numeric>
@@ -38,7 +38,7 @@
 #include "Camera.h"
 #include "Table.h"
 #include "NaifStatus.h"
-#include "iException.h"
+#include "IException.h"
 
 #include "naif/SpiceUsr.h"
 #define PURE_METHODS_PRESENT 1
@@ -48,8 +48,8 @@ using namespace std;
 namespace Isis {
 
 /** Default constructor */
-SpkSegment::SpkSegment() : SpiceSegment() { 
-  init(); 
+SpkSegment::SpkSegment() : SpiceSegment() {
+  init();
 }
 
 /** Constructor from ISIS cube file by name of the cube */
@@ -68,24 +68,24 @@ SpkSegment::SpkSegment(Cube &cube) : SpiceSegment(cube) {
 }
 
 /**
- * @brief Load and process SPICE data from an ISIS cube object 
- *  
- * This method extracts SPK SPICE date from an ISIS cube object.  This object 
- * must have been spiceinit'ed at a minimum and, by definition, have a 
- * supporting camera model. 
- *  
- * SPK data is extracted from the SpicePosition object via the Table it provides 
- * of this information.  The SPICE position state vectors are potentially 
- * trasformed to the proper state for target body, center body and reference 
- * frame. 
- * 
+ * @brief Load and process SPICE data from an ISIS cube object
+ *
+ * This method extracts SPK SPICE date from an ISIS cube object.  This object
+ * must have been spiceinit'ed at a minimum and, by definition, have a
+ * supporting camera model.
+ *
+ * SPK data is extracted from the SpicePosition object via the Table it provides
+ * of this information.  The SPICE position state vectors are potentially
+ * trasformed to the proper state for target body, center body and reference
+ * frame.
+ *
  * @author kbecker (5/2/2011)
- * 
- * @param cube  Cube to generate SPICE segment from 
+ *
+ * @param cube  Cube to generate SPICE segment from
  *
  * @internal
  *   @history 2011-05-27 Debbie A. Cook - Added call to create Hermite cache
- *                           to make this option available for testing. 
+ *                           to make this option available for testing.
  *                           This will need to be an option in the future.
  */
 void SpkSegment::import(Cube &cube) {
@@ -137,7 +137,7 @@ void SpkSegment::import(Cube &cube) {
 //     const double Epsilon(3.0e-3);
     const double Epsilon(3.0e-3);
 
-    // Pad the top and bottom of the 
+    // Pad the top and bottom of the
     _states = expand(1, 1, _states);
     _epochs = expand(1, 1, _epochs);
 
@@ -149,7 +149,7 @@ void SpkSegment::import(Cube &cube) {
     double sTime = _epochs[1] - Epsilon;
     SVector s0 = makeState(ipos, _epochs[1], stateT, sTime);
     SVector(ndim2, _states[0]).inject(s0);
-    _epochs[0] = sTime; 
+    _epochs[0] = sTime;
 
     // Add record to bottom of states
     stateT = SVector(ndim2, _states[ndim1-2]);
@@ -178,44 +178,43 @@ void SpkSegment::import(Cube &cube) {
     setStartTime(_epochs[0]);
     setEndTime(_epochs[size(_epochs)-1]);
 
-  } catch ( iException &ie  ) {
+  } catch ( IException &ie  ) {
     ostringstream mess;
     mess << "Failed to construct SPK content from ISIS file " << Source();
-    ie.Message(iException::User, mess.str(), _FILEINFO_);
-    throw;
+    throw IException(ie, IException::User, mess.str(), _FILEINFO_);
   }
 
   return;
 }
 
 /**
- * @brief Convert J2000 positions to frame relative to center body 
- *  
- * This method converts the data from SpicePostion to state vectors relative to 
- * the center of motion of the object identified by body.  The return results 
- * will be ready to write to (at least) SPK kernels of type 9 and 13. 
- *  
- * The "states" parameters will be a matrix of the form states[nrecs][6], where 
- * "nrecs" is the number of states in the table, and times[nrecs] corresponds 
- * to TDB time for each nrecs record. 
- *  
- * PreRequisites: 
+ * @brief Convert J2000 positions to frame relative to center body
+ *
+ * This method converts the data from SpicePostion to state vectors relative to
+ * the center of motion of the object identified by body.  The return results
+ * will be ready to write to (at least) SPK kernels of type 9 and 13.
+ *
+ * The "states" parameters will be a matrix of the form states[nrecs][6], where
+ * "nrecs" is the number of states in the table, and times[nrecs] corresponds
+ * to TDB time for each nrecs record.
+ *
+ * PreRequisites:
  *   The internal _body, _center and _refFrame are required to be defined prior
- *     to calling this routine. 
+ *     to calling this routine.
  *   The FK kernel is likely to be required to be loaded in the NAIF kernel
  *     pool so that frame translations can occur.  The caller is burdened with
  *     ensuring the kernel is loaded.
- *  
+ *
  * @author Kris Becker - 2/21/2011
- * 
+ *
  * @param camera Camera object for the data
  * @param spice  Data from the SpicePosition::LineCache method
  * @param states Matrix containing "nrecs" states vectors
  * @param times  TBD epoch times for each record
  */
 void SpkSegment::getStates(Camera &camera, const SMatrix &spice,
-                           SMatrix &states, SVector &epochs, bool &hasVV) 
-                           const { 
+                           SMatrix &states, SVector &epochs, bool &hasVV)
+                           const {
   int nrecs = size(spice);
   int nelems = spice.dim2();
   states = SMatrix(nrecs, 6, 0.0);  // Initialize to 0 should no deltas exist
@@ -229,7 +228,7 @@ void SpkSegment::getStates(Camera &camera, const SMatrix &spice,
  //   cout  << "Rec: " << i;
     for ( int j = 0 ; j < (nelems-1) ; j++ ) {
       states[i][j] = spice[i][j];
- //     cout << " " << setw(26) << setprecision(13) << _states[i][j];         
+ //     cout << " " << setw(26) << setprecision(13) << _states[i][j];
     }
     epochs[i] = spice[i][nelems-1];
  //   cout << " " << setw(26) << setprecision(13) << _epochs[i] << "\n";
@@ -249,19 +248,19 @@ void SpkSegment::getStates(Camera &camera, const SMatrix &spice,
 }
 
 /**
- * @brief Make a new state vector from the current state and time 
- *  
- * This method creates a new state from the given state0 using the position 
- * object and current time, time0, at that position.  timeT is the new time of 
- * the desired state.   
- * 
+ * @brief Make a new state vector from the current state and time
+ *
+ * This method creates a new state from the given state0 using the position
+ * object and current time, time0, at that position.  timeT is the new time of
+ * the desired state.
+ *
  * @author kbecker (5/2/2011)
- * 
- * @param position  Position object for the state 
+ *
+ * @param position  Position object for the state
  * @param time0     Current time for give state
  * @param state0    Current state vector
  * @param timeT     Desired time of the new state
- * 
+ *
  * @return SpkSegment::SVector New state at timeT
  * @internal
  * @history 2011-06-03 Debbie A. Cook Put extrapolation code back
@@ -282,7 +281,7 @@ SpkSegment::SVector SpkSegment::makeState(SpicePosition *position, const double 
   }
 #endif
 //   for ( int i = 3 ; i < stateT.dim1() ; i++ ) {
-//     stateT[i] = 0.0;  
+//     stateT[i] = 0.0;
 //   }
 
   return (stateT);
@@ -290,22 +289,22 @@ SpkSegment::SVector SpkSegment::makeState(SpicePosition *position, const double 
 
 /**
  * @brief Construct a comment for the given segment
- * 
+ *
  * @author kbecker (5/2/2011)
- * 
+ *
  * @return std::string Comment string for the segment
  */
 std::string SpkSegment::getComment() const {
   ostringstream comment;
 
-  comment << 
+  comment <<
 "\n-----------------------------------------------------------------------\n" <<
 "  File:        " << Filename(Source()).Name() << endl <<
 "  Segment ID:  " << Id() << " (ProductId)" << endl <<
 "  StartTime:   " << utcStartTime() << endl <<
 "  EndTime:     " << utcEndTime() << endl <<
 "  Target Body: " << "Body " << _body << ", " << _bodyFrame << endl <<
-"  Center Body: " << "Body " << _center << ", " << _centerFrame << endl << 
+"  Center Body: " << "Body " << _center << ", " << _centerFrame << endl <<
 "  RefFrame:    " << _refFrame << endl <<
 "  Records:     " << size() << endl;
 
@@ -313,12 +312,12 @@ std::string SpkSegment::getComment() const {
   comment <<
 "  HasVV:       " << hasVV << endl;
 
-  comment <<                       
+  comment <<
 "  PolyDegree:  " << _degree << endl <<
 "  CamVersion:  " << CameraVersion() << endl;
   std::vector<std::string> klist = getKernels().getKernelList();
   if ( klist.size() > 0 ) {
-    comment << 
+    comment <<
 "  Kernels:     \n";
     for ( unsigned int i = 0 ; i < klist.size() ; i++  ) {
       comment <<
@@ -331,7 +330,7 @@ std::string SpkSegment::getComment() const {
 
 /**
  * @brief Initialize object parameters
- * 
+ *
  * @author kbecker (5/2/2011)
  */
 void SpkSegment::init() {
@@ -345,17 +344,17 @@ void SpkSegment::init() {
 }
 
 /**
- * @brief Load the SPK segements from the ISIS table object 
- *  
- * This method extracts position vectors, velocity vectors (if they exist) and 
- * epochs (times) from an ISIS SpicePosition BLOB/table.  The table content 
- * (number of fields) determine if the vectors exist. 
- * 
+ * @brief Load the SPK segements from the ISIS table object
+ *
+ * This method extracts position vectors, velocity vectors (if they exist) and
+ * epochs (times) from an ISIS SpicePosition BLOB/table.  The table content
+ * (number of fields) determine if the vectors exist.
+ *
  * @author kbecker (5/2/2011)
- * 
+ *
  * @param table   SpicePosition Table to extract SPK data
- * 
- * @return SpkSegment::SMatrix Returns SPK data 
+ *
+ * @return SpkSegment::SMatrix Returns SPK data
  */
 SpkSegment::SMatrix SpkSegment::load(Table &table) {
 
@@ -369,8 +368,8 @@ SpkSegment::SMatrix SpkSegment::load(Table &table) {
   // Ensure the table has the expected format, error out if not valid.
 //   if ( !((nvals == 7) || (nvals == 4)) ) {
 //     ostringstream mess;
-//     mess << "SPICE (SPK) Table " << table.Name() 
-//          << " must have 7 (with velocity vectors) or 4 fields but has " 
+//     mess << "SPICE (SPK) Table " << table.Name()
+//          << " must have 7 (with velocity vectors) or 4 fields but has "
 //          << nvals;
 //     throw iException::Message(iException::User, mess.str(), _FILEINFO_);
 //   }
@@ -388,26 +387,26 @@ SpkSegment::SMatrix SpkSegment::load(Table &table) {
 }
 
 /**
- * @brief Adjust times for stellar aberration and light time 
- *  
- * This method adjusts the times for stellar aberration and light time 
- * correction if needed.  This is only a temporary fix until it is corrected in 
- * the SpicePosition class. 
- *  
- * Prerequisites:  Upon calling this method, the appropriate SPK must be loaded. 
- * The reference frame (_refFrame), typically "J2000", must also be defined. 
- *  
- * Currently, several missions do not apply these corrections.  These are 
- * LunarOrbiter and Mariner10. 
- *  
+ * @brief Adjust times for stellar aberration and light time
+ *
+ * This method adjusts the times for stellar aberration and light time
+ * correction if needed.  This is only a temporary fix until it is corrected in
+ * the SpicePosition class.
+ *
+ * Prerequisites:  Upon calling this method, the appropriate SPK must be loaded.
+ * The reference frame (_refFrame), typically "J2000", must also be defined.
+ *
+ * Currently, several missions do not apply these corrections.  These are
+ * LunarOrbiter and Mariner10.
+ *
  * @author kbecker (5/2/2011)
- * 
+ *
  * @param epochs Times to correct for aberration and light time
- * 
+ *
  * @return SpkSegment::SVector Corrected/adjust times
  */
-SpkSegment::SVector SpkSegment::adjustTimes(Camera &camera, 
-                                            const SVector &epochs) const { 
+SpkSegment::SVector SpkSegment::adjustTimes(Camera &camera,
+                                            const SVector &epochs) const {
 
   SpiceInt observer = camera.NaifSpkCode();
 

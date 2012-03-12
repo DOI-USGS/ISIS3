@@ -1,13 +1,13 @@
 UNIT TEST for Isis::AtmosModel
 
 Testing missing AtmosphericModel object ...
-**PVL ERROR** Unable to find object [AtmosphericModel]
+**ERROR** Unable to find PVL object [AtmosphericModel].
 
 Testing missing Algorithm group ...
-**PVL ERROR** Unable to find group [Algorithm]
+**ERROR** Unable to find PVL group [Algorithm].
 
 Testing missing Name keyword ...
-**USER ERROR** Keyword [Name] or keyword [AtmName] must exist in [Group = Algorithm]
+**USER ERROR** Keyword [Name] or keyword [AtmName] must exist in [Group = Algorithm].
 
 Testing supported atmospheric model ...
 
@@ -28,11 +28,11 @@ AtmosNulneg = 0
 AtmosNinc = 91
 
 Testing boundary conditions of atmospheric model set methods ...
-**USER ERROR** Invalid value of Atmospheric tau [-1.0]
-**USER ERROR** Invalid value of Atmospheric wha [0.0]
-**USER ERROR** Invalid value of Atmospheric wha [2.0]
-**USER ERROR** Invalid value of Hapke atmospheric hga [-1.0]
-**USER ERROR** Invalid value of Hapke atmospheric hga [1.0]
+**USER ERROR** Invalid value of Atmospheric tau [-1.0].
+**USER ERROR** Invalid value of Atmospheric wha [0.0].
+**USER ERROR** Invalid value of Atmospheric wha [2.0].
+**USER ERROR** Invalid value of Hapke atmospheric hga [-1.0].
+**USER ERROR** Invalid value of Hapke atmospheric hga [1.0].
 
 Testing atmospheric model InrFunc2Bint method ...
 Results from InrFunc2Bint = -5.26033e-07
@@ -574,8 +574,8 @@ x	n	G11Prime(x)	Ei(x)	En(x)
 1.5	1	0.238472	3.30129	0.10002
 1.5	2	0.238472	3.30129	0.0731008
 EXCEPTIONS:
-**PROGRAMMER ERROR** AtmosModel::Ei() - Invalid argument. Definition requires x > 0.0. Entered x = 0.0
-**PROGRAMMER ERROR** AtmosModel::En() - Invalid arguments. Definition requires (x > 0.0 and n >=0 ) or (x >= 0.0 and n > 1). Entered x = 0.0 and n = 1
-**PROGRAMMER ERROR** AtmosModel::En() - Invalid arguments. Definition requires (x > 0.0 and n >=0 ) or (x >= 0.0 and n > 1). Entered x = -1.0 and n = 0
+**PROGRAMMER ERROR** AtmosModel::Ei() - Invalid argument. Definition requires x > 0.0. Entered x = 0.0.
+**PROGRAMMER ERROR** AtmosModel::En() - Invalid arguments. Definition requires (x > 0.0 and n >=0 ) or (x >= 0.0 and n > 1). Entered x = 0.0 and n = 1.
+**PROGRAMMER ERROR** AtmosModel::En() - Invalid arguments. Definition requires (x > 0.0 and n >=0 ) or (x >= 0.0 and n > 1). Entered x = -1.0 and n = 0.
 	************************************************
 

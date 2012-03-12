@@ -4,7 +4,7 @@
 #include "ProcessByLine.h"
 #include "Pvl.h"
 #include "UserInterface.h"
-#include "iException.h"
+#include "IException.h"
 #include "MiCalibration.h"
 #include "iTime.h"
 #include "Brick.h"
@@ -56,7 +56,7 @@ void IsisMain() {
   if(pack->hasGroup("Radiometry")) {
     string msg = "The MI image [" + pack->getFilename() + "] has already "
                  "been radiometrically calibrated";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   //Open the calibration kernel that contains constrnts for each camera

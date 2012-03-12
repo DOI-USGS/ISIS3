@@ -2,7 +2,7 @@
 
 #include "Chip.h"
 #include "Cube.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "Pipeline.h"
 #include "Statistics.h"
@@ -22,7 +22,7 @@ void IsisMain() {
   if ("Mariner_10" != (string)labels->FindKeyword("SpacecraftName", Pvl::Traverse)) {
     string msg = "The cube [" + ui.GetFilename("FROM") + "] does not appear" +
       " to be a Mariner10 cube";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // Check that the cube actually needs reconstruction
@@ -35,7 +35,7 @@ void IsisMain() {
   if(stats->ValidPixels() > 8) {
     string msg = "The cube [" + ui.GetFilename("FROM") + "] does not need" +
       " reconstruction, try mar10clean instead";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
   if (stats != NULL) {
     delete stats;

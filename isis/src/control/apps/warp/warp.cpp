@@ -28,7 +28,7 @@ void IsisMain() {
     const ControlPoint *cp = cn.GetPoint(i);
     if (cp->GetNumMeasures() != 2) {
       string msg = "Control points must have exactly 2 control measures";
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     if (!cp->IsIgnored()) {
       inputLine.push_back(cp->GetMeasure(0)->GetLine());
@@ -42,7 +42,7 @@ void IsisMain() {
   //  throw an error
   if (inputLine.size() < 1) {
     string msg = "The specified Control Network is empty.";
-    throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // Open the input cube
@@ -98,7 +98,7 @@ void IsisMain() {
   else {
     string msg = "Unknow value for INTERP [" +
                  ui.GetString("INTERP") + "]";
-    throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+    throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
   p.StartProcess(*transform, *interp);

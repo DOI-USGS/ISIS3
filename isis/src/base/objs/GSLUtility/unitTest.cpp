@@ -110,8 +110,8 @@ int main(int argc, char *argv[]) {
     cout << "Fit:  " << setprecision(4)
          << sqrt(eigen[0]*eigen[0] + eigen[1]*eigen[1]) << endl;
   }
-  catch(iException &ie) {
-    ie.Report();
+  catch(IException &ie) {
+    ie.print();
   }
 
   return (0);

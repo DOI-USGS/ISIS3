@@ -83,13 +83,13 @@ testing GetCubeSerials...
   ALPHA
 
 Test adding control points with identical id numbers ...
-**PROGRAMMER ERROR** ControlPoint must have unique Id
+**PROGRAMMER ERROR** ControlPoint must have unique Id.
 
 Test deleting nonexistant control point id ...
-**USER ERROR** point Id [T0002] does not exist in the network
+**USER ERROR** point Id [T0002] does not exist in the network.
 
 Test deleting nonexistant control point index ...
-**PROGRAMMER ERROR** Index [7] out of range
+**PROGRAMMER ERROR** Index [7] out of range.
 
 Writing ControlNet to temp.txt in Pvl format
 Reading ControlNet from temp.txt

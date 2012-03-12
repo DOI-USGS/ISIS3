@@ -31,7 +31,7 @@
 #include "SpkKernelWriter.h"
 #include "Pvl.h"
 #include "iString.h"
-#include "iException.h"
+#include "IException.h"
 
 #include "NaifStatus.h"
 

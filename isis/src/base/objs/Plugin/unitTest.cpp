@@ -1,7 +1,7 @@
 #include <iostream>
 #include <sstream>
 #include "Plugin.h"
-#include "iException.h"
+#include "IException.h"
 #include "Preference.h"
 
 using namespace std;

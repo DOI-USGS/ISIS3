@@ -21,7 +21,7 @@
  */
 #include "NaifStatus.h"
 #include "naif/SpiceUsr.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "Pvl.h"
 #include "PvlTranslationManager.h"
@@ -90,16 +90,14 @@ namespace Isis {
     try {
       errMsg = trans.Translate("ShortMessage");
     }
-    catch(iException &e) {
-      e.Clear();
+    catch(IException &) {
       errMsg = "An unknown NAIF error has been encountered.";
     }
 
     try {
       errMsg += " " + trans.Translate("LongMessage");
     }
-    catch(iException &e) {
-      e.Clear();
+    catch(IException &) {
     }
 
     // Now process the error
@@ -111,6 +109,6 @@ namespace Isis {
     errMsg += "provided by NAIF is [" + iString(naifShort) + "]. ";
     errMsg += "The Naif error is [" + iString(naifLong) + "]";
 
-    throw iException::Message(iException::Spice, errMsg, _FILEINFO_);
+    throw IException(IException::Unknown, errMsg, _FILEINFO_);
   }
 }

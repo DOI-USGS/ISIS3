@@ -36,12 +36,12 @@ void IsisMain() {
       inCube->getLabel()->HasObject("Instrument")) {
     string msg = "Input cube [" + ui.GetFilename("FROM") + "] does not appear"
                + "to be a DTM";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
-  
+
   double min = -DBL_MAX;
   double max = DBL_MAX;
-  
+
   // Setup output type for DTM, default 32 bit
   if(ui.GetString("DTMBITTYPE") == "8BIT") {
     p.SetOutputType(Isis::UnsignedByte);
@@ -118,7 +118,7 @@ void IsisMain() {
                   mapping["WESTERNMOST_LONGITUDE"][0].ToDouble() ) / 2) +
                   mapping["WESTERNMOST_LONGITUDE"][0].ToDouble() ;
     isEquirectangular = false;
-     
+
     // North polar case
     if (clat > 0.0 && clon < 270.0) {
       northAzimuth = 270.00 - clon;
@@ -140,7 +140,7 @@ void IsisMain() {
     string msg = "The projection type [" +
         mapping["MAP_PROJECTION_TYPE"][0]
         + "] is not supported";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // A lot of label hacking goes on below, for the most part, it is in order,
@@ -156,7 +156,7 @@ void IsisMain() {
   PvlObject & projection = pdsLabel.FindObject("IMAGE_MAP_PROJECTION");
   projection.AddKeyword(
       PvlKeyword("^DATA_SET_MAP_PROJECTION","DSMAP.CAT"));
-  
+
   // Delete unneeded keywords in object
   projection.DeleteKeyword("FIRST_STANDARD_PARALLEL");
   projection.DeleteKeyword("SECOND_STANDARD_PARALLEL");
@@ -171,8 +171,8 @@ void IsisMain() {
   }
 
   Pvl format;
- 
-  // Have to do things this way to get an array of values 
+
+  // Have to do things this way to get an array of values
   PvlKeyword validMin("VALID_MINIMUM","REAL");
   validMin += "2";
   format.AddKeyword(validMin);
@@ -216,7 +216,7 @@ void IsisMain() {
   else {
     pdsLabel.AddKeyword(inputParameters["PRODUCER_FULL_NAME"]);
   }
-  
+
   // Will we be using the default names?
   bool defaultNames = ui.GetBoolean("DEFAULTNAMES");
   Filename ortho1(ui.GetFilename("ORTHO1"));
@@ -243,9 +243,9 @@ void IsisMain() {
     iString producing = inputParameters["PRODUCING_INSTITUTION"][0];
     if (producing.size() > 1) {
       string msg = "PRODUCTING_INSTITUTION value [" + producing + "] must be a single character";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
-    pId += "_" + producing; 
+    pId += "_" + producing;
 
     double version = ui.GetDouble("PRODUCT_VERSION_ID");
 
@@ -253,7 +253,7 @@ void IsisMain() {
     // Only important thing to note is that a #.0 number is converted to 0#
     // for the name, otherwise, its is predictable, always 2 greatest numbers:
     // ##.
-    // >10, takes first two digits 
+    // >10, takes first two digits
     // The number found here is used in ortho images as well.
     if (version >= 10.0) {
       vers = iString(version).substr(0,2);
@@ -284,7 +284,7 @@ void IsisMain() {
     // It was negative, or something else crazy?
     else {
       string msg = "Version number [" + iString(version) + "] is invalid";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     // Finish off name string
@@ -333,7 +333,7 @@ void IsisMain() {
   // Output the DTM, it should be ready
   Filename outFile;
   if (defaultNames) {
-    string dir = outDir.Expanded(); 
+    string dir = outDir.Expanded();
     outFile = Filename(dir + pdsLabel.FindKeyword("PRODUCT_ID")[0] + ".IMG");
   }
   else {
@@ -396,7 +396,7 @@ void IsisMain() {
       orthoOut = ui.GetFilename(ortho);
     }
     else {
-      // Will always be DT, orthos are 1 and 2, can only be Equirectangular 
+      // Will always be DT, orthos are 1 and 2, can only be Equirectangular
       // or Polar Stereographic, hence E or P
       // XML has detailed description of name format.
       orthoOut += "DT";
@@ -412,9 +412,9 @@ void IsisMain() {
       iString producing = inputParameters["PRODUCING_INSTITUTION"][0];
       if (producing.size() > 1) {
         string msg = "PRODUCTING_INSTITUTION value [" + producing + "] must be a single character";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
-      orthoOut += "_" + producing; 
+      orthoOut += "_" + producing;
 
       // Found the version above
       orthoOut += vers;
@@ -429,7 +429,7 @@ void IsisMain() {
       Projection * proj = ProjectionFactory::CreateFromCube(*orthoInCube);
       newRadius = proj->LocalRadius((double)orthoMap["CENTER_LATITUDE"]);
 
-      // Convert radius to KM  
+      // Convert radius to KM
       newRadius /= 1000;
       orthoMap.FindKeyword("A_AXIS_RADIUS").SetValue(newRadius);
       orthoMap.FindKeyword("A_AXIS_RADIUS").SetUnits("KM");
@@ -439,7 +439,7 @@ void IsisMain() {
       orthoMap.FindKeyword("C_AXIS_RADIUS").SetUnits("KM");
     }
     // Else case for Polar Stereographic is unnecessary as all it does is
-    // calculate view parameters which we already have. 
+    // calculate view parameters which we already have.
 
 
     // Set format and template
@@ -469,7 +469,7 @@ void IsisMain() {
 
     // These come from the user, mostly, and are in the order they appear in the output
     // labels.
-    orthoLabel.AddKeyword(inputParameters["DATA_SET_ID"]);  
+    orthoLabel.AddKeyword(inputParameters["DATA_SET_ID"]);
     orthoLabel.AddKeyword(inputParameters["DATA_SET_NAME"]);
     orthoLabel.AddKeyword(inputParameters["PRODUCER_INSTITUTION_NAME"]);
     orthoLabel.AddKeyword(inputParameters["PRODUCER_ID"]);
@@ -483,7 +483,7 @@ void IsisMain() {
     orthoLabel.AddKeyword(PvlKeyword("PRODUCT_VERSION_ID",ui.GetAsString("PRODUCT_VERSION_ID")));
     orthoLabel.AddKeyword(PvlKeyword("RATIONALE_DESC",ui.GetString("RATIONALE_DESC")));
     orthoLabel.AddKeyword(inputParameters["SOFTWARE_NAME"]);
-      
+
     // Long ago we made a VIEWING_PARAMETERS object, it still is correct
     // Need to be careful to not use any object references from the Pvl
     // after this call, known problem with Pvl and vector reallocation.
@@ -505,17 +505,17 @@ void IsisMain() {
     p.EndProcess();
 
   } // End scope of for loop for 4 ortho images
-  
+
 }
 
 /*
  * Scale letter of the image, A = 0.25, B = 0.5, C = 1.0, and so on.
  * We are using a 10% fudge range.
- */ 
+ */
 char findScaleLetter(double scale) {
   int steps = 0;
   double matchNum = 0.25;
-  double epsilon = matchNum * 0.1; // = 10% of matchNum 
+  double epsilon = matchNum * 0.1; // = 10% of matchNum
 
   bool bounded = false;
   while (!bounded) {
@@ -528,15 +528,15 @@ char findScaleLetter(double scale) {
 
     // Increase to next possible scale and increase epsilon
     matchNum *= 2;
-    epsilon *= 2; 
-    
-    if (matchNum > 129) { // Max allowed is J, 128, before skipping to Z 
+    epsilon *= 2;
+
+    if (matchNum > 129) { // Max allowed is J, 128, before skipping to Z
       bounded = true;
       steps = 25; // Get us to 'Z'
     }
   }
   char scaleLetter = 'A';
-  // For however many steps we took, increase the letter. 
+  // For however many steps we took, increase the letter.
   scaleLetter += steps;
   // 0.25 = A, 0.5 = B, 1.0 = C...
   return scaleLetter;

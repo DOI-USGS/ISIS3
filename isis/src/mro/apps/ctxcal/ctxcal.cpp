@@ -2,7 +2,7 @@
 #include "ProcessByLine.h"
 #include "SpecialPixel.h"
 #include "iTime.h"
-#include "iException.h"
+#include "IException.h"
 #include "TextFile.h"
 #include "LineManager.h"
 #include "Brick.h"
@@ -41,7 +41,7 @@ void IsisMain() {
   std::string instId = inst["InstrumentId"];
   if(instId != "CTX") {
     string msg = "This is not a CTX image.  Ctxcal requires a CTX image.";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   Cube *icube = p.SetInputCube("FROM", OneBand);
@@ -63,7 +63,7 @@ void IsisMain() {
   if(icube->hasGroup("Radiometry")) {
     string msg = "The CTX image [" + icube->getFilename() + "] has already "
                  "been radiometrically calibrated";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // Get label parameters we will need for calibration equation
@@ -149,7 +149,7 @@ void IsisMain() {
     double w1 = w0 * ((dist * dist) / (dist1 * dist1));
     if(exposure *w1 == 0.0) {
       string msg = icube->getFilename() + ": exposure or w1 has value of 0.0 ";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     iof = 1.0 / (exposure * w1);
   }

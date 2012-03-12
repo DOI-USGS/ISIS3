@@ -2,7 +2,7 @@
 #include "CameraFactory.h"
 #include "Camera.h"
 #include "ProcessRubberSheet.h"
-#include "iException.h"
+#include "IException.h"
 #include "cam2cam.h"
 
 using namespace std;

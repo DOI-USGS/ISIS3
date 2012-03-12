@@ -18,7 +18,7 @@ int main(int argc, char *argv[]) {
   Database testdb("unittestdb", "SQLite");
   testdb.setDatabaseName(dbname.c_str());
   if(!testdb.open()) {
-    iException::Message(iException::User, "Connection failed", _FILEINFO_);
+    throw IException(IException::User, "Connection failed", _FILEINFO_);
   }
 
   //  Construct queries
@@ -42,8 +42,8 @@ int main(int argc, char *argv[]) {
       cout << "Field " << i << ": " << fields[i] << endl;
     }
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   cout << "Database Name: " << testdb.Name() << endl;

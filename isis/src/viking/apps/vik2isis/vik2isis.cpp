@@ -7,7 +7,7 @@
 #include "ProcessImportPds.h"
 #include "UserInterface.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "Pvl.h"
 #include "iString.h"
 
@@ -35,18 +35,17 @@ void IsisMain() {
 
     if(compressionTest.Groups() == 0 && compressionTest.Objects() == 0 &&
         compressionTest.Keywords() < 2) {
-      throw iException::Message(iException::Programmer, "", _FILEINFO_);
+      throw IException(IException::Programmer, "", _FILEINFO_);
     }
   }
-  catch(iException &e) {
-    e.Clear();
+  catch(IException &e) {
     tempFile = true;
     string command = "$ISISROOT/bin/vdcomp " + in.Expanded() + " " +
                      temp.Expanded() + " > /dev/null 2>&1";
     int returnValue = system(command.c_str()) >> 8;
     if(returnValue) {
       string msg = "Error running vdcomp";
-      Isis::iException::errType msgTarget = Isis::iException::Programmer;
+      IException::ErrorType msgTarget = IException::Programmer;
       switch(returnValue) {
         case 1:
           msg =  "Vik2Isis called vdcomp and help mode was triggered.\n";
@@ -74,10 +73,10 @@ void IsisMain() {
         case 42:
           msg = "Input file [" + in.Name() + "] has\ninvalid or" +
                 " corrupted line header table!";
-          msgTarget = Isis::iException::User;
+          msgTarget = IException::User;
           break;
       }
-      throw iException::Message(msgTarget, msg, _FILEINFO_);
+      throw IException(msgTarget, msg, _FILEINFO_);
     }
     in = temp.Expanded();
   }
@@ -87,10 +86,10 @@ void IsisMain() {
   try {
     p.SetPdsFile(in.Expanded(), "", pdsLabel);
   }
-  catch(iException &e) {
+  catch(IException &e) {
     string msg = "Input file [" + in.Name() +
                  "] does not appear to be a Viking PDS product";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   Cube *ocube = p.SetOutputCube("TO");

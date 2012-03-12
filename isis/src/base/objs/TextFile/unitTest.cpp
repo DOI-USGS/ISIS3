@@ -1,6 +1,6 @@
 #include "TextFile.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "Preference.h"
 #include <iostream>
@@ -81,8 +81,8 @@ int main(int argc, char *argv[]) {
            << p.Size() << endl;
     }
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
   cout << endl;
 
@@ -128,8 +128,8 @@ int main(int argc, char *argv[]) {
       }
     }
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
   cout << endl;
 
@@ -148,8 +148,8 @@ int main(int argc, char *argv[]) {
            << p.Size() << endl;
     }
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
   cout << endl;
 
@@ -174,8 +174,8 @@ int main(int argc, char *argv[]) {
       }
     }
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
   cout << endl;
 
@@ -187,8 +187,8 @@ int main(int argc, char *argv[]) {
   try {                                                  // open file, will truncate
     Isis::TextFile f(testFile, "OverWrite");
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
   cout << endl;
 
@@ -241,8 +241,8 @@ int main(int argc, char *argv[]) {
            << f.Size() << endl;
     }
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
   cout << endl;
 
@@ -280,8 +280,8 @@ int main(int argc, char *argv[]) {
       f.PutLine(testLines[i]);
     }
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
   cout << endl;
 
@@ -351,8 +351,8 @@ int main(int argc, char *argv[]) {
       cout << " *** Failed Read to end of file *** " << endl;
     }
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
   cout << endl;
 
@@ -406,8 +406,8 @@ int main(int argc, char *argv[]) {
       cout << " *** Failed Read Replaced lines *** " << endl;
     }
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
   cout << endl;
 
@@ -424,9 +424,8 @@ int main(int argc, char *argv[]) {
   try {
     Isis::TextFile f(testFile, "Input");
   }
-  catch(Isis::iException &e) {
-    ReportError(iString(e.Errors()));
-    e.Clear();
+  catch(Isis::IException &e) {
+    ReportError(e.toString());
   }
   cout << endl;
 
@@ -438,9 +437,8 @@ int main(int argc, char *argv[]) {
   try {
     Isis::TextFile f(testFile, "Output");
   }
-  catch(Isis::iException &e) {
-    ReportError(iString(e.Errors()));
-    e.Clear();
+  catch(Isis::IException &e) {
+    ReportError(e.toString());
   }
   cout << endl;
 
@@ -450,9 +448,8 @@ int main(int argc, char *argv[]) {
   try {
     Isis::TextFile fxText(testFile, "xxxInputxxx");
   }
-  catch(Isis::iException &e) {
-    ReportError(iString(e.Errors()));
-    e.Clear();
+  catch(Isis::IException &e) {
+    ReportError(e.toString());
   }
   cout << endl;
 
@@ -463,9 +460,8 @@ int main(int argc, char *argv[]) {
     Isis::TextFile f(testFile, "Input");
     f.PutLine("Line 1");
   }
-  catch(Isis::iException &e) {
-    ReportError(iString(e.Errors()));
-    e.Clear();
+  catch(Isis::IException &e) {
+    ReportError(e.toString());
   }
   cout << endl;
 
@@ -477,9 +473,8 @@ int main(int argc, char *argv[]) {
     f.Close();
     f.PutLine("Line 1");
   }
-  catch(Isis::iException &e) {
-    ReportError(iString(e.Errors()));
-    e.Clear();
+  catch(Isis::IException &e) {
+    ReportError(e.toString());
   }
   cout << endl;
 
@@ -491,9 +486,8 @@ int main(int argc, char *argv[]) {
     f.Close();
     f.GetLine();
   }
-  catch(Isis::iException &e) {
-    ReportError(iString(e.Errors()));
-    e.Clear();
+  catch(Isis::IException &e) {
+    ReportError(e.toString());
   }
   cout << endl;
 

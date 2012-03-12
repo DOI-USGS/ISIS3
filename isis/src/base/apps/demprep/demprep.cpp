@@ -55,7 +55,7 @@ void IsisMain() {
   if(proj == NULL) {
     iString message = "The input cube must be a DEM file, which means it must be projected. ";
     message += "This file is not map projected.";
-    throw iException::Message(iException::User, message, _FILEINFO_);
+    throw IException(IException::User, message, _FILEINFO_);
   }
 
   if(!proj->IsEquatorialCylindrical()) {
@@ -77,7 +77,7 @@ void IsisMain() {
     record += fmax;
 
     Table table(shp_name,record);
- 
+
     record[0] = Distance(inCubeStats.Minimum(),
                          Distance::Meters).kilometers();
     record[1] = Distance(inCubeStats.Maximum(),
@@ -91,7 +91,7 @@ void IsisMain() {
 
   if (proj->LatitudeTypeString() != "Planetocentric") {
     iString message = "The input cube must have Planetocentric latitude type.";
-    throw iException::Message(iException::User, message, _FILEINFO_);
+    throw IException(IException::User, message, _FILEINFO_);
   }
 
   // Determine if the file is global
@@ -144,14 +144,14 @@ void IsisMain() {
         }
         proj->SetGround(-90.0,-180.0);
       }
-      if (proj->IsGood()) { 
+      if (proj->IsGood()) {
         if (proj->WorldX() > 0.0 && proj->WorldX() < ins+1 &&
             proj->WorldY() > 0.0 && proj->WorldY() < inl+1) {
           insideImage = insideImage + 1;
         }
         proj->SetGround(-90.0,180.0);
       }
-      if (proj->IsGood()) { 
+      if (proj->IsGood()) {
         if (proj->WorldX() > 0.0 && proj->WorldX() < ins+1 &&
             proj->WorldY() > 0.0 && proj->WorldY() < inl+1) {
           insideImage = insideImage + 1;

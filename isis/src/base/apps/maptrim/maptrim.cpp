@@ -6,7 +6,7 @@
 #include "ProgramLauncher.h"
 #include "ProjectionFactory.h"
 #include "Projection.h"
-#include "iException.h"
+#include "IException.h"
 #include "SpecialPixel.h"
 
 using namespace std;
@@ -40,7 +40,7 @@ void IsisMain() {
   }
   else {
     string msg = "Latitude and longitude range not defined in projection";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   string mode = ui.GetString("MODE");
@@ -75,10 +75,9 @@ void IsisMain() {
     try {
       ProgramLauncher::RunIsisProgram("crop", cropParams);
     }
-    catch(iException &e) {
+    catch(IException &e) {
       string msg = "Could not execute crop with params: [" + cropParams + "]";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg,
-                                      _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     if(mode == "BOTH") {
       delete proj;

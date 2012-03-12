@@ -7,8 +7,8 @@
 
 #include "UserInterface.h"
 #include "Filename.h"
-#include "iException.h"
-#include "iException.h"
+#include "IException.h"
+#include "IException.h"
 #include "iTime.h"
 #include "Preference.h"
 
@@ -33,17 +33,17 @@ void IsisMain() {
     if(lab.FindObject("IMAGE").HasKeyword("ENCODING_TYPE")) compressed = true;
     projected = lab.HasObject("IMAGE_MAP_PROJECTION");
   }
-  catch(iException &e) {
+  catch(IException &e) {
     string msg = "Unable to read [DATA_SET_ID] from input file [" +
                  in.Expanded() + "]";
-    throw iException::Message(iException::Io, msg, _FILEINFO_);
+    throw IException(e, IException::Io, msg, _FILEINFO_);
   }
 
   //Checks if in file is rdr
   if(projected) {
     string msg = "[" + in.Name() + "] appears to be an rdr file.";
     msg += " Use pds2isis.";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   id.ConvertWhiteSpace();
@@ -53,7 +53,7 @@ void IsisMain() {
       (id != "MGS-M-MOC-NA/WA-2-SDP-L0-V1.0")) {
     string msg = "Input file [" + in.Expanded() + "] does not appear to be " +
                  "in MOC EDR format. DATA_SET_ID [" + id + "]";
-    throw iException::Message(iException::Io, msg, _FILEINFO_);
+    throw IException(IException::Io, msg, _FILEINFO_);
   }
 
 
@@ -69,7 +69,7 @@ void IsisMain() {
                       uncompressed.Expanded();
     if(system(command.c_str()) == 1) {
       string msg = "Unable to execute [mocuncompress]";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     p.SetPdsFile(uncompressed.Expanded(), "", pdsLabel);
     translbl = uncompressed;

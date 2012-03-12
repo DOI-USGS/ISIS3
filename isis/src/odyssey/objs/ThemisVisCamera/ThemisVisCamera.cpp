@@ -37,9 +37,9 @@ namespace Isis {
   /**
    * Constructor for the Themis Vis Camera Model
    *
-   * @param lab Pvl label from an Odyssey Themis VIS image. 
+   * @param lab Pvl label from an Odyssey Themis VIS image.
    *
-   * @throws iException::User - The image does not appear to be a Themis
+   * @throws IException::User - The image does not appear to be a Themis
    *                                  VIS image
    * @internal
    *   @history 2010-08-04 Jeannie Walldren - Added NAIF error check.
@@ -57,7 +57,7 @@ namespace Isis {
     // make sure it is a themis vis image
     if(inst["InstrumentId"][0] != "THEMIS_VIS") {
       string msg = "The image does not appear to be a Themis Vis Image";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     // Get necessary variables
@@ -120,11 +120,11 @@ namespace Isis {
 
   /**
    * Calculates time offset for the given band.
-   * 
+   *
    * @param vband The band number.
-   * 
+   *
    * @return @b double The time offset value.
-   * 
+   *
    */
   double ThemisVisCamera::BandEphemerisTimeOffset(int vband) {
     int waveToTimeBand[] = {2, 5, 3, 4, 1};
@@ -155,8 +155,8 @@ namespace Isis {
 
 // Plugin
 /**
- * This is the function that is called in order to instantiate a 
- * ThemisVisCamera object. 
+ * This is the function that is called in order to instantiate a
+ * ThemisVisCamera object.
  *
  * @param lab Cube labels
  *

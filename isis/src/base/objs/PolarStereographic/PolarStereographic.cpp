@@ -24,7 +24,7 @@
 #include <cfloat>
 #include <iostream>
 #include "PolarStereographic.h"
-#include "iException.h"
+#include "IException.h"
 #include "Constants.h"
 
 using namespace std;
@@ -87,7 +87,7 @@ namespace Isis {
       if(p_centerLatitude == 0) {
         string msg = "Invalid value for keyword [CenterLatitude] in map file.";
         msg += "  CenterLatitude cannot equal 0.0";
-        throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
       if(this->IsPlanetocentric()) {
         p_centerLatitude = this->ToPlanetographic(p_centerLatitude);
@@ -112,9 +112,9 @@ namespace Isis {
         p_poleFlag = false;  // Implies we are at a pole
       }
     }
-    catch(Isis::iException &e) {
+    catch(IException &e) {
       string message = "Invalid label group [Mapping]";
-      throw Isis::iException::Message(Isis::iException::Projection, message, _FILEINFO_);
+      throw IException(e, IException::Unknown, message, _FILEINFO_);
     }
   }
 
@@ -203,7 +203,7 @@ namespace Isis {
 
     if(fabs(p_latitude) > Isis::HALFPI) {
       string msg = "X,Y causes latitude to be outside [-90,90] in PolarStereographic Class";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     // Compute the longitude

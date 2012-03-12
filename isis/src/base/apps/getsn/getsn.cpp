@@ -43,7 +43,7 @@ void IsisMain() {
   }
   else {
     string msg = "Invalid format string [" + format + "]";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // Extract label from cube file
@@ -71,11 +71,11 @@ void IsisMain() {
       bool append = ui.GetBoolean("APPEND");
       // Open in append or overwrite
       TextFile txt(ui.GetFilename("TO"), append ? "append" : "overwrite");
-      
+
       // Build string
       string line = "";
       for (int i = 0; i < sn.Keywords(); i++) {
-        if (i != 0) 
+        if (i != 0)
           line += ",";
         line += sn[i][0];
       }

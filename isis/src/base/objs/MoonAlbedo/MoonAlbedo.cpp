@@ -1,7 +1,7 @@
 #include <cmath>
 #include "MoonAlbedo.h"
 #include "SpecialPixel.h"
-#include "iException.h"
+#include "IException.h"
 
 #define MIN(x,y) (((x) < (y)) ? (x) : (y))
 #define MAX(x,y) (((x) > (y)) ? (x) : (y))
@@ -96,18 +96,18 @@ namespace Isis {
     double c30 = cos(30.0 * Isis::PI / 180.0);
     if(1.0 + g1sq + 2.0 * g1 *c30 <= 0.0) {
       std::string msg = "Error while initializing Buratti function";
-      throw iException::Message(iException::Math, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
     double pg130 = p_normF1 * (1.0 - g1sq) / (pow((1.0 + g1sq + 2.0 * g1 * c30), 1.5));
     if(1.0 + p_normG2sq + 2.0 * p_normG2 *c30 <= 0.0) {
       std::string msg = "Error while initializing Buratti function";
-      throw iException::Message(iException::Math, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
     double pg230 = p_normF * (1.0 - p_normG2sq) / (pow((1.0 + p_normG2sq + 2.0 * p_normG2 * c30), 1.5));
     if(p_normBsh1 < 0.0) p_normBsh1 = 0.0;
     if(1.0 + tan(15.0 * Isis::PI / 180.0) / p_normH == 0.0) {
       std::string msg = "Error while initializing Buratti function";
-      throw iException::Message(iException::Math, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
     double bshad30 = 1.0 + p_normBsh1 / (1.0 + tan(15.0 * Isis::PI / 180.0) / p_normH);
     p_normPg30 = (pg130 + pg230) * bshad30;
@@ -115,23 +115,23 @@ namespace Isis {
     p_normFbc3 = 1.0 + p_normBc1 * 2.0;
     if(p_normFbc3 == 0.0) {
       std::string msg = "Error while initializing Buratti function";
-      throw iException::Message(iException::Math, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
     p_normC3 = cos(2.0 * Isis::PI / 180.0);
     if(1.0 + p_normG2sq + 2.0 * p_normG2 *p_normC3 <= 0.0) {
       std::string msg = "Error while initializing Buratti function";
-      throw iException::Message(iException::Math, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
     p_normPg32 = p_normF * (1.0 - p_normG2sq) / (pow((1.0 + p_normG2sq + 2.0 * p_normG2 * p_normC3), 1.5));
     if(1.0 + tan(Isis::PI / 180.0) / p_normH == 0.0) {
       std::string msg = "Error while initializing Buratti function";
-      throw iException::Message(iException::Math, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
     p_normBshad3 = 1.0 + p_normBsh1 / (1.0 + tan(Isis::PI / 180.0) / p_normH);
   }
 
   void MoonAlbedo::NormModelAlgorithm(double phase, double incidence, double emission,
-                                      double demincidence, double dememission, double dn, 
+                                      double demincidence, double dememission, double dn,
                                       double &albedo, double &mult, double &base) {
     double a;
     double cosa;
@@ -273,7 +273,7 @@ namespace Isis {
     if(h == 0.0) {
       std::string msg = "Invalid value of normalization h [" +
                         iString(h) + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     p_normH = h;
@@ -290,7 +290,7 @@ namespace Isis {
     if(bsh1 < 0.0) {
       std::string msg = "Invalid value of normalization bsh1 [" +
                         iString(bsh1) + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     p_normBsh1 = bsh1;

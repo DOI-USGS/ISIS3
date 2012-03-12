@@ -1,5 +1,5 @@
 #include <iomanip>
-#include "iException.h"
+#include "IException.h"
 #include "Cube.h"
 #include "OverlapStatistics.h"
 #include "Statistics.h"
@@ -65,8 +65,8 @@ int main(int argc, char *argv[]) {
     PrintResults("I01523019RDR.lev2.cub", 1, oNorm);
     PrintResults("I02609002RDR.lev2.cub", 2, oNorm);
   }
-  catch(Isis::iException &e) {
-    e.Report();
+  catch(Isis::IException &e) {
+    e.print();
   }
 }
 

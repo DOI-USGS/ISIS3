@@ -9,7 +9,7 @@
 #include "Area3D.h"
 #include "Displacement.h"
 #include "Distance.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 
 namespace Isis {
@@ -96,7 +96,7 @@ namespace Isis {
     if(rawData.size() != m_rawBuffer->size()) {
       iString msg = "Cannot set raw data on a RawCubeChunk with a differently "
           "sized data array";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     m_dirty = true;
@@ -108,9 +108,9 @@ namespace Isis {
   /**
    * This method is currently not in use due to a faster way of getting data
    *   from the buffer (through the internal pointer).
-   * 
+   *
    * @param offset the offset into the raw data buffer
-   * @returns the char at the position indicated by the given offset. 
+   * @returns the char at the position indicated by the given offset.
    */
   unsigned char RawCubeChunk::getChar(int offset) const {
     return ((unsigned char *)m_rawBuffer->data())[offset];

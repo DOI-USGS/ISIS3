@@ -30,7 +30,7 @@
 #include "PvlKeyword.h"
 #include "PvlContainer.h"
 #include "CollectorMap.h"
-#include "iException.h"
+#include "IException.h"
 
 namespace Isis {
 

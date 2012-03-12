@@ -9,7 +9,7 @@
 #include "naif/SpiceZfc.h"
 #include "naif/SpiceZmc.h"
 #include "Quaternion.h"
-#include "iException.h"
+#include "IException.h"
 #include "Preference.h"
 
 using namespace std;

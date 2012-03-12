@@ -8,7 +8,7 @@
 #include "UserInterface.h"
 #include "CubeAttribute.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "iTime.h"
 
 using namespace std;
@@ -38,7 +38,7 @@ void IsisMain() {
   if(lab.HasObject("IMAGE_MAP_PROJECTION")) {
     string msg = "[" + inFile.Name() + "] appears to be an rdr file.";
     msg += " Use pds2isis.";
-    throw iException::Message(iException::Io, msg, _FILEINFO_);
+    throw IException(IException::Io, msg, _FILEINFO_);
   }
 
   // data set id value must contain "SSI-2-REDR-V1.0"(valid SSI image)
@@ -49,13 +49,13 @@ void IsisMain() {
     if(dataSetId.find("SSI-2-REDR-V1.0") == string::npos
         && dataSetId.find("SSI-4-REDR-V1.0") == string::npos) {
       string msg = "Invalid DATA_SET_ID [" + dataSetId + "]";
-      throw iException::Message(iException::Pvl, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
   }
-  catch(iException &e) {
+  catch(IException &e) {
     string msg = "Unable to read [DATA_SET_ID] from input file [" +
                  inFile.Expanded() + "]";
-    throw iException::Message(iException::Io, msg, _FILEINFO_);
+    throw IException(IException::Unknown, msg, _FILEINFO_);
   }
 
   // set summing mode

@@ -1,7 +1,7 @@
 #include "Isis.h"
 #include "ProcessByQuickFilter.h"
 #include "UserInterface.h"
-#include "iException.h"
+#include "IException.h"
 
 using namespace std;
 using namespace Isis;
@@ -45,7 +45,7 @@ void IsisMain() {
   // If trimming did not occur tell the user
   if(!trimmed) {
     string msg = "Your selected parameters did not trim any data from the cube";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 }
 

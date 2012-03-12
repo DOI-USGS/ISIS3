@@ -16,7 +16,7 @@
 #include <QVariant>
 #include <QVBoxLayout>
 
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 
 #include "AbstractTreeItem.h"
@@ -103,7 +103,7 @@ namespace Isis
       if (!someModel)
       {
         iString msg = "Attempted to set a NULL model!";
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
       if (model)
@@ -127,7 +127,7 @@ namespace Isis
               model, SIGNAL(treeSelectionChanged(QList< AbstractTreeItem * >)));
       connect(model, SIGNAL(tableSelectionChanged(QList<AbstractTreeItem*>)),
               this, SLOT(scrollTo(QList<AbstractTreeItem*>)));
-      
+
       refresh();
     }
 
@@ -207,11 +207,11 @@ namespace Isis
                 if (child->isSelected())
                   newlySelectedItems.append(child);
               }
-              
+
               item->setSelected(!item->isSelected());
               if (item->isSelected())
                 newlySelectedItems.append(item);
-              
+
               lastDirectlySelectedItem = item;
               lastShiftSelection->clear();
             }
@@ -227,13 +227,13 @@ namespace Isis
                   // gets the new shift selection without selecting children
                   QList< AbstractTreeItem * > tmp =
                       model->getItems(lastDirectlySelectedItem, item);
-                  
+
                   // use tmp to create a new lastShiftSelection with children
                   // selected as well
                   foreach (AbstractTreeItem * i, tmp)
                   {
                     lastShiftSelection->append(i);
-                    
+
                     // if this item is a point item then select its children
                     if (i->getPointerType() == AbstractTreeItem::Point)
                     {
@@ -262,7 +262,7 @@ namespace Isis
                 item->setSelected(true);
                 newlySelectedItems.append(item);
                 lastDirectlySelectedItem = item;
-                
+
                 if (item->getPointerType() == AbstractTreeItem::Point)
                 {
                   foreach (AbstractTreeItem * child, item->getChildren())
@@ -271,11 +271,11 @@ namespace Isis
                     newlySelectedItems.append(child);
                   }
                 }
-                
+
                 lastShiftSelection->clear();
               }
             }
-            
+
             emit treeSelectionChanged(newlySelectedItems);
           }
         }
@@ -605,7 +605,7 @@ namespace Isis
       int rowCount = (int) ceil(viewport()->height() / (double) rowHeight);
       *items = model->getItems(startRow, startRow + rowCount,
                               AbstractTreeModel::AllItems, false);
-      
+
       viewport()->update();
     }
 
@@ -626,26 +626,26 @@ namespace Isis
 
       return arrowRect;
     }
-    
+
     void TreeViewContent::scrollTo(
         QList< AbstractTreeItem * > newlySelectedItems)
     {
       if (newlySelectedItems.size())
         scrollTo(newlySelectedItems.last());
     }
-    
-    
+
+
     void TreeViewContent::scrollTo(AbstractTreeItem * newlySelectedItem)
     {
       if (newlySelectedItem->getPointerType() == AbstractTreeItem::Measure)
         newlySelectedItem->parent()->setExpanded(true);
-      
+
       int row = getModel()->indexOfVisibleItem(newlySelectedItem);
-      
+
       if (row >= 0)
       {
         int topRow = verticalScrollBar()->value();
-        
+
         if (row < topRow)
         {
           verticalScrollBar()->setValue(row);
@@ -658,7 +658,7 @@ namespace Isis
             verticalScrollBar()->setValue(row - wholeVisibleRowCount + 1);
         }
       }
-      
+
       viewport()->update();
     }
   }

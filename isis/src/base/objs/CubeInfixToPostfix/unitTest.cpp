@@ -1,12 +1,16 @@
-#include "Calculator.h"
 #include "CubeInfixToPostfix.h"
-#include "Preference.h"
+
 #include <float.h>
+
+#include "Calculator.h"
+#include "IException.h"
+#include "Preference.h"
 
 using namespace std;
 using namespace Isis;
 
 int main(int argc, char *argv[]) {
+  Isis::Preference::Preferences(true);
   cout << "-------------------------------------------------------" << endl;
   cout << "Test CubeInfixToPostfix" << endl;
 
@@ -49,9 +53,8 @@ int main(int argc, char *argv[]) {
       iString postfix = converter.convert(equations[equation]);
       cout << "   Postfix: '" << postfix << "'" << endl;
     }
-    catch(iException e) {
-      e.Report(false);
-      e.Clear();
+    catch(IException &e) {
+      e.print();
     }
   }
 }

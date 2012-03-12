@@ -5,7 +5,7 @@
 #include "PvlGroup.h"
 #include "PvlObject.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "Constants.h"
 #include "PvlFormatPds.h"
 #include "Preference.h"
@@ -439,8 +439,8 @@ int main() {
 
 
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 
 

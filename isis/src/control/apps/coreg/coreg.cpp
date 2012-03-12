@@ -16,7 +16,7 @@
 #include "SerialNumber.h"
 #include "Statistics.h"
 #include "UserInterface.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "iTime.h"
 
@@ -42,7 +42,7 @@ void IsisMain() {
       if(!ui.WasEntered("ONET")) {
         string msg = "A Control Net file must be entered if the TO parameter is ";
         msg += "entered";
-        throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
     }
   }
@@ -68,12 +68,12 @@ void IsisMain() {
   if((trans.getLineCount() != match.getLineCount()) ||
       (trans.getSampleCount() != match.getSampleCount())) {
     string msg = "Input Cube Lines and Samples must be equal!";
-    throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   if(trans.getBandCount() != 1 || match.getBandCount() != 1) {
     string msg = "Input Cubes must have only one band!";
-    throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // Get serial number
@@ -87,7 +87,7 @@ void IsisMain() {
     if(sTrans == sMatch) {
       string msg = "Cube Serial Numbers must be unique - FROM=" + serialTrans +
                    ", MATCH=" + serialMatch;
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     serialTrans = sTrans;
     serialMatch = sMatch;
@@ -224,7 +224,7 @@ void IsisMain() {
   // If none of the points registered, throw an error
   if(sStats.TotalPixels() < 1) {
     string msg = "Coreg was unable to register any points. Check your algorithm definition.";
-    throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // Don't need the cubes opened anymore
@@ -265,18 +265,18 @@ void IsisMain() {
   // second input image
   if(ui.WasEntered("TO")) {
     if(ui.GetString("TRANSFORM") == "TRANSLATE") {
-      string params = " from="   + ui.GetFilename("FROM") + 
-                      " to="     + ui.GetFilename("TO") + 
-                      " strans=" + iString(sTrans) + 
-                      " ltrans=" + iString(lTrans) + 
+      string params = " from="   + ui.GetFilename("FROM") +
+                      " to="     + ui.GetFilename("TO") +
+                      " strans=" + iString(sTrans) +
+                      " ltrans=" + iString(lTrans) +
                       " interp=" + ui.GetString("INTERP");
       ProgramLauncher::RunIsisProgram("translate", params);
     }
     else {
-      string params = " from="    + ui.GetFilename("FROM") + 
-                      " to="     + ui.GetFilename("TO") + 
-                      " cube="   + ui.GetFilename("MATCH") + 
-                      " cnet="   + ui.GetFilename("ONET") + 
+      string params = " from="    + ui.GetFilename("FROM") +
+                      " to="     + ui.GetFilename("TO") +
+                      " cube="   + ui.GetFilename("MATCH") +
+                      " cnet="   + ui.GetFilename("ONET") +
                       " interp=" + ui.GetString("INTERP") +
                       " degree=" + iString(ui.GetInteger("DEGREE"));
       ProgramLauncher::RunIsisProgram("warp", params);

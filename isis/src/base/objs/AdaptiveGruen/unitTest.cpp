@@ -67,8 +67,8 @@ int main() {
 
 
   }
-  catch(iException &e) {
-    e.Report();
+  catch(IException &e) {
+    e.print();
   }
 
   return 0;

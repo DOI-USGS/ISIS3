@@ -22,7 +22,7 @@
 
 #include "iString.h"
 #include "Message.h"
-#include "iException.h"
+#include "IException.h"
 #include "PvlTranslationManager.h"
 
 using namespace std;
@@ -148,13 +148,9 @@ namespace Isis {
           Isis::PvlContainer *con = CreateContainer(g.Name(), outputLabel);
           (*con) += PvlTranslationManager::DoTranslation(g.Name());
         }
-        catch(iException &e) {
-          if(IsOptional(g.Name())) {
-            e.Clear();
-          }
-          else {
-//            e.Report();
-            throw e;
+        catch(IException &e) {
+          if(!IsOptional(g.Name())) {
+            throw;
           }
         }
       }
@@ -168,7 +164,7 @@ namespace Isis {
    *
    * @param findex The index into the input keyword array.  Defaults to 0
    *
-   * @throws Isis::iException::Programmer
+   * @throws Isis::IException::Programmer
    */
   const PvlKeyword &PvlTranslationManager::InputKeyword(
     const std::string nName) const {
@@ -194,7 +190,7 @@ namespace Isis {
     if(anInputGroupFound) {
       string msg = "Unable to find input keyword [" + InputKeywordName(nName) +
                    "] for output name [" + nName + "] in file [" + TranslationTable().Filename() + "]";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     else {
       string container = "";
@@ -207,7 +203,7 @@ namespace Isis {
 
       string msg = "Unable to find input group [" + container +
                    "] for output name [" + nName + "] in file [" + TranslationTable().Filename() + "]";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
 

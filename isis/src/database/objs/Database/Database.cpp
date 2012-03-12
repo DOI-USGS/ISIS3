@@ -417,8 +417,7 @@ namespace Isis {
     if(!profile.isValid()) {
       ostringstream mess;
       mess << "Database/profile [" << profile.Name() << "] is not valid!" << ends;
-      throw iException::Message(Isis::iException::Programmer, mess.str(),
-                                _FILEINFO_);
+      throw IException(IException::Programmer, mess.str(), _FILEINFO_);
     }
 
     _actualConnectionName = profile.Name();
@@ -443,15 +442,14 @@ namespace Isis {
       }
       return (db);
     }
-    catch(iException &ie) {
+    catch(IException &ie) {
       string mess = "Unable to create database from " + profile.Name();
-      ie.Message(Isis::iException::User, mess, _FILEINFO_);
-      throw ie;
+      throw IException(ie, IException::User, mess, _FILEINFO_);
     }
     catch(...) {
       string mess = "Unknown exception while creating database from profile "
                     + profile.Name();
-      throw iException::Message(Isis::iException::User, mess, _FILEINFO_);
+      throw IException(IException::User, mess, _FILEINFO_);
     }
   }
 
@@ -491,7 +489,7 @@ namespace Isis {
         ostringstream mess;
         mess << "Invalid port number [" << profile("Port") << "] in profile "
              << profile("Name") << ends;
-        throw iException::Message(Isis::iException::User, mess.str(), _FILEINFO_);
+        throw IException(IException::User, mess.str(), _FILEINFO_);
       }
     }
 
@@ -562,11 +560,10 @@ namespace Isis {
    * @param f        Name of method initiating the exception
    * @param l        Line number the error occured
    */
-  void Database::tossDbError(const std::string &message, const char *f, int l) const
-  throw(iException &) {
+  void Database::tossDbError(const std::string &message, const char *f, int l) const {
     string errmess = message + " - DatabaseError = " +
                      iString::ToStd(lastError().text());
-    throw iException::Message(Isis::iException::Programmer, errmess, f, l);
+    throw IException(IException::Programmer, errmess, f, l);
   }
 
 }

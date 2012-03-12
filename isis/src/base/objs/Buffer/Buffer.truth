@@ -48,6 +48,6 @@ d[0]:             999
 d[2]:             999
 d[n]:             999
 
-**PROGRAMMER ERROR** Array subscript [-1] is out of array bounds
-**PROGRAMMER ERROR** Array subscript [24] is out of array bounds
-**PROGRAMMER ERROR** Input and output buffers are not the same pixel type
+**PROGRAMMER ERROR** Array subscript [-1] is out of array bounds.
+**PROGRAMMER ERROR** Array subscript [24] is out of array bounds.
+**PROGRAMMER ERROR** Input and output buffers are not the same pixel type.

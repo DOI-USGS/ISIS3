@@ -24,7 +24,7 @@
 #include <QTime>
 
 #include "SpecialPixel.h"
-#include "iException.h"
+#include "IException.h"
 #include "Application.h"
 #include "ProcessByLine.h"
 #include "Pvl.h"
@@ -44,12 +44,12 @@ namespace Isis {
     if(InputCubes.size() != 0) {
       std::string msg = "Input cubes already exist; do not call SetInputCube when using ";
       msg += "ProcessMosaic::StartProcess(std::string)";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if(OutputCubes.size() == 0) {
       std::string msg = "An output cube must be set before calling StartProcess";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     CubeAttributeInput inAtt(inputFile);
@@ -63,7 +63,7 @@ namespace Isis {
 
     if(*iproj != *oproj) {
       string msg = "Mapping groups do not match between cube [" + inputFile + "] and mosaic";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     int outSample, outSampleEnd, outLine, outLineEnd;
@@ -100,23 +100,23 @@ namespace Isis {
       }
     }
 
-    // Check overlaps of input image along the mosaic edges before 
+    // Check overlaps of input image along the mosaic edges before
     // calling ProcessMosaic::StartProcess
     // Left edge
     if(outSample < 1) {
       ins = ins + outSample - 1;
     }
-    
+
     // Top edge
     if(outLine < 1) {
       inl = inl + outLine - 1;
     }
-    
+
     // Right edge
     if((outSample + ins - 1) > nsMosaic) {
       ins = nsMosaic - outSample + 1;
     }
-    
+
     // Bottom edge
     if((outLine + inl - 1) > nlMosaic) {
       inl = nlMosaic - outLine + 1;
@@ -142,9 +142,9 @@ namespace Isis {
         }
         while(wrapPossible && outSample < nsMosaic);
       }
-      catch(iException &e) {
+      catch(IException &e) {
         string msg = "Unable to mosaic cube [" + Filename(inputFile).Name() + "]";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
     }
 
@@ -176,7 +176,7 @@ namespace Isis {
 
     if(propagationCubes.size() < 1) {
       string msg = "The list does not contain any data";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     for(unsigned int i = 0; i < propagationCubes.size(); i++) {
@@ -192,7 +192,7 @@ namespace Isis {
       if((proj != NULL) && (*proj != *projNew)) {
         string msg = "Mapping groups do not match between cubes [" +
                      propagationCubes[0] + "] and [" + propagationCubes[i] + "]";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
 
       // Figure out the x/y range as it may be needed later
@@ -234,7 +234,7 @@ namespace Isis {
       CubeAttributeOutput &oAtt, const std::string &mosaicFile) {
     if(propagationCubes.size() < 1) {
       string msg = "The list does not contain any data";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     int samples, lines, bands = 0;
@@ -280,7 +280,7 @@ namespace Isis {
       else if(*proj != *projNew) {
         string msg = "Mapping groups do not match between cube [" + propagationCubes[i] +
                      "] and [" + propagationCubes[0] + "]";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
 
       if(proj) delete proj;
@@ -362,7 +362,7 @@ namespace Isis {
       CubeAttributeOutput &oAtt, const std::string &mosaicFile) {
     if(OutputCubes.size() != 0) {
       std::string msg = "You can only specify one output cube and projection";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if(mapping.HasKeyword("UpperLeftCornerX"))

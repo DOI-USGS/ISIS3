@@ -45,7 +45,7 @@
 #endif
 #endif
 
-#include "iException.h"
+#include "IException.h"
 
 namespace Isis {
   namespace GSL {
@@ -104,7 +104,7 @@ namespace Isis {
         }
 
         void check(int gsl_status, const char *src = __FILE__, int line = __LINE__)
-        const throw(iException &);
+        const;
 
 
         size_t Rows(const gsl_matrix *m) const;

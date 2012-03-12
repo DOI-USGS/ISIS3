@@ -9,7 +9,7 @@
 #include <QLocale>
 #include <QVariant>
 
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "SpecialPixel.h"
 
@@ -176,7 +176,7 @@ namespace Isis
       {
         iString msg = "Children of AbstractTreeItem must call setDataWidth "
             "with a non-zero width";
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
       return dataWidth;
@@ -203,7 +203,7 @@ namespace Isis
     {
       iString msg = "This tree item does not keep track of visible filtered "
           "items";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
 
@@ -219,7 +219,7 @@ namespace Isis
       if (avgCharWidth <= 0)
       {
         iString msg = "calcDataWidth() expects a positive non-zero value.";
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
       dataWidth = (avgCharWidth + 1) * getFormattedData().size();

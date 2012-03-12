@@ -6,7 +6,7 @@
 #include "Cube.h"
 #include "FileList.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "Longitude.h"
 #include "OriginalLabel.h"
@@ -55,7 +55,7 @@ void IsisMain() {
     if((string)from1lab.FindGroup("Archive", Pvl::Traverse)["ObservationId"] !=
         (string)from2lab.FindGroup("Archive", Pvl::Traverse)["ObservationId"]) {
       string msg = "Images not from the same observation";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     from2Mosaic = from2lab.FindGroup("Mosaic", Pvl::Traverse);
@@ -194,7 +194,7 @@ void IsisMain() {
     string tmp(tempFile.Expanded());
     remove(tmp.c_str());
     string msg = "Camera did not intersect images to gather stats";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   //work on the times (from mosaic group)

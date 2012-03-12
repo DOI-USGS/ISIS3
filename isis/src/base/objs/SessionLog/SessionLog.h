@@ -24,7 +24,7 @@
 
 #include <string>
 #include "Pvl.h"
-#include "iException.h"
+#include "IException.h"
 
 namespace Isis {
   /**

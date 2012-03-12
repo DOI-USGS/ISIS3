@@ -24,7 +24,7 @@
 #define GaussianDistribution_h
 
 #include "Statistics.h"
-#include "iException.h"
+#include "IException.h"
 #include "Constants.h"
 
 namespace Isis {

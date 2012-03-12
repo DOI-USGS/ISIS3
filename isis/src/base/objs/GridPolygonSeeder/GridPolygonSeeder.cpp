@@ -27,7 +27,7 @@
 
 #include "Pvl.h"
 #include "PvlGroup.h"
-#include "iException.h"
+#include "IException.h"
 #include "PolygonTools.h"
 #include "iString.h"
 
@@ -416,7 +416,7 @@ namespace Isis {
       else {
         std::string msg = "PVL for GridPolygonSeeder must contain [XSpacing] in [";
         msg += pvl.Filename() + "]";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
 
       p_Yspacing = 0.0;
@@ -429,7 +429,7 @@ namespace Isis {
       else {
         std::string msg = "PVL for GridPolygonSeeder must contain [YSpacing] in [";
         msg += pvl.Filename() + "]";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
 
       p_subGrid = false;
@@ -440,18 +440,18 @@ namespace Isis {
         }
       }
     }
-    catch(iException &e) {
+    catch(IException &e) {
       std::string msg = "Improper format for PolygonSeeder PVL [" + pvl.Filename() + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(e, IException::User, msg, _FILEINFO_);
     }
 
     if(p_Xspacing <= 0.0) {
       iString msg = "X Spacing must be greater that 0.0 [(" + iString(p_Xspacing) + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     if(p_Yspacing <= 0.0) {
       iString msg = "Y Spacing must be greater that 0.0 [(" + iString(p_Yspacing) + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
 

@@ -30,4 +30,4 @@ Number of Knowns = 7
   x =   1.65888		1.65888
   y =   1.43458		1.43458
 
-**MATH ERROR** No solution available because no input data was provided
+**ERROR** No solution available because no input data was provided.

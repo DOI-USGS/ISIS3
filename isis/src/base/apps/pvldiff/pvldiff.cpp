@@ -5,7 +5,7 @@
 
 #include "PvlContainer.h"
 #include "Pvl.h"
-#include "iException.h"
+#include "IException.h"
 
 
 using namespace std;
@@ -82,7 +82,7 @@ void CompareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2) {
       pvl1.Size() != tolerances[pvl1.Name()].Size()) {
     string msg = "Size of keyword '" + pvl1.Name() + "' does not match with ";
     msg += "its number of tolerances in the DIFF file.";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   if(ignorekeys.HasKeyword(pvl1.Name()) &&
@@ -90,7 +90,7 @@ void CompareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2) {
       pvl1.Size() != ignorekeys[pvl1.Name()].Size()) {
     string msg = "Size of keyword '" + pvl1.Name() + "' does not match with ";
     msg += "its number of ignore keys in the DIFF file.";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   for(int i = 0; i < pvl1.Size() && filesMatch; i++) {
@@ -136,12 +136,11 @@ void CompareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2) {
         }
       }
     }
-    catch(iException e) {
-      e.Clear();
-
+    catch(IException &) {
       if(!val1.Equal(val2)) {
         filesMatch = false;
-        differenceReason = "Keyword '" + pvl1.Name() + "': values do not match.";
+        differenceReason = "Keyword '" + pvl1.Name() + "': values do not "
+            "match.";
       }
     }
   }
@@ -150,7 +149,8 @@ void CompareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2) {
 void CompareObjects(const PvlObject &pvl1, const PvlObject &pvl2) {
   if(pvl1.Name().compare(pvl2.Name()) != 0) {
     filesMatch = false;
-    differenceReason = "Object " + pvl1.Name() + " does not match " + pvl2.Name();
+    differenceReason = "Object " + pvl1.Name() + " does not match " +
+        pvl2.Name();
   }
 
   if(pvl1.Keywords() != pvl2.Keywords()) {

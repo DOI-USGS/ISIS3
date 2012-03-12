@@ -1,7 +1,7 @@
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "Plugin.h"
-#include "iException.h"
+#include "IException.h"
 #include "PolynomialBivariate.h"
 #include "LeastSquares.h"
 #include "Filename.h"
@@ -106,10 +106,10 @@ namespace Isis {
       if(invalgo.HasKeyword("MinimumArea"))
         invalgo.DeleteKeyword("MinimumArea");
     }
-    catch(iException &e) {
+    catch(IException &e) {
       std::string msg = "Improper format for PolygonSeeder PVL [";
       msg +=  pvl.Filename() + "]. Location [" + errorSpot + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     return;

@@ -1,6 +1,6 @@
 #include <iostream>
 #include "PvlToken.h"
-#include "iException.h"
+#include "IException.h"
 #include "Preference.h"
 
 using namespace std;
@@ -36,15 +36,15 @@ int main(int argc, char *argv[]) {
   try {
     dog.GetValue(-1);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   try {
     dog.GetValue(1);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   return 0;

@@ -1,6 +1,6 @@
 #include "ControlNetValidMeasure.h"
 #include "Preference.h"
-#include "iException.h"
+#include "IException.h"
 
 using namespace std;
 using namespace Isis;
@@ -29,8 +29,8 @@ int main(void) {
       ControlNetValidMeasure cnetVM(pvlLog);
       cout << cnetVM.GetLogPvl();
     }
-    catch(iException e) {
-      e.Report(false);
+    catch(IException &e) {
+      e.print();
     }
 
     try {
@@ -49,8 +49,8 @@ int main(void) {
       ControlNetValidMeasure cnetVM(pvlLog);
       cout << cnetVM.GetLogPvl();
     }
-    catch(iException e) {
-      e.Report(false);
+    catch(IException &e) {
+      e.print();
     }
 
     try {
@@ -74,8 +74,8 @@ int main(void) {
       ControlNetValidMeasure cnetVM(pvlLog);
       cout << cnetVM.GetLogPvl();
     }
-    catch(iException e) {
-      e.Report(false);
+    catch(IException &e) {
+      e.print();
     }
 
     try {
@@ -96,8 +96,8 @@ int main(void) {
       ControlNetValidMeasure cnetVM(pvlLog);
       cout << cnetVM.GetLogPvl();
     }
-    catch(iException e) {
-      e.Report(false);
+    catch(IException &e) {
+      e.print();
     }
 
     try {
@@ -123,8 +123,8 @@ int main(void) {
       ControlNetValidMeasure cnetVM(pvlLog);
       cout << cnetVM.GetLogPvl();
     }
-    catch(iException e) {
-      e.Report(false);
+    catch(IException &e) {
+      e.print();
     }
 
     try {
@@ -150,8 +150,8 @@ int main(void) {
       ControlNetValidMeasure cnetVM(pvlLog);
       cout << cnetVM.GetLogPvl();
     }
-    catch(iException e) {
-      e.Report(false);
+    catch(IException &e) {
+      e.print();
     }
 
     try {
@@ -176,13 +176,13 @@ int main(void) {
       ControlNetValidMeasure cnetVM(pvlLog);
       cout << cnetVM.GetLogPvl();
     }
-    catch(iException e) {
-      e.Report(false);
+    catch(IException &e) {
+      e.print();
     }
   }
-  catch(iException e) {
-    throw iException::Message(
-        iException::Programmer, "ControlNetValidMeasure Unit test Exception",
+  catch(IException &e) {
+    throw IException(e,
+        IException::Unknown, "ControlNetValidMeasure Unit test Exception",
         _FILEINFO_);
   }
 

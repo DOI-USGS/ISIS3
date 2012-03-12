@@ -26,7 +26,7 @@
 #include "Camera.h"
 #include "CubeManager.h"
 #include "Distance.h"
-#include "iException.h"
+#include "IException.h"
 #include "iTime.h"
 #include "Longitude.h"
 #include "Projection.h"
@@ -179,7 +179,7 @@ namespace Isis {
   bool CameraPointInfo::CheckCube() {
     if(currentCube == NULL) {
       string msg = "Please set a cube before setting parameters";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
       return false;
     }
     return true;
@@ -242,12 +242,12 @@ namespace Isis {
     if(!camera->HasSurfaceIntersection()) {
       error = "Requested position does not project in camera model; no surface intersection";
       noErrors = false;
-      if(!allowErrors) throw iException::Message(iException::Camera, error, _FILEINFO_);
+      if(!allowErrors) throw IException(IException::Unknown, error, _FILEINFO_);
     }
     if(!camera->InCube() && !allowOutside) {
       error = "Requested position does not project in camera model; not inside cube";
       noErrors = false;
-      if(!allowErrors) throw iException::Message(iException::Camera , error, _FILEINFO_);
+      if(!allowErrors) throw IException(IException::Unknown, error, _FILEINFO_);
     }
 
     if(!noErrors) {

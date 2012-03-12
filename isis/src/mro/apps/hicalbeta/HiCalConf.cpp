@@ -1,26 +1,26 @@
-/**                                                                       
- * @file                                                                  
+/**
+ * @file
  * $Revision: 1.5 $
  * $Date: 2009/12/29 23:03:52 $
  * $Id: HiCalConf.cpp,v 1.5 2009/12/29 23:03:52 ehyer Exp $
- * 
- *   Unless noted otherwise, the portions of Isis written by the USGS are 
- *   public domain. See individual third-party library and package descriptions 
- *   for intellectual property information, user agreements, and related  
- *   information.                                                         
- *                                                                        
- *   Although Isis has been used by the USGS, no warranty, expressed or   
- *   implied, is made by the USGS as to the accuracy and functioning of such 
- *   software and related material nor shall the fact of distribution     
+ *
+ *   Unless noted otherwise, the portions of Isis written by the USGS are
+ *   public domain. See individual third-party library and package descriptions
+ *   for intellectual property information, user agreements, and related
+ *   information.
+ *
+ *   Although Isis has been used by the USGS, no warranty, expressed or
+ *   implied, is made by the USGS as to the accuracy and functioning of such
+ *   software and related material nor shall the fact of distribution
  *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.                                        
- *                                                                        
- *   For additional information, launch                                   
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html                
+ *   USGS in connection therewith.
+ *
+ *   For additional information, launch
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
  *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.                                    
- */ 
+ *   http://www.usgs.gov/privacy.html.
+ */
 #include <string>
 #include <vector>
 #include <numeric>
@@ -35,7 +35,7 @@
 #include "Brick.h"
 #include "SpecialPixel.h"
 #include "iString.h"
-#include "iException.h"
+#include "IException.h"
 
 #include "naif/SpiceUsr.h"
 
@@ -48,36 +48,36 @@ bool HiCalConf::_naifLoaded = false;
 /**
  * @brief Default constructor for HiCalConf
  */
-  HiCalConf::HiCalConf() : DbAccess() { 
+  HiCalConf::HiCalConf() : DbAccess() {
     _profName.clear();
-    init(); 
-  } 
+    init();
+  }
 
 
   /**
    * @brief Construct from a HiRISE label
    * @param label Label from HiRISE cube file
    */
-  HiCalConf::HiCalConf(Pvl &label) : DbAccess() { 
+  HiCalConf::HiCalConf(Pvl &label) : DbAccess() {
     _profName.clear();
     init(label);
-  } 
+  }
 
   /**
    * @brief Construct from HiRISE label and configuration file
-   * 
+   *
    * @param label Label from HiRISE cube file
    * @param conf Name of configuration file to use
    */
-  HiCalConf::HiCalConf(Pvl &label, const std::string &conf) : 
+  HiCalConf::HiCalConf(Pvl &label, const std::string &conf) :
        DbAccess(Pvl(filepath(conf)).FindObject("Hical", PvlObject::Traverse)) {
     _profName.clear();
     init(label);
-  } 
+  }
 
   /**
    * @brief Define label to initialize parameters from
-   * 
+   *
    * @param label Label from HiRISE cube file
    */
   void HiCalConf::setLabel(Pvl &label) {
@@ -87,14 +87,14 @@ bool HiCalConf::_naifLoaded = false;
 
   /**
    * @brief Resolve a file path validating existance
-   * 
+   *
    * This method determines if a filepath is versioned (as indicated with one or
    * more '?') and returns the expanded file name \b only.  It does not expand
    * the path portion of the filespec.  This is so to make use of the results of
    * this method in reporting files in labels...to make it tidy.
-   * 
+   *
    * @param fname  File specification with or without versioning patterns
-   * 
+   *
    * @return string Expanded filename but not the filepath
    */
   string HiCalConf::filepath(const std::string &fname) const {
@@ -113,11 +113,11 @@ bool HiCalConf::_naifLoaded = false;
 
   /**
    * @brief Establish the configuration file used for calibration parameters
-   * 
+   *
    * This file can be established at any point in the processing as parameters
    * are resolved as needed (lazy instantiation).  One must be established
    * before any calibration can take place.
-   * 
+   *
    * @param conf Name of configuration file to use
    */
   void HiCalConf::setConf(const std::string &conf) {
@@ -126,11 +126,11 @@ bool HiCalConf::_naifLoaded = false;
 
   /**
    * @brief Selects a profile other than the default
-   * 
+   *
    * Use of this method is to explicitly select a named profile in the
    * configuration file.  If this is used, additional profile options are not
    * loaded.
-   * 
+   *
    * @param profile Name of existing profile in the configuration file
    */
   void HiCalConf::selectProfile(const std::string &profile) {
@@ -140,9 +140,9 @@ bool HiCalConf::_naifLoaded = false;
 
   /**
    * @brief Returns the selected profile name
-   * 
+   *
    * This method returns the selected profile name.
-   * 
+   *
    * @return string Selected profile name
    */
   string HiCalConf::getProfileName() const {
@@ -151,15 +151,15 @@ bool HiCalConf::_naifLoaded = false;
 
   /**
    * @brief Returns the named expanded matrix file reference
-   * 
+   *
    * This method returns the name of a matrix file reference variable from the
    * \b Matrices keyword as determined from the fully option profile. It then
    * expands the filename portion (not the filepath!) and returns the result as
    * a string for subsequent use.  See also getMatrixList and getMatrix.
-   * 
+   *
    * @param name  Name of Matrix to resolve.  It must be one in the \b Matrices
    *              keyword from the configuration file
-   * 
+   *
    * @return std::string The expanded file name reference for the matrix
    */
   std::string HiCalConf::getMatrixSource(const std::string &name) const {
@@ -168,45 +168,45 @@ bool HiCalConf::_naifLoaded = false;
 
    /**
    * @brief Returns the named expanded matrix file reference
-   * 
+   *
    * This method returns the name of a matrix file reference variable from the
    * \b Matrices keyword as determined from the specified profile. It then
    * expands the filename portion (not the filepath!) and returns the result as
    * a string for subsequent use.  See also getMatrixList and getMatrix.
-   * 
+   *
    * @param name  Name of Matrix to resolve.  It must be one in the \b Matrices
    *              keyword from the configuration file
-   * @param matconf Profile to extract the named matrix source from 
-   * 
+   * @param matconf Profile to extract the named matrix source from
+   *
    * @return std::string The expanded file name reference for the matrix
    */
   std::string HiCalConf::getMatrixSource(const std::string &name,
                                          const DbProfile &matconf) const {
 
-    std::string mfile = parser(matconf.value(name), 
+    std::string mfile = parser(matconf.value(name),
                                getList(matconf,"OptionKeywords"),
                                matconf);
- 
+
 //  Translate and return
     return (filepath(mfile));
   }
 
-  HiVector HiCalConf::getMatrix(const std::string &name, 
+  HiVector HiCalConf::getMatrix(const std::string &name,
                                 int expected_size) const {
     return (getMatrix(name,getMatrixProfile(), expected_size));
   }
 
 
-  std::string HiCalConf::resolve(const std::string &composite, 
+  std::string HiCalConf::resolve(const std::string &composite,
                                  const DbProfile &matconf) const {
-    return (parser(composite,getList(matconf,"OptionKeywords"), matconf)); 
+    return (parser(composite,getList(matconf,"OptionKeywords"), matconf));
   }
 
 
 
   /**
    * @brief Returns the named matrix from the specified file reference
-   * 
+   *
    * The matrix specified in the name parameter must exist in the \b Matrices
    * keyword in the \b Hical object of the configuration file.  A fully option
    * profile is created within this method and the keyword of the named variable
@@ -215,20 +215,20 @@ bool HiCalConf::_naifLoaded = false;
    * band is extracted from the cube file as determined by the CCD channel
    * (provide by the getMatrixBand method) and returned in a HiVector data
    * array.
-   * 
+   *
    * Note that the caller can specify the number of samples expected from the
    * matrix cube in the expected_size parameter if it is non-zero.  Once the
    * matrix cube is opened, the number of samples is checked against this
    * parameter and if they do not match, an exception is thrown.
-   * 
-   * @param name Name of matrix to retreive 
-   * @param profile Specfied profile providing all parameters 
+   *
+   * @param name Name of matrix to retreive
+   * @param profile Specfied profile providing all parameters
    * @param expected_size Expected number of samples in the matrix cube
-   * 
+   *
    * @return HiCalConf::HiVector Returns the extracted band from the cube
    */
-  HiVector HiCalConf::getMatrix(const std::string &name, 
-                                const DbProfile &profile, 
+  HiVector HiCalConf::getMatrix(const std::string &name,
+                                const DbProfile &profile,
                                 int expected_size) const {
 
     std::string mfile = getMatrixSource(name, profile);
@@ -241,12 +241,12 @@ bool HiCalConf::_naifLoaded = false;
     if (expected_size != 0) {
       if (cube.getSampleCount() != expected_size) {
         ostringstream mess;
-        mess << "Specifed matrix  (" << name 
-             << ") from file \"" << mfile 
+        mess << "Specifed matrix  (" << name
+             << ") from file \"" << mfile
              << "\" does not have expected samples (" << expected_size
              << ") but has " << cube.getSampleCount();
         cube.close();
-        throw iException::Message(iException::User, mess.str(), _FILEINFO_);
+        throw IException(IException::User, mess.str(), _FILEINFO_);
       }
     }
 
@@ -265,19 +265,19 @@ bool HiCalConf::_naifLoaded = false;
 
   /**
    * @brief Returns a named scalar constant
-   * 
+   *
    * This method returns a named scalar constant parameter retrieved from the
    * configuration file through a fully optioned profile.  This keyword does not
    * necessarily have to exist in the \b Scalars keyword in the \b Hical object,
    * but is required to be a floating point value (or values).  The result is
    * returned as a HiVector data array.
-   * 
+   *
    * @param name Name of scalar constant to return
    * @param expected_size Expected size of constant if non-zero
-   * 
+   *
    * @return HiCalConf::HiVector Values of scalar constants
    */
-  HiVector HiCalConf::getScalar(const std::string &name, 
+  HiVector HiCalConf::getScalar(const std::string &name,
                                 const DbProfile &profile,
                                 int expected_size) const {
     int nvals = profile.count(name);
@@ -286,10 +286,10 @@ bool HiCalConf::_naifLoaded = false;
     if (expected_size != 0) {
       if (nvals != expected_size) {
         ostringstream mess;
-        mess << "Specifed scalar (" << name 
+        mess << "Specifed scalar (" << name
              << ") does not have expected size (" << expected_size
              << ") but has " << nvals;
-        throw iException::Message(iException::User, mess.str(), _FILEINFO_);
+        throw IException(IException::User, mess.str(), _FILEINFO_);
       }
     }
 //  All is OK
@@ -302,11 +302,11 @@ bool HiCalConf::_naifLoaded = false;
 
   /**
    * @brief Computes the distance from the Sun to the observed body
-   * 
+   *
    * This method requires the appropriate NAIK kernels to be loaded that
    * provides instrument time support, leap seconds and planet body ephemeris.
-   * 
-   * @return double Distance in AU between Sun and observed body 
+   *
+   * @return double Distance in AU between Sun and observed body
    */
   double HiCalConf::sunDistanceAU() {
     loadNaifTiming();
@@ -316,7 +316,7 @@ bool HiCalConf::_naifLoaded = false;
     scs2e_c (-74999,scStartTime.c_str(),&obsStartTime);
 
     string targetName = getKey("TargetName", "Instrument");
-    if ( (iString::Equal(targetName, "Sky")) || 
+    if ( (iString::Equal(targetName, "Sky")) ||
          (iString::Equal(targetName, "Cal")) ||
          (iString::Equal(targetName, "Phobos")) ||
          (iString::Equal(targetName, "Deimos")) ) {
@@ -334,54 +334,54 @@ bool HiCalConf::_naifLoaded = false;
 
   /**
    * @brief Returns the band number of a Matrix file given CCD, Channel number
-   * 
+   *
    * The ordering of HiRISE Isis matrix cubes are required to be ordered by CCD
    * and channel number.  The band number is computed as:
    * @code
    * band =  1 + ccd * 2 + channel
    * @endcode
-   *  
-   * Note that this method extracts the values from a stored cube label.  It 
-   * must be initialized with a label or an error will occur. 
-   *  
+   *
+   * Note that this method extracts the values from a stored cube label.  It
+   * must be initialized with a label or an error will occur.
+   *
    * @return int Band number of matrix cube
    */
   int HiCalConf::getMatrixBand() const {
     Pvl label = _label;
     DbProfile parms = makeParameters(label);
-    return (getMatrixBand(parms)); 
+    return (getMatrixBand(parms));
   }
 
   /**
    * @brief Returns the band number of a Matrix file from a profile
-   * 
+   *
    * The ordering of HiRISE Isis matrix cubes are required to be ordered by CCD
    * and CHANNEL number.  The band number is computed as:
    * @code
    * band =  1 + ccd * 2 + channel
    * @endcode
-   *  
-   * @param  DbProfile Profile to get CCD and CHANNEL values from 
+   *
+   * @param  DbProfile Profile to get CCD and CHANNEL values from
    * @return int Band number of matrix cube
    */
 
   int HiCalConf::getMatrixBand(const DbProfile &p) const {
-    return (getChannelIndex(ToInteger(p("CCD")), ToInteger(p("CHANNEL")))); 
+    return (getChannelIndex(ToInteger(p("CCD")), ToInteger(p("CHANNEL"))));
   }
 
   /**
    * @brief Generic profile keyword value extractor
-   * 
+   *
    * This method retrieves a profile keyword from the given profile and returns
    * all its values a a list of strings.  An exception will be thrown
    * incidentally if the keyword does not exist.
-   * 
+   *
    * @param profile Profile containing the keyword to extract
    * @param key  Name of keyword to retrieve
-   * 
+   *
    * @return std::vector<std::string> List of values from profile keyword
    */
-  HiCalConf::ValueList HiCalConf::getList(const DbProfile &profile, 
+  HiCalConf::ValueList HiCalConf::getList(const DbProfile &profile,
                                           const std::string &key) const {
     ValueList slist;
 
@@ -397,7 +397,7 @@ bool HiCalConf::_naifLoaded = false;
 
 /**
  * @brief Load required NAIF kernels required for timing needs
- * 
+ *
  * This method maintains the loading of kernels for HiRISE timing and planetary
  * body ephemerides to support time and relative positions of planet bodies.
  */
@@ -437,11 +437,11 @@ void HiCalConf::init() {
 
 /**
  * @brief Initialization of object using HiRISE label
- * 
+ *
  * This method initializes the object from a HiRISE label.  Note that a copy of
  * the label is created so that subsequent operations can be supported and it is
  * not dependant upon callers behaviour.
- * 
+ *
  * @param label Pvl label of HiRISE cube
  */
 void HiCalConf::init(Pvl &label) {
@@ -452,16 +452,16 @@ void HiCalConf::init(Pvl &label) {
 
 /**
  * @brief Get a label keyword
- * 
+ *
  * Retreives a keyword from a HiRISE label and returns a reference to it.  If it
  * does not exist, an exception is thrown incidentally.
- * 
+ *
  * @param key Name of keyword in label to retrieve
  * @param group Optional group name to use if non-empty.
- * 
+ *
  * @return PvlKeyword& Reference to retrieved label keyword
  */
-PvlKeyword &HiCalConf::getKey(const std::string &key, 
+PvlKeyword &HiCalConf::getKey(const std::string &key,
                                  const std::string &group) {
   if (!group.empty()) {
     PvlGroup &grp = _label.FindGroup(group, Pvl::Traverse);
@@ -474,19 +474,19 @@ PvlKeyword &HiCalConf::getKey(const std::string &key,
 
 /**
  * @brief Returns the Matrix profile
- * 
+ *
  * This method constructs a fully optioned matrix profile from the
  * configuration file.  If the caller has designated a specific named profile,
  * the options profiles are not loaded.
- * 
+ *
  * Options profiles are read from the \b ProfileOptions configuration keyword
  * and resolved through pattern replacement of FILTER, TDI, BIN, CCD and CHANNEL
  * values are determined from the HiRISE label.  If named profiles exist after
  * the textual substitutions of these values they are added to the base default
  * profile.  This process will replace existing default keywords of the same
  * name in subseqent optional keywords.
- * 
- * @param profile Optional name of the profile to retrieve.  It will use the 
+ *
+ * @param profile Optional name of the profile to retrieve.  It will use the
  *                default profile if this parameter is not provided (empty).
  * @return DbProfile  Returns a fully optioned profile
  */
@@ -495,10 +495,10 @@ DbProfile HiCalConf::getMatrixProfile(const std::string &profile) const {
   DbProfile matconf = getProfile(myprof);
   if (!matconf.isValid()) {
     ostringstream mess;
-    mess << "Specifed matrix profile (" << matconf.Name() 
+    mess << "Specifed matrix profile (" << matconf.Name()
          << ") does not exist or is invalid!";
-    throw iException::Message(iException::User, mess.str(), _FILEINFO_);
-  }  
+    throw IException(IException::User, mess.str(), _FILEINFO_);
+  }
 
   //  Profile the label and merge them.  Order is important.
   matconf = DbProfile(getLabelProfile(matconf), matconf, matconf.Name());
@@ -529,7 +529,7 @@ DbProfile HiCalConf::getLabelProfile(const DbProfile &profile) const {
     for ( int g = 0 ; g < ngroups ; g++ ) {
       string group = profile("LabelGroups", g);
       PvlGroup grp = label.FindGroup(group, Pvl::Traverse);
-      lblprof = DbProfile(lblprof,DbProfile(grp)); 
+      lblprof = DbProfile(lblprof,DbProfile(grp));
     }
   }
   return (lblprof);
@@ -573,18 +573,18 @@ std::string  HiCalConf::makePattern(const std::string &str) const {
 
 /**
  * @brief Performs a search and replace operation for the given string
- * 
+ *
  * This method will search the input string s for predefined keywords (FILTER,
  * TDI, BIN, CCD and CHANNEL) delimited by {} and replace these occurances with
  * the textual equivalent.
- * 
+ *
  * @param s String to conduct search/replace of values
- * 
+ *
  * @return std::string  Results of search/replace
  */
 std::string HiCalConf::parser(const std::string &s, const ValueList &vlist,
                               const DbProfile &prof) const {
-    string sout(s); 
+    string sout(s);
 
     ValueList::const_iterator ciVlist;
     for ( ciVlist = vlist.begin() ; ciVlist != vlist.end() ; ++ciVlist ) {

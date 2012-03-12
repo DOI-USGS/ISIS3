@@ -23,7 +23,7 @@
 #include <sstream>
 #include <iomanip>
 
-#include "iException.h"
+#include "IException.h"
 #include "Message.h"
 #include "iString.h"
 #include "Filename.h"

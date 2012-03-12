@@ -3,16 +3,16 @@ Testing GetUserInterface ...
 unitTest.cub
 
 Testing SetOutputCube without an input cube ...
-**PROGRAMMER ERROR** No input images have been selected ... thereforethe output image size can not be determined
+**PROGRAMMER ERROR** No input images have been selected ... thereforethe output image size can not be determined.
 
 Testing SetOutputCube with bogus samples ...
-**PROGRAMMER ERROR** Invalid cube size specifications [ns=0,nl=1,nb=1]
+**PROGRAMMER ERROR** Invalid cube size specifications [ns=0,nl=1,nb=1].
 
 Testing SetOutputCube with bogus lines ...
-**PROGRAMMER ERROR** Invalid cube size specifications [ns=1,nl=0,nb=1]
+**PROGRAMMER ERROR** Invalid cube size specifications [ns=1,nl=0,nb=1].
 
 Testing SetOutputCube with bogus bands ...
-**PROGRAMMER ERROR** Invalid cube size specifications [ns=1,nl=1,nb=0]
+**PROGRAMMER ERROR** Invalid cube size specifications [ns=1,nl=1,nb=0].
 
 Testing SetInputCube/SetInputWorkCube ... 
 Samples:  126
@@ -23,25 +23,25 @@ Testing SetInputWorkCube OneBand Error ...
 An exception was thrown!
 
 Testing SetInputWorkCube SizeMatch error for bands ...
-**USER ERROR** The number of bands in the input cubes must match
+**USER ERROR** The number of bands in the input cubes must match.
 
 Testing SetInputWorkCube SizeMatch error for lines ...
-**USER ERROR** The number of lines in the input cubes must match
+**USER ERROR** The number of lines in the input cubes must match.
 
 Testing SetInputWorkCube SizeMatch error for samples ...
-**USER ERROR** The number of samples in the input cubes must match
+**USER ERROR** The number of samples in the input cubes must match.
 
 Testing SetInputWorkCube SpatialMatch error for lines ...
-**USER ERROR** The number of lines in the input cubes must match
+**USER ERROR** The number of lines in the input cubes must match.
 
 Testing SetInputWorkCube SpatialMatch error for samples ...
-**USER ERROR** The number of samples in the input cubes must match
+**USER ERROR** The number of samples in the input cubes must match.
 
 Testing SetInputWorkCube BandMatchOrOne error ...
-**USER ERROR** The number of bands in the secondary input cubes must match the primary input cube or be exactly one
+**USER ERROR** The number of bands in the secondary input cubes must match the primary input cube or be exactly one.
 
 Testing SetInputWorkCube AllMatchOrOne error ...
-**USER ERROR** The number of bands in the secondary input cubes must match the primary input cube or be exactly one
+**USER ERROR** The number of bands in the secondary input cubes must match the primary input cube or be exactly one.
 
 Testing Logging ...
 Group = Results

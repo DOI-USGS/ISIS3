@@ -9,7 +9,7 @@
 #include "Angle.h"
 #include "Camera.h"
 #include "Cube.h"
-#include "iException.h"
+#include "IException.h"
 #include "Photometry.h"
 #include "ProcessByLine.h"
 #include "Pvl.h"
@@ -71,7 +71,7 @@ void LoadPvl() {
   nrmName = nrmName.UpCase();
   if (phtName == "NONE" && atmName == "NONE" && nrmName == "NONE") {
     string message = "A photometric or atmospheric or normalization model must be specified before it can be loaded from the PVL";
-    throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+    throw IException(IException::User, message, _FILEINFO_);
   }
   if (phtName != "NONE") {
     if (inPvl.HasObject("PhotometricModel")) {
@@ -170,7 +170,7 @@ void LoadPvl() {
                 ui.PutString("ZEROB0STANDARD", "FALSE");
               } else {
                 string message = "The ZEROB0STANDARD value is invalid - must be set to TRUE or FALSE";
-                throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+                throw IException(IException::User, message, _FILEINFO_);
               }
             }
             if (phtVal == "HAPKEHEN") {
@@ -228,7 +228,7 @@ void LoadPvl() {
               os.str("");
               os << l;
               ui.PutAsString("L", os.str());
-            } 
+            }
           } else if (phtVal == "MINNAERT") {
             if (phtGrp->HasKeyword("K")) {
               double k = phtGrp->FindKeyword("K");
@@ -239,7 +239,7 @@ void LoadPvl() {
           } else if (phtVal != "LAMBERT" && phtVal != "LOMMELSEELIGER" &&
                      phtVal != "LUNARLAMBERTMCEWEN") {
             string message = "Unsupported photometric model [" + phtVal + "].";
-            throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+            throw IException(IException::User, message, _FILEINFO_);
           }
           ui.PutAsString("PHTNAME", phtVal);
         }
@@ -250,7 +250,7 @@ void LoadPvl() {
   iString nrmVal;
 //  if (nrmName == "NONE") {
 //    string message = "A normalization model must be specified before it can be loaded from the PVL";
-//    throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+//    throw IException(IException::User, message, _FILEINFO_);
 //  }
   if (nrmName != "NONE") {
     if (inPvl.HasObject("NormalizationModel")) {
@@ -291,7 +291,7 @@ void LoadPvl() {
         if (wasFound) {
           if (nrmName != "ALBEDOATM" && nrmName != "SHADEATM" && nrmName != "TOPOATM") {
             ui.Clear("ATMNAME");
-          }  
+          }
           ui.Clear("NORMNAME");
           ui.Clear("INCREF");
           ui.Clear("INCMAT");
@@ -322,7 +322,7 @@ void LoadPvl() {
                 os.str("");
                 os << incref;
                 ui.PutAsString("INCREF", os.str());
-              } 
+              }
               if (nrmGrp->HasKeyword("INCMAT")) {
                 double incmat = nrmGrp->FindKeyword("INCMAT");
                 os.str("");
@@ -340,7 +340,7 @@ void LoadPvl() {
                 os.str("");
                 os << albedo;
                 ui.PutAsString("ALBEDO", os.str());
-              }  
+              }
             } else if (nrmVal == "SHADE") {
               if (nrmGrp->HasKeyword("INCREF")) {
                 double incref = nrmGrp->FindKeyword("INCREF");
@@ -399,7 +399,7 @@ void LoadPvl() {
                 os.str("");
                 os << incref;
                 ui.PutAsString("INCREF", os.str());
-              } 
+              }
               if (nrmGrp->HasKeyword("ALBEDO")) {
                 double albedo = nrmGrp->FindKeyword("ALBEDO");
                 os.str("");
@@ -408,7 +408,7 @@ void LoadPvl() {
               }
             } else {
               string message = "Unsupported normalization model [" + nrmVal + "].";
-              throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+              throw IException(IException::User, message, _FILEINFO_);
             }
           } else {
             if (nrmGrp->HasKeyword("D")) {
@@ -483,7 +483,7 @@ void LoadPvl() {
   }
 //  if (atmName == "NONE") {
 //    string message = "An atmospheric model must be specified before it can be loaded from the PVL";
-//    throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+//    throw IException(IException::User, message, _FILEINFO_);
 //  }
   if (atmName != "NONE") {
     if (inPvl.HasObject("AtmosphericModel")) {
@@ -575,7 +575,7 @@ void LoadPvl() {
               ui.PutString("NULNEG", "NO");
             } else {
               string message = "The NULNEG value is invalid - must be set to YES or NO";
-              throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+              throw IException(IException::User, message, _FILEINFO_);
             }
           }
         }
@@ -600,7 +600,7 @@ void LoadPvl() {
             atmVal != "HAPKEATM1" && atmVal != "HAPKEATM2" &&
             atmVal != "ISOTROPIC1" && atmVal != "ISOTROPIC2") {
           string message = "Unsupported atmospheric model [" + atmVal + "].";
-          throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+          throw IException(IException::User, message, _FILEINFO_);
         }
         ui.PutAsString("ATMNAME", atmVal);
       }
@@ -622,7 +622,7 @@ void IsisMain() {
   bool wasFound = false;
   if (ui.WasEntered("FROMPVL")) {
     iString normVal;
-    Pvl fromNormPvl; 
+    Pvl fromNormPvl;
     PvlObject fromNormObj;
     PvlGroup fromNormGrp;
     string input = ui.GetFilename("FROMPVL");
@@ -677,7 +677,7 @@ void IsisMain() {
       string message = "A Normalization model must be specified before running this program. ";
       message += "You need to provide a Normalization model through an input PVL (FROMPVL) or ";
       message += "you need to specify a Normalization model through the program interface.";
-      throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+      throw IException(IException::User, message, _FILEINFO_);
     }
     if (wasFound) {
       toNormPvl.AddObject(fromNormObj);
@@ -704,7 +704,7 @@ void IsisMain() {
       if (!toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
                      HasKeyword("INCREF")) {
         string message = "The " + normName + " Normalization model requires a value for the INCREF parameter.";
-        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+        throw IException(IException::User, message, _FILEINFO_);
       }
     }
     if (ui.WasEntered("INCMAT")) {
@@ -717,7 +717,7 @@ void IsisMain() {
                      HasKeyword("INCMAT")) {
         string message = "The " + normName + " Normalization model requires a value for the INCMAT parameter.";
         message += "The normal range for INCMAT is: 0 <= INCMAT < 90";
-        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+        throw IException(IException::User, message, _FILEINFO_);
       }
     }
     if (ui.WasEntered("THRESH")) {
@@ -729,7 +729,7 @@ void IsisMain() {
       if (!toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
                      HasKeyword("THRESH")) {
         string message = "The " + normName + " Normalization model requires a value for the THRESH parameter.";
-        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+        throw IException(IException::User, message, _FILEINFO_);
       }
     }
     if (ui.WasEntered("ALBEDO")) {
@@ -742,7 +742,7 @@ void IsisMain() {
                      HasKeyword("ALBEDO")) {
         string message = "The " + normName + " Normalization model requires a value for the ALBEDO parameter.";
         message += "The ALBEDO parameter has no limited range";
-        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+        throw IException(IException::User, message, _FILEINFO_);
       }
     }
   } else if (normName == "MOONALBEDO") {
@@ -756,7 +756,7 @@ void IsisMain() {
                      HasKeyword("D")) {
         string message = "The " + normName + " Normalization model requires a value for the D parameter.";
         message += "The D parameter has no limited range";
-        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+        throw IException(IException::User, message, _FILEINFO_);
       }
     }
     if (ui.WasEntered("E")) {
@@ -769,7 +769,7 @@ void IsisMain() {
                      HasKeyword("E")) {
         string message = "The " + normName + " Normalization model requires a value for the E parameter.";
         message += "The E parameter has no limited range";
-        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+        throw IException(IException::User, message, _FILEINFO_);
       }
     }
     if (ui.WasEntered("F")) {
@@ -782,7 +782,7 @@ void IsisMain() {
                      HasKeyword("F")) {
         string message = "The " + normName + " Normalization model requires a value for the F parameter.";
         message += "The F parameter has no limited range";
-        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+        throw IException(IException::User, message, _FILEINFO_);
       }
     }
     if (ui.WasEntered("G2")) {
@@ -795,7 +795,7 @@ void IsisMain() {
                      HasKeyword("G2")) {
         string message = "The " + normName + " Normalization model requires a value for the G2 parameter.";
         message += "The G2 parameter has no limited range";
-        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+        throw IException(IException::User, message, _FILEINFO_);
       }
     }
     if (ui.WasEntered("XMUL")) {
@@ -808,7 +808,7 @@ void IsisMain() {
                      HasKeyword("XMUL")) {
         string message = "The " + normName + " Normalization model requires a value for the XMUL parameter.";
         message += "The XMUL parameter has no range limit";
-        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+        throw IException(IException::User, message, _FILEINFO_);
       }
     }
     if (ui.WasEntered("WL")) {
@@ -821,7 +821,7 @@ void IsisMain() {
                      HasKeyword("WL")) {
         string message = "The " + normName + " Normalization model requires a value for the WL parameter.";
         message += "The WL parameter has no range limit";
-        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+        throw IException(IException::User, message, _FILEINFO_);
       }
     }
     if (ui.WasEntered("H")) {
@@ -834,7 +834,7 @@ void IsisMain() {
                      HasKeyword("H")) {
         string message = "The " + normName + " Normalization model requires a value for the H parameter.";
         message += "The H parameter has no limited range";
-        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+        throw IException(IException::User, message, _FILEINFO_);
       }
     }
     if (ui.WasEntered("BSH1")) {
@@ -847,7 +847,7 @@ void IsisMain() {
                      HasKeyword("BSH1")) {
         string message = "The " + normName + " Normalization model requires a value for the BSH1 parameter.";
         message += "The normal range for BSH1 is: 0 <= BSH1";
-        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+        throw IException(IException::User, message, _FILEINFO_);
       }
     }
     if (ui.WasEntered("XB1")) {
@@ -860,7 +860,7 @@ void IsisMain() {
                      HasKeyword("XB1")) {
         string message = "The " + normName + " Normalization model requires a value for the XB1 parameter.";
         message += "The XB1 parameter has no range limit";
-        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+        throw IException(IException::User, message, _FILEINFO_);
       }
     }
     if (ui.WasEntered("XB2")) {
@@ -873,7 +873,7 @@ void IsisMain() {
                      HasKeyword("XB2")) {
         string message = "The " + normName + " Normalization model requires a value for the XB2 parameter.";
         message += "The XB2 parameter has no range limit";
-        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+        throw IException(IException::User, message, _FILEINFO_);
       }
     }
   } else if (normName == "SHADE") {
@@ -887,7 +887,7 @@ void IsisMain() {
                      HasKeyword("INCREF")) {
         string message = "The " + normName + " Normalization model requires a value for the INCREF parameter.";
         message += "The normal range for INCREF is: 0 <= INCREF < 90";
-        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+        throw IException(IException::User, message, _FILEINFO_);
       }
     }
     if (ui.WasEntered("ALBEDO")) {
@@ -899,7 +899,7 @@ void IsisMain() {
       if (!toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
                      HasKeyword("ALBEDO")) {
         string message = "The " + normName + " Normalization model requires a value for the ALBEDO parameter.";
-        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+        throw IException(IException::User, message, _FILEINFO_);
       }
     }
   } else if (normName == "TOPO") {
@@ -912,7 +912,7 @@ void IsisMain() {
       if (!toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
                      HasKeyword("INCREF")) {
         string message = "The " + normName + " Normalization model requires a value for the INCREF parameter.";
-        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+        throw IException(IException::User, message, _FILEINFO_);
       }
     }
     if (ui.WasEntered("THRESH")) {
@@ -925,7 +925,7 @@ void IsisMain() {
                      HasKeyword("THRESH")) {
         string message = "The " + normName + " Normalization model requires a value for the THRESH parameter.";
         message += "The THRESH parameter has no range limit";
-        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+        throw IException(IException::User, message, _FILEINFO_);
       }
     }
     if (ui.WasEntered("ALBEDO")) {
@@ -937,7 +937,7 @@ void IsisMain() {
       if (!toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
                      HasKeyword("ALBEDO")) {
         string message = "The " + normName + " Normalization model requires a value for the ALBEDO parameter.";
-        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+        throw IException(IException::User, message, _FILEINFO_);
       }
     }
   } else if (normName == "ALBEDOATM") {
@@ -950,7 +950,7 @@ void IsisMain() {
       if (!toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
                      HasKeyword("INCREF")) {
         string message = "The " + normName + " Normalization model requires a value for the INCREF parameter.";
-        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+        throw IException(IException::User, message, _FILEINFO_);
       }
     }
   } else if (normName == "SHADEATM") {
@@ -963,7 +963,7 @@ void IsisMain() {
       if (!toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
                      HasKeyword("INCREF")) {
         string message = "The " + normName + " Normalization model requires a value for the INCREF parameter.";
-        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+        throw IException(IException::User, message, _FILEINFO_);
       }
     }
     if (ui.WasEntered("ALBEDO")) {
@@ -975,7 +975,7 @@ void IsisMain() {
       if (!toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
                      HasKeyword("ALBEDO")) {
         string message = "The " + normName + " Normalization model requires a value for the ALBEDO parameter.";
-        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+        throw IException(IException::User, message, _FILEINFO_);
       }
     }
   } else if (normName == "TOPOATM") {
@@ -988,7 +988,7 @@ void IsisMain() {
       if (!toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
                      HasKeyword("INCREF")) {
         string message = "The " + normName + " Normalization model requires a value for the INCREF parameter.";
-        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+        throw IException(IException::User, message, _FILEINFO_);
       }
     }
     if (ui.WasEntered("ALBEDO")) {
@@ -1000,11 +1000,11 @@ void IsisMain() {
       if (!toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
                      HasKeyword("ALBEDO")) {
         string message = "The " + normName + " Normalization model requires a value for the ALBEDO parameter.";
-        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+        throw IException(IException::User, message, _FILEINFO_);
       }
     }
   }
- 
+
   Pvl toAtmPvl;
   iString atmName = ui.GetAsString("ATMNAME");
   atmName = atmName.UpCase();
@@ -1014,7 +1014,7 @@ void IsisMain() {
     wasFound = false;
     if (ui.WasEntered("FROMPVL")) {
       iString atmVal;
-      Pvl fromAtmPvl; 
+      Pvl fromAtmPvl;
       PvlObject fromAtmObj;
       PvlGroup fromAtmGrp;
       string input = ui.GetFilename("FROMPVL");
@@ -1068,7 +1068,7 @@ void IsisMain() {
         string message = "An Atmospheric model must be specified when doing normalization with atmosphere.";
         message += "You need to provide an Atmospheric model through an input PVL (FROMPVL) or ";
         message += "you need to specify an Atmospheric model through the program interface.";
-        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+        throw IException(IException::User, message, _FILEINFO_);
       }
       if (wasFound) {
         toAtmPvl.AddObject(fromAtmObj);
@@ -1099,7 +1099,7 @@ void IsisMain() {
                       HasKeyword("HNORM")) {
           string message = "The " + atmName + " Atmospheric model requires a value for the HNORM parameter.";
           message += "The normal range for HNORM is: 0 <= HNORM";
-          throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+          throw IException(IException::User, message, _FILEINFO_);
         }
       }
       if (ui.WasEntered("TAU")) {
@@ -1112,7 +1112,7 @@ void IsisMain() {
                       HasKeyword("TAU")) {
           string message = "The " + atmName + " Atmospheric model requires a value for the TAU parameter.";
           message += "The normal range for TAU is: 0 <= TAU";
-          throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+          throw IException(IException::User, message, _FILEINFO_);
         }
       }
       if (ui.WasEntered("TAUREF")) {
@@ -1125,7 +1125,7 @@ void IsisMain() {
                       HasKeyword("TAUREF")) {
           string message = "The " + atmName + " Atmospheric model requires a value for the TAUREF parameter.";
           message += "The normal range for TAUREF is: 0 <= TAUREF";
-          throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+          throw IException(IException::User, message, _FILEINFO_);
         }
       }
       if (ui.WasEntered("WHA")) {
@@ -1138,7 +1138,7 @@ void IsisMain() {
                       HasKeyword("WHA")) {
           string message = "The " + atmName + " Atmospheric model requires a value for the WHA parameter.";
           message += "The normal range for WHA is: 0 < WHA < 1";
-          throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+          throw IException(IException::User, message, _FILEINFO_);
         }
       }
       if (ui.GetString("NULNEG") == "YES") {
@@ -1152,7 +1152,7 @@ void IsisMain() {
                       HasKeyword("NULNEG")) {
           string message = "The " + atmName + " Atmospheric model requires a value for the NULNEG parameter.";
           message += "The valid values for NULNEG are: YES, NO";
-          throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+          throw IException(IException::User, message, _FILEINFO_);
         }
       }
     }
@@ -1168,7 +1168,7 @@ void IsisMain() {
                       HasKeyword("BHA")) {
           string message = "The " + atmName + " Atmospheric model requires a value for the BHA parameter.";
           message += "The normal range for BHA is: -1 <= BHA <= 1";
-          throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+          throw IException(IException::User, message, _FILEINFO_);
         }
       }
     }
@@ -1183,7 +1183,7 @@ void IsisMain() {
                       HasKeyword("HGA")) {
           string message = "The " + atmName + " Atmospheric model requires a value for the HGA parameter.";
           message += "The normal range for HGA is: -1 < HGA < 1";
-          throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+          throw IException(IException::User, message, _FILEINFO_);
         }
       }
     }
@@ -1196,7 +1196,7 @@ void IsisMain() {
   wasFound = false;
   if (ui.WasEntered("FROMPVL")) {
     iString phtVal;
-    Pvl fromPhtPvl; 
+    Pvl fromPhtPvl;
     PvlObject fromPhtObj;
     PvlGroup fromPhtGrp;
     string input = ui.GetFilename("FROMPVL");
@@ -1246,12 +1246,12 @@ void IsisMain() {
         }
       }
     }
-    // Check to make sure that a photometric model was specified 
+    // Check to make sure that a photometric model was specified
     if (phtName == "NONE") {
       string message = "A Photometric model must be specified before running this program.";
       message += "You need to provide a Photometric model through an input PVL (FROMPVL) or ";
       message += "you need to specify a Photometric model through the program interface.";
-      throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+      throw IException(IException::User, message, _FILEINFO_);
     }
     if (wasFound) {
       toPhtPvl.AddObject(fromPhtObj);
@@ -1279,7 +1279,7 @@ void IsisMain() {
                     HasKeyword("THETA")) {
         string message = "The " + phtName + " Photometric model requires a value for the THETA parameter.";
         message += "The normal range for THETA is: 0 <= THETA <= 90";
-        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+        throw IException(IException::User, message, _FILEINFO_);
       }
     }
     if (ui.WasEntered("WH")) {
@@ -1292,7 +1292,7 @@ void IsisMain() {
                     HasKeyword("WH")) {
         string message = "The " + phtName + " Photometric model requires a value for the WH parameter.";
         message += "The normal range for WH is: 0 < WH <= 1";
-        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+        throw IException(IException::User, message, _FILEINFO_);
       }
     }
     if (ui.WasEntered("HH")) {
@@ -1305,7 +1305,7 @@ void IsisMain() {
                     HasKeyword("HH")) {
         string message = "The " + phtName + " Photometric model requires a value for the HH parameter.";
         message += "The normal range for HH is: 0 <= HH";
-        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+        throw IException(IException::User, message, _FILEINFO_);
       }
     }
     if (ui.WasEntered("B0")) {
@@ -1318,7 +1318,7 @@ void IsisMain() {
                     HasKeyword("B0")) {
         string message = "The " + phtName + " Photometric model requires a value for the B0 parameter.";
         message += "The normal range for B0 is: 0 <= B0";
-        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+        throw IException(IException::User, message, _FILEINFO_);
       }
     }
     if (ui.GetString("ZEROB0STANDARD") == "TRUE") {
@@ -1332,7 +1332,7 @@ void IsisMain() {
                     HasKeyword("ZEROB0STANDARD")) {
         string message = "The " + phtName + " Photometric model requires a value for the ZEROB0STANDARD parameter.";
         message += "The valid values for ZEROB0STANDARD are: TRUE, FALSE";
-        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+        throw IException(IException::User, message, _FILEINFO_);
       }
     }
     if (phtName == "HAPKEHEN") {
@@ -1346,7 +1346,7 @@ void IsisMain() {
                       HasKeyword("HG1")) {
           string message = "The " + phtName + " Photometric model requires a value for the HG1 parameter.";
           message += "The normal range for HG1 is: -1 < HG1 < 1";
-          throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+          throw IException(IException::User, message, _FILEINFO_);
         }
       }
       if (ui.WasEntered("HG2")) {
@@ -1359,7 +1359,7 @@ void IsisMain() {
                       HasKeyword("HG2")) {
           string message = "The " + phtName + " Photometric model requires a value for the HG2 parameter.";
           message += "The normal range for HG2 is: 0 <= HG2 <= 1";
-          throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+          throw IException(IException::User, message, _FILEINFO_);
         }
       }
     } else {
@@ -1373,7 +1373,7 @@ void IsisMain() {
                       HasKeyword("BH")) {
           string message = "The " + phtName + " Photometric model requires a value for the BH parameter.";
           message += "The normal range for BH is: -1 <= BH <= 1";
-          throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+          throw IException(IException::User, message, _FILEINFO_);
         }
       }
       if (ui.WasEntered("CH")) {
@@ -1386,7 +1386,7 @@ void IsisMain() {
                       HasKeyword("CH")) {
           string message = "The " + phtName + " Photometric model requires a value for the CH parameter.";
           message += "The normal range for CH is: -1 <= CH <= 1";
-          throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+          throw IException(IException::User, message, _FILEINFO_);
         }
       }
     }
@@ -1399,7 +1399,7 @@ void IsisMain() {
       if (!toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                     HasKeyword("PHASELIST")) {
         string message = "The " + phtName + " Photometric model requires a value for the PHASELIST parameter.";
-        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+        throw IException(IException::User, message, _FILEINFO_);
       }
     }
     if (ui.WasEntered("PHASECURVELIST")) {
@@ -1410,7 +1410,7 @@ void IsisMain() {
       if (!toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                     HasKeyword("PHASECURVELIST")) {
         string message = "The " + phtName + " Photometric model requires a value for the PHASECURVELIST parameter.";
-        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+        throw IException(IException::User, message, _FILEINFO_);
       }
     }
     if (phtName == "LUNARLAMBERTEMPIRICAL") {
@@ -1422,7 +1422,7 @@ void IsisMain() {
         if (!toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                       HasKeyword("LLIST")) {
           string message = "The " + phtName + " Photometric model requires a value for the LLIST parameter.";
-          throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+          throw IException(IException::User, message, _FILEINFO_);
         }
       }
     } else {
@@ -1434,7 +1434,7 @@ void IsisMain() {
         if (!toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                       HasKeyword("KLIST")) {
           string message = "The " + phtName + " Photometric model requires a value for the KLIST parameter.";
-          throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+          throw IException(IException::User, message, _FILEINFO_);
         }
       }
     }
@@ -1449,7 +1449,7 @@ void IsisMain() {
                     HasKeyword("L")) {
         string message = "The " + phtName + " Photometric model requires a value for the L parameter.";
         message += "The L parameter has no limited range";
-        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+        throw IException(IException::User, message, _FILEINFO_);
       }
     }
   } else if (phtName == "MINNAERT") {
@@ -1463,7 +1463,7 @@ void IsisMain() {
                     HasKeyword("K")) {
         string message = "The " + phtName + " Photometric model requires a value for the K parameter.";
         message += "The normal range for K is: 0 <= K";
-        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+        throw IException(IException::User, message, _FILEINFO_);
       }
     }
   }
@@ -1486,17 +1486,17 @@ void IsisMain() {
   maxema = ui.GetDouble("MAXEMISSION");
   maxinc = ui.GetDouble("MAXINCIDENCE");
   usedem = ui.GetBoolean("USEDEM");
-  
+
   // determine how photometric angles should be calculated
   angleSource = ui.GetString("ANGLESOURCE");
- 
+
   // Get camera information if needed
-  if (angleSource == "ELLIPSOID" || angleSource == "DEM" || 
+  if (angleSource == "ELLIPSOID" || angleSource == "DEM" ||
       angleSource == "CENTER_FROM_IMAGE") {
-    // Set up the input cube 
+    // Set up the input cube
     icube = p.SetInputCube("FROM");
     cam = icube->getCamera();
-  } 
+  }
   else {
     p.SetInputCube("FROM");
   }
@@ -1525,7 +1525,7 @@ void IsisMain() {
     centerIncidence = ui.GetDouble("INCIDENCE_ANGLE");
     centerEmission = ui.GetDouble("EMISSION_ANGLE");
   }
- 
+
   // Get the BandBin Center from the image
   PvlGroup pvlg = inLabel.FindGroup("BandBin", Pvl::Traverse);
   double wl;
@@ -1565,26 +1565,26 @@ void photomet(Buffer &in, Buffer &out) {
 
   double dempha=0., deminc=0., demema=0., mult=0., base=0.;
   double ellipsoidpha=0., ellipsoidinc=0., ellipsoidema=0.;
-  
+
   for (int i = 0; i < in.size(); i++) {
-  
+
     // if special pixel, copy to output
     if(!IsValidPixel(in[i])) {
       out[i] = in[i];
     }
-    
+
     // if off the target, set to null
     else if((angleSource == "ELLIPSOID" || angleSource == "DEM" ||
             angleSource == "CENTER_FROM_IMAGE") &&
             (!cam->SetImage(in.Sample(i), in.Line(i)))) {
       out[i] = NULL8;
     }
-    
+
     // otherwise, compute angle values
     else {
-      
+
       bool success = true;
-      if (angleSource == "CENTER_FROM_IMAGE" || 
+      if (angleSource == "CENTER_FROM_IMAGE" ||
           angleSource == "CENTER_FROM_LABEL" ||
           angleSource == "CENTER_FROM_USER") {
         ellipsoidpha = centerPhase;

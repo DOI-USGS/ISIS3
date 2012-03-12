@@ -36,8 +36,8 @@ void IsisMain() {
     cout << label << endl;
     remove(file.c_str());
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   // Test a QUBE file
@@ -61,19 +61,18 @@ void IsisMain() {
     cout << stat->Average() << endl;
     cout << stat->Variance() << endl;
     p2.EndProcess();
-    
+
     // Check input file error
     try {
       Isis::OriginalLabel ol(file);
     }
-    catch(Isis::iException &e) {
-      ReportError(iString(e.Errors()));
-      e.Clear();
+    catch(Isis::IException &e) {
+      ReportError(e.toString());
     }
     remove(file.c_str());
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   // Test an Isis2 file
@@ -93,8 +92,8 @@ void IsisMain() {
     string file = Isis::Application::GetUserInterface().GetFilename("TO");
     remove(file.c_str());
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 }
 

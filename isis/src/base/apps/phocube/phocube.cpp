@@ -7,7 +7,7 @@
 #include "ProcessByBrick.h"
 #include "ProcessByLine.h"
 #include "SpecialPixel.h"
-#include "iException.h"
+#include "IException.h"
 
 #include <cmath>
 
@@ -85,7 +85,7 @@ void IsisMain() {
     }
     catch(iException &e) {
       string msg = "Mosaic files must contain mapping labels";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(e, IException::User, msg, _FILEINFO_);
     }
   } 
   else {
@@ -95,7 +95,7 @@ void IsisMain() {
     catch(iException &e) {
       string msg = "Input file needs to have spiceinit run on it - if this file ";
       msg += "is a mosaic, then check the MOSAICONLY box";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(e, IException::User, msg, _FILEINFO_);
     }
   }
 
@@ -146,7 +146,7 @@ void IsisMain() {
   if(nbands < 1) {
     string message = "At least one photometry parameter must be entered"
                      "[PHASE, EMISSION, INCIDENCE, LATITUDE, LONGITUDE...]";
-    throw iException::Message(iException::User, message, _FILEINFO_);
+    throw IException(IException::User, message, _FILEINFO_);
   }
 
   // Retrieve the orignal values from the input cube band
@@ -196,7 +196,7 @@ void IsisMain() {
   }
   else {
     // Toss the input file as stated above
-    p.ClearInputCubes();   
+    p.ClearInputCubes();
 
     // Start the processing
     p.StartProcess(phocube);
@@ -406,8 +406,8 @@ void phocube(Buffer &out) {
 
 
 // Function to create a keyword with same values of a specified count
-template <typename T> 
-  PvlKeyword makeKey(const std::string &name, const int &nvals, 
+template <typename T>
+  PvlKeyword makeKey(const std::string &name, const int &nvals,
                      const T &value) {
     PvlKeyword key(name);
     for (int i = 0 ; i < nvals ; i++) {
@@ -445,7 +445,7 @@ MosData *getMosaicIndicies(Camera &camera, MosData &md) {
       double cosi = cos(myincidence.radians());
       if (fabs(cosi) < Epsilon) cosi = Epsilon;
       //  Convert resolution to KM
-      md.m_albedo = (res / 1000.0 ) * ( (1.0 / cose) + (1.0 / cosi) );  
+      md.m_albedo = (res / 1000.0 ) * ( (1.0 / cose) + (1.0 / cosi) );
     }
   }
 
@@ -458,7 +458,7 @@ MosData *getMosaicIndicies(Camera &camera, MosData &md) {
 //  existance of the keyword and uses its (assumed) first value to set nvals
 //  values to a constant.  If the keyword doesn't exist, it uses the default
 //  value.
-void UpdateBandKey(const std::string &keyname, PvlGroup &bb, const int &nvals, 
+void UpdateBandKey(const std::string &keyname, PvlGroup &bb, const int &nvals,
                    const std::string &default_value) {
 
   string defVal(default_value);

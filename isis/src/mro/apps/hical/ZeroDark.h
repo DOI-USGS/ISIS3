@@ -36,7 +36,7 @@
 #include "LoadCSV.h"
 #include "LowPassFilter.h"
 #include "Statistics.h"
-#include "iException.h"
+#include "IException.h"
 
 namespace Isis {
 

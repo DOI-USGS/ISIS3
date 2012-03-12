@@ -22,7 +22,7 @@
  */
 #include "Endian.h"
 #include "EndianSwapper.h"
-#include "iException.h"
+#include "IException.h"
 #include "Message.h"
 #include <string>
 
@@ -40,7 +40,7 @@ namespace Isis {
 
     if(inputEndian != "LSB" && inputEndian != "MSB") {
       string message = "Invalid parameter-InputEndian must be LSB or MSB";
-      throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+      throw IException(IException::Programmer, message, _FILEINFO_);
     }
 
     if((Isis::IsLsb() && inputEndian == "LSB") ||

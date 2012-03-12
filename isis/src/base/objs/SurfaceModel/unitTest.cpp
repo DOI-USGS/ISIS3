@@ -1,7 +1,7 @@
 #include <vector>
 #include <iostream>
 #include "SurfaceModel.h"
-#include "iException.h"
+#include "IException.h"
 #include "Preference.h"
 
 int main() {
@@ -44,7 +44,7 @@ int main() {
     std::cout << mx << " " << my << std::endl;
     std::cout << s.Evaluate(mx, my) << std::endl;
   }
-  catch(Isis::iException &e) {
-    e.Report();
+  catch(Isis::IException &e) {
+    e.print();
   }
 }

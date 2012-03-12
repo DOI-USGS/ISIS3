@@ -104,7 +104,7 @@ void IsisMain() {
 
   double l,s,sample,line,temp,  //line and sample coordinates for looping through the panC
          ct,  //"cosine of theta" used to prevent evaluted the trig function thousands of times
-         st;  //"sine of theta"   used to prevent evaluted the trig function thousands of times  
+         st;  //"sine of theta"   used to prevent evaluted the trig function thousands of times
 
   std::vector <std::vector <double> > scanFid;  //fiducials of Scan i
   std::vector <std::vector <double> > conFid;  //fiducials of Scan i
@@ -128,10 +128,10 @@ void IsisMain() {
   fidC.open(fiducialFilename.Expanded(),"r");
   if (!fidC.isOpen()) {
     string msg = "Unable to open the fiducial patternS cube: ApolloPanFiducialMark.cub\n";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
   refL = fidC.getLineCount();
-  refS = fidC.getSampleCount();  
+  refS = fidC.getSampleCount();
   patternS.SetSize((int)floor((refS-2)/SCALE),(int)floor((refL-2)/SCALE));  //scaled pattern chip for fast matching
   patternS.TackCube((refS-1)/2,(refL-1)/2);
   patternS.Load(fidC,0,SCALE);
@@ -146,19 +146,19 @@ void IsisMain() {
     panC[i-1]->open(fileName,"r");
     if (!panC[i-1]->isOpen()){
       string msg = "Unable to open input cube: " + iString(fileName[i-1]) + "\n";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
 
   //parameters for maximum correlation autoregestration  see:  file:///usgs/pkgs/isis3nightly2011-09-21/isis/doc/documents/patternSMatch/patternSMatch.html#DistanceTolerance
   //printf("DEBUG1\n");
   Filename fiducialPvl("$apollo15/templates/apolloPanFiducialFinder.pvl");
-  pvl.Read(fiducialPvl.Expanded());  //read in the autoreg parameters  
+  pvl.Read(fiducialPvl.Expanded());  //read in the autoreg parameters
   AutoReg *arS = AutoRegFactory::Create(pvl);
 
   *arS->PatternChip()   = patternS;  //patternS chip is constant
 
-  //set up a centroid measurer  
+  //set up a centroid measurer
   //Centroid centroid;
   CentroidApolloPan centroid(resolution);
   Chip inputChip,selectionChip;
@@ -171,7 +171,7 @@ void IsisMain() {
 
   //find conjugate finducials and calcualte transformations
   for (i=0;i<7;i++) {
-    //for each scan segment 0-6 
+    //for each scan segment 0-6
     //1. find the probable conjugate fiducials (those with the smallest sample coordinates)
     //2. use the nominal transformation to find their matches in the next scan
     //3. robustly calculate the transformation (that is in a manner resistent to erroneous measurements)
@@ -210,18 +210,18 @@ void IsisMain() {
             foundFirst = true;  //once the first fiducial is found stop
           }
         }
-      }  
+      }
     }
     if(s>=averageLines+searchCellSize/2.0) {
        string msg = "Unable to locate a fiducial mark in the input cube [" + fileName + "].  Check FROM and MICRONS parameters.";
-       throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+       throw IException(IException::Io, msg, _FILEINFO_);
        return;
     }
 
-  
+
     for (s= scanFid[0][0], l=scanFid[0][1];s + nominalTrans < scanS;s+=averageSamples/2.0) {
       //look for the bottom fiducial
-      searchS.TackCube(s,l+averageLines);  
+      searchS.TackCube(s,l+averageLines);
       searchS.Load(*panC[i],0,scale);
       *arS->SearchChip()   = searchS;
       //printf("DEBUG3.2\n");
@@ -234,7 +234,7 @@ void IsisMain() {
       }
       //printf("DEBUG3.4\n");
       inputChip.Load(*panC[i],0,1);
-      //inputChip.Write("inputTemp.cub");//debug    
+      //inputChip.Write("inputTemp.cub");//debug
       centroid.selectAdaptive(&inputChip,&selectionChip);      //continuous dynamic range selection
       //selectionChip.Write("selectionTemp.cub");//debug
       if (centroid.elipticalReduction(&selectionChip,95,play,2000) != 0) {    //elliptical trimming/smoothing... if this fails move on
@@ -258,7 +258,7 @@ void IsisMain() {
       searchS.Load(*panC[i],0,scale);
       *arS->SearchChip()   = searchS;
       regStatus = arS->Register();
-      if (regStatus == AutoReg::SuccessPixel) {  
+      if (regStatus == AutoReg::SuccessPixel) {
         inputChip.TackCube( arS->CubeSample(),arS->CubeLine() );
       }
       else {
@@ -310,10 +310,10 @@ void IsisMain() {
         inputChip.SetChipPosition(sample,line);
         //now that the complete conjugate pair has been located save it
         pairFid[2] = inputChip.CubeSample();
-        pairFid[3] = inputChip.CubeLine();  
+        pairFid[3] = inputChip.CubeLine();
         pairFid[0] = scanFid[j][0];
         pairFid[1] = scanFid[j][1];
-        conFid.push_back(pairFid);  
+        conFid.push_back(pairFid);
       }
       /*else {  //DEBUG whole else block
         if (regStatus == AutoReg::SuccessPixel) printf("DEBUG: Conjugate fiducial elliptical reduction failed\ninitialPoint: %lf %lf\n",arS->CubeSample(),arS->CubeLine());
@@ -346,7 +346,7 @@ void IsisMain() {
 
       normal equation:
   transpose(a)*inverse(m)*a*delta = transpose(a)*inverse(m)*w
-  
+
       Solution:
   delta = minverse(transpose(a)*inverse(m)*a)*transpose(a)*inverse(m)*w    iterate until corrections in delta are insignificant
 
@@ -394,7 +394,7 @@ void IsisMain() {
 
             // the following calculation of mdot matrix is left in the code for ease of understanding, the matrix is constant (as shown below)
             // and thus neither caculated nor stored in memory
-            //partials wrt measured quantities  
+            //partials wrt measured quantities
             //bdot[0][0] = ct;  //partial of equation 1 wrt to x scani
             //bdot[1][0] = st;  //partial of equation 2 wrt to x scani
 
@@ -410,7 +410,7 @@ void IsisMain() {
             //mdot = bdot*covariance_matrix*transpose(bdot);  covariance_matrix assumed identity--that keeps are weighted residuals in pixel units for easy interpretation
             //mdot[0] = 2.0;  //bdot[0][0]*bodt[0][0] + bdot[0][1]*bodt[0][1] + bdot[0][2]*bodt[0][2] + bdot[0][3]*bodt[0][3] = ct*ct + st*st + 1 + 0 = 2
             //mdot[1] = 0.0;  //bdot[0][0]*bodt[1][0] + bdot[0][1]*bodt[1][1] + bdot[0][2]*bodt[1][2] + bdot[0][3]*bodt[1][3] = ct*st - ct*st + 0 + 0 = 0
-            //mdot[2] = 2.0;  //bdot[1][0]*bodt[1][0] + bdot[1][1]*bodt[1][1] + bdot[1][2]*bodt[1][2] + bdot[1][3]*bodt[1][3] = st*st + ct*ct + 0 + 1 = 2        
+            //mdot[2] = 2.0;  //bdot[1][0]*bodt[1][0] + bdot[1][1]*bodt[1][1] + bdot[1][2]*bodt[1][2] + bdot[1][3]*bodt[1][3] = st*st + ct*ct + 0 + 1 = 2
 
             //mdot inverse
             //mdot[0] = 0.5;
@@ -418,17 +418,17 @@ void IsisMain() {
             //mdot[2] = 0.5;
 
             if (sqrt(0.5*(wdot[0]*wdot[0] + wdot[1]*wdot[1])) > 3.0) continue;  //if the R^2 residual is greater than 3.0 pixels go on to the next point
-            
+
             //partials wrt unknowns
             adot[0][0] = -conFid[m][0]*st - conFid[m][1]*ct;  //wrt to theta
             adot[1][0] =  conFid[m][0]*ct - conFid[m][1]*st;
-          
+
             adot[0][1] = 1.0;    //wrt dx
             adot[1][1] = 0.0;
 
             adot[0][2] = 0.0;    //wrt dy
             adot[1][2] = 1.0;
-            
+
             //build the normal equations
             //add transpose(adot)*adot to ata  //note: becuase m is constant, and every weight is equal, it is irrelevant and ignored
             for (l=0;l<3;l++)
@@ -461,9 +461,9 @@ void IsisMain() {
               temp = sqrt(wdot[0]*wdot[0] + wdot[1]*wdot[1]);
 
               if (temp > sol.maxR) sol.maxR = temp;
-              
+
               sol.averR += temp;
-      
+
               sol.limit[0] +=  conFid[m][0];
               sol.limit[1] +=  conFid[m][1];
             }
@@ -473,7 +473,7 @@ void IsisMain() {
             solV.push_back(sol);
             break; //break out of interation counting loop
           }
-        }//iteration counting for loop        
+        }//iteration counting for loop
 
       }
     }//end of two point solutions loops
@@ -481,12 +481,12 @@ void IsisMain() {
       printf("ERROR: unable to to calculate transformation coefficients. Check FROM and MICRON parameters.\n");
       return;
     }
-    //now that all the two point solutions have been found go through and choose the best    
+    //now that all the two point solutions have been found go through and choose the best
     //first lets thin by maximum residual
     temp = solV[0].maxR;  //find the lowest max residual
     //printf("DEBUG7.1\n");
     for (j=1;j<int(solV.size());j++){
-      if (solV[j].maxR < temp) temp = solV[j].maxR;  
+      if (solV[j].maxR < temp) temp = solV[j].maxR;
     }
     temp = ceil(temp);  //toss out any solution that has a maximum residual higher than ceil(lowest max residual)
     //printf("DEBUG7.2\n");
@@ -496,7 +496,7 @@ void IsisMain() {
     //then by average residual
     temp = solV[0].averR;  //find the lowest average residual
     for (j=1;j<int(solV.size());j++){
-      if (solV[j].averR < temp) temp = solV[j].averR;  
+      if (solV[j].averR < temp) temp = solV[j].averR;
     }
     //printf("DEBUG7.3\n");
     temp = ceil(temp);  //toss out any solutins that have average resiudals highter than ceil(lowest average residual)
@@ -522,9 +522,9 @@ void IsisMain() {
     //printf("DEBUG8\n");
   }//end of scan loop
 
-  
+
   //we now have seven transformations that convert from scan i to scan i+1 for i = 0 to 7
-  //as scan 8 is the left most scan and has a nominally identity transfrom from its sample-line sytem to the stiched cube sample-line system  
+  //as scan 8 is the left most scan and has a nominally identity transfrom from its sample-line sytem to the stiched cube sample-line system
   //Comibine transformations so that each transforms is from scan i to scan 8
   for (i=0;i<7;i++) {
     for (j=i+1;j<8;j++) {
@@ -544,15 +544,15 @@ void IsisMain() {
   trans[7].dy = 0.0;
 
   //now lets find the extents of the stiched image
-  double minS=1, 
-         maxS=panC[7]->getSampleCount(), 
-         minL =1, 
+  double minS=1,
+         maxS=panC[7]->getSampleCount(),
+         minL =1,
          maxL = panC[7]->getLineCount();
 
   for (i=0;i<7;i++) {
     scanS = panC[i]->getSampleCount();
     scanL = panC[i]->getLineCount();
-    
+
     //convert the four corner points to the scan 8 domain and determine the greatest extents
     temp = cos(trans[i].theta) - sin(trans[i].theta) + trans[i].dx;
     if (temp < minS) minS = temp;
@@ -584,14 +584,14 @@ void IsisMain() {
   //update the transformations to make the minimum line = 1
   for (i=0;i<8;i++)
     trans[i].dy += 1- minL;
-  
+
   maxL += ceil(1 - minL);
   minL = 1;
-  
+
   //update the transformations to make the minimum sample = 1
   for (i=0;i<8;i++)
     trans[i].dx += 1- minS;
-  
+
   maxS += ceil(1 - minS);
   minS = 1;
 
@@ -604,7 +604,7 @@ void IsisMain() {
     printf("DEBUG: seam sample: %lf\n",trans[i].limit[0]);
   }
 
-  
+
 
   //finally  shift and invert the transformations so that they covert from the rubber sheeted sub-cubes back to the sub-scans
   //the result of this will be transformations that will convert from a set of coordinate systems that differ only by an integral transformation back to sub-scans,  each sub-scan will be rubber sheeted into one of these systems and
@@ -622,7 +622,7 @@ void IsisMain() {
   //make the final maxes integral
   maxS = ceil(maxS);
   maxL = ceil(maxL);
-  
+
   Interpolator bilinearInt(Interpolator::BiLinearType);
   ProcessRubberSheet rubberS;
 
@@ -650,7 +650,7 @@ void IsisMain() {
   ProcessMosaic mosaic;
   mosaic.SetOutputCube("TO");
   mosaic.SetBandBinMatch(false);
-  
+
 
   //transform and mosaic the content from each scan
   for(i=0;i<8;i++) {  //for each scan

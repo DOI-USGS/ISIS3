@@ -29,7 +29,7 @@
 #include <algorithm>
 #include <iomanip>
 #include "iString.h"
-#include "iException.h"
+#include "IException.h"
 #include "SpecialPixel.h"
 
 using namespace std;
@@ -442,8 +442,8 @@ namespace Isis {
       }
     }
     catch(...) {
-      string message = "Cannot convert (" + str + ") to an integer";
-      throw Isis::iException::Message(Isis::iException::Parse, message, _FILEINFO_);
+      string message = "Failed to convert string [" + str + "] to an integer";
+      throw IException(IException::Unknown, message, _FILEINFO_);
     }
     return(v_out);
   }
@@ -478,8 +478,9 @@ namespace Isis {
       }
     }
     catch(...) {
-      string message = "Cannot convert (" + str + ") to a big integer";
-      throw Isis::iException::Message(Isis::iException::Parse, message, _FILEINFO_);
+      string message = "Failed to convert string [" + str + "] to a big "
+                       "integer";
+      throw IException(IException::Unknown, message, _FILEINFO_);
     }
     return(v_out);
   }
@@ -525,8 +526,9 @@ namespace Isis {
         v_out = u.f;
       }
       catch(...) {
-        string message = "Cannot convert HEX value [" + str + "] to a double";
-        throw Isis::iException::Message(Isis::iException::Parse, message, _FILEINFO_);
+        string message = "Failed to convert HEX string [" + str + "] to a "
+                         "double";
+        throw IException(IException::Unknown, message, _FILEINFO_);
       }
     }
     // Convert a decimal value
@@ -543,8 +545,8 @@ namespace Isis {
         }
       }
       catch(...) {
-        string message = "Cannot convert [" + str + "] to a double";
-        throw Isis::iException::Message(Isis::iException::Parse, message, _FILEINFO_);
+        string message = "Failed to convert string [" + str + "] to a double";
+        throw IException(IException::Unknown, message, _FILEINFO_);
       }
     }
 

@@ -171,14 +171,15 @@ namespace Isis {
 
       window->show();
     }
-    catch(iException &e) {
+    catch(IException &e) {
       // close MdiCubeViewport window
       cvp->close();
       // add a new message to the caught exception and throw
-      throw e.Message(iException::Programmer,
-                      "Exception caught when attempting to show cube "
-                      + cube->getFilename(),
-                      _FILEINFO_);
+      throw IException(e,
+                       IException::Programmer,
+                       "Exception caught when attempting to show cube "
+                       + cube->getFilename(),
+                       _FILEINFO_);
     }
 
     emit cubeViewportAdded(cvp);

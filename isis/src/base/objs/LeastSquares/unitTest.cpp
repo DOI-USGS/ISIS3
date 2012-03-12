@@ -1,5 +1,5 @@
 #include <iostream>
-#include "iException.h"
+#include "IException.h"
 #include "LeastSquares.h"
 #include "Preference.h"
 
@@ -118,8 +118,8 @@ int main() {
     cerr << "  x =   " << xcoefSVD << "\t\t" << xcoefQRD << endl;
     cerr << "  y =   " << ycoefSVD << "\t\t" << ycoefQRD << endl ;
   }
-  catch(Isis::iException &e) {
-    e.Report();
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   cerr << endl;
@@ -129,9 +129,8 @@ int main() {
     Isis::LeastSquares lsq2(b);
     lsq2.Solve();
   }
-  catch(Isis::iException &e) {
-    e.Report();
-    e.Clear();
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   return 0;

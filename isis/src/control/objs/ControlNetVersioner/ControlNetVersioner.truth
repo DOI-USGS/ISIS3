@@ -2,9 +2,9 @@ Test ControlNetVersioner
 Reading: ./reallyOldNetwork.net...
 
 Read network...
-**I/O ERROR** Reading the control network [reallyOldNetwork.net] failed
-**I/O ERROR** The target name is not recognized
-**SPICE ERROR** An empty string was passed into a naif routine. The short explanation provided by NAIF is [SPICE(EMPTYSTRING)]. The Naif error is [String "name" has length zero.]
+**I/O ERROR** Reading the control network [reallyOldNetwork.net] failed.
+**I/O ERROR** The target name is not recognized.
+**ERROR** An empty string was passed into a naif routine. The short explanation provided by NAIF is [SPICE(EMPTYSTRING)]. The Naif error is [String "name" has length zero.].
 
 Reading: ./reallyOldNetwork2.net...
 
@@ -279,9 +279,9 @@ Reading/Writing control network is consistent
 Reading: ./badNetwork.net...
 
 Read network...
-**I/O ERROR** Reading the control network [badNetwork.net] failed
-**USER ERROR** Cannot parse binary PB file
-**PROGRAMMER ERROR** Failed to read input PB file badNetwork.net
+**I/O ERROR** Reading the control network [badNetwork.net] failed.
+**USER ERROR** Cannot parse binary PB file.
+**PROGRAMMER ERROR** Failed to read input PB file badNetwork.net.
 
 Reading: ./semilarge.net...
 

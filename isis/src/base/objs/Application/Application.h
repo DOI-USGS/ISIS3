@@ -44,9 +44,10 @@ class QLocalSocket;
 
 namespace Isis {
   class Gui;
+  class IException;
   class Progress;
 
-  /** 
+  /**
    *  @author ????-??-?? Unknown
    *
    * @internal
@@ -119,20 +120,20 @@ namespace Isis {
       static iString Name();
 
       /**
-       * @param helpers 
+       * @param helpers
        */
       void RegisterGuiHelpers(std::map<std::string, void *> helpers) {
         p_guiHelpers = helpers;
       };
 
       /**
-       * @param helper 
+       * @param helper
        */
       void *GetGuiHelper(std::string helper) {
         return p_guiHelpers[helper];
       };
 
-      void GuiReportError(Isis::iException &e);
+      void GuiReportError(IException &e);
 
       static iString UserName();
       static iString HostName();
@@ -147,15 +148,15 @@ namespace Isis {
       int PageFaults();
       int ProcessSwaps();
 
-      QLocalSocket *p_connectionToParent; //!< 
-      time_t p_startTime;                 //!< 
-      clock_t p_startClock;               //!< 
-      std::string p_datetime;             //!< 
-      int p_startDirectIO;                //!< 
-      int p_startPageFaults;              //!< 
-      int p_startProcessSwaps;            //!< 
-      pid_t p_childPid;                   //!< 
-      bool p_childCaught;                 //!< 
+      QLocalSocket *p_connectionToParent; //!<
+      time_t p_startTime;                 //!<
+      clock_t p_startClock;               //!<
+      std::string p_datetime;             //!<
+      int p_startDirectIO;                //!<
+      int p_startPageFaults;              //!<
+      int p_startProcessSwaps;            //!<
+      pid_t p_childPid;                   //!<
+      bool p_childCaught;                 //!<
 
       UserInterface *p_ui;  //!< Pointer to a User Interface object
 
@@ -169,7 +170,7 @@ namespace Isis {
 
       friend class Gui;
       void FunctionCleanup();
-      int FunctionError(Isis::iException &e);
+      int FunctionError(IException &e);
 
       friend class Progress;
       friend class ProgramLauncher;
@@ -178,7 +179,7 @@ namespace Isis {
       void ProcessGuiEvents();
 
       /**
-       * @param p_connection 
+       * @param p_connection
        */
       void SetParentConnection(QLocalSocket *p_connection) {
         p_connectionToParent = p_connection;
@@ -186,9 +187,9 @@ namespace Isis {
       void EstablishConnections();
       void WaitForCommand(int childSocket);
 
-      pid_t p_pid;                                //!< 
-      std::map<std::string, void *> p_guiHelpers; //!< 
-      static iString p_appName;                   //!< 
+      pid_t p_pid;                                //!<
+      std::map<std::string, void *> p_guiHelpers; //!<
+      static iString p_appName;                   //!<
   };
 
   extern Application *iApp;

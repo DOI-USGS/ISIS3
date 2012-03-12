@@ -1,6 +1,6 @@
 #include <cmath>
 #include "LunarLambertMcEwen.h"
-#include "iException.h"
+#include "IException.h"
 
 namespace Isis {
   LunarLambertMcEwen::LunarLambertMcEwen(Pvl &pvl) : PhotoModel(pvl) {

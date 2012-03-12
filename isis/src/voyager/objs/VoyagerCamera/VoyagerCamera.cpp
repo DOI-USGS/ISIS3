@@ -1,20 +1,20 @@
 /**
  * @file
- * $Revision: 1.0 $ 
- * $Date: 2009/05/27 12:08:01 $ 
+ * $Revision: 1.0 $
+ * $Date: 2009/05/27 12:08:01 $
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for 
+ *   domain. See individual third-party library and package descriptions for
  *   intellectual property information,user agreements, and related information.
  *
  *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software 
- *   and related material nor shall the fact of distribution constitute any such 
- *   warranty, and no responsibility is assumed by the USGS in connection 
+ *   is made by the USGS as to the accuracy and functioning of such software
+ *   and related material nor shall the fact of distribution constitute any such
+ *   warranty, and no responsibility is assumed by the USGS in connection
  *   therewith.
  *
  *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see 
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
  *   the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
@@ -51,10 +51,10 @@ namespace Isis {
    * @throw iException::User - "File does not appear to be a Voyager image.
    *        Invalid SpacecraftName."
    *
-   * @author 2010-07-19 Mackenzie Boyd 
+   * @author 2010-07-19 Mackenzie Boyd
    *
-   * @internal 
-   *   @history 2010-07-19 Mackenzie Boyd - Original Version 
+   * @internal
+   *   @history 2010-07-19 Mackenzie Boyd - Original Version
    *   @history 2011-05-03 Jeannie Walldren - Added NAIF error check. Updated
    *                          documentation. Added call to
    *                          ShutterOpenCloseTimes() method.
@@ -70,12 +70,12 @@ namespace Isis {
     PvlGroup inst = lab.FindGroup ("Instrument",Pvl::Traverse);
     iString spacecraft = (string)inst["SpacecraftName"];
     iString instId = (string)inst["InstrumentId"];
-    
+
     iString reseauFilename = "";
     int spacecraftCode = 0;
     int instCode = 0;
 
-    // These set up which kernel and other files to access, 
+    // These set up which kernel and other files to access,
     if (spacecraft == "VOYAGER_1") {
       p_ckFrameId = -31100;
       p_spkTargetId = -31;
@@ -94,7 +94,7 @@ namespace Isis {
       else {
         string msg = "File does not appear to be a Voyager image. InstrumentId ["
           + instId + "] is invalid Voyager value.";
-        throw iException::Message(iException::User,msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
     }
     else if (spacecraft == "VOYAGER_2") {
@@ -115,13 +115,13 @@ namespace Isis {
       else {
         string msg = "File does not appear to be a Voyager image. InstrumentId ["
           + instId + "] is invalid Voyager value.";
-        throw iException::Message(iException::User,msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
     }
     else {
       string msg = "File does not appear to be a Voyager image. SpacecraftName ["
           + spacecraft + "] is invalid Voyager value.";
-      throw iException::Message(iException::User,msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     new CameraDetectorMap(this);
@@ -135,14 +135,14 @@ namespace Isis {
     Filename masterReseaus(reseauFilename);
     try {
       new ReseauDistortionMap(this, lab, masterReseaus.Expanded());
-    } catch (iException &e) {
-      e.Report();
+    } catch (IException &e) {
+      e.print();
     }
 
     // Setup the ground and sky map
     new CameraGroundMap(this);
     new CameraSkyMap(this);
-   
+
     // StartTime is the most accurate time available because in voy2isis the
     // StartTime is modified to be highly accurate.
     // exposure duration keyword value is measured in seconds
@@ -155,7 +155,7 @@ namespace Isis {
      * AS NOTED IN ISIS2 PROGRAM lev1u_vgr_routines.c:
      * StartTime (FDS count) from the labels calculated to correspond the true spacecraft
      * clock count for the frame.  The true spacecraft clock count is readout
-     * time of the frame, which occurred 2 seconds after shutter close. 
+     * time of the frame, which occurred 2 seconds after shutter close.
      *****************************************************************************/
     pair<iTime, iTime> shuttertimes = ShutterOpenCloseTimes(startTime.Et(),
                                                             exposureDuration);

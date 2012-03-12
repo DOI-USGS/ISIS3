@@ -1,7 +1,7 @@
 #include <string>
 #include <iostream>
 #include <stdio.h>
-#include "iException.h"
+#include "IException.h"
 #include "Cube.h"
 #include "Portal.h"
 #include "Preference.h"
@@ -18,9 +18,9 @@ int main(int argc, char *argv[]) {
   try {
     cube->open(fname);
   }
-  catch(Isis::iException &e) {
+  catch(Isis::IException &e) {
     delete cube;
-    e.Report(false);
+    e.print();
     exit(1);
   }
 

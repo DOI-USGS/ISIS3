@@ -28,7 +28,7 @@
 #include "WriteTabular.h"
 #include "iString.h"
 #include "Message.h"
-#include "iException.h"
+#include "IException.h"
 #include "SpecialPixel.h"
 
 namespace Isis {
@@ -69,7 +69,7 @@ namespace Isis {
       if(thisTitle.length() > thisCol.Width()) {
         std::string message = "Column header [" + thisTitle + "] is wider " +
                               "than the set width for column [" + iString((int)index) + "]";
-        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+        throw IException(IException::User, message, _FILEINFO_);
       }
 
       int iteration = 0;
@@ -83,7 +83,7 @@ namespace Isis {
         }
         else {
           std::string message = "Alignment is improperly set";
-          throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+          throw IException(IException::User, message, _FILEINFO_);
         }
         iteration++;
       }//end while
@@ -141,7 +141,7 @@ namespace Isis {
         return;
       }
       std::string message = "Wrong data type for this Column";
-      throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+      throw IException(IException::User, message, _FILEINFO_);
     }
     iString thisItem(item);
     if(thisItem.length() > thisCol.Width()) {
@@ -187,7 +187,7 @@ namespace Isis {
     if(thisCol.DataType() != Column::String &&
         thisCol.DataType() != Column::Pixel) {
       std::string message = "Wrong data type for this Column";
-      throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+      throw IException(IException::User, message, _FILEINFO_);
     }
     if(item.length() > thisCol.Width()) {
       item = "*";
@@ -232,7 +232,7 @@ namespace Isis {
     if(thisCol.DataType() != Column::Real &&
         thisCol.DataType() != Column::Pixel) {
       std::string message = "Wrong data type for this Column";
-      throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+      throw IException(IException::User, message, _FILEINFO_);
     }
 
     //Check for special pixels, if it's a pixel column

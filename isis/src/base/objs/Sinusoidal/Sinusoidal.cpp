@@ -23,7 +23,7 @@
 #include <cmath>
 #include <cfloat>
 #include "Sinusoidal.h"
-#include "iException.h"
+#include "IException.h"
 #include "Constants.h"
 
 using namespace std;
@@ -43,10 +43,10 @@ namespace Isis {
    *                      middle of the longitude range specified in the labels.
    *                      Defaults to false
    *
-   * @throws Isis::iException::Io
+   * @throws Isis::IException::Io
    */
   Sinusoidal::Sinusoidal(Isis::Pvl &label, bool allowDefaults) :
-    Isis::Projection::Projection(label) {
+      Isis::Projection::Projection(label) {
     try {
       // Try to read the mapping group
       Isis::PvlGroup &mapGroup = label.FindGroup("Mapping", Isis::Pvl::Traverse);
@@ -65,9 +65,9 @@ namespace Isis {
       p_centerLongitude *= Isis::PI / 180.0;
       if(p_longitudeDirection == PositiveWest) p_centerLongitude *= -1.0;
     }
-    catch(Isis::iException &e) {
+    catch(IException &e) {
       string message = "Invalid label group [Mapping]";
-      throw Isis::iException::Message(Isis::iException::Io, message, _FILEINFO_);
+      throw IException(e, IException::Io, message, _FILEINFO_);
     }
   }
 

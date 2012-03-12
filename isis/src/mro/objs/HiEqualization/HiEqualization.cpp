@@ -4,7 +4,7 @@
 
 #include "Buffer.h"
 #include "Cube.h"
-#include "iException.h"
+#include "IException.h"
 #include "LineManager.h"
 #include "OverlapNormalization.h"
 #include "OverlapStatistics.h"
@@ -111,7 +111,7 @@ namespace Isis {
     if (imageList.size() > 10) {
       string msg = "The input file [" + fromListName +
         "] cannot contain more than 10 file names";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     // Reference for converting a CPMM number to a CCD number
@@ -131,12 +131,17 @@ namespace Isis {
         // of how the indices changed so we can rearrange the output list later
         movedIndices.push_back(i);
       }
+      catch (IException &e) {
+        string msg = "The [" + imageList[i] +
+          "] file is not a valid HiRise image";
+        throw IException(e, IException::User, msg, _FILEINFO_);
+      }
       catch (...) {
         // If any part of the above didn't work, we can safely assume the
         // current file is not a valid HiRise image
         string msg = "The [" + imageList[i] +
           "] file is not a valid HiRise image";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
     }
 
@@ -149,7 +154,7 @@ namespace Isis {
       if (id1 != id2) {
         string msg = "The list of input images must be all RED, all IR, or ";
         msg += "all BG";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
     }
 
@@ -181,14 +186,14 @@ namespace Isis {
       if (imageList.size() != 2) {
         string msg = "A list of IR images must have exactly two ";
         msg += "file names";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
     }
     else if (ccds[0] == 12 || ccds[0] == 13) {
       if (imageList.size() != 2) {
         string msg = "A list of BG images must have exactly two ";
         msg += "file names";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
     }
   }

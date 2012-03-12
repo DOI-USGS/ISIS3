@@ -44,7 +44,7 @@
 #include "SpecialPixel.h"
 #include "iTime.h"
 #include "iString.h"
-#include "iException.h"
+#include "IException.h"
 #include "Latitude.h"
 #include "Longitude.h"
 #include "PolygonTools.h"
@@ -342,7 +342,7 @@ namespace Isis {
   void BandGeometry::generateGeometryKeys(PvlObject &pband) {
     if(size() <= 0) {
       std::string mess = "No Band geometry available!";
-      iException::Message(iException::Programmer, mess, _FILEINFO_);
+      throw IException(IException::Programmer, mess, _FILEINFO_);
     }
 
     GProperties g = getGeometrySummary();
@@ -602,7 +602,7 @@ namespace Isis {
   void BandGeometry::generatePolygonKeys(PvlObject &pband) {
     if(size() <= 0) {
       std::string mess = "No Band geometry available!";
-      iException::Message(iException::Programmer, mess, _FILEINFO_);
+      throw IException(IException::Programmer, mess, _FILEINFO_);
     }
 
     // Compute surface area - already done in collection phase

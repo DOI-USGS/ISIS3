@@ -1,28 +1,28 @@
 #if !defined(GainChannelNormalize_h)
 #define GainChannelNormalize_h
-/**                                                                       
- * @file                                                                  
+/**
+ * @file
  * $Revision$
  * $Date$
  * $Id$
- * 
- *   Unless noted otherwise, the portions of Isis written by the USGS are 
- *   public domain. See individual third-party library and package descriptions 
- *   for intellectual property information, user agreements, and related  
- *   information.                                                         
- *                                                                        
- *   Although Isis has been used by the USGS, no warranty, expressed or   
- *   implied, is made by the USGS as to the accuracy and functioning of such 
- *   software and related material nor shall the fact of distribution     
+ *
+ *   Unless noted otherwise, the portions of Isis written by the USGS are
+ *   public domain. See individual third-party library and package descriptions
+ *   for intellectual property information, user agreements, and related
+ *   information.
+ *
+ *   Although Isis has been used by the USGS, no warranty, expressed or
+ *   implied, is made by the USGS as to the accuracy and functioning of such
+ *   software and related material nor shall the fact of distribution
  *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.                                        
- *                                                                        
- *   For additional information, launch                                   
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html                
+ *   USGS in connection therewith.
+ *
+ *   For additional information, launch
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
  *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.                                    
- */                                                                       
+ *   http://www.usgs.gov/privacy.html.
+ */
 #include <cmath>
 #include <string>
 #include <vector>
@@ -34,27 +34,27 @@
 #include "Module.h"
 #include "Filename.h"
 
-#include "iException.h"
+#include "IException.h"
 
 namespace Isis {
 
   /**
    * @brief Computes a gain correction for each sample GainChannelNormalize
-   * 
+   *
    * This class computes the HiRISE gain component correction for each sample.
-   * 
+   *
    * @ingroup Utility
-   * 
-   * @author 2010-04-19 Kris Becker 
-   * @internal 
+   *
+   * @author 2010-04-19 Kris Becker
+   * @internal
    */
   class GainChannelNormalize : public Module {
 
-    public: 
+    public:
       //  Constructors and Destructor
-      GainChannelNormalize() : Module("GainChannelNormalize"), 
+      GainChannelNormalize() : Module("GainChannelNormalize"),
                                _normalizer(0.0) { }
-      GainChannelNormalize(const HiCalConf &conf) : 
+      GainChannelNormalize(const HiCalConf &conf) :
                            Module("GainChannelNormalize"), _normalizer(0.0) {
         init(conf);
       }
@@ -87,9 +87,9 @@ namespace Isis {
         }
         else {
           std::ostringstream mess;
-          mess << "Expected 1 or " << nsamps << " values from CSV file " 
+          mess << "Expected 1 or " << nsamps << " values from CSV file "
                << getcsvFile() << " but got " << z.dim() << " instead!";
-          throw iException::Message(iException::User, mess.str(), _FILEINFO_);
+          throw IException(IException::User, mess.str(), _FILEINFO_);
         }
 
         //  Apply the factor to the data

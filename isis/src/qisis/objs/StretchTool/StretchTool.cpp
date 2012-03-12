@@ -11,7 +11,7 @@
 #include "Brick.h"
 #include "CubeViewport.h"
 #include "Histogram.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "MainWindow.h"
 #include "MdiCubeViewport.h"
@@ -59,7 +59,7 @@ namespace Isis {
     p_stretchRegional->setText("Regional Stretch");
     connect(p_stretchRegional, SIGNAL(activated()), this, SLOT(stretchRegional()));
 
-    // Emit a signal when an exception occurs and connect to the Warning object 
+    // Emit a signal when an exception occurs and connect to the Warning object
     // to display Warning icon and the message
     connect(this, SIGNAL(warningSignal(std::string &, const std::string)),
             (ViewportMainWindow *)parent,
@@ -332,16 +332,16 @@ namespace Isis {
   }
 
   /**
-   * Update the streches and corresponding histograms for all the  
+   * Update the streches and corresponding histograms for all the
    * colors Red, Green and Blue for Stretch All Mode.
-   * 
+   *
    * @author Sharmila Prasad (3/14/2011)
    */
   void StretchTool::updateAdvStretchDialogforAll(void)
   {
     if(p_advancedStretch->isVisible()) {
       MdiCubeViewport *cvp = cubeViewport();
-      
+
       if(!cvp->isGray() &&
          !cvp->redBuffer()->working() &&
          !cvp->greenBuffer()->working() &&
@@ -360,7 +360,7 @@ namespace Isis {
       }
     }
   }
-  
+
   /**
    * This is called when the visible area changes.
    */
@@ -481,7 +481,7 @@ namespace Isis {
         cvp->stretchGray(newStretch);
       }
     }
-    else 
+    else
     {
       if(bandId == (int)Red || bandId == (int)All) {
         if(cvp->redBuffer() && cvp->redBuffer()->hasEntireCube()) {
@@ -647,8 +647,8 @@ namespace Isis {
   /**
    * This method is called when the stretch has changed and sets the min/max
    * text fields to the correct values.
-   *  
-   *  Does not effect All as the min/max lineedits are hidden for this option 
+   *
+   *  Does not effect All as the min/max lineedits are hidden for this option
    */
   void StretchTool::changeStretch() {
     MdiCubeViewport *cvp = cubeViewport();
@@ -788,7 +788,7 @@ namespace Isis {
    */
   void StretchTool::stretchRegional(CubeViewport *cvp) {
     QRect rect(0, 0, cvp->viewport()->width(), cvp->viewport()->height());
-    
+
     stretchRect(cvp, rect);
   }
 
@@ -807,11 +807,11 @@ namespace Isis {
     QRect rubberBandRect = RubberBandTool::rectangle();
     //Return if the width or height is zero
     if(rubberBandRect.width() == 0 || rubberBandRect.height() == 0) return;
-    
+
     stretchRect(cvp, rubberBandRect);
   }
-  
-  
+
+
   /**
    * stretch the specified CubeViewport with the given rect
    *
@@ -825,7 +825,7 @@ namespace Isis {
         newStretch.ClearPairs();
         newStretch.CopyPairs(stretchBuffer(cvp->grayBuffer(), rect));
         cvp->stretchGray(newStretch);
-        
+
         // send the stretch to any ChipViewports that want to listen
         *p_chipViewportStretch = newStretch;
         emit stretchChipViewport(p_chipViewportStretch, cvp);
@@ -837,7 +837,7 @@ namespace Isis {
           newStretch.CopyPairs(stretchBuffer(cvp->redBuffer(), rect));
           cvp->stretchRed(newStretch);
         }
-        if (p_stretchBand==Green || p_stretchBand==All){ 
+        if (p_stretchBand==Green || p_stretchBand==All){
           newStretch = cvp->greenStretch();
           newStretch.ClearPairs();
           newStretch.CopyPairs(stretchBuffer(cvp->greenBuffer(), rect));
@@ -849,17 +849,16 @@ namespace Isis {
           newStretch.CopyPairs(stretchBuffer(cvp->blueBuffer(), rect));
           cvp->stretchBlue(newStretch);
         }
-        if(p_stretchBand != Red && p_stretchBand != Blue && 
+        if(p_stretchBand != Red && p_stretchBand != Blue &&
            p_stretchBand != Green && p_stretchBand != All) {
-            throw iException::Message(iException::Programmer,
-                                      "Unknown stretch band", _FILEINFO_);
+            throw IException(IException::Programmer,
+                             "Unknown stretch band",
+                             _FILEINFO_);
         }
       }
-      
+
       stretchChanged();
    }
-  
-  
 
 
   /**
@@ -879,7 +878,7 @@ namespace Isis {
 
     if(s == Qt::RightButton) {
       stretchGlobal(cvp);
-      
+
       // notify any ChipViewports listening that the CubeViewport was stretched
       // back to global
       emit stretchChipViewport(NULL, cvp);
@@ -1029,7 +1028,7 @@ namespace Isis {
    * @param band Band to stretch
    */
   Stretch StretchTool::stretchBand(CubeViewport *cvp, StretchBand band) {
-     
+
     int bandNum = cvp->grayBand();
     Stretch stretch = cvp->grayStretch();
     if(band == Red) {
@@ -1097,8 +1096,9 @@ namespace Isis {
   Statistics StretchTool::statsFromBuffer(ViewportBuffer *buffer,
       QRect rect) {
     if(buffer->working()) {
-      throw iException::Message(iException::User,
-                                "Cannot stretch while the cube is still loading", _FILEINFO_);
+      throw IException(IException::User,
+                       "Cannot stretch while the cube is still loading",
+                       _FILEINFO_);
     }
 
     QRect dataArea = QRect(buffer->bufferXYRect().intersected(rect));
@@ -1183,7 +1183,7 @@ namespace Isis {
 
       return hist;
     }
-    catch(iException &e) {
+    catch(IException &e) {
       // get the min and max DN values of the data area
       iString sMin(min);
       iString sMax(max);
@@ -1193,7 +1193,7 @@ namespace Isis {
       // Emit signal to the parent tool to display Warning object with the warning message
       //emit warningSignal(msg, e.Errors());
 
-      throw iException::Message(iException::None, msg, _FILEINFO_);
+      throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
   }
 
@@ -1207,7 +1207,7 @@ namespace Isis {
     p_stretchBand = (StretchBand) p_stretchBandComboBox->itemData(
                       p_stretchBandComboBox->currentIndex()
                     ).toInt();
-   
+
     if(p_stretchBand == All) {
       p_stretchMinEdit->hide();
       p_stretchMaxEdit->hide();

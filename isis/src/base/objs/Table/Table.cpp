@@ -23,7 +23,7 @@
 #include <fstream>
 #include <string>
 #include "Table.h"
-#include "iException.h"
+#include "IException.h"
 #include "Endian.h"
 
 using namespace std;
@@ -205,7 +205,7 @@ namespace Isis {
    *
    * @param stream InputStream to read data in from
    *
-   * @throws Isis::iException::Io - Error reading or preparing to read a record
+   * @throws Isis::IException::Io - Error reading or preparing to read a record
    */
   void Table::ReadData(std::istream &stream) {
     for(int rec = 0; rec < p_records; rec++) {
@@ -215,7 +215,7 @@ namespace Isis {
       if(!stream.good()) {
         string msg = "Error preparing to read record [" + Isis::iString(rec + 1) +
                      "] from Table [" + p_blobName + "]";
-        throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+        throw IException(IException::Io, msg, _FILEINFO_);
       }
 
       char *buf = new char[RecordSize()];
@@ -223,7 +223,7 @@ namespace Isis {
       if(!stream.good()) {
         string msg = "Error reading record [" + Isis::iString(rec + 1) +
                      "] from Table [" + p_blobName + "]";
-        throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+        throw IException(IException::Io, msg, _FILEINFO_);
       }
 
       if(p_swap) p_record.Swap(buf);

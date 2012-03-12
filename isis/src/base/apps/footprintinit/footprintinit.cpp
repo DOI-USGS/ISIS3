@@ -1,6 +1,6 @@
 #include "Isis.h"
 
-#include "iException.h"
+#include "IException.h"
 #include "ImagePolygon.h"
 #include "PolygonTools.h"
 #include "Process.h"
@@ -21,9 +21,9 @@ void IsisMain() {
   try {
     cube.getCamera();
   }
-  catch(iException &e) {
+  catch(IException &e) {
     string msg = "Spiceinit must be run before initializing the polygon";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(e, IException::User, msg, _FILEINFO_);
   }
 
   Progress prog;
@@ -58,16 +58,16 @@ void IsisMain() {
   }
   else {
     string msg = "Invalid INCTYPE option[" + incType + "]";
-    throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
   bool precision = ui.GetBoolean("INCREASEPRECISION");
   try {
     poly.Create(cube, sinc, linc, 1, 1, 0, 0, 1, precision);
   }
-  catch (iException &e) {
+  catch (IException &e) {
     string msg = "Cannot generate polygon for [" + ui.GetFilename("FROM") + "]";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(e, IException::User, msg, _FILEINFO_);
   }
 
   if(ui.GetBoolean("TESTXY")) {
@@ -109,20 +109,19 @@ void IsisMain() {
 
         polygonGenerated = true;
       }
-      catch (iException &e) {
+      catch (IException &e) {
         if (precision && sinc > 1 && linc > 1) {
           sinc = sinc * 2 / 3;
           linc = linc * 2 / 3;
           poly.Create(cube, sinc, linc);
-          e.Clear();
         }
         else {
           delete proj;
           delete xyPoly;
-          e.Report(); // This should be a NAIF error
+          e.print(); // This should be a NAIF error
           string msg = "Cannot calculate XY for [";
           msg += ui.GetFilename("FROM") + "]";
-          throw iException::Message(iException::User, msg, _FILEINFO_);
+          throw IException(e, IException::User, msg, _FILEINFO_);
         }
       }
 

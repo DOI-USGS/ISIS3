@@ -1,6 +1,6 @@
 #include <iostream>
 #include "TableField.h"
-#include "iException.h"
+#include "IException.h"
 #include "Preference.h"
 
 using namespace std;
@@ -185,8 +185,8 @@ int main(int argc, char *argv[]) {
     g = f12.PvlGroup();
     cout << g << endl;
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
   cout << "----------------------------------------" << endl;
 
@@ -203,8 +203,8 @@ int main(int argc, char *argv[]) {
     cout << g << endl;
 
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
   cout << "----------------------------------------" << endl;
 }

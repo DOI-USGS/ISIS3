@@ -4,7 +4,7 @@
 #include "Constants.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 
 using std::min;
@@ -80,7 +80,7 @@ namespace Isis {
     if(p_atmosWha == 1.0) {
       std::string msg = "Anisotropic conservative case not implemented yet - WHA parameter cannot be set to 1.0.";
       msg += "This will cause negative planetary curvature to occur.";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     if(TauOrWhaChanged()) {
@@ -256,7 +256,7 @@ namespace Isis {
     }
     else {
       std::string msg = "Negative length of planetary curvature encountered";
-      throw iException::Message(iException::Math, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     f2munot = munotp * (f1munot + p_e2 / emunot - 1);
@@ -275,7 +275,7 @@ namespace Isis {
     }
     else {
       std::string msg = "Negative length of planetary curvature encountered";
-      throw iException::Message(iException::Math, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     f2mu = mup * (f1mu + p_e2 / emu - 1);

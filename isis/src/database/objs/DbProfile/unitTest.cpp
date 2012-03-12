@@ -29,8 +29,8 @@ int main(int argc, char *argv[]) {
     cerr << "BadKey =";
     cerr << p("BadKey") << endl;
   }
-  catch(iException &ie) {
-    ie.Report();
+  catch(IException &ie) {
+    ie.print();
   }
 
   return 0;

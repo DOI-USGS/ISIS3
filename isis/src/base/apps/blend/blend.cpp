@@ -13,7 +13,7 @@
 #include "OverlapStatistics.h"
 #include "ProcessByLine.h"
 #include "UserInterface.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 
 
@@ -42,7 +42,7 @@ class Node {
     }
 
     int createIndex(int sample, int line) {
-      return line * m_samples + sample; 
+      return line * m_samples + sample;
     }
 
     bool hasNeighbor(int sample, int line) {
@@ -57,7 +57,7 @@ class Node {
       return Node(sample, line, m_samples, m_lines, getNextScore(stop));
     }
 
-    void evaluate(int sample, int line, 
+    void evaluate(int sample, int line,
         QQueue<Node> &nodes, QVector<int> &ol, int stop) {
 
       if (hasNeighbor(sample, line)) {
@@ -132,7 +132,7 @@ void IsisMain() {
   FileList inputs(ui.GetFilename("FROMLIST"));
   if (inputs.size() < 2) {
     string msg = "FROMLIST must have at least two images to blend";
-    throw iException::Message(Isis::iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   FileList outputs;
@@ -149,7 +149,7 @@ void IsisMain() {
     QFile::remove(output);
     if (!QFile::copy(input, output)) {
       string msg = "Cannot create output cube [" + output.toStdString() + "]";
-      throw iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
 
@@ -239,7 +239,7 @@ void IsisMain() {
       if (!overlapped.contains(QString::fromStdString(inputs[i]))) {
         string msg = "Input Cube [" + inputs[i] +
           "] does not overlap another cube";
-        throw iException::Message(Isis::iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
     }
   }
@@ -286,7 +286,7 @@ Chip * createRamp(Chip *pic1, Chip *pic2, int stop) {
 
   if (x != pic2->Samples() || y != pic2->Lines()) {
     string msg = "The two pictures need to be of the exact same dimensions";
-    throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
   // Create the two overlap arrays
@@ -398,7 +398,7 @@ void readOutputs(string outName, const FileList &inputs, FileList &outputs) {
   if (outputs.size() != inputs.size()) {
     string msg = "There must be exactly one output image in the TOLIST for "
         "each input image in the FROMLIST";
-    throw iException::Message(Isis::iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // Make sure that every output file has a different filename from its
@@ -407,7 +407,7 @@ void readOutputs(string outName, const FileList &inputs, FileList &outputs) {
     if (outputs[i].compare(inputs[i]) == 0) {
       string msg = "The to list file [" + outputs[i] +
         "] has the same name as its corresponding from list file.";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
 }

@@ -82,7 +82,7 @@ PvlObject SpiceDbGen::Direct(iString quality, iString location,
     if(files.size() == 0) {
       string message = "Your filter [" + location + "/" + filter[i] + "]"
                        + "has not detected any " + quality + " kernels";
-      throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+      throw IException(IException::User, message, _FILEINFO_);
     }
 
     for(int fileNum = 0 ; fileNum < files.size() ; fileNum++) {
@@ -111,7 +111,7 @@ PvlObject SpiceDbGen::Direct(iString quality, iString location,
     }
     else {
       string message = "A kernel of type [" + grp->Name() + "] has been found in a directory for type [" + type + "]" ;
-      throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+      throw IException(IException::Programmer, message, _FILEINFO_);
       break;
     }
   }

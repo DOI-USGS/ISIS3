@@ -12,7 +12,7 @@
 #include "ControlMeasureLogData.h"
 #include "ControlNetFileV0002.pb.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "Latitude.h"
 #include "Longitude.h"
 #include "NaifStatus.h"
@@ -42,7 +42,7 @@ namespace Isis {
 
   /**
    * Reads binary version 2
-   * 
+   *
    * @internal
    * @history 2011-05-02 Debbie A. Cook - Converted to read constrained
    *                     point type
@@ -58,7 +58,7 @@ namespace Isis {
     fstream input(file.Expanded().c_str(), ios::in | ios::binary);
     if (!input.is_open()) {
       iString msg = "Failed to open control network file" + file.fileName();
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     input.seekg(headerStartPos, ios::beg);
@@ -76,7 +76,7 @@ namespace Isis {
       if (!p_networkHeader->ParseFromCodedStream(&headerCodedInStream)) {
         iString msg = "Failed to read input control net file [" +
             file.fileName() + "]";
-        throw iException::Message(iException::Io, msg, _FILEINFO_);
+        throw IException(IException::Io, msg, _FILEINFO_);
       }
       headerCodedInStream.PopLimit(oldLimit);
 
@@ -138,7 +138,7 @@ namespace Isis {
     }
     catch (...) {
       string msg = "Cannot understand binary PB file";
-      throw Isis::iException::Message(iException::Io, msg, _FILEINFO_);
+      throw IException(IException::Io, msg, _FILEINFO_);
     }
   }
 
@@ -170,7 +170,7 @@ namespace Isis {
     if (!p_networkHeader->SerializeToOstream(&output)) {
       iString msg = "Failed to write output control network file [" +
           file.fileName() + "]";
-      throw iException::Message(iException::Io, msg, _FILEINFO_);
+      throw IException(IException::Io, msg, _FILEINFO_);
     }
 
     streampos curPosition = startCoreHeaderPos + coreHeaderSize;
@@ -179,13 +179,13 @@ namespace Isis {
         iString msg = "Failed to write output control network file [" +
             file.fileName() + "] because control points are missing required "
             "fields";
-        throw iException::Message(iException::Io, msg, _FILEINFO_);
+        throw IException(IException::Io, msg, _FILEINFO_);
       }
 
       if(!p_controlPoints->at(cpIndex).SerializeToOstream(&output)) {
         iString msg = "Failed to write output control network file [" +
             file.fileName() + "] while attempting to write control points";
-        throw iException::Message(iException::Io, msg, _FILEINFO_);
+        throw IException(IException::Io, msg, _FILEINFO_);
       }
 
       curPosition += p_controlPoints->at(cpIndex).ByteSize();
@@ -228,16 +228,16 @@ namespace Isis {
 
   /**
    * Converts binary control net version 2 to pvl version 3
-   * 
+   *
    * @internal
    * @history 2011-05-02 Debbie A. Cook - Converted to version pvl 3
    *                     instead of 2
-   * @history 2011-05-09 Tracie Sucharski - Add comments for printing apriori 
+   * @history 2011-05-09 Tracie Sucharski - Add comments for printing apriori
    *                     and adjusted values as lat/lon/radius, and sigmas.
    * @history 2011-05-16 Tracie Sucharski - Before trying to get radii, make
    *                     sure network has a TargetName.  If not, do not add
    *                     lat/lon/radius comments for SurfacePoints.
-   * @history 2011-06-07 Tracie Sucharski/Debbie A. Cook - Point Type changes 
+   * @history 2011-06-07 Tracie Sucharski/Debbie A. Cook - Point Type changes
    *                          Ground ----> Fixed
    *                          Tie    ----> Free
    *
@@ -265,9 +265,9 @@ namespace Isis {
         NaifStatus::CheckErrors();
         pvlRadii = Projection::TargetRadii(target);
       }
-      catch(iException &e) {
+      catch(IException &e) {
         iString msg = "The target name, " + target + ", is not recognized.";
-        throw iException::Message(iException::Io, msg, _FILEINFO_);
+        throw IException(e, IException::Unknown, msg, _FILEINFO_);
       }
     }
 
@@ -362,13 +362,13 @@ namespace Isis {
                 Displacement(binaryPoint.apriorix(),Displacement::Meters),
                 Displacement(binaryPoint.aprioriy(),Displacement::Meters),
                 Displacement(binaryPoint.aprioriz(),Displacement::Meters));
-        pvlPoint.FindKeyword("AprioriX").AddComment("AprioriLatitude = " + 
+        pvlPoint.FindKeyword("AprioriX").AddComment("AprioriLatitude = " +
                                  iString(apriori.GetLatitude().degrees()) +
                                  " <degrees>");
-        pvlPoint.FindKeyword("AprioriY").AddComment("AprioriLongitude = " + 
+        pvlPoint.FindKeyword("AprioriY").AddComment("AprioriLongitude = " +
                                  iString(apriori.GetLongitude().degrees()) +
                                  " <degrees>");
-        pvlPoint.FindKeyword("AprioriZ").AddComment("AprioriRadius = " + 
+        pvlPoint.FindKeyword("AprioriZ").AddComment("AprioriRadius = " +
                                  iString(apriori.GetLocalRadius().meters()) +
                                  " <meters>");
 
@@ -429,13 +429,13 @@ namespace Isis {
                 Displacement(binaryPoint.adjustedx(),Displacement::Meters),
                 Displacement(binaryPoint.adjustedy(),Displacement::Meters),
                 Displacement(binaryPoint.adjustedz(),Displacement::Meters));
-        pvlPoint.FindKeyword("AdjustedX").AddComment("AdjustedLatitude = " + 
+        pvlPoint.FindKeyword("AdjustedX").AddComment("AdjustedLatitude = " +
                                  iString(adjusted.GetLatitude().degrees()) +
                                  " <degrees>");
-        pvlPoint.FindKeyword("AdjustedY").AddComment("AdjustedLongitude = " + 
+        pvlPoint.FindKeyword("AdjustedY").AddComment("AdjustedLongitude = " +
                                  iString(adjusted.GetLongitude().degrees()) +
                                  " <degrees>");
-        pvlPoint.FindKeyword("AdjustedZ").AddComment("AdjustedRadius = " + 
+        pvlPoint.FindKeyword("AdjustedZ").AddComment("AdjustedRadius = " +
                                  iString(adjusted.GetLocalRadius().meters()) +
                                  " <meters>");
 

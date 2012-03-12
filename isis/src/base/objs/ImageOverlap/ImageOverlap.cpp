@@ -5,7 +5,7 @@
 #include "geos/io/WKBWriter.h"
 
 #include "PolygonTools.h"
-#include "iException.h"
+#include "IException.h"
 #include "Filename.h"
 #include "ImageOverlap.h"
 #include "iString.h"
@@ -149,7 +149,7 @@ namespace Isis {
     for(unsigned int s = 0; s < p_serialNumbers.size(); ++s) {
       if(sn == p_serialNumbers[s]) {
         std::string msg = "Duplicate SN added to [" +  p_polygon->toString() + "]";
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       }
     }
 

@@ -116,7 +116,7 @@ namespace Isis {
     if ((statsBand < 0) || (statsBand > cube.getBandCount())) {
       string msg = "Cannot gather histogram for band [" + iString(statsBand) +
           "]";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     // We need to find the min/max DN value for our histogram bins to be the
@@ -149,7 +149,7 @@ namespace Isis {
     }
     else {
       iString msg = "Unsupported pixel type";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if (startSample == Null)
@@ -224,7 +224,7 @@ namespace Isis {
     if (binEnd < binStart) {
       string msg = "The binning range start [" + iString(binStart) +
                    " must be less than the end [" + iString(binEnd) + ".";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     p_binRangeStart = binStart;
@@ -348,7 +348,7 @@ namespace Isis {
     if ((percent < 0.0) || (percent > 100.0)) {
       string m = "Argument percent outside of the range 0 to 100 in";
       m += " [Histogram::Percent]";
-      throw iException::Message(iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     if (ValidPixels() < 1) return NULL8;
@@ -393,7 +393,7 @@ namespace Isis {
   BigInt Histogram::BinCount(const int index) const {
     if ((index < 0) || (index >= (int)p_bins.size())) {
       string message = Message::ArraySubscriptNotInRange(index);
-      throw iException::Message(iException::Programmer, message, _FILEINFO_);
+      throw IException(IException::Programmer, message, _FILEINFO_);
     }
 
     return p_bins[index];
@@ -415,7 +415,7 @@ namespace Isis {
                            double &low, double &high) const {
     if ((index < 0) || (index >= (int)p_bins.size())) {
       string message = Message::ArraySubscriptNotInRange(index);
-      throw iException::Message(iException::Programmer, message, _FILEINFO_);
+      throw IException(IException::Programmer, message, _FILEINFO_);
     }
 
     double binSize = (BinRangeEnd() - BinRangeStart()) / (double)(p_bins.size() - 1);
@@ -435,7 +435,7 @@ namespace Isis {
   double Histogram::BinMiddle(const int index) const {
     if ((index < 0) || (index >= (int)p_bins.size())) {
       string message = Message::ArraySubscriptNotInRange(index);
-      throw iException::Message(iException::Programmer, message, _FILEINFO_);
+      throw IException(IException::Programmer, message, _FILEINFO_);
     }
 
     double low, high;

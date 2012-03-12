@@ -239,7 +239,7 @@ namespace Isis {
    * with a ControlMeasure.
    *
    * @param *camera  Pointer to camera
-   *           
+   *
    * @return Status Success
    *
    * @internal
@@ -367,7 +367,7 @@ namespace Isis {
    * method for the BundleAdjustment class to avoid having to go redo the calculation.
    *
    * @param *camera  Pointer to camera
-   *           
+   *
    * @return Status Success
    *
    * @internal
@@ -387,7 +387,7 @@ namespace Isis {
    * method for the BundleAdjustment class to avoid having to go redo the calculation.
    *
    * @param *camera  Pointer to camera
-   *           
+   *
    * @return Status Success
    *
    * @internal
@@ -411,7 +411,7 @@ namespace Isis {
    * the current measure.  It should only be used by jigsaw.
    *
    * @param *reject  rejected flag
-   *           
+   *
    * @return Status Success
    *
    * @internal
@@ -459,10 +459,10 @@ namespace Isis {
    * Set the BundleAdjust Residual of the coordinate.
    *   ***Warning:  This method should only be used by BundleAdjust
    *                and its applications.
-   * 
+   *
    * @param sampResidual  Sample Residual
    * @param lineResidual  Line Residual
-   * 
+   *
    * @internal
    *   @history 2011-07-01 Debbie A. Cook  Removed editLock check to
    *                         allow the residuals of locked points
@@ -505,7 +505,7 @@ namespace Isis {
     if (!data.IsValid()) {
       iString msg = "Cannot set log data with invalid information stored in "
           "the ControlMeasureLogData";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if (HasLogData(data.GetDataType()))
@@ -587,7 +587,7 @@ namespace Isis {
           newLogData.DataTypeToName(newLogData.GetDataType()) + "] because this"
           " control measure does not have log data for this value. Please use "
           "SetLogData instead";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
 
@@ -739,7 +739,7 @@ namespace Isis {
     if (!validField) {
       iString msg = "Cannot test IsStatisticallyRelevant on Measure Data ["
           + iString(field) + "]";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     return relevant;
@@ -796,7 +796,7 @@ namespace Isis {
   QString ControlMeasure::GetPointId() const {
     if (parentPoint == NULL) {
       iString msg = "Measure has no containing point";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     return parentPoint->GetId();
@@ -857,8 +857,7 @@ namespace Isis {
       return p_ignore;
     else {
       iString msg = data + " passed to GetMeasureData but is invalid";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg,
-          _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
 
@@ -959,17 +958,14 @@ namespace Isis {
     MeasureType measureType;
     if (str == "candidate")
       measureType = ControlMeasure::Candidate;
+    else if (str == "manual")
+      measureType = ControlMeasure::Manual;
+    else if (str == "registeredpixel")
+      measureType = ControlMeasure::RegisteredPixel;
+    else if (str == "registeredsubpixel")
+      measureType = ControlMeasure::RegisteredSubPixel;
     else
-      if (str == "manual")
-        measureType = ControlMeasure::Manual;
-      else
-        if (str == "registeredpixel")
-          measureType = ControlMeasure::RegisteredPixel;
-        else
-          if (str == "registeredsubpixel")
-            measureType = ControlMeasure::RegisteredSubPixel;
-          else
-            throw iException::Message(iException::Programmer, err, _FILEINFO_);
+      throw IException(IException::Programmer, err, _FILEINFO_);
 
     return measureType;
   }
@@ -1010,7 +1006,7 @@ namespace Isis {
     if (sPrintable == "") {
       iString msg = "Measure type [" + iString(type) + "] cannot be converted "
           "to a string";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     return sPrintable;

@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "Preference.h"
 #include "ProgramLauncher.h"
@@ -34,9 +34,8 @@ void IsisMain() {
     ProgramLauncher::RunSystemCommand("ls -l * | grep Program | "
         "sed 's/\\(.*\\)\\(ProgramLauncher.*\\)/\\2/");
   }
-  catch(iException &e) {
-    e.Report(false);
-    e.Clear();
+  catch(IException &e) {
+    e.print();
   }
 
 
@@ -47,9 +46,8 @@ void IsisMain() {
     ProgramLauncher::RunIsisProgram("chocolatelab",
                                     "from=$base/testData/ab102401_ideal.cub");
   }
-  catch(iException &e) {
-    e.Report(false);
-    e.Clear();
+  catch(IException &e) {
+    e.print();
   }
 
 
@@ -61,9 +59,8 @@ void IsisMain() {
         "from=\\$base/testData/ab102401_ideal.cub -pid=999 "
         "-preference=\\$ISISROOT/src/base/objs/Preference/TestPreferences");
   }
-  catch(iException &e) {
-    e.Report(false);
-    e.Clear();
+  catch(IException &e) {
+    e.print();
   }
 
 
@@ -76,8 +73,7 @@ void IsisMain() {
         "from=\\$base/testData/ab102401_ideal.cub "
         "-preference=\\$ISISROOT/src/base/objs/Preference/TestPreferences");
   }
-  catch(iException &e) {
-    e.Report(false);
-    e.Clear();
+  catch(IException &e) {
+    e.print();
   }
 }

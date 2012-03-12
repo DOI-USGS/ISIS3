@@ -25,7 +25,7 @@
 #include "CameraFactory.h"
 #include "CameraFocalPlaneMap.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "iTime.h"
 #include "Preference.h"
 #include "Pvl.h"
@@ -244,8 +244,8 @@ int main(void) {
     delete camh;
   }
 
-  catch(iException &e) {
-    e.Report();
+  catch(IException &e) {
+    e.print();
   }
 }
 

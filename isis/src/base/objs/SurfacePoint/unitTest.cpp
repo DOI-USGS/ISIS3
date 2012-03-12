@@ -6,7 +6,7 @@
 #include "Camera.h"
 #include "Displacement.h"
 #include "Distance.h"
-#include "iException.h"
+#include "IException.h"
 #include "Latitude.h"
 #include "Longitude.h"
 #include "Preference.h"
@@ -124,8 +124,8 @@ int main(int argc, char *argv[]) {
          << setw(10) << covarRec(2,0) << setw(10) << covarRec(2,1)
          << setw(10) << covarRec(2,2) << endl;
   }
-  catch(Isis::iException &e) {
-    e.Report();
+  catch(Isis::IException &e) {
+    e.print();
   }
 
     try {
@@ -248,8 +248,8 @@ int main(int argc, char *argv[]) {
          << endl << endl;
 
   }
-  catch(Isis::iException &e) {
-    e.Report();
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   cout << "Test computational methods..." << endl;

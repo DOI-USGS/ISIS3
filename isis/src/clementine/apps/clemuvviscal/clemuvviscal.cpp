@@ -5,7 +5,7 @@
 #include "ProcessByLine.h"
 #include "Pixel.h"
 #include "Camera.h"
-#include "iException.h"
+#include "IException.h"
 #include "Table.h"
 
 using namespace std;
@@ -114,7 +114,7 @@ void IsisMain() {
   bool camSuccess = cam->SetImage(icube->getSampleCount() / 2, icube->getLineCount() / 2);
 
   if(!camSuccess) {
-    throw iException::Message(iException::Camera, "Unable to calculate the Solar Distance for this cube.", _FILEINFO_);
+    throw IException(IException::Unknown, "Unable to calculate the Solar Distance for this cube.", _FILEINFO_);
   }
 
   dist = cam->SolarDistance();
@@ -141,7 +141,7 @@ void IsisMain() {
       phase = 2;
     }
     else {
-      throw iException::Message(iException::Pvl, "Invalid Mission Phase", _FILEINFO_);
+      throw IException(IException::Unknown, "Invalid Mission Phase", _FILEINFO_);
     }
 
     // This formula makes the primary search critera the original product ID's extension,

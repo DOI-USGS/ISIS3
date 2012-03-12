@@ -2,7 +2,7 @@
 
 #include <QString>
 
-#include "iException.h"
+#include "IException.h"
 #include "FileList.h"
 #include "Filename.h"
 #include "SerialNumber.h"
@@ -49,9 +49,9 @@ namespace Isis {
         }
       }
     }
-    catch(iException &e) {
+    catch(IException &e) {
       std::string msg = "Can't open or invalid file list [" + listfile + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(e, IException::User, msg, _FILEINFO_);
     }
   }
 
@@ -64,9 +64,9 @@ namespace Isis {
 
   /**
    * Delete a serial number off of the list given the Serial Number
-   * 
+   *
    * @author Sharmila Prasad (9/9/2010)
-   * 
+   *
    * @param sn - serial number
    */
   void SerialNumberList::Delete(const std::string &sn)
@@ -85,7 +85,7 @@ namespace Isis {
    * SerialNumberList
    *
    * @param filename the filename to be added
-   * @param def2filename If a serial number could not be found, try to return the 
+   * @param def2filename If a serial number could not be found, try to return the
    *                     filename
    *
    * @internal
@@ -94,7 +94,7 @@ namespace Isis {
    * @history 2010-11-24 Tracie Sucharski - Added bool def2filename parameter.
    *                        This will allow level 2 images to be added to a
    *                        serial number list.
-   * @history 2010-11-29 Tracie Sucharski - Only read the Instrument group 
+   * @history 2010-11-29 Tracie Sucharski - Only read the Instrument group
    *                        if p_checkTarget is True.  If def2filename is True,
    *                        check for Mapping group if Target does not exist.
    */
@@ -118,14 +118,14 @@ namespace Isis {
           else {
             std::string msg = "Unable to find Instrument or Mapping group in ";
             msg += filename + " for comparing target";
-            throw iException::Message(iException::User, msg, _FILEINFO_);
+            throw IException(IException::User, msg, _FILEINFO_);
           }
         }
         else {
           // No Instrument group
           std::string msg = "Unable to find Instrument group in " + filename;
           msg += " for comparing target";
-          throw iException::Message(iException::User, msg, _FILEINFO_);
+          throw IException(IException::User, msg, _FILEINFO_);
         }
 
         target = targetGroup["TargetName"][0];
@@ -136,7 +136,7 @@ namespace Isis {
         else if (p_target != target) {
           std::string msg = "Target name of [" + target + "] from file [";
           msg += filename + "] does not match [" + p_target + "]";
-          throw iException::Message(iException::User, msg, _FILEINFO_);
+          throw IException(IException::User, msg, _FILEINFO_);
         }
       }
 
@@ -146,13 +146,13 @@ namespace Isis {
       if(sn == "Unknown") {
         std::string msg = "Invalid serial number [Unknown] from file [";
         msg += filename + "]";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
       else if(HasSerialNumber(sn)) {
         int index = SerialNumberIndex(sn);
         std::string msg = "Duplicate, serial number [" + sn + "] from files [";
         msg += SerialNumberList::Filename(sn) + "] and [" + Filename(index) + "].";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
       Pair nextpair;
       nextpair.filename = Isis::Filename(filename).Expanded();
@@ -162,11 +162,11 @@ namespace Isis {
       p_serialMap.insert(std::pair<std::string, int>(sn, (int)(p_pairs.size() - 1)));
       p_fileMap.insert(std::pair<std::string, int>(nextpair.filename, (int)(p_pairs.size() - 1)));
     }
-    catch(iException &e) {
+    catch(IException &e) {
       std::string msg = "File [" + Isis::Filename(filename).Expanded() +
                         "] can not be added to ";
       msg += "serial number list";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(e, IException::User, msg, _FILEINFO_);
     }
   }
 
@@ -224,7 +224,7 @@ namespace Isis {
     else {
       std::string msg = "Requested serial number [" + sn + "] ";
       msg += "does not exist in the list";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
 
@@ -245,7 +245,7 @@ namespace Isis {
       std::string msg = "Requested filename [" +
                         Isis::Filename(filename).Expanded() + "]";
       msg += "does not exist in the list";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     int index = FilenameIndex(filename);
     return p_pairs[index].serialNumber;
@@ -265,7 +265,7 @@ namespace Isis {
     else {
       iString num = iString(index);
       std::string msg = "Index [" + (std::string) num + "] is invalid";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
 
@@ -283,7 +283,7 @@ namespace Isis {
     else {
       iString num = iString(index);
       std::string msg = "Index [" + (std::string) num + "] is invalid";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
 
@@ -301,7 +301,7 @@ namespace Isis {
     else {
       std::string msg = "Requested serial number [" + sn + "] ";
       msg += "does not exist in the list";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
 
@@ -324,7 +324,7 @@ namespace Isis {
       std::string msg = "Requested filename [" +
                         Isis::Filename(filename).Expanded() + "]";
       msg += "does not exist in the list";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     return pos->second;
   }
@@ -343,7 +343,7 @@ namespace Isis {
     else {
       iString num = iString(index);
       std::string msg = "Index [" + (std::string) num + "] is invalid";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
 
@@ -370,7 +370,7 @@ namespace Isis {
     else {
       std::string msg = "Requested observation number [" + on + "] ";
       msg += "does not exist in the list";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
 

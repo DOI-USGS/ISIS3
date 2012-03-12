@@ -32,22 +32,22 @@ Pairs = 0
 Testing Parse
 127.5
 
-**USER ERROR** Invalid stretch pairs [0:0 50:0 49:255 255:255]
-**PROGRAMMER ERROR** Input pairs must be in ascending order
-**USER ERROR** Invalid stretch pairs [-5xyzzy:0 50:0 100:255 255:255]
-**PARSE ERROR** Cannot convert [-5xyzzy] to a double
+**USER ERROR** Invalid stretch pairs [0:0 50:0 49:255 255:255].
+**PROGRAMMER ERROR** Input pairs must be in ascending order.
+**USER ERROR** Invalid stretch pairs [-5xyzzy:0 50:0 100:255 255:255].
+**ERROR** Failed to convert string [-5xyzzy] to a double.
 
 Testing new Parse that takes %'s for input side of pairs
 75
 
-**USER ERROR** Invalid stretch pairs [0:0 50:0 49:255 100:255]
-**PROGRAMMER ERROR** Input pairs must be in ascending order
-**USER ERROR** Invalid stretch pairs [-5:10]
-**PROGRAMMER ERROR** Argument percent outside of the range 0 to 100 in [Histogram::Percent]
-**USER ERROR** Invalid stretch pairs [121:215]
-**PROGRAMMER ERROR** Argument percent outside of the range 0 to 100 in [Histogram::Percent]
-**USER ERROR** Invalid stretch pairs [-5xyzzy:0 50:0 100:255]
-**PARSE ERROR** Cannot convert [-5xyzzy] to a double
+**USER ERROR** Invalid stretch pairs [0:0 50:0 49:255 100:255].
+**PROGRAMMER ERROR** Input pairs must be in ascending order.
+**USER ERROR** Invalid stretch pairs [-5:10].
+**PROGRAMMER ERROR** Argument percent outside of the range 0 to 100 in [Histogram::Percent].
+**USER ERROR** Invalid stretch pairs [121:215].
+**PROGRAMMER ERROR** Argument percent outside of the range 0 to 100 in [Histogram::Percent].
+**USER ERROR** Invalid stretch pairs [-5xyzzy:0 50:0 100:255].
+**ERROR** Failed to convert string [-5xyzzy] to a double.
 0, 255
 100, 100
 255, 0

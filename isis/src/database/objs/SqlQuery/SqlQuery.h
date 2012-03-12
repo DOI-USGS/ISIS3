@@ -26,7 +26,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include "iException.h"
+#include "IException.h"
 #include "Database.h"
 #include <QSqlQuery>
 #include <QSqlError>
@@ -199,8 +199,7 @@ namespace Isis {
     private:
       bool _throwIfFailed;        //!<  User can select action on query results
 
-      void tossQueryError(const std::string &message, const char *f, int l) const
-      throw(iException &);
+      void tossQueryError(const std::string &message, const char *f, int l) const;
   };
 }
 #endif

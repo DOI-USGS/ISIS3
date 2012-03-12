@@ -48,7 +48,7 @@ Longitude OK
 
 --------------------------------------------
 Kernel ID error messages: 
-**USER ERROR** No CK Frame ID for Ideal Camera class
-**USER ERROR** No CK Reference ID for Ideal Camera class
-**USER ERROR** No SPK Target ID for Ideal Camera class
-**USER ERROR** No SPK Reference ID for Ideal Camera class
+**USER ERROR** No CK Frame ID for Ideal Camera class.
+**USER ERROR** No CK Reference ID for Ideal Camera class.
+**USER ERROR** No SPK Target ID for Ideal Camera class.
+**USER ERROR** No SPK Reference ID for Ideal Camera class.

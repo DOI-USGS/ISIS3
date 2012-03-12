@@ -31,7 +31,7 @@
 #include "Constants.h"
 #include "Displacement.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 
 using namespace std;
 namespace Isis {
@@ -59,7 +59,7 @@ namespace Isis {
    *                     End
    *                   @endcode
    *
-   * @throws Isis::iException::Projection
+   * @throws Isis::IException::Unknown
    */
   Projection::Projection(Isis::Pvl &label) : p_mappingGrp("Mapping") {
     try {
@@ -81,19 +81,19 @@ namespace Isis {
       else {
         string message = "No target radii available through keywords ";
         message += "[EquatorialRadius and PolarRadius] or [TargetName].";
-        throw Isis::iException::Message(Isis::iException::Projection, message, _FILEINFO_);
+        throw IException(IException::Unknown, message, _FILEINFO_);
       }
 
       // Check the radii for validity
       if(p_equatorialRadius <= 0.0) {
         string message = "Invalid value for keyword [EquatorialRadius] it must be ";
         message += "greater than zero";
-        throw Isis::iException::Message(Isis::iException::Projection, message, _FILEINFO_);
+        throw IException(IException::Unknown, message, _FILEINFO_);
       }
       if(p_polarRadius <= 0.0) {
         string message = "Invalid value for keyword [PolarRadius] it must be ";
         message += "greater than zero";
-        throw Isis::iException::Message(Isis::iException::Projection, message, _FILEINFO_);
+        throw IException(IException::Unknown, message, _FILEINFO_);
       }
 
       // Get the LatitudeType
@@ -106,7 +106,7 @@ namespace Isis {
       else {
         string message = "Invalid value for keyword [LatitudeType] must be ";
         message += "[Planetographic or Planetocentric]";
-        throw Isis::iException::Message(Isis::iException::Projection, message, _FILEINFO_);
+        throw IException(IException::Unknown, message, _FILEINFO_);
       }
 
       // Get the LongitudeDirection
@@ -119,7 +119,7 @@ namespace Isis {
       else {
         string message = "Invalid value for keyword [LongitudeDirection] must be ";
         message += "[PositiveWest or PositiveEast]";
-        throw Isis::iException::Message(Isis::iException::Projection, message, _FILEINFO_);
+        throw IException(IException::Unknown, message, _FILEINFO_);
       }
 
       // Get the LongitudeDomain
@@ -132,7 +132,7 @@ namespace Isis {
       else {
         string message = "Invalid value for keyword [LongitudeDomain] must be ";
         message += "[180 or 360]";
-        throw Isis::iException::Message(Isis::iException::Projection, message, _FILEINFO_);
+        throw IException(IException::Unknown, message, _FILEINFO_);
       }
 
       // Get the ground range if it exists
@@ -149,27 +149,27 @@ namespace Isis {
         if((p_minimumLatitude < -90.0) || (p_minimumLatitude > 90.0)) {
           string msg = "[MinimumLatitude] of [" + iString(p_minimumLatitude);
           msg += "] is outside the range of [-90:90]";
-          throw Isis::iException::Message(Isis::iException::Projection, msg, _FILEINFO_);
+          throw IException(IException::Unknown, msg, _FILEINFO_);
         }
 
         if((p_maximumLatitude < -90.0) || (p_maximumLatitude > 90.0)) {
           string msg = "[MaximumLatitude] of [" + iString(p_maximumLatitude);
           msg += "] is outside the range of [-90:90]";
-          throw Isis::iException::Message(Isis::iException::Projection, msg, _FILEINFO_);
+          throw IException(IException::Unknown, msg, _FILEINFO_);
         }
 
         if(p_minimumLatitude >= p_maximumLatitude) {
           string msg = "[MinimumLatitude,MaximumLatitude] of [" + iString(p_minimumLatitude);
           msg += + "," + iString(p_maximumLatitude) + "] are not ";
           msg += "properly ordered";
-          throw Isis::iException::Message(Isis::iException::Projection, msg, _FILEINFO_);
+          throw IException(IException::Unknown, msg, _FILEINFO_);
         }
 
         if(p_minimumLongitude >= p_maximumLongitude) {
           string msg = "[MinimumLongitude,MaximumLongitude] of [" + iString(p_minimumLongitude);
           msg += + "," + iString(p_maximumLongitude) + "] are not ";
           msg += "properly ordered";
-          throw Isis::iException::Message(Isis::iException::Projection, msg, _FILEINFO_);
+          throw IException(IException::Unknown, msg, _FILEINFO_);
         }
 
         p_groundRangeGood = true;
@@ -203,9 +203,9 @@ namespace Isis {
         if(str.UpCase() == "SKY") p_sky = true;
       }
     }
-    catch(Isis::iException &e) {
+    catch(IException &e) {
       string message = "Invalid label group [Mapping]";
-      throw Isis::iException::Message(Isis::iException::Projection, message, _FILEINFO_);
+      throw IException(e, IException::Unknown, message, _FILEINFO_);
     }
   }
 
@@ -496,7 +496,7 @@ namespace Isis {
       iString err = "Domain [";
       err += domain;
       err += "] is not 180 or 360.";
-      throw iException::Message(iException::Programmer, err, _FILEINFO_);
+      throw IException(IException::Programmer, err, _FILEINFO_);
     }
 
     return mylon;
@@ -524,7 +524,7 @@ namespace Isis {
       iString err = "Domain [";
       err += domain;
       err += "] is not 180 or 360.";
-      throw iException::Message(iException::Programmer, err, _FILEINFO_);
+      throw IException(IException::Programmer, err, _FILEINFO_);
     }
 
     return mylon;
@@ -1039,7 +1039,7 @@ namespace Isis {
 
     if(iteration >= MAX_ITERATIONS) {
       string msg = "Failed to converge in Projection::tCompute";
-      throw Isis::iException::Message(Isis::iException::Projection, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     return localPhi;
@@ -1150,7 +1150,7 @@ namespace Isis {
     bodn2c_c(target.c_str(), &code, &found);
     if(!found) {
       string msg = "Could not convert target name [" + target + "] to NAIF code";
-      throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+      throw IException(IException::Io, msg, _FILEINFO_);
     }
 
     // Load the most recent target attitude and shape kernel for NAIF

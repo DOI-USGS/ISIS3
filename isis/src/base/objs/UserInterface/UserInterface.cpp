@@ -25,7 +25,7 @@
 #include <vector>
 
 #include "Application.h"
-#include "iException.h"
+#include "IException.h"
 #include "Filename.h"
 #include "iString.h"
 #include "Message.h"
@@ -49,7 +49,7 @@ namespace Isis {
    */
   UserInterface::UserInterface(const std::string &xmlfile, int &argc,
                                char *argv[]) :
-    IsisAml::IsisAml(xmlfile) {
+      IsisAml::IsisAml(xmlfile) {
     p_interactive = false;
     p_info = false;
     p_infoFileName = "";
@@ -71,8 +71,7 @@ namespace Isis {
         setup.MakeDirectory();
       }
     }
-    catch(iException &e) {
-      e.Clear();
+    catch(IException &) {
     }
 
     // Parse the user input
@@ -101,9 +100,9 @@ namespace Isis {
    *
    * @param argv[] Array of arguments
    *
-   * @throws Isis::iException::User - Invalid command line
-   * @throws Isis::iException::System - -GUI and -PID are incompatible arguments
-   * @throws Isis::iException::System - -BATCHLIST & -GUI are incompatible
+   * @throws Isis::IException::User - Invalid command line
+   * @throws Isis::IException::System - -GUI and -PID are incompatible arguments
+   * @throws Isis::IException::System - -BATCHLIST & -GUI are incompatible
    *                                    arguments
    */
   void UserInterface::LoadCommandLine(int argc, char *argv[]) {
@@ -174,8 +173,7 @@ namespace Isis {
         if(paramValue.size() > 1) {
           string msg = "Invalid value for reserve parameter ["
                        + paramName + "]";
-          throw iException::Message(iException::User, msg,
-                                    _FILEINFO_);
+          throw IException(IException::User, msg, _FILEINFO_);
         }
 
         // We have an option (not a parameter)...
@@ -187,8 +185,7 @@ namespace Isis {
             if(matchOption >= 0) {
               string msg = "Ambiguous Reserve Parameter ["
                            + paramName + "]. Please clarify.";
-              throw iException::Message(iException::User, msg,
-                                        _FILEINFO_);
+              throw IException(IException::User, msg,  _FILEINFO_);
             }
 
             matchOption = option;
@@ -215,8 +212,7 @@ namespace Isis {
 
           msg += " [" + msgOptions + "]";
 
-          throw iException::Message(iException::User, msg,
-                                    _FILEINFO_);
+          throw IException(IException::User, msg, _FILEINFO_);
         }
 
         paramName = options[matchOption];
@@ -238,9 +234,9 @@ namespace Isis {
         Clear(paramName);
         PutAsString(paramName, paramValue);
       }
-      catch(Isis::iException &e) {
-        throw Isis::iException::Message(Isis::iException::User,
-                                        "Invalid command line", _FILEINFO_);
+      catch(IException &e) {
+        throw IException(
+            e, IException::User, "Invalid command line", _FILEINFO_);
       }
     }
 
@@ -250,8 +246,7 @@ namespace Isis {
       string msg =
         "-BATCHLIST cannot be used with -GUI, -SAVE, -RESTORE, ";
       msg += "or -LAST";
-      throw Isis::iException::Message(Isis::iException::System, msg,
-                                      _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     // Must use batchlist if using errorlist or onerror=continue
@@ -259,8 +254,7 @@ namespace Isis {
       string msg =
         "-ERRLIST and -ONERROR=continue cannot be used without ";
       msg += " the -BATCHLIST option";
-      throw Isis::iException::Message(Isis::iException::System, msg,
-                                      _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
 
@@ -318,7 +312,7 @@ namespace Isis {
       // parameters can not start with "="
       string msg = "Unknown parameter [" + string(p_cmdline[curPos])
                    + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     name = paramName;
@@ -371,8 +365,7 @@ namespace Isis {
       if(strPos == 0) {
         if(arrayString[strPos] != '(') {
           string msg = "Invalid array format [" + arrayString + "]";
-          throw iException::Message(iException::User, msg,
-                                    _FILEINFO_);
+          throw IException(IException::User, msg, _FILEINFO_);
         }
 
         continue;
@@ -387,15 +380,14 @@ namespace Isis {
       // ends in a backslash??
       else if(arrayString[strPos] == '\\') {
         string msg = "Invalid array format [" + arrayString + "]";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
 
       // not in quoted part of string
       if(!inDoubleQuotes && !inSingleQuotes) {
         if(arrayClosed) {
           string msg = "Invalid array format [" + arrayString + "]";
-          throw iException::Message(iException::User, msg,
-                                    _FILEINFO_);
+          throw IException(IException::User, msg, _FILEINFO_);
         }
 
         nextElementStarted = (nextElementStarted || arrayString[strPos] != ' ');
@@ -463,7 +455,7 @@ namespace Isis {
 
     if(!arrayClosed || currElement != "") {
       string msg = "Invalid array format [" + arrayString + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     return values;
@@ -680,7 +672,7 @@ namespace Isis {
 
       if(value == "") {
         string msg = "-ERRLIST expects a file name";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
 
       if(Filename(p_errList).Exists()) {
@@ -701,8 +693,7 @@ namespace Isis {
         msg =
           "[" + value
           + "] is an invalid value for -ONERROR, options are ABORT or CONTINUE";
-        throw Isis::iException::Message(Isis::iException::User, msg,
-                                        _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
     }
     else if(name == "-SAVE") {
@@ -732,8 +723,7 @@ namespace Isis {
     // Can't have a parent id and the gui
     if(p_parentId > 0 && p_interactive) {
       string msg = "-GUI and -PID are incompatible arguments";
-      throw Isis::iException::Message(Isis::iException::System, msg,
-                                      _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
   }
 
@@ -744,7 +734,7 @@ namespace Isis {
    *
    *  @history 2010-03-26 Sharmila Prasad - Remove the restriction of the number of
    *           columns in the batchlist file to 10.
-   * @throws Isis::iException::User - The batchlist does not contain any data
+   * @throws Isis::IException::User - The batchlist does not contain any data
    */
   void UserInterface::LoadBatchList(const std::string file) {
     // Read in the batch list
@@ -752,10 +742,10 @@ namespace Isis {
     try {
       temp.Open(file);
     }
-    catch(iException &e) {
+    catch (IException &e) {
       string msg = "The batchlist file [" + file
                    + "] could not be opened";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     p_batchList.resize(temp.LineCount());
@@ -791,14 +781,14 @@ namespace Isis {
       if(p_batchList[i - 1].size() != p_batchList[i].size()) {
         string msg =
           "The number of columns must be constant in batchlist";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
     }
     // The batchlist cannot be empty
     if(p_batchList.size() < 1) {
       string msg = "The list file [" + file
                    + "] does not contain any data";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
 
@@ -843,7 +833,7 @@ namespace Isis {
 
               for (int i = 0; matchesDefault && i < (int)values.size(); i++) {
                 matchesDefault = matchesDefault &&
-                                 values[i] == paramData->defaultValues[i]; 
+                                 values[i] == paramData->defaultValues[i];
               }
             }
 
@@ -877,14 +867,12 @@ namespace Isis {
       catch(...) {
         string msg = "The history file [" + file
                      + "] is corrupt, please fix or delete this file";
-        throw Isis::iException::Message(Isis::iException::User, msg,
-                                        _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
     }
     else {
       string msg = "The history file [" + file + "] does not exist";
-      throw Isis::iException::Message(Isis::iException::User, msg,
-                                      _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
 
@@ -922,8 +910,7 @@ namespace Isis {
         hist.Read(histFile.Expanded());
       }
     }
-    catch(iException e) {
-      e.Clear();
+    catch(IException &) {
     }
 
     // Add it
@@ -938,8 +925,7 @@ namespace Isis {
     try {
       hist.Write(histFile.Expanded());
     }
-    catch(iException &e) {
-      e.Clear();
+    catch(IException &) {
     }
 
   }
@@ -985,10 +971,8 @@ namespace Isis {
               thisValue.replace(0, 1, "");
               token = thisValue.Token("$");
             }
-            catch (iException &e) {
-              e.Clear();
-
-              // Let the variable be parsed by the application 
+            catch (IException &e) {
+              // Let the variable be parsed by the application
               newValue += "$";
               token = thisValue.Token("$");
             }
@@ -1000,9 +984,8 @@ namespace Isis {
           paramValue[value] = newValue;
         }
       }
-      catch(Isis::iException &e) {
-        throw Isis::iException::Message(Isis::iException::User,
-                                        "Invalid command line", _FILEINFO_);
+      catch(IException &e) {
+        throw IException(IException::User, "Invalid command line", _FILEINFO_);
       }
 
       PutAsString(paramName, paramValue);
@@ -1049,8 +1032,7 @@ namespace Isis {
         msg =
           "Unable to create error list [" + p_errList
           + "] Disk may be full or directory permissions not writeable";
-        throw Isis::iException::Message(Isis::iException::User, msg,
-                                        _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
 
       for(int j = 0; j < (int) p_batchList[i].size(); j ++) {
@@ -1064,9 +1046,9 @@ namespace Isis {
 
   /**
    * This method returns the flag state of info. This returns if
-   * its in debugging mode(the -info tag was specified). 
-   *  
-   * @return @b bool Flag state on info. 
+   * its in debugging mode(the -info tag was specified).
+   *
+   * @return @b bool Flag state on info.
    */
   bool UserInterface::GetInfoFlag() {
     return p_info;
@@ -1074,9 +1056,9 @@ namespace Isis {
 
   /**
    * This method returns the filename where the debugging info is
-   * stored when the "-info" tag is used. 
-   *  
-   * @return @b string Name of file containing debugging ingo. 
+   * stored when the "-info" tag is used.
+   *
+   * @return @b string Name of file containing debugging ingo.
    */
   std::string UserInterface::GetInfoFileName() {
     return p_infoFileName;

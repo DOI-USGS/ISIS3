@@ -59,8 +59,8 @@ namespace Isis {
       enum IntegFunc { OuterFunction, //!< Indicates that Romberg's method will integrate the function OutrFunc2Bint()
                        InnerFunction  //!< Indicates that Romberg's method will integrate the function InrFunc2Bint()
                      };
-      double RombergsMethod(AtmosModel *am, IntegFunc sub, double a, double b) throw(iException &);
-      double RefineExtendedTrap(AtmosModel *am, IntegFunc sub, double a, double b, double s, unsigned int n) throw(iException &);
+      double RombergsMethod(AtmosModel *am, IntegFunc sub, double a, double b);
+      double RefineExtendedTrap(AtmosModel *am, IntegFunc sub, double a, double b, double s, unsigned int n);
 
       static double OutrFunc2Bint(AtmosModel *am, double phi);
       static double InrFunc2Bint(AtmosModel *am, double mu);

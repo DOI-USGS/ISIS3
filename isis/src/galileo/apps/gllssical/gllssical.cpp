@@ -19,7 +19,7 @@ using namespace std;
  *   using the book "In Orbit at Jupiter, Contributions of the Galileo
  *   Science Team," Section H Part I.
  */
- 
+
 // Globals
 vector<double> weight;
 double scaleFactor0; // Entire scale factor that e is multiplied by
@@ -255,7 +255,7 @@ Filename FindDarkFile(Cube *icube) {
     return Filename(string("$galileo/calibration/darkcurrent/") + data.Token(" ") + string(".cub"));
   }
 
-  throw iException::Message(iException::Pvl, "Dark current file could not be determined.", _FILEINFO_);
+  throw IException(IException::Unknown, "Dark current file could not be determined.", _FILEINFO_);
 }
 
 Filename FindGainFile(Cube *icube) {
@@ -298,7 +298,7 @@ Filename FindGainFile(Cube *icube) {
     return Filename(string("$galileo/calibration/gain/") + data.Token(" ") + string(".cub"));
   }
 
-  throw iException::Message(iException::Pvl, "Gain file could not be determined.", _FILEINFO_);
+  throw IException(IException::Unknown, "Gain file could not be determined.", _FILEINFO_);
 }
 
 Filename ReadWeightTable(Cube *icube) {
@@ -340,16 +340,16 @@ int getGainModeID(Cube *icube) {
     gainModeId = 4;
   }
   else {
-    throw iException::Message(iException::Pvl,
-                              "Invalid value for Gain Mode ID [" +
-                              icube->getGroup("Instrument")["GainModeId"][0] +
-                              "].", _FILEINFO_);
+    throw IException(IException::Unknown,
+                     "Invalid value for Gain Mode ID [" +
+                     icube->getGroup("Instrument")["GainModeId"][0] +
+                     "].", _FILEINFO_);
   }
 
   return gainModeId;
 }
 
-/* 
+/*
  * Calculates scaleFactor0, which is:
  *
  *         S1       K
@@ -386,8 +386,7 @@ void calculateScaleFactor0(Cube *icube, Cube *gaincube) {
           continue;
         }
       }
-      catch(iException e) {
-        e.Clear();
+      catch(IException &) {
         continue;
       }
     }
@@ -399,11 +398,11 @@ void calculateScaleFactor0(Cube *icube, Cube *gaincube) {
   int filterNumber = (int)icube->getGroup("BandBin")["FilterNumber"][0];
 
   if(fltToRef.Size() == 0) {
-    throw iException::Message(iException::Pvl,
-                              "Unable to find matching reflectance and radiance values for target [" +
-                              icube->getGroup("Instrument")["TargetName"][0] + "] in [" +
-                              GetScaleFactorFile().Expanded() + "]",
-                              _FILEINFO_);
+    throw IException(IException::Unknown,
+                     "Unable to find matching reflectance and radiance values for target [" +
+                     icube->getGroup("Instrument")["TargetName"][0] + "] in [" +
+                     GetScaleFactorFile().Expanded() + "]",
+                     _FILEINFO_);
   }
 
   double s1 = fltToRef[filterNumber];
@@ -414,9 +413,9 @@ void calculateScaleFactor0(Cube *icube, Cube *gaincube) {
     bool camSuccess = cam->SetImage(icube->getSampleCount() / 2, icube->getLineCount() / 2);
 
     if(!camSuccess) {
-      throw iException::Message(iException::Camera,
-                                "Unable to calculate the Solar Distance on [" +
-                                icube->getFilename() + "]", _FILEINFO_);
+      throw IException(IException::Unknown,
+                       "Unable to calculate the Solar Distance on [" +
+                       icube->getFilename() + "]", _FILEINFO_);
     }
 
 

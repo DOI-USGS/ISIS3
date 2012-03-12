@@ -22,8 +22,8 @@
  */
 #include <iostream>
 
-#include "iException.h"
-#include "iException.h"
+#include "IException.h"
+#include "IException.h"
 #include "Preference.h"
 
 #include "CubeAttribute.h"
@@ -53,7 +53,7 @@ namespace Isis {
     }
     else {
       string msg = "Invalid cube attribute string [" + att + "]";
-      throw Isis::iException::Message(Isis::iException::Parse, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
   }
 
@@ -264,13 +264,13 @@ namespace Isis {
 
   void CubeAttributeOutput::Minimum(const double min) {
     p_minimum = min;
-    p_rangeType = Isis::RangeSet;
+    p_rangeType = RangeSet;
   }
 
 
   void CubeAttributeOutput::Maximum(const double max) {
     p_maximum = max;
-    p_rangeType = Isis::RangeSet;
+    p_rangeType = RangeSet;
   }
 
 
@@ -280,7 +280,7 @@ namespace Isis {
       msg = msg + "Request for CubeAttributeOutput::PixelType failed. " +
             "PixelType has not been set. Use PropagatePixelType or " +
             "UserPixelType to determine how to set PixelType.";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     return p_pixelType;
   }
@@ -401,7 +401,7 @@ namespace Isis {
         else {
           p_maximum = 0.0;
         }
-        p_rangeType = Isis::RangeSet;
+        p_rangeType = RangeSet;
       }
 
       // Parse any pixel type attributes
@@ -452,7 +452,7 @@ namespace Isis {
   void CubeAttributeOutput::Initialize() {
     p_pixelType = Isis::None;
     p_pixelTypeDef = "PROPAGATE";
-    p_rangeType = Isis::PropagateRange;
+    p_rangeType = PropagateRange;
     p_minimum = 0.0;
     p_maximum = 0.0;
     p_format = Cube::Tile;

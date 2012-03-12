@@ -52,8 +52,8 @@ int main() {
     std::cout << "Position = " << ar->CubeSample() << " " <<
               ar->CubeLine() << std::endl;
   }
-  catch(iException &e) {
-    e.Report();
+  catch(IException &e) {
+    e.print();
   }
 
   return 0;

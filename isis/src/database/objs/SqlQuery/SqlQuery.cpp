@@ -269,12 +269,12 @@ namespace Isis {
   }
 
   /**
-   * @brief Issues an iException from various sources of error states in this
+   * @brief Issues an IException from various sources of error states in this
    *        class.
    *
    * This method is provided to issue a consistant error message format from this
    * class.  The user of this class can decide at runtime to issue
-   * Isis::iException exceptions when error condition or query failures are
+   * Isis::IException exceptions when error condition or query failures are
    * detected or handle the errors themselves.  All exceptions go through this
    * method for deployment to simplify the process.
    *
@@ -288,11 +288,10 @@ namespace Isis {
    * @param f Routine name issuing the error
    * @param l Line number of the offending error
    */
-  void SqlQuery::tossQueryError(const std::string &message, const char *f, int l) const
-  throw(iException &) {
+  void SqlQuery::tossQueryError(const std::string &message, const char *f, int l) const {
     string errmess = message + " - QueryError = " +
                      iString::ToStd(lastError().text());
-    throw iException::Message(Isis::iException::User, errmess, f, l);
+    throw IException(IException::User, errmess, f, l);
   }
 
 }

@@ -23,12 +23,13 @@
 
 #include "PixelType.h"
 #include "Buffer.h"
-#include "iException.h"
+#include "IException.h"
 #include "Message.h"
 
 #include <iostream>
 
 using namespace std;
+
 namespace Isis {
 
   /**
@@ -61,15 +62,15 @@ namespace Isis {
 
     if(p_nsamps <= 0) {
       string message = "Invalid value for sample dimensions (nsamps)";
-      throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+      throw IException(IException::Programmer, message, _FILEINFO_);
     }
     if(p_nlines <= 0) {
       string message = "Invalid value for line dimensions (nlines)";
-      throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+      throw IException(IException::Programmer, message, _FILEINFO_);
     }
     if(p_nbands <= 0) {
       string message = "Invalid value for band dimensions (nbands)";
-      throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+      throw IException(IException::Programmer, message, _FILEINFO_);
     }
 
     p_npixels = p_nsamps * p_nlines * p_nbands;
@@ -201,21 +202,20 @@ namespace Isis {
    * @throws Isis::iException::Programmer - Array Subscript not in range
    */
   int Buffer::Index(const int i_samp, const int i_line, const int i_band)
-  const throw(Isis::iException &) {
-
+      const {
     if((i_samp < p_sample) || (i_samp > (p_sample + p_nsamps - 1))) {
-      string message = Isis::Message::ArraySubscriptNotInRange(i_samp);
-      throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+      string message = Message::ArraySubscriptNotInRange(i_samp);
+      throw IException(IException::Programmer, message, _FILEINFO_);
     }
 
     if((i_line < p_line) || (i_line > (p_line + p_nlines - 1))) {
-      string message = Isis::Message::ArraySubscriptNotInRange(i_line);
-      throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+      string message = Message::ArraySubscriptNotInRange(i_line);
+      throw IException(IException::Programmer, message, _FILEINFO_);
     }
 
     if((i_band < p_band) || (i_band > (p_band + p_nbands - 1))) {
-      string message = Isis::Message::ArraySubscriptNotInRange(i_band);
-      throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+      string message = Message::ArraySubscriptNotInRange(i_band);
+      throw IException(IException::Programmer, message, _FILEINFO_);
     }
 
     //  Got a valid reference location so compute the index and return
@@ -236,12 +236,12 @@ namespace Isis {
    */
   double Buffer::at(const int index) const {
     if(index < 0) {
-      string message = Isis::Message::ArraySubscriptNotInRange(index);
-      throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+      string message = Message::ArraySubscriptNotInRange(index);
+      throw IException(IException::Programmer, message, _FILEINFO_);
     }
     else if(index >= p_npixels) {
-      string message = Isis::Message::ArraySubscriptNotInRange(index);
-      throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+      string message = Message::ArraySubscriptNotInRange(index);
+      throw IException(IException::Programmer, message, _FILEINFO_);
     }
 
     return p_buf[index];
@@ -258,12 +258,12 @@ namespace Isis {
   void Buffer::Copy(const Buffer &in) {
     if(p_npixels != in.size()) {
       string message = "Input and output buffers are not the same size";
-      throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+      throw IException(IException::Programmer, message, _FILEINFO_);
     }
 
     if(p_pixelType != in.PixelType()) {
       string message = "Input and output buffers are not the same pixel type";
-      throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+      throw IException(IException::Programmer, message, _FILEINFO_);
     }
 
     size_t n = sizeof(double);
@@ -324,8 +324,8 @@ namespace Isis {
         p_buf = NULL;
         p_rawbuf = NULL;
       }
-      string message = Isis::Message::MemoryAllocationFailed();
-      throw Isis::iException::Message(Isis::iException::System, message, _FILEINFO_);
+      string message = Message::MemoryAllocationFailed();
+      throw IException(IException::Unknown, message, _FILEINFO_);
     }
   }
 }

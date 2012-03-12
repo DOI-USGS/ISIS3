@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 #include "Preference.h"
-#include "iException.h"
+#include "IException.h"
 #include "Cube.h"
 #include "BandManager.h"
 
@@ -65,8 +65,8 @@ int main(int argc, char *argv[]) {
     cout << "Testing errors ... " << endl;
     band.SetBand(0, 0);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
     cout << endl;
   }
 
@@ -74,8 +74,8 @@ int main(int argc, char *argv[]) {
     cout << "Testing errors ... " << endl;
     band.SetBand(1, 0);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
     cout << endl;
   }
 

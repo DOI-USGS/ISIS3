@@ -3,7 +3,7 @@
 #include "SpecialPixel.h"
 #include "LineManager.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "Table.h"
 
 using namespace std;

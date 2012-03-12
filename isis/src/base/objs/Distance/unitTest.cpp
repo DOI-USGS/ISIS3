@@ -3,15 +3,13 @@
 #include <iostream>
 
 #include "Displacement.h"
-#include "iException.h"
+#include "IException.h"
 #include "Preference.h"
 
 using std::cerr;
 using std::endl;
 
-using Isis::Distance;
-using Isis::iException;
-using Isis::Preference;
+using namespace Isis;
 
 int main(int argc, char *argv[]) {
   Preference::Preferences(true);
@@ -25,8 +23,8 @@ int main(int argc, char *argv[]) {
     Distance dist;
     cerr << dist.meters() << " meters" << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -34,8 +32,8 @@ int main(int argc, char *argv[]) {
     Distance dist(1500.5, Distance::Meters);
     cerr << dist.meters() << " meters" << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -43,8 +41,8 @@ int main(int argc, char *argv[]) {
     Distance dist(1500.5, Distance::Kilometers);
     cerr << dist.meters() << " meters" << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -53,8 +51,8 @@ int main(int argc, char *argv[]) {
     Distance copiedDist(dist);
     cerr << copiedDist.meters() << " meters" << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   cerr << endl << "----- Testing Accessors -----" << endl << endl;
@@ -64,8 +62,8 @@ int main(int argc, char *argv[]) {
     Distance dist(1, Distance::Meters);
     cerr << dist.meters() << " meters" << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -73,8 +71,8 @@ int main(int argc, char *argv[]) {
     Distance dist(1, Distance::Kilometers);
     cerr << dist.kilometers() << " kilometers" << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   cerr << endl << "----- Testing Operators -----" << endl << endl;
@@ -91,17 +89,17 @@ int main(int argc, char *argv[]) {
     cerr << "Distance 1 == Distance 2 ? " << (dist1 == dist2) << endl;
     cerr << "Distance 1 <= Distance 2 ? " << (dist1 <= dist2) << endl;
     cerr << "Distance 1 < Distance 2 ? " << (dist1 < dist2) << endl;
-    cerr << "Distance 1 + Distance 2 ? " << (dist1 + dist2).meters() << 
+    cerr << "Distance 1 + Distance 2 ? " << (dist1 + dist2).meters() <<
         " meters" << endl;
-    cerr << "Distance 1 - Distance 2 ? " << (dist1 - dist2).meters() << 
+    cerr << "Distance 1 - Distance 2 ? " << (dist1 - dist2).meters() <<
         " meters" << endl;
 
     dist1 = dist2;
     cerr << "Distance 1 = Distance 2... Distance 1 = " << dist1.meters() <<
         " meters" << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -116,26 +114,26 @@ int main(int argc, char *argv[]) {
     cerr << "Distance 1 == Distance 2 ? " << (dist1 == dist2) << endl;
     cerr << "Distance 1 <= Distance 2 ? " << (dist1 <= dist2) << endl;
     cerr << "Distance 1 < Distance 2 ? " << (dist1 < dist2) << endl;
-    cerr << "Distance 1 + Distance 2 ? " << (dist1 + dist2).meters() << 
+    cerr << "Distance 1 + Distance 2 ? " << (dist1 + dist2).meters() <<
         " meters" << endl;
 
-    // This should work since it returns a displacement 
+    // This should work since it returns a displacement
     try {
-      cerr << "Distance 1 - Distance 2 ? " << (dist1 - dist2).meters() << 
+      cerr << "Distance 1 - Distance 2 ? " << (dist1 - dist2).meters() <<
           " meters" << endl;
       cerr << "Distance 1 -= Distance 2 ? " << endl;
       dist1 -= dist2;
     }
-    catch(iException &e) {
-      e.Report(false);
+    catch(IException &e) {
+      e.print();
     }
 
     dist1 = dist2;
     cerr << "Distance 1 = Distance 2... Distance 1 = " << dist1.meters() <<
         " meters" << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -150,17 +148,17 @@ int main(int argc, char *argv[]) {
     cerr << "Distance 1 == Distance 2 ? " << (dist1 == dist2) << endl;
     cerr << "Distance 1 <= Distance 2 ? " << (dist1 <= dist2) << endl;
     cerr << "Distance 1 < Distance 2 ? " << (dist1 < dist2) << endl;
-    cerr << "Distance 1 + Distance 2 ? " << (dist1 + dist2).meters() << 
+    cerr << "Distance 1 + Distance 2 ? " << (dist1 + dist2).meters() <<
         " meters" << endl;
-    cerr << "Distance 1 - Distance 2 ? " << (dist1 - dist2).meters() << 
+    cerr << "Distance 1 - Distance 2 ? " << (dist1 - dist2).meters() <<
         " meters" << endl;
 
     dist1 = dist2;
     cerr << "Distance 1 = Distance 2... Distance 1 = " << dist1.meters() <<
         " meters" << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -175,9 +173,9 @@ int main(int argc, char *argv[]) {
     cerr << "Distance 1 == Distance 2 ? " << (dist1 == dist2) << endl;
     cerr << "Distance 1 <= Distance 2 ? " << (dist1 <= dist2) << endl;
     cerr << "Distance 1 < Distance 2 ? " << (dist1 < dist2) << endl;
-    cerr << "Distance 1 + Distance 2 ? " << (dist1 + dist2).meters() << 
+    cerr << "Distance 1 + Distance 2 ? " << (dist1 + dist2).meters() <<
         " meters" << endl;
-    cerr << "Distance 1 - Distance 2 ? " << (dist1 - dist2).meters() << 
+    cerr << "Distance 1 - Distance 2 ? " << (dist1 - dist2).meters() <<
         " meters" << endl;
 
     dist1 = dist2;
@@ -190,8 +188,8 @@ int main(int argc, char *argv[]) {
     cerr << "Distance 1 -= Distance 2... Distance 1 = " << dist1.meters() <<
         " meters" << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -208,17 +206,17 @@ int main(int argc, char *argv[]) {
     cerr << "Distance 1 == Distance 2 ? " << (dist1 == dist2) << endl;
     cerr << "Distance 1 <= Distance 2 ? " << (dist1 <= dist2) << endl;
     cerr << "Distance 1 < Distance 2 ? " << (dist1 < dist2) << endl;
-    cerr << "Distance 1 + Distance 2 ? " << (dist1 + dist2).meters() << 
+    cerr << "Distance 1 + Distance 2 ? " << (dist1 + dist2).meters() <<
         " meters" << endl;
-    cerr << "Distance 1 - Distance 2 ? " << (dist1 - dist2).meters() << 
+    cerr << "Distance 1 - Distance 2 ? " << (dist1 - dist2).meters() <<
         " meters" << endl;
 
     dist1 = dist2;
     cerr << "Distance 1 = Distance 2... Distance 1 = " << dist1.meters() <<
         " meters" << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   cerr << endl << "----- Testing Error Checking -----" << endl << endl;
@@ -226,66 +224,66 @@ int main(int argc, char *argv[]) {
   try {
     Distance dist(-1, Distance::Meters);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
     Distance dist(-1, Distance::Kilometers);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
     Distance dist(1, Distance::Kilometers);
     dist.setMeters(-1);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
     Distance dist(1, Distance::Kilometers);
     dist.setMeters(-1);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
     Distance dist(1, Distance::Kilometers);
     dist.setKilometers(-1);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
     Distance() > Distance();
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
     Distance() >= Distance();
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
     Distance() < Distance();
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
     Distance() <= Distance();
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 }

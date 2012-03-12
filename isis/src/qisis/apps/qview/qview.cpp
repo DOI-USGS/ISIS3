@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
 #ifdef CWDEBUG
   startMonitoringMemory();
 #endif
-  
+
   Isis::Gui::checkX11();
 
   // Check to see if the user wants to force a new window
@@ -196,9 +196,8 @@ int main(int argc, char *argv[]) {
         vw->workspace()->addCubeViewport(QString(argv[i]));
         openingAFileSucceeded = true;
       }
-      catch(iException &e) {
-        e.Report();
-        e.Clear();
+      catch(IException &e) {
+        e.print();
 
         // If we're trying to open more later or have opened a file, allow
         //   qview to continue running. Otherwise (this if), crash.

@@ -132,8 +132,8 @@ Group = Field
 End_Group
 ----------------------------------------
 Testing erroneous type constructor
-**PROGRAMMER ERROR** Field [Test] has invalid type
+**PROGRAMMER ERROR** Field [Test] has invalid type.
 ----------------------------------------
 Testing erroneous size constructor
-**PARSE ERROR** Cannot convert (-7.3) to an integer
+**ERROR** Failed to convert string [-7.3] to an integer.
 ----------------------------------------

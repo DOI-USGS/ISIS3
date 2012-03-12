@@ -147,7 +147,7 @@ namespace Isis {
                              ") in file " + fname +
                              " less than number requested (" +
                              iString(nvalues) + ")!";
-          throw iException::Message(iException::User, mess.c_str(), _FILEINFO_);
+          throw IException(IException::User, mess.c_str(), _FILEINFO_);
         }
         std::vector<double> rsp;
         for(int i = 0 ; i < nvalues ; i++) {
@@ -161,7 +161,7 @@ namespace Isis {
     std::ostringstream mess;
     mess << "CSV Vector MDIS filter " << filter <<  ", not found in file "
          << fname << "!";
-    throw iException::Message(iException::User, mess.str(), _FILEINFO_);
+    throw IException(IException::User, mess.str(), _FILEINFO_);
   }
 
 
@@ -175,7 +175,7 @@ namespace Isis {
       std::string mess = "Number values (" + iString(row.dim1()) +
                          ") in file " + fname + " less than number requested (" +
                          iString(nvalues) + ")!";
-      throw iException::Message(iException::User, mess.c_str(), _FILEINFO_);
+      throw IException(IException::User, mess.c_str(), _FILEINFO_);
 
     }
     std::vector<double> rsp;

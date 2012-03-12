@@ -27,10 +27,10 @@ void IsisMain() {
     instid = (string) lab.FindKeyword("INSTRUMENT_ID");
     missid = (string) lab.FindKeyword("MISSION_ID");
   }
-  catch(iException &e) {
+  catch(IException &e) {
     string msg = "Unable to read [INSTRUMENT_ID] or [MISSION_ID] from input file [" +
                  inFile.Expanded() + "]";
-    throw iException::Message(iException::Io, msg, _FILEINFO_);
+    throw IException(IException::Io, msg, _FILEINFO_);
   }
 
   instid.ConvertWhiteSpace();
@@ -42,7 +42,7 @@ void IsisMain() {
   if(missid != "DAWN" && instid != "FC1" && instid != "FC2") {
     string msg = "Input file [" + inFile.Expanded() + "] does not appear to be " +
                  "a DAWN Framing Camera (FC) EDR or RDR file.";
-    throw iException::Message(iException::Io, msg, _FILEINFO_);
+    throw IException(IException::Io, msg, _FILEINFO_);
   }
 
   std::string target;
@@ -153,7 +153,7 @@ void IsisMain() {
   else {
     string msg = "Input file [" + inFile.Expanded() + "] has an invalid " +
                  "FilterNumber. The FilterNumber must fall in the range 1 to 8.";
-    throw iException::Message(iException::Io, msg, _FILEINFO_);
+    throw IException(IException::Io, msg, _FILEINFO_);
   }
   bbGrp.AddKeyword(PvlKeyword("Center", center));
   bbGrp.AddKeyword(PvlKeyword("Width", width));
@@ -170,7 +170,7 @@ void IsisMain() {
   else {
     string msg = "Input file [" + inFile.Expanded() + "] has an invalid " +
                  "InstrumentId.";
-    throw iException::Message(iException::Io, msg, _FILEINFO_);
+    throw IException(IException::Unknown, msg, _FILEINFO_);
   }
   outcube->putGroup(kerns);
 

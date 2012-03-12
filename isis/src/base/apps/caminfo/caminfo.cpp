@@ -7,7 +7,7 @@
 #include "CameraStatistics.h"
 #include "CamTools.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "ImagePolygon.h"
 #include "iString.h"
 #include "iTime.h"
@@ -184,7 +184,7 @@ void IsisMain() {
     }
     else {
       string msg = "Invalid INCTYPE option[" + incType + "]";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     bandGeom = new BandGeometry();
@@ -199,7 +199,7 @@ void IsisMain() {
     // Check if the user requires valid image center geometry
     if(ui.GetBoolean("VCAMERA") && (!bandGeom->hasCenterGeometry())) {
       string msg = "Image center does not project in camera model";
-      throw iException::Message(iException::Camera, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
   }
 

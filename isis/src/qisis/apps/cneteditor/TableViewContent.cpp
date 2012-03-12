@@ -20,7 +20,7 @@
 #include <QVBoxLayout>
 
 #include "ControlMeasure.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 
 #include "AbstractTableDelegate.h"
@@ -41,7 +41,7 @@ namespace Isis
     TableViewContent::TableViewContent(AbstractTableModel * someModel)
     {
       nullify();
-      
+
       model = someModel;
       connect(model, SIGNAL(modelModified()), this, SLOT(refresh()));
       connect(model, SIGNAL(filterProgressChanged(int)),
@@ -54,18 +54,18 @@ namespace Isis
               SIGNAL(tableSelectionChanged(QList< AbstractTreeItem * >)));
       connect(model, SIGNAL(treeSelectionChanged(QList< AbstractTreeItem * >)),
               this, SLOT(scrollTo(QList< AbstractTreeItem * >)));
-      
+
       columns = getModel()->getColumns();
       for (int i = 0; i < columns->size(); i++)
       {
         TableColumn * column = (*columns)[i];
-        
+
         connect(column, SIGNAL(visibilityChanged()), this, SLOT(refresh()));
         connect(column, SIGNAL(visibilityChanged()),
                 this, SLOT(updateHorizontalScrollBar()));
         connect(column, SIGNAL(widthChanged()), this, SLOT(refresh()));
       }
-      
+
       items = new QList< AbstractTreeItem * >;
       mousePressPos = new QPoint;
       activeCell = new QPair<AbstractTreeItem *, int>(NULL, -1);
@@ -118,7 +118,7 @@ namespace Isis
 
       delete deleteSelectedRowsAct;
       deleteSelectedRowsAct = NULL;
-      
+
       delete lastShiftArrowSelectedCell;
       lastShiftArrowSelectedCell = NULL;
 
@@ -152,7 +152,7 @@ namespace Isis
   //       iString msg = "Attempted to set a NULL model!";
   //       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
   //     }
-  // 
+  //
   //     if (getModel())
   //     {
   //       disconnect(getModel(), SIGNAL(modelModified()), this, SLOT(refresh()));
@@ -165,10 +165,10 @@ namespace Isis
   //       disconnect(getModel(), SIGNAL(selectionChanged(QList<AbstractTreeItem*>)),
   //                  this, SLOT(scrollTo(QList<AbstractTreeItem*>)));
   //     }
-  // 
+  //
   //     model = someModel;
   //     columns = someModel->getColumns();
-  // 
+  //
   //     connect(model, SIGNAL(modelModified()), this, SLOT(refresh()));
   //     connect(model, SIGNAL(filterProgressChanged(int)),
   //             this, SLOT(updateItemList()));
@@ -178,7 +178,7 @@ namespace Isis
   //             model, SIGNAL(tableSelectionChanged(QList< AbstractTreeItem * >)));
   //     connect(model, SIGNAL(treeSelectionChanged(QList<AbstractTreeItem*>)),
   //             this, SLOT(scrollTo(QList<AbstractTreeItem*>)));
-  // 
+  //
   //     refresh();
   //   }
 
@@ -193,7 +193,7 @@ namespace Isis
           int rowCount = model->getVisibleRowCount();
           verticalScrollBar()->setRange(0, qMax(rowCount - 1, 0));
         }
-        
+
         updateItemList();
   //      clearActiveCell();
   //       clearColumnSelection();
@@ -221,7 +221,7 @@ namespace Isis
         TableColumnList visibleCols = columns->getVisibleColumns();
         for (int i = 0; i < visibleCols.size(); i++)
           range += visibleCols[i]->getWidth() - 1;
-        
+
         // For the border...
         range -= 2;
         horizontalScrollBar()->setRange(0, range - viewport()->width());
@@ -231,24 +231,24 @@ namespace Isis
           horizontalScrollBar()->setValue(horizontalScrollBar()->maximum());
       }
     }
-    
-    
+
+
     void TableViewContent::scrollTo(
         QList< AbstractTreeItem * > newlySelectedItems)
     {
       if (newlySelectedItems.size())
         scrollTo(newlySelectedItems.last());
     }
-    
-    
+
+
     void TableViewContent::scrollTo(AbstractTreeItem * newlySelectedItem)
     {
       int row = getModel()->indexOfVisibleItem(newlySelectedItem);
-      
+
       if (row >= 0)
       {
         int topRow = verticalScrollBar()->value();
-        
+
         if (row < topRow)
         {
           verticalScrollBar()->setValue(row);
@@ -261,7 +261,7 @@ namespace Isis
             verticalScrollBar()->setValue(row - wholeVisibleRowCount + 1);
         }
       }
-      
+
       viewport()->update();
     }
 
@@ -307,14 +307,14 @@ namespace Isis
 
         int rowNum = event->pos().y() / rowHeight;
         int colNum = getColumnFromScreenX(event->pos().x());
-        
+
         // HACK
         // BUG
         // TODO
         // FIXME
         if (colNum == 0)
           clearActiveCell();
-        
+
         if (rowNum >= 0 && rowNum < items->size() && activeCell->first)
         {
           // The user clicked on a valid item, handle selection of individual
@@ -332,7 +332,7 @@ namespace Isis
               else
                 rowsWithActiveColumnSelected->removeAll(activeCell->first);
               lastDirectlySelectedRow = activeCell->first;
-              
+
               lastShiftSelection->clear();
             }
             else
@@ -365,7 +365,7 @@ namespace Isis
               if (column->getTitle().isEmpty())
               {
                 clearColumnSelection();
-                
+
                 AbstractTreeItem * const & item = items->at(rowNum);
                 QList< AbstractTreeItem * > newlySelectedItems;
 
@@ -406,7 +406,7 @@ namespace Isis
                     newlySelectedItems.append(item);
                   }
                 }
-                
+
                 QList< AbstractTreeItem * > tmp = newlySelectedItems;
                 newlySelectedItems.clear();
                 foreach (AbstractTreeItem * i, tmp)
@@ -421,7 +421,7 @@ namespace Isis
                     }
                   }
                 }
-                
+
                 emit tableSelectionChanged(newlySelectedItems);
               }
             }
@@ -449,7 +449,7 @@ namespace Isis
         if (event->buttons() & Qt::LeftButton)
         {
           int rowNum = event->pos().y() / rowHeight;
-          
+
           // used to make sure that the mouse position is inside the content
           int yPos = event->pos().y();
           if (yPos >= 0 && rowNum < items->size() && activeCell->first)
@@ -473,7 +473,7 @@ namespace Isis
               if (columnNum != -1)
               {
                 clearColumnSelection();
-                
+
                 QList< AbstractTreeItem * > tmp =
                     updateRowGroupSelection(rowNum);
                 QList< AbstractTreeItem * > newlySelectedItems;
@@ -489,7 +489,7 @@ namespace Isis
                     }
                   }
                 }
-                
+
                 emit tableSelectionChanged(newlySelectedItems);
               }
             }
@@ -525,7 +525,7 @@ namespace Isis
     void TableViewContent::keyPressEvent(QKeyEvent * event)
     {
       Qt::Key key = (Qt::Key) event->key();
-      
+
       // Handle Ctrl-A (selects all rows)
       if (key == Qt::Key_A && event->modifiers() == Qt::ControlModifier)
       {
@@ -536,7 +536,7 @@ namespace Isis
 
         emit tableSelectionChanged();
       }
-      
+
       // Handle esc key (cancel editing)
       else if (key == Qt::Key_Escape)
       {
@@ -548,28 +548,28 @@ namespace Isis
           viewport()->update();
         }
       }
-      
+
       // Handle delete key (delete row(s) if any are selected)
       else if (key == Qt::Key_Delete)
       {
         if (hasRowSelection())
           deleteSelectedRows();
       }
-      
+
       // Handle return or enter (stop editing)
       else if (key == Qt::Key_Return || key == Qt::Key_Enter)
       {
         finishEditing();
         moveActiveCellDown();
       }
-      
+
       // Handle
       else if (key == Qt::Key_Tab)
       {
         finishEditing();
         moveActiveCellRight();
       }
-      
+
       // Handle arrow key navigation
       else if (key == Qt::Key_Up || key == Qt::Key_Down ||
           key == Qt::Key_Left || key == Qt::Key_Right)
@@ -583,46 +583,46 @@ namespace Isis
             activeCell->second = 1;
           }
         }
-        
+
         if (hasActiveCell() && !editWidget)
         {
           // should have items if we have an active cell
           ASSERT(items->size());
-          
+
           // Handle up arrow with shift pressed
           if (key == Qt::Key_Up && event->modifiers() == Qt::ShiftModifier)
           {
             ASSERT(lastShiftArrowSelectedCell);
-            
+
             AbstractTreeItem * prevCell = lastShiftArrowSelectedCell->first ?
                 lastShiftArrowSelectedCell->first : activeCell->first;
-            
+
             int prevCellIndex = getModel()->indexOfVisibleItem(prevCell);
-            
+
             if (prevCellIndex > 0)
             {
               QList< AbstractTreeItem * > itemList =
                   getModel()->getItems(prevCellIndex - 1, prevCellIndex);
-              
+
               if (itemList.size())
               {
                 AbstractTreeItem * curItem = itemList[0];
 //                 cerr << "curItem: " << qPrintable(curItem->getData(
 //                     columns->getVisibleColumns()[
 //                     activeCell->second]->getTitle())) << "\n";
-                
+
                 if (rowsWithActiveColumnSelected->contains(curItem) ||
                     curItem == activeCell->first)
                   rowsWithActiveColumnSelected->removeAll(prevCell);
                 else
                   rowsWithActiveColumnSelected->append(curItem);
-                
+
                 if (curItem == activeCell->first)
                   lastShiftArrowSelectedCell->first = NULL;
                 else
                   lastShiftArrowSelectedCell->first = curItem;
                 lastShiftArrowSelectedCell->second = activeCell->second;
-                
+
                 // scroll if needed
                 int itemsPrevIndex = items->indexOf(prevCell);
                 int itemsCurIndex = items->indexOf(curItem);
@@ -639,38 +639,38 @@ namespace Isis
                     //verticalScrollBar()->setValue(qMin(prevCell + 1, ));
                   }
                 }
-                
+
                 viewport()->update();
               }
             }
           }
-          
+
           // Handle down arrow with shift pressed
           else if (key == Qt::Key_Down && event->modifiers() == Qt::ShiftModifier)
           {
             AbstractTreeItem * prevCell = lastShiftArrowSelectedCell->first ?
                 lastShiftArrowSelectedCell->first : activeCell->first;
-                
+
             int prevCellIndex = getModel()->indexOfVisibleItem(prevCell);
-            
+
             if (prevCellIndex >= 0 &&
                 prevCellIndex < getModel()->getVisibleRowCount() - 1)
             {
               QList< AbstractTreeItem * > itemList =
                   getModel()->getItems(prevCellIndex + 1, prevCellIndex + 2);
-              
+
               if (itemList.size())
               {
                 AbstractTreeItem * curItem = itemList[0];
   //               cerr << "curItem: " << qPrintable(curItem->getData(columns->getVisibleColumns()[activeCell->second]->getTitle())) << "\n";;
-                
-                
+
+
                 if (rowsWithActiveColumnSelected->contains(curItem) ||
                     curItem == activeCell->first)
                   rowsWithActiveColumnSelected->removeAll(prevCell);
                 else
                   rowsWithActiveColumnSelected->append(curItem);
-                
+
                 if (curItem == activeCell->first)
                   lastShiftArrowSelectedCell->first = NULL;
                 else
@@ -699,25 +699,25 @@ namespace Isis
               }
             }
           }
-          
+
           // Handle up arrow
           else if (key == Qt::Key_Up)
           {
             moveActiveCellUp();
           }
-          
+
           // Handle down arrow
           else if (key == Qt::Key_Down)
           {
             moveActiveCellDown();
           }
-          
+
           // Handle left arrow
           else if (key == Qt::Key_Left)
           {
             moveActiveCellLeft();
           }
-            
+
           // Handle right arrow
           else if (key == Qt::Key_Right)
           {
@@ -725,7 +725,7 @@ namespace Isis
           }
         }
       }
-      
+
       // start editing the active cell
       else
       {
@@ -734,9 +734,9 @@ namespace Isis
         {
           if (!items->contains(activeCell->first))
             scrollTo(activeCell->first);
-          
+
           ASSERT(items->contains(activeCell->first));
-          
+
           if (items->contains(activeCell->first) &&
               cellIsEditable(items->indexOf(activeCell->first),
               activeCell->second))
@@ -757,8 +757,8 @@ namespace Isis
         }
       }
     }
-    
-    
+
+
     void TableViewContent::finishEditing()
     {
       if (editWidget)
@@ -775,7 +775,7 @@ namespace Isis
       }
     }
 
-    
+
     void TableViewContent::moveActiveCellUp()
     {
       int activeIndex = items->indexOf(activeCell->first);
@@ -785,17 +785,17 @@ namespace Isis
         {
           int row = qMax(0, getModel()->indexOfVisibleItem(
               activeCell->first) - 1);
-          
+
           verticalScrollBar()->setValue(row);
         }
-        
+
         activeCell->first = (*items)[qMax(0, activeIndex - 1)];
         clearColumnSelection();
         viewport()->update();
       }
     }
 
-    
+
     void TableViewContent::moveActiveCellDown()
     {
       int activeIndex = items->indexOf(activeCell->first);
@@ -805,17 +805,17 @@ namespace Isis
         {
           int row = qMin(getModel()->getVisibleRowCount() - 1,
                         getModel()->indexOfVisibleItem(items->at(0)));
-          
+
           verticalScrollBar()->setValue(row + 1);
           activeIndex = items->indexOf(activeCell->first);
         }
-        
+
         activeCell->first = (*items)[qMin(activeIndex + 1, items->size() - 1)];
         clearColumnSelection();
         viewport()->update();
       }
     }
-    
+
 
     void TableViewContent::moveActiveCellLeft()
     {
@@ -826,7 +826,7 @@ namespace Isis
         horizontalScrollBar()->setValue(horizontalScrollBar()->value() -
             columns->getVisibleColumns()[activeCell->second]->getWidth());
       }
-      
+
       clearColumnSelection();
       viewport()->update();
     }
@@ -842,7 +842,7 @@ namespace Isis
         horizontalScrollBar()->setValue(horizontalScrollBar()->value() +
           columns->getVisibleColumns()[activeCell->second]->getWidth());
       }
-      
+
       clearColumnSelection();
       viewport()->update();
     }
@@ -876,14 +876,14 @@ namespace Isis
 
           if (i < items->size())
           {
-            
-            
-            
-            
-            
-            
+
+
+
+
+
+
             // ********************************************************
-            // HACK: FIXME: ask tree items if background needs to be 
+            // HACK: FIXME: ask tree items if background needs to be
             // darkened, instead figuring that out here.  Also, change
             // composition mode so that ref measure rows look different
             // when they are highlighted as well
@@ -903,18 +903,18 @@ namespace Isis
             }
             */
             //*********************************************************
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-          
+
+
+
+
+
+
+
+
+
+
+
+
             if (items->at(i)->isSelected())
             {
               QPoint selectionTopLeft(-absoluteTopLeft.x(), relativeTopLeft.y());
@@ -923,7 +923,7 @@ namespace Isis
               QRect selectionRect(selectionTopLeft, selectionSize);
               painter.fillRect(selectionRect, palette().highlight().color());
             }
-            
+
             paintRow(&painter, i, absoluteTopLeft, relativeTopLeft);
           }
         }
@@ -1015,7 +1015,7 @@ namespace Isis
     {
       if (col->hasNetworkStructureEffect())
         emit rebuildModels(QList< AbstractTreeItem * >());
-      
+
       emit modelDataChanged();
     }
 
@@ -1036,7 +1036,7 @@ namespace Isis
       rowsWithActiveColumnSelected->clear();
     }
 
-    
+
     void TableViewContent::copyCellSelection(bool allCells)
     {
       if (hasActiveCell())
@@ -1068,7 +1068,7 @@ namespace Isis
             QMessageBox::StandardButton status = QMessageBox::warning(
                 this, "Change cells?", warningText, QMessageBox::Yes |
                 QMessageBox::No | QMessageBox::YesToAll | QMessageBox::NoToAll);
-            
+
             switch (status)
             {
               case QMessageBox::YesToAll:
@@ -1081,7 +1081,7 @@ namespace Isis
               default:;
             }
           }
-          
+
           if (changeData)
             row->setData(colTitle, cellData);
         }
@@ -1134,17 +1134,17 @@ namespace Isis
 
       return column;
     }
-    
-    
+
+
     int TableViewContent::getRowFromScreenY(int screenY) const
     {
       int rowNum = -1;
       int calculatedRowNum = screenY / rowHeight;
-      
-      if (calculatedRowNum >= 0 && calculatedRowNum < items->size() && 
+
+      if (calculatedRowNum >= 0 && calculatedRowNum < items->size() &&
           screenY >= 0 && screenY <= viewport()->height())
         rowNum = calculatedRowNum;
-      
+
       return rowNum;
     }
 
@@ -1177,26 +1177,26 @@ namespace Isis
 
       return (model->getSelectedItems().contains(row));
     }
-    
-    
+
+
     bool TableViewContent::rowIsValid(int rowNum) const
     {
       bool valid = false;
-      
+
       if (rowNum >= 0 && rowNum < items->size())
         valid = true;
-      
+
       return valid;
     }
-    
-    
+
+
     bool TableViewContent::columnIsValid(int colNum) const
     {
       bool valid = false;
-      
+
       if (colNum >= 0 && colNum < columns->getVisibleColumns().size())
         valid = true;
-      
+
       return valid;
     }
 
@@ -1392,13 +1392,12 @@ namespace Isis
               columns->getVisibleColumns()[activeCell->second];
           model->getDelegate()->saveData(editWidget, activeCell->first,
               col);
-          
+
           cellDataChanged(col);
         }
-        catch (iException & e)
+        catch (IException &e)
         {
           QMessageBox::critical(this, "Failed to Set Data", e.what());
-          e.Clear();
         }
       }
 
@@ -1417,7 +1416,7 @@ namespace Isis
           QPair<int, int> cellXRange(columns->getVisibleXRange(i));
           QRect cellRect(cellXRange.first, rowHeight * rowNum,
               cellXRange.second - cellXRange.first, rowHeight);
-          
+
           cellRect.moveLeft(cellRect.left() - horizontalScrollBar()->value());
 
           if (cellRect.contains(screenPos) &&
@@ -1434,10 +1433,10 @@ namespace Isis
         clearColumnSelection();
         lastDirectlySelectedRow = NULL;
       }
-      
+
       clearColumnSelection();
     }
-    
+
 
     void TableViewContent::updateColumnGroupSelection(AbstractTreeItem * item)
     {
@@ -1448,7 +1447,7 @@ namespace Isis
           rowsWithActiveColumnSelected->removeOne(row);
       }
 
-      
+
       if (lastDirectlySelectedRow)
       {
         *lastShiftSelection = model->getItems(
@@ -1475,7 +1474,7 @@ namespace Isis
         if (row->getPointerType() == AbstractTreeItem::Point)
           foreach (AbstractTreeItem * child, row->getChildren())
             child->setSelected(false);
-            
+
         if (row->getPointerType() == AbstractTreeItem::Measure)
           row->parent()->setSelected(false);
 
@@ -1502,7 +1501,7 @@ namespace Isis
 
         newlySelectedItems.append(row);
       }
-      
+
       return newlySelectedItems;
     }
 
@@ -1552,8 +1551,8 @@ namespace Isis
         viewport()->update();
       }
     }
-    
-    
+
+
     void TableViewContent::showContextMenu(QPoint mouseLocation)
     {
       QMenu contextMenu(this);
@@ -1565,14 +1564,14 @@ namespace Isis
         contextMenu.addAction(deleteSelectedRowsAct);
         contextMenu.exec(mapToGlobal(mouseLocation));
       }
-      
+
       // Only show the context menu for cells if the user right-clicked on the
       // active cell.
       if (hasActiveCell() && mouseInCellSelection(mouseLocation))
       {
         if (rowsWithActiveColumnSelected->size() > 1)
           contextMenu.addAction(applyToSelectionAct);
-        
+
         contextMenu.addAction(applyToAllAct);
         contextMenu.exec(mapToGlobal(mouseLocation));
       }

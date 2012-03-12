@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "iException.h"
+#include "IException.h"
 #include "Displacement.h"
 #include "Distance.h"
 #include "Preference.h"
@@ -10,11 +10,7 @@
 using std::cerr;
 using std::endl;
 
-using Isis::Area3D;
-using Isis::iException;
-using Isis::Displacement;
-using Isis::Distance;
-using Isis::Preference;
+using namespace Isis;
 
 void printArea(const Area3D &area);
 
@@ -29,8 +25,8 @@ int main(int argc, char *argv[]) {
     cerr << "Empty constructor" << endl;
     Area3D area;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -40,8 +36,8 @@ int main(int argc, char *argv[]) {
     Area3D area(a, a, a, b, b, b);
     printArea(area);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -51,8 +47,8 @@ int main(int argc, char *argv[]) {
     Area3D area(a, a, a, b, b, b);
     printArea(area);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -63,8 +59,8 @@ int main(int argc, char *argv[]) {
     Area3D copiedArea(area);
     printArea(copiedArea);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   cerr << endl << "----- Testing Operators -----" << endl << endl;
@@ -93,8 +89,8 @@ int main(int argc, char *argv[]) {
     cerr << "Area3D 1 = Area3D 2... Area3D 1 = ";
     printArea(area1);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   // General intersect test
@@ -124,8 +120,8 @@ int main(int argc, char *argv[]) {
     cerr << "Area3D 1 = Area3D 2... Area3D 1 = ";
     printArea(area1);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   // Intersect has no overlap
@@ -153,8 +149,8 @@ int main(int argc, char *argv[]) {
     cerr << "Area3D 1 = Area3D 2... Area3D 1 = ";
     printArea(area1);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   // Test with invalid displacements/distances in constructors
@@ -182,8 +178,8 @@ int main(int argc, char *argv[]) {
     cerr << "Area3D 1 = Area3D 2... Area3D 1 = ";
     printArea(area1);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   // Test displacement v. distance in constructors
@@ -211,8 +207,8 @@ int main(int argc, char *argv[]) {
     cerr << "Area3D 1 = Area3D 2... Area3D 1 = ";
     printArea(area1);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   // Test setStartY
@@ -241,8 +237,8 @@ int main(int argc, char *argv[]) {
     cerr << "Area3D 1 = Area3D 2... Area3D 1 = ";
     printArea(area1);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   // Test moveStartY
@@ -271,8 +267,8 @@ int main(int argc, char *argv[]) {
     cerr << "Area3D 1 = Area3D 2... Area3D 1 = ";
     printArea(area1);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   // Test invalid displacements
@@ -297,8 +293,8 @@ int main(int argc, char *argv[]) {
     cerr << "Area3D 1 = Area3D 2... Area3D 1 = ";
     printArea(area1);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   // Test partially invalid displacements
@@ -325,8 +321,8 @@ int main(int argc, char *argv[]) {
     cerr << "Area3D 1 = Area3D 2... Area3D 1 = ";
     printArea(area1);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
 
@@ -338,8 +334,8 @@ int main(int argc, char *argv[]) {
     Displacement b(1, Displacement::Meters);
     Area3D area(b, a, a, a, b, b);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -347,8 +343,8 @@ int main(int argc, char *argv[]) {
     Displacement b(1, Displacement::Meters);
     Area3D area(a, b, a, b, a, b);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -356,8 +352,8 @@ int main(int argc, char *argv[]) {
     Displacement b(1, Displacement::Meters);
     Area3D area(a, a, b, b, b, a);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 }
 

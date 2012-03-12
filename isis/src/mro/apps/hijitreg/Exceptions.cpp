@@ -1,4 +1,4 @@
-/*	Exception
+/*Exception
 
 PIRL CVS ID: $Id: Exceptions.cpp,v 1.2 2009/02/23 16:36:10 slambright Exp $
 
@@ -33,15 +33,15 @@ Debug Controls
 Define any of the following options to obtain the desired debug reports.
 *******************************************************************************/
 
-#define	DEBUG_ALL			(-1)
-#define	DEBUG_EXCEPTIONS	(1 << 0)
+#define DEBUG_ALL (-1)
+#define DEBUG_EXCEPTIONS (1 << 0)
 
 #include <iostream>
 using std::cerr;
 using std::endl;
 
 #endif
-//	End DEBUG
+// End DEBUG
 
 namespace UA {
   namespace HiRISE {
@@ -61,14 +61,14 @@ namespace UA {
       const std::string &message,
       const char *caller_id
     )
-      :	Message
+      : Message
       (
         std::string(ID)
         + (caller_id ? (std::string("\n") + caller_id) : "")
         + '\n' + message
       ) {
       if(! Message.empty() && Message [Message.size() - 1] == '\n')
-        //	Remove the trailing newline.
+        // Remove the trailing newline.
         Message.erase(Message.size() - 1);
       User_Message_Index =
         strlen(ID) + (caller_id ? (strlen(caller_id) + 2) : 1);
@@ -100,7 +100,7 @@ namespace UA {
     std::string Exception::message()
     const
     throw() {
-      //	Exclude the Exception ID but include the caller_id (if it exists).
+      // Exclude the Exception ID but include the caller_id (if it exists).
       std::string::size_type index = strlen(ID) + 1;
       if(index > Message.size())
         index = 0;
@@ -121,14 +121,14 @@ namespace UA {
           << "    new_message.length: " << new_message.length() << endl;
 #endif
       if(User_Message_Index >= Message.length())
-        //	Then there is no message to replace; append on the next line.
+        // Then there is no message to replace; append on the next line.
         (Message += '\n') += new_message;
       else
-        //	Replace the trailing user message portion of the Message.
+        // Replace the trailing user message portion of the Message.
         Message.replace(User_Message_Index,
                         Message.length() - User_Message_Index, new_message);
       if(! Message.empty() && Message [Message.size() - 1] == '\n')
-        //	Remove the trailing newline.
+        // Remove the trailing newline.
         Message.erase(Message.size() - 1);
 #if ((DEBUG) & DEBUG_EXCEPTION)
       cerr

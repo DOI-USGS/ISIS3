@@ -2,17 +2,17 @@
  * @file
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for 
+ *   domain. See individual third-party library and package descriptions for
  *   intellectual property information,user agreements, and related information.
  *
  *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software 
- *   and related material nor shall the fact of distribution constitute any such 
- *   warranty, and no responsibility is assumed by the USGS in connection 
+ *   is made by the USGS as to the accuracy and functioning of such software
+ *   and related material nor shall the fact of distribution constitute any such
+ *   warranty, and no responsibility is assumed by the USGS in connection
  *   therewith.
  *
  *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see 
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
  *   the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
@@ -26,7 +26,7 @@
 #include "CameraGroundMap.h"
 #include "CameraSkyMap.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "iTime.h"
 #include "NaifStatus.h"
@@ -39,7 +39,7 @@ namespace Isis {
    *
    * @param lab Pvl label from an Apollo Metric image.
    *
-   * @internal 
+   * @internal
    *   @history 2011-01-14 Travis Addair - Added new CK/SPK accessor methods.
    *   @history 2011-05-03 Jeannie Walldren - Added documentation.
    */
@@ -93,7 +93,7 @@ namespace Isis {
     }
     else {
       string msg = "File does not appear to be an Apollo image";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     // Create a cache and grab spice info since it does not change for
@@ -138,12 +138,12 @@ namespace Isis {
 
 /**
  * This is the function that is called in order to instantiate an
- * ApolloMetricCamera object. 
+ * ApolloMetricCamera object.
  *
  * @param lab Cube labels
  *
- * @return Camera* ApolloMetricCamera 
- * @internal 
+ * @return Camera* ApolloMetricCamera
+ * @internal
  *   @history 2011-05-03 Jeannie Walldren - Added documentation. Removed Apollo
  *            namespace.
  */

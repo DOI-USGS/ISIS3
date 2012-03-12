@@ -10,7 +10,7 @@
 #include "ControlCubeGraphNode.h"
 
 #include "ControlMeasureLogData.h"
-#include "iException.h"
+#include "IException.h"
 #include "Preference.h"
 
 using namespace std;
@@ -41,9 +41,8 @@ int main() {
     graphNode.addMeasure(measure1);
     cout << "Successfully added measure" << endl;
   }
-  catch (iException &e) {
-    e.Report(false);
-    e.Clear();
+  catch (IException &e) {
+    e.print();
   }
   cout << endl;
 
@@ -55,9 +54,8 @@ int main() {
     graphNode.addMeasure(measure2);
     cout << "Successfully added measure" << endl;
   }
-  catch (iException &e) {
-    e.Report(false);
-    e.Clear();
+  catch (IException &e) {
+    e.print();
   }
   cout << endl;
 
@@ -80,9 +78,8 @@ int main() {
     graphNode.addMeasure(measure3);
     cout << "Successfully added measure" << endl;
   }
-  catch (iException &e) {
-    e.Report(false);
-    e.Clear();
+  catch (IException &e) {
+    e.print();
   }
   cout << endl;
 
@@ -94,18 +91,17 @@ int main() {
     graphNode.addMeasure(measure4);
     cout << "Successfully added measure" << endl;
   }
-  catch (iException &e) {
-    e.Report(false);
-    e.Clear();
+  catch (IException &e) {
+    e.print();
   }
   cout << endl;
-  
+
   cout << "Testing getMeasures method...\n";
   QList< ControlMeasure * > measures = graphNode.getMeasures();
   foreach (ControlMeasure * measure, measures) {
     cout << "   (" << measure->GetCubeSerialNumber() << ")\n";
   }
-  
+
   cout << "\nTesting getValidMeasures method...\n";
   measures[0]->SetIgnored(true);
   measures = graphNode.getValidMeasures();

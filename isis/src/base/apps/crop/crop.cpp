@@ -4,7 +4,7 @@
 #include "SpecialPixel.h"
 #include "LineManager.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "Projection.h"
 #include "AlphaCube.h"
 #include "Table.h"
@@ -53,13 +53,13 @@ void IsisMain() {
   if(ss > cube.getSampleCount()) {
     cube.close();
     string msg = "[SAMPLE] exceeds number of samples in the [FROM] cube";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   if(sl > cube.getLineCount()) {
     cube.close();
     string msg = "[LINE] exceeds number of lines in the [FROM] cube";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // Make sure the number of elements do not fall outside the cube
@@ -67,14 +67,14 @@ void IsisMain() {
     cube.close();
     string msg = "[SAMPLE+NSAMPLES-1] exceeds number of ";
     msg += "samples in the [FROM] cube";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   if(el > cube.getLineCount()) {
     cube.close();
     string msg = "[LINE+NLINES-1] exceeds number of ";
     msg += "lines in the [FROM] cube";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // Determine the size of the output cube and then update the image size

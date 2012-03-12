@@ -34,7 +34,7 @@
 #include "Progress.h"
 #include "Pvl.h"
 #include "SpecialPixel.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 
 using namespace std;
@@ -90,9 +90,9 @@ namespace Isis {
     else if(instDataRate >= 203.0 && instDataRate <= 204.0) p_telemetryRate = 32;
     else if(instDataRate >= 304.0 && instDataRate <= 305.0) p_telemetryRate = 40;
     else if(instDataRate >= 365.0 && instDataRate <= 366.0) p_telemetryRate = 48;
-    else throw iException::Message(iException::Pvl,
-                                     "Input file contains invalid InstrumentDataRate. See Software Interface Specification (SIS), Version 1.1, page 31.",
-                                     _FILEINFO_);
+    else throw IException(IException::Unknown,
+                          "Input file contains invalid InstrumentDataRate. See Software Interface Specification (SIS), Version 1.1, page 31.",
+                          _FILEINFO_);
 
     p_readoutOrder = cissLab.ReadoutOrder();
 
@@ -107,9 +107,9 @@ namespace Isis {
         p_lines   = 256;
         break;
       default:
-        throw iException::Message(iException::Pvl,
-                                  "Input file contains invalid SummingMode. See Software Interface Specification (SIS), Version 1.1, page 31.",
-                                  _FILEINFO_);
+        throw IException(IException::Unknown,
+                         "Input file contains invalid SummingMode. See Software Interface Specification (SIS), Version 1.1, page 31.",
+                         _FILEINFO_);
     }
     p_samples = p_lines;
     p_startTime.resize(p_samples);
@@ -132,11 +132,11 @@ namespace Isis {
   *
   * @returns <b>vector \<vector \<double\> \></b> Final array of
   *         dark current DNs to be subtracted
-  * @throws Isis::iException::Pvl If the input image has an
+  * @throws Isis::IException::Pvl If the input image has an
   *             unknown ReadoutCycleIndex or DelayedReadoutFlag.
-  * @throws Isis::iException::Pvl If the input image has an
+  * @throws Isis::IException::Pvl If the input image has an
   *             invalid GainModeId.
-  * @throws Isis::iException::Math If MakeDarkArray() returns a
+  * @throws Isis::IException::Math If MakeDarkArray() returns a
   *             vector of zeros.
   * @see MakeDarkArray()
   *
@@ -147,14 +147,14 @@ namespace Isis {
   */
   vector <vector <double> > DarkCurrent::ComputeDarkDN() { //get dark_DN
     if(p_readoutIndex == -999) {
-      throw iException::Message(iException::Pvl,
+      throw IException(IException::Unknown,
                                 "Readout cycle index is unknown.",
                                 _FILEINFO_);
     }
     if(p_btsm == -1) {
-      throw iException::Message(iException::Pvl,
-                                "Delayed readout flag is unknown.",
-                                _FILEINFO_);
+      throw IException(IException::Unknown,
+                       "Delayed readout flag is unknown.",
+                       _FILEINFO_);
     }
     vector <vector <double> > dark_e(p_samples), dark_DN(p_samples);
     for(unsigned int i = 0; i < dark_e.size(); i++) {
@@ -191,9 +191,9 @@ namespace Isis {
             gainRatio = 2.357285;
             break;
           default:
-            throw iException::Message(iException::Pvl,
-                                      "Input file contains invalid GainModeId. See Software Interface Specification (SIS), Version 1.1, page 29.",
-                                      _FILEINFO_);
+            throw IException(IException::Unknown,
+                             "Input file contains invalid GainModeId. See Software Interface Specification (SIS), Version 1.1, page 29.",
+                             _FILEINFO_);
         }
       }
       else {
@@ -212,9 +212,9 @@ namespace Isis {
             gainRatio = 2.360374;
             break;
           default:
-            throw iException::Message(iException::Pvl,
-                                      "Input file contains invalid GainModeId. See Software Interface Specification (SIS), Version 1.1, page 29.",
-                                      _FILEINFO_);
+            throw IException(IException::Unknown,
+                             "Input file contains invalid GainModeId. See Software Interface Specification (SIS), Version 1.1, page 29.",
+                             _FILEINFO_);
         }
       }
       for(unsigned int i = 0; i < dark_e.size(); i++) {
@@ -225,9 +225,9 @@ namespace Isis {
       return dark_DN;
     }
     else {
-      throw iException::Message(iException::Math,
-                                "Error in dark simulation; dark array conatains all zeros.",
-                                _FILEINFO_);
+      throw IException(IException::Unknown,
+                       "Error in dark simulation; dark array conatains all zeros.",
+                       _FILEINFO_);
     }
   }//end ComputeDarkDN
 
@@ -271,7 +271,7 @@ namespace Isis {
     int line = lline - 1;       //lline is from 1 to 1024 => line is from 0 to 1023
     if(line < 0 || line > 1023) {
       iString msg = "DarkCurrent: For ComputeLineTime(lline), lline must be between 1 and 1024." + iString(lline) + " out of range";
-      throw iException::Message(iException::Programmer, msg.c_str() , _FILEINFO_);
+      throw IException(IException::Programmer, msg.c_str() , _FILEINFO_);
     }
 
     double r1 = 0;
@@ -287,9 +287,9 @@ namespace Isis {
           r1 = 201.734;
           break;
         default:
-          throw iException::Message(iException::Pvl,
-                                    "Input file contains invalid number of lines. See Software Interface Specification (SIS), Version 1.1, page 50.",
-                                    _FILEINFO_);
+          throw IException(IException::Unknown,
+                           "Input file contains invalid number of lines. See Software Interface Specification (SIS), Version 1.1, page 50.",
+                           _FILEINFO_);
       }
       double linetime = t0 + line / r1;
       return linetime;
@@ -593,7 +593,7 @@ namespace Isis {
           case 512: {  // sum2, not converted
             rate0 = 90.568;
             slope = 0.3671; // +/- 0.0255
-            
+
             if(fsw >= 1.4) {
               correction = 1.0034;
             }
@@ -938,9 +938,9 @@ namespace Isis {
           readout = 6;
           break;
         default:
-          throw iException::Message(iException::Pvl,
-                                    "Input file contains invalid ReadoutCycleIndex. See Software Interface Specification (SIS), Version 1.1, page 40.",
-                                    _FILEINFO_);
+          throw IException(IException::Unknown,
+                           "Input file contains invalid ReadoutCycleIndex. See Software Interface Specification (SIS), Version 1.1, page 40.",
+                           _FILEINFO_);
       }
       double t1;
       if(readout * (6.0 / ((double)(tlm))) - ((int) readout * (6.0 / ((double)(tlm)))) < .5) {
@@ -1130,14 +1130,14 @@ namespace Isis {
     // this method mimics makedarkarray method of cassimg_subtractdark.pro from idl's cisscal program
     FindDarkFiles();
     if(!p_dparamfile.Exists()) {
-      throw iException::Message(iException::Io,
-                                "DarkParameterFile ***"
-                                + p_dparamfile.Expanded() + "*** not found.", _FILEINFO_);
+      throw IException(IException::Io,
+                       "DarkParameterFile ***"
+                       + p_dparamfile.Expanded() + "*** not found.", _FILEINFO_);
     }
     if(p_narrow && (!p_bdpath.Exists())) {
-      throw iException::Message(iException::Io,
-                                "BiasDistortionFile ***"
-                                + p_bdpath.Expanded() + "*** not found.", _FILEINFO_);
+      throw IException(IException::Io,
+                       "BiasDistortionFile ***"
+                       + p_bdpath.Expanded() + "*** not found.", _FILEINFO_);
     }
     ComputeTimeArrays();//fill in values for p_startTime, p_endTime, p_duration
     int good = 0;
@@ -1230,9 +1230,9 @@ namespace Isis {
       }
       return dark_e;
     }
-    throw iException::Message(iException::Io,
-                              "StartTime == EndTime for all pixels.",
-                              _FILEINFO_);
+    throw IException(IException::Io,
+                     "StartTime == EndTime for all pixels.",
+                     _FILEINFO_);
   }//end MakeDarkArray
 
   /**

@@ -4,7 +4,7 @@
 
 #include "FileList.h"
 #include "Progress.h"
-#include "iException.h"
+#include "IException.h"
 #include "SerialNumber.h"
 #include "PolygonTools.h"
 #include "ImagePolygon.h"
@@ -24,7 +24,7 @@ void IsisMain() {
   if(imageList.size() < 1) {
     std::string msg = "The list file [" + ui.GetFilename("FROMLIST") +
                       "] does not contain any data";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   Progress prog;
@@ -46,10 +46,10 @@ void IsisMain() {
     try {
       cube.getCamera();
     }
-    catch(iException &e) {
+    catch(IException &e) {
       string msg = "Spiceinit must be run prior to running footprintmerge";
       msg += " for cube [" + imageList[img] + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(e, IException::User, msg, _FILEINFO_);
     }
 
     //  Make sure cube has been run through footprintinit
@@ -58,10 +58,10 @@ void IsisMain() {
       cube.read(*poly);
       cube.close();
     }
-    catch(iException &e) {
+    catch(IException &e) {
       string msg = "Footprintinit must be run prior to running footprintmerge";
       msg += " for cube [" + imageList[img] + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     //  If more than 1 poly, set conv360 for later conversion to 180 and merging

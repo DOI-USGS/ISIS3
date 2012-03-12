@@ -24,7 +24,7 @@
 #include "iString.h"
 #include "TextFile.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "LeastSquares.h"
 #include "Pvl.h"
 #include "naif/SpiceUsr.h"
@@ -50,7 +50,7 @@ namespace Isis {
       if(mission != "VIKING") {
         string msg = "Invalid Keyword [SpacecraftName]. " +  spacecraft +
                      "must start with 'VIKING'";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
       int spn = 0;
       if((char)spacecraft[spacecraft.size() - 1] == '1') spn = 1;
@@ -58,7 +58,7 @@ namespace Isis {
       if(spn == 0) {
         string msg = "Invalid Keyword [SpacecraftName]. " + spacecraft +
                      "must terminate with '1' or '2'";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
       double clock = instrument["SPACECRAFTCLOCKCOUNT"];
       iString instId = (string)instrument["INSTRUMENTID"];
@@ -81,7 +81,7 @@ namespace Isis {
       else {
         string msg = "Invalid Keyword [InstrumentID]. " + instId;
         msg += "must terminate with an 'A' or 'B'";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
 
       string startTime = instrument["STARTTIME"];
@@ -104,9 +104,9 @@ namespace Isis {
       viklinSetup(mission, spn, target, cam, wav, (int)cs1, (int)cs2, (int)cs3, (int)cs4);
       vikoffSetup(mission, spn, target, cam, clock, (int)cs3);
     }
-    catch(iException e) {
+    catch(IException &e) {
       string msg = "Input file [" + fname + "] does not appear to be a viking image";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
 
@@ -126,7 +126,7 @@ namespace Isis {
    * @param cs4 The state of camera 4, set only if camera is 4, and it is an
    *            extended mission
    *
-   * @throws Isis::iException::Programmer - Could not find match in vikcal.sav
+   * @throws Isis::IException::Programmer - Could not find match in vikcal.sav
    */
   void CalParameters::vikcalSetup(string mission, int spn, string target,
                                   int cam, string wav, int cs1, int cs2, int cs3, int cs4) {
@@ -187,7 +187,7 @@ namespace Isis {
       return;
     }
     string msg = "Could not find match in [vikcal.sav] calibration file";
-    throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
   /**
@@ -227,7 +227,7 @@ namespace Isis {
    * @param cs4 The state of camera 4, set only if the camera is 4, and it is an
    *            extended mission
    *
-   * @throws Isis::iException::Programmer - Could not find match in viklin.sav
+   * @throws Isis::IException::Programmer - Could not find match in viklin.sav
    */
   void CalParameters::viklinSetup(string mission, int spn, string target,
                                   int cam, string wav, int cs1, int cs2, int cs3, int cs4) {
@@ -270,7 +270,7 @@ namespace Isis {
       return;
     }
     string msg = "Could not find match in [viklin.sav] calibration file";
-    throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
   /**
@@ -285,7 +285,7 @@ namespace Isis {
    * @param clock The spacecraft clock count found in the input cube label
    * @param cs3 The state of camera 3 found in the input cube label (Offset Mode)
    *
-   * @throws Isis::iException::Programmer - Could not find match in vikoff.sav
+   * @throws Isis::IException::Programmer - Could not find match in vikoff.sav
    */
   void CalParameters::vikoffSetup(string mission, int spn, string target,
                                   int cam, double clock, int cs3) {
@@ -368,7 +368,7 @@ namespace Isis {
       }
       if(frm1 == -1.0 || frm2 == -1.0) {
         string msg = "Could not find match in [vikoff.sav] calibration file";
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
       // Calculate the offset at each point
@@ -413,7 +413,7 @@ namespace Isis {
       return;
     }
     string msg = "Could not find match in [vikoff.sav] calibration file";
-    throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
   /**

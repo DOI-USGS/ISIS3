@@ -21,14 +21,14 @@
  */
 
 #include "CubeInfixToPostfix.h"
-#include "iException.h"
+#include "IException.h"
 
 using namespace std;
 
 namespace Isis {
   /**
    * Constructs a CubeInfixToPostfix converter
-   * 
+   *
    * @author janderson (2/2/2012)
    */
   CubeInfixToPostfix::CubeInfixToPostfix() {
@@ -36,10 +36,10 @@ namespace Isis {
   }
 
   /**
-   * This method is used to create functions that are specific to 
-   * cubes.  Moved the cubemin and cubemax functions out of the 
-   * InfixToPostfix initialization method into this method 
-   * 
+   * This method is used to create functions that are specific to
+   * cubes.  Moved the cubemin and cubemax functions out of the
+   * InfixToPostfix initialization method into this method
+   *
    * @author janderson (2/2/2012)
    */
   void CubeInfixToPostfix::initialize() {
@@ -100,8 +100,7 @@ namespace Isis {
     try {
       return InfixToPostfix::findOperator(representation);
     }
-    catch(iException &e) {
-      e.Clear();
+    catch(IException &) {
     }
 
     bool isFunction = (representation.size() > 1);
@@ -119,7 +118,9 @@ namespace Isis {
       return p_operators[p_operators.size()-1];
     }
 
-    throw iException::Message(iException::User, "The operator '" + representation + "' is not recognized.", _FILEINFO_);
+    throw IException(IException::User,
+                     "The operator '" + representation + "' is not recognized.",
+                     _FILEINFO_);
   }
 
 

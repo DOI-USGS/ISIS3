@@ -32,7 +32,7 @@
 
 #include "Application.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 
 using namespace std;
@@ -67,7 +67,7 @@ namespace Isis {
     if(!isIsisProgram) {
       iString msg = "Program [" + programName + "] does not appear to be a "
           "valid Isis 3 program";
-      throw iException::Message(iException::System, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     iString serverName = "isis_" + Application::UserName() +
@@ -92,10 +92,11 @@ namespace Isis {
 
     if(!connected) {
       iString msg = "Isis child process failed to communicate with parent";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     QLocalSocket *childSocket = server.nextPendingConnection();
+    IException errors;
 
     // Don't return until we're done running this program
     while(childSocket->state() != QLocalSocket::UnconnectedState) {
@@ -130,7 +131,8 @@ namespace Isis {
           }
 
           if(messageDone) {
-            ProcessIsisMessageFromChild(code, message);
+            errors.append(
+              ProcessIsisMessageFromChild(code, message));
             code = "";
             message = "";
             messageDone = false;
@@ -144,7 +146,7 @@ namespace Isis {
     if(childProcess.exitCode() != 0) {
       iString msg = "Running Isis program [" + programName + "] failed with "
                     "return status [" + iString(childProcess.exitCode()) + "]";
-      throw iException::Message(iException::System, msg, _FILEINFO_);
+      throw IException(errors, IException::Unknown, msg, _FILEINFO_);
     }
   }
 
@@ -159,17 +161,17 @@ namespace Isis {
    *            PvlGroup, Pvl, etc... really anything. It depends on the code
    *            parameter.
    */
-  void ProgramLauncher::ProcessIsisMessageFromChild(iString code, iString msg) {
-    if(code == "PROGRESSTEXT") {
-      if(!iApp) return; // cannot process this kind of message from qisis yet
+  IException
+      ProgramLauncher::ProcessIsisMessageFromChild(iString code, iString msg) {
+    IException errors;
+
+    if(code == "PROGRESSTEXT" && iApp) {
       iApp->UpdateProgress(msg, true);
     }
-    else if(code == "PROGRESS") {
-      if(!iApp) return; // cannot process this kind of message from qisis yet
+    else if(code == "PROGRESS" && iApp) {
       iApp->UpdateProgress((int)msg, true);
     }
-    else if(code == "LOG") {
-      if(!iApp) return; // cannot process this kind of message from qisis yet
+    else if(code == "LOG" && iApp) {
       stringstream msgStream;
       msgStream << msg;
       Pvl logPvl;
@@ -181,8 +183,7 @@ namespace Isis {
         iApp->Log(logPvl.Group(0));
       }
     }
-    else if(code == "GUILOG") {
-      if(!iApp) return; // cannot process this kind of message from qisis yet
+    else if(code == "GUILOG" && iApp) {
       iApp->GuiLog(msg);
     }
     else if(code == "ERROR") {
@@ -199,10 +200,12 @@ namespace Isis {
         std::string efile = g["File"];
         int eline = g["Line"];
 
-        iException::Message((iException::errType)ecode,
-                              emsg, efile.c_str(), eline);
+        errors.append(
+          IException((IException::ErrorType)ecode, emsg, efile.c_str(), eline));
       }
     }
+
+    return errors;
   }
 
 
@@ -223,7 +226,7 @@ namespace Isis {
     if(status != 0) {
       iString msg = "Executing command [" + fullCommand +
                     "] failed with return status [" + iString(status) + "]";
-      throw Isis::iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
 }  //end namespace isis

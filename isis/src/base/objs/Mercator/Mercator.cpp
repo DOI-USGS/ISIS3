@@ -23,7 +23,7 @@
 #include <cmath>
 #include <cfloat>
 #include "Mercator.h"
-#include "iException.h"
+#include "IException.h"
 #include "Constants.h"
 
 using namespace std;
@@ -82,9 +82,9 @@ namespace Isis {
       double p_eccsq = Eccentricity() * Eccentricity();
       p_scalefactor = cos_clat / sqrt(1.0 - p_eccsq * sin_clat * sin_clat);
     }
-    catch(Isis::iException &e) {
+    catch (IException &e) {
       string message = "Invalid label group [Mapping]";
-      throw Isis::iException::Message(Isis::iException::Io, message, _FILEINFO_);
+      throw IException(e, IException::Io, message, _FILEINFO_);
     }
   }
 

@@ -81,9 +81,9 @@ void IsisMain() {
         }
       }
       else {
-        throw iException::Message(iException::User,
-                                  "The file [" + ui.GetFilename("FROM") + "] contains unsupported data type.",
-                                  _FILEINFO_);
+        throw IException(IException::User,
+                         "The file [" + ui.GetFilename("FROM") + "] contains unsupported data type.",
+                         _FILEINFO_);
       }
       jp.SetInputFile(iString(ui.GetFilename("FROM")));
       jp.SetOutputCube("TO");
@@ -91,10 +91,10 @@ void IsisMain() {
       jp.StartProcess();
       jp.EndProcess();
     }
-    catch(Isis::iException &e) {
-      throw iException::Message(iException::User,
-                                "The file [" + ui.GetFilename("FROM") + "] does not contain a recognized image format.",
-                                _FILEINFO_);
+    catch(IException &e) {
+      throw IException(IException::User,
+                       "The file [" + ui.GetFilename("FROM") + "] does not contain a recognized image format.",
+                       _FILEINFO_);
     }
   }
   else {
@@ -181,7 +181,7 @@ void toRGBCube(Buffer &out) {
   }
   else {
     string msg = "RGB cubes must have exactly three bands.";
-    throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
   line++;
@@ -218,7 +218,7 @@ void toARGBCube(Buffer &out) {
   }
   else {
     string msg = "ARGB cubes must have exactly four bands.";
-    throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
   line++;

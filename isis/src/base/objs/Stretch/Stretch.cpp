@@ -25,7 +25,7 @@
 #include "Histogram.h"
 #include "iString.h"
 #include "SpecialPixel.h"
-#include "iException.h"
+#include "IException.h"
 #include "Pvl.h"
 
 using namespace std;
@@ -54,14 +54,14 @@ namespace Isis {
    *
    * @param output Output value when the input is mapped
    *
-   * @throws Isis::iException::Programmer - input pairs must be in ascending
+   * @throws Isis::IException::Programmer - input pairs must be in ascending
    *                                        order
    */
   void Stretch::AddPair(const double input, const double output) {
     if(p_pairs > 0) {
       if(input <= p_input[p_pairs-1]) {
         string msg = "Input pairs must be in ascending order";
-        throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       }
     }
 
@@ -149,7 +149,7 @@ namespace Isis {
   * @param pairs A string containing stretch pairs for example
   *              "0:0 50:0 100:255 255:255"
   *
-  * @throws Isis::iException::User - invalid stretch pair
+  * @throws Isis::IException::User - invalid stretch pair
   *
   * @return std::pair of doubles where first is the first input and
   *         second is the first output
@@ -164,8 +164,8 @@ namespace Isis {
 
     // do output side but first check for empty string
     if(pairs.length() == 0) {
-      throw Isis::iException::Message(Isis::iException::User, "Invalid stretch pairs [" +
-                                      pairs + "]", _FILEINFO_);
+      throw IException(IException::User, "Invalid stretch pairs [" +
+                       pairs + "]", _FILEINFO_);
     }
     pairs.TrimHead(" \t\r\n\v\f");
     temp = pairs.Token(" \t\r\n\v\f");
@@ -186,7 +186,7 @@ namespace Isis {
    * @param pairs A string containing stretch pairs for example
    *              "0:0 50:0 100:255 255:255"
    *
-   * @throws Isis::iException::User - invalid stretch pair
+   * @throws Isis::IException::User - invalid stretch pair
    */
   void Stretch::Parse(const std::string &pairs) {
     // Zero out the stretch arrays
@@ -205,8 +205,8 @@ namespace Isis {
       }
     }
 
-    catch(Isis::iException &e) {
-      throw Isis::iException::Message(Isis::iException::User, "Invalid stretch pairs [" + pairs + "]", _FILEINFO_);
+    catch(IException &e) {
+      throw IException(e, IException::User, "Invalid stretch pairs [" + pairs + "]", _FILEINFO_);
     }
   }
 
@@ -221,7 +221,7 @@ namespace Isis {
    * @param pairs A string containing stretch pairs for example
    *              "0:0 50:0 100:255"
    *
-   * @throws Isis::iException::User - invalid stretch pair
+   * @throws Isis::IException::User - invalid stretch pair
    */
   void Stretch::Parse(const std::string &pairs, const Isis::Histogram *hist) {
     // Zero out the stretch arrays
@@ -262,9 +262,9 @@ namespace Isis {
       }
     }
 
-    catch(Isis::iException &e) {
-      throw Isis::iException::Message(Isis::iException::User, "Invalid stretch pairs [" +
-                                      pairs + "]", _FILEINFO_);
+    catch(IException &e) {
+      throw IException(e, IException::User, "Invalid stretch pairs [" +
+                       pairs + "]", _FILEINFO_);
     }
   }
 
@@ -355,7 +355,7 @@ namespace Isis {
 
     if(inputs.Size() != outputs.Size()) {
       std::string msg = "Invalid Pvl file: The number of Input values must equal the number of Output values";
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     for(int i = 0; i < inputs.Size(); i++) {
       AddPair(inputs[i], outputs[i]);

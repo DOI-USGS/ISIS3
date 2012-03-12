@@ -22,7 +22,7 @@
 #include "MiniRF.h"
 #include "iString.h"
 #include "iTime.h"
-#include "iException.h"
+#include "IException.h"
 #include "RadarPulseMap.h"
 #include "RadarGroundRangeMap.h"
 #include "RadarSlantRangeMap.h"
@@ -165,25 +165,25 @@ namespace Isis {
   }
 
   /**
-   * CK frame ID.  This is an overridden method for the Camera class pure 
+   * CK frame ID.  This is an overridden method for the Camera class pure
    * virtual method. It will always throw an error for MiniRF models.
    * @throw iException - "Cannot generate CK for MiniRF."
-   * @return @b int 
+   * @return @b int
    */
   int MiniRF::CkFrameId() const {
     std::string msg = "Cannot generate CK for MiniRF";
-    throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   /**
-   * CK Reference ID.  This is an overridden method for the Camera class pure 
+   * CK Reference ID.  This is an overridden method for the Camera class pure
    * virtual method. It will always throw an error for MiniRF models.
    * @throw iException - "Cannot generate CK for MiniRF."
-   * @return @b int 
+   * @return @b int
    */
   int MiniRF::CkReferenceId() const {
     std::string msg = "Cannot generate CK for MiniRF";
-    throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 }
 

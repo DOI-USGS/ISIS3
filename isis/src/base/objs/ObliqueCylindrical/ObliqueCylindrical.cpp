@@ -23,7 +23,7 @@
 #include <cmath>
 #include <cfloat>
 #include "ObliqueCylindrical.h"
-#include "iException.h"
+#include "IException.h"
 #include "Constants.h"
 #include "naif/SpiceUsr.h"
 
@@ -56,25 +56,25 @@ namespace Isis {
       }
 
       if(p_poleLatitude < -90 || p_poleLatitude > 90) {
-        throw iException::Message(iException::Pvl,
-                                  "Pole latitude must be between -90 and 90.",
-                                  _FILEINFO_);
+        throw IException(IException::Unknown,
+                         "Pole latitude must be between -90 and 90.",
+                         _FILEINFO_);
       }
 
       p_poleLongitude = mapGroup["PoleLongitude"];
 
       if(p_poleLongitude < -360 || p_poleLongitude > 360) {
-        throw iException::Message(iException::Pvl,
-                                  "Pole longitude must be between -360 and 360.",
-                                  _FILEINFO_);
+        throw IException(IException::Unknown,
+                         "Pole longitude must be between -360 and 360.",
+                         _FILEINFO_);
       }
 
       p_poleRotation = mapGroup["PoleRotation"];
 
       if(p_poleRotation < -360 || p_poleRotation > 360) {
-        throw iException::Message(iException::Pvl,
-                                  "Pole rotation must be between -360 and 360.",
-                                  _FILEINFO_);
+        throw IException(IException::Unknown,
+                         "Pole rotation must be between -360 and 360.",
+                         _FILEINFO_);
       }
 
       bool calculateVectors = false;
@@ -146,9 +146,9 @@ namespace Isis {
 
       init();
     }
-    catch(Isis::iException &e) {
+    catch(IException &e) {
       string message = "Invalid label group [Mapping]";
-      throw Isis::iException::Message(Isis::iException::Io, message, _FILEINFO_);
+      throw IException(e, IException::Io, message, _FILEINFO_);
     }
   }
 
@@ -529,9 +529,9 @@ namespace Isis {
     * Check that p_equatorialRadius isn't zero because we'll divide by it later
     *******************************************************************************/
     if(abs(p_equatorialRadius) <= DBL_EPSILON) {
-      throw iException::Message(iException::Pvl,
-                                "The input center latitude is too close to a pole which will result in a division by zero.",
-                                _FILEINFO_);
+      throw IException(IException::Unknown,
+                       "The input center latitude is too close to a pole which will result in a division by zero.",
+                       _FILEINFO_);
     }
   }
 

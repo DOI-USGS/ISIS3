@@ -31,7 +31,7 @@
 #include "Cube.h"
 #include "Camera.h"
 #include "SpiceManager.h"
-#include "iException.h"
+#include "IException.h"
 
 namespace Isis {
 

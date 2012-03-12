@@ -29,7 +29,7 @@
 #include <QMessageBox>
 
 #include "WarningWidget.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 
 namespace Isis {

@@ -22,6 +22,8 @@
 
 #include "LineManager.h"
 
+#include "IException.h"
+
 using namespace std;
 namespace Isis {
 
@@ -56,12 +58,12 @@ namespace Isis {
   bool LineManager::SetLine(const int line, const int band) {
     if(line < 1) {
       string message = "Invalid value for argument [line]";
-      throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+      throw IException(IException::Programmer, message, _FILEINFO_);
     }
 
     if(band < 1) {
       string message = "Invalid value for argument [band]";
-      throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+      throw IException(IException::Programmer, message, _FILEINFO_);
     }
 
     int map = (band - 1) * MaxLines() + line - 1;

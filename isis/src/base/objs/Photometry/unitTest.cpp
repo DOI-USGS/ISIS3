@@ -3,7 +3,7 @@
 #include "Photometry.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
-#include "iException.h"
+#include "IException.h"
 #include "Preference.h"
 
 using namespace Isis;
@@ -184,8 +184,8 @@ int main() {
     std::cerr << "Tolerance = " << tolerance << "\n";
     std::cerr << "brentsolvers Root = " << root << "\n";
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   return 0;

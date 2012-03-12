@@ -37,22 +37,21 @@ void IsisMain() {
       //   the center will work.
       if(!cam->SetImage(icube->getSampleCount() / 2, icube->getLineCount() / 2)) {
         // Get into the catch(...)
-        throw iException::Message(iException::Programmer, "", _FILEINFO_);
+        throw IException(IException::Programmer, "", _FILEINFO_);
       }
 
       // Convert resolution to the DN value's unit (easier)
       resolution[0] = cam->SampleResolution() / ui.GetDouble("CONVERSION");;
       resolution[1] = cam->LineResolution()   / ui.GetDouble("CONVERSION");;
     }
-    catch(iException &e) {
+    catch(IException &) {
       // Failed at getting the camera, reset our exception and try again with the projection
-      e.Clear();
 
       Projection *proj = icube->getProjection();
 
       if(!proj->SetWorld(icube->getSampleCount() / 2, icube->getLineCount() / 2)) {
         iString message = "Failed to SetWorld at the center of the image";
-        throw iException::Message(iException::Programmer, message, _FILEINFO_);
+        throw IException(IException::Programmer, message, _FILEINFO_);
       }
 
       // Convert resolution to the DN value's unit (easier)

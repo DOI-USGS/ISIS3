@@ -14,7 +14,7 @@
 #include "BasisFunction.h"
 #include "PolynomialUnivariate.h"
 #include "iString.h"
-#include "iException.h"
+#include "IException.h"
 #include "Table.h"
 #include "NaifStatus.h"
 
@@ -103,7 +103,7 @@ namespace Isis {
 
     if(!found) {
       std::string msg = "Cannot find [" + key + "] in text kernels";
-      throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+      throw IException(IException::Io, msg, _FILEINFO_);
     }
 
     p_axisV = 2;
@@ -233,7 +233,7 @@ namespace Isis {
               (SpiceDouble( *)[3]) &p_CJ[0]);
 
       if(p_hasAngularVelocity) {
-        if( p_degree == 0) 
+        if( p_degree == 0)
           p_av = p_cacheAv[0];
         else
           ComputeAv();
@@ -274,13 +274,13 @@ namespace Isis {
           if(eqstr_c(naifstr, "SPICE(UNKNOWNFRAME)")) {
             Isis::iString msg = Isis::iString((int) p_constantFrames[0]) + " is an unrecognized " +
                                 "reference frame code.  Has the mission frames kernel been loaded?";
-            throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+            throw IException(IException::Io, msg, _FILEINFO_);
           }
           else {
             Isis::iString msg = "No pointing available at requested time [" +
                                 Isis::iString(p_et + p_timeBias) + "] for frame code [" +
                                 Isis::iString((int) p_constantFrames[0]) + "]";
-            throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+            throw IException(IException::Io, msg, _FILEINFO_);
           }
         }
 
@@ -340,23 +340,23 @@ namespace Isis {
     // Check for valid arguments
     if(size <= 0) {
       std::string msg = "Argument cacheSize must not be less or equal to zero";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if(startTime > endTime) {
       std::string msg = "Argument startTime must be less than or equal to endTime";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if((startTime != endTime) && (size == 1)) {
       std::string msg = "Cache size must be more than 1 if startTime endTime differ";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     // Make sure cache isn't already loaded
     if(p_source == Memcache) {
       std::string msg = "A SpiceRotation cache has already been created";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     // Save full cache parameters
@@ -562,7 +562,7 @@ namespace Isis {
     }
     else  {
       std::string msg = "Expecting either three, five, or eight fields in the SpiceRotation table";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
 
@@ -585,14 +585,14 @@ namespace Isis {
     // Make sure source is Function
     if(p_source != Function) {
       std::string msg = "The SpiceRotation has not yet been fit to a function";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     // Clear existing matrices from cache
     p_cacheTime.clear();
     p_cache.clear();
 
-    // Clear the angular velocity cache if we can calculate it instead.  It can't be calculated for 
+    // Clear the angular velocity cache if we can calculate it instead.  It can't be calculated for
     // functions of degree 0 (framing cameras), so keep the original av.  It is better than nothing.
     if (p_degree > 0  && p_cacheAv.size() > 1)  p_cacheAv.clear();
 
@@ -639,7 +639,7 @@ namespace Isis {
 
     if(p_source != Memcache) {
       std::string msg = "Only cached rotations can be  returned as a line cache of quaternions and time";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     // Load the table and return it to caller
     return Cache(tableName);
@@ -749,7 +749,7 @@ namespace Isis {
     else {
       // throw an error -- should not get here -- invalid Spice Source
       std::string msg = "To create table source of data must be either Memcache or Function";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
   }
@@ -808,7 +808,7 @@ namespace Isis {
   */
   std::vector<double> SpiceRotation::GetCenterAngles() {
     // Compute the center time
-    double etCenter = (p_fullCacheEndTime + p_fullCacheStartTime) / 2.; 
+    double etCenter = (p_fullCacheEndTime + p_fullCacheStartTime) / 2.;
     SetEphemerisTime(etCenter);
 
     return Angles(p_axis3, p_axis2, p_axis1);
@@ -924,7 +924,7 @@ namespace Isis {
       // Nothing to do
       return;
 //      std::string msg = "Rotation already fit to a polynomial -- spiceint first to refit";
-//      throw Isis::iException::Message(Isis::iException::User,msg,_FILEINFO_);
+//      throw IException(IException::User,msg,_FILEINFO_);
     }
 
     // Adjust degree of polynomial on available data
@@ -1167,7 +1167,7 @@ namespace Isis {
     }
     else {
       Isis::iString msg = "Coeff index, " + Isis::iString(coeffIndex) + " exceeds degree of polynomial";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     return derivative;
   }
@@ -1336,7 +1336,7 @@ namespace Isis {
   void SpiceRotation::SetAxes(int axis1, int axis2, int axis3) {
     if(axis1 < 1  ||  axis2 < 1  || axis3 < 1  || axis1 > 3  || axis2 > 3  || axis3 > 3) {
       std::string msg = "A rotation axis is outside the valid range of 1 to 3";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     p_axis1 = axis1;
     p_axis2 = axis2;
@@ -1367,7 +1367,7 @@ namespace Isis {
       if(p_fullCacheSize != (int) p_cache.size()) {
 
         Isis::iString msg = "Full cache size does NOT match cache size in LoadTimeCache -- should never happen";
-        throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
       SpiceDouble timeSclkdp[p_fullCacheSize];
@@ -1459,7 +1459,7 @@ namespace Isis {
         if(ic[2] == 5) break;
         if(ic[2] != 3) {
           std::string msg = "Time fetching method only works on type 3 and 5 ck";
-          throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+          throw IException(IException::Programmer, msg, _FILEINFO_);
         }
 
         // Check times for type 3 ck segment if spacecraft matches
@@ -1476,7 +1476,7 @@ namespace Isis {
             // cross a segment unless the next segment starts where the current one ends
             if(observationSpansToNextSegment && currentTime > segStartEt) {
               std::string msg = "Observation crosses segment boundary--unable to interpolate pointing";
-              throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+              throw IException(IException::Programmer, msg, _FILEINFO_);
             }
             if(observEnd > segStopEt) {
               observationSpansToNextSegment = true;
@@ -1536,7 +1536,7 @@ namespace Isis {
     }
     else if(count == 0  &&  p_source != Nadir  &&  p_minimizeCache == Yes) {
       std::string msg = "No camera kernels loaded...Unable to determine time cache to downsize";
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     // Load times according to cache size (body rotations) -- handle first round of type 5 ck case and multiple ck case --
@@ -1559,7 +1559,7 @@ namespace Isis {
     // No time cache was initialized -- throw an error
     if(p_fullCacheSize < 1) {
       std::string msg = "Time cache not available -- rerun spiceinit";
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     std::vector<double> fullCacheTime;
@@ -1600,7 +1600,7 @@ namespace Isis {
         }
 
         std::string msg = "The frame" + iString((int) frameCodes[frmidx]) + " is not supported by Naif";
-        throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
       double matrix[3][3];
@@ -1621,14 +1621,14 @@ namespace Isis {
 
           std::string msg = "The ck rotation from frame " + iString(frameCodes[frmidx]) + " can not be found"
                             + " due to no pointing available at requested time or a problem with the frame";
-          throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+          throw IException(IException::Programmer, msg, _FILEINFO_);
         }
       }
       else if(type == TK) {
         tkfram_((SpiceInt *) &typid, (double *) matrix, &nextFrame, (logical *) &found);
         if(!found) {
           std::string msg = "The tk rotation from frame " + iString(frameCodes[frmidx]) + " can not be found";
-          throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+          throw IException(IException::Programmer, msg, _FILEINFO_);
         }
       }
       else if(type == DYN) {
@@ -1645,7 +1645,7 @@ namespace Isis {
         std::string msg = "The frame " + iString(frameCodes[frmidx]) +
                           " has a type " + iString(type) + " not supported by your version of Naif Spicelib." +
                           "You need to update.";
-        throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+        throw IException(IException::Programmer, msg, _FILEINFO_);
 
       }
       frameCodes.push_back(nextFrame);
@@ -1746,7 +1746,7 @@ namespace Isis {
     // Make sure the angles have been fit to polynomials
     if(p_source != Function) {
       std::string msg = "The SpiceRotation pointing angles must be fit to polynomials in order to compute angular velocity";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     std::vector<double> dCJdt;
@@ -1875,7 +1875,7 @@ namespace Isis {
     NaifStatus::CheckErrors();
 
     if(!p_hasAngularVelocity) return p_CJ;
-      
+
     double diffTime = timeEt - p_et;
     std::vector<double> CJ(9,0.);
     double dmat[3][3];
@@ -1892,7 +1892,7 @@ namespace Isis {
    /** Set the full cache time parameters.
     *
     * @param [in]   startTime The earliest time of the full cache coverage
-    * @param [in]   endTime   The latest time of the full cache coverage 
+    * @param [in]   endTime   The latest time of the full cache coverage
     * @param [in]   cacheSize The number of epochs in the full (line) cache
     *
     */

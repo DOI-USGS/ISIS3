@@ -27,7 +27,7 @@
 #include <sstream>
 
 #include "Preference.h"
-#include "iException.h"
+#include "IException.h"
 #include "LineManager.h"
 #include "Pvl.h"
 #include "PixelType.h"
@@ -51,7 +51,7 @@ namespace Isis {
 
     if(!vicFile) {
       string msg = "Cannot open vicar file [" + vicarFile + "]";
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     try {
@@ -84,7 +84,7 @@ namespace Isis {
       if(pixType == "REAL") pixelType = Real;
       if(pixelType == None) {
         string msg = "Unsupported pixel type [FORMAT=" + pixType + "]";
-        throw iException::Message(iException::Io, msg, _FILEINFO_);
+        throw IException(IException::Io, msg, _FILEINFO_);
       }
       SetPixelType(pixelType);
 
@@ -108,7 +108,7 @@ namespace Isis {
       }
       else {
         string msg = "Unsupported file organization [" + organization + "]";
-        throw iException::Message(iException::Io, msg, _FILEINFO_);
+        throw IException(IException::Io, msg, _FILEINFO_);
       }
 
       // See if there is end-of-dataset labels
@@ -135,9 +135,9 @@ namespace Isis {
         }
       }
     }
-    catch(iException &e) {
+    catch(IException &e) {
       string msg = "Input file [" + vicarFile + "] does not appear to be a vicar file";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     SetInputFile(vicarFile);
@@ -171,7 +171,7 @@ namespace Isis {
       // we're totally lost at this point
       if(pos == 1023) {
         string msg = "Cannot find label size in VICAR file";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
     }
 

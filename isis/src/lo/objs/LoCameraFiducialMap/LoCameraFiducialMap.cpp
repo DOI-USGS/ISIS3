@@ -34,11 +34,11 @@ namespace Isis {
 
 
   /**
-   *  
-   * Reads the fiducials from the instrument group of the labels 
+   *
+   * Reads the fiducials from the instrument group of the labels
    * @param inst Instrument group from the Pvl labels
-   * 
-   * @throws iException::User - "Unable to read fiducial mapping from cube 
+   *
+   * @throws IException::User - "Unable to read fiducial mapping from cube
    *             labels - Input cube must be processed in Isis 2 through
    *             lofixlabel and converted to Isis 3 with pds2isis"
    */
@@ -59,11 +59,11 @@ namespace Isis {
         p_fidYCoords.push_back(fYs[i]);
       }
     }
-    catch(iException &e) {
+    catch(IException &e) {
       string msg = "Unable to read fiducial mapping from cube labels - ";
       msg += "Input cube must be processed in Isis 2 through lofixlabel ";
       msg += "and converted to Isis 3 with pds2isis";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(e, IException::User, msg, _FILEINFO_);
     }
   }
 
@@ -71,9 +71,9 @@ namespace Isis {
   /**
    * Creates focal plane affine transform.
    * @param xdir The x-axis direction.
-   * 
-   * 
-   * @throws iException::User - "Unable to create fiducial map."
+   *
+   *
+   * @throws IException::User - "Unable to create fiducial map."
    */
   void LoCameraFiducialMap::CreateTrans(int xdir) {
     // Setup focal plane map
@@ -85,9 +85,9 @@ namespace Isis {
                      p_fidSamples.size());
 
     }
-    catch(iException &e) {
+    catch(IException &e) {
       string msg = "Unable to create fiducial map.";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     // Get the coefficients

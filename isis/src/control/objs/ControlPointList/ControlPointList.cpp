@@ -2,7 +2,7 @@
 
 #include <QList>
 
-#include "iException.h"
+#include "IException.h"
 #include "FileList.h"
 #include "Filename.h"
 #include "iString.h"
@@ -27,10 +27,10 @@ namespace Isis {
       //sort the list for faster searches - internally uses qsort()
       mqCpList.sort();
     }
-    catch(iException &e) {
-      std::string msg = "Can't open or invalid file list [" + 
+    catch(IException &e) {
+      std::string msg = "Can't open or invalid file list [" +
           psListFile.Expanded() + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(e, IException::User, msg, _FILEINFO_);
     }
   }
 
@@ -85,7 +85,7 @@ namespace Isis {
     else {
       iString num = iString(piIndex);
       std::string msg = "Index [" + (std::string) num + "] is invalid";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
 
@@ -103,7 +103,7 @@ namespace Isis {
     else {
       std::string msg = "Requested control point id [" + psCpId + "] ";
       msg += "does not exist in the list";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
 

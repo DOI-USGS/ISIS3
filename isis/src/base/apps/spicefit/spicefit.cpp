@@ -2,7 +2,7 @@
 #include "Cube.h"
 #include "Table.h"
 #include "Camera.h"
-#include "iException.h"
+#include "IException.h"
 #include "CameraDetectorMap.h"
 
 using namespace std;
@@ -24,7 +24,7 @@ void IsisMain() {
     Camera *cam = cube.getCamera();
     if(cam->DetectorMap()->LineRate() == 0.0) {
       string msg = "[" + ui.GetFilename("FROM") + "] is not a line scan camera";
-      throw iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     cam->InstrumentRotation()->SetPolynomial();
 
@@ -43,8 +43,8 @@ void IsisMain() {
     cube.write(cmatrix);
     cube.close();
   }
-  catch(iException &e) {
+  catch(IException &e) {
     string msg = "Unable to fit pointing for [" + ui.GetFilename("FROM") + "]";
-    throw iException::Message(Isis::iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 }

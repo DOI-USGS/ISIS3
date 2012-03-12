@@ -12,7 +12,7 @@
 #include "Cube.h"
 
 #include "PvlGroup.h"
-#include "iException.h"
+#include "IException.h"
 
 using namespace std;
 using namespace Isis;
@@ -45,12 +45,12 @@ void IsisMain () {
 
         if ( backplaneCai.Bands().size() != 3 ) {
             string msg = "Invalid Backplane: The backplane must be exactly 3 bands";
-            throw iException::Message(iException::User, msg, _FILEINFO_);
+            throw IException(IException::User, msg, _FILEINFO_);
         }
 
         if (icube->getBandCount() != 1) {
             string msg = "Invalid Image: The backplane option can only be used with a single image band at a time.";
-            throw iException::Message(iException::User, msg, _FILEINFO_);
+            throw IException(IException::User, msg, _FILEINFO_);
         }
 
         CubeAttributeInput cai;
@@ -85,7 +85,7 @@ void IsisMain () {
         string msg = " Algorithm Name [" + algoName + "] not recognized. ";
         msg += "Compatible Algorithms are:\n    Hillier\n    Exponential\n    HapkeExponential";
 
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
     }
 
     pho->SetMinimumPhaseAngle(ui.GetDouble("MINPHASE"));

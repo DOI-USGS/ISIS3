@@ -1,7 +1,7 @@
 #include "NaifStatus.h"
 #include "naif/SpiceUsr.h"
 #include "Preference.h"
-#include "iException.h"
+#include "IException.h"
 
 using namespace Isis;
 
@@ -20,8 +20,8 @@ int main() {
     erract_c("SET", (SpiceInt)0, tmp);
     NaifStatus::CheckErrors();
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
 }

@@ -224,7 +224,7 @@ namespace Isis {
     if(p_groundMap == NULL ||
         (p_grid == NULL && p_latLinesGrid == NULL && p_lonLinesGrid == NULL)) {
       iString msg = "GroundGrid::CreateGrid missing ground map or grid array";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if(p_reinitialize) {
@@ -272,7 +272,7 @@ namespace Isis {
 
       // I chose parse because it's not really the user's fault or the
       //   programmer's. It's a stripped keyword in a Pvl.
-      throw iException::Message(iException::Parse, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     // subsequent calls to this method must always reinitialize the grid
@@ -306,7 +306,7 @@ namespace Isis {
 
       if(numSteps <= 0) {
         iString msg = "No gridlines would intersect the image";
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
       progress->SetMaximumSteps((long)(numSteps + 0.5));
@@ -554,7 +554,7 @@ namespace Isis {
     }
     else {
       iString msg = "GroundGrid::SetGridBit no grids available";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
 
@@ -592,7 +592,7 @@ namespace Isis {
     }
     else {
       iString msg = "GroundGrid::GetGridBit no grids available";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     return result;

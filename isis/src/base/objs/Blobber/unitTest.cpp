@@ -2,7 +2,7 @@
 #include "Preference.h"
 #include "SpecialPixel.h"
 #include "Blobber.h"
-#include "iException.h"
+#include "IException.h"
 #include "Cube.h"
 
 using namespace std;
@@ -147,8 +147,8 @@ int main(int argc, char *argv[]) {
       nfailed++;
     }
   }
-  catch(Isis::iException &e) {
-    e.Report();
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   //  Return status

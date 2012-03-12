@@ -107,8 +107,8 @@ void IsisMain() {
   else if (pxlBin > 0) nDarkColumns /= (pxlBin+1); // Might be 1 if wo/DPU + MP 2x2
 
   //  Determine number of valid darks.  For no binning will have 3.  All combos
-  //  that have 2x2 total binning will give 1 valid dark.  All other options 
-  //  have no valid dark columns.   
+  //  that have 2x2 total binning will give 1 valid dark.  All other options
+  //  have no valid dark columns.
   nValidDark = MIN(nDarkColumns, 3);
   if(nValidDark < 3) {
     if((fpuBin + pxlBin) > 1) nValidDark = 0;
@@ -139,25 +139,25 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   convertDarkToNull = !ui.GetBoolean("KEEPDARK");
   if (!convertDarkToNull) nSampsToNull = 0;
-    
+
 
   iString darkCurr = ui.GetString("DARKCURRENT");
   g_flatfield = ui.GetBoolean("FLATFIELD");
   g_radiometric = ui.GetBoolean("RADIOMETRIC");
 
   if(icube->getBandCount() != 1) {
-    throw iException::Message(iException::User,
-                              "MDIS images may only contain one band", _FILEINFO_);
+    throw IException(IException::User,
+                     "MDIS images may only contain one band", _FILEINFO_);
   }
 
   if(icube->getSampleCount() < 3) {
-    throw iException::Message(iException::User,
-                              "Unable to obtain dark current data. Expected a sample dimension of at least 3", _FILEINFO_);
+    throw IException(IException::User,
+                     "Unable to obtain dark current data. Expected a sample dimension of at least 3", _FILEINFO_);
   }
 
   if((int)icube->getGroup("Instrument")["Unlutted"] == false) {
-    throw iException::Message(iException::User,
-                              "Calibration may not be performed on unlutted data.", _FILEINFO_);
+    throw IException(IException::User,
+                     "Calibration may not be performed on unlutted data.", _FILEINFO_);
   }
 
 
@@ -171,9 +171,8 @@ void IsisMain() {
       darkCurr = "MODEL";
       string mess = "There are no valid dark current pixels which are required"
                     " for " + darkCurr + " calibration... must use MODEL";
-      iException &ie = iException::Message(iException::User, mess, _FILEINFO_);
-      ie.Report();
-      ie.Clear();
+      IException ie(IException::User, mess, _FILEINFO_);
+      ie.print();
     }
 
     //  Model cannot be used for exposure times > 1.0 <sec>
@@ -182,9 +181,8 @@ void IsisMain() {
       string mess = "There are no valid dark current pixels and the dark model"
                     " correction can not be used when the exposure duration"
                     " exceeds 1000...image cannot be calibrated";
-      iException &ie = iException::Message(iException::User, mess, _FILEINFO_);
-      ie.Report();
-      ie.Clear();
+      IException ie(IException::User, mess, _FILEINFO_);
+      ie.print();
     }
   }
 
@@ -204,9 +202,8 @@ void IsisMain() {
     if(exposureDuration > 1.0) {
       string mess = "Dark model correction can not be used when the "
                     "exposure duration exceeds 1000...using LINEAR instead.";
-      iException &ie = iException::Message(iException::User, mess, _FILEINFO_);
-      ie.Report();
-      ie.Clear();
+      IException ie(IException::User, mess, _FILEINFO_);
+      ie.print();
 
       // set processing to standard
       darkCurrentMode = DarkCurrentLinear;
@@ -219,9 +216,9 @@ void IsisMain() {
   }
   else {
     // should never happen
-    throw iException::Message(iException::Programmer,
-                              "Invalid dark current mode [" +
-                              darkCurr + "]", _FILEINFO_);
+    throw IException(IException::Programmer,
+                     "Invalid dark current mode [" +
+                     darkCurr + "]", _FILEINFO_);
   }
 
   string darkCurrentFile("");
@@ -327,7 +324,7 @@ void IsisMain() {
       ProgramLauncher::RunIsisProgram("reduce", parameters);
       reducedFlat = newflat.Expanded();
     }
-    catch (iException &ie) {
+    catch (IException &) {
       remove(reducedFlat.c_str());
       throw;
     }
@@ -583,20 +580,20 @@ void Calibrate(vector<Buffer *>&in, vector<Buffer *>&out) {
           imageOut[i] /= 0.008760 * log10(imageOut[i]) + 0.936321;
         }
       }
-  
+
       // Step 3: Readout Smear Correction (ms -> seconds)
       double t2 = smearComponent / imageIn.SampleDimension() / 1000.0;
-  
+
       if(exposureDuration > 0.0 && imageIn.Line() > 1) {
         smearData[i] += t2 / exposureDuration * prevLineData[i];
         imageOut[i] -= smearData[i];
       }
-  
+
       prevLineData[i] = imageOut[i];
-  
+
       // Step 4: Uniformity (flat field)
       imageOut[i] /= flatField[i]; // divide by flat field
-  
+
       // Step 5: Absolute coefficient
       if(exposureDuration > 0.0) {
         imageOut[i] = imageOut[i] / exposureDuration * abs_coef;

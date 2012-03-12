@@ -26,7 +26,7 @@
 #include <QList>
 #include <QQueue>
 
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "RawCubeChunk.h"
 

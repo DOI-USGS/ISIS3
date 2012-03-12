@@ -11,7 +11,7 @@
 #include "LineManager.h"
 #include "ProcessByLine.h"
 #include "Statistics.h"
-#include "iException.h"
+#include "IException.h"
 #include "Pipeline.h"
 #include "Pvl.h"
 #include "Table.h"
@@ -55,7 +55,7 @@ void IsisMain() {
   //Check to make sure we got the cube properly
   if(!inputCube.isOpen()) {
     string msg = "Could not open FROM cube" + fromFile.Expanded();
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   ProcessByLine processByLine;
@@ -89,7 +89,7 @@ void IsisMain() {
     for(int i = 0 ; i < num_phases ; i++) {
       phases[i] /= binning_mode;
     }
-  
+
     //Phases must be able to stretch across the entire cube
     if(totalSamples != phases[3]) {
       iString required_samples(phases[3]);
@@ -98,20 +98,20 @@ void IsisMain() {
       msg += required_samples;
       msg += " samples per line for binning mode ";
       msg += bin_string;
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
-  
+
     //Index starts at 1 and will go up to totalLines. This must be done since
     // lines go into different statistics vectors based on their index
     myIndex = 1;
     processByLine.StartProcess(getStats);
-  
+
     //This program is trying to find horizontal striping in the image that occurs
     // in every other line, but at runtime we do not know whether that striping
     // occurs on the odd numbered lines (1, 3, 5, etc.) or the even numbered
     // ones (2, 4, 6, etc.). The below algorithm determines which of these is the
     // case.
-  
+
     string parity = ui.GetString("PARITY");
     if(parity == "EVEN") {
       offset = 1;
@@ -141,14 +141,14 @@ void IsisMain() {
         offset = 0;
       }
     }
-  
+
     //Again we must reset the index, because we apply corrections only on every
     // other line and the fix processing function has no concept of where it is
     // in the cube.
     myIndex = 1;
-  
+
     mode = (ui.GetString("CORRECTION") == "MULTIPLY");
-  
+
     processByLine.SetOutputCube("TO");
     processByLine.StartProcess(fix);
     processByLine.EndProcess();
@@ -282,29 +282,29 @@ void fix(Buffer &in, Buffer &out) {
 
 /**
  * Destripe for images which have summing greater than 2
- * 
+ *
  * @author Sharmila Prasad (12/21/2010)
- * 
+ *
  * @param piSamples - Image Sample size
  */
 void DestripeForOtherBinningModes(int piSamples)
 {
   int iBoxSample = (2 * piSamples) - 1;
   iString sSamples(iBoxSample);
-  
+
   Pipeline p("hidestripe");
   p.SetInputFile("FROM");
   p.SetOutputFile("TO");
   p.KeepTemporaryFiles(false);
   p.AddOriginalBranch("lpf");
   p.AddOriginalBranch("hpf");
-  
+
   p.AddToPipeline("lowpass");
   p.Application("lowpass").SetInputParameter("FROM", false);
   p.Application("lowpass").SetOutputParameter("TO", "lowpass");
   p.Application("lowpass").EnableBranch("lpf", true);
   p.Application("lowpass").EnableBranch("hpf", false);
-  
+
   // Set parameters for "lpf" branch
   p.Application("lowpass").AddConstParameter("lpf", "SAMPLES", sSamples);
   p.Application("lowpass").AddConstParameter("lpf", "LINES", "3");
@@ -313,25 +313,25 @@ void DestripeForOtherBinningModes(int piSamples)
   p.Application("lowpass").AddConstParameter("lpf", "HIS",  "FALSE");
   p.Application("lowpass").AddConstParameter("lpf", "LRS",  "FALSE");
   p.Application("lowpass").AddConstParameter("lpf", "LIS",  "FALSE");
-  
+
   p.AddToPipeline("highpass");
   p.Application("highpass").SetInputParameter("FROM", false);
   p.Application("highpass").SetOutputParameter("TO", "highpass");
   p.Application("highpass").EnableBranch("lpf", false);
   p.Application("highpass").EnableBranch("hpf", true);
-  
+
   // Set parameters for "hpf" branch
   p.Application("highpass").AddConstParameter("hpf", "SAMPLES", sSamples);
   p.Application("highpass").AddConstParameter("hpf", "LINES", "1");
   p.Application("highpass").AddConstParameter("hpf", "PROPAGATE", "TRUE");
-  
+
   p.AddToPipeline("fx");
   p.Application("fx").SetInputParameter("FROMLIST", PipelineApplication::LastAppOutputList, false);
   p.Application("fx").SetOutputParameter("TO", "add");
   p.Application("fx").AddConstParameter("MODE", "LIST");
   p.Application("fx").AddConstParameter("EQUATION", "f1+f2");
-  
+
   //cout << p;
-  
+
   p.Run();
 }

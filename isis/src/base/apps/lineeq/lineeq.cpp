@@ -71,7 +71,7 @@ void IsisMain() {
   QuickFilter filter(icube->getLineCount(), boxcarSize, 1);
 
   if(icube->getLineCount() <= numIgnoredLines) {
-    throw iException::Message(iException::User, "Image does not contain any valid data.", _FILEINFO_);
+    throw IException(IException::User, "Image does not contain any valid data.", _FILEINFO_);
   }
 
   for(int band = 0; band < icube->getBandCount(); band ++) {
@@ -130,7 +130,7 @@ void gatherAverages(Buffer &in) {
 void apply(Buffer &in, Buffer &out) {
   for(int sample = 0; sample < in.size(); sample ++) {
 
-    if (!Isis::IsSpecial(in[sample]))    
+    if (!Isis::IsSpecial(in[sample]))
       out[sample] = in[sample] * cubeAverage[in.Band() - 1] / lineAverages[in.Band() - 1][in.Line() - 1];
     else
       out[sample] = in[sample];

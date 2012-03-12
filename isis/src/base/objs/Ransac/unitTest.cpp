@@ -2,7 +2,7 @@
 
 #include "Ransac.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 
 #include "Preference.h"
@@ -16,7 +16,7 @@ int main(int argc, char *argv[]) {
   try {
     cout << "Unit test for Isis::Ransac" << endl;
   }
-  catch(Isis::iException &e) {
-    e.Report();
+  catch(Isis::IException &e) {
+    e.print();
   }
 }

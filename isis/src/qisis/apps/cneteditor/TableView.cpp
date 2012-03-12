@@ -27,19 +27,19 @@ namespace Isis
                          QString objName)
     {
       nullify();
-      
+
       settingsPath = new QString(pathForSettings);
       setObjectName(objName);
-      
+
       model = someModel;
       connect(model, SIGNAL(filterCountsChanged(int,int)),
               this, SIGNAL(filterCountsChanged(int,int)));
-      
+
       columns = model->getColumns();
-      
+
       // Add a column for row numbers and global selection.
       columns->prepend(new TableColumn("", true, false));
-      
+
       QSettings settings(*settingsPath, QSettings::NativeFormat);
       QString key;
       for (int i = 0; i < columns->size(); i++)
@@ -52,7 +52,7 @@ namespace Isis
           key = objectName() + " " + colTitle + " width";
           key.replace(" ", "_");
           col->setWidth(settings.value(key, defaultWidth).toInt());
-          
+
           key = objectName() + " " + colTitle + " ascending";
           key.replace(" ", "_");
           col->setSortAscending(settings.value(key, true).toBool());
@@ -60,11 +60,11 @@ namespace Isis
         else
         {
           col->setWidth(defaultWidth);
-          
+
           // no need to set sort order since it is already ascending by default
         }
       }
-      
+
       key = objectName() + " sorting order";
       key.replace(" ", "_");
       try
@@ -72,28 +72,21 @@ namespace Isis
         columns->setSortingOrder(
             settings.value(key, QStringList()).toStringList());
       }
-      catch (iException & e)
+      catch (IException &e)
       {
-        cerr << "Failed to restore the sorting order!\n\n"
-                "Dear programmer,\n"
-                "  Did any of the column titles change since the last\n"
-                "  time QSettings were saved?  If so this message should\n"
-                "  go away after the next successfull save of QSettings.\n"
-                "  Note that your users will also see this message the\n"
-                "  first time they run the program with your new column\n"
-                "  titles, which should be handled with versioning.\n"
-                "  Please see Steven Lambright for the correct way to\n"
-                "  implement versioning.  So many people get this wrong,\n"
-                "  and you surely don't want to be one of \"those\"\n"
-                "  people, do you?\n\n";
+//         cerr << "Failed to restore the sorting order!\n\n"
+//                 "Dear programmer,\n"
+//                 "  Did any of the column titles change since the last\n"
+//                 "  time QSettings were saved?  If so this message should\n"
+//                 "  go away after the next successfull save of QSettings.\n"
       }
-      
+
       header = new TableViewHeader(model);
       connect(header, SIGNAL(requestedGlobalSelection(bool)),
               this, SLOT(handleModelSelectionChanged()));
       connect(header, SIGNAL(requestedGlobalSelection(bool)),
               this, SIGNAL(selectionChanged()));
-      
+
       content = new TableViewContent(model);
       connect(content, SIGNAL(tableSelectionChanged()),
               this, SIGNAL(selectionChanged()));
@@ -110,7 +103,7 @@ namespace Isis
 
       connect(header, SIGNAL(columnResized(bool)),
               content, SLOT(updateHorizontalScrollBar(bool)));
-      
+
       QVBoxLayout * layout = new QVBoxLayout;
       layout->addWidget(header);
       layout->addWidget(content);
@@ -138,21 +131,21 @@ namespace Isis
             key = objectName() + " " + colTitle + " width";
             key.replace(" ", "_");
             settings.setValue(key, col->getWidth());
-            
+
             key = objectName() + " " + colTitle + " ascending";
             key.replace(" ", "_");
             settings.setValue(key, col->sortAscending());
           }
         }
-        
+
         key = objectName() + " sorting order";
         key.replace(" ", "_");
         settings.setValue(key, columns->getSortingOrderAsStrings());
       }
-      
+
       delete model;
       model = NULL;
-      
+
       columns = NULL;
     }
 
@@ -183,7 +176,7 @@ namespace Isis
   //   void TableView::setModel(AbstractTableModel * newModel)
   //   {
   //     ASSERT(content);
-  // 
+  //
   //     if (newModel)
   //     {
   //       ASSERT(header);
@@ -203,16 +196,16 @@ namespace Isis
   //           this, SLOT(onModelSelectionChanged()));
   //       connect(header, SIGNAL(requestedGlobalSelection(bool)),
   //           this, SIGNAL(selectionChanged()));
-  // 
+  //
   //       columns = newModel->getColumns();
-  // 
+  //
   //       // Add a column for row numbers and global selection.
   //       columns->prepend(new TableColumn("", true, false));
-  // 
+  //
   //       for (int i = 0; i < columns->size(); i++)
   //       {
   //         TableColumn * column = (*columns)[i];
-  //         
+  //
   //         column->setWidth(QFontMetrics(font()).width(column->getTitle()) + 25);
   //         connect(column, SIGNAL(visibilityChanged()), header, SLOT(update()));
   //         connect(column, SIGNAL(visibilityChanged()), content, SLOT(refresh()));
@@ -220,7 +213,7 @@ namespace Isis
   //             content, SLOT(updateHorizontalScrollBar()));
   //         connect(column, SIGNAL(widthChanged()), content, SLOT(refresh()));
   //       }
-  // 
+  //
   //       header->setColumns(columns);
   //       content->setModel(newModel);
   //       header->update();

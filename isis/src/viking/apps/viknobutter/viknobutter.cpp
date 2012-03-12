@@ -23,7 +23,7 @@ void IsisMain() {
   else if(scn == "VIKING_ORBITER_2") spn = 2;
   else {
     string msg = "Invalid spacecraftname [" + scn + "]";
-    throw iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+    throw IException(IException::Programmer, msg, _FILEINFO_);
   }
   // determine if # of cols is even or odd
   bool even = true;

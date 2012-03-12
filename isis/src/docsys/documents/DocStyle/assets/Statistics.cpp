@@ -21,7 +21,7 @@
 #include <float.h>
 #include <string>
 #include "Statistics.h"
-#include "iException.h"
+#include "IException.h"
 
 using namespace std;
 namespace Isis {

@@ -104,8 +104,7 @@ namespace Isis {
    *         validatity of the profile returned as this is the only indication of
    *         success.
    */
-  const DbProfile DbAccess::getProfile(const std::string &name) const
-  throw(iException &) {
+  const DbProfile DbAccess::getProfile(const std::string &name) const {
     string defName(name);
     if(defName.empty()) {
       defName = getDefaultProfileName();
@@ -139,7 +138,7 @@ namespace Isis {
    *
    * @return const DbProfile The requested nth profile
    */
-  const DbProfile DbAccess::getProfile(int nth) const throw(iException &) {
+  const DbProfile DbAccess::getProfile(int nth) const {
     const DbProfile &p = _profiles.getNth(nth);
     return(DbProfile(*this, p, p.Name()));
   }

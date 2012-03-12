@@ -79,7 +79,7 @@ Displacement 1 = Displacement 2... Displacement 1 = 10 meters
 
 ----- Testing Error Checking -----
 
-**PROGRAMMER ERROR** Displacement has not been initialized, you must initialize it first before comparing with another displacement using [>]
-**PROGRAMMER ERROR** Displacement has not been initialized, you must initialize it first before comparing with another displacement using [>]
-**PROGRAMMER ERROR** Displacement has not been initialized, you must initialize it first before comparing with another displacement using [<]
-**PROGRAMMER ERROR** Displacement has not been initialized, you must initialize it first before comparing with another displacement using [<]
+**PROGRAMMER ERROR** Displacement has not been initialized, you must initialize it first before comparing with another displacement using [>].
+**PROGRAMMER ERROR** Displacement has not been initialized, you must initialize it first before comparing with another displacement using [>].
+**PROGRAMMER ERROR** Displacement has not been initialized, you must initialize it first before comparing with another displacement using [<].
+**PROGRAMMER ERROR** Displacement has not been initialized, you must initialize it first before comparing with another displacement using [<].

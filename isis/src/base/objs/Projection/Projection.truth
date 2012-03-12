@@ -1,48 +1,48 @@
 Unit test for Isis::Projection ...
 
 Test for missing Mapping Group
-**PROJECTION ERROR** Invalid label group [Mapping]
-**PVL ERROR** Unable to find group [Mapping]
+**ERROR** Invalid label group [Mapping].
+**ERROR** Unable to find PVL group [Mapping].
 
 Test for missing Equatorial Radius
-**PROJECTION ERROR** Invalid label group [Mapping]
-**PROJECTION ERROR** No target radii available through keywords [EquatorialRadius and PolarRadius] or [TargetName].
+**ERROR** Invalid label group [Mapping].
+**ERROR** No target radii available through keywords [EquatorialRadius and PolarRadius] or [TargetName].
 
 Test for missing polar radius
-**PROJECTION ERROR** Invalid label group [Mapping]
-**PROJECTION ERROR** No target radii available through keywords [EquatorialRadius and PolarRadius] or [TargetName].
+**ERROR** Invalid label group [Mapping].
+**ERROR** No target radii available through keywords [EquatorialRadius and PolarRadius] or [TargetName].
 
 Test for invalid Equatoral Radius
-**PROJECTION ERROR** Invalid label group [Mapping]
-**PROJECTION ERROR** Invalid value for keyword [EquatorialRadius] it must be greater than zero
+**ERROR** Invalid label group [Mapping].
+**ERROR** Invalid value for keyword [EquatorialRadius] it must be greater than zero.
 
 Test for invalid polar radius
-**PROJECTION ERROR** Invalid label group [Mapping]
-**PROJECTION ERROR** Invalid value for keyword [PolarRadius] it must be greater than zero
+**ERROR** Invalid label group [Mapping].
+**ERROR** Invalid value for keyword [PolarRadius] it must be greater than zero.
 
 Test for missing latitude type
-**PROJECTION ERROR** Invalid label group [Mapping]
-**PVL ERROR** Keyword [LatitudeType] does not exist in [Group = Mapping]
+**ERROR** Invalid label group [Mapping].
+**ERROR** PVL Keyword [LatitudeType] does not exist in [Group = Mapping].
 
 Test for invalid latitude type
-**PROJECTION ERROR** Invalid label group [Mapping]
-**PROJECTION ERROR** Invalid value for keyword [LatitudeType] must be [Planetographic or Planetocentric]
+**ERROR** Invalid label group [Mapping].
+**ERROR** Invalid value for keyword [LatitudeType] must be [Planetographic or Planetocentric].
 
 Test for missing longitude direction
-**PROJECTION ERROR** Invalid label group [Mapping]
-**PVL ERROR** Keyword [LongitudeDirection] does not exist in [Group = Mapping]
+**ERROR** Invalid label group [Mapping].
+**ERROR** PVL Keyword [LongitudeDirection] does not exist in [Group = Mapping].
 
 Test for invalid longitude direction
-**PROJECTION ERROR** Invalid label group [Mapping]
-**PROJECTION ERROR** Invalid value for keyword [LongitudeDirection] must be [PositiveWest or PositiveEast]
+**ERROR** Invalid label group [Mapping].
+**ERROR** Invalid value for keyword [LongitudeDirection] must be [PositiveWest or PositiveEast].
 
 Test for missing longitude domain
-**PROJECTION ERROR** Invalid label group [Mapping]
-**PVL ERROR** Keyword [LongitudeDomain] does not exist in [Group = Mapping]
+**ERROR** Invalid label group [Mapping].
+**ERROR** PVL Keyword [LongitudeDomain] does not exist in [Group = Mapping].
 
 Test for invalid longitude domain
-**PROJECTION ERROR** Invalid label group [Mapping]
-**PROJECTION ERROR** Invalid value for keyword [LongitudeDomain] must be [180 or 360]
+**ERROR** Invalid label group [Mapping].
+**ERROR** Invalid value for keyword [LongitudeDomain] must be [180 or 360].
 
 Projection Specifications
 Equatorial Radius:     1
@@ -83,20 +83,20 @@ ocentric to ographic to ocentric = 45
 ographic to ocentric to ographic = 45
 
 Testing unordered latitude range
-**PROJECTION ERROR** Invalid label group [Mapping]
-**PROJECTION ERROR** [MinimumLatitude,MaximumLatitude] of [45.0,-80.0] are not properly ordered
+**ERROR** Invalid label group [Mapping].
+**ERROR** [MinimumLatitude,MaximumLatitude] of [45.0,-80.0] are not properly ordered.
 
 Testing invalid minimum latitude
-**PROJECTION ERROR** Invalid label group [Mapping]
-**PROJECTION ERROR** [MinimumLatitude] of [-95.0] is outside the range of [-90:90]
+**ERROR** Invalid label group [Mapping].
+**ERROR** [MinimumLatitude] of [-95.0] is outside the range of [-90:90].
 
 Testing invalid maximum latitude
-**PROJECTION ERROR** Invalid label group [Mapping]
-**PROJECTION ERROR** [MaximumLatitude] of [95.0] is outside the range of [-90:90]
+**ERROR** Invalid label group [Mapping].
+**ERROR** [MaximumLatitude] of [95.0] is outside the range of [-90:90].
 
 Testing unordered longitude range
-**PROJECTION ERROR** Invalid label group [Mapping]
-**PROJECTION ERROR** [MinimumLongitude,MaximumLongitude] of [15.0,-190.0] are not properly ordered
+**ERROR** Invalid label group [Mapping].
+**ERROR** [MinimumLongitude,MaximumLongitude] of [15.0,-190.0] are not properly ordered.
 
 Has as longitude range:  1
 Minimum latitude:        45

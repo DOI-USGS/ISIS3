@@ -5,7 +5,7 @@
 #include <QLabel>
 
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "MosaicSceneWidget.h"
 #include "PvlObject.h"
@@ -24,7 +24,7 @@ namespace Isis {
       connect(scene, SIGNAL(mouseEnter()), this, SLOT(mouseEnter()));
       connect(scene, SIGNAL(mouseLeave()), this, SLOT(mouseLeave()));
       connect(scene, SIGNAL(mouseMove(QPointF)), this, SLOT(mouseMove(QPointF)));
-  
+
       connect(scene, SIGNAL(mouseDoubleClick(QPointF)),
               this, SLOT(mouseDoubleClick(QPointF)));
       connect(scene, SIGNAL(mouseButtonPress(QPointF, Qt::MouseButton)),
@@ -91,17 +91,17 @@ namespace Isis {
       return obj;
     }
 
-    throw iException::Message(
-        iException::Programmer, "Please re-implement toPvl in your tool",
-        _FILEINFO_);
+    throw IException(IException::Programmer,
+                     "Please re-implement toPvl in your tool",
+                     _FILEINFO_);
   }
 
 
   void MosaicTool::fromPvl(const PvlObject &obj) {
     if(projectPvlObjectName() != "") {
-      throw iException::Message(
-          iException::Programmer, "Please re-implement fromPvl in your tool",
-          _FILEINFO_);
+      throw IException(IException::Programmer,
+                       "Please re-implement fromPvl in your tool",
+                       _FILEINFO_);
     }
   }
 
@@ -191,4 +191,3 @@ namespace Isis {
     return new QWidget();
   }
 }
-

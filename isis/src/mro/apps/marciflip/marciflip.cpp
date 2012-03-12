@@ -4,7 +4,7 @@
 #include "Brick.h"
 #include "ProcessByBrick.h"
 #include "OriginalLabel.h"
-#include "iException.h"
+#include "IException.h"
 
 using namespace std;
 using namespace Isis;

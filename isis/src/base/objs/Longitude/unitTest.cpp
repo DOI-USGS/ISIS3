@@ -2,18 +2,14 @@
 
 #include <iostream>
 
-#include "iException.h"
+#include "IException.h"
 #include "Constants.h"
 #include "Preference.h"
 
 using std::cout;
 using std::endl;
 
-using Isis::Angle;
-using Isis::Longitude;
-using Isis::iException;
-using Isis::Preference;
-using Isis::PI;
+using namespace Isis;
 
 int main(int argc, char *argv[]) {
   Preference::Preferences(true);
@@ -27,8 +23,8 @@ int main(int argc, char *argv[]) {
     Longitude lon;
     cout << lon.degrees() << " degrees" << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -36,8 +32,8 @@ int main(int argc, char *argv[]) {
     Longitude lon(180.0, Angle::Degrees);
     cout << lon.degrees() << " degrees" << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -45,8 +41,8 @@ int main(int argc, char *argv[]) {
     Longitude lon(180.0, Angle::Degrees, Longitude::PositiveWest);
     cout << lon.degrees() << " degrees" << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -55,8 +51,8 @@ int main(int argc, char *argv[]) {
         Longitude::Domain180);
     cout << lon.degrees() << " degrees" << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -65,8 +61,8 @@ int main(int argc, char *argv[]) {
         Longitude::Domain360);
     cout << lon.degrees() << " degrees" << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -76,8 +72,8 @@ int main(int argc, char *argv[]) {
     cout << lon.degrees() << " degrees == " << Longitude(lon).degrees() <<
       " degrees" << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   cout << endl << "----- Testing Set Methods -----" << endl << endl;
@@ -88,8 +84,8 @@ int main(int argc, char *argv[]) {
     lon.setPositiveEast(90, Angle::Degrees);
     cout << lon.degrees() << " degrees" << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -102,8 +98,8 @@ int main(int argc, char *argv[]) {
     lonCopy = lon;
     cout << "After assignment: " << lonCopy.degrees() << " degrees" << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   cout << endl << "----- Testing Get Methods -----" << endl << endl;
@@ -121,8 +117,8 @@ int main(int argc, char *argv[]) {
     cout << lon.positiveWest(Angle::Radians) / PI << "*pi radians positive "
         "west" << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   cout << endl;
@@ -140,8 +136,8 @@ int main(int argc, char *argv[]) {
     cout << lon.positiveWest(Angle::Radians) / PI << "*pi radians positive "
         "west" << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   cout << endl;
@@ -159,8 +155,8 @@ int main(int argc, char *argv[]) {
     cout << lon.positiveWest(Angle::Radians) / PI << "*pi radians positive "
         "west" << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   cout << endl;
@@ -178,8 +174,8 @@ int main(int argc, char *argv[]) {
     cout << lon.positiveWest(Angle::Radians) / PI << "*pi radians positive "
         "west" << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   cout << endl << "----- Testing Domain Methods -----" << endl << endl;
@@ -192,7 +188,7 @@ int main(int argc, char *argv[]) {
     cout << "Test force360Domain" << endl;
     cout << lon.force360Domain().degrees() << " degrees" << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 }

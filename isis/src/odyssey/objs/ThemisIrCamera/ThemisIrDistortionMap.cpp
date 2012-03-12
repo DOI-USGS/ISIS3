@@ -2,17 +2,17 @@
  * @file
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for 
+ *   domain. See individual third-party library and package descriptions for
  *   intellectual property information,user agreements, and related information.
  *
  *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software 
- *   and related material nor shall the fact of distribution constitute any such 
- *   warranty, and no responsibility is assumed by the USGS in connection 
+ *   is made by the USGS as to the accuracy and functioning of such software
+ *   and related material nor shall the fact of distribution constitute any such
+ *   warranty, and no responsibility is assumed by the USGS in connection
  *   therewith.
  *
  *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see 
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
  *   the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
@@ -25,7 +25,7 @@ using namespace std;
 
 namespace Isis {
   /**
-   * @param parent 
+   * @param parent
    */
   ThemisIrDistortionMap::ThemisIrDistortionMap(Camera *parent) :
     CameraDistortionMap(parent, 1.0) {
@@ -37,7 +37,7 @@ namespace Isis {
   void ThemisIrDistortionMap::SetBand(const int band) {
     if(band < 1 || band > 10) {
       string msg = "Band number out of array bounds in ThemisIRDistortionMap";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     double k[] = { 0.996005, 0.995358, 0.994260, 0.993290, 0.992389,
                    0.991474, 0.990505, 0.989611, 0.988653, 0.9877

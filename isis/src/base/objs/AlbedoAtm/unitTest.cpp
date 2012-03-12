@@ -9,7 +9,7 @@
 #include "NormModelFactory.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
-#include "iException.h"
+#include "IException.h"
 #include "Preference.h"
 
 using namespace Isis;
@@ -76,8 +76,8 @@ int main() {
     nm->CalcNrmAlbedo(86.7187773, 51.7060221, 38.9331391, 51.7060221, 38.9331391, .0794225037, result, mult, base);
     std::cout << "Normalization value = " << result << std::endl << std::endl;
   }
-  catch(iException &e) {
-    e.Report();
+  catch(IException &e) {
+    e.print();
   }
 
   return 0;

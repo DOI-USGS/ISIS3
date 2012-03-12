@@ -1,6 +1,6 @@
 #include <iostream>
 #include "Histogram.h"
-#include "iException.h"
+#include "IException.h"
 #include "Preference.h"
 
 using namespace std;
@@ -61,70 +61,70 @@ int main(int argc, char *argv[]) {
     cout << "BinCount(20):      " << h.BinCount(20) << endl;
     cout << endl;
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   try {
     Isis::Histogram g(1.0, 0.0);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   try {
     h.Percent(-1.0);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   try {
     h.Percent(101.0);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   try {
     h.BinCount(-1);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   try {
     h.BinCount(1024);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   try {
     h.BinMiddle(-1);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   try {
     h.BinMiddle(1024);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   try {
     h.BinRange(-1, low, high);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   try {
     h.BinRange(1024, low, high);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 }

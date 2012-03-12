@@ -1,6 +1,6 @@
 #include <iostream>
 #include "CissLabels.h"
-#include "iException.h"
+#include "IException.h"
 #include "Pvl.h"
 
 using namespace std;
@@ -116,7 +116,7 @@ int main(int argc, char *argv[]) {
     cout  << endl;
     return 0;
   }
-  catch(iException &e) {
-    e.Report();
+  catch(IException &e) {
+    e.print();
   }
 }

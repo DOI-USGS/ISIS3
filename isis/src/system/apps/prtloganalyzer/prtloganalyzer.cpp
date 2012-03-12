@@ -6,7 +6,7 @@
 #include "Process.h"
 #include "ProgramAnalyzer.h"
 #include "iTime.h"
-#include "iException.h"
+#include "IException.h"
 
 using namespace std;
 using namespace Isis;
@@ -71,7 +71,7 @@ void IsisMain() {
     ostm.open(file.c_str(), std::ios::out);
     if(!ostm) {
       string message = "Cannot open/create output file " + file;
-      throw iException::Message(iException::Io, message, _FILEINFO_);
+      throw IException(IException::Io, message, _FILEINFO_);
     }
 
     analyzer.header(ostm);

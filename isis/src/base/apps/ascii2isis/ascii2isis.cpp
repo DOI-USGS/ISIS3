@@ -57,7 +57,7 @@ void IsisMain() {
   fin.open(from.c_str(), std::ios::in);
   if(!fin.is_open()) {
     string msg = "Cannot open input file [" + from + "]";
-    throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+    throw IException(IException::Io, msg, _FILEINFO_);
   }
 
   //  Skip header information if it exists

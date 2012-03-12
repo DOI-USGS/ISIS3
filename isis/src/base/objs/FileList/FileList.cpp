@@ -21,7 +21,7 @@
  *   http://www.usgs.gov/privacy.html.
  */
 #include "FileList.h"
-#include "iException.h"
+#include "IException.h"
 #include "Message.h"
 #include "Filename.h"
 #include "iString.h"
@@ -71,7 +71,7 @@ namespace Isis {
     istm.open(file.c_str(), std::ios::in);
     if(!istm) {
       string message = Isis::Message::FileOpen(file);
-      throw Isis::iException::Message(Isis::iException::Io, message, _FILEINFO_);
+      throw IException(IException::Io, message, _FILEINFO_);
     }
 
     // Internalize
@@ -81,10 +81,10 @@ namespace Isis {
       // Close the file
       istm.close();
     }
-    catch(Isis::iException &e) {
+    catch(IException &e) {
       istm.close();
       string msg = "File [" + file + "] contains no data";
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
   }
@@ -159,7 +159,7 @@ namespace Isis {
     }
     if(this->size() == 0) {
       string msg = "Input Stream Empty";
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
 
@@ -180,8 +180,8 @@ namespace Isis {
     // Open the file
     ostm.open(file.c_str(), std::ios::out);
     if(!ostm) {
-      string message = Isis::Message::FileOpen(file);
-      throw Isis::iException::Message(Isis::iException::Io, message, _FILEINFO_);
+      string message = Message::FileOpen(file);
+      throw IException(IException::Io, message, _FILEINFO_);
     }
 
     // Internalize

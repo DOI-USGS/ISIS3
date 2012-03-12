@@ -22,7 +22,7 @@
 #include "ControlPointEdit.h"
 #include "Distance.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "Latitude.h"
 #include "Longitude.h"
 #include "MainWindow.h"
@@ -45,18 +45,18 @@ namespace Isis {
 
   const int VIEWSIZE = 301;
   using namespace Qnet;
-  
+
   const int CHIPVIEWPORT_WIDTH = 310;
 
 
   /**
    * Consructs the Qnet Tool window
-   * 
+   *
    * @param parent Pointer to the parent widget for the Qnet tool
-   * 
-   * @internal 
+   *
+   * @internal
    * @history 2010-06-03 Jeannie Walldren - Initialized pointers to null.
-   * 
+   *
    */
   QnetTool::QnetTool (QWidget *parent) : Tool(parent) {
 
@@ -131,7 +131,7 @@ namespace Isis {
 
 
 
-  /** 
+  /**
    * create the main window for editing control points
    *
    * @param parent Pointer to parent QWidget
@@ -161,7 +161,7 @@ namespace Isis {
     createActions();
     createMenus();
     createToolBars();
-    
+
     // create p_pointEditor first since we need to get its templateFilename
     // later
     p_pointEditor = new ControlPointEdit(g_controlNetwork, parent);
@@ -174,7 +174,7 @@ namespace Isis {
     connect(p_pointEditor, SIGNAL(measureSaved()), this, SLOT(measureSaved()));
     connect(this, SIGNAL(measureChanged()),
             p_pointEditor, SLOT(colorizeSaveButton()));
-        
+
     QPushButton * addMeasure = new QPushButton("Add Measure(s) to Point");
     addMeasure->setToolTip("Add a new measure to the edit control point.");
     addMeasure->setWhatsThis("This allows a new control measure to be added "
@@ -199,7 +199,7 @@ namespace Isis {
     addMeasureLayout->addWidget(addMeasure);
     addMeasureLayout->addWidget(p_savePoint);
 //    addMeasureLayout->addStretch();
-    
+
     p_templateFilenameLabel = new QLabel("Template File: " +
         QString::fromStdString(p_pointEditor->templateFilename()));
     p_templateFilenameLabel->setToolTip("Sub-pixel registration template File.");
@@ -210,7 +210,7 @@ namespace Isis {
                   "registration template.  Refer to $ISISROOT/doc/documents/"
                   "PatternMatch/PatternMatch.html for a description of the "
                   "contents of this file.");
-    
+
     p_groundFilenameLabel = new QLabel("Ground Source File: ");
     p_groundFilenameLabel->setToolTip("Cube used to create ground control "
                                "points, either Fixed or Constrained.");
@@ -227,7 +227,7 @@ namespace Isis {
                              "radius for ground control points.");
 
     QVBoxLayout * centralLayout = new QVBoxLayout;
-    
+
     centralLayout->addWidget(p_templateFilenameLabel);
     centralLayout->addWidget(p_groundFilenameLabel);
     centralLayout->addWidget(p_radiusFilenameLabel);
@@ -245,46 +245,46 @@ namespace Isis {
     p_qnetTool->setCentralWidget(scrollArea);
 //    p_qnetTool->setCentralWidget(centralWidget);
 
-    
+
     connect(this, SIGNAL(editPointChanged(QString)),
             this, SLOT(paintAllViewports(QString)));
 
     readSettings();
   }
-  
-  
+
+
   //! creates everything above the ControlPointEdit
   QSplitter * QnetTool::createTopSplitter() {
-  
+
     QHBoxLayout * measureLayout = new QHBoxLayout;
     measureLayout->addWidget(createLeftMeasureGroupBox());
     measureLayout->addWidget(createRightMeasureGroupBox());
-    
+
     QVBoxLayout * groupBoxesLayout = new QVBoxLayout;
     groupBoxesLayout->addWidget(createControlPointGroupBox());
     groupBoxesLayout->addStretch();
     groupBoxesLayout->addLayout(measureLayout);
-    
+
     QWidget * groupBoxesWidget = new QWidget;
     groupBoxesWidget->setLayout(groupBoxesLayout);
-    
+
     createTemplateEditorWidget();
-    
+
     QSplitter * topSplitter = new QSplitter;
     topSplitter->addWidget(groupBoxesWidget);
     topSplitter->addWidget(p_templateEditorWidget);
     topSplitter->setStretchFactor(0, 4);
     topSplitter->setStretchFactor(1, 3);
-    
+
     p_templateEditorWidget->hide();
-    
+
     return topSplitter;
   }
-  
-  
+
+
   //! @returns The groupbox labeled "Control Point"
   QGroupBox * QnetTool::createControlPointGroupBox() {
-  
+
     // create left vertical layout
     p_ptIdValue = new QLabel;
     p_pointType = new QComboBox;
@@ -314,7 +314,7 @@ namespace Isis {
     leftLayout->addWidget(p_pointAprioriLatitudeSigma);
     leftLayout->addWidget(p_pointAprioriLongitudeSigma);
     leftLayout->addWidget(p_pointAprioriRadiusSigma);
-    
+
     // create right vertical layout's top layout
     p_lockPoint = new QCheckBox("Edit Lock Point");
     connect(p_lockPoint, SIGNAL(clicked(bool)), this, SLOT(setLockPoint(bool)));
@@ -333,24 +333,24 @@ namespace Isis {
     rightLayout->addWidget(p_pointLatitude);
     rightLayout->addWidget(p_pointLongitude);
     rightLayout->addWidget(p_pointRadius);
-    
-    
+
+
     QHBoxLayout * mainLayout = new QHBoxLayout;
     mainLayout->addLayout(leftLayout);
     mainLayout->addStretch();
     mainLayout->addLayout(rightLayout);
-    
+
     // create the groupbox
     QGroupBox * groupBox = new QGroupBox("Control Point");
     groupBox->setLayout(mainLayout);
-    
+
     return groupBox;
   }
-  
-  
+
+
   //! @returns The groupbox labeled "Left Measure"
   QGroupBox * QnetTool::createLeftMeasureGroupBox() {
-  
+
     p_leftCombo = new QComboBox;
     p_leftCombo->view()->installEventFilter(this);
     p_leftCombo->setToolTip("Choose left control measure");
@@ -407,14 +407,14 @@ namespace Isis {
 
     QGroupBox * leftGroupBox = new QGroupBox("Left Measure");
     leftGroupBox->setLayout(leftLayout);
-    
+
     return leftGroupBox;
   }
-  
-  
+
+
   //! @returns The groupbox labeled "Right Measure"
   QGroupBox * QnetTool::createRightMeasureGroupBox() {
-  
+
     // create widgets for the right groupbox
     p_rightCombo = new QComboBox;
     p_rightCombo->view()->installEventFilter(this);
@@ -452,7 +452,7 @@ namespace Isis {
     p_rightGoodness = new QLabel();
     p_rightGoodness->setToolTip(p_leftGoodness->toolTip());
     p_rightGoodness->setWhatsThis(p_leftGoodness->whatsThis());
-    
+
     // create right groupbox
     QVBoxLayout * rightLayout = new QVBoxLayout;
     rightLayout->addWidget(p_rightCombo);
@@ -465,14 +465,14 @@ namespace Isis {
     rightLayout->addWidget(p_rightSampShift);
     rightLayout->addWidget(p_rightLineShift);
     rightLayout->addWidget(p_rightGoodness);
-    
+
     QGroupBox * rightGroupBox = new QGroupBox("Right Measure");
     rightGroupBox->setLayout(rightLayout);
-    
+
     return rightGroupBox;
   }
-  
-  
+
+
   //! Creates the Widget which contains the template editor and its toolbar
   void QnetTool::createTemplateEditorWidget() {
 
@@ -607,9 +607,9 @@ namespace Isis {
 
 
 
-  /** 
-   * Customize dropdown menus below title bar. 
-   *  
+  /**
+   * Customize dropdown menus below title bar.
+   *
    * @internal
    *   @history 2008-11-18 Jeannie Walldren - Added "Close" action to the file
    *                          menu on the qnet tool window.
@@ -650,11 +650,11 @@ namespace Isis {
 
 
 
-  /** 
-   * This method is connected with the measureSaved() signal from 
-   * ControlPointEdit. 
-   *  
-   * @internal 
+  /**
+   * This method is connected with the measureSaved() signal from
+   * ControlPointEdit.
+   *
+   * @internal
    *   @history 2008-11-26 Jeannie Walldren - Added message box to warn the user
    *                          that they are saving an "Ignore" point and ask
    *                          whether they would like to set Ignore=false. This
@@ -705,7 +705,7 @@ namespace Isis {
 
 
     //  Only print error if both original measure in network and the current
-    //  edit measure are both editLocked.  If only the edit measure is 
+    //  edit measure are both editLocked.  If only the edit measure is
     //  locked, then user just locked and it needs to be saved.
     //  Do not use this classes IsMeasureLocked since we actually want to
     //  check the original againsted the edit measure and we don't care
@@ -718,11 +718,11 @@ namespace Isis {
       switch (QMessageBox::question(p_qnetTool, "Qnet Tool Save Measure",
                                     message, "&Yes", "&No", 0, 0)) {
         // Yes:  set EditLock=false for the right measure
-        case 0: 
+        case 0:
           p_rightMeasure->SetEditLock(false);
           p_lockRightMeasure->setChecked(false);
         // No:  keep EditLock=true and do NOT save measure
-        case 1: 
+        case 1:
           return;
       }
     }
@@ -734,7 +734,7 @@ namespace Isis {
       switch (QMessageBox::question(p_qnetTool, "Qnet Tool Save Measure",
                                     message, "&Yes", "&No", 0, 0)) {
         // Yes:  set Ignore=false for the point and measures and save point
-        case 0: 
+        case 0:
           p_editPoint->SetIgnored(false);
           emit ignorePointChanged();
           if (p_leftMeasure->IsIgnored()) {
@@ -746,7 +746,7 @@ namespace Isis {
             emit ignoreRightChanged();
           }
         // No: keep Ignore=true and save measure
-        case 1: 
+        case 1:
           break;
 
       }
@@ -757,11 +757,11 @@ namespace Isis {
       switch(QMessageBox::question(p_qnetTool, "Qnet Tool Save Measure",
                                    message, "&Yes", "&No", 0, 0)){
         // Yes:  set Ignore=false for the right measure and save point
-        case 0: 
+        case 0:
             p_rightMeasure->SetIgnored(false);
             emit ignoreRightChanged();
         // No:  keep Ignore=true and save point
-        case 1: 
+        case 1:
           break;
       }
     }
@@ -772,7 +772,7 @@ namespace Isis {
       ControlMeasure *refMeasure = p_editPoint->GetRefMeasure();
       // Reference Measure not on left.  Ask user if they want to change
       // the reference measure, but only if it is not the ground source on the left
-      if (refMeasure->GetCubeSerialNumber() != 
+      if (refMeasure->GetCubeSerialNumber() !=
         p_leftMeasure->GetCubeSerialNumber() &&
         p_leftMeasure->GetCubeSerialNumber() != p_groundSN) {
         QString message = "This point already contains a reference measure.  ";
@@ -807,7 +807,7 @@ namespace Isis {
           refMeasure = p_editPoint->GetRefMeasure();
 
         }
-            
+
             // ??? Need to set rest of measures to Candiate and add more warning. ???//
       }
       // If the right measure is the reference, make sure they really want
@@ -853,11 +853,11 @@ namespace Isis {
         switch (QMessageBox::question(p_qnetTool, "Qnet Tool Save Measure",
                                       message, "&Yes", "&No", 0, 0)) {
           // Yes:  set EditLock=false for the point and save point
-          case 0: 
+          case 0:
             p_editPoint->SetEditLock(false);
             p_lockPoint->setChecked(false);
           // No:  keep EditLock=true and return
-          case 1: 
+          case 1:
             loadPoint();
             return;
 
@@ -938,7 +938,7 @@ namespace Isis {
         vector<Distance> targetRadii = g_controlNetwork->GetTargetRadii();
         if (p_editPoint->HasAprioriCoordinates()) {
           SurfacePoint aprioriPt = p_editPoint->GetAprioriSurfacePoint();
-          aprioriPt.SetRadii(Distance(targetRadii[0]), 
+          aprioriPt.SetRadii(Distance(targetRadii[0]),
                                 Distance(targetRadii[1]),
                                 Distance(targetRadii[2]));
           Distance latSigma = aprioriPt.GetLatSigmaDistance();
@@ -957,14 +957,13 @@ namespace Isis {
                                           Distance(radius, Distance::Meters)));
         }
       }
-      catch (iException &e) {
+      catch (IException &e) {
         QString message = "Unable to set Apriori Surface Point.\n";
         message += "Latitude = " + QString::number(lat);
         message += "  Longitude = " + QString::number(lon);
         message += "  Radius = " + QString::number(radius) + "\n";
-        message += e.Errors().c_str();
+        message += e.toString().c_str();
         QMessageBox::critical(p_qnetTool,"Error",message);
-        e.Clear();
       }
       p_editPoint->SetAprioriSurfacePointSource(p_groundSurfacePointSource);
       p_editPoint->SetAprioriSurfacePointSourceFile(p_groundSourceFile);
@@ -1008,18 +1007,18 @@ namespace Isis {
 
 
   /**
-   * Save edit point to the Control Network.  Up to this point the point is 
-   * simply a copy and does not exist in the network. 
-   *  
-   * @author 2010-11-19 Tracie Sucharski 
-   *  
-   * @internal 
-   * @history 2011-04-20 Tracie Sucharski - If EditLock set, prompt for changing 
+   * Save edit point to the Control Network.  Up to this point the point is
+   * simply a copy and does not exist in the network.
+   *
+   * @author 2010-11-19 Tracie Sucharski
+   *
+   * @internal
+   * @history 2011-04-20 Tracie Sucharski - If EditLock set, prompt for changing
    *                        and do not save point if editLock not changed.
-   * @history 2011-07-05 Tracie Sucharski - Move point EditLock error checking 
+   * @history 2011-07-05 Tracie Sucharski - Move point EditLock error checking
    *                        to individual point parameter setting methods, ie.
    *                        SetPointType, SetIgnorePoint.
-   *      
+   *
    */
   void QnetTool::savePoint () {
 
@@ -1029,7 +1028,7 @@ namespace Isis {
     *updatePoint = *p_editPoint;
 
     //  If this is a fixed or constrained point, see if there is a temporary
-    //  measure holding the coordinate information from the ground source. 
+    //  measure holding the coordinate information from the ground source.
     //  If so, delete this measure before saving point.  Clear out the
     //  fixed Measure variable (memory deleted in ControlPoint::Delete).
     if (updatePoint->GetType() != ControlPoint::Free &&
@@ -1058,7 +1057,7 @@ namespace Isis {
     emit refreshNavList();
     // emit signal so the nav tool can update edit point
     emit editPointChanged(p_editPoint->GetId());
-    // emit a signal to alert user to save when exiting 
+    // emit a signal to alert user to save when exiting
     emit netChanged();
     //   Refresh chipViewports to show new positions of controlPoints
     p_pointEditor->refreshChips();
@@ -1069,16 +1068,16 @@ namespace Isis {
 
   /**
    * Set the point type
-   * @param pointType int Index from point type combo box 
-   *  
-   * @author 2011-07-05 Tracie Sucharski 
-   *  
-   * @internal 
+   * @param pointType int Index from point type combo box
+   *
+   * @author 2011-07-05 Tracie Sucharski
+   *
+   * @internal
    */
   void QnetTool::setPointType (int pointType) {
     if (p_editPoint == NULL) return;
 
-    ControlPoint::Status status = 
+    ControlPoint::Status status =
          p_editPoint->SetType((ControlPoint::PointType) pointType);
     if (status == ControlPoint::PointLocked) {
       p_pointType->setCurrentIndex((int) p_editPoint->GetType());
@@ -1101,13 +1100,13 @@ namespace Isis {
 
 
   /**
-   * Set point's "EditLock" keyword to the value of the input parameter. 
-   * @param ignore Boolean value that determines the EditLock value for this 
+   * Set point's "EditLock" keyword to the value of the input parameter.
+   * @param ignore Boolean value that determines the EditLock value for this
    *               point.
-   *  
-   * @author 2011-03-07 Tracie Sucharski 
-   *  
-   * @internal 
+   *
+   * @author 2011-03-07 Tracie Sucharski
+   *
+   * @internal
    */
   void QnetTool::setLockPoint (bool lock) {
     if (p_editPoint == NULL) return;
@@ -1121,10 +1120,10 @@ namespace Isis {
   /**
    * Set point's "Ignore" keyword to the value of the input
    * parameter.
-   * @param ignore Boolean value that determines the Ignore value for this point. 
-   *  
-   * @internal 
-   * @history 2010-12-15 Tracie Sucharski - Remove netChanged, the point is 
+   * @param ignore Boolean value that determines the Ignore value for this point.
+   *
+   * @internal
+   * @history 2010-12-15 Tracie Sucharski - Remove netChanged, the point is
    *                        not changed in the net unless "Save Point" is
    *                        selected.
    */
@@ -1147,16 +1146,16 @@ namespace Isis {
 
   /**
    * Set the "EditLock" keyword of the measure shown in the left viewport to the
-   * value of the input parameter. 
-   * 
+   * value of the input parameter.
+   *
    * @param ignore Boolean value that determines the EditLock value for the left
    *               measure.
-   *  
-   * @author 2011-03-07 Tracie Sucharski 
-   *  
-   * @internal 
-   * @history 2011-06-27 Tracie Sucharski - emit signal indicating a measure 
-   *                        parameter has changed. 
+   *
+   * @author 2011-03-07 Tracie Sucharski
+   *
+   * @internal
+   * @history 2011-06-27 Tracie Sucharski - emit signal indicating a measure
+   *                        parameter has changed.
    */
   void QnetTool::setLockLeftMeasure (bool lock) {
     if (p_leftMeasure != NULL) p_leftMeasure->SetEditLock(lock);
@@ -1176,19 +1175,19 @@ namespace Isis {
   /**
    * Set the "Ignore" keyword of the measure shown in the left
    * viewport to the value of the input parameter.
-   * 
-   * @param ignore Boolean value that determines the Ignore value for the left 
+   *
+   * @param ignore Boolean value that determines the Ignore value for the left
    *               measure.
    * @internal
    * @history 2010-01-27 Jeannie Walldren - Fixed bug that resulted in segfault.
    *                          Moved the check whether p_rightMeasure is null
    *                          before the check whether p_rightMeasure equals
    *                          p_leftMeasure.
-   * @history 2010-12-15 Tracie Sucharski - Remove netChanged, the point is 
+   * @history 2010-12-15 Tracie Sucharski - Remove netChanged, the point is
    *                        not changed in the net unless "Save Point" is
    *                        selected.
-   * @history 2011-06-27 Tracie Sucharski - emit signal indicating a measure 
-   *                        parameter has changed. 
+   * @history 2011-06-27 Tracie Sucharski - emit signal indicating a measure
+   *                        parameter has changed.
    */
   void QnetTool::setIgnoreLeftMeasure (bool ignore) {
     if (p_leftMeasure != NULL) p_leftMeasure->SetIgnored(ignore);
@@ -1206,17 +1205,17 @@ namespace Isis {
 
 
   /**
-   * Set the "EditLock" keyword of the measure shown in the right viewport to 
-   * the value of the input parameter. 
-   * 
-   * @param ignore Boolean value that determines the EditLock value for the 
+   * Set the "EditLock" keyword of the measure shown in the right viewport to
+   * the value of the input parameter.
+   *
+   * @param ignore Boolean value that determines the EditLock value for the
    *               right measure.
-   *  
-   * @author 2011-03-07 Tracie Sucharski 
-   *  
+   *
+   * @author 2011-03-07 Tracie Sucharski
+   *
    * @internal
-   * @history 2011-06-27 Tracie Sucharski - emit signal indicating a measure 
-   *                        parameter has changed. 
+   * @history 2011-06-27 Tracie Sucharski - emit signal indicating a measure
+   *                        parameter has changed.
    */
   void QnetTool::setLockRightMeasure (bool lock) {
     if (p_rightMeasure != NULL) p_rightMeasure->SetEditLock(lock);
@@ -1234,19 +1233,19 @@ namespace Isis {
 
   /**
    * Set the "Ignore" keyword of the measure shown in the right
-   * viewport to the value of the input parameter. 
-   * 
-   * @param ignore Boolean value that determines the Ignore value for the right 
+   * viewport to the value of the input parameter.
+   *
+   * @param ignore Boolean value that determines the Ignore value for the right
    *               measure.
    * @internal
    * @history 2010-01-27 Jeannie Walldren - Fixed bug that resulted in segfault.
    *                          Moved the check whether p_leftMeasure is null before
    *                          the check whether p_rightMeasure equals
    *                          p_leftMeasure.
-   * @history 2010-12-15 Tracie Sucharski - Remove netChanged, the point is 
+   * @history 2010-12-15 Tracie Sucharski - Remove netChanged, the point is
    *                        not changed in the net unless "Save Point" is
    *                        selected.
-   * @history 2011-06-27 Tracie Sucharski - emit signal indicating a measure 
+   * @history 2011-06-27 Tracie Sucharski - emit signal indicating a measure
    *                        parameter has changed.
    */
   void QnetTool::setIgnoreRightMeasure (bool ignore) {
@@ -1266,9 +1265,9 @@ namespace Isis {
 
 
   /**
-   * Signal to save control net 
-   *  
-   * @author 2011-10-31 Tracie Sucharski 
+   * Signal to save control net
+   *
+   * @author 2011-10-31 Tracie Sucharski
    */
   void QnetTool::saveNet() {
     if (p_cnetFilename.isEmpty()) {
@@ -1294,7 +1293,7 @@ namespace Isis {
 
 
   /**
-   * 
+   *
    */
   void QnetTool::updateList() {
 
@@ -1304,14 +1303,14 @@ namespace Isis {
 
 
   /**
-   * Updates the Control Network displayed in the Qnet Tool title 
-   * bar. This slot is connected to QnetFileTool's 
-   * controlNetworkUpdated(QString cNetFilename) signal. 
-   * 
-   * @param cNetFilename Filename of the most recently selected 
+   * Updates the Control Network displayed in the Qnet Tool title
+   * bar. This slot is connected to QnetFileTool's
+   * controlNetworkUpdated(QString cNetFilename) signal.
+   *
+   * @param cNetFilename Filename of the most recently selected
    *                     control network.
-   * @see QnetFileTool 
-   * @internal 
+   * @see QnetFileTool
+   * @internal
    *   @history Tracie Sucharski - Original version
    *   @history 2008-11-26 Jeannie Walldren - Added cNetFilename input parameter
    *                          in order to show the file path in the window's title
@@ -1329,13 +1328,13 @@ namespace Isis {
 
 
 
-  /** 
+  /**
    * Adds the Tie tool action to the tool pad.  When the Tie tool is selected, the
-   * Navigation Tool will automatically open. 
-   *  
+   * Navigation Tool will automatically open.
+   *
    * @param pad Tool pad
-   * @return @b QAction* Pointer to Tie tool action 
-   *  
+   * @return @b QAction* Pointer to Tie tool action
+   *
    * @internal
    *   @history 2010-07-01 Jeannie Walldren - Added connection between qnet's
    *                          TieTool button and the showNavWindow() method
@@ -1353,24 +1352,24 @@ namespace Isis {
 
   /**
    * Handle mouse events on CubeViewport
-   * 
+   *
    * @param p[in]   (QPoint)            Point under cursor in cubeviewport
    * @param s[in]   (Qt::MouseButton)   Which mouse button was pressed
-   * 
+   *
    * @internal
    * @history  2007-06-12 Tracie Sucharski - Swapped left and right mouse
    *                           button actions.
-   * @history  2009-06-08 Tracie Sucharski - Add error checking for editing 
+   * @history  2009-06-08 Tracie Sucharski - Add error checking for editing
    *                           or deleting points when no point exists.
    * @history 2010-06-03 Jeannie Walldren - Removed "std::" since "using
    *                          namespace std"
-   * @history 2010-11-19 Tracie Sucharski - Make a copy of the point to be 
+   * @history 2010-11-19 Tracie Sucharski - Make a copy of the point to be
    *                          edited or added.  Do not add to control
    *                          network until user selects
    *                          "Save Point To Control Network".
-   * @history 2012-01-11 Tracie Sucharski - Add error check for invalid lat, lon 
-   *                          when creating new control point. 
-   *  
+   * @history 2012-01-11 Tracie Sucharski - Add error check for invalid lat, lon
+   *                          when creating new control point.
+   *
    */
   void QnetTool::mouseButtonRelease(QPoint p, Qt::MouseButton s) {
     MdiCubeViewport *cvp = cubeViewport();
@@ -1447,10 +1446,10 @@ namespace Isis {
 
   /**
    *   Create new control point
-   *  
-   * @param lat Latitude value of control point to be created. 
-   * @param lon Longitude value of control point to be created. 
-   *  
+   *
+   * @param lat Latitude value of control point to be created.
+   * @param lon Longitude value of control point to be created.
+   *
    * @internal
    *   @history 2008-11-20 Jeannie Walldren - Added message box if pointID value
    *                          entered already exists for another ControlPoint.
@@ -1474,7 +1473,7 @@ namespace Isis {
    *   @history 2010-11-19  Tracie Sucharski - Changed p_controlPoint to
    *                           p_editPoint which is a copy rather than a pointer
    *                           directly to the network.
-   *   @history 2010-12-15 Tracie Sucharski - Remove netChanged, the point is 
+   *   @history 2010-12-15 Tracie Sucharski - Remove netChanged, the point is
    *                           not changed in the net unless "Save Point" is
    *                           selected.
    *   @history 2011-03-31 Tracie Sucharski - Remove check for point only
@@ -1486,7 +1485,7 @@ namespace Isis {
    *   @history 2011-07-19 Tracie Sucharski - Remove call to
    *                           SetAprioriSurfacePoint, this should only be
    *                           done for constrained or fixed points.
-   *  
+   *
    */
   void QnetTool::createPoint(double lat,double lon) {
 
@@ -1518,7 +1517,7 @@ namespace Isis {
       ControlPoint *newPoint =
         new ControlPoint(newPointDialog->ptIdValue->text().toStdString());
 
-      // If this ControlPointId already exists, message box pops up and user is 
+      // If this ControlPointId already exists, message box pops up and user is
       // asked to enter a new value.
       if (g_controlNetwork->ContainsPoint(newPoint->GetId())) {
         iString message = "A ControlPoint with Point Id = [" + newPoint->GetId();
@@ -1571,11 +1570,11 @@ namespace Isis {
       loadPoint();
       p_qnetTool->setShown(true);
       p_qnetTool->raise();
-      
+
       loadTemplateFile(QString::fromStdString(
           p_pointEditor->templateFilename()));
 
-    
+
       // emit signal so the nave tool refreshes the list
       emit refreshNavList();
       // emit signal so the nav tool can update edit point
@@ -1592,14 +1591,14 @@ namespace Isis {
 
   /**
    *   Create new Fixed control point
-   *  
-   * @param lat Latitude value of control point to be created. 
-   * @param lon Longitude value of control point to be created. 
-   *  
-   * @author 2010-11-09 Tracie Sucharski 
-   *  
+   *
+   * @param lat Latitude value of control point to be created.
+   * @param lon Longitude value of control point to be created.
+   *
+   * @author 2010-11-09 Tracie Sucharski
+   *
    * @internal
-   *  
+   *
    */
   void QnetTool::createFixedPoint(double lat,double lon) {
 
@@ -1633,8 +1632,8 @@ namespace Isis {
     QnetFixedPointDialog *fixedPointDialog = new QnetFixedPointDialog();
     fixedPointDialog->SetFiles(pointFiles);
     if (fixedPointDialog->exec()) {
-      ControlPoint *fixedPoint = 
-      new ControlPoint(fixedPointDialog->ptIdValue->text().toStdString()); 
+      ControlPoint *fixedPoint =
+      new ControlPoint(fixedPointDialog->ptIdValue->text().toStdString());
 
       if (fixedPointDialog->fixed->isChecked()) {
         fixedPoint->SetType(ControlPoint::Fixed);
@@ -1643,7 +1642,7 @@ namespace Isis {
         fixedPoint->SetType(ControlPoint::Constrained);
       }
 
-      // If this ControlPointId already exists, message box pops up and user is 
+      // If this ControlPointId already exists, message box pops up and user is
       // asked to enter a new value.
       if (g_controlNetwork->ContainsPoint(fixedPoint->GetId())) {
         string message = "A ControlPoint with Point Id = [" + fixedPoint->GetId();
@@ -1754,21 +1753,21 @@ namespace Isis {
 
   /**
    * Delete control point
-   * 
+   *
    * @param point Pointer to control point (net memory) to be deleted.
-   * 
+   *
    * @internal
    * @history 2010-06-03 Jeannie Walldren - Removed "std::" since "using
    *                           namespace std"
    * @history 2010-07-12 Jeannie Walldren - Fixed bug by setting control point
    *                          to NULL if removed from the control net and check
    *                          for NULL points before emitting editPointChanged
-   * @history 2011-04-04 Tracie Sucharski - Move code that was after the exec 
+   * @history 2011-04-04 Tracie Sucharski - Move code that was after the exec
    *                          block within, so that if the Cancel button is
    *                          selected, nothing else happens.
-   * @history 2011-07-15 Tracie Sucharski - Print info about deleting editLock 
-   *                          points and reference measures. 
-   *  
+   * @history 2011-07-15 Tracie Sucharski - Print info about deleting editLock
+   *                          points and reference measures.
+   *
    */
   void QnetTool::deletePoint(ControlPoint *point) {
 
@@ -1782,7 +1781,7 @@ namespace Isis {
     *p_editPoint = *point;
     loadPoint();
 
-    //  Change point in viewport to red so user can see what point they are 
+    //  Change point in viewport to red so user can see what point they are
     //  about to delete.
     // the nav tool will update edit point
     emit editPointChanged(p_editPoint->GetId());
@@ -1869,9 +1868,9 @@ namespace Isis {
             p_pointEditor->templateFilename()));
       }
 
-      // emit a signal to alert user to save when exiting 
+      // emit a signal to alert user to save when exiting
       emit netChanged();
-  
+
       // emit signal so the nav tool can update edit point
       if (p_editPoint != NULL) {
         emit editPointChanged(p_editPoint->GetId());
@@ -1889,8 +1888,8 @@ namespace Isis {
 
   /**
    * Modify control point
-   * 
-   * @param point Pointer to control point to be modified. 
+   *
+   * @param point Pointer to control point to be modified.
    *
    * @history 2009-09-15 Tracie Sucharski - Add error check for points
    *                       with no measures.
@@ -1907,7 +1906,7 @@ namespace Isis {
         emit editPointChanged(p_editPoint->GetId());
       }
       else {
-        // this signal is connected to QnetTool::paintAllViewports 
+        // this signal is connected to QnetTool::paintAllViewports
         // and QnetNavTool::updateEditPoint
         emit editPointChanged("");
       }
@@ -1939,8 +1938,8 @@ namespace Isis {
   }
 
   /**
-   * @brief Load point into QnetTool. 
-   * @internal 
+   * @brief Load point into QnetTool.
+   * @internal
    *   @history 2008-11-26  Jeannie Walldren - Added "Number of Measures" to
    *                           QnetTool point information.
    *   @history 2010-06-03 Jeannie Walldren - Removed "std::" since "using
@@ -1982,7 +1981,7 @@ namespace Isis {
     p_leftCombo->clear();
     p_rightCombo->clear();
     p_pointFiles.clear();
-    
+
     // Find in point and delete, it will be re-created with current
     // ground source if this is a fixed point
     if (p_editPoint->HasSerialNumber(p_groundSN)) {
@@ -2056,8 +2055,8 @@ namespace Isis {
     //  TODO:  WHAT HAPPENS IF THERE IS ONLY ONE MEASURE IN THIS CONTROLPOINT??
     // Assuming combo loaded in same order as measures in the control point-is
     // this a safe assumption???
-    // 
-    //  Find the file from the cubeViewport that was originally used to select 
+    //
+    //  Find the file from the cubeViewport that was originally used to select
     //  the point, this will be displayed on the left ChipViewport, unless the
     //  point was selected on the ground source image.  In this case, simply
     //  load the first measure on the left.
@@ -2108,13 +2107,13 @@ namespace Isis {
 
   /**
    * @brief Load measure information into the measure table
-   * @internal 
+   * @internal
    *   @history 2011-12-05 Tracie Sucharski - Turn off sorting until table
    *                          is loaded.
    *
    */
   void QnetTool::loadMeasureTable () {
-    if (p_measureWindow == NULL) { 
+    if (p_measureWindow == NULL) {
       p_measureWindow = new QMainWindow();
       p_measureTable = new QTableWidget();
       p_measureTable->setMinimumWidth(1600);
@@ -2173,7 +2172,7 @@ namespace Isis {
       }
       p_measureTable->setItem(row,column++,tableItem);
 
-      if (m.GetSampleResidual() == Null) {  
+      if (m.GetSampleResidual() == Null) {
         tableItem = new QTableWidgetItem(QString("Null"));
       }
       else {
@@ -2182,7 +2181,7 @@ namespace Isis {
       }
       p_measureTable->setItem(row,column++,tableItem);
 
-      if (m.GetLineResidual() == Null) {  
+      if (m.GetLineResidual() == Null) {
         tableItem = new QTableWidgetItem(QString("Null"));
       }
       else {
@@ -2310,27 +2309,27 @@ namespace Isis {
       case APRIORILINE:
         return "Apriori Line";
     }
-    throw iException::Message(iException::Programmer,
+    throw IException(IException::Programmer,
         "Invalid measure column passed to measureColumnToString", _FILEINFO_);
   }
 
 
 
-  /** 
+  /**
    * Update the Surface Point Information in the QnetTool window
-   *  
-   * @author 2011-03-01 Tracie Sucharski 
-   *  
-   * @internal 
-   * @history 2011-05-12 Tracie Sucharski - Type printing Apriori Values 
-   * @history 2011-05-24 Tracie Sucharski - Set target radii on apriori 
+   *
+   * @author 2011-03-01 Tracie Sucharski
+   *
+   * @internal
+   * @history 2011-05-12 Tracie Sucharski - Type printing Apriori Values
+   * @history 2011-05-24 Tracie Sucharski - Set target radii on apriori
    *                        surface point, so that sigmas can be converted to
    *                        meters.
    */
   void QnetTool::updateSurfacePointInfo () {
 
     QString s;
-  
+
     SurfacePoint aprioriPoint = p_editPoint->GetAprioriSurfacePoint();
     if (aprioriPoint.GetLatitude().degrees() == Null) {
       s = "AprioriLatitude:  Null";
@@ -2357,7 +2356,7 @@ namespace Isis {
           " <meters>";
     }
     p_pointAprioriRadius->setText(s);
-  
+
     if (aprioriPoint.Valid()) {
       vector<Distance> targRadii = g_controlNetwork->GetTargetRadii();
       aprioriPoint.SetRadii(targRadii[0],targRadii[1],targRadii[2]);
@@ -2398,8 +2397,8 @@ namespace Isis {
       s = "Apriori Radius Sigma:  Null";
       p_pointAprioriRadiusSigma->setText(s);
     }
-      
-          
+
+
     SurfacePoint point = p_editPoint->GetAdjustedSurfacePoint();
     if (point.GetLatitude().degrees() == Null) {
       s = "Adjusted Latitude:  Null";
@@ -2431,16 +2430,16 @@ namespace Isis {
 
 
 
-  /** 
-   * Select left measure 
-   *  
-   * @param index Index of file from the point files vector 
-   *  
+  /**
+   * Select left measure
+   *
+   * @param index Index of file from the point files vector
+   *
    * @internal
    * @history 2010-06-03 Jeannie Walldren - Removed "std::" since "using
    *                          namespace std"
-   * @history 2011-07-06 Tracie Sucharski - If point is Locked, and measure is 
-   *                          reference, lock the measure. 
+   * @history 2011-07-06 Tracie Sucharski - If point is Locked, and measure is
+   *                          reference, lock the measure.
    */
   void QnetTool::selectLeftMeasure(int index) {
     iString file = p_pointFiles[index];
@@ -2466,15 +2465,15 @@ namespace Isis {
     p_pointEditor->setLeftMeasure (p_leftMeasure, p_leftCube,
                                    p_editPoint->GetId());
     updateLeftMeasureInfo ();
-      
+
   }
 
 
-  /** 
-   * Select right measure 
-   *  
-   * @param index  Index of file from the point files vector 
-   *  
+  /**
+   * Select right measure
+   *
+   * @param index  Index of file from the point files vector
+   *
    * @internal
    * @history 2010-06-03 Jeannie Walldren - Removed "std::" since "using
    *                          namespace std"
@@ -2512,18 +2511,18 @@ namespace Isis {
 
   /**
    * @internal
-   * @history 2008-11-24  Jeannie Walldren - Added "Goodness of Fit" to left 
+   * @history 2008-11-24  Jeannie Walldren - Added "Goodness of Fit" to left
    *                         measure info.
-   * @history 2010-07-22  Tracie Sucharski - Updated new measure types  
+   * @history 2010-07-22  Tracie Sucharski - Updated new measure types
    *                           associated with implementation of binary
    *                           control networks.
-   * @history 2010-12-27  Tracie Sucharski - Write textual Null instead of 
+   * @history 2010-12-27  Tracie Sucharski - Write textual Null instead of
    *                           the numeric Null for sample & line residuals.
-   * @history 2011-04-20  Tracie Sucharski - Set EditLock check box correctly 
-   * @history 2011-05-20  Tracie Sucharski - Added Reference output 
-   * @history 2011-07-19  Tracie Sucharski - Did some re-arranging and added 
-   *                           sample/line shifts. 
-   * 
+   * @history 2011-04-20  Tracie Sucharski - Set EditLock check box correctly
+   * @history 2011-05-20  Tracie Sucharski - Added Reference output
+   * @history 2011-07-19  Tracie Sucharski - Did some re-arranging and added
+   *                           sample/line shifts.
+   *
    */
   void QnetTool::updateLeftMeasureInfo () {
 
@@ -2601,16 +2600,16 @@ namespace Isis {
    *                           measure info.
    * @history 2010-06-03 Jeannie Walldren - Removed "std::" since "using
    *                           namespace std"
-   * @history 2010-07-22  Tracie Sucharski - Updated new measure types  
+   * @history 2010-07-22  Tracie Sucharski - Updated new measure types
    *                           associated with implementation of binary
    *                           control networks.
-   * @history 2010-12-27  Tracie Sucharski - Write textual Null instead of 
-   *                           the numeric Null for sample & line residuals. 
-   * @history 2011-04-20  Tracie Sucharski - Set EditLock check box correctly 
-   * @history 2011-05-20  Tracie Sucharski - Added Reference output 
-   * @history 2011-07-19  Tracie Sucharski - Did some re-arranging and added 
-   *                           sample/line shifts. 
-   * 
+   * @history 2010-12-27  Tracie Sucharski - Write textual Null instead of
+   *                           the numeric Null for sample & line residuals.
+   * @history 2011-04-20  Tracie Sucharski - Set EditLock check box correctly
+   * @history 2011-05-20  Tracie Sucharski - Added Reference output
+   * @history 2011-07-19  Tracie Sucharski - Did some re-arranging and added
+   *                           sample/line shifts.
+   *
    */
 
   void QnetTool::updateRightMeasureInfo () {
@@ -2684,15 +2683,15 @@ namespace Isis {
 
 
   /**
-   * Add measure to point 
-   *  
+   * Add measure to point
+   *
    * @internal
-   * @history 2010-07-22  Tracie Sucharski - MeasureType of Estimated is now 
+   * @history 2010-07-22  Tracie Sucharski - MeasureType of Estimated is now
    *                           Reference.  This change associated with
    *                           implementation of binary control networks.
-   * @history 2011-04-06  Tracie Sucharski - If not a fixed point, use the 
-   *                           Reference measure to get lat,lon. 
-   * 
+   * @history 2011-04-06  Tracie Sucharski - If not a fixed point, use the
+   *                           Reference measure to get lat,lon.
+   *
    */
   void QnetTool::addMeasure() {
 
@@ -2700,7 +2699,7 @@ namespace Isis {
     //  contain the point, but that do not already have a measure.
     QStringList pointFiles;
 
-    //  Initialize camera for all images in control network,  
+    //  Initialize camera for all images in control network,
     //  TODO::   Needs to be moved to QnetFileTool.cpp
     Camera *cam;
 
@@ -2769,14 +2768,14 @@ namespace Isis {
 
 
   /**
-   * Event filter for QnetTool.  Determines whether to update left or right 
-   * measure info. 
-   * 
+   * Event filter for QnetTool.  Determines whether to update left or right
+   * measure info.
+   *
    * @param o Pointer to QObject
    * @param e Pointer to QEvent
-   * 
+   *
    * @return @b bool Indicates whether the event type is "Leave".
-   * 
+   *
    */
   bool QnetTool::eventFilter(QObject *o, QEvent *e) {
     if(e->type() != QEvent::Leave) return false;
@@ -2794,10 +2793,10 @@ namespace Isis {
 
   /**
    * Take care of drawing things on a viewPort.
-   * This is overiding the parents paintViewport member. 
-   *  
+   * This is overiding the parents paintViewport member.
+   *
    * @param vp Pointer to Viewport to be painted
-   * @param painter 
+   * @param painter
    */
   void QnetTool::paintViewport(MdiCubeViewport *vp, QPainter *painter) {
     drawAllMeasurments (vp,painter);
@@ -2805,23 +2804,23 @@ namespace Isis {
   }
 
 
-  /** 
-   * This method will repaint the given Point ID in each viewport 
-   * Note: The pointId parameter is here even though it's not used because 
-   * the signal (QnetTool::editPointChanged connected to this slot is also 
-   * connected to another slot (QnetNavTool::updateEditPoint which needs the 
-   * point Id.  TODO:  Clean this up, use 2 different signals? 
-   *  
-   * @param pointId 
-   *  
+  /**
+   * This method will repaint the given Point ID in each viewport
+   * Note: The pointId parameter is here even though it's not used because
+   * the signal (QnetTool::editPointChanged connected to this slot is also
+   * connected to another slot (QnetNavTool::updateEditPoint which needs the
+   * point Id.  TODO:  Clean this up, use 2 different signals?
+   *
+   * @param pointId
+   *
    * @internal
    * @history 2010-06-03 Jeannie Walldren - Removed "std::" since "using
    *                          namespace std"
-   */    
+   */
   void QnetTool::paintAllViewports(QString pointId) {
-    
+
     // Take care of drawing things on all viewPorts.
-    // Calling update will cause the Tool class to call all registered tools 
+    // Calling update will cause the Tool class to call all registered tools
     // if point has been deleted, this will remove it from the main window
     MdiCubeViewport *vp;
     for (int i=0; i<(int)cubeViewportList()->size(); i++) {
@@ -2868,7 +2867,7 @@ namespace Isis {
     if (!g_controlNetwork->GetCubeSerials().contains(
                       QString::fromStdString(serialNumber))) return;
     if (!g_serialNumberList->HasSerialNumber(serialNumber)) return;
-    QList<ControlMeasure *> measures = 
+    QList<ControlMeasure *> measures =
         g_controlNetwork->GetMeasuresInCube(serialNumber);
     // loop through all measures contained in this cube
     for (int i = 0; i < measures.count(); i++) {
@@ -2924,10 +2923,10 @@ namespace Isis {
   /**
    * Draw all Fixed or Constrained points on the ground source viewport
    * @param vp Viewport whose measurements will be drawn
-   * @param painter 
-   *  
-   * @author 2011-09-16  Tracie Sucharski 
-   *  
+   * @param painter
+   *
+   * @author 2011-09-16  Tracie Sucharski
+   *
    * @internal
    */
   void QnetTool::drawGroundMeasures(MdiCubeViewport *vp, QPainter *painter) {
@@ -2972,8 +2971,8 @@ namespace Isis {
 
   /**
    * Allows user to set a new template file.
-   * @author 2008-12-10 Jeannie Walldren 
-   * @internal 
+   * @author 2008-12-10 Jeannie Walldren
+   * @internal
    *   @history 2008-12-10 Jeannie Walldren - Original Version
    *
 
@@ -2990,110 +2989,110 @@ namespace Isis {
           "Save changes?"),
           QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
           QMessageBox::Yes);
-          
+
       if (r == QMessageBox::Yes)
         saveTemplateFileAs();
       else if (r == QMessageBox::Cancel)
         return false;
     }
-    
+
     return true;
   }
-  
-  
+
+
   /**
    * prompt user for a registration template file to open.  Once the file is
    * selected, loadTemplateFile is called to update the current template file
    * being used.
    */
   void QnetTool::openTemplateFile() {
-  
+
     if (!okToContinue())
       return;
-    
+
     QString filename = QFileDialog::getOpenFileName(p_qnetTool,
         "Select a registration template", ".",
         "Registration template files (*.def *.pvl);;All files (*)");
-        
+
     if (filename.isEmpty())
       return;
-      
+
     if (p_pointEditor->setTemplateFile(filename)) {
       loadTemplateFile(filename);
     }
   }
-  
-  
+
+
   /**
    * Updates the current template file being used.
    *
    * @param fn The file path of the new template file
    */
   void QnetTool::loadTemplateFile(QString fn) {
-  
+
     QFile file(QString::fromStdString(Filename((iString) fn).Expanded()));
     if (!file.open(QIODevice::ReadOnly)) {
       QString msg = "Failed to open template file \"" + fn + "\"";
       QMessageBox::warning(p_qnetTool, "IO Error", msg);
       return;
     }
-    
+
     QTextStream stream(&file);
     p_templateEditor->setText(stream.readAll());
     file.close();
-    
+
     QScrollBar * sb = p_templateEditor->verticalScrollBar();
     sb->setValue(sb->minimum());
-    
+
     p_templateModified = false;
     p_saveTemplateFile->setEnabled(false);
     p_templateFilenameLabel->setText("Template File: " + fn);
   }
-  
-  
+
+
   //! called when the template file is modified by the template editor
   void QnetTool::setTemplateModified() {
     p_templateModified = true;
     p_saveTemplateFile->setEnabled(true);
   }
-  
-  
+
+
   //! save the file opened in the template editor
   void QnetTool::saveTemplateFile() {
-  
+
     if (!p_templateModified)
       return;
-    
+
     QString filename = QString::fromStdString(
         p_pointEditor->templateFilename());
-        
+
     writeTemplateFile(filename);
   }
-  
-  
+
+
   //! save the contents of template editor to a file chosen by the user
   void QnetTool::saveTemplateFileAs() {
-  
+
     QString filename = QFileDialog::getSaveFileName(p_qnetTool,
         "Save registration template", ".",
         "Registration template files (*.def *.pvl);;All files (*)");
-        
+
     if (filename.isEmpty())
       return;
-  
+
     writeTemplateFile(filename);
   }
-  
-  
+
+
   /**
    * write the contents of the template editor to the file provided.
    *
    * @param fn The filename to write to
    */
   void QnetTool::writeTemplateFile(QString fn) {
-  
+
     QString contents = p_templateEditor->toPlainText();
-    
+
     // catch errors in Pvl format when populating pvl object
     stringstream ss;
     ss << contents.toStdString();
@@ -3101,30 +3100,29 @@ namespace Isis {
       Pvl pvl;
       ss >> pvl;
     }
-    catch(iException &e) {
-      QString message = e.Errors().c_str();
-      e.Clear();
+    catch(IException &e) {
+      QString message = e.toString();
       QMessageBox::warning(p_qnetTool, "Error", message);
       return;
     }
-    
+
     QString expandedFilename(QString::fromStdString(
         Filename((iString) fn).Expanded()));
-    
+
     QFile file(expandedFilename);
-    
+
     if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
       QString msg = "Failed to save template file to \"" + fn + "\"\nDo you "
           "have permission?";
       QMessageBox::warning(p_qnetTool, "IO Error", msg);
       return;
     }
-    
+
     // now save contents
     QTextStream stream(&file);
     stream << contents;
     file.close();
-    
+
     if (p_pointEditor->setTemplateFile(fn)) {
       p_templateModified = false;
       p_saveTemplateFile->setEnabled(false);
@@ -3134,11 +3132,11 @@ namespace Isis {
 
 
   /**
-   * Allows the user to view the template file that is currently 
-   * set. 
-   *  
-   * @author 2008-12-10 Jeannie Walldren 
-   * @internal 
+   * Allows the user to view the template file that is currently
+   * set.
+   *
+   * @author 2008-12-10 Jeannie Walldren
+   * @internal
    *   @history 2008-12-10 Jeannie Walldren - Original Version
    *   @history 2008-12-10 Jeannie Walldren - Added "" namespace to
    *                          PvlEditDialog reference and changed
@@ -3153,14 +3151,13 @@ namespace Isis {
       // Create registration dialog window using PvlEditDialog class
       // to view and/or edit the template
       PvlEditDialog registrationDialog(templatePvl);
-      registrationDialog.setWindowTitle("View or Edit Template File: " 
+      registrationDialog.setWindowTitle("View or Edit Template File: "
                                          + QString::fromStdString(templatePvl.Filename()));
       registrationDialog.resize(550,360);
       registrationDialog.exec();
     }
-    catch (iException &e) {
-      QString message = e.Errors().c_str();
-      e.Clear ();
+    catch (IException &e) {
+      QString message = e.toString().c_str();
       QMessageBox::information(p_qnetTool, "Error", message);
     }
   }
@@ -3168,8 +3165,8 @@ namespace Isis {
 
 
   /**
-   * Slot which calls ControlPointEditor slot to save chips 
-   *  
+   * Slot which calls ControlPointEditor slot to save chips
+   *
    * @author 2009-03-17 Tracie Sucharski
    */
 
@@ -3179,10 +3176,10 @@ namespace Isis {
 
 
   void QnetTool::showHideTemplateEditor() {
-  
+
     if (!p_templateEditorWidget)
       return;
-    
+
     p_templateEditorWidget->setVisible(!p_templateEditorWidget->isVisible());
   }
 
@@ -3190,10 +3187,10 @@ namespace Isis {
 
   /**
    * Update the current editPoint information in the Point Editor labels
-   * 
+   *
    * @author 2011-05-05 Tracie Sucharski
-   *  
-   * @TODO  Instead of a single method, should slots be separate for each 
+   *
+   * @TODO  Instead of a single method, should slots be separate for each
    *        updated point parameter, ie. ignore, editLock, apriori, etc.
    *        This is not robust, if other point attributes are changed outside
    *        of QnetTool, this method will need to be updated.
@@ -3226,22 +3223,22 @@ namespace Isis {
 
 
   /**
-   * Refresh all necessary widgets in QnetTool including the PointEditor and 
-   * CubeViewports. 
-   *  
-   * @author 2008-12-09 Tracie Sucharski 
-   *  
-   * @internal 
-   * @history 2010-12-15 Tracie Sucharski - Before setting p_editPoint to NULL, 
+   * Refresh all necessary widgets in QnetTool including the PointEditor and
+   * CubeViewports.
+   *
+   * @author 2008-12-09 Tracie Sucharski
+   *
+   * @internal
+   * @history 2010-12-15 Tracie Sucharski - Before setting p_editPoint to NULL,
    *                        release memory.  TODO: Why is the first if statement
    *                        being done???
-   * @history 2011-10-20 Tracie Sucharski - If no control points exist in the 
+   * @history 2011-10-20 Tracie Sucharski - If no control points exist in the
    *                        network, emit proper signal and make sure editor
    *                        and measure table are hidden.
-   *  
+   *
    */
   void QnetTool::refresh() {
-    
+
 
     //  Check point being edited, make sure it still exists, if not ???
     //  Update ignored checkbox??
@@ -3251,7 +3248,7 @@ namespace Isis {
         ControlPoint *pt = g_controlNetwork->GetPoint(id);
         pt = 0;
       }
-      catch (iException &e) {
+      catch (IException &) {
         delete p_editPoint;
         p_editPoint = NULL;
         emit editPointChanged("");
@@ -3270,11 +3267,11 @@ namespace Isis {
 
 
   /**
-   * Emits a signal to displays the Navigation window.  This signal is connected 
-   * to QnetNavTool. 
-   *  
-   * @internal 
-   *   @history 2010-07-01 Jeannie Walldren - Original version 
+   * Emits a signal to displays the Navigation window.  This signal is connected
+   * to QnetNavTool.
+   *
+   * @internal
+   *   @history 2010-07-01 Jeannie Walldren - Original version
    */
   void QnetTool::showNavWindow(bool checked){
     emit showNavTool();
@@ -3290,8 +3287,8 @@ namespace Isis {
    * @internal
    * @todo Find a way to enable Show Nav Button even when there are no images open
    *       in the main window.
-   *  
-   * @history 2010-07-01 Jeannie Walldren - Original version. 
+   *
+   * @history 2010-07-01 Jeannie Walldren - Original version.
    */
   QWidget *QnetTool::createToolBarWidget (QStackedWidget *parent) {
     QWidget *hbox = new QWidget(parent);
@@ -3317,15 +3314,15 @@ namespace Isis {
 
 
   /**
-   * Open a ground source for selecting fixed points.  This file could be 
-   * a DEM, a shaded version of a DEM or a level1 image with corrected pointing 
-   * or some other type of basemap. 
-   * 
+   * Open a ground source for selecting fixed points.  This file could be
+   * a DEM, a shaded version of a DEM or a level1 image with corrected pointing
+   * or some other type of basemap.
+   *
    * @author  2009-07-20 Tracie Sucharski
-   * 
-   * @internal 
-   * @history 2011-06-03 Tracie Sucharski - Make sure edit point valid before 
-   *                        loading. 
+   *
+   * @internal
+   * @history 2011-06-03 Tracie Sucharski - Make sure edit point valid before
+   *                        loading.
    */
   void QnetTool::openGround() {
 
@@ -3368,10 +3365,9 @@ namespace Isis {
       p_groundGmap = new UniversalGroundMap(*p_groundCube);
       p_groundFile = Filename(p_groundCube->getFilename()).Name().c_str();
     }
-    catch (iException &e) {
-      QString message = e.Errors().c_str();
+    catch (IException &e) {
+      QString message = e.toString();
       QMessageBox::critical(p_qnetTool, "Error", message);
-      e.Clear();
       if (p_groundCube) {
         delete p_groundCube;
         p_groundCube = NULL;      }
@@ -3418,12 +3414,11 @@ namespace Isis {
           PvlGroup mapping = p_groundCube->getGroup("Mapping");
           p_demFile = QString::fromStdString(mapping ["EquatorialRadius"])
                          + ", " + QString::fromStdString(mapping ["PolarRadius"]);
-          //  
+          //
           p_radiusSourceFile = "";
         }
       }
-      catch (iException &e) {
-        e.Clear();
+      catch (IException &) {
         try {
           camera = CameraFactory::Create(*(p_groundCube->getLabel()));
           p_groundSurfacePointSource = ControlPoint::SurfacePointSource::Reference;
@@ -3445,7 +3440,7 @@ namespace Isis {
             }
           }
         }
-        catch (iException &e) {
+        catch (IException &) {
           QString message = "Cannot create either Camera or Projections ";
           message += "for the ground source file.  Check the validity of the ";
           message += " cube labels.  The cube must either be projected or ";
@@ -3470,10 +3465,10 @@ namespace Isis {
 
   /**
    * Open a DEM for ground source radii
-   * 
+   *
    * @author  2011-01-18 Tracie Sucharski
-   * 
-   * 
+   *
+   *
    */
   void QnetTool::openDem() {
 
@@ -3521,10 +3516,9 @@ namespace Isis {
       try {
         p_demCube->open(demFile.toStdString());
         p_demFile = Filename(p_demCube->getFilename()).Name().c_str();
-      } catch (iException &e) {
-        QString message = e.Errors().c_str();
+      } catch (IException &e) {
+        QString message = e.toString();
         QMessageBox::critical(p_qnetTool, "Error", message);
-        e.Clear();
         if (p_demCube) {
           delete p_demCube;
           p_demCube = NULL;
@@ -3602,10 +3596,10 @@ namespace Isis {
 
   /**
    * Return a radius values from the dem using bilinear interpolation
-   * 
+   *
    * @author  2011-08-01 Tracie Sucharski
-   * 
-   * @internal 
+   *
+   * @internal
    */
   double QnetTool::demRadius(double latitude, double longitude) {
 
@@ -3662,16 +3656,16 @@ namespace Isis {
 
 
   /**
-   * Check for implicitly locked measure in p_editPoint.  If point is Locked, 
+   * Check for implicitly locked measure in p_editPoint.  If point is Locked,
    * and this measure is the reference, it is implicity Locked.
-   * Because measure is a copy, the ControlPoint::IsEditLocked() which checks 
-   * for implicit Lock on Reference measures does not work because there is 
-   * not a parent point. 
-   *  
-   * @param[in] serialNumber (QString)   Serial number of measure to be checked 
-   *  
-   *  
-   * @author 2011-07-06 Tracie Sucharski 
+   * Because measure is a copy, the ControlPoint::IsEditLocked() which checks
+   * for implicit Lock on Reference measures does not work because there is
+   * not a parent point.
+   *
+   * @param[in] serialNumber (QString)   Serial number of measure to be checked
+   *
+   *
+   * @author 2011-07-06 Tracie Sucharski
    */
   bool QnetTool::IsMeasureLocked (iString serialNumber) {
 

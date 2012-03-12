@@ -30,7 +30,7 @@
 #include "Distance.h"
 #include "EndianSwapper.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "iTime.h"
 #include "Longitude.h"
@@ -86,9 +86,9 @@ namespace Isis {
    * @param lab  Pvl labels
    * @param noTables Indicates the use of tables.
    *
-   * @throw Isis::Exception::Io - "Can not find NAIF code for NAIF target"
-   * @throw Isis::Exception::Camera - "No camera pointing available"
-   * @throw Isis::Exception::Camera - "No instrument position available"
+   * @throw Isis::IException::Io - "Can not find NAIF code for NAIF target"
+   * @throw Isis::IException::Camera - "No camera pointing available"
+   * @throw Isis::IException::Camera - "No instrument position available"
    *
    * @internal
    *   @history 2011-02-08 Jeannie Walldren - Initialize pointers to null.
@@ -269,7 +269,7 @@ namespace Isis {
           namfrm_c(naifTarget.c_str(), &frameCode);
           if(frameCode == 0) {
             string msg = "Can not find NAIF code for [" + naifTarget + "]";
-            throw iException::Message(iException::Io, msg, _FILEINFO_);
+            throw IException(IException::Io, msg, _FILEINFO_);
           }
         }
 
@@ -311,9 +311,9 @@ namespace Isis {
     //  keywords.
 
     if(kernels["InstrumentPointing"].Size() == 0) {
-      throw iException::Message(iException::Camera,
-                                "No camera pointing available",
-                                _FILEINFO_);
+      throw IException(IException::Unknown,
+                       "No camera pointing available",
+                       _FILEINFO_);
     }
 
     //  2009-03-18  Tracie Sucharski - Removed test for old keywords, any files
@@ -332,9 +332,9 @@ namespace Isis {
     }
 
     if(kernels["InstrumentPosition"].Size() == 0) {
-      throw iException::Message(iException::Camera,
-                                "No instrument position available",
-                                _FILEINFO_);
+      throw IException(IException::Unknown,
+                       "No instrument position available",
+                       _FILEINFO_);
     }
 
     if(iString((std::string)kernels["InstrumentPosition"]).UpCase() == "TABLE") {
@@ -352,7 +352,7 @@ namespace Isis {
    * @param key PvlKeyword
    * @param noTables Indicates the use of tables.
    *
-   * @throw Isis::iException::Io - "Spice file does not exist."
+   * @throw Isis::IException::Io - "Spice file does not exist."
    */
   void Spice::Load(PvlKeyword &key, bool noTables) {
     NaifStatus::CheckErrors();
@@ -366,7 +366,7 @@ namespace Isis {
       Filename file(key[i]);
       if(!file.exists()) {
         string msg = "Spice file does not exist [" + file.Expanded() + "]";
-        throw iException::Message(iException::Io, msg, _FILEINFO_);
+        throw IException(IException::Io, msg, _FILEINFO_);
       }
       string fileName(file.Expanded());
       furnsh_c(fileName.c_str());
@@ -512,11 +512,11 @@ namespace Isis {
    * @param size Size of the cache.
    * @param tol Tolerance.
    *
-   * @throw Isis::iException::Programmer - "Argument cacheSize must be greater
+   * @throw Isis::IException::Programmer - "Argument cacheSize must be greater
    *        than zero"
-   * @throw Isis::iException::Programmer - "Argument startTime must be less than
+   * @throw Isis::IException::Programmer - "Argument startTime must be less than
    *        or equal to endTime"
-   * @throw Isis::iException::User - "This instrument does not support time
+   * @throw Isis::IException::User - "This instrument does not support time
    *             padding"
    *
    * @history 2011-04-10 Debbie A. Cook - Updated to only create cache for
@@ -529,22 +529,22 @@ namespace Isis {
     // Check for errors
     if(cacheSize <= 0) {
       string msg = "Argument cacheSize must be greater than zero";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if(startTime > endTime) {
       string msg = "Argument startTime must be less than or equal to endTime";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if(*p_cacheSize > 0) {
       string msg = "A cache has already been created";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if(cacheSize == 1 && (*p_startTimePadding != 0 || *p_endTimePadding != 0)) {
       string msg = "This instrument does not support time padding";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     string abcorr;
@@ -683,9 +683,9 @@ namespace Isis {
 
     *p_et = et;
 
-    p_bodyRotation->SetEphemerisTime(et.Et());  
-    p_instrumentRotation->SetEphemerisTime(et.Et()); 
-    p_instrumentPosition->SetEphemerisTime(et.Et());    
+    p_bodyRotation->SetEphemerisTime(et.Et());
+    p_instrumentRotation->SetEphemerisTime(et.Et());
+    p_instrumentPosition->SetEphemerisTime(et.Et());
     p_sunPosition->SetEphemerisTime(et.Et());
 
     std::vector<double> uB = p_bodyRotation->ReferenceVector(p_sunPosition->Coordinate());
@@ -708,7 +708,7 @@ namespace Isis {
   void Spice::InstrumentPosition(double p[3]) const {
     if(p_et == NULL) {
       std::string msg = "You must call SetTime first";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     std::vector<double> sB = p_bodyRotation->ReferenceVector(p_instrumentPosition->Coordinate());
@@ -726,7 +726,7 @@ namespace Isis {
   void Spice::InstrumentVelocity(double v[3]) const {
     if(p_et == NULL) {
       std::string msg = "You must call SetTime first";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     std::vector<double> vB = p_bodyRotation->ReferenceVector(p_instrumentPosition->Velocity());
@@ -757,7 +757,7 @@ namespace Isis {
   void Spice::SunPosition(double p[3]) const {
     if(p_et == NULL) {
       std::string msg = "You must call SetTime first";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     p[0] = p_uB[0];
     p[1] = p_uB[1];
@@ -800,7 +800,7 @@ namespace Isis {
     if(!found) {
       string msg = "Could not convert Target [" + *p_target +
                    "] to NAIF code";
-      throw iException::Message(iException::Io, msg, _FILEINFO_);
+      throw IException(IException::Io, msg, _FILEINFO_);
     }
 
     return (int) code;
@@ -954,7 +954,7 @@ namespace Isis {
 
       if(!found) {
         string msg = "Can not find [" + key + "] in text kernels";
-        throw iException::Message(iException::Io, msg, _FILEINFO_);
+        throw IException(IException::Io, msg, _FILEINFO_);
       }
 
       storeValue(key, index, type, result);
@@ -966,7 +966,7 @@ namespace Isis {
       if(result.isNull()) {
         iString msg = "The camera is requesting spice data [" + key + "] that "
             "was not attached, please re-run spiceinit";
-        throw iException::Message(iException::Spice, msg, _FILEINFO_);
+        throw IException(IException::Unknown, msg, _FILEINFO_);
       }
     }
 
@@ -1035,7 +1035,7 @@ namespace Isis {
     }
     else {
       iString msg = "Unable to store variant in labels for key [" + key + "]";
-      throw iException::Message(iException::Spice, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
   }
 
@@ -1059,8 +1059,7 @@ namespace Isis {
         else if(type == SpiceIntType)
           result = (int)storedKeyword[index];
       }
-      catch(iException &e) {
-        e.Clear();
+      catch(IException &) {
       }
     }
 
@@ -1077,7 +1076,7 @@ namespace Isis {
    *
    * @return @b string Value from the NAIF text pool
    *
-   * @throw Isis::iException::Io - "Can not find key in instrument kernels."
+   * @throw Isis::IException::Io - "Can not find key in instrument kernels."
    */
   iString Spice::GetString(const iString &key, int index) {
     return readValue(key, SpiceStringType, index).toString();
@@ -1093,7 +1092,7 @@ namespace Isis {
    * @param lon Sub-spacecraft longitude
    *
    * @see SetTime()
-   * @throw Isis::iException::Programmer - "You must call SetTime
+   * @throw Isis::IException::Programmer - "You must call SetTime
    *             first."
    */
   void Spice::SubSpacecraftPoint(double &lat, double &lon) {
@@ -1101,7 +1100,7 @@ namespace Isis {
 
     if(p_et == NULL) {
       std::string msg = "You must call SetTime first";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     SpiceDouble usB[3], dist;
@@ -1140,7 +1139,7 @@ namespace Isis {
    * @param lon Sub-solar longitude
    *
    * @see SetTime()
-   * @throw Isis::iException::Programmer - "You must call SetTime
+   * @throw Isis::IException::Programmer - "You must call SetTime
    *             first."
    */
   void Spice::SubSolarPoint(double &lat, double &lon) {
@@ -1148,7 +1147,7 @@ namespace Isis {
 
     if(p_et == NULL) {
       std::string msg = "You must call SetTime first";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     SpiceDouble uuB[3], dist;

@@ -4,7 +4,7 @@
 #include "MultivariateStatistics.h"
 #include "OverlapStatistics.h"
 #include "UserInterface.h"
-#include "iException.h"
+#include "IException.h"
 
 using namespace std;
 using namespace Isis;
@@ -32,7 +32,7 @@ void IsisMain() {
     //Make sure the projections overlap
     if(!oStats.HasOverlap()) {
       string msg = "Input Cubes do not appear to overlap";
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     // Get mvstat data for the overlapping area
     stats = oStats.GetMStats(1);

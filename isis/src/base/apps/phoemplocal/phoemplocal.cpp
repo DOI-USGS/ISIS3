@@ -16,7 +16,7 @@
 #include "AtmosModel.h"
 #include "AtmosModelFactory.h"
 #include "GuiEditFile.h"
-#include "iException.h"
+#include "IException.h"
 #include "PhotoModel.h"
 #include "PhotoModelFactory.h"
 #include "Photometry.h"
@@ -54,7 +54,7 @@ struct linearFitParams {
   HapkeArrs hapkeArrs;
   Datum datum;
   Pvl pvl;
-  double c0, c1; // Constant and linear coefficients of linear 
+  double c0, c1; // Constant and linear coefficients of linear
                  // fit of empirical fn to Hapke @ fixed PAR
   bool iord;
   PhotoModel *pModel;
@@ -73,7 +73,7 @@ int seedNumber=0;
 double LinearFitPhotometricToHapke(double pPar, void* pParams);
 
 // Fills the buffer HAPKE_IMG with the Hapke-model radiances of point
-void GetHapkeImgLocation(PhotoModel *pHapke, AtmosModel *pAsmModel, HapkeArrs & pHapkeArrs, 
+void GetHapkeImgLocation(PhotoModel *pHapke, AtmosModel *pAsmModel, HapkeArrs & pHapkeArrs,
                          Datum & pDatum);
 
 void IsisMain() {
@@ -83,7 +83,7 @@ void IsisMain() {
 
   // Determine if user is providing a seed for the random number
   // generator
-  useSeed = ui.GetBoolean("SEED"); 
+  useSeed = ui.GetBoolean("SEED");
   if (useSeed) {
     seedNumber = ui.GetInteger("SEED_NUMBER");
   }
@@ -92,7 +92,7 @@ void IsisMain() {
   iString sHapkeFunc = ui.GetAsString("PHTNAME");
   sHapkeFunc = sHapkeFunc.UpCase();
 
-  // Should contains parameter names matching GUI not to be included 
+  // Should contains parameter names matching GUI not to be included
   // in the Pvl defFile
   vector<string> inclusion;
   inclusion.clear();
@@ -112,9 +112,9 @@ void IsisMain() {
   }
   else {
     string sErrMsg = "Invalid Hapke Function\n";
-    throw iException::Message(iException::User, sErrMsg, _FILEINFO_);
+    throw IException(IException::User, sErrMsg, _FILEINFO_);
   }
-  
+
   Pvl hapkePvl;
   ui.CreatePVL(hapkePvl, "Hapke", "PhotometricModel", "Algorithm", inclusion);
 
@@ -123,11 +123,11 @@ void IsisMain() {
   Application::Log(hapkeGrp);
 
   PhotoModel *hapkeModel = PhotoModelFactory::Create(hapkePvl);
- 
+
   // Type of photometric function to fit (lunar-lambert, Minnaert) to the Hapke Model
   iString sEmpirical = ui.GetAsString("MODEL");
   sEmpirical = sEmpirical.UpCase();
-  
+
   Pvl empPvl;
   empPvl.AddObject(PvlObject("PhotometricModel"));
   empPvl.FindObject("PhotometricModel").AddGroup(PvlGroup("Algorithm"));
@@ -136,13 +136,13 @@ void IsisMain() {
   } else {
     empPvl.FindObject("PhotometricModel").FindGroup("Algorithm").AddKeyword(PvlKeyword("Name", "Minnaert"), Pvl::Replace);
   }
- 
+
   // Get Emission, Incidence, Phase Mean Ground Plane Geometry (Datum)
   datum.m_emission  = ui.GetDouble("EMISSION");
   datum.m_incidence = ui.GetDouble("INCIDENCE");
   datum.m_phase     = ui.GetDouble("PHASE");
   datum.m_rmsSlope  = ui.GetDouble("RMS_SLOPE");
-   
+
   // Save output to the Results group
   std::stringstream os;
   os << "Group = Results" << endl;
@@ -152,7 +152,7 @@ void IsisMain() {
   os << "THETA = " << ui.GetDouble("THETA") << endl;
   os << "HH = " << ui.GetDouble("HH") << endl;
   os << "B0 = " << ui.GetDouble("B0") << endl;
- 
+
   if (sHapkeFunc == "HAPKEHEN") {
     os << "# SINGLE PARTICLE PHASE FUNCTION IS HENYEY-GREENSTEIN WITH:" << endl;
     os << "HG1 = " << ui.GetDouble("HG1") << endl;
@@ -164,10 +164,10 @@ void IsisMain() {
     os << "CH = " << ui.GetDouble("CH") << endl;
   }
   else {
-      string errMsg = "Undefined Hapke Model\n";
-      throw iException::Message(iException::User, errMsg, _FILEINFO_);
+    string errMsg = "Undefined Hapke Model\n";
+    throw IException(IException::User, errMsg, _FILEINFO_);
   }
- 
+
   // Order of approximation in atmospheric scatter model
   bool doAsm = false;
   iString sAsmType = ui.GetAsString("ATMNAME");
@@ -175,7 +175,7 @@ void IsisMain() {
   if (sAsmType != "NONE") {
     doAsm = true;
   }
-   
+
   AtmosModel *asmModel=NULL;
   if (doAsm) {
     Pvl asmPvl;
@@ -215,7 +215,7 @@ void IsisMain() {
     }
     else {
       string errMsg = "Undefined Atmospheric Scattering Model\n";
-      throw iException::Message(iException::User, errMsg, _FILEINFO_);
+      throw IException(IException::User, errMsg, _FILEINFO_);
     }
 
     os << "TAU = " << asmModel->AtmosTau() << endl;
@@ -225,15 +225,15 @@ void IsisMain() {
 
     asmModel->GenerateAhTable();
   }
-  
+
   os << "GRID_POINTS = " << NL << endl;
   os << "INCIDENCE_ANGLE_TO_DATUM = " << datum.m_incidence << endl;
   os << "EMISSION_ANGLE_TO_DATUM = " << datum.m_emission << endl;
   os << "PHASE_ANGLE = " << datum.m_phase << endl;
   os << "RMS_SLOPE = " << datum.m_rmsSlope << endl;
-  
+
   if (sEmpirical == "LUNARLAMBERT") {
-    os << "# FITTED EMPIRICAL FUNCTION IS LUNAR-LAMBERT: LIMB-DARKENING PARAMETER IS L" << endl; 
+    os << "# FITTED EMPIRICAL FUNCTION IS LUNAR-LAMBERT: LIMB-DARKENING PARAMETER IS L" << endl;
   }
   else {
     os << "# FITTED EMPIRICAL FUNCTION IS MINNAERT: LIMB-DARKENING PARAMETER IS K" << endl;
@@ -252,7 +252,7 @@ void IsisMain() {
 
   if (datum.m_phase > (datum.m_emission + datum.m_incidence)) {
     string sErrMsg = "No valid fit points\n";
-    throw iException::Message(iException::User, sErrMsg, _FILEINFO_);
+    throw IException(IException::User, sErrMsg, _FILEINFO_);
   }
   else {
     GetHapkeImgLocation(hapkeModel, asmModel, hapkeVal, datum);
@@ -267,7 +267,7 @@ void IsisMain() {
   // Coefficients of the fit C0 (additive) and C1 (multiplicative)
   lFitParams.c0        = 0;
   lFitParams.c1        = 0;
- 
+
   lFitParams.pModel = PhotoModelFactory::Create(empPvl);
   // Log the Empirical Photometric Model Def File
   PvlGroup empGrp = empPvl.FindObject("PhotometricModel").FindGroup("Algorithm");
@@ -280,14 +280,14 @@ void IsisMain() {
   double xa = 0.0;
   double xb = 1.0;
   double xc,fa,fb,fc;
-  Photometry::minbracket(xa, xb, xc, fa, fb, fc, 
+  Photometry::minbracket(xa, xb, xc, fa, fb, fc,
       &LinearFitPhotometricToHapke, &lFitParams); // minimum parabola (approximation)
 
-  double tolerance = 1e-6;  
+  double tolerance = 1e-6;
   Photometry::brentminimizer(xa, xc, &Func, xb, tolerance);
-  
+
   double parmin = LinearFitPhotometricToHapke(xb, &lFitParams);
- 
+
   if (!lFitParams.iord) {
     os << "LIMB_DARKENING_PARAMETER = " << xb << endl;
     os << "BEST_FIT_MULTIPLIER = " << lFitParams.c1 << endl;
@@ -322,12 +322,12 @@ void IsisMain() {
   }
 
 
-  if (ui.WasEntered("TO")) {  
+  if (ui.WasEntered("TO")) {
     Pvl mainpvl;
     if (ui.WasEntered("NOTE")) {
-      mainpvl.AddGroup(note); 
+      mainpvl.AddGroup(note);
     }
-    mainpvl.AddGroup(results); 
+    mainpvl.AddGroup(results);
     string sOutFile = ui.GetFilename("TO");
     bool append = ui.GetBoolean("APPEND");
     ofstream os;
@@ -337,7 +337,7 @@ void IsisMain() {
       mainpvl.Write(sOutFile);
     }
   }
- 
+
   if (lFitParams.pModel != NULL) {
     delete lFitParams.pModel;
     lFitParams.pModel = NULL;
@@ -352,19 +352,19 @@ void IsisMain() {
   }
 }
 
-/** 
+/**
  * Fits a simple photometric model to the Hapke model by linear least
  * squares fit at a contant given value of the limb-darkening parameter pPar.
  * The RMS error of the fit is returned.
- *  
- * The prototype is set to match the gsl_function data type to use gsl's brentminimizer function. 
- *  
+ *
+ * The prototype is set to match the gsl_function data type to use gsl's brentminimizer function.
+ *
  * The gsl_function is a pointer to function of the following prototype:
- * double (* function) (double x, void * params) 
- *  
- * Following is an example to use gsl_function 
+ * double (* function) (double x, void * params)
+ *
+ * Following is an example to use gsl_function
  * struct my_f_params { double a; double b; double c; };
- * 
+ *
  *  double my_f (double x, void * p) {
  *    struct my_f_params * params = (struct my_f_params *)p;
  *    double a = (params->a);
@@ -379,16 +379,16 @@ void IsisMain() {
  *
  *  F.function = &my_f;
  *  F.params = &params;
- *  
+ *
  * @author Sharmila Prasad (8/10/2011)
- * 
- * @param pPar - limb-darkening parameter 
- * 
+ *
+ * @param pPar - limb-darkening parameter
+ *
  * @return double - RMS error of fit
  */
 double LinearFitPhotometricToHapke(double pPar, void* pParams){
   double lfit_pho_local;  // Output: RMS error of fit
-  double c0, c1;          // Constant and linear coefficients of linear 
+  double c0, c1;          // Constant and linear coefficients of linear
                           // fit of empirical fn to Hapke @ fixed PAR
 
   struct linearFitParams * lFitParams = (struct linearFitParams *)pParams;
@@ -397,27 +397,27 @@ double LinearFitPhotometricToHapke(double pPar, void* pParams){
   const Datum pDatum         = lFitParams->datum;
   const bool iord            = lFitParams->iord;
   PhotoModel *pmodel = lFitParams->pModel;
- 
+
   if (pEmpirical == "LUNARLAMBERT") {
     pmodel->SetPhotoL(pPar);
   }
   else {
     pmodel->SetPhotoK(pPar);
   }
- 
-  // Accumulation buffers for least-squares fit information: 
+
+  // Accumulation buffers for least-squares fit information:
   // sums of products of abcissa and ordinate...
   double sum1=0, sumX=0, sumY=0, sumXX=0, sumXY=0, sumYY=0;
 
   double inc, ema;      // Incidence and emission angles
-  
-  // Here, abcissa and ordinate of fit, i.e., Hapke model value, 
-  // simple model value 
+
+  // Here, abcissa and ordinate of fit, i.e., Hapke model value,
+  // simple model value
   double x, y;
-  
+
   double den;         // Denominator for least squares calcs
   double arg;
-  
+
   // Accumulate statistics
   for (int j=0; j<NL; j++) {
     for (int i=0; i<NS; i++) {
@@ -433,13 +433,13 @@ double LinearFitPhotometricToHapke(double pPar, void* pParams){
       sumYY += (y*y);
     }
   }
-  
+
   // Check that some points were found so the fit can be done
-  if (sum1 < 1 || sumXX <= 0 || 
+  if (sum1 < 1 || sumXX <= 0 ||
       (iord && ((sum1 * sumXX - sumX * sumX) == 0))) {
    return -1; // nofit
   }
-  
+
   // Evaluate coefficients and RMS error of the linear least-squares fit
   if (!iord) {
     c0 = 0;
@@ -452,17 +452,17 @@ double LinearFitPhotometricToHapke(double pPar, void* pParams){
     c1  = (sum1 * sumXY - sumX * sumY) / den;
     arg = (sumYY + 2 * (c0 * c1 * sumX - c0 * sumY -c1 * sumXY) + c0 * c0 * sum1 + c1 * c1 * sumXX) / sum1;
   }
-  
+
   if (arg > 0) {
     lfit_pho_local = sqrt(arg);
   }
   else {
     lfit_pho_local = 0;
   }
-  
+
   lFitParams->c0 = c0;
   lFitParams->c1 = c1;
-  
+
   return lfit_pho_local;
 }
 
@@ -470,27 +470,27 @@ double LinearFitPhotometricToHapke(double pPar, void* pParams){
  * Fills the buffer HAPKE_IMG with the Hapke-model radiances of
  * points with given PHASE and random incidence and emission angles
  * stored in INC_IMG, EMA_IMG.
- *  
- * Ported from Isis2 
- *  
+ *
+ * Ported from Isis2
+ *
  * @author Sharmila Prasad (8/9/2011)
- *  
+ *
  * @param pHapke     - Hapke Photo Model
- * @param pAsmModel  - Is Atmospheric Model selected 
+ * @param pAsmModel  - Is Atmospheric Model selected
  * @param pHapkeArrs - Structure of hapke, inc, ema arrays
  * @param pDatum     - Structure with datum incidence, emission, phase and rms slope
  */
 void GetHapkeImgLocation(PhotoModel *pHapke, AtmosModel *pAsmModel, HapkeArrs & pHapkeArrs, Datum & pDatum) {
   if (NS != (NL * 2 - 1)) {
     string errMsg = "Bad Buffer Dimensions\n";
-    throw iException::Message(iException::User, errMsg, _FILEINFO_);
+    throw IException(IException::User, errMsg, _FILEINFO_);
   }
-  
+
   double incX = sin(pDatum.m_incidence * DEG2RAD);
   double incZ = cos(pDatum.m_incidence * DEG2RAD);
   double emaZ = cos(pDatum.m_emission  * DEG2RAD);
   double cosP = cos(pDatum.m_phase     * DEG2RAD);
-  
+
   double emaX, emaY, scaZrad=0;
 
   if (pDatum.m_incidence==0 || pDatum.m_emission==0) {
@@ -504,12 +504,12 @@ void GetHapkeImgLocation(PhotoModel *pHapke, AtmosModel *pAsmModel, HapkeArrs & 
     scaZrad = acos(emaX/emaY);
     emaY   *= sin(scaZrad);
   }
-  
+
   double rmsBI = tan(pDatum.m_rmsSlope * DEG2RAD) / sqrt(2);
-  
+
   // Calculates Angles based on Random Orientation to Datum
   // Algorithm for Gaussian random deviates is that of Box and Muller,
-  // taken from Forsyth, Malcom, and Moler. 
+  // taken from Forsyth, Malcom, and Moler.
   double u1 = rando(1);
   double u2 = 0;
   for (int j=0; j<NL; j++) {
@@ -528,11 +528,11 @@ void GetHapkeImgLocation(PhotoModel *pHapke, AtmosModel *pAsmModel, HapkeArrs & 
       double mu = (emaZ-emaX*dzdx-emaY*dzdy)/den;
       double inc = acos(munot)/DEG2RAD;
       double ema = acos(mu)/DEG2RAD;
-      
+
       pHapkeArrs.m_hapkeImg[i][j] = pHapke->CalcSurfAlbedo(pDatum.m_phase, inc, ema);
       pHapkeArrs.m_incImg[i][j]   = inc;
       pHapkeArrs.m_emaImg[i][j]   = ema;
-      
+
       // Note that incidence and emission Datum replace inc and ema in Atmospheric Models
       //ISOTROPIC1, ISOTROPIC2, ANISOTROPIC1, ANISOTROPIC2
       double pstd=0, trans=0, trans0=0, sbar=0, transs=0;
@@ -540,10 +540,10 @@ void GetHapkeImgLocation(PhotoModel *pHapke, AtmosModel *pAsmModel, HapkeArrs & 
       if (pAsmModel != NULL) {
         pAsmModel->CalcAtmEffect(pDatum.m_phase, pDatum.m_incidence, pDatum.m_emission,
                                  &pstd, &trans, &trans0, &sbar, &transs);
-        
+
         //R8SPLINT(INCTABLE,AHTABLE,AHTABLE2,NINC,INCDAT,AHI)
         ahi = (pAsmModel->AtmosAhSpline()).Evaluate(pDatum.m_incidence, NumericalApproximation::Extrapolate);
-        
+
         munot = cos(DEG2RAD * pDatum.m_incidence);
         pHapkeArrs.m_hapkeImg[i][j] = pstd + trans * munot * ahi / (1 - pAsmModel->AtmosAb() * sbar)
                                       + trans0 * (pHapkeArrs.m_hapkeImg[i][j] - ahi * munot);
@@ -554,10 +554,10 @@ void GetHapkeImgLocation(PhotoModel *pHapke, AtmosModel *pAsmModel, HapkeArrs & 
 
 /**
  * Random number generator
- * 
+ *
  * @author Janet Barrett USGS Flagstaff Original Version Mar 12 2003
- * 
- * @return float rand 
+ *
+ * @return float rand
  */
 float rando(int init) {
   float rnd;
@@ -576,6 +576,6 @@ float rando(int init) {
     i = rand();
     rnd = (float)i/(float)RAND_MAX;
   }
- 
+
   return(rnd);
 }

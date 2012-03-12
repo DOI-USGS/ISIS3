@@ -3,7 +3,7 @@
 #include "ProcessByLine.h"
 #include "UserInterface.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "Preference.h"
 #include "iString.h"
 #include "Pvl.h"
@@ -55,17 +55,17 @@ void IsisMain() {
     }
 
   }
-  catch(iException &e) {
+  catch(IException &e) {
     string msg = "Unable to read [DATA_SET_ID] from input file [" +
                  inFile.Expanded() + "]";
-    throw iException::Message(iException::Io, msg, _FILEINFO_);
+    throw IException(IException::Unknown, msg, _FILEINFO_);
   }
 
   //Checks if in file is rdr
   if(projected) {
     string msg = "[" + inFile.Name() + "] appears to be an rdr file.";
     msg += " Use pds2isis.";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   id.ConvertWhiteSpace();
@@ -74,13 +74,13 @@ void IsisMain() {
   if(id != "MRO-M-CTX-2-EDR-L0-V1.0") {
     string msg = "Input file [" + inFile.Expanded() + "] does not appear to be " +
                  "in MRO-CTX EDR format. DATA_SET_ID is [" + id + "]";
-    throw iException::Message(iException::Io, msg, _FILEINFO_);
+    throw IException(IException::Unknown, msg, _FILEINFO_);
   }
 
   // Check to make sure the SampleBitModeId is SQROOT
   if(bitMode != "SQROOT") {
     string msg = "Can't handle Sample Bit Mode [" + bitMode + "]";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   //Process the file

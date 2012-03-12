@@ -39,7 +39,7 @@
 #include "Brick.h"
 #include "Camera.h"
 #include "CubeDataThread.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "Filename.h"
 #include "Histogram.h"
@@ -69,19 +69,19 @@ namespace Isis {
       QWidget *parent) : QAbstractScrollArea(parent) {
     // Is the cube usable?
     if(cube == NULL) {
-      throw iException::Message(iException::Programmer,
-                                "Can not view NULL cube pointer",
-                                _FILEINFO_);
+      throw IException(IException::Programmer,
+                       "Can not view NULL cube pointer",
+                       _FILEINFO_);
     }
     else if(!cube->isOpen()) {
-      throw iException::Message(iException::Programmer,
-                                "Can not view unopened cube",
-                                _FILEINFO_);
+      throw IException(IException::Programmer,
+                       "Can not view unopened cube",
+                       _FILEINFO_);
     }
 
     p_cube = cube;
     p_cubeData = NULL;
-    
+
     if (cubeData)
     {
       p_cubeData = cubeData;
@@ -150,8 +150,7 @@ namespace Isis {
     try {
       p_groundMap = new UniversalGroundMap(*p_cube);
     }
-    catch(iException &e) {
-      e.Clear();
+    catch(IException &) {
     }
 
     if(p_groundMap != NULL) {
@@ -162,8 +161,7 @@ namespace Isis {
           try {
             p_projection = cube->getProjection();
           }
-          catch(iException &e) {
-            e.Clear();
+          catch(IException &) {
           }
         }
       }
@@ -351,10 +349,10 @@ namespace Isis {
     // p_cubeData MUST be deleted AFTER all viewport buffers!!!
     if(p_cubeData) {
       p_cubeData->RemoveChangeListener();
-      
+
       if(p_thisOwnsCubeData)
         delete p_cubeData;
-      
+
       p_cubeData = NULL;
     }
 
@@ -584,7 +582,7 @@ namespace Isis {
       if (scale > maxScale) {
         scale = maxScale;
       }
-      // don't let zoom scale be smaller than one pixel high/wide showing 
+      // don't let zoom scale be smaller than one pixel high/wide showing
       double minScale = 1.0 / (min(cubeSamples(),cubeLines()));
       if (scale < minScale) {
         scale = minScale;
@@ -1167,8 +1165,7 @@ namespace Isis {
         }
 
         if(y >= p_image->height()) {
-          throw iException::Message(iException::Programmer, "y too big",
-                                    _FILEINFO_);
+          throw IException(IException::Programmer, "y too big", _FILEINFO_);
         }
 
         QRgb *rgb = (QRgb *) p_image->scanLine(y);
@@ -1182,13 +1179,11 @@ namespace Isis {
           }
 
           if(bufferX < 0) {
-            throw iException::Message(iException::Programmer, "bufferX < 0",
-                                      _FILEINFO_);
+            throw IException(IException::Programmer, "bufferX < 0", _FILEINFO_);
           }
 
           if(x >= p_image->width()) {
-            throw iException::Message(iException::Programmer, "x too big",
-                                      _FILEINFO_);
+            throw IException(IException::Programmer, "x too big", _FILEINFO_);
           }
 
           double bufferVal = line.at(bufferX);
@@ -1214,16 +1209,18 @@ namespace Isis {
             p_redBuffer->bufferXYRect().top()) ||
             (p_greenBuffer->bufferXYRect().top() !=
              p_blueBuffer->bufferXYRect().top())) {
-          throw iException::Message(iException::Programmer,
-                                    "Buffer rects mismatched", _FILEINFO_);
+          throw IException(IException::Programmer,
+                           "Buffer rects mismatched",
+                           _FILEINFO_);
         }
 
         if((p_greenBuffer->bufferXYRect().left() !=
             p_redBuffer->bufferXYRect().left()) ||
             (p_greenBuffer->bufferXYRect().left() !=
              p_blueBuffer->bufferXYRect().left())) {
-          throw iException::Message(iException::Programmer,
-                                    "Buffer rects mismatched", _FILEINFO_);
+          throw IException(IException::Programmer,
+                           "Buffer rects mismatched",
+                           _FILEINFO_);
         }
 
         dataArea = QRect(p_redBuffer->bufferXYRect().intersected(rect));
@@ -1240,8 +1237,9 @@ namespace Isis {
           if((int)redLine.size() < dataArea.width() ||
               (int)greenLine.size() < dataArea.width() ||
               (int)blueLine.size() < dataArea.width()) {
-            throw iException::Message(iException::Programmer,
-                                      "Empty buffer line", _FILEINFO_);
+            throw IException(IException::Programmer,
+                             "Empty buffer line",
+                             _FILEINFO_);
           }
 
           QRgb *rgb = (QRgb *) p_image->scanLine(y);

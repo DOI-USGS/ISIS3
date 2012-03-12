@@ -1,17 +1,17 @@
 Testing Isis::ProcessByQuickFilter Class ... 
-**PROGRAMMER ERROR** StartProcess only supports exactly one input file
+**PROGRAMMER ERROR** StartProcess only supports exactly one input file.
 
-**PROGRAMMER ERROR** StartProcess only supports exactly one output file
+**PROGRAMMER ERROR** StartProcess only supports exactly one output file.
 
-**PROGRAMMER ERROR** The lines in the input and output cube must match
+**PROGRAMMER ERROR** The lines in the input and output cube must match.
 
-**PROGRAMMER ERROR** The samples in the input and output cube must match
+**PROGRAMMER ERROR** The samples in the input and output cube must match.
 
-**PROGRAMMER ERROR** The bands in the input and output cube must match
+**PROGRAMMER ERROR** The bands in the input and output cube must match.
 
-**USER ERROR** Boxcar height is too big for cube size
+**USER ERROR** Boxcar height is too big for cube size.
 
-**USER ERROR** Boxcar width is too big for cube size
+**USER ERROR** Boxcar width is too big for cube size.
 
 unittest: Working
 0% Processed

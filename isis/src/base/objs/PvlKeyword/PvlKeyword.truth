@@ -4,7 +4,7 @@
 'KEYWORD' -----------------------> VALID
     NAME: KEYWORD
 'KEYWORD X' ---------------------> INVALID
-    **PVL ERROR** Expected an assignment operator [=], but found [X]
+    **ERROR** Expected an assignment [=] when reading PVL, but found [X].
 'KEYWORD =' ---------------------> INCOMPLETE
 'KEYWORD = SOME_VAL' ------------> VALID
     NAME: KEYWORD
@@ -18,7 +18,7 @@
 'KEYWORD = (VAL' ----------------> INCOMPLETE
 'KEYWORD = (VAL1,VAL2' ----------> INCOMPLETE
 'KEYWORD = (A B,C,D)' -----------> INVALID
-    **PVL ERROR** Found extra data after [A] in array
+    **ERROR** Found extra data after [A] in array when reading PVL.
 'KEYWORD = ((A B),(C),(D' -------> INCOMPLETE
 'KEYWORD = (SOME_VAL)' ----------> VALID
     NAME: KEYWORD
@@ -30,7 +30,7 @@
     NAME: KEYWORD
     VALUE: SOME_VAL <a>
 'KEYWORD = (A, )' ---------------> INVALID
-    **PVL ERROR** Unexpected close of keyword-value array
+    **ERROR** Unexpected close of keyword-value array when reading PVL.
 'KEYWORD = ()' ------------------> VALID
     NAME: KEYWORD
 'KEYWORD = (A,B)' ---------------> VALID
@@ -55,7 +55,7 @@
     VALUE: A
     VALUE: B
 'KEYWORD = (A, B,C,D,E))' -------> INVALID
-    **PVL ERROR** Keyword has extraneous data [)] at the end
+    **ERROR** Keyword has extraneous data [)] at the end.
 'KEYWORD = ((1, 2), {3,  4}, (5), 6)' > VALID
     NAME: KEYWORD
     VALUE: (1, 2)
@@ -68,7 +68,7 @@
     VALUE: VAL2
     VALUE: VAL3
 'KEYWORD = { "VAL1" , "VAL2", "VAL3")' > INVALID
-    **PVL ERROR** Incorrect array close; expected [}] but found [)] in keyword named [KEYWORD]
+    **ERROR** Incorrect array close when reading PVL; expected [}] but found [)] in keyword named [KEYWORD].
 'KEYWORD = { "VAL1" ,' ----------> INCOMPLETE
 'KEYWORD = "(A,B,"' -------------> VALID
     NAME: KEYWORD
@@ -90,7 +90,7 @@
     VALUE: D <d>
 'KEYWORD = ',E) <unit>' ---------> INCOMPLETE
 'KEYWORD = ,E) <unit>' ----------> INVALID
-    **PVL ERROR** Keyword has extraneous data [,E) <unit>] at the end
+    **ERROR** Keyword has extraneous data [,E) <unit>] at the end.
 #SOMECOMMENT
 'KEYWORD = SOME_VAL' ------------> VALID
     COMMENT: #SOMECOMMENT
@@ -195,14 +195,14 @@ Input:
 KEYWORD X
 
 Output: 
-**PVL ERROR** Unable to read keyword [KEYWORD X]
-**PVL ERROR** Expected an assignment operator [=], but found [X]
+**ERROR** Unable to read PVL keyword [KEYWORD X].
+**ERROR** Expected an assignment [=] when reading PVL, but found [X].
 
 Input:
 KEYWORD =
 
 Output: 
-**PVL ERROR** The keyword [KEYWORD =] does not appear to be a valid Pvl Keyword
+**ERROR** The PVL keyword [KEYWORD =] does not appear to be a valid Pvl Keyword.
 
 Input:
 KEYWORD = SOME_VAL
@@ -226,26 +226,26 @@ Input:
 KEYWORD = (VAL
 
 Output: 
-**PVL ERROR** The keyword [KEYWORD = (VAL] does not appear to be a valid Pvl Keyword
+**ERROR** The PVL keyword [KEYWORD = (VAL] does not appear to be a valid Pvl Keyword.
 
 Input:
 KEYWORD = (VAL1,VAL2
 
 Output: 
-**PVL ERROR** The keyword [KEYWORD = (VAL1,VAL2] does not appear to be a valid Pvl Keyword
+**ERROR** The PVL keyword [KEYWORD = (VAL1,VAL2] does not appear to be a valid Pvl Keyword.
 
 Input:
 KEYWORD = (A B,C,D)
 
 Output: 
-**PVL ERROR** Unable to read keyword [KEYWORD = (A B,C,D)]
-**PVL ERROR** Found extra data after [A] in array
+**ERROR** Unable to read PVL keyword [KEYWORD = (A B,C,D)].
+**ERROR** Found extra data after [A] in array when reading PVL.
 
 Input:
 KEYWORD = ((A B),(C),(D
 
 Output: 
-**PVL ERROR** The keyword [KEYWORD = ((A B),(C),(D] does not appear to be a valid Pvl Keyword
+**ERROR** The PVL keyword [KEYWORD = ((A B),(C),(D] does not appear to be a valid Pvl Keyword.
 
 Input:
 KEYWORD = (SOME_VAL)
@@ -269,8 +269,8 @@ Input:
 KEYWORD = (A, )
 
 Output: 
-**PVL ERROR** Unable to read keyword [KEYWORD = (A, )]
-**PVL ERROR** Unexpected close of keyword-value array
+**ERROR** Unable to read PVL keyword [KEYWORD = (A, )].
+**ERROR** Unexpected close of keyword-value array when reading PVL.
 
 Input:
 KEYWORD = ()
@@ -313,8 +313,8 @@ Input:
 KEYWORD = (A, B,C,D,E))
 
 Output: 
-**PVL ERROR** Unable to read keyword [KEYWORD = (A, B,C,D,E))]
-**PVL ERROR** Keyword has extraneous data [)] at the end
+**ERROR** Unable to read PVL keyword [KEYWORD = (A, B,C,D,E))].
+**ERROR** Keyword has extraneous data [)] at the end.
 
 Input:
 KEYWORD = ((1, 2), {3,  4}, (5), 6)
@@ -332,14 +332,14 @@ Input:
 KEYWORD = { "VAL1" , "VAL2", "VAL3")
 
 Output: 
-**PVL ERROR** Unable to read keyword [KEYWORD = { "VAL1" , "VAL2", "VAL3")]
-**PVL ERROR** Incorrect array close; expected [}] but found [)] in keyword named [KEYWORD]
+**ERROR** Unable to read PVL keyword [KEYWORD = { "VAL1" , "VAL2", "VAL3")].
+**ERROR** Incorrect array close when reading PVL; expected [}] but found [)] in keyword named [KEYWORD].
 
 Input:
 KEYWORD = { "VAL1" ,
 
 Output: 
-**PVL ERROR** The keyword [KEYWORD = { "VAL1" ,] does not appear to be a valid Pvl Keyword
+**ERROR** The PVL keyword [KEYWORD = { "VAL1" ,] does not appear to be a valid Pvl Keyword.
 
 Input:
 KEYWORD = "(A,B,"
@@ -369,14 +369,14 @@ Input:
 KEYWORD = ',E) <unit>
 
 Output: 
-**PVL ERROR** The keyword [KEYWORD = ',E) <unit>] does not appear to be a valid Pvl Keyword
+**ERROR** The PVL keyword [KEYWORD = ',E) <unit>] does not appear to be a valid Pvl Keyword.
 
 Input:
 KEYWORD = ,E) <unit>
 
 Output: 
-**PVL ERROR** Unable to read keyword [KEYWORD = ,E) <unit>]
-**PVL ERROR** Keyword has extraneous data [,E) <unit>] at the end
+**ERROR** Unable to read PVL keyword [KEYWORD = ,E) <unit>].
+**ERROR** Keyword has extraneous data [,E) <unit>] at the end.
 
 Input:
 #SOMECOMMENT
@@ -442,7 +442,7 @@ C3*/
 KEYWORD = SOME_VAL
 
 Output: 
-**PVL ERROR** Cannot have ['/*'] inside a multi-line comment
+**ERROR** Error when reading a pvl: Cannot have ['/*'] inside a multi-line comment.
 
 Input:
 /*C1
@@ -450,7 +450,7 @@ Input:
 KEYWORD = SOME_VAL
 
 Output: 
-**PVL ERROR** Cannot have ['/*'] inside a multi-line comment
+**ERROR** Error when reading a pvl: Cannot have ['/*'] inside a multi-line comment.
 
 Input:
 /*C1
@@ -458,7 +458,7 @@ A/**/
 KEYWORD = SOME_VAL
 
 Output: 
-**PVL ERROR** Cannot have ['/*'] inside a multi-line comment
+**ERROR** Error when reading a pvl: Cannot have ['/*'] inside a multi-line comment.
 
 Input:
 /*           A            */
@@ -476,7 +476,7 @@ Input:
 KEYWORD = SOME_VAL
 
 Output: 
-**PVL ERROR** Cannot have ['/*'] inside a multi-line comment
+**ERROR** Error when reading a pvl: Cannot have ['/*'] inside a multi-line comment.
 
 Input:
 /*C1   

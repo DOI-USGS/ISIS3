@@ -28,7 +28,7 @@
 #include "iString.h"
 #include "CSVReader.h"
 #include "CollectorMap.h"
-#include "iException.h"
+#include "IException.h"
 
 using namespace std;
 
@@ -153,11 +153,11 @@ namespace Isis {
    *
    * @param csvfile  Name of file to read
    */
-  void CSVReader::read(const std::string &csvfile) throw(iException &) {
+  void CSVReader::read(const std::string &csvfile) {
     ifstream ifile(csvfile.c_str(), ios::in);
     if(!ifile) {
       string mess = "Unable to open file " + csvfile;
-      throw iException::Message(iException::User, mess, _FILEINFO_);
+      throw IException(IException::User, mess, _FILEINFO_);
     }
 
     _lines.clear();
@@ -431,7 +431,7 @@ namespace Isis {
     if(!ifile.eof()) {
       ostringstream mess;
       mess << "Error reading line " << (nlines + 1) << ends;
-      throw iException::Message(iException::User, mess.str(), _FILEINFO_);
+      throw IException(IException::User, mess.str(), _FILEINFO_);
     }
 
     return (ifile);

@@ -21,7 +21,7 @@
  */
 
 #include <string>
-#include "iException.h"
+#include "IException.h"
 #include "Filename.h"
 #include "Message.h"
 #include "CisscalFile.h"
@@ -88,7 +88,7 @@ namespace Isis {
       line = "";
       string message = "TextFile:GetLine: -> Error reading text file: ["
                        + p_filename + "]";
-      throw Isis::iException::Message(Isis::iException::Io, message, _FILEINFO_);
+      throw IException(IException::Io, message, _FILEINFO_);
     }
     // Search for tag "\begindata" if it was not already found by recursively using this method
     if(!p_begindataFound) {

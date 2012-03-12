@@ -1,26 +1,26 @@
-/**                                                                       
- * @file                                                                  
+/**
+ * @file
  * $Revision$
  * $Date$
  * $Id$
- * 
- *   Unless noted otherwise, the portions of Isis written by the USGS are 
- *   public domain. See individual third-party library and package descriptions 
- *   for intellectual property information, user agreements, and related  
- *   information.                                                         
- *                                                                        
- *   Although Isis has been used by the USGS, no warranty, expressed or   
- *   implied, is made by the USGS as to the accuracy and functioning of such 
- *   software and related material nor shall the fact of distribution     
+ *
+ *   Unless noted otherwise, the portions of Isis written by the USGS are
+ *   public domain. See individual third-party library and package descriptions
+ *   for intellectual property information, user agreements, and related
+ *   information.
+ *
+ *   Although Isis has been used by the USGS, no warranty, expressed or
+ *   implied, is made by the USGS as to the accuracy and functioning of such
+ *   software and related material nor shall the fact of distribution
  *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.                                        
- *                                                                        
- *   For additional information, launch                                   
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html                
+ *   USGS in connection therewith.
+ *
+ *   For additional information, launch
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
  *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.                                    
- */ 
+ *   http://www.usgs.gov/privacy.html.
+ */
 #include <string>
 #include <vector>
 #include <numeric>
@@ -38,7 +38,7 @@
 #include "TextFile.h"
 #include "Application.h"
 #include "NaifStatus.h"
-#include "iException.h"
+#include "IException.h"
 
 #include "naif/SpiceUsr.h"
 
@@ -75,7 +75,7 @@ std::string SpiceKernel::getSummary(const std::string &commfile) const {
   for ( int i = 0 ; i < size() ; i++) {
     seglist.push_back(&_segments[i]);
   }
-  
+
   // Sorts the Segment pointers
   stable_sort(seglist.begin(), seglist.end(), CheckSegment);
 
@@ -96,7 +96,7 @@ std::string SpiceKernel::getSummary(const std::string &commfile) const {
      seglist.push_back(&_segments[i]);
      comChars += _segments[i].getComment().size();
    }
-  
+
    stable_sort(seglist.begin(), seglist.end(), CheckSegment);
 
    string comment = getCkComment(comfile);
@@ -108,7 +108,7 @@ std::string SpiceKernel::getSummary(const std::string &commfile) const {
      CkKernelWriter ckwriter(kname, comChars+512, cktype);
      ckwriter.addComment(comment);
      NaifStatus::CheckErrors();
-   
+
    // Write sorted segments
      for ( unsigned int i = 0 ; i < seglist.size() ; i++ ) {
        try {
@@ -116,19 +116,17 @@ std::string SpiceKernel::getSummary(const std::string &commfile) const {
          comment = seglist[i]->getComment();
          ckwriter.addComment(comment);
          NaifStatus::CheckErrors();
-       } catch ( iException &ie ) {
+       } catch ( IException &ie ) {
          ostringstream mess;
          mess << "Failed to write segment, ID = " << seglist[i]->Id();
-         ie.Message(iException::Programmer, mess.str(), _FILEINFO_);
-         throw;
+         throw IException(ie, IException::Programmer, mess.str(), _FILEINFO_);
        }
-     } 
+     }
    }
-   catch ( iException &ie ) {
+   catch ( IException &ie ) {
      ostringstream mess;
      mess << "Could not create output CK kernel file: " << kname;
-     ie.Message(iException::User, mess.str(), _FILEINFO_);
-     throw;
+     throw IException(ie, IException::User, mess.str(), _FILEINFO_);
    }
    return;
  }

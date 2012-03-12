@@ -1,7 +1,7 @@
 #include "Isis.h"
 #include "ProcessByLine.h"
 #include "SpecialPixel.h"
-#include "iException.h"
+#include "IException.h"
 
 using namespace std;
 using namespace Isis;
@@ -43,7 +43,7 @@ void IsisMain() {
   //The user didn't trim anything
   if(notrim == true) {
     string message = "No trimming was done-output equals input file";
-    throw iException::Message(iException::User, message, _FILEINFO_);
+    throw IException(IException::User, message, _FILEINFO_);
   }
 
 }

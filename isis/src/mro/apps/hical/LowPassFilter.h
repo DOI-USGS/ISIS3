@@ -31,7 +31,7 @@
 #include "HiCalUtil.h"
 #include "Module.h"
 #include "QuickFilter.h"
-#include "iException.h"
+#include "IException.h"
 
 namespace Isis {
 

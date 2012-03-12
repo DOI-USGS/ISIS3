@@ -20,7 +20,7 @@
  */
 
 #include "HiLab.h"
-#include "iException.h"
+#include "IException.h"
 
 using namespace std;
 using namespace Isis;
@@ -36,7 +36,7 @@ HiLab::HiLab(Cube *cube) {
   }
   else {
     std::string msg = "Cannot find required Summing keyword in label";
-    throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+    throw IException(IException::Io, msg, _FILEINFO_);
   }
 
   if(group.HasKeyword("Tdi")) {
@@ -44,7 +44,7 @@ HiLab::HiLab(Cube *cube) {
   }
   else {
     std::string msg = "Cannot find required Tdi keyword in label";
-    throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+    throw IException(IException::Io, msg, _FILEINFO_);
   }
 
 }

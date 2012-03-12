@@ -2,17 +2,17 @@
  * @file
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for 
+ *   domain. See individual third-party library and package descriptions for
  *   intellectual property information,user agreements, and related information.
  *
  *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software 
- *   and related material nor shall the fact of distribution constitute any such 
- *   warranty, and no responsibility is assumed by the USGS in connection 
+ *   is made by the USGS as to the accuracy and functioning of such software
+ *   and related material nor shall the fact of distribution constitute any such
+ *   warranty, and no responsibility is assumed by the USGS in connection
  *   therewith.
  *
  *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see 
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
  *   the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
@@ -24,7 +24,7 @@
 
 #include "Camera.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "iTime.h"
 #include "LeastSquares.h"
@@ -37,10 +37,10 @@ using namespace std;
 namespace Isis {
   /**
    * Constructs the VimsSkyMap object
-   *  
+   *
    * @param parent A pointer to the parent Camera object
    * @param lab Pvl labels for the image
-   * 
+   *
    * @internal
    */
   VimsSkyMap::VimsSkyMap(Camera *parent, Pvl &lab) :
@@ -52,10 +52,10 @@ namespace Isis {
    * Initialize vims sky model
    *
    * @param [in] lab   (Pvl &)      Cube Pvl label
-   *  
+   *
    * @throw iException::Io - "Cannot process NYQUIST(undersampled) mode "
    * @throw iException::Io - "Can't open unit vector file"
-   * @internal 
+   * @internal
    *   @history  2007-04-16 Tracie Sucharski - Look for unit vectors in
    *                              the proper directory.
    *   @history  2007-04-18 Tracie Sucharski, The inaccuracy of the 15 Mhz clock
@@ -152,7 +152,7 @@ namespace Isis {
       }
       if(sampMode == "NYQUIST") {
         string msg = "Cannot process NYQUIST(undersampled) mode ";
-        throw iException::Message(iException::Io, msg, _FILEINFO_);
+        throw IException(IException::Io, msg, _FILEINFO_);
       }
     }
 
@@ -161,7 +161,7 @@ namespace Isis {
     fin.open(vectorFilename.c_str(), ios::in | ios::binary);
     if(!fin.is_open()) {
       string msg = "Can't open unit vector file";
-      throw iException::Message(iException::Io, msg, _FILEINFO_);
+      throw IException(IException::Io, msg, _FILEINFO_);
     }
     //  Read correct band
     /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

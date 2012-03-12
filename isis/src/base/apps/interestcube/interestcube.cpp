@@ -4,7 +4,7 @@
 #include "ProcessByBrick.h"
 #include "Pixel.h"
 #include "Cube.h"
-#include "iException.h"
+#include "IException.h"
 
 using namespace std;
 using namespace Isis;
@@ -41,9 +41,9 @@ void IsisMain() {
     op["MinimumInterest"] = 0.0;
     Application::Log(op);
   }
-  catch(iException &e) {
+  catch(IException &e) {
     std::string msg = "Improper format for InterestOperator PVL [" + pvl.Filename() + "]";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(e, IException::User, msg, _FILEINFO_);
   }
 
   iop = InterestOperatorFactory::Create(pvl);
@@ -69,7 +69,7 @@ void Operate(Isis::Buffer &in, Isis::Buffer &out) {
     out[0] = iop->InterestAmount();
 
   }
-  catch(iException &e) {
-    e.Report();
+  catch(IException &e) {
+    e.print();
   }
 }

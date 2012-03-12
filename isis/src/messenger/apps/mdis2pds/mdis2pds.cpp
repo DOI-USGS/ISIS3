@@ -8,7 +8,7 @@
 #include "UserInterface.h"
 #include "Progress.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "ProcessExportPds.h"
 #include "Cube.h"
 #include "Histogram.h"
@@ -167,7 +167,7 @@ void IsisMain() {
   }
   else {
     string msg = "[" + iString(nbits) + "] is not a supported bit length.";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
   dataSetID += "-CDR-CALDATA-V1.0";
 
@@ -265,10 +265,9 @@ void IsisMain() {
         darkStripMean[0] = iString(SetRound(darkStripMean[0], 16));
       }
     }
-    catch(iException &e) {
+    catch(IException &) {
       // If we fail to convert this keyword to a number, then preserve
       // its existing value
-      e.Clear();
     }
   }
 
@@ -310,7 +309,7 @@ void IsisMain() {
   data_quality_id.SetValue(Quote(data_quality_id));
   PvlKeyword &sequence_name = pdsLabel.FindKeyword("SEQUENCE_NAME", Pvl::Traverse);
   sequence_name.SetValue(Quote(sequence_name));
- 
+
   PvlKeyword &start_count = pdsLabel.FindKeyword("SPACECRAFT_CLOCK_START_COUNT", Pvl::Traverse);
   start_count.SetValue(Quote(start_count));
   PvlKeyword &stop_count = pdsLabel.FindKeyword("SPACECRAFT_CLOCK_STOP_COUNT", Pvl::Traverse);

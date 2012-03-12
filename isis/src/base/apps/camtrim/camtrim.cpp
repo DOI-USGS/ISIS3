@@ -36,7 +36,7 @@ void IsisMain() {
     iString msg = "Input cube [" + ui.GetFilename("FROM") + "] is level 2 "
         "(projected). This application is only designed to operate on level 1 "
         "(non-projected) cubes. Please use maptrim instead";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // Create the output cube

@@ -72,7 +72,7 @@ void IsisMain () {
 
     if (list.size() < 1) {
         string msg = "The list file [" + ui.GetFilename("FROMLIST") + "does not contain any data";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
     }
 
     g_productVersionId = ui.GetString("VERSIONIDSTRING");
@@ -92,7 +92,7 @@ void IsisMain () {
         if (productId != prodId) {
             string msg = "This program is intended for use on a single LROC WAC images only.";
             msg += "The ProductIds do not match.";
-            throw iException::Message(iException::User, msg, _FILEINFO_);
+            throw IException(IException::User, msg, _FILEINFO_);
         }
 
         Isis::PvlGroup &inst = tempPvl.FindGroup("Instrument", Pvl::Traverse);
@@ -103,7 +103,7 @@ void IsisMain () {
         if (instId != "WAC-VIS" && instId != "WAC-UV") {
             string msg = "This program is intended for use on LROC WAC images only. [";
             msg += list[i] + "] does not appear to be a WAC image.";
-            throw iException::Message(iException::User, msg, _FILEINFO_);
+            throw IException(IException::User, msg, _FILEINFO_);
         }
 
         iString instModeId = (string) inst["InstrumentModeId"];

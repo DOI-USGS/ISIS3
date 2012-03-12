@@ -5,7 +5,7 @@
 #include "ProcessBySpectra.h"
 #include "NumericalApproximation.h"
 #include "SpecialPixel.h"
-#include "iException.h"
+#include "IException.h"
 
 using namespace std;
 using namespace Isis;
@@ -112,7 +112,7 @@ void fill(Buffer &in, Buffer &out) {
         out[j] = spline.Evaluate((double)(j + 1));
       }
       // if Evaluate() fails, copy the input value and increment numSpecPixKept
-      catch(iException &e) {
+      catch(IException &e) {
         out[j] = in[j];
         numSpecPixKept++;
       }

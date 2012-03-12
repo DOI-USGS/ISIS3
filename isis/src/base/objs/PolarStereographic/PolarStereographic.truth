@@ -1,16 +1,16 @@
 Unit Test For PolarStereographic
 
 Test missing center longitude keyword ...
-**PROJECTION ERROR** Invalid label group [Mapping]
-**PVL ERROR** Keyword [CenterLongitude] does not exist in [Group = Mapping]
+**ERROR** Invalid label group [Mapping].
+**ERROR** PVL Keyword [CenterLongitude] does not exist in [Group = Mapping].
 
 Test missing center latitude keyword ...
-**PROJECTION ERROR** Invalid label group [Mapping]
-**PVL ERROR** Keyword [CenterLatitude] does not exist in [Group = Mapping]
+**ERROR** Invalid label group [Mapping].
+**ERROR** PVL Keyword [CenterLatitude] does not exist in [Group = Mapping].
 
 Test invalid center latitude keyword ...
-**PROJECTION ERROR** Invalid label group [Mapping]
-**USER ERROR** Invalid value for keyword [CenterLatitude] in map file.  CenterLatitude cannot equal 0.0
+**ERROR** Invalid label group [Mapping].
+**USER ERROR** Invalid value for keyword [CenterLatitude] in map file.  CenterLatitude cannot equal 0.0.
 
 Test SetGround method ... 
 Setting ground to (-75,150)

@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "BandSpinBox.h"
-#include "iException.h"
+#include "IException.h"
 
 namespace Isis {
   /**
@@ -101,8 +101,7 @@ namespace Isis {
       }
     }
     else {
-      throw iException::Message(iException::Programmer,
-                                      "Invalid key", _FILEINFO_);
+      throw IException(IException::Programmer, "Invalid key", _FILEINFO_);
     }
   }
 
@@ -115,8 +114,7 @@ namespace Isis {
    */
   void BandSpinBox::setKey(int key) {
     if((key < 0) || (key >= (int) p_map.size())) {
-      throw iException::Message(iException::Programmer,
-                                      "Invalid key", _FILEINFO_);
+      throw IException(IException::Programmer, "Invalid key", _FILEINFO_);
     }
     else {
       setKey(p_keys[key]);

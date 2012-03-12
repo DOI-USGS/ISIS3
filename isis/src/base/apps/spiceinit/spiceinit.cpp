@@ -5,7 +5,7 @@
 #include "Camera.h"
 #include "CameraFactory.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "KernelDb.h"
 #include "Longitude.h"
 #include "Process.h"
@@ -39,12 +39,12 @@ void IsisMain() {
   if (!ui.GetBoolean("CKPREDICTED") && !ui.GetBoolean("CKRECON") &&
      !ui.GetBoolean("CKSMITHED") && !ui.GetBoolean("CKNADIR")) {
     string msg = "At least one CK quality must be selected";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
   if (!ui.GetBoolean("SPKPREDICTED") && !ui.GetBoolean("SPKRECON") &&
      !ui.GetBoolean("SPKSMITHED")) {
     string msg = "At least one SPK quality must be selected";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // Make sure it is not projected
@@ -52,14 +52,13 @@ void IsisMain() {
   try {
     proj = icube->getProjection();
   }
-  catch(iException &e) {
+  catch(IException &) {
     proj = NULL;
-    e.Clear();
   }
 
   if (proj != NULL) {
     string msg = "Can not initialize SPICE for a map projected cube";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   Pvl lab = *icube->getLabel();
@@ -151,10 +150,10 @@ void IsisMain() {
     bool kernelSuccess = false;
 
     if (ck.size() == 0 && !ui.WasEntered("CK")) {
-      throw iException::Message(iException::Camera,
-                                "No Camera Kernel found for the image [" + ui.GetFilename("FROM")
-                                + "]",
-                                _FILEINFO_);
+      throw IException(IException::Unknown,
+                       "No Camera Kernel found for the image [" + ui.GetFilename("FROM")
+                       + "]",
+                       _FILEINFO_);
     }
     else if (ui.WasEntered("CK")) {
       // ck needs to be array size 1 and empty kernel objects
@@ -178,9 +177,9 @@ void IsisMain() {
     }
 
     if (!kernelSuccess)
-      throw iException::Message(iException::Camera,
-                                "Unable to initialize camera model",
-                                _FILEINFO_);
+      throw IException(IException::Unknown,
+                       "Unable to initialize camera model",
+                       _FILEINFO_);
   }
 
   p.EndProcess();
@@ -328,8 +327,8 @@ bool TryKernels(Cube *icube, Process &p,
       cam = icube->getCamera();
       Application::Log(currentKernels);
     }
-    catch(iException &e) {
-      Pvl errPvl = e.PvlErrors();
+    catch(IException &e) {
+      Pvl errPvl = e.toPvl();
 
       if (errPvl.Groups() > 0) {
         currentKernels += PvlKeyword("Error", errPvl.Group(errPvl.Groups() - 1)["Message"][0]);
@@ -337,7 +336,7 @@ bool TryKernels(Cube *icube, Process &p,
 
       Application::Log(currentKernels);
       icube->putGroup(originalKernels);
-      throw e;
+      throw;
     }
 
     if (ui.GetBoolean("ATTACH")) {
@@ -440,8 +439,7 @@ bool TryKernels(Cube *icube, Process &p,
 
     p.WriteHistory(*icube);
   }
-  catch(iException &e) {
-    e.Clear();
+  catch(IException &) {
     icube->putGroup(originalKernels);
     return false;
   }
@@ -502,12 +500,12 @@ void RequestSpice(Cube *icube, Pvl &labels, iString missionName) {
 
   // Verify everything in the kernels group exists, if not then our kernels are
   //   out of date.
-  for (int keywordIndex = 0; 
+  for (int keywordIndex = 0;
       keywordIndex < kernelsGroup.Keywords();
       keywordIndex++) {
     PvlKeyword &curKeyword = kernelsGroup[keywordIndex];
 
-    if (curKeyword.Name() == "NaifFrameCode" || 
+    if (curKeyword.Name() == "NaifFrameCode" ||
         curKeyword.Name() == "InstrumentPointingQuality" ||
         curKeyword.Name() == "InstrumentPositionQuality" ||
         curKeyword.Name() == "CameraVersion" ||
@@ -548,8 +546,8 @@ void RequestSpice(Cube *icube, Pvl &labels, iString missionName) {
   try {
     icube->getCamera();
   }
-  catch (iException &e) {
-    throw iException::Message(iException::Spice,
+  catch (IException &e) {
+    throw IException(e, IException::Unknown,
        "The SPICE server returned incompatible SPICE data",
         _FILEINFO_);
   }

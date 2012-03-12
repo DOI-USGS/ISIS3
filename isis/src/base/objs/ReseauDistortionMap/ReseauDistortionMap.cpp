@@ -38,7 +38,7 @@ namespace Isis {
    * @param fname The filename containing master reseau location for the
    *              particular camera
    *
-   * @throws Isis::iException::User - There are not the same amount of master and
+   * @throws Isis::IException::User - There are not the same amount of master and
    *                                  refined reseaus
    */
   ReseauDistortionMap::ReseauDistortionMap(Camera *parent, Pvl &labels, const std::string &fname) :
@@ -57,7 +57,7 @@ namespace Isis {
     if(mline.Size() != msamp.Size()) {
       string msg = "The number of lines and samples for the master reseaus are";
       msg += "not equal, the data file may be bad";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     for(int i = 0; i < p_numRes; i++) {
       p_mlines.push_back(mline[i]);
@@ -71,7 +71,7 @@ namespace Isis {
     if(rline.Size() != rsamp.Size()) {
       string msg = "The number of lines and samples for the refined reseaus are";
       msg += "not equal, the data file may be bad";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     for(int i = 0; i < p_numRes; i++) {
       p_rlines.push_back(rline[i]);
@@ -80,7 +80,7 @@ namespace Isis {
     if(p_mlines.size() != p_rlines.size()) {
       string msg = "The number of master reseaus and refined reseaus";
       msg += "do not appear to be equal";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
 

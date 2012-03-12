@@ -20,7 +20,7 @@
 #include "Displacement.h"
 
 #include "Distance.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "SpecialPixel.h"
 
@@ -91,7 +91,7 @@ namespace Isis {
   /**
    * Set the displacement in meters.
    *
-   * @param displacementInMeters This is the value to set this displacement to, 
+   * @param displacementInMeters This is the value to set this displacement to,
    *     given in meters.
    */
   void Displacement::setMeters(double displacementInMeters) {
@@ -112,8 +112,8 @@ namespace Isis {
   /**
    * Set the displacement in kilometers.
    *
-   * @param displacementInKilometers This is the value to set as the 
-   *     displacement, given in kilometers. 
+   * @param displacementInKilometers This is the value to set as the
+   *     displacement, given in kilometers.
    */
   void Displacement::setKilometers(double displacementInKilometers) {
     setDisplacement(displacementInKilometers, Kilometers);
@@ -159,16 +159,16 @@ namespace Isis {
   /**
     * Compare two displacements with the greater than operator.
     *
-    * @param otherdisplacement This is the displacement we're comparing to, i.e. 
+    * @param otherdisplacement This is the displacement we're comparing to, i.e.
     *     it is on the right-hand-side of the operator when used
-    * @return True if the length of this displacement is greater than the length 
+    * @return True if the length of this displacement is greater than the length
     *     of the given displacement
     */
   bool Displacement::operator >(const Displacement &otherDisplacement) const {
     if(!isValid() || !otherDisplacement.isValid()) {
       iString msg = "Displacement has not been initialized, you must initialize "
           "it first before comparing with another displacement using [>]";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     return meters() > otherDisplacement.meters();
@@ -178,16 +178,16 @@ namespace Isis {
   /**
     * Compare two displacements with the less than operator.
     *
-    * @param otherdisplacement This is the displacement we're comparing to, i.e. 
+    * @param otherdisplacement This is the displacement we're comparing to, i.e.
     *     on the right-hand-side of the operator when used
-    * @return True if the length of the displacement is less than the length of 
+    * @return True if the length of the displacement is less than the length of
     *     the given displacement
     */
   bool Displacement::operator <(const Displacement &otherDisplacement) const {
     if(!isValid() || !otherDisplacement.isValid()) {
       iString msg = "Displacement has not been initialized, you must initialize "
           "it first before comparing with another displacement using [<]";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     return meters() < otherDisplacement.meters();
@@ -200,7 +200,7 @@ namespace Isis {
    * @param displacementToAdd This is the displacement we are adding to ourselves
    * @return Resulting displacement, self not modified
    */
-  Displacement Displacement::operator 
+  Displacement Displacement::operator
                               +(const Displacement &displacementToAdd) const {
     if(!isValid() || !displacementToAdd.isValid()) return Displacement();
 
@@ -386,14 +386,14 @@ namespace Isis {
       case Pixels:
         iString msg = "Cannot call displacement with pixels, ask for another "
             "unit";
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+        throw IException(IException::Programmer, msg, _FILEINFO_);
         break;
     }
 
     if(resultingDisplacement == Null) {
       iString msg = "Displacement does not understand the enumerated value [" +
         iString(displacementUnit) + "] as a unit";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     return resultingDisplacement;
@@ -430,14 +430,14 @@ namespace Isis {
       case Pixels:
         iString msg = "Cannot setDisplacement with pixels, must convert to "
             "another unit first";
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+        throw IException(IException::Programmer, msg, _FILEINFO_);
         break;
     }
 
     if(displacementInMeters == Null) {
       iString msg = "Displacement does not understand the enumerated value [" +
         iString(displacementUnit) + "] as a unit";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     m_displacementInMeters = displacementInMeters;

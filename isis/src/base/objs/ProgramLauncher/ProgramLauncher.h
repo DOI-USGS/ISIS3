@@ -25,6 +25,7 @@
  */
 
 namespace Isis {
+  class IException;
   class iString;
 
   /**
@@ -46,7 +47,7 @@ namespace Isis {
       static void RunSystemCommand(iString commandLine);
 
     private:
-      static void ProcessIsisMessageFromChild(iString code, iString msg);
+      static IException ProcessIsisMessageFromChild(iString code, iString msg);
 
     private:
       //! Construction is not allowed

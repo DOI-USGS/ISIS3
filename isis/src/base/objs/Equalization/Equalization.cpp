@@ -10,7 +10,7 @@
 #include "Process.h"
 #include "ProcessByLine.h"
 #include "Projection.h"
-#include "iException.h"
+#include "IException.h"
 
 using std::string;
 using std::vector;
@@ -48,7 +48,7 @@ namespace Isis {
     if (holdList.size() > m_imageList.size()) {
       string msg = "The list of identifiers to be held must be less than or ";
       msg += "equal to the total number of identitifers.";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     // Make sure each file in the holdlist matches a file in the fromlist
@@ -64,7 +64,7 @@ namespace Isis {
       if (!matched) {
         string msg = "The hold list file [" + holdList[i] +
                           "] does not match a file in the from list";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
     }
   }
@@ -172,7 +172,7 @@ namespace Isis {
       if (badFiles != "") {
         string msg = "File(s) " + badFiles;
         msg += " do(es) not overlap any other input images with enough valid pixels";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
     }
 
@@ -360,7 +360,7 @@ namespace Isis {
     if (m_imageList.size() < 2) {
       string msg = "The input file [" + fromListName +
         "] must contain at least 2 file names";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     Cube tempCube;
@@ -400,7 +400,7 @@ namespace Isis {
         if (m_maxBand != cube2.getBandCount()) {
           string msg = "Number of bands do not match between cubes [" +
             m_imageList[i] + "] and [" + m_imageList[j] + "]";
-          throw iException::Message(iException::User, msg, _FILEINFO_);
+          throw IException(IException::User, msg, _FILEINFO_);
         }
 
         //Create projection from each cube
@@ -411,7 +411,7 @@ namespace Isis {
         if (*proj1 != *proj2) {
           string msg = "Mapping groups do not match between cubes [" +
             m_imageList[i] + "] and [" + m_imageList[j] + "]";
-          throw iException::Message(iException::User, msg, _FILEINFO_);
+          throw IException(IException::User, msg, _FILEINFO_);
         }
       }
     }
@@ -435,7 +435,7 @@ namespace Isis {
     if (outList.size() != m_imageList.size()) {
       string msg = "Each input file in the FROM LIST must have a ";
       msg += "corresponding output file in the TO LIST.";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     // Make sure that all output files do not have the same names as their
@@ -444,7 +444,7 @@ namespace Isis {
       if (outList[i].compare(m_imageList[i]) == 0) {
         string msg = "The to list file [" + outList[i] +
           "] has the same name as its corresponding from list file.";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
     }
   }
@@ -498,7 +498,7 @@ namespace Isis {
     if (m_imageList.size() > (unsigned)equalInfo.Groups() - 1) {
       string msg = "Each input file in the FROM LIST must have a ";
       msg += "corresponding input file in the INPUT STATISTICS.";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     vector<int> normIndices;
@@ -521,7 +521,7 @@ namespace Isis {
       if (!foundFile) {
         string msg = "The from list file [" + fromFile +
                           "] does not have any corresponding file in the stats list.";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
     }
 

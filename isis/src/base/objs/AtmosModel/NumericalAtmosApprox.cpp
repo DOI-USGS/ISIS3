@@ -24,7 +24,7 @@
 #include "AtmosModel.h"
 #include "NumericalAtmosApprox.h"
 #include "NumericalApproximation.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 
 using namespace std;
@@ -65,7 +65,7 @@ namespace Isis {
    *   @history 2008-11-05 Jeannie Walldren - Renamed, moved to new
    *            class, and changed i/o parameters.
    */
-  double NumericalAtmosApprox::RombergsMethod(AtmosModel *am, IntegFunc sub, double a, double b) throw(iException &) {
+  double NumericalAtmosApprox::RombergsMethod(AtmosModel *am, IntegFunc sub, double a, double b) {
     // This method was derived from an algorithm in the text
     // Numerical Recipes in C: The Art of Scientific Computing
     // Section 4.3 by Flannery, Press, Teukolsky, and Vetterling
@@ -105,15 +105,16 @@ namespace Isis {
         // not just a polynomial in h.
       }
     }
-    catch(iException e) { // catch error from RefineExtendedTrap, Constructor, Evaluate, PolynomialNevilleErrorEstimate
-      throw e.Message(e.Type(),
+    catch(IException &e) { // catch error from RefineExtendedTrap, Constructor, Evaluate, PolynomialNevilleErrorEstimate
+      throw IException(e,
+                       e.errorType(),
                       "NumericalAtmosApprox::RombergsMethod() - Caught the following error: ",
                       _FILEINFO_);
     }
-    throw iException::Message(iException::Programmer,
-                              "NumericalAtmosApprox::RombergsMethod() - Failed to converge in "
-                              + iString(maxits) + " iterations.",
-                              _FILEINFO_);
+    throw IException(IException::Programmer,
+                     "NumericalAtmosApprox::RombergsMethod() - Failed to converge in "
+                     + iString(maxits) + " iterations.",
+                     _FILEINFO_);
   }
 
   /**
@@ -148,7 +149,7 @@ namespace Isis {
    *   @history 2008-11-05 Jeannie Walldren - Renamed, moved to new
    *          class, and changed i/o parameters.
    */
-  double NumericalAtmosApprox::RefineExtendedTrap(AtmosModel *am, IntegFunc sub, double a, double b, double s, unsigned int n) throw(iException &) {
+  double NumericalAtmosApprox::RefineExtendedTrap(AtmosModel *am, IntegFunc sub, double a, double b, double s, unsigned int n) {
     // This method was derived from an algorithm in the text
     // Numerical Recipes in C: The Art of Scientific Computing
     // Section 4.2 by Flannery, Press, Teukolsky, and Vetterling
@@ -186,8 +187,9 @@ namespace Isis {
         return (0.5 * (s + (b - a) * sum / tnm));// replace s with refined value
       }
     }
-    catch(iException e) { // catch exception from Evaluate()
-      throw e.Message(e.Type(),
+    catch(IException &e) { // catch exception from Evaluate()
+      throw IException(e,
+                       e.errorType(),
                       "NumericalAtmosApprox::RefineExtendedTrap() - Caught the following error: ",
                       _FILEINFO_);
     }
@@ -225,8 +227,9 @@ namespace Isis {
       result = qromb.RombergsMethod(am, sub, 1.0e-6, 1.0);
       return result;
     }
-    catch(iException e) { // catch exception from RombergsMethod()
-      throw e.Message(e.Type(),
+    catch(IException &e) { // catch exception from RombergsMethod()
+      throw IException(e,
+                       e.errorType(),
                       "NumericalAtmosApprox::OutrFunc2Bint() - Caught the following error: ",
                       _FILEINFO_);
     }
@@ -332,7 +335,7 @@ namespace Isis {
       else {
         string msg = "NumericalAtmosApprox::InrFunc2Bint() - Invalid value of atmospheric ";
         msg += "switch used as argument to this function";
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       }
     }
     return result;

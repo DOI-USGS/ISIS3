@@ -300,7 +300,9 @@ namespace Isis {
     // Make a drop down menu of helper buttons
     else {
       if(p_helperMenu) {
-        throw iException::Message(iException::Programmer, "Can not call GuiParameter::AddHelpers twice", _FILEINFO_);
+        throw IException(IException::Programmer,
+                         "Can not call GuiParameter::AddHelpers twice",
+                         _FILEINFO_);
       }
 
       p_helperMenu = new QMenu();

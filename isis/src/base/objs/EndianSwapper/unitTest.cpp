@@ -1,7 +1,7 @@
 #include <iostream>
 #include <cmath>
 #include "EndianSwapper.h"
-#include "iException.h"
+#include "IException.h"
 #include "Preference.h"
 
 using namespace std;
@@ -117,8 +117,8 @@ int main(int argc, char *argv[]) {
   try {
     Isis::EndianSwapper invalid("INV");
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 
 }

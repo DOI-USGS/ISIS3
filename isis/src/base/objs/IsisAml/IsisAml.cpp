@@ -27,7 +27,7 @@
 #include <xercesc/sax2/XMLReaderFactory.hpp>
 
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "IsisAml.h"
 #include "IsisXMLChTrans.h"
 #include "iString.h"
@@ -73,7 +73,7 @@ IsisAml::~IsisAml() {
  * must be one of: (TRUE, FALSE, YES, NO, or a partial match of any of these
  * beginning with the first character).
  *
- * @throws iException (IsisUserError) The parameter already has a value in its
+ * @throws IException The parameter already has a value in its
  * "value" data member.Overwriting an existing value is not allowed. Use "Clear"
  * to erase all values in the value data member instead of overwriting an
  * existing value.
@@ -86,7 +86,7 @@ void IsisAml::PutAsString(const string &paramName,
   if(param->values.size() > 0) {
     string message = "A value for this parameter [" + paramName + "] has "
                      "already been entered.";
-    throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+    throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
   }
 
   param->values.clear();
@@ -114,7 +114,7 @@ void IsisAml::PutAsString(const string &paramName,
   if(param->values.size() > 0) {
     string message = "A value for this parameter [" + paramName + "] has "
                      "already been entered.";
-    throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+    throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
   }
 
   param->values.resize(value.size());
@@ -147,14 +147,14 @@ void IsisAml::PutString(const string &paramName, const string &value) {
 
   if(param->type != "string" && param->type != "combo") {
     string message = "Parameter [" + paramName + "] is not a string.";
-    throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+    throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
   }
 
   if(param->values.size() > 0) {
     string message = "A value for this parameter [" + paramName + "] has "
                      "already been saved (possibly by IsisGui). If you need to "
                      "change the value use \"Clear\" before the Put.";
-    throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+    throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
   }
 
   param->values.clear();
@@ -180,14 +180,14 @@ void IsisAml::PutString(const string &paramName,
 
   if(param->type != "string" && param->type != "combo") {
     string message = "Parameter [" + paramName + "] is not a string.";
-    throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+    throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
   }
 
   if(param->values.size() > 0) {
     string message = "A value for this parameter [" + paramName + "] has "
                      "already been saved (possibly by IsisGui). If you need to "
                      "change the value use \"Clear\" before the Put.";
-    throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+    throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
   }
 
   param->values.resize(value.size());
@@ -215,14 +215,14 @@ void IsisAml::PutFilename(const string &paramName,
 
   if((param->type != "filename") && (param->type != "cube")) {
     string message = "Parameter [" + paramName + "] is not a filename.";
-    throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+    throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
   }
 
   if(param->values.size() > 0) {
     string message = "A value for this parameter [" + paramName + "] has "
                      "already been saved (possibly by IsisGui). If you need to "
                      "change the value use \"Clear\" before the Put.";
-    throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+    throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
   }
 
   param->values.clear();
@@ -257,14 +257,14 @@ void IsisAml::PutFilename(const string &paramName,
 
   if((param->type != "filename") && (param->type != "cube")) {
     string message = "Parameter [" + paramName + "] is not a filename.";
-    throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+    throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
   }
 
   if(param->values.size() > 0) {
     string message = "A value for this parameter [" + paramName + "] has "
                      "already been saved (possibly by IsisGui). If you need to "
                      "change the value use \"Clear\" before the Put.";
-    throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+    throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
   }
 
   param->values.resize(value.size());
@@ -295,14 +295,14 @@ void IsisAml::PutInteger(const string &paramName,
 
   if(param->type != "integer") {
     string message = "Parameter [" + paramName + "] is not an integer.";
-    throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+    throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
   }
 
   if(param->values.size() > 0) {
     string message = "A value for this parameter [" + paramName + "] has "
                      "already been saved (possibly by IsisGui). If you need to "
                      "change the value use \"Clear\" before the Put.";
-    throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+    throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
   }
 
   param->values.clear();
@@ -336,14 +336,14 @@ void IsisAml::PutInteger(const string &paramName,
 
   if(param->type != "integer") {
     string message = "Parameter [" + paramName + "] is not an integer.";
-    throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+    throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
   }
 
   if(param->values.size() > 0) {
     string message = "A value for this parameter [" + paramName + "] has "
                      "already been saved (possibly by IsisGui). If you need to "
                      "change the value use \"Clear\" before the Put.";
-    throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+    throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
   }
 
   param->values.resize(value.size());
@@ -381,14 +381,14 @@ void IsisAml::PutDouble(const string &paramName,
 
   if(param->type != "double") {
     string message = "Parameter [" + paramName + "] is not a double.";
-    throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+    throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
   }
 
   if(param->values.size() > 0) {
     string message = "A value for this parameter [" + paramName + "] has "
                      "already been saved (possibly by IsisGui). If you need to "
                      "change the value use \"Clear\" before the Put.";
-    throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+    throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
   }
 
   param->values.clear();
@@ -422,14 +422,14 @@ void IsisAml::PutDouble(const string &paramName,
 
   if(param->type != "double") {
     string message = "Parameter [" + paramName + "] is not a double.";
-    throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+    throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
   }
 
   if(param->values.size() > 0) {
     string message = "A value for this parameter [" + paramName + "] has "
                      "already been saved (possibly by IsisGui). If you need to "
                      "change the value use \"Clear\" before the Put.";
-    throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+    throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
   }
 
   param->values.resize(value.size());
@@ -466,14 +466,14 @@ void IsisAml::PutBoolean(const string &paramName,
 
   if(param->type != "boolean") {
     string message = "Parameter [" + paramName + "] is not a boolean.";
-    throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+    throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
   }
 
   if(param->values.size() > 0) {
     string message = "A value for this parameter [" + paramName + "] has "
                      "already been saved (possibly by IsisGui). If you need to "
                      "change the value use \"Clear\" before the Put.";
-    throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+    throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
   }
 
   param->values.clear();
@@ -512,14 +512,14 @@ void IsisAml::PutBoolean(const string &paramName,
 
   if(param->type != "boolean") {
     string message = "Parameter [" + paramName + "] is not a boolean.";
-    throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+    throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
   }
 
   if(param->values.size() > 0) {
     string message = "A value for this parameter [" + paramName + "] has "
                      "already been saved (possibly by IsisGui). If you need to "
                      "change the value use \"Clear\" before the Put.";
-    throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+    throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
   }
 
   param->values.resize(value.size());
@@ -557,7 +557,7 @@ string IsisAml::GetAsString(const string &paramName) const {
   if(param->values.size() == 0) {
     if(param->defaultValues.size() == 0) {
       string message = "Parameter [" + paramName + "] has no value.";
-      throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+      throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
     }
     else {
       value = param->defaultValues[0];
@@ -592,7 +592,7 @@ void IsisAml::GetAsString(const string &paramName,
   if(param->values.size() == 0) {
     if(param->defaultValues.size() == 0) {
       string message = "Parameter [" + paramName + "] has no value.";
-      throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+      throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
     }
     else {
       for(unsigned int i = 0; i < param->defaultValues.size(); i++)
@@ -626,14 +626,14 @@ Isis::iString IsisAml::GetFilename(const string &paramName, string extension) co
 
   if((param->type != "filename") && (param->type != "cube")) {
     string message = "Parameter [" + paramName + "] is not a filename.";
-    throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+    throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
   }
 
   string value;
   if(param->values.size() == 0) {
     if(param->defaultValues.size() == 0) {
       string message = "Parameter [" + paramName + "] has no value.";
-      throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+      throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
     }
     else {
       value = param->defaultValues[0];
@@ -667,14 +667,14 @@ void IsisAml::GetFilename(const string &paramName,
 
   if((param->type != "filename") && (param->type != "cube")) {
     string message = "Parameter [" + paramName + "] is not a filename.";
-    throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+    throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
   }
 
   values.clear();
   if(param->values.size() == 0) {
     if(param->defaultValues.size() == 0) {
       string message = "Parameter [" + paramName + "] has no value.";
-      throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+      throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
     }
     else {
       for(unsigned int i = 0; i < param->defaultValues.size(); i++) {
@@ -712,13 +712,13 @@ string IsisAml::GetString(const string &paramName) const {
 
   if(param->type != "string" && param->type != "combo") {
     string message = "Parameter [" + paramName + "] is not a string.";
-    throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+    throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
   }
 
   if(param->values.size() == 0) {
     if(param->defaultValues.size() == 0) {
       string message = "Parameter [" + paramName + "] has no value.";
-      throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+      throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
     }
     else {
       value = param->defaultValues[0];
@@ -742,7 +742,7 @@ string IsisAml::GetString(const string &paramName) const {
           if(found != -1) {
             string message = "Value [" + value + "] for parameter [" +
                              paramName + "] is not unique.";
-            throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+            throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
           }
           found = p;
         }
@@ -778,7 +778,7 @@ void IsisAml::GetString(const string &paramName,
 
   if(param->type != "string" && param->type != "combo") {
     string message = "Parameter [" + paramName + "] is not a string.";
-    throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+    throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
   }
 
   values.clear();
@@ -786,7 +786,7 @@ void IsisAml::GetString(const string &paramName,
   if(param->values.size() == 0) {
     if(param->defaultValues.size() == 0) {
       string message = "Parameter [" + paramName + "] has no value.";
-      throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+      throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
     }
     else {
       for(unsigned int i = 0; i < param->defaultValues.size(); i++)
@@ -820,14 +820,14 @@ int IsisAml::GetInteger(const string &paramName) const {
 
   if(param->type != "integer") {
     string message = "Parameter [" + paramName + "] is not an integer.";
-    throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+    throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
   }
 
   Isis::iString value;
   if(param->values.size() == 0) {
     if(param->defaultValues.size() == 0) {
       string message = "Parameter [" + paramName + "] has no value.";
-      throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+      throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
     }
     else {
       value = param->defaultValues[0];
@@ -860,7 +860,7 @@ void IsisAml::GetInteger(const string &paramName,
 
   if(param->type != "integer") {
     string message = "Parameter [" + paramName + "] is not an integer.";
-    throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+    throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
   }
 
   values.clear();
@@ -868,7 +868,7 @@ void IsisAml::GetInteger(const string &paramName,
   if(param->values.size() == 0) {
     if(param->defaultValues.size() == 0) {
       string message = "Parameter [" + paramName + "] has no value.";
-      throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+      throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
     }
     else {
       for(unsigned int i = 0; i < param->defaultValues.size(); i++)
@@ -904,14 +904,14 @@ double IsisAml::GetDouble(const string &paramName) const {
 
   if(param->type != "double") {
     string message = "Parameter [" + paramName + "] is not a double.";
-    throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+    throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
   }
 
   Isis::iString value;
   if(param->values.size() == 0) {
     if(param->defaultValues.size() == 0) {
       string message = "Parameter [" + paramName + "] has no value.";
-      throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+      throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
     }
     else {
       value = param->defaultValues[0];
@@ -943,7 +943,7 @@ void IsisAml::GetDouble(const string &paramName,
 
   if(param->type != "double") {
     string message = "Parameter [" + paramName + "] is not a double.";
-    throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+    throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
   }
 
   values.clear();
@@ -951,7 +951,7 @@ void IsisAml::GetDouble(const string &paramName,
   if(param->values.size() == 0) {
     if(param->defaultValues.size() == 0) {
       string message = "Parameter [" + paramName + "] has no value.";
-      throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+      throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
     }
     else {
       for(unsigned int i = 0; i < param->defaultValues.size(); i++)
@@ -986,14 +986,14 @@ bool IsisAml::GetBoolean(const string &paramName) const {
 
   if(param->type != "boolean") {
     string message = "Parameter [" + paramName + "] is not a boolean.";
-    throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+    throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
   }
 
   Isis::iString value;
   if(param->values.size() == 0) {
     if(param->defaultValues.size() == 0) {
       string message = "Parameter [" + paramName + "] has no value.";
-      throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+      throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
     }
     else {
       value = param->defaultValues[0];
@@ -1027,7 +1027,7 @@ void IsisAml::GetBoolean(const string &paramName,
 
   if(param->type != "boolean") {
     string message = "Parameter [" + paramName + "] is not a boolean.";
-    throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+    throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
   }
 
   values.clear();
@@ -1036,7 +1036,7 @@ void IsisAml::GetBoolean(const string &paramName,
   if(param->values.size() == 0) {
     if(param->defaultValues.size() == 0) {
       string message = "Parameter [" + paramName + "] has no value.";
-      throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+      throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
     }
     else {
       for(unsigned int i = 0; i < param->defaultValues.size(); i++) {
@@ -1114,12 +1114,12 @@ string IsisAml::GroupName(const int &index) const {
 
 /**
  * Given group name return its index in the Gui
- * 
+ *
  * @author Sharmila Prasad (8/11/2011)
- * 
- * @param grpName 
- * 
- * @return int 
+ *
+ * @param grpName
+ *
+ * @return int
  */
 int IsisAml::GroupIndex(const string & grpName) const {
   for(int i=0; i<(int)groups.size(); i++) {
@@ -1131,36 +1131,36 @@ int IsisAml::GroupIndex(const string & grpName) const {
 }
 
 /**
- * Create a PVL file from the parameters in a Group given the Gui group name, 
- * Pvl Object and Group names and the list of parameters to be included in the 
- * Pvl 
- * 
+ * Create a PVL file from the parameters in a Group given the Gui group name,
+ * Pvl Object and Group names and the list of parameters to be included in the
+ * Pvl
+ *
  * @author Sharmila Prasad (8/11/2011)
- * 
- * @param pvlDef      - output PVL 
+ *
+ * @param pvlDef      - output PVL
  * @param guiGrpName  - Gui Group name
  * @param pvlObjName  - output PVL Object name
  * @param pvlGrpName  - output PVL Group name
  * @param include     - vector of parameter names to be part of the output PVL
  */
 void IsisAml::CreatePVL(Isis::Pvl &pvlDef , string guiGrpName, string pvlObjName, string pvlGrpName, vector<string> & include) {
-  
+
   Isis::PvlObject *pvlObj = NULL;
   if (pvlObjName != "") {
     pvlObj = new Isis::PvlObject(pvlObjName);
   }
-  
+
   // Get Gui Group index
   int grpIndex= GroupIndex(guiGrpName);
-  
+
   if (pvlGrpName == "" || grpIndex == -1 ) {
     string errMsg = "Must provide Group Name\n";
-    throw Isis::iException::Message(Isis::iException::User, errMsg, _FILEINFO_); 
+    throw Isis::IException(Isis::IException::User, errMsg, _FILEINFO_);
   }
-  
+
   Isis::PvlGroup grp(pvlGrpName);
   for(int i=0; i<NumParams(grpIndex); i++) {
-    string paramName = ParamName(grpIndex, i); 
+    string paramName = ParamName(grpIndex, i);
 
     if(IsParamInPvlInclude(paramName,include)) {
       Isis::iString paramType = Isis::iString(ParamType(grpIndex, i)).DownCase();
@@ -1192,13 +1192,13 @@ void IsisAml::CreatePVL(Isis::Pvl &pvlDef , string guiGrpName, string pvlObjName
 
 /**
  * Verify if the Parameter is in the Included list
- * 
+ *
  * @author Sharmila Prasad (8/11/2011)
- * 
+ *
  * @param paramName - parameter name
  * @param include   - include list
- * 
- * @return bool 
+ *
+ * @return bool
  */
 bool IsisAml::IsParamInPvlInclude(string & paramName, vector<string> & include) {
 
@@ -1882,16 +1882,16 @@ void IsisAml::Clear(const string &paramName) {
  * @return CubeAttributeInput
  *
  * @throws iException::Programmer "Parameter is not a cube."
- * @throws iException::Programmer "Parameter in not an input cube" 
+ * @throws iException::Programmer "Parameter in not an input cube"
  */
 Isis::CubeAttributeInput &IsisAml::GetInputAttribute(const string &paramName) {
 
   IsisParameterData *param = const_cast <IsisParameterData *>(ReturnParam(paramName));
 
   if(param->type != "cube") {
-    string message = "Unable to get input cube attributes.  Parameter [" 
+    string message = "Unable to get input cube attributes.  Parameter ["
       + paramName + "] is not a cube. Parameter type = [" + param->type + "].";
-    throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+    throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
   }
 
   string value;
@@ -1899,7 +1899,7 @@ Isis::CubeAttributeInput &IsisAml::GetInputAttribute(const string &paramName) {
     if(param->defaultValues.size() == 0) {
       value.clear();
 //      string message = "Parameter [" + paramName + "] has no value.";
-//      throw Isis::iException::Message(Isis::iException::User,message, _FILEINFO_);
+//      throw Isis::IException(Isis::IException::User,message, _FILEINFO_);
     }
     else {
       value = param->defaultValues[0];
@@ -1913,9 +1913,9 @@ Isis::CubeAttributeInput &IsisAml::GetInputAttribute(const string &paramName) {
     param->inCubeAtt.Set(value);
   }
   else {
-    string message = "Unable to get input cube attributes.  Parameter [" 
+    string message = "Unable to get input cube attributes.  Parameter ["
       + paramName + "] is not an input. Parameter fileMode = [" + param->fileMode + "].";
-    throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+    throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
   }
   return param->inCubeAtt;
 }
@@ -1935,9 +1935,9 @@ Isis::CubeAttributeOutput &IsisAml::GetOutputAttribute(const string &paramName) 
   IsisParameterData *param = const_cast <IsisParameterData *>(ReturnParam(paramName));
 
   if(param->type != "cube") {
-    string message = "Unable to get output cube attributes.  Parameter [" 
+    string message = "Unable to get output cube attributes.  Parameter ["
       + paramName + "] is not a cube. Parameter type = [" + param->type + "].";
-    throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+    throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
   }
 
   string value;
@@ -1945,7 +1945,7 @@ Isis::CubeAttributeOutput &IsisAml::GetOutputAttribute(const string &paramName) 
     if(param->defaultValues.size() == 0) {
       value.clear();
 //      string message = "Parameter [" + paramName + "] has no value.";
-//      throw Isis::iException::Message(Isis::iException::User,message, _FILEINFO_);
+//      throw Isis::IException(Isis::IException::User,message, _FILEINFO_);
     }
     else {
       value = param->defaultValues[0];
@@ -1960,9 +1960,9 @@ Isis::CubeAttributeOutput &IsisAml::GetOutputAttribute(const string &paramName) 
     param->outCubeAtt.Set(value);
   }
   else {
-    string message = "Unable to get output cube attributes.  Parameter [" 
+    string message = "Unable to get output cube attributes.  Parameter ["
       + paramName + "] is not an output. Parameter fileMode = [" + param->fileMode + "].";
-    throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+    throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
   }
   return param->outCubeAtt;
 }
@@ -1993,7 +1993,7 @@ const IsisParameterData *IsisAml::ReturnParam(const string &paramName) const {
         if(cur_pn == pn) {
           if(exact) {
             string message = "Parameter [" + paramName + "] is not unique.";
-            throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+            throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
           }
           else {
             exact = true;
@@ -2010,11 +2010,11 @@ const IsisParameterData *IsisAml::ReturnParam(const string &paramName) const {
   }
   if(param == NULL) {
     string message = "Unknown parameter [" + paramName + "].";
-    throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+    throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
   }
   else if((found > 1) && (!exact)) {
     string message = "Parameter [" + paramName + "] is not unique.";
-    throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+    throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
   }
   return param;
 }
@@ -2025,7 +2025,7 @@ const IsisParameterData *IsisAml::ReturnParam(const string &paramName) const {
  * @param param The parameter data
  *
  * @throws iException::User
- * @internal 
+ * @internal
  *   @history 2010-07-19 Jeannie Walldren - Added check for FileCustomization
  *                          preference if an existing output file is selected
  */
@@ -2038,10 +2038,10 @@ void IsisAml::Verify(const IsisParameterData *param) {
         Isis::iString value(param->values[i]);
         value.ToInteger();
       }
-      catch(Isis::iException &e) {
+      catch(Isis::IException &e) {
         string message = "Unable to convert [" + param->values[i] + "] to an integer,"
                          " parameter [" + param->name + "].";
-        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+        throw Isis::IException(e, Isis::IException::User, message, _FILEINFO_);
       }
     }
     else if(param->type == "double") {
@@ -2049,10 +2049,10 @@ void IsisAml::Verify(const IsisParameterData *param) {
         Isis::iString value(param->values[i]);
         value.ToDouble();
       }
-      catch(Isis::iException &e) {
+      catch(Isis::IException &e) {
         string message = "Unable to convert [" + param->values[i] + "] to a double,"
                          " parameter [" + param->name + "].";
-        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+        throw Isis::IException(e, Isis::IException::User, message, _FILEINFO_);
       }
     }
     else if(param->type == "boolean") {
@@ -2062,13 +2062,13 @@ void IsisAml::Verify(const IsisParameterData *param) {
       try {
         StringToBool(v);
       }
-      catch(Isis::iException &e) {
+      catch(Isis::IException &e) {
         string message = "Illegal value for [" + param->name + "], [" + param->values[i] + "].";
-        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+        throw Isis::IException(e, Isis::IException::User, message, _FILEINFO_);
       }
     }
     else if(param->type == "filename") {
-      // If this is an output file and a file with this name already exists, 
+      // If this is an output file and a file with this name already exists,
       // check user filename customization preferences.
       Isis::iString value(param->values[i]);
       Isis::Filename name(value);
@@ -2077,9 +2077,9 @@ void IsisAml::Verify(const IsisParameterData *param) {
         CheckFilenamePreference(value, param->name);
       }
     }
-    // THIS IS CURRENTLY HANDLED IN THE CUBE CLASS, see CubeIoHandler.cpp 
+    // THIS IS CURRENTLY HANDLED IN THE CUBE CLASS, see CubeIoHandler.cpp
     // 2010-07-15 Jeannie Walldren
-    // 
+    //
     //  else if(param->type == "cube") {
     //    Isis::iString value(param->values[i]);
     //    Isis::Filename name(value);
@@ -2088,7 +2088,7 @@ void IsisAml::Verify(const IsisParameterData *param) {
     //        && Isis::Preference::Preferences().FindGroup("CubeCustomization").FindKeyword("Overwrite")[0] == "Error") {
     //      string message = "Invalid output cube for [" + param->name + "]. The cube file [" + value + "] already exists.  " +
     //                       "The user preference cube customization group is set to disallow cube overwrites.";
-    //      throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+    //      throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
     //    }
     //  }
   }
@@ -2103,10 +2103,10 @@ void IsisAml::Verify(const IsisParameterData *param) {
           Isis::iString value(param->defaultValues[i]);
           value.ToInteger();
         }
-        catch(Isis::iException &e) {
+        catch(Isis::IException &e) {
           string message = "Unable to convert default [" + param->defaultValues[i] +
                            "] to an integer, parameter [" + param->name + "].";
-          throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+          throw Isis::IException(e, Isis::IException::Programmer, message, _FILEINFO_);
         }
       }
       else if(param->type == "double") {
@@ -2114,10 +2114,10 @@ void IsisAml::Verify(const IsisParameterData *param) {
           Isis::iString value(param->defaultValues[i]);
           value.ToDouble();
         }
-        catch(Isis::iException &e) {
+        catch(Isis::IException &e) {
           string message = "Unable to convert default [" + param->defaultValues[i] +
                            "] to a double, parameter [" + param->name + "].";
-          throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+          throw Isis::IException(e, Isis::IException::Programmer, message, _FILEINFO_);
         }
       }
       else if(param->type == "boolean") {
@@ -2127,10 +2127,10 @@ void IsisAml::Verify(const IsisParameterData *param) {
         try {
           StringToBool(v);
         }
-        catch(Isis::iException &e) {
+        catch(Isis::IException &e) {
           string message = "Illegal default value for [" + param->name + "], ["
                            + param->defaultValues[i] + "].";
-          throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+          throw Isis::IException(e, Isis::IException::User, message, _FILEINFO_);
         }
       }
       else if(param->type == "filename") {
@@ -2162,7 +2162,7 @@ void IsisAml::Verify(const IsisParameterData *param) {
             string message = "Duplicate list options [" +
                              param->listOptions[p].value +
                              "] in parameter [" + param->name + "].";
-            throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+            throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
           }
           exact = true;
         }
@@ -2181,12 +2181,12 @@ void IsisAml::Verify(const IsisParameterData *param) {
           message += ", " + param->listOptions[p].value;
         }
         message += "].";
-        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+        throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
       }
       else if(!exact && partial > 1) {
         string msg = "Value of [" + param->name +
                      "] does not match a list option uniquely.";
-        throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+        throw Isis::IException(Isis::IException::Programmer, msg, _FILEINFO_);
       }
     }
   }
@@ -2203,12 +2203,12 @@ void IsisAml::Verify(const IsisParameterData *param) {
         if(StringToBool(incl) && (temp < min)) {
           string message = "Parameter [" + param->name +
                            "] must be greater than or equal to [" + param->minimum + "].";
-          throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+          throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
         }
         else if(!StringToBool(incl) && (temp <= min)) {
           string message = "Parameter [" + param->name +
                            "] must be greater than [" + param->minimum + "].";
-          throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+          throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
         }
       }
       else if(param->type == "double") {
@@ -2219,12 +2219,12 @@ void IsisAml::Verify(const IsisParameterData *param) {
         if(StringToBool(incl) && (temp < min)) {
           string message = "Parameter [" + param->name +
                            "] must be greater than or equal to [" + param->minimum + "].";
-          throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+          throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
         }
         else if(!StringToBool(incl) && (temp <= min)) {
           string message = "Parameter [" + param->name +
                            "] must be greater than [" + param->minimum + "].";
-          throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+          throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
         }
       }
     }
@@ -2238,12 +2238,12 @@ void IsisAml::Verify(const IsisParameterData *param) {
           if(StringToBool(incl) && (temp < min)) {
             string message = "Parameter [" + param->name +
                              "] must be greater than or equal to [" + param->minimum + "].";
-            throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+            throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
           }
           else if(!StringToBool(incl) && (temp <= min)) {
             string message = "Parameter [" + param->name +
                              "] must be greater than [" + param->minimum + "].";
-            throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+            throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
           }
         }
         else if(param->type == "double") {
@@ -2254,12 +2254,12 @@ void IsisAml::Verify(const IsisParameterData *param) {
           if(StringToBool(incl) && (temp < min)) {
             string message = "Parameter [" + param->name +
                              "] must be greater than or equal to [" + param->minimum + "].";
-            throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+            throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
           }
           else if(!StringToBool(incl) && (temp <= min)) {
             string message = "Parameter [" + param->name +
                              "] must be greater than [" + param->minimum + "].";
-            throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+            throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
           }
         }
       }
@@ -2279,12 +2279,12 @@ void IsisAml::Verify(const IsisParameterData *param) {
         if(StringToBool(incl) && (temp > max)) {
           string message = "Parameter [" + param->name +
                            "] must be less than or equal to [" + param->maximum + "].";
-          throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+          throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
         }
         else if(!StringToBool(incl) && (temp >= max)) {
           string message = "Parameter [" + param->name +
                            "] must be less than [" + param->maximum + "].";
-          throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+          throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
         }
       }
       else if(param->type == "double") {
@@ -2295,12 +2295,12 @@ void IsisAml::Verify(const IsisParameterData *param) {
         if(StringToBool(incl) && (temp > max)) {
           string message = "Parameter [" + param->name +
                            "] must be less than or equal to [" + param->maximum + "].";
-          throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+          throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
         }
         else if(!StringToBool(incl) && (temp >= max)) {
           string message = "Parameter [" + param->name +
                            "] must be less than [" + param->maximum + "].";
-          throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+          throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
         }
       }
     }
@@ -2314,12 +2314,12 @@ void IsisAml::Verify(const IsisParameterData *param) {
           if(StringToBool(incl) && (temp > max)) {
             string message = "Parameter [" + param->name +
                              "] must be less than or equal to [" + param->maximum + "].";
-            throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+            throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
           }
           else if(!StringToBool(incl) && (temp >= max)) {
             string message = "Parameter [" + param->name +
                              "] must be less than [" + param->maximum + "].";
-            throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+            throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
           }
         }
         else if(param->type == "double") {
@@ -2330,12 +2330,12 @@ void IsisAml::Verify(const IsisParameterData *param) {
           if(StringToBool(incl) && (temp > max)) {
             string message = "Parameter [" + param->name +
                              "] must be less than or equal to [" + param->maximum + "].";
-            throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+            throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
           }
           else if(!StringToBool(incl) && (temp >= max)) {
             string message = "Parameter [" + param->name +
                              "] must be less than [" + param->maximum + "].";
-            throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+            throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
           }
         }
       }
@@ -2350,14 +2350,14 @@ void IsisAml::Verify(const IsisParameterData *param) {
     if(param->type != "integer") {
       string message = "Parameter [" + param->name +
                        "] must be of type integer to have an [odd] test.";
-      throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+      throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
     }
     else {
       for(unsigned int i = 0; i < param->values.size(); i++) {
         Isis::iString value(param->values[i]);
         if((value.ToInteger() % 2) != 1) {
           string message = "Value for [" + param->name + "] must be odd.";
-          throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+          throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
         }
       }
     }
@@ -2369,19 +2369,19 @@ void IsisAml::Verify(const IsisParameterData *param) {
 /**
  * This method checks whether the user preferences are set to allow overwrites
  * of existing files.  It should be called if the parameter is an output and the
- * given file name exists. 
- *  
+ * given file name exists.
+ *
  * @param filename Name of the file to be overwritten.
  * @param paramname Name of the output file parameter.
- *  
+ *
  * @throw iException::User -  "The file already exists. The user preference file
  *        customization group is set to disallow file overwrites."
  * @throw iException::User - "Invalid entry in user preference file
  *        FileCustomization group."
- *  
- * @author 2010-07-19 Jeannie Walldren 
- * @internal 
- *   @history 2010-07-19 Jeannie Walldren - Original version. 
+ *
+ * @author 2010-07-19 Jeannie Walldren
+ * @internal
+ *   @history 2010-07-19 Jeannie Walldren - Original version.
  */
 void IsisAml::CheckFilenamePreference(string filename, string paramname) {
   Isis::PvlGroup fileCustomization = Isis::Preference::Preferences().FindGroup("FileCustomization");
@@ -2393,12 +2393,12 @@ void IsisAml::CheckFilenamePreference(string filename, string paramname) {
   if(overwritePreference.UpCase() == "ERROR") {
     string message = "Invalid output filename for [" + paramname + "]. The file [" + filename + "] already exists.  " +
                      "The user preference file customization group is set to disallow file overwrites.";
-    throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+    throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
   }
-  else if(overwritePreference.UpCase() != "ALLOW") { // not set to ERROR or ALLOW 
+  else if(overwritePreference.UpCase() != "ALLOW") { // not set to ERROR or ALLOW
     string message = "Invalid entry in user preference file FileCustomization group.";
     message += "  Overwrite = [" + temp + "].  Valid values: [Allow] or [Error].";
-    throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+    throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
   }
 }
 
@@ -2429,7 +2429,7 @@ void IsisAml::VerifyAll() {
               string message = "Parameter [" + param2->name +
                                "] must be used if parameter [" +
                                param->name + "] equates to true.";
-              throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+              throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
             }
           }
         }
@@ -2448,7 +2448,7 @@ void IsisAml::VerifyAll() {
                 string message = "Parameter [" + param2->name +
                                  "] must be used if parameter [" +
                                  param->name + "] is used.";
-                throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+                throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
               }
             }
           }
@@ -2462,7 +2462,7 @@ void IsisAml::VerifyAll() {
               string message = "Parameter [" + param2->name +
                                "] must be used if parameter [" +
                                param->name + "] is used.";
-              throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+              throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
             }
           }
         }
@@ -2481,7 +2481,7 @@ void IsisAml::VerifyAll() {
               string message = "Parameter [" + param2->name +
                                "] must NOT be used if parameter [" +
                                param->name + "] equates to true.";
-              throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+              throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
             }
           }
         }
@@ -2496,7 +2496,7 @@ void IsisAml::VerifyAll() {
                 string message = "Parameter [" + param2->name +
                                  "] must be used if parameter [" +
                                  param->name + "] is used.";
-                throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+                throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
               }
             }
           }
@@ -2506,7 +2506,7 @@ void IsisAml::VerifyAll() {
               string message = "Parameter [" + param2->name +
                                "] must NOT be used if parameter [" +
                                param->name + "] is used.";
-              throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+              throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
             }
           }
         }
@@ -2527,7 +2527,7 @@ void IsisAml::VerifyAll() {
             else {
               string msg = "Parameter is not INTEGER or DOUBLE type [" +
                            param->name + "]";
-              throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+              throw Isis::IException(Isis::IException::Programmer, msg, _FILEINFO_);
             }
 
             if(param2->type == "integer") {
@@ -2539,14 +2539,14 @@ void IsisAml::VerifyAll() {
             else {
               string msg = "Parameter is not INTEGER or DOUBLE type [" +
                            param->name + "]";
-              throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+              throw Isis::IException(Isis::IException::Programmer, msg, _FILEINFO_);
             }
 
             if(double2 >= double1) {
               string message = "Parameter [" + param->name +
                                "] must be greater than parameter [" +
                                param2->name + "].";
-              throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+              throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
             }
           }
         }
@@ -2568,7 +2568,7 @@ void IsisAml::VerifyAll() {
             else {
               string msg = "Parameter is not INTEGER or DOUBLE type [" +
                            param->name + "]";
-              throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+              throw Isis::IException(Isis::IException::Programmer, msg, _FILEINFO_);
             }
 
             if(param2->type == "integer") {
@@ -2580,14 +2580,14 @@ void IsisAml::VerifyAll() {
             else {
               string msg = "Parameter is not INTEGER or DOUBLE type [" +
                            param->name + "]";
-              throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+              throw Isis::IException(Isis::IException::Programmer, msg, _FILEINFO_);
             }
 
             if(double2 > double1) {
               string message = "Parameter [" + param->name +
                                "] must be greater than or equal to parameter [" +
                                param2->name + "].";
-              throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+              throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
             }
           }
         }
@@ -2607,7 +2607,7 @@ void IsisAml::VerifyAll() {
             else {
               string msg = "Parameter is not INTEGER or DOUBLE type [" +
                            param->name + "]";
-              throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+              throw Isis::IException(Isis::IException::Programmer, msg, _FILEINFO_);
             }
 
             if(param2->type == "integer") {
@@ -2619,14 +2619,14 @@ void IsisAml::VerifyAll() {
             else {
               string msg = "Parameter is not INTEGER or DOUBLE type [" +
                            param->name + "]";
-              throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+              throw Isis::IException(Isis::IException::Programmer, msg, _FILEINFO_);
             }
 
             if(double2 <= double1) {
               string message = "Parameter [" + param->name +
                                "] must be less than parameter [" +
                                param2->name + "].";
-              throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+              throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
             }
           }
         }
@@ -2648,7 +2648,7 @@ void IsisAml::VerifyAll() {
             else {
               string msg = "Parameter is not INTEGER or DOUBLE type [" +
                            param->name + "]";
-              throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+              throw Isis::IException(Isis::IException::Programmer, msg, _FILEINFO_);
             }
 
             if(param2->type == "integer") {
@@ -2660,14 +2660,14 @@ void IsisAml::VerifyAll() {
             else {
               string msg = "Parameter is not INTEGER or DOUBLE type [" +
                            param->name + "]";
-              throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+              throw Isis::IException(Isis::IException::Programmer, msg, _FILEINFO_);
             }
 
             if(double2 < double1) {
               string message = "Parameter [" + param->name +
                                "] must be less than or equal to parameter [" +
                                param2->name + "].";
-              throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+              throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
             }
           }
         }
@@ -2688,7 +2688,7 @@ void IsisAml::VerifyAll() {
             else {
               string msg = "Parameter is not INTEGER or DOUBLE type [" +
                            param->name + "]";
-              throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+              throw Isis::IException(Isis::IException::Programmer, msg, _FILEINFO_);
             }
 
             if(param2->type == "integer") {
@@ -2700,14 +2700,14 @@ void IsisAml::VerifyAll() {
             else {
               string msg = "Parameter is not INTEGER or DOUBLE type [" +
                            param->name + "]";
-              throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+              throw Isis::IException(Isis::IException::Programmer, msg, _FILEINFO_);
             }
 
             if(double2 == double1) {
               string message = "Parameter [" + param->name +
                                "] must NOT be equal to parameter [" +
                                param2->name + "].";
-              throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+              throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
             }
           }
         }
@@ -2739,7 +2739,7 @@ void IsisAml::VerifyAll() {
                                  "] can not be entered if parameter [" +
                                  param->name + "] is equal to [" +
                                  value + "]";
-                throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+                throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
               }
             }
           }
@@ -2773,7 +2773,7 @@ void IsisAml::VerifyAll() {
                                  "] must be entered if parameter [" +
                                  param->name + "] is equal to [" +
                                  value + "]";
-                throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+                throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
               }
             }
           }
@@ -2870,7 +2870,7 @@ void IsisAml::VerifyAll() {
 
         if(!excluded) {
           string message = "Parameter [" + param->name + "] must be entered.";
-          throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+          throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
         }
       }
     }
@@ -2918,7 +2918,7 @@ bool IsisAml::StringToBool(Isis::iString value) const {
   }
   else {
     string message = "Invalid boolean value [" + value + "].";
-    throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+    throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
   }
   return false;
 }
@@ -2939,24 +2939,24 @@ void IsisAml::CommandLine(Isis::Pvl &cont) const {
       // If this param has a value add it to the command line
       if(param->values.size() > 0) {
         Isis::PvlKeyword paramKeyword(param->name);
-        
+
         for(unsigned int value = 0; value < param->values.size(); value++) {
           paramKeyword.AddValue(param->values[value]);
         }
-        
+
         group += paramKeyword;
       }
 
       // Or if it has a default value add it to the command line
       else if(param->defaultValues.size() > 0) {
         Isis::PvlKeyword paramKeyword(param->name);
-        
-        for(unsigned int value = 0; 
+
+        for(unsigned int value = 0;
            value < param->defaultValues.size();
            value++) {
           paramKeyword.AddValue(param->defaultValues[value]);
         }
-        
+
         group += paramKeyword;
       }
     }
@@ -3032,7 +3032,7 @@ void IsisAml::StartParser(const char *xmlfile) {
   catch(const XERCES::XMLException &toCatch) {
     string message = "Error during XML parser initialization" +
                      (string)XERCES::XMLString::transcode(toCatch.getMessage());
-    throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+    throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
     return;
   }
 
@@ -3076,7 +3076,7 @@ void IsisAml::StartParser(const char *xmlfile) {
   catch(const XERCES::XMLException &toCatch) {
     string message = "Error in application XML file: " +
                      (string)XERCES::XMLString::transcode(toCatch.getMessage());
-    throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+    throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
     XERCES::XMLPlatformUtils::Terminate();
     return;
   }

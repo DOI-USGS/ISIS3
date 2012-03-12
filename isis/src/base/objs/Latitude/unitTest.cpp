@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "iException.h"
+#include "IException.h"
 #include "Constants.h"
 #include "Distance.h"
 #include "Preference.h"
@@ -10,12 +10,7 @@
 using std::cout;
 using std::endl;
 
-using Isis::Angle;
-using Isis::Distance;
-using Isis::iException;
-using Isis::Latitude;
-using Isis::Preference;
-using Isis::PI;
+using namespace Isis;
 
 int main(int argc, char *argv[]) {
   Preference::Preferences(true);
@@ -29,8 +24,8 @@ int main(int argc, char *argv[]) {
     Latitude lat;
     cout << lat.degrees() << " degrees" << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -38,8 +33,8 @@ int main(int argc, char *argv[]) {
     Latitude lat(45.0, Angle::Degrees);
     cout << lat.degrees() << " degrees" << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -51,8 +46,8 @@ int main(int argc, char *argv[]) {
                  Angle::Degrees);
     cout << lat.degrees() << " degrees" << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -62,8 +57,8 @@ int main(int argc, char *argv[]) {
                  Angle::Degrees);
     cout << lat.degrees() << " degrees" << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -73,8 +68,8 @@ int main(int argc, char *argv[]) {
                  Angle::Degrees, Latitude::AllowPastPole);
     cout << lat.degrees() << " degrees" << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -84,8 +79,8 @@ int main(int argc, char *argv[]) {
                  Angle::Degrees, Latitude::AllowPastPole);
     cout << lat.degrees() << " degrees" << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -95,8 +90,8 @@ int main(int argc, char *argv[]) {
                  Angle::Degrees);
     cout << lat.degrees() << " degrees" << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -107,8 +102,8 @@ int main(int argc, char *argv[]) {
     cout << lat.degrees() << " degrees == ";
     cout << Latitude(lat).degrees() << " degrees" << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   cout << endl << "----- Testing Set Methods -----" << endl << endl;
@@ -125,8 +120,8 @@ int main(int argc, char *argv[]) {
     lat2 = lat;
     cout << lat.degrees() << " degrees after assignment" << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -135,8 +130,8 @@ int main(int argc, char *argv[]) {
     lat.setPlanetographic(25, Angle::Degrees);
     cout << lat.degrees() << " degrees" << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -146,8 +141,8 @@ int main(int argc, char *argv[]) {
     lat.setPlanetographic(25, Angle::Degrees);
     cout << lat.degrees() << " degrees" << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   cout << endl << "----- Testing Get Methods -----" << endl << endl;
@@ -163,8 +158,8 @@ int main(int argc, char *argv[]) {
     cout << lat.planetographic(Angle::Degrees) << " degrees planetographic"
          << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   cout << endl;

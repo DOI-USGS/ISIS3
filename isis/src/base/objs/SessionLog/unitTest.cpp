@@ -4,7 +4,7 @@
 
 #include "Application.h"
 #include "Preference.h"
-#include "iException.h"
+#include "IException.h"
 #include "Pvl.h"
 
 using namespace std;
@@ -47,8 +47,8 @@ int main(int argc, char *argv[]) {
       log.AddResults(results);
       std::cout << log << std::endl;
     }
-    catch(Isis::iException &e) {
-      e.Report();
+    catch(Isis::IException &e) {
+      e.print();
     }
 
     try {
@@ -58,13 +58,13 @@ int main(int argc, char *argv[]) {
       log.AddError(error);
       std::cout << log << std::endl;
     }
-    catch(Isis::iException &e) {
-      e.Report();
+    catch(Isis::IException &e) {
+      e.print();
     }
 
   }
-  catch(Isis::iException &e) {
-    e.Report();
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   return 0;

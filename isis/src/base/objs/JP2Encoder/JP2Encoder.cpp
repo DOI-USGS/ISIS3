@@ -25,7 +25,7 @@
 #include <string>
 #include <sstream>
 
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "JP2Encoder.h"
 #include "JP2Error.h"
@@ -55,7 +55,7 @@ namespace Isis {
 
     if(p_sampleDimension == 0 || p_lineDimension == 0 || p_bandDimension == 0) {
       string msg = "Invalid sample/line/band dimensions specified for output file";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if(type == Isis::SignedWord) {
@@ -75,7 +75,7 @@ namespace Isis {
     }
     else {
       string msg = "Invalid pixel type specified for output file";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     // Determine number of resolution levels. The sample/line dimension at the

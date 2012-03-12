@@ -31,7 +31,7 @@
 #include "CameraFocalPlaneMap.h"
 #include "Constants.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "iTime.h"
 #include "NaifStatus.h"

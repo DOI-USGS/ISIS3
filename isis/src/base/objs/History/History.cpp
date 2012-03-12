@@ -33,7 +33,7 @@ using namespace std;
 
 namespace Isis {
 
-  /** 
+  /**
    *  Constructor for reading a history blob
    *  @param name
    */
@@ -41,7 +41,7 @@ namespace Isis {
     p_history.SetTerminator("");
   }
 
-  /** 
+  /**
    *  Constructor for reading a history blob
    *  @param name
    *  @param file
@@ -63,9 +63,9 @@ namespace Isis {
     AddEntry(hist);
   }
 
-  /** 
-   * Adds given PvlObject to History Pvl 
-   *  
+  /**
+   * Adds given PvlObject to History Pvl
+   *
    * @param obj PvlObject to be added
    */
   void History::AddEntry(Isis::PvlObject &obj) {
@@ -73,7 +73,7 @@ namespace Isis {
   }
 
   /**
-   *   
+   *
    */
   void History::WriteInit() {
     ostringstream ostr;
@@ -92,10 +92,10 @@ namespace Isis {
     if(temp != NULL) delete [] temp;
   }
 
-  /** 
-   * Reads p_buffer into a pvl 
-   *  
-   * @return @b Pvl 
+  /**
+   * Reads p_buffer into a pvl
+   *
+   * @return @b Pvl
    */
   Pvl History::ReturnHist() {
     Pvl pvl;
@@ -106,8 +106,8 @@ namespace Isis {
   }
 
   /**
-   * Reads input stream into Pvl. 
-   *  
+   * Reads input stream into Pvl.
+   *
    * @param pvl Pvl into which the input stream will be read.
    * @param is Input stream.
    */
@@ -115,8 +115,7 @@ namespace Isis {
     try {
       Blob::Read(pvl, is);
     }
-    catch(iException &e) {
-      e.Clear();
+    catch(IException &e) {
     }
   }
 }

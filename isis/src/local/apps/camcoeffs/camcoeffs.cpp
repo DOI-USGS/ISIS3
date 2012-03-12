@@ -3,7 +3,7 @@
 #include <string>
 #include <cmath>
 
-#include "iException.h"
+#include "IException.h"
 
 using namespace std;
 using namespace Isis;
@@ -117,7 +117,7 @@ void IsisMain() {
   }
 
   if(!solutionFound) {
-    throw iException::Message(iException::Math, "Not enough information", _FILEINFO_);
+    throw IException(IException::Unknown, "Not enough information", _FILEINFO_);
   }
 
   iString inEquationX = "X = " + iString(eq1[0]);

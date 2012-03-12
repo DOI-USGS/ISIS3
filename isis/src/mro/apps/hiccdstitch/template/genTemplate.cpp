@@ -3,7 +3,7 @@
 #include "ProcessByLine.h"
 #include "Brick.h"
 #include "FileList.h"
-#include "iException.h"
+#include "IException.h"
 
 using namespace std;
 using namespace Isis;
@@ -62,4 +62,4 @@ int main(int argc, char *argv[]) {
   pvl.Write("hiccdstitch.offsets.def");
 #endif
   return (0);
-}	// End of IsisMain
+}// End of IsisMain

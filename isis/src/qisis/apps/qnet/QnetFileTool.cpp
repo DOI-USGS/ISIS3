@@ -152,11 +152,10 @@ namespace Isis {
         g_controlNetwork = NULL;
       }
     }
-    catch (iException &e) {
+    catch (IException &e) {
       QString message = "Error processing cube list.  \n";
-      string errors = e.Errors();
+      string errors = e.toString();
       message += errors.c_str();
-      e.Clear();
       QMessageBox::information((QWidget *)parent(), "Error", message);
       QApplication::restoreOverrideCursor();
       return;
@@ -189,11 +188,10 @@ namespace Isis {
         g_controlNetwork = new ControlNet(cNetFilename.toStdString(),
                                                 &progress);
       }
-      catch (iException &e) {
+      catch (IException &e) {
         QString message = "Invalid control network.  \n";
-        string errors = e.Errors();
+        string errors = e.toString();
         message += errors.c_str();
-        e.Clear();
         QMessageBox::information((QWidget *)parent(), "Error", message);
         QApplication::restoreOverrideCursor();
         return;
@@ -205,16 +203,15 @@ namespace Isis {
       Progress progress;
       g_controlNetwork->SetImages(*g_serialNumberList,&progress);
     }
-    catch (iException &e) {
+    catch (IException &e) {
       QString message = "Cannot initialize images in control network.  \n";
-      string errors = e.Errors();
+      string errors = e.toString();
       message += errors.c_str();
-      e.Clear();
       QMessageBox::information((QWidget *)parent(), "Error", message);
       QApplication::restoreOverrideCursor();
       return;
     }
-    
+
     p_openGround->setEnabled(true);
     p_openDem->setEnabled(true);
 
@@ -287,12 +284,11 @@ namespace Isis {
     if (!fn.isEmpty()) {
       try {
         g_controlNetwork->Write(fn.toStdString());
-      } 
-      catch (iException &e) {
+      }
+      catch (IException &e) {
         QString message = "Error saving control network.  \n";
-        string errors = e.Errors();
+        string errors = e.toString();
         message += errors.c_str();
-        e.Clear();
         QMessageBox::information((QWidget *)parent(), "Error", message);
         return;
       }
@@ -348,11 +344,11 @@ namespace Isis {
   }
 
   /**
-   * Load images for the given point 
+   * Load images for the given point
    *
    * @param point Control point to load
-   *  
-   * @internal 
+   *
+   * @internal
    *   @history 2010-12-10 Tracie Sucharski - Renamed slot loadPoint to
    *                          loadPointImages.
    */

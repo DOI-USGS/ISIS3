@@ -28,7 +28,7 @@
 #include "Camera.h"
 #include "Constants.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "iTime.h"
 #include "Latitude.h"
@@ -43,10 +43,10 @@ using namespace std;
 namespace Isis {
   /**
    * Constructs the VimsGroundMap object
-   *  
+   *
    * @param parent A pointer to the parent Camera object
-   * @param lab Pvl labels for the image 
-   */ 
+   * @param lab Pvl labels for the image
+   */
   VimsGroundMap::VimsGroundMap(Camera *parent, Pvl &lab) :
     CameraGroundMap(parent) {
     // Init(lab);
@@ -68,7 +68,7 @@ namespace Isis {
     if (parent->ParentSamples() > 64 || parent->ParentLines() > 64) {
       iString msg = "The Vims ground map does not understand cubes that "
                     "initially have more than 64 lines or 64 samples.";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
 
@@ -110,11 +110,11 @@ namespace Isis {
   /**
    * Initialize vims camera model
    *
-   * @param [in] lab   (Pvl &)      Cube Pvl label 
-   *  
-   * @throw iException::Io - "Cannot process NYQUIST(undersampled) mode " 
-   *  
-   * @internal 
+   * @param [in] lab   (Pvl &)      Cube Pvl label
+   *
+   * @throw iException::Io - "Cannot process NYQUIST(undersampled) mode "
+   *
+   * @internal
    *   @history  2007-04-16 Tracie Sucharski - Look for unit vectors in
    *                              the proper directory.
    *   @history  2007-04-18 Tracie Sucharski, The inaccuracy of the 15 Mhz clock
@@ -199,7 +199,7 @@ namespace Isis {
       }
       if(sampMode == "NYQUIST") {
         string msg = "Cannot process NYQUIST(undersampled) mode ";
-        throw iException::Message(iException::Io, msg, _FILEINFO_);
+        throw IException(IException::Io, msg, _FILEINFO_);
       }
     }
 
@@ -264,7 +264,7 @@ namespace Isis {
    *
    * @return @b bool Indicates whether the conversion was successful
    *
-   * @internal 
+   * @internal
    * @history 2008-01-02 Tracie Sucharski - Check incoming pixel for validity
    *                                against edge of pixel not center.
    * @history 2008-02-05 Tracie Sucharski, Replaced unitVector files with
@@ -320,7 +320,7 @@ namespace Isis {
    *
    * @return @b bool Indicates whether the conversion was successful
    *
-   * @internal 
+   * @internal
    * @history 2007-04-18  Tracie Sucharski - Added check for reasonable
    *                             match when attempting to find closest
    *                             lat/lon in map arrays.
@@ -476,10 +476,10 @@ namespace Isis {
   /**
    * If on boundary convert longitude values.  If trying to find 360, convert
    * longitude values on other side of meridian to values greater than 360.  If
-   * trying to find 1.0, convert longitude values on other side to negative 
+   * trying to find 1.0, convert longitude values on other side to negative
    * numbers.
    *
-   * This modifies lon2 and leaves lon1 alone. 
+   * This modifies lon2 and leaves lon1 alone.
    * @param lon1 Longitude value 1
    * @param lon2 Longitude value to be modified.
    */
@@ -496,14 +496,14 @@ namespace Isis {
   }
 
 
-  /** 
+  /**
    *  Compute undistorted focal plane coordinate from ground position.
    *
    * @param surfacePoint Ground surface point
    *
    * @return @b bool Indicates whether the conversion was successful.
    *
-   * @internal 
+   * @internal
    */
   bool VimsGroundMap::SetGround(const SurfacePoint &surfacePoint) {
     return SetGround(surfacePoint.GetLatitude(), surfacePoint.GetLongitude());
@@ -519,7 +519,7 @@ namespace Isis {
    * system.  This code was converted from Rick McCloskey's point_tbl c
    * code.
    *
-   * @internal 
+   * @internal
    *   @history 2008-01-031  Tracie Sucharski - Converted Rick's code rather than
    *                                 using the unitVector files from Rick.
    */

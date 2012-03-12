@@ -21,7 +21,7 @@
  */
 
 #include "TableField.h"
-#include "iException.h"
+#include "IException.h"
 
 using namespace std;
 namespace Isis {
@@ -64,7 +64,7 @@ namespace Isis {
    * @param field PvlGroup containing Name, Size, and Type for new TableField
    *              object
    *
-   * @throws Isis::iException::Programmer - Invalid field type
+   * @throws Isis::IException::Programmer - Invalid field type
    */
   TableField::TableField(Isis::PvlGroup &field) {
     p_name = (string) field["Name"];
@@ -91,7 +91,7 @@ namespace Isis {
     }
     else {
       string msg = "Field [" + p_name + "] has invalid type";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
 
@@ -104,12 +104,12 @@ namespace Isis {
    *
    * @return
    *
-   * @throws Isis::iException::Programmer - Field is not a Double
+   * @throws Isis::IException::Programmer - Field is not a Double
    */
   TableField::operator double() const {
     if(p_type != TableField::Double) {
       string msg = "Field [" + p_name + "] is not a Double";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     return p_dvalues[0];
   }
@@ -119,12 +119,12 @@ namespace Isis {
    *
    * @return
    *
-   * @throws Isis::iException::Programmer - Field is not an Integer
+   * @throws Isis::IException::Programmer - Field is not an Integer
    */
   TableField::operator int() const {
     if(p_type != TableField::Integer) {
       string msg = "Field [" + p_name + "] is not Integer";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     return p_ivalues[0];
   }
@@ -134,12 +134,12 @@ namespace Isis {
    *
    * @return
    *
-   * @throws Isis::iException::Programmer - Field is not a Real
+   * @throws Isis::IException::Programmer - Field is not a Real
    */
   TableField::operator float() const {
     if(p_type != TableField::Real) {
       string msg = "Field [" + p_name + "] is not Real";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     return p_rvalues[0];
   }
@@ -149,12 +149,12 @@ namespace Isis {
    *
    * @return
    *
-   * @throws Isis::iException::Programmer - Field is not a string
+   * @throws Isis::IException::Programmer - Field is not a string
    */
   TableField::operator std::string() const {
     if(p_type != TableField::Text) {
       string msg = "Field [" + p_name + "] is not Text";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     return p_svalue;
   }
@@ -164,12 +164,12 @@ namespace Isis {
    *
    * @return
    *
-   * @throws Isis::iException::Programmer - Field is not a Double array
+   * @throws Isis::IException::Programmer - Field is not a Double array
    */
   TableField::operator std::vector<double>() const {
     if(p_type != TableField::Double) {
       string msg = "Field [" + p_name + "] is not a Double array";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     return p_dvalues;
   }
@@ -179,12 +179,12 @@ namespace Isis {
    *
    * @return
    *
-   * @throws Isis::iException::Programmer - Field is not an Integer array
+   * @throws Isis::IException::Programmer - Field is not an Integer array
    */
   TableField::operator std::vector<int>() const {
     if(p_type != TableField::Integer) {
       string msg = "Field [" + p_name + "] is not an Integer array";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     return p_ivalues;
   }
@@ -194,12 +194,12 @@ namespace Isis {
    *
    * @return
    *
-   * @throws Isis::iException::Programmer - Field is not an Integer array
+   * @throws Isis::IException::Programmer - Field is not an Integer array
    */
   TableField::operator std::vector<float>() const {
     if(p_type != TableField::Real) {
       string msg = "Field [" + p_name + "] is not a Real array";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     return p_rvalues;
   }
@@ -209,12 +209,12 @@ namespace Isis {
    *
    * @param value Integer to be assigned to field value
    *
-   * @throws Isis::iException::Programmer - Field is not an Integer
+   * @throws Isis::IException::Programmer - Field is not an Integer
    */
   void TableField::operator=(const int value) {
     if(p_type != TableField::Integer) {
       string msg = "Field [" + p_name + "] is not an Integer";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     p_ivalues[0] = value;
   }
@@ -224,12 +224,12 @@ namespace Isis {
    *
    * @param value Double to be assigned to field value
    *
-   * @throws Isis::iException::Programmer - Field is not a Double
+   * @throws Isis::IException::Programmer - Field is not a Double
    */
   void TableField::operator=(const double value) {
     if(p_type != TableField::Double) {
       string msg = "Field [" + p_name + "] is not a Double";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     p_dvalues[0] = value;
   }
@@ -239,12 +239,12 @@ namespace Isis {
    *
    * @param value string to be assigned to field value
    *
-   * @throws Isis::iException::Programmer - Field is not a string
+   * @throws Isis::IException::Programmer - Field is not a string
    */
   void TableField::operator=(const std::string &value) {
     if(p_type != TableField::Text) {
       string msg = "Field [" + p_name + "] is not Text";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     p_svalue = value;
   }
@@ -254,12 +254,12 @@ namespace Isis {
    *
    * @param value float to be assigned to field value
    *
-   * @throws Isis::iException::Programmer - Field is not a string
+   * @throws Isis::IException::Programmer - Field is not a string
    */
   void TableField::operator=(const float value) {
     if(p_type != TableField::Real) {
       string msg = "Field [" + p_name + "] is not Real";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     p_rvalues[0] = value;
   }
@@ -269,17 +269,17 @@ namespace Isis {
    *
    * @param values Integer vector of values to be assigned to field value
    *
-   * @throws Isis::iException::Programmer - Field is not an Integer
-   * @throws Isis::iException::Programmer - Vector is not the correct size
+   * @throws Isis::IException::Programmer - Field is not an Integer
+   * @throws Isis::IException::Programmer - Vector is not the correct size
    */
   void TableField::operator=(const std::vector<int> &values) {
     if(p_type != TableField::Integer) {
       string msg = "Field [" + p_name + "] is not an Integer";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     else if((int) values.size() != p_size) {
       string msg = "Field [" + p_name + "] values vector is not the correct size";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     p_ivalues = values;
   }
@@ -289,17 +289,17 @@ namespace Isis {
    *
    * @param values Double vector of values to be assigned to field value
    *
-   * @throws Isis::iException::Programmer - Field is not a Double
-   * @throws Isis::iException::Programmer - Vector is not the correct size
+   * @throws Isis::IException::Programmer - Field is not a Double
+   * @throws Isis::IException::Programmer - Vector is not the correct size
    */
   void TableField::operator=(const std::vector<double> &values) {
     if(p_type != TableField::Double) {
       string msg = "Field [" + p_name + "] is not a Double";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     else if((int) values.size() != p_size) {
       string msg = "Field [" + p_name + "] values vector is not the correct size";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     p_dvalues = values;
   }
@@ -310,17 +310,17 @@ namespace Isis {
    * @param values Float vector of values to be assigned to field
    *               value
    *
-   * @throws Isis::iException::Programmer - Field is not a Real
-   * @throws Isis::iException::Programmer - Vector is not the correct size
+   * @throws Isis::IException::Programmer - Field is not a Real
+   * @throws Isis::IException::Programmer - Vector is not the correct size
    */
   void TableField::operator=(const std::vector<float> &values) {
     if(p_type != TableField::Real) {
       string msg = "Field [" + p_name + "] is not a Real";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     else if((int) values.size() != p_size) {
       string msg = "Field [" + p_name + "] values vector is not the correct size";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     p_rvalues = values;
   }
@@ -366,7 +366,7 @@ namespace Isis {
     }
     else {
       string msg = "Invalid field type";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
 
@@ -375,12 +375,12 @@ namespace Isis {
    *
    * @param buf
    *
-   * @throws Isis::iException::Programmer - Field is not Text
+   * @throws Isis::IException::Programmer - Field is not Text
    */
   void TableField::operator=(const char *buf) {
     if(p_type != TableField::Text) {
       string msg = "Field [" + p_name + "] is not Text";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     p_svalue = buf;

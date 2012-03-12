@@ -6,7 +6,7 @@
 
 #include "ControlNet.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "Preference.h"
 #include "Pvl.h"
@@ -65,7 +65,7 @@ void TestNetwork(const string &filename, bool printNetwork) {
       test2 = ControlNetVersioner::Read(Filename("./tmp"));
 //       cerr << "Elapsed time to read: " << timer2.elapsed() << "ms" << endl;
     }
-    catch(iException &e) {
+    catch(IException &e) {
       remove("./tmp");
       throw;
     }
@@ -100,9 +100,8 @@ void TestNetwork(const string &filename, bool printNetwork) {
       remove("./tmp2.pvl");
     }
   }
-  catch(iException &e) {
-    e.Report(false);
-    e.Clear();
+  catch(IException &e) {
+    e.print();
   }
 
   if(test) {

@@ -1,7 +1,7 @@
 #include "ControlPoint.h"
 #include "ControlMeasure.h"
 #include "ControlNet.h"
-#include "iException.h"
+#include "IException.h"
 #include "Preference.h"
 #include "ControlGraph.h"
 
@@ -135,8 +135,8 @@ int main() {
     cerr << "\n\nGetCubesOnIsland(42) returns:";
     cubesOnIsland = cg.GetCubesOnIsland(42);
   }
-  catch (iException e) {
-    e.Report();
+  catch (IException &e) {
+    e.print();
   }
 
   cerr << "\nGetCubeList() returns:\n";

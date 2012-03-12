@@ -35,7 +35,7 @@
 #include "geos/util/GEOSException.h"
 
 #include "ImageOverlap.h"
-#include "iException.h"
+#include "IException.h"
 #include "PvlGroup.h"
 
 namespace Isis {
@@ -149,7 +149,7 @@ namespace Isis {
                                      geos::geom::MultiPolygon *lonLatPolygon);
 
       bool SetPolygon(geos::geom::Geometry *poly, int position, ImageOverlap *sncopy = NULL, bool insert = false);
-      void HandleError(iException &e, SerialNumberList *snlist, iString msg = "", int overlap1 = -1, int overlap2 = -1);
+      void HandleError(IException &e, SerialNumberList *snlist, iString msg = "", int overlap1 = -1, int overlap2 = -1);
       void HandleError(geos::util::GEOSException *exc, SerialNumberList *snlist, iString msg = "", int overlap1 = -1, int overlap2 = -1);
       void HandleError(SerialNumberList *snlist, iString msg, int overlap1 = -1, int overlap2 = -1);
 

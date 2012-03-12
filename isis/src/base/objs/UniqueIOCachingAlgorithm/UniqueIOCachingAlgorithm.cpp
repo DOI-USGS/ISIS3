@@ -26,7 +26,7 @@
 #include <QList>
 #include <QQueue>
 
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "RawCubeChunk.h"
 
@@ -44,8 +44,9 @@ namespace Isis {
     m_uniqueIOs = new QQueue < QList <RawCubeChunk *> >;
 
     if (numUniqueIOs <= 0) {
-      iString msg = "At least one unique IO must be used";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      iString msg = "At least one unique IO must be used when using the unique "
+          "IO cube caching algorithm";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     while (m_uniqueIOs->size() < numUniqueIOs)

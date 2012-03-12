@@ -61,7 +61,7 @@ namespace Isis {
         // Test for valid band
         if ((band <= 0) || (band > (int) _bandpho.size())) {
             std::string mess = "Provided band " + iString(band) + " out of range.";
-            throw iException::Message(iException::Programmer, mess, _FILEINFO_);
+            throw IException(IException::Programmer, mess, _FILEINFO_);
         }
         double ph = photometry(_bandpho[band - 1], i, e, g);
         return (_bandpho[band - 1].phoStd / ph);
@@ -295,16 +295,15 @@ namespace Isis {
                 ostringstream mess;
                 mess << "Band " << i + 1 << " with wavelength Center = " << center[i]
                         << " does not have PhotometricModel Algorithm group/profile";
-                iException &e = iException::Message(iException::User, mess.str(), _FILEINFO_);
-                errs += e.Errors() + "\n";
-                e.Clear();
+                IException e(IException::User, mess.str(), _FILEINFO_);
+                errs += e.toString() + "\n";
             }
         }
 
         // Check for errors and throw them all at the same time
         if (!errs.empty()) {
             errs += " --> Errors in the input PVL file \"" + pvl.Filename() + "\"";
-            throw iException::Message(iException::User, errs, _FILEINFO_);
+            throw IException(IException::User, errs, _FILEINFO_);
         }
 
         return;

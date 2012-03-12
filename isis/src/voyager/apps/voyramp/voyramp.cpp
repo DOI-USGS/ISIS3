@@ -2,7 +2,7 @@
 
 #include "Buffer.h"
 #include "Cube.h"
-#include "iException.h"
+#include "IException.h"
 #include "iTime.h"
 #include "ProcessByLine.h"
 #include "Pvl.h"
@@ -52,52 +52,52 @@ void IsisMain() {
   // Processing by line
   ProcessByLine p;
   line = 1;
-  
+
   UserInterface &ui = Application::GetUserInterface();
-  
+
   p.SetInputCube("FROM");
   Cube * outCube = p.SetOutputCube("TO");
-  
+
   // FYI, labels are copied on SetOutputCube call, so In and Out labels match
   PvlObject & isiscube = outCube->getLabel()->FindObject("IsisCube");
   PvlGroup & inst = isiscube.FindGroup("Instrument");
-  
+
   // Verify Voyager1 spacecraft
   if (inst["SpacecraftName"][0] != "VOYAGER_1") {
     string msg = "The cube [" + ui.GetFilename("FROM") + "] does not appear" +
                  " to be a Voyager1 image";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
-  
+
   // Verify has been radiometrically calibrated
   if (!isiscube.HasGroup("Radiometry")) {
     string msg = "The cube [" + ui.GetFilename("FROM") + "] has not been" +
                  "radiometrically corrected, run voycal first";
   }
- 
+
   // Image time
   iTime time(inst["StartTime"][0]);
   // Day 64, hour 1
   iTime min("1979-03-05T01:00:00.000");
   // Day 64, hour 17
   iTime max("1979-03-05T17:00:00.000");
-  
+
   // From Isis2, the time range is day 64, hours 1-16, inclusive.
   if (time < min || time >= max) {
     string message = "The cube [" + ui.GetFilename("FROM") + "] has image" +
                      " time [" + time.UTC() + "] outside of allowable" +
                      "range [" + min.UTC() + "] to [" + max.UTC() + "]";
-    throw iException::Message(iException::User, message, _FILEINFO_);
+    throw IException(IException::User, message, _FILEINFO_);
   }
 
   PvlGroup & radio = isiscube.FindGroup("Radiometry");
   double gain = radio["GainCorrection"];
   double off = radio["OffsetCorrection"];
   double XMLT = radio["XMLT"];
-  
-  int startHour = time.Hour() - 1;  
-  int endHour = time.Hour(); 
-  
+
+  int startHour = time.Hour() - 1;
+  int endHour = time.Hour();
+
   double event_hr;
   double rawtop, rawmid, rawbot;
   double y1, y2, y3;
@@ -105,26 +105,26 @@ void IsisMain() {
   double x1sq, x2sq, x3sq;
   double deta, detb1, detb2, detb3;
 
-  /* 
+  /*
    * You get what you see: This is copied from Isis2's voyramp.
-   * Documentation was sparse... 
+   * Documentation was sparse...
    * I cannot explain what occuring from an understand of the code, only from
    * and understanding of the problem. The paper referenced in the XML
-   * provides a graph with 3 curves, offsets for top, middle, and bottom of 
-   * the frame. These lines are DN offsets by hour. From these values we have 
-   * to interpolate. So that at any given time with in the range and at any 
-   * location in the image we may find the correct DN offset. The code below 
-   * should be accomplishing this. 
-   */ 
+   * provides a graph with 3 curves, offsets for top, middle, and bottom of
+   * the frame. These lines are DN offsets by hour. From these values we have
+   * to interpolate. So that at any given time with in the range and at any
+   * location in the image we may find the correct DN offset. The code below
+   * should be accomplishing this.
+   */
   event_hr = ((double)time.Hour()) + ((double)time.Minute())/60.0 + time.Second()/3600.0;
-  
+
   rawtop = interp(table[startHour].w(), table[startHour].x(),
                   table[endHour].w(),   table[endHour].x(), event_hr);
   rawmid = interp(table[startHour].w(), table[startHour].y(),
                   table[endHour].w(),  table[endHour].y(), event_hr);
-  rawbot = interp(table[startHour].w(), table[startHour].z(), 
+  rawbot = interp(table[startHour].w(), table[startHour].z(),
                   table[endHour].w(),   table[endHour].z(),event_hr);
-  
+
   y1 = XMLT * (gain * rawtop + off);
   y2 = XMLT * (gain * rawmid + off);
   y3 = XMLT * (gain * rawbot + off);
@@ -142,7 +142,7 @@ void IsisMain() {
   detb3=x1sq*(x2*y3-y2*x3)-x1*(x2sq*y3-y2*x3sq)+ y1*(x2sq*x3-x2*x3sq);
 
   // Corrective output DN for ...
-  plasmaA = detb1/deta; 
+  plasmaA = detb1/deta;
   plasmaB = detb2/deta;
   plasmaC = detb3/deta;
 
@@ -166,15 +166,15 @@ void IsisMain() {
 // In Isis2 a mistake was made where instead of line, another value was used
 // in calculating the plasmaOffset, after talking to Kris Becker, the
 // original author, we determine line should be correct, however, this means
-// there is no truth data to verify this. 
+// there is no truth data to verify this.
 void ioCorrection(Buffer &in, Buffer &out) {
-  plasmaOffset = plasmaA * line * line + 
-                 plasmaB * line + 
+  plasmaOffset = plasmaA * line * line +
+                 plasmaB * line +
                  plasmaC;
   for (int i = 0; i < in.size(); i++) {
     if (IsSpecial(in[i])) {
       out[i] = in[i];
-    } 
+    }
     else {
       out[i] = in[i] - plasmaOffset;
     }
@@ -186,8 +186,8 @@ void ioCorrection(Buffer &in, Buffer &out) {
 // Interpolate between two sets of values at two times.
 static double interp(double x1, double y1, double x2, double y2, double x) {
   if (x1 == x2) {
-    throw iException::Message(iException::Programmer,
-                              "First dependent variables are equal", _FILEINFO_);
+    throw IException(IException::Programmer,
+                     "First dependent variables are equal", _FILEINFO_);
   }
   return (y2 + (x - x2) * (y1 - y2) / (x1 - x2));
 }

@@ -6,7 +6,7 @@
 
 #include "Cube.h"
 #include "Hillier.h"
-#include "iException.h"
+#include "IException.h"
 #include "ProcessByLine.h"
 #include "Pvl.h"
 #include "PvlGroup.h"

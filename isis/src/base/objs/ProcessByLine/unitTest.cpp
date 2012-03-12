@@ -86,8 +86,8 @@ void IsisMain() {
     cout << "Testing error for no input/output ..." << endl;
     p.StartProcess(oneInput);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
     p.EndProcess();
     cout << endl;
   }
@@ -98,8 +98,8 @@ void IsisMain() {
     cout << "Testing error for too many input/outputs ..." << endl;
     p.StartProcess(oneInput);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
     p.EndProcess();
     cout << endl;
   }
@@ -108,8 +108,8 @@ void IsisMain() {
     cout << "Testing for exactly one input ..." << endl;
     p.StartProcess(oneInAndOut);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
     p.EndProcess();
     cout << endl;
   }
@@ -119,8 +119,8 @@ void IsisMain() {
     cout << "Testing for exactly one output ..." << endl;
     p.StartProcess(oneInAndOut);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
     p.EndProcess();
     cout << endl;
   }
@@ -131,8 +131,8 @@ void IsisMain() {
     cout << "Testing for lines mismatch ..." << endl;
     p.StartProcess(oneInAndOut);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
     p.EndProcess();
     cout << endl;
   }
@@ -144,8 +144,8 @@ void IsisMain() {
     cout << "Testing for samples mismatch ..." << endl;
     p.StartProcess(oneInAndOut);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
     p.EndProcess();
     cout << endl;
   }
@@ -157,8 +157,8 @@ void IsisMain() {
     cout << "Testing for bands mismatch ..." << endl;
     p.StartProcess(oneInAndOut);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
     p.EndProcess();
     cout << endl;
   }
@@ -167,8 +167,8 @@ void IsisMain() {
     cout << "Testing for no inputs/outputs ..." << endl;
     p.StartProcess(twoInAndOut);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
     p.EndProcess();
     cout << endl;
   }
@@ -180,8 +180,8 @@ void IsisMain() {
     p.SetOutputCube("TO2", 1, 1, 1);
     p.StartProcess(twoInAndOut);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
     p.EndProcess();
     cout << endl;
   }
@@ -193,8 +193,8 @@ void IsisMain() {
     p.SetOutputCube("TO2", 2, 1, 1);
     p.StartProcess(twoInAndOut);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
     p.EndProcess();
     cout << endl;
   }
@@ -205,8 +205,8 @@ void IsisMain() {
     p.SetOutputCube("TO2", 2, 2, 1);
     p.StartProcess(twoInAndOut);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
     p.EndProcess();
     cout << endl;
   }

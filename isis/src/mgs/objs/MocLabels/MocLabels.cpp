@@ -5,8 +5,8 @@
 #include <fstream>
 
 #include "MocLabels.h"
-#include "iException.h"
-#include "iException.h"
+#include "IException.h"
+#include "IException.h"
 #include "iString.h"
 #include "iTime.h"
 #include "mocxtrack.h"
@@ -43,9 +43,9 @@ namespace Isis {
       ValidateLabels();
       Compute();
     }
-    catch(iException &e) {
+    catch(IException &e) {
       string msg = "Labels do not appear contain a valid MOC instrument";
-      throw iException::Message(iException::Pvl, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
   }
   /**
@@ -111,7 +111,7 @@ namespace Isis {
     if(!p_mocNA && !p_mocRedWA && !p_mocBlueWA) {
       string msg = "InstrumentID [" + p_instrumentId + "] and/or FilterName ["
                    + p_filter + "] are inappropriate for the MOC camera";
-      throw iException::Message(iException::Pvl, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     // Validate summing modes for narrow angle camera
@@ -119,13 +119,13 @@ namespace Isis {
       if((p_crosstrackSumming < 1) || (p_crosstrackSumming > 8)) {
         string msg = "MOC-NA keyword [CrosstrackSumming] must be between ";
         msg += "1 and 8, but is [" + iString(p_crosstrackSumming) + "]";
-        throw iException::Message(iException::Pvl, msg, _FILEINFO_);
+        throw IException(IException::Unknown, msg, _FILEINFO_);
       }
 
       if((p_downtrackSumming < 1) || (p_downtrackSumming > 8)) {
         string msg = "MOC-NA keyword [DowntrackSumming] must be between ";
         msg += "1 and 8, but is [" + iString(p_downtrackSumming) + "]";
-        throw iException::Message(iException::Pvl, msg, _FILEINFO_);
+        throw IException(IException::Unknown, msg, _FILEINFO_);
       }
     }
 
@@ -134,13 +134,13 @@ namespace Isis {
       if((p_crosstrackSumming < 1) || (p_crosstrackSumming > 127)) {
         string msg = "MOC-WA keyword [CrosstrackSumming] must be between ";
         msg += "1 and 127, but is [" + iString(p_crosstrackSumming) + "]";
-        throw iException::Message(iException::Pvl, msg, _FILEINFO_);
+        throw IException(IException::Unknown, msg, _FILEINFO_);
       }
 
       if((p_downtrackSumming < 1) || (p_downtrackSumming > 127)) {
         string msg = "MOC-WA keyword [DowntrackSumming] must be between ";
         msg += "1 and 127, but is [" + iString(p_downtrackSumming) + "]";
-        throw iException::Message(iException::Pvl, msg, _FILEINFO_);
+        throw IException(IException::Unknown, msg, _FILEINFO_);
       }
     }
   }
@@ -162,17 +162,17 @@ namespace Isis {
     if(NarrowAngle()) {
       p = p_gainMapNA.find(p_gainModeId);
       if(p == p_gainMapNA.end()) {
-        string msg = "Invalid value for keyword GainModeId [" +
+        string msg = "Invalid value for PVL keyword GainModeId [" +
                      p_gainModeId + "]";
-        throw iException::Message(iException::Pvl, msg, _FILEINFO_);
+        throw IException(IException::Unknown, msg, _FILEINFO_);
       }
     }
     else {
       p = p_gainMapWA.find(p_gainModeId);
       if(p == p_gainMapWA.end()) {
-        string msg = "Invalid value for keyword GainModeId [" +
+        string msg = "Invalid value for PVL keyword GainModeId [" +
                      p_gainModeId + "]";
-        throw iException::Message(iException::Pvl, msg, _FILEINFO_);
+        throw IException(IException::Unknown, msg, _FILEINFO_);
       }
     }
     p_gain = p->second;
@@ -205,7 +205,7 @@ namespace Isis {
         p = p_gainMapNA.find(index);
         if(p == p_gainMapNA.end()) {
           string msg = "Could not find new gain for pre-mapping narrow angle image";
-          throw iException::Message(iException::Pvl, msg, _FILEINFO_);
+          throw IException(IException::Unknown, msg, _FILEINFO_);
         }
         p_gain = p->second;
       }
@@ -281,7 +281,7 @@ namespace Isis {
   int MocLabels::StartDetector(int sample) const {
     if((sample < 1) || (sample > p_ns)) {
       string msg = "Out of array bounds in MocLabels::StartDetector";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
     return p_startDetector[sample-1];
   }
@@ -293,7 +293,7 @@ namespace Isis {
   int MocLabels::EndDetector(int sample) const {
     if((sample < 1) || (sample > p_ns)) {
       string msg = "Out of array bounds in MocLabels::EndDetector";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
     return p_endDetector[sample-1];
   }
@@ -305,7 +305,7 @@ namespace Isis {
   double MocLabels::Sample(int detector) const {
     if((detector < 0) || (detector >= Detectors())) {
       string msg = "Out of array bounds in MocLabels::Sample";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
     return p_sample[detector];
   }
@@ -560,7 +560,7 @@ namespace Isis {
             unload_c(sclkKern.c_str());
 
             string msg = "Invalid GainModeId [" + gainId + "] in wago table";
-            throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+            throw IException(IException::Unknown, msg, _FILEINFO_);
           }
           double gain = p->second;
 

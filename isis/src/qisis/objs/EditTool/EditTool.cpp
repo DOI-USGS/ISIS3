@@ -280,7 +280,7 @@ namespace Isis {
       try {
         vp->cube()->reopen("rw");
       }
-      catch(iException &e) {
+      catch(IException &) {
         QMessageBox::information((QWidget *)parent(), "Error", "Cannot open cube read/write");
         return;
       }
@@ -290,7 +290,7 @@ namespace Isis {
                                "Error", "Cannot edit in color mode");
       return;
     }
-    
+
     int issamp, isline, iesamp, ieline;
     double ssamp, sline, esamp, eline;
     QList<QPoint *> *linePts = NULL;
@@ -299,7 +299,7 @@ namespace Isis {
     if (p_shapeComboBox->currentIndex() == Rectangle) {
 
       if (!RubberBandTool::isValid()) return;
-      
+
       QRect r = RubberBandTool::rectangle();
       if ((r.width() < 1) || (r.height() < 1)) return;
 
@@ -400,7 +400,7 @@ namespace Isis {
       try {
         vp->cube()->reopen("rw");
       }
-      catch(iException &e) {
+      catch(IException &) {
         QMessageBox::information((QWidget *)parent(), "Error", "Cannot open cube read/write");
         return;
       }

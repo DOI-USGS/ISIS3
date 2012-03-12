@@ -2,7 +2,7 @@
 #include <QToolBar>
 
 #include "Gui.h"
-#include "iException.h"
+#include "IException.h"
 #include "ViewportMainWindow.h"
 #include "QtieFileTool.h"
 #include "BandTool.h"
@@ -21,7 +21,7 @@
 using namespace Isis;
 
 int main(int argc, char *argv[]) {
-  
+
   Isis::Gui::checkX11();
 
   try {
@@ -85,8 +85,8 @@ int main(int argc, char *argv[]) {
 
     return app->exec();
   }
-  catch (iException &e) {
-    e.Report();
+  catch (IException &e) {
+    e.print();
   }
 }
 

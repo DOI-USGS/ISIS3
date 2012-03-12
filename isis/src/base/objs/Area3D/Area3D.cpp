@@ -27,7 +27,7 @@
 
 #include "Displacement.h"
 #include "Distance.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 
 namespace Isis {
@@ -332,7 +332,7 @@ namespace Isis {
             getEndX(), getEndY(), getStartZ() + depth);
   }
 
- 
+
   /**
    * Sets the rightmost X position. This method may change the width of the 3D
    *   area.
@@ -611,21 +611,21 @@ namespace Isis {
         iString msg = "Cannot have a 3D area with inverted X coordinates of ["
             + iString(startX.meters()) + " meters] to ["
             + iString(endX.meters()) + " meters]";
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
       if(startYValid && endYValid && startY > endY) {
         iString msg = "Cannot have a 3D area with inverted Y coordinates of ["
             + iString(startY.meters()) + " meters] to ["
             + iString(endY.meters()) + " meters]";
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
       if(startZValid && endZValid && startZ > endZ) {
         iString msg = "Cannot have a 3D area with inverted Z coordinates of ["
             + iString(startZ.meters()) + " meters] to ["
             + iString(endZ.meters()) + " meters]";
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
       if(startXValid)

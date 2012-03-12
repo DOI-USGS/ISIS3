@@ -7,7 +7,7 @@
 #include "geos/geom/Geometry.h"
 #include "geos/geom/Polygon.h"
 
-#include "iException.h"
+#include "IException.h"
 #include "PolygonTools.h"
 #include "PolygonSeeder.h"
 #include "PolygonSeederFactory.h"
@@ -105,7 +105,7 @@ int main() {
           }
           else {
             iString msg = "Unable to convert to a (lon,lat)";
-            throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+            throw IException(IException::Programmer, msg, _FILEINFO_);
           }
         }
 
@@ -115,8 +115,8 @@ int main() {
           cout << points[i]->getX() << " " << points[i]->getY() << ")" << endl;
         }
       }
-      catch(iException &e) {
-        e.Report();
+      catch(IException &e) {
+        e.print();
       }
 
       cout << "Test 3, test for too thin" << endl;
@@ -162,14 +162,14 @@ int main() {
           cout << "Point(" << i << ") = " << seedValues[i]->toString() << endl;
         }
       }
-      catch(iException &e) {
-        e.Report();
+      catch(IException &e) {
+        e.print();
       }
     }
     while(!alg.HasKeyword("SubGrid"));
   }
-  catch(iException &e) {
-    e.Report();
+  catch(IException &e) {
+    e.print();
   }
 
   return 0;

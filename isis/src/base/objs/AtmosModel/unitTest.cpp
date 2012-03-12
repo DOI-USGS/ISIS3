@@ -9,7 +9,7 @@
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "Anisotropic1.h"
-#include "iException.h"
+#include "IException.h"
 #include "Preference.h"
 
 using namespace std;
@@ -67,8 +67,8 @@ int main() {
 
     am->SetAtmosWha(0.95);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
   cout << endl;
 
@@ -76,36 +76,36 @@ int main() {
   try {
     am->SetAtmosTau(-1.0);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
     am->SetAtmosWha(0.0);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
     am->SetAtmosWha(2.0);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
     am->SetAtmosHga(-1.0);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
     am->SetAtmosHga(1.0);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   cout << endl;
@@ -122,8 +122,8 @@ int main() {
     cout << "Results from InrFunc2Bint = " << result <<
          endl << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
   cout << endl;
 
@@ -137,8 +137,8 @@ int main() {
     cout << "Results from InrFunc2Bint = " << result <<
          endl << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
   cout << endl;
 
@@ -159,8 +159,8 @@ int main() {
     }
     cout  << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   cout << "Testing atmospheric model OutrFunc2Bint method ..."
@@ -175,8 +175,8 @@ int main() {
     cout << "Results from OutrFunc2Bint = " << result <<
          endl << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
   cout << endl;
 
@@ -194,8 +194,8 @@ int main() {
     cout << "Results from r8qromb = " << ss <<
          endl << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
   cout << endl;
 
@@ -220,8 +220,8 @@ int main() {
            endl;
     }
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
   cout << endl;
 
@@ -261,8 +261,8 @@ int main() {
     }
     cout << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
   try {
     am->SetAtmosAtmSwitch(1);
@@ -284,8 +284,8 @@ int main() {
 
 
   }
-  catch(iException &error) {
-    error.Report(false);
+  catch(IException &error) {
+    error.print();
   }
   // Exponential integrals and G11Prime
   cout << "Test En ..." << endl;
@@ -299,8 +299,8 @@ int main() {
     cout << "           Actual value = " << 0.957308 << endl
          << endl;
   }
-  catch(iException &e) {
-    e.Report();
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -313,8 +313,8 @@ int main() {
     cout << "                  Actual value = " << 0.35086 << endl
          << endl;
   }
-  catch(iException &e) {
-    e.Report();
+  catch(IException &e) {
+    e.print();
   }
 
   cout << "Test Ei ..." << endl;
@@ -327,8 +327,8 @@ int main() {
     cout << "          Actual value = " << -0.626785 << endl
          << endl;
   }
-  catch(iException &e) {
-    e.Report();
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -340,8 +340,8 @@ int main() {
     cout << "                  Actual value = " << 3.30129 << endl
          << endl;
   }
-  catch(iException &e) {
-    e.Report();
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -353,8 +353,8 @@ int main() {
     cout << "        Actual value = " << 7.57611 << endl
          << endl;
   }
-  catch(iException &e) {
-    e.Report();
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -366,8 +366,8 @@ int main() {
     cout << "            Actual value = " << -3.55274 << endl
          << endl;
   }
-  catch(iException &e) {
-    e.Report();
+  catch(IException &e) {
+    e.print();
   }
 
   cout << "Test G11Prime ..." << endl;
@@ -380,8 +380,8 @@ int main() {
     cout << "               Actual value = " << 0.79134 << endl
          << endl;
   }
-  catch(iException &e) {
-    e.Report();
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -393,8 +393,8 @@ int main() {
     cout << "                 Actual value = " << 0.217167 << endl
          << endl;
   }
-  catch(iException &e) {
-    e.Report();
+  catch(IException &e) {
+    e.print();
   }
   cout << endl;
   cout << "x\tn\tG11Prime(x)\tEi(x)\tEn(x)" << endl;
@@ -411,20 +411,20 @@ int main() {
   try {
     AtmosModel::Ei(0.0); // require x > 0
   }
-  catch(iException e) {
-    e.Report();
+  catch(IException e) {
+    e.print();
   }
   try {
     AtmosModel::En(1, 0.0); // require (n>=0 & x>0) or (n>1 & x>=0)
   }
-  catch(iException e) {
-    e.Report();
+  catch(IException e) {
+    e.print();
   }
   try {
     AtmosModel::En(0, -1.0); // require (n>=0 & x>0) or (n>1 & x>=0)
   }
-  catch(iException e) {
-    e.Report();
+  catch(IException e) {
+    e.print();
   }
 
   cout << "\t************************************************" << endl;
@@ -436,8 +436,8 @@ void doit(Pvl &lab, PhotoModel &pm) {
     //AtmosModel *am = AtmosModelFactory::Create(lab,pm);
     AtmosModelFactory::Create(lab, pm);
   }
-  catch(iException &error) {
-    error.Report(false);
+  catch(IException &error) {
+    error.print();
   }
 
   cout << endl;

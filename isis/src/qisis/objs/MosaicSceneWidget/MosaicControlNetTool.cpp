@@ -8,7 +8,7 @@
 #include "ControlNetGraphicsItem.h"
 #include "CubeDisplayProperties.h"
 #include "FileDialog.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "MosaicSceneWidget.h"
 #include "PvlObject.h"
@@ -170,7 +170,7 @@ namespace Isis {
       "This tool shows you all of the control points in your network for "
       "which a latitude/longitude can be calculated. The control points are "
       "shown as color-coded '+' marks. The control points have a right-click "
-      "menu and information about them can be seen just by hovering over them." 
+      "menu and information about them can be seen just by hovering over them."
       "<p><b>Shortcut:</b>  c</p> ";
     action->setWhatsThis(text);
     return action;
@@ -396,11 +396,9 @@ namespace Isis {
         connect(m_controlNetGraphics, SIGNAL(destroyed(QObject *)),
                 this, SLOT(objectDestroyed(QObject *)));
       }
-      catch(iException &e) {
-        QString message = "Invalid control network.  \n";
-        std::string errors = e.Errors();
-        message += errors.c_str();
-        e.Clear();
+      catch(IException &e) {
+        QString message = "Invalid control network.\n";
+        message += e.toString().ToQt();
         QMessageBox::information(getWidget(), "Error", message);
         return;
       }
@@ -443,4 +441,3 @@ namespace Isis {
       m_controlNetGraphics->setVisible(m_displayControlNetButton->isChecked());
   }
 }
-

@@ -20,12 +20,12 @@ bool copyBlob(Cube * from, Cube * to, iString type, iString name, iString fname)
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
-  
+
   // Make cube and open Read/Write
   Cube inOut;
   inOut.open(ui.GetFilename("From"),"rw");
 
-  Pvl * mergeTo = NULL; 
+  Pvl * mergeTo = NULL;
   Pvl * source = NULL;
   iString sourceFileName = ui.GetFilename("Source");
   mergeTo = inOut.getLabel();
@@ -38,7 +38,7 @@ void IsisMain() {
   // We received a cube of matching size
   //   The safest option
   // We received a cube of equal sample and line scale
-  //   If sample and line scales don't match, we stop, depending on 
+  //   If sample and line scales don't match, we stop, depending on
   //   what they choose to copy.
   Cube sourceCube;
   bool isACube = true;
@@ -55,7 +55,7 @@ void IsisMain() {
     source = sourceCube.getLabel();
   }
 
-  // Check if we need an alpha cube group. 
+  // Check if we need an alpha cube group.
   bool sameSize = false;
   bool xyScaleMatch = false;
   int sourceSamps = -1;
@@ -63,7 +63,7 @@ void IsisMain() {
   int outSamps = -1;
   int outLines = -1;
   double sampScale = 0.0;
-  double lineScale = 0.0; 
+  double lineScale = 0.0;
 
   // Check, do we have the same size cubes? how about same sample line scale?
   if (isACube) {
@@ -81,7 +81,7 @@ void IsisMain() {
         lineScale = sampScale;
         xyScaleMatch = true;
       }
-    } 
+    }
   }
 
   // We'll be recording everything that we copy in here
@@ -94,9 +94,9 @@ void IsisMain() {
       // Can't copy Instrument group if the the scale factors don't match
       string msg = "Cannot copy Instruments group when the sample scaling"
                    " factor and line scaling factor do not match";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
-    bool success = copyGroup(source, mergeTo, "Instrument"); 
+    bool success = copyGroup(source, mergeTo, "Instrument");
     results += PvlKeyword("Instrument", success ? "true" : "false");
   }
 
@@ -107,26 +107,26 @@ void IsisMain() {
       if (inOut.getBandCount() != sourceCube.getBandCount()) {
         string msg = "Cannot copy BandBin group when the number of bands does"
                      " not match";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
     }
-    bool success = copyGroup(source, mergeTo, "Bandbin"); 
+    bool success = copyGroup(source, mergeTo, "Bandbin");
     results += PvlKeyword("BandBin", success ? "true" : "false");
   }
 
   // Kernels group, no safetys here
   // If they exist, we'll also be copying the 4 tables associated with kernels
   if (ui.GetBoolean("Kernels")) {
-    bool success = copyGroup(source, mergeTo, "Kernels"); 
+    bool success = copyGroup(source, mergeTo, "Kernels");
     results += PvlKeyword("Kernels", success ? "true" : "false");
 
     if (isACube) {
       iString fname = sourceFileName;
-      bool insPoint = copyBlob(&sourceCube, &inOut, "InstrumentPointing","Table", sourceFileName); 
-      bool insPos = copyBlob(&sourceCube, &inOut, "InstrumentPosition","Table", sourceFileName); 
-      bool bodyRot = copyBlob(&sourceCube, &inOut, "BodyRotation","Table", sourceFileName); 
-      bool sunPos = copyBlob(&sourceCube, &inOut, "SunPosition","Table", sourceFileName); 
-        
+      bool insPoint = copyBlob(&sourceCube, &inOut, "InstrumentPointing","Table", sourceFileName);
+      bool insPos = copyBlob(&sourceCube, &inOut, "InstrumentPosition","Table", sourceFileName);
+      bool bodyRot = copyBlob(&sourceCube, &inOut, "BodyRotation","Table", sourceFileName);
+      bool sunPos = copyBlob(&sourceCube, &inOut, "SunPosition","Table", sourceFileName);
+
       results += PvlKeyword("Table:InstrumentPointing", insPoint ? "true" : "false");
       results += PvlKeyword("Table:InstrumentPosition", insPos ? "true" : "false");
       results += PvlKeyword("Table:BodyRotation", bodyRot ? "true" : "false");
@@ -146,8 +146,8 @@ void IsisMain() {
       // Can't copy Mapping group if the the scale factors don't match
       string msg = "Cannot copy Mapping group when the sample scaling"
                    " factor and line scaling factor do not match";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
-    } 
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
     bool success = copyGroup(source, mergeTo, "Mapping");
     results += PvlKeyword("Mapping", success ? "true" : "false");
   }
@@ -161,7 +161,7 @@ void IsisMain() {
   // Polygons Blob
   if (ui.GetBoolean("Polygon")) {
     if (isACube) {
-      bool success = copyBlob(&sourceCube, &inOut, "Footprint", "Polygon", sourceFileName); 
+      bool success = copyBlob(&sourceCube, &inOut, "Footprint", "Polygon", sourceFileName);
       results += PvlKeyword("Polygon:Footprint", success ? "true" : "false");
     }
     else {
@@ -200,14 +200,14 @@ void IsisMain() {
     QStringList list = blobs.split(",");
     QString blob;
     foreach (blob, list) {
-      if (isACube) { 
+      if (isACube) {
         QStringList brk = blob.split(":");
         if (brk.size() != 2) {
           string msg = "The blob name [" + blob.toStdString() + "] is"
                        " improperly formatted";
-          throw iException::Message(iException::User, msg, _FILEINFO_);
+          throw IException(IException::User, msg, _FILEINFO_);
         }
-        bool success = copyBlob(&sourceCube, &inOut, brk[1].toStdString(), 
+        bool success = copyBlob(&sourceCube, &inOut, brk[1].toStdString(),
                          brk[0].toStdString(), sourceFileName);
         results += PvlKeyword(blob.toStdString(), success ? "true" : "false");
       }
@@ -225,7 +225,7 @@ void IsisMain() {
     SubArea subarea;
     subarea.SetSubArea(sourceSamps, sourceLines, 1, 1, sourceSamps, sourceLines, lineScale, sampScale);
     subarea.UpdateLabel(&inOut, &inOut, results);
-  } 
+  }
 
   // Add History
   bool found = false;
@@ -245,7 +245,7 @@ void IsisMain() {
   }
 
   inOut.close();
-  sourceCube.close(); 
+  sourceCube.close();
 
   Application::Log(results);
 }
@@ -258,13 +258,12 @@ bool copyGroup(Pvl * source, Pvl * mergeTo, iString name) {
     // The call we're looking to get an exception on is the one just below.
     PvlGroup & toCopy = source->FindGroup(name, Pvl::Traverse);
     PvlObject & isiscube = mergeTo->FindObject("IsisCube");
-    if (isiscube.HasGroup(name)) 
+    if (isiscube.HasGroup(name))
       isiscube.DeleteGroup(name);
     isiscube.AddGroup(toCopy);
     return true;
   }
-  catch (iException &e) {
-    e.Clear();
+  catch (IException &) {
     return false;
   }
 }
@@ -276,9 +275,8 @@ bool copyBlob(Cube * from, Cube * to, iString name, iString type, iString fname)
     to->write(blob);
     return true;
   }
-  catch (iException & e) {
-    e.Clear();
+  catch (IException &) {
     return false;
-  } 
+  }
 }
 

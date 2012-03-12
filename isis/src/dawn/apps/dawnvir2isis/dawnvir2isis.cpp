@@ -10,7 +10,7 @@
 #include "Filename.h"
 #include "ImportPdsTable.h"
 
-using namespace std; 
+using namespace std;
 using namespace Isis;
 
 void IsisMain ()
@@ -26,7 +26,7 @@ void IsisMain ()
   }
 
 
-  // Generate the housekeeping filenames 
+  // Generate the housekeeping filenames
   string hkLabel("");
   string hkData("");
   if (ui.WasEntered("HKFROM") ) {
@@ -54,10 +54,10 @@ void IsisMain ()
     instid = (string) lab.FindKeyword ("CHANNEL_ID");
     missid = (string) lab.FindKeyword ("INSTRUMENT_HOST_ID");
   }
-  catch (iException &e) {
+  catch (IException &e) {
     string msg = "Unable to read [INSTRUMENT_ID] or [MISSION_ID] from input file [" +
                  inFile.Expanded() + "]";
-    throw iException::Message(iException::Io,msg, _FILEINFO_);
+    throw IException(e, IException::Io,msg, _FILEINFO_);
   }
 
   instid.ConvertWhiteSpace();
@@ -66,10 +66,10 @@ void IsisMain ()
   missid.ConvertWhiteSpace();
   missid.Compress();
   missid.Trim(" ");
-  if (missid != "DAWN" && instid != "VIS" && instid != "IR") { 
+  if (missid != "DAWN" && instid != "VIS" && instid != "IR") {
     string msg = "Input file [" + inFile.Expanded() + "] does not appear to be a " +
                  "DAWN Visual and InfraRed Mapping Spectrometer (VIR) EDR or RDR file.";
-    throw iException::Message(iException::Io,msg, _FILEINFO_);
+    throw IException(IException::Unknown, msg, _FILEINFO_);
   }
 
   std::string target;
@@ -121,7 +121,7 @@ void IsisMain ()
   outcube->putGroup(outLabel.FindGroup("BandBin",Pvl::Traverse));
   outcube->putGroup(outLabel.FindGroup("Archive",Pvl::Traverse));
   outcube->putGroup(outLabel.FindGroup("Instrument",Pvl::Traverse));
-  
+
   PvlGroup kerns("Kernels");
   if (instid == "VIS") {
     kerns += PvlKeyword("NaifFrameCode",-203211);
@@ -130,7 +130,7 @@ void IsisMain ()
   } else {
     string msg = "Input file [" + inFile.Expanded() + "] has an invalid " +
                  "InstrumentId.";
-    throw iException::Message(iException::Io,msg, _FILEINFO_);
+    throw IException(IException::Unknown, msg, _FILEINFO_);
   }
   outcube->putGroup(kerns);
 
@@ -146,10 +146,9 @@ void IsisMain ()
    hktab.Label().AddKeyword(PvlKeyword("SourceFile", hkLabel));
    outcube->write(hktab);
  }
- catch (iException &ie) {
+ catch (IException &ie) {
    string mess = "Cannot read/open housekeeping data";
-   ie.Message(iException::User, mess, _FILEINFO_);
-   throw;
+   throw IException(ie, IException::User, mess, _FILEINFO_);
  }
 
   p.EndProcess ();

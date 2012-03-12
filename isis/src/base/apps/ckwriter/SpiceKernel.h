@@ -32,7 +32,7 @@
 #include <sstream>
 
 #include "iString.h"
-#include "iException.h"
+#include "IException.h"
 #include "SpiceSegment.h"
 
 namespace Isis {

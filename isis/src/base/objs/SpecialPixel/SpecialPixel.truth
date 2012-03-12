@@ -128,17 +128,17 @@ Li to Pixel:		-1.797693134862315e+308
 
 Testing illegal shortcuts/expressions for StringToPixel(string):
 **USER ERROR** Input [Nl] does not appear to be a legal special pixel abbreviation or double value.
-**PARSE ERROR** Cannot convert [NL] to a double
+**ERROR** Failed to convert string [NL] to a double.
 **USER ERROR** Input [Nulll] does not appear to be a legal special pixel abbreviation or double value.
-**PARSE ERROR** Cannot convert [NULLL] to a double
+**ERROR** Failed to convert string [NULLL] to a double.
 **USER ERROR** Input [L] is not a unique abbreviation. Use LI or LR.
 **USER ERROR** Input [Ls] does not appear to be a legal special pixel abbreviation or double value.
-**PARSE ERROR** Cannot convert [LS] to a double
+**ERROR** Failed to convert string [LS] to a double.
 **USER ERROR** Input [H] is not a unique abbreviation. Use HI or HR.
 **USER ERROR** Input [Hs] does not appear to be a legal special pixel abbreviation or double value.
-**PARSE ERROR** Cannot convert [HS] to a double
+**ERROR** Failed to convert string [HS] to a double.
 **USER ERROR** Input [Hrsr] does not appear to be a legal special pixel abbreviation or double value.
-**PARSE ERROR** Cannot convert [HRSR] to a double
+**ERROR** Failed to convert string [HRSR] to a double.
 **USER ERROR** Input [nonsense] does not appear to be a legal special pixel abbreviation or double value.
-**PARSE ERROR** Cannot convert [NONSENSE] to a double
+**ERROR** Failed to convert string [NONSENSE] to a double.
 

@@ -33,7 +33,7 @@
 #include "HiBlob.h"
 #include "Cube.h"
 
-#include "iException.h"
+#include "IException.h"
 
 namespace Isis {
 

@@ -9,7 +9,7 @@
 #include "SpecialPixel.h"
 #include "UserInterface.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "iTime.h"
 #include "Preference.h"
 #include "iString.h"
@@ -40,21 +40,21 @@ void IsisMain() {
     id.Trim(" ");
     if(id.find("CLEM") == string::npos) {
       string msg = "Invalid DATA_SET_ID [" + id + "]";
-      throw iException::Message(iException::Pvl, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
   }
-  catch(iException &e) {
+  catch(IException &e) {
     string msg = "Input file [" + in.Expanded() +
                  "] does not appear to be " +
                  "in Clementine EDR format";
-    throw iException::Message(iException::Io, msg, _FILEINFO_);
+    throw IException(IException::Unknown, msg, _FILEINFO_);
   }
 
   //Checks if in file is rdr
   if(projected) {
     string msg = "[" + in.Name() + "] appears to be an rdr file.";
     msg += " Use pds2isis.";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   //Decompress the file

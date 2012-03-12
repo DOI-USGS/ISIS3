@@ -279,7 +279,7 @@ void IsisMain() {
   if ((double)outMappingGrp["MinimumLongitude"] >=
       (double)outMappingGrp["MaximumLongitude"]) {
 
-    if ((string)outMappingGrp["MinimumLongitude"] == "180.0" && 
+    if ((string)outMappingGrp["MinimumLongitude"] == "180.0" &&
         (int)userMappingGrp["LongitudeDomain"] == 180)
       outMappingGrp["MinimumLongitude"] = "-180";
 
@@ -301,7 +301,7 @@ void IsisMain() {
     if(!ui.WasEntered("MINLON") || !ui.WasEntered("MAXLON")) {
       string msg = "Unable to determine the correct [MinimumLongitude,MaximumLongitude].";
       msg += " Please specify these values in the [MINLON,MAXLON] parameters";
-      throw iException::Message(iException::Pvl, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
   }
 
@@ -362,7 +362,7 @@ void IsisMain() {
   }
   else {
     string msg = "Unknow value for INTERP [" + ui.GetString("INTERP") + "]";
-    throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
   // Warp the cube
@@ -481,8 +481,7 @@ void LoadMapRange() {
   try {
     userMap.Read(ui.GetFilename("MAP"));
   }
-  catch(iException &e) {
-    e.Clear();
+  catch(IException &e) {
   }
 
   // Get input cube
@@ -491,8 +490,7 @@ void LoadMapRange() {
   try {
     fromMap.Read(ui.GetFilename("FROM"));
   }
-  catch(iException &e) {
-    e.Clear();
+  catch(IException &e) {
   }
 
   // Try to get the mapping groups
@@ -501,8 +499,7 @@ void LoadMapRange() {
   try {
     fromMapping = fromMap.FindGroup("Mapping", Pvl::Traverse);
   }
-  catch(iException &e) {
-    e.Clear();
+  catch(IException &e) {
   }
 
   PvlGroup userMapping("Mapping");
@@ -510,8 +507,7 @@ void LoadMapRange() {
   try {
     userMapping = userMap.FindGroup("Mapping", Pvl::Traverse);
   }
-  catch(iException &e) {
-    e.Clear();
+  catch(IException &e) {
   }
 
   // Do conversions on from map
@@ -570,8 +566,7 @@ void LoadMapRange() {
       fromMapping["MinimumLongitude"] = fromMap.FindGroup("Mapping", Pvl::Traverse)["MinimumLongitude"];
       fromMapping["MaximumLongitude"] = fromMap.FindGroup("Mapping", Pvl::Traverse)["MaximumLongitude"];
     }
-    catch(iException &e) {
-      e.Clear();
+    catch(IException &e) {
     }
   }
 

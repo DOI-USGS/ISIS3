@@ -161,7 +161,7 @@ void helperButtonGetTableList() {
     if(cnt >= label.Objects()) {
       pos = 0;
       string msg = "Parameter [FROM] has no tables.";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     // When the end of the objects is hit, display "NAME" parameter as blank
     if(pos >= label.Objects()) {

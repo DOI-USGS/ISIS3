@@ -22,7 +22,7 @@
  */
 
 #include <string>
-#include "iException.h"
+#include "IException.h"
 #include "Interpolator.h"
 
 using namespace std;
@@ -75,7 +75,7 @@ namespace Isis {
     switch(p_type) {
       case None: {
           string message = "Interpolator type not set";
-          throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+          throw IException(IException::Programmer, message, _FILEINFO_);
           break;
         }
       case NearestNeighborType:
@@ -90,7 +90,7 @@ namespace Isis {
     }
 
     string message = "Invalid interpolator";
-    throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+    throw IException(IException::Programmer, message, _FILEINFO_);
   }
   /**
    * Sets the type of interpolation. (NearestNeighbor, BiLinear, CubicConvulsion).
@@ -226,7 +226,7 @@ namespace Isis {
     switch(p_type) {
       case None: {
           string message = "Interpolator type not set";
-          throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+          throw IException(IException::Programmer, message, _FILEINFO_);
           break;
         }
       case NearestNeighborType:
@@ -241,7 +241,7 @@ namespace Isis {
     }
 
     string message = "Invalid interpolator";
-    throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+    throw IException(IException::Programmer, message, _FILEINFO_);
   }
 
   /**
@@ -254,7 +254,7 @@ namespace Isis {
     switch(p_type) {
       case None: {
           string message = "Interpolator type not set";
-          throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+          throw IException(IException::Programmer, message, _FILEINFO_);
           break;
         }
       case NearestNeighborType:
@@ -269,7 +269,7 @@ namespace Isis {
     }
 
     string message = "Invalid interpolator";
-    throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+    throw IException(IException::Programmer, message, _FILEINFO_);
   }
 
   /**
@@ -283,7 +283,7 @@ namespace Isis {
     switch(p_type) {
       case None: {
           string message = "Interpolator type not set";
-          throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+          throw IException(IException::Programmer, message, _FILEINFO_);
           break;
         }
         // To get the correct pixel for NN you have to round the sample
@@ -301,7 +301,7 @@ namespace Isis {
     }
 
     string message = "Invalid interpolator";
-    throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+    throw IException(IException::Programmer, message, _FILEINFO_);
   }
 
   /**
@@ -315,7 +315,7 @@ namespace Isis {
     switch(p_type) {
       case None: {
           string message = "Interpolator type not set";
-          throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+          throw IException(IException::Programmer, message, _FILEINFO_);
           break;
         }
         // To get the correct pixel for NN you have to round the line
@@ -333,6 +333,6 @@ namespace Isis {
     }
 
     string message = "Invalid interpolator";
-    throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+    throw IException(IException::Programmer, message, _FILEINFO_);
   }
 }

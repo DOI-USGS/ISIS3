@@ -61,7 +61,7 @@ namespace Isis {
       try {
         (*searchResult)->open(fileName.toStdString());
       }
-      catch(iException &e) {
+      catch(IException &e) {
         CleanCubes(fileName.toStdString());
         throw;
       }

@@ -31,7 +31,7 @@
 #include "HiCalUtil.h"
 #include "Pvl.h"
 #include "DbAccess.h"
-#include "iException.h"
+#include "IException.h"
 
 namespace Isis {
 

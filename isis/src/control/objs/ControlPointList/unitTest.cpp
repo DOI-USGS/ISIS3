@@ -3,12 +3,14 @@
 #include <string>
 #include <iostream>
 
-#include "iException.h"
+#include "IException.h"
 #include "Filename.h" 
+#include "Preference.h" 
 
 using namespace std;
 
 int main() {
+  Isis::Preference::Preferences(true);
   Isis::ControlPointList cpl(Isis::Filename("points.lis")); //list of Control Point Ids in the file
 
   int size = cpl.Size();
@@ -22,8 +24,8 @@ int main() {
   try {
     std::cerr << cpl.ControlPointId(size) << "\n";
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   try {
@@ -31,7 +33,7 @@ int main() {
     std::cerr << cpl.ControlPointIndex("new0036") << "\n";
     std::cerr << cpl.ControlPointIndex("new0000") << "\n"; //not found - invalid point
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 }

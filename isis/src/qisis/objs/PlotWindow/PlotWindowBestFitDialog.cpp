@@ -117,8 +117,7 @@ namespace Isis {
       try {
         m_curveMultivariateStats->LinearRegression(a, b);
       }
-      catch (iException &e) {
-        e.Clear();
+      catch (IException &) {
       }
 
       if (!IsSpecial(a) && !IsSpecial(b)) {
@@ -159,8 +158,7 @@ namespace Isis {
       try {
         m_curveMultivariateStats->LinearRegression(a, b);
       }
-      catch (iException &e) {
-        e.Clear();
+      catch (IException &) {
       }
 
       ScatterPlotData *scatterData =
@@ -274,8 +272,7 @@ namespace Isis {
       try {
         m_curveMultivariateStats->LinearRegression(a, b);
       }
-      catch (iException &e) {
-        e.Clear();
+      catch (IException &) {
       }
 
       if (!IsSpecial(a) && !IsSpecial(b)) {

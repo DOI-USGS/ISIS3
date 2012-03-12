@@ -49,7 +49,7 @@ namespace Isis {
         (percent != 5) && (percent != 10)) {
       string m = "Invalid preference for [ProgressBarPercent] in ";
       m += "group [UserInterface] must be 1, 2, 5, or 10";
-      throw Isis::iException::Message(Isis::iException::User, m, _FILEINFO_);
+      throw IException(IException::User, m, _FILEINFO_);
     }
 
     // Initialize private variables
@@ -96,13 +96,13 @@ namespace Isis {
    *
    * @param steps Maximum number of steps
    *
-   * @throws Isis::iException::Programmer Invalid value for step (must be >0)
+   * @throws IException::Programmer Invalid value for step (must be >0)
    */
   void Progress::SetMaximumSteps(const int steps) {
     if(steps < 0) {
       string m = "Value for [steps] must be greater than ";
       m += "or equal to zero in [Progress::SetMaximumSteps]";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
     p_maximumSteps = steps;
     p_currentStep = 0;
@@ -116,14 +116,14 @@ namespace Isis {
    * in the image. If you do not call this enough times you will not reached 100%
    * processed.
    *
-   * @throws Isis::iException::Programmer Step exceeds maximumSteps
+   * @throws IException::Programmer Step exceeds maximumSteps
    */
   void Progress::CheckStatus() {
     // Error check
     //std::cout << p_currentStep << " / " << p_maximumSteps << std::endl;
     if(p_currentStep > p_maximumSteps) {
       string m = "Step exceeds maximumSteps in [Progress::CheckStatus]";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     if(p_currentStep == 0) {
@@ -177,19 +177,19 @@ namespace Isis {
   void Progress::AddSteps(const int steps) {
     if(steps == 0) {
       string m = "Value for [steps] must not be zero in [Progress::AddSteps]";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     p_maximumSteps += steps;
 
     if(p_currentStep > p_maximumSteps) {
       string m = "Step exceeds maximumSteps in [Progress::AddSteps]";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     if(p_maximumSteps <= 0) {
       string m = "Maximum steps must be greater than zero in [Progress::AddSteps]";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
   }
 } // end namespace isis

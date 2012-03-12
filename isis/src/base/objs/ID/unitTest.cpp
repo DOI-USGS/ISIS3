@@ -1,5 +1,5 @@
 #include <iostream>
-#include "iException.h"
+#include "IException.h"
 #include "ID.h"
 #include "Preference.h"
 
@@ -15,8 +15,8 @@ int main() {
       }
     }
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   std::cout << std::endl << "Test 2: No '?' test" << std::endl;
@@ -26,8 +26,8 @@ int main() {
       std::cout << pid2.Next() << std::endl;
     }
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   std::cout << std::endl << "Test 3: Broken replacement string" << std::endl;
@@ -37,8 +37,8 @@ int main() {
       std::cout << pid3.Next() << std::endl;
     }
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   std::cout << std::endl << "Test 4: differing start numbers" << std::endl;
@@ -48,8 +48,8 @@ int main() {
       std::cout << pid4.Next() << std::endl;
     }
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
   return 0;
 }

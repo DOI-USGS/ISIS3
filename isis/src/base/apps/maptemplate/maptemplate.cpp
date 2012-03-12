@@ -8,7 +8,7 @@
 #include "Camera.h"
 #include "Cube.h"
 #include "FileList.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "Projection.h"
 #include "ProjectionFactory.h"

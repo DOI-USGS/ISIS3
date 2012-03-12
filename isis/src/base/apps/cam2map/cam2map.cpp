@@ -5,7 +5,7 @@
 #include "Projection.h"
 #include "ProjectionFactory.h"
 #include "ProcessRubberSheet.h"
-#include "iException.h"
+#include "IException.h"
 #include "cam2map.h"
 
 using namespace std;
@@ -51,7 +51,7 @@ void IsisMain() {
   if(incam->IsSky()) {
     string msg = "The image [" + ui.GetFilename("FROM") +
                  "] is targeting the sky, use skymap instead.";
-    throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // Get the mapping grop
@@ -202,7 +202,7 @@ void IsisMain() {
       else if(ui.GetString("LONSEAM") == "ERROR") {
         string msg = "The image [" + ui.GetFilename("FROM") + "] crosses the " +
                      "longitude seam";
-        throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
     }
   }
@@ -404,7 +404,7 @@ void LoadMapRes() {
   }
   else {
     string msg = "No resolution value found in [" + ui.GetFilename("MAP") + "]";
-    throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 }
 
@@ -467,7 +467,7 @@ void LoadMapRange() {
   if(count < 4) {
     string msg = "One or more of the values for the ground range was not found";
     msg += " in [" + ui.GetFilename("MAP") + "]";
-    throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 }
 

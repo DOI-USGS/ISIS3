@@ -31,7 +31,7 @@ void IsisMain() {
     if (!ui.WasEntered("OUTSTATS")) {
       std::string msg = "If the CALCULATE option is selected, you must enter";
       msg += " an OUTSTATS file";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
 
@@ -47,7 +47,7 @@ void IsisMain() {
     double sampPercent = ui.GetDouble("PERCENT");
     if (sampPercent <= 0.0 || sampPercent > 100.0) {
       string msg = "The sampling percent must be a decimal (0.0, 100.0]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     int mincnt = ui.GetInteger("MINCOUNT");

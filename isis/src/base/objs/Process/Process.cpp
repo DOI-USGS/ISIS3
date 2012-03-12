@@ -27,7 +27,7 @@
 #include "Process.h"
 #include "Filename.h"
 #include "Message.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "Preference.h"
 #include "Application.h"
@@ -87,7 +87,7 @@ namespace Isis {
         cube->open(fname);
       }
     }
-    catch(Isis::iException &e) {
+    catch(IException &e) {
       delete cube;
       throw;
     }
@@ -99,7 +99,7 @@ namespace Isis {
           if(cube->getLineCount() != InputCubes[0]->getLineCount()) {
             string message = "The number of lines in the secondary input cubes must match";
             message += " the primary input cube or be exactly one";
-            throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+            throw IException(IException::User, message, _FILEINFO_);
           }
         }
 
@@ -107,14 +107,14 @@ namespace Isis {
           if(cube->getSampleCount() != InputCubes[0]->getSampleCount()) {
             string message = "The number of samples in the secondary input cubes must match";
             message += " the primary input cube or be exactly one";
-            throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+            throw IException(IException::User, message, _FILEINFO_);
           }
         }
         if(cube->getBandCount() != 1) {
           if(cube->getBandCount() != InputCubes[0]->getBandCount()) {
             string message = "The number of bands in the secondary input cubes must match";
             message += " the primary input cube or be exactly one";
-            throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+            throw IException(IException::User, message, _FILEINFO_);
           }
         }
 
@@ -128,15 +128,15 @@ namespace Isis {
       if(InputCubes.size() > 0) {
         if(cube->getLineCount() != InputCubes[0]->getLineCount()) {
           string message = "The number of lines in the input cubes must match";
-          throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+          throw IException(IException::User, message, _FILEINFO_);
         }
         if(cube->getSampleCount() != InputCubes[0]->getSampleCount()) {
           string message = "The number of samples in the input cubes must match";
-          throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+          throw IException(IException::User, message, _FILEINFO_);
         }
         if(cube->getBandCount() != InputCubes[0]->getBandCount()) {
           string message = "The number of bands in the input cubes must match";
-          throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+          throw IException(IException::User, message, _FILEINFO_);
         }
       }
     }
@@ -146,11 +146,11 @@ namespace Isis {
       if(InputCubes.size() > 0) {
         if(cube->getLineCount() != InputCubes[0]->getLineCount()) {
           string message = "The number of lines in the input cubes must match";
-          throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+          throw IException(IException::User, message, _FILEINFO_);
         }
         if(cube->getSampleCount() != InputCubes[0]->getSampleCount()) {
           string message = "The number of samples in the input cubes must match";
-          throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+          throw IException(IException::User, message, _FILEINFO_);
         }
       }
     }
@@ -159,7 +159,7 @@ namespace Isis {
     if(requirements & Isis::OneBand) {
       if(cube->getBandCount() != 1) {
         string message = "Input cube [" + fname + "] must have one band";
-        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+        throw IException(IException::User, message, _FILEINFO_);
       }
     }
 
@@ -170,7 +170,7 @@ namespace Isis {
           if(cube->getBandCount() != InputCubes[0]->getBandCount()) {
             string message = "The number of bands in the secondary input cubes must match";
             message += " the primary input cube or be exactly one";
-            throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+            throw IException(IException::User, message, _FILEINFO_);
           }
         }
       }
@@ -182,14 +182,14 @@ namespace Isis {
   }
 
   /**
-   * Set the InputCube vector to an opened Cube which was dynamically allocated. 
-   * This is used if there already exists a valid opened cube 
-   *  
-   * Note: This requires that the cube was dynamically allocated because ClearInputCubes 
-   * deletes the cube. 
-   * 
+   * Set the InputCube vector to an opened Cube which was dynamically allocated.
+   * This is used if there already exists a valid opened cube
+   *
+   * Note: This requires that the cube was dynamically allocated because ClearInputCubes
+   * deletes the cube.
+   *
    * @author Sharmila Prasad (5/7/2011)
-   * 
+   *
    * @param inCube - Pointer to input Cube
    */
   void Process::SetInputCube(Isis::Cube *inCube)
@@ -199,10 +199,10 @@ namespace Isis {
     }
     else {
       string message = "Input cube does not exist";
-      throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+      throw IException(IException::User, message, _FILEINFO_);
     }
   }
-  
+
   /**
    * Opens an input cube specified by the user and verifies requirements are met.
    *
@@ -262,7 +262,7 @@ namespace Isis {
     if(InputCubes.size() == 0) {
       string message = "No input images have been selected ... therefore";
       message += "the output image size can not be determined";
-      throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+      throw IException(IException::Programmer, message, _FILEINFO_);
     }
 
     int nl = InputCubes[0]->getLineCount();
@@ -300,7 +300,7 @@ namespace Isis {
       ostringstream message;
       message << "Invalid cube size specifications [ns=" << ns << ",nl=" << nl
               << ",nb=" << nb << "]";
-      throw Isis::iException::Message(Isis::iException::Programmer, message.str(), _FILEINFO_);
+      throw IException(IException::Programmer, message.str(), _FILEINFO_);
     }
 
     string fname = Application::GetUserInterface().GetFilename(parameter);
@@ -334,7 +334,7 @@ namespace Isis {
       ostringstream message;
       message << "Invalid cube size specifications [ns=" << ns << ",nl=" << nl
               << ",nb=" << nb << "]";
-      throw Isis::iException::Message(Isis::iException::Programmer, message.str(), _FILEINFO_);
+      throw IException(IException::Programmer, message.str(), _FILEINFO_);
     }
 
     // Setup the cube
@@ -352,7 +352,7 @@ namespace Isis {
         else {
           string msg = "You told me to propagate PixelType from input to output";
           msg += " cube but there are no input cubes loaded";
-          throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+          throw IException(IException::Programmer, msg, _FILEINFO_);
         }
       }
       else {
@@ -366,7 +366,7 @@ namespace Isis {
         else if(InputCubes.size() == 0) {
           string msg = "You told me to propagate base/multiplier from input to output";
           msg += " cube but there are no input cubes loaded";
-          throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+          throw IException(IException::Programmer, msg, _FILEINFO_);
         }
         else if(cube->getPixelType() >= InputCubes[0]->getPixelType()) {
           double base = InputCubes[0]->getBase();
@@ -378,12 +378,12 @@ namespace Isis {
                 (cube->getPixelType() != Isis::SignedWord)) {
           string msg = "Looks like your refactoring to add different pixel types";
           msg += " you'll need to make changes here";
-          throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+          throw IException(IException::Programmer, msg, _FILEINFO_);
         }
         else {
           string msg = "You've chosen to reduce your output PixelType for [" +
                        fname + "] you must specify the output pixel range too";
-          throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+          throw IException(IException::User, msg, _FILEINFO_);
         }
       }
       else {
@@ -455,7 +455,7 @@ namespace Isis {
       // Transfer history from the first input cube
       WriteHistory(*cube);
     }
-    catch(Isis::iException &e) {
+    catch(IException &e) {
       delete cube;
       throw;
     }
@@ -485,7 +485,7 @@ namespace Isis {
 
   /**
    * Close output cubes from the list and clear the list
-   * 
+   *
    * @author Sharmila Prasad (5/7/2011)
    */
   void Process::ClearOutputCubes(){
@@ -608,7 +608,7 @@ namespace Isis {
     if(!installed.Exists()) {
       string message = "Data directory for mission [" + mission + "] " +
                        "is not installed at your site";
-      throw Isis::iException::Message(Isis::iException::Io, message, _FILEINFO_);
+      throw IException(IException::Io, message, _FILEINFO_);
     }
 
     Isis::Filename expanded(dir + "/" + file);

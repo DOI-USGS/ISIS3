@@ -10,7 +10,7 @@
 #include "Gui.h"
 #include "HelpTool.h"
 #include "HistogramTool.h"
-#include "iException.h"
+#include "IException.h"
 #include "PanTool.h"
 #include "Preference.h"
 #include "PvlGroup.h"
@@ -44,9 +44,9 @@ int main(int argc, char *argv[]) {
   signal(SIGABRT, Abort);
   signal(SIGINT, InterruptSignal);
 #endif
-  
+
   Isis::Gui::checkX11();
-  
+
   Qnet::g_controlNetwork = NULL;
   Qnet::g_serialNumberList = NULL;
 
@@ -258,8 +258,8 @@ int main(int argc, char *argv[]) {
     return status;
 
   }
-  catch (iException &e) {
-    e.Report();
+  catch (IException &e) {
+    e.print();
   }
 }
 

@@ -2,7 +2,7 @@
 #include "PvlObject.h"
 #include "PvlGroup.h"
 #include "UserInterface.h"
-#include "iException.h"
+#include "IException.h"
 
 using namespace std;
 using namespace Isis;
@@ -21,7 +21,7 @@ void IsisMain() {
   string algoName = ui.GetString("ALGORITHM");
   if(!algos.HasGroup(algoName)) {
     // Give the user a list of possible algorithms
-    string msg = "Invalid value for [ALGORITHM] entered [" + algoName + "].  " 
+    string msg = "Invalid value for [ALGORITHM] entered [" + algoName + "].  "
       + "Must be one of [";
 
     for(int i = 0; i < algos.Groups(); i++) {
@@ -32,7 +32,7 @@ void IsisMain() {
       msg += algos.Group(i).Name();
     }
     msg += "]";
-    throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // Make algorithm group
@@ -51,7 +51,7 @@ void IsisMain() {
     if(reduction < 1) {
       string msg = "Invalid value for [REDUCTIONFACTOR] entered ["
         + iString(reduction) + "].  Must be greater than or equal to 1 (Default = 1)";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
 
@@ -74,7 +74,7 @@ void IsisMain() {
   else {
     if(ui.WasEntered("INTERPOLATORTYPE")) {
       string msg = "CHIPINTERPOLATOR parameter must be set to TRUE to enter INTERPOLATORTYPE parameter";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
 
@@ -91,18 +91,18 @@ void IsisMain() {
   if(psamp + pline < 3) {
     string msg = "The Pattern Chip must be larger than one pixel for the ";
     msg += "autoregistration to work properly";
-    throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
   // Make sure the pattern chip is smaller than the search chip
   if(ssamp < psamp || sline < pline) {
     string msg = "The Pattern Chip must be smaller than the Search Chip";
-    throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
   // Make sure the pattern chip spans at least a 3x3 window in the search chip
   if(psamp + 2 > ssamp || pline + 2 > sline) {
     string msg = "The Pattern Chip must span at least a 3x3 window in the ";
     msg += "Search Chip";
-    throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // Set up the pattern chip group
@@ -120,9 +120,9 @@ void IsisMain() {
     patternChip += PvlKeyword("MinimumZScore", iString(minimum));
 
     if(minimum <= 0.0) {
-      string msg = "Invalid value for [MINIMUMZSCORE] entered [" 
+      string msg = "Invalid value for [MINIMUMZSCORE] entered ["
         + iString(minimum) + "].  Must be greater than 0.0 (Default = 1.0)";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
   if(ui.WasEntered("PVALIDPERCENT")) {
@@ -130,7 +130,7 @@ void IsisMain() {
     if((percent <= 0.0) || (percent > 100.0)) {
       string msg = "Invalid value for [PVALIDPERCENT] entered ["
         + iString(percent) + "].  Must be greater than 0.0 and less than or equal to 100.0 (Default = 50.0)";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     patternChip += PvlKeyword("ValidPercent", iString(percent));
   }
@@ -150,7 +150,7 @@ void IsisMain() {
     if((percent <= 0.0) || (percent > 100.0)) {
       string msg = "Invalid value for [SSUBCHIPVALIDPERCENT] entered ["
         + iString(percent) + "].  Must be greater than 0.0 and less than or equal to 100.0 (Default = 50.0)";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     searchChip += PvlKeyword("SubchipValidPercent", iString(percent));
   }
@@ -169,7 +169,7 @@ void IsisMain() {
     if(distanceTol <= 0.0) {
       string msg = "Invalid value for [DISTANCETOLERANCE] entered ["
         + iString(distanceTol) + "].  Must be greater than 0.0 (Default = 1.5)";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     int winSize = ui.GetInteger("WINDOWSIZE");
@@ -179,14 +179,14 @@ void IsisMain() {
     if(winSize < 3) {
       string msg = "Invalid value for [WINDOWSIZE] entered ["
         + iString(winSize) + "].  Must be greater than or equal to 3 (Default = 5)";
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     // Make sure the window size is odd
     if(winSize % 2 == 0) {
       string msg = "Invalid value for [WINDOWSIZE] entered ["
         + iString(winSize) + "].  Must be an odd number (Default = 5)";
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     if(ui.GetBoolean("ECCENTRICITYTESTING")) {
@@ -196,7 +196,7 @@ void IsisMain() {
       if(eccRatio < 1) {
         string msg = "Invalid value for [ECCENTRICITYRATIO] entered ["
           + iString(eccRatio) + "].  Must be 1.0 or larger (Default = 2.0)";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
     }
     if(ui.GetBoolean("RESIDUALTESTING")) {
@@ -206,7 +206,7 @@ void IsisMain() {
       if(residualTol < 0) {
         string msg = "Invalid value for [RESIDUALTOLERANCE] entered ["
           + iString(residualTol) + "].  Must be 0.0 or larger (Default = 0.1)";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
     }
     autoreg.AddGroup(surfaceModel);

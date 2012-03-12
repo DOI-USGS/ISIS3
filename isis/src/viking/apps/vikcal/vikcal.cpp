@@ -41,7 +41,7 @@ void IsisMain() {
   if(icube.hasGroup("Radiometry")) {
     string msg = "The Viking image [" + icube.getFilename() + "] has already "
         "been radiometrically calibrated";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   CubeAttributeInput dcf;

@@ -128,13 +128,13 @@ namespace Isis {
     // Error checks ... there must be one input and output
     if(InputCubes.size() != 1) {
       string m = "You must specify exactly one input cube";
-      throw iException::Message(iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     //  Make sure the tile size has been set
     if(!p_tileSizeSet) {
       string m = "Use the SetTileSize method to set the tile size";
-      throw iException::Message(iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     ProcessByBrick::SetBrickSize(p_tileSamples, p_tileLines, 1);
@@ -149,27 +149,27 @@ namespace Isis {
     if(InputCubes[0]->getLineCount() != OutputCubes[0]->getLineCount()) {
       string m = "The number of lines in the input and output cubes ";
       m += "must match";
-      throw iException::Message(iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     // The samples in the input and output must match
     if(InputCubes[0]->getSampleCount() != OutputCubes[0]->getSampleCount()) {
       string m = "The number of samples in the input and output cubes ";
       m += "must match";
-      throw iException::Message(iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     // The bands in the input and output must match
     if(InputCubes[0]->getBandCount() != OutputCubes[0]->getBandCount()) {
       string m = "The number of bands in the input and output cubes ";
       m += "must match";
-      throw iException::Message(iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     //  Make sure the tile size has been set
     if(!p_tileSizeSet) {
       string m = "Use the SetTileSize method to set the tile size";
-      throw iException::Message(iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     ProcessByBrick::SetBrickSize(p_tileSamples, p_tileLines, 1);
@@ -183,7 +183,7 @@ namespace Isis {
     // Make sure we had an image
     if(InputCubes.size() == 0 && OutputCubes.size() == 0) {
       string m = "You have not specified any input or output cubes";
-      throw iException::Message(iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     // Make sure all the output images have the same number of bands as
@@ -192,7 +192,7 @@ namespace Isis {
       if(OutputCubes[i]->getBandCount() != InputCubes[0]->getBandCount()) {
         string m = "All output cubes must have the same number of bands ";
         m += "as the first input cube or output cube";
-        throw iException::Message(iException::Programmer, m, _FILEINFO_);
+        throw IException(IException::Programmer, m, _FILEINFO_);
       }
     }
 

@@ -24,7 +24,7 @@
 #ifndef EndianSwapper_h
 #define EndianSwapper_h
 
-#include "iException.h"
+#include "IException.h"
 
 namespace Isis {
 

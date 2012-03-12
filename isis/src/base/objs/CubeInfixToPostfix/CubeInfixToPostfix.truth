@@ -28,7 +28,7 @@ Test CubeInfixToPostfix
 
 
 6: Convert 'sin 5' to postfix
-**USER ERROR** Missing parenthesis after sin
+**USER ERROR** Missing parenthesis after sin.
 
 
 7: Convert '--sin(-(f54+f65()))' to postfix

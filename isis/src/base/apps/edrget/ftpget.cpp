@@ -4,7 +4,7 @@
 
 #include "ftpget.h"
 #include "iString.h"
-#include "iException.h"
+#include "IException.h"
 #include "Progress.h"
 #include  "Application.h"
 
@@ -26,19 +26,19 @@ namespace Isis {
     //next four if check the URL and return true is there is error.
     if(!url.isValid()) {
       string msg = "invalid URL";
-      iException::Message(iException::User, msg, _FILEINFO_);
+//       iException::Message(iException::User, msg, _FILEINFO_);
       p_error = true;
       return p_error;
     }
     if(url.scheme().toLower() != "ftp") {
       string msg = "URL must start with 'ftp:'";
-      iException::Message(iException::User, msg, _FILEINFO_);
+//       iException::Message(iException::User, msg, _FILEINFO_);
       p_error =  true;
       return p_error;
     }
     if(url.path().isEmpty()) {
       string msg = "URL has no path";
-      iException::Message(iException::User, msg, _FILEINFO_);
+//       iException::Message(iException::User, msg, _FILEINFO_);
       p_error =  true;
       return p_error;
     }
@@ -51,7 +51,7 @@ namespace Isis {
     localFileName +=  QFileInfo(url.path()).fileName();
     if(localFileName.isEmpty()) {
       string msg = "URL has no filename";
-      iException::Message(iException::User, msg, _FILEINFO_);
+//       iException::Message(iException::User, msg, _FILEINFO_);
       p_error = true;
       return p_error;
     }
@@ -59,7 +59,7 @@ namespace Isis {
     p_file.setFileName(localFileName);
     if(!p_file.open(QIODevice::WriteOnly)) {
       string msg = "Cannot open output file";
-      iException::Message(iException::User, msg, _FILEINFO_);
+//       iException::Message(iException::User, msg, _FILEINFO_);
       p_error =  true;
       return p_error;
     }
@@ -77,7 +77,7 @@ namespace Isis {
       p_error = true;
       iString msg = p_ftp.errorString().toStdString();
       msg.Remove("\n");
-      iException::Message(iException::User, msg, _FILEINFO_);
+//       iException::Message(iException::User, msg, _FILEINFO_);
     }
     else {
       p_error = false;

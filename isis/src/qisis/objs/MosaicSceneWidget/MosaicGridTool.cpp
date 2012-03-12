@@ -13,7 +13,7 @@
 
 #include "Angle.h"
 #include "GridGraphicsItem.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "Latitude.h"
 #include "Longitude.h"
@@ -47,7 +47,7 @@ namespace Isis {
       iString msg = "Please set the mosaic scene's projection before trying to "
                     "draw a grid. This means either open a cube (a projection "
                     "will be calculated) or set the projection explicitly";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
 

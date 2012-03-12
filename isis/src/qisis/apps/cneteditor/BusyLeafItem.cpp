@@ -2,7 +2,7 @@
 
 #include <QVariant>
 
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 
 #include "AbstractTreeItem.h"

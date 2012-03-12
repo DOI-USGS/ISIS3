@@ -1,5 +1,5 @@
 #include "SocketThread.h"
-#include "iException.h"
+#include "IException.h"
 #include "Application.h"
 
 #include <errno.h>

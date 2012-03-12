@@ -23,7 +23,7 @@
 
 #include "PolygonSeederFactory.h"
 #include "Plugin.h"
-#include "iException.h"
+#include "IException.h"
 #include "Filename.h"
 
 namespace Isis {

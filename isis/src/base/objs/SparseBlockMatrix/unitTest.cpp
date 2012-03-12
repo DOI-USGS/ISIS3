@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "iException.h"
+#include "IException.h"
 #include "Preference.h"
 #include <boost/numeric/ublas/matrix.hpp>
 
@@ -24,8 +24,8 @@ int main(int argc, char *argv[]) {
     cerr << "# matrix elements: " << spcm.numberOfElements() << endl;
     spcm.print(std::cerr);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -36,8 +36,8 @@ int main(int argc, char *argv[]) {
     cerr << "# of matrix elements: " << spcm.numberOfElements() << endl;
     spcm.print(std::cerr);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -53,8 +53,8 @@ int main(int argc, char *argv[]) {
     cerr << "# of matrix elements = " << spcm.numberOfElements() << endl;
     spcm.print(std::cerr);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -72,8 +72,8 @@ int main(int argc, char *argv[]) {
     cerr << "# of matrix elements = " << clone.numberOfElements() << endl;
     clone.print(std::cerr);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -90,8 +90,8 @@ int main(int argc, char *argv[]) {
     cerr << "# of matrix elements = " << clone.numberOfElements() << endl;
     clone.print(std::cerr);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -108,8 +108,8 @@ int main(int argc, char *argv[]) {
     cerr << "# of matrix elements = " << clone.numberOfElements() << endl;
     clone.print(std::cerr);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
   try {
     cerr << "----- zero blocks" << endl;
@@ -125,8 +125,8 @@ int main(int argc, char *argv[]) {
     cerr << "# of matrix elements = " << spcm.numberOfElements() << endl;
     spcm.print(std::cerr);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -143,8 +143,8 @@ int main(int argc, char *argv[]) {
     cerr << "# of matrix elements = " << spcm.numberOfElements() << endl;
     spcm.print(std::cerr);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   cerr << endl << "----- Testing SparseBlockRowMatrix -----" << endl << endl;
@@ -156,8 +156,8 @@ int main(int argc, char *argv[]) {
     cerr << "# matrix elements: " << sprm.numberOfElements() << endl;
     sprm.print(std::cerr);    
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -168,8 +168,8 @@ int main(int argc, char *argv[]) {
     cerr << "# of matrix elements: " << sprm.numberOfElements() << endl;
     sprm.print(std::cerr);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -185,8 +185,8 @@ int main(int argc, char *argv[]) {
     cerr << "# of matrix elements = " << sprm.numberOfElements() << endl;
     sprm.print(std::cerr);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -204,8 +204,8 @@ int main(int argc, char *argv[]) {
     cerr << "# of matrix elements = " << clone.numberOfElements() << endl;
     clone.print(std::cerr);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -222,8 +222,8 @@ int main(int argc, char *argv[]) {
     cerr << "# of matrix elements = " << clone.numberOfElements() << endl;
     clone.print(std::cerr);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -240,8 +240,8 @@ int main(int argc, char *argv[]) {
     cerr << "# of matrix elements = " << clone.numberOfElements() << endl;
     clone.print(std::cerr);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
   try {
     cerr << "----- zero blocks" << endl;
@@ -257,8 +257,8 @@ int main(int argc, char *argv[]) {
     cerr << "# of matrix elements = " << spcm.numberOfElements() << endl;
     spcm.print(std::cerr);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -275,8 +275,8 @@ int main(int argc, char *argv[]) {
     cerr << "# of matrix elements = " << spcm.numberOfElements() << endl;
     spcm.print(std::cerr);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   cerr << endl << "----- Testing SparseBlockMatrix -----" << endl << endl;
@@ -290,8 +290,8 @@ int main(int argc, char *argv[]) {
     cerr << "           # matrix elements: " << sbm.numberOfElements() << endl;
     sbm.print(std::cerr);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -304,8 +304,8 @@ int main(int argc, char *argv[]) {
     cerr << "           # matrix elements: " << sbm.numberOfElements() << endl;
     sbm.print(std::cerr);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
   
   try {
@@ -319,8 +319,8 @@ int main(int argc, char *argv[]) {
     cerr << "           # matrix elements: " << sbm.numberOfElements() << endl;
     sbm.print(std::cerr);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }  
 
   try {
@@ -340,8 +340,8 @@ int main(int argc, char *argv[]) {
     cerr << "           # matrix elements: " << sbm.numberOfElements() << endl;
     sbm.print(std::cerr);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -362,8 +362,8 @@ int main(int argc, char *argv[]) {
     cerr << "           # matrix elements: " << sbm.numberOfElements() << endl;
     clone.print(std::cerr);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -383,8 +383,8 @@ int main(int argc, char *argv[]) {
     cerr << "           # matrix elements: " << sbm.numberOfElements() << endl;
     clone.print(std::cerr);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -404,8 +404,8 @@ int main(int argc, char *argv[]) {
     cerr << "           # matrix elements: " << sbm.numberOfElements() << endl;
     clone.print(std::cerr);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -425,8 +425,8 @@ int main(int argc, char *argv[]) {
     cerr << "           # matrix elements: " << sbm.numberOfElements() << endl;
     sbm.print(std::cerr);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -446,8 +446,8 @@ int main(int argc, char *argv[]) {
     cerr << "           # matrix elements: " << sbm.numberOfElements() << endl;
     sbm.print(std::cerr);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -472,8 +472,8 @@ int main(int argc, char *argv[]) {
     cerr << "           # matrix elements: " << sbm.numberOfElements() << endl;
     sbm.print(std::cerr);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
 /*

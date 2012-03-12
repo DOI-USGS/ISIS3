@@ -1,6 +1,6 @@
 Unit test for Isis::Spice
 Testing unknown target ...
-**I/O ERROR** Could not convert Target [Mard] to NAIF code
+**I/O ERROR** Could not convert Target [Mard] to NAIF code.
 
 Creating Spice object ...
 BodyCode        = 499
@@ -10,13 +10,13 @@ IkCode          = -94031
 
 
 Testing unknown integer keyword ... 
-**I/O ERROR** Can not find [BadInteger] in text kernels
+**I/O ERROR** Can not find [BadInteger] in text kernels.
 
 Testing unknown double keyword ... 
-**I/O ERROR** Can not find [BadDouble] in text kernels
+**I/O ERROR** Can not find [BadDouble] in text kernels.
 
 Testing unknown string keyword ... 
-**I/O ERROR** Can not find [BadString] in text kernels
+**I/O ERROR** Can not find [BadString] in text kernels.
 
 Testing convience get methods ... 
 -94031

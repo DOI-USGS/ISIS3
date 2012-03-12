@@ -21,7 +21,7 @@
  */
 
 #include "InfixToPostfix.h"
-#include "iException.h"
+#include "IException.h"
 #include <iostream>
 
 using namespace std;
@@ -205,9 +205,10 @@ namespace Isis {
           // Make sure this is truly an operand and not an operator by casting it
           (double)data;
         }
-        catch(iException e) {
-          e.Clear();
-          throw iException::Message(iException::User, "The operator '" + data + "' is not recognized.", _FILEINFO_);
+        catch(IException &) {
+          throw IException(IException::User,
+                           "The operator '" + data + "' is not recognized.",
+                           _FILEINFO_);
         }
 
         // This was clearly an operand at this point
@@ -219,10 +220,10 @@ namespace Isis {
 
       // If we found consecutive operators or operands, tell the user
       if(numConsecutiveOperators > 1) {
-        throw iException::Message(iException::User, "Missing an operand near the operator '" + data + "'.", _FILEINFO_);
+        throw IException(IException::User, "Missing an operand near the operator '" + data + "'.", _FILEINFO_);
       }
       else if(numConsecutiveOperands > 1) {
-        throw iException::Message(iException::User, "Missing an operator before " + data + ".", _FILEINFO_);
+        throw IException(IException::User, "Missing an operator before " + data + ".", _FILEINFO_);
       }
     }
 
@@ -231,9 +232,9 @@ namespace Isis {
 
       // Any opening parentheses here are invalid at this point
       if(op == "(") {
-        throw iException::Message(iException::User,
-                                  "There are too many opening parentheses ('(') in the equation.",
-                                  _FILEINFO_);
+        throw IException(IException::User,
+                         "There are too many opening parentheses ('(') in the equation.",
+                         _FILEINFO_);
       }
 
       postfix += ' ' + op + ' ';
@@ -335,9 +336,9 @@ namespace Isis {
     }
 
     if(!openingFound) {
-      throw iException::Message(iException::User,
-                                "There are too many closing parentheses (')') in the equation.",
-                                _FILEINFO_);
+      throw IException(IException::User,
+                       "There are too many closing parentheses (')') in the equation.",
+                       _FILEINFO_);
     }
   }
 
@@ -358,7 +359,7 @@ namespace Isis {
     }
 
     // Nothing found
-    throw iException::Message(iException::User, "The operator '" + representation + "' is not recognized.", _FILEINFO_);
+    throw IException(IException::User, "The operator '" + representation + "' is not recognized.", _FILEINFO_);
   }
 
   /**
@@ -510,9 +511,9 @@ namespace Isis {
             // We see a zero-arg function, and we grabbed an open parenthesis from it.
             //   Make sure the next thing is a close or we have a problem.
             if(equation.Token(" ") != ")") {
-              throw iException::Message(iException::User,
-                                        "The function " + func->inputString() + " should not have any arguments.",
-                                        _FILEINFO_);
+              throw IException(IException::User,
+                               "The function " + func->inputString() + " should not have any arguments.",
+                               _FILEINFO_);
             }
 
             // Close the arguments and the wrapping parentheses. They wrote their call correct :)
@@ -524,9 +525,9 @@ namespace Isis {
 
           // Make sure the user put parentheses around these, otherwise we're left in the dark.
           if(func->argumentCount() > 1 && equation.Token(" ") != "(") {
-            throw iException::Message(iException::User,
-                                      "Missing parenthesis after " + func->inputString(),
-                                      _FILEINFO_);
+            throw IException(IException::User,
+                             "Missing parenthesis after " + func->inputString(),
+                             _FILEINFO_);
           }
 
           // Single argument missing parenthesis?
@@ -538,9 +539,9 @@ namespace Isis {
               //   unless it's a negate, because we insert those, tell them their mistake. It's not
               //   my job to figure out what they mean!
               if(func->inputString() != "--") {
-                throw iException::Message(iException::User,
-                                          "Missing parenthesis after " + func->inputString(),
-                                          _FILEINFO_);
+                throw IException(IException::User,
+                                 "Missing parenthesis after " + func->inputString(),
+                                 _FILEINFO_);
               }
 
               // It's a negate without parentheses, so they mean the next term?
@@ -572,9 +573,9 @@ namespace Isis {
                   iString newElem = equation.Token(" ");
 
                   if(newElem == "") {
-                    throw iException::Message(iException::User,
-                                              "Missing closing parentheses after '" + argument + "'.",
-                                              _FILEINFO_);
+                    throw IException(IException::User,
+                                     "Missing closing parentheses after '" + argument + "'.",
+                                     _FILEINFO_);
                   }
 
                   if(newElem == "(") numParens++;
@@ -606,9 +607,9 @@ namespace Isis {
 
             // Ran out of data, the function call is not complete.
             if(elem == "") {
-              throw iException::Message(iException::User,
-                                        "The definition of '" + func->inputString() + "' is not complete.",
-                                        _FILEINFO_);
+              throw IException(IException::User,
+                               "The definition of '" + func->inputString() + "' is not complete.",
+                               _FILEINFO_);
             }
 
             if(elem == "(") {
@@ -632,9 +633,9 @@ namespace Isis {
 
               // Too many arguments? We don't expect a comma delimiter on the last argument.
               if(argNum == func->argumentCount()) {
-                throw iException::Message(iException::User,
-                                          "There were too many arguments supplied to the function '" + func->inputString() + "'.",
-                                          _FILEINFO_);
+                throw IException(IException::User,
+                                 "There were too many arguments supplied to the function '" + func->inputString() + "'.",
+                                 _FILEINFO_);
               }
             }
             else {
@@ -651,9 +652,9 @@ namespace Isis {
             }
             // Closed the function early?
             else if(numParens == -1) {
-              throw iException::Message(iException::User,
-                                        "There were not enough arguments supplied to the function '" + func->inputString() + "'.",
-                                        _FILEINFO_);
+              throw IException(IException::User,
+                               "There were not enough arguments supplied to the function '" + func->inputString() + "'.",
+                               _FILEINFO_);
             }
           }
         }
@@ -673,9 +674,9 @@ namespace Isis {
     argument = argument.Remove(")");
 
     if(argument == "") {
-      throw iException::Message(iException::User,
-                                "Argument " + (iString)(argNum + 1) + " in function " + funcName + " must not be empty.",
-                                _FILEINFO_);
+      throw IException(IException::User,
+                       "Argument " + (iString)(argNum + 1) + " in function " + funcName + " must not be empty.",
+                       _FILEINFO_);
     }
   }
 }

@@ -40,7 +40,7 @@
 #include "Kernels.h"
 #include "iString.h"
 #include "Cube.h"
-#include "iException.h"
+#include "IException.h"
 
 
 namespace Isis {

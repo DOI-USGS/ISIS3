@@ -8,7 +8,7 @@
 #include "ControlNetFileV0001.pb.h"
 #include "ControlMeasureLogData.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "Progress.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
@@ -42,7 +42,7 @@ namespace Isis {
     fstream input(file.Expanded().c_str(), ios::in | ios::binary);
     if (!input.is_open()) {
       iString msg = "Failed to open PB file" + file.fileName();
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     input.seekg(coreStartPos, ios::beg);
@@ -56,12 +56,16 @@ namespace Isis {
     try {
       if (!p_network->ParseFromCodedStream(&codedInStream)) {
         iString msg = "Failed to read input PB file " + file.fileName();
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       }
+    }
+    catch (IException &e) {
+      string msg = "Cannot parse binary PB file";
+      throw IException(e, IException::User, msg, _FILEINFO_);
     }
     catch (...) {
       string msg = "Cannot parse binary PB file";
-      throw Isis::iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     const PvlObject &logDataInfo = protoBufferInfo.FindObject("LogData");
@@ -80,12 +84,12 @@ namespace Isis {
     try {
       if (!p_logData->ParseFromCodedStream(&codedLogInStream)) {
         iString msg = "Failed to read log data in PB file [" + file.fileName() + "]";
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       }
     }
     catch (...) {
       string msg = "Cannot parse binary PB file's log data";
-      throw Isis::iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
 
@@ -299,8 +303,7 @@ namespace Isis {
              ControlMeasureLogData interpreter(log);
              pvlMeasure += interpreter.ToKeyword();
            }
-           catch(iException &e) {
-             e.Clear();
+           catch(IException &) {
            }
          }
 

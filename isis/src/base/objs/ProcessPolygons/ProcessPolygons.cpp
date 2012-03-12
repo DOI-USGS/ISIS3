@@ -184,7 +184,7 @@ namespace Isis {
       std::string msg = "ERROR! geos exception 1 [";
       msg += (iString)ill->what() + "]";
       delete ill;
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }/*end catch*/
 
 
@@ -316,7 +316,7 @@ namespace Isis {
       std::string msg = "ERROR! geos exception 1 [";
       msg += (iString)ill->what() + "]";
       delete ill;
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }/*end catch*/
 
   }

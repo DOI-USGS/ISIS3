@@ -1,11 +1,11 @@
-**USER ERROR** MinDN must be less than MaxDN
-**USER ERROR** Min EmissionAngle must be less than Max EmissionAngle
-**USER ERROR** Invalid Max Incidence Angle, Valid Range is [0-135]
-**USER ERROR** Invalid Resolution value(s), Resolution must be greater than zero
+**USER ERROR** MinDN must be less than MaxDN.
+**USER ERROR** Min EmissionAngle must be less than Max EmissionAngle.
+**USER ERROR** Invalid Max Incidence Angle, Valid Range is [0-135].
+**USER ERROR** Invalid Resolution value(s), Resolution must be greater than zero.
 **USER ERROR** Cannot have both Sample/Line Residuals and Residual Magnitude.
-Choose either Sample/Line Residual or Residual Magnitude
+Choose either Sample/Line Residual or Residual Magnitude.
 **USER ERROR** Cannot have both Sample/Line Shift and Pixel Shift tolerances.
-Choose either Sample/Line Shift or Pixel Shift to validate on
+Choose either Sample/Line Shift or Pixel Shift to validate on.
 Group = StandardOptions
   MinDN             = -1.0
   MaxDN             = 1.0

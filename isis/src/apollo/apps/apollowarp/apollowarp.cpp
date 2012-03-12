@@ -22,11 +22,11 @@ void IsisMain() {
   string mission = (ipacket->getGroup("Instrument"))["SpacecraftName"];
   if (mission.substr(0,6) != "APOLLO") {
     string msg = "This application is for use with Apollo spacecrafts only. ";
-    throw Isis::iException::Message(Isis::iException::Pvl,msg, _FILEINFO_);
+    throw IException(IException::Unknown, msg, _FILEINFO_);
   }
   if ((string)reseaus["Status"] != "Refined" && (string)reseaus["Status"] != "Removed") {
     string msg = "This application can only be run after findapollorx.";
-    throw Isis::iException::Message(Isis::iException::Pvl,msg, _FILEINFO_);
+    throw IException(IException::Unknown, msg, _FILEINFO_);
   }
 
   // Get the master reseau info
@@ -76,7 +76,7 @@ void IsisMain() {
   else {
     string msg = "Unknow value for INTERP [" +
                  ui.GetString("INTERP") + "]";
-    throw Isis::iException::Message(Isis::iException::Programmer,msg,_FILEINFO_);
+    throw IException(IException::Programmer, msg,_FILEINFO_);
   }
 
   // Warp the image

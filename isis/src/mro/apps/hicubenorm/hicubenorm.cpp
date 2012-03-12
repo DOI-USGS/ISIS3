@@ -11,7 +11,7 @@
 #include "ProcessByTile.h"
 #include "ProcessByLine.h"
 #include "SpecialPixel.h"
-#include "iException.h"
+#include "IException.h"
 #include "Pvl.h"
 #include "Statistics.h"
 #include "VecFilter.h"
@@ -65,9 +65,9 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   if(!(ui.WasEntered("TO")) && !(ui.WasEntered("STATS"))) {
     string msg = "User must specify a TO and/or STATS file.";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
-  
+
   // We will be processing by tile.
   ProcessByTile p;
 
@@ -81,7 +81,7 @@ void IsisMain() {
 
   // Cubenorm New Version Flag
   bool bNewVersion = ui.GetBoolean("NEW_VERSION");
-  
+
   // Setup the tile size for columnar processing
   p.SetTileSize(1, totalLines);
   rowcol = totalSamples;
@@ -96,14 +96,13 @@ void IsisMain() {
   else {
     PVLIn(ui.GetFilename("FROMSTATS"));
   }
-  
+
   // Check to make sure the first vector has as many elements as the last
   // vector, and that there is a vector element for each row/col
   if(!bNewVersion && band.size() != (unsigned int)(rowcol * totalBands)) {
     string message = "You have entered an invalid input file " +
                      ui.GetFilename("FROMSTATS");
-    throw  iException::Message(Isis::iException::Io, message,
-                               _FILEINFO_);
+    throw IException(IException::Io, message, _FILEINFO_);
   }
 
   // Get the information needed to filter the statistics
@@ -118,7 +117,7 @@ void IsisMain() {
     filter = average;
     filterStats(filter, filtsize, pause_crop, channel);
     average = filter;
-  
+
     // Filter the column medians
     filter = median;
     filterStats(filter, filtsize, pause_crop, channel);
@@ -135,18 +134,18 @@ void IsisMain() {
       tableOut(ui.GetFilename("STATS"));
     }
   }
-  
+
   // Update the statistics vectors before creating the output
   // file. Now get the statistics for each column
   normalizeUsingAverage = ui.GetString("NORMALIZER") == "AVERAGE";
-    
+
   if(normalizeUsingAverage) {
     normalizer = average;
   }
   else {
     normalizer = median;
   }
-  
+
   // If an output file was specified then normalize the cube
   if(ui.WasEntered("TO")) {
     // Before creating a normalized cube check to see if there
@@ -156,15 +155,15 @@ void IsisMain() {
         if(IsValidPixel(normalizer[i]) && normalizer[i] <= 0.0) {
           string msg = "Cube file can not be normalized with [MULTIPLY] ";
           msg += "option, some column averages <= 0.0";
-          throw iException::Message(iException::User, msg, _FILEINFO_);
+          throw IException(IException::User, msg, _FILEINFO_);
         }
       }
     }
-    
+
     // Setup the output file and apply the coefficients by either
     // subtracting or multipling them
     p.SetOutputCube("TO");
-    
+
     // Should we preserve the average/median of the input image???
     if(ui.GetBoolean("PRESERVE")) {
       if(ui.GetString("MODE") == "SUBTRACT") {
@@ -174,7 +173,7 @@ void IsisMain() {
         keepSame(totalBands, rowcol, DIVIDE);
       }
     }
-    
+
     // Process based on the mode
     if(ui.GetString("MODE") == "SUBTRACT") {
       p.StartProcess(subtract);
@@ -358,8 +357,7 @@ void tableIn(const Isis::Filename &filename) {
 
   if(!in) {
     string message = "Error opening " + filename.Expanded();
-    throw  iException::Message(Isis::iException::Io, message,
-                               _FILEINFO_);
+    throw IException(IException::Io, message, _FILEINFO_);
   }
 
   //skip the header (106 bytes)
@@ -573,11 +571,11 @@ void filterStats(vector<double> &filter, int &filtsize, bool &pause_crop,
 }
 
 /**
- * Corrects the average and median Cubenorm statistics by using combination of 
- * low and high pass filters 
- * 
+ * Corrects the average and median Cubenorm statistics by using combination of
+ * low and high pass filters
+ *
  * @author Sharmila Prasad (1/27/2011)
- * 
+ *
  * @param piFilterSize - Box car filter size
  * @param pbPauseCrop  - Flag whether to exclude column averages at pause points
  * @param piChannelNum - Input image Channel number
@@ -591,15 +589,15 @@ void CorrectCubenormStats(int piFilterSize, bool pbPauseCrop, int piChannelNum, 
   const int iChannelPause[2][iChannelSize] = {{252, 515, 778}, {247, 510, 773}};
   const int iChannelWidth[2][iChannelSize] = {{17, 17, 17}, {17, 17, 17}};
   const string sChannelDirection[2]        = {"RIGHT", "LEFT"};
-  
+
   int iLeftCut   = 6;
   int iRightCut  = 6;
   int iMaxPoints = 0;
   int iStatsSize = (int)validpixels.size();
-  
+
   VecFilter vFilter;
   vector<double> dInFilter, dOrigFilter, dTempFilter, dFilter;
- 
+
   for (int i = 0; i < iStatsSize; i++) {
     if (validpixels[i] > iMaxPoints) {
       iMaxPoints = validpixels[i];
@@ -608,7 +606,7 @@ void CorrectCubenormStats(int piFilterSize, bool pbPauseCrop, int piChannelNum, 
       stddev[i] = 0;
     }
   }
-  
+
   for(int iIndex = 0; iIndex < 2; iIndex++) {
     if(!iIndex) {
       dOrigFilter = average;
@@ -635,19 +633,19 @@ void CorrectCubenormStats(int piFilterSize, bool pbPauseCrop, int piChannelNum, 
       }
       else {
         iRightCut = 50;
-      }   
+      }
     }
     // zero out left edge
     for(int i = 0; i < iLeftCut; i++) {
       dInFilter[i] = 0.0;
     }
-    
+
     // zero out right edge
     int iMax = iStatsSize - iRightCut;
     for(int i = iStatsSize - 1; i >= iMax; i--) {
       dInFilter[i] = 0.0;
     }
-  
+
     // Zero out the pause point pixels if requested and the input
     // image file has a bin mode of 1 (samples=1024)
     if(pbPauseCrop && iStatsSize == 1024) {
@@ -662,16 +660,16 @@ void CorrectCubenormStats(int piFilterSize, bool pbPauseCrop, int piChannelNum, 
           i1 = iChannelPause[piChannelNum][i] - 1;
           i2 = iChannelPause[piChannelNum][i] + iChannelWidth[piChannelNum][i] - 2;
         }
-        if(i1 < 0) 
+        if(i1 < 0)
           i1 = 0;
-        if(i2 > iStatsSize - 1) 
+        if(i2 > iStatsSize - 1)
           i2 = iStatsSize - 1;
         for(int j = i1; j <= i2; j++) {
           dInFilter[j] = 0.0;
         }
       }
     }
-  
+
     // Here is the boxfilter - the outer most loop is for the number
     // of filter iterations
     for(int iPass = 1; iPass <= 3; iPass++) {
@@ -679,12 +677,12 @@ void CorrectCubenormStats(int piFilterSize, bool pbPauseCrop, int piChannelNum, 
         dFilter = vFilter.LowPass(dInFilter, piFilterSize);
         dInFilter = dFilter;
       }
-  
+
       // Zero out any columns that are different from the average by more
       // than a specific percent
       if(iPass < 3) {
         double dFraction = 0.25;
-        if(iPass >= 2) 
+        if(iPass >= 2)
           dFraction = 0.125;
         for(int k = 0; k < iStatsSize; k++) {
           if(dInFilter[k] != 0.0 && dOrigFilter[k] != 0.0) {
@@ -692,14 +690,14 @@ void CorrectCubenormStats(int piFilterSize, bool pbPauseCrop, int piChannelNum, 
               dTempFilter[k] = 0.0;
             }
           }
-        } 
+        }
         dInFilter = dTempFilter;
       }
     }
-  
+
     // Perform the highpass by differencing the original from the lowpass
     dFilter = vFilter.HighPass(dOrigFilter, dFilter, validpixels, iMaxPoints, psMode);
-  
+
     // -999999 is a flag set by highpass filter to indicate a column had a missing pixels
     // due to a problem with furrows or noise
     double dValue;
@@ -722,10 +720,10 @@ void CorrectCubenormStats(int piFilterSize, bool pbPauseCrop, int piChannelNum, 
         else {
           dValue = dFilter[i];
         }
-      }  
+      }
     }
     else {
-      dValue = dFilter[0];  
+      dValue = dFilter[0];
       for (int i=0; i<iStatsSize; i++) {
         if (dFilter[i] ==  MARKER) {
           if (dValue != MARKER) {

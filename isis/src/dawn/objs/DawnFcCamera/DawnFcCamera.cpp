@@ -65,7 +65,7 @@ namespace Isis {
     // non-square detectors.
     iString keyword = "INS" + (iString)(int)NaifIkCode() + "_PIXEL_SIZE";
     double pixelPitch = (Spice::GetDouble(keyword, 0) + Spice::GetDouble(keyword, 1)) / 2.0;
-    pixelPitch /= 1000.0;  
+    pixelPitch /= 1000.0;
     SetPixelPitch(pixelPitch);
 
     // We have not seen images or tested images with summing mode or
@@ -76,7 +76,7 @@ namespace Isis {
     if ((ParentLines() != 1024) || (ParentSamples() != 1024)) {
       string msg = "The ISIS Dawn FC model expects the image size to be 1024x1024";
       msg += "Please contact Jeff Anderson (janderson@usgs.gov) with the Dawn FC PDS filename for further testing.";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     CameraDetectorMap *detectorMap = new CameraDetectorMap(this);
     detectorMap->SetDetectorSampleSumming(1);
@@ -92,8 +92,8 @@ namespace Isis {
 
     // Setup distortion map.  Start by reading the distortion coefficient from the instrument kernel.  Then
     // construct the distortion model.  Note the distortion model code is copied from the RadialDistortionMap
-    // class and reversed.  TODO:  Check with Ken Edmundson to see if we can just read from IK and pass 1/K 
-    // to the original RadialDistortionMap which would allow us to delete the DawnFcDistortionMap 
+    // class and reversed.  TODO:  Check with Ken Edmundson to see if we can just read from IK and pass 1/K
+    // to the original RadialDistortionMap which would allow us to delete the DawnFcDistortionMap
     double k = Spice::GetDouble("INS" + (iString)(int)NaifIkCode() + "_RAD_DIST_COEFF");
     new DawnFcDistortionMap(this,k);
 

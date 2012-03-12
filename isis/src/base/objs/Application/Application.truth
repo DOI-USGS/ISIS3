@@ -34,7 +34,7 @@ GuiHelpers ok
 
 In myFunct
 
-**PROGRAMMER ERROR** testing an error
+**PROGRAMMER ERROR** testing an error.
 
 Object = unittest
   IsisVersion       = "3.2.2.0 | 2010-11-05"

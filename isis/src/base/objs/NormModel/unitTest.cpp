@@ -8,7 +8,7 @@
 #include "NormModelFactory.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
-#include "iException.h"
+#include "IException.h"
 #include "Preference.h"
 
 using namespace Isis;
@@ -60,8 +60,8 @@ int main() {
     std::cout << "Testing normalization model get methods ..." << std::endl;
     std::cout << "AlgorithmName = " << nm->AlgorithmName() << std::endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   std::cout << std::endl;
@@ -73,8 +73,8 @@ void doit(Pvl &lab, PhotoModel &pm) {
   try {
     NormModelFactory::Create(lab, pm);
   }
-  catch(iException &error) {
-    error.Report(false);
+  catch(IException &error) {
+    error.print();
   }
   std::cout << std::endl;
 }
@@ -83,8 +83,8 @@ void doit(Pvl &lab, PhotoModel &pm, AtmosModel &am) {
   try {
     NormModelFactory::Create(lab, pm, am);
   }
-  catch(iException &error) {
-    error.Report(false);
+  catch(IException &error) {
+    error.print();
   }
   std::cout << std::endl;
 }

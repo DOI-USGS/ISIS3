@@ -58,7 +58,7 @@ void helperButtonGetBlobList() {
     if(cnt >= label.Objects()) {
       pos = 0;
       string msg = "Parameter [FROM] has no blobs.";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     // When the end of the objects is hit,
     // display "NAME" and "TYPE" parameters as blank

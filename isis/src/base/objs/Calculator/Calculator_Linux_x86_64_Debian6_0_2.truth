@@ -50,7 +50,7 @@ Bitwise Or (v1,v4): [ 3 2 3 ]
 Square Root(-1): [ -nan ]
 Log(of 0): [ -inf ]
 -------------------------------------------------------
-**MATH ERROR** Shift value must be <= to number of samples.
-**MATH ERROR** Shift value must be <= to number of samples.
-**MATH ERROR** Cannot operate on vectors of differing sizes.
-**MATH ERROR** Stack is empty, cannot perform any more operations.
+**ERROR** When trying to do a left shift calculation, a shift value greater than the data size was encountered. Shifting by this value would erase all of the data.
+**ERROR** When trying to do a right shift calculation, a shift value greater than the data size was encountered. Shifting by this value would erase all of the data.
+**PROGRAMMER ERROR** The stack based calculator cannot operate on vectors of differing sizes.
+**ERROR** Math calculator stack is empty, cannot perform any more operations.

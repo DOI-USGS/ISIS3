@@ -16,7 +16,7 @@ int main(int argc, char *argv[]) {
   string dbfileName(dbfile.Expanded());
   testdb.setDatabaseName(dbfileName.c_str());
   if(!testdb.open()) {
-    iException::Message(iException::User, "Connection failed", _FILEINFO_);
+    throw IException(IException::User, "Connection failed", _FILEINFO_);
   }
 
   string table = "CREATE TABLE testTable ("
@@ -43,8 +43,8 @@ int main(int argc, char *argv[]) {
       cout << "Is null (blank): " << r.isNull("") << endl;
     }
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
 

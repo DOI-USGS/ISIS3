@@ -2,7 +2,7 @@
 #include <iomanip>
 
 #include "Camera.h"
-#include "iException.h"
+#include "IException.h"
 #include "Latitude.h"
 #include "Longitude.h"
 #include "Pvl.h"
@@ -180,8 +180,8 @@ int main(int argc, char *argv[]) {
       }
     }
   }
-  catch (Isis::iException &e) {
-    e.Report();
+  catch (Isis::IException &e) {
+    e.print();
   }
 }
 

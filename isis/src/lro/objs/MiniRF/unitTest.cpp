@@ -23,7 +23,7 @@
 #include "Camera.h"
 #include "CameraFactory.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "Preference.h"
 #include "Pvl.h"
 
@@ -89,17 +89,17 @@ int main(void) {
     // Test kernel ID messages
     cout << endl << "Kernel ID error messages: " << endl;
     try{ cam->CkFrameId(); }
-    catch (iException e){ e.Report(); }
+    catch (IException e){ e.print(); }
     try{ cam->CkReferenceId(); }
-    catch (iException e){ e.Report(); }
+    catch (IException e){ e.print(); }
     try{ cam->SpkTargetId(); }
-    catch (iException e){ e.Report(); }
+    catch (IException e){ e.print(); }
     try{ cam->SpkReferenceId(); }
-    catch (iException e){ e.Report(); }
+    catch (IException e){ e.print(); }
 
  // }
-//  catch(Isis::iException &e) {
-//    e.Report();
+//  catch(Isis::IException &e) {
+//    e.print();
 //  }
 }
 

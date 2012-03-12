@@ -28,7 +28,7 @@
 #include "ConcurrentControlNetReader.h"
 #include "ControlNet.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "ProgressBar.h"
 #include "Pvl.h"
 
@@ -71,7 +71,7 @@ namespace Isis
 #endif
 
     nullify();
-    
+
     displayProperties = CnetDisplayProperties::getInstance();
     curFile = new QString;
 //     cubeListFile = new QString;
@@ -114,7 +114,7 @@ namespace Isis
 
     delete cnet;
     cnet = NULL;
-    
+
     delete displayProperties;
     displayProperties = NULL;
 
@@ -126,7 +126,7 @@ namespace Isis
 
     delete curFile;
     curFile = NULL;
-    
+
 //     delete cubeListFile;
 //     cubeListFile = NULL;
 
@@ -135,7 +135,7 @@ namespace Isis
 
     delete loadingProgressBar;
     loadingProgressBar = NULL;
-    
+
     delete toolBars;
     toolBars = NULL;
 
@@ -332,7 +332,7 @@ namespace Isis
     loadingProgressBar = new ProgressBar("Reading network");
     statusBar()->addPermanentWidget(loadingProgressBar);
     loadingProgressBar->setVisible(false);
-    
+
     cubeListProgressBar = new ProgressBar("Reading cube list");
     statusBar()->addPermanentWidget(cubeListProgressBar);
     cubeListProgressBar->setVisible(false);
@@ -397,7 +397,7 @@ namespace Isis
   {
     setDirty(true);
   }
-  
+
 
   void CnetEditorWindow::setSaveAsPvl(int state)
   {
@@ -416,7 +416,7 @@ namespace Isis
       ASSERT(displayProperties);
       displayProperties->setCubeList(filename);
     }
-    
+
   }
 
 
@@ -505,11 +505,10 @@ namespace Isis
       cnetReader->read(filename);
       setFileState(FileLoading, filename);
     }
-    catch (iException e)
+    catch (IException &)
     {
       QMessageBox::critical(this, tr("cneteditor"),
           tr("Failed to open the file provided"));
-      e.Clear();
       setFileState(NoFile, "");
     }
   }
@@ -586,7 +585,7 @@ namespace Isis
       cnet = NULL;
       delete cnetReader;
       cnetReader = NULL;
-      
+
       foreach (QToolBar * tb, *toolBars)
       {
         foreach (QAction * tbAct, tb->actions())
@@ -596,7 +595,7 @@ namespace Isis
         delete tb;
         toolBars->removeOne(tb);
       }
-      
+
 //       removeEmptyMenus();
 
       setFileState(NoFile, "");
@@ -628,8 +627,8 @@ namespace Isis
     setFileState(HasFile, *curFile);
     saveAsPvl = !Pvl((iString) *curFile).HasObject("ProtoBuffer");
   }
-  
-  
+
+
   void CnetEditorWindow::populateMenus()
   {
     QMap< QAction *, QList< QString > > actionMap;
@@ -637,21 +636,21 @@ namespace Isis
     QMapIterator< QAction *, QList< QString > > i(actionMap);
 
     QWidget * widget = NULL;
-    
+
     while (i.hasNext())
     {
       i.next();
       QAction * act = i.key();
       QList< QString > location = i.value();
-      
+
       widget = menuBar();
-      
+
       while (location.size())
       {
         QString menuName = location.takeFirst();
-        
+
         int actListIndex = indexOfActionList(widget->actions(), menuName);
-        
+
         // if menuName not found in current widget's actions,
         // then add needed submenu
         if (actListIndex == -1)
@@ -659,7 +658,7 @@ namespace Isis
           QMenuBar * mb = qobject_cast< QMenuBar * >(widget);
           QMenu * m = qobject_cast< QMenu * >(widget);
           ASSERT((mb != NULL) ^ (m != NULL));
-          
+
           if (mb)
           {
             mb->addMenu(menuName);
@@ -678,12 +677,12 @@ namespace Isis
           widget = widget->actions()[actListIndex]->menu();
         }
       }
-      
+
       widget->addAction(act);
     }
   }
-  
-  
+
+
   int CnetEditorWindow::indexOfActionList(QList< QAction * > actionList,
                                           QString actionText)
   {
@@ -691,11 +690,11 @@ namespace Isis
     for (int i = 0; index == -1 && i < actionList.size(); i++)
       if (actionList[i]->text() == actionText)
         index = i;
-      
+
     return index;
   }
-  
-  
+
+
   void CnetEditorWindow::populateToolBars()
   {
     QMap< QString, QList< QAction * > > actionMap;
@@ -707,12 +706,12 @@ namespace Isis
       i.next();
       QString objName = i.key();
       QList< QAction * > actionList = i.value();
-      
+
 //       foreach (QAction * action, actionList)
 //       {
 //         mainToolBar->addAction(action);
 //       }
-      
+
       // if toolbar already exists, just add the actions to it
       int index = indexOfToolBar(objName);
 //       cerr << "index: " << index << "\n";
@@ -728,7 +727,7 @@ namespace Isis
 //             actionList.removeAt(i);
 //           }
 //         }
-        
+
         foreach (QAction * action, actionList)
           (*toolBars)[index]->addAction(action);
       }
@@ -744,20 +743,20 @@ namespace Isis
           newToolBar->setFloatable(false);
           foreach (QAction * action, actionList)
             newToolBar->addAction(action);
-          
+
           addToolBar(Qt::TopToolBarArea, newToolBar);
         }
       }
     }
   }
-  
-  
+
+
   int CnetEditorWindow::indexOfToolBar(QString objName)
   {
     ASSERT(toolBars);
-    
+
     int index = -1;
-    
+
     for (int i = 0; index == -1 && i < toolBars->size(); i++)
       if (toolBars->at(i)->objectName() == objName)
         index = i;
@@ -770,7 +769,7 @@ namespace Isis
   {
     QQueue< QWidget * > q;
     q.enqueue(menuBar());
-    
+
     while (q.size())
     {
       QWidget * widget = q.dequeue();
@@ -788,8 +787,8 @@ namespace Isis
       }
     }
   }
-  
-  
+
+
   void CnetEditorWindow::about()
   {
     cerr << "CneteditorWindow::about() implement me!\n";

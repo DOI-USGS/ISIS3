@@ -3,7 +3,7 @@
 #include "Pipeline.h"
 #include "PipelineApplication.h"
 #include "ProgramLauncher.h"
-#include "iException.h"
+#include "IException.h"
 #include "Application.h"
 #include "Preference.h"
 #include "TextFile.h"
@@ -50,10 +50,10 @@ namespace Isis {
    * This method is the core of the pipeline class. This method tells each
    * PipelineApplication to learn about itself and calculate necessary filenames,
    * execution calls, etc... Pipeline error checking happens in here, so if a
-   * Pipeline is invalid this method will throw the iException.
+   * Pipeline is invalid this method will throw the IException.
    *
    * @internal
-   *   @history 2011-08-15 Debbie A. Cook Added check for NULL pointers in p_apps 
+   *   @history 2011-08-15 Debbie A. Cook Added check for NULL pointers in p_apps
    *                                       vector since a [ause is added as a
    *                                       NULL pointer.
    */
@@ -88,7 +88,7 @@ namespace Isis {
         if(mustElimBands && p_apps[i]->SupportsVirtualBands()) {
           if(i != 0 && p_virtualBands.size() != 1) {
             iString message = "If multiple original inputs were set in the pipeline, the first application must support virtual bands.";
-            throw iException::Message(iException::Programmer, message, _FILEINFO_);
+            throw IException(IException::Programmer, message, _FILEINFO_);
           }
 
           p_apps[i]->SetVirtualBands(p_virtualBands);
@@ -133,7 +133,7 @@ namespace Isis {
           if(p_apps[i]->InputBranches().size() != OriginalBranches().size()) {
             string msg = "The program [" + p_apps[i]->Name() + "] can not be the first in the pipeline";
             msg += " because it must be run multiple times with unspecified varying inputs";
-            throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+            throw IException(IException::Programmer, msg, _FILEINFO_);
           }
         }
       }
@@ -141,7 +141,7 @@ namespace Isis {
       // Make sure we found an app!
       if(!foundFirst) {
         string msg = "No applications are enabled in the pipeline";
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
       // Make sure all tmp files are unique!
@@ -150,7 +150,7 @@ namespace Isis {
           if(tmpFiles[i] == tmpFiles[j]) {
             string msg = "There is a conflict with the temporary file naming. The temporary file [";
             msg += tmpFiles[i] + "] is created twice.";
-            throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+            throw IException(IException::Programmer, msg, _FILEINFO_);
           }
         }
       }
@@ -165,12 +165,12 @@ namespace Isis {
       }
 
       int lastApp = p_apps.size()-1;
-      if (p_apps[p_apps.size()-1] == NULL) 
+      if (p_apps[p_apps.size()-1] == NULL)
         lastApp = p_apps.size() - 2;
 
       if(p_apps[lastApp]->GetOutputs().size() == 0) {
         string msg = "There are no outputted files in the pipeline. At least one program must generate an output file.";
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       }
     }
   }
@@ -181,9 +181,9 @@ namespace Isis {
    * program, call this method.
    *
    * @internal
-   *   @history 2011-08-15 Debbie A. Cook Added check for NULL pointers in p_apps 
+   *   @history 2011-08-15 Debbie A. Cook Added check for NULL pointers in p_apps
    *                                       vector since a pause is added as a
-   *                                       NULL pointer.  Also adjusted 
+   *                                       NULL pointer.  Also adjusted
    *                                       application loops for potential
    *                                       pauses.
    */
@@ -228,13 +228,12 @@ namespace Isis {
             try {
               ProgramLauncher::RunIsisProgram(Application(i).Name(), params[j]);
             }
-            catch(Isis::iException & Ex) {
+            catch(IException &ex) {
               if(!p_continue && !Application(i).Continue()) {
-                throw iException::Message(iException::Programmer, Ex.Errors(), _FILEINFO_);
+                throw;
               }
               else {
-                cerr << Ex.Errors() << endl;
-                Ex.Clear();
+                ex.print();
                 cerr << "Continuing ......" << endl;
               }
             }
@@ -268,7 +267,7 @@ namespace Isis {
    *
    * @param inputParam The parameter to get from the user interface that contains
    *                   the input file
-   * @history 2010-12-20 Sharmila Prasad - Changed p_originalBranches array 
+   * @history 2010-12-20 Sharmila Prasad - Changed p_originalBranches array
    *                                       to p_inputBranches
    */
   void Pipeline::SetInputFile(const iString &inputParam) {
@@ -284,9 +283,9 @@ namespace Isis {
    * be read, and the inputFile parameter will be read as a path to a file instead
    * of as a parameter.
    *
-   * @param inputParam A filename object containing the location of the input file 
-   * @history 2010-12-20 Sharmila Prasad - Changed p_originalBranches array 
-   *                                       to p_inputBranches 
+   * @param inputParam A filename object containing the location of the input file
+   * @history 2010-12-20 Sharmila Prasad - Changed p_originalBranches array
+   *                                       to p_inputBranches
    */
   void Pipeline::SetInputFile(const Filename &inputFile) {
     p_originalInput.push_back(inputFile.Expanded());
@@ -302,12 +301,12 @@ namespace Isis {
    *
    * @param inputParam The parameter to get from the user interface that contains
    *                   the input file
-   * @history 2010-12-20 Sharmila Prasad - Changed p_originalBranches array 
-   *                                       to p_inputBranches 
+   * @history 2010-12-20 Sharmila Prasad - Changed p_originalBranches array
+   *                                       to p_inputBranches
    */
   void Pipeline::SetInputListFile(const iString &inputParam) {
     UserInterface &ui = Application::GetUserInterface();
-    
+
     TextFile filelist(Filename(ui.GetFilename(inputParam)).Expanded());
     string filename;
     int branch = 1;
@@ -329,15 +328,15 @@ namespace Isis {
    * This method is used to set the original input files. These files are the
    * first program's input, a branch will be added for every line in the file.
    *
-   * @param inputParam The filename of the list file contains the input files 
-   * @history 2010-12-20 Sharmila Prasad - Changed p_originalBranches array 
-   *                                       to p_inputBranches 
+   * @param inputParam The filename of the list file contains the input files
+   * @history 2010-12-20 Sharmila Prasad - Changed p_originalBranches array
+   *                                       to p_inputBranches
    */
   void Pipeline::SetInputListFile(const Filename &inputFilename) {
     TextFile filelist(inputFilename.Expanded());
     string filename;
     int branch = 1;
-    
+
     while(filelist.GetLineNoFilter(filename)) {
       p_originalInput.push_back(filename);
       p_inputBranches.push_back(Filename(inputFilename).Expanded() + " " + iString(branch));
@@ -361,8 +360,8 @@ namespace Isis {
    *                          contains the virtual bands list; internal default is
    *                          supported. Empty string if no virtual bands
    *                          parameter exists.
-   * @history 2010-12-20 Sharmila Prasad - Changed p_originalBranches array 
-   *                                       to p_inputBranches 
+   * @history 2010-12-20 Sharmila Prasad - Changed p_originalBranches array
+   *                                       to p_inputBranches
    */
   void Pipeline::SetInputFile(const iString &inputParam, const iString &virtualBandsParam) {
     UserInterface &ui = Application::GetUserInterface();
@@ -470,11 +469,11 @@ namespace Isis {
 
 
   /**
-   * Add a pause to the pipeline. 
+   * Add a pause to the pipeline.
    *
    *
    * @internal
-   *   @history 2011-08-15 Debbie A. Cook Original version 
+   *   @history 2011-08-15 Debbie A. Cook Original version
    */
   void Pipeline::AddPause() {
     // Add the pause
@@ -496,7 +495,7 @@ namespace Isis {
    *                   Pipeline::Application
    *
    * @internal
-   *   @history 2011-08-15 Debbie A. Cook Added check for NULL pointers in p_apps 
+   *   @history 2011-08-15 Debbie A. Cook Added check for NULL pointers in p_apps
    *
    */
   void Pipeline::AddToPipeline(const iString &appname, const iString &identifier) {
@@ -505,7 +504,7 @@ namespace Isis {
       if(p_appIdentifiers[appIdentifier] == identifier) {
         iString message = "The application identifier [" + identifier + "] is not unique. " +
                           "Please providing a unique identifier";
-        throw iException::Message(iException::Programmer, message, _FILEINFO_);
+        throw IException(IException::Programmer, message, _FILEINFO_);
       }
     }
 
@@ -558,7 +557,7 @@ namespace Isis {
    * @param appname The name of the new application
    *
    * @internal
-   *   @history 2011-08-15 Debbie A. Cook Added check for NULL pointers in p_apps 
+   *   @history 2011-08-15 Debbie A. Cook Added check for NULL pointers in p_apps
    *
    */
   void Pipeline::AddToPipeline(const iString &appname) {
@@ -567,7 +566,7 @@ namespace Isis {
       if(p_appIdentifiers[appIdentifier] == appname) {
         iString message = "The application identifier [" + appname + "] is not unique. Please use " +
                           "the other AddToPipeline method providing a unique identifier";
-        throw iException::Message(iException::Programmer, message, _FILEINFO_);
+        throw IException(IException::Programmer, message, _FILEINFO_);
       }
     }
 
@@ -629,7 +628,7 @@ namespace Isis {
 
     if(!found) {
       iString msg = "Application identified by [" + identifier + "] has not been added to the pipeline";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     return *p_apps[index];
@@ -647,7 +646,7 @@ namespace Isis {
   PipelineApplication &Pipeline::Application(const int &index) {
     if(index > Size()) {
       iString msg = "Index [" + iString(index) + "] out of bounds";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     return *p_apps[index];
@@ -663,12 +662,12 @@ namespace Isis {
    * @param appname The program to start with
    *
    * @internal
-   *   @history 2011-08-15 Debbie A. Cook Added check for NULL pointers in p_apps 
+   *   @history 2011-08-15 Debbie A. Cook Added check for NULL pointers in p_apps
    *
    */
   void Pipeline::SetFirstApplication(const iString &appname) {
     int appIndex = 0;
-    for(appIndex = 0; appIndex < (int)p_apps.size() && 
+    for(appIndex = 0; appIndex < (int)p_apps.size() &&
                       p_apps[appIndex]->Name() != appname; appIndex++) {
       if (p_apps[appIndex] == NULL) continue;
       p_apps[appIndex]->Disable();
@@ -679,7 +678,7 @@ namespace Isis {
 
     if(appIndex >= (int)p_apps.size()) {
       string msg = "Pipeline could not find application [" + appname + "]";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
 
@@ -693,7 +692,7 @@ namespace Isis {
    * @param appname The program to end with
    *
    * @internal
-   *   @history 2011-08-15 Debbie A. Cook Added check for NULL pointers in p_apps 
+   *   @history 2011-08-15 Debbie A. Cook Added check for NULL pointers in p_apps
    *
    */
   void Pipeline::SetLastApplication(const iString &appname) {
@@ -705,7 +704,7 @@ namespace Isis {
 
     if(appIndex < 0) {
       string msg = "Pipeline could not find application [" + appname + "]";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
 
@@ -720,7 +719,7 @@ namespace Isis {
    * @return iString The final output string
    *
    * @internal
-   *   @history 2011-08-15 Debbie A. Cook Added check for NULL pointers in p_apps 
+   *   @history 2011-08-15 Debbie A. Cook Added check for NULL pointers in p_apps
    *
    */
   iString Pipeline::FinalOutput(int branch, bool addModifiers) {
@@ -731,7 +730,7 @@ namespace Isis {
     if(p_finalOutput.size() > 1) {
       if((unsigned int)branch >= p_finalOutput.size()) {
         iString msg = "Output not set for branch [" + iString(branch) + "]";
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
       if(!p_outputListNeedsModifiers) {
@@ -811,7 +810,7 @@ namespace Isis {
    * PipelineApplication::Disable, SetFirstApplication and SetLastApplication.
    *
    * @internal
-   *   @history 2011-08-15 Debbie A. Cook Added check for NULL pointers in p_apps 
+   *   @history 2011-08-15 Debbie A. Cook Added check for NULL pointers in p_apps
    *
    */
   void Pipeline::EnableAllApplications() {
@@ -834,7 +833,7 @@ namespace Isis {
    * @return ostream& The modified output stream
    *
    * @internal
-   *   @history 2011-08-15 Debbie A. Cook Added check for NULL pointers in p_apps 
+   *   @history 2011-08-15 Debbie A. Cook Added check for NULL pointers in p_apps
    *
    */
   ostream &operator<<(ostream &os, Pipeline &pipeline) {

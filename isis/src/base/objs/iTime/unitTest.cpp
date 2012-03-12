@@ -1,6 +1,6 @@
 #include <iostream>
 #include <iomanip>
-#include "iException.h"
+#include "IException.h"
 #include "iTime.h"
 
 #include "Preference.h"
@@ -35,8 +35,8 @@ int main(int argc, char *argv[]) {
     cout << "   Et          = " << time->Et() << endl;
     cout << "   UTC         = " << time->UTC() << endl;
   }
-  catch(Isis::iException &error) {
-    error.Report(false);
+  catch(Isis::IException &error) {
+    error.print();
   }
 
 
@@ -67,8 +67,8 @@ int main(int argc, char *argv[]) {
     cout << "   UTC         = " << time.UTC() << endl;
     saveEt = time.Et();
   }
-  catch(Isis::iException &error) {
-    error.Report(false);
+  catch(Isis::IException &error) {
+    error.print();
   }
 
 
@@ -95,8 +95,8 @@ int main(int argc, char *argv[]) {
     cout << "   Et          = " << time.Et() << endl;
     cout << "   UTC         = " << time.UTC() << endl;
   }
-  catch(Isis::iException &error) {
-    error.Report(false);
+  catch(Isis::IException &error) {
+    error.print();
   }
 
 
@@ -117,8 +117,8 @@ int main(int argc, char *argv[]) {
     cout << "    " << t1->EtString() << " >= " << t4->EtString() << " = ";
     cout << (*t1 >= *t4) << endl;
   }
-  catch(Isis::iException &error) {
-    error.Report(false);
+  catch(Isis::IException &error) {
+    error.print();
   }
 
   try {
@@ -138,8 +138,8 @@ int main(int argc, char *argv[]) {
     cout << "    " << t1->EtString() << " <= " << t4->EtString() << " = ";
     cout << (*t1 <= *t4) << endl;
   }
-  catch(Isis::iException &error) {
-    error.Report(false);
+  catch(Isis::IException &error) {
+    error.print();
   }
 
 
@@ -160,8 +160,8 @@ int main(int argc, char *argv[]) {
     cout << "    " << t1->EtString() << " > " << t4->EtString() << " = ";
     cout << (*t1 > *t4) << endl;
   }
-  catch(Isis::iException &error) {
-    error.Report(false);
+  catch(Isis::IException &error) {
+    error.print();
   }
 
   try {
@@ -181,8 +181,8 @@ int main(int argc, char *argv[]) {
     cout << "    " << t1->EtString() << " < " << t4->EtString() << " = ";
     cout << (*t1 < *t4) << endl;
   }
-  catch(Isis::iException &error) {
-    error.Report(false);
+  catch(Isis::IException &error) {
+    error.print();
   }
 
   try {
@@ -199,8 +199,8 @@ int main(int argc, char *argv[]) {
     cout << "    " << t1->EtString() << " != " << t3->EtString() << " = ";
     cout << (*t1 != *t3) << endl;
   }
-  catch(Isis::iException &error) {
-    error.Report(false);
+  catch(Isis::IException &error) {
+    error.print();
   }
 
   try {
@@ -217,8 +217,8 @@ int main(int argc, char *argv[]) {
     cout << "    " << t1->EtString() << " == " << t3->EtString() << " = ";
     cout << (*t1 == *t3) << endl;
   }
-  catch(Isis::iException &error) {
-    error.Report(false);
+  catch(Isis::IException &error) {
+    error.print();
   }
 
 

@@ -2,7 +2,7 @@
 
 #include "Preference.h"
 #include "Progress.h"
-#include "iException.h"
+#include "IException.h"
 
 using namespace std;
 int main() {
@@ -28,16 +28,16 @@ int main() {
   try {
     p.CheckStatus();
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   // Check for error on setting the Maximum Steps
   try {
     p.SetMaximumSteps(-1);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   // Check for error on bad creation
@@ -45,7 +45,7 @@ int main() {
     uip["ProgressBarPercent"] = 3;
     Isis::Progress p2;
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 }

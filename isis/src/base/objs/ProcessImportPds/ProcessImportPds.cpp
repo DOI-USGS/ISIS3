@@ -26,7 +26,7 @@
 
 #include "Preference.h"
 
-#include "iException.h"
+#include "IException.h"
 #include "LineManager.h"
 #include "Pvl.h"
 #include "PvlObject.h"
@@ -135,14 +135,14 @@ namespace Isis {
             else {
               string msg = "Unable to find input file [" + tmp + "] or [" +
                            ifile.Expanded() + "]";
-              throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+              throw IException(IException::Io, msg, _FILEINFO_);
             }
           }
         }
       }
       else {
         string msg = "Unsupported encoding type in [" + p_labelFile + "]";
-        throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+        throw IException(IException::Io, msg, _FILEINFO_);
       }
     }
 
@@ -158,7 +158,7 @@ namespace Isis {
     }
     else {
       string msg = "Unknown label type in [" + p_labelFile + "]";
-      throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+      throw IException(IException::Io, msg, _FILEINFO_);
     }
 
     // Find out if this is a PDS file or an ISIS2 file
@@ -175,14 +175,14 @@ namespace Isis {
    */
   void ProcessImportPds::ProcessDataFilePointer(Isis::PvlTranslationManager & pdsXlater, const bool & calcOffsetOnly) {
     const PvlKeyword & dataFilePointer = pdsXlater.InputKeyword("DataFilePointer");
-    
+
     Isis::iString dataFileName;
     Isis::iString units;
     Isis::iString str;
     int offset = -1;
 
     // If only size 1, we either have a file name or an offset
-    // Either way, when we're done with these two ifs, variables offset and 
+    // Either way, when we're done with these two ifs, variables offset and
     // dataFileName will be set.
     if (dataFilePointer.Size() == 1) {
       try {
@@ -192,11 +192,10 @@ namespace Isis {
         // Successful? we have an offset, means current, p_labelFile
         // is the location of the data as well
         dataFileName = p_labelFile;
-      } 
-      catch(Isis::iException &e) {
-        e.Clear();
+      }
+      catch(IException &e) {
         // Failed to parse to an int, means we have a file name
-        // No offset given, so we use 1, offsets are 1 based 
+        // No offset given, so we use 1, offsets are 1 based
         offset = 1;
         units = "BYTES";
         dataFileName = str;
@@ -214,21 +213,21 @@ namespace Isis {
       string msg = "Data file pointer ^IMAGE or ^QUBE has no value, must"
                    "have either file name or offset or both, in [" +
                    p_labelFile + "]";
-      throw Isis::iException::Message(Isis::iException::Parse, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
     // Error, more than two values
     else {
       string msg = "Improperly formatted data file pointer keyword ^IMAGE or "
                    "^QUBE, in [" + p_labelFile + "], must contain filename "
                    " or offset or both";
-      throw Isis::iException::Message(Isis::iException::Parse, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
-    
+
     // Now, to handle the values we found
     // the filename first, only do so if calcOffsetOnly is false
     if (!calcOffsetOnly) {
       Isis::Filename labelFile(p_labelFile);
-      
+
       // If dataFileName isn't empty, and does start at the root, use it
       Isis::Filename dataFile;
       if (dataFileName.size() != 0 && dataFileName.at(0) == '/')
@@ -252,7 +251,7 @@ namespace Isis {
         else {
           string msg = "Unable to find input file [" + tmp + "] or [" +
                        dataFile.Expanded() + "]";
-          throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+          throw IException(IException::Io, msg, _FILEINFO_);
         }
       }
     }
@@ -260,7 +259,7 @@ namespace Isis {
     // Now, to handle the offset
     units.Trim(" \t\r\v\n");
     if (units == "BYTES" || units == "B") {
-      SetFileHeaderBytes(offset - 1);  
+      SetFileHeaderBytes(offset - 1);
     }
     else {
       Isis::iString recSize = pdsXlater.Translate("DataFileRecordBytes");
@@ -304,12 +303,12 @@ namespace Isis {
     else {
       string msg = "Invalid PixelType and BitsPerPixel combination [" + str +
                    ", " + Isis::iString(bitsPerPixel) + "]";
-      throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+      throw IException(IException::Io, msg, _FILEINFO_);
     }
-  } 
+  }
 
   /**
-   * Handles all special pixel setting, ultimately, calls SetSpecialValues. 
+   * Handles all special pixel setting, ultimately, calls SetSpecialValues.
    */
   void ProcessImportPds::ProcessSpecialPixels(Isis::PvlTranslationManager & pdsXlater, const bool & isQube) {
     iString str;
@@ -410,7 +409,7 @@ namespace Isis {
     str = pdsXlater.Translate("CoreLineSuffixBytes");
     SetDataSuffixBytes(str.ToInteger());
 
-    ProcessPixelBitandType(pdsXlater); 
+    ProcessPixelBitandType(pdsXlater);
 
     str = pdsXlater.Translate("CoreByteOrder");
     SetByteOrder(Isis::ByteOrderEnumeration(str));
@@ -434,19 +433,19 @@ namespace Isis {
     // Use the name supplied by the application if it is there
     if(pdsDataFile.length() > 0) {
       SetInputFile(pdsDataFile);
-      ProcessDataFilePointer(pdsXlater, true); 
+      ProcessDataFilePointer(pdsXlater, true);
     }
     // If the data is in JPEG 2000 format, then use the name of the file
     // from the label
     else if(p_jp2File.length() > 0) {
       SetInputFile(p_jp2File);
-      ProcessDataFilePointer(pdsXlater, true); 
+      ProcessDataFilePointer(pdsXlater, true);
     }
     // Use the "^IMAGE or ^QUBE" label to get the filename for the image data
     // Get the path portion from user entered label file spec
     else {
       // Handle filename and offset
-      ProcessDataFilePointer(pdsXlater, false); 
+      ProcessDataFilePointer(pdsXlater, false);
     }
 
     //------------------------------------------------------------
@@ -474,7 +473,7 @@ namespace Isis {
     }
     else {
       string msg = "Unsupported axis order [" + str + "]";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
 
@@ -490,9 +489,9 @@ namespace Isis {
    *
    * @param transFile
    *
-   * @throws Isis::iException::Message 
-   *  
-   * @history 2010-12-09 Sharmila Prasad - Set default offset to be 1 for detatched label 
+   * @throws Isis::iException::Message
+   *
+   * @history 2010-12-09 Sharmila Prasad - Set default offset to be 1 for detatched label
    *                                       and offset not set
    */
   void ProcessImportPds::ProcessPdsQubeLabel(const std::string &pdsDataFile,
@@ -525,7 +524,7 @@ namespace Isis {
       }
       else {
         string message = "Unknown file axis name [" + str + "]";
-        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+        throw IException(IException::User, message, _FILEINFO_);
       }
     }
 
@@ -548,7 +547,7 @@ namespace Isis {
       pdsCoreOrgStream << pdsCoreOrg;
 
       string msg = "Unsupported axis order [" + pdsCoreOrgStream.str() + "]";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
 
@@ -572,7 +571,7 @@ namespace Isis {
     trailer += suffix;
     SetDataTrailerBytes(trailer);
 
-    ProcessPixelBitandType(pdsXlater); 
+    ProcessPixelBitandType(pdsXlater);
 
     // Set the byte order
     str = pdsXlater.Translate("CoreByteOrder");
@@ -606,11 +605,11 @@ namespace Isis {
       SetInputFile(p_jp2File);
       ProcessDataFilePointer(pdsXlater, true);
     }
-    else { 
+    else {
       // Handle filename and offset
       ProcessDataFilePointer(pdsXlater, false);
     }
-       
+
 
     //------------------------------------------------------------
     // Find the image data base and multiplier
@@ -749,7 +748,7 @@ namespace Isis {
 
     if(lab.FindGroup("Mapping").HasKeyword("CenterLongitude")) {
       PvlKeyword &centerLon = lab.FindGroup("Mapping")["CenterLongitude"];
-      if(p_longitudeDomain == 180) 
+      if(p_longitudeDomain == 180)
         centerLon = Projection::To180Domain((double)centerLon);
       else
         centerLon = Projection::To360Domain((double)centerLon);
@@ -757,7 +756,7 @@ namespace Isis {
 
     if(lab.FindGroup("Mapping").HasKeyword("PoleLongitude")) {
       PvlKeyword &poleLon = lab.FindGroup("Mapping")["PoleLongitude"];
-      if(p_longitudeDomain == 180) 
+      if(p_longitudeDomain == 180)
         poleLon = Projection::To180Domain((double)poleLon);
       else
         poleLon = Projection::To360Domain((double)poleLon);
@@ -799,7 +798,7 @@ namespace Isis {
     }
     else {
       string message = "No projection name in labels";
-      throw Isis::iException::Message(Isis::iException::Projection, message, _FILEINFO_);
+      throw IException(IException::Unknown, message, _FILEINFO_);
     }
 
     if(pdsXlater.InputHasKeyword("TargetName")) {
@@ -807,7 +806,7 @@ namespace Isis {
     }
     else {
       string message = "No target name in labels";
-      throw Isis::iException::Message(Isis::iException::Projection, message, _FILEINFO_);
+      throw IException(IException::Unknown, message, _FILEINFO_);
     }
 
     if(pdsXlater.InputHasKeyword("EquatorialRadius")) {
@@ -816,7 +815,7 @@ namespace Isis {
     }
     else {
       string message = "No equatorial radius name in labels";
-      throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+      throw IException(IException::User, message, _FILEINFO_);
     }
 
     if(pdsXlater.InputHasKeyword("PolarRadius")) {
@@ -825,7 +824,7 @@ namespace Isis {
     }
     else {
       string message = "No polar radius in labels";
-      throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+      throw IException(IException::User, message, _FILEINFO_);
     }
 
     if(pdsXlater.InputHasKeyword("LongitudeDirection")) {
@@ -850,8 +849,7 @@ namespace Isis {
       try {
         p_minimumLatitude = str.ToDouble();
       }
-      catch(Isis::iException &e) {
-        e.Clear();
+      catch(IException &e) {
         p_minimumLatitude = Isis::NULL8;
       }
     }
@@ -864,8 +862,7 @@ namespace Isis {
       try {
         p_maximumLatitude = str.ToDouble();
       }
-      catch(Isis::iException &e) {
-        e.Clear();
+      catch(IException &e) {
         p_maximumLatitude = Isis::NULL8;
       }
     }
@@ -882,8 +879,7 @@ namespace Isis {
         positiveWest = true;
         p_minimumLongitude = str.ToDouble();
       }
-      catch(Isis::iException &e) {
-        e.Clear();
+      catch(IException &e) {
         p_minimumLongitude = Isis::NULL8;
       }
     }
@@ -892,8 +888,7 @@ namespace Isis {
       try {
         p_minimumLongitude = str.ToDouble();
       }
-      catch(Isis::iException &e) {
-        e.Clear();
+      catch(IException &e) {
         p_minimumLongitude = Isis::NULL8;
       }
     }
@@ -907,8 +902,7 @@ namespace Isis {
         positiveWest = true;
         p_maximumLongitude = str.ToDouble();
       }
-      catch(Isis::iException &e) {
-        e.Clear();
+      catch(IException &e) {
         p_maximumLongitude = Isis::NULL8;
       }
     }
@@ -917,8 +911,7 @@ namespace Isis {
       try {
         p_maximumLongitude = str.ToDouble();
       }
-      catch(Isis::iException &e) {
-        e.Clear();
+      catch(IException &e) {
         p_maximumLongitude = Isis::NULL8;
       }
     }
@@ -981,10 +974,9 @@ namespace Isis {
       str = pdsXlater.Translate("Rotation");
       p_rotation = str.ToDouble();
     }
-    catch(iException &e) {
+    catch(IException &) {
       // assume no rotation if the value isn't a number
       p_rotation = 0.0;
-      e.Clear(); 
     }
 
     //  Look for projection offsets/mults to convert between line/samp and x/y

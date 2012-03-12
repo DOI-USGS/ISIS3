@@ -5,7 +5,7 @@
 #include <string>
 
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "NaifStatus.h"
 #include "ProcessImportPds.h"
@@ -48,10 +48,10 @@ void IsisMain() {
       ConvertComments(in);
       tempFile = true;
     }
-    catch(iException &e) {
-      throw iException::Message(iException::Io,
-                                "Unable to decompress input file ["
-                                + in.Name() + "].", _FILEINFO_);
+    catch(IException &e) {
+      throw IException(IException::Io,
+                       "Unable to decompress input file ["
+                       + in.Name() + "].", _FILEINFO_);
     }
   }
   else if (ext == "IMG") {
@@ -60,17 +60,17 @@ void IsisMain() {
   else {
     string msg = "Input file [" + in.Name() +
                  "] does not appear to be a Voyager EDR";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
   // Convert the pds file to a cube
   Pvl pdsLabel;
   try {
     p.SetPdsFile(in.Expanded(), "", pdsLabel);
   }
-  catch(iException &e) {
+  catch(IException &e) {
     string msg = "Unable to set PDS file.  Decompressed input file ["
                  + in.Name() + "] does not appear to be a PDS product";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   Cube *ocube = p.SetOutputCube("TO");
@@ -183,7 +183,7 @@ void TranslateVoyagerLabels(Pvl &inputLabel, Cube *ocube) {
     else {
       string msg = "Instrument ID [" + instId + "] does not match Narrow or" +
                    "Wide angle camera";
-      iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
   else if((string) inst.FindKeyword("SpacecraftName") == "VOYAGER_2") {
@@ -201,13 +201,13 @@ void TranslateVoyagerLabels(Pvl &inputLabel, Cube *ocube) {
     else {
       string msg = "Instrument ID [" + instId + "] does not match Narrow or" +
                    "Wide angle camera";
-      iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
   else {
     string msg = "Spacecraft name [" + (string)inst.FindKeyword("SpacecraftName") +
                  "] does not match Voyager1 or Voyager2 spacecraft";
-    iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
   ocube->putGroup(kern);
 

@@ -84,7 +84,7 @@ namespace Isis {
       AddMeasure(newMeasure);
 
       if (other.referenceMeasure == i.value())
-        SetRefMeasure(newMeasure); 
+        SetRefMeasure(newMeasure);
     }
 
     id = other.id;
@@ -150,7 +150,7 @@ namespace Isis {
         break;
       default:
         iString msg = "Point type is invalid.";
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+        throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     ignore = fileEntry.ignore();
@@ -431,7 +431,7 @@ namespace Isis {
         iString msg = "The SerialNumber is not unique. A measure with "
             "serial number [" + measure->GetCubeSerialNumber() + "] already "
             "exists for ControlPoint [" + GetId() + "]";
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       }
     }
 
@@ -471,7 +471,7 @@ namespace Isis {
     if (!measures->contains(serialNumber)) {
       iString msg = "No measure with serial number [" + serialNumber +
           "] is owned by this point";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
 
@@ -542,7 +542,7 @@ namespace Isis {
   int ControlPoint::Delete(int index) {
     if (index < 0 || index >= cubeSerials->size()) {
       iString msg = "index [" + iString(index) + "] out of bounds";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     return Delete(cubeSerials->at(index));
@@ -597,7 +597,7 @@ namespace Isis {
   const ControlMeasure *ControlPoint::GetMeasure(int index) const {
     if (index < 0 || index >= cubeSerials->size()) {
       iString msg = "Index [" + iString(index) + "] out of range";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     return GetMeasure(cubeSerials->at(index));
@@ -607,7 +607,7 @@ namespace Isis {
   ControlMeasure *ControlPoint::GetMeasure(int index) {
     if (index < 0 || index >= cubeSerials->size()) {
       iString msg = "Index [" + iString(index) + "] out of range";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     return GetMeasure(cubeSerials->at(index));
@@ -622,7 +622,7 @@ namespace Isis {
   const ControlMeasure *ControlPoint::GetRefMeasure() const {
     if (referenceMeasure == NULL) {
       iString msg = "Control point [" + GetId() + "] has no reference measure!";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     return referenceMeasure;
@@ -635,7 +635,7 @@ namespace Isis {
   ControlMeasure *ControlPoint::GetRefMeasure() {
     if (referenceMeasure == NULL) {
       iString msg = "Control point [" + GetId() + "] has no reference measure!";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     return referenceMeasure;
@@ -747,7 +747,7 @@ namespace Isis {
     if (index < 0 || index >= cubeSerials->size()) {
       iString msg = "Index [";
       msg += index + "] out of range";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     SetExplicitReference((*measures)[cubeSerials->at(index)]);
@@ -767,7 +767,7 @@ namespace Isis {
     if (!cubeSerials->contains(sn)) {
       iString msg = "Point [" + id + "] has no measure with serial number [" +
           sn + "]";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     SetExplicitReference((*measures)[sn]);
@@ -837,13 +837,13 @@ namespace Isis {
    *   the point on the surface of the planet that the measures are tied to.
    *   This updates the last modified attributes of this point.
    *     *** Warning:  Only BundleAdjust and its applications should be
-   *                   using this method.  
+   *                   using this method.
    *
    * @param newSurfacePoint The point on the target's surface the measures are
    *                        tied to
    *
    * @internal
-   *   @history 2011-07-01 Debbie A. Cook  Removed editLock check 
+   *   @history 2011-07-01 Debbie A. Cook  Removed editLock check
    */
   ControlPoint::Status ControlPoint::SetAdjustedSurfacePoint(
     SurfacePoint newSurfacePoint) {
@@ -865,7 +865,7 @@ namespace Isis {
     if (type != Fixed && type != Free && type != Constrained) {
       iString msg = "Invalid Point Enumeration, [" + iString(type) + "], for "
           "Control Point [" + GetId() + "]";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if (editLock)
@@ -1020,7 +1020,7 @@ namespace Isis {
       if (!aprioriSurfacePoint.Valid()) {
         iString msg = "ControlPoint [" + GetId() + "] is a fixed point ";
         msg += "and requires an apriori x/y/z";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
       // Don't return until after the FocalPlaneMeasures have been set
       //      return;
@@ -1049,7 +1049,7 @@ namespace Isis {
         Camera *cam = m->Camera();
         if (cam == NULL) {
           iString msg = "The Camera must be set prior to calculating apriori";
-          throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+          throw IException(IException::Programmer, msg, _FILEINFO_);
         }
         if (cam->SetImage(m->GetSample(), m->GetLine())) {
           goodMeasures++;
@@ -1074,7 +1074,7 @@ namespace Isis {
           iString msg = "Cannot compute lat/lon/radius (x/y/z) for "
               "ControlPoint [" + GetId() + "], measure [" +
               m->GetCubeSerialNumber() + "]";
-          throw iException::Message(iException::User, msg, _FILEINFO_);
+          throw IException(IException::User, msg, _FILEINFO_);
 
           // m->SetFocalPlaneMeasured(?,?);
         }
@@ -1096,7 +1096,7 @@ namespace Isis {
     if (goodMeasures == 0) {
       iString msg = "ControlPoint [" + GetId() + "] has no measures which "
           "project to lat/lon/radius (x/y/z)";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     // Compute the averages
@@ -1132,7 +1132,7 @@ namespace Isis {
   /**
    * This method computes the BundleAdjust residuals for a point.
    *     *** Warning:  Only BundleAdjust and its applications should be
-   *                   using this method.  
+   *                   using this method.
    *
    * @history 2008-07-17 Tracie Sucharski,  Added ptid and measure serial
    *                            number to the unable to map to surface error.
@@ -1191,7 +1191,7 @@ namespace Isis {
         if (!fpmap->SetFocalPlane(m->GetFocalPlaneComputedX(), m->GetFocalPlaneComputedY())) {
           iString msg = "Sanity check #1 for ControlPoint [" + GetId() +
               "], ControlMeasure [" + m->GetCubeSerialNumber() + "]";
-          throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+          throw IException(IException::Programmer, msg, _FILEINFO_);
           // This error shouldn't happen but check anyways
         }
 
@@ -1212,7 +1212,7 @@ namespace Isis {
               GetId() + "], ControlMeasure [" +
               m->GetCubeSerialNumber() + "]" +
               " does not map into image";
-          throw iException::Message(iException::User, msg, _FILEINFO_);
+          throw IException(IException::User, msg, _FILEINFO_);
         }
 
         cuSamp = cam->Sample();
@@ -1227,7 +1227,7 @@ namespace Isis {
         if (!fpmap->SetFocalPlane(m->GetFocalPlaneMeasuredX(), m->GetFocalPlaneMeasuredY())) {
           iString msg = "Sanity check #2 for ControlPoint [" + GetId() +
               "], ControlMeasure [" + m->GetCubeSerialNumber() + "]";
-          throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+          throw IException(IException::Programmer, msg, _FILEINFO_);
           // This error shouldn't happen but check anyways
         }
         muSamp = fpmap->DetectorSample();
@@ -1430,15 +1430,12 @@ namespace Isis {
 
     if (pointTypeString == "Fixed")
       type = ControlPoint::Fixed;
+    else if (pointTypeString == "Constrained")
+      type = ControlPoint::Constrained;
+    else if (pointTypeString == "Free")
+      type = ControlPoint::Free;
     else
-      if (pointTypeString == "Constrained")
-        type = ControlPoint::Constrained;
-      else
-        if (pointTypeString == "Free")
-          type = ControlPoint::Free;
-        else
-          throw iException::Message(iException::Programmer,
-                                    errMsg, _FILEINFO_);
+      throw IException(IException::Programmer, errMsg, _FILEINFO_);
 
     return type;
   }
@@ -1735,7 +1732,7 @@ namespace Isis {
     if (referenceMeasure == NULL) {
       iString msg = "There is no reference measure set in the ControlPoint [" +
           GetId() + "]";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     return referenceMeasure->GetCubeSerialNumber();
@@ -1770,7 +1767,7 @@ namespace Isis {
     if (throws && index == -1) {
       iString msg = "ControlMeasure [" + sn + "] does not exist in point [" +
           id + "]";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     return index;
@@ -1789,7 +1786,7 @@ namespace Isis {
     if (!referenceMeasure) {
       iString msg = "There is no reference measure for point [" + id + "]."
           "  This also means of course that the point is empty!";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     int index = cubeSerials->indexOf(referenceMeasure->GetCubeSerialNumber());
@@ -1926,8 +1923,8 @@ namespace Isis {
    *
    * @param other The other point to compare to
    *
-   * @returns true if the two points are equal, and false otherwise 
-   * 
+   * @returns true if the two points are equal, and false otherwise
+   *
    */
   bool ControlPoint::operator==(const ControlPoint &other) const {
     return other.GetNumMeasures() == GetNumMeasures() &&
@@ -1953,7 +1950,7 @@ namespace Isis {
    * @param pPoint
    *
    * @return ControlPoint&
-   *  
+   *
    * @internal
    *   @history 2011-09-13 Eric Hyer,Tracie Sucharski - Changed input parameter
    *                          to const &.  Re-wrote using Delete and AddMeasure
@@ -1962,7 +1959,7 @@ namespace Isis {
    *   @history 2011-09-30 Tracie Sucharski - Fixed some memory leaks and
    *                          deleted some calls that were already handled in
    *                          AddMeasure.
-   *   @history 2011-10-03 Tracie Sucharski - Unlock measures before Deleting                         
+   *   @history 2011-10-03 Tracie Sucharski - Unlock measures before Deleting
    */
   const ControlPoint &ControlPoint::operator=(const ControlPoint &other) {
 

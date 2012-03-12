@@ -1,7 +1,7 @@
 #include <sstream>
 #include "PvlTranslationManager.h"
 #include "Preference.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "Preference.h"
 
@@ -164,16 +164,16 @@ int main(void) {
     try {
       transMgr.InputKeyword("BadGroup");
     }
-    catch(Isis::iException &e) {
+    catch(Isis::IException &e) {
       cerr << "    ";
-      e.Report(false);
+      e.print();
     }
     try {
       transMgr.InputKeyword("GoodGroupBadKey");
     }
-    catch(Isis::iException &e) {
+    catch(Isis::IException &e) {
       cerr << "    ";
-      e.Report(false);
+      e.print();
     }
     cout << endl;
 
@@ -184,16 +184,16 @@ int main(void) {
     try {
       transMgr.InputKeyword("BadGroup").Unit();
     }
-    catch(Isis::iException &e) {
+    catch(Isis::IException &e) {
       cerr << "    ";
-      e.Report(false);
+      e.print();
     }
     try {
       transMgr.InputKeyword("GoodGroupBadKey").Unit();
     }
-    catch(Isis::iException &e) {
+    catch(Isis::IException &e) {
       cerr << "    ";
-      e.Report(false);
+      e.print();
     }
     cout << endl;
 
@@ -204,16 +204,16 @@ int main(void) {
     try {
       transMgr.InputKeyword("BadGroup").Size();
     }
-    catch(Isis::iException &e) {
+    catch(Isis::IException &e) {
       cerr << "    ";
-      e.Report(false);
+      e.print();
     }
     try {
       transMgr.InputKeyword("GoodGroupBadKey").Size();
     }
-    catch(Isis::iException &e) {
+    catch(Isis::IException &e) {
       cerr << "    ";
-      e.Report(false);
+      e.print();
     }
     cout << endl;
 
@@ -240,8 +240,8 @@ int main(void) {
 
 
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   return 0;

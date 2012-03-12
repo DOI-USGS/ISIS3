@@ -1,7 +1,7 @@
 #include <cmath>
 #include "Mixed.h"
 #include "SpecialPixel.h"
-#include "iException.h"
+#include "IException.h"
 
 namespace Isis {
   Mixed::Mixed(Pvl &pvl, PhotoModel &pmodel) : NormModel(pvl, pmodel) {
@@ -61,7 +61,7 @@ namespace Isis {
 
     if(p_psurfref == 0.0) {
       std::string err = "Divide by zero error";
-      throw iException::Message(iException::Math, err, _FILEINFO_);
+      throw IException(IException::Unknown, err, _FILEINFO_);
     }
     else {
       p_rhobar = p_normAlbedo / p_psurfref;
@@ -76,7 +76,7 @@ namespace Isis {
     double arg = pow(p_psurfref, 2.0) + pow(p_psurfmatch * pprimeref / std::max(1.0e-30, p_pprimematch), 2.0);
     if((arg < 1.0e-10) || (arg > 1.0e10)) {
       std::string err = "Bad reference state encountered";
-      throw iException::Message(iException::Math, err, _FILEINFO_);
+      throw IException(IException::Unknown, err, _FILEINFO_);
     }
 
     p_anum = sqrt(arg);
@@ -84,7 +84,7 @@ namespace Isis {
   }
 
   void Mixed::NormModelAlgorithm(double phase, double incidence, double emission,
-                                 double demincidence, double dememission, double dn, 
+                                 double demincidence, double dememission, double dn,
                                  double &albedo, double &mult, double &base) {
     static double psurf;
     static double pprime;
@@ -137,7 +137,7 @@ namespace Isis {
     if(pharef < 0.0 || pharef >= 180.0) {
       std::string msg = "Invalid value of normalization pharef [" +
                         iString(pharef) + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     p_normPharef = pharef;
@@ -156,7 +156,7 @@ namespace Isis {
     if(incref < 0.0 || incref >= 90.0) {
       std::string msg = "Invalid value of normalization incref [" +
                         iString(incref) + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     p_normIncref = incref;
@@ -175,7 +175,7 @@ namespace Isis {
     if(emaref < 0.0 || emaref >= 90.0) {
       std::string msg = "Invalid value of normalization emaref [" +
                         iString(emaref) + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     p_normEmaref = emaref;
@@ -195,7 +195,7 @@ namespace Isis {
     if(phamat < 0.0 || phamat >= 180.0) {
       std::string msg = "Invalid value of normalization phamat [" +
                         iString(phamat) + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     p_normPhamat = phamat;
@@ -215,7 +215,7 @@ namespace Isis {
     if(incmat < 0.0 || incmat >= 90.0) {
       std::string msg = "Invalid value of normalization incmat [" +
                         iString(incmat) + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     p_normIncmat = incmat;
@@ -235,7 +235,7 @@ namespace Isis {
     if(emamat < 0.0 || emamat >= 90.0) {
       std::string msg = "Invalid value of normalization emamat [" +
                         iString(emamat) + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     p_normEmamat = emamat;

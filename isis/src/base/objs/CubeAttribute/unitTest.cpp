@@ -21,7 +21,7 @@
 
 #include <iostream>
 #include <string>
-#include "iException.h"
+#include "IException.h"
 #include "Preference.h"
 #include "CubeAttribute.h"
 #include "EndianSwapper.h"
@@ -43,8 +43,8 @@ int main(int argc, char *argv[]) {
     delete att;
     cout << endl;
   }
-  catch(Isis::iException &error) {
-    error.Report(false);
+  catch(Isis::IException &error) {
+    error.print();
   }
   cout << endl << endl;
 
@@ -61,8 +61,8 @@ int main(int argc, char *argv[]) {
     cout << pvl << endl;
     cout << endl;
   }
-  catch(Isis::iException &error) {
-    error.Report(false);
+  catch(Isis::IException &error) {
+    error.print();
   }
   cout << endl << endl;
 
@@ -74,8 +74,8 @@ int main(int argc, char *argv[]) {
     cout << endl << endl;
     delete att;
   }
-  catch(Isis::iException &error) {
-    error.Report(true);
+  catch(Isis::IException &error) {
+    error.print();
   }
   cout << endl << endl;
 
@@ -87,8 +87,8 @@ int main(int argc, char *argv[]) {
     cout << endl << endl;
     delete att;
   }
-  catch(Isis::iException &error) {
-    error.Report(true);
+  catch(Isis::IException &error) {
+    error.print();
   }
   cout << endl << endl;
 
@@ -100,8 +100,8 @@ int main(int argc, char *argv[]) {
     cout << endl << endl;
     delete att;
   }
-  catch(Isis::iException &error) {
-    error.Report(false);
+  catch(Isis::IException &error) {
+    error.print();
   }
   cout << endl << endl;
 
@@ -113,8 +113,8 @@ int main(int argc, char *argv[]) {
     cout << endl << endl;
     delete att;
   }
-  catch(Isis::iException &error) {
-    error.Report(false);
+  catch(Isis::IException &error) {
+    error.print();
   }
   cout << endl << endl;
 
@@ -126,8 +126,8 @@ int main(int argc, char *argv[]) {
     cout << endl << endl;
     delete att;
   }
-  catch(Isis::iException &error) {
-    error.Report(false);
+  catch(Isis::IException &error) {
+    error.print();
   }
   cout << endl << endl;
 
@@ -139,8 +139,8 @@ int main(int argc, char *argv[]) {
     cout << endl << endl;
     delete att;
   }
-  catch(Isis::iException &error) {
-    error.Report(false);
+  catch(Isis::IException &error) {
+    error.print();
   }
   cout << endl << endl;
 
@@ -152,8 +152,8 @@ int main(int argc, char *argv[]) {
     cout << endl << endl;
     delete att;
   }
-  catch(Isis::iException &error) {
-    error.Report(false);
+  catch(Isis::IException &error) {
+    error.print();
   }
   cout << endl << endl;
 
@@ -171,8 +171,8 @@ int main(int argc, char *argv[]) {
     cout << pvl << endl;
     delete att;
   }
-  catch(Isis::iException &error) {
-    error.Report(false);
+  catch(Isis::IException &error) {
+    error.print();
   }
   cout << endl << endl;
 
@@ -189,8 +189,8 @@ int main(int argc, char *argv[]) {
     cout << pvl << endl;
     delete att;
   }
-  catch(Isis::iException &error) {
-    error.Report(false);
+  catch(Isis::IException &error) {
+    error.print();
   }
   cout << endl << endl;
 
@@ -207,8 +207,8 @@ int main(int argc, char *argv[]) {
     cout << pvl << endl;
     delete att;
   }
-  catch(Isis::iException &error) {
-    error.Report(false);
+  catch(Isis::IException &error) {
+    error.print();
   }
   cout << endl << endl;
 
@@ -225,8 +225,8 @@ int main(int argc, char *argv[]) {
     att->Write(cout);
     delete att;
   }
-  catch(Isis::iException &error) {
-    error.Report(false);
+  catch(Isis::IException &error) {
+    error.print();
   }
   cout << endl << endl;
 
@@ -246,8 +246,8 @@ void ReportOutput(Isis::CubeAttributeOutput *att, string orderHint) {
     string tmp =   Isis::PixelTypeName(att->PixelType());
     cout << "PixelType            = " << tmp << endl;
   }
-  catch(Isis::iException &error) {
-    error.Report(false);
+  catch(Isis::IException &error) {
+    error.print();
   }
   cout << "Propagate Min/Max    = " << att->PropagateMinimumMaximum() << endl;
   cout << "Minimum              = " << att->Minimum() << endl;

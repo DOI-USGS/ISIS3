@@ -171,7 +171,7 @@ void TranslateUoACassiniLabels(Pvl &labelPvl, Cube *ocube) {
   else {
     string msg = "CISS2ISIS only imports Cassini ISS narrow ";
     msg += "angle or wide angle images";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
   outLabel->FindObject("IsisCube").AddGroup(kerns);
 
@@ -206,7 +206,7 @@ void TranslateUoACassiniLabels(Pvl &labelPvl, Cube *ocube) {
   if(!foundfilter) {
     string msg = "Camera Angle Lookup Failed: ";
     msg += "Filter combination " + filter + " unknown.";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
   PvlGroup bandBin("BandBin");
   bandBin += PvlKeyword("FilterName", filter);

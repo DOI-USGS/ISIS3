@@ -67,13 +67,13 @@ namespace Isis {
       Pvl pvl(p_templateFilename);
       p_autoRegFact = AutoRegFactory::Create(pvl);
     }
-    catch ( iException &e ) {
+    catch (IException &e) {
       p_autoRegFact = NULL;
-      e.Message(iException::Io,
-                "Cannot create AutoRegFactory.  As a result, sub-pixel registration will not work.",
-                _FILEINFO_);
-      QString message = e.Errors().c_str();
-      e.Clear();
+      IException fullError(e, IException::Io,
+                           "Cannot create AutoRegFactory. As a result, "
+                           "sub-pixel registration will not work.",
+                           _FILEINFO_);
+      QString message = fullError.toString();
       QMessageBox::information((QWidget *)parent, "Error", message);
     }
 
@@ -683,10 +683,9 @@ namespace Isis {
         p_rightChip->Load(*p_rightCube, *p_leftChip, *p_leftCube);
 
       }
-      catch ( iException &e ) {
-        e.Message(iException::User, "Geom failed.", _FILEINFO_);
-        QString message = e.Errors().c_str();
-        e.Clear();
+      catch (IException &e) {
+        IException fullError(e, IException::User, "Geom failed.", _FILEINFO_);
+        QString message = fullError.toString();
         QMessageBox::information((QWidget *)parent(), "Error", message);
         p_rightChip->Load(*p_rightCube);
         p_geomIt = false;
@@ -789,10 +788,10 @@ namespace Isis {
 
   /**
    * Find point from left ChipViewport in the right ChipViewport
-   * 
-   * @author tsucharski (6/27/2011) 
-   *  
-   * @history 2011-06-27 Tracie Sucharski - If measure moves to different 
+   *
+   * @author tsucharski (6/27/2011)
+   *
+   * @history 2011-06-27 Tracie Sucharski - If measure moves to different
    *                        samp/line than saved measure, change save button
    *                        to red.
    */
@@ -878,11 +877,10 @@ namespace Isis {
       p_autoRegFact->SearchChip()->Load(*p_rightCube,
                           *(p_autoRegFact->PatternChip()), *p_leftCube);
     }
-    catch ( iException &e ) {
-      QString msg = "Cannot register this point, unable to Load chips.";
-      msg += e.Errors().c_str();
+    catch (IException &e) {
+      QString msg = "Cannot register this point, unable to Load chips.\n";
+      msg += e.toString().ToQt();
       QMessageBox::information((QWidget *)parent(), "Error", msg);
-      e.Clear();
       return;
     }
 
@@ -947,11 +945,10 @@ namespace Isis {
         return;
       }
     }
-    catch ( iException &e ) {
-      QString msg = "Cannot register this point.";
-      msg += e.Errors().c_str();
+    catch (IException &e) {
+      QString msg = "Cannot register this point.\n";
+      msg += e.toString().ToQt();
       QMessageBox::information((QWidget *)parent(), "Error", msg);
-      e.Clear();
       return;
     }
 
@@ -1004,7 +1001,7 @@ namespace Isis {
    *                          and current coordinate.  If autoreg has been
    *                          calculated, save coordinate to apriori before
    *                          updating to subpixel registered coordinate.
-   *  
+   *
    */
   void ControlPointEdit::saveMeasure() {
 
@@ -1101,17 +1098,15 @@ namespace Isis {
         p_rightView->geomChip(p_leftChip, p_leftCube);
 
       }
-      catch ( iException &e ) {
-        e.Message(iException::User, "Geom failed.", _FILEINFO_);
-        QString message = e.Errors().c_str();
-        e.Clear();
+      catch (IException &e) {
+        IException fullError(e, IException::User, "Geom failed.", _FILEINFO_);
+        QString message = fullError.toString();
         QMessageBox::information((QWidget *)parent(), "Error", message);
         p_geomIt = false;
         p_nogeom->setChecked(true);
         p_geom->setChecked(false);
       }
     }
-
   }
 
 
@@ -1164,10 +1159,9 @@ namespace Isis {
       p_rightView->geomChip(p_leftChip, p_leftCube);
 
     }
-    catch ( iException &e ) {
-      e.Message(iException::User, "Geom failed.", _FILEINFO_);
-      QString message = e.Errors().c_str();
-      e.Clear();
+    catch (IException &e) {
+      IException fullError(e, IException::User, "Geom failed.", _FILEINFO_);
+      QString message = fullError.toString();
       QMessageBox::information((QWidget *)parent(), "Error", message);
       p_geomIt = false;
       p_nogeom->setChecked(true);
@@ -1332,15 +1326,15 @@ namespace Isis {
       p_templateFilename = fn.toStdString();
       return true;
     }
-    catch ( iException &e ) {
+    catch (IException &e) {
       // set templateFilename back to its original value
       p_templateFilename = temp;
-      e.Message(iException::Io, "Cannot create AutoRegFactory for " +
-                fn.toStdString() +
-                ".  As a result, current template file will remain set to " +
-                p_templateFilename, _FILEINFO_);
-      QString message = e.Errors().c_str();
-      e.Clear();
+      IException fullError(e, IException::Io,
+          "Cannot create AutoRegFactory for " +
+          fn.toStdString() +
+          ".  As a result, current template file will remain set to " +
+          p_templateFilename, _FILEINFO_);
+      QString message = fullError.toString();
       QMessageBox::information((QWidget *)parent(), "Error", message);
       return false;
     }

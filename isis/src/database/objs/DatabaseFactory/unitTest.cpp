@@ -46,8 +46,8 @@ int main(int argc, char *argv[]) {
     cout << "Attempting to create a database connection" << endl;
     df->create("doesntexist");
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   Database d;
@@ -60,8 +60,8 @@ int main(int argc, char *argv[]) {
     df->create("test db");
     cout << "Done." << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   cout << "Is Available: " << df->isAvailable("test db") << endl;

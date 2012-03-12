@@ -22,12 +22,12 @@ Percent(99.5):       5
 BinCount(0):         0
 BinCount(20):      0
 
-**PROGRAMMER ERROR** Invalid Range: Minimum [1.0] must be less than the Maximum [0.0]
-**PROGRAMMER ERROR** Argument percent outside of the range 0 to 100 in [Histogram::Percent]
-**PROGRAMMER ERROR** Argument percent outside of the range 0 to 100 in [Histogram::Percent]
-**PROGRAMMER ERROR** Array subscript [-1] is out of array bounds
-**PROGRAMMER ERROR** Array subscript [1024] is out of array bounds
-**PROGRAMMER ERROR** Array subscript [-1] is out of array bounds
-**PROGRAMMER ERROR** Array subscript [1024] is out of array bounds
-**PROGRAMMER ERROR** Array subscript [-1] is out of array bounds
-**PROGRAMMER ERROR** Array subscript [1024] is out of array bounds
+**PROGRAMMER ERROR** Invalid Range: Minimum [1.0] must be less than the Maximum [0.0].
+**PROGRAMMER ERROR** Argument percent outside of the range 0 to 100 in [Histogram::Percent].
+**PROGRAMMER ERROR** Argument percent outside of the range 0 to 100 in [Histogram::Percent].
+**PROGRAMMER ERROR** Array subscript [-1] is out of array bounds.
+**PROGRAMMER ERROR** Array subscript [1024] is out of array bounds.
+**PROGRAMMER ERROR** Array subscript [-1] is out of array bounds.
+**PROGRAMMER ERROR** Array subscript [1024] is out of array bounds.
+**PROGRAMMER ERROR** Array subscript [-1] is out of array bounds.
+**PROGRAMMER ERROR** Array subscript [1024] is out of array bounds.

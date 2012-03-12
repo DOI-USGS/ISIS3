@@ -9,13 +9,13 @@ ABCD61EFG
 ABCD71EFG
 ABCD81EFG
 ABCD91EFG
-**USER ERROR** Maximum number reached for string [ABCD??EFG]
+**USER ERROR** Maximum number reached for string [ABCD??EFG].
 
 Test 2: No '?' test
-**USER ERROR** No replacement set in string [Serial]
+**USER ERROR** No replacement set in string [Serial].
 
 Test 3: Broken replacement string
-**USER ERROR** iString [Serial??Number??] contains more than one replacement set
+**USER ERROR** iString [Serial??Number??] contains more than one replacement set.
 
 Test 4: differing start numbers
 Test00

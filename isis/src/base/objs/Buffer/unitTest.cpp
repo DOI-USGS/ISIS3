@@ -1,6 +1,6 @@
 #include <iostream>
 #include "Buffer.h"
-#include "iException.h"
+#include "IException.h"
 #include "Preference.h"
 
 using namespace std;
@@ -10,10 +10,10 @@ class Test : public Buffer {
   public:
     Test(int s, int l, int b) : Isis::Buffer(s, l, b, Isis::SignedInteger) {};
     ~Test() {};
-    void Report();
+    void print();
 };
 
-void Test::Report() {
+void Test::print() {
   SetBasePosition(3, 2, 1);
   cout << "Sample():         " << Sample() << endl;
   cout << "Line():           " << Line() << endl;
@@ -66,7 +66,7 @@ int main(int argc, char *argv[]) {
   cout << "b[10]:            " << b[10] << endl;
   cout << "b[23]:            " << b[23] << endl << endl;
 
-  b.Report();
+  b.print();
 
   Test a = b;
   if(a.DoubleBuffer() != b.DoubleBuffer()) {
@@ -103,15 +103,15 @@ int main(int argc, char *argv[]) {
   try {
     a.at(-1);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   try {
     a.at(24);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   try {
@@ -120,8 +120,8 @@ int main(int argc, char *argv[]) {
 
     a2.Copy(b2);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   return 0;

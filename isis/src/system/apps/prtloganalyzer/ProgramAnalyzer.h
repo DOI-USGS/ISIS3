@@ -32,7 +32,7 @@
 #include "PvlObject.h"
 #include "Statistics.h"
 #include "CollectorMap.h"
-#include "iException.h"
+#include "IException.h"
 
 namespace Isis {
 

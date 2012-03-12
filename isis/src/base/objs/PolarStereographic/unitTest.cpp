@@ -1,6 +1,6 @@
 #include <iostream>
 #include <iomanip>
-#include "iException.h"
+#include "IException.h"
 #include "PolarStereographic.h"
 #include "ProjectionFactory.h"
 #include "Preference.h"
@@ -30,8 +30,8 @@ int main(int argc, char *argv[]) {
   try {
     Isis::PolarStereographic p(lab);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
   cout << endl;
   mg += Isis::PvlKeyword("CenterLongitude", -100.0);
@@ -40,8 +40,8 @@ int main(int argc, char *argv[]) {
   try {
     Isis::PolarStereographic p(lab);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
   cout << endl;
   cout << "Test invalid center latitude keyword ..." << endl;
@@ -49,8 +49,8 @@ int main(int argc, char *argv[]) {
   try {
     Isis::PolarStereographic p(lab);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
   cout << endl;
   mg.AddKeyword(Isis::PvlKeyword("CenterLatitude", -71.0), Isis::PvlGroup::Replace);
@@ -126,7 +126,7 @@ int main(int argc, char *argv[]) {
     cout << "  USGS Professional Paper 1395 by John P. Snyder" << endl;
     cout << "  Pages 315-319" << endl;
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 }

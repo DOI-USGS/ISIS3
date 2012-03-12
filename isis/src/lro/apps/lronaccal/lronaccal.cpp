@@ -3,7 +3,7 @@
 #include "SpecialPixel.h"
 #include "Camera.h"
 #include "iTime.h"
-#include "iException.h"
+#include "IException.h"
 #include "TextFile.h"
 #include "Brick.h"
 #include "Table.h"
@@ -68,18 +68,18 @@ void IsisMain() {
   std::string instId = inst["InstrumentId"];
   if(instId != "NACL" && instId != "NACR") {
     string msg = "This is not a NAC image.  lrocnaccal requires a NAC image.";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // And check if it has already run through calibration
   if(lab.FindObject("IsisCube").HasGroup("Radiometry")) {
     string msg = "This image has already been calibrated";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   if(lab.FindObject("IsisCube").HasGroup("AlphaCube")) {
     string msg = "This application can not be run on any image that has been geometrically transformed (i.e. scaled, rotated, sheared, or reflected) or cropped.";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   if(instId == "NACL")
@@ -114,7 +114,7 @@ void IsisMain() {
       maskedFilename.HighestVersion();
     if(!maskedFilename.Exists()) {
       string msg = maskedFile + " does not exist.";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     Pvl maskedPvl(maskedFilename.Expanded());
@@ -190,7 +190,7 @@ void IsisMain() {
       radFilename.HighestVersion();
     if(!radFilename.Exists()) {
       string msg = radFile + " does not exist.";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     Pvl radPvl(radFilename.Expanded());
@@ -220,9 +220,9 @@ void IsisMain() {
         unload_c(pckKernel2.c_str());
         unload_c(pckKernel3.c_str());
       }
-      catch(iException &e) {
+      catch(IException &e) {
         string msg = "Unable to find the necessary SPICE kernels for converting to IOF";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(e, IException::User, msg, _FILEINFO_);
       }
       g_iofLeft = radPvl["IOF_LEFT"];
       g_iofRight = radPvl["IOF_RIGHT"];
@@ -332,7 +332,7 @@ void CopyCubeIntoArray(string &fileString, vector<double> &data) {
     filename.HighestVersion();
   if(!filename.Exists()) {
     string msg = fileString + " does not exist.";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
   cube.open(filename.Expanded());
   Brick brick(cube.getSampleCount(), cube.getLineCount(), cube.getBandCount(),
@@ -352,7 +352,7 @@ void ReadTextDataFile(string &fileString, vector<double> &data) {
     filename.HighestVersion();
   if(!filename.Exists()) {
     string msg = fileString + " does not exist.";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
   TextFile file(filename.Expanded());
   iString lineString;
@@ -370,7 +370,7 @@ void ReadTextDataFile(string &fileString, vector<vector<double> > &data) {
     filename.HighestVersion();
   if(!filename.Exists()) {
     string msg = fileString + " does not exist.";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
   TextFile file(filename.Expanded());
   iString lineString;

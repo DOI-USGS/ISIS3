@@ -27,7 +27,7 @@
 #include "CameraFocalPlaneMap.h"
 #include "CameraGroundMap.h"
 #include "CameraSkyMap.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "iTime.h"
 #include "NaifStatus.h"
@@ -44,16 +44,16 @@ namespace Isis {
    * This camera model does not support subframes of jailbar imaging modes.
    * An exception is thrown in those cases.
    *
-   * @param lab Pvl label from a Messenger MDIS image. 
+   * @param lab Pvl label from a Messenger MDIS image.
    *
-   * @throws iException::User - "Subframe imaging mode is not supported" 
-   * @throws iException::User - "Jail bar observations are not supported" 
-   * @throws iException::User - "New MDIS/NAC distortion model invalidates 
+   * @throws iException::User - "Subframe imaging mode is not supported"
+   * @throws iException::User - "Jail bar observations are not supported"
+   * @throws iException::User - "New MDIS/NAC distortion model invalidates
    *                 previous SPICE - you must rerun spiceinit to get new
    *                 kernels"
-   * @internal 
+   * @internal
    *   @history 2011-05-03 Jeannie Walldren - Added NAIF error check.
-   *    
+   *
    */
   MdisCamera::MdisCamera(Pvl &lab) : FramingCamera(lab) {
     NaifStatus::CheckErrors();
@@ -189,17 +189,16 @@ namespace Isis {
     // Scott Turner and Lillian Nguyen at JHUAPL.
     // (2010/10/06) The WAC now uses the same disortion model implementation.
     // Valid Taylor Series parameters are in versions msgr_mdis_v120.ti IK
-    // and above.   Note fnCode works for NAC as well as long as 
+    // and above.   Note fnCode works for NAC as well as long as
     // filterNumber stays at 0 for the NAC only!
     try {
       TaylorCameraDistortionMap *distortionMap = new TaylorCameraDistortionMap(this);
       distortionMap->SetDistortion(fnCode);
     }
-    catch(iException &ie) {
+    catch(IException &ie) {
       string msg = "New MDIS NAC/WAC distortion models will invalidate previous "
                    "SPICE - you may need to rerun spiceinit to get new kernels";
-      ie.Message(iException::User, msg, _FILEINFO_);
-      throw;
+      throw IException(ie, IException::User, msg, _FILEINFO_);
     }
 
     // Setup the ground and sky map
@@ -220,28 +219,28 @@ namespace Isis {
   }
 
 
-  /** 
+  /**
    * Returns the shutter open and close times.  The user should pass in the
    * ExposureDuration keyword value, converted from milliseconds to seconds, and
    * the SpacecraftClockCount keyword value, converted to ephemeris time. The StartTime keyword
-   * value from the labels represents the shutter open time of the observation. 
-   * This method uses the FramingCamera class implementation, returning the 
-   * given time value as the shutter open and the sum of the time value and 
-   * exposure duration as the shutter close. 
+   * value from the labels represents the shutter open time of the observation.
+   * This method uses the FramingCamera class implementation, returning the
+   * given time value as the shutter open and the sum of the time value and
+   * exposure duration as the shutter close.
    *
-   * @param exposureDuration Exposure duration value from the labels, converted 
+   * @param exposureDuration Exposure duration value from the labels, converted
    *                         to seconds.
-   * @param time The SpacecraftClockCount value from the labels, converted to ephemeris 
+   * @param time The SpacecraftClockCount value from the labels, converted to ephemeris
    *             time
    * @return @b pair < @b iTime, @b iTime > The first value is the shutter
    *         open time and the second is the shutter close time.
-   *  
-   * @see 
+   *
+   * @see
    * @author 2011-05-03 Jeannie Walldren
    * @internal
    *   @history 2011-05-03 Jeannie Walldren - Original version.
    */
-  pair <iTime, iTime> MdisCamera::ShutterOpenCloseTimes(double time, 
+  pair <iTime, iTime> MdisCamera::ShutterOpenCloseTimes(double time,
                                                         double exposureDuration) {
     return FramingCamera::ShutterOpenCloseTimes(time, exposureDuration);
   }

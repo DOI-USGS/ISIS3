@@ -20,7 +20,7 @@
 
 #include "Application.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "Preference.h"
 #include "ProgramLauncher.h"
@@ -38,7 +38,7 @@ namespace Isis {
 
   //! Singleton
   Gui *Gui::p_gui = NULL;
-  
+
   /**
    * check to see if X is available
    */
@@ -50,7 +50,7 @@ namespace Isis {
     // reports for this.  Hopefully detecting this ourselves and printing the
     // following message will help.  If not then yes, this is the message that
     // needs changing...
-    
+
     #ifdef Q_OS_LINUX
     if (!XOpenDisplay(NULL)) {
       std::cerr << "cannot connect to X server...\n\n"
@@ -61,13 +61,13 @@ namespace Isis {
           "If the possible causes cited above have been ruled out and this "
           "problem persists, then check your X settings or contact your "
           "system administrator.\n\n";
-      
+
       abort();
     }
     #endif
   }
-  
-  
+
+
   Gui *Gui::Create(Isis::UserInterface &ui, int &argc, char *argv[]) {
     // Don't recreate
     if(p_gui != NULL) return p_gui;
@@ -337,10 +337,9 @@ namespace Isis {
       Progress(100);
       ProgressText("Done");
     }
-    catch(Isis::iException &e) {
+    catch(IException &e) {
       QApplication::restoreOverrideCursor();
-      if(e.Type() == Isis::iException::Cancel) {
-        e.Clear();
+      if(e.toString() == "") {
         ProgressText("Stopped");
       }
       else {
@@ -721,7 +720,7 @@ namespace Isis {
       }
 
     }
-    catch(Isis::iException &e) {
+    catch(IException &e) {
       p_historyEntry = entries - 1;
       QApplication::beep();
       return;
@@ -745,7 +744,7 @@ namespace Isis {
       for(int i = 0; i < (int)excludeList.size(); i++) {
         for(unsigned int e = 0; e < p_parameters.size(); e++) {
           GuiParameter &exclude = *(p_parameters[e]);
-          if(exclude.Name() != excludeList[i]) continue; 
+          if(exclude.Name() != excludeList[i]) continue;
           exclude.SetEnabled(false, (param.Type()==GuiParameter::ComboWidget));
         }
       }
@@ -848,7 +847,7 @@ namespace Isis {
       helper = (void ( *)())ptr;
       helper();
     }
-    catch(Isis::iException &e) {
+    catch(IException &e) {
       Isis::iApp->GuiReportError(e);
     }
 

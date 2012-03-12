@@ -23,7 +23,7 @@
 #include <cmath>
 #include <cfloat>
 #include "LambertConformal.h"
-#include "iException.h"
+#include "IException.h"
 #include "Constants.h"
 #include "iString.h"
 
@@ -79,7 +79,7 @@ namespace Isis {
       if(fabs(p_centerLongitude) > 360.0) {
         iString message = "Central Longitude [" + iString(p_centerLongitude);
         message += "] must be between -360 and 360";
-        throw Isis::iException::Message(Isis::iException::Projection, message, _FILEINFO_);
+        throw IException(IException::Unknown, message, _FILEINFO_);
       }
 
       // convert to radians, adjust for longitude direction
@@ -99,11 +99,11 @@ namespace Isis {
       // Test to make sure standard parallels are valid
       if(fabs(p_par1) > 90.0 || fabs(p_par2) > 90.0) {
         string message = "Standard Parallels must between -90 and 90";
-        throw Isis::iException::Message(Isis::iException::Projection, message, _FILEINFO_);
+        throw IException(IException::Unknown, message, _FILEINFO_);
       }
       if(fabs(p_par1 + p_par2) < DBL_EPSILON) {
         string message = "Standard Parallels cannot be symmetric to the equator";
-        throw Isis::iException::Message(Isis::iException::Projection, message, _FILEINFO_);
+        throw IException(IException::Unknown, message, _FILEINFO_);
       }
       // Removed because this test only works for northern hemisphere
       // Just reorder the parallels so p1 is at the larger radius of the two
@@ -130,14 +130,14 @@ namespace Isis {
         iString message = "Center Latitude [" + iString(p_centerLatitude);
         message += "] is not valid, it projects to infinity for standard parallels [";
         message += iString(p_par1) + "," + iString(p_par2) + "]";
-        throw Isis::iException::Message(Isis::iException::Projection, message, _FILEINFO_);
+        throw IException(IException::Unknown, message, _FILEINFO_);
       }
       // Test for cone pointed north "^"
       else if((p_par2 > 0.0) && (fabs(-90.0 - p_centerLatitude) < DBL_EPSILON)) {
         iString message = "Center Latitude [" + iString(p_centerLatitude);
         message += "] is not valid, it projects to infinity for standard parallels [";
         message += iString(p_par1) + "," + iString(p_par2) + "]";
-        throw Isis::iException::Message(Isis::iException::Projection, message, _FILEINFO_);
+        throw IException(IException::Unknown, message, _FILEINFO_);
       }
       // convert clat to radians
       p_centerLatitude *= Isis::PI / 180.0;
@@ -171,9 +171,9 @@ namespace Isis {
       p_f = m1 / (p_n * pow(t1, p_n));
       p_rho = p_equatorialRadius * p_f * pow(tclat, p_n);
     }
-    catch(Isis::iException &e) {
+    catch(IException &e) {
       string message = "Invalid label group [Mapping]";
-      throw Isis::iException::Message(Isis::iException::Io, message, _FILEINFO_);
+      throw IException(e, IException::Io, message, _FILEINFO_);
     }
   }
 

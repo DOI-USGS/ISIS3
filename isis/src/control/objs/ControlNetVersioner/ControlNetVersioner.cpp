@@ -9,7 +9,7 @@
 #include "ControlMeasureLogData.h"
 #include "Distance.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "Latitude.h"
 #include "Longitude.h"
@@ -47,13 +47,13 @@ namespace Isis {
       }
       else {
         iString msg = "Could not determine the control network file type";
-        throw iException::Message(iException::Io, msg, _FILEINFO_);
+        throw IException(IException::Io, msg, _FILEINFO_);
       }
     }
-    catch(iException &e) {
+    catch(IException &e) {
       iString msg = "Reading the control network [" + networkFilename.fileName()
           + "] failed";
-      throw iException::Message(iException::Io, msg, _FILEINFO_);
+      throw IException(e, IException::Io, msg, _FILEINFO_);
     }
   }
 
@@ -120,7 +120,7 @@ namespace Isis {
         default:
           iString msg = "The Pvl file version [" + iString(version) + "] is not"
               " supported";
-          throw iException::Message(iException::Io, msg, _FILEINFO_);
+          throw IException(IException::Unknown, msg, _FILEINFO_);
       }
 
       version = network["Version"][0];
@@ -128,7 +128,7 @@ namespace Isis {
       if(version == previousVersion) {
         iString msg = "Cannot update from version [" + iString(version) + "] "
             "to any other version";
-          throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+          throw IException(IException::Programmer, msg, _FILEINFO_);
       }
     }
 
@@ -165,7 +165,7 @@ namespace Isis {
     if(!header.IsInitialized()) {
       iString msg = "There is missing required information in the network "
           "header";
-      throw iException::Message(iException::Io, msg, _FILEINFO_);
+      throw IException(IException::Io, msg, _FILEINFO_);
     }
 
     QList<ControlPointFileEntryV0002> &points = latest->GetNetworkPoints();
@@ -243,7 +243,7 @@ namespace Isis {
         }
         else {
           iString msg = "Invalid AprioriXYZSource [" + source + "]";
-          throw iException::Message(iException::User, msg, _FILEINFO_);
+          throw IException(IException::User, msg, _FILEINFO_);
         }
       }
 
@@ -272,7 +272,7 @@ namespace Isis {
         }
         else {
           std::string msg = "Invalid AprioriRadiusSource, [" + source + "]";
-          throw iException::Message(iException::User, msg, _FILEINFO_);
+          throw IException(IException::User, msg, _FILEINFO_);
         }
       }
 
@@ -353,9 +353,9 @@ namespace Isis {
           measure.set_type(
               ControlPointFileEntryV0002::Measure::RegisteredSubPixel);
         else
-          throw iException::Message(iException::Io,
-                                    "Unknown measure type [" + type + "]",
-                                    _FILEINFO_);
+          throw IException(IException::Io,
+                           "Unknown measure type [" + type + "]",
+                           _FILEINFO_);
         group.DeleteKeyword("MeasureType");
 
         for(int key = 0; key < group.Keywords(); key++) {
@@ -363,7 +363,7 @@ namespace Isis {
           if(!interpreter.IsValid()) {
             iString msg = "Unhandled or duplicate keywords in control measure ["
                 + group[key].Name() + "]";
-            throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+            throw IException(IException::Programmer, msg, _FILEINFO_);
           }
           else {
             *measure.add_log() = interpreter.ToProtocolBuffer();
@@ -376,7 +376,7 @@ namespace Isis {
       if(!point.IsInitialized()) {
         iString msg = "There is missing required information in the control "
             "points or measures";
-        throw iException::Message(iException::Io, msg, _FILEINFO_);
+        throw IException(IException::Io, msg, _FILEINFO_);
       }
 
       points.append(point);
@@ -419,7 +419,7 @@ namespace Isis {
       default:
         iString msg = "The binary file version [" + iString(version) + "] is "
             "not supported";
-        throw iException::Message(iException::Io, msg, _FILEINFO_);
+        throw IException(IException::Io, msg, _FILEINFO_);
     }
 
     // Now read and update as necessary
@@ -468,25 +468,27 @@ namespace Isis {
     try {
       radii = Projection::TargetRadii(network["TargetName"]);
     }
-    catch(iException &e) {
+    catch(IException &e) {
       error = true;
     }
 
     // If we had an error then the errors aren't flushed
     bool errorsFlushed = false;
+    IException naifError;
     while(!errorsFlushed) {
       try {
         NaifStatus::CheckErrors();
         errorsFlushed = true;
       }
-      catch(iException &e) {
+      catch(IException &e) {
         error = true;
+        naifError = e;
       }
     }
 
     if(error) {
       iString msg = "The target name is not recognized";
-      throw iException::Message(iException::Io, msg, _FILEINFO_);
+      throw IException(naifError, IException::Io, msg, _FILEINFO_);
     }
 
     Distance equatorialRadius(radii["EquatorialRadius"], Distance::Meters);
@@ -495,7 +497,7 @@ namespace Isis {
     for(int cpIndex = 0; cpIndex < network.Objects(); cpIndex ++) {
       PvlObject &cp = network.Object(cpIndex);
 
-      if(cp.HasKeyword("Held") && cp["Held"][0] == "True") 
+      if(cp.HasKeyword("Held") && cp["Held"][0] == "True")
         cp["PointType"] = "Ground";
 
       if(cp.HasKeyword("AprioriLatLonSource"))

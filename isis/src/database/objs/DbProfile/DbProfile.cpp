@@ -162,14 +162,13 @@ namespace Isis {
     try {
       return (_keys.get(key)[nth]);
     }
-    catch(iException &ie) {
+    catch(IException &ie) {
       ostringstream mess;
       mess << "Error fetching value from key " << key;
       if(nth != 0) {
         mess << " (index=" << nth << ")";
       }
-      ie.Message(iException::Programmer, mess.str(), _FILEINFO_);
-      throw;
+      throw IException(ie, IException::Programmer, mess.str(), _FILEINFO_);
     }
   }
 

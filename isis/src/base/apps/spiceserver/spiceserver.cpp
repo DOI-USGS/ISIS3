@@ -121,19 +121,19 @@ void IsisMain() {
         err += error.toStdString();
         err += "] on line [" + iString(errorLine) + "] column [";
         err += iString(errorCol) + "]";
-        throw iException::Message(iException::Io, err, _FILEINFO_);
+        throw IException(IException::Io, err, _FILEINFO_);
       }
     }
     else {
       iString msg = "Unable to read input file";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     if (otherVersion != Application::Version()) {
       iString msg = "The SPICE server only supports the latest Isis version [" +
                     Application::Version() + "], version [" + otherVersion +
                     "] is not compatible";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     // This next section looks a lot like spiceinit, its semi-duplicated because
@@ -208,10 +208,10 @@ void IsisMain() {
     bool kernelSuccess = false;
 
     if (ck.size() == 0) {
-      throw iException::Message(iException::Camera,
-                                "No Camera Kernel found for the image [" +
-                                  ui.GetFilename("FROM") + "]",
-                                _FILEINFO_);
+      throw IException(IException::Unknown,
+                       "No Camera Kernel found for the image [" +
+                        ui.GetFilename("FROM") + "]",
+                       _FILEINFO_);
     }
 
     while (ck.size() != 0 && !kernelSuccess) {
@@ -229,9 +229,9 @@ void IsisMain() {
     }
 
     if (!kernelSuccess) {
-      throw iException::Message(iException::Camera,
-                                "Unable to initialize camera model",
-                                _FILEINFO_);
+      throw IException(IException::Unknown,
+                       "Unable to initialize camera model",
+                       _FILEINFO_);
     }
     else {
       PackageKernels(ui.GetFilename("TO"));
@@ -382,8 +382,8 @@ bool TryKernels(Pvl &label, Process &p,
       applicationLog += lab.FindGroup("Kernels", Pvl::Traverse);
       applicationLog.Write(ui.GetFilename("TO") + ".print");
     }
-    catch (iException &e) {
-      Pvl errPvl = e.PvlErrors();
+    catch (IException &e) {
+      Pvl errPvl = e.toPvl();
 
       if (errPvl.Groups() > 0)
         currentKernels += PvlKeyword("Error",
@@ -453,8 +453,7 @@ bool TryKernels(Pvl &label, Process &p,
     kernelsLabels += cam->getStoredNaifKeywords();
     kernelsLabels.Write(ui.GetFilename("TO") + ".lab");
   }
-  catch (iException &e) {
-    e.Clear();
+  catch (IException &) {
     return false;
   }
 
@@ -469,7 +468,7 @@ iString TableToXml(iString tableName, iString file) {
   QFile tableFile(file);
   if (!tableFile.open(QIODevice::ReadOnly)) {
     iString msg = "Unable to read temporary file [" + file + "]";
-    throw iException::Message(iException::Io, msg, _FILEINFO_);
+    throw IException(IException::Io, msg, _FILEINFO_);
   }
 
   QByteArray data = tableFile.readAll();

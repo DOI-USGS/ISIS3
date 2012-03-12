@@ -23,7 +23,7 @@
 
 #include "TableRecord.h"
 #include "iString.h"
-#include "iException.h"
+#include "IException.h"
 
 using namespace std;
 namespace Isis {
@@ -47,7 +47,7 @@ namespace Isis {
    *
    * @return The specified TableField
    *
-   * @throws Isis::iException::Programmer - The field does not exist in the
+   * @throws Isis::IException::Programmer - The field does not exist in the
    *                                        record
    */
   Isis::TableField &TableRecord::operator[](const std::string &field) {
@@ -60,7 +60,7 @@ namespace Isis {
     }
 
     string msg = "Field [" + field + "] does not exist in record";
-    throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+    throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
   /**
@@ -68,7 +68,7 @@ namespace Isis {
    *
    * @param buf
    *
-   * @throws Isis::iException::Programmer - Invalid field type
+   * @throws Isis::IException::Programmer - Invalid field type
    */
   void TableRecord::Pack(char *buf) const {
     int sbyte = 0;
@@ -112,7 +112,7 @@ namespace Isis {
       }
       else {
         string msg = "Invalid field type";
-        throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       }
     }
   }
@@ -193,7 +193,7 @@ namespace Isis {
       }
       else {
         string msg = "Invalid field type";
-        throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       }
     }
   }

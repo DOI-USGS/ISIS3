@@ -15,7 +15,7 @@ void IsisMain() {
     if (!ui.WasEntered("OUTSTATS")) {
       std::string msg = "If the CALCULATE option is selected, you must enter";
       msg += " an OUTSTATS file";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
 

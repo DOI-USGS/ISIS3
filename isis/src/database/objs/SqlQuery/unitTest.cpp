@@ -2,7 +2,7 @@
 #include "SqlRecord.h"
 #include "Filename.h"
 #include "Database.h"
-#include "iException.h"
+#include "IException.h"
 #include "Preference.h"
 
 using namespace std;
@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
   string  query = "SELECT * FROM testTable;";
 
   if(!testdb.open()) {
-    iException::Message(iException::User, "Connection failed", _FILEINFO_);
+    throw IException(IException::User, "Connection failed", _FILEINFO_);
   }
 
   SqlQuery q(testdb);
@@ -38,8 +38,8 @@ int main(int argc, char *argv[]) {
     cout << "Query: " << q.getQuery() << endl;
 
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   cout << "The mac systems report the double fields as string fields. " <<

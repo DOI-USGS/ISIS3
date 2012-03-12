@@ -47,7 +47,7 @@ void IsisMain() {
 
     if(!ui.WasEntered("TO")) {
       string msg = "The [TO] parameter must be entered";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     string outfile = ui.GetFilename("TO");
     ofstream fout;
@@ -164,7 +164,7 @@ void IsisMain() {
 //     double maxYValue = DBL_MIN;
 //     double minYValue = DBL_MAX;
 //     // ---------------------------------------------
-// 
+//
     for(int y = 0; y < binCountData.size(); y++) {
 
       intervals[y].interval = QwtInterval(binCountData[y].x(),

@@ -1,6 +1,6 @@
 #include <iostream>
 #include "QuickFilter.h"
-#include "iException.h"
+#include "IException.h"
 #include "Preference.h"
 
 using namespace std;
@@ -148,71 +148,71 @@ int main(int argc, char *argv[]) {
   try {
     Isis::QuickFilter f2(0, 3, 3);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   // Bad boxcar width
   try {
     Isis::QuickFilter f2(5, 0, 3);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   // Bad boxcar height
   try {
     Isis::QuickFilter f2(5, 3, 0);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   // Width not odd
   try {
     Isis::QuickFilter f2(5, 2, 3);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   // Height not odd
   try {
     Isis::QuickFilter f2(5, 3, 2);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   // Minimum = maximum
   try {
     f.SetMinMax(1.0, 1.0);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   // Minimum > maximum
   try {
     f.SetMinMax(2.0, 1.0);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   // Bad number of valid points
   try {
     f.SetMinimumPixels(0);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   // Add too much data
   try {
     f.AddLine(a);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 }

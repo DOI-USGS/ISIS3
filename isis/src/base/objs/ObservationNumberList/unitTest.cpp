@@ -1,7 +1,7 @@
 #include <iostream>
 #include "ObservationNumberList.h"
 #include "SerialNumberList.h"
-#include "iException.h"
+#include "IException.h"
 
 using namespace std;
 int main(int argc, char *argv[]) {
@@ -47,8 +47,8 @@ int main(int argc, char *argv[]) {
       cout << "[NotAnObservation] is not an existing ObservationNumber" << endl;
 
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   cout << endl << endl;;

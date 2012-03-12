@@ -37,14 +37,14 @@ int main() {
   try {
     poly.Create(cube);
   }
-  catch(iException &e) {
+  catch(IException &e) {
     std::string msg = "Cannot create polygon for [" + cube.getFilename() + "]";
-    throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
 
   //  write poly as WKT
-  ProgramLauncher::RunSystemCommand("echo \"" + poly.Polys()->toString() 
+  ProgramLauncher::RunSystemCommand("echo \"" + poly.Polys()->toString()
     + "\" | sed "
       "'s/\\([0-9][0-9]*\\.[0-9][0-9][0-9][0-9][0-9]\\)\\([0-9]*\\)/\\1/g'"
     );
@@ -53,13 +53,13 @@ int main() {
   try {
     poly.Create(cube, 12, 1, 384, 640, 385);
   }
-  catch(iException &e) {
+  catch(IException &e) {
     std::string msg = "Cannot create sub-polygon for [" + cube.getFilename() + "]";
-    throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
   //  write poly as WKT
-  ProgramLauncher::RunSystemCommand("echo \"" + poly.Polys()->toString() 
+  ProgramLauncher::RunSystemCommand("echo \"" + poly.Polys()->toString()
     + "\" | sed "
       "'s/\\([0-9][0-9]*\\.[0-9][0-9][0-9][0-9][0-9][0-9]\\)\\([0-9]*\\)/\\1/g'"
     );
@@ -69,13 +69,13 @@ int main() {
   try {
     poly.Create(cube, 10, 12, 1, 384, 640, 385);
   }
-  catch(iException &e) {
+  catch(IException &e) {
     std::string msg = "Cannot create lower quality polygon for [" +
         cube.getFilename() + "]";
-    throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    throw IException(IException::Programmer, msg, _FILEINFO_);
   }
   //  write poly as WKT
-  ProgramLauncher::RunSystemCommand("echo \"" + poly.Polys()->toString() 
+  ProgramLauncher::RunSystemCommand("echo \"" + poly.Polys()->toString()
     + "\" | sed "
       "'s/\\([0-9][0-9]*\\.[0-9][0-9][0-9][0-9][0-9][0-9]\\)\\([0-9]*\\)/\\1/g'"
     );

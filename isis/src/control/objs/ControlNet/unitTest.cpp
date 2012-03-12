@@ -16,7 +16,7 @@
 #include "SurfacePoint.h"
 #include "SpecialPixel.h"
 #include "TextFile.h"
-#include "iException.h"
+#include "IException.h"
 #include "Preference.h"
 
 using namespace std;
@@ -189,8 +189,8 @@ int main() {
   try {
     cn1.AddPoint(cn1.GetPoint(3));
   }
-  catch (iException &e) {
-    e.Report(false);
+  catch (IException &e) {
+    e.print();
   }
   cout << endl;
 
@@ -202,8 +202,8 @@ int main() {
   try {
     cn1.DeletePoint(id2);
   }
-  catch (iException &e) {
-    e.Report(false);
+  catch (IException &e) {
+    e.print();
   }
   cout << endl;
 
@@ -212,8 +212,8 @@ int main() {
   try {
     cn1.DeletePoint(7);
   }
-  catch (iException &e) {
-    e.Report(false);
+  catch (IException &e) {
+    e.print();
   }
   cout << endl;
 

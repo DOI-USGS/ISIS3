@@ -1,7 +1,7 @@
 #include <cmath>
 #include "Anisotropic1.h"
 #include "AtmosModel.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 
 using std::max;
@@ -58,7 +58,7 @@ namespace Isis {
    *          Replaced Isis::PI with PI since this is in Isis
    *          namespace.
    * @history 2011-12-19 Janet Barrett - Added code to estimate the
-   *          shadow brightness value (transs). Also got rid of 
+   *          shadow brightness value (transs). Also got rid of
    *          unnecessary check for identical photometric angle values
    *          between successive calls. This check should only be
    *          made in the photometric models.
@@ -96,7 +96,7 @@ namespace Isis {
     if(p_atmosWha == 1.0) {
       std::string msg = "Anisotropic conservative case not implemented yet - WHA parameter cannot be set to 1.0";
       msg += "This will cause negative planetary curvature to occur.";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     if(TauOrWhaChanged()) {
@@ -251,11 +251,11 @@ namespace Isis {
     p_trans0 = emunot * emu;
 
     // Calculate the transmission of light that must be subtracted from a
-    // shadow. This includes direct flux and the scattered flux in the 
+    // shadow. This includes direct flux and the scattered flux in the
     // upsun half of the sky downwelling onto the surface, and the usual
     // transmission upward. NOTE: We need to derive the analytic expression
     // for the light from half the sky in the Legendre scattering model. Until
-    // we do so, we are setting the shadow transmission to the purely 
+    // we do so, we are setting the shadow transmission to the purely
     // unscattered part (same as trans0). This will give a result but is
     // not fully consistent with how the other scattering models are
     // implemented.

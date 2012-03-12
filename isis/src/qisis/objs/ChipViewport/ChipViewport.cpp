@@ -91,9 +91,9 @@ namespace Isis {
   void ChipViewport::setChip(Chip *chip, Cube *chipCube) {
     // Is the chip usable?
     if (chip == NULL || chipCube == NULL) {
-      throw iException::Message(iException::Programmer,
-                                      "Can not view NULL chip pointer",
-                                      _FILEINFO_);
+      throw IException(IException::Programmer,
+                       "Can not view NULL chip pointer",
+                       _FILEINFO_);
     }
 
     p_zoomFactor = 1.0;
@@ -263,7 +263,7 @@ namespace Isis {
           double samp = m->GetSample();
           double line = m->GetLine();
           int x, y;
-      
+
           cubeToViewport(samp, line, x, y);
           // Determine pen color
           // if the point or measure is ignored set to yellow
@@ -278,7 +278,7 @@ namespace Isis {
           else {
             painter.setPen(Qt::green); // set all other point markers green
           }
-      
+
           // draw points which are not under cross
           if (x != (p_width - 1) / 2 || y != (p_height - 1) / 2) {
             painter.drawLine(x - 5, y, x + 5, y);
@@ -529,11 +529,10 @@ namespace Isis {
       p_chip->Load(*p_chipCube, *matchChip, *matchChipCube);
 //    p_chip->ReLoad(*matchChip,p_zoomFactor);
     }
-    catch (iException &e) {
+    catch (IException &e) {
       QString msg = "Cannot geom chip.\n";
-      msg += e.Errors().c_str();
+      msg += e.toString().ToQt();
       QMessageBox::information((QWidget *)parent(), "Error", msg);
-      e.Clear();
       return;
     }
 
@@ -553,11 +552,10 @@ namespace Isis {
     try {
       p_chip->Load(*p_chipCube, p_rotation, p_zoomFactor);
     }
-    catch (iException &e) {
+    catch (IException &e) {
       QString msg = "Cannot load no geom chip.\n";
-      msg += e.Errors().c_str();
+      msg += e.toString().ToQt();
       QMessageBox::information((QWidget *)parent(), "Error", msg);
-      e.Clear();
       return;
     }
 
@@ -583,11 +581,10 @@ namespace Isis {
     try {
       p_chip->Load(*p_chipCube, -rotation, p_zoomFactor);
     }
-    catch (iException &e) {
+    catch (IException &e) {
       QString msg = "Cannot load rotated chip.\n";
-      msg += e.Errors().c_str();
+      msg += e.toString().ToQt();
       QMessageBox::information((QWidget *)parent(), "Error", msg);
-      e.Clear();
       return;
     }
 
@@ -609,26 +606,24 @@ namespace Isis {
 
     // Is the chip usable?
     if (p_chip == NULL) {
-      throw iException::Message(iException::Programmer,
-                                      "Can not view NULL chip pointer",
-                                      _FILEINFO_);
+      throw IException(IException::Programmer,
+                       "Can not view NULL chip pointer",
+                       _FILEINFO_);
     }
 
     if (tackSample != 0. && tackLine != 0.)
       p_chip->TackCube(tackSample, tackLine);
     if (p_geomIt) {
       if (p_matchChip == NULL) {
-        throw iException::Message(iException::User,
-                                        "Invalid match chip", _FILEINFO_);
+        throw IException(IException::User, "Invalid match chip", _FILEINFO_);
       }
       try {
         p_chip->Load(*p_chipCube, *p_matchChip, *p_matchChipCube);
       }
-      catch (iException &e) {
+      catch (IException &e) {
         QString msg = "Cannot reload chip.\n";
-        msg += e.Errors().c_str();
+        msg += e.toString().ToQt();
         QMessageBox::information((QWidget *)parent(), "Error", msg);
-        e.Clear();
         return;
       }
 //      p_chip->ReLoad(*p_matchChip,p_zoomFactor);
@@ -637,11 +632,10 @@ namespace Isis {
       try {
         p_chip->Load(*p_chipCube, p_rotation, p_zoomFactor);
       }
-      catch (iException &e) {
+      catch (IException &e) {
         QString msg = "Cannot reload chip.\n";
-        msg += e.Errors().c_str();
+        msg += e.toString().ToQt();
         QMessageBox::information((QWidget *)parent(), "Error", msg);
-        e.Clear();
         return;
       }
     }
@@ -654,5 +648,4 @@ namespace Isis {
     //  can update the sample/line label.
     emit tackPointChanged(p_zoomFactor);
   }
-
 }

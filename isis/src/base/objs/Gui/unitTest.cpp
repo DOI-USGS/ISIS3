@@ -1,5 +1,5 @@
 #include <iostream>
-#include "iException.h"
+#include "IException.h"
 #include "Preference.h"
 
 using namespace std;

@@ -1,5 +1,5 @@
 #include "Isis.h"
-#include "iException.h"
+#include "IException.h"
 
 #include "CSVReader.h"
 #include "iString.h"
@@ -11,7 +11,7 @@
 #include "SpecialPixel.h"
 
 // Debugging
-//#define _DEBUG_ 
+//#define _DEBUG_
 
 using namespace std;
 using namespace Isis;
@@ -27,19 +27,19 @@ void CleanUp(vector<iString> & psTempFiles, string psInfile);
 void IsisMain() {
   vector<iString> sTempFiles;
   string inFile, outFile;
-  
+
   try {
     // Get user interface
     UserInterface &ui = Application::GetUserInterface();
 
     bool bRemoveTempFiles = ui.GetBoolean("REMOVE");
-    
+
     bool bMapping       = ui.GetBoolean("MAPPING");
     bool bIngestion     = ui.GetBoolean("INGESTION");
     bool bHideStripe    = ui.GetBoolean("DESTRIPE");
     bool bNoiseFilter   = ui.GetBoolean("NOISE_FILTER");
     bool bRemoveFurrows = ui.GetBoolean("FURROWS");
-    
+
     // Get the cube info
     inFile  = ui.GetFilename("FROM");
     outFile = ui.GetFilename("TO");
@@ -54,21 +54,21 @@ void IsisMain() {
     }
     // Get the Summing from the label
     int iSumming = int (cubeLabel.FindObject("IsisCube").FindGroup("Instrument").FindKeyword("Summing")[0]);
-    
+
     Pipeline p1("hicalproc1");
     p1.SetInputFile("FROM");
     p1.SetOutputFile(Filename("$TEMPORARY/p1_out.cub"));
     sTempFiles.push_back(Filename("$TEMPORARY/p1_out.cub").Expanded());
     p1.KeepTemporaryFiles(!bRemoveTempFiles);
-    
-    // If Raw image convert to Isis format 
+
+    // If Raw image convert to Isis format
     p1.AddToPipeline("hi2isis");
     p1.Application("hi2isis").SetInputParameter ("FROM", false);
     p1.Application("hi2isis").SetOutputParameter("TO", "lev2");
     if (!bIngestion) {
       p1.Application("hi2isis").Disable();
     }
-    
+
     // Run spiceinit
     p1.AddToPipeline("spiceinit");
     p1.Application("spiceinit").SetInputParameter("FROM", false);
@@ -85,17 +85,17 @@ void IsisMain() {
 
     p1.AddToPipeline("hifurrows");
     p1.Application("hifurrows").SetInputParameter ("FROM",        false);
-    p1.Application("hifurrows").SetOutputParameter("TO",          "rmfrw"); 
+    p1.Application("hifurrows").SetOutputParameter("TO",          "rmfrw");
     p1.Application("hifurrows").AddConstParameter ("NEW_VERSION", "true");
     p1.Application("hifurrows").AddConstParameter ("LOWPASS",     "true");
     if (!bRemoveFurrows) {
       p1.Application("hifurrows").Disable();
     }
-  
+
     // MASK if NoiseFilter==true
     p1.AddToPipeline("mask");
     // if nothing to mask, continue even if app generates an exception
-    p1.Application("mask").SetContinue(true); 
+    p1.Application("mask").SetContinue(true);
     p1.Application("mask").SetInputParameter ("FROM",     false);
     p1.Application("mask").SetOutputParameter("TO",       "mask1");
     p1.Application("mask").AddConstParameter ("MINIMUM",  "1200");
@@ -105,7 +105,7 @@ void IsisMain() {
     if (!bNoiseFilter) {
       p1.Application("mask").Disable();
     }
-    
+
     // There is no ouput created as the Furrows and Noise Filter apps are disabled
     // Hence just copy the input to the output
     if (!bIngestion && !bMapping && !bRemoveFurrows && !bNoiseFilter) {
@@ -118,14 +118,14 @@ void IsisMain() {
     cout << "*****************************************************************\n";
 #endif
     p1.Run();
-    
+
 
     Pipeline pStats;
     pStats.SetInputFile(Filename("$TEMPORARY/p1_out.cub"));
     pStats.SetOutputFile(Filename("$TEMPORARY/statsMask"));
     sTempFiles.push_back(Filename("$TEMPORARY/statsMask").Expanded());
     pStats.KeepTemporaryFiles(!bRemoveTempFiles);
-    
+
     pStats.AddToPipeline("cubenorm");
     pStats.Application("cubenorm").SetInputParameter("FROM",   false);
     pStats.Application("cubenorm").SetOutputParameter("STATS", "statsMask");
@@ -167,12 +167,12 @@ void IsisMain() {
     if (!bNoiseFilter) {
       p2.Application("mask").Disable();
     }
-    
+
     // Caliberation
     p2.AddToPipeline("hical");
     p2.Application("hical").SetInputParameter("FROM", false);
     p2.Application("hical").SetOutputParameter("TO", "hical");
-  
+
     // Gaindrift Corrections
     GetCCD_Channel_Coefficients(cubeLabel);
     p2.AddToPipeline("fx");
@@ -182,13 +182,13 @@ void IsisMain() {
     iString sEquation = "\\((F1/(" + csvArr[R0]+ "+( " + csvArr[R1] + "*line)+(" + csvArr[R2];
     sEquation += "*line*line))) *(line<" + csvArr[MAX_LINE]+ ") + (F1*(line>=" + csvArr[MAX_LINE] + ")))";
     p2.Application("fx").AddConstParameter("EQUATION", sEquation);
-#ifdef _DEBUG_    
+#ifdef _DEBUG_
     cerr << "FX Equation=" << sEquation << endl;
     cout << p2<<endl;
     cout << "*****************************************************************\n";
 #endif
     p2.Run();
-    
+
     // ********************************************************************************************
     // CubeNorm Corrections
     // ********************************************************************************************
@@ -198,7 +198,7 @@ void IsisMain() {
       p3.SetOutputFile(Filename("$TEMPORARY/StatsCubeNorm1"));
       sTempFiles.push_back(Filename("$TEMPORARY/StatsCubeNorm1").Expanded());
       p3.KeepTemporaryFiles(!bRemoveTempFiles);
-      
+
       // Crop if skip top and bottom lines are defined in the Configuration file
       /*p3.AddToPipeline("crop");
       p3.Application("crop").SetInputParameter ("FROM",   false);
@@ -206,43 +206,43 @@ void IsisMain() {
       p3.Application("crop").AddConstParameter ("line",   "1");
       //p3.Application("crop").AddConstParameter ("nlines", "156");
       p3.Application("crop").AddConstParameter ("nlines", "209");*/
-      
+
       p3.AddToPipeline("cubenorm");
       p3.Application("cubenorm").SetInputParameter ("FROM",   false);
       p3.Application("cubenorm").SetOutputParameter("stats",  "stats");
       p3.Application("cubenorm").AddConstParameter ("format", "table");
       p3.Run();
-      
-  #ifdef _DEBUG_  
+
+  #ifdef _DEBUG_
       cout << p3 << endl;
       cout << "*****************************************************************\n";
-  #endif    
-      
+  #endif
+
       Pipeline p4("hicalproc4");
       p4.SetInputFile(Filename("$TEMPORARY/p2_out.cub"));
       p4.SetOutputFile(Filename("$TEMPORARY/StatsCubeNorm2"));
       sTempFiles.push_back(Filename("$TEMPORARY/StatsCubeNorm2").Expanded());
       p4.KeepTemporaryFiles(!bRemoveTempFiles);
-      
+
       p4.AddToPipeline("hicubenorm");
       p4.Application("hicubenorm").SetInputParameter ("FROM",         false);
       p4.Application("hicubenorm").SetOutputParameter("STATS",        "hicbnrm");
       p4.Application("hicubenorm").AddConstParameter ("FORMAT",       "TABLE");
       p4.Application("hicubenorm").AddConstParameter ("FILTER",       "5");
       p4.Application("hicubenorm").AddConstParameter ("STATSOURCE",   "TABLE");
-      p4.Application("hicubenorm").AddConstParameter ("FROMSTATS",     
-                                       Filename("$TEMPORARY/StatsCubeNorm1").Expanded()); 
+      p4.Application("hicubenorm").AddConstParameter ("FROMSTATS",
+                                       Filename("$TEMPORARY/StatsCubeNorm1").Expanded());
       p4.Application("hicubenorm").AddConstParameter ("NEW_VERSION",   "TRUE");
       p4.Application("hicubenorm").AddConstParameter ("HIGHPASS_MODE", "HIGHPASS_DIVIDE");
       p4.Application("hicubenorm").AddConstParameter ("PAUSECROP",     "TRUE");
 
       p4.Run();
 
-  #ifdef _DEBUG_      
+  #ifdef _DEBUG_
       cout << p4 << endl;
       cout << "*****************************************************************\n";
   #endif
-    
+
       Pipeline p5("hicalproc5");
       p5.SetInputFile(Filename("$TEMPORARY/p2_out.cub"));
       if (bHideStripe || bMapping) {
@@ -254,7 +254,7 @@ void IsisMain() {
       }
       p5.KeepTemporaryFiles(!bRemoveTempFiles);
       p5.SetContinue(true);
-    
+
       p5.AddToPipeline("cubenorm");
       p5.Application("cubenorm").SetInputParameter ("FROM",       false);
       p5.Application("cubenorm").SetOutputParameter("TO",         "cbnorm");
@@ -273,18 +273,18 @@ void IsisMain() {
         p5.Application("hinoise").SetInputParameter ("FROM", false);
         p5.Application("hinoise").SetOutputParameter("TO",   "hinoise");
         p5.Application("hinoise").AddConstParameter ("REMOVE", iString(bRemoveTempFiles));
-        
+
         // Values got from HiCal configuration file
         // Lowpass options
         p5.Application("hinoise").AddConstParameter ("LPF_LINES",   "251");
         p5.Application("hinoise").AddConstParameter ("LPF_SAMPLES", "3");
         p5.Application("hinoise").AddConstParameter ("LPF_MINPER",  "5");
-        
+
         // Highpass Options
         p5.Application("hinoise").AddConstParameter ("HPF_LINES",   "251");
         p5.Application("hinoise").AddConstParameter ("HPF_SAMPLES", "1");
         p5.Application("hinoise").AddConstParameter ("HPF_MINPER",  "5");
-        
+
         // Noise Filter options
         p5.Application("hinoise").AddConstParameter ("NULL_COLUMNS",         "FALSE");
         p5.Application("hinoise").AddConstParameter ("TOLMIN",               "3.5");
@@ -302,17 +302,17 @@ void IsisMain() {
         p5.Application("hinoise").AddConstParameter ("HARD_FILTERING",       "0.1");
         p5.Application("hinoise").AddConstParameter ("HIGHEND_PERCENT",      "99.999");
         p5.Application("hinoise").AddConstParameter ("HARD_HIGHEND_PERCENT", "99.99");
-        
-        
+
+
         p5.Application("hinoise").Disable();
       }
       p5.Run();
-#ifdef _DEBUG_      
+#ifdef _DEBUG_
       cout << p5 << endl;
       cout << "*****************************************************************\n";
 #endif
     }
-    
+
     // **********************************************************************************
     // HideStripe Filter
     if (bHideStripe) {
@@ -326,14 +326,14 @@ void IsisMain() {
         sTempFiles.push_back(Filename("$TEMPORARY/p6_out.cub").Expanded());
       }
       p6.KeepTemporaryFiles(!bRemoveTempFiles);
-        
+
       if (iSumming == 1 || iSumming == 2) {
         p6.AddToPipeline("hidestripe", "hidestripe1");
         p6.Application("hidestripe1").SetInputParameter ("FROM",       false);
         p6.Application("hidestripe1").SetOutputParameter("TO",         "hdstrp1");
         p6.Application("hidestripe1").AddConstParameter ("PARITY",     "EVEN");
         p6.Application("hidestripe1").AddConstParameter ("CORRECTION", "ADD");
-          
+
         p6.AddToPipeline("hidestripe", "hidestripe2");
         p6.Application("hidestripe2").SetInputParameter ("FROM",       false);
         p6.Application("hidestripe2").SetOutputParameter("TO",         "hdstrp2");
@@ -349,7 +349,7 @@ void IsisMain() {
         p6.Application("hidestripe").AddConstParameter ("CORRECTION", "ADD");
       }
       p6.Run();
-#ifdef _DEBUG_      
+#ifdef _DEBUG_
       cout << p6 << endl;
       cout << "*****************************************************************\n";
 #endif
@@ -367,7 +367,7 @@ void IsisMain() {
       }
       p7.SetOutputFile("TO");
       p7.KeepTemporaryFiles(!bRemoveTempFiles);
-      
+
       p7.AddToPipeline("cam2map");
       p7.Application("cam2map").SetInputParameter ("FROM", false);
       p7.Application("cam2map").SetOutputParameter("TO", "map");
@@ -376,7 +376,7 @@ void IsisMain() {
       if(ui.WasEntered("PIXRES")) {
         p7.Application("cam2map").AddConstParameter("PIXRES", "MPP");
       }
-#ifdef _DEBUG_  
+#ifdef _DEBUG_
       cout << p7 << endl;
       cout << "*****************************************************************\n";
 #endif
@@ -385,25 +385,25 @@ void IsisMain() {
     }
     CleanUp(sTempFiles, inFile);
   }
-  catch(Isis::iException &e) {
+  catch(IException &) {
     CleanUp(sTempFiles, inFile);
     throw;
   }
   catch(std::exception const &se) {
     CleanUp(sTempFiles, inFile);
     string message = "std::exception: " + (iString)se.what();
-    throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+    throw IException(IException::User, message, _FILEINFO_);
   }
   catch(...) {
     CleanUp(sTempFiles, inFile);
     string message = "Other Error";
-    throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+    throw IException(IException::User, message, _FILEINFO_);
   }
 }
 
 /**
  * Clean up intermediate and log files
- * 
+ *
  * @author Sharmila Prasad (2/14/2011)
  */
 void CleanUp(vector<iString> & psTempFiles, string psInfile)
@@ -413,7 +413,7 @@ void CleanUp(vector<iString> & psTempFiles, string psInfile)
     remove(psTempFiles[i].c_str());
   }
   psTempFiles.clear();
-  
+
   // Cleanup log files
   int ipos = psInfile.find(".cub");
   if (ipos != (int)string::npos) {
@@ -426,71 +426,71 @@ void CleanUp(vector<iString> & psTempFiles, string psInfile)
 }
 
 /**
- * With the Channel, CCD in the isis label, find the coefficient values 
- * for this image 
- * 
+ * With the Channel, CCD in the isis label, find the coefficient values
+ * for this image
+ *
  * @author Sharmila Prasad (11/24/2010)
- * 
- * @param pCubeLabel 
+ *
+ * @param pCubeLabel
  */
 void GetCCD_Channel_Coefficients(Pvl & pCubeLabel)
 {
   int iChannel=-1, iSumming=-1;
   string sCcd="";
-  
+
   PvlGroup instrGrp = pCubeLabel.FindObject("IsisCube").FindGroup("Instrument");
-  
+
   // Summing keyword
   if (!instrGrp.HasKeyword("Summing")) {
     string sMsg = "Summing keyword not found";
-    throw Isis::iException::Message(Isis::iException::User, sMsg, _FILEINFO_);
+    throw IException(IException::User, sMsg, _FILEINFO_);
   }
   else {
     PvlKeyword binKey = instrGrp.FindKeyword("Summing");
     iSumming = (int)binKey[0];
     if (iSumming != 1 && iSumming != 2 && iSumming != 4) {
       string sMsg = "Invalid Summing value in input file, must be 1,2,or 4";
-      throw Isis::iException::Message(Isis::iException::User, sMsg, _FILEINFO_);
+      throw IException(IException::User, sMsg, _FILEINFO_);
     }
   }
-  
+
   // CCD Keyword
   if (!instrGrp.HasKeyword("CcdId")) {
     string sMsg = "CcdId keyword not found";
-    throw Isis::iException::Message(Isis::iException::User, sMsg, _FILEINFO_);
+    throw IException(IException::User, sMsg, _FILEINFO_);
   }
   else {
     PvlKeyword ccdKey = instrGrp.FindKeyword("CcdId");
     sCcd = ccdKey[0];
   }
-  
+
   // Channel Keyword
   if (!instrGrp.HasKeyword("ChannelNumber")) {
     string sMsg = "ChannelNumber keyword not found";
-    throw Isis::iException::Message(Isis::iException::User, sMsg, _FILEINFO_);
+    throw IException(IException::User, sMsg, _FILEINFO_);
   }
   else {
     PvlKeyword channelKey = instrGrp.FindKeyword("ChannelNumber");
     iChannel = channelKey[0];
   }
-  
+
   // Get the coefficient file name
   iString dCoeffFile = "$mro/calibration/HiRISE_Gain_Drift_Correction_Bin" + iString(iSumming) + ".0001.csv";
   //iString dCoeffFile = "/home/sprasad/isis3/isis/src/mro/apps/hicalproc/HiRISE_Gain_Drift_Correction_Bin" + iString(iSumming) + ".0001.csv";
-#ifdef _DEBUG_  
+#ifdef _DEBUG_
   cout << dCoeffFile << endl;
 #endif
-  
+
   // Get the coefficients
   ReadCoefficientFile(Filename(dCoeffFile).Expanded(), sCcd, iChannel);
 }
 
 /**
  * Reads the CSV coefficient file
- * 
+ *
  * @author Sharmila Prasad (11/24/2010)
- * 
- * @param psCoeffFile = Coefficient file name 
+ *
+ * @param psCoeffFile = Coefficient file name
  */
 void ReadCoefficientFile(string psCoeffile, string psCcd, int piChannel)
 {
@@ -498,28 +498,28 @@ void ReadCoefficientFile(string psCoeffile, string psCcd, int piChannel)
   double dCoeff[5];
   int iRows = coefFile.rows();
   int iRowIndex = -1;
-  
+
   iString sColName = psCcd + "_" + iString(piChannel);
-#ifdef _DEBUG_ 
+#ifdef _DEBUG_
   cout << endl << "Col name=" << sColName <<  "Rows=" << iRows << endl;
 #endif
-  
+
   for (int i=0; i<iRows; i++) {
     csvArr = coefFile.getRow(i);
     if (csvArr[0] == sColName) {
       iRowIndex = i;
       break;
     }
-  } 
-  
+  }
+
   if (iRowIndex != -1) {
-    int iArrSize = csvArr.dim();    
+    int iArrSize = csvArr.dim();
     for (int i=1; i<iArrSize; i++) {
       csvArr[i].TrimHead(" \n,");
       csvArr[i].TrimTail(" \n,\t\r");
-      dCoeff[i] = iString(csvArr[i]).ToDouble(); 
+      dCoeff[i] = iString(csvArr[i]).ToDouble();
       if (dCoeff[i] < 0) {
-        dCoeff[i] *= -1; 
+        dCoeff[i] *= -1;
         csvArr[i] = iString(dCoeff[i]) ;
       }
     }
@@ -527,11 +527,11 @@ void ReadCoefficientFile(string psCoeffile, string psCcd, int piChannel)
 }
 
 /**
- * Develop min and max thresholds for elminating bad pixels. This part of 
- * the Mask() functionality in the hical pipeline 
- * 
+ * Develop min and max thresholds for elminating bad pixels. This part of
+ * the Mask() functionality in the hical pipeline
+ *
  * @author Sharmila Prasad (2/1/2011)
- * 
+ *
  * @param psStatsFile - Cubenorm stats output file
  * @param pdMinDN     - Minimum DN Value
  * @param pdMaxDN     - Maximum DN value
@@ -542,17 +542,17 @@ void AnalyzeCubenormStats(string psStatsFile, int piSumming, double & pdMinDN, d
   int iRows = coefFile.rows();
   vector <int> iValidPoints;
   vector <double> dStdDev, dMinimum, dMaximum;
-  
+
   // Skip the header row
   int iMaxValidPoints=0;
   for (int i=1; i<iRows; i++) {
     csvArr = coefFile.getRow(i);
-    
+
     int iArrSize = csvArr.dim();
     for (int j=0; j<iArrSize; j++) {
       csvArr[j].TrimHead(" \n,");
       csvArr[j].TrimTail(" \n,\t\r");
-      // Store Valid Points and get the Max Valid Points for a 
+      // Store Valid Points and get the Max Valid Points for a
       // given RowCol
       //cerr << "  " << j << "." << csvArr[j];
       if (j==2) {
@@ -567,7 +567,7 @@ void AnalyzeCubenormStats(string psStatsFile, int piSumming, double & pdMinDN, d
       if (j==5) {
         dStdDev.push_back(csvArr[j]);
       }
-      
+
       // Get the Maximum and Minimum values
       if (j==6) {
         dMinimum.push_back(csvArr[j]);
@@ -576,8 +576,8 @@ void AnalyzeCubenormStats(string psStatsFile, int piSumming, double & pdMinDN, d
         dMaximum.push_back(csvArr[j]);
       }
     }
-  } 
-  
+  }
+
   // Get the median standard deviation value for all columns that have
   // the maximum valid pixel count
   vector <double> dStdDevValidPnts;
@@ -586,11 +586,11 @@ void AnalyzeCubenormStats(string psStatsFile, int piSumming, double & pdMinDN, d
       dStdDevValidPnts.push_back(dStdDev[i]);
     }
   }
-  
+
   sort (dStdDevValidPnts.begin(), dStdDevValidPnts.end());
   double dStdFraction  = 0.95;
   double dMedianStdDev = dStdDevValidPnts[ int( (dStdDevValidPnts.size()-1) * dStdFraction) ];
-  
+
   // Find the minimum of minimums and the maximum of maximums for any
   // column whose std is less than or equal to $medstd + $tol;
   double dValidPointFrac = (iMaxValidPoints * 0.90);
@@ -603,26 +603,26 @@ void AnalyzeCubenormStats(string psStatsFile, int piSumming, double & pdMinDN, d
   }
   sort (dValidMin.begin(), dValidMin.end());
   sort (dValidMax.begin(), dValidMax.end());
-  
+
   pdMinDN = int( dValidMin[int( (dValidMin.size()-1) * 0.05)] );
   pdMaxDN = int( dValidMax[int( (dValidMax.size()-1) * 0.95)] );
 
   double dMinFraction=0, dMaxFraction=0;
   if (piSumming == 1) {
-    dMinFraction = 0.70; 
+    dMinFraction = 0.70;
     dMaxFraction = 1.30;
   }
   else if (piSumming == 2) {
-    dMinFraction = 0.60; 
+    dMinFraction = 0.60;
     dMaxFraction = 1.40;
   }
   else {
-    dMinFraction = 0.50; 
+    dMinFraction = 0.50;
     dMaxFraction = 1.50;
   }
   pdMinDN = dMinFraction * pdMinDN;
   pdMaxDN = dMaxFraction * pdMaxDN;
-#ifdef _DEBUG_ 
+#ifdef _DEBUG_
   cerr << "MinDN=" << pdMinDN << "   MaxDN=" << pdMaxDN << endl;
 #endif
 }

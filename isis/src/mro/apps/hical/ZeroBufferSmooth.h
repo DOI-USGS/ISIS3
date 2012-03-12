@@ -39,7 +39,7 @@
 #include "LowPassFilter.h"
 #include "Statistics.h"
 #include "SpecialPixel.h"
-#include "iException.h"
+#include "IException.h"
 
 namespace Isis {
 

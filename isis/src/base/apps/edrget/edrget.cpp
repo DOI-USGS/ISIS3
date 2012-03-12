@@ -8,7 +8,7 @@
 #include "UserInterface.h"
 #include "ProgramLauncher.h"
 #include "iString.h"
-#include "iException.h"
+#include "IException.h"
 
 using namespace Isis;
 using namespace std;
@@ -51,7 +51,7 @@ void IsisMain() {
         string localFileNameStr(localFileName.toStdString());
         remove(localFileNameStr.c_str());
         iString msg = "Could not acquire [" + guiURL + "]";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
     }
   }
@@ -81,14 +81,14 @@ void IsisMain() {
         string localFileNameStr(localFileName.toStdString());
         remove(localFileNameStr.c_str());
         iString msg = "Could not acquire [" + guiURL + "]";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
     }
   }
   //if scheme is not ftp or http throw error
   else {
     iString msg = "Scheme [" + qurl.scheme().toStdString() + "] not found, must be 'ftp' or 'http'";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 }
 

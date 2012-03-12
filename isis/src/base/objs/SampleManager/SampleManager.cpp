@@ -23,6 +23,9 @@
 
 #include "SampleManager.h"
 
+#include "IException.h"
+#include "iString.h"
+
 using namespace std;
 namespace Isis {
 
@@ -57,12 +60,12 @@ namespace Isis {
   bool SampleManager::SetSample(const int sample, const int band) {
     if(sample < 1) {
       string message = "Invalid value for argument [sample]";
-      throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+      throw IException(IException::Programmer, message, _FILEINFO_);
     }
 
     if(band < 1) {
       string message = "Invalid value for argument [band]";
-      throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+      throw IException(IException::Programmer, message, _FILEINFO_);
     }
 
     int map = (band - 1) * MaxSamples() + sample - 1;

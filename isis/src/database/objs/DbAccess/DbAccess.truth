@@ -15,6 +15,5 @@ Count: 1
 Key: test_key
 Value: test value
 () operator: test value
-**PROGRAMMER ERROR** Requested index (99) out of range
-
-**I/O ERROR** Unable to open [/tmp/not_a_file]
+**PROGRAMMER ERROR** Requested index (99) out of range.
+**I/O ERROR** Unable to open [/tmp/not_a_file].

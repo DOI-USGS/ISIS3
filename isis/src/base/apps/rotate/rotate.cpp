@@ -38,7 +38,7 @@ void IsisMain() {
   else {
     string msg = "Unknow value for INTERP [" +
                  ui.GetString("INTERP") + "]";
-    throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
   p.StartProcess(*transform, *interp);

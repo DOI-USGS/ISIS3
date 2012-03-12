@@ -27,8 +27,7 @@
 #include "PvlContainer.h"
 #include "Pvl.h"
 #include "Filename.h"
-#include "iException.h"
-#include "iException.h"
+#include "IException.h"
 #include "Message.h"
 #include "PvlFormat.h"
 
@@ -79,10 +78,10 @@ namespace Isis {
   Isis::PvlKeyword &PvlContainer::FindKeyword(const std::string &name) {
     PvlKeywordIterator key = FindKeyword(name, Begin(), End());
     if(key == End()) {
-      string msg = "Keyword [" + name + "] does not exist in [" +
+      string msg = "PVL Keyword [" + name + "] does not exist in [" +
                    Type() + " = " + Name() + "]";
       if(p_filename.size() > 0) msg += " in file [" + p_filename + "]";
-      throw Isis::iException::Message(Isis::iException::Pvl, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     return *key;
@@ -92,15 +91,15 @@ namespace Isis {
    * Find a keyword with a specified name.
    * @param name The name of the keyword to look for.
    * @return The PvlKeyword object.
-   * @throws iException::Pvl The keyword doesn't exist.
+   * @throws IException The keyword doesn't exist.
    */
   const Isis::PvlKeyword &PvlContainer::FindKeyword(const std::string &name) const {
     ConstPvlKeywordIterator key = FindKeyword(name, Begin(), End());
     if(key == End()) {
-      string msg = "Keyword [" + name + "] does not exist in [" +
+      string msg = "PVL Keyword [" + name + "] does not exist in [" +
                    Type() + " = " + Name() + "]";
       if(p_filename.size() > 0) msg += " in file [" + p_filename + "]";
-      throw Isis::iException::Message(Isis::iException::Pvl, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     return *key;
@@ -114,10 +113,10 @@ namespace Isis {
   void PvlContainer::DeleteKeyword(const std::string &name) {
     PvlKeywordIterator key = FindKeyword(name, Begin(), End());
     if(key == End()) {
-      string msg = "Keyword [" + name + "] does not exist in [" +
+      string msg = "PVL Keyword [" + name + "] does not exist in [" +
                    Type() + " = " + Name() + "]";
       if(p_filename.size() > 0) msg += " in file [" + p_filename + "]";
-      throw Isis::iException::Message(Isis::iException::Pvl, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     p_keywords.erase(key);
@@ -131,10 +130,10 @@ namespace Isis {
    */
   void PvlContainer::DeleteKeyword(const int index) {
     if(index >= (int)p_keywords.size() || index < 0) {
-      string msg = "The specified index is out of bounds in [" +
+      string msg = "The specified index is out of bounds in PVL [" +
                    Type() + " = " + Name() + "]";
       if(p_filename.size() > 0) msg += " in file [" + p_filename + "]";
-      throw Isis::iException::Message(Isis::iException::Pvl, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     PvlKeywordIterator key = Begin();
@@ -186,10 +185,10 @@ namespace Isis {
    * @return The PvlKeyword at the specified index.
    * @throws iException::Message The index is out of bounds.
    */
-  Isis::PvlKeyword &PvlContainer::operator[](const int index) {
+  PvlKeyword &PvlContainer::operator[](const int index) {
     if(index < 0 || index >= (int)p_keywords.size()) {
-      string msg = Isis::Message::ArraySubscriptNotInRange(index);
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      string msg = Message::ArraySubscriptNotInRange(index);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     return *(p_keywords.begin() + index);
   };
@@ -203,8 +202,8 @@ namespace Isis {
    */
   const Isis::PvlKeyword &PvlContainer::operator[](const int index) const {
     if(index < 0 || index >= (int)p_keywords.size()) {
-      string msg = Isis::Message::ArraySubscriptNotInRange(index);
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      string msg = Message::ArraySubscriptNotInRange(index);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     return *(p_keywords.begin() + index);
   }
@@ -281,7 +280,7 @@ namespace Isis {
         Isis::Filename file(filename);
         if(!file.Exists()) {
           string message = "Could not open the template file [" + filename + "]";
-          throw Isis::iException::Message(Isis::iException::Io, message, _FILEINFO_);
+          throw IException(IException::Io, message, _FILEINFO_);
         }
         Isis::Pvl include(file.Expanded());
 
@@ -397,16 +396,16 @@ namespace Isis {
 
     return *this;
   }
-  
+
   /**
    * Validate all the PvlKeywords in this container
-   * 
+   *
    * @author Sharmila Prasad (9/24/2010)
-   * 
-   * @param pPvlCont - Container to be Validated 
-   *  
-   * @history 2010-10-18 Sharmila Prasad - Added options "Type", "Range", "Value" 
-   *                                       for the keyword validation 
+   *
+   * @param pPvlCont - Container to be Validated
+   *
+   * @history 2010-10-18 Sharmila Prasad - Added options "Type", "Range", "Value"
+   *                                       for the keyword validation
    */
   void PvlContainer::ValidateAllKeywords(PvlContainer & pPvlCont)
   {
@@ -416,15 +415,15 @@ namespace Isis {
       PvlKeyword & pvlTmplKwrd = (*this)[i];
       string sKeyName = pvlTmplKwrd.Name();
       bool bKwrdFound = false;
-      
-      // These are reserved keywords for properties like "Range", "Value", "Type", 
+
+      // These are reserved keywords for properties like "Range", "Value", "Type",
       // "Required" or "Repeated"
       if(sKeyName.find("__Required") != string::npos || sKeyName.find("__Repeated") != string::npos ||
          sKeyName.find("__Range") != string::npos || sKeyName.find("__Value") != string::npos ||
          sKeyName.find("__Type") != string::npos) {
         continue;
       }
-      
+
       if(pPvlCont.HasKeyword(sKeyName)) {
         PvlKeyword & pvlKwrd = pPvlCont.FindKeyword(sKeyName);
         string sTmplKwrdRange = sKeyName + "__Range";
@@ -465,29 +464,29 @@ namespace Isis {
       }
       if (bKwrdFound == false) {
         string sErrMsg = "Keyword \"" + sKeyName + "\" Not Found in the Template File\n";
-        throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_);
+        throw IException(IException::User, sErrMsg, _FILEINFO_);
       }
-      
+
       // Check for "Repeated" Option
       ValidateRepeatOption(pvlTmplKwrd, pPvlCont);
     }
   }
-  
+
   /**
-   * Validate Repeat Option in the Template Group. This option indicates 
-   * that a particular keyname can be repeated several times 
-   * 
+   * Validate Repeat Option in the Template Group. This option indicates
+   * that a particular keyname can be repeated several times
+   *
    * @author Sharmila Prasad (9/24/2010)
-   * 
+   *
    * @param pPvlTmplKwrd - Template Keyword wit
-   * @param pPvlCont - Container with all the Keywords 
-   *  
-   * @history 2010-10-18 Sharmila Prasad - Added option "Type" for the keyword validation 
+   * @param pPvlCont - Container with all the Keywords
+   *
+   * @history 2010-10-18 Sharmila Prasad - Added option "Type" for the keyword validation
    */
   void PvlContainer::ValidateRepeatOption(PvlKeyword & pPvlTmplKwrd, PvlContainer & pPvlCont)
   {
     string sTmplKeyName = pPvlTmplKwrd.Name();
-    
+
     // Check for the Type
     string sType = sTmplKeyName + "__Type";
     string sValueType ="";

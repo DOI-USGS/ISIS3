@@ -18,7 +18,7 @@
 #include "Cube.h"
 #include "CubeDisplayProperties.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "MosaicFileListWidget.h"
 #include "MosaicSceneWidget.h"
 #include "ProgressBar.h"
@@ -218,9 +218,8 @@ namespace Isis {
       prop->moveToThread(m_targetThread);
       return prop;
     }
-    catch(iException &e) {
-      e.Report(false);
-      e.Clear();
+    catch(IException &e) {
+      e.print();
       return NULL;
     }
   }
@@ -255,9 +254,8 @@ namespace Isis {
       prop->moveToThread(m_targetThread);
       return prop;
     }
-    catch(iException &e) {
-      e.Report(false);
-      e.Clear();
+    catch(IException &e) {
+      e.print();
       return NULL;
     }
   }
@@ -479,10 +477,10 @@ namespace Isis {
 
       openProjectCubes(cubesList);
     }
-    catch(iException &e) {
+    catch(IException &e) {
       p_progress->setVisible(false);
       flushCubes();
-      throw iException::Message(iException::Io, "Input project file does is not"
+      throw IException(e, IException::Unknown, "Input project file does is not"
           " an up to date qmos project", _FILEINFO_);
     }
   }
@@ -535,4 +533,3 @@ namespace Isis {
     }
   }
 }
-

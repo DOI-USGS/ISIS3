@@ -24,7 +24,7 @@ void IsisMain() {
   fin.open(from.c_str(), ios::in | ios::binary);
   if(!fin.is_open()) {
     string msg = "Cannot open input file [" + from + "]";
-    throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+    throw IException(IException::Io, msg, _FILEINFO_);
   }
 
   /**
@@ -48,7 +48,7 @@ void IsisMain() {
 
   if(readBytes.readLong != 0x67B) {
     string msg = "Input file [" + from + "] does not appear to be in ddd format";
-    throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+    throw IException(IException::Io, msg, _FILEINFO_);
   }
 
   fin.read(readBytes.readChars, 4);
@@ -64,7 +64,7 @@ void IsisMain() {
 
   if(fin.fail() || fin.eof()) {
     string msg = "An error ocurred when reading the input file [" + from + "]";
-    throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+    throw IException(IException::Io, msg, _FILEINFO_);
   }
 
   fin.close();
@@ -81,7 +81,7 @@ void IsisMain() {
       break;
     default:
       iString msg = "Unsupported bit per pixel count [" + iString((int)readBytes.readLong) + "]";
-      throw iException::Message(iException::Io, msg, _FILEINFO_);
+      throw IException(IException::Io, msg, _FILEINFO_);
   }
 
   nsamples /= (readBytes.readLong / 8);

@@ -25,7 +25,7 @@
 #include "ControlMeasure.h"
 #include "ControlNet.h"
 #include "ControlPoint.h"
-#include "iException.h"
+#include "IException.h"
 
 #include "AbstractTreeItem.h"
 #include "FilterWidget.h"
@@ -203,18 +203,18 @@ namespace Isis
         {
           iString msg = "The first item passed to getItems(AbstractTreeItem*, "
               "AbstractTreeItem*) is not visible in this model's tree";
-          throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+          throw IException(IException::Programmer, msg, _FILEINFO_);
         }
 
         AbstractTreeItem * end = item2;
-        
+
         // Sometimes we need to build the list forwards and sometimes backwards.
         // This is accomplished by using either append or prepend.  We abstract
         // away which of these we should use (why should we care) by using the
         // variable "someKindaPend" to store the appropriate method.
         void (QList<AbstractTreeItem*>::*someKindaPend)(
             AbstractTreeItem * const &);
-        
+
         someKindaPend = &QList<AbstractTreeItem *>::append;
         if (start == item2)
         {
@@ -232,7 +232,7 @@ namespace Isis
         {
           iString msg = "The second item passed to getItems(AbstractTreeItem*, "
               "AbstractTreeItem*) is not visible in this model's tree";
-          throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+          throw IException(IException::Programmer, msg, _FILEINFO_);
         }
 
         (foundItems.*someKindaPend)(end);
@@ -329,8 +329,8 @@ namespace Isis
 
       return count;
     }
-    
-    
+
+
     int AbstractTreeModel::indexOfVisibleItem(AbstractTreeItem const * item,
         InterestingItemsFlag flags, bool ignoreExpansion) const
     {
@@ -346,17 +346,17 @@ namespace Isis
 
           currentItem = nextItem(currentItem, flags, ignoreExpansion);
         }
-        
+
         index++;
-        
+
         if (!currentItem)
           index = -1;
       }
 
       return index;
     }
-    
-    
+
+
     void AbstractTreeModel::setFrozen(bool newFrozenState)
     {
       frozen = newFrozenState;
@@ -373,8 +373,8 @@ namespace Isis
         }
       }
     }
-    
-    
+
+
     bool AbstractTreeModel::isFrozen() const
     {
       return frozen;
@@ -391,14 +391,14 @@ namespace Isis
     {
       return filterRunning;
     }
-    
-    
+
+
     bool AbstractTreeModel::isRebuilding() const
     {
       return rebuildRunning;
     }
-    
-    
+
+
     void AbstractTreeModel::setFilter(FilterWidget * fw)
     {
       guisFilterWidget = fw;
@@ -523,7 +523,7 @@ namespace Isis
             delete localFilterWidgetCopy;
             localFilterWidgetCopy = NULL;
           }
-            
+
           localFilterWidgetCopy = new FilterWidget(*guisFilterWidget);
 
           // using the local copy (NOT the GUI's FilterWidget!!!) apply then
@@ -672,9 +672,9 @@ namespace Isis
         delete newRoot;
         newRoot = NULL;
       }
-      
+
       applyFilter();
-      
+
       setRebuilding(false);
       emit modelModified();
 

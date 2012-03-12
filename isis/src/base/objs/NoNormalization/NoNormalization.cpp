@@ -1,7 +1,7 @@
 #include <cmath>
 #include "NoNormalization.h"
 #include "SpecialPixel.h"
-#include "iException.h"
+#include "IException.h"
 
 namespace Isis {
   NoNormalization::NoNormalization(Pvl &pvl, PhotoModel &pmodel) :

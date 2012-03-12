@@ -23,6 +23,7 @@
  */
 
 #include "BandManager.h"
+#include "IException.h"
 
 using namespace std;
 namespace Isis {
@@ -57,12 +58,12 @@ namespace Isis {
   bool BandManager::SetBand(const int sample, const int line) {
     if(sample < 1) {
       string message = "Invalid value for argument [sample]";
-      throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+      throw IException(IException::Programmer, message, _FILEINFO_);
     }
 
     if(line < 1) {
       string message = "Invalid value for argument [line]";
-      throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+      throw IException(IException::Programmer, message, _FILEINFO_);
     }
 
     int map = (line - 1) * MaxBands() + sample - 1;

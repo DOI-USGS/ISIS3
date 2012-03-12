@@ -24,10 +24,10 @@ void IsisMain() {
   try {
     id = (string) lab.FindKeyword("DATA_SET_ID");
   }
-  catch(iException &e) {
+  catch(IException &e) {
     string msg = "Unable to read [DATA_SET_ID] from input file [" +
                  inFile.Expanded() + "]";
-    throw iException::Message(iException::Io, msg, _FILEINFO_);
+    throw IException(e, IException::Unknown, msg, _FILEINFO_);
   }
 
   p.SetPdsFile(inFile.Expanded(), "", label);

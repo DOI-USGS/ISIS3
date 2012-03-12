@@ -89,22 +89,22 @@ GUI:     0
 Finished Batchlist Test
 
 Testing =value
-**USER ERROR** Unknown parameter [=input.cub]
+**USER ERROR** Unknown parameter [=input.cub].
 
 Testing param =value
-**USER ERROR** Unknown parameter [=bread]
+**USER ERROR** Unknown parameter [=bread].
 
 Testing unterminated array-value quote
-**USER ERROR** Invalid array format [("hello)]
+**USER ERROR** Invalid array format [("hello)].
 
 Testing array-value ending in backslash
-**USER ERROR** Invalid array format [(hello)\]
+**USER ERROR** Invalid array format [(hello)\].
 
 FROM:    It
 TO:      Worked
 GUI:     0
 
-**USER ERROR** Invalid command line
+**USER ERROR** Invalid command line.
 **USER ERROR** Unknown parameter [bogus].
 
-**USER ERROR** The history file [junk.par] does not exist
+**USER ERROR** The history file [junk.par] does not exist.

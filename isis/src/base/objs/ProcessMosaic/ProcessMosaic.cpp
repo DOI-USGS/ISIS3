@@ -23,7 +23,7 @@
 
 #include "ProcessMosaic.h"
 #include "SpecialPixel.h"
-#include "iException.h"
+#include "IException.h"
 #include "Application.h"
 #include "Pvl.h"
 #include "Table.h"
@@ -63,7 +63,7 @@ namespace Isis {
     m_priority = input;
 
     m_matchDEM = false;
-    
+
     // Initialize the data members
     m_oss = -1;
     m_osl = -1;
@@ -98,23 +98,23 @@ namespace Isis {
   *           output cube. The cordinate is in output cube space and must be
   *           a legal band number within the output cube.
   *
-  * @throws Isis::iException::Message
+  * @throws Isis::IException::Message
   *
   * @author Sharmila Prasad (8/25/2009)
   */
   void ProcessMosaic::StartProcess(const int &os, const int &ol, const int &ob) {
- 
+
     // Error checks ... there must be one input and one output
     if((OutputCubes.size() != 1) || (InputCubes.size() != 1)) {
       string m = "You must specify exactly one input and one output cube";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     bool bTrackExists = false;
     if(!m_mosaicOptions.bCreate) {
       bTrackExists = GetTrackStatus();
     }
-    
+
     // **
     // Set up the input sub cube (This must be a legal sub-area of the input cube)
     // *
@@ -148,11 +148,11 @@ namespace Isis {
     if((m_osl + m_inl - 1) > OutputCubes[0]->getLineCount()) {
       m_inl = OutputCubes[0]->getLineCount() - m_osl + 1;
     }
-    
+
     // Tests for completly off the mosaic
     if((m_ins < 1) || (m_inl < 1)) {
       string m = "The input cube does not overlap the mosaic";
-      throw Isis::iException::Message(Isis::iException::User, m, _FILEINFO_);
+      throw IException(IException::User, m, _FILEINFO_);
     }
 
     // Band Adjustments
@@ -161,7 +161,7 @@ namespace Isis {
       m_inb = m_inb + m_osb - 1;
       m_osb = 1;
     }
-    
+
     p_progress->SetMaximumSteps((int)InputCubes[0]->getLineCount() * (int)InputCubes[0]->getBandCount());
     p_progress->CheckStatus();
 
@@ -171,18 +171,18 @@ namespace Isis {
     // (3) Ontop priority with all the special pixel flags set to true
     if(m_mosaicOptions.bTrack) {
       if(!(m_priority == band  ||
-          ((m_priority == input || m_priority == mosaic) && 
+          ((m_priority == input || m_priority == mosaic) &&
            (OutputCubes[0]->getBandCount()-1) == 1) ||   // tracking band was already created for Tracking=true
           (m_priority == input && m_highSat && m_lowSat && m_null)) ){
         string m = "Tracking cannot be True for multi-band Mosaic with ontop or beneath priority";
-        throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+        throw IException(IException::Programmer, m, _FILEINFO_);
       }
     }
-    
+
     // *******************************************************************************
 
     Pvl *inLab  = InputCubes[0]->getLabel();
-    // Create / Match DEM Shape Model if bMatchDEM Flag is enabled 
+    // Create / Match DEM Shape Model if bMatchDEM Flag is enabled
     if (m_matchDEM){
       MatchDEMShapeModel();
     }
@@ -207,7 +207,7 @@ namespace Isis {
       // BandBin group is not found
       else {
         string m = "Match BandBin cannot be True when the Image does not have the BandBin group";
-        throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+        throw IException(IException::Programmer, m, _FILEINFO_);
       }
     }
     // Match BandBin set to false and CREATE and TRACKING is true
@@ -369,17 +369,17 @@ namespace Isis {
   } // End StartProcess
 
   /**
-   * Match the Shape Model for input and mosaic. If creating the mosaic, 
-   * copy the input ShapeModel from the input label. 
-   * Store only the file name of the Shape Model 
-   * 
+   * Match the Shape Model for input and mosaic. If creating the mosaic,
+   * copy the input ShapeModel from the input label.
+   * Store only the file name of the Shape Model
+   *
    * @author Sharmila Prasad (1/24/2011)
    */
   void ProcessMosaic::MatchDEMShapeModel(void)
   {
     Pvl* inLabel  = InputCubes[0]->getLabel();
     Pvl* outLabel = OutputCubes[0]->getLabel();
-    
+
     if(outLabel->FindObject("IsisCube").HasGroup("Mosaic")) {
       PvlGroup outMosaicGrp = outLabel->FindObject("IsisCube").FindGroup("Mosaic");
       if(outMosaicGrp.HasKeyword("ShapeModel")) {
@@ -399,7 +399,7 @@ namespace Isis {
           }
         }
         std::string sErrMsg = "Input and Mosaic DEM Shape Model do not match";
-        throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_);
+        throw IException(IException::User, sErrMsg, _FILEINFO_);
       }
     }
     else {
@@ -420,10 +420,10 @@ namespace Isis {
       }
     }
   }
-  
+
   /**
    * Reset all the count bands to default at the time of mosaic creation
-   * 
+   *
    * @author Sharmila Prasad (1/13/2011)
    */
   void ProcessMosaic::ResetCountBands(void)
@@ -447,19 +447,19 @@ namespace Isis {
     }
   }
   /**
-   * Calculate DN value for a pixel for average priority and set the 
-   * Count band portal 
-   * 
+   * Calculate DN value for a pixel for average priority and set the
+   * Count band portal
+   *
    * @author Sharmila Prasad (1/13/2011)
-   *  
+   *
    * @param piPixel     - Pixel index
    * @param piPortal    - Input Portal
    * @param poPortal    - Output Portal
-   * @param porigPortal - Count Portal 
-   * 
+   * @param porigPortal - Count Portal
+   *
    * @return bool
    */
-  bool ProcessMosaic::ProcessAveragePriority(int piPixel, Portal& piPortal, Portal& poPortal, 
+  bool ProcessMosaic::ProcessAveragePriority(int piPixel, Portal& piPortal, Portal& poPortal,
                                              Portal& porigPortal)
   {
     bool bChanged=false;
@@ -488,7 +488,7 @@ namespace Isis {
     }
     return bChanged;
   }
-  
+
   /**
   *  This method matches the input BandBin group to the mosaic BandBin Group
   *  and allows band to be replaced in mosaic if it is NA (not assigned).
@@ -496,7 +496,7 @@ namespace Isis {
   *
   *  returns None
   *
-  *  @throws Isis::iException::Message
+  *  @throws Isis::IException::Message
   *
   *  @author Sharmila Prasad (9/25/2009)
   */
@@ -508,7 +508,7 @@ namespace Isis {
     PvlGroup &outBin = outLab->FindGroup("BandBin", Pvl::Traverse);
     if(inBin.Keywords() != outBin.Keywords()) {
       string msg = "Pvl Group [BandBin] does not match between the input and output cubes";
-      throw Isis::iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     //pvl - zero based
@@ -525,7 +525,7 @@ namespace Isis {
           if(outKey[j] == "NA") {
             outKey[j] = inKey[k];
             if(m_priority == average) {
-              if(sOutName.find("Filter") != string::npos || 
+              if(sOutName.find("Filter") != string::npos ||
                  sOutName.find("Name") != string::npos) {
                 outKey[j+iOutBandsHalf] = inKey[k] + "_Count";
               }
@@ -537,14 +537,14 @@ namespace Isis {
           else if(outKey[j] != inKey[k]) {
             string msg = "Pvl Group [BandBin] in Key[" + outKey.Name() + "] In value" + inKey[k] +
                          "and Out value=" + outKey[j] + " do not match";
-            throw Isis::iException::Message(iException::User, msg, _FILEINFO_);
+            throw IException(IException::User, msg, _FILEINFO_);
           }
         }
       }
       else {
         string msg = "Pvl Group [BandBin] In Keyword[" + inBin[i].Name() + "] and Out Keyword[" + outBin[i].Name() +
                      "] does not match";
-        throw Isis::iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
     }
 //     m_inb /= outBin.Keywords();
@@ -557,11 +557,11 @@ namespace Isis {
   /**
    *  This method adds the BandBin group to the mosaic corresponding
    *  to the actual bands in the mosaic
-   *  
+   *
    *  returns None
    *
    *  @author Sharmila Prasad (9/24/2009)
-   *  
+   *
    *  @history 2011-01-12 Sharmila Prasad Added logic for Count Bands for
    *  Average Priority
    */
@@ -590,7 +590,7 @@ namespace Isis {
       PvlKeyword &cInKey = cInBin[i];
       int iInKeySize = cInKey.Size();
       PvlKeyword cOutKey(cInKey.Name());
-      
+
       for(int b = 0; b < osb; b++) {
         cOutKey += "NA";
       }
@@ -608,12 +608,12 @@ namespace Isis {
       if(m_mosaicOptions.bTrack && iInBands == iInKeySize) {
         cOutKey += "TRACKING"; // for the origin band
       }
-      
-      // Tag the Count Bands if priority is Average. 
+
+      // Tag the Count Bands if priority is Average.
       else if(m_priority == average) {
         int iTotalOutBands = OutputCubes[0]->getBandCount();
         isb = m_isb - 1; // reset the input starting band
-        int iOutStartBand = iOutBands + osb; 
+        int iOutStartBand = iOutBands + osb;
         string sKeyName = cInKey.Name();
         bool bFilterKey = false;
         if(sKeyName.find("Filter") != string::npos ||
@@ -678,7 +678,7 @@ namespace Isis {
     for(int i=0; i<iOutBands; i++) {
       cOutKey += "NA";
     }
-    
+
     if(m_priority == average) {
       for(int i=iOutBands; i<iOutBandsTotal; i++) {
         cOutKey += "NA_Count";
@@ -688,7 +688,7 @@ namespace Isis {
     if(m_mosaicOptions.bTrack) {
       cOutKey += "TRACKING";
     }
-    
+
     cOutBin += cOutKey;
 
     outLab->FindObject("IsisCube").AddGroup(cOutBin);
@@ -752,7 +752,7 @@ namespace Isis {
     }
     if(!bFound) {
       string msg = "Invalid Band / Key Name, Value ";
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     if(peFileType == inFile)
@@ -772,8 +772,8 @@ namespace Isis {
    *
    * @index     - Filename Index for the origin band (default +
    *                zero based index)
-   *  
-   * @throws Isis::iException::Message
+   *
+   * @throws Isis::IException::Message
    *
    * @author Sharmila Prasad (9/04/2009)
    */
@@ -819,10 +819,10 @@ namespace Isis {
       OutputCubes[0]->write(origPortal);
     }
   }
-  
+
   /**
    * Mosaicking for Band Priority with no Tracking
-   * 
+   *
    * @author Sharmila Prasad (1/4/2012)
    */
   void ProcessMosaic::BandPriorityWithNoTracking(void) {
@@ -844,12 +844,12 @@ namespace Isis {
 
       oComparePortal.SetPosition(m_oss, outLine, m_mosaicOptions.iOutBand);
       OutputCubes[0]->read(oComparePortal);
-      
+
       Isis::Portal iPortal(m_ins, 1, InputCubes[0]->getPixelType());
       Isis::Portal oPortal(m_ins, 1, OutputCubes[0]->getPixelType());
-      
+
       bool inCopy = false;
-      
+
       // Move the input data to the output
       for(int iPixel = 0; iPixel < m_ins; iPixel++) {
         resultsPortal[iPixel] = false;
@@ -874,16 +874,16 @@ namespace Isis {
           }
         }
       }
-      
+
       if(inCopy) {
         for(int ib = m_isb, ob = m_osb; ib < (m_isb + m_inb) && ob <= m_onb; ib++, ob++) {
           // Set the position of the portals in the input and output cubes
           iPortal.SetPosition(m_iss, inLine, ib);
           InputCubes[0]->read(iPortal);
-  
+
           oPortal.SetPosition(m_oss, outLine, ob);
           OutputCubes[0]->read(oPortal);
-            
+
           for(int iPixel = 0; iPixel < m_ins; iPixel++) {
             if(resultsPortal[iPixel]) {
               oPortal[iPixel] = iPortal[iPixel];
@@ -972,7 +972,7 @@ namespace Isis {
    *
    * @returns default value
    *
-   * @throws Isis::iException::Message
+   * @throws Isis::IException::Message
    *
    * @author Sharmila Prasad (9/10/2009)
    */
@@ -994,7 +994,7 @@ namespace Isis {
 
       default:
         string msg = "ProcessMosaic::GetOriginDefaultByPixelType - Invalid Pixel Type";
-        throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+        throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     return iDefault;
@@ -1158,7 +1158,7 @@ namespace Isis {
 
             if(bFull) {
               string msg = "The number of images in the Mosaic exceeds the pixel size";
-              throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+              throw IException(IException::Programmer, msg, _FILEINFO_);
             }
 
             for(int i = 0; i < iRecs; i++) {
@@ -1257,7 +1257,7 @@ namespace Isis {
    *           application to choose a sub-area from the input cube to be place
    *           into the mosaic. Defaults to number of bands in the cube
    *
-   * @throws Isis::iException::Message
+   * @throws Isis::IException::Message
    */
   Isis::Cube *ProcessMosaic::SetInputCube(const std::string &parameter,
                                           const int ss, const int sl, const int sb,
@@ -1266,7 +1266,7 @@ namespace Isis {
     // Make sure only one input is active at a time
     if(InputCubes.size() > 0) {
       string m = "You must specify exactly one input cube";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     m_iss = ss;
@@ -1285,7 +1285,7 @@ namespace Isis {
       iString sStr(cBandKey[0]);
       if(sStr.ToInteger() < nb) {
         string m = "The parameter number of input bands exceeds the actual number of bands in the input cube";
-        throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+        throw IException(IException::Programmer, m, _FILEINFO_);
       }
     }
     return cInCube;
@@ -1325,7 +1325,7 @@ namespace Isis {
    *           application to choose a sub-area from the input cube to be place
    *           into the mosaic. Defaults to number of bands in the cube
    *
-   * @throws Isis::iException::Message
+   * @throws Isis::IException
    */
   Isis::Cube *ProcessMosaic::SetInputCube(const std::string &fname,
                                           Isis::CubeAttributeInput &att,
@@ -1335,7 +1335,7 @@ namespace Isis {
     // Make sure only one input is active at a time
     if(InputCubes.size() > 0) {
       string m = "You must specify exactly one input cube";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     m_iss = ss;
@@ -1354,7 +1354,7 @@ namespace Isis {
       iString sStr(cBandKey[0]);
       if(sStr.ToInteger() < nb) {
         string m = "The parameter number of input bands exceeds the actual number of bands in the input cube";
-        throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+        throw IException(IException::Programmer, m, _FILEINFO_);
       }
     }
     return cInCube;
@@ -1372,14 +1372,14 @@ namespace Isis {
    *                    line TO=mosaic.cub and this method will attempt to open the
    *                    cube "mosaic.cub" if the parameter was set to "TO". .
    *
-   * @throws Isis::iException::Message
+   * @throws Isis::IException::Message
    */
   Isis::Cube *ProcessMosaic::SetOutputCube(const std::string &psParameter) {
 
     // Make sure there is only one output cube
     if(OutputCubes.size() > 0) {
       string m = "You must specify exactly one output cube";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     // Attempt to open a cube ... get the filename from the user parameter
@@ -1389,7 +1389,7 @@ namespace Isis {
       string fname = Application::GetUserInterface().GetFilename(psParameter);
       cube->open(fname, "rw");
     }
-    catch(Isis::iException &e) {
+    catch(IException &) {
       delete cube;
       throw;
     }

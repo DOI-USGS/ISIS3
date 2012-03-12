@@ -197,9 +197,9 @@ namespace Isis {
   /**
    * Create the menus for QtieTool
    *
-   * @internal 
-   * @history 2011-10-06 Tracie Sucharski - Added Help and What's This 
-   *  
+   * @internal
+   * @history 2011-10-06 Tracie Sucharski - Added Help and What's This
+   *
    */
   void QtieTool::createMenus() {
 
@@ -312,22 +312,20 @@ namespace Isis {
     try {
       p_baseGM = new UniversalGroundMap(*p_baseCube);
     }
-    catch (iException &e) {
+    catch (IException &e) {
       QString message = "Cannot initialize universal ground map for basemap.\n";
-      string errors = e.Errors();
+      string errors = e.toString();
       message += errors.c_str();
-      e.Clear();
       QMessageBox::critical((QWidget *)parent(), "Error", message);
       return;
     }
     try {
       p_matchGM = new UniversalGroundMap(*matchCube);
     }
-    catch (iException &e) {
+    catch (IException &e) {
       QString message = "Cannot initialize universal ground map for match cube.\n";
-      string errors = e.Errors();
+      string errors = e.toString();
       message += errors.c_str();
-      e.Clear();
       QMessageBox::critical((QWidget *)parent(), "Error", message);
       return;
     }
@@ -431,14 +429,13 @@ namespace Isis {
                 Latitude(lat, Angle::Degrees), Longitude(lon, Angle::Degrees),
                 radius));
     }
-    catch (iException &e) {
+    catch (IException &e) {
       QString message = "Unable to set Apriori Surface Point.\n";
       message += "Latitude = " + QString::number(lat);
       message += "  Longitude = " + QString::number(lon);
       message += "  Radius = " + QString::number(radius.meters()) + "\n";
-      message += e.Errors().c_str();
+      message += e.toString().ToQt();
       QMessageBox::critical((QWidget *)parent(),"Error",message);
-      e.Clear();
     }
 
     emit editPointChanged();
@@ -496,12 +493,11 @@ namespace Isis {
       try {
         point = p_controlNet->FindClosest(sn, samp, line);
       }
-      catch (iException &e) {
+      catch (IException &e) {
         QString message = "No points found for editing.  Create points ";
         message += "using the right mouse button.";
-        message += e.Errors().c_str();
+        message += e.toString().ToQt();
         QMessageBox::critical((QWidget *)parent(), "Error", message);
-        e.Clear();
         return;
       }
       modifyPoint(point);
@@ -855,11 +851,10 @@ namespace Isis {
       }
 
     }
-    catch (iException &e) {
+    catch (IException &e) {
       QString message = "Bundle Solution failed.\n";
-      string errors = e.Errors();
+      string errors = e.toString();
       message += errors.c_str();
-      e.Clear();
 //      message += "\n\nMaximum Error = " + QString::number(net.MaximumResiudal());
 //      message += "\nAverage Error = " + QString::number(net.AverageResidual());
       message += "\n\nMaximum Error = " + QString::number(net.GetMaximumResidual());
@@ -889,13 +884,12 @@ namespace Isis {
     try {
       p_matchCube->read(h);
     }
-    catch (iException &e) {
+    catch (IException &e) {
       QString message = "Could not read cube history, "
                         "will not update history.\n";
-      string errors = e.Errors();
+      string errors = e.toString();
       message += errors.c_str();
       QMessageBox::warning((QWidget *)parent(), "Warning", message);
-      e.Clear();
       return;
     }
     PvlObject history("qtie");
@@ -961,9 +955,8 @@ namespace Isis {
       registrationDialog.resize(550, 360);
       registrationDialog.exec();
     }
-    catch (iException &e) {
-      QString message = e.Errors().c_str();
-      e.Clear();
+    catch (IException &e) {
+      QString message = e.toString();
       QMessageBox::warning((QWidget *)parent(), "Error", message);
     }
   }
@@ -1004,11 +997,10 @@ namespace Isis {
 
         net.Write(fn.toStdString());
       }
-      catch (iException &e) {
+      catch (IException &e) {
         QString message = "Error saving control network.  \n";
-        string errors = e.Errors();
+        string errors = e.toString();
         message += errors.c_str();
-        e.Clear();
         QMessageBox::information((QWidget *)parent(), "Error", message);
         return;
       }

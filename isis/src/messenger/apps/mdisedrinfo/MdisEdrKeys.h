@@ -33,7 +33,7 @@
 #include "CollectorMap.h"
 #include "MdisGeometry.h"
 #include "OriginalLabel.h"
-#include "iException.h"
+#include "IException.h"
 
 namespace Isis {
 
@@ -144,7 +144,7 @@ namespace Isis {
        *
        * @return const PvlKeyword&  Returns a reference to the keyword at index
        */
-      const PvlKeyword &operator[](const int index) const throw(iException &) {
+      const PvlKeyword &operator[](const int index) const {
         return (_keys.getNth(index));
       }
 
@@ -158,7 +158,7 @@ namespace Isis {
        *
        * @return PvlKeyword& Reference to named keyword
        */
-      PvlKeyword &get(const std::string &name) throw(iException &) {
+      PvlKeyword &get(const std::string &name) {
         return (_keys.get(name));
       }
 
@@ -173,7 +173,7 @@ namespace Isis {
        * @return const PvlKeyword& Returns a const reference to the named
        *         keyword
        */
-      const PvlKeyword &get(const std::string &name) const throw(iException &) {
+      const PvlKeyword &get(const std::string &name) const {
         return (_keys.get(name));
       }
 
@@ -211,6 +211,7 @@ namespace Isis {
 
         std::string loopSep("");
         int nbad(0);
+        IException errors;
         for(unsigned int i = 0 ; i < keylist.size() ; i++) {
           iString keyname(keylist[i]);
           keyname.Trim(" \n\t");
@@ -237,17 +238,18 @@ namespace Isis {
             }
             loopSep = ";";
           }
-          catch(iException &ie) {
+          catch(IException &ie) {
             nbad++;
             std::string mess = "Keyword \"" + keyname + "\" does not exist!";
-            iException::Message(iException::User, mess.c_str(), _FILEINFO_);
+            errors.append(
+                IException(IException::User, mess.c_str(), _FILEINFO_));
           }
         }
 
         // Check to see if all keywords are found
         if(nbad > 0) {
           std::string mess = "One or more keywords in list do not exist!";
-          throw iException::Message(iException::User, mess.c_str(), _FILEINFO_);
+          throw IException(errors, IException::User, mess.c_str(), _FILEINFO_);
         }
 
         return (out.str());

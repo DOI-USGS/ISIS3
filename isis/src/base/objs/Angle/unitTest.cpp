@@ -1,7 +1,7 @@
 #include <iostream>
 #include <iomanip>
 #include "Constants.h"
-#include "iException.h"
+#include "IException.h"
 #include "Preference.h"
 #include "Angle.h"
 
@@ -40,8 +40,8 @@ int main(int argc, char *argv[]) {
       endl;
     cout << "  " << angle.text() << endl;
   }
-  catch(Isis::iException &e) {
-    e.Report();
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   try {
@@ -51,8 +51,8 @@ int main(int argc, char *argv[]) {
     cout << "  Valid? " << angle.isValid() << endl;
     cout << "  " << angle.text() << endl;
   }
-  catch(Isis::iException &e) {
-    e.Report();
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   try {
@@ -61,8 +61,8 @@ int main(int argc, char *argv[]) {
       " degrees" <<endl;
     cout << "  " << angle.text(false) << endl;
   }
-  catch(Isis::iException &e) {
-    e.Report();
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   try {
@@ -71,8 +71,8 @@ int main(int argc, char *argv[]) {
     cout <<"  Copy constructor:  " << angleCopy.degrees() << " degrees" << 
         endl;
   }
-  catch(Isis::iException &e) {
-    e.Report();
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   cout << endl << "Testing mutators" << endl;
@@ -86,8 +86,8 @@ int main(int argc, char *argv[]) {
     cout <<"  setRadians:  " << angle.radians() << " radians" << 
         endl;
   }
-  catch(Isis::iException &e) {
-    e.Report();
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   cout << endl << "Testing operators" << endl;
@@ -98,8 +98,8 @@ int main(int argc, char *argv[]) {
     cout << "  Assignment operator:  " << angle.degrees() << " degrees" <<
         endl;
   }
-  catch(Isis::iException &e) {
-    e.Report();
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   try {
@@ -116,8 +116,8 @@ int main(int argc, char *argv[]) {
     angle1 = angle1 - angle2;
     cout << "    angle - angle: " << angle1.degrees() << " degrees" <<endl;
   }
-  catch(Isis::iException &e) {
-    e.Report();
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   try {
@@ -133,8 +133,8 @@ int main(int argc, char *argv[]) {
     angle = angle / 2;
     cout << "    angle / double: " << angle.degrees() << " degrees" <<endl;
   }
-  catch(Isis::iException &e) {
-    e.Report();
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   cout << endl << "Testing logical operators" << endl;
@@ -146,8 +146,8 @@ int main(int argc, char *argv[]) {
     cout << "  angle1 == angle2?  " << (Angle() == Angle()) << endl;
     cout << "  angle1 == angle2?  " << (Angle() == angle2) <<endl;
   }
-  catch(Isis::iException &e) {
-    e.Report();
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   try {
@@ -155,8 +155,8 @@ int main(int argc, char *argv[]) {
     Angle angle2(45., Angle::Degrees);
     cout << "  angle1 <  angle2?  " << (angle1 < angle2) << endl;
   }
-  catch(Isis::iException &e) {
-    e.Report();
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   try {
@@ -164,32 +164,32 @@ int main(int argc, char *argv[]) {
     Angle angle2(45., Angle::Degrees);
     cout << "  angle1 <= angle2?  " << (angle1 <= angle2) << endl;
   }
-  catch(Isis::iException &e) {
-    e.Report();
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   try {
     Angle angle1(30., Angle::Degrees );
     cout << "  angle1 <  angle2?  " << (angle1 < Angle());
   }
-  catch(Isis::iException &e) {
-    e.Report();
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   try {
     Angle angle1(30., Angle::Degrees );
     cout << "  angle1 <  angle2?  " << (Angle() < angle1);
   }
-  catch(Isis::iException &e) {
-    e.Report();
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   try {
     Angle angle1(30., Angle::Degrees );
     cout << "  angle1 <=  angle2?  " << (Angle() <= angle1);
   }
-  catch(Isis::iException &e) {
-    e.Report();
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   try {
@@ -197,16 +197,16 @@ int main(int argc, char *argv[]) {
     Angle angle2(45., Angle::Degrees);
     cout << "  angle1 >  angle2?  " << (angle1 > angle2) << endl;
   }
-  catch(Isis::iException &e) {
-    e.Report();
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   try {
     Angle angle1(30., Angle::Degrees );
     cout << "  angle1 >  angle2?  " << (angle1 > Angle()) << endl;
   }
-  catch(Isis::iException &e) {
-    e.Report();
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   try {
@@ -214,16 +214,16 @@ int main(int argc, char *argv[]) {
     Angle angle2(45., Angle::Degrees);
     cout << "  angle1 >= angle2?  " << (angle1 >= angle2) << endl;
   }
-  catch(Isis::iException &e) {
-    e.Report();
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   try {
     Angle angle1(30., Angle::Degrees );
     cout << "  angle1 >= angle2?  " << (angle1 >= Angle()) << endl;
   }
-  catch(Isis::iException &e) {
-    e.Report();
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   cout << endl << "Testing protected methods" << endl;
@@ -232,8 +232,8 @@ int main(int argc, char *argv[]) {
     MyAngle angle(30., Angle::Degrees);
     angle.TestUnitWrapValue();
   }
-  catch(Isis::iException &e) {
-    e.Report();
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   try {
@@ -241,8 +241,8 @@ int main(int argc, char *argv[]) {
     cout << "  Degree ";
     angle.setAngle(60., Angle::Degrees);
   }
-  catch(Isis::iException &e) {
-    e.Report();
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   try {
@@ -250,8 +250,8 @@ int main(int argc, char *argv[]) {
     cout << "  Radian ";
     angle.setAngle(.5, Angle::Degrees);
   }
-  catch(Isis::iException &e) {
-    e.Report();
+  catch(Isis::IException &e) {
+    e.print();
   }
 }
 

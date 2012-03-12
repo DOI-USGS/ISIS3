@@ -85,7 +85,7 @@ void IsisMain() {
   else {
     string msg = "Unknown value for INTERP [" +
                  ui.GetString("INTERP") + "]";
-    throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+    throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
   // Create the output file

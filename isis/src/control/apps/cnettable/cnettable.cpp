@@ -7,7 +7,7 @@
 #include "ControlPoint.h"
 #include "Displacement.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "Latitude.h"
 #include "Longitude.h"
@@ -62,7 +62,7 @@ void IsisMain() {
 
   if(cnet.GetNumMeasures() == 0) {
     string msg = "Your control network must contain at least one point";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   prog.SetMaximumSteps(cnet.GetNumMeasures());
@@ -192,13 +192,11 @@ void IsisMain() {
     measureInfo += iString(CheckValue(Asp.GetLonSigma().degrees())) + ",";
     measureInfo += iString(CheckValue(Asp.GetLocalRadiusSigma().kilometers())) + ",";
     try { measureInfo += iString(CheckValue(Asp.GetLatSigmaDistance().kilometers())) + ","; }
-    catch (iException e) {
-      e.Clear();
+    catch (IException &) {
       measureInfo += ",";
     }
     try { measureInfo += iString(CheckValue(Asp.GetLonSigmaDistance().kilometers())) + ","; }
-    catch (iException e) {
-      e.Clear();
+    catch (IException &) {
       measureInfo += ",";
     }
 
@@ -216,13 +214,11 @@ void IsisMain() {
     measureInfo += iString(CheckValue(sp.GetLonSigma().degrees())) + ",";
     measureInfo += iString(CheckValue(sp.GetLocalRadiusSigma().kilometers())) + ",";
     try { measureInfo += iString(CheckValue(sp.GetLatSigmaDistance().kilometers())) + ","; }
-    catch (iException e) {
-      e.Clear();
+    catch (IException &e) {
       measureInfo += ",";
     }
     try { measureInfo += iString(CheckValue(sp.GetLonSigmaDistance().kilometers())) + ","; }
-    catch (iException e) {
-      e.Clear();
+    catch (IException &e) {
       measureInfo += ",";
     }
 
@@ -260,8 +256,8 @@ void IsisMain() {
     measureInfo += iString(CheckValue(cpoint->GetStatistic(
         &ControlMeasure::GetPixelShift).Minimum())) + ",";
     measureInfo += iString(CheckValue(cpoint->GetStatistic(
-        &ControlMeasure::GetPixelShift).Average())) + ",";  
-    
+        &ControlMeasure::GetPixelShift).Average())) + ",";
+
     measureInfo += iString(CheckValue(cpoint->GetStatistic(
         ControlMeasureLogData::MaximumPixelZScore).Maximum())) + ",";
     measureInfo += iString(CheckValue(cpoint->GetStatistic(
@@ -278,7 +274,7 @@ void IsisMain() {
         ControlMeasureLogData::GoodnessOfFit).Minimum())) + ",";
     measureInfo += iString(CheckValue(cpoint->GetStatistic(
         ControlMeasureLogData::GoodnessOfFit).Average())) + ",";
-    
+
     // Loop through all measures in controlpoint
     for(int j = 0; j < cpoint->GetNumMeasures(); j++) {
 
@@ -291,7 +287,7 @@ void IsisMain() {
       // Shouldn't ever happen, but, being safe...
       if(grp == NULL) {
         string msg = "You shouldn't have gotten here. Errors in CameraPointInfo class";
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       }
       Write(grp, *cmeasure);
       delete grp;
@@ -323,9 +319,9 @@ iString CheckValue(double value) {
 
 iString CheckValue(iString value) {
   if (value == iString(Isis::Null) ||
-      value == iString(Isis::Hrs) || 
-      value == iString(Isis::His) || 
-      value == iString(Isis::Lrs) || 
+      value == iString(Isis::Hrs) ||
+      value == iString(Isis::His) ||
+      value == iString(Isis::Lrs) ||
       value == iString(Isis::Lis)) {
     return iString("");
   }
@@ -336,15 +332,15 @@ iString CheckValue(iString value) {
 
 iString CheckValue(QString value) {
   if (value == QString::number(Isis::Null) ||
-      value == QString::number(Isis::Hrs) || 
-      value == QString::number(Isis::His) || 
-      value == QString::number(Isis::Lrs) || 
+      value == QString::number(Isis::Hrs) ||
+      value == QString::number(Isis::His) ||
+      value == QString::number(Isis::Lrs) ||
       value == QString::number(Isis::Lis)) {
     return iString("");
   }
   else {
     return value.toStdString();
-  }  
+  }
 }
 
 // Write each PvlGroup out to file
@@ -375,7 +371,7 @@ void Write(PvlGroup *point, const ControlMeasure &cm) {
     foreach (nameValuePair, printableMeasureData) {
       output += nameValuePair.at(0) + ",";
     }
-    
+
     // point information
     for(int i = 0; i < maxCount; i++) {
       if((*point)[i].Size() == 3) {
@@ -427,7 +423,7 @@ void Write(PvlGroup *point, const ControlMeasure &cm) {
   //  output += iString(cm.GetMeasureData(dataNames[i])) + ",";
   //}
 
-  
+
 
   if(errors) output += QString((*point)[maxCount][0]);
 

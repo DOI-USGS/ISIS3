@@ -21,7 +21,7 @@
  */
 
 #include <iomanip>
-#include "iException.h"
+#include "IException.h"
 #include "CameraFactory.h"
 #include "Preference.h"
 #include "Filename.h"
@@ -312,7 +312,7 @@ const bool KernelDb::Matches(Pvl &lab, PvlGroup &kernelDbGrp,
           matchKeywords = false;
         }
       }
-      catch(Isis::iException &e) {
+      catch(IException &e) {
         // This error is thrown if the group or keyword do not exist in 'lab'
         matchKeywords = false;
       }
@@ -357,7 +357,7 @@ const bool KernelDb::Matches(Pvl &lab, PvlGroup &kernelDbGrp,
 
         }
       }
-      catch(Isis::iException &e) {
+      catch(IException &) {
         matchKeywords = false;
       }
     }
@@ -473,7 +473,7 @@ std::vector<std::string> KernelDb::GetFile(PvlGroup &grp) {
       string msg = "Invalid File keyword value in [Group = ";
       msg += grp.Name() + "] in database file [";
       msg += p_filename + "]";
-      throw iException::Message(iException::Parse, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
   }
 

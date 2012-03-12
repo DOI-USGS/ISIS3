@@ -36,7 +36,7 @@
 #include "ControlMeasure.h"
 #include "ControlPoint.h"
 #include "Distance.h"
-#include "iException.h"
+#include "IException.h"
 #include "Latitude.h"
 #include "Longitude.h"
 #include "SpecialPixel.h"

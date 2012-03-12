@@ -21,7 +21,7 @@
  */
 
 #include "QuickFilter.h"
-#include "iException.h"
+#include "IException.h"
 #include <float.h>
 
 using namespace std;
@@ -38,36 +38,36 @@ namespace Isis {
    *
    * @param height Height of the boxcar (must be odd)
    *
-   * @throws Isis::iException::Programmer
+   * @throws Isis::IException::Programmer
    */
   QuickFilter::QuickFilter(const int ns, const int width,
                            const int height) {
     // Error checks
     if(ns <= 0) {
       string msg = "Invalid value for [ns] in QuickFilter constructor";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if(width < 1) {
       string m = "[Width] must be must be greater than or equal to one in ";
       m += "QuickFilter constructor";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
     else if((width % 2) == 0) {
       string m = "[Width] must be must be odd in ";
       m += "QuickFilter constructor";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     if(height < 1) {
       string m = "[Height] must be must be greater than or equal to one in ";
       m += "QuickFilter constructor";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
     else if((height % 2) == 0) {
       string m = "[Height] must be must be odd in ";
       m += "QuickFilter constructor";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     // Create buffers
@@ -134,7 +134,7 @@ namespace Isis {
   void QuickFilter::SetMinMax(const double minimum, const double maximum) {
     if(minimum >= maximum) {
       string m = "Minimum must be less than maximum in [QuickFilter::SetMinMax]";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     p_minimum = minimum;
@@ -156,7 +156,7 @@ namespace Isis {
     if(pixels < 0) {
       string m = "Pixels must be greater than or equal to zero in ";
       m += "[QuickFilter::SetMinimumPixels]";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
     p_minimumPixels = pixels;
     if(p_minimumPixels > p_width * p_height) {
@@ -181,7 +181,7 @@ namespace Isis {
     if(p_linesAdded > p_height) {
       string m = "Number of lines added exceeds boxcar height ... ";
       m += "use RemoveLine before AddLine";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     for(int i = 0; i < p_ns; i++) {

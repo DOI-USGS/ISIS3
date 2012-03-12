@@ -53,7 +53,7 @@ void IsisMain() {
   else {
     string msg = "Unknow value for TYPE [" +
                  ui.GetString("TYPE") + "]";
-    throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
   p.EndProcess();

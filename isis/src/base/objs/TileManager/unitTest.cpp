@@ -1,7 +1,7 @@
 #include <string>
 #include <iostream>
 #include <stdio.h>
-#include "iException.h"
+#include "IException.h"
 #include "Cube.h"
 #include "TileManager.h"
 #include "Preference.h"
@@ -21,9 +21,9 @@ int main(int argc, char *argv[]) {
     cube->setDimensions(ns, nl, nb);
     cube->create(fname);
   }
-  catch(Isis::iException &e) {
+  catch(Isis::IException &e) {
     delete cube;
-    e.Report(false);
+    e.print();
   }
 
   // Create a tile buffer for the cube with default size (128,128)

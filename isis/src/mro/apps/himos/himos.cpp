@@ -4,7 +4,7 @@
 #include "Camera.h"
 #include "Cube.h"
 #include "FileList.h"
-#include "iException.h"
+#include "IException.h"
 #include "Pvl.h"
 #include "iString.h"
 #include "Longitude.h"
@@ -37,7 +37,7 @@ void IsisMain() {
     if(flist.size() < 1) {
       string msg = "the list file [" + ui.GetFilename("FROMLIST") +
                    "does not contain any data";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     // open all the cube and place in vector clist
@@ -173,7 +173,7 @@ void IsisMain() {
     }
     if(runXY) {
       string msg = "Camera did not intersect images to gather stats";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     // get the min and max SCLK values ( do this with string comp.)
@@ -284,13 +284,13 @@ void IsisMain() {
     mosCube.close();
 
   }
-  catch(iException &e) {
+  catch(IException &e) {
     for(int i = 0; i < (int)clist.size(); i++) {
       clist[i]->close();
       delete clist[i];
     }
     string msg = "The mosaic [" + ui.GetFilename("TO") + "] was NOT created";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 } // end of isis main
 
@@ -304,7 +304,7 @@ void CompareLabels(Pvl &pmatch, Pvl &pcomp) {
 
   if(obsMatch != obsComp) {
     string msg = "Images not from the same observation";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // Test of the BandBin filter name
@@ -315,6 +315,6 @@ void CompareLabels(Pvl &pmatch, Pvl &pcomp) {
 
   if(bandMatch != bandComp) {
     string msg = "Images not the same filter";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 }

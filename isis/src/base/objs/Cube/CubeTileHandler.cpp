@@ -25,7 +25,7 @@
 
 #include <QFile>
 
-#include "iException.h"
+#include "IException.h"
 #include "Pvl.h"
 #include "PvlObject.h"
 #include "PvlKeyword.h"
@@ -110,7 +110,7 @@ namespace Isis {
           "failed with reading [" +
           QString::number(chunkToFill.getByteCount()) +
           "] bytes at position [" + QString::number(startByte) + "]";
-      throw iException::Message(iException::Io, msg, _FILEINFO_);
+      throw IException(IException::Io, msg, _FILEINFO_);
     }
   }
 
@@ -133,7 +133,7 @@ namespace Isis {
           "failed with writing [" +
           QString::number(chunkToWrite.getByteCount()) +
           "] bytes at position [" + QString::number(startByte) + "]";
-      throw iException::Message(iException::Io, msg, _FILEINFO_);
+      throw IException(IException::Io, msg, _FILEINFO_);
     }
   }
 

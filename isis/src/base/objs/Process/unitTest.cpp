@@ -29,8 +29,8 @@ void IsisMain() {
   try {
     p.SetOutputCube("TO");
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
   cout << endl;
 
@@ -38,8 +38,8 @@ void IsisMain() {
   try {
     p.SetOutputCube("TO", 0, 1, 1);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
   cout << endl;
 
@@ -47,8 +47,8 @@ void IsisMain() {
   try {
     p.SetOutputCube("TO", 1, 0, 1);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
   cout << endl;
 
@@ -56,8 +56,8 @@ void IsisMain() {
   try {
     p.SetOutputCube("TO", 1, 1, 0);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
   cout << endl;
 
@@ -72,9 +72,8 @@ void IsisMain() {
   try {
     p.SetInputCube("FROM", Isis::OneBand);
   }
-  catch(Isis::iException &e) {
+  catch(Isis::IException &e) {
     cout << "An exception was thrown!" << endl;
-    e.Clear();
   }
   cout << endl;
 
@@ -84,8 +83,8 @@ void IsisMain() {
     p.SetInputCube("unitTest.cub",
                    att, Isis::SizeMatch);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
   cout << endl;
 
@@ -101,8 +100,8 @@ void IsisMain() {
     p2.SetInputCube("unitTest.cub", att,
                     Isis::SizeMatch);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
   cout << endl;
 
@@ -117,8 +116,8 @@ void IsisMain() {
     p2.SetInputCube("unitTest.cub", att,
                     Isis::SizeMatch);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
   cout << endl;
 
@@ -130,8 +129,8 @@ void IsisMain() {
     p2.SetInputCube("unitTest.cub", att,
                     Isis::SpatialMatch);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
   cout << endl;
 
@@ -143,8 +142,8 @@ void IsisMain() {
     p2.SetInputCube("unitTest.cub", att,
                     Isis::SpatialMatch);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
   cout << endl;
 
@@ -159,8 +158,8 @@ void IsisMain() {
     p2.SetInputCube("unitTest.cub", att,
                     Isis::BandMatchOrOne);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
   cout << endl;
 
@@ -175,8 +174,8 @@ void IsisMain() {
     p2.SetInputCube("unitTest.cub", att,
                     Isis::AllMatchOrOne);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
   cout << endl;
 

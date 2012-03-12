@@ -14,5 +14,5 @@ Clearing dog values
   valuesize:  0
 
 Testing Throws in dog
-**PROGRAMMER ERROR** Array subscript [-1] is out of array bounds
-**PROGRAMMER ERROR** Array subscript [1] is out of array bounds
+**PROGRAMMER ERROR** Array subscript [-1] is out of array bounds.
+**PROGRAMMER ERROR** Array subscript [1] is out of array bounds.

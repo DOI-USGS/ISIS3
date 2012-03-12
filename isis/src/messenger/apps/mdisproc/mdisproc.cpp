@@ -4,7 +4,7 @@
 
 #include "UserInterface.h"
 #include "Pipeline.h"
-#include "iException.h"
+#include "IException.h"
 
 using namespace std;
 using namespace Isis;
@@ -13,7 +13,7 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   if(!ui.GetBoolean("INGESTION") && !ui.GetBoolean("CALIBRATION") && !ui.GetBoolean("CDR")) {
     string msg = "You must pick one of [INGESTION,CALIBRATION,CDR]";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   Pipeline p("mdisproc");

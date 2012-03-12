@@ -3,7 +3,7 @@
 #include "Camera.h"
 #include "CameraStatistics.h"
 #include "Cube.h"
-#include "iException.h"
+#include "IException.h"
 #include "Pvl.h"
 #include "Preference.h"
 #include "Statistics.h"
@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
       cout << endl;
     }
   }
-  catch(Isis::iException &e) {
-    e.Report();
+  catch(Isis::IException &e) {
+    e.print();
   }
 }

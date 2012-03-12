@@ -1,4 +1,4 @@
-#include "iException.h"
+#include "IException.h"
 #include "Pvl.h"
 #include "MocLabels.h"
 #include "Preference.h"
@@ -58,8 +58,8 @@ int main() {
     cout << "Offset = " << lab2.Offset() << endl << endl;
 
   }
-  catch(iException &e) {
-    e.Report();
+  catch(IException &e) {
+    e.print();
   }
 }
 

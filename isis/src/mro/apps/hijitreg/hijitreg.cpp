@@ -16,7 +16,7 @@
 #include "Chip.h"
 #include "Cube.h"
 #include "HiJitCube.h"
-#include "iException.h"
+#include "IException.h"
 #include "iTime.h"
 #include "MultivariateStatistics.h"
 #include "Progress.h"
@@ -101,7 +101,7 @@ void IsisMain() {
 //  Ensure only one band
   if((trans.getBandCount() != 1) || (match.getBandCount() != 1)) {
     string msg = "Input Cubes must have only one band!";
-    throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
 //  Now test compatability (basically summing)
@@ -110,7 +110,7 @@ void IsisMain() {
 //  Determine intersection
   if(!trans.intersects(match)) {
     string msg = "Input Cubes do not overlap!";
-    throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
 //  Get overlapping regions of each cube

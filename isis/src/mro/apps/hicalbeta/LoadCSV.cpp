@@ -1,26 +1,26 @@
-/**                                                                       
- * @file                                                                  
+/**
+ * @file
  * $Revision$
  * $Date$
  * $Id$
- * 
- *   Unless noted otherwise, the portions of Isis written by the USGS are 
- *   public domain. See individual third-party library and package descriptions 
- *   for intellectual property information, user agreements, and related  
- *   information.                                                         
- *                                                                        
- *   Although Isis has been used by the USGS, no warranty, expressed or   
- *   implied, is made by the USGS as to the accuracy and functioning of such 
- *   software and related material nor shall the fact of distribution     
+ *
+ *   Unless noted otherwise, the portions of Isis written by the USGS are
+ *   public domain. See individual third-party library and package descriptions
+ *   for intellectual property information, user agreements, and related
+ *   information.
+ *
+ *   Although Isis has been used by the USGS, no warranty, expressed or
+ *   implied, is made by the USGS as to the accuracy and functioning of such
+ *   software and related material nor shall the fact of distribution
  *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.                                        
- *                                                                        
- *   For additional information, launch                                   
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html                
+ *   USGS in connection therewith.
+ *
+ *   For additional information, launch
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
  *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.                                    
- */ 
+ *   http://www.usgs.gov/privacy.html.
+ */
 #include <string>
 #include <vector>
 #include <numeric>
@@ -29,7 +29,7 @@
 
 #include "LoadCSV.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 
 using namespace std;
 
@@ -39,13 +39,13 @@ namespace Isis {
   LoadCSV::LoadCSV() : _base(), _csvSpecs("LoadCSV"), _data(0,0), _history() { }
 
   LoadCSV::LoadCSV(const std::string &base, const HiCalConf &conf,
-                   const DbProfile &profile) : _base(), _csvSpecs("LoadCSV"), 
-                   _data(0,0), _history() { 
+                   const DbProfile &profile) : _base(), _csvSpecs("LoadCSV"),
+                   _data(0,0), _history() {
     load(base, conf, profile);
   }
 
   void LoadCSV::load(const std::string &base, const HiCalConf &conf,
-                     const DbProfile &profile) throw (iException &) {
+                     const DbProfile &profile) {
 
     //  Initialize the object with necessary info
     init(base, conf, profile);
@@ -69,7 +69,7 @@ namespace Isis {
     int skip = ConfKey(_csvSpecs, makeKey("SkipLines"), 0);
     addHistory("SkipLines", ToString(skip));
     bool comments = IsEqual(ConfKey(_csvSpecs, makeKey("IgnoreComments"), string("TRUE")));
-    string separator = ConfKey(_csvSpecs, makeKey("Separator"), string(",")); 
+    string separator = ConfKey(_csvSpecs, makeKey("Separator"), string(","));
     if (separator.empty()) separator = ",";   // Guarantees content
 
     // Apply conditions
@@ -84,10 +84,9 @@ namespace Isis {
     csvfile = csvF.Expanded();
     try {
       csv.read(csvfile);
-    } catch (iException &ie) {
+    } catch (IException &ie) {
       string mess =  "Could not read CSV file \'" + csvfile + "\'";
-      ie.Message(iException::User, mess, _FILEINFO_);
-      throw; 
+      throw IException(ie, IException::User, mess, _FILEINFO_);
     }
 
     //  Now get the data from the CSV table
@@ -105,15 +104,15 @@ namespace Isis {
       CSVReader::CSVAxis chead = csv.getHeader();
       startColumn = getAxisIndex(colName, chead);
       if (startColumn < 0) {
-        string mess = "Column name " + colName + 
+        string mess = "Column name " + colName +
                       " not found in CSV file " + csvfile;
-        throw iException::Message(iException::User, mess, _FILEINFO_);
+        throw IException(IException::User, mess, _FILEINFO_);
       }
       endColumn = startColumn;
       addHistory("ColumnIndex", ToString(startColumn));
     }
     else if (!(getValue("ColumnIndex").empty())) {
-       startColumn = ToInteger(getValue("ColumnIndex")) + 
+       startColumn = ToInteger(getValue("ColumnIndex")) +
                                  ((rowHeader) ? 1 : 0);
        endColumn = startColumn;
       addHistory("ColumnStart", ToString(startColumn));
@@ -126,13 +125,13 @@ namespace Isis {
       addHistory("RowName", rowName);
       if (!rowHeader) {
         string mess = "Row name given but config does not specify presence of row header!";
-        throw iException::Message(iException::User, mess, _FILEINFO_);
+        throw IException(IException::User, mess, _FILEINFO_);
       }
       CSVReader::CSVAxis rhead = csv.getColumn(0);
       startRow = getAxisIndex(rowName, rhead);
       if (startRow < 0) {
         string mess = "Row name " + rowName + " not found in CSV file " + csvfile;
-        throw iException::Message(iException::User, mess, _FILEINFO_);
+        throw IException(IException::User, mess, _FILEINFO_);
       }
       endRow = startRow;
       addHistory("RowIndex", ToString(startRow));
@@ -155,7 +154,7 @@ namespace Isis {
       for (int c = startColumn, hc = 0 ; c <= endColumn ; c++, hc++) {
         try {
           d[hr][hc] = ToDouble(row[c]);
-        } 
+        }
         catch (...) {
           std::ostringstream mess;
           mess << "Invalid real value (" << row[c] << ") in row index " << r;
@@ -176,9 +175,9 @@ namespace Isis {
       //iException::Clear(); Not sure how this could ever do anything
       std::ostringstream mess;
       mess << "Conversion errors in CSV file " + csvfile + ": Errors: ";
-      std::copy(errors.begin(), errors.end(), 
+      std::copy(errors.begin(), errors.end(),
                 std::ostream_iterator<std::string>(mess,"; "));
-      throw iException::Message(iException::User, mess.str(), _FILEINFO_);
+      throw IException(IException::User, mess.str(), _FILEINFO_);
     }
     return;
   }
@@ -192,14 +191,14 @@ namespace Isis {
     return (_data.dim1() * _data.dim2());
   }
 
-  bool LoadCSV::validateSize(const int &expected, const bool &throw_on_error) 
-                             const throw (iException &) {
+  bool LoadCSV::validateSize(const int &expected, const bool &throw_on_error)
+                             const {
     if (expected != size()) {
       if (!throw_on_error) return (false);
       ostringstream mess;
       mess << "Invalid count (Expected: " << expected << ", Received: "
            << size() << ") in CSV file " << getValue();
-      throw iException::Message(iException::User, mess.str(), _FILEINFO_);
+      throw IException(IException::User, mess.str(), _FILEINFO_);
     }
     return (true);
   }
@@ -235,14 +234,14 @@ namespace Isis {
     return;
   }
 
-  void LoadCSV::addHistory(const std::string &element, 
+  void LoadCSV::addHistory(const std::string &element,
                            const std::string &desc) {
     std::ostringstream mess;
     mess << element << "[" << desc << "]";
     _history.push_back(mess.str());
   }
 
-  void LoadCSV::getKeyList(const std::string &base, 
+  void LoadCSV::getKeyList(const std::string &base,
                            std::vector<std::string> &keys) const {
     keys.clear();
     keys.push_back(base);

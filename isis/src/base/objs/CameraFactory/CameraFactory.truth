@@ -1,32 +1,32 @@
 Unit test for CameraFactory
 Testing missing Instrument Group ...
-Version: **CAMERA ERROR** Unable to locate latest camera model version number from group [Instrument]
-**PVL ERROR** Unable to find group [Instrument]
+Version: **ERROR** Unable to locate latest camera model version number from group [Instrument].
+**ERROR** Unable to find PVL group [Instrument].
 
-**CAMERA ERROR** Unable to initialize camera model from group [Instrument]
-**PVL ERROR** Unable to find group [Instrument]
+**ERROR** Unable to initialize camera model from group [Instrument].
+**ERROR** Unable to find PVL group [Instrument].
 
 Testing missing spacecraft name ...
-Version: **CAMERA ERROR** Unable to locate latest camera model version number from group [Instrument]
-**PVL ERROR** Keyword [SpacecraftName] does not exist in [Group = Instrument]
+Version: **ERROR** Unable to locate latest camera model version number from group [Instrument].
+**ERROR** PVL Keyword [SpacecraftName] does not exist in [Group = Instrument].
 
-**CAMERA ERROR** Unable to initialize camera model from group [Instrument]
-**PVL ERROR** Keyword [SpacecraftName] does not exist in [Group = Instrument]
+**ERROR** Unable to initialize camera model from group [Instrument].
+**ERROR** PVL Keyword [SpacecraftName] does not exist in [Group = Instrument].
 
 Testing missing instrument id ...
-Version: **CAMERA ERROR** Unable to locate latest camera model version number from group [Instrument]
-**PVL ERROR** Keyword [InstrumentId] does not exist in [Group = Instrument]
+Version: **ERROR** Unable to locate latest camera model version number from group [Instrument].
+**ERROR** PVL Keyword [InstrumentId] does not exist in [Group = Instrument].
 
-**CAMERA ERROR** Unable to initialize camera model from group [Instrument]
-**PVL ERROR** Keyword [InstrumentId] does not exist in [Group = Instrument]
+**ERROR** Unable to initialize camera model from group [Instrument].
+**ERROR** PVL Keyword [InstrumentId] does not exist in [Group = Instrument].
 
 Testing unsupported camera mode ...
-Version: **CAMERA ERROR** Unable to locate latest camera model version number from group [Instrument]
-**CAMERA ERROR** Unsupported camera model, unable to find plugin for SpacecraftName [BOGUS SPACECRAFT] with InstrumentId [BOGUS INSTRUMENT]
+Version: **ERROR** Unable to locate latest camera model version number from group [Instrument].
+**ERROR** Unsupported camera model, unable to find plugin for SpacecraftName [BOGUS SPACECRAFT] with InstrumentId [BOGUS INSTRUMENT].
 **PVL ERROR** Unable to find group [BOGUSSPACECRAFT/BOGUSINSTRUMENT] in file [/usgs/pkgs/isis3nightly/isis/lib/Camera.plugin]
 
-**CAMERA ERROR** Unable to initialize camera model from group [Instrument]
-**CAMERA ERROR** Unable to locate latest camera model version number from group [Instrument]
-**CAMERA ERROR** Unsupported camera model, unable to find plugin for SpacecraftName [BOGUS SPACECRAFT] with InstrumentId [BOGUS INSTRUMENT]
+**ERROR** Unable to initialize camera model from group [Instrument].
+**ERROR** Unable to locate latest camera model version number from group [Instrument].
+**ERROR** Unsupported camera model, unable to find plugin for SpacecraftName [BOGUS SPACECRAFT] with InstrumentId [BOGUS INSTRUMENT].
 **PVL ERROR** Unable to find group [BOGUSSPACECRAFT/BOGUSINSTRUMENT] in file [/usgs/pkgs/isis3nightly/isis/lib/Camera.plugin]
 

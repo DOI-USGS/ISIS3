@@ -24,20 +24,20 @@ void IsisMain() {
   try {
     id = (string) lab.FindKeyword("DATA_SET_ID");
   }
-  catch(iException &e) {
+  catch(IException &e) {
     string msg = "Unable to read [DATA_SET_ID] from input file [" +
                  inFile.Expanded() + "]";
-    throw iException::Message(iException::Io, msg, _FILEINFO_);
+    throw IException(e, IException::Unknown, msg, _FILEINFO_);
   }
 
   id.ConvertWhiteSpace();
   id.Compress();
   id.Trim(" ");
-  if(id != "TC_MAP") { 
+  if(id != "TC_MAP") {
     string msg = "Input file [" + inFile.Expanded() + "] does not appear to be " +
                  "in Kaguya Terrain Camera level 2 format. " +
                  "DATA_SET_ID is [" + id + "]";
-    throw iException::Message(iException::Io, msg, _FILEINFO_);
+    throw IException(IException::Unknown, msg, _FILEINFO_);
   }
 
   p.SetPdsFile(labelFile, "", label);
@@ -63,7 +63,7 @@ void IsisMain() {
   // Write the Archive and Mapping groups to the output cube label
   outcube->putGroup(otherLabels.FindGroup("Mapping"));
   outcube->putGroup(otherLabels.FindGroup("Archive"));
-   
+
   // Add the BandBin group
   PvlGroup bbin("BandBin");
   bbin += PvlKeyword("FilterName", "BroadBand");

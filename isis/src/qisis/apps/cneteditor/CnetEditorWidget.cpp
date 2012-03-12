@@ -29,7 +29,7 @@
 
 #include "ControlNet.h"
 #include "ControlPoint.h"
-#include "iException.h"
+#include "IException.h"
 
 #include "AbstractMeasureItem.h"
 #include "AbstractPointItem.h"
@@ -87,7 +87,7 @@ namespace Isis
     setLayout(mainLayout);
 
     createActions();
-    
+
     topSplitterDefault = new QByteArray(topSplitter->saveState());
 
     readSettings();
@@ -117,10 +117,10 @@ namespace Isis
 
     delete connectionTreeView;
     connectionTreeView = NULL;
-    
+
     delete pointTableView;
     pointTableView = NULL;
-    
+
     delete measureTableView;
     measureTableView = NULL;
 
@@ -132,18 +132,18 @@ namespace Isis
 
     delete connectionFilterWidget;
     connectionFilterWidget = NULL;
-    
+
     delete menuActions;
     menuActions = NULL;
 
     delete toolBarActions;
     toolBarActions = NULL;
-    
+
     pointTableBox = NULL;
     measureTableBox = NULL;
     topSplitter = NULL;
     mainSplitter = NULL;
-    
+
     // TODO: null all member widgets!
   }
 
@@ -160,7 +160,7 @@ namespace Isis
 
     pointTableModel = NULL;
     measureTableModel = NULL;
-    
+
     pointTableBox = NULL;
     measureTableBox = NULL;
 
@@ -172,7 +172,7 @@ namespace Isis
 
     menuActions = NULL;
     toolBarActions = NULL;
-    
+
     filterArea = NULL;
 
     pointFilterWidget = NULL;
@@ -203,10 +203,9 @@ namespace Isis
       {
         item->deleteSource();
       }
-      catch (iException & e)
+      catch (IException &e)
       {
         QString message = e.what();
-        e.Clear();
 
         if (!ignoreAll)
         {
@@ -311,7 +310,7 @@ namespace Isis
     QList< QString > freezeTablesLocation;
     freezeTablesLocation.append(tr("&Tables"));
     menuActions->insert(freezeTablesAct, freezeTablesLocation);
-    
+
     QAction * enableSortAct = new QAction(QIcon(":sort"),
                                           tr("&Enable Sorting"), this);
     enableSortAct->setCheckable(true);
@@ -326,12 +325,12 @@ namespace Isis
     QList< QString > enableSortLocation;
     enableSortLocation.append(tr("&Tables"));
     menuActions->insert(enableSortAct, enableSortLocation);
-    
+
     QAction * whatsThisAct = QWhatsThis::createAction(this);
     QList< QString > whatsThisLocation;
     whatsThisLocation.append(tr("&Help"));
     menuActions->insert(whatsThisAct, whatsThisLocation);
-    
+
     QList< QAction * > tbActionList;
     tbActionList.append(freezeTablesAct);
     tbActionList.append(enableSortAct);
@@ -339,7 +338,7 @@ namespace Isis
     toolBarActions->insert("settingsToolBar", tbActionList);
   }
 
-  
+
   void CnetEditorWidget::createPointTreeView()
   {
     pointTreeView = new TreeView();
@@ -430,20 +429,20 @@ namespace Isis
         "point.<br/><br/>Cells that are gray are not editable.</html>");
     connect(pointTableView, SIGNAL(modelDataChanged()),
             this, SIGNAL(cnetModified()));
-    
+
     connect(pointTreeView, SIGNAL(selectionChanged()),
             pointTableView, SLOT(handleModelSelectionChanged()));
     connect(pointTableView, SIGNAL(selectionChanged()),
             pointTreeView, SLOT(handleModelSelectionChanged()));
-    
+
     connect(pointTableView,
             SIGNAL(rebuildModels(QList< CnetViz::AbstractTreeItem * >)),
             this,
             SLOT(rebuildModels(QList< CnetViz::AbstractTreeItem * >)));
-    
+
     connect(pointTableView, SIGNAL(filterCountsChanged(int,int)),
             this, SLOT(handlePointTableFilterCountsChanged(int,int)));
-    
+
     for (int i = 0; i < AbstractPointItem::COLS; i++)
     {
       QAction * act = new QAction(
@@ -489,7 +488,7 @@ namespace Isis
             SIGNAL(rebuildModels(QList< CnetViz::AbstractTreeItem * >)),
             this,
             SLOT(rebuildModels(QList< CnetViz::AbstractTreeItem * >)));
-    
+
     connect(measureTableView, SIGNAL(filterCountsChanged(int,int)),
             this, SLOT(handleMeasureTableFilterCountsChanged(int,int)));
 
@@ -541,16 +540,16 @@ namespace Isis
     handleTableFilterCountsChanged(visibleRows, totalRows, pointTableBox,
                                    "Control Point Table");
   }
-  
-  
+
+
   void CnetEditorWidget::handleMeasureTableFilterCountsChanged(
       int visibleRows, int totalRows)
   {
     handleTableFilterCountsChanged(visibleRows, totalRows, measureTableBox,
                                    "Control Measure Table");
   }
-  
-  
+
+
   void CnetEditorWidget::handleTableFilterCountsChanged(
       int visibleRows, int totalRows, QGroupBox * box, QString initialText)
   {
@@ -561,14 +560,14 @@ namespace Isis
         newTitle += QString::number(visibleRows);
       else
         newTitle += "???";
-      
+
       newTitle += " / " + QString::number(totalRows) + ")";
-        
+
       box->setTitle(newTitle);
     }
   }
-  
-  
+
+
   void CnetEditorWidget::upgradeVersion()
   {
     if (*workingVersion == "")
@@ -596,7 +595,7 @@ namespace Isis
     mainSplitter->restoreState(settings.value("mainSplitter").toByteArray());
 
     QString key;
-    
+
     QList< QAction * > actions =
         measureTableView->getHorizontalHeader()->actions();
     for (int i = 0; i < actions.size(); i++)
@@ -631,7 +630,7 @@ namespace Isis
     settings.setValue("mainSplitter", mainSplitter->saveState());
 
     QString key;
-    
+
     QList< QAction * > actions =
         measureTableView->getHorizontalHeader()->actions();
     for (int i = 0; i < actions.size(); i++)
@@ -693,29 +692,29 @@ namespace Isis
     ASSERT(menuActions);
     return *menuActions;
   }
-  
-  
+
+
   QMap< QString, QList< QAction * > > CnetEditorWidget::getToolBarActions()
   {
     ASSERT(toolBarActions);
     return *toolBarActions;
   }
-  
-  
+
+
   void CnetEditorWidget::setSortingEnabled(bool sortingIsEnabled)
   {
 //     cerr << "CnetEditorWidget::setSortingEnabled called\n";
     ASSERT(pointTableModel);
     ASSERT(measureTableModel);
-    
+
     if (pointTableModel)
       pointTableModel->setSortingEnabled(sortingIsEnabled);
-    
+
     if (measureTableModel)
       measureTableModel->setSortingEnabled(sortingIsEnabled);
   }
-  
-  
+
+
   void CnetEditorWidget::setTablesFrozen(bool freezeTables)
   {
     if (freezeTables)

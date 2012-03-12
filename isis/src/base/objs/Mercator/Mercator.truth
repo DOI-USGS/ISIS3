@@ -1,12 +1,12 @@
 UNIT TEST FOR Mercator
 
 Test missing center longitude keyword ...
-**I/O ERROR** Invalid label group [Mapping]
-**PVL ERROR** Keyword [CenterLongitude] does not exist in [Group = Mapping]
+**I/O ERROR** Invalid label group [Mapping].
+**ERROR** PVL Keyword [CenterLongitude] does not exist in [Group = Mapping].
 
 Test missing center latitude keyword...
-**I/O ERROR** Invalid label group [Mapping]
-**PVL ERROR** Keyword [CenterLatitude] does not exist in [Group = Mapping]
+**I/O ERROR** Invalid label group [Mapping].
+**ERROR** PVL Keyword [CenterLatitude] does not exist in [Group = Mapping].
 
 Test SetGround method ... 
 Setting ground to (35,-75)

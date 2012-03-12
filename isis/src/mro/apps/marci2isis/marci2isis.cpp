@@ -4,7 +4,7 @@
 #include "Brick.h"
 #include "MultivariateStatistics.h"
 #include "OriginalLabel.h"
-#include "iException.h"
+#include "IException.h"
 
 using namespace std;
 using namespace Isis;
@@ -51,14 +51,14 @@ void IsisMain() {
   if(lab.HasObject("IMAGE_MAP_PROJECTION")) {
     string msg = "[" + inFile.Name() + "] appears to be an rdr file.";
     msg += " Use pds2isis.";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   Pvl pdsLab;
   p.SetPdsFile(inFile.Expanded(), "", pdsLab);
 
   if((int)pdsLab["SAMPLING_FACTOR"] == 12) {
-    throw iException::Message(iException::User, "Summing mode of 12 not supported", _FILEINFO_);
+    throw IException(IException::User, "Summing mode of 12 not supported", _FILEINFO_);
   }
 
   // We need to know how many filters and their height to import the data properly
@@ -88,9 +88,9 @@ void IsisMain() {
       }
 
       if(filtNum >= numKnownFilters) {
-        throw iException::Message(iException::Pvl,
-                                  "Nothing is known about the [" + pdsLab["FILTER_NAME"][filter] + "] filter. COLOROFFSET not possible.",
-                                  _FILEINFO_);
+        throw IException(IException::Unknown,
+                         "Nothing is known about the [" + pdsLab["FILTER_NAME"][filter] + "] filter. COLOROFFSET not possible.",
+                         _FILEINFO_);
       }
       else {
         padding[filter] = (colorOffset * filterHeight) * filtNum;
@@ -283,14 +283,14 @@ void translateMarciLabels(Pvl &pdsLabel, Pvl &cubeLabel) {
     inst += PvlKeyword("SpacecraftName", "MARS RECONNAISSANCE ORBITER");
   }
   else {
-    throw iException::Message(iException::User, "The input file does not appear to be a MARCI image", _FILEINFO_);
+    throw IException(IException::User, "The input file does not appear to be a MARCI image", _FILEINFO_);
   }
 
   if((string)pdsLabel["INSTRUMENT_ID"] == "MARCI") {
     inst += PvlKeyword("InstrumentId", "Marci");
   }
   else {
-    throw iException::Message(iException::User, "The input file does not appear to be a MARCI image", _FILEINFO_);
+    throw IException(IException::User, "The input file does not appear to be a MARCI image", _FILEINFO_);
   }
 
   inst += PvlKeyword("TargetName", (string)pdsLabel["TARGET_NAME"]);

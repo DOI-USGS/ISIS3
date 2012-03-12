@@ -15,7 +15,7 @@
 #include "Brick.h"
 #include "Cube.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "UniversalGroundMap.h"
 
@@ -123,9 +123,8 @@ namespace Isis {
     try {
       newCube->open(fileName.Expanded(), "rw");
     }
-    catch (iException &e) {
+    catch (IException &e) {
       if (!mustOpenReadWrite) {
-        e.Clear();
         newCube->open(fileName.Expanded(), "r");
       }
       else {
@@ -175,8 +174,8 @@ namespace Isis {
 
     return newId;
   }
-  
-  
+
+
   /**
    * Removes a cube from this lock manager
    *
@@ -186,17 +185,16 @@ namespace Isis {
    */
   void CubeDataThread::RemoveCube(int cubeId) {
     p_threadSafeMutex->lock();
-    
+
     QMap< int, QPair< bool, Cube * > >::iterator i;
     i = p_managedCubes->find(cubeId);
-    
+
     if (i == p_managedCubes->end()) {
       p_threadSafeMutex->unlock();
       QString msg = "CubeDataThread::RemoveCube failed because cube ID [";
       msg += QString::number(cubeId);
       msg += "] not found";
-      throw iException::Message(iException::Programmer, msg.toStdString(),
-                                _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if (p_managedDataSources->contains(cubeId)) {
@@ -204,22 +202,21 @@ namespace Isis {
       QString msg = "CubeDataThread::RemoveCube failed cube ID [";
       msg += QString::number(cubeId);
       msg += "] has requested Bricks";
-      throw iException::Message(iException::Programmer, msg.toStdString(),
-                                _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     // if we have ownership of the cube then me must delete it
     if (i.value().first)
       delete i.value().second;
     i.value().second = NULL;
-    
+
     p_managedCubes->remove(i.key());
 
     p_threadSafeMutex->unlock();
 
   }
 
-  
+
   /**
    * You must call this method after connecting to the BrickChanged signal,
    * otherwise you are not guaranteed a good Brick pointer.
@@ -254,7 +251,7 @@ namespace Isis {
    */
   void CubeDataThread::GetCubeData(int cubeId, int ss, int sl, int es, int el,
                                    int band, void *caller, bool sharedLock) {
-                                   
+
     Brick *requestedBrick = NULL;
 
     p_threadSafeMutex->lock();
@@ -336,8 +333,8 @@ namespace Isis {
       emit ReadWriteReady(caller, cubeId, (*p_managedData)[exactIndex].second);
     }
   }
-  
-  
+
+
   /**
    * Given a Cube pointer, return the cube ID associated with it.
    *
@@ -352,10 +349,10 @@ namespace Isis {
       if (i.value().second == cubeToFind)
         return i.key();
     }
-    throw iException::Message(iException::Programmer, "Cube does not exist in "
-        "this CubeDataThread", _FILEINFO_);
+    throw IException(IException::Programmer,
+                     "Cube does not exist in this CubeDataThread", _FILEINFO_);
   }
-  
+
 
   /**
    * This method is exclusively used to acquire locks. This handles the problem
@@ -429,7 +426,7 @@ namespace Isis {
       iString msg = "cube ID [";
       msg += iString(cubeId);
       msg += "] is not a valid cube ID";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     GetCubeData(cubeId, startSample, startLine, endSample, endLine, band,
@@ -442,26 +439,28 @@ namespace Isis {
    * ReadWriteReady signal will be emitted with the parameter caller being equal
    * to the requester pointer in the signal. You should pass "this" for caller,
    * and you must ignore all ReadReady signals which do not have "requester ==
-   * this" -> otherwise your pointer is not guaranteed and you are corrupting the
-   * process of the real requester.
+   * this" -> otherwise your pointer is not guaranteed and you are corrupting
+   * the process of the real requester.
    *
    * @param cubeId Cube to read from
    * @param startSample Starting Sample Position
    * @param startLine Starting Line Position
    * @param endSample Ending Sample Position
    * @param endLine Ending Line Position
-   * @param band Band Number To Read From (multi-band bricks not supported at this
-   *             time)
-   * @param caller A pointer to the calling class, used to identify who requested
-   *               the data when they receive the ReadWriteReady signal
+   * @param band Band Number To Read From (multi-band bricks not supported at
+   *             this time)
+   * @param caller A pointer to the calling class, used to identify who
+   *               requested the data when they receive the ReadWriteReady
+   *               signal
    */
   void CubeDataThread::ReadWriteCube(int cubeId, int startSample,
-                                     int startLine, int endSample, int endLine, int band, void *caller) {
+                                     int startLine, int endSample, int endLine,
+                                     int band, void *caller) {
     if(!p_managedCubes->contains(cubeId)) {
       iString msg = "cube ID [";
       msg += iString(cubeId);
       msg += "] is not a valid cube ID";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     GetCubeData(cubeId, startSample, startLine, endSample, endLine, band,
@@ -600,8 +599,7 @@ namespace Isis {
       if (!(*p_managedData)[index].first->tryLockForRead()) {
         if (writeLock) {
           iString msg = "Overlapping data had write locks";
-          throw iException::Message(iException::Programmer, msg,
-                                          _FILEINFO_);
+          throw IException(IException::Programmer, msg, _FILEINFO_);
         }
 
         writeLock = true;
@@ -610,8 +608,7 @@ namespace Isis {
       else {
         if (writeLock) {
           iString msg = "Overlapping data had write locks";
-          throw iException::Message(iException::Programmer, msg,
-                                          _FILEINFO_);
+          throw IException(IException::Programmer, msg, _FILEINFO_);
         }
 
         // Unlock the lock we just made
@@ -680,11 +677,12 @@ namespace Isis {
    */
   bool CubeDataThread::FreeBrick(int brickIndex) {
     ASSERT(p_managedData->size() == p_managedDataSources->size());
-    
+
     // make sure brick is not still being used!
     if (!(*p_managedData)[brickIndex].first->tryLockForWrite()) {
-      throw iException::Message(iException::Programmer,
-                                "CubeDataThread::FreeBrick called on a locked brick", _FILEINFO_);
+      throw IException(IException::Programmer,
+                       "CubeDataThread::FreeBrick called on a locked brick",
+                       _FILEINFO_);
     }
     else {
       (*p_managedData)[brickIndex].first->unlock();
@@ -692,7 +690,7 @@ namespace Isis {
 
     // make sure no one is looking through p_managedData in order to delete it
     p_threadSafeMutex->lock();
-    
+
     if (p_currentLocksWaiting == 0) {
       delete (*p_managedData)[brickIndex].first;
       delete (*p_managedData)[brickIndex].second;
@@ -714,7 +712,7 @@ namespace Isis {
       p_threadSafeMutex->unlock();
       return true;
     }
-    
+
     p_threadSafeMutex->unlock();
 
     // no actual free was done
@@ -745,8 +743,9 @@ namespace Isis {
    */
   UniversalGroundMap *CubeDataThread::GetUniversalGroundMap(int cubeId) const {
     if (!p_managedCubes->contains(cubeId)) {
-      throw iException::Message(iException::Programmer, "Invalid Cube ID ["
-                                + iString(cubeId) + "]", _FILEINFO_);
+      throw IException(IException::Programmer,
+                       "Invalid Cube ID [" + iString(cubeId) + "]",
+                       _FILEINFO_);
     }
 
     return new UniversalGroundMap(*(*p_managedCubes)[cubeId].second);
@@ -761,8 +760,9 @@ namespace Isis {
    */
   const Cube *CubeDataThread::GetCube(int cubeId) const {
     if (!p_managedCubes->contains(cubeId)) {
-      throw iException::Message(iException::Programmer, "Invalid Cube ID ["
-                                + iString(cubeId) + "]", _FILEINFO_);
+      throw IException(IException::Programmer,
+                       "Invalid Cube ID [" + iString(cubeId) + "]",
+                       _FILEINFO_);
     }
 
     return (*p_managedCubes)[cubeId].second;

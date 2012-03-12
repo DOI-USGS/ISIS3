@@ -22,8 +22,8 @@
 
 #include "Filename.h"
 #include "Pvl.h"
-#include "iException.h"
-#include "iException.h"
+#include "IException.h"
+#include "IException.h"
 #include "Message.h"
 #include "PvlFormat.h"
 #include "PvlObject.h"
@@ -67,7 +67,7 @@ namespace Isis {
    *
    * @return The PvlGroup object sought for.
    *
-   * @throws iException::Pvl
+   * @throws IException
    */
   Isis::PvlGroup &PvlObject::FindGroup(const std::string &name,
                                        PvlObject::FindOptions opts) {
@@ -88,9 +88,9 @@ namespace Isis {
       searchList.erase(searchList.begin());
     }
 
-    string msg = "Unable to find group [" + name + "]";
+    string msg = "Unable to find PVL group [" + name + "]";
     if(p_filename.size() > 0) msg += " in file [" + p_filename + "]";
-    throw Isis::iException::Message(Isis::iException::Pvl, msg, _FILEINFO_);
+    throw IException(IException::Unknown, msg, _FILEINFO_);
   }
 
 
@@ -102,7 +102,7 @@ namespace Isis {
    *
    * @return The PvlGroup object sought for.
    *
-   * @throws iException::Pvl
+   * @throws IException
    */
   const Isis::PvlGroup &PvlObject::FindGroup(const std::string &name,
       PvlObject::FindOptions opts) const {
@@ -123,9 +123,9 @@ namespace Isis {
       searchList.erase(searchList.begin());
     }
 
-    string msg = "Unable to find group [" + name + "]";
+    string msg = "Unable to find PVL group [" + name + "]";
     if(p_filename.size() > 0) msg += " in file [" + p_filename + "]";
-    throw Isis::iException::Message(Isis::iException::Pvl, msg, _FILEINFO_);
+    throw IException(IException::Unknown, msg, _FILEINFO_);
   }
 
 
@@ -143,7 +143,7 @@ namespace Isis {
    *
    * @return The keyword sought
    *
-   * @throws iException::Pvl
+   * @throws IException
    */
   PvlKeyword &PvlObject::FindKeyword(const std::string &kname,
                                      FindOptions opts) {
@@ -186,9 +186,9 @@ namespace Isis {
     }
 
     // No where else to look for the Keyword so throw an error
-    string msg = "Unable to find keyword [" + kname + "]";
+    string msg = "Unable to find PVL keyword [" + kname + "]";
     if(p_filename.size() > 0) msg += " in file [" + p_filename + "]";
-    throw Isis::iException::Message(Isis::iException::Pvl, msg, _FILEINFO_);
+    throw IException(IException::Unknown, msg, _FILEINFO_);
   }
 
 
@@ -256,7 +256,7 @@ namespace Isis {
    *
    * @return The PvlObject sought for.
    *
-   * @throws iException::Pvl
+   * @throws IException
    */
   PvlObject &PvlObject::FindObject(const std::string &name,
                                    PvlObject::FindOptions opts) {
@@ -277,9 +277,9 @@ namespace Isis {
       searchList.erase(searchList.begin());
     }
 
-    string msg = "Unable to find object [" + name + "]";
+    string msg = "Unable to find PVL object [" + name + "]";
     if(p_filename.size() > 0) msg += " in file [" + p_filename + "]";
-    throw Isis::iException::Message(Isis::iException::Pvl, msg, _FILEINFO_);
+    throw IException(IException::Unknown, msg, _FILEINFO_);
   }
 
 
@@ -291,7 +291,7 @@ namespace Isis {
    *
    * @return The PvlObject sought for.
    *
-   * @throws iException::Pvl
+   * @throws IException
    */
   const PvlObject &PvlObject::FindObject(const std::string &name,
                                          FindOptions opts) const {
@@ -317,13 +317,13 @@ namespace Isis {
       searchList.erase(searchList.begin());
     }
 
-    string msg = "Unable to find object [" + name + "]";
+    string msg = "Unable to find PVL object [" + name + "]";
 
     if(p_filename.size() > 0) {
       msg += " in file [" + p_filename + "]";
     }
 
-    throw Isis::iException::Message(Isis::iException::Pvl, msg, _FILEINFO_);
+    throw IException(IException::Unknown, msg, _FILEINFO_);
   }
 
 
@@ -332,15 +332,15 @@ namespace Isis {
    *
    * @param name The name of the PvlObject to remove.
    *
-   * @throws iException::Pvl
+   * @throws IException
    */
   void PvlObject::DeleteObject(const std::string &name) {
     PvlObjectIterator key = FindObject(name, BeginObject(), EndObject());
     if(key == EndObject()) {
-      string msg = "Unable to find object [" + name + "] in " + Type() +
+      string msg = "Unable to find PVL object [" + name + "] in " + Type() +
                    " [" + Name() + "]";
       if(p_filename.size() > 0) msg += " in file [" + p_filename + "]";
-      throw Isis::iException::Message(Isis::iException::Pvl, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     p_objects.erase(key);
@@ -352,14 +352,14 @@ namespace Isis {
    *
    * @param index The index of the PvlObject to remove.
    *
-   * @throws iException::Pvl
+   * @throws IException
    */
   void PvlObject::DeleteObject(const int index) {
     if(index >= (int)p_objects.size() || index < 0) {
-      string msg = "The specified index is out of bounds in " + Type() +
+      string msg = "The specified index is out of bounds in PVL " + Type() +
                    " [" + Name() + "]";
       if(p_filename.size() > 0) msg += " in file [" + p_filename + "]";
-      throw Isis::iException::Message(Isis::iException::Pvl, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     PvlObjectIterator key = BeginObject();
@@ -374,15 +374,15 @@ namespace Isis {
    *
    * @param name The name of the PvlGroup to remove.
    *
-   * @throws iException::Pvl
+   * @throws IException
    */
   void PvlObject::DeleteGroup(const std::string &name) {
     PvlGroupIterator key = FindGroup(name, BeginGroup(), EndGroup());
     if(key == EndGroup()) {
-      string msg = "Unable to find group [" + name + "] in " + Type() +
+      string msg = "Unable to find PVL group [" + name + "] in " + Type() +
                    " [" + Name() + "]";
       if(p_filename.size() > 0) msg += " in file [" + p_filename + "]";
-      throw Isis::iException::Message(Isis::iException::Pvl, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     p_groups.erase(key);
@@ -394,14 +394,14 @@ namespace Isis {
    *
    * @param index The index of the PvlGroup to remove.
    *
-   * @throws iException::Pvl
+   * @throws IException
    */
   void PvlObject::DeleteGroup(const int index) {
     if(index >= (int)p_groups.size() || index < 0) {
-      string msg = "The specified index is out of bounds in " + Type() +
+      string msg = "The specified index is out of bounds in PVL " + Type() +
                    " [" + Name() + "]";
       if(p_filename.size() > 0) msg += " in file [" + p_filename + "]";
-      throw Isis::iException::Message(Isis::iException::Pvl, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     PvlGroupIterator key = BeginGroup();
@@ -418,14 +418,12 @@ namespace Isis {
    *
    * @return The PvlGroup sought for.
    *
-   * @throws iException::Pvl
+   * @throws IException
    */
   Isis::PvlGroup &PvlObject::Group(const int index) {
     if(index < 0 || index >= (int)p_groups.size()) {
-      string msg = Isis::Message::ArraySubscriptNotInRange(index);
-      throw Isis::iException::Message(Isis::iException::Programmer,
-                                      msg,
-                                      _FILEINFO_);
+      string msg = Message::ArraySubscriptNotInRange(index);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     return p_groups[index];
@@ -439,14 +437,12 @@ namespace Isis {
    *
    * @return The PvlGroup sought for.
    *
-   * @throws iException::Pvl
+   * @throws IException
    */
   const Isis::PvlGroup &PvlObject::Group(const int index) const {
     if(index < 0 || index >= (int)p_groups.size()) {
-      string msg = Isis::Message::ArraySubscriptNotInRange(index);
-      throw Isis::iException::Message(Isis::iException::Programmer,
-                                      msg,
-                                      _FILEINFO_);
+      string msg = Message::ArraySubscriptNotInRange(index);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     return p_groups[index];
@@ -459,14 +455,12 @@ namespace Isis {
    *
    * @return The PvlObject sought for.
    *
-   * @throws iException::Programmer
+   * @throws IException::Programmer
    */
   PvlObject &PvlObject::Object(const int index) {
     if(index < 0 || index >= (int)p_objects.size()) {
-      string msg = Isis::Message::ArraySubscriptNotInRange(index);
-      throw Isis::iException::Message(Isis::iException::Programmer,
-                                      msg,
-                                      _FILEINFO_);
+      string msg = Message::ArraySubscriptNotInRange(index);
+      throw IException(Isis::IException::Programmer, msg, _FILEINFO_);
     }
 
     return p_objects[index];
@@ -479,14 +473,12 @@ namespace Isis {
    *
    * @return The PvlObject sought for.
    *
-   * @throws iException::Programmer
+   * @throws IException::Programmer
    */
   const PvlObject &PvlObject::Object(const int index) const {
     if(index < 0 || index >= (int)p_objects.size()) {
-      string msg = Isis::Message::ArraySubscriptNotInRange(index);
-      throw Isis::iException::Message(Isis::iException::Programmer,
-                                      msg,
-                                      _FILEINFO_);
+      string msg = Message::ArraySubscriptNotInRange(index);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     return p_objects[index];
@@ -526,11 +518,9 @@ namespace Isis {
         string filename = outTemplate[i];
         Isis::Filename file(filename);
         if(!file.Exists()) {
-          string message = "Could not open the following template file: ";
+          string message = "Could not open the following PVL template file: ";
           message += filename;
-          throw Isis::iException::Message(Isis::iException::Io,
-                                          message,
-                                          _FILEINFO_);
+          throw IException(IException::Io, message, _FILEINFO_);
         }
 
         Isis::Pvl include(file.Expanded());
@@ -702,10 +692,10 @@ namespace Isis {
 
       is.seekg(beforeKeywordPos, ios::beg);
 
-      string msg = "Expected keyword named [Object], found keyword named [";
+      string msg = "Expected PVL keyword named [Object], found keyword named [";
       msg += readKeyword.Name();
       msg += "]";
-      throw iException::Message(iException::Pvl, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if(readKeyword.Size() == 1) {
@@ -714,7 +704,7 @@ namespace Isis {
     else {
       is.seekg(beforeKeywordPos, ios::beg);
 
-      string msg = "Expected a single value for object name, found [(";
+      string msg = "Expected a single value for PVL object name, found [(";
 
       for(int i = 0; i < readKeyword.Size(); i++) {
         if(i != 0) msg += ", ";
@@ -723,7 +713,7 @@ namespace Isis {
       }
 
       msg += ")]";
-      throw iException::Message(iException::Pvl, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     for(int comment = 0; comment < readKeyword.Comments(); comment++) {
@@ -747,10 +737,10 @@ namespace Isis {
 
           string msg = "Unexpected [";
           msg += readKeyword.Name();
-          msg += "] in Object [";
+          msg += "] in PVL Object [";
           msg += result.Name();
           msg += "]";
-          throw iException::Message(iException::Pvl, msg, _FILEINFO_);
+          throw IException(IException::Unknown, msg, _FILEINFO_);
         }
       }
 
@@ -789,9 +779,9 @@ namespace Isis {
 
       is.seekg(beforeKeywordPos, ios::beg);
 
-      string msg = "Object [" + result.Name();
+      string msg = "PVL Object [" + result.Name();
       msg += "] EndObject not found before end of file";
-      throw iException::Message(iException::Pvl, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     return is;
@@ -807,26 +797,26 @@ namespace Isis {
 
     return *this;
   }
-  
+
   /**
-   * Validate a PvlObject, comparing against corresponding Template PvlObject. 
-   * If the Objects are nested, it will recursively validate the PvlObject. 
-   *  
-   * Template PvlObject has the format: 
+   * Validate a PvlObject, comparing against corresponding Template PvlObject.
+   * If the Objects are nested, it will recursively validate the PvlObject.
+   *
+   * Template PvlObject has the format:
    * Object = (objectName, optional/required)
-   * 
+   *
    * @author Sharmila Prasad (9/22/2010)
-   * 
+   *
    * @param pvlObj- PvlObject to be validated
    */
   void PvlObject::ValidateObject(PvlObject & pPvlObj)
   {
     // Validate the current object
     int iObjSize = Objects();
-    
+
     for(int i=0; i<iObjSize; i++) {
       PvlObject & pvlTmplObj = Object(i);
-      
+
       string sObjName = pvlTmplObj.Name();
       bool bObjFound = false;
 
@@ -851,7 +841,7 @@ namespace Isis {
       }
       if (bObjFound == false) {
         string sErrMsg = "Object \"" + sObjName + "\" Not Found in the Template File\n";
-        throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_);
+        throw IException(IException::User, sErrMsg, _FILEINFO_);
       }
     }
 
@@ -861,7 +851,7 @@ namespace Isis {
       PvlGroup & pvlTmplGrp = Group(i);
       bool bGrpFound = false;
       string sGrpName = pvlTmplGrp.Name();
-      
+
       // Pvl contains the Object Name
       if(pPvlObj.HasGroup(sGrpName)) {
         PvlGroup & pvlGrp = pPvlObj.FindGroup(sGrpName);
@@ -883,10 +873,10 @@ namespace Isis {
       }
       if (bGrpFound == false) {
         string sErrMsg = "Group \"" + sGrpName + "\" Not Found in the Template File\n";
-        throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_);
+        throw IException(IException::User, sErrMsg, _FILEINFO_);
       }
     }
-    
+
     // Validate the Keywords in the current Object
     ValidateAllKeywords((PvlContainer &)pPvlObj);
   }

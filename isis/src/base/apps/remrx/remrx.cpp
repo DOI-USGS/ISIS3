@@ -33,12 +33,12 @@ void IsisMain() {
   if((string)status == "Nominal") {
     string msg = "Input file [" + in +
                  "] appears to have nominal reseau status. You must run findrx first.";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
   if((string)status == "Removed") {
     string msg = "Input file [" + in +
                  "] appears to already have reseaus removed.";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   status = "Removed";

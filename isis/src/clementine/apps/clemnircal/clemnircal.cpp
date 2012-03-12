@@ -1,7 +1,7 @@
 #include "Isis.h"
 #include "ProcessByLine.h"
 #include "Pixel.h"
-#include "iException.h"
+#include "IException.h"
 #include "TextFile.h"
 #include "Table.h"
 #include <cmath>
@@ -122,7 +122,7 @@ void IsisMain() {
       iString err = "The Gain Factor for Gain Mode ID [";
       err += gainModeID;
       err += "] could not be found in clemnircal.def";
-      throw iException::Message(iException::Programmer, err, _FILEINFO_);
+      throw IException(IException::Programmer, err, _FILEINFO_);
     }
 
     gainFactor = (gainFactorData.FindGroup(group))["GAIN"];
@@ -131,7 +131,7 @@ void IsisMain() {
       iString err = "The Gain Factor for Gain Mode ID [";
       err += gainModeID;
       err += "] can not be zero.";
-      throw iException::Message(iException::Programmer, err, _FILEINFO_);
+      throw IException(IException::Programmer, err, _FILEINFO_);
     }
 
     affileLoc = "$clementine1/calibration/nir/nirmodeflats/" + affileLoc;
@@ -222,7 +222,7 @@ void IsisMain() {
 
   if(numCoefficients == 0) {
     iString err = "The orbit [" + orbit + "] could not be located in the thermal corrections table [" + thermTbl + "].";
-    throw iException::Message(iException::Programmer, err, _FILEINFO_);
+    throw IException(IException::Unknown, err, _FILEINFO_);
   }
 
   // Start the processing

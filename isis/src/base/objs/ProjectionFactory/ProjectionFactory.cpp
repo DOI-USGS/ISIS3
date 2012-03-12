@@ -29,7 +29,7 @@
 #include "Cube.h"
 #include "Displacement.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "Plugin.h"
 #include "Projection.h"
 
@@ -64,7 +64,7 @@ namespace Isis {
     // Try to load a plugin file in the current working directory and then
     // load the system file
     Plugin p;
-    
+
     if(m_projPlugin.Filename() == "") {
       Filename localFile("Projection.plugin");
       if(localFile.Exists())
@@ -85,10 +85,10 @@ namespace Isis {
       try {
         ptr = m_projPlugin.GetPlugin(proj);
       }
-      catch(Isis::iException &e) {
+      catch(IException &e) {
         string msg = "Unsupported projection, unable to find plugin for [" +
                      proj + "]";
-        throw Isis::iException::Message(Isis::iException::System, msg, _FILEINFO_);
+        throw IException(IException::Unknown, msg, _FILEINFO_);
       }
 
       // Now cast that pointer in the proper way
@@ -97,10 +97,10 @@ namespace Isis {
       // Create the projection as requested
       return (*plugin)(label, allowDefaults);
     }
-    catch(Isis::iException &e) {
+    catch(IException &e) {
       string message = "Unable to initialize Projection information ";
       message += "from group [Mapping]";
-      throw Isis::iException::Message(Isis::iException::Io, message, _FILEINFO_);
+      throw IException(e, IException::Io, message, _FILEINFO_);
     }
   }
 
@@ -136,6 +136,7 @@ namespace Isis {
     double localRadius = proj->LocalRadius(trueScaleLat);
     delete proj;
 
+    IException errors;
     try {
       // Try to get the pixel resolution and then compute the scale
       double scale, pixelResolution;
@@ -146,9 +147,10 @@ namespace Isis {
       }
 
       // If not get the scale and then compute the pixel resolution
-      catch(Isis::iException &e) {
+      catch(IException &e) {
+        errors.append(e);
+
         scale = mapGroup["Scale"];
-        e.Clear();
         pixelResolution = (2.0 * Isis::PI * localRadius) / (360.0 * scale);
       }
       // Write out the scale and resolution with units and truescale latitude
@@ -182,7 +184,7 @@ namespace Isis {
         if(!proj->HasGroundRange()) {
           string msg = "Invalid ground range [MinimumLatitude,MaximumLatitude,";
           msg += "MinimumLongitude,MaximumLongitude] missing or invalid";
-          throw Isis::iException::Message(Isis::iException::Projection, msg, _FILEINFO_);
+          throw IException(IException::Unknown, msg, _FILEINFO_);
         }
 
         double minX, maxX, minY, maxY;
@@ -190,7 +192,7 @@ namespace Isis {
           string msg = "Invalid ground range [MinimumLatitude,MaximumLatitude,";
           msg += "MinimumLongitude,MaximumLongitude] cause invalid computation ";
           msg += "of image size";
-          throw Isis::iException::Message(Isis::iException::Projection, msg, _FILEINFO_);
+          throw IException(IException::Unknown, msg, _FILEINFO_);
         }
 
         // Convert upperleft coordinate to units of pixel
@@ -270,10 +272,13 @@ namespace Isis {
       proj->SetUpperLeftCorner(Displacement(upperLeftX, Displacement::Meters),
                                Displacement(upperLeftY, Displacement::Meters));
     }
-    catch(Isis::iException &e) {
+    catch(IException &e) {
       string msg = "Unable to create projection";
       if(label.Filename() != "") msg += " from file [" + label.Filename() + "]";
-      throw Isis::iException::Message(Isis::iException::Projection, msg, _FILEINFO_);
+      IException finalError(IException::Unknown, msg, _FILEINFO_);
+      finalError.append(errors);
+      finalError.append(e);
+      throw finalError;
     }
     return proj;
   }
@@ -322,9 +327,8 @@ namespace Isis {
       }
 
       // If not get the scale and then compute the pixel resolution
-      catch(Isis::iException &e) {
+      catch(IException &) {
         scale = mapGroup["Scale"];
-        e.Clear();
         pixelResolution = (2.0 * Isis::PI * localRadius) / (360.0 * scale);
       }
       // Write out the scale and resolution with units and truescale latitude
@@ -513,10 +517,10 @@ namespace Isis {
       proj->SetUpperLeftCorner(Displacement(upperLeftX, Displacement::Meters),
                                Displacement(upperLeftY, Displacement::Meters));
     }
-    catch(Isis::iException &e) {
+    catch(IException &e) {
       string msg = "Unable to create projection";
       if(label.Filename() != "") msg += " from file [" + label.Filename() + "]";
-      throw Isis::iException::Message(Isis::iException::Projection, msg, _FILEINFO_);
+      throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
     return proj;
   }
@@ -563,10 +567,10 @@ namespace Isis {
       proj->SetUpperLeftCorner(Displacement(upperLeftX, Displacement::Meters),
                                Displacement(upperLeftY, Displacement::Meters));
     }
-    catch(Isis::iException &e) {
+    catch (IException &e) {
       string msg = "Unable to initialize cube projection";
       if(label.Filename() != "") msg += " from file [" + label.Filename() + "]";
-      throw Isis::iException::Message(Isis::iException::Projection, msg, _FILEINFO_);
+      throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
     return proj;
   }

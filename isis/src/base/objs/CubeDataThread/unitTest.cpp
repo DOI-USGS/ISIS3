@@ -26,7 +26,7 @@ void IsisMain() {
 
   Cube someCube;
   cubeData->AddCube(&someCube);
-  
+
   cout << "Testing FindCubeId method :  " << cubeData->FindCubeId(&someCube)
        << endl << endl;
 
@@ -127,7 +127,7 @@ void IsisMain() {
 
   // Create a deadlock
 
-  cout << endl << endl << "Creating Deadlock then trying to remove cubes" 
+  cout << endl << endl << "Creating Deadlock then trying to remove cubes"
        << endl;
   tester->WriteCubeTest3(readWrite1);
 
@@ -136,35 +136,32 @@ void IsisMain() {
         tester->NumberOfTestsDone() != 14) {
     QThread::yieldCurrentThread();
   }
-  
+
   try {
    cubeData->RemoveCube(readWrite1);
    cout << "Remove cube didn't throw an exception, PROBLEM!" << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
-    e.Clear();
+  catch(IException &e) {
+    e.print();
   }
-  
+
   try {
    cubeData->RemoveCube(-1);
    cout << "Remove cube didn't throw an exception, PROBLEM!" << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
-    e.Clear();
+  catch(IException &e) {
+    e.print();
   }
-  
+
   try {
    cubeData->RemoveCube(readOnly1);
    cout << "Remove cube succeeded" << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
-    e.Clear();
+  catch(IException &e) {
+    e.print();
   }
 
-  cout << endl << endl << "Deleting CubeDataThread with allocated bricks..." 
+  cout << endl << endl << "Deleting CubeDataThread with allocated bricks..."
        << endl;
   delete cubeData;
 

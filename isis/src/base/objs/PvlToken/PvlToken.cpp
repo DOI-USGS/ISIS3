@@ -20,7 +20,8 @@
  *   http://www.usgs.gov/privacy.html.
  */
 #include "PvlToken.h"
-#include "iException.h"
+#include "IException.h"
+#include "iString.h"
 #include "Message.h"
 
 using namespace std;
@@ -109,12 +110,12 @@ namespace Isis {
    *
    * @return string
    *
-   * @throws Isis::iException::Programmer
+   * @throws Isis::IException::Programmer
    */
   string PvlToken::GetValue(const int index) const {
     if((index < 0) || (index >= (int) value.size())) {
       string message = Isis::Message::ArraySubscriptNotInRange(index);
-      throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+      throw IException(IException::Programmer, message, _FILEINFO_);
     }
     return value[index];
   }
@@ -126,12 +127,12 @@ namespace Isis {
    *
    * @return string
    *
-   * @throws Isis::iException::Programmer
+   * @throws Isis::IException::Programmer
    */
   string PvlToken::GetValueUpper(const int index) const {
     if((index < 0) || (index >= (int) value.size())) {
       string message = Isis::Message::ArraySubscriptNotInRange(index);
-      throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+      throw IException(IException::Programmer, message, _FILEINFO_);
     }
     string upper = value[index];
     for(int i = 0; i < (int)upper.size(); i++) {

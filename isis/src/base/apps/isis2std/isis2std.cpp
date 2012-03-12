@@ -253,7 +253,7 @@ void IsisMain() {
     if(!supported) {
       string msg = "The installation of Trolltech/Qt does not support ";
       msg += "your selected format [" + format + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     // Setup the required extension and world file
@@ -367,7 +367,7 @@ void IsisMain() {
       iString err = "Unable to save [";
       err += filename.c_str();
       err += "] to the disk";
-      throw iException::Message(iException::User, err, _FILEINFO_);
+      throw IException(IException::User, err, _FILEINFO_);
     }
 
     // Create a world file if it has a map projection
@@ -395,7 +395,7 @@ void toGreyscaleImage(Buffer &in) {
       string msg = "QT has detected your file size as exceeding 2GB.";
       msg += " While your image might be under 2GB, your image labels are more";
       msg += " than likely pushing the file size over 2GB.";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
 }
@@ -418,7 +418,7 @@ void checkDataSize(Isis::BigInt line, Isis::BigInt samp, iString mode) {
     double inGB = (double)size / (1024 * 1024 * 1024);
     string msg = "Cube exceeds max size of 2GB. Qimage cannot support ";
     msg += "that much raw data. Your cube is " + (iString)inGB + " GB.";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
   return;
 }

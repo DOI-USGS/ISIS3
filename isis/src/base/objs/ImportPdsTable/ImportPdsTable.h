@@ -26,12 +26,12 @@
 #include <vector>
 #include <string>
 
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "Pvl.h"
 #include "Table.h"
 
-namespace Isis {         
+namespace Isis {
 /**
  * @brief Import a PDS table file with a label description
  *
@@ -69,7 +69,7 @@ class ImportPdsTable {
     void load(const std::string &labfile, const std::string &tabfile = "");
 
     bool hasColumn(const std::string &colName) const;
-    std::string getColumnName(const int &index = 0, const bool &formatted = true) 
+    std::string getColumnName(const int &index = 0, const bool &formatted = true)
                              const;
     std::vector<std::string> getColumnNames(const bool &formatted = true) const;
 
@@ -77,9 +77,9 @@ class ImportPdsTable {
     bool setType(const std::string &colName, const std::string &dtype);
 
     Table exportAsTable(const std::string &tname) const;
-    Table exportAsTable(const std::string &colNames, 
+    Table exportAsTable(const std::string &colNames,
                         const std::string &tname) const;
-    Table exportAsTable(const std::vector<std::string> &colNames, 
+    Table exportAsTable(const std::vector<std::string> &colNames,
                         const std::string &tname) const;
 
   private:
@@ -102,15 +102,14 @@ class ImportPdsTable {
 
     void init();
 
-    void loadLabel(const std::string &labfile, std::string &tblfile) 
-                   throw (iException &);
-    void loadTable(const std::string &tabfile) throw (iException &);
+    void loadLabel(const std::string &labfile, std::string &tblfile);
+    void loadTable(const std::string &tabfile);
 
     ColumnDescr getColumnDescription(PvlObject &colobj, int nth) const;
     ColumnDescr *findColumn(const std::string &colName);
     const ColumnDescr *findColumn(const std::string &colName) const;
 
-    std::string getColumnValue(const std::string &tline, 
+    std::string getColumnValue(const std::string &tline,
                                const ColumnDescr &cdesc) const;
     std::string getFormattedName(const std::string &colname) const;
     std::string getGenericType(const std::string &ttype) const;

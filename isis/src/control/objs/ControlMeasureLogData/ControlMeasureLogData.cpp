@@ -204,7 +204,7 @@ namespace Isis {
       ControlMeasureLogData::ToProtocolBuffer() const {
     if(!IsValid()) {
       iString msg = "Cannot write an invalid log data entry to binary format";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     ControlPointFileEntryV0002_Measure_MeasureLogData protoBufDataEntry;
@@ -214,7 +214,7 @@ namespace Isis {
 
     return protoBufDataEntry;
   }
-  
+
 
   /**
    * This converts a string to a log data type and is useful for converting Pvl
@@ -233,8 +233,7 @@ namespace Isis {
           return (NumericLogDataType) i;
         }
       }
-      catch (iException &e) {
-        e.Clear();
+      catch (IException &) {
       }
     }
 
@@ -253,7 +252,7 @@ namespace Isis {
     switch(type) {
       case InvalidNumericLogDataType: {
           iString msg = "Cannot convert an invalid data type to a string";
-          throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+          throw IException(IException::Programmer, msg, _FILEINFO_);
         }
 
       case Eccentricity:
@@ -282,6 +281,6 @@ namespace Isis {
     }
 
     iString msg = "Unknown data type [" + iString(type) + "]";
-    throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 }

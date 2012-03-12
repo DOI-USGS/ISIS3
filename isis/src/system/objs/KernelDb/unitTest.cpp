@@ -1,5 +1,5 @@
 #include <iostream>
-#include "iException.h"
+#include "IException.h"
 #include "KernelDb.h"
 #include "Preference.h"
 #include "Pvl.h"

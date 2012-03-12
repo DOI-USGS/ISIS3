@@ -1,5 +1,5 @@
 #include <iomanip>
-#include "iException.h"
+#include "IException.h"
 #include "Cube.h"
 #include "OverlapStatistics.h"
 #include "Preference.h"
@@ -39,8 +39,8 @@ int main(int argc, char *argv[]) {
     cout << "    Start Line = " << oStats.StartLineY() << endl;
     cout << "    End Line = " << oStats.EndLineY() << endl << endl;
   }
-  catch(Isis::iException &e) {
-    e.Report();
+  catch(Isis::IException &e) {
+    e.print();
   }
 }
 

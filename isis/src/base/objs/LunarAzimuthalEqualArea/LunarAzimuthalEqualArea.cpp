@@ -23,7 +23,7 @@
 #include <cmath>
 #include <cfloat>
 #include "LunarAzimuthalEqualArea.h"
-#include "iException.h"
+#include "IException.h"
 #include "Constants.h"
 
 using namespace std;
@@ -36,7 +36,7 @@ namespace Isis {
   *              the LunarAzimuthalEqualArea projection requires the
   *              center longitude to be defined in the keyword CenterLongitude.
   *
-  * @throws Isis::iException::Io
+  * @throws Isis::IException::Io
   */
   LunarAzimuthalEqualArea::LunarAzimuthalEqualArea(
     Isis::Pvl &label) : Isis::Projection::Projection(label) {
@@ -49,10 +49,9 @@ namespace Isis {
       p_maxLibration = mapGroup["MaximumLibration"];
       p_maxLibration *= PI / 180.0;
     }
-    catch(Isis::iException &e) {
+    catch(Isis::IException &e) {
       string message = "Invalid label group [Mapping]";
-      throw Isis::iException::Message(Isis::iException::Io, message,
-                                      _FILEINFO_);
+      throw IException(IException::Io, message, _FILEINFO_);
     }
   }
 

@@ -1,5 +1,5 @@
 #include "PvlKeyword.h"
-#include "iException.h"
+#include "IException.h"
 #include "PvlSequence.h"
 #include "Preference.h"
 
@@ -93,11 +93,11 @@ int main() {
       if(result) cout << "VALID" << endl;
       else cout << "INCOMPLETE" << endl;
     }
-    catch(iException &e) {
+    catch(IException &e) {
       cout << "INVALID" << endl;
       cout << "    ";
       cout.flush();
-      e.Report(false);
+      e.print();
     }
 
     if(result) {
@@ -135,8 +135,8 @@ int main() {
       stream >> someKey;
       cout << someKey << endl;
     }
-    catch(iException &e) {
-      e.Report(false);
+    catch(IException &e) {
+      e.print();
     }
 
     cout << endl;
@@ -276,8 +276,8 @@ int main() {
     cout << "double     = " << (double)cast03 << endl;
 
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
   catch(...) {
     cout << "Unknown error" << endl;
@@ -288,8 +288,8 @@ int main() {
     cout << key << endl;
     Isis::PvlKeyword key2("Bob is a name", "Yes it is");
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 
 
@@ -297,8 +297,8 @@ int main() {
     Isis::PvlKeyword key(" Test_key_3 ", "Might'not work");
     cerr << key << endl;
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
   
   // Test Validation of PvlKeywords
@@ -317,7 +317,7 @@ int main() {
     pvlKwrd=PvlKeyword("KeyName", 3.5);
     pvlTmplKwrd.ValidateKeyword(pvlKwrd);
   } 
-  catch(Isis::iException &e) {
+  catch(Isis::IException &e) {
    cerr << "Invalid Keyword Type: Integer Expected" << endl;
   }
   
@@ -326,7 +326,7 @@ int main() {
     PvlKeyword pvlTmplKwrd("KeyName", "integer");
     PvlKeyword pvlKwrd("KeyName", -3);
     pvlTmplKwrd.ValidateKeyword(pvlKwrd, "positive");
-  } catch(Isis::iException &e) {
+  } catch(Isis::IException &e) {
     cerr <<"Positive number Expected" << endl;
   }
   
@@ -336,7 +336,7 @@ int main() {
     PvlKeyword pvlTmplKwrdRange("KeyName__Range", (0-10));
     PvlKeyword pvlKwrd("KeyName", 11);
     pvlTmplKwrd.ValidateKeyword(pvlKwrd, "", &pvlTmplKwrdRange);
-  } catch(Isis::iException &e) {
+  } catch(Isis::IException &e) {
     cerr <<"Integer not in the Range. Expected (0-10)" << endl;
   }
   
@@ -354,7 +354,7 @@ int main() {
     pvlKwrd=PvlKeyword("KeyName", "value");
     pvlTmplKwrd.ValidateKeyword(pvlKwrd, "", &pvlTmplKwrdValue);
   } 
-  catch(Isis::iException &e) {
+  catch(Isis::IException &e) {
     cerr << "Invalid Keyword Value: Expected values \"value1\", \"value2\", \"value3\"" << endl;
   }
   
@@ -372,7 +372,7 @@ int main() {
     pvlKwrd=PvlKeyword("KeyName", "value");
     pvlTmplKwrd.ValidateKeyword(pvlKwrd);
   } 
-  catch(Isis::iException &e) {
+  catch(Isis::IException &e) {
     cerr << "Invalid Keyword Type: Expected  Boolean values \"true\", \"false\", \"null\"" << endl;
   }
 }

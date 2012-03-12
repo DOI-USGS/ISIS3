@@ -1,25 +1,25 @@
-/**                                                                       
- * @file                                                                  
+/**
+ * @file
  * $Revision$
  * $Date$
  * $Id$
- * 
- *   Unless noted otherwise, the portions of Isis written by the USGS are 
- *   public domain. See individual third-party library and package descriptions 
- *   for intellectual property information, user agreements, and related  
- *   information.                                                         
- *                                                                        
- *   Although Isis has been used by the USGS, no warranty, expressed or   
- *   implied, is made by the USGS as to the accuracy and functioning of such 
- *   software and related material nor shall the fact of distribution     
+ *
+ *   Unless noted otherwise, the portions of Isis written by the USGS are
+ *   public domain. See individual third-party library and package descriptions
+ *   for intellectual property information, user agreements, and related
+ *   information.
+ *
+ *   Although Isis has been used by the USGS, no warranty, expressed or
+ *   implied, is made by the USGS as to the accuracy and functioning of such
+ *   software and related material nor shall the fact of distribution
  *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.                                        
- *                                                                        
- *   For additional information, launch                                   
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html                
+ *   USGS in connection therewith.
+ *
+ *   For additional information, launch
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
  *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.                                    
+ *   http://www.usgs.gov/privacy.html.
  */
 #include <string>
 #include <vector>
@@ -33,7 +33,7 @@
 #include "TextFile.h"
 #include "Pvl.h"
 #include "iString.h"
-#include "iException.h"
+#include "IException.h"
 
 #include "naif/SpiceUsr.h"
 #include "NaifStatus.h"
@@ -64,7 +64,7 @@ namespace Isis {
  void CkKernelWriter::setType(const int cktype) {
    if ( (cktype < 1) || (cktype > 3) ) {
      string mess = "Invalid CK kernel type: " + iString(cktype);
-     throw iException::Message(iException::Programmer, mess, _FILEINFO_);
+     throw IException(IException::Programmer, mess, _FILEINFO_);
    }
  }
  void CkKernelWriter::setCommentSize(const int &csize) {
@@ -87,10 +87,10 @@ namespace Isis {
    return (lastWrite);
  }
 
- void CkKernelWriter::open(const std::string &kfile, 
+ void CkKernelWriter::open(const std::string &kfile,
                            const std::string &intCkName) {
    Filename kf(kfile);
-   if ( kf.Exists() ) {   
+   if ( kf.Exists() ) {
      string full_kf = kf.Expanded();
      remove(full_kf.c_str());
    }
@@ -114,7 +114,7 @@ namespace Isis {
      default:
        string mess = "Selected CK type (" + iString(_ckType) +
                      ") invalid - must be 1, 2 or 3";
-       throw iException::Message(iException::Programmer, mess, _FILEINFO_);
+       throw IException(IException::Programmer, mess, _FILEINFO_);
    }
    return;
 
@@ -124,7 +124,7 @@ namespace Isis {
  bool CkKernelWriter::writeComment(const std::string &comment) const {
    if ( _handle == 0 ) {
      string mess = "Comments cannot be written as the file is not open";
-     throw iException::Message(iException::Programmer, mess, _FILEINFO_);
+     throw IException(IException::Programmer, mess, _FILEINFO_);
    }
 
    // Trap errors so they are not fatal if the comment section fills up.
@@ -144,7 +144,7 @@ namespace Isis {
           commOut.push_back(comment[i]);
         }
      }
-  
+
      // See if there is residual to write
      if ( commOut.size() > 0 ) {
        while ( commOut.size() < 2 ) { commOut.append(" "); }
@@ -152,8 +152,7 @@ namespace Isis {
        _comCharsWritten += commOut.size();
        NaifStatus::CheckErrors();
      }
-   } catch (iException &ie ) {
-     ie.Clear();
+   } catch (IException &) {
      return (false);
    }
 
@@ -188,15 +187,15 @@ namespace Isis {
     ckw01_c(_handle, sclks[0], sclks[nrecs-1], segment.InstCode(),
              refFrame.c_str(), hasAvvs, segId.c_str(), nrecs, &sclks[0],
              quats[0], avvs);
-    NaifStatus::CheckErrors(); 
+    NaifStatus::CheckErrors();
     return;
   }
 
   void CkKernelWriter::writeCk2(const SpiceSegment &segment) const {
- 
+
     if ( !segment.hasAngularVelocities() ) {
       string mess = "Type 2 CK kernels require angular velocities";
-      throw iException::Message(iException::User, mess, _FILEINFO_);
+      throw IException(IException::User, mess, _FILEINFO_);
     }
 
     const SpiceSegment::SVector &sclks = segment.SCLKTimes();
@@ -218,7 +217,7 @@ namespace Isis {
     ckw02_c(_handle, sclks[0], sclks[nrecs-1], segment.InstCode(),
              refFrame.c_str(), segId.c_str(), nrecs, &sclks[0],
              &stops[0], quats[0], avvs[0], &rates[0]);
-    NaifStatus::CheckErrors(); 
+    NaifStatus::CheckErrors();
     return;
   }
 
@@ -245,7 +244,7 @@ namespace Isis {
              quats[0], avvs, 1, &sclks[0]);
     segment.UnloadKernelType("FK");
 
-    NaifStatus::CheckErrors(); 
+    NaifStatus::CheckErrors();
     return;
   }
 

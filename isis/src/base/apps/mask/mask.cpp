@@ -1,7 +1,7 @@
 #include "Isis.h"
 #include "ProcessByLine.h"
 #include "SpecialPixel.h"
-#include "iException.h"
+#include "IException.h"
 
 using namespace std;
 using namespace Isis;
@@ -58,7 +58,7 @@ void IsisMain() {
   if(!masked) {
     string message = "No mask was performed-the output file is the same as ";
     message += "the input file.";
-    throw iException::Message(iException::User, message, _FILEINFO_);
+    throw IException(IException::User, message, _FILEINFO_);
   }
 
 }

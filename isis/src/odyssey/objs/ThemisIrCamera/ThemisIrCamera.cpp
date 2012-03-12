@@ -2,17 +2,17 @@
  * @file
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for 
+ *   domain. See individual third-party library and package descriptions for
  *   intellectual property information,user agreements, and related information.
  *
  *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software 
- *   and related material nor shall the fact of distribution constitute any such 
- *   warranty, and no responsibility is assumed by the USGS in connection 
+ *   is made by the USGS as to the accuracy and functioning of such software
+ *   and related material nor shall the fact of distribution constitute any such
+ *   warranty, and no responsibility is assumed by the USGS in connection
  *   therewith.
  *
  *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see 
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
  *   the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
@@ -22,7 +22,7 @@
 #include "ThemisIrDistortionMap.h"
 
 #include "CameraFocalPlaneMap.h"
-#include "iException.h"
+#include "IException.h"
 #include "iTime.h"
 #include "LineScanCameraDetectorMap.h"
 #include "LineScanCameraGroundMap.h"
@@ -34,7 +34,7 @@ namespace Isis {
   /**
    * Constructor for the Themis Ir Camera Model
    *
-   * @param lab Pvl label from an Odyssey Themis Ir image. 
+   * @param lab Pvl label from an Odyssey Themis Ir image.
    *
    * @internal
    *   @history 2011-05-03 Jeannie Walldren - Added NAIF error check.
@@ -116,7 +116,7 @@ namespace Isis {
    * number
    *
    * @param vband The band number to set
-   *  
+   *
    * @author 2009-02-26 Jeff Anderson
    */
   void ThemisIrCamera::SetBand(const int vband) {
@@ -128,13 +128,13 @@ namespace Isis {
       band = ReferenceBand();
       if((band < 1) || (band > 10)) {
         string msg = "Invalid Reference Band [" + iString(band) + "]";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
     }
     else {
       if(vband > (int) p_originalBand.size()) {
         string msg = "Band number out of array bounds in ThemisIRCamera";
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       }
       band = p_originalBand[vband-1];
     }
@@ -203,8 +203,8 @@ namespace Isis {
 
 // Plugin
 /**
- * This is the function that is called in order to instantiate a 
- * ThemisIrCamera object. 
+ * This is the function that is called in order to instantiate a
+ * ThemisIrCamera object.
  *
  * @param lab Cube labels
  *

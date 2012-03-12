@@ -34,7 +34,7 @@
 #include <naif/SpiceUsr.h>
 
 #include "CameraFactory.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "OriginalLabel.h"
 #include "Projection.h"
@@ -134,8 +134,8 @@ namespace Isis {
     // Ensure there is a camera model instantiated!
     if(!_camera) {
       string mess = "No image (camera model) established for reference pixel!";
-      throw iException::Message(iException::Programmer, mess.c_str(),
-                                _FILEINFO_);
+      throw IException(IException::Programmer, mess.c_str(),
+                       _FILEINFO_);
     }
 
     //  Compute point at center
@@ -173,8 +173,8 @@ namespace Isis {
     // Ensure there is a camera model instantiated!
     if(!_camera) {
       string mess = "No image (camera model) established for reference pixel!";
-      throw iException::Message(iException::Programmer, mess.c_str(),
-                                _FILEINFO_);
+      throw IException(IException::Programmer, mess.c_str(),
+                       _FILEINFO_);
     }
 
     //  Upper right corner point
@@ -196,8 +196,8 @@ namespace Isis {
     // Ensure there is a camera model instantiated!
     if(!_camera) {
       string mess = "No image (camera model) established for reference pixel!";
-      throw iException::Message(iException::Programmer, mess.c_str(),
-                                _FILEINFO_);
+      throw IException(IException::Programmer, mess.c_str(),
+                       _FILEINFO_);
     }
 
     //  Lower left corner point
@@ -219,8 +219,8 @@ namespace Isis {
     // Ensure there is a camera model instantiated!
     if(!_camera) {
       string mess = "No image (camera model) established for reference pixel!";
-      throw iException::Message(iException::Programmer, mess.c_str(),
-                                _FILEINFO_);
+      throw IException(IException::Programmer, mess.c_str(),
+                       _FILEINFO_);
     }
 
     //  Lower right corner point
@@ -306,8 +306,8 @@ namespace Isis {
     // Ensure there is a camera model instantiated!
     if(!_camera) {
       string mess = "No image (camera model) established for Geometry keys!";
-      throw iException::Message(iException::Programmer, mess.c_str(),
-                                _FILEINFO_);
+      throw IException(IException::Programmer, mess.c_str(),
+                       _FILEINFO_);
     }
 
 // Get the center ra/dec
@@ -402,8 +402,8 @@ namespace Isis {
     // Ensure there is a camera model instantiated!
     if(!_camera) {
       string mess = "No image (camera model) established for Target keys!";
-      throw iException::Message(iException::Programmer, mess.c_str(),
-                                _FILEINFO_);
+      throw IException(IException::Programmer, mess.c_str(),
+                       _FILEINFO_);
     }
 
     // Get sc_target_position_vector and target_center_distance for all targets
@@ -546,8 +546,8 @@ namespace Isis {
     // Ensure there is a camera model instantiated!
     if(!_camera) {
       string mess = "No image (camera model) established for Target keys!";
-      throw iException::Message(iException::Programmer, mess.c_str(),
-                                _FILEINFO_);
+      throw IException(IException::Programmer, mess.c_str(),
+                       _FILEINFO_);
     }
 
     //  Now compute the reticle points of all subframes if they exist
@@ -709,8 +709,7 @@ namespace Isis {
     // Ensure there is a camera model instantiated!
     if(!_camera) {
       string mess = "No image/camera model established for smear components!";
-      throw iException::Message(iException::Programmer, mess.c_str(),
-                                _FILEINFO_);
+      throw IException(IException::Programmer, mess.c_str(), _FILEINFO_);
     }
 
     // Get NAIF body codes
@@ -881,8 +880,7 @@ namespace Isis {
     // Ensure there is a camera model instantiated!
     if(!_camera) {
       string mess = "No image (camera model) established for Spacecraft keys!";
-      throw iException::Message(iException::Programmer, mess.c_str(),
-                                _FILEINFO_);
+      throw IException(IException::Programmer, mess.c_str(), _FILEINFO_);
     }
 
     // Get reference pixel coordinate
@@ -955,8 +953,7 @@ namespace Isis {
     // Ensure there is a camera model instantiated!
     if(!_camera) {
       string mess = "No image/camera model established for Spacecraft Velocity keys!";
-      throw iException::Message(iException::Programmer, mess.c_str(),
-                                _FILEINFO_);
+      throw IException(IException::Programmer, mess.c_str(), _FILEINFO_);
     }
 
     // Get NAIF body codes
@@ -999,8 +996,7 @@ namespace Isis {
     // Ensure there is a camera model instantiated!
     if(!_camera) {
       string mess = "No image (camera model) established for Viewing & Lighting keys!";
-      throw iException::Message(iException::Programmer, mess.c_str(),
-                                _FILEINFO_);
+      throw IException(IException::Programmer, mess.c_str(), _FILEINFO_);
     }
 
 // Get reference pixel coordinate

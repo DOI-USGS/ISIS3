@@ -1542,10 +1542,10 @@ End
 
 
 ---------- Check for NO value in an option/list/included parameter ----------
-**USER ERROR** Parameter [G1P3] must be entered if parameter [G1P0] is equal to [G1P0L1X]
+**USER ERROR** Parameter [G1P3] must be entered if parameter [G1P0] is equal to [G1P0L1X].
 
 ---------- Check for value in an option/list/excluded parameter ----------
-**USER ERROR** Parameter [G2P0] can not be entered if parameter [G1P0] is equal to [G1P0L0]
+**USER ERROR** Parameter [G2P0] can not be entered if parameter [G1P0] is equal to [G1P0L0].
 
 ---------- Check error for unknown parameter ----------
 **USER ERROR** Unknown parameter [xyz].

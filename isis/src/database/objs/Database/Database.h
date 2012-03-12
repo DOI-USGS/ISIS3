@@ -27,7 +27,7 @@
 #include <vector>
 #include <iostream>
 #include "DbProfile.h"
-#include "iException.h"
+#include "IException.h"
 #include <QSqlDatabase>
 
 namespace Isis {
@@ -131,8 +131,7 @@ namespace Isis {
                                                  * construction techniques */
       std::string _name;           //!<  Name of the connection
 
-      void tossDbError(const std::string &message, const char *f, int l) const
-      throw(iException &);
+      void tossDbError(const std::string &message, const char *f, int l) const;
   };
 
 }

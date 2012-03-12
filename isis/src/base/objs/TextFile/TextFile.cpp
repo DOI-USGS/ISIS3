@@ -20,8 +20,8 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include "iException.h"
-#include "iException.h"
+#include "IException.h"
+#include "IException.h"
 #include "Filename.h"
 #include "Message.h"
 #include "TextFile.h"
@@ -226,9 +226,9 @@ namespace Isis {
    * @param extension Extension to be added to filename (added only if not already
    *                  on filename). Defaults to ""
    *
-   * @throws Isis::iException::Programmer
-   * @throws Isis::iException::Io - output file already exists
-   * @throws Isis::iException::Io - unable to open file
+   * @throws Isis::IException::Programmer
+   * @throws Isis::IException::Io - output file already exists
+   * @throws Isis::IException::Io - unable to open file
    */
   void TextFile::Open(const std::string &filename, const char *openmode,
                       const char *extension) {
@@ -243,8 +243,7 @@ namespace Isis {
     if(p_stream.is_open()) {
       string message = "TextFile:Open:-> Already opened with this object: ["
                        + string(openmode) + "]:[" + p_filename + "]";
-      throw Isis::iException::Message(Isis::iException::Programmer,
-                                      message, _FILEINFO_);
+      throw IException(IException::Programmer, message, _FILEINFO_);
     }
 
     p_openmode = 0;
@@ -274,8 +273,7 @@ namespace Isis {
     else {
       string message = "TextFile::-> Unknown openmode: (input, output, overwrite, append):["
                        + string(openmode) + "]:[" + p_filename + "]";
-      throw Isis::iException::Message(Isis::iException::Programmer,
-                                      message, _FILEINFO_);
+      throw IException(IException::Programmer, message, _FILEINFO_);
     }
 
     // Input
@@ -288,7 +286,7 @@ namespace Isis {
       if(filenameTmp.Exists()) {
         string message = "TextFile:Open: -> Output file already exists ["
                          + string(openmode) + "]:[" + p_filename + "]";
-        throw Isis::iException::Message(Isis::iException::Io, message, _FILEINFO_);
+        throw IException(IException::Io, message, _FILEINFO_);
       }
 
       p_stream.open(p_filename.c_str(), fstream::in | fstream::out | fstream::trunc);
@@ -312,7 +310,7 @@ namespace Isis {
     if(!p_stream.is_open()) {
       string message = "TextFile:Open:-> Unable to open: ["
                        + string(openmode) + "]:[" + p_filename + "]";
-      throw Isis::iException::Message(Isis::iException::Io, message, _FILEINFO_);
+      throw IException(IException::Io, message, _FILEINFO_);
     }
   }
 
@@ -323,8 +321,7 @@ namespace Isis {
     else {
       if(bailIfNotOpen) {
         string message = "TextFile::-> File not open: [" + p_filename + "]";
-        throw Isis::iException::Message(Isis::iException::Programmer,
-                                        message, _FILEINFO_);
+        throw IException(IException::Programmer, message, _FILEINFO_);
       }
       else {
         return(false);
@@ -477,7 +474,7 @@ namespace Isis {
    *
    * @return bool
    *
-   * @throws Isis::iException::Io - error reading text file
+   * @throws Isis::IException::Io - error reading text file
    */
   bool TextFile::p_GetLine(std::string &line, bool chkComment) {
     OpenChk(true);
@@ -497,7 +494,7 @@ namespace Isis {
       line = "";
       string message = "TextFile:GetLine: -> Error reading text file: ["
                        + p_filename + "]";
-      throw Isis::iException::Message(Isis::iException::Io, message, _FILEINFO_);
+      throw IException(IException::Io, message, _FILEINFO_);
     }
 
     // See if we have a comment and if we need to ignore
@@ -532,8 +529,8 @@ namespace Isis {
    *
    * @param line Char string to be written to file.Defaults to ""
    *
-   * @throws Isis::iException::Io - error writing text to file
-   * @throws Isis::iException::Programmer - input is read only text file, cannot
+   * @throws Isis::IException::Io - error writing text to file
+   * @throws Isis::IException::Programmer - input is read only text file, cannot
    *                                        write to file
    */
   void TextFile::PutLine(const char *line) {
@@ -546,14 +543,13 @@ namespace Isis {
       if(p_openmode != 1) {
         string message = "TextFile:PutLine: -> Error writing text file: ["
                          + p_filename + "]";
-        throw Isis::iException::Message(Isis::iException::Io, message, _FILEINFO_);
+        throw IException(IException::Io, message, _FILEINFO_);
       }
       else {
         string message =
           "TextFile:PutLine: -> Attempt to write to INPUT - Read Only text file: ["
           + p_filename + "]";
-        throw Isis::iException::Message(Isis::iException::Programmer, message,
-                                        _FILEINFO_);
+        throw IException(IException::Programmer, message, _FILEINFO_);
       }
     }
   }

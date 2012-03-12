@@ -2,7 +2,7 @@
 #include "NormModel.h"
 #include "PhotoModel.h"
 #include "AtmosModel.h"
-#include "iException.h"
+#include "IException.h"
 
 namespace Isis {
   /**

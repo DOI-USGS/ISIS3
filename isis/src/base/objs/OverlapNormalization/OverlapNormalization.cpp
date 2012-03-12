@@ -24,7 +24,7 @@
 
 #include <iomanip>
 
-#include "iException.h"
+#include "IException.h"
 
 using namespace std;
 
@@ -106,11 +106,11 @@ namespace Isis {
     double weight) {
     if (index1 >= m_statsList.size()) {
       string msg = "The index 1 is outside the bounds of the list.";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     if (index2 >=  m_statsList.size()) {
       string msg = "The index 2 is outside the bounds of the list.";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     // If there is no overlapping area, then the overlap is invalid
@@ -121,7 +121,7 @@ namespace Isis {
     // The weight must be a positive real number
     if (weight <= 0.0) {
       string msg = "All weights must be positive real numbers.";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     OverlapNormalization::Overlap o;
@@ -160,7 +160,7 @@ namespace Isis {
     // Make sure that there is at least one overlap
     if (m_overlapList.size() == 0) {
       std::string msg = "None of the input images overlap";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     // Make sure the number of valid overlaps + hold images is greater than the
@@ -169,7 +169,7 @@ namespace Isis {
     if (m_overlapList.size() + m_idHoldList.size() < m_statsList.size()) {
       std::string msg = "The number of overlaps and holds must be greater than";
       msg += " the number of input images";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     // Calculate offsets
@@ -279,7 +279,7 @@ namespace Isis {
   double OverlapNormalization::Average(const unsigned index) const {
     if (index >= m_statsList.size()) {
       string msg = "The index was out of bounds for the list of statistics.";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     return m_statsList[index]->Average();
@@ -300,7 +300,7 @@ namespace Isis {
   double OverlapNormalization::Gain(const unsigned index) const {
     if (index >= m_statsList.size()) {
       string msg = "The index was out of bounds for the list of statistics.";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     return m_gains[index];
@@ -321,7 +321,7 @@ namespace Isis {
   double OverlapNormalization::Offset(const unsigned index) const {
     if (index >= m_statsList.size()) {
       string msg = "The index was out of bounds for the list of statistics.";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     return m_offsets[index];
@@ -345,7 +345,7 @@ namespace Isis {
     if (!m_solved) {
       string msg = "The least squares equation has not been successfully ";
       msg += "solved yet.";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if (Isis::IsSpecial(dn)) return dn;

@@ -25,7 +25,7 @@
 #include <vector>
 #include "tnt/tnt_array2d.h"
 #include "MultivariateStatistics.h"
-#include "iException.h"
+#include "IException.h"
 #include "Constants.h"
 
 namespace Isis {

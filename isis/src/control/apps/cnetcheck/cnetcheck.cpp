@@ -53,13 +53,13 @@ QVector< set<iString> > findIslands(
   QMap < iString, set<iString> > adjCubes);
 
 QList< ControlCubeGraphNode * > checkSerialList(
-    SerialNumberList * serialNumbers, ControlNet * controlNet);  
-  
+    SerialNumberList * serialNumbers, ControlNet * controlNet);
+
 void WriteOutput(SerialNumberList num2cube,
                  string filename,
                  set<iString> sns,
                  QMap< iString, set<iString> > cps);
-                 
+
 double getControlFitness(const ControlCubeGraphNode * node, double tolerance, Cube * cube);
 void noLatLonCheck(ControlNet &cnet, CubeManager &manager, Progress &progress,
     bool ignore, SerialNumberList &num2cube,
@@ -203,7 +203,7 @@ void IsisMain() {
 
     progress.CheckStatus();
   }
-  
+
 
   // Checks/detects islands
   set<iString> index;
@@ -290,7 +290,7 @@ void IsisMain() {
     ss << "These serial numbers, filenames, and control points are listed in [";
     ss << Filename(name).Name() + "]" << endl;
   }
-  
+
   // Perform Low Coverage check if it was selected
   iString coverageOp = "LowCoverage";
   int failedCoverageCheck = 0;
@@ -554,34 +554,34 @@ double getControlFitness(const ControlCubeGraphNode * node, double tolerance, Cu
   static  geos::geom::GeometryFactory geosFactory;
   geos::geom::CoordinateSequence * pts = new geos::geom::CoordinateArraySequence();
   QList< ControlMeasure * > measures = node->getMeasures();
-  
+
   // Populate pts with a list of control points
   foreach (ControlMeasure * measure, measures) {
     pts->add(geos::geom::Coordinate(measure->GetSample(), measure->GetLine()));
   }
   pts->add(geos::geom::Coordinate(measures[0]->GetSample(), measures[0]->GetLine()));
-  
+
   if (pts->size() >= 4) {
-  
+
     // Calculate the convex hull
     geos::geom::Geometry * convexHull = geosFactory.createPolygon(
         geosFactory.createLinearRing(pts), 0)->convexHull();
-    
+
     // Calculate the area of the convex hull
     double convexArea = convexHull->getArea();
     iString sn = node->getSerialNumber();
     double cubeArea = cube->getSampleCount() * cube->getLineCount();
-    
+
     controlFitness = convexArea / cubeArea;
-    
+
     if (pts) {
       delete pts;
       pts = NULL;
     }
   }
-  
+
   return controlFitness;
-  
+
 }
 
 
@@ -611,9 +611,8 @@ void noLatLonCheck(ControlNet &cnet, CubeManager &manager, Progress &progress,
       try {
         cam = cube->getCamera();
       }
-      catch(iException &e) {
+      catch(IException &) {
         createdCamera = false;
-        e.Clear();
       }
 
       QList<ControlMeasure *> measures = graphNode->getMeasures();

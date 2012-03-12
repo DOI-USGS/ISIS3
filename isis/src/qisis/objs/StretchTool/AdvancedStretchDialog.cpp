@@ -69,13 +69,13 @@ namespace Isis {
     connect(p_bluStretch, SIGNAL(stretchChanged()),
             this, SIGNAL(stretchChanged()));
   }
-  
+
   /**
-   * Update the stretch and histogram for all the bands 
+   * Update the stretch and histogram for all the bands
    * for All BandId option.
-   * 
+   *
    * @author Sharmila Prasad (3/14/2011)
-   * 
+   *
    * @param redStretch - Updated Red Stretch
    * @param redHist    - Updated Red Histogram
    * @param grnStretch - Updated Green Stretch
@@ -86,7 +86,7 @@ namespace Isis {
   void AdvancedStretchDialog::updateForRGBMode(Stretch &redStretch,
       Histogram &redHist,
       Stretch &grnStretch, Histogram &grnHist,
-      Stretch &bluStretch, Histogram &bluHist) 
+      Stretch &bluStretch, Histogram &bluHist)
   {
     if(p_redStretch) {
       p_redStretch->setStretch(redStretch);
@@ -97,13 +97,13 @@ namespace Isis {
       p_grnStretch->setStretch(grnStretch);
       p_grnStretch->setHistogram(grnHist);
     }
-    
+
     if(p_bluStretch) {
       p_bluStretch->setStretch(bluStretch);
       p_bluStretch->setHistogram(bluHist);
     }
   }
-  
+
 
 
   /**
@@ -115,7 +115,7 @@ namespace Isis {
   void AdvancedStretchDialog::enableGrayMode(Stretch &grayStretch,
       Histogram &grayHist) {
     destroyCurrentStretches();
-    
+
     p_grayStretch = new AdvancedStretch(grayHist, grayStretch,
                                         "Gray", QColor(Qt::gray));
     layout()->addWidget(p_grayStretch);
@@ -267,7 +267,7 @@ namespace Isis {
     }
     else {
       iString msg = "Gray mode not enabled, cannot get gray stretch";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
 
@@ -283,7 +283,7 @@ namespace Isis {
     }
     else {
       iString msg = "RGB mode not enabled, cannot get red stretch";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
 
@@ -299,7 +299,7 @@ namespace Isis {
     }
     else {
       iString msg = "RGB mode not enabled, cannot get green stretch";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
 
@@ -315,7 +315,7 @@ namespace Isis {
     }
     else {
       iString msg = "RGB mode not enabled, cannot get blue stretch";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
-};
+}

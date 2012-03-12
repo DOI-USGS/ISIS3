@@ -71,19 +71,19 @@ void IsisMain() {
   // We dont actually need all 10... so dont do this exception
   //if(inputList.size() != 10) {
   //  iString msg = "Input list file must have 10 entries, one for each CCD (0 to 9)";
-  //  throw iException::Message(iException::User, msg, _FILEINFO_);
+  //  throw IException(IException::User, msg, _FILEINFO_);
   //}
 
   int masterFileNum = ui.GetInteger("MASTER");
 
   numFiles = inputList.size();
-  
+
   // This will initialize our global variables
   FindRed(inputList, masterFileNum);
 
   if(masterFileNum - firstFilter > numFiles || masterFileNum - firstFilter < 0) {
     iString msg = "Input list does not contain the MASTER [RED" + iString(masterFileNum) + "]";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   Pipeline matchfilePipeline("hijitter - match");
@@ -149,7 +149,7 @@ void IsisMain() {
   if (ui.WasEntered("JITTERCK"))  p.Run();
 
   // the outputs are temporary files
-  for(int redNum = 0; redNum < numFiles; redNum++) 
+  for(int redNum = 0; redNum < numFiles; redNum++)
     tempFiles.push_back(Filename("$TEMPORARY/noproj.FROM" + iString(redNum + 1) + ".cub").Expanded());
 
   // Do some calculations, delete the final outputs from the pipeline
@@ -171,15 +171,15 @@ void IsisMain() {
     try {
       ProgramLauncher::RunIsisProgram("ckwriter", params);
     }
-    catch(iException &e) {
+    catch(IException &e) {
       iString message = "Creation of the output ck, " +
         ui.GetFilename("JITTERCK") + " failed.";
-      throw iException::Message(iException::Programmer, message, _FILEINFO_);
+      throw IException(IException::Programmer, message, _FILEINFO_);
     }
 
     p.Run();
   }
-  
+
   // Crop the lines using the jitter file if crop is ebabled
   if(ui.GetBoolean("CROP")) {
     double eTime1, eTime2;
@@ -190,31 +190,31 @@ void IsisMain() {
     for(int i=0; i<numFiles; i++) {
       int line1=0, line2=0;
       int numLines=0;
-      
+
       GetCropLines(p.FinalOutput(i).c_str(), eTime1, eTime2, line1, line2, numLines);
       Pipeline pcrop;
       pcrop.KeepTemporaryFiles(false);
-      
+
       iString tag = "crop" + iString(i);
       string inFile(p.FinalOutput(i).c_str());
       string outFile = "temp_"+tag+".cub";
 
       pcrop.SetInputFile(Filename(inFile));
       pcrop.SetOutputFile(Filename(outFile));
-      
+
       pcrop.AddToPipeline("crop", tag);
       pcrop.Application(tag).SetInputParameter ("FROM",   false);
       pcrop.Application(tag).SetOutputParameter("TO",     "crop");
       pcrop.Application(tag).AddConstParameter ("LINE",   line1);
       pcrop.Application(tag).AddConstParameter ("NLINES", numLines);
       pcrop.Run();
-      
+
       remove(inFile.c_str());
       rename(outFile.c_str(), inFile.c_str());
     }
   }
-  
-  for(unsigned int tempFile = 0; tempFile < tempFiles.size(); tempFile++) 
+
+  for(unsigned int tempFile = 0; tempFile < tempFiles.size(); tempFile++)
     remove(tempFiles[tempFile].c_str());
 
   tempFiles.clear();
@@ -236,12 +236,12 @@ Filename FindRed(FileList &inList, int n) {
 
   if(n > 9 || n < 0) {
     iString msg = "Parameter n must be [0-9] but found [" + iString(n) + "]";
-    throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
   if(!redFiles.empty() && redFiles[n].empty()) {
     iString msg = "Filter [RED" + iString(n) + "] is not in the input list";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   if(!redFiles.empty()) return redFiles[n];
@@ -260,7 +260,7 @@ Filename FindRed(FileList &inList, int n) {
 
       if(redNumber < 0 || redNumber > 9) {
         iString msg = "CcdId value of [" + redNum + "] found in [" + inList[i] + "] not supported";
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
       if(lastRedNum == -1) {
@@ -274,19 +274,19 @@ Filename FindRed(FileList &inList, int n) {
       }
       else {
         iString msg = "The input file list must be in order from RED0 to RED9";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
 
       redFiles[redNumber] = inList[i];
     }
-    catch(iException &e) {
+    catch(IException &e) {
       nonMroFile = inList[i];
     }
   }
 
   if(!nonMroFile.empty()) {
     iString message = "File [" + nonMroFile + "] is not a valid MRO cube";
-    throw iException::Message(iException::User, message, _FILEINFO_);
+    throw IException(IException::User, message, _FILEINFO_);
   }
 
   // Look for missing files
@@ -325,8 +325,7 @@ void ProcessNoprojFiles(Pipeline &p) {
     try {
       ProgramLauncher::RunIsisProgram("hijitreg", params);
     }
-    catch(iException &e) {
-      e.Clear();
+    catch(IException &e) {
       count --;
       continue;
     }
@@ -371,17 +370,16 @@ void ProcessNoprojFiles(Pipeline &p) {
         }
       }
     }
-    catch(iException &e) {
+    catch(IException &e) {
       //iString msg = "Unable to find average sample/line offsets in hijitreg results for CCDs [" + iString(i) + "-" + iString(i+1) + "]";
       //throw iException::Message(iException::Programmer, msg, _FILEINFO_);
       count --;
-      e.Clear();
     }
   }
 
   if(count <= 0) {
     iString msg = "Unable to calculate average sample/line offsets from hijitreg results";
-    throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
   Pvl labels(Filename("$TEMPORARY/noproj.FROM1.cub").Expanded());
@@ -416,9 +414,9 @@ void ProcessNoprojFiles(Pipeline &p) {
 
 /**
  * Get the start and end ephemeris time from the jitter file
- * 
+ *
  * @author Sharmila Prasad (12/20/2011)
- *  
+ *
  * @param jitterFile - jitter file
  * @param eTime1 - Start time
  * @param eTime2 - End time
@@ -437,7 +435,7 @@ void GetEphemerisTimeFromJitterFile(const string jitterFile, double & eTime1, do
     for (int i=0; i<iArrSize; i++) {
       csvArr[i].TrimHead(" \n,");
       csvArr[i].TrimTail(" \n,\t\r");
-      temp = iString(csvArr[i]).ToDouble(); 
+      temp = iString(csvArr[i]).ToDouble();
       if(!i && temp == 0) {
         break;
       }
@@ -456,15 +454,15 @@ void GetEphemerisTimeFromJitterFile(const string jitterFile, double & eTime1, do
 
 /**
  * GetCropLines for an image given the start and end ephemeris times
- * 
+ *
  * @author Sharmila Prasad (12/21/2011)
- * 
+ *
  * @param inFile   - Input image file
  * @param eTime1   - Ephemeris start time
  * @param eTime2   - Ephemeris end time
  * @param line1    - Calculated start line for cropping
- * @param line2    - Calculated end line for cropping 
- * @param numLines - Number of lines in the image to be cropped 
+ * @param line2    - Calculated end line for cropping
+ * @param numLines - Number of lines in the image to be cropped
  */
 void GetCropLines(const string inFile, double eTime1, double eTime2, int & line1, int & line2, int & numLines){
 
@@ -485,7 +483,7 @@ void GetCropLines(const string inFile, double eTime1, double eTime2, int & line1
     numLines = imgLines - line1 + 1;
   else
     numLines = line2 - line1 + 1;
-  
+
   inCube->close();
   delete(inCube);
 }

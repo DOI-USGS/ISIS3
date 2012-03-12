@@ -10,7 +10,7 @@
 #include "ControlMeasure.h"
 #include "ControlMeasureLogData.h"
 #include "ControlPoint.h"
-#include "iException.h"
+#include "IException.h"
 
 
 #include "TableColumn.h"
@@ -89,7 +89,7 @@ namespace Isis
 
       iString msg = "Column title [" + columnTitle + "] does not match any of "
           "the defined column types";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
 
@@ -380,13 +380,13 @@ namespace Isis
           iString msg = "Measures in point [" +
               getFormattedData(getColumnName(PointId)) +
               "] cannot be deleted because point is edit locked";
-          throw iException::Message(iException::User, msg, _FILEINFO_);
+          throw IException(IException::User, msg, _FILEINFO_);
         }
         else if (measure->IsEditLocked()) {
           iString msg = "Measure [" + getFormattedData() + "] in point [" +
               getFormattedData(getColumnName(PointId)) +
               "] cannot be deleted because measure is edit locked";
-          throw iException::Message(iException::User, msg, _FILEINFO_);
+          throw IException(IException::User, msg, _FILEINFO_);
         }
   //       else if (measure->Parent()->GetRefMeasure() == measure) {
   //         iString msg = "Measure [" + getData() + "] in point [" +
@@ -413,7 +413,7 @@ namespace Isis
     {
       return measure;
     }
-    
+
 
     bool AbstractMeasureItem::hasMeasure(ControlMeasure * m) const
     {

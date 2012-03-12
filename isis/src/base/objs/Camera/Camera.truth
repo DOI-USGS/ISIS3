@@ -189,8 +189,8 @@ Lines: 1404
 Bands: 1
 ParentLines: 768
 ParentSamples: 640
-**PROGRAMMER ERROR** Camera::RaDecRange can not calculate a right ascension, declination range for projected images which are not projected to sky
-**PROGRAMMER ERROR** Camera::RaDecResolution can not calculate a right ascension, declination resolution for projected images which are not projected to sky
+**PROGRAMMER ERROR** Camera::RaDecRange can not calculate a right ascension, declination range for projected images which are not projected to sky.
+**PROGRAMMER ERROR** Camera::RaDecResolution can not calculate a right ascension, declination resolution for projected images which are not projected to sky.
 Calling Distortion, FocalPlane, Detector, Ground, and Sky Map functions... Done.
 Calling IgnoreProjection (false)...
 

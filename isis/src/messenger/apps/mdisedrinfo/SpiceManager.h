@@ -30,7 +30,7 @@
 #include "Pvl.h"
 #include "Cube.h"
 #include "Camera.h"
-#include "iException.h"
+#include "IException.h"
 
 namespace Isis {
 

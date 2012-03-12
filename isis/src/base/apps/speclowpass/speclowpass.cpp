@@ -28,7 +28,7 @@ void IsisMain() {
   if(bands > maxBands) {
     iString msg = "Parameter bands [" + iString(bands) + "] exceeds maximum allowable size "
                   + "of [" + iString(maxBands) + "] for cube [" + icube->getFilename() + "]";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // Set the Boxcar Parameters

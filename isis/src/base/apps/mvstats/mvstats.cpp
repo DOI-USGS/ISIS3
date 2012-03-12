@@ -25,7 +25,7 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   if(!ui.WasEntered("CUBE") && !ui.WasEntered("FLATFILE")) {
     string message = "At least one output file must be entered";
-    throw iException::Message(iException::User, message, _FILEINFO_);
+    throw IException(IException::User, message, _FILEINFO_);
   }
 
   string file = ui.GetFilename("FROM");
@@ -38,7 +38,7 @@ void IsisMain() {
   //Check to see if the input cube has enough bands
   if(bands < 2) {
     string message = "Input band must have at least two bands!";
-    throw iException::Message(iException::User, message, _FILEINFO_);
+    throw IException(IException::User, message, _FILEINFO_);
   }
 
   //Set the matrices according to the number of bands in the input cube

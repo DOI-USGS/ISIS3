@@ -33,7 +33,7 @@
 #include "PvlKeyword.h"
 #include "SpecialPixel.h"
 #include "ImagePolygon.h"
-#include "iException.h"
+#include "IException.h"
 
 namespace Isis {
 

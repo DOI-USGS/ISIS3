@@ -3,7 +3,7 @@
 #include "Isis.h"
 #include "ProcessByLine.h"
 #include "ProcessMosaic.h"
-#include "iException.h"
+#include "IException.h"
 #include "FileList.h"
 #include "TextFile.h"
 #include "SpecialPixel.h"
@@ -48,7 +48,7 @@ void IsisMain() {
         if((nsamps != cube.getSampleCount()) || (nlines != cube.getLineCount())) {
           string msg = "Spatial dimensions of cube [" +
                        cubeList[i] + "] does not match other cubes in list";
-          throw iException::Message(iException::User, msg, _FILEINFO_);
+          throw IException(IException::User, msg, _FILEINFO_);
         }
         // Get the total number of bands
         nbands += cube.getBandCount();
@@ -74,9 +74,9 @@ void IsisMain() {
       cube.close();
     }
   }
-  catch(iException &e) {
+  catch(IException &e) {
     string msg = "Invalid cube in list file [" + ui.GetFilename("FROMLIST") + "]";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(e, IException::User, msg, _FILEINFO_);
   }
 
   // Setup to propagate from the first input cube
@@ -98,7 +98,7 @@ void IsisMain() {
       string msg = "Filename [" + ui.GetFilename("PROPLAB") +
                    "] to propagate labels from is not in the list file [" +
                    ui.GetFilename("FROMLIST") + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
   p2.SetInputCube(cubeList[index], inatt);

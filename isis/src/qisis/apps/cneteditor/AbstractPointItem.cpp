@@ -11,7 +11,7 @@
 #include "ControlMeasure.h"
 #include "ControlNet.h"
 #include "ControlPoint.h"
-#include "iException.h"
+#include "IException.h"
 #include "Latitude.h"
 #include "Longitude.h"
 #include "TableColumn.h"
@@ -91,7 +91,7 @@ namespace Isis
 
       iString msg = "Column title [" + columnTitle + "] does not match any of "
           "the defined column types";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
 
@@ -327,17 +327,17 @@ namespace Isis
             break;
           case AdjustedSPLatSigma: {
             iString msg = "Cannot set adjusted surface point latitude sigma";
-            throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+            throw IException(IException::Programmer, msg, _FILEINFO_);
             break;
           }
           case AdjustedSPLonSigma: {
             iString msg = "Cannot set adjusted surface point longitude sigma";
-            throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+            throw IException(IException::Programmer, msg, _FILEINFO_);
             break;
           }
           case AdjustedSPRadiusSigma: {
             iString msg = "Cannot set adjusted surface point radius sigma";
-            throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+            throw IException(IException::Programmer, msg, _FILEINFO_);
             break;
           }
           case APrioriSPLat: {
@@ -367,7 +367,7 @@ namespace Isis
             Distance newRadius(catchNull(newData), Distance::Meters);
             SurfacePoint newSurfacePoint(prepareSurfacePoint(newRadius,
                 point->GetAprioriSurfacePoint()));
-                      
+
             newSurfacePoint.SetSphericalCoordinates(
                       newSurfacePoint.GetLatitude(),
                       newSurfacePoint.GetLongitude(),
@@ -458,7 +458,7 @@ namespace Isis
         if (point->IsEditLocked()) {
           iString msg = "Point [" + getFormattedData() + "] is edit locked and "
               "cannot be deleted";
-          throw iException::Message(iException::User, msg, _FILEINFO_);
+          throw IException(IException::User, msg, _FILEINFO_);
         }
 
         ControlPoint * tempPoint = point;

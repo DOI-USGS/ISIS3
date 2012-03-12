@@ -21,7 +21,7 @@
 
 #include "CameraDistortionMap.h"
 #include "CameraFocalPlaneMap.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "iTime.h"
 #include "LineScanCameraDetectorMap.h"

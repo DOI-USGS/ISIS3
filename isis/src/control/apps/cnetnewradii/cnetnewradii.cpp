@@ -7,7 +7,7 @@
 #include "ControlPoint.h"
 #include "Cube.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "Interpolator.h"
 #include "Latitude.h"
 #include "Longitude.h"
@@ -33,10 +33,10 @@ void IsisMain() {
   try {
     ugm = new UniversalGroundMap(demCube);
   }
-  catch (iException e) {
+  catch (IException &e) {
     iString msg = "Cannot initalize UniversalGroundMap for DEM cube [" +
                    demFile + "]";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   //  Use bilinear interpolation to read radius from DEM
@@ -52,15 +52,15 @@ void IsisMain() {
   GetLatLon newRadiiSource;
   iString getLatLon = iString(ui.GetAsString("GETLATLON")).UpCase();
   if (getLatLon == "ADJUSTED") {
-      newRadiiSource = Adjusted;
+    newRadiiSource = Adjusted;
   }
   else if (getLatLon == "APRIORI") {
-      newRadiiSource = Apriori;
+    newRadiiSource = Apriori;
   }
   else {
-      string msg = "The value for parameter GETLATLON [";
-      msg += ui.GetAsString("GETLATLON") + "] must be provided.";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+    string msg = "The value for parameter GETLATLON [";
+    msg += ui.GetAsString("GETLATLON") + "] must be provided.";
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   int numSuccesses = 0;
@@ -139,12 +139,12 @@ void IsisMain() {
     if (numConstrainedFixed == 0) {
       string msg = "There were no Fixed or Constrained points in this network."
           "  No radii were replaced.";
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     else {
       string msg = "No valid radii can be calculated. Verify that the DEM [" +
                        ui.GetAsString("MODEL") + "] is valid.";
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
 

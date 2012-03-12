@@ -318,26 +318,26 @@ Total Bands=2
 
 *** Test Error Handling ***
 Test multiple input error
-**PROGRAMMER ERROR** You must specify exactly one input cube
+**PROGRAMMER ERROR** You must specify exactly one input cube.
 
 Test multiple output error
-**PROGRAMMER ERROR** You must specify exactly one output cube
+**PROGRAMMER ERROR** You must specify exactly one output cube.
 
 Test input does not overlap mosaic
-**USER ERROR** The input cube does not overlap the mosaic
+**USER ERROR** The input cube does not overlap the mosaic.
 
 Test input does not overlap mosaic
-**USER ERROR** The input cube does not overlap the mosaic
+**USER ERROR** The input cube does not overlap the mosaic.
 
 Test no input cube
-**PROGRAMMER ERROR** You must specify exactly one input and one output cube
+**PROGRAMMER ERROR** You must specify exactly one input and one output cube.
 
 Test no output cube
-**PROGRAMMER ERROR** You must specify exactly one input and one output cube
+**PROGRAMMER ERROR** You must specify exactly one input and one output cube.
 
 Test Band cannot be a priority if Track is not set
 unittest: Working
 0% ProcessedTest Band not found with Band as Priority
 unittest: Working
-0% Processed**USER ERROR** Invalid Band / Key Name, Value 
+0% Processed**USER ERROR** Invalid Band / Key Name, Value.
 

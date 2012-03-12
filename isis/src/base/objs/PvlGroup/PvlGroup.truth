@@ -33,7 +33,7 @@ Group = POODLE
   /* This is another comment */
   BIG     = ("  NOT  ", "REALLY LARGE")
 End_Group
-**PVL ERROR** Group [POODLE] EndGroup not found before end of file
+**ERROR** Group [POODLE] EndGroup not found before end of file when reading PVL.
 Template Group:
 Group = Point_ErrorMagnitude
   Point_ErrorMagnitude__Required = false

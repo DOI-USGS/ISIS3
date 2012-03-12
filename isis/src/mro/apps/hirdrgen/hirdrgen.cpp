@@ -43,7 +43,7 @@ void IsisMain() {
                  Application::GetUserInterface().GetFilename("FROM") +
                  "] does not appear to be a HiRISE RDR product. Number of " +
                  "bands is greater than 3";
-    throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
   // Setup to get a histogram for each band

@@ -2,7 +2,7 @@
 
 #include "PipelineApplication.h"
 #include "Pipeline.h"
-#include "iException.h"
+#include "IException.h"
 #include "Application.h"
 
 using namespace Isis;
@@ -13,7 +13,7 @@ namespace Isis {
    * Constructs the first pipeline application.
    *
    * @param appName The name of this application
-   * @param pipe The pipeline 
+   * @param pipe The pipeline
    * @history 2010-12-20 Sharmila Prasad Initialise & enable the branches
    */
   PipelineApplication::PipelineApplication(iString appName, Pipeline *pipe) {
@@ -43,8 +43,8 @@ namespace Isis {
    * Constructs subsequent pipeline applications
    *
    * @param appName The name of this application
-   * @param previous The previously last pipeline application 
-   * @history 2010-12-20 Sharmila Prasad Initialise & enable the branches 
+   * @param previous The previously last pipeline application
+   * @history 2010-12-20 Sharmila Prasad Initialise & enable the branches
    */
   PipelineApplication::PipelineApplication(iString appName, PipelineApplication *previous) {
     p_name = appName;
@@ -151,13 +151,13 @@ namespace Isis {
    * parameter.
    *
    * @param modString Branch name
-   * @param type Modifier type; currently only supports constant strings 
+   * @param type Modifier type; currently only supports constant strings
    * @history 2010-12-20 Sharmila Prasad Enable the branch at the time of creation
    */
   void PipelineApplication::AddBranch(const iString &modString, NameModifierType type) {
     if(modString == "") {
       string msg = "Can not add empty branch to pipeline";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     //if(p_inBranches.size() != 1 || p_inBranches[0] != "") {
@@ -169,7 +169,7 @@ namespace Isis {
       p_outBranches.clear();
       p_enableBranch.clear();
     }
-    
+
     if(p_inBranches.size() == 1) {
       p_outBranches.push_back(modString);
       p_enableBranch.push_back(true);
@@ -294,8 +294,8 @@ namespace Isis {
   /**
    * This method calculates the inputs, outputs and necessary calls to this
    * program for the pipeline. This should only be used by Pipeline.
-   *  
-   * @history 2010-12-20 Sharmila Prasad Set appropriate inputs to the branch taking 
+   *
+   * @history 2010-12-20 Sharmila Prasad Set appropriate inputs to the branch taking
    *          into consideration whether the previous branch was enabled/disabled. Also
    *          set the input list accordingly if needlist is true
    */
@@ -317,12 +317,12 @@ namespace Isis {
     for(int i=0; i<(int)p_inBranches.size(); i++) {
       cerr << "Branch" << i << " = " << p_inBranches[i] << endl;
     }
-    
+
     cerr << "Output Branches Size=" << p_outBranches.size() << endl;
     for(int i=0; i<(int)p_outBranches.size(); i++) {
       cerr << "Branch" << i << " = " << p_outBranches[i] << " Enabled=" << p_enableBranch[i] << endl;
     }*/
-    
+
     // Make sure we have different inputs for different runs...
     if(!runOnce && p_input.size() == 1) {
       PipelineParameter &inputParam = p_input[0];
@@ -347,8 +347,8 @@ namespace Isis {
         p_outputs.push_back(p_name + "." +tmpBranch + ".blank");
         continue;
       }
-      
-      
+
+
       // Figure out the input file; could throw an exception if the user didnt set it
       iString inputFile = CalculateInputFile(branch);
       // Figure out the output file; This adds the output to the output list*
@@ -443,7 +443,7 @@ namespace Isis {
                   iString message = "Application [" + Name() + "] in the pipeline branches with an ";
                   message += "output parameter for each branch, but branch [" + p_outBranches[outBranch];
                   message += "] has multiple output files specified.";
-                  throw iException::Message(iException::Programmer, message, _FILEINFO_);
+                  throw IException(IException::Programmer, message, _FILEINFO_);
                 }
 
                 outputSet = true;
@@ -454,7 +454,7 @@ namespace Isis {
               iString message = "Application [" + Name() + "] in the pipeline branches with an ";
               message += "output parameter for each branch, but branch [" + p_outBranches[outBranch];
               message += "] has no output files specified.";
-              throw iException::Message(iException::Programmer, message, _FILEINFO_);
+              throw IException(IException::Programmer, message, _FILEINFO_);
             }
           }
         }
@@ -492,7 +492,7 @@ namespace Isis {
         iString message = "There was a problem with calculating the inputs for program [" + Name();
         message += "]. Please verify your program is not setting outputs for branches that ";
         message += "don't have input.";
-        throw iException::Message(iException::Programmer, message, _FILEINFO_);
+        throw IException(IException::Programmer, message, _FILEINFO_);
       }
 
       // Remember this parameter string
@@ -506,15 +506,15 @@ namespace Isis {
    *
    * @param branch Branch this input file affects
    *
-   * @return iString Input filename 
-   * @history 2010-12-20 Sharmila Prasad Get the right input for this branch if previous 
-   *          branch is disabled. 
+   * @return iString Input filename
+   * @history 2010-12-20 Sharmila Prasad Get the right input for this branch if previous
+   *          branch is disabled.
    */
   iString PipelineApplication::CalculateInputFile(int branch) {
     iString file = "";
 
     PipelineApplication *prev = Previous();
-    
+
     if(prev != NULL) {
       // The last app exists, look for output on this branch
       if(branch < (int)prev->GetOutputs().size() && prev->BranchEnabled(branch)) {
@@ -525,8 +525,8 @@ namespace Isis {
           if(prev->Branches()){
              if (!prev->BranchEnabled(branch)) {
                string msg = "Application branches but branch is disabled";
-               throw iException::Message(iException::Programmer, msg, _FILEINFO_); 
-             } 
+               throw IException(IException::Programmer, msg, _FILEINFO_);
+             }
           }
           /*   else {
                vector<iString> inputs = prev->GetInputs();
@@ -551,7 +551,7 @@ namespace Isis {
         }
       }
     }
-        
+
     // We're either the first program, or nothing has generated output yet.
     if(file.empty()){
       file = p_pipeline->OriginalInput(branch);
@@ -733,11 +733,11 @@ namespace Isis {
 
     if(p_inBranches[0] != "") {
       string msg = "Application [" + Name() + "] in the pipeline does not have an input for branch [" + p_inBranches[branch] + "]";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     else {
       string msg = "Application [" + Name() + "] in the pipeline does not have an input";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
 
@@ -777,7 +777,7 @@ namespace Isis {
 
     if(!found) {
       string msg = "Branch [" + name + "] does not exist in the pipeline application [" + Name() + "]";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     return branchIndex;

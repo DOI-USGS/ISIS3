@@ -31,7 +31,7 @@
 #include <iomanip>
 #include <exception>
 #include "iString.h"
-#include "iException.h"
+#include "IException.h"
 #include <gsl/gsl_math.h>
 
 
@@ -563,13 +563,13 @@ namespace Isis {
        *
        * @param key Key to fetch the value for
        * @return T Value associated with name
-       * @throws iException if the value is not found
+       * @throws IException if the value is not found
        */
-      T &get(const K &key) throw(iException &) {
+      T &get(const K &key) {
         CollectorIter cItr = _list.find(key);
         if(cItr == _list.end()) {
           std::string mess = "Requested value does not exist!";
-          throw iException::Message(iException::Programmer, mess.c_str(), _FILEINFO_);
+          throw IException(IException::Programmer, mess, _FILEINFO_);
         }
         return (cItr->second);
       }
@@ -579,11 +579,11 @@ namespace Isis {
        *
        * @param key Key to fetch the value for
        */
-      const T &get(const K &key) const throw(iException &) {
+      const T &get(const K &key) const {
         CollectorConstIter cItr = _list.find(key);
         if(cItr == _list.end()) {
           std::string mess = "Requested value does not exist!";
-          throw iException::Message(iException::Programmer, mess.c_str(), _FILEINFO_);
+          throw IException(IException::Programmer, mess, _FILEINFO_);
         }
         return (cItr->second);
       }
@@ -620,7 +620,7 @@ namespace Isis {
        *
        * @return T Value associated with name
        */
-      T &getNth(int nth) throw(iException &) {
+      T &getNth(int nth) {
         CollectorIter cItr;
         int i;
         for(cItr = _list.begin(), i = 0 ; cItr != _list.end() ; ++cItr, i++) {
@@ -630,7 +630,7 @@ namespace Isis {
         if(cItr == _list.end()) {
           std::ostringstream mess;
           mess << "Requested index (" << nth << ") out of range" << std::endl;
-          throw iException::Message(iException::Programmer, mess.str(), _FILEINFO_);
+          throw IException(IException::Programmer, mess.str(), _FILEINFO_);
         }
         return (cItr->second);
       }
@@ -645,7 +645,7 @@ namespace Isis {
         *
         * @return T Value associated with name
         */
-      const T &getNth(int nth) const throw(iException &) {
+      const T &getNth(int nth) const {
         CollectorConstIter cItr;
         int i;
         for(cItr = _list.begin(), i = 0 ; cItr != _list.end() ; ++cItr, i++) {
@@ -654,7 +654,7 @@ namespace Isis {
         if(cItr == _list.end()) {
           std::ostringstream mess;
           mess << "Requested index (" << nth << ") out of range" << std::endl;
-          throw iException::Message(iException::Programmer, mess.str(), _FILEINFO_);
+          throw IException(IException::Programmer, mess.str(), _FILEINFO_);
         }
         return (cItr->second);
       }
@@ -669,7 +669,7 @@ namespace Isis {
         *
         * @return K Key associated with name
         */
-      const K &key(int nth) const throw(iException &) {
+      const K &key(int nth) const {
         CollectorConstIter cItr;
         int i;
         for(cItr = _list.begin(), i = 0 ; cItr != _list.end() ; ++cItr, i++) {
@@ -678,7 +678,7 @@ namespace Isis {
         if(cItr == _list.end()) {
           std::ostringstream mess;
           mess << "Requested key index (" << nth << ") out of range" << std::endl;
-          throw iException::Message(iException::Programmer, mess.str(), _FILEINFO_);
+          throw IException(IException::Programmer, mess.str(), _FILEINFO_);
         }
         return (cItr->first);
       }

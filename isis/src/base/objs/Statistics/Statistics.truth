@@ -71,8 +71,8 @@ Hrs Pixels:     0
 Sum:            0
 SumSquare:      0
 
-**PROGRAMMER ERROR** You are removing non-existant data in [Statistics::RemoveData]
-**PROGRAMMER ERROR** Minimum is invalid since you removed data
-**PROGRAMMER ERROR** Maximum is invalid since you removed data
-**PROGRAMMER ERROR** Invalid value for percent
-**PROGRAMMER ERROR** Invalid value for percent
+**PROGRAMMER ERROR** You are removing non-existant data in [Statistics::RemoveData].
+**PROGRAMMER ERROR** Minimum is invalid since you removed data.
+**PROGRAMMER ERROR** Maximum is invalid since you removed data.
+**PROGRAMMER ERROR** Invalid value for percent.
+**PROGRAMMER ERROR** Invalid value for percent.

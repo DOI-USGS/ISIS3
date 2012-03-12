@@ -21,16 +21,18 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include <string>
-
-#include <iostream>
-
-#include <vector>
-#include "naif/SpiceUsr.h"
-#include "naif/SpiceZfc.h"
-#include "naif/SpiceZmc.h"
 #include "Quaternion.h"
-#include "iException.h"
+
+#include <string>
+#include <iostream>
+#include <vector>
+
+#include <naif/SpiceUsr.h>
+#include <naif/SpiceZfc.h>
+#include <naif/SpiceZmc.h>
+
+#include "IException.h"
+#include "iString.h"
 
 namespace Isis {
   /**
@@ -76,7 +78,7 @@ namespace Isis {
     }
     else {
       std::string msg = "Input vector of unexpected size for matrix or quaternion";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
   }
@@ -191,7 +193,7 @@ namespace Isis {
     }
     else {
       std::string msg = "Unable to make quaternion a unit quaternion";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     qout.p_quaternion[0] = (qout.p_quaternion[0] * scalar) / unitizer;
@@ -226,7 +228,7 @@ namespace Isis {
   std::vector<double> Quaternion::Qxv(const std::vector<double> &vin) {
     if(vin.size() != 3) {
       std::string msg = "Unexpected vector size -- 3 expected";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     Quaternion qvin;

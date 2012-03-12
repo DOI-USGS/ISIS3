@@ -1,7 +1,7 @@
 #include <cmath>
 #include "TopoAtm.h"
 #include "NumericalApproximation.h"
-#include "iException.h"
+#include "IException.h"
 
 namespace Isis {
   /*
@@ -34,7 +34,8 @@ namespace Isis {
 
     if(algorithm.HasKeyword("Pharef")) {
       SetNormPharef(algorithm["Pharef"]);
-    } else {
+    }
+    else {
       p_normPharef = p_normIncref;
     }
 
@@ -53,7 +54,7 @@ namespace Isis {
 
     if(psurf0 == 0.0) {
       std::string msg = "Divide by zero encountered";
-      throw iException::Message(iException::Math, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
     else {
       p_normRhobar = p_normAlbedo / psurf0;
@@ -72,7 +73,7 @@ namespace Isis {
 
     // Now calculate atmosphere at standard conditions
     GetAtmosModel()->SetStandardConditions(true);
-    GetAtmosModel()->CalcAtmEffect(p_normPharef, p_normIncref, p_normEmaref, &pstdref, &transref, 
+    GetAtmosModel()->CalcAtmEffect(p_normPharef, p_normIncref, p_normEmaref, &pstdref, &transref,
                                    &trans0ref, &sbar, &transs);
     GetAtmosModel()->SetStandardConditions(false);
 
@@ -91,7 +92,7 @@ namespace Isis {
    *          since this is in Isis namespace.
    */
   void TopoAtm::NormModelAlgorithm(double phase, double incidence, double emission,
-                                   double demincidence, double dememission, double dn, 
+                                   double demincidence, double dememission, double dn,
                                    double &albedo, double &mult, double &base) {
     double eps = 0.1;
     static double psurf;
@@ -165,7 +166,7 @@ namespace Isis {
   void TopoAtm::SetNormPharef(const double pharef) {
     if(pharef < 0.0 || pharef >= 180.0) {
       std::string msg = "Invalid value of normalization pharef [" + iString(pharef) + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     p_normPharef = pharef;
@@ -183,7 +184,7 @@ namespace Isis {
   void TopoAtm::SetNormIncref(const double incref) {
     if(incref < 0.0 || incref >= 90.0) {
       std::string msg = "Invalid value of normalization incref [" + iString(incref) + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     p_normIncref = incref;
@@ -201,7 +202,7 @@ namespace Isis {
   void TopoAtm::SetNormEmaref(const double emaref) {
     if(emaref < 0.0 || emaref >= 90.0) {
       std::string msg = "Invalid value of normalization emaref [" + iString(emaref) + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     p_normEmaref = emaref;

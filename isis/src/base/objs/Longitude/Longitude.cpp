@@ -22,7 +22,7 @@
 #include <cmath>
 
 #include "Constants.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "PvlGroup.h"
 #include "SpecialPixel.h"
@@ -58,7 +58,7 @@ namespace Isis {
     else {
       iString msg = "Longitude domain [" +
           iString(mapping["LongitudeDomain"][0]) + "] not recognized";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if(mapping["LongitudeDirection"][0] == "PositiveEast") {
@@ -70,7 +70,7 @@ namespace Isis {
     else {
       iString msg = "Longitude direction [" +
           iString(mapping["LongitudeDirection"][0]) + "] not recognized";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
 
@@ -96,7 +96,7 @@ namespace Isis {
     }
     else {
       iString msg = "Longitude direction [" + iString(lonDir) + "] not valid";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
 
@@ -123,7 +123,7 @@ namespace Isis {
     }
     else {
       iString msg = "Longitude direction [" + iString(lonDir) + "] not valid";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
 

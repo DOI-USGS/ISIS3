@@ -22,7 +22,7 @@
 #include <sstream>
 #include <fstream>
 #include "PvlTokenizer.h"
-#include "iException.h"
+#include "IException.h"
 #include "Message.h"
 #include "iString.h"
 
@@ -149,9 +149,9 @@ namespace Isis {
           s = ReadToParen(stream);
           ParseCommaList(t, s);
         }
-        catch(Isis::iException &e) {
+        catch(IException &e) {
           string message = Isis::Message::KeywordValueBad(t.GetKey());
-          throw Isis::iException::Message(Isis::iException::Parse, message, _FILEINFO_);
+          throw IException(e, IException::Unknown, message, _FILEINFO_);
         }
         tokens.push_back(t);
         continue;
@@ -163,9 +163,9 @@ namespace Isis {
           s = ReadToBrace(stream);
           ParseCommaList(t, s);
         }
-        catch(Isis::iException &e) {
+        catch(IException &e) {
           string message = Isis::Message::KeywordValueBad(t.GetKey());
-          throw Isis::iException::Message(Isis::iException::Parse, message, _FILEINFO_);
+          throw IException(e, IException::Unknown, message, _FILEINFO_);
         }
         tokens.push_back(t);
         continue;
@@ -176,9 +176,9 @@ namespace Isis {
         try {
           s = ReadToDoubleQuote(stream);
         }
-        catch(Isis::iException &e) {
+        catch(IException &e) {
           string message = Isis::Message::KeywordValueBad(t.GetKey());
-          throw Isis::iException::Message(Isis::iException::Parse, message, _FILEINFO_);
+          throw IException(e, IException::Unknown, message, _FILEINFO_);
         }
         t.AddValue(s);
         tokens.push_back(t);
@@ -190,9 +190,9 @@ namespace Isis {
         try {
           s = ReadToSingleQuote(stream);
         }
-        catch(Isis::iException &e) {
+        catch(IException &e) {
           string message = Isis::Message::KeywordValueBad(t.GetKey());
-          throw Isis::iException::Message(Isis::iException::Parse, message, _FILEINFO_);
+          throw IException(IException::Unknown, message, _FILEINFO_);
         }
         t.AddValue(s);
         tokens.push_back(t);
@@ -295,7 +295,7 @@ namespace Isis {
       ValidateCharacter(c);
       if(c == EOF) {
         string message = Isis::Message::MissingDelimiter('"', s);
-        throw Isis::iException::Message(Isis::iException::Parse, message, _FILEINFO_);
+        throw IException(IException::Unknown, message, _FILEINFO_);
       }
       else if(c != '"') {
         s += (char) c;
@@ -332,7 +332,7 @@ namespace Isis {
       ValidateCharacter(c);
       if(c == EOF) {
         string message = Isis::Message::MissingDelimiter('\'', s);
-        throw Isis::iException::Message(Isis::iException::Parse, message, _FILEINFO_);
+        throw IException(IException::Unknown, message, _FILEINFO_);
       }
       else if(c != '\'') {
         s += (char) c;
@@ -371,26 +371,24 @@ namespace Isis {
       ValidateCharacter(c);
       if(c == EOF) {
         string message = Isis::Message::MissingDelimiter(')', s);
-        throw Isis::iException::Message(Isis::iException::Parse, message, _FILEINFO_);
+        throw IException(IException::Unknown, message, _FILEINFO_);
       }
       else if(c == '"') {
         try {
           s += "\"" + ReadToDoubleQuote(stream) + "\"";
         }
-        catch(Isis::iException &e) {
-          e.Clear();
+        catch(IException &) {
           string message = Isis::Message::MissingDelimiter('"', s);
-          throw Isis::iException::Message(Isis::iException::Parse, message, _FILEINFO_);
+          throw IException(IException::Unknown, message, _FILEINFO_);
         }
       }
       else if(c == '\'') {
         try {
           s += "'" + ReadToSingleQuote(stream) + "'";
         }
-        catch(Isis::iException &e) {
-          e.Clear();
+        catch(IException &) {
           string message = Isis::Message::MissingDelimiter('\'', s);
-          throw Isis::iException::Message(Isis::iException::Parse, message, _FILEINFO_);
+          throw IException(IException::Unknown, message, _FILEINFO_);
         }
       }
       else if(c == ')') {
@@ -417,26 +415,24 @@ namespace Isis {
       ValidateCharacter(c);
       if(c == EOF) {
         string message = Isis::Message::MissingDelimiter('}', s);
-        throw Isis::iException::Message(Isis::iException::Parse, message, _FILEINFO_);
+        throw IException(IException::Unknown, message, _FILEINFO_);
       }
       else if(c == '"') {
         try {
           s += "\"" + ReadToDoubleQuote(stream) + "\"";
         }
-        catch(Isis::iException &e) {
-          e.Clear();
+        catch(IException &e) {
           string message = Isis::Message::MissingDelimiter('"', s);
-          throw Isis::iException::Message(Isis::iException::Parse, message, _FILEINFO_);
+          throw IException(IException::Unknown, message, _FILEINFO_);
         }
       }
       else if(c == '\'') {
         try {
           s += "'" + ReadToSingleQuote(stream) + "'";
         }
-        catch(Isis::iException &e) {
-          e.Clear();
+        catch(IException &) {
           string message = Isis::Message::MissingDelimiter('\'', s);
-          throw Isis::iException::Message(Isis::iException::Parse, message, _FILEINFO_);
+          throw IException(IException::Unknown, message, _FILEINFO_);
         }
       }
       else if(c == '}') {
@@ -515,6 +511,6 @@ namespace Isis {
     if(c == '\0') return;
 
     string message = "ASCII data expected but found unprintable (binary) data";
-    throw Isis::iException::Message(Isis::iException::Parse, message, _FILEINFO_);
+    throw IException(IException::Unknown, message, _FILEINFO_);
   }
 } // end namespace isis

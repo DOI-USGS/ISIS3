@@ -21,7 +21,7 @@
 #include <float.h>
 #include <string>
 #include "Statistics.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 
 using namespace std;
@@ -82,7 +82,7 @@ namespace Isis {
    *
    * @param count The number of elements in the data to be removed.
    *
-   * @throws Isis::iException::Message RemoveData is trying to remove data that
+   * @throws Isis::IException::Message RemoveData is trying to remove data that
    *    doesn't exist.
    */
   void Statistics::RemoveData(const double *data, const unsigned int count) {
@@ -121,7 +121,7 @@ namespace Isis {
 
     if(p_totalPixels < 0) {
       string m = "You are removing non-existant data in [Statistics::RemoveData]";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
   }
 
@@ -138,7 +138,7 @@ namespace Isis {
       iString sMin(minimum);
       iString sMax(maximum);
       std::string m = "Invalid Range: Minimum [" + sMin + "] must be less than the Maximum [" + sMax + "]";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
   }
   /**
@@ -202,13 +202,13 @@ namespace Isis {
    *
    * @return Current minimum value in data set.
    *
-   * @throws Isis::iException::Message The data set is blank, so the minimum is
+   * @throws Isis::IException::Message The data set is blank, so the minimum is
    *    invalid.
    */
   double Statistics::Minimum() const {
     if(p_removedData) {
       string m = "Minimum is invalid since you removed data";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     if(p_validPixels < 1) return Isis::NULL8;
@@ -222,13 +222,13 @@ namespace Isis {
    *
    * @return Current maximum value in data set
    *
-   * @throws Isis::iException::Message The data set is blank, so the maximum is
+   * @throws Isis::IException::Message The data set is blank, so the maximum is
    *    invalid.
    */
   double Statistics::Maximum() const {
     if(p_removedData) {
       string m = "Maximum is invalid since you removed data";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     if(p_validPixels < 1) return Isis::NULL8;
@@ -349,12 +349,12 @@ namespace Isis {
    *
    * @return Minimum value (excluding statistical outliers)
    *
-   * @throws Isis::iException::Message
+   * @throws Isis::IException::Message
    */
   double Statistics::ChebyshevMinimum(const double percent) const {
     if((percent <= 0.0) || (percent >= 100.0)) {
       string m = "Invalid value for percent";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     if(p_validPixels < 1) return Isis::NULL8;
@@ -375,12 +375,12 @@ namespace Isis {
    *
    * @return maximum value excluding statistical outliers
    *
-   * @throws Isis::iException::Message
+   * @throws Isis::IException::Message
    */
   double Statistics::ChebyshevMaximum(const double percent) const {
     if((percent <= 0.0) || (percent >= 100.0)) {
       string m = "Invalid value for percent";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     if(p_validPixels < 1) return Isis::NULL8;
@@ -449,7 +449,7 @@ namespace Isis {
       else {
         string m = "Undefined Z-score. Standard deviation is zero and";
         m += " the input value[" + Isis::iString(value) + "] is out of range [" + Isis::iString(Maximum()) + "].";
-        throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+        throw IException(IException::Programmer, m, _FILEINFO_);
       }
     }
     return (value - Average()) / StandardDeviation();

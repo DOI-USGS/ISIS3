@@ -10,7 +10,7 @@
 // Isis specific include files go next
 #include "ProcessByLine.h"
 #include "SpecialPixel.h"
-#include "iException.h"
+#include "IException.h"
 #include "Pvl.h"
 #include "TextFile.h"
 #include "Statistics.h"
@@ -61,7 +61,7 @@ void IsisMain() {
     if(pencil.LineCount() - 1 < icube->getBandCount()) {
       string msg = "The spectral pencil file [" + ui.GetAsString("SPECTRUM") +
                    "] does not contain enough data for all bands.";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     string st;
     int column = -1;
@@ -82,7 +82,7 @@ void IsisMain() {
     if(column < 0  || (unsigned)column > tokens.size()) {
       string msg = "The column specified in file [" + ui.GetFilename("SPECTRUM")
                    + "] was not found.";
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     // Add the correct column of data to normalizer
     for(int i = 0; i < icube->getBandCount(); i++) {

@@ -34,12 +34,12 @@ QnetSetAprioriDialog::QnetSetAprioriDialog(QWidget *parent) : QDialog(parent) {
 
 /**
  * Set control points in the dialog
- * 
- * @param selectedPoints QList<QListWidgetItem *> ControlPoints listed 
- *  
- * @internal 
- * @history 2011-10-03 Tracie Sucharski - Do not enable user Entered Button, 
- *                        this will only be enabled if the group box is enabled. 
+ *
+ * @param selectedPoints QList<QListWidgetItem *> ControlPoints listed
+ *
+ * @internal
+ * @history 2011-10-03 Tracie Sucharski - Do not enable user Entered Button,
+ *                        this will only be enabled if the group box is enabled.
  */
 void QnetSetAprioriDialog::setPoints(QList<QListWidgetItem *> selectedPoints) {
 
@@ -98,7 +98,7 @@ void QnetSetAprioriDialog::fillLineEdits() {
   ControlPoint *pt = g_controlNetwork->GetPoint(id);
   SurfacePoint sPt = pt->GetAprioriSurfacePoint();
   vector<Distance> targetRadii = g_controlNetwork->GetTargetRadii();
-  sPt.SetRadii(Distance(targetRadii[0]), 
+  sPt.SetRadii(Distance(targetRadii[0]),
                Distance(targetRadii[1]),
                Distance(targetRadii[2]));
   if (sPt.GetLatitude().degrees() != Null) {
@@ -132,22 +132,22 @@ void QnetSetAprioriDialog::fillLineEdits() {
 /**
  * Slot to set apriori on selected Points from Navigator list box
  *
- * @author 2011-03-24 Tracie Sucharski 
- *  
- * @internal 
- * @todo  This method should be temporary until the control point editor 
+ * @author 2011-03-24 Tracie Sucharski
+ *
+ * @internal
+ * @todo  This method should be temporary until the control point editor
  *           comes online.  If this stick around, needs to be re-disigned-
  *           put in a separate class??
- *  
- * @history 2011-04-04 Tracie Sucharski - Grey out userEntered if more than 
+ *
+ * @history 2011-04-04 Tracie Sucharski - Grey out userEntered if more than
  *                        a single point is selected.  Grey out lat,lon,radius
  *                        edits if UserEntered is not selected.
- * @history 2011-04-13 Tracie Sucharski - If single point selected, fill in 
+ * @history 2011-04-13 Tracie Sucharski - If single point selected, fill in
  *                        LineEdit's with current controlPoint values.
- * @history 2011-04-19 Tracie Sucharski - Redesign using modeless dialog. 
- * @history 2011-04-26 Tracie Sucharski - Move from QnetNavTool to 
- *                        QnetSetAprioriDialog. 
- */ 
+ * @history 2011-04-19 Tracie Sucharski - Redesign using modeless dialog.
+ * @history 2011-04-26 Tracie Sucharski - Move from QnetNavTool to
+ *                        QnetSetAprioriDialog.
+ */
 void QnetSetAprioriDialog::setApriori() {
 
   double latSigma = Null;
@@ -231,7 +231,7 @@ void QnetSetAprioriDialog::setApriori() {
       //  first set the target radii
       SurfacePoint spt = pt->GetAprioriSurfacePoint();
       vector<Distance> targetRadii = g_controlNetwork->GetTargetRadii();
-      spt.SetRadii(Distance(targetRadii[0]), 
+      spt.SetRadii(Distance(targetRadii[0]),
                    Distance(targetRadii[1]),
                    Distance(targetRadii[2]));
       spt.SetSphericalSigmasDistance(Distance(latSigma,Distance::Meters),
@@ -245,11 +245,10 @@ void QnetSetAprioriDialog::setApriori() {
       emit pointChanged(id);
       emit netChanged();
     }
-    catch (iException &e )  {
+    catch (IException &e)  {
       QString message = "Error setting sigmas. \n";
-      message += e.Errors().c_str();
+      message += e.toString().c_str();
       QMessageBox::critical((QWidget *)parent(),"Error",message);
-      e.Clear();
       QApplication::restoreOverrideCursor();
       // Sigmas failed, but surface pt coordinate was set
       emit pointChanged(id);

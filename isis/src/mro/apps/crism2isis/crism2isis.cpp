@@ -32,7 +32,7 @@ void IsisMain() {
   }
   else {
     string msg = "Unsupported CRISM file type, supported types are: DDR, MRDR, and TRDR";
-    throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   if(prodType.Equal("MAP_PROJECTED_MULTISPECTRAL_RDR")) {
@@ -43,7 +43,7 @@ void IsisMain() {
     }
     else {
       string msg = "Could not find label PRODUCT_ID, invalid MRDR";
-      throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     //If the product type is AL (Lambert albedo) or IF (I/F)
@@ -64,7 +64,7 @@ void IsisMain() {
           // Open table file
           if(!fin->OpenChk()) {
             string msg = "Cannot open wavelength table [" + tableFile.Expanded() + "]";
-            throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+            throw IException(IException::Io, msg, _FILEINFO_);
           }
 
           //For each line in the wavelength table, add the width to
@@ -87,7 +87,7 @@ void IsisMain() {
         //Otherwise throw an error
         else {
           string msg = "Cannot fine wavelength table [" + tableFile.Expanded() + "]";
-          throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+          throw IException(IException::Io, msg, _FILEINFO_);
         }
       }
     }
@@ -128,7 +128,7 @@ void IsisMain() {
   }
   else {
     string msg = "Unsupported CRISM file type, supported types are: DDR, MRDR, and TRDR";
-    throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // Translate the Instrument group

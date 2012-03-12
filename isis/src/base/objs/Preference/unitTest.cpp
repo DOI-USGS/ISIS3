@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "Preference.h"
-#include "iException.h"
+#include "IException.h"
 
 using namespace std;
 int main()
@@ -52,8 +52,8 @@ int main()
     remove("tmpSystem");
     remove("tmpUser");
   }
-  catch(Isis::iException &error) {
-    error.Report(false);
+  catch(Isis::IException &error) {
+    error.print();
   }
 
   return 0;

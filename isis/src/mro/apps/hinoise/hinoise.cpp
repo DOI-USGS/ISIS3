@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include "CSVReader.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "Pipeline.h"
 #include <QList>
 
@@ -21,7 +21,7 @@ int giLpfLines, giLpfSamples, giLpfMinPer;
 
 // Get Highpass Filter values
 int giHpfLines, giHpfSamples, giHpfMinPer;
-  
+
 // Noise Filter values
 bool gbNullColumns;
 int  giNoiseLines, giNoiseSamples;
@@ -35,30 +35,30 @@ double gdHardFilter, gdHighEndPercent, gdHardHighEndPercent;
 // Create temporary file names
 string gsCubeStats1, gsCubeStats2;
 string gsTempFile;
-   
+
 void GetValuesFromHistogram(string psHistFile, double & pdLisPer, double & pdMaxDN, double & pdStdDev);
 void ProcessCubeNormStats(string psStatsFile, int piChannel, int piSumming);
 
 void IsisMain() {
   try {
     UserInterface &ui = Application::GetUserInterface();
-    
+
     string sInputFile  = ui.GetAsString("FROM");
     string sOutputFile = ui.GetAsString("TO");
     string sInBaseName = Filename(sInputFile).Basename();
-    
+
     bool bRemove = ui.GetBoolean("REMOVE");
-    
+
     // Get Lowpass Filter Values
     giLpfLines   = ui.GetInteger("LPF_LINES");
     giLpfSamples = ui.GetInteger("LPF_SAMPLES");
     giLpfMinPer  = ui.GetInteger("LPF_MINPER");
-    
+
     // Get Highpass Filter values
     giHpfLines   = ui.GetInteger("HPF_LINES");
     giHpfSamples = ui.GetInteger("HPF_SAMPLES");
     giHpfMinPer  = ui.GetInteger("HPF_MINPER");
-    
+
     // Noise Filter values
     gbNullColumns        = ui.GetBoolean("NULL_COLUMNS");
     gdTolMin             = ui.GetDouble("TOLMIN");
@@ -76,13 +76,13 @@ void IsisMain() {
     gdHardFilter         = ui.GetDouble("HARD_FILTERING");
     gdHighEndPercent     = ui.GetDouble("HIGHEND_PERCENT");
     gdHardHighEndPercent = ui.GetDouble("HARD_HIGHEND_PERCENT");
-    
+
     // Get Summing, CcdId and Channel Number from the cube label
     Pvl cubeLabel = Pvl(sInputFile);
     int iSumming  = int (cubeLabel.FindObject("IsisCube").FindGroup("Instrument").FindKeyword("Summing")[0]);
     int iChannel  = int (cubeLabel.FindObject("IsisCube").FindGroup("Instrument").FindKeyword("ChannelNumber")[0]);
     string sCcdId = cubeLabel.FindObject("IsisCube").FindGroup("Instrument").FindKeyword("CcdId");
-    
+
     // Get the image histogram
     Pipeline p1("hinoise1");
     p1.SetInputFile("FROM");
@@ -90,29 +90,29 @@ void IsisMain() {
     p1.SetOutputFile(Filename(sTempHistFile));
     sTempFiles.push_back(Filename(sTempHistFile).Expanded());
     p1.KeepTemporaryFiles(!bRemove);
-    
+
     p1.AddToPipeline("hist");
     p1.Application("hist").SetInputParameter("FROM",  false);
     p1.Application("hist").SetOutputParameter("TO",   "hist");
   #ifdef _DEBUG_
     cout << p1 << endl;
     cout << "****************************************************************************\n";
-  #endif  
+  #endif
     p1.Run();
-    
+
     double dLisPer, dMaxDN, dStdDev;
     GetValuesFromHistogram(Filename(sTempHistFile).Expanded(), dLisPer, dMaxDN, dStdDev);
   #ifdef _DEBUG_
     cerr << "Lis=" << dLisPer << "  MaxDN=" << dMaxDN << " StdDev=" << dStdDev << endl;
-  #endif  
-    
+  #endif
+
     Pipeline p2("hinoise2");
     p2.SetInputFile("FROM");
     string sTempFile2 = "$TEMPORARY/" + sInBaseName + "_cubenorm.txt";
     p2.SetOutputFile(Filename(sTempFile2));
     sTempFiles.push_back(Filename(sTempFile2).Expanded());
     p2.KeepTemporaryFiles(!bRemove);
-    
+
     p2.AddToPipeline("cubenorm");
     p2.Application("cubenorm").SetInputParameter("FROM",      false);
     p2.Application("cubenorm").SetOutputParameter("STATS",    "cubenorm");
@@ -121,9 +121,9 @@ void IsisMain() {
   #ifdef _DEBUG_
     cout << p2 << endl;
     cout << "****************************************************************************\n";
-  #endif  
+  #endif
     p2.Run();
-  
+
     gsCubeStats1 = Filename("$TEMPORARY/" + sInBaseName + "_cubenorm1.txt").Expanded();
     gsCubeStats2 = Filename("$TEMPORARY/" + sInBaseName + "_cubenorm2.txt").Expanded();
   #ifdef _DEBUG_
@@ -131,9 +131,9 @@ void IsisMain() {
   #endif
     sTempFiles.push_back(gsCubeStats1);
     sTempFiles.push_back(gsCubeStats2);
-    
+
     ProcessCubeNormStats(Filename(sTempFile2).Expanded(), iChannel, iSumming);
-  
+
     // Clear the bad colmns for the highpass filter
     Pipeline p3("hinoise3");
     p3.SetInputFile("FROM");
@@ -157,7 +157,7 @@ void IsisMain() {
     cout << "****************************************************************************\n";
   #endif
     p3.Run();
-    
+
     // Clear the bad colmns for the lowpass filter
     Pipeline p4("hinoise4");
     p4.SetInputFile("FROM");
@@ -165,7 +165,7 @@ void IsisMain() {
     p4.SetOutputFile(Filename(sTempFile4));
     sTempFiles.push_back(Filename(sTempFile4).Expanded());
     p4.KeepTemporaryFiles(!bRemove);
-    
+
     p4.AddToPipeline("cubenorm");
     p4.Application("cubenorm").SetInputParameter ("FROM",      false);
     p4.Application("cubenorm").SetOutputParameter("TO",        "cubenorm.p4");
@@ -179,7 +179,7 @@ void IsisMain() {
     cout << "****************************************************************************\n";
   #endif
     p4.Run();
-    
+
     // ****************************************************************************
     // Perform highpass/lowpass filter vertical destripping
     // ****************************************************************************
@@ -190,7 +190,7 @@ void IsisMain() {
     p5.SetOutputFile(Filename(sTempFile5));
     sTempFiles.push_back(Filename(sTempFile5).Expanded());
     p5.KeepTemporaryFiles(!bRemove);
-    
+
     p5.AddToPipeline("lowpass");
     p5.Application("lowpass").SetInputParameter ("FROM",    false);
     p5.Application("lowpass").SetOutputParameter("TO",      "lowpass.p5");
@@ -205,7 +205,7 @@ void IsisMain() {
     cout << "****************************************************************************\n";
   #endif
     p5.Run();
-    
+
     // b. Highpass
     Pipeline p6("hinoise6");
     p6.SetInputFile (Filename(sTempFile3));
@@ -213,7 +213,7 @@ void IsisMain() {
     p6.SetOutputFile(Filename(sTempFile6));
     sTempFiles.push_back(Filename(sTempFile6).Expanded());
     p6.KeepTemporaryFiles(!bRemove);
-    
+
     p6.AddToPipeline("highpass");
     p6.Application("highpass").SetInputParameter ("FROM",    false);
     p6.Application("highpass").SetOutputParameter("TO",      "highpass.p6");
@@ -226,7 +226,7 @@ void IsisMain() {
     cout << "****************************************************************************\n";
   #endif
     p6.Run();
-    
+
     // Enter the outputs of lowpass and highpass filenames to a list file
     string sTempListFile = "$TEMPORARY/" + sInBaseName + "_TempList.lis";
     gsTempFile = Filename(sTempListFile).Expanded();
@@ -236,7 +236,7 @@ void IsisMain() {
     ostm << Filename(sTempFile5).Expanded() << endl;
     ostm << Filename(sTempFile6).Expanded() << endl;
     ostm.close();
-    
+
     // c. algebra (lowpass + highpass)
     Pipeline p7("hinoise7");
     p7.SetInputFile (Filename(sTempListFile));
@@ -244,7 +244,7 @@ void IsisMain() {
     p7.SetOutputFile(Filename(sTempFile7));
     sTempFiles.push_back(Filename(sTempFile7).Expanded());
     p7.KeepTemporaryFiles(!bRemove);
-    
+
     p7.AddToPipeline("fx");
     p7.Application("fx").SetInputParameter ("FROMLIST", false);
     p7.Application("fx").SetOutputParameter("TO",       "add.p7");
@@ -255,9 +255,9 @@ void IsisMain() {
     cout << "****************************************************************************\n";
   #endif
     p7.Run();
-  
+
     remove(gsTempFile.c_str());
-    
+
     // ****************************************************************************
     // Perform noise filter 3 times
     // ****************************************************************************
@@ -267,7 +267,7 @@ void IsisMain() {
     p8.SetOutputFile(Filename(sTempFile8));
     sTempFiles.push_back(Filename(sTempFile8).Expanded());
     p8.KeepTemporaryFiles(!bRemove);
-    
+
     if (dLisPer >= gdHardFilter) {
       gdTolMin = gdHard_TolMin;
       gdTolMax = gdHard_TolMax;
@@ -276,7 +276,7 @@ void IsisMain() {
     if (gdFlatTol < 0.00001) {
       gdFlatTol = 0.00001;
     }
-  
+
     // Perform the 1st noise filter
     p8.AddToPipeline("noisefilter", "noisefilter_pass1");
     p8.Application("noisefilter_pass1").SetInputParameter ("FROM",    false);
@@ -292,7 +292,7 @@ void IsisMain() {
     p8.Application("noisefilter_pass1").AddConstParameter ("LINE",    iString(giNoiseLines));
     p8.Application("noisefilter_pass1").AddConstParameter ("LISISNOISE", "TRUE");
     p8.Application("noisefilter_pass1").AddConstParameter ("LRSISNOISE", "TRUE");
-    
+
     // Perform the 2nd noise filter
     p8.AddToPipeline("noisefilter", "noisefilter_pass2");
     p8.Application("noisefilter_pass2").SetInputParameter ("FROM",    false);
@@ -308,7 +308,7 @@ void IsisMain() {
     p8.Application("noisefilter_pass2").AddConstParameter ("LINE",    iString(giNoiseLines));
     p8.Application("noisefilter_pass2").AddConstParameter ("LISISNOISE", "TRUE");
     p8.Application("noisefilter_pass2").AddConstParameter ("LRSISNOISE", "TRUE");
-    
+
     // Perform the 3rd noise filter
     p8.AddToPipeline("noisefilter", "noisefilter_pass3");
     p8.Application("noisefilter_pass3").SetInputParameter ("FROM",    false);
@@ -329,7 +329,7 @@ void IsisMain() {
     cout << "****************************************************************************\n";
   #endif
     p8.Run();
-    
+
     // ****************************************************************************
     // Perform another highpass /lowpass filter now that the
     // data are much cleaner
@@ -341,7 +341,7 @@ void IsisMain() {
     p9.SetOutputFile(Filename(sTempFile9));
     sTempFiles.push_back(Filename(sTempFile9).Expanded());
     p9.KeepTemporaryFiles(!bRemove);
- 
+
     p9.AddToPipeline("lowpass");
     p9.Application("lowpass").SetInputParameter ("FROM",    false);
     p9.Application("lowpass").SetOutputParameter("TO",      "lowpass.p9");
@@ -360,7 +360,7 @@ void IsisMain() {
     cout << "****************************************************************************\n";
   #endif
     p9.Run();
-  
+
     // b. Highpass
     Pipeline p10("hinoise10");
     p10.SetInputFile (Filename(sTempFile8));
@@ -368,7 +368,7 @@ void IsisMain() {
     p10.SetOutputFile(Filename(sTempFile10));
     sTempFiles.push_back(Filename(sTempFile10).Expanded());
     p10.KeepTemporaryFiles(!bRemove);
-  
+
     p10.AddToPipeline("highpass");
     p10.Application("highpass").SetInputParameter ("FROM",    false);
     p10.Application("highpass").SetOutputParameter("TO",      "highpass.p10");
@@ -381,7 +381,7 @@ void IsisMain() {
     cout << "****************************************************************************\n";
   #endif
     p10.Run();
-  
+
     // Enter the outputs of lowpass and highpass filenames to a list file
     gsTempFile = Filename(sTempListFile).Expanded();
     sTempFiles.push_back(gsTempFile);
@@ -389,7 +389,7 @@ void IsisMain() {
     ostm << Filename(sTempFile9).Expanded() << endl;
     ostm << Filename(sTempFile10).Expanded() << endl;
     ostm.close();
-  
+
     // c. algebra (lowpass + highpass)
     Pipeline p11("hinoise11");
     p11.SetInputFile (Filename(sTempListFile));
@@ -403,7 +403,7 @@ void IsisMain() {
       p11.SetOutputFile("TO");
     }
     p11.KeepTemporaryFiles(!bRemove);
-  
+
     p11.AddToPipeline("fx");
     p11.Application("fx").SetInputParameter ("FROMLIST", false);
     p11.Application("fx").SetOutputParameter("TO",       "add.p11");
@@ -414,7 +414,7 @@ void IsisMain() {
     cout << "****************************************************************************\n";
   #endif
     p11.Run();
-  
+
     // ****************************************************************************
     // Perform LPFZ  filters if we have a RED filter image.
     // For IR and BG filter data, assume that the HiColorNorm pipeline
@@ -426,13 +426,13 @@ void IsisMain() {
       p12.SetInputFile(Filename(sTempFile11));
       p12.SetOutputFile("TO");
       p12.KeepTemporaryFiles(!bRemove);
-    
+
       p12.AddToPipeline("lowpass", "lowpass_pass1");
       p12.Application("lowpass_pass1").SetInputParameter ("FROM",    false);
       p12.Application("lowpass_pass1").SetOutputParameter("TO",      "lowpass.p12.1");
       p12.Application("lowpass_pass1").AddConstParameter ("SAMPLES", "3");
       p12.Application("lowpass_pass1").AddConstParameter ("LINES",   "3");
-     
+
       p12.Application("lowpass_pass1").AddConstParameter ("MINOPT",  "COUNT");
       p12.Application("lowpass_pass1").AddConstParameter ("MINIMUM", "1");
       p12.Application("lowpass_pass1").AddConstParameter ("FILTER",  "OUTSIDE");
@@ -441,7 +441,7 @@ void IsisMain() {
       p12.Application("lowpass_pass1").AddConstParameter ("HIS",     "TRUE");
       p12.Application("lowpass_pass1").AddConstParameter ("LRS",     "TRUE");
       p12.Application("lowpass_pass1").AddConstParameter ("LIS",     "TRUE");
-      
+
       p12.AddToPipeline("lowpass", "lowpass_pass2");
       p12.Application("lowpass_pass2").SetInputParameter ("FROM",    false);
       p12.Application("lowpass_pass2").SetOutputParameter("TO",      "lowpass.p12.2");
@@ -461,31 +461,31 @@ void IsisMain() {
   #endif
       p12.Run();
     }
-    
+
     // more clean up
     for (int i=0; i<(int)sTempFiles.size(); i++) {
       remove(sTempFiles[i].c_str());
     }
     sTempFiles.clear();
-  } 
-  catch(Isis::iException &e) {
+  }
+  catch(IException &) {
     throw;
   }
   catch(std::exception const &se) {
     string sErrMsg = "std::exception: " + (iString)se.what();
-    throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_);
+    throw IException(IException::User, sErrMsg, _FILEINFO_);
   }
   catch(...) {
     string sErrMsg = "Other Error";
-    throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_);
+    throw IException(IException::User, sErrMsg, _FILEINFO_);
   }
 }
 
 /**
  * Process/Filter cubenorm stats
- * 
+ *
  * @author Sharmila Prasad (2/7/2011)
- * 
+ *
  * @param psStatsFile - input cubenorm stats
  * @param piChannel   - Channel Number 0/1
  * @param piSumming   - Summing mode
@@ -521,7 +521,7 @@ void ProcessCubeNormStats(string psStatsFile, int piChannel, int piSumming)
       sHeader += "\n";
     }
   }
-  
+
   // Disregard the header
   iRows--;
   for (int i=0; i<iRows; i++) {
@@ -529,16 +529,16 @@ void ProcessCubeNormStats(string psStatsFile, int piChannel, int piSumming)
     dNorm2.push_back(1.0);
     double dFrac = iValidPoints[i]/iMaxValidPoints;
     if (dFrac < gdClearFrac && gbNullColumns ) {
-      dNorm1[i] = 0.0; 
+      dNorm1[i] = 0.0;
       dNorm2[i] = 0.0;
     }
   }
-  
+
   // Determine if the pause point pixels need to be zapped
   if (piSumming == 1) {
     QList<int> iChannelPause, iChannelWidth;
     string sChDirection;
-    
+
     if (piChannel == 0 ) {
       iChannelPause << 1 << 252 << 515 << 778; // Channel 0 pause point sample locations (1st pixel = index 1)
       iChannelWidth << 3 << 6 << 6 << 6;       // Number of pixels to cut from pause point
@@ -549,7 +549,7 @@ void ProcessCubeNormStats(string psStatsFile, int piChannel, int piSumming)
       iChannelWidth << 8 << 7 << 6 << 3;           // Number of pixels to cut from pause point
       sChDirection = "LEFT";
     }
-    
+
     bool bNoiseTrigger = false;
     for (int ip=0; ip<iChannelPause.size(); ip++) {
       int i1=0, i2=0;
@@ -567,14 +567,14 @@ void ProcessCubeNormStats(string psStatsFile, int piChannel, int piSumming)
       if (i2 >= iRows){
         i2 = iRows-1;
       }
-    
+
       for (int i=i1; i<=i2; i++){
         if (iValidPoints[i]/iMaxValidPoints < gdNonValidFrac) {
           bNoiseTrigger = true;
         }
       }
     }
-    
+
     for (int ip=0; ip<iChannelPause.size(); ip++) {
       int i1, i2;
       if (sChDirection == "LEFT") {
@@ -599,15 +599,15 @@ void ProcessCubeNormStats(string psStatsFile, int piChannel, int piSumming)
       }
     }
   }
-  
+
   // Write the results of the filtered cubenorm data into 2 output files
   FILE * file1, *file2;
   file1 = fopen(gsCubeStats1.c_str(), "w");
   file2 = fopen(gsCubeStats2.c_str(), "w");
 
-  fprintf (file1, "%8s%8s%15s%15s%15s%15s%15s%15s\n","Band", "RowCol", "ValidPoints", 
+  fprintf (file1, "%8s%8s%15s%15s%15s%15s%15s%15s\n","Band", "RowCol", "ValidPoints",
            "Average", "Median", "StdDev", "Minimum", "Maximim");
-  fprintf (file2, "%8s%8s%15s%15s%15s%15s%15s%15s\n","Band", "RowCol", "ValidPoints", 
+  fprintf (file2, "%8s%8s%15s%15s%15s%15s%15s%15s\n","Band", "RowCol", "ValidPoints",
            "Average", "Median", "StdDev", "Minimum", "Maximim");
   for (int i=0; i<iRows; i++) {
     fprintf (file1, "%8d%8d%15d%15.3f%15.3f%15.3f%15.3f%15.3f\n",
@@ -621,9 +621,9 @@ void ProcessCubeNormStats(string psStatsFile, int piChannel, int piSumming)
 
 /**
  * Get Max Dn Value, std deviation and percentage of LIS pixels from the histogram file
- * 
+ *
  * @author Sharmila Prasad (2/4/2011)
- * 
+ *
  * @param psHistFile - input histogram file
  * @param pdLisPer   - calculated percentage of LIS pixels
  * @param pdMaxDN    - caculated Max Dn Value
@@ -631,7 +631,7 @@ void ProcessCubeNormStats(string psStatsFile, int piChannel, int piSumming)
  */
 void GetValuesFromHistogram(string psHistFile, double & pdLisPer, double & pdMaxDN, double & pdStdDev)
 {
-  int iTotalPixels=0, iNullPixels=0, iLisPixels=0; 
+  int iTotalPixels=0, iNullPixels=0, iLisPixels=0;
 
   if (gdHighEndPercent < 99.0) {
     gdHighEndPercent = 99.0;
@@ -651,7 +651,7 @@ void GetValuesFromHistogram(string psHistFile, double & pdLisPer, double & pdMax
       iStartIndex = i;
       break;
     }
-    
+
     if (csvArr[0] == "Std Deviation") {
       pdStdDev = iString(csvArr[1]).ToDouble();
     }
@@ -665,17 +665,17 @@ void GetValuesFromHistogram(string psHistFile, double & pdLisPer, double & pdMax
       iLisPixels = iString(csvArr[1]).ToInteger();
     }
   }
-  
+
   pdLisPer=0;
   if (iTotalPixels - iNullPixels > 0) {
     pdLisPer = iLisPixels / (iTotalPixels - iNullPixels)*100.0;
   }
-  
+
   double dCumPer = gdHighEndPercent;
   if (pdLisPer > gdHardFilter) {
     dCumPer = gdHardHighEndPercent;
   }
-  
+
   pdMaxDN=0;
   histFile= CSVReader(psHistFile, true, 1, ',', false, true);
   iRows = histFile.rows();

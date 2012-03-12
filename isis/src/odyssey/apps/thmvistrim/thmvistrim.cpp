@@ -32,13 +32,13 @@ void IsisMain() {
     if(icube->getGroup("Instrument")["InstrumentID"][0] != "THEMIS_VIS") {
       string msg = "This program is intended for use on THEMIS VIS images only. [";
       msg += inFilename.Expanded() + "] does not appear to be a THEMIS VIS image.";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
-  catch(iException &e) {
+  catch(IException &e) {
     string msg = "This program is intended for use on THEMIS VIS images only. [";
     msg += inFilename.Expanded() + "] does not appear to be a THEMIS VIS image.";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(e, IException::User, msg, _FILEINFO_);
   }
 
   frameletSize = 192 / (int)icube->getGroup("Instrument")["SpatialSumming"][0];
@@ -95,9 +95,9 @@ void CalculateBottomTrim(Cube *icube) {
   frameletBottomTrimSize = 0;
 
   if(icube->getCamera() == NULL) {
-    string msg = "A camera is required to automatically ";
-    msg += "calculate the bottom trim of a cube. Please run spiceinit on the input cube";
-    throw iException::Message(iException::Camera, msg, _FILEINFO_);
+    string msg = "A camera is required to automatically calculate the bottom "
+                 "trim of a cube. Please run spiceinit on the input cube";
+    throw IException(IException::Unknown, msg, _FILEINFO_);
   }
 
   // We really don't care at all about the original camera. What's needed is

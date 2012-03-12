@@ -4,7 +4,7 @@
 #include "PhotoModelFactory.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
-#include "iException.h"
+#include "IException.h"
 #include "Preference.h"
 
 using namespace Isis;
@@ -58,8 +58,8 @@ int main() {
     std::cout << "Results from PhtTopder = " << result <<
               std::endl << std::endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   std::cout << "Test PhtAcos ..." << std::endl;
@@ -79,8 +79,8 @@ int main() {
     std::cout << "        Actual value = " << 2.608802982 << std::endl
               << std::endl;
   }
-  catch(iException &e) {
-    e.Report();
+  catch(IException &e) {
+    e.print();
   }
 
   std::cout << std::endl;
@@ -93,8 +93,8 @@ void doit(Pvl &lab) {
     //PhotoModel *pm = PhotoModelFactory::Create(lab);
     PhotoModelFactory::Create(lab);
   }
-  catch(iException &error) {
-    error.Report(false);
+  catch(IException &error) {
+    error.print();
   }
   std::cout << std::endl;
 }

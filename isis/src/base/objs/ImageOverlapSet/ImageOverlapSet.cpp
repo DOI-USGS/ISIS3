@@ -9,7 +9,7 @@
 #include "geos/util/IllegalArgumentException.h"
 #include "geos/geom/Point.h"
 #include "geos/opOverlay.h"
-#include "iException.h"
+#include "IException.h"
 #include "Cube.h"
 #include "SerialNumberList.h"
 #include "PolygonTools.h"
@@ -71,7 +71,7 @@ namespace Isis {
       try {
         cube.open(sns.Filename(i));
       }
-      catch(iException &error) {
+      catch(IException &error) {
         std::string msg = "Unable to open cube for serial number [";
         msg += sns.SerialNumber(i) + "] filename [" + sns.Filename(i) + "]";
 
@@ -85,7 +85,8 @@ namespace Isis {
 
       // Create a ImageOverlap with the serial number and the bounding
       // polygon and save it
-      geos::geom::MultiPolygon *tmp = PolygonTools::MakeMultiPolygon(poly->Polys());
+      geos::geom::MultiPolygon *tmp = PolygonTools::MakeMultiPolygon(
+          poly->Polys());
 
       delete poly;
       poly = NULL;
@@ -96,14 +97,15 @@ namespace Isis {
       if(!tmp->isValid()) {
         delete tmp;
         tmp = NULL;
-        iString msg = "The image [" + sns.Filename(sns.SerialNumber(i)) + "] has an invalid footprint";
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+        iString msg = "The image [" + sns.Filename(sns.SerialNumber(i)) +
+                      "] has an invalid footprint";
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
       try {
         mp = PolygonTools::Despike(tmp);
       }
-      catch(iException &e) {
+      catch(IException &e) {
         if(tmp->isValid()) {
           mp = tmp;
           tmp = NULL;
@@ -129,7 +131,8 @@ namespace Isis {
       }
     }
 
-    // Despikes the polygons from the Serial Numbers prior to overlap determination
+    // Despikes the polygons from the Serial Numbers prior to overlap
+    //   determination
     DespikeLonLatOverlaps();
 
     if(p_threadedCalculate) {
@@ -162,7 +165,7 @@ namespace Isis {
     if(!p_lonLatOverlaps.empty()) {
       string msg = "FindImageOverlaps(SerialNumberList&,std::string) may not be called on " \
                    "an ImageOverlapSet which already contains overlaps.";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     p_writtenSoFar = 0;
@@ -290,7 +293,7 @@ namespace Isis {
 
     if(sns.size() != polygons.size()) {
       string message = "Invalid argument sizes. Sizes must match.";
-      throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+      throw IException(IException::Programmer, message, _FILEINFO_);
     }
 
     // Create one ImageOverlap for each image sn
@@ -324,9 +327,15 @@ namespace Isis {
 
       inStream.close();
     }
+    catch(IException &e) {
+      iString msg = "The overlap file [" + filename + "] does not contain a "
+                    "valid list of image overlaps";
+      throw IException(e, IException::Unknown, msg, _FILEINFO_);
+    }
     catch(...) {
-      iString msg = "The overlap file [" + filename + "] does not contain a valid list of image overlaps";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      iString msg = "The overlap file [" + filename + "] does not contain a "
+                    "valid list of image overlaps";
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
   }
 
@@ -370,8 +379,7 @@ namespace Isis {
         multiPolygon = despiked;
       }
     }
-    catch(iException &e) {
-      e.Clear();
+    catch(IException &) {
     }
 
     if(multiPolygon->isValid() && (multiPolygon->isEmpty() || multiPolygon->getArea() > 1.0e-14)) {
@@ -417,7 +425,7 @@ namespace Isis {
 
     if(p_lonLatOverlaps.size() == 0) {
       iString msg = "No overlaps were found.";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     try {
@@ -473,7 +481,7 @@ namespace Isis {
 
     if(failed) {
       iString msg = "Unable to write the image overlap list to [" + filename + "]";
-      throw iException::Message(iException::Io, msg, _FILEINFO_);
+      throw IException(IException::Io, msg, _FILEINFO_);
     }
   }
 
@@ -533,7 +541,7 @@ namespace Isis {
           try {
             intersected = PolygonTools::Intersect(poly1, poly2);
           }
-          catch(iException &e) {
+          catch(IException &e) {
             intersected = NULL;
             string error = "Intersection of overlaps failed.";
 
@@ -587,7 +595,7 @@ namespace Isis {
             delete intersected;
             intersected = NULL;
           }
-          catch(iException &e) {
+          catch(IException &e) {
             if(!intersected->isValid()) {
               delete intersected;
               intersected = NULL;
@@ -597,7 +605,6 @@ namespace Isis {
             }
             else {
               overlap = PolygonTools::MakeMultiPolygon(intersected);
-              e.Clear();
 
               delete intersected;
               intersected = NULL;
@@ -630,7 +637,7 @@ namespace Isis {
             try {
               tmpGeom = PolygonTools::Difference(poly2, poly1);
             }
-            catch(iException &e) {
+            catch(IException &e) {
               HandleError(e, snlist, "Differencing overlap polygons failed. The first polygon will be removed.", inside, outside);
 
               // Delete outside polygon directly and reset outside loop
@@ -651,7 +658,7 @@ namespace Isis {
             try {
               tmpGeom = PolygonTools::Difference(poly1, poly2);
             }
-            catch(iException &e) {
+            catch(IException &e) {
               HandleError(e, snlist, "Differencing overlap polygons failed. The second polygon will be removed.", inside, outside);
 
 
@@ -672,8 +679,7 @@ namespace Isis {
             try {
               tmpGeom = PolygonTools::Difference(poly1, overlap);
             }
-            catch(iException &e) {
-              e.Clear();
+            catch(IException &e) {
               tmpGeom = NULL;
             }
 
@@ -683,7 +689,7 @@ namespace Isis {
                 tmpGeom = PolygonTools::Difference(poly1, poly2);
               }
             }
-            catch(iException &e) {
+            catch(IException &e) {
               tmpGeom = NULL;
               HandleError(e, snlist, "Differencing overlap polygons failed", inside, outside);
               continue;
@@ -704,7 +710,7 @@ namespace Isis {
           } // End of partial overlap else
         }
         // Collections are illegal as intersection argument
-        catch(iException &e) {
+        catch(IException &e) {
           HandleError(e, snlist, "Unable to find overlap.", inside, outside);
         }
         // Collections are illegal as intersection argument
@@ -808,7 +814,7 @@ namespace Isis {
    * @param overlap1 First problematic overlap
    * @param overlap2 Second problematic overlap
    */
-  void ImageOverlapSet::HandleError(iException &e, SerialNumberList *snlist, iString msg, int overlap1, int overlap2) {
+  void ImageOverlapSet::HandleError(IException &e, SerialNumberList *snlist, iString msg, int overlap1, int overlap2) {
     PvlGroup err("ImageOverlapError");
 
     if(overlap1 >= 0 && overlap1 < p_lonLatOverlaps.size()) {
@@ -866,8 +872,6 @@ namespace Isis {
     p_errorLog.push_back(err);
 
     if(!p_continueAfterError) throw;
-
-    e.Clear();
   }
 
   /**
@@ -932,7 +936,9 @@ namespace Isis {
     delete exc;
 
     if(!p_continueAfterError) {
-      throw iException::Message(iException::Programmer, err["Description"], _FILEINFO_);
+      throw IException(IException::Programmer,
+                       err["Description"][0],
+                       _FILEINFO_);
     }
   }
 
@@ -992,7 +998,9 @@ namespace Isis {
     p_errorLog.push_back(err);
 
     if(!p_continueAfterError) {
-      throw iException::Message(iException::Programmer, err["Description"], _FILEINFO_);
+      throw IException(IException::Programmer,
+                       err["Description"][0],
+                       _FILEINFO_);
     }
   }
 
@@ -1008,8 +1016,7 @@ namespace Isis {
         p_lonLatOverlaps[i]->SetPolygon(
           PolygonTools::Despike(p_lonLatOverlaps[i]->Polygon()));
       }
-      catch(iException &e) {
-        e.Clear();
+      catch(IException &e) {
       }
     }
   }

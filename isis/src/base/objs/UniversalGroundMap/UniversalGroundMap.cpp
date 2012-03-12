@@ -49,8 +49,7 @@ namespace Isis {
       else
         p_projection = Isis::ProjectionFactory::CreateFromCube(pvl);
     }
-    catch (iException &e) {
-      e.Clear();
+    catch (IException &firstError) {
       p_camera = NULL;
       p_projection = NULL;
 
@@ -60,11 +59,14 @@ namespace Isis {
         else
           p_camera = CameraFactory::Create(pvl);
       }
-      catch (iException &e) {
+      catch (IException &secondError) {
         p_projection = NULL;
         std::string msg = "Could not create camera or projection for [" +
                           pvl.Filename() + "]";
-        throw iException::Message(iException::Camera, msg, _FILEINFO_);
+        IException realError(IException::Unknown, msg, _FILEINFO_);
+        realError.append(firstError);
+        realError.append(secondError);
+        throw realError;
       }
     }
   }

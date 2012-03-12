@@ -141,7 +141,7 @@ namespace Isis {
     Pvl tmp;
     tmp += mapping;
 
-    if(!mapping.HasKeyword("EquatorialRadius")) { 
+    if(!mapping.HasKeyword("EquatorialRadius")) {
       PvlGroup radii = Projection::TargetRadii(mapping["TargetName"]);
       tmp.FindGroup("Mapping") += radii["EquatorialRadius"];
       tmp.FindGroup("Mapping") += radii["PolarRadius"];
@@ -208,7 +208,7 @@ namespace Isis {
       proj = ProjectionFactory::CreateFromCube(*label);
       return proj->Mapping();
     }
-    catch(iException &e) {
+    catch(IException &) {
       Pvl mappingPvl("$base/templates/maps/equirectangular.map");
       PvlGroup &mappingGrp = mappingPvl.FindGroup("Mapping");
       mappingGrp += PvlKeyword("LatitudeType", "Planetocentric");
@@ -233,15 +233,15 @@ namespace Isis {
                                  "meters");
 
       }
-      catch(iException &e) {
+      catch(IException &) {
         mappingGrp +=
             label->FindGroup("Instrument", Pvl::Traverse)["TargetName"];
       }
 
-      e.Clear();
       return mappingGrp;
     }
   }
+
 
   /**
    * Returns a list of all the cubes selected in the scene
@@ -385,7 +385,7 @@ namespace Isis {
       output += zOrders;
     }
     else {
-      throw iException::Message(iException::User,
+      throw IException(IException::User,
           "Cannot save a scene without a projection to a project file",
           _FILEINFO_);
     }
@@ -396,7 +396,7 @@ namespace Isis {
 
   /**
    * Call this method after loading any cubes when loading a project.
-   * 
+   *
    * @param project The project Pvl
    */
   void MosaicSceneWidget::fromPvl(const PvlObject &project) {
@@ -457,7 +457,7 @@ namespace Isis {
 
   /**
    * Call this method before loading any cubes when loading a project.
-   * 
+   *
    * @param project The project Pvl
    */
   void MosaicSceneWidget::preloadFromPvl(const PvlObject &project) {
@@ -493,7 +493,7 @@ namespace Isis {
     }
 
     iString msg = "Cube is not in the mosaic";
-    throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
 
@@ -841,8 +841,7 @@ namespace Isis {
       cubeToMosaic(cube);
       return NULL; // We have one already, ignore the add request
     }
-    catch(iException &e) {
-      e.Clear();
+    catch(IException &) {
     }
 
     MosaicSceneItem *mosItem = new MosaicSceneItem(cube, this);
@@ -937,9 +936,8 @@ namespace Isis {
         if(item)
           sceneItems.append(item);
       }
-      catch(iException &e) {
-        e.Report(false);
-        e.Clear();
+      catch(IException &e) {
+        e.print();
       }
 
       m_progress->setValue(m_progress->value() + 1);
@@ -1092,8 +1090,8 @@ namespace Isis {
       m_projectionFootprint->show();
 
     }
-    catch(iException &e) {
-      std::string msg = e.Errors();
+    catch(IException &e) {
+      std::string msg = e.toString();
       QMessageBox::information(this, "Error", QString::fromStdString(msg),
                                QMessageBox::Ok);
       //m_showReference->setChecked(Qt::Unchecked);
@@ -1167,8 +1165,8 @@ namespace Isis {
 
       setProjection(mapping);
     }
-    catch(iException &e) {
-      std::string msg = e.Errors();
+    catch(IException &e) {
+      std::string msg = e.toString();
       QMessageBox::information(this, "Error", QString::fromStdString(msg), QMessageBox::Ok);
       return;
     }
@@ -1352,7 +1350,7 @@ namespace Isis {
       try {
         mosaicSceneItem->reproject();
       }
-      catch(iException &e) {
+      catch(IException &e) {
         iString msg = "The file [";
 
         if(mosaicSceneItem->cubeDisplay())
@@ -1360,10 +1358,8 @@ namespace Isis {
 
         msg += "] is being removed due to not being able to project";
 
-        iException &tmp = iException::Message(iException::Programmer,
-                                              msg, _FILEINFO_);
-        tmp.Report();
-        tmp.Clear();
+        IException tmp(e, IException::Programmer, msg, _FILEINFO_);
+        tmp.print();
         mosaicSceneItem->cubeDisplay()->deleteLater();
       }
 
@@ -1518,4 +1514,3 @@ namespace Isis {
     return first->zValue() > second->zValue();
   }
 }
-

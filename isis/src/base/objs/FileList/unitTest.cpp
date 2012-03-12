@@ -1,5 +1,5 @@
 #include "FileList.h"
-#include "iException.h"
+#include "IException.h"
 #include "Preference.h"
 
 using namespace std;
@@ -14,8 +14,8 @@ int main(void) {
   try {
     Isis::FileList fl2("NoWayThisFileExists");
   }
-  catch(Isis::iException &e) {
-//    e.Report(false);
+  catch(Isis::IException &e) {
+//    e.print();
     cerr << "Unable to open the file" << endl;
   }
   return 0;

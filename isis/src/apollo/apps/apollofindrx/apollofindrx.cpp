@@ -6,7 +6,7 @@
 #include "PolynomialBivariate.h"
 #include "LeastSquares.h"
 #include "Progress.h"
-#include "iException.h"
+#include "IException.h"
 #include "Apollo.h"
 
 using namespace std;
@@ -46,7 +46,7 @@ void IsisMain ()
     Apollo apollo(mission, instrument);
     if (mission.substr(0,6) != "APOLLO") {
       string msg = "This application is for use with Apollo spacecrafts only.";
-      throw Isis::iException::Message(Isis::iException::Pvl,msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     // If the Keyword sizes don't match up, throw errors.
@@ -55,19 +55,19 @@ void IsisMain ()
       string msg = "Sample size incorrect [Sample size " +
                     iString(reseaus["Sample"].Size()) + " != " + " Line size " +
                     iString(reseaus["Line"].Size()) + "]";
-      throw Isis::iException::Message(Isis::iException::Pvl,msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
     if (nres != reseaus["Type"].Size()) {
       string msg = "Type size incorrect [Type size " +
                     iString(reseaus["Type"].Size()) + " != " + " Line size " +
                     iString(reseaus["Line"].Size()) + "]";
-      throw Isis::iException::Message(Isis::iException::Pvl,msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
     if (nres != reseaus["Valid"].Size()) {
       string msg = "Valid size incorrect [Valid size " +
                     iString(reseaus["Valid"].Size()) + " != " + " Line size " +
                     iString(reseaus["Line"].Size()) + "]";
-      throw Isis::iException::Message(Isis::iException::Pvl,msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     // Display the progress
@@ -153,7 +153,7 @@ void IsisMain ()
     else {
       string msg = "No Reseaus located. Labels will not be changed.";
       msg += "Try changing the registration parameters.";
-      throw Isis::iException::Message(Isis::iException::Pvl,msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     cube.close();
@@ -206,8 +206,7 @@ void Refine() {
   }
   try {
     lsq.Solve();
-  } catch (iException &e) {
-    e.Clear();
+  } catch (IException &) {
     return;
   }
 

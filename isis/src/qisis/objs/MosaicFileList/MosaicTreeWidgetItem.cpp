@@ -3,7 +3,7 @@
 #include "Cube.h"
 #include "CubeDisplayProperties.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "SpecialPixel.h"
 #include "Table.h"
 
@@ -131,7 +131,7 @@ namespace Isis {
         return "";
     }
 
-    throw iException::Message(iException::Programmer,
+    throw IException(IException::Programmer,
         "Invalid tree column passed to treeColumnToString", _FILEINFO_);
   }
 
@@ -158,4 +158,3 @@ namespace Isis {
     }
   }
 }
-

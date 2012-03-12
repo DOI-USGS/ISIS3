@@ -1,6 +1,6 @@
 #include "Isis.h"
 #include "ProcessByLine.h"
-#include "iException.h"
+#include "IException.h"
 #include "Filename.h"
 
 using namespace std;

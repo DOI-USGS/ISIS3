@@ -51,12 +51,12 @@ void IsisMain() {
       }
       else {
         string message = "The BandBin in your input cube does not have a Center value.";
-        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+        throw IException(IException::User, message, _FILEINFO_);
       }
     }
     else {
       string message = "There is not a BandBin Group in the input cube.";
-      throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+      throw IException(IException::User, message, _FILEINFO_);
     }
   }
 

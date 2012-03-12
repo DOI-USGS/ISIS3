@@ -17,7 +17,7 @@ void IsisMain() {
 
   //Throws exception if user is dumb
   if(lineOverlap >= numberOfLines) {
-    throw iException::Message(iException::User, "The Line Overlap (OVERLAP) must be less than the Number of Lines (LN).", _FILEINFO_);
+    throw IException(IException::User, "The Line Overlap (OVERLAP) must be less than the Number of Lines (LN).", _FILEINFO_);
   }
 
   //Opens the cube

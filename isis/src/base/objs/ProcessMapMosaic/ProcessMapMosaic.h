@@ -70,7 +70,7 @@ namespace Isis {
    *                          different caching algorithm.
    *  @history 2011-09-08 Sharmila Prasad - Fixed Bug #406, Additional boundary checks similar to
    *            ProcessMosaic so that there will be no interruption for applications like automos
-   *  
+   *
    *  @todo 2005-02-11 Stuart Sides - add coded example and implementation example
    *                                  to class documentation
    */
@@ -81,7 +81,7 @@ namespace Isis {
 
       //! Constructs a Mosaic object
       ProcessMapMosaic();
-      
+
       //! Destructor
       ~ProcessMapMosaic() { };
 
@@ -113,9 +113,9 @@ namespace Isis {
 
       //! Input cube cannot be set here
       Isis::Cube *SetInputCube() {
-        throw iException::Message(iException::Programmer,
-                                  "ProcessMapMosaic does not support the SetInputCube method",
-                                  _FILEINFO_);
+        throw IException(IException::Programmer,
+                         "ProcessMapMosaic does not support the SetInputCube method",
+                         _FILEINFO_);
       }
 
       //! Mosaic Processing method, returns false if the cube is not inside the mosaic

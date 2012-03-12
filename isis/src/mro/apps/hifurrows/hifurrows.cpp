@@ -46,7 +46,7 @@ void IsisMain() {
   // We will be processing by line
   ProcessByLine p;
   UserInterface &ui = Application::GetUserInterface();
-  
+
   if(ui.GetBoolean("NEW_VERSION")) {
     RemoveFurrows_Version_1_42();
     return;
@@ -91,7 +91,7 @@ void IsisMain() {
     }
     else {
       string msg = "Cannot process merged images.";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
 
@@ -168,12 +168,12 @@ void furrowCheck(Buffer &in, Buffer &out) {
 }
 
 /**
- * The processing has been taken from the Version 1.42 of 
- * the HiCal pipeline. Furrows are Nulled in the columns specified 
- * based on Channel and Summing modes and if the DN are not in the threshold 
- * range. If furrows are found, then trimfilter and lowpass applications are 
+ * The processing has been taken from the Version 1.42 of
+ * the HiCal pipeline. Furrows are Nulled in the columns specified
+ * based on Channel and Summing modes and if the DN are not in the threshold
+ * range. If furrows are found, then trimfilter and lowpass applications are
  * run in the pipeline to smooth the edges which were nulled due to the furrows.
- * 
+ *
  * @author Sharmila Prasad (1/31/2011)
  */
 void RemoveFurrows_Version_1_42(void)
@@ -182,11 +182,11 @@ void RemoveFurrows_Version_1_42(void)
   //int iCh1_Bin2_Samples[] = { 512, 511, 510, 509, 508, 507, 506, 505, 504, 503};
   //int iCh0_Bin4_Samples[] = { 1, 2, 3, 4, 5, 6};
   //int iCh1_Bin4_Samples[] = { 256, 255, 254, 253, 252, 251};
-  
-  ProcessBySample procSample; 
+
+  ProcessBySample procSample;
 
   UserInterface &ui = Application::GetUserInterface();
-  
+
   Cube *inCube = procSample.SetInputCube("FROM");
   HiLab hiInfo(inCube);
   int iChannel = hiInfo.getChannel();
@@ -199,11 +199,11 @@ void RemoveFurrows_Version_1_42(void)
 
   if(iBin != 2 && iBin != 4) {
     string sErrMsg = "Unsupported Summing Mode";
-    throw iException::Message(iException::User, sErrMsg, _FILEINFO_);
+    throw IException(IException::User, sErrMsg, _FILEINFO_);
   }
-  
+
   GetFurrowThresholdValues(iCcdId, iBin);
-  
+
   if(iBin == 2) {
     if(iChannel == 0) {
       iStartSample = 11;
@@ -224,13 +224,13 @@ void RemoveFurrows_Version_1_42(void)
       iNumSamples  = 250;
     }
   }
-  
+
   iLastSample = iStartSample + iNumSamples - 1;
 #ifdef _DEBUG_
   cerr << "\n*** Samples not to check for Furrows ***\n";
   cerr << "Start Sample=" << iStartSample << "  Num=" << iNumSamples << "  Last=" << iLastSample << endl;
 #endif
- 
+
   procSample.SetOutputCube("TO");
   procSample.StartProcess(FurrowProcess);
   procSample.EndProcess();
@@ -238,7 +238,7 @@ void RemoveFurrows_Version_1_42(void)
 #ifdef _DEBUG_
   cerr << "Furrows Found=" << bFurrowsFound << endl;;
 #endif
-  
+
   // apply trim filter if furrows found
   iString sTempFile("./FixFurrows.cub");
   if(bFurrowsFound) {
@@ -246,7 +246,7 @@ void RemoveFurrows_Version_1_42(void)
     p.SetInputFile(Filename(ui.GetFilename("TO")));
     p.SetOutputFile(Filename(sTempFile));
     p.KeepTemporaryFiles(false);
-    
+
     p.AddToPipeline("trimfilter");
     p.Application("trimfilter").SetInputParameter ("FROM",    false);
     p.Application("trimfilter").SetOutputParameter("TO",      "trim");
@@ -254,7 +254,7 @@ void RemoveFurrows_Version_1_42(void)
     p.Application("trimfilter").AddConstParameter ("SAMPLES", "3");
     p.Application("trimfilter").AddConstParameter ("MINOPT",  "COUNT");
     p.Application("trimfilter").AddConstParameter ("MINIMUM", "5");
-    
+
     if(ui.GetBoolean("LOWPASS")) {
       p.AddToPipeline("lowpass");
       p.Application("lowpass").SetInputParameter ("FROM",    false);
@@ -265,47 +265,47 @@ void RemoveFurrows_Version_1_42(void)
       p.Application("lowpass").AddConstParameter ("MINIMUM", "5");
       p.Application("lowpass").AddConstParameter ("FILTER",  "OUTSIDE");
     }
-    
+
 #ifdef _DEBUG_
     cout << p;
 #endif
 
     p.Run();
-    
+
     // Copy trimfilter output file to Output file specified by the user
     CubeAttributeInput inAtt;
     procSample.SetInputCube(sTempFile, inAtt);
     procSample.SetOutputCube("TO");
     procSample.StartProcess(CopyTrimFilterOutput);
     procSample.EndProcess();
-  
+
     // clean up
     remove(sTempFile.c_str());
   }
 }
 
 /**
- * Determine the Furrows and set their values to NULL. Specified 
- * columns are skipped depending on the Channel and Summing modes. 
- * The columns that are not skipped, if the DN value is not in the 
- * threshold range then it is set to NULL. 
- * 
+ * Determine the Furrows and set their values to NULL. Specified
+ * columns are skipped depending on the Channel and Summing modes.
+ * The columns that are not skipped, if the DN value is not in the
+ * threshold range then it is set to NULL.
+ *
  * @author Sharmila Prasad (1/31/2011)
- * 
+ *
  * @param in  - input buffer
  * @param out - output buffer
  */
 void FurrowProcess(Buffer &in, Buffer &out) {
   int iCurrentSample = in.Sample();
-  
+
   if(iCurrentSample < iStartSample || iCurrentSample > iLastSample) {
     iFurrowSample++;
   }
-  
+
 #ifdef _DEBUG_
   cerr << iCurrentSample << "  FurrowSampleIndex=" << iFurrowSample << endl;
 #endif
-    
+
   // Loop and move appropriate samples
   for(int i = 0; i < in.size(); i++) {
     if((iCurrentSample >= iStartSample && iCurrentSample <= iLastSample)) {
@@ -324,12 +324,12 @@ void FurrowProcess(Buffer &in, Buffer &out) {
 }
 
 /**
- * Copy the input to the output cube - used to copy the 
- * trimfilter result to the final output 
- * 
+ * Copy the input to the output cube - used to copy the
+ * trimfilter result to the final output
+ *
  * @author Sharmila Prasad (2/1/2011)
- * 
- * @param in - input buffer 
+ *
+ * @param in - input buffer
  * @param out - output buffer
  */
 void CopyTrimFilterOutput(Buffer &in, Buffer &out)
@@ -338,15 +338,15 @@ void CopyTrimFilterOutput(Buffer &in, Buffer &out)
     out[i] = in[i];
 }
 /**
- * Get the Max Thresholds  for DN value to be considered a Furrow, 
- * based on CCID and Summing modes(2/4) 
- * 
+ * Get the Max Thresholds  for DN value to be considered a Furrow,
+ * based on CCID and Summing modes(2/4)
+ *
  * @author Sharmila Prasad (1/31/2011)
- * 
+ *
  * @param piCcdId - CCID
  * @param piBin   - Summing Mode
- * 
- * @return None 
+ *
+ * @return None
  */
 void GetFurrowThresholdValues(int piCcdId, int piBin)
 {
@@ -354,7 +354,7 @@ void GetFurrowThresholdValues(int piCcdId, int piBin)
   switch(piCcdId) {
     case RED0:
       if(piBin == 2)
-        iFurrowThresholds << 8000 << 8100 << 8700 << 9200 << 9600 << 10000 << 12000 << 12000 << 12000 << 12000; 
+        iFurrowThresholds << 8000 << 8100 << 8700 << 9200 << 9600 << 10000 << 12000 << 12000 << 12000 << 12000;
       else if(piBin == 4) {
         iFurrowThresholds << 8000 << 9000 << 9500 <<  9900 <<  9900 << 10000;
       }
@@ -449,8 +449,8 @@ void GetFurrowThresholdValues(int piCcdId, int piBin)
         iFurrowThresholds << 7600 << 8300 << 9000 << 10000 << 10500 << 12000;
       }
       break;
-    } 
-  
+    }
+
 #ifdef _DEBUG_
   QListIterator<int> i(iFurrowThresholds);
   while (i.hasNext())

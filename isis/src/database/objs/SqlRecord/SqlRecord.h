@@ -26,7 +26,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include "iException.h"
+#include "IException.h"
 #include <QSqlRecord>
 
 namespace Isis {

@@ -1,7 +1,7 @@
 #include <string>
 #include <iostream>
 #include "Application.h"
-#include "iException.h"
+#include "IException.h"
 #include "Preference.h"
 #include "PvlGroup.h"
 #include "PvlObject.h"
@@ -13,7 +13,7 @@ void myFunct() {
 
 void myError() {
   std::string msg = "testing an error";
-  throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+  throw Isis::IException(Isis::IException::Programmer, msg, _FILEINFO_);
 }
 
 using namespace std;

@@ -30,7 +30,7 @@
 
 #include "Pvl.h"
 #include "PvlGroup.h"
-#include "iException.h"
+#include "IException.h"
 #include "PolygonTools.h"
 #include "LimitPolygonSeeder.h"
 
@@ -179,7 +179,7 @@ namespace Isis {
       else {
         std::string msg = "PVL for LimitPolygonSeeder must contain [MajorAxisPoints] in [";
         msg += pvl.Filename() + "]";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
 
       p_minorAxisPts = 0;
@@ -192,22 +192,22 @@ namespace Isis {
       else {
         std::string msg = "PVL for LimitPolygonSeeder must contain [MinorAxisPoints] in [";
         msg += pvl.Filename() + "]";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
     }
-    catch(iException &e) {
+    catch(IException &e) {
       std::string msg = "Improper format for PolygonSeeder PVL [" + pvl.Filename() + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     if(p_majorAxisPts < 1.0) {
       iString msg = "Major axis points must be greater that 0.0 [(" + iString(p_majorAxisPts) + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     if(p_minorAxisPts <= 0.0) {
       iString msg = "Minor axis points must be greater that 0.0 [(" + iString(p_minorAxisPts) + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
 

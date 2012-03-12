@@ -122,7 +122,7 @@ void IsisMain() {
       !ui.WasEntered("SMITHEDFILTER")) {
     string message =
       "You must enter a filter AND directory for at least one type of kernel";
-    throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+    throw IException(IException::User, message, _FILEINFO_);
   }
 
   //specify a name for the output file

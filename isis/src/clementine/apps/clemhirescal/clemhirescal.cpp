@@ -2,7 +2,7 @@
 
 #include "Cube.h"
 #include "CubeAttribute.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "ProcessByLine.h"
 #include "Pvl.h"
@@ -28,7 +28,7 @@ void IsisMain() {
   iString wave = (string)label->FindGroup("BandBin", Pvl::Traverse)["FilterName"];
   if((wave != "A") && (wave != "B") && (wave != "C") && (wave != "D")) {
     string message = "Invalid FilterName [" + wave + "], can only handle A-D filters";
-    throw iException::Message(Isis::iException::None, message, _FILEINFO_);
+    throw IException(IException::Unknown, message, _FILEINFO_);
   }
   // Determine and load calibration flat field file
   wave.DownCase();
@@ -41,7 +41,7 @@ void IsisMain() {
   int index = label->FindGroup("Instrument", Pvl::Traverse)["OffsetModeID"];
   if(index < 0 || index > 5) {
     string message = "Invalid OffsetModeID, can only handle offests 0-5";
-    throw iException::Message(Isis::iException::None, message, _FILEINFO_);
+    throw IException(IException::Unknown, message, _FILEINFO_);
   }
 
   // Set the offset (b0) value based on mode
@@ -65,7 +65,7 @@ void IsisMain() {
       }
       else {
         string message = "Image is not one of supported MCP Gain Mode IDs, enter your own K value";
-        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+        throw IException(IException::Unknown, message, _FILEINFO_);
       }
     }
     // Three possiblities for filter D
@@ -81,13 +81,13 @@ void IsisMain() {
       }
       else {
         string message = "Image is not one of supported MCP Gain Mode IDs, enter your own K value";
-        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+        throw IException(IException::User, message, _FILEINFO_);
       }
     }
     // Other filters not supported for preset K value
     else {
       string message = "Image is of filter [" + wave + "], not supported type A or D, enter your own K value";
-      throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+      throw IException(IException::User, message, _FILEINFO_);
     }
   }
 

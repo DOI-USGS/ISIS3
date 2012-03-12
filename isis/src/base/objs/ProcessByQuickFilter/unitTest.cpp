@@ -17,8 +17,8 @@ void IsisMain() {
   try {
     p.StartProcess(filter);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
     p.EndProcess();
     cout << endl;
   }
@@ -28,8 +28,8 @@ void IsisMain() {
     p.SetInputCube("FROM");
     p.StartProcess(filter);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
     p.EndProcess();
     cout << endl;
   }
@@ -40,8 +40,8 @@ void IsisMain() {
     p.SetOutputCube("TO", 1, 1, 1);
     p.StartProcess(filter);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
     p.EndProcess();
     cout << endl;
   }
@@ -52,8 +52,8 @@ void IsisMain() {
     p.SetOutputCube("TO", 1, 126, 1);
     p.StartProcess(filter);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
     p.EndProcess();
     cout << endl;
   }
@@ -64,8 +64,8 @@ void IsisMain() {
     p.SetOutputCube("TO", 126, 126, 1);
     p.StartProcess(filter);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
     p.EndProcess();
     cout << endl;
   }
@@ -82,8 +82,8 @@ void IsisMain() {
     p2.SetOutputCube("TO");
     p2.StartProcess(filter);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
     p2.EndProcess();
     cout << endl;
   }
@@ -99,8 +99,8 @@ void IsisMain() {
     p3.SetOutputCube("TO");
     p3.StartProcess(filter);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
     p3.EndProcess();
     cout << endl;
   }

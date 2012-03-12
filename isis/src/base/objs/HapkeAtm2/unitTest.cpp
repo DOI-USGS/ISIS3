@@ -6,7 +6,7 @@
 #include "AtmosModelFactory.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
-#include "iException.h"
+#include "IException.h"
 #include "Preference.h"
 
 using namespace Isis;
@@ -68,8 +68,8 @@ int main() {
     std::cout << "Trans0 = " << trans0 << std::endl;
     std::cout << "Sbar = " << sbar << std::endl << std::endl;
   }
-  catch(iException &e) {
-    e.Report();
+  catch(IException &e) {
+    e.print();
   }
 
   return 0;

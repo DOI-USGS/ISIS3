@@ -2,15 +2,13 @@
 
 #include <iostream>
 
-#include "iException.h"
+#include "IException.h"
 #include "Preference.h"
 
 using std::cout;
 using std::endl;
 
-using Isis::Displacement;
-using Isis::iException;
-using Isis::Preference;
+using namespace Isis;
 
 int main(int argc, char *argv[]) {
   Preference::Preferences(true);
@@ -24,8 +22,8 @@ int main(int argc, char *argv[]) {
     Displacement disp;
     cout << disp.meters() << " meters" << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -33,8 +31,8 @@ int main(int argc, char *argv[]) {
     Displacement disp(1500.5, Displacement::Meters);
     cout << disp.meters() << " meters" << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -42,8 +40,8 @@ int main(int argc, char *argv[]) {
     Displacement disp(1500.5, Displacement::Kilometers);
     cout << disp.meters() << " meters" << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -52,8 +50,8 @@ int main(int argc, char *argv[]) {
     Displacement copiedDisp(disp);
     cout << copiedDisp.meters() << " meters" << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   cout << endl << "----- Testing Accessors -----" << endl << endl;
@@ -63,8 +61,8 @@ int main(int argc, char *argv[]) {
     Displacement disp(1, Displacement::Meters);
     cout << disp.meters() << " meters" << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -72,8 +70,8 @@ int main(int argc, char *argv[]) {
     Displacement disp(1, Displacement::Kilometers);
     cout << disp.kilometers() << " kilometers" << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   cout << endl << "----- Testing Operators -----" << endl << endl;
@@ -90,17 +88,17 @@ int main(int argc, char *argv[]) {
     cout << "Displacement 1 == Displacement 2 ? " << (disp1 == disp2) << endl;
     cout << "Displacement 1 <= Displacement 2 ? " << (disp1 <= disp2) << endl;
     cout << "Displacement 1 < Displacement 2 ? " << (disp1 < disp2) << endl;
-    cout << "Displacement 1 + Displacement 2 ? " << 
+    cout << "Displacement 1 + Displacement 2 ? " <<
         (disp1 + disp2).meters() << " meters" << endl;
     cout << "Displacement 1 - Displacement 2 ? " <<
         (disp1 - disp2).meters() << " meters" << endl;
 
     disp1 = disp2;
-    cout << "Displacement 1 = Displacement 2... Displacement 1 = " << 
+    cout << "Displacement 1 = Displacement 2... Displacement 1 = " <<
         disp1.meters() << " meters" << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -115,23 +113,23 @@ int main(int argc, char *argv[]) {
     cout << "Displacement 1 == Displacement 2 ? " << (disp1 == disp2) << endl;
     cout << "Displacement 1 <= Displacement 2 ? " << (disp1 <= disp2) << endl;
     cout << "Displacement 1 < Displacement 2 ? " << (disp1 < disp2) << endl;
-    cout << "Displacement 1 + Displacement 2 ? " << (disp1 + disp2).meters() << 
+    cout << "Displacement 1 + Displacement 2 ? " << (disp1 + disp2).meters() <<
         " meters" << endl;
 
     // This should throw an exception and never cout
     try {
       (disp1 - disp2).meters();
     }
-    catch(iException &e) {
-      e.Report(false);
+    catch(IException &e) {
+      e.print();
     }
 
     disp1 = disp2;
     cout << "Displacement 1 = Displacement 2... Displacement 1 = " << disp1.meters() <<
         " meters" << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -146,17 +144,17 @@ int main(int argc, char *argv[]) {
     cout << "Displacement 1 == Displacement 2 ? " << (disp1 == disp2) << endl;
     cout << "Displacement 1 <= Displacement 2 ? " << (disp1 <= disp2) << endl;
     cout << "Displacement 1 < Displacement 2 ? " << (disp1 < disp2) << endl;
-    cout << "Displacement 1 + Displacement 2 ? " << (disp1 + disp2).meters() << 
+    cout << "Displacement 1 + Displacement 2 ? " << (disp1 + disp2).meters() <<
         " meters" << endl;
-    cout << "Displacement 1 - Displacement 2 ? " << (disp1 - disp2).meters() << 
+    cout << "Displacement 1 - Displacement 2 ? " << (disp1 - disp2).meters() <<
         " meters" << endl;
 
     disp1 = disp2;
     cout << "Displacement 1 = Displacement 2... Displacement 1 = " << disp1.meters() <<
         " meters" << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -171,9 +169,9 @@ int main(int argc, char *argv[]) {
     cout << "Displacement 1 == Displacement 2 ? " << (disp1 == disp2) << endl;
     cout << "Displacement 1 <= Displacement 2 ? " << (disp1 <= disp2) << endl;
     cout << "Displacement 1 < Displacement 2 ? " << (disp1 < disp2) << endl;
-    cout << "Displacement 1 + Displacement 2 ? " << (disp1 + disp2).meters() << 
+    cout << "Displacement 1 + Displacement 2 ? " << (disp1 + disp2).meters() <<
         " meters" << endl;
-    cout << "Displacement 1 - Displacement 2 ? " << (disp1 - disp2).meters() << 
+    cout << "Displacement 1 - Displacement 2 ? " << (disp1 - disp2).meters() <<
         " meters" << endl;
 
     disp1 = disp2;
@@ -186,8 +184,8 @@ int main(int argc, char *argv[]) {
     cout << "Displacement 1 -= Displacement 2... Displacement 1 = " << disp1.meters() <<
         " meters" << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -204,17 +202,17 @@ int main(int argc, char *argv[]) {
     cout << "Displacement 1 == Displacement 2 ? " << (disp1 == disp2) << endl;
     cout << "Displacement 1 <= Displacement 2 ? " << (disp1 <= disp2) << endl;
     cout << "Displacement 1 < Displacement 2 ? " << (disp1 < disp2) << endl;
-    cout << "Displacement 1 + Displacement 2 ? " << (disp1 + disp2).meters() << 
+    cout << "Displacement 1 + Displacement 2 ? " << (disp1 + disp2).meters() <<
         " meters" << endl;
-    cout << "Displacement 1 - Displacement 2 ? " << (disp1 - disp2).meters() << 
+    cout << "Displacement 1 - Displacement 2 ? " << (disp1 - disp2).meters() <<
         " meters" << endl;
 
     disp1 = disp2;
     cout << "Displacement 1 = Displacement 2... Displacement 1 = " << disp1.meters() <<
         " meters" << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   cout << endl << "----- Testing Error Checking -----" << endl << endl;
@@ -222,39 +220,39 @@ int main(int argc, char *argv[]) {
   try {
     Displacement disp(-1, Displacement::Meters);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
     Displacement disp(-1, Displacement::Kilometers);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
     Displacement disp(1, Displacement::Kilometers);
     disp.setMeters(-1);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
     Displacement disp(1, Displacement::Kilometers);
     disp.setMeters(-1);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
     Displacement disp(1, Displacement::Kilometers);
     disp.setKilometers(-1);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   /*
@@ -263,36 +261,36 @@ int main(int argc, char *argv[]) {
     Displacement disp(1, (Displacement::Units)-1);
     disp.setKilometers(-1);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
   */
 
   try {
     Displacement() > Displacement();
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
     Displacement() >= Displacement();
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
     Displacement() < Displacement();
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
     Displacement() <= Displacement();
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 }

@@ -4,7 +4,7 @@
 #include "IsisAml.h"
 
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "Pvl.h"
 #include "Preference.h"
@@ -154,8 +154,8 @@ Inheritor::Inheritor(const char *xmlfile): IsisAml(xmlfile) {
       }
     }
   }
-  catch(Isis::iException &error) {
-    error.Report(false);
+  catch(Isis::IException &error) {
+    error.print();
   }
 }
 
@@ -169,8 +169,8 @@ int main(void) {
   try {
     aml = new Inheritor(xmlFile.c_str());
   }
-  catch(Isis::iException &error) {
-    error.Report(false);
+  catch(Isis::IException &error) {
+    error.print();
     exit(1);
   }
 
@@ -316,8 +316,8 @@ int main(void) {
     cout << "  FR's value = " << aml->GetString("fr") << endl;
     cout << endl;
   }
-  catch(Isis::iException &error) {
-    error.Report(false);
+  catch(Isis::IException &error) {
+    error.print();
   }
   cout << endl;
 
@@ -331,9 +331,8 @@ int main(void) {
       aml->PutAsString("G1P0", "11111");
       aml->PutAsString("G1P0", "22222");
     }
-    catch(Isis::iException &error) {
-      ReportError(Isis::iString(error.Errors()));
-      error.Clear();
+    catch(Isis::IException &error) {
+      ReportError(error.toString());
     }
     aml->Clear("G1P0");
 
@@ -342,18 +341,16 @@ int main(void) {
       aml->PutString("G1P0", "G1P0L0");
       aml->PutString("G1P0", "22222");
     }
-    catch(Isis::iException &error) {
-      ReportError(Isis::iString(error.Errors()));
-      error.Clear();
+    catch(Isis::IException &error) {
+      ReportError(error.toString());
     }
     aml->Clear("G1P0");
 
     try { // PARAMETER NOT STRING
       aml->PutString("G2P4", "xxxxxx");
     }
-    catch(Isis::iException &error) {
-      ReportError(Isis::iString(error.Errors()));
-      error.Clear();
+    catch(Isis::IException &error) {
+      ReportError(error.toString());
     }
 
     cout << "  PutFilename:" << endl;
@@ -361,30 +358,27 @@ int main(void) {
       aml->PutFilename("G0P0", "xxxxxxx");
       aml->PutFilename("G0P0", "yyyyyyy");
     }
-    catch(Isis::iException &error) {
-      ReportError(Isis::iString(error.Errors()));
-      error.Clear();
+    catch(Isis::IException &error) {
+      ReportError(error.toString());
     }
     aml->Clear("G0P0");
 
     try { // PARAMETER NOT FILENAME
       aml->PutFilename("G2P4", "xxxxxx");
     }
-    catch(Isis::iException &error) {
-      ReportError(Isis::iString(error.Errors()));
-      error.Clear();
+    catch(Isis::IException &error) {
+      ReportError(error.toString());
     }
 
     cout << "  Cube tests:" << endl;
-    
+
     try { // UNABLE TO GET INPUT CUBE ATTRIBUTES
       aml->PutFilename("CUBE2", "xxxxxxx.cub+1,2-4");
       Isis::CubeAttributeInput &att = aml->GetInputAttribute("CUBE2");
       cout << "    " << att.BandsStr() << endl;
     }
-    catch(Isis::iException &error) {
-      ReportError(Isis::iString(error.Errors()));
-      error.Clear();
+    catch(Isis::IException &error) {
+      ReportError(error.toString());
     }
     aml->Clear("CUBE2");
 
@@ -397,9 +391,8 @@ int main(void) {
       cout << "    File format = " << att.FileFormatStr() << endl;
       cout << "    Pixel type  = " << Isis::PixelTypeName(att.PixelType()) << endl;
     }
-    catch(Isis::iException &error) {
-      ReportError(Isis::iString(error.Errors()));
-      error.Clear();
+    catch(Isis::IException &error) {
+      ReportError(error.toString());
     }
     aml->Clear("CUBE1");
 
@@ -408,18 +401,16 @@ int main(void) {
       aml->PutInteger("G6P2", 1);
       aml->PutInteger("G6P2", 1);
     }
-    catch(Isis::iException &error) {
-      ReportError(Isis::iString(error.Errors()));
-      error.Clear();
+    catch(Isis::IException &error) {
+      ReportError(error.toString());
     }
     aml->Clear("G6P2");
 
     try { // PARAMETER NOT INTEGER
       aml->PutInteger("G6P0", 1);
     }
-    catch(Isis::iException &error) {
-      ReportError(Isis::iString(error.Errors()));
-      error.Clear();
+    catch(Isis::IException &error) {
+      ReportError(error.toString());
     }
 
     cout << "  PutDouble:" << endl;
@@ -427,18 +418,16 @@ int main(void) {
       aml->PutDouble("G1P2", 1.0);
       aml->PutDouble("G1P2", 1.0);
     }
-    catch(Isis::iException &error) {
-      ReportError(Isis::iString(error.Errors()));
-      error.Clear();
+    catch(Isis::IException &error) {
+      ReportError(error.toString());
     }
     aml->Clear("G1P2");
 
     try { // PARAMETER NOT DOUBLE
       aml->PutDouble("G0P0", 1.0);
     }
-    catch(Isis::iException &error) {
-      ReportError(Isis::iString(error.Errors()));
-      error.Clear();
+    catch(Isis::IException &error) {
+      ReportError(error.toString());
     }
 
 
@@ -447,44 +436,39 @@ int main(void) {
       aml->PutBoolean("G6P0", true);
       aml->PutBoolean("G6P0", false);
     }
-    catch(Isis::iException &error) {
-      ReportError(Isis::iString(error.Errors()));
-      error.Clear();
+    catch(Isis::IException &error) {
+      ReportError(error.toString());
     }
     aml->Clear("G6P0");
 
     try { // PARAMETER NOT BOOLEAN
       aml->PutBoolean("G0P0", false);
     }
-    catch(Isis::iException &error) {
-      ReportError(Isis::iString(error.Errors()));
-      error.Clear();
+    catch(Isis::IException &error) {
+      ReportError(error.toString());
     }
 
     cout << "  GetAsString:" << endl;
     try { // PARAMETER HAS NO VALUE
       string s = aml->GetAsString("G2P0");
     }
-    catch(Isis::iException &error) {
-      ReportError(Isis::iString(error.Errors()));
-      error.Clear();
+    catch(Isis::IException &error) {
+      ReportError(error.toString());
     }
 
     cout << "  GetFilename:" << endl;
     try { // PARAMETER HAS NO VALUE
       string s = aml->GetFilename("G0P0");
     }
-    catch(Isis::iException &error) {
-      ReportError(Isis::iString(error.Errors()));
-      error.Clear();
+    catch(Isis::IException &error) {
+      ReportError(error.toString());
     }
 
     try { // PARAMETER NOT FILENAME
       string s = aml->GetFilename("G2P4");
     }
-    catch(Isis::iException &error) {
-      ReportError(Isis::iString(error.Errors()));
-      error.Clear();
+    catch(Isis::IException &error) {
+      ReportError(error.toString());
     }
 
 #if 0
@@ -492,7 +476,7 @@ int main(void) {
     try {
       string s = aml->GetCube("CUBE1");
     }
-    catch(Isis::iException &error) {
+    catch(Isis::IException &error) {
       ReportError(Isis::iString(error.Errors()));
       error.Clear();
     }
@@ -501,7 +485,7 @@ int main(void) {
     try {
       string s = aml->GetCube("G2P4");
     }
-    catch(Isis::iException &error) {
+    catch(Isis::IException &error) {
       ReportError(Isis::iString(error.Errors()));
       error.Clear();
     }
@@ -511,91 +495,81 @@ int main(void) {
     try { // PARAMETER HAS NO VALUE
       string s = aml->GetString("G6P3");
     }
-    catch(Isis::iException &error) {
-      ReportError(Isis::iString(error.Errors()));
-      error.Clear();
+    catch(Isis::IException &error) {
+      ReportError(error.toString());
     }
 
     try { // PARAMETER NOT STRING
       string s = aml->GetString("G2P4");
     }
-    catch(Isis::iException &error) {
-      ReportError(Isis::iString(error.Errors()));
-      error.Clear();
+    catch(Isis::IException &error) {
+      ReportError(error.toString());
     }
 
     cout << "  GetInteger:" << endl;
     try { // PARAMETER HAS NO VALUE
       aml->GetInteger("G2P0");
     }
-    catch(Isis::iException &error) {
-      ReportError(Isis::iString(error.Errors()));
-      error.Clear();
+    catch(Isis::IException &error) {
+      ReportError(error.toString());
     }
 
     try { // PARAMETER NOT INTEGER
       aml->GetInteger("G0P0");
     }
-    catch(Isis::iException &error) {
-      ReportError(Isis::iString(error.Errors()));
-      error.Clear();
+    catch(Isis::IException &error) {
+      ReportError(error.toString());
     }
 
     cout << "  GetDouble:" << endl;
     try { // PARAMETER HAS NO VALUE
       aml->GetDouble("G1P3");
     }
-    catch(Isis::iException &error) {
-      ReportError(Isis::iString(error.Errors()));
-      error.Clear();
+    catch(Isis::IException &error) {
+      ReportError(error.toString());
     }
 
     try { // PARAMETER NOT DOUBLE
       aml->GetDouble("G0P1");
     }
-    catch(Isis::iException &error) {
-      ReportError(Isis::iString(error.Errors()));
-      error.Clear();
+    catch(Isis::IException &error) {
+      ReportError(error.toString());
     }
 
     cout << "  GetBoolean:" << endl;
     try { // PARAMETER HAS NO VALUE
       aml->GetBoolean("G6P0");
     }
-    catch(Isis::iException &error) {
-      ReportError(Isis::iString(error.Errors()));
-      error.Clear();
+    catch(Isis::IException &error) {
+      ReportError(error.toString());
     }
 
     try { // INVALID BOOLEAN VALUE
       aml->PutAsString("G6P0", "cccc");
       aml->GetBoolean("G6P0");
     }
-    catch(Isis::iException &error) {
-      ReportError(Isis::iString(error.Errors()));
-      error.Clear();
+    catch(Isis::IException &error) {
+      ReportError(error.toString());
     }
     aml->Clear("G6P0");
 
     try { // PARAMETER NOT BOOLEAN
       aml->GetBoolean("G1P1");
     }
-    catch(Isis::iException &error) {
-      ReportError(Isis::iString(error.Errors()));
-      error.Clear();
+    catch(Isis::IException &error) {
+      ReportError(error.toString());
     }
 
     try { // PARAMETER NOT UNIQUE
       string s = aml->GetString("F");
     }
-    catch(Isis::iException &error) {
-      ReportError(Isis::iString(error.Errors()));
-      error.Clear();
+    catch(Isis::IException &error) {
+      ReportError(error.toString());
     }
 
   }
-  catch(Isis::iException &error) {
-    error.Report(false);
+  catch(Isis::IException &error) {
+    error.print();
   }
   // Load up a valid set of parameters
 
@@ -702,8 +676,8 @@ int main(void) {
   try {
     aml->VerifyAll();
   }
-  catch(Isis::iException &error) {
-    error.Report(false);
+  catch(Isis::IException &error) {
+    error.print();
   }
   cout << endl;
 
@@ -714,8 +688,8 @@ int main(void) {
     aml->CommandLine(lab);
     cout << lab << endl << endl;
   }
-  catch(Isis::iException &error) {
-    error.Report(false);
+  catch(Isis::IException &error) {
+    error.print();
   }
 
   cout << endl;
@@ -727,9 +701,8 @@ int main(void) {
   try { // PARAMETER MUST BE ENTERED IF OTHER PARAMETER HAS PARTICULAR VALUE
     aml->VerifyAll();
   }
-  catch(Isis::iException &error) {
-    ReportError(Isis::iString(error.Errors()));
-    error.Clear();
+  catch(Isis::IException &error) {
+    ReportError(error.toString());
   }
   aml->Clear("G1P0");
   aml->PutAsString("G1P3", "1.1");
@@ -740,9 +713,8 @@ int main(void) {
   try { // PARAMETER CAN NOT BE ENTERED IF OTHER PARAMETER HAS PARTICULAR VALUE
     aml->VerifyAll();
   }
-  catch(Isis::iException &error) {
-    ReportError(Isis::iString(error.Errors()));
-    error.Clear();
+  catch(Isis::IException &error) {
+    ReportError(error.toString());
   }
   aml->Clear("G2P0");
 
@@ -750,9 +722,8 @@ int main(void) {
   try { // UNKNOWN PARAMETER
     aml->Clear("xyz");
   }
-  catch(Isis::iException &error) {
-    ReportError(Isis::iString(error.Errors()));
-    error.Clear();
+  catch(Isis::IException &error) {
+    ReportError(error.toString());
   }
 
   cout << "---------- Check errors for user file overwrite preferences ----------" << endl;
@@ -774,9 +745,8 @@ int main(void) {
     cout << "  Overwrite not allowed:" << endl;
     aml->VerifyAll();
   }
-  catch(Isis::iException &error) {
-    ReportError(Isis::iString(error.Errors()));
-    error.Clear();
+  catch(Isis::IException &error) {
+    ReportError(error.toString());
   }
 
   try { // INVALID OVERWRITE VALUE IN USER PREFERENCE FILE
@@ -784,9 +754,8 @@ int main(void) {
     cout << "  Invalid Overwrite preference value:" << endl;
     aml->VerifyAll();
   }
-  catch(Isis::iException &error) {
-    ReportError(Isis::iString(error.Errors()));
-    error.Clear();
+  catch(Isis::IException &error) {
+    ReportError(error.toString());
   }
   remove("junk.txt");
 }

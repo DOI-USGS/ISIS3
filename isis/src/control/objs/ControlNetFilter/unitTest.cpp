@@ -5,7 +5,7 @@
 #include "ControlPoint.h"
 #include "ControlMeasure.h"
 #include "ControlNetFilter.h"
-#include "iException.h"
+#include "IException.h"
 #include "Preference.h"
 #include "PvlGroup.h"
 #include "PvlKeyword.h"

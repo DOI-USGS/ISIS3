@@ -6,7 +6,7 @@
 
 #include "ProcessByLine.h"
 #include "SpecialPixel.h"
-#include "iException.h"
+#include "IException.h"
 
 using namespace std;
 using namespace Isis;
@@ -73,7 +73,7 @@ void IsisMain() {
         //  We have overlap
         string message = "Check the ranges entered for overlap between differing  ";
         message += "special pixels.  ";
-        throw iException::Message(iException::User, message, _FILEINFO_);
+        throw IException(IException::User, message, _FILEINFO_);
       }
     }
     //  Copy sorted list back to original vector.

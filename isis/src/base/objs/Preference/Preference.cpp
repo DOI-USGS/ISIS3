@@ -30,7 +30,7 @@
 
 #include "Preference.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 
 using namespace std;
 namespace Isis {

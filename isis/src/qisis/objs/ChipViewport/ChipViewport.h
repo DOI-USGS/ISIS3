@@ -29,7 +29,7 @@
 
 #include "Chip.h"
 #include "Stretch.h"
-#include "iException.h"
+#include "IException.h"
 #include "Histogram.h"
 
 

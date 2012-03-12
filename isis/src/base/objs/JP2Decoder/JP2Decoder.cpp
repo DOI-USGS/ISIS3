@@ -25,7 +25,7 @@
 #include <string>
 #include <sstream>
 
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "JP2Decoder.h"
 #include "JP2Error.h"
@@ -73,7 +73,7 @@ namespace Isis {
       if(!JP2_Source->open(JP2_Stream)) {
         std::string msg = "Unable to open the decoder because the source file ";
         msg += "does not have valid JP2 format content [" + p_jp2File + "]";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
 
       // Initialize the JP2 header boxes up to the first codestream box
@@ -98,7 +98,7 @@ namespace Isis {
       if(p_pixelBits > 16 || p_pixelBytes > 2) {
         std::string msg = "The source file has unsupported pixel type ";
         msg += "[" + p_jp2File + "]";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
       p_signedData = JPEG2000_Codestream->get_signed(0, true);
 
@@ -116,7 +116,7 @@ namespace Isis {
             pixel_bits != p_pixelBits || signed_data != p_signedData) {
           std::string msg = "The source file does not have bands with matching ";
           msg += "characteristics";
-          throw iException::Message(iException::User, msg, _FILEINFO_);
+          throw IException(IException::User, msg, _FILEINFO_);
         }
       }
 

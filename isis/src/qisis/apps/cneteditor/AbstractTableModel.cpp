@@ -9,7 +9,7 @@
 #include <QtConcurrentRun>
 #include <QTimer>
 
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 
 #include "AbstractTableDelegate.h"
@@ -35,22 +35,22 @@ namespace Isis
 
       dataModel = model;
       connect(model, SIGNAL(cancelSort()), this, SLOT(cancelSort()));
-      
+
       delegate = someDelegate;
-      
+
       setSortingEnabled(false);
       setSorting(false);
-      
+
       sortedItems = new QList<AbstractTreeItem *>;
       busyItem = new BusyLeafItem;
       sortStatusPoller = new QTimer;
-      
+
       sortingWatcher = new QFutureWatcher< QList< AbstractTreeItem * > >;
       connect(sortingWatcher, SIGNAL(finished()), this, SLOT(sortFinished()));
-      
+
       connect(sortStatusPoller, SIGNAL(timeout()),
               this, SLOT(sortStatusUpdated()));
-      
+
       // Signal forwarding
       connect(model, SIGNAL(modelModified()), SLOT(rebuildSort()));
 //       connect(model, SIGNAL(modelModified()), this, SIGNAL(modelModified()));
@@ -66,7 +66,7 @@ namespace Isis
 
       connect(model, SIGNAL(rebuildProgressRangeChanged(int, int)),
               this, SIGNAL(rebuildProgressRangeChanged(int, int)));
-      
+
       connect(this, SIGNAL(tableSelectionChanged(QList<AbstractTreeItem *>)),
               model, SIGNAL(tableSelectionChanged(QList<AbstractTreeItem *>)));
       connect(model, SIGNAL(filterCountsChanged(int,int)),
@@ -77,7 +77,7 @@ namespace Isis
     AbstractTableModel::~AbstractTableModel()
     {
       cancelSort();
-      
+
       dataModel = NULL;
 
       delete delegate;
@@ -103,7 +103,7 @@ namespace Isis
         delete columns;
         columns = NULL;
       }
-      
+
       delete sortingWatcher;
       sortingWatcher = NULL;
     }
@@ -132,12 +132,12 @@ namespace Isis
       if (sortingEnabled != enabled)
       {
         sortingEnabled = enabled;
-        
+
         if (sortingEnabled)
           rebuildSort();
         else
           cancelSort();  // can safely be called when not sorting
-          
+
         emit modelModified();
       }
     }
@@ -159,8 +159,8 @@ namespace Isis
     {
       return delegate;
     }
-    
-    
+
+
     void AbstractTableModel::applyFilter()
     {
       getDataModel()->applyFilter();
@@ -180,7 +180,7 @@ namespace Isis
         {
           // sorting is always done on a COPY of the items list
           QList< AbstractTreeItem * > copy = *sortedItems;
-  
+
           QFuture< QList< AbstractTreeItem * > > future =
               QtConcurrent::run(this, &AbstractTableModel::doSort, copy);
           sortingWatcher->setFuture(future);
@@ -234,11 +234,11 @@ namespace Isis
       {
         sortedSubsetOfItems = getDataModel()->getItems(start, end, flags, true);
       }
-      
+
       return sortedSubsetOfItems;
     }
-    
-    
+
+
     QList< AbstractTreeItem * > AbstractTableModel::getSortedItems(
         AbstractTreeItem * item1, AbstractTreeItem * item2,
         AbstractTreeModel::InterestingItems flags)
@@ -270,11 +270,11 @@ namespace Isis
         if (!start)
         {
           iString msg = "Could not find the first item";
-          throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+          throw IException(IException::Programmer, msg, _FILEINFO_);
         }
 
         AbstractTreeItem * end = item2;
-        
+
         // Sometimes we need to build the list forwards and sometimes backwards.
         // This is accomplished by using either append or prepend.  We abstract
         // away which of these we should use (why should we care) by using the
@@ -282,7 +282,7 @@ namespace Isis
         void (QList< AbstractTreeItem * >::*someKindaPend)(
             AbstractTreeItem * const &);
         someKindaPend = &QList< AbstractTreeItem * >::append;
-        
+
         if (start == item2)
         {
           end = item1;
@@ -299,7 +299,7 @@ namespace Isis
         if (currentIndex >= sortedItems->size())
         {
           iString msg = "Could not find the second item";
-          throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+          throw IException(IException::Programmer, msg, _FILEINFO_);
         }
 
         (sortedSubsetOfItems.*someKindaPend)(end);
@@ -307,8 +307,8 @@ namespace Isis
 
       return sortedSubsetOfItems;
     }
-    
-    
+
+
     void AbstractTableModel::handleTreeSelectionChanged(
         QList< AbstractTreeItem * > newlySelectedItems,
         AbstractTreeItem::InternalPointerType pointerType)
@@ -334,8 +334,8 @@ namespace Isis
       if (lessThanFunctor)
         emit sortProgressChanged(lessThanFunctor->getCompareCount());
     }
-    
-    
+
+
     void AbstractTableModel::sortFinished()
     {
       QList< AbstractTreeItem * > newSortedItems = sortingWatcher->result();
@@ -353,7 +353,7 @@ namespace Isis
       }
     }
 
-    
+
     void AbstractTableModel::cancelSort()
     {
       if (isSorting() && lessThanFunctor)
@@ -362,8 +362,8 @@ namespace Isis
         while (lessThanFunctor->interrupted());
       }
     }
-    
-    
+
+
     QList< AbstractTreeItem * > AbstractTableModel::doSort(
         QList< AbstractTreeItem * > itemsToSort)
     {
@@ -411,13 +411,13 @@ namespace Isis
             emit sortProgressRangeChanged(0, 0);
             emit sortProgressChanged(0);
             emit modelModified();
-            
+
             setSorting(false);
             lessThanFunctor->reset();
-            
+
             return QList< AbstractTreeItem * >();
           }
-          
+
     //       for (int i = columnsToSortOn.size() - 1; i >= 0; i--)
     //         qStableSort(sortedItems->begin(), sortedItems->end(),
     //                     LessThanFunctor(columnsToSortOn.at(i)));
@@ -433,16 +433,16 @@ namespace Isis
 //                << "sort!\n";
 
         }
-        
+
         setSorting(false);
-        
+
         //     cerr << "AbstractTableModel::sort done\n";
       }
-      
+
       return itemsToSort;
     }
 
-  
+
     void AbstractTableModel::nullify()
     {
       dataModel = NULL;
@@ -461,8 +461,8 @@ namespace Isis
     {
       sorting = isSorting;
     }
-    
-    
+
+
     void AbstractTableModel::rebuildSort()
     {
   //     cerr << "AbstractTableModel::rebuildSort called\n";
@@ -481,7 +481,7 @@ namespace Isis
       }
     }
 
-  
+
     // *********** LessThanFunctor implementation *************
 
 
@@ -497,26 +497,26 @@ namespace Isis
     {
       column = other.column;
     }
-    
-    
+
+
     AbstractTableModel::LessThanFunctor::~LessThanFunctor()
     {
       column = NULL;
     }
-    
-    
+
+
     int AbstractTableModel::LessThanFunctor::getCompareCount() const
     {
       return sharedData->getCompareCount();
     }
-    
-    
+
+
     void AbstractTableModel::LessThanFunctor::interrupt()
     {
       sharedData->setInterrupted(true);
     }
-    
-    
+
+
     bool AbstractTableModel::LessThanFunctor::interrupted()
     {
       return sharedData->interrupted();
@@ -535,14 +535,14 @@ namespace Isis
       if (left->getPointerType() != right->getPointerType())
       {
         iString msg = "Tried to compare apples to oranges";
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       }
-      
+
       if (sharedData->interrupted())
       {
         throw SortingCanceledException();
       }
-      
+
       sharedData->incrementCompareCount();
       //.fetchAndAddRelaxed(1);
 
@@ -609,13 +609,13 @@ namespace Isis
         compareCount(other.compareCount), interruptFlag(other.interruptFlag)
     {
     }
-    
-    
+
+
     AbstractTableModel::LessThanFunctorData::~LessThanFunctorData()
     {
     }
-    
-    
+
+
     int AbstractTableModel::LessThanFunctorData::getCompareCount() const
     {
       return compareCount;
@@ -626,15 +626,15 @@ namespace Isis
     {
       compareCount.fetchAndAddRelaxed(1);
     }
-    
-    
+
+
     void AbstractTableModel::LessThanFunctorData::setInterrupted(bool newStatus)
     {
       newStatus ? interruptFlag.fetchAndStoreRelaxed(1) :
                   interruptFlag.fetchAndStoreRelaxed(0);
     }
-    
-    
+
+
     bool AbstractTableModel::LessThanFunctorData::interrupted()
     {
       return interruptFlag != 0;

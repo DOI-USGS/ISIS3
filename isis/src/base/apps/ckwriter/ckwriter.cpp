@@ -8,7 +8,7 @@
 #include "SpiceKernel.h"
 #include "SpiceSegment.h"
 
-using namespace std; 
+using namespace std;
 using namespace Isis;
 
 void IsisMain() {
@@ -17,11 +17,11 @@ void IsisMain() {
   // Get the list of names of input CCD cubes to stitch together
   FileList flist;
   UserInterface &ui = Application::GetUserInterface();
-  if (ui.WasEntered("FROM")) flist.push_back(ui.GetFilename("FROM")); 
+  if (ui.WasEntered("FROM")) flist.push_back(ui.GetFilename("FROM"));
   if (ui.WasEntered("FROMLIST")) flist.Read(ui.GetFilename("FROMLIST"));
   if (flist.size() < 1) {
     string msg = "Files must be specified in FROM and/or FROMLIST - none found!";
-    throw iException::Message(iException::User,msg,_FILEINFO_);
+    throw IException(IException::User,msg,_FILEINFO_);
   }
 
   SpiceKernel kernel;
@@ -52,7 +52,7 @@ void IsisMain() {
     os.open(fFile.c_str(),ios::out);
     if (!os) {
       string mess = "Cannot create SUMMARY output file " + fFile;
-      throw iException::Message(iException::User, mess, _FILEINFO_);
+      throw IException(IException::User, mess, _FILEINFO_);
     }
     os << kernel.getSummary(comfile);
     os.close();

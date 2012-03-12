@@ -15,7 +15,7 @@
 #include "ProcessByLine.h"
 #include "Brick.h"
 #include "FileList.h"
-#include "iException.h"
+#include "IException.h"
 
 using namespace std;
 using namespace Isis;
@@ -109,7 +109,7 @@ void IsisMain() {
   if(list.size() < 1) {
     string msg = "The list file[" + ui.GetFilename("FROMLIST") +
                  " does not contain any filenames";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
 #if 0
@@ -135,7 +135,7 @@ void IsisMain() {
   else {
     string msg = "Unknow value for INTERP [" +
                  ui.GetString("INTERP") + "]";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
 //  Open the shift definitions file
@@ -166,7 +166,7 @@ void IsisMain() {
       if(obsId != (string) arch["ObservationId"]) {
         string msg = "Input file " + list[i]
                      + " has a different ObservationId";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
     }
 
@@ -174,7 +174,7 @@ void IsisMain() {
     int chan = inst["ChannelNumber"];
     if(chan != 2) {
       string msg = "Input file " + list[i] + " contains a single channel";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     int cpmm = inst["CpmmNumber"];
     int ccd = cpmm2ccd[cpmm];
@@ -263,7 +263,7 @@ void IsisMain() {
   // Check for consistent filters
   if((gotRed && gotNir) || (gotRed && gotBg) || (gotNir && gotBg)) {
     string msg = "Cannot stitch together different filter images";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // Sort the list of CCD info structs according to ascending CCD numbers
@@ -275,7 +275,7 @@ void IsisMain() {
   for(vec_sz i = 1; i < CCDlist.size(); ++i) {
     if(CCDlist[i].ccdNumber != prevCCD + 1) {
       string msg = "CCD numbers are not adjacent";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     prevCCD = CCDlist[i].ccdNumber;
   }
@@ -325,7 +325,7 @@ void IsisMain() {
       std::ostringstream mess;
       mess << "File " << CCDlist[i].filename << " does not have the required "
            << maxBands << " bands, but only " << CCDlist[i].nb;
-      iException::Message(iException::User, mess.str(), _FILEINFO_);
+      IException(IException::User, mess.str(), _FILEINFO_);
       nBandErrs++;
     }
   }
@@ -333,7 +333,7 @@ void IsisMain() {
 //  If we find any band count inconsistancies, gotta give up the ghost
   if(nBandErrs > 0) {
     std::string mess = "Band count inconsistancies exist in input cubes!";
-    throw iException::Message(iException::User, mess.c_str(), _FILEINFO_);
+    throw IException(IException::User, mess.c_str(), _FILEINFO_);
   }
 
   // Compute number of samples in output file

@@ -33,7 +33,7 @@
 #include "ProcessByLine.h"
 #include "SpecialPixel.h"
 #include "MocLabels.h"
-#include "iException.h"
+#include "IException.h"
 
 using namespace std;
 using namespace Isis;
@@ -56,7 +56,7 @@ void IsisMain() {
   if(moc.CrosstrackSumming() != 1) {
     string msg = "MOC images do not have even/odd noise problems";
     msg += " if the crosstrack summing mode greater than one";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // Get even and odd column statistics
@@ -77,7 +77,7 @@ void IsisMain() {
   // throw err if, pixel counts could result in division by zero
   if((oddCount == 0) || (evenCount == 0)) {
     string msg = "Couldn't compute column averages";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
   correctionOffset = ((evenSum / evenCount) - (oddSum / oddCount)) / 2.0;
 

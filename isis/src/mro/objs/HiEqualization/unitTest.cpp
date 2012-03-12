@@ -4,7 +4,7 @@
 #include "HiEqualization.h"
 #include "Preference.h"
 #include "ProcessByLine.h"
-#include "iException.h"
+#include "IException.h"
 
 using namespace std;
 using namespace Isis;
@@ -67,8 +67,8 @@ int main(int argc, char *argv[]) {
       p.EndProcess();
     }
   }
-  catch (iException &e) {
-    e.Report();
+  catch (IException &e) {
+    e.print();
   }
 }
 

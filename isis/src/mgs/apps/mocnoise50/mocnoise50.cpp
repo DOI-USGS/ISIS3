@@ -19,8 +19,8 @@
 #include "Isis.h"
 #include "ProcessByLine.h"
 #include "SpecialPixel.h"
-#include "iException.h"
-#include "iException.h"
+#include "IException.h"
+#include "IException.h"
 #include "Pvl.h"
 #include "MocLabels.h"
 
@@ -55,14 +55,14 @@ void IsisMain() {
   if(moc.WideAngle()) {
     string msg = "The 50 sample noise pattern does not occur in ";
     msg += "MOC wide angle images";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // Must have crosstrack summing of 1
   if(moc.CrosstrackSumming() != 1) {
     string msg = "The 50 sample noise pattern does not occur in ";
     msg += "MOC narrow angle images with crosstrack summing greater than one";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // Initializations

@@ -10,7 +10,7 @@
 #include "ControlPoint.h"
 #include "ControlPointGraphicsItem.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "Latitude.h"
 #include "Longitude.h"
 #include "MosaicGraphicsView.h"
@@ -152,8 +152,7 @@ namespace Isis {
             }
           }
         }
-        catch(iException &e) {
-          e.Clear();
+        catch(IException &) {
         }
       }
     }
@@ -185,8 +184,7 @@ namespace Isis {
         result = QString::fromStdString(
             m_serialNumbers->Filename(sn.toStdString()));
       }
-      catch(iException &e) {
-        e.Clear();
+      catch(IException &) {
       }
     }
 
@@ -235,8 +233,7 @@ namespace Isis {
         try {
           m_serialNumbers->Add(filename.toStdString());
         }
-        catch(iException &e) {
-          e.Clear();
+        catch(IException &) {
         }
       }
 
@@ -262,4 +259,3 @@ namespace Isis {
     }
   }
 }
-

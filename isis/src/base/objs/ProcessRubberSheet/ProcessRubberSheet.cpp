@@ -46,18 +46,18 @@ namespace Isis {
    * @param interp A fully initialized Interpolator object. The Interpolate
    *               member of this object is used to calculate output pixel values.
    *
-   * @throws Isis::iException::Message
+   * @throws Isis::IException::Message
    */
   void ProcessRubberSheet::StartProcess(Isis::Transform &trans,
                                         Isis::Interpolator &interp) {
     // Error checks ... there must be one input and one output
     if(InputCubes.size() != 1) {
       string m = "You must specify exactly one input cube";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
     else if(OutputCubes.size() != 1) {
       string m = "You must specify exactly one output cube";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     // allocate the sampMap/lineMap vectors

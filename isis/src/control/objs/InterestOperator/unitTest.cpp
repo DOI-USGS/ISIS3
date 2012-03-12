@@ -54,8 +54,8 @@ int main() {
               << "Line : " << iop->CubeLine() << std::endl
               << "Interest: " << iop->InterestAmount() << std::endl;
   }
-  catch (iException &e) {
-    e.Report();
+  catch (IException &e) {
+    e.print();
   }
 
 

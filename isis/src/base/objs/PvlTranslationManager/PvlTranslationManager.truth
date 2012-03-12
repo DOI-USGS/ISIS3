@@ -5,22 +5,22 @@ Testing Isis::PvlTranslationManager object
     NumberOfBands   = 27
     PixelResolution = 100
     Error messages:
-    **PROGRAMMER ERROR** Unable to find input group [Bad1,Bad2,Bad3] for output name [BadGroup] in file []
-    **PROGRAMMER ERROR** Unable to find input keyword [BadKey] for output name [GoodGroupBadKey] in file []
+    **PROGRAMMER ERROR** Unable to find input group [Bad1,Bad2,Bad3] for output name [BadGroup] in file [].
+    **PROGRAMMER ERROR** Unable to find input keyword [BadKey] for output name [GoodGroupBadKey] in file [].
 
   Testing InputUnits member
     PixelResolution = meters
     NumberOfBands   = 
     Error messages:
-    **PROGRAMMER ERROR** Unable to find input group [Bad1,Bad2,Bad3] for output name [BadGroup] in file []
-    **PROGRAMMER ERROR** Unable to find input keyword [BadKey] for output name [GoodGroupBadKey] in file []
+    **PROGRAMMER ERROR** Unable to find input group [Bad1,Bad2,Bad3] for output name [BadGroup] in file [].
+    **PROGRAMMER ERROR** Unable to find input keyword [BadKey] for output name [GoodGroupBadKey] in file [].
 
   Testing InputSize member
     BandName        = 3
     PixelResolution = 1
     Error messages:
-    **PROGRAMMER ERROR** Unable to find input group [Bad1,Bad2,Bad3] for output name [BadGroup] in file []
-    **PROGRAMMER ERROR** Unable to find input keyword [BadKey] for output name [GoodGroupBadKey] in file []
+    **PROGRAMMER ERROR** Unable to find input group [Bad1,Bad2,Bad3] for output name [BadGroup] in file [].
+    **PROGRAMMER ERROR** Unable to find input keyword [BadKey] for output name [GoodGroupBadKey] in file [].
 
   Testing InputHasKeyword member
     BandName        = 1

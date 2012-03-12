@@ -23,7 +23,7 @@
 #include "Camera.h"
 #include "CameraFactory.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "iTime.h"
 #include "Mariner10Camera.h"
 #include "Preference.h"
@@ -132,8 +132,8 @@ int main(void) {
       cout << endl << "--------------------------------------------" << endl;
     }
   }
-  catch(iException &e) {
-    e.Report();
+  catch(IException &e) {
+    e.print();
   }
 }
 

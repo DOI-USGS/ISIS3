@@ -26,7 +26,7 @@
 #include <QHBoxLayout>
 #include <QApplication>
 
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "MainWindow.h"
 #include "MdiCubeViewport.h"
@@ -90,13 +90,13 @@ namespace Isis {
   }
 
   /**
-   * Adds the action to the toolpad.  The icon used will be the magnifying 
-   * glass.  The tool tip reads "Zoom (Z)" with shortcut key "Z". 
+   * Adds the action to the toolpad.  The icon used will be the magnifying
+   * glass.  The tool tip reads "Zoom (Z)" with shortcut key "Z".
    *
    *
    * @param toolpad Toolpad to which the zoom tool will be added
    *
-   * @return QAction* ZoomTool action defined by the cursor, ToolTip, 
+   * @return QAction* ZoomTool action defined by the cursor, ToolTip,
    */
   QAction *ZoomTool::toolPadAction(ToolPad *toolpad) {
     QAction *action = new QAction(toolpad);
@@ -112,9 +112,9 @@ namespace Isis {
 
 
   /**
-   * Adds the zoom action to the given menu.  This will include the Zoom In (by 
-   * factor of 2), Zoom Out (by factor of 1/2), Zoom Actual (1:1) and Zoom Fit 
-   * actions. 
+   * Adds the zoom action to the given menu.  This will include the Zoom In (by
+   * factor of 2), Zoom Out (by factor of 1/2), Zoom Actual (1:1) and Zoom Fit
+   * actions.
    *
    *
    * @param menu Pointer to the QMenu
@@ -129,9 +129,9 @@ namespace Isis {
 
   /**
    * Creates the widget to add to the tool bar.  For each button, this method
-   * assigns the icons, ToolTips, WhatsThis, and connects a slot to the clicked 
-   * signal.  The following buttons are included 
-   * <UL> 
+   * assigns the icons, ToolTips, WhatsThis, and connects a slot to the clicked
+   * signal.  The following buttons are included
+   * <UL>
    *   <LI> Zoom In - uses the magnifying glass with "+" icon and shortcut +
    *   <LI> Zoom Out - uses the magnifying glass with "-" icon and shortcut -
    *   <LI> Zoom 1:1 - uses the magnifying glass with "1:1" icon and shortcut /
@@ -315,8 +315,8 @@ namespace Isis {
    *
    */
   void ZoomTool::zoomActual() {
-    // zoom factor passed in is 0 
-    // this will indicate to set new scale to 1 in zoomBy() 
+    // zoom factor passed in is 0
+    // this will indicate to set new scale to 1 in zoomBy()
     zoomBy(0.0);
   }
 
@@ -325,8 +325,8 @@ namespace Isis {
    * Zoom by the given factor.
    *
    *
-   * @param factor Zoom factor value 
-   * @internal 
+   * @param factor Zoom factor value
+   * @internal
    *   @history 2010-07-12 Jeannie Walldren - Modified to call this object's
    *                          setScale method.
    *   @history 2010-07-12 Jeannie Walldren - Replaced checks for newScale==0
@@ -338,7 +338,7 @@ namespace Isis {
     double newScale = d->scale() * factor;
     if(newScale == 0.0) {
       // if zoomActual was called (1:1) the factor was set to 0.
-      // change scale to 1.0 
+      // change scale to 1.0
       newScale = 1.0;
     }
     setScale(d, newScale);
@@ -352,7 +352,7 @@ namespace Isis {
           newScale = d->scale() * factor;
           if(newScale == 0.0) {
             // if zoomActual was called (1:1) the factor was set to 0.
-            // change scale to 1.0 
+            // change scale to 1.0
             newScale = 1.0;
           }
           setScale(d, newScale);
@@ -364,7 +364,7 @@ namespace Isis {
 
   /**
    * Fits the cube in the viewport.
-   * @internal 
+   * @internal
    *   @history 2010-07-12 Jeannie Walldren - Modified to call this object's
    *                          setScale method.
    */
@@ -390,7 +390,7 @@ namespace Isis {
   /**
    * Slot for the "Fit to Width" menu item on the Fit button.  This will
    * display the cube so that the entire cube width is displayed.
-   * @internal 
+   * @internal
    *   @history 2010-07-12 Jeannie Walldren - Modified to call this object's
    *                          setScale method.
    */
@@ -416,7 +416,7 @@ namespace Isis {
    * Slot for the "Fit to Heighth" menu item on the Fit button.  This will display
    * the cube so that the entire cube heighth is displayed.
    *
-   * @internal 
+   * @internal
    *   @history 2010-07-12 Jeannie Walldren - Modified to call this object's
    *                          setScale method.
    */
@@ -442,7 +442,7 @@ namespace Isis {
    * This method zooms by the value input in the line edit next to
    * the zoom tools.
    *
-   * @internal 
+   * @internal
    *   @history 2010-07-12 Jeannie Walldren - Modified to call this object's
    *                          setScale method.
    */
@@ -489,7 +489,7 @@ namespace Isis {
    * by the RubberBandTool or will handle different zoom methods
    * specified by the last RubberBandTool's  mouse button.
    *
-   * @internal 
+   * @internal
    *   @history 2010-07-12 Jeannie Walldren - Modified to call this object's
    *                          setScale method.
    *   @history 2010-07-12 Jeannie Walldren - Replaced checks for newScale==0
@@ -557,7 +557,7 @@ namespace Isis {
       double newScale = d->scale() * factor;
       if(newScale == 0.0) {
         // ctrl+middle (1:1) the factor was set to 0.
-        // change scale to 1.0 
+        // change scale to 1.0
         newScale = 1.0;
       }
       QPoint p = RubberBandTool::getVertices()[0];
@@ -572,7 +572,7 @@ namespace Isis {
             newScale = d->scale() * factor;
             if(newScale == 0.0) {
               // ctrl+middle (1:1) the factor was set to 0.
-              // change scale to 1.0 
+              // change scale to 1.0
               newScale = 1.0;
             }
             newScale = setScale(d, newScale, p.x(), p.y());
@@ -598,37 +598,39 @@ namespace Isis {
   /**
    * This method will attempt to reset the scale for the given MdiCubeViewport
    * using the new scale value.  If this fails, a message box will pop up.
-   * 
+   *
    * @param d Pointer to MdiCubeViewport
    * @param newScale New scale value of the cube
-   * @return @b double The scale value used.  If the passed in value fails, this 
+   * @return @b double The scale value used.  If the passed in value fails, this
    *         will be the previous scale value.
-   * @throw iException::User "Scale value must be greater than 0." 
-   * @throw iException::User "Unable to rescale image." 
-   * @internal 
-   * @author Jeannie Walldren 
-   *   @history 2010-07-12 Jeannie Walldren - Original version. 
+   * @throw iException::User "Scale value must be greater than 0."
+   * @throw iException::User "Unable to rescale image."
+   * @internal
+   * @author Jeannie Walldren
+   *   @history 2010-07-12 Jeannie Walldren - Original version.
    *   @history 2010-07-14 Jeannie Walldren - Added error message if the new
    *                          scale value is less than or equal to 0.
-   * 
+   *
    */
   double ZoomTool::setScale(MdiCubeViewport *d, double newScale) {
 
     double oldScale = d->scale();
     try {
       if (newScale <= 0.0) {
-        throw iException::Message(iException::User,
-          "Scale value must be greater than 0.", _FILEINFO_);
+        throw IException(IException::User,
+                         "Scale value must be greater than 0.",
+                         _FILEINFO_);
       }
       d->setScale(newScale);
     }
-    catch (iException &e) {
-      e.Message(iException::User, 
-        "Unable to rescale image to [" 
-        + iString(newScale*100) + "]", _FILEINFO_);
-      QString message = e.Errors().c_str();
+    catch (IException &e) {
+      IException fullError(e,
+                           IException::User,
+                           "Unable to rescale image to ["
+                           + iString(newScale*100) + "]",
+                           _FILEINFO_);
+      QString message = fullError.toString();
       QMessageBox::warning((QWidget *)parent(), "Warning", message);
-      e.Clear();
       newScale = oldScale;
       d->setScale(newScale);
     }
@@ -637,21 +639,21 @@ namespace Isis {
 
 
   /**
-   * This method will attempt to reset the scale for the given MdiCubeViewport at 
+   * This method will attempt to reset the scale for the given MdiCubeViewport at
    * the x, y values using the new scale value.  If this fails, a message box will
-   * pop up. 
-   * 
+   * pop up.
+   *
    * @param d Pointer to MdiCubeViewport
-   * @param newScale New scale value of the cube 
-   * @param x 
-   * @param y 
-   * @return @b double The scale value used.  If the passed in value fails, this 
+   * @param newScale New scale value of the cube
+   * @param x
+   * @param y
+   * @return @b double The scale value used.  If the passed in value fails, this
    *         will be the previous scale value.
-   * @throw iException::User "Scale value must be greater than 0." 
-   * @throw iException::User "Unable to rescale image." 
-   * @internal 
-   * @author Jeannie Walldren 
-   *   @history 2010-07-12 Jeannie Walldren - Original version. 
+   * @throw iException::User "Scale value must be greater than 0."
+   * @throw iException::User "Unable to rescale image."
+   * @internal
+   * @author Jeannie Walldren
+   *   @history 2010-07-12 Jeannie Walldren - Original version.
    *   @history 2010-07-14 Jeannie Walldren - Added error message if the new
    *                          scale value is less than or equal to 0.
    */
@@ -660,18 +662,18 @@ namespace Isis {
     double oldScale = d->scale();
     try {
       if (newScale <= 0.0) {
-        throw iException::Message(iException::User,
-          "Scale value must be greater than 0.", _FILEINFO_);
+        throw IException(IException::User,
+            "Scale value must be greater than 0.", _FILEINFO_);
       }
       d->setScale(newScale, x, y);
     }
-    catch (iException &e) {
-      e.Message(iException::User, 
-        "Unable to rescale image to [" 
-        + iString(newScale*100) + "]", _FILEINFO_);
-      QString message = e.Errors().c_str();
+    catch (IException &e) {
+      IException fullError(e, IException::User,
+                           "Unable to rescale image to ["
+                           + iString(newScale * 100) + "]",
+                           _FILEINFO_);
+      QString message = fullError.toString();
       QMessageBox::warning((QWidget *)parent(), "Warning", message);
-      e.Clear();
       newScale = oldScale;
       d->setScale(newScale, x, y);
     }
@@ -679,21 +681,21 @@ namespace Isis {
   }
 
   /**
-   * This method will attempt to reset the scale for the given MdiCubeViewport at 
+   * This method will attempt to reset the scale for the given MdiCubeViewport at
    * the x, y values using the new scale value.  If this fails, a message box will
-   * pop up. 
-   * 
+   * pop up.
+   *
    * @param d Pointer to MdiCubeViewport
-   * @param newScale New scale value of the cube 
+   * @param newScale New scale value of the cube
    * @param samp
    * @param line
-   * @return @b double The scale value used.  If the passed in value fails, this 
+   * @return @b double The scale value used.  If the passed in value fails, this
    *         will be the previous scale value.
-   * @throw iException::User "Scale value must be greater than 0." 
-   * @throw iException::User "Unable to rescale image." 
-   * @internal 
-   * @author Jeannie Walldren 
-   *   @history 2010-07-12 Jeannie Walldren - Original version. 
+   * @throw iException::User "Scale value must be greater than 0."
+   * @throw iException::User "Unable to rescale image."
+   * @internal
+   * @author Jeannie Walldren
+   *   @history 2010-07-12 Jeannie Walldren - Original version.
    *   @history 2010-07-14 Jeannie Walldren - Added error message if the new
    *                          scale value is less than or equal to 0.
    */
@@ -702,18 +704,19 @@ namespace Isis {
     double oldScale = d->scale();
     try {
       if (newScale <= 0.0) {
-        throw iException::Message(iException::User,
-          "Scale value must be greater than 0.", _FILEINFO_);
+        throw IException(IException::User,
+            "Scale value must be greater than 0.", _FILEINFO_);
       }
       d->setScale(newScale, samp, line);
     }
-    catch (iException &e) {
-      e.Message(iException::User, 
-        "Unable to rescale image to [" 
-        + iString(newScale*100) + "]", _FILEINFO_);
-      QString message = e.Errors().c_str();
+    catch (IException &e) {
+      IException fullError(e,
+                           IException::User,
+                           "Unable to rescale image to ["
+                           + iString(newScale*100) + "]",
+                           _FILEINFO_);
+      QString message = fullError.toString();
       QMessageBox::warning((QWidget *)parent(), "Warning", message);
-      e.Clear();
       newScale = oldScale;
       d->setScale(newScale, samp, line);
     }

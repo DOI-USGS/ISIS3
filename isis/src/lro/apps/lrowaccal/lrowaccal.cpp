@@ -65,18 +65,18 @@ void IsisMain () {
   if (instId != "WAC-VIS" && instId != "WAC-UV") {
     string msg = "This program is intended for use on LROC WAC images only. [";
     msg += icube->getFilename() + "] does not appear to be a WAC image.";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // And check if it has already run through calibration
   if (icube->getLabel()->FindObject("IsisCube").HasGroup("Radiometry")) {
     string msg = "This image has already been calibrated";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   if (icube->getLabel()->FindObject("IsisCube").HasGroup("AlphaCube")) {
     string msg = "This application can not be run on any image that has been geometrically transformed (i.e. scaled, rotated, sheared, or reflected) or cropped.";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   g_dark = ui.GetBoolean("DARK");
@@ -166,7 +166,7 @@ void IsisMain () {
       radFilename.HighestVersion();
     if (!radFilename.Exists()) {
       string msg = radFile + " does not exist.";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     Pvl radPvl(radFilename.Expanded());
@@ -201,9 +201,9 @@ void IsisMain () {
         unload_c(pckKernel2.c_str());
         unload_c(pckKernel3.c_str());
       }
-      catch (iException &e) {
+      catch (IException &e) {
         string msg = "Can not find necessary SPICE kernels for converting to IOF";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(e, IException::User, msg, _FILEINFO_);
       }
     }
     else {
@@ -382,7 +382,7 @@ void CopyCubeIntoBuffer ( string &fileString, Buffer* &data) {
     filename.HighestVersion();
   if (!filename.Exists()) {
     string msg = fileString + " does not exist.";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
   cube.open(filename.Expanded());
   Brick brick(cube.getSampleCount(), cube.getLineCount(), cube.getBandCount(), cube.getPixelType());
@@ -462,7 +462,7 @@ void GetDark(string fileString, double temp, double time, Buffer* &data1, Buffer
   // Now that we have all the available temperatures, we need to find the nearest two temperatures and interpolate (or extrapolate) between them
   if (temperatures.size() == 0) {
     string msg = "No Dark files exist for these image options [" + basename + "]";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
   else if ( temperatures.size() > 2) {
     if (abs(temp - temperatures[0]) < abs(temp - temperatures[1])){
@@ -504,15 +504,14 @@ void GetDark(string fileString, double temp, double time, Buffer* &data1, Buffer
       if ( f1.Exists() && f2.Exists() && abs(times[i] - time) < abs(bestTime - time))
         bestTime = times[i];
     }
-    catch ( Isis::iException e) {
+    catch ( IException e) {
       // We ignore exceptions as we expect them every time there is not a file with the given temperature and time
-      e.Clear(); 
     }
   }
 
   if (bestTime == -1) {
     string msg = "No Dark files exist for these image options [" + basename + "]\n no matching times";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   file1 = fileString.substr(0, tempIndex) + iString((int)temp1) + fileString.substr(tempIndex+1, timeIndex-tempIndex-1) + iString(bestTime) + fileString.substr(timeIndex+1);
@@ -566,12 +565,12 @@ void GetMask(string &fileString, double temp, Buffer* &data) {
   // Now that we have all the available temperatures, we need to find the nearest temperature
   if (temperatures.size() == 0) {
     string msg = "No Dark files exist for these image options [" + basename + "]";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   double bestTemp = temperatures[0];
   for (unsigned int i=1; i< temperatures.size(); i++) {
-    if (abs(temp - temperatures[i]) < abs(temp - bestTemp)) 
+    if (abs(temp - temperatures[i]) < abs(temp - bestTemp))
       bestTemp = temperatures[i];
   }
   index = fileString.find_first_of("*");

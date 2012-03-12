@@ -6,10 +6,10 @@
 #include "Camera.h"
 #include "SpecialPixel.h"
 #include "iTime.h"
-#include "iException.h"
+#include "IException.h"
 #include "Brick.h"
 
-using namespace std; 
+using namespace std;
 using namespace Isis;
 
 // Working functions and parameters
@@ -40,7 +40,7 @@ void IsisMain() {
   std::string mission = inst["SpacecraftName"];
   if (mission != "Mariner_10") {
     string msg = "This is not a Mariner 10 image.  Mar10cal requires a Mariner 10 image.";
-    throw iException::Message(iException::User,msg,_FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   Cube * icube = p.SetInputCube("FROM", OneBand);
@@ -49,7 +49,7 @@ void IsisMain() {
   if (icube->hasGroup("Radiometry")) {
     string msg = "This Mariner 10 image [" + icube->getFilename() + "] has "
                  "already been radiometrically calibrated";
-    throw iException::Message(iException::User,msg,_FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // Get label parameters we will need for calibration equation
@@ -58,9 +58,9 @@ void IsisMain() {
 
   iString filter = (string)(icube->getGroup("BandBin"))["FilterName"];
   filter = filter.UpCase().substr(0,3);
-  
+
   string target = inst["TargetName"];
-  
+
   iTime startTime((string) inst["StartTime"]);
 
   double exposure = inst["ExposureDuration"];
@@ -77,11 +77,11 @@ void IsisMain() {
     }
     else {
       string msg = "Camera [" + camera + "] is not supported.";
-      throw iException::Message(iException::User,msg,_FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
   correctedExp = exposure + exposureOffset;
- 
+
   Cube * dcCube;
   if (ui.WasEntered ("DCCUBE") ) {
     dcCube = p.SetInputCube("DCCUBE");
@@ -107,7 +107,7 @@ void IsisMain() {
 
   if (filter == "FAB" || filter == "WAF") {
     string msg = "Filter type [" + filter + "] is not supported at this time.";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   if (ui.WasEntered ("COEFCUBE")) {
@@ -132,7 +132,7 @@ void IsisMain() {
     }
     else {
       string msg = "Camera [" + camera + "] is not supported.";
-      throw iException::Message(iException::User,msg,_FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
 
@@ -144,7 +144,7 @@ void IsisMain() {
   Camera * cam = icube->getCamera();
   bool camSuccess = cam->SetImage(icube->getSampleCount()/2,icube->getLineCount()/2);
   if (!camSuccess) {
-    throw iException::Message(iException::Camera,
+    throw IException(IException::Unknown,
         "Unable to calculate the Solar Distance on [" +
         icube->getFilename() + "]", _FILEINFO_);
   }
@@ -164,14 +164,14 @@ void IsisMain() {
   calgrp += PvlKeyword("AbsoluteCoefficient", absCoef);
 
   ocube->putGroup(calgrp);
-  
+
   // Start the line-by-line calibration sequence
   p.StartProcess(Mar10Cal);
   p.EndProcess();
 }
 
 // Line processing routine
-void Mar10Cal (std::vector<Isis::Buffer *> & inCubes, 
+void Mar10Cal (std::vector<Isis::Buffer *> & inCubes,
     std::vector<Isis::Buffer *> & outCubes) {
 
   Buffer & in = *inCubes[0];
@@ -218,14 +218,14 @@ void Mar10Cal (std::vector<Isis::Buffer *> & inCubes,
         for (int iteration = 0; iteration < 9; iteration++) {
 
           // Ax^3 + Bx^2 + Cx + D = 0 'normal cubic equation'
-          double numerator = 
+          double numerator =
             (coef->at(coef->Index(samp+1, in.Line(), 4)) * pow(x, 3)) +
             (coef->at(coef->Index(samp+1, in.Line(), 3)) * pow(x, 2)) +
             (coef->at(coef->Index(samp+1, in.Line(), 2)) * x) +
             (coef->at(coef->Index(samp+1, in.Line(), 1)) - dcCorrected);
 
           // Ax^2 + Bx + C = 0
-          double denominator = 
+          double denominator =
             (3 * coef->at(coef->Index(samp+1, in.Line(), 4)) * pow(x, 2)) +
             (2 * coef->at(coef->Index(samp+1, in.Line(), 3)) * x) +
             coef->at(coef->Index(samp+1, in.Line(), 2));

@@ -6,7 +6,7 @@
 #include "Brick.h"
 #include "Camera.h"
 #include "CameraPointInfo.h"
-#include "iException.h"
+#include "IException.h"
 #include "iTime.h"
 #include "Progress.h"
 #include "SpecialPixel.h"
@@ -133,7 +133,7 @@ void IsisMain() {
   else {
     if(ui.GetString("FORMAT") == "FLAT") {
       string msg = "Flat file must have a name.";
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
   delete point;

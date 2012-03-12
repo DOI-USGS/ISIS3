@@ -1,5 +1,5 @@
 #include <iostream>
-#include "iException.h"
+#include "IException.h"
 #include "CameraFactory.h"
 #include "Pvl.h"
 #include "Preference.h"
@@ -36,8 +36,8 @@ void doit(Isis::Pvl &lab) {
     cerr << "Version: ";
     cerr << Isis::CameraFactory::CameraVersion(lab) << endl;
   }
-  catch(Isis::iException &error) {
-    error.Report(false);
+  catch(Isis::IException &error) {
+    error.print();
   }
 
   cerr << endl;
@@ -45,8 +45,8 @@ void doit(Isis::Pvl &lab) {
   try {
     Isis::CameraFactory::Create(lab);
   }
-  catch(Isis::iException &error) {
-    error.Report(false);
+  catch(Isis::IException &error) {
+    error.print();
   }
 
   cerr << endl;

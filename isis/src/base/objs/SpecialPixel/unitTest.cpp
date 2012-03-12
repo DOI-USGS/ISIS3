@@ -1,6 +1,6 @@
 #include <iostream>
 #include <iomanip>
-#include "iException.h"
+#include "IException.h"
 #include "SpecialPixel.h"
 #include "Preference.h"
 
@@ -221,57 +221,57 @@ int main(int argc, char *argv[]) {
     s = "Nl";
     Isis::StringToPixel(s);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
   try {
     s = "Nulll";
     Isis::StringToPixel(s);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
   try {
     s = "L";
     Isis::StringToPixel(s);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
   try {
     s = "Ls";
     Isis::StringToPixel(s);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
   try {
     s = "H";
     Isis::StringToPixel(s);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
   try {
     s = "Hs";
     Isis::StringToPixel(s);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
   try {
     s = "Hrsr";
     Isis::StringToPixel(s);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
   try {
     s = "nonsense";
     Isis::StringToPixel(s);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
   cout << endl;
 }

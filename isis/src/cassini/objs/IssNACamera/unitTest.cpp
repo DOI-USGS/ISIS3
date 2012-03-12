@@ -24,7 +24,7 @@
 #include "Camera.h"
 #include "CameraFactory.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "iTime.h"
 #include "IssNACamera.h"
 #include "Preference.h"
@@ -89,8 +89,8 @@ int main(void) {
     cout << "\nFor center pixel position ..." << endl;
     TestLineSamp(cam, samp, line);
   }
-  catch(iException &e) {
-    e.Report();
+  catch(IException &e) {
+    e.print();
   }
 }
 

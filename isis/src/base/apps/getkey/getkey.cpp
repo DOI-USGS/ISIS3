@@ -82,7 +82,7 @@ void IsisMain() {
     if(key.Size() < i) {
       string msg = "The value entered for [KEYINDEX] is out of the array ";
       msg += "bounds for the keyword [" + ui.GetString("KEYWORD") + "]";
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     // Get the keyword value
     else value = key[i-1];

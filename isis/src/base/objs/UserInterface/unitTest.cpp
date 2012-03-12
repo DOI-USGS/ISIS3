@@ -1,6 +1,6 @@
 #include <iostream>
 #include "UserInterface.h"
-#include "iException.h"
+#include "IException.h"
 #include "Preference.h"
 #include "Filename.h"
 
@@ -236,8 +236,8 @@ int main(int argc, char *argv[]) {
       cout << "GUI:     " << ui.IsInteractive() << endl;
       cout << endl;
     }
-    catch(Isis::iException &e) {
-      e.Report(false);
+    catch(Isis::IException &e) {
+      e.print();
       cout << endl;
     }
 
@@ -262,8 +262,8 @@ int main(int argc, char *argv[]) {
       cout << "GUI:     " << ui.IsInteractive() << endl;
       cout << endl;
     }
-    catch(Isis::iException &e) {
-      e.Report(false);
+    catch(Isis::IException &e) {
+      e.print();
       cout << endl;
     }
 
@@ -279,8 +279,8 @@ int main(int argc, char *argv[]) {
       cout << "GUI:     " << ui.IsInteractive() << endl;
       cout << endl;
     }
-    catch(Isis::iException &e) {
-      e.Report(false);
+    catch(Isis::IException &e) {
+      e.print();
       cout << endl;
     }
 
@@ -296,8 +296,8 @@ int main(int argc, char *argv[]) {
       cout << "GUI:     " << ui.IsInteractive() << endl;
       cout << endl;
     }
-    catch(Isis::iException &e) {
-      e.Report(false);
+    catch(Isis::IException &e) {
+      e.print();
       cout << endl;
     }
 
@@ -312,8 +312,8 @@ int main(int argc, char *argv[]) {
       cout << "GUI:     " << ui.IsInteractive() << endl;
       cout << endl;
     }
-    catch(Isis::iException &e) {
-      e.Report(false);
+    catch(Isis::IException &e) {
+      e.print();
       cout << endl;
     }
 
@@ -324,8 +324,8 @@ int main(int argc, char *argv[]) {
 
       Isis::UserInterface ui(unitTestXml, myArgc, myArgv);
     }
-    catch(Isis::iException &e) {
-      e.Report(false);
+    catch(Isis::IException &e) {
+      e.print();
       cout << endl;
     }
 
@@ -336,11 +336,11 @@ int main(int argc, char *argv[]) {
 
       Isis::UserInterface ui(unitTestXml, myArgc, myArgv);
     }
-    catch(Isis::iException &e) {
-      e.Report(false);
+    catch(Isis::IException &e) {
+      e.print();
     }
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 }

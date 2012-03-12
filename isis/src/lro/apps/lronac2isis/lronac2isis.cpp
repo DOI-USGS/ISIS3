@@ -2,7 +2,7 @@
 #include "ProcessImportPds.h"
 #include "UserInterface.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "Pvl.h"
 #include "OriginalLabel.h"
@@ -40,7 +40,7 @@ void IsisMain() {
       id = (string) lab.FindKeyword("DATA_SET_ID");
     else {
       string msg = "Unable to read [DATA_SET_ID] from input file [" + inFile.Expanded() + "]";
-      throw iException::Message(iException::Io, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     //Checks if in file is rdr
@@ -48,7 +48,7 @@ void IsisMain() {
     if(projected) {
       string msg = "[" + inFile.Name() + "] appears to be an rdr file.";
       msg += " Use pds2isis.";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     sumMode = (int) lab.FindKeyword("CROSSTRACK_SUMMING");
@@ -60,7 +60,7 @@ void IsisMain() {
 
     if(mtermKeyword.Size() != xtermKeyword.Size() || btermKeyword.Size() != xtermKeyword.Size()) {
       string msg = "The decompanding terms do not have the same dimensions";
-      throw iException::Message(iException::Io, msg, _FILEINFO_);
+      throw IException(IException::Io, msg, _FILEINFO_);
     }
 
     for(int i = 0; i < xtermKeyword.Size(); i++) {
@@ -76,9 +76,9 @@ void IsisMain() {
     else
       g_flip = false;
   }
-  catch(iException &e) {
+  catch(IException &e) {
     string msg = "The PDS header is missing important keyword(s).";
-    throw iException::Message(iException::Io, msg, _FILEINFO_);
+    throw IException(IException::Io, msg, _FILEINFO_);
   }
 
   id.ConvertWhiteSpace();
@@ -87,7 +87,7 @@ void IsisMain() {
   if(id.substr(13, 3) != "EDR") {
     string msg = "Input file [" + inFile.Expanded() + "] does not appear to be "
                  + "in LROC-NAC EDR format. DATA_SET_ID is [" + id + "]";
-    throw iException::Message(iException::Io, msg, _FILEINFO_);
+    throw IException(IException::Io, msg, _FILEINFO_);
   }
 
   //Process the file

@@ -4,7 +4,7 @@
 
 #include "ProcessByBrick.h"
 #include "Pixel.h"
-#include "iException.h"
+#include "IException.h"
 
 using namespace std;
 using namespace Isis;

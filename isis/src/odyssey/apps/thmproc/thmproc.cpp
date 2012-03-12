@@ -11,7 +11,7 @@ void IsisMain() {
 
   if(!ui.GetBoolean("INGESTION") && !ui.GetBoolean("MAPPING")) {
     string msg = "You must pick one of [INGESTION,MAPPING]";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   if(ui.GetBoolean("INGESTION")) {

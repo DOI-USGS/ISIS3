@@ -7,7 +7,7 @@
 #include "ProjectionFactory.h"
 #include "ProcessRubberSheet.h"
 
-#include "iException.h"
+#include "IException.h"
 
 using namespace std;
 using namespace Isis;
@@ -291,7 +291,7 @@ void LoadMapRes() {
   else {
     string msg = "Mapfile [" + ui.GetFilename("MAP") +
                  "] does not have [SCALE] keyword to load";
-    throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 }
 
@@ -349,7 +349,7 @@ void LoadMapRange() {
   if(count < 4) {
     string msg = "One or more of the values for the sky range was not found";
     msg += " in [" + ui.GetFilename("MAP") + "]";
-    throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 }
 

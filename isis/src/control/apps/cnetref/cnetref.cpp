@@ -10,7 +10,7 @@
 #include "GuiEditFile.h"
 #include "InterestOperatorFactory.h"
 #include "InterestOperator.h"
-#include "iException.h"
+#include "IException.h"
 #include "Progress.h"
 #include "Pvl.h"
 
@@ -53,7 +53,7 @@ void IsisMain() {
 
       if (pvlDefFile->Group(0).HasKeyword("PixelsFromEdge") && pvlDefFile->Group(0).HasKeyword("MetersFromEdge")) {
         string message = "DefFile Error : Cannot have both \"PixelsFromEdge\" && \"MetersFromEdge\"" ;
-        throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+        throw IException(IException::User, message, _FILEINFO_);
       }
 
       Pvl pvlTemplate, pvlResults;
@@ -67,7 +67,7 @@ void IsisMain() {
       if (pvlResults.Groups() > 0 || pvlResults.Keywords() > 0) {
         Application::Log(pvlResults.Group(0));
         string sErrMsg = "Invalid Deffile\n";
-        throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_);
+        throw IException(IException::User, sErrMsg, _FILEINFO_);
       }
     }
 
@@ -117,7 +117,7 @@ void IsisMain() {
         dResValue = ui.GetDouble("RESVALUE");
         if (dResValue < 0) {
           std::string message = "Invalid Nearest Resolution Value";
-          throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+          throw IException(IException::User, message, _FILEINFO_);
         }
       }
       else if (sType == "RANGE") {
@@ -125,7 +125,7 @@ void IsisMain() {
         dMaxRes = ui.GetDouble("MAXRES");
         if (dMinRes < 0 || dMaxRes < 0 || dMinRes > dMaxRes) {
           std::string message = "Invalid Resolution Range";
-          throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+          throw IException(IException::User, message, _FILEINFO_);
         }
       }
       cnetValidMeas = new CnetRefByResolution(pvlDefFile, sSerialNumFile, GetResolutionType(sType), dResValue, dMinRes, dMaxRes);
@@ -136,7 +136,7 @@ void IsisMain() {
     else if (sCriteria == "INTEREST") {
       if (!bDefFile) {
         std::string msg = "Interest Option must have a DefFile";
-        throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
       std::string sOverlapListFile = "";
       if (ui.WasEntered("LIMIT")) {
@@ -161,7 +161,7 @@ void IsisMain() {
       Application::Log(interestOp->GetStdOptions());
       Application::Log(interestOp->GetStatistics());
     }
-    
+
     // Write the new control network out
     cNet.Write(ui.GetFilename("ONET"));
 
@@ -170,7 +170,7 @@ void IsisMain() {
     ControlNetStatistics cnetStats(&cNet);
     cnetStats.GenerateControlNetStats(statsGrp);
     Application::Log(statsGrp);
-    
+
     if (cnetValidMeas) {
       Pvl pvlLog = cnetValidMeas->GetLogPvl();
       if (bLogFile) {
@@ -184,21 +184,21 @@ void IsisMain() {
     }
 
   } // REFORMAT THESE ERRORS INTO ISIS TYPES AND RETHROW
-  catch (Isis::iException &e) {
+  catch (IException &e) {
     throw;
   }
   catch (geos::util::GEOSException *exc) {
     string message = "GEOS Exception: " + (iString)exc->what();
     delete exc;
-    throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+    throw IException(IException::User, message, _FILEINFO_);
   }
   catch (std::exception const &se) {
     string message = "std::exception: " + (iString)se.what();
-    throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+    throw IException(IException::User, message, _FILEINFO_);
   }
   catch (...) {
     string message = "Other Error";
-    throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+    throw IException(IException::User, message, _FILEINFO_);
   }
 }
 
@@ -228,7 +228,7 @@ ResolutionType GetResolutionType(std::string psType) {
 
 /**
  * Helper function to print out template to log.
- * 
+ *
  * @author Sharmila Prasad (5/24/2011)
  */
 void ViewDefFile() {
@@ -243,15 +243,15 @@ void ViewDefFile() {
 }
 
 /**
- * Helper function to be able to edit the Deffile. 
- * Opens an editor to edit the file. 
- * 
+ * Helper function to be able to edit the Deffile.
+ * Opens an editor to edit the file.
+ *
  * @author Sharmila Prasad (5/23/2011)
  */
 void EditDefFile(void) {
   UserInterface &ui = Application::GetUserInterface();
   string sDefFile = ui.GetAsString("DEFFILE");
-  
+
   GuiEditFile::EditFile(ui, sDefFile);
 }
 

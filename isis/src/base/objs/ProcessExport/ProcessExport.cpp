@@ -23,7 +23,7 @@
 #include <iomanip>
 #include "ProcessExport.h"
 #include "Preference.h"
-#include "iException.h"
+#include "IException.h"
 #include "LineManager.h"
 #include "BandManager.h"
 #include "SpecialPixel.h"
@@ -155,19 +155,19 @@ namespace Isis {
    * @param maximum Maximum pixel value in the input cube to be mapped to the
    *                maximum value in the Buffer
    *
-   * @throws Isis::iException::Message
+   * @throws Isis::IException::Message
    */
   void ProcessExport::SetInputRange(const double minimum, const double middle,
                                     const double maximum) {
     if(minimum >= middle) {
       string message =
         "minimum must be less than the middle [ProcessExport::SetInputRange]";
-      throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+      throw IException(IException::Programmer, message, _FILEINFO_);
     }
     if(middle >= maximum) {
       string message =
         "middle must be less than the maximum [ProcessExport::SetInputRange]";
-      throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+      throw IException(IException::Programmer, message, _FILEINFO_);
     }
     p_inputMinimum.clear();
     p_inputMinimum.resize(InputCubes.size(), minimum);
@@ -210,17 +210,17 @@ namespace Isis {
     if(minimum >= middle) {
       string message =
         "minimum must be less than the middle [ProcessExport::SetInputRange]";
-      throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+      throw IException(IException::Programmer, message, _FILEINFO_);
     }
     if(middle >= maximum) {
       string message =
         "middle must be less than the maximum [ProcessExport::SetInputRange]";
-      throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+      throw IException(IException::Programmer, message, _FILEINFO_);
     }
     if(index >= (int)InputCubes.size() || index < 0) {
       string message =
         "index out of bounds";
-      throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+      throw IException(IException::Programmer, message, _FILEINFO_);
     }
 
     p_inputMinimum.resize(index + 1, minimum);
@@ -429,7 +429,7 @@ namespace Isis {
     if(minimum >= maximum) {
       string message =
         "minimum must be less than the maximum [ProcessExport::SetOutputRange]";
-      throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+      throw IException(IException::Programmer, message, _FILEINFO_);
     }
 
     p_outputMinimum = minimum;
@@ -585,7 +585,7 @@ namespace Isis {
     if(p_format < 0 || p_format > 3) {
       string message =
         "Format of the output file must be set prior to calling this method [ProcessExport::SetOutputType]";
-      throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+      throw IException(IException::Programmer, message, _FILEINFO_);
     }
     if(pixelIn == Isis::UnsignedByte)
       SetOutputRange((double)VALID_MIN1, (double)VALID_MAX1);
@@ -597,7 +597,7 @@ namespace Isis {
       if(p_format == JP2) {
         string message =
           "Unsupported bit type for JP2 formatted files [ProcessExport::SetOutputType]";
-        throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+        throw IException(IException::Programmer, message, _FILEINFO_);
       }
       else {
         SetOutputRange(-DBL_MAX, DBL_MAX);
@@ -605,7 +605,7 @@ namespace Isis {
     else {
       string message =
         "Unsupported bit type [ProcessExport::SetOutputType]";
-      throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+      throw IException(IException::Programmer, message, _FILEINFO_);
     }
   }
 
@@ -650,7 +650,7 @@ namespace Isis {
   void ProcessExport::InitProcess() {
     if(InputCubes.size() < 1) {
       string m = "You have not specified any input cubes";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     // Construct a line buffer manager
@@ -721,7 +721,7 @@ namespace Isis {
     }
     else {
       string m = "Invalid storage order.";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     // Loop and let the app programmer fiddle with the buffers
@@ -771,7 +771,7 @@ namespace Isis {
     }
     else {
       string m = "Invalid storage order.";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
   }
@@ -808,7 +808,7 @@ namespace Isis {
       }
       else {
         string m = "All input cubes must have the same dimensions";
-        throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+        throw IException(IException::Programmer, m, _FILEINFO_);
       }
     }
 
@@ -870,7 +870,7 @@ namespace Isis {
       }
       else {
         string m = "All input cubes must have the same dimensions";
-        throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+        throw IException(IException::Programmer, m, _FILEINFO_);
       }
     }
 
@@ -931,7 +931,7 @@ namespace Isis {
       }
       else {
         string m = "All input cubes must have the same dimensions";
-        throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+        throw IException(IException::Programmer, m, _FILEINFO_);
       }
     }
 
@@ -990,7 +990,7 @@ namespace Isis {
     }
     else {
       string m = "Output stream cannot be generated for requested storage order type.";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     // Loop for each line of data
@@ -1216,8 +1216,7 @@ namespace Isis {
 
       os.close();
     }
-    catch(iException &e) {
-      e.Clear();
+    catch(IException &e) {
     }
   }
 }

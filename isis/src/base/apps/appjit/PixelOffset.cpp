@@ -13,7 +13,7 @@
 #include "BasisFunction.h"
 #include "PolynomialUnivariate.h"
 #include "iString.h"
-#include "iException.h"
+#include "IException.h"
 
 
 namespace Isis {
@@ -62,7 +62,7 @@ namespace Isis {
       int num = iString::Split(' ', iString::ConvertWhiteSpace(lines[iline]), fields, false);
       if(num != 3) {
         Isis::iString msg = "Three fields are required:  sample, line, and ephemeris time.";
-        throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+        throw IException(IException::Io, msg, _FILEINFO_);
       }
       p_samples.push_back(iString::ToDouble(fields[0]));
       p_lines.push_back(iString::ToDouble(fields[1]));
@@ -127,7 +127,7 @@ namespace Isis {
     else  {
       std::string msg;
       msg = "Error in extrapolation code";
-      throw iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if(index < 0) index = 0;
@@ -239,7 +239,7 @@ namespace Isis {
     if(fitAng1->Knowns() == 0) {
       std::string msg;
       msg = "Cube time range is not covered by jitter file";
-      throw iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     //Solve the equations for the coefficients

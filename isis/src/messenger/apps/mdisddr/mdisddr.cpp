@@ -8,7 +8,7 @@
 #include "UserInterface.h"
 #include "Progress.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "ProcessExportPds.h"
 #include "Cube.h"
 #include "Histogram.h"
@@ -346,14 +346,14 @@ void IsisMain() {
     processPds.EndProcess();
     remove(pfile.c_str());
   }
-  catch(iException &ie) {
+  catch(IException &) {
     remove(pfile.c_str());
     throw;
   }
   catch(...) {
     remove(pfile.c_str());
-    throw iException::Message(iException::None, "Unexpected exception caught!",
-                              _FILEINFO_);
+    throw IException(IException::Unknown, "Unexpected exception caught!",
+                     _FILEINFO_);
   }
 
 }

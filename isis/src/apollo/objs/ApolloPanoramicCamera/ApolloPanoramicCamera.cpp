@@ -2,7 +2,7 @@
 #include "ApolloPanoramicDetectorMap.h"
 #include "iString.h"
 #include "iTime.h"
-#include "iException.h"
+#include "IException.h"
 #include "LineScanCameraDetectorMap.h"
 #include "CameraFocalPlaneMap.h"
 #include "CameraDistortionMap.h"

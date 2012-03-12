@@ -513,8 +513,8 @@ Buffer Size:  1 126 1
   Current sample, line, band is:  25 1 2
 
 Testing errors ... 
-**PROGRAMMER ERROR** Invalid value for argument [sample]
+**PROGRAMMER ERROR** Invalid value for argument [sample].
 
 Testing errors ... 
-**PROGRAMMER ERROR** Invalid value for argument [band]
+**PROGRAMMER ERROR** Invalid value for argument [band].
 

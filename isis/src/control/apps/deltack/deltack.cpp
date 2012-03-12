@@ -6,7 +6,7 @@
 #include "ControlPoint.h"
 #include "Distance.h"
 #include "History.h"
-#include "iException.h"
+#include "IException.h"
 #include "Latitude.h"
 #include "Longitude.h"
 #include "Process.h"
@@ -149,9 +149,9 @@ void IsisMain() {
     gp += PvlKeyword("Status", "Camera pointing updated");
     Application::Log(gp);
   }
-  catch(iException &e) {
+  catch(IException &e) {
     string msg = "Unable to update camera pointing for [" + filename + "]";
-    throw iException::Message(Isis::iException::Camera, msg, _FILEINFO_);
+    throw IException(e, IException::Unknown, msg, _FILEINFO_);
   }
 
 }
@@ -165,7 +165,7 @@ Distance GetRadius(std::string filename, Latitude lat, Longitude lon) {
   if(!radius.isValid()) {
     string msg = "Could not determine radius from DEM at lat/lon [";
     msg += iString(lat.degrees()) + "," + iString(lon.degrees()) + "]";
-    throw iException::Message(Isis::iException::Camera, msg, _FILEINFO_);
+    throw IException(IException::Unknown, msg, _FILEINFO_);
   }
   return radius;
 }

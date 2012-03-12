@@ -54,7 +54,7 @@
 
 
 #define FIDL  26.72093    //spacing between fiducial marks in mm
-#define ROLLC  74.0846291699105  //constant to convert from V/H to roll speed in rads/sec 
+#define ROLLC  74.0846291699105  //constant to convert from V/H to roll speed in rads/sec
 
 #define NODES  87  //must be odd!!!  number of nodes to put in tables
 
@@ -114,7 +114,7 @@ void IsisMain() {
   //int nlines,nsamples,nbands;
 
   double deg2rad = acos(-1.0)/180.0;
-  
+
   ProcessImport jp;
   Filename transFile("$apollo15/translations/apollopantranstable.trn");
   PvlTranslationTable transTable(transFile);
@@ -133,11 +133,11 @@ void IsisMain() {
   try {
     panCube.open(ui.GetFilename("FROM"),"rw");
   }
-  catch (Isis::iException &e) {
-    throw iException::Message(iException::User,
-                              "Unable to open the file [" + ui.GetFilename("FROM") + "] as a cube.",
-                              _FILEINFO_);
-  } 
+  catch (IException &e) {
+    throw IException(IException::User,
+                     "Unable to open the file [" + ui.GetFilename("FROM") + "] as a cube.",
+                     _FILEINFO_);
+  }
 
   ////////////////////////////////////////////build the cube header instrament group
   PvlGroup inst_pvlG("Instrument");
@@ -190,7 +190,7 @@ void IsisMain() {
   keyword.SetName("StopTime");
   keyword.SetValue(iStrTEMP=isisTime.UTC());
   inst_pvlG.AddKeyword(keyword);
-  
+
   keyword.SetName("LineExposureDuration");
   keyword.SetValue(iStrTEMP=-led,"sec/mm");  //converted led to msec/mm--negative sign to account for the anti-parallel time and line axes
   inst_pvlG.AddKeyword(keyword);
@@ -252,8 +252,9 @@ void IsisMain() {
   if(!found) {
     string naifTarget = string("IAU_MOOM");
     namfrm_c(naifTarget.c_str(), &frameCode);
-    if(frameCode == 0) {      string msg = "Can not find NAIF code for [" + naifTarget + "]";
-      throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+    if(frameCode == 0) {
+      string msg = "Can not find NAIF code for [" + naifTarget + "]";
+      throw IException(IException::Io, msg, _FILEINFO_);
     }
   }
   spRot = new SpiceRotation(frameCode);
@@ -261,7 +262,7 @@ void IsisMain() {
   Table tableTargetRot = spRot->Cache("BodyRotation");
   tableTargetRot.Label() += PvlKeyword("Description","Created by apollopaninit");
   panCube.write(tableTargetRot);
-  
+
 
   //////////////////////////////////////////////////attach a sun position table
   spPos = new SpicePosition(10,301);  //Position of the sun (10) WRT to the MOON (301)
@@ -286,7 +287,7 @@ void IsisMain() {
   posSel.resize(3);
   sunPos.resize(3);
   posJ20.resize(3);
-      
+
   double  temp,
           vel[3],    //the total velocity vector (combined Horizonatal and normal components) in km/sec
           M[3][3],    //rotation matrix
@@ -294,10 +295,10 @@ void IsisMain() {
           northpn[3],      //normal to the plane containing all the north/south directions, that is plane containing the origin, the z axis, and the primary point of intersection
           northl[3],    //north direction vector in local horizontal plane
           azm[3],    //azm direction of the veclocity vector in selenographic coordinates
-          azmp[3],    //azm rotated (partially) and projected into the image plane  
+          azmp[3],    //azm rotated (partially) and projected into the image plane
           norm[3],    //normal to the local horizontal plane
           look[3];    //unit direction vector in the pincipal cameral look direction, parallel to the vector from the center of the moon through the spacecraft
-  
+
   double  pos0[3],  //coordinate of the camera position
           pint[3]; //coordinate of the principle intersection point
 
@@ -329,7 +330,7 @@ void IsisMain() {
   omega = -atan2(look[1],look[2]);  //omega rotation to zero look[1]
   phi   = atan2(-look[0], sin(omega)*look[1] - cos(omega)*look[2]);  //phi rotation to zero look[0]
   //use the horizontal velocity vector direction to solve for the last rotation; we will make the image x axis parallel to the in-image-plane projection of the horizontal direction of flight
-  crossp(norm,zdir,northpn); // the local normal cross the selenogrpahic z gives northpn, normal to the plane containing all the north/south directions, that is, the plane containing the origin, the z axis, and the primary point of intersection 
+  crossp(norm,zdir,northpn); // the local normal cross the selenogrpahic z gives northpn, normal to the plane containing all the north/south directions, that is, the plane containing the origin, the z axis, and the primary point of intersection
   crossp(northpn,norm,northl);   // the normal to the plane containing all the north/south directions cross the local normal direction gives the local north/south direction in the local normal plane
   if (northl[2] < 0) {  //if by chance we got the south direction change the signs
     northl[0] = -northl[0];
@@ -440,7 +441,8 @@ void IsisMain() {
   spRot->SetEphemerisTime(isisTime.Et());
   M_J2toT = spRot->Matrix();   //this actually gives the rotation from J2000 to target centric
   for(j=0;j<3;j++)    //reformating M_J2toT to a 3x3
-    for(k=0;k<3;k++)      Mtemp1[j][k] = M_J2toT[3*j+k];
+    for(k=0;k<3;k++)
+      Mtemp1[j][k] = M_J2toT[3*j+k];
   mxm_c(M0,Mtemp1,Mtemp2);
   M2Q(Mtemp2,Q[(NODES-1)/2]);  //save the middle scan line quarternion
 
@@ -561,28 +563,28 @@ void IsisMain() {
 
   if( 10.0/resolution < 0.5) play=0.5;//debug
   else play = 10.0/resolution;  //debug
-  
+
   //copy the patternS chip (the entire ApolloPanFiducialMark.cub)
   Filename fiducialFilename("$apollo15/calibration/ApolloPanFiducialMark.cub");
   fidC.open(fiducialFilename.Expanded(),"r");
   if( !fidC.isOpen() ) {
     string msg = "Unable to open the fiducial patternS cube: ApolloPanFiducialMark.cub\n";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
   refL = fidC.getLineCount();
-  refS = fidC.getSampleCount();  
+  refS = fidC.getSampleCount();
   patternS.SetSize(int((refS-2)/SCALE),int((refL-2)/SCALE));  //scaled pattern chip for fast matching
   patternS.TackCube((refS-1)/2,(refL-1)/2);
   patternS.Load(fidC,0,SCALE);
 
   //parameters for maximum correlation autoregestration  see:  file:///usgs/pkgs/isis3nightly2011-09-21/isis/doc/documents/patternSMatch/patternSMatch.html#DistanceTolerance
   Filename fiducialPvl("$apollo15/templates/apolloPanFiducialFinder.pvl");
-  pvl.Read(fiducialPvl.Expanded());  //read in the autoreg parameters  
+  pvl.Read(fiducialPvl.Expanded());  //read in the autoreg parameters
   AutoReg *arS = AutoRegFactory::Create(pvl);
 
   *arS->PatternChip()   = patternS;  //patternS chip is constant
 
-  //set up a centroid measurer  
+  //set up a centroid measurer
   CentroidApolloPan centroid(resolution);
   Chip inputChip,selectionChip;
   inputChip.SetSize(int(ceil(200*5.0/resolution)),int(ceil(200*5.0/resolution)));
@@ -619,15 +621,15 @@ void IsisMain() {
           foundFirst = true;  //once the first fiducial is found stop
         }
       }
-    }  
+    }
   }
   if(s>=averageLines+searchCellSize/2.0) {
      string msg = "Unable to locate a fiducial mark in the input cube [" + fileName + "].  Check FROM and MICRONS parameters.";
-     throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+     throw IException(IException::Io, msg, _FILEINFO_);
      return;
   }
-  
-  
+
+
   //record first fiducial measurement in the table
   recordFid[0] = 0;
   recordFid[1] = sampleInitial;
@@ -639,7 +641,7 @@ void IsisMain() {
      if (fidn == 23) s -= averageSamples/2.0;
 
      //look for the bottom fiducial
-     searchS.TackCube(s,l+averageLines);  
+     searchS.TackCube(s,l+averageLines);
      searchS.Load(panCube,0,scale);
      *arS->SearchChip()   = searchS;
      regStatus = arS->Register();
@@ -651,8 +653,8 @@ void IsisMain() {
      }
      inputChip.Load(panCube,0,1);
      centroid.selectAdaptive(&inputChip,&selectionChip);          //continuous dynamic range selection
-     //inputChip.Write("inputTemp.cub");//debug  
-     //selectionChip.Write("selectionTemp.cub");//debug        
+     //inputChip.Write("inputTemp.cub");//debug
+     //selectionChip.Write("selectionTemp.cub");//debug
      if (centroid.elipticalReduction(&selectionChip,95,play,2000) != 0 ) {      //elliptical trimming/smoothing... if this fails move on
        //selectionChip.Write("selectionTempTrimmed.cub");//getchar();//debug
        centroid.centerOfMass(&selectionChip,&sample,&line);      //center of mass to reduce selection to a single measure
@@ -662,11 +664,11 @@ void IsisMain() {
        recordFid[0] = fidn*2+1;
        recordFid[1] = sample;
        recordFid[2] = line;
-       tableFid += recordFid;      
+       tableFid += recordFid;
      }
      /*else {  //DEBUG whole else block
        if (regStatus == AutoReg::SuccessPixel) printf("DEBUG: AutoReg Success: elliptical reduction failed: initialPoint: %lf %lf\n",arS->CubeSample(),arS->CubeLine());
-       else printf("DEBUG: AutoReg Failure:  elliptical reduction failed: initialPoint: %lf %lf\n",s,l+averageLines); 
+       else printf("DEBUG: AutoReg Failure:  elliptical reduction failed: initialPoint: %lf %lf\n",s,l+averageLines);
        selectionChip.Write("selectionChip.cub");
        getchar();
      }*/
@@ -685,14 +687,14 @@ void IsisMain() {
      }
      inputChip.Load(panCube,0,1);
      centroid.selectAdaptive(&inputChip,&selectionChip);//continuous dynamic range selection
-     //inputChip.Write("inputTemp.cub");//debug        
+     //inputChip.Write("inputTemp.cub");//debug
      //selectionChip.Write("selectionTemp.cub");//debug
      if (centroid.elipticalReduction(&selectionChip,95,play,2000) !=0) {    //elliptical trimming/smoothing... if this fails move on
        //selectionChip.Write("selectionTempTrimmed.cub");//getchar();//debug
        centroid.centerOfMass(&selectionChip,&sample,&line);      //center of mass to reduce selection to a single measure
        inputChip.SetChipPosition(sample,line);
        s = inputChip.CubeSample();            //when finding the top fiducial both s and l are refined for a successful measurement, this will help follow trends in the scaned image
-       l = inputChip.CubeLine();  
+       l = inputChip.CubeLine();
        recordFid[0] = fidn*2;
        recordFid[1] = s;
        recordFid[2] = l;
@@ -712,7 +714,7 @@ void IsisMain() {
 
   delete spPos;
   delete spRot;
-  
+
   //close the new cube
   panCube.close(false);
   return;
@@ -732,7 +734,7 @@ void Load_Kernel(Isis::PvlKeyword &key) {
      Isis::Filename file(key[i]);
      if(!file.exists()) {
        string msg = "Spice file does not exist [" + file.Expanded() + "]";
-       throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+       throw IException(IException::Io, msg, _FILEINFO_);
      }
      string fileName(file.Expanded());
      furnsh_c(fileName.c_str());
@@ -743,7 +745,7 @@ void Load_Kernel(Isis::PvlKeyword &key) {
 
 void crossp(double v1[3],double v2[3],double v1cv2[3])
 {
-  //calcuate v1 cross v2 
+  //calcuate v1 cross v2
   v1cv2[0] = v1[1]*v2[2] - v1[2]*v2[1];
   v1cv2[1] = v1[2]*v2[0] - v1[0]*v2[2];
   v1cv2[2] = v1[0]*v2[1] - v1[1]*v2[0];
@@ -751,9 +753,9 @@ void crossp(double v1[3],double v2[3],double v1cv2[3])
 }
 
 void Geographic2GeocentricLunar(double geographic[3], double geocentric[3])
-/* 
+/*
   given
-  geographic -> (Lat, Lon, H) 
+  geographic -> (Lat, Lon, H)
 
   calc
   geocentric <- (X, Y, Z)
@@ -775,7 +777,7 @@ void Geographic2GeocentricLunar(double geographic[3], double geocentric[3])
 void MfromLeftEulers(double M[3][3], double omega, double phi, double kappa)
 {
   /*given three left handed Euler angles compute M 3x3 orthogonal rotation matrix
-  
+
     M    <-  3x3 rotation matrix
     omega  ->  left handed rotation (rad) around the x axis
     phi    ->  left handed rotation (rad) around the once rotated y axis
@@ -790,7 +792,8 @@ void MfromLeftEulers(double M[3][3], double omega, double phi, double kappa)
   M[1][2] = cos(omega) * sin(phi) * sin(kappa) + sin(omega) * cos(kappa);
   M[2][0] = sin(phi);
   M[2][1] = -sin(omega) * cos(phi);
-  M[2][2] = cos(omega) * cos(phi);
+  M[2][2] = cos(omega) * cos(phi);
+
 }
 
 void MfromVecLeftAngle(double M[3][3], double vec[3], double angle)
@@ -813,13 +816,13 @@ void MfromVecLeftAngle(double M[3][3], double vec[3], double angle)
   M[0][0] = cos(l) + vs[0]*vs[0] * (1 - cos(l));
   M[0][1] = vs[0] * vs[1] * (1 - cos(l)) - vs[2] * sin(l);
   M[0][2] = vs[0] * vs[2] * (1 - cos(l)) + vs[1] * sin(l);
-    
+
   M[1][0] = vs[0] * vs[1] * (1 - cos(l)) + vs[2] * sin(l);
   M[1][1] = cos(l) + vs[1]*vs[1] * (1 - cos(l));
   M[1][2] = vs[1] * vs[2] * (1 - cos(l)) - vs[0] * sin(l);
-    
+
   M[2][0] = vs[0] * vs[2] * (1 - cos(l)) - vs[1] * sin(l);
-  M[2][1] = vs[1] * vs[2] * (1 - cos(l)) + vs[0] * sin(l); 
+  M[2][1] = vs[1] * vs[2] * (1 - cos(l)) + vs[0] * sin(l);
   M[2][2] = cos(l) + vs[2]*vs[2] * (1 - cos(l));
 }
 
@@ -831,16 +834,16 @@ void M2Q(double M[3][3], double Q[4])
     Q  <-  four ellement unit quarternion
 
   */
-   
+
   //following the decomposition algorithim given at: http://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation
 
   int index[3],i;
   double temp;
-    
+
   //find the largest diagonal ellement in Md
   temp = fabs(M[0][0]);
   index[0] = 0;
-    
+
   for(i=1; i<2 ; i++)
   {
     if( fabs(M[i][i] ) > temp )
@@ -849,17 +852,17 @@ void M2Q(double M[3][3], double Q[4])
       index[0] = i;
     }
   }
-    
+
   index[1] = index[0] + 1;
   if( index[1] > 2 )
     index[1] -= 3;
-    
+
   index[2] = index[1] + 1;
   if( index[2] > 2 )
     index[2] -= 3;
-    
+
   temp = sqrt(1 + M[index[0]][index[0]] - M[index[1]][index[1]] - M[index[2]][index[2]]);
-    
+
   if( temp == 0 )
   {
     Q[0] = 1;
@@ -868,10 +871,10 @@ void M2Q(double M[3][3], double Q[4])
     Q[3] = 0;
     return;
   }
-           
+
   Q[0] = (  M[index[2]][index[1]] - M[index[1]][index[2]]  ) / (2 * temp);
   Q[index[1] + 1] = (M[index[0]][index[1]] + M[index[1]][index[0]]) / (2 * temp);
   Q[index[2] + 1] = (M[index[2]][index[0]] + M[index[0]][index[2]]) / (2 * temp);
-    
+
   Q[index[0] + 1] = temp / 2;
 }

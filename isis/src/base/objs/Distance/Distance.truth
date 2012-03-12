@@ -40,7 +40,7 @@ Distance 1 < Distance 2 ? 1
 Distance 1 + Distance 2 ? 11 meters
 Distance 1 - Distance 2 ? -9 meters
 Distance 1 -= Distance 2 ? 
-**PROGRAMMER ERROR** Negative distances are not supported, the value [-9.0 meters] cannot be stored in the Distance class
+**PROGRAMMER ERROR** Negative distances are not supported, the value [-9.0 meters] cannot be stored in the Distance class.
 Distance 1 = Distance 2... Distance 1 = 10 meters
 
 Distance 1: 10 meters
@@ -82,12 +82,12 @@ Distance 1 = Distance 2... Distance 1 = 10 meters
 
 ----- Testing Error Checking -----
 
-**PROGRAMMER ERROR** Negative distances are not supported, the value [-1.0 meters] cannot be stored in the Distance class
-**PROGRAMMER ERROR** Negative distances are not supported, the value [-1000.0 meters] cannot be stored in the Distance class
-**PROGRAMMER ERROR** Negative distances are not supported, the value [-1.0 meters] cannot be stored in the Distance class
-**PROGRAMMER ERROR** Negative distances are not supported, the value [-1.0 meters] cannot be stored in the Distance class
-**PROGRAMMER ERROR** Negative distances are not supported, the value [-1000.0 meters] cannot be stored in the Distance class
-**PROGRAMMER ERROR** Distance has not been initialized, you must initialize it first before comparing with another distance using [>]
-**PROGRAMMER ERROR** Distance has not been initialized, you must initialize it first before comparing with another distance using [>]
-**PROGRAMMER ERROR** Distance has not been initialized, you must initialize it first before comparing with another distance using [<]
-**PROGRAMMER ERROR** Distance has not been initialized, you must initialize it first before comparing with another distance using [<]
+**PROGRAMMER ERROR** Negative distances are not supported, the value [-1.0 meters] cannot be stored in the Distance class.
+**PROGRAMMER ERROR** Negative distances are not supported, the value [-1000.0 meters] cannot be stored in the Distance class.
+**PROGRAMMER ERROR** Negative distances are not supported, the value [-1.0 meters] cannot be stored in the Distance class.
+**PROGRAMMER ERROR** Negative distances are not supported, the value [-1.0 meters] cannot be stored in the Distance class.
+**PROGRAMMER ERROR** Negative distances are not supported, the value [-1000.0 meters] cannot be stored in the Distance class.
+**PROGRAMMER ERROR** Distance has not been initialized, you must initialize it first before comparing with another distance using [>].
+**PROGRAMMER ERROR** Distance has not been initialized, you must initialize it first before comparing with another distance using [>].
+**PROGRAMMER ERROR** Distance has not been initialized, you must initialize it first before comparing with another distance using [<].
+**PROGRAMMER ERROR** Distance has not been initialized, you must initialize it first before comparing with another distance using [<].

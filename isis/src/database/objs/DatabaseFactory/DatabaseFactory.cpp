@@ -371,7 +371,7 @@ namespace Isis {
     if(!isDriverAvailable(driver)) {
       string mess = "Driver [" + driver + "] for database [" + dbname
                     + "] does not exist";
-      throw iException::Message(Isis::iException::Programmer, mess, _FILEINFO_);
+      throw IException(IException::Unknown, mess, _FILEINFO_);
     }
 
     //  Create the database with the specified driver and name
@@ -400,7 +400,7 @@ namespace Isis {
 
     // One doesn't exist, throw an error
     string mess = "Database [" + dbname + "] does not exist";
-    throw iException::Message(Isis::iException::Programmer, mess, _FILEINFO_);
+    throw IException(IException::Unknown, mess, _FILEINFO_);
   }
 
   /**

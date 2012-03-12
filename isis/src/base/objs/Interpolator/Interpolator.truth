@@ -1,6 +1,6 @@
 Testing invalid interpolator
   Cought invalid interpolator error.
-**PROGRAMMER ERROR** Interpolator type not set
+**PROGRAMMER ERROR** Interpolator type not set.
 Testing Nearest Neighbor
   99.5 = 99.5000000000000
 Testing Bilinear

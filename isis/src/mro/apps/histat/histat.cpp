@@ -58,7 +58,7 @@ void IsisMain() {
   //Check to make sure we got the cube properly
   if(!inputCube.isOpen()) {
     string msg = "Could not open FROM cube" + fromFile.Expanded();
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   Process p;
@@ -329,5 +329,5 @@ void ThrowException(int vectorSize, int left, int right, string name) {
   string err;
   err = "You are trying to skip as many or more samples of the " + name +
         " than exist";
-  throw iException::Message(iException::User, err, _FILEINFO_);
+  throw IException(IException::User, err, _FILEINFO_);
 }

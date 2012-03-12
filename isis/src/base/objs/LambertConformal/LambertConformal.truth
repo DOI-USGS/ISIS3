@@ -1,20 +1,20 @@
 UNIT TEST FOR LambertConformal
 
 Test missing center longitude keyword ...
-**I/O ERROR** Invalid label group [Mapping]
-**PVL ERROR** Keyword [CenterLongitude] does not exist in [Group = Mapping]
+**I/O ERROR** Invalid label group [Mapping].
+**ERROR** PVL Keyword [CenterLongitude] does not exist in [Group = Mapping].
 
 Test missing center latitude keyword...
-**I/O ERROR** Invalid label group [Mapping]
-**PVL ERROR** Keyword [CenterLatitude] does not exist in [Group = Mapping]
+**I/O ERROR** Invalid label group [Mapping].
+**ERROR** PVL Keyword [CenterLatitude] does not exist in [Group = Mapping].
 
 Test missing first standard parallel keyword...
-**I/O ERROR** Invalid label group [Mapping]
-**PVL ERROR** Keyword [FirstStandardParallel] does not exist in [Group = Mapping]
+**I/O ERROR** Invalid label group [Mapping].
+**ERROR** PVL Keyword [FirstStandardParallel] does not exist in [Group = Mapping].
 
 Test missing second standard parallel keyword...
-**I/O ERROR** Invalid label group [Mapping]
-**PVL ERROR** Keyword [SecondStandardParallel] does not exist in [Group = Mapping]
+**I/O ERROR** Invalid label group [Mapping].
+**ERROR** PVL Keyword [SecondStandardParallel] does not exist in [Group = Mapping].
 
 Test SetGround method ... 
 Setting ground to (35,-75)
@@ -99,11 +99,11 @@ End_Group
 End
 
 Test invalid combinations of mapping parameters ...
-**I/O ERROR** Invalid label group [Mapping]
-**PROJECTION ERROR** Center Latitude [-90.0] is not valid, it projects to infinity for standard parallels [33.0,45.0]
+**I/O ERROR** Invalid label group [Mapping].
+**ERROR** Center Latitude [-90.0] is not valid, it projects to infinity for standard parallels [33.0,45.0].
 
-**I/O ERROR** Invalid label group [Mapping]
-**PROJECTION ERROR** Center Latitude [90.0] is not valid, it projects to infinity for standard parallels [45.0,-60.0]
+**I/O ERROR** Invalid label group [Mapping].
+**ERROR** Center Latitude [90.0] is not valid, it projects to infinity for standard parallels [45.0,-60.0].
 
 Unit test was obtained from:
 

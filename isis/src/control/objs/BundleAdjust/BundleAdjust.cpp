@@ -46,7 +46,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     Application::Log(gp);
 
     errlog += ". (See print.prt for details)";
-    throw iException::Message(iException::Math, errlog, _FILEINFO_);
+    throw IException(IException::Unknown, errlog, _FILEINFO_);
   }
 
   BundleAdjust::BundleAdjust(const std::string &cnetFile,
@@ -115,7 +115,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
   }
 
   BundleAdjust::~BundleAdjust() {
-    // If we have ownership 
+    // If we have ownership
     if (m_bCleanUp) {
       delete m_pCnet;
       delete m_pSnList;
@@ -141,9 +141,9 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     try {
       csv.read(scsigmasList);
     }
-    catch (iException &e) {
+    catch (IException &e) {
       std::string msg = "Failed to read spacecraft sigmas file";
-      throw Isis::iException::Message(iException::Io, msg, _FILEINFO_);
+      throw IException(e, IException::Io, msg, _FILEINFO_);
     }
 
     int nrows = csv.rows();
@@ -309,8 +309,8 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
    * checks implemented for ...
    *  (1) images with 0 or 1 measures
    * @internal
-   *   @history  2011-08-4 Debbie A. Cook - Changed error message to 
-   *                        indicate it fails with one measure as 
+   *   @history  2011-08-4 Debbie A. Cook - Changed error message to
+   *                        indicate it fails with one measure as
    *                        well as no measures.
    */
   bool BundleAdjust::validateNetwork() {
@@ -331,7 +331,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       msg += m_pSnList->Filename(i) + ": " + iString(nMeasures) + "\n";
     }
     if ( nimagesWithInsufficientMeasures > 0 ) {
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     return true;
@@ -426,7 +426,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       if (!(m_pSnList->HasSerialNumber(m_pHeldSnList->SerialNumber(ih)))) {
         std::string msg = "Held image [" + m_pHeldSnList->SerialNumber(ih)
                           + "not in FROMLIST";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
     }
   }
@@ -482,7 +482,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         m_strSolutionMethod != "OLDSPARSE" ) {
       m_nNumPointPartials = 2;
 
-      if (m_bSolveRadii) 
+      if (m_bSolveRadii)
         m_nNumPointPartials++;
     }
   }
@@ -556,7 +556,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         m_dImageParameterWeights[nIndex++] = m_dGlobalCameraAngularVelocityWeight;
         m_dImageParameterWeights[nIndex++] = m_dGlobalCameraAngularAccelerationWeight;
       }
-    }    
+    }
   }
 
   /**
@@ -590,7 +590,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         std::string msg = "Cube file " + m_pSnList->Filename(isn)
                           + " must be held since it is on the same observation as held cube "
                           + m_pHeldSnList->Filename(ih);
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
     }
   }
@@ -637,7 +637,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     if (m_nNumberCameraCoefSolved > m_nsolveCamDegree + 1) {
       std::string msg = "Selected SolveCameraDegree " + iString(m_nsolveCamDegree)
                         + " is not sufficient for the CAMSOLVE";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
 
@@ -946,14 +946,14 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       m_nDegreesOfFreedom =
         m_nObservations + (m_nConstrainedPointParameters + m_nConstrainedImageParameters) - m_nUnknownParameters;
 
-      if (m_nDegreesOfFreedom > 0) 
+      if (m_nDegreesOfFreedom > 0)
         m_dSigma0 = dvtpv / m_nDegreesOfFreedom;
       else if (m_bDeltack && m_nDegreesOfFreedom == 0)
         m_dSigma0 = dvtpv;
       else {
-        std::string msg = "Degrees of Freedom " + iString(m_nDegreesOfFreedom) 
+        std::string msg = "Degrees of Freedom " + iString(m_nDegreesOfFreedom)
             + " is invalid (&lt;= 0)!";
-      throw Isis::iException::Message(iException::Io, msg, _FILEINFO_);
+      throw IException(IException::Io, msg, _FILEINFO_);
     }
 
       m_dSigma0 = sqrt(m_dSigma0);
@@ -976,7 +976,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         int nconverged = 0;
         int numimgparam = m_Image_Solution.size();
         for (int ij = 0; ij < numimgparam; ij++) {
-          if (fabs(m_Image_Solution(ij)) > m_dConvergenceThreshold) 
+          if (fabs(m_Image_Solution(ij)) > m_dConvergenceThreshold)
             break;
           else
             nconverged++;
@@ -988,7 +988,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
           printf("Deltack Bundle has converged\n");
           break;
         }
-      }  
+      }
 
       clock_t iterationclock2 = clock();
       double dIterationTime = ((iterationclock2 - iterationclock1) / (double)CLOCKS_PER_SEC);
@@ -1036,7 +1036,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     std::string msg = "Need to return something here, or just change the whole darn thing? [";
 //    msg += iString(tol) + "] in less than [";
 //    msg += iString(m_nMaxIterations) + "] iterations";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   /**
@@ -2159,7 +2159,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
     int nzlength = nz.size();
 
-    int nColsC = C.size2();    
+    int nColsC = C.size2();
     for ( i = 0; i < nRowsA; ++i ) {
       for ( j = 0; j < nColsC; ++j ) {
         d = 0;
@@ -2180,7 +2180,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     // load cholmod triplet
     if ( !loadCholmodTriplet() ) {
       std::string msg = "CHOLMOD: Failed to load Triplet matrix";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     // convert triplet to sparse matrix
@@ -2208,7 +2208,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     if ( m_cm.status == CHOLMOD_NOT_POSDEF ) {
       std::string msg = "matrix NOT positive-definite: failure at column "
           + m_L->minor;
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
 //      FILE * pFile2;
@@ -2654,7 +2654,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     if (!(pCamera->GroundMap()->GetXY(point.GetAdjustedSurfacePoint(), &dComputedx, &dComputedy))) {
       std::string msg = "Unable to map apriori surface point for measure ";
       msg += measure.GetCubeSerialNumber() + " on point " + point.GetId() + " into focal plane";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     // partials for fixed point w/r lat, long, radius in Body-Fixed
@@ -3341,16 +3341,16 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
               msg += "indicates a point with no measures.  Running the program, ";
               msg += "cnetcheck, before jigsaw should catch these problems.";
             }
-            throw Isis::iException::Message(iException::Math, msg, _FILEINFO_);
+            throw IException(IException::Unknown, msg, _FILEINFO_);
           }
         }
       }
-      catch (iException &e) {
+      catch (IException &e) {
         std::string msg = "Unable to solve in BundleAdjust, ";
         msg += "Iteration " + Isis::iString(m_nIteration) + " of ";
         msg += Isis::iString(m_nMaxIterations) + ", Sigma0 = ";
         msg += Isis::iString(m_dConvergenceThreshold);
-        throw Isis::iException::Message(iException::Math, msg, _FILEINFO_);
+        throw IException(IException::Unknown, msg, _FILEINFO_);
       }
 
       // Ok take the results and put them back into the camera blobs
@@ -3397,7 +3397,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     std::string msg = "Did not converge to Sigma0 criteria [";
     msg += iString(m_dConvergenceThreshold) + "] in less than [";
     msg += iString(m_nMaxIterations) + "] iterations";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   /**
@@ -3518,7 +3518,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       if (!(pCamera->GroundMap()->GetXY(point->GetAdjustedSurfacePoint(), &dComputedx, &dComputedy))) {
         std::string msg = "Unable to map apriori surface point for measure ";
         msg += measure->GetCubeSerialNumber() + " on point " + point->GetId() + " into focal plane";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
 
       // Determine the image index
@@ -3835,7 +3835,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       }
 
       if (m_cmatrixSolveType != None) {
-        
+
 //         TC = pInstRot->ConstantMatrix();
 //         TB = pInstRot->TimeBasedMatrix();
 
@@ -3850,7 +3850,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         // Add the partials for ra
         for (int icoef = 0; icoef < m_nNumberCameraCoefSolved; icoef++) {
           pCamera->GroundMap()->GetdXYdOrientation(SpiceRotation::WRT_RightAscension, icoef, &px[nIndex], &py[nIndex]);
-          
+
 //           if (icoef == 0) {
 //             z1 = -TB[1] * lookJ[0] + TB[0] * lookJ[1];
 //             z2 = -TB[4] * lookJ[0] + TB[3] * lookJ[1];
@@ -3864,7 +3864,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 //             px[nIndex] = px[nIndex-1] * dTime;
 //             py[nIndex] = py[nIndex-1] * dTime;
 //           }
-          
+
           nIndex++;
         }
 
@@ -3895,12 +3895,12 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
         // Add the partial for twist if necessary
         if (m_bSolveTwist) {
-          
+
 //           z1 = TC[6] * NY - TC[7] * NX;
-          
+
           for (int icoef = 0; icoef < m_nNumberCameraCoefSolved; icoef++) {
             pCamera->GroundMap()->GetdXYdOrientation(SpiceRotation::WRT_Twist, icoef, &px[nIndex], &py[nIndex]);
-            
+
 //             if (icoef == 0) {
 //               px[nIndex] = a1 * (((TC[0] * NY - TC[1] * NX) - z1 * a2));
 //               py[nIndex] = a1 * (((TC[3] * NY - TC[4] * NX) - z1 * a3));
@@ -3909,7 +3909,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 //               px[nIndex] = px[nIndex-1] * dTime;
 //               py[nIndex] = py[nIndex-1] * dTime;
 //             }
-          
+
             nIndex++;
           }
  //   nIndex = (Images() - m_nHeldImages) * m_nNumImagePartials;
@@ -5814,7 +5814,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
           m_dParameterWeights[nWtIndex] *= m_dParameterWeights[nWtIndex];
           m_nConstrainedPointParameters++;
         }
-      
+
         if( point->IsLongitudeConstrained() ) {
           apriorisigmas[1] = point->GetAprioriSurfacePoint().GetLonSigmaDistance().meters();
           m_dParameterWeights[nWtIndex+1] = point->GetAprioriSurfacePoint().GetLonWeight();
@@ -5890,7 +5890,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       SurfacePoint.SetSphericalSigmasDistance(
           Distance(dSigmaLat, Distance::Meters),
           Distance(dSigmaLong, Distance::Meters),
-          Distance(dSigmaRadius, Distance::Kilometers));    
+          Distance(dSigmaRadius, Distance::Kilometers));
 
       point->SetAdjustedSurfacePoint(SurfacePoint);
     }
@@ -6133,7 +6133,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         double rmsLineResiduals = m_rmsImageLineResiduals[i].Rms();
         double rmsLandSResiduals = m_rmsImageResiduals[i].Rms();
 
-        nMeasures = 
+        nMeasures =
             m_pCnet->GetNumberOfMeasuresInImage(m_pSnList->SerialNumber(i));
         nRejectedMeasures =
             m_pCnet->GetNumberOfJigsawRejectedMeasuresInImage(
@@ -6598,7 +6598,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
               continue;
 
           nRays = point->GetNumMeasures();
-          dResidualRms = point->GetResidualRms();         
+          dResidualRms = point->GetResidualRms();
           dLat = point->GetAdjustedSurfacePoint().GetLatitude().degrees();
           dLon = point->GetAdjustedSurfacePoint().GetLongitude().degrees();
           dRadius = point->GetAdjustedSurfacePoint().GetLocalRadius().meters();
@@ -6609,7 +6609,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
           if (point->GetType() == ControlPoint::Fixed)
               strStatus = "FIXED";
-          else if (point->GetType() == ControlPoint::Constrained) 
+          else if (point->GetType() == ControlPoint::Constrained)
               strStatus = "CONSTRAINED";
           else if (point->GetType() == ControlPoint::Free)
               strStatus = "FREE";
@@ -6702,10 +6702,10 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
    *
    * @internal
    * @history 2011-05-22 Debbie A. Cook - Added commas to make csv header lines
-   *                      consistent for comparer   
+   *                      consistent for comparer
    * @history 2011-06-05 Debbie A. Cook - Fixed output of spacecraft position
    *                      when it is not part of the bundle
-   * @history 2011-07-26 Debbie A. Cook - Omitted output of camera angles for 
+   * @history 2011-07-26 Debbie A. Cook - Omitted output of camera angles for
    *                      radar, which only has spacecraft position
    */
   bool BundleAdjust::OutputNoErrorPropagation() {
@@ -6891,7 +6891,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
                   ostr << " " << strcoeff << "t";
               else
                   ostr << strcoeff << "t" << i;
-              if( i == 0 ) {                 
+              if( i == 0 ) {
                   sprintf(buf, " RA (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
                           ostr.str().c_str(),(coefRA[i] - m_Image_Corrections(nIndex)) * RAD2DEG,
                           m_Image_Corrections(nIndex) * RAD2DEG, coefRA[i] * RAD2DEG,

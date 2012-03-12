@@ -3,7 +3,7 @@
 #include "UserInterface.h"
 #include "Filename.h"
 #include "Pvl.h"
-#include "iException.h"
+#include "IException.h"
 #include "TextFile.h"
 #include <string>
 
@@ -23,7 +23,7 @@ void IsisMain() {
   if(label.HasObject("IMAGE_MAP_PROJECTION")) {
     string msg = "[" + in.Name() + "] appears to be an rdr file.";
     msg += " Use pds2isis.";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   p.SetPdsFile(in.Expanded(), "", label);
@@ -50,7 +50,7 @@ void TranslateLunarLabels(Filename &labelFile, Cube *ocube) {
   // Check to see if file is PDS
   if(inputLabel.HasKeyword("PDS_VERSION_ID", Pvl::None)) {
     iString pdsVersion = inputLabel.FindKeyword("PDS_VERSION_ID", Pvl::None)[0];
-    
+
     if(pdsVersion == "PDS3") {
       if(inputLabel.HasKeyword("LO:FIDUCIAL_ID", Pvl::Traverse)) {
         hasFiducial = true;
@@ -61,13 +61,13 @@ void TranslateLunarLabels(Filename &labelFile, Cube *ocube) {
       }
       else {
         string msg = "[" + labelFile.Name() + "] does not contain boresight or fiducial information";
-        throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
     }
     else {
       string msg = "[" + labelFile.Name() + "] contains unknown PDS version [" +
                    pdsVersion + "]";
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
   // Else the input is an Isis2 cube
@@ -81,7 +81,7 @@ void TranslateLunarLabels(Filename &labelFile, Cube *ocube) {
     }
     else {
       string msg = "[" + labelFile.Name() + "] does not contain boresight or fiducial information";
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
 

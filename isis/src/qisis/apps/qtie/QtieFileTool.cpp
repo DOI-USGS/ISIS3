@@ -90,14 +90,14 @@ namespace Isis {
         try {
           baseCube->getProjection();
         }
-        catch (iException &e) {
+        catch (IException &) {
           baseCube->close();
           QString message = "Base must be projected";
           QMessageBox::critical((QWidget *)parent(), "Error", message);
           baseCube->close();
         }
       }
-      catch (iException &e) {
+      catch (IException &) {
         QString message = "Unable to open base cube";
         QMessageBox::critical((QWidget *)parent(), "Error", message);
       }
@@ -131,13 +131,13 @@ namespace Isis {
             continue;
           }
         }
-        catch (iException &e) {
+        catch (IException &) {
           QString message = "Error reading match cube labels.";
           QMessageBox::critical((QWidget *)parent(), "Error", message);
           matchCube->close();
         }
       }
-      catch (iException &e) {
+      catch (IException &) {
         QString message = "Unable to open match cube";
         QMessageBox::critical((QWidget *)parent(), "Error", message);
       }
@@ -170,11 +170,10 @@ namespace Isis {
       try {
         cnet = new ControlNet(cnetFile.toStdString());
       }
-      catch (iException &e) {
+      catch (IException &e) {
         QString message = "Invalid control network.  \n";
-        std::string errors = e.Errors();
+        std::string errors = e.toString();
         message += errors.c_str();
-        e.Clear();
         QMessageBox::information((QWidget *)parent(), "Error", message);
         QApplication::restoreOverrideCursor();
         return;

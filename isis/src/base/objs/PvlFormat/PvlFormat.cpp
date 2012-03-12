@@ -20,7 +20,7 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include "iException.h"
+#include "IException.h"
 #include "Message.h"
 #include "iString.h"
 #include "Filename.h"
@@ -89,11 +89,11 @@ namespace Isis {
       Pvl pvl(file);
       Add(pvl);
     }
-    catch(iException &e) {
+    catch(IException &e) {
       string msg;
       msg += "Unable to open or read keyword to type mapping file [";
       msg += file + "]";
-      throw iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(e, IException::Programmer, msg, _FILEINFO_);
     }
   }
 
@@ -114,7 +114,7 @@ namespace Isis {
       for(int j = 1; j < key.Size(); ++j) newKey.AddValue(key[j]);
       // Make sure we don't duplicate Keys
       if (p_keywordMap.HasKeyword(name)) {
-        p_keywordMap.DeleteKeyword(name);  
+        p_keywordMap.DeleteKeyword(name);
       }
       p_keywordMap.AddKeyword(newKey);
     }

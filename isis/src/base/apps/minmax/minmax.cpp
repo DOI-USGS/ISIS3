@@ -4,7 +4,7 @@
 #include "SpecialPixel.h"
 #include "LineManager.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 
 using namespace std;
 using namespace Isis;
@@ -46,9 +46,9 @@ void IsisMain() {
 //  Minimum DN filter
 void minimumFilter(Buffer &in, double &v) {
 
-  v = DBL_MAX;	/*initialize v to the BIGGEST DN possible for
-			Isis, ensuring that it will be replaced so
-			long as there are valid pixels in the boxcar*/
+  v = DBL_MAX;/*initialize v to the BIGGEST DN possible for
+Isis, ensuring that it will be replaced so
+long as there are valid pixels in the boxcar*/
   for(int i = 0; i < in.size() ; i++) {
     if(!IsSpecial(in[i])) {
       if(v >= in[i]) {
@@ -63,9 +63,9 @@ void minimumFilter(Buffer &in, double &v) {
 //   Maximum DN filter
 void maximumFilter(Buffer &in, double &v) {
 
-  v = -(DBL_MAX);	/*Initialize v to the SMALLEST DN possible for
-				Isis, ensuring that it will be replaced so
-				long as there are valid pixels in the boxcar*/
+  v = -(DBL_MAX);/*Initialize v to the SMALLEST DN possible for
+Isis, ensuring that it will be replaced so
+long as there are valid pixels in the boxcar*/
 
   for(int i = 0; i < in.size() ; i++) {
     if(!IsSpecial(in[i])) {

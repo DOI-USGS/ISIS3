@@ -105,8 +105,7 @@ namespace Isis {
    */
   void ViewportBuffer::fillBuffer(QRect rect) {
     if(p_band == -1) {
-      throw iException::Message(iException::Programmer, "invalid band",
-                                _FILEINFO_);
+      throw IException(IException::Programmer, "invalid band", _FILEINFO_);
     }
 
     ViewportBufferFill *newFill = createViewportBufferFill(
@@ -125,28 +124,27 @@ namespace Isis {
    */
   void ViewportBuffer::fillBuffer(QRect rect, const Brick *data) {
     if(p_band == -1) {
-      throw iException::Message(iException::Programmer, "invalid band",
-                                _FILEINFO_);
+      throw IException(IException::Programmer, "invalid band", _FILEINFO_);
     }
-    
+
     rect = rect.intersected(bufferXYRect());
-    
+
     if (!rect.isValid())
       return;
-    
+
     try {
       ViewportBufferFill *fill = createViewportBufferFill(rect, false);
-      
+
       while(fill->shouldRequestMore()) {
         fill->incRequestPosition();
         fill->incReadPosition();
-        
+
         for(int x = rect.left(); x <= rect.right(); x ++) {
           // Index into internal buffer is minus leftmost/topmost pixel
           int xIndex = x - fill->getLeftmostPixelPosition();
           int yIndex = fill->getRequestPosition() -
           fill->getTopmostPixelPosition();
-          
+
           double samp = fill->viewportToSample(x);
           double line = fill->viewportToLine(fill->getRequestPosition());
           if (samp < data->Sample())
@@ -157,12 +155,12 @@ namespace Isis {
             line = data->Line();
           if (line > data->Line() + data->LineDimension())
             line = data->Line() + data->LineDimension();
-          
+
           // Index into buffer is current sample - start sample
             //   *Brick indices are in units of cube pixels, not screen pixels
             int brickIndex = data->Index((int)(samp + 0.5), (int)(line + 0.5),
                                          p_band);
-            
+
             if(brickIndex < 0) {
               p_buffer.at(yIndex).at(xIndex) = data->at(0);
             }
@@ -172,8 +170,9 @@ namespace Isis {
             else {
               if(yIndex < 0 || xIndex < 0 || yIndex >= (int) p_buffer.size() ||
                 xIndex >= (int) p_buffer.at(yIndex).size()) {
-                throw iException::Message(iException::Programmer,
-                                          "index out of range", _FILEINFO_);
+                throw IException(IException::Programmer,
+                                 "index out of range",
+                                 _FILEINFO_);
                 }
                 else {
                   p_buffer.at(yIndex).at(xIndex) = data->at(brickIndex);
@@ -182,9 +181,9 @@ namespace Isis {
         }
       }
     }
-    catch (iException &e) {
-      throw iException::Message(iException::Programmer, "Failed to load brick "
-      "into buffer", _FILEINFO_);
+    catch (IException &e) {
+      throw IException(e, IException::Programmer, "Failed to load brick "
+                       "into buffer", _FILEINFO_);
     }
   }
 
@@ -204,16 +203,14 @@ namespace Isis {
       return;
 
     if(p_actions->empty()) {
-      throw iException::Message(iException::Programmer, "no actions",
-                                _FILEINFO_);
+      throw IException(IException::Programmer, "no actions", _FILEINFO_);
     }
 
     ViewportBufferAction *curAction = p_actions->head();
 
     if(curAction->getActionType() != ViewportBufferAction::fill ||
         !curAction->started()) {
-      throw iException::Message(iException::Programmer, "not a fill action",
-                                _FILEINFO_);
+      throw IException(IException::Programmer, "not a fill action", _FILEINFO_);
     }
 
     ViewportBufferFill *fill = (ViewportBufferFill *) curAction;
@@ -221,7 +218,7 @@ namespace Isis {
     const QRect *rect = fill->getRect();
 
     int y = fill->getReadPosition(); // screen line
-    
+
     // check to see if the next screen line's brick differs from this screen
     // line's brick.  If it does, which brick do we use?
     int curBrickLine = (int) (fill->viewportToLine(y) + 0.5);
@@ -235,7 +232,7 @@ namespace Isis {
     else {
       p_bricksOrdered = true;
     }
-    
+
     double samp, line;
 
     // Loop through x values of rect on screen that we want to fill
@@ -273,7 +270,7 @@ namespace Isis {
             msg += "The X-Index [" + iString(xIndex) + " is greater than the "
                 "X-Size of [" + iString((int) p_buffer.at(yIndex).size()) + "]";
 
-          throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+          throw IException(IException::Programmer, msg, _FILEINFO_);
         }
         else {
           p_buffer.at(yIndex).at(xIndex) = brick->at(brickIndex);
@@ -282,7 +279,7 @@ namespace Isis {
     }
     fill->incReadPosition();
 
-    
+
     if(fill->shouldRequestMore()) {
       if (p_bricksOrdered) {
         requestCubeLine(fill);
@@ -337,13 +334,13 @@ namespace Isis {
    */
   const vector<double> &ViewportBuffer::getLine(int line) {
     if(!p_bufferInitialized || !p_enabled) {
-      throw iException::Message(iException::Programmer, "no data",
-                                _FILEINFO_);
+      throw IException(IException::Programmer, "no data", _FILEINFO_);
     }
 
     if(line < 0 || line >= (int)p_buffer.size()) {
-      throw iException::Message(iException::Programmer,
-                                "Invalid call to getLine", _FILEINFO_);
+      throw IException(IException::Programmer,
+                       "Invalid call to getLine",
+                       _FILEINFO_);
     }
 
     return p_buffer.at(line);
@@ -499,9 +496,7 @@ namespace Isis {
     //   isn't actually valid. So, in the case of any bad fill rects we will
     //   fill everything.
     if(!someRect.isValid()) {
-      throw iException::Message(iException::Programmer,
-                                "Fill rect invalid",
-                                _FILEINFO_);
+      throw IException(IException::Programmer, "Fill rect invalid", _FILEINFO_);
     }
 
     double xScale = p_viewport->scale();
@@ -538,8 +533,7 @@ namespace Isis {
    */
   void ViewportBuffer::requestCubeLine(ViewportBufferFill *fill) {
     if(p_band == -1) {
-      throw iException::Message(iException::Programmer, "invalid band",
-                                _FILEINFO_);
+      throw IException(IException::Programmer, "invalid band", _FILEINFO_);
     }
 
     // Prep to create minimal buffer(s) to read the cube
@@ -1285,8 +1279,9 @@ namespace Isis {
       updateBoundingRects();
       reinitialize();
     }
-    catch (iException &e) {
-      throw iException::Message(iException::Programmer, "Unable to change scale.", _FILEINFO_);
+    catch (IException &e) {
+      throw IException(
+          e, IException::Programmer, "Unable to change scale.", _FILEINFO_);
     }
   }
 
@@ -1383,11 +1378,13 @@ namespace Isis {
                                    false);
         enqueueAction(fill);
       }
-      
+
       doQueuedActions();
     }
-    catch (iException &e) {
-      throw iException::Message(iException::Programmer, "Unable to resize and fill buffer.", _FILEINFO_);
+    catch (IException &e) {
+      throw IException(IException::Programmer,
+                       "Unable to resize and fill buffer.",
+                       _FILEINFO_);
     }
   }
 }

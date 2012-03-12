@@ -5,7 +5,7 @@
 #include <QString>
 #include <QWhatsThis>
 
-#include "iException.h"
+#include "IException.h"
 #include "MainWindow.h"
 #include "Workspace.h"
 #include "Preference.h"
@@ -68,7 +68,7 @@ namespace Isis {
                           (std::string)" file:" + file.Expanded() + " &";
     if(system(command.c_str()) != 0) {
       iString msg = "Failed to execute [" + command + "]";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
 }

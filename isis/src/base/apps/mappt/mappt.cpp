@@ -7,7 +7,7 @@
 
 #include "Brick.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "Process.h"
 #include "Projection.h"
@@ -53,7 +53,7 @@ void IsisMain() {
       string msg = "Invalid value for LATITUDE ["
                    + iString(lat) + "] outside range of ";
       msg += "[-90,90]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     iString coordsys = ui.GetString("COORDSYS");
@@ -80,7 +80,7 @@ void IsisMain() {
       // Does it exist?
       if(!mapFile.Exists()) {
         string msg = "Filename [" + ui.GetFilename("MAP") + "] does not exist";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
 
       // Load it up into a new projection
@@ -300,12 +300,12 @@ void IsisMain() {
     }
     else if(ui.GetString("FORMAT") == "FLAT") {
       string msg = "Flat file must have a name.";
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
   else {
     string msg = "Could not project requested position";
-    throw iException::Message(iException::Projection, msg, _FILEINFO_);
+    throw IException(IException::Unknown, msg, _FILEINFO_);
   }
 }
 

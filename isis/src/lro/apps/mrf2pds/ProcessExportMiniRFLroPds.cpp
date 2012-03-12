@@ -22,7 +22,7 @@
 
 #include "Pvl.h"
 #include "PvlFormat.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "Filename.h"
 #include "PvlFormatPds.h"
@@ -50,7 +50,7 @@ namespace Isis {
     }
     else {
       string msg = "Unsupported PDS output type";
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     return *p_label;
   }
@@ -73,7 +73,7 @@ namespace Isis {
     }
     else {
       string msg = "Invalid PDS export type";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     StandardImageImage(mainPvl);

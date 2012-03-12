@@ -23,7 +23,7 @@
 #include "Camera.h"
 #include "CameraFactory.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "iTime.h"
 #include "Preference.h"
 #include "Pvl.h"
@@ -107,8 +107,8 @@ int main(void) {
       cout << setprecision(16) << "Longitude off by: " << cam->UniversalLongitude() - knownLon << endl;
     }
   }
-  catch(iException &e) {
-    e.Report();
+  catch(IException &e) {
+    e.print();
   }
 }
 

@@ -23,7 +23,7 @@
 #include <cmath>
 #include <cfloat>
 #include "Orthographic.h"
-#include "iException.h"
+#include "IException.h"
 #include "Constants.h"
 
 using namespace std;
@@ -143,9 +143,9 @@ namespace Isis {
         }
       }
     }
-    catch(Isis::iException &e) {
+    catch(IException &e) {
       string message = "Invalid label group [Mapping]";
-      throw Isis::iException::Message(Isis::iException::Io, message, _FILEINFO_);
+      throw IException(e, IException::Io, message, _FILEINFO_);
     }
   }
 

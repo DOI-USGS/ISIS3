@@ -22,6 +22,7 @@
  *   http://www.usgs.gov/privacy.html.
  */
 #include "Brick.h"
+#include "IException.h"
 
 namespace Isis {
   /**
@@ -58,7 +59,7 @@ namespace Isis {
   bool Brick::SetBrick(const int brick) {
     if(brick < 1) {
       std::string message = "Invalid value for argument [brick]";
-      throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+      throw IException(IException::Programmer, message, _FILEINFO_);
     }
 
     return setpos(brick - 1);

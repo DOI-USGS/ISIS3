@@ -9,7 +9,7 @@
 
 #include "Statistics.h"
 #include "Pvl.h"
-#include "iException.h"
+#include "IException.h"
 #include "WriteTabular.h"
 #include "iString.h"
 #include "Pixel.h"
@@ -65,7 +65,7 @@ void IsisMain() {
     diffCount = ui.GetInteger("COUNT");
     if(!ui.WasEntered("TO")) {
       string message = "A target file is required for difference output";
-      throw iException::Message(iException::User, message, _FILEINFO_);
+      throw IException(IException::User, message, _FILEINFO_);
     }
 
   }

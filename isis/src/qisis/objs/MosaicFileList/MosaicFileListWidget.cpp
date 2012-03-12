@@ -12,7 +12,7 @@
 
 #include "CubeDisplayProperties.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "MosaicTreeWidget.h"
 #include "MosaicTreeWidgetItem.h"
 #include "PvlObject.h"
@@ -106,11 +106,11 @@ namespace Isis {
 
         iString msg = "Mosaic file list did not have a location for "
             "all of the cubes. Putting them in the first group";
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       }
     }
     else {
-      throw iException::Message(iException::Io, "Unable to read mosaic file's "
+      throw IException(IException::Io, "Unable to read mosaic file's "
           "list widget settings from Pvl", _FILEINFO_);
     }
   }
@@ -285,9 +285,8 @@ namespace Isis {
       }
     }
 
-    throw iException::Message(iException::Programmer, "Cannot find a cube in "
+    throw IException(IException::Programmer, "Cannot find a cube in "
         "tree with filename matching [" + filename.toStdString() + "]",
          _FILEINFO_);
   }
 }
-

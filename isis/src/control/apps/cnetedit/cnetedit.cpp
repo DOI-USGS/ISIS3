@@ -24,7 +24,7 @@
 #include "PvlObject.h"
 #include "SerialNumber.h"
 #include "SerialNumberList.h"
-#include "iException.h"
+#include "IException.h"
 
 #include "GuiEditFile.h"
 
@@ -159,7 +159,7 @@ void IsisMain() {
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
       string msg = "Unable to open MEASURELIST [" +
         file.fileName().toStdString() + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     QTextStream in(&file);
@@ -170,7 +170,7 @@ void IsisMain() {
       if (results.size() < 2) {
         string msg = "Line " + iString(lineNumber) + " in the MEASURELIST does "
           "not contain a Point ID and a cube filename separated by a comma";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
 
       if (!editMeasures->contains(results[0]))
@@ -254,7 +254,7 @@ void IsisMain() {
       if (pvlResults.Groups() > 0 || pvlResults.Keywords() > 0) {
         Application::Log(pvlResults.Group(0));
         string sErrMsg = "Invalid Deffile\n";
-        throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_);
+        throw IException(IException::User, sErrMsg, _FILEINFO_);
       }
 
       // Construct the validator from the user-specified definition file
@@ -285,7 +285,7 @@ void IsisMain() {
   // Log statistics
   if (keepLog) {
     Pvl outputLog;
-    
+
     outputLog.AddKeyword(PvlKeyword("PointsDeleted", numPointsDeleted));
     outputLog.AddKeyword(PvlKeyword("MeasuresDeleted", numMeasuresDeleted));
 
@@ -442,7 +442,7 @@ void deletePoint(ControlNet &cnet, int cp) {
     }
 
     cnet.DeletePoint(cp);
-  } 
+  }
   else {
     for (int cm = 0; cm < point->GetNumMeasures(); cm++) {
       if (point->GetMeasure(cm)->IsEditLocked()) {
@@ -475,7 +475,7 @@ void populateLog(ControlNet &cnet, bool ignore) {
   ignoredMeasures = new QMap<string, PvlGroup>;
 
   retainedReferences = new QMap<string, string>;
-  
+
   editLockedPoints = new QMap<string, string>;
   editLockedMeasures = new QMap<string, PvlGroup>;
 
@@ -638,24 +638,24 @@ void ignoreCubes(ControlNet &cnet, SerialNumberList &snl) {
     // Control Measure for according exclusion
     for (int cm = point->GetNumMeasures() - 1; cm >= 0; cm--) {
       ControlMeasure *measure = point->GetMeasure(cm);
-      
+
       if (!point->IsIgnored() && point->GetMeasure(cm)->IsEditLocked()) {
         ignoreMeasure(cnet, point, measure, "EditLocked measure skipped");
       }
-    
+
       string serialNumber = measure->GetCubeSerialNumber();
-      
+
       if (snl.HasSerialNumber(serialNumber)) {
         string cause = "Serial Number in CUBELIST";
         if (cm == point->IndexOfRefMeasure() && retainRef) {
           logResult(retainedReferences, point->GetId(), cause);
-        } 
+        }
         else if (!measure->IsIgnored() || cm == point->IndexOfRefMeasure()) {
           ignoreMeasure(cnet, point, measure, cause);
-  
+
           if (cm == point->IndexOfRefMeasure() && !point->IsIgnored()) {
             ignorePoint(cnet, point, "Reference measure ignored");
-          } 
+          }
         }
       }
 
@@ -758,13 +758,13 @@ void ignoreMeasures(ControlNet &cnet,
           string cause = "Measure in MEASURELIST";
           if (cm == point->IndexOfRefMeasure() && retainRef) {
             logResult(retainedReferences, point->GetId(), cause);
-          } 
+          }
           else if (!measure->IsIgnored() || cm == point->IndexOfRefMeasure()) {
             ignoreMeasure(cnet, point, measure, cause);
 
             if (cm == point->IndexOfRefMeasure() && !point->IsIgnored()) {
               ignorePoint(cnet, point, "Reference measure ignored");
-            } 
+            }
           }
         }
 
@@ -844,7 +844,7 @@ void checkAllMeasureValidity(ControlNet &cnet, string cubeList) {
       if (!serialNumbers.HasSerialNumber(serialNumber)) {
         string msg = "Serial Number [" + serialNumber + "] contains no ";
         msg += "matching cube in FROMLIST";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
 
       cube = new Cube;
@@ -854,9 +854,9 @@ void checkAllMeasureValidity(ControlNet &cnet, string cubeList) {
         try {
           camera = cube->getCamera();
         }
-        catch (Isis::iException &e) {
+        catch (IException &e) {
           string msg = "Cannot Create Camera for Image:" + cube->getFilename();
-          throw iException::Message(iException::User, msg, _FILEINFO_);
+          throw IException(e, IException::User, msg, _FILEINFO_);
         }
       }
     }
@@ -879,7 +879,7 @@ void checkAllMeasureValidity(ControlNet &cnet, string cubeList) {
           }
           else {
             ignoreMeasure(cnet, point, measure, cause);
-  
+
             if (measure == point->GetRefMeasure()) {
               ignorePoint(cnet, point, "Reference measure ignored");
             }
@@ -1016,15 +1016,15 @@ void PrintTemp() {
 }
 
 /**
- * Helper function to be able to edit the Deffile. 
- * Opens an editor to edit the file. 
- * 
+ * Helper function to be able to edit the Deffile.
+ * Opens an editor to edit the file.
+ *
  * @author Sharmila Prasad (5/23/2011)
  */
 void EditDefFile(void) {
   UserInterface &ui = Application::GetUserInterface();
   string sDefFile = ui.GetAsString("DEFFILE");
-  
+
   GuiEditFile::EditFile(ui, sDefFile);
 }
 

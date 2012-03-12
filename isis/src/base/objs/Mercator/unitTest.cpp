@@ -1,7 +1,7 @@
 #include <iostream>
 #include <iomanip>
 #include "Mercator.h"
-#include "iException.h"
+#include "IException.h"
 #include "ProjectionFactory.h"
 #include "Preference.h"
 
@@ -29,8 +29,8 @@ int main(int argc, char *argv[]) {
   try {
     Isis::Mercator p(lab);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
   cout << endl;
 
@@ -40,8 +40,8 @@ int main(int argc, char *argv[]) {
   try {
     Isis::Mercator p(lab);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
   cout << endl;
 
@@ -119,8 +119,8 @@ int main(int argc, char *argv[]) {
     cout << "  USGS Professional Paper 1395 by John P. Snyder" << endl;
     cout << "  Pages 267-268" << endl;
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 }
 

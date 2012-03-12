@@ -23,7 +23,7 @@
 #include "Angle.h"
 #include "Distance.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "iTime.h"
 #include "Latitude.h"
 #include "Longitude.h"
@@ -322,7 +322,7 @@ int main(int argc, char *argv[]) {
     spi2.SetUniversalGround(11.57143551329, 43.328646604);
     cerr << "Has Intersection    = " << spi2.HasSurfaceIntersection() << endl;
   }
-  catch(Isis::iException &e) {
-    e.Report();
+  catch(Isis::IException &e) {
+    e.print();
   }
 }

@@ -55,8 +55,8 @@ Output Sample:Line = 96.5:96.5
 60% Processed70% Processed80% Processed90% Processed100% Processed
 
 Testing NO input with one output error ...
-**PROGRAMMER ERROR** You must specify exactly one input cube
+**PROGRAMMER ERROR** You must specify exactly one input cube.
 
 Testing one input with NO output error ...
-**PROGRAMMER ERROR** You must specify exactly one output cube
+**PROGRAMMER ERROR** You must specify exactly one output cube.
 

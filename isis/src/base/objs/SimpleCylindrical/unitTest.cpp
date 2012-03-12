@@ -1,6 +1,6 @@
 #include <iostream>
 #include <iomanip>
-#include "iException.h"
+#include "IException.h"
 #include "SimpleCylindrical.h"
 #include "ProjectionFactory.h"
 #include "Preference.h"
@@ -29,8 +29,8 @@ int main(int argc, char *argv[]) {
   try {
     Isis::SimpleCylindrical p(lab);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
   cout << endl;
 
@@ -96,8 +96,8 @@ int main(int argc, char *argv[]) {
     cout << tmp3 << endl;
     cout << endl;
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 }
 

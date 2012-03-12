@@ -55,7 +55,7 @@ namespace Isis {
    *
    *  @returns Statisticts for the given type of data
    *
-   *  @throws iException When the given type of data does not exist
+   *  @throws IException When the given type of data does not exist
    */
   const Statistics &GroupedStatistics::GetStatistics(const QString &statType)
   const {
@@ -65,8 +65,7 @@ namespace Isis {
     if(i == groupedStats->constEnd()) {
       std::string msg = statType.toStdString();
       msg += " passed to GetStats but does not exist within the map";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg,
-                                      _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     return i.value();

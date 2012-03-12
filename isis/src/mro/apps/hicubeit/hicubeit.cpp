@@ -44,20 +44,20 @@ void IsisMain() {
     if(((int)irInst["CpmmNumber"] != 6) || ((int)bgInst["CpmmNumber"] != 4)) {
       string msg = "You can only stack color images with RED4, IR10, and BG12 ";
       msg += "or RED5, IR11, and BG13";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
   else if((int)redInst["CpmmNumber"] == 8) {
     if(((int)irInst["CpmmNumber"] != 7) || ((int)bgInst["CpmmNumber"] != 9)) {
       string msg = "You can only stack color images with RED4, IR10, and BG12 ";
       msg += "or RED5, IR11, and BG13";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
   else {
     string msg = "You can only stack color images with RED4, IR10, and BG12 ";
     msg += "or RED5, IR11, and BG13";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // Concatenate all the source products into one keyword

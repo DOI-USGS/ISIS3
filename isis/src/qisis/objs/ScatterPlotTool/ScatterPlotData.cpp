@@ -258,7 +258,7 @@ namespace Isis {
 
     iString msg = "Bin at index [" + iString(index) + "] not found. "
                   "There are [" + iString(numberOfBins()) + "] bins";
-    throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
 
@@ -452,7 +452,7 @@ namespace Isis {
     if (xIndex < 0 || yIndex < 0 || xIndex >= xSize || yIndex >= ySize) {
       iString msg = "Bin at index [" + iString(binIndex) + "] not found. "
                     "There are [" + iString(numberOfBins()) + "] bins";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     return QPair<int, int>(xIndex, yIndex);

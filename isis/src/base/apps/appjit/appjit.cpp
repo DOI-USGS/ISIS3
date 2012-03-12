@@ -7,7 +7,7 @@
 #include "SpiceRotation.h"
 #include "iString.h"
 #include "FileList.h"
-#include "iException.h"
+#include "IException.h"
 #include "CameraDetectorMap.h"
 
 using namespace std;
@@ -32,7 +32,7 @@ void IsisMain() {
 
   if(list.size() < 1) {
     string msg = "The input list file [" + ui.GetFilename("FROMLIST") + "is empty";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   int ifile = 0;
@@ -44,7 +44,7 @@ void IsisMain() {
   if(ifile >= (int) list.size()) {
     string msg = "The master file, [" + Filename(ui.GetFilename("MASTER")).Expanded() + " is not included in " +
                  "the input list file " + ui.GetFilename("FROMLIST") + "]";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   bool step2 = false;
@@ -66,7 +66,7 @@ void IsisMain() {
     Camera *cam = cube.getCamera();
     if(cam->DetectorMap()->LineRate() == 0.0) {
       string msg = "[" + ui.GetFilename("MASTER") + "] is not a line scan camera image";
-      throw iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     // Create the master rotation to be corrected
@@ -105,7 +105,7 @@ void IsisMain() {
     cmatrix.Label() += PvlKeyword("Description", "Corrected using appjit and" + ui.GetFilename("JITTERFILE"));
     cmatrix.Label() += PvlKeyword("Kernels");
     PvlKeyword ckKeyword = crot.InstrumentPointingValue();
-    
+
     for (int i = 0; i < ckKeyword.Size(); i++) {
       cmatrix.Label()["Kernels"].AddValue(ckKeyword[i]);
     }
@@ -141,7 +141,7 @@ void IsisMain() {
         Camera *cam = cube.getCamera();
         if(cam->DetectorMap()->LineRate() == 0.0) {
           string msg = "[" + ui.GetFilename("FROM") + "] is not a line scan camera";
-          throw iException::Message(Isis::iException::User, msg, _FILEINFO_);
+          throw IException(IException::User, msg, _FILEINFO_);
         }
         // Pull out the pointing cache as a table and write it
         cube.write(cmatrix);
@@ -152,7 +152,7 @@ void IsisMain() {
     }
     Application::Log(gp);
   }
-  catch(iException &e) {
+  catch(IException &e) {
     string msg;
     if(!step2) {
       msg = "Unable to fit pointing for [" + ui.GetFilename("MASTER") + "]";
@@ -160,6 +160,6 @@ void IsisMain() {
     else {
       msg = "Unable to update pointing for nonMaster file(s)";
     }
-    throw iException::Message(Isis::iException::User, msg, _FILEINFO_);
+    throw IException(e, IException::User, msg, _FILEINFO_);
   }
 }

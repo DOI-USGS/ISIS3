@@ -1,7 +1,7 @@
 #include "Isis.h"
 
 #include "Cube.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "OriginalLabel.h"
 #include "ProcessImport.h"
@@ -30,7 +30,7 @@ void IsisMain() {
   // Check stream open status
   if(!input.is_open()) {
     string msg = "Cannot open input file [" + from + "]";
-    throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+    throw IException(IException::Io, msg, _FILEINFO_);
   }
 
   char reading[81];
@@ -89,7 +89,7 @@ void IsisMain() {
   // Its possible they could have this instead of T, in which case we won't even try
   if(labels["SIMPLE"][0] == "F") {
     string msg = "The file [" + ui.GetFilename("FROM") + "] does not conform to the FITS standards";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   ProcessImport pfits;
@@ -113,22 +113,22 @@ void IsisMain() {
       break;
     case 32:
       msg = "Signed 32 bit integer (int) pixel type is not supported at this time";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
       break;
     case 64:
       msg = "Signed 64 bit integer (long) pixel type is not supported at this time";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
       break;
     case -32:
       type = Isis::Real;
       break;
     case -64:
       msg = "64 bit floating point (double) pixel type is not supported at this time";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
       break;
     default:
       msg = "Unknown pixel type [" + labels["BITPIX"][0] + "] cannot be imported";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
       break;
   }
 
@@ -144,7 +144,7 @@ void IsisMain() {
   }
   else {
     string msg = "NAXIS count of [" + labels["NAXIS"][0] + "] is not supported at this time";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // Base and multiplier

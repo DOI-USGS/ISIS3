@@ -9,7 +9,7 @@
 #include "ControlNet.h"
 #include "ControlPoint.h"
 #include "FileList.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "Pvl.h"
 #include "PvlObject.h"
@@ -45,7 +45,7 @@ void IsisMain() {
     else {
       string msg = "Unable to find keyword [\"IMAGE_NUMBER\" or \"IMAGE_ID\"] in file [";
       msg += fsc + "]";
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     iString sn(snl.SerialNumber(f));
     fscMap.insert(std::pair<int, string>(f, fsc));

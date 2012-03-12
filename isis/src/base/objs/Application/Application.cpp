@@ -46,7 +46,7 @@ extern int errno;
 #include "Constants.h"    //is this still used in this class?
 #include "CubeManager.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "Gui.h"  //is this still used?
 #include "Message.h"
@@ -65,7 +65,7 @@ namespace Isis {
   Application *iApp = NULL;
 
   /**
-   * Constuctor for the Application object   
+   * Constuctor for the Application object
    *
    * @param argc Number of arguments in argv[].  This must be passed by
    *             reference!!
@@ -83,7 +83,7 @@ namespace Isis {
 
     // Get the starting wall clock time
     // p_datetime = DateTime(&p_startTime);
-        
+
     // Init
     p_startClock = 0;
     p_startDirectIO = 0;
@@ -124,7 +124,7 @@ namespace Isis {
         f = "$ISISROOT/bin/xml/" + f.Name();
         if (!f.Exists()) {
           string message = Message::FileOpen(f.Expanded());
-          throw iException::Message(iException::Io, message, _FILEINFO_);
+          throw IException(IException::Io, message, _FILEINFO_);
         }
       }
       string xmlfile = f.Expanded();
@@ -138,8 +138,9 @@ namespace Isis {
         new QCoreApplication(argc, argv);
       }
     }
-    catch (iException &e) {
-      exit(e.Report());
+    catch (IException &e) {
+      e.print();
+      exit(e.errorType());
     }
 
     iApp = this;
@@ -176,10 +177,10 @@ namespace Isis {
   int Application::Run(void (*funct)()) {
     int status = 0;
     try {
-      if (p_ui->IsInteractive()) {        
+      if (p_ui->IsInteractive()) {
         p_ui->TheGui()->Exec(funct);
       }
-      else {        
+      else {
         if (p_ui->BatchListSize() > 0) {
           for (int i = 0; i < p_ui->BatchListSize(); i++) {
             try {
@@ -198,7 +199,7 @@ namespace Isis {
               Application::FunctionCleanup();
               p_BatchlistPass++;
             }
-            catch (iException &e) {
+            catch (IException &e) {
               p_ui->SetErrorList(i);
               status = Application::FunctionError(e);
               if (p_ui->AbortOnError()) {
@@ -221,7 +222,7 @@ namespace Isis {
         }
       }
     }
-    catch (iException &e) {
+    catch (IException &e) {
       status = Application::FunctionError(e);
     }
 
@@ -288,7 +289,7 @@ namespace Isis {
     string conTime = temp;
 
     //cerr << "Accounting GUI end time=" << endTime <<  " start time=" << p_startTime << "  total=" << seconds << endl;
-    
+
     // Grab the ending cpu time to compute total cpu time
     clock_t endClock = clock();
     seconds = (double(endClock) - (double)p_startClock) / CLOCKS_PER_SEC;
@@ -298,7 +299,7 @@ namespace Isis {
     minutes = minutes - hours * 60;
     sprintf(temp, "%02d:%02d:%04.1f", hours, minutes, seconds);
     string cpuTime = temp;
-    
+
     // Add this information to the log
     PvlGroup acct("Accounting");
     acct += PvlKeyword("ConnectTime", conTime);
@@ -487,16 +488,18 @@ namespace Isis {
 
 
   /**
-   * @param code 
-   * @param message 
+   * @param code
+   * @param message
    */
   void Application::SendParentData(const string code,
       const string &message) {
     // See if we need to connect to the parent
     if (p_connectionToParent == NULL) {
-      iString msg = "Unable to communicate with parent process with pid [" +
-          iString(iApp->GetUserInterface().ParentId()) + "]";
-      throw iException::Message(iException::System, msg, _FILEINFO_);
+      iString msg = "This process (program) was executed by an existing Isis 3 "
+          "process. However, we failed to establish a communication channel "
+          "with the parent (launcher) process. The parent process has a PID of "
+          "[" + iString(iApp->GetUserInterface().ParentId()) + "]";
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     // Have connection so build data string and send it
@@ -507,9 +510,12 @@ namespace Isis {
     data += '\n';
 
     if (p_connectionToParent->write(data.c_str(), data.size()) == -1) {
-      string msg = "Unable to send data to parent [" +
+      iString msg = "This process (program) was executed by an exiting Isis 3 "
+          "process. A communication channel was established with the parent "
+          "(launcher) process, but when we tried to send data to the parent "
+          "process an error occurred. The parent process has a PID of [" +
           iString(iApp->GetUserInterface().ParentId()) + "]";
-      throw iException::Message(iException::System, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     p_connectionToParent->waitForBytesWritten(-1);
@@ -567,7 +573,7 @@ namespace Isis {
           ofstream debugingLog(filename.c_str());
           if (!debugingLog.good()) {
             string msg = "Error opening debugging log file [" + filename + "]";
-            throw iException::Message(Isis::iException::System, msg, _FILEINFO_);
+            throw IException(IException::Io, msg, _FILEINFO_);
           }
           debugingLog << log << endl;
           debugingLog << "\n############### User Preferences ################\n" << endl;
@@ -612,8 +618,8 @@ namespace Isis {
    *
    * @return int The Error Type
    */
-  int Application::FunctionError(Isis::iException &e) {
-    Pvl errors = e.PvlErrors();
+  int Application::FunctionError(IException &e) {
+    Pvl errors = e.toPvl();
     SessionLog::TheLog().AddError(errors);
     SessionLog::TheLog().Write();
 
@@ -621,23 +627,13 @@ namespace Isis {
       SendParentErrors(errors);
     }
     else if (p_ui->IsInteractive()) {
-      if (e.IsPvlFormat()) {
-        ostringstream ostr;
-        ostr << errors << endl;
-        p_ui->TheGui()->LoadMessage(ostr.str());
-      }
-      else {
-        p_ui->TheGui()->LoadMessage(e.Errors());
-      }
+      p_ui->TheGui()->LoadMessage(e.toString());
     }
     else if (SessionLog::TheLog().TerminalOutput()) {
       cerr << SessionLog::TheLog() << endl;
     }
-    else if (e.IsPvlFormat()) {
-      cerr << errors << endl;
-    }
     else {
-      cerr << e.Errors() << endl;
+      cerr << e.toString() << endl;
     }
 
     // If debugging flag on write debugging log
@@ -662,7 +658,7 @@ namespace Isis {
           ofstream debugingLog(filename.c_str());
           if (!debugingLog.good()) {
             string msg = "Error opening debugging log file [" + filename + "]";
-            throw iException::Message(iException::System, msg, _FILEINFO_);
+            throw IException(IException::Io, msg, _FILEINFO_);
           }
           debugingLog << log << endl;
           debugingLog << "\n############### User Preferences ################\n" << endl;
@@ -695,9 +691,7 @@ namespace Isis {
       }
     }
 
-    int errorType = (int)e.Type();
-    e.Clear();
-    return errorType;
+    return (int)e.errorType();
   }
 
   /**
@@ -706,27 +700,21 @@ namespace Isis {
    *
    * @param e The Isis::iException
    */
-  void Application::GuiReportError(Isis::iException &e) {
-    Pvl errors = e.PvlErrors();
-    if (e.Type() == iException::Cancel) {
-      e.Clear();
+  void Application::GuiReportError(IException &e) {
+    iString errorMessage = e.toString();
+    if (errorMessage == "") {
       p_ui->TheGui()->ProgressText("Stopped");
     }
-    if (e.IsPvlFormat()) {
-      ostringstream ostr;
-      ostr << errors << endl;
-      p_ui->TheGui()->LoadMessage(ostr.str());
-    }
     else {
-      p_ui->TheGui()->LoadMessage(e.Errors());
+      p_ui->TheGui()->LoadMessage(errorMessage);
+      p_ui->TheGui()->ProgressText("Error");
     }
 
-    if (p_ui->TheGui()->ShowWarning()) exit(0);
-    p_ui->TheGui()->ProgressText("Error");
-    e.Clear();
+    if (p_ui->TheGui()->ShowWarning())
+      exit(0);
   }
 
-  iString Application::p_appName("Unknown"); //!< 
+  iString Application::p_appName("Unknown"); //!<
   /**
    * Returns the name of the application.  Returns 'Unknown' if the application
    * or gui equal NULL
@@ -793,7 +781,7 @@ namespace Isis {
   void Application::ProcessGuiEvents() {
     if (p_ui->IsInteractive()) {
       if (p_ui->TheGui()->ProcessEvents()) {
-        throw iException::Message(iException::Cancel, "", _FILEINFO_);
+        throw IException();
       }
     }
   }
@@ -835,8 +823,8 @@ namespace Isis {
 
   /**
    * The Isis Version for this application.
-   * @return @b iString 
-   * 
+   * @return @b iString
+   *
    */
   iString Application::Version() {
     return isisVersion();

@@ -3,7 +3,7 @@
 #include "Isis.h"
 #include "ProcessMapMosaic.h"
 #include "FileList.h"
-#include "iException.h"
+#include "IException.h"
 #include "SpecialPixel.h"
 #include "Projection.h"
 #include "ProjectionFactory.h"
@@ -28,9 +28,9 @@ void IsisMain() {
   list.Read(ui.GetFilename("FROMLIST"));
   if(list.size() < 1) {
     string msg = "The list file [" + ui.GetFilename("FROMLIST") +"does not contain any data";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
-  
+
   fstream os;
   bool olistFlag = false;
   if (ui.WasEntered("TOLIST")){
@@ -47,7 +47,7 @@ void IsisMain() {
   // Get the Track Flag
   bool bTrack = ui.GetBoolean("TRACK");
   m.SetTrackFlag(bTrack);
-  
+
   // Set up the mosaic priority, either the input cubes will be
   // placed ontop of each other in the mosaic or beneath each other or
   // placed based on band with "Lesser" or "Greater" criteria
@@ -63,7 +63,7 @@ void IsisMain() {
   }
   else if(ui.GetString("PRIORITY") == "AVERAGE") {
     priority = ProcessMapMosaic::average;
-  } 
+  }
   else {
     priority = ProcessMapMosaic::band;
     sType = ui.GetString("TYPE");
@@ -83,7 +83,7 @@ void IsisMain() {
 
   // Priority
   m.SetPriority(priority);
-  
+
   CubeAttributeOutput &oAtt = ui.GetOutputAttribute("MOSAIC");
   if(ui.GetString("GRANGE") == "USER") {
     m.SetOutputCube(list,
@@ -102,10 +102,10 @@ void IsisMain() {
   // Loop for each input file and place it in the output mosaic
 
   m.SetBandBinMatch(ui.GetBoolean("MATCHBANDBIN"));
-  
+
   // Get the MatchDEM Flag
   m.SetMatchDEM(ui.GetBoolean("MATCHDEM"));
-  
+
   bool mosaicCreated = false;
   for(unsigned int i = 0; i < list.size(); i++) {
     if(!m.StartProcess(list[i])) {
@@ -131,11 +131,11 @@ void IsisMain() {
       m.SetCreateFlag(false);
     }
   }
-  
+
   if(olistFlag) {
     os.close();
   }
-  
+
   m.EndProcess();
 }
 
@@ -166,7 +166,7 @@ void calcRange(double &minLat, double &maxLat, double &minLon, double &maxLon) {
     }
     else if(*proj != *firstProj) {
       string msg = "Mapping groups do not match between cubes [" + list[0] + "] and [" + list[i] + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     if(proj->HasGroundRange()) {

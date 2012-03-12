@@ -32,23 +32,22 @@ void IsisMain() {
   Filename inFilename = ui.GetFilename("FROM");
   try {
     if(icube.getGroup("Instrument")["InstrumentID"][0] != "Marci") {
-      throw iException::Message(iException::User, "", _FILEINFO_);
+      throw IException();
     }
 
     if(!icube.getGroup("Archive").HasKeyword("SampleBitModeId")) {
-      throw iException::Message(iException::User, "", _FILEINFO_);
+      throw IException();
     }
   }
-  catch(iException &e) {
-    e.Clear();
+  catch(IException &) {
     string msg = "This program is intended for use on MARCI images only. [";
     msg += inFilename.Expanded() + "] does not appear to be a MARCI image.";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   if(icube.getGroup("Archive")["SampleBitModeId"][0] != "SQROOT") {
     string msg = "Sample bit mode [" + icube.getGroup("Archive")["SampleBitModeId"][0] + "] is not supported.";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // Read in calibration coefficients
@@ -104,7 +103,7 @@ void IsisMain() {
   if(calibrationData.Objects() != 7) {
     iString msg = "Calibration file [" + calFile.Expanded() + "] must contain data for 7 filters in ascending order;";
     msg += " only [" + iString(calibrationData.Objects()) + "] objects were found";
-    throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
   // Read it, make sure it's ordered
@@ -113,7 +112,7 @@ void IsisMain() {
 
     if((int)calObj["FilterNumber"] != obj + 1) {
       iString msg = "Calibration file [" + calFile.Expanded() + "] must have the filters in ascending order";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     pair<double, double> calData(calObj["RadianceCoefficient"], calObj["SolarSpectralDistance"]);
@@ -189,7 +188,7 @@ void IsisMain() {
     }
     else {
       iString msg = "Unrecognized filter name [" + iString(filtNames[i]) + "]";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
 

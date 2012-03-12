@@ -55,7 +55,7 @@ void IsisMain() {
       string msg = "A target must be specified either by the [TARGET] "
           "parameter or included as a value for keyword [TargetName] in the "
           "projection file";
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     mapGroup.AddKeyword(PvlKeyword("TargetName", target), Pvl::Replace);
@@ -102,7 +102,7 @@ void IsisMain() {
     bool foundRange = proj->XYRange(minX, maxX, minY, maxY);
     if (!foundRange) {
       string msg = "Cannot convert Lat/Long range to an X/Y range";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     // Create the control net to store the points in.
@@ -173,7 +173,7 @@ void IsisMain() {
     if (!ui.WasEntered("TARGET")) {
       string msg = "A target must be specified by the [TARGET] parameter ";
       msg += "or included as a value for keyword [TargetName] in the projection file";
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     string target = ui.GetString("TARGET");
@@ -258,17 +258,17 @@ void checkLatitude(double minLat, double maxLat) {
   if (minLat > maxLat) {
     string msg = "MINLAT [" + iString(minLat) +
       "] is greater than MAXLAT [" + iString(maxLat) + "]";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   if (minLat < -90) {
     string msg = "MINLAT [" + iString(minLat) + "] is less than -90";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   if (maxLat > 90) {
     string msg = "MAXLAT [" + iString(maxLat) + "] is greater than 90";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 }
 
@@ -281,14 +281,14 @@ void checkLongitude(double minLon, double maxLon, int lonDomain) {
       "If you meant to wrap around the [" + iString(lonDomain) +
       "] longitude " + "boundary, use a MAXLON of [" +
       iString(suggestedMaxLon) + "]";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   if (minLon < lonDomain - 360) {
     string msg = "MINLON [" + iString(minLon) +
       "] is less than [" + iString(lonDomain) + "] domain minimum [" +
       iString(lonDomain - 360) + "]";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   if (maxLon - minLon > 360) {
@@ -297,7 +297,7 @@ void checkLongitude(double minLon, double maxLon, int lonDomain) {
     string msg = "The specified longitude range [" + iString(minLon) +
       "] to [" + iString(maxLon) + "] seeds that same area of the target [" +
       iString(loops) + "] times";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 }
 

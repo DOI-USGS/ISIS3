@@ -2,7 +2,7 @@
 #include "Process.h"
 #include "BundleAdjust.h"
 #include "Table.h"
-#include "iException.h"
+#include "IException.h"
 #include "CubeAttribute.h"
 #include "iTime.h"
 
@@ -127,13 +127,13 @@ void IsisMain() {
   }
 
   b->SetStandardOutput(ui.GetBoolean("BUNDLEOUT_TXT"));
-  b->SetCSVOutput(ui.GetBoolean("OUTPUT_CSV"));  
+  b->SetCSVOutput(ui.GetBoolean("OUTPUT_CSV"));
   b->SetResidualOutput(ui.GetBoolean("RESIDUALS_CSV"));
 
   // Check to make sure user entered something to adjust... Or can just points be in solution?
    if (camsolve == "NONE"  &&  spsolve == "NONE") {
      string msg = "Must either solve for camera pointing or spacecraft position";
-     throw iException::Message(Isis::iException::User, msg, _FILEINFO_);
+     throw IException(IException::User, msg, _FILEINFO_);
    }
 
   // set convergence threshold
@@ -206,11 +206,10 @@ void IsisMain() {
     Application::Log(gp);
   }
 
-  catch(iException &e) {
-
+  catch(IException &e) {
     b->ControlNet()->Write(ui.GetFilename("ONET"));
     string msg = "Unable to bundle adjust network [" + cnetFile + "]";
-    throw iException::Message(Isis::iException::User, msg, _FILEINFO_);
+    throw IException(e, IException::User, msg, _FILEINFO_);
   }
 
   delete b;

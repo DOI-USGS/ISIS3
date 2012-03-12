@@ -26,7 +26,7 @@
 #include "Filename.h"
 #include "Projection.h"
 #include "ProjectionFactory.h"
-#include "iException.h"
+#include "IException.h"
 #include "Brick.h"
 #include "Progress.h"
 #include <cfloat>
@@ -54,7 +54,7 @@ namespace Isis {
     // Test to ensure sampling percent in bound
     if (sampPercent <= 0.0 || sampPercent > 100.0) {
       string msg = "The sampling percent must be a decimal (0.0, 100.0]";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     p_sampPercent = sampPercent;
@@ -67,7 +67,7 @@ namespace Isis {
     if (x.getBandCount() != y.getBandCount()) {
       string msg = "Number of bands do not match between cubes [" +
                    p_xFile.Name() + "] and [" + p_yFile.Name() + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     p_bands = x.getBandCount();
     p_stats.resize(p_bands);
@@ -80,7 +80,7 @@ namespace Isis {
     if (*projX != *projY) {
       string msg = "Mapping groups do not match between cubes [" +
                    p_xFile.Name() + "] and [" + p_yFile.Name() + "]";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     // Figure out the x/y range for both images to find the overlap
@@ -272,10 +272,9 @@ namespace Isis {
             LinReg += a;
             LinReg += b;
           }
-          catch (iException &e) {
+          catch (IException &e) {
             // It is possible one of the overlaps was constant and therefore
             // the regression would be a vertical line (x=c instead of y=ax+b)
-            e.Clear();
           }
           o += LinReg;
         }
@@ -283,10 +282,10 @@ namespace Isis {
 
       return o;
     }
-    catch (iException &e) {
+    catch (IException &e) {
       string msg = "Trivial overlap between [" + FilenameX().Name();
       msg += "] and [" + FilenameY().Name() + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
 

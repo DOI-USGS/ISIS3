@@ -69,11 +69,11 @@ Count[2]:               5
 Count[3]:               0
 
 Testing errors
-**PROGRAMMER ERROR** Invalid value for [ns] in QuickFilter constructor
-**PROGRAMMER ERROR** [Width] must be must be greater than or equal to one in QuickFilter constructor
-**PROGRAMMER ERROR** [Height] must be must be greater than or equal to one in QuickFilter constructor
-**PROGRAMMER ERROR** [Width] must be must be odd in QuickFilter constructor
-**PROGRAMMER ERROR** [Height] must be must be odd in QuickFilter constructor
-**PROGRAMMER ERROR** Minimum must be less than maximum in [QuickFilter::SetMinMax]
-**PROGRAMMER ERROR** Minimum must be less than maximum in [QuickFilter::SetMinMax]
-**PROGRAMMER ERROR** Number of lines added exceeds boxcar height ... use RemoveLine before AddLine
+**PROGRAMMER ERROR** Invalid value for [ns] in QuickFilter constructor.
+**PROGRAMMER ERROR** [Width] must be must be greater than or equal to one in QuickFilter constructor.
+**PROGRAMMER ERROR** [Height] must be must be greater than or equal to one in QuickFilter constructor.
+**PROGRAMMER ERROR** [Width] must be must be odd in QuickFilter constructor.
+**PROGRAMMER ERROR** [Height] must be must be odd in QuickFilter constructor.
+**PROGRAMMER ERROR** Minimum must be less than maximum in [QuickFilter::SetMinMax].
+**PROGRAMMER ERROR** Minimum must be less than maximum in [QuickFilter::SetMinMax].
+**PROGRAMMER ERROR** Number of lines added exceeds boxcar height ... use RemoveLine before AddLine.

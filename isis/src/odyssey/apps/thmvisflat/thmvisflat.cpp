@@ -27,13 +27,13 @@ void IsisMain() {
     if(icube.getGroup("Instrument")["InstrumentID"][0] != "THEMIS_VIS") {
       string msg = "This program is intended for use on THEMIS VIS images only. [";
       msg += inFilename.Expanded() + "] does not appear to be a THEMIS VIS image.";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
-  catch(iException &e) {
+  catch(IException &e) {
     string msg = "This program is intended for use on THEMIS VIS images only. [";
     msg += inFilename.Expanded() + "] does not appear to be a THEMIS VIS image.";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(e, IException::User, msg, _FILEINFO_);
   }
 
   vector<Cube *> flatcubes;

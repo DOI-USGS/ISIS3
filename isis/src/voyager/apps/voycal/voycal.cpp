@@ -3,7 +3,7 @@
 #include "Buffer.h"
 #include "Camera.h"
 #include "CubeAttribute.h"
-#include "iException.h"
+#include "IException.h"
 #include "ProcessByLine.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
@@ -53,7 +53,7 @@ void IsisMain() {
   if (incube->isProjected()) {
     string msg = "The cube [" + ui.GetFilename("FROM") + "] has a projection" +
                  " and cannot be radiometrically calibrated";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // access important label objects, will be used later.
@@ -66,7 +66,7 @@ void IsisMain() {
   if (isiscube.HasGroup("Radiometry")) {
     string msg = "Cube [" + ui.GetFilename("FROM") + "] has already been" +
                  " radiometrically corrected";
-    throw iException::Message(iException::User,msg,_FILEINFO_);
+    throw IException(IException::User,msg,_FILEINFO_);
   }
 
   // Verify Voyager spacecraft and get number, 1 or 2
@@ -74,7 +74,7 @@ void IsisMain() {
   if (scNumber != "VOYAGER_1" && scNumber != "VOYAGER_2") {
     string msg = "The cube [" + ui.GetFilename("FROM") + "] does not appear" +
                  " to be a Voyager image";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
   scNumber = scNumber[8];
 
@@ -92,12 +92,11 @@ void IsisMain() {
     string filter = bandbin["FilterName"][0] + "_" + bandbin["FilterNumber"][0];
     calib = cstate1.FindObject(filter);
   }
-  catch (iException &e) {
+  catch (IException &e) {
     string msg = "Could not find match in [voycal.pvl] calibration file,";
     msg += " the error was: ";
     msg += e.what();
-    e.Clear();
-    throw iException::Message(iException::None, msg, _FILEINFO_);
+    throw IException(IException::Unknown, msg, _FILEINFO_);
   }
 
   // Get appropriate calibration files
@@ -131,12 +130,11 @@ void IsisMain() {
       string filter = bandbin["FilterName"][0] + "_" + bandbin["FilterNumber"][0];
       lin = cstate1.FindObject(filter);
     }
-    catch (iException &e) {
+    catch (IException &e) {
       string msg = "Could not find match in [voylin.pvl] calibration file,";
       msg += " the error was: ";
       msg += e.what();
-      e.Clear();
-      throw iException::Message(iException::None, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
     // Calculated constant for linear correction
     aCoef = ((double)lin["NormalizingPower"] - (double)lin["B_HighEndNon-LinearityCorrection"]) /

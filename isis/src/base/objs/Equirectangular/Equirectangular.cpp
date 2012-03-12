@@ -21,7 +21,7 @@
  *   http://www.usgs.gov/privacy.html.
  */
 #include "Equirectangular.h"
-#include "iException.h"
+#include "IException.h"
 #include "Constants.h"
 #include <cmath>
 #include <cfloat>
@@ -97,12 +97,12 @@ namespace Isis {
       p_cosCenterLatitude = cos(p_centerLatitude);
       if(fabs(p_cosCenterLatitude) < DBL_EPSILON) {
         string message = "Keyword value for CenterLatitude is too close to the pole";
-        throw Isis::iException::Message(Isis::iException::Io, message, _FILEINFO_);
+        throw IException(IException::Io, message, _FILEINFO_);
       }
     }
-    catch(Isis::iException &e) {
+    catch(IException &e) {
       string message = "Invalid label group [Mapping]";
-      throw Isis::iException::Message(Isis::iException::Io, message, _FILEINFO_);
+      throw IException(e, IException::Io, message, _FILEINFO_);
     }
   }
 

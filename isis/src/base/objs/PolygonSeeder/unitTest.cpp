@@ -1,7 +1,7 @@
 #include <iostream>
 #include <cstdlib>
 
-#include "iException.h"
+#include "IException.h"
 #include "PolygonSeeder.h"
 #include "PolygonSeederFactory.h"
 #include "Pvl.h"
@@ -41,8 +41,8 @@ int main() {
     std::cout << "No reason to test GridPolygonSeeder, so we're done" << std::endl;
 
   }
-  catch(iException &e) {
-    e.Report();
+  catch(IException &e) {
+    e.print();
   }
 
   return 0;

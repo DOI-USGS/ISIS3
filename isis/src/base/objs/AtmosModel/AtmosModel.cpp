@@ -9,7 +9,7 @@
 #include "Minnaert.h"
 #include "LunarLambert.h"
 #include "Plugin.h"
-#include "iException.h"
+#include "IException.h"
 #include "Filename.h"
 
 using namespace std;
@@ -109,7 +109,7 @@ namespace Isis {
     if(algorithm.HasKeyword("Hnorm")) {
       SetAtmosHnorm(algorithm["Hnorm"]);
     }
-    
+
     if(algorithm.HasKeyword("Iord")) {
       SetAtmosIord(((string)algorithm["Iord"]).compare("YES") == 0);
     }
@@ -208,9 +208,9 @@ namespace Isis {
    *           computed, @a x > 0.0
    * @returns @b double The exponential integral for the given
    *        @a x.
-   * @throws Isis::iException::Programmer "Invalid arguments.
+   * @throws Isis::IException::Programmer "Invalid arguments.
    *             Definition requires x > 0.0."
-   * @throws Isis::iException::Math "Power series failed to
+   * @throws Isis::IException::Math "Power series failed to
    *             converge"
    * @internal
    *   @history 1999-08-11 K Teal Thompson - Original
@@ -220,7 +220,7 @@ namespace Isis {
     *  @history 2008-11-05 Jeannie Walldren - Renamed and modified
     *           input parameters.  Added documentation.
    */
-  double AtmosModel::Ei(double x) throw(iException &) {
+  double AtmosModel::Ei(double x) {
     //static double r8ei(double x) in original NumericalMethods class
     // This method was derived from an algorithm in the text
     // Numerical Recipes in C: The Art of Scientific Computing
@@ -238,10 +238,10 @@ namespace Isis {
     euler = 0.57721566;
 
     if(x <= 0.0) {
-      throw iException::Message(iException::Programmer,
-                                "AtmosModel::Ei() - Invalid argument. Definition requires x > 0.0. Entered x = "
-                                + iString(x),
-                                _FILEINFO_);
+      throw IException(IException::Programmer,
+                       "AtmosModel::Ei() - Invalid argument. Definition requires x > 0.0. Entered x = "
+                       + iString(x),
+                       _FILEINFO_);
     }
     if(x < fpmin) {  //special case: avoid failure of convergence test because underflow
       result = log(x) + euler;
@@ -258,10 +258,10 @@ namespace Isis {
           return(result);
         }
       }
-      throw iException::Message(iException::Math,
-                                "AtmosModel::Ei() - Power series failed to converge in "
-                                + iString(maxit) + " iterations. Unable to calculate exponential integral.",
-                                _FILEINFO_);
+      throw IException(IException::Unknown,
+                       "AtmosModel::Ei() - Power series failed to converge in "
+                       + iString(maxit) + " iterations. Unable to calculate exponential integral.",
+                       _FILEINFO_);
     }
     else { // Use asymptotic series
       sum = 0.0;
@@ -347,12 +347,12 @@ namespace Isis {
    * @param x  The exponential integral En(x) will be evaluated
    * @returns @b double Value of the exponential integral for
    *        the give n and x.
-   * @throws Isis::iException::Programmer "Invalid arguments.
+   * @throws Isis::IException::Programmer "Invalid arguments.
    *             Definition requires (x > 0.0 and n >=0 ) or (x >=
    *             0.0 and n > 1)."
-   * @throws Isis::iException::Math "Continued fraction failed to
+   * @throws Isis::IException::Math "Continued fraction failed to
    *             converge"
-   * @throws Isis::iException::Math "Series representation failed to converge"
+   * @throws Isis::IException::Math "Series representation failed to converge"
    * @internal
    *   @history 1999-08-10 K Teal Thompson - Original version in
    *            named pht_r8expint Isis2.
@@ -361,7 +361,7 @@ namespace Isis {
    *   @history 2008-11-05 Jeannie Walldren - Renamed and modified
    *            input parameters.  Added documentation.
    */
-  double AtmosModel::En(unsigned int n, double x) throw(iException &) {
+  double AtmosModel::En(unsigned int n, double x) {
     //static double r8expint(int n, double x) in original NumericalMethods class
     // This method was derived from an algorithm in the text
     // Numerical Recipes in C: The Art of Scientific Computing
@@ -387,8 +387,7 @@ namespace Isis {
       iString msg = "AtmosModel::En() - Invalid arguments. ";
       msg += "Definition requires (x > 0.0 and n >=0 ) or (x >= 0.0 and n > 1). ";
       msg += "Entered x = " + iString(x) + " and n = " + iString((int) n);
-      throw iException::Message(iException::Programmer, msg,
-                                _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     else if(n == 0) {  // special case, this implies x > 0 by logic above
       result = exp(-x) / x;
@@ -413,10 +412,10 @@ namespace Isis {
           return(result);
         }
       }
-      throw iException::Message(iException::Math,
-                                "AtmosModel::En() - Continued fraction failed to converge in "
-                                + iString(maxit) + " iterations. Unable to calculate exponential integral.",
-                                _FILEINFO_);
+      throw IException(IException::Unknown,
+                       "AtmosModel::En() - Continued fraction failed to converge in "
+                       + iString(maxit) + " iterations. Unable to calculate exponential integral.",
+                       _FILEINFO_);
     }
     else { // evaluate series
       if(nm1 != 0) {
@@ -443,10 +442,10 @@ namespace Isis {
           return(result);
         }
       }
-      throw iException::Message(iException::Math,
-                                "AtmosModel::En() - Series representation failed to converge in "
-                                + iString(maxit) + " iterations. Unable to calculate exponential integral.",
-                                _FILEINFO_);
+      throw IException(IException::Unknown,
+                       "AtmosModel::En() - Series representation failed to converge in "
+                       + iString(maxit) + " iterations. Unable to calculate exponential integral.",
+                       _FILEINFO_);
     }
     return(result);
   }
@@ -465,7 +464,7 @@ namespace Isis {
    *        through the atmosphere with no scatterings in the
    *        atmosphere
    * @param sbar illumination of the ground by the sky
-   * @throw Isis::iException::User "Invalid photometric angles"
+   * @throw Isis::IException::User "Invalid photometric angles"
    */
   void AtmosModel::CalcAtmEffect(double pha, double inc, double ema,
                                  double *pstd, double *trans, double *trans0, double *sbar,
@@ -475,7 +474,7 @@ namespace Isis {
     //if (pha > 180.0 || inc > 90.0 || ema > 90.0 || pha < 0.0 ||
     //    inc < 0.0 || ema < 0.0) {
     //  string msg = "Invalid photometric angles";
-    //  throw iException::Message(iException::Programmer,msg,_FILEINFO_);
+    //  throw IException::Message(IException::Programmer,msg,_FILEINFO_);
     //}
 
     // Apply atmospheric function
@@ -699,7 +698,7 @@ namespace Isis {
    * This method is a modified version of the GenerateHahgTables
    * method and is used solely for shadow modeling. Unlike the
    * GenerateHahgTables method, this method does not tabulate the
-   * first or third integrals. It only evaluates the middle 
+   * first or third integrals. It only evaluates the middle
    * integral that corrects the sbar variable (illumination of
    * the ground by the sky).
    *
@@ -768,13 +767,13 @@ namespace Isis {
   *
   * @param atmswitch  Internal atmospheric function parameter,
   *                   there is no default
-  * @throw Isis::iException::User "Invalid value of atmospheric
+  * @throw Isis::IException::User "Invalid value of atmospheric
   *        atmswitch"
   */
   void AtmosModel::SetAtmosAtmSwitch(const int atmswitch) {
     if(atmswitch < 0 || atmswitch > 3) {
       string msg = "Invalid value of atmospheric atmswitch [" + iString(atmswitch) + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     p_atmosAtmSwitch = atmswitch;
@@ -788,14 +787,14 @@ namespace Isis {
    *
    * @param bha  Anisotropic atmospheric function parameter,
    *             default is 0.85
-   * @throw Isis::iException::User "Invalid value of atmospheric
+   * @throw Isis::IException::User "Invalid value of atmospheric
    *        bha"
    */
   void AtmosModel::SetAtmosBha(const double bha) {
     if(bha < -1.0 || bha > 1.0) {
       string msg = "Invalid value of Anisotropic atmospheric bha [" +
                    iString(bha) + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     p_atmosBha = bha;
@@ -809,13 +808,13 @@ namespace Isis {
    *
    * @param hga  Hapke atmospheric function parameter,
    *             default is 0.68
-   * @throw Isis::iException::User "Invalid value of atmospheric
+   * @throw Isis::IException::User "Invalid value of atmospheric
    *        hga"
    */
   void AtmosModel::SetAtmosHga(const double hga) {
     if(hga <= -1.0 || hga >= 1.0) {
       string msg = "Invalid value of Hapke atmospheric hga [" + iString(hga) + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     p_atmosHga = hga;
@@ -828,13 +827,13 @@ namespace Isis {
    *
    * @param inc  Internal atmospheric function parameter,
    *             there is no default
-   * @throw Isis::iException::User "Invalid value of atmospheric
+   * @throw Isis::IException::User "Invalid value of atmospheric
    *        inc"
    */
   void AtmosModel::SetAtmosInc(const double inc) {
     if(inc < 0.0 || inc > 90.0) {
       string msg = "Invalid value of atmospheric inc [" + iString(inc) + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     p_atmosInc = inc;
@@ -849,7 +848,7 @@ namespace Isis {
    * of YES or NO.
    *
    * @param nulneg  Atmospheric function parameter, default is NO
-   * @throw Isis::iException::User "Invalid value of atmospheric
+   * @throw Isis::IException::User "Invalid value of atmospheric
    *        nulneg"
    *
    */
@@ -859,7 +858,7 @@ namespace Isis {
 
     if(temp != "NO" && temp != "YES") {
       string msg = "Invalid value of Atmospheric nulneg [" + temp + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     SetAtmosNulneg(temp.compare("YES") == 0);
@@ -872,14 +871,14 @@ namespace Isis {
    *
    * @param phi  Internal atmospheric function parameter,
    *             there is no default
-   * @throw Isis::iException::User "Invalid value of atmospheric
+   * @throw Isis::IException::User "Invalid value of atmospheric
    *        phi"
    *
    */
   void AtmosModel::SetAtmosPhi(const double phi) {
     if(phi < 0.0 || phi > 360.0) {
       string msg = "Invalid value of atmospheric phi [" + iString(phi) + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     p_atmosPhi = phi;
@@ -892,13 +891,13 @@ namespace Isis {
    * limited to values that are >=0.
    *
    * @param tau  Atmospheric function parameter, default is 0.28
-   * @throw Isis::iException::User "Invalid value of atmospheric
+   * @throw Isis::IException::User "Invalid value of atmospheric
    *        tau"
    */
   void AtmosModel::SetAtmosTau(const double tau) {
     if(tau < 0.0) {
       string msg = "Invalid value of Atmospheric tau [" + iString(tau) + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     p_atmosTau = tau;
@@ -911,13 +910,13 @@ namespace Isis {
    * are >=0.
    *
    * @param tauref  Atmospheric function parameter, default is 0.0
-   * @throw Isis::iException::User "Invalid value of atmospheric
+   * @throw Isis::IException::User "Invalid value of atmospheric
    *        tauref"
    */
   void AtmosModel::SetAtmosTauref(const double tauref) {
     if(tauref < 0.0) {
       string msg = "Invalid value of Atmospheric tauref [" + iString(tauref) + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     p_atmosTauref = tauref;
@@ -929,14 +928,14 @@ namespace Isis {
    * is limited to values that are >0 and <=1.
    *
    * @param wha  Atmospheric function parameter, default is 0.95
-   * @throw Isis::iException::User "Invalid value of atmospheric
+   * @throw Isis::IException::User "Invalid value of atmospheric
    *        wha"
    *
    */
   void AtmosModel::SetAtmosWha(const double wha) {
     if(wha <= 0.0 || wha > 1.0) {
       string msg = "Invalid value of Atmospheric wha [" + iString(wha) + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     p_atmosWha = wha;
@@ -949,7 +948,7 @@ namespace Isis {
   bool AtmosModel::TauOrWhaChanged() const {
     return (AtmosTau() != p_atmosTauold) || (AtmosWha() != p_atmosWhaold);
   }
-  
+
   /**
    * Set the Atmospheric function parameter. This is the
    * atmospheric shell thickness normalized to the planet radius
@@ -963,16 +962,16 @@ namespace Isis {
   void AtmosModel::SetAtmosHnorm(const double hnorm) {
     if(hnorm < 0.0) {
       std::string msg = "Invalid value of Atmospheric hnorm [" + iString(hnorm) + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     p_atmosHnorm = hnorm;
   }
-  
+
   /**
    * Set additive offset in fit
-   * 
+   *
    * @author Sharmila Prasad (8/18/2011)
-   * 
+   *
    * @param offset true/false
    */
   void AtmosModel::SetAtmosIord(const string offset) {
@@ -981,17 +980,17 @@ namespace Isis {
 
     if(temp != "NO" && temp != "YES") {
       string msg = "Invalid value of Atmospheric additive offset[" + temp + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     SetAtmosIord(temp.compare("YES") == 0);
   }
-  
+
   /**
    * Estimate the optical depth tau using shadows
-   * 
+   *
    * @author Janet Barrett (12/16/2011)
-   * 
+   *
    * @param esttau true/false
    */
   void AtmosModel::SetAtmosEstTau(const string esttau) {
@@ -1000,7 +999,7 @@ namespace Isis {
 
     if(temp != "NO" && temp != "YES") {
       string msg = "Invalid value of Atmospheric optical depth estimation[" + temp + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     SetAtmosEstTau(temp.compare("YES") == 0);

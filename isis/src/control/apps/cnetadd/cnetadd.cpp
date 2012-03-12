@@ -32,7 +32,7 @@
 #include "SerialNumberList.h"
 #include "SurfacePoint.h"
 #include "UserInterface.h"
-#include "iException.h"
+#include "IException.h"
 #include "iTime.h"
 
 using geos::geom::Coordinate;
@@ -102,7 +102,7 @@ void IsisMain() {
         if (addSerials.SerialNumber(i) == addSerials.SerialNumber(j)) {
           std::string msg = "Add list files [" + addSerials.Filename(i) + "] and [";
           msg += addSerials.Filename(j) + "] share the same serial number.";
-          throw iException::Message(iException::User, msg, _FILEINFO_);
+          throw IException(IException::User, msg, _FILEINFO_);
         }
       }
     }
@@ -120,7 +120,7 @@ void IsisMain() {
         std::string msg = "Unable to retreive lat/lon from Control Point [";
         msg += point->GetId() + "]. RETREIVAL=POINT cannot be used unless ";
         msg += "all Control Points have Latitude/Longitude keywords.";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
 
       surfacePoints[point->GetId()] = surfacePoint;
@@ -372,10 +372,10 @@ void SetControlPointLatLon(SerialNumberList &snl, ControlNet &cnet) {
       cube->getCamera()->SetImage(cm->GetSample(), cm->GetLine());
       surfacePoints[point->GetId()] = cube->getCamera()->GetSurfacePoint();
     }
-    catch (iException &e) {
+    catch (IException &e) {
       std::string msg = "Unable to create camera for cube file [";
       msg += snl.Filename(cm->GetCubeSerialNumber()) + "]";
-      throw iException::Message(iException::System, msg, _FILEINFO_);
+      throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
     cube = NULL; //Do not delete, manager still has ownership
 
@@ -391,10 +391,10 @@ QList<ControlPoint *> getValidPoints(Cube &cube, STRtree &coordTree) {
   try {
     cube.read(poly);
   }
-  catch (iException &e) {
+  catch (IException &e) {
     std::string msg = "Footprintinit must be run prior to running cnetadd";
     msg += " with POLYGON=TRUE for cube [" + cube.getFilename() + "]";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(e, IException::User, msg, _FILEINFO_);
   }
 
   std::vector<void *> matches;

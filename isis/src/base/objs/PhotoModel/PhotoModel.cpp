@@ -3,7 +3,7 @@
 #include "PhotoModel.h"
 #include "Plugin.h"
 #include "Pvl.h"
-#include "iException.h"
+#include "IException.h"
 
 using namespace std;
 
@@ -25,13 +25,13 @@ namespace Isis {
     if(algorithm.HasKeyword("PhtName")) {
       p_photoAlgorithmName = string(algorithm["PhtName"]);
     }
-    else if(algorithm.HasKeyword("Name")) { 
+    else if(algorithm.HasKeyword("Name")) {
       p_photoAlgorithmName = string(algorithm["Name"]);
     }
     else {
       iString msg = "Keyword [Name] or keyword [PhtName] must ";
       msg += "exist in [Group = Algorithm]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     p_standardConditions = false;

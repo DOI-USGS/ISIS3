@@ -5,7 +5,7 @@
 #include "NumericalApproximation.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 
 using std::max;

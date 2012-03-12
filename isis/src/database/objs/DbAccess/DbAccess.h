@@ -29,7 +29,7 @@
 
 #include "CollectorMap.h"
 #include "DbProfile.h"
-#include "iException.h"
+#include "IException.h"
 
 namespace Isis {
 
@@ -153,9 +153,8 @@ namespace Isis {
         return (_profiles.exists(profile));
       }
 
-      const DbProfile getProfile(const std::string &name = "") const
-      throw(iException &);
-      const DbProfile getProfile(int nth) const throw(iException &);
+      const DbProfile getProfile(const std::string &name = "") const;
+      const DbProfile getProfile(int nth) const;
 
 
       /**

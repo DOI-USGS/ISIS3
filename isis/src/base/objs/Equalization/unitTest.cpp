@@ -2,7 +2,7 @@
 
 #include "Buffer.h"
 #include "Equalization.h"
-#include "iException.h"
+#include "IException.h"
 #include "OverlapNormalization.h"
 #include "OverlapStatistics.h"
 #include "PvlGroup.h"
@@ -74,8 +74,8 @@ int main(int argc, char *argv[]) {
       p.ProcessCubeInPlace(func, false);
     }
   }
-  catch (iException &e) {
-    e.Report();
+  catch (IException &e) {
+    e.print();
   }
 }
 

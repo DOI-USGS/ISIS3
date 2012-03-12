@@ -12,7 +12,7 @@
 
 #include "ControlMeasure.h"
 #include "ControlPoint.h"
-#include "iException.h"
+#include "IException.h"
 
 #include "AbstractPointItem.h"
 #include "AbstractTreeItem.h"
@@ -90,10 +90,10 @@ namespace Isis
               default:
                 break;
             }
-            
+
             return combo;
           }
-          
+
         // handle line edit cases
         default:
           return new QLineEdit();
@@ -101,7 +101,7 @@ namespace Isis
 
       iString msg = "Could not create delegate widget for column ["
           + col->getTitle() + "]";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
 
@@ -127,7 +127,7 @@ namespace Isis
             combo->setCurrentIndex(point->IndexOfRefMeasure());
           }
           break;
-          
+
         case AbstractPointItem::PointType:
         case AbstractPointItem::EditLock:
         case AbstractPointItem::Ignored:
@@ -190,15 +190,15 @@ namespace Isis
 
             for (int i = 0; i < point->GetNumMeasures(); i++)
               combo->insertItem(i, point->GetMeasure(i)->GetCubeSerialNumber());
-            
+
             combo->setCurrentIndex(point->IndexOfRefMeasure());
-            
+
             for (int i = combo->count() - 1; i >= 0; --i)
               if (combo->itemText(i).toLower().startsWith(newData.toLower()))
                 combo->setCurrentIndex(i);
           }
           break;
-          
+
         case AbstractPointItem::PointType:
         case AbstractPointItem::EditLock:
         case AbstractPointItem::Ignored:
@@ -230,7 +230,7 @@ namespace Isis
               default:
                 break;
             }
-            
+
             for (int i = combo->count() - 1; i >= 0; --i)
               if (combo->itemText(i).toLower().startsWith(newData.toLower()))
                 combo->setCurrentIndex(i);

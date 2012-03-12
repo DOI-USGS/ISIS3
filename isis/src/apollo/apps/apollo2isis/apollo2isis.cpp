@@ -4,7 +4,7 @@
 #include "Filename.h"
 #include "Pvl.h"
 #include "iString.h"
-#include "iException.h"
+#include "IException.h"
 #include "iTime.h"
 #include "Apollo.h"
 #include "PvlTranslationTable.h"

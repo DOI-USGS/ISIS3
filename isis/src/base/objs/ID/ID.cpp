@@ -17,7 +17,7 @@
  */
 
 #include "ID.h"
-#include "iException.h"
+#include "IException.h"
 #include "Message.h"
 #include "iString.h"
 #include <iostream>
@@ -35,7 +35,7 @@ namespace Isis {
     p_namebase = name;
     if(p_namebase.find("?", 0) == std::string::npos) {
       std::string msg = "No replacement set in string [" + p_namebase + "]";
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     p_numStart = ((int) p_namebase.find("?", 0));
     int endPos = (int)p_namebase.find_last_of("?", p_namebase.size());
@@ -44,7 +44,7 @@ namespace Isis {
     for(int i = 0; i < (int)sub.length(); i++) {
       if(sub[i] != '?') {
         std::string msg = "iString [" + p_namebase + "] contains more than one replacement set";
-        throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
     }
     p_namebase.erase(p_numStart, p_numLength);
@@ -71,7 +71,7 @@ namespace Isis {
       std::string original = p_namebase;
       original.insert(p_numStart, replacement);
       std::string msg = "Maximum number reached for string [" + original + "]";
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     while((int)num.size() < p_numLength) {
       num = "0" + num;

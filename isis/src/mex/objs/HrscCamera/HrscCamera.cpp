@@ -39,7 +39,7 @@ namespace Isis {
    * Creates a HrscCamera Camera Model
    *
    * @param lab Pvl label from the iamge
-   * @internal 
+   * @internal
    *   @history 2011-05-03 Jeannie Walldren - Added NAIF error check.
    */
   HrscCamera::HrscCamera(Pvl &lab) : LineScanCamera(lab) {
@@ -89,8 +89,8 @@ namespace Isis {
   HrscCamera::~HrscCamera() {}
 
 
-  /** 
-   * @param filename  
+  /**
+   * @param filename
    */
   void HrscCamera::ReadLineRates(iString filename) {
     Table timesTable("LineScanTimes", filename);
@@ -98,7 +98,7 @@ namespace Isis {
     if(timesTable.Records() <= 0) {
       string msg = "Table [LineScanTimes] in [";
       msg += filename + "] must not be empty";
-      throw iException::Message(iException::Pvl, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     for(int i = 0; i < timesTable.Records(); i++) {
@@ -110,7 +110,7 @@ namespace Isis {
     if(p_lineRates.size() <= 0) {
       string msg = "There is a problem with the data within the Table ";
       msg += "[LineScanTimes] in [" + filename + "]";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
   }
 }

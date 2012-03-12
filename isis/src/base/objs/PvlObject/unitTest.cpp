@@ -3,7 +3,7 @@
 
 #include "PvlObject.h"
 #include "PvlTokenizer.h"
-#include "iException.h"
+#include "IException.h"
 #include "Preference.h"
 
 using namespace Isis;
@@ -60,14 +60,14 @@ int main() {
   try {
     cout << o.FindKeyword("Trout", PvlObject::None) << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
   try {
     cout << o.FindKeyword("Bus", PvlObject::Traverse) << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
   cout << "Keyword Trout should not exist at top level " << o.HasKeyword("Trout", PvlObject::None) << endl;
   cout << "Keyword Bus should dnot exit at top level " << o.HasKeyword("Bus", PvlObject::Traverse) << endl;
@@ -107,9 +107,9 @@ int main() {
     os5 >> o5;
     cout << o5;
   }
-  catch(iException &e) {
+  catch(IException &e) {
     cout.flush();
-    e.Report(false);
+    e.print();
   }
 
 
@@ -122,9 +122,9 @@ int main() {
     os5 >> o5;
     cout << o5;
   }
-  catch(iException &e) {
+  catch(IException &e) {
     cout.flush();
-    e.Report(false);
+    e.print();
   }
   
   try {
@@ -218,9 +218,9 @@ int main() {
     
     cout << "After Validation Results PVL:\n" << pvlObjectRoot << endl;
     
-  } catch (iException &e) {
+  } catch (IException &e) {
     cout.flush();
-    e.Report(false);
+    e.print();
   }
 
   cout << endl << "Testing reallocation ..." << endl;

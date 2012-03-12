@@ -9,7 +9,7 @@
 #include <QScrollBar>
 
 #include "CubeDisplayProperties.h"
-#include "iException.h"
+#include "IException.h"
 #include "MosaicTreeWidgetItem.h"
 #include "ProgressBar.h"
 
@@ -120,9 +120,8 @@ namespace Isis {
 
       return item;
     }
-    catch(iException &e) {
-      e.Report();
-      e.Clear();
+    catch(IException &e) {
+      e.print();
     }
 
     return NULL;
@@ -603,4 +602,3 @@ namespace Isis {
     return result;
   }
 }
-

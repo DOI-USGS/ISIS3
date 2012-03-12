@@ -3,7 +3,7 @@
 #include "PvlGroup.h"
 #include "PvlTokenizer.h"
 #include "Preference.h"
-#include "iException.h"
+#include "IException.h"
 
 using namespace std;
 using namespace Isis;
@@ -73,9 +73,9 @@ int main() {
     os2 >> g2;
     cout << g2 << endl;
   }
-  catch(iException &e) {
+  catch(IException &e) {
     cout.flush();
-    e.Report(false);
+    e.print();
   }
   
   // Validate Group
@@ -118,7 +118,7 @@ int main() {
   try {
     pvlTmplGrp.ValidateGroup(pvlGrp);
   } 
-  catch (iException &e) {
+  catch (IException &e) {
     cerr << "\n**Test1**RequiredKeyword\nResults Group:\n" << pvlGrp << endl;
     cerr << "**PVL ERROR** Required Keyword \"GreaterThan\" not found in the PvlGroup\n";
     cerr << "**********\n";
@@ -147,8 +147,8 @@ int main() {
     cout << "Results Group:\n" << pvlGrp << endl;
     cerr << "**********\n";
   } 
-  catch (iException &e) {
-    e.Report(false);
+  catch (IException &e) {
+    e.print();
   } 
   
   // Test for unvalidated elements
@@ -167,8 +167,8 @@ int main() {
     cout << "Results Group:\n" << pvlGrp << endl;
     cerr << "**********\n";
   } 
-  catch (iException &e) {
-    e.Report(false);
+  catch (IException &e) {
+    e.print();
   } 
   
 }

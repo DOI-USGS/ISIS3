@@ -214,6 +214,6 @@ Testing MakeDirectory for $temporaryIsisFilenameTest
   The directory create succeed
 
 Testing MakeDirectory for $temporaryIsisFilenameTest
-**PROGRAMMER ERROR** Unable to create directory [../Filename/IsisFilenameTest]
+**PROGRAMMER ERROR** Unable to create directory [../Filename/IsisFilenameTest].
 
 

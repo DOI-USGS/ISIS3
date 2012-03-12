@@ -37,15 +37,15 @@ int main(int argc, char *argv[]) {
   try {
     d.getProfile(99);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
     d.load("/tmp/not_a_file");
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   return 0;

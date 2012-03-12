@@ -7,15 +7,15 @@ unittest: Gathering statistics
 3.69653e+38
 
 
-**USER ERROR** The LRS range [35.0,55.0] overlaps the NULL range [0.0,45.0]
+**USER ERROR** The LRS range [35.0,55.0] overlaps the NULL range [0.0,45.0].
 
 
-**USER ERROR** The HRS range [-10.0,5.0] overlaps the NULL range [0.0,45.0]
+**USER ERROR** The HRS range [-10.0,5.0] overlaps the NULL range [0.0,45.0].
 
-**USER ERROR** The Null range [35.0,55.0] overlaps the LRS range [10.0,145.0]
+**USER ERROR** The Null range [35.0,55.0] overlaps the LRS range [10.0,145.0].
 
-**USER ERROR** The LIS range [0.0,15.0] overlaps the NULL range [0.0,45.0]
+**USER ERROR** The LIS range [0.0,15.0] overlaps the NULL range [0.0,45.0].
 
-**USER ERROR** The HIS range [-10.0,155.0] overlaps the LRS range [10.0,145.0]
+**USER ERROR** The HIS range [-10.0,155.0] overlaps the LRS range [10.0,145.0].
 
 

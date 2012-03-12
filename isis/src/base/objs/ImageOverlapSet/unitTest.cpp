@@ -1,7 +1,7 @@
 #include <iostream>
 #include <exception>
 
-#include "iException.h"
+#include "IException.h"
 #include "SerialNumberList.h"
 #include "PolygonTools.h"
 #include "ImageOverlapSet.h"

@@ -1623,29 +1623,29 @@ Sample:  1:1  Line:  126:126  Band:  2:1
 100% Processed
 End Testing Functors
 Testing error for no input/output ...
-**PROGRAMMER ERROR** You haven't specified an input or output cube
+**PROGRAMMER ERROR** You haven't specified an input or output cube.
 
 Testing error for too many input/outputs ...
-**PROGRAMMER ERROR** You can only specify exactly one input or output cube
+**PROGRAMMER ERROR** You can only specify exactly one input or output cube.
 
 Testing for exactly one input ...
-**PROGRAMMER ERROR** You must specify exactly one input cube
+**PROGRAMMER ERROR** You must specify exactly one input cube.
 
 Testing for exactly one output ...
-**PROGRAMMER ERROR** You must specify exactly one output cube
+**PROGRAMMER ERROR** You must specify exactly one output cube.
 
 Testing for lines mismatch ...
-**PROGRAMMER ERROR** The number of lines in the input and output cubes must match
+**PROGRAMMER ERROR** The number of lines in the input and output cubes must match.
 
 Testing for bands mismatch ...
-**PROGRAMMER ERROR** The number of bands in the input and output cubes must match
+**PROGRAMMER ERROR** The number of bands in the input and output cubes must match.
 
 Testing for no inputs/outputs ...
-**PROGRAMMER ERROR** You have not specified any input or output cubes
+**PROGRAMMER ERROR** You have not specified any input or output cubes.
 
 Testing for output lines mismatch ...
-**PROGRAMMER ERROR** All output cubes must have the same number of lines as the first input cube or output cube
+**PROGRAMMER ERROR** All output cubes must have the same number of lines as the first input cube or output cube.
 
 Testing for output bands mismatch ...
-**PROGRAMMER ERROR** All output cubes must have the same number of bands as the first input cube or output cube
+**PROGRAMMER ERROR** All output cubes must have the same number of bands as the first input cube or output cube.
 

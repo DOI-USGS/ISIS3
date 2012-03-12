@@ -3,7 +3,7 @@
 
 #include <cstdio>
 #include <string>
-#include <vector> 
+#include <vector>
 #include <algorithm>
 #include <sstream>
 #include <iostream>
@@ -20,7 +20,7 @@
 #include "HiCalUtil.h"
 #include "HiCalData.h"
 #include "Statistics.h"
-#include "SplineFill.h"              // SpineFillComp.h 
+#include "SplineFill.h"              // SpineFillComp.h
 #include "LowPassFilter.h"           // LowPassFilterComp.h
 #include "ZeroBufferSmooth.h"        // DriftBuffer.h  (Zf)
 #include "ZeroBufferFit.h"           // DriftCorrect.h (Zd)
@@ -46,11 +46,11 @@ MatrixList *calVars = 0;
 
 /**
  * @brief Apply calibration to each HiRISE image line
- * 
+ *
  * This function applies the calbration equation to each input image line.  It
  * gets matrices and constants from the \b calVars container that is established
  * in the main with some user input via the configuration (CONF) parameter.
- * 
+ *
  * @param in  Input raw image line buffer
  * @param out Output calibrated image line buffer
  */
@@ -81,7 +81,7 @@ void calibrate(Buffer &in, Buffer &out) {
     else {
       double hdn;
       hdn = (in[i] - ZBF[line] - ZRev[i] - ZD[i]); // Drift, Reverse, Dark
-      hdn = hdn / GLD[line];  // GainLineDrift 
+      hdn = hdn / GLD[line];  // GainLineDrift
       data.push_back(hdn);   // Accumulate average for non-linearity
       out[i] = hdn;
     }
@@ -94,8 +94,8 @@ void calibrate(Buffer &in, Buffer &out) {
     for (int i = 0 ; i < out.size() ; i++) {
       if (!IsSpecial(out[i])) {
         double hdn = out[i];
-        hdn = hdn * GCN[i] * NLGain * GFF[i] * GT[i];  // Gain, Non-linearity 
-                                                       // gain,  FlatField, 
+        hdn = hdn * GCN[i] * NLGain * GFF[i] * GT[i];  // Gain, Non-linearity
+                                                       // gain,  FlatField,
                                                        // TempGain
         out[i] = hdn / GUC;                   // I/F or DN or DN/US
       }
@@ -185,19 +185,19 @@ void IsisMain(){
     }
 
 /////////////////////////////////////////////////////////////////////
-// ZeroBufferFit 
+// ZeroBufferFit
 //  Compute second level of drift correction.  The high level noise
 //  is removed from a modeled non-linear fit.
-// 
+//
     procStep = "ZeroBufferFit module";
     HiHistory ZbfHist;
     hiconf.selectProfile("ZeroBufferFit");
     hiprof = hiconf.getMatrixProfile();
     ZbfHist.add("Profile["+ hiprof.Name()+"]");
-    if (!SkipModule(hiprof) ) { 
+    if (!SkipModule(hiprof) ) {
       ZeroBufferFit zbf(hiconf);
 
-      calVars->add(hiconf.getProfileName(), 
+      calVars->add(hiconf.getProfileName(),
                    zbf.Normalize(zbf.Solve(calVars->get("ZeroBufferSmooth"))));
       ZbfHist = zbf.History();
       if ( hiprof.exists("DumpModuleFile") ) {
@@ -211,9 +211,9 @@ void IsisMain(){
 
 
  ////////////////////////////////////////////////////////////////////
- //  ZeroReverse 
+ //  ZeroReverse
     procStep = "ZeroReverse module";
-    hiconf.selectProfile("ZeroReverse"); 
+    hiconf.selectProfile("ZeroReverse");
     hiprof = hiconf.getMatrixProfile();
     HiHistory ZrHist;
     ZrHist.add("Profile["+ hiprof.Name()+"]");
@@ -232,7 +232,7 @@ void IsisMain(){
 
 /////////////////////////////////////////////////////////////////
 // ZeroDark removes dark current
-// 
+//
     procStep = "ZeroDark module";
     hiconf.selectProfile("ZeroDark");
     hiprof =  hiconf.getMatrixProfile();
@@ -253,7 +253,7 @@ void IsisMain(){
 
 ////////////////////////////////////////////////////////////////////
 // GainLineDrift correct for gain-based drift
-// 
+//
     procStep = "GainLineDrift module";
     hiconf.selectProfile("GainLineDrift");
     hiprof = hiconf.getMatrixProfile();
@@ -275,7 +275,7 @@ void IsisMain(){
 ////////////////////////////////////////////////////////////////////
 //  GainNonLinearity  Correct for non-linear gain
     procStep = "GainNonLinearity module";
-    hiconf.selectProfile("GainNonLinearity"); 
+    hiconf.selectProfile("GainNonLinearity");
     hiprof =  hiconf.getMatrixProfile();
     HiHistory GnlHist;
     GnlHist.add("Profile["+ hiprof.Name()+"]");
@@ -283,7 +283,7 @@ void IsisMain(){
       GainNonLinearity gnl(hiconf);
       calVars->add(hiconf.getProfileName(), gnl.ref());
       GnlHist = gnl.History();
-      if ( hiprof.exists("DumpModuleFile") ) { 
+      if ( hiprof.exists("DumpModuleFile") ) {
         gnl.Dump(hiconf.getMatrixSource("DumpModuleFile",hiprof));
       }
     }
@@ -293,9 +293,9 @@ void IsisMain(){
     }
 
 ////////////////////////////////////////////////////////////////////
-//  GainChannelNormalize  Correct for sample gain with the G matrix 
+//  GainChannelNormalize  Correct for sample gain with the G matrix
     procStep = "GainChannelNormalize module";
-    hiconf.selectProfile("GainChannelNormalize"); 
+    hiconf.selectProfile("GainChannelNormalize");
     hiprof =  hiconf.getMatrixProfile();
     HiHistory GcnHist;
     GcnHist.add("Profile["+ hiprof.Name()+"]");
@@ -303,7 +303,7 @@ void IsisMain(){
       GainChannelNormalize gcn(hiconf);
       calVars->add(hiconf.getProfileName(), gcn.ref());
       GcnHist = gcn.History();
-      if ( hiprof.exists("DumpModuleFile") ) { 
+      if ( hiprof.exists("DumpModuleFile") ) {
         gcn.Dump(hiconf.getMatrixSource("DumpModuleFile",hiprof));
       }
     }
@@ -315,7 +315,7 @@ void IsisMain(){
 ////////////////////////////////////////////////////////////////////
 //  GainFlatField  Flat field correction with A matrix
     procStep = "GainFlatField module";
-    hiconf.selectProfile("GainFlatField"); 
+    hiconf.selectProfile("GainFlatField");
     hiprof =  hiconf.getMatrixProfile();
     HiHistory GffHist;
     GffHist.add("Profile["+ hiprof.Name()+"]");
@@ -335,7 +335,7 @@ void IsisMain(){
 ////////////////////////////////////////////////////////////////////
 // GainTemperature -  Temperature-dependant gain correction
     procStep = "GainTemperature module";
-    hiconf.selectProfile("GainTemperature"); 
+    hiconf.selectProfile("GainTemperature");
     hiprof =  hiconf.getMatrixProfile();
     HiHistory GtHist;
     GtHist.add("Profile["+ hiprof.Name()+"]");
@@ -354,7 +354,7 @@ void IsisMain(){
 
 ////////////////////////////////////////////////////////////////////
 //  GainUnitConversion converts to requested units
-// 
+//
     procStep = "GainUnitConversion module";
     hiconf.selectProfile("GainUnitConversion");
     hiprof = hiconf.getMatrixProfile();
@@ -378,7 +378,7 @@ void IsisMain(){
     hiconf.selectProfile();
 
 //----------------------------------------------------------------------
-// 
+//
 /////////////////////////////////////////////////////////////////////////
 //  Call the processing function
     procStep = "calibration phase";
@@ -396,9 +396,9 @@ void IsisMain(){
       string hdumpFile = hdump.Expanded();
       ofstream ofile(hdumpFile.c_str(), ios::out);
       if (!ofile) {
-        string mess = "Unable to open/create history dump file " + 
+        string mess = "Unable to open/create history dump file " +
                       hdump.Expanded();
-        iException::Message(iException::User, mess, _FILEINFO_).Report();
+        IException(IException::User, mess, _FILEINFO_).print();
       }
       else {
         ofile << "Program:  " << hical_program << endl;
@@ -410,7 +410,7 @@ void IsisMain(){
         ofile << "TO:       " << ocube->getFilename()  << endl;
         ofile << "CONF:     " << conf_file  << endl << endl;
 
-        ofile << "/* " << hical_program << " application equation */\n" 
+        ofile << "/* " << hical_program << " application equation */\n"
               << "/* hdn = (idn - ZeroBufferFit(ZeroBufferSmooth) - ZeroReverse - ZeroDark) */\n"
               << "/* odn = hdn / GainLineDrift * GainNonLinearity * GainChannelNormalize */\n"
               << "/*           * GainFlatField  * GainTemperature / GainUnitConversion */\n\n";
@@ -456,7 +456,7 @@ void IsisMain(){
     //  Record parameter generation history.  Controllable in configuration
     //  file.  Note this is optional because of a BUG!! in the ISIS label
     //  writer as this application was initially developed
-    if ( IsEqual(ConfKey(hiprof,"LogParameterHistory",string("TRUE")),"TRUE")) { 
+    if ( IsEqual(ConfKey(hiprof,"LogParameterHistory",string("TRUE")),"TRUE")) {
       rcal += ZbsHist.makekey("ZeroBufferSmooth");
       rcal += ZbfHist.makekey("ZeroBufferFit");
       rcal += ZrHist.makekey("ZeroReverse");
@@ -470,15 +470,14 @@ void IsisMain(){
     }
 
     p.EndProcess();
-  } 
-  catch (iException &ie) {
+  }
+  catch (IException &ie) {
     delete calVars;
     calVars = 0;
     string mess = "Failed in " + procStep;
-    ie.Message(iException::User, mess.c_str(), _FILEINFO_);
-    throw;
+    throw IException(IException::User, mess.c_str(), _FILEINFO_);
   }
-  
+
 // Clean up parameters
   delete calVars;
   calVars = 0;

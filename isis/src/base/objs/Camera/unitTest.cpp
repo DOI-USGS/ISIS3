@@ -2,17 +2,17 @@
  * @file
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for 
+ *   domain. See individual third-party library and package descriptions for
  *   intellectual property information,user agreements, and related information.
  *
  *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software 
- *   and related material nor shall the fact of distribution constitute any such 
- *   warranty, and no responsibility is assumed by the USGS in connection 
+ *   is made by the USGS as to the accuracy and functioning of such software
+ *   and related material nor shall the fact of distribution constitute any such
+ *   warranty, and no responsibility is assumed by the USGS in connection
  *   therewith.
  *
  *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see 
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
  *   the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
@@ -24,7 +24,7 @@
 #include "Camera.h"
 #include "CameraFactory.h"
 #include "Cube.h"
-#include "iException.h"
+#include "IException.h"
 #include "Latitude.h"
 #include "Longitude.h"
 #include "Preference.h"
@@ -51,7 +51,7 @@ class MyCamera : public Camera {
       return Framing;
     }
 
-    virtual int CkFrameId() const { return (-94000); }   
+    virtual int CkFrameId() const { return (-94000); }
     virtual int CkReferenceId() const { return (1); }
     virtual int SpkReferenceId() const { return (1); }
 };
@@ -105,8 +105,7 @@ int main() {
     cout << "IntersectsLongitudeDomain: "
          << c->IntersectsLongitudeDomain(pvl) << endl;
   }
-  catch(iException &e) {
-    e.Clear();
+  catch(IException &e) {
     cout << "No mapping group found, so GroundRange and " << endl
          << "IntersectsLongitudeDomain cannot run." << endl;
   }
@@ -141,17 +140,15 @@ int main() {
   try {
     cout << c->RaDecRange(ra, ra, dec, dec) << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
-    e.Clear();
+  catch(IException &e) {
+    e.print();
   }
 
   try {
     cout << c->RaDecResolution() << endl;
   }
-  catch(iException &e) {
-    e.Report(false);
-    e.Clear();
+  catch(IException &e) {
+    e.print();
   }
 
   cout << "Calling Distortion, FocalPlane, ";

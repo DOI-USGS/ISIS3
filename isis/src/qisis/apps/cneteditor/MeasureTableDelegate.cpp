@@ -13,7 +13,7 @@
 
 #include "ControlMeasure.h"
 #include "ControlMeasure.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 
 #include "AbstractMeasureItem.h"
@@ -71,7 +71,7 @@ namespace Isis
 
       iString msg = "Could not create delegate widget for column ["
           + col->getTitle() + "]";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
 
@@ -136,35 +136,35 @@ namespace Isis
         case AbstractMeasureItem::EditLock:
           {
             QComboBox * combo = static_cast< QComboBox * >(widget);
-            
+
             if (measure->IsEditLocked())
               combo->setCurrentIndex(0);
             else
               combo->setCurrentIndex(1);
-            
+
             if (QString("yes").startsWith(newData.toLower()))
               combo->setCurrentIndex(0);
             else if (QString("no").startsWith(newData.toLower()))
               combo->setCurrentIndex(1);
           }
           break;
-          
+
         case AbstractMeasureItem::Ignored:
           {
             QComboBox * combo = static_cast< QComboBox * >(widget);
-        
+
             if (measure->IsIgnored())
               combo->setCurrentIndex(0);
             else
               combo->setCurrentIndex(1);
-            
+
             if (QString("yes").startsWith(newData.toLower()))
               combo->setCurrentIndex(0);
             if (QString("no").startsWith(newData.toLower()))
               combo->setCurrentIndex(1);
           }
           break;
-          
+
         case AbstractMeasureItem::Type:
           {
             QComboBox * combo = static_cast< QComboBox * >(widget);
@@ -176,7 +176,7 @@ namespace Isis
                 combo->setCurrentIndex(i);
           }
           break;
-          
+
         default:
           {
             QLineEdit * lineEdit = static_cast< QLineEdit * >(widget);

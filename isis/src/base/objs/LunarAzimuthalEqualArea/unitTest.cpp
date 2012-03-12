@@ -4,7 +4,7 @@
 #include <iomanip>
 #include <cmath>
 #include "LunarAzimuthalEqualArea.h"
-#include "iException.h"
+#include "IException.h"
 #include "ProjectionFactory.h"
 #include "Preference.h"
 
@@ -102,8 +102,8 @@ int main(int argc, char *argv[]) {
     tmp2.AddGroup(p.Mapping());
 
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 }
 

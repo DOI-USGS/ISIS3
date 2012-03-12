@@ -2,7 +2,7 @@
 
 #include "AbstractLeafItem.h"
 
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 
 
@@ -24,7 +24,7 @@ namespace Isis
     AbstractTreeItem * AbstractLeafItem::childAt(int row) const
     {
       iString msg = "childAt() called on an AbstractLeafItem!";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
       return NULL;
     }
 
@@ -32,7 +32,7 @@ namespace Isis
     QList< AbstractTreeItem * > AbstractLeafItem::getChildren() const
     {
       iString msg = "getChildren() called on an AbstractLeafItem!";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
       return QList< AbstractTreeItem * >();
     }
 
@@ -40,7 +40,7 @@ namespace Isis
     int AbstractLeafItem::indexOf(AbstractTreeItem * child) const
     {
       iString msg = "indexOf() called on an AbstractLeafItem!";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
       return -1;
     }
 
@@ -54,7 +54,7 @@ namespace Isis
     void AbstractLeafItem::addChild(AbstractTreeItem * child)
     {
       iString msg = "addChild() called on an AbstractLeafItem!";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
 
@@ -73,14 +73,14 @@ namespace Isis
     void AbstractLeafItem::setFirstVisibleChild(AbstractTreeItem *)
     {
       iString msg = "setFirstVisibleChild() called on an AbstractLeafItem!";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
 
     void AbstractLeafItem::setLastVisibleChild(AbstractTreeItem *)
     {
       iString msg = "setLastVisibleChild() called on an AbstractLeafItem!";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
 }

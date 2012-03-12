@@ -85,14 +85,14 @@ End
 temp = (a, b, c)
 End
 
-**unitTest2.pvl]
-**PVL ERROR** Error in pvl on line [9]
-**PVL ERROR** Unable to read keyword [Dog = Big Dog]
-**PVL ERROR** Keyword has extraneous data [Dog] at the end
+**ERROR** Unable to read PVL file unitTest2.pvl].
+**ERROR** Error in PVL file on line [9].
+**ERROR** Unable to read PVL keyword [Dog = Big Dog].
+**ERROR** Keyword has extraneous data [Dog] at the end.
 
-**unitTest3.pvl]
-**PVL ERROR** Error in pvl on line [12]
-**PVL ERROR** Unexpected [EndGroup] in Object [A]
+**ERROR** Unable to read PVL file unitTest3.pvl].
+**ERROR** Error in PVL file on line [12].
+**ERROR** Unexpected [EndGroup] in PVL Object [A].
 
 Testing MESSENGER labels with data at bottom...
 

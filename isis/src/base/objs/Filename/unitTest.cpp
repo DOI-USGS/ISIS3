@@ -4,7 +4,7 @@
 #include <QDate>
 
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "Preference.h"
 #include "ProgramLauncher.h"
 
@@ -289,8 +289,8 @@ int main(int argc, char *argv[]) {
     try {
       p.HighestVersion();
     }
-    catch(iException &error) {
-      error.Report(false);
+    catch(IException &error) {
+      error.print();
     }
     cout << "  " << p.Name() << endl;
     cout << endl;
@@ -300,8 +300,8 @@ int main(int argc, char *argv[]) {
     try {
       q.HighestVersion();
     }
-    catch(iException &error) {
-      error.Report(false);
+    catch(IException &error) {
+      error.print();
     }
     cout << "  " << q.Name() << endl;
     cout << endl;
@@ -311,8 +311,8 @@ int main(int argc, char *argv[]) {
     try {
       q2.HighestVersion();
     }
-    catch(iException &error) {
-      error.Report(false);
+    catch(IException &error) {
+      error.print();
     }
     cout << "  " << q2.Name() << endl;
     cout << endl;
@@ -333,9 +333,8 @@ int main(int argc, char *argv[]) {
     try {
       r.HighestVersion();
     }
-    catch(iException &error) {
+    catch(IException &error) {
       cout << "No version string in tttt" << endl;
-      error.Clear();
     }
     cout << endl;
 
@@ -344,9 +343,8 @@ int main(int argc, char *argv[]) {
     try {
       s.HighestVersion();
     }
-    catch(iException &error) {
+    catch(IException &error) {
       cout << "No version available for ??tttt" << endl;
-      error.Clear();
     }
     cout << endl;
     ProgramLauncher::RunSystemCommand("touch junk06.tmp");
@@ -408,8 +406,8 @@ int main(int argc, char *argv[]) {
     try {
       pNew.NewVersion();
     }
-    catch(iException &error) {
-      error.Report(false);
+    catch(IException &error) {
+      error.print();
     }
     cout << "  " << pNew.Name() << endl;
     cout << endl;
@@ -419,8 +417,8 @@ int main(int argc, char *argv[]) {
     try {
       qNew.NewVersion();
     }
-    catch(iException &error) {
-      error.Report(false);
+    catch(IException &error) {
+      error.print();
     }
     cout << "  " << qNew.Name() << endl;
     cout << endl;
@@ -430,8 +428,8 @@ int main(int argc, char *argv[]) {
     try {
       q2New.NewVersion();
     }
-    catch(iException &error) {
-      error.Report(false);
+    catch(IException &error) {
+      error.print();
     }
     cout << " " << q2New.Name() << endl;
     cout << endl;
@@ -455,8 +453,8 @@ int main(int argc, char *argv[]) {
       QString expected = today.toString("'tttt'dd'tt'yyyy'tt'MMM'.tmp'");
       success = todayFilename.Name() == expected.toStdString();
     }
-    catch(iException &error) {
-      error.Report(false);
+    catch(IException &error) {
+      error.print();
     }
     cout << "Made today's filename: " << success << endl;
     cout << endl;
@@ -466,9 +464,8 @@ int main(int argc, char *argv[]) {
     try {
       rNew.NewVersion();
     }
-    catch(iException &error) {
+    catch(IException &error) {
       cout << "No version string in tttt" << endl;
-      error.Clear();
     }
     cout << endl;
 
@@ -485,8 +482,8 @@ int main(int argc, char *argv[]) {
         cout << "  The test file for \"Exists()\" was located" << endl;
       }
     }
-    catch(iException &error) {
-      error.Report(false);
+    catch(IException &error) {
+      error.print();
     }
     cout << endl;
 
@@ -497,14 +494,14 @@ int main(int argc, char *argv[]) {
         cout << "  The test file for \"!Exists()\" was not located (this is correct)" << endl;
       }
     }
-    catch(iException &error) {
-      error.Report(false);
+    catch(IException &error) {
+      error.print();
     }
     cout << endl;
   }
-  catch(iException &e) {
+  catch(IException &e) {
     try {
-      e.Report(true);
+      e.print();
     }
     catch(...) {
       cout << "Unknown error in iException.Report" << endl;
@@ -523,8 +520,8 @@ int main(int argc, char *argv[]) {
     d.MakeDirectory();
     cout << "  The directory create succeed" << endl;
   }
-  catch(iException &error) {
-    error.Report(false);
+  catch(IException &error) {
+    error.print();
   }
   cout << endl;
 
@@ -533,9 +530,8 @@ int main(int argc, char *argv[]) {
   try {
     d.MakeDirectory();
   }
-  catch(iException &error) {
-    ReportError(iString(error.Errors()) ); //shorten path
-    error.Clear();
+  catch(IException &error) {
+    ReportError(error.toString()); //shorten path
   }
   cout << endl;
 
@@ -606,9 +602,8 @@ void TestHighestVersion(string name) {
     filename.HighestVersion();
     cout << "  " << filename.Name() << endl;
   }
-  catch(iException &error) {
+  catch(IException &error) {
     cout << "No version available for " << name << endl;
-    error.Clear();
   }
   cout << endl;
 }

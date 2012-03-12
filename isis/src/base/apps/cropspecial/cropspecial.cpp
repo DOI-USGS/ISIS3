@@ -58,7 +58,7 @@ void IsisMain() {
   if(minSample == cube.getSampleCount() + 1) {
     cube.close();
     string msg = "There are no valid pixels in the [FROM] cube";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   numSamples = maxSample - (minSample - 1);

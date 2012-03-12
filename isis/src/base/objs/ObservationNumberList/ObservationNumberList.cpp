@@ -1,5 +1,5 @@
 #include "ObservationNumberList.h"
-#include "iException.h"
+#include "IException.h"
 #include "FileList.h"
 #include "Filename.h"
 #include "SerialNumberList.h"
@@ -41,7 +41,7 @@ namespace Isis {
 
     if(snlist->Size() == 0) {
       std::string msg = "Serial number list is empty";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     std::map<std::string, int> observationMap;
@@ -81,7 +81,7 @@ namespace Isis {
 
     if(snlist->Size() == 0) {
       std::string msg = "Removing serial number list is empty";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     p_sets.clear();
@@ -187,7 +187,7 @@ namespace Isis {
     else {
       iString num = iString(serialNumberIndex);
       std::string msg = "Serial Number Index [" + (std::string) num + "] is invalid";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
 
@@ -205,7 +205,7 @@ namespace Isis {
       std::string msg = "Requested filename [" +
                         Isis::Filename(filename).Expanded() + "]";
       msg += "does not exist in the list";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     int index = FilenameIndex(filename);
     return p_pairs[index].observationNumber;
@@ -225,7 +225,7 @@ namespace Isis {
     else {
       iString num = iString(index);
       std::string msg = "Index [" + (std::string) num + "] is invalid";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
 
@@ -250,7 +250,7 @@ namespace Isis {
     else {
       std::string msg = "Requested observation number [" + on + "] ";
       msg += "does not exist in the list";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
 

@@ -1,6 +1,6 @@
 #include <iostream>
 #include "SerialNumberList.h"
-#include "iException.h"
+#include "IException.h"
 #include "Preference.h"
 
 using namespace std;
@@ -36,8 +36,8 @@ int main(int argc, char *argv[]) {
 
     cout << endl << "Index->observationNumber (2):  " << snl.ObservationNumber(2) << endl;
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   cout << endl << endl;;
@@ -49,8 +49,8 @@ int main(int argc, char *argv[]) {
     snl.Add("$base/testData/blobTruth.cub");
     snl.Add("$lo/testData/3133_h1.cub");
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 
 }

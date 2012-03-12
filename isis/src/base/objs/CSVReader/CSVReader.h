@@ -29,7 +29,7 @@
 #include "tnt/tnt_array1d.h"
 #include "iString.h"
 #include "CollectorMap.h"
-#include "iException.h"
+#include "IException.h"
 
 namespace Isis {
 
@@ -449,7 +449,7 @@ namespace Isis {
         return (_keepParts);
       }
 
-      void read(const std::string &fname) throw(iException &);
+      void read(const std::string &fname);
 
       CSVAxis getHeader() const;
       CSVAxis getRow(int index) const;

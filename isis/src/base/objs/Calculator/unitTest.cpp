@@ -4,6 +4,7 @@
 
 #include <QVector>
 
+#include "IException.h"
 #include "Preference.h"
 
 
@@ -11,8 +12,8 @@ using namespace std;
 using namespace Isis;
 
 int main(int argc, char *argv[]) {
-  Isis::Preference::Preferences(true);
-  Isis::Calculator c;
+  Preference::Preferences(true);
+  Calculator c;
   QVector<double> v1;
   QVector<double> v2;
   QVector<double> v3;
@@ -351,8 +352,8 @@ int main(int argc, char *argv[]) {
     c.PrintTop();
     c.Clear();
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -363,8 +364,8 @@ int main(int argc, char *argv[]) {
     c.PrintTop();
     c.Clear();
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -372,8 +373,8 @@ int main(int argc, char *argv[]) {
     c.Push(v3);
     c.Add();
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 
   try {
@@ -381,7 +382,7 @@ int main(int argc, char *argv[]) {
     c.Add();
     c.Clear();
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 }

@@ -4,7 +4,7 @@
 #include "Cube.h"
 #include "Chip.h"
 #include "Progress.h"
-#include "iException.h"
+#include "IException.h"
 #include "AutoReg.h"
 #include "AutoRegFactory.h"
 #include "Brick.h"
@@ -33,19 +33,19 @@ void IsisMain() {
     string msg = "Sample size incorrect [Sample size " +
                  iString(reseaus["Sample"].Size()) + " != " + " Line size " +
                  iString(reseaus["Line"].Size()) + "]";
-    throw Isis::iException::Message(Isis::iException::Pvl, msg, _FILEINFO_);
+    throw IException(IException::Unknown, msg, _FILEINFO_);
   }
   if(nres != reseaus["Type"].Size()) {
     string msg = "Type size incorrect [Type size " +
                  iString(reseaus["Type"].Size()) + " != " + " Line size " +
                  iString(reseaus["Line"].Size()) + "]";
-    throw Isis::iException::Message(Isis::iException::Pvl, msg, _FILEINFO_);
+    throw IException(IException::Unknown, msg, _FILEINFO_);
   }
   if(nres != reseaus["Valid"].Size()) {
     string msg = "Valid size incorrect [Valid size " +
                  iString(reseaus["Valid"].Size()) + " != " + " Line size " +
                  iString(reseaus["Line"].Size()) + "]";
-    throw Isis::iException::Message(Isis::iException::Pvl, msg, _FILEINFO_);
+    throw IException(IException::Unknown, msg, _FILEINFO_);
   }
 
   // Auto Registration

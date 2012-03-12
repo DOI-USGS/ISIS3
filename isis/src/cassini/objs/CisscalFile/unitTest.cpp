@@ -22,7 +22,7 @@
 #include <vector>
 
 #include "CisscalFile.h"
-#include "iException.h"
+#include "IException.h"
 #include "Preference.h"
 
 using namespace std;
@@ -135,8 +135,8 @@ int main(int argc, char *argv[]) {
     }
     cout << "--------------------------------------------" << endl;
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 //-----------------------------------------------------------------------------------
   cout << "2) Remove temp file -> " << testFile << " <-" << endl;

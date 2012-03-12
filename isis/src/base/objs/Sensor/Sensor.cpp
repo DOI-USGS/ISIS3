@@ -28,7 +28,7 @@
 #include "Constants.h"
 #include "CubeManager.h"
 #include "Distance.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "iTime.h"
 #include "Latitude.h"
@@ -107,7 +107,7 @@ namespace Isis {
               "radii values. The demprep program should be used to prepare the "
               "DEM before you can run this program. There is more information "
               "available in the documentation of the demprep program.";
-          throw iException::Message(iException::User, msg, _FILEINFO_);
+          throw IException(IException::User, msg, _FILEINFO_);
         }
 
         Table table("ShapeModelStatistics", demCube, demlab);
@@ -955,8 +955,8 @@ namespace Isis {
 
   /**
    * Return the vector between the spacecraft and surface point in body-fixed
-   *  
-   * @author 2011-12-20 Tracie Sucharski 
+   *
+   * @author 2011-12-20 Tracie Sucharski
    */
   void Sensor::SpacecraftSurfaceVector(double scSurfaceVector[3]) const {
     scSurfaceVector[0] = p_lookB[0];

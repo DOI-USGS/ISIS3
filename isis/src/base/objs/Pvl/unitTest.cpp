@@ -1,5 +1,5 @@
 #include "Pvl.h"
-#include "iException.h"
+#include "IException.h"
 #include "Preference.h"
 
 #include <iostream>
@@ -53,11 +53,11 @@ int main() {
     p5.Read("unitTest2.pvl");
     cout << p5 << endl << endl;
   }
-  catch(iException &e) {
+  catch(IException &e) {
     cout.flush();
 
     // make this error work regardless of directory...
-    string errors = e.Errors();
+    string errors = e.toString();
 
     while(errors.find("/") != string::npos) {
       int pos = errors.find("/");
@@ -72,7 +72,6 @@ int main() {
     }
 
     cout << errors;
-    e.Clear();
   }
 
   cout << endl << endl;
@@ -82,11 +81,11 @@ int main() {
     p6.Read("unitTest3.pvl");
     cout << p6 << endl << endl;
   }
-  catch(iException &e) {
+  catch(IException &e) {
     cout.flush();
 
     // make this error work regardless of directory...
-    string errors = e.Errors();
+    string errors = e.toString();
 
     while(errors.find("/") != string::npos) {
       int pos = errors.find("/");
@@ -101,7 +100,6 @@ int main() {
     }
 
     cout << errors;
-    e.Clear();
   }
 
   cout << endl << endl;
@@ -112,11 +110,11 @@ int main() {
     p7.Read("unitTest4.pvl");
     cout << p7 << endl << endl;
   }
-  catch(iException &e) {
+  catch(IException &e) {
     cout.flush();
 
     // make this error work regardless of directory...
-    string errors = e.Errors();
+    string errors = e.toString();
 
     while(errors.find("/") != string::npos) {
       int pos = errors.find("/");
@@ -131,16 +129,15 @@ int main() {
     }
 
     cout << errors;
-    e.Clear();
   }
-  
+
   // Validate a PVL
   Pvl pvlTmpl("cnetstatsTest.def");
   cout << "\n\n***Template PVL**\n" << pvlTmpl << endl;
-  
+
   Pvl pvlUser("pointdef.def");
   cout << "\n\n***Test PVL**\n" << pvlUser << endl;
-  
+
   Pvl pvlResults;
   pvlTmpl.ValidatePvl(pvlUser, pvlResults);
   cout << "\n\n**Result PVL**\n" << pvlResults << endl;

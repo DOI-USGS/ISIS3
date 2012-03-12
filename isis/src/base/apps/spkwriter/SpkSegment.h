@@ -33,7 +33,7 @@
 
 #include "SpiceSegment.h"
 #include "iString.h"
-#include "iException.h"
+#include "IException.h"
 
 
 namespace Isis {

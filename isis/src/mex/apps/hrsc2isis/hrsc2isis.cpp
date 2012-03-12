@@ -6,7 +6,7 @@
 #include "Table.h"
 #include "CubeAttribute.h"
 #include "LineManager.h"
-#include "iException.h"
+#include "IException.h"
 
 using namespace std;
 using namespace Isis;
@@ -48,13 +48,12 @@ void IsisMain() {
   try {
     Pvl temp(ui.GetFilename("FROM"));
     // Check for HRSC file
-    if(temp["INSTRUMENT_ID"][0] != "HRSC") throw iException::Message(iException::User, "", _FILEINFO_);
+    if(temp["INSTRUMENT_ID"][0] != "HRSC") throw IException();
   }
-  catch(iException e) {
-    e.Clear();
+  catch(IException &e) {
     iString msg = "File [" + ui.GetFilename("FROM") +
                   "] does not appear to be a Mars Express HRSC image.";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   ProcessImportPds p;
@@ -150,7 +149,7 @@ void IsisMain() {
     Filename inFile = ui.GetFilename("FROM");
     string msg = "[" + inFile.Name() + "] appears to be an rdr file.";
     msg += " Use pds2isis.";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   p.Progress()->SetText("Importing");
@@ -280,7 +279,7 @@ void TranslateHrscLabels(Pvl &inLabels, Pvl &outLabel) {
     std::string msg = "Unrecognized Detector ID [";
     msg += key;
     msg += "]";
-    throw iException::Message(iException::Pvl, msg, _FILEINFO_);
+    throw IException(IException::Unknown, msg, _FILEINFO_);
   }
 
   PvlGroup kerns("Kernels");

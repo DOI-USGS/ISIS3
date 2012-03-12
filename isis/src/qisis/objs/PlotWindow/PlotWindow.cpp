@@ -65,7 +65,7 @@ namespace Isis {
 
     if (!m_parent) {
       iString msg = "PlotWindow cannot be instantiated with a NULL parent";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     installEventFilter(this);
@@ -901,7 +901,7 @@ namespace Isis {
 
     for (int i = 0; i < m_plot->itemList().size(); i ++) {
       QwtPlotItem *plotItem = m_plot->itemList()[i];
-      if (plotItem->rtti() == QwtPlotItem::Rtti_PlotMarker) 
+      if (plotItem->rtti() == QwtPlotItem::Rtti_PlotMarker)
         (plotItem->*method)();
     }
     /*Replot with all symbols hidden*/
@@ -933,7 +933,7 @@ namespace Isis {
 
     for (int i = 0; i < m_plot->itemList().size(); i ++) {
       QwtPlotItem *plotItem = m_plot->itemList()[i];
-      if (plotItem->rtti() == QwtPlotItem::Rtti_PlotCurve) 
+      if (plotItem->rtti() == QwtPlotItem::Rtti_PlotCurve)
         (plotItem->*method)();
     }
     /*Replot with all curves hidden*/
@@ -1247,11 +1247,11 @@ namespace Isis {
 
 
   /**
-   * This method sets the visibility states in the curve (and it's symbols) to 
+   * This method sets the visibility states in the curve (and it's symbols) to
    *   match with this window's current visibility settings. Every means of
    *   adding a curve to the window needs to call this with the curve that is
    *   being added, otherwise visibility states will not be consistent.
-   * 
+   *
    * @param curve Curve (with symbols) to set the visibility states on
    */
   void PlotWindow::updateVisibility(PlotCurve *curve) {
@@ -1447,8 +1447,8 @@ namespace Isis {
 
   /**
    * This method filters the events of the objects it is connected
-   * to.  In this case, the eventFilter has been installed on the m_plot and 
-   * m_legend. 
+   * to.  In this case, the eventFilter has been installed on the m_plot and
+   * m_legend.
    * @param o
    * @param e
    *

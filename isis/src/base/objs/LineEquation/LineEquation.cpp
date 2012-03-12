@@ -21,7 +21,7 @@
  *   http://www.usgs.gov/privacy.html.
  */
 #include "LineEquation.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include <iostream>
 #include <iomanip>
@@ -67,7 +67,7 @@ namespace Isis {
   void LineEquation::AddPoint(double x, double y) {
     if(p_defined) {
       std::string msg = "Line equation is already defined with 2 points";
-      throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+      throw IException(IException::Io, msg, _FILEINFO_);
     }
     p_x.push_back(x);
     p_y.push_back(y);
@@ -82,11 +82,11 @@ namespace Isis {
   double LineEquation::Slope() {
     if(!p_defined) {
       std::string msg = "Line equation undefined:  2 points are required";
-      throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+      throw IException(IException::Io, msg, _FILEINFO_);
     }
     else if(p_x[0] == p_x[1]) {
       std::string msg = "Points have identical independent variables -- no slope";
-      throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+      throw IException(IException::Io, msg, _FILEINFO_);
     }
     else if(!p_slopeDefined) {
       p_slope = (p_y[0] - p_y[1]) / (p_x[0] - p_x[1]);
@@ -102,11 +102,11 @@ namespace Isis {
   double LineEquation::Intercept() {
     if(!p_defined) {
       std::string msg = "Line equation undefined:  2 points are required";
-      throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+      throw IException(IException::Io, msg, _FILEINFO_);
     }
     else if(p_x[0] == p_x[1]) {
       std::string msg = "Points have identical independent variables -- no intercept";
-      throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+      throw IException(IException::Io, msg, _FILEINFO_);
     }
     else if(!p_interceptDefined) {
       p_intercept = p_y[0] - Slope() * p_x[0];

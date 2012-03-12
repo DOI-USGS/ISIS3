@@ -10,7 +10,7 @@
 #include "ControlNet.h"
 #include "ControlPoint.h"
 #include "ControlMeasureLogData.h"
-#include "iException.h"
+#include "IException.h"
 #include "Preference.h"
 
 using namespace std;
@@ -121,16 +121,15 @@ int main() {
     cout << "Nonreference point failed" << endl;
   else
     cout << "Nonreference point ok" << endl;
-  
+
 
 
 
   try {
     d.SetLogData(ControlMeasureLogData());
   }
-  catch (iException &e) {
-    e.Report(false);
-    e.Clear();
+  catch (IException &e) {
+    e.print();
   }
 }
 

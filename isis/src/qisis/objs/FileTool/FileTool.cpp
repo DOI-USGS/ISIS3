@@ -85,7 +85,7 @@ namespace Isis {
     p_saveAs->setWhatsThis(whatsThis);
     connect(p_saveAs, SIGNAL(activated()), this, SLOT(saveAs()));
     p_saveAs->setEnabled(false);
-    
+
     p_saveInfo = new QAction(parent);
     p_saveInfo->setText("Save &Info...");
     p_saveInfo->setIcon(QPixmap(toolIconDir() + "/filesaveas.png"));
@@ -95,7 +95,7 @@ namespace Isis {
     p_saveInfo->setWhatsThis(whatsThis);
     connect(p_saveInfo, SIGNAL(activated()), this, SLOT(saveInfo()));
     p_saveInfo->setEnabled(false);
-    
+
     p_exportView = new QAction(parent);
     p_exportView->setText("Export View");
     p_exportView->setIcon(QPixmap(toolIconDir() + "/fileexport.png"));
@@ -267,17 +267,17 @@ namespace Isis {
     //so reopen the current cube!
     cubeViewport()->cube()->reopen("rw");
   }
-  
+
   /**
    * SaveAs Action - Displays the FileDialog with the filterlist (*.cub) to select
-   * the output cube. This dialog additionally displays radio buttons for choices 
-   * FullImage, ExportAsIs, ExportFullRes. These choices are located at the bottom 
+   * the output cube. This dialog additionally displays radio buttons for choices
+   * FullImage, ExportAsIs, ExportFullRes. These choices are located at the bottom
    * of the dialog.
-   * FullImage     - copies the entire image into the user specified output file 
-   * ExportAsIs    - copies the image as displayed in the qview app window 
-   * ExportFullRes - copies the image as displayed in the qview app window but with 
+   * FullImage     - copies the entire image into the user specified output file
+   * ExportAsIs    - copies the image as displayed in the qview app window
+   * ExportFullRes - copies the image as displayed in the qview app window but with
    *                 full resolution
-   *  
+   *
    * @author Sharmila Prasad (4/8/2011)
    */
   void FileTool::saveAs() {
@@ -305,12 +305,12 @@ namespace Isis {
   }
 
   /**
-   * Save input image as a cube into specified output file as FullImage or 
+   * Save input image as a cube into specified output file as FullImage or
    * ExportAsIs or ExportFullRes option
-   * 
+   *
    * @author Sharmila Prasad (4/8/2011)
-   * 
-   * @param psOutFile - user specified output file 
+   *
+   * @param psOutFile - user specified output file
    */
   void FileTool::saveAsCubeByOption(QString psOutFile) {
     //If the current viewport is null (safety check), return from this method
@@ -347,7 +347,7 @@ namespace Isis {
 
     //Save the current cube's changes by reopening it, and open an input cube
     //from the current cube's location
-    Cube *icube = new Cube(); 
+    Cube *icube = new Cube();
     icube->open(cubeViewport()->cube()->getFilename(), "rw");
     Cube *ocube = NULL;
 
@@ -366,7 +366,7 @@ namespace Isis {
       // start and end Samples and Lines
       double dStartSample=0, dEndSample=0, dStartLine=0, dEndLine=0;
       p_lastViewport->getCubeArea(dStartSample, dEndSample, dStartLine, dEndLine);
-      
+
       if(p_saveAsDialog->getSaveAsType() == SaveAsDialog::ExportFullRes || p_lastViewport->scale() == 1) {
         int numSamples = (int)ceil(dEndSample-dStartSample);
         int numLines = (int)ceil(dEndLine-dStartLine);
@@ -386,15 +386,15 @@ namespace Isis {
 
     p_lastDir = psOutFile;
   }
-  
+
   /**
    * For AsIs option, save the enlarged input image visible in the viewport window
-   * using the Enlarge functionality 
-   *  
-   * @author Sharmila Prasad (4/26/2011) 
-   *  
+   * using the Enlarge functionality
+   *
+   * @author Sharmila Prasad (4/26/2011)
+   *
    * @param pInCube - Input Cube
-   * @param pOutCube - Output Cube 
+   * @param pOutCube - Output Cube
    */
   void FileTool::saveAsEnlargedCube(Cube *icube,
                                     const QString & psOutFile) {
@@ -413,34 +413,33 @@ namespace Isis {
       p.SetInputCube (icube);
       Cube *ocube = p.SetOutputCube(psOutFile.toStdString(), CubeAttributeOutput(" "),
                        ons , onl, icube->getBandCount());
-      
+
       Interpolator *interp = new Interpolator(Interpolator::NearestNeighborType);
-      
+
       Enlarge *imgEnlarge  = new Enlarge(icube, dScale, dScale);
       imgEnlarge->SetInputArea((int)dStartSample, (int)dEndSample, (int)dStartLine, (int)dEndLine);
 
       p.StartProcess(*imgEnlarge, *interp);
       imgEnlarge->UpdateOutputLabel(ocube);
       p.EndProcess();
-      
+
       delete imgEnlarge;
       delete interp;
-      
-    } catch(iException &e) {
+
+    } catch(IException &) {
       QMessageBox::critical((QWidget *)parent(),
                             "Error", "Cannot open file, please check permissions");
-      e.Clear();
     }
   }
 
   /**
    * For AsIs option, save the reduced input image visible in the viewport window
-   * using the Reduce functionality 
-   * 
-   * @author Sharmila Prasad (4/26/2011) 
-   *  
+   * using the Reduce functionality
+   *
+   * @author Sharmila Prasad (4/26/2011)
+   *
    * @param pInCube - Input Cube
-   * @param psOutFile - Output filename 
+   * @param psOutFile - Output filename
    */
   void FileTool::saveAsReducedCube(Cube *icube,
                                    const QString & psOutFile) {
@@ -453,7 +452,7 @@ namespace Isis {
     double ins, inl;
     ins = dEndSample-dStartSample;
     inl = dEndLine-dStartLine;
-    
+
     int ons, onl;
     ons = (int)ceil(ins * dScale);
     onl = (int)ceil(inl * dScale);
@@ -461,14 +460,14 @@ namespace Isis {
     CubeAttributeInput cai(icube->getFilename());
     vector<string> bands = cai.Bands();
     int inb = bands.size();
-    
+
     if(inb == 0) {
       inb = cubeViewport()->cube()->getBandCount();
       for(int i = 1; i <= inb; i++) {
         bands.push_back((iString)i);
       }
     }
-    
+
     ProcessByLine p;
     p.SetInputCube (icube);
     Cube *ocube = NULL;
@@ -478,30 +477,30 @@ namespace Isis {
       // the original set was for info about the cube only
       p.ClearInputCubes();
     }
-    catch(iException &e) {
+    catch(IException &) {
       // If there is a problem, catch it and close the cube so it isn't open next time around
       icube->close();
-      throw e;
+      throw;
     }
 
     Cube *tempcube=new Cube;
     tempcube->open(cubeViewport()->cube()->getFilename(), "r");
     Nearest *near = new Nearest(tempcube, ins/ons, inl/onl);
     near->setInputBoundary((int)dStartSample, (int)dEndSample, (int)dStartLine, (int)dEndLine);
-    
+
     p.ProcessCubeInPlace(*near, false);
     near->UpdateOutputLabel(ocube);
     p.EndProcess();
-    
+
     delete near;
     near=NULL;
   }
 
   /**
    * AsIs option, save the input image visible in the viewport window Enlarged/Reduced
-   * 
+   *
    * @author Sharmila Prasad (4/26/2011)
-   * 
+   *
    * @param pInCube - Input Cube
    * @param pOutCube - Output Cube
    */
@@ -520,17 +519,17 @@ namespace Isis {
 
   /**
    * Copy input image details into the output given output images's dimension.
-   * Info like instrument, history are transferred to output image 
-   * 
+   * Info like instrument, history are transferred to output image
+   *
    * @param icube        - input image
    * @param ocube        - output image
    * @param outAtt       - output cube attributes
    * @param piNumSamples - out samples
    * @param piNumLines   - out lines
    * @param piNumBands   - out bands
-   *  
+   *
    * @history 2011-05-11 Sharmila Prasad - Isolated from original SaveAs function so that
-   *                                           it can be used by different SaveAs options 
+   *                                           it can be used by different SaveAs options
    */
   void FileTool::copyCubeDetails(const QString & psOutFile, Cube *icube,
       Cube *ocube, int piNumSamples, int piNumLines, int piNumBands) {
@@ -565,12 +564,12 @@ namespace Isis {
                 (ocube->getPixelType() != SignedWord)) {
           std::string msg = "Looks like your refactoring to add different pixel types";
           msg += " you'll need to make changes here";
-          throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+          throw IException(IException::Programmer, msg, _FILEINFO_);
         }
         else {
           std::string msg = "You've chosen to reduce your output PixelType for [" +
                             psOutFile.toStdString() + "] you must specify the output pixel range too";
-          throw iException::Message(iException::User, msg, _FILEINFO_);
+          throw IException(IException::User, msg, _FILEINFO_);
         }
       }
       else {
@@ -623,21 +622,21 @@ namespace Isis {
         }
       }
     }
-    catch(iException &e) {
+    catch(IException &) {
       delete ocube;
       throw;
     }
   }
-  
+
   /**
    * This method essentially creates a new cube, copies the
    * current cube (and any changes made to it) to the new cube,
    * reverses all changes NOT saved to the current cube and closes
    * it. Finally it sets the cubeviewport's cube to the new saved
    * cube.
-   *  
+   *
    * @param pInCube  - input image
-   * @param pOutCube - output image 
+   * @param pOutCube - output image
    */
   void FileTool::saveAsFullImage(Cube *icube, Cube *ocube) {
     //Start the copy process line by line
@@ -662,13 +661,13 @@ namespace Isis {
   }
 
   /**
-   * Full Resolution option, save the input image visible in the viewport window 
+   * Full Resolution option, save the input image visible in the viewport window
    * Enlarged/Reduced in full resolution
-   * 
+   *
    * @author Sharmila Prasad (4/26/2011)
-   * 
+   *
    * @param pInCube     - input image
-   * @param pOutCube    - output image 
+   * @param pOutCube    - output image
    * @param pNumSamples - out samples
    * @param pNumLines   - out lines
    */
@@ -678,10 +677,10 @@ namespace Isis {
     double dStartSample=0, dEndSample=0, dStartLine=0, dEndLine=0;
     p_lastViewport->getCubeArea(dStartSample, dEndSample, dStartLine, dEndLine);
     int iNumBands   = pInCube->getBandCount();
-    
+
     Portal iPortal (pNumSamples, 1, pInCube->getPixelType());
     Portal oPortal (pNumSamples, 1, pOutCube->getPixelType());
-    
+
     for(int iBand=1; iBand<=iNumBands; iBand++) {
       int ol=1;
       for(int iLine=(int)dStartLine; iLine<=(int)dEndLine; iLine++) {
@@ -690,17 +689,17 @@ namespace Isis {
 
         oPortal.SetPosition(1, ol++, iBand);
         pOutCube->read(oPortal);
-        
+
         oPortal.Copy(iPortal);
         pOutCube->write(oPortal);
       }
     }
   }
-  
+
   /**
-   * Saves the whatsthis info of the cubeviewport to 
-   * user specified output file 
-   * 
+   * Saves the whatsthis info of the cubeviewport to
+   * user specified output file
+   *
    * @author Sharmila Prasad (4/6/2011)
    */
   void FileTool::saveInfo(void)
@@ -709,14 +708,14 @@ namespace Isis {
       QMessageBox::information((QWidget *)parent(), "Error", "No active cube to save info");
       return;
     }
-    
+
     //Get the new cube's filename
     QString output =
       QFileDialog::getSaveFileName((QWidget *)parent(),
                                    "Choose output file",
                                    p_lastDir,
                                    QString("PVL Files (*.pvl)"));
-    
+
     //If the filename is empty, return
     if(output.isEmpty()) {
       return;
@@ -729,7 +728,7 @@ namespace Isis {
     cubeViewport()->getAllWhatsThisInfo(whatsThisPvl);
     whatsThisPvl.Write(output.toStdString());
   }
-  
+
   /**
    * This method copies from the input buffer to the output buffer
    *

@@ -1,7 +1,7 @@
 #include <sstream>
 #include "PvlToken.h"
 #include "PvlTokenizer.h"
-#include "iException.h"
+#include "IException.h"
 #include "Preference.h"
 
 using namespace std;
@@ -39,8 +39,8 @@ int main(void) {
   try {
     tizer.Load(os);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   vector<Isis::PvlToken> t = tizer.GetTokenList();
@@ -67,8 +67,8 @@ int main(void) {
   try {
     tizer.Load(os2);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
   cout << endl;
 
@@ -78,8 +78,8 @@ int main(void) {
   try {
     tizer.Load(os3);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
   cout << endl;
 
@@ -89,8 +89,8 @@ int main(void) {
   try {
     tizer.Load(os4);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
   cout << endl;
 
@@ -100,8 +100,8 @@ int main(void) {
   try {
     tizer.Load(os5);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
   cout << endl;
 
@@ -111,8 +111,8 @@ int main(void) {
   try {
     tizer.Load(os6);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
   cout << endl;
 
@@ -122,8 +122,8 @@ int main(void) {
   try {
     tizer.Load(os7);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
   cout << endl;
 
@@ -133,8 +133,8 @@ int main(void) {
   try {
     tizer.Load(os8);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
   cout << endl;
 

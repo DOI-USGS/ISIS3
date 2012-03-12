@@ -27,19 +27,21 @@
 #include <iostream>
 #include <vector>
 
+#include <geos/geom/Geometry.h>
+#include <geos/geom/Polygon.h>
+#include <geos/geom/CoordinateArraySequence.h>
+#include <geos/algorithm/LineIntersector.h>
+#include <geos/util/IllegalArgumentException.h>
+#include <geos/util/TopologyException.h>
+#include <geos/util/GEOSException.h>
+#include <geos/io/WKTReader.h>
+#include <geos/io/WKTWriter.h>
+#include <geos/operation/distance/DistanceOp.h>
+
 #include "ImagePolygon.h"
+#include "iString.h"
 #include "SpecialPixel.h"
 #include "PolygonTools.h"
-#include "geos/geom/Geometry.h"
-#include "geos/geom/Polygon.h"
-#include "geos/geom/CoordinateArraySequence.h"
-#include "geos/algorithm/LineIntersector.h"
-#include "geos/util/IllegalArgumentException.h"
-#include "geos/util/TopologyException.h"
-#include "geos/util/GEOSException.h"
-#include "geos/io/WKTReader.h"
-#include "geos/io/WKTWriter.h"
-#include "geos/operation/distance/DistanceOp.h"
 
 using namespace std;
 
@@ -113,17 +115,22 @@ namespace Isis {
     try {
       cam = cube.getCamera();
     }
-    catch(iException &error) {
+    catch(IException &camError) {
       try {
         proj = cube.getProjection();
         p_isProjected = true;
-        error.Clear();
       }
-      catch(iException &error) {
+      catch(IException &projError) {
         std::string msg = "Can not create polygon, ";
         msg += "cube [" + cube.getFilename();
         msg += "] is not a camera or map projection";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+
+        IException polyError(IException::User, msg, _FILEINFO_);
+
+        polyError.append(camError);
+        polyError.append(projError);
+
+        throw polyError;
       }
     }
     if(cam != NULL) p_isProjected = cam->HasProjection();
@@ -152,11 +159,10 @@ namespace Isis {
       try {
         p_gMap->Camera()->IgnoreElevationModel(true);
       }
-      catch(iException &e) {
-        e.Clear();
+      catch(IException &) {
         std::string msg = "Cannot use an ellipsoid shape model";
         msg += " on a limb image without a camera.";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
     }
 
@@ -200,7 +206,7 @@ namespace Isis {
 
     if (sinc < 1 || linc < 1) {
       std::string msg = "Sample and line increments must be 1 or greater";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     cam = initCube(cube, ss, sl, ns, nl, band);
@@ -219,22 +225,21 @@ namespace Isis {
 
         polygonGenerated = true;
       }
-      catch (iException &e) {
+      catch (IException &e) {
         delete p_pts;
 
         sinc = sinc * 2 / 3;
         linc = linc * 2 / 3;
 
         if (increasePrecision && (sinc > 1 || linc > 1)) {
-          e.Clear();
         }
         else {
-          e.Report(); // This should be a NAIF error
+          e.print(); // This should be a NAIF error
           std::string msg = "Cannot find polygon for image "
-            "[" + cube.getFilename() + "]: ";
-          msg += increasePrecision ? "Cannot increase precision any further" : 
+              "[" + cube.getFilename() + "]: ";
+          msg += increasePrecision ? "Cannot increase precision any further" :
               "The increment/step size might be too large";
-          throw iException::Message(iException::User, msg, _FILEINFO_);
+          throw IException(IException::User, msg, _FILEINFO_);
         }
       }
     }
@@ -302,7 +307,7 @@ namespace Isis {
       }
 
       std::string msg = "Unable to create image footprint. Starting point is not on the edge of the image.";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     else if(x < 0 && y < 0) {  // current is top left
       geos::geom::Coordinate next(currentPoint->x, currentPoint->y - 1 * p_lineinc);
@@ -386,7 +391,7 @@ namespace Isis {
     }
     else {
       std::string msg = "Unable to create image footprint. Error walking image.";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
 
@@ -504,7 +509,7 @@ namespace Isis {
 
     // Check to make sure a point was found
     std::string msg = "No lat/lon data found for image";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
 
@@ -530,10 +535,10 @@ namespace Isis {
 
   /**
    * Calculates the four border points, particularly for validSampleDim() and
-   * validLineDim() 
-   *  
-   * @internal 
-   * @history 2011-05-16 Tracie Sucharski - Fixed typo from p_cubeSamples to 
+   * validLineDim()
+   *
+   * @internal
+   * @history 2011-05-16 Tracie Sucharski - Fixed typo from p_cubeSamples to
    *                       p_cubeSamps in ASSERT.
    */
   void ImagePolygon::calcImageBorderCoordinates() {
@@ -648,7 +653,7 @@ namespace Isis {
         // resulting in an infinite loop
         if(points.size() < 3) {
           std::string msg = "Failed to find next point in the image.";
-          throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+          throw IException(IException::Programmer, msg, _FILEINFO_);
         }
 
         // remove last point from the list
@@ -658,7 +663,7 @@ namespace Isis {
 
         if(tempPoint.equals(currentPoint) || tempPoint.equals(oldDuplicatePoint)) {
           std::string msg = "Failed to find next valid point in the image.";
-          throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+          throw IException(IException::Programmer, msg, _FILEINFO_);
         }
       }
 
@@ -720,7 +725,7 @@ namespace Isis {
 
     if(points.size() <= 3) {
       std::string msg = "Failed to find enough points on the image.";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     FindSubpixel(points);
@@ -826,7 +831,7 @@ namespace Isis {
 
     if(hasNorthPole && hasSouthPole) {
       std::string msg = "Unable to create image footprint because image has both poles";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     else if(crossingPoints->size() == 0) {
       // No crossing points
@@ -928,7 +933,7 @@ namespace Isis {
 
     if(closestDistance == DBL_MAX) {
       std::string msg = "Image contains a pole but did not detect a meridian crossing!";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     // split image at the pole
@@ -999,7 +1004,7 @@ namespace Isis {
           }
           else {
             std::string msg = "Image contains a pole but could not determine a meridian crossing!";
-            throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+            throw IException(IException::Programmer, msg, _FILEINFO_);
           }
 
         }
@@ -1042,8 +1047,7 @@ namespace Isis {
             return false;
           }
         }
-        catch(iException &error) {
-          error.Clear();
+        catch(IException &error) {
         }
 
         /**
@@ -1264,23 +1268,23 @@ namespace Isis {
       std::string msg = "Unable to create image footprint (Fix360Poly) due to ";
       msg += "geos illegal argument [" + iString(geosIll->what()) + "]";
       delete geosIll;
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
     catch(geos::util::GEOSException *geosExc) {
       std::string msg = "Unable to create image footprint (Fix360Poly) due to ";
       msg += "geos exception [" + iString(geosExc->what()) + "]";
       delete geosExc;
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
-    catch(iException &e) {
+    catch(IException &e) {
       std::string msg = "Unable to create image footprint (Fix360Poly) due to ";
       msg += "isis operation exception [" + iString(e.what()) + "]";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
     catch(...) {
       std::string msg = "Unable to create image footprint (Fix360Poly) due to ";
       msg += "unknown exception";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
   }
 
@@ -1290,7 +1294,7 @@ namespace Isis {
    *
    * @param[in] is  (std::fstream)   Input stream to read from
    *
-   * throws Isis::iException::Io - Error reading data from stream
+   * throws Isis::IException::Io - Error reading data from stream
    *
    */
   void ImagePolygon::ReadData(std::istream &is) {
@@ -1300,7 +1304,7 @@ namespace Isis {
     if(!is.good()) {
       string msg = "Error preparing to read data from " + p_type +
                    " [" + p_blobName + "]";
-      throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+      throw IException(IException::Io, msg, _FILEINFO_);
     }
 
     char *buf = new char[p_nbytes+1];
@@ -1315,7 +1319,7 @@ namespace Isis {
     if(!is.good()) {
       string msg = "Error reading data from " + p_type + " [" +
                    p_blobName + "]";
-      throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+      throw IException(IException::Io, msg, _FILEINFO_);
     }
 
     geos::io::WKTReader *wkt = new geos::io::WKTReader(&(globalFactory));
@@ -1331,7 +1335,7 @@ namespace Isis {
     // Check to see p_polygons is valid data
     if(!p_polygons) {
       string msg = "Cannot write a NULL polygon!";
-      throw Isis::iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     p_polyStr = wkt->write(p_polygons);
     p_nbytes = p_polyStr.size();

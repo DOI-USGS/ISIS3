@@ -1,26 +1,26 @@
-/**                                                                       
- * @file                                                                  
+/**
+ * @file
  * $Revision$
  * $Date$
- * $Id$ 
- * 
- *   Unless noted otherwise, the portions of Isis written by the USGS are 
- *   public domain. See individual third-party library and package descriptions 
- *   for intellectual property information, user agreements, and related  
- *   information.                                                         
- *                                                                        
- *   Although Isis has been used by the USGS, no warranty, expressed or   
- *   implied, is made by the USGS as to the accuracy and functioning of such 
- *   software and related material nor shall the fact of distribution     
+ * $Id$
+ *
+ *   Unless noted otherwise, the portions of Isis written by the USGS are
+ *   public domain. See individual third-party library and package descriptions
+ *   for intellectual property information, user agreements, and related
+ *   information.
+ *
+ *   Although Isis has been used by the USGS, no warranty, expressed or
+ *   implied, is made by the USGS as to the accuracy and functioning of such
+ *   software and related material nor shall the fact of distribution
  *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.                                        
- *                                                                        
- *   For additional information, launch                                   
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html                
+ *   USGS in connection therewith.
+ *
+ *   For additional information, launch
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
  *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.                                    
- */ 
+ *   http://www.usgs.gov/privacy.html.
+ */
 #include <string>
 #include <vector>
 #include <numeric>
@@ -32,7 +32,8 @@
 #include <gsl/gsl_multifit_nlin.h>
 
 #include "NonLinearLSQ.h"
-#include "iException.h"
+#include "IException.h"
+#include "iString.h"
 
 using namespace std;
 
@@ -63,7 +64,7 @@ int NonLinearLSQ::curvefit() {
   gsl_multifit_fdfsolver_set(s, &mf, x);
 
   _nIters = 0;
-  checkIteration(_nIters, gslToNlsq(s->x), NLVector(p,999.0), 
+  checkIteration(_nIters, gslToNlsq(s->x), NLVector(p,999.0),
                   gsl_blas_dnrm2(s->f), GSL_CONTINUE);
 
 
@@ -132,7 +133,7 @@ int NonLinearLSQ::df(const gsl_vector *x, void *params, gsl_matrix *J) {
   return  (GSL_SUCCESS);
 }
 
-int NonLinearLSQ::fdf(const gsl_vector *x, void *params, gsl_vector *fx, 
+int NonLinearLSQ::fdf(const gsl_vector *x, void *params, gsl_vector *fx,
                       gsl_matrix *J) {
   f(x,params,fx);
   df(x,params,J);
@@ -140,7 +141,7 @@ int NonLinearLSQ::fdf(const gsl_vector *x, void *params, gsl_vector *fx,
 }
 
 
-NonLinearLSQ::NLVector NonLinearLSQ::getUncertainty(const gsl_matrix *covar) 
+NonLinearLSQ::NLVector NonLinearLSQ::getUncertainty(const gsl_matrix *covar)
                                                     const {
    NLVector unc(covar->size1);
    for (size_t i = 0 ; i < covar->size1 ; i++ ) {
@@ -172,14 +173,14 @@ NonLinearLSQ::NLMatrix NonLinearLSQ::gslToNlsq(const gsl_matrix *m) const {
 
 gsl_vector *NonLinearLSQ::NlsqTogsl(const NonLinearLSQ::NLVector &v,
                                     gsl_vector *gv) const {
-  if (gv == 0) { 
+  if (gv == 0) {
     gv = gsl_vector_alloc(v.dim());
   }
   else if (gv->size != (size_t) v.dim()) {
     ostringstream mess;
     mess << "Size of NL vector (" << v.dim() << ") not same as GSL vector ("
          << gv->size << ")";
-    throw iException::Message(iException::Programmer, mess.str(), _FILEINFO_);
+    throw IException(IException::Programmer, mess.str(), _FILEINFO_);
   }
 
   for (int i = 0 ; i < v.dim() ; i++) {
@@ -190,16 +191,16 @@ gsl_vector *NonLinearLSQ::NlsqTogsl(const NonLinearLSQ::NLVector &v,
 
 gsl_matrix *NonLinearLSQ::NlsqTogsl(const NonLinearLSQ::NLMatrix &m,
                                     gsl_matrix *gm) const {
-  if (gm == 0) { 
+  if (gm == 0) {
     gm = gsl_matrix_alloc(m.dim1(), m.dim2());
   }
-  else if ((gm->size1 != (size_t) m.dim1()) && 
+  else if ((gm->size1 != (size_t) m.dim1()) &&
            (gm->size2 != (size_t) m.dim2()) ) {
     ostringstream mess;
     mess << "Size of NL matrix (" << m.dim1() << "," << m.dim2()
          << ") not same as GSL matrix (" << gm->size1 << "," << gm->size2
          << ")";
-    throw iException::Message(iException::Programmer, mess.str(), _FILEINFO_);
+    throw IException(IException::Programmer, mess.str(), _FILEINFO_);
   }
 
   for (int i = 0 ; i < m.dim1() ; i++) {

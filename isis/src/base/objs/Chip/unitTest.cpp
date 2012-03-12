@@ -289,65 +289,57 @@ int main() {
   try {
     chip.SetReadInterpolator(Isis::Interpolator::None);
   }
-  catch(iException &e) {
-    ReportError(iString(e.Errors()));
-    e.Clear();
+  catch(IException &e) {
+    ReportError(e.toString());
   }
   cout << "Try to set interpolator to type 3 (enum value not assigned):" << endl;
   try {
     chip.SetReadInterpolator((Isis::Interpolator::interpType) 3);
   }
-  catch(iException &e) {
-    ReportError(iString(e.Errors()));
-    e.Clear();
+  catch(IException &e) {
+    ReportError(e.toString());
   }
   cout << "Try to set chip size with input parameter equal to 0:" << endl;
   try {
     newChip.SetSize(0, 1);
   }
-  catch(iException &e) {
-    ReportError(iString(e.Errors()));
-    e.Clear();
+  catch(IException &e) {
+    ReportError(e.toString());
   }
   cout << "Try to load a cube that is not camera or map projection:" << endl;
   try {
     newChip.Load(junk, matchChip, junkCube);
   }
-  catch(iException &e) {
-    ReportError(iString(e.Errors()));
-    e.Clear();
+  catch(IException &e) {
+    ReportError(e.toString());
   }
   cout << "Try to load a cube with a match cube that is not camera or map projection:" << endl;
   try {
     newChip.Load(junkCube, matchChip, junk);
   }
-  catch(iException &e) {
-    ReportError(iString(e.Errors()));
-    e.Clear();
+  catch(IException &e) {
+    ReportError(e.toString());
   }
   cout << "Try to load a cube with match chip and cube that can not find at least 3 points for Affine Transformation:" << endl;
   try {
     newChip.Load(junkCube, matchChip, junkCube2);
   }
-  catch(iException &e) {
-    ReportError(iString(e.Errors()));
-    e.Clear();
+  catch(IException &e) {
+    ReportError(e.toString());
   }
   cout << "Try to set valid range with larger number passed in as first parameter:" << endl;
   try {
     newChip.SetValidRange(4, 3);
   }
-  catch(iException &e) {
-    ReportError(iString(e.Errors()));
-    e.Clear();
+  catch(IException &e) {
+    ReportError(e.toString());
   }
   cout << "Try to extract a sub-chip with samples or lines greater than original chip:" << endl;
   try {
     newChip.Extract(2, 5, 1, 1);
   }
-  catch(iException &e) {
-    ReportError(iString(e.Errors()));
-    e.Clear();
+  catch(IException &e) {
+    ReportError(e.toString());
   }
 
 
@@ -371,8 +363,8 @@ int main() {
     chip.Write("junk3.cub");
     chip2.Write("junk4.cub");
   }
-  catch(iException &e) {
-    e.Report();
+  catch(IException &e) {
+    e.print();
   }
 #endif
 

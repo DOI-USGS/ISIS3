@@ -41,7 +41,7 @@ namespace Isis {
       MosaicSceneWidget *parent) : QGraphicsObject() {
     if (parent->getProjection() == NULL) {
       std::string msg = "Parent does not have projection in MosaicWidget";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     m_cubeDisplay = cubeDisplay;
@@ -144,12 +144,12 @@ namespace Isis {
       try {
         reproject();
       }
-      catch(iException &e) {
+      catch(IException &e) {
         m_cubeDisplay->deleteLater();
 
         iString msg = "Could not project the footprint from cube [" +
             m_cubeDisplay->displayName() + "]";
-        throw iException::Message(iException::Io, msg, _FILEINFO_);
+        throw IException(e, IException::Unknown, msg, _FILEINFO_);
       }
     }
   }
@@ -353,9 +353,8 @@ namespace Isis {
         painter->drawImage(polygon->boundingRect(), image);
       }
     }
-    catch(iException &e) {
-      e.Report();
-      e.Clear();
+    catch(IException &e) {
+      e.print();
     }
 
     QApplication::restoreOverrideCursor();
@@ -597,7 +596,7 @@ namespace Isis {
 
 
   /**
-   * This gets a Stretch object that will work for the 
+   * This gets a Stretch object that will work for the
    *   cubeDisplay converting from DN to screen pixel.
    *
    * The first time this is called the stretch is calculated, later calls

@@ -3,7 +3,7 @@
 #include "Hapke.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 
 using namespace std;
@@ -303,7 +303,7 @@ namespace Isis {
     if(hg1 <= -1.0 || hg1 >= 1.0) {
       string msg = "Invalid value of Hapke Henyey Greenstein hg1 [" +
                    iString(hg1) + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     p_photoHg1 = hg1;
   }
@@ -320,7 +320,7 @@ namespace Isis {
     if(hg2 < 0.0 || hg2 > 1.0) {
       string msg = "Invalid value of Hapke Henyey Greenstein hg2 [" +
                    iString(hg2) + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     p_photoHg2 = hg2;
   }
@@ -337,7 +337,7 @@ namespace Isis {
     if(bh < -1.0 || bh > 1.0) {
       string msg = "Invalid value of Hapke Legendre bh [" +
                    iString(bh) + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     p_photoBh = bh;
   }
@@ -354,7 +354,7 @@ namespace Isis {
     if(ch < -1.0 || ch > 1.0) {
       string msg = "Invalid value of Hapke Legendre ch [" +
                    iString(ch) + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     p_photoCh = ch;
   }
@@ -370,7 +370,7 @@ namespace Isis {
     if(wh <= 0.0 || wh > 1.0) {
       string msg = "Invalid value of Hapke wh [" +
                    iString(wh) + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     p_photoWh = wh;
   }
@@ -386,7 +386,7 @@ namespace Isis {
     if(hh < 0.0) {
       string msg = "Invalid value of Hapke hh [" +
                    iString(hh) + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     p_photoHh = hh;
   }
@@ -402,7 +402,7 @@ namespace Isis {
     if(b0 < 0.0) {
       string msg = "Invalid value of Hapke b0 [" +
                    iString(b0) + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     p_photoB0 = b0;
   }
@@ -421,7 +421,7 @@ namespace Isis {
     if(temp != "NO" && temp != "YES" && temp != "FALSE" && temp != "TRUE") {
       string msg = "Invalid value of Hapke b0standard [" +
                    temp + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     if (temp == "NO" || temp == "FALSE") p_photo0B0Standard = "FALSE";
     if (temp == "YES" || temp == "TRUE") p_photo0B0Standard = "TRUE";
@@ -437,7 +437,7 @@ namespace Isis {
     if(theta < 0.0 || theta > 90.0) {
       string msg = "Invalid value of Hapke theta [" +
                    iString(theta) + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     p_photoTheta = theta;
   }

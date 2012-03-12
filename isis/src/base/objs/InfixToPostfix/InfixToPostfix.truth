@@ -28,7 +28,7 @@ Test InfixToPostfix
 
 
 6: Convert 'sin 5' to postfix
-**USER ERROR** Missing parenthesis after sin
+**USER ERROR** Missing parenthesis after sin.
 
 
 7: Convert '--sin(-(54+65))' to postfix

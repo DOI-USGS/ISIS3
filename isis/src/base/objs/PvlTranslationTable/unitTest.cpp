@@ -1,7 +1,7 @@
 #include <sstream>
 #include "PvlTranslationTable.h"
 #include "Preference.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "Preference.h"
 
@@ -79,9 +79,9 @@ int main(void) {
     try {
       table.InputGroup("tttt1");
     }
-    catch(iException &e) {
+    catch(IException &e) {
       cerr << "    ";
-      e.Report(false);
+      e.print();
       cerr << endl;
     }
 
@@ -94,9 +94,9 @@ int main(void) {
     try {
       table.InputKeywordName("tttt2");
     }
-    catch(iException &e) {
+    catch(IException &e) {
       cerr << "    ";
-      e.Report(false);
+      e.print();
       cerr << endl;
     }
 
@@ -109,9 +109,9 @@ int main(void) {
     try {
       table.InputDefault("tttt3");
     }
-    catch(iException &e) {
+    catch(IException &e) {
       cerr << "    ";
-      e.Report(false);
+      e.print();
       cerr << endl;
     }
 
@@ -128,25 +128,25 @@ int main(void) {
     try {
       table.Translate("tttt6");
     }
-    catch(iException &e) {
+    catch(IException &e) {
       cerr << "    ";
-      e.Report(false);
+      e.print();
     }
 
     try {
       table.Translate("DataFileRecordBytes");
     }
-    catch(iException &e) {
+    catch(IException &e) {
       cerr << "    ";
-      e.Report(false);
+      e.print();
     }
 
     try {
       table.Translate("CoreBitsPerPixel", "31");
     }
-    catch(Isis::iException &e) {
+    catch(Isis::IException &e) {
       cerr << "    ";
-      e.Report(false);
+      e.print();
       cerr << endl;
     }
 
@@ -218,8 +218,8 @@ int main(void) {
     t.tester();
 
   }
-  catch(iException &e) {
-    e.Report();
+  catch(IException &e) {
+    e.print();
   }
 
   return 0;

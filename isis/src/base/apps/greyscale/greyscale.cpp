@@ -34,7 +34,7 @@ void IsisMain() {
     }
   }
   else {
-    throw iException::Message(iException::User, "Must enter valid pixel DN values.", _FILEINFO_);
+    throw IException(IException::User, "Must enter valid pixel DN values.", _FILEINFO_);
   }
 
   // Get the size of the cube and create the cube

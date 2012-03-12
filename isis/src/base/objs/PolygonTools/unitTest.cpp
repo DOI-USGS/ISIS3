@@ -4,7 +4,7 @@
 #include <geos/geom/Polygon.h>
 #include <geos/util/GEOSException.h>
 
-#include "iException.h"
+#include "IException.h"
 #include "PolygonTools.h"
 #include "Projection.h"
 #include "ProjectionFactory.h"
@@ -229,9 +229,9 @@ int main() {
 
     return 0;
   }
-  catch(Isis::iException &e) {
+  catch(Isis::IException &e) {
     cout << "ERROR " << e.what() << endl;
-    e.Report();
+    e.print();
   }
   catch(geos::util::GEOSException *exc) {
     cout << "GEOS Exception: " << exc->what() << endl;

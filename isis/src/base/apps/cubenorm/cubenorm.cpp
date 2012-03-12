@@ -11,7 +11,7 @@
 #include "ProcessByTile.h"
 #include "ProcessByLine.h"
 #include "SpecialPixel.h"
-#include "iException.h"
+#include "IException.h"
 #include "Pvl.h"
 #include "Statistics.h"
 
@@ -61,7 +61,7 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   if(!(ui.WasEntered("TO")) && !(ui.WasEntered("STATS"))) {
     string msg = "User must specify a TO and/or STATS file.";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // We will be processing by tile.  This is nice since we change change the
@@ -106,8 +106,7 @@ void IsisMain() {
       (st.size() != (unsigned int)(rowcol * totalBands))) {
     string message = "You have entered an invalid input file " +
                      ui.GetFilename("FROMSTATS");
-    throw  iException::Message(Isis::iException::Io, message,
-                               _FILEINFO_);
+    throw IException(IException::Io, message, _FILEINFO_);
   }
 
   //If a STATS file was specified then create statistics file
@@ -126,7 +125,7 @@ void IsisMain() {
         if(IsValidPixel(normalizer[i]) && normalizer[i] <= 0.0) {
           string msg = "Cube file can not be normalized with [MULTIPLY] ";
           msg += "option, some column averages <= 0.0";
-          throw iException::Message(iException::User, msg, _FILEINFO_);
+          throw IException(IException::User, msg, _FILEINFO_);
         }
       }
     }
@@ -344,8 +343,7 @@ void tableIn(const Isis::Filename &filename) {
 
   if(!in) {
     string message = "Error opening " + filename.Expanded();
-    throw  iException::Message(Isis::iException::Io, message,
-                               _FILEINFO_);
+    throw IException(IException::Io, message, _FILEINFO_);
   }
 
   //skip the header (106 bytes)

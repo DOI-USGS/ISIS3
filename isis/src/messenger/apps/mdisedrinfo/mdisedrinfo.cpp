@@ -64,12 +64,11 @@ void IsisMain() {
       //  Run spiceinit on it
       ProgramLauncher::RunIsisProgram("spiceinit", "from=" + temp.Expanded());
     }
-    catch(iException &ie) {
+    catch(IException &ie) {
       string tempName(temp.Expanded());
       remove(tempName.c_str());
-      ie.Message(iException::User, "Failed to execute mdis2isis/spiceinit",
-                 _FILEINFO_);
-      throw;
+      throw IException(ie, IException::User,
+                       "Failed to execute mdis2isis/spiceinit", _FILEINFO_);
     }
 
     //  FROM file is now the ISIS cube.  Stage cube file for deletion as well.
@@ -97,7 +96,7 @@ void IsisMain() {
       if(!kmap.Exists()) {
         string mess = "EDR keyword map source file, " + kmap.Expanded()
                       + ", does not exist!";
-        throw iException::Message(iException::User, mess.c_str(), _FILEINFO_);
+        throw IException(IException::User, mess.c_str(), _FILEINFO_);
       }
 
       // Get the keylist source line
@@ -105,13 +104,13 @@ void IsisMain() {
       ifstream ifile(kmapName.c_str(), ios::in);
       if(!ifile) {
         string mess = "Unable to open key map source file " + kmap.Expanded();
-        throw iException::Message(iException::User, mess, _FILEINFO_);
+        throw IException(IException::User, mess, _FILEINFO_);
       }
 
       string keystring;
       if(!getline(ifile, keystring)) {
         string mess = "I/O error reading key map line from  " + kmap.Expanded();
-        throw iException::Message(iException::User, mess, _FILEINFO_);
+        throw IException(IException::User, mess, _FILEINFO_);
       }
 
       ifile.close();
@@ -137,7 +136,7 @@ void IsisMain() {
         if(!ofile) {
           string mess = "Could not open or create output TO file " +
                         tomapName;
-          throw iException::Message(iException::User, mess, _FILEINFO_);
+          throw IException(IException::User, mess, _FILEINFO_);
         }
 
         //  Write the header if requested by the user
@@ -163,8 +162,7 @@ void IsisMain() {
 //  Log the results to the log/terminal/gui
     Application::Log(mdiskeys);
   }
-  catch(iException &ie) {
-
+  catch(IException &) {
     string fromName(from.Expanded());
     if(delete_from) remove(fromName.c_str());
     throw;

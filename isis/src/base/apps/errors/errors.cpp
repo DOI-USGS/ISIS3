@@ -17,7 +17,7 @@ void IsisMain() {
   if(outFile.exists() && !append) {
     string msg = "Output file [" + outFile.Expanded() + "] already exists.";
     msg += " Append option set to False.";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   int numErrors = 0;

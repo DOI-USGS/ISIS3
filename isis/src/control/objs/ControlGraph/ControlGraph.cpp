@@ -15,7 +15,7 @@
 #include "ControlPoint.h"
 #include "GroupedStatistics.h"
 #include "ControlNet.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 
 
@@ -129,8 +129,7 @@ namespace Isis {
     if (connected) {
       QString msg = "\n\nGetCubesOnIsland called on connected graph with no "
                     "islands!!!\n\n";
-      throw iException::Message(iException::Programmer, msg.toStdString(),
-                                _FILEINFO_);
+      throw IException(IException::Programmer, msg.toStdString(), _FILEINFO_);
     }
 
     ASSERT(islands->size() != 0);
@@ -140,8 +139,7 @@ namespace Isis {
                     QString::number(island) + "\nbut that island does not exist!!!"
                     "\n\nThere are " + QString::number(islands->size()) + " islands "
                     "numbered from 0 to " + QString::number(islands->size() - 1) + "\n\n";
-      throw Isis::iException::Message(Isis::iException::Programmer,
-                                      msg.toStdString(), _FILEINFO_);
+      throw IException(IException::Programmer, msg.toStdString(), _FILEINFO_);
     }
 
     QVector< QString > cubeList;

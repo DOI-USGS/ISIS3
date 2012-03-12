@@ -9,7 +9,7 @@
 #include "ControlMeasureLogData.h"
 #include "ControlNet.h"
 #include "Cube.h"
-#include "iException.h"
+#include "IException.h"
 #include "iTime.h"
 #include "Latitude.h"
 #include "Longitude.h"
@@ -70,7 +70,7 @@ ControlPoint CreatePoint(const SmtkPoint &spnt, const std::string &pid,
 }
 
 /** Function that creates and writes a control network from a SmtkQStack */
-void WriteCnet(const std::string &netfile, SmtkQStack &points, 
+void WriteCnet(const std::string &netfile, SmtkQStack &points,
                const std::string &target, const std::string &lcn,
                const std::string &rcn) {
    // Initialize control point network
@@ -112,7 +112,7 @@ void IsisMain() {
   // Ensure only single bands
   if (lhImage.getBandCount() != 1 || rhImage.getBandCount() != 1) {
     string msg = "Input Cubes must have only one band!";
-    throw Isis::iException::Message(Isis::iException::User,msg,_FILEINFO_);
+    throw IException(IException::User,msg,_FILEINFO_);
   }
 
   //  Both images must have a Camera and can also have a Projection.  We will
@@ -124,9 +124,9 @@ void IsisMain() {
     lhCamera = lhImage.getCamera();
     rhCamera = rhImage.getCamera();
   }
-  catch (iException &ie) {
+  catch (IException &ie) {
     string msg = "Both input images must have a camera";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(ie, IException::User, msg, _FILEINFO_);
   }
 
   //  Since we are generating a DEM, we must turn off any existing
@@ -145,7 +145,7 @@ void IsisMain() {
     if (sLeft == sRight) {
       string msg = "Cube Serial Numbers must be unique - FROM=" + serialLeft +
                    ", MATCH=" + serialRight;
-      throw iException::Message(iException::User,msg,_FILEINFO_);
+      throw IException(IException::User,msg,_FILEINFO_);
     }
     serialLeft = sLeft;
     serialRight = sRight;
@@ -186,9 +186,9 @@ void IsisMain() {
         for(int cmIndex = 0; cmIndex < cp->GetNumMeasures(); cmIndex ++) {
           ControlMeasure *cm = cp->GetMeasure(cmIndex);
           if (!cm->IsIgnored()) {
-            if (cm->GetCubeSerialNumber() == serialLeft) 
+            if (cm->GetCubeSerialNumber() == serialLeft)
               cmLeft = cp->GetMeasure(cmIndex);
-            if (cm->GetCubeSerialNumber() == serialRight) 
+            if (cm->GetCubeSerialNumber() == serialRight)
               cmRight = cp->GetMeasure(cmIndex);
           }
         }
@@ -212,7 +212,7 @@ void IsisMain() {
 
       prog.CheckStatus();
     }
-  } 
+  }
   else {
   // We want to create a grid of control points that is N rows by M columns.
 
@@ -244,7 +244,7 @@ void IsisMain() {
 
     //  Now select a subset of fpass points as the seed points
     cout << "Number of Potential Seed Points: " << fpass.size() << "\n";
-    cout << "Min / Max Eigenvalues Matched: " << temp_mev.Minimum() << ", " 
+    cout << "Min / Max Eigenvalues Matched: " << temp_mev.Minimum() << ", "
          << temp_mev.Maximum() << "\n";
 
     // How many seed points are requested
@@ -266,7 +266,7 @@ void IsisMain() {
       else {
         bestm = matcher.FindExpDistEV(fpass, seedsample, temp_mev.Minimum(),
                                       temp_mev.Maximum());
-      } 
+      }
 
       //  Add point to stack
       if (bestm != fpass.end()) {
@@ -280,7 +280,7 @@ void IsisMain() {
 
     // If a user wants to see the seed network, write it out here
     if (ui.WasEntered("OSEEDNET")) {
-      WriteCnet(ui.GetFilename("OSEEDNET"), gstack, 
+      WriteCnet(ui.GetFilename("OSEEDNET"), gstack,
                 lhCamera->Target(), serialLeft, serialRight);
     }
 
@@ -292,7 +292,7 @@ void IsisMain() {
   ///////////////////////////////////////////////////////////////////////
   if (gstack.size() <= 0) {
     string msg = "No seed points found - may need to check Gruen parameters.";
-    throw iException::Message(iException::User, msg, _FILEINFO_);    
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   //  Report seed point status
@@ -319,7 +319,7 @@ void IsisMain() {
 
     // Print number on stack
     if ((gstack.size() % 1000) == 0) {
-      cout << "Number on Stack: " << gstack.size() 
+      cout << "Number on Stack: " << gstack.size()
            << ". " << cstack.value().GoodnessOfFit() << "\n";
     }
 
@@ -342,28 +342,28 @@ void IsisMain() {
         bmf.insert(cstack.key(), spnt);  // inserts (0,0) offset excluded below
         int line   = cstack.key().first;
         int sample = cstack.key().second;
-  
+
         //  Determine match points
         double eigen(spnt.GoodnessOfFit());
         for (int sampBox = -halfBox ; sampBox <= halfBox ; sampBox++ ) {
           int csamp = sample + sampBox;
           for (int lineBox = -halfBox ; lineBox <= halfBox ; lineBox++) {
-            int cline = line + lineBox; 
-            if ( !( (sampBox == 0) && (lineBox == 0)) ) {// Already added above 
-              SmtkQPair dupPair(cline, csamp); 
+            int cline = line + lineBox;
+            if ( !( (sampBox == 0) && (lineBox == 0)) ) {// Already added above
+              SmtkQPair dupPair(cline, csamp);
               SmtkQStackIter temp = bmf.find(dupPair);
               SmtkPoint bmfpnt;
               if (temp != bmf.end()) {
                 if (temp.value().GoodnessOfFit() > eigen) {
                   // Create cloned point with better fit
-                  bmfpnt = matcher.Clone(spnt, Coordinate(cline,csamp)); 
-                } 
+                  bmfpnt = matcher.Clone(spnt, Coordinate(cline,csamp));
+                }
               }
               else {  // ISIS2 is BMF(SAMP,LINE,7) .EQ VALID_MAX4)
                 // Clone new point for insert
-                bmfpnt = matcher.Clone(spnt, Coordinate(cline,csamp)); 
+                bmfpnt = matcher.Clone(spnt, Coordinate(cline,csamp));
               }
-  
+
               //  Add if good point
               if (bmfpnt.isValid()) {
                 bmf.insert(dupPair, bmfpnt);
@@ -371,7 +371,7 @@ void IsisMain() {
             }
           }
         }
-  
+
         // Grow stack with spacing adding info to stack
         for (int i = -1 ; i <= 1 ; i ++) {  // Sample
           for (int j = -1 ; j <= 1 ; j ++) {  // Line
@@ -382,14 +382,14 @@ void IsisMain() {
               double sline = line   + (j * space);
               Coordinate pnt = Coordinate(sline, ssamp);
               SmtkPoint gpnt = matcher.Clone(spnt, pnt);
-    
+
               if ( gpnt.isValid() ) {
                 SmtkQPair growpt((int) sline, (int) ssamp);
-      
+
                 // double check we don't have a finalized result at this position
                 SmtkQStackIter temp = bmf.find(growpt);
                 if(temp == bmf.end()) {
-                  gstack.insert(growpt, gpnt); 
+                  gstack.insert(growpt, gpnt);
                 }
               }
             }
@@ -412,7 +412,7 @@ void IsisMain() {
     cout << "\nCreating output DEM from " << bmf.size() << " points.\n";
     Process  p;
     Cube *icube = p.SetInputCube("FROM");
-    Cube *ocube = p.SetOutputCube("TO", icube->getSampleCount(), 
+    Cube *ocube = p.SetOutputCube("TO", icube->getSampleCount(),
                                   icube->getLineCount(), 3);
     p.ClearInputCubes();
 
@@ -493,7 +493,7 @@ void IsisMain() {
   Pvl arPvl = matcher.RegistrationStatistics();
   PvlGroup smtkresultsPvl("SmtkResults");
   smtkresultsPvl += PvlKeyword("SpiceOffImage", matcher.OffImageErrorCount());
-  smtkresultsPvl += PvlKeyword("SpiceDistanceError", matcher.SpiceErrorCount()); 
+  smtkresultsPvl += PvlKeyword("SpiceDistanceError", matcher.SpiceErrorCount());
   arPvl.AddGroup(smtkresultsPvl);
 
   for(int i = 0; i < arPvl.Groups(); i++) {
@@ -501,8 +501,8 @@ void IsisMain() {
   }
 
   // add the auto registration information to print.prt
-  PvlGroup autoRegTemplate = matcher.RegTemplate(); 
-  Application::Log(autoRegTemplate); 
+  PvlGroup autoRegTemplate = matcher.RegTemplate();
+  Application::Log(autoRegTemplate);
 
   // Don't need the cubes opened anymore
   lhImage.close();

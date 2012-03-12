@@ -22,7 +22,7 @@
 
 #include "Distance.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "iTime.h"
 #include "Spice.h"
 #include "Preference.h"
@@ -120,8 +120,8 @@ int main(int argc, char *argv[]) {
     cout << "Testing unknown target ..." << endl;
     MySpice spi(lab);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
     cout << endl;
   }
 
@@ -137,8 +137,8 @@ int main(int argc, char *argv[]) {
     cout << "Testing unknown integer keyword ... " << endl;
     spi.MyInteger("BadInteger");
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
     cout << endl;
   }
 
@@ -147,8 +147,8 @@ int main(int argc, char *argv[]) {
     cout << "Testing unknown double keyword ... " << endl;
     spi.MyDouble("BadDouble");
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
     cout << endl;
   }
 
@@ -157,8 +157,8 @@ int main(int argc, char *argv[]) {
     cout << "Testing unknown string keyword ... " << endl;
     spi.MyString("BadString");
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
     cout << endl;
   }
 

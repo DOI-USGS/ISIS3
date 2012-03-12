@@ -23,7 +23,7 @@
 
 using namespace std;
 
-#include "iException.h"
+#include "IException.h"
 #include "IsisAmlData.h"
 
 // Constructors

@@ -81,8 +81,8 @@ namespace Isis {
 
       // These methods were moved here from the NumericalMethods class
       static double G11Prime(double tau);
-      static double Ei(double x) throw(iException &);
-      static double En(unsigned int n, double x) throw(iException &);
+      static double Ei(double x);
+      static double En(unsigned int n, double x);
       // Calculate atmospheric scattering effect
       void CalcAtmEffect(double pha, double inc, double ema, double *pstd,
                          double *trans, double *trans0, double *sbar, double *transs);
@@ -111,13 +111,13 @@ namespace Isis {
       void SetAtmosHnorm(const double hnorm);
       void SetAtmosIord(const string offset);
       void SetAtmosEstTau(const string esttau);
-      
+
       //! Return atmospheric algorithm name
       string AlgorithmName() const {
         return p_atmosAlgorithmName;
       };
 
-      //! Allow additive offset in fit? 
+      //! Allow additive offset in fit?
       bool AtmosAdditiveOffset() const {
         return p_atmosAddOffset;
       };
@@ -126,7 +126,7 @@ namespace Isis {
       double AtmosHnorm() const {
         return p_atmosHnorm;
       };
-      
+
       //! Return atmospheric Bha value
       double AtmosBha() const {
         return p_atmosBha;
@@ -167,7 +167,7 @@ namespace Isis {
       double AtmosMunot() const {
         return p_atmosMunot;
       };
-      
+
       //! Return atmospheric IncTable value
       vector <double> AtmosIncTable() {
         return p_atmosIncTable;
@@ -249,7 +249,7 @@ namespace Isis {
       void SetOldWha(double wha) {
         p_atmosWhaold = wha;
       }
-      
+
       PhotoModel *GetPhotoModel() const {
         return p_atmosPM;
       }

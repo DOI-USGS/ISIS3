@@ -24,7 +24,7 @@
  */
 
 #include <vector>
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 
 using namespace std;

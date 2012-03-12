@@ -19,17 +19,18 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
+#include "Affine.h"
 
 #include <vector>
 #include <iostream>
 #include <string>
 #include "jama/jama_svd.h"
 
-#include "Affine.h"
-#include "PolynomialBivariate.h"
-#include "LeastSquares.h"
-#include "iException.h"
 #include "Constants.h"
+#include "IException.h"
+#include "iString.h"
+#include "LeastSquares.h"
+#include "PolynomialBivariate.h"
 
 using namespace std;
 
@@ -255,12 +256,12 @@ namespace Isis {
    *
    * @param am Affine matrix to validate
    */
-  void Affine::checkDims(const AMatrix &am) const throw(iException &) {
+  void Affine::checkDims(const AMatrix &am) const {
     if((am.dim1() != 3) && (am.dim2() != 3)) {
       ostringstream mess;
       mess << "Affine matrices must be 3x3 - this one is " << am.dim1()
            << "x" << am.dim2();
-      throw iException::Message(iException::Programmer, mess.str(), _FILEINFO_);
+      throw IException(IException::Programmer, mess.str(), _FILEINFO_);
     }
     return;
   }
@@ -275,7 +276,7 @@ namespace Isis {
    *
    * @return Affine::AMatrix The inverted matrix
    */
-  Affine::AMatrix Affine::invert(const AMatrix &a) const throw(iException &) {
+  Affine::AMatrix Affine::invert(const AMatrix &a) const {
     // Now compute the inverse affine matrix using singular value
     // decomposition A = USV'.  So invA = V invS U'.  Where ' represents
     // the transpose of a matrix and invS is S with the recipricol of the
@@ -291,7 +292,7 @@ namespace Isis {
     for(int i = 0; i < invS.dim1(); i++) {
       if(invS[i][i] == 0.0) {
         string msg = "Affine transform not invertible";
-        throw iException::Message(iException::Math, msg, _FILEINFO_);
+        throw IException(IException::Unknown, msg, _FILEINFO_);
       }
       invS[i][i] = 1.0 / invS[i][i];
     }

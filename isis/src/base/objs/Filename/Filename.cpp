@@ -27,7 +27,7 @@
 #include <QDir>
 
 #include "Preference.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 
 using namespace std;
@@ -98,7 +98,7 @@ namespace Isis {
 
 
   /**
-   * @brief Returns the path. 
+   * @brief Returns the path.
    * @returns the path portion of a filename. For *nix operating
    * systems this includes everything upto but not including the
    * last slash "/". For file names created without any slashes
@@ -116,7 +116,7 @@ namespace Isis {
 
 
   /**
-   * @brief Returns the basename. 
+   * @brief Returns the basename.
    * @returns the file name only. This excludes any path and the last extension.
    * For *nix operating systems this includes everything following the last slash
    * "/" and upto the last dot ".". If a file name contains multiple extensions,
@@ -134,7 +134,7 @@ namespace Isis {
 
 
   /**
-   * @brief Returns the filename. 
+   * @brief Returns the filename.
    * @returns the file name and all extensions of the filename. For
    * *nix operating systems this includes everything following the
    * last slash "/".
@@ -145,7 +145,7 @@ namespace Isis {
 
 
   /**
-   * @brief Returns the extension (Does not include .) 
+   * @brief Returns the extension (Does not include .)
    * @returns the extension of the filename. If multiple extensions
    * exist, then only the last one will be returned.
    */
@@ -155,8 +155,8 @@ namespace Isis {
 
 
   /**
-   * @brief Returns the full filename (path, basename and 
-   * extension(s)). 
+   * @brief Returns the full filename (path, basename and
+   * extension(s)).
    * @returns a fully expanded version of the file name. This will
    * include the expansion of any Isis Preference variables,
    * environment variables and operating system shortcuts such as
@@ -223,7 +223,7 @@ namespace Isis {
     QDir dir((QString)(iString)Path());
     if (!dir.exists()) {
       string msg = "The path [" + Path() + "] does not exist";
-      throw iException::Message(iException::Io, msg, _FILEINFO_);
+      throw IException(IException::Io, msg, _FILEINFO_);
     }
     return dir;
   }
@@ -262,7 +262,7 @@ namespace Isis {
     if (!IsVersioned()) {
       string msg = "Filename [" + Expanded() +
                    "] does not contain a version sequence";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
 
@@ -311,7 +311,7 @@ namespace Isis {
     // Make sure we got a version number
     if (highestVersion.isEmpty()) {
       string msg = "No versions available for file [" + Expanded() + "]";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     QString name = ReplacePattern(Name().ToQt(), highestVersion);
@@ -361,7 +361,7 @@ namespace Isis {
       if (name[pos] != '?') {
         string msg = "Only one version sequence is allowed per filename [" +
                      Expanded() + "]";
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       }
     }
 
@@ -418,7 +418,7 @@ namespace Isis {
 
     if (latestFilename == "") {
       string msg = "No versions available for file [" + Expanded() + "]";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     string fullFilename = Path() + "/" + latestFilename.toStdString();
@@ -515,8 +515,7 @@ namespace Isis {
     QDir dir;
     if(!dir.mkdir(iString(Expanded()))) {
       string msg = "Unable to create directory [" + Expanded() + "]";
-      throw iException::Message(iException::Programmer,
-                                      msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
   }
@@ -535,7 +534,7 @@ namespace Isis {
    *
    * If a relative path is specified, and the DataDirectory-&gt;Temporary
    *   preference is not set, then the file will be created relative to the
-   *   current directory. 
+   *   current directory.
    *
    * The temporary file's filename will be modified to be unique; the final
    *   filename will consist of the current name with a number between 100,000
@@ -580,7 +579,7 @@ namespace Isis {
     while(add < 1000000);
 
     string msg = "No temporary files available for [" + name + extension + "]";
-    throw iException::Message(iException::Io, msg, _FILEINFO_);
+    throw IException(IException::Io, msg, _FILEINFO_);
   }
 
 

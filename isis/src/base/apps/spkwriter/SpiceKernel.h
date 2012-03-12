@@ -34,7 +34,7 @@
 #include <algorithm>
 
 #include "iString.h"
-#include "iException.h"
+#include "IException.h"
 #include "SpiceSegment.h"
 
 namespace Isis {

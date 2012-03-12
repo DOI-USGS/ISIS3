@@ -145,8 +145,8 @@ int main() {
   try {
     p_ar->SetPatternValidPercent(-1);
   }
-  catch (iException e) {
-    e.Report();
+  catch (IException &e) {
+    e.print();
   }
   cout << endl;
   cout << "-------------------------------------------" << endl;
@@ -155,8 +155,8 @@ int main() {
   try {
     p_ar->SetSubsearchValidPercent(102);
   }
-  catch (iException &e) {
-    e.Report();
+  catch (IException &e) {
+    e.print();
   }
   cout << endl;
   cout << "-------------------------------------------" << endl;
@@ -165,8 +165,8 @@ int main() {
   try {
     p_ar->SetPatternZScoreMinimum(0);
   }
-  catch (iException &e) {
-    e.Report();
+  catch (IException &e) {
+    e.print();
   }
   cout << endl;
   cout << "-------------------------------------------" << endl;
@@ -175,15 +175,15 @@ int main() {
   try {
     p_ar->SetSurfaceModelWindowSize(1);
   }
-  catch (iException &e) {
-    e.Report();
+  catch (IException &e) {
+    e.print();
   }
   cout << endl;
   try {
     p_ar->SetSurfaceModelWindowSize(4);
   }
-  catch (iException &e) {
-    e.Report();
+  catch (IException &e) {
+    e.print();
   }
   cout << endl;
   cout << "-------------------------------------------" << endl;
@@ -192,8 +192,8 @@ int main() {
   try {
     p_ar->SetSurfaceModelEccentricityRatio(.5);
   }
-  catch (iException &e) {
-    e.Report();
+  catch (IException &e) {
+    e.print();
   }
   cout << endl;
   cout << "-------------------------------------------" << endl;
@@ -202,8 +202,8 @@ int main() {
   try {
     p_ar->SetSurfaceModelResidualTolerance(-1);
   }
-  catch (iException &e) {
-    e.Report();
+  catch (IException &e) {
+    e.print();
   }
   cout << endl;
   cout << "-------------------------------------------" << endl;
@@ -212,8 +212,8 @@ int main() {
   try {
     p_ar->SetSurfaceModelDistanceTolerance(0);
   }
-  catch (iException &e) {
-    e.Report();
+  catch (IException &e) {
+    e.print();
   }
   cout << endl;
   cout << "-------------------------------------------" << endl;
@@ -222,8 +222,8 @@ int main() {
   try {
     p_ar->SetReductionFactor(0);
   }
-  catch (iException &e) {
-    e.Report();
+  catch (IException &e) {
+    e.print();
   }
   cout << endl;
 
@@ -348,9 +348,8 @@ void Doit(Isis::PvlObject &obj) {
     p_ar->SetEccentricityTesting(true);
     p_ar->SetResidualTesting(true);
   }
-  catch(Isis::iException &error) {
+  catch(Isis::IException &error) {
     iString err = error.what();
-    error.Clear();
 
     // We need to get rid of the contents of the second [] on each line to
     // ensure file paths do not persist.

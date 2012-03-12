@@ -110,16 +110,15 @@ namespace Isis {
         } // end for table[i].Fields
       } // end for table.Records
     }
-    catch(iException &e) {
-      e.Clear();
-
-      iException::Message(iException::Io,
+    catch(IException &e) {
+      IException error(
+          e,
+          IException::Io,
           "Please run camstats with the attach option. "
           "Camera statistics will be unavailable for [" +
               m_filename.toStdString() + "]", _FILEINFO_);
 
-      e.Report();
-      e.Clear();
+      error.print();
     }
   }
 
@@ -266,17 +265,15 @@ namespace Isis {
         cube()->read(poly);
         m_footprint = PolygonTools::MakeMultiPolygon(poly.Polys()->clone());
       }
-      catch (iException &e) {
-        e.Clear();
-
+      catch (IException &e) {
         try {
           createManualFootprint(lock);
         }
-        catch(iException &e) {
+        catch(IException &e) {
           iString msg = "Could not read the footprint from cube [" +
               displayName() + "]. Please make "
               "sure footprintinit has been run";
-          throw iException::Message(iException::Io, msg, _FILEINFO_);
+          throw IException(e, IException::Io, msg, _FILEINFO_);
         }
       }
     }
@@ -710,12 +707,11 @@ namespace Isis {
 
     m_footprint = PolygonTools::MakeMultiPolygon(imgPoly.Polys()->clone());
 
-    iException &e = iException::Message(iException::User,
+    IException e = IException(IException::User,
         "Warning: Polygon re-calculated "
         "for [" + displayName().toStdString() +
         "] which can be very slow", _FILEINFO_);
-    e.Report();
-    e.Clear();
+    e.print();
   }
 }
 

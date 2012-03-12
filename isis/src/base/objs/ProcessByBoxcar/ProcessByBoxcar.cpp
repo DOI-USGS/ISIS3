@@ -53,44 +53,44 @@ namespace Isis {
    *
    * @param funct (Isis::Buffer &in, double &out) Name of your processing function
    *
-   * @throws Isis::iException::Programmer
+   * @throws Isis::IException::Programmer
    */
   void ProcessByBoxcar::StartProcess(void funct(Isis::Buffer &in, double &out)) {
     // Error checks ... there must be one input and output
     if(InputCubes.size() != 1) {
       string m = "You must specify exactly one input cube";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
     else if(OutputCubes.size() != 1) {
       string m = "You must specify exactly one output cube";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     // The lines in the input and output must match
     if(InputCubes[0]->getLineCount() != OutputCubes[0]->getLineCount()) {
       string m = "The number of lines in the input and output cubes ";
       m += "must match";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     // The samples in the input and output must match
     if(InputCubes[0]->getSampleCount() != OutputCubes[0]->getSampleCount()) {
       string m = "The number of samples in the input and output cubes ";
       m += "must match";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     // The bands in the input and output must match
     if(InputCubes[0]->getBandCount() != OutputCubes[0]->getBandCount()) {
       string m = "The number of bands in the input and output cubes ";
       m += "must match";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     //  Make sure the boxcar size has been set
     if(!p_boxsizeSet) {
       string m = "Use the SetBoxcarSize method to set the boxcar size";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     // Construct boxcar buffer and line buffer managers

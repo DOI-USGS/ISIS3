@@ -100,7 +100,7 @@ namespace Isis {
     else {
       string msg = "File does not appear to be a Mariner10 image. InstrumentId ["
         + instId + "] is invalid Mariner 10 value.";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     const string fname = Filename("$mariner10/reseaus/mar10" + cam
@@ -109,9 +109,9 @@ namespace Isis {
     try {
       new ReseauDistortionMap(this, lab, fname);
     }
-    catch(iException &e) {
+    catch(IException &e) {
       string msg = "Unable to create distortion map.";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(e, IException::Programmer, msg, _FILEINFO_);
     }
 
     // Setup the ground and sky map
@@ -157,7 +157,7 @@ namespace Isis {
 
 /**
  * This is the function that is called in order to instantiate a Mariner10Camera
- * object. 
+ * object.
  *
  * @param lab Cube labels
  *

@@ -10,7 +10,7 @@
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
 #include "PvlObject.h"
-#include "iException.h"
+#include "IException.h"
 #include "iTime.h"
 
 using std::string;
@@ -70,7 +70,7 @@ void IsisMain() {
     if (filelist.size() < 2) {
       string msg = "CLIST [" + ui.GetFilename("CLIST") + "] must contain at "
           "least two filenames: a base network and a new network";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     if (ui.GetBoolean("REVERSE")) {
@@ -83,7 +83,7 @@ void IsisMain() {
     filelist.push_back(ui.GetFilename("CNET2"));
   }
 
-  // Get overwrite options, all false by default, and only useable when in 
+  // Get overwrite options, all false by default, and only useable when in
   // MERGE mode
   overwritePoints = false;
   overwriteMeasures = false;
@@ -99,13 +99,13 @@ void IsisMain() {
 
   // Setup a conflict log, which will only be added to and reported if the user
   // specified a log file, but for the sake of simplicity, the objects will be
-  // kept around anyway.  
+  // kept around anyway.
   // TODO there is likely a more elegant solution than to keep around unneeded
   // objects, but it's already memory and computationally cheap as is
   PvlObject conflictLog("Conflicts");
   report = ui.WasEntered("LOG");
 
-  // Determine whether the user wants to allow merging duplicate points or 
+  // Determine whether the user wants to allow merging duplicate points or
   // throw an error
   mergePoints = ui.GetString("DUPLICATEPOINTS") == "MERGE";
 
@@ -134,7 +134,7 @@ ControlNet * mergeNetworks(FileList &filelist, PvlObject &conflictLog,
   progress.SetMaximumSteps(filelist.size());
   progress.CheckStatus();
 
-  // The original base network is the first in the list, all successive 
+  // The original base network is the first in the list, all successive
   // networks will be added to the base in descending order
   ControlNet *baseNet = new ControlNet(Filename(filelist[0]).Expanded());
   baseNet->SetNetworkId(networkId);
@@ -155,7 +155,7 @@ ControlNet * mergeNetworks(FileList &filelist, PvlObject &conflictLog,
     if (baseNet->GetTarget().DownCase() != newNet.GetTarget().DownCase()) {
       string msg = "Input [" + newNet.GetNetworkId() + "] does not target the "
           "same target as other Control Network(s)";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     // Setup a conflict log object for this new network
@@ -194,7 +194,7 @@ void mergeNetwork(ControlNet &baseNet, ControlNet &newNet, PvlObject &cnetLog) {
         msg += "Control Point with ID [" + newPoint->GetId() + "] already ";
         msg += "contained within the base network.  ";
         msg += "Set DUPLICATEPOINTS=MERGE to merge conflicting Control Points";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
     }
     else {
@@ -383,10 +383,10 @@ void addMeasure(ControlPoint *basePoint, ControlPoint *newPoint,
 
   // Copy the new measure to avoid losing it when the new point is deleted
   ControlMeasure *outMeasure = new ControlMeasure(*newMeasure);
-  
+
   // Add the copied measure to the base point
   basePoint->Add(outMeasure);
-  
+
   // Finally, set the output measure to be the reference of the base point if
   // the new measure is the reference in the new point and
   // OVERWRITEREFERENCE=true

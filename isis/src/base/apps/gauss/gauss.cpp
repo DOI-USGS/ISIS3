@@ -5,7 +5,7 @@
 #include "SpecialPixel.h"
 #include "LineManager.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 
 using namespace std;
 using namespace Isis;
@@ -54,7 +54,7 @@ void setFilter(int size, double stdDev) {
                                                     x^2+y^2
                                                -- -----------
                 G(x,y) =           1              2(stdDev)^2
-      			    --------------- e^
+          --------------- e^
           2(pi)(stdDev)^2
       */
 

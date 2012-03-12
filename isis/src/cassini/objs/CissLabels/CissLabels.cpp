@@ -3,7 +3,7 @@
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "SpecialPixel.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 
 using namespace std;
@@ -32,17 +32,17 @@ namespace Isis {
    * values of image properties not already in the labels.
    *
    * @param lab @b Pvl Labels of Cassini ISS file
-   * @throws iException::Pvl Not valid Cassini ISS instrument
+   * @throws IException::Pvl Not valid Cassini ISS instrument
    */
   void CissLabels::Init(Pvl &lab) {
     try {
       ReadLabels(lab);
       ComputeImgProperties();
     }
-    catch(iException &e) {
-      e.Report();
+    catch(IException &e) {
+      e.print();
       string msg = "Labels do not appear contain a valid Cassini ISS instrument";
-      throw iException::Message(iException::Pvl, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
   }
 
@@ -121,7 +121,7 @@ namespace Isis {
     else if(p_filter[0] == "MT3")  p_filterIndex.push_back(27);
     else if(p_filter[0] == "CB2")  p_filterIndex.push_back(28);
     else if(p_filter[0] == "MT2")  p_filterIndex.push_back(29);
-    else throw iException::Message(iException::Pvl, "Labels have invalid filter 1 name.  Cannot get filter 1 index.", _FILEINFO_);
+    else throw IException(IException::Unknown, "Labels have invalid filter 1 name.  Cannot get filter 1 index.", _FILEINFO_);
 
     if(p_filter[1] == "UV3")        p_filterIndex.push_back(2);
     else if(p_filter[1] == "BL2")   p_filterIndex.push_back(4);
@@ -141,7 +141,7 @@ namespace Isis {
     else if(p_filter[1] == "HAL")   p_filterIndex.push_back(33);
     else if(p_filter[1] == "IRP90") p_filterIndex.push_back(34);
     else if(p_filter[1] == "IRP0")  p_filterIndex.push_back(35);
-    else throw iException::Message(iException::Pvl, "Labels have invalid filter 2 name.  Cannot get filter 2 index.", _FILEINFO_);
+    else throw IException(IException::Unknown, "Labels have invalid filter 2 name.  Cannot get filter 2 index.", _FILEINFO_);
     return;
   }
 }

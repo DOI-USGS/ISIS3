@@ -109,7 +109,7 @@ namespace Isis {
     if((percent < 0.0) || (percent > 100.0)) {
       string m = "Argument percent outside of the range 0 to 100 in";
       m += " [GaussianDistribution::InverseCumulativeDistribution]";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     // for information on the following algorithm, go to the website

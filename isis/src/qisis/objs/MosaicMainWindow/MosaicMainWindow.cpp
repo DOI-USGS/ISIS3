@@ -121,9 +121,8 @@ namespace Isis {
           }
         }
       }
-      catch (iException &e) {
+      catch (IException &e) {
         QMessageBox::warning(this, "Problem Loading File", e.what());
-        e.Clear();
       }
     }
 
@@ -618,7 +617,7 @@ namespace Isis {
 
       if (filesInList.empty()) {
         iString msg = "No files were found inside the file list";
-        throw iException::Message(iException::Io, msg, _FILEINFO_);
+        throw IException(IException::Unknown, msg, _FILEINFO_);
       }
 
       openFiles(filesInList);
@@ -764,4 +763,3 @@ namespace Isis {
     createController();
   }
 }
-

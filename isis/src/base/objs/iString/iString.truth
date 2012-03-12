@@ -27,13 +27,13 @@ Before DownCase : ABCDEFGHIJKLMNOPQRSTUVWXYZABC!@#$%^&*()
 After DownCase  : abcdefghijklmnopqrstuvwxyzabc!@#$%^&*()
 Integer : 987654321
 Integer : 987654321
-**PARSE ERROR** Cannot convert (987trew) to an integer
+**ERROR** Failed to convert string [987trew] to an integer.
 BigInteger : 9876543210
 BigInteger : 9876543210
-**PARSE ERROR** Cannot convert (987trew) to a big integer
+**ERROR** Failed to convert string [987trew] to a big integer.
 Double : 9876.54321
 Double : 9876.54321
-**PARSE ERROR** Cannot convert [123$987] to a double
+**ERROR** Failed to convert string [123$987] to a double.
 Exponent : 123.0E45
 Exponent : 1.23e+47
 25:255 35:15

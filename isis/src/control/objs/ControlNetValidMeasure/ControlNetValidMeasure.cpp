@@ -22,7 +22,7 @@ namespace Isis {
    */
   ControlNetValidMeasure::ControlNetValidMeasure(Pvl *pPvl) {
     InitStdOptions();
-    
+
     if(pPvl != NULL && pPvl->HasGroup("ValidMeasure")) {
       Parse(*pPvl);
     }
@@ -42,7 +42,7 @@ namespace Isis {
    */
   ControlNetValidMeasure::ControlNetValidMeasure(Pvl &pPvl) {
     InitStdOptions();
-    
+
     if(pPvl.HasGroup("ValidMeasure")) {
       Parse(pPvl);
     }
@@ -71,11 +71,11 @@ namespace Isis {
     mdMetersFromEdge       = 0;
     mdSampleResTolerance   = DBL_MAX;
     mdLineResTolerance     = DBL_MAX;
-    mdResidualTolerance    = DBL_MAX; 
+    mdResidualTolerance    = DBL_MAX;
     m_sampleShiftTolerance = DBL_MAX;
     m_lineShiftTolerance   = DBL_MAX;
-    m_pixelShiftTolerance  = DBL_MAX; 
-    
+    m_pixelShiftTolerance  = DBL_MAX;
+
     mbCameraRequired       = false;
     mbValidateDN           = false;
     mbValidateFromEdge     = false;
@@ -91,7 +91,7 @@ namespace Isis {
 
     mStdOptionsGrp += Isis::PvlKeyword("MinDN",             (mdMinDN == Isis::ValidMinimum ? "NA" : iString(mdMinDN)));
     mStdOptionsGrp += Isis::PvlKeyword("MaxDN",             (mdMaxDN == Isis::ValidMaximum ? "NA" : iString(mdMaxDN)));
-    
+
     mStdOptionsGrp += Isis::PvlKeyword("MinEmission",       mdMinEmissionAngle);
     mStdOptionsGrp += Isis::PvlKeyword("MaxEmission",       mdMaxEmissionAngle);
     mStdOptionsGrp += Isis::PvlKeyword("MinIncidence",      mdMinIncidenceAngle);
@@ -100,11 +100,11 @@ namespace Isis {
     mStdOptionsGrp += Isis::PvlKeyword("MaxResolution",     (mdMaxResolution == DBL_MAX ? "NA" : iString(mdSampleResTolerance)));
     mStdOptionsGrp += Isis::PvlKeyword("PixelsFromEdge",    miPixelsFromEdge);
     mStdOptionsGrp += Isis::PvlKeyword("MetersFromEdge",    mdMetersFromEdge);
-    
+
     mStdOptionsGrp += Isis::PvlKeyword("SampleResidual",    (mdSampleResTolerance   == DBL_MAX ? "NA" : iString(mdSampleResTolerance)));
     mStdOptionsGrp += Isis::PvlKeyword("LineResidual",      (mdLineResTolerance     == DBL_MAX ? "NA" : iString(mdLineResTolerance)));
     mStdOptionsGrp += Isis::PvlKeyword("ResidualMagnitude", (mdResidualTolerance    == DBL_MAX ? "NA" : iString(mdResidualTolerance)));
-    
+
     mStdOptionsGrp += Isis::PvlKeyword("SampleShift",       (m_sampleShiftTolerance == DBL_MAX ? "NA" : iString(m_sampleShiftTolerance)));
     mStdOptionsGrp += Isis::PvlKeyword("LineShift",         (m_lineShiftTolerance   == DBL_MAX ? "NA" : iString(m_lineShiftTolerance)));
     mStdOptionsGrp += Isis::PvlKeyword("PixelShift",        (m_pixelShiftTolerance  == DBL_MAX ? "NA" : iString(m_pixelShiftTolerance)));
@@ -159,16 +159,16 @@ namespace Isis {
 
   /**
    * Validate a point on an image and the Control Measure if not Null
-   * 
+   *
    * @author Sharmila Prasad (5/17/2011)
-   * 
+   *
    * @param pSample      - Image Sample
    * @param pLine        - Image Line
    * @param pMeasure     - Control Measure
    * @param pCube        - Control Measure's image
    * @param pMeasureGrp  - Result PvlGroup
-   *  
-   * @return MeasureValidationResults 
+   *
+   * @return MeasureValidationResults
    */
   MeasureValidationResults ControlNetValidMeasure::ValidStandardOptions(
       double pSample, double pLine, const ControlMeasure *pMeasure, Cube *pCube,
@@ -180,9 +180,9 @@ namespace Isis {
       try {
         measureCamera = pCube->getCamera();
       }
-      catch(Isis::iException &e) {
+      catch(IException &e) {
         string msg = "Cannot Create Camera for Image:" + pCube->getFilename();
-        throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
     }
 
@@ -207,7 +207,7 @@ namespace Isis {
 
     if (measureCamera != NULL) {
       measureCamera->SetImage(pSample, pLine);
-  
+
       mdEmissionAngle     = measureCamera->EmissionAngle();
       mdIncidenceAngle    = measureCamera->IncidenceAngle();
       mdResolution        = measureCamera->PixelResolution();
@@ -218,27 +218,27 @@ namespace Isis {
       if (temp != Null) {
         mdSampleResidual = fabs(temp);
       }
-      
+
       temp = pMeasure->GetLineResidual();
       if (temp != Null) {
         mdLineResidual = fabs(temp);
       }
-      
+
       temp = pMeasure->GetResidualMagnitude();
       if (temp != Null) {
         mdResidualMagnitude = fabs(temp);
       }
-      
+
       temp = pMeasure->GetSampleShift();
       if (temp != Null) {
         m_sampleShift = fabs(temp);
       }
-      
+
       temp = pMeasure->GetLineShift();
       if (temp != Null) {
         m_lineShift = fabs(temp);
       }
-      
+
       temp = pMeasure->GetPixelShift();
       if (temp != Null) {
         m_pixelShift = fabs(temp);
@@ -277,63 +277,63 @@ namespace Isis {
         results.addFailure(MeasureValidationResults::EmissionAngle,
             mdEmissionAngle, mdMinEmissionAngle, mdMaxEmissionAngle);
       }
-  
+
       if(!ValidIncidenceAngle(mdIncidenceAngle)) {
         results.addFailure(MeasureValidationResults::IncidenceAngle,
             mdIncidenceAngle, mdMinIncidenceAngle, mdMaxEmissionAngle);
       }
-      
+
       if(!ValidResolution(mdResolution)) {
         results.addFailure(MeasureValidationResults::Resolution,
           mdResolution, mdMinResolution, mdMaxResolution);
       }
     }
-    
+
     if(mbValidateDN) {
       if(!ValidDnValue(mdDnValue)) {
         results.addFailure(MeasureValidationResults::DNValue,
             mdDnValue, mdMinDN, mdMaxDN);
       }
     }
-    
+
     if(mbValidateFromEdge) {
       if(!PixelsFromEdge((int)pSample, (int)pLine, pCube)) {
         results.addFailure(MeasureValidationResults::PixelsFromEdge, miPixelsFromEdge);
       }
-  
+
       if(!MetersFromEdge((int)pSample, (int)pLine, pCube)) {
         results.addFailure(MeasureValidationResults::MetersFromEdge,
             mdMetersFromEdge);
       }
     }
-    
+
     if(pMeasure != NULL) {
-      ValidResidualTolerances(mdSampleResidual, mdLineResidual, 
+      ValidResidualTolerances(mdSampleResidual, mdLineResidual,
                               mdResidualMagnitude, results);
-      ValidShiftTolerances(m_sampleShift, m_lineShift, 
+      ValidShiftTolerances(m_sampleShift, m_lineShift,
                            m_pixelShift, results);
     }
 
     return results;
   }
-  
+
   /**
    * Validate a point on an image for Standard Options
-   * 
+   *
    * @author Sharmila Prasad (5/17/2011)
-   * 
+   *
    * @param pSample     - Image Sample
    * @param pLine       - Image Line
    * @param pCube       - Image
    * @param pMeasureGrp - Optional Result Group
-   * 
-   * @return MeasureValidationResults 
+   *
+   * @return MeasureValidationResults
    */
   MeasureValidationResults ControlNetValidMeasure::ValidStandardOptions(
        double pSample, double pLine, Cube *pCube, PvlGroup *pMeasureGrp) {
-    
+
     return ValidStandardOptions(pSample, pLine, NULL, pCube, pMeasureGrp);
-    
+
   }
 
 
@@ -345,8 +345,8 @@ namespace Isis {
    * @param piSample    - Point Sample location
    * @param piLine      - Point Line location
    * @param pCube       - Control Measure Cube
-   * @param pMeasureGrp - Log PvlGroup 
-   *  
+   * @param pMeasureGrp - Log PvlGroup
+   *
    * @return bool
    */
   MeasureValidationResults ControlNetValidMeasure::ValidStandardOptions(
@@ -355,7 +355,7 @@ namespace Isis {
     double dSample, dLine;
     dSample = pMeasure->GetSample();
     dLine   = pMeasure->GetLine();
-    
+
     return (ValidStandardOptions(dSample, dLine, pMeasure, pCube, pMeasureGrp));
   }
 
@@ -367,7 +367,7 @@ namespace Isis {
     double dSample, dLine;
     dSample = pMeasure->GetSample();
     dLine   = pMeasure->GetLine();
-    
+
     return ValidStandardOptions(dSample, dLine, pMeasure,
           pCube, camera, pMeasureGrp);
   }
@@ -414,7 +414,7 @@ namespace Isis {
     if(mPvlOpGrp.HasKeyword("MinResolution")){
       mdMinResolution = mPvlOpGrp["MinResolution"];
       mbCameraRequired = true;
-    } 
+    }
     else {
       mdMinResolution = 0;
     }
@@ -423,7 +423,7 @@ namespace Isis {
     if(mPvlOpGrp.HasKeyword("MaxResolution")){
       mdMaxResolution = mPvlOpGrp["MaxResolution"];
       mbCameraRequired = true;
-    } 
+    }
     else {
       mdMaxResolution = DBL_MAX;
     }
@@ -431,12 +431,12 @@ namespace Isis {
 
     if(mdMinResolution < 0 || mdMaxResolution < 0) {
       string msg = "Invalid Resolution value(s), Resolution must be greater than zero";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     if(mdMaxResolution < mdMinResolution) {
       string msg = "MinResolution must be less than MaxResolution";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
 
@@ -452,7 +452,7 @@ namespace Isis {
     if(mPvlOpGrp.HasKeyword("MinDN")) {
       mdMinDN = mPvlOpGrp["MinDN"];
       mbValidateDN = true;
-    } 
+    }
     else {
       mdMinDN = Isis::ValidMinimum;
     }
@@ -461,7 +461,7 @@ namespace Isis {
     if(mPvlOpGrp.HasKeyword("MaxDN")) {
       mdMaxDN = mPvlOpGrp["MaxDN"];
       mbValidateDN = true;
-    } 
+    }
     else {
       mdMaxDN = Isis::ValidMaximum;
     }
@@ -469,7 +469,7 @@ namespace Isis {
 
     if(mdMaxDN < mdMinDN) {
       string msg = "MinDN must be less than MaxDN";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
 
@@ -487,7 +487,7 @@ namespace Isis {
       mbCameraRequired = true;
       if(mdMinEmissionAngle < 0 || mdMinEmissionAngle > 135) {
         string msg = "Invalid Min Emission Angle, Valid Range is [0-135]";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
     }
     mStdOptionsGrp += Isis::PvlKeyword("MinEmission", mdMinEmissionAngle);
@@ -497,14 +497,14 @@ namespace Isis {
       mbCameraRequired = true;
       if(mdMaxEmissionAngle < 0 || mdMaxEmissionAngle > 135) {
         string msg = "Invalid Max Emission Angle, Valid Range is [0-135]";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
     }
     mStdOptionsGrp += Isis::PvlKeyword("MaxEmission", mdMaxEmissionAngle);
 
     if(mdMaxEmissionAngle < mdMinEmissionAngle) {
       string msg = "Min EmissionAngle must be less than Max EmissionAngle";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
   }
@@ -523,7 +523,7 @@ namespace Isis {
       mbCameraRequired = true;
       if(mdMinIncidenceAngle < 0 || mdMinIncidenceAngle > 135) {
         string msg = "Invalid Min Incidence Angle, Valid Range is [0-135]";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
     }
     mStdOptionsGrp += Isis::PvlKeyword("MinIncidence", mdMinIncidenceAngle);
@@ -533,20 +533,20 @@ namespace Isis {
       mbCameraRequired = true;
       if(mdMaxIncidenceAngle < 0 || mdMaxIncidenceAngle > 135) {
         string msg = "Invalid Max Incidence Angle, Valid Range is [0-135]";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
     }
     mStdOptionsGrp += Isis::PvlKeyword("MaxIncidence", mdMaxIncidenceAngle);
 
     if(mdMaxIncidenceAngle < mdMinIncidenceAngle) {
       string msg = "Min IncidenceAngle must be less than Max IncidenceAngle";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
 
   /**
    * Validate Pvl Sample, Line, Residual Magnitude Tolerances
-   * 
+   *
    * @author Sharmila Prasad (5/16/2011)
    */
   void ControlNetValidMeasure::ValidatePvlResidualTolerances(void){
@@ -556,36 +556,36 @@ namespace Isis {
       mdSampleResTolerance = mPvlOpGrp["SampleResidual"];
       if(mdSampleResTolerance < 0) {
         string msg = "Invalid Sample Residual, must be greater than zero";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
       bRes = true;
     }
     mStdOptionsGrp += Isis::PvlKeyword("SampleResidual", (mdSampleResTolerance   == DBL_MAX ? "NA" : iString(mdSampleResTolerance)));
-    
+
     if(mPvlOpGrp.HasKeyword("LineResidual")) {
       mdLineResTolerance = mPvlOpGrp["LineResidual"];
       if(mdLineResTolerance < 0) {
         string msg = "Invalid Line Residual, must be greater than zero";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
       bRes = true;
     }
     mStdOptionsGrp += Isis::PvlKeyword("LineResidual", (mdLineResTolerance   == DBL_MAX ? "NA" : iString(mdLineResTolerance)));
-    
+
     if(mPvlOpGrp.HasKeyword("ResidualMagnitude")) {
       mdResidualTolerance = mPvlOpGrp["ResidualMagnitude"];
       if(mdResidualTolerance < 0) {
         string msg = "Invalid Residual Magnitude Tolerance, must be greater than zero";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
       bResMag = true;
     }
     mStdOptionsGrp += Isis::PvlKeyword("ResidualMagnitude", (mdResidualTolerance   == DBL_MAX ? "NA" : iString(mdResidualTolerance)));
-    
+
     if(bRes && bResMag) {
       string msg = "Cannot have both Sample/Line Residuals and Residual Magnitude.";
       msg += "\nChoose either Sample/Line Residual or Residual Magnitude";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
 
@@ -601,51 +601,51 @@ namespace Isis {
       if (m_sampleShiftTolerance < 0) {
         string msg = "Invalid Sample Shift tolerance:"
             " must be greater than or equal to zero";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
       hasSampleLineShift = true;
     }
     mStdOptionsGrp += Isis::PvlKeyword("SampleShift", (m_sampleShiftTolerance == DBL_MAX ? "NA" : iString(m_sampleShiftTolerance)));
-    
+
     if (mPvlOpGrp.HasKeyword("LineShift")) {
       m_lineShiftTolerance = mPvlOpGrp["LineShift"];
       if (m_lineShiftTolerance < 0) {
         string msg = "Invalid Line Shift tolerance:"
             " must be greater than or equal to zero";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
       hasSampleLineShift = true;
     }
     mStdOptionsGrp += Isis::PvlKeyword("LineShift", (m_lineShiftTolerance == DBL_MAX ? "NA" : iString(m_lineShiftTolerance)));
-    
+
     bool hasPixelShift = false;
     if (mPvlOpGrp.HasKeyword("PixelShift")) {
       m_pixelShiftTolerance = mPvlOpGrp["PixelShift"];
       if (m_pixelShiftTolerance < 0) {
         string msg = "Invalid Pixel Shift tolerance:"
             " must be greater than or equal to zero";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
       hasPixelShift = true;
     }
     mStdOptionsGrp += Isis::PvlKeyword("PixelShift", (m_pixelShiftTolerance == DBL_MAX ? "NA" : iString(m_pixelShiftTolerance)));
-    
+
     if (hasSampleLineShift && hasPixelShift) {
       string msg = "Cannot have both Sample/Line Shift and Pixel Shift";
       msg += " tolerances.\n";
       msg += "Choose either Sample/Line Shift or Pixel Shift to validate on";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
 
-  
+
   /**
    * Validates an Emission angle by comparing with the min and max values in the def file.
    * If Emission Angle is greater or lesser than the max/min values in the def file or the defaults
    * it returns false else true.
    *
-   * @author Sharmila Prasad (3/30/2010) 
-   *  
+   * @author Sharmila Prasad (3/30/2010)
+   *
    * @param pdEmissionAngle - Emission Angle to Valdiate
    *
    * @return bool
@@ -664,8 +664,8 @@ namespace Isis {
    *
    * @author Sharmila Prasad (5/10/2010)
    *
-   * @param pdIncidenceAngle - Incidence Angle to Valdiate 
-   *  
+   * @param pdIncidenceAngle - Incidence Angle to Valdiate
+   *
    * @return bool
    */
   bool ControlNetValidMeasure::ValidIncidenceAngle(double pdIncidenceAngle) {
@@ -680,9 +680,9 @@ namespace Isis {
    * def file or the defaults.
    *
    * @author Sharmila Prasad (3/30/2010)
-   *  
-   * @param pdDnValue - DN Value to Valdiate 
-   *  
+   *
+   * @param pdDnValue - DN Value to Valdiate
+   *
    * @return bool
    */
   bool ControlNetValidMeasure::ValidDnValue(double pdDnValue) {
@@ -697,9 +697,9 @@ namespace Isis {
    * def file or the defaults.
    *
    * @author Sharmila Prasad (6/4/2010)
-   *  
-   * @param pdResolution - Resolution to Validate 
-   *  
+   *
+   * @param pdResolution - Resolution to Validate
+   *
    * @return bool
    */
   bool ControlNetValidMeasure::ValidResolution(double pdResolution) {
@@ -711,23 +711,23 @@ namespace Isis {
 
 
   /**
-   * Validate whether the Sample and Line Residuals and Residual Magnitudes are 
+   * Validate whether the Sample and Line Residuals and Residual Magnitudes are
    * within the set Tolerances'
-   * 
+   *
    * @author Sharmila Prasad (5/16/2011)
-   * 
+   *
    * @param pdSampleResidual    - Measure's Sample residual
    * @param pdLineResidual      - Measure's Line residual
    * @param pdResidualMagnitude - Measure's Residual Magnitude
    * @param pResults            - MeasureValidationResults
-   * 
+   *
    * @return bool - Valid (true/false)
    */
-  bool ControlNetValidMeasure::ValidResidualTolerances(double pdSampleResidual, 
-                             double pdLineResidual, double pdResidualMagnitude, 
+  bool ControlNetValidMeasure::ValidResidualTolerances(double pdSampleResidual,
+                             double pdLineResidual, double pdResidualMagnitude,
                                             MeasureValidationResults & pResults){
     bool bFlag = true;
-    
+
     if(pdSampleResidual > mdSampleResTolerance) {
       bFlag = false;
       pResults.addFailure(MeasureValidationResults::SampleResidual, mdSampleResTolerance, "greater");
@@ -740,7 +740,7 @@ namespace Isis {
       bFlag = false;
       pResults.addFailure(MeasureValidationResults::ResidualMagnitude, mdResidualTolerance, "greater");
     }
-    
+
     return bFlag;
   }
 
@@ -748,16 +748,16 @@ namespace Isis {
   /**
    * Validate whether the Sample and Line Shifts and Pixel Shift are within the
    * set Tolerances.
-   * 
+   *
    * @param sampleShift Measure's sample shift (current - apriori)
    * @param lineShift Measure's line shift (current - apriori)
    * @param pixelShift Measure's pixel shift (Euclidean distance shifted)
    * @param results Validation results populated with any new failures
-   * 
+   *
    * @return Whether every test was valid or not
    */
   bool ControlNetValidMeasure::ValidShiftTolerances(
-      double sampleShift, double lineShift, double pixelShift, 
+      double sampleShift, double lineShift, double pixelShift,
       MeasureValidationResults &results) {
 
     bool valid = true;
@@ -777,17 +777,17 @@ namespace Isis {
       results.addFailure(MeasureValidationResults::PixelShift,
           m_pixelShiftTolerance, "greater");
     }
-    
+
     return valid;
   }
 
-      
+
   /**
    * Validate if a point has a valid lat, lon for that camera
    *
    * @author Sharmila Prasad (6/4/2010)
    *
-   * @param pCamera 
+   * @param pCamera
    * @param piSample
    * @param piLine
    *
@@ -923,10 +923,10 @@ namespace Isis {
       }
       return false;
     }
-    catch(iException &e) {
+    catch(IException &e) {
       string msg = "Cannot Create Camera for Image [" +
           pCube->getFilename() + "]";
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
 };

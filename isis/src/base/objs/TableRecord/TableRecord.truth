@@ -38,4 +38,4 @@ Group = Field
   Size = 1
 End_Group
 -----
-**PROGRAMMER ERROR** Field [Five] does not exist in record
+**PROGRAMMER ERROR** Field [Five] does not exist in record.

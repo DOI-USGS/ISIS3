@@ -140,20 +140,20 @@ void CreatePsf(Pipeline &p) {
     if(instrument != "HIRISE") {
       iString message = "This program is meant to be run on HiRISE images only, found "
                         "[InstrumentId] to be [" + instrument + "] and was expecting [HIRISE]";
-      throw iException::Message(iException::User, message, _FILEINFO_);
+      throw IException(IException::User, message, _FILEINFO_);
     }
   }
-  catch(iException &e) {
+  catch(IException &e) {
     iString message = "The [FROM] file is not a valid HIRISE cube. "
                       "Please make sure it was imported using hi2isis.";
-    throw iException::Message(iException::User, message, _FILEINFO_);
+    throw IException(IException::User, message, _FILEINFO_);
   }
 
   if(fromCube.getLineCount() != fromCube.getSampleCount()) {
     iString message = "This program only works on square cubes, the number of samples [" +
                       iString(fromCube.getSampleCount()) + "] must match the number of lines [" +
                       iString(fromCube.getLineCount()) + "]";
-    throw iException::Message(iException::User, message, _FILEINFO_);
+    throw IException(IException::User, message, _FILEINFO_);
   }
 
   // Let's figure out which point spread function we're supposed to be using
@@ -171,7 +171,7 @@ void CreatePsf(Pipeline &p) {
   }
   else {
     iString message = "The filter [" + filter + "] does not have a default point spread function. Please provide one using the [PSF] parameter.";
-    throw iException::Message(iException::Programmer, message, _FILEINFO_);
+    throw IException(IException::Programmer, message, _FILEINFO_);
   }
 
   psfFile += ".cub";
@@ -182,13 +182,13 @@ void CreatePsf(Pipeline &p) {
   if(psfCube.getLineCount() > fromCube.getLineCount()) {
     iString message = "The input cube dimensions must be at least [" + iString(psfCube.getLineCount());
     message += "] pixels in the line and sample dimensions";
-    throw iException::Message(iException::User, message, _FILEINFO_);
+    throw IException(IException::User, message, _FILEINFO_);
   }
 
   if(!IsPowerOf2(fromCube.getLineCount())) {
     iString message = "The input cube dimensions must be a power of 2 (found [" +
                       iString(fromCube.getLineCount()) + "])";
-    throw iException::Message(iException::User, message, _FILEINFO_);
+    throw IException(IException::User, message, _FILEINFO_);
   }
 
   LineManager psfMgr(psfCube);

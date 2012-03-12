@@ -26,7 +26,7 @@
 #include "Cube.h"
 #include "Progress.h"
 #include "SpecialPixel.h"
-#include "iException.h"
+#include "IException.h"
 
 using std::string;
 using std::vector;
@@ -164,7 +164,7 @@ namespace Isis {
     else {
       string msg = "Field type for " + getFieldName() +
                    " is not double or integer";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
 

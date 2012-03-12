@@ -32,7 +32,7 @@ void IsisMain() {
                   "exceeds maximum allowable size of ["
                   + iString((cubeBands * 2) - 1) + "] for cube ["
                   + icube->getFilename() + "]";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   //Set the Boxcar Parameters

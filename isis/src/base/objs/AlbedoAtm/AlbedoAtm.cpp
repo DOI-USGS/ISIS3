@@ -1,7 +1,7 @@
 #include <cmath>
 #include "AlbedoAtm.h"
 #include "NumericalApproximation.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 
 #define MIN(x,y) (((x) < (y)) ? (x) : (y))
@@ -80,7 +80,7 @@ namespace Isis {
    *          PI since this is in Isis namespace.
    */
   void AlbedoAtm::NormModelAlgorithm(double phase, double incidence, double emission,
-                                     double demincidence, double dememission, double dn, 
+                                     double demincidence, double dememission, double dn,
                                      double &albedo, double &mult, double &base) {
     static double psurf;
     static double ahInterp;
@@ -140,8 +140,8 @@ namespace Isis {
       fourthterm = pow(q, 2.0) - 4.0 * thirdterm;
 
       if(fourthterm < 0.0) {
-        std::string msg = "Square root of negative encountered";
-        throw iException::Message(iException::Math, msg, _FILEINFO_);
+        std::string msg = "Square root of negative (math) encountered";
+        throw IException(IException::Unknown, msg, _FILEINFO_);
       }
       else {
         fifthterm = q + sqrt(fourthterm);
@@ -152,8 +152,8 @@ namespace Isis {
 
     // Now use rho and reference geometry to calculate output dnout
     if((1.0 - rho * GetAtmosModel()->AtmosAb()*p_normSbar) <= 0.0) {
-      std::string msg = "Divide by zero encountered";
-      throw iException::Message(iException::Math, msg, _FILEINFO_);
+      std::string msg = "Divide by zero (math) encountered";
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
     else {
       albedo = p_normPstdref + rho * (p_normAhref * p_normMunotref *
@@ -176,7 +176,7 @@ namespace Isis {
     if(pharef < 0.0 || pharef >= 180.0) {
       std::string msg = "Invalid value of normalization pharef [" +
                         iString(pharef) + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     p_normPharef = pharef;
@@ -195,7 +195,7 @@ namespace Isis {
     if(incref < 0.0 || incref >= 90.0) {
       std::string msg = "Invalid value of normalization incref [" +
                         iString(incref) + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     p_normIncref = incref;
@@ -214,7 +214,7 @@ namespace Isis {
     if(emaref < 0.0 || emaref >= 90.0) {
       std::string msg = "Invalid value of normalization emaref [" +
                         iString(emaref) + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     p_normEmaref = emaref;

@@ -1,5 +1,5 @@
 #include "Shade.h"
-#include "iException.h"
+#include "IException.h"
 
 #define MIN(x,y) (((x) < (y)) ? (x) : (y))
 #define MAX(x,y) (((x) > (y)) ? (x) : (y))
@@ -19,7 +19,8 @@ namespace Isis {
 
     if(algorithm.HasKeyword("Pharef")) {
       SetNormPharef(algorithm["Pharef"]);
-    } else {
+    }
+    else {
       p_normPharef = p_normIncref;
     }
 
@@ -33,7 +34,7 @@ namespace Isis {
   }
 
   void Shade::NormModelAlgorithm(double phase, double incidence, double emission,
-                                 double demincidence, double dememission, double dn, 
+                                 double demincidence, double dememission, double dn,
                                  double &albedo, double &mult, double &base) {
     double rho;
     double psurfref;
@@ -45,7 +46,7 @@ namespace Isis {
 
     if(psurfref == 0.0) {
       std::string msg = "Divide by zero error";
-      throw iException::Message(iException::Math, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     rho = p_normAlbedo / psurfref;
@@ -65,7 +66,7 @@ namespace Isis {
   void Shade::SetNormPharef(const double pharef) {
     if(pharef < 0.0 || pharef >= 180.0) {
       std::string msg = "Invalid value of normalization pharef [" + iString(pharef) + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     p_normPharef = pharef;
@@ -83,7 +84,7 @@ namespace Isis {
   void Shade::SetNormIncref(const double incref) {
     if(incref < 0.0 || incref >= 90.0) {
       std::string msg = "Invalid value of normalization incref [" + iString(incref) + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     p_normIncref = incref;
@@ -101,7 +102,7 @@ namespace Isis {
   void Shade::SetNormEmaref(const double emaref) {
     if(emaref < 0.0 || emaref >= 90.0) {
       std::string msg = "Invalid value of normalization emaref [" + iString(emaref) + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     p_normEmaref = emaref;

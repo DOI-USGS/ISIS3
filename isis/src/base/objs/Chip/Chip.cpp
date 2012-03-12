@@ -28,7 +28,7 @@
 #include "Camera.h"
 #include "Chip.h"
 #include "Cube.h"
-#include "iException.h"
+#include "IException.h"
 #include "Interpolator.h"
 #include "LineManager.h"
 #include "PolygonTools.h"
@@ -59,7 +59,7 @@ namespace Isis {
     p_buf = other.p_buf;
     p_tackSample = other.p_tackSample;
     p_tackLine = other.p_tackLine;
- 
+
     p_cubeTackSample = other.p_cubeTackSample;
     p_cubeTackLine = other.p_cubeTackLine;
 
@@ -141,11 +141,11 @@ namespace Isis {
    * @internal
    * @history 2010-06-10 Jeannie Walldren - Modified error message
    */
-  void Chip::SetSize(const int samples, const int lines) throw(iException &) {
+  void Chip::SetSize(const int samples, const int lines) {
     if(samples <= 0.0 || lines <= 0.0) {
       string msg = "Unable to set chip size to [" + iString(samples);
       msg += ", " + iString(lines) + "].  Samples and lines must be greater than zero.";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     p_chipSamples = samples;
     p_chipLines = lines;
@@ -316,23 +316,27 @@ namespace Isis {
    *  @history 2010-06-10 Jeannie Walldren - Modified error message and added
    *                         tolerance to linearity check.  Fixed error messages.
    */
-  void Chip::Load(Cube &cube, Chip &match, Cube &matchChipCube, const double scale, const int band) throw(iException &) {
+  void Chip::Load(Cube &cube, Chip &match, Cube &matchChipCube, const double scale, const int band) {
     // See if the match cube has a camera or projection
     Camera *matchCam = NULL;
     Projection *matchProj = NULL;
     try {
       matchCam = matchChipCube.getCamera();
     }
-    catch(iException &error) {
+    catch(IException &error1) {
       try {
         matchProj = matchChipCube.getProjection();
-        error.Clear();
       }
-      catch(iException &error) {
+      catch(IException &error2) {
         string msg = "Can not geom chip.  ";
         msg += "Match chip cube [" + matchChipCube.getFilename();
         msg += "] is not a camera or map projection";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+
+        IException fullError(IException::User, msg, _FILEINFO_);
+        fullError.append(error1);
+        fullError.append(error2);
+
+        throw fullError;
       }
     }
 
@@ -342,16 +346,20 @@ namespace Isis {
     try {
       cam = cube.getCamera();
     }
-    catch(iException &error) {
+    catch(IException &error1) {
       try {
         proj = cube.getProjection();
-        error.Clear();
       }
-      catch(iException &error) {
+      catch(IException &error2) {
         string msg = "Can not geom chip.  ";
         msg += "Chip cube [" + cube.getFilename();
         msg += "] is not a camera or map projection";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+
+        IException fullError(IException::User, msg, _FILEINFO_);
+        fullError.append(error1);
+        fullError.append(error2);
+
+        throw fullError;
       }
     }
 
@@ -510,7 +518,7 @@ namespace Isis {
       string msg = "Cannot find enough points to perform Affine transformation.  ";
       msg += "Unable to load chip from [" + cube.getFilename();
       msg += "] to match chip from [" + matchChipCube.getFilename() + "].";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     // Now take our control points and create the affine map
@@ -700,11 +708,11 @@ namespace Isis {
    * @internal
    * @history 2010-06-10 Jeannie Walldren - Modified error message
    */
-  void Chip::SetValidRange(const double minimum, const double maximum) throw(iException &) {
+  void Chip::SetValidRange(const double minimum, const double maximum) {
     if(minimum >= maximum) {
       string msg = "Unable to set valid chip range to [" + iString(minimum);
       msg += ", " + iString(maximum) + "].  First parameter must be smaller than the second.";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     p_validMinimum = minimum;
@@ -763,16 +771,16 @@ namespace Isis {
    * @param samp      Input chip sample to be placed at output chip tack
    * @param line      Input chip line to be placed at output chip tack
    * @return @b Chip Sub-chip extracted from the chip
-   * @throws Isis::iException::Programmer - Chip extraction invalid
+   * @throws Isis::IException::Programmer - Chip extraction invalid
    * @internal
    * @history 2010-06-10 Jeannie Walldren - Modified error message
    */
-  Chip Chip::Extract(int samples, int lines, int samp, int line) throw(iException &) {
+  Chip Chip::Extract(int samples, int lines, int samp, int line) {
     if(samples > Samples() || lines > Lines()) {
       string msg = "Cannot extract sub-chip of size [" + iString(samples);
       msg += ", " + iString(lines) + "] from chip of size [" + iString(Samples());
       msg += ", " + iString(Lines()) + "]";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     Chip chipped(samples, lines);

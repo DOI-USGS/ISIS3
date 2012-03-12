@@ -6,7 +6,7 @@
 #include "Camera.h"
 #include "CameraFactory.h"
 #include "GroundGrid.h"
-#include "iException.h"
+#include "IException.h"
 #include "Latitude.h"
 #include "Longitude.h"
 #include "ProcessByLine.h"
@@ -54,26 +54,26 @@ void IsisMain() {
 
   iString lval = iString::UpCase(ui.GetString("LINEVALUE"));
   if (lval == "HRS") {
-    lineValue = Isis::Hrs; 
+    lineValue = Isis::Hrs;
   }
   else if (lval == "LRS") {
-    lineValue = Isis::Lrs; 
+    lineValue = Isis::Lrs;
   }
   else if (lval == "NULL") {
-    lineValue = Isis::Null; 
+    lineValue = Isis::Null;
   }
   else if (lval == "DN") {
     if (ui.WasEntered("DNVALUE")) {
-      lineValue = ui.GetDouble("DNVALUE"); 
+      lineValue = ui.GetDouble("DNVALUE");
     }
     else {
-      throw iException::Message(iException::User, "Must enter value in DNVALUE", _FILEINFO_);
+      throw IException(IException::User, "Must enter value in DNVALUE", _FILEINFO_);
     }
   }
   else {
     iString msg = "Invalid LINEVALUE string [" + ui.GetString("LINEVALUE");
     msg += "], must be one of HRS, LRS, NULL, or DN.";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   inputSamples = icube->getSampleCount();

@@ -1,19 +1,19 @@
 Unit test for Isis::ProjectionFactory
 Test for missing pixel resolution ... 
-**PROJECTION ERROR** Unable to initialize cube projection
-**PVL ERROR** Keyword [PixelResolution] does not exist in [Group = Mapping]
+**ERROR** Unable to initialize cube projection.
+**ERROR** PVL Keyword [PixelResolution] does not exist in [Group = Mapping].
 
-**PROJECTION ERROR** Unable to create projection
-**PVL ERROR** Keyword [Scale] does not exist in [Group = Mapping]
-**PVL ERROR** Keyword [PixelResolution] does not exist in [Group = Mapping]
+**ERROR** Unable to create projection.
+**ERROR** PVL Keyword [Scale] does not exist in [Group = Mapping].
+**ERROR** PVL Keyword [PixelResolution] does not exist in [Group = Mapping].
 
 Test for missing upper left X ... 
-**PROJECTION ERROR** Unable to initialize cube projection
-**PVL ERROR** Keyword [UpperLeftCornerX] does not exist in [Group = Mapping]
+**ERROR** Unable to initialize cube projection.
+**ERROR** PVL Keyword [UpperLeftCornerX] does not exist in [Group = Mapping].
 
 Test for missing upper left Y ... 
-**PROJECTION ERROR** Unable to initialize cube projection
-**PVL ERROR** Keyword [UpperLeftCornerY] does not exist in [Group = Mapping]
+**ERROR** Unable to initialize cube projection.
+**ERROR** PVL Keyword [UpperLeftCornerY] does not exist in [Group = Mapping].
 
 Testing conversion from image to ground ... 
 Latitude:  22.82592837303
@@ -24,8 +24,8 @@ Sample:    244.5
 Line:      354.5
 
 Testing missing ground range on create method ... 
-**PROJECTION ERROR** Unable to create projection
-**PROJECTION ERROR** Invalid ground range [MinimumLatitude,MaximumLatitude,MinimumLongitude,MaximumLongitude] missing or invalid
+**ERROR** Unable to create projection.
+**ERROR** Invalid ground range [MinimumLatitude,MaximumLatitude,MinimumLongitude,MaximumLongitude] missing or invalid.
 
 Testing create method ... 
 Lines:       708

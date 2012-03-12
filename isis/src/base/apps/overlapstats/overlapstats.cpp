@@ -50,7 +50,7 @@ void IsisMain() {
             "list that was not in the provided cube list. Please ensure that "
             "the cube list is the same one used to generate your overlap list "
             "file.";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
     }
   }
@@ -177,11 +177,11 @@ void IsisMain() {
         mpXY = NULL;
 
       }
-      catch(iException &e) {
+      catch(IException &e) {
         errorNum++;
 
         if(ui.WasEntered("ERRORS")) {
-          errors << e.PvlErrors().Group(0).FindKeyword("Message")[0];
+          errors << e.toPvl().Group(0).FindKeyword("Message")[0];
 
           for(int serNum = 0; serNum < overlaps[index]->Size(); serNum++) {
             if(serNum == 0) {
@@ -195,8 +195,6 @@ void IsisMain() {
 
           errors << endl;
         }
-
-        e.Clear();
 
         progress.CheckStatus();
         continue;
@@ -212,7 +210,7 @@ void IsisMain() {
     msg += Filename(ui.GetFilename("OVERLAPLIST")).Name();
     msg += "] does not contain any overlaps across the provided cubes [";
     msg += Filename(ui.GetFilename("FROMLIST")).Name() + "]";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
 
@@ -275,7 +273,7 @@ void IsisMain() {
     outfile.close();
     if(outfile.fail()) {
       iString msg = "Unable to write the statistics to [" + ui.GetFilename("TO") + "]";
-      throw iException::Message(iException::Io, msg, _FILEINFO_);
+      throw IException(IException::Io, msg, _FILEINFO_);
     }
   }
 

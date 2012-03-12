@@ -3,7 +3,7 @@
 #include "Brick.h"
 #include "EndianSwapper.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "OriginalLabel.h"
 #include "ProcessByLine.h"
@@ -47,7 +47,7 @@ void IsisMain() {
   if(lab.HasObject("IMAGE_MAP_PROJECTION")) {
     string msg = "[" + in.Name() + "] appears to be an rdr file.";
     msg += " Use pds2isis.";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   //Make sure it is a vims cube
@@ -60,14 +60,14 @@ void IsisMain() {
     id.Trim(" ");
     if(id != "VIMS") {
       string msg = "Invalid INSTRUMENT_ID [" + id + "]";
-      throw iException::Message(iException::Pvl, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
   }
-  catch(iException &e) {
+  catch(IException &e) {
     string msg = "Input file [" + in.Expanded() +
                  "] does not appear to be " +
                  "in VIMS EDR/RDR format";
-    throw iException::Message(iException::Io, msg, _FILEINFO_);
+    throw IException(IException::Io, msg, _FILEINFO_);
   }
 
   Filename tempname(in.Basename() + ".bsq.cub");
@@ -211,7 +211,7 @@ void ReadVimsBIL(std::string inFilename, const PvlKeyword &suffixItems, std::str
   else {
     string msg = "Invalid PixelType and BitsPerPixel combination [" + str +
                  ", " + Isis::iString(bitsPerPixel) + "]";
-    throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+    throw IException(IException::Io, msg, _FILEINFO_);
   }
 
   str = pdsXlater.Translate("CoreByteOrder");
@@ -255,7 +255,7 @@ void ReadVimsBIL(std::string inFilename, const PvlKeyword &suffixItems, std::str
   fin.open(inFilename.c_str(), ios::in | ios::binary);
   if(!fin.is_open()) {
     string msg = "Cannot open input file [" + inFilename + "]";
-    throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+    throw IException(IException::Io, msg, _FILEINFO_);
   }
 
   // Handle the file header
@@ -270,7 +270,7 @@ void ReadVimsBIL(std::string inFilename, const PvlKeyword &suffixItems, std::str
     string msg = "Cannot read file [" + inFilename + "]. Position [" +
                  Isis::iString((int)pos) + "]. Byte count [" +
                  Isis::iString(fileHeaderBytes) + "]" ;
-    throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+    throw IException(IException::Io, msg, _FILEINFO_);
   }
 
   // Construct a line buffer manager
@@ -299,7 +299,7 @@ void ReadVimsBIL(std::string inFilename, const PvlKeyword &suffixItems, std::str
         string msg = "Cannot read file [" + inFilename + "]. Position [" +
                      Isis::iString((int)pos) + "]. Byte count [" +
                      Isis::iString(readBytes) + "]" ;
-        throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+        throw IException(IException::Io, msg, _FILEINFO_);
       }
 
       // Swap the bytes if necessary and convert any out of bounds pixels
@@ -372,7 +372,7 @@ void ReadVimsBIL(std::string inFilename, const PvlKeyword &suffixItems, std::str
           string msg = "Cannot read file [" + inFilename + "]. Position [" +
                        Isis::iString((int)pos) + "]. Byte count [" +
                        Isis::iString(4) + "]" ;
-          throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+          throw IException(IException::Io, msg, _FILEINFO_);
         }
       }
     } // End band loop
@@ -385,7 +385,7 @@ void ReadVimsBIL(std::string inFilename, const PvlKeyword &suffixItems, std::str
       string msg = "Cannot read file [" + inFilename + "]. Position [" +
                    Isis::iString((int)pos) + "]. Byte count [" +
                    Isis::iString(4 * (4 * ns + 4)) + "]" ;
-      throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+      throw IException(IException::Io, msg, _FILEINFO_);
     }
 
   } // End line loop

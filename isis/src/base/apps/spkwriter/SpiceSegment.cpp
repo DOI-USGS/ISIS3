@@ -1,26 +1,26 @@
-/**                                                                       
- * @file                                                                  
+/**
+ * @file
  * $Revision$
  * $Date$
  * $Id$
- * 
- *   Unless noted otherwise, the portions of Isis written by the USGS are 
- *   public domain. See individual third-party library and package descriptions 
- *   for intellectual property information, user agreements, and related  
- *   information.                                                         
- *                                                                        
- *   Although Isis has been used by the USGS, no warranty, expressed or   
- *   implied, is made by the USGS as to the accuracy and functioning of such 
- *   software and related material nor shall the fact of distribution     
+ *
+ *   Unless noted otherwise, the portions of Isis written by the USGS are
+ *   public domain. See individual third-party library and package descriptions
+ *   for intellectual property information, user agreements, and related
+ *   information.
+ *
+ *   Although Isis has been used by the USGS, no warranty, expressed or
+ *   implied, is made by the USGS as to the accuracy and functioning of such
+ *   software and related material nor shall the fact of distribution
  *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.                                        
- *                                                                        
- *   For additional information, launch                                   
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html                
+ *   USGS in connection therewith.
+ *
+ *   For additional information, launch
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
  *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.                                    
- */ 
+ *   http://www.usgs.gov/privacy.html.
+ */
 #include <string>
 #include <vector>
 #include <numeric>
@@ -35,7 +35,7 @@
 #include "Camera.h"
 #include "iTime.h"
 #include "NaifStatus.h"
-#include "iException.h"
+#include "IException.h"
 
 #include "naif/SpiceUsr.h"
 
@@ -45,8 +45,8 @@ namespace Isis {
 
 
   /** Initialize  */
-SpiceSegment::SpiceSegment() { 
-  init(); 
+SpiceSegment::SpiceSegment() {
+  init();
 }
 
 /** Initialize with a cube extracting BLOB content */
@@ -62,17 +62,17 @@ void SpiceSegment::setId(const std::string &name) {
 
 
 /**
- * @brief Provide on-demand loading of a kernel type in the NAIF pool 
- *  
- * This method provides the ability for users to load particular kernels 
- * associated with an ISIS cube (or segment) when the need arises.  This 
- * commonly occurs when transforming states and/or frames and body ids.  This is 
- * implemented through the Kernels class so that documentation would be useful 
- * to review for usage details. 
- * 
- * 
- * @param ktypes  Optional string type of kernel to load (e.g., "LSK,FK"). 
- * 
+ * @brief Provide on-demand loading of a kernel type in the NAIF pool
+ *
+ * This method provides the ability for users to load particular kernels
+ * associated with an ISIS cube (or segment) when the need arises.  This
+ * commonly occurs when transforming states and/or frames and body ids.  This is
+ * implemented through the Kernels class so that documentation would be useful
+ * to review for usage details.
+ *
+ *
+ * @param ktypes  Optional string type of kernel to load (e.g., "LSK,FK").
+ *
  * @return int  Number of kernels loaded for the requested type
  */
 int SpiceSegment::LoadKernelType(const std::string &ktypes) const {
@@ -81,27 +81,27 @@ int SpiceSegment::LoadKernelType(const std::string &ktypes) const {
 
 /**
  * @brief Unload specific kernels from the NAIF pool
- *  
- * This is the compliment of the LoadKernelType() method that will unload 
- * kernels that were requested through that method. 
- * 
+ *
+ * This is the compliment of the LoadKernelType() method that will unload
+ * kernels that were requested through that method.
+ *
  * @param ktypes   Optional string type of kernel to unload (e.g., "LSK,FK").
- * 
- * @return int Number kernels unloaded 
+ *
+ * @return int Number kernels unloaded
  */
 int SpiceSegment::UnloadKernelType(const std::string &ktypes) const {
   return (_kernels.UnLoad(ktypes));
 }
 
 /**
- * @brief Initializes an ISIS cube converting it into a SPICE segment 
- *  
- * This method is called to extract the perinent contents of an ISIS cube file 
- * and accumulate generic information that is used to create the output SPICE 
- * kernel segment.  Other specific kernel types can use this class as its base 
- * class and add to it additional elements to complete the needed content for 
- * the NAIF kernel. 
- * 
+ * @brief Initializes an ISIS cube converting it into a SPICE segment
+ *
+ * This method is called to extract the perinent contents of an ISIS cube file
+ * and accumulate generic information that is used to create the output SPICE
+ * kernel segment.  Other specific kernel types can use this class as its base
+ * class and add to it additional elements to complete the needed content for
+ * the NAIF kernel.
+ *
  * @param cube ISIS cube file to accumulate information from
  */
 void SpiceSegment::init(Cube &cube) {
@@ -116,7 +116,7 @@ void SpiceSegment::init(Cube &cube) {
   try {
 
     // Order is somewhat important here.  The call to initialize Kernels
-    // object checks the NAIF pool for existance.  It logs their NAIF 
+    // object checks the NAIF pool for existance.  It logs their NAIF
     // status as loaded which may cause trouble from here on...
     Pvl *label = cube.getLabel();
     _kernels.Init(*label);
@@ -141,11 +141,10 @@ void SpiceSegment::init(Cube &cube) {
     setStartTime(camera->CacheStartTime().Et());
     setEndTime(camera->CacheEndTime().Et());
 
-  } catch ( iException &ie  ) {
+  } catch ( IException &ie  ) {
     ostringstream mess;
     mess << "Failed to construct Spice Segment basics from ISIS file " << _fname;
-    ie.Message(iException::User, mess.str(), _FILEINFO_);
-    throw;
+    throw IException(ie, IException::User, mess.str(), _FILEINFO_);
   }
 
   return;
@@ -153,20 +152,20 @@ void SpiceSegment::init(Cube &cube) {
 
 /**
  * @brief Get specified keyword values from an ISIS label
- * 
+ *
  * This routine provides access to an ISIS label w/out regard for structure.  In
  * other words, it will traverse the label looking for the first occurance of
  *the specified keyword and return the first value of the first occurance.
- * 
- * 
- * @param label   Label to search the keyword 
+ *
+ *
+ * @param label   Label to search the keyword
  * @param keyword Nanme of keyword to find
- * 
+ *
  * @return std::string Returns first value in the found keyword.  If the keyword
  *         does not exist, an empty string is returned.
  */
-std::string SpiceSegment::getKeyValue(PvlObject &label, 
-                                      const std::string &keyword) { 
+std::string SpiceSegment::getKeyValue(PvlObject &label,
+                                      const std::string &keyword) {
   string value("");
   if ( label.HasKeyword(keyword,Pvl::Traverse) ) {
     value = label.FindKeyword(keyword,Pvl::Traverse)[0];
@@ -177,10 +176,10 @@ std::string SpiceSegment::getKeyValue(PvlObject &label,
 
 /**
  * @brief Reentrant initializer for the variables of this object
- * 
+ *
  * All variables are set to their respective defaults.  Strings are empty,
  * binaries are 0 and the Kernels object is cleared.
- * 
+ *
  */
 void SpiceSegment::init() {
   _name = _fname = _instId = _target = "";
@@ -190,18 +189,18 @@ void SpiceSegment::init() {
 }
 
 /**
- * @brief Retrieve and convert image times from labels 
- *  
- * This method retrieves the start and end times of the image observation from 
- * the labels.  It mimicks what the spiceinit application does when making this 
- * determination. 
- * 
+ * @brief Retrieve and convert image times from labels
+ *
+ * This method retrieves the start and end times of the image observation from
+ * the labels.  It mimicks what the spiceinit application does when making this
+ * determination.
+ *
  * @param lab   Label to get times from
- * @param start Returns start time of the image from the Instrument/StartTime 
+ * @param start Returns start time of the image from the Instrument/StartTime
  *              keyword if it exists
- * @param end   Returns end time of the image from the Instrument/EndTime 
+ * @param end   Returns end time of the image from the Instrument/EndTime
  *              keyword if it exists
- * 
+ *
  * @return bool Always returns true
  */
 bool SpiceSegment::getImageTimes(Pvl &lab, double &start, double &end) const {
@@ -222,28 +221,28 @@ bool SpiceSegment::getImageTimes(Pvl &lab, double &start, double &end) const {
 
 /**
  * @brief Add elements to top and bottom of a matrix
- *  
- * This method is to expand a matrix to add additional records for padding 
+ *
+ * This method is to expand a matrix to add additional records for padding
  * purposes. The parameter ntop indicate the number to add to the top of the
  * matrix. nbot indicates the number to add to the bottom
- *  
+ *
  * Elements added to the top have the contents of the first element of the
- * input matrix copied to it. Elements added to the bottom have the last 
- * element copied to it. 
- *  
- * The new matrix has the contents of the original copied to it place 
+ * input matrix copied to it. Elements added to the bottom have the last
+ * element copied to it.
+ *
+ * The new matrix has the contents of the original copied to it place
  * immediately after the number of elements added to it.
- *  
+ *
  * @author Kris Becker - 4/6/2011
- * 
+ *
  * @param ntop Number of elements to add to the top
  * @param vec  number of elements to add to the bottom
- * @param matrix Matrix to add elements to 
- *  
+ * @param matrix Matrix to add elements to
+ *
  *  @return SpiceSegment::SMatrix Expanded matrix
  */
 SpiceSegment::SMatrix SpiceSegment::expand(int ntop, int nbot,
-                                           const SpiceSegment::SMatrix &matrix) 
+                                           const SpiceSegment::SMatrix &matrix)
                                            const {
   //  Add lines to matrix at top and bottom
   int ndim(matrix.dim1());
@@ -279,28 +278,28 @@ SpiceSegment::SMatrix SpiceSegment::expand(int ntop, int nbot,
 
 /**
  * @brief Add elements to top and bottom of a vector
- *  
- * This method is to expand a vector to add additional records for padding 
+ *
+ * This method is to expand a vector to add additional records for padding
  * purposes. The parameter ntop indicate the number to add to the top of the
  * vector. nbot indicates the number to add to the bottom
- *  
+ *
  * Elements added to the top have the contents of the first element of the
- * input vector copied to it. Elements added to the bottom have the last 
- * element copied to it. 
- *  
- * The new vector has the contents of the original copied to it place 
+ * input vector copied to it. Elements added to the bottom have the last
+ * element copied to it.
+ *
+ * The new vector has the contents of the original copied to it place
  * immediately after the number of elements added to it.
- *  
+ *
  * @author Kris Becker - 4/6/2011
- * 
+ *
  * @param ntop Number of elements to add to the top
  * @param vec  number of elements to add to the bottom
  * @param vector Vector to add elements to
- *  
+ *
  *  @return SpiceSegment::SVector Expanded vector
  */
-SpiceSegment::SVector SpiceSegment::expand(int ntop, int nbot, 
-                                           const SpiceSegment::SVector &vec) 
+SpiceSegment::SVector SpiceSegment::expand(int ntop, int nbot,
+                                           const SpiceSegment::SVector &vec)
                                            const {
   //  Add lines to matrix at top and bottom
   int ndim(vec.dim1());
@@ -343,14 +342,14 @@ void SpiceSegment::setEndTime(double et) {
 
 /**
  * @brief Convert NAIF code to frame or body name
- *  
- * This routine will convert a NAIF integer code to either the frame (first) or 
- * body (second) name. 
- *  
+ *
+ * This routine will convert a NAIF integer code to either the frame (first) or
+ * body (second) name.
+ *
  * @author kbecker (3/26/2011)
- * 
+ *
  * @param naifid NAIF integer code to convert to a name
- * 
+ *
  * @return std::string Returns the frame or body name.
  */
 std::string SpiceSegment::getNaifName(int naifid) const {
@@ -366,7 +365,7 @@ std::string SpiceSegment::getNaifName(int naifid) const {
 
   // If it fails, just report it missing
   if ( cframe.empty() ) {
-    string mess = "Failed to convert FrameId (" + iString(naifid) + 
+    string mess = "Failed to convert FrameId (" + iString(naifid) +
                   ") to string - perhaps the frame kernel is missing or not" +
                   " loaded.";
     cframe = "_UNKNOWN_";

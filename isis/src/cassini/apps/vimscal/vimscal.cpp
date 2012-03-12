@@ -5,7 +5,7 @@
 
 #include "Camera.h"
 #include "EndianSwapper.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "LeastSquares.h"
 #include "LineManager.h"
@@ -75,19 +75,18 @@ void IsisMain() {
     isVims = (icube->getLabel()->FindGroup("Instrument",
               Pvl::Traverse)["InstrumentId"][0] == "VIMS");
   }
-  catch(iException &e) {
-    e.Clear();
+  catch(IException &e) {
     isVims = false;
   }
 
   if(!isVims) {
     iString msg = "The input cube [" + iString(ui.GetAsString("FROM")) + "] is not a Cassini VIMS cube";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   if(icube->getLabel()->FindObject("IsisCube").HasGroup("AlphaCube")) {
     iString msg = "The input cube [" + iString(ui.GetAsString("FROM")) + "] has had its dimensions modified and can not be calibrated";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // done first since it's likely to cause an error if one exists
@@ -187,11 +186,11 @@ void calculateSolarRemove(Cube *icube, ProcessByLine *p) {
   try {
     cam = icube->getCamera();
   }
-  catch(iException &e) {
-    iString msg = "Unable to create a camera from [" +
+  catch(IException &e) {
+    iString msg = "Unable to create a camera model from [" +
                   icube->getFilename() + "]. Please run "
                   "spiceinit on this file";
-    throw iException::Message(iException::Camera, msg, _FILEINFO_);
+    throw IException(e, IException::Unknown, msg, _FILEINFO_);
   }
 
 
@@ -425,7 +424,7 @@ void calculateVisDarkCurrent(Cube *icube) {
         if(fread(&calData, sizeof(calData), 1, calFilePtr) != 1) {
           // error!
           string msg = "Error reading file [" + calFile + "]";
-          throw iException::Message(iException::Io, msg, _FILEINFO_);
+          throw IException(IException::Io, msg, _FILEINFO_);
         }
 
         int associatedSample = sample - sampleOffset + 1;
@@ -698,7 +697,7 @@ void GetOffsets(const Pvl &lab, int &finalSampOffset, int &finalLineOffset) {
     }
     else {
       string msg = "Unsupported sampling mode [" + samplingMode + "]";
-      throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+      throw IException(IException::Io, msg, _FILEINFO_);
     }
   }
   else {
@@ -712,11 +711,11 @@ void GetOffsets(const Pvl &lab, int &finalSampOffset, int &finalLineOffset) {
     }
     else if(samplingMode == "NYQUIST") {
       string msg = "Cannot process NYQUIST (undersampled) mode ";
-      throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
     else {
       string msg = "Unsupported sampling mode [" + samplingMode + "]";
-      throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
   }
 

@@ -3,7 +3,7 @@
 #include "SerialNumber.h"
 #include "ObservationNumber.h"
 #include "SerialNumberList.h"
-#include "iException.h"
+#include "IException.h"
 #include "Pvl.h"
 #include "Cube.h"
 #include "Process.h"
@@ -36,8 +36,7 @@ namespace Isis {
       PvlGroup snGroup = FindSerialTranslation(label);
       sn = CreateSerialNumber(snGroup, (int)snGroup["ObservationKeys"]);
     }
-    catch(iException &e) {
-      e.Clear();
+    catch(IException &) {
       if(def2filename) {
         //  Try to return the filename if it exists in the label, otherwise use
         //  "Unknown" as a last resort.

@@ -24,7 +24,7 @@
 #include <string>
 #include <sstream>
 
-#include "iException.h"
+#include "IException.h"
 #include "JP2Error.h"
 
 using namespace std;
@@ -66,6 +66,6 @@ namespace Isis {
    *
    */
   void JP2Error::flush(bool end_of_message) {
-    throw iException::Message(iException::User, Message, _FILEINFO_);
+    throw IException(IException::User, Message.c_str(), _FILEINFO_);
   }
 }

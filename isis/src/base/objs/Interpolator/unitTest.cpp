@@ -1,7 +1,7 @@
 #include <iostream>
 #include <iomanip>
 #include <sstream>
-#include "iException.h"
+#include "IException.h"
 #include "Interpolator.h"
 #include "Preference.h"
 
@@ -20,9 +20,9 @@ int main(int argc, char *argv[]) {
     double val = interp->Interpolate(10.0, 25.0, buf);
     cout << "  " << 99.5 << " = " << val << endl;
   }
-  catch(Isis::iException &e) {
+  catch(Isis::IException &e) {
     cout << "  Cought invalid interpolator error." << endl;
-    e.Report(false);
+    e.print();
   }
 
   // Test Nearest Neighbor

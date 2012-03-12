@@ -23,7 +23,7 @@
 #include <cmath>
 #include <cfloat>
 #include "SimpleCylindrical.h"
-#include "iException.h"
+#include "IException.h"
 #include "Constants.h"
 
 using namespace std;
@@ -43,7 +43,7 @@ namespace Isis {
    *                      to the label using the middle of the longitude range
    *                      as specified in the labels. Defaults to false
    *
-   * @throws Isis::iException::Io
+   * @throws Isis::IException::Io
    */
   SimpleCylindrical::SimpleCylindrical(Isis::Pvl &label, bool allowDefaults) :
     Isis::Projection::Projection(label) {
@@ -63,9 +63,9 @@ namespace Isis {
       p_centerLongitude *= Isis::PI / 180.0;
       if(p_longitudeDirection == PositiveWest) p_centerLongitude *= -1.0;
     }
-    catch(Isis::iException &e) {
+    catch(IException &e) {
       string message = "Invalid label group [Mapping]";
-      throw Isis::iException::Message(Isis::iException::Io, message, _FILEINFO_);
+      throw IException(e, IException::Io, message, _FILEINFO_);
     }
   }
 

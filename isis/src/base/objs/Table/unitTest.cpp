@@ -1,6 +1,6 @@
 #include <iostream>
 #include "Table.h"
-#include "iException.h"
+#include "IException.h"
 #include "Preference.h"
 
 using namespace std;
@@ -108,8 +108,8 @@ int main(int argc, char *argv[]) {
     }
 
   }
-  catch(Isis::iException &e) {
-    e.Report();
+  catch(Isis::IException &e) {
+    e.print();
   }
 }
 

@@ -459,8 +459,8 @@ void IsisMain() {
     m.StartProcess(1, 1, 1);
     m.EndProcess();
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
     p.EndProcess();
     cout << endl;
   }
@@ -475,8 +475,8 @@ void IsisMain() {
     m.StartProcess(1, 1, 1);
     m.EndProcess();
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
     p.EndProcess();
     cout << endl;
   }
@@ -491,8 +491,8 @@ void IsisMain() {
     m.StartProcess(-20, 0, 1);
     m.EndProcess();
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
     p.EndProcess();
     cout << endl;
   }
@@ -505,8 +505,8 @@ void IsisMain() {
     m.StartProcess(54, 23, 1);
     m.EndProcess();
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
     p.EndProcess();
     cout << endl;
   }
@@ -520,8 +520,8 @@ void IsisMain() {
     m.StartProcess(1, 1, 1);
     m.EndProcess();
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
     p.EndProcess();
     cout << endl;
   }
@@ -535,8 +535,8 @@ void IsisMain() {
     m.StartProcess(1, 1, 1);
     m.EndProcess();
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
     p.EndProcess();
     cout << endl;
   }
@@ -555,8 +555,8 @@ void IsisMain() {
     m.StartProcess(1, 1, 1);
     m.EndProcess();
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
     p.EndProcess();
     cout << endl;
   }
@@ -576,8 +576,8 @@ void IsisMain() {
     //m.Test();
     m.EndProcess();
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
     p.EndProcess();
     cout << endl;
   }

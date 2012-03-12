@@ -11,4 +11,4 @@ Size of Long Long Int:  8   Long Long Int 0x0000000012345600 to HOST:  242640999
 Testing nan:  
 PreSwap:  -1 -87 15 61 
 PostSwap: 61 15 -87 -1 
-**PROGRAMMER ERROR** Invalid parameter-InputEndian must be LSB or MSB
+**PROGRAMMER ERROR** Invalid parameter-InputEndian must be LSB or MSB.

@@ -29,7 +29,7 @@
 #include <QStringList>
 
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 
 using namespace std;
 
@@ -78,7 +78,7 @@ namespace Isis {
     if(plugin == 0) {
       string msg = "Unable to find plugin [" + pluginName +
                    "] in shared library [" + lib.fileName().toStdString() + "]";
-      throw Isis::iException::Message(Isis::iException::System, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     return plugin;

@@ -1,6 +1,6 @@
 #include "Albedo.h"
 #include "SpecialPixel.h"
-#include "iException.h"
+#include "IException.h"
 
 #define MIN(x,y) (((x) < (y)) ? (x) : (y))
 #define MAX(x,y) (((x) > (y)) ? (x) : (y))
@@ -67,8 +67,8 @@ namespace Isis {
     }
     else {
       if(psurf == 0.0) {
-        std::string msg = "Divide by zero error";
-        throw iException::Message(iException::Math, msg, _FILEINFO_);
+        std::string msg = "Albedo math divide by zero error";
+        throw IException(IException::Unknown, msg, _FILEINFO_);
       }
       else {
         result = dn * p_normPsurfref / psurf;
@@ -92,7 +92,7 @@ namespace Isis {
     if(pharef < 0.0 || pharef >= 180.0) {
       std::string msg = "Invalid value of normalization pharef [" +
                         iString(pharef) + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     p_normPharef = pharef;
   }
@@ -110,7 +110,7 @@ namespace Isis {
     if(incref < 0.0 || incref >= 90.0) {
       std::string msg = "Invalid value of normalization incref [" +
                         iString(incref) + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     p_normIncref = incref;
   }
@@ -128,7 +128,7 @@ namespace Isis {
     if(emaref < 0.0 || emaref >= 90.0) {
       std::string msg = "Invalid value of normalization emaref [" +
                         iString(emaref) + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     p_normEmaref = emaref;
   }
@@ -143,7 +143,7 @@ namespace Isis {
     if(incmat < 0.0 || incmat >= 90.0) {
       std::string msg = "Invalid value of normalization incmat [" +
                         iString(incmat) + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     p_normIncmat = incmat;
   }

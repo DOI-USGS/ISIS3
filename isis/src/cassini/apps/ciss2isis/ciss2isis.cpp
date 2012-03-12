@@ -17,7 +17,7 @@
 #include "Table.h"
 #include "UserInterface.h"
 #include "TextFile.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 
 
@@ -52,7 +52,7 @@ void IsisMain() {
   if(label.HasObject("IMAGE_MAP_PROJECTION")) {
     string msg = "[" + in.Name() + "] appears to be an rdr file.";
     msg += " Use pds2isis.";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // Set the output bit type to SignedWord
@@ -248,16 +248,16 @@ void FixDns(Buffer &buf) {
 
 /**
  * This method uses the translation table to read labels and adds any
- * other needed keywords to Instrument, BandBin, and Kernels groups 
+ * other needed keywords to Instrument, BandBin, and Kernels groups
  * Called in IsisMain()
- * 
- * @param labelFile 
- * @param ocube 
- *  
- * @history 2008-08-21 Jeannie Walldren 
- * @history 2010-12-08 Sharmila Prasad - Removed traling 'Z' for Start, 
+ *
+ * @param labelFile
+ * @param ocube
+ *
+ * @history 2008-08-21 Jeannie Walldren
+ * @history 2010-12-08 Sharmila Prasad - Removed traling 'Z' for Start,
  *                                       Stop and Image Time labels
- *  
+ *
  */
 void TranslateCassIssLabels(Filename &labelFile, Cube *ocube) {
   // Get the directory where the CISS translation tables are.
@@ -304,20 +304,20 @@ void TranslateCassIssLabels(Filename &labelFile, Cube *ocube) {
   else {
     flightSoftware = fsw.ToDouble();
   }
-  
+
   // Remove the trailing 'Z' in some pds labels
   iString sUpdateTime = inst.FindKeyword("StartTime")[0];
   sUpdateTime.Trim("Zz");
   inst.FindKeyword("StartTime").SetValue(sUpdateTime);
-  
+
   sUpdateTime = inst.FindKeyword("StopTime")[0];
   sUpdateTime.Trim("Zz");
   inst.FindKeyword("StopTime").SetValue(sUpdateTime);
-  
+
   sUpdateTime = inst.FindKeyword("ImageTime")[0];
   sUpdateTime.Trim("Zz");
   inst.FindKeyword("ImageTime").SetValue(sUpdateTime);
-  
+
 
   // create BandBin group
   iString filter = inputLabel.FindKeyword("FilterName")[0] + "/" +
@@ -379,7 +379,7 @@ void TranslateCassIssLabels(Filename &labelFile, Cube *ocube) {
   else {
     string msg = "CISS2ISIS only imports Cassini ISS narrow ";
     msg += "angle or wide angle images";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
   ocube->putGroup(kerns);
 

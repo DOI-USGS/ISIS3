@@ -38,7 +38,7 @@
 #include "CameraDistortionMap.h"
 #include "CameraGroundMap.h"
 #include "CameraSkyMap.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "iTime.h"
 #include "Latitude.h"
@@ -354,7 +354,7 @@ namespace Isis {
   * @param longitude Longitude coordinate of the cube
   * @param radius Radius coordinate of the cube
   *
-  * @return @b bool Returns true if the Universal Ground was set successfully 
+  * @return @b bool Returns true if the Universal Ground was set successfully
   *              and false if it was not
   */
   bool Camera::SetUniversalGround(const double latitude, const double longitude,
@@ -635,7 +635,7 @@ namespace Isis {
     // Checks for invalide lat/lon ranges
     if(p_minlon == DBL_MAX  ||  p_minlat == DBL_MAX  ||  p_maxlon == -DBL_MAX  ||  p_maxlat == -DBL_MAX) {
       string message = "Camera missed planet or SPICE data off.";
-      throw iException::Message(iException::Camera, message, _FILEINFO_);
+      throw IException(IException::Unknown, message, _FILEINFO_);
     }
   }
 
@@ -682,7 +682,7 @@ namespace Isis {
     if(map.HasKeyword("EquatorialRadius"))
       a = Distance(map["EquatorialRadius"][0], Distance::Meters);
 
-    if(map.HasKeyword("PolarRadius")) 
+    if(map.HasKeyword("PolarRadius"))
       b = Distance(map["PolarRadius"][0], Distance::Meters);
 
     // Convert to planetographic if necessary
@@ -845,8 +845,8 @@ namespace Isis {
 
     return false;
   }
-  
-  
+
+
   /**
    * Sets the passed in vector to be the local normal which is calculated using
    * the DEM
@@ -855,20 +855,20 @@ namespace Isis {
    *
    */
   void Camera::GetLocalNormal(double normal[3]) {
-    
+
     // As documented in the doxygen above, the goal of this method is to
     // calculate a normal vector to the surface using the DEM instead of the
     // ellipsoid
     double samp = Sample();
     double line = Line();
-    
+
     // order of points in vector is top, bottom, left, right
     QList< QPair< double, double > > surroundingPoints;
     surroundingPoints.append(qMakePair(samp, line - 0.5));
     surroundingPoints.append(qMakePair(samp, line + 0.5));
     surroundingPoints.append(qMakePair(samp - 0.5, line));
     surroundingPoints.append(qMakePair(samp + 0.5, line));
-    
+
     // save state
     bool computed = p_pointComputed;
     double originalSample = samp;
@@ -879,7 +879,7 @@ namespace Isis {
     QVector< double * > lookVects(4);
     for (int i = 0; i < lookVects.size(); i++)
       lookVects[i] = new double[3];
-      
+
     for (int i = 0; i < surroundingPoints.size(); i ++) {
       if (!(SetImage(surroundingPoints[i].first, surroundingPoints[i].second))) {
         surroundingPoints[i].first = samp;
@@ -910,7 +910,7 @@ namespace Isis {
       latrec_c(demRadius.kilometers(), demLon.radians(),
                demLat.radians(), lookVects[i]);
     }
-   
+
     if ((surroundingPoints[0].first == surroundingPoints[1].first &&
         surroundingPoints[0].second == surroundingPoints[1].second) ||
        (surroundingPoints[2].first == surroundingPoints[3].first &&
@@ -937,13 +937,13 @@ namespace Isis {
     vsub_c(lookVects[0], lookVects[1], topMinusBottom);
     double rightMinusLeft[3];
     vsub_c(lookVects[3], lookVects[2], rightMinusLeft);
-    
+
     // take cross product of subtraction results to get normal
     ucrss_c(topMinusBottom, rightMinusLeft, normal);
-    
+
     // unitize normal (and do sanity check for magnitude)
     double mag;
-    unorm_c(normal, normal, &mag); 
+    unorm_c(normal, normal, &mag);
     if (mag == 0.0) {
       normal[0] = 0.;
       normal[1] = 0.;
@@ -958,16 +958,16 @@ namespace Isis {
       // free memory
       for (int i = 0; i < lookVects.size(); i++)
         delete [] lookVects[i];
- 
+
       return;
     }
-    
+
     double centerLookVect[3];
     SetImage(originalSample, originalLine);
-    
+
     // Check to make sure that the normal is pointing outward from the planet
-    // surface. This is done by taking the dot product of the normal and 
-    // any one of the unitized xyz vectors. If the normal is pointing inward, 
+    // surface. This is done by taking the dot product of the normal and
+    // any one of the unitized xyz vectors. If the normal is pointing inward,
     // then negate it.
 
     SpiceDouble pB[3];
@@ -987,13 +987,13 @@ namespace Isis {
     else {
       p_pointComputed = false;
     }
-    
+
     // free memory
     for (int i = 0; i < lookVects.size(); i++)
       delete [] lookVects[i];
   }
-  
-  
+
+
   /**
    * Calculates LOCAL photometric angles using the DEM (not ellipsoid).  These
    * calcualtions are more expensive computationally than Sensor's angle getter
@@ -1008,7 +1008,7 @@ namespace Isis {
    */
   void Camera::LocalPhotometricAngles(Angle & phase, Angle & incidence,
       Angle & emission, bool &success) {
-    
+
     // get local normal vector
     double normal[3];
     GetLocalNormal(normal);
@@ -1021,7 +1021,7 @@ namespace Isis {
       success = false;
       return;
     }
-    
+
     // get a normalized surface spacecraft vector
     SpiceDouble surfSpaceVect[3], unitizedSurfSpaceVect[3], dist;
     std::vector<double> sB = BodyRotation()->ReferenceVector(
@@ -1045,19 +1045,19 @@ namespace Isis {
     // the phase angle (in radians)
     phase = Angle(vsep_c(unitizedSurfSpaceVect, unitizedSurfSunVect),
         Angle::Radians);
-    
+
     // use normalized surface spacecraft and local normal vectors to calculate
     // the emission angle (in radians)
     emission = Angle(vsep_c(unitizedSurfSpaceVect, normal),
         Angle::Radians);
-    
+
     // use normalized surface sun and normal vectors to calculate the incidence
     // angle (in radians)
     incidence = Angle(vsep_c(unitizedSurfSunVect, normal),
         Angle::Radians);
   }
-  
-  
+
+
   /**
    * Computes the RaDec range
    *
@@ -1065,8 +1065,8 @@ namespace Isis {
    * @param maxra Maximum right ascension value
    * @param mindec Minimum declination value
    * @param maxdec Maximum declination value
-   *  
-   * @throw iException::Programmer - "Camera::RaDecRange can not calculate a 
+   *
+   * @throw iException::Programmer - "Camera::RaDecRange can not calculate a
    *  right ascension, declination range for projected images which are not
    *  projected to sky"
    * @return @b bool Returns true if the range computation was successful and false
@@ -1077,7 +1077,7 @@ namespace Isis {
     if(p_projection != NULL && !p_projection->IsSky()) {
       iString msg = "Camera::RaDecRange can not calculate a right ascension, declination range";
       msg += " for projected images which are not projected to sky";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     bool computed = p_pointComputed;
@@ -1222,7 +1222,7 @@ namespace Isis {
     if(p_projection != NULL && !p_projection->IsSky()) {
       iString msg = "Camera::RaDecResolution can not calculate a right ascension, declination resolution";
       msg += " for projected images which are not projected to sky";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     bool computed = p_pointComputed;
@@ -1274,7 +1274,7 @@ namespace Isis {
     // We are in northern hemisphere
     if (lat >= 0.0) {
       return ComputeAzimuth(LocalRadius(90.0, 0.0), 90.0, 0.0);
-    } 
+    }
     // We are in southern hemisphere
     else {
       double azimuth = ComputeAzimuth(LocalRadius(-90.0, 0.0),
@@ -1314,25 +1314,25 @@ namespace Isis {
    * Computes the azimuth value from your current position (origin) to a
    * point of interest specified by the lat/lon input to this method. All
    * azimuths are measured the same way regardless of the image level (level1
-   * or level2) and the shape model being used. The azimuth is an angle 
-   * measured along the ground from the current postion (origin point) to a 
-   * point of interest. The azimuth is measured in a positive clockwise 
-   * direction from a reference line. The reference line is formed by drawing 
+   * or level2) and the shape model being used. The azimuth is an angle
+   * measured along the ground from the current postion (origin point) to a
+   * point of interest. The azimuth is measured in a positive clockwise
+   * direction from a reference line. The reference line is formed by drawing
    * a line horizontally from the origin point to the right side of the image.
    * This is usually called the 3 o'clock reference line because the image
    * can be viewed as a clock face and the origin point as the center of the
    * clock face with the hand of the clock pointing at 3 o'clock. The azimuth
-   * is measured in a positive clockwise direction because images have 
+   * is measured in a positive clockwise direction because images have
    * lines that increase downward. If lines increased upward, then the azimuth
    * would be measure in a positive counterclockwise direction.
    *
-   * The algorithm works by getting the body-fixed (x,y,z) of the origin point 
-   * and the body-fixed (x,y,z) of the point of interest. The vector from the 
+   * The algorithm works by getting the body-fixed (x,y,z) of the origin point
+   * and the body-fixed (x,y,z) of the point of interest. The vector from the
    * origin point to the point of interest is then determined. The perpendicular
-   * component of this new vector to the origin vector is determined. This gives 
-   * a vector that is tangent to the planet surface at the origin point and that 
-   * is in the direction of the point of interest. The tangent vector is then 
-   * scaled to be within a pixel in size. A new body-fixed vector from the 
+   * component of this new vector to the origin vector is determined. This gives
+   * a vector that is tangent to the planet surface at the origin point and that
+   * is in the direction of the point of interest. The tangent vector is then
+   * scaled to be within a pixel in size. A new body-fixed vector from the
    * center of the planet to the head of the tangent vector is determined.
    * The body-fixed (x,y,z) of the new vector is used to get line,sample. So,
    * we now have the line,sample of the origin point and the line,sample of
@@ -1356,26 +1356,26 @@ namespace Isis {
    * @history 2010-09-28  Janet Barrett - Added Randy's updated method
    *                         for calculating the azimuth.
    * @history 2011-02-11  Janet Barrett - Added documentation.
-   * @history 2011_02-11  Janet Barrett - There were some problems with 
+   * @history 2011_02-11  Janet Barrett - There were some problems with
    *                         calculating azimuths when a DEM shape model was
    *                         specified. One problem occurred when the DEM did
    *                         not cover the poles. The LocalRadius was returning
    *                         a NULL for the radius value in places that the DEM
    *                         did not cover (such as the poles). This was fixed
-   *                         by using the radius of the origin point when 
-   *                         determining the x,y,z location of the point of 
-   *                         interest. The radius is not important because we just 
-   *                         need to know the direction of the point of interest 
-   *                         from the origin point. Another problem was also found 
-   *                         with the call to SetUniversalGround when the new point 
-   *                         (new point = point within a pixel of the origin point 
-   *                         and in the direction of the point of interest) was being 
+   *                         by using the radius of the origin point when
+   *                         determining the x,y,z location of the point of
+   *                         interest. The radius is not important because we just
+   *                         need to know the direction of the point of interest
+   *                         from the origin point. Another problem was also found
+   *                         with the call to SetUniversalGround when the new point
+   *                         (new point = point within a pixel of the origin point
+   *                         and in the direction of the point of interest) was being
    *                         determined. The new point should be at the same radius as
    *                         the origin point, but this was not happening. The call to
-   *                         SetUniversalGround was changed to use the radius of the 
-   *                         origin point when determining the line,sample of the new 
+   *                         SetUniversalGround was changed to use the radius of the
+   *                         origin point when determining the line,sample of the new
    *                         point. Another problem was that the vector pointing from
-   *                         the origin point to the point of interest was being 
+   *                         the origin point to the point of interest was being
    *                         unitized before its perpendicular component was being
    *                         calculated. This has been fixed.
    *
@@ -1419,8 +1419,8 @@ namespace Isis {
 
     SpiceDouble hpoB[3];
     SpiceDouble spoB[3];
-    // Get the component of the difference vector poB that is perpendicular to the origin 
-    // point; this will result in a vector that is tangent to the surface at the origin 
+    // Get the component of the difference vector poB that is perpendicular to the origin
+    // point; this will result in a vector that is tangent to the surface at the origin
     // point and is in the direction of the point of interest
     vperp_c(poB, oB, hpoB);
     // Unitize the tangent vector and then scale it to within a pixel of the origin point
@@ -1549,7 +1549,7 @@ namespace Isis {
     double azimuth = 0.0;
     if (sin(b) == 0.0 || sin(c) == 0.0) {
       return azimuth;
-    } 
+    }
     double A = acos((cos(a) - cos(b)*cos(c))/(sin(b)*sin(c))) * 180.0 / PI;
     //double B = acos((cos(b) - cos(c)*cos(a))/(sin(c)*sin(a))) * 180.0 / PI;
     if (cslon > cglon) {
@@ -1635,7 +1635,7 @@ namespace Isis {
    *   is the number of lines in the cube if the ephemeris time changes in the
    *   image, one otherwise.
    *
-   * @internal 
+   * @internal
    *   @history 2011-02-08 Jeannie Walldren - Removed unused input parameter.
    *                          Moved calculations of cache size and start/end
    *                          ephemeris times to their own methods.
@@ -1667,8 +1667,8 @@ namespace Isis {
 
     p_ignoreProjection = projIgnored;
 
-    Spice::CreateCache(ephemerisTimes.first, ephemerisTimes.second, 
-                       cacheSize, tol); 
+    Spice::CreateCache(ephemerisTimes.first, ephemerisTimes.second,
+                       cacheSize, tol);
 
     SetTime(ephemerisTimes.first);
 
@@ -1687,12 +1687,12 @@ namespace Isis {
    * close time) is the maximum value of those ephemeris times. This method must
    * be called before a call to the Spice::CreateCache() method.  It is called
    * in the LoadCache() method.
-   *  
-   * @throw iException::Programmer - "Unable to find time range for the 
+   *
+   * @throw iException::Programmer - "Unable to find time range for the
    *             spice kernels."
    * @see CreateCache()
    * @see LoadCache()
-   * 
+   *
    * @author 2011-02-02 Jeannie Walldren
    * @internal
    *   @history 2011-02-02 Jeannie Walldren - Original version.
@@ -1718,7 +1718,7 @@ namespace Isis {
     }
     if(startTime == -DBL_MAX || endTime == -DBL_MAX) {
       string msg = "Unable to find time range for the spice kernels";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     ephemerisTimes.first = startTime;
     ephemerisTimes.second = endTime;
@@ -1730,12 +1730,12 @@ namespace Isis {
    * of lines in the beta cube and adds 1, since we need at least 2 points for
    * interpolation. This method must be called before a call to the
    * Spice::CreateCache() method.  It is called in the LoadCache() method.
-   *  
+   *
    * @throw iException::Programmer - "A cache has already been created."
    * @see CreateCache()
    * @see LoadCache()
-   * 
-   * @author 2011-02-02 Jeannie Walldren 
+   *
+   * @author 2011-02-02 Jeannie Walldren
    * @internal
    *   @history 2011-02-02 Jeannie Walldren - Original version.
    */
@@ -1779,12 +1779,12 @@ namespace Isis {
 
     if(endSize > startSize) {
       iString message = "Camera::SetGeometricTilingHint End size must be smaller than the start size";
-      throw iException::Message(iException::Programmer, message, _FILEINFO_);
+      throw IException(IException::Programmer, message, _FILEINFO_);
     }
 
     if(startSize < 4) {
       iString message = "Camera::SetGeometricTilingHint Start size must be at least 4";
-      throw iException::Message(iException::Programmer, message, _FILEINFO_);
+      throw IException(IException::Programmer, message, _FILEINFO_);
     }
 
     bool foundEnd = false;
@@ -1797,12 +1797,12 @@ namespace Isis {
     //   a power of 2
     if(powerOf2 < 0) {
       iString message = "Camera::SetGeometricTilingHint Start size must be a power of 2";
-      throw iException::Message(iException::Programmer, message, _FILEINFO_);
+      throw IException(IException::Programmer, message, _FILEINFO_);
     }
 
     if(!foundEnd) {
       iString message = "Camera::SetGeometricTilingHint End size must be a power of 2 less than the start size, but greater than 2";
-      throw iException::Message(iException::Programmer, message, _FILEINFO_);
+      throw IException(IException::Programmer, message, _FILEINFO_);
     }
 
     p_geometricTilingStartSize = startSize;

@@ -53,7 +53,7 @@ void IsisMain() {
     else {
       string msg = "The file [" + ui.GetFilename("FROM") + "] does not have a mapping group,"
                    + " you must enter a Pixel Resolution";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
 

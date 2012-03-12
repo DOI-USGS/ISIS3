@@ -26,7 +26,7 @@
 #include <sstream>
 #include <vector>
 
-#include "iException.h"
+#include "IException.h"
 #include "Cube.h"
 #include "Brick.h"
 #include "Camera.h"

@@ -23,7 +23,7 @@
 #include <cmath>
 #include <cfloat>
 #include "TransverseMercator.h"
-#include "iException.h"
+#include "IException.h"
 #include "Constants.h"
 #include "Projection.h"
 
@@ -48,7 +48,7 @@ namespace Isis {
    * @throws Isis::iException::Io
    */
   TransverseMercator::TransverseMercator(Isis::Pvl &label, bool allowDefaults) :
-    Isis::Projection::Projection(label) {
+      Isis::Projection::Projection(label) {
     try {
       // Try to read the mapping group
       Isis::PvlGroup &mapGroup = label.FindGroup("Mapping", Isis::Pvl::Traverse);
@@ -74,13 +74,13 @@ namespace Isis {
       // make sure the center latitude value is valid
       if(fabs(p_centerLatitude) >= 90.0) {
         string msg = "Invalid Center Latitude Value. Must be between -90 and 90";
-        throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+        throw IException(IException::Io, msg, _FILEINFO_);
       }
 
       // make sure the center longitude value is valid
       if(fabs(p_centerLongitude) > 360.0) {
         string msg = "Invalid Center Longitude Value. Must be between -360 and 360";
-        throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+        throw IException(IException::Io, msg, _FILEINFO_);
       }
 
       // convert latitude to planetographic if it is planetocentric
@@ -116,9 +116,9 @@ namespace Isis {
       }
       p_scalefactor = mapGroup["ScaleFactor"];
     }
-    catch(Isis::iException &e) {
+    catch(IException &e) {
       string message = "Invalid label group [Mapping]";
-      throw Isis::iException::Message(Isis::iException::Io, message, _FILEINFO_);
+      throw IException(e, IException::Io, message, _FILEINFO_);
     }
   }
 

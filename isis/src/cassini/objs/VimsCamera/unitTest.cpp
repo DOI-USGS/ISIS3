@@ -25,7 +25,7 @@
 #include "Camera.h"
 #include "CameraFactory.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "Preference.h"
 #include "Pvl.h"
 
@@ -164,8 +164,8 @@ int main(void) {
       cout << endl;
     }
   }
-  catch(iException &e) {
-    e.Report();
+  catch(IException &e) {
+    e.print();
   }
 }
 

@@ -32,7 +32,7 @@
 #include "Filename.h"
 #include "PvlKeyword.h"
 #include "Pvl.h"
-#include "iException.h"
+#include "IException.h"
 #include "naif/SpiceUsr.h"
 
 using namespace std;
@@ -223,7 +223,7 @@ namespace Isis {
       Isis::Filename file(key[i]);
       if(!file.exists()) {
         string msg = "Spice file does not exist [" + file.Expanded() + "]";
-        throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+        throw IException(IException::Io, msg, _FILEINFO_);
       }
       string fileName(file.Expanded());
       if(_furnish) furnsh_c(fileName.c_str());

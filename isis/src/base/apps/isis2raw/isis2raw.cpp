@@ -80,7 +80,7 @@ void IsisMain() {
   fout.open(to.c_str(), ios::out | ios::binary);
   if(!fout.is_open()) {
     string msg = "Cannot open raw output file";
-    throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
   // Set the Output Storage Format
@@ -118,7 +118,7 @@ void checkRange(UserInterface &ui, double &min, double &max) {
     if(ui.GetDouble("OMIN") < min) {
       string message = "OMIN [" + iString(min) + "] is too small for the provided BITTYPE [";
       message += ui.GetString("BITTYPE") + "]";
-      throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+      throw IException(IException::User, message, _FILEINFO_);
     }
     else {
       min = ui.GetDouble("OMIN");
@@ -128,7 +128,7 @@ void checkRange(UserInterface &ui, double &min, double &max) {
     if(ui.GetDouble("OMAX") > max) {
       string message = "OMAX [" + iString(max) + "] is too large for the provided BITTYPE [";
       message += ui.GetString("BITTYPE") + "]";
-      throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+      throw IException(IException::User, message, _FILEINFO_);
     }
     else {
       max = ui.GetDouble("OMAX");
@@ -137,7 +137,7 @@ void checkRange(UserInterface &ui, double &min, double &max) {
   if(min >= max) {
     string message = "OMIN [" + iString(min) + "] cannot be greater than or equal to OMAX [";
     message += iString(max) + "]";
-    throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+    throw IException(IException::User, message, _FILEINFO_);
   }
 }
 

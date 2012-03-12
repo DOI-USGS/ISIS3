@@ -1,27 +1,27 @@
 #if !defined(SmtkMatcher_h)
 #define SmtkMatcher_h
 
-/**                                                                       
- * @file                                                                  
- * $Revision: 1.1 $                                                             
- * $Date: 2009/09/09 23:42:41 $                                                                 
- *                                                                        
- *   Unless noted otherwise, the portions of Isis written by the USGS are 
- *   public domain. See individual third-party library and package descriptions 
- *   for intellectual property information, user agreements, and related  
- *   information.                                                         
- *                                                                        
- *   Although Isis has been used by the USGS, no warranty, expressed or   
- *   implied, is made by the USGS as to the accuracy and functioning of such 
- *   software and related material nor shall the fact of distribution     
+/**
+ * @file
+ * $Revision: 1.1 $
+ * $Date: 2009/09/09 23:42:41 $
+ *
+ *   Unless noted otherwise, the portions of Isis written by the USGS are
+ *   public domain. See individual third-party library and package descriptions
+ *   for intellectual property information, user agreements, and related
+ *   information.
+ *
+ *   Although Isis has been used by the USGS, no warranty, expressed or
+ *   implied, is made by the USGS as to the accuracy and functioning of such
+ *   software and related material nor shall the fact of distribution
  *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.                                        
- *                                                                        
- *   For additional information, launch                                   
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html                
+ *   USGS in connection therewith.
+ *
+ *   For additional information, launch
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
  *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.                                    
+ *   http://www.usgs.gov/privacy.html.
  */
 
 #include <memory>
@@ -38,15 +38,15 @@
 namespace Isis {
 
 /**
- * @brief Workhorse of stereo matcher 
- *  
- * This class provides stereo matching functionality to the SMTK toolkit.  It 
- * registers points, clones them by adjusting parameters to nearby point 
- * locations and manages point selection processes. 
- *  
- * The Gruen algorithm is initialized here and maintained for use in the 
- * stereo matching process. 
- * 
+ * @brief Workhorse of stereo matcher
+ *
+ * This class provides stereo matching functionality to the SMTK toolkit.  It
+ * registers points, clones them by adjusting parameters to nearby point
+ * locations and manages point selection processes.
+ *
+ * The Gruen algorithm is initialized here and maintained for use in the
+ * stereo matching process.
+ *
  * @author 2011-05-28 Kris Becker
  *
  * @internal
@@ -86,14 +86,14 @@ class SmtkMatcher {
     void setWriteSubsearchChipPattern(const std::string &fileptrn = "SmtkMatcher");
 
     SmtkQStackIter FindSmallestEV(SmtkQStack &stack);
-    SmtkQStackIter FindExpDistEV(SmtkQStack &stack, const double &seedsample, 
+    SmtkQStackIter FindExpDistEV(SmtkQStack &stack, const double &seedsample,
                                  const double &minEV, const double &maxEV);
 
     SmtkPoint Register(const Coordinate &lpnt,
                        const AffineRadio &affrad = AffineRadio());
-    SmtkPoint Register(const PointPair &pnts, 
+    SmtkPoint Register(const PointPair &pnts,
                        const AffineRadio &affrad = AffineRadio());
-    SmtkPoint Register(const SmtkPoint &spnt, 
+    SmtkPoint Register(const SmtkPoint &spnt,
                        const AffineRadio &affrad = AffineRadio());
     SmtkPoint Register(const PointGeometry &lpg, const PointGeometry &rpg,
                        const AffineRadio &affrad  = AffineRadio());
@@ -123,7 +123,7 @@ class SmtkMatcher {
     gsl_rng * r;                       // GSL random number generator
 
     void randomNumberSetup();
-    bool validate(const bool &throwError = true) const throw (iException&);
+    bool validate(const bool &throwError = true) const;
 
     inline Camera &lhCamera() { return (*m_lhCube->getCamera());   }
     inline Camera &rhCamera() { return (*m_rhCube->getCamera());   }
@@ -133,7 +133,7 @@ class SmtkMatcher {
 
     bool inCube(const Camera &camera, const Coordinate &point) const;
 
-    SmtkPoint makeRegisteredPoint(const PointGeometry &left, 
+    SmtkPoint makeRegisteredPoint(const PointGeometry &left,
                                   const PointGeometry &right, Gruen *gruen);
 };
 } // namespace Isis

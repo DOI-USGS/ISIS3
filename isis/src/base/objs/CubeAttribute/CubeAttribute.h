@@ -27,61 +27,12 @@
 
 #include "Cube.h"
 #include "Endian.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "PixelType.h"
 #include "Pvl.h"
 
 namespace Isis {
-
-  /**
-   * @brief Output cube range tracker
-   *
-   * This enumeration and its functions are for the output range
-   * of a cube.
-  **/
-  enum RangeType {
-    PropagateRange, //!< Propagate the range from an input cube
-    RangeSet,       //!< The range has been set
-  };
-
-
-  /**
-   * Return the string representation of the contents of a
-   * variable of type RangeType
-   *
-   * @param rangeType enum to be converted to a string
-   *
-   * @return A string representation of the rangeType parameter
-   */
-  inline std::string RangeTypeName(RangeType rangeType) {
-    if(rangeType == PropagateRange) return "Propagate";
-    if(rangeType == RangeSet) return "Set";
-
-    std::string msg = "Invalid output range type [" + Isis::iString(rangeType) + "]";
-    throw Isis::iException::Message(Isis::iException::Parse, msg, _FILEINFO_);
-  }
-
-
-  /**
-   * Return the appropriate RangeType depending on which of
-   * the valid values the argument spells
-   *
-   * @param rangeType A string representation of the rangeType
-   *
-   * @return The RangeType enum corresponding to the string parameter
-   */
-  inline RangeType RangeTypeEnumeration(const std::string &rangeType) {
-    Isis::iString temp(rangeType);
-    temp = temp.UpCase();
-    if(temp == "PROPAGATE") return PropagateRange;
-    if(temp == "SET") return RangeSet;
-
-    std::string msg = "Invalid output range type string [" + rangeType + "]";
-    throw Isis::iException::Message(Isis::iException::Parse, msg, _FILEINFO_);
-  }
-
-
   /**
    * @brief Input cube label type tracker
    *
@@ -109,7 +60,7 @@ namespace Isis {
     if(labelType == DetachedLabel) return "Detached";
 
     std::string msg = "Invalid label attachment type [" + Isis::iString(labelType) + "]";
-    throw Isis::iException::Message(Isis::iException::Parse, msg, _FILEINFO_);
+    throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
 
@@ -122,13 +73,13 @@ namespace Isis {
    * @return The RangeType enum corresponding to the string parameter
    */
   inline LabelAttachment LabelAttachmentEnumeration(const std::string &labelType) {
-    Isis::iString temp(labelType);
+    iString temp(labelType);
     temp = temp.UpCase();
     if(temp == "ATTACHED") return AttachedLabel;
     if(temp == "DETACHED") return DetachedLabel;
 
     std::string msg = "Invalid label attachment type string [" + labelType + "]";
-    throw Isis::iException::Message(Isis::iException::Parse, msg, _FILEINFO_);
+    throw IException(IException::Unknown, msg, _FILEINFO_);
   }
 
 
@@ -390,9 +341,23 @@ namespace Isis {
         return false;
       };
 
+    private:
+      /**
+       * @brief Output cube range tracker
+       *
+       * This enumeration and its functions are for the output range
+       * of a cube.
+      **/
+      enum RangeType {
+        PropagateRange, //!< Propagate the range from an input cube
+        RangeSet,       //!< The range has been set
+      };
+
+    public:
+
       //! Return true if the min/max are to be propagated from an input cube
       inline bool PropagateMinimumMaximum() const {
-        if(p_rangeType == Isis::PropagateRange) {
+        if(p_rangeType == PropagateRange) {
           return true;
         }
         return false;
@@ -478,6 +443,7 @@ namespace Isis {
 
 
     private:
+
       Isis::PixelType p_pixelType; //!< Stores the pixel type
       /**
        *
@@ -490,7 +456,7 @@ namespace Isis {
        * Stores weather the pixel range has been set or should be
        * propagated from an input cube
        */
-      Isis::RangeType p_rangeType;
+      RangeType p_rangeType;
 
       double p_minimum; //!< Stores the minimum for the output cube attribute
       double p_maximum; //!< Stores the maximum for the output cube attribute

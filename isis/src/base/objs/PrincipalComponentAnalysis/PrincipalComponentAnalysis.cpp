@@ -46,7 +46,7 @@ namespace Isis {
   PrincipalComponentAnalysis::PrincipalComponentAnalysis(TNT::Array2D<double> transform) {
     if(transform.dim1() != transform.dim2()) {
       std::string m = "Illegal transform matrix";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     p_dimensions = transform.dim1();
@@ -64,7 +64,7 @@ namespace Isis {
     //  we cannot add more data
     if(p_hasTransform) {
       std::string m = "Cannot add data to a PCA that has a defined transform matrix";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     // add the data to the multivariate stats objects
@@ -79,7 +79,7 @@ namespace Isis {
   void PrincipalComponentAnalysis::ComputeTransform() {
     if(p_hasTransform) {
       std::string m = "This PCA already has a computed transform";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     TNT::Array2D<double> C(p_dimensions, p_dimensions);
@@ -119,7 +119,7 @@ namespace Isis {
     JAMA::LU<double> lu(p_transform);
     if(lu.det() == 0.0) {
       std::string m = "Cannot take the inverse of the transform matrix";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     p_inverse = lu.solve(id);
@@ -129,7 +129,7 @@ namespace Isis {
   TNT::Array2D<double> PrincipalComponentAnalysis::Transform(TNT::Array2D<double> data) {
     if(data.dim1() != 1 || data.dim2() != p_dimensions) {
       std::string m = "Transform input must be of dimension 1 x " + p_dimensions;
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     // the vector times the transform matrix
@@ -140,7 +140,7 @@ namespace Isis {
   TNT::Array2D<double> PrincipalComponentAnalysis::Inverse(TNT::Array2D<double> data) {
     if(data.dim1() != 1 || data.dim2() != p_dimensions) {
       std::string m = "Transform input must be of dimension 1 x " + p_dimensions;
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     // the vector times the inverse matrix

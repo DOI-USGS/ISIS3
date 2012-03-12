@@ -6,7 +6,7 @@
 #include <map>
 #include <gsl/gsl_errno.h>
 #include <gsl/gsl_spline.h>
-#include "iException.h"
+#include "IException.h"
 
 using namespace std;
 
@@ -735,11 +735,11 @@ namespace Isis {
                       };
 
       // CONSTRUCTORS
-      NumericalApproximation(const NumericalApproximation::InterpType &itype = CubicNatural) throw(iException &);
+      NumericalApproximation(const NumericalApproximation::InterpType &itype = CubicNatural);
       NumericalApproximation(unsigned int n, double *x, double *y,
-                             const NumericalApproximation::InterpType &itype = CubicNatural) throw(iException &);
+                             const NumericalApproximation::InterpType &itype = CubicNatural);
       NumericalApproximation(const vector <double> &x, const vector <double> &y,
-                             const NumericalApproximation::InterpType &itype = CubicNatural)throw(iException &);
+                             const NumericalApproximation::InterpType &itype = CubicNatural);
       NumericalApproximation(const NumericalApproximation &dint);
       // ASSIGNMENT OPERATOR
       NumericalApproximation &operator=(const NumericalApproximation &numApMeth);
@@ -776,16 +776,16 @@ namespace Isis {
         return (p_itype);
       }
       int MinPoints();
-      int MinPoints(NumericalApproximation::InterpType itype) throw(iException &);
+      int MinPoints(NumericalApproximation::InterpType itype);
 
       // ADD DATA TO OBJECT
       void AddData(const double x, const double y);
       void AddData(unsigned int n, double *x, double *y);
-      void AddData(const vector <double> &x, const vector <double> &y) throw(iException &);
-      void SetCubicClampedEndptDeriv(const double yp1, const double ypn) throw(iException &);
-      void AddCubicHermiteDeriv(unsigned int n, double *fprimeOfx) throw(iException &);
-      void AddCubicHermiteDeriv(const vector <double> &fprimeOfx) throw(iException &);
-      void AddCubicHermiteDeriv(const double fprimeOfx) throw(iException &);
+      void AddData(const vector <double> &x, const vector <double> &y);
+      void SetCubicClampedEndptDeriv(const double yp1, const double ypn);
+      void AddCubicHermiteDeriv(unsigned int n, double *fprimeOfx);
+      void AddCubicHermiteDeriv(const vector <double> &fprimeOfx);
+      void AddCubicHermiteDeriv(const double fprimeOfx);
 
       //ACCESSOR METHODS AFTER DATA IS ENTERED
       double DomainMinimum();
@@ -811,43 +811,43 @@ namespace Isis {
                         NearestEndpoint //!< Evaluate() returns the y-value of the nearest endpoint if @a a is outside of the domain.
                       };
       // INTERPOLATION AND EXTRAPOLATION RESULTS
-      double          Evaluate(const double          a, const ExtrapType &etype = ThrowError) throw(iException &);
-      vector <double> Evaluate(const vector <double> &a, const ExtrapType &etype = ThrowError) throw(iException &);
-      vector <double> PolynomialNevilleErrorEstimate() throw(iException &);
-      vector <double> CubicClampedSecondDerivatives() throw(iException &);
+      double          Evaluate(const double          a, const ExtrapType &etype = ThrowError);
+      vector <double> Evaluate(const vector <double> &a, const ExtrapType &etype = ThrowError);
+      vector <double> PolynomialNevilleErrorEstimate();
+      vector <double> CubicClampedSecondDerivatives();
       double EvaluateCubicHermiteFirstDeriv(const double a);
       double EvaluateCubicHermiteSecDeriv(const double a);
 
       // DIFFERENTIATION METHODS
-      double GslFirstDerivative(const double a) throw(iException &);
+      double GslFirstDerivative(const double a);
       double BackwardFirstDifference(const double a, const unsigned int n = 3,
-                                     const double h = 0.1) throw(iException &);
+                                     const double h = 0.1);
       double ForwardFirstDifference(const double a, const unsigned int n = 3,
-                                    const double h = 0.1) throw(iException &);
+                                    const double h = 0.1);
       double CenterFirstDifference(const double a, const unsigned int n = 5,
-                                   const double h = 0.1) throw(iException &);
+                                   const double h = 0.1);
 
-      double GslSecondDerivative(const double a) throw(iException &);
+      double GslSecondDerivative(const double a);
       double BackwardSecondDifference(const double a, const unsigned int n = 3,
-                                      const double h = 0.1) throw(iException &);
+                                      const double h = 0.1);
       double ForwardSecondDifference(const double a, const unsigned int n = 3,
-                                     const double h = 0.1) throw(iException &);
+                                     const double h = 0.1);
       double CenterSecondDifference(const double a, const unsigned int n = 5,
-                                    const double h = 0.1) throw(iException &);
+                                    const double h = 0.1);
 
       // INTERGRATION METHODS
-      double GslIntegral(const double a, const double b) throw(iException &);
+      double GslIntegral(const double a, const double b);
       double TrapezoidalRule(const double a, const double b);
       double Simpsons3PointRule(const double a, const double b);
       double Simpsons4PointRule(const double a, const double b);
       double BoolesRule(const double a, const double b);
-      double RefineExtendedTrap(double a, double b, double s, unsigned int n) throw(iException &);
-      double RombergsMethod(double a, double b) throw(iException &);
+      double RefineExtendedTrap(double a, double b, double s, unsigned int n);
+      double RombergsMethod(double a, double b);
 
       // ASSIGNMENT OPERATORS
       void Reset();
-      void Reset(NumericalApproximation::InterpType itype) throw(iException &);
-      void SetInterpType(NumericalApproximation::InterpType itype) throw(iException &);
+      void Reset(NumericalApproximation::InterpType itype);
+      void SetInterpType(NumericalApproximation::InterpType itype);
 
     protected:
       // == CLASS VARIABLES
@@ -881,29 +881,29 @@ namespace Isis {
       bool GslInterpType(NumericalApproximation::InterpType itype) const;
       void GslAllocation(unsigned int npoints);
       void GslDeallocation();
-      InterpFunctor GslFunctor(NumericalApproximation::InterpType itype) const throw(iException &);
+      InterpFunctor GslFunctor(NumericalApproximation::InterpType itype) const;
       // VERIFICATION METHODS
       void GslIntegrityCheck(int gsl_status, const char *src,
-                             int line) throw(iException &);
-      void ValidateDataSet() throw(iException &);
+                             int line);
+      void ValidateDataSet();
       bool InsideDomain(const double a);
       // COMPUTATION AND EVALUATION METHODS
       bool   GslComputed() const;
-      void   ComputeGsl() throw(iException &);
-      void   ComputeCubicClamped() throw(iException &);
+      void   ComputeGsl();
+      void   ComputeCubicClamped();
       double ValueToExtrapolate(const double a, const ExtrapType &etype);
       double          EvaluateCubicNeighborhood(const double a);
       vector <double> EvaluateCubicNeighborhood(const vector <double> &a, const ExtrapType &etype);
-      double          EvaluateCubicClamped(const double a) throw(iException &);
-      double          EvaluateCubicHermite(const double a) throw(iException &);
-      double          EvaluatePolynomialNeville(const double a) throw(iException &);
+      double          EvaluateCubicClamped(const double a);
+      double          EvaluateCubicHermite(const double a);
+      double          EvaluatePolynomialNeville(const double a);
       vector <double> EvaluateForIntegration(const double a, const double b,
-                                             const unsigned int n) throw(iException &);
+                                             const unsigned int n);
       int FindIntervalLowerIndex(const double a);
       // STANDARDIZE ERRORS
-      void ReportException(iException::errType type, const string &method,
+      void ReportException(IException::ErrorType type, const string &method,
                            const string &message, const char *filesrc,
-                           int lineno) const throw(iException &);
+                           int lineno) const;
   };
 };
 

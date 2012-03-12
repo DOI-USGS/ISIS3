@@ -106,8 +106,8 @@ Crow = Null
 Rattler = DiamondBack
 1
 CAT = Meow
-**PVL ERROR** Keyword [Trout] does not exist in [Object = Beasts]
-**PVL ERROR** Unable to find keyword [Bus]
+**ERROR** PVL Keyword [Trout] does not exist in [Object = Beasts].
+**ERROR** Unable to find PVL keyword [Bus].
 Keyword Trout should not exist at top level 0
 Keyword Bus should dnot exit at top level 0
 End new for PvlObjectFindKeyword
@@ -187,9 +187,9 @@ Object = Hello
 End_Object
 
 Testing Object with no end tag
-**PVL ERROR** Object [Hello] EndObject not found before end of file
+**ERROR** PVL Object [Hello] EndObject not found before end of file.
 Testing Object with wrong end tag
-**PVL ERROR** Unexpected [EndGroup] in Object [Hello]
+**ERROR** Unexpected [EndGroup] in PVL Object [Hello].
 Template Object:
 Object = Object0
   Object = Object2

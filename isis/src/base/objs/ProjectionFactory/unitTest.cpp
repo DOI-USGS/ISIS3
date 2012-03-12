@@ -1,6 +1,6 @@
 #include <iostream>
 #include <iomanip>
-#include "iException.h"
+#include "IException.h"
 #include "ProjectionFactory.h"
 #include "Pvl.h"
 #include "Projection.h"
@@ -103,8 +103,8 @@ int main(int argc, char *argv[]) {
     cout << "Label results" << endl;
     cout << lab2 << endl;
   }
-  catch(Isis::iException &e) {
-    e.Report();
+  catch(Isis::IException &e) {
+    e.print();
   }
 }
 
@@ -112,8 +112,8 @@ void doit(Isis::Pvl &lab) {
   try {
     Isis::ProjectionFactory::CreateFromCube(lab);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
   cout << endl;
 }
@@ -123,8 +123,8 @@ void doit2(Isis::Pvl &lab) {
     int lines, samples;
     Isis::ProjectionFactory::CreateForCube(lab, samples, lines);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
   cout << endl;
 }

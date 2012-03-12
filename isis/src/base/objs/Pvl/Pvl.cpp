@@ -27,7 +27,7 @@
 #include <fstream>
 
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "Message.h"
 #include "PvlTokenizer.h"
 #include "PvlFormat.h"
@@ -82,18 +82,23 @@ namespace Isis {
     ifstream istm;
     istm.open(p_filename.c_str(), std::ios::in);
     if(!istm) {
-      string message = Isis::Message::FileOpen(temp.Expanded());
-      throw Isis::iException::Message(Isis::iException::Io, message, _FILEINFO_);
+      string message = Message::FileOpen(temp.Expanded());
+      throw IException(IException::Io, message, _FILEINFO_);
     }
 
     // Read it
     try {
       istm >> *this;
     }
+    catch(IException &e) {
+      istm.close();
+      string message = "Unable to read PVL file [" + temp.Expanded() + "]";
+      throw IException(e, IException::Unknown, message, _FILEINFO_);
+    }
     catch(...) {
       istm.close();
       string message = "Unable to read PVL file [" + temp.Expanded() + "]";
-      throw Isis::iException::Message(Isis::iException::Io, message, _FILEINFO_);
+      throw IException(IException::Unknown, message, _FILEINFO_);
     }
     istm.close();
   }
@@ -126,7 +131,7 @@ namespace Isis {
     ostm.seekp(0, std::ios::beg);
     if(!ostm) {
       string message = Isis::Message::FileCreate(temp.Expanded());
-      throw Isis::iException::Message(Isis::iException::Io, message, _FILEINFO_);
+      throw IException(IException::Io, message, _FILEINFO_);
     }
 
     // Write the labels
@@ -134,10 +139,15 @@ namespace Isis {
       ostm << *this;
       if(Terminator() != "") ostm << GetFormat()->FormatEOL();
     }
+    catch(IException &e) {
+      ostm.close();
+      string message = "Unable to write PVL to file [" + temp.Expanded() + "]";
+      throw IException(e, IException::Io, message, _FILEINFO_);
+    }
     catch(...) {
       ostm.close();
       string message = "Unable to write PVL to file [" + temp.Expanded() + "]";
-      throw Isis::iException::Message(Isis::iException::Io, message, _FILEINFO_);
+      throw IException(IException::Io, message, _FILEINFO_);
     }
 
     if(removeFormatter) {
@@ -174,8 +184,8 @@ namespace Isis {
     ostm.open(tempName.c_str(), std::ios::app);
     ostm.seekp(0, std::ios::end);
     if(!ostm) {
-      string message = Isis::Message::FileOpen(temp.Expanded());
-      throw Isis::iException::Message(Isis::iException::Io, message, _FILEINFO_);
+      string message = Message::FileOpen(temp.Expanded());
+      throw IException(IException::Io, message, _FILEINFO_);
     }
 
     // Write the labels
@@ -187,7 +197,7 @@ namespace Isis {
       ostm.close();
       string message = "Unable to append PVL infomation to file [" +
                        temp.Expanded() + "]";
-      throw Isis::iException::Message(Isis::iException::Io, message, _FILEINFO_);
+      throw IException(IException::Io, message, _FILEINFO_);
     }
 
     if(removeFormatter) {
@@ -243,7 +253,7 @@ namespace Isis {
         Isis::Filename file(filename);
         if(!file.Exists()) {
           string message = "Could not open the template file [" + filename + "]";
-          throw Isis::iException::Message(Isis::iException::Io, message, _FILEINFO_);
+          throw IException(IException::Io, message, _FILEINFO_);
         }
         Isis::Pvl include(file.Expanded());
 
@@ -379,7 +389,7 @@ namespace Isis {
   istream &operator>>(std::istream &is, Pvl &pvl) {
     if(!is.good()) {
       string msg = "Tried to read input stream with an error state into a Pvl";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     try {
@@ -404,8 +414,8 @@ namespace Isis {
 
             string msg = "Unexpected [";
             msg += readKeyword.Name();
-            msg += "] in Object [ROOT]";
-            throw iException::Message(iException::Pvl, msg, _FILEINFO_);
+            msg += "] in PVL Object [ROOT]";
+            throw IException(IException::Unknown, msg, _FILEINFO_);
           }
         }
 
@@ -445,7 +455,7 @@ namespace Isis {
 
       return is;
     }
-    catch(iException &e) {
+    catch(IException &e) {
       if(is.eof() && !is.bad()) {
         is.clear();
         is.unget();
@@ -475,12 +485,12 @@ namespace Isis {
 
       string msg;
       if(lineNumber > 0) {
-        msg = "Error in pvl on line [";
+        msg = "Error in PVL file on line [";
         msg += iString((Isis::BigInt)lineNumber);
         msg += "]";
       }
 
-      throw iException::Message(iException::Pvl, msg, _FILEINFO_);
+      throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
   }
 
@@ -495,15 +505,15 @@ namespace Isis {
     return *this;
   }
 
-  
+
   /**
    * Validate a Pvl, comparing against corresponding Template Pvl
    * It validates all the Objects, Groups and Keywords
-   * 
+   *
    * @author Sharmila Prasad (9/22/2010)
-   * 
-   * @param pPvl - User Pvl to be validated 
-   * @param pPvlResults - Contains the unvalidated Pvl 
+   *
+   * @param pPvl - User Pvl to be validated
+   * @param pPvlResults - Contains the unvalidated Pvl
    */
   void Pvl::ValidatePvl(const Pvl & pPvl, Pvl & pPvlResults)
   {
@@ -517,7 +527,7 @@ namespace Isis {
 
       string sObjName = pvlTmplObj.Name();
       bool bObjFound = false;
-      
+
       // Pvl contains the Object Name
       if(pPvl.HasObject(sObjName)) {
         PvlObject & pvlObj = pPvlResults.FindObject(sObjName);
@@ -539,7 +549,7 @@ namespace Isis {
       }
       if (bObjFound == false) {
         string sErrMsg = "Object \"" + sObjName + "\" Not Found in the Template File\n";
-        throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_);
+        throw IException(IException::User, sErrMsg, _FILEINFO_);
       }
     }
 
@@ -547,10 +557,10 @@ namespace Isis {
     int iTmplGrpSize = Groups();
     for(int i=0; i<iTmplGrpSize; i++) {
       PvlGroup & pvlTmplGrp = Group(i);
-      
+
       string sGrpName  = pvlTmplGrp.Name();
       bool bGrpFound = false;
-      
+
       // Pvl contains the Object Name
       if(pPvl.HasGroup(sGrpName)) {
         PvlGroup & pvlGrp = pPvlResults.FindGroup(sGrpName);
@@ -572,12 +582,12 @@ namespace Isis {
       }
       if (bGrpFound == false) {
         string sErrMsg = "Group \"" + sGrpName + "\" Not Found in the Template File\n";
-        throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_);
+        throw IException(IException::User, sErrMsg, _FILEINFO_);
       }
     }
-    
+
     // Validate all the Keywords
     ValidateAllKeywords((PvlContainer &)pPvlResults);
   }
-  
+
 } //end namespace isis

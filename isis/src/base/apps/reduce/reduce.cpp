@@ -1,5 +1,5 @@
 #include "Isis.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "ProcessByLine.h"
 #include "Reduce.h"
@@ -30,10 +30,10 @@ void IsisMain() {
     bands = cai.Bands();
 
     inCube.setVirtualBands(bands);
-    
+
     string from = ui.GetFilename("FROM");
     inCube.open(from);
-    
+
     ins = inCube.getSampleCount();
     inl = inCube.getLineCount();
     inb = inCube.getBandCount();
@@ -57,7 +57,7 @@ void IsisMain() {
     if(ons > ins || onl > inl) {
       string msg = "Number of output samples/lines must be less than or equal";
       msg = msg + " to the input samples/lines.";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     //  Allocate output file
@@ -65,7 +65,7 @@ void IsisMain() {
     // Our processing routine only needs 1
     // the original set was for info about the cube only
     p.ClearInputCubes();
-    
+
     // Start the processing
     PvlGroup results;
     if(alg == "AVERAGE"){
@@ -78,23 +78,23 @@ void IsisMain() {
       p.ProcessCubeInPlace(near, false);
       results = near.UpdateOutputLabel(ocube);
     }
-        
+
     // Cleanup
     inCube.close();
     p.EndProcess();
-  
+
     // Write the results to the log
     Application::Log(results);
   } // REFORMAT THESE ERRORS INTO ISIS TYPES AND RETHROW
-  catch (Isis::iException &e) {
+  catch (IException &) {
     throw;
-  }  
+  }
   catch (std::exception const &se) {
     string message = "std::exception: " + (iString)se.what();
-    throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+    throw IException(IException::User, message, _FILEINFO_);
   }
   catch (...) {
     string message = "Other Error";
-    throw Isis::iException::Message(Isis::iException::User, message, _FILEINFO_);
+    throw IException(IException::User, message, _FILEINFO_);
   }
 }

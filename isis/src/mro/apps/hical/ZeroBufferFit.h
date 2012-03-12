@@ -31,7 +31,7 @@
 #include "HiCalConf.h"
 #include "NonLinearLSQ.h"
 #include "Module.h"
-#include "iException.h"
+#include "IException.h"
 
 namespace Isis {
 

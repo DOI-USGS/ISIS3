@@ -24,7 +24,7 @@
 
 #include "Endian.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "PixelType.h"
 #include "Projection.h"
@@ -41,7 +41,7 @@ using namespace std;
 namespace Isis {
   /**
    * Default Constructor - Set to default the data members
-   * 
+   *
    */
   ProcessExportPds::ProcessExportPds() {
     p_label       = NULL;
@@ -71,7 +71,7 @@ namespace Isis {
 
   /**
    * Destructor
-   * 
+   *
    */
   ProcessExportPds::~ProcessExportPds() {
     if(p_label != NULL) {
@@ -110,7 +110,7 @@ namespace Isis {
     }
     else {
       string msg = "Unsupported PDS output type";
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     return *p_label;
@@ -142,7 +142,7 @@ namespace Isis {
     }
     else {
       string msg = "Invalid PDS export type";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if(p_pdsFileType == ProcessExportPds::JP2Image) {
@@ -248,7 +248,7 @@ namespace Isis {
     }
     else {
       string msg = "Labels must be detached for JP2 files";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     Filename outFile(sImageFile);
     PvlObject cmpObj("COMPRESSED_FILE");
@@ -262,7 +262,7 @@ namespace Isis {
     int storagebytes = InputCubes[0]->getSampleCount() * InputCubes[0]->getLineCount();
     if(p_pixelType == Isis::Real) {
       string msg = "JPEG2000 does not support floating point data";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     if(p_pixelType == Isis::UnsignedWord || p_pixelType == Isis::SignedWord) {
       storagebytes = storagebytes * 2;
@@ -332,7 +332,7 @@ namespace Isis {
     }
     else {
       string msg = "Labels must be detached for JP2 files";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     Filename outFile(sImageFile);
     PvlObject cmpObj("COMPRESSED_FILE");
@@ -346,7 +346,7 @@ namespace Isis {
     int storagebytes = InputCubes[0]->getSampleCount() * InputCubes[0]->getLineCount();
     if(p_pixelType == Isis::Real) {
       string msg = "JPEG2000 does not support floating point data";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     if(p_pixelType == Isis::UnsignedWord || p_pixelType == Isis::SignedWord) {
       storagebytes = storagebytes * 2;
@@ -372,7 +372,7 @@ namespace Isis {
    * This should not be called until after all settings have been made. The
    * labels may contain the wrong data if it is.
    *
-   * @throws Isis::iException::Message
+   * @throws Isis::IException::Message
    */
   void ProcessExportPds::StandardImageImage(Pvl &mainPvl) {
     mainPvl.GetFormat()->Add("$base/translations/pdsExportImageImage.typ");
@@ -501,7 +501,7 @@ namespace Isis {
     }
     else {
       string msg = "Unsupported PDS pixel type or sample size";
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
 
@@ -511,7 +511,7 @@ namespace Isis {
    * This should not be called until after all settings have been made. The
    * labels may contain the wrong data if it is.
    *
-   * @throws Isis::iException::Message
+   * @throws Isis::IException::Message
    */
   void ProcessExportPds::StandardJP2Image(Pvl &mainPvl) {
     mainPvl.GetFormat()->Add("$base/translations/pdsExportImageImage.typ");
@@ -643,7 +643,7 @@ namespace Isis {
     }
     else {
       string msg = "Unsupported PDS pixel type or sample size";
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
 

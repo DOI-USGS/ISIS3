@@ -24,7 +24,7 @@
 #include "InterestOperatorFactory.h"
 #include "InterestOperator.h"
 #include "Plugin.h"
-#include "iException.h"
+#include "IException.h"
 #include "Filename.h"
 
 namespace Isis {

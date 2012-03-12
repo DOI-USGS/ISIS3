@@ -16,7 +16,7 @@
 #include "Cube.h"
 #include "CubeManager.h"
 #include "FileList.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "Longitude.h"
 #include "Latitude.h"
@@ -48,7 +48,7 @@ void IsisMain() {
 
   if(!ui.WasEntered("FROMLIST") && ui.WasEntered("TOLIST")) {
     std::string msg = "To create a [TOLIST] the [FROMLIST] parameter must be provided.";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   bool noIgnore          = ui.GetBoolean("NOIGNORE");
@@ -68,7 +68,7 @@ void IsisMain() {
     std::string msg = "At least one filter must be selected [";
     msg += "NOIGNORE,NOMEASURELESS,NOSINGLEMEASURE,REFERENCE,FIXED,TOLERANCE,";
     msg += "POINTLIST,CUBES,LATLON]";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   if(cubeMeasures || reference) {
@@ -202,7 +202,7 @@ void IsisMain() {
         if(!hasSerialNumber) {
           string msg = newPoint->GetId() + "," + newMeasure->GetCubeSerialNumber();
           //Delete Reference Measures not in the list, if retainReference is turned off
-          if(newPoint->GetRefMeasure() != newMeasure || 
+          if(newPoint->GetRefMeasure() != newMeasure ||
              (newPoint->GetRefMeasure() == newMeasure && !retainReference))
             omit(newPoint, cm);
           else {
@@ -211,7 +211,7 @@ void IsisMain() {
               msg += ", Reference not in the list but Retained";
             }
           }
-          
+
           noCubeMeasures.append(msg);
         }
       }
@@ -598,9 +598,8 @@ void ExtractLatLonRange(ControlNet &outNet, QVector<iString> nonLatLonPoints,
             delete projection;
             projection = NULL;
           }
-          catch(iException &e) {
+          catch(IException &) {
             remove = true;
-            e.Clear();
           }
         }
         else {
@@ -667,9 +666,9 @@ bool NotInLatLonRange(SurfacePoint surfacePtToTest, Latitude minlat,
   try {
     outRange = !lat.inRange(minlat, maxlat) || !lon.inRange(minlon, maxlon);
   }
-  catch (iException &e) {
+  catch (IException &e) {
     iString msg = "Cannot complete lat/lon range test with given filters";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(e, IException::User, msg, _FILEINFO_);
   }
 
   return outRange;
@@ -695,10 +694,9 @@ void WriteCubeOutList(ControlNet cnet, QMap<iString, iString> sn2file) {
       p.SetMaximumSteps(cnet.GetNumPoints());
       p.CheckStatus();
     }
-    catch(iException &e) {
-      e.Clear();
+    catch(IException &e) {
       std::string msg = "The provided filters have resulted in an empty Control Network.";
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      throw IException(e, IException::User, msg, _FILEINFO_);
     }
 
     std::set<iString> outputsn;

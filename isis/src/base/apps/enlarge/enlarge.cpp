@@ -1,7 +1,7 @@
 #include "Isis.h"
 
 #include "Enlarge.h"
-#include "iException.h"
+#include "IException.h"
 #include "ProcessRubberSheet.h"
 
 using namespace std;
@@ -49,9 +49,9 @@ void IsisMain() {
   if(ons < ins || onl < inl) {
     string msg = "Number of output samples/lines must be greater than or equal";
     msg = msg + " to the input samples/lines.";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
-  
+
   // Set up the interpolator
   Interpolator *interp;
   if(ui.GetString("INTERP") == "NEARESTNEIGHBOR") {
@@ -66,9 +66,9 @@ void IsisMain() {
   else {
     string msg = "Unknown value for INTERP [" +
                  ui.GetString("INTERP") + "]";
-    throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    throw IException(IException::Programmer, msg, _FILEINFO_);
   }
-  
+
   // Allocate the output file, the number of bands does not change in the output
   Cube *ocube = p.SetOutputCube("TO", ons, onl, inb);
 
@@ -78,7 +78,7 @@ void IsisMain() {
   Enlarge *transform = new Enlarge(icube, sampleScale, lineScale);
   p.StartProcess(*transform, *interp);
   PvlGroup resultsGrp = transform->UpdateOutputLabel(ocube);
-  
+
   // Cleanup
   icube->close();
   ocube->close();

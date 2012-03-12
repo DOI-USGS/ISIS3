@@ -12,7 +12,7 @@ Is Available: 0
 Is connected: 0
 Is persistant: 0
 Attempting to create a database connection
-**PROGRAMMER ERROR** Database [doesntexist] does not exist
+**ERROR** Database [doesntexist] does not exist.
 Adding a database... Done.
 Attempting to create a database connection... Done.
 Is Available: 0

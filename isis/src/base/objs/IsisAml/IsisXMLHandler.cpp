@@ -30,8 +30,7 @@ using namespace std;
 
 #include <sstream>
 
-#include "iException.h"
-#include "iException.h"
+#include "IException.h"
 
 #include "iString.h"
 
@@ -97,7 +96,7 @@ void IsisXMLHandler::error(const XERCES::SAXParseException &e) {
   os << "Error in application XML file line: " << e.getLineNumber()
      << " char: " << e.getColumnNumber() << ". "
      << XERCES::XMLString::transcode(e.getMessage());
-  throw Isis::iException::Message(Isis::iException::Programmer, os.str(), _FILEINFO_);
+  throw Isis::IException(Isis::IException::Programmer, os.str(), _FILEINFO_);
 }
 
 void IsisXMLHandler::fatalError(const XERCES::SAXParseException &e) {
@@ -105,7 +104,7 @@ void IsisXMLHandler::fatalError(const XERCES::SAXParseException &e) {
   os << "Error in application XML file line: " << e.getLineNumber()
      << " char: " << e.getColumnNumber() << ". "
      << XERCES::XMLString::transcode(e.getMessage());
-  throw Isis::iException::Message(Isis::iException::Programmer, os.str(), _FILEINFO_);
+  throw Isis::IException(Isis::IException::Programmer, os.str(), _FILEINFO_);
 }
 
 void IsisXMLHandler::warning(const XERCES::SAXParseException &e) {
@@ -113,7 +112,7 @@ void IsisXMLHandler::warning(const XERCES::SAXParseException &e) {
   os << "Error in application XML file line: " << e.getLineNumber()
      << " char: " << e.getColumnNumber() << ". "
      << XERCES::XMLString::transcode(e.getMessage());
-  throw Isis::iException::Message(Isis::iException::Programmer, os.str(), _FILEINFO_);
+  throw Isis::IException(Isis::IException::Programmer, os.str(), _FILEINFO_);
 }
 
 

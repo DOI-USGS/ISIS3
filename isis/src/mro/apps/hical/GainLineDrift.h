@@ -34,7 +34,7 @@
 #include "Module.h"
 #include "Filename.h"
 
-#include "iException.h"
+#include "IException.h"
 
 namespace Isis {
 

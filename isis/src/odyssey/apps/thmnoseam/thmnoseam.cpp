@@ -18,7 +18,7 @@ using namespace std;
 //! This is the method called by ProcessByBrick.
 void FixSeams(vector<Buffer *> &inBuffers, vector<Buffer *> &outBuffers);
 
-//! This function calculates about how much the framelets overlap 
+//! This function calculates about how much the framelets overlap
 int FrameletOverlapSize();
 int frameletSize; //!< This is the number of lines in a framelet
 Cube *evenCube; //!< Input even framelet cube
@@ -41,20 +41,18 @@ QList< QPair< QPair<int, int>, double> > nextFrameletFixes;
  */
 class Offset {
   public:
-    Offset()
-    {
+    Offset() {
       p_valid = false;
     }
-    
-    Offset(int sample, int frameletLine, int sampleOffset, int lineOffset)
-    {
+
+    Offset(int sample, int frameletLine, int sampleOffset, int lineOffset) {
       p_valid = true;
       p_sample = sample;
       p_frameletLine = frameletLine;
       p_sampleOffset = sampleOffset;
       p_lineOffset = lineOffset;
     }
-    
+
     //! Offset should be used
     bool Valid() { return p_valid; }
     //! Used to verify we're at the correct sample
@@ -65,7 +63,7 @@ class Offset {
     int SampleOffset() { return p_sampleOffset; }
     //! Translation between current line and next framelet's line
     int LineOffset() { return p_lineOffset; }
-    
+
   private:
     bool p_valid;
     int p_sample;
@@ -90,65 +88,60 @@ void IsisMain() {
   // Make sure it is a Themis EDR/RDR
   try {
     if(evenCube->getGroup("Instrument")["InstrumentID"][0] != "THEMIS_VIS") {
-      throw iException::Message(iException::User, "", _FILEINFO_);
+      throw IException(IException::User, "", _FILEINFO_);
     }
   }
-  catch(iException &e) {
-    e.Clear();
-
+  catch(IException &) {
     string msg = "This program is intended for use on THEMIS VIS images only";
     msg += " [" + ui.GetFilename("INEVEN") + "] does not appear to be a ";
     msg += "THEMIS VIS image.";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   try {
     if(oddCube->getGroup("Instrument")["InstrumentID"][0] != "THEMIS_VIS") {
-      throw iException::Message(iException::User, "", _FILEINFO_);
+      throw IException(IException::User, "", _FILEINFO_);
     }
   }
-  catch(iException &e) {
-    e.Clear();
-
+  catch(IException &e) {
     string msg = "This program is intended for use on THEMIS VIS images only";
     msg += " [" + ui.GetFilename("INODD") + "] does not appear to be a ";
     msg += "THEMIS VIS image.";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
-  
+
   if (evenCube->getGroup("Instrument")["Framelets"][0] != "Even") {
     string msg = "The image [" + ui.GetFilename("INEVEN") + "] does not appear "
         "to contain the EVEN framelets of a Themis VIS cube";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
-  
+
   if (oddCube->getGroup("Instrument")["Framelets"][0] != "Odd") {
     string msg = "The image [" + ui.GetFilename("ODDEVEN") + "] does not appear "
         "to contain the ODD framelets of a Themis VIS cube";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
-  
+
   PvlGroup &inputInstrumentGrp = evenCube->getGroup("Instrument");
   PvlKeyword &spatialSumming = inputInstrumentGrp["SpatialSumming"];
   frameletSize = 192 / (int)spatialSumming[0];
   overlapSize = FrameletOverlapSize();
 
-  if(overlapSize == 0)
-  {
+  if(overlapSize == 0) {
     iString msg = "There must be overlap to remove seams";
-    throw iException::Message(iException::Camera, msg, _FILEINFO_);
+    throw IException(IException::Unknown, msg, _FILEINFO_);
   }
-  
+
   p.SetBrickSize(evenCube->getSampleCount(), frameletSize, 1);
-  
+
   p.StartProcess(FixSeams);
-  
+
   PvlGroup &evenInst = outEven->getGroup("Instrument");
   evenInst["Framelets"] = "Even";
-  
+
   PvlGroup &oddInst = outOdd->getGroup("Instrument");
   oddInst["Framelets"] = "Odd";
-  
+
   p.EndProcess();
 }
 
@@ -157,42 +150,37 @@ void IsisMain() {
 //! band changes so it doesn't have to re-project at every framelet.
 //! Equivalent changes are calculated for the next framelet... that is,
 //! equivalent pixels. This function both calculates and applies these.
-void RemoveSeam(Buffer &out, int framelet, int band, 
-                bool matchIsEven)
-{
+void RemoveSeam(Buffer &out, int framelet, int band,
+                bool matchIsEven) {
   // Apply fixes from last pass. Basically all changes happen in two
   //   places, because the DNs exist in two cubes, this is the second
   //   place.
-  for(int fix = 0; fix < nextFrameletFixes.size(); fix ++)
-  {
+  for(int fix = 0; fix < nextFrameletFixes.size(); fix ++) {
     QPair<int, int> fixLoc = nextFrameletFixes[fix].first;
     double fixDn = nextFrameletFixes[fix].second;
 
-    try
-    {
+    try {
       int outIndex = out.Index(fixLoc.first, fixLoc.second, band);
       out[outIndex] = fixDn;
     }
-    catch(iException &e)
-    {
-      e.Clear();
+    catch(IException &) {
     }
   }
-  
+
   nextFrameletFixes.clear();
 
   // Match == goodData. "goodData" is the top of the next framelet.
   Cube *goodDataCube = (matchIsEven) ? evenCube : oddCube;
   // "badData" is the bottom of the current framelet, what we were given.
   Cube *badDataCube  = (matchIsEven) ? oddCube  : evenCube;
-  
+
   Camera *goodCam = goodDataCube->getCamera();
   Camera *badCam  = badDataCube->getCamera();
-  
+
   // Verify we're at the correct band
   goodCam->SetBand(band);
   badCam->SetBand(band);
-  
+
   // Absolute line number for top of framelets.
   int goodDataStart = frameletSize * (framelet + 1);
   int badDataStart = frameletSize * framelet;
@@ -201,19 +189,17 @@ void RemoveSeam(Buffer &out, int framelet, int band,
   int badLineStart = goodDataStart - overlapSize - 1;
   // End corrections to the current brick at this line
   int badLineEnd = goodDataStart - 1;
-  
+
   int offsetSample = 0;
   int offsetLine = 0;
 
   // Loop left to right, top to bottom of problematic area at bottom of framelet
-  for(int badLine = badLineStart; badLine <= badLineEnd; badLine ++)
-  {
-    for(int sample = 1; sample <= out.SampleDimension(); sample ++)
-    {
+  for(int badLine = badLineStart; badLine <= badLineEnd; badLine ++) {
+    for(int sample = 1; sample <= out.SampleDimension(); sample ++) {
       // A fair good data weight is the % across problematic area so fair
-      double goodDataWeight = (double)(badLine - badLineStart) / 
+      double goodDataWeight = (double)(badLine - badLineStart) /
                              (double)(badLineEnd - badLineStart);
-      
+
       // But good data is good, so let's bias it towards the good data
       goodDataWeight *= 2;
       if(goodDataWeight > 1) goodDataWeight = 1;
@@ -228,8 +214,7 @@ void RemoveSeam(Buffer &out, int framelet, int band,
 
       // Does the optimized (pre-calculated) translation from bad to good
       //  exist?
-      if(optimizeIndex < frameletOffsetsForBand.size())
-      {
+      if(optimizeIndex < frameletOffsetsForBand.size()) {
         // This offset any good? If not then do nothing.
         if(!frameletOffsetsForBand[optimizeIndex].Valid())
           continue;
@@ -241,16 +226,14 @@ void RemoveSeam(Buffer &out, int framelet, int band,
         ASSERT(frameletOffsetsForBand[optimizeIndex].Sample() == sample);
       }
       // There is no pre-calculated translation, calculate it
-      else if(badCam->SetImage(sample, badLine))
-      {
+      else if(badCam->SetImage(sample, badLine)) {
         double lat = badCam->UniversalLatitude();
         double lon = badCam->UniversalLongitude();
 
-        if(goodCam->SetUniversalGround(lat, lon))
-        {
+        if(goodCam->SetUniversalGround(lat, lon)) {
           double goodSample = goodCam->Sample();
           double goodLine = goodCam->Line();
-          
+
           // Set the current offset for correction
           offsetSample = (int)(goodSample - sample + 0.5);
           offsetLine = (int)(goodLine - badLine + 0.5);
@@ -259,15 +242,14 @@ void RemoveSeam(Buffer &out, int framelet, int band,
           frameletOffsetsForBand.push_back(Offset(sample, badLine - badDataStart,
                                                   offsetSample, offsetLine));
         }
-        else
-        {
+        else {
           // Don't do anything since we failed at this pixel; it will be copied
           //   from the input directly
           frameletOffsetsForBand.push_back(Offset());
           continue;
         }
       }
-      
+
       // Translate current sample,line (bad) to (good) data's sample,line
       double goodSample = offsetSample + sample;
       double goodLine = offsetLine + badLine;
@@ -276,17 +258,15 @@ void RemoveSeam(Buffer &out, int framelet, int band,
       Portal p(1, 1, goodDataCube->getPixelType());
       p.SetPosition(goodSample, goodLine, band);
       goodDataCube->read(p);
-      
+
       // Attempt to apply weighted average
-      if(!Isis::IsSpecial(p[0]) && !Isis::IsSpecial(out[outIndex]))
-      {
+      if(!Isis::IsSpecial(p[0]) && !Isis::IsSpecial(out[outIndex])) {
         out[outIndex] = p[0] * goodDataWeight + out[outIndex] * badDataWeight;
       }
-      else if(!Isis::IsSpecial(p[0]))
-      {
+      else if(!Isis::IsSpecial(p[0])) {
         out[outIndex] = p[0];
       }
-        
+
       // Apply change to next framelet also
       QPair<int, int> fixLoc((int)(goodSample + 0.5),
                              (int)(goodLine   + 0.5));
@@ -306,31 +286,29 @@ void RemoveSeam(Buffer &out, int framelet, int band,
 void FixSeams(vector<Buffer *> &inBuffers, vector<Buffer *> &outBuffers) {
   Buffer &evenBuffer    = *inBuffers[0];
   Buffer &oddBuffer     = *inBuffers[1];
-  
+
   Buffer &outEvenBuffer = *outBuffers[0];
   Buffer &outOddBuffer  = *outBuffers[1];
-  
+
   outEvenBuffer.Copy(evenBuffer);
   outOddBuffer.Copy(oddBuffer);
-  
+
   Statistics evenStats;
   evenStats.AddData(evenBuffer.DoubleBuffer(), evenBuffer.size());
-  
+
   Statistics oddStats;
   oddStats.AddData(oddBuffer.DoubleBuffer(), oddBuffer.size());
-  
+
   int framelet = (evenBuffer.Line() - 1) / frameletSize;
-  
+
   if(framelet == 0) {
     frameletOffsetsForBand.clear();
   }
-  
-  if(evenStats.ValidPixels() > oddStats.ValidPixels())
-  {
+
+  if(evenStats.ValidPixels() > oddStats.ValidPixels()) {
     RemoveSeam(outEvenBuffer, framelet, evenBuffer.Band(), false);
   }
-  else
-  {
+  else {
     RemoveSeam(outOddBuffer, framelet, oddBuffer.Band(), true);
   }
 }
@@ -342,11 +320,11 @@ void FixSeams(vector<Buffer *> &inBuffers, vector<Buffer *> &outBuffers) {
 int FrameletOverlapSize() {
   Camera *camEven = evenCube->getCamera();
   Camera *camOdd = oddCube->getCamera();
-  
+
   if(camEven == NULL || camOdd == NULL) {
     string msg = "A camera is required to automatically calculate the overlap "
                  "between framelets. Please run spiceinit on the input cube";
-    throw iException::Message(iException::Camera, msg, _FILEINFO_);
+    throw IException(IException::Unknown, msg, _FILEINFO_);
   }
 
   int frameletOverlap = 0;

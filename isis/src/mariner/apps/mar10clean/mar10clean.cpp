@@ -2,7 +2,7 @@
 
 #include "Chip.h"
 #include "Cube.h"
-#include "iException.h"
+#include "IException.h"
 #include "Pipeline.h"
 #include "Statistics.h"
 
@@ -18,11 +18,11 @@ void IsisMain() {
   Pvl * labels = iCube.getLabel();
   if ("Mariner_10" != (string)labels->FindKeyword("SpacecraftName", Pvl::Traverse)) {
     string msg = "The cube [" + ui.GetFilename("FROM") + "] does not appear" +
-      " to be a Mariner10 cube";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+        " to be a Mariner10 cube";
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
-  // Check that the cube actually needs cleaning. This verifies that it 
+  // Check that the cube actually needs cleaning. This verifies that it
   // wasn't a "compressed" cube and that it hasn't been cleaned.
   Chip cp(5, 5);
   cp.TackCube(2.5, 2.5);
@@ -33,12 +33,12 @@ void IsisMain() {
   if (stats->ValidPixels() == 7) {
     string msg = "The cube [" + ui.GetFilename("FROM") + "] needs" +
       " reconstruction, try mar10restore instead";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
   else if (stats->ValidPixels() == 0) {
     string msg = "The cube [" + ui.GetFilename("FROM") + "]" +
       " appears to have already been cleaned";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
   if (stats != NULL) {
     delete stats;

@@ -1,7 +1,7 @@
 #include "Isis.h"
 #include "UserInterface.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "Pvl.h"
 #include "ProcessExportMiniRFLroPds.h"

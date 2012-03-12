@@ -29,7 +29,7 @@
 #include "AlphaCube.h"
 #include "Projection.h"
 #include "ProjectionFactory.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 
 using namespace std;
@@ -88,24 +88,24 @@ namespace Isis {
 
     if(p_sl > p_el) {
       string msg = "Invalid start/end line range [sl,el] specified for subarea";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if(p_ss > p_es) {
       string msg = "Invalid start/end sample range [ss,es] specified for subarea";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     p_linc = linc;
     if(p_linc <= 0.0) {
       string msg = "Invalid line increment [linc] specified for subarea";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     p_sinc = sinc;
     if(p_sinc <= 0.0) {
       string msg = "Invalid sample increment [sinc] specified for subarea";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
 

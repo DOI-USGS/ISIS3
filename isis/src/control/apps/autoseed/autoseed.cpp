@@ -27,7 +27,7 @@
 #include "SerialNumberList.h"
 #include "SpecialPixel.h"
 #include "UniversalGroundMap.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 
 enum SeedDomain {
@@ -132,7 +132,7 @@ void IsisMain() {
     else if(domain.UpCase() != "XY") {
       iString msg = "Invalid value provided for keywork [SeedDomain]";
       msg += " Possible values include [XY, SampleLine]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
 
@@ -286,7 +286,7 @@ void IsisMain() {
       }
       points = seeder->Seed(mp);
     }
-    catch(iException &e) {
+    catch(IException &e) {
 
       if(ui.WasEntered("ERRORS")) {
 
@@ -295,7 +295,7 @@ void IsisMain() {
         }
         errorNum ++;
 
-        errors << e.PvlErrors().Group(0).FindKeyword("Message")[0];
+        errors << e.toPvl().Group(0).FindKeyword("Message")[0];
         for(int serNum = 0; serNum < overlaps[ov]->Size(); serNum++) {
           if(serNum == 0) {
             errors << ": ";
@@ -307,7 +307,6 @@ void IsisMain() {
         }
       }
 
-      e.Clear();
       continue;
     }
 
@@ -328,7 +327,7 @@ void IsisMain() {
         }
         else {
           iString msg = "Unable to convert from X/Y to a (lon,lat)";
-          throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+          throw IException(IException::Unknown, msg, _FILEINFO_);
         }
       }
     }
@@ -342,7 +341,7 @@ void IsisMain() {
         }
         else {
           iString msg = "Unable to convert from Sample/Line to a (lon,lat)";
-          throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+          throw IException(IException::Unknown, msg, _FILEINFO_);
         }
       }
     }
@@ -365,7 +364,7 @@ void IsisMain() {
           std::string msg = "Unable to create a Universal Ground for Serial Number [";
           msg += (*overlaps[ov])[sn] + "] The associated image is more than ";
           msg += "likely missing from your FROMLIST.";
-          throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+          throw IException(IException::User, msg, _FILEINFO_);
         }
 
         if(!gmap->SetUniversalGround(seed[point]->getY(), seed[point]->getX())) {
@@ -467,7 +466,7 @@ void IsisMain() {
   if(cnet.GetNumPoints() == 0) {
     string msg = "The ouput control network is empty. This is likely due";
     msg += " to the input cubes failing to overlap.";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // Write the control network out

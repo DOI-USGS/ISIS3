@@ -24,7 +24,8 @@
 #include <iostream>
 
 #include "Column.h"
-#include "iException.h"
+#include "IException.h"
+#include "iString.h"
 
 namespace Isis {
 
@@ -64,8 +65,8 @@ namespace Isis {
    */
   void Column::SetName(std::string name) {
     if(p_width != 0 && name.length() > p_width) {
-      std::string message = "Name[" + name + "] is wider than width";
-      throw iException::Message(iException::User, message, _FILEINFO_);
+      iString message = "Name[" + name + "] is wider than width";
+      throw IException(IException::User, message, _FILEINFO_);
     }
     p_name = name;
   }
@@ -79,7 +80,7 @@ namespace Isis {
     if(p_name.size() > 0 && p_name.size() > width) {
       std::string message = "Width is insufficient to contain name[";
       message += p_name + "]";
-      throw iException::Message(iException::User, message, _FILEINFO_);
+      throw IException(IException::User, message, _FILEINFO_);
     }
     p_width = width;
   }
@@ -94,7 +95,7 @@ namespace Isis {
         (type == Column::Integer || type == Column::String)) {
       std::string message = "Integer or string type is not sensible if ";
       message += "alignment is Decimal.";
-      throw iException::Message(iException::User, message, _FILEINFO_);
+      throw IException(IException::User, message, _FILEINFO_);
     }
     p_type = type;
   }
@@ -113,7 +114,7 @@ namespace Isis {
         (p_type == Column::Integer || p_type == Column::String)) {
       std::string message = "Decimal alignment does not make sense for ";
       message += "integer or string values.";
-      throw iException::Message(iException::Programmer, message, _FILEINFO_);
+      throw IException(IException::Programmer, message, _FILEINFO_);
     }
     p_align = alignment;
   }
@@ -130,7 +131,7 @@ namespace Isis {
     if(DataType() != Column::Real &&
         DataType() != Column::Pixel) {
       std::string message = "Setting precision only makes sense for Decimal Alignment";
-      throw iException::Message(iException::User, message, _FILEINFO_);
+      throw IException(IException::User, message, _FILEINFO_);
     }
     p_precision = precision;
   }
@@ -145,7 +146,7 @@ namespace Isis {
 
     if(p_type == 0) {
       std::string message = "Type has not been set yet!";
-      throw iException::Message(iException::User, message, _FILEINFO_);
+      throw IException(IException::User, message, _FILEINFO_);
     }
 
     return p_type;

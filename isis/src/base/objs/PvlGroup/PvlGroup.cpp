@@ -20,7 +20,7 @@
 
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
-#include "iException.h"
+#include "IException.h"
 #include "PvlFormat.h"
 
 using namespace std;
@@ -69,10 +69,10 @@ namespace Isis {
 
       is.seekg(beforeKeywordPos, ios::beg);
 
-      string msg = "Expected keyword named [Group], found keyword named [";
+      string msg = "Expected PVL keyword named [Group], found keyword named [";
       msg += readKeyword.Name();
-      msg += "]";
-      throw iException::Message(iException::Pvl, msg, _FILEINFO_);
+      msg += "] when reading PVL";
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     if(readKeyword.Size() == 1) {
@@ -93,8 +93,8 @@ namespace Isis {
         msg += readKeyword[i];
       }
 
-      msg += ")]";
-      throw iException::Message(iException::Pvl, msg, _FILEINFO_);
+      msg += ")] when reading PVL";
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
 
@@ -122,8 +122,8 @@ namespace Isis {
           msg += readKeyword.Name();
           msg += "] in Group [";
           msg += result.Name();
-          msg += "]";
-          throw iException::Message(iException::Pvl, msg, _FILEINFO_);
+          msg += "] when reading PVL";
+          throw IException(IException::Unknown, msg, _FILEINFO_);
         }
       }
 
@@ -143,8 +143,8 @@ namespace Isis {
       is.seekg(beforeKeywordPos, ios::beg);
 
       string msg = "Group [" + result.Name();
-      msg += "] EndGroup not found before end of file";
-      throw iException::Message(iException::Pvl, msg, _FILEINFO_);
+      msg += "] EndGroup not found before end of file when reading PVL";
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     return is;
@@ -205,16 +205,16 @@ namespace Isis {
 
     return *this;
   }
-  
+
   /**
-   * Validate a PvlGroup, comparing against the corresponding 
+   * Validate a PvlGroup, comparing against the corresponding
    * PvlGroup in the Template file
-   *  
-   * Template PvlGroup has the format: 
+   *
+   * Template PvlGroup has the format:
    * Group = (groupName, optional/required)
-   * 
+   *
    * @author Sharmila Prasad (9/22/2010)
-   * 
+   *
    * @param pPvlGrp - PvlGroup to be validated
    */
   void PvlGroup::ValidateGroup(PvlGroup & pPvlGrp)
@@ -222,10 +222,10 @@ namespace Isis {
     // Group cannot be empty - needs to have a keyword
     if(pPvlGrp.Keywords() <= 0) {
       string sErrMsg = "Group \"" + pPvlGrp.Name() + "\" has no Keywords\n";
-      throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_);
+      throw IException(IException::User, sErrMsg, _FILEINFO_);
     }
-    
+
     ValidateAllKeywords((PvlContainer &)pPvlGrp);
   }
-  
+
 } // end namespace isis

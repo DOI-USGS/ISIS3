@@ -9,7 +9,7 @@
 
 #include "ControlMeasure.h"
 #include "ControlPoint.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 
 
@@ -91,7 +91,7 @@ namespace Isis {
       iString msg = "Attempted to add Control Measure with Cube Serial Number ";
       msg += "[" + measure->GetCubeSerialNumber() + "] does not match Serial ";
       msg += "Number [" + *serialNumber + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     measure->associatedCSN = this;
@@ -156,18 +156,18 @@ namespace Isis {
   QList< ControlMeasure * > ControlCubeGraphNode::getMeasures() const {
     return measures->values();
   }
-  
-  
+
+
   QList< ControlMeasure * > ControlCubeGraphNode::getValidMeasures() const {
     QList< ControlMeasure * > validMeasures;
-    
-    QList< ControlMeasure * > measureList = measures->values();   
+
+    QList< ControlMeasure * > measureList = measures->values();
     foreach(ControlMeasure * measure, measureList) {
       if (!measure->IsIgnored())
         validMeasures.append(measure);
     }
-    
-    return validMeasures; 
+
+    return validMeasures;
   }
 
 
@@ -186,7 +186,7 @@ namespace Isis {
       iString msg = "point [";
       msg += (iString) point->GetId();
       msg += "] not found in the ControlCubeGraphNode";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     return (*measures)[point];
@@ -199,7 +199,7 @@ namespace Isis {
       iString msg = "point [";
       msg += (iString) point->GetId();
       msg += "] not found in the ControlCubeGraphNode";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     return measures->value(point);

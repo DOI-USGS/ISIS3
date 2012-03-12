@@ -26,31 +26,31 @@ void IsisMain() {
   PvlKeyword &status = info ->getGroup("RESEAUS")["STATUS"];
   UserInterface &ui = Application::GetUserInterface();
   string in = ui.GetFilename("FROM");
-  
+
   string spacecraft = (info->getGroup("Instrument")["SpacecraftName"]);
   string instrument = (info->getGroup("Instrument")["InstrumentId"]);
   Apollo apollo(spacecraft, instrument);
   if (spacecraft.substr(0,6) != "APOLLO") {
     string msg = "This application is for use with Apollo spacecrafts only. ";
-    throw Isis::iException::Message(Isis::iException::Pvl,msg, _FILEINFO_);
+    throw IException(IException::Unknown, msg, _FILEINFO_);
   }
 
   // Check reseau status and make sure it is not nominal or removed
   if ((string)status == "Nominal") {
-    string msg = "Input file [" + in + 
+    string msg = "Input file [" + in +
           "] appears to have nominal reseau status. You must run findrx first.";
-    throw iException::Message(iException::User,msg, _FILEINFO_);
+    throw IException(IException::User,msg, _FILEINFO_);
   }
   if ((string)status == "Removed") {
-    string msg = "Input file [" + in + 
+    string msg = "Input file [" + in +
           "] appears to already have reseaus removed.";
-    throw iException::Message(iException::User,msg, _FILEINFO_);
-  }  
+    throw IException(IException::User,msg, _FILEINFO_);
+  }
 
   status = "Removed";
 
   p.SetOutputCube ("TO");
-  
+
   // Start the processing
   p.StartProcess(cpy);
   p.EndProcess();

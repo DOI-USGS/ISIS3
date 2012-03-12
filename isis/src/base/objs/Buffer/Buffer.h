@@ -23,7 +23,6 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include "iException.h"
 #include "PixelType.h"
 
 namespace Isis {
@@ -118,8 +117,7 @@ namespace Isis {
       int Line(const int index = 0) const;
       int Band(const int index = 0) const;
       void Position(const int index, int &i_samp, int &i_line, int &i_band) const;
-      int Index(const int i_samp, const int i_line, const int i_band) const
-      throw(Isis::iException &);
+      int Index(const int i_samp, const int i_line, const int i_band) const;
 
       // Methods which give info about the buffer or its contents
       double at(const int index) const;

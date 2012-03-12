@@ -27,7 +27,7 @@
 
 #include "CameraDistortionMap.h"
 #include "CameraFocalPlaneMap.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "iTime.h"
 #include "LineScanCameraDetectorMap.h"
@@ -165,7 +165,7 @@ namespace Isis {
     else {
       string msg = "Unknown InstrumentType [" +
                         (string) inst["InstrumentType"] + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
 
@@ -174,59 +174,59 @@ namespace Isis {
 
 
   /**
-   * CK frame ID.  This is an overridden method for the Camera class pure 
+   * CK frame ID.  This is an overridden method for the Camera class pure
    * virtual method. It will always throw an error for Ideal Camera models.
-   * @throw iException - "No CK Frame ID for Ideal Camera class."
-   * @return @b int 
+   * @throw IException - "No CK Frame ID for Ideal Camera class."
+   * @return @b int
    */
   int IdealCamera::CkFrameId() const {
     string msg = "No CK Frame ID for Ideal Camera class";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
 
   /**
-   * CK Reference ID.  This is an overridden method for the Camera class pure 
+   * CK Reference ID.  This is an overridden method for the Camera class pure
    * virtual method. It will always throw an error for Ideal Camera models.
-   * @throw iException - "No CK Reference ID for Ideal Camera class."
-   * @return @b int 
+   * @throw IException - "No CK Reference ID for Ideal Camera class."
+   * @return @b int
    */
   int IdealCamera::CkReferenceId() const {
     string msg = "No CK Reference ID for Ideal Camera class";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   /**
-   * SPK Target ID.  This is an overridden method for the Camera class pure 
+   * SPK Target ID.  This is an overridden method for the Camera class pure
    * virtual method. It will always throw an error for Ideal Camera models.
-   * @throw iException - "No SPK Target ID for Ideal Camera class."
-   * @return @b int 
+   * @throw IException - "No SPK Target ID for Ideal Camera class."
+   * @return @b int
    */
   int IdealCamera::SpkTargetId() const {
     string msg = "No SPK Target ID for Ideal Camera class";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   /**
-   * SPK Center ID.  This is an overridden method for the Camera class pure 
+   * SPK Center ID.  This is an overridden method for the Camera class pure
    * virtual method. It will always throw an error for Ideal Camera models.
-   * @throw iException - "No SPK Center ID for Ideal Camera class."
-   * @return @b int 
+   * @throw IException - "No SPK Center ID for Ideal Camera class."
+   * @return @b int
    */
   int IdealCamera::SpkCenterId() const {
     string msg = "No SPK Center ID for Ideal Camera class";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   /**
-   * SPK Reference ID.  This is an overridden method for the Camera class pure 
+   * SPK Reference ID.  This is an overridden method for the Camera class pure
    * virtual method. It will always throw an error for Ideal Camera models.
-   * @throw iException - "No SPK Reference ID for Ideal Camera class."
-   * @return @b int 
+   * @throw IException - "No SPK Reference ID for Ideal Camera class."
+   * @return @b int
    */
   int IdealCamera::SpkReferenceId() const {
     string msg = "No SPK Reference ID for Ideal Camera class";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 }
 

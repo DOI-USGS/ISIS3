@@ -25,7 +25,7 @@
 
 #include "PolynomialUnivariate.h"
 #include "iString.h"
-#include "iException.h"
+#include "IException.h"
 
 namespace Isis {
   /**
@@ -99,8 +99,8 @@ namespace Isis {
       derivative = 1;
     }
     else {
-      Isis::iString msg = "Coeff index, " + Isis::iString(coefIndex) + " exceeds degree of polynomial";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      iString msg = "Coeff index, " + Isis::iString(coefIndex) + " exceeds degree of polynomial";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     return derivative;
   }

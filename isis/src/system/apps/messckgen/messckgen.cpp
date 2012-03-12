@@ -181,7 +181,7 @@ void IsisMain() {
               string bcExpanded = Filename(bcFilename).Expanded();
               if (!QFile(QString::fromStdString(bcExpanded)).exists()) {
                 string msg = "The BC file [" + bcExpanded + "] does not exist";
-                throw iException::Message(iException::User, msg, _FILEINFO_);
+                throw IException(IException::User, msg, _FILEINFO_);
               }
 
               // If the current day's file isn't already present in the group,

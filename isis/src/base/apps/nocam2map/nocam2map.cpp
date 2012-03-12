@@ -239,7 +239,7 @@ void IsisMain() {
       if(!found) {
         string msg = "Could not convert Target [" + target +
                      "] to NAIF code";
-        throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+        throw IException(IException::Io, msg, _FILEINFO_);
       }
 
       SpiceInt n;
@@ -775,7 +775,7 @@ void LoadMapRes() {
   }
   else {
     string msg = "No resolution value found in [" + ui.GetFilename("MAP") + "]";
-    throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 }
 
@@ -841,7 +841,7 @@ void ComputeInputRange() {
       if(!found) {
         string msg = "Could not convert Target [" + target +
                      "] to NAIF code";
-        throw Isis::iException::Message(Isis::iException::Io, msg, _FILEINFO_);
+        throw IException(IException::Io, msg, _FILEINFO_);
       }
 
       SpiceInt n;
@@ -952,6 +952,6 @@ void LoadMapRange() {
   if(count < 4) {
     string msg = "One or more of the values for the ground range was not found";
     msg += " in [" + ui.GetFilename("MAP") + "]";
-    throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 }

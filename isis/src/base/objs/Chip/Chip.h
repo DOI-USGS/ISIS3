@@ -50,7 +50,7 @@ namespace Isis {
    *
    * @see AutoReg
    * @see AutoRegFactory
-   *  
+   *
    * @internal
    *   @history 2006-07-11  Tracie Sucharski - Added reLoad method to use
    *                          p_cube instead of cube passed in.
@@ -118,7 +118,7 @@ namespace Isis {
       Chip(const int samples, const int lines);
       virtual ~Chip();
 
-      void SetSize(const int samples, const int lines) throw(iException &);
+      void SetSize(const int samples, const int lines);
 
       bool IsInsideChip(double sample, double line);
 
@@ -204,7 +204,7 @@ namespace Isis {
       void Load(Cube &cube, const double rotation = 0.0, const double scale = 1.0,
                 const int band = 1);
       void Load(Cube &cube, Chip &match, Cube &matchChipCube,
-                const double scale = 1.0, const int band = 1) throw(iException &);
+                const double scale = 1.0, const int band = 1);
       void Load(Cube &cube, const Affine &affine, const bool &keepPoly = true,
                 const int band = 1);
 
@@ -233,7 +233,7 @@ namespace Isis {
       };
 
       void SetValidRange(const double minimum = Isis::ValidMinimum,
-                         const double maximum = Isis::ValidMaximum) throw(iException &);
+                         const double maximum = Isis::ValidMaximum);
       bool IsValid(double percentage);
 
       /** Returns whether the value at the given sample, line position is within the
@@ -249,7 +249,7 @@ namespace Isis {
         return true;
       }
 
-      Chip Extract(int samples, int lines, int samp, int line) throw(iException &);
+      Chip Extract(int samples, int lines, int samp, int line);
       void Extract(int samp, int line, Chip &output);
       Isis::Statistics *Statistics();
       void Extract(Chip &output, Affine &affine);
@@ -315,7 +315,7 @@ namespace Isis {
        * Sets Interpolator Type for loading a chip.  This type is used in the Read()
        * method.
        * @param type Interpolator type to be used.
-       * @throws Isis::iException::Programmer - Invalid Interpolator Type
+       * @throws IException::Programmer - Invalid Interpolator Type
        * @see Read()
        * @see SetReadInterpolator()
        * @author Jeannie Walldren
@@ -332,7 +332,7 @@ namespace Isis {
         // Interpolator::None is not valid type
         string msg = "Invalid Interpolator type.  Cannot use [";
         msg += iString(type) + "] to read cube into chip.";
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
     private:

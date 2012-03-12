@@ -1,7 +1,7 @@
 #include "Isis.h"
 #include "ProcessByLine.h"
 #include "SpecialPixel.h"
-#include "iException.h"
+#include "IException.h"
 
 using namespace std;
 using namespace Isis;
@@ -34,7 +34,7 @@ void IsisMain() {
   double den = 2.0 * (x21 * y31 - x31 * y21);
   if(den == 0.0) {
     string message = "The three points lie on a line so a circle can not be computed";
-    throw iException::Message(iException::User, message, _FILEINFO_);
+    throw IException(IException::User, message, _FILEINFO_);
   }
 
   double sq2 = x21 * x21 + y21 * y21;

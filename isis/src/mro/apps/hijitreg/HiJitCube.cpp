@@ -27,7 +27,7 @@
 #include "naif/SpiceUsr.h"
 
 #include "HiJitCube.h"
-#include "iException.h"
+#include "IException.h"
 #include "Instrument.hh"
 #include "Pvl.h"
 #include "PvlGroup.h"
@@ -130,7 +130,7 @@ namespace Isis {
       msg << "Summing mode (" << jdata.summing
           << ") in file " << getFilename() << " is not equal to summing mode ("
           << other.summing << ") in file " << cube.getFilename() << endl;
-      throw iException::Message(iException::User, msg.str(), _FILEINFO_);
+      throw IException(IException::User, msg.str(), _FILEINFO_);
     }
     return;
   }
@@ -279,7 +279,7 @@ namespace Isis {
       msg << "Summing mode (" << jdata.summing
           << ") is illegal (must be > 0) or CPMM number (" << jdata.cpmmNumber
           << ") is invalid in file " << getFilename() << endl;
-      throw iException::Message(iException::User, msg.str(), _FILEINFO_);
+      throw IException(IException::User, msg.str(), _FILEINFO_);
     }
 
 //  It is assumed all images start at the line location in the focal plane
@@ -291,7 +291,7 @@ namespace Isis {
       msg << "Channel number (" << jdata.channelNumber
           << ") is invalid (must be 0, 1 or 2) in file " << getFilename()
           << endl;
-      throw iException::Message(iException::User, msg.str(), _FILEINFO_);
+      throw IException(IException::User, msg.str(), _FILEINFO_);
     }
     else {
       if(originst) {
@@ -320,7 +320,7 @@ namespace Isis {
     ostringstream msg;
     msg << "Invalid summing mode (" << summing << ") for file " <<
         getFilename() << std::endl;
-    throw iException::Message(iException::User, msg.str(), _FILEINFO_);
+    throw IException(IException::User, msg.str(), _FILEINFO_);
   }
 
 

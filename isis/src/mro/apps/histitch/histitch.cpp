@@ -143,7 +143,7 @@ void IsisMain() {
     string msg = "SEAMSIZE [" + iString(seamSize) + "] + SKIP [" + iString(skipSize) + "] must ";
     msg += " be less than the number of samples [" + iString(icube1->getSampleCount()) + "] in ";
     msg += "[" + ui.GetAsString("FROM1") + "]";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   PvlGroup &from1Archive = icube1->getGroup("ARCHIVE");
@@ -159,7 +159,7 @@ void IsisMain() {
   else  {
     if(fromData[0].ChnNumber != 0) {
       string msg = "FROM1 channel number must be 1 or 2";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     fromData[0].offset = fromData[0].nSamples;
   }
@@ -176,7 +176,7 @@ void IsisMain() {
       string msg = "SEAMSIZE [" + iString(seamSize) + "] + SKIP [" + iString(skipSize) + "] must ";
       msg += " be less than the number of samples [" + iString(icube2->getSampleCount()) + " in ";
       msg += "[" + ui.GetAsString("FROM2") + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     //Test to make sure input files are compatable
@@ -187,7 +187,7 @@ void IsisMain() {
     string from2ObsId = from2Archive["ObservationId"];
     if(from1ObsId != from2ObsId) {
       string msg = "The input files Observation Id's are not compatable";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     stitchedProductIds = "(" + stitchedProductIds + ", " +
                          (string)from2Archive["ProductId"][0] + ")";
@@ -199,7 +199,7 @@ void IsisMain() {
     string from2CcdId = from2Instrument["CCDId"];
     if(from1CcdId != from2CcdId) {
       string msg = "The input files CCD Id's are not compatable";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     //Make sure channel numbers are equal to 0 & 1
@@ -207,7 +207,7 @@ void IsisMain() {
     if(!((fromData[0].ChnNumber == 0) && (fromData[1].ChnNumber == 1)) &&
         !((fromData[0].ChnNumber == 1) && (fromData[1].ChnNumber == 0))) {
       string msg = "The input files Channel numbers must be equal to 0 and 1";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
 //  Set up offsets

@@ -23,7 +23,7 @@
 #include <cmath>
 #include <cfloat>
 #include "PointPerspective.h"
-#include "iException.h"
+#include "IException.h"
 #include "Constants.h"
 
 using namespace std;
@@ -42,7 +42,7 @@ namespace Isis {
    *                      middle of the longitude range specified in the labels.
    *                      Defaults to false.
    *
-   * @throws Isis::iException::Io
+   * @throws Isis::IException::Io
    */
   PointPerspective::PointPerspective(Isis::Pvl &label, bool allowDefaults) :
     Isis::Projection::Projection(label) {
@@ -87,9 +87,9 @@ namespace Isis {
       p_P = 1.0 + (p_distance / p_equatorialRadius);
 
     }
-    catch(Isis::iException &e) {
+    catch(IException &e) {
       string message = "Invalid label group [Mapping]";
-      throw Isis::iException::Message(Isis::iException::Io, message, _FILEINFO_);
+      throw IException(e, IException::Io, message, _FILEINFO_);
     }
   }
 

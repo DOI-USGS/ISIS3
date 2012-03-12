@@ -4,7 +4,7 @@
 
 #include "httpget.h"
 #include "iString.h"
-#include "iException.h"
+#include "IException.h"
 #include "Progress.h"
 
 
@@ -26,19 +26,19 @@ namespace Isis {
     // The next four ifs will check the URL and return error is bad
     if(!url.isValid()) {
       string msg = "invalid URL";
-      iException::Message(iException::User, msg, _FILEINFO_);
+//       iException::Message(iException::User, msg, _FILEINFO_);
       p_error = true;
       return p_error;
     }
     if(url.scheme().toLower() != "http") {
       string msg = "URL must start with 'http:'";
-      iException::Message(iException::User, msg, _FILEINFO_);
+//       iException::Message(iException::User, msg, _FILEINFO_);
       p_error = true;
       return p_error;
     }
     if(url.path().isEmpty()) {
       string msg = "URL has no path";
-      iException::Message(iException::User, msg, _FILEINFO_);
+//       iException::Message(iException::User, msg, _FILEINFO_);
       p_error = true;
       return p_error;
     }
@@ -51,7 +51,7 @@ namespace Isis {
     localFileName +=  QFileInfo(url.path()).fileName();
     if(localFileName.isEmpty()) {
       string msg = "URL has no filename";
-      iException::Message(iException::User, msg, _FILEINFO_);
+//       iException::Message(iException::User, msg, _FILEINFO_);
       p_error = true;
       return p_error;
     }
@@ -59,7 +59,7 @@ namespace Isis {
     p_file.setFileName(localFileName);
     if(!p_file.open(QIODevice::WriteOnly)) {
       string msg = "Cannot open output file";
-      iException::Message(iException::User, msg, _FILEINFO_);
+//       iException::Message(iException::User, msg, _FILEINFO_);
       p_error = true;
       return p_error;
     }
@@ -87,12 +87,12 @@ namespace Isis {
     if(error) {
       p_error =  true;
       string msg = p_http.errorString().toStdString();
-      iException::Message(iException::User, msg, _FILEINFO_);
+//       iException::Message(iException::User, msg, _FILEINFO_);
     }
     else if(p_http.lastResponse().statusCode()  != 200 && p_http.lastResponse().statusCode()  != 0) {
       p_error = true;
       string msg = "error code: [" + errLUT[p_http.lastResponse().statusCode()] + "]";
-      iException::Message(iException::User, msg, _FILEINFO_);
+//       iException::Message(iException::User, msg, _FILEINFO_);
     }
     else {
       p_error = false;

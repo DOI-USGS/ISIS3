@@ -68,7 +68,7 @@ void IsisMain() {
   if(flist.size() < 1) {
     string msg = "The list file[" + ui.GetFilename("FROMLIST") +
                  " does not contain any filenames";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   string projection("Equirectangular");
@@ -114,16 +114,16 @@ void IsisMain() {
       // group
       Cube cube;
       cube.open(flist[i]);
-  
+
       int lines = cube.getLineCount();
       int samples = cube.getSampleCount();
-  
-  
+
+
       PvlObject fmap("File");
       fmap += PvlKeyword("Name", flist[i]);
       fmap += PvlKeyword("Lines", lines);
       fmap += PvlKeyword("Samples", samples);
-  
+
       Camera *cam = cube.getCamera();
       Pvl mapping;
       cam->BasicMapping(mapping);
@@ -132,32 +132,32 @@ void IsisMain() {
       mapgrp.AddKeyword(PvlKeyword("LatitudeType", lattype), Pvl::Replace);
       mapgrp.AddKeyword(PvlKeyword("LongitudeDirection", londir), Pvl::Replace);
       mapgrp.AddKeyword(PvlKeyword("LongitudeDomain", londom), Pvl::Replace);
-  
+
       // Get the radii
       Distance radii[3];
       cam->Radii(radii);
-  
+
       eqRad   = radii[0].meters();
       eq2Rad  = radii[1].meters();
       poleRad = radii[2].meters();
-  
+
       target = cam->Target();
       equiRadStat.AddData(&eqRad, 1);
       poleRadStat.AddData(&poleRad, 1);
-  
+
       // Get resolution
       double lowres = cam->LowestImageResolution();
       double hires = cam->HighestImageResolution();
       scaleStat.AddData(&lowres, 1);
       scaleStat.AddData(&hires, 1);
-  
+
       double pixres = (lowres + hires) / 2.0;
       double scale = Scale(pixres, poleRad, eqRad);
       mapgrp.AddKeyword(PvlKeyword("PixelResolution", pixres), Pvl::Replace);
       mapgrp.AddKeyword(PvlKeyword("Scale", scale, "pixels/degree"), Pvl::Replace);
       mapgrp += PvlKeyword("MinPixelResolution", lowres, "meters");
       mapgrp += PvlKeyword("MaxPixelResolution", hires, "meters");
-  
+
       // Get the universal ground range
       double minlat, maxlat, minlon, maxlon;
       cam->GroundRange(minlat, maxlat, minlon, maxlon, mapping);
@@ -165,20 +165,19 @@ void IsisMain() {
       mapgrp.AddKeyword(PvlKeyword("MaximumLatitude", maxlat), Pvl::Replace);
       mapgrp.AddKeyword(PvlKeyword("MinimumLongitude", minlon), Pvl::Replace);
       mapgrp.AddKeyword(PvlKeyword("MaximumLongitude", maxlon), Pvl::Replace);
-  
+
       fmap.AddGroup(mapgrp);
       fileset.AddObject(fmap);
-  
+
       longitudeStat.AddData(&minlon, 1);
       longitudeStat.AddData(&maxlon, 1);
       latitudeStat.AddData(&minlat, 1);
       latitudeStat.AddData(&maxlat, 1);
-    } catch(iException &ie) {
+    }
+    catch(IException &ie) {
       string mess = "Problems with file " + flist[i] + "\n" +
                      ie.what();
-      ie.Clear();
-      ie.Message(iException::User, mess, _FILEINFO_);
-      throw;
+      throw IException(IException::User, mess, _FILEINFO_);
     }
 
     p.ClearInputCubes();

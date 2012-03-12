@@ -7,7 +7,8 @@
 #include <QWidget>
 #include <QStylePainter>
 
-#include "iException.h"
+#include "IException.h"
+#include "iString.h"
 
 
 namespace Isis
@@ -17,40 +18,40 @@ namespace Isis
   Tab::Tab(QWidget * associatedWidget, QWidget * parent) : QAction(parent)
   {
     this->associatedWidget = associatedWidget;
-  
+
     position = 0;
     radioGroup = 0;
     selectedStatus = false;
-  
+
     setCheckable(true);
-  
+
     connect(this, SIGNAL(triggered()), this, SLOT(handleTriggered()));
-    
+
     ASSERT_PTR(associatedWidget);
   }
-  
-  
+
+
   //! destructs a Tab
   Tab::~Tab()
   {
     associatedWidget = NULL;
   }
-  
-  
+
+
   //! set the position of the Tab within a TabBar
   void Tab::setPosition(const int & newPosition)
   {
     position = newPosition;
   }
-  
-  
+
+
   //! get the position of the Tab within a TabBar
   const int & Tab::getPosition() const
   {
     return position;
   }
-  
-  
+
+
   /**
    * Tabs which share a radio group have the property that only only one Tab
    * in the group can be selected at a time.
@@ -61,8 +62,8 @@ namespace Isis
   {
     radioGroup = newRadioGroup;
   }
-  
-  
+
+
   /**
    * Tabs which share a radio group have the property that only only one Tab
    * in the group can be selected at a time.
@@ -73,8 +74,8 @@ namespace Isis
   {
     return radioGroup;
   }
-  
-  
+
+
   /**
    * A selected Tab will look visually pressed and have its associatedWidget
    * visible.  A Tab which is not selected will look like a normal button and
@@ -88,15 +89,15 @@ namespace Isis
     {
       QString msg = "Tab::setSelected called but can't show or hide the "
           "associatedWidget because it is NULL!";
-      throw iException::Message(iException::Programmer, msg.toStdString(),
+      throw IException(IException::Programmer, msg,
           _FILEINFO_);
-    } 
+    }
     setChecked(newStatus);
     newStatus ? associatedWidget->show() : associatedWidget->hide();
     selectedStatus = newStatus;
   }
-  
-  
+
+
   /**
    * A selected Tab will look visually pressed and have its associatedWidget
    * visible.  A Tab which is not selected will look like a normal button and
@@ -108,8 +109,8 @@ namespace Isis
   {
     return selectedStatus;
   }
-  
-  
+
+
   /**
    * This SLOT is executed when the Tab is clicked, and emits its own clicked
    * SIGNAL (which contains its index) to the TabBar.  The TabBar can then
@@ -120,5 +121,5 @@ namespace Isis
   {
     emit clicked(position);
   }
-  
+
 }

@@ -6,7 +6,7 @@
 #include "ControlMeasure.h"
 #include "ControlNet.h"
 #include "ControlPoint.h"
-#include "iException.h"
+#include "IException.h"
 #include "Latitude.h"
 #include "Longitude.h"
 #include "Preference.h"
@@ -130,8 +130,8 @@ int main() {
   try {
     cp.Add(cm2);
   }
-  catch (Isis::iException &e) {
-    e.Report(false);
+  catch (IException &e) {
+    e.print();
   }
 
   cout << endl << "Test SetAdjustedSurfacePoint ... " << endl;
@@ -244,9 +244,8 @@ int main() {
   try {
     ControlPoint::StringToPointType("aoeu");
   }
-  catch (iException e) {
-    cout << "  " << e.Errors() << "\n";
-    e.Clear();
+  catch (IException &e) {
+    cout << "  " << e.toString() << "\n";
   }
 }
 

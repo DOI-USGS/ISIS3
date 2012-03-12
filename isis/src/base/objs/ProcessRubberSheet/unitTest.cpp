@@ -76,8 +76,8 @@ void IsisMain() {
     p.SetOutputCube("TO", 1, 1, 1);
     p.StartProcess(*trans, *interp);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
     p.EndProcess();
     cout << endl;
   }
@@ -87,8 +87,8 @@ void IsisMain() {
     p.SetInputCube("FROM");
     p.StartProcess(*trans, *interp);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
     p.EndProcess();
     cout << endl;
   }

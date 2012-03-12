@@ -1,6 +1,6 @@
 #include <cmath>
 #include "Minnaert.h"
-#include "iException.h"
+#include "IException.h"
 
 namespace Isis {
   Minnaert::Minnaert(Pvl &pvl) : PhotoModel(pvl) {

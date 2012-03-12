@@ -2,17 +2,17 @@
  * @file
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for 
+ *   domain. See individual third-party library and package descriptions for
  *   intellectual property information,user agreements, and related information.
  *
  *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software 
- *   and related material nor shall the fact of distribution constitute any such 
- *   warranty, and no responsibility is assumed by the USGS in connection 
+ *   is made by the USGS as to the accuracy and functioning of such software
+ *   and related material nor shall the fact of distribution constitute any such
+ *   warranty, and no responsibility is assumed by the USGS in connection
  *   therewith.
  *
  *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see 
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
  *   the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
@@ -24,7 +24,7 @@
 
 #include "CameraFocalPlaneMap.h"
 #include "CameraSkyMap.h"
-#include "iException.h"
+#include "IException.h"
 #include "iTime.h"
 #include "NaifStatus.h"
 #include "PushFrameCameraDetectorMap.h"
@@ -38,9 +38,9 @@ namespace Isis {
    *
    * @param lab Pvl Label to create the camera model from
    *
-   * @throws Isis::iException::User - The image does not appear to be a Marci
+   * @throws Isis::IException::User - The image does not appear to be a Marci
    *             image
-   * @internal 
+   * @internal
    *   @history 2011-05-03 Jeannie Walldren - Added NAIF error check.
    */
   MarciCamera::MarciCamera(Pvl &lab) : PushFrameCamera(lab) {
@@ -49,7 +49,7 @@ namespace Isis {
     // make sure it is a marci image
     if(inst["InstrumentId"][0] != "Marci") {
       string msg = "The image does not appear to be a Marci Image";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     // Set up the camera characteristics
@@ -108,7 +108,7 @@ namespace Isis {
     for(int i = 0; i < filtNames.Size(); i++) {
       if(filterToDetectorOffset.find(filtNames[i]) == filterToDetectorOffset.end()) {
         string msg = "Unrecognized filter name [" + filtNames[i] + "]";
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
       p_detectorStartLines.push_back(filterToDetectorOffset.find(filtNames[i])->second);
@@ -140,7 +140,7 @@ namespace Isis {
     }
     else {
       string msg = "Unrecognized NaifIkCode [" + iString((int)NaifIkCode()) + "]";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     // Setup distortion map
@@ -186,7 +186,7 @@ namespace Isis {
 
 
 /**
- * This is the function that is called in order to instantiate a MarciCamera object. 
+ * This is the function that is called in order to instantiate a MarciCamera object.
  *
  * @param lab Cube labels
  *

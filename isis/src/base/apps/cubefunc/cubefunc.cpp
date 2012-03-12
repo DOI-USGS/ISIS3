@@ -2,7 +2,7 @@
 #include "Isis.h"
 #include "ProcessByLine.h"
 #include "SpecialPixel.h"
-#include "iException.h"
+#include "IException.h"
 
 using namespace std;
 using namespace Isis;
@@ -64,7 +64,7 @@ void IsisMain() {
     }
     else {
       string message = "For the XTOY function, you must enter a value for y";
-      throw iException::Message(iException::User, message, _FILEINFO_);
+      throw IException(IException::User, message, _FILEINFO_);
     }
   }
 

@@ -8,7 +8,7 @@
 
 #include "UserInterface.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "iTime.h"
 #include "Preference.h"
 #include "Buffer.h"
@@ -71,17 +71,17 @@ void IsisMain() {
     id = (string) lab.FindKeyword("DATA_SET_ID");
     projected = lab.HasObject("IMAGE_MAP_PROJECTION");
   }
-  catch(iException &e) {
+  catch(IException &e) {
     string msg = "Unable to read [DATA_SET_ID] from input file [" +
                  inFile.Expanded() + "]";
-    throw iException::Message(iException::Io, msg, _FILEINFO_);
+    throw IException(e, IException::Io, msg, _FILEINFO_);
   }
 
   //Checks if in file is rdr
   if(projected) {
     string msg = "[" + inFile.Name() + "] appears to be an rdr file.";
     msg += " Use pds2isis.";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   id.ConvertWhiteSpace();
@@ -90,7 +90,7 @@ void IsisMain() {
   if(id != "MRO-M-HIRISE-2-EDR-V1.0") {
     string msg = "Input file [" + inFile.Expanded() + "] does not appear to be " +
                  "in HiRISE EDR format. DATA_SET_ID is [" + id + "]";
-    throw iException::Message(iException::Io, msg, _FILEINFO_);
+    throw IException(IException::Io, msg, _FILEINFO_);
   }
 
   p.SetPdsFile(inFile.Expanded(), "", pdsLabel);

@@ -24,7 +24,7 @@
 #include "PhotoModelFactory.h"
 #include "PhotoModel.h"
 #include "Plugin.h"
-#include "iException.h"
+#include "IException.h"
 #include "Filename.h"
 
 namespace Isis {
@@ -63,7 +63,7 @@ namespace Isis {
     else {
       iString msg = "Keyword [Name] or keyword [PhtName] must ";
       msg += "exist in [Group = Algorithm]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     // Open the factory plugin file

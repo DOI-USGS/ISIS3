@@ -30,7 +30,7 @@
 #include <gsl/gsl_errno.h>
 
 #include "GSLUtility.h"
-#include "iException.h"
+#include "IException.h"
 
 using namespace std;
 
@@ -235,7 +235,9 @@ namespace Isis {
         ostringstream mess;
         mess << "Size of NL vector (" << v.dim() << ") not same as GSL vector ("
              << gv->size << ")";
-        throw iException::Message(iException::Programmer, mess.str(), _FILEINFO_);
+        throw IException(IException::Programmer,
+                         mess.str().c_str(),
+                         _FILEINFO_);
       }
 
       for(int i = 0 ; i < v.dim() ; i++) {
@@ -265,7 +267,9 @@ namespace Isis {
         mess << "Size of NL matrix (" << m.dim1() << "," << m.dim2()
              << ") not same as GSL matrix (" << Rows(gm) << "," << Columns(gm)
              << ")";
-        throw iException::Message(iException::Programmer, mess.str(), _FILEINFO_);
+        throw IException(IException::Programmer,
+                         mess.str().c_str(),
+                         _FILEINFO_);
       }
 
       for(int i = 0 ; i < m.dim1() ; i++) {
@@ -317,11 +321,10 @@ namespace Isis {
      * @param src Name of the source file where the function was called.
      * @param line Line number in the source where the call/error occurs
      */
-    void GSLUtility::check(int gsl_status, const char *src, int line)
-    const throw(iException &) {
+    void GSLUtility::check(int gsl_status, const char *src, int line) const {
       if(gsl_status != GSL_SUCCESS) {
         string msg = "GSL error occured: " + string(gsl_strerror(gsl_status));
-        throw iException::Message(iException::Programmer, msg.c_str(), src, line);
+        throw IException(IException::Programmer, msg.c_str(), src, line);
       }
       return;
     }
@@ -346,8 +349,8 @@ namespace Isis {
                              int gsl_errno) {
       ostringstream mess;
       mess << "GSLError (" << gsl_errno << ") -> " << reason;
-      throw iException::Message(iException::Programmer, mess.str(),
-                                const_cast<char *>(file), line);
+      throw IException(IException::Programmer, mess.str().c_str(),
+                       file, line);
     }
 
   }

@@ -14,7 +14,7 @@
 #include "PolynomialUnivariate.h"
 #include "iString.h"
 #include "iTime.h"
-#include "iException.h"
+#include "IException.h"
 #include "Table.h"
 #include "NaifStatus.h"
 
@@ -43,7 +43,7 @@ namespace Isis {
     // Make sure the kernels are written to the labels and not just the tables (blobs)
     if(!p_spi->HasKernels(lab)) {
       std::string msg = "The master file must contain the kernel files.  Rerun spiceinit with attach=no";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     // Get the kernel group and save the instrument pointing keyword
@@ -183,7 +183,7 @@ namespace Isis {
     // Make sure caches are already loaded
     if(!p_cachesLoaded) {
       std::string msg = "A LineScanCameraRotation cache has not been loaded yet";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     // Clear existing matrices from cache

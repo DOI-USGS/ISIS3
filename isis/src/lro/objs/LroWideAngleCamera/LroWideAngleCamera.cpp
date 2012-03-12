@@ -2,17 +2,17 @@
  * @file
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for 
+ *   domain. See individual third-party library and package descriptions for
  *   intellectual property information,user agreements, and related information.
  *
  *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software 
- *   and related material nor shall the fact of distribution constitute any such 
- *   warranty, and no responsibility is assumed by the USGS in connection 
+ *   is made by the USGS as to the accuracy and functioning of such software
+ *   and related material nor shall the fact of distribution constitute any such
+ *   warranty, and no responsibility is assumed by the USGS in connection
  *   therewith.
  *
  *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see 
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
  *   the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
@@ -27,7 +27,7 @@
 #include "CameraFocalPlaneMap.h"
 #include "CameraSkyMap.h"
 #include "CollectorMap.h"
-#include "iException.h"
+#include "IException.h"
 #include "iTime.h"
 #include "NaifStatus.h"
 #include "PushFrameCameraDetectorMap.h"
@@ -42,7 +42,7 @@ namespace Isis {
    *
    * @throws Isis::iException::User - The image does not appear to be a Lunar
    *             Reconaissance Orbiter Wide Angle Camera image
-   * @internal 
+   * @internal
    *   @history 2011-05-03 Jeannie Walldren - Added NAIF error check.
    */
   LroWideAngleCamera::LroWideAngleCamera(Pvl &lab) :
@@ -81,7 +81,7 @@ namespace Isis {
     else {
       string msg = "Invalid value [" + instId
                    + "] for keyword [InstrumentId]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     p_nframelets = ParentLines() / (frameletSize / sumMode);
@@ -96,7 +96,7 @@ namespace Isis {
       mess << "Number bands in (file) label (" << nbands
            << ") do not match number of values in BandBin/Center keyword ("
            << filtNames.Size() << ") - required for band-dependent geoemtry";
-      throw iException::Message(iException::User, mess.str(), _FILEINFO_);
+      throw IException(IException::User, mess.str(), _FILEINFO_);
     }
 
     // Is the data flipped?
@@ -134,7 +134,7 @@ namespace Isis {
     for(int i = 0; i < filtNames.Size(); i++) {
       if(!filterToDetectorOffset.exists(filtNames[i])) {
         string msg = "Unrecognized filter name [" + filtNames[i] + "]";
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
       p_detectorStartLines.push_back(filterToDetectorOffset.get(filtNames[i]));
@@ -170,7 +170,7 @@ namespace Isis {
     //  get instrument-specific sample offset
     iString instModeId = ((iString)(string) inst["InstrumentModeId"]).UpCase();
     // For BW mode, add the mode (0,1 (non-polar) or 2,3 (polar)) used to
-    // acquire image 
+    // acquire image
     if (instModeId == "BW") {
       instModeId += inst["Mode"][0];
       // There are no offsets for BW mode.. there can only be 1 filter
@@ -223,7 +223,7 @@ namespace Isis {
       mess << "Requested virtual band (" << vband
            << ") outside valid (BandBin/Center) limits (1 - " << maxbands
            <<  ")";
-      throw iException::Message(iException::Programmer, mess.str(), _FILEINFO_);
+      throw IException(IException::Programmer, mess.str(), _FILEINFO_);
     }
 
     //  Set up valid band access
@@ -235,7 +235,7 @@ namespace Isis {
   }
 
   /**
-   * @param key 
+   * @param key
    * @return @b int Pool key size
    */
   int LroWideAngleCamera::PoolKeySize(const string &key) const {
@@ -248,8 +248,8 @@ namespace Isis {
   }
 
   /**
-   * @param key 
-   * @return @b vector < @b int > 
+   * @param key
+   * @return @b vector < @b int >
    */
   vector<int> LroWideAngleCamera::GetVector(const string &key) {
     QVariant poolKeySize = getStoredResult(key + "_SIZE", SpiceIntType);
@@ -263,7 +263,7 @@ namespace Isis {
 
     if(nvals <= 0) {
       string mess = "Kernel pool keyword " + key + " not found!";
-      throw iException::Message(iException::Programmer, mess, _FILEINFO_);
+      throw IException(IException::Programmer, mess, _FILEINFO_);
     }
 
     vector<int> parms;
@@ -280,7 +280,7 @@ namespace Isis {
 // Plugin
 /**
  * This is the function that is called in order to instantiate a
- * LroWideAngleCamera object. 
+ * LroWideAngleCamera object.
  *
  * @param lab Cube labels
  *

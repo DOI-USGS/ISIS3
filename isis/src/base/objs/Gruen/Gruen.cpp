@@ -38,11 +38,11 @@
 
 using namespace std;
 
-namespace Isis { 
+namespace Isis {
 
   /**
    * @brief Default constructor sets up default Gruen parameters
-   * 
+   *
    * @author Kris Becker - 5/22/2011
    */
   Gruen::Gruen() : AutoReg(Gruen::getDefaultParameters()) {
@@ -54,8 +54,8 @@ namespace Isis {
    *
    * This will construct a minimum difference search algorith.  It is
    * recommended that you use a AutoRegFactory class as opposed to
-   * this constructor.  Direct construction is used commonly in stereo 
-   * matching. 
+   * this constructor.  Direct construction is used commonly in stereo
+   * matching.
    *
    * @param pvl  A Pvl object that contains a valid automatic registration
    * definition
@@ -111,17 +111,17 @@ namespace Isis {
   }
 
   /**
-   * @brief Sets initial chip transformation 
-   *  
-   * This method can be used with AutoReg registration to set initial affine 
-   * transform parameters.  This initial condition will be applied to the whole 
-   * search chip extraction for the first subsearch chip.  The caller must 
-   * define the contents of the affine and radiometric parameters. See the 
-   * AffineRadio construct for details. 
-   * 
+   * @brief Sets initial chip transformation
+   *
+   * This method can be used with AutoReg registration to set initial affine
+   * transform parameters.  This initial condition will be applied to the whole
+   * search chip extraction for the first subsearch chip.  The caller must
+   * define the contents of the affine and radiometric parameters. See the
+   * AffineRadio construct for details.
+   *
    * @author kbecker (5/14/2011)
-   * 
-   * @param affrad Initial Affine/Radio parameters to apply on registration 
+   *
+   * @param affrad Initial Affine/Radio parameters to apply on registration
    *               entry
    */
   void Gruen::setAffineRadio(const AffineRadio &affrad) {
@@ -130,14 +130,14 @@ namespace Isis {
   }
 
   /**
-   * @brief Set affine parameters to defaults 
-   *  
-   * This method differs from the one above in that it uses the defaults as 
-   * defined at construction.  The basic difference is that this call sets the 
-   * affine portion to the identity and the radiometric parameters to the 
-   * defaults as provided in the user input auto-regististration parameters. 
-   * It may have default shift and gain values to use. 
-   * 
+   * @brief Set affine parameters to defaults
+   *
+   * This method differs from the one above in that it uses the defaults as
+   * defined at construction.  The basic difference is that this call sets the
+   * affine portion to the identity and the radiometric parameters to the
+   * defaults as provided in the user input auto-regististration parameters.
+   * It may have default shift and gain values to use.
+   *
    * @author Kris Becker - 6/4/2011
    */
   void Gruen::setAffineRadio() {
@@ -166,10 +166,10 @@ namespace Isis {
    * @param pattern   Fixed pattern chip which subsearch is trying to match
    * @param subsearch Affined extraction of the search chip
    *
-   * @return Returns 0 if successful, otherwise returns the error number 
+   * @return Returns 0 if successful, otherwise returns the error number
    *         associated with the problem encountered (see ErrorTypes)
    */
-  int Gruen::algorithm(Chip &pattern, Chip &subsearch, 
+  int Gruen::algorithm(Chip &pattern, Chip &subsearch,
                        const Radiometric &radio, BigInt &ptsUsed,
                        double &resid, GMatrix &atai, AffineRadio &affrad) {
 
@@ -258,9 +258,8 @@ namespace Isis {
       GMatrix x = b;
       atai = Cholsl(atai, p, b, x);
     }
-    catch(iException &ie) {
-      string mess = "Cholesky Failed:: " + ie.Errors();
-      ie.Clear();
+    catch(IException &ie) {
+      string mess = "Cholesky Failed:: " + ie.toString();
       return (logError(CholeskyFailed, string(mess.c_str())));
     }
 
@@ -284,9 +283,8 @@ namespace Isis {
    try {
      affrad = AffineRadio(alpha);
     }
-    catch(iException &ie) {
-      string mess = "Affine failed: " + ie.Errors();
-      ie.Clear();
+    catch(IException &ie) {
+      string mess = "Affine failed: " + ie.toString();
       return (logError(AffineNotInvertable, mess));
     }
 
@@ -295,14 +293,14 @@ namespace Isis {
 
   /**
    * @brief Compute the error analysis of convergent Gruen matrix
-   * 
+   *
    * @author kbecker (5/15/2011)
-   * 
-   * @param npts 
-   * @param resid 
-   * @param atai 
-   * 
-   * @return Analysis 
+   *
+   * @param npts
+   * @param resid
+   * @param atai
+   *
+   * @return Analysis
    */
   Analysis Gruen::errorAnalysis(const BigInt &npts, const double &resid,
                                 const GMatrix &atai) {
@@ -319,7 +317,7 @@ namespace Isis {
       }
     }
     results.m_variance = variance;
-  
+
 
     // Set up submatrix
     GMatrix skmat(2,2);
@@ -336,9 +334,8 @@ namespace Isis {
         results.m_kmat[i] = kmat[i*3][i*3];
       }
     }
-    catch(iException &ie) {
-      string errmsg = "Eigen Solution Failed:: " + ie.Errors();
-      ie.Clear();
+    catch(IException &ie) {
+      string errmsg = "Eigen Solution Failed:: " + ie.toString();
       results.m_status = logError(EigenSolutionFailed, errmsg);
       return (results);
     }
@@ -349,13 +346,13 @@ namespace Isis {
 
   /**
    * @brief Compute Cholesky solution
-   * 
+   *
    * @author kbecker (5/15/2011)
-   * 
-   * @param a 
-   * @param p 
-   * 
-   * @return Gruen::GMatrix 
+   *
+   * @param a
+   * @param p
+   *
+   * @return Gruen::GMatrix
    */
   GMatrix Gruen::Choldc(const GMatrix &a, GVector &p) const {
     int nrows(a.dim1());
@@ -373,9 +370,9 @@ namespace Isis {
         // Handle diagonal special
         if (i == j) {
           if (sum <= 0.0) {
-            throw iException::Message(iException::Programmer,
-                                  "Choldc failed - matrix not postive definite",
-                                      _FILEINFO_);
+            throw IException(IException::Programmer,
+                             "Choldc failed - matrix not postive definite",
+                             _FILEINFO_);
           }
           p[i] = sqrt(sum);
         }
@@ -389,15 +386,15 @@ namespace Isis {
 
   /**
    * @brief Compute Cholesky solution matrix from correlation
-   * 
+   *
    * @author kbecker (5/15/2011)
-   * 
-   * @param a 
-   * @param p 
-   * @param b 
-   * @param x 
-   * 
-   * @return Gruen::GMatrix 
+   *
+   * @param a
+   * @param p
+   * @param b
+   * @param x
+   *
+   * @return Gruen::GMatrix
    */
   GMatrix Gruen::Cholsl(const GMatrix &a,const GVector &p, const GMatrix &b,
                         const GMatrix &x) const {
@@ -433,15 +430,15 @@ namespace Isis {
 
   /**
    * @brief Compute the Jacobian of a covariance matrix
-   * 
+   *
    * @author kbecker (5/15/2011)
-   * 
-   * @param a 
-   * @param evals 
-   * @param evecs 
-   * @param MaxIters 
-   * 
-   * @return int 
+   *
+   * @param a
+   * @param evals
+   * @param evecs
+   * @param MaxIters
+   *
+   * @return int
    */
   int Gruen::Jacobi(const GMatrix &a, GVector &evals,
                     GMatrix &evecs, const int &MaxIters) const {
@@ -549,9 +546,9 @@ namespace Isis {
     // Reach here and we have too many iterations
     evals = d;
     evecs = v;
-    throw iException::Message(iException::Programmer,
-                              "Too many iterations in Jacobi",
-                              _FILEINFO_);
+    throw IException(IException::Programmer,
+                     "Too many iterations in Jacobi",
+                     _FILEINFO_);
     return (nrot);
   }
 
@@ -566,11 +563,11 @@ namespace Isis {
 
   /**
    * @brief Sort eigenvectors from highest to lowest
-   * 
+   *
    * @author kbecker (5/15/2011)
-   * 
-   * @param evals 
-   * @param evecs 
+   *
+   * @param evals
+   * @param evecs
    */
   void Gruen::EigenSort(GVector &evals, GMatrix &evecs) const {
     assert(evals.dim1() == evecs.dim1());
@@ -713,7 +710,7 @@ namespace Isis {
     //  line/sample positions
     pChip.SetChipPosition(pChip.TackSample(), pChip.TackLine());
     sChip.SetChipPosition(sChip.TackSample(), sChip.TackLine());
-    MatchPoint matchpt = MatchPoint(PointPair(Coordinate(pChip), 
+    MatchPoint matchpt = MatchPoint(PointPair(Coordinate(pChip),
                                               Coordinate(sChip)));
 
     // Create the fit chip whose size is the same as the pattern chip.
@@ -794,7 +791,7 @@ namespace Isis {
             matchpt.setStatus(CheckConstraints(matchpt));
           }
 
-          //  Set output point 
+          //  Set output point
           m_point = matchpt;
           return (Status(matchpt));  // with AutoReg status
         }
@@ -803,10 +800,9 @@ namespace Isis {
       try {
         affine += alpha;
       }
-      catch (iException &ie) {
+      catch (IException &ie) {
         string mess = "Affine invalid/not invertable";
         matchpt.setStatus(logError(AffineNotInvertable, mess));
-        ie.Clear();
         return (Status(matchpt));  //  Another error condition to return
       }
     } while (!done);
@@ -816,9 +812,9 @@ namespace Isis {
 
   /**
    * @brief Load default Gruen parameter file in $ISIS3DATA/base/templates
-   * 
+   *
    * @author Kris Becker - 5/22/2011
-   * 
+   *
    * @return Pvl Contents of default file
    */
   Pvl &Gruen::getDefaultParameters() {
@@ -1079,9 +1075,9 @@ namespace Isis {
 
   /**
    * @brief Return set of tolerances for affine convergence
-   * 
+   *
    * @author kbecker (5/15/2011)
-   * 
+   *
    * @return Tolerance Affine tolerances from PVL setup
    */
   AffineTolerance Gruen::getAffineTolerance() const {
@@ -1151,13 +1147,13 @@ namespace Isis {
 
   /**
    * @brief Compute the chip coordinate of the registered pixel
-   * 
+   *
    * @author Kris Becker - 5/19/2011
-   * 
+   *
    * @param chip  Chip to update with registration parameters
    * @param point Registration match information
-   * 
-   * @return Coordinate 
+   *
+   * @return Coordinate
    */
   Coordinate Gruen::getChipUpdate(Chip &chip, MatchPoint &point) const {
     Coordinate chippt = point.getAffinePoint(Coordinate(0.0, 0.0));

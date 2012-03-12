@@ -6,7 +6,7 @@
 #include <iostream>
 #include <sstream>
 
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "ProcessExport.h"
 #include "Pvl.h"
@@ -46,7 +46,7 @@ void IsisMain() {
   else if(ui.GetString("BITTYPE") == "32BIT") bitpix = "-32";
   else {
     string msg = "Pixel type of [" + ui.GetString("BITTYPE") + "] is unsupported";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   //  Determine bit size and calculate number of bytes to write
@@ -162,7 +162,7 @@ void IsisMain() {
     }
     // If we were set on SKY and Sky doesn't exist
     else if(msg != "Sky") {
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
 
@@ -179,7 +179,7 @@ void IsisMain() {
   fout.open(to.c_str(), ios::out | ios::binary);
   if(!fout.is_open()) {
     string msg = "Cannot open fits output file";
-    throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
   fout.seekp(0);

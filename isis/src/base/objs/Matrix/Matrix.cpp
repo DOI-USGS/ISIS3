@@ -27,9 +27,10 @@
 #include "jama/jama_eig.h"
 #include "jama/jama_lu.h"
 
-#include "Matrix.h"
-#include "iException.h"
 #include "Constants.h"
+#include "IException.h"
+#include "iString.h"
+#include "Matrix.h"
 
 namespace Isis {
   /**
@@ -39,7 +40,7 @@ namespace Isis {
   Matrix::Matrix(const int n, const int m, const double value) {
     if(n < 1 || m < 1) {
       std::string m = "Invalid matrix dimensions";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
     p_matrix = TNT::Array2D<double>(n, m, value);
   }
@@ -60,7 +61,7 @@ namespace Isis {
   Matrix Matrix::Identity(const int n) {
     if(n < 1) {
       std::string m = "Invalid matrix dimensions";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
     Matrix identity(n, n);
     for(int i = 0; i < identity.Rows(); i++) {
@@ -75,7 +76,7 @@ namespace Isis {
   double Matrix::Determinant() {
     if(Rows() != Columns()) {
       std::string m = "Unable to calculate the determinant, the matrix is not square.";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
     JAMA::LU<double> lu(p_matrix);
     return lu.det();
@@ -87,7 +88,7 @@ namespace Isis {
   double Matrix::Trace() {
     if(Rows() != Columns()) {
       std::string m = "Unable to calculate the trace, the matrix is not square.";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
     double trace = 0.0;
     for(int i = 0; i < Rows(); i++) {
@@ -102,7 +103,7 @@ namespace Isis {
   Matrix Matrix::Multiply(Matrix &matrix) {
     if(Columns() != matrix.Rows()) {
       std::string m = "Incompatible matrix dimensions, cannot multiply the matrices.";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
     TNT::Array2D<double> m(matrix.Rows(), matrix.Columns());
     for(int i = 0; i < m.dim1(); i++) {
@@ -119,7 +120,7 @@ namespace Isis {
   Matrix Matrix::Add(Matrix &matrix) {
     if(Rows() != matrix.Rows() || Columns() != matrix.Columns()) {
       std::string m = "Incompatible matrix dimensions, cannot add the matrices.";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
     TNT::Array2D<double> m(matrix.Rows(), matrix.Columns());
     for(int i = 0; i < m.dim1(); i++) {
@@ -136,7 +137,7 @@ namespace Isis {
   Matrix Matrix::Subtract(Matrix &matrix) {
     if(Rows() != matrix.Rows() || Columns() != matrix.Columns()) {
       std::string m = "Incompatible matrix dimensions, cannot subtract the matrices.";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
     TNT::Array2D<double> m(matrix.Rows(), matrix.Columns());
     for(int i = 0; i < m.dim1(); i++) {
@@ -155,7 +156,7 @@ namespace Isis {
   Matrix Matrix::MultiplyElementWise(Matrix &matrix) {
     if(Rows() != matrix.Rows() || Columns() != matrix.Columns()) {
       std::string m = "Incompatible matrix dimensions, cannot multiply the matrices.";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
     TNT::Array2D<double> m(matrix.Rows(), matrix.Columns());
     for(int i = 0; i < m.dim1(); i++) {
@@ -198,7 +199,7 @@ namespace Isis {
   Matrix Matrix::Inverse() {
     if(Rows() != Columns()) {
       std::string m = "Unable to calculate the inverse, the matrix is not square.";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
     TNT::Array2D<double> id(p_matrix.dim1(), p_matrix.dim2(), 0.0);
     for(int i = 0; i < p_matrix.dim1(); i++) id[i][i] = 1;
@@ -206,7 +207,7 @@ namespace Isis {
     JAMA::LU<double> lu(p_matrix);
     if(lu.det() == 0.0) {
       std::string m = "Cannot take the inverse of the matrix";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     return Matrix(lu.solve(id));
@@ -218,7 +219,7 @@ namespace Isis {
   std::vector<double> Matrix::Eigenvalues() {
     if(Rows() != Columns()) {
       std::string m = "Unable to calculate eigenvalues, the matrix is not square.";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
     JAMA::Eigenvalue<double> E(p_matrix);
     TNT::Array2D<double> D;
@@ -239,7 +240,7 @@ namespace Isis {
   Matrix Matrix::Eigenvectors() {
     if(Rows() != Columns()) {
       std::string m = "Unable to calculate eigenvectors, the matrix is not square.";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
     JAMA::Eigenvalue<double> E(p_matrix);
     TNT::Array2D<double> V;

@@ -22,7 +22,8 @@
  */
 #include <iostream>
 #include "BasisFunction.h"
-#include "iException.h"
+#include "IException.h"
+#include "iString.h"
 
 namespace Isis {
 
@@ -54,9 +55,9 @@ namespace Isis {
    */
   void BasisFunction::SetCoefficients(const std::vector<double> &coefs) {
     if((int)coefs.size() != p_numCoefs) {
-      std::string msg = "[coefs] does not match number of coefficients ";
+      iString msg = "[coefs] does not match number of coefficients ";
       msg += "in the basis equation";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     p_coefs = coefs;
   }
@@ -74,14 +75,14 @@ namespace Isis {
     if((int)vars.size() != p_numVars) {
       std::string msg = "[vars] does not match the number of variables ";
       msg += "in the basis equation";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     Expand(vars);
     if((int)p_terms.size() != p_numCoefs) {
       std::string msg = "Expansion of [terms] does not match number of ";
       msg += "coefficients in the basis equation";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     double result = 0.0;

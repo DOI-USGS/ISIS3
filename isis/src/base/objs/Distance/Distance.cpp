@@ -20,7 +20,7 @@
 #include "Distance.h"
 
 #include "Displacement.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "SpecialPixel.h"
 
@@ -180,7 +180,7 @@ namespace Isis {
     if(!isValid() || !otherDistance.isValid()) {
       iString msg = "Distance has not been initialized, you must initialize "
           "it first before comparing with another distance using [>]";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     return meters() > otherDistance.meters();
@@ -198,7 +198,7 @@ namespace Isis {
     if(!isValid() || !otherDistance.isValid()) {
       iString msg = "Distance has not been initialized, you must initialize "
           "it first before comparing with another distance using [<]";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     return meters() < otherDistance.meters();
@@ -393,15 +393,16 @@ namespace Isis {
         break;
 
       case Pixels:
-        iString msg = "Cannot distance with pixels, ask for another unit";
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+        iString msg = "Cannot call distance() with pixels, ask for another "
+                      "unit";
+        throw IException(IException::Programmer, msg, _FILEINFO_);
         break;
     }
 
     if(resultingDistance == Null) {
       iString msg = "Distance does not understand the enumerated value [" +
-        iString(distanceUnit) + "] as a unit";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+          iString(distanceUnit) + "] as a unit";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     return resultingDistance;
@@ -438,21 +439,21 @@ namespace Isis {
       case Pixels:
         iString msg = "Cannot setDistance with pixels, must convert to another "
             "unit first";
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+        throw IException(IException::Programmer, msg, _FILEINFO_);
         break;
     }
 
     if(distanceInMeters == Null) {
       iString msg = "Distance does not understand the enumerated value [" +
         iString(distanceUnit) + "] as a unit";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if (distanceInMeters < 0.0) {
       iString msg = "Negative distances are not supported, the value [" +
         iString(distanceInMeters) + " meters] cannot be stored in the Distance "
         "class";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     m_distanceInMeters = distanceInMeters;

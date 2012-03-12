@@ -24,7 +24,7 @@
 #include <sstream>
 #include "Filename.h"
 #include "Constants.h"
-#include "iException.h"
+#include "IException.h"
 #include "Parabola.h"
 
 namespace Isis {

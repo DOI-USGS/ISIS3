@@ -29,18 +29,18 @@ void IsisMain() {
   if(!mapGrp.HasKeyword("TargetName")) {
     string msg = "The given MAP [" + userMap.Name() +
                  "] does not have the TargetName keyword.";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
   else if(!mapGrp.HasKeyword("EquatorialRadius") ||
           !mapGrp.HasKeyword("PolarRadius")) {
     string msg = "The given MAP [" + userMap.Name() +
                  "] does not have the EquatorialRadius and PolarRadius keywords.";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
   else if(!mapGrp.HasKeyword("LongitudeDomain")) {
     string msg = "The given MAP [" + userMap.Name() +
                  "] does not have the LongitudeDomain keyword.";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
 
@@ -61,8 +61,8 @@ void IsisMain() {
   }
   else {
     string message = "Invalid option [" + option + "] for parameter COORDINATES";
-    throw iException::Message(iException::User, message, _FILEINFO_);
-  } 
+    throw IException(IException::User, message, _FILEINFO_);
+  }
 
   double res = 0.0;
   double scale = 0.0;
@@ -80,9 +80,9 @@ void IsisMain() {
   else {
     string msg = "The given MAP[" + userMap.Name() +
                  "] does not have the PixelResolution or Scale keywords.";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
-  
+
   //Read in line and sample inputs
   double line = ui.GetDouble("LINE");
   double samp = ui.GetDouble("SAMPLE");
@@ -117,8 +117,7 @@ void IsisMain() {
   try {
     cube.read(hist);
   }
-  catch(iException &e) {
-    e.Clear();
+  catch(IException &e) {
   }
   hist.AddEntry();
   cube.write(hist);

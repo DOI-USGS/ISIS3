@@ -88,8 +88,7 @@ void IsisMain() {
         Angle(0.2, Angle::Degrees), Angle(0.2, Angle::Degrees),
         &progress, Angle(0.1, Angle::Degrees), Angle(0.01, Angle::Degrees));
   }
-  catch(iException &e) {
-    e.Report(false);
-    e.Clear();
+  catch(IException &e) {
+    e.print();
   }
 }

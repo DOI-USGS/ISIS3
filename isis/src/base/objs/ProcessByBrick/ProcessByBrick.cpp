@@ -48,18 +48,18 @@ namespace Isis {
 
 
   /**
-   * Opens an input cube specified by the user and verifies requirements are 
-   * met. This method is overloaded and adds the requirements of 
-   * ISIS::SpatialMatch which requires all input cubes to have the same 
-   * dimensions or be exactly be exactly one.  For more information see 
-   * Process::SetInputCube 
+   * Opens an input cube specified by the user and verifies requirements are
+   * met. This method is overloaded and adds the requirements of
+   * ISIS::SpatialMatch which requires all input cubes to have the same
+   * dimensions or be exactly be exactly one.  For more information see
+   * Process::SetInputCube
    *
    *  @return Cube*
    *
-   * @param parameter User parameter to obtain file to open. Typically, the 
-   * value is "FROM". For example, the user can specify on the command line 
-   * FROM=myfile.cub and this method will attempt to open the cube "myfile.cub" 
-   * if the parameter was set to "FROM". 
+   * @param parameter User parameter to obtain file to open. Typically, the
+   * value is "FROM". For example, the user can specify on the command line
+   * FROM=myfile.cub and this method will attempt to open the cube "myfile.cub"
+   * if the parameter was set to "FROM".
    *
    * @param requirements See Process::SetInputCube for more information.
    *                     Defaults to 0
@@ -167,7 +167,7 @@ namespace Isis {
   void ProcessByBrick::SetInputBrickSize(int ns, int nl, int nb, int cube) {
     if(cube > (int)InputCubes.size()) {
       string m = "The specified cube is out of range";
-      throw iException::Message(iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     // If a default size has already been set, use it to fill in
@@ -226,12 +226,12 @@ namespace Isis {
   void ProcessByBrick::SetOutputBrickSize(int ns, int nl, int nb, int cube) {
     if(cube > (int)OutputCubes.size()) {
       string m = "The specified cube is out of range";
-      throw iException::Message(iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     // If a default size has already been set, use it to fill in
     if(p_outputBrickSamples.size() > 0) {
-      p_outputBrickSamples.resize(OutputCubes.size() + 1, 
+      p_outputBrickSamples.resize(OutputCubes.size() + 1,
                                   p_outputBrickSamples[0]);
       p_outputBrickLines.resize(OutputCubes.size() + 1, p_outputBrickLines[0]);
       p_outputBrickBands.resize(OutputCubes.size() + 1, p_outputBrickBands[0]);
@@ -283,7 +283,7 @@ namespace Isis {
    * cube be loaded. No output cubes are produced.
    *
    * @deprecated
-   * @param funct (Buffer &in) Receive an nxm brick in the input buffer. 
+   * @param funct (Buffer &in) Receive an nxm brick in the input buffer.
    *                                If n=1 and m=lines this will process by
    *                                columns. Likewise if n=samples and m=1 this
    *                                will process by lines.
@@ -364,7 +364,7 @@ namespace Isis {
    * cubes.
    *
    * @deprecated
-   * @param funct (vector<Buffer *> &in, vector<Buffer *> &out) 
+   * @param funct (vector<Buffer *> &in, vector<Buffer *> &out)
    *              Receive an nxm brick in the input buffer. If n=1 and m=lines
    *              this will process by columns.  Likewise if n=samples and m=1
    *              this will process by lines.
@@ -531,17 +531,17 @@ namespace Isis {
 
 
   /**
-   * Prepare and check to run "function" parameter for 
-   * StartProcess(void funct(Buffer &in)) and 
+   * Prepare and check to run "function" parameter for
+   * StartProcess(void funct(Buffer &in)) and
    * StartProcessInPlace(Functor funct)
    *
-   * @param cube - Pointer to input or output cube depending if the input 
-   *               cube is available 
+   * @param cube - Pointer to input or output cube depending if the input
+   *               cube is available
    * @param bricks - Pointer to first cube brick to be processed
    *
-   * @return bool - If input cube is available(true/false) 
+   * @return bool - If input cube is available(true/false)
    *
-   * @history 2011-04-22 Sharmila Prasad - Ported from 
+   * @history 2011-04-22 Sharmila Prasad - Ported from
    *                                StartProcess (void funct(Buffer
    *                                &in))
    */
@@ -549,7 +549,7 @@ namespace Isis {
     // Error checks
     if ((InputCubes.size() + OutputCubes.size()) != 1) {
       string m = "You can only specify exactly one input or output cube";
-      throw iException::Message(iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     bool haveInput;
@@ -558,17 +558,17 @@ namespace Isis {
       if (!p_inputBrickSizeSet) {
         string m = "Use the SetBrickSize() or SetInputBrickSize() method to set"
                    " the input brick size";
-        throw iException::Message(iException::Programmer, m, _FILEINFO_);
+        throw IException(IException::Programmer, m, _FILEINFO_);
       }
       // And the size is stored
       else if (p_inputBrickSamples.size() == 1) {
-        SetInputBrickSize(p_inputBrickSamples[0], p_inputBrickLines[0], 
+        SetInputBrickSize(p_inputBrickSamples[0], p_inputBrickLines[0],
                           p_inputBrickBands[0], 1);
       }
 
       haveInput = true;
       *cube = InputCubes[0];
-      *bricks = new Brick(**cube, p_inputBrickSamples[1], 
+      *bricks = new Brick(**cube, p_inputBrickSamples[1],
                                 p_inputBrickLines[1], p_inputBrickBands[1]);
     }
     else {
@@ -576,17 +576,17 @@ namespace Isis {
       if (!p_outputBrickSizeSet) {
         string m = "Use the SetBrickSize() or SetOutputBrickSize() method to "
                    "set the output brick size";
-        throw iException::Message(iException::Programmer, m, _FILEINFO_);
+        throw IException(IException::Programmer, m, _FILEINFO_);
       }
       // And the size is stored
       else if (p_outputBrickSamples.size() == 1) {
-        SetOutputBrickSize(p_outputBrickSamples[0], p_outputBrickLines[0], 
+        SetOutputBrickSize(p_outputBrickSamples[0], p_outputBrickLines[0],
                            p_outputBrickBands[0], 1);
       }
 
       haveInput = false;
       *cube = OutputCubes[0];
-      *bricks = new Brick(**cube, p_outputBrickSamples[1], 
+      *bricks = new Brick(**cube, p_outputBrickSamples[1],
                                 p_outputBrickLines[1], p_outputBrickBands[1]);
     }
 
@@ -595,8 +595,8 @@ namespace Isis {
 
 
   /**
-   * Prepare and check to run "function" parameter for 
-   * StartProcess(void funct(Buffer &in, Buffer &out)) and 
+   * Prepare and check to run "function" parameter for
+   * StartProcess(void funct(Buffer &in, Buffer &out)) and
    * StartProcessIO(Functor funct)
    *
    * @param ibrick - Pointer to first input cube brick
@@ -613,27 +613,27 @@ namespace Isis {
     // Error checks ... there must be one input and output
     if (InputCubes.size() != 1) {
       string m = "You must specify exactly one input cube";
-      throw iException::Message(iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
     else if (OutputCubes.size() != 1) {
       string m = "You must specify exactly one output cube";
-      throw iException::Message(iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     //  Make sure the brick size has been set
     if (!p_inputBrickSizeSet || !p_outputBrickSizeSet) {
       string m = "Use the SetBrickSize(), SetInputBrickSize(), or "
                  "SetOutputBrickSize() method to set the brick sizes";
-      throw iException::Message(iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     // Make all input and/or output cubes have the same size
     if (p_outputBrickSamples.size() == 1) {
-      SetOutputBrickSize(p_outputBrickSamples[0], p_outputBrickLines[0], 
+      SetOutputBrickSize(p_outputBrickSamples[0], p_outputBrickLines[0],
                          p_outputBrickBands[0], 1);
     }
     if (p_inputBrickSamples.size() == 1) {
-      SetInputBrickSize(p_inputBrickSamples[0], p_inputBrickLines[0], 
+      SetInputBrickSize(p_inputBrickSamples[0], p_inputBrickLines[0],
                         p_inputBrickBands[0], 1);
     }
 
@@ -641,9 +641,9 @@ namespace Isis {
     if (Wraps()) {
       // Use the size of each cube as the area for the bricks to traverse since
       // we will be wrapping if we hit the end of one, but not the other.
-      *ibrick = new Brick(*InputCubes[0], p_inputBrickSamples[1], 
+      *ibrick = new Brick(*InputCubes[0], p_inputBrickSamples[1],
                                 p_inputBrickLines[1], p_inputBrickBands[1]);
-      *obrick = new Brick(*OutputCubes[0], p_outputBrickSamples[1], 
+      *obrick = new Brick(*OutputCubes[0], p_outputBrickSamples[1],
                                 p_outputBrickLines[1], p_outputBrickBands[1]);
     }
     else {
@@ -684,8 +684,8 @@ namespace Isis {
 
 
   /**
-   * Prepare and check to run "function" parameter for 
-   * StartProcess(void funct(vector<Buffer *> &in, 
+   * Prepare and check to run "function" parameter for
+   * StartProcess(void funct(vector<Buffer *> &in,
    * vector<Buffer *> &out)), StartProcessIOList(Functor funct)
    *
    * @param ibufs - input buffer manager
@@ -695,9 +695,9 @@ namespace Isis {
    *
    * @return int  - Number of bricks
    *
-   * @history 2011-04-22 Sharmila Prasad - Ported from StartProcess 
+   * @history 2011-04-22 Sharmila Prasad - Ported from StartProcess
    *                         (void funct(vector<Buffer *> &in,
-   *                         vector<Buffer *> &out)) 
+   *                         vector<Buffer *> &out))
    */
   int ProcessByBrick::PrepProcessCubes(vector<Buffer *> & ibufs,
                                        vector<Buffer *> & obufs,
@@ -706,26 +706,26 @@ namespace Isis {
     // Make sure we had an image
     if(InputCubes.size() == 0 && OutputCubes.size() == 0) {
       string m = "You have not specified any input or output cubes";
-      throw iException::Message(iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     //  Make sure the brick size has been set
     if(!p_inputBrickSizeSet && InputCubes.size() > 0) {
       string m = "Use the SetBrickSize() or SetInputBrick() method to set the "
                  "input brick size(s)";
-      throw iException::Message(iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
     else if(p_inputBrickSizeSet && p_inputBrickSamples.size() == 1) {
-      SetInputBrickSize(p_inputBrickSamples[0], p_inputBrickLines[0], 
+      SetInputBrickSize(p_inputBrickSamples[0], p_inputBrickLines[0],
                         p_inputBrickBands[0], InputCubes.size());
     }
     if(!p_outputBrickSizeSet && OutputCubes.size() > 0) {
       string m = "Use the SetBrickSize() or SetOutputBrick() method to set the "
                  "output brick size(s)";
-      throw iException::Message(iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
     else if(p_outputBrickSizeSet && p_outputBrickSamples.size() == 1) {
-      SetOutputBrickSize(p_outputBrickSamples[0], p_outputBrickLines[0], 
+      SetOutputBrickSize(p_outputBrickSamples[0], p_outputBrickLines[0],
                          p_outputBrickBands[0], OutputCubes.size());
     }
 

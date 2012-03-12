@@ -26,7 +26,7 @@
 #include "Statistics.h"
 #include "Histogram.h"
 #include "Stretch.h"
-#include "iException.h"
+#include "IException.h"
 #include "Constants.h"
 
 namespace Isis {

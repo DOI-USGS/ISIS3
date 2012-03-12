@@ -3,7 +3,7 @@
 #include <iomanip>
 
 #include "VecFilter.h"
-#include "iException.h"
+#include "IException.h"
 #include "Preference.h"
 
 using namespace std;

@@ -25,7 +25,7 @@
 
 #include "Constants.h"
 #include "iString.h"
-#include "iException.h"
+#include "IException.h"
 #include "SpecialPixel.h"
 
 namespace Isis {
@@ -39,9 +39,9 @@ namespace Isis {
 
   /**
    * Constructs an angle object with the entered value and unit
-   *  
-   * @param angle The initial angle value in units of the unit parameter 
-   * @param unit  The unit of the initial angle (see Angle::Units) 
+   *
+   * @param angle The initial angle value in units of the unit parameter
+   * @param unit  The unit of the initial angle (see Angle::Units)
    */
   Angle::Angle(double angle, Units unit) {
     switch (unit) {
@@ -56,15 +56,15 @@ namespace Isis {
       default:
         iString msg = "Angle can not interpret the enumerated value ["  +
           iString(unit) + "] as a unit";
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+        throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
 
 
   /**
-   * Constructs an angle object from another Angle object 
+   * Constructs an angle object from another Angle object
    *
-   * @param fromAngle The angle object to copy on initialization 
+   * @param fromAngle The angle object to copy on initialization
    */
   Angle::Angle(const Angle& fromAngle) {
     m_radians = fromAngle.m_radians;
@@ -73,7 +73,7 @@ namespace Isis {
 
   /**
    * Destroys the angle object
-   *  
+   *
    */
   Angle::~Angle() {
     // Help prevent any accidental reuse of an Angle object
@@ -97,7 +97,7 @@ namespace Isis {
    *   the result will be an invalid angle.
    *
    * @param angle2 The angle to add to this angle
-   * @return sum angle 
+   * @return sum angle
    */
   Angle Angle::operator+(const Angle& angle2) const {
     if(!isValid() || !angle2.isValid()) return Angle();
@@ -160,7 +160,7 @@ namespace Isis {
     * Divide this angle by a double
     *
     * @param value The double value to use as the divisor
-    * @return Quotient of the angles 
+    * @return Quotient of the angles
     */
   Angle Angle::operator/(double value) const {
     if(!isValid()) return Angle();
@@ -186,14 +186,14 @@ namespace Isis {
    * Test if the other angle is less than the current angle. If either is
    *   invalid, then an exception will be thrown.
    *
-   * @param angle2 The comparison angle (on right-hand-side of < operator) 
-   * @return True if the angle is less than the comparision angle 
+   * @param angle2 The comparison angle (on right-hand-side of < operator)
+   * @return True if the angle is less than the comparision angle
    */
   bool Angle::operator<(const Angle& angle2) const {
     if(!isValid() || !angle2.isValid()) {
       iString msg = "Cannot compare a invalid angles with the < operator";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
-    } 
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
 
     return (angle(Radians) < angle2.angle(Radians));
   }
@@ -203,14 +203,14 @@ namespace Isis {
    * Test if the other angle is greater than the current angle. If either is
    *   invalid, then an exception will be thrown.
    *
-   * @param angle2 The comparison angle (on right-hand-side of > operator) 
-   * @return True if the angle is greater than the comparision angle 
+   * @param angle2 The comparison angle (on right-hand-side of > operator)
+   * @return True if the angle is greater than the comparision angle
    */
   bool Angle::operator>(const Angle& angle2) const {
     if(!isValid() || !angle2.isValid()) {
       iString msg = "Cannot compare a invalid angles with the > operator";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
-    } 
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
 
     return (angle(Radians) > angle2.angle(Radians));
   }
@@ -224,7 +224,7 @@ namespace Isis {
    */
   iString Angle::text(bool printUnits) const {
     iString textResult = "(N/A)";
-      
+
     if (isValid()) {
       textResult = iString(degrees());
 
@@ -258,13 +258,13 @@ namespace Isis {
 
     iString msg = "Angle can not interpret the enumerated value ["  +
       iString(unit) + "] as a unit";
-    throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
 
   /**
    * Return angle value in desired units
-   *  
+   *
    * @param unit Desired units of the angle (see Angle::Units)
    * @return  angle value in specified units
    */
@@ -289,7 +289,7 @@ namespace Isis {
     if(angleValue == Null) {
       iString msg = "Angle can not interpret the enumerated value ["  +
         iString(unit) + "] as a unit";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     return angleValue;
@@ -299,14 +299,14 @@ namespace Isis {
   /**
    * Set angle value in desired units
    *
-   * @param angle The angle value in units of the unit parameter 
+   * @param angle The angle value in units of the unit parameter
    * @param unit  Desired units of the angle (see Angle::Units)
    */
   void Angle::setAngle(const double &angle,const Units& unit) {
     // Don't allow non-Null special pixels, Null means no value
     if (IsSpecial(angle) && angle != Null) {
       iString msg = "Angle cannot be a non-Null special pixel";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     // Don't do math on special pixels
@@ -327,7 +327,7 @@ namespace Isis {
       default:
         iString msg = "Angle can not interpret the enumerated value ["  +
           iString(unit) + "] as a unit";
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+        throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
 

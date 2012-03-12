@@ -23,7 +23,7 @@
 
 #include "Application.h"
 #include "FilterCachingAlgorithm.h"
-#include "iException.h"
+#include "IException.h"
 #include "LineManager.h"
 #include "Preference.h"
 #include "QuickFilter.h"
@@ -44,37 +44,37 @@ namespace Isis {
    * @param funct (Isis::Buffer &in, Isis::Buffer &out, Isis::QuickFilter &filter)
    *              Name of your processing function
    *
-   * @throws Isis::iException::Programmer
+   * @throws Isis::IException::Programmer
    */
   void ProcessByQuickFilter::StartProcess(void
                                           funct(Isis::Buffer &in, Isis::Buffer &out, Isis::QuickFilter &filter)) {
     // Error checks ... there must be one input and output
     if(InputCubes.size() != 1) {
       string m = "StartProcess only supports exactly one input file";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     if(OutputCubes.size() != 1) {
       string m = "StartProcess only supports exactly one output file";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     // The lines in the input and output must match
     if(InputCubes[0]->getLineCount() != OutputCubes[0]->getLineCount()) {
       string m = "The lines in the input and output cube must match";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     // The samples in the input and output must match
     if(InputCubes[0]->getSampleCount() != OutputCubes[0]->getSampleCount()) {
       string m = "The samples in the input and output cube must match";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     // The bands in the input and output must match
     if(InputCubes[0]->getBandCount() != OutputCubes[0]->getBandCount()) {
       string m = "The bands in the input and output cube must match";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     // Construct line buffer managers
@@ -93,12 +93,12 @@ namespace Isis {
     // Make sure the boxcar widht and height aren't too big for the image
     if(lines * 2 - 1 < p_boxcarLines) {
       string msg = "Boxcar height is too big for cube size";
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     if(samples * 2 - 1 < p_boxcarSamples) {
       string msg = "Boxcar width is too big for cube size";
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     InputCubes[0]->addCachingAlgorithm(new FilterCachingAlgorithm(3));

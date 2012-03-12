@@ -29,7 +29,7 @@
 
 #include <string>
 #include "LeastSquares.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 
 namespace Isis {
@@ -57,8 +57,7 @@ namespace Isis {
       if (sparseRows == 0  ||  sparseCols == 0) {
         std::string msg = "If solving using sparse matrices, you must enter";
         msg += " the number of rows/columns";
-        throw Isis::iException::Message(Isis::iException::Programmer, msg,
-                                        _FILEINFO_);
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
 #if !defined(__sun__)
@@ -106,7 +105,7 @@ namespace Isis {
    *               than 1 increases residual for this known, while weight greater
    *               than 1 decreases the residual for this known.
    *
-   * @throws Isis::iException::Programmer - Number of elements in data does not
+   * @throws Isis::IException::Programmer - Number of elements in data does not
    *                                        match basis requirements
    *
    * @internal
@@ -121,7 +120,7 @@ namespace Isis {
     if((int) data.size() != p_basis->Variables()) {
       std::string msg = "Number of elements in data does not match basis [" +
                         p_basis->Name() + "] requirements";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     p_expected.push_back(result);
@@ -187,7 +186,7 @@ namespace Isis {
     if((row >= Rows()) || (row < 0)) {
       std::string msg = "Index out of bounds ";
       msg += "[Given = " + Isis::iString(row) + "]";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     return p_input[row];
   }
@@ -203,7 +202,7 @@ namespace Isis {
     if((row >= Rows()) || (row < 0)) {
       std::string msg = "Index out of bounds ";
       msg += "[Given = " + Isis::iString(row) + "]";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     return p_expected[row];
   }
@@ -243,7 +242,7 @@ namespace Isis {
       p_solved = false;
       std::string msg = "No solution available because no input data was "
                         "provided";
-      throw Isis::iException::Message(Isis::iException::Math, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     if(method == SVD) {
@@ -331,7 +330,7 @@ namespace Isis {
       msg += "Not enough knowns or knowns are co-linear ... ";
       msg += "[Unknowns = " + Isis::iString(p_basis->Coefficients()) + "] ";
       msg += "[Knowns = " + Isis::iString(coefs.dim1()) + "]";
-      throw Isis::iException::Message(Isis::iException::Math, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     // Set the coefficients in our basis equation
@@ -401,7 +400,7 @@ namespace Isis {
     int full = qr.isFullRank();
     if(full == 0) {
       std::string msg = "Not full rank";
-      throw Isis::iException::Message(Isis::iException::Math, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     TNT::Array1D<double> coefs = qr.solve(b);
@@ -428,19 +427,19 @@ namespace Isis {
    * @brief  Solve using sparse class
    *
    * After all the data has been registered through AddKnown, invoke this
-   * method to solve the system of equations Nx = b, where 
-   *  
-   * N = ATPA 
+   * method to solve the system of equations Nx = b, where
+   *
+   * N = ATPA
    * b = ATPl, and
-   *  
-   * N is the "normal equations matrix; 
-   * A is the so-called "design" matrix; 
-   * P is the observation weight matrix (typically diagonal); 
+   *
+   * N is the "normal equations matrix;
+   * A is the so-called "design" matrix;
+   * P is the observation weight matrix (typically diagonal);
    * l is the "computed - observed" column vector;
-   *  
+   *
    * The solution is achieved using a sparse matrix formulation of
-   * the LU decomposition of the normal equations. 
-   *  
+   * the LU decomposition of the normal equations.
+   *
    * You can then use the Evaluate and Residual methods freely.
    *
    * @internal
@@ -452,9 +451,9 @@ namespace Isis {
    *                          column number of a column that contained all zeros.
    * @history 2009-12-21  Jeannie Walldren - Changed variable name
    *          from p_weight to p_sqrtweight.
-   * @history 2010        Ken Edmundson 
+   * @history 2010        Ken Edmundson
    * @history 2010-11-20  Debbie A. Cook Merged Ken Edmundson verion with system version
-   * @history 2011-03-17  Ken Edmundson Corrected computation of residuals 
+   * @history 2011-03-17  Ken Edmundson Corrected computation of residuals
    *
    */
 #if !defined(__sun__)
@@ -506,7 +505,7 @@ namespace Isis {
 
     // solve with decomposed normals and right hand side
     // int perm = 0;  //  use natural ordering
-    int perm = 2;     //  confirm meaning and necessity of 
+    int perm = 2;     //  confirm meaning and necessity of
 //  double recond;    //  variables perm and recond
     p_SLU_Factor.solve(p_xSparse,gmm::mat_const_col(p_ATb,0), perm);
 
@@ -598,7 +597,7 @@ namespace Isis {
     printf("Sigma0 = %20.10lf\nNumber of Observations = %d\nNumber of Parameters = %d\nNumber of Constrained Parameters = %d\nDOF = %d\n",p_sigma0,p_sparseRows,p_sparseCols,p_constrainedParameters,p_degreesOfFreedom);
 //    printf("printing residuals\n");
 //    for( int k = 0; k < p_sparseRows; k++ )
-//    {  
+//    {
 //      printf("%lf %lf\n",p_residuals[k],p_residuals[k+1]);
 //      k++;
 //    }
@@ -609,54 +608,54 @@ namespace Isis {
   }
 #endif
 
-  /** 
-   * @brief  Error propagation for sparse least-squares solution 
-   *  
-   * Computes the variance-covariance matrix of the parameters. 
-   * This is the inverse of the normal equations matrix, scaled by 
-   * the reference variance (also called variance of unit weight, 
-   * etc). 
-   *  
-   * @internal 
-   * @history  2009-11-19 Ken Edmundson, New method 
-   *  
-   * Notes: 
-   *  
-   * 1) The SLU_Factor (Super LU Factor) has already been 
-   * factorised in each iteration but there is no gmm++ method to 
-   * get the inverse of the sparse matrix implementation. so we 
-   * have to get it ourselves. This is don by solving the 
+  /**
+   * @brief  Error propagation for sparse least-squares solution
+   *
+   * Computes the variance-covariance matrix of the parameters.
+   * This is the inverse of the normal equations matrix, scaled by
+   * the reference variance (also called variance of unit weight,
+   * etc).
+   *
+   * @internal
+   * @history  2009-11-19 Ken Edmundson, New method
+   *
+   * Notes:
+   *
+   * 1) The SLU_Factor (Super LU Factor) has already been
+   * factorised in each iteration but there is no gmm++ method to
+   * get the inverse of the sparse matrix implementation. so we
+   * have to get it ourselves. This is don by solving the
    * factorized normals repeatedly with right-hand sides that are
-   * the columns of the identity matrix (which is how gmm - or 
-   * anybody else would do it). 
-   *  
+   * the columns of the identity matrix (which is how gmm - or
+   * anybody else would do it).
+   *
    * 2) We should create our own matrix library, probably wrapping
-   * the gmm++ library (and perhaps other(s) that may have 
-   * additional desired functionality). The inverse function 
-   * should be part of the library, along with the capacity for 
-   * triangular storage and other decomposition techniques - 
-   * notably Cholesky. 
-   *  
-   * 3) The LU decomposition can be be performed even if the 
-   * normal equations are singular. But, we should always be 
-   * dealing with a positive-definite matrix (for the bundle 
+   * the gmm++ library (and perhaps other(s) that may have
+   * additional desired functionality). The inverse function
+   * should be part of the library, along with the capacity for
+   * triangular storage and other decomposition techniques -
+   * notably Cholesky.
+   *
+   * 3) The LU decomposition can be be performed even if the
+   * normal equations are singular. But, we should always be
+   * dealing with a positive-definite matrix (for the bundle
    * adjustment). Cholesky is faster, more efficient, and requires
-   * a positive-definite matrix, so if it fails, it is an 
-   * indication of a singular matrix - bottom line - we should be 
-   * using Cholesky. Or a derivative of Cholesky, i.e., UTDU 
-   * (LDLT). 
-   *  
-   * 4) As a consequence of 3), we should be checking for 
-   * positive-definite state of the normals, perhaps via the 
-   * matrix determinant, prior to solving. There is a check in 
-   * place now that checks to see if a column of the design matrix 
-   * (or basis?) is all zero. This is equivalent - if a set of 
-   * vectors contains the zero vector, then the set is linearly 
-   * dependent, and the matrix is not positive-definite. In 
-   * Jigsaw, the most likely cause of the normals being 
-   * non-positive-definite probably is failure to establish the 
-   * datum (i.e. constraining a minimum of seven parameters - 
-   * usually 3 coordinates of two points and 1 of a third). 
+   * a positive-definite matrix, so if it fails, it is an
+   * indication of a singular matrix - bottom line - we should be
+   * using Cholesky. Or a derivative of Cholesky, i.e., UTDU
+   * (LDLT).
+   *
+   * 4) As a consequence of 3), we should be checking for
+   * positive-definite state of the normals, perhaps via the
+   * matrix determinant, prior to solving. There is a check in
+   * place now that checks to see if a column of the design matrix
+   * (or basis?) is all zero. This is equivalent - if a set of
+   * vectors contains the zero vector, then the set is linearly
+   * dependent, and the matrix is not positive-definite. In
+   * Jigsaw, the most likely cause of the normals being
+   * non-positive-definite probably is failure to establish the
+   * datum (i.e. constraining a minimum of seven parameters -
+   * usually 3 coordinates of two points and 1 of a third).
    */
 #if !defined(__sun__)
   bool LeastSquares::SparseErrorPropagation ()
@@ -739,13 +738,13 @@ namespace Isis {
    *
    * @return The evaluation for the input variable.
    *
-   * @throws Isis::iException::Programmer - Unable to evaluate until a
+   * @throws Isis::IException::Programmer - Unable to evaluate until a
    *                                        solution has been computed
    */
   double LeastSquares::Evaluate(const std::vector<double> &data) {
     if(!p_solved) {
       std::string msg = "Unable to evaluate until a solution has been computed";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     return p_basis->Evaluate(data);
   }
@@ -756,13 +755,13 @@ namespace Isis {
    *
    * @return The vector of residuals.
    *
-   * @throws Isis::iException::Programmer - Unable to return residuals until a
+   * @throws Isis::IException::Programmer - Unable to return residuals until a
    *                                        solution has been computed
    */
   std::vector<double> LeastSquares::Residuals() const {
     if(!p_solved) {
       std::string msg = "Unable to return residuals until a solution has been computed";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     return p_residuals;
   }
@@ -776,13 +775,13 @@ namespace Isis {
    *
    * @return The output value of the residual.
    *
-   * @throws Isis::iException::Programmer - Unable to return residuals until a
+   * @throws Isis::IException::Programmer - Unable to return residuals until a
    *                                        solution has been computed
    */
   double LeastSquares::Residual(int i) const {
     if(!p_solved) {
       std::string msg = "Unable to return residuals until a solution has been computed";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     return p_residuals[i];
   }

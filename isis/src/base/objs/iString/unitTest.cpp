@@ -1,7 +1,7 @@
 #include <iostream>
 #include <sstream>
 #include "iString.h"
-#include "iException.h"
+#include "IException.h"
 #include "Preference.h"
 
 using namespace std;
@@ -80,8 +80,8 @@ int main(int argc, char *argv[]) {
     try {
       str8.ToInteger();
     }
-    catch(Isis::iException &error) {
-      error.Report(false);
+    catch(Isis::IException &error) {
+      error.print();
     }
 
     Isis::iString str8a = Isis::BigInt(9876543210LL);
@@ -91,8 +91,8 @@ int main(int argc, char *argv[]) {
     try {
       str8a.ToBigInteger();
     }
-    catch(Isis::iException &error) {
-      error.Report(false);
+    catch(Isis::IException &error) {
+      error.print();
     }
 
     Isis::iString str9 = 9876.54321;
@@ -102,8 +102,8 @@ int main(int argc, char *argv[]) {
     try {
       str9.ToDouble();
     }
-    catch(Isis::iException &error) {
-      error.Report(false);
+    catch(Isis::IException &error) {
+      error.print();
     }
 
     Isis::iString str10 = "123.0E45";
@@ -239,8 +239,8 @@ int main(int argc, char *argv[]) {
     cout << "After Replace (dont honor quotes) >" << str31a <<  "<" << endl;
 
   }
-  catch(Isis::iException &error) {
-    error.Report(false);
+  catch(Isis::IException &error) {
+    error.print();
   }
 
   //Tests for static functions untested above
@@ -282,7 +282,7 @@ int main(int argc, char *argv[]) {
     }
 
   }
-  catch(Isis::iException &error) {
-    error.Report(false);
+  catch(Isis::IException &error) {
+    error.print();
   }
 }

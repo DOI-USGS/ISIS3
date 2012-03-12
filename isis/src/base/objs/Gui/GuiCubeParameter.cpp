@@ -40,7 +40,7 @@
 #include "GuiCubeParameter.h"
 #include "GuiInputAttribute.h"
 #include "GuiOutputAttribute.h"
-#include "iException.h"
+#include "IException.h"
 #include "ProgramLauncher.h"
 #include "Pvl.h"
 #include "UserInterface.h"
@@ -50,7 +50,7 @@ namespace Isis {
 
   /**
    * @brief Constructs GuiCubeParameter object
-   * 
+   *
    * @param grid Pointer to QGridLayout
    * @param ui User interface object
    * @param group Index of group
@@ -137,8 +137,8 @@ namespace Isis {
     return;
   }
 
-  /** 
-   * Opens cube in qview. 
+  /**
+   * Opens cube in qview.
    * @throws Isis::Exception::User "You must enter a cube name to open"
    */
   void GuiCubeParameter::ViewCube() {
@@ -159,15 +159,15 @@ namespace Isis {
       // Throw an error if no cube name was entered
       else {
         std::string msg = "You must enter a cube name to open";
-        throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
     }
-    catch(Isis::iException &e) {
+    catch(IException &e) {
       Isis::iApp->GuiReportError(e);
     }
   }
 
-  /** 
+  /**
    * Displays cube label in the GUI log.
    * @throws Isis::Exception::User "You must enter a cube name to open"
    */
@@ -191,10 +191,10 @@ namespace Isis {
       }
       else {
         std::string msg = "You must enter a cube name to open";
-        throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
     }
-    catch(Isis::iException &e) {
+    catch(IException &e) {
       Isis::iApp->GuiReportError(e);
     }
 

@@ -24,7 +24,7 @@
 
 #include "Camera.h"
 #include "Plugin.h"
-#include "iException.h"
+#include "IException.h"
 #include "Filename.h"
 
 using namespace std;
@@ -72,7 +72,7 @@ namespace Isis {
         string msg = "The camera model used to create a camera for this cube is out of date, " \
                      "please re-run spiceinit on the file or process with an old Isis version " \
                      "that has the correct camera model.";
-        throw Isis::iException::Message(Isis::iException::System, msg, _FILEINFO_);
+        throw IException(IException::Unknown, msg, _FILEINFO_);
       }
 
       // See if we have a camera model plugin
@@ -80,11 +80,11 @@ namespace Isis {
       try {
         ptr = m_cameraPlugin.GetPlugin(group);
       }
-      catch(Isis::iException &e) {
+      catch(IException &e) {
         string msg = "Unsupported camera model, unable to find plugin for ";
         msg += "SpacecraftName [" + spacecraft + "] with InstrumentId [";
         msg += name + "]";
-        throw Isis::iException::Message(Isis::iException::System, msg, _FILEINFO_);
+        throw IException(e, IException::Unknown, msg, _FILEINFO_);
       }
 
       // Now cast that pointer in the proper way
@@ -94,9 +94,9 @@ namespace Isis {
       // Create the projection as requested
       return (*plugin)(lab);
     }
-    catch(Isis::iException &e) {
+    catch(IException &e) {
       string message = "Unable to initialize camera model from group [Instrument]";
-      throw Isis::iException::Message(Isis::iException::Camera, message, _FILEINFO_);
+      throw IException(e, IException::Unknown, message, _FILEINFO_);
     }
   }
 
@@ -140,23 +140,23 @@ namespace Isis {
       try {
         plugin = m_cameraPlugin.FindGroup(group);
       }
-      catch(iException &e) {
+      catch(IException &e) {
         string msg = "Unsupported camera model, unable to find plugin for ";
         msg += "SpacecraftName [" + spacecraft + "] with InstrumentId [";
         msg += name + "]";
-        throw Isis::iException::Message(Isis::iException::Camera, msg, _FILEINFO_);
+        throw IException(e, IException::Unknown, msg, _FILEINFO_);
       }
 
       if(!plugin.HasKeyword("Version")) {
         string msg = "Camera model identified by [" + group + "] does not have a version number";
-        throw Isis::iException::Message(Isis::iException::Camera, msg, _FILEINFO_);
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
       return (int)plugin["Version"];
     }
-    catch(Isis::iException &e) {
+    catch(IException &e) {
       string msg = "Unable to locate latest camera model version number from group [Instrument]";
-      throw Isis::iException::Message(Isis::iException::Camera, msg, _FILEINFO_);
+      throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
   }
 } // end namespace isis

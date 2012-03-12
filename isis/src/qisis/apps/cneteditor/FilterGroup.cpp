@@ -12,7 +12,7 @@
 #include <QString>
 #include <QVBoxLayout>
 
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 
 #include "AbstractFilterSelector.h"
@@ -332,7 +332,7 @@ namespace Isis
         }
 
         iString msg = "Assignment of FilterGroup failed";
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
       return *this;

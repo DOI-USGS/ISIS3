@@ -3,7 +3,7 @@
 #include "Isotropic2.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 
 using std::min;
@@ -208,7 +208,7 @@ namespace Isis {
     else {
       std::string msg = "Negative length of planetary curvature ";
       msg += "encountered";
-      throw iException::Message(iException::Math, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     xx = mup;
@@ -222,7 +222,7 @@ namespace Isis {
     }
     else {
       std::string msg = "Negative length of planetary curvature encountered";
-      throw iException::Message(iException::Math, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     xmunot = 1.0 + p_wha2 * f1mmunot + p_delta * munotp * (1.0 - emunot);

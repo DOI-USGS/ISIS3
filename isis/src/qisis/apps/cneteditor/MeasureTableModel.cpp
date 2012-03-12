@@ -12,7 +12,7 @@
 #include "ControlMeasure.h"
 #include "ControlMeasure.h"
 #include "Distance.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "Latitude.h"
 #include "Longitude.h"

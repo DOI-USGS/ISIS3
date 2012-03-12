@@ -4,7 +4,7 @@
 
 #include <QCoreApplication>
 
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "TextFile.h"
 
@@ -79,7 +79,7 @@ namespace Isis {
     }
     else {
       iString msg = "$ISISROOT/version line 1, no valid text found";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if (validPartOfLine.indexIn(line2) != -1) {
@@ -87,7 +87,7 @@ namespace Isis {
     }
     else {
       iString msg = "$ISISROOT/version line 2, no valid text found";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if (validPartOfLine.indexIn(line4) != -1) {
@@ -95,7 +95,7 @@ namespace Isis {
     }
     else {
       iString msg = "$ISISROOT/version line 4, no valid text found";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     return line1 + " " + line4 + " | " + line2;

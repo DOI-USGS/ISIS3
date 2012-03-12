@@ -26,7 +26,7 @@
 #include <cfloat>
 #include <QString>
 #include "iString.h"
-#include "iException.h"
+#include "IException.h"
 
 namespace Isis {
 
@@ -393,15 +393,15 @@ namespace Isis {
     }
     if(matches > 1) {
       std::string msg = "Input [" + str + "] is not a unique abbreviation. Use " + s + "I or " + s + "R.";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     if(matches == 0) {
       try {
         return s.ToDouble();
       }
-      catch(iException &e) {
+      catch(IException &e) {
         std::string msg = "Input [" + str + "] does not appear to be a legal special pixel abbreviation or double value.";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(e, IException::User, msg, _FILEINFO_);
       }
     }
     if(s[0] == 'N') return Null;

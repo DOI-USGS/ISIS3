@@ -10,7 +10,7 @@
 
 #include "UserInterface.h"
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "iTime.h"
 #include "Buffer.h"
 #include "TextFile.h"
@@ -79,17 +79,17 @@ void IsisMain() {
     id = (string) lab.FindKeyword("MISSION_NAME");
     projected = lab.HasObject("IMAGE_MAP_PROJECTION");
   }
-  catch(iException &e) {
+  catch(IException &e) {
     string msg = "Unable to read [MISSION] from input file [" +
                  inFile.Expanded() + "]";
-    throw iException::Message(iException::Io, msg, _FILEINFO_);
+    throw IException(e, IException::Io, msg, _FILEINFO_);
   }
 
   //Checks if in file is rdr
   if(projected) {
     string msg = "[" + inFile.Name() + "] appears to be an rdr file.";
     msg += " Use pds2isis.";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   id.ConvertWhiteSpace();
@@ -98,7 +98,7 @@ void IsisMain() {
   if(id != "MESSENGER") {
     string msg = "Input file [" + inFile.Expanded() + "] does not appear to be " +
                  "in MESSENGER EDR format. MISSION_NAME is [" + id + "]";
-    throw iException::Message(iException::Io, msg, _FILEINFO_);
+    throw IException(IException::Io, msg, _FILEINFO_);
   }
 
   std::string target;
@@ -314,7 +314,7 @@ int CreateFilterSpecs(const std::string &instId, int filter_code,
     //  Not the expected instrument
     string msg = "Unknown InstrumentId [" + instId + "], image does not " +
                  "appear to be from the MESSENGER/MDIS Camera";
-    throw iException::Message(iException::Io, msg, _FILEINFO_);
+    throw IException(IException::Io, msg, _FILEINFO_);
   }
 
   if(!name.empty()) {
@@ -338,11 +338,11 @@ void UnlutData(Buffer &data) {
   for(int i = 0; i < data.size(); i++) {
     int dnvalue = (int)(data[i] + 0.5);
     if(dnvalue < 0 || dnvalue > 255) {
-      throw iException::Message(iException::User,
-                                "In the input file a value of [" +
-                                iString(data[i]) +
-                                "] was found. Unlutted images should only contain values 0 to 255.",
-                                _FILEINFO_);
+      throw IException(IException::User,
+                       "In the input file a value of [" +
+                       iString(data[i]) +
+                       "] was found. Unlutted images should only contain values 0 to 255.",
+                       _FILEINFO_);
     }
 
     out[i] = lut[dnvalue];
@@ -366,7 +366,7 @@ LutTable LoadLut(Pvl &label, std::string &tableused, std::string &froot) {
     std::ostringstream mess;
     mess << "MDIS LUT Inversion table, " << tableFile.Expanded()
          << ", should contain 256 rows but has " << nRows;
-    throw iException::Message(iException::User, mess.str(), _FILEINFO_);
+    throw IException(IException::User, mess.str(), _FILEINFO_);
   }
 
   int nCols = csv.columns();
@@ -374,7 +374,7 @@ LutTable LoadLut(Pvl &label, std::string &tableused, std::string &froot) {
     std::ostringstream mess;
     mess << "MDIS LUT Inversion table, " << tableFile.Expanded()
          << ", should contain 9 columns but has " << nCols;
-    throw iException::Message(iException::User, mess.str(), _FILEINFO_);
+    throw IException(IException::User, mess.str(), _FILEINFO_);
   }
 
   LutTable mlut(nRows, Null); // 8 bit => 12 bit, 2^8 = 256 conversion values
@@ -391,7 +391,7 @@ LutTable LoadLut(Pvl &label, std::string &tableused, std::string &froot) {
       mess << "Index (" << dn8 << ") at line " << i + 1
            << " is invalid inMDIS LUT Inversion table "
            << tableFile.Expanded() << " - valid range is 0 <= index < 256!";
-      throw iException::Message(iException::User, mess.str(), _FILEINFO_);
+      throw IException(IException::User, mess.str(), _FILEINFO_);
     }
 
     double dn16 = ToDouble(row[tableRow]);

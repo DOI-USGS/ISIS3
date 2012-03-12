@@ -36,7 +36,7 @@
 #include "LeastSquares.h"
 #include "LowPassFilter.h"
 #include "MultivariateStatistics.h"
-#include "iException.h"
+#include "IException.h"
 
 using namespace std;
 

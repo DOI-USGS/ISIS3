@@ -10,7 +10,7 @@
 #include "Camera.h"
 #include "NaifStatus.h"
 #include "iString.h"
-#include "iException.h"
+#include "IException.h"
 #include "iTime.h"
 #include "LineScanCameraDetectorMap.h"
 #include "CameraFocalPlaneMap.h"
@@ -46,14 +46,14 @@ namespace Isis {
 
       // Set proper end frame
       int virFrame(0);
-      if (channelId == "VIS") { 
+      if (channelId == "VIS") {
         // Frame DAWN_VIR_VIS : DAWN_VIR_VIS_ZERO
-        virFrame = (hasArtCK) ? -203211 : -203221; 
+        virFrame = (hasArtCK) ? -203211 : -203221;
       }
       else { // (channelId == "IR)
         // Frame DAWN_VIR_IR : DAWN_VIR_IR_ZERO
-        virFrame = (hasArtCK) ? -203213 : -203223; 
-      } 
+        virFrame = (hasArtCK) ? -203213 : -203223;
+      }
 
       InstrumentRotation()->SetFrame(virFrame);
 
@@ -140,16 +140,16 @@ namespace Isis {
 
 
    /**
-    * @brief Scrubs a string coming out of the housekeeping table 
-    *  
-    * This routine is needed to clean up strings from the housekeeping table. 
-    * There apparently are extraneous characters in the text fields in this 
-    * table. 
-    *  
-    * This method removes all non-printable characters and the space character. 
-    * 
+    * @brief Scrubs a string coming out of the housekeeping table
+    *
+    * This routine is needed to clean up strings from the housekeeping table.
+    * There apparently are extraneous characters in the text fields in this
+    * table.
+    *
+    * This method removes all non-printable characters and the space character.
+    *
     * @param text         String to scrub
-    * 
+    *
     * @return std::string Returns scrubs strings
     */
    std::string DawnVirCamera::scrub(const std::string &text) const {
@@ -170,7 +170,7 @@ namespace Isis {
      return (m_exposureTime);
    }
 
-   /** Return the line scan rate */ 
+   /** Return the line scan rate */
    double DawnVirCamera::scanLineTime() const {
      return (m_scanRate);
    }
@@ -213,8 +213,8 @@ namespace Isis {
    *
    * @history 2011-07-22 Kris Becker
    */
-   void DawnVirCamera::readHouseKeeping(const std::string &filename, 
-                                       double lineRate) { 
+   void DawnVirCamera::readHouseKeeping(const std::string &filename,
+                                       double lineRate) {
     //  Open the ISIS table object
     Table hktable("VIRHouseKeeping", filename);
 
@@ -231,7 +231,7 @@ namespace Isis {
       double mirrorCos = trec["MirrorCos"];
       double scanElecDeg = atan(mirrorSin/mirrorCos) * dpr_c();
       double optAng = ((scanElecDeg - 3.7996979) * 0.25/0.257812);
-      optAng /= 1000.0;  
+      optAng /= 1000.0;
 
 
       ScanMirrorInfo smInfo;
@@ -244,13 +244,13 @@ namespace Isis {
       if ( ! isDark ) {  angFit.AddData(lineno, optAng);   }
 
 #if defined(DUMP_INFO)
-      cout << "Line(" << ((isDark) ? "C): " : "O): ") << i 
-           << ", OptAng(D): " << setprecision(12) << optAng * dpr_c() 
+      cout << "Line(" << ((isDark) ? "C): " : "O): ") << i
+           << ", OptAng(D): " << setprecision(12) << optAng * dpr_c()
            << ", MidExpTime(ET): " <<  lineMidTime
            << "\n";
 #endif
 
-      // Store line, 
+      // Store line,
       smInfo.m_lineNum = lineno;
       smInfo.m_scanLineEt = lineMidTime;
       smInfo.m_mirrorSin = mirrorSin;
@@ -259,8 +259,8 @@ namespace Isis {
       smInfo.m_isDarkCurrent = isDark;
 
       if ((!m_is1BCalibrated) || (!(m_is1BCalibrated && isDark))) {
-        m_lineRates.push_back(LineRateChange(lineno, 
-                                             lineStartTime(lineMidTime), 
+        m_lineRates.push_back(LineRateChange(lineno,
+                                             lineStartTime(lineMidTime),
                                              lineRate));
         m_mirrorData.push_back(smInfo);
         lineno++;
@@ -286,9 +286,9 @@ namespace Isis {
     //  Gut check on housekeeping contents and cube lines
     if ((int) m_lineRates.size() != Lines()) {
       ostringstream mess;
-      mess << "Number housekeeping lines determined (" << m_lineRates.size() 
+      mess << "Number housekeeping lines determined (" << m_lineRates.size()
            << ") is not equal to image lines(" << Lines() << ")";
-      throw iException::Message(iException::Programmer, mess.str(), _FILEINFO_);
+      throw IException(IException::Programmer, mess.str(), _FILEINFO_);
     }
   }
 
@@ -323,7 +323,7 @@ namespace Isis {
     record += av2;
     record += av3;
     record += t;
-  
+
     // Get pointing table
     Table quats("SpiceRotation", record);
     int nfields = record.Fields();
@@ -352,7 +352,7 @@ namespace Isis {
         eulang[1] = -optAng;
         eul2xf_c(eulang, 1, 2, 3, xform);
         mxmg_c(xform, &state[0][0], 6, 6, 6, xform2);
-      
+
         // Transform to output format
         xf2rav_c(xform2, m, av);  // Transfers AV to output q_av via pointer
         m2q_c(m, q_av);          // Transfers quaternion
@@ -366,11 +366,10 @@ namespace Isis {
         record[nvals] = etTime;
         quats += record;
       }
-      catch (iException &ie) {
+      catch (IException &ie) {
         ostringstream mess;
         mess << "Failed to get point state for line " << i+1;
-        ie.Message(iException::User, mess.str(), _FILEINFO_);
-        throw;
+        throw IException(ie, IException::User, mess.str(), _FILEINFO_);
       }
     }
 
@@ -381,7 +380,7 @@ namespace Isis {
 
     // Create the time dependant frames keyword
     int virZeroId = GetInteger("FRAME_" + virZero);
-    PvlKeyword tdf("TimeDependentFrames", virZeroId); // DAWN_VIR_{ID}_ZERO 
+    PvlKeyword tdf("TimeDependentFrames", virZeroId); // DAWN_VIR_{ID}_ZERO
     tdf.AddValue(-203200);  // DAWN_VIR
     tdf.AddValue(-203000);  // DAWN_SPACECRAFT
     tdf.AddValue(1);        // J2000
@@ -415,7 +414,7 @@ namespace Isis {
    *  specified time. This method actually computes the complete
    *  pointing rotations at the given time (typically the mid
    *  exposure time).
-   *  
+   *
    *  If acceleration vectors are not present, then only the
    *  rotation properties are retrived from the CK kernels.  The
    *  acceleration vectors are then set to 0.
@@ -426,43 +425,43 @@ namespace Isis {
 
   DawnVirCamera::SMatrix DawnVirCamera::getStateRotation(const std::string &frame1,
                                                          const std::string &frame2,
-                                                         const double &etTime) 
-                                                         const { 
+                                                         const double &etTime)
+                                                         const {
     SMatrix state(6,6);
     NaifStatus::CheckErrors();
     try {
       // Get pointing w/AVs
-      sxform_c(frame1.c_str(), frame2.c_str(), etTime, 
+      sxform_c(frame1.c_str(), frame2.c_str(), etTime,
                (SpiceDouble (*)[6]) state[0]);
       NaifStatus::CheckErrors();
-    } catch ( iException &ie ) {
-      ie.Clear();
+    }
+    catch (IException &) {
       try {
         SMatrix rot(3,3);
-        pxform_c(frame1.c_str(), frame2.c_str(), etTime, 
+        pxform_c(frame1.c_str(), frame2.c_str(), etTime,
                  (SpiceDouble (*)[3]) rot[0]);
         NaifStatus::CheckErrors();
         SpiceDouble av[3] = {0.0, 0.0, 0.0 };
-        rav2xf_c((SpiceDouble (*)[3]) rot[0], av, 
+        rav2xf_c((SpiceDouble (*)[3]) rot[0], av,
                  (SpiceDouble (*)[6]) state[0]);
-      } catch ( iException &ie2 ) {
+      }
+      catch (IException &ie2) {
         ostringstream mess;
-        mess << "Could not get state rotation for Frame1 (" << frame1 
+        mess << "Could not get state rotation for Frame1 (" << frame1
              << ") to Frame2 (" <<  frame2 <<  ") at time " << etTime;
-        ie2.Message(iException::User, mess.str(), _FILEINFO_);
-        throw;
+        throw IException(ie2, IException::User, mess.str(), _FILEINFO_);
       }
     }
     return (state);
   }
 
-  /** 
+  /**
   * @brief determine if the CK articulation kernels are present/given
-  *  
+  *
   *  This method will determine if the CK articulation kernels are present in
   *  the labels.  If a kernel with the file pattern "dawn_vir_?????????_?.bc"
   *  is present as a CK kernel, then that kernel contains mirror scan angles
-  *  for each line.  
+  *  for each line.
 
   *  If the kernel does not exist, this camera model will provide these angles
   *  from the VIR housekeeping data.

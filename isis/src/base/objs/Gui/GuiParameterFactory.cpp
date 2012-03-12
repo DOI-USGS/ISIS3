@@ -44,7 +44,7 @@ namespace Isis {
     }
     else {
       std::string msg = "Invalid parameter type in XML [" + paramType + "]";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     return p;

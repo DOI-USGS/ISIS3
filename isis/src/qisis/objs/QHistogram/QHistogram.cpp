@@ -22,7 +22,7 @@
 
 #include "QHistogram.h"
 #include "Histogram.h"
-#include "iException.h"
+#include "IException.h"
 #include <QFileDialog>
 #include <QPrintDialog>
 #include <QPainter>

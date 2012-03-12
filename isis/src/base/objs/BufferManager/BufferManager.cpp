@@ -26,6 +26,8 @@
 #include <iostream>
 #include <string>
 
+#include "IException.h"
+
 using namespace std;
 
 namespace Isis {
@@ -254,7 +256,7 @@ namespace Isis {
     }
     else {
       string message = "Invalid value for argument [map]";
-      throw Isis::iException::Message(Isis::iException::Programmer, message, _FILEINFO_);
+      throw IException(IException::Programmer, message, _FILEINFO_);
     }
 
     return !end();

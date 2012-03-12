@@ -3,7 +3,7 @@
 #include <cmath>
 #include <cfloat>
 #include "Projection.h"
-#include "iException.h"
+#include "IException.h"
 #include "WorldMapper.h"
 #include "Constants.h"
 #include "PvlGroup.h"
@@ -400,8 +400,8 @@ int main(int argc, char *argv[]) {
     cout << "Mars equatorial radius: " << radii["EquatorialRadius"] << endl;
     cout << "Mars polar radius: " << radii["PolarRadius"] << endl;
   }
-  catch(Isis::iException &error) {
-    error.Report(false);
+  catch(Isis::IException &error) {
+    error.print();
   }
 
   cout << "Rotation Tests" << endl;
@@ -459,7 +459,7 @@ void Doit(Isis::Pvl &lab) {
   try {
     MyProjection p(lab);
   }
-  catch(Isis::iException &error) {
-    error.Report(false);
+  catch(Isis::IException &error) {
+    error.print();
   }
 }

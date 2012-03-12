@@ -260,28 +260,28 @@ Top Left Sample:  0, Top Left Line:  124, Top Left Band:  2
 Top Left Sample:  0, Top Left Line:  125, Top Left Band:  2
 100% Processed
 Testing for no inputs/outputs ...
-**PROGRAMMER ERROR** You must specify exactly one input cube
+**PROGRAMMER ERROR** You must specify exactly one input cube.
 
 Testing for exactly one input ...
-**PROGRAMMER ERROR** You must specify exactly one output cube
+**PROGRAMMER ERROR** You must specify exactly one output cube.
 
-**PROGRAMMER ERROR** No input images have been selected ... thereforethe output image size can not be determined
+**PROGRAMMER ERROR** No input images have been selected ... thereforethe output image size can not be determined.
 
 Testing for too many input cubes ...
-**PROGRAMMER ERROR** You must specify exactly one input cube
+**PROGRAMMER ERROR** You must specify exactly one input cube.
 
 Testing for too many output cubes ...
-**PROGRAMMER ERROR** You must specify exactly one output cube
+**PROGRAMMER ERROR** You must specify exactly one output cube.
 
 Testing for lines mismatch ...
-**PROGRAMMER ERROR** The number of lines in the input and output cubes must match
+**PROGRAMMER ERROR** The number of lines in the input and output cubes must match.
 
 Testing for samples mismatch ...
-**PROGRAMMER ERROR** The number of samples in the input and output cubes must match
+**PROGRAMMER ERROR** The number of samples in the input and output cubes must match.
 
 Testing for bands mismatch ...
-**PROGRAMMER ERROR** The number of bands in the input and output cubes must match
+**PROGRAMMER ERROR** The number of bands in the input and output cubes must match.
 
 Testing for boxcar size not set ...
-**PROGRAMMER ERROR** Use the SetBoxcarSize method to set the boxcar size
+**PROGRAMMER ERROR** Use the SetBoxcarSize method to set the boxcar size.
 

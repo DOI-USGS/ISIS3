@@ -5,7 +5,7 @@
 #include <fstream>
 #include <sstream>
 
-#include "iException.h"
+#include "IException.h"
 #include "Pvl.h"
 #include "PvlEditDialog.h"
 
@@ -104,10 +104,9 @@ namespace Isis {
       // fill pvl with contents of stringstream
       ss >> pvl;
     }
-    catch(Isis::iException &e) {
+    catch(IException &e) {
       // catch errors in Pvl format when populating pvl object
-      QString message = e.Errors().c_str();
-      e.Clear();
+      QString message = e.toString().ToQt();
       QMessageBox::warning((QWidget *)parent(), "Error", message);
       return;
     }
@@ -126,10 +125,9 @@ namespace Isis {
       try {
         pvl.Write(saveFile);
       }
-      catch(Isis::iException &e) {
+      catch(IException &e) {
         // report exception(s) to mesage box
-        QString message = e.Errors().c_str();
-        e.Clear();
+        QString message = e.toString().ToQt();
         QMessageBox::warning((QWidget *)parent(), "Error", message);
         return;
       }

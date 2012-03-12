@@ -1,6 +1,6 @@
 #include <iostream>
 #include "Apollo.h"
-#include "iException.h"
+#include "IException.h"
 #include "Filename.h"
 #include "iString.h"
 
@@ -41,7 +41,7 @@ int main(int argc, char *argv[]) {
     cout << "Time: " << time << endl;
 
   }
-  catch(Isis::iException &e) {
-    e.Report();
+  catch(Isis::IException &e) {
+    e.print();
   }
 }

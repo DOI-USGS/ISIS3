@@ -1,6 +1,6 @@
 #include <cmath>
 #include "LunarLambertEmpirical.h"
-#include "iException.h"
+#include "IException.h"
 
 namespace Isis {
   LunarLambertEmpirical::LunarLambertEmpirical(Pvl &pvl) : PhotoModel(pvl) {
@@ -12,19 +12,19 @@ namespace Isis {
       SetPhotoPhaseList(algo["PhaseList"]);
     } else {
       std::string msg = "The empirical Lunar Lambert phase list was not provided by user";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     if (algo.HasKeyword("LList")) {
       SetPhotoLList(algo["LList"]);
     } else {
       std::string msg = "The empirical Lunar Lambert l exponent list was not provided by user";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     if (algo.HasKeyword("PhaseCurveList")) {
       SetPhotoPhaseCurveList(algo["PhaseCurveList"]);
     } else {
       std::string msg = "The empirical Lunar Lambert phase brightness list was not provided by user";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     // Make sure all the vectors are the same size
@@ -33,15 +33,15 @@ namespace Isis {
     if (p_photoPhaseAngleCount != (int)p_photoLList.size()) {
       std::string msg = "Number of empirical Lunar Lambert l list values must be equal";
       msg += "to number of phase angles provided";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     if (p_photoPhaseAngleCount != (int)p_photoPhaseCurveList.size()) {
       std::string msg = "Number of empirical Lunar Lambert phase curve list values must be equal";
       msg += "to number of phase angles provided";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
- 
+
     // Create Cubic piecewise linear splines
     p_photoLSpline.Reset();
     p_photoLSpline.SetInterpType(NumericalApproximation::CubicClamped);
@@ -80,16 +80,16 @@ namespace Isis {
       if (phaseangle < 0.0 || phaseangle > 180.0) {
         std::string msg = "Invalid value of empirical Lunar Lambert phase angle list value [" +
                           iString(phaseangle) + "]";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
       p_photoPhaseList.push_back(phaseangle);
     }
   }
 
   /**
-    * Set the empirical Lunar Lambert function L exponent list.  This is used to 
+    * Set the empirical Lunar Lambert function L exponent list.  This is used to
     * govern the limb-darkening in the Lunar Lambert photometric function.  Values
-    * of the Lunar Lambert exponent generally fall in the range from 0.0 
+    * of the Lunar Lambert exponent generally fall in the range from 0.0
     * (Lambert function) to 1.0 (Lommel-Seeliger or "lunar" function). There are
     * no limits on the value of this parameter, but values far outside the 0 to 1
     * range will not be very useful.
@@ -110,7 +110,7 @@ namespace Isis {
   /**
     * Set the empirical Lunar Lambert function phase curve list.  This list provides
     * the brightness values that correspond to the limb-darkening values in the
-    * empirical Lunar Lambert photometric function. 
+    * empirical Lunar Lambert photometric function.
     *
     * @param phasecurvelist  List of brightness values corresponding to Lunar Lambert function exponents
     */

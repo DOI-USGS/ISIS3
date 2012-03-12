@@ -23,7 +23,7 @@ void IsisMain() {
   if(lab.HasObject("IMAGE_MAP_PROJECTION")) {
     string msg = "[" + input.Name() + "] has already been projected.";
     msg += " Use pds2isis.";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   iString output;

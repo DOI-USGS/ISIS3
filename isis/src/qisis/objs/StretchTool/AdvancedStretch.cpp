@@ -8,7 +8,7 @@
 
 #include "Stretch.h"
 #include "iString.h"
-#include "iException.h"
+#include "IException.h"
 #include "StretchType.h"
 #include "LinearStretchType.h"
 #include "SawtoothStretchType.h"

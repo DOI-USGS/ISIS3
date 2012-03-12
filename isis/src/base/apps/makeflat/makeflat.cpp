@@ -356,7 +356,7 @@ void IsisMain() {
    */
   if(numOutputSamples <= 0) {
     string msg = "No valid input cubes were found";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   /**
@@ -365,7 +365,7 @@ void IsisMain() {
    */
   if(tempFileLength <= 0) {
     string msg = "No valid input data was found";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   /**

@@ -49,7 +49,7 @@ void IsisMain() {
   //Check to make sure we got the cube properly
   if(!inputCube.isOpen()) {
     string msg = "Could not open FROM cube" + fromFile.Expanded();
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
   Process p;
   Cube *icube = p.SetInputCube("FROM");
@@ -71,7 +71,7 @@ void IsisMain() {
   int numSections = ui.GetInteger("SECTIONS");
   if(numSections > 9) {
     string msg = "You may have no more than 9 sections per side";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   int sectionLength = 0;

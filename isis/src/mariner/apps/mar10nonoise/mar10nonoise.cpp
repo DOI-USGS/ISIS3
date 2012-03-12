@@ -1,7 +1,7 @@
 #include "Isis.h"
 
 #include "Cube.h"
-#include "iException.h"
+#include "IException.h"
 #include "Pipeline.h"
 #include "UserInterface.h"
 
@@ -17,8 +17,8 @@ void IsisMain() {
   Pvl * labels = iCube.getLabel();
   if ("Mariner_10" != (string)labels->FindKeyword("SpacecraftName", Pvl::Traverse)) {
     string msg = "The cube [" + ui.GetFilename("FROM") + "] does not appear" +
-      " to be a Mariner10 cube";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+        " to be a Mariner10 cube";
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // Open the input cube

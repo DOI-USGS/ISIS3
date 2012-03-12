@@ -22,7 +22,7 @@
 #include "Filename.h"
 #include "Histogram.h"
 #include "LeastSquares.h"
-#include "iException.h"
+#include "IException.h"
 #include "Interpolator.h"
 #include "Matrix.h"
 #include "PixelType.h"
@@ -35,8 +35,8 @@ namespace Isis {
   /**
    * Create AutoReg object.  Because this is a pure virtual class you can
    * not create an AutoReg class directly.  Instead, see the AutoRegFactory
-   * class.  The default settings include: 
-   * <ul> 
+   * class.  The default settings include:
+   * <ul>
    *   <li> PatternChip
    *     <ul>
    *       <li>Samples = 3
@@ -70,9 +70,9 @@ namespace Isis {
    *       <li>ResidualTesting = False
    *       <li>ResidualTolerance = 0.1
    *     </ul>
-   * </ul> 
-   * The reduced chips are initially set to the same size as their corresponding 
-   * chips in the constructor. 
+   * </ul>
+   * The reduced chips are initially set to the same size as their corresponding
+   * chips in the constructor.
    *
    * @param pvl  A pvl object containing a valid AutoReg specification
    *
@@ -209,7 +209,7 @@ namespace Isis {
    * @see patternMatch.doc under the coreg
    *      application
    *
-   * @param pvl The pvl object containing the specification 
+   * @param pvl The pvl object containing the specification
    * @throw  iException::User "Improper format for AutoReg PVL."
    * @internal
    *   @history 2010-06-15 Jeannie Walldren - Added ability to read
@@ -294,9 +294,9 @@ namespace Isis {
       }
 
     }
-    catch(iException &e) {
+    catch(IException &e) {
       string msg = "Improper format for AutoReg PVL [" + pvl.Filename() + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(e, IException::User, msg, _FILEINFO_);
     }
     return;
   }
@@ -316,20 +316,20 @@ namespace Isis {
       p_gradientFilterType = Sobel;
     }
     else {
-      throw iException::Message(iException::User,
-                                "Invalid Gradient type.  Cannot use ["
-                                + gradientFilterType + "] to filter chip",
-                                _FILEINFO_);
+      throw IException(IException::User,
+                       "Invalid Gradient type.  Cannot use ["
+                       + gradientFilterType + "] to filter chip",
+                       _FILEINFO_);
     }
   }
 
   /**
    * If the sub-pixel accuracy is enabled, the Register() method will attempt to
    * match the pattern chip to the search chip at sub-pixel accuracy, otherwise it
-   * will be registered at whole pixel accuracy. 
-   *  
-   * If this method is not called, the sub pixel accuracy defaults to on = true 
-   * in the AutoReg object constructor. 
+   * will be registered at whole pixel accuracy.
+   *
+   * If this method is not called, the sub pixel accuracy defaults to on = true
+   * in the AutoReg object constructor.
    *
    * @param on Set the state of registration accuracy.  The
    *           default is sub-pixel accuracy is on
@@ -351,50 +351,50 @@ namespace Isis {
    * apply to all reduced patterns.  Additionally, the pattern sampling
    * effects the pixel count.  For example if pattern sampling is 50% then
    * only 220 pixels in the 21x21 pattern are considered so 165 must be
-   * valid. 
-   *  
-   * If this method is not called, the PatternChip ValidPercent defaults to 50 
-   * in the AutoReg object constructor. 
-   *  
-   * @see SetValidRange() 
+   * valid.
+   *
+   * If this method is not called, the PatternChip ValidPercent defaults to 50
+   * in the AutoReg object constructor.
+   *
+   * @see SetValidRange()
    * @param percent   Percentage of valid data between 0 and 100,
    *                  default is 50% if never invoked
-   * @throw iException::User - "Invalid value for PatternChip ValidPercent." 
+   * @throw iException::User - "Invalid value for PatternChip ValidPercent."
    */
   void AutoReg::SetPatternValidPercent(const double percent) {
     if((percent <= 0.0) || (percent > 100.0)) {
-      string msg = "Invalid value for PatternChip ValidPercent [" 
-        + iString(percent) 
+      string msg = "Invalid value for PatternChip ValidPercent ["
+        + iString(percent)
         + "].  Must be greater than 0.0 and less than or equal to 100.0 (Default is 50.0).";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     p_patternValidPercent = percent;
   }
 
 
   /**
-   * Set the amount of data in the search chip's subchip that must be valid. 
-   *  
-   * 
-   * If this method is not called, the SearchChip SubchipValidPercent defaults 
-   * to 50 in the AutoReg object constructor. 
+   * Set the amount of data in the search chip's subchip that must be valid.
+   *
+   *
+   * If this method is not called, the SearchChip SubchipValidPercent defaults
+   * to 50 in the AutoReg object constructor.
    *
    *
    * @param percent   Percentage of valid data between 0 and 100,
    *                  default is 50% if never invoked
-   * @see SetPatternValidPercent() 
-   * @throw iException::User - "Invalid value for SearchChip 
+   * @see SetPatternValidPercent()
+   * @throw iException::User - "Invalid value for SearchChip
    *        SubchipValidPercent."
-   * @internal 
+   * @internal
    *   @author 2010-07-20 Jeannie Walldren
    *   @history 2010-07-20 Jeannie Walldren - Original Version.
    */
   void AutoReg::SetSubsearchValidPercent(const double percent) {
     if((percent <= 0.0) || (percent > 100.0)) {
-      string msg = "Invalid value for SearchChip SubchipValidPercent [" 
+      string msg = "Invalid value for SearchChip SubchipValidPercent ["
         + iString(percent) + "]"
         + "].  Must be greater than 0.0 and less than or equal to 100.0 (Default is 50.0).";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     p_subsearchValidPercent = percent;
   }
@@ -406,33 +406,33 @@ namespace Isis {
    * deviation). If the minimum or maximum pixel value in the
    * pattern chip does not meet the minimum zscore value (see a
    * statisitcs book for definition of zscore) then invalid
-   * registration will occur. 
-   *  
-   * 
-   * If this method is not called, the z-score minimum defaults to 1.0 in the 
-   * AutoReg object constructor. 
+   * registration will occur.
+   *
+   *
+   * If this method is not called, the z-score minimum defaults to 1.0 in the
+   * AutoReg object constructor.
    *
    * @param minimum The minimum zscore value for the pattern chip.
    *                 Default is 1.0
-   * @throw iException::User - "Invalid value for PatternChip MinimumZScore." 
+   * @throw iException::User - "Invalid value for PatternChip MinimumZScore."
    */
   void AutoReg::SetPatternZScoreMinimum(double minimum) {
     if(minimum <= 0.0) {
       string msg = "Invalid value for PatternChip MinimumZScore ["
         + iString(minimum)
         + "].  Must be greater than 0.0. (Default is 1.0).";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     p_minimumPatternZScore = minimum;
   }
 
 
   /**
-   * Set the tolerance for an acceptable goodness of fit 
-   *  
-   * 
+   * Set the tolerance for an acceptable goodness of fit
+   *
+   *
    * If this method is not called, the tolerance value defaults to Isis::Null in
-   * the AutoReg object constructor. 
+   * the AutoReg object constructor.
    *
    * @param tolerance   This tolerance is used to test against the goodness
    *                    of fit returned by the MatchAlgorith method after
@@ -451,13 +451,13 @@ namespace Isis {
    *   <LI>BiLinearType</LI>
    *   <LI>CubicConvolutionType</LI>
    * </UL>
-   *  
-   * If this method is not called, the chip interpolator type defaults to 
-   * CubicConvolutionType in the Chip class. 
-   *  
+   *
+   * If this method is not called, the chip interpolator type defaults to
+   * CubicConvolutionType in the Chip class.
+   *
    * @param interpolator Name of interpolator type to be used.  This is taken from
    *                     the Pvl's ChipInterpolator keyword value.
-   * @throw iException::User - "Invalid Interpolator type." 
+   * @throw iException::User - "Invalid Interpolator type."
    * @author Jeannie Walldren
    * @internal
    *   @history 2010-06-15 Jeannie Walldren - Original version.
@@ -475,10 +475,10 @@ namespace Isis {
       itype = Isis::Interpolator::CubicConvolutionType;
     }
     else {
-      throw iException::Message(iException::User,
-                                "Invalid Interpolator type.  Cannot use ["
-                                + interpolator + "] to load chip",
-                                _FILEINFO_);
+      throw IException(IException::User,
+                       "Invalid Interpolator type.  Cannot use ["
+                       + interpolator + "] to load chip",
+                       _FILEINFO_);
     }
 
     // Set pattern and search chips to use this interpolator type when reading data from cube
@@ -493,20 +493,20 @@ namespace Isis {
    * Set the surface model window size. The pixels in this window
    * will be used to fit a surface model in order to compute
    * sub-pixel accuracy.  In some cases the default (3x3) and
-   * produces erroneous sub-pixel accuracy values. 
-   *  
-   * If this method is not called, the window size defaults to 5 in the AutoReg 
-   * object constructor. 
-   *  
+   * produces erroneous sub-pixel accuracy values.
+   *
+   * If this method is not called, the window size defaults to 5 in the AutoReg
+   * object constructor.
+   *
    *  @param size The size of the window must be three or greater
    *             and odd.
-   * @throw iException::User - "Invalid value for SurfaceModel WindowSize." 
+   * @throw iException::User - "Invalid value for SurfaceModel WindowSize."
    */
   void AutoReg::SetSurfaceModelWindowSize(int size) {
     if(size % 2 != 1 || size < 3) {
       string msg = "Invalid value for SurfaceModel WindowSize ["
         + iString(size) + "].  Must be an odd number greater than or equal to 3";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     p_windowSize = size;
   }
@@ -515,20 +515,20 @@ namespace Isis {
    * A 1:1 ratio represents a perfect circle.  Allowing the user
    * to set this ratio lets them determine which points to throw
    * out if the surface model gets too elliptical.
-   *  
+   *
    * If this method is not called, the eccentricity ratio defaults to 2:1 in the
-   * AutoReg object constructor. 
-   * 
+   * AutoReg object constructor.
+   *
    * @param eccentricityRatio Eccentricity ratio.  Must be greater than or equal
    *                          to 1.
-   * @throw iException::User - "Invalid value for SurfaceModel 
+   * @throw iException::User - "Invalid value for SurfaceModel
    *        EccentricityRatio."
                                                                                */
   void AutoReg::SetSurfaceModelEccentricityRatio(double eccentricityRatio) {
     if(eccentricityRatio < 1) {
-      string msg = "Invalid value for SurfaceModel EccentricityRatio [" 
+      string msg = "Invalid value for SurfaceModel EccentricityRatio ["
         + iString(eccentricityRatio) + "].  Must greater than or equal to 1.0.";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     p_surfaceModelEccentricityRatioTolerance = eccentricityRatio;
     p_surfaceModelEccentricityTolerance = sqrt(eccentricityRatio * eccentricityRatio - 1) / eccentricityRatio;
@@ -543,18 +543,18 @@ namespace Isis {
    * by summing the absolute values of all the residuals (computed
    * z minus actual z) and dividing by the number of residuals.
    *
-   * If this method is not called, the residual tolerance defaults to 0.1 in the 
-   * AutoReg object constructor. 
-   *  
+   * If this method is not called, the residual tolerance defaults to 0.1 in the
+   * AutoReg object constructor.
+   *
    * @param residualTolerance Residual tolerance.  Must be greater than 0.
-   * @throw iException::User - "Invalid value for SurfaceModel 
+   * @throw iException::User - "Invalid value for SurfaceModel
    *        ResidualTolerance."
    */
   void AutoReg::SetSurfaceModelResidualTolerance(double residualTolerance) {
     if(residualTolerance < 0) {
-      string msg = "Invalid value for SurfaceModel ResidualTolerance [" 
+      string msg = "Invalid value for SurfaceModel ResidualTolerance ["
         + iString(residualTolerance) + "].  Must greater than or equal to 0.0.";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     p_surfaceModelResidualTolerance = residualTolerance;
   }
@@ -563,19 +563,19 @@ namespace Isis {
    * Set a distance the surface model solution is allowed to move
    * away from the best whole pixel fit in the fit chip.
    *
-   * If this method is not called, the distance tolerance defaults to 1.5 in the 
-   * AutoReg object constructor. 
-   *  
+   * If this method is not called, the distance tolerance defaults to 1.5 in the
+   * AutoReg object constructor.
+   *
    * @param distance The distance allowed to move in pixels.  Must
    *                 be greater than 0.
-   * @throw iException::User - "Invalid value for SurfaceModel 
+   * @throw iException::User - "Invalid value for SurfaceModel
    *        DistanceTolerance."
    */
   void AutoReg::SetSurfaceModelDistanceTolerance(double distance) {
     if(distance <= 0.0) {
-      string msg = "Invalid value for SurfaceModel DistanceTolerance [" 
+      string msg = "Invalid value for SurfaceModel DistanceTolerance ["
         + iString(distance) + "].  Must greater than 0.0.";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     p_distanceTolerance = distance;
   }
@@ -585,17 +585,17 @@ namespace Isis {
    * Set the reduction factor used to speed up the pattern
    * matching algorithm.
    *
-   * If this method is not called, the reduction factor defaults to 1 in the 
-   * AutoReg object constructor. 
-   *  
+   * If this method is not called, the reduction factor defaults to 1 in the
+   * AutoReg object constructor.
+   *
    * @param factor Reduction factor.  Must be greater than or equal to 1.
-   * @throw iException::User - "Invalid value for Algorithm ReductionFactor." 
+   * @throw iException::User - "Invalid value for Algorithm ReductionFactor."
    */
   void AutoReg::SetReductionFactor(int factor) {
     if(factor < 1) {
       string msg = "Invalid value for Algorithm ReductionFactor ["
         + iString(factor) + "].  Must greater than or equal to 1.";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     p_reduceFactor = factor;
   }
@@ -651,9 +651,9 @@ namespace Isis {
    * Walk the pattern chip through the search chip to find the best registration
    *
    * @return @b AutoReg::RegisterStatus  Returns the status of the registration.
-   * @throw iException::User - "Search chips samples must be at least N pixels 
+   * @throw iException::User - "Search chips samples must be at least N pixels
    *        wider than the pattern chip samples for successful surface modeling"
-   * @throw iException::User - "Search chips lines must be at least N pixels 
+   * @throw iException::User - "Search chips lines must be at least N pixels
    *        taller than the pattern chip lines for successful surface modeling"
    * @throw iException::User - "Reduction factor is too large"
    */
@@ -667,7 +667,7 @@ namespace Isis {
       msg += iString(p_searchChip.Samples()) + "] must be at ";
       msg += "least [" + iString(N) + "] pixels wider than the pattern chip samples [";
       msg += iString(p_patternChip.Samples()) + "] for successful surface modeling";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     if(p_searchChip.Lines() < p_patternChip.Lines() + N) {
@@ -675,7 +675,7 @@ namespace Isis {
       msg += iString(p_searchChip.Lines()) + "] must be at ";
       msg += "least [" + iString(N) + "] pixels taller than the pattern chip lines [";
       msg += iString(p_patternChip.Lines()) + "] for successful surface modeling";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     Init();
@@ -733,7 +733,7 @@ namespace Isis {
     // ----------------------------------------------------------------------
     if(gradientPatternChip.Samples() / p_reduceFactor < 2 || gradientPatternChip.Lines() / p_reduceFactor < 2) {
       string msg = "Reduction factor is too large";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     // Establish the center search tack point as best pixel to start for the
@@ -832,7 +832,7 @@ namespace Isis {
         gradientSearchChip.SetChipPosition(p_chipSample, p_chipLine);
         p_cubeSample = gradientSearchChip.CubeSample();
         p_cubeLine   = gradientSearchChip.CubeLine();
-        
+
         // Save off the gradient search and pattern chips if we used a gradient
         // filter.
         if (p_gradientFilterType != None) {
@@ -1011,7 +1011,7 @@ namespace Isis {
       // Perform extra sanity check.
       string msg =
         "No rule to set sub-chip width for selected Gradient Filter Type.";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     // Create a new chip to hold output during processing.
@@ -1095,9 +1095,9 @@ namespace Isis {
    * @param startSamp Start sample
    * @param endSamp End sample
    * @param startLine Start line
-   * @param endLine End line 
-   *  
-   * @throw iException::Programmer - "StartSample = EndSample and StartLine = 
+   * @param endLine End line
+   *
+   * @throw iException::Programmer - "StartSample = EndSample and StartLine =
    *        EndLine."
    */
   void AutoReg::Match(Chip &sChip, Chip &pChip, Chip &fChip, int startSamp, int endSamp, int startLine, int endLine) {
@@ -1106,7 +1106,7 @@ namespace Isis {
       string msg = "StartSample [" + iString(startSamp) + "] = EndSample ["
         + iString(endSamp) + "] and StartLine [" + iString(startLine) + " = EndLine ["
         + iString(endLine) + "].";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     // Ok create a fit chip whose size is the same as the search chip
@@ -1184,8 +1184,7 @@ namespace Isis {
     try {
       lsq.Solve();
     }
-    catch(iException &e) {
-      e.Clear();
+    catch(IException &) {
       p_registrationStatus = SurfaceModelSolutionInvalid;
       p_surfaceModelSolutionInvalidCount++;
       return false;
@@ -1462,7 +1461,7 @@ namespace Isis {
    * @param bestSamp Best sample
    * @param bestLine Best line
    *
-   * @return @b AutoReg::RegisterStatus  Status of match 
+   * @return @b AutoReg::RegisterStatus  Status of match
    */
   AutoReg::RegisterStatus AutoReg::AdaptiveRegistration(Chip &sChip,
       Chip &pChip,
@@ -1474,7 +1473,7 @@ namespace Isis {
       int bestSamp,
       int bestLine) {
     string msg = "Programmer needs to write their own virtual AdaptiveRegistration method";
-    throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    throw IException(IException::Programmer, msg, _FILEINFO_);
     return SuccessSubPixel;
   }
 

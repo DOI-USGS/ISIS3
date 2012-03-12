@@ -234,9 +234,9 @@ namespace Isis {
         try {
           return (computeStats(_rowList.getNth(i)));
         }
-        catch(iException &oor) {
+        catch(IException &oor) {
           std::string msg = "Requested value (" + iString(i) +  ") not found";
-          throw iException::Message(Isis::iException::User, msg, _FILEINFO_);
+          throw IException(oor, IException::User, msg, _FILEINFO_);
         }
       }
 

@@ -24,7 +24,6 @@
 
 #include <vector>
 #include "tnt/tnt_array2d.h"
-#include "iException.h"
 
 namespace Isis {
   /**
@@ -72,7 +71,7 @@ namespace Isis {
    *          constructor that accepts an AMatrix; added static method to return
    *          an Affine identity matrix; added methods to retrieve forward and
    *          inverse AMatrixs; added new method that inverts the matrix.
-   * @history 2010-11-18 Kris Becker Fixed bug in inverse representation when 
+   * @history 2010-11-18 Kris Becker Fixed bug in inverse representation when
    *          scaling is applied to the current transform.
    *
    */
@@ -135,8 +134,8 @@ namespace Isis {
       double p_xp;        //!< x' value of the (x',y') coordinate
       double p_yp;        //!< y' value of the (x',y') coordinate
 
-      void checkDims(const AMatrix &am) const throw(iException &);
-      AMatrix invert(const AMatrix &a) const throw(iException &);
+      void checkDims(const AMatrix &am) const;
+      AMatrix invert(const AMatrix &a) const;
   };
 };
 

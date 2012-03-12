@@ -6,7 +6,7 @@
 #include "NormModelFactory.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
-#include "iException.h"
+#include "IException.h"
 #include "Preference.h"
 
 using namespace Isis;
@@ -59,8 +59,8 @@ int main() {
     std::cout << "Test phase=86.7187773, incidence=51.7060221, emission=38.9331391, dn=.0794225037 ..." << std::endl;
     std::cout << "Normalization value = " << result << std::endl << std::endl;
   }
-  catch(iException &e) {
-    e.Report();
+  catch(IException &e) {
+    e.print();
   }
 
   return 0;

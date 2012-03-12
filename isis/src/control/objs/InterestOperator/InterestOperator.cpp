@@ -2,7 +2,7 @@
 #include "Pvl.h"
 #include "InterestOperator.h"
 #include "Plugin.h"
-#include "iException.h"
+#include "IException.h"
 #include "Filename.h"
 #include "Statistics.h"
 #include "PolygonTools.h"
@@ -30,10 +30,10 @@ namespace Isis {
     mOperatorGrp = PvlGroup("InterestOptions");
     Parse(pPvl);
   }
-  
+
   /**
    * Initialise Interest Options to defaults
-   * 
+   *
    * @author Sharmila Prasad (11/21/2011)
    */
   void InterestOperator::InitInterestOptions() {
@@ -46,7 +46,7 @@ namespace Isis {
     p_clipPolygon = NULL;
     mbOverlaps = false;
   }
-  
+
   /**
    * Destroy InterestOperator object
    */
@@ -104,9 +104,9 @@ namespace Isis {
       mOperatorGrp += Isis::PvlKeyword("MinimumInterest", p_minimumInterest);
 
     }
-    catch (iException &e) {
+    catch (IException &e) {
       std::string msg = "Improper format for InterestOperator PVL [" + pPvl.Filename() + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
 
@@ -157,7 +157,7 @@ namespace Isis {
     {
       std::string msg = "Cannot run interest on images with no camera. Image " +
                         pCube.getFilename() + " has no Camera";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     int pad = Padding();
@@ -272,9 +272,9 @@ namespace Isis {
 
     // Log Point Details
     if (bPntEditLock) {
-      pPvlObj += Isis::PvlKeyword("Reference", "No Change, PointEditLock"); 
+      pPvlObj += Isis::PvlKeyword("Reference", "No Change, PointEditLock");
     }
-    
+
     for (int measure = 0; measure < iNumMeasures; measure++) {
       ControlMeasure *newMeasure = new ControlMeasure(*pCPoint[measure]);
       newMeasure->SetDateTime();
@@ -294,7 +294,7 @@ namespace Isis {
       if (bMeasureLocked) {
         pvlMeasureGrp += Isis::PvlKeyword("EditLock", "True");
       }
-      
+
       if (!newMeasure->IsIgnored()) {
         Cube *measureCube = mCubeMgr.OpenCube(mSerialNumbers.Filename(sn));
 
@@ -382,15 +382,14 @@ namespace Isis {
       // Measure is locked
       int iNumMeasuresLocked = newPnt->GetNumLockedMeasures();
       int numMeasures = newPnt->GetNumMeasures();
-      
+
       bool bRefLocked = false;
       int iOrigRefIndex = -1;
       try {
         iOrigRefIndex = newPnt->IndexOfRefMeasure();
         bRefLocked = newPnt->GetRefMeasure()->IsEditLocked();
       }
-      catch(iException &e) {
-        e.Clear();
+      catch(IException &) {
       }
 
       // Only perform the interest operation on points of type "Free" and
@@ -425,9 +424,9 @@ namespace Isis {
           try {
             bestCamera = bestCube->getCamera();
           }
-          catch (Isis::iException &e) {
+          catch (IException &e) {
             std::string msg = "Cannot Create Camera for Image:" + mSerialNumbers.Filename(sn);
-            throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+            throw IException(IException::User, msg, _FILEINFO_);
           }
 
           double dBestSample   = mtInterestResults[iBestMeasureIndex].mdBestSample;
@@ -436,7 +435,7 @@ namespace Isis {
           bestCamera->SetImage(dBestSample, dBestLine);
           dReferenceLat = bestCamera->UniversalLatitude();
           dReferenceLon = bestCamera->UniversalLongitude();
-          
+
           // Set the point reference
           newPnt->SetRefMeasure(iBestMeasureIndex);
         }
@@ -470,9 +469,9 @@ namespace Isis {
             try {
               measureCamera = measureCube->getCamera();
             }
-            catch (Isis::iException &e) {
+            catch (IException &e) {
               std::string msg = "Cannot Create Camera for Image:" + mSerialNumbers.Filename(sn);
-              throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+              throw IException(e, IException::User, msg, _FILEINFO_);
             }
 
             if (measureCamera->SetUniversalGround(dReferenceLat, dReferenceLon) &&
@@ -482,7 +481,7 @@ namespace Isis {
                 newMeasure->SetCoordinate(mtInterestResults[measure].mdBestSample,
                                           mtInterestResults[measure].mdBestLine, ControlMeasure::Candidate);
             //    newMeasure->SetType(ControlMeasure::Reference);
-                
+
 
 
                 pvlMeasureGrp += Isis::PvlKeyword("NewLocation",  LocationString(mtInterestResults[measure].mdBestSample,
@@ -497,9 +496,9 @@ namespace Isis {
 
                 double origSample = newMeasure->GetSample();
                 double origLine   = newMeasure->GetLine();
-                
+
                 newMeasure->SetCoordinate(dSample, dLine);
-                
+
                 MeasureValidationResults results =
                   ValidStandardOptions(newMeasure, measureCube);
                 if (!results.isValid()) {
@@ -653,7 +652,7 @@ namespace Isis {
       if (overlapPoly == NULL) {
         string msg = "Unable to find overlap polygon for point [" +
                      pCnetPoint.GetId() + "]";
-        throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
     }
 
@@ -787,9 +786,9 @@ namespace Isis {
       try {
         camera = pCube.getCamera();
       }
-      catch (Isis::iException &e) {
+      catch (IException &e) {
         std::string msg = "Cannot Create Camera for Image:" + mSerialNumbers.Filename(serialNum);
-        throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
 
       if (camera->SetImage(iOrigSample, iOrigLine)) {

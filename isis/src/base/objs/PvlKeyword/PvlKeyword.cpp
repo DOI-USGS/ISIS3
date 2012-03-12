@@ -25,7 +25,7 @@
 #include <QString>
 
 #include "PvlKeyword.h"
-#include "iException.h"
+#include "IException.h"
 #include "Message.h"
 #include "iString.h"
 #include "PvlSequence.h"
@@ -117,10 +117,8 @@ namespace Isis {
   bool PvlKeyword::IsNull(const int index) const {
     if(Size() == 0) return true;
     if(index < 0 || index >= (int)p_values.size()) {
-      string msg = Isis::Message::ArraySubscriptNotInRange(index);
-      throw Isis::iException::Message(Isis::iException::Programmer,
-                                      msg,
-                                      _FILEINFO_);
+      string msg = Message::ArraySubscriptNotInRange(index);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     if(StringEqual("NULL", p_values[index])) return true;
     if(StringEqual("", p_values[index])) return true;
@@ -140,7 +138,7 @@ namespace Isis {
     if(final.find_first_of("\n\r\t\f\v\b ") != std::string::npos) {
       string msg = "[" + name + "] is invalid. Keyword name cannot ";
       msg += "contain whitespace.";
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     if(p_name) {
@@ -226,7 +224,7 @@ namespace Isis {
     else {
       iString msg = "PvlKeyword::SetUnits called with value [" + value +
                     "] which does not exist in this Keyword";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
 
@@ -334,11 +332,9 @@ namespace Isis {
    */
   Isis::iString &PvlKeyword::operator[](const int index) {
     if(index < 0 || index >= (int)p_values.size()) {
-      string msg = (Isis::Message::ArraySubscriptNotInRange(index)) +
+      string msg = (Message::ArraySubscriptNotInRange(index)) +
                    "for Keyword [" + string(p_name) + "]";
-      throw Isis::iException::Message(Isis::iException::Programmer,
-                                      msg,
-                                      _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     return p_values[index];
   }
@@ -357,10 +353,8 @@ namespace Isis {
    */
   const Isis::iString &PvlKeyword::operator[](const int index) const {
     if(index < 0 || index >= (int)p_values.size()) {
-      string msg = Isis::Message::ArraySubscriptNotInRange(index);
-      throw Isis::iException::Message(Isis::iException::Programmer,
-                                      msg,
-                                      _FILEINFO_);
+      string msg = Message::ArraySubscriptNotInRange(index);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     return p_values[index];
   }
@@ -378,10 +372,8 @@ namespace Isis {
     if(!p_units) return "";
 
     if(index < 0 || index >= (int)p_units->size()) {
-      string msg = Isis::Message::ArraySubscriptNotInRange(index);
-      throw Isis::iException::Message(Isis::iException::Programmer,
-                                      msg,
-                                      _FILEINFO_);
+      string msg = Message::ArraySubscriptNotInRange(index);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     return (*p_units)[index];
   }
@@ -464,10 +456,8 @@ namespace Isis {
     if(!p_comments) return "";
 
     if(index < 0 || index >= (int)p_comments->size()) {
-      string msg = Isis::Message::ArraySubscriptNotInRange(index);
-      throw Isis::iException::Message(Isis::iException::Programmer,
-                                      msg,
-                                      _FILEINFO_);
+      string msg = Message::ArraySubscriptNotInRange(index);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     return (*p_comments)[index];
   };
@@ -585,10 +575,8 @@ namespace Isis {
    */
   bool PvlKeyword::IsEquivalent(const std::string &string1, int index) const {
     if(index < 0 || index >= (int)p_values.size()) {
-      string msg = Isis::Message::ArraySubscriptNotInRange(index);
-      throw Isis::iException::Message(Isis::iException::Programmer,
-                                      msg,
-                                      _FILEINFO_);
+      string msg = Message::ArraySubscriptNotInRange(index);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     return StringEqual(p_values[index], string1);
@@ -980,8 +968,9 @@ namespace Isis {
         comment = true;
 
         if(line.find("/*") != string::npos) {
-          iString msg = "Cannot have ['/*'] inside a multi-line comment";
-          throw iException::Message(iException::Pvl, msg, _FILEINFO_);
+          iString msg = "Error when reading a pvl: Cannot have ['/*'] inside a "
+                        "multi-line comment";
+          throw IException(IException::Unknown, msg, _FILEINFO_);
         }
 
         if(line.find("*/") != string::npos) {
@@ -1030,7 +1019,7 @@ namespace Isis {
                         keywordName,
                         keywordValues);
       }
-      catch(iException &e) {
+      catch(IException &e) {
         if(is.eof() && !is.bad()) {
           is.clear();
           is.unget();
@@ -1038,11 +1027,11 @@ namespace Isis {
 
         is.seekg(beforeLine, ios::beg);
 
-        string msg = "Unable to read keyword [";
+        string msg = "Unable to read PVL keyword [";
         msg += keywordString;
         msg += "]";
 
-        throw iException::Message(iException::Pvl, msg, _FILEINFO_);
+        throw IException(e, IException::Unknown, msg, _FILEINFO_);
       }
 
       // Result valid?
@@ -1080,17 +1069,17 @@ namespace Isis {
       string msg;
 
       if(keywordString.empty() && !multiLineComment) {
-        msg = "Input contains no Pvl Keywords";
+        msg = "PVL input contains no Pvl Keywords";
       }
       else if(multiLineComment) {
-        msg = "Input ends while still in a multi-line comment";
+        msg = "PVL input ends while still in a multi-line comment";
       }
       else {
-        msg = "The keyword [" + keywordString + "] does not appear to be";
+        msg = "The PVL keyword [" + keywordString + "] does not appear to be";
         msg += " a valid Pvl Keyword";
       }
 
-      throw iException::Message(iException::Pvl, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     if(!keywordDone) {
@@ -1101,14 +1090,14 @@ namespace Isis {
       string msg;
 
       if(keywordString.empty()) {
-        msg = "Error reading keyword";
+        msg = "Error reading PVL keyword";
       }
       else {
-        msg = "The keyword [" + keywordString + "] does not appear to be";
+        msg = "The PVL keyword [" + keywordString + "] does not appear to be";
         msg += " complete";
       }
 
-      throw iException::Message(iException::Pvl, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     return is;
@@ -1325,10 +1314,10 @@ namespace Isis {
       }
 
       if(noneStripped) {
-        string msg = "Expected a comment but found [";
+        string msg = "Expected a comment in PVL but found [";
         msg += keyword;
         msg += "]";
-        throw iException::Message(iException::Pvl, msg, _FILEINFO_);
+        throw IException(IException::Unknown, msg, _FILEINFO_);
       }
     }
 
@@ -1367,11 +1356,11 @@ namespace Isis {
     // if we don't have an equal, then we have a problem - an invalid symbol.
     // Our possible remaining formats both are KEYWORD = ...
     if(keyword[0] != '=') {
-      string msg = "Expected an assignment operator [=], but found [";
+      string msg = "Expected an assignment [=] when reading PVL, but found [";
       msg += keyword[0];
       msg += "]";
 
-      throw iException::Message(iException::Pvl, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     keyword = iString(keyword.substr(1)).Trim(" \t");
@@ -1421,14 +1410,14 @@ namespace Isis {
 
         if(!keyword.empty() && keyword[0] == wrongClosingParen) {
 
-          string msg = "Incorrect array close; expected [";
+          string msg = "Incorrect array close when reading PVL; expected [";
           msg += closingParen;
           msg += "] but found [";
           msg += wrongClosingParen;
           msg += "] in keyword named [";
           msg += keywordName;
           msg += "]";
-          throw iException::Message(iException::Pvl, msg, _FILEINFO_);
+          throw IException(IException::Unknown, msg, _FILEINFO_);
         }
 
         // This contains <VALUE, UNIT>
@@ -1467,8 +1456,9 @@ namespace Isis {
         //  keyword = (VALUE,VALUE,)
         // which is unrecoverable
         if(foundComma && foundCloseParen) {
-          string msg = "Unexpected close of keyword-value array";
-          throw iException::Message(iException::Pvl, msg, _FILEINFO_);
+          string msg = "Unexpected close of keyword-value array when reading "
+                       "PVL";
+          throw IException(IException::Unknown, msg, _FILEINFO_);
         }
 
         // Check for (VALUE VALUE
@@ -1479,8 +1469,8 @@ namespace Isis {
           // We have (VALUE VALUE
           string msg = "Found extra data after [";
           msg += nextItem;
-          msg += "] in array";
-          throw iException::Message(iException::Pvl, msg, _FILEINFO_);
+          msg += "] in array when reading PVL";
+          throw IException(IException::Unknown, msg, _FILEINFO_);
         }
 
         // we're good with this element of the array, remember it
@@ -1560,7 +1550,7 @@ namespace Isis {
       string msg = "Keyword has extraneous data [";
       msg += keyword;
       msg += "] at the end";
-      throw iException::Message(iException::Pvl, msg, _FILEINFO_);
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     // We've parsed this keyword! :)
@@ -1936,13 +1926,13 @@ namespace Isis {
           int iValue=0;
           try {
             iValue = iString::ToInteger(sValue);
-          } catch(iException & e) {
+          } catch(IException & e) {
             string sErrMsg = "\"" +pvlKwrd.Name() +"\" expects an Integer value";
-            throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_);
+            throw IException(e, IException::User, sErrMsg, _FILEINFO_);
           }
           if(bRange && (iValue < dRangeMin || iValue > dRangeMax)) {
             string sErrMsg = "\"" +pvlKwrd.Name() +"\" is not in the specified Range";
-            throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_);
+            throw IException(IException::User, sErrMsg, _FILEINFO_);
           }
           if(bValue) {
             bool bFound = false;
@@ -1954,14 +1944,14 @@ namespace Isis {
             }
             if(!bFound) {
               string sErrMsg = "\"" +pvlKwrd.Name() +"\" has value not in the accepted list";
-              throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_);
+              throw IException(IException::User, sErrMsg, _FILEINFO_);
             }
           }
           // Type is specified (positive / negative)
           if(psValueType.length()) {
             if((psValueType == "positive" && iValue < 0) || (psValueType == "negative" && iValue >= 0) ) {
               string sErrMsg = "\"" +pvlKwrd.Name() +"\" has invalid value";
-              throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_);
+              throw IException(IException::User, sErrMsg, _FILEINFO_);
             }
           }
         }
@@ -1977,7 +1967,7 @@ namespace Isis {
           double dValue = iString::ToDouble(sValue);
           if(bRange && (dValue < dRangeMin || dValue > dRangeMax)) {
             string sErrMsg = "\"" +pvlKwrd.Name() +"\" is not in the specified Range";
-            throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_);
+            throw IException(IException::User, sErrMsg, _FILEINFO_);
           }
           if(bValue) {
             bool bFound = false;
@@ -1989,14 +1979,14 @@ namespace Isis {
             }
             if(!bFound) {
               string sErrMsg = "\"" +pvlKwrd.Name() +"\" has value not in the accepted list";
-            throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_);
+              throw IException(IException::User, sErrMsg, _FILEINFO_);
             }
           }
           // Type is specified (positive / negative)
           if(psValueType.length()) {
             if((psValueType == "positive" && dValue < 0) || (psValueType == "negative" && dValue >= 0) ) {
               string sErrMsg = "\"" +pvlKwrd.Name() +"\" has invalid value";
-              throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_);
+              throw IException(IException::User, sErrMsg, _FILEINFO_);
             }
           }
         }
@@ -2010,7 +2000,7 @@ namespace Isis {
         string sValue = iString::DownCase(pvlKwrd[i]);
         if(sValue != "null" && sValue != "true" && sValue != "false"){
           string sErrMsg = "Wrong Type of value in the Keyword \"" + Name() + "\" \n";
-          throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_);
+          throw IException(IException::User, sErrMsg, _FILEINFO_);
         }
       }
       return;
@@ -2030,7 +2020,7 @@ namespace Isis {
           }
           if(!bValFound) {
             string sErrMsg = "Wrong Type of value in the Keyword \"" + Name() + "\" \n";
-            throw Isis::iException::Message(Isis::iException::User, sErrMsg, _FILEINFO_);
+            throw IException(IException::User, sErrMsg, _FILEINFO_);
           }
         }
       }

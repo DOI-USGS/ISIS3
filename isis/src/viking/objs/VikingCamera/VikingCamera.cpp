@@ -89,7 +89,7 @@ namespace Isis {
       else {
         string msg = "File does not appear to be a Viking image. InstrumentId ["
           + instId + "] is invalid Viking value.";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
     }
     else if(spacecraft == "VIKING_ORBITER_2") {
@@ -115,13 +115,13 @@ namespace Isis {
       else {
         string msg = "File does not appear to be a Viking image. InstrumentId ["
           + instId + "] is invalid Viking value.";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
     }
     else {
       string msg = "File does not appear to be a Viking image. SpacecraftName ["
           + spacecraft + "] is invalid Viking value.";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     // DOCUMENTATION FROM ISIS2 lev1u_vik_vis_routines.c:
@@ -191,14 +191,14 @@ namespace Isis {
    * converted to ephemeris time. To find the shutter open time, 2 offset values
    * must be added to the SpacecraftClockCount keyword value. To find the
    * shutter close time, the exposure duration is added to the calculated
-   * shutter open time. This method overrides the FramingCamera class method. 
+   * shutter open time. This method overrides the FramingCamera class method.
    *
    * @param exposureDuration ExposureDuration keyword value from the labels, in
    *                         seconds.
    * @param time The SpacecraftClockCount keyword value from the labels,
    *             converted to ephemeris time.
    *
-   * @return @b pair < @b iTime, @b iTime > The first value is the shutter open 
+   * @return @b pair < @b iTime, @b iTime > The first value is the shutter open
    *         time and the second is the shutter close time.
    *
    * @author 2011-05-03 Jeannie Walldren
@@ -227,7 +227,7 @@ namespace Isis {
 
 /**
  * This is the function that is called in order to instantiate a VikingCamera
- * object. 
+ * object.
  *
  * @param lab Cube labels
  *

@@ -1,7 +1,7 @@
 #include <iostream>
 #include "SpecialPixel.h"
 #include "Stretch.h"
-#include "iException.h"
+#include "IException.h"
 #include "Preference.h"
 #include "Histogram.h"
 
@@ -60,8 +60,8 @@ int main() {
   try {
     s.AddPair(1.0, 200.0);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   cout << endl << "Testing Parse" << endl;
@@ -72,15 +72,15 @@ int main() {
   try {
     s.Parse("0:0 50:0 49:255 255:255");
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   try {
     s.Parse("-5xyzzy:0 50:0 100:255 255:255");
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   // test the Parse for when inputs are %'s
@@ -99,32 +99,32 @@ int main() {
   try {
     s.Parse("0:0 50:0 49:255 100:255", h);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   // test for % < 0
   try {
     s.Parse("-5:10", h);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   // test for % > 100
   try {
     s.Parse("121:215", h);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   // test for other bad data
   try {
     s.Parse("-5xyzzy:0 50:0 100:255", h);
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   try {
@@ -146,8 +146,8 @@ int main() {
     remove(output.c_str());
 
   }
-  catch(Isis::iException &e) {
-    e.Report(false);
+  catch(Isis::IException &e) {
+    e.print();
   }
 
   std::cout << "testing copy pairs" << std::endl;

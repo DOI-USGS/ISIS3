@@ -110,7 +110,7 @@ namespace Isis {
 
     if (selectedRanges.empty()) {
       iString msg = "You must select a row to delete";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     int row = selectedRanges.first().topRow();
@@ -142,10 +142,9 @@ namespace Isis {
         }
       }
     }
-    catch (iException &e) {
+    catch (IException &e) {
       p_errorMessage->setText(QString::fromStdString(
-          "<font color='red'>" + e.Errors() + "</font>"));
-      e.Clear();
+          "<font color='red'>" + e.toString() + "</font>"));
     }
 
     return stretch;

@@ -2,7 +2,7 @@
 
 #include "Brick.h"
 #include "Camera.h"
-#include "iException.h"
+#include "IException.h"
 #include "iTime.h"
 
 using namespace std;
@@ -35,7 +35,7 @@ void IsisMain() {
     double dec = ui.GetDouble("DEC");
     if(!cam->SetRightAscensionDeclination(ra, dec)) {
       string msg = "Invalid Ra/Dec coordinate";
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     samp = cam->Sample();
     line = cam->Line();
@@ -120,6 +120,6 @@ void IsisMain() {
   }
   else if(ui.GetString("FORMAT") == "FLAT") {
     string msg = "Flat file must have a name.";
-    throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 }

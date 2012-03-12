@@ -16,7 +16,7 @@
 #include "Progress.h"
 #include "SerialNumberList.h"
 #include "UserInterface.h"
-#include "iException.h"
+#include "IException.h"
 #include "iTime.h"
 
 using namespace std;
@@ -51,7 +51,7 @@ void IsisMain() {
   if (outNet.GetNumPoints() <= 0) {
     std::string msg = "Control network [" + ui.GetFilename("CNET") + "] ";
     msg += "contains no points";
-    throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   outNet.SetUserName(Application::UserName());
@@ -252,8 +252,7 @@ void IsisMain() {
                 }
               }
             }
-            catch (iException &e) {
-              e.Clear();
+            catch (IException &e) {
               unregistered++;
 
               if (ui.GetBoolean("OUTPUTFAILED")) {
@@ -444,9 +443,14 @@ void verifyCube(Cube & cube) {
   try {
     cube.getCamera();
   }
-  catch (iException &e) {
-    cube.getProjection();
-    e.Clear();
+  catch (IException &camError) {
+    try {
+      cube.getProjection();
+    }
+    catch (IException &projError) {
+      projError.append(camError);
+      throw projError;
+    }
   }
 }
 

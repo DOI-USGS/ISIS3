@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-#include "iException.h"
+#include "IException.h"
 #include "ProjectionFactory.h"
 #include "Progress.h"
 #include "Projection.h"
@@ -61,10 +61,10 @@ void IsisMain() {
   try {
     proj = ProjectionFactory::Create(p);
   }
-  catch(iException &e) {
+  catch(IException &e) {
     string msg = "Cannot create grid - MapFile [" + mapFile +
                  "] does not contain necessary information to create a projection";
-    throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+    throw IException(e, IException::User, msg, _FILEINFO_);
   }
 
 

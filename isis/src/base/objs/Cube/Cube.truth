@@ -101,7 +101,7 @@ Mode:           149.148
 Total Pixels:   60000
 Null Pixels:    0
 
-**PROGRAMMER ERROR** Invalid band in [CubeInfo::Histogram]
+**PROGRAMMER ERROR** Invalid band in [CubeInfo::Histogram].
 Testing statistics method, band 1 ... 
 Gathering statistics
 0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
@@ -118,7 +118,7 @@ Standard Dev:   17205.2
 Total Pixels:   60000
 Null Pixels:    0
 
-**PROGRAMMER ERROR** Invalid band in [CubeInfo::Statistics]
+**PROGRAMMER ERROR** Invalid band in [CubeInfo::Statistics].
 
 Virtual band tests
 Nbands = 2
@@ -204,19 +204,19 @@ Reading partially within virtual band boundaries ...
 Comparing results ... 
 
 Testing errors ... 
-**PROGRAMMER ERROR** You already have a cube opened
-**PROGRAMMER ERROR** You already have a cube opened
-**PROGRAMMER ERROR** The cube [IsisCube_01.cub] is opened read-only ... you can't write to it
-**I/O ERROR** Unable to open [blah]
-**PROGRAMMER ERROR** Out of array bounds [2]
-**PROGRAMMER ERROR** Out of array bounds [0]
-**PROGRAMMER ERROR** Try opening a file before you read it
-**PROGRAMMER ERROR** Try opening/creating a file before you write it
-**PROGRAMMER ERROR** Number of samples [0], lines [0], or bands [0] cannot be less than 1
-**I/O ERROR** Label space is full in [IsisCube_04.cub] unable to write labels
+**PROGRAMMER ERROR** You already have a cube opened.
+**PROGRAMMER ERROR** You already have a cube opened.
+**PROGRAMMER ERROR** The cube [IsisCube_01.cub] is opened read-only ... you can't write to it.
+**I/O ERROR** Unable to open [blah].
+**PROGRAMMER ERROR** Out of array bounds [2].
+**PROGRAMMER ERROR** Out of array bounds [0].
+**PROGRAMMER ERROR** Try opening a file before you read it.
+**PROGRAMMER ERROR** Try opening/creating a file before you write it.
+**PROGRAMMER ERROR** Number of samples [0], lines [0], or bands [0] cannot be less than 1.
+**I/O ERROR** Label space is full in [IsisCube_04.cub] unable to write labels.
 **USER ERROR** The cube you are attempting to create [IsisCube_05] is [33527GB]. This is larger than the current allowed size of [12GB]. The cube dimensions were (S,L,B) [1000000, 1000000, 9] with [4] bytes per pixel. If you still wish to create this cube, the maximum value can be changed in the file [~/.Isis/IsisPreferences] within the group CubeCustomization, keyword MaximumSize.
-**PROGRAMMER ERROR** Unknown value for access [a]. Expected 'r'  or 'rw'
-**PROGRAMMER ERROR** SetDimensions:  Invalid number of sample, lines or bands
-**PROGRAMMER ERROR** SetDimensions:  Invalid number of sample, lines or bands
-**PROGRAMMER ERROR** SetDimensions:  Invalid number of sample, lines or bands
-**I/O ERROR** Failed to open [/usgs/cpkgs/isis3/data/base/testData/isisTruth.cub] with read/write access
+**PROGRAMMER ERROR** Unknown value for access [a]. Expected 'r'  or 'rw'.
+**PROGRAMMER ERROR** SetDimensions:  Invalid number of sample, lines or bands.
+**PROGRAMMER ERROR** SetDimensions:  Invalid number of sample, lines or bands.
+**PROGRAMMER ERROR** SetDimensions:  Invalid number of sample, lines or bands.
+**I/O ERROR** Failed to open [/usgs/cpkgs/isis3/data/base/testData/isisTruth.cub] with read/write access.

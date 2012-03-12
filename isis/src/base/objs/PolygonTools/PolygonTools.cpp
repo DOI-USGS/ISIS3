@@ -63,7 +63,7 @@ namespace Isis {
     if(projection == NULL) {
       string msg = "Unable to convert Lon/Lat polygon to X/Y. ";
       msg += "No projection has was supplied";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     // Convert the Lat/Lon poly coordinates to X/Y coordinates
@@ -142,9 +142,9 @@ namespace Isis {
 
           return despikedPoly;
         }
-        catch(iException &e) {
+        catch(IException &e) {
           iString msg = "Unable to convert polygon from Lat/Lon to X/Y";
-          throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+          throw IException(IException::Programmer, msg, _FILEINFO_);
         }
       }
 
@@ -170,7 +170,7 @@ namespace Isis {
     if(projection == NULL) {
       string msg = "Unable to convert X/Y polygon to Lon/Lat. ";
       msg += "No projection was supplied";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     // Convert the X/Y poly coordinates to Lat/Lon coordinates
@@ -235,9 +235,9 @@ namespace Isis {
 
           return despikedPoly;
         }
-        catch(iException &e) {
+        catch(IException &e) {
           iString msg = "Unable to convert polygon from X/Y to Lat/Lon";
-          throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+          throw IException(IException::Programmer, msg, _FILEINFO_);
         }
       }
     } // end else
@@ -262,7 +262,7 @@ namespace Isis {
     if(ugm == NULL) {
       string msg = "Unable to convert Lon/Lat polygon to Sample/Line. ";
       msg += "No UniversalGroundMap was supplied";
-      throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     // Convert the Lon/Lat poly coordinates to Sample/Line coordinates
@@ -329,9 +329,9 @@ namespace Isis {
 
           return despikedPoly;
         }
-        catch(iException &e) {
+        catch(IException &e) {
           iString msg = "Unable to convert polygon from Lat/Lon to Sample/Line";
-          throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+          throw IException(IException::Programmer, msg, _FILEINFO_);
         }
       }
     } // end else
@@ -458,10 +458,10 @@ namespace Isis {
       leftOf180Pts->add(geos::geom::Coordinate(180, 90));
       leftOf180Pts->add(geos::geom::Coordinate(180, -90));
       leftOf180Pts->add(geos::geom::Coordinate(0, -90));
-      
+
       geos::geom::LinearRing *leftOf180Geom =
           globalFactory.createLinearRing(leftOf180Pts);
-      
+
       geos::geom::Polygon *leftOf180Poly =
           globalFactory.createPolygon(leftOf180Geom, NULL);
 
@@ -472,25 +472,25 @@ namespace Isis {
       rightOf180Pts->add(geos::geom::Coordinate(360, 90));
       rightOf180Pts->add(geos::geom::Coordinate(360, -90));
       rightOf180Pts->add(geos::geom::Coordinate(180, -90));
-      
+
       geos::geom::LinearRing *rightOf180Geom =
           globalFactory.createLinearRing(rightOf180Pts);
-      
+
       geos::geom::Polygon *rightOf180Poly =
           globalFactory.createPolygon(rightOf180Geom, NULL);
-      
+
       geos::geom::Geometry *preserved = Intersect(leftOf180Poly, poly360);
       geos::geom::Geometry *moving = Intersect(rightOf180Poly, poly360);
-      
+
       geos::geom::CoordinateSequence *movingPts = moving->getCoordinates();
       geos::geom::CoordinateSequence *movedPts =
           new geos::geom::CoordinateArraySequence();
-      
+
       for(unsigned int i = 0; i < movingPts->getSize(); i ++) {
         movedPts->add(geos::geom::Coordinate(movingPts->getAt(i).x - 360.0,
                                              movingPts->getAt(i).y));
       }
-      
+
       if(movedPts->getSize()) {
         movedPts->add(geos::geom::Coordinate(movedPts->getAt(0).x,
                                             movedPts->getAt(0).y));
@@ -498,13 +498,13 @@ namespace Isis {
 
       geos::geom::Geometry *moved = globalFactory.createPolygon(
           globalFactory.createLinearRing(movedPts), NULL);
-      
+
       std::vector<geos::geom::Geometry *> *geomsForCollection = new
           std::vector<geos::geom::Geometry *>;
       geomsForCollection->push_back(preserved);
       geomsForCollection->push_back(moved);
 
-      geos::geom::GeometryCollection *the180Polys = 
+      geos::geom::GeometryCollection *the180Polys =
           Isis::globalFactory.createGeometryCollection(geomsForCollection);
 
       geos::geom::MultiPolygon *result = MakeMultiPolygon(the180Polys);
@@ -521,11 +521,11 @@ namespace Isis {
       iString msg = "Conversion to 180 failed. The reason given was [" +
           iString(exc->what()) + "]";
       delete exc;
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     catch(...) {
       iString msg = "Conversion to 180 failed. Could not determine the reason";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
 
@@ -627,12 +627,11 @@ namespace Isis {
           lr = fixed;
         }
       }
-      catch(iException &e) {
+      catch(IException &e) {
         // Sometimes despike and fix fail, but the input is really valid. We can just go
         // with the non-despiked polygon.
         if(ls->isValid() && ls->getGeometryTypeId() == geos::geom::GEOS_LINEARRING) {
           lr = dynamic_cast<geos::geom::LinearRing *>(ls->clone());
-          e.Clear();
         }
         else {
           throw;
@@ -660,7 +659,7 @@ namespace Isis {
       delete mp;
       mp = NULL;
       iString msg = "Despike failed to correct the polygon";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     // if multipoly area changes more than 25% we did something bad to the multipolygon
@@ -668,7 +667,7 @@ namespace Isis {
       iString msg = "Despike failed to correct the polygon " + mp->toString();
       delete mp;
 
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     return mp;
@@ -882,15 +881,15 @@ namespace Isis {
     catch(geos::util::GEOSException *exc) {
       iString msg = "Intersect operation failed. The reason given was [" + iString(exc->what()) + "]";
       delete exc;
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-    catch(iException &e) {
+    catch(IException &e) {
       iString msg = "Intersect operation failed";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(e, IException::Programmer, msg, _FILEINFO_);
     }
     catch(...) {
       iString msg = "Intersect operation failed for an unknown reason";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
 
@@ -933,12 +932,12 @@ namespace Isis {
       catch(...) {
         if(precision == minPrecision) {
           iString msg = "An unknown geos error occurred";
-          throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+          throw IException(IException::Programmer, msg, _FILEINFO_);
         }
 
         if(!failed) {
           iString msg = "An unknown geos error occurred when attempting to clone a geometry";
-          throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+          throw IException(IException::Programmer, msg, _FILEINFO_);
         }
       }
 
@@ -970,21 +969,21 @@ namespace Isis {
           delete result;
 
           iString msg = "Operation [" + iString((int)opcode) + "] failed";
-          throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+          throw IException(IException::Programmer, msg, _FILEINFO_);
         }
 
         delete result;
         result = newResult;
       }
-      catch(iException &e) {
+      catch(IException &e) {
         iString msg = "Operation [" + iString((int)opcode) + "] failed";
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       }
     }
 
     if(result == NULL) {
       iString msg = "Operation [" + iString((int)opcode) + " failed";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     return result;
@@ -1015,7 +1014,7 @@ namespace Isis {
     }
     else {
       iString msg = "PolygonTools::FixGeometry does not support [" + GetGeometryName(geom) + "]";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
 
@@ -1068,9 +1067,9 @@ namespace Isis {
         geos::geom::LinearRing *newHole = FixGeometry((geos::geom::LinearRing *)thisHole);
         holes->push_back(newHole);
       }
-      catch(iException &e) {
+      catch (IException &e) {
         iString msg = "Failed when attempting to fix interior ring of multipolygon";
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       }
     } // end num holes in polygon loop
 
@@ -1085,14 +1084,14 @@ namespace Isis {
       }
       else {
         iString msg = "Failed when attempting to fix exterior ring of polygon. The exterior ring is not simple and closed";
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
       return globalFactory.createPolygon(newExterior, holes);
     }
-    catch(iException &e) {
+    catch (IException &e) {
       iString msg = "Failed when attempting to fix exterior ring of polygon";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(e, IException::Programmer, msg, _FILEINFO_);
     }
   }
 
@@ -1182,12 +1181,12 @@ namespace Isis {
       exc = NULL;
 
       iString msg = "Error when attempting to fix linear ring";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if(newRing && !newRing->isValid() && ring->isValid()) {
       iString msg = "Failed when attempting to fix linear ring";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     else if(!newRing || !newRing->isValid()) {
       if(newRing) {
@@ -1247,15 +1246,15 @@ namespace Isis {
     catch(geos::util::GEOSException *exc) {
       iString msg = "Difference operation failed. The reason given was [" + iString(exc->what()) + "]";
       delete exc;
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-    catch(iException &e) {
+    catch(IException &e) {
       iString msg = "Difference operation failed";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(e, IException::Programmer, msg, _FILEINFO_);
     }
     catch(...) {
       iString msg = "Difference operation failed for an unknown reason";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
 
@@ -1322,7 +1321,7 @@ namespace Isis {
 
       return mp;
     }
-    
+
     // All other geometry types are invalid so ignore them
     else {
       return Isis::globalFactory.createMultiPolygon();
@@ -1381,7 +1380,7 @@ namespace Isis {
     if (intersectionStarted && intersectionEnded) {
       geos::geom::CoordinateSequence *merged =
           new geos::geom::CoordinateArraySequence;
-    
+
       unsigned int i = 0;
       for (i = 0; i < aIntersectionBegin; i ++) {
         merged->add(polyAPoints->getAt(i));
@@ -1406,14 +1405,14 @@ namespace Isis {
     return result;
   }
 
-  
+
   geos::geom::MultiPolygon *PolygonTools::FixSeam(
       const geos::geom::MultiPolygon *poly) {
 
     std::vector<geos::geom::Geometry *> *polys =
         new std::vector<geos::geom::Geometry *>;
-    
-    
+
+
     for(unsigned int copyIndex = 0;
         copyIndex < poly->getNumGeometries();
         copyIndex ++) {
@@ -1421,7 +1420,7 @@ namespace Isis {
     }
 
     unsigned int outerPolyIndex = 0;
-    
+
     while(outerPolyIndex + 1 < polys->size()) {
       unsigned int innerPolyIndex = outerPolyIndex + 1;
 
@@ -1451,7 +1450,7 @@ namespace Isis {
           innerPolyIndex ++;
         }
       }
-      
+
       outerPolyIndex ++;
     }
 
@@ -1486,7 +1485,7 @@ namespace Isis {
     }
     else {
       iString msg = "PolygonTools::ReducePrecision does not support [" + GetGeometryName(geom) + "]";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
 
@@ -1556,9 +1555,9 @@ namespace Isis {
         }
 
       }
-      catch(iException &e) {
+      catch(IException &e) {
         iString msg = "Failed when attempting to fix interior ring of multipolygon";
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+        throw IException(e, IException::Programmer, msg, _FILEINFO_);
       }
     } // end num holes in polygon loop
 
@@ -1573,14 +1572,14 @@ namespace Isis {
       }
       else {
         iString msg = "Failed when attempting to fix exterior ring of polygon. The exterior ring is not simple and closed";
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
       return globalFactory.createPolygon(newExterior, holes);
     }
-    catch(iException &e) {
+    catch(IException &e) {
       iString msg = "Failed when attempting to fix exterior ring of polygon";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(e, IException::Programmer, msg, _FILEINFO_);
     }
   }
 
@@ -1628,7 +1627,7 @@ namespace Isis {
       exc = NULL;
 
       iString msg = "Error when attempting to reduce precision of linear ring";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     // try to despike
@@ -1637,13 +1636,12 @@ namespace Isis {
       delete newRing;
       newRing = tmp;
     }
-    catch(iException &e) {
-      e.Clear();
+    catch(IException &e) {
     }
 
     if(!newRing->isValid()) {
       iString msg = "Failed when attempting to reduce precision of linear ring";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     return newRing;

@@ -24,10 +24,10 @@ void IsisMain() {
   try {
     id = (string) lab.FindKeyword("DATA_SET_ID");
   }
-  catch(iException &e) {
+  catch(IException &e) {
     string msg = "Unable to read [DATA_SET_ID] from input file [" +
                  inFile.Expanded() + "]";
-    throw iException::Message(iException::Io, msg, _FILEINFO_);
+    throw IException(IException::Io, msg, _FILEINFO_);
   }
 
   id.ConvertWhiteSpace();
@@ -43,7 +43,7 @@ void IsisMain() {
                  "or in LUNAR RECONNAISSANCE ORBITER MINI-RF LRO level 1 or " +
                  "level 2 format. " +
                  "DATA_SET_ID is [" + id + "]";
-    throw iException::Message(iException::Io, msg, _FILEINFO_);
+    throw IException(IException::Io, msg, _FILEINFO_);
   }
 
   p.SetPdsFile(labelFile, "", label);
@@ -64,7 +64,7 @@ void IsisMain() {
   else {
     string msg = "Input file [" + inFile.Expanded() + "] has an invalid " +
                  "band storage type. BAND_STORAGE_TYPE is [" + bandorder + "]";
-    throw iException::Message(iException::Io, msg, _FILEINFO_);
+    throw IException(IException::Io, msg, _FILEINFO_);
   }
   p.StartProcess();
 
@@ -130,7 +130,7 @@ void IsisMain() {
         string msg = "Input file [" + inFile.Expanded() + "] does not have valid " +
                      "ScaledPixelHeight and ScaledPixelWidth values. These values " +
                      "must be equivalent or the image is considered to be invalid.";
-        throw iException::Message(iException::Io, msg, _FILEINFO_);
+        throw IException(IException::Io, msg, _FILEINFO_);
       }
     }
 

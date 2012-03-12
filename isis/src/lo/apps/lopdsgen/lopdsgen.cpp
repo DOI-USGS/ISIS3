@@ -153,7 +153,7 @@ void IsisMain() {
     else {
       Filename inputFile(ui.GetFilename("FROM"));
       string msg = "[" + inputFile.Expanded() + "] does not appear to be an LO file.  ";
-      throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
   // Reexporting a product created by this program and reingested into Isis
@@ -202,7 +202,7 @@ void IsisMain() {
     Filename inputFile(ui.GetFilename("FROM"));
     string msg = "[" + inputFile.Expanded() + "] does not contain boresight or fiducial information.  ";
     msg += "Try ingesting your data with lo2isis first.";
-    throw Isis::iException::Message(Isis::iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // Add PRODUCT_CREATION_TIME

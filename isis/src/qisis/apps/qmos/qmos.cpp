@@ -1,7 +1,7 @@
 #include "IsisDebug.h"
 
 #include "Gui.h"
-#include "iException.h"
+#include "IException.h"
 #include "MosaicMainWindow.h"
 #include "Preference.h"
 #include "PvlGroup.h"
@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
 #ifdef CWDEBUG
   startMonitoringMemory();
 #endif
-  
+
   Isis::Gui::checkX11();
 
   try {
@@ -43,8 +43,8 @@ int main(int argc, char *argv[]) {
 
     return status;
   }
-  catch(iException &e) {
-    e.Report();
+  catch(IException &e) {
+    e.print();
   }
 
 }

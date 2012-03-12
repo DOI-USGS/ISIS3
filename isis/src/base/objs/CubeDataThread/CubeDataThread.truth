@@ -128,8 +128,8 @@ Creating Deadlock then trying to remove cubes
     New Data: 
       5	3	4
 
-**PROGRAMMER ERROR** CubeDataThread::RemoveCube failed cube ID [3] has requested Bricks
-**PROGRAMMER ERROR** CubeDataThread::RemoveCube failed because cube ID [-1] not found
+**PROGRAMMER ERROR** CubeDataThread::RemoveCube failed cube ID [3] has requested Bricks.
+**PROGRAMMER ERROR** CubeDataThread::RemoveCube failed because cube ID [-1] not found.
 Remove cube succeeded
 
 

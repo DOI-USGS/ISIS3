@@ -27,7 +27,7 @@
 
 #include "Calculator.h"
 #include "InfixToPostfix.h"
-#include "iException.h"
+#include "IException.h"
 #include "SpecialPixel.h"
 
 using namespace std;
@@ -449,15 +449,18 @@ namespace Isis {
   void Calculator::LeftShift() {
     QVector<double> y = Pop();
     if(y.size() != 1) {
-      std::string msg = "Must use scalars for shifting.";
-      throw Isis::iException::Message(Isis::iException::Math, msg, _FILEINFO_);
+      iString msg = "When trying to do a left shift calculation, a non-scalar "
+                    "shift value was encountered. Shifting requires scalars.";
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
     else {
       QVector<double> x = Pop();
 
       if((int)y[0] > (int)x.size()) {
-        std::string msg = "Shift value must be <= to number of samples.";
-        throw Isis::iException::Message(Isis::iException::Math, msg, _FILEINFO_);
+        iString msg = "When trying to do a left shift calculation, a shift "
+                      "value greater than the data size was encountered. "
+                      "Shifting by this value would erase all of the data.";
+        throw IException(IException::Unknown, msg, _FILEINFO_);
       }
       else {
         QVector<double> result;
@@ -485,15 +488,18 @@ namespace Isis {
   void Calculator::RightShift() {
     QVector<double> y = Pop();
     if(y.size() != 1) {
-      std::string msg = "Must use scalars for shifting.";
-      throw Isis::iException::Message(Isis::iException::Math, msg, _FILEINFO_);
+      iString msg = "When trying to do a right shift calculation, a non-scalar "
+                    "shift value was encountered. Shifting requires scalars.";
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
     else {
       QVector<double> x = Pop();
 
       if((int)y[0] > (int)x.size()) {
-        std::string msg = "Shift value must be <= to number of samples.";
-        throw Isis::iException::Message(Isis::iException::Math, msg, _FILEINFO_);
+        iString msg = "When trying to do a right shift calculation, a shift "
+                      "value greater than the data size was encountered. "
+                      "Shifting by this value would erase all of the data.";
+        throw IException(IException::Unknown, msg, _FILEINFO_);
       }
       else {
         QVector<double> result;
@@ -948,8 +954,9 @@ namespace Isis {
     QVector<double> top;
 
     if(p_valStack->empty()) {
-      std::string msg = "Stack is empty, cannot perform any more operations.";
-      throw Isis::iException::Message(Isis::iException::Math, msg, _FILEINFO_);
+      iString msg = "Math calculator stack is empty, cannot perform any "
+                    "more operations.";
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     top = p_valStack->top();
@@ -1061,8 +1068,9 @@ namespace Isis {
                                     double operation(double, double)) {
     if(arg1End - arg1Start != 1 && arg2End - arg2Start != 1 &&
         arg1End - arg1Start != arg2End - arg2Start) {
-      std::string msg = "Cannot operate on vectors of differing sizes.";
-      throw Isis::iException::Message(Isis::iException::Math, msg, _FILEINFO_);
+      iString msg = "The stack based calculator cannot operate on vectors "
+                    "of differing sizes.";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     int iSize = max(arg1End - arg1Start, arg2End - arg2Start);

@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "iException.h"
+#include "IException.h"
 #include "Brick.h"
 #include "Cube.h"
 #include "Filename.h"
@@ -103,8 +103,8 @@ int main(int argc, char *argv[]) {
     try {
       in2.open("IsisCube_02");
     }
-    catch (iException &e) {
-      e.Report();
+    catch (IException &e) {
+      e.print();
     }
     Report(in2);
     j = 0;
@@ -198,8 +198,8 @@ int main(int argc, char *argv[]) {
     try {
       in.getHistogram(-1);
     }
-    catch(iException &e) {
-      e.Report(false);
+    catch(IException &e) {
+      e.print();
     }
 
     // Test statistics object on a single band, 1 by default
@@ -228,8 +228,8 @@ int main(int argc, char *argv[]) {
     try {
       in.getStatistics(-1);
     }
-    catch(iException &e) {
-      e.Report(false);
+    catch(IException &e) {
+      e.print();
     }
 
     cerr << endl;
@@ -430,60 +430,60 @@ int main(int argc, char *argv[]) {
     try {
       in.open("blah");
     }
-    catch(iException &e) {
-      e.Report(false);
+    catch(IException &e) {
+      e.print();
     }
 
     try {
       in.create("blah");
     }
-    catch(iException &e) {
-      e.Report(false);
+    catch(IException &e) {
+      e.print();
     }
 
     try {
       in.write(inLine3);
     }
-    catch(iException &e) {
-      e.Report(false);
+    catch(IException &e) {
+      e.print();
     }
 
     try {
       Cube in;
       in.open("blah");
     }
-    catch(iException &e) {
-      e.Report(false);
+    catch(IException &e) {
+      e.print();
     }
 
     try {
       in.getPhysicalBand(2);
     }
-    catch(iException &e) {
-      e.Report(false);
+    catch(IException &e) {
+      e.print();
     }
 
     try {
       in.getPhysicalBand(0);
     }
-    catch(iException &e) {
-      e.Report(false);
+    catch(IException &e) {
+      e.print();
     }
 
     try {
       Cube in;
       in.read(inLine3);
     }
-    catch(iException &e) {
-      e.Report(false);
+    catch(IException &e) {
+      e.print();
     }
 
     try {
       Cube in;
       in.write(inLine3);
     }
-    catch(iException &e) {
-      e.Report(false);
+    catch(IException &e) {
+      e.print();
     }
 
     try {
@@ -491,8 +491,8 @@ int main(int argc, char *argv[]) {
       out.create("IsisCube_04");
       out.close();
     }
-    catch(iException &e) {
-      e.Report(false);
+    catch(IException &e) {
+      e.print();
     }
 
     try {
@@ -502,8 +502,8 @@ int main(int argc, char *argv[]) {
       out.create("IsisCube_04");
       out.close();
     }
-    catch(iException &e) {
-      e.Report(false);
+    catch(IException &e) {
+      e.print();
     }
 
     try {
@@ -512,55 +512,55 @@ int main(int argc, char *argv[]) {
       out.create("IsisCube_05");
       out.close();
     }
-    catch(iException &e) {
-      e.Report(false);
+    catch(IException &e) {
+      e.print();
     }
     try {
       Cube in;
       in.open("IsisCube_01", "a");
     }
-    catch(iException &e) {
-      e.Report(false);
+    catch(IException &e) {
+      e.print();
     }
     try {
       Cube in;
       in.setDimensions(0, 0, 0);
     }
-    catch(iException &e) {
-      e.Report(false);
+    catch(IException &e) {
+      e.print();
     }
     try {
       Cube in;
       in.setDimensions(1, 0, 0);
     }
-    catch(iException &e) {
-      e.Report(false);
+    catch(IException &e) {
+      e.print();
     }
     try {
       Cube in;
       in.setDimensions(1, 1, 0);
     }
-    catch(iException &e) {
-      e.Report(false);
+    catch(IException &e) {
+      e.print();
     }
 
     Cube in4;
     try {
       in4.open("$base/testData/isisTruth.cub");
     }
-    catch(iException &e) {
-      e.Report(false);
+    catch(IException &e) {
+      e.print();
     }
     try {
       in4.reopen("rw");
     }
-    catch(iException &e) {
-      e.Report(false);
+    catch(IException &e) {
+      e.print();
     }
 
   }
-  catch(iException &e) {
-    e.Report();
+  catch(IException &e) {
+    e.print();
   }
 
   remove("IsisCube_01.cub");
@@ -591,8 +591,7 @@ void Report(Cube &c) {
     cerr.flush();
     cerr << c.isReadOnly();
   }
-  catch(iException &e) {
-    e.Clear();
+  catch(IException &e) {
     cerr << "N/A";
   }
 
@@ -603,8 +602,7 @@ void Report(Cube &c) {
     cerr.flush();
     cerr << c.isReadWrite();
   }
-  catch(iException &e) {
-    e.Clear();
+  catch(IException &e) {
     cerr << "N/A";
   }
 

@@ -1,6 +1,6 @@
 #include <iostream>
 #include "MultivariateStatistics.h"
-#include "iException.h"
+#include "IException.h"
 #include "Preference.h"
 
 using namespace std;

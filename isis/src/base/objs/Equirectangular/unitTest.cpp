@@ -1,6 +1,6 @@
 #include <iostream>
 #include <iomanip>
-#include "iException.h"
+#include "IException.h"
 #include "Equirectangular.h"
 #include "ProjectionFactory.h"
 #include "Preference.h"
@@ -31,8 +31,8 @@ int main(int argc, char *argv[]) {
   try {
     Equirectangular p(lab);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
   cout << endl;
 
@@ -42,8 +42,8 @@ int main(int argc, char *argv[]) {
   try {
     Equirectangular p(lab);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
   cout << endl;
 
@@ -120,8 +120,8 @@ int main(int argc, char *argv[]) {
   try {
     Equirectangular p2(lab);
   }
-  catch(iException &e) {
-    e.Report(false);
+  catch(IException &e) {
+    e.print();
   }
 }
 

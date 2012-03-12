@@ -1,6 +1,6 @@
 #include <iostream>
 #include "Blob.h"
-#include "iException.h"
+#include "IException.h"
 #include "Preference.h"
 
 using namespace std;
@@ -68,8 +68,8 @@ int main(int argc, char *argv[]) {
     remove("junk");
 
   }
-  catch(Isis::iException &e) {
-    e.Report();
+  catch(Isis::IException &e) {
+    e.print();
   }
 }
 

@@ -25,7 +25,7 @@
 #include <string>
 #include <iostream>
 #include "MultivariateStatistics.h"
-#include "iException.h"
+#include "IException.h"
 
 
 namespace Isis {
@@ -133,7 +133,7 @@ namespace Isis {
 
     if(p_totalPixels < 0) {
       std::string m = "You are removing non-existant data in [MultivariateStatistics::RemoveData]";
-      throw Isis::iException::Message(Isis::iException::Programmer, m, _FILEINFO_);
+      throw IException(IException::Programmer, m, _FILEINFO_);
     }
   }
 
@@ -212,7 +212,7 @@ namespace Isis {
     double denom = (double)p_validPixels * p_x.SumSquare() - p_x.Sum() * p_x.Sum();
     if(denom == 0.0) {
       std::string msg = "Unable to compute linear regression in Multivariate Statistics";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     a = p_y.Sum() * p_x.SumSquare() - p_x.Sum() * p_sumxy;
     a = a / denom;

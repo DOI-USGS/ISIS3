@@ -5,7 +5,7 @@
 #include "ProcessImport.h"
 
 #include "Filename.h"
-#include "iException.h"
+#include "IException.h"
 #include "iTime.h"
 #include "Pipeline.h"
 
@@ -19,7 +19,7 @@ void IsisMain() {
       !ui.GetBoolean("CALIBRATION") &&
       !ui.GetBoolean("MAPPING")) {
     string m = "Please pick at least one of [INGESTION, CALIBRATION, MAPPING]";
-    throw iException::Message(iException::User, m, _FILEINFO_);
+    throw IException(IException::User, m, _FILEINFO_);
   }
 
   Pipeline p("mocproc");

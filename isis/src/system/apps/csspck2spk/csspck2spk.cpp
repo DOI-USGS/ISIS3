@@ -102,7 +102,7 @@ void IsisMain() {
             string msg = "This file has already been updated [";
             msg += iString(inDBfile) + "] by an old version of this program.";
             msg += "  This is not a valid input.";
-            throw iException::Message(iException::User, msg, _FILEINFO_);
+            throw IException(IException::User, msg, _FILEINFO_);
           }
         }
       }
@@ -145,7 +145,7 @@ void IsisMain() {
       // DB file
       string msg = "SPK [" + spk.toStdString() +
           "] does not map to an entry in [" + inDBfile + "]";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
 

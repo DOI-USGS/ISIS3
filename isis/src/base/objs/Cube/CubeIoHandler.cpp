@@ -44,7 +44,7 @@
 #include "Distance.h"
 #include "Endian.h"
 #include "EndianSwapper.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "PixelType.h"
 #include "Preference.h"
@@ -91,7 +91,7 @@ namespace Isis {
     try {
       if (!dataFile) {
         iString msg = "Cannot create a CubeIoHandler with a NULL data file";
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
       m_cachingAlgorithms = new QList<CubeCachingAlgorithm *>;
@@ -154,9 +154,13 @@ namespace Isis {
 
       setVirtualBands(virtualBandList);
     }
+    catch(IException &e) {
+      iString msg = "Constructing CubeIoHandler failed";
+      throw IException(e, IException::Programmer, msg, _FILEINFO_);
+    }
     catch(...) {
       iString msg = "Constructing CubeIoHandler failed";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
 
@@ -487,7 +491,7 @@ namespace Isis {
    * @return the byte size of each chunk in the cube. Currently they must be
    *   constant size, but this is planned to be changed at some point in
    *   time.
-   * 
+   *
    * @returns Number of bytes in a cube chunk
    */
   BigInt CubeIoHandler::getBytesPerChunk() const {
@@ -531,7 +535,7 @@ namespace Isis {
    *
    * Chunks which sit outside of the cube entirely must not be passed into this
    *   method; the results will be wrong.
-   * 
+   *
    * @return The chunk's index into the file
    */
   int CubeIoHandler::getChunkIndex(const RawCubeChunk &chunk)  const {
@@ -563,7 +567,7 @@ namespace Isis {
   /**
    * @return the QFile containing cube data. This is what should be read from and
    *   written to.
-   * 
+   *
    * @return The data file for I/O
    */
   QFile * CubeIoHandler::getDataFile() {
@@ -667,7 +671,7 @@ namespace Isis {
       }
     }
     else {
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
 
@@ -817,7 +821,7 @@ namespace Isis {
         * So we want to find which cube chunks line up to the requested area.
         *   To do this, we find which chunk intersects the top left of the
         *   requested cube area. That chunk is a given that we need it. Then
-        *   we search in the positive X direction for more chunks that 
+        *   we search in the positive X direction for more chunks that
         *   intersect the user-requested area until we no longer do. Then we
         *   know all of the chunks that intersect a whole y-range of the
         *   requested area. We shrink the requested area (remove the found
@@ -1421,7 +1425,7 @@ namespace Isis {
                 else if(raw == LOW_INSTR_SAT4)
                   bufferVal = LOW_INSTR_SAT8;
                 else if(raw == LOW_REPR_SAT4)
-                  bufferVal = LOW_REPR_SAT8; 
+                  bufferVal = LOW_REPR_SAT8;
                 else if(raw == HIGH_INSTR_SAT4)
                   bufferVal = HIGH_INSTR_SAT8;
                 else if(raw == HIGH_REPR_SAT4)
@@ -1610,7 +1614,7 @@ namespace Isis {
                   raw = HIGH_INSTR_SAT2;
                 else if(bufferVal == HIGH_REPR_SAT8)
                   raw = HIGH_REPR_SAT2;
-                else 
+                else
                   raw = LOW_REPR_SAT2;
               }
 
@@ -1651,7 +1655,7 @@ namespace Isis {
                   raw = LOW_REPR_SAT1;
                 else if(bufferVal == HIGH_INSTR_SAT8)
                   raw = HIGH_INSTR_SAT1;
-                else if(bufferVal == HIGH_REPR_SAT8) 
+                else if(bufferVal == HIGH_REPR_SAT8)
                   raw = HIGH_REPR_SAT1;
                 else
                   raw = LOW_REPR_SAT1;
@@ -1675,7 +1679,7 @@ namespace Isis {
     if(!m_dataIsOnDiskMap) {
       iString msg = "Cannot call CubeIoHandler::writeNullDataToDisk unless "
           "data is not already on disk (Cube::Create was called)";
-      throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     int numChunks = getChunkCount();

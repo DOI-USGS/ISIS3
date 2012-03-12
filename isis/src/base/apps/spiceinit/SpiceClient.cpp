@@ -11,7 +11,7 @@
 
 #include "Application.h"
 #include "Constants.h"
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "Pvl.h"
 #include "Table.h"
@@ -167,9 +167,7 @@ namespace Isis {
       // Make sure we can get the log out of it before continuing
       applicationLog();
     }
-    catch(iException &e) {
-      e.Clear();
-
+    catch(IException &) {
       p_error = new iString();
 
       // Well, the XML is bad, maybe it's PVL
@@ -188,9 +186,7 @@ namespace Isis {
           *p_error += err.FindKeyword("Message")[0];
         }
       }
-      catch(iException &e) {
-        e.Clear();
-
+      catch(IException &) {
         if (reply->error() != QNetworkReply::NoError) {
           *p_error = "An error occurred when talking to the server";
 
@@ -368,7 +364,7 @@ namespace Isis {
   QDomElement SpiceClient::rootXMLElement() {
     if(!p_response || !p_rawResponse) {
       iString error = "No server response available";
-      throw iException::Message(iException::Io, error, _FILEINFO_);
+      throw IException(IException::Io, error, _FILEINFO_);
     }
 
     QDomDocument document;
@@ -384,7 +380,7 @@ namespace Isis {
       iString msg = "Unexpected response from spice server [";
       msg += *p_rawResponse;
       msg += "]";
-      throw iException::Message(iException::Io, msg, _FILEINFO_);
+      throw IException(IException::Io, msg, _FILEINFO_);
     }
   }
 
@@ -411,7 +407,7 @@ namespace Isis {
     }
 
     iString msg = "Server response missing XML Tag [" + name + "]";
-    throw iException::Message(iException::Io, msg, _FILEINFO_);
+    throw IException(IException::Io, msg, _FILEINFO_);
   }
 
 
@@ -524,7 +520,7 @@ namespace Isis {
    */
   void SpiceClient::checkErrors() {
     if(p_error) {
-      throw iException::Message(iException::Spice, *p_error, _FILEINFO_);
+      throw IException(IException::Unknown, *p_error, _FILEINFO_);
     }
   }
 

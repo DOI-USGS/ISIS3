@@ -31,7 +31,7 @@
 #include "Module.h"
 #include "NumericalApproximation.h"
 #include "SpecialPixel.h"
-#include "iException.h"
+#include "IException.h"
 
 namespace Isis {
 

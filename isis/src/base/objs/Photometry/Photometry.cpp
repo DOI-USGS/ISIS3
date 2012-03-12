@@ -1,4 +1,4 @@
-#include "iException.h"
+#include "IException.h"
 #include "iString.h"
 #include "Pvl.h"
 #include "Photometry.h"
@@ -27,7 +27,7 @@ namespace Isis {
       p_phtPmodel = PhotoModelFactory::Create(pvl);
     } else {
       std::string msg = "A Photometric model must be specified to do any type of photometry";
-      throw iException::Message(iException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg, _FILEINFO_);
     }
     if(pvl.HasObject("AtmosphericModel")) {
       p_phtAmodel = AtmosModelFactory::Create(pvl, *p_phtPmodel);
@@ -97,7 +97,7 @@ namespace Isis {
     p_phtNmodel->CalcNrmAlbedo(pha, inc, ema, deminc, demema, dn, albedo, mult, base);
     return;
   }
-  
+
   /**
    * GSL's the Brent-Dekker method (referred to here as Brent's method) combines an
    * interpolation strategy with the bisection algorithm. This produces a fast algorithm
@@ -108,18 +108,18 @@ namespace Isis {
    * curve with the x-axis is taken as a guess for the root. If it lies within the bounds
    * of the current interval then the interpolating point is accepted, and used to generate
    * a smaller interval. If the interpolating point is not accepted then the algorithm falls
-   * back to an ordinary bisection step. 
-   *  
-   * The best estimate of the root is taken from the most recent interpolation or bisection. 
-   * 
+   * back to an ordinary bisection step.
+   *
+   * The best estimate of the root is taken from the most recent interpolation or bisection.
+   *
    * @author Sharmila Prasad (9/15/2011)
-   * 
-   * @param x_lo      - Initial lower search interval 
-   * @param x_hi      - Initial higher search interval 
+   *
+   * @param x_lo      - Initial lower search interval
+   * @param x_hi      - Initial higher search interval
    * @param Func      - Continuous function of one variable for the root finders to operate on
    * @param tolerance - Root Error Tolerance
    * @param root      - Output calculated root
-   * 
+   *
    * @return int      - Algorithm status
    */
   int Photometry::brentsolver(double x_lo, double x_hi, gsl_function *Func, double tolerance, double &root){
@@ -127,11 +127,11 @@ namespace Isis {
     int iter=0, max_iter=100;
     const gsl_root_fsolver_type *T;
     gsl_root_fsolver *s;
-    
+
     T = gsl_root_fsolver_brent;
     s = gsl_root_fsolver_alloc (T);
     gsl_root_fsolver_set(s, Func, x_lo, x_hi);
-    
+
     do {
       iter++;
       status = gsl_root_fsolver_iterate(s);
@@ -139,68 +139,68 @@ namespace Isis {
       x_lo   = gsl_root_fsolver_x_lower(s);
       x_hi   = gsl_root_fsolver_x_upper(s);
       status = gsl_root_test_interval(x_lo, x_hi, 0, tolerance);
-      
+
     } while (status != GSL_SUCCESS && iter < max_iter);
-    
+
     gsl_root_fsolver_free(s);
     return status;
   }
-  
+
   /**
    * The Brent minimization algorithm combines a parabolic interpolation with the golden section algorithm.
-   * This produces a fast algorithm which is still robust. The outline of the algorithm can be summarized as 
-   * follows: on each iteration Brent's method approximates the function using an interpolating parabola 
-   * through three existing points. The minimum of the parabola is taken as a guess for the minimum. 
-   * If it lies within the bounds of the current interval then the interpolating point is accepted, 
-   * and used to generate a smaller interval. If the interpolating point is not accepted then the 
-   * algorithm falls back to an ordinary golden section step. The full details of Brent's method 
-   * include some additional checks to improve convergence. 
-   * 
+   * This produces a fast algorithm which is still robust. The outline of the algorithm can be summarized as
+   * follows: on each iteration Brent's method approximates the function using an interpolating parabola
+   * through three existing points. The minimum of the parabola is taken as a guess for the minimum.
+   * If it lies within the bounds of the current interval then the interpolating point is accepted,
+   * and used to generate a smaller interval. If the interpolating point is not accepted then the
+   * algorithm falls back to an ordinary golden section step. The full details of Brent's method
+   * include some additional checks to improve convergence.
+   *
    * @author Sharmila Prasad (8/15/2011)
-   * 
+   *
    * @param x_lower - x_lower interval
    * @param x_upper - x_upper interval
-   * @param Func - gsl_function, high-level driver for the algorithm 
+   * @param Func - gsl_function, high-level driver for the algorithm
    *               Continuous function of one variable for the minimizers to operate on
    * @param x_minimum - x_minimum calculated parabola min value
    * @return double - status
    */
-  int Photometry::brentminimizer(double x_lower, double x_upper, gsl_function *Func, 
+  int Photometry::brentminimizer(double x_lower, double x_upper, gsl_function *Func,
       double & x_minimum, double tolerance) {
     int status;
     int iter=0, max_iter=100;
-    
+
     const gsl_min_fminimizer_type *T;
     gsl_min_fminimizer *s;
     //double m_expected = M_PI;
-    
+
     T = gsl_min_fminimizer_brent;
     s = gsl_min_fminimizer_alloc(T);
 
-    // This function sets, or resets, an existing minimizer s to use the function Func and 
-    // the initial search interval [x_lower, x_upper], with a guess for the location of 
-    // the minimum x_minimum. If the interval given does not contain a minimum, then 
+    // This function sets, or resets, an existing minimizer s to use the function Func and
+    // the initial search interval [x_lower, x_upper], with a guess for the location of
+    // the minimum x_minimum. If the interval given does not contain a minimum, then
     // the function returns an error code of GSL_EINVAL.
     gsl_min_fminimizer_set(s, Func, x_minimum, x_lower, x_upper);
-    
+
     do {
       iter++;
       status    = gsl_min_fminimizer_iterate(s);
       x_minimum = gsl_min_fminimizer_x_minimum(s);
       x_lower   = gsl_min_fminimizer_x_lower(s);
       x_upper   = gsl_min_fminimizer_x_upper(s);
-      
+
       status = gsl_min_test_interval(x_lower, x_upper, tolerance, 0.0);
     } while(status == GSL_CONTINUE && iter < max_iter);
 
     // This function frees all the memory associated with the minimizer s.
     gsl_min_fminimizer_free(s);
-    
+
     return status;
   }
 
   /**
-   * This bracketing algorithm was taken from 
+   * This bracketing algorithm was taken from
    *    http://cxc.harvard.edu/sherpa/methods/fminpowell.py.txt
    * and converted to C++.
    */
@@ -240,7 +240,7 @@ namespace Isis {
       if (iter > maxiter) {
         iString msg = "Maximum iterations exceeded in minimum bracketing ";
         msg += "algorithm (minbracket) - root cannot be bracketed";
-        throw iException::Message(iException::User, msg, _FILEINFO_);
+        throw IException(IException::User, msg, _FILEINFO_);
       }
       iter = iter + 1;
       double fw;
@@ -284,5 +284,5 @@ namespace Isis {
       fc = fw;
     }
     return;
-  } 
+  }
 }

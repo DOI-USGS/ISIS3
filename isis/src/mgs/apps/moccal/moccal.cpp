@@ -21,7 +21,7 @@
 #include "SpecialPixel.h"
 #include "MocLabels.h"
 #include "iTime.h"
-#include "iException.h"
+#include "IException.h"
 #include "TextFile.h"
 #include "LineManager.h"
 
@@ -68,7 +68,7 @@ void IsisMain() {
   if(icube->hasGroup("Radiometry")) {
     string msg = "The MOC image [" + icube->getFilename() + "] has already "
                  "been radiometrically calibrated";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // Get label parameters we will need for calibration equation
@@ -277,7 +277,7 @@ void gbl::LoadCoefficients(const string &file, int ns) {
   if((int)gainCoef.size() != gbl::moc->Detectors()) {
     string msg = "Coefficient file [" + file + "] size is wrong ... should have [";
     msg += iString(gbl::moc->Detectors()) + "] gain/offset entries";
-    throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
   // The gain and offset will need to be based on the compression from
@@ -291,7 +291,7 @@ void gbl::LoadCoefficients(const string &file, int ns) {
     for(n = 0; ss <= es; ss++, n++) {
       if(ss >= (int)gainCoef.size()) {
         string msg = "Array bounds exceeded for gainCoef/offsetCoef";
-        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       }
       gsum += gainCoef[ss];
       osum += offsetCoef[ss];

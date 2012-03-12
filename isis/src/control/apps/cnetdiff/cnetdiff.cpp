@@ -11,7 +11,7 @@
 #include "ControlNet.h"
 #include "ControlPoint.h"
 #include "ControlMeasure.h"
-#include "iException.h"
+#include "IException.h"
 #include "PvlContainer.h"
 #include "PvlGroup.h"
 
@@ -149,7 +149,7 @@ void Compare(const PvlObject &point1Pvl, const PvlObject &point2Pvl) {
   if(point1Pvl.Name() != point2Pvl.Name()) {
     iString msg = "The control points' CreatePvlOject method returned an "
                   "unexpected result";
-    throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
   if(point1Pvl.Groups() != point2Pvl.Groups()) {
@@ -221,7 +221,7 @@ void CompareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2) {
   if(pvl1.Name().compare(pvl2.Name()) != 0) {
     iString msg = "CompareKeywords should always be called with keywords that "
                   "have the same name";
-    throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+    throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
   if(pvl1.Size() != pvl2.Size()) {
@@ -235,7 +235,7 @@ void CompareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2) {
       pvl1.Size() != tolerances[pvl1.Name()].Size()) {
     string msg = "Size of value '" + pvl1.Name() + "' does not match with ";
     msg += "its number of tolerances in the DIFF file.";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   if(ignorekeys.HasKeyword(pvl1.Name()) &&
@@ -243,7 +243,7 @@ void CompareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2) {
       pvl1.Size() != ignorekeys[pvl1.Name()].Size()) {
     string msg = "Size of value '" + pvl1.Name() + "' does not match with ";
     msg += "its number of ignore keys in the DIFF file.";
-    throw iException::Message(iException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   for(int i = 0; i < pvl1.Size() && filesMatch; i++) {
@@ -290,9 +290,7 @@ void CompareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2) {
         }
       }
     }
-    catch(iException e) {
-      e.Clear();
-
+    catch(IException &e) {
       if(!val1.Equal(val2)) {
         filesMatch = false;
         differenceReason = "Value '" + pvl1.Name() + "': values do not match.";

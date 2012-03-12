@@ -2,7 +2,7 @@
 #include <iomanip>
 #include "GaussianStretch.h"
 #include "Histogram.h"
-#include "iException.h"
+#include "IException.h"
 #include "Preference.h"
 
 using namespace std;

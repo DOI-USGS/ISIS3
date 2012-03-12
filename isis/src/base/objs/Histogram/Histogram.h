@@ -25,7 +25,7 @@
 
 #include "Cube.h"
 #include "Constants.h"
-#include "iException.h"
+#include "IException.h"
 #include "Progress.h"
 #include "SpecialPixel.h"
 #include "Statistics.h"
