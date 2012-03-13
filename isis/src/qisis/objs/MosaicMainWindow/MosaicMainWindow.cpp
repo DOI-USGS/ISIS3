@@ -126,6 +126,8 @@ namespace Isis {
       }
     }
 
+    m_lastOpenedFile = QFileInfo(".");
+
     if (!filesToOpen.isEmpty())
       openFiles(filesToOpen);
   }
@@ -267,7 +269,6 @@ namespace Isis {
     filterList.append("All Files (*)");
 
     QDir directory = m_lastOpenedFile.dir();
-
     QStringList selected = QFileDialog::getOpenFileNames(this, "Open Cubes",
         directory.path(), filterList.join(";;"));
 
@@ -652,8 +653,10 @@ namespace Isis {
 
   void MosaicMainWindow::openFiles(QStringList cubeNames) {
     // Create a mosaic widget if we don't have one
-    if (!cubeNames.empty())
+    if (!cubeNames.empty()) {
       displayController();
+      m_lastOpenedFile = QFileInfo(cubeNames.last());
+    }
 
     if (m_mosaicController)
       m_mosaicController->openCubes(cubeNames);

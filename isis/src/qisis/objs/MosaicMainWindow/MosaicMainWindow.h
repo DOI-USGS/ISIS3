@@ -31,6 +31,12 @@ namespace Isis {
    *   @history 2011-09-27 Steven Lambright - Improved user documentation
    *   @history 2011-11-21 Steven Lambright - View menu actions come from more
    *                           places now. Fixes #568
+   *   @history 2012-03-13 Steven Lambright - m_lastOpenedFile wasn't being
+   *                           initialized or set properly causing the file open
+   *                           dialogs to always open to '/' which was undesired
+   *                           behavior. This has been fixed by initializing it
+   *                           to '.' and updating its value  when a cube is
+   *                           opened. Fixes #752. 
    */
   class MosaicMainWindow : public MainWindow {
       Q_OBJECT
