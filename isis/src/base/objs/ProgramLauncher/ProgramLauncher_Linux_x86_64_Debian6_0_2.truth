@@ -49,7 +49,8 @@ Testing using Isis 3 program as a system program...
 
 terminate called after throwing an instance of 'Isis::IException'
   what():  **ERROR** This process (program) was executed by an existing Isis 3 process. However, we failed to establish a communication channel with the parent (launcher) process. The parent process has a PID of [999].
-**PROGRAMMER ERROR** Executing command [$ISISROOT/bin/stats from=\$base/testData/ab102401_ideal.cub -pid=999 -preference=\$ISISROOT/src/base/objs/Preference/TestPreferences] failed with return status [6].
+Aborted
+**PROGRAMMER ERROR** Executing command [$ISISROOT/bin/stats from=\$base/testData/ab102401_ideal.cub -pid=999 -preference=\$ISISROOT/src/base/objs/Preference/TestPreferences] failed with return status [34304].
 
 Testing using Isis 3 program as a system program without pid... 
 
