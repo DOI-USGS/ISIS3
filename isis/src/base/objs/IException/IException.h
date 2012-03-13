@@ -87,6 +87,10 @@ namespace Isis {
    *                           not helpful to users. The code was updated
    *                           appropriately to follow the current Isis coding
    *                           standards.
+   *   @history 2012-03-13 Steven Lambright - toString() was giving "End" with
+   *                           an empty exception when using Format = Pvl. It
+   *                           should (and must) be an empty string. This is
+   *                           fixed -- fixes #755.
    */
   class IException : public std::exception {
     public:

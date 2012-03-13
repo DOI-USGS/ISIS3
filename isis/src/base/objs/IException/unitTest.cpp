@@ -182,6 +182,9 @@ int main(void) {
     cerr << "Pvl Format -- toString():\n";
     cerr << lastError.toString() << "\n\n";
 
+    cerr << "Pvl Format -- empty toString():\n";
+    cerr << IException().toString() << "\n\n";
+
     formatValue = "Standard"; // restore original value
   }
 

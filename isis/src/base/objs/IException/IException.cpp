@@ -506,9 +506,12 @@ namespace Isis {
 
     if (usePvlFormat) {
       Pvl errors = toPvl();
-      stringstream stringStream;
-      stringStream << errors;
-      result = stringStream.str();
+
+      if (errors.Groups() != 0) {
+        stringstream stringStream;
+        stringStream << errors;
+        result = stringStream.str();
+      }
     }
     else {
       QList<IException> exceptionsToConvert;
