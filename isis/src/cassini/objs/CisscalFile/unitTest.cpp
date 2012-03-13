@@ -22,12 +22,19 @@
 #include <vector>
 
 #include "CisscalFile.h"
+#include "Filename.h"
 #include "IException.h"
 #include "Preference.h"
 
 using namespace std;
 using namespace Isis;
 
+/** 
+ *  
+ * @internal 
+ * @history 2012-03-12 Tracie Sucharski - Replaced /tmp with $temporary 
+ *  
+ */
 int main(int argc, char *argv[]) {
   Preference::Preferences(true);
   cout << endl << "Unit test for CisscalFile" << endl;
@@ -36,7 +43,7 @@ int main(int argc, char *argv[]) {
 
 // ----------------------------------------------------------------------------------
 
-  string testFile = "/tmp/CisscalFile.tmp";
+  string testFile = "$temporary/CisscalFile.tmp";
   // setup test data
   string testLines[8];
 
@@ -75,11 +82,11 @@ int main(int argc, char *argv[]) {
     string line;
     // data line 1
     lineFound = f.GetLine(line);
-    if(!lineFound) {
+    if (!lineFound) {
       cout << "First Line Not Found" << endl;
       return 0;
     }
-    if(line != testLines[4]) {
+    if (line != testLines[4]) {
       cout << " *** Failed to Find \"\\begindata\" Tag *** " << endl;
       cout << "   First line of data should be:   -> " << testLines[4] << " <-" << endl;
       cout << "   returned is: -> " << line << " <-" << endl;
@@ -88,11 +95,11 @@ int main(int argc, char *argv[]) {
     cout << line << endl;
     // data line 2
     lineFound = f.GetLine(line);
-    if(!lineFound) {
+    if (!lineFound) {
       cout << "Second Line Not Found" << endl;
       return 0;
     }
-    if(line != testLines[5]) {
+    if (line != testLines[5]) {
       cout << " *** Failed to Match Second Line *** " << endl;
       cout << "   First line of data should be:   -> " << testLines[5] << " <-" << endl;
       cout << "   returned is: -> " << line << " <-" << endl;
@@ -101,11 +108,11 @@ int main(int argc, char *argv[]) {
     cout << line << endl;
     // data line 3
     lineFound = f.GetLine(line);
-    if(!lineFound) {
+    if (!lineFound) {
       cout << "Third Line Not Found" << endl;
       return 0;
     }
-    if(line != testLines[6]) {
+    if (line != testLines[6]) {
       cout << " *** Failed to Match Third Line *** " << endl;
       cout << "   First line of data should be:   -> " << testLines[6] << " <-" << endl;
       cout << "   returned is: -> " << line << " <-" << endl;
@@ -114,11 +121,11 @@ int main(int argc, char *argv[]) {
     cout << line << endl;
     // last line, empty
     lineFound = f.GetLine(line);
-    if(!lineFound) {
+    if (!lineFound) {
       cout << "Last Line Not Found" << endl;
       return 0;
     }
-    if(line != testLines[7]) {
+    if (line != testLines[7]) {
       cout << " *** Failed to Match Last Line *** " << endl;
       cout << "   First line of data should be:   -> " << testLines[7] << " <-" << endl;
       cout << "   returned is: -> " << line << " <-" << endl;
@@ -127,12 +134,13 @@ int main(int argc, char *argv[]) {
     cout << line << endl;
     // grab line beyond end of file
     lineFound = f.GetLine(line);
-    if(lineFound) {
+    if (lineFound) {
       cout << "Extra Line Found:   -> " << line << " <-" << endl;
       lineFound = f.GetLine(line);
       cout << "Next Line True?   -> " << lineFound << " <-" << endl;
       return 0;
     }
+    f.Close();
     cout << "--------------------------------------------" << endl;
   }
   catch(Isis::IException &e) {
@@ -140,7 +148,7 @@ int main(int argc, char *argv[]) {
   }
 //-----------------------------------------------------------------------------------
   cout << "2) Remove temp file -> " << testFile << " <-" << endl;
-  if(remove(testFile.c_str())) {
+  if (remove(Filename(testFile).Expanded().c_str())) {
     cout << "*** Failed to remove tmp file: " << testFile << endl;
   }
   return 0;
