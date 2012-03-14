@@ -23,7 +23,8 @@ you must <em>not</em> upgrade the Isis Data Files!!!
 </div>
 -->
 
-        <h2>Platforms</h2>
+        <h2>Overview</h2>
+        <h3>Platforms</h3>
         <p>
            Isis 3 applications are compiled and linked on our local systems. We 
            provide copies of some of the necessary third party libraries, but we 
@@ -36,7 +37,7 @@ you must <em>not</em> upgrade the Isis Data Files!!!
            resource limits.
         </p>
 
-        <h2>1) Find Disk Space</h2>
+        <h3>Finding Disk Space</h3>
         <p>
             The current distribution of Isis 3 contains over 300 applications. 
             It includes the complete source, binaries, documentation, and
@@ -74,7 +75,48 @@ you must <em>not</em> upgrade the Isis Data Files!!!
         $ cd isis3
 </pre>
 
-        <h2>2) Download Isis3</h2>
+        <h2>Automated Installation</h2>
+        <h3>Java Installer</h3>
+        <p>
+          Isis 3 now features a downloadable Java-based installer.  The
+          installer can be run in both graphical (GUI) and console (command
+          line) modes, and features the ability to create automated installation
+          scripts.  To run the installer, download the isisInstall.sh Bash
+          script from the link below and execute it.  This script will
+          automatically fetch the most recent version of the installer and
+          launch it.
+        </p>
+        <p>
+          After downloading the script, open a terminal in the directory where
+          the script was installed.  Give the installation script executable
+          permissions and run it by typing the following:
+          <pre>
+            chmod +x isisInstall.sh
+            ./isisInstall.sh
+          </pre>
+          For additional options and help, give the script the <i>-h</i> option:
+          <pre>
+            ./isisInstall.sh -h
+          </pre>
+          This script has been written with the goal of never needing to be
+          updated.  However, after downloading and setting $ISISROOT, the latest
+          version of the installation script can be obtained at the following
+          location on your local machine:
+          <pre>
+            $ISISROOT/src/docsys/documents/InstallGuide/assets/isisInstall.py
+          </pre>
+        </p>
+        <p>
+          Follow this link to download the installation script.  Depending on
+          your browser, you may need to right-click and select "Save Link As..."
+          to download:
+        </p>
+        <p>
+          <a href="assets/isisInstall.sh" target="_blank">Installation Script</a>
+        </p>
+
+        <h2>Manual Installation</h2>
+        <h3>Downloading Isis 3</h3>
         <p>
           We are distributing Isis3 using two rsync servers. If the "rsync" 
           command is is not available on your system please see your system
@@ -183,7 +225,7 @@ you must <em>not</em> upgrade the Isis Data Files!!!
         </p>
 
 
-        <h2>3) Get the Isis3 data files </h2>
+        <h3>Downloading Isis 3 Data</h3>
         <p>
             The data area is separate from the source code. This data area is
             crucial to Isis3 and some of it must be downloaded.
@@ -354,7 +396,7 @@ you must <em>not</em> upgrade the Isis Data Files!!!
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/voyager2 data/
         </pre>
 
-        <h2>4) Set up your environment</h2>
+        <h3>Environment Setup</h3>
         <p>
             Isis3 needs to know where all its pieces are located. We use an
             environment variable called "ISISROOT" to do this. For the above 
@@ -457,6 +499,7 @@ you must <em>not</em> upgrade the Isis Data Files!!!
     <change name="Stuart Sides" date="2010-03-18">Updated for release 3.2.0</change>
     <change name="Steven Lambright" date="2010-06-25">Updated for release 3.2.1</change>
     <change name="Jai Rideout" date="2011-04-15">Added rsync partial option to rsync commands and added new mission-specific sections</change>
+    <change name="Travis Addair" date="2012-03-14">Added Java installer section</change>
   </history>
 
   <bibliography>
