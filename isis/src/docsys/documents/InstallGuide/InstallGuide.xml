@@ -103,7 +103,7 @@ you must <em>not</em> upgrade the Isis Data Files!!!
           version of the installation script can be obtained at the following
           location on your local machine:
           <pre>
-            $ISISROOT/src/docsys/documents/InstallGuide/assets/isisInstall.py
+            $ISISROOT/src/docsys/documents/InstallGuide/assets/isisInstall.sh
           </pre>
         </p>
         <p>
