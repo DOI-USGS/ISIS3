@@ -75,6 +75,7 @@ namespace Isis {
 
       virtual bool SetGround(const Latitude &lat, const Longitude &lon);
       virtual bool SetGround(const SurfacePoint &surfacePoint);
+      virtual bool SetGround(const SurfacePoint &surfacePoint, const int &approxLine);
 
     protected:
       enum FindFocalPlaneStatus {

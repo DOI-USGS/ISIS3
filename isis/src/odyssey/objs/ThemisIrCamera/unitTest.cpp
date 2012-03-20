@@ -112,8 +112,8 @@ void TestLineSamp(Camera *cam, double samp, double line) {
   if(success) {
     double deltaSamp = samp - cam->Sample();
     double deltaLine = line - cam->Line();
-    if(fabs(deltaSamp) < 0.001) deltaSamp = 0;
-    if(fabs(deltaLine) < 0.001) deltaLine = 0;
+    if(fabs(deltaSamp) < 0.01) deltaSamp = 0;
+    if(fabs(deltaLine) < 0.01) deltaLine = 0;
     cout << "DeltaSample = " << deltaSamp << endl;
     cout << "DeltaLine = " << deltaLine << endl << endl;
   }
