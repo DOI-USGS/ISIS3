@@ -29,6 +29,8 @@
 #include "CubeAttribute.h"
 #include "Statistics.h"
 
+template <typename T> class QSet;
+
 namespace Isis {
   const int SizeMatch = 1;
   const int SpatialMatch = 2;
@@ -191,6 +193,14 @@ namespace Isis {
        */
       std::vector<Isis::Cube *> OutputCubes;
 
+      /**
+       * A list of cubes owned by this instant.  These cubes will be deleted on
+       * finalization.  Process will not take ownership of cubes allocated
+       * outside of Process.  It is the caller's responsibility to delete such
+       * cubes.
+       */
+      QSet<Isis::Cube *> *m_ownedCubes;
+
     public:
       Process();
       virtual ~Process();
@@ -215,7 +225,7 @@ namespace Isis {
                                const Isis::CubeAttributeInput &att,
                                int requirements = 0);
       void SetInputCube(Isis::Cube *inCube);
-      void ClearInputCubes();
+
 
       Isis::Cube *SetOutputCube(const std::string &parameter);
       Isis::Cube *SetOutputCube(const std::string &parameter, const int nsamps,
@@ -224,6 +234,9 @@ namespace Isis {
                                 const Isis::CubeAttributeOutput &att,
                                 const int nsamps, const int nlines,
                                 const int nbands = 1);
+
+      void ClearCubes();
+      void ClearInputCubes();
       void ClearOutputCubes();
  
       void PropagateLabels(const bool prop);

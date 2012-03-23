@@ -411,6 +411,9 @@ namespace Isis {
       //! Set the output cube attribute maximum
       void Maximum(const double max);
 
+      //! Return true iff the pixel type is not None
+      bool HasPixelType() const;
+
       //! Return the pixel type as an Isis::PixelType
       Isis::PixelType PixelType() const;
 

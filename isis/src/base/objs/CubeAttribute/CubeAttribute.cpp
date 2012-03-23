@@ -274,6 +274,11 @@ namespace Isis {
   }
 
 
+  bool CubeAttributeOutput::HasPixelType() const {
+    return p_pixelType != Isis::None;
+  }
+
+
   Isis::PixelType CubeAttributeOutput::PixelType() const {
     if(p_pixelType == Isis::None) {
       string msg;

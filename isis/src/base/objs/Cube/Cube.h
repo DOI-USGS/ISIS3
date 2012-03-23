@@ -36,6 +36,7 @@ namespace Isis {
   class Blob;
   class Buffer;
   class Camera;
+  class CubeAttributeOutput;
   class CubeCachingAlgorithm;
   class CubeIoHandler;
   class iString;
@@ -206,6 +207,7 @@ namespace Isis {
 
       void close(bool remove = false);
       void create(const iString &cfile);
+      void create(const iString &cfile, const CubeAttributeOutput &att);
       void open(const iString &cfile, iString access = "r");
       void reopen(iString access = "r");
 

@@ -23,6 +23,8 @@
 #include <sstream>
 #include <fstream>
 
+#include <QSet>
+
 #include "SessionLog.h"
 #include "Process.h"
 #include "Filename.h"
@@ -40,6 +42,8 @@ namespace Isis {
 
   //! Constructs a Process Object
   Process::Process() {
+    m_ownedCubes = NULL;
+
     p_progress = new Isis::Progress();
     p_progress->SetText("Working");
     p_propagateLabels = true;
@@ -47,12 +51,17 @@ namespace Isis {
     p_propagatePolygons = true;
     p_propagateHistory = true;
     p_propagateOriginalLabel = true;
+
+    m_ownedCubes = new QSet<Cube *>;
   }
 
   //! Destroys the Process Object. It will close all opened cubes
   Process::~Process() {
     EndProcess();
     delete p_progress;
+
+    delete m_ownedCubes;
+    m_ownedCubes = NULL;
   }
 
   /**
@@ -178,15 +187,13 @@ namespace Isis {
 
     // Everything is good so save the cube on the stack
     InputCubes.push_back(cube);
+    m_ownedCubes->insert(cube);
     return cube;
   }
 
   /**
    * Set the InputCube vector to an opened Cube which was dynamically allocated.
    * This is used if there already exists a valid opened cube
-   *
-   * Note: This requires that the cube was dynamically allocated because ClearInputCubes
-   * deletes the cube.
    *
    * @author Sharmila Prasad (5/7/2011)
    *
@@ -330,7 +337,7 @@ namespace Isis {
                                      const int ns, const int nl,
                                      const int nb) {
     // Make sure we have good dimensions
-    if((ns <= 0) || (nl <= 0) || (nb <= 0)) {
+    if ((ns <= 0) || (nl <= 0) || (nb <= 0)) {
       ostringstream message;
       message << "Invalid cube size specifications [ns=" << ns << ",nl=" << nl
               << ",nb=" << nb << "]";
@@ -341,12 +348,10 @@ namespace Isis {
     Isis::Cube *cube = new Isis::Cube;
     try {
       cube->setDimensions(ns, nl, nb);
-      cube->setByteOrder(att.ByteOrder());
-      cube->setFormat(att.FileFormat());
-      cube->setLabelsAttached(att.AttachedLabel());
+      cube->create(fname, att);
 
-      if(att.PropagatePixelType()) {
-        if(InputCubes.size() > 0) {
+      if (att.PropagatePixelType()) {
+        if (InputCubes.size() > 0) {
           cube->setPixelType(InputCubes[0]->getPixelType());
         }
         else {
@@ -355,58 +360,48 @@ namespace Isis {
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
       }
-      else {
-        cube->setPixelType(att.PixelType());
-      }
 
-      if(att.PropagateMinimumMaximum()) {
+      if (att.PropagateMinimumMaximum()) {
         if(cube->getPixelType() == Isis::Real) {
           cube->setBaseMultiplier(0.0, 1.0);
         }
-        else if(InputCubes.size() == 0) {
+        else if (InputCubes.size() == 0) {
           string msg = "You told me to propagate base/multiplier from input to output";
           msg += " cube but there are no input cubes loaded";
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
-        else if(cube->getPixelType() >= InputCubes[0]->getPixelType()) {
+        else if (cube->getPixelType() >= InputCubes[0]->getPixelType()) {
           double base = InputCubes[0]->getBase();
           double mult = InputCubes[0]->getMultiplier();
           cube->setBaseMultiplier(base, mult);
         }
-        else if((cube->getPixelType() != Isis::Real) &&
-                (cube->getPixelType() != Isis::UnsignedByte) &&
-                (cube->getPixelType() != Isis::SignedWord)) {
+        else if ((cube->getPixelType() != Isis::Real) &&
+            (cube->getPixelType() != Isis::UnsignedByte) &&
+            (cube->getPixelType() != Isis::SignedWord)) {
           string msg = "Looks like your refactoring to add different pixel types";
           msg += " you'll need to make changes here";
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
         else {
           string msg = "You've chosen to reduce your output PixelType for [" +
-                       fname + "] you must specify the output pixel range too";
+            fname + "] you must specify the output pixel range too";
           throw IException(IException::User, msg, _FILEINFO_);
         }
       }
-      else {
-        // Not propagating so either the user entered or the programmer did
-        cube->setMinMax(att.Minimum(), att.Maximum());
-      }
 
-      if(InputCubes.size() > 0) {
+      if (InputCubes.size() > 0) {
         int needLabBytes = InputCubes[0]->getLabelSize(true) + (1024 * 6);
-        if(needLabBytes > cube->getLabelSize()) {
+        if (needLabBytes > cube->getLabelSize()) {
           cube->setLabelSize(needLabBytes);
         }
       }
 
-      // Allocate the cube
-      cube->create(fname);
-
       // Transfer labels from the first input cube
-      if((p_propagateLabels) && (InputCubes.size() > 0)) {
+      if ((p_propagateLabels) && (InputCubes.size() > 0)) {
         Isis::PvlObject &incube =
-            InputCubes[0]->getLabel()->FindObject("IsisCube");
+          InputCubes[0]->getLabel()->FindObject("IsisCube");
         Isis::PvlObject &outcube = cube->getLabel()->FindObject("IsisCube");
-        for(int i = 0; i < incube.Groups(); i++) {
+        for (int i = 0; i < incube.Groups(); i++) {
           outcube.AddGroup(incube.Group(i));
         }
 
@@ -417,10 +412,10 @@ namespace Isis {
       }
 
       // Transfer tables from the first input cube
-      if((p_propagateTables) && (InputCubes.size() > 0)) {
+      if ((p_propagateTables) && (InputCubes.size() > 0)) {
         Isis::Pvl &inlab = *InputCubes[0]->getLabel();
-        for(int i = 0; i < inlab.Objects(); i++) {
-          if(inlab.Object(i).IsNamed("Table")) {
+        for (int i = 0; i < inlab.Objects(); i++) {
+          if (inlab.Object(i).IsNamed("Table")) {
             Isis::Blob t((string)inlab.Object(i)["Name"], inlab.Object(i).Name());
             InputCubes[0]->read(t);
             cube->write(t);
@@ -429,10 +424,10 @@ namespace Isis {
       }
 
       // Transfer blobs from the first input cube
-      if((p_propagatePolygons) && (InputCubes.size() > 0)) {
+      if ((p_propagatePolygons) && (InputCubes.size() > 0)) {
         Isis::Pvl &inlab = *InputCubes[0]->getLabel();
-        for(int i = 0; i < inlab.Objects(); i++) {
-          if(inlab.Object(i).IsNamed("Polygon")) {
+        for (int i = 0; i < inlab.Objects(); i++) {
+          if (inlab.Object(i).IsNamed("Polygon")) {
             Isis::Blob t((string)inlab.Object(i)["Name"], inlab.Object(i).Name());
             InputCubes[0]->read(t);
             cube->write(t);
@@ -441,10 +436,10 @@ namespace Isis {
       }
 
       // Transfer tables from the first input cube
-      if((p_propagateOriginalLabel) && (InputCubes.size() > 0)) {
+      if ((p_propagateOriginalLabel) && (InputCubes.size() > 0)) {
         Isis::Pvl &inlab = *InputCubes[0]->getLabel();
-        for(int i = 0; i < inlab.Objects(); i++) {
-          if(inlab.Object(i).IsNamed("OriginalLabel")) {
+        for (int i = 0; i < inlab.Objects(); i++) {
+          if (inlab.Object(i).IsNamed("OriginalLabel")) {
             Isis::OriginalLabel ol;
             InputCubes[0]->read(ol);
             cube->write(ol);
@@ -455,13 +450,14 @@ namespace Isis {
       // Transfer history from the first input cube
       WriteHistory(*cube);
     }
-    catch(IException &e) {
+    catch (IException &e) {
       delete cube;
       throw;
     }
 
     // Everything is fine so save the cube on the stack
     OutputCubes.push_back(cube);
+    m_ownedCubes->insert(cube);
     return cube;
   }
 
@@ -476,26 +472,56 @@ namespace Isis {
   }
 
   /**
-   * Cleans up by closing cubes and freeing memory
+   * Cleans up by closing cubes and freeing memory for owned cubes.  Clears the
+   * lists for all cubes.
    */
   void Process::Finalize() {
-    ClearInputCubes();
-    ClearOutputCubes();
+    ClearCubes();
+    InputCubes.clear();
+    OutputCubes.clear();
   }
 
   /**
-   * Close output cubes from the list and clear the list
-   *
-   * @author Sharmila Prasad (5/7/2011)
+   * Close owned cubes from the list and clear the list
    */
-  void Process::ClearOutputCubes(){
-    // Close the output cubes
-    for(int i = 0; i < (int)OutputCubes.size(); i++) {
-      OutputCubes[i]->close();
-      delete OutputCubes[i];
+  void Process::ClearCubes() {
+    // Close the cubes
+    QList<Cube *> ownedCubes = m_ownedCubes->toList();
+    for (int i = 0; i < ownedCubes.size(); i++) {
+      ownedCubes[i]->close();
+      delete ownedCubes[i];
+    }
+    m_ownedCubes->clear();
+  }
+
+  /**
+   * Close owned input cubes from the list and clear the list
+   */
+  void Process::ClearInputCubes() {
+    // Close the cubes
+    for (unsigned int i = 0; i < InputCubes.size(); i++) {
+      if (m_ownedCubes->contains(InputCubes[i])) {
+        InputCubes[i]->close();
+        delete InputCubes[i];
+      }
+    }
+    InputCubes.clear();
+  }
+
+  /**
+   * Close owned output cubes from the list and clear the list
+   */
+  void Process::ClearOutputCubes() {
+    // Close the cubes
+    for (unsigned int i = 0; i < OutputCubes.size(); i++) {
+      if (m_ownedCubes->contains(OutputCubes[i])) {
+        OutputCubes[i]->close();
+        delete OutputCubes[i];
+      }
     }
     OutputCubes.clear();
   }
+
   /**
    * This method allows the programmer to turn on/off the propagation of labels
    * from the 1st input cube to any of the output cubes.  By default, propagation
@@ -614,21 +640,6 @@ namespace Isis {
     Isis::Filename expanded(dir + "/" + file);
     if(highestVersion) expanded.HighestVersion();
     return expanded.Expanded();
-  }
-
-  /**
-   * This method clears the input cube list.  It is most commonly used in
-   * applications which need to generate an output cube without an input cube,
-   * however, propogation of input characteristics are known. For example,
-   * creating the initial cube for a mosaic.
-   */
-  void Process::ClearInputCubes() {
-    // Close the input cubes
-    for(int i = 0; i < (int)InputCubes.size(); i++) {
-      InputCubes[i]->close();
-      delete InputCubes[i];
-    }
-    InputCubes.clear();
   }
 
   /**

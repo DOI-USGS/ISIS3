@@ -113,6 +113,13 @@ XERCESLIBDIR = -L$(ISIS3LOCAL)/lib
 XERCESLIB    = -lxerces-c
 
 #---------------------------------------------------------------------------
+# Set up for Tiff 
+#---------------------------------------------------------------------------
+TIFFINCDIR = -I$(ISIS3LOCAL)/include/tiff/tiff-4.0.1
+TIFFLIBDIR = -L$(ISIS3LOCAL)/lib
+TIFFLIB    = -ltiff
+
+#---------------------------------------------------------------------------
 # Set up for naif
 #---------------------------------------------------------------------------
 NAIFINCDIR = -I$(ISIS3LOCAL)/include/naif/cspice64
@@ -245,6 +252,7 @@ THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/liblapack.so"
 THIRDPARTYLIBS    += "$(ISIS3SYSLIB)/libblas.so.*"
 THIRDPARTYLIBS    += "$(ISIS3SYSLIB)/libgfortran.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libxerces-c*.so*"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libtiff*.so*"
 THIRDPARTYLIBS    += "$(ISIS3SYSLIB)/libgsl*.so*"
 #THIRDPARTYLIBS    += "$(ISIS3SYSLIB)/libicuuc.so*"
 #THIRDPARTYLIBS    += "$(ISIS3SYSLIB)/libicudata.so*"

@@ -125,6 +125,13 @@ XERCESLIB    = -lxerces-c
 XALAN        = $(ISIS3OPT)/bin/Xalan
 
 #---------------------------------------------------------------------------
+# Set up for Tiff
+#---------------------------------------------------------------------------
+TIFFINCDIR = -I$(ISIS3OPT)/include/tiff
+TIFFLIBDIR = -L$(ISIS3OPT)/lib
+TIFFLIB    = -ltiff
+
+#---------------------------------------------------------------------------
 # Set up for naif
 #---------------------------------------------------------------------------
 NAIFINCDIR = -I$(ISIS3LOCAL)/include
@@ -241,6 +248,7 @@ THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libcspice*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libprotobuf*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libiconv*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libxerces-c*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libtiff*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libgsl*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libz*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libssl*.dylib"

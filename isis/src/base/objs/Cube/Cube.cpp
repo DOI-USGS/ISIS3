@@ -31,6 +31,7 @@
 #include "Application.h"
 #include "Camera.h"
 #include "CameraFactory.h"
+#include "CubeAttribute.h"
 #include "CubeBsqHandler.h"
 #include "CubeTileHandler.h"
 #include "Endian.h"
@@ -342,6 +343,20 @@ namespace Isis {
 
     // Write the labels
     writeLabels();
+  }
+
+
+  void Cube::create(
+      const iString &cubeFilename, const CubeAttributeOutput &att) {
+
+    setByteOrder(att.ByteOrder());
+    setFormat(att.FileFormat());
+    setLabelsAttached(att.AttachedLabel());
+    if (att.HasPixelType()) setPixelType(att.PixelType());
+    setMinMax(att.Minimum(), att.Maximum());
+
+    // Allocate the cube
+    create(cubeFilename);
   }
 
 
