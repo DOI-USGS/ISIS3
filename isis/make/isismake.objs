@@ -71,7 +71,7 @@ MOCGEN       = $(wildcard moc_*.cpp)
 .SUFFIXES: .proto .pb.h .pb.cc
 .SUFFIXES: .cc .o
 
-object: protos
+object: $(UIHEADERS) protos
 	if [ "$(OBJS)" != "" ]; then   \
 	  $(MAKE) $(OBJS);             \
 	fi
@@ -81,6 +81,9 @@ object: protos
 
 .cc.o:
 	$(CXX) $(ALLINCDIRS) $(ISISCPPFLAGS) -c -o $@ $?
+
+ui_%.h: %.ui
+	$(UIC) -o $@ $^
 
 #  Its not necessarily $(LIBRARY)!
 .a.so :
@@ -202,7 +205,7 @@ html: force
 
 clean:  localclean
 	$(RM) $(OBJS) $(PROTOSGEN) $(MOCGEN) unitTest.o unitTest print.prt   \
-	  $(ARCHIVELIB) $(SHAREDLIB) libisis$(ISISLIBVERSION).a              \
+	  $(UIHEADERS) $(ARCHIVELIB) $(SHAREDLIB) libisis$(ISISLIBVERSION).a \
 	  libisis$(ISISLIBVERSION).so libisis$(ISISLIBVERSION).dylib         \
 	  unitTest.output;                                                   \
 	$(RM) -rf html .objs
