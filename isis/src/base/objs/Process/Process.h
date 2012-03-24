@@ -235,6 +235,9 @@ namespace Isis {
                                 const int nsamps, const int nlines,
                                 const int nbands = 1);
 
+      void AddInputCube(Cube *cube, bool owned = true);
+      void AddOutputCube(Cube *cube, bool owned = true);
+
       void ClearCubes();
       void ClearInputCubes();
       void ClearOutputCubes();

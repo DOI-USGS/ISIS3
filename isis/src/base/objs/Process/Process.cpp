@@ -186,8 +186,7 @@ namespace Isis {
     }
 
     // Everything is good so save the cube on the stack
-    InputCubes.push_back(cube);
-    m_ownedCubes->insert(cube);
+    AddInputCube(cube);
     return cube;
   }
 
@@ -202,7 +201,7 @@ namespace Isis {
   void Process::SetInputCube(Isis::Cube *inCube)
   {
     if(inCube != NULL && inCube->isOpen()) {
-      InputCubes.push_back(inCube);
+      AddInputCube(inCube, false);
     }
     else {
       string message = "Input cube does not exist";
@@ -348,10 +347,12 @@ namespace Isis {
     Isis::Cube *cube = new Isis::Cube;
     try {
       cube->setDimensions(ns, nl, nb);
-      cube->create(fname, att);
+      cube->setByteOrder(att.ByteOrder());
+      cube->setFormat(att.FileFormat());
+      cube->setLabelsAttached(att.AttachedLabel());
 
-      if (att.PropagatePixelType()) {
-        if (InputCubes.size() > 0) {
+      if(att.PropagatePixelType()) {
+        if(InputCubes.size() > 0) {
           cube->setPixelType(InputCubes[0]->getPixelType());
         }
         else {
@@ -360,48 +361,58 @@ namespace Isis {
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
       }
+      else {
+        cube->setPixelType(att.PixelType());
+      }
 
-      if (att.PropagateMinimumMaximum()) {
+      if(att.PropagateMinimumMaximum()) {
         if(cube->getPixelType() == Isis::Real) {
           cube->setBaseMultiplier(0.0, 1.0);
         }
-        else if (InputCubes.size() == 0) {
+        else if(InputCubes.size() == 0) {
           string msg = "You told me to propagate base/multiplier from input to output";
           msg += " cube but there are no input cubes loaded";
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
-        else if (cube->getPixelType() >= InputCubes[0]->getPixelType()) {
+        else if(cube->getPixelType() >= InputCubes[0]->getPixelType()) {
           double base = InputCubes[0]->getBase();
           double mult = InputCubes[0]->getMultiplier();
           cube->setBaseMultiplier(base, mult);
         }
-        else if ((cube->getPixelType() != Isis::Real) &&
-            (cube->getPixelType() != Isis::UnsignedByte) &&
-            (cube->getPixelType() != Isis::SignedWord)) {
+        else if((cube->getPixelType() != Isis::Real) &&
+                (cube->getPixelType() != Isis::UnsignedByte) &&
+                (cube->getPixelType() != Isis::SignedWord)) {
           string msg = "Looks like your refactoring to add different pixel types";
           msg += " you'll need to make changes here";
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
         else {
           string msg = "You've chosen to reduce your output PixelType for [" +
-            fname + "] you must specify the output pixel range too";
+                       fname + "] you must specify the output pixel range too";
           throw IException(IException::User, msg, _FILEINFO_);
         }
       }
+      else {
+        // Not propagating so either the user entered or the programmer did
+        cube->setMinMax(att.Minimum(), att.Maximum());
+      }
 
-      if (InputCubes.size() > 0) {
+      if(InputCubes.size() > 0) {
         int needLabBytes = InputCubes[0]->getLabelSize(true) + (1024 * 6);
-        if (needLabBytes > cube->getLabelSize()) {
+        if(needLabBytes > cube->getLabelSize()) {
           cube->setLabelSize(needLabBytes);
         }
       }
 
+      // Allocate the cube
+      cube->create(fname);
+
       // Transfer labels from the first input cube
-      if ((p_propagateLabels) && (InputCubes.size() > 0)) {
+      if((p_propagateLabels) && (InputCubes.size() > 0)) {
         Isis::PvlObject &incube =
-          InputCubes[0]->getLabel()->FindObject("IsisCube");
+            InputCubes[0]->getLabel()->FindObject("IsisCube");
         Isis::PvlObject &outcube = cube->getLabel()->FindObject("IsisCube");
-        for (int i = 0; i < incube.Groups(); i++) {
+        for(int i = 0; i < incube.Groups(); i++) {
           outcube.AddGroup(incube.Group(i));
         }
 
@@ -412,10 +423,10 @@ namespace Isis {
       }
 
       // Transfer tables from the first input cube
-      if ((p_propagateTables) && (InputCubes.size() > 0)) {
+      if((p_propagateTables) && (InputCubes.size() > 0)) {
         Isis::Pvl &inlab = *InputCubes[0]->getLabel();
-        for (int i = 0; i < inlab.Objects(); i++) {
-          if (inlab.Object(i).IsNamed("Table")) {
+        for(int i = 0; i < inlab.Objects(); i++) {
+          if(inlab.Object(i).IsNamed("Table")) {
             Isis::Blob t((string)inlab.Object(i)["Name"], inlab.Object(i).Name());
             InputCubes[0]->read(t);
             cube->write(t);
@@ -424,10 +435,10 @@ namespace Isis {
       }
 
       // Transfer blobs from the first input cube
-      if ((p_propagatePolygons) && (InputCubes.size() > 0)) {
+      if((p_propagatePolygons) && (InputCubes.size() > 0)) {
         Isis::Pvl &inlab = *InputCubes[0]->getLabel();
-        for (int i = 0; i < inlab.Objects(); i++) {
-          if (inlab.Object(i).IsNamed("Polygon")) {
+        for(int i = 0; i < inlab.Objects(); i++) {
+          if(inlab.Object(i).IsNamed("Polygon")) {
             Isis::Blob t((string)inlab.Object(i)["Name"], inlab.Object(i).Name());
             InputCubes[0]->read(t);
             cube->write(t);
@@ -436,10 +447,10 @@ namespace Isis {
       }
 
       // Transfer tables from the first input cube
-      if ((p_propagateOriginalLabel) && (InputCubes.size() > 0)) {
+      if((p_propagateOriginalLabel) && (InputCubes.size() > 0)) {
         Isis::Pvl &inlab = *InputCubes[0]->getLabel();
-        for (int i = 0; i < inlab.Objects(); i++) {
-          if (inlab.Object(i).IsNamed("OriginalLabel")) {
+        for(int i = 0; i < inlab.Objects(); i++) {
+          if(inlab.Object(i).IsNamed("OriginalLabel")) {
             Isis::OriginalLabel ol;
             InputCubes[0]->read(ol);
             cube->write(ol);
@@ -456,8 +467,7 @@ namespace Isis {
     }
 
     // Everything is fine so save the cube on the stack
-    OutputCubes.push_back(cube);
-    m_ownedCubes->insert(cube);
+    AddOutputCube(cube);
     return cube;
   }
 
@@ -477,20 +487,26 @@ namespace Isis {
    */
   void Process::Finalize() {
     ClearCubes();
-    InputCubes.clear();
-    OutputCubes.clear();
   }
+
+  void Process::AddInputCube(Cube *cube, bool owned) {
+    InputCubes.push_back(cube);
+    if (owned) m_ownedCubes->insert(cube);
+  }
+
+  void Process::AddOutputCube(Cube *cube, bool owned) {
+    OutputCubes.push_back(cube);
+    if (owned) m_ownedCubes->insert(cube);
+  }
+
 
   /**
    * Close owned cubes from the list and clear the list
    */
   void Process::ClearCubes() {
     // Close the cubes
-    QList<Cube *> ownedCubes = m_ownedCubes->toList();
-    for (int i = 0; i < ownedCubes.size(); i++) {
-      ownedCubes[i]->close();
-      delete ownedCubes[i];
-    }
+    ClearInputCubes();
+    ClearOutputCubes();
     m_ownedCubes->clear();
   }
 

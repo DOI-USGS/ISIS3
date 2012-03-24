@@ -352,7 +352,7 @@ namespace Isis {
     mosaicCube->open(mosaicFile, "rw");
     mosaicCube->addCachingAlgorithm(new UniqueIOCachingAlgorithm(2));
 
-    OutputCubes.push_back(mosaicCube);
+    AddOutputCube(mosaicCube);
     return mosaicCube;
   }
 
@@ -406,7 +406,7 @@ namespace Isis {
     }
 
     Cube *mosaicCube = new Cube();
-    OutputCubes.push_back(mosaicCube);
+    AddOutputCube(mosaicCube);
     mosaicCube->open(mosaicFile, "rw");
     mosaicCube->addCachingAlgorithm(new UniqueIOCachingAlgorithm(2));
 

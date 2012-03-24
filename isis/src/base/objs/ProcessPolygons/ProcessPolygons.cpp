@@ -362,7 +362,7 @@ namespace Isis {
     /*Open the average file with read/write permission*/
     Cube *averageCube = new Cube();
     averageCube->open(avgFilename, "rw");
-    OutputCubes.push_back(averageCube);
+    AddOutputCube(averageCube);
 
     /*Now open the count file with read/write permission*/
     Cube *countCube = new Cube();
@@ -378,7 +378,7 @@ namespace Isis {
       countCube->open(countFilename, "rw");
     }
 
-    OutputCubes.push_back(countCube);
+    AddOutputCube(countCube);
     return countCube;
   }
 

@@ -1402,7 +1402,7 @@ namespace Isis {
     }
 
     // Everything is fine so save the cube on the stack
-    OutputCubes.push_back(cube);
+    AddOutputCube(cube);
     return cube;
   }
 
