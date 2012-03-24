@@ -100,6 +100,7 @@ void IsisMain() {
     Functor5 functor;
     p.ProcessCubeInPlace(functor);
     p.EndProcess();
+    cube->close();
     cube = new Cube;
     cube->open(Application::GetUserInterface().GetFilename("TO"), "rw");
     Statistics *statsBand1 = cube->getStatistics(1);
