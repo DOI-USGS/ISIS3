@@ -1,14 +1,10 @@
 #include "QtImporter.h"
 
-#include <sstream>
-
 #include <QImage>
 
 #include "Filename.h"
 #include "IException.h"
-#include "ProcessByLine.h"
 
-using namespace std;
 using namespace Isis;
 
 
@@ -48,6 +44,10 @@ namespace Isis {
 
   bool QtImporter::isArgb() const {
     return m_qimage->hasAlphaChannel();
+  }
+
+
+  void QtImporter::updateRawBuffer(int line, int band) const {
   }
 
 

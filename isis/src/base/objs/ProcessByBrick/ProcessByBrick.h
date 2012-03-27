@@ -90,6 +90,11 @@ namespace Isis {
       //! Destroys the ProcessByBrick object
       ~ProcessByBrick();
 
+      enum ProcessingDirection {
+        LinesFirst,
+        BandsFirst
+      };
+
       using Process::SetInputCube;
       Cube *SetInputCube(const std::string &parameter,
                          int requirements = 0);
@@ -107,6 +112,9 @@ namespace Isis {
       void SetOutputBrickSize(int ns, int nl, int nb);
       void SetOutputBrickSize(int ns, int nl, int nb, 
                               int cube);
+
+      void SetProcessingDirection(ProcessingDirection direction);
+      ProcessingDirection GetProcessingDirection();
 
       void SetWrap(bool wrap);
       bool Wraps();
@@ -790,6 +798,9 @@ namespace Isis {
       };
 
     private:
+      bool p_reverse; /**< Use the reverse option for constructing the Buffer
+                        objects when the Processing Direction is changed from
+                        LinesFirst to BandsFirst*/
       bool p_wrapOption;    //!< Indicates whether the brick manager will wrap
       bool p_inputBrickSizeSet;  /**< Indicates whether the brick size has been
                                       set*/

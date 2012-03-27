@@ -2,8 +2,11 @@
 #define JP2Importer_h
 
 #include "ImageImporter.h"
+#include "PixelType.h"
 
 namespace Isis {
+  class JP2Decoder;
+
   /**
    * @author 2012-03-16 Travis Addair
    *
@@ -14,14 +17,12 @@ namespace Isis {
       JP2Importer(Filename inputName);
       virtual ~JP2Importer();
 
-      using ImageImporter::import;
-      virtual Cube * import(Filename outputName, CubeAttributeOutput &att);
-
       virtual bool isGrayscale() const;
       virtual bool isRgb() const;
       virtual bool isArgb() const;
 
     protected:
+      virtual void updateRawBuffer(int line, int band) const;
       virtual int getPixel(int s, int l) const;
 
       virtual int getGray(int pixel) const;
@@ -30,9 +31,12 @@ namespace Isis {
       virtual int getBlue(int pixel) const;
       virtual int getAlpha(int pixel) const;
 
+      int getFromBuffer(int s, int b) const;
+
     private:
-      int m_pixelBytes;
-      bool m_signed;
+      JP2Decoder *m_decoder;
+      mutable char **m_buffer; // TODO hack, we need non-const process method
+      Isis::PixelType m_pixelType;
   };
 };
 

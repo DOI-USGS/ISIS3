@@ -68,16 +68,17 @@ namespace Isis {
        * @param type Type of pixel in raw buffer
        */
       Brick(const int nsamps, const int nlines, const int nbands,
-            const Isis::PixelType type) :
+            const Isis::PixelType type, bool reverse=false) :
         Isis::BufferManager(nsamps, nlines, nbands,
-                            nsamps, nlines, nbands, type) {
+                            nsamps, nlines, nbands, type, reverse) {
       };
 
       Brick(const Isis::Cube &cube, const int &bufNumSamples,
-            const int &bufNumLines, const int &bufNumBands) :
+            const int &bufNumLines, const int &bufNumBands,
+            bool reverse=false) :
         Isis::BufferManager(cube.getSampleCount(), cube.getLineCount(),
                             cube.getBandCount(), bufNumSamples, bufNumLines,
-                            bufNumBands, cube.getPixelType()) {
+                            bufNumBands, cube.getPixelType(), reverse) {
       };
 
       /**
@@ -93,9 +94,10 @@ namespace Isis {
        * @param type Type of pixel in raw buffer
        */
       Brick(int maxSamples, int maxLines, int maxBands, int bufNumSamples,
-            int bufNumLines, int bufNumBands, Isis::PixelType type) :
+            int bufNumLines, int bufNumBands, Isis::PixelType type,
+            bool reverse=false) :
         Isis::BufferManager(maxSamples, maxLines, maxBands, bufNumSamples,
-                            bufNumLines, bufNumBands, type) {
+                            bufNumLines, bufNumBands, type, reverse) {
       };
 
     public:

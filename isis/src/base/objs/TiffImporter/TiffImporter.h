@@ -22,6 +22,7 @@ namespace Isis {
     protected:
       int samplesPerPixel() const;
 
+      virtual void updateRawBuffer(int line, int band) const;
       virtual int getPixel(int s, int l) const;
 
       virtual int getGray(int pixel) const;

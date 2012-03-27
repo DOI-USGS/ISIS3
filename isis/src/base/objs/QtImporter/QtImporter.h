@@ -21,6 +21,7 @@ namespace Isis {
       virtual bool isArgb() const;
 
     protected:
+      virtual void updateRawBuffer(int line, int band) const;
       virtual int getPixel(int s, int l) const;
 
       virtual int getGray(int pixel) const;

@@ -42,6 +42,11 @@ namespace Isis {
   void ImageImporter::operator()(Buffer &out) const {
     GetChannelMethod getChannel = getBandChannel(out.Band());
 
+    // This should be abstract in the base class, do nothing for Qt (reads into
+    // memory) and TIFF until we can read it piece by piece, but will need to be
+    // used to get JP2 working
+    updateRawBuffer(out.Line(), out.Band());
+
     int l = out.Line() - 1;
     for (int s = 0; s < out.SampleDimension(); s++) {
       out[s] = testSpecial((this->*getChannel)(getPixel(s, l)));
@@ -81,6 +86,7 @@ namespace Isis {
     label->AddGroup(bandBin);
 
     p.SetInputCube(cube);
+    p.SetProcessingDirection(ProcessByBrick::BandsFirst);
     p.ProcessCubeInPlace(*this, false);
     p.EndProcess();
 
@@ -217,6 +223,17 @@ namespace Isis {
     }
 
     return getChannel;
+  }
+
+
+  int ImageImporter::convertRgbToGray(int pixel) const {
+    // Weighted formula taken from Qt documentation on converting an RGB
+    // value to grayscale:
+    // http://qt-project.org/doc/qt-4.8/qcolor.html#qGray-2
+    int red = getRed(pixel);
+    int green = getBlue(pixel);
+    int blue = getGreen(pixel);
+    return (red * 11 + green * 16 + blue * 5) / 32;
   }
 
 

@@ -18,10 +18,10 @@ namespace Isis {
       ImageImporter(Filename inputName);
       virtual ~ImageImporter();
 
-      virtual void operator()(Buffer &out) const;
+      void operator()(Buffer &out) const;
 
-      virtual Cube * import(Filename outputName);
-      virtual Cube * import(Filename outputName, CubeAttributeOutput &att);
+      Cube * import(Filename outputName);
+      Cube * import(Filename outputName, CubeAttributeOutput &att);
 
       void setNullRange(double min, double max);
       void setLrsRange(double min, double max);
@@ -52,7 +52,9 @@ namespace Isis {
       double testSpecial(double pixel) const;
 
       virtual GetChannelMethod getBandChannel(int band) const;
+      virtual int convertRgbToGray(int pixel) const;
 
+      virtual void updateRawBuffer(int line, int band) const = 0;
       virtual int getPixel(int s, int l) const = 0;
 
       virtual int getGray(int pixel) const = 0;

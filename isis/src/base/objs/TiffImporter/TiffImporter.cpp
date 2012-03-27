@@ -1,12 +1,8 @@
 #include "TiffImporter.h"
 
-#include <sstream>
-
 #include "Filename.h"
 #include "IException.h"
-#include "ProcessByLine.h"
 
-using namespace std;
 using namespace Isis;
 
 
@@ -86,6 +82,10 @@ namespace Isis {
   }
 
 
+  void TiffImporter::updateRawBuffer(int line, int band) const {
+  }
+
+
   int TiffImporter::getPixel(int s, int l) const {
     l = lines() - l - 1;
     int index = l * samples() + s;
@@ -94,13 +94,7 @@ namespace Isis {
 
 
   int TiffImporter::getGray(int pixel) const {
-    // Weighted formula taken from Qt documentation on converting an RGB
-    // value to grayscale:
-    // http://qt-project.org/doc/qt-4.8/qcolor.html#qGray-2
-    uint32 red = TIFFGetR(pixel);
-    uint32 green = TIFFGetG(pixel);
-    uint32 blue = TIFFGetB(pixel);
-    return (red * 11 + green * 16 + blue * 5) / 32;
+    return convertRgbToGray(pixel);
   }
 
 

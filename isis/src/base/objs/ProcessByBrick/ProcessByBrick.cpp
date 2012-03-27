@@ -40,6 +40,7 @@ namespace Isis {
     p_inputBrickSizeSet = false;
     p_outputBrickSizeSet = false;
     p_wrapOption = false;
+    p_reverse = false;
   }
 
 
@@ -248,6 +249,28 @@ namespace Isis {
     p_outputBrickBands[cube] = nb;
 
     p_outputBrickSizeSet = true;
+  }
+
+
+  /**
+   * Set the direction the data will be read, either all lines in a single band
+   * proceeding to the next band (LinesFirst), or every band for every line
+   * proceeding to the next line (BandsFirst).  The default is to process all
+   * lines of a band first.
+   */
+  void ProcessByBrick::SetProcessingDirection(ProcessingDirection direction) {
+    p_reverse = direction == BandsFirst ? true : false;
+  }
+
+
+  /**
+   * Returns the direction the data will be read, either all lines in a single
+   * band proceeding to the next band (LinesFirst), or every band for every line
+   * proceeding to the next line (BandsFirst).  The default is to process all
+   * lines of a band first.
+   */
+  ProcessByBrick::ProcessingDirection ProcessByBrick::GetProcessingDirection() {
+    return p_reverse ? BandsFirst : LinesFirst;
   }
 
 
@@ -569,7 +592,7 @@ namespace Isis {
       haveInput = true;
       *cube = InputCubes[0];
       *bricks = new Brick(**cube, p_inputBrickSamples[1],
-                                p_inputBrickLines[1], p_inputBrickBands[1]);
+          p_inputBrickLines[1], p_inputBrickBands[1], p_reverse);
     }
     else {
       //  Make sure the brick size has been set
@@ -587,7 +610,7 @@ namespace Isis {
       haveInput = false;
       *cube = OutputCubes[0];
       *bricks = new Brick(**cube, p_outputBrickSamples[1],
-                                p_outputBrickLines[1], p_outputBrickBands[1]);
+          p_outputBrickLines[1], p_outputBrickBands[1], p_reverse);
     }
 
     return haveInput;
@@ -642,9 +665,9 @@ namespace Isis {
       // Use the size of each cube as the area for the bricks to traverse since
       // we will be wrapping if we hit the end of one, but not the other.
       *ibrick = new Brick(*InputCubes[0], p_inputBrickSamples[1],
-                                p_inputBrickLines[1], p_inputBrickBands[1]);
+          p_inputBrickLines[1], p_inputBrickBands[1], p_reverse);
       *obrick = new Brick(*OutputCubes[0], p_outputBrickSamples[1],
-                                p_outputBrickLines[1], p_outputBrickBands[1]);
+          p_outputBrickLines[1], p_outputBrickBands[1], p_reverse);
     }
     else {
       // Since we are not wrapping, we need to find the maximum size of the
@@ -663,12 +686,14 @@ namespace Isis {
                                 p_inputBrickSamples[1],
                                 p_inputBrickLines[1],
                                 p_inputBrickBands[1],
-                                InputCubes[0]->getPixelType());
+                                InputCubes[0]->getPixelType(),
+                                p_reverse);
       *obrick = new Brick(maxSamples, maxLines, maxBands,
                                 p_outputBrickSamples[1],
                                 p_outputBrickLines[1],
                                 p_outputBrickBands[1],
-                                OutputCubes[0]->getPixelType());
+                                OutputCubes[0]->getPixelType(),
+                                p_reverse);
     }
 
     int numBricks;
@@ -759,14 +784,16 @@ namespace Isis {
         ibrick = new Brick(*InputCubes[i-1],
                             p_inputBrickSamples[i],
                             p_inputBrickLines[i],
-                            p_inputBrickBands[i]);
+                            p_inputBrickBands[i],
+                            p_reverse);
       }
       else {
         ibrick = new Brick(maxSamples, maxLines, maxBands,
                             p_inputBrickSamples[i],
                             p_inputBrickLines[i],
                             p_inputBrickBands[i],
-                            InputCubes[i - 1]->getPixelType());
+                            InputCubes[i - 1]->getPixelType(),
+                            p_reverse);
       }
       ibrick->begin();
       ibufs.push_back(ibrick);
@@ -782,14 +809,16 @@ namespace Isis {
         obrick = new Brick(*OutputCubes[i-1],
                             p_outputBrickSamples[i],
                             p_outputBrickLines[i],
-                            p_outputBrickBands[i]);
+                            p_outputBrickBands[i],
+                            p_reverse);
       }
       else {
         obrick = new Brick(maxSamples, maxLines, maxBands,
                             p_outputBrickSamples[i],
                             p_outputBrickLines[i],
                             p_outputBrickBands[i],
-                            OutputCubes[i - 1]->getPixelType());
+                            OutputCubes[i - 1]->getPixelType(),
+                            p_reverse);
       }
       obrick->begin();
       obufs.push_back(obrick);
