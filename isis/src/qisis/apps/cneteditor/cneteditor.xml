@@ -162,5 +162,8 @@
       Edit-locked points and measures now appear non-editable in the point and
       measure tables. Fixes #356.
     </change>
+    <change name="Jai Rideout" date="2012-03-28">
+      Points with any edit-locked measures can no longer be deleted. Fixes #621.
+    </change>
   </history>
 </application>

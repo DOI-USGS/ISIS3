@@ -460,6 +460,11 @@ namespace Isis
               "cannot be deleted";
           throw IException(IException::User, msg, _FILEINFO_);
         }
+        else if (point->GetNumLockedMeasures() > 0) {
+          iString msg = "Point [" + getFormattedData() + "] has at least one "
+              "edit locked measure and cannot be deleted";
+          throw IException(IException::User, msg, _FILEINFO_);
+        }
 
         ControlPoint * tempPoint = point;
         point = NULL;
