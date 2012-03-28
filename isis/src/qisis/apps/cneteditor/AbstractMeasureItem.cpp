@@ -354,21 +354,16 @@ namespace Isis
     // lock column should be uneditable. If the measure's parent point is
     // edit-locked, none of the columns should be editable as it should only be
     // unlocked from the parent point.
-    bool AbstractMeasureItem::isDataLocked(QString columnTitle) const {
-      bool locked = true;
-      if (measure->IsEditLocked()) {
-        if (getColumn(columnTitle) == EditLock) {
-          if (measure->Parent() && measure->Parent()->IsEditLocked())
-            locked = true;
-          else
-            locked = false;
-        }
-      }
-      else {
+    bool AbstractMeasureItem::isDataEditable(QString columnTitle) const {
+      bool parentLocked = !measure->Parent() ||
+                           measure->Parent()->IsEditLocked();
+      bool locked = measure->IsEditLocked() || parentLocked;
+
+      if (getColumn(columnTitle) == EditLock && !parentLocked) {
         locked = false;
       }
 
-      return locked;
+      return !locked;
     }
 
 

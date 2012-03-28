@@ -437,7 +437,7 @@ namespace Isis
     // Returns true if the data at the given column is locked (i.e.
     // edit-locked). If the point is edit-locked, all columns except the edit
     // lock column should be uneditable.
-    bool AbstractPointItem::isDataLocked(QString columnTitle) const {
+    bool AbstractPointItem::isDataEditable(QString columnTitle) const {
       bool locked = true;
       if (point->IsEditLocked()) {
         if (getColumn(columnTitle) == EditLock)
@@ -447,7 +447,7 @@ namespace Isis
         locked = false;
       }
 
-      return locked;
+      return !locked;
     }
 
 

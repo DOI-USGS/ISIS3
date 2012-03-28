@@ -1208,7 +1208,9 @@ namespace Isis
 
       bool editable = false;
 
+      QString colName = columns->getVisibleColumns()[colNum]->getTitle();
       if (items->at(rowNum)->isSelectable() &&
+          items->at(rowNum)->isDataEditable(colName) &&
           !columns->getVisibleColumns()[colNum]->isReadOnly())
         editable = true;
 

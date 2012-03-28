@@ -54,7 +54,7 @@ namespace Isis
     }
 
 
-    bool AbstractImageItem::isDataLocked(QString columnTitle) const {
+    bool AbstractImageItem::isDataEditable(QString columnTitle) const {
       return false;
     }
 

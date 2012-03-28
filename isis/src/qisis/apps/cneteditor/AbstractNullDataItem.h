@@ -35,7 +35,7 @@ namespace Isis
         virtual QVariant getData() const;
         virtual QVariant getData(QString columnTitle) const;
         virtual void setData(QString const & columnTitle, QString const & newData);
-        virtual bool isDataLocked(QString columnTitle) const;
+        virtual bool isDataEditable(QString columnTitle) const;
         virtual void deleteSource();
         virtual InternalPointerType getPointerType() const;
         virtual void * getPointer() const;

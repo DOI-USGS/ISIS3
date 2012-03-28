@@ -43,7 +43,7 @@ namespace Isis
     }
 
 
-    bool AbstractNullDataItem::isDataLocked(QString columnTitle) const {
+    bool AbstractNullDataItem::isDataEditable(QString columnTitle) const {
       return false;
     }
 

@@ -158,5 +158,9 @@
       may be either filtering on cube serial numbers or cube filenames. Fixes
       #304.
     </change>
+    <change name="Steven Lambright and Jai Rideout" date="2012-03-28">
+      Edit-locked points and measures now appear non-editable in the point and
+      measure tables. Fixes #356.
+    </change>
   </history>
 </application>
