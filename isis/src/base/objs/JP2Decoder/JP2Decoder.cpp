@@ -227,4 +227,21 @@ namespace Isis {
     delete [] p_isSigned;
 #endif
   }
+
+
+  bool JP2Decoder::IsJP2(string filename) {
+    jp2_family_src *stream = new jp2_family_src();
+    stream->open(filename.c_str());
+    jp2_source *source = new jp2_source();
+
+    bool result = source->open(stream);
+
+    source->close();
+    delete source;
+
+    stream->close();
+    delete stream;
+
+    return result;
+  }
 }

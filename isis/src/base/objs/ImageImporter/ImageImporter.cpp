@@ -5,6 +5,7 @@
 #include "Buffer.h"
 #include "CubeAttribute.h"
 #include "Filename.h"
+#include "JP2Decoder.h"
 #include "JP2Importer.h"
 #include "ProcessByLine.h"
 #include "QtImporter.h"
@@ -13,7 +14,13 @@
 
 using namespace Isis;
 
+
 namespace Isis {
+  /**
+   * Construct the importer.
+   *
+   * @param inputName The name of the input image
+   */
   ImageImporter::ImageImporter(Filename inputName) {
     m_inputName = NULL;
     m_outCube = NULL;
@@ -30,6 +37,9 @@ namespace Isis {
   }
 
 
+  /**
+   * Destruct the importer.  Also deletes the output cube handle.
+   */
   ImageImporter::~ImageImporter() {
     delete m_inputName;
     m_inputName = NULL;
@@ -39,14 +49,30 @@ namespace Isis {
   }
 
 
+  /**
+   * The method for processing the output cube in place, called for each line of
+   * the output image.  Enables the importer to be used as a functor in a custom
+   * ProcessByLine routine, bypassing the black-box import() method entirely.
+   * Care should be taken, however, to observe the requirements placed on the
+   * structure of such a processing routine by this method.  For example, the
+   * JP2Importer child requires that the processing proceed in the direction of
+   * bands before lines, because its input data is structured in a BIL (band
+   * interlaced by line) format.
+   *
+   * @param out A reference to a line of output data to be written to
+   */
   void ImageImporter::operator()(Buffer &out) const {
+    // Get the method responsible for finding the color component for the
+    // current output pixel
     GetChannelMethod getChannel = getBandChannel(out.Band());
 
-    // This should be abstract in the base class, do nothing for Qt (reads into
-    // memory) and TIFF until we can read it piece by piece, but will need to be
-    // used to get JP2 working
+    // Updates the raw buffer of input data when only part of the image is
+    // stored in memory at a time
     updateRawBuffer(out.Line(), out.Band());
 
+    // Processing by line, so loop over every sample in the buffer and get its
+    // color component for the current output band, filter based on our special
+    // pixel ranges, then output the resulting DN
     int l = out.Line() - 1;
     for (int s = 0; s < out.SampleDimension(); s++) {
       out[s] = testSpecial((this->*getChannel)(getPixel(s, l)));
@@ -54,12 +80,32 @@ namespace Isis {
   }
 
 
+  /**
+   * Import the image with default output attributes.
+   *
+   * @param outputName The filename of the output cube
+   */
   Cube * ImageImporter::import(Filename outputName) {
     CubeAttributeOutput att;
     return import(outputName, att);
   }
 
 
+  /**
+   * Import the input image this instance was constructed with into the given
+   * output Isis cube with the given output attributes.  This will do a
+   * black-box import using a ProcessByLine routine.  The BandBin group will be
+   * updated in the output cube with the names of the color channels included.
+   * The output cube will be returned on completion of the import process so the
+   * caller can continue to modify the labels.  The importer instance will
+   * retain ownership of this cube, such that the cube handle will be
+   * deallocated upon destruction of the importer.
+   *
+   * @param outputName The filename of the output cube
+   * @param att The attributes for writing the output cube
+   *
+   * @return A handle on the newly imported Isis cube owned by the importer
+   */
   Cube * ImageImporter::import(Filename outputName, CubeAttributeOutput &att) {
     ProcessByLine p;
     Cube *cube = createOutput(outputName, att);
@@ -94,6 +140,15 @@ namespace Isis {
   }
 
 
+  /**
+   * Create the output cube from the given filename and attributes.  Set its
+   * dimensions based on those encapsulated by the importer.
+   *
+   * @param outputName The filename of the output cube
+   * @param att The attributes for writing the output cube
+   *
+   * @return The newly created cube handle devoid of any data
+   */
   Cube * ImageImporter::createOutput(
       Filename outputName, CubeAttributeOutput &att) {
 
@@ -103,39 +158,81 @@ namespace Isis {
   }
 
 
+  /**
+   * Set the number of bands to be created for the output cube based on the
+   * number of color channels in the input image.
+   */
   void ImageImporter::setDefaultBands() {
     setBands((isGrayscale()) ? 1 : (isArgb()) ? 4 : 3);
   }
 
 
+  /**
+   * Set the range of DN values within which a pixel from the input image will
+   * be set to Null in the output.
+   *
+   * @param min Any DN less than this value will not be set to Null.
+   * @param max Any DN greater than this value will not be set to Null.
+   */
   void ImageImporter::setNullRange(double min, double max) {
     m_nullMin = min;
     m_nullMax = max;
   }
 
 
+  /**
+   * Set the range of DN values within which a pixel from the input image will
+   * be set to LRS in the output.
+   *
+   * @param min Any DN less than this value will not be set to LRS.
+   * @param max Any DN greater than this value will not be set to LRS.
+   */
   void ImageImporter::setLrsRange(double min, double max) {
     m_lrsMin = min;
     m_lrsMax = max;
   }
 
 
+  /**
+   * Set the range of DN values within which a pixel from the input image will
+   * be set to HRS in the output.
+   *
+   * @param min Any DN less than this value will not be set to HRS.
+   * @param max Any DN greater than this value will not be set to HRS.
+   */
   void ImageImporter::setHrsRange(double min, double max) {
     m_hrsMin = min;
     m_hrsMax = max;
   }
 
 
+  /**
+   * Set the sample dimension (width) of the output image.
+   *
+   * @param s The new sample dimension
+   */
   void ImageImporter::setSamples(int s) {
     m_samples = s;
   }
 
 
+  /**
+   * Set the line dimension (height) of the output image.
+   *
+   * @param l The new line dimension
+   */
   void ImageImporter::setLines(int l) {
     m_lines = l;
   }
 
 
+  /**
+   * Set the band dimension (depth) of the output image.  Because this importer
+   * only works on Grayscale, RGB, and RGBA images, possible values are 1, 3,
+   * and 4 for the respective color modes.
+   *
+   * @param b The new band dimension
+   */
   void ImageImporter::setBands(int b) {
     if (b == 2 || b > 4)
       throw IException(IException::Programmer,
@@ -146,36 +243,57 @@ namespace Isis {
   }
 
 
+  /**
+   * The sample dimension (width) of the output image.
+   *
+   * @return The sample dimension
+   */
   int ImageImporter::samples() const {
     return m_samples;
   }
 
 
+  /**
+   * The line dimension (height) of the output image.
+   *
+   * @return The line dimension
+   */
   int ImageImporter::lines() const {
     return m_lines;
   }
 
 
+  /**
+   * The band dimension (depth) of the output image.
+   *
+   * @return The band dimension
+   */
   int ImageImporter::bands() const {
     return m_bands;
   }
 
 
+  /**
+   * The filename of the input image this instance was constructed with.
+   *
+   * @return A copy of the input filename
+   */
   Filename ImageImporter::filename() const {
     return *m_inputName;
   }
 
 
   /**
-   * Tests the pixel. If it is valid it will return the dn value,
-   * otherwise it will return the Isis special pixel value that
-   * corresponds to it
+   * Tests a pixel against the Null, HRS, and LRS ranges defined by the
+   * importer's handler.  Any pixel value falling within one of these ranges
+   * will be converted into the given type of special pixel.  In case of
+   * overlapping ranges, these tests will be performed in the order mentioned at
+   * the start of this description.  By default, these ranges are set such that
+   * all incoming pixels will retain their original values.
    *
-   * @param pixel The double precision value that represents a
-   *              pixel.
-   * @return double  The double precision value representing the
-   *         pixel will return as a valid dn or changed to an isis
-   *         special pixel.
+   * @param pixel The DN value to be tested
+   *
+   * @return The valid DN or special pixel if it fell within the special ranges
    */
   double ImageImporter::testSpecial(double pixel) const {
     if (pixel <= m_nullMax && pixel >= m_nullMin) {
@@ -193,11 +311,22 @@ namespace Isis {
   }
 
 
+  /**
+   * Retrieve the method responsible for fetching the color channel from the
+   * input image corresponding to the current band out of output being filled.
+   * This will always be the getGray() method for single band output images.
+   * For RGB/A images, band 1 will be red, band 2 green, band 3 blue, and band 4
+   * alpha.
+   *
+   * @param band The current band of the output image
+   *
+   * @return The method that converts input pixels into the current band's color
+   *         component
+   */
   ImageImporter::GetChannelMethod
     ImageImporter::getBandChannel(int band) const {
 
     GetChannelMethod getChannel;
-
     if (bands() == 1) {
       getChannel = &ImageImporter::getGray;
     }
@@ -221,15 +350,26 @@ namespace Isis {
               _FILEINFO_);
       }
     }
-
     return getChannel;
   }
 
 
+  /**
+   * Convert the current pixel, taken from an RGB/A image, and blend its
+   * RGB components into a single grayscale DN.  The three color components are
+   * weighted by the following formula:
+   *   
+   *   gray = (red * 11 + green * 16 + blue * 5) / 32
+   *
+   * This formula was taken from the Qt documentation on converting an RGB value
+   * to grayscale: http://qt-project.org/doc/qt-4.8/qcolor.html#qGray-2
+   *
+   * @param pixel The pixel value to be broken up into RGB components and
+   *        converted to grayscale
+   *
+   * @return The grayscale DN value
+   */
   int ImageImporter::convertRgbToGray(int pixel) const {
-    // Weighted formula taken from Qt documentation on converting an RGB
-    // value to grayscale:
-    // http://qt-project.org/doc/qt-4.8/qcolor.html#qGray-2
     int red = getRed(pixel);
     int green = getBlue(pixel);
     int blue = getGreen(pixel);
@@ -237,6 +377,19 @@ namespace Isis {
   }
 
 
+  /**
+   * A static (factory) method for constructing an ImageImporter instance from
+   * an input filename.  The specific subclass of the returned instance is
+   * determined from the interpreted image format of the input image.  Such
+   * tests are done by reading a minimal amount of the input data necessary to
+   * determine the format.  It is the caller's responsibility to delete the
+   * importer instance when they are finished with it.  Note that deleting the
+   * importer will also delete the cube handle returned by the import() method.
+   *
+   * @param inputName The filename of the input image to be imported
+   *
+   * @return A pointer to the instantiated importer owned by the caller
+   */
   ImageImporter * ImageImporter::fromFilename(Filename inputName) {
     ImageImporter *importer = NULL;
 
@@ -247,8 +400,13 @@ namespace Isis {
     else if (format != "") {
       importer = new QtImporter(inputName);
     }
-    else {
+    else if (JP2Decoder::IsJP2(inputName.Expanded())) {
       importer = new JP2Importer(inputName);
+    }
+    else {
+      throw IException(IException::Programmer,
+          "Cannot determine image format for [" + inputName.Expanded() + "]",
+          _FILEINFO_);
     }
 
     return importer;

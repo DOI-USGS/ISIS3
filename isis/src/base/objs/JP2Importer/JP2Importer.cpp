@@ -9,6 +9,11 @@ using namespace Isis;
 
 
 namespace Isis {
+  /**
+   * Construct the importer.
+   *
+   * @param inputName The name of the input image
+   */
   JP2Importer::JP2Importer(Filename inputName) : ImageImporter(inputName) {
     m_decoder = NULL;
     m_buffer = NULL;
@@ -51,6 +56,9 @@ namespace Isis {
   }
 
 
+  /**
+   * Destruct the importer.
+   */
   JP2Importer::~JP2Importer() {
     delete m_decoder;
     m_decoder = NULL;
@@ -60,21 +68,45 @@ namespace Isis {
   }
 
 
+  /**
+   * Tests to see if the input image is single-banded, implying grayscale (no
+   * RGB/A).
+   *
+   * @return True if the image is grayscale, false otherwise
+   */
   bool JP2Importer::isGrayscale() const {
     return m_decoder->GetBandDimension() == 1;
   }
 
 
+  /**
+   * Tests to see if the input image is triple-banded, implying RGB (no alpha).
+   *
+   * @return True if the image is RGB, false otherwise
+   */
   bool JP2Importer::isRgb() const {
     return m_decoder->GetBandDimension() == 3;
   }
 
 
+  /**
+   * Tests to see if the input image is quadruple-banded, implying RGBA.
+   *
+   * @return True if the image is RGBA, false otherwise
+   */
   bool JP2Importer::isArgb() const {
     return m_decoder->GetBandDimension() == 4;
   }
 
 
+  /**
+   * Updates the buffer used to store chunks of the input data at a time.  Reads
+   * a single line of data from the input with all its color channels.  Uses the
+   * pixel type to determine the size of each pixel value to read in.
+   *
+   * @param line Current line of the output buffer
+   * @param band Current band of the output buffer
+   */
   void JP2Importer::updateRawBuffer(int line, int band) const {
     // Only read a new chunk of data when we move to a new line, since we read
     // all the input bands for the current line at once
@@ -87,36 +119,100 @@ namespace Isis {
   }
 
 
+  /**
+   * Returns a representation of a pixel for the input format that can then be
+   * broken down into specific gray or RGB/A components.
+   *
+   * @param s The sample of the desired pixel
+   * @param l The line of the desired pixel
+   *
+   * @return The current sample, used as an index into the data buffer
+   *
+   * @todo This design was created before it was determined that JPEG 2000 does
+   *       not have a traditional pixel representation used to get color
+   *       components, so this is somewhat of a hack.
+   */
   int JP2Importer::getPixel(int s, int l) const {
     return s;
   }
 
 
+  /**
+   * Retrieves the gray component of the given pixel.  For grayscale images,
+   * simply returns the value in the single band.  For RGB/A, converts the RGB
+   * components into grayscale.
+   *
+   * @param pixel Index into the line buffer corresponding to a sample
+   *
+   * @return The gray component
+   */
   int JP2Importer::getGray(int pixel) const {
     return isGrayscale() ? getFromBuffer(pixel, 0) : convertRgbToGray(pixel);
   }
 
 
+  /**
+   * Retrieves the red component of the given pixel from the first band of the
+   * input buffer.
+   *
+   * @param pixel Index into the line buffer corresponding to a sample
+   *
+   * @return The red component
+   */
   int JP2Importer::getRed(int pixel) const {
     return getFromBuffer(pixel, 0);
   }
 
 
+  /**
+   * Retrieves the green component of the given pixel from the second band of
+   * the input buffer.
+   *
+   * @param pixel Index into the line buffer corresponding to a sample
+   *
+   * @return The green component
+   */
   int JP2Importer::getGreen(int pixel) const {
     return getFromBuffer(pixel, 1);
   }
 
 
+  /**
+   * Retrieves the blue component of the given pixel from the third band of the
+   * input buffer.
+   *
+   * @param pixel Index into the line buffer corresponding to a sample
+   *
+   * @return The blue component
+   */
   int JP2Importer::getBlue(int pixel) const {
     return getFromBuffer(pixel, 2);
   }
 
 
+  /**
+   * Retrieves the alpha component of the given pixel from the fourth band of
+   * the input buffer.
+   *
+   * @param pixel Index into the line buffer corresponding to a sample
+   *
+   * @return The alpha component
+   */
   int JP2Importer::getAlpha(int pixel) const {
     return getFromBuffer(pixel, 3);
   }
 
 
+  /**
+   * Retrieves the pixel value from the input buffer corresponding to the given
+   * sample and band (the buffer contains an entire line).  Dependent upon the
+   * pixel type of the input data.
+   *
+   * @param s Index into the line buffer corresponding to a sample
+   * @param b Index into the line buffer corresponding to a band
+   *
+   * @return The pixel value of the given component
+   */
   int JP2Importer::getFromBuffer(int s, int b) const {
     int value;
 

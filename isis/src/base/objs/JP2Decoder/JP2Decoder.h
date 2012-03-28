@@ -129,6 +129,8 @@ namespace Isis {
       // Read 16-bit data from the JP2 file
       void Read(short int **inbuf);
 
+      static bool IsJP2(std::string filename);
+
     private:
       std::string p_jp2File;          //!<Input file name
       unsigned int p_resolutionLevel; //!<Resolution level that file will be decompressed

@@ -257,6 +257,8 @@ namespace Isis {
    * proceeding to the next band (LinesFirst), or every band for every line
    * proceeding to the next line (BandsFirst).  The default is to process all
    * lines of a band first.
+   *
+   * @param direction The new enumerated processing direction
    */
   void ProcessByBrick::SetProcessingDirection(ProcessingDirection direction) {
     p_reverse = direction == BandsFirst ? true : false;
@@ -268,6 +270,8 @@ namespace Isis {
    * band proceeding to the next band (LinesFirst), or every band for every line
    * proceeding to the next line (BandsFirst).  The default is to process all
    * lines of a band first.
+   *
+   * @return The selected enumerated processing direction
    */
   ProcessByBrick::ProcessingDirection ProcessByBrick::GetProcessingDirection() {
     return p_reverse ? BandsFirst : LinesFirst;
