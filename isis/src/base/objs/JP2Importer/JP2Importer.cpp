@@ -111,6 +111,8 @@ namespace Isis {
     // Only read a new chunk of data when we move to a new line, since we read
     // all the input bands for the current line at once
     // NOTE m_buffer is changed in this method, making the const-ness a lie
+    // TODO make the buffer local to the operator() method and read all bands of
+    // a line at a time with a ProcessByBrick
     if (band == 1) {
       if (m_pixelType == Isis::UnsignedByte)
         m_decoder->Read((unsigned char **) m_buffer);
