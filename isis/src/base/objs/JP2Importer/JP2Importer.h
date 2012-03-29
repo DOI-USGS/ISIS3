@@ -68,12 +68,8 @@ namespace Isis {
       //! Takes a raw stream of JPEG 2000 data and reads it into a buffer.
       JP2Decoder *m_decoder;
 
-      /**
-       * Buffer that stores a line of JPEG 2000 data and all its color bands.
-       *
-       * @todo Making mutable is a hack, we need non-const process method
-       */
-      mutable char **m_buffer;
+      //! Buffer that stores a line of JPEG 2000 data and all its color bands.
+      char **m_buffer;
 
       //! Pixel type of the input image needed for reading data into the buffer.
       Isis::PixelType m_pixelType;
