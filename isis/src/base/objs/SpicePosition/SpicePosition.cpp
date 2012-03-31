@@ -22,26 +22,29 @@ namespace Isis {
    * @param observerCode Valid naif body name.
    */
   SpicePosition::SpicePosition(int targetCode, int observerCode) {
-    p_targetCode = targetCode;
-    p_observerCode = observerCode;
-    p_timeBias = 0.0;
     p_aberrationCorrection = "LT+S";
-    p_source = Spice;
+    p_baseTime = 0.;
+    p_coefficients[0].clear();
+    p_coefficients[1].clear();
+    p_coefficients[2].clear();
     p_coordinate.resize(3);
-    p_velocity.resize(3);
     p_degree = 2;
+    p_degreeApplied = false;
     p_et = -DBL_MAX;
-    p_override = NoOverrides;
     p_fullCacheStartTime = 0;
     p_fullCacheEndTime = 0;
     p_fullCacheSize = 0;
-    p_degreeApplied = false;
     p_hasVelocity = false;
+    p_observerCode = observerCode;
+    p_override = NoOverrides;
+    p_source = Spice;
+    p_targetCode = targetCode;
+    p_timeBias = 0.0;
+    p_timeScale = 1.;
+    p_velocity.resize(3);
     p_xhermite = NULL;
     p_yhermite = NULL;
     p_zhermite = NULL;
-    p_baseTime = 0.;
-    p_timeScale = 1.;
   }
 
 
@@ -120,6 +123,9 @@ namespace Isis {
     }
     else if(p_source == PolyFunction) {
       SetEphemerisTimePolyFunction();
+    }
+    else if(p_source == PolyFunctionOverHermiteConstant) {
+      SetEphemerisTimePolyFunctionOverHermiteConstant();
     }
     else {  // Read from the kernel
       SetEphemerisTimeSpice();
@@ -342,6 +348,15 @@ namespace Isis {
    *   @history 2011-01-05 Debbie A. Cook - Added PolyFunction
    */
   Table SpicePosition::Cache(const std::string &tableName) {
+    if (p_source == PolyFunctionOverHermiteConstant) {
+      LineCache(tableName);
+      // TODO Figure out how to get the tolerance -- for now hard code .01
+      Memcache2HermiteCache(0.01);
+
+      std::cout << "Cache size is " << p_cache.size();
+
+    }
+
     // record to be added to table
     TableRecord record;
 
@@ -483,11 +498,15 @@ namespace Isis {
    * velocity Z, and time of J2000 position.
    *
    * @param tableName    Name of the table to create and return
+   *
+   * @internal
+   *   @history 2012-01-25 Debbie A. Cook - Modified error checking for p_source
+   *                         to allow all function sources (>=HermiteCache)
    */
   Table SpicePosition::LineCache(const std::string &tableName) {
 
     // Apply the function and fill the caches
-    if(p_source == PolyFunction)  ReloadCache();
+    if(p_source >= HermiteCache)  ReloadCache();
 
     if(p_source != Memcache) {
       std::string msg = "Only cached positions can be returned as a line cache of positions and time";
@@ -505,6 +524,9 @@ namespace Isis {
    * calculated from functions fit to the coordinates of the position
    * over a time range.
    *
+   * @internal
+   *   @history 2012-01-25 Debbie A. Cook - Modified error checking for type
+   *                        to allow all function types (>=HermiteCache)
    */
   void SpicePosition::ReloadCache() {
     NaifStatus::CheckErrors();
@@ -512,9 +534,9 @@ namespace Isis {
     // Save current et
     double et = p_et;
 
-    // Make sure source is PolyFunction
-    if(p_source != PolyFunction) {
-      std::string msg = "The SpicePosition has not yet been fit to a polynomial function";
+    // Make sure source is a function
+    if(p_source < HermiteCache) {
+      std::string msg = "The SpicePosition has not yet been fit to a function";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -696,7 +718,9 @@ namespace Isis {
    *  where t = (time - p_baseTime) / p_timeScale.
    *
    */
-  void SpicePosition::SetPolynomial() {
+  void SpicePosition::SetPolynomial(Source type) {
+    std::vector<double> XC, YC, ZC;
+
     // Check to see if the position is already a Polynomial Function
     if (p_source == PolyFunction)
       return;
@@ -709,6 +733,15 @@ namespace Isis {
       p_degree = 1;
     }
 
+    //Check for polynomial over Hermite constant and initialize coefficients
+    if (type == PolyFunctionOverHermiteConstant) {
+      XC.assign(p_degree + 1, 0.);
+      YC.assign(p_degree + 1, 0.);
+      ZC.assign(p_degree + 1, 0.);
+      SetPolynomial(XC, YC, ZC, type);
+      return;
+    }
+
     Isis::PolynomialUnivariate function1(p_degree);       //!< Basis function fit to X
     Isis::PolynomialUnivariate function2(p_degree);       //!< Basis function fit to Y
     Isis::PolynomialUnivariate function3(p_degree);       //!< Basis function fit to Z
@@ -716,7 +749,6 @@ namespace Isis {
     // Compute the base time
     ComputeBaseTime();
     std::vector<double> time;
-    std::vector<double> XC, YC, ZC;
 
     if(p_cache.size() == 1) {
       double t = p_cacheTime.at(0);
@@ -806,10 +838,13 @@ namespace Isis {
    * @param [in] YC Coefficients of fit to Y coordinate
    * @param [in] ZC Coefficients of fit to Z coordinate
    *
+   * @internal
+   *   @history 2012-02-05 Debbie A. Cook - Added type argument
    */
   void SpicePosition::SetPolynomial(const std::vector<double>& XC,
                                     const std::vector<double>& YC,
-                                    const std::vector<double>& ZC) {
+                                    const std::vector<double>& ZC,
+                                    const Source type) {
     Isis::PolynomialUnivariate function1(p_degree);
     Isis::PolynomialUnivariate function2(p_degree);
     Isis::PolynomialUnivariate function3(p_degree);
@@ -830,7 +865,9 @@ namespace Isis {
     // Set the flag indicating p_degree has been applied to the spacecraft
     // positions and the coefficients of the polynomials have been saved.
     p_degreeApplied = true;
-    p_source = PolyFunction;
+
+    // Reset the interpolation source
+    p_source = type;
 
     // Update the current position
     double et = p_et;
@@ -892,7 +929,9 @@ namespace Isis {
    *
    * @param [in] baseTime The baseTime to use and override the computed base time
    *
-   * @history 2011-04-08 Debbie A. Cook - Corrected p_override set to BaseAndScale
+   * @internal
+   *   @history 2011-04-08 Debbie A. Cook - Corrected p_override set to 
+   *                         BaseAndScale
    */
   void SpicePosition::SetOverrideBaseTime(double baseTime, double timeScale) {
     p_overrideBaseTime = baseTime;
@@ -925,7 +964,7 @@ namespace Isis {
 
 //  if(coeffIndex > 2) {
 //    std::string msg = "SpicePosition only supports up to a 2nd order fit for the spacecraft position";
-//    throw Isis::iException::Message(Isis::iException::Programmer, msg, _FILEINFO_);
+//    throw IException(IException::Programmer, msg, _FILEINFO_);
 //  }
 //
     // Reset the coordinate to its derivative
@@ -1218,6 +1257,31 @@ namespace Isis {
     }
   }
 
+
+  /**
+   * This is a protected method that is called by
+   * SetEphemerisTime() when Source type is PolyFunctionOverHermiteConstant.  It
+   * calculates J2000 coordinates (x,y,z) of the body that correspond to a given 
+   * et in seconds. These coordinates are obtained by adding a constant cubic 
+   * Hermite spline added to an nth degree polynomial function fit to 
+   * each coordinate of the position vector.
+   * @see SetEphemerisTime()
+   * @internal
+   *   @history 2012-01-25 Debbie A. Cook - Original version
+   */
+  void SpicePosition::SetEphemerisTimePolyFunctionOverHermiteConstant() {
+    SetEphemerisTimeHermiteCache();
+    std::vector<double> hermiteCoordinate = p_coordinate;
+    std::vector<double> hermiteVelocity = p_velocity;
+    SetEphemerisTimePolyFunction();
+
+    for (int index = 0; index < 3; index++) {
+      p_coordinate[index] += hermiteCoordinate[index];
+      p_velocity[index] += hermiteVelocity[index];
+    }
+  }
+
+
   /**
    * This is a protected method that is called by
    * SetEphemerisTime() when Source type is Spice.  It
@@ -1482,8 +1546,8 @@ namespace Isis {
         coefY.push_back(p_coefficients[1][icoef]);
         coefZ.push_back(p_coefficients[2][icoef]);
       }
-      SetPolynomial(coefX, coefY, coefZ);
       p_degree = degree;
+      SetPolynomial(coefX, coefY, coefZ);
     }
   }
 
@@ -1578,6 +1642,40 @@ namespace Isis {
 
      return extrapPos;
    }
+
+
+  /**
+   * This method returns the Hermite coordinate for the current time for
+   * PolyFunctionOverHermiteConstant functions.
+   * @see SetEphemerisTime()
+   * @internal
+   *   @history 2012-02-05 Debbie A. Cook - Original version
+   */
+  std::vector<double> SpicePosition::HermiteCoordinate() {
+    if (p_source != PolyFunctionOverHermiteConstant) {
+      throw IException(IException::Programmer, 
+        "Hermite coordinates only available for PolyFunctionOverHermiteConstant",
+          _FILEINFO_);
+    }
+
+    // Save the current coordinate so it can be reset
+    std::vector<double> coordinate = p_coordinate;
+    SetEphemerisTimeHermiteCache();
+    std::vector<double> hermiteCoordinate = p_coordinate;
+    p_coordinate = coordinate;
+    return hermiteCoordinate;
+  }
+
+
+  // /** Resets the source interpolation of the position.
+  //  *
+  //  * @param [in]   source    The interpolation to use for calculating position
+  //  *
+  //  */
+  //  void SetSource(Source source) {
+  //    p_source = source;
+  //    return;
+  //  }
 }
 
 

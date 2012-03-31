@@ -140,17 +140,28 @@ namespace Isis {
    *  @history 2011-05-27 Debbie A. Cook - Renamed old ReloadCache method for
    *                       converting polynomial functions to Hermite cubic
    *                       splines to LoadHermiteCache for use with spkwriter.
+   *  @history 2012-03-31 Debbie A. Cook - Programmer notes: Added new 
+   *                       interpolation algorithm, 
+   *                       PolyFunctionOverHermiteConstant, and new supporting
+   *                       method, SetEphemerisTimePolyOverHermiteConstant.  Also
+   *                       added argument to SetPolynomial methods for type.
+   *                       LineCache and ReloadCache were modified to allow
+   *                       other function types beyond the PolyFunction.  Added
+   *                       new method to return Hermite coordinate.
    */
   class SpicePosition {
     public:
       //??? jw
       /**
-       * This enum defines indicates the status of the object
+       * This enum indicates the status of the object.  The class 
+       * expects functions to be after MemCache in the list.
        */
       enum Source { Spice,       //!< Object is reading directly from the kernels
                     Memcache,    //!< Object is reading from cached table
                     HermiteCache,//!< Object is reading from splined table
-                    PolyFunction //!< Object is calculated from nth degree polynomial
+                    PolyFunction, //!< Object is calculated from nth degree polynomial
+                    PolyFunctionOverHermiteConstant //!< Object is reading from splined
+                    //                table and adding nth degree polynomial
                   };
 
       SpicePosition(int targetCode, int observerCode);
@@ -200,11 +211,12 @@ namespace Isis {
         return (p_cache.size() > 0);
       };
 
-      void SetPolynomial();
+      void SetPolynomial(const Source type = PolyFunction);
 
       void SetPolynomial(const std::vector<double>& XC,
                          const std::vector<double>& YC,
-                         const std::vector<double>& ZC);
+                         const std::vector<double>& ZC,
+                         const Source type = PolyFunction);
 
       void GetPolynomial(std::vector<double>& XC,
                          std::vector<double>& YC,
@@ -240,11 +252,13 @@ namespace Isis {
       enum OverrideType {NoOverrides, ScaleOnly, BaseAndScale};
       void Memcache2HermiteCache(double tolerance);
       std::vector<double> Extrapolate(double timeEt);
+      std::vector<double> HermiteCoordinate();
     protected:
       void SetEphemerisTimeMemcache();
       void SetEphemerisTimeHermiteCache();
       void SetEphemerisTimeSpice();
       void SetEphemerisTimePolyFunction();
+      void SetEphemerisTimePolyFunctionOverHermiteConstant();
 
       std::vector<int> HermiteIndices(double tol, std::vector <int> indexList);
 
