@@ -320,6 +320,12 @@ namespace Isis {
    *   @history 2011-10-14 Ken Edmundson Added method ClearJigsawRejected(); to
    *                           set all measure and point JigsawRejected flags to
    *                           false prior to bundle adjustment.
+   *   @history 2012-03-31 Debbie A. Cook Programmer note:  Revised 
+   *                           ComputeResiduals to call 
+   *                           ComputeResidualsMillimeters and avoid duplication
+   *                           of code.  Also revised 
+   *                           ComputeResidualsMillimeters to make the radar
+   *                           case handled the same as other instruments.
    */
   class ControlPoint : public QObject {
 

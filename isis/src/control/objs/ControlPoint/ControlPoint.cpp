@@ -465,7 +465,7 @@ namespace Isis {
    * number.  It is common to ensure that a measure exists before taking some
    * action.
    *
-   * @param sn The serial number of the measure to Validate
+   * @param sn The serial number of the measure to validate
    */
   void ControlPoint::ValidateMeasure(iString serialNumber) const {
     if (!measures->contains(serialNumber)) {
@@ -1147,6 +1147,9 @@ namespace Isis {
    * @history 2011-07-01 Debbie A. Cook, Removed editLock check to allow
    *                            BundleAdjust to compute residuals for
    *                            editLocked points
+   * @history 2012-01-18 Debbie A. Cook, Revised to call 
+   *                            ComputeResidualsMillimeters() to avoid 
+   *                            duplication of code
    */
   ControlPoint::Status ControlPoint::ComputeResiduals() {
     if (IsIgnored())
@@ -1168,21 +1171,18 @@ namespace Isis {
 
       // TODO:  Should we use crater diameter?
       Camera *cam = m->Camera();
-      cam->SetImage(m->GetSample(), m->GetLine());
 
       double cuSamp;
       double cuLine;
       CameraFocalPlaneMap *fpmap = m->Camera()->FocalPlaneMap();
 
-      if (cam->GetCameraType()  !=  Isis::Camera::Radar) {
+      // Map the lat/lon/radius of the control point through the Spice of the
+      // measurement sample/line to get the computed sample/line.  This must be
+      // done manually because the camera will compute a new time for line scanners,
+      // instead of using the measured time.
+      ComputeResiduals_Millimeters();
 
-        // Map the lat/lon/radius of the control point through the Spice of the
-        // measurement sample/line to get the computed sample/line.  This must be
-        // done manually because the camera will compute a new time for line scanners,
-        // instead of using the measured time.
-        double cudx, cudy;
-        cam->GroundMap()->GetXY(GetAdjustedSurfacePoint(), &cudx, &cudy);
-        m->SetFocalPlaneComputed(cudx, cudy);
+      if (cam->GetCameraType()  !=  Isis::Camera::Radar) {
 
         // Now things get tricky.  We want to produce errors in pixels not mm
         // but some of the camera maps could fail.  One that won't is the
@@ -1200,23 +1200,59 @@ namespace Isis {
       }
 
       else {
-        // For radar we can't map through the current Spice, because y in the
-        // focal plane is doppler shift.  Line is calculated from time.  If
-        // we hold time and the Spice, we'll get the same sample/line as
-        // measured
-        double lat = GetAdjustedSurfacePoint().GetLatitude().degrees();
-        double lon = GetAdjustedSurfacePoint().GetLongitude().degrees();
-        double rad = GetAdjustedSurfacePoint().GetLocalRadius().meters();
-        if (!cam->SetUniversalGround(lat, lon, rad)) {
-          std::string msg = "ControlPoint [" +
-              GetId() + "], ControlMeasure [" +
-              m->GetCubeSerialNumber() + "]" +
-              " does not map into image";
-          throw IException(IException::User, msg, _FILEINFO_);
-        }
+        // For radar line is calculated from time in the camera.  Use the 
+        // closest line to scale the focal plane y (doppler shift) to image line
+        // for computing the line residual.  Get a local ratio 
+        //     measureLine    =   adjacentLine
+        //     ------------       --------------  in both cases, doppler shift
+        //     dopplerMLine       dopplerAdjLine  is calculated using SPICE
+        //                                        at the time of the measurement
+        //
+        // 1.  Get the surface point mapped to by an adjacent pixel above (if
+        //     doppler is < 0) or below (if doppler is > 0) the measured pixel
+        // 2.  Set image to the measured sample/line to load the SPICE for the
+        //     time of the measurement.
+        // 3.  Map the surface point from the adjacent pixel through the SPICE
+        //     into the image plane to get a scale for mapping from doppler
+        //     shift to line.  Apply the scale to get the line residual
+        double sample = m->GetSample();
+        double computedY = m->GetFocalPlaneComputedY();
+        double computedX = m->GetFocalPlaneComputedX();
+        double adjLine;
 
-        cuSamp = cam->Sample();
-        cuLine = cam->Line();
+        // Step 1. What happens if measured line is 1???  TODO
+        if (computedY < 0)
+          adjLine = m->GetLine() - 1.;
+        else
+          adjLine = m->GetLine() + 1.;
+
+        cam->SetImage(sample, adjLine);
+        SurfacePoint sp = cam->GetSurfacePoint();
+
+        // Step 2.
+        cam->SetImage(sample, m->GetLine());
+        double focalplaneX;
+        double scalingY;
+
+        // Step 3.
+        cam->GroundMap()->GetXY(sp, &focalplaneX, &scalingY);
+        double deltaLine;
+
+        if (computedY < 0)
+          deltaLine = -computedY/scalingY;
+        else
+          deltaLine = computedY/scalingY;
+
+        // Now map through the camera steps to take X from slant range to ground
+        // range to pixels.  Y just tracks through as 0.
+        if (cam->DistortionMap()->SetUndistortedFocalPlane(computedX, 
+                                                           computedY)){
+          double focalPlaneX = cam->DistortionMap()->FocalPlaneX();
+          double focalPlaneY = cam->DistortionMap()->FocalPlaneY();
+          fpmap->SetFocalPlane(focalPlaneX,focalPlaneY);
+        } 
+        cuSamp = fpmap->DetectorSample();
+        cuLine = m->GetLine() + deltaLine;
       }
 
       double muSamp;
@@ -1240,7 +1276,7 @@ namespace Isis {
 
       // The units are in detector sample/lines.  We will apply the instrument
       // summing mode to get close to real pixels.  Note however we are in
-      // undistorted pixels
+      // undistorted pixels except for radar instruments.
       double sampResidual = muSamp - cuSamp;
       double lineResidual = muLine - cuLine;
       m->SetResidual(sampResidual, lineResidual);
@@ -1260,8 +1296,11 @@ namespace Isis {
    *                            calculations for each camera type.
    * @history 2011-03-24 Debbie A. Cook - Removed IsMeasured check since it
    *                            was really checking for Candidate measures.
-   *
-   * @todo Use this method in ComputeResiduals to avoid duplication of code
+   * @history 2012-01-18 Debbie A. Cook - Made radar case the same as
+   *                            other instruments and removed incorrect
+   *                            call to SetResidual, which was setting
+   *                            focal plane residuals in x and y instead
+   *                            of image residuals in sample and line.
    */
 
   ControlPoint::Status ControlPoint::ComputeResiduals_Millimeters() {
@@ -1287,26 +1326,23 @@ namespace Isis {
       double cudx, cudy;
 
       // Map the lat/lon/radius of the control point through the Spice of the
-      // measurement sample/line to get the computed sample/line.
-      if (cam->GetCameraType() != Isis::Camera::Radar) {
-        if (cam->GetCameraType() != 0)  // no need to call setimage for framing camera
-          cam->SetImage(m->GetSample(), m->GetLine());
-        cam->GroundMap()->GetXY(GetAdjustedSurfacePoint(), &cudx, &cudy);
-      }
-      // y is doppler shift for radar.  If we map through the current Spice
-      // line will be calculated from time and if we hold the time and the
-      // Spice we will get the same x/y as measured.
-      else {
-        cam->GroundMap()->SetGround(GetAdjustedSurfacePoint());
-        cudx = cam->GroundMap()->FocalPlaneX();  // Get undistorted
-        cudy = cam->GroundMap()->FocalPlaneY();
-      }
-      double mudx = m->GetFocalPlaneMeasuredX();
-      double mudy = m->GetFocalPlaneMeasuredY();
+      // measurement sample/line to get the computed undistorted focal plane
+      // coordinates (mm if not radar).  This works for radar too because in
+      // the undistorted focal plane, y has not been set to 0 (set to 0 when
+      // going to distorted focal plane or ground range in this case), so we
+      // can hold the Spice to calculate residuals in undistorted focal plane
+      // coordinates.
+      if (cam->GetCameraType() != 0)  // no need to call setimage for framing camera
+        cam->SetImage(m->GetSample(), m->GetLine());
+
+      cam->GroundMap()->GetXY(GetAdjustedSurfacePoint(), &cudx, &cudy);
+      // double mudx = m->GetFocalPlaneMeasuredX();
+      // double mudy = m->GetFocalPlaneMeasuredY();
 
       m->SetFocalPlaneComputed(cudx, cudy);
 
-      m->SetResidual(mudx - cudx, mudy - cudy);
+      // This is wrong.  The stored residual is in pixels (sample,line), not x and y
+      // m->SetResidual(mudx - cudx, mudy - cudy);
     }
 
     return Success;
