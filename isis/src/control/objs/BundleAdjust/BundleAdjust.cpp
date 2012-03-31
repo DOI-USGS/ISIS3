@@ -4775,7 +4775,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       if (point->IsIgnored())
         continue;
 
-      point->ComputeResiduals_Millimeters();
+      point->ComputeResiduals();
 
       int nMeasures = point->GetNumMeasures();
       for (int j = 0; j < nMeasures; j++) {
@@ -4787,8 +4787,8 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         dWeight = 1.0 / dWeight;
         dWeight *= dWeight;
 
-        vx = measure->GetSampleResidual();
-        vy = measure->GetLineResidual();
+        vx = measure->GetFocalPlaneMeasuredX() - measure->GetFocalPlaneComputedX();
+        vy = measure->GetFocalPlaneMeasuredY() - measure->GetFocalPlaneComputedY();
 
         //        std::cout << "vx vy" << vx << " " << vy << std::endl;
 

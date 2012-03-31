@@ -137,6 +137,8 @@ namespace Isis {
    *   @history 2011-12-20 Ken Edmundson, Fixes to outlier rejection. Added
    *                          rejection multiplier member variable, can be set in
    *                          jigsaw interface.
+   *   @history 2012-03-31 Debbie A. Cook Programmer note:  Made code consistent
+   *                          with changes to ControlPoint.
    */
   class BundleAdjust {
     public:
