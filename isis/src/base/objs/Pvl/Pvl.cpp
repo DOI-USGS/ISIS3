@@ -464,9 +464,6 @@ namespace Isis {
       istream::pos_type errorPos = is.tellg();
       if((int)errorPos == -1) throw;
 
-      is.seekg(0, ios::end);
-      istream::pos_type fileEndPos = is.tellg();
-
       is.seekg(0, ios::beg);
       long lineNumber = 1;
 

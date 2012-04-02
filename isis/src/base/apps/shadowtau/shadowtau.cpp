@@ -84,7 +84,6 @@ void IsisMain() {
   // Should contains parameter names matching GUI not to be inclusiond
   // in the Pvl defFile
   vector<string> inclusion;
-  bool dataFileRequired = false;
   PhotoModel *photoModel = NULL;
   if (sPhotoFunc == "HAPKEHEN" || sPhotoFunc == "HAPKELEG") { // Single Particle Phase Function HENYEY-GREENSTEIN
     inclusion.push_back("PHTNAME");
@@ -119,7 +118,6 @@ void IsisMain() {
 
   //datafile':get data file only for photometric functions that need it
   if (sPhotoFunc == "LUNARLAMBERTEMPIRICAL" || sPhotoFunc == "MINNAERTEMPIRICAL") {
-    dataFileRequired = true;
     string sDataFile =  ui.GetFilename("DATAFILE");
   }
 

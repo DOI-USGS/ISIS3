@@ -214,8 +214,6 @@ namespace Isis {
    */
   void RubberBandTool::calcRectCorners(QPoint corner1, QPoint corner2, QPoint &corner3, QPoint &corner4) {
     double slope = ((double)corner2.y() - (double)corner1.y()) / ((double)corner2.x() - (double)corner1.x());
-    int delta_x;
-    int delta_y;
 
     if((fabs(slope) > DBL_EPSILON) && (slope < DBL_MAX) && (slope > -DBL_MAX)) {
       // corner1,corner2 make up y=m(x-x1)+y1
@@ -253,15 +251,12 @@ namespace Isis {
       corner4.setY((int)(perpLine1IntersectX * slope + parallelB)); //mx+b
     }
     else if(fabs(slope) < DBL_EPSILON) {
-      delta_x = 0;
-      delta_y = corner3.y() - corner2.y();
       corner3.setX(corner2.x());
       corner3.setY(corner3.y());
       corner4.setX(corner1.x());
       corner4.setY(corner3.y());
     }
     else {
-      delta_x = corner3.x() - corner2.x();
       corner3.setX(corner3.x());
       corner3.setY(corner2.y());
       corner4.setX(corner3.x());
@@ -623,9 +618,6 @@ namespace Isis {
 
     p_mouseButton = mouseButton;
 
-    // Store the mouse location for painting the polygons
-    QPoint oldMouseLoc = *p_mouseLoc;
-    
     if ((p_mouseButton & Qt::ControlModifier) == Qt::ControlModifier)
       *p_mouseLoc = snapMouse(p);
     else

@@ -233,7 +233,7 @@ namespace Isis {
       p_bricksOrdered = true;
     }
 
-    double samp, line;
+    double samp;
 
     // Loop through x values of rect on screen that we want to fill
     for(int x = rect->left(); x <= rect->right(); x++) {
@@ -242,7 +242,6 @@ namespace Isis {
       int yIndex = y - fill->getTopmostPixelPosition();
 
       samp = fill->viewportToSample(x);
-      line = fill->viewportToLine(y);
 
       // Index into buffer is current sample - start sample
       //   *Brick indices are in units of cube pixels, not screen pixels

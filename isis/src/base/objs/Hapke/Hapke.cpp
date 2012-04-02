@@ -112,7 +112,6 @@ namespace Isis {
     double tan2t;
     double gamma;
     double hgs;
-    double sing;
     double cosg;
     double tang2;
     double bg;
@@ -188,7 +187,6 @@ namespace Isis {
     gamma = sqrt(1.0 - p_photoWh);
     hgs = p_photoHg1 * p_photoHg1;
 
-    sing = sin(pharad);
     cosg = cos(pharad);
     tang2 = tan(pharad/2.0);
 

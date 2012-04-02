@@ -150,9 +150,7 @@ namespace Isis {
 
     double D = atan2(y, x);
     double test = RP / radius;
-    double IERROR;
     if(abs(test) > 1.0) {
-      IERROR = 1001;  // throw exception or something ??
       return false;
     }
 

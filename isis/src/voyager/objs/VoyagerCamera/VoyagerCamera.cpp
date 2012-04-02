@@ -72,8 +72,6 @@ namespace Isis {
     iString instId = (string)inst["InstrumentId"];
 
     iString reseauFilename = "";
-    int spacecraftCode = 0;
-    int instCode = 0;
 
     // These set up which kernel and other files to access,
     if (spacecraft == "VOYAGER_1") {
@@ -81,15 +79,12 @@ namespace Isis {
       p_spkTargetId = -31;
 
       reseauFilename += "1/reseaus/vg1";
-      spacecraftCode = -31;
 
       if (instId == "NARROW_ANGLE_CAMERA") {
         reseauFilename += "na";
-        instCode = -31101;
       }
       else if (instId == "WIDE_ANGLE_CAMERA") {
         reseauFilename += "wa";
-        instCode = -31102;
       }
       else {
         string msg = "File does not appear to be a Voyager image. InstrumentId ["
@@ -102,15 +97,12 @@ namespace Isis {
       p_spkTargetId = -32;
 
       reseauFilename += "2/reseaus/vg2";
-      spacecraftCode = -32;
 
       if (instId == "NARROW_ANGLE_CAMERA") {
         reseauFilename += "na";
-        instCode = -32101;
       }
       else if (instId == "WIDE_ANGLE_CAMERA") {
         reseauFilename += "wa";
-        instCode = -32102;
       }
       else {
         string msg = "File does not appear to be a Voyager image. InstrumentId ["

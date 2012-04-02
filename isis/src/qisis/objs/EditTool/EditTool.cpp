@@ -412,7 +412,7 @@ namespace Isis {
     }
 
     int issamp, isline, iesamp, ieline;
-    double ssamp, sline, esamp, eline;
+    double ssamp, sline;
 
     //  If right mouse button, pick up dn value under the cursor which will be
     //  used as the edit value.
@@ -436,8 +436,6 @@ namespace Isis {
         p_shapeComboBox->currentIndex() == HorizLine ||
         p_shapeComboBox->currentIndex() == VertLine) {
       vp->viewportToCube(p.x(), p.y(), ssamp, sline);
-      esamp = ssamp;
-      eline = sline;
       if ((ssamp < 0.5) || (sline < 0.5) ||
           (ssamp > vp->cubeSamples() + 0.5) || (sline > vp->cubeLines() + 0.5)) {
         QApplication::beep();

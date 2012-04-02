@@ -565,24 +565,19 @@ namespace Isis {
     SetSearchGround(minBorder, constBorder, searchLongitude);
     double value1 = (searchX) ? XCoord() : YCoord();
     double value2 = value1;
-    double value3 = value1;
 
     double border1 = minBorder;
     double border2 = minBorder;
     double border3 = minBorder;
 
-    double extremeVal1 = value1;
     double extremeVal2 = value1;
-    double extremeVal3 = value1;
 
     double extremeBorder1 = minBorder;
-    double extremeBorder2 = minBorder;
     double extremeBorder3 = minBorder;
 
     while(currBorderVal <= LOOP_END) {
       SetSearchGround(currBorderVal, constBorder, searchLongitude);
 
-      value3 = value2;
       value2 = value1;
       value1 = (searchX) ? XCoord() : YCoord();
       border3 = border2;
@@ -590,12 +585,9 @@ namespace Isis {
       border1 = currBorderVal;
 
       if((findMin && value2 < extremeVal2) || (!findMin && value2 > extremeVal2)) {
-        extremeVal1 = value1;
         extremeVal2 = value2;
-        extremeVal3 = value3;
 
         extremeBorder3 = border3;
-        extremeBorder2 = border2;
         extremeBorder1 = border1;
       }
 

@@ -867,8 +867,8 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     InitializePoints(); // New method to set apriori sigmas and surface points
 
     // Initialize solution parameters
-    double sigmaXY, sigmaHat, sigmaX, sigmaY;
-    sigmaXY = sigmaHat = sigmaX = sigmaY = 0.0;
+    //double sigmaXY, sigmaHat, sigmaX, sigmaY;
+    //sigmaXY = sigmaHat = sigmaX = sigmaY = 0.0;
     m_nIteration = 1;
 
     clock_t t1 = clock();
@@ -2191,17 +2191,17 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 //      fclose(pFile1);
 
     // analyze matrix
-    clock_t t1 = clock();
+    //clock_t t1 = clock();
     m_L = cholmod_analyze(m_N, &m_cm); // should we analyze just 1st iteration?
-    clock_t t2 = clock();
-    double delapsedtime = ((t2-t1)/(double)CLOCKS_PER_SEC);
+    //clock_t t2 = clock();
+    //double delapsedtime = ((t2-t1)/(double)CLOCKS_PER_SEC);
     //printf("cholmod Analyze Elapsed Time: %20.10lf\n",delapsedtime);
 
     // create cholmod cholesky factor (LDLT?)
-    t1 = clock();
+    //t1 = clock();
     cholmod_factorize(m_N, m_L, &m_cm);
-    t2 = clock();
-    delapsedtime = ((t2-t1)/(double)CLOCKS_PER_SEC);
+    //t2 = clock();
+    //delapsedtime = ((t2-t1)/(double)CLOCKS_PER_SEC);
     //printf("cholmod Factorize Elapsed Time: %20.10lf\n",delapsedtime);
 
     // check for "matrix not positive definite" error
@@ -2234,10 +2234,10 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 //      fclose(pFile3);
 
     // cholmod solve
-    t1 = clock();
+    //t1 = clock();
     x = cholmod_solve (CHOLMOD_A, m_L, b, &m_cm) ;
-    t2 = clock();
-    delapsedtime = ((t2-t1)/(double)CLOCKS_PER_SEC);
+    //t2 = clock();
+    //delapsedtime = ((t2-t1)/(double)CLOCKS_PER_SEC);
     //printf("cholmod Solution Elapsed Time: %20.10lf\n",delapsedtime);
 
 //      FILE * pFile4;
@@ -4094,7 +4094,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         continue;
 
       pFocalPlaneMap1 = pCamera1->FocalPlaneMap();
-      if (!pDistortionMap1)
+      if (!pFocalPlaneMap1)
         continue;
 
       pCamera1->SetImage(measure1.GetSample(), measure1.GetLine());
@@ -6170,7 +6170,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
           return false;
 
       char buf[1056];
-      bool bHeld = false;
+      //bool bHeld = false;
       std::vector<double> PosX(3);
       std::vector<double> PosY(3);
       std::vector<double> PosZ(3);
@@ -6204,8 +6204,8 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
       for ( int i = 0; i < nImages; i++ ) {
 
-          if ( m_nHeldImages > 0 && m_pHeldSnList->HasSerialNumber(m_pSnList->SerialNumber(i)) )
-              bHeld = true;
+          //if ( m_nHeldImages > 0 && m_pHeldSnList->HasSerialNumber(m_pSnList->SerialNumber(i)) )
+          //    bHeld = true;
 
           pCamera = m_pCnet->Camera(i);
           if ( !pCamera )
@@ -6720,7 +6720,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
       char buf[1056];
 
-    bool bHeld = false;
+    //bool bHeld = false;
     std::vector<double> PosX(3);
     std::vector<double> PosY(3);
     std::vector<double> PosZ(3);
@@ -6740,8 +6740,8 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     fp_out << buf;
 
     for (int i = 0; i < nImages; i++) {
-      if (m_nHeldImages > 0 && m_pHeldSnList->HasSerialNumber(m_pSnList->SerialNumber(i)))
-        bHeld = true;
+      //if (m_nHeldImages > 0 && m_pHeldSnList->HasSerialNumber(m_pSnList->SerialNumber(i)))
+      //  bHeld = true;
 
       pCamera = m_pCnet->Camera(i);
       if (!pCamera)
@@ -7458,7 +7458,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       double dSigma = 0.;
       int nIndex = 0;
       bool bSolveSparse = false;
-      bool bHeld = false;
+      //bool bHeld = false;
       std::vector<double> PosX(3);
       std::vector<double> PosY(3);
       std::vector<double> PosZ(3);
@@ -7480,9 +7480,9 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
       for ( int i = 0; i < nImages; i++ ) {
 
-        if (m_nHeldImages > 0 &&
-            m_pHeldSnList->HasSerialNumber(m_pSnList->SerialNumber(i)) )
-          bHeld = true;
+        //if (m_nHeldImages > 0 &&
+        //    m_pHeldSnList->HasSerialNumber(m_pSnList->SerialNumber(i)) )
+        //  bHeld = true;
 
         pCamera = m_pCnet->Camera(i);
         if ( !pCamera )

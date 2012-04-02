@@ -211,9 +211,6 @@ namespace Isis {
   
     std::vector<double> lamda(pts.size(),1.0/double(pts.size()));  //vector of weights for the individual pts
 
-    FILE *OUT;
-    OUT = fopen("tempPts.txt","w");
-
     
     double delta,temp,ptc[2];
 

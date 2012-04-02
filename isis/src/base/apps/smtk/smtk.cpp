@@ -430,13 +430,10 @@ void IsisMain() {
     prog.SetMaximumSteps(nBTiles);
     prog.CheckStatus();
 
-    BigInt nOut(0);
     Statistics stAng;
     while ( !eigen.end() ) {   // Must use the last band for this!!
       PointPlot tm = for_each(bmf.begin(), bmf.end(), PointPlot(dem, plotdist));
       tm.FillPoints(*lhCamera, *rhCamera, boxsize, dem, stErr, eigen, &stAng);
-      int nout = tm.PointsOut();
-      nOut = nout;
 
       ocube->write(dem);
       ocube->write(stErr);

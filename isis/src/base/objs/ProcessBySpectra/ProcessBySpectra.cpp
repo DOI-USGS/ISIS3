@@ -195,20 +195,6 @@ namespace Isis {
       throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
-    int numLines = 1, numSamples = 1, numBands = 1;
-
-    if(InputCubes[0]->getBandCount() > OutputCubes[0]->getBandCount())
-      numBands = InputCubes[0]->getBandCount();
-    else numBands = OutputCubes[0]->getBandCount();
-    if(Type() == ByLine) {
-      numSamples = std::max(InputCubes[0]->getSampleCount(),
-                            OutputCubes[0]->getSampleCount());
-    }
-    else if(Type() == BySample) {
-      numLines = std::max(InputCubes[0]->getLineCount(),
-                          OutputCubes[0]->getLineCount());
-    }
-
     if(Type() == PerPixel) {
       SetInputBrickSize(1, 1, InputCubes[0]->getBandCount());
       SetOutputBrickSize(1, 1, OutputCubes[0]->getBandCount());

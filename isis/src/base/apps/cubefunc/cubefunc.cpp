@@ -92,7 +92,6 @@ void cubefunc(Buffer &in,
       out[i] = in[i];
     }
     else {
-      double deg;
       switch(Function) {
         case COS:
           if(in[i] < (-(2 * PI)) || in[i] > (2 * PI)) {
@@ -113,7 +112,6 @@ void cubefunc(Buffer &in,
           //  tolerance since the radiance value will probably never be
           //  exactly 90, 270, -90 or -270 degrees due to round off.
           //  First convert input value from radians to degrees.
-          deg = in[i] * (180. / PI);
           if(abs(abs(in[i]) - 90.0) <= .0001 ||
               abs(abs(in[i]) - 270.0) <= .0001) {
             out[i] = NULL8;

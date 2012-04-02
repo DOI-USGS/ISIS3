@@ -469,8 +469,6 @@ namespace Isis {
       QMessageBox::information((QWidget *)parent(), "Warning", message);
       return;
     }
-    if (cvp->cursorInside())
-      QPoint p = cvp->cursorPosition();
 
     // ???  do we only allow mouse clicks on level1???
     //    If we allow on both, need to find samp,line on level1 if

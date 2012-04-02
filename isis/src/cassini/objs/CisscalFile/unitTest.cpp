@@ -58,14 +58,12 @@ int main(int argc, char *argv[]) {
   testLines[7] = "";
 
   // calc cumulative byte counts for each line - to check CisscalFile.Size()
-  streamsize testLineBytes[8];
   streamsize numBytes = 0;
   streamsize numBytesFiltered = 0;
   vector<string> testLinesVector;
 
   for(int i = 0; i <= 7; i++) {
     numBytes += testLines[i].length() + strlen("\n");
-    testLineBytes[i] = numBytes;
     testLinesVector.push_back(testLines[i]);
   }
 

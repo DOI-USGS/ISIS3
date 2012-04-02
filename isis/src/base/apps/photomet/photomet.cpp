@@ -1563,7 +1563,7 @@ void IsisMain() {
  */
 void photomet(Buffer &in, Buffer &out) {
 
-  double dempha=0., deminc=0., demema=0., mult=0., base=0.;
+  double deminc=0., demema=0., mult=0., base=0.;
   double ellipsoidpha=0., ellipsoidinc=0., ellipsoidema=0.;
 
   for (int i = 0; i < in.size(); i++) {
@@ -1590,7 +1590,6 @@ void photomet(Buffer &in, Buffer &out) {
         ellipsoidpha = centerPhase;
         ellipsoidinc = centerIncidence;
         ellipsoidema = centerEmission;
-        dempha = centerPhase;
         deminc = centerIncidence;
         demema = centerEmission;
       } else {
@@ -1602,12 +1601,10 @@ void photomet(Buffer &in, Buffer &out) {
           Angle phase, incidence, emission;
           cam->LocalPhotometricAngles(phase, incidence, emission, success);
           if (success) {
-            dempha = phase.degrees();
             deminc = incidence.degrees();
             demema = emission.degrees();
           }
         } else if (angleSource == "ELLIPSOID") {
-          dempha = ellipsoidpha;
           deminc = ellipsoidinc;
           demema = ellipsoidema;
         }

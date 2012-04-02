@@ -904,7 +904,6 @@ namespace Isis {
     int iBand    = OutputCubes[0]->getBandCount();
     int iLines   = OutputCubes[0]->getLineCount();
     int iSamples = OutputCubes[0]->getSampleCount();
-    int iFileIndex, iFileCount;
 
     Isis::Portal origPortal(iSamples, 1, OutputCubes[0]->getPixelType());
     if(m_priority == average) {
@@ -912,7 +911,6 @@ namespace Isis {
         origPortal.SetPosition(1, line, iBand/2+1);  //sample, line, band position
         OutputCubes[0]->read(origPortal);
         for(int iPixel=0; iPixel<origPortal.size(); iPixel++) {
-          iFileCount = (int)origPortal[iPixel];
         }
         if(line >= 2) {
           break;
@@ -920,13 +918,10 @@ namespace Isis {
       }
     }
     else {
-      int  iOffset = GetOriginDefaultByPixelType();
-
       for(int line=1; line<=iLines; line++) {
         origPortal.SetPosition(1, line, iBand);  //sample, line, band position
         OutputCubes[0]->read(origPortal);
         for(int iPixel=0; iPixel<origPortal.size(); iPixel++) {
-          iFileIndex = (int)origPortal[iPixel] - iOffset;
         }
         if(line >= 2) {
           break;

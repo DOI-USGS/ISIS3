@@ -75,8 +75,6 @@ namespace Isis {
     connect(mWarning, SIGNAL(clicked()), mDialog, SLOT(show())); // display the dialog window when this button is clicked
     mDialog->resize(800, 250);
     mTextEdit->setBaseSize(750, 200) ;
-
-    QSize qs =  mSBar->baseSize();
   }
 
   /**

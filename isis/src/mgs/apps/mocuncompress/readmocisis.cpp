@@ -132,7 +132,6 @@ int main(int argc, char **argv)
   int total = 0;
   int cs_check = 1;
   int pad_cs = 0;
-  int i;
   int multi = 0;
   int sequence = -1, processor = 0, n_processors = 1;
   int last_frag = -1;
@@ -174,20 +173,19 @@ int main(int argc, char **argv)
     byte *indat = 0, *chunk = 0;
 
     lasth = h;
-    i = fseek(infile, total + 2048, 0);
+    fseek(infile, total + 2048, 0);
     count = fread(&h, sizeof(h), 1, infile);
-    i = MAKELONG(h.len);
+    MAKELONG(h.len);
     if(count && MAKELONG(h.len) == 0) {
       // simulate the EOF even though there's padding
       count = 0;
       h = lasth;
     }
-    i = h.status & 2;
     if(count == 0 && MocCompress == PRED && (h.status & 2) == 0) {
       // image was short -- last flag missing
       h.status = 2;
       frag = decode(h, indat, 0, &len, mbr);
-      i = fwrite(frag, 1, len, out);
+      fwrite(frag, 1, len, out);
       total_image += len;
     }
     if(count == 0) break;
@@ -220,7 +218,7 @@ int main(int argc, char **argv)
         bzero(frag, 240 * 1024);
         total_image += n_pad * 240 * 1024;
         if(verbose) fprintf(stderr, "padding %d frags\n", n_pad);
-        while(n_pad--) i = fwrite(frag, 1, 240 * 1024, out);
+        while(n_pad--) fwrite(frag, 1, 240 * 1024, out);
       }
       free(frag);
     }
@@ -258,7 +256,7 @@ int main(int argc, char **argv)
           total_image += 240 * 1024;
           total += sizeof(struct msdp_header) + datlen + 1;
           if(verbose) fprintf(stderr, "trashing bad frag\n");
-          i = fwrite(frag, 1, 240 * 1024, out);
+          fwrite(frag, 1, 240 * 1024, out);
           free(frag);
           continue;
         }
@@ -266,11 +264,10 @@ int main(int argc, char **argv)
     }
 
     frag = decode(h, indat, datlen, &len, mbr);
-    i = sizeof(frag);
     total_image += len;
     if(verbose) fprintf(stderr, "fragment len %d => %d\n", datlen, len);
     total += sizeof(struct msdp_header) + datlen + 1;
-    i = fwrite(frag, 1, len, out);
+    fwrite(frag, 1, len, out);
     if(0) free(frag);
     free(chunk);
     if(h.status & 2) break;

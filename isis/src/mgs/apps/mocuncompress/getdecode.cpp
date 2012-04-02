@@ -170,7 +170,6 @@ void ht_dump(Huffman_node *root, int code, int len)
 int ht_tablefy(Huffman_node *root, unsigned char *flags, unsigned char *zero, unsigned char *one, unsigned char *index)
 {
   int local_index = (int)(long)(index);
-  int i;
 
   if(root->zero) {
     if(root->zero->zero == 0 && root->zero->one == 0) {
@@ -178,11 +177,10 @@ int ht_tablefy(Huffman_node *root, unsigned char *flags, unsigned char *zero, un
       zero[(int)(long)index] = root->zero->value;
     }
     else {
-      i = ZERO;
       flags[local_index] |= ZERO;
       index += 1;
       zero[local_index] = (char)(long)index;
-      index = (unsigned char*)ht_tablefy(root->zero, flags, zero, one, index);
+      index = (unsigned char*)(long)ht_tablefy(root->zero, flags, zero, one, index);
     }
   }
   if(root->one) {
@@ -194,7 +192,7 @@ int ht_tablefy(Huffman_node *root, unsigned char *flags, unsigned char *zero, un
       flags[local_index] |= ONE;
       index += 1;
       one[local_index] = (char)(long)index;
-      index = (unsigned char*)ht_tablefy(root->one, flags, zero, one, index);
+      index = (unsigned char*)(long)ht_tablefy(root->one, flags, zero, one, index);
     }
   }
   return (int)(long)index;
@@ -236,11 +234,10 @@ void ht_free(Huffman_node *root)
 
 void decodeInit(int n) {
   Huffman_node *tree = 0;
-  int i;
 //  uint8 flags[256], zero[256], one[256];
 
   tree = ht_tree_gen(n);
   /* i is the # of slots actually used... */
-  i = ht_tablefy(tree, code, left, right, 0) + 1;
+  ht_tablefy(tree, code, left, right, 0);
   ht_free(tree);
 }

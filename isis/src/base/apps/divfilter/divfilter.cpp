@@ -21,17 +21,6 @@ void IsisMain() {
 
   //Set up boxcar variables (minimum)
   UserInterface &ui = Application::GetUserInterface();
-  int lines = ui.GetInteger("LINES");
-  int samples = ui.GetInteger("SAMPLES");
-  int minimum;
-  if(ui.GetString("MINOPT") == "PERCENTAGE") {
-    int size = lines * samples;
-    double perc = ui.GetInteger("MINIMUM") / 100;
-    minimum = (int)(size * perc);
-  }
-  else {
-    minimum = ui.GetInteger("MINIMUM");
-  }
 
   // Find out how to handle special pixels
   propagate = ui.GetBoolean("PROPAGATE");

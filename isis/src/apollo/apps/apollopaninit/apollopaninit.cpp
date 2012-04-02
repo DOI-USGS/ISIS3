@@ -104,7 +104,7 @@ void IsisMain() {
   iTime  isisTime;
   iString iStrTEMP;
 
-  int nRadii,i,j,k,scFrameCode,insCode;
+  int i,j,k,scFrameCode,insCode;
 
   std::string mission;
 
@@ -278,7 +278,6 @@ void IsisMain() {
   //get the radii of the MOON
   SpiceInt tempRadii = 0;
   bodvcd_c(301,"RADII",3,&tempRadii,R_MOON);  //units are km
-  nRadii = (int) tempRadii;
   double  omega,phi,kappa;
 
   std::vector<double>  posSel;  //Seleno centric position
@@ -529,7 +528,6 @@ void IsisMain() {
   double l=1,s=1,sample,line,sampleInitial=1,lineInitial=1,play;  //line and sample coordinates for looping through the panCube
 
   int  regStatus,
-       panL,
        fidn,
        panS,
        refL,  //number of lines in the patternS
@@ -540,7 +538,6 @@ void IsisMain() {
 
   iString fileName;
 
-  panL = panCube.getLineCount();
   panS = panCube.getSampleCount();
 
   //Table definition

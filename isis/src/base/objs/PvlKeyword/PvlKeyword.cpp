@@ -681,7 +681,6 @@ namespace Isis {
     //  string on. Data structure: vector< startPos, endPos > where
     //  remainingText[startPos] and remainingText[endPos] must both be quotes.
     vector< pair<int, int> > quotedAreas;
-    char endQuoteChar = '\0';
     int  quoteStart = -1;
 
     // if its an array, indent subsequent lines 1 more
@@ -730,7 +729,6 @@ namespace Isis {
           (quoteStart < 0) && i < quoteStartEnds.size();
           i++) {
         if(quoteStartEnds[i].first == remainingText[pos]) {
-          endQuoteChar = quoteStartEnds[i].second;
           quoteStart = pos;
         }
       }
@@ -751,7 +749,6 @@ namespace Isis {
             quotedAreas.push_back(pair<int, int>(quoteStart, pos));
 
             quoteStart = -1;
-            endQuoteChar = '\0';
           }
         }
       }
@@ -1600,17 +1597,14 @@ namespace Isis {
     bool impliedQuote = true;
     char quoteEnd = ' ';
     bool keepQuotes = false;
-    size_t currentDelimPos = string::npos;
 
     if(keyword[0] == '\'' || keyword[0] == '"') {
       quoteEnd = keyword[0];
       impliedQuote = false;
-      currentDelimPos = 0;
     }
     else if(keyword[0] == '<') {
       quoteEnd = '>';
       impliedQuote = false;
-      currentDelimPos = 0;
     }
     else {
       // we're not quoted, look for alternative delimiters.
@@ -1632,7 +1626,6 @@ namespace Isis {
             quote < sizeof(implicitQuotes) / sizeof(char);
             quote ++) {
           if(keyword[currentPos] == implicitQuotes[quote]) {
-            currentDelimPos = currentPos;
             quoteEnd = implicitQuotes[quote];
             foundImplicitQuote = true;
           }
@@ -1646,7 +1639,6 @@ namespace Isis {
 
     for(unsigned int delim = 0; delim < otherDelimiters.size(); delim ++) {
       if(keyword[0] == otherDelimiters[delim].first) {
-        currentDelimPos = 0;
         quoteEnd = otherDelimiters[delim].second;
         keepQuotes = true;
         impliedQuote = false;

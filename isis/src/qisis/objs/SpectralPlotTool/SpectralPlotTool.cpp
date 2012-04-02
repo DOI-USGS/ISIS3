@@ -353,7 +353,6 @@ namespace Isis {
       foreach (MdiCubeViewport *viewport, viewportsToPlot()) {
         /* We'll need X-Axis labels and a xMax to scale to.*/
         QVector<double> labels;
-        double xMax = 10.0;
         Statistics wavelengthStats;
 
         QVector<QPointF> avgData, minData, maxData, std1Data, std2Data,
@@ -361,7 +360,6 @@ namespace Isis {
         QVector<Statistics> plotStats;
 
         getSpectralStatistics(labels, plotStats, viewport);
-        xMax = labels.size();
 
         for (int index = 0; index < labels.size(); index++) {
           if (!IsSpecial(plotStats[index].Average()) &&

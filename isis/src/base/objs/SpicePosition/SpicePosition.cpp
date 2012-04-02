@@ -176,9 +176,6 @@ namespace Isis {
     LoadTimeCache();
 
     // Loop and load the cache
-    double cacheSlope = 0.0;
-    if(size > 1) cacheSlope = (endTime - startTime) / (double)(size - 1);
-
     for(int i = 0; i < size; i++) {
       double et = p_cacheTime[i];
       SetEphemerisTime(et);

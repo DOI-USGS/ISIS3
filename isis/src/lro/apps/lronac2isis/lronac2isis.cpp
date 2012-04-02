@@ -32,7 +32,6 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   Filename inFile = ui.GetFilename("FROM");
   iString id;
-  int sumMode;
   try {
     Pvl lab(inFile.Expanded());
 
@@ -50,8 +49,6 @@ void IsisMain() {
       msg += " Use pds2isis.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
-
-    sumMode = (int) lab.FindKeyword("CROSSTRACK_SUMMING");
 
     // Store the decompanding information
     PvlKeyword xtermKeyword = lab.FindKeyword("LRO:XTERM"),

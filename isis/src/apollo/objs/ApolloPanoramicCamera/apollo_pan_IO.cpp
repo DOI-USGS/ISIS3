@@ -142,8 +142,7 @@ int Apollo_Pan_IO::compute_interior_orienation()
   //if( !obs[0].flag || !obs[1].flag || !obs[88].flag || !obs[89].flag)
   //  return -1;
 
-  int    nu,   //number of unknowns
-       i,j,k,l,m;  //indeces-counters for linear algebra computations
+  int     i,j,k,l,m;  //indeces-counters for linear algebra computations
 
   double  cdot[43][4][6],
       angle,              //angle of rotation to vertical for determining rotation coefficients
@@ -196,7 +195,6 @@ int Apollo_Pan_IO::compute_interior_orienation()
   if (n ==0) return -1;
 
   //now that we know how many affines will be needed we can get started
-  nu = 6*n;    //code change 8-19-2010 eroneously 4*n (probably confusion with 2D conformal transformation)
 
   //solve each affine individually
   

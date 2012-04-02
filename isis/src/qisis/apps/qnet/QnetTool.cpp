@@ -1374,7 +1374,6 @@ namespace Isis {
   void QnetTool::mouseButtonRelease(QPoint p, Qt::MouseButton s) {
     MdiCubeViewport *cvp = cubeViewport();
     if (cvp  == NULL) return;
-    if (cvp->cursorInside()) QPoint p = cvp->cursorPosition();
 
     iString file = cvp->cube()->getFilename();
     iString sn = g_serialNumberList->SerialNumber(file);
@@ -3245,8 +3244,7 @@ namespace Isis {
     if (p_editPoint != NULL) {
       try {
         QString id = p_ptIdValue->text().remove("Point ID:  ");
-        ControlPoint *pt = g_controlNetwork->GetPoint(id);
-        pt = 0;
+        g_controlNetwork->GetPoint(id);
       }
       catch (IException &) {
         delete p_editPoint;
@@ -3402,10 +3400,8 @@ namespace Isis {
     }
     // Is this a level 1 or level 2?
     else {
-      Camera *camera = NULL;
-      Projection *projection = NULL;
       try {
-        projection = ProjectionFactory::CreateFromCube(*p_groundCube);
+        ProjectionFactory::CreateFromCube(*p_groundCube);
         p_groundSurfacePointSource = ControlPoint::SurfacePointSource::Basemap;
         // TODO  Add Basemap to ControlPoint::RadiusSource
         if (!p_demOpen) {
@@ -3420,7 +3416,7 @@ namespace Isis {
       }
       catch (IException &) {
         try {
-          camera = CameraFactory::Create(*(p_groundCube->getLabel()));
+          CameraFactory::Create(*(p_groundCube->getLabel()));
           p_groundSurfacePointSource = ControlPoint::SurfacePointSource::Reference;
           if (!p_demOpen) {
             //  If level 1, determine the shape model

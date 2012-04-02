@@ -104,7 +104,6 @@ void IsisMain() {
 
   // Save major equitorial and polar radii for last occuring
   double eqRad;
-  double eq2Rad;
   double poleRad;
 
   string target("Unknown");
@@ -138,7 +137,6 @@ void IsisMain() {
       cam->Radii(radii);
 
       eqRad   = radii[0].meters();
-      eq2Rad  = radii[1].meters();
       poleRad = radii[2].meters();
 
       target = cam->Target();

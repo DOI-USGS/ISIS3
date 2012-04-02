@@ -107,8 +107,6 @@ namespace Isis {
     // *** May need to do a frame trace and load the frames (at least the constant ones) ***
 
     // Loop and load the cache
-    double cacheSlope = 0.0;
-    if(size > 1) cacheSlope = (endTime - startTime) / (double)(size - 1);
     double state[6];
     double lt;
     NaifStatus::CheckErrors();

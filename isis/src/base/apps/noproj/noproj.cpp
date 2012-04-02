@@ -104,7 +104,6 @@ void IsisMain() {
   int sampleExpansion = int((ui.GetDouble("SAMPEXP") / 100.) * detectorSamples + .5);
   int lineExpansion = int((ui.GetDouble("LINEEXP") / 100.) * numberLines + .5);
   string instType;
-  double exposure;
 
   // Adjust translations for summing mode
   transl /= ui.GetDouble("SUMMINGMODE");
@@ -122,7 +121,6 @@ void IsisMain() {
     instType = "LINESCAN";
     // Isis3 line rate is always in seconds so convert to milliseconds for the
     // Ideal instrument
-    exposure = incam->DetectorMap()->LineRate() * 1000.;
     detectorLines = 1;
     expandFlag = 1;
   }

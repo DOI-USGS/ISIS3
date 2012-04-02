@@ -173,7 +173,6 @@ void IsisMain() {
       replaceLock = true;
     }
 
-    bool shouldDeleteReferenceMeasure = false;
     for(int cm = newPoint->GetNumMeasures() - 1; cm >= 0; cm --) {
       const ControlMeasure *newMeasure = newPoint->GetMeasure(cm);
 
@@ -182,8 +181,6 @@ void IsisMain() {
         //New error with deleting Reference Measures
         if(newPoint->GetRefMeasure() != newMeasure)
           omit(newPoint, cm);
-        else
-          shouldDeleteReferenceMeasure = true;
       }
       else if(reference && newPoint->GetRefMeasure() != newMeasure) {
         nonReferenceMeasures.append(newPoint->GetId() + "," + newMeasure->GetCubeSerialNumber());
@@ -206,7 +203,6 @@ void IsisMain() {
              (newPoint->GetRefMeasure() == newMeasure && !retainReference))
             omit(newPoint, cm);
           else {
-            shouldDeleteReferenceMeasure = true;
             if(newPoint->GetRefMeasure() == newMeasure && retainReference) {
               msg += ", Reference not in the list but Retained";
             }

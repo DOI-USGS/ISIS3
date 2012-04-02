@@ -1037,7 +1037,7 @@ int read_var(char *ibuf, int host)
 //char  *ibuf;
 //int   host;
 {
-  int   length, result, nlen;
+  int   length, nlen;
   char  temp;
   union { /* this union is used to swap 16 and 32 bit integers          */
     char  ichar[4];
@@ -1050,7 +1050,7 @@ int read_var(char *ibuf, int host)
       /* IBM PC host                                         */
       /*******************************************************/
       length = 0;
-      result = read(infile, &length, (size_t) 2);
+      read(infile, &length, (size_t) 2);
       nlen =   read(infile, ibuf, (size_t)(length + (length % 2)));
       return (length);
 
@@ -1059,7 +1059,7 @@ int read_var(char *ibuf, int host)
       /*******************************************************/
 
       length = 0;
-      result = read(infile, onion.ichar, (size_t) 2);
+      read(infile, onion.ichar, (size_t) 2);
       /*     byte swap the length field                            */
       temp   = onion.ichar[0];
       onion.ichar[0] = onion.ichar[1];
@@ -1078,7 +1078,7 @@ int read_var(char *ibuf, int host)
       /* VAX host, but not a variable length file            */
       /*******************************************************/
       length = 0;
-      result = read(infile, &length, (size_t) 2);
+      read(infile, &length, (size_t) 2);
       nlen =   read(infile, ibuf, (size_t)(length + (length % 2)));
 
       /* check to see if we crossed a vax record boundary          */
@@ -1091,7 +1091,7 @@ int read_var(char *ibuf, int host)
       /* Unix workstation host (non-byte-swapped 32 bit host)*/
       /*******************************************************/
       length = 0;
-      result = read(infile, onion.ichar, (size_t) 2);
+      read(infile, onion.ichar, (size_t) 2);
       /*     byte swap the length field                            */
       temp   = onion.ichar[0];
       onion.ichar[0] = onion.ichar[1];

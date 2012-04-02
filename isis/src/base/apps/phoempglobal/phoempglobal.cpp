@@ -195,7 +195,6 @@ void IsisMain() {
   double fa, fb, fc;
   double tolerance = 1e-6;
   double c1_0=0.0;
-  double parmin=0.0;
   if (!iord && phmin > 1e-6) {
     lFitParams.phase = 0.0e0;
     emamaxupdated  = emamax;
@@ -209,13 +208,11 @@ void IsisMain() {
     if (c < parb) c = parb;
     if (c < parc) c = parc;
     Photometry::brentminimizer(a, c, &Func, parb, tolerance);
-    parmin = LinearFitPhotometricToHapkeGlobal(parb, &lFitParams);
+    LinearFitPhotometricToHapkeGlobal(parb, &lFitParams);
     c1_0 = lFitParams.c1;
   }
 
   // Now loop to create the table of results versus phase angle
-  double rms0=0.0;
-  double rms1=0.0;
   double dph = (phmax-phmin) / (double)(nph-1);
   for(int iph=0; iph<nph; iph++) {
     // Fill the buffer with the Hapke results at the right phase
@@ -228,9 +225,9 @@ void IsisMain() {
     GetHapkeImage(hapkeModel, asmModel, hapkeImgPtr, lFitParams.phase, emamaxupdated);
     lFitParams.emamax = emamaxupdated;
     para = 0.0e0;
-    rms0 = LinearFitPhotometricToHapkeGlobal(para, &lFitParams);
+    LinearFitPhotometricToHapkeGlobal(para, &lFitParams);
     parb = 1.0e0;
-    rms1 = LinearFitPhotometricToHapkeGlobal(parb, &lFitParams);
+    LinearFitPhotometricToHapkeGlobal(parb, &lFitParams);
     Photometry::minbracket(para, parb, parc, fa, fb, fc,
         &LinearFitPhotometricToHapkeGlobal, &lFitParams); // minimum parabola (approximation)
     double a = para;
@@ -240,7 +237,7 @@ void IsisMain() {
     if (c < parb) c = parb;
     if (c < parc) c = parc;
     Photometry::brentminimizer(a, c, &Func, parb, tolerance);
-    parmin = LinearFitPhotometricToHapkeGlobal(parb, &lFitParams);
+    LinearFitPhotometricToHapkeGlobal(parb, &lFitParams);
 
     double c1 = lFitParams.c1;
     if (lFitParams.phase < 1e-6) {

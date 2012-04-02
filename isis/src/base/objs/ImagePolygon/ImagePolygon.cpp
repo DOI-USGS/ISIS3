@@ -109,7 +109,6 @@ namespace Isis {
     p_cube = &cube;
 
     Camera *cam = NULL;
-    Projection *proj = NULL;
     p_isProjected = false;
 
     try {
@@ -117,7 +116,7 @@ namespace Isis {
     }
     catch(IException &camError) {
       try {
-        proj = cube.getProjection();
+        cube.getProjection();
         p_isProjected = true;
       }
       catch(IException &projError) {
