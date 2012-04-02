@@ -2,13 +2,12 @@
 
 #include "CnetEditorWindow.h"
 
-#include <iostream>
-
 #include <QAction>
 #include <QApplication>
 #include <QButtonGroup>
 #include <QCheckBox>
 #include <QCloseEvent>
+#include <QDebug>
 #include <QDockWidget>
 #include <QHBoxLayout>
 #include <QLayout>
@@ -74,7 +73,6 @@ namespace Isis
 
     displayProperties = CnetDisplayProperties::getInstance();
     curFile = new QString;
-//     cubeListFile = new QString;
     labelFont = new QFont("Sansserif", 9);
     toolBars = new QList< QToolBar * >;
 
@@ -86,6 +84,11 @@ namespace Isis
     readSettings();
 
     setFileState(NoFile, "");
+
+    QHBoxLayout * horizontalLayout = new QHBoxLayout;
+    QWidget * dummyCentralWidget = new QWidget;
+    dummyCentralWidget->setLayout(horizontalLayout);
+    setCentralWidget(dummyCentralWidget);
 
     if (QApplication::arguments().size() > 1)
       load(QApplication::arguments().at(1));
@@ -127,9 +130,6 @@ namespace Isis
     delete curFile;
     curFile = NULL;
 
-//     delete cubeListFile;
-//     cubeListFile = NULL;
-
     delete labelFont;
     labelFont = NULL;
 
@@ -150,7 +150,6 @@ namespace Isis
     cnetReader = NULL;
     editorWidget = NULL;
     curFile = NULL;
-//     cubeListFile = NULL;
     labelFont = NULL;
 
     openNetAct = NULL;
@@ -304,7 +303,6 @@ namespace Isis
     menuBar()->addMenu("&Tables");
 
     helpMenu = menuBar()->addMenu("&Help");
-//     helpMenu->addAction(aboutAct);
   }
 
 
@@ -434,16 +432,10 @@ namespace Isis
   void CnetEditorWindow::setFileState(CnetEditorWindow::FileState state,
       QString filename)
   {
-    if (centralWidget() && centralWidget() != editorWidget)
-      setCentralWidget(NULL);
-
     switch (state)
     {
       case HasFile:
-//         setDockWidgetsVisible(true);
-
-        if (centralWidget() != editorWidget)
-          setCentralWidget(editorWidget);
+        centralWidget()->layout()->addWidget(editorWidget);
 
         openCubeListAct->setEnabled(true);
         openNetAct->setEnabled(false);
@@ -456,8 +448,6 @@ namespace Isis
         break;
 
       case NoFile:
-//         setDockWidgetsVisible(false);
-        setCentralWidget(new QWidget());
         openCubeListAct->setEnabled(true);
         openNetAct->setEnabled(true);
         saveAsAct->setEnabled(false);
@@ -470,8 +460,6 @@ namespace Isis
         break;
 
       case FileLoading:
-//         setDockWidgetsVisible(false);
-        setCentralWidget(new QWidget());
         openCubeListAct->setEnabled(false);
         openNetAct->setEnabled(false);
         saveAsAct->setEnabled(false);
@@ -596,8 +584,6 @@ namespace Isis
         toolBars->removeOne(tb);
       }
 
-//       removeEmptyMenus();
-
       setFileState(NoFile, "");
     }
   }
@@ -611,7 +597,6 @@ namespace Isis
     populateMenus();
     populateToolBars();
     connect(editorWidget, SIGNAL(cnetModified()), this, SLOT(setDirty()));
-//     setFileState(CnetEditorWindow::HasFile, *curFile);
 
     pointTreeDockWidget->setWidget(editorWidget->getPointTreeView());
     serialTreeDockWidget->setWidget(editorWidget->getSerialTreeView());
@@ -791,7 +776,6 @@ namespace Isis
 
   void CnetEditorWindow::about()
   {
-    cerr << "CneteditorWindow::about() implement me!\n";
   }
 
 
