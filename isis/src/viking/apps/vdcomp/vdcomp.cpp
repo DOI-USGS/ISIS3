@@ -113,6 +113,7 @@
 /*   5:   Out of memory in half_tree                                */
 /*   6:   Out of memory in new_node                                 */
 /*   7:   Invalid byte count in dcmprs                              */
+/*   8:   Failed during a read operation                            */
 /*   42:  Input file has invalid or corrupted line header table     */
 /*                                                                  */
 /********************************************************************/
@@ -1050,7 +1051,8 @@ int read_var(char *ibuf, int host)
       /* IBM PC host                                         */
       /*******************************************************/
       length = 0;
-      read(infile, &length, (size_t) 2);
+      if (read(infile, &length, (size_t) 2) != 2)
+        exit(8);
       nlen =   read(infile, ibuf, (size_t)(length + (length % 2)));
       return (length);
 
@@ -1059,7 +1061,8 @@ int read_var(char *ibuf, int host)
       /*******************************************************/
 
       length = 0;
-      read(infile, onion.ichar, (size_t) 2);
+      if (read(infile, onion.ichar, (size_t) 2) != 2)
+        exit(8);
       /*     byte swap the length field                            */
       temp   = onion.ichar[0];
       onion.ichar[0] = onion.ichar[1];
@@ -1078,7 +1081,8 @@ int read_var(char *ibuf, int host)
       /* VAX host, but not a variable length file            */
       /*******************************************************/
       length = 0;
-      read(infile, &length, (size_t) 2);
+      if(read(infile, &length, (size_t) 2) != 2)
+        exit(8);
       nlen =   read(infile, ibuf, (size_t)(length + (length % 2)));
 
       /* check to see if we crossed a vax record boundary          */
@@ -1091,7 +1095,8 @@ int read_var(char *ibuf, int host)
       /* Unix workstation host (non-byte-swapped 32 bit host)*/
       /*******************************************************/
       length = 0;
-      read(infile, onion.ichar, (size_t) 2);
+      if(read(infile, onion.ichar, (size_t) 2) != 2)
+        exit(8);
       /*     byte swap the length field                            */
       temp   = onion.ichar[0];
       onion.ichar[0] = onion.ichar[1];
