@@ -80,6 +80,10 @@
     <change name="Janet Barrett" date="2010-01-27">
       Added support for JPEG2000 files.
     </change>
+    <change name="Stuart Sides and Steven Lambright" date="2012-04-03">
+      Added minimum and maximum input stretch values and output file 
+      name to the output log. fixes #761
+    </change>
   </history>
 
   <category>

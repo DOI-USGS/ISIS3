@@ -35,6 +35,7 @@ void IsisMain() {
   int quality = ui.GetInteger("QUALITY");
 
   iString mode = ui.GetString("MODE");
+  iString outFileName = ui.GetFilename("TO");
 
   // Create an object for exporting image data
   ProcessExport p;
@@ -62,7 +63,7 @@ void IsisMain() {
         p.SetOutputType(Isis::UnsignedByte);
         p.SetOutputRange(1.0, 255.0);
         p.SetOutputNull(0.0);
-        JP2_encoder = new JP2Encoder(ui.GetFilename("TO"), icube->getSampleCount(),
+        JP2_encoder = new JP2Encoder(outFileName, icube->getSampleCount(),
                                      icube->getLineCount(), icube->getBandCount(), Isis::UnsignedByte);
         datamin = 0;
         datamax = 255;
@@ -75,7 +76,7 @@ void IsisMain() {
         p.SetOutputType(Isis::SignedWord);
         p.SetOutputNull(-32768.0);
         p.SetOutputRange(-32752.0, 32767.0);
-        JP2_encoder = new JP2Encoder(ui.GetFilename("TO"), icube->getSampleCount(),
+        JP2_encoder = new JP2Encoder(outFileName, icube->getSampleCount(),
                                      icube->getLineCount(), icube->getBandCount(), Isis::SignedWord);
         datamin = -32752;
         datamax = 32767;
@@ -88,7 +89,7 @@ void IsisMain() {
         p.SetOutputType(Isis::UnsignedWord);
         p.SetOutputNull(0.0);
         p.SetOutputRange(3.0, 65522.0);
-        JP2_encoder = new JP2Encoder(ui.GetFilename("TO"), icube->getSampleCount(),
+        JP2_encoder = new JP2Encoder(outFileName, icube->getSampleCount(),
                                      icube->getLineCount(), icube->getBandCount(), Isis::UnsignedWord);
         datamin = 3;
         datamax = 65522;
@@ -129,7 +130,7 @@ void IsisMain() {
         p.SetOutputType(Isis::UnsignedByte);
         p.SetOutputRange(1.0, 255.0);
         p.SetOutputNull(0.0);
-        JP2_encoder = new JP2Encoder(ui.GetFilename("TO"), redcube->getSampleCount(),
+        JP2_encoder = new JP2Encoder(outFileName, redcube->getSampleCount(),
                                      redcube->getLineCount(), 3, Isis::UnsignedByte);
         datamin = 0;
         datamax = 255;
@@ -142,7 +143,7 @@ void IsisMain() {
         p.SetOutputType(Isis::SignedWord);
         p.SetOutputNull(-32768.0);
         p.SetOutputRange(-32752.0, 32767.0);
-        JP2_encoder = new JP2Encoder(ui.GetFilename("TO"), redcube->getSampleCount(),
+        JP2_encoder = new JP2Encoder(outFileName, redcube->getSampleCount(),
                                      redcube->getLineCount(), 3, Isis::SignedWord);
         datamin = -32752;
         datamax = 32767;
@@ -155,7 +156,7 @@ void IsisMain() {
         p.SetOutputType(Isis::UnsignedWord);
         p.SetOutputNull(0.0);
         p.SetOutputRange(3.0, 65522.0);
-        JP2_encoder = new JP2Encoder(ui.GetFilename("TO"), redcube->getSampleCount(),
+        JP2_encoder = new JP2Encoder(outFileName, redcube->getSampleCount(),
                                      redcube->getLineCount(), 3, Isis::UnsignedWord);
         datamin = 3;
         datamax = 65522;
@@ -198,7 +199,7 @@ void IsisMain() {
         p.SetOutputType(Isis::UnsignedByte);
         p.SetOutputRange(1.0, 255.0);
         p.SetOutputNull(0.0);
-        JP2_encoder = new JP2Encoder(ui.GetFilename("TO"), alphacube->getSampleCount(),
+        JP2_encoder = new JP2Encoder(outFileName, alphacube->getSampleCount(),
                                      alphacube->getLineCount(), 4, Isis::UnsignedByte);
         datamin = 0;
         datamax = 255;
@@ -211,7 +212,7 @@ void IsisMain() {
         p.SetOutputType(Isis::SignedWord);
         p.SetOutputNull(-32768.0);
         p.SetOutputRange(-32752.0, 32767.0);
-        JP2_encoder = new JP2Encoder(ui.GetFilename("TO"), alphacube->getSampleCount(),
+        JP2_encoder = new JP2Encoder(outFileName, alphacube->getSampleCount(),
                                      alphacube->getLineCount(), 4, Isis::SignedWord);
         datamin = -32752;
         datamax = 32767;
@@ -224,7 +225,7 @@ void IsisMain() {
         p.SetOutputType(Isis::UnsignedWord);
         p.SetOutputNull(0.0);
         p.SetOutputRange(3.0, 65522.0);
-        JP2_encoder = new JP2Encoder(ui.GetFilename("TO"), alphacube->getSampleCount(),
+        JP2_encoder = new JP2Encoder(outFileName, alphacube->getSampleCount(),
                                      alphacube->getLineCount(), 4, Isis::UnsignedWord);
         datamin = 3;
         datamax = 65522;
@@ -233,7 +234,10 @@ void IsisMain() {
       p.StartProcess(toJP2ARGB);
     }
     // Create a world file if it has a map projection
-    Filename fname(ui.GetFilename("TO"));
+    Filename fname(outFileName);
+    fname.RemoveExtension();
+    fname.AddExtension(extension);
+    outFileName = fname.Expanded();
     fname.RemoveExtension();
     fname.AddExtension(world);
     p.CreateWorldFile(fname.Expanded());
@@ -356,16 +360,16 @@ void IsisMain() {
     }
 
     // Get the name of the file and write it
-    Filename fname(ui.GetFilename("TO"));
+    Filename fname(outFileName);
     fname.AddExtension(extension);
-    string filename(fname.Expanded());
+    outFileName = fname.Expanded();
 
     // The return status is wrong for JPEG images, so the code will always
     //   continue.
-    if(!qimage->save(filename.c_str(), format.c_str(), quality)) {
+    if(!qimage->save(outFileName.c_str(), format.c_str(), quality)) {
       delete qimage;
       iString err = "Unable to save [";
-      err += filename.c_str();
+      err += outFileName.c_str();
       err += "] to the disk";
       throw IException(IException::User, err, _FILEINFO_);
     }
@@ -373,11 +377,47 @@ void IsisMain() {
     // Create a world file if it has a map projection
     fname.RemoveExtension();
     fname.AddExtension(world);
-    p.CreateWorldFile(fname.Expanded());
+    outFileName = fname.Expanded();
+    p.CreateWorldFile(outFileName);
     p.EndProcess();
 
     delete qimage;
   }
+
+  PvlGroup results("Results");
+  results += PvlKeyword("OutputFilename", outFileName);
+
+  if (mode == "GRAYSCALE") {
+    results += PvlKeyword("InputMinimum", p.GetInputMinimum());
+    results += PvlKeyword("InputMaximum", p.GetInputMaximum());
+  }
+  else {
+    int alphaIndex = -1;
+    int redIndex = 0;
+    int greenIndex = 1;
+    int blueIndex = 2;
+
+    if (mode == "ARGB") {
+      alphaIndex++;
+      redIndex++;
+      greenIndex++;
+      blueIndex++;
+    }
+
+    if (alphaIndex != -1) {
+      results += PvlKeyword("AlphaInputMinimum", p.GetInputMinimum(alphaIndex));
+      results += PvlKeyword("AlphaInputMaximum", p.GetInputMaximum(alphaIndex));
+    }
+
+    results += PvlKeyword("RedInputMinimum", p.GetInputMinimum(redIndex));
+    results += PvlKeyword("RedInputMaximum", p.GetInputMaximum(redIndex));
+    results += PvlKeyword("GreenInputMinimum", p.GetInputMinimum(greenIndex));
+    results += PvlKeyword("GreenInputMaximum", p.GetInputMaximum(greenIndex));
+    results += PvlKeyword("BlueInputMinimum", p.GetInputMinimum(blueIndex));
+    results += PvlKeyword("BlueInputMaximum", p.GetInputMaximum(blueIndex));
+  }
+
+  Application::Log(results);
 }
 
 // Write a line of data to the greyscale qimage object
