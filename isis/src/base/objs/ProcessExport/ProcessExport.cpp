@@ -410,6 +410,12 @@ namespace Isis {
     }
   }
 
+
+   bool ProcessExport::HasInputRange() const {
+     return p_inputMinimum.size() > 0;
+   }
+
+
   /**
    * @brief Set output pixel range in Buffer
    *
@@ -653,6 +659,11 @@ namespace Isis {
       throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
+    // TODO this really belongs here, but causes problems because of its
+    // coupling with an application User Interface that contains a STRETCH
+    // parameter
+    //if (!HasInputRange()) SetInputRange();
+
     // Construct a line buffer manager
     if(p_format == BIP) {
       p_progress->SetMaximumSteps((InputCubes[0]->getSampleCount()) * (InputCubes[0]->getLineCount()));
@@ -757,23 +768,58 @@ namespace Isis {
   *                                jpg, tif, etc).
   *
   */
-  void ProcessExport::StartProcess(void
-                                   funct(std::vector<Isis::Buffer *> &in)) {
+  void ProcessExport::StartProcess(void funct(vector<Buffer *> &in)) {
+    int length = (p_format == BIP) ?
+      InputCubes[0]->getBandCount() : InputCubes[0]->getLineCount();
 
-    if(p_format == BSQ) {
-      StartProcessBSQ(funct);
+    int samples = InputCubes[0]->getSampleCount();
+
+    // Loop and let the app programmer fiddle with the lines
+    vector<BufferManager *> imgrs = GetBuffers();
+    for (int k = 1; k <= length; k++) {
+      vector<Buffer *> ibufs;
+
+      for (unsigned int j = 0; j < InputCubes.size(); j++) {
+        // Read a line of data
+        InputCubes[j]->read(*imgrs[j]);
+
+        // Stretch the pixels into the desired range
+        for (int i = 0; i < samples; i++)
+          (*imgrs[j])[i] = p_str[j]->Map((*imgrs[j])[i]);
+
+        ibufs.push_back(imgrs[j]);
+      }
+
+      // Invoke the user function
+      funct(ibufs);
+
+      for (unsigned int i = 0; i < imgrs.size(); i++) imgrs[i]->next();
+      p_progress->CheckStatus();
     }
-    else if(p_format == BIL || p_format == JP2) {
-      StartProcessBIL(funct);
+  }
+
+
+  vector<BufferManager *> ProcessExport::GetBuffers() {
+    InitProcess();
+    vector<BufferManager *> imgrs;
+    int length;
+    if (p_format == BSQ) {
+      imgrs = GetBuffersBSQ();
+      length = InputCubes[0]->getLineCount();
     }
-    else if(p_format == BIP) {
-      StartProcessBIP(funct);
+    else if (p_format == BIL || p_format == JP2) {
+      imgrs = GetBuffersBIL();
+      length = InputCubes[0]->getLineCount();
+    }
+    else if (p_format == BIP) {
+      imgrs = GetBuffersBIP();
+      length = InputCubes[0]->getBandCount();
     }
     else {
       string m = "Invalid storage order.";
       throw IException(IException::Programmer, m, _FILEINFO_);
     }
-
+    return imgrs;
   }
 
 
@@ -792,16 +838,15 @@ namespace Isis {
   *                                etc).
   *
   */
-  void ProcessExport::StartProcessBSQ(void
-                                      funct(std::vector<Isis::Buffer *> &in)) {
-    InitProcess();
-
+  vector<BufferManager *> ProcessExport::GetBuffersBSQ() {
     int samples = InputCubes[0]->getSampleCount();
     int lines = InputCubes[0]->getLineCount();
-    vector<Isis::LineManager *> imgrs;
 
-    for(unsigned int i = 0; i < InputCubes.size(); i++) {
-      if((InputCubes[i]->getSampleCount() == samples) && (InputCubes[i]->getLineCount() == lines)) {
+    vector<BufferManager *> imgrs;
+    for (unsigned int i = 0; i < InputCubes.size(); i++) {
+      if((InputCubes[i]->getSampleCount() == samples) &&
+          (InputCubes[i]->getLineCount() == lines)) {
+
         Isis::LineManager *iline = new Isis::LineManager(*InputCubes[i]);
         iline->begin();
         imgrs.push_back(iline);
@@ -812,29 +857,7 @@ namespace Isis {
       }
     }
 
-    // Loop and let the app programmer fiddle with the lines
-    for(int line = 1; line <= lines; line++) {
-      std::vector<Isis::Buffer *> ibufs;
-
-      for(unsigned int j = 0; j < InputCubes.size(); j++) {
-        // Read a line of data
-        InputCubes[j]->read(*imgrs[j]);
-        // Stretch the pixels into the desired range
-        for(int i = 0; i < samples; i++) {
-          (*imgrs[j])[i] = p_str[j]->Map((*imgrs[j])[i]);
-        }
-
-        ibufs.push_back(imgrs[j]);
-      }
-
-      // Invoke the user function
-      funct(ibufs);
-
-      for(unsigned int i = 0; i < imgrs.size(); i++) {
-        imgrs[i]->next();
-      }
-      p_progress->CheckStatus();
-    }
+    return imgrs;
   }
 
 
@@ -854,16 +877,15 @@ namespace Isis {
    *                                etc).
    *
    */
-  void ProcessExport::StartProcessBIL(void
-                                      funct(std::vector<Isis::Buffer *> &in)) {
-    InitProcess();
-
+  vector<BufferManager *> ProcessExport::GetBuffersBIL() {
     int samples = InputCubes[0]->getSampleCount();
     int lines = InputCubes[0]->getLineCount();
-    vector<Isis::LineManager *> imgrs;
 
-    for(unsigned int i = 0; i < InputCubes.size(); i++) {
-      if((InputCubes[i]->getSampleCount() == samples) && (InputCubes[i]->getLineCount() == lines)) {
+    vector<BufferManager *> imgrs;
+    for (unsigned int i = 0; i < InputCubes.size(); i++) {
+      if ((InputCubes[i]->getSampleCount() == samples) &&
+          (InputCubes[i]->getLineCount() == lines)) {
+
         Isis::LineManager *iline = new Isis::LineManager(*InputCubes[i], true);
         iline->begin();
         imgrs.push_back(iline);
@@ -874,29 +896,7 @@ namespace Isis {
       }
     }
 
-    // Loop and let the app programmer fiddle with the lines
-    for(int line = 1; line <= lines; line++) {
-      std::vector<Isis::Buffer *> ibufs;
-
-      for(unsigned int j = 0; j < InputCubes.size(); j++) {
-        // Read a line of data
-        InputCubes[j]->read(*imgrs[j]);
-        // Stretch the pixels into the desired range
-        for(int i = 0; i < samples; i++) {
-          (*imgrs[j])[i] = p_str[j]->Map((*imgrs[j])[i]);
-        }
-
-        ibufs.push_back(imgrs[j]);
-      }
-
-      // Invoke the user function
-      funct(ibufs);
-
-      for(unsigned int i = 0; i < imgrs.size(); i++) {
-        imgrs[i]->next();
-      }
-      p_progress->CheckStatus();
-    }
+    return imgrs;
   }
 
   /**
@@ -915,14 +915,11 @@ namespace Isis {
    *                                etc).
    *
    */
-  void ProcessExport::StartProcessBIP(void
-                                      funct(std::vector<Isis::Buffer *> &in)) {
-    InitProcess();
-
+  vector<BufferManager *> ProcessExport::GetBuffersBIP() {
     int bands = InputCubes[0]->getBandCount();
     int samples = InputCubes[0]->getSampleCount();
-    vector<Isis::BandManager *> imgrs;
 
+    vector<BufferManager *> imgrs;
     for(unsigned int i = 0; i < InputCubes.size(); i++) {
       if((InputCubes[i]->getBandCount() == bands) && (InputCubes[i]->getSampleCount() == samples)) {
         Isis::BandManager *iband = new Isis::BandManager(*InputCubes[i]);
@@ -935,29 +932,7 @@ namespace Isis {
       }
     }
 
-    // Loop and let the app programmer fiddle with the lines
-    for(int band = 1; band <= bands; band++) {
-      std::vector<Isis::Buffer *> ibufs;
-
-      for(unsigned int j = 0; j < InputCubes.size(); j++) {
-        // Read a line of data
-        InputCubes[j]->read(*imgrs[j]);
-        // Stretch the pixels into the desired range
-        for(int i = 0; i < bands; i++) {
-          (*imgrs[j])[i] = p_str[j]->Map((*imgrs[j])[i]);
-        }
-
-        ibufs.push_back(imgrs[j]);
-      }
-
-      // Invoke the user function
-      funct(ibufs);
-
-      for(unsigned int i = 0; i < imgrs.size(); i++) {
-        imgrs[i]->next();
-      }
-      p_progress->CheckStatus();
-    }
+    return imgrs;
   }
 
 

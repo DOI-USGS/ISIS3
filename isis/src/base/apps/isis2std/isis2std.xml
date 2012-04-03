@@ -298,9 +298,6 @@
             <description>
 	      Output Isis cube in TIFF format
             </description>
-            <exclusions>
-              <item>BITTYPE</item>
-            </exclusions>
           </option>
           <option value="JPEG">
             <brief>Joint Photographic Experts Group</brief>

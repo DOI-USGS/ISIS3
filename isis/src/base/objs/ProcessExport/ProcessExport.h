@@ -27,13 +27,13 @@
 #include <fstream>
 #include "Process.h"
 #include "Buffer.h"
+#include "BufferManager.h"
 #include "SpecialPixel.h"
 #include "Endian.h"
 #include "EndianSwapper.h"
 #include "Stretch.h"
 
 namespace Isis {
-
   /**
    * @brief Process class for exporting cubes
    *
@@ -125,6 +125,7 @@ namespace Isis {
       double OutputLrs();
       double OutputHis();
       double OutputHrs();
+      bool HasInputRange() const;
       void SetInputRange();
       void SetInputRange(const double minimum, const double maximum);
       void SetInputRange(const double minimum, const double maximum, const int index);
@@ -158,14 +159,46 @@ namespace Isis {
         p_format = format;
       };
 
+
+      template <typename Functor> void ProcessCubes(const Functor & functor) {
+        int length = (p_format == BIP) ?
+          InputCubes[0]->getBandCount() : InputCubes[0]->getLineCount();
+
+        int samples = InputCubes[0]->getSampleCount();
+
+        // Loop and let the app programmer fiddle with the lines
+        std::vector<BufferManager *> imgrs = GetBuffers();
+        for (int k = 1; k <= length; k++) {
+          std::vector<Buffer *> ibufs;
+
+          for (unsigned int j = 0; j < InputCubes.size(); j++) {
+            // Read a line of data
+            InputCubes[j]->read(*imgrs[j]);
+
+            // Stretch the pixels into the desired range
+            for (int i = 0; i < samples; i++)
+              (*imgrs[j])[i] = p_str[j]->Map((*imgrs[j])[i]);
+
+            ibufs.push_back(imgrs[j]);
+          }
+
+          // Invoke the user function
+          functor(ibufs);
+
+          for (unsigned int i = 0; i < imgrs.size(); i++) imgrs[i]->next();
+          p_progress->CheckStatus();
+        }
+      }
+
     protected:
 
       //! Current storage order
       ExportFormat p_format;
 
-      void StartProcessBSQ(void funct(std::vector<Isis::Buffer *> &in));
-      void StartProcessBIL(void funct(std::vector<Isis::Buffer *> &in));
-      void StartProcessBIP(void funct(std::vector<Isis::Buffer *> &in));
+      std::vector<BufferManager *> GetBuffers();
+      std::vector<BufferManager *> GetBuffersBSQ();
+      std::vector<BufferManager *> GetBuffersBIL();
+      std::vector<BufferManager *> GetBuffersBIP();
 
       double p_outputMinimum; //!<Desired minimum pixel value in the Buffer
       double p_outputMiddle;  /**<Middle pixel value (minimum+maximun)/2.0 in

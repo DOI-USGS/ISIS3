@@ -1,0 +1,72 @@
+#ifndef StreamExporter_h
+#define StreamExporter_h
+
+/**
+ * @file
+ * $Revision: 1.17 $
+ * $Date: 2010/03/22 19:44:53 $
+ *
+ *   Unless noted otherwise, the portions of Isis written by the USGS are
+ *   public domain. See individual third-party library and package descriptions
+ *   for intellectual property information, user agreements, and related
+ *   information.
+ *
+ *   Although Isis has been used by the USGS, no warranty, expressed or
+ *   implied, is made by the USGS as to the accuracy and functioning of such
+ *   software and related material nor shall the fact of distribution
+ *   constitute any such warranty, and no responsibility is assumed by the
+ *   USGS in connection therewith.
+ *
+ *   For additional information, launch
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
+ *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
+ *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
+ *   http://www.usgs.gov/privacy.html.
+ */
+
+#include "ImageExporter.h"
+#include "PixelType.h"
+
+namespace Isis {
+  /**
+   * @brief Exports cubes into a standard format in incremental pieces
+   *
+   * @ingroup HighLevelCubeIO
+   *
+   * @author 2012-04-03 Travis Addair
+   *
+   * @internal
+   *
+   */
+  class StreamExporter : public ImageExporter {
+    public:
+      StreamExporter();
+      virtual ~StreamExporter();
+
+      virtual void setGrayscale(ExportDescription &desc);
+      virtual void setRgb(ExportDescription &desc);
+      virtual void setRgba(ExportDescription &desc);
+
+      void setType(ExportDescription &desc);
+
+    protected:
+      virtual void initialize(ExportDescription &desc);
+
+      PixelType getPixelType() const;
+
+      virtual void writeGrayscale(vector<Buffer *> &in) const;
+      virtual void writeRgb(vector<Buffer *> &in) const;
+      virtual void writeRgba(vector<Buffer *> &in) const;
+
+      virtual void createBuffer() = 0;
+
+      virtual void setBuffer(int s, int b, int dn) const = 0; 
+      virtual void writeLine(int l) const = 0;
+
+    private:
+      PixelType m_type;
+  };
+};
+
+
+#endif
