@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="csspckgen"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Creates a new Cassini PCK SPICE DB file for the latest date-versioned PCKs
+  </brief>
+
+  <description>
+    <p>
+      This program creates the latest PCK SPICE DB file for the Cassini
+      missions.  The Cassini mission continually refines its approximations of
+      planetary constants, and so regularly releases their latest PCK with each
+      SPK release.  There are only two PCKs that need to be considered: a
+      general Cassini PCK and a Jupiter PCK.  Each file is versioned with a date
+      string.
+    </p>
+    <p>
+      New version of Isis 3 are capable of resolving this date string and
+      grabbing the latest PCK from the data area.  In an effort to support
+      legacy versions of Isis 3, this program adds Selection groups for the
+      direct paths to the latest PCK files, and is called by the makedb script
+      within the Cassini PCK directory in order to always contain the latest
+      PCKs.
+    </p>
+    <p>
+      When initializing a file, spiceinit will grab the last PCK in the DB file
+      that it can use for the given coverage period.  With this in mind, the
+      date-versioned filenames should be placed below the direct filenames such
+      that new versions of Isis will resolve the latest PCK at runtime.  This
+      way, in case a user is missing the directly specified PCK, they could fall
+      back to whatever happens to be the latest PCK in their data area.
+      Unfortunately, in legacy versions of Isis 3, spiceinit only looks at the
+      coverage time, and does not consider whether a file exists when
+      determining if it is usable, thus the date-versioned filenames must be
+      placed above the direct filenames, and will thus not be used until legacy
+      support is dropped.
+    </p>
+    <p>
+      Once all supported versions of Isis contain the date-versioning logic,
+      these direct filenames should no longer be added by this program, and
+      removed from all future DB files.
+    </p>
+  </description>
+
+  <history>
+    <change name="Travis Addair" date="2012-04-03">
+      Original version
+    </change>
+  </history>
+
+  <category>
+    <categoryItem>System</categoryItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input PCK kernel.????.db file
+        </brief>
+        <description>
+          The PCK PVL group DB file used to generate the new db file. Defaulted
+          to use the versioned pattern
+          $ISIS3DATA/cassini/kernels/pck/kernels.????.db.
+        </description>
+        <internalDefault>
+          Automatic
+        </internalDefault>
+        <filter>
+          *.db
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output PCK kernel.????.db file
+        </brief>
+        <description>
+          The new DB file that is the matching PCK file.  Defaulted to use a new
+          version of the patterned filename
+          $ISIS3DATA/cassini/kernels/pck/kernels.????.db.
+        </description>
+        <internalDefault>
+          Automatic
+        </internalDefault>
+        <filter>
+          *.db
+        </filter>
+      </parameter>
+    </group>
+  </groups>
+</application>
