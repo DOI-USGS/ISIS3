@@ -65,6 +65,43 @@ void IsisMain() {
     }
   }
 
+  // Write out the results
+  PvlGroup results("Results");
+  results += PvlKeyword("OutputFilename", outputName.Expanded());
+
+  if (mode == "GRAYSCALE") {
+    results += PvlKeyword("InputMinimum", exporter->getInputMinimum(0));
+    results += PvlKeyword("InputMaximum", exporter->getInputMaximum(0));
+  }
+  else {
+    int redIndex = 0;
+    int greenIndex = 1;
+    int blueIndex = 2;
+    int alphaIndex = 3;
+
+    results += PvlKeyword(
+        "RedInputMinimum", exporter->getInputMinimum(redIndex));
+    results += PvlKeyword(
+        "RedInputMaximum", exporter->getInputMaximum(redIndex));
+    results += PvlKeyword(
+        "GreenInputMinimum", exporter->getInputMinimum(greenIndex));
+    results += PvlKeyword(
+        "GreenInputMaximum", exporter->getInputMaximum(greenIndex));
+    results += PvlKeyword(
+        "BlueInputMinimum", exporter->getInputMinimum(blueIndex));
+    results += PvlKeyword(
+        "BlueInputMaximum", exporter->getInputMaximum(blueIndex));
+
+    if (mode == "ARGB") {
+      results += PvlKeyword(
+          "AlphaInputMinimum", exporter->getInputMinimum(alphaIndex));
+      results += PvlKeyword(
+          "AlphaInputMaximum", exporter->getInputMaximum(alphaIndex));
+    }
+  }
+
+  Application::Log(results);
+
   delete exporter;
 }
 

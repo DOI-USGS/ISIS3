@@ -8,29 +8,29 @@
 
   <description>
     <p>
-    This program will export an Isis cube to one of several popular standard
-    formats.  The formats may include PNG, JPEG, TIFF, BMP, GIF, and JP2.
-    Not all formats are available as the program implementation depends on the 
-    Qt library by TrollTech.  The JPEG2000 (JP2) format does not depend on the
-    Qt library for support. Support for JP2 is handled internally by the ISIS3
-    library. This program requires the input cube have exactly one band.
-    Therefore, you must input a cube with exactly one band or a multi-band
-    cube with a band specifier (e.g., file.cub+4). In addition if the cube 
-    has Mapping labels, the program will produce a world file for use in Arc
-    and/or other GIS type packages.  The file will have an extension that
-    uses the first and last letters for the image extenstion and a "w". For
-    example, tif produces a world file extension of tfw.
+      This program will export an Isis cube to one of several popular standard
+      formats.  The formats may include PNG, JPEG, TIFF, BMP, GIF, and JP2.
+      Not all formats are available as the program implementation depends on the 
+      Qt library by TrollTech.  The JPEG2000 (JP2) format does not depend on the
+      Qt library for support. Support for JP2 is handled internally by the ISIS3
+      library. This program requires the input cube have exactly one band.
+      Therefore, you must input a cube with exactly one band or a multi-band
+      cube with a band specifier (e.g., file.cub+4). In addition if the cube 
+      has Mapping labels, the program will produce a world file for use in Arc
+      and/or other GIS type packages.  The file will have an extension that
+      uses the first and last letters for the image extenstion and a "w". For
+      example, tif produces a world file extension of tfw.
     </p>
 
     <p>
-    In order to ensure acceptable contrast in
-    the output file, three stretch options are given 1) linear,
-    2) piecewise-linear, and 3) manual.
-    Special pixels are mapped in the following manner, Low Saturation values
-    and Null are made black and High Saturation values are made white.
-    Please note: there is currently a 2GB filesize limit on the output image.
-    This limit does not apply to output JPEG2000 files. JPEG2000 files can
-    be output as 8-bit, signed 16-bit, or unsigned 16-bit files.
+      In order to ensure acceptable contrast in
+      the output file, three stretch options are given 1) linear,
+      2) piecewise-linear, and 3) manual.
+      Special pixels are mapped in the following manner, Low Saturation values
+      and Null are made black and High Saturation values are made white.
+      Please note: there is currently a 2GB filesize limit on the output image.
+      This limit does not apply to output JPEG2000 files. JPEG2000 files can
+      be output as 8-bit, signed 16-bit, or unsigned 16-bit files.
     </p>
   </description>
 
@@ -42,19 +42,19 @@
       Added application test
     </change>
     <change name="Jacob Danton" date="2006-02-06">
-        Added two new modes (rgb and argb) and updated the appTest.
+      Added two new modes (rgb and argb) and updated the appTest.
     </change>
     <change name="Elizabeth Miller" date="2006-05-08">
       Added MIN and MAX percent options
     </change>
     <change name="Jacob Danton" date="2006-05-22">
-        Added seperate MINIMUM and MAXIMUM parameters for all channels.
+      Added seperate MINIMUM and MAXIMUM parameters for all channels.
     </change>
     <change name="Brendan George" date="2007-05-03">
-        Modified to use Filename class, and added appropriate appTest
+      Modified to use Filename class, and added appropriate appTest
     </change>
     <change name="Steven Lambright" date="2007-07-10">
-        Modified to give an error if write fails. Memory leak fixed.
+      Modified to give an error if write fails. Memory leak fixed.
     </change>
     <change name="Jeff Anderson" date="2007-08-20">
       Modified so that ISIS Null pixels are written as zeros in the output cube
@@ -83,6 +83,9 @@
     <change name="Stuart Sides and Steven Lambright" date="2012-04-03">
       Added minimum and maximum input stretch values and output file 
       name to the output log. fixes #761
+    </change>
+    <change name="Travis Addair" date="2012-04-03">
+      Added support for exporting cubes greater than 2GB to TIFFs.
     </change>
   </history>
 
@@ -194,61 +197,61 @@
       </parameter>
 
       <parameter name="MODE">
-            <type>string</type>
-            <default><item>GRAYSCALE</item></default>
-            <brief>Image mode</brief>
+        <type>string</type>
+        <default><item>GRAYSCALE</item></default>
+        <brief>Image mode</brief>
+        <description>
+          This parameter specifies the image mode. If GRAYSCALE, a single
+          one-band cube is used.  If RGB, three one-band cubes are used.
+        </description>
+        <list>
+          <option value="GRAYSCALE">
+            <brief>Grayscale mode</brief>
             <description>
-                This parameter specifies the image mode. If GRAYSCALE, a single one-band cube is used.
-                If RGB, three one-band cubes are used.
+              A single channel image.
             </description>
-            <list>
-                <option value="GRAYSCALE">
-                    <brief>Grayscale mode</brief>
-                    <description>
-                        A single channel image.
-                    </description>
-                    <exclusions>
-                        <item>ALPHA</item>
-                        <item>RED</item>
-                        <item>GREEN</item>
-                        <item>BLUE</item>
-                        <item>AMIN</item>
-                        <item>AMAX</item>
-                        <item>RMIN</item>
-                        <item>RMAX</item>
-                        <item>GMIN</item>
-                        <item>GMAX</item>
-                        <item>BMIN</item>
-                        <item>BMAX</item>
-                    </exclusions>
-                </option>
-                <option value="RGB">
-                    <brief>RGB mode</brief>
-                    <description>
-                        A three channel image (red, green, and blue).
-                    </description>
-                    <exclusions>
-                        <item>FROM</item>
-                        <item>ALPHA</item>
-                        <item>MINIMUM</item>
-                        <item>MAXIMUM</item>
-                        <item>AMIN</item>
-                        <item>AMAX</item>
-                    </exclusions>
-                </option>
-                <option value="ARGB">
-                    <brief>ARGB mode</brief>
-                    <description>
-                        A four channel image (alpha, red, green, and blue).
-                    </description>
-                    <exclusions>
-                        <item>FROM</item>
-                        <item>MINIMUM</item>
-                        <item>MAXIMUM</item>
-                    </exclusions>
-                </option>
-            </list>
-        </parameter>
+            <exclusions>
+              <item>ALPHA</item>
+              <item>RED</item>
+              <item>GREEN</item>
+              <item>BLUE</item>
+              <item>AMIN</item>
+              <item>AMAX</item>
+              <item>RMIN</item>
+              <item>RMAX</item>
+              <item>GMIN</item>
+              <item>GMAX</item>
+              <item>BMIN</item>
+              <item>BMAX</item>
+            </exclusions>
+          </option>
+          <option value="RGB">
+            <brief>RGB mode</brief>
+            <description>
+              A three channel image (red, green, and blue).
+            </description>
+            <exclusions>
+              <item>FROM</item>
+              <item>ALPHA</item>
+              <item>MINIMUM</item>
+              <item>MAXIMUM</item>
+              <item>AMIN</item>
+              <item>AMAX</item>
+            </exclusions>
+          </option>
+          <option value="ARGB">
+            <brief>ARGB mode</brief>
+            <description>
+              A four channel image (alpha, red, green, and blue).
+            </description>
+            <exclusions>
+              <item>FROM</item>
+              <item>MINIMUM</item>
+              <item>MAXIMUM</item>
+            </exclusions>
+          </option>
+        </list>
+      </parameter>
     </group>
 
     <group name="Output Settings">
@@ -259,17 +262,16 @@
         </default>
         <brief>Format of output image</brief>
         <description>
-          This parameter is used to select the output format.  It can
-          be one of PNG, BMP, JPEG, TIF, GIF, or JP2.  Note that not all
-          formats are available.  It will depend on your installation
-          of the Qt libraries.
+          This parameter is used to select the output format.  It can be one of
+          PNG, BMP, JPEG, TIF, GIF, or JP2.  Note that not all formats are
+          available.  It will depend on your installation of the Qt libraries.
         </description>
 
         <list>
           <option value="PNG">
             <brief>Portable network graphics</brief>
             <description>
-	      Output Isis cube in PNG format
+              Output Isis cube in PNG format
             </description>
             <exclusions>
               <item>BITTYPE</item>
@@ -278,7 +280,7 @@
           <option value="BMP">
             <brief>Bit mapped graphics</brief>
             <description>
-	      Output Isis cube in BMP format
+              Output Isis cube in BMP format
             </description>
             <exclusions>
               <item>BITTYPE</item>
@@ -287,7 +289,7 @@
           <option value="GIF">
             <brief>Graphics interchange format</brief>
             <description>
-	      Output Isis cube in GIF format
+              Output Isis cube in GIF format
             </description>
             <exclusions>
               <item>BITTYPE</item>
@@ -296,13 +298,13 @@
           <option value="TIFF">
             <brief>Tagged image files format</brief>
             <description>
-	      Output Isis cube in TIFF format
+              Output Isis cube in TIFF format
             </description>
           </option>
           <option value="JPEG">
             <brief>Joint Photographic Experts Group</brief>
             <description>
-	      Output Isis cube in JPEG format
+              Output Isis cube in JPEG format
             </description>
             <exclusions>
               <item>BITTYPE</item>
@@ -311,7 +313,7 @@
           <option value="JP2">
             <brief>Joint Photographic Experts Group 2000</brief>
             <description>
-	      Output Isis cube in JP2 format
+              Output Isis cube in JP2 format
             </description>
             <exclusions>
               <item>QUALITY</item>
@@ -320,19 +322,18 @@
         </list>
       </parameter> 
       <parameter name="QUALITY">
-          <type>integer</type>
-          <brief>Specify output image quality</brief>
-          <default><item>100</item></default>
-          <description>
-              This parameter allows the user to specify level of quality 
-              (compression) for the output image.  Some output image types may 
-              not utilize this parameter.  The range is from 100 (no 
-              compression and highest quality) to 0 (highest compression and 
-              reduced quality).  A value of -1 can be given to use the default 
-              settings.
-          </description>
-          <minimum inclusive="yes">-1</minimum>
-          <maximum inclusive="yes">100</maximum>
+        <type>integer</type>
+        <brief>Specify output image quality</brief>
+        <default><item>100</item></default>
+        <description>
+          This parameter allows the user to specify level of quality
+          (compression) for the output image.  Some output image types may not
+          utilize this parameter.  The range is from 100 (no compression and
+          highest quality) to 0 (highest compression and reduced quality).  A
+          value of -1 can be given to use the default settings.
+        </description>
+        <minimum inclusive="yes">-1</minimum>
+        <maximum inclusive="yes">100</maximum>
       </parameter>
       <parameter name="BITTYPE">
         <type>string</type>
@@ -342,9 +343,9 @@
         <brief>Bit type of output file</brief>
         <description>
           Bit type of output:
-            8 bit (0=black, 255=white)
-            16 bit unsigned (0=black, 65535=white)
-            16 bit signed (-32767=black, 32768=white)
+          8 bit (0=black, 255=white)
+          16 bit unsigned (0=black, 65535=white)
+          16 bit signed (-32767=black, 32768=white)
         </description>
         <list>
           <option value="8BIT">
@@ -377,21 +378,21 @@
         </default>
         <brief>Type of stretch</brief>
         <description>
-          This parameter is used to select one of three ways to stretch
-          (or map) output pixels.  The are LINEAR, PIECEWISE, or MANUAL.
+          This parameter is used to select one of three ways to stretch (or map)
+          output pixels.  The are LINEAR, PIECEWISE, or MANUAL.
         </description>
 
         <list>
           <option value="LINEAR">
             <brief> Linear stretch </brief>
             <description>
-              A minimum and maximum are automatically computed based on
-              the statistics of the selected band.  A histogram of the band
-              is used to pick the minimum at 0.5% of the data and the maximum
-              at 99.5% of the data.  Input pixels less than or equal to the
-              minimum are stretched to black while pixels greater than the or
-              equal to the maximum are stretched to white.  A linear mapping
-              occurs between the minimum and maximum.
+              A minimum and maximum are automatically computed based on the
+              statistics of the selected band.  A histogram of the band is used
+              to pick the minimum at 0.5% of the data and the maximum at 99.5%
+              of the data.  Input pixels less than or equal to the minimum are
+              stretched to black while pixels greater than the or equal to the
+              maximum are stretched to white.  A linear mapping occurs between
+              the minimum and maximum.
             </description>
             <exclusions>
               <item>MINIMUM</item>
@@ -410,13 +411,13 @@
             <brief> Piecewise-linear stretch </brief>
             <description>
               This option is similar to the LINEAR option.  A minimum and
-              maximum are automatically computed.  Additionally, the median
-              is computed and it is mapped to the middle gray value (halfway
+              maximum are automatically computed.  Additionally, the median is
+              computed and it is mapped to the middle gray value (halfway
               between white and black). Therefore, it is a piecewise-linear
               stretch with input pixels mapped linearly between either 1) the
               minimum/median or 2) the median/maximum.  This option is useful
-              for contrast stretching cubes with skewed histograms to ensure
-              a balanced contrast.
+              for contrast stretching cubes with skewed histograms to ensure a
+              balanced contrast.
             </description>
             <exclusions>
               <item>MINIMUM</item>
@@ -559,7 +560,8 @@
         <type>double</type>
         <brief>Minimum Percent</brief>
         <description>
-          The percentage of data in the histogram used to compute the minimum pixel value in the stretch.
+          The percentage of data in the histogram used to compute the minimum
+          pixel value in the stretch.
         </description>
         <default><item>0.5</item></default>
         <lessThan>
@@ -571,7 +573,8 @@
         <type>double</type>
         <brief>Maximum Percent</brief>
         <description>
-          The percentage of data in the histogram used to compute the maximum pixel value in the stretch.
+          The percentage of data in the histogram used to compute the maximum
+          pixel value in the stretch.
         </description>
         <default><item>99.5</item></default>
         <greaterThan>
