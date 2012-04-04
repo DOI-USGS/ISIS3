@@ -109,11 +109,14 @@ namespace Isis {
    *
    * @param filename The name of the cube
    * @param att The cube attributes such as band number
+   *
+   * @return The index of the newly added channel
    */
-  void ExportDescription::addChannel(Filename filename,
+  int ExportDescription::addChannel(Filename filename,
       CubeAttributeInput &att) {
 
     m_channels->append(new ChannelDescription(filename, att));
+    return m_channels->size() - 1;
   }
 
 
@@ -125,13 +128,16 @@ namespace Isis {
    * @param att The cube attributes such as band number
    * @param min The minimum DN in the input mapped to the minimum of the output
    * @param max The maximum DN in the input mapped to the maximum of the output
+   *
+   * @return The index of the newly added channel
    */
-  void ExportDescription::addChannel(
+  int ExportDescription::addChannel(
       Filename filename, CubeAttributeInput &att, double min, double max) {
 
     ChannelDescription *desc = new ChannelDescription(filename, att);
     desc->setInputRange(min, max);
     m_channels->append(desc);
+    return m_channels->size() - 1;
   }
 
 

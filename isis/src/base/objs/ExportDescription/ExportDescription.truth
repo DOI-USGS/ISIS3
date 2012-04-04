@@ -1,2 +1,19 @@
-Testing Isis::ExportDescription ...
-Test deferred to the appTest for isis2std
+********* Start testing of ExportDescription *********
+PASS : ExportDescription::getPixelType() : None == 0
+PASS : ExportDescription::setPixelType() : SignedWord == 4
+PASS : ExportDescription::getOutputMinimum() : -32752.0 == -32752.0
+PASS : ExportDescription::getOutputMaximum() : 32767.0 == 32767.0
+PASS : ExportDescription::getOutputNull() : -32768.0 == -32768.0
+PASS : ExportDescription::addChannel() : 0 == 0
+PASS : ExportDescription::addChannel() : 1 == 1
+PASS : ExportDescription::addChannel() : 2 == 2
+PASS : ExportDescription::channelCount() : 3 == 3
+PASS : ExportDescription::ChannelDescription::filename() : red.cub == red.cub
+PASS : ExportDescription::ChannelDescription::hasCustomRange() : false == 0
+PASS : ExportDescription::ChannelDescription::filename() : green.cub == green.cub
+PASS : ExportDescription::ChannelDescription::hasCustomRange() : true == 1
+PASS : ExportDescription::ChannelDescription::filename() : blue.cub == blue.cub
+PASS : ExportDescription::ChannelDescription::hasCustomRange() : true == 1
+PASS : ExportDescription::ChannelDescription::getInputMinimum() : 500.0 == 500.0
+PASS : ExportDescription::ChannelDescription::getInputMaximum() : 1000.0 == 1000.0
+********* Finished testing of ExportDescription *********

@@ -1,14 +1,99 @@
 #include <iostream>
-#include "Preference.h"
 
-using namespace std;
+#include <QList>
+
+#include "ExportDescription.h"
+#include "PixelType.h"
+#include "Preference.h"
+#include "iString.h"
+
+using namespace Isis;
+using std::cout;
+using std::endl;
+
+
+const iString className = "ExportDescription";
+
+
+void printFailure(iString methodName, iString message="") {
+  cout <<
+    "FAIL : " << className << "::" << methodName <<
+    " : " << message << endl;
+}
+
+
+template <class T>
+void compareEqual(iString methodName, T expected, T found,
+    iString expectedString="", iString foundString="") {
+
+  bool equal = expected == found;
+  cout <<
+    (equal ? "PASS : " : "FAIL : ") <<
+    className << "::" << methodName << " : " <<
+    (expectedString != "" ? expectedString : iString(expected)) <<
+    (equal ? " == " : " != ") <<
+    (foundString != "" ? foundString : iString(found)) << endl;
+}
 
 int main() {
-  Isis::Preference::Preferences(true);
+  Preference::Preferences(true);
 
-  // TODO actually test this
-  cout << "Testing Isis::ExportDescription ..." << endl;
-  cout << "Test deferred to the appTest for isis2std" << endl;
+  cout << "********* Start testing of " << className << " *********" << endl;
+  ExportDescription desc;
 
-  return (0);
+  compareEqual("getPixelType()", None, desc.getPixelType(), "None");
+
+  desc.setPixelType(SignedWord);
+  compareEqual("setPixelType()", SignedWord, desc.getPixelType(), "SignedWord");
+
+  compareEqual("getOutputMinimum()", -32752.0, desc.getOutputMinimum());
+  compareEqual("getOutputMaximum()", 32767.0, desc.getOutputMaximum());
+  compareEqual("getOutputNull()", -32768.0, desc.getOutputNull());
+
+  QList<Filename> filenames;
+  filenames.append(Filename("red.cub"));
+  filenames.append(Filename("green.cub"));
+  filenames.append(Filename("blue.cub"));
+  try {
+    CubeAttributeInput att;
+    int index = desc.addChannel(filenames[0], att);
+    compareEqual("addChannel()", 0, index);
+
+    index = desc.addChannel(filenames[1], att, 100.0, 500.0);
+    compareEqual("addChannel()", 1, index);
+
+    index = desc.addChannel(filenames[2], att, 500.0, 1000.0);
+    compareEqual("addChannel()", 2, index);
+  }
+  catch (IException &e) {
+    printFailure("addChannel()", e.toString());
+  }
+
+  iString innerName = "ChannelDescription";
+  compareEqual("channelCount()", 3, desc.channelCount());
+  for (int i = 0; i < desc.channelCount(); i++) {
+    const ExportDescription::ChannelDescription &channel = desc.getChannel(i);
+    compareEqual(innerName + "::filename()",
+        filenames[i].Name(), channel.filename().Name());
+
+    if (i == 0) {
+      compareEqual(innerName + "::hasCustomRange()",
+          false, channel.hasCustomRange(), "false");
+    }
+    else {
+      compareEqual(innerName + "::hasCustomRange()",
+          true, channel.hasCustomRange(), "true");
+
+      if (i == 2) {
+        compareEqual(innerName + "::getInputMinimum()",
+            500.0, channel.getInputMinimum());
+        compareEqual(innerName + "::getInputMaximum()",
+            1000.0, channel.getInputMaximum());
+      }
+    }
+  }
+
+  cout << "********* Finished testing of " << className << " *********" << endl;
+  return 0;
 }
+

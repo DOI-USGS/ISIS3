@@ -3,34 +3,36 @@
 <application name="isis2std" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>
-    Exports a cube to PNG, JPEG, TIFF, JPEG2000 format
+    Exports a cube to a PNG, BMP, GIF, TIFF, JPEG, or JPEG 2000
   </brief>
 
   <description>
     <p>
       This program will export an Isis cube to one of several popular standard
-      formats.  The formats may include PNG, JPEG, TIFF, BMP, GIF, and JP2.
-      Not all formats are available as the program implementation depends on the 
-      Qt library by TrollTech.  The JPEG2000 (JP2) format does not depend on the
-      Qt library for support. Support for JP2 is handled internally by the ISIS3
-      library. This program requires the input cube have exactly one band.
-      Therefore, you must input a cube with exactly one band or a multi-band
-      cube with a band specifier (e.g., file.cub+4). In addition if the cube 
-      has Mapping labels, the program will produce a world file for use in Arc
-      and/or other GIS type packages.  The file will have an extension that
-      uses the first and last letters for the image extenstion and a "w". For
-      example, tif produces a world file extension of tfw.
+      formats.  The formats may include PNG, JPEG, TIFF, BMP, GIF, and JP2.  Not
+      all formats are available as the program implementation depends on the Qt
+      library by TrollTech.  Furthermore, Qt can only export Isis cubes less
+      than 2GB in file size.  The JPEG2000 (JP2) and TIFF formats do not depend
+      on the Qt library, and can export arbitrarily large cubes.  Because these
+      cubes and writing routines are streamed lines at a time, very little of
+      the image will ever be held in memory at one time, so exporting to JP2 or
+      TIFF is suggested for large images.  TIFFs and JPEG 2000s can also be
+      output as 8-bit, signed 16-bit, or unsigned 16-bit files.
     </p>
-
     <p>
-      In order to ensure acceptable contrast in
-      the output file, three stretch options are given 1) linear,
-      2) piecewise-linear, and 3) manual.
-      Special pixels are mapped in the following manner, Low Saturation values
-      and Null are made black and High Saturation values are made white.
-      Please note: there is currently a 2GB filesize limit on the output image.
-      This limit does not apply to output JPEG2000 files. JPEG2000 files can
-      be output as 8-bit, signed 16-bit, or unsigned 16-bit files.
+      This program requires the input cube have exactly one band.  Therefore,
+      you must input a cube with exactly one band or a multi-band cube with a
+      band specifier (e.g., file.cub+4). In addition if the cube has Mapping
+      labels, the program will produce a world file for use in Arc and/or other
+      GIS type packages.  The file will have an extension that uses the first
+      and last letters for the image extenstion and a "w". For example, tif
+      produces a world file extension of tfw.
+    </p>
+    <p>
+      In order to ensure acceptable contrast in the output file, three stretch
+      options are given 1) linear, 2) piecewise-linear, and 3) manual.  Special
+      pixels are mapped in the following manner: Low Saturation values and Null
+      are made black and High Saturation values are made white.
     </p>
   </description>
 

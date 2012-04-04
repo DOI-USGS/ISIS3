@@ -9,6 +9,8 @@ using namespace Isis;
 
 
 void addChannel(ExportDescription &desc, iString param, iString mode);
+void addResults(PvlGroup &results, ImageExporter *exporter,
+    iString channel, int index);
 
 
 void IsisMain() {
@@ -25,18 +27,23 @@ void IsisMain() {
   else if (ui.GetString("BITTYPE") == "U16BIT")
     desc.setPixelType(UnsignedWord);
 
+  int redIndex;
+  int greenIndex;
+  int blueIndex;
+  int alphaIndex;
+
   iString mode = ui.GetString("MODE");
   if (mode == "GRAYSCALE") {
     addChannel(desc, "FROM", mode);
     exporter->setGrayscale(desc);
   }
   else {
-    addChannel(desc, "RED", mode);
-    addChannel(desc, "GREEN", mode);
-    addChannel(desc, "BLUE", mode);
+    redIndex = addChannel(desc, "RED", mode);
+    greenIndex = addChannel(desc, "GREEN", mode);
+    blueIndex = addChannel(desc, "BLUE", mode);
 
     if (mode == "RGBA") {
-      addChannel(desc, "ALPHA", mode);
+      alphaIndex = addChannel(desc, "ALPHA", mode);
       exporter->setRgba(desc);
     }
     else {
@@ -52,16 +59,16 @@ void IsisMain() {
     ui.Clear("MINIMUM");
     ui.Clear("MAXIMUM");
 
-    ui.PutDouble("RMIN", exporter->getInputMinimum(0));
-    ui.PutDouble("RMAX", exporter->getInputMaximum(0));
-    ui.PutDouble("GMIN", exporter->getInputMinimum(1));
-    ui.PutDouble("GMAX", exporter->getInputMaximum(1));
-    ui.PutDouble("BMIN", exporter->getInputMinimum(2));
-    ui.PutDouble("BMAX", exporter->getInputMaximum(2));
+    ui.PutDouble("RMIN", exporter->getInputMinimum(redIndex));
+    ui.PutDouble("RMAX", exporter->getInputMaximum(redIndex));
+    ui.PutDouble("GMIN", exporter->getInputMinimum(greenIndex));
+    ui.PutDouble("GMAX", exporter->getInputMaximum(greenIndex));
+    ui.PutDouble("BMIN", exporter->getInputMinimum(blueIndex));
+    ui.PutDouble("BMAX", exporter->getInputMaximum(blueIndex));
 
     if (mode == "ARGB") {
-      ui.PutDouble("AMIN", exporter->getInputMinimum(3));
-      ui.PutDouble("AMAX", exporter->getInputMaximum(3));
+      ui.PutDouble("AMIN", exporter->getInputMinimum(alphaIndex));
+      ui.PutDouble("AMAX", exporter->getInputMaximum(alphaIndex));
     }
   }
 
@@ -70,34 +77,14 @@ void IsisMain() {
   results += PvlKeyword("OutputFilename", outputName.Expanded());
 
   if (mode == "GRAYSCALE") {
-    results += PvlKeyword("InputMinimum", exporter->getInputMinimum(0));
-    results += PvlKeyword("InputMaximum", exporter->getInputMaximum(0));
+    addResults(results, exporter, "", 0);
   }
   else {
-    int redIndex = 0;
-    int greenIndex = 1;
-    int blueIndex = 2;
-    int alphaIndex = 3;
+    addResults(results, exporter, "Red", redIndex);
+    addResults(results, exporter, "Green", greenIndex);
+    addResults(results, exporter, "Blue", blueIndex);
 
-    results += PvlKeyword(
-        "RedInputMinimum", exporter->getInputMinimum(redIndex));
-    results += PvlKeyword(
-        "RedInputMaximum", exporter->getInputMaximum(redIndex));
-    results += PvlKeyword(
-        "GreenInputMinimum", exporter->getInputMinimum(greenIndex));
-    results += PvlKeyword(
-        "GreenInputMaximum", exporter->getInputMaximum(greenIndex));
-    results += PvlKeyword(
-        "BlueInputMinimum", exporter->getInputMinimum(blueIndex));
-    results += PvlKeyword(
-        "BlueInputMaximum", exporter->getInputMaximum(blueIndex));
-
-    if (mode == "ARGB") {
-      results += PvlKeyword(
-          "AlphaInputMinimum", exporter->getInputMinimum(alphaIndex));
-      results += PvlKeyword(
-          "AlphaInputMaximum", exporter->getInputMaximum(alphaIndex));
-    }
+    if (mode == "ARGB") addResults(results, exporter, "Alpha", alphaIndex);
   }
 
   Application::Log(results);
@@ -121,5 +108,15 @@ void addChannel(ExportDescription &desc, iString param, iString mode) {
   else {
     desc.addChannel(name, att);
   }
+}
+
+
+void addResults(PvlGroup &results, ImageExporter *exporter,
+    iString channel, int index) {
+
+  results += PvlKeyword(
+      channel + "InputMinimum", exporter->getInputMinimum(index));
+  results += PvlKeyword(
+      channel + "InputMaximum", exporter->getInputMaximum(index));
 }
 

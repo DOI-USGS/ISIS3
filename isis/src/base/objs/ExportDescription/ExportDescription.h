@@ -106,8 +106,8 @@ namespace Isis {
       double getOutputMaximum() const;
       double getOutputNull() const;
 
-      void addChannel(Filename filename, CubeAttributeInput &att);
-      void addChannel(Filename filename, CubeAttributeInput &att,
+      int addChannel(Filename filename, CubeAttributeInput &att);
+      int addChannel(Filename filename, CubeAttributeInput &att,
           double min, double max);
       const ChannelDescription & getChannel(int i) const;
       int channelCount() const;
