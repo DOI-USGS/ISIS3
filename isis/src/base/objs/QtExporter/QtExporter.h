@@ -32,15 +32,16 @@ namespace Isis {
   /**
    * @brief Exports cubes into one of several formats with Qt facilities
    *
-   * Takes a standard input image format and imports it into Isis in the cube
-   * format using Qt's QImage structure to handle reading the data into memory.
-   * See Qt's documentation on QImageReader for a complete list of supported
+   * Takes a series of single-banded Isis cubes and exports them into one of
+   * several possible standard image formats using Qt's QImage structure to
+   * handle reading the data into memory and setting individual pixel values.
+   * Set Qt's documentation on QImageWriter for a complete list of supported
    * formats:
    *
-   *   http://qt-project.org/doc/qt-4.8/qimagereader.html#supportedImageFormats
+   *   http://qt-project.org/doc/qt-4.8/qimagewriter.html#supportedImageFormats
    *
-   * While Qt can be used to import TIFF images into Isis, it is generally
-   * recommended to use the TiffImporter class instead, which uses LibTIFF
+   * While Qt can be used to export Isis cubes to TIFF images, it is generally
+   * recommended to use the TiffExporter class instead, which uses LibTIFF
    * version 4 to import big TIFFs.  Qt, as of version 4.8, can only import
    * images <2GB in size.
    *
@@ -49,6 +50,7 @@ namespace Isis {
    * @author 2012-04-03 Travis Addair
    *
    * @internal
+   *   @history 2012-04-04 Travis Addair - Added documentation.
    *
    */
   class QtExporter : public ImageExporter {
@@ -72,9 +74,10 @@ namespace Isis {
       void checkDataSize(BigInt samples, BigInt lines, int bands);
 
     private:
-      //! Structure holding all input image data in memory.
+      //! Structure holding all output image data in memory.
       QImage *m_qimage;
 
+      //! The lowercase abbreviated format of the output image.
       iString m_format;
   };
 };

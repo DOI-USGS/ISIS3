@@ -31,11 +31,17 @@ namespace Isis {
   /**
    * @brief Exports cubes into a standard format in incremental pieces
    *
+   * Abstract base class for a series of stream image exporters.  Stream
+   * exporters are specialized in that they write out data as a stream of lines
+   * as opposed to keeping the export data all in memory.  In this way, they can
+   * be run on arbitrarily large images.
+   *
    * @ingroup HighLevelCubeIO
    *
    * @author 2012-04-03 Travis Addair
    *
    * @internal
+   *   @history 2012-04-04 Travis Addair - Added documentation.
    *
    */
   class StreamExporter : public ImageExporter {
@@ -58,12 +64,32 @@ namespace Isis {
       virtual void writeRgb(vector<Buffer *> &in) const;
       virtual void writeRgba(vector<Buffer *> &in) const;
 
+      /**
+       * Pure virtual method for creating the buffer to store a chunk of
+       * streamed line data with one or more bands.
+       */
       virtual void createBuffer() = 0;
 
+      /**
+       * Pure virtual method for setting a particular index of the line buffer
+       * to the given DN.
+       *
+       * @param s The sample index into the buffer
+       * @param b The band index into the buffer
+       * @param dn The value to set at the given index
+       */
       virtual void setBuffer(int s, int b, int dn) const = 0; 
+
+      /**
+       * Pure virtual method for writing a line of buffered data to the output
+       * image on disk.
+       *
+       * @param l The line of the output image to write to
+       */
       virtual void writeLine(int l) const = 0;
 
     private:
+      //! Pixel type to export the data to.
       PixelType m_type;
   };
 };

@@ -10,9 +10,7 @@ using namespace Isis;
 
 namespace Isis {
   /**
-   * Construct the importer.
-   *
-   * @param inputName The name of the input image
+   * Construct the JPEG 2000 exporter.
    */
   JP2Exporter::JP2Exporter() : StreamExporter() {
     m_encoder = NULL;
@@ -23,7 +21,7 @@ namespace Isis {
 
 
   /**
-   * Destruct the importer.
+   * Destruct the exporter.
    */
   JP2Exporter::~JP2Exporter() {
     delete m_encoder;
@@ -34,6 +32,10 @@ namespace Isis {
   }
 
 
+  /**
+   * Creates the buffer to store a chunk of streamed line data with one or more
+   * bands.
+   */
   void JP2Exporter::createBuffer() {
     PixelType type = getPixelType();
     int mult = (type == Isis::UnsignedByte) ? 1 : 2;
@@ -44,6 +46,13 @@ namespace Isis {
   }
 
 
+  /**
+   * Initialize the encoder, open the output file for writing, then let the base
+   * ImageExporter handle the generic black-box writing routine.
+   *
+   * @param outputName The filename of the output cube
+   * @param quality The quality of the output, not used for JPEG 2000
+   */
   void JP2Exporter::write(Filename outputName, int quality) {
     PixelType type = getPixelType();
     m_encoder = new JP2Encoder(
@@ -54,6 +63,13 @@ namespace Isis {
   }
 
 
+  /**
+   * Set the DN value at the given sample and band of the line buffer.
+   *
+   * @param s The sample index into the buffer
+   * @param b The band index into the buffer
+   * @param dn The value to set at the given index
+   */
   void JP2Exporter::setBuffer(int s, int b, int dn) const {
     PixelType type = getPixelType();
     switch (type) {
@@ -74,6 +90,11 @@ namespace Isis {
   }
 
 
+  /**
+   * Writes a line of buffered data to the output image on disk.
+   *
+   * @param l The line of the output image, unused for JPEG 2000
+   */
   void JP2Exporter::writeLine(int l) const {
     PixelType type = getPixelType();
     if (type == Isis::UnsignedByte)
@@ -83,6 +104,13 @@ namespace Isis {
   }
 
 
+  /**
+   * Returns true if the format is "jp2".
+   *
+   * @param format Lowercase format abbreviation
+   *
+   * @return True if "jp2", false otherwise
+   */
   bool JP2Exporter::canWriteFormat(iString format) {
     return format == "jp2";
   }

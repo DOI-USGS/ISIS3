@@ -13,9 +13,9 @@ using namespace Isis;
 
 namespace Isis {
   /**
-   * Construct the importer.
+   * Construct the Qt exporter.
    *
-   * @param inputName The name of the input image
+   * @param format The format to export to
    */
   QtExporter::QtExporter(iString format) : ImageExporter() {
     m_qimage = NULL;
@@ -36,7 +36,7 @@ namespace Isis {
 
 
   /**
-   * Destruct the importer.
+   * Destruct the exporter.
    */
   QtExporter::~QtExporter() {
     delete m_qimage;
@@ -44,6 +44,13 @@ namespace Isis {
   }
 
 
+  /**
+   * Set the input with the description generically, check the data size for a
+   * single-band image with the established dimensions, initialize the image
+   * with the Indexed8 format, and setup the color table from 0 to 256.
+   *
+   * @param desc Export description containing necessary channel information
+   */
   void QtExporter::setGrayscale(ExportDescription &desc) {
     Cube *cube = setInput(desc);
     checkDataSize(cube->getSampleCount(), cube->getLineCount(), 1);
@@ -58,6 +65,13 @@ namespace Isis {
   }
 
 
+  /**
+   * Set the input with the description generically, check the data size for a
+   * three-band image with the established dimensions, and initialize the image
+   * with the RGB32 format.
+   *
+   * @param desc Export description containing necessary channel information
+   */
   void QtExporter::setRgb(ExportDescription &desc) {
     Cube *cube = setInput(desc);
     checkDataSize(cube->getSampleCount(), cube->getLineCount(), 3);
@@ -66,6 +80,13 @@ namespace Isis {
   }
 
 
+  /**
+   * Set the input with the description generically, check the data size for a
+   * four-band image with the established dimensions, and initialize the image
+   * with the ARGB32 format.
+   *
+   * @param desc Export description containing necessary channel information
+   */
   void QtExporter::setRgba(ExportDescription &desc) {
     Cube *cube = setInput(desc);
     checkDataSize(cube->getSampleCount(), cube->getLineCount(), 4);
@@ -74,6 +95,11 @@ namespace Isis {
   }
 
 
+  /**
+   * Write a line of grayscale data to the output image.
+   *
+   * @param in Vector containing a single grayscale input line
+   */
   void QtExporter::writeGrayscale(vector<Buffer *> &in) const {
     Buffer &grayLine = *in[0];
 
@@ -96,6 +122,11 @@ namespace Isis {
   }
 
 
+  /**
+   * Write a line of RGB data to the output image.
+   *
+   * @param in Vector containing three input lines (red, green, blue)
+   */
   void QtExporter::writeRgb(vector<Buffer *> &in) const {
     Buffer &redLine = *in[0];
     Buffer &greenLine = *in[1];
@@ -112,6 +143,11 @@ namespace Isis {
   }
 
 
+  /**
+   * Write a line of RGBA data to the output image.
+   *
+   * @param in Vector containing four input lines (red, green, blue, alpha)
+   */
   void QtExporter::writeRgba(vector<Buffer *> &in) const {
     Buffer &redLine = *in[0];
     Buffer &greenLine = *in[1];
@@ -130,6 +166,13 @@ namespace Isis {
   }
 
 
+  /**
+   * Let the base ImageExporter handle the generic black-box writing routine,
+   * then save the image to disk.
+   *
+   * @param outputName The filename of the output cube
+   * @param quality The quality of the output, not used for TIFF
+   */
   void QtExporter::write(Filename outputName, int quality) {
     ImageExporter::write(outputName, quality);
 
@@ -145,6 +188,14 @@ namespace Isis {
   }
 
 
+  /**
+   * Checks that the data size for an image of the desired dimensions will be
+   * less than 2GB.
+   *
+   * @param samples Number of samples in the output
+   * @param lines Number of lines in the output
+   * @param bands Number of bands in the output
+   */
   void QtExporter::checkDataSize(BigInt samples, BigInt lines, int bands) {
     // Qt has a 2GB limit on file sizes it can handle
     BigInt maxSize = (BigInt) 2 * 1024 * 1024 * 1024;
@@ -159,6 +210,13 @@ namespace Isis {
   }
 
 
+  /**
+   * Returns true if the format is supported by QImageWriter.
+   *
+   * @param format Lowercase format abbreviation
+   *
+   * @return True if supported in Qt, false otherwise
+   */
   bool QtExporter::canWriteFormat(iString format) {
     bool supported = false;
     QList<QByteArray> list = QImageWriter::supportedImageFormats();

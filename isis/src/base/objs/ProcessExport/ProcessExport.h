@@ -137,14 +137,9 @@ namespace Isis {
       void SetOutputEndian(enum ByteOrder endianness);
       void SetOutputType(Isis::PixelType pixelIn);
 
-      //! Get the valid minimum pixel value for the Nth input cube
-      double GetInputMinimum(const int n = 0) {
-        return (p_inputMinimum[n]);
-      };
-      //! Get the valid maximum pixel value for the Nth input cube
-      double GetInputMaximum(const int n = 0) {
-        return (p_inputMaximum[n]);
-      };
+      double GetInputMinimum(unsigned int n=0) const;
+      double GetInputMaximum(unsigned int n=0) const;
+
       //! Get the valid minimum pixel value to be written to the output file
       double GetOutputMinimum() {
         return (p_outputMinimum);

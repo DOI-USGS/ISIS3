@@ -32,11 +32,16 @@ namespace Isis {
   /**
    * @brief Exports cubes into JPEG 2000 images
    *
+   * A streamed exporter for JPEG 2000 images.  Can write an arbitrarily large
+   * set of single-band Isis cubes to an arbitrarily large JPEG 2000 image with
+   * the given pixel type.
+   *
    * @ingroup HighLevelCubeIO
    *
    * @author 2012-04-03 Travis Addair
    *
    * @internal
+   *   @history 2012-04-04 Travis Addair - Added documentation.
    *
    */
   class JP2Exporter : public StreamExporter {
@@ -55,8 +60,10 @@ namespace Isis {
       virtual void writeLine(int l) const;
 
     private:
+      //! Object responsible for writing data to the output image
       JP2Encoder *m_encoder;
 
+      //! Two dimensional array containing all color channels for a line
       char **m_buffer;
   };
 };

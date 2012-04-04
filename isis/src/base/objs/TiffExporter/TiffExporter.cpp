@@ -9,9 +9,7 @@ using namespace Isis;
 
 namespace Isis {
   /**
-   * Construct the importer.
-   *
-   * @param inputName The name of the input image
+   * Construct the TIFF exporter.
    */
   TiffExporter::TiffExporter() : StreamExporter() {
     m_image = NULL;
@@ -22,7 +20,7 @@ namespace Isis {
 
 
   /**
-   * Destruct the importer.
+   * Destruct the exporter.
    */
   TiffExporter::~TiffExporter() {
     _TIFFfree(m_raster);
@@ -33,6 +31,10 @@ namespace Isis {
   }
 
 
+  /**
+   * Creates the buffer to store a chunk of streamed line data with one or more
+   * bands.
+   */
   void TiffExporter::createBuffer() {
     PixelType type = getPixelType();
     int mult = (type == Isis::UnsignedByte) ? 1 : 2;
@@ -44,6 +46,13 @@ namespace Isis {
   }
 
 
+  /**
+   * Open the output file for writing, initialize its fields, then let the base
+   * ImageExporter handle the generic black-box writing routine.
+   *
+   * @param outputName The filename of the output cube
+   * @param quality The quality of the output, not used for TIFF
+   */
   void TiffExporter::write(Filename outputName, int quality) {
     // Open the output image
     if ((m_image = TIFFOpen(outputName.Expanded().c_str(), "w")) == NULL) {
@@ -69,6 +78,14 @@ namespace Isis {
   }
 
 
+  /**
+   * Set the DN value at the given sample and band, resolved to a single index,
+   * of the line buffer.
+   *
+   * @param s The sample component of the index into the buffer
+   * @param b The band component of the index into the buffer
+   * @param dn The value to set at the given index
+   */
   void TiffExporter::setBuffer(int s, int b, int dn) const {
     PixelType type = getPixelType();
     int index = s * bands() + b;
@@ -90,6 +107,11 @@ namespace Isis {
   }
 
 
+  /**
+   * Writes a line of buffered data to the output image on disk.
+   *
+   * @param l The line of the output image
+   */
   void TiffExporter::writeLine(int l) const {
     if (!TIFFWriteScanline(m_image, m_raster, l)) {
       throw IException(IException::Programmer,
@@ -98,6 +120,13 @@ namespace Isis {
   }
 
 
+  /**
+   * Returns true if the format is "tiff".
+   *
+   * @param format Lowercase format abbreviation
+   *
+   * @return True if "tiff", false otherwise
+   */
   bool TiffExporter::canWriteFormat(iString format) {
     return format == "tiff";
   }

@@ -31,11 +31,16 @@ namespace Isis {
   /**
    * @brief Exports cubes into TIFF images
    *
+   * A streamed exporter for TIFF images.  Can write an arbitrarily large set of
+   * single-band Isis cubes to an arbitrarily large TIFF image with the given
+   * pixel type.
+   *
    * @ingroup HighLevelCubeIO
    *
    * @author 2012-04-03 Travis Addair
    *
    * @internal
+   *   @history 2012-04-04 Travis Addair - Added documentation.
    *
    */
   class TiffExporter : public StreamExporter {
@@ -54,8 +59,10 @@ namespace Isis {
       virtual void writeLine(int l) const;
 
     private:
+      //! Object responsible for writing data to the output image
       TIFF *m_image;
 
+      //! Array containing all color channels for a line
       char *m_raster;
   };
 };

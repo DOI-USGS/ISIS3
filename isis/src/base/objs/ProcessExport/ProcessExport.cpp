@@ -416,6 +416,28 @@ namespace Isis {
    }
 
 
+   //! Get the valid minimum pixel value for the Nth input cube
+   double ProcessExport::GetInputMinimum(unsigned int n) const {
+     if (n >= p_inputMinimum.size())
+       throw IException(IException::Programmer,
+           "There is no input minimum for channel " + iString((int) n),
+           _FILEINFO_);
+
+     return p_inputMinimum[n];
+   }
+
+
+   //! Get the valid maximum pixel value for the Nth input cube
+   double ProcessExport::GetInputMaximum(unsigned int n) const {
+     if (n >= p_inputMaximum.size())
+       throw IException(IException::Programmer,
+           "There is no input maximum for channel " + iString((int) n),
+           _FILEINFO_);
+
+     return p_inputMaximum[n];
+   }
+
+
   /**
    * @brief Set output pixel range in Buffer
    *
@@ -772,8 +794,6 @@ namespace Isis {
     int length = (p_format == BIP) ?
       InputCubes[0]->getBandCount() : InputCubes[0]->getLineCount();
 
-    int samples = InputCubes[0]->getSampleCount();
-
     // Loop and let the app programmer fiddle with the lines
     vector<BufferManager *> imgrs = GetBuffers();
     for (int k = 1; k <= length; k++) {
@@ -784,7 +804,7 @@ namespace Isis {
         InputCubes[j]->read(*imgrs[j]);
 
         // Stretch the pixels into the desired range
-        for (int i = 0; i < samples; i++)
+        for (int i = 0; i < InputCubes[0]->getSampleCount(); i++)
           (*imgrs[j])[i] = p_str[j]->Map((*imgrs[j])[i]);
 
         ibufs.push_back(imgrs[j]);
@@ -802,18 +822,14 @@ namespace Isis {
   vector<BufferManager *> ProcessExport::GetBuffers() {
     InitProcess();
     vector<BufferManager *> imgrs;
-    int length;
     if (p_format == BSQ) {
       imgrs = GetBuffersBSQ();
-      length = InputCubes[0]->getLineCount();
     }
     else if (p_format == BIL || p_format == JP2) {
       imgrs = GetBuffersBIL();
-      length = InputCubes[0]->getLineCount();
     }
     else if (p_format == BIP) {
       imgrs = GetBuffersBIP();
-      length = InputCubes[0]->getBandCount();
     }
     else {
       string m = "Invalid storage order.";

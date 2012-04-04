@@ -9,9 +9,7 @@ using namespace Isis;
 
 namespace Isis {
   /**
-   * Construct the importer.
-   *
-   * @param inputName The name of the input image
+   * Construct the stream exporter.
    */
   StreamExporter::StreamExporter() : ImageExporter() {
     m_type = Isis::None;
@@ -19,33 +17,65 @@ namespace Isis {
 
 
   /**
-   * Destruct the importer.
+   * Destruct the exporter.
    */
   StreamExporter::~StreamExporter() {
   }
 
 
+  /**
+   * Generic initialization with the export description.  Stream exporters do
+   * not do anything special to export a grayscale image beyond setting up the
+   * appropriate number of color channels.
+   *
+   * @param desc Export description containing necessary channel information
+   */
   void StreamExporter::setGrayscale(ExportDescription &desc) {
     initialize(desc);
   }
 
 
+  /**
+   * Generic initialization with the export description.  Stream exporters do
+   * not do anything special to export an RGB image beyond setting up the
+   * appropriate number of color channels.
+   *
+   * @param desc Export description containing necessary channel information
+   */
   void StreamExporter::setRgb(ExportDescription &desc) {
     initialize(desc);
   }
 
 
+  /**
+   * Generic initialization with the export description.  Stream exporters do
+   * not do anything special to export an RGBA image beyond setting up the
+   * appropriate number of color channels.
+   *
+   * @param desc Export description containing necessary channel information
+   */
   void StreamExporter::setRgba(ExportDescription &desc) {
     initialize(desc);
   }
 
 
+  /**
+   * Generic initialization with the export description.  Set the input and set
+   * the pixel type.
+   *
+   * @param desc Export description containing necessary channel information
+   */
   void StreamExporter::initialize(ExportDescription &desc) {
     setInput(desc);
     setType(desc);
   }
 
 
+  /**
+   * Set the pixel type from the description and create the buffer.
+   *
+   * @param desc Export description containing necessary bit type information
+   */
   void StreamExporter::setType(ExportDescription &desc) {
     ProcessExport &p = getProcess();
     p.SetFormat(ProcessExport::BIL);
@@ -61,11 +91,21 @@ namespace Isis {
   }
 
 
+  /**
+   * Returns the pixel type.  Defaults to None if not set by the user.
+   *
+   * @return The pixel type: {None, UnsignedByte, SignedWord, UnsignedWord}
+   */
   PixelType StreamExporter::getPixelType() const {
     return m_type;
   }
 
 
+  /**
+   * Write a line of grayscale data to the output image.
+   *
+   * @param in Vector containing a single grayscale input line
+   */
   void StreamExporter::writeGrayscale(vector<Buffer *> &in) const {
     Buffer &grayLine = *in[0];
 
@@ -78,6 +118,11 @@ namespace Isis {
   }
 
 
+  /**
+   * Write a line of RGB data to the output image.
+   *
+   * @param in Vector containing three input lines (red, green, blue)
+   */
   void StreamExporter::writeRgb(vector<Buffer *> &in) const {
     Buffer &redLine = *in[0];
     Buffer &greenLine = *in[1];
@@ -97,6 +142,11 @@ namespace Isis {
   }
 
 
+  /**
+   * Write a line of RGBA data to the output image.
+   *
+   * @param in Vector containing four input lines (red, green, blue, alpha)
+   */
   void StreamExporter::writeRgba(vector<Buffer *> &in) const {
     Buffer &redLine = *in[0];
     Buffer &greenLine = *in[1];
