@@ -8,7 +8,7 @@
 using namespace Isis;
 
 
-void addChannel(ExportDescription &desc, iString param, iString mode);
+int addChannel(ExportDescription &desc, iString param, iString mode);
 void addResults(PvlGroup &results, ImageExporter *exporter,
     iString channel, int index);
 
@@ -27,10 +27,10 @@ void IsisMain() {
   else if (ui.GetString("BITTYPE") == "U16BIT")
     desc.setPixelType(UnsignedWord);
 
-  int redIndex;
-  int greenIndex;
-  int blueIndex;
-  int alphaIndex;
+  int redIndex = -1;
+  int greenIndex = -1;
+  int blueIndex = -1;
+  int alphaIndex = -1;
 
   iString mode = ui.GetString("MODE");
   if (mode == "GRAYSCALE") {
@@ -93,21 +93,24 @@ void IsisMain() {
 }
 
 
-void addChannel(ExportDescription &desc, iString param, iString mode) {
+int addChannel(ExportDescription &desc, iString param, iString mode) {
   UserInterface &ui = Application::GetUserInterface();
   Filename name = ui.GetFilename(param);
   CubeAttributeInput &att = ui.GetInputAttribute(param);
 
+  int index = -1;
   if (mode != "GRAYSCALE" && ui.GetString("STRETCH") == "MANUAL") {
     iString bandId = param.substr(0, 1);
     double min = ui.GetDouble(bandId + "MIN");
     double max = ui.GetDouble(bandId + "MAX");
 
-    desc.addChannel(name, att, min, max);
+    index = desc.addChannel(name, att, min, max);
   }
   else {
-    desc.addChannel(name, att);
+    index = desc.addChannel(name, att);
   }
+
+  return index;
 }
 
 
