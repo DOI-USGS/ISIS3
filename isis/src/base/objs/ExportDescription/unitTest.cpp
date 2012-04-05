@@ -35,6 +35,7 @@ void compareEqual(iString methodName, T expected, T found,
     (foundString != "" ? foundString : iString(found)) << endl;
 }
 
+
 int main() {
   Preference::Preferences(true);
 
@@ -56,6 +57,8 @@ int main() {
   filenames.append(Filename("blue.cub"));
   try {
     CubeAttributeInput att;
+    att.Set("+1");
+
     int index = desc.addChannel(filenames[0], att);
     compareEqual("addChannel()", 0, index);
 
@@ -75,6 +78,8 @@ int main() {
     const ExportDescription::ChannelDescription &channel = desc.getChannel(i);
     compareEqual(innerName + "::filename()",
         filenames[i].Name(), channel.filename().Name());
+    compareEqual(innerName + "::attributes()",
+        iString("1"), iString(channel.attributes().BandsStr()));
 
     if (i == 0) {
       compareEqual(innerName + "::hasCustomRange()",

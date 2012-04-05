@@ -9,10 +9,13 @@ PASS : ExportDescription::addChannel() : 1 == 1
 PASS : ExportDescription::addChannel() : 2 == 2
 PASS : ExportDescription::channelCount() : 3 == 3
 PASS : ExportDescription::ChannelDescription::filename() : red.cub == red.cub
+PASS : ExportDescription::ChannelDescription::attributes() : 1 == 1
 PASS : ExportDescription::ChannelDescription::hasCustomRange() : false == 0
 PASS : ExportDescription::ChannelDescription::filename() : green.cub == green.cub
+PASS : ExportDescription::ChannelDescription::attributes() : 1 == 1
 PASS : ExportDescription::ChannelDescription::hasCustomRange() : true == 1
 PASS : ExportDescription::ChannelDescription::filename() : blue.cub == blue.cub
+PASS : ExportDescription::ChannelDescription::attributes() : 1 == 1
 PASS : ExportDescription::ChannelDescription::hasCustomRange() : true == 1
 PASS : ExportDescription::ChannelDescription::getInputMinimum() : 500.0 == 500.0
 PASS : ExportDescription::ChannelDescription::getInputMaximum() : 1000.0 == 1000.0
