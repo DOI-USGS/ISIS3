@@ -1,0 +1,28 @@
+Test Huber
+Model set in Constructor with defualt TC: wFunc->sqrtWeightScaler(-0.5): 1.000000 wFunc->sqrtWeightScaler(0.75): 1.000000 wFunc->sqrtWeightScaler(-2): 0.820061 wFunc->sqrtWeightScaler(2.5): 0.733485
+TC constant re-set to 2.0:              : wFunc->sqrtWeightScaler(-0.5): 1.000000 wFunc->sqrtWeightScaler(0.75): 1.000000 wFunc->sqrtWeightScaler(-2): 1.000000 wFunc->sqrtWeightScaler(2.5): 0.894427
+TC constant re-est to default:          : wFunc->sqrtWeightScaler(-0.5): 1.000000 wFunc->sqrtWeightScaler(0.75): 1.000000 wFunc->sqrtWeightScaler(-2): 0.820061 wFunc->sqrtWeightScaler(2.5): 0.733485
+Model Manually set with default TC:     : wFunc->sqrtWeightScaler(-0.5): 1.000000 wFunc->sqrtWeightScaler(0.75): 1.000000 wFunc->sqrtWeightScaler(-2): 0.820061 wFunc->sqrtWeightScaler(2.5): 0.733485
+Model Manually set with TC =2.0:        : wFunc->sqrtWeightScaler(-0.5): 1.000000 wFunc->sqrtWeightScaler(0.75): 1.000000 wFunc->sqrtWeightScaler(-2): 1.000000 wFunc->sqrtWeightScaler(2.5): 0.894427
+
+Test HuberModified
+Model set in Constructor with defualt TC: wFunc->sqrtWeightScaler(-0.5): 0.985807 wFunc->sqrtWeightScaler(0.75): 0.968121 wFunc->sqrtWeightScaler(-2): 0.778042 wFunc->sqrtWeightScaler(2.5): 0.695902
+TC constant re-set to 2.0:              : wFunc->sqrtWeightScaler(-0.5): 0.994794 wFunc->sqrtWeightScaler(0.75): 0.988295 wFunc->sqrtWeightScaler(-2): 0.917317 wFunc->sqrtWeightScaler(2.5): 0.871314
+TC constant re-est to default:          : wFunc->sqrtWeightScaler(-0.5): 0.985807 wFunc->sqrtWeightScaler(0.75): 0.968121 wFunc->sqrtWeightScaler(-2): 0.778042 wFunc->sqrtWeightScaler(2.5): 0.695902
+Model Manually set with default TC:     : wFunc->sqrtWeightScaler(-0.5): 0.985807 wFunc->sqrtWeightScaler(0.75): 0.968121 wFunc->sqrtWeightScaler(-2): 0.778042 wFunc->sqrtWeightScaler(2.5): 0.695902
+Model Manually set with TC =2.0:        : wFunc->sqrtWeightScaler(-0.5): 0.994794 wFunc->sqrtWeightScaler(0.75): 0.988295 wFunc->sqrtWeightScaler(-2): 0.917317 wFunc->sqrtWeightScaler(2.5): 0.871314
+
+Test Welsch
+Model set in Constructor with defualt TC: wFunc->sqrtWeightScaler(-0.5): 0.986065 wFunc->sqrtWeightScaler(0.75): 0.968920 wFunc->sqrtWeightScaler(-2): 0.798898 wFunc->sqrtWeightScaler(2.5): 0.704114
+TC constant re-set to 2.0:              : wFunc->sqrtWeightScaler(-0.5): 0.969233 wFunc->sqrtWeightScaler(0.75): 0.932102 wFunc->sqrtWeightScaler(-2): 0.606531 wFunc->sqrtWeightScaler(2.5): 0.457833
+TC constant re-est to default:          : wFunc->sqrtWeightScaler(-0.5): 0.986065 wFunc->sqrtWeightScaler(0.75): 0.968920 wFunc->sqrtWeightScaler(-2): 0.798898 wFunc->sqrtWeightScaler(2.5): 0.704114
+Model Manually set with default TC:     : wFunc->sqrtWeightScaler(-0.5): 0.986065 wFunc->sqrtWeightScaler(0.75): 0.968920 wFunc->sqrtWeightScaler(-2): 0.798898 wFunc->sqrtWeightScaler(2.5): 0.704114
+Model Manually set with TC =2.0:        : wFunc->sqrtWeightScaler(-0.5): 0.969233 wFunc->sqrtWeightScaler(0.75): 0.932102 wFunc->sqrtWeightScaler(-2): 0.606531 wFunc->sqrtWeightScaler(2.5): 0.457833
+
+Test Chen
+Model set in Constructor with defualt TC: wFunc->sqrtWeightScaler(-0.5): 1.837117 wFunc->sqrtWeightScaler(0.75): 1.071652 wFunc->sqrtWeightScaler(-2): 0.000000 wFunc->sqrtWeightScaler(2.5): 0.000000
+TC constant re-set to 2.0:              : wFunc->sqrtWeightScaler(-0.5): 9.185587 wFunc->sqrtWeightScaler(0.75): 8.420121 wFunc->sqrtWeightScaler(-2): 0.000000 wFunc->sqrtWeightScaler(2.5): 0.000000
+TC constant re-est to default:          : wFunc->sqrtWeightScaler(-0.5): 1.837117 wFunc->sqrtWeightScaler(0.75): 1.071652 wFunc->sqrtWeightScaler(-2): 0.000000 wFunc->sqrtWeightScaler(2.5): 0.000000
+Model Manually set with default TC:     : wFunc->sqrtWeightScaler(-0.5): 1.837117 wFunc->sqrtWeightScaler(0.75): 1.071652 wFunc->sqrtWeightScaler(-2): 0.000000 wFunc->sqrtWeightScaler(2.5): 0.000000
+Model Manually set with TC =2.0:        : wFunc->sqrtWeightScaler(-0.5): 9.185587 wFunc->sqrtWeightScaler(0.75): 8.420121 wFunc->sqrtWeightScaler(-2): 0.000000 wFunc->sqrtWeightScaler(2.5): 0.000000
+
