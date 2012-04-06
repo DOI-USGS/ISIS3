@@ -71,6 +71,13 @@ namespace Isis {
       //! Destructor
       virtual ~MinimumDifference() {};
 
+      /**
+       * Minimum tolerance specific to algorithm
+       */
+      virtual double MostLenientTolerance() {
+        return DBL_MAX;
+      }
+
     protected:
       virtual double MatchAlgorithm(Chip &pattern, Chip &subsearch);
       virtual bool CompareFits(double fit1, double fit2);

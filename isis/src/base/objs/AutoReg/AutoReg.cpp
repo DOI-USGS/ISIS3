@@ -323,6 +323,19 @@ namespace Isis {
     }
   }
 
+
+  iString AutoReg::GradientFilterString() const {
+    switch (p_gradientFilterType) {
+      case None: return "None";
+      case Sobel: return "Sobel";
+      default: throw IException(
+                   IException::Programmer,
+                   "AutoReg only allows Sobel gradient filter or None",
+                   _FILEINFO_);
+    }
+  }
+
+
   /**
    * If the sub-pixel accuracy is enabled, the Register() method will attempt to
    * match the pattern chip to the search chip at sub-pixel accuracy, otherwise it
@@ -1548,6 +1561,55 @@ namespace Isis {
       if(smodel.HasKeyword("ResidualTolerance")) {
         reg += PvlKeyword("ResidualTolerance", smodel["ResidualTolerance"][0]);
       }
+    }
+
+    return reg;
+  }
+
+
+  /**
+   * Returns a PvlGroup containing the PvlKeywords of the parameters this object
+   * was most recently run with.  Because of publically accessible mutators,
+   * AutoReg's runtime parameters can change, and this version of the template
+   * is designed to reflect the paramters it was actually run with, as opposed
+   * to simply initialized with.  If no mutators were ever called externally,
+   * then this PvlGroup should be the same as the one received from
+   * RegTemplate().
+   *
+   * @return @b PvlGroup The keywords this object was most recently run with
+   */
+  PvlGroup AutoReg::UpdatedTemplate() {
+    PvlGroup reg("AutoRegistration");
+
+    reg += PvlKeyword("Algorithm", AlgorithmName());
+    reg += PvlKeyword("Tolerance", Tolerance());
+    reg += PvlKeyword("SubpixelAccuracy",
+        SubPixelAccuracy() ? "True" : "False");
+    reg += PvlKeyword("ReductionFactor", ReductionFactor());
+    reg += PvlKeyword("Gradient", GradientFilterString());
+
+    Chip *pattern = PatternChip();
+    reg += PvlKeyword("PatternSamples", pattern->Samples());
+    reg += PvlKeyword("PatternLines", pattern->Lines());
+    reg += PvlKeyword("MinimumZScore", MinimumZScore());
+    reg += PvlKeyword("ValidPercent", PatternValidPercent());
+    // TODO Chip needs accessors to valid minimum and maximum
+
+    Chip *search = SearchChip();
+    reg += PvlKeyword("SearchSamples", search->Samples());
+    reg += PvlKeyword("SearchLines", search->Lines());
+    reg += PvlKeyword("SubchipValidPercent", SubsearchValidPercent());
+    // TODO Chip needs accessors to valid minimum and maximum
+
+    if (SubPixelAccuracy()) {
+      reg += PvlKeyword("DistanceTolerance", DistanceTolerance());
+      reg += PvlKeyword("WindowSize", WindowSize());
+
+      if (p_testEccentricity)
+        reg += PvlKeyword("EccentricityRatio", EccentricityRatioTolerance());
+
+      if (p_testResidual)
+        reg += PvlKeyword("ResidualTolerance", ResidualTolerance());
     }
 
     return reg;

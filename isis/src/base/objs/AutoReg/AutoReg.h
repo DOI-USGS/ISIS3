@@ -271,6 +271,8 @@ namespace Isis {
       void SetSurfaceModelResidualTolerance(double residualTolerance);
       void SetGradientFilterType(const iString& gradientFilterType);
 
+      iString GradientFilterString() const;
+
       /**
        * Determine if eccentricity tests should be performed during 
        * registration. 
@@ -306,6 +308,11 @@ namespace Isis {
         return p_subpixelAccuracy;
       }
 
+      //! Return the reduction factor.
+      int ReductionFactor() {
+        return p_reduceFactor;
+      }
+
       //! Return pattern chip valid percent.  The default value is 
       double PatternValidPercent() const {
         return p_patternValidPercent;
@@ -319,6 +326,11 @@ namespace Isis {
       //! Return match algorithm tolerance
       inline double Tolerance() const {
         return p_tolerance;
+      };
+
+      //! Return window size
+      double WindowSize() const {
+        return p_windowSize;
       };
 
       //! Return distance tolerance
@@ -438,6 +450,13 @@ namespace Isis {
       }
 
       /**
+       * Minimum tolerance specific to algorithm
+       */
+      virtual double MostLenientTolerance() {
+        return DBL_MIN;
+      }
+
+      /**
        * Returns the name of the algorithm.
        *
        *
@@ -446,6 +465,8 @@ namespace Isis {
       virtual iString AlgorithmName() const = 0;
 
       PvlGroup RegTemplate();
+
+      PvlGroup UpdatedTemplate();
 
     protected:
       /**
