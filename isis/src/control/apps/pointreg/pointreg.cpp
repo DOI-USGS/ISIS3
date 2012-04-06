@@ -38,10 +38,18 @@ int unregistered;
 bool logFalsePositives;
 bool revertFalsePositives;
 int expansion;
+double resTolerance;
 
 
 class Validation {
   public:
+    enum Result {
+      Untested,
+      Success,
+      Failure,
+      Skipped
+    };
+
     Validation(string test, ControlMeasure *held, ControlMeasure *registered,
         double tolerance) {
 
@@ -57,15 +65,60 @@ class Validation {
       m_shiftSample = 0.0;
       m_shiftLine = 0.0;
 
+      m_resDiff = 0.0;
+      m_resTolerance = 0.0;
+
       m_shift = 0.0;
       m_shiftTolerance = tolerance;
-      m_valid = false;
+
+      m_result = Untested;
     }
 
     ~Validation() {}
 
-    bool validated() {
-      return m_valid;
+    bool untested() const {
+      return m_result == Untested;
+    }
+
+    bool succeeded() const {
+      return m_result == Success;
+    }
+
+    bool failed() const {
+      return m_result == Failure;
+    }
+
+    bool skipped() const {
+      return m_result == Skipped;
+    }
+
+    string resultString() const {
+      switch (m_result) {
+        case Untested: return "Untested";
+        case Success: return "Success";
+        case Failure: return "Failure";
+        case Skipped: return "Skipped";
+        default: throw IException(IException::Programmer,
+                     "Unknown value for m_result", _FILEINFO_);
+      }
+    }
+
+    void setValidity(bool valid) {
+      m_result = valid ? Success : Failure;
+    }
+
+    void skip(string testFailure) {
+      m_test = testFailure;
+      m_result = Skipped;
+    }
+
+    void compareResolutions(double heldResolution, double registeredResolution,
+        double tolerance) {
+
+      m_resDiff = fabs(heldResolution - registeredResolution);
+      m_resTolerance = tolerance;
+
+      if (m_resDiff > m_resTolerance) skip("Resolution Tolerance");
     }
 
     void compare(double shiftSample, double shiftLine) {
@@ -76,22 +129,24 @@ class Validation {
       double lineShift = shiftLine - m_aprioriLine;
 
       m_shift = sqrt(pow(sampleShift, 2) + pow(lineShift, 2));
-      m_valid = m_shift <= m_shiftTolerance;
+      setValidity(m_shift <= m_shiftTolerance);
     }
 
     static string getHeader() {
-      return "Test,PointID,HeldID,RegisteredID,"
+      return "Result,Test,PointID,HeldID,RegisteredID,"
           "Sample,Line,ShiftedSample,ShiftedLine,"
+          "ResolutionDifference,ResolutionTolerance,"
           "Shift,ShiftTolerance";
     }
 
     string toString() {
       stringstream stream;
       stream <<
-        m_test << "," << m_pointId << "," <<
+        resultString() << "," << m_test << "," << m_pointId << "," <<
         m_heldId << "," << m_registeredId << "," <<
         m_aprioriSample << "," << m_aprioriLine << "," <<
         m_shiftSample << "," << m_shiftLine << "," <<
+        m_resDiff << "," << m_resTolerance << "," <<
         m_shift << "," << m_shiftTolerance;
       return stream.str();
     }
@@ -107,10 +162,13 @@ class Validation {
     double m_shiftSample;
     double m_shiftLine;
 
+    double m_resDiff;
+    double m_resTolerance;
+
     double m_shift;
     double m_shiftTolerance;
 
-    bool m_valid;
+    Result m_result;
 };
 
 
@@ -216,6 +274,7 @@ void IsisMain() {
         patternSamples + expansion, patternLines + expansion);
 
     revertFalsePositives = ui.GetBoolean("REVERT");
+    resTolerance = ui.GetDouble("RESTOLERANCE");
   }
 
   // Register the points and create a new
@@ -651,7 +710,10 @@ void validatePoint(ControlPoint *point, ControlMeasure *reference,
         Validation validation = backRegister(
             reference, measure, shiftTolerance);
 
-        if (!validation.validated()) {
+        // If the validation failed, or we were unable to perform the validation
+        // due to registration errors, we consider this registration to be a
+        // false positive
+        if (validation.failed() || validation.untested()) {
           if (revertFalsePositives) {
             measure->SetType(ControlMeasure::Candidate);
             measure->SetCoordinate(
@@ -659,8 +721,12 @@ void validatePoint(ControlPoint *point, ControlMeasure *reference,
             measure->SetIgnored(true);
             // TODO remove log data here
           }
+        }
 
-          if (logFalsePositives) {
+        // If the registration did not succeed for whatever reason (untested,
+        // failed, or skipped due to incompatible data), log the result
+        if (logFalsePositives) {
+          if (!validation.succeeded()) {
             falsePositives->append(
                 QString::fromStdString(validation.toString()));
           }
@@ -674,55 +740,29 @@ void validatePoint(ControlPoint *point, ControlMeasure *reference,
 Validation backRegister(ControlMeasure *reference, ControlMeasure *measure,
     double shiftTolerance) {
 
+  Validation validation(
+      "Back-Registration", measure, reference, shiftTolerance);
+
   Cube &patternCube = *cubeMgr->OpenCube(files->Filename(
         measure->GetCubeSerialNumber()));
   Cube &searchCube = *cubeMgr->OpenCube(files->Filename(
         reference->GetCubeSerialNumber()));
 
-  /* TODO remove
-  int patternSamples = validator->PatternChip()->Samples();
-  int patternLines = validator->PatternChip()->Lines();
+  double patternRes = getResolution(patternCube, *measure);
+  double searchRes = getResolution(searchCube, *reference);
+  validation.compareResolutions(patternRes, searchRes, resTolerance);
 
-  double patternResolution = getResolution(patternCube, *measure);
-  double searchResolution = getResolution(searchCube, *reference);
-
-  double tolerance = shiftTolerance;
-  if (patternResolution > searchResolution) {
-    double ratio = patternResolution / searchResolution;
-    tolerance *= ratio;
-
-    int adjustedSamples = (int) patternSamples * ratio;
-    int adjustedLines = (int) patternLines * ratio;
-
-    if (adjustedSamples % 2 == 0) adjustedSamples++;
-    if (adjustedLines % 2 == 0) adjustedLines++;
-
-    validator->SearchChip()->SetSize(
-        adjustedSamples + expansion, adjustedLines + expansion);
-    validator->PatternChip()->SetSize(adjustedSamples, adjustedLines);
-  }
-  */
+  if (validation.skipped()) 
+    return validation;
 
   validator->SearchChip()->TackCube(
       reference->GetSample(), reference->GetLine());
   validator->PatternChip()->TackCube(measure->GetSample(), measure->GetLine());
   validator->PatternChip()->Load(patternCube);
 
-  /* TODO remove
-   double validPercent = validator->PatternValidPercent();
-   Statistics *stats = validator->PatternChip()->Statistics();
-   double validRatio = (double) stats->ValidPixels() / stats->TotalPixels();
-   if (validRatio * 100.0 > validPercent) {
-     double newValidPercent = validPercent * validRatio;
-     validator->SetPatternValidPercent(newValidPercent);
-   }
-   */
-
   verifyCube(patternCube);
   verifyCube(searchCube);
 
-  Validation validation(
-      "Back-Registration", measure, reference, shiftTolerance);
   try {
     validator->SearchChip()->Load(
         searchCube, *(validator->PatternChip()), patternCube);
@@ -748,13 +788,6 @@ Validation backRegister(ControlMeasure *reference, ControlMeasure *measure,
   }
   catch (IException &e) {
   }
-
-  /* TODO remove
-  validator->PatternChip()->SetSize(patternSamples, patternLines);
-  validator->SearchChip()->SetSize(
-      patternSamples + expansion, patternLines + expansion);
-  validator->SetPatternValidPercent(validPercent);
-  */
 
   return validation;
 }

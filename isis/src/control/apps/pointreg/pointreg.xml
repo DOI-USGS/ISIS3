@@ -221,6 +221,11 @@
       Eccentricity, AverageResidual, and renamed GoodnessOfFit to
       WholePixelCorrelation.
     </change>
+    <change name="Travis Addair" date="2012-04-06">
+      Added RESTOLERANCE option enabling users to skip validation for
+      registrations whose measurements differ in resolution greater than the
+      specified tolerance.
+    </change>
   </history>
 
   <groups>
@@ -480,6 +485,7 @@
             <exclusions>
               <item>REVERT</item>
               <item>SEARCH</item>
+              <item>RESTOLERANCE</item>
               <item>SHIFT</item>
               <item>FALSEPOSITIVES</item>
             </exclusions>
@@ -545,6 +551,30 @@
           to 5).
         </description>
         <internalDefault>WindowSize</internalDefault>
+      </parameter>
+
+      <parameter name="RESTOLERANCE">
+        <type>double</type>
+        <brief>
+          Maximum allowed difference in resolution for validating a registration
+        </brief>
+        <description>
+          <p>
+            Differences in image resolution can often lead to poor
+            registrations.  Because validation is itself a registration process,
+            it can also lead to poor validations.  When considering a
+            registration to be validated, if the two measurements differ in
+            image resolution by more than this tolerance (in meters per pixel),
+            then the validation will be skipped.  By default, this value is set
+            to 5.0 meters per pixel.
+          </p>
+          <p>
+            Note that skipped registrations will be reported to the
+            FALSEPOSITIVES report, but will <b>not</b> be reverted when the
+            REVERT option is enabled.
+          </p>
+        </description>
+        <default><item>5.0</item></default>
       </parameter>
 
       <parameter name="SHIFT">
