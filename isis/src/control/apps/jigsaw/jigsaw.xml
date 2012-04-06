@@ -393,7 +393,197 @@
           <item>3.0</item>
         </default>
       </parameter>
+   </group>
+
+   <group name="Maximum Likelihood Estimation">
+    
+      <parameter name="MODEL1">
+        <type>string</type>
+        <brief>A maximum likelihood estimation model selection.</brief>
+        <description> A maximum likelihood estimation model selection.
+        </description>
+        <default><item>NONE</item></default>
+        <list>
+          <option value="NONE">
+            <brief>None: no tier one maximumlikelihood estimation</brief>
+            <description>
+              None: no tier one maximumlikelihood estimation
+            </description>
+            <exclusions>
+               <item>MODEL2</item>
+               <item>MODEL3</item>
+               <item>MAX_MODEL1_C_QUANTILE</item>
+               <item>MAX_MODEL2_C_QUANTILE</item>
+               <item>MAX_MODEL3_C_QUANTILE</item>
+            </exclusions>
+          </option>
+          <option value="HUBER">
+            <brief>Huber: aproximates the L2 norm near 0, and the L1 norm therafter.  Has one continuous derivative.</brief>
+            <description>
+               A highly recommend model, that works well in many situations.
+            </description>
+            <exclusions>
+               <item>REJECTION_MULTIPLIER</item>
+               <item>OUTLIER_REJECTION</item>
+               <item>ERRORPROPAGATION</item>
+            </exclusions>
+          </option>
+          <option value="HUBER_MODIFIED">
+            <brief>Huber Modified: approximates the L2 norm near 0 and the L1 norm thereafter.  Has two continuous derivatives.</brief>
+            <description>
+               An adaptation of the hignly recomended Huber model that has two continuous derviatives.
+            </description>
+            <exclusions>
+               <item>REJECTION_MULTIPLIER</item>
+               <item>OUTLIER_REJECTION</item>
+               <item>ERRORPROPAGATION</item>
+            </exclusions>
+          </option>
+        </list>
+      </parameter>
+
+      <parameter name="MAX_MODEL1_C_QUANTILE">
+        <brief>Quantile of the |resiudual| distribution used to set the tweaking constant of the maximum likelihood estimation model.</brief>
+        <description> 
+          The tweaking constant has differenct meaning depending on the model being used:
+            Huber models:  The point at which the transformation motion from L2 to L1 norms takes place.  Recomended quantile: 0.5
+            Welsch model:  Residuals whose absolute value is twice the tweaking constant are approaching negligible significance. Recomended quantile: 0.7
+            Chen model:    Residuals whose absolute values is greater than the tweaking constant are total ignored.  Recomend quantile: > 0.9
+        </description>
+        <type>double</type>
+        <default>
+          <item>0.5</item>
+        </default>
+        <minimum inclusive="no">0</minimum>
+        <maximum incluseive="no">1</maximum>
+      </parameter>
+
+      <parameter name="MODEL2">
+        <type>string</type>
+        <brief>A maximum likelihood estimation model selection.</brief>
+        <description> A maximum likelihood estimation model selection.
+        </description>
+        <default><item>NONE</item></default>
+        <list>
+          <option value="NONE">
+            <brief>None: no tier two maximumlikelihood estimation</brief>
+            <description>
+              None: no tier two maximumlikelihood estimation
+            </description>
+            <exclusions>
+               <item>MODEL3</item>
+               <item>MAX_MODEL2_C_QUANTILE</item>
+               <item>MAX_MODEL3_C_QUANTILE</item>
+            </exclusions>
+          </option>
+          <option value="HUBER">
+            <brief>Huber: aproximates the L2 norm near 0, and the L1 norm therafter.  Has one continuous derivative.</brief>
+            <description>
+               A highly recommend model, that works well in many situations.
+            </description>
+          </option>
+          <option value="HUBER_MODIFIED">
+            <brief>Huber Modified: approximates the L2 norm near 0 and the L1 norm thereafter.  Has two continuous derivatives.</brief>
+            <description>
+               An adaptation of the hignly recomended Huber model that has two continuous derviatives.
+            </description>
+          </option>
+          <option value="WELSCH">
+            <brief>Welsch: aprroximates the L2 norm near 0, but then decays exponentially to zero.</brief>
+            <description>
+               This model reduces the significance of large residuals more agressively than Huber.  Large residuals will have less influence than small residuals,
+               and they approach negligibility as they approach infinity.  Measures can be effectively 'removed' by this method, which may cause singularities and/or islands.
+            </description>
+          </option>
+          <option value="CHEN">
+            <brief>Chen: a highly aggresive method that intentionally removes the largest few percent of residuals</brief>
+            <description>
+               This mehtod dramatically increases the influence of smaller residuals (beyond the L2 norm), while at the same time totally ignoring the largest few
+               percent of the residuals.
+            </description>
+          </option>
+        </list>
+      </parameter>
+
+      <parameter name="MAX_MODEL2_C_QUANTILE">
+        <brief>Quantile of the |resiudual| distribution used to set the tweaking constant of the maximum likelihood estimation model.</brief>
+        <description> 
+          The tweaking constant has differenct meaning depending on the model being used:
+            Huber models:  The point at which the transformation motion from L2 to L1 norms takes place.  Recomended quantile: 0.5
+            Welsch model:  Residuals whose absolute value is twice the tweaking constant are approaching negligible significance. Recomended quantile: 0.7
+            Chen model:    Residuals whose absolute values is greater than the tweaking constant are total ignored.  Recomend quantile: > 0.9
+        </description>
+        <type>double</type>
+        <default>
+          <item>0.5</item>
+        </default>
+        <minimum inclusive="no">0</minimum>
+        <maximum incluseive="no">1</maximum>
+      </parameter>
+
+      <parameter name="MODEL3">
+        <type>string</type>
+        <brief>A maximum likelihood estimation model selection.</brief>
+        <description> A maximum likelihood estimation model selection.
+        </description>
+        <default><item>NONE</item></default>
+        <list>
+          <option value="NONE">
+            <brief>None: no tier three maximumlikelihood estimation</brief>
+            <description>
+              None: no tier three maximumlikelihood estimation
+            </description>
+            <exclusions>
+               <item>MAX_MODEL3_C_QUANTILE</item>
+            </exclusions>
+          </option>
+          <option value="HUBER">
+            <brief>Huber: aproximates the L2 norm near 0, and the L1 norm therafter.  Has one continuous derivative.</brief>
+            <description>
+               A highly recommend model, that works well in many situations.
+            </description>
+          </option>
+          <option value="HUBER_MODIFIED">
+            <brief>Huber Modified: approximates the L2 norm near 0 and the L1 norm thereafter.  Has two continuous derivatives.</brief>
+            <description>
+               An adaptation of the hignly recomended Huber model that has two continuous derviatives.
+            </description>
+          </option>
+          <option value="WELSCH">
+            <brief>Welsch: aprroximates the L2 norm near 0, but then decays exponentially to zero.</brief>
+            <description>
+               This model reduces the significance of large residuals more agressively than Huber.  Large residuals will have less influence than small residuals,
+               and they approach negligibility as they approach infinity.  Measures can be effectively 'removed' by this method, which may cause singularities and/or islands.
+            </description>
+          </option>
+          <option value="CHEN">
+            <brief>Chen: a highly aggresive method that intentionally removes the largest few percent of residuals</brief>
+            <description>
+               This mehtod dramatically increases the influence of smaller residuals (beyond the L2 norm), while at the same time totally ignoring the largest residuals.
+            </description>
+          </option>
+        </list>
+      </parameter>
+
+      <parameter name="MAX_MODEL3_C_QUANTILE">
+        <brief>Quantile of the |resiudual| distribution used to set the tweaking constant of the maximum likelihood estimation model.</brief>
+        <description> 
+          The tweaking constant has differenct meaning depending on the model being used:
+            Huber models:  The point at which the transformation motion from L2 to L1 norms takes place.  Recomended quantile: 0.5
+            Welsch model:  Residuals whose absolute value is twice the tweaking constant are approaching negligible significance. Recomended quantile: 0.7
+            Chen model:    Residuals whose absolute values is greater than the tweaking constant are total ignored.  Recomend quantile: > 0.9
+        </description>
+        <type>double</type>
+        <default>
+          <item>0.5</item>
+        </default>
+        <minimum inclusive="no">0</minimum>
+        <maximum incluseive="no">1</maximum>
+      </parameter>
+
     </group>
+
+ 
 
     <group name="Convergence Criteria">
       <parameter name="SIGMA0">

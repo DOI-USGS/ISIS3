@@ -1293,7 +1293,7 @@ namespace Isis {
       catch (IException &e) {
         iString msg = "Unable to create camera for cube file ";
         msg += filename;
-        throw IException(IException::Unknown, msg, _FILEINFO_);
+        throw IException(e, IException::Unknown, msg, _FILEINFO_);
       }
 
       if (progress != NULL)

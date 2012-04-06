@@ -53,6 +53,8 @@ template< typename A, typename B > class QMap;
 namespace Isis {
   class LeastSquares;
   class BasisFunction;
+  class MaximumLikelihoodWFunctions;
+  class StatCumProbDistDynCalc;
 
   /**
    * @author 2006-05-30 Jeff Anderson, Debbie A. Cook, and Tracie Sucharski
@@ -137,19 +139,14 @@ namespace Isis {
    *   @history 2011-12-20 Ken Edmundson, Fixes to outlier rejection. Added
    *                          rejection multiplier member variable, can be set in
    *                          jigsaw interface.
-   *   @history 2012-03-31 Debbie A. Cook Programmer note:  Made code consistent
-   *                          with changes to ControlPoint.
+   *   @history 2012-03-26 Orrin Thomas, added maximum likelihood capabilities
    */
   class BundleAdjust {
     public:
-      BundleAdjust(const std::string &cnetFile, const std::string &cubeList,
-                   bool printSummary = true);
-      BundleAdjust(const std::string &cnetFile, const std::string &cubeList,
-                   const std::string &heldList, bool printSummary = true);
-      BundleAdjust(Isis::ControlNet &cnet, Isis::SerialNumberList &snlist,
-                   bool printSummary = true);
-      BundleAdjust(Isis::ControlNet &cnet, Isis::SerialNumberList &snlist,
-                   Isis::SerialNumberList &heldsnlist, bool printSummary = true);
+      BundleAdjust(const std::string &cnetFile, const std::string &cubeList,                                     bool printSummary = true);
+      BundleAdjust(const std::string &cnetFile, const std::string &cubeList,        const std::string &heldList, bool printSummary = true);
+      BundleAdjust( Isis::ControlNet &cnet,  Isis::SerialNumberList &snlist,                                     bool printSummary = true);
+      BundleAdjust( Isis::ControlNet &cnet,  Isis::SerialNumberList &snlist, Isis::SerialNumberList &heldsnlist, bool printSummary = true);
       ~BundleAdjust();
 
       bool ReadSCSigmas(const std::string &scsigmasList);
@@ -189,8 +186,8 @@ namespace Isis {
       void SetGlobalCameraAngularVelocityAprioriSigma(double d) { if( m_nNumberCameraCoefSolved < 2 ) return; m_dGlobalCameraAnglesAprioriSigma[1] = d; }
       void SetGlobalCameraAngularAccelerationAprioriSigma(double d) { if( m_nNumberCameraCoefSolved < 3 ) return; m_dGlobalCameraAnglesAprioriSigma[2] = d; }
 
-//      void SetGlobalCameraAngularVelocityAprioriSigma(double d) { m_dGlobalCameraAngularVelocityAprioriSigma = d; }
-//      void SetGlobalCameraAngularAccelerationAprioriSigma(double d) { m_dGlobalCameraAngularAccelerationAprioriSigma = d; }
+//    void SetGlobalCameraAngularVelocityAprioriSigma(double d) { m_dGlobalCameraAngularVelocityAprioriSigma = d; }
+//    void SetGlobalCameraAngularAccelerationAprioriSigma(double d) { m_dGlobalCameraAngularAccelerationAprioriSigma = d; }
 
       void SetStandardOutput(bool b) { m_bOutputStandard = b; }
       void SetCSVOutput(bool b) { m_bOutputCSV = b; }
@@ -607,6 +604,37 @@ namespace Isis {
       bool freeCholMod();
       bool cholmod_Inverse();
       bool loadCholmodTriplet();
+
+
+
+      //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      // variables and methods for maximum likelihood estimation
+      //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      /**  This class is used to reweight observations in order to achieve more robust parameter estimation, up to three different maximum likelihood estimation models can be used in succession
+       */
+      MaximumLikelihoodWFunctions *m_wFunc[3];
+     
+      /**  This class will be used to calculate the cumulative probability distribution of |R^2 residuals|, quantiles of this distribution are used to adjust the maximum likelihood functions dynamically iteration by iteration
+       */
+      StatCumProbDistDynCalc *m_cumPro;
+
+      /**  This class keeps track of the cumulative probability distribution of residuals (in unweighted pixels), this is used for reporting, and not for computation
+       */
+      StatCumProbDistDynCalc *m_cumProRes;
+
+      /**  Up to three different maximum likelihood estimation models can be used in succession, these flags record if they are enabled 
+       */
+      bool m_maxLikelihoodFlag[3];
+
+      /**  This count keeps track of which stadge of the maximum likelihood adjustment the bundle is currently on
+       */
+      int m_maxLikelihoodIndex;
+
+      /**  Quantiles of the |residual| distribution to be used for tweaking constants of the maximum probability models
+       */
+      double m_maxLikelihoodQuan[3];
+
+      public: void maximumLikelihoodSetup( QList<std::string> models, QList<double> quantiles );
   };
 
 }

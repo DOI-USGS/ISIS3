@@ -20,6 +20,8 @@
 #include "Latitude.h"
 #include "Longitude.h"
 #include "iTime.h"
+#include "StatCumProbDistDynCalc.h"
+#include "MaximumLikelihoodWFunctions.h"
 
 #include "boost/numeric/ublas/matrix_sparse.hpp"
 #include "boost/numeric/ublas/vector_proxy.hpp"
@@ -63,6 +65,16 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     m_bDeltack = false;
 
     Init(&progress);
+ 
+    //cumulative residual probability distribution calculator
+    m_cumProRes = new StatCumProbDistDynCalc;
+    m_cumProRes->initialize(101);  //set up the cum probibility solver to have a node at every percent of the distribution
+
+    //initialize maximum likelihood estimation parameters
+    m_wFunc[0]=m_wFunc[1]=m_wFunc[2]=NULL;  //initialize to NULL
+    m_maxLikelihoodFlag[0]=m_maxLikelihoodFlag[1]=m_maxLikelihoodFlag[2]=false; //NULL flag by defual
+    m_cumPro=NULL;
+    m_maxLikelihoodIndex=0;    
   }
 
   BundleAdjust::BundleAdjust(const std::string &cnetFile,
@@ -79,7 +91,18 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     m_strOutputFilePrefix = "";
     m_bDeltack = false;
 
+ 
     Init(&progress);
+
+    //cumulative residual probability distribution calculator
+    m_cumProRes = new StatCumProbDistDynCalc;
+    m_cumProRes->initialize(101);  //set up the cum probibility solver to have a node at every percent of the distribution
+
+    //initialize maximum likelihood estimation parameters
+    m_wFunc[0]=m_wFunc[1]=m_wFunc[2]=NULL;  //initialize to NULL
+    m_maxLikelihoodFlag[0]=m_maxLikelihoodFlag[1]=m_maxLikelihoodFlag[2]=false; //NULL flag by defual
+    m_cumPro=NULL;    
+    m_maxLikelihoodIndex=0;
   }
 
   BundleAdjust::BundleAdjust(Isis::ControlNet &cnet,
@@ -96,6 +119,16 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     m_bDeltack = true;
 
     Init();
+
+    //cumulative residual probability distribution calculator
+    m_cumProRes = new StatCumProbDistDynCalc;
+    m_cumProRes->initialize(101);  //set up the cum probibility solver to have a node at every percent of the distribution
+
+    //initialize maximum likelihood estimation parameters
+    m_wFunc[0]=m_wFunc[1]=m_wFunc[2]=NULL;  //initialize to NULL
+    m_maxLikelihoodFlag[0]=m_maxLikelihoodFlag[1]=m_maxLikelihoodFlag[2]=false; //NULL flag by defual
+    m_cumPro=NULL;    
+    m_maxLikelihoodIndex=0;
   }
 
   BundleAdjust::BundleAdjust(Isis::ControlNet &cnet,
@@ -112,6 +145,16 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     m_bDeltack = false;
 
     Init();
+
+    //cumulative residual probability distribution calculator
+    m_cumProRes = new StatCumProbDistDynCalc;
+    m_cumProRes->initialize(101);  //set up the cum probibility solver to have a node at every percent of the distribution
+
+    //initialize maximum likelihood estimation parameters
+    m_wFunc[0]=m_wFunc[1]=m_wFunc[2]=NULL;  //initialize to NULL
+    m_maxLikelihoodFlag[0]=m_maxLikelihoodFlag[1]=m_maxLikelihoodFlag[2]=false; //NULL flag by defual
+    m_cumPro=NULL;    
+    m_maxLikelihoodIndex=0;
   }
 
   BundleAdjust::~BundleAdjust() {
@@ -132,6 +175,15 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
     if ( m_strSolutionMethod == "SPARSE" )
       freeCholMod();
+
+    //delete residual cumulative probability calculator
+    delete m_cumProRes;
+
+    //deleting dynamically allocated classes used for maximum likelihood estimation
+    delete m_wFunc[0];
+    delete m_wFunc[1];
+    delete m_wFunc[2];
+    delete m_cumPro;
   }
 
   bool BundleAdjust::ReadSCSigmas(const std::string &scsigmasList) {
@@ -962,14 +1014,20 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       printf("Observations: %d\nConstrained Parameters:%d\nUnknowns: %d\nDegrees of Freedom: %d\n",
              m_nObservations, m_nConstrainedPointParameters, m_nUnknownParameters, m_nDegreesOfFreedom);
 
+
       // check for convergence
       if ( !m_bDeltack ) {
         if (fabs(dSigma0_previous - m_dSigma0) <= m_dConvergenceThreshold) {
-          m_bLastIteration = true;
-
-          m_bConverged = true;
-          printf("Bundle has converged\n");
-          break;
+          //convergeance detected
+          if (m_maxLikelihoodIndex+1 < 3 && m_maxLikelihoodFlag[m_maxLikelihoodIndex+1]) {  //if maximum likelihood tiers are being processed check to see if there's another tier to go //if there's another tier to go check the flag to see if it's enabled
+            m_maxLikelihoodIndex++;  //if there's another tier to go then continue with the next maximum likelihood model
+          }
+          else {  //otherwise iteration are complete
+            m_bLastIteration = true;
+            m_bConverged = true;
+            printf("Bundle has converged\n");
+            break;
+          }
         }
       }
       else {
@@ -990,6 +1048,17 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         }
       }
 
+      printf("Maximum Likelihood Tier: %d\n",m_maxLikelihoodIndex);
+      if (m_maxLikelihoodFlag[m_maxLikelihoodIndex]) {  //if maximum likelihood estimation is being used
+        //at the end of every iteration
+        //  reset the tweaking contant to the desired quantile of the |residual| distribution
+        m_wFunc[m_maxLikelihoodIndex]->setTweakingConstant(m_cumPro->value(m_maxLikelihoodQuan[m_maxLikelihoodIndex]));
+        //  print meadians of residuals
+        printf("Median of R^2 residauls:  %lf\n",m_cumPro->value(0.5));
+        //restart the dynamic calculation of the cumulative probility distribution of |R^2 residuals| --so it will be up to date for the next iteration
+        m_cumPro->initialize(101);
+      }
+
       clock_t iterationclock2 = clock();
       double dIterationTime = ((iterationclock2 - iterationclock1) / (double)CLOCKS_PER_SEC);
       printf("End of Iteration %d\nElapsed Time: %20.10lf\n", m_nIteration, dIterationTime);
@@ -1002,6 +1071,9 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         m_bMaxIterationsReached = true;
         break;
       }
+
+      //restart the dynamic calculation of the cumulative probility distribution of residuals (in unweighted pixels) --so it will be up to date for the next iteration
+      if (!m_bConverged) m_cumProRes->initialize(101);
 
       SpecialKIterationSummary();
 
@@ -1324,10 +1396,10 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       m_nConstrainedPointParameters++;
     }
 
-//    std::cout << "N22 before inverse" << std::endl << N22 << std::endl;
+ //   std::cout << "N22 before inverse" << std::endl << N22 << std::endl;
     // invert N22
     Invert_3x3(N22);
-//    std::cout << "N22 after inverse" << std::endl << N22 << std::endl;
+   // std::cout << "N22 after inverse" << std::endl << N22 << std::endl;
 
     // save upper triangular covariance matrix for error propagation
     // TODO:  The following method does not exist yet (08-13-2010)
@@ -2751,8 +2823,20 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     coeff_RHS(0) = deltax;
     coeff_RHS(1) = deltay;
 
+    m_cumProRes->addObs(deltax/pCamera->PixelPitch());
+    m_cumProRes->addObs(deltay/pCamera->PixelPitch());
+
     dObservationSigma = 1.4 * pCamera->PixelPitch();
     dObservationWeight = 1.0 / dObservationSigma;
+
+    if (m_maxLikelihoodFlag[m_maxLikelihoodIndex]) {  //if maximum likelihood estimation is being used
+      double residualR2ZScore = sqrt(deltax*deltax + deltay*deltay)/dObservationSigma/sqrt(2.0);
+      m_cumPro->addObs(residualR2ZScore);  //dynamically build the cumulative probability distribution of the R^2 residual Z Scores
+      //double tempScaler = m_wFunc[m_maxLikelihoodIndex]->sqrtWeightScaler(residualR2ZScore);
+      //if ( tempScaler == 0.0) printf("ZeroScaler\n");
+      //if ( tempScaler < 0.0)  printf("NegativeScaler\n");
+      dObservationWeight *= m_wFunc[m_maxLikelihoodIndex]->sqrtWeightScaler(residualR2ZScore);
+    }
 
 //    std::cout << "Measuredx " << dMeasuredx << " Measuredy = " << dMeasuredy << std::endl;
 //    std::cout << "dComputedx " << dComputedx << " dComputedy = " << dComputedy << std::endl;
@@ -5970,6 +6054,31 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       fp_out << buf;
       sprintf(buf,"\n           REJECTION MULTIPLIER: %lf",m_dRejectionMultiplier);
       fp_out << buf;
+      sprintf(buf, "\n\nMAXIMUM LIKELIHOOD ESTIMATION\n============================\n");
+      fp_out << buf;
+      for (int tier=0;tier<3;tier++) {
+        if (m_maxLikelihoodFlag[tier]) {
+          sprintf(buf, "\n                         Tier %d Enabled: TRUE",tier);
+          fp_out << buf;
+          sprintf(buf,"\n               Maximum Likelihood Model: ");
+          fp_out << buf;
+          m_wFunc[tier]->maximumLikelihoodModel(buf);
+          fp_out << buf;
+          sprintf(buf, "\n    Quantile used for tweaking constant: %lf",m_maxLikelihoodQuan[tier]);
+          fp_out << buf;
+          sprintf(buf, "\n   Quantile weighted R^2 Residual value: %lf",m_wFunc[tier]->tweakingConstant());
+          fp_out << buf;
+          sprintf(buf, "\n       Approx. weighted Residual cutoff: ");
+          fp_out << buf;
+          m_wFunc[tier]->weightedResidualCutoff(buf);
+          fp_out << buf;
+          if (tier != 2) fp_out << "\n";
+        }
+        else {
+          sprintf(buf, "\n                         Tier %d Enabled: FALSE",tier);
+          fp_out << buf;
+        }
+      }
       sprintf(buf, "\n\nINPUT: CONVERGENCE CRITERIA\n===========================\n");
       fp_out << buf;
       sprintf(buf,"\n                         SIGMA0: %e",m_dConvergenceThreshold);
@@ -6118,6 +6227,44 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       fp_out << buf;
       sprintf(buf, "             Total Elapsed Time: %6.4lf (seconds)\n",m_dElapsedTime);
       fp_out << buf;
+      if ( m_nObservations+m_nRejectedObservations > 100) {  //if there was enough data to calculate percentiles and box plot data
+        sprintf(buf, "\n           Residual Percentiles:\n");
+        fp_out << buf;
+        try {
+          for ( int bin=1;bin<34;bin++) {
+            //double quan = m_cumProRes->value(double(bin)/100);
+            sprintf(buf, "                 Percentile %3d: %+8.3lf                 Percentile %3d: %+8.3lf                 Percentile %3d: %+8.3lf\n",bin   ,m_cumProRes->value(double(bin   )/100.0),
+                                                                                                                                                    bin+33,m_cumProRes->value(double(bin+33)/100.0),  
+                                                                                                                                                    bin+66,m_cumProRes->value(double(bin+66)/100.0));
+            fp_out << buf;
+          }
+        }
+        catch (IException &e) {
+          std::string msg = "Faiiled to output residual percentiles for bundleout";
+          throw IException(e, IException::Io, msg, _FILEINFO_);
+        }
+        try {
+          sprintf(buf, "\n              Residual Box Plot:");
+          fp_out << buf;
+          sprintf(buf, "\n                        minimum: %+8.3lf",m_cumProRes->min()); 
+          fp_out << buf;
+          sprintf(buf, "\n                     Quartile 1: %+8.3lf",m_cumProRes->value(0.25));
+          fp_out << buf;
+          sprintf(buf, "\n                         Median: %+8.3lf",m_cumProRes->value(0.50));
+          fp_out << buf;
+          sprintf(buf, "\n                     Quartile 3: %+8.3lf",m_cumProRes->value(0.75));
+          fp_out << buf;
+          sprintf(buf, "\n                        maximum: %+8.3lf\n",m_cumProRes->max());
+          fp_out << buf;
+        }
+        catch (IException &e) {
+          std::string msg = "Faiiled to output residual box plot for bundleout";
+          throw IException(e, IException::Io, msg, _FILEINFO_);
+        }
+      }
+      
+
+     
 
       sprintf(buf,"\nIMAGE MEASURES SUMMARY\n==========================\n\n");
       fp_out << buf;
@@ -8109,6 +8256,42 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
   void BundleAdjust::SetSolutionMethod(std::string str) {
     m_strSolutionMethod = str;
     FillPointIndexMap();
+  }
+
+ /**  This method steps up the maximum likelihood estimation solution.  Zero to three successive solutions models are available.
+  */
+  void BundleAdjust::maximumLikelihoodSetup( QList<std::string> models, QList<double> quantiles ) {
+    m_wFunc[0]=m_wFunc[1]=m_wFunc[2]=NULL;  //initialize to NULL
+    m_maxLikelihoodFlag[0]=m_maxLikelihoodFlag[1]=m_maxLikelihoodFlag[2]=false; //NULL flag by defualt
+    if (models.size() == 0) {  //MaximumLikeliHood Estimation not being used, so leave everything NULL
+      m_cumPro=NULL;    
+    }
+    else {
+      m_cumPro = new StatCumProbDistDynCalc;
+      m_cumPro->initialize(101);  //set up the cum probibility solver to have a node at every percent of the distribution
+      for (int i=0;i<models.size() && i<3;i++) {
+        m_maxLikelihoodFlag[i] = true;
+        m_wFunc[i] = new MaximumLikelihoodWFunctions;
+        if ( models[i].compare("HUBER") == 0 )
+          m_wFunc[i]->setModel(MaximumLikelihoodWFunctions::Huber);
+        else if ( models[i].compare("HUBER_MODIFIED") == 0 )
+          m_wFunc[i]->setModel(MaximumLikelihoodWFunctions::HuberModified);
+        else if ( models[i].compare("WELSCH") == 0 )
+          m_wFunc[i]->setModel(MaximumLikelihoodWFunctions::Welsch);
+        else if ( models[i].compare("CHEN") == 0 )
+          m_wFunc[i]->setModel(MaximumLikelihoodWFunctions::Chen);
+        else {
+           std::string msg = "Unsuported Maximum Likelihood estimation model: " + models[i] + "\n";
+           m_maxLikelihoodFlag[i] = false;
+           throw IException(IException::Io, msg, _FILEINFO_);
+        }
+      }  
+    }
+    for (int i=0;i<quantiles.size() && i<3;i++) m_maxLikelihoodQuan[i] = quantiles[i];
+
+    //maximum likelihood estimation tiered solutions requiring multiple convergeances are support, this index keeps track
+    // of which tier the solution is in
+    m_maxLikelihoodIndex=0;
   }
 
 }

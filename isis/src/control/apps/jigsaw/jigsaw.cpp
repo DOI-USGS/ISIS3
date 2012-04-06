@@ -5,6 +5,8 @@
 #include "IException.h"
 #include "CubeAttribute.h"
 #include "iTime.h"
+#include <vector>
+
 
 using namespace std;
 using namespace Isis;
@@ -16,9 +18,10 @@ void IsisMain() {
   std::string cnetFile = ui.GetFilename("CNET");
   std::string cubeList = ui.GetFilename("FROMLIST");
 
-  // Get the held list if entered and prep for bundle adjustment
+  
   BundleAdjust *b = NULL;
 
+  // Get the held list if entered and prep for bundle adjustment, to determine which constructor to use
   if (ui.WasEntered("HELDLIST")) {
     std::string heldList = ui.GetFilename("HELDLIST");
     b = new BundleAdjust(cnetFile, cubeList, heldList);
@@ -26,6 +29,23 @@ void IsisMain() {
   else {
     b = new BundleAdjust(cnetFile, cubeList);
    }
+
+  //build lists of maximum likelihood estimation model strings and quantiles
+  QList<string> maxLikeModels;
+  QList<double> maxQuan;
+  if ( ui.GetString("MODEL1").compare("NONE") !=0 ) {
+    maxLikeModels.push_back(ui.GetString("MODEL1"));
+    maxQuan.push_back(ui.GetDouble("MAX_MODEL1_C_QUANTILE"));
+  }
+  if ( ui.GetString("MODEL2").compare("NONE") !=0 ) {
+    maxLikeModels.push_back(ui.GetString("MODEL2"));
+    maxQuan.push_back(ui.GetDouble("MAX_MODEL2_C_QUANTILE"));
+  }
+  if ( ui.GetString("MODEL3").compare("NONE") !=0 ) {
+    maxLikeModels.push_back(ui.GetString("MODEL3"));
+    maxQuan.push_back(ui.GetDouble("MAX_MODEL3_C_QUANTILE"));
+  }
+  b->maximumLikelihoodSetup(maxLikeModels,maxQuan);  //set up maximum likelihood estimater
 
   // For now don't use SC_SIGMAS.  This is not fully implemented yet.
   // if (ui.WasEntered("SC_SIGMAS"))
