@@ -25,6 +25,8 @@
 #include "Latitude.h"
 #include "Longitude.h"
 
+using namespace std;
+
 namespace Isis {
   RadarGroundMap::RadarGroundMap(Camera *parent, Radar::LookDirection ldir,
                                  double waveLength) :
@@ -39,7 +41,7 @@ namespace Isis {
 //    p_camera->Radii(radii);
 //    p_tolerance = p_camera->FocalLength() / radii[2];
 //    p_tolerance *= 180.0 / Isis::PI;
-    p_tolerance = .00000001;
+    p_tolerance = .0001;
 
     // Compute a default time tolerance to a 1/20 of a pixel
     double et1 = p_camera->Spice::CacheStartTime().Et();
@@ -96,9 +98,6 @@ namespace Isis {
     Distance radii[3];
     p_camera->Radii(radii);
     SpiceDouble R = radii[0].kilometers();
-    SpiceDouble lastR = DBL_MAX;
-    SpiceDouble rlat;
-    SpiceDouble rlon;
 
     SpiceDouble lat = DBL_MAX;
     SpiceDouble lon = DBL_MAX;
@@ -107,6 +106,65 @@ namespace Isis {
     slantRangeSqr = slantRangeSqr * slantRangeSqr;
     SpiceDouble X[3];
 
+    // The iteration code was moved to its own method so that it can be run multiple times
+    // if necessary. The first iteration should suffice for those pixels that have shallow
+    // slopes. For those pixels that lie on steep slopes (up to 2x the incidence angle), then
+    // an additional iteration call is needed. In the future, we may need to add more calls
+    // to the iteration method if the slope is greater than 2x the incidence angle. The
+    // slope variable will need to be halved each time the iteration method is called until
+    // a solution is found. So, for example, if we needed to call the iteration method a third
+    // time, the slope variable would be set to .25.
+    bool useSlopeEqn = false;
+    double slope = .5;
+    bool success = Iterate(R,slantRangeSqr,c,r,X,lat,lon,Xsc,useSlopeEqn,slope);
+
+    if(!success) {
+      R = radii[0].kilometers();
+      useSlopeEqn = true;
+      success = Iterate(R,slantRangeSqr,c,r,X,lat,lon,Xsc,useSlopeEqn,slope);
+    }
+
+    if(!success) return false;
+
+    lat = lat * 180.0 / Isis::PI;
+    lon = lon * 180.0 / Isis::PI;
+    while(lon < 0.0) lon += 360.0;
+
+    // Compute body fixed look direction
+    std::vector<double> lookB;
+    lookB.resize(3);
+    lookB[0] = X[0] - Xsc[0];
+    lookB[1] = X[1] - Xsc[1];
+    lookB[2] = X[2] - Xsc[2];
+
+    std::vector<double> lookJ = bodyFrame->J2000Vector(lookB);
+    SpiceRotation *cameraFrame = p_camera->InstrumentRotation();
+    std::vector<double> lookC = cameraFrame->ReferenceVector(lookJ);
+
+    SpiceDouble unitLookC[3];
+    vhat_c(&lookC[0], unitLookC);
+
+    return p_camera->Sensor::SetUniversalGround(lat, lon);
+  }
+
+  /** Iteration loop for computing ground position from slant range
+   *
+   * @param ux Slant range distance in meters scaled to focal plane
+   * @param uy Doppler shift (always 0.0)
+   * @param uz Not used
+   *
+   * @return conversion was successful
+   */
+  bool RadarGroundMap::Iterate(SpiceDouble &R, const double &slantRangeSqr, const SpiceDouble c[],
+                               const SpiceDouble r[], SpiceDouble X[], SpiceDouble &lat,
+                               SpiceDouble &lon, const std::vector<double> &Xsc,
+                               const bool &useSlopeEqn, const double &slope) {
+
+    lat = DBL_MAX;
+    lon = DBL_MAX;
+    SpiceDouble lastR = DBL_MAX;
+    SpiceDouble rlat;
+    SpiceDouble rlon;
     int iter = 0;
     do {
       double normXsc = vnorm_c(&Xsc[0]);
@@ -132,32 +190,19 @@ namespace Isis {
 
       rlat = lat * 180.0 / Isis::PI;
       rlon = lon * 180.0 / Isis::PI;
-      R = p_camera->LocalRadius(rlat, rlon).kilometers();
+      if(useSlopeEqn) {
+        R = lastR + slope * (p_camera->LocalRadius(rlat, rlon).kilometers() - lastR);
+      } else {
+        R = p_camera->LocalRadius(rlat, rlon).kilometers();
+      }
+      
       iter++;
     }
-    while(fabs(R - lastR) > p_tolerance && iter < 30);
+    while(fabs(R - lastR) > p_tolerance && iter < 100);
 
     if(fabs(R - lastR) > p_tolerance) return false;
-
-    lat = lat * 180.0 / Isis::PI;
-    lon = lon * 180.0 / Isis::PI;
-    while(lon < 0.0) lon += 360.0;
-
-    // Compute body fixed look direction
-    std::vector<double> lookB;
-    lookB.resize(3);
-    lookB[0] = X[0] - Xsc[0];
-    lookB[1] = X[1] - Xsc[1];
-    lookB[2] = X[2] - Xsc[2];
-
-    std::vector<double> lookJ = bodyFrame->J2000Vector(lookB);
-    SpiceRotation *cameraFrame = p_camera->InstrumentRotation();
-    std::vector<double> lookC = cameraFrame->ReferenceVector(lookJ);
-
-    SpiceDouble unitLookC[3];
-    vhat_c(&lookC[0], unitLookC);
-
-    return p_camera->Sensor::SetUniversalGround(lat, lon);
+ 
+    return true;
   }
 
   /** Compute undistorted focal plane coordinate from ground position
