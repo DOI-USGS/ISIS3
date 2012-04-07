@@ -198,11 +198,20 @@ PROTOC         = $(ISIS3LOCAL)/bin/protoc
 # should be set to true if you are building with the Kakadu library and
 # you want to use the JPEG2000 specific code in the ISIS3 system. Otherwise,
 # set the ENABLEJP2K flag to false.
+#
+#  Added abililty to automatically detect the existance of the Kakadu include
+#  directory.  One can set the environment variable JP2KFLAG with a 1 or 0
+#  depending upon need.  Developers can define appropriate enviroment variables
+#  for the complete JP2K environment.  Just redefine them based upon the usage
+#  below (i.e., be sure to add -I, -L and -l to the variables for KAKADUINCDIR,
+#  KAKADULIBDIR and KAKADULIB, respectively).
 #---------------------------------------------------------------------------
-KAKADUINCDIR = -I$(ISIS3LOCAL)/include/kakadu/v6_3-00967N
-KAKADULIBDIR = -L$(ISIS3LOCAL)/lib
-KAKADULIB    = -lkdu_a63R
-ISISCPPFLAGS += -DENABLEJP2K=1
+KAKADUINCDIR ?= -I$(ISIS3LOCAL)/include/kakadu/v6_3-00967N
+KAKADULIBDIR ?= -L$(ISIS3LOCAL)/lib
+KAKADULIB    ?= -lkdu_a63R
+#  Strip -I from Kakadu include directory macro and check for existance
+JP2KFLAG ?= $(shell if [ -d $(subst -I,,$(KAKADUINCDIR)) ]; then echo "1"; else echo "0"; fi;)
+ISISCPPFLAGS += -DENABLEJP2K=$(JP2KFLAG)
 
 #---------------------------------------------------------------------------
 # Set up for BOOST

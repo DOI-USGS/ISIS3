@@ -80,9 +80,13 @@ namespace Isis {
    * @ingroup HighLevelCubeIO
    *
    * @author 2009-12-18 Janet Barrett
-   *
+   * 
    * @internal
    *  @history 2009-12-18 Janet Barrett - Original version.
+   *  @history 2012-04-06 Kris Becker - Fixed condition compilation where
+   *                        support for JP2K is disabled
+   *  
+   *  
    *
    */
   class JP2Decoder {

@@ -1,5 +1,5 @@
 #---------------------------------------------------------------------------
-#  Determine Linux Architecture.  Ensure the host architecture is set
+#  Determine MacOSX Architecture.  Ensure the host architecture is set
 #  and then determine machine type
 #---------------------------------------------------------------------------
 include $(ISISROOT)/make/isis.conf

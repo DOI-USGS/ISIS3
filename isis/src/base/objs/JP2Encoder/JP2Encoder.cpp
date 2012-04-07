@@ -106,7 +106,7 @@ namespace Isis {
     kdu_customize_errors(Kakadu_Error);
 #else
     std::string msg = "JPEG2000 has not been enabled with this build of ISIS3";
-    throw iException::Message(iException::System, msg, _FILEINFO_);
+    throw IException(IException::Programmer, msg, _FILEINFO_);
 #endif
   }
 

@@ -73,6 +73,8 @@ namespace Isis {
    *
    * @internal
    *  @history 2009-01-11 Janet Barrett - Original version.
+   *  @history 2012-04-06 Kris Becker - Fixed condition compilation where
+   *                        support for JP2K is disabled
    *
    */
   class JP2Encoder {

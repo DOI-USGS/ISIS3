@@ -51,7 +51,7 @@ namespace Isis {
     kdu_customize_errors(Kakadu_Error);
 #else
     std::string msg = "JPEG2000 has not been enabled with this build of ISIS3";
-    throw iException::Message(iException::System, msg, _FILEINFO_);
+    throw IException(IException::Programmer, msg, _FILEINFO_);
 #endif
   }
 
@@ -230,6 +230,7 @@ namespace Isis {
 
 
   bool JP2Decoder::IsJP2(string filename) {
+#if ENABLEJP2K
     jp2_family_src *stream = new jp2_family_src();
     stream->open(filename.c_str());
     jp2_source *source = new jp2_source();
@@ -243,5 +244,8 @@ namespace Isis {
     delete stream;
 
     return result;
+#else
+    return (false);
+#endif
   }
 }
