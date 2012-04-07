@@ -864,9 +864,9 @@ namespace Isis {
       else {
         os << *p_label << endl;
       }
-      // Fill the difference between the old and new label size with nulls.
+      // Fill the difference between the old and new label size with spaces.
       if(p_pdsFileType != ProcessExportPds::JP2Image) {
-        for(int i = LabelSize(); i < labSize; ++i) os << '\0';
+        for(int i = LabelSize(); i < labSize; ++i) os << ' ';
       }
     }
     else if(p_exportType == Fixed) {
@@ -895,7 +895,7 @@ namespace Isis {
         os << *p_label << endl;
       }
       if(p_pdsFileType != ProcessExportPds::JP2Image) {
-        for(int i = LabelSize(); i < labelRecords * lineBytes; ++i) os << '\0';
+        for(int i = LabelSize(); i < labelRecords * lineBytes; ++i) os << ' ';
       }
     }
   }

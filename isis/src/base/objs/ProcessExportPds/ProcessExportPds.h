@@ -49,7 +49,10 @@ namespace Isis {
    *                           fixed PDS type products.  It assumed only 1 band.
    *   @history 2010-02-24 Janet Barrett - Added code to support JPEG2000. 
    *   @history 2010-07-21 Sharmila Prasad - Fixed error while converting
-   *                           resolution from Meters to Kilometers 
+   *                           resolution from Meters to Kilometers
+   *   @history 2012-04-06 Kris Becker - Correct label padding whereby spaces
+   *                           are used as the fill character instead of '\0'.
+   *                           This makes it compliant with PDS specifications.
    */
   class ProcessExportPds : public Isis::ProcessExport {
     public:
