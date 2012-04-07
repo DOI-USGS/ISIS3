@@ -41,6 +41,7 @@
 #include "Pvl.h"
 #include "SpecialPixel.h"
 #include "SpiceManager.h"
+#include "Projection.h"
 
 using namespace std;
 
@@ -335,7 +336,7 @@ namespace Isis {
     if(rot < 0.0) rot += 360.0;
     // Above completes celestial north, below is twist angle
     double twist_angle = (180.0 - rot);
-    twist_angle = fmod(twist_angle, 360.0);
+    twist_angle = Projection::To360Domain(fmod(twist_angle, 360.0));
     geom += format("TWIST_ANGLE", twist_angle, "DEG");
 
 //  Now compute the RA/DEC reticle points

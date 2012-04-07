@@ -63,7 +63,10 @@ namespace Isis {
    *          SC_TARGET_POSITION_VECTOR and TARGET_CENTER_DISTANCE when target
    *          is anything but Sky (it was previously only computed when the
    *          center reference pixel intersected the target).
-   * @history 2009-09-18 Debbie A. Cook - corrected pxlscl and explen in MdisGeometry
+   * @history 2009-09-18 Debbie A. Cook - corrected pxlscl and explen in 
+   *                       MdisGeometry
+   * @history 2012-04-06 Kris Becker - Corrected TWIST_ANGLE computation to 
+   *                       ensure it is restricted to the 0-360 degree domain.
    */
   class MdisGeometry {
     public:
