@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include <QDateTime>
+#include <QDebug>
 #include <QFutureWatcher>
 #include <QSettings>
 #include <QtConcurrentRun>
@@ -39,6 +40,7 @@ namespace Isis
       delegate = someDelegate;
 
       setSortingEnabled(false);
+      setSortLimit(10000);
       setSorting(false);
 
       sortedItems = new QList<AbstractTreeItem *>;
@@ -132,14 +134,26 @@ namespace Isis
       if (sortingEnabled != enabled)
       {
         sortingEnabled = enabled;
-
-        if (sortingEnabled)
-          rebuildSort();
-        else
-          cancelSort();  // can safely be called when not sorting
-
-        emit modelModified();
+        rebuildSort();
       }
+    }
+
+
+    int AbstractTableModel::sortLimit() const {
+      return m_sortLimit;
+    }
+
+
+    void AbstractTableModel::setSortLimit(int limit) {
+      if (m_sortLimit != limit) {
+        m_sortLimit = limit;
+        rebuildSort();
+      }
+    }
+
+
+    bool AbstractTableModel::sortingOn() const {
+      return (sortingIsEnabled() && (getVisibleRowCount() < sortLimit()));
     }
 
 
@@ -169,7 +183,7 @@ namespace Isis
 
     void AbstractTableModel::sort()
     {
-      if (sortedItems->size() && !dataModel->isFiltering() &&
+      if (sortingOn() && sortedItems->size() && !dataModel->isFiltering() &&
           !dataModel->isRebuilding())
       {
         if (isSorting())
@@ -185,6 +199,8 @@ namespace Isis
               QtConcurrent::run(this, &AbstractTableModel::doSort, copy);
           sortingWatcher->setFuture(future);
         }
+
+        emit modelModified();
       }
     }
 
@@ -218,7 +234,7 @@ namespace Isis
     {
       QList< AbstractTreeItem * > sortedSubsetOfItems;
 
-      if (sortingIsEnabled())
+      if (sortingOn())
       {
         while (start <= end)
         {
@@ -245,7 +261,7 @@ namespace Isis
     {
       QList< AbstractTreeItem * > sortedSubsetOfItems;
 
-      if (!sortingIsEnabled())
+      if (!sortingOn())
       {
         sortedSubsetOfItems = getDataModel()->getItems(item1, item2, flags, true);
       }
@@ -375,7 +391,7 @@ namespace Isis
         setSorting(true);
 
         QList< TableColumn * > columnsToSortOn = columns->getSortingOrder();
-        if (sortingIsEnabled())
+        if (sortingOn())
         {
           // Create a new comparison functor to be used in the sort. It will
           // keep track of the number of comparisons made so that we can make a
@@ -468,7 +484,8 @@ namespace Isis
   //     cerr << "AbstractTableModel::rebuildSort called\n";
       ASSERT(dataModel);
       ASSERT(sortedItems);
-      if (sortingEnabled)
+
+      if (sortingOn())
       {
         sortingEnabled = false;
         *sortedItems = getItems(0, -1);
@@ -477,6 +494,7 @@ namespace Isis
       }
       else
       {
+        cancelSort();
         emit modelModified();
       }
     }

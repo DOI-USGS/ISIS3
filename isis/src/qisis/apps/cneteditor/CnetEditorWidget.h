@@ -71,9 +71,19 @@ namespace Isis
       QMap< QAction *, QList< QString > > getMenuActions();
       QMap< QString, QList< QAction * > > getToolBarActions();
       
+      bool measureTableSortingEnabled() const;
+      int measureTableSortLimit() const;
+      bool pointTableSortingEnabled() const;
+      int pointTableSortLimit() const;
+
+      void setMeasureTableSortingEnabled(bool enabled);
+      void setMeasureTableSortLimit(int limit);
+      void setPointTableSortingEnabled(bool enabled);
+      void setPointTableSortLimit(int limit);
       
+
     public slots:
-      void setSortingEnabled(bool);
+      void configSorting();
       void setTablesFrozen(bool);
 
 

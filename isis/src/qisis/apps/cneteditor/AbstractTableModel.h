@@ -60,6 +60,9 @@ namespace Isis
         virtual bool isFiltering() const;
         virtual bool sortingIsEnabled() const;
         virtual void setSortingEnabled(bool);
+        virtual int sortLimit() const;
+        virtual void setSortLimit(int);
+        virtual bool sortingOn() const;
         virtual TableColumnList * getColumns();
         virtual const AbstractTableDelegate * getDelegate() const;
         
@@ -125,7 +128,9 @@ namespace Isis
         TableColumnList * columns;
         QTimer * sortStatusPoller;
         LessThanFunctor * lessThanFunctor;
+
         bool sortingEnabled;
+        int m_sortLimit;
         bool sorting;
         QFutureWatcher< QList< AbstractTreeItem * > > * sortingWatcher;
         

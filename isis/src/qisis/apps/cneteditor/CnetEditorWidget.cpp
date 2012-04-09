@@ -35,6 +35,7 @@
 #include "AbstractPointItem.h"
 #include "AbstractTreeItem.h"
 #include "CnetDisplayProperties.h"
+#include "CnetEditorSortConfigDialog.h"
 #include "MeasureTableModel.h"
 #include "PointTableModel.h"
 #include "TableView.h"
@@ -285,37 +286,18 @@ namespace Isis
     freezeTablesLocation.append(tr("&Tables"));
     menuActions->insert(freezeTablesAct, freezeTablesLocation);
 
-    QAction * enableSortAct = new QAction(QIcon(":sort"),
-                                          tr("&Enable Sorting"), this);
-    enableSortAct->setCheckable(true);
-    QString enableSortToolTipText = tr("Enable sorting on table columns");
-    enableSortAct->setToolTip(enableSortToolTipText);
-    enableSortAct->setStatusTip(enableSortToolTipText);
-    enableSortAct->setWhatsThis(tr("<html>When sorting is enabled, the data "
-        "in the tables can be sorted by clicking on column headings.  Sorting "
-        "is disabled by default because of how long it can take for very large "
-        "control networks.</html>"));
-    connect(enableSortAct, SIGNAL(toggled(bool)),
-            this, SLOT(setSortingEnabled(bool)));
-    QList< QString > enableSortLocation;
-    enableSortLocation.append(tr("&Tables"));
-    menuActions->insert(enableSortAct, enableSortLocation);
-
-    QAction * configureSortAct = new QAction(tr("&Sorting Options..."), this);
+    QAction * configureSortAct = new QAction(QIcon(":sort"),
+                                             tr("&Sorting Options..."), this);
     QString configureSortToolTipText = tr("Configure table sorting options");
-    enableSortAct->setToolTip(configureSortToolTipText);
-    enableSortAct->setStatusTip(configureSortToolTipText);
-    enableSortAct->setWhatsThis(tr("<html>Click here to configure options "
+    configureSortAct->setToolTip(configureSortToolTipText);
+    configureSortAct->setStatusTip(configureSortToolTipText);
+    configureSortAct->setWhatsThis(tr("<html>Click here to configure options "
         "related to the sorting of table columns.</html>"));
-    connect(configureSortAct, SIGNAL(toggled(bool)),
-            this, SLOT(setSortingEnabled(bool)));
-    //QList< QString > enableSortLocation;
-    enableSortLocation.append(tr("&Tables"));
-    menuActions->insert(enableSortAct, enableSortLocation);
-
-
-
-
+    connect(configureSortAct, SIGNAL(triggered()),
+            this, SLOT(configSorting()));
+    QList< QString > configureSortLocation;
+    configureSortLocation.append(tr("&Tables"));
+    menuActions->insert(configureSortAct, configureSortLocation);
 
     QAction * whatsThisAct = QWhatsThis::createAction(this);
     QList< QString > whatsThisLocation;
@@ -324,8 +306,7 @@ namespace Isis
 
     QList< QAction * > tbActionList;
     tbActionList.append(freezeTablesAct);
-    tbActionList.append(enableSortAct);
-//     actionList.append(whatsThisAct);
+    tbActionList.append(configureSortAct);
     toolBarActions->insert("settingsToolBar", tbActionList);
   }
 
@@ -578,6 +559,16 @@ namespace Isis
       key.replace(" ", "_");
       actions[i]->setChecked(settings.value(key, true).toBool());
     }
+
+    // Restore sorting configuration settings.
+    setMeasureTableSortingEnabled(
+        settings.value("measureTableSortingEnabled", true).toBool());
+    setMeasureTableSortLimit(
+        settings.value("measureTableSortLimit", 10000).toInt());
+    setPointTableSortingEnabled(
+        settings.value("pointTableSortingEnabled", true).toBool());
+    setPointTableSortLimit(
+        settings.value("pointTableSortLimit", 10000).toInt());
   }
 
 
@@ -608,6 +599,16 @@ namespace Isis
       key.replace(" ", "_");
       settings.setValue(key, actions[i]->isChecked());
     }
+
+    // Write sorting configuration settings.
+    settings.setValue("measureTableSortingEnabled",
+                      measureTableSortingEnabled());
+    settings.setValue("measureTableSortLimit",
+                      measureTableSortLimit());
+    settings.setValue("pointTableSortingEnabled",
+                      pointTableSortingEnabled());
+    settings.setValue("pointTableSortLimit",
+                      pointTableSortLimit());
   }
 
   QWidget * CnetEditorWidget::getPointTreeView() {
@@ -652,16 +653,50 @@ namespace Isis
   }
 
 
-  void CnetEditorWidget::setSortingEnabled(bool sortingIsEnabled) {
-//     cerr << "CnetEditorWidget::setSortingEnabled called\n";
-    ASSERT(pointTableModel);
-    ASSERT(measureTableModel);
+  bool CnetEditorWidget::measureTableSortingEnabled() const {
+    return measureTableModel->sortingIsEnabled();
+  }
 
-    if (pointTableModel)
-      pointTableModel->setSortingEnabled(sortingIsEnabled);
 
-    if (measureTableModel)
-      measureTableModel->setSortingEnabled(sortingIsEnabled);
+  int CnetEditorWidget::measureTableSortLimit() const {
+    return measureTableModel->sortLimit();
+  }
+
+
+  bool CnetEditorWidget::pointTableSortingEnabled() const {
+    return pointTableModel->sortingIsEnabled();
+  }
+
+
+  int CnetEditorWidget::pointTableSortLimit() const {
+    return pointTableModel->sortLimit();
+  }
+
+
+  void CnetEditorWidget::setMeasureTableSortingEnabled(bool enabled) {
+    measureTableModel->setSortingEnabled(enabled);
+  }
+
+
+  void CnetEditorWidget::setMeasureTableSortLimit(int limit) {
+    measureTableModel->setSortLimit(limit);
+  }
+
+
+  void CnetEditorWidget::setPointTableSortingEnabled(bool enabled) {
+    pointTableModel->setSortingEnabled(enabled);
+  }
+
+
+  void CnetEditorWidget::setPointTableSortLimit(int limit) {
+    pointTableModel->setSortLimit(limit);
+  }
+
+
+  void CnetEditorWidget::configSorting() {
+    CnetEditorSortConfigDialog * dialog = new CnetEditorSortConfigDialog(this);
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
+    dialog->show();
   }
 
 

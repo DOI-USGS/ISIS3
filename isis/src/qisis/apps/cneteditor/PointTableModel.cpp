@@ -42,6 +42,8 @@ namespace Isis
               SIGNAL(treeSelectionChanged(QList< AbstractTreeItem * >)),
               this,
               SLOT(handleTreeSelectionChanged(QList< AbstractTreeItem * >)));
+
+      setSortingEnabled(true);
     }
 
 

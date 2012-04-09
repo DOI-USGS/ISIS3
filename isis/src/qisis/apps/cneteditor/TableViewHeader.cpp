@@ -515,7 +515,7 @@ namespace Isis
             right.setY(left.y());
           }
           
-          if (model->sortingIsEnabled())
+          if (model->sortingOn())
           {
             painter->drawLine(left, center);
             painter->drawLine(center, right);

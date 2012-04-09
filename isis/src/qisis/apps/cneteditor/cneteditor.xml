@@ -165,5 +165,10 @@
     <change name="Jai Rideout" date="2012-03-28">
       Points with any edit-locked measures can no longer be deleted. Fixes #621.
     </change>
+    <change name="Jai Rideout and Steven Lambright" date="2012-04-09">
+      Sorting is now configurable through a sorting dialog, including the
+      ability to enable/disable sorting and set table size limits for automatic
+      enabling of sorting on either the point or measure table. Fixes #360.
+    </change>
   </history>
 </application>
