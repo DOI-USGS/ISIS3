@@ -1,5 +1,8 @@
 #include "Isis.h"
 
+#include <QList>
+#include <QString>
+
 #include "Buffer.h"
 #include "Camera.h"
 #include "CubeAttribute.h"
@@ -11,12 +14,15 @@
 #include "PvlObject.h"
 #include "SpecialPixel.h"
 #include "UserInterface.h"
+#include "iString.h"
 
 using namespace std;
 using namespace Isis;
 
 void calibration(vector<Buffer *> &in,
                  vector<Buffer *> &out);
+PvlObject fetchCoefficients(Pvl &calibration, QList<QString> &hierarchy);
+void checkCoefficient(PvlObject &coefficients, iString keyName);
 
 // Linearity correction
 bool linear;
@@ -82,15 +88,26 @@ void IsisMain() {
   Pvl calibra(Filename("$voyager" + scNumber +
                            "/calibration/voycal.pvl").Expanded());
   PvlObject calib;
+  QList<QString> hierarchy;
   try {
     // Search voycal.pvl for appropriate object
-    PvlObject &spacecraft = calibra.FindObject(instrument.FindKeyword("SpacecraftName")[0]);
-    PvlObject &inst = spacecraft.FindObject(instrument.FindKeyword("InstrumentId")[0]);
-    PvlObject &smode = inst.FindObject("ShutterMode" + instrument.FindKeyword("CameraState2")[0]);
-    PvlObject &mphase = smode.FindObject(archive.FindKeyword("MissionPhaseName")[0]);
-    PvlObject &cstate1 = mphase.FindObject("ScanRate" + instrument.FindKeyword("CameraState1")[0]);
-    string filter = bandbin["FilterName"][0] + "_" + bandbin["FilterNumber"][0];
-    calib = cstate1.FindObject(filter);
+    hierarchy.append(instrument.FindKeyword("SpacecraftName")[0]);
+    hierarchy.append(instrument.FindKeyword("InstrumentId")[0]);
+    hierarchy.append(
+        iString("ShutterMode" + instrument.FindKeyword("CameraState2")[0]));
+    hierarchy.append(archive.FindKeyword("MissionPhaseName")[0]);
+    hierarchy.append(
+        iString("ScanRate" + instrument.FindKeyword("CameraState1")[0]));
+    hierarchy.append(
+        iString(bandbin["FilterName"][0] + "_" + bandbin["FilterNumber"][0]));
+
+    calib = fetchCoefficients(calibra, hierarchy);
+
+    checkCoefficient(calib, "OmegaNaught");
+    checkCoefficient(calib, "SunDistance");
+    checkCoefficient(calib, "GainCorrection");
+    checkCoefficient(calib, "OffsetCorrection");
+    checkCoefficient(calib, "DeltaExposureTime");
   }
   catch (IException &e) {
     string msg = "Could not find match in [voycal.pvl] calibration file,";
@@ -119,16 +136,15 @@ void IsisMain() {
   if (linear) {
     Pvl linearity(Filename("$voyager" + scNumber +
                      "/calibration/voylin.pvl").Expanded());
+
     PvlObject lin;
     try {
       // Search voylin.pvl for appropriate object
-      PvlObject &spacecraft = linearity.FindObject(instrument.FindKeyword("SpacecraftName")[0]);
-      PvlObject &inst = spacecraft.FindObject(instrument.FindKeyword("InstrumentId")[0]);
-      PvlObject &smode = inst.FindObject("ShutterMode" + instrument.FindKeyword("CameraState2")[0]);
-      PvlObject &mphase = smode.FindObject(archive.FindKeyword("MissionPhaseName")[0]);
-      PvlObject &cstate1 = mphase.FindObject("ScanRate" + instrument.FindKeyword("CameraState1")[0]);
-      string filter = bandbin["FilterName"][0] + "_" + bandbin["FilterNumber"][0];
-      lin = cstate1.FindObject(filter);
+      lin = fetchCoefficients(linearity, hierarchy);
+
+      checkCoefficient(lin, "NormalizingPower");
+      checkCoefficient(lin, "B_HighEndNon-LinearityCorrection");
+      checkCoefficient(lin, "K_PowerOfNon-Linearity");
     }
     catch (IException &e) {
       string msg = "Could not find match in [voylin.pvl] calibration file,";
@@ -235,3 +251,89 @@ void calibration(vector<Buffer *> &in, vector<Buffer *> &out) {
     }
   }
 }
+
+
+/**
+ * Fetches all the coefficients for a calibration in a single top-level
+ * PvlObject.  The calibration PVL will be explored from the top-down looking
+ * for keywords.  Objects named in the hierarchy list will be explored down
+ * the chain in the order listed.  So, for example, if hierarchy is the list
+ * ["A", "B", "C"], then this function will assume that "A" is a child of the
+ * top-level calibration PvlObject, "B" is a child of "A", and "C" is a child
+ * of "B".
+ *
+ * If any keyword found in a child object further down the chain conflicts
+ * with a keyword found higher up, the child object's keyword will overwrite
+ * the value of that keyword in the coefficients object.  In this way,
+ * calibration files can define top-level "default" coefficients that apply to
+ * the entire mission, and can provide camera- or filter-specific coefficients
+ * to overwrite them as needed.
+ *
+ * @param calibration The mission-specific calibration PVL file
+ * @param hierarchy A list of hierarchical PvlObject names to search
+ *
+ * @return A single object containing all coefficients
+ */
+PvlObject fetchCoefficients(Pvl &calibration, QList<QString> &hierarchy) {
+  // All coefficients go into one top-level object without any children
+  PvlObject coefficients;
+
+  // Add all the keywords from the calibration PVL top-level object
+  for (int k = 0; k < calibration.Keywords(); k++)
+    coefficients.AddKeyword(calibration[k]);
+
+  // Iterate over every object in the hierarchy looking for coefficient
+  // keywords.  The first string is the name of the first object, the second
+  // the name of the next object down, etc. We start from the top-level PVL
+  // object and work our way down.
+  bool validHierarchy = true;
+  PvlObject *parent = &calibration;
+  for (int o = 0; o < hierarchy.size() && validHierarchy; o++) {
+    iString objectName = hierarchy[o].toStdString();
+
+    if (parent->HasObject(objectName)) {
+      // The object named in the hierarchy exists in the calibration file, so
+      // grab it
+      PvlObject &object = parent->FindObject(objectName);
+
+      // Find all the keywords at the object level
+      for (int k = 0; k < object.Keywords(); k++) {
+        PvlKeyword &keyword = object[k];
+        if (coefficients.HasKeyword(keyword.Name())) {
+          // The coefficients object already has a value for this coefficient
+          // keyword.  Because this one is lower down the chain, it is more
+          // specifically defined, thus we should use it instead.
+          PvlKeyword &coefficient = coefficients.FindKeyword(keyword.Name());
+          for (int i = 0; i < coefficient.Size(); i++) {
+            coefficient[i] = keyword[i];
+          }
+        }
+        else {
+          // This is a new keyword, so add it to the coefficients object
+          coefficients.AddKeyword(object[k]);
+        }
+      }
+
+      // Update the parent object for the next object down the chain
+      parent = &object;
+    }
+    else {
+      // We've reached a dead end, our hierarchy no longer makes sense, so
+      // bail out
+      validHierarchy = false;
+    }
+  }
+
+  return coefficients;
+}
+
+
+void checkCoefficient(PvlObject &coefficients, iString keyName) {
+  if (!coefficients.HasKeyword(keyName))
+    throw IException(
+        IException::Programmer,
+        "Coefficient [" + keyName + "] was not found in the calibration PVL "
+        "for the input data.  Consider adding a default.",
+        _FILEINFO_);
+}
+
