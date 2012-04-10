@@ -86,8 +86,7 @@ namespace Isis {
    */
   QAction *SunShadowTool::toolPadAction(ToolPad *toolpad) {
     QAction *action = new QAction(toolpad);
-//     action->setIcon(QPixmap(toolIconDir() + "/sunshadow.png"));
-    action->setIcon(QPixmap(Filename("$ISISROOT/sunshadow.png").Expanded()));
+    action->setIcon(QPixmap(toolIconDir() + "/sunshadow.png"));
     action->setToolTip("Sun Shadow (U)");
     action->setShortcut(Qt::Key_U);
 

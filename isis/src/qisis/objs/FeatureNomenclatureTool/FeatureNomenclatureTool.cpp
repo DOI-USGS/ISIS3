@@ -325,7 +325,7 @@ namespace Isis {
   QAction *FeatureNomenclatureTool::toolPadAction(ToolPad *toolpad) {
     QAction *action = new QAction(toolpad);
 
-    action->setIcon(QPixmap(Filename("$ISISROOT/nomenclature.png").Expanded()));
+    action->setIcon(QPixmap(toolIconDir() + "/nomenclature.png"));
     action->setToolTip("Nomenclature (N)");
     action->setShortcut(Qt::Key_N);
 
