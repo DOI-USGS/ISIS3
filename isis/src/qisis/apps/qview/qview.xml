@@ -18,7 +18,7 @@
       Original version
     </change>
     <change name="Jeff Anderson" date="2006-01-06">
-      Port to Qt4 and add blink tool 
+      Port to Qt4 and add blink tool
     </change>
     <change name="Elizabeth Miller" date="2006-07-26">
       Fixed bug with filename expansion and added the MeasureTool
@@ -30,22 +30,22 @@
       Added new rubber band functionality
     </change>
     <change name="Sharmila Prasad" date="2009-10-19">
-      Added Mosaic Tracking info like image index, serial number and file name 
-      in the Advanced Tracking window to have the ability to track mosaic 
+      Added Mosaic Tracking info like image index, serial number and file name
+      in the Advanced Tracking window to have the ability to track mosaic
       origin.
     </change>
     <change name="Jeannie Walldren" date="2010-03-08">
-      Modified FindTool.  If a user enters a line/sample in the Image tab, then 
-      the corresponding lat/lon is displayed in the Ground tab.  Added Record 
-      button to FindTool to record clicked or typed point in the 
+      Modified FindTool.  If a user enters a line/sample in the Image tab, then
+      the corresponding lat/lon is displayed in the Ground tab.  Added Record
+      button to FindTool to record clicked or typed point in the
       AdvancedTrackTool window.
     </change>
     <change name="Sharmila Prasad" date="2010-03-19">
-      "qview" now has the ability to handle exceptions. The status bar now 
-      displays a default NoWarning icon with "Ready" message. If an 
-      exception is caught, the icon changes to Warning and displays the error 
-      message. Clicking on the Warning icon will display a dialog window with 
-      the details of the most recent error occured. Closing the dialog or any 
+      "qview" now has the ability to handle exceptions. The status bar now
+      displays a default NoWarning icon with "Ready" message. If an
+      exception is caught, the icon changes to Warning and displays the error
+      message. Clicking on the Warning icon will display a dialog window with
+      the details of the most recent error occured. Closing the dialog or any
       other mouse activity will reset the Warning status.
     </change>
     <change name="Eric Hyer" date="2010-03-22">
@@ -54,20 +54,23 @@
     <change name="Sharmila Prasad" date="2010-03-24">
       Enable FindTool for images without camera and/or projection
     </change>
-    <change name="Sharmila Prasad" date="2011-02-16">Added columns Local 
+    <change name="Sharmila Prasad" date="2011-02-16">Added columns Local
      Emission and  Incidence Angles for Advanced Tracking Tool
     </change>
     <change name="Sharmila Prasad" date="2011-03-18">
-      Connect the viewport's close signal to the all windows/subwindows like 
+      Connect the viewport's close signal to the all windows/subwindows like
       plottool and histogram tools as well.
     </change>
     <change name="Sharmila Prasad" date="2011-05-11">
-      Added options for SaveAs to save cube as fullImage, Export AsIs or Export 
+      Added options for SaveAs to save cube as fullImage, Export AsIs or Export
       FullResolution options
     </change>
     <change name="Steven Lambright, Jai Rideout and Tracie Sucharski" date="2012-01-18">
       Re-implemented all of the plotting functionality in order to improve the
       user interface and capabilities. Added best fit lines and a scatter plot.
+    </change>
+    <change name="Steven Lambright" date="2012-03-22">
+      Added the sun shadow and feature nomenclature tools.
     </change>
   </history>
 </application>

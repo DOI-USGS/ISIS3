@@ -66,6 +66,10 @@ namespace Isis {
    *                                       to use the new Latitude and Longitude
    *                                       classes.
    *  @history 2011-01-25 Eric Hyer - Added SetGround method for Surface Points
+   *  @history 2012-03-22 Steven Lambright - Added GroundRange() method because
+   *                          I needed a ground range in the qview nomenclature
+   *                          tool and this seemed like the best place to put
+   *                          it. The Cube paramater is optional.
    */
   class UniversalGroundMap {
     public:
@@ -101,6 +105,11 @@ namespace Isis {
       double UniversalLatitude() const;
       double UniversalLongitude() const;
       double Resolution() const;
+
+      bool GroundRange(Cube *cube,
+                       Latitude &minLat, Latitude &maxLat,
+                       Longitude &minLon, Longitude &maxLon,
+                       bool allowEstimation = true);
 
       /**
        * Returns whether the ground map has a projection or not

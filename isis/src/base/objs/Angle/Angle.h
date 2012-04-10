@@ -35,6 +35,7 @@ namespace Isis {
    *                           SetDegrees
    *   @history 2012-02-16 Steven Lambright - Brought up to method and member
    *                           naming standards.
+   *   @history 2012-03-22 Steven Lambright - Renamed text() to toString().
    */
   class Angle {
 
@@ -64,16 +65,16 @@ namespace Isis {
     virtual ~Angle();
 
 
-    // Class member operator functions 
+    // Class member operator functions
     bool isValid() const;
 
     /**
      * Assign angle object equal to another
      *
      * @param angle2 The angle value to copy
-     * @return The new angle value 
+     * @return The new angle value
      */
-    Angle& operator=(const Angle& angle2) { 
+    Angle& operator=(const Angle& angle2) {
       setAngle(angle2.radians(), Radians); return *this;
     }
 
@@ -92,7 +93,7 @@ namespace Isis {
      * Add angle value to another as double and replace original
      *
      * @param angle2 The angle to add to this angle
-     * @return sum angle, replaces original 
+     * @return sum angle, replaces original
      */
     void operator+=(const Angle&  angle2) {
       *this = *this + angle2;
@@ -146,7 +147,7 @@ namespace Isis {
     /**
      * Divide this angle by a double and return the resulting angle.
      *
-     * @param value The double value to use as the divisor 
+     * @param value The double value to use as the divisor
      */
     void operator/=(double value) {
       *this = *this / value;
@@ -162,7 +163,7 @@ namespace Isis {
      * Invalid angles are equal to each other.
      *
      * @param angle2 The comparison angle (on right-hand-side of == operator)
-     * @return true if the angle equals the comparision angle 
+     * @return true if the angle equals the comparision angle
      */
     bool operator==(const Angle& angle2) const {
       return (angle(Radians) == angle2.angle(Radians));
@@ -174,7 +175,7 @@ namespace Isis {
      * result of the '==' operator.
      *
      * @param angle2 The comparison angle (on right-hand-side of != operator)
-     * @return true if the angle does not equal the comparision angle 
+     * @return true if the angle does not equal the comparision angle
      */
     bool operator!=(const Angle& angle2) const {
       return !(*this == angle2);
@@ -184,8 +185,8 @@ namespace Isis {
     /**
      * Test if the other angle is less than or equal to the current angle
      *
-     * @param angle2 The comparison angle (on right-hand-side of < operator) 
-     * @return true if the angle is less than or equal to the comparision angle 
+     * @param angle2 The comparison angle (on right-hand-side of < operator)
+     * @return true if the angle is less than or equal to the comparision angle
      */
     bool operator<=(const Angle& angle2) const {
       return *this < angle2 || *this == angle2;
@@ -195,9 +196,9 @@ namespace Isis {
     /**
      * Test if the other angle is greater than or equal to the current angle
      *
-     * @param angle2 The comparison angle (on right-hand-side of < operator) 
-     * @return true if the angle is greater than or equal to the comparision 
-     *          angle 
+     * @param angle2 The comparison angle (on right-hand-side of < operator)
+     * @return true if the angle is greater than or equal to the comparision
+     *          angle
      */
     bool operator>=(const Angle& angle2) const {
       return *this > angle2 || *this == angle2;
@@ -208,7 +209,7 @@ namespace Isis {
      * Convert an angle to a double. This will return the radians version of
      *   the angle.
      *
-     * @return The angle value in radians 
+     * @return The angle value in radians
 
     operator double() const { return angle(Radians); }*/
 
@@ -238,7 +239,7 @@ namespace Isis {
      */
     void setDegrees(double degrees) { setAngle(degrees, Degrees); }
 
-    virtual iString text(bool printUnits = true) const;
+    virtual iString toString(bool includeUnits = true) const;
 
   protected:
     double unitWrapValue(const Units& unit) const;

@@ -16,6 +16,7 @@
 #include "BandTool.h"
 #include "BlinkTool.h"
 #include "EditTool.h"
+#include "FeatureNomenclatureTool.h"
 #include "Filename.h"
 #include "FileTool.h"
 #include "FindTool.h"
@@ -36,6 +37,7 @@
 #include "SocketThread.h"
 #include "StatisticsTool.h"
 #include "StretchTool.h"
+#include "SunShadowTool.h"
 #include "ViewportMainWindow.h"
 #include "WindowTool.h"
 #include "Workspace.h"
@@ -165,6 +167,12 @@ int main(int argc, char *argv[]) {
   Tool *measureTool = new MeasureTool(vw);
   measureTool->addTo(vw);
 
+  Tool *sunShadowTool = new SunShadowTool(vw);
+  sunShadowTool->addTo(vw);
+
+  Tool *featureNomenclatureTool = new FeatureNomenclatureTool(vw);
+  featureNomenclatureTool->addTo(vw);
+
   Tool *specialPixelTool = new SpecialPixelTool(vw);
   specialPixelTool->addTo(vw);
 
@@ -256,6 +264,8 @@ int main(int argc, char *argv[]) {
   delete spectralPlotTool;
   delete scatterPlotTool;
   delete specialPixelTool;
+  delete featureNomenclatureTool;
+  delete sunShadowTool;
   delete measureTool;
   delete windowTool;
   delete advancedTrackTool;

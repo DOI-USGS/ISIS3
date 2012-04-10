@@ -102,7 +102,8 @@ QTLIBDIR  = -L$(QTDIR)/libexec/qt4-mac/lib -F$(QTDIR)/libexec/qt4-mac/lib
 ISISCPPFLAGS       += $(QTDARWINFLAGS)
 QTCOMMONFRAMEWORKS  =
 QTFRAMEWORKS        = -framework QtXmlPatterns -framework QtXml -framework QtNetwork \
-                      -framework QtSql -framework QtGui -framework QtCore -framework QtSvg
+                      -framework QtSql -framework QtGui -framework QtCore -framework QtSvg \
+                      -framework QtWebKit -framework QtOpenGL
 QTLIB               = $(QTFRAMEWORKS) $(QTCOMMONFRAMEWORKS)
 
 QTOPENGL     = -framework OpenGL -framework AGL
@@ -242,6 +243,8 @@ THIRDPARTYLIBS    += "$(QTDIR)/libexec/qt4-mac/lib/QtSql.framework"
 THIRDPARTYLIBS    += "$(QTDIR)/libexec/qt4-mac/lib/QtGui.framework"
 THIRDPARTYLIBS    += "$(QTDIR)/libexec/qt4-mac/lib/QtCore.framework"
 THIRDPARTYLIBS    += "$(QTDIR)/libexec/qt4-mac/lib/QtSvg.framework"
+THIRDPARTYLIBS    += "$(QTDIR)/libexec/qt4-mac/lib/QtWebKit.framework"
+THIRDPARTYLIBS    += "$(QTDIR)/libexec/qt4-mac/lib/QtOpenGL.framework"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libqwt.*dylib"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libcspice*.dylib"
 #THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libsuperlu_3.0.dylib"

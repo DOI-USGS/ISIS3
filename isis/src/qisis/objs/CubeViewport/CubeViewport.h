@@ -67,41 +67,44 @@ namespace Isis {
    *  @history 2008-06-19  Noah Hilt, Added a close event for saving and discarding
    *                           changes and a method to set the cube.
    *  @history 2008-12-04  Jeannie Walldren, Fixed a bug in computeStretch() method
-   *                          for comparing precision difference on 32 bit Linux
-   *                          system. Added try/catch in showCube() to set
-   *                          p_cubeShown = false if this fails.
+   *                           for comparing precision difference on 32 bit Linux
+   *                           system. Added try/catch in showCube() to set
+   *                           p_cubeShown = false if this fails.
    *  @history 2009-03-09  Steven Lambright - Changed the way we do floating point
-   *                          math in autoStretch to work better in order to allow
-   *                          more cubes to open.
+   *                           math in autoStretch to work better in order to allow
+   *                           more cubes to open.
    *  @history 2009-03-27 Noah Hilt/Steven Lambright - Removed old rubber band
-   *                         methods and variables. Added new ViewportBuffer to
-   *                         read and store visible dn values in the viewport.
+   *                          methods and variables. Added new ViewportBuffer to
+   *                          read and store visible dn values in the viewport.
    *  @history 2009-10-23 Steven Lambright - Camera::SetBand is now called when
-   *                         switching the band being shown.
+   *                          switching the band being shown.
    *  @history 2010-04-08 Steven Lambright and Eric Hyer -
-   *                         Now supports ViewportBuffer using threaded cube I/O
+   *                          Now supports ViewportBuffer using threaded cube I/O
    *  @history 2010-04-30 Steven Lambright - Bug fixes and better
-   *                         support for threaded cube I/O
+   *                          support for threaded cube I/O
    *  @history 2010-05-20 Steven Lambright - Added memory of global
-   *                         stretches
+   *                          stretches
    *  @history 2010-05-24 Eric Hyer - Fixed bug where QPainter construction was
-   *                         being attempted with a potentially null pixmap
+   *                          being attempted with a potentially null pixmap
    *  @history 2010-06-26 Eric Hyer - Moved MDI specific code to new child class
-   *                         called MdiCubeViewport.  Fixed many include mistakes.
+   *                          called MdiCubeViewport.  Fixed many include mistakes.
    *  @history 2010-07-12 Jeannie Walldren - Changed setScale() method's maximum
-   *                         value from hard-coded 16 to the max of the viewport
-   *                         width and height.  Added setScale() minimum value of
-   *                         1/min(samps,lines).  Added exceptions to
-   *                         ViewportBuffer to help track errors.
+   *                          value from hard-coded 16 to the max of the viewport
+   *                          width and height.  Added setScale() minimum value
+   *                          of 1/min(samps,lines).  Added exceptions to
+   *                          ViewportBuffer to help track errors.
    *  @history 2010-11-08 Eric Hyer -  Added better mouseMove signal
    *  @history 2010-12-01 Steven Lambright - The initial scale now uses fitScale
-   *                         so that it is consistent with the zoom tool.
+   *                          so that it is consistent with the zoom tool.
    *  @history 2011-03-30 Sharmila Prasad - Set the frame shadow and style to remove
-   *                      border around the image
+   *                          border around the image
    *  @history 2011-03-31 Sharmila Prasad - Added band info to "whatsthis"
-   *                      API to store the whatsthis info in a PVL format
+   *                          API to store the whatsthis info in a PVL format
    *  @history 2011-04-25 Steven Lambright - Fixed "center" and added more safety
-   *                      checks.
+   *                          checks.
+   *  @history 2012-03-22 Steven Lambright and Jai Rideout - Fixed bug where
+   *                          screenPixelsChanged was not correctly emitted
+   *                          on resize.
    */
   class CubeViewport : public QAbstractScrollArea {
       Q_OBJECT
@@ -307,22 +310,22 @@ namespace Isis {
        * @param stretch
        */
       void setAllBandStretches(Stretch stretch);
-      
-      
+
+
       /**
        * @returns this CubeViewport's CubeDataThread
        */
       CubeDataThread *cubeDataThread() {
         return p_cubeData;
       }
-      
+
       /**
        * @returns the CubeViewport's cube id
        */
       int cubeID() {
         return p_cubeId;
       }
-      
+
 
       /**
        * Get All WhatsThis info - viewport, cube, area in PVL format
@@ -443,14 +446,14 @@ namespace Isis {
 
     protected: // data
       QPixmap p_pixmap;//!< The qpixmap.
-      
+
       //! Stretches for each previously stretched band
       QVector< Stretch * > * p_knownStretches;
 
       //! Global stretches for each stretched band
       QVector< Stretch * > * p_globalStretches;
 
-      
+
     private: // data
       ViewportBuffer *p_grayBuffer;  //!< Viewport Buffer to manage gray band
       ViewportBuffer *p_redBuffer;  //!< Viewport Buffer to manage red band
@@ -493,7 +496,7 @@ namespace Isis {
 
       //! A list of rects that the viewport buffers have requested painted
       QList< QRect * > *p_pixmapPaintRects;
-      
+
       CubeDataThread *p_cubeData;  //!< Does all the cube I/O
       int p_cubeId; //!< Cube ID given from cube data thread for I/O
 

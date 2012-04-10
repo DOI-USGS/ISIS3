@@ -219,16 +219,16 @@ namespace Isis {
   /**
    * Get the angle in human-readable form.
    *
-   * @param printUnits Include the angle's units in the text.
-   * @return A user-displayable angle.
+   * @param includeUnits Include the angle's units in the text.
+   * @return A user-displayable angle string.
    */
-  iString Angle::text(bool printUnits) const {
-    iString textResult = "(N/A)";
+  iString Angle::toString(bool includeUnits) const {
+    iString textResult = "";
 
     if (isValid()) {
       textResult = iString(degrees());
 
-      if (printUnits)
+      if (includeUnits)
         textResult += " degrees";
     }
 

@@ -23,10 +23,9 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-// The only includes allowed in this file are the direct parents of this class!
 #include "CubeViewport.h"
-// There are absolutely no exceptions to this.
 
+#include <QMetaType>
 
 
 class QPaintEvent;
@@ -45,9 +44,11 @@ namespace Isis {
    * @author ????-??-?? Eric Hyer - Moved MDI specific code here from
    *                        CubeViewport
    *
-   * @internal
-   *
    * @see Workspace CubeViewport
+   *
+   * @internal
+   *   @history 2012-03-22 Steven Lambright - Added Qt meta type declarations
+   *                           for QVariant.
    */
   class MdiCubeViewport : public CubeViewport {
       Q_OBJECT
@@ -86,5 +87,7 @@ namespace Isis {
 
   };
 }
+
+Q_DECLARE_METATYPE(Isis::MdiCubeViewport *);
 
 #endif

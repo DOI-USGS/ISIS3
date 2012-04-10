@@ -1,5 +1,5 @@
-#ifndef _QISISAPPLICATION_H_
-#define _QISISAPPLICATION_H_
+#ifndef QIsisApplication_H
+#define QIsisApplication_H
 
 /**
  * @file
@@ -24,13 +24,8 @@
  */
 
 
-#include <iostream>
 #include <QApplication>
-#include <QMessageBox>
-
-#include "WarningWidget.h"
-#include "IException.h"
-#include "iString.h"
+#include <QUrl>
 
 namespace Isis {
   /**
@@ -47,16 +42,20 @@ namespace Isis {
    *
    * @internal
    *   @history 2010-06-29 Steven Lambright - Added a setlocale to english for
-   *            numeric values
-   *
-   *
-   * @todo
+   *                           numeric values
+   *   @history 2013-03-22 Steven Lambright - Added the Url handler for http://
+   *                           links. Currently using QWebView - we may want
+   *                           options later.
    */
   class QIsisApplication : public QApplication {
+      Q_OBJECT
 
     public:
       QIsisApplication(int &argc, char *argv[]);
       virtual bool notify(QObject *rec, QEvent *ev);
+
+    public slots:
+      void openUrl(QUrl url);
   };
 };
 

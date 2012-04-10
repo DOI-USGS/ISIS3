@@ -160,6 +160,21 @@ namespace Isis {
 
 
   /**
+   * Get a textual representation of this distance.
+   *
+   * @return XXX meters (or empty string if not valid).
+   */
+  iString Distance::toString() const {
+    iString string;
+
+    if (isValid())
+      string = iString(meters()) + " meters";
+
+    return string;
+  }
+
+
+  /**
    * Test if this distance has been initialized or not
    *
    * @return True if this distance has been initialized.

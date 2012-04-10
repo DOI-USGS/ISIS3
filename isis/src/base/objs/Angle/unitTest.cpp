@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
     cout << "  Default constructor - valid?:  " << angle.isValid() << 
       " values: " << angle.radians() << " and " << angle.degrees() << 
       endl;
-    cout << "  " << angle.text() << endl;
+    cout << "  " << angle.toString() << endl;
   }
   catch(Isis::IException &e) {
     e.print();
@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
     cout << "  Degree input and radian output:  " << angle.radians() << 
       " radians" << endl;
     cout << "  Valid? " << angle.isValid() << endl;
-    cout << "  " << angle.text() << endl;
+    cout << "  " << angle.toString() << endl;
   }
   catch(Isis::IException &e) {
     e.print();
@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
     Angle angle(30. * PI / 180., Angle::Radians );
     cout << "  Radian input and degree output:  " << angle.degrees() <<
       " degrees" <<endl;
-    cout << "  " << angle.text(false) << endl;
+    cout << "  " << angle.toString(false) << endl;
   }
   catch(Isis::IException &e) {
     e.print();

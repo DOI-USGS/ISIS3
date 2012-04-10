@@ -1062,6 +1062,7 @@ namespace Isis {
 
     // Repaint the internal viewport and scroll bars
     viewport()->update();
+    emit screenPixelsChanged();
   }
 
 

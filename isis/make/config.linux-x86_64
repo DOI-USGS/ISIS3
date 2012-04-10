@@ -91,7 +91,7 @@ QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.8.0/QtWebKit
 QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.8.0/QtXml
 QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.8.0/QtXmlPatterns
 QTLIBDIR = -L$(ISIS3LOCAL)/lib
-QTLIB    = -lQtXmlPatterns -lQtXml -lQtNetwork -lQtSql -lQtGui -lQtCore -lQtSvg -lQtTest
+QTLIB    = -lQtXmlPatterns -lQtXml -lQtNetwork -lQtSql -lQtGui -lQtCore -lQtSvg -lQtTest -lQtOpenGL -lQtWebKit
 
 UIC      = $(ISIS3LOCAL)/bin/uic
 MOC      = $(ISIS3LOCAL)/bin/moc
@@ -247,6 +247,8 @@ THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtCore.so*[^g]"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtSvg.so*[^g]"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtTest.so*[^g]"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtDBus.so*[^g]"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtWebKit.so*[^g]"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtOpenGL.so*[^g]"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libqwt.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libprotobuf.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libgeos-*.so"

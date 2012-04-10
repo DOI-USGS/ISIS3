@@ -1,11 +1,15 @@
 #include "UniversalGroundMap.h"
 
+#include <QPointF>
+
 #include "Camera.h"
 #include "CameraFactory.h"
+#include "ImagePolygon.h"
 #include "Latitude.h"
 #include "Longitude.h"
 #include "Latitude.h"
 #include "Longitude.h"
+#include "PolygonTools.h"
 #include "Projection.h"
 #include "ProjectionFactory.h"
 #include "SurfacePoint.h"
@@ -255,5 +259,223 @@ namespace Isis {
     else {
       return p_projection->Resolution();
     }
+  }
+
+
+  /**
+   * Find the lat/lon range of the image. This will use the image footprint,
+   *   camera, or projection in order to find a good result.
+   *
+   * @param Cube* This is required for estimation. You can pass in NULL (it will
+   *              disable estimation).
+   * @param minLat This is an output: minimum latitude
+   * @param maxLat This is an output: maximum latitude
+   * @param minLon This is an output: minimum longitude
+   * @param maxLon This is an output: maximum longitude
+   * @param allowEstimation If this is true then extra efforts will be made to
+   *     guess the ground range of the input. This can still fail.
+   * @return True if a ground range was found, false if no ground range could
+   *     be determined. Some lat/lon results may still be populated; their
+   *     values are undefined.
+   */
+  bool UniversalGroundMap::GroundRange(Cube *cube, Latitude &minLat,
+      Latitude &maxLat, Longitude &minLon, Longitude &maxLon,
+      bool allowEstimation) {
+    minLat = Latitude();
+    maxLat = Latitude();
+    minLon = Longitude();
+    maxLon = Longitude();
+
+    // If we have a footprint, use it
+    try {
+      if (cube) {
+        ImagePolygon poly;
+        cube->read(poly);
+        geos::geom::MultiPolygon *footprint = PolygonTools::MakeMultiPolygon(
+            poly.Polys()->clone());
+
+        geos::geom::Geometry *envelope = footprint->getEnvelope();
+        geos::geom::CoordinateSequence *coords = envelope->getCoordinates();
+
+        for (unsigned int i = 0; i < coords->getSize(); i++) {
+          const geos::geom::Coordinate &coord = coords->getAt(i);
+
+          Latitude coordLat(coord.y, Angle::Degrees);
+          Longitude coordLon(coord.x, Angle::Degrees);
+
+          if (!minLat.isValid() || minLat > coordLat)
+            minLat = coordLat;
+          if (!maxLat.isValid() || maxLat < coordLat)
+            maxLat = coordLat;
+
+          if (!minLon.isValid() || minLon > coordLon)
+            minLon = coordLon;
+          if (!maxLon.isValid() || maxLon < coordLon)
+            maxLon = coordLon;
+        }
+
+        delete coords;
+        coords = NULL;
+
+        delete envelope;
+        envelope = NULL;
+
+        delete footprint;
+        footprint = NULL;
+      }
+    }
+    catch (IException &) {
+    }
+
+    if (!minLat.isValid() || !maxLat.isValid() ||
+        !minLon.isValid() || !maxLon.isValid()) {
+      if (HasCamera()) {
+        // Footprint failed, ask the camera
+        PvlGroup mappingGrp("Mapping");
+        mappingGrp += PvlKeyword("LatitudeType", "Planetocentric");
+        mappingGrp += PvlKeyword("LongitudeDomain", "360");
+        mappingGrp += PvlKeyword("LongitudeDirection", "PositiveEast");
+
+        Pvl mappingPvl;
+        mappingPvl += mappingGrp;
+        double minLatDouble;
+        double maxLatDouble;
+        double minLonDouble;
+        double maxLonDouble;
+        p_camera->GroundRange(
+            minLatDouble, maxLatDouble,
+            minLonDouble, maxLonDouble, mappingPvl);
+        minLat = Latitude(minLatDouble, Angle::Degrees);
+        maxLat = Latitude(maxLatDouble, Angle::Degrees);
+        minLon = Longitude(minLonDouble, Angle::Degrees);
+        maxLon = Longitude(maxLonDouble, Angle::Degrees);
+      }
+      else if (HasProjection()) {
+        // Footprint failed, look in the mapping group
+        PvlGroup mappingGrp = p_projection->Mapping();
+        if (mappingGrp.HasKeyword("MinimumLatitude") &&
+            mappingGrp.HasKeyword("MaximumLatitude") &&
+            mappingGrp.HasKeyword("MinimumLongitude") &&
+            mappingGrp.HasKeyword("MaximumLongitude")) {
+
+          minLat = Latitude(mappingGrp["MinimumLatitude"],
+                            mappingGrp, Angle::Degrees);
+          maxLat = Latitude(mappingGrp["MaximumLatitude"],
+                            mappingGrp, Angle::Degrees);
+          minLon = Longitude(mappingGrp["MinimumLongitude"],
+                             mappingGrp, Angle::Degrees);
+          maxLon = Longitude(mappingGrp["MaximumLongitude"],
+                             mappingGrp, Angle::Degrees);
+
+        }
+        else if (allowEstimation && cube) {
+          // Footprint and mapping failed... no lat/lon range of any kind is
+          //   available. Let's test points in the image to try to make our own
+          //   extent.
+          QList<QPointF> imagePoints;
+
+          /*
+           * This is where we're testing:
+           *
+           *  |-----------|
+           *  |1    2    3|
+           *  |           |
+           *  |8    9    4|
+           *  |           |
+           *  |7    6    5|
+           *  |-----------|
+           *
+           * We'll test at the edges and one off to help DEMs work.
+           */
+
+          int sampleCount = cube->getSampleCount();
+          int lineCount = cube->getLineCount();
+
+          // 1
+          imagePoints.append(
+              QPointF(0.5, 0.5));
+          imagePoints.append(
+              QPointF(2, 2));
+
+          // 2
+          imagePoints.append(
+              QPointF((sampleCount / 2) + 0.5, 0.5));
+          imagePoints.append(
+              QPointF((sampleCount / 2) + 0.5, 2));
+
+          // 3
+          imagePoints.append(
+              QPointF(sampleCount + 0.5, 0.5));
+          imagePoints.append(
+              QPointF(sampleCount + 0.5, 2));
+
+          // 4
+          imagePoints.append(
+              QPointF(sampleCount + 0.5, (lineCount / 2) +  0.5));
+          imagePoints.append(
+              QPointF(sampleCount - 1, (lineCount / 2) + 0.5));
+
+          // 5
+          imagePoints.append(
+              QPointF(sampleCount + 0.5, lineCount + 0.5));
+          imagePoints.append(
+              QPointF(sampleCount - 1, lineCount - 1));
+
+          // 6
+          imagePoints.append(
+              QPointF((sampleCount / 2) + 0.5, lineCount + 0.5));
+          imagePoints.append(
+              QPointF((sampleCount / 2) + 0.5, lineCount - 1));
+
+          // 7
+          imagePoints.append(
+              QPointF(0.5, lineCount + 0.5));
+          imagePoints.append(
+              QPointF(2, lineCount - 1));
+
+          // 8
+          imagePoints.append(
+              QPointF(0.5, (lineCount / 2) + 0.5));
+          imagePoints.append(
+              QPointF(2, (lineCount / 2) + 0.5));
+
+          // 9
+          imagePoints.append(
+              QPointF((sampleCount / 2) + 0.5, (lineCount / 2) + 0.5));
+
+          foreach (QPointF imagePoint, imagePoints) {
+            if (p_projection->SetWorld(imagePoint.x(), imagePoint.y())) {
+              Latitude latResult(p_projection->UniversalLatitude(),
+                                 Angle::Degrees);
+              Longitude lonResult(p_projection->UniversalLongitude(),
+                                  Angle::Degrees);
+              if (minLat.isValid())
+                minLat = qMin(minLat, latResult);
+              else
+                minLat = latResult;
+
+              if (maxLat.isValid())
+                maxLat = qMax(maxLat, latResult);
+              else
+                maxLat = latResult;
+
+              if (minLon.isValid())
+                minLon = qMin(minLon, lonResult);
+              else
+                minLon = lonResult;
+
+              if (maxLon.isValid())
+                maxLon = qMax(maxLon, lonResult);
+              else
+                maxLon = lonResult;
+            }
+          }
+        }
+      }
+    }
+
+    return (minLat.isValid() && maxLat.isValid() &&
+            minLon.isValid() && maxLon.isValid() &&
+            minLat < maxLat && minLon < maxLon);
   }
 }

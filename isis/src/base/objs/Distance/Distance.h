@@ -22,6 +22,7 @@
 
 namespace Isis {
   class Displacement;
+  class iString;
 
   /**
    * @brief Distance measurement, usually in meters
@@ -38,6 +39,7 @@ namespace Isis {
    *   @history 2011-04-18 Steven Lambright Improved special pixel math handling
    *   @history 2012-02-16 Steven Lambright - Brought up to method and member
    *                           naming standards.
+   *   @history 2012-03-22 Steven Lambright - Added toString().
    */
   class Distance {
     public:
@@ -70,6 +72,7 @@ namespace Isis {
       double pixels(double pixelsPerMeter = 1.0) const;
       void setPixels(double distanceInPixels, double pixelsPerMeter = 1.0);
 
+      iString toString() const;
       bool isValid() const;
 
       bool operator >(const Distance &otherDistance) const;

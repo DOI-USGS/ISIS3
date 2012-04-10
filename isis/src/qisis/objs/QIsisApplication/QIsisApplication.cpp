@@ -2,9 +2,15 @@
 
 #include <locale.h>
 
+#include <QDesktopServices>
 #include <QObject>
+#include <QMessageBox>
+#include <QUrl>
+#include <QWebView>
 
 #include "Filename.h"
+#include "IException.h"
+#include "iString.h"
 
 namespace Isis {
   /**
@@ -15,11 +21,13 @@ namespace Isis {
    */
   QIsisApplication::QIsisApplication(int &argc, char *argv[]) :
     QApplication(argc, argv) {
-
     // try to use US locale for numbers so we don't end up printing "," instead
     //   of "." where it might count.
     setlocale(LC_NUMERIC, "en_US");
+
+    QDesktopServices::setUrlHandler("http", this, "openUrl");
   }
+
 
   /**
   * notify - this function overrides the QApplication notify as
@@ -46,5 +54,16 @@ namespace Isis {
       QMessageBox::critical(NULL, "Error", e.what());
     }
     return false;
+  }
+
+
+  /**
+   * Open a URL in the browser specified by Isis.
+   */
+  void QIsisApplication::openUrl(QUrl url) {
+     QWebView *view = new QWebView(NULL);
+     view->setAttribute(Qt::WA_DeleteOnClose);
+     view->load(url);
+     view->show();
   }
 }
