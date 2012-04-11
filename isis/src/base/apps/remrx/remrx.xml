@@ -30,9 +30,13 @@
   </description>
 
   <category>
+    <categoryItem>Geometry</categoryItem>
+    <!-- These three removed until we update the doc system to
+    better show a difference betwee category and mission
     <missionItem>Viking</missionItem>
     <missionItem>Voyager</missionItem>
     <missionItem>Mariner</missionItem>
+    !-->
   </category>
 
   <seeAlso>
