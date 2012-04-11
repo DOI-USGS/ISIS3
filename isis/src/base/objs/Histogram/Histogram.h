@@ -31,6 +31,8 @@
 #include "Statistics.h"
 
 namespace Isis {
+  class ControlNet;
+  class ControlMeasure;
   /**
    * @brief Container of a cube histogram
    *
@@ -63,6 +65,9 @@ namespace Isis {
    *            for floating point cubes.
    *   @history 2012-01-19 Steven Lambright and Jai Rideout - Added constructor
    *                           parameters to read from the Cube automatically.
+   *   @history 2012-04-10 Orrin Thomas - Added constructor parameters to read
+                               from ControlNets automatically (For control measure
+                               data.)
    */
   class Histogram : public Statistics {
     public:
@@ -73,12 +78,17 @@ namespace Isis {
                 double endSample = Null, double endLine = Null, int bins = 0,
                 bool addCubeData = false);
 
+      //constuctors that use ControlNetworks to build histograms of ControlMeasure data 
+      Histogram(ControlNet &net, double(ControlMeasure::*statFunc)() const, int bins);
+      Histogram(ControlNet &net, double(ControlMeasure::*statFunc)() const, double binWidth);
+
       ~Histogram();
 
       void SetBins(const int bins);
 
       void Reset();
       void AddData(const double *data, const unsigned int count);
+      void AddData(const double data);
       void RemoveData(const double *data, const unsigned int count);
 
       double Median() const;
@@ -105,6 +115,9 @@ namespace Isis {
       void InitializeFromCube(Cube &cube, int statsBand, Progress *progress,
           int nbins = 0, double startSample = Null, double startLine = Null,
           double endSample = Null, double endLine = Null);
+
+      void addMeasureDataFromNet(ControlNet &net, double(ControlMeasure::*statFunc)() const);
+      void rangesFromNet(ControlNet &net, double(ControlMeasure::*statFunc)() const);
 
       //! The array of counts.
       std::vector<BigInt> p_bins;

@@ -26,8 +26,12 @@
 #include <iostream>
 
 #include "Brick.h"
+#include "ControlMeasure.h"
+#include "ControlNet.h"
+#include "ControlPoint.h"
 #include "Message.h"
 #include "LineManager.h"
+#include <math.h>
 
 using namespace std;
 namespace Isis {
@@ -106,6 +110,135 @@ namespace Isis {
         }
       }
     }
+  }
+
+
+  /**
+   * Constructs a histogram from a control netowrk 
+   *
+   * @param net  reference to a ControlNetwork used to access all the measures
+   * @param statFunc  pointer to a ControlMeasure acessor, the returns of this function call will be used to build up the network
+   * @param bins   the number of bins to divide the histogram into
+   * @throws The number of Histogram Bins must be greater than 0
+   */
+  Histogram::Histogram(ControlNet &net, double(ControlMeasure::*statFunc)() const, int bins) {
+    
+    //check to make sure we have a reasonable number of bins
+    if (bins < 1) {
+      string msg = "The number of Histogram Bins must be greater than 0";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+    SetBins(bins);
+
+    //set the ranges
+    rangesFromNet(net,statFunc);
+
+    //add all the data to the now setup histogram
+    addMeasureDataFromNet(net,statFunc);
+  }
+
+
+  /**
+   * Constructs a histogram from a control netowrk 
+   *
+   * @param net  reference to a ControlNetwork used to access all the measures
+   * @param statFunc  pointer to a ControlMeasure acessor, the returns of this function call will be used to build up the network
+   * @param binWidth   the width of histogram bins
+   * @throws The width of Histogram Bins must be greater than 0
+   */
+  Histogram::Histogram(ControlNet &net, double(ControlMeasure::*statFunc)() const, double binWidth) {
+    
+    //check to make sure we have a reasonable number of bins
+    if (binWidth <= 0 ) {
+      string msg = "The width of Histogram Bins must be greater than 0";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+   //get the range of the data
+   rangesFromNet(net,statFunc);
+
+   
+   //stretch the domain so that it is an even multiple of binWidth
+   double domain = this->ValidMaximum() - this->ValidMinimum();
+   double stretch = domain/binWidth;
+   stretch = (1-fmod(stretch,1.0))*binWidth;
+   domain += stretch;
+   stretch /= 2.0;
+   SetValidRange(this->ValidMinimum()-stretch,this->ValidMaximum()+stretch);
+   SetBinRange  (this->ValidMinimum()        ,this->ValidMaximum()        );
+
+   //from the domain of the data and the requested bin width calculate the number of bins
+   int nBins = int ( ceil(domain/binWidth)+1 );
+   SetBins(nBins);
+
+   //add all the data to the now setup histogram
+   addMeasureDataFromNet(net,statFunc);
+  }
+
+
+  /**
+   * Iterates through all the measures in a network adding them to the histogram
+   *
+   * @param net  reference to a ControlNetwork used to access all the measures
+   * @param statFunc  pointer to a ControlMeasure acessor, the returns of this function call will be used to build up the network
+   */
+  void Histogram::addMeasureDataFromNet(ControlNet &net, double(ControlMeasure::*statFunc)() const) {
+    //get the number of object points
+    int nObjPts =  net.GetNumPoints();
+    for (int i=0;i<nObjPts;i++) { //for each Object point
+      const ControlPoint *point = net.GetPoint(i);
+      if (point->IsIgnored()) continue;  //if the point is ignored then continue
+
+      //get the number of measures
+      int nObs = point->GetNumMeasures();
+      for (int j=0;j<nObs;j++) {  //for every measure
+        const ControlMeasure *measure = point->GetMeasure(j);
+        if (measure->IsIgnored())  continue;
+        this->AddData((measure->*statFunc)());
+      }
+    }
+  }
+
+
+  /**
+   * Iterates through all the measures in a network in order to find the domain of the data
+   *
+   * @param net  reference to a ControlNetwork used to access all the measures
+   * @param statFunc  pointer to a ControlMeasure acessor, the returns of this function call will be used to build up the network
+   * @throw The net file appears to have 1 or fewer measures, thus no histogram can be formed
+   */
+  void Histogram::rangesFromNet(ControlNet &net, double(ControlMeasure::*statFunc)() const) {
+    double min,max,temp;
+    min =  DBL_MAX;
+    max = -DBL_MAX;
+
+    //get the number of object points
+    int nObjPts =  net.GetNumPoints();
+    for (int i=0;i<nObjPts;i++) { //for each Object point
+      const ControlPoint *point = net.GetPoint(i);
+      if (point->IsIgnored()) continue;  //if the point is ignored then continue
+
+      //get the number of measures
+      int nObs = point->GetNumMeasures();
+      for (int j=0;j<nObs;j++) {  //for every measure
+        const ControlMeasure *measure = point->GetMeasure(j);
+        if (measure->IsIgnored())  continue;
+
+        temp = (measure->*statFunc)();  //get the data using the passed ControlMeasure acessor function pointer
+        if (temp > max) max = temp;
+        if (temp < min) min = temp;
+      }
+    }
+
+    //if DBL_MAX's weren't changed there's a problem
+    if (max <= min) {
+      string msg = "The net file appears to have 1 or fewer measures, thus no histogram can be formed";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    //set up the histogram ranges
+    SetValidRange(min, max);
+    SetBinRange(min, max);
   }
 
 
@@ -276,6 +409,34 @@ namespace Isis {
       }
     }
   }
+
+
+  /**
+   * Add a single double data to the histogram.  Of course this can be invoke multiple times.
+   * e.g. once for each residual in a network for instance.
+   *
+   * @param data a single observation to be added to the histogram
+   */
+
+  void Histogram::AddData(const double data) {
+    Statistics::AddData(data);
+
+    int nbins = p_bins.size();
+    int index;
+    if (IsValidPixel(data) && InRange(data)) {
+      if (BinRangeStart() == BinRangeEnd()) {
+        index = 0;
+      }
+      else {
+        index = (int) floor((double)(nbins - 1) / (BinRangeEnd() - BinRangeStart()) *
+                            (data - BinRangeStart()) + 0.5);
+      }
+      if (index < 0) index = 0;
+      if (index >= nbins) index = nbins - 1;
+      p_bins[index] += 1;
+    }
+  }
+
 
   /**
    * Remove an array of doubles from the histogram counters. Note that this
