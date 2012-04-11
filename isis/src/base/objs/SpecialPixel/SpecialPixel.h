@@ -364,7 +364,7 @@ namespace Isis {
     }
 
     QString result;
-    return result.setNum(d).toStdString();
+    return result.setNum(d, 'g', 8).toStdString();
   }
   /**
    * Takes the name of the pixel type as a string and returns a
