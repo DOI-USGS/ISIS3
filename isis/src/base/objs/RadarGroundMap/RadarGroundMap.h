@@ -87,14 +87,17 @@ namespace Isis {
    *                      1E-6 and increased the number of iterations from 30 to
    *                      100.
    *  @history 2012-04-03 Janet Barrett - The iteration code was moved to its own method so 
-   *                      that it can be run multiple times
-   *          // if necessary. The first iteration should suffice for those pixels that have shallow
-   *              // slopes. For those pixels that lie on steep slopes (up to 2x the incidence angle), then
-   *                  // an additional iteration call is needed. In the future, we may need to add more calls
-   *                      // to the iteration method if the slope is greater than 2x the incidence angle. The
-   *                          // slope variable will need to be halved each time the iteration method is called until
-   *                              // a solution is found. So, for example, if we needed to call the iteration method a third
-   *                                  // time, the slope variable would be set to .25.
+   *                      that it can be run multiple times if necessary. The first iteration 
+   *                      should suffice for those pixels that have shallow slopes. For those 
+   *                      pixels that lie on steep slopes (up to 2x the incidence angle), then
+   *                      an additional iteration call is needed. In the future, we may need to 
+   *                      add more calls to the iteration method if the slope is greater than 2x 
+   *                      the incidence angle. The slope variable will need to be halved each time 
+   *                      the iteration method is called until a solution is found. So, for example, 
+   *                      if we needed to call the iteration method a third time, the slope variable 
+   *                      would be set to .25.
+   *  @history 2012-04-11 Janet Barrett - Removed call to SetLookDirection from the SetGround
+   *                      method.
    */
   class RadarGroundMap : public CameraGroundMap {
     public:
