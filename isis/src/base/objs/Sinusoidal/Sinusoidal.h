@@ -60,6 +60,10 @@ namespace Isis {
    *  @history 2007-06-29 Steven Lambright - Added Mapping, MappingLatitudes and
    *                                          MappingLongitudes methods.
    *  @history 2008-05-09 Steven Lambright - Added Name, Version methods
+   *  @history 2012-03-30 Steven Lambright and Stuart Sides - SetCoordinate will
+   *                          now fail if the resulting longitude is becoming too
+   *                          large to work with in double precision. Fixes
+   *                          #656.
    */
 
   class Sinusoidal : public Isis::Projection {

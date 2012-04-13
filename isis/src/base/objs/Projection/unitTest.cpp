@@ -200,7 +200,8 @@ int main(int argc, char *argv[]) {
   cout << "Bring -50  into 360 Domain:  " << p.To360Domain(-50.0) << endl;
   cout << "Bring  50  into 360 Domain:  " << p.To360Domain(50.0) << endl;
   cout << "Bring   0  into 360 Domain:  " << p.To360Domain(0.0) << endl;
-  cout << "Bring 360  into 360 Domain:  " << p.To360Domain(360.0) << endl << endl;
+  cout << "Bring 360-e  into 360 Domain:  " << p.To360Domain(360.0 - 1E-10)
+       << endl << endl;
   cout << "Bring 240  into 180 Domain:  " << p.To180Domain(240.0) << endl;
   cout << "Bring 140  into 180 Domain:  " << p.To180Domain(140.0) << endl;
   cout << "Bring -180 into 180 Domain:  " << p.To180Domain(-180.0) << endl;

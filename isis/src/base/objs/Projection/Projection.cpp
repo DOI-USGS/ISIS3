@@ -32,6 +32,7 @@
 #include "Displacement.h"
 #include "Filename.h"
 #include "IException.h"
+#include "Longitude.h"
 
 using namespace std;
 namespace Isis {
@@ -453,10 +454,7 @@ namespace Isis {
    * @param lon Longitude to convert into the 0 to 360 domain.
    */
   double Projection::To360Domain(const double lon) {
-    double mylon = lon;
-    while(mylon < 0.0) mylon += 360.0;
-    while(mylon > 360.0) mylon -= 360.0;
-    return mylon;
+    return Isis::Longitude(lon, Angle::Degrees).force360Domain().degrees();
   }
 
   /**
@@ -468,10 +466,7 @@ namespace Isis {
    * @param lon Longitude to convert into the -180 to 180 domain.
    */
   double Projection::To180Domain(const double lon) {
-    double mylon = lon;
-    while(mylon < -180.0) mylon += 360.0;
-    while(mylon > 180.0) mylon -= 360.0;
-    return mylon;
+    return Isis::Longitude(lon, Angle::Degrees).force180Domain().degrees();
   }
 
   /**

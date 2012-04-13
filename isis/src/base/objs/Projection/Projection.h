@@ -121,6 +121,9 @@ namespace Isis {
    *  @history 2012-03-01 Jeff Anderson - Fixed bug in SetUpperLeftCorner by
    *                          adding Pvl::Replace when updating the mapping
    *                          labels 
+   *  @history 2012-03-30 Steven Lambright and Stuart Sides - To360Domain() and
+   *                          To180Domain() are now constant time operations.
+   *                          Fixes #656.
    */
   class Projection {
     public:

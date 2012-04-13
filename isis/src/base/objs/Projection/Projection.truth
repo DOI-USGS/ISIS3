@@ -61,11 +61,11 @@ Testing conversion methods
 Bring -50  into 360 Domain:  310
 Bring  50  into 360 Domain:  50
 Bring   0  into 360 Domain:  0
-Bring 360  into 360 Domain:  360
+Bring 360-e  into 360 Domain:  359.9999999999
 
 Bring 240  into 180 Domain:  -120
 Bring 140  into 180 Domain:  140
-Bring -180 into 180 Domain:  -180
+Bring -180 into 180 Domain:  180
 Bring 180  into 180 Domain:  180
 
 Change -90 to planetographic: -90

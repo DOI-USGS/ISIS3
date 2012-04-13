@@ -155,7 +155,10 @@ namespace Isis {
     //  p_longitude = To360Domain (p_longitude);
     //  if (p_longitudeDomain == 180) p_longitude = To180Domain(p_longitude);
 
-    p_good = true;
+    // Our double precision is not good once we pass a certain magnitude of
+    //   longitude. Prevent failures down the road by failing now.
+    p_good = (fabs(p_longitude) < 1E10);
+
     return p_good;
   }
 
