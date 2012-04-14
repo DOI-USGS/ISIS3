@@ -454,7 +454,13 @@ namespace Isis {
    * @param lon Longitude to convert into the 0 to 360 domain.
    */
   double Projection::To360Domain(const double lon) {
-    return Isis::Longitude(lon, Angle::Degrees).force360Domain().degrees();
+    double result = lon;
+
+    if ( (lon < 0.0 || lon > 360.0) &&
+        !qFuzzyCompare(lon, 0.0) && !qFuzzyCompare(lon, 360.0))
+     result = Isis::Longitude(lon, Angle::Degrees).force360Domain().degrees();
+
+    return result;
   }
 
   /**
