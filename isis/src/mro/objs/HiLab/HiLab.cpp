@@ -23,7 +23,10 @@
 using namespace std;
 
 namespace Isis {
-  //! Constructs a HiLab Object
+  /**
+   * Constructs a HiLab Object
+   * @param cube The cube containing the HiRise labels to be processed. 
+   */
   HiLab::HiLab(Cube *cube) {
     PvlGroup group = cube->getGroup("Instrument");
     p_cpmmNumber = group["CpmmNumber"];
@@ -45,7 +48,7 @@ namespace Isis {
       throw IException(IException::Io, msg, _FILEINFO_);
     }
   }
-  //! Returns the ccd from a lookup table based on the cpmm number
+
   int HiLab::getCcd() {
     const int cpmm2ccd[] = {0, 1, 2, 3, 12, 4, 10, 11, 5, 13, 6, 7, 8, 9};
     return cpmm2ccd[p_cpmmNumber];
