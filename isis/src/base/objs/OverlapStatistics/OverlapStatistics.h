@@ -63,7 +63,7 @@ namespace Isis {
    *                          processing time
    *  @history 2012-04-16 Jeannie Backer - Added forward declaration for
    *                          PvlObject and ordered #includes in the
-   *                          implementation file.
+   *                          implementation file. Added documentation.
    *
    */
 
@@ -84,6 +84,7 @@ namespace Isis {
       bool HasOverlap(int band) const {
         return (p_stats[band-1].ValidPixels() > 0);
       };
+
       bool HasOverlap() const;
 
       /**
@@ -248,6 +249,39 @@ namespace Isis {
         return GetMStats(band).ValidPixels() > p_mincnt;
       };
 
+      /**
+       * Creates a Pvl containing the following Overlap Statistics information
+       *  
+       * File1
+       *   StartSample
+       *   EndSample
+       *   StartLine
+       *   EndLine
+       *   Average
+       *   StandardDeviation
+       *   Variance
+       * File2
+       *   StartSample
+       *   EndSample
+       *   StartLine
+       *   EndLine
+       *   Average
+       *   StandardDeviation
+       *   Variance
+       * Width 
+       * Height 
+       * SamplingPercent 
+       * Covariance 
+       * Correlation 
+       * ValidOverlap 
+       * ValidPixels 
+       * InvalidPixels 
+       * TotalPixels 
+       *
+       *
+       * @return PvlObject PvlObject containing the information for the Overlap
+       *         Statistics.
+       */
       PvlObject toPvl() const;
 
 
