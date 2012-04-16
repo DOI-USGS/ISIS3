@@ -16,6 +16,8 @@
 #include "MosaicGraphicsView.h"
 #include "MosaicSceneWidget.h"
 #include "Projection.h"
+#include "PvlKeyword.h"
+#include "PvlObject.h"
 
 namespace Isis {
   /**

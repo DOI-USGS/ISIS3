@@ -18,6 +18,8 @@ namespace Isis {
    *
    * @internal
    *   @history 2011-05-10 Steven Lambright - Added arrow capabilities for CPs
+   *   @history 2012-04-16 Jeannie Backer - Added #include for Pvl class in
+   *                           implementation file.
    */
   class ControlNetGraphicsItem : public QGraphicsObject {
       Q_OBJECT

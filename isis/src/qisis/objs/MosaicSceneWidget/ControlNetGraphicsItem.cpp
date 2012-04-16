@@ -17,6 +17,7 @@
 #include "MosaicSceneWidget.h"
 #include "ProgressBar.h"
 #include "Projection.h"
+#include "Pvl.h"
 #include "SerialNumberList.h"
 #include "SurfacePoint.h"
 #include "UniversalGroundMap.h"

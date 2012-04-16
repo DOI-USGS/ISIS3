@@ -9,6 +9,7 @@ class QLineEdit;
 
 namespace Isis {
   class Distance;
+  class PvlObject;
 
   /**
    * @brief This displays a box with a given distance from a point
@@ -19,6 +20,9 @@ namespace Isis {
    *
    * @internal
    *   @history 2011-09-27 Steven Lambright - Improved user documentation
+   *   @history 2012-04-16 Jeannie Backer - Added forward declaration for
+   *                           PvlObject. Added #include for PvlKeyword and
+   *                           PvlObject classes in implementation file.
    */
   class MosaicAreaTool : public MosaicTool {
       Q_OBJECT

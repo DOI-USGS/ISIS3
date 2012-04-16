@@ -23,6 +23,8 @@ namespace Isis {
    *   @history 2011-05-07 Steven Lambright - Refactored along with all of
    *                       'qmos'
    *   @history 2011-05-11 Steven Lambright - Added project settings
+   *   @history 2012-04-16 Jeannie Backer - Added #include for PvlObject class
+   *                           in implementation file.
    */
   class MosaicGridTool : public MosaicTool {
       Q_OBJECT

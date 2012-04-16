@@ -10,6 +10,7 @@ class QLineEdit;
 class QToolButton;
 
 namespace Isis {
+  class PvlObject;
   /**
    * @brief This controls the 'Find' abilities in the MosaicSceneWidget 
    *
@@ -22,6 +23,8 @@ namespace Isis {
    *                       'qmos'
    *   @history 2011-05-11 Steven Lambright - Added project settings
    *   @history 2011-09-27 Steven Lambright - Improved user documentation
+   *   @history 2012-04-16 Jeannie Backer - Added forward declaration for
+   *                           PvlObject.
    */
   class MosaicFindTool : public MosaicTool {
       Q_OBJECT
