@@ -1,5 +1,3 @@
-#ifndef hiLab_cpp
-#define hiLab_cpp
 /**
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are public
@@ -23,35 +21,33 @@
 #include "IException.h"
 
 using namespace std;
-using namespace Isis;
 
-//! Constructs a HiLab Object
-HiLab::HiLab(Cube *cube) {
-  PvlGroup group = cube->getGroup("Instrument");
-  p_cpmmNumber = group["CpmmNumber"];
-  p_channel = group["ChannelNumber"];
-
-  if(group.HasKeyword("Summing")) {
-    p_bin = group["Summing"];
+namespace Isis {
+  //! Constructs a HiLab Object
+  HiLab::HiLab(Cube *cube) {
+    PvlGroup group = cube->getGroup("Instrument");
+    p_cpmmNumber = group["CpmmNumber"];
+    p_channel = group["ChannelNumber"];
+  
+    if(group.HasKeyword("Summing")) {
+      p_bin = group["Summing"];
+    }
+    else {
+      std::string msg = "Cannot find required Summing keyword in label";
+      throw IException(IException::Io, msg, _FILEINFO_);
+    }
+  
+    if(group.HasKeyword("Tdi")) {
+      p_tdi = group["Tdi"];
+    }
+    else {
+      std::string msg = "Cannot find required Tdi keyword in label";
+      throw IException(IException::Io, msg, _FILEINFO_);
+    }
   }
-  else {
-    std::string msg = "Cannot find required Summing keyword in label";
-    throw IException(IException::Io, msg, _FILEINFO_);
+  //! Returns the ccd from a lookup table based on the cpmm number
+  int HiLab::getCcd() {
+    const int cpmm2ccd[] = {0, 1, 2, 3, 12, 4, 10, 11, 5, 13, 6, 7, 8, 9};
+    return cpmm2ccd[p_cpmmNumber];
   }
-
-  if(group.HasKeyword("Tdi")) {
-    p_tdi = group["Tdi"];
-  }
-  else {
-    std::string msg = "Cannot find required Tdi keyword in label";
-    throw IException(IException::Io, msg, _FILEINFO_);
-  }
-
 }
-//! Returns the ccd from a lookup table based on the cpmm number
-int HiLab::getCcd() {
-  const int cpmm2ccd[] = {0, 1, 2, 3, 12, 4, 10, 11, 5, 13, 6, 7, 8, 9};
-  return cpmm2ccd[p_cpmmNumber];
-}
-
-#endif

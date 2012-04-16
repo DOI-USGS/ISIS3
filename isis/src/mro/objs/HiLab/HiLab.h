@@ -25,55 +25,58 @@
 #include "Cube.h"
 #include "Pvl.h"
 
-using namespace Isis;
-/**
- * @brief Process HiRise label
- *
- * This class retrieves label keyword values from an Isis3
- * HiRise cube file. This class receives a Cube object from
- * an opened HiRise cube file and has methods to return HiRise
- * specific keyword values from the label.
- *
- * @ingroup MarsReconnaissanceOrbiter
- *
- * @author 2005-06-29 unknown
- *
- * @internal
- *  @history 2005-06-29 unknown - Original Version
- *  @history 2006-08-17 Debbie A. Cook - Added members p_bin and p_tdi
- *                      along with methods to retrieve them and the ccd
- *  @history 2008-05-12 Steven Lambright - Removed references to CubeInfo
- */
-class HiLab {
-  public:
-    HiLab(Cube *cube);
-
-    //! Returns the cpmm number read from the labels of a hiris cube
-    int getCpmmNumber() {
-      return p_cpmmNumber;
-    };
-
-    //! Returns the channel read from the labels of a hirise cube
-    int getChannel() {
-      return p_channel;
-    };
-
-    //! Returns the bin read as Summing from the labels of a hirise cube
-    int getBin() {
-      return p_bin;
-    };
-
-    //! Returns the tdi read from the labels of a hirise cube
-    int getTdi() {
-      return p_tdi;
-    };
-
-    int getCcd();
-
-  private:
-    int p_cpmmNumber;
-    int p_channel;
-    int p_bin;
-    int p_tdi;
+namespace Isis {
+  /**
+   * @brief Process HiRise label
+   *
+   * This class retrieves label keyword values from an Isis3
+   * HiRise cube file. This class receives a Cube object from
+   * an opened HiRise cube file and has methods to return HiRise
+   * specific keyword values from the label.
+   *
+   * @ingroup MarsReconnaissanceOrbiter
+   *
+   * @author 2005-06-29 unknown
+   *
+   * @internal
+   *  @history 2005-06-29 unknown - Original Version
+   *  @history 2006-08-17 Debbie A. Cook - Added members p_bin and p_tdi
+   *                      along with methods to retrieve them and the ccd
+   *  @history 2008-05-12 Steven Lambright - Removed references to CubeInfo
+   *  @history 2012-04-16 Jeannie Walldren - Wrapped class
+   *                      inside Isis namespace.
+   */
+  class HiLab {
+    public:
+      HiLab(Cube *cube);
+  
+      //! Returns the cpmm number read from the labels of a hiris cube
+      int getCpmmNumber() {
+        return p_cpmmNumber;
+      };
+  
+      //! Returns the channel read from the labels of a hirise cube
+      int getChannel() {
+        return p_channel;
+      };
+  
+      //! Returns the bin read as Summing from the labels of a hirise cube
+      int getBin() {
+        return p_bin;
+      };
+  
+      //! Returns the tdi read from the labels of a hirise cube
+      int getTdi() {
+        return p_tdi;
+      };
+  
+      int getCcd();
+  
+    private:
+      int p_cpmmNumber;
+      int p_channel;
+      int p_bin;
+      int p_tdi;
+  };
 };
 #endif
