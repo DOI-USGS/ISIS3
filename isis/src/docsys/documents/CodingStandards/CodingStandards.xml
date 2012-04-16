@@ -109,7 +109,7 @@
             <font color="green"> 
             // The second and third lines are often indented to line up with the 
             // appropriate opening parenthesis. </font>
-            throw iException::Message(iException::Camera,
+            throw IException(IException::Unknown,
                                       "Camera missed planet or SPICE data off.",
                                       _FILEINFO_);
           </strong></pre>
@@ -477,12 +477,11 @@
         <p>
           <strong>**Note:</strong>  There are 3 existing classes in <strong>Isis 3
           </strong> that do not follow this convention.  The <strong>iString
-          </strong>, <strong>iException</strong> and <strong>iTime</strong> classes 
-          needed a prefix to distinguish them from the C++ system string, exception 
-          and time classes.  While these classes will not be changed at this time, 
-          in the event that similar classes are created, a capital letter 
-          <i>I</i> prefix should be used to remain consistent with the
-          rest of <strong>Isis 3</strong>.
+          </strong> and <strong>iTime</strong> classes needed a prefix to 
+          distinguish them from the C++ system string and time classes.  While 
+          these classes will not be changed at this time, in the event that 
+          similar classes are created, a capital letter <i>I</i> prefix should 
+          be used to remain consistent with the rest of <strong>Isis 3</strong>.
         </p>
         <p>
           For example:
@@ -825,7 +824,7 @@
           
             <font color="olive"><b>#include</b></font> "Constants.h"
             <font color="olive"><b>#include</b></font> "Displacement.h"
-            <font color="olive"><b>#include</b></font> "iException.h"
+            <font color="olive"><b>#include</b></font> "IException.h"
             <font color="olive"><b>#include</b></font> "Pvl.h"
             <font color="olive"><b>#include</b></font> "WorldMapper.h"
           
@@ -842,7 +841,7 @@
             <font color="olive"><b>#include</b></font> &lt;map&gt;
           
             <font color="olive"><b>#include</b></font> "Application.h"
-            <font color="olive"><b>#include</b></font> "iException.h"
+            <font color="olive"><b>#include</b></font> "IException.h"
             <font color="olive"><b>#include</b></font> "iString.h"
             <font color="olive"><b>#include</b></font> "Process.h"
             <font color="olive"><b>#include</b></font> "UserInterface.h"
@@ -1216,6 +1215,11 @@
     </change>
     <change name="Jeannie Backer" date="2012-02-23">
       Clarified the language for Member Function Names.  Fixed typos.
+    </change>
+    </change>
+    <change name="Jeannie Backer" date="2012-04-16">
+      Replaced references to iException with IException due to class name 
+      change.
     </change>
   </history>
 
