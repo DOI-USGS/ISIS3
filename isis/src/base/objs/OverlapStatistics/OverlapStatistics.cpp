@@ -21,16 +21,19 @@
  */
 
 #include "OverlapStatistics.h"
-#include "MultivariateStatistics.h"
-#include "Cube.h"
-#include "Filename.h"
-#include "Projection.h"
-#include "ProjectionFactory.h"
-#include "IException.h"
-#include "Brick.h"
-#include "Progress.h"
+
 #include <cfloat>
 #include <iomanip>
+
+#include "Brick.h"
+#include "Cube.h"
+#include "Filename.h"
+#include "IException.h"
+#include "MultivariateStatistics.h"
+#include "Progress.h"
+#include "Projection.h"
+#include "ProjectionFactory.h"
+#include "PvlObject.h"
 
 using namespace std;
 namespace Isis {

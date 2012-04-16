@@ -28,6 +28,7 @@
 #include "MultivariateStatistics.h"
 
 namespace Isis {
+  class PvlObject;
   /**
    * @brief Calculates statistics in the area of overlap between two projected cubes
    *
@@ -54,12 +55,15 @@ namespace Isis {
    *  @history 2007-08-27 Steven Koechle - removed space from standard deviation
    *                         keyword
    *  @history 2008-06-18 Steven Koechle - fixed Documentation Errors
-   *  @history 2009-03-12 Travis Addair - added tracking for
-   *           percent processed
+   *  @history 2009-03-12 Travis Addair - added tracking for percent processed
    *  @history 2009-06-24 Travis Addair - optimized statistic gathering, changed
-   *           PVL print-out for readability, and added functionality to allow the
-   *           user to specify a "sampling percent" when gathering statistics to
-   *           save processing time
+   *                          PVL print-out for readability, and added
+   *                          functionality to allow the user to specify a
+   *                          "sampling percent" when gathering statistics to save
+   *                          processing time
+   *  @history 2012-04-16 Jeannie Backer - Added forward declaration for
+   *                          PvlObject and ordered #includes in the
+   *                          implementation file.
    *
    */
 
@@ -74,7 +78,7 @@ namespace Isis {
        *
        * @param band The band number of the cubes to be checked for an overlap
        *
-       * @returns bool Returns true if the cubes overlap in the specified band,
+       * @return bool Returns true if the cubes overlap in the specified band,
        *               and false if they do not overlap
        */
       bool HasOverlap(int band) const {
@@ -248,21 +252,21 @@ namespace Isis {
 
 
     private:
-      int p_bands;               //!<Number of bands
-      double p_sampPercent;      //!<Percentage of lines sampled
-      Isis::Filename p_xFile;       //!<Filename of X cube
-      Isis::Filename p_yFile;       //!<Filename of Y cube
-      int p_sampRange;           //!<Sample range of overlap
-      int p_lineRange;           //!<Line range of overlap
-      int p_minSampX;            //!<Starting Sample of overlap in X cube
-      int p_maxSampX;            //!<Ending Sample of overlap in X cube
-      int p_minSampY;            //!<Starting Sample of overlap in Y cube
-      int p_maxSampY;            //!<Ending Sample of overlap in Y cube
-      int p_minLineX;            //!<Starting Line of overlap in X cube
-      int p_maxLineX;            //!<Ending Line of overlap in X cube
-      int p_minLineY;            //!<Starting Line of overlap in Y cube
-      int p_maxLineY;            //!<Ending Line of overlap in Y cube
-      int p_mincnt;              //!<Minimum valid pixels to be valid overlap
+      int p_bands;               //!< Number of bands
+      double p_sampPercent;      //!< Percentage of lines sampled
+      Isis::Filename p_xFile;    //!< Filename of X cube
+      Isis::Filename p_yFile;    //!< Filename of Y cube
+      int p_sampRange;           //!< Sample range of overlap
+      int p_lineRange;           //!< Line range of overlap
+      int p_minSampX;            //!< Starting Sample of overlap in X cube
+      int p_maxSampX;            //!< Ending Sample of overlap in X cube
+      int p_minSampY;            //!< Starting Sample of overlap in Y cube
+      int p_maxSampY;            //!< Ending Sample of overlap in Y cube
+      int p_minLineX;            //!< Starting Line of overlap in X cube
+      int p_maxLineX;            //!< Ending Line of overlap in X cube
+      int p_minLineY;            //!< Starting Line of overlap in Y cube
+      int p_maxLineY;            //!< Ending Line of overlap in Y cube
+      int p_mincnt;              //!< Minimum valid pixels to be valid overlap
 
       //!Multivariate Stats object for overlap data from both cubes
       std::vector<Isis::MultivariateStatistics> p_stats;
