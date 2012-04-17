@@ -176,7 +176,7 @@ namespace Isis {
 
       void CheckVersion() const;
 
-      QString ReplacePattern(QString name, QString version);
+      QString ReplacePattern(QString name, QString version, bool pad=true);
 
       QString PadFront(QString string, QString padding, int minLength);
 

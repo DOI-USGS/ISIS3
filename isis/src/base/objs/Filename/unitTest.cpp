@@ -358,6 +358,11 @@ int main(int argc, char *argv[]) {
     ProgramLauncher::RunSystemCommand("rm junk06.tmp");
     ProgramLauncher::RunSystemCommand("rm junk09.tmp");
 
+    // Test Highest Version for file with less digits than question marks in its
+    // pattern
+    ProgramLauncher::RunSystemCommand("touch mk00062b.tmp");
+    TestHighestVersion("mk??????b.tmp");
+    remove("mk00062b.tmp");
 
     // Test Highest Version for date versioned files
     ProgramLauncher::RunSystemCommand("touch tttt05Sep2002.tmp");

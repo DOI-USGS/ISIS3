@@ -314,7 +314,7 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    QString name = ReplacePattern(Name().ToQt(), highestVersion);
+    QString name = ReplacePattern(Name().ToQt(), highestVersion, false);
     string temp = Path() + "/" + name.toStdString();
     QFileInfo::setFile(temp.c_str());
   }
@@ -323,11 +323,11 @@ namespace Isis {
   /**
    * Replace the numeric '?' pattern with the given version number.
    */
-  QString Filename::ReplacePattern(QString name, QString version) {
+  QString Filename::ReplacePattern(QString name, QString version, bool pad) {
     // Pad each extra '?' with a '0'. This maintains the length of the filename
     // so that "file.???.ext" will be "file.001.ext" instead of "file.1.ext".
     int minLength = name.lastIndexOf("?") - name.indexOf("?") + 1;
-    version = PadFront(version, "0", minLength);
+    if (pad) version = PadFront(version, "0", minLength);
 
     return name.replace(QRegExp("\\?+"), version);
   }

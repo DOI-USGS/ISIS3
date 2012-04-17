@@ -165,6 +165,9 @@ No version available for ??tttt
 Testing HighestVersion to expand 1 "?" into 2 digits
 junk09.tmp
 
+Testing HighestVersion for file mk??????b.tmp
+  mk00062b.tmp
+
 Testing HighestVersion for file tttt{ddMMMyyyy}.tmp
   tttt14Apr2010.tmp
 
