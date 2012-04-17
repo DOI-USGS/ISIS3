@@ -1216,7 +1216,6 @@
     <change name="Jeannie Backer" date="2012-02-23">
       Clarified the language for Member Function Names.  Fixed typos.
     </change>
-    </change>
     <change name="Jeannie Backer" date="2012-04-16">
       Replaced references to iException with IException due to class name 
       change.
