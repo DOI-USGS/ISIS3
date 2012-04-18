@@ -2,6 +2,8 @@
 
 #include <algorithm>
 
+#include <QMap>
+
 #include "ControlMeasure.h"
 #include "ControlNet.h"
 #include "ControlPoint.h"
@@ -60,6 +62,8 @@ bool overwriteMissing;
 bool report;
 bool mergePoints;
 
+string logName;
+
 
 void IsisMain() {
   // Get user parameters
@@ -104,6 +108,7 @@ void IsisMain() {
   // objects, but it's already memory and computationally cheap as is
   PvlObject conflictLog("Conflicts");
   report = ui.WasEntered("LOG");
+  logName = report ? ui.GetFilename("LOG") : "";
 
   // Determine whether the user wants to allow merging duplicate points or
   // throw an error
@@ -116,7 +121,7 @@ void IsisMain() {
   if (report) {
     Pvl outPvl;
     outPvl.AddObject(conflictLog);
-    outPvl.Write(ui.GetFilename("LOG"));
+    outPvl.Write(logName);
   }
 
   // Writes out the final Control Net
@@ -128,6 +133,56 @@ void IsisMain() {
 
 ControlNet * mergeNetworks(FileList &filelist, PvlObject &conflictLog,
     iString networkId, iString description) {
+
+  if (!mergePoints) {
+    bool hasDuplicates = false;
+    PvlObject errors("Errors");
+
+    QMap<QString, QString> pointSources;
+    for (unsigned int n = 0; n < filelist.size(); n++) {
+      Filename cnetName(filelist[n]);
+      ControlNet network(cnetName.Expanded());
+
+      for (int p = 0; p < network.GetNumPoints(); p++) {
+        ControlPoint *point = network.GetPoint(p);
+        if (pointSources.contains(point->GetId())) {
+          hasDuplicates = true;
+
+          if (report) {
+            PvlObject duplicate("Duplicate");
+            duplicate.AddKeyword(PvlKeyword("PointId", point->GetId()));
+            duplicate.AddKeyword(PvlKeyword(
+                  "SourceNetwork", pointSources[point->GetId()].toStdString()));
+            duplicate.AddKeyword(PvlKeyword("AddNetwork", cnetName.Name()));
+            errors.AddObject(duplicate);
+          }
+          else {
+            // User has disallowed merging points, so throw an error
+            string msg = "Add network [" + cnetName.Name() + "] contains "
+              "Control Point with ID [" + point->GetId() + "] already "
+              "contained within source network [" +
+              pointSources[point->GetId()].toStdString() + "].  "
+              "Set DUPLICATEPOINTS=MERGE to merge conflicting Control Points";
+            throw IException(IException::User, msg, _FILEINFO_);
+          }
+        }
+        else {
+          pointSources.insert(point->GetId(), cnetName.Name());
+        }
+      }
+    }
+
+    if (hasDuplicates && report) {
+      Pvl outPvl;
+      outPvl.AddObject(errors);
+      outPvl.Write(logName);
+
+      string msg = "Networks contained duplicate points.  See log file [" +
+        logName + "] for details.  "
+        "Set DUPLICATEPOINTS=MERGE to merge conflicting Control Points";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+  }
 
   // Creates a Progress bar for the entire merging process
   Progress progress;
@@ -178,24 +233,13 @@ void mergeNetwork(ControlNet &baseNet, ControlNet &newNet, PvlObject &cnetLog) {
   for (int newIndex = 0; newIndex < newNet.GetNumPoints(); newIndex++) {
     ControlPoint *newPoint = newNet.GetPoint(newIndex);
     if (baseNet.ContainsPoint(newPoint->GetId())) {
-      // The base already has a point with the current ID, do we merge or throw
-      // an error?
-      if (mergePoints) {
-        // Merge the points together, the result will be a wholly new point that
-        // needs to be added to the network, and the old point in base removed
-        ControlPoint *basePoint = baseNet.GetPoint(QString(newPoint->GetId()));
-        ControlPoint *outPoint = mergePoint(basePoint, newPoint, cnetLog);
-        baseNet.DeletePoint(basePoint);
-        baseNet.AddPoint(outPoint);
-      }
-      else {
-        // User has disallowed merging points, so throw an error
-        string msg = "New network [" + newNet.GetNetworkId() + "] contains ";
-        msg += "Control Point with ID [" + newPoint->GetId() + "] already ";
-        msg += "contained within the base network.  ";
-        msg += "Set DUPLICATEPOINTS=MERGE to merge conflicting Control Points";
-        throw IException(IException::User, msg, _FILEINFO_);
-      }
+      // The base already has a point with the current ID.  Merge the points
+      // together, the result will be a wholly new point that needs to be added
+      // to the network, and the old point in base removed.
+      ControlPoint *basePoint = baseNet.GetPoint(QString(newPoint->GetId()));
+      ControlPoint *outPoint = mergePoint(basePoint, newPoint, cnetLog);
+      baseNet.DeletePoint(basePoint);
+      baseNet.AddPoint(outPoint);
     }
     else {
       // This point does not exist in the base network yet, so go ahead and add

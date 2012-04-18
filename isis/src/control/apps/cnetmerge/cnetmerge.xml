@@ -119,6 +119,13 @@
       Rewrote large sections of the documentation to make more clear,
       accessible, and user-friendly.
     </change>
+    <change name="Travis Addair" date="2012-04-17">
+      Moved duplicate point check for DUPLICATEPOINTS=ERROR to occur before
+      merging is attempted.  In this way, errors can be caught before expensive
+      merging begins.  Also enabled logging of duplicate points.  If the user
+      specifies a LOG file with DUPLICATEPOINTS=ERROR, all duplicate points will
+      be reported to that file before the program terminates.
+    </change>
   </history> 
 
   <category>
@@ -315,7 +322,6 @@
               if nothing else is different between them.
             </description>
             <exclusions>
-              <item>LOG</item>
               <item>OVERWRITEPOINTS</item>
               <item>OVERWRITEMEASURES</item>
               <item>OVERWRITEREFERENCE</item>
