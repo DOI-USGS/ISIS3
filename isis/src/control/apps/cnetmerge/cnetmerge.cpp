@@ -92,6 +92,11 @@ void IsisMain() {
       // output first
       filelist.insert(filelist.begin(), baseName);
     }
+    else {
+      // So there is a record of which file was used as the BASE in the print
+      // file
+      ui.PutFilename("BASE", filelist[0]);
+    }
 
     // Check after taking into account an explicit base network if we have at
     // least two networks to merge
