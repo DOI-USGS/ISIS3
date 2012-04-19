@@ -119,9 +119,9 @@
         </font></a></p>
         <h3> <a name="lineLength">Line Length</a> </h3>
         <p>
-          Lines of code should not exceed 80 characters unless they can not be 
+          Lines of code should not exceed 100 characters unless they can not be 
           wrapped.  This may be difficult in a few cases, however there are little 
-          if any cases in which the 80 character limit must be broken.  For function
+          if any cases in which the 100 character limit must be broken.  For function
           implementation, lines may be broken between the return type and class name
           scope or between input parameters as shown below.
         </p> 
@@ -1219,6 +1219,9 @@
     <change name="Jeannie Backer" date="2012-04-16">
       Replaced references to iException with IException due to class name 
       change.
+    </change>
+    <change name="Jeannie Backer" date="2012-04-19">
+      Changed line length limit from 80 to 100 columns.
     </change>
   </history>
 
