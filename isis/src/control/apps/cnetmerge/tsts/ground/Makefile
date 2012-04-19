@@ -4,7 +4,7 @@ include $(ISISROOT)/make/isismake.tsts
 
 commands:
 	$(APPNAME) INPUTTYPE=cnets \
-	CNET=$(INPUT)/testNetGround.ctl \
+	BASE=$(INPUT)/testNetGround.ctl \
 	CNET2=$(INPUT)/testNetReferences.ctl \
 	ONET=$(OUTPUT)/testGround.net \
 	LOG=$(OUTPUT)/groundReport.txt \
@@ -12,7 +12,7 @@ commands:
 	NETWORKID=testReplaceMerge DESCRIPTION=NewTextCtl \
 	> /dev/null;
 	$(APPNAME) INPUTTYPE=cnets \
-	CNET=$(INPUT)/testNetReferences.ctl \
+	BASE=$(INPUT)/testNetReferences.ctl \
 	CNET2=$(INPUT)/testNetGround.ctl \
 	ONET=$(OUTPUT)/testReferences.net \
 	LOG=$(OUTPUT)/referenceReport.txt \

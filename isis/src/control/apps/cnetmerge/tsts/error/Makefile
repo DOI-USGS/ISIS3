@@ -20,4 +20,10 @@ commands:
 	NETWORKID=testErrorMergeNoLog DESCRIPTION=NewTextCtl \
 	2> $(OUTPUT)/error2.txt > /dev/null;
 
+	$(APPNAME) INPUTTYPE=cnets \
+	CNET2=$(INPUT)/testNet1.ctl \
+	ONET=$(OUTPUT)/nobase.net \
+	NETWORKID=testErrorMergeNoBase DESCRIPTION=NewTextCtl \
+	2> $(OUTPUT)/error3.txt > /dev/null;
+
 	$(RM) $(OUTPUT)/list.lis;

@@ -71,19 +71,41 @@ void IsisMain() {
   FileList filelist;
   if (ui.GetString("INPUTTYPE") == "LIST") {
     filelist = ui.GetFilename("CLIST");
-    if (filelist.size() < 2) {
-      string msg = "CLIST [" + ui.GetFilename("CLIST") + "] must contain at "
-          "least two filenames: a base network and a new network";
-      throw IException(IException::User, msg, _FILEINFO_);
+
+    if (ui.WasEntered("BASE")) {
+      // User has chosen an explicit base network
+      string baseName = ui.GetFilename("BASE");
+      Filename baseFilename(baseName);
+
+      // Remove the base network from the list if it is present
+      for (unsigned int i = 0; i < filelist.size(); i++) {
+        if (Filename(filelist[i]).Expanded() == baseFilename.Expanded()) {
+          // Filenames match, so erase it and move on.  We assume it only
+          // appears once.  There are currently no checks for duplicate
+          // networks.
+          filelist.erase(filelist.begin() + i);
+          break;
+        }
+      }
+
+      // Add the explicit base network to the front so it gets added to the
+      // output first
+      filelist.insert(filelist.begin(), baseName);
     }
 
-    if (ui.GetBoolean("REVERSE")) {
-      std::reverse(filelist.begin(), filelist.end());
+    // Check after taking into account an explicit base network if we have at
+    // least two networks to merge
+    if (filelist.size() < 2) {
+      string msg = "CLIST [" + ui.GetFilename("CLIST") + "] and BASE [" +
+        (ui.WasEntered("BASE") ? ui.GetFilename("BASE") : "Automatic") +
+        "] must total to at least two distinct filenames: "
+        "a base network and a new network";
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
   else if (ui.GetString("INPUTTYPE") == "CNETS") {
     // Treat simple case in general way, as a two-cnet list
-    filelist.push_back(ui.GetFilename("CNET"));
+    filelist.push_back(ui.GetFilename("BASE"));
     filelist.push_back(ui.GetFilename("CNET2"));
   }
 
@@ -178,7 +200,7 @@ ControlNet * mergeNetworks(FileList &filelist, PvlObject &conflictLog,
       outPvl.Write(logName);
 
       string msg = "Networks contained duplicate points.  See log file [" +
-        logName + "] for details.  "
+        Filename(logName).Name() + "] for details.  "
         "Set DUPLICATEPOINTS=MERGE to merge conflicting Control Points";
       throw IException(IException::User, msg, _FILEINFO_);
     }

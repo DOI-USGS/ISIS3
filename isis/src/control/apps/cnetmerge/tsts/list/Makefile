@@ -13,12 +13,12 @@ commands:
 	> /dev/null;
 
 	$(APPNAME) INPUTTYPE=list \
-	REVERSE=true \
+	BASE=$(INPUT)/testNet2.ctl \
 	CLIST=$(OUTPUT)/list.lis \
-	ONET=$(OUTPUT)/testReplaceReverse.net \
+	ONET=$(OUTPUT)/testReplaceExplicit.net \
 	DUPLICATEPOINTS=merge \
-	LOG=$(OUTPUT)/reportReverse.txt \
-	NETWORKID=testReplaceMerge DESCRIPTION=NewTextCtl \
+	LOG=$(OUTPUT)/reportExplicit.txt \
+	NETWORKID=testReplaceMergeExplicit DESCRIPTION=NewTextCtl \
 	> /dev/null;
 
 	$(RM) $(OUTPUT)/list.lis;

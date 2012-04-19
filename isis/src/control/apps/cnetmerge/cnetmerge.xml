@@ -126,6 +126,15 @@
       specifies a LOG file with DUPLICATEPOINTS=ERROR, all duplicate points will
       be reported to that file before the program terminates.
     </change>
+    <change name="Travis Addair" date="2011-04-18">
+      Removed the REVERSE option and changed the CNET parameter to BASE.  When
+      INPUTTYPE=CNETS, BASE will act exactly as CNET did.  However, when
+      INPUTTYPE=LIST, the BASE parameter can now be provided in order to set an
+      explicit base network, effectively adding it to the front of the input
+      list.  If the explicit base network also appears in the input list, it
+      will be ignored there to avoid adding it twice.  If not value is provided
+      for BASE, the first element in the list is considered the base network.
+    </change>
   </history> 
 
   <category>
@@ -147,17 +156,25 @@
           <option value = "LIST">
             <brief>Merge a list of networks</brief>
             <description>
-              This option will have the program retrieve its input from a list
-              of Control Networks (one per line), and merge them one by one.
-              The first network in the list acts as the initial "base" network
-              into which each successive network is "added".  The last network
-              in the file is the last network to be added to the network, and
-              thus will have either highest or lowest priority in certain
-              conflict resolutions depending on the option(s) specified in the
-              "Conflict Resolution" parameter group.
+              <p>
+                This option will have the program retrieve its input from a list
+                of Control Networks (one per line), and merge them one by one.
+                The first network in the list acts as the initial "base" network
+                into which each successive network is "added".  The last network
+                in the file is the last network to be added to the network, and
+                thus will have either highest or lowest priority in certain
+                conflict resolutions depending on the option(s) specified in the
+                "Conflict Resolution" parameter group.
+              </p>
+              <p>
+                If a value is provided for the BASE parameter, then that network
+                will become the new, explicit base.  This will effectively place
+                the explicit base at the front of the input list.  If the
+                explicit base appears elsewhere in the list, it will be ignored
+                there to avoid adding it to the output twice.
+              </p>
             </description>
             <exclusions>
-              <item>CNET</item>
               <item>CNET2</item>
             </exclusions>
           </option>
@@ -165,29 +182,18 @@
             <brief>Merge a pair of networks</brief>
             <description>
               Selecting this option is like providing a list of networks to be
-              merged with only two networks.  The first network (CNET) will
+              merged with only two networks.  The first network (BASE) will
               act as the base network, and the second network (CNET2) will act
               as the network being "added".
             </description>
+            <inclusions>
+              <item>BASE</item>
+            </inclusions>
             <exclusions>
-              <item>REVERSE</item>
               <item>CLIST</item>
             </exclusions>
           </option>
         </list>
-      </parameter>
-
-      <parameter name="REVERSE">
-        <type>boolean</type>
-        <default><item>False</item></default>
-        <brief>Reverse the order of CLIST, making last network the base</brief>
-        <description>
-          By default, the first network in CLIST will be the base network, and
-          each network below it will be added to it in descending order.  When
-          this option is SELECTED, the input CLIST will be reversed, making the
-          last item in the list the base network, and the second-to-last item
-          the first to be added, etc.
-        </description>
       </parameter>
 
       <parameter name = "CLIST">
@@ -197,28 +203,49 @@
           List of Control Networks to be merged
         </brief>
         <description>
-          Starting from the first network in the list as the "base", the
-          program will "add" each following network in the order specified by
-          this list to produce the output.  When conflicts arise, they are
-          resolved in accordance with the options in the "Conflict Resolution"
-          group.
+          <p>
+            Starting from the first network in the list as the "base", the
+            program will "add" each following network in the order specified by
+            this list to produce the output.  When conflicts arise, they are
+            resolved in accordance with the options in the "Conflict Resolution"
+            group.
+          </p>
+          <p>
+            If a value is provided for the BASE parameter, then that network
+            will effectively be added to the front of this list, becoming the
+            new base network into which all the networks in this list are added.
+            If the BASE filename also appears elsewhere in this list, it will be
+            ignored in the list to avoid adding it twice.
+          </p>
         </description>
         <filter>
           *.txt *.lis *.list *.lst
         </filter>
       </parameter>
 
-      <parameter name="CNET">
+      <parameter name="BASE">
         <type>filename</type>
         <fileMode>input</fileMode>
+        <internalDefault>Automatic</internalDefault>
         <brief>
           "Base" Control Network
         </brief>
         <description>
-          The "base" Control Network into which the second control network
-          will be "added".  When no overwrite option(s) from the "Conflict
-          Resolution" group are selected, any conflicts will be resolved
-          by retaining the values from this network.
+          <p>
+            The "base" Control Network into which all other control networks
+            will be "added".  When no overwrite option(s) from the "Conflict
+            Resolution" group are selected, any conflicts will be resolved by
+            retaining the values from this network.
+          </p>
+          <p>
+            This parameter is required for the INPUTTYPE of CNETS, and is
+            optional for LIST.  When INPUTTYPE=LIST and an explicit BASE is
+            provided, the value of this parameter will act as the first network
+            in the list, making it the base network into which all other
+            networks are added.  If a network with the same filename appears in
+            the input list, it will be ignored in the list to avoid adding it
+            twice.
+          </p>
         </description>
         <filter>
           *.ctl *.pvl *.net
