@@ -6,6 +6,7 @@
 #include <ctime>
 
 #include <QList>
+#include <QSet>
 #include <QString>
 
 #include "ControlCubeGraphNode.h"
@@ -22,6 +23,185 @@
 using namespace std;
 using namespace Isis;
 
+
+bool lessThan(const ControlMeasure *m1, const ControlMeasure *m2) {
+  return m1->GetResidualMagnitude() < m2->GetResidualMagnitude();
+}
+
+
+void printMeasures(QList< ControlMeasure * > measures,
+    QMap< ControlMeasure *, QString > measureNames) {
+
+  for (int i = 0; i < measures.size(); i++) {
+    cout << "      " << measureNames[measures[i]].toStdString() <<
+      " (" << measures[i]->GetCubeSerialNumber() << " -> " <<
+      measures[i]->Parent()->GetId() << ", residual = " <<
+      measures[i]->GetResidualMagnitude() << ")" << endl;
+  }
+}
+
+
+void testConnectivity() {
+  ControlNet net;
+
+  ControlPoint *p1 = new ControlPoint("p1");
+  ControlPoint *p2 = new ControlPoint("p2");
+  ControlPoint *p3 = new ControlPoint("p3");
+  ControlPoint *p4 = new ControlPoint("p4");
+  ControlPoint *p5 = new ControlPoint("p5");
+
+  QMap< ControlMeasure *, QString > measureNames;
+
+  // m1 will act as a normal "good" edge, one of the first to add to the MST,
+  // and the best route to ALPHA
+  ControlMeasure *m1 = new ControlMeasure;
+  m1->SetCubeSerialNumber("ALPHA");
+  m1->SetResidual(1, 1);
+  measureNames.insert(m1, "m1");
+
+  // m2 will be a required edge, the only way to get to BETA
+  ControlMeasure *m2 = new ControlMeasure;
+  m2->SetCubeSerialNumber("BETA");
+  m2->SetResidual(2, 2);
+  measureNames.insert(m2, "m2");
+
+  // m3 is not the best edge coming off GAMMA, but is part of the shortest
+  // sub-path, so it will be added
+  ControlMeasure *m3 = new ControlMeasure;
+  m3->SetCubeSerialNumber("GAMMA");
+  m3->SetResidual(3, 3);
+  measureNames.insert(m3, "m3");
+
+  // m4 looks like a good edge to add, but because m5 is so bad, we don't want
+  // it in the final MST; it will be pruned out of the MST because m5 will never
+  // be added
+  ControlMeasure *m4 = new ControlMeasure;
+  m4->SetCubeSerialNumber("GAMMA");
+  m4->SetResidual(1, 1);
+  measureNames.insert(m4, "m4");
+
+  // A classic "bad" edge we definetly don't want in the MST if we can avoid it,
+  // and luckily we can
+  ControlMeasure *m5 = new ControlMeasure;
+  m5->SetCubeSerialNumber("DELTA");
+  m5->SetResidual(8, 8);
+  measureNames.insert(m5, "m5");
+
+  // This edge is pretty good, forms a path to DELTA from ALPHA that, with m7,
+  // is shorter than the path from GAMMA to DELTA by m4 and m5
+  ControlMeasure *m6 = new ControlMeasure;
+  m6->SetCubeSerialNumber("DELTA");
+  m6->SetResidual(3, 3);
+  measureNames.insert(m6, "m6");
+
+  // Not a great edge, an example where an edge would not normally be added if
+  // alone, but together with another edge forms the best path to a node
+  ControlMeasure *m7 = new ControlMeasure;
+  m7->SetCubeSerialNumber("ALPHA");
+  m7->SetResidual(4, 4);
+  measureNames.insert(m7, "m7");
+
+  // A measure living on a point that only connects to one image; this will be
+  // pruned
+  ControlMeasure *m8 = new ControlMeasure;
+  m8->SetCubeSerialNumber("ALPHA");
+  m8->SetResidual(1, 1);
+  measureNames.insert(m8, "m8");
+
+  // The only measure in the second island, this is used to illustrate how a
+  // single node island produces an empty MST
+  ControlMeasure *m9 = new ControlMeasure;
+  m9->SetCubeSerialNumber("EPSILON");
+  m9->SetResidual(1, 1);
+  measureNames.insert(m9, "m9");
+
+  p1->Add(m1);
+  p1->Add(m2);
+  p1->Add(m3);
+
+  p2->Add(m4);
+  p2->Add(m5);
+
+  p3->Add(m6);
+  p3->Add(m7);
+
+  p4->Add(m8);
+
+  p5->Add(m9);
+
+  net.AddPoint(p1);
+  net.AddPoint(p2);
+  net.AddPoint(p3);
+  net.AddPoint(p4);
+  net.AddPoint(p5);
+
+  cout << "\nTesting GetNodeConnections()\n";
+  QList< QList< ControlCubeGraphNode * > > islands = net.GetNodeConnections();
+  if (islands[0].contains(m9->ControlSN())) islands.swap(0, 1);
+  cout << "  " << "Island Count = " << islands.size() << endl;
+
+  cout << "\nTesting MinimumSpanningTree()\n";
+  QList< QSet< ControlMeasure * > > spanningTrees;
+  int nodeCount = 0;
+  for (int i = 0; i < islands.size(); i++) {
+    spanningTrees.append(net.MinimumSpanningTree(islands[i], lessThan));
+    nodeCount += islands[i].size();
+  }
+
+  cout << "  " << "Tree Count = " << spanningTrees.size() << endl;
+  cout << "  " << "Graph Node Count = " << nodeCount << endl;
+
+  QList< QMap< QString, ControlMeasure * > > includedMaps;
+  QList< QMap< QString, ControlMeasure * > > excludedMaps;
+  for (int i = 0; i < spanningTrees.size(); i++) {
+    includedMaps.append(QMap< QString, ControlMeasure * >());
+    excludedMaps.append(QMap< QString, ControlMeasure * >());
+  }
+
+  int measureCount = 0;
+  for (int p = 0; p < net.GetNumPoints(); p++) {
+    ControlPoint *point = net.GetPoint(p);
+    for (int m = 0; m < point->GetNumMeasures(); m++) {
+      ControlMeasure *measure = point->GetMeasure(m);
+      measureCount++;
+      for (int i = 0; i < spanningTrees.size(); i++) {
+        if (islands[i].contains(measure->ControlSN())) {
+          if (spanningTrees[i].contains(measure))
+            includedMaps[i].insert(measureNames[measure], measure);
+          else
+            excludedMaps[i].insert(measureNames[measure], measure);
+        }
+      }
+    }
+  }
+  cout << "  " << "Measure Count = " << measureCount << endl;
+
+  int includedMeasures = 0;
+  for (int i = 0; i < spanningTrees.size(); i++) {
+    QSet< ControlMeasure * > measures = spanningTrees[i];
+    includedMeasures += measures.size();
+  }
+
+  if (islands.size() != spanningTrees.size()) {
+    cout << "  " << "Island Count == " << islands.size() << " != " <<
+      spanningTrees.size() << " == MST Count" << endl;
+  }
+  else {
+    cout << "  " << "Island Count == " << islands.size() <<
+      " == MST Count" << endl;
+
+    for (int i = 0; i < spanningTrees.size(); i++) {
+      cout << "\n  " << "Minimum Spanning Tree " << i << endl;
+
+      cout << "    " << "Nodes = " << islands[i].size() << endl;
+      cout << "    " << "Included Measures = " << includedMaps[i].size() << endl;
+      printMeasures(includedMaps[i].values(), measureNames);
+
+      cout << "    " << "Excluded Measures = " << excludedMaps[i].size() << endl;
+      printMeasures(excludedMaps[i].values(), measureNames);
+    }
+  }
+}
 
 
 int main() {
@@ -265,6 +445,7 @@ int main() {
   remove("temp2.bin");
 
   cout << "Testing GetCubeGraphNodes\n";
+
   QList< ControlCubeGraphNode * > graphnodes = net.GetCubeGraphNodes();
   foreach ( ControlCubeGraphNode * node, graphnodes ) {
     cout << "    " << node->getSerialNumber() << "\n";
@@ -274,6 +455,8 @@ int main() {
        << net.getGraphNode("ALPHA")->getSerialNumber() << "\n";
        
   cout << "\nTesting getEdgeCount: " << net.getEdgeCount() << "\n";
+
+  testConnectivity();
 
   //system("cat unitTest.output | grep -v DateTime > temp.output; mv temp.output unitTest.output");
   //system("cat unitTest.output | sed -r s/`date +%Y-%m-%dT`\\[0-9:\\]\\{8\\}/2010-08-27T17:10:06/g > temp.output; mv temp.output unitTest.output");

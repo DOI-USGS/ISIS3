@@ -524,7 +524,7 @@ namespace Isis {
       searchList.insert(nodes[i], false);
 
     // for storing nodes as they are found
-    QList< ControlCubeGraphNode * > results;
+    QSet< ControlCubeGraphNode * > results;
 
     QQueue< ControlCubeGraphNode * > q;
     q.enqueue(nodes[0]);
@@ -532,7 +532,7 @@ namespace Isis {
       ControlCubeGraphNode *curNode = q.dequeue();
       if (!results.contains(curNode)) {
         // add to results
-        results.append(curNode);
+        results.insert(curNode);
         searchList[curNode] = true;
 
         // add all the neighbors to the queue
@@ -543,7 +543,7 @@ namespace Isis {
       }
     } // end of breadth-first search
 
-    return results;
+    return results.values();
   }
 
 
@@ -889,6 +889,19 @@ namespace Isis {
     // or graph node data.  All of that is owned by the network.
     QList< ControlVertex * > vertexList = forest.values();
     for (int i = 0; i < vertexList.size(); i++) delete vertexList[i];
+
+    // Sanity check: an island with n nodes, by definition, must have an MST of
+    // e edges such that n <= e <= 2n
+    int n = island.size();
+    int e = minimumTree.size();
+    if (n > 1) {
+      if (e < n || e > 2 * n) {
+        iString msg = "The island of n = [" + iString(n) +
+          "] nodes must have a minimum spanning tree of e = [" + iString(e) +
+          "] edges such that n <= e <= 2n";
+        throw IException(IException::Programmer, msg, _FILEINFO_);
+      }
+    }
 
     return minimumTree;
   }

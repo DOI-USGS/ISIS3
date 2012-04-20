@@ -332,3 +332,31 @@ Testing GetCubeGraphNodes
 Testing getGraphNode: ALPHA
 
 Testing getEdgeCount: 2
+
+Testing GetNodeConnections()
+  Island Count = 2
+
+Testing MinimumSpanningTree()
+  Tree Count = 2
+  Graph Node Count = 5
+  Measure Count = 9
+  Island Count == 2 == MST Count
+
+  Minimum Spanning Tree 0
+    Nodes = 4
+    Included Measures = 5
+      m1 (ALPHA -> p1, residual = 1.41421)
+      m2 (BETA -> p1, residual = 2.82843)
+      m3 (GAMMA -> p1, residual = 4.24264)
+      m6 (DELTA -> p3, residual = 4.24264)
+      m7 (ALPHA -> p3, residual = 5.65685)
+    Excluded Measures = 3
+      m4 (GAMMA -> p2, residual = 1.41421)
+      m5 (DELTA -> p2, residual = 11.3137)
+      m8 (ALPHA -> p4, residual = 1.41421)
+
+  Minimum Spanning Tree 1
+    Nodes = 1
+    Included Measures = 0
+    Excluded Measures = 1
+      m9 (EPSILON -> p5, residual = 1.41421)
