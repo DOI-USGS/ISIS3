@@ -9,6 +9,7 @@
 #include <QtAlgorithms>
 #include <QPair>
 #include <QQueue>
+#include <QSet>
 #include <QTime>
 
 #include <boost/numeric/ublas/symmetric.hpp>
@@ -762,6 +763,124 @@ namespace Isis {
 
 
   /**
+   * This method uses Kruskal's Algorithm to construct a minimum spanning tree
+   * of the given island, where the weight of each edge is determined by the
+   * provided less-than comparison function.  In other words, if a Control
+   * Measure is less-than another, it is said to have a lower weight, and is
+   * thus more likely to appear in the minimum spanning tree.
+   *
+   * Minimum spanning trees are constructed on islands, not networks, so it is
+   * important that the caller first retrieve the list of islands in the network
+   * from the GetNodeConnections() method before invoking this method.  Creating
+   * a minimum spanning tree for an entire network with multiple islands would
+   * be impractical, as this method does not account for the possibility that
+   * some nodes are disconnected in the input.
+   *
+   * A common usage of the minimum spanning tree is to measure the importance of
+   * a given measure or point to the overall connectivity of a network.  If a
+   * measurement is not in the MST, we do not need to worry about creating
+   * additional islands by removing it.
+   *
+   * It is important that the user choose their less-than function carefully.
+   * If a poor less-than function is used, then "bad" measures could end up in
+   * the MST while "good" measures are excluded, thus giving the user the false
+   * impression that a good measure can be safely deleted, while a bad measure
+   * must be preserved.  The application "cnetwinnow", for example, tries to
+   * remove as many measures with high residuals as possible without increasing
+   * the island count of the network, so its less-than function compares the
+   * residual magnitude of the two input measures.
+   *
+   * @param island The list of graph nodes forming the island to be minimized
+   * @param lessThan A comparison function telling us if one measure is better
+   *                 than another
+   * 
+   * @return The set of all measures (edges) in the minimum spanning tree
+   */
+  QSet< ControlMeasure * > ControlNet::MinimumSpanningTree(
+      QList< ControlCubeGraphNode *> &island,
+      bool lessThan(const ControlMeasure *, const ControlMeasure *)) const {
+
+    // Kruskal's Algorithm
+    QSet< ControlMeasure * > minimumTree;
+
+    // We start with a map containing all the unconnected vertices (nodes and
+    // points), each its own single-element tree.  Our goal is join them all
+    // together into one tree connecting every vertex.  We map into the forest
+    // with point ID and serial number so the two types of vertices can share a
+    // common, nearly constant-time lookup interface.
+    QMap< QString, ControlVertex * > forest;
+
+    // Get a list of all the candidate edges on the island, and a set of their
+    // associated Control Points (to avoid duplication, as measures share common
+    // points)
+    QList< ControlMeasure * > edges;
+    QSet< ControlPoint * > uniquePoints;
+    for (int i = 0; i < island.size(); i++) {
+      // Add every graph node as a tree in the forest
+      ControlCubeGraphNode *node = island[i];
+      forest.insert(node->getSerialNumber(), new ControlVertex(node));
+
+      // Every graph node has a list of measures: these are our edges
+      QList< ControlMeasure * > measures = node->getMeasures();
+      for (int j = 0; j < measures.size(); j++) {
+        edges.append(measures[j]);
+
+        // Every measure has a point: these act as one of our endpoints
+        uniquePoints.insert(measures[j]->Parent());
+      }
+    }
+
+    // Sort the edges in increasing weight with the provided less-than function
+    qSort(edges.begin(), edges.end(), lessThan);
+
+    // Add every unique point on the island as a tree in the forest
+    QList< ControlPoint * > pointList = uniquePoints.values();
+    for (int i = 0; i < pointList.size(); i++) {
+      ControlPoint *point = pointList[i];
+      forest.insert(point->GetId(), new ControlVertex(point));
+    }
+
+    // Every time we join two trees together, we reduce the total number of
+    // trees by one, but our forest data structure is unchanged, so keep a
+    // record of the actual forest size to decrement manually as we go along
+    int trees = forest.size();
+
+    // Keep trying to join trees until there is only one tree remaining or we're
+    // out of edges to try
+    while (trees > 1 && edges.size() > 0) {
+      // Try to add our lowest-weighted edge to the minimum spanning tree
+      ControlMeasure *leastEdge = edges.takeFirst();
+
+      // Each edge connects two vertices: a point and a graph node.  So grab the
+      // trees for each node and check that they're disjoint, and thus able to
+      // be joined.
+      iString pointId = leastEdge->Parent()->GetId();
+      ControlVertex *endpoint1 = forest[pointId];
+
+      iString serialNum = leastEdge->ControlSN()->getSerialNumber();
+      ControlVertex *endpoint2 = forest[serialNum];
+
+      // When the edge joins two different trees (i.e., they have different
+      // roots), then add the edge to the minimum spanning tree and join the
+      // trees into one.  Otherwise, we have formed a cycle and should thus
+      // discard the edge.
+      if (endpoint1->getRoot() != endpoint2->getRoot()) {
+        ControlVertex::join(endpoint1, endpoint2);
+        trees--;
+        minimumTree.insert(leastEdge);
+      }
+    }
+
+    // Clean up our vertices.  This will not delete any of the point, measure,
+    // or graph node data.  All of that is owned by the network.
+    QList< ControlVertex * > vertexList = forest.values();
+    for (int i = 0; i < vertexList.size(); i++) delete vertexList[i];
+
+    return minimumTree;
+  }
+
+
+  /**
    * @returns The total number of edges in the bi-directional graph for images
    */
   int ControlNet::getEdgeCount() const {
@@ -843,6 +962,74 @@ namespace Isis {
   QList< ControlMeasure * > ControlNet::GetMeasuresInCube(iString serialNumber) {
     ValidateSerialNumber(serialNumber);
     return (*cubeGraphNodes)[serialNumber]->getMeasures();
+  }
+
+
+  /**
+   * Copies the content of the a ControlMeasureLessThanFunctor
+   *
+   * @param other, reference to the other ControlMeasureLessThanFunctor
+   */
+  ControlNet::ControlMeasureLessThanFunctor & 
+    ControlNet::ControlMeasureLessThanFunctor::operator=(ControlMeasureLessThanFunctor const &other) {
+    
+    if (this != &other) {
+      this->m_accessor = other.m_accessor;
+    }
+
+    return *this;
+  }
+
+
+
+  /**
+   * The () operator for the Control Measure less than functor
+   * 
+   * @param a, ControlMeasure* pointer to the first control measure
+   * @param b, ControlMeasure* pointer to the sencond control measure
+   */
+  bool ControlNet::ControlMeasureLessThanFunctor::operator()
+    (ControlMeasure* const &a, ControlMeasure* const &b) {
+    
+    return (a->*this->m_accessor)() < (b->*this->m_accessor)();
+
+  }
+
+  /**
+   * Get a sorted list of all the measures that have values in a given ragen
+   *
+   * @param statFunc A pointer to a control Measure acessor
+   * @param min the minimum value of acessor return for list inclusion
+   * @param max the maximum value of acessor return for list inclusion
+   */
+  QList< ControlMeasure * > ControlNet::sortedMeasureList(double(ControlMeasure::*statFunc)() const,
+                                                          double min,double max) {
+
+    QList< ControlMeasure * >measures;
+
+    //build a list of all the pointers to the relevant measures
+      //get the number of object points
+    int nObjPts =  this->GetNumPoints();
+    for (int i=0;i<nObjPts;i++) { //for each Object point
+      ControlPoint *point = this->GetPoint(i);
+      if (point->IsIgnored()) continue;  //if the point is ignored then continue
+
+        //get the number of measures
+      int nObs = point->GetNumMeasures();
+      for (int j=0;j<nObs;j++) {  //for every measure
+        ControlMeasure *measure = point->GetMeasure(j);
+        if (measure->IsIgnored())  continue;
+        double temp = (measure->*statFunc)();
+        if (temp > min)
+        if (min <= temp && temp <= max) measures.push_back(measure);
+      }
+    }
+
+    //sort the measures
+    ControlMeasureLessThanFunctor lessThan(statFunc);
+    qSort(measures.begin(),measures.end(),lessThan);
+
+    return measures;
   }
 
 

@@ -34,6 +34,7 @@
 template< typename A, typename B > class QHash;
 template< typename T > class QList;
 template< typename A, typename B > class QPair;
+template< typename T > class QSet;
 class QString;
 
 
@@ -190,9 +191,14 @@ namespace Isis {
       QList< ControlCubeGraphNode * > GetCubeGraphNodes();
       QList< QList< QString > > GetSerialConnections() const;
       QList< QList< ControlCubeGraphNode * > > GetNodeConnections() const;
+      QSet< ControlMeasure * > MinimumSpanningTree(
+          QList< ControlCubeGraphNode *> &island,
+          bool lessThan(const ControlMeasure *, const ControlMeasure *)) const;
       int getEdgeCount() const;
       iString CubeGraphToString() const;
       QList< ControlMeasure * > GetMeasuresInCube(iString serialNumber);
+      QList< ControlMeasure * > sortedMeasureList(double(ControlMeasure::*statFunc)() const,
+                                                  double min,double max);
       void DeleteMeasuresWithId(iString serialNumber);
 
       void ComputeResiduals();
@@ -268,6 +274,84 @@ namespace Isis {
           ControlCubeGraphNode * > list) const;
       void Shuffle(QList< ControlCubeGraphNode * > & list) const;
       QPair< int, int > CalcBWAndCE(QList< QString > serials) const;
+
+
+    private:
+      class ControlMeasureLessThanFunctor :
+        public std::binary_function<ControlMeasure* const &,
+        ControlMeasure * const &, bool > {
+
+          public:
+            ControlMeasureLessThanFunctor(double(ControlMeasure::*accessorMethod)() const) {
+              m_accessor = accessorMethod;
+            }
+            ControlMeasureLessThanFunctor(ControlMeasureLessThanFunctor const &other) {
+              this->m_accessor = other.m_accessor;
+            }
+            ~ControlMeasureLessThanFunctor() {}
+
+            bool operator()(ControlMeasure* const &, ControlMeasure* const &);
+            ControlMeasureLessThanFunctor & operator=(ControlMeasureLessThanFunctor const &other); 
+
+          private:
+            double(ControlMeasure::*m_accessor)() const;
+        };
+
+
+      /**
+       * Encapsulation of a vertex in a minimum spanning tree.  Can be either a
+       * Control Point or a Graph Node.  Each vertex is connected to another by
+       * a measure.  A vertex without a parent vertex is considered a root node,
+       * or the base of its own tree.
+       */
+      class ControlVertex {
+        public:
+          //! Construct a vertex from a Graph Node
+          ControlVertex(ControlCubeGraphNode *node) {
+            m_node = node;
+            m_point = NULL;
+            m_parent = NULL;
+          }
+
+          //! Construct a vertex from a Control Point
+          ControlVertex(ControlPoint *point) {
+            m_point = point;
+            m_node = NULL;
+            m_parent = NULL;
+          }
+
+          //! Does not own any of its private data
+          ~ControlVertex() {}
+
+          //! Set the parent vertex, removing the root node status.
+          void setParent(ControlVertex *v) { m_parent = v; }
+
+          //! Get the root node, or greatest ancestor
+          ControlVertex * getRoot() {
+            ControlVertex *current = this;
+            while (current->getParent() != NULL)
+              current = current->getParent();
+            return current;
+          }
+
+          //! Get the parent node.  A root node has no parent.
+          ControlVertex * getParent() { return m_parent; }
+
+          //! Join two nodes by setting one root to be the other's parent
+          static void join(ControlVertex *v1, ControlVertex *v2) {
+            v1->getRoot()->setParent(v2->getRoot());
+          }
+
+        private:
+          //! The possibly non-existant graph node
+          ControlCubeGraphNode *m_node;
+
+          //! The possibly non-existant control point
+          ControlPoint *m_point;
+
+          //! The possibly non-existant parent vertex
+          ControlVertex *m_parent;
+      };
 
 
     private: // data
