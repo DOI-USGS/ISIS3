@@ -896,9 +896,9 @@ namespace Isis {
     int e = minimumTree.size();
     if (n > 1) {
       if (e < n || e > 2 * n) {
-        iString msg = "The island of n = [" + iString(n) +
-          "] nodes must have a minimum spanning tree of e = [" + iString(e) +
-          "] edges such that n <= e <= 2n";
+        iString msg = "An island of n = [" + iString(n) +
+          "] > 1 nodes must have a minimum spanning tree of e edges such that "
+          " n <= e <= 2n, but e = [" + iString(e) + "]";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
     }
