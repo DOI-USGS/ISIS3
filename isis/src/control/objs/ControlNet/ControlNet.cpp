@@ -764,10 +764,21 @@ namespace Isis {
 
   /**
    * This method uses Kruskal's Algorithm to construct a minimum spanning tree
-   * of the given island, where the weight of each edge is determined by the
-   * provided less-than comparison function.  In other words, if a Control
-   * Measure is less-than another, it is said to have a lower weight, and is
-   * thus more likely to appear in the minimum spanning tree.
+   * of the given island, with control measures acting as the edges between
+   * graph nodes.   Because measures do not directly connect graph nodes, but
+   * rather connect graph nodes to control points, points are considered
+   * "intermediate vertices".  When building the tree, we treat points like
+   * normal graph node vertices, but after the tree is built, we prune away any
+   * measures that, in conjunction with a point, form an "incomplete edge".
+   * Such an edge goes from a graph node to a point, but does not have another
+   * edge going from that point to another node.  Since the primary purpose of
+   * this tree is to evaluate image connectivity, such edges are unnecessary.
+   * A "complete edge" consists of two measures and a point, and connects two
+   * graph nodes, or images.
+   *
+   * The cost of each edge is determined by the provided less-than comparison
+   * function.  If a Control Measure is less-than another, it is said to have a
+   * lower cost, and is thus more likely to appear in the minimum spanning tree.
    *
    * Minimum spanning trees are constructed on islands, not networks, so it is
    * important that the caller first retrieve the list of islands in the network
@@ -813,12 +824,12 @@ namespace Isis {
     // Get a list of all the candidate edges on the island, and a set of their
     // associated Control Points (to avoid duplication, as measures share common
     // points).  Keep a count of how many measures in the MST are connected to
-    // each point, as we'll want to prunt off points with only one such
+    // each point, as we'll want to prune off points with only one such
     // conenction.
     QList< ControlMeasure * > edges;
     QMap< ControlPoint *, int > uniquePoints;
     for (int i = 0; i < island.size(); i++) {
-      // Add every graph node as a tree in the forest
+      // Add each graph node as a tree in the forest
       ControlCubeGraphNode *node = island[i];
       forest.insert(node->getSerialNumber(), new ControlVertex(node));
 
@@ -827,12 +838,16 @@ namespace Isis {
       for (int j = 0; j < measures.size(); j++) {
         edges.append(measures[j]);
 
-        // Every measure has a point: these act as one of our endpoints
+        // Every measure has a point: these act as intermediate vertices.  We
+        // keep a count of how many edges in the MST come off this point.
+        // Points with less than 2 edges are considered incomplete, as they do
+        // not form a connection from one graph node to another, or a "complete
+        // edge"
         uniquePoints.insert(measures[j]->Parent(), 0);
       }
     }
 
-    // Sort the edges in increasing weight with the provided less-than function
+    // Sort the edges in increasing cost with the provided less-than function
     qSort(edges.begin(), edges.end(), lessThan);
 
     // Add every unique point on the island as a tree in the forest
@@ -850,7 +865,7 @@ namespace Isis {
     // Keep trying to join trees until there is only one tree remaining or we're
     // out of edges to try
     while (trees > 1 && edges.size() > 0) {
-      // Try to add our lowest-weighted edge to the minimum spanning tree
+      // Try to add our lowest-cost edge to the minimum spanning tree
       ControlMeasure *leastEdge = edges.takeFirst();
 
       // Each edge connects two vertices: a point and a graph node.  So grab the
@@ -876,7 +891,8 @@ namespace Isis {
 
     // Prune edges that go from a graph node to a point, but not from that
     // point to another graph node.  We care about image (graph node)
-    // connectivity, not point connectivity.
+    // connectivity, not point connectivity.  A complete edge consists of two
+    // measures and a point, so remove any incomplete edges.
     QList< ControlMeasure * > unprunedEdges = minimumTree.values();
     for (int i = 0; i < unprunedEdges.size(); i++) {
       if (uniquePoints[unprunedEdges[i]->Parent()] < 2)
@@ -885,8 +901,8 @@ namespace Isis {
         minimumTree.remove(unprunedEdges[i]);
     }
 
-    // Clean up our vertices.  This will not delete any of the point, measure,
-    // or graph node data.  All of that is owned by the network.
+    // Clean up our vertices.  This will not delete any of the points, measures,
+    // or graph nodes.  All of that is owned by the network.
     QList< ControlVertex * > vertexList = forest.values();
     for (int i = 0; i < vertexList.size(); i++) delete vertexList[i];
 
