@@ -890,8 +890,8 @@ namespace Isis {
     QList< ControlVertex * > vertexList = forest.values();
     for (int i = 0; i < vertexList.size(); i++) delete vertexList[i];
 
-    // Sanity check: an island with n nodes, by definition, must have an MST of
-    // e edges such that n <= e <= 2n
+    // Sanity check: an island with n > 1 nodes must, by definition, have an MST
+    // of e edges such that n <= e <= 2n
     int n = island.size();
     int e = minimumTree.size();
     if (n > 1) {
