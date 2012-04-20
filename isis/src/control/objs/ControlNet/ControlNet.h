@@ -337,6 +337,12 @@ namespace Isis {
           //! Get the parent node.  A root node has no parent.
           ControlVertex * getParent() { return m_parent; }
 
+          //! Get the node representation of this vertex
+          ControlCubeGraphNode * getNode() { return m_node; }
+
+          //! Get the point representation of this vertex
+          ControlPoint * getPoint() { return m_point; }
+
           //! Join two nodes by setting one root to be the other's parent
           static void join(ControlVertex *v1, ControlVertex *v2) {
             v1->getRoot()->setParent(v2->getRoot());

@@ -812,9 +812,11 @@ namespace Isis {
 
     // Get a list of all the candidate edges on the island, and a set of their
     // associated Control Points (to avoid duplication, as measures share common
-    // points)
+    // points).  Keep a count of how many measures in the MST are connected to
+    // each point, as we'll want to prunt off points with only one such
+    // conenction.
     QList< ControlMeasure * > edges;
-    QSet< ControlPoint * > uniquePoints;
+    QMap< ControlPoint *, int > uniquePoints;
     for (int i = 0; i < island.size(); i++) {
       // Add every graph node as a tree in the forest
       ControlCubeGraphNode *node = island[i];
@@ -826,7 +828,7 @@ namespace Isis {
         edges.append(measures[j]);
 
         // Every measure has a point: these act as one of our endpoints
-        uniquePoints.insert(measures[j]->Parent());
+        uniquePoints.insert(measures[j]->Parent(), 0);
       }
     }
 
@@ -834,7 +836,7 @@ namespace Isis {
     qSort(edges.begin(), edges.end(), lessThan);
 
     // Add every unique point on the island as a tree in the forest
-    QList< ControlPoint * > pointList = uniquePoints.values();
+    QList< ControlPoint * > pointList = uniquePoints.keys();
     for (int i = 0; i < pointList.size(); i++) {
       ControlPoint *point = pointList[i];
       forest.insert(point->GetId(), new ControlVertex(point));
@@ -855,25 +857,33 @@ namespace Isis {
       // trees for each node and check that they're disjoint, and thus able to
       // be joined.
       iString pointId = leastEdge->Parent()->GetId();
-      ControlVertex *endpoint1 = forest[pointId];
+      ControlVertex *pointVertex = forest[pointId];
 
       iString serialNum = leastEdge->ControlSN()->getSerialNumber();
-      ControlVertex *endpoint2 = forest[serialNum];
+      ControlVertex *nodeVertex = forest[serialNum];
 
       // When the edge joins two different trees (i.e., they have different
       // roots), then add the edge to the minimum spanning tree and join the
       // trees into one.  Otherwise, we have formed a cycle and should thus
       // discard the edge.
-      if (endpoint1->getRoot() != endpoint2->getRoot()) {
-        ControlVertex::join(endpoint1, endpoint2);
+      if (pointVertex->getRoot() != nodeVertex->getRoot()) {
+        ControlVertex::join(pointVertex, nodeVertex);
         trees--;
         minimumTree.insert(leastEdge);
+        uniquePoints[pointVertex->getPoint()]++;
       }
     }
 
-    // TODO prune edges that go from a graph node to a point, but not from that
+    // Prune edges that go from a graph node to a point, but not from that
     // point to another graph node.  We care about image (graph node)
     // connectivity, not point connectivity.
+    QList< ControlMeasure * > unprunedEdges = minimumTree.values();
+    for (int i = 0; i < unprunedEdges.size(); i++) {
+      if (uniquePoints[unprunedEdges[i]->Parent()] < 2)
+        // The point this edge is connected to does not go on to another node,
+        // so prune it
+        minimumTree.remove(unprunedEdges[i]);
+    }
 
     // Clean up our vertices.  This will not delete any of the point, measure,
     // or graph node data.  All of that is owned by the network.
