@@ -12,7 +12,7 @@ commands:
 	  onet_prefix=$(OUTPUT)/outsplit?? \
 	  num_output_files=2 > /dev/null;
 	  cnetmerge inputtype=cnets \
-	  cnet=$(OUTPUT)/outsplit01.net \
+	  base=$(OUTPUT)/outsplit01.net \
 	  cnet2=$(OUTPUT)/outsplit02.net \
 	  networkid=autoseed \
 	  description=cnetsplit \
