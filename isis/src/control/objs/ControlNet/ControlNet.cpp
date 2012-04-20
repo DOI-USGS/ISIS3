@@ -871,6 +871,10 @@ namespace Isis {
       }
     }
 
+    // TODO prune edges that go from a graph node to a point, but not from that
+    // point to another graph node.  We care about image (graph node)
+    // connectivity, not point connectivity.
+
     // Clean up our vertices.  This will not delete any of the point, measure,
     // or graph node data.  All of that is owned by the network.
     QList< ControlVertex * > vertexList = forest.values();
